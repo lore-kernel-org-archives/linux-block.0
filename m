@@ -2,121 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D88D5C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 18:21:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62008C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 18:41:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239635AbiB1SWL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 13:22:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50564 "EHLO
+        id S240902AbiB1Sm2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 13:42:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240487AbiB1SWD (ORCPT
+        with ESMTP id S240699AbiB1SmV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 13:22:03 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A54489CE0
-        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 09:59:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646071174; x=1677607174;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7NBJjuEjWCCHJ62pzBKGkvafYbZAfTVrb4v4jYDW/1s=;
-  b=AaE3FwNqNo5xOa+bQZDPmKltqKz0BABKpWNzWBV+f5/Ym/qedy29vhA9
-   +sGIXGSf/ROYqENSbJeunccwndwCKuovIPifQ55KpCPSV80mPeK/d9Knf
-   UR7TA+zNQt4fCwYlfhE/dzYJFxwjjZIz0s6JAx6BhCRDoKT9xFzazz2gZ
-   3gzMNbPwDEF/MboyjNtAdT2VprILqp5S7chzmtIqw2haThj23CIALZcTQ
-   SQJxAjo0IMkoTLRJtAFX8Hj5Mn4/P0kCBcg006DoOSutXiCmeWX81mgHp
-   LYQ+PD+oe9NbJ7tdQLl7+RAXYoTqpaIZvzpkPmxZ3DZiADa8RyOFI0rqd
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="251778083"
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="251778083"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 09:58:18 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="534545174"
-Received: from lkp-server01.sh.intel.com (HELO 788b1cd46f0d) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 28 Feb 2022 09:58:16 -0800
-Received: from kbuild by 788b1cd46f0d with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nOkHn-0007eo-FW; Mon, 28 Feb 2022 17:58:15 +0000
-Date:   Tue, 1 Mar 2022 01:57:33 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH 6/6] blk-mq: manage hctx map via xarray
-Message-ID: <202203010133.JIpKpP2Z-lkp@intel.com>
-References: <20220228090430.1064267-7-ming.lei@redhat.com>
+        Mon, 28 Feb 2022 13:42:21 -0500
+X-Greylist: delayed 599 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 28 Feb 2022 10:36:57 PST
+Received: from relay4.hostedemail.com (relay4.hostedemail.com [64.99.140.36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 745EFD95;
+        Mon, 28 Feb 2022 10:36:57 -0800 (PST)
+Received: from omf09.hostedemail.com (a10.router.float.18 [10.200.18.1])
+        by unirelay11.hostedemail.com (Postfix) with ESMTP id 8480C81766;
+        Mon, 28 Feb 2022 18:20:49 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf09.hostedemail.com (Postfix) with ESMTPA id 5C4272002A;
+        Mon, 28 Feb 2022 18:20:29 +0000 (UTC)
+Message-ID: <0be9de3920442df490f01b6fb1c42521c3de6190.camel@perches.com>
+Subject: Re: [PATCH 1/6] drivers: usb: remove usage of list iterator past
+ the loop body
+From:   Joe Perches <joe@perches.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Arnd Bergman <arnd@arndb.de>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linuxppc-dev@lists.ozlabs.org, linux-sgx@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org,
+        dmaengine@vger.kernel.org, linux1394-devel@lists.sourceforge.net,
+        amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+        intel-gfx@lists.freedesktop.org, nouveau@lists.freedesktop.org,
+        linux-rdma@vger.kernel.org, linux-media@vger.kernel.org,
+        intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+        linux-wireless@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-usb@vger.kernel.org, linux-aspeed@lists.ozlabs.org,
+        bcm-kernel-feedback-list@broadcom.com, linux-tegra@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, kvm@vger.kernel.org,
+        linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org,
+        kgdb-bugreport@lists.sourceforge.net,
+        v9fs-developer@lists.sourceforge.net,
+        tipc-discussion@lists.sourceforge.net, alsa-devel@alsa-project.org
+Date:   Mon, 28 Feb 2022 10:20:28 -0800
+In-Reply-To: <20220228112413.GA2812@kadam>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+         <20220228110822.491923-2-jakobkoschel@gmail.com>
+         <20220228112413.GA2812@kadam>
+Content-Type: text/plain; charset="ISO-8859-1"
+User-Agent: Evolution 3.40.4-1ubuntu2 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220228090430.1064267-7-ming.lei@redhat.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 7bit
+X-Stat-Signature: 1e1i8ombnsc3cdkptu3anccezjc89zox
+X-Rspamd-Server: rspamout07
+X-Rspamd-Queue-Id: 5C4272002A
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+i6vY6IDwHpNq++UEo/5hqvP4PvgQNb4E=
+X-HE-Tag: 1646072429-12569
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+On Mon, 2022-02-28 at 14:24 +0300, Dan Carpenter wrote:
 
-Thank you for the patch! Perhaps something to improve:
+> a multi-line indent gets curly braces for readability even though
+> it's not required by C.  And then both sides would get curly braces.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on v5.17-rc6 next-20220225]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Ming-Lei/blk-mq-update_nr_hw_queues-related-improvement-bugfix/20220228-170706
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: i386-randconfig-a002-20220228 (https://download.01.org/0day-ci/archive/20220301/202203010133.JIpKpP2Z-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/176e39bc0acb20f8fd869d170b429b7253b089c4
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Ming-Lei/blk-mq-update_nr_hw_queues-related-improvement-bugfix/20220228-170706
-        git checkout 176e39bc0acb20f8fd869d170b429b7253b089c4
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
-   In file included from block/blk-mq-debugfs-zoned.c:7:
->> block/blk-mq-debugfs.h:24:14: warning: declaration of 'struct blk_mq_hw_ctx' will not be visible outside of this function [-Wvisibility]
-                                     struct blk_mq_hw_ctx *hctx);
-                                            ^
-   block/blk-mq-debugfs.h:25:44: warning: declaration of 'struct blk_mq_hw_ctx' will not be visible outside of this function [-Wvisibility]
-   void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx);
-                                              ^
-   block/blk-mq-debugfs.h:32:19: warning: declaration of 'struct blk_mq_hw_ctx' will not be visible outside of this function [-Wvisibility]
-                                          struct blk_mq_hw_ctx *hctx);
-                                                 ^
-   block/blk-mq-debugfs.h:33:50: warning: declaration of 'struct blk_mq_hw_ctx' will not be visible outside of this function [-Wvisibility]
-   void blk_mq_debugfs_unregister_sched_hctx(struct blk_mq_hw_ctx *hctx);
-                                                    ^
-   4 warnings generated.
+That's more your personal preference than a coding style guideline.
 
 
-vim +24 block/blk-mq-debugfs.h
-
-16b738f651c83a Omar Sandoval      2017-05-04  20  
-6cfc0081b046eb Greg Kroah-Hartman 2019-06-12  21  void blk_mq_debugfs_register(struct request_queue *q);
-d173a25165c124 Omar Sandoval      2017-05-04  22  void blk_mq_debugfs_unregister(struct request_queue *q);
-6cfc0081b046eb Greg Kroah-Hartman 2019-06-12  23  void blk_mq_debugfs_register_hctx(struct request_queue *q,
-9c1051aacde828 Omar Sandoval      2017-05-04 @24  				  struct blk_mq_hw_ctx *hctx);
-9c1051aacde828 Omar Sandoval      2017-05-04  25  void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx);
-6cfc0081b046eb Greg Kroah-Hartman 2019-06-12  26  void blk_mq_debugfs_register_hctxs(struct request_queue *q);
-9c1051aacde828 Omar Sandoval      2017-05-04  27  void blk_mq_debugfs_unregister_hctxs(struct request_queue *q);
-d332ce091813d1 Omar Sandoval      2017-05-04  28  
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
