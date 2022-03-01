@@ -2,134 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB65C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 23:24:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED2A2C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 23:34:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231405AbiCAXZL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 18:25:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39860 "EHLO
+        id S238658AbiCAXfI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 18:35:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229651AbiCAXZL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 18:25:11 -0500
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A807232071
-        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 15:24:29 -0800 (PST)
-Received: by mail-qk1-x732.google.com with SMTP id b13so14225657qkj.12
-        for <linux-block@vger.kernel.org>; Tue, 01 Mar 2022 15:24:29 -0800 (PST)
+        with ESMTP id S238637AbiCAXfH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 18:35:07 -0500
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADF1E5EDC9
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 15:34:25 -0800 (PST)
+Received: by mail-qv1-xf2a.google.com with SMTP id e22so219609qvf.9
+        for <linux-block@vger.kernel.org>; Tue, 01 Mar 2022 15:34:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=DpRjb/PBbJp9xBWpXcgVzGGQA7rNM3h9KoahHshtY0I=;
-        b=o5/zWWj5Owdrx3UqP2Kt4ZD/AsQ3ClKOGGZbawmdutdtWnOdS3bffNJQmCLAH/jZJt
-         MmxJFg2x1+ydx9IG/fzXNpGmlbhkzm/bC0Ukl2bSriVYpZtus0+IB5KL8Qio3NQw4wap
-         0nX8ZISvqi5st7M8m0pPqK6vxZPwq7lg0xJTMGsJWOArjX/Y6+HuyOGIFv9Qi1s67t9K
-         Jej06t6s9q3EJRCmyw8QDYYZfCYQD4iaEo9Vuknjqb2j1Q+F4xO2v2c3QTUFSrYLgFhj
-         prf2RSf/D1hsNxqUCkTZfH07OelB2rBiVLVik9thoLeyJ3HAG4dvszk/Vt3/lH+oWzie
-         AlSQ==
+        bh=mWx/LrLYsQfbKydIAf/7SwoD2mCjJZvFq91qLa8lPug=;
+        b=e3nZhC5+l9xSRLdZ52DIXLgl76h13w79vehfIYQjLFWIQSsvTMftIRsY8ViToazPAZ
+         QFbkX2Muojs2Pj2zWmcxMmb1La18u/P7H1oVHT9/Im9VRaFLMLOU+IoG9DyqgrY7sNF4
+         K+UGMI4NbpJclF7uFB7a0byX/9J23OlIMp+3Ut+8bLcAgBdp81U9alD50/2YfpPanUhh
+         HPxYTkHINoctKhA9gMt/u35AgArjZ1PIOhUH2hMBgnG52DA9fkykE9Pvy6S8lCNO4hgG
+         Hu8Zfw8hBv7uwG8pGOa5Q0YGfSqYUjQYs2VPh+VHHT+fsSfsZ41UXxOjICtOrXDyF1kO
+         xg7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=DpRjb/PBbJp9xBWpXcgVzGGQA7rNM3h9KoahHshtY0I=;
-        b=ZubaS9dKR8lXeJChwf6Hm3jGbbe3SJUsPeor1tNuUjWI+1QNghTXAH7fuDjnapfz8T
-         QAP649lTswUgZyKA6jyFxKvpiT7X8913GxKN9RN4is5zHalDZNi6Sj8xcs6blFSnw24M
-         TC3mDQQ5GpPr9Ipz0LcTW0WyvtiyAshbzSGgLEk0zL3gFCOUgiYM6rIU4nLn9FOTzfMd
-         IEVI+bbG1GENrgUqMIl5wZtr2gUng678L+DPl775oUPtalvjTtCsLuW6+DxDfzghJcp5
-         +1SbW0HlbdaBya/Uu4JKiu5j038KjuKz7JP1gE3qg6UqWKaMVn1Gaffc1CoWf10Huhev
-         WZOg==
-X-Gm-Message-State: AOAM533jsygQHQSggals7rww8WYmkq7rec5ZacOEA/TMZNsMJ7LyVPMN
-        3BIYo2QMjQlW9nAqqtCt0cWhIUAy+oCXYEMRetUl0w==
-X-Google-Smtp-Source: ABdhPJyowAYBsiW1nV0gvghyDAQppbEL7pR3M+QeI9qLpoD0lAYSyaNMtF6EqEG+uknySajKy/D0kFavTMFDW2gxVAQ=
-X-Received: by 2002:a37:9f84:0:b0:5e9:6c34:620f with SMTP id
- i126-20020a379f84000000b005e96c34620fmr14642137qke.648.1646177068516; Tue, 01
- Mar 2022 15:24:28 -0800 (PST)
+        bh=mWx/LrLYsQfbKydIAf/7SwoD2mCjJZvFq91qLa8lPug=;
+        b=3fUWYu0nUpLyJzs4yx2EychxAfyVKwBW9P0FIoFUAnYDGpH3jxXwqbZkM5VZf3otFf
+         XnlxFKqqNDC4us0JPU10fQ0h7fK6jtM8Na6U2cAK6N3caEIMMN1K7APgbHZd0cxwtQ2L
+         bfo5gBrR31bs0avAsZomEsbSoAbkdCiJKZtywsbYv/AZwv0mga6FAxiH6JrKQGMt143n
+         EEfF1xMB6hmo6KPwWnpw7XPsWi1eD4CaHUMsB5fMBcgLtdTKqpgM6G/60fvNY/DhBoub
+         +VR0ayXUXMbE4qBCwps3HPn8nlZKZHBIlJuMeIqtGm+pw+OURxddrYV9v49Acz8LuuH1
+         b/Dg==
+X-Gm-Message-State: AOAM533wSeaksILI0MeZfblsg45WFJvlN4ZuZlS0ZY0gMSW1GP3TidnM
+        iO9+Vm01oW4VHLWr9CvrwngOC19CEU5c9Btm64zL1cIZlT0=
+X-Google-Smtp-Source: ABdhPJxT8ixyPUum5vHjaIh/ScO8V99UZmyY3ZhyUCg28dxyS2CE9ZonLh3Wc4MIGmPcKfy+vqYnRWVNC3A/hYI+jmc=
+X-Received: by 2002:a05:6214:9c3:b0:432:c0c0:a6c3 with SMTP id
+ dp3-20020a05621409c300b00432c0c0a6c3mr16032462qvb.43.1646177664600; Tue, 01
+ Mar 2022 15:34:24 -0800 (PST)
 MIME-Version: 1.0
-References: <87tucsf0sr.fsf@collabora.com> <986caf55-65d1-0755-383b-73834ec04967@suse.de>
- <b6bb4435-d83c-b129-c761-00a74e7e0739@grimberg.me> <87bkyyg4jc.fsf@collabora.com>
- <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
-In-Reply-To: <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
+References: <20220217181907.A2460E9317@localhost>
+In-Reply-To: <20220217181907.A2460E9317@localhost>
 From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Tue, 1 Mar 2022 15:24:17 -0800
-Message-ID: <CACGdZY+SLWETvAxH6M+BhipB1KV=W+kS7cxFWgaiK=en4sqDPQ@mail.gmail.com>
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Hannes Reinecke <hare@suse.de>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
+Date:   Tue, 1 Mar 2022 15:34:13 -0800
+Message-ID: <CACGdZYL8k46jTXvuu5AXzwZwQF2yj5WEwC_PTsN+f9mD6vUVmg@mail.gmail.com>
+Subject: Re: [LSF/MM/BPF Topic][LSF/MM/BPF Attend] iscsi issue of scale with MNoT
+To:     lduncan@suse.com
+Cc:     lsf-pc@lists.linux-foundation.org, linux-scsi@vger.kernel.org,
+        linux-block@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000006fec4a05d9307758"
+        boundary="000000000000f6c43605d9309a9b"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000006fec4a05d9307758
+--000000000000f6c43605d9309a9b
 Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 24, 2022 at 2:12 AM Sagi Grimberg <sagi@grimberg.me> wrote:
+On Thu, Feb 17, 2022 at 10:19 AM <lduncan@suse.com> wrote:
 >
+> [RESEND -- apologies if you see this more than once]
 >
-> >>> Actually, I'd rather have something like an 'inverse io_uring', where
-> >>> an application creates a memory region separated into several 'ring'
-> >>> for submission and completion.
-> >>> Then the kernel could write/map the incoming data onto the rings, and
-> >>> application can read from there.
-> >>> Maybe it'll be worthwhile to look at virtio here.
-
-Another advantage that comes to mind, especially the userspace target
-needs to operate on the data anyways, is if we're forwarding to
-io_uring based networking, or user based networking, reading a direct
-mapping may be quicker than opening a file & reading it.
-
-(I think an idea for parallel/out-of-order processing was
-fd-per-request, if this is too much overhead / too limited due to fd
-count, perhaps mapping is just the way to go)
-
-> >>
-> >> There is lio loopback backed by tcmu... I'm assuming that nvmet can
-> >> hook into the same/similar interface. nvmet is pretty lean, and we
-> >> can probably help tcmu/equivalent scale better if that is a concern...
-> >
-> > Sagi,
-> >
-> > I looked at tcmu prior to starting this work.  Other than the tcmu
-> > overhead, one concern was the complexity of a scsi device interface
-> > versus sending block requests to userspace.
+> The iSCSI protocol continues to be used in Linux, but some of the
+> users push the system past its normal limits. And using multipath just
+> exacerbates that problem (usually doubling the number of sessions).
 >
-> The complexity is understandable, though it can be viewed as a
-> capability as well. Note I do not have any desire to promote tcmu here,
-> just trying to understand if we need a brand new interface rather than
-> making the existing one better.
+> I'd like to gather some numbers for open-iscsi (the standard Linux
+> iSCSI initiator) and the kernel target code (i.e. LIO/targetcli) on
+> what happens when there are MNoT -- massive numbers of targets.
 >
-> > What would be the advantage of doing it as a nvme target over delivering
-> > directly to userspace as a block driver?
+> "Massive" in my case, will be relative, since I don't have access to
+> a supercomputer, but I believe it will not be too hard to start
+> pushing the system too far. For example, a recent user problem found
+> that even at 2000 sessions using multipath, the system takes about 80
+> seconds to switch paths. Each switch takes 80ms (and they are
+> currently serialized), but when you multiply that by 1000 it adds up.
 >
-> Well, for starters you gain the features and tools that are extensively
-> used with nvme. Plus you get the ecosystem support (development,
-> features, capabilities and testing). There are clear advantages of
-> plugging into an established ecosystem.
+> For the initiator, I've long suspected some parts of the code were not
+> designed for scale, so this might give me a chance to find and
+> possibly address some of these issues.
 
-I recall when discussing an nvme style approach, another advantage was
-the nvme target impl could be re-used if exposing the same interface
-via this user space block device interface, or e.g. presenting as nvme
-device to a VM, etc.
+There are some linear lookups (sess_list, conn_list) in the iSCSI
+netlink which may be low hanging fruit, and do show up in heatmaps
+when creating/destroying sessions/connections in the presence of 10k+
+sessions in a machine. (Though this doesn't manifest 80s+ stalls,
+thankfully)
+>
+> --
+> Lee Duncan
 
-That said, for a device that just needs to support read/write &
-forward data to some userspace networked storage, the overhead in
-implementation and interface should be considered. If there's a rich
-set of tooling here already to create a custom nvme target, perhaps
-that could be leveraged?
-
-Maybe there's a middle ground? If we do a "inverse io_uring" -
-forwarding the block interface into userspace, and allowing those who
-choose to implement passthrough commands (to get the extra
-"capability")? Providing an efficient mechanism to forward block
-requests to userspace, then allowing the target to implement their
-favorite flavor.
-
-Khazhy
-
---0000000000006fec4a05d9307758
+--000000000000f6c43605d9309a9b
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -196,14 +162,14 @@ a1pUuyFRuqCOJ0r2IJcYVXrreMNOZfcjKtzZ290l5UZJtlKXS0qfeVdndP8ld3kdTYr4EcWiSI5l
 qohmI3eIH5GaIMsagonJlBy+HTzwO5RW54p4DjsVMwcYB+82QFGOT2AZoIBeCYFXU2XB6t0Q8RoU
 8Jg6o35bh+CWZ2UxggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxT
 aWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjACEAEO
-OfOqtlFUhIfo3Q6pjqUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIKuSAQ8SxUA1
-+HESbhCwrwRuIKc3eFP44Z7ADI4vW7LwMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
-hvcNAQkFMQ8XDTIyMDMwMTIzMjQyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJ
+OfOqtlFUhIfo3Q6pjqUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIL5r8/JN03Qf
+2AetgDe7PTZ4s7Ru98+ybg9lPYr0/SFqMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZI
+hvcNAQkFMQ8XDTIyMDMwMTIzMzQyNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJ
 YIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcN
-AQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAk2dgGIEZYilmPV1agqbILKZwCSXNt
-XljzNvkVx3med2ZOOcb5DABxby6CDsCkO2fRz+o+ayvE/CONwf+p27tqF2tHStl/+VjchnsGZZqH
-60KVv6NpzunNJUvFMH6uPWXiM3lnR8LkENXYGrjtoTg8BAZL0kPddAKQ9C4sQ8iKFGtXalKM2AQ0
-1XeXwK31LYf72Te8Eb9tvE/IgsJUjSTpSwb1h037xgoMbKvm/7T8rccQdt8FaiJJ1ppyIR9L7xv9
-cBcv9pyB/1DRL5+LcnCHFpTQGvOITKKB2Ni1W0BG7Bn+uJct9diCcaJ/UljtMFIP9Ac05lCvmZLZ
-vedfZaGo
---0000000000006fec4a05d9307758--
+AQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC/t4XIXC/mPAj4TcN4vI8paU8SWUQB
+XmpuKvcjMMGqyzygbH16ZqcRFixAlD6jrsr9ZLpvYVAhRNeqzF5t7itgbaRA9/qXYFzRM1bZzAYB
+v4iZbGSjXgcHZmYrC3OHhfGWVf/qWyNcUGvbO4g7cZET9oNIL0T7XP2NkNris7XraDYnevA24tuP
+lSQpCUjnJrl5m6uQnYhQbyBTrwTfDXyCsOMnmZJLJVDsWG93MwBGmrA/1pkhv1jR3G4qXDvZ9xAP
+rb8B60dnr0CyAKHjp4PNkx3BYDh72NoO8srf6szJAy73Rkq+xKJQ2QVpNyWUOeTZK7knYIYzIJjM
+77wFF+9I
+--000000000000f6c43605d9309a9b--
