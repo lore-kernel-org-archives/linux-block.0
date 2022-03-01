@@ -2,158 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C416C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:20:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53699C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:20:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233278AbiCAMVZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 07:21:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51296 "EHLO
+        id S234711AbiCAMV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 07:21:27 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233039AbiCAMVZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 07:21:25 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A7957170;
-        Tue,  1 Mar 2022 04:20:43 -0800 (PST)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K7GWx17dbzdZj5;
-        Tue,  1 Mar 2022 20:19:25 +0800 (CST)
-Received: from dggpemm500004.china.huawei.com (7.185.36.219) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 1 Mar 2022 20:20:41 +0800
-Received: from huawei.com (10.175.124.27) by dggpemm500004.china.huawei.com
- (7.185.36.219) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 1 Mar
- 2022 20:20:40 +0800
-From:   Laibin Qiu <qiulaibin@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next v2] blk-throttle: Set BIO_THROTTLED when bio has been throttled
-Date:   Tue, 1 Mar 2022 20:39:19 +0800
-Message-ID: <20220301123919.2381579-1-qiulaibin@huawei.com>
-X-Mailer: git-send-email 2.22.0
+        with ESMTP id S234710AbiCAMV0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 07:21:26 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EA757170;
+        Tue,  1 Mar 2022 04:20:46 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DB11D68BEB; Tue,  1 Mar 2022 13:20:42 +0100 (CET)
+Date:   Tue, 1 Mar 2022 13:20:42 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ira Weiny <ira.weiny@intel.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Justin Sanders <justin@coraid.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Denis Efremov <efremov@linux.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
+        nvdimm@lists.linux.dev
+Subject: Re: [PATCH 06/10] nvdimm-btt: use bvec_kmap_local in
+ btt_rw_integrity
+Message-ID: <20220301122042.GB3405@lst.de>
+References: <20220222155156.597597-1-hch@lst.de> <20220222155156.597597-7-hch@lst.de> <Yh2aCi6gtG0naC1r@iweiny-desk3>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.124.27]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500004.china.huawei.com (7.185.36.219)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yh2aCi6gtG0naC1r@iweiny-desk3>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-1.In current process, all bio will set the BIO_THROTTLED flag
-after __blk_throtl_bio().
+On Mon, Feb 28, 2022 at 07:59:06PM -0800, Ira Weiny wrote:
+> On Tue, Feb 22, 2022 at 04:51:52PM +0100, Christoph Hellwig wrote:
+> > Using local kmaps slightly reduces the chances to stray writes, and
+> > the bvec interface cleans up the code a little bit.
+> > 
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > ---
+> >  drivers/nvdimm/btt.c | 10 ++++------
+> >  1 file changed, 4 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+> > index cbd994f7f1fe6..9613e54c7a675 100644
+> > --- a/drivers/nvdimm/btt.c
+> > +++ b/drivers/nvdimm/btt.c
+> > @@ -1163,17 +1163,15 @@ static int btt_rw_integrity(struct btt *btt, struct bio_integrity_payload *bip,
+> >  		 */
+> >  
+> >  		cur_len = min(len, bv.bv_len);
+> > -		mem = kmap_atomic(bv.bv_page);
+> > +		mem = bvec_kmap_local(&bv);
+> >  		if (rw)
+> > -			ret = arena_write_bytes(arena, meta_nsoff,
+> > -					mem + bv.bv_offset, cur_len,
+> > +			ret = arena_write_bytes(arena, meta_nsoff, mem, cur_len,
+> 
+> Why drop bv.bv_offset here and below?
 
-2.If bio needs to be throttled, it will start the timer and
-stop submit bio directly. Bio will submit in
-blk_throtl_dispatch_work_fn() when the timer expires.But in
-the current process, if bio is throttled. The BIO_THROTTLED
-will be set to bio after timer start. If the bio has been
-completed, it may cause use-after-free blow.
-
-BUG: KASAN: use-after-free in blk_throtl_bio+0x12f0/0x2c70
-Read of size 2 at addr ffff88801b8902d4 by task fio/26380
-
- dump_stack+0x9b/0xce
- print_address_description.constprop.6+0x3e/0x60
- kasan_report.cold.9+0x22/0x3a
- blk_throtl_bio+0x12f0/0x2c70
- submit_bio_checks+0x701/0x1550
- submit_bio_noacct+0x83/0xc80
- submit_bio+0xa7/0x330
- mpage_readahead+0x380/0x500
- read_pages+0x1c1/0xbf0
- page_cache_ra_unbounded+0x471/0x6f0
- do_page_cache_ra+0xda/0x110
- ondemand_readahead+0x442/0xae0
- page_cache_async_ra+0x210/0x300
- generic_file_buffered_read+0x4d9/0x2130
- generic_file_read_iter+0x315/0x490
- blkdev_read_iter+0x113/0x1b0
- aio_read+0x2ad/0x450
- io_submit_one+0xc8e/0x1d60
- __se_sys_io_submit+0x125/0x350
- do_syscall_64+0x2d/0x40
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Allocated by task 26380:
- kasan_save_stack+0x19/0x40
- __kasan_kmalloc.constprop.2+0xc1/0xd0
- kmem_cache_alloc+0x146/0x440
- mempool_alloc+0x125/0x2f0
- bio_alloc_bioset+0x353/0x590
- mpage_alloc+0x3b/0x240
- do_mpage_readpage+0xddf/0x1ef0
- mpage_readahead+0x264/0x500
- read_pages+0x1c1/0xbf0
- page_cache_ra_unbounded+0x471/0x6f0
- do_page_cache_ra+0xda/0x110
- ondemand_readahead+0x442/0xae0
- page_cache_async_ra+0x210/0x300
- generic_file_buffered_read+0x4d9/0x2130
- generic_file_read_iter+0x315/0x490
- blkdev_read_iter+0x113/0x1b0
- aio_read+0x2ad/0x450
- io_submit_one+0xc8e/0x1d60
- __se_sys_io_submit+0x125/0x350
- do_syscall_64+0x2d/0x40
- entry_SYSCALL_64_after_hwframe+0x44/0xa9
-
-Freed by task 0:
- kasan_save_stack+0x19/0x40
- kasan_set_track+0x1c/0x30
- kasan_set_free_info+0x1b/0x30
- __kasan_slab_free+0x111/0x160
- kmem_cache_free+0x94/0x460
- mempool_free+0xd6/0x320
- bio_free+0xe0/0x130
- bio_put+0xab/0xe0
- bio_endio+0x3a6/0x5d0
- blk_update_request+0x590/0x1370
- scsi_end_request+0x7d/0x400
- scsi_io_completion+0x1aa/0xe50
- scsi_softirq_done+0x11b/0x240
- blk_mq_complete_request+0xd4/0x120
- scsi_mq_done+0xf0/0x200
- virtscsi_vq_done+0xbc/0x150
- vring_interrupt+0x179/0x390
- __handle_irq_event_percpu+0xf7/0x490
- handle_irq_event_percpu+0x7b/0x160
- handle_irq_event+0xcc/0x170
- handle_edge_irq+0x215/0xb20
- common_interrupt+0x60/0x120
- asm_common_interrupt+0x1e/0x40
-
-Fix this by move BIO_THROTTLED set into the queue_lock.
-
-Signed-off-by: Laibin Qiu <qiulaibin@huawei.com>
----
- block/blk-throttle.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index a3b3ebc72dd4..9d4ad9317509 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -2145,13 +2145,14 @@ bool __blk_throtl_bio(struct bio *bio)
- 	}
- 
- out_unlock:
--	spin_unlock_irq(&q->queue_lock);
- 	bio_set_flag(bio, BIO_THROTTLED);
- 
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	if (throttled || !td->track_bio_latency)
- 		bio->bi_issue.value |= BIO_ISSUE_THROTL_SKIP_LATENCY;
- #endif
-+	spin_unlock_irq(&q->queue_lock);
-+
- 	rcu_read_unlock();
- 	return throttled;
- }
--- 
-2.22.0
-
+Because bvec_kmap_local includes bv_offset in the pointer that it
+returns.
