@@ -2,113 +2,40 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98CC0C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 10:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 716DFC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 11:25:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232199AbiCAKaJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 05:30:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56126 "EHLO
+        id S232707AbiCAL0N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 06:26:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56516 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234305AbiCAKaG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 05:30:06 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7CD6565415
-        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 02:29:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646130558;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=MyK8CGeqc8W1ttSv05bq0b6rSbbQ2JkU82/9ujV/uPI=;
-        b=WG5+vMPg9zqycd/Boc/wulZULjlnT0235Ucby2kZXmgYTggZxjueswmx0ThPK4ueGS2Hfz
-        5t5fhscALRa7bIABO69LHmaizJLiHQBoSh75mom/bfPFs43HWqFcamQEOgzddI2RLD105T
-        B6B/SGpEKmREv2/ytuXFhwzJaohiJqY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-353-vtR9JpqPPUqdZT2yhI3tpw-1; Tue, 01 Mar 2022 05:29:13 -0500
-X-MC-Unique: vtR9JpqPPUqdZT2yhI3tpw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4D4CFC80;
-        Tue,  1 Mar 2022 10:29:11 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id EE0596F965;
-        Tue,  1 Mar 2022 10:29:06 +0000 (UTC)
-Date:   Tue, 1 Mar 2022 18:29:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Yu Kuai <yukuai3@huawei.com>, tj@kernel.org, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
-Message-ID: <Yh31bQu3gbXoDBuK@T590>
-References: <20220210115637.1074927-1-yukuai3@huawei.com>
- <YhuyBgZSS6m/Mwu6@infradead.org>
- <Yhxnkg0AEaj36t+a@T590>
- <YhyYpWHGVhs3J/dk@infradead.org>
+        with ESMTP id S231944AbiCAL0M (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 06:26:12 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D84B591371
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 03:25:31 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 652BA68AFE; Tue,  1 Mar 2022 12:25:27 +0100 (CET)
+Date:   Tue, 1 Mar 2022 12:25:27 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        damien.lemoal@wdc.com, axboe@kernel.dk, hch@lst.de,
+        sagi@grimberg.me
+Subject: Re: [PATCH 1/1] block: move sector bio member into blk_next_bio()
+Message-ID: <20220301112527.GA2567@lst.de>
+References: <20220301022310.8579-1-kch@nvidia.com> <20220301022310.8579-2-kch@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YhyYpWHGVhs3J/dk@infradead.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20220301022310.8579-2-kch@nvidia.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 01:40:53AM -0800, Christoph Hellwig wrote:
-> On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
-> > > FYI, this crashed left rigt and center when running xfstests with
-> > > traces pointing to throtl_pending_timer_fn.
-> > 
-> > Can you share the exact xfstests test(fs, test)? Or panic log?
-> > 
-> > I can't reproduce it when running './check -g auto' on XFS, meantime
-> > tracking throtl_pending_timer_fn().
-> 
-> From a quick run using f2fs:
-> 
-> generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
-
-Thanks for providing the reproducer.
-
-The reason is that the pending timer is deleted in blkg's release
-handler, so the timer can still be live after request queue is released.
-
-The patch of 'block: cancel all throttled bios in del_gendisk()' should just
-make it easier to trigger.
-
-After patch of "block: move blkcg initialization/destroy into disk allocation/
-release handler" lands, the issue can be fixed easily by:
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index fa063c6c0338..e8d4be5e1de3 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -82,6 +82,7 @@ static void blkg_free(struct blkcg_gq *blkg)
- 		if (blkg->pd[i])
- 			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
- 
-+	blk_put_queue(blkg->q);
- 	free_percpu(blkg->iostat_cpu);
- 	percpu_ref_exit(&blkg->refcnt);
- 	kfree(blkg);
-@@ -297,9 +298,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
- 	blkg->online = true;
- 	spin_unlock(&blkcg->lock);
- 
--	if (!ret)
-+	if (!ret && blk_get_queue(q))
- 		return blkg;
--
-+	else if (!ret)
-+		ret = -ENODEV;
- 	/* @blkg failed fully initialized, use the usual release path */
- 	blkg_put(blkg);
- 	return ERR_PTR(ret);
-
-
-Thanks,
-Ming
-
+It would be nice to just calculate the sector from the previous
+bio using bio_end_sector, but that doesn't really work with the
+current blk_next_bio pattern.  It might make sense to just take the
+initial allocation case out of blk_next_bio and do that manually now
+that the bio_alloc interface makes a lot more sense.
