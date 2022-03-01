@@ -2,140 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AABC4332F
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 09:07:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC742C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 09:08:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233438AbiCAJHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 04:07:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
+        id S232481AbiCAJJO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 04:09:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229906AbiCAJHx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 04:07:53 -0500
+        with ESMTP id S232359AbiCAJJO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 04:09:14 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9202089CE4
-        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 01:07:12 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9B8322B0A
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 01:08:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646125631;
+        s=mimecast20190719; t=1646125712;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=C9yUIg5j65w+qFKrB2q98qn+HFOuWpxbJH81ykhBbNU=;
-        b=NJTfIJvm0pPEjChV5JfaQ/vFuQzff5ffXfSy0yYVcJ/tookKukIr0W/URLZ2mS9Ck5ogE3
-        Nqmd/wBQWzRfOdGYaT+qumR8QpTOSP0SlpujSH8C531FQRTwTgEiBlVHPsfbGZckbreCal
-        OfrgDPzTvRZMg5HT0JpIfzpR0ubKRdo=
+        bh=IRuB1SEfC3LgzJZ2LYZ2zf/sw3E70orGW8XC0CyQcIE=;
+        b=cz65Vf0sgYP27vx2t+yF6plv6YFrjAtVSQeTzea3aPJRh42ZNYr7kyQ5pimE/szostxapS
+        dIHNBnsgX3LKnxLzWfjzK4UCzd+zTLA4qy6abZfTF4dh47b3+I/YcW+DDT4DgPGoX/bLFp
+        +FqL8MLt/tJmJp3XKqb0ePIeHR0ntqE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-36-PNX7isssMnCg8DTO-XnzpQ-1; Tue, 01 Mar 2022 04:07:08 -0500
-X-MC-Unique: PNX7isssMnCg8DTO-XnzpQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+ us-mta-122-uE4nz8L9N8uKjWws9S8atw-1; Tue, 01 Mar 2022 04:08:31 -0500
+X-MC-Unique: uE4nz8L9N8uKjWws9S8atw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31ACB801AB2;
-        Tue,  1 Mar 2022 09:07:07 +0000 (UTC)
-Received: from localhost (unknown [10.39.194.231])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id ADCA51038AC5;
-        Tue,  1 Mar 2022 09:07:00 +0000 (UTC)
-Date:   Tue, 1 Mar 2022 09:06:59 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Akihiko Odaki <akihiko.odaki@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] virtio-blk: Assign discard_granularity
-Message-ID: <Yh3iMymdtD6rGYzs@stefanha-x1.localdomain>
-References: <20220224093802.11348-1-akihiko.odaki@gmail.com>
- <YhypTNtWpcgh3gb2@stefanha-x1.localdomain>
- <e306700c-3153-9422-974c-1f5f10e232d6@gmail.com>
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 522E01006AA7;
+        Tue,  1 Mar 2022 09:08:30 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 705FC646CF;
+        Tue,  1 Mar 2022 09:08:13 +0000 (UTC)
+Date:   Tue, 1 Mar 2022 17:08:08 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     kernel test robot <lkp@intel.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, llvm@lists.linux.dev,
+        kbuild-all@lists.01.org, linux-block@vger.kernel.org,
+        Yu Kuai <yukuai3@huawei.com>
+Subject: Re: [PATCH 6/6] blk-mq: manage hctx map via xarray
+Message-ID: <Yh3ieEj0dt7JFa6Z@T590>
+References: <20220228090430.1064267-7-ming.lei@redhat.com>
+ <202203010133.JIpKpP2Z-lkp@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="QjNeH+KS6pqTHNut"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e306700c-3153-9422-974c-1f5f10e232d6@gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <202203010133.JIpKpP2Z-lkp@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi,
 
---QjNeH+KS6pqTHNut
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for the report!
 
-On Tue, Mar 01, 2022 at 02:43:55PM +0900, Akihiko Odaki wrote:
-> On 2022/02/28 19:51, Stefan Hajnoczi wrote:
-> > On Thu, Feb 24, 2022 at 06:38:02PM +0900, Akihiko Odaki wrote:
-> > > Virtual I/O Device (VIRTIO) Version 1.1
-> > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-cs=
-prd01.html
-> > > > discard_sector_alignment can be used by OS when splitting a request
-> > > > based on alignment.
-> > >=20
-> > > According to Documentation/ABI/stable/sysfs-block, the corresponding
-> > > field in the kernel is, confusingly, discard_granularity, not
-> > > discard_alignment.
-> >=20
-> > Good catch, struct virtio_blk_config->discard_sector_alignment is Linux
-> > q->limits.discard_granularity.
-> >=20
-> > >=20
-> > > Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
-> > > ---
-> > >   drivers/block/virtio_blk.c | 4 +---
-> > >   1 file changed, 1 insertion(+), 3 deletions(-)
-> > >=20
-> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > index c443cd64fc9b..1fb3c89900e3 100644
-> > > --- a/drivers/block/virtio_blk.c
-> > > +++ b/drivers/block/virtio_blk.c
-> > > @@ -913,11 +913,9 @@ static int virtblk_probe(struct virtio_device *v=
-dev)
-> > >   		blk_queue_io_opt(q, blk_size * opt_io_size);
-> > >   	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
-> > > -		q->limits.discard_granularity =3D blk_size;
-> > > -
-> > >   		virtio_cread(vdev, struct virtio_blk_config,
-> > >   			     discard_sector_alignment, &v);
-> > > -		q->limits.discard_alignment =3D v ? v << SECTOR_SHIFT : 0;
-> >=20
-> > Should we use struct virtio_blk_config->topology.alignment_offset
-> > ("offset of first aligned logical block" and used for Linux
-> > blk_queue_alignment_offset()) for q->limits.discard_alignment?
->=20
-> Maybe but I'm not sure. I had looked at the code of QEMU
-> (commit 5c1ee569660d4a205dced9cb4d0306b907fb7599) but it apparently always
-> sets 0 for virtio_blk_config->topology.alignment_offset.
-> I don't have a hardware which requires discard_alignment either so I cann=
-ot
-> test it.
->=20
-> I'd like to leave this patch as is since I cannot deny the possibility th=
-at
-> the host has a different alignment offset for discarding and other
-> operations.
+On Tue, Mar 01, 2022 at 01:57:33AM +0800, kernel test robot wrote:
+> Hi Ming,
+> 
+> Thank you for the patch! Perhaps something to improve:
+> 
+> [auto build test WARNING on axboe-block/for-next]
+> [also build test WARNING on v5.17-rc6 next-20220225]
+> [If your patch is applied to the wrong git tree, kindly drop us a note.
+> And when submitting patch, we suggest to use '--base' as documented in
+> https://git-scm.com/docs/git-format-patch]
+> 
+> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/blk-mq-update_nr_hw_queues-related-improvement-bugfix/20220228-170706
+> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+> config: i386-randconfig-a002-20220228 (https://download.01.org/0day-ci/archive/20220301/202203010133.JIpKpP2Z-lkp@intel.com/config)
+> compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project d271fc04d5b97b12e6b797c6067d3c96a8d7470e)
+> reproduce (this is a W=1 build):
+>         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+>         chmod +x ~/bin/make.cross
+>         # https://github.com/0day-ci/linux/commit/176e39bc0acb20f8fd869d170b429b7253b089c4
+>         git remote add linux-review https://github.com/0day-ci/linux
+>         git fetch --no-tags linux-review Ming-Lei/blk-mq-update_nr_hw_queues-related-improvement-bugfix/20220228-170706
+>         git checkout 176e39bc0acb20f8fd869d170b429b7253b089c4
+>         # save the config file to linux build tree
+>         mkdir build_dir
+>         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+> 
+> If you fix the issue, kindly add following tag as appropriate
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> All warnings (new ones prefixed by >>):
+> 
+>    In file included from block/blk-mq-debugfs-zoned.c:7:
+> >> block/blk-mq-debugfs.h:24:14: warning: declaration of 'struct blk_mq_hw_ctx' will not be visible outside of this function [-Wvisibility]
+>                                      struct blk_mq_hw_ctx *hctx);
 
-Fair enough. To do it properly we'd need to add a new configuration
-space field to virtio-blk.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+The warning is nothing to do with this patchset.
 
---QjNeH+KS6pqTHNut
-Content-Type: application/pgp-signature; name="signature.asc"
+You can trigger that by just changing modify time of include/linux/blkdev.h.
 
------BEGIN PGP SIGNATURE-----
+The following patch can fix the warning, and I will post one formal
+patch soon.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmId4jMACgkQnKSrs4Gr
-c8hVTQf/fK2GjZF044xLZweZrpcjLJNrkExfCsyHEH1Ah4G4APuU/5PSDiiYm6XX
-EWrQanPgZ7Js5AkKfqsj5BslgH6HuTGUUfdP96Ww3uOxGG1jXpN3ifmN6vnLLUuR
-+KQjF89iI6zAl8yuV1OvGWl7+KgT0zmGEyFlY2t2ELov/TihbI872+kohZxpUCf4
-/7ZkXj7EL7BJxRmez/82PlVNzp1rqM7WsO9E+exIRL5uedb1w2lO8U96h9B7FO0i
-eCJCD3MH8bTQ5q30xXMdEueNrRanBEnaXtteAmnAyrgXhK43mYGgvklxigXq2wrG
-2ehNobgts6blVTE4GekOllSvt+9ZBw==
-=qaMg
------END PGP SIGNATURE-----
+diff --git a/block/blk-mq-debugfs.h b/block/blk-mq-debugfs.h
+index a68aa6041a10..37fe2716e96e 100644
+--- a/block/blk-mq-debugfs.h
++++ b/block/blk-mq-debugfs.h
+@@ -5,6 +5,7 @@
+ #ifdef CONFIG_BLK_DEBUG_FS
 
---QjNeH+KS6pqTHNut--
+ #include <linux/seq_file.h>
++#include <linux/blk-mq.h>
+
+ struct blk_mq_debugfs_attr {
+        const char *name;
+
+
+Thanks,
+Ming
 
