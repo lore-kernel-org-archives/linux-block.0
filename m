@@ -2,76 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53699C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:20:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E6AC433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:56:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234711AbiCAMV1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 07:21:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51316 "EHLO
+        id S234055AbiCAM5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 07:57:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234710AbiCAMV0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 07:21:26 -0500
+        with ESMTP id S230415AbiCAM5Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 07:57:16 -0500
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04EA757170;
-        Tue,  1 Mar 2022 04:20:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A755996B9;
+        Tue,  1 Mar 2022 04:56:36 -0800 (PST)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id DB11D68BEB; Tue,  1 Mar 2022 13:20:42 +0100 (CET)
-Date:   Tue, 1 Mar 2022 13:20:42 +0100
+        id BB10268AFE; Tue,  1 Mar 2022 13:56:32 +0100 (CET)
+Date:   Tue, 1 Mar 2022 13:56:32 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ira Weiny <ira.weiny@intel.com>
+To:     Bart Van Assche <bvanassche@acm.org>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Justin Sanders <justin@coraid.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Denis Efremov <efremov@linux.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        nvdimm@lists.linux.dev
-Subject: Re: [PATCH 06/10] nvdimm-btt: use bvec_kmap_local in
- btt_rw_integrity
-Message-ID: <20220301122042.GB3405@lst.de>
-References: <20220222155156.597597-1-hch@lst.de> <20220222155156.597597-7-hch@lst.de> <Yh2aCi6gtG0naC1r@iweiny-desk3>
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: move more work to disk_release v2
+Message-ID: <20220301125632.GA3911@lst.de>
+References: <20220227172144.508118-1-hch@lst.de> <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yh2aCi6gtG0naC1r@iweiny-desk3>
+In-Reply-To: <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 07:59:06PM -0800, Ira Weiny wrote:
-> On Tue, Feb 22, 2022 at 04:51:52PM +0100, Christoph Hellwig wrote:
-> > Using local kmaps slightly reduces the chances to stray writes, and
-> > the bvec interface cleans up the code a little bit.
-> > 
-> > Signed-off-by: Christoph Hellwig <hch@lst.de>
-> > ---
-> >  drivers/nvdimm/btt.c | 10 ++++------
-> >  1 file changed, 4 insertions(+), 6 deletions(-)
-> > 
-> > diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
-> > index cbd994f7f1fe6..9613e54c7a675 100644
-> > --- a/drivers/nvdimm/btt.c
-> > +++ b/drivers/nvdimm/btt.c
-> > @@ -1163,17 +1163,15 @@ static int btt_rw_integrity(struct btt *btt, struct bio_integrity_payload *bip,
-> >  		 */
-> >  
-> >  		cur_len = min(len, bv.bv_len);
-> > -		mem = kmap_atomic(bv.bv_page);
-> > +		mem = bvec_kmap_local(&bv);
-> >  		if (rw)
-> > -			ret = arena_write_bytes(arena, meta_nsoff,
-> > -					mem + bv.bv_offset, cur_len,
-> > +			ret = arena_write_bytes(arena, meta_nsoff, mem, cur_len,
-> 
-> Why drop bv.bv_offset here and below?
+On Sun, Feb 27, 2022 at 03:18:24PM -0800, Bart Van Assche wrote:
+> The second issue I run into with this branch is as follows
+> (also for nvmeof-mp/002):
 
-Because bvec_kmap_local includes bv_offset in the pointer that it
-returns.
+You'll need this patch, which is only in mainline but not the
+for-5.18/block branch:
+
+fd9f4e62a39f09a7c014d7415c2b9d1390aa0504
+Author: Christoph Hellwig <hch@lst.de>
+Date:   Tue Jan 18 08:04:44 2022 +0100
+
+    block: assign bi_bdev for cloned bios in blk_rq_prep_clone
+
