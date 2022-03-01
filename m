@@ -2,155 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C225CC433F5
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 08:46:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46AABC4332F
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 09:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233608AbiCAIrN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 03:47:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32792 "EHLO
+        id S233438AbiCAJHx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 04:07:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233559AbiCAIrE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 03:47:04 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A2A489301;
-        Tue,  1 Mar 2022 00:46:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Y0hYS9Vtv04cgL8ZGlvJWTccJmGVHbCFCF4GFhHbI+k=; b=KrUZYt/FtwvMDhmKfrKOZwaUF/
-        y30krvFNu6YsGMZraYH0fcq4oPPnY95iUtPMlj75kiTwVtWMSH0BJnNukaR0S2Ft3s69HMgrIWX6K
-        B0ynYtp7X0fTcyMXfSrgbZJzA94+ja3EHtfPXHL0SnUUmsHSW6WbFd60AJRdT6OzvneHhPg0Sst0p
-        OeOakIR9zPYim8mgxvBseVPaOllGxf4ZXcYomixrPyRC2jlT8J9Xdr20OR4AmtU9Wpcx1CrSOfEsd
-        Wa6o6tAN3u2T+UMXIdY38qusyVicUx3wWnxgZXDjrV8abEGBM8LTkPAwdNpNLHZQR6daK+dRRgLH/
-        xdUK0+cA==;
-Received: from [2.53.44.23] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nOy99-00FfSF-3j; Tue, 01 Mar 2022 08:46:15 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH 5/5] pktcdvd: stop using bio_reset
-Date:   Tue,  1 Mar 2022 10:45:52 +0200
-Message-Id: <20220301084552.880256-6-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220301084552.880256-1-hch@lst.de>
-References: <20220301084552.880256-1-hch@lst.de>
+        with ESMTP id S229906AbiCAJHx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 04:07:53 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9202089CE4
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 01:07:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646125631;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=C9yUIg5j65w+qFKrB2q98qn+HFOuWpxbJH81ykhBbNU=;
+        b=NJTfIJvm0pPEjChV5JfaQ/vFuQzff5ffXfSy0yYVcJ/tookKukIr0W/URLZ2mS9Ck5ogE3
+        Nqmd/wBQWzRfOdGYaT+qumR8QpTOSP0SlpujSH8C531FQRTwTgEiBlVHPsfbGZckbreCal
+        OfrgDPzTvRZMg5HT0JpIfzpR0ubKRdo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-36-PNX7isssMnCg8DTO-XnzpQ-1; Tue, 01 Mar 2022 04:07:08 -0500
+X-MC-Unique: PNX7isssMnCg8DTO-XnzpQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31ACB801AB2;
+        Tue,  1 Mar 2022 09:07:07 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.231])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id ADCA51038AC5;
+        Tue,  1 Mar 2022 09:07:00 +0000 (UTC)
+Date:   Tue, 1 Mar 2022 09:06:59 +0000
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Akihiko Odaki <akihiko.odaki@gmail.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] virtio-blk: Assign discard_granularity
+Message-ID: <Yh3iMymdtD6rGYzs@stefanha-x1.localdomain>
+References: <20220224093802.11348-1-akihiko.odaki@gmail.com>
+ <YhypTNtWpcgh3gb2@stefanha-x1.localdomain>
+ <e306700c-3153-9422-974c-1f5f10e232d6@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="QjNeH+KS6pqTHNut"
+Content-Disposition: inline
+In-Reply-To: <e306700c-3153-9422-974c-1f5f10e232d6@gmail.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just initialize the bios on-demand.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/pktcdvd.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+--QjNeH+KS6pqTHNut
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/drivers/block/pktcdvd.c b/drivers/block/pktcdvd.c
-index 6aec11ed185d8..e4ee7856483cf 100644
---- a/drivers/block/pktcdvd.c
-+++ b/drivers/block/pktcdvd.c
-@@ -525,7 +525,6 @@ static struct packet_data *pkt_alloc_packet_data(int frames)
- 	pkt->w_bio = bio_kmalloc(frames, GFP_KERNEL);
- 	if (!pkt->w_bio)
- 		goto no_bio;
--	bio_init(pkt->w_bio, NULL, pkt->w_bio->bi_inline_vecs, frames, 0);
- 
- 	for (i = 0; i < frames / FRAMES_PER_PAGE; i++) {
- 		pkt->pages[i] = alloc_page(GFP_KERNEL|__GFP_ZERO);
-@@ -537,26 +536,20 @@ static struct packet_data *pkt_alloc_packet_data(int frames)
- 	bio_list_init(&pkt->orig_bios);
- 
- 	for (i = 0; i < frames; i++) {
--		struct bio *bio = bio_kmalloc(1, GFP_KERNEL);
--		if (!bio)
-+		pkt->r_bios[i] = bio_kmalloc(1, GFP_KERNEL);
-+		if (!pkt->r_bios[i])
- 			goto no_rd_bio;
--		bio_init(bio, NULL, bio->bi_inline_vecs, 1, 0);
--		pkt->r_bios[i] = bio;
- 	}
- 
- 	return pkt;
- 
- no_rd_bio:
--	for (i = 0; i < frames; i++) {
--		if (pkt->r_bios[i])
--			bio_uninit(pkt->r_bios[i]);
-+	for (i = 0; i < frames; i++)
- 		kfree(pkt->r_bios[i]);
--	}
- no_page:
- 	for (i = 0; i < frames / FRAMES_PER_PAGE; i++)
- 		if (pkt->pages[i])
- 			__free_page(pkt->pages[i]);
--	bio_uninit(pkt->w_bio);
- 	kfree(pkt->w_bio);
- no_bio:
- 	kfree(pkt);
-@@ -571,13 +564,10 @@ static void pkt_free_packet_data(struct packet_data *pkt)
- {
- 	int i;
- 
--	for (i = 0; i < pkt->frames; i++) {
--		bio_uninit(pkt->r_bios[i]);
-+	for (i = 0; i < pkt->frames; i++)
- 		kfree(pkt->r_bios[i]);
--	}
- 	for (i = 0; i < pkt->frames / FRAMES_PER_PAGE; i++)
- 		__free_page(pkt->pages[i]);
--	bio_uninit(pkt->w_bio);
- 	kfree(pkt->w_bio);
- 	kfree(pkt);
- }
-@@ -950,6 +940,7 @@ static void pkt_end_io_read(struct bio *bio)
- 
- 	if (bio->bi_status)
- 		atomic_inc(&pkt->io_errors);
-+	bio_uninit(bio);
- 	if (atomic_dec_and_test(&pkt->io_wait)) {
- 		atomic_inc(&pkt->run_sm);
- 		wake_up(&pd->wqueue);
-@@ -967,6 +958,7 @@ static void pkt_end_io_packet_write(struct bio *bio)
- 
- 	pd->stats.pkt_ended++;
- 
-+	bio_uninit(bio);
- 	pkt_bio_finished(pd);
- 	atomic_dec(&pkt->io_wait);
- 	atomic_inc(&pkt->run_sm);
-@@ -1021,7 +1013,7 @@ static void pkt_gather_data(struct pktcdvd_device *pd, struct packet_data *pkt)
- 			continue;
- 
- 		bio = pkt->r_bios[f];
--		bio_reset(bio, pd->bdev, REQ_OP_READ);
-+		bio_init(bio, pd->bdev, bio->bi_inline_vecs, 1, REQ_OP_READ);
- 		bio->bi_iter.bi_sector = pkt->sector + f * (CD_FRAMESIZE >> 9);
- 		bio->bi_end_io = pkt_end_io_read;
- 		bio->bi_private = pkt;
-@@ -1234,7 +1226,8 @@ static void pkt_start_write(struct pktcdvd_device *pd, struct packet_data *pkt)
- {
- 	int f;
- 
--	bio_reset(pkt->w_bio, pd->bdev, REQ_OP_WRITE);
-+	bio_init(pkt->w_bio, pd->bdev, pkt->w_bio->bi_inline_vecs, pkt->frames,
-+		 REQ_OP_WRITE);
- 	pkt->w_bio->bi_iter.bi_sector = pkt->sector;
- 	pkt->w_bio->bi_end_io = pkt_end_io_packet_write;
- 	pkt->w_bio->bi_private = pkt;
--- 
-2.30.2
+On Tue, Mar 01, 2022 at 02:43:55PM +0900, Akihiko Odaki wrote:
+> On 2022/02/28 19:51, Stefan Hajnoczi wrote:
+> > On Thu, Feb 24, 2022 at 06:38:02PM +0900, Akihiko Odaki wrote:
+> > > Virtual I/O Device (VIRTIO) Version 1.1
+> > > https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-cs=
+prd01.html
+> > > > discard_sector_alignment can be used by OS when splitting a request
+> > > > based on alignment.
+> > >=20
+> > > According to Documentation/ABI/stable/sysfs-block, the corresponding
+> > > field in the kernel is, confusingly, discard_granularity, not
+> > > discard_alignment.
+> >=20
+> > Good catch, struct virtio_blk_config->discard_sector_alignment is Linux
+> > q->limits.discard_granularity.
+> >=20
+> > >=20
+> > > Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
+> > > ---
+> > >   drivers/block/virtio_blk.c | 4 +---
+> > >   1 file changed, 1 insertion(+), 3 deletions(-)
+> > >=20
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index c443cd64fc9b..1fb3c89900e3 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -913,11 +913,9 @@ static int virtblk_probe(struct virtio_device *v=
+dev)
+> > >   		blk_queue_io_opt(q, blk_size * opt_io_size);
+> > >   	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
+> > > -		q->limits.discard_granularity =3D blk_size;
+> > > -
+> > >   		virtio_cread(vdev, struct virtio_blk_config,
+> > >   			     discard_sector_alignment, &v);
+> > > -		q->limits.discard_alignment =3D v ? v << SECTOR_SHIFT : 0;
+> >=20
+> > Should we use struct virtio_blk_config->topology.alignment_offset
+> > ("offset of first aligned logical block" and used for Linux
+> > blk_queue_alignment_offset()) for q->limits.discard_alignment?
+>=20
+> Maybe but I'm not sure. I had looked at the code of QEMU
+> (commit 5c1ee569660d4a205dced9cb4d0306b907fb7599) but it apparently always
+> sets 0 for virtio_blk_config->topology.alignment_offset.
+> I don't have a hardware which requires discard_alignment either so I cann=
+ot
+> test it.
+>=20
+> I'd like to leave this patch as is since I cannot deny the possibility th=
+at
+> the host has a different alignment offset for discarding and other
+> operations.
+
+Fair enough. To do it properly we'd need to add a new configuration
+space field to virtio-blk.
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--QjNeH+KS6pqTHNut
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmId4jMACgkQnKSrs4Gr
+c8hVTQf/fK2GjZF044xLZweZrpcjLJNrkExfCsyHEH1Ah4G4APuU/5PSDiiYm6XX
+EWrQanPgZ7Js5AkKfqsj5BslgH6HuTGUUfdP96Ww3uOxGG1jXpN3ifmN6vnLLUuR
++KQjF89iI6zAl8yuV1OvGWl7+KgT0zmGEyFlY2t2ELov/TihbI872+kohZxpUCf4
+/7ZkXj7EL7BJxRmez/82PlVNzp1rqM7WsO9E+exIRL5uedb1w2lO8U96h9B7FO0i
+eCJCD3MH8bTQ5q30xXMdEueNrRanBEnaXtteAmnAyrgXhK43mYGgvklxigXq2wrG
+2ehNobgts6blVTE4GekOllSvt+9ZBw==
+=qaMg
+-----END PGP SIGNATURE-----
+
+--QjNeH+KS6pqTHNut--
 
