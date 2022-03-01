@@ -2,49 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1E6AC433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:56:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8266C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 12:59:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234055AbiCAM5R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 07:57:17 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34674 "EHLO
+        id S229926AbiCANAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 08:00:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230415AbiCAM5Q (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 07:57:16 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A755996B9;
-        Tue,  1 Mar 2022 04:56:36 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BB10268AFE; Tue,  1 Mar 2022 13:56:32 +0100 (CET)
-Date:   Tue, 1 Mar 2022 13:56:32 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-Subject: Re: move more work to disk_release v2
-Message-ID: <20220301125632.GA3911@lst.de>
-References: <20220227172144.508118-1-hch@lst.de> <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org>
+        with ESMTP id S233780AbiCANAI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 08:00:08 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 042B4574BB
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 04:59:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=l2WBiCb5duYJRA9nKpihqrJOH1Qjg6utSrFiu8qAdtc=; b=hiLqSin/KTgGp/pVfKA4oNOQBe
+        yBIjl8paEb1t/eX0PsQnx7zim2rAivxjfJjFrlMwMRknc7Q/JJnUDEmhHJsaADJhVovcz965ZSAJs
+        4u8nrVRnTD/+Bhkk3ETG1zDwCQdFeT3leQEvLWuqDS3XJCase+Pio7j0tSlloJdVxtatwWW2ixUCf
+        Ta+RwFhNV8ZLYTHi41YZdWkexWvpTGOK/I/i7/3+eCvBy7nmrSEXN0wDTH6pWgbZ59Bhade+NnTuB
+        EIFRB2ij0J/21YAVnk0HQ+3vN9NDVqLSWotbhJi5R5r8Vi5dSq8+FqT1oeNlsoBgRR8VfWZR+Doue
+        6XRcwulg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nP266-00GgOp-J9; Tue, 01 Mar 2022 12:59:22 +0000
+Date:   Tue, 1 Mar 2022 04:59:22 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Xie Yongji <xieyongji@bytedance.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk,
+        hch@infradead.org, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
+Message-ID: <Yh4YqjqV0MasKde4@infradead.org>
+References: <20220228065720.100-1-xieyongji@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220228065720.100-1-xieyongji@bytedance.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Feb 27, 2022 at 03:18:24PM -0800, Bart Van Assche wrote:
-> The second issue I run into with this branch is as follows
-> (also for nvmeof-mp/002):
+Looks good,
 
-You'll need this patch, which is only in mainline but not the
-for-5.18/block branch:
-
-fd9f4e62a39f09a7c014d7415c2b9d1390aa0504
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue Jan 18 08:04:44 2022 +0100
-
-    block: assign bi_bdev for cloned bios in blk_rq_prep_clone
-
+Reviewed-by: Christoph Hellwig <hch@lst.de>
