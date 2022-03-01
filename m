@@ -2,88 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E06C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 13:37:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94499C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 13:54:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235058AbiCANiB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 08:38:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46000 "EHLO
+        id S234845AbiCANzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 08:55:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234687AbiCANiA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 08:38:00 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15E089D0F8
-        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 05:37:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=u3tLw5ZeGoSiDbcH6v5iLJ1Kz3D8CxYacZcGoCAytZk=; b=SzYE0J4ltP4mLGulkjUX8UoLq9
-        tvDYnMGwHW3depYKdOkpK16hRhCIhyRCJxWmiZgx1/ewCEsmoacFVqrQODaaqxTz4XFcKYwC1qlbC
-        JxIYTh122GzGF1w2Und3hCGDUNKBD9h4DZqR0mR3koMJZ1aee1ce2r2sBTf415cpKe4H9+HwqPYhd
-        YvJ4Uz9rrc6h0C5/d5zRt0CBco5SffJHutQ5+eh+K/XGq7a/o6lVOsg4z+7fX8xee7DEJLpt7BPNs
-        RKHi/6ca4Bq4h3myJ2/KhHPuHE45yPNe3ZbqN1eqozYylrvP1FjcbB0UXqekBCvQlVobM6XNJ+wyo
-        J3EP6KJw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nP2gn-00GvLk-Jp; Tue, 01 Mar 2022 13:37:17 +0000
-Date:   Tue, 1 Mar 2022 05:37:17 -0800
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH 6/6] blk-mq: manage hctx map via xarray
-Message-ID: <Yh4hjS0S3vXfLWlH@infradead.org>
-References: <20220228090430.1064267-1-ming.lei@redhat.com>
- <20220228090430.1064267-7-ming.lei@redhat.com>
+        with ESMTP id S233891AbiCANzN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 08:55:13 -0500
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06245A0BE;
+        Tue,  1 Mar 2022 05:54:31 -0800 (PST)
+Received: from kwepemi100001.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K7JXG75DRz1GBx4;
+        Tue,  1 Mar 2022 21:49:50 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100001.china.huawei.com (7.221.188.215) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 1 Mar 2022 21:54:29 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 1 Mar 2022 21:54:28 +0800
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+To:     Ming Lei <ming.lei@redhat.com>,
+        Christoph Hellwig <hch@infradead.org>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org> <Yhxnkg0AEaj36t+a@T590>
+ <YhyYpWHGVhs3J/dk@infradead.org> <Yh31bQu3gbXoDBuK@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <836f0686-4ac8-327d-2bab-64a762ea8673@huawei.com>
+Date:   Tue, 1 Mar 2022 21:54:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220228090430.1064267-7-ming.lei@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Yh31bQu3gbXoDBuK@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> -			hctxs[i] = blk_mq_alloc_and_init_hctx(set, q, i,
-> -					old_node);
-> -			WARN_ON_ONCE(!hctxs[i]);
-> +			WARN_ON_ONCE(!blk_mq_alloc_and_init_hctx(set, q, i,
-> +						old_node));
+ÔÚ 2022/03/01 18:29, Ming Lei Ð´µÀ:
+> On Mon, Feb 28, 2022 at 01:40:53AM -0800, Christoph Hellwig wrote:
+>> On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
+>>>> FYI, this crashed left rigt and center when running xfstests with
+>>>> traces pointing to throtl_pending_timer_fn.
+>>>
+>>> Can you share the exact xfstests test(fs, test)? Or panic log?
+>>>
+>>> I can't reproduce it when running './check -g auto' on XFS, meantime
+>>> tracking throtl_pending_timer_fn().
+>>
+>>  From a quick run using f2fs:
+>>
+>> generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
+> 
+> Thanks for providing the reproducer.
+> 
+> The reason is that the pending timer is deleted in blkg's release
+> handler, so the timer can still be live after request queue is released.
+> 
+> The patch of 'block: cancel all throttled bios in del_gendisk()' should just
+> make it easier to trigger.
+> 
+> After patch of "block: move blkcg initialization/destroy into disk allocation/
+> release handler" lands, the issue can be fixed easily by:
 
+Hi,
 
-Please avoid doing the actual work inside a WARN_ON statement.
+Thanks for locating this problem,
 
->  
->  	for (; j < end; j++) {
-> -		struct blk_mq_hw_ctx *hctx = hctxs[j];
-> +		struct blk_mq_hw_ctx *hctx = blk_mq_get_hctx(q, j);
->  
-> -		if (hctx) {
-> +		if (hctx)
->  			blk_mq_exit_hctx(q, set, hctx, j);
-> -			hctxs[j] = NULL;
-> -		}
->  	}
+Perhaps this patch should wait for the problem to be solved.
 
-Instead of a for loop that does xa_loads repeatedly this can just
-use xa_for_each_range.  Same for a bunch of other loops like that,
-e.g. in blk_mq_unregister_dev or the __blk_mq_register_dev failure
-path.
-
-> @@ -919,12 +919,12 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
->  static inline struct blk_mq_hw_ctx *blk_mq_get_hctx(struct request_queue *q,
->  		unsigned int hctx_idx)
->  {
-> -	return q->queue_hw_ctx[hctx_idx];
-> +	return xa_load(&q->hctx_table, hctx_idx);
->  }
->  
->  #define queue_for_each_hw_ctx(q, hctx, i)				\
->  	for ((i) = 0; (i) < (q)->nr_hw_queues &&			\
-> -	     ({ hctx = blk_mq_get_hctx((q), (i)); 1; }); (i)++)
-> +	     (hctx = blk_mq_get_hctx((q), (i))); (i)++)
-
-This should be using a xa_for_each loop.
-
-With various places converted to loops I'm not even sure we really
-want the blk_mq_get_hctx helper at all.
+Thanks,
+Kuai
+> 
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index fa063c6c0338..e8d4be5e1de3 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -82,6 +82,7 @@ static void blkg_free(struct blkcg_gq *blkg)
+>   		if (blkg->pd[i])
+>   			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
+>   
+> +	blk_put_queue(blkg->q);
+>   	free_percpu(blkg->iostat_cpu);
+>   	percpu_ref_exit(&blkg->refcnt);
+>   	kfree(blkg);
+> @@ -297,9 +298,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+>   	blkg->online = true;
+>   	spin_unlock(&blkcg->lock);
+>   
+> -	if (!ret)
+> +	if (!ret && blk_get_queue(q))
+>   		return blkg;
+> -
+> +	else if (!ret)
+> +		ret = -ENODEV;
+>   	/* @blkg failed fully initialized, use the usual release path */
+>   	blkg_put(blkg);
+>   	return ERR_PTR(ret);
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
