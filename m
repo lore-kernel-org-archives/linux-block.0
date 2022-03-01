@@ -2,99 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AD9C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 04:11:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E028FC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 05:44:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230348AbiCAEL5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 23:11:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55376 "EHLO
+        id S230044AbiCAFok (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 00:44:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230243AbiCAEL4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 23:11:56 -0500
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A425C5881D;
-        Mon, 28 Feb 2022 20:11:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646107876; x=1677643876;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=qltwIc937Uu5ijgl7gEV8QkFm9r0IMF7rI6cefmccNg=;
-  b=M6i/D8mcSzertUgoZedoD2ZstrLGCCTGRxA7uO6UBU7QgXeEd11RYcJs
-   V6ee1QP1z99YCinMvfQDdQrE3XjHVBWIP5StE7FNhRTPyNgZoL34ltusE
-   p8pMONrkYdSFzNcUXNVKSYb+kHTismkd+tQT6TYwEUl0537PIZu0YKfh0
-   mq9eAXB9AkQoXgqfJOq7mHmoh5tcXhGoz6tugCfr/W9WSm5OCKP20v3HS
-   mXElobuZiJOsCZFz6bfn673RQ+uEIWWhPnIBNkcHHhtf91+0R0OcqPb67
-   EGpkMghHDT3nzGNy4KkydcReTvYd4HvD1a/mYFJZv/IFkUeihMA5V5D10
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="253242178"
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="253242178"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 20:11:16 -0800
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="550543648"
-Received: from chunhanz-mobl.amr.corp.intel.com (HELO localhost) ([10.212.29.175])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 20:11:15 -0800
-Date:   Mon, 28 Feb 2022 20:11:15 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Justin Sanders <justin@coraid.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Denis Efremov <efremov@linux.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        nvdimm@lists.linux.dev
-Subject: Re: [PATCH 10/10] floppy: use memcpy_{to,from}_bvec
-Message-ID: <Yh2c41kEWmmGgWLG@iweiny-desk3>
-References: <20220222155156.597597-1-hch@lst.de>
- <20220222155156.597597-11-hch@lst.de>
+        with ESMTP id S229572AbiCAFoj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 00:44:39 -0500
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67FA3C726;
+        Mon, 28 Feb 2022 21:43:59 -0800 (PST)
+Received: by mail-pf1-x42f.google.com with SMTP id y11so13207107pfa.6;
+        Mon, 28 Feb 2022 21:43:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=LwvwEzrp1xIn/jiiFpp6P3SyFgnwZ8pdXfzOU/9VimM=;
+        b=ET/mFAPhigISowfoXYA20OpHqk3b9a377bJHQAx/qiZNGD/rCjrHZIID+csiK8jxjw
+         csAgrclrCMAp3lafFbwBkY1TMlrh2B335k7jWtctCtNZb3vne87S95RBhOSy1pDqnV/8
+         j8gfCKCjHHrSLNZi9QW045rbK1MOOUD1eGhAUKx9fZkqtiC7mCV1D0azocajXFOhLhqa
+         Mh+yu10gYbKl0F60BnGwmMLZRKNIKwva12PFiREuNWNmfx1u/nAVoeAWGexFmoOzQYeM
+         wFcyQ0rnCo+MXgzicTl97V7dqClDSjQaCG/nmNmXmu9IIDLbvCRIb6nKEp5m0RgjuQZH
+         BKig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=LwvwEzrp1xIn/jiiFpp6P3SyFgnwZ8pdXfzOU/9VimM=;
+        b=fCIJsfRbR8iPqKM8dlUiXBm0PWm9fjRvVeG4sfIn1t/R9IGbkoELw+kH85VX3GuTYV
+         LkjFVHeM0FlaCayoyeVJCjHSCHWPIEH1WJSAGlfSuao1kluuN8RKghXbFTWdE9V0hvAk
+         vJMfNAFoxwaP/5BqCoDetqMM7p6alw8AxQgSym7MDYW0x5mEeA0lVOGKBkII5yn5trMK
+         AC3qljaeovGiXZqWLXO65+WOjy2I92DOWfJ6dyJzrC9xKgi+BxwK+Z9DUH4/0tT7XloA
+         fm/r3n0Q1BUnC0UzRO1Otj+m8IYL3r3DlXH8rPA3H6gKztL+FzJRKZQOkCiuOgFK410P
+         FvnA==
+X-Gm-Message-State: AOAM532ZrVvhgvvKLRf9jf8xxvIm3PgAWX2P+4K5zrTe13EYeBjm2dyk
+        /MRvNPextZA9KowlSVO+A4Y=
+X-Google-Smtp-Source: ABdhPJz6BAAdB9CWW32JUQzeaQpYg9pPmndbJaPAFugg683B8RIVCOr4kFFB4mO+fVhzp5+5G2m/mQ==
+X-Received: by 2002:a63:1350:0:b0:378:7fb4:63eb with SMTP id 16-20020a631350000000b003787fb463ebmr10043971pgt.457.1646113439190;
+        Mon, 28 Feb 2022 21:43:59 -0800 (PST)
+Received: from [192.168.66.3] (p912131-ipoe.ipoe.ocn.ne.jp. [153.243.13.130])
+        by smtp.gmail.com with ESMTPSA id l13-20020a056a00140d00b004e13da93eaasm16233690pfu.62.2022.02.28.21.43.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Feb 2022 21:43:58 -0800 (PST)
+Message-ID: <e306700c-3153-9422-974c-1f5f10e232d6@gmail.com>
+Date:   Tue, 1 Mar 2022 14:43:55 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220222155156.597597-11-hch@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH] virtio-blk: Assign discard_granularity
+Content-Language: en-US
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        Jens Axboe <axboe@kernel.dk>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+References: <20220224093802.11348-1-akihiko.odaki@gmail.com>
+ <YhypTNtWpcgh3gb2@stefanha-x1.localdomain>
+From:   Akihiko Odaki <akihiko.odaki@gmail.com>
+In-Reply-To: <YhypTNtWpcgh3gb2@stefanha-x1.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 04:51:56PM +0100, Christoph Hellwig wrote:
-> Use the helpers instead of open coding them.
+On 2022/02/28 19:51, Stefan Hajnoczi wrote:
+> On Thu, Feb 24, 2022 at 06:38:02PM +0900, Akihiko Odaki wrote:
+>> Virtual I/O Device (VIRTIO) Version 1.1
+>> https://docs.oasis-open.org/virtio/virtio/v1.1/csprd01/virtio-v1.1-csprd01.html
+>>> discard_sector_alignment can be used by OS when splitting a request
+>>> based on alignment.
+>>
+>> According to Documentation/ABI/stable/sysfs-block, the corresponding
+>> field in the kernel is, confusingly, discard_granularity, not
+>> discard_alignment.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Good catch, struct virtio_blk_config->discard_sector_alignment is Linux
+> q->limits.discard_granularity.
+> 
+>>
+>> Signed-off-by: Akihiko Odaki <akihiko.odaki@gmail.com>
+>> ---
+>>   drivers/block/virtio_blk.c | 4 +---
+>>   1 file changed, 1 insertion(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+>> index c443cd64fc9b..1fb3c89900e3 100644
+>> --- a/drivers/block/virtio_blk.c
+>> +++ b/drivers/block/virtio_blk.c
+>> @@ -913,11 +913,9 @@ static int virtblk_probe(struct virtio_device *vdev)
+>>   		blk_queue_io_opt(q, blk_size * opt_io_size);
+>>   
+>>   	if (virtio_has_feature(vdev, VIRTIO_BLK_F_DISCARD)) {
+>> -		q->limits.discard_granularity = blk_size;
+>> -
+>>   		virtio_cread(vdev, struct virtio_blk_config,
+>>   			     discard_sector_alignment, &v);
+>> -		q->limits.discard_alignment = v ? v << SECTOR_SHIFT : 0;
+> 
+> Should we use struct virtio_blk_config->topology.alignment_offset
+> ("offset of first aligned logical block" and used for Linux
+> blk_queue_alignment_offset()) for q->limits.discard_alignment?
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+Maybe but I'm not sure. I had looked at the code of QEMU
+(commit 5c1ee569660d4a205dced9cb4d0306b907fb7599) but it apparently 
+always sets 0 for virtio_blk_config->topology.alignment_offset.
+I don't have a hardware which requires discard_alignment either so I 
+cannot test it.
 
-> ---
->  drivers/block/floppy.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/floppy.c b/drivers/block/floppy.c
-> index 19c2d0327e157..8c647532e3ce9 100644
-> --- a/drivers/block/floppy.c
-> +++ b/drivers/block/floppy.c
-> @@ -2485,11 +2485,9 @@ static void copy_buffer(int ssize, int max_sector, int max_sector_2)
->  		}
->  
->  		if (CT(raw_cmd->cmd[COMMAND]) == FD_READ)
-> -			memcpy_to_page(bv.bv_page, bv.bv_offset, dma_buffer,
-> -				       size);
-> +			memcpy_to_bvec(&bv, dma_buffer);
->  		else
-> -			memcpy_from_page(dma_buffer, bv.bv_page, bv.bv_offset,
-> -					 size);
-> +			memcpy_from_bvec(dma_buffer, &bv);
->  
->  		remaining -= size;
->  		dma_buffer += size;
-> -- 
-> 2.30.2
-> 
-> 
+I'd like to leave this patch as is since I cannot deny the possibility 
+that the host has a different alignment offset for discarding and other 
+operations.
