@@ -2,119 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94499C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 13:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5615C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 14:26:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234845AbiCANzN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 08:55:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35542 "EHLO
+        id S235183AbiCAO0o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 09:26:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233891AbiCANzN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 08:55:13 -0500
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A06245A0BE;
-        Tue,  1 Mar 2022 05:54:31 -0800 (PST)
-Received: from kwepemi100001.china.huawei.com (unknown [172.30.72.57])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4K7JXG75DRz1GBx4;
-        Tue,  1 Mar 2022 21:49:50 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100001.china.huawei.com (7.221.188.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 1 Mar 2022 21:54:29 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 1 Mar 2022 21:54:28 +0800
-Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
-To:     Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@infradead.org>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220210115637.1074927-1-yukuai3@huawei.com>
- <YhuyBgZSS6m/Mwu6@infradead.org> <Yhxnkg0AEaj36t+a@T590>
- <YhyYpWHGVhs3J/dk@infradead.org> <Yh31bQu3gbXoDBuK@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <836f0686-4ac8-327d-2bab-64a762ea8673@huawei.com>
-Date:   Tue, 1 Mar 2022 21:54:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S231732AbiCAO0o (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 09:26:44 -0500
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEC5A6E4C9;
+        Tue,  1 Mar 2022 06:26:02 -0800 (PST)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id A216C2110B;
+        Tue,  1 Mar 2022 14:26:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1646144761;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=igSUBiGP75gcwuKKcw5IrELkytjlsx5b26P1/uxLTDI=;
+        b=m4GhdnjslealexAP/oRzJR1pak++pQpgQY4kGvEzjaC3YgUl6DX+wndyUWZb7LLrMlUDUL
+        bDXGGES3NylgjPmmsF6g4hclkisVsizYxF7LUGh4WuoXDGkJOvlIsbr9g2ywdN4oZ/N8I5
+        Egd3FZTeVFhYl7SEjKJmrYj0gjJMsmc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1646144761;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=igSUBiGP75gcwuKKcw5IrELkytjlsx5b26P1/uxLTDI=;
+        b=AS2kmChYl/LTYbL9BGHDEoAKkBtbDX0SK3ZHu2HGLBKbGwSLvwAIOHJkcZ711kpgGAIw50
+        0JidFyRYjfU/SpDg==
+Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
+        by relay2.suse.de (Postfix) with ESMTP id 600F3A3B81;
+        Tue,  1 Mar 2022 14:26:01 +0000 (UTC)
+Received: by ds.suse.cz (Postfix, from userid 10065)
+        id E36AEDA80E; Tue,  1 Mar 2022 15:22:09 +0100 (CET)
+Date:   Tue, 1 Mar 2022 15:22:09 +0100
+From:   David Sterba <dsterba@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 1/5] btrfs: simplify ->flush_bio handling
+Message-ID: <20220301142209.GN12643@suse.cz>
+Reply-To: dsterba@suse.cz
+Mail-Followup-To: dsterba@suse.cz, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Josef Bacik <josef@toxicpanda.com>, David Sterba <dsterba@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+References: <20220301084552.880256-1-hch@lst.de>
+ <20220301084552.880256-2-hch@lst.de>
 MIME-Version: 1.0
-In-Reply-To: <Yh31bQu3gbXoDBuK@T590>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220301084552.880256-2-hch@lst.de>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/03/01 18:29, Ming Lei Ð´µÀ:
-> On Mon, Feb 28, 2022 at 01:40:53AM -0800, Christoph Hellwig wrote:
->> On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
->>>> FYI, this crashed left rigt and center when running xfstests with
->>>> traces pointing to throtl_pending_timer_fn.
->>>
->>> Can you share the exact xfstests test(fs, test)? Or panic log?
->>>
->>> I can't reproduce it when running './check -g auto' on XFS, meantime
->>> tracking throtl_pending_timer_fn().
->>
->>  From a quick run using f2fs:
->>
->> generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
-> 
-> Thanks for providing the reproducer.
-> 
-> The reason is that the pending timer is deleted in blkg's release
-> handler, so the timer can still be live after request queue is released.
-> 
-> The patch of 'block: cancel all throttled bios in del_gendisk()' should just
-> make it easier to trigger.
-> 
-> After patch of "block: move blkcg initialization/destroy into disk allocation/
-> release handler" lands, the issue can be fixed easily by:
-
-Hi,
-
-Thanks for locating this problem,
-
-Perhaps this patch should wait for the problem to be solved.
-
-Thanks,
-Kuai
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index fa063c6c0338..e8d4be5e1de3 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -82,6 +82,7 @@ static void blkg_free(struct blkcg_gq *blkg)
->   		if (blkg->pd[i])
->   			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
->   
-> +	blk_put_queue(blkg->q);
->   	free_percpu(blkg->iostat_cpu);
->   	percpu_ref_exit(&blkg->refcnt);
->   	kfree(blkg);
-> @@ -297,9 +298,10 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
->   	blkg->online = true;
->   	spin_unlock(&blkcg->lock);
->   
-> -	if (!ret)
-> +	if (!ret && blk_get_queue(q))
->   		return blkg;
+On Tue, Mar 01, 2022 at 10:45:48AM +0200, Christoph Hellwig wrote:
+> @@ -6962,16 +6961,6 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
+>  	if (!dev)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	/*
+> -	 * Preallocate a bio that's always going to be used for flushing device
+> -	 * barriers and matches the device lifespan
+> -	 */
+> -	dev->flush_bio = bio_kmalloc(GFP_KERNEL, 0);
+> -	if (!dev->flush_bio) {
+> -		kfree(dev);
+> -		return ERR_PTR(-ENOMEM);
+> -	}
 > -
-> +	else if (!ret)
-> +		ret = -ENODEV;
->   	/* @blkg failed fully initialized, use the usual release path */
->   	blkg_put(blkg);
->   	return ERR_PTR(ret);
-> 
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+>  	INIT_LIST_HEAD(&dev->dev_list);
+>  	INIT_LIST_HEAD(&dev->dev_alloc_list);
+>  	INIT_LIST_HEAD(&dev->post_commit_list);
+> diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
+> index 005c9e2a491a1..9af7b6211920c 100644
+> --- a/fs/btrfs/volumes.h
+> +++ b/fs/btrfs/volumes.h
+> @@ -117,7 +117,7 @@ struct btrfs_device {
+>  	u64 commit_bytes_used;
+>  
+>  	/* for sending down flush barriers */
+> -	struct bio *flush_bio;
+
+Please add this comment to the struct member declaration:
+
+	/* Bio used for flushing device barriers */
+
+> +	struct bio flush_bio;
+
+Otherwise
+
+Reviewed-by: David Sterba <dsterba@suse.com>
+
+Thanks.
