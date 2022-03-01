@@ -2,144 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7F05C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 28 Feb 2022 23:27:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EA4C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 00:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230024AbiB1X1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 18:27:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48356 "EHLO
+        id S230293AbiCAAbQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 19:31:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229961AbiB1X1p (ORCPT
+        with ESMTP id S229480AbiCAAbQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 18:27:45 -0500
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB8CADE2C1;
-        Mon, 28 Feb 2022 15:27:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=kySnWHttTi8Odl1WzgGLjQ1pb3b/AWH5qnYZSwnte50=; b=nt03mWtTaEB9qwsFMTflxzDbvW
-        aPSsVBeLr8i8UFwA1l3fNavsuYE231uUwb0yDTUi43cd3zIwbEaMZqro2u+rXbOt0KZriPQpyGi5J
-        +pW6oqM84XOoVppIQh3QNnM4ANpt9aIP3ShEwC0IGa2NKI/m2xxapQAyHhJG42Bevn7SuMSAnyA27
-        7+3DFdmFFllbJzk1MHudhAJj7GPo/5RsA7npxrePVRbtGBQKbJeOUSye2chevgvDMrFkod2y0FmL7
-        JW29U+rs2LR5a0WX3s04bvbvXotX/UjRCpaaxaXPYROyoDfpDk5Wuy418QovroPX+qbpGelik5Tc/
-        I0FC9RZw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nOpPe-0090gL-Ex; Mon, 28 Feb 2022 23:26:42 +0000
-Date:   Mon, 28 Feb 2022 23:26:42 +0000
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        alsa-devel@alsa-project.org, linux-aspeed@lists.ozlabs.org,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        linux-iio@vger.kernel.org, nouveau@lists.freedesktop.org,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        samba-technical@lists.samba.org,
-        linux1394-devel@lists.sourceforge.net, drbd-dev@lists.linbit.com,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        KVM list <kvm@vger.kernel.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        linux-staging@lists.linux.dev, "Bos, H.J." <h.j.bos@vu.nl>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        intel-wired-lan@lists.osuosl.org,
-        kgdb-bugreport@lists.sourceforge.net,
-        bcm-kernel-feedback-list@broadcom.com,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Kees Cook <keescook@chromium.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        v9fs-developer@lists.sourceforge.net,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        linux-sgx@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>, linux-usb@vger.kernel.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        tipc-discussion@lists.sourceforge.net,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        Mike Rapoport <rppt@kernel.org>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-Message-ID: <Yh1aMm3hFe/j9ZbI@casper.infradead.org>
-References: <20220228110822.491923-1-jakobkoschel@gmail.com>
- <20220228110822.491923-3-jakobkoschel@gmail.com>
- <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
- <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
- <CAHk-=wj8fkosQ7=bps5K+DDazBXk=ypfn49A0sEq+7-nZnyfXA@mail.gmail.com>
- <CAHk-=wiTCvLQkHcJ3y0hpqH7FEk9D28LDvZZogC6OVLk7naBww@mail.gmail.com>
- <Yh0tl3Lni4weIMkl@casper.infradead.org>
- <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+        Mon, 28 Feb 2022 19:31:16 -0500
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63E8E764C;
+        Mon, 28 Feb 2022 16:30:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646094636; x=1677630636;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iQYOoTv3Io78EdoGSCPEiJBASaZqMAGkeBkPnB8tiBw=;
+  b=bJGXHJgllAyPfas0F8VKyN2QA+dO5VUNWMgpG44IXfA8o11cFwoS11Nk
+   oZluO1LnS39E9dzU8EgiHyzVaY+4gm9srTJw5MFm7eH3Td6NlgLKOJskg
+   k0eQpFEllCu2mRKlaqvf6qkggM6AgcGC4t7E80OT08ubydXws7GbQfrHV
+   ZfYtWZ3DEqRTFafulHtAL8GMctGlrGz5gUVYOLNWwnT3LrCu1Z1ZErjJf
+   /eVnPqMDH/y5Pp+Lj7YKNMwRRgxC6YxheeHUI5aHayFKfJx96f8PRiaBI
+   59NbbgXYDSzPqHRbGZk/FnS8hOCTiTnKQf+6XRgjnK7d7Bsx45w53YIqh
+   g==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="232991456"
+X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
+   d="scan'208";a="232991456"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 16:30:36 -0800
+X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
+   d="scan'208";a="803674992"
+Received: from chunhanz-mobl.amr.corp.intel.com (HELO localhost) ([10.212.29.175])
+  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 16:30:35 -0800
+Date:   Mon, 28 Feb 2022 16:30:35 -0800
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Justin Sanders <justin@coraid.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Denis Efremov <efremov@linux.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
+        nvdimm@lists.linux.dev
+Subject: Re: [PATCH 01/10] iss-simdisk: use bvec_kmap_local in
+ simdisk_submit_bio
+Message-ID: <Yh1pKyX8z6R1l7mf@iweiny-desk3>
+References: <20220222155156.597597-1-hch@lst.de>
+ <20220222155156.597597-2-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAHk-=wgBfJ1-cPA2LTvFyyy8owpfmtCuyiZi4+um8DhFNe+CyA@mail.gmail.com>
+In-Reply-To: <20220222155156.597597-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Feb 28, 2022 at 12:37:15PM -0800, Linus Torvalds wrote:
-> On Mon, Feb 28, 2022 at 12:16 PM Matthew Wilcox <willy@infradead.org> wrote:
-> >
-> > Then we can never use -Wshadow ;-(  I'd love to be able to turn it on;
-> > it catches real bugs.
+On Tue, Feb 22, 2022 at 04:51:47PM +0100, Christoph Hellwig wrote:
+> Using local kmaps slightly reduces the chances to stray writes, and
+> the bvec interface cleans up the code a little bit.
 > 
-> Oh, we already can never use -Wshadow regardless of things like this.
-> That bridge hasn't just been burned, it never existed in the first
-> place.
-> 
-> The whole '-Wshadow' thing simply cannot work with local variables in
-> macros - something that we've used since day 1.
-> 
-> Try this (as a "p.c" file):
-> 
->         #define min(a,b) ({                     \
->                 typeof(a) __a = (a);            \
->                 typeof(b) __b = (b);            \
->                 __a < __b ? __a : __b; })
-> 
->         int min3(int a, int b, int c)
->         {
->                 return min(a,min(b,c));
->         }
-> 
-> and now do "gcc -O2 -S t.c".
-> 
-> Then try it with -Wshadow.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-#define ___PASTE(a, b)	a##b
-#define __PASTE(a, b) ___PASTE(a, b)
-#define _min(a, b, u) ({         \
-        typeof(a) __PASTE(__a,u) = (a);            \
-        typeof(b) __PASTE(__b,u) = (b);            \
-        __PASTE(__a,u) < __PASTE(__b,u) ? __PASTE(__a,u) : __PASTE(__b,u); })
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
 
-#define min(a, b) _min(a, b, __COUNTER__)
-
-int min3(int a, int b, int c)
-{
-        return min(a,min(b,c));
-}
-
-(probably there's a more elegant way to do this)
+> ---
+>  arch/xtensa/platforms/iss/simdisk.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/xtensa/platforms/iss/simdisk.c b/arch/xtensa/platforms/iss/simdisk.c
+> index 8eb6ad1a3a1de..0f0e0724397f4 100644
+> --- a/arch/xtensa/platforms/iss/simdisk.c
+> +++ b/arch/xtensa/platforms/iss/simdisk.c
+> @@ -108,13 +108,13 @@ static void simdisk_submit_bio(struct bio *bio)
+>  	sector_t sector = bio->bi_iter.bi_sector;
+>  
+>  	bio_for_each_segment(bvec, bio, iter) {
+> -		char *buffer = kmap_atomic(bvec.bv_page) + bvec.bv_offset;
+> +		char *buffer = bvec_kmap_local(&bvec);
+>  		unsigned len = bvec.bv_len >> SECTOR_SHIFT;
+>  
+>  		simdisk_transfer(dev, sector, len, buffer,
+>  				bio_data_dir(bio) == WRITE);
+>  		sector += len;
+> -		kunmap_atomic(buffer);
+> +		kunmap_local(buffer);
+>  	}
+>  
+>  	bio_endio(bio);
+> -- 
+> 2.30.2
+> 
+> 
