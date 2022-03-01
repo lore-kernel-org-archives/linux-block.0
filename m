@@ -2,109 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79087C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 02:13:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4594C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  1 Mar 2022 02:15:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232071AbiCACNi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Feb 2022 21:13:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
+        id S232010AbiCACPz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Feb 2022 21:15:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231996AbiCACNi (ORCPT
+        with ESMTP id S230452AbiCACPz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Feb 2022 21:13:38 -0500
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C162DE1;
-        Mon, 28 Feb 2022 18:12:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646100777; x=1677636777;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=FHnCsOMAMVBswmIQalbSrppghnzz3akbTDtT8A36Yxg=;
-  b=gky3VH8HpuBTmSWQthfd7i1UxfeExdzkLT0NchEMzjtmf58xDS78LmOz
-   R1kme0ofczXP8FZddko4VKHz1piELJCgM0Yzgih8Hp8WDzUZ0uZTvh65k
-   6i4dPfnNtogPA7hN+NU/RJP/uuWmzxhEisYYtVW5Iheu8zyOowQnQmhzA
-   CuHkYRVO3nWD6AxNa/GV0lkb87kc5ChRFp1vyAx/PEFK+sqscrMJRz+Wz
-   YEX+NHZW4aBCVlZgeTl4h2RcVTmf/nOS3bLRLi3goO6BP5ktZbkMkUC2C
-   oK+Xkk+5yDHN6dtjdEqDe/nypY94/z+z0w3Tfa2jS4CyQduw5HBXTEgC8
-   g==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10272"; a="339469568"
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="339469568"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 18:12:46 -0800
-X-IronPort-AV: E=Sophos;i="5.90,144,1643702400"; 
-   d="scan'208";a="629855449"
-Received: from chunhanz-mobl.amr.corp.intel.com (HELO localhost) ([10.212.29.175])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Feb 2022 18:12:45 -0800
-Date:   Mon, 28 Feb 2022 18:12:45 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Justin Sanders <justin@coraid.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Denis Efremov <efremov@linux.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        nvdimm@lists.linux.dev
-Subject: Re: [PATCH 04/10] zram: use memcpy_from_bvec in zram_bvec_write
-Message-ID: <Yh2BHT4xXBJac987@iweiny-desk3>
-References: <20220222155156.597597-1-hch@lst.de>
- <20220222155156.597597-5-hch@lst.de>
+        Mon, 28 Feb 2022 21:15:55 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 09F5A3A193
+        for <linux-block@vger.kernel.org>; Mon, 28 Feb 2022 18:15:13 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-311-AiLIJJiTPXKF2aB_irlgEQ-1; Tue, 01 Mar 2022 02:15:11 +0000
+X-MC-Unique: AiLIJJiTPXKF2aB_irlgEQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.28; Tue, 1 Mar 2022 02:15:09 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.028; Tue, 1 Mar 2022 02:15:09 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Linus Torvalds' <torvalds@linux-foundation.org>,
+        =?utf-8?B?Q2hyaXN0aWFuIEvDtm5pZw==?= <christian.koenig@amd.com>
+CC:     linux-wireless <linux-wireless@vger.kernel.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        KVM list <kvm@vger.kernel.org>,
+        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        "Rasmus Villemoes" <linux@rasmusvillemoes.dk>,
+        dri-devel <dri-devel@lists.freedesktop.org>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        linux-arch <linux-arch@vger.kernel.org>,
+        CIFS <linux-cifs@vger.kernel.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        linux-scsi <linux-scsi@vger.kernel.org>,
+        linux-rdma <linux-rdma@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        amd-gfx list <amd-gfx@lists.freedesktop.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
+        Linux Media Mailing List <linux-media@vger.kernel.org>,
+        Kees Cook <keescook@chromium.org>,
+        "Arnd Bergman" <arnd@arndb.de>,
+        Linux PM <linux-pm@vger.kernel.org>,
+        intel-gfx <intel-gfx@lists.freedesktop.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Nathan Chancellor <nathan@kernel.org>,
+        dma <dmaengine@vger.kernel.org>,
+        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+        Jakob Koschel <jakobkoschel@gmail.com>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>,
+        linux-tegra <linux-tegra@vger.kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        "Andy Shevchenko" <andriy.shevchenko@linux.intel.com>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        Netdev <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux F2FS Dev Mailing List 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        Mike Rapoport <rppt@kernel.org>
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Index: AQHYLN1fDoOXhdJpm02jJhIGc9kG8qypx5SQ
+Date:   Tue, 1 Mar 2022 02:15:09 +0000
+Message-ID: <d245f691cfdf43d9a1e1e33acb570325@AcuMS.aculab.com>
+References: <20220228110822.491923-1-jakobkoschel@gmail.com>
+ <20220228110822.491923-3-jakobkoschel@gmail.com>
+ <2e4e95d6-f6c9-a188-e1cd-b1eae465562a@amd.com>
+ <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+In-Reply-To: <CAHk-=wgQps58DPEOe4y5cTh5oE9EdNTWRLXzgMiETc+mFX7jzw@mail.gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220222155156.597597-5-hch@lst.de>
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Feb 22, 2022 at 04:51:50PM +0100, Christoph Hellwig wrote:
-> Use memcpy_from_bvec instead of open coding the logic.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+RnJvbTogTGludXMgVG9ydmFsZHMNCj4gU2VudDogMjggRmVicnVhcnkgMjAyMiAxOTo1Ng0KPiBP
+biBNb24sIEZlYiAyOCwgMjAyMiBhdCA0OjE5IEFNIENocmlzdGlhbiBLw7ZuaWcNCj4gPGNocmlz
+dGlhbi5rb2VuaWdAYW1kLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBJIGRvbid0IHRoaW5rIHRoYXQg
+dXNpbmcgdGhlIGV4dHJhIHZhcmlhYmxlIG1ha2VzIHRoZSBjb2RlIGluIGFueSB3YXkNCj4gPiBt
+b3JlIHJlbGlhYmxlIG9yIGVhc2llciB0byByZWFkLg0KPiANCj4gU28gSSB0aGluayB0aGUgbmV4
+dCBzdGVwIGlzIHRvIGRvIHRoZSBhdHRhY2hlZCBwYXRjaCAod2hpY2ggcmVxdWlyZXMNCj4gdGhh
+dCAiLXN0ZD1nbnUxMSIgdGhhdCB3YXMgZGlzY3Vzc2VkIGluIHRoZSBvcmlnaW5hbCB0aHJlYWQp
+Lg0KPiANCj4gVGhhdCB3aWxsIGd1YXJhbnRlZSB0aGF0IHRoZSAncG9zJyBwYXJhbWV0ZXIgb2Yg
+bGlzdF9mb3JfZWFjaF9lbnRyeSgpDQo+IGlzIG9ubHkgdXBkYXRlZCBJTlNJREUgdGhlIGZvcl9l
+YWNoX2xpc3RfZW50cnkoKSBsb29wLCBhbmQgY2FuIG5ldmVyDQo+IHBvaW50IHRvIHRoZSAod3Jv
+bmdseSB0eXBlZCkgaGVhZCBlbnRyeS4NCj4gDQo+IEFuZCBJIHdvdWxkIGFjdHVhbGx5IGhvcGUg
+dGhhdCBpdCBzaG91bGQgYWN0dWFsbHkgY2F1c2UgY29tcGlsZXINCj4gd2FybmluZ3MgYWJvdXQg
+cG9zc2libHkgdW5pbml0aWFsaXplZCB2YXJpYWJsZXMgaWYgcGVvcGxlIHRoZW4gdXNlIHRoZQ0K
+PiAncG9zJyBwb2ludGVyIG91dHNpZGUgdGhlIGxvb3AuIEV4Y2VwdA0KPiANCj4gIChhKSB0aGF0
+IGNvZGUgaW4gc2d4L2VuY2wuYyBjdXJyZW50bHkgaW5pdGlhbGl6ZXMgJ3RtcCcgdG8gTlVMTCBm
+b3INCj4gaW5leHBsaWNhYmxlIHJlYXNvbnMgLSBwb3NzaWJseSBiZWNhdXNlIGl0IGFscmVhZHkg
+ZXhwZWN0ZWQgdGhpcw0KPiBiZWhhdmlvcg0KPiANCj4gIChiKSB3aGVuIEkgcmVtb3ZlIHRoYXQg
+TlVMTCBpbml0aWFsaXplciwgSSBzdGlsbCBkb24ndCBnZXQgYSB3YXJuaW5nLA0KPiBiZWNhdXNl
+IHdlJ3ZlIGRpc2FibGVkIC1Xbm8tbWF5YmUtdW5pbml0aWFsaXplZCBzaW5jZSBpdCByZXN1bHRz
+IGluIHNvDQo+IG1hbnkgZmFsc2UgcG9zaXRpdmVzLg0KPiANCj4gT2ggd2VsbC4NCj4gDQo+IEFu
+eXdheSwgZ2l2ZSB0aGlzIHBhdGNoIGEgbG9vaywgYW5kIGF0IGxlYXN0IGlmIGl0J3MgZXhwYW5k
+ZWQgdG8gZG8NCj4gIihwb3MpID0gTlVMTCIgaW4gdGhlIGVudHJ5IHN0YXRlbWVudCBmb3IgdGhl
+IGZvci1sb29wLCBpdCB3aWxsIGF2b2lkDQo+IHRoZSBIRUFEIHR5cGUgY29uZnVzaW9uIHRoYXQg
+SmFrb2IgaXMgd29ya2luZyBvbi4gQW5kIEkgdGhpbmsgaW4gYQ0KPiBjbGVhbmVyIHdheSB0aGFu
+IHRoZSBob3JyaWQgZ2FtZXMgaGUgcGxheXMuDQo+IA0KPiAoQnV0IGl0IHdvbid0IGF2b2lkIHBv
+c3NpYmxlIENQVSBzcGVjdWxhdGlvbiBvZiBzdWNoIHR5cGUgY29uZnVzaW9uLg0KPiBUaGF0LCBp
+biBteSBvcGluaW9uLCBpcyBhIGNvbXBsZXRlbHkgZGlmZmVyZW50IGlzc3VlKQ0KPiANCj4gSSBk
+byB3aXNoIHdlIGNvdWxkIGFjdHVhbGx5IHBvaXNvbiB0aGUgJ3BvcycgdmFsdWUgYWZ0ZXIgdGhl
+IGxvb3ANCj4gc29tZWhvdyAtIGJ1dCBjbGVhcmx5IHRoZSAibWlnaHQgYmUgdW5pbml0aWFsaXpl
+ZCIgSSB3YXMgaG9waW5nIGZvcg0KPiBpc24ndCB0aGUgd2F5IHRvIGRvIGl0Lg0KPiANCj4gQW55
+Ym9keSBoYXZlIGFueSBpZGVhcz8NCj4gDQo+ICAgICAgICAgICAgICAgICBMaW51cw0KZGlmZiAt
+LWdpdCBhL2luY2x1ZGUvbGludXgvbGlzdC5oIGIvaW5jbHVkZS9saW51eC9saXN0LmgNCmluZGV4
+IGRkNmMyMDQxZDA5Yy4uYmFiOTk1NTk2YWFhIDEwMDY0NA0KLS0tIGEvaW5jbHVkZS9saW51eC9s
+aXN0LmgNCisrKyBiL2luY2x1ZGUvbGludXgvbGlzdC5oDQpAQCAtNjM0LDEwICs2MzQsMTAgQEAg
+c3RhdGljIGlubGluZSB2b2lkIGxpc3Rfc3BsaWNlX3RhaWxfaW5pdChzdHJ1Y3QgbGlzdF9oZWFk
+ICpsaXN0LA0KICAqIEBoZWFkOgl0aGUgaGVhZCBmb3IgeW91ciBsaXN0Lg0KICAqIEBtZW1iZXI6
+CXRoZSBuYW1lIG9mIHRoZSBsaXN0X2hlYWQgd2l0aGluIHRoZSBzdHJ1Y3QuDQogICovDQotI2Rl
+ZmluZSBsaXN0X2Zvcl9lYWNoX2VudHJ5KHBvcywgaGVhZCwgbWVtYmVyKQkJCQlcDQotCWZvciAo
+cG9zID0gbGlzdF9maXJzdF9lbnRyeShoZWFkLCB0eXBlb2YoKnBvcyksIG1lbWJlcik7CVwNCi0J
+ICAgICAhbGlzdF9lbnRyeV9pc19oZWFkKHBvcywgaGVhZCwgbWVtYmVyKTsJCQlcDQotCSAgICAg
+cG9zID0gbGlzdF9uZXh0X2VudHJ5KHBvcywgbWVtYmVyKSkNCisjZGVmaW5lIGxpc3RfZm9yX2Vh
+Y2hfZW50cnkocG9zLCBoZWFkLCBtZW1iZXIpCQkJCQlcDQorCWZvciAodHlwZW9mKHBvcykgX19p
+dGVyID0gbGlzdF9maXJzdF9lbnRyeShoZWFkLCB0eXBlb2YoKnBvcyksIG1lbWJlcik7CVwNCisJ
+ICAgICAhbGlzdF9lbnRyeV9pc19oZWFkKF9faXRlciwgaGVhZCwgbWVtYmVyKSAmJiAoKChwb3Mp
+PV9faXRlciksMSk7CVwNCisJICAgICBfX2l0ZXIgPSBsaXN0X25leHRfZW50cnkoX19pdGVyLCBt
+ZW1iZXIpKQ0KIA0KIC8qKg0KICAqIGxpc3RfZm9yX2VhY2hfZW50cnlfcmV2ZXJzZSAtIGl0ZXJh
+dGUgYmFja3dhcmRzIG92ZXIgbGlzdCBvZiBnaXZlbiB0eXBlLg0KDQpJIHRoaW5rIHlvdSBhY3R1
+YWxseSB3YW50Og0KCSFsaXN0X2VudHJ5X2lzX2hlYWQoX19pdGVyLCBoZWFkLCBtZW1iZXIpID8g
+KCgocG9zKT1fX2l0ZXIpLDEpIDogKCgocG9zKSA9IE5VTEwpLDApOw0KDQpXaGljaCBjYW4gYmUg
+ZG9uZSBpbiB0aGUgb3JpZ2luYWwgYnk6DQoJIWxpc3RfZW50cnlfaXNfaGVhZChwb3MsIGhlYWQs
+IG1lbWJlcikgPyAxIDogKCgocG9zKSA9IE5VTEwpLCAwKTsNCg0KQWx0aG91Z2ggaXQgd291bGQg
+YmUgc2FmZXIgdG8gaGF2ZSAod2l0aG91dCBsb29raW5nIHVwIHRoZSBhY3R1YWwgbmFtZSk6DQoJ
+Zm9yIChpdGVtICpfX2l0ZW0gPSBoZWFkOyBcDQoJCV9faXRlbSA/ICgoKHBvcykgPSBsaXN0X2l0
+ZW0oX19pdGVtLCBtZW1iZXIpKSwgMSkgOiAoKChwb3MpID0gTlVMTCksIDApOw0KCQlfX2l0ZW0g
+PSAocG9zKS0+bWVtYmVyKQ0KDQpUaGUgbG9jYWwgZG9lcyBuZWVkICdmaXhpbmcnIHRvIGF2b2lk
+IHNoYWRvd2luZyBmb3IgbmVzdGVkIGxvb3BzLg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBB
+ZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMs
+IE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
-Same comment regarding the dst map.  Does it need to be atomic?
-
-Regardless,
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-
-> ---
->  drivers/block/zram/zram_drv.c | 5 +----
->  1 file changed, 1 insertion(+), 4 deletions(-)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index 14becdf2815df..e9474b02012de 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1465,7 +1465,6 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
->  {
->  	int ret;
->  	struct page *page = NULL;
-> -	void *src;
->  	struct bio_vec vec;
->  
->  	vec = *bvec;
-> @@ -1483,11 +1482,9 @@ static int zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
->  		if (ret)
->  			goto out;
->  
-> -		src = kmap_atomic(bvec->bv_page);
->  		dst = kmap_atomic(page);
-> -		memcpy(dst + offset, src + bvec->bv_offset, bvec->bv_len);
-> +		memcpy_from_bvec(dst + offset, bvec);
->  		kunmap_atomic(dst);
-> -		kunmap_atomic(src);
->  
->  		vec.bv_page = page;
->  		vec.bv_len = PAGE_SIZE;
-> -- 
-> 2.30.2
-> 
-> 
