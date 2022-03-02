@@ -2,109 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE85FC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 13:55:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B15DC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 14:04:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242564AbiCBNz5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 08:55:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60312 "EHLO
+        id S242553AbiCBOFM convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 09:05:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240933AbiCBNzr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 08:55:47 -0500
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A623DCA71E
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 05:53:31 -0800 (PST)
-Received: by mail-ej1-x62f.google.com with SMTP id hw13so3861443ejc.9
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 05:53:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=YCCSfRJDnXWOkNDwW72f3MN8R37EnnYbFY8Wl4Di/bQ=;
-        b=3WV9mTimTinyzLjmo8r1K9HD+/zbmnjroLSnRZ+J9q1WiMAAPCYhhiSgiK+mnUtHa+
-         FX0ie/KxPNPmj3kycEhG6qzMz5fJBLyTOF9q/oLgtdWvkUVfRjvxTQo900L036XGR1wk
-         T+EOsyEX2y3CkAz/UecImcpdyxxsbLxCvV/R3XiTw0byAvs+P39OXyGwT3fsROxFItcC
-         6W1g9aFWHw2wYIDI7bNnI7Ml6W+WwpACCcJmzG4stHmjD2lHl8gJtkVRIIVp8Xa6VBAP
-         NNUHLZ7aq0hxR/zThH+OMBbZYbC2E3hdeymj8Y5ByISV8VVfmniXFmuWZrgZ2W7HM2Xa
-         X7Pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=YCCSfRJDnXWOkNDwW72f3MN8R37EnnYbFY8Wl4Di/bQ=;
-        b=ceCsA/AHkGbmGVUnmVuazPiQI7H7ATMuM+7mnYp7WG/DsENclbvABYUYu6/TmZbOfL
-         YPjfol5SpIbIVNeic5x1a80o4d4pRxle3zUCoEmX5REFP6pqekmFE9lJR++IbN4Et0Oc
-         EJu2x8Jc760AUBf8tv84htk2RwV6R8ueaIhlQ9h4QdxM2o3PkjHQ3mEi5HV6/d279vUD
-         1ehwYW0ZDq6fgCfWS/4wwneCLiEByJDBhOkPMC3LsMRFjHPR0nApim984ProX6c6tyEJ
-         SvRW/sqYclJUerEVbBpd6jSDs/0OeWz8Qp37ktorX6ZMHhwNNuJJKWQjvxwYjSt1bSKm
-         a9jg==
-X-Gm-Message-State: AOAM531gaqhyMqDmgmZ7qinHsq6/4RHEW6+6h6dgGoWTtLebrGgzbaLF
-        nAUXg2t4ZjIwnDL7uUbejjIZaIUomSu3to3qwhmA
-X-Google-Smtp-Source: ABdhPJwdQFZGKVuGc1bd8h8/1g9ClJ1bYWZ4K7b34lr/We363Rb5gYLoiOIWvK2ZPT7pbNa3F6enZHxpnSu9MGHb5rs=
-X-Received: by 2002:a17:906:974e:b0:6bb:4f90:a6ae with SMTP id
- o14-20020a170906974e00b006bb4f90a6aemr23569009ejy.452.1646229208514; Wed, 02
- Mar 2022 05:53:28 -0800 (PST)
+        with ESMTP id S242592AbiCBOFC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 09:05:02 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 879B78597F
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 06:04:13 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-196-4Li6Fux3PdyQ14Lo-DMf3A-1; Wed, 02 Mar 2022 14:04:10 +0000
+X-MC-Unique: 4Li6Fux3PdyQ14Lo-DMf3A-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.28; Wed, 2 Mar 2022 14:04:06 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.028; Wed, 2 Mar 2022 14:04:06 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Xiaomeng Tong' <xiam0nd.tong@gmail.com>,
+        "torvalds@linux-foundation.org" <torvalds@linux-foundation.org>
+CC:     "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
+        "amd-gfx@lists.freedesktop.org" <amd-gfx@lists.freedesktop.org>,
+        "andriy.shevchenko@linux.intel.com" 
+        <andriy.shevchenko@linux.intel.com>,
+        "arnd@arndb.de" <arnd@arndb.de>,
+        "bcm-kernel-feedback-list@broadcom.com" 
+        <bcm-kernel-feedback-list@broadcom.com>,
+        "bjohannesmeyer@gmail.com" <bjohannesmeyer@gmail.com>,
+        "c.giuffrida@vu.nl" <c.giuffrida@vu.nl>,
+        "christian.koenig@amd.com" <christian.koenig@amd.com>,
+        "christophe.jaillet@wanadoo.fr" <christophe.jaillet@wanadoo.fr>,
+        "dan.carpenter@oracle.com" <dan.carpenter@oracle.com>,
+        "dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
+        "gustavo@embeddedor.com" <gustavo@embeddedor.com>,
+        "h.j.bos@vu.nl" <h.j.bos@vu.nl>,
+        "intel-gfx@lists.freedesktop.org" <intel-gfx@lists.freedesktop.org>,
+        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+        "jakobkoschel@gmail.com" <jakobkoschel@gmail.com>,
+        "jgg@ziepe.ca" <jgg@ziepe.ca>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "kgdb-bugreport@lists.sourceforge.net" 
+        <kgdb-bugreport@lists.sourceforge.net>,
+        "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+        "linux-arch@vger.kernel.org" <linux-arch@vger.kernel.org>,
+        "linux-arm-kernel@lists.infradead.org" 
+        <linux-arm-kernel@lists.infradead.org>,
+        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
+        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
+        "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        "linux1394-devel@lists.sourceforge.net" 
+        <linux1394-devel@lists.sourceforge.net>,
+        "linux@rasmusvillemoes.dk" <linux@rasmusvillemoes.dk>,
+        "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
+        "nathan@kernel.org" <nathan@kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
+        "rppt@kernel.org" <rppt@kernel.org>,
+        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
+        "tglx@linutronix.de" <tglx@linutronix.de>,
+        "tipc-discussion@lists.sourceforge.net" 
+        <tipc-discussion@lists.sourceforge.net>,
+        "v9fs-developer@lists.sourceforge.net" 
+        <v9fs-developer@lists.sourceforge.net>
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Topic: [PATCH 2/6] treewide: remove using list iterator after loop body
+ as a ptr
+Thread-Index: AQHYLhg9+DU/OogLf0+tiSFmjztyUKysHu+Q
+Date:   Wed, 2 Mar 2022 14:04:06 +0000
+Message-ID: <1077f17e50d34dc2bbfdf4e52a1cb2fd@AcuMS.aculab.com>
+References: <CAHk-=whLK11HyvpUtEftOjc3Gup2V77KpAQ2fycj3uai=qceHw@mail.gmail.com>
+ <20220302093106.8402-1-xiam0nd.tong@gmail.com>
+In-Reply-To: <20220302093106.8402-1-xiam0nd.tong@gmail.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 MIME-Version: 1.0
-References: <20220228065720.100-1-xieyongji@bytedance.com> <20220301104039-mutt-send-email-mst@kernel.org>
- <85e61a65-4f76-afc0-272f-3b13333349f1@nvidia.com> <20220302081542-mutt-send-email-mst@kernel.org>
- <bd53b0dc-bef6-cd1a-ac5c-68766089a619@nvidia.com> <20220302083112-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220302083112-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 2 Mar 2022 21:53:17 +0800
-Message-ID: <CACycT3uJFNof7UNTdrEK2dVB-W9q4VVkVWnjos6TJawSRF+EDA@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 9:33 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Wed, Mar 02, 2022 at 03:24:51PM +0200, Max Gurtovoy wrote:
+From: Xiaomeng Tong
+> Sent: 02 March 2022 09:31
+> 
+> On Mon, 28 Feb 2022 16:41:04 -0800, Linus Torvalds
+> <torvalds@linux-foundation.org> wrote:
 > >
-> > On 3/2/2022 3:17 PM, Michael S. Tsirkin wrote:
-> > > On Wed, Mar 02, 2022 at 11:51:27AM +0200, Max Gurtovoy wrote:
-> > > > On 3/1/2022 5:43 PM, Michael S. Tsirkin wrote:
-> > > > > On Mon, Feb 28, 2022 at 02:57:20PM +0800, Xie Yongji wrote:
-> > > > > > Currently we have a BUG_ON() to make sure the number of sg
-> > > > > > list does not exceed queue_max_segments() in virtio_queue_rq().
-> > > > > > However, the block layer uses queue_max_discard_segments()
-> > > > > > instead of queue_max_segments() to limit the sg list for
-> > > > > > discard requests. So the BUG_ON() might be triggered if
-> > > > > > virtio-blk device reports a larger value for max discard
-> > > > > > segment than queue_max_segments().
-> > > > > Hmm the spec does not say what should happen if max_discard_seg
-> > > > > exceeds seg_max. Is this the config you have in mind? how do you
-> > > > > create it?
-> > > > I don't think it's hard to create it. Just change some registers in the
-> > > > device.
-> > > >
-> > > > But with the dynamic sgl allocation that I added recently, there is no
-> > > > problem with this scenario.
-> > > Well the problem is device says it can't handle such large descriptors,
-> > > I guess it works anyway, but it seems scary.
-> >
-> > I don't follow.
-> >
-> > The only problem this patch solves is when a virtio blk device reports
-> > larger value for max_discard_segments than max_segments.
-> >
->
-> No, the peroblem reported is when virtio blk device reports
-> max_segments < 256 but not max_discard_segments.
-> I would expect discard to follow max_segments restrictions then.
->
+> > But basically to _me_, the important part is that the end result is
+> > maintainable longer-term.
+> 
+> I couldn't agree more. And because of that, I stick with the following
+> approach because it's maintainable longer-term than "type(pos) pos" one:
+>  Implements a new macro for each list_for_each_entry* with _inside suffix.
+>   #define list_for_each_entry_inside(pos, type, head, member)
 
-I think one point is whether we want to allow the corner case that the
-device reports a larger value for max_discard_segments than
-max_segments. For example, queue size is 256, max_segments is 128 - 2,
-max_discard_segments is 256 - 2.
+I think that it would be better to make any alternate loop macro
+just set the variable to NULL on the loop exit.
+That is easier to code for and the compiler might be persuaded to
+not redo the test.
 
-Thanks,
-Yongji
+It also doesn't need an extra variable defined in the for() statement
+so can be back-ported to older kernels without required declaration
+in the middle of blocks.
+
+OTOH there may be alternative definitions that can be used to get
+the compiler (or other compiler-like tools) to detect broken code.
+Even if the definition can't possibly generate a working kerrnel.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
+
