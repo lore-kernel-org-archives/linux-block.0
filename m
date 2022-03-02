@@ -2,82 +2,349 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FBCC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 12:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C54C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 12:14:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236534AbiCBMP2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 07:15:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47432 "EHLO
+        id S240762AbiCBMPg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 07:15:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48182 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241716AbiCBMP1 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 07:15:27 -0500
+        with ESMTP id S241714AbiCBMPg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 07:15:36 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9DF1BC116A
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 04:14:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E43BE32ED2
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 04:14:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646223282;
+        s=mimecast20190719; t=1646223291;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=1NaJH5Gq3jvaXZ636iEe2xCl6z0Sk5xsTyGhQTEH0RI=;
-        b=QrojtipXpNkMXC2zOEz1SicjP6FLs4zCUdy4QHj16DEqBKDhLyvM2B7DL6Fku1u+0URAba
-        iTty4Rey5y07YGauX6DbQgQivtOmb5wUYzOXvmmR3cOSAa1F+iPv8A+tvhQBersIGXeJbf
-        yDgKTAZ9uUExxI513J2Ojzf/RSiAZ4Y=
+        bh=GDEQU1C44f57nbGeRB3U1RAKSHcnaI+oKIaH6S8NO/g=;
+        b=grdmULUfgFBTXQlWjZI1tf1XqwGY2GKrBSn28WQdZuYtet4dneFUIeUknxZ47absnkom6f
+        x2a8SNevmYvWxXXck6+IcTxdbLlcRA3YYoVHd+MDqo9Nyk5R04ERaHp+I7SZ9FLuLYdyOE
+        WFxvRetmKq73EYYg72ROZTq4ux+G+aE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-569-5GFqyzVNO1iqtnOKyF8drw-1; Wed, 02 Mar 2022 07:14:41 -0500
-X-MC-Unique: 5GFqyzVNO1iqtnOKyF8drw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-145-oGXZN1sCNdihRsdKTR_pVw-1; Wed, 02 Mar 2022 07:14:48 -0500
+X-MC-Unique: oGXZN1sCNdihRsdKTR_pVw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DDC35200;
-        Wed,  2 Mar 2022 12:14:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA00C1854E27;
+        Wed,  2 Mar 2022 12:14:47 +0000 (UTC)
 Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DB8D623795;
-        Wed,  2 Mar 2022 12:14:34 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E700F7AB7C;
+        Wed,  2 Mar 2022 12:14:42 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
-        Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH V2 4/6] block: mtip32xx: don't touch q->queue_hw_ctx
-Date:   Wed,  2 Mar 2022 20:14:05 +0800
-Message-Id: <20220302121407.1361401-5-ming.lei@redhat.com>
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 5/6] blk-mq: prepare for implementing hctx table via xarray
+Date:   Wed,  2 Mar 2022 20:14:06 +0800
+Message-Id: <20220302121407.1361401-6-ming.lei@redhat.com>
 In-Reply-To: <20220302121407.1361401-1-ming.lei@redhat.com>
 References: <20220302121407.1361401-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-q->queue_hw_ctx is really one blk-mq internal structure for retrieving
-hctx via its index, not supposed to be used by drivers. Meantime drivers
-can get the tags structure easily from tagset.
+It is inevitable to cause use-after-free on q->queue_hw_ctx between
+queue_for_each_hw_ctx() and blk_mq_update_nr_hw_queues(). And converting
+to xarray can fix the uaf, meantime code gets cleaner.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Prepare for converting q->queue_hctx_ctx into xarray, one thing is that
+xa_for_each() can only accept 'unsigned long' as index, so changes type
+of hctx index of queue_for_each_hw_ctx() into 'unsigned long'.
+
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- drivers/block/mtip32xx/mtip32xx.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+ block/blk-mq-debugfs.c        |  6 +++---
+ block/blk-mq-sched.c          |  9 +++++----
+ block/blk-mq-sysfs.c          | 10 ++++++----
+ block/blk-mq-tag.c            |  2 +-
+ block/blk-mq.c                | 30 ++++++++++++++++--------------
+ drivers/block/rnbd/rnbd-clt.c |  2 +-
+ 6 files changed, 32 insertions(+), 27 deletions(-)
 
-diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-index cba956881d55..2d43ab5b5cc0 100644
---- a/drivers/block/mtip32xx/mtip32xx.c
-+++ b/drivers/block/mtip32xx/mtip32xx.c
-@@ -160,9 +160,7 @@ static bool mtip_check_surprise_removal(struct driver_data *dd)
- static struct mtip_cmd *mtip_cmd_from_tag(struct driver_data *dd,
- 					  unsigned int tag)
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 3a790eb4995c..e2880f6deb34 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -707,7 +707,7 @@ static void debugfs_create_files(struct dentry *parent, void *data,
+ void blk_mq_debugfs_register(struct request_queue *q)
  {
--	struct blk_mq_hw_ctx *hctx = dd->queue->queue_hw_ctx[0];
--
--	return blk_mq_rq_to_pdu(blk_mq_tag_to_rq(hctx->tags, tag));
-+	return blk_mq_rq_to_pdu(blk_mq_tag_to_rq(dd->tags.tags[0], tag));
- }
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
  
- /*
+ 	debugfs_create_files(q->debugfs_dir, q, blk_mq_debugfs_queue_attrs);
+ 
+@@ -780,7 +780,7 @@ void blk_mq_debugfs_unregister_hctx(struct blk_mq_hw_ctx *hctx)
+ void blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_debugfs_register_hctx(q, hctx);
+@@ -789,7 +789,7 @@ void blk_mq_debugfs_register_hctxs(struct request_queue *q)
+ void blk_mq_debugfs_unregister_hctxs(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_debugfs_unregister_hctx(hctx);
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index 55488ba97823..e6ad8f761474 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -515,7 +515,7 @@ static void blk_mq_exit_sched_shared_tags(struct request_queue *queue)
+ static void blk_mq_sched_tags_teardown(struct request_queue *q, unsigned int flags)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (hctx->sched_tags) {
+@@ -550,9 +550,10 @@ static int blk_mq_init_sched_shared_tags(struct request_queue *queue)
+ 
+ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ {
+-	unsigned int i, flags = q->tag_set->flags;
++	unsigned int flags = q->tag_set->flags;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct elevator_queue *eq;
++	unsigned long i;
+ 	int ret;
+ 
+ 	if (!e) {
+@@ -618,7 +619,7 @@ int blk_mq_init_sched(struct request_queue *q, struct elevator_type *e)
+ void blk_mq_sched_free_rqs(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	if (blk_mq_is_shared_tags(q->tag_set->flags)) {
+ 		blk_mq_free_rqs(q->tag_set, q->sched_shared_tags,
+@@ -635,7 +636,7 @@ void blk_mq_sched_free_rqs(struct request_queue *q)
+ void blk_mq_exit_sched(struct request_queue *q, struct elevator_queue *e)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	unsigned int i;
++	unsigned long i;
+ 	unsigned int flags = 0;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index 674786574075..8d8c71c77ff8 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -206,7 +206,7 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
+ void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	lockdep_assert_held(&q->sysfs_dir_lock);
+ 
+@@ -255,7 +255,8 @@ void blk_mq_sysfs_init(struct request_queue *q)
+ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int ret, i;
++	unsigned long i;
++	int ret;
+ 
+ 	WARN_ON_ONCE(!q->kobj.parent);
+ 	lockdep_assert_held(&q->sysfs_dir_lock);
+@@ -290,7 +291,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ void blk_mq_sysfs_unregister(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	mutex_lock(&q->sysfs_dir_lock);
+ 	if (!q->mq_sysfs_init_done)
+@@ -306,7 +307,8 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
+ int blk_mq_sysfs_register(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i, ret = 0;
++	unsigned long i;
++	int ret = 0;
+ 
+ 	mutex_lock(&q->sysfs_dir_lock);
+ 	if (!q->mq_sysfs_init_done)
+diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
+index 0fd409b8e86e..1850a4225e12 100644
+--- a/block/blk-mq-tag.c
++++ b/block/blk-mq-tag.c
+@@ -515,7 +515,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
+ 		bt_for_each(NULL, q, btags, fn, priv, false);
+ 	} else {
+ 		struct blk_mq_hw_ctx *hctx;
+-		int i;
++		unsigned long i;
+ 
+ 		queue_for_each_hw_ctx(q, hctx, i) {
+ 			struct blk_mq_tags *tags = hctx->tags;
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 57ae9df0f4dc..bffdd71c670d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -312,7 +312,7 @@ EXPORT_SYMBOL_GPL(blk_mq_unquiesce_queue);
+ void blk_mq_wake_waiters(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	unsigned int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hw_queue_mapped(hctx))
+@@ -1442,7 +1442,7 @@ static void blk_mq_timeout_work(struct work_struct *work)
+ 		container_of(work, struct request_queue, timeout_work);
+ 	unsigned long next = 0;
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	/* A deadlock might occur if a request is stuck requiring a
+ 	 * timeout at the same time a queue freeze is waiting
+@@ -2143,7 +2143,7 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+ void blk_mq_run_hw_queues(struct request_queue *q, bool async)
+ {
+ 	struct blk_mq_hw_ctx *hctx, *sq_hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	sq_hctx = NULL;
+ 	if (blk_mq_has_sqsched(q))
+@@ -2171,7 +2171,7 @@ EXPORT_SYMBOL(blk_mq_run_hw_queues);
+ void blk_mq_delay_run_hw_queues(struct request_queue *q, unsigned long msecs)
+ {
+ 	struct blk_mq_hw_ctx *hctx, *sq_hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	sq_hctx = NULL;
+ 	if (blk_mq_has_sqsched(q))
+@@ -2209,7 +2209,7 @@ EXPORT_SYMBOL(blk_mq_delay_run_hw_queues);
+ bool blk_mq_queue_stopped(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		if (blk_mq_hctx_stopped(hctx))
+@@ -2248,7 +2248,7 @@ EXPORT_SYMBOL(blk_mq_stop_hw_queue);
+ void blk_mq_stop_hw_queues(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_stop_hw_queue(hctx);
+@@ -2266,7 +2266,7 @@ EXPORT_SYMBOL(blk_mq_start_hw_queue);
+ void blk_mq_start_hw_queues(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_start_hw_queue(hctx);
+@@ -2286,7 +2286,7 @@ EXPORT_SYMBOL_GPL(blk_mq_start_stopped_hw_queue);
+ void blk_mq_start_stopped_hw_queues(struct request_queue *q, bool async)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		blk_mq_start_stopped_hw_queue(hctx, async);
+@@ -3446,7 +3446,7 @@ static void blk_mq_exit_hw_queues(struct request_queue *q,
+ 		struct blk_mq_tag_set *set, int nr_queue)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	unsigned int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (i == nr_queue)
+@@ -3637,7 +3637,8 @@ static void __blk_mq_free_map_and_rqs(struct blk_mq_tag_set *set,
+ 
+ static void blk_mq_map_swqueue(struct request_queue *q)
+ {
+-	unsigned int i, j, hctx_idx;
++	unsigned int j, hctx_idx;
++	unsigned long i;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct blk_mq_ctx *ctx;
+ 	struct blk_mq_tag_set *set = q->tag_set;
+@@ -3744,7 +3745,7 @@ static void blk_mq_map_swqueue(struct request_queue *q)
+ static void queue_set_hctx_shared(struct request_queue *q, bool shared)
+ {
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i) {
+ 		if (shared) {
+@@ -3844,7 +3845,7 @@ static int blk_mq_alloc_ctxs(struct request_queue *q)
+ void blk_mq_release(struct request_queue *q)
+ {
+ 	struct blk_mq_hw_ctx *hctx, *next;
+-	int i;
++	unsigned long i;
+ 
+ 	queue_for_each_hw_ctx(q, hctx, i)
+ 		WARN_ON_ONCE(hctx && list_empty(&hctx->hctx_list));
+@@ -4362,7 +4363,8 @@ int blk_mq_update_nr_requests(struct request_queue *q, unsigned int nr)
+ {
+ 	struct blk_mq_tag_set *set = q->tag_set;
+ 	struct blk_mq_hw_ctx *hctx;
+-	int i, ret;
++	int ret;
++	unsigned long i;
+ 
+ 	if (!set)
+ 		return -EINVAL;
+@@ -4738,7 +4740,7 @@ void blk_mq_cancel_work_sync(struct request_queue *q)
+ {
+ 	if (queue_is_mq(q)) {
+ 		struct blk_mq_hw_ctx *hctx;
+-		int i;
++		unsigned long i;
+ 
+ 		cancel_delayed_work_sync(&q->requeue_work);
+ 
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index c08971de369f..58304f978e10 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -1343,7 +1343,7 @@ static inline void rnbd_init_hw_queue(struct rnbd_clt_dev *dev,
+ 
+ static void rnbd_init_mq_hw_queues(struct rnbd_clt_dev *dev)
+ {
+-	int i;
++	unsigned long i;
+ 	struct blk_mq_hw_ctx *hctx;
+ 	struct rnbd_queue *q;
+ 
 -- 
 2.31.1
 
