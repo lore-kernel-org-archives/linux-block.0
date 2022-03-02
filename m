@@ -2,52 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17754C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 08:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ACEC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 08:26:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235656AbiCBIZ5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 03:25:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36670 "EHLO
+        id S240102AbiCBI0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 03:26:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233938AbiCBIZ4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 03:25:56 -0500
-X-Greylist: delayed 450 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 02 Mar 2022 00:25:13 PST
-Received: from vps.irrigationbc.com (vps.irrigationbc.com [172.96.181.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89C1AB82C9
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 00:25:13 -0800 (PST)
-Received: by vps.irrigationbc.com (Postfix, from userid 10000)
-        id 6181D83519; Wed,  2 Mar 2022 00:17:43 -0800 (PST)
-To:     linux-block@vger.kernel.org
-Subject: Please activate your account
-X-PHP-Originating-Script: 10000:MailTransport.php
-From:   Irrigation Scheduling Calculator <info@irrigationbc.com>
-X-Mailer: CakePHP Email
-Date:   Wed, 02 Mar 2022 00:17:43 -0800
-Message-ID: <621f28276cbc48ada83e2d61ac60b585@land-calc.irrigationbc.com>
+        with ESMTP id S240093AbiCBI0p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 03:26:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 897A8B82D9
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 00:26:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646209562;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YtrInDoeeooDXLH4/ASDNuBM89b2Da/ya3ncv+m8FWA=;
+        b=Dj0qUGBEBdb1PyFKVrQHSAuZA1MHlK1p0CbLFzB+2giIG8HTPLn5pPcq5Hm7H2fH1zqWXf
+        HU+XpXYodwSpy/j/VMFnnz/30qrtRFA2gA7A304QjS5miZhpXyk8j2DimJ57+0pLQRcHxM
+        RZYctjoV/+fkvP+JLeERzvTMOd1A/I4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-326-sAHRB3rVNm6CEswhqULziw-1; Wed, 02 Mar 2022 03:25:57 -0500
+X-MC-Unique: sAHRB3rVNm6CEswhqULziw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F944824FA7;
+        Wed,  2 Mar 2022 08:25:55 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 629027FCE4;
+        Wed,  2 Mar 2022 08:25:49 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 16:25:45 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Abdul Haleem <abdhalee@linux.vnet.ibm.com>
+Cc:     linux-scsi <linux-scsi@vger.kernel.org>, yukuai3@huawei.com,
+        linux-next <linux-next@vger.kernel.org>, axboe@kernel.dk,
+        linux-block@vger.kernel.org,
+        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [next-20220225][Oops][ppc] lvm snapshot merge results kernel
+ panics (throtl_pending_timer_fn)
+Message-ID: <Yh8qCS5JM8ZbtqY4@T590>
+References: <d583adf0-2d98-60b6-620c-722912c05852@linux.vnet.ibm.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d583adf0-2d98-60b6-620c-722912c05852@linux.vnet.ibm.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Welcome 4k8x5rc p61vqii,
+On Wed, Mar 02, 2022 at 01:31:39PM +0530, Abdul Haleem wrote:
+> Greeting's
+> 
+> Linux next kernel 5.17.0-rc5-next-20220225 crashed on my power 10 LPAR when
+> merge lvm snapshot on nvme disk
 
-Your login details are below:
-
-https://land-calc.irrigationbc.com/users/login
-
-	Username: ❤️ Patti liked you! Click Here: https://bit.ly/3hlho06?2wocl ❤️
-	Password: 7DogVDrQCCxB
+Please try next-20220301, in which the "bad" patch of 'block: cancel all
+throttled bios in del_gendisk()' is dropped.
 
 
-bienvenue 4k8x5rc p61vqii,
-
-Vos informations de connexion sont ci-dessous:
-
-https://land-calc.irrigationbc.com/users/login
-
-	Username: ❤️ Patti liked you! Click Here: https://bit.ly/3hlho06?2wocl ❤️
-	Password: 7DogVDrQCCxB
-This email was sent using the CakePHP Framework, http://cakephp.org.
+Thanks,
+Ming
 
