@@ -2,154 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC201C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 20:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4ACC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 20:43:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243183AbiCBUUC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 15:20:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37682 "EHLO
+        id S236431AbiCBUoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 15:44:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243127AbiCBUUB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 15:20:01 -0500
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DDB1C9A32
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 12:19:17 -0800 (PST)
-Received: by mail-ed1-x52d.google.com with SMTP id bq11so3879777edb.2
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 12:19:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Uy+qIY61mUv01aVZ77KYqcI4VQ6CnEr5ehBFaIlKwdg=;
-        b=Be+smD91jIehBxsphVP8GxPmG9fZ7UzsziFVI8sCcayH4ghcjVwFadN69qX3SSZZfA
-         w/nKcppYscRVDTynDM99u+3Int1mDvzuW1vHPoDdJ+8JxYLDdH7+xaY9DZL7COnmW4q3
-         yEVm7FisHcBkdW7xwzBny/SyDipBoZU1ONqUc=
+        with ESMTP id S231127AbiCBUoV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 15:44:21 -0500
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77BFA36B6A;
+        Wed,  2 Mar 2022 12:43:37 -0800 (PST)
+Received: by mail-pj1-f41.google.com with SMTP id gj15-20020a17090b108f00b001bef86c67c1so2753935pjb.3;
+        Wed, 02 Mar 2022 12:43:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Uy+qIY61mUv01aVZ77KYqcI4VQ6CnEr5ehBFaIlKwdg=;
-        b=taOunxhSwmKm/foI2UJzHGegVkelbZ1PqIy0HFl8/7SGpTFOsgTyuZncYMMcu++Mkc
-         //hMOhY8Xmrhdy7WVMX6Pe9t4ojnlLNkvXFFcK0kceZFah8KnaCqZRKGWEQvbiPLP6Kg
-         SZhVbRqreRZ8GURpaBXRIWoE90drj7Ic+RSC4nD8tNlsFM58Bkb281F5goZuMdSjAiIi
-         qHM7/cSvBRCs+nP4dEYXoLeryI/zsYSJ5zoLjuh9mONLOYXHP09y6w52CPEEcBKGjVWP
-         SeG8wneMb4F430iqDcn0h2+wW9W7JGnjpgSeyVHLYu97yYUYt/oZC8vq1ftHmGEo6tal
-         6WUQ==
-X-Gm-Message-State: AOAM5323Y+OaMHRQ6yQfyiApRImxGVjHmr+PIIP6E/uNkrL4bU5/H5Yx
-        CtQUcP3PSJ8H62JkhPS189u0XCGryjn+Wobfm8w=
-X-Google-Smtp-Source: ABdhPJypsp13QqP3gg6kDumLBeSYyaYNfo35nm8mVkZE0KhPCgV/WUQC45xhSpMLHzM1dHyZICfokg==
-X-Received: by 2002:a05:6402:1d4e:b0:415:bc08:1d14 with SMTP id dz14-20020a0564021d4e00b00415bc081d14mr4495358edb.217.1646252355394;
-        Wed, 02 Mar 2022 12:19:15 -0800 (PST)
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com. [209.85.208.53])
-        by smtp.gmail.com with ESMTPSA id ck3-20020a0564021c0300b00413cd3eef2csm3436612edb.2.2022.03.02.12.19.12
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 12:19:13 -0800 (PST)
-Received: by mail-ed1-f53.google.com with SMTP id w3so3839941edu.8
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 12:19:12 -0800 (PST)
-X-Received: by 2002:a2e:3013:0:b0:246:2ca9:365e with SMTP id
- w19-20020a2e3013000000b002462ca9365emr21092331ljw.291.1646252342192; Wed, 02
- Mar 2022 12:19:02 -0800 (PST)
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=lgYOR0NAjV43r8oYaHMPMronWC+T+uvO+TYbc9ZRf2U=;
+        b=Do7KuqMBP/y4oIXCc27REEmmeyXsQ6BpAC2gB6U/LVB2ZNfh4Nh9GmKMZPuFes/YLC
+         pHO8uQOYa/PKUaJhi3WDoHy8KcCkLkLZgvHOBnNnqfRzrGEz20DRVGbHUkIIRZWGQeu8
+         fzyZDAGiKgkuRZ2dtHZaLS6JzPV4zMF/sygEzbeF+6zvqGtxSzRIEZTFhRfQBIlE7RJF
+         9F9iFyjiuHKY1F/mE/XWWByHSumXeQHnLjkI2CPFr/t/5PwZpfOtCNX2x1/qW/0/t33L
+         A8k649uAPfZ972Tlr0KQCNp6qHYmmsl+UT0hXzwKmpD7N/O9s7bQ4EvEGLeMaLL2z9NI
+         jZIw==
+X-Gm-Message-State: AOAM532wr43A/92deLW2TbooI5zAFm1jwDp3LLIoYzl5q46w9sHMXH0W
+        tTkJFtYz6r/mm07TRtQWbFcqdUTLcF4=
+X-Google-Smtp-Source: ABdhPJyaNbmqlyYCF0pLP/kU5mYs6ZZtG6sJ6Lt4AcJ3790H8g6EdnWM4bXzhCMZArL+GVOyY1Rd0w==
+X-Received: by 2002:a17:902:d50b:b0:151:94d9:eeaf with SMTP id b11-20020a170902d50b00b0015194d9eeafmr5879371plg.133.1646253816786;
+        Wed, 02 Mar 2022 12:43:36 -0800 (PST)
+Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
+        by smtp.gmail.com with ESMTPSA id k4-20020a17090a910400b001bd171c7fd4sm5933510pjo.25.2022.03.02.12.43.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 12:43:35 -0800 (PST)
+Date:   Wed, 2 Mar 2022 12:43:32 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     "hch@infradead.org" <hch@infradead.org>
+Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
+        "bcrl@kvack.org" <bcrl@kvack.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-aio@kvack.org" <linux-aio@kvack.org>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-api@vger.kernel.org" <linux-api@vger.kernel.org>,
+        SelvaKumar S <selvakuma.s1@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Javier Gonzalez <javier.gonz@samsung.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        "Remzi H. Arpaci-Dusseau" <remzi@cs.wisc.edu>
+Subject: Re: [PATCH v4 6/6] io_uring: add support for zone-append
+Message-ID: <20220302204332.dgstbjcpzgiurn5t@garbanzo>
+References: <MWHPR04MB375863C20C1EF2CB27E62703E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731091416.GA29634@infradead.org>
+ <MWHPR04MB37586D39CA389296CE0252A4E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731094135.GA4104@infradead.org>
+ <MWHPR04MB3758A4B2967DB1FABAAD9265E74E0@MWHPR04MB3758.namprd04.prod.outlook.com>
+ <20200731125110.GA11500@infradead.org>
+ <CY4PR04MB37517D633920E4D31AC6EA0DE74B0@CY4PR04MB3751.namprd04.prod.outlook.com>
+ <20200814081411.GA16943@infradead.org>
+ <CA+1E3r+WXC_MK5Zf2OZEv17ddJDjtXbhpRFoeDns4F341xMhow@mail.gmail.com>
+ <20200908151801.GA16742@infradead.org>
 MIME-Version: 1.0
-References: <282f0f8d-f491-26fc-6ae0-604b367a5a1a@amd.com> <b2d20961dbb7533f380827a7fcc313ff849875c1.camel@HansenPartnership.com>
- <7D0C2A5D-500E-4F38-AD0C-A76E132A390E@kernel.org> <73fa82a20910c06784be2352a655acc59e9942ea.camel@HansenPartnership.com>
- <CAHk-=wiT5HX6Kp0Qv4ZYK_rkq9t5fZ5zZ7vzvi6pub9kgp=72g@mail.gmail.com>
- <7dc860874d434d2288f36730d8ea3312@AcuMS.aculab.com> <CAHk-=whKqg89zu4T95+ctY-hocR6kDArpo2qO14-kV40Ga7ufw@mail.gmail.com>
- <0ced2b155b984882b39e895f0211037c@AcuMS.aculab.com> <CAHk-=wix0HLCBs5sxAeW3uckg0YncXbTjMsE-Tv8WzmkOgLAXQ@mail.gmail.com>
- <78ccb184-405e-da93-1e02-078f90d2b9bc@rasmusvillemoes.dk> <202203021158.DB5204A0@keescook>
-In-Reply-To: <202203021158.DB5204A0@keescook>
-From:   Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Wed, 2 Mar 2022 12:18:45 -0800
-X-Gmail-Original-Message-ID: <CAHk-=wikKPC0LUqZ8++EC5JOvGdBqVH9uUaTX=DvBioDoReYww@mail.gmail.com>
-Message-ID: <CAHk-=wikKPC0LUqZ8++EC5JOvGdBqVH9uUaTX=DvBioDoReYww@mail.gmail.com>
-Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body
- as a ptr
-To:     Kees Cook <keescook@chromium.org>
-Cc:     Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        David Laight <David.Laight@aculab.com>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        "alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>,
-        KVM list <kvm@vger.kernel.org>,
-        "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
-        "linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>,
-        "nouveau@lists.freedesktop.org" <nouveau@lists.freedesktop.org>,
-        dri-devel <dri-devel@lists.freedesktop.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>,
-        "linux1394-devel@lists.sourceforge.net" 
-        <linux1394-devel@lists.sourceforge.net>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        linux-arch <linux-arch@vger.kernel.org>,
-        CIFS <linux-cifs@vger.kernel.org>,
-        "linux-aspeed@lists.ozlabs.org" <linux-aspeed@lists.ozlabs.org>,
-        linux-scsi <linux-scsi@vger.kernel.org>,
-        linux-rdma <linux-rdma@vger.kernel.org>,
-        "linux-staging@lists.linux.dev" <linux-staging@lists.linux.dev>,
-        amd-gfx list <amd-gfx@lists.freedesktop.org>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        "kgdb-bugreport@lists.sourceforge.net" 
-        <kgdb-bugreport@lists.sourceforge.net>,
-        "bcm-kernel-feedback-list@broadcom.com" 
-        <bcm-kernel-feedback-list@broadcom.com>,
-        Dan Carpenter <dan.carpenter@oracle.com>,
-        Linux Media Mailing List <linux-media@vger.kernel.org>,
-        Arnd Bergman <arnd@arndb.de>,
-        Linux PM <linux-pm@vger.kernel.org>,
-        intel-gfx <intel-gfx@lists.freedesktop.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Nathan Chancellor <nathan@kernel.org>,
-        dma <dmaengine@vger.kernel.org>,
-        Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
-        Jakob Koschel <jakobkoschel@gmail.com>,
-        "v9fs-developer@lists.sourceforge.net" 
-        <v9fs-developer@lists.sourceforge.net>,
-        linux-tegra <linux-tegra@vger.kernel.org>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "linux-sgx@vger.kernel.org" <linux-sgx@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        Netdev <netdev@vger.kernel.org>,
-        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
-        "samba-technical@lists.samba.org" <samba-technical@lists.samba.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Linux F2FS Dev Mailing List 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "tipc-discussion@lists.sourceforge.net" 
-        <tipc-discussion@lists.sourceforge.net>,
-        Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
-        Mike Rapoport <rppt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20200908151801.GA16742@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 2, 2022 at 12:07 PM Kees Cook <keescook@chromium.org> wrote:
->
-> I've long wanted to change kfree() to explicitly set pointers to NULL on
-> free. https://github.com/KSPP/linux/issues/87
+On Tue, Sep 08, 2020 at 04:18:01PM +0100, hch@infradead.org wrote:
+> On Mon, Sep 07, 2020 at 12:31:42PM +0530, Kanchan Joshi wrote:
+> > But there are use-cases which benefit from supporting zone-append on
+> > raw block-dev path.
+> > Certain user-space log-structured/cow FS/DB will use the device that
+> > way. Aerospike is one example.
+> > Pass-through is synchronous, and we lose the ability to use io-uring.
+> 
+> So use zonefs, which is designed exactly for that use case.
 
-We've had this discussion with the gcc people in the past, and gcc
-actually has some support for it, but it's sadly tied to the actual
-function name (ie gcc has some special-casing for "free()")
+Using zonefs to test append alone can introduce a slight overhead with
+the VFS if we want to do something such as just testing any hot path
+with append and the block layer. If we want to live with that, that's
+fine!
 
-See
+Just saying.
 
-    https://gcc.gnu.org/bugzilla/show_bug.cgi?id=94527
-
-for some of that discussion.
-
-Oh, and I see some patch actually got merged since I looked there last
-so that you can mark "deallocator" functions, but I think it's only
-for the context matching, not for actually killing accesses to the
-pointer afterwards.
-
-               Linus
+  Luis
