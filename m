@@ -2,77 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CE0C43217
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:00:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92EE1C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:09:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229820AbiCCAAz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:00:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
+        id S230062AbiCCAKd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:10:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229878AbiCCAAw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:00:52 -0500
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 514C14E3AD
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 16:00:04 -0800 (PST)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id B935E1F447C3
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1646262253;
-        bh=kCGdmb3Zl8LmQYTtv4iaRAdRVGxPo2kdF0JrVOMn1ek=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=ETjYzzTaVrp37XmpJS0G0V8CSyUFQFXBuH8aJ74w6P3h9XzbBxQdppdMvF4mP/0bB
-         JsiweFdlOqDD3z/Zffg21OWxgnxioFrRL/TJ/zHbUNJ7vD5MnI/syYhX6yL0Ki1+ZM
-         BVcGFQh7KDYcNyZTBn25eqlkgpOxQrOZMwu3oSqY1eIAmpdgDlorAYI2r86vfHcHri
-         dQIw5M6YukYQahAylyzdn6VtTAVsaOsrx1nFgGQU0xkRy3+vrVnnKRvl+2d9qfBnvb
-         DQ3woOfEeGLREBs1eAGc0emV284DQLiRZogI20KTZ06LnqxMKQSTCxMUP4iQCGvuty
-         5aEIbywI2nSHA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-Organization: Collabora
-References: <87tucsf0sr.fsf@collabora.com>
-        <986caf55-65d1-0755-383b-73834ec04967@suse.de>
-Date:   Wed, 02 Mar 2022 18:04:08 -0500
-In-Reply-To: <986caf55-65d1-0755-383b-73834ec04967@suse.de> (Hannes Reinecke's
-        message of "Tue, 22 Feb 2022 07:57:27 +0100")
-Message-ID: <87tucgj6s7.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        with ESMTP id S230005AbiCCAKc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:10:32 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCEE310529C;
+        Wed,  2 Mar 2022 16:09:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8MhDtqQ0Z0PI4RYelBosXGB/3GmmVHxJgRFyiYQ2lIc=; b=VS52RSFjHjFc85YIWiRxYsmK9A
+        dGN1hbFmbe0sPau9oYsf7OCqp18ZD3fpDFB5dgAx8RflLluWd71WIhGjFwGSGLzse6IBY0mMBOtbK
+        ryzO5+401ecKTbaFYdcRdQzchtcBde+wK/C5x/V7bn+/kF8ZmJ9EwXQNwjIJWJgf5KRa0oE6QdVMx
+        b1XWZdlkwmy2ou7FksM3ztEUBNB27sUMRiegzr/htuKjEGBZ6zfHoRFTmRiFQDWr/pEfRtl6DG37c
+        DLtOHeZE++Ff2XwzxGsPyZ/+9seGGxN6dCytqEz9FGqfC6E3M188W3iBrXDQPqCYXsFxibexAxra6
+        L9lfU+Bg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPXuI-004esY-HK; Wed, 02 Mar 2022 22:57:18 +0000
+Date:   Wed, 2 Mar 2022 14:57:18 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Arnd Bergmann <arnd@arndb.de>
+Cc:     David Howells <dhowells@redhat.com>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        lsf-pc@lists.linux-foundation.org, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, Christian Brauner <brauner@kernel.org>
+Subject: Re: [LSF/MM/BPF TOPIC] configfd as a replacement for both ioctls and
+ fsconfig
+Message-ID: <Yh/2TpJsqjX3PpVS@bombadil.infradead.org>
+References: <Yh1swsJLXvLLIQ0e@bombadil.infradead.org>
+ <2ee1eb2b46a3bbdbde4244634586655247f5c676.camel@HansenPartnership.com>
+ <1476917.1643724793@warthog.procyon.org.uk>
+ <3570401.1646234372@warthog.procyon.org.uk>
+ <Yh/nn1yjU1xF9qCG@bombadil.infradead.org>
+ <c16dfd08-14f1-bd43-73ca-c1f3e7b3c205@kernel.dk>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c16dfd08-14f1-bd43-73ca-c1f3e7b3c205@kernel.dk>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hannes Reinecke <hare@suse.de> writes:
+On Wed, Mar 02, 2022 at 03:05:33PM -0700, Jens Axboe wrote:
+> On 3/2/22 2:54 PM, Luis Chamberlain wrote:
+> > On Wed, Mar 02, 2022 at 03:19:32PM +0000, David Howells wrote:
+> >> Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >>
+> >>>> It'd be nice to be able to set up a 'configuration transaction' and then
+> >>>> do a commit to apply it all in one go.
+> >>>
+> >>> Can't io-uring cmd effort help here?
+> >>
+> >> I don't know.  Wouldn't that want to apply each element as a separate thing?
+> > 
+> > There is nothing to stop us to design an API which starts a
+> > transaction / ends. And io-uring cmd supports links so this is all
+> > possible in theory, I just don't think anyone has done it before.
+> 
+> Only thing you're missing there is unroll on failure. It's quite
+> possible to have linked operations, but the only recurse is "abort rest
+> of chain if one fails".
 
-> Actually, I'd rather have something like an 'inverse io_uring', where an
-> application creates a memory region separated into several 'ring' for 
-> submission and completion.
-> Then the kernel could write/map the incoming data onto the rings, and
-> application can read from there.
-> Maybe it'll be worthwhile to look at virtio here.
+Yikes. I can see this getting complicated fast. But wouldn't dbs have
+already dealt with this somehow?
 
->
-> But in either case, using fds or pipes for commands doesn't really
-> scale, as the number of fds is inherently limited. And using fds 
-> restricts you to serial processing (as you can read only sequentially
-> from a fd); with mmap() you'll get a greater flexibility and the option 
-> of parallel processing.
+But yes, my point still stands. io-uring cmd stuff really can be a game
+changer on how we deal with new APIs. While unifying arch stuff to make
+system calls easier to add, I'm actually thinking, if an async API
+is needed, then perhaps we can *curtail* adding new system calls and just
+handle these through the io-uring cmd stuff. Of course, so long as your
+subsystem deals with file_operations.
 
-Hannes,
+> > I mean... io-uring cmd file operation stuff is not even upstream
+> > yet...
+> 
+> Mostly because it hasn't been pushed. Was waiting for a good idea on how
+> to handle extended commands, and actually had the epiphany and
+> implemented it next week. So a more palatable version should be posted
+> soon.
 
-I'm not trying to push an fd implementation, and seems clear that
-io_uring is the right way to go.  But isn't fd virtually unlimited,
-as they can be extended up to procfs's file-max for a specific user?
+I am more than ecstatic to hear this! I cannot wait!
+ 
+> >> But you might want to do something more akin to a db transaction, where you
+> >> start a transaction, read stuff, consider your changes, propose your changes
+> >> and then commit - which would mean io_uring wouldn't help.
+> > 
+> > I think Pavel had some advanced use cases to support that with io-uring
+> > cmd work. For instance open a file descriptor and then work on it all
+> > in the same chain of commands sent.
+> 
+> That already exists in the kernel, it's direct descriptors. See:
+> 
+> https://lwn.net/Articles/863071/
+> 
+> With that, you can have a chain that does "open file, do X to file, do Y
+> to file, etc, close file" in one operation. Links like mentioned above,
+> but can pre-make requests that operate on a descriptor that has been
+> opened.
 
-Also, I was proposing one fd per IO operation, so each request data is
-independent.  But, even within each IO, it doesn't necessarily need to
-be sequential.  Isn't pread/pwrite parallel on the same fd?
+Groovy, thanks for the pointer!
 
-A FD-based implementation could also use existing io_uring operations,
-IORING_OP_READV/IORING_OP_WRITEV, against the file descriptor.
-
--- 
-Gabriel Krisman Bertazi
+  Luis
