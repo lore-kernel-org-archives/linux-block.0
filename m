@@ -2,304 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCBBC4332F
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 04:54:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E0CBC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 05:05:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239526AbiCBEyi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 23:54:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59080 "EHLO
+        id S231472AbiCBFGM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 00:06:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54336 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239495AbiCBEyh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 23:54:37 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8887BB150C;
-        Tue,  1 Mar 2022 20:53:54 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id 27so640373pgk.10;
-        Tue, 01 Mar 2022 20:53:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=nNi4rMqg08CCrpEt9N8/H4Odr1aWwbhtB5E4unm3mVA=;
-        b=aTK+2SIkmj0YCy3LfaTX7xI10dtEgXOhPOlOkEIAcRmYIhXTVrV+4obrF/HAC/E4RP
-         thxxSltqgn80CKK/IsYyTe+37x3HMgPzvwNyTjQHXcxhGEMWPKIfIm8sq7Hcm5uDdlZW
-         8mTvAXX2ZDpyOcW0Ipmbvf/oquLo6sUBSVok+Snsw/1O1aisT3Qr7ci4urU2Ghl4WhsM
-         can3P6KDsKsQMUf3O4fIedCUVMxSpzs8kqfuwYSkgiyEXDcSaVbiXS8DKUbatpkLCnBL
-         0lFlzYMn7OiLjidLwQZAT41PUKCbzY7aFFEFeS+95kobv6MlptrGnaw7GyKYQVJt2Ubb
-         3OGw==
+        with ESMTP id S229464AbiCBFGK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 00:06:10 -0500
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDFD3A1462;
+        Tue,  1 Mar 2022 21:05:27 -0800 (PST)
+Received: by mail-pg1-f170.google.com with SMTP id 195so677207pgc.6;
+        Tue, 01 Mar 2022 21:05:27 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=nNi4rMqg08CCrpEt9N8/H4Odr1aWwbhtB5E4unm3mVA=;
-        b=BVe7jFKdDvXRUk+WfuPYidKbaeMq8H3t8LeB2RyZs1CLVxbJg1q/NIzjriOKXVJfGd
-         ZoP9BdaYW6+icwSCkLB9oY23qdZwqpZq0Qm2ZYzikRKNp3/K0GAkrc+Kze9PLiolUELm
-         pK66ZRDCclNYZ3lGiqLWseJVRBYO7GKkDSSPSXsjtF/uomd2LRaZkUAxtSzQlqSedqve
-         heks4nljBgvcwmX/EBetbLeBoC+lhqZuqQFN48pfi2JvWYkaYdn/HPmlKw1piybn5dyD
-         VwWoQwP3oUt1ufT2mHHo+UN4G/wCVWkOBqZBCQySXzuuQQXet4hW3Oci5zy37fbDkhrm
-         4rMQ==
-X-Gm-Message-State: AOAM532HOAbXJqW8jan0GNx8OMIbjxoZYnTe7g8x8pE5hbiYnkYB64BQ
-        hw9UmVo+laMup5CXadBdDI8=
-X-Google-Smtp-Source: ABdhPJxfU+Zk4/I1aHYGv00DHbooJyvOZzR43S+TPguw15+w148owaMwAlgFuPKmmKJnMgw9jCCjCg==
-X-Received: by 2002:a05:6a00:130e:b0:4cc:3c7d:4dec with SMTP id j14-20020a056a00130e00b004cc3c7d4decmr31361435pfu.32.1646196833916;
-        Tue, 01 Mar 2022 20:53:53 -0800 (PST)
-Received: from ip-172-31-19-208.ap-northeast-1.compute.internal (ec2-18-181-137-102.ap-northeast-1.compute.amazonaws.com. [18.181.137.102])
-        by smtp.gmail.com with ESMTPSA id b1-20020a630c01000000b003758d1a40easm14175994pgl.19.2022.03.01.20.53.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Mar 2022 20:53:53 -0800 (PST)
-Date:   Wed, 2 Mar 2022 04:53:41 +0000
-From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH v3 00/21] DEPT(Dependency Tracker)
-Message-ID: <Yh74VbNZZt35wHZD@ip-172-31-19-208.ap-northeast-1.compute.internal>
-References: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
- <Yh70VkRkUfwIjPWv@ip-172-31-19-208.ap-northeast-1.compute.internal>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=grFy95UMmw6XvQWZ5Vr9x+TwK2mEpVY3Ui9h0IeBjZ4=;
+        b=c5V3UY2MeQAyynpduQCeeqcvHx+3tZiV8/JtKjLA7/ZBiDuSzK6+cRXmOFzvjufAe0
+         q3TPZBIljjorACDi844klOn0pY1EcxOeqXeUDzwhL8wT8UvOmP00FRrCDq0k8ZD/aoCC
+         /8EKXyyX9T4JhmiKnpdl8miTRPhQURXbUdIEE+EIboXzh0ardtMtZ5zoYtZTpbdW3CO5
+         h2KSRGgy4jsucXbUrQqb90P0+NP8q4HOfNqM5ofvqO94GTRadvkzl4TjDP18uAalQHpL
+         Uoc0dkxixiAg6sNGJtPRspza8rvLkFjAUVgXCZxfeyC9SZKwq8+JHHJeENKzqyRu1g0i
+         FvRw==
+X-Gm-Message-State: AOAM532e4hbfhDLCGS3zCAaCBydGUYGhNWguamgTbCuhC4XzOIIlW2gh
+        VI1Qv24dFMHkDzAozKnKXDXzHHEJyCsYGg==
+X-Google-Smtp-Source: ABdhPJzF/kXNU/ZHajn5wh6Te0YLvbIb4Sj2XeBYEqdx1dObioM/pdgrxoOY8j+rwSnDCg0PPOPkeA==
+X-Received: by 2002:a05:6a00:1a04:b0:4e1:786c:cce3 with SMTP id g4-20020a056a001a0400b004e1786ccce3mr31231669pfv.81.1646197527155;
+        Tue, 01 Mar 2022 21:05:27 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id 132-20020a62168a000000b004f40e8b3133sm3755946pfw.188.2022.03.01.21.05.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 01 Mar 2022 21:05:26 -0800 (PST)
+Message-ID: <c61b6a0d-c3b5-30e2-14c5-efa7ea475c23@acm.org>
+Date:   Tue, 1 Mar 2022 21:05:24 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yh70VkRkUfwIjPWv@ip-172-31-19-208.ap-northeast-1.compute.internal>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: move more work to disk_release v2
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+References: <20220227172144.508118-1-hch@lst.de>
+ <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org> <20220301125632.GA3911@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220301125632.GA3911@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 04:36:38AM +0000, Hyeonggon Yoo wrote:
-> On Mon, Feb 28, 2022 at 06:56:39PM +0900, Byungchul Park wrote:
-> > I didn't want to bother you so I was planning to send the next spin
-> > after making more progress. However, PATCH v2 reports too many false
-> > positives because Dept tracked the bit_wait_table[] wrong way - I
-> > apologize for that. So I decided to send PATCH v3 first before going
-> > further for those who want to run Dept for now.
-> > 
-> > There might still be some false positives but not overwhelming.
-> >
+On 3/1/22 04:56, Christoph Hellwig wrote:
+> On Sun, Feb 27, 2022 at 03:18:24PM -0800, Bart Van Assche wrote:
+>> The second issue I run into with this branch is as follows
+>> (also for nvmeof-mp/002):
 > 
-> Hello Byungchul, I'm running DEPT v3 on my system
-> and I see report below.
+> You'll need this patch, which is only in mainline but not the
+> for-5.18/block branch:
 > 
-> Looking at the kmemleak code and comment, I think
-> kmemleak tried to avoid lockdep recursive warning
-> but detected by DEPT?
->
-
-Forgot to include another warning caused by DEPT.
-
-And comment below might be useful for debugging:
-
-in kmemleak.c:
-  43  * Locks and mutexes are acquired/nested in the following order:
-  44  *
-  45  *   scan_mutex [-> object->lock] -> kmemleak_lock -> other_object->lock (SINGLE_DEPTH_NESTING)
-  46  *
-  47  * No kmemleak_lock and object->lock nesting is allowed outside scan_mutex
-  48  * regions.
-
-===================================================
-DEPT: Circular dependency has been detected.
-5.17.0-rc1+ #1 Tainted: G        W        
----------------------------------------------------
-summary
----------------------------------------------------
-*** DEADLOCK ***
-
-context A
-    [S] __raw_spin_lock_irqsave(&object->lock:0)
-    [W] __raw_spin_lock_irqsave(kmemleak_lock:0)
-    [E] spin_unlock(&object->lock:0)
-
-context B
-    [S] __raw_spin_lock_irqsave(kmemleak_lock:0)
-    [W] _raw_spin_lock_nested(&object->lock:0)
-    [E] spin_unlock(kmemleak_lock:0)
-
-[S]: start of the event context
-[W]: the wait blocked
-[E]: the event not reachable
-
----------------------------------------------------
-context A's detail
----------------------------------------------------
-context A
-    [S] __raw_spin_lock_irqsave(&object->lock:0)
-    [W] __raw_spin_lock_irqsave(kmemleak_lock:0)
-    [E] spin_unlock(&object->lock:0)
-
-[S] __raw_spin_lock_irqsave(&object->lock:0):
-[<ffffffc00810302c>] scan_gray_list+0x84/0x13c
-stacktrace:
-      dept_ecxt_enter+0x88/0xf4
-      _raw_spin_lock_irqsave+0xf0/0x1c4
-      scan_gray_list+0x84/0x13c
-      kmemleak_scan+0x2d8/0x54c
-      kmemleak_scan_thread+0xac/0xd4
-      kthread+0xd4/0xe4
-      ret_from_fork+0x10/0x20
-
-[W] __raw_spin_lock_irqsave(kmemleak_lock:0):
-[<ffffffc008102ebc>] scan_block+0x3c/0x128
-stacktrace:
-      __dept_wait+0x8c/0xa4
-      dept_wait+0x6c/0x88
-      _raw_spin_lock_irqsave+0xb8/0x1c4
-      scan_block+0x3c/0x128
-      scan_gray_list+0xc4/0x13c
-      kmemleak_scan+0x2d8/0x54c
-      kmemleak_scan_thread+0xac/0xd4
-      kthread+0xd4/0xe4
-      ret_from_fork+0x10/0x20
-
-[E] spin_unlock(&object->lock:0):
-[<ffffffc008102ee0>] scan_block+0x60/0x128
-
----------------------------------------------------
-context B's detail
----------------------------------------------------
-context B
-    [S] __raw_spin_lock_irqsave(kmemleak_lock:0)
-    [W] _raw_spin_lock_nested(&object->lock:0)
-    [E] spin_unlock(kmemleak_lock:0)
-
-[S] __raw_spin_lock_irqsave(kmemleak_lock:0):
-[<ffffffc008102ebc>] scan_block+0x3c/0x128
-stacktrace:
-      dept_ecxt_enter+0x88/0xf4
-      _raw_spin_lock_irqsave+0xf0/0x1c4
-      scan_block+0x3c/0x128
-      kmemleak_scan+0x19c/0x54c
-      kmemleak_scan_thread+0xac/0xd4
-      kthread+0xd4/0xe4
-      ret_from_fork+0x10/0x20
-
-[W] _raw_spin_lock_nested(&object->lock:0):
-[<ffffffc008102f34>] scan_block+0xb4/0x128
-stacktrace:
-      dept_wait+0x74/0x88
-      _raw_spin_lock_nested+0xa8/0x1b0
-      scan_block+0xb4/0x128
-      kmemleak_scan+0x19c/0x54c
-      kmemleak_scan_thread+0xac/0xd4
-      kthread+0xd4/0xe4
-      ret_from_fork+0x10/0x20
-[E] spin_unlock(kmemleak_lock:0):
-[<ffffffc008102ee0>] scan_block+0x60/0x128
-stacktrace:
-      dept_event+0x7c/0xfc
-      _raw_spin_unlock_irqrestore+0x8c/0x120
-      scan_block+0x60/0x128
-      kmemleak_scan+0x19c/0x54c
-      kmemleak_scan_thread+0xac/0xd4
-      kthread+0xd4/0xe4
-      ret_from_fork+0x10/0x20
----------------------------------------------------
-information that might be helpful
----------------------------------------------------
-CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
-Hardware name: linux,dummy-virt (DT)
-Call trace:
- dump_backtrace.part.0+0x9c/0xc4
- show_stack+0x14/0x28
- dump_stack_lvl+0x9c/0xcc
- dump_stack+0x14/0x2c
- print_circle+0x2d4/0x438
- cb_check_dl+0x6c/0x70
- bfs+0xc0/0x168
- add_dep+0x88/0x11c
- add_wait+0x2d0/0x2dc
- __dept_wait+0x8c/0xa4
- dept_wait+0x6c/0x88
- _raw_spin_lock_irqsave+0xb8/0x1c4
- scan_block+0x3c/0x128
- scan_gray_list+0xc4/0x13c
- kmemleak_scan+0x2d8/0x54c
- kmemleak_scan_thread+0xac/0xd4
- kthread+0xd4/0xe4
- ret_from_fork+0x10/0x20
-
-> ===================================================
-> DEPT: Circular dependency has been detected.
-> 5.17.0-rc1+ #1 Tainted: G        W
-> ---------------------------------------------------
-> summary
-> ---------------------------------------------------
-> *** AA DEADLOCK ***
+> fd9f4e62a39f09a7c014d7415c2b9d1390aa0504
+> Author: Christoph Hellwig <hch@lst.de>
+> Date:   Tue Jan 18 08:04:44 2022 +0100
 > 
-> context A
->     [S] __raw_spin_lock_irqsave(&object->lock:0)
->     [W] _raw_spin_lock_nested(&object->lock:0)
->     [E] spin_unlock(&object->lock:0)
-> 
-> [S]: start of the event context
-> [W]: the wait blocked
-> [E]: the event not reachable
-> ---------------------------------------------------
-> context A's detail
-> ---------------------------------------------------
-> context A
->     [S] __raw_spin_lock_irqsave(&object->lock:0)
->     [W] _raw_spin_lock_nested(&object->lock:0)
->     [E] spin_unlock(&object->lock:0)
-> 
-> [S] __raw_spin_lock_irqsave(&object->lock:0):
-> [<ffffffc00810302c>] scan_gray_list+0x84/0x13c
-> stacktrace:
->       dept_ecxt_enter+0x88/0xf4
->       _raw_spin_lock_irqsave+0xf0/0x1c4
->       scan_gray_list+0x84/0x13c
->       kmemleak_scan+0x2d8/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> [E] spin_unlock(&object->lock:0):
-> [<ffffffc008102ee0>] scan_block+0x60/0x128
-> ---------------------------------------------------
-> information that might be helpful
-> ---------------------------------------------------
-> CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x9c/0xc4
->  show_stack+0x14/0x28
->  dump_stack_lvl+0x9c/0xcc
->  dump_stack+0x14/0x2c
->  print_circle+0x2d4/0x438
->  cb_check_dl+0x44/0x70
->  bfs+0x60/0x168
->  add_dep+0x88/0x11c
->  add_wait+0x2d0/0x2dc
->  __dept_wait+0x8c/0xa4
->  dept_wait+0x6c/0x88
->  _raw_spin_lock_nested+0xa8/0x1b0
->  scan_block+0xb4/0x128
->  scan_gray_list+0xc4/0x13c
->  kmemleak_scan+0x2d8/0x54c
->  kmemleak_scan_thread+0xac/0xd4
->  kthread+0xd4/0xe4
->  ret_from_fork+0x10/0x20
->
-[...]
+>      block: assign bi_bdev for cloned bios in blk_rq_prep_clone
 
---
-Thank you, You are awesome!
-Hyeonggon :-)
+Hmm ... even with that patch applied, I still see the crash reported in 
+my previous email. After I observed that crash I did a clean kernel 
+build to make sure that the kernel binaries used in my test match the 
+source code.
+
+Bart.
+
+BUG: KASAN: null-ptr-deref in __blk_account_io_start+0x28/0xa0
+Read of size 8 at addr 0000000000000008 by task kworker/0:1H/155
+
+CPU: 0 PID: 155 Comm: kworker/0:1H Not tainted 5.17.0-rc2-dbg+ #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
+rel-1.15.0-0-g2dd4b9b-rebuilt.opensuse.org 04/01/2014
+Workqueue: kblockd blk_mq_requeue_work
+Call Trace:
+[ ... ]
