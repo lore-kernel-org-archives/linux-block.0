@@ -2,95 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8C60C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 23:45:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C57C433FE
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 23:49:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229520AbiCBXqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 18:46:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52940 "EHLO
+        id S229631AbiCBXuV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 18:50:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42548 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229507AbiCBXqF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 18:46:05 -0500
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2DA3FBDC;
-        Wed,  2 Mar 2022 15:43:39 -0800 (PST)
-Received: by mail-qv1-f49.google.com with SMTP id j5so2811599qvs.13;
-        Wed, 02 Mar 2022 15:43:39 -0800 (PST)
+        with ESMTP id S229640AbiCBXuU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 18:50:20 -0500
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7469D244A06
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 15:49:33 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id 9so2975065pll.6
+        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 15:49:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YubSjBfIuHvUqf85+oZbcJlWJHy5V5+oMv2zbzjivfY=;
-        b=Z4fxse9WuKTEQIl/j+PccFudevCMik/LMzm+qtuG0JK/MKiS1Af+FFgitvg79t8Ljq
-         YepZcKc/5ZWAJdwLfbyoomIZVZHISKUbXsIFeik9lL3RbQHmgkjbqoUniENrqy+5Dj3b
-         vBaXYw4PRJRKSxI6is82klOD4/1Wh5A4vyE98a/4V8BfstON/ghf+SzmFSMUXifQ9axq
-         4fAbYmDFn3QaOJnUeN2bcEBnHyDAppe2TCxYHURJm9ZCJuyUEcc1mzSJX0SUxy3ZyT+e
-         WyJ8XChvTNn3E3+DMygnZKXPaEstaK3xMBTjgyUUF3htGPkenlCRgvTYs0Pyw50j4558
-         XQlg==
-X-Gm-Message-State: AOAM531ck4QaLm0vQBOP8VrHVCGNgQYiWKJQ9jTXVKXkVpXTT8gQsHC0
-        gtn4OLjlOhm5ZVTqAQ3hZBbnejnMVAs=
-X-Google-Smtp-Source: ABdhPJxUsTDEZUjKOL/Hkg6jc21Fhkxg+c8+3++ArYMa3Xk3Lu21qOMBed3EIK/TolFwzwRvHO+G8A==
-X-Received: by 2002:a17:902:f602:b0:14f:53a8:64f7 with SMTP id n2-20020a170902f60200b0014f53a864f7mr33024156plg.151.1646264018123;
-        Wed, 02 Mar 2022 15:33:38 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id h2-20020a056a00218200b004f66d50f054sm219507pfi.158.2022.03.02.15.33.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 02 Mar 2022 15:33:37 -0800 (PST)
-Message-ID: <9e818df5-e8c0-b397-ae21-1a0745074094@acm.org>
-Date:   Wed, 2 Mar 2022 15:33:35 -0800
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=27harkJvt3GbkEUzd97hE61qyRwT0mO4luQz+C9YIVY=;
+        b=DdHq5ZP+f5JDXYc8ClDxOP1ZXcXsodD5KES9mNg/AUOSCQffw4+tMC+4r39FvkfNpd
+         zSreW8rfuHAOQ2BuqrVLF38l6V7gQITeWy5/2Ti4GMJdd9Pyi2iOxY/CfMMpffzlAHxW
+         6IIQ6hHZ0w6tfXz6pLyO0NCPVQJaqj7KyhUWGHonQpD79uJVPaQvf5K8YCPNJxN8eBzm
+         EZiU5ON/n+vX2lNifVpHHSzlOgTxwe+tFJ1QCU8Uuou2FpXdYF9+UXRfikaQNU2oP7gf
+         H1lwR4idoVgKWDwV7Z2JFeUS26ij6kvo6329NQuDwdJ4h75t+OnNoDduQKElBQASt/tb
+         T4RQ==
+X-Gm-Message-State: AOAM533cnnkO7kr0UOIavJJB70250bmzHMUcnpPinpGwhwztm+srj/s/
+        yASCgHC5zuavK1o1CPYUcLLRiYHIhSs=
+X-Google-Smtp-Source: ABdhPJxqr04ho8Sf+nOJf9uzDiSKIAwAy2mFLuUc3UFVCMr4d+Uzjzb7WW+wppBuBw6DqL0IfkWtMQ==
+X-Received: by 2002:a17:902:ccc6:b0:14f:88e6:8040 with SMTP id z6-20020a170902ccc600b0014f88e68040mr33506847ple.13.1646264446627;
+        Wed, 02 Mar 2022 15:40:46 -0800 (PST)
+Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
+        by smtp.gmail.com with ESMTPSA id q194-20020a6275cb000000b004f396541cecsm253220pfc.155.2022.03.02.15.40.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 15:40:45 -0800 (PST)
+Date:   Wed, 2 Mar 2022 15:40:43 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        Dave Jones <davej@codemonkey.org.uk>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] Towards more useful nvme passthrough
+Message-ID: <20220302234043.wlacvj223rcymc4b@garbanzo>
+References: <CGME20220228093018epcas5p137f53cb05ce95fed2ac173b8fddf2eee@epcas5p1.samsung.com>
+ <20220228092511.458285-1-joshi.k@samsung.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: move more work to disk_release v2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20220227172144.508118-1-hch@lst.de>
- <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org> <20220301125632.GA3911@lst.de>
- <c61b6a0d-c3b5-30e2-14c5-efa7ea475c23@acm.org>
- <20220302150319.GA30076@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220302150319.GA30076@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220228092511.458285-1-joshi.k@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/2/22 07:03, Christoph Hellwig wrote:
-> On Tue, Mar 01, 2022 at 09:05:24PM -0800, Bart Van Assche wrote:
->> Hmm ... even with that patch applied, I still see the crash reported in my
->> previous email. After I observed that crash I did a clean kernel build to
->> make sure that the kernel binaries used in my test match the source code.
+On Mon, Feb 28, 2022 at 02:55:11PM +0530, Kanchan Joshi wrote:
+> I'd like a propose a session to go over:
 > 
-> I still can't reproduce it at all.  With this patchset on Jens'
-> for-5.18/block branch I do get a pre-existing crash in
-> nvmf_connect_admin_queue, and on Jens' for-next tree that has all the
-> latest fixes from Linus' tree I only see the CM lockdep warning you
-> reported.
-> 
-> FYI, this is a branch with the patches applied ontop of the for-next
-> branch:
-> 
-> http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/freeze-for-next
+> - What are the issues in having the above work (uring-cmd and new nvme
+> passthru) merged?
 
-Hi Christoph,
+It sounds like we just needed to settle on the formats. And a few more
+eyeballs / reviewed-by's. No? And it sounds like Jens is about to punt
+a new series :)
 
-Thanks for having published a merge of block-for-next and the branch 
-with this patch series. That makes it easy for me to replicate your 
-kernel tree. I can reproduce the null-ptr-deref with the freeze-for-next 
-branch but not with Jens' block-for-next branch (commit e70f36e84f9b 
-("Merge branch 'for-5.18/block' into for-next")). This is what appears 
-in the kernel log on my test setup for the freeze-for-next branch 
-(commit acac349e5516 ("block: move rq_qos_exit() into disk_release()"):
+> - What would be other useful things to add in nvme-passthru. For
+> example- lack of vectored-io for passthru was one such missing piece.
+> That is covered from nvme 5.18 onwards [4]. But are there other things
+> that user-space would need before it starts treating this path as a
+> good alternative to kernel-bypass?
 
-BUG: KASAN: null-ptr-deref in __blk_account_io_start+0x28/0xa0
+I think it would be good to split this into two parts:
 
-Maybe we are using different kernel configurations? I'm using 
-CONFIG_NVME_MULTIPATH=n. I guess that you are using CONFIG_NVME_MULTIPATH=y?
+ * io-uring cmd extensions
+ * what can be extended for nvme
 
-Bart.
+io-uring cmd is not even upstream yet, so I don't think folks widely really
+realize the potential yet. So I think it's a bit too early to tell here,
+and so we should go out and preach at things like Plumbers and other
+conferences with a few nice demos of what can be done. nvme being one
+use case, but I think it would help to get other users active and not
+just vaporware.
+
+The problem I'm seeing with this effort too is it relies too heavily
+on the nvme passthrough being the only use case so far, and that's
+a bit too involved. So I'd like to encourage other simple users
+to consider helping here.
+
+Granted this is like looking for a nail when you're hammer. And so
+the only way to not have it be that way is to aim smaller, a simple
+real demo of something useful. I don't know.. I'd think something like
+trinity might have a field day with this.
+
+> - Despite the numbers above, nvme passthru has more room for
+> efficiency e.g. unlike regular io, we do copy_to_user to fetch
+> command, and put_user to return the result. Eliminating some of this
+> may require new ioctl. There may be other opinions on what else needs
+> overhaul in this path.
+
+I think we are being to hard on ourselves. Start small, and, get some
+basic stuff up. And allow for flexibility for improvement. I think
+at this point we have more than proof of concept no but something
+tangible?
+
+> - What would be a good way to upstream the tests? Nvme-cli may not be
+> very useful. Should it be similar to fio’s sg ioengine. But
+> unlike sg, here we are combining ng with io_uring, and one would want
+> to retain all the tunables of io_uring (register/fixed buffers/sqpoll
+> etc.)
+
+If the goal was to help open the door for unsupported commands then
+in so far as upstream is concerned shouldn't we only care about the
+generic plumbing? ie, specific commands / which might not yet be
+baked for general consumption (like zone append) are left to up to
+implementors to figure out where they test. Let's use zone append
+as an example. Without a raw block interface to it, we can use this
+framework, ideally.. but yeah how do we test? Are vendors all going
+to agree to use microbenches with io-uring cmd?
+
+> - All the above is for 2.0 passthru which essentially forms a direct
+> path between io_uring and nvme. And io_uring and nvme programming
+> model share many similarities. For 3.0 passthru, would it be crazy to
+> think of trimming the path further by eliminating the block-layer and
+> doing stuff without “struct request”. There is some interest in
+> developing user-space block device [5] and FS anyway.
+
+I failed to capture where 2.0 and 3.0 are defined. Can you elaborate?
+
+  Luis
