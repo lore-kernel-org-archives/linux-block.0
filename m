@@ -2,90 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9486CC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 10:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F08DC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 12:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239677AbiCBKq7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 05:46:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42760 "EHLO
+        id S241701AbiCBMPI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 07:15:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232281AbiCBKq6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 05:46:58 -0500
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACD37B54E4
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 02:46:15 -0800 (PST)
-Received: by mail-ej1-x62d.google.com with SMTP id qt6so2761464ejb.11
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 02:46:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=dTWbHVP694/y8JRF1U4dnDjjT3Lz4bGbKprHj3pcE9M=;
-        b=eXpqzEGGVA93vhCHsrUsBrS5LACnekzMj0M39dATR9U8X0F7qOtOM/CZOOHzlMr0/e
-         KDs8wd4IVzR0vds0PkdsfroW5uPOGsAqSQhOn++mJPfQSSKU0NNAoADXYkK5Wd0twQ8B
-         H2DslTcoFjgsL7cQx5BRsNIXQ3NSaulgZF3MG4CIkOm5Olmhk4UMoi5yiPBcNu4uqfWI
-         0ogiSXytpoU06uEwaIwAY6AqhoGuhp+PZZvgx4Yi3XK8awXMHs749IZUK1+e0ZsoZDhR
-         5o8ZYNOMEYCS4TzUw2bWweljVV1txSPi6G67WhEGENDrCvEIlY8skK1wWXk+135LR6+q
-         RloQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dTWbHVP694/y8JRF1U4dnDjjT3Lz4bGbKprHj3pcE9M=;
-        b=oGCsl5hWo0a2K11IirgntQMj46ABirGYP4IdjQPK0rOxKDF0jCMV3I49P9VrqbIleT
-         p5QuzvBvFL9a6TB41/HkO01uszSSLmG7DIx4mYRGVBWL5YDB3kzZrm6HVAGQuDaDumqm
-         N4q7vLkZdznS0sPvmmkgWcncuASCKG/QpgI4IklQQPp5DRIILZ4F4XoY4VJ/Eo7ugvga
-         XtQhwylOxq6I/wUyV5kexlRkytcSQh11Dmepyec/6QtBGENmk70JNf8vFwfoi8VV+Bd5
-         oP9IysIaJk42zZBsAvHHERJe/g4G0rR2dEWJu4kmK4c+a+niKMqPOZKLBF2Wxf4yu23s
-         GuWw==
-X-Gm-Message-State: AOAM532ClThgCW11FQogJXwDbm2qBzbMdTi5q5zvGYw/rxZD4Oh3b0ht
-        kkEBMafBUmAerPJIJFdUdpTkMqU6kUfLaIOqDiLU
-X-Google-Smtp-Source: ABdhPJy+OIdiSSoVcciyXhDi5uiVzbX+Oo5S7yF/lDRAZdb2JqwiFwjXej42BMAn3XwJOC3/Fs4yUT0eqwcHND7FOHg=
-X-Received: by 2002:a17:906:56cd:b0:6d6:e276:f455 with SMTP id
- an13-20020a17090656cd00b006d6e276f455mr6680402ejc.257.1646217974246; Wed, 02
- Mar 2022 02:46:14 -0800 (PST)
+        with ESMTP id S241707AbiCBMPE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 07:15:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 429C036B48
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 04:14:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646223260;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=kghroLwTmGzJqs7ksDSoJhAx7Na2hOM5Czt7RblWWlg=;
+        b=JN0j8T2I2aFyaKwNTmbeYjdzemvC9JVdwk2VfT7TvA0zaY0z9D2xQe/rfhbwGQAuVU+s9q
+        QWwMRSFro7+mL/imrb8dE1i0ADHasKRZVwFhhNKVPuubTVg7I2HTc9NknTSljLWambaTED
+        jchUY268ezGRYhxaVnp3CjWSkeT3idw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-141-xBM333TVO8Sc7I-8j24fgQ-1; Wed, 02 Mar 2022 07:14:17 -0500
+X-MC-Unique: xBM333TVO8Sc7I-8j24fgQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45EF18070F0;
+        Wed,  2 Mar 2022 12:14:16 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 900A71053B07;
+        Wed,  2 Mar 2022 12:14:15 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/6] blk-mq: update_nr_hw_queues related improvement & bugfix
+Date:   Wed,  2 Mar 2022 20:14:01 +0800
+Message-Id: <20220302121407.1361401-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <20220228065720.100-1-xieyongji@bytedance.com> <20220301104039-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220301104039-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Wed, 2 Mar 2022 18:46:03 +0800
-Message-ID: <CACycT3uGFUjmuESUi9=Kkeg4FboVifAHD0D0gPTkEprcTP=x+g@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 1, 2022 at 11:43 PM Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> On Mon, Feb 28, 2022 at 02:57:20PM +0800, Xie Yongji wrote:
-> > Currently we have a BUG_ON() to make sure the number of sg
-> > list does not exceed queue_max_segments() in virtio_queue_rq().
-> > However, the block layer uses queue_max_discard_segments()
-> > instead of queue_max_segments() to limit the sg list for
-> > discard requests. So the BUG_ON() might be triggered if
-> > virtio-blk device reports a larger value for max discard
-> > segment than queue_max_segments().
->
-> Hmm the spec does not say what should happen if max_discard_seg
-> exceeds seg_max. Is this the config you have in mind? how do you
-> create it?
->
+Hi,
 
-One example: the device doesn't specify the value of max_discard_seg
-in the config space, then the virtio-blk driver will use
-MAX_DISCARD_SEGMENTS (256) by default. Then we're able to trigger the
-BUG_ON() if the seg_max is less than 256.
+The 1st patch figures out correct numa node for each kind of hw queue.
 
-While the spec didn't say what should happen if max_discard_seg
-exceeds seg_max, it also doesn't explicitly prohibit this
-configuration. So I think we should at least not panic the kernel in
-this case.
+The 2nd patch simplifies reallocation of q->queue_hw_ctx a bit.
 
-Thanks,
-Yongji
+The 3rd patch re-configures poll capability after queue map is changed.
+
+The 4th patch changes mtip32xx to avoid to refer to q->queue_hw_ctx
+directly.
+
+The 5th & 6th patches fix use-after-free on q->queue_hw_ctx.
+
+V2:
+	- use xa_for_each() to implement queue_for_each_hw_ctx(5/6 6/6) 
+	- patch style change(1/6)
+	- rename as suggested by Christoph(3/6)
+
+Ming Lei (6):
+  blk-mq: figure out correct numa node for hw queue
+  blk-mq: simplify reallocation of hw ctxs a bit
+  blk-mq: reconfigure poll after queue map is changed
+  block: mtip32xx: don't touch q->queue_hw_ctx
+  blk-mq: prepare for implementing hctx table via xarray
+  blk-mq: manage hctx map via xarray
+
+ block/blk-mq-debugfs.c            |   6 +-
+ block/blk-mq-sched.c              |   9 +-
+ block/blk-mq-sysfs.c              |  12 ++-
+ block/blk-mq-tag.c                |   4 +-
+ block/blk-mq.c                    | 158 +++++++++++++++++-------------
+ block/blk-mq.h                    |   2 +-
+ drivers/block/mtip32xx/mtip32xx.c |   4 +-
+ drivers/block/rnbd/rnbd-clt.c     |   2 +-
+ include/linux/blk-mq.h            |   3 +-
+ include/linux/blkdev.h            |   2 +-
+ 10 files changed, 113 insertions(+), 89 deletions(-)
+
+-- 
+2.31.1
+
