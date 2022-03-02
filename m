@@ -2,102 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F673C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 00:46:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D432C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 00:51:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232388AbiCBAqq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 1 Mar 2022 19:46:46 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
+        id S238796AbiCBAwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 1 Mar 2022 19:52:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231748AbiCBAqp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 19:46:45 -0500
+        with ESMTP id S238783AbiCBAv7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 1 Mar 2022 19:51:59 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7028A5F24A
-        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 16:46:03 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 908033F883
+        for <linux-block@vger.kernel.org>; Tue,  1 Mar 2022 16:51:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646181962;
+        s=mimecast20190719; t=1646182276;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=y9GiUqB4Tu/RCAi83nCkYUeMANtbdClO14LgMa0o8fw=;
-        b=gLhPHeTcL6v+poFDm5eF/0Tlk7u+sOD0an87O968WrsCsQusks0pJmJKJfclCWqzQqLIJv
-        NqKtO/lYMrKgat7VOU+kpjnE1Y1kSb8QKcGLv0MOd+1HsuyIess8jKkHfGUzC0y87xwW3p
-        IvM4C3fvi57arwh0vZMCRyV7sH9lDSA=
+        bh=PSE7XhaCLoK3lvixPJtHiDdmfP+vYGOwXq3x81uSukw=;
+        b=S8/dHvhyuZZknx1E1elAndcfnbHxjYDY5tT6wEHvCGU8SPo3GywmpmL3ASYsMKZDxe2rI6
+        F/wTad6+QJRhBhp5S2Q7QyyGdiUQJDuWEWKdLydoIQEsPipWI6M5RSlVj7ALcGqssEB3iI
+        oBQymnLgTDmP/F8InIUnkc/6Y46OpwY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-121-DlvziJF8OfC_0xRYsyzhyg-1; Tue, 01 Mar 2022 19:45:55 -0500
-X-MC-Unique: DlvziJF8OfC_0xRYsyzhyg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+ us-mta-645-BBzowO1OMtOEOJJbFaBeuw-1; Tue, 01 Mar 2022 19:51:11 -0500
+X-MC-Unique: BBzowO1OMtOEOJJbFaBeuw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1C7361006AA6;
-        Wed,  2 Mar 2022 00:45:53 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 051E08145F7;
+        Wed,  2 Mar 2022 00:51:10 +0000 (UTC)
 Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 98DBC7F7E2;
-        Wed,  2 Mar 2022 00:45:22 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 08:45:17 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4C0B0519BE;
+        Wed,  2 Mar 2022 00:51:04 +0000 (UTC)
+Date:   Wed, 2 Mar 2022 08:51:00 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jeffle Xu <jefflexu@linux.alibaba.com>, dm-devel@redhat.com,
-        Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH V3 0/3] block/dm: support bio polling
-Message-ID: <Yh6+HUBnx62CUCSu@T590>
-References: <20210623074032.1484665-1-ming.lei@redhat.com>
- <Yhz4AGXcn0DUeSwq@redhat.com>
- <Yh1vrWXlaTnEcrNd@T590>
- <Yh6N7msbMBcANFxg@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, tj@kernel.org,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+Message-ID: <Yh6/dH2CERzsBPJd@T590>
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org>
+ <Yhxnkg0AEaj36t+a@T590>
+ <YhyYpWHGVhs3J/dk@infradead.org>
+ <Yh31bQu3gbXoDBuK@T590>
+ <836f0686-4ac8-327d-2bab-64a762ea8673@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <Yh6N7msbMBcANFxg@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <836f0686-4ac8-327d-2bab-64a762ea8673@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 01, 2022 at 04:19:42PM -0500, Mike Snitzer wrote:
-> On Mon, Feb 28 2022 at  7:58P -0500,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Mon, Feb 28, 2022 at 11:27:44AM -0500, Mike Snitzer wrote:
+On Tue, Mar 01, 2022 at 09:54:28PM +0800, yukuai (C) wrote:
+> 在 2022/03/01 18:29, Ming Lei 写道:
+> > On Mon, Feb 28, 2022 at 01:40:53AM -0800, Christoph Hellwig wrote:
+> > > On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
+> > > > > FYI, this crashed left rigt and center when running xfstests with
+> > > > > traces pointing to throtl_pending_timer_fn.
+> > > > 
+> > > > Can you share the exact xfstests test(fs, test)? Or panic log?
+> > > > 
+> > > > I can't reproduce it when running './check -g auto' on XFS, meantime
+> > > > tracking throtl_pending_timer_fn().
 > > > 
-> > > Hey Ming,
+> > >  From a quick run using f2fs:
 > > > 
-> > > I'd like us to follow-through with adding bio-based polling support.
-> > > Kind of strange none of us that were sent this V3 ever responded,
-> > > sorry about that!
-> > > 
-> > > Do you have interest in rebasing this patchset (against linux-dm.git's
-> > > "dm-5.18" branch since there has been quite some churn)?  Or are you
-> > > OK with me doing the rebase?
+> > > generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
 > > 
-> > Hi Mike,
+> > Thanks for providing the reproducer.
 > > 
-> > Actually I have one local v5.17 rebase:
+> > The reason is that the pending timer is deleted in blkg's release
+> > handler, so the timer can still be live after request queue is released.
 > > 
-> > https://github.com/ming1/linux/tree/my_v5.17-dm-io-poll
+> > The patch of 'block: cancel all throttled bios in del_gendisk()' should just
+> > make it easier to trigger.
 > > 
-> > Also one for-5.18/block rebase which is done just now:
-> > 
-> > https://github.com/ming1/linux/tree/my_v5.18-dm-bio-poll
-> > 
-> > In my previous test on v5.17 rebase, the IOPS improvement is a bit small,
-> > so I didn't post it out. Recently not get time to investigate
-> > the performance further, so please feel free to work on it.
+> > After patch of "block: move blkcg initialization/destroy into disk allocation/
+> > release handler" lands, the issue can be fixed easily by:
 > 
-> OK, I've rebased it on dm-5.18.
+> Hi,
 > 
-> Can you please share the exact test(s) you were running?  I assume you
-> were running directly against a request-based device and then
-> comparing polling perf through dm-linear to the same underlying
-> request-based device?
+> Thanks for locating this problem,
+> 
+> Perhaps this patch should wait for the problem to be solved.
 
-I run io_uring over dm-linear and dm-stripe, over two nvme disks with
-2 poll_queues.
+BTW, please see the top 3 patches in the following tree:
 
-IOPS improvement can be observed, but not big.
+https://github.com/ming1/linux/commits/my_v5.18-pre-rc
+
+xfstests generic/081 can run for hours without problems, without the fix,
+the crash can be triggered in 10 minutes.
+
 
 Thanks,
 Ming
