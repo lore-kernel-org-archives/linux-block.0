@@ -2,71 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98ACEC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 08:26:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C1B4C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  2 Mar 2022 09:03:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240102AbiCBI0s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 03:26:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36940 "EHLO
+        id S240306AbiCBJDq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 04:03:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240093AbiCBI0p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 03:26:45 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 897A8B82D9
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 00:26:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646209562;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=YtrInDoeeooDXLH4/ASDNuBM89b2Da/ya3ncv+m8FWA=;
-        b=Dj0qUGBEBdb1PyFKVrQHSAuZA1MHlK1p0CbLFzB+2giIG8HTPLn5pPcq5Hm7H2fH1zqWXf
-        HU+XpXYodwSpy/j/VMFnnz/30qrtRFA2gA7A304QjS5miZhpXyk8j2DimJ57+0pLQRcHxM
-        RZYctjoV/+fkvP+JLeERzvTMOd1A/I4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-326-sAHRB3rVNm6CEswhqULziw-1; Wed, 02 Mar 2022 03:25:57 -0500
-X-MC-Unique: sAHRB3rVNm6CEswhqULziw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F944824FA7;
-        Wed,  2 Mar 2022 08:25:55 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 629027FCE4;
-        Wed,  2 Mar 2022 08:25:49 +0000 (UTC)
-Date:   Wed, 2 Mar 2022 16:25:45 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Abdul Haleem <abdhalee@linux.vnet.ibm.com>
-Cc:     linux-scsi <linux-scsi@vger.kernel.org>, yukuai3@huawei.com,
-        linux-next <linux-next@vger.kernel.org>, axboe@kernel.dk,
-        linux-block@vger.kernel.org,
-        linuxppc-dev <linuxppc-dev@lists.ozlabs.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [next-20220225][Oops][ppc] lvm snapshot merge results kernel
- panics (throtl_pending_timer_fn)
-Message-ID: <Yh8qCS5JM8ZbtqY4@T590>
-References: <d583adf0-2d98-60b6-620c-722912c05852@linux.vnet.ibm.com>
+        with ESMTP id S240296AbiCBJDp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 04:03:45 -0500
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5FD19C18
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 01:02:56 -0800 (PST)
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4K7p6b111xz687Sl;
+        Wed,  2 Mar 2022 17:02:47 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Wed, 2 Mar 2022 10:02:54 +0100
+Received: from [10.47.80.134] (10.47.80.134) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 2 Mar
+ 2022 09:02:54 +0000
+Message-ID: <7d112d9f-6ab1-4f8e-6005-b940074f1071@huawei.com>
+Date:   Wed, 2 Mar 2022 09:02:53 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d583adf0-2d98-60b6-620c-722912c05852@linux.vnet.ibm.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.1
+Subject: Re: [PATCH 1/6] blk-mq: figure out correct numa node for hw queue
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        Yu Kuai <yukuai3@huawei.com>
+References: <20220228090430.1064267-1-ming.lei@redhat.com>
+ <20220228090430.1064267-2-ming.lei@redhat.com>
+ <45adf246-176a-b4a5-d973-4c885c37d821@huawei.com> <Yh7MqBLsE2FJvT2Z@T590>
+From:   John Garry <john.garry@huawei.com>
+In-Reply-To: <Yh7MqBLsE2FJvT2Z@T590>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.80.134]
+X-ClientProxiedBy: lhreml721-chm.china.huawei.com (10.201.108.72) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 01:31:39PM +0530, Abdul Haleem wrote:
-> Greeting's
-> 
-> Linux next kernel 5.17.0-rc5-next-20220225 crashed on my power 10 LPAR when
-> merge lvm snapshot on nvme disk
+On 02/03/2022 01:47, Ming Lei wrote:
+>>>    static struct blk_mq_tags *blk_mq_alloc_rq_map(struct blk_mq_tag_set *set,
+>>>    					       unsigned int hctx_idx,
+>>>    					       unsigned int nr_tags,
+>>>    					       unsigned int reserved_tags)
+>>>    {
+>>>    	struct blk_mq_tags *tags;
+>>> -	int node;
+>>> +	int node = blk_mq_get_hctx_node(set, hctx_idx);
+>> nit: the code originally had reverse firtree ordering, which I suppose is
+>> not by mistake
+> What is reverse firtree ordering here? I don't know what is wrong
+> with the above one line change from patch style viewpoint, and
+> checkpatch complains nothing here.
 
-Please try next-20220301, in which the "bad" patch of 'block: cancel all
-throttled bios in del_gendisk()' is dropped.
+checkpath would not complain about this. I'm talking about:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/maintainer-tip.rst#n587
 
+The original code had:
 
-Thanks,
-Ming
+	struct blk_mq_tags *tags;
+	int node;
 
+as opposed to:
+
+	int node;
+	struct blk_mq_tags *tags;
+
+That's all. The block code seems to mostly follow this style when 
+possible. It's just a style issue.
+
+thanks,
+John
