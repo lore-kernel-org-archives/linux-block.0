@@ -2,202 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 634FFC4332F
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 02:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6565C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 03:31:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231818AbiCCCda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 21:33:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60882 "EHLO
+        id S229446AbiCCDcf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 22:32:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231800AbiCCCd3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 21:33:29 -0500
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87AD636C;
-        Wed,  2 Mar 2022 18:32:40 -0800 (PST)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 2232WZQO020612
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 2 Mar 2022 21:32:36 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 7634315C0038; Wed,  2 Mar 2022 21:32:35 -0500 (EST)
-Date:   Wed, 2 Mar 2022 21:32:35 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     Jan Kara <jack@suse.cz>, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.com, jlayton@kernel.org, dan.j.williams@intel.com,
-        hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <YiAow5gi21zwUT54@mit.edu>
-References: <1645096204-31670-1-git-send-email-byungchul.park@lge.com>
- <1645096204-31670-2-git-send-email-byungchul.park@lge.com>
- <20220221190204.q675gtsb6qhylywa@quack3.lan>
- <20220223003534.GA26277@X58A-UD3R>
- <20220223144859.na2gjgl5efgw5zhn@quack3.lan>
- <20220224011102.GA29726@X58A-UD3R>
- <20220224102239.n7nzyyekuacgpnzg@quack3.lan>
- <20220228092826.GA5201@X58A-UD3R>
- <20220228101444.6frl63dn5vmgycbp@quack3.lan>
- <20220303010033.GB20752@X58A-UD3R>
+        with ESMTP id S229458AbiCCDce (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 22:32:34 -0500
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63DC511D798
+        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 19:31:48 -0800 (PST)
+Received: by mail-ed1-x52f.google.com with SMTP id i11so4860515eda.9
+        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 19:31:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=IDmqEl8g94be2Aujv7w5OVxFMBvJ7E/+DDgi8jtXbK4=;
+        b=dujNAGDOSWfzme5yj8Avp0TCcVq3gHjdtKhUTiOa0A8e2d0xvPnK7jzgmL6VP3WJ4+
+         ZQKP8H040InhzhTY2aAegUUKNPishvUWGnQcdovBc1pBj+VnJZfYsIA72gjCllsybjI4
+         PjZUmV/uQOBEcqB6C+B7IOzLjoQN5XqXmMDuEl6F+ihTEghbdBrH7/RzQzAEU/9sJvr+
+         8LTosezzTkh2QlICTMKC5OpL2dnPMQdXGaYODYxGuKLytGQWxJwXQMADBmj2MgOqSzDE
+         Fbltb7idne+/rVnk0MC5jOSkaY27vEghxjNpPSnQl47lGhgxtfWYNBekKoN8/v1CHoC4
+         7HXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=IDmqEl8g94be2Aujv7w5OVxFMBvJ7E/+DDgi8jtXbK4=;
+        b=qGcbwp5VUeEj+d0HEzX3gfUeARR5Au/c5nO9wxMFxxqLgYvXz2zyRO50YIGfwkBgyL
+         Rzqzogbzg+jRGjS/+E03EZ5cpePnUZjBgvloFk9QfMlA9/kOus6GpBgWRWltIT9KXDuc
+         pF4Wqzvol2d8Ei2DIue6JUcHXbZAbcwX1peNkfr83q1HYDcK/3cFVHMN7vv8/RsoH+em
+         tZS4DEzUOKBNPmt6DHhicLCp078+5NToqNZyroFAfAoTJ0Xcp0Z6t3oINJwHN23zVANe
+         txdzN26HTujPo9MWYkfebMJBkBmJ0LEkLuuAZ+4QajjFXdcRBrw+feOyD0ZzgXM8jB6V
+         SU3A==
+X-Gm-Message-State: AOAM533B9/hLghGNFhS5/j8oFnEdmk3MT8Wwa37Fr+Qrl0otzQoxhs1M
+        Z+ucVFB3ROKfsoDm5dZigCTb/K3BcwanbAXpzzb2hmGvJQ==
+X-Google-Smtp-Source: ABdhPJxP8B5ny7nhFRp4S7DP7xjG6HoBSmEvx4tPiXCLsUQSavN+yRY65rF/VjjoszhkMDNWtGsDv5vLWMXvcgJ2rwg=
+X-Received: by 2002:a50:fe08:0:b0:40f:932a:47b0 with SMTP id
+ f8-20020a50fe08000000b0040f932a47b0mr32521948edt.64.1646278306932; Wed, 02
+ Mar 2022 19:31:46 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220303010033.GB20752@X58A-UD3R>
+References: <20220228065720.100-1-xieyongji@bytedance.com> <20220301104039-mutt-send-email-mst@kernel.org>
+ <CACycT3uGFUjmuESUi9=Kkeg4FboVifAHD0D0gPTkEprcTP=x+g@mail.gmail.com>
+ <20220302081017-mutt-send-email-mst@kernel.org> <8fa47a28-a974-4478-23b6-aea14355a315@nvidia.com>
+In-Reply-To: <8fa47a28-a974-4478-23b6-aea14355a315@nvidia.com>
+From:   Yongji Xie <xieyongji@bytedance.com>
+Date:   Thu, 3 Mar 2022 11:31:35 +0800
+Message-ID: <CACycT3ubdASWTW3UN4Wxg2iYnXRaMkrfHty0p6h1E0EYPF82Yw@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@infradead.org>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 10:00:33AM +0900, Byungchul Park wrote:
-> 
-> Unfortunately, it's neither perfect nor safe without another wakeup
-> source - rescue wakeup source.
-> 
->    consumer			producer
-> 
-> 				lock L
-> 				(too much work queued == true)
-> 				unlock L
-> 				--- preempted
->    lock L
->    unlock L
->    do work
->    lock L
->    unlock L
->    do work
->    ...
->    (no work == true)
->    sleep
-> 				--- scheduled in
-> 				sleep
+On Wed, Mar 2, 2022 at 11:05 PM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
+>
+>
+> On 3/2/2022 3:15 PM, Michael S. Tsirkin wrote:
+> > On Wed, Mar 02, 2022 at 06:46:03PM +0800, Yongji Xie wrote:
+> >> On Tue, Mar 1, 2022 at 11:43 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >>> On Mon, Feb 28, 2022 at 02:57:20PM +0800, Xie Yongji wrote:
+> >>>> Currently we have a BUG_ON() to make sure the number of sg
+> >>>> list does not exceed queue_max_segments() in virtio_queue_rq().
+> >>>> However, the block layer uses queue_max_discard_segments()
+> >>>> instead of queue_max_segments() to limit the sg list for
+> >>>> discard requests. So the BUG_ON() might be triggered if
+> >>>> virtio-blk device reports a larger value for max discard
+> >>>> segment than queue_max_segments().
+> >>> Hmm the spec does not say what should happen if max_discard_seg
+> >>> exceeds seg_max. Is this the config you have in mind? how do you
+> >>> create it?
+> >>>
+> >> One example: the device doesn't specify the value of max_discard_seg
+> >> in the config space, then the virtio-blk driver will use
+> >> MAX_DISCARD_SEGMENTS (256) by default. Then we're able to trigger the
+> >> BUG_ON() if the seg_max is less than 256.
+> >>
+> >> While the spec didn't say what should happen if max_discard_seg
+> >> exceeds seg_max, it also doesn't explicitly prohibit this
+> >> configuration. So I think we should at least not panic the kernel in
+> >> this case.
+> >>
+> >> Thanks,
+> >> Yongji
+> > Oh that last one sounds like a bug, I think it should be
+> > min(MAX_DISCARD_SEGMENTS, seg_max)
+> >
+> > When max_discard_seg and seg_max both exist, that's a different question. We can
+> > - do min(max_discard_seg, seg_max)
+> > - fail probe
+> > - clear the relevant feature flag
+> >
+> > I feel we need a better plan than submitting an invalid request to device.
+>
+> We should cover only for a buggy devices.
+>
+> The situation that max_discard_seg > seg_max should be fine.
+>
+> Thus the bellow can be added to this patch:
+>
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index c443cd64fc9b..3e372b97fe10 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -926,8 +926,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+>                  virtio_cread(vdev, struct virtio_blk_config,
+> max_discard_seg,
+>                               &v);
+>                  blk_queue_max_discard_segments(q,
+> -                                              min_not_zero(v,
+> - MAX_DISCARD_SEGMENTS));
+> +                                              min_t(u32, (v ? v :
+> sg_elems),
+> + MAX_DISCARD_SEGMENTS));
+>
+>                  blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+>          }
+>
+>
 
-That's not how things work in ext4.  It's **way** more complicated
-than that.  We have multiple wait channels, one wake up the consumer
-(read: the commit thread), and one which wakes up any processes
-waiting for commit thread to have made forward progress.  We also have
-two spin-lock protected sequence number, one which indicates the
-current commited transaction #, and one indicating the transaction #
-that needs to be committed.
+LGTM, I can add this in v3.
 
-On the commit thread, it will sleep on j_wait_commit, and when it is
-woken up, it will check to see if there is work to be done
-(j_commit_sequence != j_commit_request), and if so, do the work, and
-then wake up processes waiting on the wait_queue j_wait_done_commit.
-(Again, all of this uses the pattern, "prepare to wait", then check to
-see if we should sleep, if we do need to sleep, unlock j_state_lock,
-then sleep.   So this prevents any races leading to lost wakeups.
-
-On the start_this_handle() thread, if we current transaction is too
-full, we set j_commit_request to its transaction id to indicate that
-we want the current transaction to be committed, and then we wake up
-the j_wait_commit wait queue and then we enter a loop where do a
-prepare_to_wait in j_wait_done_commit, check to see if
-j_commit_sequence == the transaction id that we want to be completed,
-and if it's not done yet, we unlock the j_state_lock spinlock, and go
-to sleep.  Again, because of the prepare_to_wait, there is no chance
-of a lost wakeup.
-
-So there really is no "consumer" and "producer" here.  If you really
-insist on using this model, which really doesn't apply, for one
-thread, it's the consumer with respect to one wait queue, and the
-producer with respect to the *other* wait queue.  For the other
-thread, the consumer and producer roles are reversed.
-
-And of course, this is a highly simplified model, since we also have a
-wait queue used by the commit thread to wait for the number of active
-handles on a particular transaction to go to zero, and
-stop_this_handle() will wake up commit thread via this wait queue when
-the last active handle on a particular transaction is retired.  (And
-yes, that parameter is also protected by a different spin lock which
-is per-transaction).
-
-So it seems to me that a fundamental flaw in DEPT's model is assuming
-that the only waiting paradigm that can be used is consumer/producer,
-and that's simply not true.  The fact that you use the term "lock" is
-also going to lead a misleading line of reasoning, because properly
-speaking, they aren't really locks.  We are simply using wait channels
-to wake up processes as necessary, and then they will check other
-variables to decide whether or not they need to sleep or not, and we
-have an invariant that when these variables change indicating forward
-progress, the associated wait channel will be woken up.
-
-Cheers,
-
-						- Ted
-
-
-P.S.  This model is also highly simplified since there are other
-reasons why the commit thread can be woken up, some which might be via
-a timeout, and some which is via the j_wait_commit wait channel but
-not because j_commit_request has been changed, but because file system
-is being unmounted, or the file system is being frozen in preparation
-of a snapshot, etc.  These are *not* necessary to prevent a deadlock,
-because under normal circumstances the two wake channels are
-sufficient of themselves.  So please don't think of them as "rescue
-wakeup sources"; again, that's highly misleading and the wrong way to
-think of them.
-
-And to make things even more complicated, we have more than 2 wait
-channel --- we have *five*:
-
-	/**
-	 * @j_wait_transaction_locked:
-	 *
-	 * Wait queue for waiting for a locked transaction to start committing,
-	 * or for a barrier lock to be released.
-	 */
-	wait_queue_head_t	j_wait_transaction_locked;
-
-	/**
-	 * @j_wait_done_commit: Wait queue for waiting for commit to complete.
-	 */
-	wait_queue_head_t	j_wait_done_commit;
-
-	/**
-	 * @j_wait_commit: Wait queue to trigger commit.
-	 */
-	wait_queue_head_t	j_wait_commit;
-
-	/**
-	 * @j_wait_updates: Wait queue to wait for updates to complete.
-	 */
-	wait_queue_head_t	j_wait_updates;
-
-	/**
-	 * @j_wait_reserved:
-	 *
-	 * Wait queue to wait for reserved buffer credits to drop.
-	 */
-	wait_queue_head_t	j_wait_reserved;
-
-	/**
-	 * @j_fc_wait:
-	 *
-	 * Wait queue to wait for completion of async fast commits.
-	 */
-	wait_queue_head_t	j_fc_wait;
-
-
-"There are more things in heaven and Earth, Horatio,
- Than are dreamt of in your philosophy."
-      	  	    - William Shakespeare, Hamlet
+Thanks,
+Yongji
