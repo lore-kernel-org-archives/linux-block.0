@@ -2,502 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456F9C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 20:13:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D819CC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 20:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236319AbiCCUO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 15:14:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60844 "EHLO
+        id S231953AbiCCUT2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 15:19:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48230 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236262AbiCCUOS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 15:14:18 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C9DAF5415;
-        Thu,  3 Mar 2022 12:13:26 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 09EFFB824B3;
-        Thu,  3 Mar 2022 20:13:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0C38EC340EF;
-        Thu,  3 Mar 2022 20:13:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646338403;
-        bh=aSWkxtTo9A2hDFZtDcKB478E3z1pgNTlMtwZ4W2VOzo=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=LqRo8u+BlxL1SThH94HdrlRTUE7tkebpy+67sLo6zMXiJ5T46PCDVd7uOKfvqiGT4
-         V6045RnMgEbtaVA7OEhmGrDGL2Ao8w5w8CGwq0tqDz0NUzD4qpvYfFh+/Iqk7tv+rh
-         w7mYWKOBCZZtmWkNMtaaTxjdJenGBicIy7+Mbad2qxRvUlhIQOhQcUh+Fitoyhux+a
-         6BYUxilLsxb2l9EcAn/GRlOkX7YXMJAmeh3YfXVDjuHz03epfihL4GwbJAmW7Q+Ajz
-         HMr5u//Ndtx0Jg5NT4xO3PR5tBxtfuNCrsG2aagaypisndJfyuziddC/w7Lxtt9edy
-         GGbdcNlz5ON7A==
-From:   Keith Busch <kbusch@kernel.org>
-To:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com,
-        Keith Busch <kbusch@kernel.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Klaus Jensen <its@irrelevant.dk>
-Subject: [PATCHv4 8/8] nvme: add support for enhanced metadata
-Date:   Thu,  3 Mar 2022 12:13:12 -0800
-Message-Id: <20220303201312.3255347-9-kbusch@kernel.org>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20220303201312.3255347-1-kbusch@kernel.org>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
+        with ESMTP id S229801AbiCCUT1 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 15:19:27 -0500
+Received: from mailout1.w2.samsung.com (mailout1.w2.samsung.com [211.189.100.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26A871201BE;
+        Thu,  3 Mar 2022 12:18:37 -0800 (PST)
+Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
+        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20220303201833usoutp0185167bd6c1eed7d8b8a9897a40e7d1b8~Y_FZAstZT2748127481usoutp01w;
+        Thu,  3 Mar 2022 20:18:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20220303201833usoutp0185167bd6c1eed7d8b8a9897a40e7d1b8~Y_FZAstZT2748127481usoutp01w
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1646338713;
+        bh=XNs9o3PiVj/v+GQmw9HUamQ2I4NZjfWYZFfmyjQDoeU=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=lylRfP2L+G3r7WhrtnQOkXEPTWmb6jnXJtvL0QH3zrfMs+ZqEn4unROmRfL/u0Zjb
+         P64wiE6QwHU8G2SG8zV7SN9xKphtn1FPmWTWaeaLeti70S2iaHv1NCDG3yvfiY27a/
+         ak9J4nBTwGsECX4goEsQI8BpLb1i8j+vjZxGMCdE=
+Received: from ussmges3new.samsung.com (u112.gpu85.samsung.co.kr
+        [203.254.195.112]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220303201832uscas1p119c3cb347257ff94a0772fd4acdfa8dc~Y_FYqrzS52940229402uscas1p1v;
+        Thu,  3 Mar 2022 20:18:32 +0000 (GMT)
+Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
+        ussmges3new.samsung.com (USCPEMTA) with SMTP id 7D.6C.09687.89221226; Thu, 
+        3 Mar 2022 15:18:32 -0500 (EST)
+Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
+        [203.254.195.89]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220303201832uscas1p133de0a86878ca99bdde0c1d59a3b9708~Y_FYWIY7C2940229402uscas1p1u;
+        Thu,  3 Mar 2022 20:18:32 +0000 (GMT)
+X-AuditID: cbfec370-9ddff700000025d7-6d-6221229894c4
+Received: from SSI-EX3.ssi.samsung.com ( [105.128.2.145]) by
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 84.28.09671.89221226; Thu, 
+        3 Mar 2022 15:18:32 -0500 (EST)
+Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
+        SSI-EX3.ssi.samsung.com (105.128.2.228) with Microsoft SMTP Server
+        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+        15.1.2242.4; Thu, 3 Mar 2022 12:18:31 -0800
+Received: from SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36]) by
+        SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36%3]) with mapi id
+        15.01.2242.008; Thu, 3 Mar 2022 12:18:31 -0800
+From:   Adam Manzanares <a.manzanares@samsung.com>
+To:     =?iso-8859-1?Q?Matias_Bj=F8rling?= <Matias.Bjorling@wdc.com>
+CC:     Damien Le Moal <Damien.LeMoal@wdc.com>,
+        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "Bart Van Assche" <bvanassche@acm.org>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        "Johannes Thumshirn" <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Thread-Topic: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Thread-Index: AQHYLpmb9dDgbycJL0eB2NODtYgLP6ytqQyAgAAQCACAADetAIAAVbuAgAAHhQCAAB4RAIAALQUAgAAHhYA=
+Date:   Thu, 3 Mar 2022 20:18:31 +0000
+Message-ID: <20220303201831.GC11082@bgt-140510-bm01>
+In-Reply-To: <BYAPR04MB4968506D0A8CAB26AC266F8DF1049@BYAPR04MB4968.namprd04.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [105.128.2.176]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <37E6E00FD8E83D4181B716A5803952FC@ssi.samsung.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SaUwTURRG82amM9Nq41gXnoIL1dQgiCISxqjYRBMbiVESN1yirY6AUqgd
+        cd8rCFRjETC1TRQhwVItaBEiamURRFwRFwqluLUiVhONAiqKUgaT/jtf3ndvzk0eiYoaeWPJ
+        hKQdjDpJnijGBVj53a4n0/TiQMWMV6+D6DNffqJ06vFuhM540IjQfzLbEbq8shqnba3B9C1b
+        A0bf9thQWpfWhdJ2nRvQWfWlPPpyixuTDpU9ex4tqzA4CZkmrw2TWc0ZuCzbfhHIvlnHy45X
+        aZFlxBrB3M1MYsJORj09aqMg3q11YqpLo3aX/NYSh8F3KhPwSUjNgqeyHoNMICBFVBGAltMm
+        nAupCDQfvYL+b1mqfw22LACarmt4XPgCoCM/D+NCJYDXjrVh3hGcmgF7668OjI+kpLA0uxzx
+        llCqG4O69qr+EkmOoMLhh7JDXGcWfOSpwzlWwCKTZ2AWoybD7zojz8vC/k7Zh46B/XxqPSwu
+        yCa8DKjRsOf+ZcTLKOUHW13nEU57OMw33ho8YTTsu/EG5zgQvurpJLh+KLTn5uAcR8HX7lqU
+        42BYeIFzEPbvaTjrwrjZMbDaZB84GFJaPmxrqOBxDwuh80UH4NgfvmjORbmSGcCc7jSCC6UA
+        6n81DurNgX0ZLwkdmGzwMTf4WBl8rAw+VgYfqzzAMwO/FJZVxjFseBKzK5SVK9mUpLjQTclK
+        K+j/dA/67qiug9bWr6E1ACFBDYAkKh4pnB00USESbpbv2cuokzeoUxIZtgb4k5jYT1iYcEUu
+        ouLkO5htDKNi1P9fEZI/9jBisuozmujmYx5FBfi7yOSoXzm9x/jRyF/03lUzUZGyJCzmZ2Fg
+        0IHw9NWR8wrG/QgBnWujb6ouNN33Z/RNASLhyXWaiNjZubaXmpCn2rsS92Ks7rk0xP9d5FYp
+        3m5b73qbK8Vj9Cvq9u1qmd+77sZ+R69rzENVp3bVvWKrMrb20oblkvrgLs3ctpyjQqTAcaQq
+        rWTE1Gh2/JbmBfkd51aeNU8qCun549mXntySXtHrtC9HPs+njcvc7u0ThhTHD7NME6SlZlpE
+        xEHlNYcsXSpJjThhi4wNa/lb7nw0pbZq1aeZxRIpvzKAjRj1fkHUb4n4REnZmpgnErMha2nA
+        QqJUjLHx8rCpqJqV/wOgHzJV4wMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDIsWRmVeSWpSXmKPExsWS2cA0UXeGkmKSwZtnwhbTPvxktmht/8Zk
+        0Xn6ApPF3657TBbb9h9ks9h7S9tiz96TLBb7Xu9ltpjQ9pXZ4saEp4wWE49vZrVYc/MpiwOP
+        x+Ur3h47Z91l92hecIfFY9OqTjaPyTeWM3p83iTn0X6gmymAPYrLJiU1J7MstUjfLoEr42n3
+        XZaC1aIV6/90szcwfhHoYuTkkBAwkVh78BdjFyMXh5DAakaJf0dnsEI4HxglPu5/yATh7GeU
+        2L7lBTtIC5uAgcTv4xuZQWwRAQeJzZO3gRUxC3xhkdj6ew1QOweHsICxxIut9RA1JhJnXx9l
+        g7CTJFaueA3WyyKgIvFlwmxWEJsXqGbri+csEMuaWCRmLL0BtoxTIFZi3eLJYDajgJjE91Nr
+        mEBsZgFxiVtP5jNB/CAgsWTPeWYIW1Ti5eN/rBC2osT97y/ZIer1JG5MncIGYdtJPHh6hBnC
+        1pZYthDiIF4BQYmTM5+wQPRKShxccYNlAqPELCTrZiEZNQvJqFlIRs1CMmoBI+sqRvHS4uLc
+        9Ipiw7zUcr3ixNzi0rx0veT83E2MwARx+t/hyB2MR2991DvEyMTBeIhRgoNZSYTXUlMhSYg3
+        JbGyKrUoP76oNCe1+BCjNAeLkjivkOvEeCGB9MSS1OzU1ILUIpgsEwenVAMTp6iYyOJkLeO/
+        ZzfuFZuxd1bOeY7DFWKnin9MKnLdMklW8PSZbzuPlhrLMhk9YFwmPeXgA0aDfwfa502MOJEf
+        uOHuLJ7zR3R5DsRblp1KupBfuHz184LD0Ta3XH35VtS/mFBc9ka8s2ebc/rGKwnlVxtMQh49
+        E7HQmlLuuPPutu4PcZJVsySM4q/ahAR/PXTztPsfvWMK9rocf6wtHRR+TlE9zHPdxOJ4yn0u
+        Oe7GXQrya4T49BrVPx+IifkeZhniW39y25IS7lM7ViX6sjlsdf1z+//3/Rc2XrrUd/LLIt2/
+        kYfPnjeZcjG2vTaI+8rGasGV84q/VvQyi4mIZ3yY9qLH/YqNYlDBIvacftdWJZbijERDLeai
+        4kQAXi5OfH8DAAA=
+X-CMS-MailID: 20220303201832uscas1p133de0a86878ca99bdde0c1d59a3b9708
+CMS-TYPE: 301P
+X-CMS-RootMailID: 20220303094915uscas1p20491e1e17088cfe8acda899a77dce98b
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+        <B3F227F7-4BF0-4735-9D0F-786B68871963@javigon.com>
+        <20220303062950.srhm5bn3mcjlwbca@ArmHalley.localdomain>
+        <CGME20220303094915uscas1p20491e1e17088cfe8acda899a77dce98b@uscas1p2.samsung.com>
+        <8386a6b9-3f06-0963-a132-5562b9c93283@wdc.com>
+        <20220303145551.GA7057@bgt-140510-bm01>
+        <4526a529-4faa-388a-a873-3dfe92b0279b@wdc.com>
+        <20220303171025.GA11082@bgt-140510-bm01>
+        <BYAPR04MB4968506D0A8CAB26AC266F8DF1049@BYAPR04MB4968.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-NVM Express ratified TP 4068 defines new protection information formats.
-Implement support for the CRC64 guard tags.
+On Thu, Mar 03, 2022 at 07:51:36PM +0000, Matias Bj=F8rling wrote:
+> > Sounds like you voluntered to teach zoned storage use 101. Can you teac=
+h me
+> > how to calculate an LBA offset given a zone number when zone capacity i=
+s not
+> > equal to zone size?
+>=20
+> zonesize_pow =3D x; // e.g., x =3D 32 if 2GiB Zone size /w 512B block siz=
+e
+> zone_id =3D y; // valid zone id
+>=20
+> struct blk_zone zone =3D zones[zone_id]; // zones is a linear array of bl=
+k_zone structs that holds per zone information.
+>=20
+> With that, one can do the following
+> 1a) first_lba_of_zone =3D  zone_id << zonesize_pow;
+> 1b) first_lba_of_zone =3D zone.start;
 
-Since the block layer doesn't support variable length reference tags,
-driver support for the Storage Tag space is not supported at this time.
+1b is interesting. What happens if i don't have struct blk_zone and zone si=
+ze=20
+is not equal to zone capacity?
 
-Cc: Hannes Reinecke <hare@suse.de>
-Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-Cc: Klaus Jensen <its@irrelevant.dk>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
-v3->v4:
+> 2a) next_writeable_lba =3D (zoneid << zonesize_pow) + zone.wp;
+> 2b) next_writeable_lba =3D zone.start + zone.wp;
 
-  Removed inline for setting ref_tag
+Can we modify 2b to not use zone.start?
 
-  Updated new exported names from prior patches
+> 3)   writeable_lbas_left =3D zone.len - zone.wp;
+> 4)   lbas_written =3D zone.wp - 1;
+>=20
+> > The second thing I would like to know is what happens when an applicati=
+on
+> > wants to map an object that spans multiple consecutive zones. Does the
+> > application have to be aware of the difference in zone capacity and zon=
+e size?
+>=20
+> The zoned namespace command set specification does not allow variable zon=
+e size. The zone size is fixed for all zones in a namespace. Only the zone =
+capacity has the capability to be variable. Usually, the zone capacity is f=
+ixed, I have not yet seen implementations that have variable zone capacitie=
+s.
+>=20
 
- drivers/nvme/host/core.c | 162 +++++++++++++++++++++++++++++++++------
- drivers/nvme/host/nvme.h |   4 +-
- include/linux/nvme.h     |  53 +++++++++++--
- 3 files changed, 188 insertions(+), 31 deletions(-)
+IDK where variable zone size came from. I am talking about the fact that th=
+e=20
+zone size does not have to equal zone capacity.=20
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index ace5f30acaf6..f3f9d48e0d32 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -919,6 +919,30 @@ static blk_status_t nvme_setup_discard(struct nvme_ns *ns, struct request *req,
- 	return BLK_STS_OK;
- }
- 
-+static void nvme_set_ref_tag(struct nvme_ns *ns, struct nvme_command *cmnd,
-+			      struct request *req)
-+{
-+	u32 upper, lower;
-+	u64 ref48;
-+
-+	/* both rw and write zeroes share the same reftag format */
-+	switch (ns->guard_type) {
-+	case NVME_NVM_NS_16B_GUARD:
-+		cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
-+		break;
-+	case NVME_NVM_NS_64B_GUARD:
-+		ref48 = ext_pi_ref_tag(req);
-+		lower = lower_32_bits(ref48);
-+		upper = upper_32_bits(ref48);
-+
-+		cmnd->rw.reftag = cpu_to_le32(lower);
-+		cmnd->rw.cdw3 = cpu_to_le32(upper);
-+		break;
-+	default:
-+		break;
-+	}
-+}
-+
- static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 		struct request *req, struct nvme_command *cmnd)
- {
-@@ -940,8 +964,7 @@ static inline blk_status_t nvme_setup_write_zeroes(struct nvme_ns *ns,
- 		switch (ns->pi_type) {
- 		case NVME_NS_DPS_PI_TYPE1:
- 		case NVME_NS_DPS_PI_TYPE2:
--			cmnd->write_zeroes.reftag =
--				cpu_to_le32(t10_pi_ref_tag(req));
-+			nvme_set_ref_tag(ns, cmnd, req);
- 			break;
- 		}
- 	}
-@@ -968,7 +991,8 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 	cmnd->rw.opcode = op;
- 	cmnd->rw.flags = 0;
- 	cmnd->rw.nsid = cpu_to_le32(ns->head->ns_id);
--	cmnd->rw.rsvd2 = 0;
-+	cmnd->rw.cdw2 = 0;
-+	cmnd->rw.cdw3 = 0;
- 	cmnd->rw.metadata = 0;
- 	cmnd->rw.slba = cpu_to_le64(nvme_sect_to_lba(ns, blk_rq_pos(req)));
- 	cmnd->rw.length = cpu_to_le16((blk_rq_bytes(req) >> ns->lba_shift) - 1);
-@@ -1002,7 +1026,7 @@ static inline blk_status_t nvme_setup_rw(struct nvme_ns *ns,
- 					NVME_RW_PRINFO_PRCHK_REF;
- 			if (op == nvme_cmd_zone_append)
- 				control |= NVME_RW_APPEND_PIREMAP;
--			cmnd->rw.reftag = cpu_to_le32(t10_pi_ref_tag(req));
-+			nvme_set_ref_tag(ns, cmnd, req);
- 			break;
- 		}
- 	}
-@@ -1654,33 +1678,58 @@ int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo)
- }
- 
- #ifdef CONFIG_BLK_DEV_INTEGRITY
--static void nvme_init_integrity(struct gendisk *disk, u16 ms, u8 pi_type,
-+static void nvme_init_integrity(struct gendisk *disk, struct nvme_ns *ns,
- 				u32 max_integrity_segments)
- {
- 	struct blk_integrity integrity = { };
- 
--	switch (pi_type) {
-+	switch (ns->pi_type) {
- 	case NVME_NS_DPS_PI_TYPE3:
--		integrity.profile = &t10_pi_type3_crc;
--		integrity.tag_size = sizeof(u16) + sizeof(u32);
--		integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+		switch (ns->guard_type) {
-+		case NVME_NVM_NS_16B_GUARD:
-+			integrity.profile = &t10_pi_type3_crc;
-+			integrity.tag_size = sizeof(u16) + sizeof(u32);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		case NVME_NVM_NS_64B_GUARD:
-+			integrity.profile = &ext_pi_type3_crc64;
-+			integrity.tag_size = sizeof(u16) + 6;
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		default:
-+			integrity.profile = NULL;
-+			break;
-+		}
- 		break;
- 	case NVME_NS_DPS_PI_TYPE1:
- 	case NVME_NS_DPS_PI_TYPE2:
--		integrity.profile = &t10_pi_type1_crc;
--		integrity.tag_size = sizeof(u16);
--		integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+		switch (ns->guard_type) {
-+		case NVME_NVM_NS_16B_GUARD:
-+			integrity.profile = &t10_pi_type1_crc;
-+			integrity.tag_size = sizeof(u16);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		case NVME_NVM_NS_64B_GUARD:
-+			integrity.profile = &ext_pi_type1_crc64;
-+			integrity.tag_size = sizeof(u16);
-+			integrity.flags |= BLK_INTEGRITY_DEVICE_CAPABLE;
-+			break;
-+		default:
-+			integrity.profile = NULL;
-+			break;
-+		}
- 		break;
- 	default:
- 		integrity.profile = NULL;
- 		break;
- 	}
--	integrity.tuple_size = ms;
-+
-+	integrity.tuple_size = ns->ms;
- 	blk_integrity_register(disk, &integrity);
- 	blk_queue_max_integrity_segments(disk->queue, max_integrity_segments);
- }
- #else
--static void nvme_init_integrity(struct gendisk *disk, u16 ms, u8 pi_type,
-+static void nvme_init_integrity(struct gendisk *disk, struct nvme_ns *ns,
- 				u32 max_integrity_segments)
- {
- }
-@@ -1750,17 +1799,73 @@ static int nvme_setup_streams_ns(struct nvme_ctrl *ctrl, struct nvme_ns *ns,
- 	return 0;
- }
- 
--static void nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
-+static int nvme_init_ms(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
-+	bool first = id->dps & NVME_NS_DPS_PI_FIRST;
-+	unsigned lbaf = nvme_lbaf_index(id->flbas);
- 	struct nvme_ctrl *ctrl = ns->ctrl;
-+	struct nvme_command c = { };
-+	struct nvme_id_ns_nvm *nvm;
-+	int ret = 0;
-+	u32 elbaf;
-+
-+	ns->pi_size = 0;
-+	ns->ms = le16_to_cpu(id->lbaf[lbaf].ms);
-+	if (!(ctrl->ctratt & NVME_CTRL_ATTR_ELBAS)) {
-+		ns->pi_size = sizeof(struct t10_pi_tuple);
-+		ns->guard_type = NVME_NVM_NS_16B_GUARD;
-+		goto set_pi;
-+	}
-+
-+	nvm = kzalloc(sizeof(*nvm), GFP_KERNEL);
-+	if (!nvm)
-+		return -ENOMEM;
- 
--	ns->ms = le16_to_cpu(id->lbaf[id->flbas & NVME_NS_FLBAS_LBA_MASK].ms);
--	if (id->dps & NVME_NS_DPS_PI_FIRST ||
--	    ns->ms == sizeof(struct t10_pi_tuple))
-+	c.identify.opcode = nvme_admin_identify;
-+	c.identify.nsid = cpu_to_le32(ns->head->ns_id);
-+	c.identify.cns = NVME_ID_CNS_CS_NS;
-+	c.identify.csi = NVME_CSI_NVM;
-+
-+	ret = nvme_submit_sync_cmd(ns->ctrl->admin_q, &c, nvm, sizeof(*nvm));
-+	if (ret)
-+		goto free_data;
-+
-+	elbaf = le32_to_cpu(nvm->elbaf[lbaf]);
-+
-+	/* no support for storage tag formats right now */
-+	if (nvme_elbaf_sts(elbaf))
-+		goto free_data;
-+
-+	ns->guard_type = nvme_elbaf_guard_type(elbaf);
-+	switch (ns->guard_type) {
-+	case NVME_NVM_NS_64B_GUARD:
-+		ns->pi_size = sizeof(struct crc64_pi_tuple);
-+		break;
-+	case NVME_NVM_NS_16B_GUARD:
-+		ns->pi_size = sizeof(struct t10_pi_tuple);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+free_data:
-+	kfree(nvm);
-+set_pi:
-+	if (ns->pi_size && (first || ns->ms == ns->pi_size))
- 		ns->pi_type = id->dps & NVME_NS_DPS_PI_MASK;
- 	else
- 		ns->pi_type = 0;
- 
-+	return ret;
-+}
-+
-+static void nvme_configure_metadata(struct nvme_ns *ns, struct nvme_id_ns *id)
-+{
-+	struct nvme_ctrl *ctrl = ns->ctrl;
-+
-+	if (nvme_init_ms(ns, id))
-+		return;
-+
- 	ns->features &= ~(NVME_NS_METADATA_SUPPORTED | NVME_NS_EXT_LBAS);
- 	if (!ns->ms || !(ctrl->ops->flags & NVME_F_METADATA_SUPPORTED))
- 		return;
-@@ -1877,7 +1982,7 @@ static void nvme_update_disk_info(struct gendisk *disk,
- 	if (ns->ms) {
- 		if (IS_ENABLED(CONFIG_BLK_DEV_INTEGRITY) &&
- 		    (ns->features & NVME_NS_METADATA_SUPPORTED))
--			nvme_init_integrity(disk, ns->ms, ns->pi_type,
-+			nvme_init_integrity(disk, ns,
- 					    ns->ctrl->max_integrity_segments);
- 		else if (!nvme_ns_has_pi(ns))
- 			capacity = 0;
-@@ -1932,7 +2037,7 @@ static void nvme_set_chunk_sectors(struct nvme_ns *ns, struct nvme_id_ns *id)
- 
- static int nvme_update_ns_info(struct nvme_ns *ns, struct nvme_id_ns *id)
- {
--	unsigned lbaf = id->flbas & NVME_NS_FLBAS_LBA_MASK;
-+	unsigned lbaf = nvme_lbaf_index(id->flbas);
- 	int ret;
- 
- 	blk_mq_freeze_queue(ns->disk->queue);
-@@ -2277,20 +2382,27 @@ static int nvme_configure_timestamp(struct nvme_ctrl *ctrl)
- 	return ret;
- }
- 
--static int nvme_configure_acre(struct nvme_ctrl *ctrl)
-+static int nvme_configure_host_options(struct nvme_ctrl *ctrl)
- {
- 	struct nvme_feat_host_behavior *host;
-+	u8 acre = 0, lbafee = 0;
- 	int ret;
- 
- 	/* Don't bother enabling the feature if retry delay is not reported */
--	if (!ctrl->crdt[0])
-+	if (ctrl->crdt[0])
-+		acre = NVME_ENABLE_ACRE;
-+	if (ctrl->ctratt & NVME_CTRL_ATTR_ELBAS)
-+		lbafee = NVME_ENABLE_LBAFEE;
-+
-+	if (!acre && !lbafee)
- 		return 0;
- 
- 	host = kzalloc(sizeof(*host), GFP_KERNEL);
- 	if (!host)
- 		return 0;
- 
--	host->acre = NVME_ENABLE_ACRE;
-+	host->acre = acre;
-+	host->lbafee = lbafee;
- 	ret = nvme_set_features(ctrl, NVME_FEAT_HOST_BEHAVIOR, 0,
- 				host, sizeof(*host), NULL);
- 	kfree(host);
-@@ -3132,7 +3244,7 @@ int nvme_init_ctrl_finish(struct nvme_ctrl *ctrl)
- 	if (ret < 0)
- 		return ret;
- 
--	ret = nvme_configure_acre(ctrl);
-+	ret = nvme_configure_host_options(ctrl);
- 	if (ret < 0)
- 		return ret;
- 
-@@ -4846,12 +4958,14 @@ static inline void _nvme_check_size(void)
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ns) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ns_zns) != NVME_IDENTIFY_DATA_SIZE);
-+	BUILD_BUG_ON(sizeof(struct nvme_id_ns_nvm) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_zns) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_id_ctrl_nvm) != NVME_IDENTIFY_DATA_SIZE);
- 	BUILD_BUG_ON(sizeof(struct nvme_lba_range_type) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_smart_log) != 512);
- 	BUILD_BUG_ON(sizeof(struct nvme_dbbuf) != 64);
- 	BUILD_BUG_ON(sizeof(struct nvme_directive_cmd) != 64);
-+	BUILD_BUG_ON(sizeof(struct nvme_feat_host_behavior) != 512);
- }
- 
- 
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 587d92df118b..77257e02ef03 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -454,9 +454,11 @@ struct nvme_ns {
- 
- 	int lba_shift;
- 	u16 ms;
-+	u16 pi_size;
- 	u16 sgs;
- 	u32 sws;
- 	u8 pi_type;
-+	u8 guard_type;
- #ifdef CONFIG_BLK_DEV_ZONED
- 	u64 zsze;
- #endif
-@@ -479,7 +481,7 @@ struct nvme_ns {
- /* NVMe ns supports metadata actions by the controller (generate/strip) */
- static inline bool nvme_ns_has_pi(struct nvme_ns *ns)
- {
--	return ns->pi_type && ns->ms == sizeof(struct t10_pi_tuple);
-+	return ns->pi_type && ns->ms == ns->pi_size;
- }
- 
- struct nvme_ctrl_ops {
-diff --git a/include/linux/nvme.h b/include/linux/nvme.h
-index 9dbc3ef4daf7..4f44f83817a9 100644
---- a/include/linux/nvme.h
-+++ b/include/linux/nvme.h
-@@ -244,6 +244,7 @@ enum {
- enum nvme_ctrl_attr {
- 	NVME_CTRL_ATTR_HID_128_BIT	= (1 << 0),
- 	NVME_CTRL_ATTR_TBKAS		= (1 << 6),
-+	NVME_CTRL_ATTR_ELBAS		= (1 << 15),
- };
- 
- struct nvme_id_ctrl {
-@@ -399,8 +400,7 @@ struct nvme_id_ns {
- 	__le16			endgid;
- 	__u8			nguid[16];
- 	__u8			eui64[8];
--	struct nvme_lbaf	lbaf[16];
--	__u8			rsvd192[192];
-+	struct nvme_lbaf	lbaf[64];
- 	__u8			vs[3712];
- };
- 
-@@ -418,8 +418,7 @@ struct nvme_id_ns_zns {
- 	__le32			rrl;
- 	__le32			frl;
- 	__u8			rsvd20[2796];
--	struct nvme_zns_lbafe	lbafe[16];
--	__u8			rsvd3072[768];
-+	struct nvme_zns_lbafe	lbafe[64];
- 	__u8			vs[256];
- };
- 
-@@ -428,6 +427,30 @@ struct nvme_id_ctrl_zns {
- 	__u8	rsvd1[4095];
- };
- 
-+struct nvme_id_ns_nvm {
-+	__le64	lbstm;
-+	__u8	pic;
-+	__u8	rsvd9[3];
-+	__le32	elbaf[64];
-+	__u8	rsvd268[3828];
-+};
-+
-+enum {
-+	NVME_ID_NS_NVM_STS_MASK		= 0x3f,
-+	NVME_ID_NS_NVM_GUARD_SHIFT	= 7,
-+	NVME_ID_NS_NVM_GUARD_MASK	= 0x3,
-+};
-+
-+static inline __u8 nvme_elbaf_sts(__u32 elbaf)
-+{
-+	return elbaf & NVME_ID_NS_NVM_STS_MASK;
-+}
-+
-+static inline __u8 nvme_elbaf_guard_type(__u32 elbaf)
-+{
-+	return (elbaf >> NVME_ID_NS_NVM_GUARD_SHIFT) & NVME_ID_NS_NVM_GUARD_MASK;
-+}
-+
- struct nvme_id_ctrl_nvm {
- 	__u8	vsl;
- 	__u8	wzsl;
-@@ -478,6 +501,8 @@ enum {
- 	NVME_NS_FEAT_IO_OPT	= 1 << 4,
- 	NVME_NS_ATTR_RO		= 1 << 0,
- 	NVME_NS_FLBAS_LBA_MASK	= 0xf,
-+	NVME_NS_FLBAS_LBA_UMASK	= 0x60,
-+	NVME_NS_FLBAS_LBA_SHIFT	= 1,
- 	NVME_NS_FLBAS_META_EXT	= 0x10,
- 	NVME_NS_NMIC_SHARED	= 1 << 0,
- 	NVME_LBAF_RP_BEST	= 0,
-@@ -496,6 +521,18 @@ enum {
- 	NVME_NS_DPS_PI_TYPE3	= 3,
- };
- 
-+enum {
-+	NVME_NVM_NS_16B_GUARD	= 0,
-+	NVME_NVM_NS_32B_GUARD	= 1,
-+	NVME_NVM_NS_64B_GUARD	= 2,
-+};
-+
-+static inline __u8 nvme_lbaf_index(__u8 flbas)
-+{
-+	return (flbas & NVME_NS_FLBAS_LBA_MASK) |
-+		((flbas & NVME_NS_FLBAS_LBA_UMASK) >> NVME_NS_FLBAS_LBA_SHIFT);
-+}
-+
- /* Identify Namespace Metadata Capabilities (MC): */
- enum {
- 	NVME_MC_EXTENDED_LBA	= (1 << 0),
-@@ -842,7 +879,8 @@ struct nvme_rw_command {
- 	__u8			flags;
- 	__u16			command_id;
- 	__le32			nsid;
--	__u64			rsvd2;
-+	__le32			cdw2;
-+	__le32			cdw3;
- 	__le64			metadata;
- 	union nvme_data_ptr	dptr;
- 	__le64			slba;
-@@ -996,11 +1034,14 @@ enum {
- 
- struct nvme_feat_host_behavior {
- 	__u8 acre;
--	__u8 resv1[511];
-+	__u8 etdas;
-+	__u8 lbafee;
-+	__u8 resv1[509];
- };
- 
- enum {
- 	NVME_ENABLE_ACRE	= 1,
-+	NVME_ENABLE_LBAFEE	= 1,
- };
- 
- /* Admin commands */
--- 
-2.25.4
+> An application that wants to place a single object across a set of zones =
+would have to be explicitly handled by the application. E.g., as well as th=
+e application, should be aware of a zone's capacity, it should also be awar=
+e that it should reset the set of zones and not a single zone. I.e., the ap=
+plication must always be aware of the zones it uses.
+>=20
+> However, an end-user application should not (in my opinion) have to deal =
+with this. It should use helper functions from a library that provides the =
+appropriate abstraction to the application, such that the applications don'=
+t have to care about either specific zone capacity/size, or multiple resets=
+. This is similar to how file systems work with file system semantics. For =
+example, a file can span multiple extents on disk, but all an application s=
+ees is the file semantics.=20
+>=20
 
+I don't want to go so far as to say what the end user application should an=
+d=20
+should not do.=
