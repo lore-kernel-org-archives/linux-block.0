@@ -2,147 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAE8C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF069C433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230479AbiCCAq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:46:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37780 "EHLO
+        id S231134AbiCCA5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:57:44 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230466AbiCCAq0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:46:26 -0500
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9290610FFC;
-        Wed,  2 Mar 2022 16:45:41 -0800 (PST)
-Received: by mail-pf1-f182.google.com with SMTP id z15so3391064pfe.7;
-        Wed, 02 Mar 2022 16:45:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RG0QAqnhkN8VsgsFISubsUwICF6EYLvwH56+TUqE5XU=;
-        b=7ESzM5mrlkniveMwmUqPN7hCcWRS5Yj8k78TNJg5Cdu2t8dEJPGyQjVvaG2NKXUAer
-         qxIz0CoDvglRfagTPzZMkHhctmpFa52wtD9PvWo+pR7A4eJZeU5HlnTkkbCinu5OsrIc
-         1hLw2UujtD7Sd4s1xtK4xwStBYtWcKeFCGpxv058/L34rQXPBhQ5LJTeBBEZZ49sas87
-         QYl9oICJipS04pEXk/ScPapdg4P/YWEUzmrn42/iSKVUwscdjt4OE+8jIQ88mUQjUO3Z
-         lU27VUtD3loOrpCv/WmG/z/oLfRJx8LwVT8tsf9gadyKtCQgH/h+IyXB/vEPP59H1QV9
-         jWtg==
-X-Gm-Message-State: AOAM5311qxmzzZduIeBTQl3Rprjxd+jykAvdnwONIg5nNjA7oWPZLdmx
-        yts9Iw25XFtrrWspKhhZ1Qg=
-X-Google-Smtp-Source: ABdhPJwHsPleyILIyHbK8t5jmqxDA0ova8fC9S8sWNDR2aRXpq3VbA3wibktuQ3GMn0tgtUkrPawsg==
-X-Received: by 2002:a05:6a00:130c:b0:4bd:118:8071 with SMTP id j12-20020a056a00130c00b004bd01188071mr35659074pfu.28.1646268340881;
-        Wed, 02 Mar 2022 16:45:40 -0800 (PST)
-Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
-        by smtp.gmail.com with ESMTPSA id s21-20020a63dc15000000b00378c9e5b37fsm282669pgg.63.2022.03.02.16.45.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 16:45:39 -0800 (PST)
-Date:   Wed, 2 Mar 2022 16:45:37 -0800
+        with ESMTP id S231132AbiCCA5n (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:57:43 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65B1C2BB1B;
+        Wed,  2 Mar 2022 16:56:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
+        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=YYLgeMF5YnFMGTtJnuFo/ahZYnFHuXykSNrnMr7pvUI=; b=MwgYUdbPY5nov/nL5hZklw87lX
+        J871ElUjlBLH/c+QuoMt5b4mpoa5Hz8A7Twe0DlHAR0uxwOhwOF7vqRkMEVA8uDSt4b2WyxBv/71g
+        Kyb9ZBGAuDPkCWnUqgHuqjy6N02yfurArbBr1n3g1JvxLdVhNK9LZQDfSchMjjlvH+UR8h853az6Y
+        y7snNzsR+/Xs8T2MazGyRFnmXp5C3Giyq3KT11/a7027Ye6Tm/0yZLWDQI8xyacrdb+PyFSGh8RgD
+        ocYNAbiiYcsNTgc60682oX/louWvk5KMgMM7Iv+PL/M+R0RsjRlG7kxFYNSdF01v/bhrw1MbcWW09
+        nj31an5w==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nPZm2-004tUo-89; Thu, 03 Mar 2022 00:56:54 +0000
+Date:   Wed, 2 Mar 2022 16:56:54 -0800
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
-        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
-        Doug Gilbert <dgilbert@interlog.com>, axboe@kernel.dk,
-        hch@lst.de, kbusch@kernel.org, javier@javigon.com,
-        anuj20.g@samsung.com, joshiiitr@gmail.com
-Subject: Re: [LSF/MM/BPF Topic] Towards more useful nvme-passthrough
-Message-ID: <20220303004537.yceop3zwrwzg3wni@garbanzo>
-References: <CGME20210609105347epcas5p42ab916655fca311157a38d54f79f95e7@epcas5p4.samsung.com>
- <20210609105050.127009-1-joshi.k@samsung.com>
- <d9e6e3cc-fedb-eb45-7a3e-5df24e67455b@suse.de>
+To:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org
+Cc:     Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>, mcgrof@kernel.org
+Subject: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d9e6e3cc-fedb-eb45-7a3e-5df24e67455b@suse.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 24, 2021 at 11:24:27AM +0200, Hannes Reinecke wrote:
-> On 6/9/21 12:50 PM, Kanchan Joshi wrote:
-> > Background & objectives:
-> > ------------------------
-> > 
-> > The NVMe passthrough interface
-> > 
-> > Good part: allows new device-features to be usable (at least in raw
-> > form) without having to build block-generic cmds, in-kernel users,
-> > emulations and file-generic user-interfaces - all this take some time to
-> > evolve.
-> > 
-> > Bad part: passthrough interface has remain tied to synchronous ioctl,
-> > which is a blocker for performance-centric usage scenarios. User-space
-> > can take the pain of implementing async-over-sync on its own but it does
-> > not make much sense in a world that already has io_uring.
-> > 
-> > Passthrough is lean in the sense it cuts through layers of abstractions
-> > and reaches to NVMe fast. One of the objective here is to build a
-> > scalable pass-through that can be readily used to play with new/emerging
-> > NVMe features.  Another is to surpass/match existing raw/direct block
-> > I/O performance with this new in-kernel path.
-> > 
-> > Recent developments:
-> > --------------------
-> > - NVMe now has a per-namespace char interface that remains available/usable
-> >   even for unsupported features and for new command-sets [1].
-> > 
-> > - Jens has proposed async-ioctl like facility 'uring_cmd' in io_uring. This
-> >   introduces new possibilities (beyond storage); async-passthrough is one of
-> > those. Last posted version is V4 [2].
-> > 
-> > - I have posted work on async nvme passthrough over block-dev [3]. Posted work
-> >   is in V4 (in sync with the infra of [2]).
-> > 
-> > Early performance numbers:
-> > --------------------------
-> > fio, randread, 4k bs, 1 job
-> > Kiops, with varying QD:
-> > 
-> > QD      Sync-PT         io_uring        Async-PT
-> > 1         10.8            10.6            10.6
-> > 2         10.9            24.5            24
-> > 4         10.6            45              46
-> > 8         10.9            90              89
-> > 16        11.0            169             170
-> > 32        10.6            308             307
-> > 64        10.8            503             506
-> > 128       10.9            592             596
-> > 
-> > Further steps/discussion points:
-> > --------------------------------
-> > 1.Async-passthrough over nvme char-dev
-> > It is in a shape to receive feedback, but I am not sure if community
-> > would like to take a look at that before settling on uring-cmd infra.
-> > 
-> > 2.Once above gets in shape, bring other perf-centric features of io_uring to
-> > this path -
-> > A. SQPoll and register-file: already functional.
-> > B. Passthrough polling: This can be enabled for block and looks feasible for
-> > char-interface as well.  Keith recently posted enabling polling for user
-> > pass-through [4]
-> > C. Pre-mapped buffers: Early thought is to let the buffers registered by
-> > io_uring, and add a new passthrough ioctl/uring_cmd in driver which does
-> > everything that passthrough does except pinning/unpinning the pages.
-> > 
-> > 3. Are there more things in the "io_uring->nvme->[block-layer]->nvme" path
-> > which can be optimized.
-> > 
-> > Ideally I'd like to cover good deal of ground before Dec. But there seems
-> > plenty of possibilities on this path.  Discussion would help in how best to
-> > move forward, and cement the ideas.
-> > 
-> > [1] https://lore.kernel.org/linux-nvme/20210421074504.57750-1-minwoo.im.dev@gmail.com/
-> > [2] https://lore.kernel.org/linux-nvme/20210317221027.366780-1-axboe@kernel.dk/
-> > [3] https://lore.kernel.org/linux-nvme/20210325170540.59619-1-joshi.k@samsung.com/
-> > [4] https://lore.kernel.org/linux-block/20210517171443.GB2709391@dhcp-10-100-145-180.wdc.com/#t
-> > 
-> I do like the idea.
-> 
-> What I would like to see is to make the ioring_cmd infrastructure
-> generally available, such that we can port the SCSI sg asynchronous
-> interface over to this.
+Thinking proactively about LSFMM, regarding just Zone storage..
 
-What prevents you from doing this already? I think we just need more
-patch reviews for the generic io-uring cmd patches, no?
+I'd like to propose a BoF for Zoned Storage. The point of it is
+to address the existing point points we have and take advantage of
+having folks in the room we can likely settle on things faster which
+otherwise would take years.
 
- Luis
+I'll throw at least one topic out:
+
+  * Raw access for zone append for microbenchmarks:
+  	- are we really happy with the status quo?
+	- if not what outlets do we have?
+
+I think the nvme passthrogh stuff deserves it's own shared
+discussion though and should not make it part of the BoF.
+
+  Luis
