@@ -2,334 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 955A1C43219
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:18:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEAE8C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 00:45:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbiCCATW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 2 Mar 2022 19:19:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58588 "EHLO
+        id S230479AbiCCAq2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 2 Mar 2022 19:46:28 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbiCCATW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:19:22 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F0A8024599
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 16:18:35 -0800 (PST)
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.53 with ESMTP; 3 Mar 2022 09:18:34 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.126 with ESMTP; 3 Mar 2022 09:18:34 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Thu, 3 Mar 2022 09:18:13 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH v3 00/21] DEPT(Dependency Tracker)
-Message-ID: <20220303001812.GA20752@X58A-UD3R>
-References: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
- <Yh70VkRkUfwIjPWv@ip-172-31-19-208.ap-northeast-1.compute.internal>
- <Yh74VbNZZt35wHZD@ip-172-31-19-208.ap-northeast-1.compute.internal>
+        with ESMTP id S230466AbiCCAq0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 2 Mar 2022 19:46:26 -0500
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9290610FFC;
+        Wed,  2 Mar 2022 16:45:41 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id z15so3391064pfe.7;
+        Wed, 02 Mar 2022 16:45:41 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RG0QAqnhkN8VsgsFISubsUwICF6EYLvwH56+TUqE5XU=;
+        b=7ESzM5mrlkniveMwmUqPN7hCcWRS5Yj8k78TNJg5Cdu2t8dEJPGyQjVvaG2NKXUAer
+         qxIz0CoDvglRfagTPzZMkHhctmpFa52wtD9PvWo+pR7A4eJZeU5HlnTkkbCinu5OsrIc
+         1hLw2UujtD7Sd4s1xtK4xwStBYtWcKeFCGpxv058/L34rQXPBhQ5LJTeBBEZZ49sas87
+         QYl9oICJipS04pEXk/ScPapdg4P/YWEUzmrn42/iSKVUwscdjt4OE+8jIQ88mUQjUO3Z
+         lU27VUtD3loOrpCv/WmG/z/oLfRJx8LwVT8tsf9gadyKtCQgH/h+IyXB/vEPP59H1QV9
+         jWtg==
+X-Gm-Message-State: AOAM5311qxmzzZduIeBTQl3Rprjxd+jykAvdnwONIg5nNjA7oWPZLdmx
+        yts9Iw25XFtrrWspKhhZ1Qg=
+X-Google-Smtp-Source: ABdhPJwHsPleyILIyHbK8t5jmqxDA0ova8fC9S8sWNDR2aRXpq3VbA3wibktuQ3GMn0tgtUkrPawsg==
+X-Received: by 2002:a05:6a00:130c:b0:4bd:118:8071 with SMTP id j12-20020a056a00130c00b004bd01188071mr35659074pfu.28.1646268340881;
+        Wed, 02 Mar 2022 16:45:40 -0800 (PST)
+Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
+        by smtp.gmail.com with ESMTPSA id s21-20020a63dc15000000b00378c9e5b37fsm282669pgg.63.2022.03.02.16.45.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Mar 2022 16:45:39 -0800 (PST)
+Date:   Wed, 2 Mar 2022 16:45:37 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        lsf-pc@lists.linux-foundation.org, linux-nvme@lists.infradead.org,
+        io-uring@vger.kernel.org, linux-block@vger.kernel.org,
+        Doug Gilbert <dgilbert@interlog.com>, axboe@kernel.dk,
+        hch@lst.de, kbusch@kernel.org, javier@javigon.com,
+        anuj20.g@samsung.com, joshiiitr@gmail.com
+Subject: Re: [LSF/MM/BPF Topic] Towards more useful nvme-passthrough
+Message-ID: <20220303004537.yceop3zwrwzg3wni@garbanzo>
+References: <CGME20210609105347epcas5p42ab916655fca311157a38d54f79f95e7@epcas5p4.samsung.com>
+ <20210609105050.127009-1-joshi.k@samsung.com>
+ <d9e6e3cc-fedb-eb45-7a3e-5df24e67455b@suse.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yh74VbNZZt35wHZD@ip-172-31-19-208.ap-northeast-1.compute.internal>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <d9e6e3cc-fedb-eb45-7a3e-5df24e67455b@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 02, 2022 at 04:53:41AM +0000, Hyeonggon Yoo wrote:
-> On Wed, Mar 02, 2022 at 04:36:38AM +0000, Hyeonggon Yoo wrote:
-> > On Mon, Feb 28, 2022 at 06:56:39PM +0900, Byungchul Park wrote:
-> > > I didn't want to bother you so I was planning to send the next spin
-> > > after making more progress. However, PATCH v2 reports too many false
-> > > positives because Dept tracked the bit_wait_table[] wrong way - I
-> > > apologize for that. So I decided to send PATCH v3 first before going
-> > > further for those who want to run Dept for now.
-> > > 
-> > > There might still be some false positives but not overwhelming.
-> > >
+On Thu, Jun 24, 2021 at 11:24:27AM +0200, Hannes Reinecke wrote:
+> On 6/9/21 12:50 PM, Kanchan Joshi wrote:
+> > Background & objectives:
+> > ------------------------
 > > 
-> > Hello Byungchul, I'm running DEPT v3 on my system
-> > and I see report below.
+> > The NVMe passthrough interface
 > > 
-> > Looking at the kmemleak code and comment, I think
-> > kmemleak tried to avoid lockdep recursive warning
-> > but detected by DEPT?
-> >
-> 
-> Forgot to include another warning caused by DEPT.
-> 
-> And comment below might be useful for debugging:
-> 
-> in kmemleak.c:
->   43  * Locks and mutexes are acquired/nested in the following order:
->   44  *
->   45  *   scan_mutex [-> object->lock] -> kmemleak_lock -> other_object->lock (SINGLE_DEPTH_NESTING)
->   46  *
->   47  * No kmemleak_lock and object->lock nesting is allowed outside scan_mutex
->   48  * regions.
-> 
-> ===================================================
-> DEPT: Circular dependency has been detected.
-> 5.17.0-rc1+ #1 Tainted: G        W        
-> ---------------------------------------------------
-> summary
-> ---------------------------------------------------
-> *** DEADLOCK ***
-> 
-> context A
->     [S] __raw_spin_lock_irqsave(&object->lock:0)
->     [W] __raw_spin_lock_irqsave(kmemleak_lock:0)
->     [E] spin_unlock(&object->lock:0)
-> 
-> context B
->     [S] __raw_spin_lock_irqsave(kmemleak_lock:0)
->     [W] _raw_spin_lock_nested(&object->lock:0)
->     [E] spin_unlock(kmemleak_lock:0)
-> 
-> [S]: start of the event context
-> [W]: the wait blocked
-> [E]: the event not reachable
-
-Hi Hyeonggon,
-
-Dept also allows the following scenario when an user guarantees that
-each lock instance is different from another at a different depth:
-
-   lock A0 with depth
-   lock A1 with depth + 1
-   lock A2 with depth + 2
-   lock A3 with depth + 3
-   (and so on)
-   ..
-   unlock A3
-   unlock A2
-   unlock A1
-   unlock A0
-
-However, Dept does not allow the following scenario where another lock
-class cuts in the dependency chain:
-
-   lock A0 with depth
-   lock B
-   lock A1 with depth + 1
-   lock A2 with depth + 2
-   lock A3 with depth + 3
-   (and so on)
-   ..
-   unlock A3
-   unlock A2
-   unlock A1
-   unlock B
-   unlock A0
-
-This scenario is clearly problematic. What do you think is going to
-happen with another context running the following?
-
-   lock A1 with depth
-   lock B
-   lock A2 with depth + 1
-   lock A3 with depth + 2
-   (and so on)
-   ..
-   unlock A3
-   unlock A2
-   unlock B
-   unlock A1
-
-It's a deadlock. That's why Dept reports this case as a problem. Or am I
-missing something?
-
-Thanks,
-Byungchul
-
-> ---------------------------------------------------
-> context A's detail
-> ---------------------------------------------------
-> context A
->     [S] __raw_spin_lock_irqsave(&object->lock:0)
->     [W] __raw_spin_lock_irqsave(kmemleak_lock:0)
->     [E] spin_unlock(&object->lock:0)
-> 
-> [S] __raw_spin_lock_irqsave(&object->lock:0):
-> [<ffffffc00810302c>] scan_gray_list+0x84/0x13c
-> stacktrace:
->       dept_ecxt_enter+0x88/0xf4
->       _raw_spin_lock_irqsave+0xf0/0x1c4
->       scan_gray_list+0x84/0x13c
->       kmemleak_scan+0x2d8/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> [W] __raw_spin_lock_irqsave(kmemleak_lock:0):
-> [<ffffffc008102ebc>] scan_block+0x3c/0x128
-> stacktrace:
->       __dept_wait+0x8c/0xa4
->       dept_wait+0x6c/0x88
->       _raw_spin_lock_irqsave+0xb8/0x1c4
->       scan_block+0x3c/0x128
->       scan_gray_list+0xc4/0x13c
->       kmemleak_scan+0x2d8/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> [E] spin_unlock(&object->lock:0):
-> [<ffffffc008102ee0>] scan_block+0x60/0x128
-> 
-> ---------------------------------------------------
-> context B's detail
-> ---------------------------------------------------
-> context B
->     [S] __raw_spin_lock_irqsave(kmemleak_lock:0)
->     [W] _raw_spin_lock_nested(&object->lock:0)
->     [E] spin_unlock(kmemleak_lock:0)
-> 
-> [S] __raw_spin_lock_irqsave(kmemleak_lock:0):
-> [<ffffffc008102ebc>] scan_block+0x3c/0x128
-> stacktrace:
->       dept_ecxt_enter+0x88/0xf4
->       _raw_spin_lock_irqsave+0xf0/0x1c4
->       scan_block+0x3c/0x128
->       kmemleak_scan+0x19c/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> [W] _raw_spin_lock_nested(&object->lock:0):
-> [<ffffffc008102f34>] scan_block+0xb4/0x128
-> stacktrace:
->       dept_wait+0x74/0x88
->       _raw_spin_lock_nested+0xa8/0x1b0
->       scan_block+0xb4/0x128
->       kmemleak_scan+0x19c/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> [E] spin_unlock(kmemleak_lock:0):
-> [<ffffffc008102ee0>] scan_block+0x60/0x128
-> stacktrace:
->       dept_event+0x7c/0xfc
->       _raw_spin_unlock_irqrestore+0x8c/0x120
->       scan_block+0x60/0x128
->       kmemleak_scan+0x19c/0x54c
->       kmemleak_scan_thread+0xac/0xd4
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> ---------------------------------------------------
-> information that might be helpful
-> ---------------------------------------------------
-> CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x9c/0xc4
->  show_stack+0x14/0x28
->  dump_stack_lvl+0x9c/0xcc
->  dump_stack+0x14/0x2c
->  print_circle+0x2d4/0x438
->  cb_check_dl+0x6c/0x70
->  bfs+0xc0/0x168
->  add_dep+0x88/0x11c
->  add_wait+0x2d0/0x2dc
->  __dept_wait+0x8c/0xa4
->  dept_wait+0x6c/0x88
->  _raw_spin_lock_irqsave+0xb8/0x1c4
->  scan_block+0x3c/0x128
->  scan_gray_list+0xc4/0x13c
->  kmemleak_scan+0x2d8/0x54c
->  kmemleak_scan_thread+0xac/0xd4
->  kthread+0xd4/0xe4
->  ret_from_fork+0x10/0x20
-> 
-> > ===================================================
-> > DEPT: Circular dependency has been detected.
-> > 5.17.0-rc1+ #1 Tainted: G        W
-> > ---------------------------------------------------
-> > summary
-> > ---------------------------------------------------
-> > *** AA DEADLOCK ***
+> > Good part: allows new device-features to be usable (at least in raw
+> > form) without having to build block-generic cmds, in-kernel users,
+> > emulations and file-generic user-interfaces - all this take some time to
+> > evolve.
 > > 
-> > context A
-> >     [S] __raw_spin_lock_irqsave(&object->lock:0)
-> >     [W] _raw_spin_lock_nested(&object->lock:0)
-> >     [E] spin_unlock(&object->lock:0)
+> > Bad part: passthrough interface has remain tied to synchronous ioctl,
+> > which is a blocker for performance-centric usage scenarios. User-space
+> > can take the pain of implementing async-over-sync on its own but it does
+> > not make much sense in a world that already has io_uring.
 > > 
-> > [S]: start of the event context
-> > [W]: the wait blocked
-> > [E]: the event not reachable
-> > ---------------------------------------------------
-> > context A's detail
-> > ---------------------------------------------------
-> > context A
-> >     [S] __raw_spin_lock_irqsave(&object->lock:0)
-> >     [W] _raw_spin_lock_nested(&object->lock:0)
-> >     [E] spin_unlock(&object->lock:0)
+> > Passthrough is lean in the sense it cuts through layers of abstractions
+> > and reaches to NVMe fast. One of the objective here is to build a
+> > scalable pass-through that can be readily used to play with new/emerging
+> > NVMe features.  Another is to surpass/match existing raw/direct block
+> > I/O performance with this new in-kernel path.
 > > 
-> > [S] __raw_spin_lock_irqsave(&object->lock:0):
-> > [<ffffffc00810302c>] scan_gray_list+0x84/0x13c
-> > stacktrace:
-> >       dept_ecxt_enter+0x88/0xf4
-> >       _raw_spin_lock_irqsave+0xf0/0x1c4
-> >       scan_gray_list+0x84/0x13c
-> >       kmemleak_scan+0x2d8/0x54c
-> >       kmemleak_scan_thread+0xac/0xd4
-> >       kthread+0xd4/0xe4
-> >       ret_from_fork+0x10/0x20
+> > Recent developments:
+> > --------------------
+> > - NVMe now has a per-namespace char interface that remains available/usable
+> >   even for unsupported features and for new command-sets [1].
 > > 
-> > [E] spin_unlock(&object->lock:0):
-> > [<ffffffc008102ee0>] scan_block+0x60/0x128
-> > ---------------------------------------------------
-> > information that might be helpful
-> > ---------------------------------------------------
-> > CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
-> > Hardware name: linux,dummy-virt (DT)
-> > Call trace:
-> >  dump_backtrace.part.0+0x9c/0xc4
-> >  show_stack+0x14/0x28
-> >  dump_stack_lvl+0x9c/0xcc
-> >  dump_stack+0x14/0x2c
-> >  print_circle+0x2d4/0x438
-> >  cb_check_dl+0x44/0x70
-> >  bfs+0x60/0x168
-> >  add_dep+0x88/0x11c
-> >  add_wait+0x2d0/0x2dc
-> >  __dept_wait+0x8c/0xa4
-> >  dept_wait+0x6c/0x88
-> >  _raw_spin_lock_nested+0xa8/0x1b0
-> >  scan_block+0xb4/0x128
-> >  scan_gray_list+0xc4/0x13c
-> >  kmemleak_scan+0x2d8/0x54c
-> >  kmemleak_scan_thread+0xac/0xd4
-> >  kthread+0xd4/0xe4
-> >  ret_from_fork+0x10/0x20
-> >
-> [...]
+> > - Jens has proposed async-ioctl like facility 'uring_cmd' in io_uring. This
+> >   introduces new possibilities (beyond storage); async-passthrough is one of
+> > those. Last posted version is V4 [2].
+> > 
+> > - I have posted work on async nvme passthrough over block-dev [3]. Posted work
+> >   is in V4 (in sync with the infra of [2]).
+> > 
+> > Early performance numbers:
+> > --------------------------
+> > fio, randread, 4k bs, 1 job
+> > Kiops, with varying QD:
+> > 
+> > QD      Sync-PT         io_uring        Async-PT
+> > 1         10.8            10.6            10.6
+> > 2         10.9            24.5            24
+> > 4         10.6            45              46
+> > 8         10.9            90              89
+> > 16        11.0            169             170
+> > 32        10.6            308             307
+> > 64        10.8            503             506
+> > 128       10.9            592             596
+> > 
+> > Further steps/discussion points:
+> > --------------------------------
+> > 1.Async-passthrough over nvme char-dev
+> > It is in a shape to receive feedback, but I am not sure if community
+> > would like to take a look at that before settling on uring-cmd infra.
+> > 
+> > 2.Once above gets in shape, bring other perf-centric features of io_uring to
+> > this path -
+> > A. SQPoll and register-file: already functional.
+> > B. Passthrough polling: This can be enabled for block and looks feasible for
+> > char-interface as well.  Keith recently posted enabling polling for user
+> > pass-through [4]
+> > C. Pre-mapped buffers: Early thought is to let the buffers registered by
+> > io_uring, and add a new passthrough ioctl/uring_cmd in driver which does
+> > everything that passthrough does except pinning/unpinning the pages.
+> > 
+> > 3. Are there more things in the "io_uring->nvme->[block-layer]->nvme" path
+> > which can be optimized.
+> > 
+> > Ideally I'd like to cover good deal of ground before Dec. But there seems
+> > plenty of possibilities on this path.  Discussion would help in how best to
+> > move forward, and cement the ideas.
+> > 
+> > [1] https://lore.kernel.org/linux-nvme/20210421074504.57750-1-minwoo.im.dev@gmail.com/
+> > [2] https://lore.kernel.org/linux-nvme/20210317221027.366780-1-axboe@kernel.dk/
+> > [3] https://lore.kernel.org/linux-nvme/20210325170540.59619-1-joshi.k@samsung.com/
+> > [4] https://lore.kernel.org/linux-block/20210517171443.GB2709391@dhcp-10-100-145-180.wdc.com/#t
+> > 
+> I do like the idea.
 > 
-> --
-> Thank you, You are awesome!
-> Hyeonggon :-)
+> What I would like to see is to make the ioring_cmd infrastructure
+> generally available, such that we can port the SCSI sg asynchronous
+> interface over to this.
+
+What prevents you from doing this already? I think we just need more
+patch reviews for the generic io-uring cmd patches, no?
+
+ Luis
