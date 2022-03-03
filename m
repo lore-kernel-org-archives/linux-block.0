@@ -2,153 +2,213 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF904C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 06:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 428E5C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 06:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229971AbiCCGas (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 01:30:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56860 "EHLO
+        id S229497AbiCCGs6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 01:48:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229967AbiCCGan (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 01:30:43 -0500
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEE8B1688F9
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 22:29:53 -0800 (PST)
-Received: by mail-ed1-x534.google.com with SMTP id i11so5225127eda.9
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 22:29:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=t+LdfiGc6xI1mxdllyfF2ZD3X/NRnVLnjV3jDQq86Bk=;
-        b=MWwHgRM1qcypVtr9iaHn+QejxGQMYgqgvOKQmg2InAE6qwP+yugvlWIoPZRU6/mYm8
-         3DZGBjFZnECQvcZX0ZX9bwwT65gpSlVdQJW7c0C0usnt24CMuYsEjYQyoVasGwpg42OM
-         v7U1aDSizg/M4J4w1TjlZnVevbMxPP8ReSw0Nm4O/eJ5Cnsg87PqHFh8pfdO3mel9gAw
-         S6Kx3a2FFNFzEr/i4KCz3OQeNYveUeqyzn1dsgFD8nIuRp365LGHGj273OrYAvAmksNW
-         YEJzOXY0otI6YCnGIvJ/Holj4f+17CSg2STx0ehi45fu625+VfHQTt3aefnp9OxFLMya
-         t1Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=t+LdfiGc6xI1mxdllyfF2ZD3X/NRnVLnjV3jDQq86Bk=;
-        b=UeA+Byt3oWQVpRuK0//uTSQD+7qwjU0Hn3kCSoet8LwyGnr6zQdi62rPQf9phsQv19
-         i0trvMgVUMzYqUNJMlAIgEcsiB1ZTn8s9CNxLlPhBtsCy1f8egIizoqn+7ovVrfYMtNB
-         E3SWcMDUhaLRfa59R36K200LfPxg+O8y485hfSHDjug/rBErOwYfp6fBL3yAEgPR8YGa
-         Xjk1GbDKsahyrAb6tiMpy79W8g6IOEVcP2o2zwSiXylerZoVTZOO8/lSxXMuhK6j7Ym5
-         zVHgk13Ph/bUY5azhIqT/6p+9ZYntYxvAgcV1jvsPacZ21jxJynwfdO7AMB39/9S+qtL
-         lttQ==
-X-Gm-Message-State: AOAM531CsDChs/EKLYFctUMlZEMUKL068440LDBDx813mXGHtLOU/KlR
-        p8bSzaUW25Grs4ywfqE/KsJBow==
-X-Google-Smtp-Source: ABdhPJy9Lfxb8IR7ZsYIVTkW0AlK9XZsF31uQVMa5xHfCfSXBtQ6lYJ+joBWcOkT15MtSCevGD4hNQ==
-X-Received: by 2002:a05:6402:1cc1:b0:413:2cfb:b6ca with SMTP id ds1-20020a0564021cc100b004132cfbb6camr32897825edb.265.1646288992145;
-        Wed, 02 Mar 2022 22:29:52 -0800 (PST)
-Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
-        by smtp.gmail.com with ESMTPSA id gj18-20020a170907741200b006da82539c83sm364669ejc.73.2022.03.02.22.29.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 22:29:51 -0800 (PST)
-From:   "Javier =?utf-8?B?R29uesOhbGV6?=" <javier@javigon.com>
-X-Google-Original-From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-Date:   Thu, 3 Mar 2022 07:29:50 +0100
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-Message-ID: <20220303062950.srhm5bn3mcjlwbca@ArmHalley.localdomain>
-References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
- <B3F227F7-4BF0-4735-9D0F-786B68871963@javigon.com>
+        with ESMTP id S229480AbiCCGs5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 01:48:57 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 520FD443E2;
+        Wed,  2 Mar 2022 22:48:12 -0800 (PST)
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K8M2h297fzBrW5;
+        Thu,  3 Mar 2022 14:46:20 +0800 (CST)
+Received: from localhost.localdomain (10.175.127.227) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Thu, 3 Mar 2022 14:48:09 +0800
+From:   Zhang Wensheng <zhangwensheng5@huawei.com>
+To:     <paolo.valente@linaro.org>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <zhangwensheng5@huawei.com>
+Subject: [PATCH -next v4] bfq: fix use-after-free in bfq_dispatch_request
+Date:   Thu, 3 Mar 2022 15:03:34 +0800
+Message-ID: <20220303070334.3020168-1-zhangwensheng5@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <B3F227F7-4BF0-4735-9D0F-786B68871963@javigon.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 03.03.2022 06:32, Javier González wrote:
->
->> On 3 Mar 2022, at 04.24, Luis Chamberlain <mcgrof@kernel.org> wrote:
->>
->> ﻿Thinking proactively about LSFMM, regarding just Zone storage..
->>
->> I'd like to propose a BoF for Zoned Storage. The point of it is
->> to address the existing point points we have and take advantage of
->> having folks in the room we can likely settle on things faster which
->> otherwise would take years.
->>
->> I'll throw at least one topic out:
->>
->>  * Raw access for zone append for microbenchmarks:
->>      - are we really happy with the status quo?
->>    - if not what outlets do we have?
->>
->> I think the nvme passthrogh stuff deserves it's own shared
->> discussion though and should not make it part of the BoF.
->>
->>  Luis
->
->Thanks for proposing this, Luis.
->
->I’d like to join this discussion too.
->
->Thanks,
->Javier
+KASAN reports a use-after-free report when doing normal scsi-mq test
 
-Let me expand a bit on this. There is one topic that I would like to
-cover in this session:
+[69832.239032] ==================================================================
+[69832.241810] BUG: KASAN: use-after-free in bfq_dispatch_request+0x1045/0x44b0
+[69832.243267] Read of size 8 at addr ffff88802622ba88 by task kworker/3:1H/155
+[69832.244656]
+[69832.245007] CPU: 3 PID: 155 Comm: kworker/3:1H Not tainted 5.10.0-10295-g576c6382529e #8
+[69832.246626] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[69832.249069] Workqueue: kblockd blk_mq_run_work_fn
+[69832.250022] Call Trace:
+[69832.250541]  dump_stack+0x9b/0xce
+[69832.251232]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.252243]  print_address_description.constprop.6+0x3e/0x60
+[69832.253381]  ? __cpuidle_text_end+0x5/0x5
+[69832.254211]  ? vprintk_func+0x6b/0x120
+[69832.254994]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.255952]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.256914]  kasan_report.cold.9+0x22/0x3a
+[69832.257753]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.258755]  check_memory_region+0x1c1/0x1e0
+[69832.260248]  bfq_dispatch_request+0x1045/0x44b0
+[69832.261181]  ? bfq_bfqq_expire+0x2440/0x2440
+[69832.262032]  ? blk_mq_delay_run_hw_queues+0xf9/0x170
+[69832.263022]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.264011]  ? blk_mq_sched_request_inserted+0x100/0x100
+[69832.265101]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.266206]  ? blk_mq_do_dispatch_ctx+0x570/0x570
+[69832.267147]  ? __switch_to+0x5f4/0xee0
+[69832.267898]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.268946]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.269840]  blk_mq_run_work_fn+0x51/0x60
+[69832.278170]  process_one_work+0x6d4/0xfe0
+[69832.278984]  worker_thread+0x91/0xc80
+[69832.279726]  ? __kthread_parkme+0xb0/0x110
+[69832.280554]  ? process_one_work+0xfe0/0xfe0
+[69832.281414]  kthread+0x32d/0x3f0
+[69832.282082]  ? kthread_park+0x170/0x170
+[69832.282849]  ret_from_fork+0x1f/0x30
+[69832.283573]
+[69832.283886] Allocated by task 7725:
+[69832.284599]  kasan_save_stack+0x19/0x40
+[69832.285385]  __kasan_kmalloc.constprop.2+0xc1/0xd0
+[69832.286350]  kmem_cache_alloc_node+0x13f/0x460
+[69832.287237]  bfq_get_queue+0x3d4/0x1140
+[69832.287993]  bfq_get_bfqq_handle_split+0x103/0x510
+[69832.289015]  bfq_init_rq+0x337/0x2d50
+[69832.289749]  bfq_insert_requests+0x304/0x4e10
+[69832.290634]  blk_mq_sched_insert_requests+0x13e/0x390
+[69832.291629]  blk_mq_flush_plug_list+0x4b4/0x760
+[69832.292538]  blk_flush_plug_list+0x2c5/0x480
+[69832.293392]  io_schedule_prepare+0xb2/0xd0
+[69832.294209]  io_schedule_timeout+0x13/0x80
+[69832.295014]  wait_for_common_io.constprop.1+0x13c/0x270
+[69832.296137]  submit_bio_wait+0x103/0x1a0
+[69832.296932]  blkdev_issue_discard+0xe6/0x160
+[69832.297794]  blk_ioctl_discard+0x219/0x290
+[69832.298614]  blkdev_common_ioctl+0x50a/0x1750
+[69832.304715]  blkdev_ioctl+0x470/0x600
+[69832.305474]  block_ioctl+0xde/0x120
+[69832.306232]  vfs_ioctl+0x6c/0xc0
+[69832.306877]  __se_sys_ioctl+0x90/0xa0
+[69832.307629]  do_syscall_64+0x2d/0x40
+[69832.308362]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[69832.309382]
+[69832.309701] Freed by task 155:
+[69832.310328]  kasan_save_stack+0x19/0x40
+[69832.311121]  kasan_set_track+0x1c/0x30
+[69832.311868]  kasan_set_free_info+0x1b/0x30
+[69832.312699]  __kasan_slab_free+0x111/0x160
+[69832.313524]  kmem_cache_free+0x94/0x460
+[69832.314367]  bfq_put_queue+0x582/0x940
+[69832.315112]  __bfq_bfqd_reset_in_service+0x166/0x1d0
+[69832.317275]  bfq_bfqq_expire+0xb27/0x2440
+[69832.318084]  bfq_dispatch_request+0x697/0x44b0
+[69832.318991]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.319984]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.321087]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.322225]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.323114]  blk_mq_run_work_fn+0x51/0x60
+[69832.323942]  process_one_work+0x6d4/0xfe0
+[69832.324772]  worker_thread+0x91/0xc80
+[69832.325518]  kthread+0x32d/0x3f0
+[69832.326205]  ret_from_fork+0x1f/0x30
+[69832.326932]
+[69832.338297] The buggy address belongs to the object at ffff88802622b968
+[69832.338297]  which belongs to the cache bfq_queue of size 512
+[69832.340766] The buggy address is located 288 bytes inside of
+[69832.340766]  512-byte region [ffff88802622b968, ffff88802622bb68)
+[69832.343091] The buggy address belongs to the page:
+[69832.344097] page:ffffea0000988a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802622a528 pfn:0x26228
+[69832.346214] head:ffffea0000988a00 order:2 compound_mapcount:0 compound_pincount:0
+[69832.347719] flags: 0x1fffff80010200(slab|head)
+[69832.348625] raw: 001fffff80010200 ffffea0000dbac08 ffff888017a57650 ffff8880179fe840
+[69832.354972] raw: ffff88802622a528 0000000000120008 00000001ffffffff 0000000000000000
+[69832.356547] page dumped because: kasan: bad access detected
+[69832.357652]
+[69832.357970] Memory state around the buggy address:
+[69832.358926]  ffff88802622b980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.360358]  ffff88802622ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.361810] >ffff88802622ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.363273]                       ^
+[69832.363975]  ffff88802622bb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+[69832.375960]  ffff88802622bb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[69832.377405] ==================================================================
 
-   - PO2 zone sizes
-       In the past weeks we have been talking to Damien and Matias around
-       the constraint that we currently have for PO2 zone sizes. While
-       this has not been an issue for SMR HDDs, the gap that ZNS
-       introduces between zone capacity and zone size causes holes in the
-       address space. This unmapped LBA space has been the topic of
-       discussion with several ZNS adopters.
+In bfq_dispatch_requestfunction, it may have function call:
 
-       One of the things to note here is that even if the zone size is a
-       PO2, the zone capacity is typically not. This means that even when
-       we can use shifts to move around zones, the actual data placement
-       algorithms need to deal with arbitrary sizes. So at the end of the
-       day applications that use a contiguous address space - like in a
-       conventional block device -, will have to deal with this.
+bfq_dispatch_request
+	__bfq_dispatch_request
+		bfq_select_queue
+			bfq_bfqq_expire
+				__bfq_bfqd_reset_in_service
+					bfq_put_queue
+						kmem_cache_free
+In this function call, in_serv_queue has beed expired and meet the
+conditions to free. In the function bfq_dispatch_request, the address
+of in_serv_queue pointing to has been released. For getting the value
+of idle_timer_disabled, it will get flags value from the address which
+in_serv_queue pointing to, then the problem of use-after-free happens;
 
-       Since chunk_sectors is no longer required to be a PO2, we have
-       started the work in removing this constraint. We are working in 2
-       phases:
+Fix the problem by check in_serv_queue == bfqd->in_service_queue, to
+get the value of idle_timer_disabled if in_serve_queue is equel to
+bfqd->in_service_queue. If the space of in_serv_queue pointing has
+been released, this judge will aviod use-after-free problem.
+And if in_serv_queue may be expired or finished, the idle_timer_disabled
+will be false which would not give effects to bfq_update_dispatch_stats.
 
-         1. Add an emulation layer in NVMe driver to simulate PO2 devices
-	when the HW presents a zone_capacity = zone_size. This is a
-	product of one of Damien's early concerns about supporting
-	existing applications and FSs that work under the PO2
-	assumption. We will post these patches in the next few days.
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+---
+ block/bfq-iosched.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
-         2. Remove the PO2 constraint from the block layer and add
-	support for arbitrary zone support in btrfs. This will allow the
-	raw block device to be present for arbitrary zone sizes (and
-	capacities) and btrfs will be able to use it natively.
-
-	For completeness, F2FS works natively in PO2 zone sizes, so we
-	will not do work here for now, as the changes will not bring any
-	benefit. For F2FS, the emulation layer will help use devices
-	that do not have PO2 zone sizes.
-
-      We are working towards having at least a RFC of (2) before LSF/MM.
-      Since this is a topic that involves several parties across the
-      stack, I believe that a F2F conversation will help laying the path
-      forward.
-
-Thanks,
-Javier
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 36a66e97e3c2..8735f075230f 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -5181,7 +5181,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct request *rq;
+ 	struct bfq_queue *in_serv_queue;
+-	bool waiting_rq, idle_timer_disabled;
++	bool waiting_rq, idle_timer_disabled = false;
+ 
+ 	spin_lock_irq(&bfqd->lock);
+ 
+@@ -5189,14 +5189,15 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
+ 
+ 	rq = __bfq_dispatch_request(hctx);
+-
+-	idle_timer_disabled =
+-		waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
++	if (in_serv_queue == bfqd->in_service_queue) {
++		idle_timer_disabled =
++			waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
++	}
+ 
+ 	spin_unlock_irq(&bfqd->lock);
+-
+-	bfq_update_dispatch_stats(hctx->queue, rq, in_serv_queue,
+-				  idle_timer_disabled);
++	bfq_update_dispatch_stats(hctx->queue, rq,
++			idle_timer_disabled ? in_serv_queue : NULL,
++				idle_timer_disabled);
+ 
+ 	return rq;
+ }
+-- 
+2.31.1
 
