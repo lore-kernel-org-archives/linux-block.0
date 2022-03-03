@@ -2,102 +2,373 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACBCCC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 09:32:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73C0FC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 09:48:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229732AbiCCJdN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 04:33:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38266 "EHLO
+        id S232013AbiCCJtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 04:49:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231460AbiCCJdL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 04:33:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8D2106BDD3
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 01:32:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646299944;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0PZ0H54yfXoj1Ao/27vobiJPxhA7EjRaFy7SZasMoSE=;
-        b=VaaYmC/ZwUkUzlqZOigDMPf8RkMTwz0p+9S0miRYeMkgJeuI7YyWjrS9n41YxkAIWSjl4M
-        biOIrtK2BmRoZIFLO8URLu62dRn2mwKq5yjptKsFIYe+mwetOhVsuZely57LHwbu+yc/gX
-        BvHb5+/h5DH+RrjMOSCJsFXcNdTGbAo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-480-lxaGFSCqPhWo-JsHKWqrtQ-1; Thu, 03 Mar 2022 04:32:21 -0500
-X-MC-Unique: lxaGFSCqPhWo-JsHKWqrtQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 65A211006AA5;
-        Thu,  3 Mar 2022 09:32:20 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E0DBE79C59;
-        Thu,  3 Mar 2022 09:32:00 +0000 (UTC)
-Date:   Thu, 3 Mar 2022 17:31:54 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     kernel test robot <lkp@intel.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, kbuild-all@lists.01.org,
-        linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH V2 5/6] blk-mq: prepare for implementing hctx table via
- xarray
-Message-ID: <YiCLCut1EP6hwdO/@T590>
-References: <20220302121407.1361401-6-ming.lei@redhat.com>
- <202203031651.z0z86F6E-lkp@intel.com>
+        with ESMTP id S231994AbiCCJtf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 04:49:35 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 87ADF14892F
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 01:48:47 -0800 (PST)
+Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
+        by 156.147.23.52 with ESMTP; 3 Mar 2022 18:48:45 +0900
+X-Original-SENDERIP: 156.147.1.151
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.151 with ESMTP; 3 Mar 2022 18:48:45 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Thu, 3 Mar 2022 18:48:24 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        bfields@fieldses.org, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
+        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+        djwong@kernel.org, dri-devel@lists.freedesktop.org,
+        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com
+Subject: Re: [PATCH v3 00/21] DEPT(Dependency Tracker)
+Message-ID: <20220303094824.GA24977@X58A-UD3R>
+References: <1646042220-28952-1-git-send-email-byungchul.park@lge.com>
+ <Yh70VkRkUfwIjPWv@ip-172-31-19-208.ap-northeast-1.compute.internal>
+ <Yh74VbNZZt35wHZD@ip-172-31-19-208.ap-northeast-1.compute.internal>
+ <20220303001812.GA20752@X58A-UD3R>
+ <YiB2SZFzgBEcywgg@ip-172-31-19-208.ap-northeast-1.compute.internal>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202203031651.z0z86F6E-lkp@intel.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <YiB2SZFzgBEcywgg@ip-172-31-19-208.ap-northeast-1.compute.internal>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 05:08:47PM +0800, kernel test robot wrote:
-> Hi Ming,
+On Thu, Mar 03, 2022 at 08:03:21AM +0000, Hyeonggon Yoo wrote:
+> On Thu, Mar 03, 2022 at 09:18:13AM +0900, Byungchul Park wrote:
+> > Hi Hyeonggon,
+> > 
+> > Dept also allows the following scenario when an user guarantees that
+> > each lock instance is different from another at a different depth:
+> >
+> >    lock A0 with depth
+> >    lock A1 with depth + 1
+> >    lock A2 with depth + 2
+> >    lock A3 with depth + 3
+> >    (and so on)
+> >    ..
+> >    unlock A3
+> >    unlock A2
+> >    unlock A1
+> >    unlock A0
+
+Look at this. Dept allows object->lock -> other_object->lock (with a
+different depth using *_lock_nested()) so won't report it.
+
+> > However, Dept does not allow the following scenario where another lock
+> > class cuts in the dependency chain:
+> > 
+> >    lock A0 with depth
+> >    lock B
+> >    lock A1 with depth + 1
+> >    lock A2 with depth + 2
+> >    lock A3 with depth + 3
+> >    (and so on)
+> >    ..
+> >    unlock A3
+> >    unlock A2
+> >    unlock A1
+> >    unlock B
+> >    unlock A0
+> > 
+> > This scenario is clearly problematic. What do you think is going to
+> > happen with another context running the following?
+> >
 > 
-> Thank you for the patch! Perhaps something to improve:
+> First of all, I want to say I'm not expert at locking primitives.
+> I may be wrong.
+
+It's okay. Thanks anyway for your feedback.
+
+> > >   45  *   scan_mutex [-> object->lock] -> kmemleak_lock -> other_object->lock (SINGLE_DEPTH_NESTING)
+> > >   46  *
+> > >   47  * No kmemleak_lock and object->lock nesting is allowed outside scan_mutex
+> > >   48  * regions.
 > 
-> [auto build test WARNING on axboe-block/for-next]
-> [also build test WARNING on v5.17-rc6 next-20220302]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
+> lock order in kmemleak is described above.
 > 
-> url:    https://github.com/0day-ci/linux/commits/Ming-Lei/blk-mq-update_nr_hw_queues-related-improvement-bugfix/20220302-201636
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-> config: m68k-randconfig-m031-20220302 (https://download.01.org/0day-ci/archive/20220303/202203031651.z0z86F6E-lkp@intel.com/config)
-> compiler: m68k-linux-gcc (GCC) 11.2.0
+> and DEPT detects two cases as deadlock:
 > 
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> 
-> smatch warnings:
-> block/blk-mq-sysfs.c:282 __blk_mq_register_dev() warn: always true condition '(--i >= 0) => (0-u32max >= 0)'
-> block/blk-mq-sysfs.c:282 __blk_mq_register_dev() warn: always true condition '(--i >= 0) => (0-u32max >= 0)'
+> 1) object->lock -> other_object->lock
 
-Good catch, will fix it by the following way in V3:
+It's not a deadlock *IF* two have different depth using *_lock_nested().
+Dept also allows this case. So Dept wouldn't report it.
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index 6a7fb960e046..851faacc2f78 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -279,8 +279,8 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
-        return ret;
+> 2) object->lock -> kmemleak_lock, kmemleak_lock -> other_object->lock
 
- unreg:
--       while (--i >= 0)
--               blk_mq_unregister_hctx(xa_load(&q->hctx_table, i));
-+       queue_for_each_hw_ctx(q, hctx, i) {
-+               blk_mq_unregister_hctx(hctx);
+But this usage is risky. I already explained it in the mail you replied
+to. I copied it. See the below.
 
-        kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
-        kobject_del(q->mq_kobj);
+context A
+> >    lock A0 with depth
+> >    lock B
+> >    lock A1 with depth + 1
+> >    lock A2 with depth + 2
+> >    lock A3 with depth + 3
+> >    (and so on)
+> >    ..
+> >    unlock A3
+> >    unlock A2
+> >    unlock A1
+> >    unlock B
+> >    unlock A0
 
+...
 
+context B
+> >    lock A1 with depth
+> >    lock B
+> >    lock A2 with depth + 1
+> >    lock A3 with depth + 2
+> >    (and so on)
+> >    ..
+> >    unlock A3
+> >    unlock A2
+> >    unlock B
+> >    unlock A1
+
+where Ax : object->lock, B : kmemleak_lock.
+
+A deadlock might occur if the two contexts run at the same time.
+
+> And in kmemleak case, 1) and 2) is not possible because it must hold
+> scan_mutex first.
+
+This is another issue. Let's focus on whether the order is okay for now.
+
+> I think the author of kmemleak intended lockdep to treat object->lock
+> and other_object->lock as different class, using raw_spin_lock_nested().
+
+Yes. The author meant to assign a different class according to its depth
+using a Lockdep API. Strictly speaking, those are the same class anyway
+but we assign a different class to each depth to avoid Lockdep splats
+*IF* the user guarantees the nesting lock usage is safe, IOW, guarantees
+each lock instance is different at a different depth.
+
+I was fundamentally asking you... so... is the nesting lock usage safe
+for real? I hope you distinguish between the safe case and the risky
+case when *_lock_nested() is involved. Thoughts?
 
 Thanks,
-Ming
+Byungchul
 
+> Am I missing something?
+> 
+> Thanks.
+> 
+> >    lock A1 with depth
+> >    lock B
+> >    lock A2 with depth + 1
+> >    lock A3 with depth + 2
+> >    (and so on)
+> >    ..
+> >    unlock A3
+> >    unlock A2
+> >    unlock B
+> >    unlock A1
+> > 
+> > It's a deadlock. That's why Dept reports this case as a problem. Or am I
+> > missing something?
+> > 
+> > Thanks,
+> > Byungchul
+> > 
+> > > ---------------------------------------------------
+> > > context A's detail
+> > > ---------------------------------------------------
+> > > context A
+> > >     [S] __raw_spin_lock_irqsave(&object->lock:0)
+> > >     [W] __raw_spin_lock_irqsave(kmemleak_lock:0)
+> > >     [E] spin_unlock(&object->lock:0)
+> > > 
+> > > [S] __raw_spin_lock_irqsave(&object->lock:0):
+> > > [<ffffffc00810302c>] scan_gray_list+0x84/0x13c
+> > > stacktrace:
+> > >       dept_ecxt_enter+0x88/0xf4
+> > >       _raw_spin_lock_irqsave+0xf0/0x1c4
+> > >       scan_gray_list+0x84/0x13c
+> > >       kmemleak_scan+0x2d8/0x54c
+> > >       kmemleak_scan_thread+0xac/0xd4
+> > >       kthread+0xd4/0xe4
+> > >       ret_from_fork+0x10/0x20
+> > > 
+> > > [W] __raw_spin_lock_irqsave(kmemleak_lock:0):
+> > > [<ffffffc008102ebc>] scan_block+0x3c/0x128
+> > > stacktrace:
+> > >       __dept_wait+0x8c/0xa4
+> > >       dept_wait+0x6c/0x88
+> > >       _raw_spin_lock_irqsave+0xb8/0x1c4
+> > >       scan_block+0x3c/0x128
+> > >       scan_gray_list+0xc4/0x13c
+> > >       kmemleak_scan+0x2d8/0x54c
+> > >       kmemleak_scan_thread+0xac/0xd4
+> > >       kthread+0xd4/0xe4
+> > >       ret_from_fork+0x10/0x20
+> > > 
+> > > [E] spin_unlock(&object->lock:0):
+> > > [<ffffffc008102ee0>] scan_block+0x60/0x128
+> > > 
+> > > ---------------------------------------------------
+> > > context B's detail
+> > > ---------------------------------------------------
+> > > context B
+> > >     [S] __raw_spin_lock_irqsave(kmemleak_lock:0)
+> > >     [W] _raw_spin_lock_nested(&object->lock:0)
+> > >     [E] spin_unlock(kmemleak_lock:0)
+> > > 
+> > > [S] __raw_spin_lock_irqsave(kmemleak_lock:0):
+> > > [<ffffffc008102ebc>] scan_block+0x3c/0x128
+> > > stacktrace:
+> > >       dept_ecxt_enter+0x88/0xf4
+> > >       _raw_spin_lock_irqsave+0xf0/0x1c4
+> > >       scan_block+0x3c/0x128
+> > >       kmemleak_scan+0x19c/0x54c
+> > >       kmemleak_scan_thread+0xac/0xd4
+> > >       kthread+0xd4/0xe4
+> > >       ret_from_fork+0x10/0x20
+> > > 
+> > > [W] _raw_spin_lock_nested(&object->lock:0):
+> > > [<ffffffc008102f34>] scan_block+0xb4/0x128
+> > > stacktrace:
+> > >       dept_wait+0x74/0x88
+> > >       _raw_spin_lock_nested+0xa8/0x1b0
+> > >       scan_block+0xb4/0x128
+> > >       kmemleak_scan+0x19c/0x54c
+> > >       kmemleak_scan_thread+0xac/0xd4
+> > >       kthread+0xd4/0xe4
+> > >       ret_from_fork+0x10/0x20
+> > > [E] spin_unlock(kmemleak_lock:0):
+> > > [<ffffffc008102ee0>] scan_block+0x60/0x128
+> > > stacktrace:
+> > >       dept_event+0x7c/0xfc
+> > >       _raw_spin_unlock_irqrestore+0x8c/0x120
+> > >       scan_block+0x60/0x128
+> > >       kmemleak_scan+0x19c/0x54c
+> > >       kmemleak_scan_thread+0xac/0xd4
+> > >       kthread+0xd4/0xe4
+> > >       ret_from_fork+0x10/0x20
+> > > ---------------------------------------------------
+> > > information that might be helpful
+> > > ---------------------------------------------------
+> > > CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
+> > > Hardware name: linux,dummy-virt (DT)
+> > > Call trace:
+> > >  dump_backtrace.part.0+0x9c/0xc4
+> > >  show_stack+0x14/0x28
+> > >  dump_stack_lvl+0x9c/0xcc
+> > >  dump_stack+0x14/0x2c
+> > >  print_circle+0x2d4/0x438
+> > >  cb_check_dl+0x6c/0x70
+> > >  bfs+0xc0/0x168
+> > >  add_dep+0x88/0x11c
+> > >  add_wait+0x2d0/0x2dc
+> > >  __dept_wait+0x8c/0xa4
+> > >  dept_wait+0x6c/0x88
+> > >  _raw_spin_lock_irqsave+0xb8/0x1c4
+> > >  scan_block+0x3c/0x128
+> > >  scan_gray_list+0xc4/0x13c
+> > >  kmemleak_scan+0x2d8/0x54c
+> > >  kmemleak_scan_thread+0xac/0xd4
+> > >  kthread+0xd4/0xe4
+> > >  ret_from_fork+0x10/0x20
+> > > 
+> > > > ===================================================
+> > > > DEPT: Circular dependency has been detected.
+> > > > 5.17.0-rc1+ #1 Tainted: G        W
+> > > > ---------------------------------------------------
+> > > > summary
+> > > > ---------------------------------------------------
+> > > > *** AA DEADLOCK ***
+> > > > 
+> > > > context A
+> > > >     [S] __raw_spin_lock_irqsave(&object->lock:0)
+> > > >     [W] _raw_spin_lock_nested(&object->lock:0)
+> > > >     [E] spin_unlock(&object->lock:0)
+> > > > 
+> > > > [S]: start of the event context
+> > > > [W]: the wait blocked
+> > > > [E]: the event not reachable
+> > > > ---------------------------------------------------
+> > > > context A's detail
+> > > > ---------------------------------------------------
+> > > > context A
+> > > >     [S] __raw_spin_lock_irqsave(&object->lock:0)
+> > > >     [W] _raw_spin_lock_nested(&object->lock:0)
+> > > >     [E] spin_unlock(&object->lock:0)
+> > > > 
+> > > > [S] __raw_spin_lock_irqsave(&object->lock:0):
+> > > > [<ffffffc00810302c>] scan_gray_list+0x84/0x13c
+> > > > stacktrace:
+> > > >       dept_ecxt_enter+0x88/0xf4
+> > > >       _raw_spin_lock_irqsave+0xf0/0x1c4
+> > > >       scan_gray_list+0x84/0x13c
+> > > >       kmemleak_scan+0x2d8/0x54c
+> > > >       kmemleak_scan_thread+0xac/0xd4
+> > > >       kthread+0xd4/0xe4
+> > > >       ret_from_fork+0x10/0x20
+> > > > 
+> > > > [E] spin_unlock(&object->lock:0):
+> > > > [<ffffffc008102ee0>] scan_block+0x60/0x128
+> > > > ---------------------------------------------------
+> > > > information that might be helpful
+> > > > ---------------------------------------------------
+> > > > CPU: 1 PID: 38 Comm: kmemleak Tainted: G        W         5.17.0-rc1+ #1
+> > > > Hardware name: linux,dummy-virt (DT)
+> > > > Call trace:
+> > > >  dump_backtrace.part.0+0x9c/0xc4
+> > > >  show_stack+0x14/0x28
+> > > >  dump_stack_lvl+0x9c/0xcc
+> > > >  dump_stack+0x14/0x2c
+> > > >  print_circle+0x2d4/0x438
+> > > >  cb_check_dl+0x44/0x70
+> > > >  bfs+0x60/0x168
+> > > >  add_dep+0x88/0x11c
+> > > >  add_wait+0x2d0/0x2dc
+> > > >  __dept_wait+0x8c/0xa4
+> > > >  dept_wait+0x6c/0x88
+> > > >  _raw_spin_lock_nested+0xa8/0x1b0
+> > > >  scan_block+0xb4/0x128
+> > > >  scan_gray_list+0xc4/0x13c
+> > > >  kmemleak_scan+0x2d8/0x54c
+> > > >  kmemleak_scan_thread+0xac/0xd4
+> > > >  kthread+0xd4/0xe4
+> > > >  ret_from_fork+0x10/0x20
+> > > >
+> > > [...]
+> > > 
+> > > --
+> > > Thank you, You are awesome!
+> > > Hyeonggon :-)
+> 
+> -- 
+> Thank you, You are awesome!
+> Hyeonggon :-)
