@@ -2,95 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 266C9C433FE
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 20:51:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87568C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 21:08:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231919AbiCCUwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 15:52:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45202 "EHLO
+        id S232741AbiCCVJh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 16:09:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231809AbiCCUwG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 15:52:06 -0500
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87A47483BC;
-        Thu,  3 Mar 2022 12:51:20 -0800 (PST)
-Received: by mail-pj1-f51.google.com with SMTP id ge19-20020a17090b0e1300b001bcca16e2e7so8870094pjb.3;
-        Thu, 03 Mar 2022 12:51:20 -0800 (PST)
+        with ESMTP id S235005AbiCCVJg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 16:09:36 -0500
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A590DEA1D
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 13:08:50 -0800 (PST)
+Received: by mail-ed1-x533.google.com with SMTP id o1so7200002edc.3
+        for <linux-block@vger.kernel.org>; Thu, 03 Mar 2022 13:08:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=PZ3qH7MSbcAoK3FAxg/4KuZZGhbpGE4nxaY+vX8catw=;
+        b=iCyWf+R2uongqpZcOk3Xez8hmW8VSyyl0NXF0vjALeB6q+XBzAM3F7S7VKfpxCgLBg
+         tutsHfZG7OvUMimiS9cUxGsjz/3hbboLU8h1PrM0YfkNSXu/GUZemn/RTGrRQ6Gwu9to
+         A9RP/ceUXz/Um0sfKi93cdtsAiLCVDtSeqlmN+EHVx1IvPslc7axdYDSHWE1bEhKYmMX
+         dkXobpqMlZQvGVoibbuiyI6z1tnZ12+/cIYl9My7d7sXvbgjWgFJmQH0UvelqxgCwBuK
+         MYunEPm9w5/BoCHs9/Y+q9AvYaAGoiJluYCftgu92v1egN91TT4vrvlEDr5+OTPYff4+
+         +7+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=BpgkWjnWuEgp3Cu6bAQ0FzKlFx/Hz9hUby+++zqWYJ0=;
-        b=tgGa+lHE+IZN6YppmNnx8QAfM6Fj3M1yq2WOhTq/3ZligKRpoZE5dPvlqDY4dPba0X
-         bQ5Hug4K0oWELfmZg1oCSlx299DAHRpGwgjVcArX08ZaAiTpucKJLiBLhqlWtqAcsjIA
-         p60JdAWSeAkRVDaWXu5TLbRbfrjQGqs+jNI3JXwuesSI7xg4C9jMEU4eyEyPJtUVuqZo
-         26DTiStDGDscNtkKsWeMuv9llOkSkvfptuF1ygvW+zP0As/e+fArbA0HqgGdSkJG40/l
-         WhjfIGN/IfTeIz16AHU4cwt599MAVqQLTq4vzSYb8ctqasuc5HauGqUpkmoZiG2z22IL
-         ZF4A==
-X-Gm-Message-State: AOAM531STuH+e69ZBUBOGytUrL5B9r8cW0wbtUPDUnluVxhI3edKf0c4
-        98ZycpYwHCFdIPXQKCljdTk=
-X-Google-Smtp-Source: ABdhPJw6To/8cw2ZGMm8I7mQ4sIahkk1H/eRR1uUPPoUOYX8L9Cxt3rRitLy4XVFfea5Qdjf8/k/Dg==
-X-Received: by 2002:a17:902:f701:b0:14d:7cea:82af with SMTP id h1-20020a170902f70100b0014d7cea82afmr37656097plo.71.1646340679915;
-        Thu, 03 Mar 2022 12:51:19 -0800 (PST)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id y12-20020a056a00190c00b004f39e28fb87sm3507488pfi.98.2022.03.03.12.51.18
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=PZ3qH7MSbcAoK3FAxg/4KuZZGhbpGE4nxaY+vX8catw=;
+        b=vzIPmSlvS5espdnEjV5y+8wefJQ5WLAc8fZRG6F95xblUQ4gW3wqJSgtZcuM+csgX0
+         X9che/j3OJ+Slb59AvlMf8cWkpRXLTJ/KYeK0ZVJDWmJOSrDhPEiWT6jX9KL6WQ6q0l2
+         /rrGUGfhmsGuIlKNNaCvBOkBcEBSLhI44+QjwxDKZEq4jOuRksReAfyfF/xiMq4OdA6p
+         k3niYxUas8B9DF7KKR25Jkaxz35BCcZQc1YzUO5D/iGUlUui/zc91TSRJr0A1ThFNcLg
+         lCyNoPW7WVaFW6UTcj5QSIevgZZEMv1sdJICsc+SU3txPk1g24iIishKSe/Tl3uFdP8Z
+         vJ5g==
+X-Gm-Message-State: AOAM532odzR6wgYEH6wlm/AcycxpX0qeHvWoVm8BTsVW6dcpvdBOnZA9
+        wHpGKFeMKSvCeM16lVIyfD/sdQ==
+X-Google-Smtp-Source: ABdhPJz/d6L5ep+A8yHyDMjVnyUxv3WmiFO0CwUUPMKxal0ZtR803qeEjeuR0gXstZ+G/Zgk6DIXfg==
+X-Received: by 2002:a05:6402:35d1:b0:412:b3df:a6d3 with SMTP id z17-20020a05640235d100b00412b3dfa6d3mr35662436edc.151.1646341728890;
+        Thu, 03 Mar 2022 13:08:48 -0800 (PST)
+Received: from smtpclient.apple (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
+        by smtp.gmail.com with ESMTPSA id z15-20020a170906240f00b006d703ca573fsm1064600eja.85.2022.03.03.13.08.47
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 03 Mar 2022 12:51:19 -0800 (PST)
-Message-ID: <7b1daba2-3ff8-d4ee-9499-89d46d756bb9@acm.org>
-Date:   Thu, 3 Mar 2022 12:51:18 -0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: move more work to disk_release v2
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org
-References: <20220227172144.508118-1-hch@lst.de>
- <741e087a-43f8-dc90-b679-7865cf503ac3@acm.org> <20220301125632.GA3911@lst.de>
- <c61b6a0d-c3b5-30e2-14c5-efa7ea475c23@acm.org>
- <20220302150319.GA30076@lst.de>
- <9e818df5-e8c0-b397-ae21-1a0745074094@acm.org>
- <20220303105455.GA14991@lst.de>
- <7b4ba630-b51c-9675-88b4-d79649756abd@acm.org>
- <20220303192338.GA23351@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220303192338.GA23351@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Thu, 03 Mar 2022 13:08:48 -0800 (PST)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Date:   Thu, 3 Mar 2022 22:08:47 +0100
+Message-Id: <9151CBBD-F5A2-40F3-8864-11E771A8D562@javigon.com>
+References: <20220303201831.GC11082@bgt-140510-bm01>
+Cc:     =?utf-8?Q?Matias_Bj=C3=B8rling?= <matias.bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Keith Busch <keith.busch@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+In-Reply-To: <20220303201831.GC11082@bgt-140510-bm01>
+To:     Adam Manzanares <a.manzanares@samsung.com>
+X-Mailer: iPhone Mail (19D52)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/3/22 11:23, Christoph Hellwig wrote:
-> Can you try this patch on top of the series?
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index 6a072543bde4d..73b8bc9d67cf6 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -883,7 +883,10 @@ static inline void blk_account_io_done(struct request *req, u64 now)
->   
->   static void __blk_account_io_start(struct request *rq)
->   {
-> -	rq->part = rq->bio->bi_bdev;
-> +	if (rq->bio)
-> +		rq->part = rq->bio->bi_bdev;
-> +	else /* should only happen for dm-mpath flush requests */
-> +		rq->part = rq->q->disk->part0;
->   
->   	part_stat_lock();
->   	update_io_ticks(rq->part, jiffies, false);
 
-Hi Christoph,
+> On 3 Mar 2022, at 21.18, Adam Manzanares <a.manzanares@samsung.com> wrote:=
 
-This patch fixes the crash I reported. With this patch applied on top of the 
-hch-block/freeze-for-next branch blktests produces the same results on my setup 
-as for Jens' for-next branch.
+>=20
+> =EF=BB=BFOn Thu, Mar 03, 2022 at 07:51:36PM +0000, Matias Bj=C3=B8rling wr=
+ote:
+>>> Sounds like you voluntered to teach zoned storage use 101. Can you teach=
+ me
+>>> how to calculate an LBA offset given a zone number when zone capacity is=
+ not
+>>> equal to zone size?
+>>=20
+>> zonesize_pow =3D x; // e.g., x =3D 32 if 2GiB Zone size /w 512B block siz=
+e
+>> zone_id =3D y; // valid zone id
+>>=20
+>> struct blk_zone zone =3D zones[zone_id]; // zones is a linear array of bl=
+k_zone structs that holds per zone information.
+>>=20
+>> With that, one can do the following
+>> 1a) first_lba_of_zone =3D  zone_id << zonesize_pow;
+>> 1b) first_lba_of_zone =3D zone.start;
+>=20
+> 1b is interesting. What happens if i don't have struct blk_zone and zone s=
+ize=20
+> is not equal to zone capacity?
+>=20
+>> 2a) next_writeable_lba =3D (zoneid << zonesize_pow) + zone.wp;
+>> 2b) next_writeable_lba =3D zone.start + zone.wp;
+>=20
+> Can we modify 2b to not use zone.start?
+>=20
+>> 3)   writeable_lbas_left =3D zone.len - zone.wp;
+>> 4)   lbas_written =3D zone.wp - 1;
+>>=20
+>>> The second thing I would like to know is what happens when an applicatio=
+n
+>>> wants to map an object that spans multiple consecutive zones. Does the
+>>> application have to be aware of the difference in zone capacity and zone=
+ size?
+>>=20
+>> The zoned namespace command set specification does not allow variable zon=
+e size. The zone size is fixed for all zones in a namespace. Only the zone c=
+apacity has the capability to be variable. Usually, the zone capacity is fix=
+ed, I have not yet seen implementations that have variable zone capacities.
+>>=20
+>=20
+> IDK where variable zone size came from. I am talking about the fact that t=
+he=20
+> zone size does not have to equal zone capacity.=20
+>=20
+>> An application that wants to place a single object across a set of zones w=
+ould have to be explicitly handled by the application. E.g., as well as the a=
+pplication, should be aware of a zone's capacity, it should also be aware th=
+at it should reset the set of zones and not a single zone. I.e., the applica=
+tion must always be aware of the zones it uses.
+>>=20
+>> However, an end-user application should not (in my opinion) have to deal w=
+ith this. It should use helper functions from a library that provides the ap=
+propriate abstraction to the application, such that the applications don't h=
+ave to care about either specific zone capacity/size, or multiple resets. Th=
+is is similar to how file systems work with file system semantics. For examp=
+le, a file can span multiple extents on disk, but all an application sees is=
+ the file semantics.=20
+>>=20
+>=20
+> I don't want to go so far as to say what the end user application should a=
+nd=20
+> should not do.
 
-Thanks!
+Adam, Matias, Damien,
 
-Bart.
+Trying to bring us back to the original proposal.=20
+
+I believe we all can agree that applications and file-systems that work in o=
+bjects / extents / segments of PO2 can benefit from defining the zone bounda=
+ry at a PO2. Based on the code I have seen so far, these applications will s=
+till have to deal with the zone capacity. So if an application of FS needs t=
+o align to a certain size, it is the capacity that will have to be considere=
+d. Since there are plenty users, I am sure there are examples where this doe=
+s not apply.=20
+
+In my view, the point to remove this constraint is that there are users that=
+ can deal with !PO2 zone sizes and imposing the unmapped LBAs for them is cr=
+eating unnecessary hassle. This hurts the zoned ecosystem and therefore adop=
+tion.=20
+
+Even when we remove PO2 zone sizes, devices exposing PO2 zone sizes will of c=
+ourse be supported, and probably preferred for the use-cases that make sense=
+.=20
+
+As we start to post patches, I hope these points become more clear.=20=
