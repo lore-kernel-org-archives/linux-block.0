@@ -2,150 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CAE0AC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 08:11:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FCFBC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 08:30:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229850AbiCCIMa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 03:12:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55672 "EHLO
+        id S231337AbiCCIbV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 03:31:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbiCCIMa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 03:12:30 -0500
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7108C170D4B
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 00:11:45 -0800 (PST)
-Received: by mail-ej1-x62c.google.com with SMTP id r13so8912881ejd.5
-        for <linux-block@vger.kernel.org>; Thu, 03 Mar 2022 00:11:45 -0800 (PST)
+        with ESMTP id S230130AbiCCIbU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 03:31:20 -0500
+Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA8F171850;
+        Thu,  3 Mar 2022 00:30:35 -0800 (PST)
+Received: by mail-pg1-x542.google.com with SMTP id z4so3886069pgh.12;
+        Thu, 03 Mar 2022 00:30:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=orkRZU3EYl7nwMmKLkhe9S0vp2TZOXRxGLBEKEhgY6c=;
-        b=fM1P81UfzeKjinHaRL6xGyT1jTG2itYotri3MnueeEwo1j31+EZX92M+0BMJgasO7p
-         o/ThD1MFuaqA+KYAr7h8RlZibpBanRfGe8i2FrnXT6uHTaYj3gbN+ZoQl1edEUyldqsf
-         TJRB34qIuH1kgu9+ux/urShvoBXBCMSFKoWeEKctRqgaNxFbd4WmBvATMEdygzP494aO
-         U9M1bvowRycY8IRKTdmP1XdW4nlkkbNzGjtwzajSMZvN/00nKrf5EUPNuaLndxF71+SO
-         xNLNq00pfaNQjjK9q1YXWAXhGYS2Q3NFlEisY5xMDbosku5YQs4utofoSIh4ZT5xIS5C
-         po9w==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=uLpTC29O7sSEzWIyhD1PQNyRAs1/upRhzEEBO0P7TrY=;
+        b=R05ZV01Yp+GvJafCjJwp2DdNQL1X7N4+v2qDpWCUjxekJqjhV8nKttt+lgDdDv8VHZ
+         pTpad4a62LLA8SjB/yHHEpNTxY0U28zfBa611uCN9ihzVETreTphlyPy+ETyTE4AgOSy
+         RSp6pqcLA1mQfW+JjTEEtr3nMT+EN3gAPPB7pPpCIhAgeloFO+Vkph8Zctn11Qajj/U0
+         QUVjSv6dTXzOO7akWefQCdrhFJznQKo01Wl+2crhxprXX9zSh/gHLWP/Xe3lMKAcW1nu
+         BI3FrzUOW0QskfQ+hVH91vnr00ExY+gCD8VtMWG6RhFXS05x/6dGZMaR1NPNguf29zlo
+         qAtA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=orkRZU3EYl7nwMmKLkhe9S0vp2TZOXRxGLBEKEhgY6c=;
-        b=8Nv2rlbOJdJrlJtsFnucD/UVP/Dp2ydOP5nKljDSpLD9JBpfpg1Lm/ktISoNI53HqC
-         QNdKkqsDzgGt++WWwU0rGHWOKItgo3yOizjm3xEVJiUJTZgLTBos24t7h9JmxhMsnx06
-         aD2Xadk9mCL1/AZCLqLPJE+UFu3muPLwOQ5R5pICwZRZdXDtDoeXIh3vYMrTz0pskc1l
-         FqnH2wEbtqYg2qE+QdL438+aKh6fW1ym1eJpnd4lNPqIDeGPuIb58SvIO+2wknHHk4KZ
-         H/xjakA1XNNGhj9H7lxO5oJRD0dhTNq+UmHq2iGp4/DGTU35/fLedwgxP31vggWPbt6a
-         D8DA==
-X-Gm-Message-State: AOAM531+z5TV7eqQt/AHrRb60P2M6/dUC2Hf4e82eAs9hW3M1JFT/vse
-        xD7sA0lcE7PrutVS3FHFcEAZjFPweWKypjYV9/Qw
-X-Google-Smtp-Source: ABdhPJw1T/8R2YfsFrTrcJxyoTvP11CgwcdzaMV+GdXCHvHcJ9gE51EBqBM+Kyfb7MJ2qSZkV3n5ETbNA/1J6uzkhRY=
-X-Received: by 2002:a17:907:7fa6:b0:6d6:f925:d97 with SMTP id
- qk38-20020a1709077fa600b006d6f9250d97mr8229636ejc.374.1646295103955; Thu, 03
- Mar 2022 00:11:43 -0800 (PST)
-MIME-Version: 1.0
-References: <20220228065720.100-1-xieyongji@bytedance.com> <20220301104039-mutt-send-email-mst@kernel.org>
- <CACycT3uGFUjmuESUi9=Kkeg4FboVifAHD0D0gPTkEprcTP=x+g@mail.gmail.com>
- <20220302081017-mutt-send-email-mst@kernel.org> <8fa47a28-a974-4478-23b6-aea14355a315@nvidia.com>
- <CACycT3ubdASWTW3UN4Wxg2iYnXRaMkrfHty0p6h1E0EYPF82Yw@mail.gmail.com> <20220303021637-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20220303021637-mutt-send-email-mst@kernel.org>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Thu, 3 Mar 2022 16:11:33 +0800
-Message-ID: <CACycT3sZ506becSGjJZQgoFJUsgVRDPo-+tJrSuEEDHCEjUr5A@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=uLpTC29O7sSEzWIyhD1PQNyRAs1/upRhzEEBO0P7TrY=;
+        b=tX4Lvnprkbl55JgpIMGPwUYB3zl4weKQtUQYSCGebicA19Oo2euseaSt/seHhHgl0U
+         WGEXF4Yq70OpGaJzdrRUdewFnJPKwyRe2hcmhELKOAaCQScpZMjVomIJ7EFgGxvhYEp3
+         9HxQe4UlZmMPk4ZhvlJqwjvYVIunkaPltt23SQUu1FRGohEGvel7sT8VStEWsaxjfs5X
+         viiLJUsV/Poav7kbPBu/1Hl2pXtDu+ktsOyqWkyiZbpO4/DOhJ/qeHIG5UgkeNYfEpB/
+         i4SSxCqaL5X+skhojHCTmrD6wVTzE//JfLQc8R7q5KqW7Pfmirm/ksaw2x6Yi8IQw3cR
+         RW+Q==
+X-Gm-Message-State: AOAM533yIcrXrWD0e+qg8tCGwICNQuG2ezuK76KXrTeyZwEDIAawJ7rL
+        tJd6y95jIfu3iOx5y5a6kN0=
+X-Google-Smtp-Source: ABdhPJxl3tqNmXwEb6Rf4RyrJiQAiYb1f64m7AmzgvvLqhkGp3dQvJbj8a24YWybBg5gGNAc3KtcpA==
+X-Received: by 2002:a63:8bca:0:b0:370:2717:3756 with SMTP id j193-20020a638bca000000b0037027173756mr29011952pge.604.1646296234811;
+        Thu, 03 Mar 2022 00:30:34 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id d5-20020a17090acd0500b001b9c05b075dsm7342532pju.44.2022.03.03.00.30.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 00:30:34 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     jakobkoschel@gmail.com
+Cc:     David.Laight@ACULAB.COM, akpm@linux-foundation.org,
+        alsa-devel@alsa-project.org, amd-gfx@lists.freedesktop.org,
+        andriy.shevchenko@linux.intel.com, arnd@arndb.de,
+        bcm-kernel-feedback-list@broadcom.com, bjohannesmeyer@gmail.com,
+        c.giuffrida@vu.nl, christian.koenig@amd.com,
+        christophe.jaillet@wanadoo.fr, dan.carpenter@oracle.com,
+        dmaengine@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dri-devel@lists.freedesktop.org, gustavo@embeddedor.com,
+        h.j.bos@vu.nl, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, jgg@ziepe.ca,
+        keescook@chromium.org, kgdb-bugreport@lists.sourceforge.net,
+        kvm@vger.kernel.org, linux-arch@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 16:30:07 +0800
+Message-Id: <20220303083007.11640-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <A568BD90-FE81-4740-B1D3-C795EB636A5A@gmail.com>
+References: <A568BD90-FE81-4740-B1D3-C795EB636A5A@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 3, 2022 at 3:22 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> I think this would make sense, it would mean you only assign the containing
+> element on valid elements.
 >
-> On Thu, Mar 03, 2022 at 11:31:35AM +0800, Yongji Xie wrote:
-> > On Wed, Mar 2, 2022 at 11:05 PM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> > >
-> > >
-> > > On 3/2/2022 3:15 PM, Michael S. Tsirkin wrote:
-> > > > On Wed, Mar 02, 2022 at 06:46:03PM +0800, Yongji Xie wrote:
-> > > >> On Tue, Mar 1, 2022 at 11:43 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >>> On Mon, Feb 28, 2022 at 02:57:20PM +0800, Xie Yongji wrote:
-> > > >>>> Currently we have a BUG_ON() to make sure the number of sg
-> > > >>>> list does not exceed queue_max_segments() in virtio_queue_rq().
-> > > >>>> However, the block layer uses queue_max_discard_segments()
-> > > >>>> instead of queue_max_segments() to limit the sg list for
-> > > >>>> discard requests. So the BUG_ON() might be triggered if
-> > > >>>> virtio-blk device reports a larger value for max discard
-> > > >>>> segment than queue_max_segments().
-> > > >>> Hmm the spec does not say what should happen if max_discard_seg
-> > > >>> exceeds seg_max. Is this the config you have in mind? how do you
-> > > >>> create it?
-> > > >>>
-> > > >> One example: the device doesn't specify the value of max_discard_seg
-> > > >> in the config space, then the virtio-blk driver will use
-> > > >> MAX_DISCARD_SEGMENTS (256) by default. Then we're able to trigger the
-> > > >> BUG_ON() if the seg_max is less than 256.
-> > > >>
-> > > >> While the spec didn't say what should happen if max_discard_seg
-> > > >> exceeds seg_max, it also doesn't explicitly prohibit this
-> > > >> configuration. So I think we should at least not panic the kernel in
-> > > >> this case.
-> > > >>
-> > > >> Thanks,
-> > > >> Yongji
-> > > > Oh that last one sounds like a bug, I think it should be
-> > > > min(MAX_DISCARD_SEGMENTS, seg_max)
-> > > >
-> > > > When max_discard_seg and seg_max both exist, that's a different question. We can
-> > > > - do min(max_discard_seg, seg_max)
-> > > > - fail probe
-> > > > - clear the relevant feature flag
-> > > >
-> > > > I feel we need a better plan than submitting an invalid request to device.
-> > >
-> > > We should cover only for a buggy devices.
-> > >
-> > > The situation that max_discard_seg > seg_max should be fine.
-> > >
-> > > Thus the bellow can be added to this patch:
-> > >
-> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > > index c443cd64fc9b..3e372b97fe10 100644
-> > > --- a/drivers/block/virtio_blk.c
-> > > +++ b/drivers/block/virtio_blk.c
-> > > @@ -926,8 +926,8 @@ static int virtblk_probe(struct virtio_device *vdev)
-> > >                  virtio_cread(vdev, struct virtio_blk_config,
-> > > max_discard_seg,
-> > >                               &v);
-> > >                  blk_queue_max_discard_segments(q,
-> > > -                                              min_not_zero(v,
-> > > - MAX_DISCARD_SEGMENTS));
-> > > +                                              min_t(u32, (v ? v :
-> > > sg_elems),
-> > > + MAX_DISCARD_SEGMENTS));
-> > >
-> > >                  blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-> > >          }
-> > >
-> > >
-> >
-> > LGTM, I can add this in v3.
-> >
-> > Thanks,
-> > Yongji
+> I was thinking something along the lines of:
 >
-> Except the logic is convoluted then.  I would instead add
+> #define list_for_each_entry(pos, head, member)					\
+>	for (struct list_head *list = head->next, typeof(pos) pos;	\
+>	     list == head ? 0 : (( pos = list_entry(pos, list, member), 1));	\
+>	     list = list->next)
 >
->         /* max_seg == 0 is out of spec but we always handled it */
->         if (!v)
->                 v = sg_elems;
+> Although the initialization block of the for loop is not valid C, I'm
+> not sure there is any way to declare two variables of a different type
+> in the initialization part of the loop.
 
-Got it.
+It can be done using a *nested loop*, like this:
 
-Thanks,
-Yongji
+#define list_for_each_entry(pos, head, member)					\
+	for (struct list_head *list = head->next, cond = (struct list_head *)-1; cond == (struct list_head *)-1; cond = NULL) \
+	  for (typeof(pos) pos;	\
+	     list == head ? 0 : (( pos = list_entry(pos, list, member), 1));	\
+	     list = list->next)
+
+>
+> I believe all this does is get rid of the &pos->member == (head) check
+> to terminate the list.
+
+Indeed, although the original way is harmless.
+
+> It alone will not fix any of the other issues that using the iterator
+> variable after the loop currently has.
+
+Yes, but I stick with the list_for_each_entry_inside(pos, type, head, member)
+way to make the iterator invisiable outside the loop (before and after the loop).
+It is maintainable longer-term than "type(pos) pos" one and perfect.
+see my explain:
+https://lore.kernel.org/lkml/20220302093106.8402-1-xiam0nd.tong@gmail.com/
+and list_for_each_entry_inside(pos, type, head, member) patch here:
+https://lore.kernel.org/lkml/20220301075839.4156-3-xiam0nd.tong@gmail.com/
+
+--
+Xiaomeng Tong
