@@ -2,108 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7255EC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 18:20:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DF9BC433FE
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 18:36:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233019AbiCCSVj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 13:21:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52114 "EHLO
+        id S235609AbiCCShg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 13:37:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231206AbiCCSVj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 13:21:39 -0500
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F70D1A39D5
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 10:20:53 -0800 (PST)
-Received: by mail-qt1-x82b.google.com with SMTP id bc10so5350190qtb.5
-        for <linux-block@vger.kernel.org>; Thu, 03 Mar 2022 10:20:53 -0800 (PST)
+        with ESMTP id S233030AbiCCShe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 13:37:34 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7561A41CA
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 10:36:47 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id d3so9219397wrf.1
+        for <linux-block@vger.kernel.org>; Thu, 03 Mar 2022 10:36:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=dubeyko-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=lOWE+vv2CjWtv52sjslTIrPdvLmSb134lQ2+RFnBpR4=;
-        b=MhTJyU01QczY/LwLvmt7UrfJTjMWAk74YIHpljwbr+nP4WseipiqGLvr/6dRm1EEsI
-         kjy5IGnkDBvSOYouoXh0goSyxYLGU7wOhbzL5IPnrhsvI/SMOVRf5YeFuZdoBheFfCGD
-         +9Mwymg1Att9JIl/+rO5+9pvcMleOWimuUvN/i5qwPwj7AQ0yvx7GtumaqRC3eG4RDVG
-         81FYrYTEumIcSXDf9VWmt1aFD3NxP0QDCDWbctEggl7FMyqdi7wD0bb0taqpx2Q0fE/p
-         jAnJGQU58B55jYH6DBSD5NdkjdUxsfLLUAiyrfBSJGVya4sysunyhR+jVXSyucl5CN04
-         33CQ==
+        d=arrikto-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=gSsCl/XOESNqiNL4KQnFJzGeYGKZJS/OXefqIbgZZJY=;
+        b=xv4zkThkBLX7HuXqZhTfHDYEZKNHRIBCccoLghrxv746zdKoMUitS4RnI/cGuGlDPQ
+         vfANpAF7D/SOQuhdavvwEHHH47Qe4rpi+IsklXWeODKqDiVmFthh1F6OigEyCr/o27Gd
+         Zlx44ZPUSEX8vFl2XZ5eEXc5WRHRksczAMyu2nxfK4OXd4FLzkuC7Fx+PO2LKk4Sj7k2
+         lAVUF6SBc5gRRYNmWr6bFsQFcG3+ERQzr4uXhWYF+qnNkFDC0G+4pOrPugWGltcGxKei
+         uHeqxuFvKXtDxibeNqrmYwAlqmHnsFQKAUqkvIDqpRvMP9f5y/5Uw4MYYGF+P4M4GCG4
+         9b4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=lOWE+vv2CjWtv52sjslTIrPdvLmSb134lQ2+RFnBpR4=;
-        b=0cA76jzViK3TNvQGNChojwsDpR6r/cmqLtYkT4gPfsMjFb8zmX7d4LhyjhxkuvoeoF
-         D/rG9D4l1fm0F4USI58Pvd+IQ0lthoYtv9xUcqAMFnTh5ptoeMUkapbhQhpJqsZMO/Fo
-         eBQQnbRTJm8XgR2Q6wx/UrTnEi1udOZP4Q9MJE2OMWi/u0amVhnPwtjs1OnqMPAniWQP
-         QjPwky/3S868khr4C/ILgCCTmtmTXiCLDnrusSBzsDFoP5jfB54tPlZcKDTFG/TaPXy7
-         y1/oFOgu+18dyPsu11GhQO/3jK7z71k8Yx8tgsqZKMATuFfj+K3oxhaOiBfYDAlP8Bax
-         0V6g==
-X-Gm-Message-State: AOAM530LtsT2OKEqvt5cuxiV4gCG+gPbyXl6L+4EfS4mTcI7b9NQf0tt
-        BWfd1Ak4aM1P+ZlJXuCZONvq/w==
-X-Google-Smtp-Source: ABdhPJzm5iGlfQVNOahtI+69DmjFphyvsKWFCsPrYX9EScs1/xOKAbe5P0ZblV3BNmFPqXylz02wAA==
-X-Received: by 2002:ac8:5d89:0:b0:2df:f357:c681 with SMTP id d9-20020ac85d89000000b002dff357c681mr21790120qtx.475.1646331652660;
-        Thu, 03 Mar 2022 10:20:52 -0800 (PST)
-Received: from smtpclient.apple ([2600:1700:42f0:6600:189c:9f41:ca51:5672])
-        by smtp.gmail.com with ESMTPSA id b137-20020ae9eb8f000000b00648f9736ab0sm1346633qkg.124.2022.03.03.10.20.48
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 03 Mar 2022 10:20:51 -0800 (PST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-From:   Viacheslav Dubeyko <slava@dubeyko.com>
-In-Reply-To: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
-Date:   Thu, 3 Mar 2022 10:20:46 -0800
-Cc:     linux-block@vger.kernel.org,
-        Linux FS Devel <linux-fsdevel@vger.kernel.org>,
-        lsf-pc@lists.linux-foundation.org,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <Matias.Bjorling@wdc.com>,
-        =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=gSsCl/XOESNqiNL4KQnFJzGeYGKZJS/OXefqIbgZZJY=;
+        b=ivclwLxT9UQ1R2rTeXVe+My/FvChvqoi4zg/yDgAZXjmy0CQb5M/UPwNZ3ITk/yaKi
+         uakBwFH66rmrV3ApurWw6d2uU5mX8zl8dJ40v26uyXbLcuis1jjY8iVBFoJ8nDnx+uoX
+         mbTLPzce7SWhX6NwtO29VftqYiuUgv7Ks0utL1BBTAgrc6GhuwQXC50XzJJnX8GwMql3
+         txac+zfdW6+/2nxyy3eqAIQHfGBc23GZnPNRFXtQj7zXehQmuns76DIS/chssKu23SkQ
+         AdYcYYFd5lWCk+o7Ijm2ZsHj8HTelld6u0qX18/KIDR3NWbibebqTYwLce0DYqBKHfzK
+         qNNA==
+X-Gm-Message-State: AOAM532Khlqmr7pxNv5Mg9M4Ke84ezQmguY3UfsgU/JGEPh4cqtklhCd
+        BHTBotbdmnzZvqrZzJ87u3ljoA==
+X-Google-Smtp-Source: ABdhPJxWp//CMSQXMH4wlOTWsuUAaFU8DcmiZw37tn30FWgGhLmSgbx50j5GThznhd1HjqQ4Zon/5g==
+X-Received: by 2002:a5d:61cb:0:b0:1f0:2598:88ff with SMTP id q11-20020a5d61cb000000b001f0259888ffmr7318696wrv.444.1646332605416;
+        Thu, 03 Mar 2022 10:36:45 -0800 (PST)
+Received: from [172.16.10.50] (213.16.240.129.dsl.dyn.forthnet.gr. [213.16.240.129])
+        by smtp.gmail.com with ESMTPSA id x15-20020adfdd8f000000b001f0473a0a3fsm2705941wrl.14.2022.03.03.10.36.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Mar 2022 10:36:44 -0800 (PST)
+Message-ID: <0e63b59c-779c-d85b-693e-79d2924acbe0@arrikto.com>
+Date:   Thu, 3 Mar 2022 20:36:42 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>,
-        "Viacheslav A. Dubeyko" <viacheslav.dubeyko@bytedance.com>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <C4EC44EB-4869-4825-B720-455BFA3118AF@dubeyko.com>
-References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        "mpatocka@redhat.com" <mpatocka@redhat.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "kbus >> Keith Busch" <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
+ <012723a9-2e9c-c638-4944-fa560e1b0df0@arrikto.com>
+ <c4124f39-1ee9-8f34-e731-42315fee15f9@nvidia.com>
+From:   Nikos Tsironis <ntsironis@arrikto.com>
+In-Reply-To: <c4124f39-1ee9-8f34-e731-42315fee15f9@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 3/1/22 23:32, Chaitanya Kulkarni wrote:
+> Nikos,
+> 
+>>> [8] https://kernel.dk/io_uring.pdf
+>>
+>> I would like to participate in the discussion too.
+>>
+>> The dm-clone target would also benefit from copy offload, as it heavily
+>> employs dm-kcopyd. I have been exploring redesigning kcopyd in order to
+>> achieve increased IOPS in dm-clone and dm-snapshot for small copies over
+>> NVMe devices, but copy offload sounds even more promising, especially
+>> for larger copies happening in the background (as is the case with
+>> dm-clone's background hydration).
+>>
+>> Thanks,
+>> Nikos
+> 
+> If you can document your findings here it will be great for me to
+> add it to the agenda.
+> 
 
+Hi,
 
-> On Mar 2, 2022, at 4:56 PM, Luis Chamberlain <mcgrof@kernel.org> =
-wrote:
->=20
-> Thinking proactively about LSFMM, regarding just Zone storage..
->=20
-> I'd like to propose a BoF for Zoned Storage. The point of it is
-> to address the existing point points we have and take advantage of
-> having folks in the room we can likely settle on things faster which
-> otherwise would take years.
->=20
-> I'll throw at least one topic out:
->=20
->  * Raw access for zone append for microbenchmarks:
->  	- are we really happy with the status quo?
-> 	- if not what outlets do we have?
->=20
-> I think the nvme passthrogh stuff deserves it's own shared
-> discussion though and should not make it part of the BoF.
->=20
->  Luis
+Give me a few days to gather my notes, because it's been a while since
+the last time I worked on this, and I will come back with a summary of
+my findings.
 
-I am working on zone-aware file system. So, I would be really happy to =
-participate.
-
-Thanks,
-Slava.
-
+Nikos
