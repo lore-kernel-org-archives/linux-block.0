@@ -2,160 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E59DC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 07:22:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B31C43219
+	for <linux-block@archiver.kernel.org>; Thu,  3 Mar 2022 07:27:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230048AbiCCHXO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 02:23:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53350 "EHLO
+        id S230180AbiCCH2J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 02:28:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229717AbiCCHXN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 02:23:13 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50CB91C119
-        for <linux-block@vger.kernel.org>; Wed,  2 Mar 2022 23:22:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646292147;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CDFPItTCDUnDzD48ZKfCOgOAERl5mtbUoXGLlNyuCC8=;
-        b=WbDb3Y4QNXrqCeesJgyWXPmdO7kTWq+4DbPvWPnvnoo4fKnSHWIG5zAt73Gp87oFAcBcRG
-        gkv3u/FHgTH5rmARWfeQ6kGz32xXmp9RLq8V7NrbAv+dEZP6+ui6UZCylUnTcFDMLTqPGY
-        T60fF3pnoZWQPZ4tw8Wz9dsGdhKN5a0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-572-BQpZvHoHNO-6IMl5euUnww-1; Thu, 03 Mar 2022 02:22:26 -0500
-X-MC-Unique: BQpZvHoHNO-6IMl5euUnww-1
-Received: by mail-wm1-f70.google.com with SMTP id 10-20020a1c020a000000b0037fae68fcc2so2849754wmc.8
-        for <linux-block@vger.kernel.org>; Wed, 02 Mar 2022 23:22:26 -0800 (PST)
+        with ESMTP id S230182AbiCCH2I (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 02:28:08 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A109C16DAE4;
+        Wed,  2 Mar 2022 23:27:22 -0800 (PST)
+Received: by mail-pj1-x102d.google.com with SMTP id z12-20020a17090ad78c00b001bf022b69d6so2947354pju.2;
+        Wed, 02 Mar 2022 23:27:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=sgLnwuYIGskFjie2H2jjPO7yZK5PfHYTTkrYtctc5ws=;
+        b=FXSRJXcZ2cyaSSh+RFzgN891/0EsPjQQYnYlHyt7Q6au+u55Yhw9CQjtuc/Xh+IxeA
+         jmfOE8xDuyw6aNjCCweSWK23ooxkZ+FDp1vmELSXGe87/BlE9lQAJ5VCHRxCoJXheQ6e
+         z0ZjBk6ntNVuChDJjKVkipnrg4PFzEOabNhKEpFBHr+LTEWxBydNvmRMp4x1CJuZdUwr
+         yIPtetuwCR4pZCzLE6nNdjkyjeKTi+kDUarqoW7jVGs3qBeY6IJUgMC1jfObzr57dlqg
+         9D3LdaczFYPoymDULVGPmDhvRiVgHdjXQ/LS1xahv5fAEYKipZZ05ntIAVBo2UMKI5ki
+         Sw5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=CDFPItTCDUnDzD48ZKfCOgOAERl5mtbUoXGLlNyuCC8=;
-        b=TOvAdDNSimcUEAq6KyKX8dYpdkIr02anT7sEQdU6KYGF+GFA4irb7HxVIjSZCEnqk7
-         xr/x/GWfagWWDeYy5KEr+sqt0y6LID2mfvSZmmyO+JJeTqE1+7Q3s4dOeNlK/mQB3Xcg
-         BcJik9UN+P4EvgPJMZ6HO3zxH2s0eUqd7zloLvWS3F5cMI9J9jYeufl14V2pREzYc3sQ
-         3Jy2CZQZa0xIR6h3Aljzb202aKGExdr3zkLEaY1L/vyaWviBoJeBS9fGW8Sf8jGaH7M+
-         GMHOubOh2tJeizsE1tg07LpHcKiTBTzHt2ZMLTHvGh/RjoLquXYhMg/n9nWqj0co5nY4
-         Ct4w==
-X-Gm-Message-State: AOAM530sCiY7UcBbRJbSFLIXSmY8aYB0is/jYRpL7vBvNa3fnGAOaL6g
-        InZrz8NU47t3syZeC1iWaFw3H6rFyXYFXE36ozJ7o4GUWIj0JaWhf8tOT7DXL5/5ID0wVQjiIA6
-        7J4qh+n/kvGWGeNUTHOuvrR4=
-X-Received: by 2002:a5d:64af:0:b0:1ef:6070:2297 with SMTP id m15-20020a5d64af000000b001ef60702297mr21871841wrp.609.1646292145137;
-        Wed, 02 Mar 2022 23:22:25 -0800 (PST)
-X-Google-Smtp-Source: ABdhPJwDOWNrHymY+lG7AWIGKBnT14vPEi71FuUfqXiT0gn+BMNgMa2PgpV650Wbvx5TV+C1spWR5g==
-X-Received: by 2002:a5d:64af:0:b0:1ef:6070:2297 with SMTP id m15-20020a5d64af000000b001ef60702297mr21871826wrp.609.1646292144926;
-        Wed, 02 Mar 2022 23:22:24 -0800 (PST)
-Received: from redhat.com ([2.55.143.133])
-        by smtp.gmail.com with ESMTPSA id k15-20020adff5cf000000b001e4b8fde355sm1128053wrp.73.2022.03.02.23.22.23
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=sgLnwuYIGskFjie2H2jjPO7yZK5PfHYTTkrYtctc5ws=;
+        b=xfCfx0luRxF8Bwa80CSNnpCbKiODpZI2Sa+Cl8h5y0cldPiwa/Eh5RS/paMRgGuSOb
+         N8zgVlDngJOZxefa38Qnyq2+CoqSjIA+wm0YERAvVhwVj0DW19VALk4XkCknGQRIHnjb
+         uXTUo0oKlDPCz589lQWCuBYMtu04UMvalo5pGvyI9GcWg/+r2r3ddBXtWiOGhB34aaSi
+         sg6gpJpBk9oKwhQ141ewJoUyzaczBR/5PAs28gQ2SMgdhDxCRQg9skbsTZstNY4xW/Ul
+         oTllXgcLLHqfQOmvwF4GjWcmUjwoRJGfR0m6iOCQTRxrUP/tVOKQetGTcy/F2kU0QKGP
+         HlsA==
+X-Gm-Message-State: AOAM533ngPpNPjEMDo+OdX7PXb4FAjkVbynWfciAFRwlrJbdUIewMqjM
+        /igPBGeaVoTOB0ygoO/aqHo=
+X-Google-Smtp-Source: ABdhPJxXZq8uo59Ohm7FMpyCTbKfTT1earKguyYxXh9VkI02LjxK1/LHoatHqlibGa3Ordge+YwobQ==
+X-Received: by 2002:a17:902:9687:b0:151:7b31:9a57 with SMTP id n7-20020a170902968700b001517b319a57mr13723244plp.146.1646292442145;
+        Wed, 02 Mar 2022 23:27:22 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id nu18-20020a17090b1b1200b001bbef4d9049sm1302089pjb.23.2022.03.02.23.27.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Mar 2022 23:22:24 -0800 (PST)
-Date:   Thu, 3 Mar 2022 02:22:21 -0500
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Yongji Xie <xieyongji@bytedance.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
-        Jason Wang <jasowang@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@infradead.org>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
-Message-ID: <20220303021637-mutt-send-email-mst@kernel.org>
-References: <20220228065720.100-1-xieyongji@bytedance.com>
- <20220301104039-mutt-send-email-mst@kernel.org>
- <CACycT3uGFUjmuESUi9=Kkeg4FboVifAHD0D0gPTkEprcTP=x+g@mail.gmail.com>
- <20220302081017-mutt-send-email-mst@kernel.org>
- <8fa47a28-a974-4478-23b6-aea14355a315@nvidia.com>
- <CACycT3ubdASWTW3UN4Wxg2iYnXRaMkrfHty0p6h1E0EYPF82Yw@mail.gmail.com>
+        Wed, 02 Mar 2022 23:27:21 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     david.laight@aculab.com
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, dmaengine@vger.kernel.org,
+        drbd-dev@lists.linbit.com, dri-devel@lists.freedesktop.org,
+        gustavo@embeddedor.com, h.j.bos@vu.nl,
+        intel-gfx@lists.freedesktop.org, intel-wired-lan@lists.osuosl.org,
+        jakobkoschel@gmail.com, jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: RE: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Thu,  3 Mar 2022 15:26:57 +0800
+Message-Id: <20220303072657.11124-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <39404befad5b44b385698ff65465abe5@AcuMS.aculab.com>
+References: <39404befad5b44b385698ff65465abe5@AcuMS.aculab.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CACycT3ubdASWTW3UN4Wxg2iYnXRaMkrfHty0p6h1E0EYPF82Yw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 11:31:35AM +0800, Yongji Xie wrote:
-> On Wed, Mar 2, 2022 at 11:05 PM Max Gurtovoy <mgurtovoy@nvidia.com> wrote:
-> >
-> >
-> > On 3/2/2022 3:15 PM, Michael S. Tsirkin wrote:
-> > > On Wed, Mar 02, 2022 at 06:46:03PM +0800, Yongji Xie wrote:
-> > >> On Tue, Mar 1, 2022 at 11:43 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > >>> On Mon, Feb 28, 2022 at 02:57:20PM +0800, Xie Yongji wrote:
-> > >>>> Currently we have a BUG_ON() to make sure the number of sg
-> > >>>> list does not exceed queue_max_segments() in virtio_queue_rq().
-> > >>>> However, the block layer uses queue_max_discard_segments()
-> > >>>> instead of queue_max_segments() to limit the sg list for
-> > >>>> discard requests. So the BUG_ON() might be triggered if
-> > >>>> virtio-blk device reports a larger value for max discard
-> > >>>> segment than queue_max_segments().
-> > >>> Hmm the spec does not say what should happen if max_discard_seg
-> > >>> exceeds seg_max. Is this the config you have in mind? how do you
-> > >>> create it?
-> > >>>
-> > >> One example: the device doesn't specify the value of max_discard_seg
-> > >> in the config space, then the virtio-blk driver will use
-> > >> MAX_DISCARD_SEGMENTS (256) by default. Then we're able to trigger the
-> > >> BUG_ON() if the seg_max is less than 256.
-> > >>
-> > >> While the spec didn't say what should happen if max_discard_seg
-> > >> exceeds seg_max, it also doesn't explicitly prohibit this
-> > >> configuration. So I think we should at least not panic the kernel in
-> > >> this case.
-> > >>
-> > >> Thanks,
-> > >> Yongji
-> > > Oh that last one sounds like a bug, I think it should be
-> > > min(MAX_DISCARD_SEGMENTS, seg_max)
-> > >
-> > > When max_discard_seg and seg_max both exist, that's a different question. We can
-> > > - do min(max_discard_seg, seg_max)
-> > > - fail probe
-> > > - clear the relevant feature flag
-> > >
-> > > I feel we need a better plan than submitting an invalid request to device.
-> >
-> > We should cover only for a buggy devices.
-> >
-> > The situation that max_discard_seg > seg_max should be fine.
-> >
-> > Thus the bellow can be added to this patch:
-> >
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index c443cd64fc9b..3e372b97fe10 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -926,8 +926,8 @@ static int virtblk_probe(struct virtio_device *vdev)
-> >                  virtio_cread(vdev, struct virtio_blk_config,
-> > max_discard_seg,
-> >                               &v);
-> >                  blk_queue_max_discard_segments(q,
-> > -                                              min_not_zero(v,
-> > - MAX_DISCARD_SEGMENTS));
-> > +                                              min_t(u32, (v ? v :
-> > sg_elems),
-> > + MAX_DISCARD_SEGMENTS));
-> >
-> >                  blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-> >          }
-> >
-> >
-> 
-> LGTM, I can add this in v3.
-> 
-> Thanks,
-> Yongji
+On Thu, 3 Mar 2022 04:58:23 +0000, David Laight wrote:
+> on 3 Mar 2022 10:27:29 +0800, Xiaomeng Tong wrote:
+> > The problem is the mis-use of iterator outside the loop on exit, and
+> > the iterator will be the HEAD's container_of pointer which pointers
+> > to a type-confused struct. Sidenote: The *mis-use* here refers to
+> > mistakely access to other members of the struct, instead of the
+> > list_head member which acutally is the valid HEAD.
+>
+> The problem is that the HEAD's container_of pointer should never
+> be calculated at all.
+> This is what is fundamentally broken about the current definition.
 
-Except the logic is convoluted then.  I would instead add
+Yes, the rule is "the HEAD's container_of pointer should never be
+calculated at all outside the loop", but how do you make sure everyone
+follows this rule?
+Everyone makes mistakes, but we can eliminate them all from the beginning
+with the help of compiler which can catch such use-after-loop things.
 
-	/* max_seg == 0 is out of spec but we always handled it */
-	if (!v)
-		v = sg_elems;
+> > IOW, you would dereference a (NULL + offset_of_member) address here.
+>
+>Where?
 
+In the case where a developer do not follows the above rule, and mistakely
+access a non-list-head member of the HEAD's container_of pointer outside
+the loop. For example:
+    struct req{
+      int a;
+      struct list_head h;
+    }
+    struct req *r;
+    list_for_each_entry(r, HEAD, h) {
+      if (r->a == 0x10)
+        break;
+    }
+    // the developer made a mistake: he didn't take this situation into
+    // account where all entries in the list are *r->a != 0x10*, and now
+    // the r is the HEAD's container_of pointer. 
+    r->a = 0x20;
+Thus the "r->a = 0x20" would dereference a (NULL + offset_of_member)
+address here.
 
--- 
-MST
+> > Please remind me if i missed something, thanks.
+> >
+> > Can you share your "alternative definitions" details? thanks!
+>
+> The loop should probably use as extra variable that points
+> to the 'list node' in the next structure.
+> Something like:
+> 	for (xxx *iter = head->next;
+> 		iter == &head ? ((item = NULL),0) : ((item = list_item(iter),1));
+> 		iter = item->member->next) {
+> 	   ...
+> With a bit of casting you can use 'item' to hold 'iter'.
 
+you still can not make sure everyone follows this rule: 
+"do not use iterator outside the loop" without the help of compiler,
+because item is declared outside the loop.
+
+BTW, to avoid ambiguity，the "alternative definitions" here i asked is
+something from you in this context:
+"OTOH there may be alternative definitions that can be used to get
+the compiler (or other compiler-like tools) to detect broken code.
+Even if the definition can't possibly generate a working kerrnel."
+
+> > 
+> > > OTOH there may be alternative definitions that can be used to get
+> > > the compiler (or other compiler-like tools) to detect broken code.
+> > > Even if the definition can't possibly generate a working kerrnel.
+> > 
+> > The "list_for_each_entry_inside(pos, type, head, member)" way makes
+> > the iterator invisiable outside the loop, and would be catched by
+> > compiler if use-after-loop things happened.
+
+> It is also a compete PITA for anything doing a search.
+
+You mean it would be a burden on search? can you show me some examples?
+
+Or you mean it is too long the list_for_each_entry_inside* string to live
+in one single line, and should spilt into two line? If it is the case, there
+are 2 way to mitigate it.
+1. pass a shorter t as struct type to the macro
+2. after all list_for_each_entry macros be replaced with
+list_for_each_entry_inside, remove the list_for_each_entry implementations
+and rename all list_for_each_entry_inside use back to the origin
+list_for_each_entry in a single patch.
+
+For me, it is acceptable and not a such big problem.
+
+--
+Xiaomeng Tong
