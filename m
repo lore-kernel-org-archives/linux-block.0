@@ -2,73 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C899BC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 15:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FE32C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 16:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232871AbiCDPji (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 10:39:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47660 "EHLO
+        id S235675AbiCDQEf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 11:04:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47492 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232483AbiCDPji (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 10:39:38 -0500
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11B6E47065;
-        Fri,  4 Mar 2022 07:38:49 -0800 (PST)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id C76D921124;
-        Fri,  4 Mar 2022 15:38:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1646408327; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fQnxl0eqs4bZW5zPw9qVTxkPmfJfmM4RO01wXd5QUQQ=;
-        b=EF2IE8a9r/nl6g8fM+ZC95CZCxjVmOxMilo6b1d/slFk5tHxyhxh5aM7OgeRJy4o8I82la
-        punlcJSNBD4zqXIj5f/6A47Rx0cNzuZEDztXtQmzJguqISeENc8yZVXa9IxRRuUa5G4gV8
-        QhNX08P/btaAwJfi7FvptAYUa+GpCfY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1646408327;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=fQnxl0eqs4bZW5zPw9qVTxkPmfJfmM4RO01wXd5QUQQ=;
-        b=/IUqc6BhQy0N2yctMiiIV7VHLvt7EftsqxKvWCPSBWMDQdv1vETb6L5/e2BpzV/bj5h9SA
-        QtdtgWvhudTSh3Bg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B8C3B13B64;
-        Fri,  4 Mar 2022 15:38:47 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id JOwDLYcyImLCMwAAMHmgww
-        (envelope-from <dwagner@suse.de>); Fri, 04 Mar 2022 15:38:47 +0000
-Date:   Fri, 4 Mar 2022 16:38:47 +0100
-From:   Daniel Wagner <dwagner@suse.de>
+        with ESMTP id S230108AbiCDQEe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 11:04:34 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61A013D90F;
+        Fri,  4 Mar 2022 08:03:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=lA+6ePXKiQ9floEuIP5ejvrnMT+UHuJ0JLlo/pBvA4I=; b=gnnEDakvzDp7H1xOPMA/na6RFx
+        0eHNYmjS+RLvVGki0i/Mre0qAqmHkwQ+ExKEhp4+MA0pA6OOc1zrIoAAMXyOnl5nRtXVbpYKr/Oqr
+        1u/fjLmzn1fl3zf2EWIM5z1A3E30CVb/be9FMAIKEmId+8EwIkOwq8ILMYFAt9k0OSCWhjKryzF+u
+        oe2lifJBr7uOAEJ85Vq9NqNmi23Ce3cKrSlDDhEy4eyeEkaSjFQ4N3JRrBMDXARSqurVjRukdEwd/
+        GbvO/GSxYrN8xc0WhUoRn5PIJ0dJUtXIKnEoWHG347XJFHVfe/hzIQpUnFmSsmsdJvoQaxhcGMMMz
+        V9kOMZcA==;
+Received: from [2001:4bb8:180:5296:7360:567:acd5:aaa2] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nQAOz-00Atyj-QQ; Fri, 04 Mar 2022 16:03:34 +0000
+From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH 1/2] block: remove commented out code from diskstats_show
-Message-ID: <20220304153847.bannj7cgo4z7vonl@carbon.lan>
-References: <20220120105248.117025-1-dwagner@suse.de>
- <20220120105248.117025-2-dwagner@suse.de>
- <83b281e5-16c2-d659-172d-3a2c911c7ff0@suse.de>
+Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Ming Lei <ming.lei@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: move more work to disk_release v3
+Date:   Fri,  4 Mar 2022 17:03:17 +0100
+Message-Id: <20220304160331.399757-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <83b281e5-16c2-d659-172d-3a2c911c7ff0@suse.de>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jan 20, 2022 at 12:02:49PM +0100, Hannes Reinecke wrote:
-> On 1/20/22 11:52 AM, Daniel Wagner wrote:
-> > The diskstats format is ABI, so we just can't add a new header. The
-> > code snippet has been commented out since at least v2.6.12-rc2.
-> > Remove it.
-> > > Reviewed-by: Hannes Reinecke <hare@suse.de>
+Hi all,
 
-Any change to queue this patch up?
+this series resurrects and forward ports ports larger parts of the
+"block: don't drain file system I/O on del_gendisk" series from Ming,
+but does not remove the draining in del_gendisk, but instead the one
+in the sd driver, which always was a bit ad-hoc.  As part of that sd
+and sr are switched to use the new ->free_disk method to avoid having
+to clear disk->private_data and the way to lookup the SCSI ULP is
+cleaned up as well.
+
+Git branch:
+
+    git://git.infradead.org/users/hch/block.git freeze-5.18
+
+Gitweb:
+
+    http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/freeze-5.18
+
+Changes since v2:
+ - handle the weird dm-multipath flush sequence corner case when
+   assinging rq->part
+
+Changes since v1:
+ - fix a refcounting bug in sd
+ - rename a function
+
+Diffstat:
+ block/blk-core.c           |    7 --
+ block/blk-mq.c             |   10 +--
+ block/blk-sysfs.c          |   25 --------
+ block/blk.h                |    2 
+ block/elevator.c           |    7 +-
+ block/genhd.c              |   38 ++++++++++++-
+ drivers/scsi/sd.c          |  114 +++++++++------------------------------
+ drivers/scsi/sd.h          |   13 +++-
+ drivers/scsi/sr.c          |  129 +++++++++------------------------------------
+ drivers/scsi/sr.h          |    5 -
+ drivers/scsi/st.c          |    1 
+ drivers/scsi/st.h          |    1 
+ include/scsi/scsi_cmnd.h   |    9 ---
+ include/scsi/scsi_driver.h |    9 ++-
+ 14 files changed, 117 insertions(+), 253 deletions(-)
