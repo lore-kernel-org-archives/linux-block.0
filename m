@@ -2,91 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29CDAC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 00:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1EFC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 00:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237425AbiCDAnx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 19:43:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38260 "EHLO
+        id S231145AbiCDAyr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 19:54:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232508AbiCDAnv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 19:43:51 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F0A849922
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 16:43:01 -0800 (PST)
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.52 with ESMTP; 4 Mar 2022 09:42:59 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.126 with ESMTP; 4 Mar 2022 09:42:59 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Fri, 4 Mar 2022 09:42:37 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        torvalds@linux-foundation.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <20220304004237.GB6112@X58A-UD3R>
-References: <YiAow5gi21zwUT54@mit.edu>
- <1646285013-3934-1-git-send-email-byungchul.park@lge.com>
- <YiDSabde88HJ/aTt@mit.edu>
+        with ESMTP id S229918AbiCDAyq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 19:54:46 -0500
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0699A13DE21;
+        Thu,  3 Mar 2022 16:54:00 -0800 (PST)
+Received: by mail-pf1-f170.google.com with SMTP id s11so6180638pfu.13;
+        Thu, 03 Mar 2022 16:54:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=YJwEZHpBOkrX91NRDhiBnL9TsivdhXedQE1MEXdFkGk=;
+        b=KLqrmsV0QMDFisEQB581pHpZA0EGa9UiO3CkbzHNOLMFnxj91kwkuw2WUOmut/cUHN
+         nsbxWH+4ijCJTsCaBks4mFTZsPmVVsrPGEbnSfFFiR7JcRGFrYFYOruemTxwDZnCH7fJ
+         zQtxl6g4+Rms0YodOQpQEXORNmg/g7Y1LWOGKH1+ZHo6mLNnNkzu2mxcCIBgZusZwVOx
+         o0iVQmtj+HW8pPuljIBUiM+rD1OoJhZpUalYj15k7VwZWmAYOdbaRO7Ry2viyIDvD0vt
+         VFB+SUc366GmdWzOLE4z897D9QcCR3/XeMJkQS8RIoQWuq76qlMsF5Od8Em1cvPuOK3z
+         0ksg==
+X-Gm-Message-State: AOAM530u1mkxOBZNGjel/zsl7R0We785t3M94/vqJ5SMjwrSlu+RgvFe
+        Py1zLpHO+BS4SzjtAysxZaw=
+X-Google-Smtp-Source: ABdhPJwrunTYNLwCSAFqvfBGbiuz/Fhz9cSPhSzz+gpBillc7qLhh3XO4rOBM76VfXVVCsK+o8PRkg==
+X-Received: by 2002:aa7:970e:0:b0:4f6:6c73:24c3 with SMTP id a14-20020aa7970e000000b004f66c7324c3mr6208291pfg.32.1646355239206;
+        Thu, 03 Mar 2022 16:53:59 -0800 (PST)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id s2-20020a056a001c4200b004f41e1196fasm3699345pfw.17.2022.03.03.16.53.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 03 Mar 2022 16:53:58 -0800 (PST)
+Message-ID: <ac499ff9-eeb4-4f25-bb59-3f37477190ed@acm.org>
+Date:   Thu, 3 Mar 2022 16:53:56 -0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YiDSabde88HJ/aTt@mit.edu>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH v5 1/3] block: add basic hardware-wrapped key support
+Content-Language: en-US
+To:     Eric Biggers <ebiggers@kernel.org>, linux-block@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org
+Cc:     linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
+        kernel-team@android.com,
+        Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+        Israel Rukshin <israelr@nvidia.com>
+References: <20220228070520.74082-1-ebiggers@kernel.org>
+ <20220228070520.74082-2-ebiggers@kernel.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220228070520.74082-2-ebiggers@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 09:36:25AM -0500, Theodore Ts'o wrote:
-> On Thu, Mar 03, 2022 at 02:23:33PM +0900, Byungchul Park wrote:
-> > I totally agree with you. *They aren't really locks but it's just waits
-> > and wakeups.* That's exactly why I decided to develop Dept. Dept is not
-> > interested in locks unlike Lockdep, but fouces on waits and wakeup
-> > sources itself. I think you get Dept wrong a lot. Please ask me more if
-> > you have things you doubt about Dept.
-> 
-> So the question is this --- do you now understand why, even though
-> there is a circular dependency, nothing gets stalled in the
-> interactions between the two wait channels?
+On 2/27/22 23:05, Eric Biggers wrote:
+> -static u8 blank_key[BLK_CRYPTO_MAX_KEY_SIZE];
+> +static u8 blank_key[BLK_CRYPTO_MAX_STANDARD_KEY_SIZE];
+>   
+>   static void blk_crypto_fallback_evict_keyslot(unsigned int slot)
+>   {
+> @@ -539,7 +539,7 @@ static int blk_crypto_fallback_init(void)
+>   	if (blk_crypto_fallback_inited)
+>   		return 0;
+>   
+> -	prandom_bytes(blank_key, BLK_CRYPTO_MAX_KEY_SIZE);
+> +	prandom_bytes(blank_key, BLK_CRYPTO_MAX_STANDARD_KEY_SIZE);
 
-??? I'm afraid I don't get you.
+Please use sizeof(blank_key) to make it easier for readers to verify that the 
+length argument is correct.
 
-All contexts waiting for any of the events in the circular dependency
-chain will be definitely stuck if there is a circular dependency as I
-explained. So we need another wakeup source to break the circle. In
-ext4 code, you might have the wakeup source for breaking the circle.
+> +int blk_crypto_derive_sw_secret(struct blk_crypto_profile *profile,
+> +				const u8 *wrapped_key,
+> +				unsigned int wrapped_key_size,
+> +				u8 sw_secret[BLK_CRYPTO_SW_SECRET_SIZE])
+> +{
+> +	int err = -EOPNOTSUPP;
+> +
+> +	if (profile &&
+> +	    (profile->key_types_supported & BLK_CRYPTO_KEY_TYPE_HW_WRAPPED) &&
+> +	    profile->ll_ops.derive_sw_secret) {
+> +		blk_crypto_hw_enter(profile);
+> +		err = profile->ll_ops.derive_sw_secret(profile, wrapped_key,
+> +						       wrapped_key_size,
+> +						       sw_secret);
+> +		blk_crypto_hw_exit(profile);
+> +	}
+> +	return err;
+> +}
 
-What I agreed with is:
+Please use the common kernel style: return early if the preconditions have not 
+been met. That helps to keep the indentation level low.
 
-   The case that 1) the circular dependency is unevitable 2) there are
-   another wakeup source for breadking the circle and 3) the duration
-   in sleep is short enough, should be acceptable.
+> @@ -68,7 +71,10 @@ static int __init bio_crypt_ctx_init(void)
+>   
+>   	/* Sanity check that no algorithm exceeds the defined limits. */
+>   	for (i = 0; i < BLK_ENCRYPTION_MODE_MAX; i++) {
+> -		BUG_ON(blk_crypto_modes[i].keysize > BLK_CRYPTO_MAX_KEY_SIZE);
+> +		BUG_ON(blk_crypto_modes[i].keysize >
+> +		       BLK_CRYPTO_MAX_STANDARD_KEY_SIZE);
+> +		BUG_ON(blk_crypto_modes[i].security_strength >
+> +		       blk_crypto_modes[i].keysize);
+>   		BUG_ON(blk_crypto_modes[i].ivsize > BLK_CRYPTO_MAX_IV_SIZE);
+>   	}
 
-Sounds good?
+Does the following advice from Linus Torvalds apply to the above code: "because 
+there is NO EXCUSE to knowingly kill the kernel"? See also 
+https://lkml.org/lkml/2016/10/4/1.
 
 Thanks,
-Byungchul
+
+Bart.
