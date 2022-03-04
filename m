@@ -2,69 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6141AC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 02:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4260BC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 03:05:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234026AbiCDC46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 21:56:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48782 "EHLO
+        id S237799AbiCDDGC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 22:06:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231992AbiCDC46 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 21:56:58 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2B76FE43B;
-        Thu,  3 Mar 2022 18:56:10 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 5A85AB8273F;
-        Fri,  4 Mar 2022 02:56:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 559DEC004E1;
-        Fri,  4 Mar 2022 02:56:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646362568;
-        bh=zIsF6583ND1nmCG72k5Y+Sn5CLZX1lUZlZX0tJyDatc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Cr5ZaYYFzKVvur8uNdE7MgBal6PbAnnUTyPlnpGIPRqzQxTrvzCP/zGtjQw87+IDf
-         UE5A6OWqSsv//soVosJ0tZrr00ttX0sOuaM9awpPeKOuHpMcHDT26ISfsQFrqLbOCx
-         /I7xLNmSpN5yFfYkgwiDTraf43xhwyH6BeKiZYavROadP89ffJtfMFJ+Qd6z9Lf4tM
-         dbpLKf0IFb9eJb5VMRTIQul7xTIrY7xaE3dKT55sY0pc9BxU1FGySw96m1/58lIa9u
-         kTcA8n6MpW6rZEId6D7dYAJF2sAghENNuH4k4IdOZi2xDdsDSNorGpqX7CW9NH4PSh
-         lZf//Hsl/BxNw==
-Date:   Thu, 3 Mar 2022 18:56:05 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     David Laight <David.Laight@aculab.com>
-Cc:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Arnd Bergmann <arnd@arndb.de>
-Subject: Re: [PATCHv4 3/8] asm-generic: introduce be48 unaligned accessors
-Message-ID: <20220304025605.GB2824821@dhcp-10-100-145-180.wdc.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-4-kbusch@kernel.org>
- <2d8895d24fff46738f98c2dae74fa440@AcuMS.aculab.com>
+        with ESMTP id S232147AbiCDDGC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 22:06:02 -0500
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD422B242;
+        Thu,  3 Mar 2022 19:05:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646363115; x=1677899115;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NGtX8x+qRt4S4GlNdmZaoqv+f3P3AFsYWBvI67NNPak=;
+  b=GpaAOreTY4fMHkJPX9LwW12dUhJbnVxcDg7SSGbilNxtuDXSP7jTNgZ2
+   fI0I2AznkoA4+0E5gfPNYhkw+jtjDF08bVQKpJO2D9XpMn2jZRWFjulcu
+   5O702xe0zvOtfL+vlOCjbxzwIC5cWO+UA//eXAk2Guyt7LCWS039YAq5K
+   xL8qR6S7l/qHkSnPy7JBMm6i0Cn6X+K6/zsFlTGBa//se0mgVGIrql4Nt
+   +BEnKtR02afR8Faw19iuQAsQK0JaWvDZLHuCQjGjtmHKpqaH6nCCJTAJG
+   +gF0CdZVO1t76YIDbckQAyJ9Y8Yfo4+I23/vg2EtuMyLN3c1Isal9Zv+8
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="241302580"
+X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
+   d="scan'208";a="241302580"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 19:05:14 -0800
+X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
+   d="scan'208";a="576746893"
+Received: from harikara-mobl.amr.corp.intel.com (HELO localhost) ([10.212.33.238])
+  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 19:05:13 -0800
+Date:   Thu, 3 Mar 2022 19:05:13 -0800
+From:   Ira Weiny <ira.weiny@intel.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Chris Zankel <chris@zankel.net>,
+        Max Filippov <jcmvbkbc@gmail.com>,
+        Justin Sanders <justin@coraid.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Denis Efremov <efremov@linux.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
+        nvdimm@lists.linux.dev
+Subject: Re: [PATCH 06/10] nvdimm-btt: use bvec_kmap_local in btt_rw_integrity
+Message-ID: <YiGB6bQGr4Yq6vpn@iweiny-desk3>
+References: <20220303111905.321089-1-hch@lst.de>
+ <20220303111905.321089-7-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2d8895d24fff46738f98c2dae74fa440@AcuMS.aculab.com>
+In-Reply-To: <20220303111905.321089-7-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 01:31:26AM +0000, David Laight wrote:
-> From: Keith Busch
-> > Sent: 03 March 2022 20:13
-> > 
-> > The NVMe protocol extended the data integrity fields with unaligned
-> > 48-bit reference tags.
+On Thu, Mar 03, 2022 at 02:19:01PM +0300, Christoph Hellwig wrote:
+> Using local kmaps slightly reduces the chances to stray writes, and
+> the bvec interface cleans up the code a little bit.
 > 
-> If they are reference tags, are they only interpreted by the
-> sending system?
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-No, this field participates in end-to-end data protection formats, so is
-verified on both sides.
+Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+
+> ---
+>  drivers/nvdimm/btt.c | 10 ++++------
+>  1 file changed, 4 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/nvdimm/btt.c b/drivers/nvdimm/btt.c
+> index cbd994f7f1fe6..9613e54c7a675 100644
+> --- a/drivers/nvdimm/btt.c
+> +++ b/drivers/nvdimm/btt.c
+> @@ -1163,17 +1163,15 @@ static int btt_rw_integrity(struct btt *btt, struct bio_integrity_payload *bip,
+>  		 */
+>  
+>  		cur_len = min(len, bv.bv_len);
+> -		mem = kmap_atomic(bv.bv_page);
+> +		mem = bvec_kmap_local(&bv);
+>  		if (rw)
+> -			ret = arena_write_bytes(arena, meta_nsoff,
+> -					mem + bv.bv_offset, cur_len,
+> +			ret = arena_write_bytes(arena, meta_nsoff, mem, cur_len,
+>  					NVDIMM_IO_ATOMIC);
+>  		else
+> -			ret = arena_read_bytes(arena, meta_nsoff,
+> -					mem + bv.bv_offset, cur_len,
+> +			ret = arena_read_bytes(arena, meta_nsoff, mem, cur_len,
+>  					NVDIMM_IO_ATOMIC);
+>  
+> -		kunmap_atomic(mem);
+> +		kunmap_local(mem);
+>  		if (ret)
+>  			return ret;
+>  
+> -- 
+> 2.30.2
+> 
