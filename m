@@ -2,99 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A4ADC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 06:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98195C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:00:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237478AbiCDGBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 01:01:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56982 "EHLO
+        id S238598AbiCDHBN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 02:01:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237373AbiCDGBM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 01:01:12 -0500
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BDBE180D03
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 22:00:22 -0800 (PST)
-Received: by mail-il1-f199.google.com with SMTP id 11-20020a056e0220cb00b002c299cb036cso4931767ilq.3
-        for <linux-block@vger.kernel.org>; Thu, 03 Mar 2022 22:00:22 -0800 (PST)
+        with ESMTP id S238446AbiCDHBM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:01:12 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8AF318E3DF;
+        Thu,  3 Mar 2022 23:00:21 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id t187so2483135pgb.1;
+        Thu, 03 Mar 2022 23:00:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=0a+oQu3LYTAbOOyoILb+F/zkApGIum0yjd+xPCLEHo4=;
+        b=UcHSzcmMAevEFsqxc8gimvoSIew96LrW3UYvjfgkcaeLb/Edql9668oTELTgMdhcyh
+         uwTLYgNgPfuwuQfZCbkLtuIX59UkP2xXrD0mK6eOfNdOu/KSihdjQUFHL7gwAFzgpb4Z
+         PeSQfhLMwS3uLkuXfSSL1QQyblGTA4kTyWBkcty1viz6EkWmIbbGn99xu95lY6jAsJ0c
+         CbisDo/RPFGn8gAJnKluj00ht4OQ80XaXmCEvGalnXTnvAWrV5UWFfWh6kgUBnLZJvSQ
+         W0PYU136vUwP4grvjJEIhDxHc0WM1lPQ2cysIXPjh+breTQ07tU9AM0RgZ3Jr4UsSFjT
+         NaGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=TFMJ4ukGQs86fCBCLXSygly6TsLRzd9XxdIZL+vlrCk=;
-        b=yld8/C8z+xAke02jZgaGunKSKP0JJjOgps+XESB3BKPz8TJuEv84Mlc3OCJRzFmW+W
-         iDzzsP1hhNNgehp0o4pejPqiPRum6RRaaLzmEoLpaxbaeMtn6dx2/dP/Fz5gamXf6p7l
-         G/zNlgkv/rDg2XhhqNg2y+HPKQ7ZcQrgb/OIrwUTUg2eZvyCosgLZJL8d+QnxCxtGw4o
-         mADswbLJfjmSUq8gTvi+UeTHdu+AdXcAJ1d5okqXypZbNZZVYDaECMqcNZJx56IAv5z5
-         EjuTKHjxlDqOiPONSVNyCELArjTa0u8+4FXv4+lDdbA/4f0QaqCnP0QysjG3Jjbyo5yO
-         AVGQ==
-X-Gm-Message-State: AOAM530maajaPWcw8fURAQIDuJyeujLvujeoZmMg2Obnpt0F0xCp933J
-        MgaEc+G3khdL6FAV88a504dTSbx4I7xehT13AKvcovqaIHpf
-X-Google-Smtp-Source: ABdhPJwvs1Gwblkb+0NmkA7Nm/FwFs9iyFV004XGZhv8GUUS9AEhXvdAnPYOPs2Ja36Z4dKoofYFWXQr6oO4lsZVAhDSm2GVn8tr
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1024:b0:314:9d7e:47f6 with SMTP id
- n4-20020a056638102400b003149d7e47f6mr32954073jan.8.1646373621601; Thu, 03 Mar
- 2022 22:00:21 -0800 (PST)
-Date:   Thu, 03 Mar 2022 22:00:21 -0800
-In-Reply-To: <0000000000002da23a05d9299019@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e2192405d95e3a37@google.com>
-Subject: Re: [syzbot] WARNING in submit_bio_noacct
-From:   syzbot <syzbot+7fdd158f9797accbebfc@syzkaller.appspotmail.com>
-To:     andrii@kernel.org, ast@kernel.org, axboe@kernel.dk,
-        bpf@vger.kernel.org, daniel@iogearbox.net,
-        john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=0a+oQu3LYTAbOOyoILb+F/zkApGIum0yjd+xPCLEHo4=;
+        b=wb2esMQoam0yRdU1iiWooJMh4JC1GjnRkNWIV6OwsjoezbD+7+ifd1PhuzPjaxCPmO
+         u1fcrH6eLHtxqL4KDTLuseNeth97iCChifcBxeofjvT0Byq082mjxQBMfKUbi4/3XunZ
+         7O1vtdoC6GJQEe1jCXtEwSzf90DWRIWVtkfFAhBCXU/4JQ9/KiwbJufulDJ2q3IPax49
+         jtXkkkenH5kmYciK/w/TThMkCF+OMj+Sm8kubeVraTrTJ9SBcdzW0IJc/7q7VtLNcYPK
+         tCqru2KpLGaD7gEtqsW5aTHIjrKYId6o+E8n1FslfMQUFX2avWIb0/I/Jx8Qwp0u0z7d
+         d27Q==
+X-Gm-Message-State: AOAM532aXFpfPfPgP0BGzvfNmwbT3nDlpYgI2HlLyy0AbUqKoKxKSL90
+        x6bmOo7yTyt/Z10hh54ZEPQ=
+X-Google-Smtp-Source: ABdhPJxBFOb3A6C/RlDh1uHGrWM51HjSkR68cXfNAhNGErUbSC2hd/FilwMHkJmidt1eEHAWD7GVrA==
+X-Received: by 2002:a05:6a00:cc7:b0:4ec:c6f3:ad29 with SMTP id b7-20020a056a000cc700b004ecc6f3ad29mr41958698pfv.66.1646377221067;
+        Thu, 03 Mar 2022 23:00:21 -0800 (PST)
+Received: from ubuntu.huawei.com ([119.3.119.19])
+        by smtp.googlemail.com with ESMTPSA id f6-20020a654006000000b00346193b405fsm3665134pgp.44.2022.03.03.23.00.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Mar 2022 23:00:20 -0800 (PST)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     daniel.thompson@linaro.org
+Cc:     akpm@linux-foundation.org, alsa-devel@alsa-project.org,
+        amd-gfx@lists.freedesktop.org, andriy.shevchenko@linux.intel.com,
+        arnd@arndb.de, bcm-kernel-feedback-list@broadcom.com,
+        bjohannesmeyer@gmail.com, c.giuffrida@vu.nl,
+        christian.koenig@amd.com, christophe.jaillet@wanadoo.fr,
+        dan.carpenter@oracle.com, david.laight@aculab.com,
+        dmaengine@vger.kernel.org, drbd-dev@lists.linbit.com,
+        dri-devel@lists.freedesktop.org, gustavo@embeddedor.com,
+        h.j.bos@vu.nl, intel-gfx@lists.freedesktop.org,
+        intel-wired-lan@lists.osuosl.org, jakobkoschel@gmail.com,
+        jgg@ziepe.ca, keescook@chromium.org,
+        kgdb-bugreport@lists.sourceforge.net, kvm@vger.kernel.org,
+        linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-block@vger.kernel.org,
+        linux-cifs@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net,
+        linux-fsdevel@vger.kernel.org, linux-iio@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-pm@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-sgx@vger.kernel.org, linux-staging@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-wireless@vger.kernel.org,
+        linux1394-devel@lists.sourceforge.net, linux@rasmusvillemoes.dk,
+        linuxppc-dev@lists.ozlabs.org, nathan@kernel.org,
+        netdev@vger.kernel.org, nouveau@lists.freedesktop.org,
+        rppt@kernel.org, samba-technical@lists.samba.org,
+        tglx@linutronix.de, tipc-discussion@lists.sourceforge.net,
+        torvalds@linux-foundation.org,
+        v9fs-developer@lists.sourceforge.net, xiam0nd.tong@gmail.com
+Subject: Re: [PATCH 2/6] treewide: remove using list iterator after loop body as a ptr
+Date:   Fri,  4 Mar 2022 14:59:57 +0800
+Message-Id: <20220304065957.16799-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20220303121824.qdyrognluik74iph@maple.lan>
+References: <20220303121824.qdyrognluik74iph@maple.lan>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+On Thu, 3 Mar 2022 12:18:24 +0000, Daniel Thompson wrote:
+> On Thu, Mar 03, 2022 at 03:26:57PM +0800, Xiaomeng Tong wrote:
+> > On Thu, 3 Mar 2022 04:58:23 +0000, David Laight wrote:
+> > > on 3 Mar 2022 10:27:29 +0800, Xiaomeng Tong wrote:
+> > > > The problem is the mis-use of iterator outside the loop on exit, and
+> > > > the iterator will be the HEAD's container_of pointer which pointers
+> > > > to a type-confused struct. Sidenote: The *mis-use* here refers to
+> > > > mistakely access to other members of the struct, instead of the
+> > > > list_head member which acutally is the valid HEAD.
+> > >
+> > > The problem is that the HEAD's container_of pointer should never
+> > > be calculated at all.
+> > > This is what is fundamentally broken about the current definition.
+> > 
+> > Yes, the rule is "the HEAD's container_of pointer should never be
+> > calculated at all outside the loop", but how do you make sure everyone
+> > follows this rule?
+> 
+> Your formulation of the rule is correct: never run container_of() on HEAD
+> pointer.
 
-HEAD commit:    91265a6da44d Add linux-next specific files for 20220303
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=10c23e1a700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=617f79440a35673a
-dashboard link: https://syzkaller.appspot.com/bug?extid=7fdd158f9797accbebfc
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f7f36e700000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=105cbfb9700000
+Actually, it is not my rule. My rule is that never access other members
+of the struct except for the list_head member after the loop, because
+this is a invalid member after loop exit, but valid for the list_head
+member which just is HEAD and the lately caculation (&pos->head) seems
+harmless.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7fdd158f9797accbebfc@syzkaller.appspotmail.com
+I have considered the case that the HEAD's container "pos" is layouted
+across the max and the min address boundary, which means the address of
+HEAD is likely 0x60, and the address of pos is likely 0xffffffe0.
+It seems ok to caculate pos with:
+((type *)(__mptr - offsetof(type, member)));
+and it seems ok to caculate head outside the loop with:
+if (&pos->head == &HEAD)
+    return NULL;
 
-------------[ cut here ]------------
-Trying to write to read-only block-device sda1 (partno 1)
-WARNING: CPU: 1 PID: 2927 at block/blk-core.c:581 bio_check_ro block/blk-core.c:581 [inline]
-WARNING: CPU: 1 PID: 2927 at block/blk-core.c:581 submit_bio_noacct+0x16f3/0x1be0 block/blk-core.c:810
-Modules linked in:
-CPU: 1 PID: 2927 Comm: jbd2/sda1-8 Not tainted 5.17.0-rc6-next-20220303-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:bio_check_ro block/blk-core.c:581 [inline]
-RIP: 0010:submit_bio_noacct+0x16f3/0x1be0 block/blk-core.c:810
-Code: 00 00 45 0f b6 a4 24 50 05 00 00 48 8d 74 24 60 48 89 ef e8 cf 1f fe ff 48 c7 c7 e0 93 24 8a 48 89 c6 44 89 e2 e8 c9 6e 41 05 <0f> 0b e9 91 f3 ff ff e8 41 96 a1 fd e8 6c bf 85 05 31 ff 89 c3 89
-RSP: 0018:ffffc9000c25f900 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff88801bdaa250 RCX: 0000000000000000
-RDX: ffff88807f5a9d40 RSI: ffffffff81602878 RDI: fffff5200184bf12
-RBP: ffff88801f184000 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff815fd23e R11: 0000000000000000 R12: 0000000000000001
-R13: ffff88801f184010 R14: ffff888018355080 R15: 1ffff9200184bf28
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000200066d0 CR3: 000000002432e000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- submit_bio block/blk-core.c:941 [inline]
- submit_bio+0x1a0/0x350 block/blk-core.c:905
- submit_bh_wbc+0x4e9/0x6b0 fs/buffer.c:3090
- jbd2_journal_commit_transaction+0x1fd9/0x6d80 fs/jbd2/commit.c:762
- kjournald2+0x1d0/0x930 fs/jbd2/journal.c:213
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
+The only case I can think of with the rule "never run container_of()
+on HEAD" must be followed is when the first argument (which is &HEAD)
+passing to container_of() is NULL + some offset, it may lead to the
+resulting "pos->member" access being a NULL dereference. But maybe
+the caller can take the responsibility to check if it is NULL, not
+container_of() itself.
 
+Please remind me if i missed somthing, thanks.
+
+> 
+> However the rule that is introduced by list_for_each_entry_inside() is
+> *not* this rule. The rule it introduces is: never access the iterator
+> variable outside the loop.
+
+Sorry for the confusion, indeed, that is two *different* rule.
+
+> 
+> Making the iterator NULL on loop exit does follow the rule you proposed
+> but using a different technique: do not allow HEAD to be stored in the
+> iterator variable after loop exit. This also makes it impossible to run
+> container_of() on the HEAD pointer.
+> 
+
+It does not. My rule is: never access the iterator variable outside the loop.
+The "Making the iterator NULL on loop exit" way still leak the pos with NULL
+outside the loop, may lead to a NULL deference.
+
+> 
+> > Everyone makes mistakes, but we can eliminate them all from the beginning
+> > with the help of compiler which can catch such use-after-loop things.
+> 
+> Indeed but if we introduce new interfaces then we don't have to worry
+> about existing usages and silent regressions. Code will have been
+> written knowing the loop can exit with the iterator set to NULL.
+
+Yes, it is more simple and compatible with existing interfaces. Howerver,
+you should make every developers to remember that "pos will be set NULL on
+loop exit", which is unreasonable and impossible for *every* single person.
+Otherwise the mis-use-after-loop will lead to a NULL dereference.
+But we can kill this problem by declaring iterator inside the loop and the
+complier will catch it if somebody mis-use-after-loop.
+
+> 
+> Sure it is still possible for programmers to make mistakes and
+> dereference the NULL pointer but C programmers are well training w.r.t.
+> NULL pointer checking so such mistakes are much less likely than with
+> the current list_for_each_entry() macro. This risk must be offset
+> against the way a NULLify approach can lead to more elegant code when we
+> are doing a list search.
+> 
+
+Yes, the NULLify approach is better than the current list_for_each_entry()
+macro, but i stick with that the list_for_each_entry_inside() way is best
+and perfect _technically_.
+
+Thus, my idea is *better a finger off than always aching*, let's settle this
+damn problem once and for all, with list_for_each_entry_inside().
+
+--
+Xiaomeng Tong
