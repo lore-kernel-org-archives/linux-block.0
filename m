@@ -2,94 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D84C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 21:39:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52BCCC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 22:10:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229919AbiCDVkY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 16:40:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35868 "EHLO
+        id S229665AbiCDWLA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 17:11:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiCDVkX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 16:40:23 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFBC01FED91
-        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 13:39:34 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id m11-20020a17090a7f8b00b001beef6143a8so9087409pjl.4
-        for <linux-block@vger.kernel.org>; Fri, 04 Mar 2022 13:39:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
-         :subject:content-transfer-encoding;
-        bh=78QaTqsXQXyIFIsYWFuWJ7jcVfFlJEtOtOpOvJoppYs=;
-        b=a7FNAUjjMbbGCm4dC1Q5J2bz06IwLxMtzNX7kzAQqIX8sEKm9wPLNdLTwG6XGb60SS
-         2HcOX9e3xLs3SiIhWHebUZFXgQz3KNoIWb+MqDnzfA0GFedV3eS90W9pkEQKcE3XBlya
-         cN4OdakOc2B39quXNB36PUQXeyt1qGn4nB8qfoXZKbOP0TQpZBFIc4yudlEPFiWoG3+W
-         hJkdUE7E6FWGuH1+cxZFbQd1LquoIJnMX+tiWUfXo4fmOhASl5vfHHPzyscFnZIrXOCG
-         uzMf71yZC9XZyHGP+qd3tumvrM0yLEoaOxYc3wS719scc3aFxgm8os2KSDLVHCMFE3vt
-         TzKw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=78QaTqsXQXyIFIsYWFuWJ7jcVfFlJEtOtOpOvJoppYs=;
-        b=s7gmpqRs99ybsYo+eo+sJqNXBZqrw86+aLIxbF8vbSzwftHqmzW/ZWJB/z+muwRZdI
-         RCgeio4qCmeCCCW9FAEgMq8uwPz/0gbHMb0qJonodJiVI/cx/RzjP6nz4vw0m2ZJk+XM
-         SGZ3cXQnD9IeRN8dffUH2ji+QCLYRO+rieggo0mhccN/w7H6Kci7nLXAcen6mdeWt7aE
-         00D3wINngXKKHeV7orW0iCNwmCBANLUqr6M4SJBqlEaKAsC+L1ir8ItZYVC/J3LEWgUH
-         nsxEuZ0+XO5w0DuqgVNFTEgz2UK57WZW3u3hy82Ci8TJshNcZwxO9h6umJ3T2fCjIasV
-         8wEw==
-X-Gm-Message-State: AOAM531BYgOHJvs4qoh13bnoC/g8duiQ6avk+xo7MFGFZf3RYTssJ+O0
-        KByZU71g8guVZMWNYiWCXthSpZN91uYlng==
-X-Google-Smtp-Source: ABdhPJxi2cea2xLDIbaQRIK6mLwzI2z+go/DuAdqGmvmKUYauL5++FshM20u6QIIyFCDunuYkFyc9w==
-X-Received: by 2002:a17:902:70c8:b0:151:a8ec:5890 with SMTP id l8-20020a17090270c800b00151a8ec5890mr398551plt.55.1646429974178;
-        Fri, 04 Mar 2022 13:39:34 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u7-20020a056a00158700b004f6ae198a56sm4088567pfk.9.2022.03.04.13.39.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Mar 2022 13:39:33 -0800 (PST)
-Message-ID: <9d5d4f0d-7028-0505-7463-ec740967b8e2@kernel.dk>
-Date:   Fri, 4 Mar 2022 14:39:32 -0700
+        with ESMTP id S229495AbiCDWK7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 17:10:59 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF348CE925;
+        Fri,  4 Mar 2022 14:10:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=HuyErcKtu69AHqki1H1pbEavQ4LL5YiG7O6LJZgqirM=; b=e272eZzJJ1BoHlixvu8OcAt5FO
+        s5dArlh7ggGL4rdUafaCgGhUm4gKNcrMoz3fsgSxphw/IlOiPOEoKqsAd6Dr4gDFiiArKGgWYmIqb
+        iVsVSupitJabKuN11ocZLLN2iPqHQ3vwhSEpQ+DGr8j2Ym/ZmnrAJKpO9U1MT2gTjgb6EnRaxu2ZL
+        IUJwkb1PB5x3/Sht4SrOJCLikPieCGC8I880YpTTPW1m7InktonJP+OKJUS8GueiWxpvktHzdeOFY
+        OnkNdQVi41ivVG84eTf/6ojPhDnBvlqjNHaU6tDuBUAigjp56Rxg6aD/laNpvGPXlhlOmKh9xLg1H
+        bO9KPsiQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nQG7k-00CBQJ-2m; Fri, 04 Mar 2022 22:10:08 +0000
+Date:   Fri, 4 Mar 2022 14:10:08 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Dave Chinner <david@fromorbit.com>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <YiKOQM+HMZXnArKT@bombadil.infradead.org>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <20220304001022.GJ3927073@dread.disaster.area>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 5.17-rc7
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220304001022.GJ3927073@dread.disaster.area>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Fri, Mar 04, 2022 at 11:10:22AM +1100, Dave Chinner wrote:
+> On Wed, Mar 02, 2022 at 04:56:54PM -0800, Luis Chamberlain wrote:
+> > Thinking proactively about LSFMM, regarding just Zone storage..
+> > 
+> > I'd like to propose a BoF for Zoned Storage. The point of it is
+> > to address the existing point points we have and take advantage of
+> > having folks in the room we can likely settle on things faster which
+> > otherwise would take years.
+> > 
+> > I'll throw at least one topic out:
+> > 
+> >   * Raw access for zone append for microbenchmarks:
+> >   	- are we really happy with the status quo?
+> > 	- if not what outlets do we have?
+> > 
+> > I think the nvme passthrogh stuff deserves it's own shared
+> > discussion though and should not make it part of the BoF.
+> 
+> Reading through the discussion on this thread, perhaps this session
+> should be used to educate application developers about how to use
+> ZoneFS so they never need to manage low level details of zone
+> storage such as enumerating zones, controlling write pointers
+> safely for concurrent IO, performing zone resets, etc.
 
-Just a small UAF fix for blktrace, please pull!
+I'm not even sure users are really aware that given cap can be different
+than zone size and btrfs uses zone size to compute size, the size is a
+flat out lie.
 
+modprobe null_blk nr_devices=0
+mkdir /sys/kernel/config/nullb/nullb0
+echo 0 > /sys/kernel/config/nullb/nullb0/completion_nsec
+echo 0 > /sys/kernel/config/nullb/nullb0/irqmode
+echo 2 > /sys/kernel/config/nullb/nullb0/queue_mode
+echo 1024 > /sys/kernel/config/nullb/nullb0/hw_queue_depth
+echo 1 > /sys/kernel/config/nullb/nullb0/memory_backed
+echo 1 > /sys/kernel/config/nullb/nullb0/zoned
 
-The following changes since commit b2750f14007f0e1b36caf51058c161d2c93e63b6:
+echo 128 > /sys/kernel/config/nullb/nullb0/zone_size
+# 6 zones are implied, we are saying 768 for the full storage size..
+# but...
+echo 768 > /sys/kernel/config/nullb/nullb0/size
 
-  Merge tag 'nvme-5.17-2022-02-24' of git://git.infradead.org/nvme into block-5.17 (2022-02-24 07:02:15 -0700)
+# If we force capacity to be way less than the zone sizes, btrfs still
+# uses the zone size to do its data / metadata size computation...
+echo 32 > /sys/kernel/config/nullb/nullb0/zone_capacity
 
-are available in the Git repository at:
+# No conventional zones
+echo 0 > /sys/kernel/config/nullb/nullb0/zone_nr_conv
 
-  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-03-04
+echo 1 > /sys/kernel/config/nullb/nullb0/power
+echo mq-deadline > /sys/block/nullb0/queue/scheduler
 
-for you to fetch changes up to 30939293262eb433c960c4532a0d59c4073b2b84:
+# mkfs.btrfs -f -d single -m single /dev/nullb0
+Label:              (null)
+UUID:               e725782a-d2d3-4c02-97fd-0501de117323
+Node size:          16384
+Sector size:        4096
+Filesystem size:    768.00MiB
+Block group profiles:
+  Data:             single          128.00MiB
+    Metadata:         single          128.00MiB
+      System:           single          128.00MiB
+      SSD detected:       yes
+      Zoned device:       yes
+        Zone size:        128.00MiB
+	Incompat features:  extref, skinny-metadata, no-holes, zoned
+	Runtime features:   free-space-tree
+	Checksum:           crc32c
+	Number of devices:  1
+	Devices:
+	   ID        SIZE  PATH
+	       1   768.00MiB  /dev/nullb0
 
-  blktrace: fix use after free for struct blk_trace (2022-02-28 06:36:33 -0700)
+# mount /dev/nullb0 /mnt
+# btrfs fi show
+Label: none  uuid: e725782a-d2d3-4c02-97fd-0501de117323
+        Total devices 1 FS bytes used 144.00KiB
+	        devid    1 size 768.00MiB used 384.00MiB path
+		/dev/nullb0
 
-----------------------------------------------------------------
-block-5.17-2022-03-04
+# btrfs fi df /mnt
+Data, single: total=128.00MiB, used=0.00B
+System, single: total=128.00MiB, used=16.00KiB
+Metadata, single: total=128.00MiB, used=128.00KiB
+GlobalReserve, single: total=3.50MiB, used=0.00B
 
-----------------------------------------------------------------
-Yu Kuai (1):
-      blktrace: fix use after free for struct blk_trace
+Since btrfs already has "real size" problems this existing
+design takes this a bit further without a fix either. I suspect
+quite a bit of puzzled users will be unhappy that even though
+ZNS claims to kill overprovisioning we're now somehow lying
+about size. I'm not even sure this might be good for the
+filesystem / metadata.
 
- kernel/trace/blktrace.c | 26 ++++++++++++++++++--------
- 1 file changed, 18 insertions(+), 8 deletions(-)
-
--- 
-Jens Axboe
-
+  Luis
