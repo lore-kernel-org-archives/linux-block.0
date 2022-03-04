@@ -2,97 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48073C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 03:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA0A1C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 03:20:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237802AbiCDDHT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 3 Mar 2022 22:07:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40460 "EHLO
+        id S237820AbiCDDVQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 3 Mar 2022 22:21:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232147AbiCDDHS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 22:07:18 -0500
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 182CE2B242;
-        Thu,  3 Mar 2022 19:06:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646363192; x=1677899192;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Lc9qHdOlafcJNOz8evKbREjH7xRoVMfzT76IGNVrBPY=;
-  b=bC0mTAmoSWJLOdpVHSWoMRSpb+0tUBSAA/3vN7QTQB/X+2eTc1f8AGnX
-   CPpgO+PNRn1I+U0KJcF+rXhqdsSvkFEjPaAChjrG8aTVDCPPDN7kV+SB5
-   AclEYC0gBGHaOyo3rY2yNq18rXDvb9Gev7mxFMwxLxya4NfRV9pRLLS2p
-   0iH10t8pBDMbl0MQ1X0XLygoEsGf+daxJp+sDxsF+tLnN+VbJ+0iuv9hy
-   Is60QymJYf76gBLiQ0h5FNgrgZrZthMbJtpdYRbijzxjNN1dTLH8xWAHO
-   lEkBeqBGn4hHUiRSWZ/u2FN3zwV+HTRIESNN1d6wKnbRehgYt4shJg3zV
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10275"; a="252707150"
-X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
-   d="scan'208";a="252707150"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 19:06:12 -0800
-X-IronPort-AV: E=Sophos;i="5.90,154,1643702400"; 
-   d="scan'208";a="546100598"
-Received: from harikara-mobl.amr.corp.intel.com (HELO localhost) ([10.212.33.238])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Mar 2022 19:06:11 -0800
-Date:   Thu, 3 Mar 2022 19:06:11 -0800
-From:   Ira Weiny <ira.weiny@intel.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Chris Zankel <chris@zankel.net>,
-        Max Filippov <jcmvbkbc@gmail.com>,
-        Justin Sanders <justin@coraid.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Denis Efremov <efremov@linux.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>, Coly Li <colyli@suse.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        linux-xtensa@linux-xtensa.org, linux-block@vger.kernel.org,
-        drbd-dev@lists.linbit.com, linux-bcache@vger.kernel.org,
-        nvdimm@lists.linux.dev
-Subject: Re: [PATCH 07/10] bcache: use bvec_kmap_local in bio_csum
-Message-ID: <YiGCIzAwEO+o9pEj@iweiny-desk3>
-References: <20220303111905.321089-1-hch@lst.de>
- <20220303111905.321089-8-hch@lst.de>
+        with ESMTP id S237817AbiCDDVP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 3 Mar 2022 22:21:15 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 832BF17EDAD
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 19:20:27 -0800 (PST)
+Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
+        by 156.147.23.53 with ESMTP; 4 Mar 2022 12:20:25 +0900
+X-Original-SENDERIP: 156.147.1.125
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.125 with ESMTP; 4 Mar 2022 12:20:24 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Fri, 4 Mar 2022 12:20:02 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        torvalds@linux-foundation.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
+Message-ID: <20220304032002.GD6112@X58A-UD3R>
+References: <YiAow5gi21zwUT54@mit.edu>
+ <1646285013-3934-1-git-send-email-byungchul.park@lge.com>
+ <YiDSabde88HJ/aTt@mit.edu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220303111905.321089-8-hch@lst.de>
+In-Reply-To: <YiDSabde88HJ/aTt@mit.edu>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 02:19:02PM +0300, Christoph Hellwig wrote:
-> Using local kmaps slightly reduces the chances to stray writes, and
-> the bvec interface cleans up the code a little bit.
+On Thu, Mar 03, 2022 at 09:36:25AM -0500, Theodore Ts'o wrote:
+> On Thu, Mar 03, 2022 at 02:23:33PM +0900, Byungchul Park wrote:
+> > I totally agree with you. *They aren't really locks but it's just waits
+> > and wakeups.* That's exactly why I decided to develop Dept. Dept is not
+> > interested in locks unlike Lockdep, but fouces on waits and wakeup
+> > sources itself. I think you get Dept wrong a lot. Please ask me more if
+> > you have things you doubt about Dept.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> So the question is this --- do you now understand why, even though
+> there is a circular dependency, nothing gets stalled in the
+> interactions between the two wait channels?
 
-Reviewed-by: Ira Weiny <ira.weiny@intel.com>
+I found a point that the two wait channels don't lead a deadlock in
+some cases thanks to Jan Kara. I will fix it so that Dept won't
+complain it.
 
-> ---
->  drivers/md/bcache/request.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
+Byungchul
+
 > 
-> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-> index 6869e010475a3..fdd0194f84dd0 100644
-> --- a/drivers/md/bcache/request.c
-> +++ b/drivers/md/bcache/request.c
-> @@ -44,10 +44,10 @@ static void bio_csum(struct bio *bio, struct bkey *k)
->  	uint64_t csum = 0;
->  
->  	bio_for_each_segment(bv, bio, iter) {
-> -		void *d = kmap(bv.bv_page) + bv.bv_offset;
-> +		void *d = bvec_kmap_local(&bv);
->  
->  		csum = crc64_be(csum, d, bv.bv_len);
-> -		kunmap(bv.bv_page);
-> +		kunmap_local(d);
->  	}
->  
->  	k->ptr[KEY_PTRS(k)] = csum & (~0ULL >> 1);
-> -- 
-> 2.30.2
-> 
+> 						- Ted
