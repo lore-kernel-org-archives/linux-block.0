@@ -2,145 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 933FBC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 10:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F8BC4332F
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 11:39:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239200AbiCDKCK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 05:02:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
+        id S229490AbiCDLka (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 06:40:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236543AbiCDKCI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 05:02:08 -0500
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D858D19CCFA
-        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 02:01:20 -0800 (PST)
-Received: by mail-pg1-x535.google.com with SMTP id w37so7101345pga.7
-        for <linux-block@vger.kernel.org>; Fri, 04 Mar 2022 02:01:20 -0800 (PST)
+        with ESMTP id S231373AbiCDLk3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 06:40:29 -0500
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3E2A145E12;
+        Fri,  4 Mar 2022 03:39:42 -0800 (PST)
+Received: by mail-pj1-x102b.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso10390429pjj.2;
+        Fri, 04 Mar 2022 03:39:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=0uZuvt6hWY7FhWXwBOqHfs5cDRj/pveU7B/PnBb5g8k=;
-        b=RzmiRvXPV6BAaKDgiQk686iZl9wds0zB5/v4fnDLwSdWlna3rpjGZw8e+qQY/aFIma
-         tcUccbg0z7e7BSJJRr5K+jaUPQJ4S6qHZ/SjVSsxSMj8k1AhmE4wN92Uo3qSMNziT0Se
-         VKd2CBpac1hypN+aOWK1UgO4GAorkYoUh2P+bN4csrYXAS8LnSaW8Ap5+yuxlAy+KDEC
-         JWMl4DsNh+PV92sqqTadQrIMQRpFGQ5L+R3xEZBs5nq2FO9PmC+KLflchtDC43OQ9S2j
-         CFWTaLueE3PUn/J0lPKLFjZr84cR5he+4mxYhGDDo+fsQoxk48tiUmJ/+tx1+hhfWFqw
-         Jh+Q==
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=T0KWcfrVhfRiQuPhzFUu+oUHR0+0iQuCKbqqyufUMXA=;
+        b=BS4C5Y1tL4r8PWIRqTmC6gS0HaL1ikR+470ZGcTaIa4wFQYparRJpFgi8byBxYfS+3
+         h+/0V9Om3+A1FxjtUhzi8xUX8SQHq+v8HkFoG+J6SemhINeDJSnxowDMKlAz8H8duGxN
+         dQUqq+1LAnYBfNHP7SN7AA2Kj/WI0bj5UMk5D1tTDQS+yqA1Cfs9LXdRBoRhuywGMkHh
+         uxofCQJrdhXypoU+Kck6or68lCBk3WDfd06ViBAREudViDBHavC9dOljVk6YKVx+g6tI
+         ywHzdC7NPv1PVpGFaSAGB5AQ+PPtoXYZIHynTx/iBcL2C16vxnOubx0fFVbm7AZnrUe7
+         ko/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=0uZuvt6hWY7FhWXwBOqHfs5cDRj/pveU7B/PnBb5g8k=;
-        b=JPR4rA2Kxam98J0snDwbddwedhX/4zbpmgdiPFQtOwBHE3i8/cmrSds20U3L0Hj0/T
-         ramjelNSjnRxETpih0+wqrSB2ThhILla4bVK+VHoMFg0W/yG1S51pVtPIz9+9rlFZKOB
-         7wxc5erVWChM1q1gsVwPtlfsy7sqpY/U0STpB1xtnKY7mcteTtFJ6jscZ4QXeIBleiXo
-         s4jxFLpJtPAAYKzN0AflqdL4NFkPmdsWPjkxTjyk6YeM7IK9fkn3Pr1uuRfAYlnJ8aYE
-         BVYpXfAeNKBCz0DyIoCxycUaBgLYo7x+Zk7aAXfVQQKDd1HFF0f/SzS/s2cAjQD4xCO1
-         ZUfA==
-X-Gm-Message-State: AOAM531Ry7IRAsctGkAi25rk10RhUe/gZcZ/ljhxHpxQJGsOpNjXc4HE
-        RrrS/+4Df0tthxRmEpvoowvh
-X-Google-Smtp-Source: ABdhPJz9fNn7RLuzI4BBkfWc3bId4tN8ZJOa8tNi/4hnRHyrVfeF0Q32OlC6+6mar/EyaRffSYAMbg==
-X-Received: by 2002:a63:83c6:0:b0:37c:97ad:be1e with SMTP id h189-20020a6383c6000000b0037c97adbe1emr1839532pge.82.1646388080367;
-        Fri, 04 Mar 2022 02:01:20 -0800 (PST)
-Received: from localhost ([139.177.225.237])
-        by smtp.gmail.com with ESMTPSA id z14-20020aa7888e000000b004e5c2c0b9dcsm5450743pfe.30.2022.03.04.02.01.19
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=T0KWcfrVhfRiQuPhzFUu+oUHR0+0iQuCKbqqyufUMXA=;
+        b=SUm9pOojNamHPikMlB/n+EFKQFn3Rg0DDWlrp1hfpRaXk/NQJfqcUDmbqOM68K6PLg
+         REBrtim79cDhhEAvhxvgisnVKhxdhi5kd02XyaEn8XKxBPEK4miUimkxL9LGOc/KxF36
+         n7Hhld7eU2PY/2XhEZHd/z0sYBiz275zgtvo+8oB3gL9oUvRNa/2WHwtz3chcWisFZZr
+         Shj2psy3XglQEgff2yELmuVfH/oU7e/nw4XQDa8jI2RPSf92kNizoaEegxxttEIEX7oM
+         LY/J7qWjSF58EkFxVKzXZ0rrwRXr/LHmQvgcLSdwDiDMgd4FKa9nXQjqh7lPFzvFY2i2
+         w6tA==
+X-Gm-Message-State: AOAM533fUHX1ynobtTFmoTJgqDlhesmnWPAFZTwUKLyiIKr9Xk5n8mYL
+        /hBBGJytElepF23W2/dANNA=
+X-Google-Smtp-Source: ABdhPJwUeGy/HJBpt8MjGZ13EzUfgfohEC7mxxbk5v1dgWi77zTAJpDwQo+/X8i3EoW7ntQ/oQ2ZNw==
+X-Received: by 2002:a17:90b:390c:b0:1bf:2d83:c70c with SMTP id ob12-20020a17090b390c00b001bf2d83c70cmr1346393pjb.217.1646393982299;
+        Fri, 04 Mar 2022 03:39:42 -0800 (PST)
+Received: from ip-172-31-19-208.ap-northeast-1.compute.internal (ec2-18-181-137-102.ap-northeast-1.compute.amazonaws.com. [18.181.137.102])
+        by smtp.gmail.com with ESMTPSA id e18-20020a63d952000000b00372a1295210sm4394691pgj.51.2022.03.04.03.39.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Mar 2022 02:01:19 -0800 (PST)
-From:   Xie Yongji <xieyongji@bytedance.com>
-To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk,
-        hch@infradead.org, mgurtovoy@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: [PATCH v3 2/2] virtio-blk: Remove BUG_ON() in virtio_queue_rq()
-Date:   Fri,  4 Mar 2022 18:00:58 +0800
-Message-Id: <20220304100058.116-2-xieyongji@bytedance.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220304100058.116-1-xieyongji@bytedance.com>
-References: <20220304100058.116-1-xieyongji@bytedance.com>
+        Fri, 04 Mar 2022 03:39:41 -0800 (PST)
+Date:   Fri, 4 Mar 2022 11:39:29 +0000
+From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        bfields@fieldses.org, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
+        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+        djwong@kernel.org, dri-devel@lists.freedesktop.org,
+        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com
+Subject: Re: [PATCH v4 22/24] dept: Don't create dependencies between
+ different depths in any case
+Message-ID: <YiH6cXo1qThA1X6B@ip-172-31-19-208.ap-northeast-1.compute.internal>
+References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
+ <1646377603-19730-23-git-send-email-byungchul.park@lge.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1646377603-19730-23-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently we have a BUG_ON() to make sure the number of sg
-list does not exceed queue_max_segments() in virtio_queue_rq().
-However, the block layer uses queue_max_discard_segments()
-instead of queue_max_segments() to limit the sg list for
-discard requests. So the BUG_ON() might be triggered if
-virtio-blk device reports a larger value for max discard
-segment than queue_max_segments(). To fix it, let's simply
-remove the BUG_ON() which has become unnecessary after commit
-02746e26c39e("virtio-blk: avoid preallocating big SGL for data").
-And the unused vblk->sg_elems can also be removed together.
+On Fri, Mar 04, 2022 at 04:06:41PM +0900, Byungchul Park wrote:
+> Dept already prevents creating dependencies between different depths of
+> the class indicated by *_lock_nested() when the lock acquisitions happen
+> consecutively.
+> 
+>    lock A0 with depth
+>    lock_nested A1 with depth + 1
+>    ...
+>    unlock A1
+>    unlock A0
+> 
+> Dept does not create A0 -> A1 dependency in this case, either.
+> 
+> However, once another class cut in, the code becomes problematic. When
+> Dept tries to create real dependencies, it does not only create real
+> ones but also wrong ones between different depths of the class.
+> 
+>    lock A0 with depth
+>    lock B
+>    lock_nested A1 with depth + 1
+>    ...
+>    unlock A1
+>    unlock B
+>    unlock A0
+> 
+> Even in this case, Dept should not create A0 -> A1 dependency.
+> 
+> So let Dept not create wrong dependencies between different depths of
+> the class in any case.
+> 
+> Reported-by: 42.hyeyoo@gmail.com
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> ---
+>  kernel/dependency/dept.c | 9 +--------
+>  1 file changed, 1 insertion(+), 8 deletions(-)
+> 
+> diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+> index 5d4efc3..cc1b3a3 100644
+> --- a/kernel/dependency/dept.c
+> +++ b/kernel/dependency/dept.c
+> @@ -1458,14 +1458,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
+>  
+>  		eh = dt->ecxt_held + i;
+>  		if (eh->ecxt->class != c || eh->nest == ne)
+> -			break;
+> -	}
+> -
+> -	for (; i >= 0; i--) {
+> -		struct dept_ecxt_held *eh;
+> -
+> -		eh = dt->ecxt_held + i;
+> -		add_dep(eh->ecxt, w);
+> +			add_dep(eh->ecxt, w);
+>  	}
+>  
+>  	if (!wait_consumed(w) && !rich_stack) {
+> -- 
+> 1.9.1
+> 
+> 
 
-Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
-Suggested-by: Christoph Hellwig <hch@infradead.org>
-Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/block/virtio_blk.c | 12 ++----------
- 1 file changed, 2 insertions(+), 10 deletions(-)
+Works as expected, Thanks!
+I would report if there is anything else interesting.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 7fc2c8b97077..8c415be86732 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -76,9 +76,6 @@ struct virtio_blk {
- 	 */
- 	refcount_t refs;
- 
--	/* What host tells us, plus 2 for header & tailer. */
--	unsigned int sg_elems;
--
- 	/* Ida index - used to track minor number allocations. */
- 	int index;
- 
-@@ -322,8 +319,6 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t status;
- 	int err;
- 
--	BUG_ON(req->nr_phys_segments + 2 > vblk->sg_elems);
--
- 	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
- 	if (unlikely(status))
- 		return status;
-@@ -783,8 +778,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	/* Prevent integer overflows and honor max vq size */
- 	sg_elems = min_t(u32, sg_elems, VIRTIO_BLK_MAX_SG_ELEMS - 2);
- 
--	/* We need extra sg elements at head and tail. */
--	sg_elems += 2;
- 	vdev->priv = vblk = kmalloc(sizeof(*vblk), GFP_KERNEL);
- 	if (!vblk) {
- 		err = -ENOMEM;
-@@ -796,7 +789,6 @@ static int virtblk_probe(struct virtio_device *vdev)
- 	mutex_init(&vblk->vdev_mutex);
- 
- 	vblk->vdev = vdev;
--	vblk->sg_elems = sg_elems;
- 
- 	INIT_WORK(&vblk->config_work, virtblk_config_changed_work);
- 
-@@ -853,7 +845,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		set_disk_ro(vblk->disk, 1);
- 
- 	/* We can handle whatever the host told us to handle. */
--	blk_queue_max_segments(q, vblk->sg_elems-2);
-+	blk_queue_max_segments(q, sg_elems);
- 
- 	/* No real sector limit. */
- 	blk_queue_max_hw_sectors(q, -1U);
-@@ -931,7 +923,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		 * handled it.
- 		 */
- 		if (!v)
--			v = sg_elems - 2;
-+			v = sg_elems;
- 		blk_queue_max_discard_segments(q,
- 					       min(v, MAX_DISCARD_SEGMENTS));
- 
+Tested-by: Hyeonggon Yoo <42.hyeyoo@gmail.com>
+
 -- 
-2.20.1
-
+Thank you, You are awesome!
+Hyeonggon :-)
