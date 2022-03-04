@@ -2,191 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12757C43219
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C656DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238702AbiCDHJv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 02:09:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38452 "EHLO
+        id S238755AbiCDHyi convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 02:54:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235317AbiCDHIm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:08:42 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81E2B190B62
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:08 -0800 (PST)
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.52 with ESMTP; 4 Mar 2022 16:07:07 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 4 Mar 2022 16:07:07 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     torvalds@linux-foundation.org
-Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-        amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: [PATCH v4 08/24] dept: Apply Dept to wait_for_completion()/complete()
-Date:   Fri,  4 Mar 2022 16:06:27 +0900
-Message-Id: <1646377603-19730-9-git-send-email-byungchul.park@lge.com>
-X-Mailer: git-send-email 1.9.1
-In-Reply-To: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
-References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
+        with ESMTP id S232416AbiCDHyh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:54:37 -0500
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E751518CC0B
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:53:49 -0800 (PST)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-89-FYvCFpCMOBqyNx07Jia5EQ-1; Fri, 04 Mar 2022 07:53:46 +0000
+X-MC-Unique: FYvCFpCMOBqyNx07Jia5EQ-1
+Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
+ AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.28; Fri, 4 Mar 2022 07:53:44 +0000
+Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
+ AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
+ 15.00.1497.028; Fri, 4 Mar 2022 07:53:44 +0000
+From:   David Laight <David.Laight@ACULAB.COM>
+To:     'Keith Busch' <kbusch@kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: RE: [PATCHv4 5/8] lib: add rocksoft model crc64
+Thread-Topic: [PATCHv4 5/8] lib: add rocksoft model crc64
+Thread-Index: AQHYLzsrMRdzY3NFeE6gsrcF0wQhN6yu0OzA
+Date:   Fri, 4 Mar 2022 07:53:44 +0000
+Message-ID: <30e059eca211460780442e2ded092722@AcuMS.aculab.com>
+References: <20220303201312.3255347-1-kbusch@kernel.org>
+ <20220303201312.3255347-6-kbusch@kernel.org>
+In-Reply-To: <20220303201312.3255347-6-kbusch@kernel.org>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
+MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by
-wait_for_completion()/complete().
+From: Keith Busch
+> Sent: 03 March 2022 20:13
+> 
+> The NVM Express specification extended data integrity fields to 64 bits
+> using the Rocksoft parameters. Add the poly to the crc64 table
+> generation, and provide a generic library routine implementing the
+> algorithm.
+> 
+> The Rocksoft 64-bit CRC model parameters are as follows:
+>     Poly: 0xAD93D23594C93659
+>     Initial value: 0xFFFFFFFFFFFFFFFF
+>     Reflected Input: True
+>     Reflected Output: True
+>     Xor Final: 0xFFFFFFFFFFFFFFFF
+> 
+> Since this model used reflected bits, the implementation generates the
+> reflected table so the result is ordered consistently.
 
-Signed-off-by: Byungchul Park <byungchul.park@lge.com>
----
- include/linux/completion.h | 42 ++++++++++++++++++++++++++++++++++++++++--
- kernel/sched/completion.c  | 12 ++++++++++--
- 2 files changed, 50 insertions(+), 4 deletions(-)
+Since the data is processed least significant bit first the
+table must be setup slightly differently.
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 51d9ab0..a1ad5a8 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -26,14 +26,48 @@
- struct completion {
- 	unsigned int done;
- 	struct swait_queue_head wait;
-+	struct dept_map dmap;
- };
- 
-+#ifdef CONFIG_DEPT
-+#define dept_wfc_init(m, k, s, n)		dept_map_init(m, k, s, n)
-+#define dept_wfc_reinit(m)			dept_map_reinit(m)
-+#define dept_wfc_wait(m, ip)						\
-+do {									\
-+	dept_ask_event(m);						\
-+	dept_wait(m, 1UL, ip, __func__, 0);				\
-+} while (0)
-+#define dept_wfc_complete(m, ip)		dept_event(m, 1UL, ip, __func__)
-+#define dept_wfc_enter(m, ip)			dept_ecxt_enter(m, 1UL, ip, "completion_context_enter", "complete", 0)
-+#define dept_wfc_exit(m, ip)			dept_ecxt_exit(m, ip)
-+#else
-+#define dept_wfc_init(m, k, s, n)		do { (void)(n); (void)(k); } while (0)
-+#define dept_wfc_reinit(m)			do { } while (0)
-+#define dept_wfc_wait(m, ip)			do { } while (0)
-+#define dept_wfc_complete(m, ip)		do { } while (0)
-+#define dept_wfc_enter(m, ip)			do { } while (0)
-+#define dept_wfc_exit(m, ip)			do { } while (0)
-+#endif
-+
-+#ifdef CONFIG_DEPT
-+#define WFC_DEPT_MAP_INIT(work) .dmap = { .name = #work, .skip_cnt = ATOMIC_INIT(0) }
-+#else
-+#define WFC_DEPT_MAP_INIT(work)
-+#endif
-+
-+#define init_completion(x)					\
-+	do {							\
-+		static struct dept_key __dkey;			\
-+		__init_completion(x, &__dkey, #x);		\
-+	} while (0)
-+
- #define init_completion_map(x, m) init_completion(x)
- static inline void complete_acquire(struct completion *x) {}
- static inline void complete_release(struct completion *x) {}
- 
- #define COMPLETION_INITIALIZER(work) \
--	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
-+	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), \
-+	WFC_DEPT_MAP_INIT(work) }
- 
- #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
- 	(*({ init_completion_map(&(work), &(map)); &(work); }))
-@@ -81,9 +115,12 @@ static inline void complete_release(struct completion *x) {}
-  * This inline function will initialize a dynamically created completion
-  * structure.
-  */
--static inline void init_completion(struct completion *x)
-+static inline void __init_completion(struct completion *x,
-+				     struct dept_key *dkey,
-+				     const char *name)
- {
- 	x->done = 0;
-+	dept_wfc_init(&x->dmap, dkey, 0, name);
- 	init_swait_queue_head(&x->wait);
- }
- 
-@@ -97,6 +134,7 @@ static inline void init_completion(struct completion *x)
- static inline void reinit_completion(struct completion *x)
- {
- 	x->done = 0;
-+	dept_wfc_reinit(&x->dmap);
- }
- 
- extern void wait_for_completion(struct completion *);
-diff --git a/kernel/sched/completion.c b/kernel/sched/completion.c
-index a778554..6e31cc0 100644
---- a/kernel/sched/completion.c
-+++ b/kernel/sched/completion.c
-@@ -29,6 +29,7 @@ void complete(struct completion *x)
- {
- 	unsigned long flags;
- 
-+	dept_wfc_complete(&x->dmap, _RET_IP_);
- 	raw_spin_lock_irqsave(&x->wait.lock, flags);
- 
- 	if (x->done != UINT_MAX)
-@@ -58,6 +59,7 @@ void complete_all(struct completion *x)
- {
- 	unsigned long flags;
- 
-+	dept_wfc_complete(&x->dmap, _RET_IP_);
- 	lockdep_assert_RT_in_threaded_ctx();
- 
- 	raw_spin_lock_irqsave(&x->wait.lock, flags);
-@@ -112,17 +114,23 @@ void complete_all(struct completion *x)
- }
- 
- static long __sched
--wait_for_common(struct completion *x, long timeout, int state)
-+_wait_for_common(struct completion *x, long timeout, int state)
- {
- 	return __wait_for_common(x, schedule_timeout, timeout, state);
- }
- 
- static long __sched
--wait_for_common_io(struct completion *x, long timeout, int state)
-+_wait_for_common_io(struct completion *x, long timeout, int state)
- {
- 	return __wait_for_common(x, io_schedule_timeout, timeout, state);
- }
- 
-+#define wait_for_common(x, t, s)					\
-+({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common(x, t, s); })
-+
-+#define wait_for_common_io(x, t, s)					\
-+({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common_io(x, t, s); })
-+
- /**
-  * wait_for_completion: - waits for completion of a task
-  * @x:  holds the state of this particular completion
--- 
-1.9.1
+...
+> + * crc64rocksoft[256] table is from the Rocksoft specification polynomial
+> + * defined as,
+> + *
+> + * x^64 + x^63 + x^61 + x^59 + x^58 + x^56 + x^55 + x^52 + x^49 + x^48 + x^47 +
+> + * x^46 + x^44 + x^41 + x^37 + x^36 + x^34 + x^32 + x^31 + x^28 + x^26 + x^23 +
+> + * x^22 + x^19 + x^16 + x^13 + x^12 + x^10 + x^9 + x^6 + x^4 + x^3 + 1
+
+Which matches the Poly: 0xAD93D23594C93659 above.
+
+...
+> +#define CRC64_ROCKSOFT_POLY 0x9A6C9329AC4BC9B5ULL
+
+But that value is clearly different.
+
+You really ought to add a comment that each byte of the constant
+has to be bit reversed from the polynomial coefficients.
+
+> -static void generate_crc64_table(void)
+> +static void generate_reflected_crc64_table(uint64_t table[256], uint64_t poly)
+> +{
+> +	uint64_t i, j, c, crc;
+> +
+> +	for (i = 0; i < 256; i++) {
+> +		crc = 0ULL;
+> +		c = i;
+> +
+> +		for (j = 0; j < 8; j++) {
+> +			if ((crc ^ (c >> j)) & 1)
+> +				crc = (crc >> 1) ^ poly;
+> +			else
+> +				crc >>= 1;
+> +		}
+> +		table[i] = crc;
+> +	}
+> +}
+
+That can be speeded up by using the identity:
+	table[x ^ y] == table[x] ^ table[y]
+
+something like:
+	crc = poly;  /* actually crc(1) */
+	table[0] = 0;
+	table[1] = crc;
+	for (i = 2; i < 8; i++) [
+		crc = crc & 1 ? (crc >> 1) ^ poly : crc >> 1;
+		for (j = 0; j < 1u << i; j++)
+			table[j + (1i << i)] = table[j] ^ crc;
+	}
+
+I think the same code can be used for a normal MSB first crc
+provided both the polynomial and crc(1) are passed in.
+
+OTOH initialisation speed may not matter.
+
+	David
+
+-
+Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+Registration No: 1397386 (Wales)
 
