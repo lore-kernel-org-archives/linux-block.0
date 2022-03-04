@@ -2,143 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C656DC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:53:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E41E9C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 10:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238755AbiCDHyi convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 02:54:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55918 "EHLO
+        id S239135AbiCDKCF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 05:02:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232416AbiCDHyh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:54:37 -0500
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E751518CC0B
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:53:49 -0800 (PST)
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-89-FYvCFpCMOBqyNx07Jia5EQ-1; Fri, 04 Mar 2022 07:53:46 +0000
-X-MC-Unique: FYvCFpCMOBqyNx07Jia5EQ-1
-Received: from AcuMS.Aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) by
- AcuMS.aculab.com (fd9f:af1c:a25b:0:994c:f5c2:35d6:9b65) with Microsoft SMTP
- Server (TLS) id 15.0.1497.28; Fri, 4 Mar 2022 07:53:44 +0000
-Received: from AcuMS.Aculab.com ([fe80::994c:f5c2:35d6:9b65]) by
- AcuMS.aculab.com ([fe80::994c:f5c2:35d6:9b65%12]) with mapi id
- 15.00.1497.028; Fri, 4 Mar 2022 07:53:44 +0000
-From:   David Laight <David.Laight@ACULAB.COM>
-To:     'Keith Busch' <kbusch@kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
-        Hannes Reinecke <hare@suse.de>
-Subject: RE: [PATCHv4 5/8] lib: add rocksoft model crc64
-Thread-Topic: [PATCHv4 5/8] lib: add rocksoft model crc64
-Thread-Index: AQHYLzsrMRdzY3NFeE6gsrcF0wQhN6yu0OzA
-Date:   Fri, 4 Mar 2022 07:53:44 +0000
-Message-ID: <30e059eca211460780442e2ded092722@AcuMS.aculab.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-6-kbusch@kernel.org>
-In-Reply-To: <20220303201312.3255347-6-kbusch@kernel.org>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
-x-originating-ip: [10.202.205.107]
+        with ESMTP id S239026AbiCDKCF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 05:02:05 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6200919BE7E
+        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 02:01:17 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id p3-20020a17090a680300b001bbfb9d760eso10214518pjj.2
+        for <linux-block@vger.kernel.org>; Fri, 04 Mar 2022 02:01:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=unTalB5dEpk0d2rLSok98CUKf5ocP3+9BVSJOkXBlF0=;
+        b=Ki2MviPi/0ZazZ6C/Ggw9CFEQ/rdT3Wb5ThnvJ4mcg3DyPR2qCvB5A8CIdI36HsAPg
+         02ggPhEDMHDmScXAP0K3dlUy2/hUdwDF3iROGWyMbqIVd1PvzHFpGnppSymP/1iYmWxa
+         X35+RRolDY3FpTmcHL3botSP4184S86qz2T0u34wlbBKYx/4giOVpgUqGHD4tg0xzE8+
+         sj6itUx2YcvVgbSMt1PO0fVYpVA1mHv9WjY91VG7PUofK8AHQhPhcxbV+1LvXYkvAb+O
+         xP+UA99ndCs7Cf5x3kY8tDqNXjPtPTExFMdA297KCwDpyPYlK7ax509pzwHYIsLQ+11z
+         IKbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=unTalB5dEpk0d2rLSok98CUKf5ocP3+9BVSJOkXBlF0=;
+        b=I0OQMZimirY3cDTYmJGHx9ZG6eNj6seJ/2LX+Udf24GSQ8wYV1F+iU4pmbsShc1BC3
+         n1f+7mD27Zzp6z3OyidMIMtrkrqa+xPbUyjECGE6z13k4wJx+BU12+hHvBs+DRt/5z+3
+         axNwumhpFha+nrgqrifFcCVqNL33cXsYc074e4h8/fgdbkTgfHMww7+YAj4BZDW8K9pi
+         EWhC4YWlJoYDic+hnKlPZ4EGIHnUDVea3c88r677kZcg9sg6S61xXT8jmyUeSZnUHdZX
+         qCy1v9xyVsHy7q3JAKfvhy/2GvcFKU96ISya998qFrkN3R46H3CxDVPq1rca4dg5/P6P
+         C+9g==
+X-Gm-Message-State: AOAM533F3UF09uti3fPLBm2D29P/xaUKZy73J3InV4DL9IHGe2TwvxME
+        tcdZMJev/zktEP/ZzXjS0LsqzwiyHTaA
+X-Google-Smtp-Source: ABdhPJz9mRHndI4k9iwXhQrG+K9i4OaTEJqeBsLCNA3yIZQIpc2BMn6nnpX9NJpSmoibME28T+hSXA==
+X-Received: by 2002:a17:902:8c8c:b0:150:739b:8ab1 with SMTP id t12-20020a1709028c8c00b00150739b8ab1mr35823267plo.3.1646388076586;
+        Fri, 04 Mar 2022 02:01:16 -0800 (PST)
+Received: from localhost ([139.177.225.237])
+        by smtp.gmail.com with ESMTPSA id x5-20020aa79a45000000b004c9d286809csm5910538pfj.61.2022.03.04.02.01.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 02:01:15 -0800 (PST)
+From:   Xie Yongji <xieyongji@bytedance.com>
+To:     mst@redhat.com, jasowang@redhat.com, axboe@kernel.dk,
+        hch@infradead.org, mgurtovoy@nvidia.com
+Cc:     virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH v3 1/2] virtio-blk: Don't use MAX_DISCARD_SEGMENTS if max_discard_seg is zero
+Date:   Fri,  4 Mar 2022 18:00:57 +0800
+Message-Id: <20220304100058.116-1-xieyongji@bytedance.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
-        auth=pass smtp.auth=C51A453 smtp.mailfrom=david.laight@aculab.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch
-> Sent: 03 March 2022 20:13
-> 
-> The NVM Express specification extended data integrity fields to 64 bits
-> using the Rocksoft parameters. Add the poly to the crc64 table
-> generation, and provide a generic library routine implementing the
-> algorithm.
-> 
-> The Rocksoft 64-bit CRC model parameters are as follows:
->     Poly: 0xAD93D23594C93659
->     Initial value: 0xFFFFFFFFFFFFFFFF
->     Reflected Input: True
->     Reflected Output: True
->     Xor Final: 0xFFFFFFFFFFFFFFFF
-> 
-> Since this model used reflected bits, the implementation generates the
-> reflected table so the result is ordered consistently.
+Currently the value of max_discard_segment will be set to
+MAX_DISCARD_SEGMENTS (256) with no basis in hardware if device
+set 0 to max_discard_seg in configuration space. It's incorrect
+since the device might not be able to handle such large descriptors.
+To fix it, let's follow max_segments restrictions in this case.
 
-Since the data is processed least significant bit first the
-table must be setup slightly differently.
+Fixes: 1f23816b8eb8 ("virtio_blk: add discard and write zeroes support")
+Signed-off-by: Xie Yongji <xieyongji@bytedance.com>
+---
+ drivers/block/virtio_blk.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-...
-> + * crc64rocksoft[256] table is from the Rocksoft specification polynomial
-> + * defined as,
-> + *
-> + * x^64 + x^63 + x^61 + x^59 + x^58 + x^56 + x^55 + x^52 + x^49 + x^48 + x^47 +
-> + * x^46 + x^44 + x^41 + x^37 + x^36 + x^34 + x^32 + x^31 + x^28 + x^26 + x^23 +
-> + * x^22 + x^19 + x^16 + x^13 + x^12 + x^10 + x^9 + x^6 + x^4 + x^3 + 1
-
-Which matches the Poly: 0xAD93D23594C93659 above.
-
-...
-> +#define CRC64_ROCKSOFT_POLY 0x9A6C9329AC4BC9B5ULL
-
-But that value is clearly different.
-
-You really ought to add a comment that each byte of the constant
-has to be bit reversed from the polynomial coefficients.
-
-> -static void generate_crc64_table(void)
-> +static void generate_reflected_crc64_table(uint64_t table[256], uint64_t poly)
-> +{
-> +	uint64_t i, j, c, crc;
-> +
-> +	for (i = 0; i < 256; i++) {
-> +		crc = 0ULL;
-> +		c = i;
-> +
-> +		for (j = 0; j < 8; j++) {
-> +			if ((crc ^ (c >> j)) & 1)
-> +				crc = (crc >> 1) ^ poly;
-> +			else
-> +				crc >>= 1;
-> +		}
-> +		table[i] = crc;
-> +	}
-> +}
-
-That can be speeded up by using the identity:
-	table[x ^ y] == table[x] ^ table[y]
-
-something like:
-	crc = poly;  /* actually crc(1) */
-	table[0] = 0;
-	table[1] = crc;
-	for (i = 2; i < 8; i++) [
-		crc = crc & 1 ? (crc >> 1) ^ poly : crc >> 1;
-		for (j = 0; j < 1u << i; j++)
-			table[j + (1i << i)] = table[j] ^ crc;
-	}
-
-I think the same code can be used for a normal MSB first crc
-provided both the polynomial and crc(1) are passed in.
-
-OTOH initialisation speed may not matter.
-
-	David
-
--
-Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-Registration No: 1397386 (Wales)
+diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+index c443cd64fc9b..7fc2c8b97077 100644
+--- a/drivers/block/virtio_blk.c
++++ b/drivers/block/virtio_blk.c
+@@ -925,9 +925,15 @@ static int virtblk_probe(struct virtio_device *vdev)
+ 
+ 		virtio_cread(vdev, struct virtio_blk_config, max_discard_seg,
+ 			     &v);
++
++		/*
++		 * max_discard_seg == 0 is out of spec but we always
++		 * handled it.
++		 */
++		if (!v)
++			v = sg_elems - 2;
+ 		blk_queue_max_discard_segments(q,
+-					       min_not_zero(v,
+-							    MAX_DISCARD_SEGMENTS));
++					       min(v, MAX_DISCARD_SEGMENTS));
+ 
+ 		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
+ 	}
+-- 
+2.20.1
 
