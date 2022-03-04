@@ -2,97 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBE59C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 20:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFEEC433FE
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 20:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231174AbiCDUMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 15:12:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
+        id S231426AbiCDUQy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 15:16:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230513AbiCDUMD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 15:12:03 -0500
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E222291CC1
-        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 12:05:37 -0800 (PST)
-Received: by mail-pf1-x434.google.com with SMTP id p8so8469206pfh.8
-        for <linux-block@vger.kernel.org>; Fri, 04 Mar 2022 12:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=LeProy8izTno1wkWKHkWuLWt5O2FYK3xOmB4Mvc3iFk=;
-        b=4sRPfiYpeKlkerSVQ2gBXlQ7rspcFwPmF/tIH9oXKImY3M7j6/0vu+EzhCplFbZNe/
-         gCGjToArVZWQMdXwTbLXTRJz5jiG7YIg17ks+HDdLmhMXqzWD2+GFQycgjOJ9aVotwvR
-         9CYfJEKdt+XGQLpWRCYv+0bzWJWGpx07RzbBF8JsK+lprONQ7JWCBPzLsQ4ZkGfYl/p5
-         Y7obbGIkT/ltHimuxLpwdzH5nE9Bjd4wjj2Rt1jEo/ZWYb73qNNWU8GkEwoOup/JZh3m
-         05GZyHmMJMDHTdAPleMUGDKK9MitOyXF9R0KpApLCtl/F9ctjcvqSStUObEXrip7YF0L
-         gkvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LeProy8izTno1wkWKHkWuLWt5O2FYK3xOmB4Mvc3iFk=;
-        b=yJaQU5Y+F6UsLztuIjK41AwbtE34lTFACX3s6/NrMkJsLIUm3vS96Nqyeds5tZGP6j
-         6pDFfRMT2g8ERXgy3v98QUwrklzIbA4CtvUYSc6oGc0lP39ysWvGfwcOmMIDYFPQsWfN
-         r7VCTLpt/IEfllmQ2hLe/kRiNexgEZmdFxehaSs1zTbBFgN0efxT3IcCakiHNPB1Ig7E
-         YBqzaq0HeY1eNH4+LIsXoxHKH/b8s+x8jBOSyMd7xD6JYoKtxhI36XFHi3J5s/SC+lTm
-         TxUqRVk9AtczjqxMMTogWnY90VeKjlYNHm1nwdzLaLTU0O7jPZ/azY+frKpmobueP49D
-         18Ig==
-X-Gm-Message-State: AOAM532trJZUsTFTLAv1TIZtwjZOTqcsNQ+hL4KFcsDv4C/7v0nxIxaz
-        /g3+K5O6fnA/yR2DXrNLdGvs0N5EwGlZgw==
-X-Google-Smtp-Source: ABdhPJzdC0Wzazqv5+3vyps6GODMy9xRLdDK4eSu1NPgcSZAabY2LxK6kKGr9BkLQlzdDCqQzUcyIg==
-X-Received: by 2002:a63:5c0f:0:b0:374:4a37:48f9 with SMTP id q15-20020a635c0f000000b003744a3748f9mr14228pgb.470.1646422686812;
-        Fri, 04 Mar 2022 11:38:06 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id t11-20020a056a00138b00b004f1343f915dsm6902723pfg.33.2022.03.04.11.38.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Mar 2022 11:38:06 -0800 (PST)
-Message-ID: <e04da66f-3f72-5d8a-479b-f413222c3646@kernel.dk>
-Date:   Fri, 4 Mar 2022 12:38:04 -0700
+        with ESMTP id S231139AbiCDUQo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 15:16:44 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D353240DFE;
+        Fri,  4 Mar 2022 12:12:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+        bh=bLCxfOdz+dmxDq7wm6IX5GzzT29aRrqMZDoR0UjGFLs=; b=0Ldtqau6edE1j97tDw1pNp+bin
+        QVTRvKSNTp0aNoqTsXAFKJvIpnPBsNZb1kU58PFzZFeaobBCuUHMus5CohDaUDu5ob+f01LkrApIx
+        IWmJ9nLJXaYjrnfhlF83ws9WV8LoiIGMBLy9dpIlOMbHwX/RUElnkpcYjfvB+YeJhnGCRCjHxqda5
+        0ADdpoCSZiHnZQ/ZYkRnli6Cm5PL7SiHUEMUCXwgbq8cJAw+rtRMd6nu25KzOXxY1uXOXxMZywd7Q
+        LjASQFH8d8IjVUWb4o2au+fYgYUOGpYpO6OWkoucqHKGmqjdOwAfZBBgH/8aIVSLTaw3+bZ6/kdLp
+        yfKyOnWg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nQEI3-00BuHS-RL; Fri, 04 Mar 2022 20:12:39 +0000
+Date:   Fri, 4 Mar 2022 12:12:39 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>
+Cc:     Adam Manzanares <a.manzanares@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <YiJyt79fELL6+/fF@bombadil.infradead.org>
+References: <B3F227F7-4BF0-4735-9D0F-786B68871963@javigon.com>
+ <20220303062950.srhm5bn3mcjlwbca@ArmHalley.localdomain>
+ <CGME20220303094915uscas1p20491e1e17088cfe8acda899a77dce98b@uscas1p2.samsung.com>
+ <8386a6b9-3f06-0963-a132-5562b9c93283@wdc.com>
+ <20220303145551.GA7057@bgt-140510-bm01>
+ <4526a529-4faa-388a-a873-3dfe92b0279b@wdc.com>
+ <20220303171025.GA11082@bgt-140510-bm01>
+ <BYAPR04MB4968506D0A8CAB26AC266F8DF1049@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220303201831.GC11082@bgt-140510-bm01>
+ <BYAPR04MB49686E8DFFF46555915F65BAF1049@BYAPR04MB4968.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 1/2] nvme: remove support or stream based temperature hint
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>
-Cc:     sagi@grimberg.me, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org
-References: <20220304175556.407719-1-hch@lst.de>
- <20220304193439.GA3256926@dhcp-10-100-145-180.wdc.com>
- <20220304193600.GA15474@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220304193600.GA15474@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BYAPR04MB49686E8DFFF46555915F65BAF1049@BYAPR04MB4968.namprd04.prod.outlook.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/4/22 12:36 PM, Christoph Hellwig wrote:
-> On Fri, Mar 04, 2022 at 11:34:39AM -0800, Keith Busch wrote:
->> On Fri, Mar 04, 2022 at 06:55:55PM +0100, Christoph Hellwig wrote:
->>> -	ctrl->nssa = le16_to_cpu(s.nssa);
->>> -	if (ctrl->nssa < BLK_MAX_WRITE_HINTS - 1) {
->>> -		dev_info(ctrl->device, "too few streams (%u) available\n",
->>> -					ctrl->nssa);
->>> -		goto out_disable_stream;
->>> -	}
->>
->> Just fyi, looks like the patch was built against an older version of the
->> driver, so it doesn't apply cleanly to nvme-5.18 at the above part.
->>
->> Also please consider folding the following in this patch since it removes all
->> nr_streams use:
+On Thu, Mar 03, 2022 at 09:33:06PM +0000, Matias Bjørling wrote:
+> > -----Original Message-----
+> > From: Adam Manzanares <a.manzanares@samsung.com>
+> > However, an end-user application should not (in my opinion) have to deal
+> > with this. It should use helper functions from a library that provides the
+> > appropriate abstraction to the application, such that the applications don't
+> > have to care about either specific zone capacity/size, or multiple resets. This is
+> > similar to how file systems work with file system semantics. For example, a file
+> > can span multiple extents on disk, but all an application sees is the file
+> > semantics.
+> > >
+> > 
+> > I don't want to go so far as to say what the end user application should and
+> > should not do.
 > 
-> This was against Jens' for-5.18/block tree.  I'm a bit lost what tree
-> to best send it against as there will always be some conflicts.
+> Consider it as a best practice example. Another typical example is
+> that one should avoid extensive flushes to disk if the application
+> doesn't need persistence for each I/O it issues. 
 
-It's always a bit of a problem when patches touch both drivers and core.
-I actually put this one in a special branch just because of that. I'll
-fold in Keith's incremental.
+Although I was sad to see there was no raw access to a block zoned
+storage device, the above makes me kind of happy that this is the case
+today. Why? Because there is an implicit requirement on management of
+data on zone storage devices outside of regular storage SSDs, and if
+its not considered and *very well documented*, in agreement with us
+all, we can end up with folks slightly surprised with these
+requirements.
 
--- 
-Jens Axboe
+An application today can't directly manage these objects so that's not
+even possible today. And in fact it's not even clear if / how we'll get
+there.
 
+So in the meantime the only way to access zones directly, if an application
+wants anything close as possible to the block layer, the only way is
+through the VFS through zonefs. I can hear people cringing even if you
+are miles away. If we want an improvement upon this, whatever API we come
+up with we *must* clearly embrace and document the requirements /
+responsiblities above.
+
+From what I read, the unmapped LBA problem can be observed as a
+non-problem *iff* users are willing to deal with the above. We seem to
+have disagreement on the expection from users.
+
+Any way, there are two aspects to what Javier was mentioning and I think
+it is *critial* to separate them:
+
+ a) emulation should be possible given the nature of NAND
+ b) The PO2 requirement exists, is / should it exist forever?
+
+The discussion around these two throws drew in a third aspect:
+
+c) Applications which want to deal with LBAs directly on
+NVMe ZNS drives must be aware of the ZNS design and deal with
+it diretly or indirectly in light of the unmapped LBAs which
+are caused by the differences between zone sizes, zone capacity,
+how objects can span multiple zones, zone resets, etc.
+
+I think a) is easier to swallow and accept provided there is
+no impact on existing users. b) and c) are things which I think
+could be elaborated a bit more at LSFMM through community dialog.
+
+  Luis
