@@ -2,150 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA38BC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 22:55:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7F7C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 23:37:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229662AbiCDW4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 17:56:31 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33512 "EHLO
+        id S229683AbiCDXht (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 18:37:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbiCDW4a (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 17:56:30 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E52222FD92;
-        Fri,  4 Mar 2022 14:55:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=wbD//7TjcScQs+hFckWtsVDx0BjrXZzwzlVXZvi3eho=; b=IfaPUt9ZPFCQjNc/qlSoB/E8C8
-        jjpv7Ih7gxo9d1M8NPSDQMRZ2OhNOYrcdZr844tS+errbT/UqqrpYA9CebayQ6xwBNbPSxUeMGtFm
-        bE4/fCf1etxdDiv+5Jqz18tnN1mf/VHJJUzQgGApFWgegizzwI8zgZC4Z5Tk/NC/3Ir8VraaXEdyO
-        QQoSmNXD9JIx8T7Li03bV8XLeL2rs8cma1DxJ3oY2/pgasPCHzz7sfM24yrhBSbmSVVSek8mFwgnW
-        ZeEHPHN2e+xHTKSejMsc8CrG4Iixr87MT96FxH+srgwHULwFcKTLlGCMtxyN7fyVuBaFmVkWhPZXf
-        dORTLXjw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nQGpm-00CFrE-CW; Fri, 04 Mar 2022 22:55:38 +0000
-Date:   Fri, 4 Mar 2022 14:55:38 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-Message-ID: <YiKY6pMczvRuEovI@bombadil.infradead.org>
-References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
- <20220304001022.GJ3927073@dread.disaster.area>
- <YiKOQM+HMZXnArKT@bombadil.infradead.org>
- <20220304224257.GN3927073@dread.disaster.area>
+        with ESMTP id S229736AbiCDXhr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 18:37:47 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D61541C8862
+        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 15:36:57 -0800 (PST)
+Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
+        by 156.147.23.52 with ESMTP; 5 Mar 2022 08:36:56 +0900
+X-Original-SENDERIP: 156.147.1.121
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.121 with ESMTP; 5 Mar 2022 08:36:56 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Sat, 5 Mar 2022 08:36:33 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        bfields@fieldses.org, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
+        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+        djwong@kernel.org, dri-devel@lists.freedesktop.org,
+        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com
+Subject: Re: [PATCH v4 16/24] locking/lockdep, cpu/hotplus: Use a weaker
+ annotation in AP thread
+Message-ID: <20220304233633.GA31304@X58A-UD3R>
+References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
+ <1646377603-19730-17-git-send-email-byungchul.park@lge.com>
+ <aac81d30-ccc6-b351-729a-7265e8b6ec2c@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220304224257.GN3927073@dread.disaster.area>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <aac81d30-ccc6-b351-729a-7265e8b6ec2c@gmail.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 05, 2022 at 09:42:57AM +1100, Dave Chinner wrote:
-> On Fri, Mar 04, 2022 at 02:10:08PM -0800, Luis Chamberlain wrote:
-> > On Fri, Mar 04, 2022 at 11:10:22AM +1100, Dave Chinner wrote:
-> > > On Wed, Mar 02, 2022 at 04:56:54PM -0800, Luis Chamberlain wrote:
-> > > > Thinking proactively about LSFMM, regarding just Zone storage..
-> > > > 
-> > > > I'd like to propose a BoF for Zoned Storage. The point of it is
-> > > > to address the existing point points we have and take advantage of
-> > > > having folks in the room we can likely settle on things faster which
-> > > > otherwise would take years.
-> > > > 
-> > > > I'll throw at least one topic out:
-> > > > 
-> > > >   * Raw access for zone append for microbenchmarks:
-> > > >   	- are we really happy with the status quo?
-> > > > 	- if not what outlets do we have?
-> > > > 
-> > > > I think the nvme passthrogh stuff deserves it's own shared
-> > > > discussion though and should not make it part of the BoF.
-> > > 
-> > > Reading through the discussion on this thread, perhaps this session
-> > > should be used to educate application developers about how to use
-> > > ZoneFS so they never need to manage low level details of zone
-> > > storage such as enumerating zones, controlling write pointers
-> > > safely for concurrent IO, performing zone resets, etc.
-> > 
-> > I'm not even sure users are really aware that given cap can be different
-> > than zone size and btrfs uses zone size to compute size, the size is a
-> > flat out lie.
+On Fri, Mar 04, 2022 at 10:28:57PM +0300, Sergei Shtylyov wrote:
+> On 3/4/22 10:06 AM, Byungchul Park wrote:
 > 
-> Sorry, I don't get what btrfs does with zone management has anything
-> to do with using Zonefs to get direct, raw IO access to individual
-> zones.
-
-You are right for direct raw access. My point was that even for
-filesystem use design I don't think the communication is clear on
-expectations. Similar computation need to be managed by fileystem
-design, for instance.
-
-> Direct IO on open zone fds is likely more efficient than
-> doing IO through the standard LBA based block device because ZoneFS
-> uses iomap_dio_rw() so it only needs to do one mapping operation per
-> IO instead of one per page in the IO. Nor does it have to manage
-> buffer heads or other "generic blockdev" functionality that direct
-> IO access to zoned storage doesn't require.
->
-> So whatever you're complaining about that btrfs lies about, does or
-> doesn't do is irrelevant - Zonefs was written with the express
-> purpose of getting user applications away from needing to directly
-> manage zone storage.
-
-I think it ended that way, I can't say it was the goal from the start.
-Seems the raw block patches had some support and in the end zonefs
-was presented as a possible outlet.
-
-> SO if you have special zone IO management
-> requirements, work out how they can be supported by zonefs - we
-> don't need yet another special purpose direct hardware access API
-> for zone storage when we already have a solid solution to the
-> problem already.
-
-If this is fairly decided. Then that's that.
-
-Calling zonefs solid though is a stretch.
-
-> > modprobe null_blk nr_devices=0
-> > mkdir /sys/kernel/config/nullb/nullb0
-> > echo 0 > /sys/kernel/config/nullb/nullb0/completion_nsec
-> > echo 0 > /sys/kernel/config/nullb/nullb0/irqmode
-> > echo 2 > /sys/kernel/config/nullb/nullb0/queue_mode
-> > echo 1024 > /sys/kernel/config/nullb/nullb0/hw_queue_depth
-> > echo 1 > /sys/kernel/config/nullb/nullb0/memory_backed
-> > echo 1 > /sys/kernel/config/nullb/nullb0/zoned
-> > 
-> > echo 128 > /sys/kernel/config/nullb/nullb0/zone_size
-> > # 6 zones are implied, we are saying 768 for the full storage size..
-> > # but...
-> > echo 768 > /sys/kernel/config/nullb/nullb0/size
-> > 
-> > # If we force capacity to be way less than the zone sizes, btrfs still
-> > # uses the zone size to do its data / metadata size computation...
-> > echo 32 > /sys/kernel/config/nullb/nullb0/zone_capacity
+> > cb92173d1f0 (locking/lockdep, cpu/hotplug: Annotate AP thread) was
 > 
-> Then that's just a btrfs zone support bug where it's used the
-> wrong information to size it's zones. Why not just send a patch to
-> fix it?
+>    You need to enclose the commit summary in (""), not just (). :-)
 
-This can change the format of existing created filesystems. And so
-if this change is welcomed I think we would need to be explicit
-about its support.
+Thank you! I will!
 
-  Luis
+> > introduced to make lockdep_assert_cpus_held() work in AP thread.
+> > 
+> > However, the annotation is too strong for that purpose. We don't have to
+> > use more than try lock annotation for that.
+> > 
+> > Furthermore, now that Dept was introduced, false positive alarms was
+> > reported by that. Replaced it with try lock annotation.
+> > 
+> > Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+> [...]
+> 
+> MBR, Sergey
