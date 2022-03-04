@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03879C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD089C4321E
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230081AbiCDHI4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 02:08:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39098 "EHLO
+        id S238749AbiCDHJA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 02:09:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238758AbiCDHIv (ORCPT
+        with ESMTP id S238766AbiCDHIv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:08:51 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39301191421
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:10 -0800 (PST)
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F3882192C8E
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:12 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 4 Mar 2022 16:07:09 +0900
+        by 156.147.23.52 with ESMTP; 4 Mar 2022 16:07:09 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 4 Mar 2022 16:07:08 +0900
+        by 156.147.1.121 with ESMTP; 4 Mar 2022 16:07:09 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -46,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v4 19/24] dept: Disable Dept within the wait_bit layer by default
-Date:   Fri,  4 Mar 2022 16:06:38 +0900
-Message-Id: <1646377603-19730-20-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 21/24] dept: Disable Dept on struct crypto_larval's completion for now
+Date:   Fri,  4 Mar 2022 16:06:40 +0900
+Message-Id: <1646377603-19730-22-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
 References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
@@ -56,42 +56,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The struct wait_queue_head array, bit_wait_table[] in sched/wait_bit.c
-are shared by all its users, which unfortunately vary in terms of class.
-So each should've been assigned its own class to avoid false positives.
+struct crypto_larval's completion is used for multiple purposes e.g.
+waiting for test to complete or waiting for probe to complete.
 
-It'd better let Dept work at a higher layer than wait_bit. So disabled
-Dept within the wait_bit layer by default.
-
-It's worth noting that Dept is still working with the other struct
-wait_queue_head ones that are mostly well-classified.
+The completion variable needs to be split according to what it's used
+for. Otherwise, Dept cannot distinguish one from another and doesn't
+work properly. Now that it isn't, disable Dept on it.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- kernel/sched/wait_bit.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ crypto/api.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/kernel/sched/wait_bit.c b/kernel/sched/wait_bit.c
-index 02ce292..3e5a3eb 100644
---- a/kernel/sched/wait_bit.c
-+++ b/kernel/sched/wait_bit.c
-@@ -3,6 +3,7 @@
-  * The implementation of the wait_bit*() and related waiting APIs:
-  */
- #include "sched.h"
-+#include <linux/dept.h>
+diff --git a/crypto/api.c b/crypto/api.c
+index cf0869d..f501b91 100644
+--- a/crypto/api.c
++++ b/crypto/api.c
+@@ -115,7 +115,12 @@ struct crypto_larval *crypto_larval_alloc(const char *name, u32 type, u32 mask)
+ 	larval->alg.cra_destroy = crypto_larval_destroy;
  
- #define WAIT_TABLE_BITS 8
- #define WAIT_TABLE_SIZE (1 << WAIT_TABLE_BITS)
-@@ -246,6 +247,8 @@ void __init wait_bit_init(void)
- {
- 	int i;
+ 	strlcpy(larval->alg.cra_name, name, CRYPTO_MAX_ALG_NAME);
+-	init_completion(&larval->completion);
++	/*
++	 * TODO: Split ->completion according to what it's used for e.g.
++	 * ->test_completion, ->probe_completion and the like, so that
++	 *  Dept can track its dependency properly.
++	 */
++	init_completion_nocheck(&larval->completion);
  
--	for (i = 0; i < WAIT_TABLE_SIZE; i++)
-+	for (i = 0; i < WAIT_TABLE_SIZE; i++) {
- 		init_waitqueue_head(bit_wait_table + i);
-+		dept_map_nocheck(&(bit_wait_table + i)->dmap);
-+	}
+ 	return larval;
  }
 -- 
 1.9.1
