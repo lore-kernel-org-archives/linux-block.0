@@ -2,20 +2,20 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 312A1C4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E5DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238785AbiCDHJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 02:09:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39378 "EHLO
+        id S238913AbiCDHJJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 02:09:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238681AbiCDHIw (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:08:52 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB0D2192CAB
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:14 -0800 (PST)
+        with ESMTP id S238775AbiCDHIv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:08:51 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 50D12192C9F
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:13 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.52 with ESMTP; 4 Mar 2022 16:07:09 +0900
+        by 156.147.23.53 with ESMTP; 4 Mar 2022 16:07:09 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
@@ -46,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v4 23/24] dept: Let it work with real sleeps in __schedule()
-Date:   Fri,  4 Mar 2022 16:06:42 +0900
-Message-Id: <1646377603-19730-24-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 22/24] dept: Don't create dependencies between different depths in any case
+Date:   Fri,  4 Mar 2022 16:06:41 +0900
+Message-Id: <1646377603-19730-23-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
 References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
@@ -56,37 +56,61 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dept commits the staged wait in __schedule() even if the corresponding
-wake_up() has already woken up the task. Which means Dept considers the
-case as a sleep. This would help Dept work for stronger detection but
-also leads false positives.
+Dept already prevents creating dependencies between different depths of
+the class indicated by *_lock_nested() when the lock acquisitions happen
+consecutively.
 
-It'd be better to let Dept work only with real sleeps conservatively for
-now. So did it.
+   lock A0 with depth
+   lock_nested A1 with depth + 1
+   ...
+   unlock A1
+   unlock A0
 
+Dept does not create A0 -> A1 dependency in this case, either.
+
+However, once another class cut in, the code becomes problematic. When
+Dept tries to create real dependencies, it does not only create real
+ones but also wrong ones between different depths of the class.
+
+   lock A0 with depth
+   lock B
+   lock_nested A1 with depth + 1
+   ...
+   unlock A1
+   unlock B
+   unlock A0
+
+Even in this case, Dept should not create A0 -> A1 dependency.
+
+So let Dept not create wrong dependencies between different depths of
+the class in any case.
+
+Reported-by: 42.hyeyoo@gmail.com
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- kernel/sched/core.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ kernel/dependency/dept.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
 
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 6a422aa..2ec7cf8 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6192,7 +6192,12 @@ static void __sched notrace __schedule(unsigned int sched_mode)
- 	local_irq_disable();
- 	rcu_note_context_switch(!!sched_mode);
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 5d4efc3..cc1b3a3 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -1458,14 +1458,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
  
--	if (sched_mode == SM_NONE)
-+	/*
-+	 * Skip the commit if the current task does not actually go to
-+	 * sleep.
-+	 */
-+	if (READ_ONCE(prev->__state) & TASK_NORMAL &&
-+	    sched_mode == SM_NONE)
- 		dept_ask_event_wait_commit(_RET_IP_);
+ 		eh = dt->ecxt_held + i;
+ 		if (eh->ecxt->class != c || eh->nest == ne)
+-			break;
+-	}
+-
+-	for (; i >= 0; i--) {
+-		struct dept_ecxt_held *eh;
+-
+-		eh = dt->ecxt_held + i;
+-		add_dep(eh->ecxt, w);
++			add_dep(eh->ecxt, w);
+ 	}
  
- 	/*
+ 	if (!wait_consumed(w) && !rich_stack) {
 -- 
 1.9.1
 
