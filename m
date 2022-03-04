@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDC3BC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B798BC4167B
+	for <linux-block@archiver.kernel.org>; Fri,  4 Mar 2022 07:08:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238775AbiCDHJK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 4 Mar 2022 02:09:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39346 "EHLO
+        id S238772AbiCDHJN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 4 Mar 2022 02:09:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238774AbiCDHIv (ORCPT
+        with ESMTP id S238748AbiCDHIv (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 4 Mar 2022 02:08:51 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 39B60192C99
-        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:13 -0800 (PST)
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D9ABC191401
+        for <linux-block@vger.kernel.org>; Thu,  3 Mar 2022 23:07:09 -0800 (PST)
 Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 4 Mar 2022 16:07:06 +0900
+        by 156.147.23.52 with ESMTP; 4 Mar 2022 16:07:08 +0900
 X-Original-SENDERIP: 156.147.1.121
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 4 Mar 2022 16:07:06 +0900
+        by 156.147.1.121 with ESMTP; 4 Mar 2022 16:07:08 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -46,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH v4 03/24] dept: Embed Dept data in Lockdep
-Date:   Fri,  4 Mar 2022 16:06:22 +0900
-Message-Id: <1646377603-19730-4-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH v4 17/24] dept: Distinguish each syscall context from another
+Date:   Fri,  4 Mar 2022 16:06:36 +0900
+Message-Id: <1646377603-19730-18-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
 References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
@@ -56,220 +56,378 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dept should work independently from Lockdep. However, there's no choise
-but to rely on Lockdep code and its instances for now.
+It enters kernel mode on each syscall and each syscall handling should
+be considered independently from the point of view of Dept. Otherwise,
+Dept may wrongly track dependencies across different syscalls.
+
+That might be a real dependency from user mode. However, now that Dept
+just started to work, conservatively let Dept not track dependencies
+across different syscalls.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/lockdep.h       | 71 ++++++++++++++++++++++++++++++++++++++++---
- include/linux/lockdep_types.h |  3 ++
- kernel/locking/lockdep.c      | 12 ++++----
- 3 files changed, 76 insertions(+), 10 deletions(-)
+ include/linux/dept.h     | 39 ++++++++++++++++------------
+ kernel/dependency/dept.c | 67 ++++++++++++++++++++++++------------------------
+ kernel/entry/common.c    |  3 +++
+ 3 files changed, 60 insertions(+), 49 deletions(-)
 
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 467b942..c56f6b6 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -20,6 +20,33 @@
- extern int prove_locking;
- extern int lock_stat;
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index e2d4aea..1a1c307 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -25,11 +25,16 @@
+ #define DEPT_MAX_SUBCLASSES_USR		(DEPT_MAX_SUBCLASSES / DEPT_MAX_SUBCLASSES_EVT)
+ #define DEPT_MAX_SUBCLASSES_CACHE	2
  
-+#ifdef CONFIG_DEPT
-+static inline void dept_after_copy_map(struct dept_map *to,
-+				       struct dept_map *from)
-+{
-+	int i;
+-#define DEPT_SIRQ			0
+-#define DEPT_HIRQ			1
+-#define DEPT_IRQS_NR			2
+-#define DEPT_SIRQF			(1UL << DEPT_SIRQ)
+-#define DEPT_HIRQF			(1UL << DEPT_HIRQ)
++enum {
++	DEPT_CXT_SIRQ = 0,
++	DEPT_CXT_HIRQ,
++	DEPT_CXT_IRQS_NR,
++	DEPT_CXT_PROCESS = DEPT_CXT_IRQS_NR,
++	DEPT_CXTS_NR
++};
 +
-+	if (from->keys == &from->keys_local)
-+		to->keys = &to->keys_local;
-+
-+	if (!to->keys)
-+		return;
-+
-+	/*
-+	 * Since the class cache can be modified concurrently we could observe
-+	 * half pointers (64bit arch using 32bit copy insns). Therefore clear
-+	 * the caches and take the performance hit.
-+	 *
-+	 * XXX it doesn't work well with lockdep_set_class_and_subclass(), since
-+	 *     that relies on cache abuse.
-+	 */
-+	for (i = 0; i < DEPT_MAX_SUBCLASSES_CACHE; i++)
-+		to->keys->classes[i] = NULL;
-+}
-+#else
-+#define dept_after_copy_map(t, f)	do { } while (0)
-+#endif
-+
- #ifdef CONFIG_LOCKDEP
++#define DEPT_SIRQF			(1UL << DEPT_CXT_SIRQ)
++#define DEPT_HIRQF			(1UL << DEPT_CXT_HIRQ)
  
- #include <linux/linkage.h>
-@@ -43,6 +70,8 @@ static inline void lockdep_copy_map(struct lockdep_map *to,
+ struct dept_ecxt;
+ struct dept_iecxt {
+@@ -95,8 +100,8 @@ struct dept_class {
+ 	/*
+ 	 * for tracking IRQ dependencies
  	 */
- 	for (i = 0; i < NR_LOCKDEP_CACHING_CLASSES; i++)
- 		to->class_cache[i] = NULL;
+-	struct dept_iecxt		iecxt[DEPT_IRQS_NR];
+-	struct dept_iwait		iwait[DEPT_IRQS_NR];
++	struct dept_iecxt		iecxt[DEPT_CXT_IRQS_NR];
++	struct dept_iwait		iwait[DEPT_CXT_IRQS_NR];
+ };
+ 
+ struct dept_stack {
+@@ -150,8 +155,8 @@ struct dept_ecxt {
+ 	/*
+ 	 * where the IRQ-enabled happened
+ 	 */
+-	unsigned long			enirq_ip[DEPT_IRQS_NR];
+-	struct dept_stack		*enirq_stack[DEPT_IRQS_NR];
++	unsigned long			enirq_ip[DEPT_CXT_IRQS_NR];
++	struct dept_stack		*enirq_stack[DEPT_CXT_IRQS_NR];
+ 
+ 	/*
+ 	 * where the event context started
+@@ -194,8 +199,8 @@ struct dept_wait {
+ 	/*
+ 	 * where the IRQ wait happened
+ 	 */
+-	unsigned long			irq_ip[DEPT_IRQS_NR];
+-	struct dept_stack		*irq_stack[DEPT_IRQS_NR];
++	unsigned long			irq_ip[DEPT_CXT_IRQS_NR];
++	struct dept_stack		*irq_stack[DEPT_CXT_IRQS_NR];
+ 
+ 	/*
+ 	 * where the wait happened
+@@ -400,19 +405,19 @@ struct dept_task {
+ 	int				wait_hist_pos;
+ 
+ 	/*
+-	 * sequential id to identify each IRQ context
++	 * sequential id to identify each context
+ 	 */
+-	unsigned int			irq_id[DEPT_IRQS_NR];
++	unsigned int			cxt_id[DEPT_CXTS_NR];
+ 
+ 	/*
+ 	 * for tracking IRQ-enabled points with cross-event
+ 	 */
+-	unsigned int			wgen_enirq[DEPT_IRQS_NR];
++	unsigned int			wgen_enirq[DEPT_CXT_IRQS_NR];
+ 
+ 	/*
+ 	 * for keeping up-to-date IRQ-enabled points
+ 	 */
+-	unsigned long			enirq_ip[DEPT_IRQS_NR];
++	unsigned long			enirq_ip[DEPT_CXT_IRQS_NR];
+ 
+ 	/*
+ 	 * current effective IRQ-enabled flag
+@@ -448,7 +453,7 @@ struct dept_task {
+ 	.dept_task.wait_hist = { { .wait = NULL, } },			\
+ 	.dept_task.ecxt_held_pos = 0,					\
+ 	.dept_task.wait_hist_pos = 0,					\
+-	.dept_task.irq_id = { 0 },					\
++	.dept_task.cxt_id = { 0 },					\
+ 	.dept_task.wgen_enirq = { 0 },					\
+ 	.dept_task.enirq_ip = { 0 },					\
+ 	.dept_task.recursive = 0,					\
+@@ -480,6 +485,7 @@ struct dept_task {
+ extern void dept_wait_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *w_fn, int ne);
+ extern void dept_event_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *e_fn);
+ extern void dept_ask_event_split_map(struct dept_map_each *me, struct dept_map_common *mc);
++extern void dept_kernel_enter(void);
+ 
+ /*
+  * for users who want to manage external keys
+@@ -520,6 +526,7 @@ struct dept_task {
+ #define dept_wait_split_map(me, mc, ip, w_fn, ne)	do { } while (0)
+ #define dept_event_split_map(me, mc, ip, e_fn)		do { } while (0)
+ #define dept_ask_event_split_map(me, mc)		do { } while (0)
++#define dept_kernel_enter()				do { } while (0)
+ #define dept_key_init(k)				do { (void)(k); } while (0)
+ #define dept_key_destroy(k)				do { (void)(k); } while (0)
+ #endif
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 6a47149..8f962ae 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -212,9 +212,9 @@ static inline struct dept_class *dep_tc(struct dept_dep *d)
+ 
+ static inline const char *irq_str(int irq)
+ {
+-	if (irq == DEPT_SIRQ)
++	if (irq == DEPT_CXT_SIRQ)
+ 		return "softirq";
+-	if (irq == DEPT_HIRQ)
++	if (irq == DEPT_CXT_HIRQ)
+ 		return "hardirq";
+ 	return "(unknown)";
+ }
+@@ -374,7 +374,7 @@ static void initialize_class(struct dept_class *c)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++) {
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 		struct dept_iecxt *ie = &c->iecxt[i];
+ 		struct dept_iwait *iw = &c->iwait[i];
+ 
+@@ -399,7 +399,7 @@ static void initialize_ecxt(struct dept_ecxt *e)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++) {
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 		e->enirq_stack[i] = NULL;
+ 		e->enirq_ip[i] = 0UL;
+ 	}
+@@ -414,7 +414,7 @@ static void initialize_wait(struct dept_wait *w)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++) {
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 		w->irq_stack[i] = NULL;
+ 		w->irq_ip[i] = 0UL;
+ 	}
+@@ -453,7 +453,7 @@ static void destroy_ecxt(struct dept_ecxt *e)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++)
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++)
+ 		if (e->enirq_stack[i])
+ 			put_stack(e->enirq_stack[i]);
+ 	if (e->class)
+@@ -469,7 +469,7 @@ static void destroy_wait(struct dept_wait *w)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++)
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++)
+ 		if (w->irq_stack[i])
+ 			put_stack(w->irq_stack[i]);
+ 	if (w->class)
+@@ -614,7 +614,7 @@ static void print_diagram(struct dept_dep *d)
+ 	const char *c_fn = e->ecxt_fn ?: "(unknown)";
+ 
+ 	irqf = e->enirqf & w->irqf;
+-	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
++	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
+ 		if (!firstline)
+ 			pr_warn("\nor\n\n");
+ 		firstline = false;
+@@ -645,7 +645,7 @@ static void print_dep(struct dept_dep *d)
+ 	const char *c_fn = e->ecxt_fn ?: "(unknown)";
+ 
+ 	irqf = e->enirqf & w->irqf;
+-	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
++	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
+ 		pr_warn("%s has been enabled:\n", irq_str(irq));
+ 		print_ip_stack(e->enirq_ip[irq], e->enirq_stack[irq]);
+ 		pr_warn("\n");
+@@ -871,7 +871,7 @@ static void bfs(struct dept_class *c, bfs_f *cb, void *in, void **out)
+  */
+ 
+ static inline unsigned long cur_enirqf(void);
+-static inline int cur_irq(void);
++static inline int cur_cxt(void);
+ static inline unsigned int cur_ctxt_id(void);
+ 
+ static inline struct dept_iecxt *iecxt(struct dept_class *c, int irq)
+@@ -1397,7 +1397,7 @@ static void add_dep(struct dept_ecxt *e, struct dept_wait *w)
+ 	if (d) {
+ 		check_dl_bfs(d);
+ 
+-		for (i = 0; i < DEPT_IRQS_NR; i++) {
++		for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 			struct dept_iwait *fiw = iwait(fc, i);
+ 			struct dept_iecxt *found_ie;
+ 			struct dept_iwait *found_iw;
+@@ -1433,7 +1433,7 @@ static void add_wait(struct dept_class *c, unsigned long ip,
+ 	struct dept_task *dt = dept_task();
+ 	struct dept_wait *w;
+ 	unsigned int wg = 0U;
+-	int irq;
++	int cxt;
+ 	int i;
+ 
+ 	w = new_wait();
+@@ -1445,9 +1445,9 @@ static void add_wait(struct dept_class *c, unsigned long ip,
+ 	w->wait_fn = w_fn;
+ 	w->wait_stack = get_current_stack();
+ 
+-	irq = cur_irq();
+-	if (irq < DEPT_IRQS_NR)
+-		add_iwait(c, irq, w);
++	cxt = cur_cxt();
++	if (cxt == DEPT_CXT_HIRQ || cxt == DEPT_CXT_SIRQ)
++		add_iwait(c, cxt, w);
+ 
+ 	/*
+ 	 * Avoid adding dependency between user aware nested ecxt and
+@@ -1512,7 +1512,7 @@ static void add_ecxt(void *obj, struct dept_class *c, unsigned long ip,
+ 	eh->nest = ne;
+ 
+ 	irqf = cur_enirqf();
+-	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR)
++	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR)
+ 		add_iecxt(c, irq, e, false);
+ 
+ 	del_ecxt(e);
+@@ -1639,7 +1639,7 @@ static void do_event(void *obj, struct dept_class *c, unsigned int wg,
+ 			break;
+ 	}
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++) {
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 		struct dept_ecxt *e;
+ 
+ 		if (before(dt->wgen_enirq[i], wg))
+@@ -1681,7 +1681,7 @@ static void disconnect_class(struct dept_class *c)
+ 		call_rcu(&d->rh, del_dep_rcu);
+ 	}
+ 
+-	for (i = 0; i < DEPT_IRQS_NR; i++) {
++	for (i = 0; i < DEPT_CXT_IRQS_NR; i++) {
+ 		stale_iecxt(iecxt(c, i));
+ 		stale_iwait(iwait(c, i));
+ 	}
+@@ -1706,27 +1706,21 @@ static inline unsigned long cur_enirqf(void)
+ 	return 0UL;
+ }
+ 
+-static inline int cur_irq(void)
++static inline int cur_cxt(void)
+ {
+ 	if (lockdep_softirq_context(current))
+-		return DEPT_SIRQ;
++		return DEPT_CXT_SIRQ;
+ 	if (lockdep_hardirq_context())
+-		return DEPT_HIRQ;
+-	return DEPT_IRQS_NR;
++		return DEPT_CXT_HIRQ;
++	return DEPT_CXT_PROCESS;
+ }
+ 
+ static inline unsigned int cur_ctxt_id(void)
+ {
+ 	struct dept_task *dt = dept_task();
+-	int irq = cur_irq();
++	int cxt = cur_cxt();
+ 
+-	/*
+-	 * Normal process context
+-	 */
+-	if (irq == DEPT_IRQS_NR)
+-		return 0U;
+-
+-	return dt->irq_id[irq] | (1UL << irq);
++	return dt->cxt_id[cxt] | (1UL << cxt);
+ }
+ 
+ static void enirq_transition(int irq)
+@@ -1776,7 +1770,7 @@ static void enirq_update(unsigned long ip)
+ 	/*
+ 	 * Do enirq_transition() only on an OFF -> ON transition.
+ 	 */
+-	for_each_set_bit(irq, &irqf, DEPT_IRQS_NR) {
++	for_each_set_bit(irq, &irqf, DEPT_CXT_IRQS_NR) {
+ 		if (prev & (1UL << irq))
+ 			continue;
+ 
+@@ -1879,6 +1873,13 @@ void dept_disable_hardirq(unsigned long ip)
+ 	dept_exit(flags);
+ }
+ 
++void dept_kernel_enter(void)
++{
++	struct dept_task *dt = dept_task();
 +
-+	dept_after_copy_map(&to->dmap, &from->dmap);
++	dt->cxt_id[DEPT_CXT_PROCESS] += (1UL << DEPT_CXTS_NR);
++}
++
+ /*
+  * Ensure it's the outmost softirq context.
+  */
+@@ -1886,7 +1887,7 @@ void dept_softirq_enter(void)
+ {
+ 	struct dept_task *dt = dept_task();
+ 
+-	dt->irq_id[DEPT_SIRQ] += (1UL << DEPT_IRQS_NR);
++	dt->cxt_id[DEPT_CXT_SIRQ] += (1UL << DEPT_CXTS_NR);
  }
  
  /*
-@@ -176,8 +205,19 @@ struct held_lock {
- 	current->lockdep_recursion -= LOCKDEP_OFF;	\
- } while (0)
+@@ -1896,7 +1897,7 @@ void dept_hardirq_enter(void)
+ {
+ 	struct dept_task *dt = dept_task();
  
--extern void lockdep_register_key(struct lock_class_key *key);
--extern void lockdep_unregister_key(struct lock_class_key *key);
-+extern void __lockdep_register_key(struct lock_class_key *key);
-+extern void __lockdep_unregister_key(struct lock_class_key *key);
-+
-+#define lockdep_register_key(k)				\
-+do {							\
-+	__lockdep_register_key(k);			\
-+	dept_key_init(&(k)->dkey);			\
-+} while (0)
-+#define lockdep_unregister_key(k)			\
-+do {							\
-+	__lockdep_unregister_key(k);			\
-+	dept_key_destroy(&(k)->dkey);			\
-+} while (0)
+-	dt->irq_id[DEPT_HIRQ] += (1UL << DEPT_IRQS_NR);
++	dt->cxt_id[DEPT_CXT_HIRQ] += (1UL << DEPT_CXTS_NR);
+ }
  
  /*
-  * These methods are used by specific locking variants (spinlocks,
-@@ -185,9 +225,18 @@ struct held_lock {
-  * to lockdep:
-  */
- 
--extern void lockdep_init_map_type(struct lockdep_map *lock, const char *name,
-+extern void __lockdep_init_map_type(struct lockdep_map *lock, const char *name,
- 	struct lock_class_key *key, int subclass, u8 inner, u8 outer, u8 lock_type);
- 
-+#define lockdep_init_map_type(l, n, k, s, i, o, t)		\
-+do {								\
-+	__lockdep_init_map_type(l, n, k, s, i, o, t);		\
-+	if ((k) == &__lockdep_no_validate__)			\
-+		dept_map_nocheck(&(l)->dmap);			\
-+	else							\
-+		dept_map_init(&(l)->dmap, &(k)->dkey, s, n);	\
-+} while (0)
-+
- static inline void
- lockdep_init_map_waits(struct lockdep_map *lock, const char *name,
- 		       struct lock_class_key *key, int subclass, u8 inner, u8 outer)
-@@ -431,13 +480,27 @@ enum xhlock_context_t {
- 	XHLOCK_CTX_NR,
- };
- 
-+#ifdef CONFIG_DEPT
-+/*
-+ * TODO: I found the case to use an address of other than a real key as
-+ * _key, for instance, in workqueue. So for now, we cannot use the
-+ * assignment like '.dmap.keys = &(_key)->dkey' unless it's fixed.
-+ */
-+#define STATIC_DEPT_MAP_INIT(_name, _key) .dmap = {		\
-+	.name = (_name),					\
-+	.keys = NULL },
-+#else
-+#define STATIC_DEPT_MAP_INIT(_name, _key)
-+#endif
-+
- #define lockdep_init_map_crosslock(m, n, k, s) do {} while (0)
- /*
-  * To initialize a lockdep_map statically use this macro.
-  * Note that _name must not be NULL.
-  */
- #define STATIC_LOCKDEP_MAP_INIT(_name, _key) \
--	{ .name = (_name), .key = (void *)(_key), }
-+	{ .name = (_name), .key = (void *)(_key), \
-+	STATIC_DEPT_MAP_INIT(_name, _key) }
- 
- static inline void lockdep_invariant_state(bool force) {}
- static inline void lockdep_free_task(struct task_struct *task) {}
-diff --git a/include/linux/lockdep_types.h b/include/linux/lockdep_types.h
-index d224308..50c8879 100644
---- a/include/linux/lockdep_types.h
-+++ b/include/linux/lockdep_types.h
-@@ -11,6 +11,7 @@
- #define __LINUX_LOCKDEP_TYPES_H
- 
- #include <linux/types.h>
+diff --git a/kernel/entry/common.c b/kernel/entry/common.c
+index bad7136..1826508 100644
+--- a/kernel/entry/common.c
++++ b/kernel/entry/common.c
+@@ -6,6 +6,7 @@
+ #include <linux/livepatch.h>
+ #include <linux/audit.h>
+ #include <linux/tick.h>
 +#include <linux/dept.h>
  
- #define MAX_LOCKDEP_SUBCLASSES		8UL
+ #include "common.h"
  
-@@ -76,6 +77,7 @@ struct lock_class_key {
- 		struct hlist_node		hash_entry;
- 		struct lockdep_subclass_key	subkeys[MAX_LOCKDEP_SUBCLASSES];
- 	};
-+	struct dept_key				dkey;
- };
+@@ -102,6 +103,7 @@ noinstr long syscall_enter_from_user_mode(struct pt_regs *regs, long syscall)
+ 	long ret;
  
- extern struct lock_class_key __lockdep_no_validate__;
-@@ -185,6 +187,7 @@ struct lockdep_map {
- 	int				cpu;
- 	unsigned long			ip;
- #endif
-+	struct dept_map			dmap;
- };
+ 	__enter_from_user_mode(regs);
++	dept_kernel_enter();
  
- struct pin_cookie { unsigned int val; };
-diff --git a/kernel/locking/lockdep.c b/kernel/locking/lockdep.c
-index 4a882f8..a85468d 100644
---- a/kernel/locking/lockdep.c
-+++ b/kernel/locking/lockdep.c
-@@ -1184,7 +1184,7 @@ static inline struct hlist_head *keyhashentry(const struct lock_class_key *key)
- }
- 
- /* Register a dynamically allocated key. */
--void lockdep_register_key(struct lock_class_key *key)
-+void __lockdep_register_key(struct lock_class_key *key)
+ 	instrumentation_begin();
+ 	local_irq_enable();
+@@ -114,6 +116,7 @@ noinstr long syscall_enter_from_user_mode(struct pt_regs *regs, long syscall)
+ noinstr void syscall_enter_from_user_mode_prepare(struct pt_regs *regs)
  {
- 	struct hlist_head *hash_head;
- 	struct lock_class_key *k;
-@@ -1207,7 +1207,7 @@ void lockdep_register_key(struct lock_class_key *key)
- restore_irqs:
- 	raw_local_irq_restore(flags);
- }
--EXPORT_SYMBOL_GPL(lockdep_register_key);
-+EXPORT_SYMBOL_GPL(__lockdep_register_key);
- 
- /* Check whether a key has been registered as a dynamic key. */
- static bool is_dynamic_key(const struct lock_class_key *key)
-@@ -4771,7 +4771,7 @@ static inline int check_wait_context(struct task_struct *curr,
- /*
-  * Initialize a lock instance's lock-class mapping info:
-  */
--void lockdep_init_map_type(struct lockdep_map *lock, const char *name,
-+void __lockdep_init_map_type(struct lockdep_map *lock, const char *name,
- 			    struct lock_class_key *key, int subclass,
- 			    u8 inner, u8 outer, u8 lock_type)
- {
-@@ -4831,7 +4831,7 @@ void lockdep_init_map_type(struct lockdep_map *lock, const char *name,
- 		raw_local_irq_restore(flags);
- 	}
- }
--EXPORT_SYMBOL_GPL(lockdep_init_map_type);
-+EXPORT_SYMBOL_GPL(__lockdep_init_map_type);
- 
- struct lock_class_key __lockdep_no_validate__;
- EXPORT_SYMBOL_GPL(__lockdep_no_validate__);
-@@ -6291,7 +6291,7 @@ void lockdep_reset_lock(struct lockdep_map *lock)
- }
- 
- /* Unregister a dynamically allocated key. */
--void lockdep_unregister_key(struct lock_class_key *key)
-+void __lockdep_unregister_key(struct lock_class_key *key)
- {
- 	struct hlist_head *hash_head = keyhashentry(key);
- 	struct lock_class_key *k;
-@@ -6326,7 +6326,7 @@ void lockdep_unregister_key(struct lock_class_key *key)
- 	/* Wait until is_dynamic_key() has finished accessing k->hash_entry. */
- 	synchronize_rcu();
- }
--EXPORT_SYMBOL_GPL(lockdep_unregister_key);
-+EXPORT_SYMBOL_GPL(__lockdep_unregister_key);
- 
- void __init lockdep_init(void)
- {
+ 	__enter_from_user_mode(regs);
++	dept_kernel_enter();
+ 	instrumentation_begin();
+ 	local_irq_enable();
+ 	instrumentation_end();
 -- 
 1.9.1
 
