@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5A7BC4167B
-	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 20:14:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 492AFC433EF
+	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 20:14:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230446AbiCEUPp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 15:15:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51834 "EHLO
+        id S232414AbiCEUPq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Mar 2022 15:15:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232342AbiCEUPm (ORCPT
+        with ESMTP id S232385AbiCEUPm (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 15:15:42 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 832A35D652;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0D4835FF22;
         Sat,  5 Mar 2022 12:14:46 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 4F3EF7A0685;
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 81C197A069D;
         Sat,  5 Mar 2022 21:14:41 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
@@ -25,9 +25,9 @@ Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
         linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 13/16] pata_parport: add kbic protocol driver
-Date:   Sat,  5 Mar 2022 21:14:08 +0100
-Message-Id: <20220305201411.501-14-linux@zary.sk>
+Subject: [PATCH 15/16] pata_parport: add on20 protocol driver
+Date:   Sat,  5 Mar 2022 21:14:10 +0100
+Message-Id: <20220305201411.501-16-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220305201411.501-1-linux@zary.sk>
 References: <20220305201411.501-1-linux@zary.sk>
@@ -37,63 +37,57 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add KingByte KBIC-951A/971A protocol driver.
+Add OnSpec 90c20 protocol driver.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/Kconfig  |  12 ++
+ drivers/ata/pata_parport/Kconfig  |  11 +++
  drivers/ata/pata_parport/Makefile |   1 +
- drivers/ata/pata_parport/kbic.c   | 292 ++++++++++++++++++++++++++++++
- 3 files changed, 305 insertions(+)
- create mode 100644 drivers/ata/pata_parport/kbic.c
+ drivers/ata/pata_parport/on20.c   | 136 ++++++++++++++++++++++++++++++
+ 3 files changed, 148 insertions(+)
+ create mode 100644 drivers/ata/pata_parport/on20.c
 
 diff --git a/drivers/ata/pata_parport/Kconfig b/drivers/ata/pata_parport/Kconfig
-index d8e5feaaae7a..004e5cf708f1 100644
+index 4505a037591a..c18757464b1d 100644
 --- a/drivers/ata/pata_parport/Kconfig
 +++ b/drivers/ata/pata_parport/Kconfig
-@@ -142,3 +142,15 @@ config PATA_PARPORT_FRPW
- 	  may answer Y here to build in the protocol driver, otherwise you
- 	  should answer M to build it as a loadable module. The module will be
- 	  called frpw.
+@@ -165,3 +165,14 @@ config PATA_PARPORT_KTTI
+ 	  support into your kernel, you may answer Y here to build in the
+ 	  protocol driver, otherwise you should answer M to build it as a
+ 	  loadable module. The module will be called ktti.
 +
-+config PATA_PARPORT_KBIC
-+	tristate "KingByte KBIC-951A/971A protocols"
++config PATA_PARPORT_ON20
++	tristate "OnSpec 90c20 protocol"
 +	depends on PATA_PARPORT
 +	help
-+	  This option enables support for the KBIC-951A and KBIC-971A parallel
-+	  port IDE protocols from KingByte Information Corp. KingByte's
-+	  adapters appear in many no-name portable disk and CD-ROM products,
-+	  especially in Europe. If you chose to build PATA_PARPORT support into your
-+	  kernel, you may answer Y here to build in the protocol driver,
-+	  otherwise you should answer M to build it as a loadable module. The
-+	  module will be called kbic.
++	  This option enables support for the (obsolete) 90c20 parallel port
++	  IDE protocol from OnSpec (often marketed under the ValuStore brand
++	  name). If you chose to build PATA_PARPORT support into your kernel, you
++	  may answer Y here to build in the protocol driver, otherwise you
++	  should answer M to build it as a loadable module.The module will
++	  be called on20.
 diff --git a/drivers/ata/pata_parport/Makefile b/drivers/ata/pata_parport/Makefile
-index 136374be9613..e82fded22da3 100644
+index 0c31cf55c96b..4358d1d946cb 100644
 --- a/drivers/ata/pata_parport/Makefile
 +++ b/drivers/ata/pata_parport/Makefile
-@@ -18,3 +18,4 @@ obj-$(CONFIG_PATA_PARPORT_EPAT)		+= epat.o
- obj-$(CONFIG_PATA_PARPORT_EPIA)		+= epia.o
- obj-$(CONFIG_PATA_PARPORT_FRIQ)		+= friq.o
+@@ -20,3 +20,4 @@ obj-$(CONFIG_PATA_PARPORT_FRIQ)		+= friq.o
  obj-$(CONFIG_PATA_PARPORT_FRPW)		+= frpw.o
-+obj-$(CONFIG_PATA_PARPORT_KBIC)		+= kbic.o
-diff --git a/drivers/ata/pata_parport/kbic.c b/drivers/ata/pata_parport/kbic.c
+ obj-$(CONFIG_PATA_PARPORT_KBIC)		+= kbic.o
+ obj-$(CONFIG_PATA_PARPORT_KTTI)		+= ktti.o
++obj-$(CONFIG_PATA_PARPORT_ON20)		+= on20.o
+diff --git a/drivers/ata/pata_parport/on20.c b/drivers/ata/pata_parport/on20.c
 new file mode 100644
-index 000000000000..49f8a88db2a2
+index 000000000000..2c0c6f9841dd
 --- /dev/null
-+++ b/drivers/ata/pata_parport/kbic.c
-@@ -0,0 +1,292 @@
++++ b/drivers/ata/pata_parport/on20.c
+@@ -0,0 +1,136 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ *	kbic.c    (c) 1997-8  Grant R. Guenther <grant@torque.net>
-+ *			      Under the terms of the GNU General Public License.
++ *	on20.c	(c) 1996-8  Grant R. Guenther <grant@torque.net>
++ *			    Under the terms of the GNU General Public License.
 + *
-+ *	This is a low-level driver for the KBIC-951A and KBIC-971A
-+ *	parallel to IDE adapter chips from KingByte Information Systems.
-+ *
-+ *	The chips are almost identical, however, the wakeup code
-+ *	required for the 971A interferes with the correct operation of
-+ *	the 951A, so this driver registers itself twice, once for
-+ *	each chip.
++ *	on20.c is a low-level protocol driver for the
++ *	Onspec 90c20 parallel to IDE adapter.
 + */
 +
 +#include <linux/module.h>
@@ -106,274 +100,123 @@ index 000000000000..49f8a88db2a2
 +
 +#include "pata_parport.h"
 +
-+#define r12w()		(delay_p, inw(pi->port + 1) & 0xffff)
++#define op(f)	do { w2(4); w0(f); w2(5); w2(0xd); w2(5); w2(0xd); w2(5); w2(4); } while (0)
++#define vl(v)	do { w2(4); w0(v); w2(5); w2(7); w2(5); w2(4); } while (0)
 +
-+#define j44(a, b)	((((a >> 4) & 0x0f) | (b & 0xf0)) ^ 0x88)
-+#define j53(w)		(((w >> 3) & 0x1f) | ((w >> 4) & 0xe0))
-+
++#define j44(a, b)	(((a >> 4) & 0x0f) | (b & 0xf0))
 +
 +/* cont = 0 - access the IDE register file
 + * cont = 1 - access the IDE command set
 + */
 +
-+static int cont_map[2] = { 0x80, 0x40 };
-+
-+static int kbic_read_regr(struct pi_adapter *pi, int cont, int regr)
++static int on20_read_regr(struct pi_adapter *pi, int cont, int regr)
 +{
-+	int a, b, s;
++	int h, l, r;
 +
-+	s = cont_map[cont];
++	r = (regr << 2) + 1 + cont;
 +
-+	switch (pi->mode) {
++	op(1); vl(r); op(0);
++
++	switch (pi->mode)  {
 +	case 0:
-+		w0(regr | 0x18 | s); w2(4); w2(6); w2(4); w2(1); w0(8);
-+		a = r1(); w0(0x28); b = r1(); w2(4);
-+		return j44(a, b);
++		w2(4); w2(6); l = r1();
++		w2(4); w2(6); h = r1();
++		w2(4); w2(6); w2(4); w2(6); w2(4);
++		return j44(l, h);
 +	case 1:
-+		w0(regr | 0x38 | s); w2(4); w2(6); w2(4); w2(5); w0(8);
-+		a = r12w(); w2(4);
-+		return j53(a);
-+	case 2:
-+		w0(regr | 0x08 | s); w2(4); w2(6); w2(4); w2(0xa5); w2(0xa1);
-+		a = r0(); w2(4);
-+		return a;
-+	case 3:
-+	case 4:
-+	case 5:
-+		w0(0x20 | s); w2(4); w2(6); w2(4); w3(regr);
-+		a = r4(); b = r4(); w2(4); w2(0); w2(4);
-+		return a;
++		w2(4); w2(0x26); r = r0();
++		w2(4); w2(0x26); w2(4);
++		return r;
++
 +	}
 +	return -1;
 +}
 +
-+static void kbic_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
++static void on20_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
 +{
-+	int s = cont_map[cont];
++	int r = (regr << 2) + 1 + cont;
 +
-+	switch (pi->mode) {
-+	case 0:
-+	case 1:
-+	case 2:
-+		w0(regr | 0x10 | s); w2(4); w2(6); w2(4);
-+		w0(val); w2(5); w2(4);
-+		break;
-+	case 3:
-+	case 4:
-+	case 5:
-+		w0(0x20 | s); w2(4); w2(6); w2(4); w3(regr);
-+		w4(val); w4(val);
-+		w2(4); w2(0); w2(4);
-+		break;
-+	}
++	op(1); vl(r);
++	op(0); vl(val);
++	op(0); vl(val);
 +}
 +
-+static void k951_connect(struct pi_adapter *pi)
++static void on20_connect(struct pi_adapter *pi)
 +{
 +	pi->saved_r0 = r0();
 +	pi->saved_r2 = r2();
-+	w2(4);
++
++	w2(4); w0(0); w2(0xc); w2(4); w2(6); w2(4); w2(6); w2(4);
++	if (pi->mode) {
++		op(2); vl(8); op(2); vl(9);
++	} else {
++		op(2); vl(0); op(2); vl(8);
++	}
 +}
 +
-+static void k951_disconnect(struct pi_adapter *pi)
++static void on20_disconnect(struct pi_adapter *pi)
 +{
++	w2(4); w0(7); w2(4); w2(0xc); w2(4);
 +	w0(pi->saved_r0);
 +	w2(pi->saved_r2);
 +}
 +
-+#define	CCP(x)	do { w2(0xc4); w0(0xaa); w0(0x55); w0(0); w0(0xff); w0(0x87);\
-+		     w0(0x78); w0(x); w2(0xc5); w2(0xc4); w0(0xff);\
-+		} while (0)
-+
-+static void k971_connect(struct pi_adapter *pi)
++static void on20_read_block(struct pi_adapter *pi, char *buf, int count)
 +{
-+	pi->saved_r0 = r0();
-+	pi->saved_r2 = r2();
-+	CCP(0x20);
++	int k, l, h;
++
++	op(1); vl(1); op(0);
++
++	for (k = 0; k < count; k++)
++		if (pi->mode) {
++			w2(4); w2(0x26); buf[k] = r0();
++		} else {
++			w2(6); l = r1(); w2(4);
++			w2(6); h = r1(); w2(4);
++			buf[k] = j44(l, h);
++		}
 +	w2(4);
 +}
 +
-+static void k971_disconnect(struct pi_adapter *pi)
-+{
-+	CCP(0x30);
-+	w0(pi->saved_r0);
-+	w2(pi->saved_r2);
-+}
-+
-+/* counts must be congruent to 0 MOD 4, but all known applications
-+ * have this property.
-+ */
-+
-+static void kbic_read_block(struct pi_adapter *pi, char *buf, int count)
-+{
-+	int k, a, b;
-+
-+	switch (pi->mode) {
-+	case 0:
-+		w0(0x98); w2(4); w2(6); w2(4);
-+		for (k = 0; k < count/2; k++) {
-+			w2(1); w0(8);    a = r1();
-+			       w0(0x28); b = r1();
-+			buf[2 * k]   = j44(a, b);
-+			w2(5);	   b = r1();
-+			       w0(8);    a = r1();
-+			buf[2 * k + 1] = j44(a, b);
-+			w2(4);
-+		}
-+		break;
-+	case 1:
-+		w0(0xb8); w2(4); w2(6); w2(4);
-+		for (k = 0; k < count / 4; k++) {
-+			w0(0xb8);
-+			w2(4); w2(5);
-+			w0(8);    buf[4 * k]   = j53(r12w());
-+			w0(0xb8); buf[4 * k + 1] = j53(r12w());
-+			w2(4); w2(5);
-+				  buf[4 * k + 3] = j53(r12w());
-+			w0(8);    buf[4 * k + 2] = j53(r12w());
-+		}
-+		w2(4);
-+		break;
-+	case 2:
-+		w0(0x88); w2(4); w2(6); w2(4);
-+		for (k = 0; k < count / 2; k++) {
-+			w2(0xa0); w2(0xa1); buf[2 * k] = r0();
-+			w2(0xa5); buf[2 * k + 1] = r0();
-+		}
-+		w2(4);
-+		break;
-+	case 3:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count; k++)
-+			buf[k] = r4();
-+		w2(4); w2(0); w2(4);
-+		break;
-+	case 4:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count / 2; k++)
-+			((u16 *)buf)[k] = r4w();
-+		w2(4); w2(0); w2(4);
-+		break;
-+	case 5:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count / 4; k++)
-+			((u32 *)buf)[k] = r4l();
-+		w2(4); w2(0); w2(4);
-+		break;
-+	}
-+}
-+
-+static void kbic_write_block(struct pi_adapter *pi, char *buf, int count)
++static void on20_write_block(struct pi_adapter *pi, char *buf, int count)
 +{
 +	int k;
 +
-+	switch (pi->mode) {
-+	case 0:
-+	case 1:
-+	case 2:
-+		w0(0x90); w2(4); w2(6); w2(4);
-+		for (k = 0; k < count / 2; k++) {
-+			w0(buf[2 * k + 1]); w2(0); w2(4);
-+			w0(buf[2 * k]);   w2(5); w2(4);
-+		}
-+		break;
-+	case 3:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count / 2; k++) {
-+			w4(buf[2 * k + 1]);
-+			w4(buf[2 * k]);
-+		}
-+		w2(4); w2(0); w2(4);
-+		break;
-+	case 4:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count / 2; k++)
-+			w4w(pi_swab16(buf, k));
-+		w2(4); w2(0); w2(4);
-+		break;
-+	case 5:
-+		w0(0xa0); w2(4); w2(6); w2(4); w3(0);
-+		for (k = 0; k < count / 4; k++)
-+			w4l(pi_swab32(buf, k));
-+		w2(4); w2(0); w2(4);
-+		break;
++	op(1); vl(1); op(0);
++
++	for (k = 0; k < count; k++) {
++		w2(5); w0(buf[k]); w2(7);
 +	}
++	w2(4);
 +}
 +
-+static void kbic_log_adapter(struct pi_adapter *pi, char *scratch, int verbose, char *chip)
++static void on20_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
 +{
-+	static char * const mode_string[] = {
-+		"4-bit", "5/3", "8-bit", "EPP-8", "EPP_16", "EPP-32"};
++	static char * const mode_string[] = { "4-bit", "8-bit" };
 +
-+	dev_info(&pi->dev, "kbic, KingByte %s at 0x%x, mode %d (%s), delay %d\n",
-+		chip, pi->port, pi->mode, mode_string[pi->mode], pi->delay);
++	dev_info(&pi->dev, "on20, OnSpec 90c20 at 0x%x, mode %d (%s), delay %d\n",
++		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
 +}
 +
-+static void k951_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
-+{
-+	kbic_log_adapter(pi, scratch, verbose, "KBIC-951A");
-+}
-+
-+static void k971_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
-+{
-+	kbic_log_adapter(pi, scratch, verbose, "KBIC-971A");
-+}
-+
-+static struct pi_protocol k951 = {
++static struct pi_protocol on20 = {
 +	.owner		= THIS_MODULE,
-+	.name		= "k951",
-+	.max_mode	= 6,
-+	.epp_first	= 3,
++	.name		= "on20",
++	.max_mode	= 2,
++	.epp_first	= 2,
 +	.default_delay	= 1,
 +	.max_units	= 1,
-+	.write_regr	= kbic_write_regr,
-+	.read_regr	= kbic_read_regr,
-+	.write_block	= kbic_write_block,
-+	.read_block	= kbic_read_block,
-+	.connect	= k951_connect,
-+	.disconnect	= k951_disconnect,
-+	.log_adapter	= k951_log_adapter,
++	.write_regr	= on20_write_regr,
++	.read_regr	= on20_read_regr,
++	.write_block	= on20_write_block,
++	.read_block	= on20_read_block,
++	.connect	= on20_connect,
++	.disconnect	= on20_disconnect,
++	.log_adapter	= on20_log_adapter,
++	.sht		= { PATA_PARPORT_SHT("pata_parport-on20") },
 +};
-+
-+static struct pi_protocol k971 = {
-+	.owner		= THIS_MODULE,
-+	.name		= "k971",
-+	.max_mode	= 6,
-+	.epp_first	= 3,
-+	.default_delay	= 1,
-+	.max_units	= 1,
-+	.write_regr	= kbic_write_regr,
-+	.read_regr	= kbic_read_regr,
-+	.write_block	= kbic_write_block,
-+	.read_block	= kbic_read_block,
-+	.connect	= k971_connect,
-+	.disconnect	= k971_disconnect,
-+	.log_adapter	= k971_log_adapter,
-+	.sht		= { PATA_PARPORT_SHT("pata_parport-kbic") },
-+};
-+
-+static int __init kbic_init(void)
-+{
-+	int rv;
-+
-+	rv = pata_parport_register_driver(&k951);
-+	if (rv < 0)
-+		return rv;
-+	rv = pata_parport_register_driver(&k971);
-+	if (rv < 0)
-+		pata_parport_unregister_driver(&k951);
-+	return rv;
-+}
-+
-+static void __exit kbic_exit(void)
-+{
-+	pata_parport_unregister_driver(&k951);
-+	pata_parport_unregister_driver(&k971);
-+}
 +
 +MODULE_LICENSE("GPL");
-+module_init(kbic_init)
-+module_exit(kbic_exit)
++module_pata_parport_driver(on20);
 -- 
 Ondrej Zary
 
