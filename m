@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13204C4332F
-	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 08:56:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA9C3C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 08:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231267AbiCEI5n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 03:57:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49754 "EHLO
+        id S231223AbiCEI5s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Mar 2022 03:57:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbiCEI5h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 03:57:37 -0500
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA392634F2;
-        Sat,  5 Mar 2022 00:56:47 -0800 (PST)
-Received: from kwepemi500025.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4K9dkn55PHzbc1t;
-        Sat,  5 Mar 2022 16:52:01 +0800 (CST)
+        with ESMTP id S231194AbiCEI5m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 03:57:42 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C897255FB1;
+        Sat,  5 Mar 2022 00:56:50 -0800 (PST)
+Received: from kwepemi500018.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4K9dp84ZlQzBrhP;
+        Sat,  5 Mar 2022 16:54:56 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500025.china.huawei.com (7.221.188.170) with Microsoft SMTP Server
+ kwepemi500018.china.huawei.com (7.221.188.213) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.18; Sat, 5 Mar 2022 16:56:45 +0800
+ 15.1.2308.21; Sat, 5 Mar 2022 16:56:48 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Sat, 5 Mar
- 2022 16:56:44 +0800
+ 2022 16:56:47 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
         <jack@suse.cz>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next 07/11] block, bfq: only count parent bfqg when bfqq is activated
-Date:   Sat, 5 Mar 2022 17:12:01 +0800
-Message-ID: <20220305091205.4188398-8-yukuai3@huawei.com>
+Subject: [PATCH -next 11/11] block, bfq: cleanup bfqq_group()
+Date:   Sat, 5 Mar 2022 17:12:05 +0800
+Message-ID: <20220305091205.4188398-12-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220305091205.4188398-1-yukuai3@huawei.com>
 References: <20220305091205.4188398-1-yukuai3@huawei.com>
@@ -48,49 +48,32 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, bfqg will be counted into 'num_groups_with_pending_reqs'
-once it's child cgroup is activated, even if the group doesn't have
-any pending requests itself.
-
-For example, if we issue sync io in cgroup /root/c1/c2, root, c1 and c2
-will all be counted into 'num_groups_with_pending_reqs', which makes it
-impossible to handle requests concurrently.
-
-This patch doesn't count the group that doesn't have any pending
-requests while it's child group has pending requests.
+Now that if bfqq is under root group, 'bfqq->entity.parent' is set to
+root group's entity instead of NULL, there is no point for the judgement
+in bfqq_group() anymore.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-wf2q.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
+ block/bfq-cgroup.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 138a2950b841..db066ae35a71 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1123,13 +1123,7 @@ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
- 					bool non_blocking_wait_rq,
- 					bool requeue, bool expiration)
- {
--	for_each_entity(entity) {
--		bfq_update_groups_with_pending_reqs(entity);
--
--		/* root group is not in service tree */
--		if (is_root_entity(entity))
--			break;
--
-+	for_each_entity_not_root(entity) {
- 		__bfq_activate_requeue_entity(entity, non_blocking_wait_rq);
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 58acaf14a91d..1fcb13e97cf0 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -307,11 +307,7 @@ static struct bfq_group *bfqg_parent(struct bfq_group *bfqg)
  
- 		if (!bfq_update_next_in_service(entity->sched_data, entity,
-@@ -1640,6 +1634,7 @@ void bfq_activate_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
  {
- 	struct bfq_entity *entity = &bfqq->entity;
+-	struct bfq_entity *group_entity = bfqq->entity.parent;
+-
+-	return group_entity ? container_of(group_entity, struct bfq_group,
+-					   entity) :
+-			      bfqq->bfqd->root_group;
++	return container_of(bfqq->entity.parent, struct bfq_group, entity);
+ }
  
-+	bfq_update_groups_with_pending_reqs(bfqq->entity.parent);
- 	bfq_activate_requeue_entity(entity, bfq_bfqq_non_blocking_wait_rq(bfqq),
- 				    false, false);
- 	bfq_clear_bfqq_non_blocking_wait_rq(bfqq);
+ /*
 -- 
 2.31.1
 
