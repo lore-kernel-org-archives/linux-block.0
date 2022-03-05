@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A33AC4321E
-	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 20:15:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95836C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 20:15:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232409AbiCEUPs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 15:15:48 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51882 "EHLO
+        id S231990AbiCEUP5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Mar 2022 15:15:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbiCEUPk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 15:15:40 -0500
+        with ESMTP id S232370AbiCEUPj (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 15:15:39 -0500
 Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 33A464090A;
-        Sat,  5 Mar 2022 12:14:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7EED413F53;
+        Sat,  5 Mar 2022 12:14:45 -0800 (PST)
 Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
         (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id 377587A0666;
-        Sat,  5 Mar 2022 21:14:41 +0100 (CET)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 006BA7A0650;
+        Sat,  5 Mar 2022 21:14:40 +0100 (CET)
 From:   Ondrej Zary <linux@zary.sk>
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
         linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: [PATCH 12/16] pata_parport: add frpw protocol driver
-Date:   Sat,  5 Mar 2022 21:14:07 +0100
-Message-Id: <20220305201411.501-13-linux@zary.sk>
+Subject: [PATCH 10/16] pata_parport: add epia protocol driver
+Date:   Sat,  5 Mar 2022 21:14:05 +0100
+Message-Id: <20220305201411.501-11-linux@zary.sk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20220305201411.501-1-linux@zary.sk>
 References: <20220305201411.501-1-linux@zary.sk>
@@ -37,62 +37,60 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add FreeCom power protocol driver.
+Add Shuttle EPIA protocol driver.
 
 Signed-off-by: Ondrej Zary <linux@zary.sk>
 ---
- drivers/ata/pata_parport/Kconfig  |  10 +
+ drivers/ata/pata_parport/Kconfig  |  11 ++
  drivers/ata/pata_parport/Makefile |   1 +
- drivers/ata/pata_parport/frpw.c   | 292 ++++++++++++++++++++++++++++++
- 3 files changed, 303 insertions(+)
- create mode 100644 drivers/ata/pata_parport/frpw.c
+ drivers/ata/pata_parport/epia.c   | 308 ++++++++++++++++++++++++++++++
+ 3 files changed, 320 insertions(+)
+ create mode 100644 drivers/ata/pata_parport/epia.c
 
 diff --git a/drivers/ata/pata_parport/Kconfig b/drivers/ata/pata_parport/Kconfig
-index 8a569ee0bf6a..d8e5feaaae7a 100644
+index 6c218486c3b8..832ab8b00511 100644
 --- a/drivers/ata/pata_parport/Kconfig
 +++ b/drivers/ata/pata_parport/Kconfig
-@@ -132,3 +132,13 @@ config PATA_PARPORT_FRIQ
- 	  should answer M to build it as a loadable module. The module will be
- 	  called friq. You must also have a high-level driver for the type
- 	  of device that you want to support.
+@@ -109,3 +109,14 @@ config PATA_PARPORT_EPAT
+ 	  PATA_PARPORT support into your kernel, you may answer Y here to build in
+ 	  the protocol driver, otherwise you should answer M to build it as a
+ 	  loadable module. The module will be called epat.
 +
-+config PATA_PARPORT_FRPW
-+	tristate "FreeCom power protocol"
++config PATA_PARPORT_EPIA
++	tristate "Shuttle EPIA protocol"
 +	depends on PATA_PARPORT
 +	help
-+	  This option enables support for the Freecom power parallel port IDE
-+	  protocol. If you chose to build PATA_PARPORT support into your kernel, you
-+	  may answer Y here to build in the protocol driver, otherwise you
-+	  should answer M to build it as a loadable module. The module will be
-+	  called frpw.
++	  This option enables support for the (obsolete) EPIA parallel port
++	  IDE protocol from Shuttle Technology. This adapter can still be
++	  found in some no-name kits. If you chose to build PATA_PARPORT support
++	  into your kernel, you may answer Y here to build in the protocol
++	  driver, otherwise you should answer M to build it as a loadable
++	  module. The module will be called epia.
 diff --git a/drivers/ata/pata_parport/Makefile b/drivers/ata/pata_parport/Makefile
-index 20d05e525c95..136374be9613 100644
+index 459307f4a096..6e72778f45cb 100644
 --- a/drivers/ata/pata_parport/Makefile
 +++ b/drivers/ata/pata_parport/Makefile
-@@ -17,3 +17,4 @@ obj-$(CONFIG_PATA_PARPORT_FIT3)		+= fit3.o
+@@ -15,3 +15,4 @@ obj-$(CONFIG_PATA_PARPORT_DSTR)		+= dstr.o
+ obj-$(CONFIG_PATA_PARPORT_FIT2)		+= fit2.o
+ obj-$(CONFIG_PATA_PARPORT_FIT3)		+= fit3.o
  obj-$(CONFIG_PATA_PARPORT_EPAT)		+= epat.o
- obj-$(CONFIG_PATA_PARPORT_EPIA)		+= epia.o
- obj-$(CONFIG_PATA_PARPORT_FRIQ)		+= friq.o
-+obj-$(CONFIG_PATA_PARPORT_FRPW)		+= frpw.o
-diff --git a/drivers/ata/pata_parport/frpw.c b/drivers/ata/pata_parport/frpw.c
++obj-$(CONFIG_PATA_PARPORT_EPIA)		+= epia.o
+diff --git a/drivers/ata/pata_parport/epia.c b/drivers/ata/pata_parport/epia.c
 new file mode 100644
-index 000000000000..5151d3c26361
+index 000000000000..7f3db02fd243
 --- /dev/null
-+++ b/drivers/ata/pata_parport/frpw.c
-@@ -0,0 +1,292 @@
++++ b/drivers/ata/pata_parport/epia.c
+@@ -0,0 +1,308 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ *	frpw.c	(c) 1996-8  Grant R. Guenther <grant@torque.net>
-+ *			    Under the terms of the GNU General Public License
++ *	epia.c    (c) 1997-8  Grant R. Guenther <grant@torque.net>
++ *			      Under the terms of the GNU General Public License.
 + *
-+ *	frpw.c is a low-level protocol driver for the Freecom "Power"
-+ *	parallel port IDE adapter.
-+ *
-+ *	Some applications of this adapter may require a "printer" reset
-+ *	prior to loading the driver.  This can be done by loading and
-+ *	unloading the "lp" driver, or it can be done by this driver
-+ *	if you define FRPW_HARD_RESET.  The latter is not recommended
-+ *	as it may upset devices on other ports.
++ *	epia.c is a low-level protocol driver for Shuttle Technologies
++ *	EPIA parallel to IDE adapter chip.  This device is now obsolete
++ *	and has been replaced with the EPAT chip, which is supported
++ *	by epat.c, however, some devices based on EPIA are still
++ *	available.
 + */
 +
 +#include <linux/module.h>
@@ -105,273 +103,292 @@ index 000000000000..5151d3c26361
 +
 +#include "pata_parport.h"
 +
-+#define cec4		do { w2(0xc); w2(0xe); w2(0xe); w2(0xc); w2(4); w2(4); w2(4); } while (0)
-+#define j44(l, h)	(((l >> 4) & 0x0f) | (h & 0xf0))
-+
-+/* cont = 0 - access the IDE register file
-+ * cont = 1 - access the IDE command set
++/* mode codes:  0  nybble reads on port 1, 8-bit writes
++ *		1  5/3 reads on ports 1 & 2, 8-bit writes
++ *		2  8-bit reads and writes
++ *		3  8-bit EPP mode
++ *		4  16-bit EPP
++ *		5  32-bit EPP
 + */
 +
-+static int cont_map[2] = { 0x08, 0x10 };
++#define j44(a, b)	(((a >> 4) & 0x0f) + (b & 0xf0))
++#define j53(a, b)	(((a >> 3) & 0x1f) + ((b << 4) & 0xe0))
 +
-+static int frpw_read_regr(struct pi_adapter *pi, int cont, int regr)
++/* cont =  0   IDE register file
++ * cont =  1   IDE control registers
++ */
++
++static int cont_map[2] = { 0, 0x80 };
++
++static int epia_read_regr(struct pi_adapter *pi, int cont, int regr)
 +{
-+	int h, l, r;
++	int a, b, r;
 +
-+	r = regr + cont_map[cont];
++	regr += cont_map[cont];
 +
-+	w2(4);
-+	w0(r); cec4;
-+	w2(6); l = r1();
-+	w2(4); h = r1();
-+	w2(4);
-+
-+	return j44(l, h);
-+}
-+
-+static void frpw_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
-+{
-+	int r = regr + cont_map[cont];
-+
-+	w2(4); w0(r); cec4;
-+	w0(val);
-+	w2(5); w2(7); w2(5); w2(4);
-+}
-+
-+static void frpw_read_block_int(struct pi_adapter *pi, char *buf, int count, int regr)
-+{
-+	int h, l, k, ph;
-+
-+	switch (pi->mode) {
++	switch (pi->mode)  {
 +	case 0:
-+		w2(4); w0(regr); cec4;
-+		for (k = 0; k < count; k++) {
-+			w2(6); l = r1();
-+			w2(4); h = r1();
-+			buf[k] = j44(l, h);
-+		}
-+		w2(4);
-+		break;
++		r = regr ^ 0x39;
++		w0(r); w2(1); w2(3); w0(r);
++		a = r1(); w2(1); b = r1(); w2(4);
++		return j44(a, b);
 +	case 1:
-+		ph = 2;
-+		w2(4); w0(regr + 0xc0); cec4;
-+		w0(0xff);
-+		for (k = 0; k < count; k++) {
-+			w2(0xa4 + ph);
-+			buf[k] = r0();
-+			ph = 2 - ph;
-+		}
-+		w2(0xac); w2(0xa4); w2(4);
-+		break;
++		r = regr ^ 0x31;
++		w0(r); w2(1); w0(r&0x37);
++		w2(3); w2(5); w0(r|0xf0);
++		a = r1(); b = r2(); w2(4);
++		return j53(a, b);
 +	case 2:
-+		w2(4); w0(regr + 0x80); cec4;
-+		for (k = 0; k < count; k++)
-+			buf[k] = r4();
-+		w2(0xac); w2(0xa4);
-+		w2(4);
++		r = regr ^ 0x29;
++		w0(r); w2(1); w2(0X21); w2(0x23);
++		a = r0(); w2(4);
++		return a;
++	case 3:
++	case 4:
++	case 5:
++		w3(regr); w2(0x24); a = r4(); w2(4);
++		return a;
++	}
++	return -1;
++}
++
++static void epia_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
++{
++	int  r;
++
++	regr += cont_map[cont];
++
++	switch (pi->mode)  {
++	case 0:
++	case 1:
++	case 2:
++		r = regr ^ 0x19;
++		w0(r); w2(1); w0(val); w2(3); w2(4);
 +		break;
 +	case 3:
-+		w2(4); w0(regr + 0x80); cec4;
-+		for (k = 0; k < count - 2; k++)
-+			buf[k] = r4();
-+		w2(0xac); w2(0xa4);
-+		buf[count - 2] = r4();
-+		buf[count - 1] = r4();
-+		w2(4);
-+		break;
 +	case 4:
-+		w2(4); w0(regr + 0x80); cec4;
-+		for (k = 0; k < (count / 2) - 1; k++)
-+			((u16 *)buf)[k] = r4w();
-+		w2(0xac); w2(0xa4);
-+		buf[count - 2] = r4();
-+		buf[count - 1] = r4();
-+		w2(4);
-+		break;
 +	case 5:
-+		w2(4); w0(regr + 0x80); cec4;
-+		for (k = 0; k < (count / 4) - 1; k++)
-+			((u32 *)buf)[k] = r4l();
-+		buf[count - 4] = r4();
-+		buf[count - 3] = r4();
-+		w2(0xac); w2(0xa4);
-+		buf[count - 2] = r4();
-+		buf[count - 1] = r4();
-+		w2(4);
++		r = regr ^ 0x40;
++		w3(r); w4(val); w2(4);
 +		break;
 +	}
 +}
 +
-+static void frpw_read_block(struct pi_adapter *pi, char *buf, int count)
++#define WR(r, v)	epia_write_regr(pi, 0, r, v)
++#define RR(r)		(epia_read_regr(pi, 0, r))
++
++/* The use of register 0x84 is entirely unclear - it seems to control
++ * some EPP counters ...  currently we know about 3 different block
++ * sizes:  the standard 512 byte reads and writes, 12 byte writes and
++ * 2048 byte reads (the last two being used in the CDrom drivers.
++ */
++
++static void epia_connect(struct pi_adapter *pi)
 +{
-+	frpw_read_block_int(pi, buf, count, 0x08);
++	pi->saved_r0 = r0();
++	pi->saved_r2 = r2();
++
++	w2(4); w0(0xa0); w0(0x50); w0(0xc0); w0(0x30); w0(0xa0); w0(0);
++	w2(1); w2(4);
++	if (pi->mode >= 3) {
++		w0(0xa); w2(1); w2(4); w0(0x82); w2(4); w2(0xc); w2(4);
++		w2(0x24); w2(0x26); w2(4);
++	}
++	WR(0x86, 8);
 +}
 +
-+static void frpw_write_block(struct pi_adapter *pi, char *buf, int count)
++static void epia_disconnect(struct pi_adapter *pi)
 +{
-+	int k;
++	/* WR(0x84, 0x10); */
++	w0(pi->saved_r0);
++	w2(1); w2(4);
++	w0(pi->saved_r0);
++	w2(pi->saved_r2);
++}
++
++static void epia_read_block(struct pi_adapter *pi, char *buf, int count)
++{
++	int k, ph, a, b;
++
++	switch (pi->mode) {
++	case 0:
++		w0(0x81); w2(1); w2(3); w0(0xc1);
++		ph = 1;
++		for (k = 0; k < count; k++) {
++			w2(2 + ph); a = r1();
++			w2(4 + ph); b = r1();
++			buf[k] = j44(a, b);
++			ph = 1 - ph;
++		}
++		w0(0); w2(4);
++		break;
++	case 1:
++		w0(0x91); w2(1); w0(0x10); w2(3);
++		w0(0x51); w2(5); w0(0xd1);
++		ph = 1;
++		for (k = 0; k < count; k++) {
++			w2(4 + ph);
++			a = r1(); b = r2();
++			buf[k] = j53(a, b);
++			ph = 1 - ph;
++		}
++		w0(0); w2(4);
++		break;
++	case 2:
++		w0(0x89); w2(1); w2(0x23); w2(0x21);
++		ph = 1;
++		for (k = 0; k < count; k++) {
++			w2(0x24 + ph);
++			buf[k] = r0();
++			ph = 1 - ph;
++		}
++		w2(6); w2(4);
++		break;
++	case 3:
++		if (count > 512)
++			WR(0x84, 3);
++		w3(0); w2(0x24);
++		for (k = 0; k < count; k++)
++			buf[k] = r4();
++		w2(4); WR(0x84, 0);
++		break;
++	case 4:
++		if (count > 512)
++			WR(0x84, 3);
++		w3(0); w2(0x24);
++		for (k = 0; k < count / 2; k++)
++			((u16 *)buf)[k] = r4w();
++		w2(4); WR(0x84, 0);
++		break;
++	case 5:
++		if (count > 512)
++			WR(0x84, 3);
++		w3(0); w2(0x24);
++		for (k = 0; k < count / 4; k++)
++			((u32 *)buf)[k] = r4l();
++		w2(4); WR(0x84, 0);
++		break;
++	}
++}
++
++static void epia_write_block(struct pi_adapter *pi, char *buf, int count)
++{
++	int ph, k, last, d;
 +
 +	switch (pi->mode) {
 +	case 0:
 +	case 1:
 +	case 2:
-+		w2(4); w0(8); cec4; w2(5);
++		w0(0xa1); w2(1); w2(3); w2(1); w2(5);
++		ph = 0; last = 0x8000;
 +		for (k = 0; k < count; k++) {
-+			w0(buf[k]);
-+			w2(7); w2(5);
++			d = buf[k];
++			if (d != last) {
++				last = d; w0(d);
++			}
++			w2(4 + ph);
++			ph = 1 - ph;
 +		}
-+		w2(4);
++		w2(7); w2(4);
 +		break;
 +	case 3:
-+		w2(4); w0(0xc8); cec4; w2(5);
++		if (count < 512)
++			WR(0x84, 1);
++		w3(0x40);
 +		for (k = 0; k < count; k++)
 +			w4(buf[k]);
-+		w2(4);
++		if (count < 512)
++			WR(0x84, 0);
 +		break;
 +	case 4:
-+		w2(4); w0(0xc8); cec4; w2(5);
++		if (count < 512)
++			WR(0x84, 1);
++		w3(0x40);
 +		for (k = 0; k < count / 2; k++)
 +			w4w(((u16 *)buf)[k]);
-+		w2(4);
++		if (count < 512)
++			WR(0x84, 0);
 +		break;
 +	case 5:
-+		w2(4); w0(0xc8); cec4; w2(5);
++		if (count < 512)
++			WR(0x84, 1);
++		w3(0x40);
 +		for (k = 0; k < count / 4; k++)
 +			w4l(((u32 *)buf)[k]);
-+		w2(4);
++		if (count < 512)
++			WR(0x84, 0);
 +		break;
 +	}
 +}
 +
-+static void frpw_connect(struct pi_adapter *pi)
++static int epia_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
 +{
-+	pi->saved_r0 = r0();
-+	pi->saved_r2 = r2();
-+	w2(4);
-+}
-+
-+static void frpw_disconnect(struct pi_adapter *pi)
-+{
-+	w2(4); w0(0x20); cec4;
-+	w0(pi->saved_r0);
-+	w2(pi->saved_r2);
-+}
-+
-+/* Stub logic to see if PNP string is available - used to distinguish
-+ * between the Xilinx and ASIC implementations of the Freecom adapter.
-+ *
-+ * returns chip_type:   0 = Xilinx, 1 = ASIC
-+ */
-+
-+static int frpw_test_pnp(struct pi_adapter *pi)
-+{
-+	int olddelay, a, b;
-+
-+#ifdef FRPW_HARD_RESET
-+	w0(0); w2(8); udelay(50); w2(0xc);   /* parallel bus reset */
-+	mdelay(1500);
-+#endif
-+
-+	olddelay = pi->delay;
-+	pi->delay = 10;
-+
-+	pi->saved_r0 = r0();
-+	pi->saved_r2 = r2();
-+
-+	w2(4); w0(4); w2(6); w2(7);
-+	a = r1() & 0xff; w2(4); b = r1() & 0xff;
-+	w2(0xc); w2(0xe); w2(4);
-+
-+	pi->delay = olddelay;
-+	w0(pi->saved_r0);
-+	w2(pi->saved_r2);
-+
-+	return ((~a & 0x40) && (b & 0x40));
-+}
-+
-+/* We use the pi->private to remember the result of the PNP test.
-+ * To make this work, private = port*2 + chip.  Yes, I know it's a hack :-(
-+ */
-+
-+static int frpw_test_proto(struct pi_adapter *pi, char *scratch, int verbose)
-+{
-+	int j, k, r;
++	int j, k, f;
 +	int e[2] = { 0, 0 };
 +
-+	if ((pi->private>>1) != pi->port)
-+		pi->private = frpw_test_pnp(pi) + 2 * pi->port;
-+
-+	if (((pi->private % 2) == 0) && (pi->mode > 2)) {
-+		if (verbose)
-+			dev_info(&pi->dev, "frpw: Xilinx does not support mode %d\n",
-+				pi->mode);
-+		return 1;
-+	}
-+
-+	if (((pi->private % 2) == 1) && (pi->mode == 2)) {
-+		if (verbose)
-+			dev_info(&pi->dev, "frpw: ASIC does not support mode 2\n");
-+		return 1;
-+	}
-+
-+	frpw_connect(pi);
++	epia_connect(pi);
 +	for (j = 0; j < 2; j++) {
-+		frpw_write_regr(pi, 0, 6, 0xa0 + j * 0x10);
++		WR(6, 0xa0 + j * 0x10);
 +		for (k = 0; k < 256; k++) {
-+			frpw_write_regr(pi, 0, 2, k ^ 0xaa);
-+			frpw_write_regr(pi, 0, 3, k ^ 0x55);
-+			if (frpw_read_regr(pi, 0, 2) != (k ^ 0xaa))
++			WR(2, k ^ 0xaa);
++			WR(3, k ^ 0x55);
++			if (RR(2) != (k ^ 0xaa))
 +				e[j]++;
 +		}
++		WR(2, 1); WR(3, 1);
 +	}
-+	frpw_disconnect(pi);
++	epia_disconnect(pi);
 +
-+	frpw_connect(pi);
-+	frpw_read_block_int(pi, scratch, 512, 0x10);
-+	r = 0;
-+	for (k = 0; k < 128; k++)
-+		if (scratch[k] != k)
-+			r++;
-+	frpw_disconnect(pi);
++	f = 0;
++	epia_connect(pi);
++	WR(0x84, 8);
++	epia_read_block(pi, scratch, 512);
++	for (k = 0; k < 256; k++) {
++		if ((scratch[2 * k] & 0xff) != ((k + 1) & 0xff))
++			f++;
++		if ((scratch[2 * k + 1] & 0xff) != ((-2 - k) & 0xff))
++			f++;
++	}
++	WR(0x84, 0);
++	epia_disconnect(pi);
 +
 +	if (verbose)
-+		dev_info(&pi->dev, "frpw: port 0x%x, chip %ld, mode %d, test=(%d,%d,%d)\n",
-+			pi->port, (pi->private % 2), pi->mode, e[0], e[1], r);
++		dev_info(&pi->dev, "epia: port 0x%x, mode %d, test=(%d,%d,%d)\n",
++			pi->port, pi->mode, e[0], e[1], f);
 +
-+	return (r || (e[0] && e[1]));
++	return (e[0] && e[1]) || f;
 +}
 +
 +
-+static void frpw_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
++static void epia_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
 +{
 +	static char * const mode_string[] = {
-+		"4-bit", "8-bit", "EPP", "EPP-8", "EPP-16", "EPP-32" };
++		"4-bit", "5/3", "8-bit", "EPP-8", "EPP-16", "EPP-32" };
 +
-+	dev_info(&pi->dev, "frpw, Freecom (%s) adapter at 0x%x, mode %d (%s), delay %d\n",
-+		((pi->private % 2) == 0) ? "Xilinx" : "ASIC", pi->port,
-+		pi->mode, mode_string[pi->mode], pi->delay);
++	dev_info(&pi->dev, "epia, Shuttle EPIA at 0x%x, mode %d (%s), delay %d\n",
++		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
 +}
 +
-+static struct pi_protocol frpw = {
++static struct pi_protocol epia = {
 +	.owner		= THIS_MODULE,
-+	.name		= "frpw",
++	.name		= "epia",
 +	.max_mode	= 6,
-+	.epp_first	= 2,
-+	.default_delay	= 2,
++	.epp_first	= 3,
++	.default_delay	= 1,
 +	.max_units	= 1,
-+	.write_regr	= frpw_write_regr,
-+	.read_regr	= frpw_read_regr,
-+	.write_block	= frpw_write_block,
-+	.read_block	= frpw_read_block,
-+	.connect	= frpw_connect,
-+	.disconnect	= frpw_disconnect,
-+	.test_proto	= frpw_test_proto,
-+	.log_adapter	= frpw_log_adapter,
-+	.sht		= { PATA_PARPORT_SHT("pata_parport-frpw") },
++	.write_regr	= epia_write_regr,
++	.read_regr	= epia_read_regr,
++	.write_block	= epia_write_block,
++	.read_block	= epia_read_block,
++	.connect	= epia_connect,
++	.disconnect	= epia_disconnect,
++	.test_proto	= epia_test_proto,
++	.log_adapter	= epia_log_adapter,
++	.sht		= { PATA_PARPORT_SHT("pata_parport-epia") },
 +};
 +
 +MODULE_LICENSE("GPL");
-+module_pata_parport_driver(frpw);
++module_pata_parport_driver(epia);
 -- 
 Ondrej Zary
 
