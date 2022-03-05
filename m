@@ -2,181 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C25B8C433FE
-	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 15:14:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEF31C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 20:14:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230204AbiCEPOu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 10:14:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55808 "EHLO
+        id S232329AbiCEUPe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Mar 2022 15:15:34 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229436AbiCEPOu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 10:14:50 -0500
-Received: from mout-xforward.gmx.net (mout-xforward.gmx.net [82.165.159.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE72B1D0D73;
-        Sat,  5 Mar 2022 07:13:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1646493155;
-        bh=m1wvyXcdmqw6SUGsb6WV3jmsFgfj7oNi36tuWjXyAkM=;
-        h=X-UI-Sender-Class:Subject:From:In-Reply-To:Date:Cc:References:To;
-        b=DJN6ASTmsXnmy9508UVvVAWneNbqlhxUUhC1cGGWcsJO5YCylURfI/AZcQX7xZoEf
-         o4V35s3iNdNGuzBK3jl9KBVQlVSgVfu/aPx2k3Z0CNUIO0IDHtJcpSo9fqJKFFdtyE
-         UtOJqK47iuFs7XGmvRmJTnFtEvI8SVNE9k06QOt8=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from smtpclient.apple ([98.128.181.196]) by mail.gmx.net (mrgmx105
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1MryTF-1nwDfK1uOD-00nwc9; Sat, 05
- Mar 2022 16:12:35 +0100
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-From:   =?utf-8?Q?Reimar_D=C3=B6ffinger?= <Reimar.Doeffinger@gmx.de>
-In-Reply-To: <20220305145534.GB31268@X58A-UD3R>
-Date:   Sat, 5 Mar 2022 16:12:27 +0100
-Cc:     Theodore Ts'o <tytso@mit.edu>, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, torvalds@linux-foundation.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <56315101-B3A5-4596-947E-5D34A5FFBB37@gmx.de>
-References: <YiAow5gi21zwUT54@mit.edu>
- <1646285013-3934-1-git-send-email-byungchul.park@lge.com>
- <YiDSabde88HJ/aTt@mit.edu> <20220304032002.GD6112@X58A-UD3R>
- <YiLbs9rszWXpHm/P@mit.edu> <20220305145534.GB31268@X58A-UD3R>
-To:     Byungchul Park <byungchul.park@lge.com>
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
-X-Provags-ID: V03:K1:whvk+lhsJ/zxK8CBSH/p6zkUgWk2DoodFfcAiSCDJJDa+Hp52O6
- Nfbhzzi+ktuZGYLtwoW9qfNJSraLEANrCWwT6xWYdnQrtUG7isGY5jyxYDHq4HWVXkcNwht
- L9exf7duZUup6Aj10JBs0SWk28hmicYpdhO/lD+yWMXlJTEBEhIt2rcl05AL/SZCvLbMreY
- BxuBvW4ogWm5Bxp58qVkg==
-X-UI-Out-Filterresults: junk:10;V03:K0:zweSzRTuMLc=:1xDoFGJXHax66F8wkqbjhSe+
- jrZLpaWfX7RdsGmf8c0wJqGXUOnP34+DW7J0BkFSDsySKSvgdL1OmujM86iapxROKsjWBK2at
- AaC7YJVZCyA69Hv3P27MHCgbSK2zzZ4KK2Oe6GrYEmlwpy2FVbSCC/7xeun6zHlkVjuvIiddh
- D4/pwsRjcVcrDUVoJICcsRBTchjbZLhIzt6oU67TpQkTiAEHOXsRgD1jE7K/aARIlal/l2DVl
- xPrJgqJCdEeMD3K9HvWDaPdYPjGsLT+GqqhXDVTE/ZcBhH7gKjsxJ1+6Mx4r/zZIKC+9botr2
- IqYgSgXq5eRA+8vyUQh0uKDBl4f8f86J1pLHhUfqTVAzMUY39gYDS3LotRNJ3MFJABZf/lfjU
- 0cyRUgOdsJ6qqJcIKXfabLzgCot3capLHxR2Y+QRnznXqMxMkuBWP/rfXMs4MV3IkGURCPEoR
- wjCQhSrxHEGzJg0IgcnYcPBWmaLWaoVy2k4UegQ/5MPQzywDfjBbz7bByArBN6HJXmBIwBB9y
- Pnh842Sj+JQ973UNMWaTtagNhqHDCFCUaii/U8GlWHeF0T3tZnXCKT9K+bTK3JEC9wI0mr+N7
- 5c68iMxdADA2W/VhYX6D4ze1a7YULWtNZNMNy3FDWaZyegNOruAYBPRGqiC1ncvx1LUISdbO/
- 8cW5Vg63lSiNWbL7GiPnEdRbk3vOksWKOVO4yhLonUE4f42S4PeEXN8IGr/zcBfEmPt4mImVd
- VWm9zpdNEo757DatvTW65sCdc6d9d4k4HWmXtEImH0pfIKwvELQRKV5KqWKK8AzF0jSCe08yN
- Pi333IVY6GV+LnI6SAxcsz0pac55X8Thf6xgpZKv08yi9/E/8ZPSGr44SrhTn4LnoZTrCkjA9
- +rdNMQQcevr3RF/Clrov3MYdmjcrJdJgY1A5A4/XUa98fnknpSHrjwxR3ZEUQ+U9XNqdW0pqm
- GDTzGpUb3Ha6onL+4oSq75jck6wezug8OqsouYMtWySjuX8G+mKJRihqyBiSNzVlSvOoXp8g/
- 2H4Eb86TLwPlahcEuRGUNI1dWpXZnpZHfWWaVTjpDLy7wPmUwWJY9U6bdxiBhka347RRMDMyY
- OpNYdXIQhCSfFWczlu9AXKQxyo5fAi+eho0to5QLeVlsFKfKAqCn+yg==
+        with ESMTP id S232323AbiCEUPd (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 15:15:33 -0500
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF49FDE83;
+        Sat,  5 Mar 2022 12:14:41 -0800 (PST)
+Received: from gsql.ggedos.sk (off-20.infotel.telecom.sk [212.5.213.20])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 06F317A04E8;
+        Sat,  5 Mar 2022 21:14:40 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH 02/16] pata_parport: add aten protocol driver
+Date:   Sat,  5 Mar 2022 21:13:57 +0100
+Message-Id: <20220305201411.501-3-linux@zary.sk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20220305201411.501-1-linux@zary.sk>
+References: <20220305201411.501-1-linux@zary.sk>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
-Sorry to butt in as an outsider, but this seems like a shockingly =
-disrespectful discussion for such a wide CC list.
-I don't want to make rules how you discuss things (I very rarely =
-contribute), and I see the value in a frank discussion, but maybe you =
-could continue with a reduced CC list?
-I find it unlikely that I am the only one who could do without this.
+Add ATEN EH-100 protocol driver.
 
-Best regards,
-Reimar D=C3=B6ffinger
+Signed-off-by: Ondrej Zary <linux@zary.sk>
+---
+ drivers/ata/pata_parport/Kconfig  |  11 +++
+ drivers/ata/pata_parport/Makefile |   1 +
+ drivers/ata/pata_parport/aten.c   | 139 ++++++++++++++++++++++++++++++
+ 3 files changed, 151 insertions(+)
+ create mode 100644 drivers/ata/pata_parport/aten.c
 
-> On 5 Mar 2022, at 15:55, Byungchul Park <byungchul.park@lge.com> =
-wrote:
->=20
-> On Fri, Mar 04, 2022 at 10:40:35PM -0500, Theodore Ts'o wrote:
->> On Fri, Mar 04, 2022 at 12:20:02PM +0900, Byungchul Park wrote:
->>>=20
->>> I found a point that the two wait channels don't lead a deadlock in
->>> some cases thanks to Jan Kara. I will fix it so that Dept won't
->>> complain it.
->>=20
->> I sent my last (admittedly cranky) message before you sent this.  I'm
->> glad you finally understood Jan's explanation.  I was trying to tell
->=20
-> Not finally. I've understood him whenever he tried to tell me =
-something.
->=20
->> you the same thing, but apparently I failed to communicate in a
->=20
-> I don't think so. Your point and Jan's point are different. All he has
-> said make sense. But yours does not.
->=20
->> sufficiently clear manner.  In any case, what Jan described is a
->> fundamental part of how wait queues work, and I'm kind of amazed that
->> you were able to implement DEPT without understanding it.  (But maybe
->=20
-> Of course, it was possible because all that Dept has to know for basic
-> work is wait and event. The subtle things like what Jan told me help
-> Dept be better.
->=20
->> that is why some of the DEPT reports were completely incomprehensible
->=20
-> It's because you are blinded to blame at it without understanding how
-> Dept works at all. I will fix those that must be fixed. Don't worry.
->=20
->> to me; I couldn't interpret why in the world DEPT was saying there =
-was
->> a problem.)
->=20
-> I can tell you if you really want to understand why. But I can't if =
-you
-> are like this.
->=20
->> In any case, the thing I would ask is a little humility.  We =
-regularly
->> use lockdep, and we run a huge number of stress tests, throughout =
-each
->> development cycle.
->=20
-> Sure.
->=20
->> So if DEPT is issuing lots of reports about apparently circular
->> dependencies, please try to be open to the thought that the fault is
->=20
-> No one was convinced that Dept doesn't have a fault. I think your
-> worries are too much.
->=20
->> in DEPT, and don't try to argue with maintainers that their code MUST
->> be buggy --- but since you don't understand our code, and DEPT must =
-be
->=20
-> No one argued that their code must be buggy, either. So I don't think
-> you have to worry about what's never happened.
->=20
->> theoretically perfect, that it is up to the Maintainers to prove to
->> you that their code is correct.
->>=20
->> I am going to gently suggest that it is at least as likely, if not
->> more likely, that the failure is in DEPT or your understanding of =
-what
->=20
-> No doubt. I already think so. But it doesn't mean that I have to keep
-> quiet without discussing to imporve Dept. I will keep improving Dept =
-in
-> a reasonable way.
->=20
->> how kernel wait channels and locking works.  After all, why would it
->> be that we haven't found these problems via our other QA practices?
->=20
-> Let's talk more once you understand how Dept works at least 10%. Or I
-> think we cannot talk in a productive way.
->=20
+diff --git a/drivers/ata/pata_parport/Kconfig b/drivers/ata/pata_parport/Kconfig
+index 56dc6b25d5fa..93b0ad65b523 100644
+--- a/drivers/ata/pata_parport/Kconfig
++++ b/drivers/ata/pata_parport/Kconfig
+@@ -8,3 +8,14 @@
+ 
+ comment "Parallel IDE protocol modules"
+ 	depends on PATA_PARPORT
++
++config PATA_PARPORT_ATEN
++	tristate "ATEN EH-100 protocol"
++	depends on PATA_PARPORT
++	help
++	  This option enables support for the ATEN EH-100 parallel port IDE
++	  protocol. This protocol is used in some inexpensive low performance
++	  parallel port kits made in Hong Kong. If you chose to build PATA_PARPORT
++	  support into your kernel, you may answer Y here to build in the
++	  protocol driver, otherwise you should answer M to build it as a
++	  loadable module. The module will be called aten.
+diff --git a/drivers/ata/pata_parport/Makefile b/drivers/ata/pata_parport/Makefile
+index b105e1cb8dc6..7e821b629c58 100644
+--- a/drivers/ata/pata_parport/Makefile
++++ b/drivers/ata/pata_parport/Makefile
+@@ -7,3 +7,4 @@
+ #
+ 
+ obj-$(CONFIG_PATA_PARPORT)		+= pata_parport.o
++obj-$(CONFIG_PATA_PARPORT_ATEN)		+= aten.o
+diff --git a/drivers/ata/pata_parport/aten.c b/drivers/ata/pata_parport/aten.c
+new file mode 100644
+index 000000000000..a811a471e942
+--- /dev/null
++++ b/drivers/ata/pata_parport/aten.c
+@@ -0,0 +1,139 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ *	aten.c  (c) 1997-8  Grant R. Guenther <grant@torque.net>
++ *			    Under the terms of the GNU General Public License.
++ *
++ *	aten.c is a low-level protocol driver for the ATEN EH-100
++ *	parallel port adapter.  The EH-100 supports 4-bit and 8-bit
++ *	modes only.  There is also an EH-132 which supports EPP mode
++ *	transfers.  The EH-132 is not yet supported.
++ */
++
++#include <linux/module.h>
++#include <linux/init.h>
++#include <linux/delay.h>
++#include <linux/kernel.h>
++#include <linux/wait.h>
++#include <linux/types.h>
++#include <linux/io.h>
++
++#include "pata_parport.h"
++
++#define j44(a, b)		((((a >> 4) & 0x0f) | (b & 0xf0)) ^ 0x88)
++
++/* cont = 0 - access the IDE register file
++ * cont = 1 - access the IDE command set
++ */
++
++static int cont_map[2] = { 0x08, 0x20 };
++
++static void aten_write_regr(struct pi_adapter *pi, int cont, int regr, int val)
++{
++	int r = regr + cont_map[cont] + 0x80;
++
++	w0(r); w2(0xe); w2(6); w0(val); w2(7); w2(6); w2(0xc);
++}
++
++static int aten_read_regr(struct pi_adapter *pi, int cont, int regr)
++{
++	int a, b, r;
++
++	r = regr + cont_map[cont] + 0x40;
++
++	switch (pi->mode) {
++	case 0:
++		w0(r); w2(0xe); w2(6);
++		w2(7); w2(6); w2(0);
++		a = r1(); w0(0x10); b = r1(); w2(0xc);
++		return j44(a, b);
++	case 1:
++		r |= 0x10;
++		w0(r); w2(0xe); w2(6); w0(0xff);
++		w2(0x27); w2(0x26); w2(0x20);
++		a = r0();
++		w2(0x26); w2(0xc);
++		return a;
++	}
++	return -1;
++}
++
++static void aten_read_block(struct pi_adapter *pi, char *buf, int count)
++{
++	int  k, a, b, c, d;
++
++	switch (pi->mode) {
++	case 0:
++		w0(0x48); w2(0xe); w2(6);
++		for (k = 0; k < count / 2; k++) {
++			w2(7); w2(6); w2(2);
++			a = r1(); w0(0x58); b = r1();
++			w2(0); d = r1(); w0(0x48); c = r1();
++			buf[2 * k] = j44(c, d);
++			buf[2 * k + 1] = j44(a, b);
++		}
++		w2(0xc);
++		break;
++	case 1:
++		w0(0x58); w2(0xe); w2(6);
++		for (k = 0; k < count / 2; k++) {
++			w2(0x27); w2(0x26); w2(0x22);
++			a = r0(); w2(0x20); b = r0();
++			buf[2 * k] = b; buf[2 * k + 1] = a;
++		}
++		w2(0x26); w2(0xc);
++		break;
++	}
++}
++
++static void aten_write_block(struct pi_adapter *pi, char *buf, int count)
++{
++	int k;
++
++	w0(0x88); w2(0xe); w2(6);
++	for (k = 0; k < count / 2; k++) {
++		w0(buf[2 * k + 1]); w2(0xe); w2(6);
++		w0(buf[2 * k]); w2(7); w2(6);
++	}
++	w2(0xc);
++}
++
++static void aten_connect(struct pi_adapter *pi)
++{
++	pi->saved_r0 = r0();
++	pi->saved_r2 = r2();
++	w2(0xc);
++}
++
++static void aten_disconnect(struct pi_adapter *pi)
++{
++	w0(pi->saved_r0);
++	w2(pi->saved_r2);
++}
++
++static void aten_log_adapter(struct pi_adapter *pi, char *scratch, int verbose)
++{
++	char *mode_string[2] = { "4-bit", "8-bit" };
++
++	dev_info(&pi->dev, "aten, ATEN EH-100 at 0x%x, mode %d (%s), delay %d\n",
++		pi->port, pi->mode, mode_string[pi->mode], pi->delay);
++}
++
++static struct pi_protocol aten = {
++	.owner		= THIS_MODULE,
++	.name		= "aten",
++	.max_mode	= 2,
++	.epp_first	= 2,
++	.default_delay	= 1,
++	.max_units	= 1,
++	.write_regr	= aten_write_regr,
++	.read_regr	= aten_read_regr,
++	.write_block	= aten_write_block,
++	.read_block	= aten_read_block,
++	.connect	= aten_connect,
++	.disconnect	= aten_disconnect,
++	.log_adapter	= aten_log_adapter,
++	.sht		= { PATA_PARPORT_SHT("pata_parport-aten") },
++};
++
++MODULE_LICENSE("GPL");
++module_pata_parport_driver(aten);
+-- 
+Ondrej Zary
 
