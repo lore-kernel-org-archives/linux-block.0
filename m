@@ -2,52 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5987DC433F5
-	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 05:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A47AC433F5
+	for <linux-block@archiver.kernel.org>; Sat,  5 Mar 2022 07:33:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbiCEFU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 00:20:26 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55294 "EHLO
+        id S231277AbiCEHeP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 5 Mar 2022 02:34:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56680 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbiCEFU0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 00:20:26 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB63B120F61;
-        Fri,  4 Mar 2022 21:19:33 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id BE57B68AFE; Sat,  5 Mar 2022 06:19:29 +0100 (CET)
-Date:   Sat, 5 Mar 2022 06:19:29 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk, sagi@grimberg.me,
-        kbusch@kernel.org, song@kernel.org, linux-block@vger.kernel.org,
-        linux-raid@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org
-Subject: Re: [PATCH 2/2] block: remove the per-bio/request write hint
-Message-ID: <20220305051929.GA24696@lst.de>
-References: <20220304175556.407719-1-hch@lst.de> <20220304175556.407719-2-hch@lst.de> <20220304221255.GL3927073@dread.disaster.area>
+        with ESMTP id S230162AbiCEHeO (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 02:34:14 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAFE66420
+        for <linux-block@vger.kernel.org>; Fri,  4 Mar 2022 23:33:24 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id hw13so21714414ejc.9
+        for <linux-block@vger.kernel.org>; Fri, 04 Mar 2022 23:33:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=from:date:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2vWrfFimlw7a7ILoyiYoEccruaTxPiuM3k59L5Zrbzg=;
+        b=6vgMAORCx6g36NxRQVDr/RDg8JmNMkalkNafmgb5ERo0VmyPFdyyxb/KQ05lmfqURH
+         0zB7IwifxEg0vaKJLrfVguQjIvwh+f/IpEB2rUnQK6Y10uu/tghprPFsA9gqmaQBBTlh
+         y9nQR0bqKuWprrJA1sTvmtK0kLWbUUODtPwr1xUCnwqeE1bcNiz39fB5GP0atkxWdbWk
+         C9U6INOaOXMsTPQKOPeeLdbthwyN7HE/M0ouxG6lKLxJlAt0BxEvY72WhsqlWoadDELQ
+         5nf8YKOcwArkeGjmPGawYSOz/U3lX9EWAkkDxAXI+w26W19V0bKaS2Fgxs+GcyYaU02w
+         i1VA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2vWrfFimlw7a7ILoyiYoEccruaTxPiuM3k59L5Zrbzg=;
+        b=KkExiiHCyYYKHFTVKfCnnB7JjQvnUEa7Vq+RY9I83LWBCfxuwNbieKBFmgQAKCAlxn
+         uNunFduvk1qVfgjBlJh3KuALf7g6R51S/OUhQmGNICEjpHdD8wZyb2hGspVSXm8GSIqm
+         Jf09fwWXCRl2fx8u+83q7t3G405xIpXK8m1RsNXTsUfVD+esFlRAgEd4LSH0ObDYJJ+e
+         gCrc0RuwzB9oQwHngswsoLfbEpIpJgHOeqASs7BBuQObkTZapPWCKmlLx8a5kZVKoLjT
+         e1itYnty+65Q7uy3qHDkiYSLvraoPTfGuinZv7SmV3Mbkd0nK03BwWJ7Md8p9UfKWyZq
+         mDiQ==
+X-Gm-Message-State: AOAM531UrvLcNoZ/hW7skLogIH7YEQx0+1nT6ejrx9po3IvQx3aSL1Rr
+        3lDplV6XZynkL+kXhURz3E7uRA==
+X-Google-Smtp-Source: ABdhPJxF/f7q8Vb2XlJFrzoFQigG0MRiz0ymo/PaetaTdaEsScXmEpBI2Qgx93Mm2IGm0s7W8Zuzyg==
+X-Received: by 2002:a17:906:974a:b0:6da:7d4b:a3a1 with SMTP id o10-20020a170906974a00b006da7d4ba3a1mr1886101ejy.454.1646465603207;
+        Fri, 04 Mar 2022 23:33:23 -0800 (PST)
+Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
+        by smtp.gmail.com with ESMTPSA id bx1-20020a0564020b4100b00410f01a91f0sm3166956edb.73.2022.03.04.23.33.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 04 Mar 2022 23:33:22 -0800 (PST)
+From:   "Javier =?utf-8?B?R29uesOhbGV6?=" <javier@javigon.com>
+X-Google-Original-From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+Date:   Sat, 5 Mar 2022 08:33:21 +0100
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Dave Chinner <david@fromorbit.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
+        Matias =?utf-8?B?QmrDuHJsaW5n?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <20220305073321.5apdknpmctcvo3qj@ArmHalley.localdomain>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <20220304001022.GJ3927073@dread.disaster.area>
+ <YiKOQM+HMZXnArKT@bombadil.infradead.org>
+ <20220304224257.GN3927073@dread.disaster.area>
+ <YiKY6pMczvRuEovI@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20220304221255.GL3927073@dread.disaster.area>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YiKY6pMczvRuEovI@bombadil.infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 05, 2022 at 09:12:55AM +1100, Dave Chinner wrote:
-> AFAICT, all the filesystem/IO path passthrough plumbing for hints is
-> now gone, and no hardware will ever receive hints.  Doesn't this
-> mean that file_write_hint(), file->f_write_hint and iocb->ki_hint
-> are now completely unused, too?
+On 04.03.2022 14:55, Luis Chamberlain wrote:
+>On Sat, Mar 05, 2022 at 09:42:57AM +1100, Dave Chinner wrote:
+>> On Fri, Mar 04, 2022 at 02:10:08PM -0800, Luis Chamberlain wrote:
+>> > On Fri, Mar 04, 2022 at 11:10:22AM +1100, Dave Chinner wrote:
+>> > > On Wed, Mar 02, 2022 at 04:56:54PM -0800, Luis Chamberlain wrote:
+>> > > > Thinking proactively about LSFMM, regarding just Zone storage..
+>> > > >
+>> > > > I'd like to propose a BoF for Zoned Storage. The point of it is
+>> > > > to address the existing point points we have and take advantage of
+>> > > > having folks in the room we can likely settle on things faster which
+>> > > > otherwise would take years.
+>> > > >
+>> > > > I'll throw at least one topic out:
+>> > > >
+>> > > >   * Raw access for zone append for microbenchmarks:
+>> > > >   	- are we really happy with the status quo?
+>> > > > 	- if not what outlets do we have?
+>> > > >
+>> > > > I think the nvme passthrogh stuff deserves it's own shared
+>> > > > discussion though and should not make it part of the BoF.
+>> > >
+>> > > Reading through the discussion on this thread, perhaps this session
+>> > > should be used to educate application developers about how to use
+>> > > ZoneFS so they never need to manage low level details of zone
+>> > > storage such as enumerating zones, controlling write pointers
+>> > > safely for concurrent IO, performing zone resets, etc.
+>> >
+>> > I'm not even sure users are really aware that given cap can be different
+>> > than zone size and btrfs uses zone size to compute size, the size is a
+>> > flat out lie.
+>>
+>> Sorry, I don't get what btrfs does with zone management has anything
+>> to do with using Zonefs to get direct, raw IO access to individual
+>> zones.
+>
+>You are right for direct raw access. My point was that even for
+>filesystem use design I don't think the communication is clear on
+>expectations. Similar computation need to be managed by fileystem
+>design, for instance.
 
-No, for the reason tha you state below.  f2fs still uses it.
+Dave,
 
-> AFAICT, this patch leaves just the f2fs allocator usage of
-> inode->i_rw_hint to select a segment to allocate from as the
-> remaining consumer of this entire plumbing and user API. Is that
-> used by applications anywhere, or can that be removed and so the
-> rest of the infrastructure get removed and the fcntl()s no-op'd or
-> -EOPNOTSUPP?
+I understand that you point to ZoneFS for this. It is true that it was
+presented at the moment as the way to do raw zone access from
+user-space.
 
-I was told it is used quite heavily in android.
+However, there is no users of ZoneFS for ZNS devices that I am aware of
+(maybe for SMR this is a different story).  The main open-source
+implementations out there for RocksDB that are being used in production
+(ZenFS and xZTL) rely on either raw zone block access or the generic
+char device in NVMe (/dev/ngXnY). This is because having the capability
+to do zone management from applications that already work with objects
+fits much better.
+
+My point is that there is space for both ZoneFS and raw zoned block
+device. And regarding !PO2 zone sizes, my point is that this can be
+leveraged both by btrfs and this raw zone block device.
