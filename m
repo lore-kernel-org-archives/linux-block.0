@@ -2,68 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7015C433EF
-	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 04:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73774C433F5
+	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 08:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229986AbiCFECM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 5 Mar 2022 23:02:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60336 "EHLO
+        id S230254AbiCFIln (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 03:41:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232854AbiCFECL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 5 Mar 2022 23:02:11 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0AD3A22BC3
-        for <linux-block@vger.kernel.org>; Sat,  5 Mar 2022 20:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646539279;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qUTyaD+bXmHvCDNuEe4Fclwb9x3jzMuMtNnahDSRCug=;
-        b=RhhTuyrvF8TPzx1MY9J69DLSyPIrXiNqogCDs3yS3wgPl+fAwp22fFVQaj+6l/dieefS6G
-        pzFbxzy7Vy6OxeT6SKMFH9Ng4jj+NxIjeQ180HmVhTQHdKpBXVSbFSJAWk5oHWtr8q6KzQ
-        a4xQyOzFxFfEVVP2quuzFDjnQYcalqY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-639-VrTIo70fP5-YVJc_Eg7hFQ-1; Sat, 05 Mar 2022 23:01:14 -0500
-X-MC-Unique: VrTIo70fP5-YVJc_Eg7hFQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 81000824FA6;
-        Sun,  6 Mar 2022 04:01:13 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FD4B5E483;
-        Sun,  6 Mar 2022 04:01:09 +0000 (UTC)
-Date:   Sun, 6 Mar 2022 12:01:04 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
+        with ESMTP id S230026AbiCFIln (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 03:41:43 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 941751D332;
+        Sun,  6 Mar 2022 00:40:51 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 43D9767373; Sun,  6 Mar 2022 09:40:47 +0100 (CET)
+Date:   Sun, 6 Mar 2022 09:40:46 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [PATCH 08/14] sr: implement ->free_disk
-Message-ID: <YiQyALQe3ZPWi0Pe@T590>
-References: <20220304160331.399757-1-hch@lst.de>
- <20220304160331.399757-9-hch@lst.de>
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 04/14] sd: rename the scsi_disk.dev field
+Message-ID: <20220306084046.GA22113@lst.de>
+References: <20220304160331.399757-1-hch@lst.de> <20220304160331.399757-5-hch@lst.de> <7ff2340d-892b-94b5-ec39-355a8f8adc73@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220304160331.399757-9-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <7ff2340d-892b-94b5-ec39-355a8f8adc73@acm.org>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 04, 2022 at 05:03:25PM +0100, Christoph Hellwig wrote:
-> Simplify the refcounting and remove the need to clear disk->private_data
-> by implementing the ->free_disk method.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Sat, Mar 05, 2022 at 05:38:40PM -0800, Bart Van Assche wrote:
+> On 3/4/22 08:03, Christoph Hellwig wrote:
+>> +	/*
+>> +	 * This device is mostly just used to show a bunch of attributes in a
+>> +	 * weird place.  In doubt don't add any new users, and most importantly
+>> +	 * don't use if for any actual refcounting.
+>> +	 */
+>> +	struct device	disk_dev;
+>
+> Isn't "weird place" subjective? How about mentioning the sysfs path 
+> explicitly (/sys/class/scsi_disk/H:C:I:L)? How about explaining why no new 
+> sysfs attributes should be added to that device instance?
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
-
--- 
-Ming
-
+Well, weird place means that all normale drivers would just use
+attributes on the gendisk for it, but sd creates a completely pointless
+device under the gendisk device for it.  If you have a better wording
+I can change it.
