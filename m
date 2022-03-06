@@ -2,92 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7184AC433F5
-	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 14:18:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A0331C433FE
+	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 14:19:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233533AbiCFOSu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Mar 2022 09:18:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33234 "EHLO
+        id S233605AbiCFOUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 09:20:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233481AbiCFOSu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 09:18:50 -0500
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A69951CB24
-        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 06:17:57 -0800 (PST)
-Received: by mail-pl1-x62c.google.com with SMTP id q11so11656337pln.11
-        for <linux-block@vger.kernel.org>; Sun, 06 Mar 2022 06:17:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=ILaW05fUQ1dnyzBz2lx6yZLVLQRGUBkLodqqsOJxlfI=;
-        b=Uwa0QMeKDwN0s9YWycovMkoEzs1FonPzncoYixFDaCLKKWE8NRke377Ds+vQRw0zvF
-         vLD1tb4jZaXTOOc6LfZ3AhSIf/h8bq9qMqjEJIimGkMROi1V8OTwG2adZGKUuZoudFQc
-         uI9b8RW139golTXremkXKYtTHWAb0MBX1qjV+CLhQ7VxjKH/syB8PgU21dNujv4d27+2
-         O4KgLszw9f2gyrH+NYrdqkfqUVG5+cKgj1BGVkx7O2SfBvPrnnESD/Z9FYYgG8vSH3jv
-         oMboe/pScahu/N4HXDrbMuMpS4rglMGUnTodetPWhllk9E+0IRq2qaWyTPOM8h4CgCe4
-         G35Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ILaW05fUQ1dnyzBz2lx6yZLVLQRGUBkLodqqsOJxlfI=;
-        b=y3bQaLF2xd6hVcVauqf3Nh4brlmB67FDagxt1RXYKmCVRcyKHYdtKLehcc+tTTSOi/
-         AHOLlUUfAD92viH72gwkJnIjoExUHk1RlCR8E0DqBhASBVO7kJcfY27QGXtbBBaPqmjj
-         XgoJS09y8uVnCMzTjdXhqMfnlP8ZhvAem5ghRhW0g/pFKj3NGL4cPKdJlMhQKWxNRrn3
-         zMwY9hXwxBENSooaY0yHhF5STILOIGjM+sGluX6LCbLuC9bqo1NbWOqIGmlcOBYr5cO5
-         5q59D6kQI0Zx+ZKOqnyO2GdSR53dchBFWsMDDmsbS4xw6+2bp6ihxXiQyj6eWHZeknK3
-         Dvng==
-X-Gm-Message-State: AOAM533yT4vaki7qlHAT8zLzLUvOzzjOKib/FajerMXk9JcDMQKjxwv4
-        iy1AbhlKdUzccNopA2AzJDGKmQ==
-X-Google-Smtp-Source: ABdhPJx6LAZv4jYCV9Zgk/CzJKt97QDYhDOzKJXDgh9qczi9Rnn5hhrALqKfNFxkUtAziLz7Ggy7Ag==
-X-Received: by 2002:a17:902:ea02:b0:14f:fd0e:e433 with SMTP id s2-20020a170902ea0200b0014ffd0ee433mr8070303plg.24.1646576277022;
-        Sun, 06 Mar 2022 06:17:57 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s42-20020a056a0017aa00b004df8133df4asm13133348pfg.179.2022.03.06.06.17.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Mar 2022 06:17:55 -0800 (PST)
-Message-ID: <c94f9c70-7052-0bae-ca0e-9b9ccc48c46b@kernel.dk>
-Date:   Sun, 6 Mar 2022 07:17:54 -0700
+        with ESMTP id S231936AbiCFOUL (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 09:20:11 -0500
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821D038DAF;
+        Sun,  6 Mar 2022 06:19:12 -0800 (PST)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 226EJA3E008889
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sun, 6 Mar 2022 09:19:10 -0500
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 3595415C0038; Sun,  6 Mar 2022 09:19:10 -0500 (EST)
+Date:   Sun, 6 Mar 2022 09:19:10 -0500
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        torvalds@linux-foundation.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
+Message-ID: <YiTC3j6Igkw7xvIM@mit.edu>
+References: <YiQq6Ou39uzHC0mu@mit.edu>
+ <1646563902-6671-1-git-send-email-byungchul.park@lge.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: bcache patches for Linux v5.18
-Content-Language: en-US
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-raid <linux-raid@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <084b5385-ebe7-5fca-8b56-a66276005e78@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <084b5385-ebe7-5fca-8b56-a66276005e78@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1646563902-6671-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/6/22 3:35 AM, Coly Li wrote:
-> Hi Jens,
+On Sun, Mar 06, 2022 at 07:51:42PM +0900, Byungchul Park wrote:
+> > 
+> > Users of DEPT must not have to understand how DEPT works in order to
 > 
-> I have technical problem to send patches via email this time, please
-> consider to pull the bcache changes from my bcache tree. They can be
-> applied on top of your for-5.18/drivers branch.
+> Users must not have to understand how Dept works for sure, and haters
+> must not blame things based on what they guess wrong.
+
+For the record, I don't hate DEPT.  I *fear* that DEPT will result in
+my getting spammed with a huge number of false posiives once automated
+testing systems like Syzkaller, zero-day test robot, etcs., get a hold
+of it once it gets merged and start generating hundreds of automated
+reports.
+
+And when I tried to read the DEPT reports, and the DEPT documentation,
+and I found that its explanation for why ext4 had a circular
+dependency simply did not make sense.  If my struggles to understand
+why DEPT was issuing a false positive is "guessing", then how do we
+have discussions over how to make DEPT better?
+
+> > called prepare-to-wait on more than one wait queue, how is DEPT going
+> > to distinguish between your "morally correct" wkaeup source, and the
+> > "rescue wakeup source"?
 > 
-> We have 2 patches for Linux v5.18, both of them are from Mingzhe Zou.
-> The first patch improves bcache initialization speed by avoid
-> unnecessary cost of cache consistency, the second one fixes a
-> potential NULL pointer deference in bcache initialization time,
-> 
-> Please take them for Linux v5.18, thanks in advance.
+> Sure, it should be done manually. I should do it on my own when that
+> kind of issue arises.
 
-I can take a git pull, but don't base it on something that isn't a tree
-of mine. If I pull your branch right now, I'll get a ton of unrelated
-changes.
+The question here is how often will it need to be done, and how easy
+will it be to "do it manually"?  Suppose we mark all of the DEPT false
+positives before it gets merged?  How easy will it be able to suppress
+future false positives in the future, as the kernel evolves?
 
-If you want to do a git pull vs sending patches, base it on
-for-5.18/drivers instead.
+Perhaps one method is to haved a way to take a particular wait queue,
+or call to schedule(), or at the level of an entire kernel source
+file, and opt it out from DEPT analysis?  That way, if DEPT gets
+merged, and a maintainer starts getting spammed by bogus (or
+incomprehensible) reports, there is a simople way they can annotate
+their source code to prevent DEPT from analyzing code that it is
+apparently not able to understand correctly.
 
--- 
-Jens Axboe
+That way we don't necessarily need to have a debate over how close to
+zero percent false positives is necessary before DEPT can get merged.
+And we avoid needing to force maintainers to prove that a DEPT report
+is a false positive, which is from my experience hard to do, since
+they get accused of being DEPT haters and not understanding DEPT.
 
+	  	   	      	    	    	     - Ted
