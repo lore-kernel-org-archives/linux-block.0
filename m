@@ -2,106 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0331C433FE
-	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 14:19:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D092EC433F5
+	for <linux-block@archiver.kernel.org>; Sun,  6 Mar 2022 14:55:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233605AbiCFOUN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Mar 2022 09:20:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37814 "EHLO
+        id S233613AbiCFO4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 09:56:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231936AbiCFOUL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 09:20:11 -0500
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 821D038DAF;
-        Sun,  6 Mar 2022 06:19:12 -0800 (PST)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 226EJA3E008889
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Sun, 6 Mar 2022 09:19:10 -0500
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 3595415C0038; Sun,  6 Mar 2022 09:19:10 -0500 (EST)
-Date:   Sun, 6 Mar 2022 09:19:10 -0500
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        torvalds@linux-foundation.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <YiTC3j6Igkw7xvIM@mit.edu>
-References: <YiQq6Ou39uzHC0mu@mit.edu>
- <1646563902-6671-1-git-send-email-byungchul.park@lge.com>
+        with ESMTP id S229541AbiCFO4i (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 09:56:38 -0500
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7A354BF8;
+        Sun,  6 Mar 2022 06:55:45 -0800 (PST)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 913711F37D;
+        Sun,  6 Mar 2022 14:55:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1646578544; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j5D+rozMKHqiwrNf7CgYcK3jmfmKFLqxQXtyCiYe+80=;
+        b=wCjrwXauk5eoHzl3KE9wufgtkH23YoKTkwywRYtOyoONiFAxJJaE7SQkph0uSXea2E16ki
+        6rsOnLNH9vllgb7BTcEpACmuz9aPWhyM9uAHxTmJnwOYqa/sii+Y/yCx/XLLV5ya/8exUp
+        mxg5oBO9U4qllpkUDOP12/DDnLw56zc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1646578544;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=j5D+rozMKHqiwrNf7CgYcK3jmfmKFLqxQXtyCiYe+80=;
+        b=8sd2UFxxCKiULn83eZrfTo1y/E9q78PUnAWkkXIZUtcEE1Kf1PaW0juAzhi1eIUqC6v7IO
+        LRSA62xlUqHMb+DA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 12434132C1;
+        Sun,  6 Mar 2022 14:55:40 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id rOagOGzLJGJKUQAAMHmgww
+        (envelope-from <colyli@suse.de>); Sun, 06 Mar 2022 14:55:40 +0000
+Message-ID: <3b93c0db-316e-d227-e98e-be7a6f4e2907@suse.de>
+Date:   Sun, 6 Mar 2022 22:55:36 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1646563902-6671-1-git-send-email-byungchul.park@lge.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.6.1
+Subject: Re: bcache patches for Linux v5.18
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-raid <linux-raid@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <084b5385-ebe7-5fca-8b56-a66276005e78@suse.de>
+ <c94f9c70-7052-0bae-ca0e-9b9ccc48c46b@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <c94f9c70-7052-0bae-ca0e-9b9ccc48c46b@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 06, 2022 at 07:51:42PM +0900, Byungchul Park wrote:
-> > 
-> > Users of DEPT must not have to understand how DEPT works in order to
-> 
-> Users must not have to understand how Dept works for sure, and haters
-> must not blame things based on what they guess wrong.
+On 3/6/22 10:17 PM, Jens Axboe wrote:
+> On 3/6/22 3:35 AM, Coly Li wrote:
+>> Hi Jens,
+>>
+>> I have technical problem to send patches via email this time, please
+>> consider to pull the bcache changes from my bcache tree. They can be
+>> applied on top of your for-5.18/drivers branch.
+>>
+>> We have 2 patches for Linux v5.18, both of them are from Mingzhe Zou.
+>> The first patch improves bcache initialization speed by avoid
+>> unnecessary cost of cache consistency, the second one fixes a
+>> potential NULL pointer deference in bcache initialization time,
+>>
+>> Please take them for Linux v5.18, thanks in advance.
+> I can take a git pull, but don't base it on something that isn't a tree
+> of mine. If I pull your branch right now, I'll get a ton of unrelated
+> changes.
 
-For the record, I don't hate DEPT.  I *fear* that DEPT will result in
-my getting spammed with a huge number of false posiives once automated
-testing systems like Syzkaller, zero-day test robot, etcs., get a hold
-of it once it gets merged and start generating hundreds of automated
-reports.
+I see, my for-next branch is not 100% clone the for-5.18/drivers branch, 
+although the patches are verified on top of it.
 
-And when I tried to read the DEPT reports, and the DEPT documentation,
-and I found that its explanation for why ext4 had a circular
-dependency simply did not make sense.  If my struggles to understand
-why DEPT was issuing a false positive is "guessing", then how do we
-have discussions over how to make DEPT better?
 
-> > called prepare-to-wait on more than one wait queue, how is DEPT going
-> > to distinguish between your "morally correct" wkaeup source, and the
-> > "rescue wakeup source"?
-> 
-> Sure, it should be done manually. I should do it on my own when that
-> kind of issue arises.
+> If you want to do a git pull vs sending patches, base it on
+> for-5.18/drivers instead.
+>
+Copied. Now I pull my for-next branch from your for-5.18/drivers branch, 
+and they are same, and the two patches are added on top of it.
 
-The question here is how often will it need to be done, and how easy
-will it be to "do it manually"?  Suppose we mark all of the DEPT false
-positives before it gets merged?  How easy will it be able to suppress
-future false positives in the future, as the kernel evolves?
+Here is the updated pull request, could you please try it again? Thanks.
 
-Perhaps one method is to haved a way to take a particular wait queue,
-or call to schedule(), or at the level of an entire kernel source
-file, and opt it out from DEPT analysis?  That way, if DEPT gets
-merged, and a maintainer starts getting spammed by bogus (or
-incomprehensible) reports, there is a simople way they can annotate
-their source code to prevent DEPT from analyzing code that it is
-apparently not able to understand correctly.
 
-That way we don't necessarily need to have a debate over how close to
-zero percent false positives is necessary before DEPT can get merged.
-And we avoid needing to force maintainers to prove that a DEPT report
-is a false positive, which is from my experience hard to do, since
-they get accused of being DEPT haters and not understanding DEPT.
+The following changes since commit 13d4ef0f66b7ee9415e101e213acaf94a0cb28ee:
 
-	  	   	      	    	    	     - Ted
+   floppy: use memcpy_{to,from}_bvec (2022-03-04 12:29:21 -0700)
+
+are available in the Git repository at:
+
+git://git.kernel.org/pub/scm/linux/kernel/git/colyli/linux-bcache.git 
+for-next
+
+for you to fetch changes up to 887554ab96588de2917b6c8c73e552da082e5368:
+
+   bcache: fixup multiple threads crash (2022-03-06 22:33:45 +0800)
+
+----------------------------------------------------------------
+Mingzhe Zou (2):
+       bcache: fixup bcache_dev_sectors_dirty_add() multithreaded CPU 
+false sharing
+       bcache: fixup multiple threads crash
+
+  drivers/md/bcache/btree.c     |  6 ++++--
+  drivers/md/bcache/writeback.c | 17 +++++++++++------
+  2 files changed, 15 insertions(+), 8 deletions(-)
+
+
+
