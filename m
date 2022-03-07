@@ -2,150 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C4FC4332F
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D60CDC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:50:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234789AbiCGCot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Mar 2022 21:44:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52276 "EHLO
+        id S234831AbiCGCvR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 21:51:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234787AbiCGCos (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:44:48 -0500
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB8AC64C7
-        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:43:53 -0800 (PST)
-Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.52 with ESMTP; 7 Mar 2022 11:43:50 +0900
-X-Original-SENDERIP: 156.147.1.127
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.127 with ESMTP; 7 Mar 2022 11:43:50 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Mon, 7 Mar 2022 11:43:25 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Joel Fernandes <joel@joelfernandes.org>
-Cc:     Theodore Ts'o <tytso@mit.edu>, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, torvalds@linux-foundation.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com, paulmck@kernel.org
-Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
-Message-ID: <20220307024325.GA6323@X58A-UD3R>
-References: <YiAow5gi21zwUT54@mit.edu>
- <1646285013-3934-1-git-send-email-byungchul.park@lge.com>
- <YiDSabde88HJ/aTt@mit.edu>
- <20220304004237.GB6112@X58A-UD3R>
- <YiLYX0sqmtkTEM5U@mit.edu>
- <20220305141538.GA31268@X58A-UD3R>
- <YiN8M4FwAeW/UAoN@google.com>
+        with ESMTP id S231821AbiCGCvR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:51:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0B0A925E81
+        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:50:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646621423;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=FJEcHpliK8hzc4zrepjvUVJb9/YWMH25+xvkMWj2sb4=;
+        b=Ctg4miIM43ahTamCpPQvQxUi1EAztseNDorSUzcJV2wm3wEXgvCBkSEllxxcSLBD4QJowB
+        jIjjwySUARiurv1mP9RlT2cs6tKVpfJ7lxs1Lnym/sXWORxm76ORB9jLCN8CHhuF0mHVp+
+        idf5K+dICOUmlgs2jfx0Y+OE90plHQs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-COH5RrKDMqSkgTWe8gV-GA-1; Sun, 06 Mar 2022 21:50:20 -0500
+X-MC-Unique: COH5RrKDMqSkgTWe8gV-GA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DDA4E108088A;
+        Mon,  7 Mar 2022 02:50:18 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 601E83058B;
+        Mon,  7 Mar 2022 02:50:14 +0000 (UTC)
+Date:   Mon, 7 Mar 2022 10:50:10 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 14/14] block: move rq_qos_exit() into disk_release()
+Message-ID: <YiVy4jk00NQJPoiX@T590>
+References: <20220304160331.399757-1-hch@lst.de>
+ <20220304160331.399757-15-hch@lst.de>
+ <85ea5b62-ac03-1d9a-f1bd-040e58235957@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YiN8M4FwAeW/UAoN@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <85ea5b62-ac03-1d9a-f1bd-040e58235957@acm.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 05, 2022 at 03:05:23PM +0000, Joel Fernandes wrote:
-> On Sat, Mar 05, 2022 at 11:15:38PM +0900, Byungchul Park wrote:
-> > Almost all you've been blaming at Dept are totally non-sense. Based on
-> > what you're saying, I'm conviced that you don't understand how Dept
-> > works even 1%. You don't even try to understand it before blame.
+On Sun, Mar 06, 2022 at 12:51:37PM -0800, Bart Van Assche wrote:
+> On 3/4/22 08:03, Christoph Hellwig wrote:
+> > From: Ming Lei <ming.lei@redhat.com>
 > > 
-> > You don't have to understand and support it. But I can't response to you
-> > if you keep saying silly things that way.
+> > There can't be FS IO in disk_release(), so it is safe to move rq_qos_exit()
+> > there.
 > 
-> Byungchul, other than ext4 have there been any DEPT reports that other
-> subsystem maintainers' agree were valid usecases?
-
-Not yet.
-
-> Regarding false-positives, just to note lockdep is not without its share of
-> false-positives. Just that (as you know), the signal-to-noise ratio should be
-> high for it to be useful. I've put up with lockdep's false positives just
-> because it occasionally saves me from catastrophe.
-
-I love your insight. Agree. A tool would be useful only when it's
-*actually* helpful. I hope Dept would be so.
-
-> > > In any case, if DEPT is going to report these "circular dependencies
-> > > as bugs that MUST be fixed", it's going to be pure noise and I will
-> > > ignore all DEPT reports, and will push back on having Lockdep replaced
-> > 
-> > Dept is going to be improved so that what you are concerning about won't
-> > be reported.
+> The commit message only explains why it is safe to move rq_qos_exit() but
+> not why moving that function call is useful. Please add an explanation of
+> why moving that function call is useful and/or necessary.
 > 
-> Yeah I am looking forward to learning more about it however I was wondering
-> about the following: lockdep can already be used for modeling "resource
-> acquire/release" and "resource wait" semantics that are unrelated to locks,
-> like we do in mm reclaim. I am wondering why we cannot just use those existing
-> lockdep mechanisms for the wait/wake usecases (Assuming that we can agree
-
-1. Lockdep can't work with general waits/events happening across
-   contexts basically. To get over this, manual tagging of
-   acquire/release can be used at each section that we suspect. But
-   unfortunately, we cannot use the method if we cannot simply identify
-   the sections. Furthermore, it's inevitable to miss sections that
-   shouldn't get missed.
-
-2. Some cases should be correctly tracked via wait/event model, not
-   acquisition order model. For example, read-lock in rwlock should be
-   defined as a waiter waiting for write-unlock, write-lock in rwlock
-   as a waiter waiting for either read-unlock or write-unlock.
-   Otherwise, if we try to track those cases using acquisition order,
-   it cannot completely work. Don't you think it looks werid?
-
-3. Tracking what we didn't track before means both stronger detection
-   and new emergence of false positives, exactly same as Lockdep at its
-   beginning when it started to track what we hadn't tracked before.
-   Even though the emergence was allowed at that time, now that Locdkep
-   got stable enough, folks would be more strict on new emergences. It's
-   gonna get even worse if valid reports are getting prevented by false
-   positives.
-
-   For that reason, multi reporting functionality is essential. I was
-   thinking to improve Lockdep to allow multi reporting. But it might be
-   needed to change more than developing a new tool from scratch. Plus
-   it might be even more difficult cuz Lockdep already works not badly.
-   So even for Lockdep, I thought the new thing should be developed
-   independently leaving Lockdep as it is.
-
-4. (minor reason) The concept and name of acquisition and release is not
-   for general wait/event. The design and implementation are not,
-   either. I wanted to address the issue as soon as possible before we
-   squeeze out Lockdep to use for general wait/event more and the kernel
-   code gets weird. Of course, it doesn't mean Dept is more stable than
-   Lockdep. However, I can tell Dept works what a dependency tool should
-   do and we need to make the code go right.
-
-> that circular dependencies on related to wait/wake is a bad thing. Or perhaps
-> there's a reason why Peter Zijlstra did not use lockdep for wait/wake
-> dependencies (such as multiple wake sources) considering he wrote a lot of
-> that code.
+> > diff --git a/block/genhd.c b/block/genhd.c
+> > index 857e0a54da7dd..56f66c6fee943 100644
+> > --- a/block/genhd.c
+> > +++ b/block/genhd.c
+> > @@ -627,7 +627,6 @@ void del_gendisk(struct gendisk *disk)
+> >   	blk_mq_freeze_queue_wait(q);
+> > -	rq_qos_exit(q);
+> >   	blk_sync_queue(q);
+> >   	blk_flush_integrity();
+> >   	/*
+> > @@ -1119,7 +1118,7 @@ static void disk_release_mq(struct request_queue *q)
+> >   		elevator_exit(q);
+> >   		mutex_unlock(&q->sysfs_lock);
+> >   	}
+> > -
+> > +	rq_qos_exit(q);
+> >   	__blk_mq_unfreeze_queue(q, true);
+> >   }
 > 
-> Keep kicking ass brother, you're doing great.
+> Commit 8e141f9eb803 ("block: drain file system I/O on del_gendisk") removed
+> the rq_qos_exit() call from blk_cleanup_queue(). This patch series does not
+> restore the rq_qos_exit() call in blk_cleanup_queue(). I think that call
+> should be restored since rq_qos_add() can be called before add_disk() is
+> called. I'm referring to the following call chain:
+> 
+> __alloc_disk_node()
+>   blkcg_init_queue()
+>     blk_iolatency_init()
+>       rq_qos_add()
+> 
+> sd_probe() is one of the functions that can take an error path after
+> __alloc_disk_node() has returned and before device_add_disk() is called.
 
-Thank you! I'll go through this in a right way so as not to disappoint
-you!
+blkcg_exit_queue() is called in disk_release(), so this error handing is
+covered since put_disk() should be called once __alloc_disk_node()
+is successful, no matter disk is added or not.
+
+We move rq_qos_exit() to disk_release() too, then every FS IO related
+resources are released in disk_release().
+
 
 Thanks,
-Byungchul
+Ming
+
