@@ -2,345 +2,198 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACC7BC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 11:31:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8740BC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 11:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231448AbiCGLci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 06:32:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
+        id S240494AbiCGLdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 06:33:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240494AbiCGLcb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 06:32:31 -0500
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A692A248
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 03:26:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1646652420; x=1678188420;
-  h=from:to:cc:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=hjoUITUXX5NDMQPWl+a2P36+kR/FsDNaOatt0eTI5H0=;
-  b=gFjMXgmSHPOJFP+4nLCNCV1ga7M++q0HtvD3q6VY0mDx2pRH13SXMD3y
-   yDYsKiUUc0dcj6DxmCYXFKcKTMXYpFj/hSvrzSz3PLWZio+4UEByDbToZ
-   nOvkNFi4B84/u//251jtGGwHpigWdHo1FRBl/1t7M80tTKZwVpRjXmGud
-   OokQ17nzT3O9EqGbGZmbHWQl52J7CJzIA/BZedov4JVqu9xX+WWy82PyY
-   yl4x3UxScB13oUemhod47EN7VYXQ6uRSnSrCcX/4nbshZiB1aGF+dtJ7M
-   D+wOWjeE7iX8cQMdCV6jQFhIf5Z0ruZOdnRhisdW2VWn0ZePS/D8WXnpj
-   w==;
-X-IronPort-AV: E=Sophos;i="5.90,162,1643644800"; 
-   d="scan'208";a="306565773"
-Received: from mail-bn8nam12lp2171.outbound.protection.outlook.com (HELO NAM12-BN8-obe.outbound.protection.outlook.com) ([104.47.55.171])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2022 19:26:58 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gyMfxj2wUener67AEmXdxXMxOYlBpWIkfAplMvdOwS+P4tHrjgPMFbAYrbAgfz6eKSh04IJ8dABb8HQKhPP4+Y+5IDKt01agOf/cIKTETzzdfEbp3Z/JszHtUBgu75yuhiCCk9TdTxDqFMZVa6r9BDx9NzCzFZhl0LbWZwcC3w5BPIwJUkpDInq+bq8f+76ZpYsW8ds2otWDEt6jPl/so7qLxSnELdfQZcYOqYkhMt5oKLTO+jBI142j+jpc04zm8Uvt5eXP8+tOKiMGEVz3QEoNXqO7uQCMusWurEgWD+sndrXDwnCXk0UmMpliDaVhu+Te/4c2VQnDBxt4Y+6HPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LsLo09xW7uY2Z5c0ZerAwrrTKlChMyInAUDF5tTckFM=;
- b=Wpp4BzhZRnRrzlISd9P6gnj7gFPBZG7HRn6Ki8qgvVjDuLjRj3Bv4UEgeJj1gMBsKd3WBTHSy45kXGh5XOmgIdFAik2RtgEOYHcgqeDIyDTj/OXOptE4kzuWt2QzIf/LJjYw5W9V0j+rdUxV3Jq+50TgSzCZ/BmFqs8MXFTUkyGi2cquR8DfKDH53d74Xd9DrXUNzP6p7mbhCvaKdkp3yvQi0pBdaZwX0IdihrM6nWhOPCiVIEw4kn5E03PsWRKy50ZJcKeLnyF5/XGPTwPxhUHlJbQ6bMhM0mzI3cdHh3joycFShqEie2XGCcvyJRyvMRGoGmz1VULgfv0cfRv4Cw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        with ESMTP id S242353AbiCGLdB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 06:33:01 -0500
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B454932049
+        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 03:29:48 -0800 (PST)
+Received: by mail-ed1-x52b.google.com with SMTP id g3so7195644edu.1
+        for <linux-block@vger.kernel.org>; Mon, 07 Mar 2022 03:29:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LsLo09xW7uY2Z5c0ZerAwrrTKlChMyInAUDF5tTckFM=;
- b=bWatG67VjNcpeQrKPvOJfoKQIp0QXHMAksEjnQlokRT+sABbUC7jZ4TMIGWpPSiQsp0715pHNozwW/hA6M2Ukzflp7A1MyhYr4Yyc933tsvpiN5MwPEg8lt+0EvrZP40D9KfS+Khw27EI7ju310g0FBDQ/12vbVPYp2ivScWRxk=
-Received: from BN0PR04MB8048.namprd04.prod.outlook.com (2603:10b6:408:15f::17)
- by CY4PR04MB1000.namprd04.prod.outlook.com (2603:10b6:910:52::37) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Mon, 7 Mar
- 2022 11:26:56 +0000
-Received: from BN0PR04MB8048.namprd04.prod.outlook.com
- ([fe80::4db7:e845:4326:2c3d]) by BN0PR04MB8048.namprd04.prod.outlook.com
- ([fe80::4db7:e845:4326:2c3d%5]) with mapi id 15.20.5038.027; Mon, 7 Mar 2022
- 11:26:56 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: [bug report] blktests block/005: KASAN uaf at bio merge
-Thread-Topic: [bug report] blktests block/005: KASAN uaf at bio merge
-Thread-Index: AQHYMhZAQGfK9roq2EqR+pvUaw6GVw==
-Date:   Mon, 7 Mar 2022 11:26:56 +0000
-Message-ID: <20220307112655.5ewkvhz5d3avglnd@shindev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 66a8e259-bd94-4fc0-d4a4-08da002d6351
-x-ms-traffictypediagnostic: CY4PR04MB1000:EE_
-x-microsoft-antispam-prvs: <CY4PR04MB1000EE108A996BD9E431A5C4ED089@CY4PR04MB1000.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nm1fdv4SE3D3jylmbzRqqWgMZDgd5TRXAz6DuW9YvwlGjntdBCPOz/CqdbPuMiC6bExZKQnTmcLWt28UqBlSYppFs+2HOxFG2wIcp3Dbh+8DSUHvLep+98OaE9MDEuR1kNE8ndbiq2syY/pJsZgWw0KL9EWv4JQAC/FNs/tjgRtb/KkkDGY5uHEZ7cK6ToQL76839iCTsltwzRSVejgqOp1LKYqt/2V+HZjaXGW3x/5WT18dsPK4FFVMWV1osbUrZQcAIHDsR4HhHzQEaq0+gOMyiWeVEVx100wf6nFoHpSvybuwdwmY6lWGMcXY4hQXyXE72OdtBdeNCJ1ih9lmZdXcOMIlwj6awd/s73iCxyypjyzwtJQOvF62hg6Dcl2lunvaHxzLI5FZV+aaF2OW0qEHX1thxVqPXUSWxxvz2hmhiPdQAcqusvQL+LSAVwBxKzsfIYEr1pogEjckPssBo50ojo37o4izdYXDywNv7GTQleB6I7pgMIt5E2yaDcmxy6WrnE30wzkfIE4wPH90vXM2YRDFJzWQ+fSoxv1yAcCrgIJtBT9ak/Jc5fF7hft1xI2yQY6YkowBLJAQ5eOtgvy99nm7oZTndx/Brzu/OuLCxZ81VFchCyHs5IUXC/mAqBuGrfFL0uR84ogKvH2HMctEgmFpHLgISZ7gHMz47auaRsNeNmJwI20nWWYUq1xSnGXBgUXAQDJQWeedDHrgaw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR04MB8048.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(6486002)(71200400001)(508600001)(54906003)(6916009)(316002)(38070700005)(66556008)(66476007)(64756008)(66446008)(4326008)(8676002)(86362001)(122000001)(38100700002)(66946007)(82960400001)(76116006)(8936002)(9686003)(33716001)(6512007)(6506007)(2906002)(44832011)(26005)(186003)(5660300002)(83380400001)(1076003)(91956017);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Uyu6q+qhHWcMPQCwPt8dJxyw0nSkPxmOZEO33pREkWO+aUuSE8gmhWLUOZXH?=
- =?us-ascii?Q?65sYp2ZcO+n0FexaoYO4rfa9h2IwmEwkAADVvXmHS+ZcboLYl4hTL/WdYHLA?=
- =?us-ascii?Q?WQXe0ntNY23aedyaj5M7A8UluSlqQKD0/ld8CjSMPAaP6dlnUou20w9Ppe29?=
- =?us-ascii?Q?hAZ4eVEj9FJ+zw+gAnHEXWUy9mGC4njNBMzINCYoTwt9bXtXycVL8ShHLEgS?=
- =?us-ascii?Q?aGQ2bIyi9QNcc1DPwTntLu48Kv1A9UfHJbFtP0eq1ZjwR4K1CnEF+iRjBYUW?=
- =?us-ascii?Q?wA+sWJbAt3VHhErzQCRHQikJe0kkub8JJcvMJznTgMsHuRYBWSEs1pg83jtH?=
- =?us-ascii?Q?ZknU5lp/Yzr+p5VTQIUtK4GmNraUXWrMIgHHnOcD1SZ4q/UuvFUThD9TkoFR?=
- =?us-ascii?Q?uJGS2GblItf/zrrVA7Q9pftWj/racAM/SnSYgnCiO3mO5ySLxVw/EMrPGKsv?=
- =?us-ascii?Q?L5Bj1THdok+z+2Nz21zIBJ/o4ICdUQ7RgHHciTOboDBsHoWzUhPc85VksFBs?=
- =?us-ascii?Q?+wnF2tUf3C5YUQtDJJYoSgRGNwTbgRfHxR7ZQ5REPys36w9f7wp6cLW6A9yY?=
- =?us-ascii?Q?YKQCEk1Qobi4akc1/MgsxuwK6qAuYSI4UPUt0Jv3SMgSUGd0dhWGsAi6jJvO?=
- =?us-ascii?Q?2vZM88glrb13FKWFSBvvrcW+SO+aQHoa8QJTlVnRdLeXphJ341mLooA7QJ2n?=
- =?us-ascii?Q?3vADmtMlUhtr3kMr5/52TDo3OMpPfkR7zT19bRsaioMiDtuvedVitxfn3WnH?=
- =?us-ascii?Q?6eUPjazB3dMNUElmbx4k+trLxnWXJcurRy9d6mmt+vF2/zsDMTXxmhmv9wrI?=
- =?us-ascii?Q?zfOTnHD0ZVdQiUoGXnBuXrfq3k/nu6e96E4wpG0/ZVmv/ErclBOgkNYKNUGc?=
- =?us-ascii?Q?G2WCeA8wRY6I9dmKE4iNMOg7yMSIEa9wDInLoUMAaDEhed9KZTKQ8MpyDDtP?=
- =?us-ascii?Q?nFuE1nVtfcx3VVBFeLIqsOg6OpeLU8I0DQS2QZv7DY1KRjjJvSLz7VX+/uVv?=
- =?us-ascii?Q?zLS2lwatbBUFvCxuEO3fQYltrmmO9e22CO3/zYsMrmvt+RQZEkKXo3uxkHwA?=
- =?us-ascii?Q?MO5RCVj0BSyKvz+yXBV4UbjTetw0/xq6WygjtQnPzD1qpnT7xxnC1HlGpcnj?=
- =?us-ascii?Q?XXhq6E3Cxl4erBvt9FYjVTPzdrOOL/kw6tCx3Ne8cGdTyodsYTe1f4taCEDN?=
- =?us-ascii?Q?k1QI+Cq42lTNQkot9y57FHkyUn/+UZpwa6CkQYCaPAFN02EPIMxZoFqZxMQW?=
- =?us-ascii?Q?Y2e0lEWzDQMGvKQazZOOh0mmOCIvD+KGDRKrrIOPjp7lASJl4ojbgdkb3RJu?=
- =?us-ascii?Q?iuRsf3qiit1eQAFmcJ7yVQl+SMln4YiH5T+PPNtT3qwUD5BcdN1dnHN9gx7d?=
- =?us-ascii?Q?6Nf1A996q3/TVfZn0eD5mc60v2QZRz1agcO7mddK7UW8r7GngcM96QSXOvfe?=
- =?us-ascii?Q?HXq4336nUmjW1PvOWDhqIf0hrIqVe8yYMRJ7IUL+MX4ovmFKAP3iNh5QL8Sa?=
- =?us-ascii?Q?lGhsH3vdfPuRB0OofKENfTORyax+4siPCEPUyoQBaf9NijkSJ0OZL4LFUNAa?=
- =?us-ascii?Q?eVXG7ui7UBIag3Swnr08E4FsvD3WrG4WEauMUIgab25npZ/D4YNhgLrdFNJJ?=
- =?us-ascii?Q?ZnwkEL3dfCa116PppMjg9fXikDihR3Q/aYr2fN9TjqF7jaUOpzlYU/Ky+zsS?=
- =?us-ascii?Q?iEk6LnNBTfUcnXGVJl8J9+5E800=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <7EA58C78B006B24E9BE1B796EDC8CCCD@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=T4acKnzVRK53XAhNeOXzw4+hZnnGtqTbL8jwbA7d8Es=;
+        b=4zPGDx3wAn33cL2ZPDTE3Vn1srNgVPZzkZ+kXLtEIE9G5f1cclmGtXAunITyuGoSOE
+         VHEqxj237Hly6FxpKyBF7eyLmZ80u70BrzsbM4n/8GRtNr4k9CnzcjzLvtsRrwH1XPCl
+         sX+fsHe9CmTpu10QjApm7KcqNU0KHEnsK7yKUpocHSKpuFqRs1bwo8abLvSBjgEZtecX
+         KDEoqlHwFzX6VSFmPIEZ5TFZBJSX5sp0IgZ6CD7OBXItj42fgVes3VrhGH6hAhrmTWXt
+         VXlusoN8Q/TKkLS0pHvaYWme1ZTje5z/ibQ/XGHp7EsdGrhcuiMaTHK0G7Wm9lodXl2t
+         8ixQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=T4acKnzVRK53XAhNeOXzw4+hZnnGtqTbL8jwbA7d8Es=;
+        b=hoPJ4d/wwNmSgLVXW+3z4zgZFBM/lkTkj85GGfkr3XX2x6AykMLSbsDtcDvYz1sK2T
+         bACylrbQuLXFwhn8LlGmfbBMNa7csreeHJMNSC9OvybqKacZbV1KSs2NpEEDwVpB2b+q
+         EJCHP5iuqeMrWl3ZhA1zA8Zzflu9pwuAp6YZ3aQMA8E8G0MJMR4hrndTFfBPpHRs/xtV
+         tp2yqWekp6Pk/EZOb5BfI8PE0bzzDulfhnQsmZHF27lo3ndCpz6ez/sO2rDMUQ0ajUQ6
+         q0XED990mpW/CK4t0G2ez/b/akBSfW4Iew/wwC17j6lGauXGTqM9pOpXQE2CQNCn9G1U
+         bmxQ==
+X-Gm-Message-State: AOAM532EbrdH+pomFhkgZxWYfJENxk+clI07THyNSytqBC/3eWS0ZzJV
+        dMS3KYQ6VTFHUcn4oLQBN8zMyg==
+X-Google-Smtp-Source: ABdhPJy/hppSMSCKvshni7v3R5KpP7hRSUmHGqeJTncIJJlKs3xHUIPHVWiof+HTB3voVflCIsttTw==
+X-Received: by 2002:a05:6402:4c6:b0:406:d579:2c4 with SMTP id n6-20020a05640204c600b00406d57902c4mr10592930edw.52.1646652587223;
+        Mon, 07 Mar 2022 03:29:47 -0800 (PST)
+Received: from localhost ([194.62.217.57])
+        by smtp.gmail.com with ESMTPSA id n6-20020aa7c786000000b00410d2403ccfsm6141013eds.21.2022.03.07.03.29.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 03:29:46 -0800 (PST)
+Date:   Mon, 7 Mar 2022 12:29:45 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Matias =?utf-8?B?QmrDuHJsaW5n?= <Matias.Bjorling@wdc.com>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Hans Holmberg <Hans.Holmberg@wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <20220307112824.ehnnec5xv6fsvkpa@ArmHalley.local>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <20220304001022.GJ3927073@dread.disaster.area>
+ <YiKOQM+HMZXnArKT@bombadil.infradead.org>
+ <20220304224257.GN3927073@dread.disaster.area>
+ <YiKY6pMczvRuEovI@bombadil.infradead.org>
+ <20220305073321.5apdknpmctcvo3qj@ArmHalley.localdomain>
+ <20220307071229.GR3927073@dread.disaster.area>
+ <BYAPR04MB496845AB3EEC1EAD8C7CE4D9F1089@BYAPR04MB4968.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR04MB8048.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 66a8e259-bd94-4fc0-d4a4-08da002d6351
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2022 11:26:56.4463
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: sgI1yfKWc1pdKYIXNnlYPNJpSMdmJ8Oa7EGFve/2zuA9OGQtIDOHBEV3gEwLC6wpTqUoNMB31f3aycHuzj9iw61PtfgyyUYLrEynJwjuSkI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB1000
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BYAPR04MB496845AB3EEC1EAD8C7CE4D9F1089@BYAPR04MB4968.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I observed blktests block/005 failure by KASAN use-after-free. The test cas=
-e
-repeats IO scheduler switch during fio workload. According to the kernel
-message, it looks like bio submit path is running while IO scheduler is inv=
-alid,
-and kyber_bio_merge accessed the invalid IO scheduler data.
+On 07.03.2022 10:27, Matias Bjørling wrote:
+>> > I understand that you point to ZoneFS for this. It is true that it was
+>> > presented at the moment as the way to do raw zone access from
+>> > user-space.
+>> >
+>> > However, there is no users of ZoneFS for ZNS devices that I am aware
+>> > of (maybe for SMR this is a different story).  The main open-source
+>> > implementations out there for RocksDB that are being used in
+>> > production (ZenFS and xZTL) rely on either raw zone block access or
+>> > the generic char device in NVMe (/dev/ngXnY).
+>>
+>> That's exactly the situation we want to avoid.
+>>
+>> You're talking about accessing Zoned storage by knowing directly about how
+>> the hardware works and interfacing directly with hardware specific device
+>> commands.
+>>
+>> This is exactly what is wrong with this whole conversation - direct access to
+>> hardware is fragile and very limiting, and the whole purpose of having an
+>> operating system is to abstract the hardware functionality into a generally
+>> usable API. That way when something new gets added to the hardware or
+>> something gets removed, the applications don't because they weren't written
+>> with that sort of hardware functionality extension in mind.
+>>
+>> I understand that RocksDB probably went direct to the hardware because, at
+>> the time, it was the only choice the developers had to make use of ZNS based
+>> storage. I understand that.
+>>
+>> However, I also understand that there are *better options now* that allow
+>> applications to target zone storage in a way that doesn't expose them to the
+>> foibles of hardware support and storage protocol specifications and
+>> characteristics.
+>>
+>> The generic interface that the kernel provides for zoned storage is called
+>> ZoneFS. Forget about the fact it is a filesystem, all it does is provide userspace
+>> with a named zone abstraction for a zoned
+>> device: every zone is an append-only file.
+>>
+>> That's what I'm trying to get across here - this whole discussion about zone
+>> capacity not matching zone size is a hardware/ specification detail that
+>> applications *do not need to know about* to use zone storage. That's
+>> something taht Zonefs can/does hide from applications completely - the zone
+>> files behave exactly the same from the user perspective regardless of whether
+>> the hardware zone capacity is the same or less than the zone size.
+>>
+>> Expanding access the hardware and/or raw block devices to ensure userspace
+>> applications can directly manage zone write pointers, zone capacity/space
+>> limits, etc is the wrong architectural direction to be taking. The sort of
+>> *hardware quirks* being discussed in this thread need to be managed by the
+>> kernel and hidden from userspace; userspace shouldn't need to care about
+>> such wierd and esoteric hardware and storage
+>> protocol/specification/implementation
+>> differences.
+>>
+>> IMO, while RocksDB is the technology leader for ZNS, it is not the model that
+>> new applications should be trying to emulate. They should be designed from
+>> the ground up to use ZoneFS instead of directly accessing nvme devices or
+>> trying to use the raw block devices for zoned storage. Use the generic kernel
+>> abstraction for the hardware like applications do for all other things!
+>>
+>> > This is because having the capability to do zone management from
+>> > applications that already work with objects fits much better.
+>>
+>> ZoneFS doesn't absolve applications from having to perform zone management
+>> to pack it's objects and garbage collect stale storage space.  ZoneFS merely
+>> provides a generic, file based, hardware independent API for performing these
+>> zone management tasks.
+>>
+>> > My point is that there is space for both ZoneFS and raw zoned block
+>> > device. And regarding !PO2 zone sizes, my point is that this can be
+>> > leveraged both by btrfs and this raw zone block device.
+>>
+>> On that I disagree - any argument that starts with "we need raw zoned block
+>> device access to ...." is starting from an invalid premise. We should be hiding
+>> hardware quirks from userspace, not exposing them further.
+>>
+>> IMO, we want writing zone storage native applications to be simple and
+>> approachable by anyone who knows how to write to append-only files.  We do
+>> not want such applications to be limited to people who have deep and rare
+>> expertise in the dark details of, say, largely undocumented niche NVMe ZNS
+>> specification and protocol quirks.
+>>
+>> ZoneFS provides us with a path to the former, what you are advocating is the
+>> latter....
 
-The failure was observed with v5.17-rc1, and still observed with v5.17-rc7.
-It was observed with QEMU NVME emulation device with ZNS zoned device
-emulation. So far, it is not observed with other devices. To recreate the
-failure, need to repeat the test case. In the worst case, 500 times repetit=
-ion
-is required.
+I agree with all you say. I can see ZoneFS becoming a generic zone API,
+but we are not there yet. Rather than advocating for using raw devices,
+I am describing how zone devices are being consumed today. So to me
+there are 2 things we need to consider: Support current customers and
+improve the way future customers consume these devices.
 
-I bisected and found the commit 9d497e2941c3 ("block: don't protect
-submit_bio_checks by q_usage_counter") triggers it. The commit moves calls =
-of
-3 functions: submit_bio_checks, blk_mq_attempt_bio_merge and rq_qos_throttl=
-e.
-I suspected that the move of blk_mq_attempt_bio_merge is the cause, and tri=
-ed
-to revert only that part. But it caused linux system boot hang related to
-rq_qos_throttle. Then I created another patch which reverts moves of both
-blk_mq_attempt_bio_merge and rq_qos_throttle calls [2]. With this patch, th=
-e
-KASAN uaf disappeared. Based on this observation, I think the failure cause=
- is
-the move of blk_mq_attempt_bio_merge out of guard by bio_queue_enter.
+Coming back to the original topic of the LSF/MM discussion, what I would
+like to propose is that we support existing, deployed devices that are
+running in Linux and do not have PO2 zone sizes. These can then be
+consumed by btrfs or presented to applications through ZoneFS. And for
+existing customers, this will mean less headaches.
 
-I'm not sure if the fix by the patch [2] is good enough. With that fix, the
-blk_mq_attempt_bio_merge call in blk_mq_get_new_requests is guarded with
-bio_queue_enter, but the blk_mq_attempt_bio_merge call in
-blk_mq_get_cached_request may not be well guarded. Comments for fix approac=
-h
-will be appreciated.
+Note here that if we use ZoneFS and all we care is zone capacities, then
+the whole PO2 argument to make applications more efficient does not
+apply anymore, as applications would be using the real capacity of the
+zone. I very much like this approach.
 
+>+ Hans (zenfs/rocksdb author)
+>
+>Dave, thank you for your great insight. It is a great argument for why zonefs makes sense. I must admit that Damien has been telling me this multiple times, but I didn't fully grok the benefits until seeing it in the light of this thread.
+>
+>Wrt to RocksDB support using ZenFS - while raw block access was the initial approach, it is very easy to change to use the zonefs API. Hans has already whipped up a plan for how to do it.
 
-[1]
-
-[  335.931534] run blktests block/005 at 2022-03-07 10:15:29
-[  336.285062] general protection fault, probably for non-canonical address=
- 0xdffffc0000000011: 0000 [#1] PREEMPT SMP KASAN PTI
-[  336.291190] KASAN: null-ptr-deref in range [0x0000000000000088-0x0000000=
-00000008f]
-[  336.297513] CPU: 0 PID: 1864 Comm: fio Not tainted 5.16.0-rc3+ #15
-[  336.302034] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qemu.org 04/01/2014
-[  336.309636] RIP: 0010:kyber_bio_merge+0x121/0x320
-[  336.315382] Code: 80 3c 16 00 0f 85 f8 01 00 00 49 8b ac 24 40 01 00 00 =
-48 ba 00 00 00 00 00 fc ff df 48 8d bd 88 00 00 00 48 89 fe 48 c1 ee 03 <80=
-> 3c 16 00 0f 85 80 01 00 00 49 8d bc 24 8c 01 00 00 4c 8b ad 88
-[  336.330777] RSP: 0018:ffff8881105e7820 EFLAGS: 00010206
-[  336.334971] RAX: 0000000000000000 RBX: ffffe8ffffc10040 RCX: 00000000000=
-00000
-[  336.340428] RDX: dffffc0000000000 RSI: 0000000000000011 RDI: 00000000000=
-00088
-[  336.345951] RBP: 0000000000000000 R08: 0000000000000000 R09: ffff888116b=
-5a29f
-[  336.351789] R10: ffffed1022d6b453 R11: 0000000000000001 R12: ffff8881132=
-1a800
-[  336.357550] R13: 0000000000000000 R14: ffff8881105e7bf0 R15: 00000000000=
-00001
-[  336.363334] FS:  00007f1adf654b40(0000) GS:ffff8881e5600000(0000) knlGS:=
-0000000000000000
-[  336.369008] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  336.373065] CR2: 000000000049be98 CR3: 0000000118c86002 CR4: 00000000001=
-70ef0
-[  336.378103] Call Trace:
-[  336.380390]  <TASK>
-[  336.382386]  blk_mq_submit_bio+0xd0c/0x1b40
-[  336.386036]  ? rcu_read_lock_sched_held+0x3f/0x70
-[  336.389727]  ? blk_mq_try_issue_list_directly+0x3c0/0x3c0
-[  336.394052]  ? get_user_pages+0xa0/0xa0
-[  336.396975]  ? should_fail_request+0x70/0x70
-[  336.400050]  __submit_bio+0x245/0x2e0
-[  336.402967]  ? submit_bio_checks+0x1700/0x1700
-[  336.406347]  ? find_held_lock+0x2c/0x110
-[  336.409339]  submit_bio_noacct+0x5a1/0x810
-[  336.412178]  ? __submit_bio+0x2e0/0x2e0
-[  336.415044]  ? __blkdev_direct_IO_simple+0x3f8/0x6f0
-[  336.418354]  submit_bio+0x149/0x340
-[  336.420715]  ? submit_bio_noacct+0x810/0x810
-[  336.423491]  __blkdev_direct_IO_simple+0x3cd/0x6f0
-[  336.426723]  ? blkdev_llseek+0xc0/0xc0
-[  336.429513]  ? lock_release+0x3a9/0x6d0
-[  336.432221]  ? lock_downgrade+0x6b0/0x6b0
-[  336.435057]  ? next_uptodate_page+0x59e/0x7d0
-[  336.438730]  ? blkdev_get_block+0xd0/0xd0
-[  336.442617]  ? fsnotify_first_mark+0x140/0x140
-[  336.446481]  blkdev_read_iter+0x3e2/0x580
-[  336.450322]  ? __do_fault+0x460/0x460
-[  336.453902]  new_sync_read+0x35f/0x5d0
-[  336.457137]  ? __fsnotify_parent+0x275/0xb20
-[  336.460911]  ? __ia32_sys_llseek+0x2f0/0x2f0
-[  336.464331]  ? __fsnotify_update_child_dentry_flags+0x2e0/0x2e0
-[  336.467827]  ? inode_security+0x4f/0xf0
-[  336.470315]  vfs_read+0x26c/0x4c0
-[  336.472552]  __x64_sys_pread64+0x17c/0x1d0
-[  336.474961]  ? vfs_read+0x4c0/0x4c0
-[  336.477133]  ? syscall_enter_from_user_mode+0x21/0x70
-[  336.479819]  do_syscall_64+0x3b/0x90
-[  336.481788]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  336.484985] RIP: 0033:0x7f1ae8d7b81f
-[  336.487043] Code: 08 89 3c 24 48 89 4c 24 18 e8 bd a8 f8 ff 4c 8b 54 24 =
-18 48 8b 54 24 10 41 89 c0 48 8b 74 24 08 8b 3c 24 b8 11 00 00 00 0f 05 <48=
-> 3d 00 f0 ff ff 77 31 44 89 c7 48 89 04 24 e8 fd a8 f8 ff 48 8b
-[  336.496657] RSP: 002b:00007ffed8151d60 EFLAGS: 00000293 ORIG_RAX: 000000=
-0000000011
-[  336.500726] RAX: ffffffffffffffda RBX: 00000000017ce540 RCX: 00007f1ae8d=
-7b81f
-[  336.504702] RDX: 0000000000001000 RSI: 0000000001894000 RDI: 00000000000=
-00008
-[  336.508525] RBP: 00000000017ce540 R08: 0000000000000000 R09: 00000000000=
-00001
-[  336.512202] R10: 00000000104e6000 R11: 0000000000000293 R12: 00007f1ac9e=
-f3e18
-[  336.515665] R13: 0000000000000000 R14: 0000000000001000 R15: 00000000000=
-00001
-[  336.518168]  </TASK>
-
-[2]
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index d69ca91fbc8b..59c66b9e8a44 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2718,7 +2718,8 @@ static bool blk_mq_attempt_bio_merge(struct request_q=
-ueue *q,
-=20
- static struct request *blk_mq_get_new_requests(struct request_queue *q,
- 					       struct blk_plug *plug,
--					       struct bio *bio)
-+					       struct bio *bio,
-+					       unsigned int nsegs)
- {
- 	struct blk_mq_alloc_data data =3D {
- 		.q		=3D q,
-@@ -2730,6 +2731,11 @@ static struct request *blk_mq_get_new_requests(struc=
-t request_queue *q,
- 	if (unlikely(bio_queue_enter(bio)))
- 		return NULL;
-=20
-+	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
-+		goto queue_exit;
-+
-+	rq_qos_throttle(q, bio);
-+
- 	if (plug) {
- 		data.nr_tags =3D plug->nr_ios;
- 		plug->nr_ios =3D 1;
-@@ -2742,12 +2748,13 @@ static struct request *blk_mq_get_new_requests(stru=
-ct request_queue *q,
- 	rq_qos_cleanup(q, bio);
- 	if (bio->bi_opf & REQ_NOWAIT)
- 		bio_wouldblock_error(bio);
-+queue_exit:
- 	blk_queue_exit(q);
- 	return NULL;
- }
-=20
- static inline struct request *blk_mq_get_cached_request(struct request_que=
-ue *q,
--		struct blk_plug *plug, struct bio *bio)
-+		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
- {
- 	struct request *rq;
-=20
-@@ -2757,14 +2764,20 @@ static inline struct request *blk_mq_get_cached_req=
-uest(struct request_queue *q,
- 	if (!rq || rq->q !=3D q)
- 		return NULL;
-=20
--	if (blk_mq_get_hctx_type(bio->bi_opf) !=3D rq->mq_hctx->type)
-+	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
-+		*bio =3D NULL;
-+		return NULL;
-+	}
-+
-+	if (blk_mq_get_hctx_type((*bio)->bi_opf) !=3D rq->mq_hctx->type)
- 		return NULL;
--	if (op_is_flush(rq->cmd_flags) !=3D op_is_flush(bio->bi_opf))
-+	if (op_is_flush(rq->cmd_flags) !=3D op_is_flush((*bio)->bi_opf))
- 		return NULL;
-=20
--	rq->cmd_flags =3D bio->bi_opf;
-+	rq->cmd_flags =3D (*bio)->bi_opf;
- 	plug->cached_rq =3D rq_list_next(rq);
- 	INIT_LIST_HEAD(&rq->queuelist);
-+	rq_qos_throttle(q, *bio);
- 	return rq;
- }
-=20
-@@ -2800,14 +2813,11 @@ void blk_mq_submit_bio(struct bio *bio)
- 	if (!bio_integrity_prep(bio))
- 		return;
-=20
--	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
--		return;
--
--	rq_qos_throttle(q, bio);
--
--	rq =3D blk_mq_get_cached_request(q, plug, bio);
-+	rq =3D blk_mq_get_cached_request(q, plug, &bio, nr_segs);
- 	if (!rq) {
--		rq =3D blk_mq_get_new_requests(q, plug, bio);
-+		if (!bio)
-+			return;
-+		rq =3D blk_mq_get_new_requests(q, plug, bio, nr_segs);
- 		if (unlikely(!rq))
- 			return;
- 	}
-
---=20
-Best Regards,
-Shin'ichiro Kawasaki=
+This is great. We have been thinking for some time about aligning with
+ZenFS for the in-kernel path. This might be the right time to take
+action on this.
