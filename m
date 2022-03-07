@@ -2,110 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F90C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C4FC4332F
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:43:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231270AbiCGCml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Mar 2022 21:42:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
+        id S234789AbiCGCot (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 21:44:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230328AbiCGCmk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:42:40 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91E5A1DA4A
-        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:41:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646620906;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=n7kabxOzF0F8GAUiBdn3b9WygOhE2sldgJPoGl+UqTk=;
-        b=R0bS8cbfafySoJcG71SdsJQNxT4pRyER6vGw4sCsxPYaYlQxDkfcoJ4qhrCNAld0hsfxqU
-        hd7XlKobD5hcILMMJKZQYI1RHM4RSwmmSr3DV3vd1qEc9OXVjGK8oMB68UfqlsHnldw5K7
-        A1AaDZxYAj/1tKfoQsY52psQNxrh6mM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-505-BZIgWRjMP2eVpUrtu3y_Wg-1; Sun, 06 Mar 2022 21:41:41 -0500
-X-MC-Unique: BZIgWRjMP2eVpUrtu3y_Wg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9CFC824FA6;
-        Mon,  7 Mar 2022 02:41:39 +0000 (UTC)
-Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FE994D708;
-        Mon,  7 Mar 2022 02:41:35 +0000 (UTC)
-Date:   Mon, 7 Mar 2022 10:41:31 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
-        dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: Re: [PATCH v5 2/2] dm: support bio polling
-Message-ID: <YiVw2y1eTcXrsdME@T590>
-References: <20220305020804.54010-1-snitzer@redhat.com>
- <20220305020804.54010-3-snitzer@redhat.com>
- <20220306092937.GC22883@lst.de>
- <2ced53d5-d87b-95db-a612-6896f73ce895@kernel.dk>
- <YiVr4rna9DG0Oyng@T590>
- <89612542-0040-65bd-23bc-5bf8cac71f61@kernel.dk>
+        with ESMTP id S234787AbiCGCos (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:44:48 -0500
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB8AC64C7
+        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:43:53 -0800 (PST)
+Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
+        by 156.147.23.52 with ESMTP; 7 Mar 2022 11:43:50 +0900
+X-Original-SENDERIP: 156.147.1.127
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.127 with ESMTP; 7 Mar 2022 11:43:50 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Mon, 7 Mar 2022 11:43:25 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Joel Fernandes <joel@joelfernandes.org>
+Cc:     Theodore Ts'o <tytso@mit.edu>, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, torvalds@linux-foundation.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        rostedt@goodmis.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com, paulmck@kernel.org
+Subject: Re: Report 2 in ext4 and journal based on v5.17-rc1
+Message-ID: <20220307024325.GA6323@X58A-UD3R>
+References: <YiAow5gi21zwUT54@mit.edu>
+ <1646285013-3934-1-git-send-email-byungchul.park@lge.com>
+ <YiDSabde88HJ/aTt@mit.edu>
+ <20220304004237.GB6112@X58A-UD3R>
+ <YiLYX0sqmtkTEM5U@mit.edu>
+ <20220305141538.GA31268@X58A-UD3R>
+ <YiN8M4FwAeW/UAoN@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <89612542-0040-65bd-23bc-5bf8cac71f61@kernel.dk>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <YiN8M4FwAeW/UAoN@google.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 06, 2022 at 07:25:11PM -0700, Jens Axboe wrote:
-> On 3/6/22 7:20 PM, Ming Lei wrote:
-> > On Sun, Mar 06, 2022 at 06:48:15PM -0700, Jens Axboe wrote:
-> >> On 3/6/22 2:29 AM, Christoph Hellwig wrote:
-> >>>> +/*
-> >>>> + * Reuse ->bi_end_io as hlist head for storing all dm_io instances
-> >>>> + * associated with this bio, and this bio's bi_end_io has to be
-> >>>> + * stored in one of 'dm_io' instance first.
-> >>>> + */
-> >>>> +static inline struct hlist_head *dm_get_bio_hlist_head(struct bio *bio)
-> >>>> +{
-> >>>> +	WARN_ON_ONCE(!(bio->bi_opf & REQ_DM_POLL_LIST));
-> >>>> +
-> >>>> +	return (struct hlist_head *)&bio->bi_end_io;
-> >>>> +}
-> >>>
-> >>> So this reuse is what I really hated.  I still think we should be able
-> >>> to find space in the bio by creatively shifting fields around to just
-> >>> add the hlist there directly, which would remove the need for this
-> >>> override and more importantly the quite cumbersome saving and restoring
-> >>> of the end_io handler.
-> >>
-> >> If it's possible, then that would be preferable. But I don't think
-> >> that's going to be easy to do...
+On Sat, Mar 05, 2022 at 03:05:23PM +0000, Joel Fernandes wrote:
+> On Sat, Mar 05, 2022 at 11:15:38PM +0900, Byungchul Park wrote:
+> > Almost all you've been blaming at Dept are totally non-sense. Based on
+> > what you're saying, I'm conviced that you don't understand how Dept
+> > works even 1%. You don't even try to understand it before blame.
 > > 
-> > I agree, now basically there isn't gap inside bio, so either adding one
-> > new field or reusing one existed field...
+> > You don't have to understand and support it. But I can't response to you
+> > if you keep saying silly things that way.
 > 
-> There'd no amount of re-arranging that'll free up 8 bytes, that's just
-> not happening. I'm not a huge fan of growing struct bio for that, and
-> the oddity here is mostly (to me) that ->bi_end_io is the one overlayed.
-> That would usually belong to the owner of the bio.
+> Byungchul, other than ext4 have there been any DEPT reports that other
+> subsystem maintainers' agree were valid usecases?
+
+Not yet.
+
+> Regarding false-positives, just to note lockdep is not without its share of
+> false-positives. Just that (as you know), the signal-to-noise ratio should be
+> high for it to be useful. I've put up with lockdep's false positives just
+> because it occasionally saves me from catastrophe.
+
+I love your insight. Agree. A tool would be useful only when it's
+*actually* helpful. I hope Dept would be so.
+
+> > > In any case, if DEPT is going to report these "circular dependencies
+> > > as bugs that MUST be fixed", it's going to be pure noise and I will
+> > > ignore all DEPT reports, and will push back on having Lockdep replaced
+> > 
+> > Dept is going to be improved so that what you are concerning about won't
+> > be reported.
 > 
-> Maybe some commenting would help?
+> Yeah I am looking forward to learning more about it however I was wondering
+> about the following: lockdep can already be used for modeling "resource
+> acquire/release" and "resource wait" semantics that are unrelated to locks,
+> like we do in mm reclaim. I am wondering why we cannot just use those existing
+> lockdep mechanisms for the wait/wake usecases (Assuming that we can agree
 
-OK, ->bi_end_io is safe because it is only called until the bio is
-ended, so we can retrieve the list head and recover ->bi_end_io before
-polling.
+1. Lockdep can't work with general waits/events happening across
+   contexts basically. To get over this, manual tagging of
+   acquire/release can be used at each section that we suspect. But
+   unfortunately, we cannot use the method if we cannot simply identify
+   the sections. Furthermore, it's inevitable to miss sections that
+   shouldn't get missed.
 
-> Is bi_next available at this point?
+2. Some cases should be correctly tracked via wait/event model, not
+   acquisition order model. For example, read-lock in rwlock should be
+   defined as a waiter waiting for write-unlock, write-lock in rwlock
+   as a waiter waiting for either read-unlock or write-unlock.
+   Otherwise, if we try to track those cases using acquisition order,
+   it cannot completely work. Don't you think it looks werid?
 
-The same bio can be re-submitted to block layer because of splitting, and
-will be linked to current->bio_list[].
+3. Tracking what we didn't track before means both stronger detection
+   and new emergence of false positives, exactly same as Lockdep at its
+   beginning when it started to track what we hadn't tracked before.
+   Even though the emergence was allowed at that time, now that Locdkep
+   got stable enough, folks would be more strict on new emergences. It's
+   gonna get even worse if valid reports are getting prevented by false
+   positives.
 
-BTW, bio splitting can be very often for some dm target, that is why we
-don't ignore bio splitting for dm polling.
+   For that reason, multi reporting functionality is essential. I was
+   thinking to improve Lockdep to allow multi reporting. But it might be
+   needed to change more than developing a new tool from scratch. Plus
+   it might be even more difficult cuz Lockdep already works not badly.
+   So even for Lockdep, I thought the new thing should be developed
+   independently leaving Lockdep as it is.
 
+4. (minor reason) The concept and name of acquisition and release is not
+   for general wait/event. The design and implementation are not,
+   either. I wanted to address the issue as soon as possible before we
+   squeeze out Lockdep to use for general wait/event more and the kernel
+   code gets weird. Of course, it doesn't mean Dept is more stable than
+   Lockdep. However, I can tell Dept works what a dependency tool should
+   do and we need to make the code go right.
+
+> that circular dependencies on related to wait/wake is a bad thing. Or perhaps
+> there's a reason why Peter Zijlstra did not use lockdep for wait/wake
+> dependencies (such as multiple wake sources) considering he wrote a lot of
+> that code.
+> 
+> Keep kicking ass brother, you're doing great.
+
+Thank you! I'll go through this in a right way so as not to disappoint
+you!
 
 Thanks,
-Ming
-
+Byungchul
