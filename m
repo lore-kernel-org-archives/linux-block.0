@@ -2,107 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9107EC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70F90C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 02:41:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234767AbiCGC0I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 6 Mar 2022 21:26:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34790 "EHLO
+        id S231270AbiCGCml (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 6 Mar 2022 21:42:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234766AbiCGC0H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:26:07 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 374E85DE75
-        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:25:14 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id cx5so11997866pjb.1
-        for <linux-block@vger.kernel.org>; Sun, 06 Mar 2022 18:25:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=hmPhMTI7t3TVVpPhw5nNW52OuQD8LGJ91mhG7z/hh1o=;
-        b=iR73YohWSGNZhYUvffMwREF+qAplYYZGbqy+iVE06V0qnhVOJgglmnYIROzZw6+aCw
-         DTRRs2Ubf7xq3ofoQNjGWfeUxhg2/0xONYt0Kt5Hfqf0iEvg5vVtPHSiVNSRpVLrJeW1
-         CwVeb/B2/pi/mIyt3kuBTpFogHdsifBkwU6zmCbX7dxIsF2uyNLrOnn7NCoo/NCAGrP1
-         TLnTVFWZCBZ12SGjdXv4qjtqb8jAH5A6i9r/xbVy5wg45A92/YQd2HZ19fGFXBqEaTkF
-         HJ4q451DQ6fd11WxoghAPiSc/Yax+q+mBsIQ41UazxcHiTyYBHYU12xTLIO0zqNPdnrS
-         cutw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=hmPhMTI7t3TVVpPhw5nNW52OuQD8LGJ91mhG7z/hh1o=;
-        b=MAFZsgV/FX/6FSujeC/ab1IqYp0wlnkMtFqmxG8pMv/89iCu7VZqfz/tqhGKR2Q2dL
-         daxRgMjZsKX/IHqack3nd4PUG4n8VVQV0xCdXKQZHd/exi6poUr/RGdcsL29TRKhYAC3
-         HCY0A2H4qHyNSIGJVPaJJIrkPo8ibzSnG+VOrmjszjiAFVtm73gLE3AYjW3vltra8yf9
-         JAlePqxAyDOcvc6YtlTFKH4T34La7Hi+lgT3M+tONNs6QxXqY5kUi4NpyILbm7RC+z5w
-         MwEbfnkFU2m/qxx6FHrwMPETsDvJif0degGYxjZqd1vk+rtorK5QnQJZjCG14XJsuACx
-         gdLA==
-X-Gm-Message-State: AOAM532rZuSeVGa1VINZBZRtLKMT6e75pmq+ht/RyL9vvT65N+Fkdeef
-        1UBlNsT4BXXRS7iXqAqpjCARnTuIMy/xe+Ol
-X-Google-Smtp-Source: ABdhPJygOhhaNp5HmmASiVr9p7LuiTuRC0JsENfLW4mS+UdTHuYZwnoYl5YbttBI/tzkKOCfCvb1yA==
-X-Received: by 2002:a17:902:b589:b0:14f:3f88:15e2 with SMTP id a9-20020a170902b58900b0014f3f8815e2mr9958915pls.171.1646619913733;
-        Sun, 06 Mar 2022 18:25:13 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d11-20020a056a00198b00b004dfc6b023b2sm13100022pfl.41.2022.03.06.18.25.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 06 Mar 2022 18:25:13 -0800 (PST)
-Message-ID: <89612542-0040-65bd-23bc-5bf8cac71f61@kernel.dk>
-Date:   Sun, 6 Mar 2022 19:25:11 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH v5 2/2] dm: support bio polling
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
+        with ESMTP id S230328AbiCGCmk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 6 Mar 2022 21:42:40 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91E5A1DA4A
+        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 18:41:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646620906;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=n7kabxOzF0F8GAUiBdn3b9WygOhE2sldgJPoGl+UqTk=;
+        b=R0bS8cbfafySoJcG71SdsJQNxT4pRyER6vGw4sCsxPYaYlQxDkfcoJ4qhrCNAld0hsfxqU
+        hd7XlKobD5hcILMMJKZQYI1RHM4RSwmmSr3DV3vd1qEc9OXVjGK8oMB68UfqlsHnldw5K7
+        A1AaDZxYAj/1tKfoQsY52psQNxrh6mM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-505-BZIgWRjMP2eVpUrtu3y_Wg-1; Sun, 06 Mar 2022 21:41:41 -0500
+X-MC-Unique: BZIgWRjMP2eVpUrtu3y_Wg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9CFC824FA6;
+        Mon,  7 Mar 2022 02:41:39 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 6FE994D708;
+        Mon,  7 Mar 2022 02:41:35 +0000 (UTC)
+Date:   Mon, 7 Mar 2022 10:41:31 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@lst.de>, Mike Snitzer <snitzer@redhat.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v5 2/2] dm: support bio polling
+Message-ID: <YiVw2y1eTcXrsdME@T590>
 References: <20220305020804.54010-1-snitzer@redhat.com>
- <20220305020804.54010-3-snitzer@redhat.com> <20220306092937.GC22883@lst.de>
- <2ced53d5-d87b-95db-a612-6896f73ce895@kernel.dk> <YiVr4rna9DG0Oyng@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YiVr4rna9DG0Oyng@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220305020804.54010-3-snitzer@redhat.com>
+ <20220306092937.GC22883@lst.de>
+ <2ced53d5-d87b-95db-a612-6896f73ce895@kernel.dk>
+ <YiVr4rna9DG0Oyng@T590>
+ <89612542-0040-65bd-23bc-5bf8cac71f61@kernel.dk>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <89612542-0040-65bd-23bc-5bf8cac71f61@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/6/22 7:20 PM, Ming Lei wrote:
-> On Sun, Mar 06, 2022 at 06:48:15PM -0700, Jens Axboe wrote:
->> On 3/6/22 2:29 AM, Christoph Hellwig wrote:
->>>> +/*
->>>> + * Reuse ->bi_end_io as hlist head for storing all dm_io instances
->>>> + * associated with this bio, and this bio's bi_end_io has to be
->>>> + * stored in one of 'dm_io' instance first.
->>>> + */
->>>> +static inline struct hlist_head *dm_get_bio_hlist_head(struct bio *bio)
->>>> +{
->>>> +	WARN_ON_ONCE(!(bio->bi_opf & REQ_DM_POLL_LIST));
->>>> +
->>>> +	return (struct hlist_head *)&bio->bi_end_io;
->>>> +}
->>>
->>> So this reuse is what I really hated.  I still think we should be able
->>> to find space in the bio by creatively shifting fields around to just
->>> add the hlist there directly, which would remove the need for this
->>> override and more importantly the quite cumbersome saving and restoring
->>> of the end_io handler.
->>
->> If it's possible, then that would be preferable. But I don't think
->> that's going to be easy to do...
+On Sun, Mar 06, 2022 at 07:25:11PM -0700, Jens Axboe wrote:
+> On 3/6/22 7:20 PM, Ming Lei wrote:
+> > On Sun, Mar 06, 2022 at 06:48:15PM -0700, Jens Axboe wrote:
+> >> On 3/6/22 2:29 AM, Christoph Hellwig wrote:
+> >>>> +/*
+> >>>> + * Reuse ->bi_end_io as hlist head for storing all dm_io instances
+> >>>> + * associated with this bio, and this bio's bi_end_io has to be
+> >>>> + * stored in one of 'dm_io' instance first.
+> >>>> + */
+> >>>> +static inline struct hlist_head *dm_get_bio_hlist_head(struct bio *bio)
+> >>>> +{
+> >>>> +	WARN_ON_ONCE(!(bio->bi_opf & REQ_DM_POLL_LIST));
+> >>>> +
+> >>>> +	return (struct hlist_head *)&bio->bi_end_io;
+> >>>> +}
+> >>>
+> >>> So this reuse is what I really hated.  I still think we should be able
+> >>> to find space in the bio by creatively shifting fields around to just
+> >>> add the hlist there directly, which would remove the need for this
+> >>> override and more importantly the quite cumbersome saving and restoring
+> >>> of the end_io handler.
+> >>
+> >> If it's possible, then that would be preferable. But I don't think
+> >> that's going to be easy to do...
+> > 
+> > I agree, now basically there isn't gap inside bio, so either adding one
+> > new field or reusing one existed field...
 > 
-> I agree, now basically there isn't gap inside bio, so either adding one
-> new field or reusing one existed field...
+> There'd no amount of re-arranging that'll free up 8 bytes, that's just
+> not happening. I'm not a huge fan of growing struct bio for that, and
+> the oddity here is mostly (to me) that ->bi_end_io is the one overlayed.
+> That would usually belong to the owner of the bio.
+> 
+> Maybe some commenting would help?
 
-There'd no amount of re-arranging that'll free up 8 bytes, that's just
-not happening. I'm not a huge fan of growing struct bio for that, and
-the oddity here is mostly (to me) that ->bi_end_io is the one overlayed.
-That would usually belong to the owner of the bio.
+OK, ->bi_end_io is safe because it is only called until the bio is
+ended, so we can retrieve the list head and recover ->bi_end_io before
+polling.
 
-Maybe some commenting would help? Is bi_next available at this point?
+> Is bi_next available at this point?
 
--- 
-Jens Axboe
+The same bio can be re-submitted to block layer because of splitting, and
+will be linked to current->bio_list[].
+
+BTW, bio splitting can be very often for some dm target, that is why we
+don't ignore bio splitting for dm polling.
+
+
+Thanks,
+Ming
 
