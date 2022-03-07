@@ -2,156 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCCFC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 11:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC748C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 12:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235170AbiCGLj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 06:39:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46694 "EHLO
+        id S231858AbiCGM2s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 07:28:48 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240357AbiCGLj0 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 06:39:26 -0500
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A148C329B1;
-        Mon,  7 Mar 2022 03:38:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1646653111; x=1678189111;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=qzMYx7l24Ue264v7dMmIEeNEqMVuLyEYw5sb7myDtVc=;
-  b=hAt7/VULWm1T7BsSXz/V8d3dxPqjSL7o6XC0wb5apmkz+OVosApjnq1d
-   3FLoTxg7cFWn1iGUWFQkRG7fS++dAtJ7Rlb78H224w7suqEK2/mH8riHu
-   wcpR5GjihquxAkoAS1RXkxBOyHLWDU6u98iVMeaIPSWVbVxQmIyKgwIZM
-   pRw5cXN/BZ59HXPS/j9JH5dXAqmZ0/O3aASnXEZcEr6b4MsH0I085SNZk
-   yj63nA+yL+A0vk50MKnpsp+Oy6ly57Xvvuu/je69gTGf8E4wfyRyxEA0/
-   pHOTJAXQInNLrEMRzt0Y/t+OuqhY+5Ax4f3DC/anQ9W/zQh5mZlX9e0Qj
-   w==;
-X-IronPort-AV: E=Sophos;i="5.90,162,1643644800"; 
-   d="scan'208";a="298794695"
-Received: from mail-bn8nam11lp2169.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.169])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2022 19:38:29 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JO4fmqML0PqQzshsM1h9gz4d3YNfj7NhxA2CW8X1RoMtobgmkoy1BFx6XCCAom/YJxzZXolM+j9KKQ6+EJfuZnlnzK6uE6yngyUT2x8EmP7dKAeGaRTnAFTN5uVjHXzYmRNutv2JbvYFsMYEFdbNlcRPgNve1c3Ju9RFESlb9LvqQRQN3UnxIKV3DAh6aKCogLImC7TzbcyGrcrPrXGpJiFOeDt8H2DbgzWO8IZWl9kdNEm0r5Sle8M8fs37n6OOjRF98RGiGUa5Je6V8O8S8aSCFIBClH7Q3krTn+fGVFE+I2y3UM6AYhYenUVwoeYaiUaIFnSA1EViIXlG63i4lg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=m/psgpexl0H+Tn1TYkW7QCKKOSY881CwqtA6TNpomyA=;
- b=Bsqcqsr8nFF5bJ8sqNGZrzv6OtfKYG/XfkXsNLICdpP3251atsC3aqo3Xp44FcB+w2tGKr05nQ5JYdrcaRFyZsJXMaiaq5I0wKW77Z2I0K4AQemjQyirzlXccWY2oExV/R5FPqx7DvfZFNWFVkiFOa870WPAj5RtqXBe7Mh/p8Zfr87dVUXqaaVxAvTa8A2poJ+wQbcuOwJRinaVWs8JpbvKCxJOZD5QcDb2qYS7WkLxfcB6FdHi1hoIpQmKoZJJmPp0PQvV1rDAOci+U6EfrPJj8b/RIxhgKEB5muSDk/YsQEL7ca44xhvkPk7nCxiPg/JzVrGt+ARTqCffAWS/tg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=m/psgpexl0H+Tn1TYkW7QCKKOSY881CwqtA6TNpomyA=;
- b=fCX6UMZhPVQMHDKnVeorkDOqIqXVzqfWPJo1+IMg6d5/W00TDpoJYV+y4ITxiYO2mvmoNhx9iWxUGPfmMvHyTO1Y0LuRwJTno8JmD3ZfyXdqlqmgZu7pD+/jlwTDYTbc5zwi7UeXuUEC7H3tIEhHKx6aci7TD1z5tGXqQnPoLnY=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by MN2PR04MB6704.namprd04.prod.outlook.com (2603:10b6:208:1e0::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Mon, 7 Mar
- 2022 11:38:27 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::e8b1:ea93:ffce:60f6]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::e8b1:ea93:ffce:60f6%4]) with mapi id 15.20.5038.027; Mon, 7 Mar 2022
- 11:38:27 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-CC:     Song Liu <song@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>
-Subject: Re: remove bio_devname
-Thread-Topic: remove bio_devname
-Thread-Index: AQHYL/HalM3iIVsQ8E6UDIHJpvJNVw==
-Date:   Mon, 7 Mar 2022 11:38:27 +0000
-Message-ID: <PH0PR04MB7416EF31E50382108FEDE5689B089@PH0PR04MB7416.namprd04.prod.outlook.com>
-References: <20220304180105.409765-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8760ae9d-6d76-4b8a-ba18-08da002efef2
-x-ms-traffictypediagnostic: MN2PR04MB6704:EE_
-x-microsoft-antispam-prvs: <MN2PR04MB670421855839CFDCB304AFB89B089@MN2PR04MB6704.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: tZ9451MKGvwAEYMNMy2TaOlFVkODzGnlFk+ACk6F5HfWVFOdC7nmirwIS89ue/50+mnSzDukwB4xHXXsTMLXvXE7uIP39I51SSLZkhEFLQ7lMOlnOhT2Tgq3gGveN+Zpe8yzJjtsv4jQqzersCpifma5nRP8SXEZD3ely69gpjkNnmZy+zMEpycSl7IzxVhqeX+WldMeiE/XoSWwi1irrRuqFD2IwVkxQk1+3bUTruWVr9WWmR5jMYeFOzAekoZflGAkfG5uK+wU8/CKXaLu15tHhk/s8IYQcoA4KnF3SEJ4rWCR1yZA4xsvdrgnRcoAj+uI3eCck2kt50FWof7NU3y4ipd6/0zWU7ZIkQV0tcUf5oWiBWzMKkS8zIUWv3iRpooq9J2rpR5LgvIkMeD93DbRtviMAEVXa3hjP+pw8ykJMukzx3pNGNRp/FDs/1gt60caAwTV8VSaD37GfPvj5GvOBZRTw74SsIaUxHbGNtdEEI2oZAjukgNnJu01Gc37iXEHBkxMWfZfxzDUNatUia5YHzURubQqaUJ8A/MP7k4s5cRS1zU0JCE+2WBxV6uCLk6m/1+rcbfAOkEBjreC6PZ21FODzcQgfhsHS03KnhQ4j0ytYGGFYwdrKFsc1a/BEBdTpJqMVr0J2l48hmUW5JVdByY59TJQfAhQmD7QzoQVSWblJU7OapPvIOLQqOMTx0/c7yVrQyCYMY9ONKbCzg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(54906003)(55016003)(83380400001)(186003)(86362001)(110136005)(33656002)(71200400001)(5660300002)(316002)(4744005)(8936002)(52536014)(91956017)(64756008)(2906002)(8676002)(508600001)(4326008)(122000001)(76116006)(66446008)(66476007)(38070700005)(66946007)(66556008)(38100700002)(9686003)(6506007)(7696005)(53546011)(7116003)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+rgAAS0dW1bhRVsud7VuPgFVuAAMTxlHbl8awey/Otxr8Oq3UnTdxORYw1Mv?=
- =?us-ascii?Q?VyudxyjDpeQCZtP1TOCYsiGhFTrcMoAYyUR4zlbIAiHA076J2lQJvPYDnQA1?=
- =?us-ascii?Q?J/VixKhBg7YQmHVWiO45b0q4RjT4tnmR8cxhzMhA28umy9d97Re+b1vn3G7p?=
- =?us-ascii?Q?b1GWC9ftJGfvkoCxFnYv341A0gmcXD3V+1yHASNIr/IyfmKN6W7pZ4KLybM1?=
- =?us-ascii?Q?JwpXdUqlPhX7iiOiJPCWfFl1IJ3eRIfauoZufwrFXRp9EIejOBLvcHvV7kqT?=
- =?us-ascii?Q?PaglLPJsHDiv05FGDWXweKLrlf5BtqCM2MRu5Hl/2ml9lpNUV6TXwXsg6SC3?=
- =?us-ascii?Q?pbQLyvX88rB6NuPbD0J49hpcMs2qvcuSWhM8zuNN5Dc7O60RWWm1v78QsMhA?=
- =?us-ascii?Q?TreazZLW6l6VbvYrtEsWvQNVu8han5R9qOzYblBNiO6kbq6RyeWCkcDeZYqp?=
- =?us-ascii?Q?NsPyHiym+BbrWHAr4s7q0WIhXEiYxnOLZdBB20gVVmB16+loIR3vNBxPUy1V?=
- =?us-ascii?Q?tk40DILzatJyd/6eLpUKBrzTqkZ82qPdNd46km6ny6LOwhqABEK3UE2msvfZ?=
- =?us-ascii?Q?9vMOsgCvU3/7Vq7i9+5QCHA1cVY7Fga6fJtWeAKTAfirznQWzGl0F06Yd3kn?=
- =?us-ascii?Q?Pt8hfGZ07BbfZeCZjFiT3T/Ndg2QkeL/a8QTSR1ZPwAleFGtUT3c0SiU0dcX?=
- =?us-ascii?Q?+5L/swNTcVlszJyIg/GpE1X+G7D5k3dW/ukCpetI958lt5PJ3CKIMspwOGen?=
- =?us-ascii?Q?1oloTBI5eAMlvwzAf+20AgIDuvwW9E8bic/xRzFDU9zteVaxvVNO6L1KfLTP?=
- =?us-ascii?Q?c8kuxVP8BZIeWxzkStDwEoHdvwg1p5jb7zQGFGBxTmYa8Xnm7zRY67lvuyNd?=
- =?us-ascii?Q?VFhPghqd9skJO4w+585QE67CnSBbOvnO5PoTl7RGFl7gilKH7kPspcV8IqHj?=
- =?us-ascii?Q?75Tw7SQ4B9urkgZlAm9Qmkk5BcX5s/Gw51LVO3SSSBDsgKpxuQkNzROfq2t0?=
- =?us-ascii?Q?BrROZ2k74ojSUQXVPci/xAMn73DIQ8AnnbyfTwxyhAJIb0cjAqoQC1Pf3gV3?=
- =?us-ascii?Q?3NB64QmWDJAuR2KJ/SrnsphJN32FQNqlgiMeuKP53HByItPzPY9Mhiag5Lxd?=
- =?us-ascii?Q?h7acYeVlu8e4uOUqJK7kglO7yn0DYIv0R+hVHfBWdaId00HH0oO/4F3W9XuQ?=
- =?us-ascii?Q?EHX4v6a8qS4ErASPOfm7bE73DH+maWf6TWiK1oCJYawLMR1JHEi1msluklyD?=
- =?us-ascii?Q?V7Ya6UlHAF5vQx78lEU1mnjIZCm9MtSCPRAFjIdsn1sTKAbuPNNMMPb2kwzI?=
- =?us-ascii?Q?qE3T6KkuBfBnaLtHpzk2VeDVSpETxnrZ+l95bo2XQW7m94+cH2gaTZb2viiM?=
- =?us-ascii?Q?k7PYfvBrwOB4xweKQCFCsnNQGodqjPy/qFcnPEFXVRy3My8PKzIl2FhRX/Y9?=
- =?us-ascii?Q?4RViFd1PuehvieKhiNGZ3k+eoecBmHE8gWe/cz6+zbKMdyYm3iAPTbjSIALf?=
- =?us-ascii?Q?LBSryrdSZtGhzXSEAIszaVNQ7mHHD+pwPHSqWfky02cFoIrKmwTlaYOiBq2O?=
- =?us-ascii?Q?P+iNOqxcaeCwUTNFpxOCk3Q8H0NCuXViM9z5zUn1n/Qkvk1+xxMfcoehzicM?=
- =?us-ascii?Q?HJzHJZrHTZsQrNf8dASkcC4LCYJif9PxRK/KqhRxNA7HNcgh2bNay21Gp3Y/?=
- =?us-ascii?Q?qIDO7u1PYItfAr0k4UhArNWnqVilSZRlCejEe3Fzu4AvKG8ymUzUeZ/3o1dj?=
- =?us-ascii?Q?cg7B89GIIq2s9gdK/yoPInSwD4SVMpY=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S242429AbiCGM2E (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 07:28:04 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2F8508119F
+        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 04:27:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646656029;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oaixLK51c3Byz8g2tt5yJA0N9WX2ZJDIdMda8nR7RQI=;
+        b=TAEn3szSGD/qSCCOjCRdL4EnB5CsZ1NihFcjdhwZsfYkmcAAGKLJY77zSPzla+NpWr7jZ3
+        4W+KafTlDILqW1cx9vfJNjCNjM0t+eSoQqd2KgW3Ywif9WRcdy4tEKxiLKu4XX9YS+wKl0
+        25dnM9RmF3JoaNhKq7huw/PdUDwDseU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-145-Elf8ImbbP_2iVwoa-z5nCw-1; Mon, 07 Mar 2022 07:27:08 -0500
+X-MC-Unique: Elf8ImbbP_2iVwoa-z5nCw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com [10.5.11.15])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4BF9FC80;
+        Mon,  7 Mar 2022 12:27:06 +0000 (UTC)
+Received: from T590 (ovpn-8-23.pek2.redhat.com [10.72.8.23])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 88B9C83080;
+        Mon,  7 Mar 2022 12:26:56 +0000 (UTC)
+Date:   Mon, 7 Mar 2022 20:26:47 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [bug report] blktests block/005: KASAN uaf at bio merge
+Message-ID: <YiX6B6uKsMQ0erbj@T590>
+References: <20220307112655.5ewkvhz5d3avglnd@shindev>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8760ae9d-6d76-4b8a-ba18-08da002efef2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2022 11:38:27.0600
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vMvFTy65qTq4xL1Tv6aN0V6gjKHLhMMg+CwdyzVQJEB3t5aAFTY9q4EBsWnDvoJu2tRzYsAmvfhGS19CxQba9jsDOW6ngd8CuoDqWJugHtQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6704
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220307112655.5ewkvhz5d3avglnd@shindev>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 04/03/2022 19:01, Christoph Hellwig wrote:=0A=
-> Hi Jens,=0A=
-> =0A=
-> this series removes the bio_devname helper and just switches all users=0A=
-> to use the %pg format string directly.=0A=
-> =0A=
-> Diffstat=0A=
->  block/bio.c               |    6 ------=0A=
->  block/blk-core.c          |   25 +++++++------------------=0A=
->  drivers/block/pktcdvd.c   |    9 +--------=0A=
->  drivers/md/dm-crypt.c     |   10 ++++------=0A=
->  drivers/md/dm-integrity.c |    5 ++---=0A=
->  drivers/md/md-multipath.c |    9 ++++-----=0A=
->  drivers/md/raid1.c        |    5 ++---=0A=
->  drivers/md/raid5-ppl.c    |   13 ++++---------=0A=
->  fs/ext4/page-io.c         |    5 ++---=0A=
->  include/linux/bio.h       |    2 --=0A=
->  10 files changed, 26 insertions(+), 63 deletions(-)=0A=
-> =0A=
-=0A=
-Looks good,=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+On Mon, Mar 07, 2022 at 11:26:56AM +0000, Shinichiro Kawasaki wrote:
+> I observed blktests block/005 failure by KASAN use-after-free. The test case
+> repeats IO scheduler switch during fio workload. According to the kernel
+> message, it looks like bio submit path is running while IO scheduler is invalid,
+> and kyber_bio_merge accessed the invalid IO scheduler data.
+> 
+> The failure was observed with v5.17-rc1, and still observed with v5.17-rc7.
+> It was observed with QEMU NVME emulation device with ZNS zoned device
+> emulation. So far, it is not observed with other devices. To recreate the
+> failure, need to repeat the test case. In the worst case, 500 times repetition
+> is required.
+> 
+> I bisected and found the commit 9d497e2941c3 ("block: don't protect
+> submit_bio_checks by q_usage_counter") triggers it. The commit moves calls of
+> 3 functions: submit_bio_checks, blk_mq_attempt_bio_merge and rq_qos_throttle.
+> I suspected that the move of blk_mq_attempt_bio_merge is the cause, and tried
+> to revert only that part. But it caused linux system boot hang related to
+> rq_qos_throttle. Then I created another patch which reverts moves of both
+> blk_mq_attempt_bio_merge and rq_qos_throttle calls [2]. With this patch, the
+> KASAN uaf disappeared. Based on this observation, I think the failure cause is
+> the move of blk_mq_attempt_bio_merge out of guard by bio_queue_enter.
+> 
+> I'm not sure if the fix by the patch [2] is good enough. With that fix, the
+> blk_mq_attempt_bio_merge call in blk_mq_get_new_requests is guarded with
+> bio_queue_enter, but the blk_mq_attempt_bio_merge call in
+> blk_mq_get_cached_request may not be well guarded. Comments for fix approach
+> will be appreciated.
+> 
+> 
+> [1]
+> 
+> [  335.931534] run blktests block/005 at 2022-03-07 10:15:29
+> [  336.285062] general protection fault, probably for non-canonical address 0xdffffc0000000011: 0000 [#1] PREEMPT SMP KASAN PTI
+> [  336.291190] KASAN: null-ptr-deref in range [0x0000000000000088-0x000000000000008f]
+> [  336.297513] CPU: 0 PID: 1864 Comm: fio Not tainted 5.16.0-rc3+ #15
+> [  336.302034] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.15.0-29-g6a62e0cb0dfe-prebuilt.qemu.org 04/01/2014
+> [  336.309636] RIP: 0010:kyber_bio_merge+0x121/0x320
+
+I can understand the issue, since both bio merge and rq_qos_throttle()
+requires to get one .q_usage_counter, otherwise switching elevator
+or changing rq qos may cause such issue.
+
+> 
+> [2]
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index d69ca91fbc8b..59c66b9e8a44 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2718,7 +2718,8 @@ static bool blk_mq_attempt_bio_merge(struct request_queue *q,
+>  
+>  static struct request *blk_mq_get_new_requests(struct request_queue *q,
+>  					       struct blk_plug *plug,
+> -					       struct bio *bio)
+> +					       struct bio *bio,
+> +					       unsigned int nsegs)
+>  {
+>  	struct blk_mq_alloc_data data = {
+>  		.q		= q,
+> @@ -2730,6 +2731,11 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+>  	if (unlikely(bio_queue_enter(bio)))
+>  		return NULL;
+>  
+> +	if (blk_mq_attempt_bio_merge(q, bio, nsegs))
+> +		goto queue_exit;
+> +
+> +	rq_qos_throttle(q, bio);
+> +
+>  	if (plug) {
+>  		data.nr_tags = plug->nr_ios;
+>  		plug->nr_ios = 1;
+> @@ -2742,12 +2748,13 @@ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+>  	rq_qos_cleanup(q, bio);
+>  	if (bio->bi_opf & REQ_NOWAIT)
+>  		bio_wouldblock_error(bio);
+> +queue_exit:
+>  	blk_queue_exit(q);
+>  	return NULL;
+>  }
+>  
+>  static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+> -		struct blk_plug *plug, struct bio *bio)
+> +		struct blk_plug *plug, struct bio **bio, unsigned int nsegs)
+>  {
+>  	struct request *rq;
+>  
+> @@ -2757,14 +2764,20 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+>  	if (!rq || rq->q != q)
+>  		return NULL;
+>  
+> -	if (blk_mq_get_hctx_type(bio->bi_opf) != rq->mq_hctx->type)
+> +	if (blk_mq_attempt_bio_merge(q, *bio, nsegs)) {
+> +		*bio = NULL;
+> +		return NULL;
+> +	}
+> +
+> +	if (blk_mq_get_hctx_type((*bio)->bi_opf) != rq->mq_hctx->type)
+>  		return NULL;
+> -	if (op_is_flush(rq->cmd_flags) != op_is_flush(bio->bi_opf))
+> +	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
+>  		return NULL;
+>  
+> -	rq->cmd_flags = bio->bi_opf;
+> +	rq->cmd_flags = (*bio)->bi_opf;
+>  	plug->cached_rq = rq_list_next(rq);
+>  	INIT_LIST_HEAD(&rq->queuelist);
+> +	rq_qos_throttle(q, *bio);
+
+rq_qos_throttle() can be put above together with blk_mq_attempt_bio_merge().
+
+>  	return rq;
+>  }
+>  
+> @@ -2800,14 +2813,11 @@ void blk_mq_submit_bio(struct bio *bio)
+>  	if (!bio_integrity_prep(bio))
+>  		return;
+>  
+> -	if (blk_mq_attempt_bio_merge(q, bio, nr_segs))
+> -		return;
+> -
+> -	rq_qos_throttle(q, bio);
+> -
+> -	rq = blk_mq_get_cached_request(q, plug, bio);
+> +	rq = blk_mq_get_cached_request(q, plug, &bio, nr_segs);
+>  	if (!rq) {
+> -		rq = blk_mq_get_new_requests(q, plug, bio);
+> +		if (!bio)
+> +			return;
+> +		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
+>  		if (unlikely(!rq))
+>  			return;
+>  	}
+
+Otherwise, the patch looks fine, can you post the formal version?
+
+Thanks,
+Ming
+
