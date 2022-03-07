@@ -2,198 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8740BC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 11:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FCCFC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 11:38:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240494AbiCGLdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 06:33:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44476 "EHLO
+        id S235170AbiCGLj3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 06:39:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242353AbiCGLdB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 06:33:01 -0500
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B454932049
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 03:29:48 -0800 (PST)
-Received: by mail-ed1-x52b.google.com with SMTP id g3so7195644edu.1
-        for <linux-block@vger.kernel.org>; Mon, 07 Mar 2022 03:29:48 -0800 (PST)
+        with ESMTP id S240357AbiCGLj0 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 06:39:26 -0500
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A148C329B1;
+        Mon,  7 Mar 2022 03:38:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1646653111; x=1678189111;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=qzMYx7l24Ue264v7dMmIEeNEqMVuLyEYw5sb7myDtVc=;
+  b=hAt7/VULWm1T7BsSXz/V8d3dxPqjSL7o6XC0wb5apmkz+OVosApjnq1d
+   3FLoTxg7cFWn1iGUWFQkRG7fS++dAtJ7Rlb78H224w7suqEK2/mH8riHu
+   wcpR5GjihquxAkoAS1RXkxBOyHLWDU6u98iVMeaIPSWVbVxQmIyKgwIZM
+   pRw5cXN/BZ59HXPS/j9JH5dXAqmZ0/O3aASnXEZcEr6b4MsH0I085SNZk
+   yj63nA+yL+A0vk50MKnpsp+Oy6ly57Xvvuu/je69gTGf8E4wfyRyxEA0/
+   pHOTJAXQInNLrEMRzt0Y/t+OuqhY+5Ax4f3DC/anQ9W/zQh5mZlX9e0Qj
+   w==;
+X-IronPort-AV: E=Sophos;i="5.90,162,1643644800"; 
+   d="scan'208";a="298794695"
+Received: from mail-bn8nam11lp2169.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.169])
+  by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2022 19:38:29 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JO4fmqML0PqQzshsM1h9gz4d3YNfj7NhxA2CW8X1RoMtobgmkoy1BFx6XCCAom/YJxzZXolM+j9KKQ6+EJfuZnlnzK6uE6yngyUT2x8EmP7dKAeGaRTnAFTN5uVjHXzYmRNutv2JbvYFsMYEFdbNlcRPgNve1c3Ju9RFESlb9LvqQRQN3UnxIKV3DAh6aKCogLImC7TzbcyGrcrPrXGpJiFOeDt8H2DbgzWO8IZWl9kdNEm0r5Sle8M8fs37n6OOjRF98RGiGUa5Je6V8O8S8aSCFIBClH7Q3krTn+fGVFE+I2y3UM6AYhYenUVwoeYaiUaIFnSA1EViIXlG63i4lg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=m/psgpexl0H+Tn1TYkW7QCKKOSY881CwqtA6TNpomyA=;
+ b=Bsqcqsr8nFF5bJ8sqNGZrzv6OtfKYG/XfkXsNLICdpP3251atsC3aqo3Xp44FcB+w2tGKr05nQ5JYdrcaRFyZsJXMaiaq5I0wKW77Z2I0K4AQemjQyirzlXccWY2oExV/R5FPqx7DvfZFNWFVkiFOa870WPAj5RtqXBe7Mh/p8Zfr87dVUXqaaVxAvTa8A2poJ+wQbcuOwJRinaVWs8JpbvKCxJOZD5QcDb2qYS7WkLxfcB6FdHi1hoIpQmKoZJJmPp0PQvV1rDAOci+U6EfrPJj8b/RIxhgKEB5muSDk/YsQEL7ca44xhvkPk7nCxiPg/JzVrGt+ARTqCffAWS/tg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=T4acKnzVRK53XAhNeOXzw4+hZnnGtqTbL8jwbA7d8Es=;
-        b=4zPGDx3wAn33cL2ZPDTE3Vn1srNgVPZzkZ+kXLtEIE9G5f1cclmGtXAunITyuGoSOE
-         VHEqxj237Hly6FxpKyBF7eyLmZ80u70BrzsbM4n/8GRtNr4k9CnzcjzLvtsRrwH1XPCl
-         sX+fsHe9CmTpu10QjApm7KcqNU0KHEnsK7yKUpocHSKpuFqRs1bwo8abLvSBjgEZtecX
-         KDEoqlHwFzX6VSFmPIEZ5TFZBJSX5sp0IgZ6CD7OBXItj42fgVes3VrhGH6hAhrmTWXt
-         VXlusoN8Q/TKkLS0pHvaYWme1ZTje5z/ibQ/XGHp7EsdGrhcuiMaTHK0G7Wm9lodXl2t
-         8ixQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=T4acKnzVRK53XAhNeOXzw4+hZnnGtqTbL8jwbA7d8Es=;
-        b=hoPJ4d/wwNmSgLVXW+3z4zgZFBM/lkTkj85GGfkr3XX2x6AykMLSbsDtcDvYz1sK2T
-         bACylrbQuLXFwhn8LlGmfbBMNa7csreeHJMNSC9OvybqKacZbV1KSs2NpEEDwVpB2b+q
-         EJCHP5iuqeMrWl3ZhA1zA8Zzflu9pwuAp6YZ3aQMA8E8G0MJMR4hrndTFfBPpHRs/xtV
-         tp2yqWekp6Pk/EZOb5BfI8PE0bzzDulfhnQsmZHF27lo3ndCpz6ez/sO2rDMUQ0ajUQ6
-         q0XED990mpW/CK4t0G2ez/b/akBSfW4Iew/wwC17j6lGauXGTqM9pOpXQE2CQNCn9G1U
-         bmxQ==
-X-Gm-Message-State: AOAM532EbrdH+pomFhkgZxWYfJENxk+clI07THyNSytqBC/3eWS0ZzJV
-        dMS3KYQ6VTFHUcn4oLQBN8zMyg==
-X-Google-Smtp-Source: ABdhPJy/hppSMSCKvshni7v3R5KpP7hRSUmHGqeJTncIJJlKs3xHUIPHVWiof+HTB3voVflCIsttTw==
-X-Received: by 2002:a05:6402:4c6:b0:406:d579:2c4 with SMTP id n6-20020a05640204c600b00406d57902c4mr10592930edw.52.1646652587223;
-        Mon, 07 Mar 2022 03:29:47 -0800 (PST)
-Received: from localhost ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id n6-20020aa7c786000000b00410d2403ccfsm6141013eds.21.2022.03.07.03.29.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 07 Mar 2022 03:29:46 -0800 (PST)
-Date:   Mon, 7 Mar 2022 12:29:45 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Matias =?utf-8?B?QmrDuHJsaW5n?= <Matias.Bjorling@wdc.com>
-Cc:     Dave Chinner <david@fromorbit.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m/psgpexl0H+Tn1TYkW7QCKKOSY881CwqtA6TNpomyA=;
+ b=fCX6UMZhPVQMHDKnVeorkDOqIqXVzqfWPJo1+IMg6d5/W00TDpoJYV+y4ITxiYO2mvmoNhx9iWxUGPfmMvHyTO1Y0LuRwJTno8JmD3ZfyXdqlqmgZu7pD+/jlwTDYTbc5zwi7UeXuUEC7H3tIEhHKx6aci7TD1z5tGXqQnPoLnY=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by MN2PR04MB6704.namprd04.prod.outlook.com (2603:10b6:208:1e0::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Mon, 7 Mar
+ 2022 11:38:27 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::e8b1:ea93:ffce:60f6]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::e8b1:ea93:ffce:60f6%4]) with mapi id 15.20.5038.027; Mon, 7 Mar 2022
+ 11:38:27 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Song Liu <song@kernel.org>, Theodore Ts'o <tytso@mit.edu>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Hans Holmberg <Hans.Holmberg@wdc.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <Keith.Busch@wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Naohiro Aota <Naohiro.Aota@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-Message-ID: <20220307112824.ehnnec5xv6fsvkpa@ArmHalley.local>
-References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
- <20220304001022.GJ3927073@dread.disaster.area>
- <YiKOQM+HMZXnArKT@bombadil.infradead.org>
- <20220304224257.GN3927073@dread.disaster.area>
- <YiKY6pMczvRuEovI@bombadil.infradead.org>
- <20220305073321.5apdknpmctcvo3qj@ArmHalley.localdomain>
- <20220307071229.GR3927073@dread.disaster.area>
- <BYAPR04MB496845AB3EEC1EAD8C7CE4D9F1089@BYAPR04MB4968.namprd04.prod.outlook.com>
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>
+Subject: Re: remove bio_devname
+Thread-Topic: remove bio_devname
+Thread-Index: AQHYL/HalM3iIVsQ8E6UDIHJpvJNVw==
+Date:   Mon, 7 Mar 2022 11:38:27 +0000
+Message-ID: <PH0PR04MB7416EF31E50382108FEDE5689B089@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20220304180105.409765-1-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 8760ae9d-6d76-4b8a-ba18-08da002efef2
+x-ms-traffictypediagnostic: MN2PR04MB6704:EE_
+x-microsoft-antispam-prvs: <MN2PR04MB670421855839CFDCB304AFB89B089@MN2PR04MB6704.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: tZ9451MKGvwAEYMNMy2TaOlFVkODzGnlFk+ACk6F5HfWVFOdC7nmirwIS89ue/50+mnSzDukwB4xHXXsTMLXvXE7uIP39I51SSLZkhEFLQ7lMOlnOhT2Tgq3gGveN+Zpe8yzJjtsv4jQqzersCpifma5nRP8SXEZD3ely69gpjkNnmZy+zMEpycSl7IzxVhqeX+WldMeiE/XoSWwi1irrRuqFD2IwVkxQk1+3bUTruWVr9WWmR5jMYeFOzAekoZflGAkfG5uK+wU8/CKXaLu15tHhk/s8IYQcoA4KnF3SEJ4rWCR1yZA4xsvdrgnRcoAj+uI3eCck2kt50FWof7NU3y4ipd6/0zWU7ZIkQV0tcUf5oWiBWzMKkS8zIUWv3iRpooq9J2rpR5LgvIkMeD93DbRtviMAEVXa3hjP+pw8ykJMukzx3pNGNRp/FDs/1gt60caAwTV8VSaD37GfPvj5GvOBZRTw74SsIaUxHbGNtdEEI2oZAjukgNnJu01Gc37iXEHBkxMWfZfxzDUNatUia5YHzURubQqaUJ8A/MP7k4s5cRS1zU0JCE+2WBxV6uCLk6m/1+rcbfAOkEBjreC6PZ21FODzcQgfhsHS03KnhQ4j0ytYGGFYwdrKFsc1a/BEBdTpJqMVr0J2l48hmUW5JVdByY59TJQfAhQmD7QzoQVSWblJU7OapPvIOLQqOMTx0/c7yVrQyCYMY9ONKbCzg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(54906003)(55016003)(83380400001)(186003)(86362001)(110136005)(33656002)(71200400001)(5660300002)(316002)(4744005)(8936002)(52536014)(91956017)(64756008)(2906002)(8676002)(508600001)(4326008)(122000001)(76116006)(66446008)(66476007)(38070700005)(66946007)(66556008)(38100700002)(9686003)(6506007)(7696005)(53546011)(7116003)(82960400001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?+rgAAS0dW1bhRVsud7VuPgFVuAAMTxlHbl8awey/Otxr8Oq3UnTdxORYw1Mv?=
+ =?us-ascii?Q?VyudxyjDpeQCZtP1TOCYsiGhFTrcMoAYyUR4zlbIAiHA076J2lQJvPYDnQA1?=
+ =?us-ascii?Q?J/VixKhBg7YQmHVWiO45b0q4RjT4tnmR8cxhzMhA28umy9d97Re+b1vn3G7p?=
+ =?us-ascii?Q?b1GWC9ftJGfvkoCxFnYv341A0gmcXD3V+1yHASNIr/IyfmKN6W7pZ4KLybM1?=
+ =?us-ascii?Q?JwpXdUqlPhX7iiOiJPCWfFl1IJ3eRIfauoZufwrFXRp9EIejOBLvcHvV7kqT?=
+ =?us-ascii?Q?PaglLPJsHDiv05FGDWXweKLrlf5BtqCM2MRu5Hl/2ml9lpNUV6TXwXsg6SC3?=
+ =?us-ascii?Q?pbQLyvX88rB6NuPbD0J49hpcMs2qvcuSWhM8zuNN5Dc7O60RWWm1v78QsMhA?=
+ =?us-ascii?Q?TreazZLW6l6VbvYrtEsWvQNVu8han5R9qOzYblBNiO6kbq6RyeWCkcDeZYqp?=
+ =?us-ascii?Q?NsPyHiym+BbrWHAr4s7q0WIhXEiYxnOLZdBB20gVVmB16+loIR3vNBxPUy1V?=
+ =?us-ascii?Q?tk40DILzatJyd/6eLpUKBrzTqkZ82qPdNd46km6ny6LOwhqABEK3UE2msvfZ?=
+ =?us-ascii?Q?9vMOsgCvU3/7Vq7i9+5QCHA1cVY7Fga6fJtWeAKTAfirznQWzGl0F06Yd3kn?=
+ =?us-ascii?Q?Pt8hfGZ07BbfZeCZjFiT3T/Ndg2QkeL/a8QTSR1ZPwAleFGtUT3c0SiU0dcX?=
+ =?us-ascii?Q?+5L/swNTcVlszJyIg/GpE1X+G7D5k3dW/ukCpetI958lt5PJ3CKIMspwOGen?=
+ =?us-ascii?Q?1oloTBI5eAMlvwzAf+20AgIDuvwW9E8bic/xRzFDU9zteVaxvVNO6L1KfLTP?=
+ =?us-ascii?Q?c8kuxVP8BZIeWxzkStDwEoHdvwg1p5jb7zQGFGBxTmYa8Xnm7zRY67lvuyNd?=
+ =?us-ascii?Q?VFhPghqd9skJO4w+585QE67CnSBbOvnO5PoTl7RGFl7gilKH7kPspcV8IqHj?=
+ =?us-ascii?Q?75Tw7SQ4B9urkgZlAm9Qmkk5BcX5s/Gw51LVO3SSSBDsgKpxuQkNzROfq2t0?=
+ =?us-ascii?Q?BrROZ2k74ojSUQXVPci/xAMn73DIQ8AnnbyfTwxyhAJIb0cjAqoQC1Pf3gV3?=
+ =?us-ascii?Q?3NB64QmWDJAuR2KJ/SrnsphJN32FQNqlgiMeuKP53HByItPzPY9Mhiag5Lxd?=
+ =?us-ascii?Q?h7acYeVlu8e4uOUqJK7kglO7yn0DYIv0R+hVHfBWdaId00HH0oO/4F3W9XuQ?=
+ =?us-ascii?Q?EHX4v6a8qS4ErASPOfm7bE73DH+maWf6TWiK1oCJYawLMR1JHEi1msluklyD?=
+ =?us-ascii?Q?V7Ya6UlHAF5vQx78lEU1mnjIZCm9MtSCPRAFjIdsn1sTKAbuPNNMMPb2kwzI?=
+ =?us-ascii?Q?qE3T6KkuBfBnaLtHpzk2VeDVSpETxnrZ+l95bo2XQW7m94+cH2gaTZb2viiM?=
+ =?us-ascii?Q?k7PYfvBrwOB4xweKQCFCsnNQGodqjPy/qFcnPEFXVRy3My8PKzIl2FhRX/Y9?=
+ =?us-ascii?Q?4RViFd1PuehvieKhiNGZ3k+eoecBmHE8gWe/cz6+zbKMdyYm3iAPTbjSIALf?=
+ =?us-ascii?Q?LBSryrdSZtGhzXSEAIszaVNQ7mHHD+pwPHSqWfky02cFoIrKmwTlaYOiBq2O?=
+ =?us-ascii?Q?P+iNOqxcaeCwUTNFpxOCk3Q8H0NCuXViM9z5zUn1n/Qkvk1+xxMfcoehzicM?=
+ =?us-ascii?Q?HJzHJZrHTZsQrNf8dASkcC4LCYJif9PxRK/KqhRxNA7HNcgh2bNay21Gp3Y/?=
+ =?us-ascii?Q?qIDO7u1PYItfAr0k4UhArNWnqVilSZRlCejEe3Fzu4AvKG8ymUzUeZ/3o1dj?=
+ =?us-ascii?Q?cg7B89GIIq2s9gdK/yoPInSwD4SVMpY=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <BYAPR04MB496845AB3EEC1EAD8C7CE4D9F1089@BYAPR04MB4968.namprd04.prod.outlook.com>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8760ae9d-6d76-4b8a-ba18-08da002efef2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Mar 2022 11:38:27.0600
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vMvFTy65qTq4xL1Tv6aN0V6gjKHLhMMg+CwdyzVQJEB3t5aAFTY9q4EBsWnDvoJu2tRzYsAmvfhGS19CxQba9jsDOW6ngd8CuoDqWJugHtQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB6704
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 07.03.2022 10:27, Matias Bjørling wrote:
->> > I understand that you point to ZoneFS for this. It is true that it was
->> > presented at the moment as the way to do raw zone access from
->> > user-space.
->> >
->> > However, there is no users of ZoneFS for ZNS devices that I am aware
->> > of (maybe for SMR this is a different story).  The main open-source
->> > implementations out there for RocksDB that are being used in
->> > production (ZenFS and xZTL) rely on either raw zone block access or
->> > the generic char device in NVMe (/dev/ngXnY).
->>
->> That's exactly the situation we want to avoid.
->>
->> You're talking about accessing Zoned storage by knowing directly about how
->> the hardware works and interfacing directly with hardware specific device
->> commands.
->>
->> This is exactly what is wrong with this whole conversation - direct access to
->> hardware is fragile and very limiting, and the whole purpose of having an
->> operating system is to abstract the hardware functionality into a generally
->> usable API. That way when something new gets added to the hardware or
->> something gets removed, the applications don't because they weren't written
->> with that sort of hardware functionality extension in mind.
->>
->> I understand that RocksDB probably went direct to the hardware because, at
->> the time, it was the only choice the developers had to make use of ZNS based
->> storage. I understand that.
->>
->> However, I also understand that there are *better options now* that allow
->> applications to target zone storage in a way that doesn't expose them to the
->> foibles of hardware support and storage protocol specifications and
->> characteristics.
->>
->> The generic interface that the kernel provides for zoned storage is called
->> ZoneFS. Forget about the fact it is a filesystem, all it does is provide userspace
->> with a named zone abstraction for a zoned
->> device: every zone is an append-only file.
->>
->> That's what I'm trying to get across here - this whole discussion about zone
->> capacity not matching zone size is a hardware/ specification detail that
->> applications *do not need to know about* to use zone storage. That's
->> something taht Zonefs can/does hide from applications completely - the zone
->> files behave exactly the same from the user perspective regardless of whether
->> the hardware zone capacity is the same or less than the zone size.
->>
->> Expanding access the hardware and/or raw block devices to ensure userspace
->> applications can directly manage zone write pointers, zone capacity/space
->> limits, etc is the wrong architectural direction to be taking. The sort of
->> *hardware quirks* being discussed in this thread need to be managed by the
->> kernel and hidden from userspace; userspace shouldn't need to care about
->> such wierd and esoteric hardware and storage
->> protocol/specification/implementation
->> differences.
->>
->> IMO, while RocksDB is the technology leader for ZNS, it is not the model that
->> new applications should be trying to emulate. They should be designed from
->> the ground up to use ZoneFS instead of directly accessing nvme devices or
->> trying to use the raw block devices for zoned storage. Use the generic kernel
->> abstraction for the hardware like applications do for all other things!
->>
->> > This is because having the capability to do zone management from
->> > applications that already work with objects fits much better.
->>
->> ZoneFS doesn't absolve applications from having to perform zone management
->> to pack it's objects and garbage collect stale storage space.  ZoneFS merely
->> provides a generic, file based, hardware independent API for performing these
->> zone management tasks.
->>
->> > My point is that there is space for both ZoneFS and raw zoned block
->> > device. And regarding !PO2 zone sizes, my point is that this can be
->> > leveraged both by btrfs and this raw zone block device.
->>
->> On that I disagree - any argument that starts with "we need raw zoned block
->> device access to ...." is starting from an invalid premise. We should be hiding
->> hardware quirks from userspace, not exposing them further.
->>
->> IMO, we want writing zone storage native applications to be simple and
->> approachable by anyone who knows how to write to append-only files.  We do
->> not want such applications to be limited to people who have deep and rare
->> expertise in the dark details of, say, largely undocumented niche NVMe ZNS
->> specification and protocol quirks.
->>
->> ZoneFS provides us with a path to the former, what you are advocating is the
->> latter....
-
-I agree with all you say. I can see ZoneFS becoming a generic zone API,
-but we are not there yet. Rather than advocating for using raw devices,
-I am describing how zone devices are being consumed today. So to me
-there are 2 things we need to consider: Support current customers and
-improve the way future customers consume these devices.
-
-Coming back to the original topic of the LSF/MM discussion, what I would
-like to propose is that we support existing, deployed devices that are
-running in Linux and do not have PO2 zone sizes. These can then be
-consumed by btrfs or presented to applications through ZoneFS. And for
-existing customers, this will mean less headaches.
-
-Note here that if we use ZoneFS and all we care is zone capacities, then
-the whole PO2 argument to make applications more efficient does not
-apply anymore, as applications would be using the real capacity of the
-zone. I very much like this approach.
-
->+ Hans (zenfs/rocksdb author)
->
->Dave, thank you for your great insight. It is a great argument for why zonefs makes sense. I must admit that Damien has been telling me this multiple times, but I didn't fully grok the benefits until seeing it in the light of this thread.
->
->Wrt to RocksDB support using ZenFS - while raw block access was the initial approach, it is very easy to change to use the zonefs API. Hans has already whipped up a plan for how to do it.
-
-This is great. We have been thinking for some time about aligning with
-ZenFS for the in-kernel path. This might be the right time to take
-action on this.
+On 04/03/2022 19:01, Christoph Hellwig wrote:=0A=
+> Hi Jens,=0A=
+> =0A=
+> this series removes the bio_devname helper and just switches all users=0A=
+> to use the %pg format string directly.=0A=
+> =0A=
+> Diffstat=0A=
+>  block/bio.c               |    6 ------=0A=
+>  block/blk-core.c          |   25 +++++++------------------=0A=
+>  drivers/block/pktcdvd.c   |    9 +--------=0A=
+>  drivers/md/dm-crypt.c     |   10 ++++------=0A=
+>  drivers/md/dm-integrity.c |    5 ++---=0A=
+>  drivers/md/md-multipath.c |    9 ++++-----=0A=
+>  drivers/md/raid1.c        |    5 ++---=0A=
+>  drivers/md/raid5-ppl.c    |   13 ++++---------=0A=
+>  fs/ext4/page-io.c         |    5 ++---=0A=
+>  include/linux/bio.h       |    2 --=0A=
+>  10 files changed, 26 insertions(+), 63 deletions(-)=0A=
+> =0A=
+=0A=
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
