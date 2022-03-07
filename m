@@ -2,106 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8084C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 06:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 935A4C433EF
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 06:45:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233864AbiCGGqB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 01:46:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51356 "EHLO
+        id S229865AbiCGGqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 01:46:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229865AbiCGGqB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 01:46:01 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 735724504F
-        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 22:45:07 -0800 (PST)
+        with ESMTP id S232006AbiCGGqc (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 01:46:32 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EB1AD4504F
+        for <linux-block@vger.kernel.org>; Sun,  6 Mar 2022 22:45:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646635506;
+        s=mimecast20190719; t=1646635538;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=3+c4wIxR54xQ3Ynz5V441Ek1YsLX4su3yjGkQCdZzAI=;
-        b=NKlJZGJ8JnQQQXeghU1YJ51N05rrpSl+FVyr2MOeSeDRxYs2nm0MK90RgjZ65MGFhc8ojv
-        nvAJtkDojvmlWoR9+cvKxI5z3teqp1kEN60+5WpZmH/QiHNmrH/S/4Vi5aSB9DnWtpBGwY
-        tJnpcrYxPgFXLSFGCzVEy6URfC+uKko=
+        bh=1NaJH5Gq3jvaXZ636iEe2xCl6z0Sk5xsTyGhQTEH0RI=;
+        b=B1Ln9xHkcLbtNM0dOBr6Aq+ZPFTZPP+M63kwDSwJ41pSPFvCurFlqEnb/GWk0VzrkH4z9q
+        vqT2ew2+SPxORJhD0ovu5UzlXa/R4jiHUGWOZr09xRIX6xijGVwepHMr6Scc1qiDV7qdt+
+        EGov+WmXTgxu0VY36Cl7OWidugkO3Ls=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-641-kgBK0gp9Nh6vwjBmV9SV3Q-1; Mon, 07 Mar 2022 01:45:01 -0500
-X-MC-Unique: kgBK0gp9Nh6vwjBmV9SV3Q-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+ us-mta-522-QLnRK-QXNRmSqZHKeav-Cw-1; Mon, 07 Mar 2022 01:45:36 -0500
+X-MC-Unique: QLnRK-QXNRmSqZHKeav-Cw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E772801AFE;
-        Mon,  7 Mar 2022 06:45:00 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0F13281424A;
+        Mon,  7 Mar 2022 06:45:35 +0000 (UTC)
 Received: from localhost (ovpn-8-23.pek2.redhat.com [10.72.8.23])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id EE0EE519B1;
-        Mon,  7 Mar 2022 06:44:41 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D37EB7A2E2;
+        Mon,  7 Mar 2022 06:45:02 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
         Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V3 3/6] blk-mq: reconfigure poll after queue map is changed
-Date:   Mon,  7 Mar 2022 14:43:58 +0800
-Message-Id: <20220307064401.30056-4-ming.lei@redhat.com>
+Subject: [PATCH V3 4/6] block: mtip32xx: don't touch q->queue_hw_ctx
+Date:   Mon,  7 Mar 2022 14:43:59 +0800
+Message-Id: <20220307064401.30056-5-ming.lei@redhat.com>
 In-Reply-To: <20220307064401.30056-1-ming.lei@redhat.com>
 References: <20220307064401.30056-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-queue map can be changed when updating nr_hw_queues, so we need to
-reconfigure queue's poll capability. Add one helper for doing this job.
+q->queue_hw_ctx is really one blk-mq internal structure for retrieving
+hctx via its index, not supposed to be used by drivers. Meantime drivers
+can get the tags structure easily from tagset.
 
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ drivers/block/mtip32xx/mtip32xx.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 64fddb36c93c..57ae9df0f4dc 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4010,6 +4010,17 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	mutex_unlock(&q->sysfs_lock);
+diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
+index cba956881d55..2d43ab5b5cc0 100644
+--- a/drivers/block/mtip32xx/mtip32xx.c
++++ b/drivers/block/mtip32xx/mtip32xx.c
+@@ -160,9 +160,7 @@ static bool mtip_check_surprise_removal(struct driver_data *dd)
+ static struct mtip_cmd *mtip_cmd_from_tag(struct driver_data *dd,
+ 					  unsigned int tag)
+ {
+-	struct blk_mq_hw_ctx *hctx = dd->queue->queue_hw_ctx[0];
+-
+-	return blk_mq_rq_to_pdu(blk_mq_tag_to_rq(hctx->tags, tag));
++	return blk_mq_rq_to_pdu(blk_mq_tag_to_rq(dd->tags.tags[0], tag));
  }
  
-+static void blk_mq_update_poll_flag(struct request_queue *q)
-+{
-+	struct blk_mq_tag_set *set = q->tag_set;
-+
-+	if (set->nr_maps > HCTX_TYPE_POLL &&
-+	    set->map[HCTX_TYPE_POLL].nr_queues)
-+		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
-+	else
-+		blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
-+}
-+
- int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		struct request_queue *q)
- {
-@@ -4044,9 +4055,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	q->tag_set = set;
- 
- 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
--	if (set->nr_maps > HCTX_TYPE_POLL &&
--	    set->map[HCTX_TYPE_POLL].nr_queues)
--		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
-+	blk_mq_update_poll_flag(q);
- 
- 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
- 	INIT_LIST_HEAD(&q->requeue_list);
-@@ -4512,6 +4521,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 	blk_mq_update_queue_map(set);
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_realloc_hw_ctxs(set, q);
-+		blk_mq_update_poll_flag(q);
- 		if (q->nr_hw_queues != set->nr_hw_queues) {
- 			int i = prev_nr_hw_queues;
- 
+ /*
 -- 
 2.31.1
 
