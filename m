@@ -2,449 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B266C433EF
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 09:51:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1965C433FE
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 10:13:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238190AbiCGJvj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 04:51:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
+        id S236288AbiCGKOW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 05:14:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239160AbiCGJtL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 04:49:11 -0500
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC7372AE35
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 01:42:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1646646187; x=1678182187;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=N2seRYX1hcqgxap/x7LFh0klPrZhZjBDJB9QAYAdZME=;
-  b=U5N/V9l2dWtAolCgH5qHnK1dFE4tDL5oUBqKKzo8/xcEcYewf5n9IsSW
-   QEXHohsSnuJXXQ/kqFea49F9bAIfxAg3IDdMIb8fNVqgi1H3Y68Db1Hoq
-   xvB9grRYp8ad66X7n6YIrOCjCyq4wVY/y7gpNxd2XX02xUQnLMJ/XY1Gr
-   wC+9k7aXFw5TgkaNxoyqvFG8XzrY3MlCjJ6dFWixy+VOzsJqES4suvtfw
-   uDkZWLtmqur7iPs65VGiHnh+mOzH/frguSArfvl99rmPGdnABD9jfHB1i
-   tCKvxqnT9/bx2Y+Yxk4ie0AB3+N1VbZXkwYpyfRZJywUTNrd4BNrrku4/
-   g==;
-X-IronPort-AV: E=Sophos;i="5.90,161,1643644800"; 
-   d="scan'208";a="298788406"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 07 Mar 2022 17:42:52 +0800
-IronPort-SDR: 25Zhnmiw4mjSvemtHCYD9wYrcd1Rbkt5d64A/kzgdE+6BM3nT8fbMWYEwPGGh9fhyfM86tpYAi
- afN6fxpEg5b0BAIr4ceIrGiCjm7cueb9KdsLM4ZTELniQw1xkicc7oSAw5lj/WXIiP1UkY+A3H
- ky7eTT8nuO0f6qTJthzDLD9aIwijcex3k4V2ATdcycAjCi+E6iPsJd9iM4qxq6XIsyhRb67w7Q
- MO4ibC8/+AyV4RTKkBQNaqwHggKso1UChq9gAhWZchZ+jS72VZKibj2hxYaORXXDbiZ4uWt+cQ
- L9O2FC2SJx5ZQduFXeMYP6Gw
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 01:14:10 -0800
-IronPort-SDR: v4jQmeLR/IhpJJF51b1Nq9XtyGgTHSvICRLq0/pYLK7YOEjz5HNya43t8IoPdmYqh96cic3icZ
- 9XZ6ZBQAIdlOMkKt4UuLsnCdafW78ATXKUXeY4n6hHArNjOPXA8gj3Jz4Clp+coRKPotGHVlMO
- wqzjjgcySQEzTj7KiDVsikTV8crh9SjviFCvFdC+A1YnXzXtfIqJgpFD9bCYKTvSmOKF18ZHQb
- L3j6j2pxkUd1dbsOw7Y7Snb2hdi0nJAPaCdRfOV1PVrPr1SgOjZTO2TutQyhLxYt46cdmLK4oy
- yfE=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2022 01:42:53 -0800
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KBtmX3XCQz1SHwl
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 01:42:52 -0800 (PST)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1646646166; x=1649238167; bh=N2seRYX1hcqgxap/x7LFh0klPrZhZjBDJB9
-        QAYAdZME=; b=LO6GTMpWgC/XrJnfpXk+5R2J/K0JpP/B7dxor+JMIBUESGNLQew
-        tkO++s8jLgI/g1zXUsOuQQGDPsx9MWCXwL2eCnGnoNtadHutzOYTusSXrmpJyMbE
-        fs1sHxJzLySd6ZD7yt7qfDwf6lpgimWSR5UbswlYAKfHOITWYf6zBJ5QrhNzIqim
-        TbsyuxsoqsAbhGEq+CFhvQtnDwPGMSzzMQnPSOVVKgzVn5g8MUQloZGKh94rGtt/
-        044tZeoZYtarVB0nNsHk+5gZw95U/kq6jkVZHpfP8jirTo7DqrJ2R1E29DzlwCRU
-        +0IuTl5rkaLv6US25nikENfDWx5usaq51rw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id Y-wWv57YqMhT for <linux-block@vger.kernel.org>;
-        Mon,  7 Mar 2022 01:42:46 -0800 (PST)
-Received: from [10.225.163.91] (unknown [10.225.163.91])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KBtmP0drcz1Rvlx;
-        Mon,  7 Mar 2022 01:42:44 -0800 (PST)
-Message-ID: <b7774aff-d391-5e37-58b5-abe6bc17e7df@opensource.wdc.com>
-Date:   Mon, 7 Mar 2022 18:42:44 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 01/16] pata_parport: add core driver (PARIDE replacement)
-Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
-        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220305201411.501-1-linux@zary.sk>
- <20220305201411.501-2-linux@zary.sk>
- <2a79b7ac-6648-7855-fcfa-de0800c9a310@opensource.wdc.com>
- <202203070955.05800.linux@zary.sk>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <202203070955.05800.linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        with ESMTP id S242126AbiCGKLP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 05:11:15 -0500
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D51898879E;
+        Mon,  7 Mar 2022 01:54:29 -0800 (PST)
+Received: by mail-ej1-x62c.google.com with SMTP id qx21so30577618ejb.13;
+        Mon, 07 Mar 2022 01:54:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=LFdIEDDy0ZaKGYeFQ4O3vTisKLa+lVgmmPHb0pU4IoY=;
+        b=qoygGdB9he2opWGHDYY9XoglRQBeKxqr2galGyGL324N6uwz5pYadRvnCC/qmNoth2
+         SSfIHRN5tIWzfosn3sS8tPkOytRkjeisdeDpM2k0zRYTe/kAsGdQqIyqANiVzAG6P2LH
+         SAdpeHjenJ2OHWABdj13zKU8Psy1bUdE1o5tqvvOETChL5hMz1fNIOWfsXUewp8/wHDB
+         1ve8ceRYlWaZyuxoBXLj1LzDNjKUn/oSswux10YTXCHdGobid0FL5GdG3MYQ13HM5Vat
+         RJgFmQFHC+D1lnfzCKDRY+bOBt0pYxbEdb+n/OuV599iG3vXRILheS1wnPIMPCbFBhbf
+         ObjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=LFdIEDDy0ZaKGYeFQ4O3vTisKLa+lVgmmPHb0pU4IoY=;
+        b=ZSJ6dqaohmaCwsyTuH+7l5R5WCVFbKN11n4pK83+QxxpMbxpfxvL11DEX/Kmra6X6c
+         lhMtQ7zmEErvtU+0Xk6KDe7LjmA2KJg2kn75LnxrSWQPb6ME10HwdkthF9/kDkpLggwf
+         Y9x3Rp0mThP0vFxX2b2HIu9lmA4uEJJBcEi97pgMnfsTKoNYZ0zJjuR7TFqvrUJEU2sO
+         KyWjsMxWSz8XCGJP4COEe7nJjFNqS9HSKxfF4AiJMrP3ne3QwB+pPMPXoaVWnBdldtut
+         uayaGvo7Fs511gIJvKy8pTVB1czTtCYq3Iq4DXFjHd04mllGVUlGaBrn9253McIpgN4k
+         nPHQ==
+X-Gm-Message-State: AOAM532q1BSIxL/r6IAIyR/38gw4a7c2elZJm/yHAXDfIGwSG/QkR/yE
+        Wdb66Dyi60Vkw1Wv9Gzvbzk=
+X-Google-Smtp-Source: ABdhPJzn9/vfO4XyyIBeJkoetqe/kypEJfdHkvj7lvP5sVvs0XW3c1b5gVNgK7dQKvtaEsb5zpkcxw==
+X-Received: by 2002:a17:907:168f:b0:6da:b548:4f9f with SMTP id hc15-20020a170907168f00b006dab5484f9fmr8375270ejc.666.1646646867157;
+        Mon, 07 Mar 2022 01:54:27 -0800 (PST)
+Received: from felia.fritz.box (200116b826f87d009c8e984acb545ab7.dip.versatel-1u1.de. [2001:16b8:26f8:7d00:9c8e:984a:cb54:5ab7])
+        by smtp.gmail.com with ESMTPSA id n3-20020a1709061d0300b006da94efcc7esm4333310ejh.204.2022.03.07.01.54.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 07 Mar 2022 01:54:26 -0800 (PST)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH RESEND] block: remove dead queue_dma_alignment branch from bio_map_user_iov()
+Date:   Mon,  7 Mar 2022 10:54:11 +0100
+Message-Id: <20220307095411.30459-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/7/22 17:55, Ondrej Zary wrote:
->>> +module_param(probe, bool, 0644);
->>> +MODULE_PARM_DESC(probe, "Enable automatic device probing (0=off, 1=on [default])");
->>> +
->>> +static bool verbose;
->>> +module_param(verbose, bool, 0644);
->>> +MODULE_PARM_DESC(verbose, "Enable verbose messages (0=off [default], 1=on)");
->>
->> Is this really necessary ? pr_debug() and all ata_xxx_debug() functions
->> can be enabled dynamically.
-> 
-> The verbose messages are for adapter chip detection. That happens before the
-> ata host is registered.
+If queue_dma_alignment(rq->q), then blk_rq_map_user_iov() will call
+bio_copy_user_iov() and not bio_map_user_iov(). So, bio_map_user_iov() does
+not need to handle the queue_dma_alignment(rq->q) case in any special way.
 
-Sure. But you can still use pr_debug(). So instead of
+Remove this dead branch from bio_map_user_iov().
 
-if (verbose)
-	dev_info();
+Suggested-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+still applies on next-20220307
 
-simply use:
+added Christoph's Reviewed-by tag from:
+  https://lore.kernel.org/all/20220104124724.GA21670@lst.de/
 
-dev_dbg()
-
-And these calls can be enabled with the standard dynamic debug control.
-
-> 
->>> +
->>> +#define DISCONNECT_TIMEOUT	(HZ / 10)
->>> +
->>> +static void pi_connect(struct pi_adapter *pi)
->>> +{
->>> +	del_timer_sync(&pi->timer);
->>> +	if (pi->claimed)
->>> +		return;
->>
->> Nit: I would reverse the condition to avoid the return. Or add a block
->> line to separate the following hunk. Better readability this way, I think.
->>
->>> +	pi->claimed = 1;
->>> +	parport_claim_or_block(pi->pardev);
->>> +	pi->proto->connect(pi);
->>> +}
->>> +
->>> +static void pi_disconnect_later(struct pi_adapter *pi)
->>> +{
->>> +	mod_timer(&pi->timer, jiffies + DISCONNECT_TIMEOUT);
->>> +}
->>
->> Is this really needed ? Not sure it helps in any way. At least the name
->> should be changed to reflect what this does. May be something like
->> pi_start_disconnect_timeout() ?
-> 
-> Disconnect needs to happen after end of an operation so the parport is freed
-> for device(s) (like a printer) connected to pass-through port of a paride
-> device. There could be even multiple paride devices chained on one parport.
-> 
-> Disconnecting immediately at the end of each function does not work
-> (probably breaks the protocol?)
-> 
-> The old high-level drivers (pd, pf...) did connect and disconnect manually
-> on each operation (command or data transfer) but it does not seem to be
-> possible with libata.
-
-I am not questioning how you handle the disconnect. I was only
-commenting that the inline function may not be that usefull and you
-could simply directly use the mod_timer() calls directly.
-
-or
-
-rename pi_disconnect_later() to something that better explains what the
-function does.
-
-> 
->>> +
->>> +static void pi_disconnect_timer(struct timer_list *t)
->>> +{
->>> +	struct pi_adapter *pi = from_timer(pi, t, timer);
->>> +
->>> +	if (!pi->claimed)
->>> +		return;
->>
->> A blank line here would be nice for readability.
->>
->>> +	pi->proto->disconnect(pi);
->>> +	parport_release(pi->pardev);
->>> +	pi->claimed = 0;
->>> +}
->>> +
->>> +/* functions taken from libata-sff.c and converted from direct port I/O */
->>> +static unsigned int pata_parport_devchk(struct ata_port *ap, unsigned int device)
->>
->> Should this be a bool function ?
-> 
-> I don't know. It's copied from libata-sff.c
->  
->>> +{
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +	u8 nsect, lbal;
->>> +
->>> +	ap->ops->sff_dev_select(ap, device);
->>> +
->>> +	pi_connect(pi);
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0x55);
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0xaa);
->>> +
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 0xaa);
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0x55);
->>> +
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_NSECT, 055);
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_LBAL, 0xaa);
->>> +
->>> +	nsect = pi->proto->read_regr(pi, 0, ATA_REG_NSECT);
->>> +	lbal = pi->proto->read_regr(pi, 0, ATA_REG_LBAL);
->>> +	pi_disconnect_later(pi);
->>> +
->>> +	if ((nsect == 0x55) && (lbal == 0xaa))
->>> +		return 1;	/* we found a device */
->>> +
->>> +	return 0;		/* nothing found */
->>> +}
->>> +
->>> +static int pata_parport_bus_softreset(struct ata_port *ap, unsigned int devmask,
->>> +				      unsigned long deadline)
->>> +{
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +
->>> +	pi_connect(pi);
->>> +	/* software reset.  causes dev0 to be selected */
->>> +	pi->proto->write_regr(pi, 1, 6, ap->ctl);
->>> +	udelay(20);	/* FIXME: flush */
->>
->> Then please fix it.
-> 
-> I don't know what that means. It's copied from libata-sff.c
-
-OK. Will have a look there too.
-
-> 
->>> +	pi->proto->write_regr(pi, 1, 6, ap->ctl | ATA_SRST);
->>> +	udelay(20);	/* FIXME: flush */
->>
->> Here too.
->>
->>> +	pi->proto->write_regr(pi, 1, 6, ap->ctl);
->>> +	ap->last_ctl = ap->ctl;
->>> +	pi_disconnect_later(pi);
->>> +
->>> +	/* wait the port to become ready */
->>> +	return ata_sff_wait_after_reset(&ap->link, devmask, deadline);
->>> +}
->>> +
->>> +static int pata_parport_softreset(struct ata_link *link, unsigned int *classes,
->>> +				  unsigned long deadline)
->>> +{
->>> +	struct ata_port *ap = link->ap;
->>> +	unsigned int slave_possible = ap->flags & ATA_FLAG_SLAVE_POSS;
->>> +	unsigned int devmask = 0;
->>> +	int rc;
->>> +	u8 err;
->>> +
->>> +	/* determine if device 0/1 are present */
->>> +	if (pata_parport_devchk(ap, 0))
->>> +		devmask |= (1 << 0);
->>> +	if (slave_possible && pata_parport_devchk(ap, 1))
->>> +		devmask |= (1 << 1);
->>> +
->>> +	/* select device 0 again */
->>> +	ap->ops->sff_dev_select(ap, 0);
->>> +
->>> +	/* issue bus reset */
->>> +	rc = pata_parport_bus_softreset(ap, devmask, deadline);
->>> +	/* if link is occupied, -ENODEV too is an error */
->>
->> Please merge this comment with the one above. That will make the code
->> more readable (I know this is the style used by many drivers, but let's
->> not repeat the weird style :)).
->>
->>> +	if (rc && (rc != -ENODEV || sata_scr_valid(link))) {
->>> +		ata_link_err(link, "SRST failed (errno=%d)\n", rc);
->>> +		return rc;
->>> +	}
->>> +
->>> +	/* determine by signature whether we have ATA or ATAPI devices */
->>> +	classes[0] = ata_sff_dev_classify(&link->device[0],
->>> +					  devmask & (1 << 0), &err);
->>> +	if (slave_possible && err != 0x81)
->>> +		classes[1] = ata_sff_dev_classify(&link->device[1],
->>> +						  devmask & (1 << 1), &err);
->>> +
->>> +	return 0;
->>> +}
->>> +
->>> +static u8 pata_parport_check_status(struct ata_port *ap)
->>> +{
->>> +	u8 status;
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +
->>> +	pi_connect(pi);
->>> +	status = pi->proto->read_regr(pi, 0, ATA_REG_STATUS);
->>> +	pi_disconnect_later(pi);
->>> +
->>> +	return status;
->>> +}
->>> +
->>> +static u8 pata_parport_check_altstatus(struct ata_port *ap)
->>> +{
->>> +	u8 altstatus;
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +
->>> +	pi_connect(pi);
->>> +	altstatus = pi->proto->read_regr(pi, 1, 6);
->>> +	pi_disconnect_later(pi);
->>> +
->>> +	return altstatus;
->>> +}
->>> +
->>> +static void pata_parport_dev_select(struct ata_port *ap, unsigned int device)
->>> +{
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +	u8 tmp;
->>> +
->>> +	pi_connect(pi);
->>> +	if (device == 0)
->>> +		tmp = ATA_DEVICE_OBS;
->>> +	else
->>> +		tmp = ATA_DEVICE_OBS | ATA_DEV1;
->>> +
->>> +	pi->proto->write_regr(pi, 0, ATA_REG_DEVICE, tmp);
->>> +	pi_disconnect_later(pi);
->>> +	ata_sff_pause(ap);	/* needed; also flushes, for mmio */
->>
->> The comment does not parse... Why is it needed ?
->> And pleasde move the comment above the call, with a blank line
->> separating it from the previous lines.
-> 
-> I don't know. It's copied from libata-sff.c
-
-Drop the comment then.
-
-> 
->>> +}
->>> +
->>> +static void pata_parport_tf_load(struct ata_port *ap, const struct ata_taskfile *tf)
->>> +{
->>> +	struct pi_adapter *pi = ap->host->private_data;
->>> +	unsigned int is_addr = tf->flags & ATA_TFLAG_ISADDR;
->>> +
->>> +	pi_connect(pi);
->>> +	if (tf->ctl != ap->last_ctl) {
->>> +		pi->proto->write_regr(pi, 1, 6, tf->ctl);
->>> +		ap->last_ctl = tf->ctl;
->>> +		ata_wait_idle(ap);
->>> +	}
->>> +
->>> +	if (is_addr && (tf->flags & ATA_TFLAG_LBA48)) {
->>> +		pi->proto->write_regr(pi, 0, ATA_REG_FEATURE, tf->hob_feature);
->>> +		pi->proto->write_regr(pi, 0, ATA_REG_NSECT, tf->hob_nsect);
->>> +		pi->proto->write_regr(pi, 0, ATA_REG_LBAL, tf->hob_lbal);
->>> +		pi->proto->write_regr(pi, 0, ATA_REG_LBAM, tf->hob_lbam);
->>> +		pi->proto->write_regr(pi, 0, ATA_REG_LBAH, tf->hob_lbah);
->>> +	}
->>> +
->>> +	if (is_addr) {
->>
->> Move this if above the previous one. Doing so, you can remove the need
->> for is_addr var and simplify the previous if condition.
->>
->> That said, many pata drivers check that flag but it is always set by
->> libata core. So checking it seems useless. Need to dig into this.
-> 
-> It's copied from libata-sff.c which is almost libata core.
-
-Yes. Saw the same pattern in different drivers. Need to figure out what
-is going on here. That flag really seem totally useless. Will check.
-Keep the flag use for now, but at least rewrite as suggested to avoid
-the need for that is_addr variable.
-
->>> +	struct timer_list timer;	/* disconnect timer */
->>> +};
->>> +
->>> +/* registers are addressed as (cont,regr)
->>> + *	cont: 0 for command register file, 1 for control register(s)
->>> + *	regr: 0-7 for register number.
->>> + */
->>> +
->>> +/* macros and functions exported to the protocol modules */
->>> +#define delay_p			(pi->delay ? udelay(pi->delay) : (void)0)
->>> +#define out_p(offs, byte)	do { outb(byte, pi->port + offs); delay_p; } while (0)
->>> +#define in_p(offs)		(delay_p, inb(pi->port + offs))
->>> +
->>> +#define w0(byte)		out_p(0, byte)
->>> +#define r0()			(in_p(0) & 0xff)
->>> +#define w1(byte)		out_p(1, byte)
->>> +#define r1()			(in_p(1) & 0xff)
->>> +#define w2(byte)		out_p(2, byte)
->>> +#define r2()			(in_p(2) & 0xff)
->>> +#define w3(byte)		out_p(3, byte)
->>> +#define w4(byte)		out_p(4, byte)
->>> +#define r4()			(in_p(4) & 0xff)
->>> +#define w4w(data)		do { outw(data, pi->port + 4); delay_p; } while (0)
->>> +#define w4l(data)		do { outl(data, pi->port + 4); delay_p; } while (0)
->>> +#define r4w()			(delay_p, inw(pi->port + 4) & 0xffff)
->>> +#define r4l()			(delay_p, inl(pi->port + 4) & 0xffffffff)
->>
->> Why not align this with the others ?
-> 
-> It's aligned properly in the file, only looks bad in a diff.
-> 
-
-OK.
-
->>> +
->>> +/**
->>> + * module_pata_parport_driver() - Helper macro for registering a pata_parport driver
->>> + * @__pi_protocol: pi_protocol struct
->>> + *
->>> + * Helper macro for pata_parport drivers which do not do anything special in module
->>> + * init/exit. This eliminates a lot of boilerplate. Each module may only
->>> + * use this macro once, and calling it replaces module_init() and module_exit()
->>> + */
->>> +#define module_pata_parport_driver(__pi_protocol) \
->>> +	module_driver(__pi_protocol, pata_parport_register_driver, pata_parport_unregister_driver)
->>
->> Make this a static inline ?
-> 
-> It's a macro that expands to other macro (defined in include/linux/device/driver.h)
-> that expands to __init and __exit functions, module_init() and
-> module_exit() so we can use:
-> 
-> module_pata_parport_driver(on26);
-> 
-> instead of:
-> 
-> static int __init on26_init(void)
-> {
-> 	return pata_parport_register_driver(&on26);
-> }
-> 
-> static void __exit on26_exit(void)
-> {
-> 	pata_parport_unregister_driver(&on26);
-> }
-> 
-> module_init(on26_init)
-> module_exit(on26_exit)
-
-OK.
+Jens, this patch must have fell through the cracks...
+please pick this minor non-urgent clean-up patch.
 
 
+ block/blk-map.c | 41 ++++++++++++++++++-----------------------
+ 1 file changed, 18 insertions(+), 23 deletions(-)
+
+diff --git a/block/blk-map.c b/block/blk-map.c
+index c7f71d83eff1..2a1d7c5f791e 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -260,31 +260,26 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 
+ 		npages = DIV_ROUND_UP(offs + bytes, PAGE_SIZE);
+ 
+-		if (unlikely(offs & queue_dma_alignment(rq->q))) {
+-			ret = -EINVAL;
+-			j = 0;
+-		} else {
+-			for (j = 0; j < npages; j++) {
+-				struct page *page = pages[j];
+-				unsigned int n = PAGE_SIZE - offs;
+-				bool same_page = false;
+-
+-				if (n > bytes)
+-					n = bytes;
+-
+-				if (!bio_add_hw_page(rq->q, bio, page, n, offs,
+-						     max_sectors, &same_page)) {
+-					if (same_page)
+-						put_page(page);
+-					break;
+-				}
+-
+-				added += n;
+-				bytes -= n;
+-				offs = 0;
++		for (j = 0; j < npages; j++) {
++			struct page *page = pages[j];
++			unsigned int n = PAGE_SIZE - offs;
++			bool same_page = false;
++
++			if (n > bytes)
++				n = bytes;
++
++			if (!bio_add_hw_page(rq->q, bio, page, n, offs,
++					     max_sectors, &same_page)) {
++				if (same_page)
++					put_page(page);
++				break;
+ 			}
+-			iov_iter_advance(iter, added);
++
++			added += n;
++			bytes -= n;
++			offs = 0;
+ 		}
++		iov_iter_advance(iter, added);
+ 		/*
+ 		 * release the pages we didn't map into the bio, if any
+ 		 */
 -- 
-Damien Le Moal
-Western Digital Research
+2.17.1
+
