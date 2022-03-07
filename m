@@ -2,84 +2,444 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BF3BC433FE
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 19:50:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4BDBC433EF
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 19:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245158AbiCGTv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 14:51:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36578 "EHLO
+        id S235127AbiCGT6R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 14:58:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239466AbiCGTv2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 14:51:28 -0500
-Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F62589324
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 11:50:33 -0800 (PST)
-Received: by mail-io1-xd2e.google.com with SMTP id r11so13738138ioh.10
-        for <linux-block@vger.kernel.org>; Mon, 07 Mar 2022 11:50:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=075g20k4DHefJxD6reM7eLorGBY2V+lTaMr5/Yfuikk=;
-        b=b6gizO6iwcc+5TmuZFQ+HaG1IufNjOIurkziuVpMjRnJkz0C7OfK1K50nDahz+v7Ll
-         UHwGuQaLB00rzfRu4UkOpJ6wWJb1nP1ftxPZ5xpdPKXaIPBbfVNygA4ILoYup/9NuSAN
-         bXqiod4vVT+LgnaOXLEeCU5i4s6TWyPRv5hnEHmxN730zF+CaiTefhnkDCVzATTIPDiQ
-         54Fy1Un6SCWLdyr4UFngqVDJUAk90q5bi7qKp7BOVNrLrGgVdW+4Z5Q+ghqdMfirjnlp
-         eLLeruOIQLu08sWXcpYj6ZIdMgWcWZ2OhLeuvm9LfhJdecKBcNy4CYO2tHNBqR9z5FZo
-         yF7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=075g20k4DHefJxD6reM7eLorGBY2V+lTaMr5/Yfuikk=;
-        b=M8cOLJkL2jJiJtsvgHlY6VWsHlifTkJ1Pz6SUDRJuCR4OHWVTqotoiyQRNPpSjpUXV
-         GUNx3Bb5wlYtSlJteHNLFaTW5v6DxDcqk3RDAHt3irQ/JBqzVOwMnEvSUDilXWm+ky8/
-         6lsRulLgEBI1ZqiTCrH7J9D9joXyelpOtTd8w1rblo7TY+DxHCq0J88elQj0BgeDcNAo
-         Ii5fFDbeBQHGx3UsFPBNFy8buOJCZ/eTS7XBi1tZnCSwkkjNeqXPcohPXwE5OSvsNmjw
-         W90wddjLaZXQdhDOCwefHCN/BiZk73Wj/kOQM5vCN8eNhlSPkEZG9RPZc9aruh9xc8MX
-         Kyvg==
-X-Gm-Message-State: AOAM53089KGXPdIX0qK0nzLK1Hu2iV11yPfdcT+blOeO7n503109TwRr
-        LP5VHl7SWVkuanCTZKxnMBEZqg==
-X-Google-Smtp-Source: ABdhPJz3EJTLTGdE09CoWJ3Zw3rYFrvaaiC7ejcGBa1FivbI69Gj/+t2treGBX0dGrzg2icD+cfxnw==
-X-Received: by 2002:a05:6638:1693:b0:317:aa11:16b with SMTP id f19-20020a056638169300b00317aa11016bmr10953735jat.125.1646682632627;
-        Mon, 07 Mar 2022 11:50:32 -0800 (PST)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id h28-20020a056e021d9c00b002c64c557eaasm1187521ila.12.2022.03.07.11.50.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Mar 2022 11:50:32 -0800 (PST)
-Message-ID: <f059aa4c-5af0-c3ee-12f9-1b19b2b380aa@kernel.dk>
-Date:   Mon, 7 Mar 2022 12:50:31 -0700
+        with ESMTP id S245196AbiCGT5t (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 14:57:49 -0500
+X-Greylist: delayed 408 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 07 Mar 2022 11:56:51 PST
+Received: from mxout03.lancloud.ru (mxout03.lancloud.ru [45.84.86.113])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A2D8A6DD
+        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 11:56:51 -0800 (PST)
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout03.lancloud.ru 20BFC208D334
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH 01/16] pata_parport: add core driver (PARIDE replacement)
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+CC:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, <linux-block@vger.kernel.org>,
+        <linux-parport@lists.infradead.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+References: <20220305201411.501-1-linux@zary.sk>
+ <20220305201411.501-2-linux@zary.sk>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <6178f89d-b84d-51af-37fc-44f7016d0a70@omp.ru>
+Date:   Mon, 7 Mar 2022 22:49:58 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCHv4 0/8] 64-bit data integrity field support
+In-Reply-To: <20220305201411.501-2-linux@zary.sk>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     hch@lst.de, martin.petersen@oracle.com
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220307193448.GC3260574@dhcp-10-100-145-180.wdc.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220307193448.GC3260574@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/7/22 12:34 PM, Keith Busch wrote:
-> Hi Jens,
+Hello!
+
+On 3/5/22 11:13 PM, Ondrej Zary wrote:
+
+> Add pata_parport (PARIDE replacement) core libata driver.
 > 
-> I believe this is looking ready at this point. Would it be too ambitious
-> to see this applied ahead of 5.18? The block layer provides the focal
-> point for new capabilities in this series, so I feel it should go
-> through that tree if you're okay with this.
+> Signed-off-by: Ondrej Zary <linux@zary.sk>
+> ---
+>  drivers/ata/Kconfig                     |  25 +
+>  drivers/ata/Makefile                    |   2 +
+>  drivers/ata/pata_parport/Kconfig        |  10 +
+>  drivers/ata/pata_parport/Makefile       |   9 +
+>  drivers/ata/pata_parport/pata_parport.c | 809 ++++++++++++++++++++++++
+>  drivers/ata/pata_parport/pata_parport.h | 110 ++++
 
-Layered it on top of the write-streams changes to avoid a silly
-conflict.
+   I'd like to suggest to just name the new subdirectory 'parport'.
+And it looks like I'll need to update my MAINTAINBERS entry to include this driver... :-)
 
--- 
-Jens Axboe
+[...]
+> diff --git a/drivers/ata/pata_parport/pata_parport.c b/drivers/ata/pata_parport/pata_parport.c
+> new file mode 100644
+> index 000000000000..7f814062cedd
+> --- /dev/null
+> +++ b/drivers/ata/pata_parport/pata_parport.c
+> @@ -0,0 +1,809 @@
+[...]
+> +static bool probe = 1;
 
+   s/1/true/.
+
+[...]
+> +/* functions taken from libata-sff.c and converted from direct port I/O */
+> +static unsigned int pata_parport_devchk(struct ata_port *ap, unsigned int device)
+
+   Should return bool now, see e.g..:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/libata.git/commit/?h=for-next&id=1336aa88d8553292604878c53538297fbc65bf0a
+
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +	u8 nsect, lbal;
+> +
+> +	ap->ops->sff_dev_select(ap, device);
+
+   Could call your sff-dev_select() methid directly here?
+
+[...]
+> +static int pata_parport_bus_softreset(struct ata_port *ap, unsigned int devmask,
+> +				      unsigned long deadline)
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +
+> +	pi_connect(pi);
+> +	/* software reset.  causes dev0 to be selected */
+> +	pi->proto->write_regr(pi, 1, 6, ap->ctl);
+> +	udelay(20);	/* FIXME: flush */
+
+   I don't think this FIXME applies to your driver...
+
+[...]
+> +static int pata_parport_softreset(struct ata_link *link, unsigned int *classes,
+> +				  unsigned long deadline)
+> +{
+> +	struct ata_port *ap = link->ap;
+> +	unsigned int slave_possible = ap->flags & ATA_FLAG_SLAVE_POSS;
+
+   Isn't this flag always set in your driver?
+
+> +	unsigned int devmask = 0;
+> +	int rc;
+> +	u8 err;
+> +
+> +	/* determine if device 0/1 are present */
+> +	if (pata_parport_devchk(ap, 0))
+> +		devmask |= (1 << 0);
+> +	if (slave_possible && pata_parport_devchk(ap, 1))
+> +		devmask |= (1 << 1);
+> +
+> +	/* select device 0 again */
+> +	ap->ops->sff_dev_select(ap, 0);
+
+   Again, could you call this directly?
+
+> +
+> +	/* issue bus reset */
+> +	rc = pata_parport_bus_softreset(ap, devmask, deadline);
+> +	/* if link is occupied, -ENODEV too is an error */
+> +	if (rc && (rc != -ENODEV || sata_scr_valid(link))) {
+
+   It's a PATA driver, why call sata_scr_valid() at all?
+
+[...]
+> +static void pata_parport_dev_select(struct ata_port *ap, unsigned int device)
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +	u8 tmp;
+> +
+> +	pi_connect(pi);
+
+   Why not call it after this *if*?
+
+> +	if (device == 0)
+> +		tmp = ATA_DEVICE_OBS;
+> +	else
+> +		tmp = ATA_DEVICE_OBS | ATA_DEV1;
+> +
+> +	pi->proto->write_regr(pi, 0, ATA_REG_DEVICE, tmp);
+> +	pi_disconnect_later(pi);
+> +	ata_sff_pause(ap);	/* needed; also flushes, for mmio */
+
+   Does this comment make sense in your driver?
+
+[...]
+> +static void pata_parport_tf_read(struct ata_port *ap, struct ata_taskfile *tf)
+> +{
+> +	struct pi_adapter *pi = ap->host->private_data;
+> +
+> +	pi_connect(pi);
+> +	tf->command = pi->proto->read_regr(pi, 0, ATA_REG_STATUS);
+
+   Use tf->status please, see:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/dlemoal/libata.git/commit/?h=for-next&id=efcef265fd83d9a68a68926abecb3e1dd3e260a8
+
+> +	tf->feature = pi->proto->read_regr(pi, 0, ATA_REG_ERR);
+
+   Use tf->error as well please.
+
+[...]
+> +static void pata_parport_lost_interrupt(struct ata_port *ap)
+> +{
+> +	u8 status;
+> +	struct ata_queued_cmd *qc;
+> +
+> +	/* Only one outstanding command per SFF channel */
+> +	qc = ata_qc_from_tag(ap, ap->link.active_tag);
+> +	/* We cannot lose an interrupt on a non-existent or polled command */
+> +	if (!qc || qc->tf.flags & ATA_TFLAG_POLLING)
+> +		return;
+> +	/* See if the controller thinks it is still busy - if so the command
+> +	   isn't a lost IRQ but is still in progress */
+> +	status = pata_parport_check_altstatus(ap);
+> +	if (status & ATA_BUSY)
+> +		return;
+> +
+> +	/* There was a command running, we are no longer busy and we have
+> +	   no interrupt. */
+> +	ata_port_warn(ap, "lost interrupt (Status 0x%x)\n", status);
+> +	/* Run the host interrupt logic as if the interrupt had not been lost */
+> +	ata_sff_port_intr(ap, qc);
+> +}
+
+   Hm, it looks like ata_sff_lost_interrupt() could be used instead...
+
+> +
+> +static struct ata_port_operations pata_parport_port_ops = {
+
+   Maybe inherit from ata_sff_port_ops? 
+
+[...]
+> +static int default_test_proto(struct pi_adapter *pi, char *scratch)
+> +{
+> +	int j, k;
+> +	int e[2] = { 0, 0 };
+> +
+> +	pi->proto->connect(pi);
+> +
+> +	for (j = 0; j < 2; j++) {
+> +		pi->proto->write_regr(pi, 0, 6, 0xa0 + j * 0x10);
+> +		for (k = 0; k < 256; k++) {
+> +			pi->proto->write_regr(pi, 0, 2, k ^ 0xaa);
+> +			pi->proto->write_regr(pi, 0, 3, k ^ 0x55);
+> +			if (pi->proto->read_regr(pi, 0, 2) != (k ^ 0xaa))
+> +				e[j]++;
+> +		}
+> +	}
+> +	pi->proto->disconnect(pi);
+> +
+> +	if (verbose)
+> +		dev_info(&pi->dev, "%s: port 0x%x, mode  %d, test=(%d,%d)\n",
+
+   Whyu 2 spaces after "mode"?
+
+> +		       pi->proto->name, pi->port,
+> +		       pi->mode, e[0], e[1]);
+> +
+> +	return (e[0] && e[1]);	/* not here if both > 0 */
+
+   No need for parens.
+
+> +}
+
+   This function kinda duplicates pata_parport_devchk()? :-)
+
+[...]
+> +static int pi_probe_mode(struct pi_adapter *pi, int max, char *scratch)
+> +{
+> +	int best, range;
+> +
+> +	if (pi->mode != -1) {
+> +		if (pi->mode >= max)
+> +			return 0;
+> +		range = 3;
+> +		if (pi->mode >= pi->proto->epp_first)
+> +			range = 8;
+> +		if ((range == 8) && (pi->port % 8))
+
+   No need for inner parens...
+
+> +			return 0;
+> +		return (!pi_test_proto(pi, scratch));
+
+   No need for outer parens, this time... :-)
+
+> +	}
+> +	best = -1;
+> +	for (pi->mode = 0; pi->mode < max; pi->mode++) {
+> +		range = 3;
+> +		if (pi->mode >= pi->proto->epp_first)
+> +			range = 8;
+> +		if ((range == 8) && (pi->port % 8))
+
+   No need for inner parens...
+
+> +			break;
+> +		if (!pi_test_proto(pi, scratch))
+> +			best = pi->mode;
+> +	}
+> +	pi->mode = best;
+> +	return (best > -1);
+
+   No need for parens...
+
+> +}
+> +
+> +
+
+   Isn't one empty line enough?
+
+> +static int pi_probe_unit(struct pi_adapter *pi, int unit, char *scratch)
+
+   Looks like it's worth making this function return bool?
+
+[...]
+> +static ssize_t new_device_store(struct bus_type *bus, const char *buf, size_t count)
+> +{
+> +	char port[12] = "auto";
+> +	char protocol[8] = "auto";
+> +	int mode = -1, unit = -1, delay = -1;
+> +	struct pi_protocol *pr, *pr_wanted;
+> +	struct device_driver *drv;
+> +	struct parport *parport;
+> +	int port_num, port_wanted, pr_num;
+> +	bool ok = false;
+> +
+> +	if (sscanf(buf, "%11s %7s %d %d %d",
+> +			port, protocol, &mode, &unit, &delay) < 1)
+> +		return -EINVAL;
+> +
+> +	if (sscanf(port, "parport%u", &port_wanted) < 1) {
+> +		if (!strcmp(port, "auto"))
+> +			port_wanted = -1;
+> +		else {
+
+   Need {} on both branches.
+
+> +			pr_err("invalid port name %s\n", port);
+> +			return -EINVAL;
+> +		}
+> +	}
+> +
+> +	drv = driver_find(protocol, &pata_parport_bus_type);
+> +	if (!drv) {
+> +		if (!strcmp(protocol, "auto"))
+> +			pr_wanted = NULL;
+> +		else {
+
+   Same here.
+
+> +			pr_err("protocol %s not found\n", protocol);
+> +			return -EINVAL;
+> +		}
+> +	} else
+
+   And here.
+
+> +		pr_wanted = container_of(drv, struct pi_protocol, driver);
+[...]
+> +static ssize_t delete_device_store(struct bus_type *bus, const char *buf, size_t count)
+> +{
+> +	struct device *dev;
+> +	char device_name[32];
+> +	int fields;
+> +
+> +	fields = sscanf(buf, "%31s", device_name);
+> +	if (fields < 1)
+
+   Strange variable name where you expect only one field... And you don't even
+use it after this check, so hardly needed at all...
+
+[...]
+> diff --git a/drivers/ata/pata_parport/pata_parport.h b/drivers/ata/pata_parport/pata_parport.h
+> new file mode 100644
+> index 000000000000..c4201b809b20
+> --- /dev/null
+> +++ b/drivers/ata/pata_parport/pata_parport.h
+> @@ -0,0 +1,110 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*
+> + *	paride.h	(c) 1997-8  Grant R. Guenther <grant@torque.net>
+
+   Doesn't match the file name anymore...
+
+> + *				    Under the terms of the GPL.
+> + *
+> + * This file defines the interface for adapter chip drivers.
+> + */
+> +
+> +#include <linux/libata.h>
+> +
+> +struct pi_adapter {
+> +	struct device dev;
+> +	struct pi_protocol *proto;	/* adapter protocol */
+> +	int port;			/* base address of parallel port */
+> +	int mode;			/* transfer mode in use */
+> +	int delay;			/* adapter delay setting */
+> +	int unit;			/* unit number for chained adapters */
+> +	int saved_r0;			/* saved port state */
+> +	int saved_r2;			/* saved port state */
+> +	unsigned long private;		/* for protocol module */
+> +	struct pardevice *pardev;	/* pointer to pardevice */
+> +	int claimed;			/* parport has already been claimed */
+
+   Use bool instead?
+
+> +	struct timer_list timer;	/* disconnect timer */
+> +};
+> +
+> +/* registers are addressed as (cont,regr)
+> + *	cont: 0 for command register file, 1 for control register(s)
+> + *	regr: 0-7 for register number.
+> + */
+> +
+> +/* macros and functions exported to the protocol modules */
+> +#define delay_p			(pi->delay ? udelay(pi->delay) : (void)0)
+> +#define out_p(offs, byte)	do { outb(byte, pi->port + offs); delay_p; } while (0)
+> +#define in_p(offs)		(delay_p, inb(pi->port + offs))
+
+   Hm, why not pass pi as an extra parameter?
+
+> +
+> +#define w0(byte)		out_p(0, byte)
+> +#define r0()			(in_p(0) & 0xff)
+
+   Why mask the result of inb()?
+
+> +#define w1(byte)		out_p(1, byte)
+> +#define r1()			(in_p(1) & 0xff)
+> +#define w2(byte)		out_p(2, byte)
+> +#define r2()			(in_p(2) & 0xff)
+> +#define w3(byte)		out_p(3, byte)
+> +#define w4(byte)		out_p(4, byte)
+> +#define r4()			(in_p(4) & 0xff)
+> +#define w4w(data)		do { outw(data, pi->port + 4); delay_p; } while (0)
+> +#define w4l(data)		do { outl(data, pi->port + 4); delay_p; } while (0)
+> +#define r4w()			(delay_p, inw(pi->port + 4) & 0xffff)
+> +#define r4l()			(delay_p, inl(pi->port + 4) & 0xffffffff)
+
+   Again, why mask these?
+
+> +
+> +static inline u16 pi_swab16(char *b, int k)
+> +{
+> +	union { u16 u; char t[2]; } r;
+> +
+> +	r.t[0] = b[2 * k + 1]; r.t[1] = b[2 * k];
+> +	return r.u;
+
+   Hm, swab16() instead?
+
+> +}
+> +
+> +static inline u32 pi_swab32(char *b, int k)
+> +{
+> +	union { u32 u; char f[4]; } r;
+> +
+> +	r.f[0] = b[4 * k + 1]; r.f[1] = b[4 * k];
+> +	r.f[2] = b[4 * k + 3]; r.f[3] = b[4 * k + 2];
+> +	return r.u;
+
+   And swab32() here instead?
+
+> +}
+[...]
+
+MNR, Sergey
