@@ -2,94 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BCABC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 15:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CACC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  7 Mar 2022 15:44:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242447AbiCGP3H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 7 Mar 2022 10:29:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
+        id S233446AbiCGPpT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 7 Mar 2022 10:45:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241186AbiCGP3H (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 10:29:07 -0500
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BF954683
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 07:28:12 -0800 (PST)
-Received: by mail-ej1-x62a.google.com with SMTP id bi12so19644082ejb.3
-        for <linux-block@vger.kernel.org>; Mon, 07 Mar 2022 07:28:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=Dsmq+MlGTQlhsi0/PSWxzY5GTv7L97fyNDmqPka/irU=;
-        b=VQu74XQEaRldE3nhHcGIDsAM9SidUnV6SiqWTJKIjkCHeg0y20QBlT3gshzR5/sm2t
-         xKOzqTP38MphQlkvwOF1iimZFB+IBYn9KOtxS3ADkOTyAHtcqEgHmgkvzfFYzxKRCMH4
-         4bVWeHHfCdYaOSNVLlwhDtFqjelOy4dXWrsWX1iAXFfx5ARPZJv3R2Jpi38xUgKaT/my
-         2CNydUHgyZfAIx7bjKiaJN+W3YpHyOzelri54qbm2x51zOIwzYBGKxLoIS1VNRfAB1Wj
-         Czjz0EUo7XnwcicB6dXEy2yBuuSTOefHsEZD1LehQjkPA6wdsHiHpzOSq1pmLG0v+StN
-         cslA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=Dsmq+MlGTQlhsi0/PSWxzY5GTv7L97fyNDmqPka/irU=;
-        b=5y3ffZ3FzqrdoP1Ub6Owi3ZE+wttwE/JvbXZRwHzrWoG3iQEdO57GGFcyjcL3n7+15
-         UXNmyYsnLrjupW24V1iPM5MIaGa9T+v+SO4iYE7FLy9GZP4HNWPeqyGxMTZvUiToM/F/
-         Ufll0BtnZyeGrhDSVHBDa2yBirJzYG1KiI5Dc8qE8eWOCgT9WBw9bP0r4miKGgh5W/H2
-         w4319I4awV0OkfrkGkGE9A+quBSyyumbfINr6bluadIVh6ORRR3eE4Nn6NPsm4qdAd2C
-         nXVJYPrpwSSnUAauwwTfv9WijsRFHo7RIaTqQKsNvAzCdHWALF3bjqLb+0D6rbQR4F8q
-         gmPA==
-X-Gm-Message-State: AOAM533SLSnsuxQRlxgwFGE7feGTDAjH/IH5Ye+n18m5wktgFWvWmWwO
-        k+oBBmQBpycbWqgnGivP+sEypQ==
-X-Google-Smtp-Source: ABdhPJwDUxFUbYYUgG91jFyky1Y4AWrV08+Usjavmt4n0oxvdvEds/LA4HECR4MHtZVV/zdkG5Q1ig==
-X-Received: by 2002:a17:907:9495:b0:6da:9602:3ec6 with SMTP id dm21-20020a170907949500b006da96023ec6mr9580400ejc.589.1646666891149;
-        Mon, 07 Mar 2022 07:28:11 -0800 (PST)
-Received: from smtpclient.apple (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
-        by smtp.gmail.com with ESMTPSA id e22-20020a170906505600b006da7d71f25csm4865412ejk.41.2022.03.07.07.28.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 07 Mar 2022 07:28:10 -0800 (PST)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-Date:   Mon, 7 Mar 2022 16:28:09 +0100
-Message-Id: <28809696-54D0-474E-9243-7FE27DDB732B@javigon.com>
-References: <20220307151556.GB3260574@dhcp-10-100-145-180.wdc.com>
-Cc:     James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org,
-        =?utf-8?Q?Matias_Bj=C3=B8rling?= <matias.bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
+        with ESMTP id S232892AbiCGPpT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 7 Mar 2022 10:45:19 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D67E376E1A;
+        Mon,  7 Mar 2022 07:44:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8Ou9QJwFaomPgiuepXAK3z2reqVCh8KUpveq8UjfyWU=; b=g14tomR0Ur5/KJ1lgH95fYB6OP
+        glmT9B3LaXUekGwiXTvSYpA/h0gXDnWb70Ef3lqq6YalkgG5IrtE6IYu9sCNDqG+VnlXRufw0dktQ
+        vPjG1QML5bpsJgDRjIFNtNQjpTBIGaH9WhIlBVuspbjMBkHjUaWK81ZnClPeO5F7whVsiHJdk7SVA
+        gsEMgk/9BLqIfBeoxzAPN7tYA1/JmuYlI39+8E6U3LfE0UFrSQTpOIUjIhYy15YNuYN9Wmy5KmeEl
+        /doSZkCqrtvcQ8PVzPWjyBpxAK/wcVSVDF1UM5vaHyTZQLR4/QYJZzWNAcj3c/EtmBQCXfJaYnxOT
+        Rltv3gKg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nRFX4-000fQy-HV; Mon, 07 Mar 2022 15:44:22 +0000
+Date:   Mon, 7 Mar 2022 07:44:22 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Dave Chinner <david@fromorbit.com>, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, lsf-pc@lists.linux-foundation.org,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
         Bart Van Assche <bvanassche@acm.org>,
         Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
         Pankaj Raghav <pankydev8@gmail.com>,
         Kanchan Joshi <joshi.k@samsung.com>,
         Nitesh Shetty <nj.shetty@samsung.com>
-In-Reply-To: <20220307151556.GB3260574@dhcp-10-100-145-180.wdc.com>
-To:     Keith Busch <kbusch@kernel.org>
-X-Mailer: iPhone Mail (19D52)
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <YiYoVmQE54mVFzHL@bombadil.infradead.org>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <20220304001022.GJ3927073@dread.disaster.area>
+ <YiKOQM+HMZXnArKT@bombadil.infradead.org>
+ <e2aeff43-a8e6-e160-1b35-1a2c1b32e443@opensource.wdc.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e2aeff43-a8e6-e160-1b35-1a2c1b32e443@opensource.wdc.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Mon, Mar 07, 2022 at 08:56:30AM +0900, Damien Le Moal wrote:
+> btrfs maps zones to block groups and the sectors between zone capacity
+> and zone size are marked as unusable. The report above is not showing
+> that. The coding is correct though. The block allocation will not be
+> attempted beyond zone capacity.
 
-> On 7 Mar 2022, at 16.16, Keith Busch <kbusch@kernel.org> wrote:
->=20
-> =EF=BB=BFOn Mon, Mar 07, 2022 at 03:35:12PM +0100, Javier Gonz=C3=A1lez wr=
-ote:
->> As I mentioned in the last reply to to Dave, the main concern for me
->> at the moment is supporting arbitrary zone sizes in the kernel. If we
->> can agree on a path towards that, we can definitely commit to focus on
->> ZoneFS and implement support for it on the different places we
->> maintain in user-space.=20
->=20
-> FWIW, the block layer doesn't require pow2 chunk_sectors anymore, so it
-> looks like that requirement for zone sizes can be relaxed, too.
+That does not explain or justify why zone size was used instead of zone
+capacity. Using the zones size gives an incorrect inflated sense of actual
+capacity, and users / userspace applications can easily missuse that.
 
-Exactly. This is the core of the proposal.=20
+Should other filesystems follow this logic as well? If so why?
 
+  Luis
