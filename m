@@ -2,65 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E55C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 09:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 273E5C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 09:59:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345246AbiCHJOB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 04:14:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39660 "EHLO
+        id S1345564AbiCHKA0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 05:00:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49122 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345192AbiCHJOA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 04:14:00 -0500
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B611A2982D
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 01:13:02 -0800 (PST)
-Received: by mail-ed1-x532.google.com with SMTP id o1so22490291edc.3
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 01:13:02 -0800 (PST)
+        with ESMTP id S1345561AbiCHKAW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 05:00:22 -0500
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A99237ABC
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 01:59:26 -0800 (PST)
+Received: by mail-ej1-x62b.google.com with SMTP id qt6so37933407ejb.11
+        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 01:59:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=4xwIW2FJYN5j+5RpBlcJYuBie5cHjb16/BXLSJiVNSY=;
-        b=ypJzaTljTOo6hefJ35LpGKLHL3EV/E+qUm7RmOF7jFkbNwvnZ7NE7pj1pciq1eaGEx
-         A9+HaBmn4ZwWdKhvzi4CxYEcga8QQKxMNXjQIL+PPRXQN8l4TjfuaBfxRf1oQWGvsv36
-         pIxBpWfjRGX8AWwqWEKtMrRLWhVuRldd5fsXMySEv+e0RBX6aMBjjfHNdq4xqB87p2MX
-         Pbx5+z+G9WrfaIyRL3RocGY17/KjWur1G4PQx2H4kUqYFv1T4y26wfq8zZKaZIk8C85Q
-         zSuczI3jgq+AWeWFuJvqXZ88sWFey3H4gKdsoC9UWGCJCHmZv/FSUGeSmgY7a6Yo8qjo
-         XBkw==
+        bh=pRG1TWdNLz8GiMsY5y8KT4bp2xB9Bcl6XVP9DPz6GnQ=;
+        b=GTOBbkSDA2VWRcV26QmnqTixaxeUSvrkCGNjxamcQbWZA32Jod2BFrLB9fnhL9wSOt
+         xT4kRXQCLNbNq7zAtDDds0/h7cbVDfV7eoSQfs2jzOxjmsdf7cmRd1jvMc2trEdYhPYZ
+         Xpub9/k25spnAPcfhJ8+/BlDP6tCFmUT1UNerCkK8X0V3+ckHyUpRIYneMdY4vMA7KwX
+         EBWuIfHkTCXPwv5S7MFv+vBBFqLgJ4HSv8H4hbxZGP2UzFYUpZ9ANkBq8YIviUwePmw2
+         t0fDg6j7T5xsifZGl3XC9QVLxOK9sngbQMvaMndBmcsg4xau8T936KQser/vR8/xfwAP
+         zVrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=4xwIW2FJYN5j+5RpBlcJYuBie5cHjb16/BXLSJiVNSY=;
-        b=DA33qDmU/MyTQhx7EfSz7SF38q6Rmath3x6nkR9gJLkqEr6kBQEWZrEbiQS27kN1T6
-         uFbiOVo1QpfiVG+4GpGpyBQWczrRZslvuJ0r/kiKJ5MSCRvOi4NJJdxjrTT94qoNPvGw
-         wIBHEwLu9Ol8O6aP7IY+lZhz/807ORtj84mZXApuS01nP8URZJHFT2GOhPICBY6qGhCA
-         1G2etf5+LFpOkXolcO1gfuDURpRvAMYPKBmTwea0+BvrkjiWeaNW76drb+jnrizlrz0a
-         kUz9m+tYhKVlCxmAkhrNwZgBFSXDF8fyVmWTNin8htNTk5qThISOKm+pjm9R6JwtjxQ4
-         4ATQ==
-X-Gm-Message-State: AOAM530eD6ysTEv6C0oaXTiKENs90b49Wid7+faAek5hACKOV1v27TGz
-        uWcjNH7DneOSPmnLxETsk/yHy7R8Izjr+g==
-X-Google-Smtp-Source: ABdhPJwTlh4V/ELL3KLh8UL7xqheRe8zLtuSqQpxO+IwY6dI3zfokmYKYwTSL1sL/5eKrJcyK3Ix4w==
-X-Received: by 2002:a50:e08c:0:b0:407:cdc6:809e with SMTP id f12-20020a50e08c000000b00407cdc6809emr14953408edl.162.1646730781303;
-        Tue, 08 Mar 2022 01:13:01 -0800 (PST)
+        bh=pRG1TWdNLz8GiMsY5y8KT4bp2xB9Bcl6XVP9DPz6GnQ=;
+        b=iMkDCGlge/zAORNOl9LNbnxRNj2qBw+A5Yab67XeDgSSofyszr+KBH4hc1Kcod8b04
+         L8HQ9Mmm8oVg2OX6QYWmhzEM9Lwan0b7+zs3/NWNfhLlSIBJYx7ovh7/B2fDr7huIWDZ
+         xgSGn1fyeFffWsMrmP4Dt+JAMJpH5vSxbmq1ckPmsmnpY6+xUdz6spd4kjdXI9K/WEmX
+         4hRA01wu8vJ5zC8G+F9ZmUWx6jNOTcieNapkiH+Qrypmr/TxTGx9nVxPkmvyjVhTJVL+
+         Gti2z5QunVindlUEF9l5Jlv2sUWGZi4fLjj1cr5lYdkpaNVnLuzhSxuIB8xesCsTtUSV
+         EMVQ==
+X-Gm-Message-State: AOAM5339y3A1HGljhfPZYabO3Nllkh69gH25MpJY/DKIOWxhNLB460DD
+        rB+q+oBa55Ee9X9Tn/5CcfTCQA==
+X-Google-Smtp-Source: ABdhPJx2L7y3iv3G/AQ2fBSScXKbPLZTYEpTt0Q9W2H/z5Onoh9Ovh8QWiTzC2ZboBeS4iPXpEufOQ==
+X-Received: by 2002:a17:906:3a4f:b0:6cf:86e0:586c with SMTP id a15-20020a1709063a4f00b006cf86e0586cmr12480862ejf.626.1646733564618;
+        Tue, 08 Mar 2022 01:59:24 -0800 (PST)
 Received: from [192.168.0.15] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id q11-20020a170906144b00b006cf61dfb03esm5663090ejc.62.2022.03.08.01.13.00
+        by smtp.gmail.com with ESMTPSA id s21-20020a170906961500b006daac87ddb0sm4882842ejx.140.2022.03.08.01.59.23
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 08 Mar 2022 01:13:00 -0800 (PST)
+        Tue, 08 Mar 2022 01:59:24 -0800 (PST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH] bfq: default slice_idle to 0 for SSD
+Subject: Re: [PATCH] Revert "Revert "block, bfq: honor already-setup queue
+ merges""
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20220308000253.645107-1-khazhy@google.com>
-Date:   Tue, 8 Mar 2022 10:12:59 +0100
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
+In-Reply-To: <20211125181510.15004-1-paolo.valente@linaro.org>
+Date:   Tue, 8 Mar 2022 10:59:22 +0100
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        =?utf-8?Q?Holger_Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <61B4B869-1B0B-4FE9-9AEE-712A3F50EDA6@linaro.org>
-References: <20220308000253.645107-1-khazhy@google.com>
-To:     Khazhismel Kumykov <khazhy@google.com>
+Message-Id: <82461016-858C-487B-B3B2-ED0008BB2501@linaro.org>
+References: <20211125181510.15004-1-paolo.valente@linaro.org>
+To:     Jens Axboe <axboe@kernel.dk>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
@@ -68,42 +68,82 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-> Il giorno 8 mar 2022, alle ore 01:02, Khazhismel Kumykov =
-<khazhy@google.com> ha scritto:
+> Il giorno 25 nov 2021, alle ore 19:15, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
 >=20
-> This improves performance on SSDs dramatically, and was default for =
-CFQ
+> A crash [1] happened to be triggered in conjunction with commit
+> 2d52c58b9c9b ("block, bfq: honor already-setup queue merges"). The
+> latter was then reverted by commit ebc69e897e17 ("Revert "block, bfq:
+> honor already-setup queue merges""). Yet, the reverted commit was not
+> the one introducing the bug. In fact, it actually triggered a UAF
+> introduced by a different commit, and now fixed by commit d29bd41428cf
+> ("block, bfq: reset last_bfqq_created on group change").
+>=20
+> So, there is no point in keeping commit 2d52c58b9c9b ("block, bfq:
+> honor already-setup queue merges") out. This commit restores it.
 >=20
 
-Ho,
-unfortunately it is unacceptable, because it simply switches BFQ off =
-with sync I/O.
+Hi,
+this patch does not seem to have been applied yet (or at least
+commented if there are still problems).
 
 Thanks,
 Paolo
 
-> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+> [1] https://bugzilla.kernel.org/show_bug.cgi?id=3D214503
+>=20
+> Reported-by: Holger Hoffst=C3=A4tte <holger@applied-asynchrony.com>
+> Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
 > ---
-> block/bfq-iosched.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> block/bfq-iosched.c | 16 +++++++++++++---
+> 1 file changed, 13 insertions(+), 3 deletions(-)
 >=20
 > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 36a66e97e3c2..f3196036940c 100644
+> index fec18118dc30..7cde7a11c42b 100644
 > --- a/block/bfq-iosched.c
 > +++ b/block/bfq-iosched.c
-> @@ -7105,7 +7105,8 @@ static int bfq_init_queue(struct request_queue =
-*q, struct elevator_type *e)
-> 	bfqd->bfq_fifo_expire[1] =3D bfq_fifo_expire[1];
-> 	bfqd->bfq_back_max =3D bfq_back_max;
-> 	bfqd->bfq_back_penalty =3D bfq_back_penalty;
-> -	bfqd->bfq_slice_idle =3D bfq_slice_idle;
-> +	/* Default to no idling for SSDs */
-> +	bfqd->bfq_slice_idle =3D blk_queue_nonrot(q) ? 0 : =
-bfq_slice_idle;
-> 	bfqd->bfq_timeout =3D bfq_timeout;
+> @@ -2662,6 +2662,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct =
+bfq_queue *new_bfqq)
+> 	 * are likely to increase the throughput.
+> 	 */
+> 	bfqq->new_bfqq =3D new_bfqq;
+> +	/*
+> +	 * The above assignment schedules the following redirections:
+> +	 * each time some I/O for bfqq arrives, the process that
+> +	 * generated that I/O is disassociated from bfqq and
+> +	 * associated with new_bfqq. Here we increases new_bfqq->ref
+> +	 * in advance, adding the number of processes that are
+> +	 * expected to be associated with new_bfqq as they happen to
+> +	 * issue I/O.
+> +	 */
+> 	new_bfqq->ref +=3D process_refs;
+> 	return new_bfqq;
+> }
+> @@ -2724,6 +2733,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq,
+> {
+> 	struct bfq_queue *in_service_bfqq, *new_bfqq;
 >=20
-> 	bfqd->bfq_large_burst_thresh =3D 8;
+> +	/* if a merge has already been setup, then proceed with that =
+first */
+> +	if (bfqq->new_bfqq)
+> +		return bfqq->new_bfqq;
+> +
+> 	/*
+> 	 * Check delayed stable merge for rotational or non-queueing
+> 	 * devs. For this branch to be executed, bfqq must not be
+> @@ -2825,9 +2838,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq,
+> 	if (bfq_too_late_for_merging(bfqq))
+> 		return NULL;
+>=20
+> -	if (bfqq->new_bfqq)
+> -		return bfqq->new_bfqq;
+> -
+> 	if (!io_struct || unlikely(bfqq =3D=3D &bfqd->oom_bfqq))
+> 		return NULL;
+>=20
 > --=20
-> 2.35.1.616.g0bdcbb4464-goog
+> 2.20.1
 >=20
 
