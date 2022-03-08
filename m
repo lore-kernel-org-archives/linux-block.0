@@ -2,83 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D61C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 05:53:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61E15C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 05:56:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344238AbiCHFyH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 00:54:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48778 "EHLO
+        id S233834AbiCHF5d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 00:57:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344388AbiCHFxm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 00:53:42 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4524C2D;
-        Mon,  7 Mar 2022 21:52:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=3yB2XsyLKYaJ70QzihkaDUnfu7i+Z20pSW9GReQZ4mo=; b=NgbX3854/TcBPXU6tCmJXwC+8I
-        ReGuzC4h+br/bV1ckqOQ5fYuI81HZLOm8GUc7NQHM5m09B7EKhOsJmzVsKMkEknlU0VCFcUJLbTJ0
-        KlCYRJ4IRDD8gRNhQSu1JopKzBAjytBEy2K7ylEbLcAuSRBFw/dxJpvXV7P6ZuTfuRp/kx4pEdYQI
-        qqj4u3IbzC8zkLOkNjxK4FYnCRYpicwK5PNV1PDfRQPUzHeKHKQqBwPCqzMNsjY/IZwoI3nupiUjl
-        eaaFH/qhis65UEkD1C7Ug68ahqVnlmQvre9hllHc1QPOnryuJgDHKgDppn01DDZIpbHQjTMlQoiqd
-        WJt27MLA==;
-Received: from [2001:4bb8:184:7746:6f50:7a98:3141:c37b] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nRSlx-002ivg-DI; Tue, 08 Mar 2022 05:52:37 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Ming Lei <ming.lei@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: [PATCH 14/14] block: move rq_qos_exit() into disk_release()
-Date:   Tue,  8 Mar 2022 06:52:00 +0100
-Message-Id: <20220308055200.735835-15-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220308055200.735835-1-hch@lst.de>
-References: <20220308055200.735835-1-hch@lst.de>
+        with ESMTP id S233650AbiCHF5c (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 00:57:32 -0500
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D67A32991;
+        Mon,  7 Mar 2022 21:56:36 -0800 (PST)
+Received: from ip4d144895.dynamic.kabel-deutschland.de ([77.20.72.149] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1nRSpm-0003fn-Ba; Tue, 08 Mar 2022 06:56:34 +0100
+Message-ID: <4af605b4-d4c9-0060-9a26-f9846d44a328@leemhuis.info>
+Date:   Tue, 8 Mar 2022 06:56:33 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Justin Sanders <justin@coraid.com>
+From:   Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Bug 215647 - aoe: removing aoe devices with flush (implicit in rmmod
+ aoe) leads to page fault
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1646718996;ff796f56;
+X-HE-SMSGID: 1nRSpm-0003fn-Ba
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Ming Lei <ming.lei@redhat.com>
+Hi! As part of my regression tracking work I noticed this bug report
+that was filed about a week ago:
 
-Keep all teardown of file system I/O related functionality in one place.
-There can't be file system I/O in disk_release(), so it is safe to move
-rq_qos_exit() there.
+https://bugzilla.kernel.org/show_bug.cgi?id=215647
 
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/genhd.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+To quote the first para:
 
-diff --git a/block/genhd.c b/block/genhd.c
-index 857e0a54da7dd..56f66c6fee943 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -627,7 +627,6 @@ void del_gendisk(struct gendisk *disk)
- 
- 	blk_mq_freeze_queue_wait(q);
- 
--	rq_qos_exit(q);
- 	blk_sync_queue(q);
- 	blk_flush_integrity();
- 	/*
-@@ -1119,7 +1118,7 @@ static void disk_release_mq(struct request_queue *q)
- 		elevator_exit(q);
- 		mutex_unlock(&q->sysfs_lock);
- 	}
--
-+	rq_qos_exit(q);
- 	__blk_mq_unfreeze_queue(q, true);
- }
- 
--- 
-2.30.2
+> there is a bug in the aoe driver module between v4.20-rc1 and
+> v5.14-rc1 inroduced in 3582dd2 (aoe: convert aoeblk to blk-mq) and
+> fixed in 6560ec9 (aoe: use blk_mq_alloc_disk and blk_cleanup_disk). 
+> Every forcible removal of an aoe device (eg. "rmmod aoe" with aoe
+> devices available or "aoe-flush ex.x") leads to a page fault. This
+> bug was successfully reproduced with kernel 5.10.92 from the debian
+> repository, there were no changes to the affected code between
+> v4.20-rc1 and v5.14-rc1. Version 4.19.208 (from debian buster) and
+> 5.17-rc4 (from debian experimental) are confirmed not to be
+> affected.
 
+I checked the logs to see why mainline might not be affected anymore and
+noticed a recent commit in the same area:
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/block/aoe/aoedev.c?id=6560ec961a080944f8d5e1fef17b771bfaf189cb
+
+> From 6560ec961a080944f8d5e1fef17b771bfaf189cb Mon Sep 17 00:00:00 2001
+> From: Christoph Hellwig <hch@lst.de>
+> Date: Wed, 2 Jun 2021 09:53:31 +0300
+> Subject: aoe: use blk_mq_alloc_disk and blk_cleanup_disk
+> 
+> Use blk_mq_alloc_disk and blk_cleanup_disk to simplify the gendisk and
+> request_queue allocation.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+> Link: https://lore.kernel.org/r/20210602065345.355274-17-hch@lst.de
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> ---
+>  drivers/block/aoe/aoedev.c | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> (limited to 'drivers/block/aoe/aoedev.c')
+> 
+> diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+> index e2ea2356da061..c5753c6bfe804 100644
+> --- a/drivers/block/aoe/aoedev.c
+> +++ b/drivers/block/aoe/aoedev.c
+> @@ -277,9 +277,8 @@ freedev(struct aoedev *d)
+>  	if (d->gd) {
+>  		aoedisk_rm_debugfs(d);
+>  		del_gendisk(d->gd);
+> -		put_disk(d->gd);
+> +		blk_cleanup_disk(d->gd);
+>  		blk_mq_free_tag_set(&d->tag_set);
+> -		blk_cleanup_queue(d->blkq);
+>  	}
+>  	t = d->targets;
+>  	e = t + d->ntargets;
+
+Does that need backporting? Or is the patch the reporter provided in
+bugzilla the easier and safer way to fix that regression in older releases?
+
+Ciao, Thorsten
