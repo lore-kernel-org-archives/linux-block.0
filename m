@@ -2,157 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A07C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 20:48:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5D7C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 21:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350165AbiCHUtW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 15:49:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49768 "EHLO
+        id S1350347AbiCHVrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 16:47:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349204AbiCHUtV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 15:49:21 -0500
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF84931504
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 12:48:22 -0800 (PST)
-Received: by mail-ej1-x630.google.com with SMTP id qt6so475409ejb.11
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 12:48:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arrikto-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=ZwTZJ+cU/YiESkdxq7NY4b6RLcbHEOvUMvJI9bbFH7M=;
-        b=Gwnt7g1XSPp1zY58EeFWUMm5Q6xwrt/izpp+FhPjy+7iS1GbvRRNqzDyqXMF4t7xO1
-         ZklX9hQxNs+ZdvPab9Q28wcBu4BGYbDhrdk5ddjP9gSzihnpoHUbou9SBEnPmhPfScRp
-         bGaCVQ1Utj2EZdYlP3YhQGLUPCyyRCB8tyHaXytM2w8JLJElKi6kAz3iULOo7EQIPIf+
-         itVbQlj6VZ7ClmD0lS/swlcnAsK0r/d6eN2usBdu7H1rjAUyYWNNJ6Y+e7VHPKKjbN8E
-         n3Mm5UxU9+4kS7CGY0vNMa/v55sSzNUVC8l5n32k+rx5W2a9rF1BAAr9xwCNrnSnsmcr
-         Q5Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ZwTZJ+cU/YiESkdxq7NY4b6RLcbHEOvUMvJI9bbFH7M=;
-        b=LngMgaDzny55vP7ayur9Ng6EldxwvfI10o/sHuwzxPZCZcuX5Y/+CvfJm++XivwVq4
-         i27I5cgKSzEWufgstr6NVjOtmVPruhUFXCHxF9kEzPSJTWklYfTNSaInWBjjriPORGKS
-         ObSqFOBJbV/CMBaGuzPTKVHPz3IVjCwDGQHGUJ/b/k5f/lKUXpiSb00BM5j4whU5+f1h
-         c0nNv3l+HwN9oRdHCbAaCkcIdQPJHETvrS2rHbpCmG7mQn1s92na+WMJzFD0adfQDdjE
-         oa4Ps8KUyLZr6i41i0MPF7RaVCdIJKAbkiS+yPAx6yo98SCQN8IX05zHJ/mfxa/zLHSJ
-         VJ3A==
-X-Gm-Message-State: AOAM5308nFr+W0ayU+nVsRyNBFGu45nxFgviOHFnoNHAeqof+BZmd9Ki
-        u+E5XA5GJZbeucwGI4BCEjlUSw==
-X-Google-Smtp-Source: ABdhPJxoU+8TvtIedOHXaAEiIlveanpsqTd3At14GihTobnyXos5yBO4WToMuK5Nec5SIeR3YDUPEQ==
-X-Received: by 2002:a17:907:168a:b0:6da:9167:47dc with SMTP id hc10-20020a170907168a00b006da916747dcmr14943856ejc.126.1646772501317;
-        Tue, 08 Mar 2022 12:48:21 -0800 (PST)
-Received: from [172.16.10.50] (213.16.240.129.dsl.dyn.forthnet.gr. [213.16.240.129])
-        by smtp.gmail.com with ESMTPSA id r23-20020aa7da17000000b00415a1431488sm8172430eds.4.2022.03.08.12.48.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Mar 2022 12:48:20 -0800 (PST)
-Message-ID: <23895da7-bcec-d092-373a-c3d961ab5c48@arrikto.com>
-Date:   Tue, 8 Mar 2022 22:48:17 +0200
+        with ESMTP id S1346980AbiCHVrN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 16:47:13 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94D095548F;
+        Tue,  8 Mar 2022 13:46:16 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 27CD0612F2;
+        Tue,  8 Mar 2022 21:46:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4FEDC340EC;
+        Tue,  8 Mar 2022 21:46:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1646775975;
+        bh=4NQDgg8rDLEMggBz3LqMK5Y31CHXEmbf5huKroKeVug=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=tTjSem06XXUAXfGknm1y00SGv6velA0nDArAbaZIknN3C+Cg5qeEG+3WWvq/nN02v
+         E7RD/Z5YeFdudMIw02dAnJgEk982YfLlYbUptqBpOypbChuykEctwxp/4yfytESZKD
+         tmem03zzNHQARta8jkC0n8RLcHFkhCBhE6vuWYd5Es0kGFVTUmf4t1ISE/6v3C62Ml
+         pNGQ21vpX7Yyf6abzGXVgcaO4LCj5W2zZSAdRD3GB8qoJTFzyLddgh31uH2+ov5VvB
+         EIpTEH3kD7iA4yZmbbaNxGo4C51IDEy5RDTQpWFbowZH+NHpcrnJG3IDfJupEWJPnI
+         5aLl0SLvmYs3A==
+Date:   Tue, 8 Mar 2022 13:46:12 -0800
+From:   Keith Busch <kbusch@kernel.org>
+To:     Vasily Gorbik <gor@linux.ibm.com>
+Cc:     linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+        axboe@kernel.dk, hch@lst.de, martin.petersen@oracle.com
+Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
+Message-ID: <20220308214612.GB3502158@dhcp-10-100-145-180.wdc.com>
+References: <20220303201312.3255347-1-kbusch@kernel.org>
+ <20220303201312.3255347-7-kbusch@kernel.org>
+ <your-ad-here.call-01646770901-ext-3299@work.hours>
+ <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
-Content-Language: en-US
-To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "martin.petersen@oracle.com >> Martin K. Petersen" 
-        <martin.petersen@oracle.com>,
-        "roland@purestorage.com" <roland@purestorage.com>,
-        "mpatocka@redhat.com" <mpatocka@redhat.com>,
-        Hannes Reinecke <hare@suse.de>,
-        "kbus >> Keith Busch" <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
-        "zach.brown@ni.com" <zach.brown@ni.com>,
-        "osandov@fb.com" <osandov@fb.com>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "djwong@kernel.org" <djwong@kernel.org>,
-        "josef@toxicpanda.com" <josef@toxicpanda.com>,
-        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
-        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>
-References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com>
- <012723a9-2e9c-c638-4944-fa560e1b0df0@arrikto.com>
- <c4124f39-1ee9-8f34-e731-42315fee15f9@nvidia.com>
-From:   Nikos Tsironis <ntsironis@arrikto.com>
-In-Reply-To: <c4124f39-1ee9-8f34-e731-42315fee15f9@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/1/22 23:32, Chaitanya Kulkarni wrote:
-> Nikos,
+On Tue, Mar 08, 2022 at 12:27:47PM -0800, Keith Busch wrote:
+> On Tue, Mar 08, 2022 at 09:21:41PM +0100, Vasily Gorbik wrote:
+> > On Thu, Mar 03, 2022 at 12:13:10PM -0800, Keith Busch wrote:
+> > > Hardware specific features may be able to calculate a crc64, so provide
+> > > a framework for drivers to register their implementation. If nothing is
+> > > registered, fallback to the generic table lookup implementation. The
+> > > implementation is modeled after the crct10dif equivalent.
+> > 
+> > Hi Keith,
+> > 
+> > this is failing on big-endian systems. I get the following on s390:
 > 
->>> [8] https://kernel.dk/io_uring.pdf
->>
->> I would like to participate in the discussion too.
->>
->> The dm-clone target would also benefit from copy offload, as it heavily
->> employs dm-kcopyd. I have been exploring redesigning kcopyd in order to
->> achieve increased IOPS in dm-clone and dm-snapshot for small copies over
->> NVMe devices, but copy offload sounds even more promising, especially
->> for larger copies happening in the background (as is the case with
->> dm-clone's background hydration).
->>
->> Thanks,
->> Nikos
-> 
-> If you can document your findings here it will be great for me to
-> add it to the agenda.
-> 
+> Oh, I see the put_unaligned_le64() in chksum_final() was not the correct
+> action. I'll send an update, thank you for the report.
 
-My work focuses mainly on improving the IOPs and latency of the
-dm-snapshot target, in order to bring the performance of short-lived
-snapshots as close as possible to bare-metal performance.
+I'll set up a BE qemu target this week, but in the meantime, would you
+be able to confirm if the following is successful?
 
-My initial performance evaluation of dm-snapshot had revealed a big
-performance drop, while the snapshot is active; a drop which is not
-justified by COW alone.
-
-Using fio with blktrace I had noticed that the per-CPU I/O distribution
-was uneven. Although many threads were doing I/O, only a couple of the
-CPUs ended up submitting I/O requests to the underlying device.
-
-The same issue also affects dm-clone, when doing I/O with sizes smaller
-than the target's region size, where kcopyd is used for COW.
-
-The bottleneck here is kcopyd serializing all I/O. Users of kcopyd, such
-as dm-snapshot and dm-clone, cannot take advantage of the increased I/O
-parallelism that comes with using blk-mq in modern multi-core systems,
-because I/Os are issued only by a single CPU at a time, the one on which
-kcopyd’s thread happens to be running.
-
-So, I experimented redesigning kcopyd to prevent I/O serialization by
-respecting thread locality for I/Os and their completions. This made the
-distribution of I/O processing uniform across CPUs.
-
-My measurements had shown that scaling kcopyd, in combination with
-scaling dm-snapshot itself [1] [2], can lead to an eventual performance
-improvement of ~300% increase in sustained throughput and ~80% decrease
-in I/O latency for transient snapshots, over the null_blk device.
-
-The work for scaling dm-snapshot has been merged [1], but,
-unfortunately, I haven't been able to send upstream my work on kcopyd
-yet, because I have been really busy with other things the last couple
-of years.
-
-I haven't looked into the details of copy offload yet, but it would be
-really interesting to see how it affects the performance of random and
-sequential workloads, and to check how, and if, scaling kcopyd affects
-the performance, in combination with copy offload.
-
-Nikos
-
-[1] https://lore.kernel.org/dm-devel/20190317122258.21760-1-ntsironis@arrikto.com/
-[2] https://lore.kernel.org/dm-devel/425d7efe-ab3f-67be-264e-9c3b6db229bc@arrikto.com/
+---
+diff --git a/crypto/crc64_rocksoft_generic.c b/crypto/crc64_rocksoft_generic.c
+index 9e812bb26dba..12a8b0575ad1 100644
+--- a/crypto/crc64_rocksoft_generic.c
++++ b/crypto/crc64_rocksoft_generic.c
+@@ -28,14 +28,14 @@ static int chksum_final(struct shash_desc *desc, u8 *out)
+ {
+ 	u64 *crc = shash_desc_ctx(desc);
+ 
+-	put_unaligned_le64(*crc, out);
++	put_unaligned(*crc, (u64 *)out);
+ 	return 0;
+ }
+ 
+ static int __chksum_finup(u64 crc, const u8 *data, unsigned int len, u8 *out)
+ {
+ 	crc = crc64_rocksoft_generic(crc, data, len);
+-	put_unaligned_le64(crc, out);
++	put_unaligned(crc, (u64 *)out);
+ 	return 0;
+ }
+ 
+--
