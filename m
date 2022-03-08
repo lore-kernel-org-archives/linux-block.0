@@ -2,280 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D2A5C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 07:33:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 008A5C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 07:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344498AbiCHHej (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 02:34:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38070 "EHLO
+        id S1344554AbiCHHet (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 02:34:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344551AbiCHHej (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 02:34:39 -0500
+        with ESMTP id S1344551AbiCHHes (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 02:34:48 -0500
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2519E35DED
-        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 23:33:43 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 51D2936335
+        for <linux-block@vger.kernel.org>; Mon,  7 Mar 2022 23:33:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646724822;
+        s=mimecast20190719; t=1646724832;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U9MSbloZGfPeakwSk6qnTSBxJRl7MwlkMx1CFcLTNSU=;
-        b=Jw0lOIjbWrA3ZNjk+0aRpna73DH134paQ70pu1JS8CU3Zt4OBRGQPwwfTGfbhZDgz4YJiL
-        uB9VFaoUTlKVL9Tb7JIvOgx1qCqeOe5fdyZUGlphZ8zdhwczsQ/uSQ/YwAeRqKJ5jFo3JA
-        TJJoHpD4d20zx2fFMbK0d2X/YBoNST0=
+        bh=2ZQRJsj2YzJqXJUCfeAgVF9BX7Yf0hFKZqeKG50eaPE=;
+        b=AqJDlnOGbwbZiaVvum/BJ2b7xYk0YWWVzLKtKSAMWEvzJIytb5SfDQQCl/KaVbOab5hVSN
+        0tHJulaDeH80Oby9GNVhXB8nMTDptpkk2ogQeTwA41DhPP4tmSnUOnUBiFUMGtf2h2idwf
+        9iHvDBuDWAl+nyHG0ooK5rDvINRjp0M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-355-2bIFxwcOPpiLXkIJLyKXRg-1; Tue, 08 Mar 2022 02:33:39 -0500
-X-MC-Unique: 2bIFxwcOPpiLXkIJLyKXRg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+ us-mta-653-pDlinjYfMeGi49GBgFkD9A-1; Tue, 08 Mar 2022 02:33:09 -0500
+X-MC-Unique: pDlinjYfMeGi49GBgFkD9A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA9012D4;
-        Tue,  8 Mar 2022 07:33:37 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D9FF951DF;
+        Tue,  8 Mar 2022 07:33:03 +0000 (UTC)
 Received: from localhost (ovpn-8-34.pek2.redhat.com [10.72.8.34])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 431776F974;
-        Tue,  8 Mar 2022 07:33:28 +0000 (UTC)
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 922C562D68;
+        Tue,  8 Mar 2022 07:32:59 +0000 (UTC)
 From:   Ming Lei <ming.lei@redhat.com>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>,
-        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH V4 6/6] blk-mq: manage hctx map via xarray
-Date:   Tue,  8 Mar 2022 15:32:19 +0800
-Message-Id: <20220308073219.91173-7-ming.lei@redhat.com>
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH V4 3/6] blk-mq: reconfigure poll after queue map is changed
+Date:   Tue,  8 Mar 2022 15:32:16 +0800
+Message-Id: <20220308073219.91173-4-ming.lei@redhat.com>
 In-Reply-To: <20220308073219.91173-1-ming.lei@redhat.com>
 References: <20220308073219.91173-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-First code becomes more clean by switching to xarray from plain array.
+queue map can be changed when updating nr_hw_queues, so we need to
+reconfigure queue's poll capability. Add one helper for doing this job.
 
-Second use-after-free on q->queue_hw_ctx can be fixed because
-queue_for_each_hw_ctx() may be run when updating nr_hw_queues is
-in-progress. With this patch, q->hctx_table is defined as xarray, and
-this structure will share same lifetime with request queue, so
-queue_for_each_hw_ctx() can use q->hctx_table to lookup hctx reliably.
-
-Reported-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Hannes Reinecke <hare@suse.de>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-mq-tag.c     |  2 +-
- block/blk-mq.c         | 62 ++++++++++++++++--------------------------
- block/blk-mq.h         |  2 +-
- include/linux/blk-mq.h |  3 +-
- include/linux/blkdev.h |  2 +-
- 5 files changed, 28 insertions(+), 43 deletions(-)
+ block/blk-mq.c | 16 +++++++++++++---
+ 1 file changed, 13 insertions(+), 3 deletions(-)
 
-diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index 1850a4225e12..68ac23d0b640 100644
---- a/block/blk-mq-tag.c
-+++ b/block/blk-mq-tag.c
-@@ -498,7 +498,7 @@ void blk_mq_queue_tag_busy_iter(struct request_queue *q, busy_tag_iter_fn *fn,
- 		void *priv)
- {
- 	/*
--	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and queue_hw_ctx
-+	 * __blk_mq_update_nr_hw_queues() updates nr_hw_queues and hctx_table
- 	 * while the queue is frozen. So we can use q_usage_counter to avoid
- 	 * racing with it.
- 	 */
 diff --git a/block/blk-mq.c b/block/blk-mq.c
-index bffdd71c670d..e8d6d7a05a43 100644
+index 64fddb36c93c..57ae9df0f4dc 100644
 --- a/block/blk-mq.c
 +++ b/block/blk-mq.c
-@@ -71,7 +71,8 @@ static int blk_mq_poll_stats_bkt(const struct request *rq)
- static inline struct blk_mq_hw_ctx *blk_qc_to_hctx(struct request_queue *q,
- 		blk_qc_t qc)
- {
--	return q->queue_hw_ctx[(qc & ~BLK_QC_T_INTERNAL) >> BLK_QC_T_SHIFT];
-+	return xa_load(&q->hctx_table,
-+			(qc & ~BLK_QC_T_INTERNAL) >> BLK_QC_T_SHIFT);
- }
- 
- static inline struct request *blk_qc_to_rq(struct blk_mq_hw_ctx *hctx,
-@@ -573,7 +574,7 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
- 	 * If not tell the caller that it should skip this queue.
- 	 */
- 	ret = -EXDEV;
--	data.hctx = q->queue_hw_ctx[hctx_idx];
-+	data.hctx = xa_load(&q->hctx_table, hctx_idx);
- 	if (!blk_mq_hw_queue_mapped(data.hctx))
- 		goto out_queue_exit;
- 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
-@@ -3437,6 +3438,8 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 
- 	blk_mq_remove_cpuhp(hctx);
- 
-+	xa_erase(&q->hctx_table, hctx_idx);
-+
- 	spin_lock(&q->unused_hctx_lock);
- 	list_add(&hctx->hctx_list, &q->unused_hctx_list);
- 	spin_unlock(&q->unused_hctx_lock);
-@@ -3476,8 +3479,15 @@ static int blk_mq_init_hctx(struct request_queue *q,
- 	if (blk_mq_init_request(set, hctx->fq->flush_rq, hctx_idx,
- 				hctx->numa_node))
- 		goto exit_hctx;
-+
-+	if (xa_insert(&q->hctx_table, hctx_idx, hctx, GFP_KERNEL))
-+		goto exit_flush_rq;
-+
- 	return 0;
- 
-+ exit_flush_rq:
-+	if (set->ops->exit_request)
-+		set->ops->exit_request(set, hctx->fq->flush_rq, hctx_idx);
-  exit_hctx:
- 	if (set->ops->exit_hctx)
- 		set->ops->exit_hctx(hctx, hctx_idx);
-@@ -3856,7 +3866,7 @@ void blk_mq_release(struct request_queue *q)
- 		kobject_put(&hctx->kobj);
- 	}
- 
--	kfree(q->queue_hw_ctx);
-+	xa_destroy(&q->hctx_table);
- 
- 	/*
- 	 * release .mq_kobj and sw queue's kobject now because
-@@ -3945,46 +3955,28 @@ static struct blk_mq_hw_ctx *blk_mq_alloc_and_init_hctx(
- static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 						struct request_queue *q)
- {
--	int i, j, end;
--	struct blk_mq_hw_ctx **hctxs = q->queue_hw_ctx;
--
--	if (q->nr_hw_queues < set->nr_hw_queues) {
--		struct blk_mq_hw_ctx **new_hctxs;
--
--		new_hctxs = kcalloc_node(set->nr_hw_queues,
--				       sizeof(*new_hctxs), GFP_KERNEL,
--				       set->numa_node);
--		if (!new_hctxs)
--			return;
--		if (hctxs)
--			memcpy(new_hctxs, hctxs, q->nr_hw_queues *
--			       sizeof(*hctxs));
--		q->queue_hw_ctx = new_hctxs;
--		kfree(hctxs);
--		hctxs = new_hctxs;
--	}
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i, j;
- 
- 	/* protect against switching io scheduler  */
- 	mutex_lock(&q->sysfs_lock);
- 	for (i = 0; i < set->nr_hw_queues; i++) {
- 		int old_node;
- 		int node = blk_mq_get_hctx_node(set, i);
--		struct blk_mq_hw_ctx *old_hctx = hctxs[i];
-+		struct blk_mq_hw_ctx *old_hctx = xa_load(&q->hctx_table, i);
- 
- 		if (old_hctx) {
- 			old_node = old_hctx->numa_node;
- 			blk_mq_exit_hctx(q, set, old_hctx, i);
- 		}
- 
--		hctxs[i] = blk_mq_alloc_and_init_hctx(set, q, i, node);
--		if (!hctxs[i]) {
-+		if (!blk_mq_alloc_and_init_hctx(set, q, i, node)) {
- 			if (!old_hctx)
- 				break;
- 			pr_warn("Allocate new hctx on node %d fails, fallback to previous one on node %d\n",
- 					node, old_node);
--			hctxs[i] = blk_mq_alloc_and_init_hctx(set, q, i,
--					old_node);
--			WARN_ON_ONCE(!hctxs[i]);
-+			hctx = blk_mq_alloc_and_init_hctx(set, q, i, old_node);
-+			WARN_ON_ONCE(!hctx);
- 		}
- 	}
- 	/*
-@@ -3993,21 +3985,13 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
- 	 */
- 	if (i != set->nr_hw_queues) {
- 		j = q->nr_hw_queues;
--		end = i;
- 	} else {
- 		j = i;
--		end = q->nr_hw_queues;
- 		q->nr_hw_queues = set->nr_hw_queues;
- 	}
- 
--	for (; j < end; j++) {
--		struct blk_mq_hw_ctx *hctx = hctxs[j];
--
--		if (hctx) {
--			blk_mq_exit_hctx(q, set, hctx, j);
--			hctxs[j] = NULL;
--		}
--	}
-+	xa_for_each_start(&q->hctx_table, j, hctx, j)
-+		blk_mq_exit_hctx(q, set, hctx, j);
+@@ -4010,6 +4010,17 @@ static void blk_mq_realloc_hw_ctxs(struct blk_mq_tag_set *set,
  	mutex_unlock(&q->sysfs_lock);
  }
  
-@@ -4046,6 +4030,8 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	INIT_LIST_HEAD(&q->unused_hctx_list);
- 	spin_lock_init(&q->unused_hctx_lock);
- 
-+	xa_init(&q->hctx_table);
++static void blk_mq_update_poll_flag(struct request_queue *q)
++{
++	struct blk_mq_tag_set *set = q->tag_set;
 +
- 	blk_mq_realloc_hw_ctxs(set, q);
- 	if (!q->nr_hw_queues)
- 		goto err_hctxs;
-@@ -4075,7 +4061,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 	return 0;
- 
- err_hctxs:
--	kfree(q->queue_hw_ctx);
-+	xa_destroy(&q->hctx_table);
- 	q->nr_hw_queues = 0;
- 	blk_mq_sysfs_deinit(q);
- err_poll:
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 948791ea2a3e..2615bd58bad3 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -83,7 +83,7 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
- 							  enum hctx_type type,
- 							  unsigned int cpu)
++	if (set->nr_maps > HCTX_TYPE_POLL &&
++	    set->map[HCTX_TYPE_POLL].nr_queues)
++		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
++	else
++		blk_queue_flag_clear(QUEUE_FLAG_POLL, q);
++}
++
+ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 		struct request_queue *q)
  {
--	return q->queue_hw_ctx[q->tag_set->map[type].mq_map[cpu]];
-+	return xa_load(&q->hctx_table, q->tag_set->map[type].mq_map[cpu]);
- }
+@@ -4044,9 +4055,7 @@ int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
+ 	q->tag_set = set;
  
- static inline enum hctx_type blk_mq_get_hctx_type(unsigned int flags)
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 3a41d50b85d3..7aa5c54901a9 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -917,8 +917,7 @@ static inline void *blk_mq_rq_to_pdu(struct request *rq)
- }
+ 	q->queue_flags |= QUEUE_FLAG_MQ_DEFAULT;
+-	if (set->nr_maps > HCTX_TYPE_POLL &&
+-	    set->map[HCTX_TYPE_POLL].nr_queues)
+-		blk_queue_flag_set(QUEUE_FLAG_POLL, q);
++	blk_mq_update_poll_flag(q);
  
- #define queue_for_each_hw_ctx(q, hctx, i)				\
--	for ((i) = 0; (i) < (q)->nr_hw_queues &&			\
--	     ({ hctx = (q)->queue_hw_ctx[i]; 1; }); (i)++)
-+	xa_for_each(&(q)->hctx_table, (i), (hctx))
+ 	INIT_DELAYED_WORK(&q->requeue_work, blk_mq_requeue_work);
+ 	INIT_LIST_HEAD(&q->requeue_list);
+@@ -4512,6 +4521,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
+ 	blk_mq_update_queue_map(set);
+ 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
+ 		blk_mq_realloc_hw_ctxs(set, q);
++		blk_mq_update_poll_flag(q);
+ 		if (q->nr_hw_queues != set->nr_hw_queues) {
+ 			int i = prev_nr_hw_queues;
  
- #define hctx_for_each_ctx(hctx, ctx, i)					\
- 	for ((i) = 0; (i) < (hctx)->nr_ctx &&				\
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f757f9c2871f..a53ae40aaded 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -355,7 +355,7 @@ struct request_queue {
- 	unsigned int		queue_depth;
- 
- 	/* hw dispatch queues */
--	struct blk_mq_hw_ctx	**queue_hw_ctx;
-+	struct xarray		hctx_table;
- 	unsigned int		nr_hw_queues;
- 
- 	/*
 -- 
 2.31.1
 
