@@ -2,156 +2,324 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50A50C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 17:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 447F7C433FE
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 17:53:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347677AbiCHRoy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 12:44:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34900 "EHLO
+        id S1349312AbiCHRyh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 12:54:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348688AbiCHRox (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 12:44:53 -0500
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4179424B3
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 09:43:55 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220308174353euoutp023ad0fe11b7e71a65bc5323b54de20ae8~aeMxmH9dc0236002360euoutp02o
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 17:43:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220308174353euoutp023ad0fe11b7e71a65bc5323b54de20ae8~aeMxmH9dc0236002360euoutp02o
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1646761433;
-        bh=UsbxH9fg3b5xy+eQ7G64zPG/vz7t9w1vpzYP7pFWkLY=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=Rs8gS3uDO8R1cIjTONiYNlhYW7WCxlN76W15T7uJXFNPDaSEF92fEMjVSevMV7y7i
-         Mf82lXt1fdyzzkkwOLTLQxpQZ0N0bg+eFrQahCIdmUMu6PHVHN08tSxWqCPr9hm1ae
-         YYw2nfFf2m1Fzz+s8Lyr2qLjujkouOAG83Hk4vFE=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220308174352eucas1p1aaaec481d602b464e8b3f8c749ec971a~aeMxTjOi52364123641eucas1p10;
-        Tue,  8 Mar 2022 17:43:52 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 34.32.09887.8D597226; Tue,  8
-        Mar 2022 17:43:52 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220308174352eucas1p274d31bc984ef986db5fa81a1af0ed79a~aeMw5u1vy2114321143eucas1p2a;
-        Tue,  8 Mar 2022 17:43:52 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220308174352eusmtrp27ff2367cb879c65630cf89d3b98622e6~aeMw44eQm0325103251eusmtrp2k;
-        Tue,  8 Mar 2022 17:43:52 +0000 (GMT)
-X-AuditID: cbfec7f4-45bff7000000269f-4f-622795d8e1be
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 0D.77.09522.8D597226; Tue,  8
-        Mar 2022 17:43:52 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220308174352eusmtip15000d2bbae96a65daaba579199aa454f~aeMwt4oJO2560225602eusmtip1O;
-        Tue,  8 Mar 2022 17:43:52 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.181) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Tue, 8 Mar 2022 17:43:49 +0000
-Message-ID: <943d3d68-0a6b-faba-74b1-10aa4c26d99d@samsung.com>
-Date:   Tue, 8 Mar 2022 18:43:48 +0100
+        with ESMTP id S1349307AbiCHRyg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 12:54:36 -0500
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F954522CC;
+        Tue,  8 Mar 2022 09:53:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1646762018; x=1678298018;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Qitj4I97KQMnsVuQMFTQ4a/o8fe2e11Qx63wNu3uOQg=;
+  b=BHejLsn6eVeLqWHucdfk0WcwGZZ/paRmu92Vq4u54F8WOSStQ9i2xEv9
+   KhS7VR3KX/X4c+QTg3JRk5V16DPJo5bBB++PG8jZzUaT39B+Jj10690yG
+   lPLP/Nwq2g70kfI2p3DjYTOR2RObdXgk3R4fizo9FaV522KXOBi042c38
+   Lefdgxc4EFsUBXxV/r7bFmoJ8MDqUTkS8RAdlFtXim9WiXugu4Ytmxn0O
+   akDgyLvSef7Dpkly1tZoeJLLU0ET+eUqXIx+FKvQQRyjUTUuzk6+66UNY
+   kQr/+xYrUwtJGXBGglvT7C4BkxqKr9U/W4RerouHVfTIt1cv9G57j1q2u
+   Q==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="252337403"
+X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
+   d="scan'208";a="252337403"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2022 09:53:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,165,1643702400"; 
+   d="scan'208";a="513204302"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 08 Mar 2022 09:53:34 -0800
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nRe1d-0001mg-QU; Tue, 08 Mar 2022 17:53:33 +0000
+Date:   Wed, 9 Mar 2022 01:52:40 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     kbuild-all@lists.01.org, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 01/16] pata_parport: add core driver (PARIDE replacement)
+Message-ID: <202203090134.f9NhVHMa-lkp@intel.com>
+References: <20220305201411.501-2-linux@zary.sk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.5.0
-Subject: Re: [PATCH 1/6] nvme: zns: Allow ZNS drives that have
- non-power_of_2 zone size
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>
-CC:     Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>,
-        <jiangbo.365@bytedance.com>, Pankaj Raghav <pankydev8@gmail.com>,
-        "Kanchan Joshi" <joshiiitr@gmail.com>,
-        <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <20220308171457.GB3501708@dhcp-10-100-145-180.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.181]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrHKsWRmVeSWpSXmKPExsWy7djPc7o3pqonGVzqVLVYfbefzeL32fPM
-        FitXH2Wy6DnwgcXi/NvDTBaTDl1jtNh7S9ti/rKn7BYT2r4yW9yY8JTRYs3NpywW616/Z3Hg
-        8fh3Yg2bx85Zd9k9zt/byOJx+Wypx6ZVnWwem5fUe+y+2QCUa73P6vF5k5xH+4FupgCuKC6b
-        lNSczLLUIn27BK6Mi/9vsBY0sVdcmnqMqYHxMGsXIyeHhICJxJoLn9m7GLk4hARWMEr8OnKL
-        DcL5wijRvX0tC4TzmVHi9tzFLDAtJ3acZYZILGeUaPt9mBmuav/+41DDdjFKrJk7gx2khVfA
-        TuLz/B9A7RwcLAIqEif+u0CEBSVOznwCNlVUIELi5ZG/TCC2sECkxPS1e5hBbGYBcYlbT+aD
-        xUUElCXuzp/JCjKfWWAfi8Smu9eYQGayCWhJNHaCreIUcJaY2XmXCaJXU6J1+292CFteYvvb
-        OcwQHyhLvJ28kBHCrpVYe+wMO4R9ilOi51chhO0isWP6O6h6YYlXx7dA1chI/N8Jcg8XkN3P
-        KDG15Q+UM4NRoufwZrCDJASsJfrO5ECYjhI3D5pBmHwSN94KQpzDJzFp23TmCYyqs5BCYhaS
-        j2ch+WAWkg8WMLKsYhRPLS3OTU8tNspLLdcrTswtLs1L10vOz93ECExyp/8d/7KDcfmrj3qH
-        GJk4GA8xSnAwK4nw3j+vkiTEm5JYWZValB9fVJqTWnyIUZqDRUmcNzlzQ6KQQHpiSWp2ampB
-        ahFMlomDU6qBSYx9i2R8I3vm4o3ey36kzJI6z2Kg7MD5Oim7IZCR5+8pA50P/PLciqpTtqjZ
-        P9uwjjX//Ib0ix3HgjZ7nma4OMssIczx2Ks05QNt53RWq1a9aDm24vykTStPdnEnZzjdPMng
-        4viIZ46ZQERB26kfWdUs8RFfQwzndjgbTmRbPFEuwdr6scFjHV394yfZP1rmXDTTWHDwuvzk
-        HSwlUq06Ft9Mzb90LlBQ32HnN3PBBt6Y+VIrc1dc2LaWy9bpOYPJV1ff9qXvPmx9IrJ3UvWW
-        jAytqey9TzKmhLTNmsf/bXWQXtcNnTah2JkmcV4+lzM7lZew377HfFE1Q9T2+vSw44UmhTxh
-        uxpLZjXvdnugxFKckWioxVxUnAgAh9ofyuEDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpileLIzCtJLcpLzFFi42I5/e/4Xd0bU9WTDPrXcFusvtvPZvH77Hlm
-        i5WrjzJZ9Bz4wGJx/u1hJotJh64xWuy9pW0xf9lTdosJbV+ZLW5MeMposebmUxaLda/fszjw
-        ePw7sYbNY+esu+we5+9tZPG4fLbUY9OqTjaPzUvqPXbfbADKtd5n9fi8Sc6j/UA3UwBXlJ5N
-        UX5pSapCRn5xia1StKGFkZ6hpYWekYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7Gxf83WAua
-        2CsuTT3G1MB4mLWLkZNDQsBE4sSOs8xdjFwcQgJLGSXezL8KlZCR+HTlIzuELSzx51oXG0TR
-        R0aJzYdPgBUJCexilDjfwwFi8wrYSXye/4Oli5GDg0VAReLEfxeIsKDEyZlPWEBsUYEIibZl
-        U5hBSoQFIiVm3fQCCTMLiEvcejKfCcQWEVCWuDt/JivIKmaBfSwSm+5eY4LY+4NR4vGa+ewg
-        zWwCWhKNnWC3cQo4S8zsvMsEMUhTonX7b3YIW15i+9s5zBD3K0u8nbyQEcKulXh1fzfjBEbR
-        WUjOm4XkjllIRs1CMmoBI8sqRpHU0uLc9NxiQ73ixNzi0rx0veT83E2MwMSw7djPzTsY5736
-        qHeIkYmD8RCjBAezkgjv/fMqSUK8KYmVValF+fFFpTmpxYcYTYFBNJFZSjQ5H5ia8kriDc0M
-        TA1NzCwNTC3NjJXEeT0LOhKFBNITS1KzU1MLUotg+pg4OKUamDacm3ThTd4XhfTyG1+2fS8t
-        q6/dmWaZbeAm/uHppmPLZmi/cD9pob+QIeev4CzG70k7rRmU2C7zLbnx4Z94//9tsYkBFp6K
-        wSlZM68smXhiSa8l/y+G3B72dxu+Oe/mDVESsb29LDqAW+7ZRp4jgY1R7jvVK95e1NU0nH9n
-        wim92cpJ74QX9i7y8m657PA27L/EQvOak83My93Nj4usu3Jq8qGo6QsczQoYpigkNmoWPCyy
-        al1vwa5zuPtQEROz7zTVGinrDZ+5D4T2lfqWyUximifwXoOl7XJE2ZZrHrWTAv/mb3SNPftu
-        wTK1r+ecBWwNCi4sfJV/4EjiyZ4ehRX9/41PX983cYekqk4erxJLcUaioRZzUXEiABoBjriV
-        AwAA
-X-CMS-MailID: 20220308174352eucas1p274d31bc984ef986db5fa81a1af0ed79a
-X-Msg-Generator: CA
-X-RootMTR: 20220308165421eucas1p20575444f59702cd5478cb35fce8b72cd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220308165421eucas1p20575444f59702cd5478cb35fce8b72cd
-References: <20220308165349.231320-1-p.raghav@samsung.com>
-        <CGME20220308165421eucas1p20575444f59702cd5478cb35fce8b72cd@eucas1p2.samsung.com>
-        <20220308165349.231320-2-p.raghav@samsung.com>
-        <20220308171457.GB3501708@dhcp-10-100-145-180.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220305201411.501-2-linux@zary.sk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Ondrej,
+
+Thank you for the patch! Perhaps something to improve:
+
+[auto build test WARNING on hch-configfs/for-next]
+[also build test WARNING on linux/master linus/master v5.17-rc7 next-20220308]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Ondrej-Zary/pata_parport-add-core-driver-PARIDE-replacement/20220307-142912
+base:   git://git.infradead.org/users/hch/configfs.git for-next
+config: sh-allmodconfig (https://download.01.org/0day-ci/archive/20220309/202203090134.f9NhVHMa-lkp@intel.com/config)
+compiler: sh4-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/05539e2a04721c2710e7d1f6ae49926474bdf918
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Ondrej-Zary/pata_parport-add-core-driver-PARIDE-replacement/20220307-142912
+        git checkout 05539e2a04721c2710e7d1f6ae49926474bdf918
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=sh SHELL=/bin/bash drivers/ata/pata_parport/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/ata/pata_parport/pata_parport.c:341:6: warning: no previous prototype for 'pi_release' [-Wmissing-prototypes]
+     341 | void pi_release(struct pi_adapter *pi)
+         |      ^~~~~~~~~~
+>> drivers/ata/pata_parport/pata_parport.c:462:6: warning: no previous prototype for 'pata_parport_bus_release' [-Wmissing-prototypes]
+     462 | void pata_parport_bus_release(struct device *dev)
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/ata/pata_parport/pata_parport.c:476:20: warning: no previous prototype for 'pi_init_one' [-Wmissing-prototypes]
+     476 | struct pi_adapter *pi_init_one(struct parport *parport, struct pi_protocol *pr,
+         |                    ^~~~~~~~~~~
 
 
-On 2022-03-08 18:14, Keith Busch wrote:
-> The zns report zones realigns the starting sector using an expected pow2
-> value, so I think you need to update that as well with something like
-> the following:
-> 
-> @@ -197,7 +189,7 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->  	c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
->  	c.zmr.pr = NVME_REPORT_ZONE_PARTIAL;
->  
-> -	sector &= ~(ns->zsze - 1);
-> +	sector = sector - sector % ns->zsze;
->  	while (zone_idx < nr_zones && sector < get_capacity(ns->disk)) {
->  		memset(report, 0, buflen);
->  
+vim +/pi_release +341 drivers/ata/pata_parport/pata_parport.c
 
-I actually have these changes in the Patch 4/6:
--	sector &= ~(ns->zsze - 1);
-+	sector = rounddown(sector, zone_size);
+   340	
+ > 341	void pi_release(struct pi_adapter *pi)
+   342	{
+   343		parport_unregister_device(pi->pardev);
+   344		if (pi->proto->release_proto)
+   345			pi->proto->release_proto(pi);
+   346		module_put(pi->proto->owner);
+   347	}
+   348	
+   349	static int default_test_proto(struct pi_adapter *pi, char *scratch)
+   350	{
+   351		int j, k;
+   352		int e[2] = { 0, 0 };
+   353	
+   354		pi->proto->connect(pi);
+   355	
+   356		for (j = 0; j < 2; j++) {
+   357			pi->proto->write_regr(pi, 0, 6, 0xa0 + j * 0x10);
+   358			for (k = 0; k < 256; k++) {
+   359				pi->proto->write_regr(pi, 0, 2, k ^ 0xaa);
+   360				pi->proto->write_regr(pi, 0, 3, k ^ 0x55);
+   361				if (pi->proto->read_regr(pi, 0, 2) != (k ^ 0xaa))
+   362					e[j]++;
+   363			}
+   364		}
+   365		pi->proto->disconnect(pi);
+   366	
+   367		if (verbose)
+   368			dev_info(&pi->dev, "%s: port 0x%x, mode  %d, test=(%d,%d)\n",
+   369			       pi->proto->name, pi->port,
+   370			       pi->mode, e[0], e[1]);
+   371	
+   372		return (e[0] && e[1]);	/* not here if both > 0 */
+   373	}
+   374	
+   375	static int pi_test_proto(struct pi_adapter *pi, char *scratch)
+   376	{
+   377		int res;
+   378	
+   379		parport_claim_or_block(pi->pardev);
+   380		if (pi->proto->test_proto)
+   381			res = pi->proto->test_proto(pi, scratch, verbose);
+   382		else
+   383			res = default_test_proto(pi, scratch);
+   384		parport_release(pi->pardev);
+   385	
+   386		return res;
+   387	}
+   388	
+   389	static int pi_probe_mode(struct pi_adapter *pi, int max, char *scratch)
+   390	{
+   391		int best, range;
+   392	
+   393		if (pi->mode != -1) {
+   394			if (pi->mode >= max)
+   395				return 0;
+   396			range = 3;
+   397			if (pi->mode >= pi->proto->epp_first)
+   398				range = 8;
+   399			if ((range == 8) && (pi->port % 8))
+   400				return 0;
+   401			return (!pi_test_proto(pi, scratch));
+   402		}
+   403		best = -1;
+   404		for (pi->mode = 0; pi->mode < max; pi->mode++) {
+   405			range = 3;
+   406			if (pi->mode >= pi->proto->epp_first)
+   407				range = 8;
+   408			if ((range == 8) && (pi->port % 8))
+   409				break;
+   410			if (!pi_test_proto(pi, scratch))
+   411				best = pi->mode;
+   412		}
+   413		pi->mode = best;
+   414		return (best > -1);
+   415	}
+   416	
+   417	
+   418	static int pi_probe_unit(struct pi_adapter *pi, int unit, char *scratch)
+   419	{
+   420		int max, s, e;
+   421	
+   422		s = unit;
+   423		e = s + 1;
+   424	
+   425		if (s == -1) {
+   426			s = 0;
+   427			e = pi->proto->max_units;
+   428		}
+   429	
+   430		if (pi->proto->test_port) {
+   431			parport_claim_or_block(pi->pardev);
+   432			max = pi->proto->test_port(pi);
+   433			parport_release(pi->pardev);
+   434		} else
+   435			max = pi->proto->max_mode;
+   436	
+   437		if (pi->proto->probe_unit) {
+   438			parport_claim_or_block(pi->pardev);
+   439			for (pi->unit = s; pi->unit < e; pi->unit++)
+   440				if (pi->proto->probe_unit(pi)) {
+   441					parport_release(pi->pardev);
+   442					if (pi_probe_mode(pi, max, scratch))
+   443						return 1;
+   444					return 0;
+   445				}
+   446			parport_release(pi->pardev);
+   447			return 0;
+   448		}
+   449	
+   450		if (!pi_probe_mode(pi, max, scratch))
+   451			return 0;
+   452		return 1;
+   453	}
+   454	
+   455	static void pata_parport_dev_release(struct device *dev)
+   456	{
+   457		struct pi_adapter *pi = container_of(dev, struct pi_adapter, dev);
+   458	
+   459		kfree(pi);
+   460	}
+   461	
+ > 462	void pata_parport_bus_release(struct device *dev)
+   463	{
+   464		/* nothing to do here but required to avoid warning on device removal */
+   465	}
+   466	
+   467	static struct bus_type pata_parport_bus_type = {
+   468		.name = DRV_NAME,
+   469	};
+   470	
+   471	static struct device pata_parport_bus = {
+   472		.init_name = DRV_NAME,
+   473		.release = pata_parport_bus_release,
+   474	};
+   475	
+ > 476	struct pi_adapter *pi_init_one(struct parport *parport, struct pi_protocol *pr,
+   477				       int mode, int unit, int delay)
+   478	{
+   479		struct pardev_cb par_cb = { };
+   480		char scratch[512];
+   481		const struct ata_port_info *ppi[] = { &pata_parport_port_info };
+   482		struct ata_host *host;
+   483		struct pi_adapter *pi = kzalloc(sizeof(struct pi_adapter), GFP_KERNEL);
+   484	
+   485		if (!pi)
+   486			return NULL;
+   487	
+   488		/* set up pi->dev before pi_probe_unit() so it can use dev_printk() */
+   489		pi->dev.parent = &pata_parport_bus;
+   490		pi->dev.bus = &pata_parport_bus_type;
+   491		pi->dev.driver = &pr->driver;
+   492		pi->dev.release = pata_parport_dev_release;
+   493		pi->dev.id = ida_alloc(&pata_parport_bus_dev_ids, GFP_KERNEL);
+   494		if (pi->dev.id < 0)
+   495			return NULL; /* pata_parport_dev_release will do kfree(pi) */
+   496		dev_set_name(&pi->dev, "pata_parport.%u", pi->dev.id);
+   497		if (device_register(&pi->dev)) {
+   498			put_device(&pi->dev);
+   499			goto out_ida_free;
+   500		}
+   501	
+   502		pi->proto = pr;
+   503	
+   504		/* still racy */
+   505		if (!try_module_get(pi->proto->owner))
+   506			goto out_unreg_dev;
+   507		if (pi->proto->init_proto && pi->proto->init_proto(pi) < 0)
+   508			goto out_module_put;
+   509	
+   510		pi->delay = (delay == -1) ? pi->proto->default_delay : delay;
+   511		pi->mode = mode;
+   512		pi->port = parport->base;
+   513	
+   514		par_cb.private = pi;
+   515		pi->pardev = parport_register_dev_model(parport, dev_name(&pi->dev),
+   516							&par_cb, pi->dev.id);
+   517		if (!pi->pardev)
+   518			goto out_module_put;
+   519	
+   520		if (!pi_probe_unit(pi, unit, scratch)) {
+   521			dev_info(&pi->dev, "Adapter not found\n");
+   522			goto out_unreg_parport;
+   523		}
+   524	
+   525		pi->proto->log_adapter(pi, scratch, verbose);
+   526	
+   527		host = ata_host_alloc_pinfo(&pi->dev, ppi, 1);
+   528		if (!host)
+   529			goto out_unreg_parport;
+   530		dev_set_drvdata(&pi->dev, host);
+   531		host->private_data = pi;
+   532	
+   533		ata_port_desc(host->ports[0], "port %s", pi->pardev->port->name);
+   534		ata_port_desc(host->ports[0], "protocol %s", pi->proto->name);
+   535	
+   536		timer_setup(&pi->timer, pi_disconnect_timer, 0);
+   537	
+   538		if (ata_host_activate(host, 0, NULL, 0, &pi->proto->sht))
+   539			goto out_unreg_parport;
+   540	
+   541		return pi;
+   542	
+   543	out_unreg_parport:
+   544		parport_unregister_device(pi->pardev);
+   545		if (pi->proto->release_proto)
+   546			pi->proto->release_proto(pi);
+   547	out_module_put:
+   548		module_put(pi->proto->owner);
+   549	out_unreg_dev:
+   550		device_unregister(&pi->dev);
+   551	out_ida_free:
+   552		ida_free(&pata_parport_bus_dev_ids, pi->dev.id);
+   553		return NULL;
+   554	}
+   555	
 
-But you are right, I should move those changes to this patch as this patch
-removes the po2 assumptions in NVMe ZNS driver.
-
-I will fix it up in the next revision. Thanks.
-
--- 
-Regards,
-Pankaj
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
