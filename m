@@ -2,137 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 863C2C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 06:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B245EC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 06:09:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230265AbiCHGGd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 01:06:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33168 "EHLO
+        id S241622AbiCHGKP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 01:10:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344067AbiCHGGd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 01:06:33 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F4BE33A3A;
-        Mon,  7 Mar 2022 22:05:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=3C1n8pTLz4iY7wIvak6imYkEu8WXKxTdhKl1kTZkaFA=; b=s1XR440QnStP9DuePegTIZ8I3m
-        8ZTwqJ+6iC+yJTezoo+XwMxzOPhNwuSK9JxrbJvFCceU2ffE7SrL6ygr1SCHQdSq5hEKVSUZjM8bd
-        pfWhQ0RsO1XBjqhBs/vzJoimt3VFDXihCG/yb60DGBemK9FCCctDnOfyCwge6/01SQ7WKQM6gOMuC
-        5WR7jUpya6BuNo5ODSsNA9WVa1puL4ClylyH8hx2zbEvYVynK4+zvQR2l9u8wGM2RsFfsjvULud9r
-        jvPNbbiY1ZcyPbTfgHBTNXS38kynT/sQzXA3Q+kq1dPwXvaS/c9jYQ6A7zyTLkcFQhvt5pNPDkRdP
-        y5AE4esA==;
-Received: from [2001:4bb8:184:7746:6f50:7a98:3141:c37b] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nRSyW-002kLc-PT; Tue, 08 Mar 2022 06:05:37 +0000
+        with ESMTP id S236371AbiCHGKP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 01:10:15 -0500
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 167CB33E0F;
+        Mon,  7 Mar 2022 22:09:20 -0800 (PST)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 9E24568AFE; Tue,  8 Mar 2022 07:09:16 +0100 (CET)
+Date:   Tue, 8 Mar 2022 07:09:16 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: [PATCH 2/2] fs: remove fs.f_write_hint
-Date:   Tue,  8 Mar 2022 07:05:29 +0100
-Message-Id: <20220308060529.736277-3-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220308060529.736277-1-hch@lst.de>
-References: <20220308060529.736277-1-hch@lst.de>
+To:     Thorsten Leemhuis <regressions@leemhuis.info>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Justin Sanders <justin@coraid.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: Re: Bug 215647 - aoe: removing aoe devices with flush (implicit in
+ rmmod aoe) leads to page fault
+Message-ID: <20220308060916.GB23629@lst.de>
+References: <4af605b4-d4c9-0060-9a26-f9846d44a328@leemhuis.info>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4af605b4-d4c9-0060-9a26-f9846d44a328@leemhuis.info>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The value is now completely unused except for reporting it back through
-the F_GET_FILE_RW_HINT ioctl, so remove the value and the two ioctls
-for it.
+On Tue, Mar 08, 2022 at 06:56:33AM +0100, Thorsten Leemhuis wrote:
+> Does that need backporting? Or is the patch the reporter provided in
+> bugzilla the easier and safer way to fix that regression in older releases?
 
-Trying to use the F_SET_FILE_RW_HINT and F_GET_FILE_RW_HINT fcntls will
-now return EINVAL, just like it would on a kernel that never supported
-this functionality in the first place.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- fs/fcntl.c         | 18 ------------------
- fs/open.c          |  1 -
- include/linux/fs.h |  9 ---------
- 3 files changed, 28 deletions(-)
-
-diff --git a/fs/fcntl.c b/fs/fcntl.c
-index 9c6c6a3e2de51..f15d885b97961 100644
---- a/fs/fcntl.c
-+++ b/fs/fcntl.c
-@@ -291,22 +291,6 @@ static long fcntl_rw_hint(struct file *file, unsigned int cmd,
- 	u64 h;
- 
- 	switch (cmd) {
--	case F_GET_FILE_RW_HINT:
--		h = file_write_hint(file);
--		if (copy_to_user(argp, &h, sizeof(*argp)))
--			return -EFAULT;
--		return 0;
--	case F_SET_FILE_RW_HINT:
--		if (copy_from_user(&h, argp, sizeof(h)))
--			return -EFAULT;
--		hint = (enum rw_hint) h;
--		if (!rw_hint_valid(hint))
--			return -EINVAL;
--
--		spin_lock(&file->f_lock);
--		file->f_write_hint = hint;
--		spin_unlock(&file->f_lock);
--		return 0;
- 	case F_GET_RW_HINT:
- 		h = inode->i_write_hint;
- 		if (copy_to_user(argp, &h, sizeof(*argp)))
-@@ -431,8 +415,6 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
- 		break;
- 	case F_GET_RW_HINT:
- 	case F_SET_RW_HINT:
--	case F_GET_FILE_RW_HINT:
--	case F_SET_FILE_RW_HINT:
- 		err = fcntl_rw_hint(filp, cmd, arg);
- 		break;
- 	default:
-diff --git a/fs/open.c b/fs/open.c
-index 9ff2f621b760b..1315253e02473 100644
---- a/fs/open.c
-+++ b/fs/open.c
-@@ -835,7 +835,6 @@ static int do_dentry_open(struct file *f,
- 	     likely(f->f_op->write || f->f_op->write_iter))
- 		f->f_mode |= FMODE_CAN_WRITE;
- 
--	f->f_write_hint = WRITE_LIFE_NOT_SET;
- 	f->f_flags &= ~(O_CREAT | O_EXCL | O_NOCTTY | O_TRUNC);
- 
- 	file_ra_state_init(&f->f_ra, f->f_mapping->host->i_mapping);
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index d5658ac5d8c65..a1fc3b41cd82f 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -966,7 +966,6 @@ struct file {
- 	 * Must not be taken from IRQ context.
- 	 */
- 	spinlock_t		f_lock;
--	enum rw_hint		f_write_hint;
- 	atomic_long_t		f_count;
- 	unsigned int 		f_flags;
- 	fmode_t			f_mode;
-@@ -2214,14 +2213,6 @@ static inline bool HAS_UNMAPPED_ID(struct user_namespace *mnt_userns,
- 	       !gid_valid(i_gid_into_mnt(mnt_userns, inode));
- }
- 
--static inline enum rw_hint file_write_hint(struct file *file)
--{
--	if (file->f_write_hint != WRITE_LIFE_NOT_SET)
--		return file->f_write_hint;
--
--	return file_inode(file)->i_write_hint;
--}
--
- static inline int iocb_flags(struct file *file);
- 
- static inline void init_sync_kiocb(struct kiocb *kiocb, struct file *filp)
--- 
-2.30.2
-
+No idea what is hidden in bugzilla, but the blk_mq_alloc_disk changes
+aren't easily backportable.
