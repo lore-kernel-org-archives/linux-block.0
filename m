@@ -2,116 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ACE5C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 15:36:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50E67C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  8 Mar 2022 15:42:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347855AbiCHPhV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 10:37:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42666 "EHLO
+        id S1344551AbiCHPmz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 10:42:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346911AbiCHPhU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 10:37:20 -0500
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8130D38BC5;
-        Tue,  8 Mar 2022 07:36:23 -0800 (PST)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.nyi.internal (Postfix) with ESMTP id E305C5C018C;
-        Tue,  8 Mar 2022 10:36:20 -0500 (EST)
-Received: from imap47 ([10.202.2.97])
-  by compute3.internal (MEProxy); Tue, 08 Mar 2022 10:36:20 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ttwalkertt.com;
-         h=cc:content-transfer-encoding:content-type:date:date:from:from
-        :in-reply-to:message-id:mime-version:reply-to:sender:subject
-        :subject:to:to; s=fm1; bh=pqibhZXEYNtOvRFmApEgPbaPmCxVr+WcKFwgCy
-        WJWqE=; b=WOoN+PfKoUTEKZb/FIMCvA94Cb5efx6tfMX4Uap8JmA48ZTEFcZaC4
-        B16DwC+X4aM7uSfIfGKMwWWgLLB3AGcGsOymdL5YbhMPO0iDcFiJsgH4HXVSCsEn
-        IFKh2s+bZvmUdvrXywXgT4+Dob0W72BSFf1BQbzgrARnvtNNy3UzGxvjbzD0bz5h
-        wZ/esmVhyFXbVFFqJCX7Z4du1OaTvxrIncgtLGF+KZLWZ9ZMH6bdoGzyQcizU6qW
-        HlYmWkM1mSnXqKRJySGy7URLTWORVngG61RewBOzrtddMDwlUF7Qfj6tpPfASrse
-        XN4++Q0eu+66yMviIpBxQdlfolpB5ttg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:date:from:from:in-reply-to:message-id:mime-version
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm2; bh=pqibhZXEYNtOvRFmA
-        pEgPbaPmCxVr+WcKFwgCyWJWqE=; b=HcHo6aC9h/H5SuCHTs82D1UFGNEnWxaJ0
-        QJZebfDIWrhZQzDpxrR0iX0lZLVxuKLOM569mHuiEgBQ0fPMBauXceq96S3tvm/J
-        VilvdlcMCw1Ti+D19YosVxl5lEZoPTGQCspygjh0tEWiMR1kA43kgu9BpqDjQdYd
-        k9waLU5t+p4GG64G/xD5Q4bYXhrhSxF6pBUeWt2b3nAldGYwiEZbn56KYF+qpdMY
-        XDprj+GX60LK/4SMA5rqzBNv3JQDVW0LXipq+MSGnOROyfMJSb373S5iie67fgqy
-        P4gtbFieqR+Y7N56ZQV2Uwcck17AyWUkmNAgTGP7aLHmhbNAQaJAQ==
-X-ME-Sender: <xms:9HcnYlMdvW7C4eMKcUeeguIJaktwYIUkf05ORNTSeujA33vdKk-3rw>
-    <xme:9HcnYn8qWFm_eFH3LCTZMFy60Rd3spiQfxJO140ImPPShyWKTILlGgHqf4Nhla8xC
-    82bd5PqniJAPcwE9zQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvvddrudduiedgjeeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgoufhorhhtvggutfgvtghiphdvucdlgedtmdenuc
-    fjughrpefofgggkfffhffvufgtgfesthhqredtreerjeenucfhrhhomhepfdhtihhmucif
-    rghlkhgvrhdfuceothhimhesthhtfigrlhhkvghrthhtrdgtohhmqeenucggtffrrghtth
-    gvrhhnpeevlefgleegtedvheejheeikedttdduieeivdegheeigfefgeefgfejudeuhfel
-    leenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehtih
-    hmsehtthifrghlkhgvrhhtthdrtghomh
-X-ME-Proxy: <xmx:9HcnYkSKLIcgXeVicA9V6MXyG-DpV4vTO3pyAxWQojAu9OzCfJjZpg>
-    <xmx:9HcnYhtjw0X_YRJPXF_2hgoPsfpccPbdQTopjvz7XzmmT7Y6rRZwjw>
-    <xmx:9HcnYtc4Y0KhlLdEDqG449DbqdmX6RCSZrr0oyjQjKp19EfhLw8Dkg>
-    <xmx:9HcnYtkrv3ZhVaPeiWQBmLsdeHMUWWAimHHnnlvaajpYRT9awNsPKg>
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-        id 6121E2740108; Tue,  8 Mar 2022 10:36:20 -0500 (EST)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.5.0-alpha0-4778-g14fba9972e-fm-20220217.001-g14fba997
-Mime-Version: 1.0
-Message-Id: <cb64d74c-1f19-40d9-880c-dc8ba1bba020@www.fastmail.com>
-Date:   Tue, 08 Mar 2022 10:36:00 -0500
-From:   "tim walker" <tim@ttwalkertt.com>
-To:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-nvme@lists.infradead.org
-Subject:  [LSF/MM/BPF TOPIC] NVMe HDD planning and directions
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S1347926AbiCHPmv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 10:42:51 -0500
+Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04104ECE1
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 07:41:52 -0800 (PST)
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220308154147epoutp020d69ba32894fefd644367e816fc6ecca~aciKztdbS2790227902epoutp028
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 15:41:47 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220308154147epoutp020d69ba32894fefd644367e816fc6ecca~aciKztdbS2790227902epoutp028
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1646754107;
+        bh=KiMjxqPMgSwlzKAGgUnynmNFgGCy1QEaMYK50C0X4/U=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=p/vhv0Vpq+tV0fPBNkxEUduCstpHfrrDlqMDWnhFU9EIZoLhVsDH97JzyjYWFhMQg
+         j3HGNK/0m8D4aqYMa0TPTnUGGVvxCt1p81bRku9VKpJmvIPVpDwNwi7TqUt7sPK2yR
+         NkatcVf29Rf7rXSqFf45XF+qfMNohIW1tsVSRUBg=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTP id
+        20220308154145epcas5p15b240ae9e4d66dd23faa52d072a8c467~aciJm2aQm2239922399epcas5p1c;
+        Tue,  8 Mar 2022 15:41:45 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.182]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4KCfh64R8Yz4x9Pp; Tue,  8 Mar
+        2022 15:41:42 +0000 (GMT)
+Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        B1.AB.05590.63977226; Wed,  9 Mar 2022 00:41:42 +0900 (KST)
+Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
+        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696~acVIb9tKl1632216322epcas5p1D;
+        Tue,  8 Mar 2022 15:26:51 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220308152651epsmtrp2743c274fcdd1adcb07fb7fc3821c1cd9~acVIbDt__2706527065epsmtrp22;
+        Tue,  8 Mar 2022 15:26:51 +0000 (GMT)
+X-AuditID: b6c32a4b-723ff700000015d6-03-622779361985
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        62.96.03370.BB577226; Wed,  9 Mar 2022 00:26:51 +0900 (KST)
+Received: from localhost.localdomain (unknown [107.110.206.5]) by
+        epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220308152649epsmtip19fca21c80039849f8245b1b624d581c8~acVGYcYir1072010720epsmtip1j;
+        Tue,  8 Mar 2022 15:26:48 +0000 (GMT)
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
+        asml.silence@gmail.com
+Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
+        mcgrof@kernel.org, a.manzanares@samsung.com, joshiiitr@gmail.com,
+        anuj20.g@samsung.com
+Subject: [PATCH 00/17] io_uring passthru over nvme
+Date:   Tue,  8 Mar 2022 20:50:48 +0530
+Message-Id: <20220308152105.309618-1-joshi.k@samsung.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrAJsWRmVeSWpSXmKPExsWy7bCmhq5ZpXqSweTrMhbTDytaNE34y2wx
+        Z9U2RovVd/vZLFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saE
+        p4wWa24+ZbH4fGYeqwO/x7Orzxg9ds66y+7RvOAOi8fls6Uem1Z1snlsXlLvsftmA5vHtsUv
+        WT36tqxi9Pi8SS6AKyrbJiM1MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VW
+        ycUnQNctMwfoByWFssScUqBQQGJxsZK+nU1RfmlJqkJGfnGJrVJqQUpOgUmBXnFibnFpXrpe
+        XmqJlaGBgZEpUGFCdsbMs7eZC3plK1bNWsXcwHhIrIuRk0NCwESif24jG4gtJLCbUWLdHL8u
+        Ri4g+xOjxKb/ZxkhnM+MEr8u7WCD6Thw8DRUxy5GiU+HFeGK9qydydzFyMHBJqApcWFyKUiN
+        iICXxP3b71lBapgFupgk3u67D9YsLGAk8X/mGjCbRUBVYuGLR6wgNq+ApcSuO93sEMvkJWZe
+        +s4OEReUODnzCQuIzQwUb946mxlkqITASg6Jz+eWskA0uEh8XLOfCcIWlnh1fAvUICmJz+/2
+        Qn1QLPHrzlGo5g5GiesNM6Ga7SUu7vnLBPIBM9AH63fpQ4RlJaaeWscEsZhPovf3E6j5vBI7
+        5sHYihL3Jj1lhbDFJR7OWAJle0hs6uljhYRWrMSDlTuYJjDKz0Lyzywk/8xC2LyAkXkVo2Rq
+        QXFuemqxaYFxXmo5PGKT83M3MYKTspb3DsZHDz7oHWJk4mA8xCjBwawkwnv/vEqSEG9KYmVV
+        alF+fFFpTmrxIUZTYCBPZJYSTc4H5oW8knhDE0sDEzMzMxNLYzNDJXHeU+kbEoUE0hNLUrNT
+        UwtSi2D6mDg4pRqYcua+S9xrfOs391nJA2JrrkQW8DfGvQwulXuY8OvoNld+Y021jwI67R59
+        E3f9mio0++FbpmfWjzi8zyw98TCS59vctR0q995/ubpv77+QXe9S7QXWvz6xbcr2N4HxgiKu
+        Vj7LGjv5dfbrflpV3ir7yjqB/ePtKYzzam2vSP+J1RPzz9p98d79BgePgglv1M50sh+tMFpw
+        3Dxv4Xn+0+v2LpvJWBp8vUgg30eSr93wtritOMP/1NRI+31S9peT73R3B1WLZQps+n2/M2L7
+        9sLVGvcj5a91vLwX/npWjKvqf3sxP3Oxk9+L84zKdyf1lxznvSHWd1f0eNF5O+tuuy++XK+F
+        W5VS8z5GxL8+qu+mxFKckWioxVxUnAgAVt36IFMEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrDLMWRmVeSWpSXmKPExsWy7bCSnO7uUvUkg3n72CymH1a0aJrwl9li
+        zqptjBar7/azWaxcfZTJ4l3rORaLztMXmCzOvz3MZDHp0DVGi723tC3mL3vKbrGk9TibxY0J
+        Txkt1tx8ymLx+cw8Vgd+j2dXnzF67Jx1l92jecEdFo/LZ0s9Nq3qZPPYvKTeY/fNBjaPbYtf
+        snr0bVnF6PF5k1wAVxSXTUpqTmZZapG+XQJXxsyzt5kLemUrVs1axdzAeEisi5GTQ0LAROLA
+        wdNsXYxcHEICOxglzr47wwiREJdovvaDHcIWllj57zk7RNFHRom2a81ARRwcbAKaEhcml4LU
+        iAgESBxsvAxWwywwg0mip/kzC0hCWMBI4v/MNWwgNouAqsTCF49YQWxeAUuJXXe6oRbIS8y8
+        9J0dIi4ocXLmE7BeZqB489bZzBMY+WYhSc1CklrAyLSKUTK1oDg3PbfYsMAoL7Vcrzgxt7g0
+        L10vOT93EyM4QrS0djDuWfVB7xAjEwfjIUYJDmYlEd7751WShHhTEiurUovy44tKc1KLDzFK
+        c7AoifNe6DoZLySQnliSmp2aWpBaBJNl4uCUamAKaJudmH/fvrKJJWTXb4HWXEmWLVwPdPpW
+        adec23/VR2FtqZLvxerT+/lcV8wOEFhQa65mxR4bGXgj8YGp7qbbZRcbzk11lIvh/5Ri8nmP
+        tZp85aGYTfMuykSndcWuFT/9oXHa0buvtyzU890RWbv2cd2coq7nRuXpe4LenHp5eckbr/ly
+        p4PmnPp9sjEyq8dj53HRcy9uSLdFLxPN1jjg8Ubj2la/7pP/5pWdWrb/ZHN7n7OOvsQGOw+/
+        wP1fQn5sKXvnZvz6S62OUIDHosWRX2tXapUW3Tqb0GK4lWNDyg+N5LJt2/9uirrgKub/6nWd
+        Ssgtv8cMcZxn1Avin2yy+PQhh68/iFPKLoVxt4gSS3FGoqEWc1FxIgA5ZTy8/wIAAA==
+X-CMS-MailID: 20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696
+References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all-
-I'd like to propose we talk about the PCIe-NVMe HDD this year. The=20
-topic comes up informally from time to time, but now that we have
-products with actual delivery schedules I think it would be valuable
-to discuss the impact to our systems.=20
+This is a streamlined series with new way of doing uring-cmd, and connects
+nvme-passthrough (over char device /dev/ngX) to it.
+uring-cmd enables using io_uring for any arbitrary command (ioctl,
+fsctl etc.) exposed by the command provider (e.g. driver, fs etc.).
 
-Background:
-NVMe specification has hardened over the decade and now NVMe=20
-devices are well integrated into our customers=E2=80=99 systems. I think
-moving HDDs to the PCIe/NVMe interface is the next logical step.=20
-Consolidating on a single API for rotational and static storage=20
-technologies. PCIe-NVMe offers SATA-level costs while supporting=20
-features and performance suitable for high-cap HDDs, and optimal=20
-interoperability for storage automation, tiering, and common=20
-management tools.=20
-We will share some early integration results, and review the
-OCP design guidelines, but really don't want to turn this into
-a status report or marketing blitz. HDDs, PCIe, and NVMe are=20
-all mature technologies, but the combination is new. We are=20
-looking to the experts to help us anticipate the challenges=20
-and benefits.
+To store the command inline within the sqe, Jens added an option to setup
+the ring with 128-byte SQEs.This gives 80 bytes of space (16 bytes at
+the end of the first sqe + 64 bytes in the second sqe). With inline
+command in sqe, the application avoids explicit allocation and, in the
+kernel, we avoid doing copy_from_user. Command-opcode, length etc.
+are stored in per-op fields of io_uring_sqe.
 
-Discussion Proposal:
+Non-inline submission (when command is a user-space pointer rather than
+housed inside sqe) is also supported.
 
--What Linux storage stack pitfalls do we need to be aware of as=20
-we field these devices with drastically different performance
-characteristics than traditional NAND? For example, what=20
-schedular or device driver level changes will be needed to=20
-integrate NVMe HDDs?
+io_uring sends this command down by newly introduced ->async_cmd()
+handler in file_operations. The handler does what is required to
+submit, and indicates queued completion.The infra has been added to
+process the completion when it arrives.
 
--Are there NVMe feature trade-offs that make sense for HDDs=20
-that won=E2=80=99t break the HDD-SSD interoperability goals?
+Overall the patches wire up the following capabilities for this path:
+- async
+- fixed-buffer
+- plugging
+- bio-cache
+- sync and async polling.
 
--How would multi-actuator HDDs be presented under NVMe?=20
-Namespace-per-actuator?
+This scales well. 512b randread perf (KIOPS) comparing
+uring-passthru-over-char (/dev/ng0n1) to
+uring-over-block(/dev/nvme0n1)
 
--NVMe HDD power management proposals. This might=20
-turn out to be the hardest part.
+QD    uring    pt    uring-poll    pt-poll
+8      538     589      831         902
+64     967     1131     1351        1378
+256    1043    1230     1376        1429
 
--NVMe HDD System architecture (maybe, if there is interest?)
+Testing/perf is done with this custom fio that turnes regular-io into
+passthru-io on supplying "uring_cmd=1" option.
+https://github.com/joshkan/fio/tree/big-sqe-pt.v1
 
-Thanks, and best regards,
-Tim Walker
+Example command-line:
+fio -iodepth=256 -rw=randread -ioengine=io_uring -bs=512 -numjobs=1
+-runtime=60 -group_reporting -iodepth_batch_submit=64
+-iodepth_batch_complete_min=1 -iodepth_batch_complete_max=64
+-fixedbufs=1 -hipri=1 -sqthread_poll=0 -filename=/dev/ng0n1
+-name=io_uring_256 -uring_cmd=1
+
+
+Anuj Gupta (3):
+  io_uring: prep for fixed-buffer enabled uring-cmd
+  nvme: enable passthrough with fixed-buffer
+  nvme: enable non-inline passthru commands
+
+Jens Axboe (5):
+  io_uring: add support for 128-byte SQEs
+  fs: add file_operations->async_cmd()
+  io_uring: add infra and support for IORING_OP_URING_CMD
+  io_uring: plug for async bypass
+  block: wire-up support for plugging
+
+Kanchan Joshi (5):
+  nvme: wire-up support for async-passthru on char-device.
+  io_uring: add support for uring_cmd with fixed-buffer
+  block: factor out helper for bio allocation from cache
+  nvme: enable bio-cache for fixed-buffer passthru
+  io_uring: add support for non-inline uring-cmd
+
+Keith Busch (2):
+  nvme: modify nvme_alloc_request to take an additional parameter
+  nvme: allow user passthrough commands to poll
+
+Pankaj Raghav (2):
+  io_uring: add polling support for uring-cmd
+  nvme: wire-up polling for uring-passthru
+
+ block/bio.c                     |  43 ++--
+ block/blk-map.c                 |  45 +++++
+ block/blk-mq.c                  |  93 ++++-----
+ drivers/nvme/host/core.c        |  21 +-
+ drivers/nvme/host/ioctl.c       | 336 +++++++++++++++++++++++++++-----
+ drivers/nvme/host/multipath.c   |   2 +
+ drivers/nvme/host/nvme.h        |  11 +-
+ drivers/nvme/host/pci.c         |   4 +-
+ drivers/nvme/target/passthru.c  |   2 +-
+ fs/io_uring.c                   | 188 ++++++++++++++++--
+ include/linux/bio.h             |   1 +
+ include/linux/blk-mq.h          |   4 +
+ include/linux/fs.h              |   2 +
+ include/linux/io_uring.h        |  43 ++++
+ include/uapi/linux/io_uring.h   |  21 +-
+ include/uapi/linux/nvme_ioctl.h |   4 +
+ 16 files changed, 689 insertions(+), 131 deletions(-)
+
+-- 
+2.25.1
+
