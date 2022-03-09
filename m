@@ -2,131 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D904EC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 22:02:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D97CBC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 23:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234240AbiCIWDy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 17:03:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47482 "EHLO
+        id S233192AbiCIXjr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 18:39:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232791AbiCIWDu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 17:03:50 -0500
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam08on2051.outbound.protection.outlook.com [40.107.100.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B97858D683
-        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 14:02:49 -0800 (PST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Ubsc0FTULoXta9DxI4LZLoa5lqWfWh0HtZPOnZtxopMHmXuQ2VaC3ce13aoC9b5o+Ad6raL5F3olhY3u3fjH663drEU1YmJkyWUBCh2FI7VqJnlc0jaAaVhWdWMEx6G4/bcVuATfjLwukanyJaWl070QO0Zrt1q5JGN2AWEUb/VWaptLn44aL+Qmv2cQ/aXFG+Ma/XfQWrKHltwCSl3isY7mqYWDCsiaqVBOI6clyMbXg9jUZqI/2L00THXuHiCBm7Mgy0BkRqKG3jUUC6Dzyo1pIUXXzLzGw4c53eAqZsV+CS9HSnebBDksZDScV0Rwgc2RBDiLVH6QiQ6zyAcquA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JD2T2JuMi75Vy9SnTrKYE1czCS+deQtGbQ8zyg3tssU=;
- b=Kno1XrIjD2JexhKcJ7K4q9gxciOsb5TSS8abPUbXgf08XnuXPPMzj6Uxk7pRSmq2CWBCc+QekoPJqqZlYL7UC3BrIMpEIwIGQV6hM0zXjHG1CTNuYH19KV1Xx9aYBvs5MSf1sb8U7q05FJuL3irfghETNnUF7Zs9PUbyd2vhQXGcnBf0qmkjgCC3D/ITJ2F/n+VgacLL7jgM6SL1AOs84DcJZIt9udlp8cH0vTUVnnfNL6vAMe8k2XtDiOJP7iQOUcmx5T3Kz6uZ9m9GLzRloYCp47EXW8LDAu3EB+1q7+RWOydW6kHpHgaBJtyNXpZoodrKoiHEdRFheNJrxRNOvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 12.22.5.236) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JD2T2JuMi75Vy9SnTrKYE1czCS+deQtGbQ8zyg3tssU=;
- b=MYylflmv75xqo7HWvq8Tb0EQQKpe4ZFapHyH+yvC+zIXzlMAFstMqFPXcz7Zo15jHUUAQs2+A2KnBXLtAkn4H2Le32Ok/TSmwbO9qYq++rhuoPOzM/fy6JIL1Svf0WZ9yXpuUta8E2S61wIFKarss77AvOwZe4InN1rZpMf6mt919xuEA2vRE2b+MAX7Fzwpyj4sfX/8U+LclleyDeAYzqxgvtOZEwCZKVr3afu5+ybZ+dkzh3YqgD04qv1vKt6YgyOD4DltncQB8sEGj6weo6CrPpUliGKSh6YwDDTDK7/eQTETnVmUB1Pt9BPiipKqoU18gfqz8pBowrlGZlXDxw==
-Received: from CO2PR04CA0183.namprd04.prod.outlook.com (2603:10b6:104:5::13)
- by BN8PR12MB3026.namprd12.prod.outlook.com (2603:10b6:408:41::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5038.14; Wed, 9 Mar
- 2022 22:02:47 +0000
-Received: from CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
- (2603:10b6:104:5:cafe::3e) by CO2PR04CA0183.outlook.office365.com
- (2603:10b6:104:5::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.20 via Frontend
- Transport; Wed, 9 Mar 2022 22:02:47 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 12.22.5.236)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 12.22.5.236 as permitted sender) receiver=protection.outlook.com;
- client-ip=12.22.5.236; helo=mail.nvidia.com;
-Received: from mail.nvidia.com (12.22.5.236) by
- CO1NAM11FT065.mail.protection.outlook.com (10.13.174.62) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.20.5038.14 via Frontend Transport; Wed, 9 Mar 2022 22:02:46 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by DRHQMAIL109.nvidia.com
- (10.27.9.19) with Microsoft SMTP Server (TLS) id 15.0.1497.18; Wed, 9 Mar
- 2022 22:02:42 +0000
-Received: from dev.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.9; Wed, 9 Mar 2022
- 14:02:41 -0800
-From:   Chaitanya Kulkarni <kch@nvidia.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, <kch@nvidia.com>, <damien.lemoal@wdc.com>,
-        <ming.lei@redhat.com>, <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH 1/1] null-blk: replace deprecated ida_simple_xxx()
-Date:   Wed, 9 Mar 2022 14:02:22 -0800
-Message-ID: <20220309220222.20931-2-kch@nvidia.com>
-X-Mailer: git-send-email 2.29.0
-In-Reply-To: <20220309220222.20931-1-kch@nvidia.com>
-References: <20220309220222.20931-1-kch@nvidia.com>
+        with ESMTP id S232756AbiCIXjq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 18:39:46 -0500
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2AD495A1F
+        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 15:38:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1646869125; x=1678405125;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=JMGoeshEilmr9wN9LzBTTFszPTSbN9GXN6C+EEWgFW8=;
+  b=M3fNdGr4L2iCf1JT+rTxcODThndPX4yWyUtZcnTFZ4BPzU93Wh6V2Oj7
+   JMAE8O5wXCpOYa3VG2vyFrA116FfTWUvMW+CaP9j2iznd6hF7FbNRiq0Q
+   BbTkaI4BM1b0+GGycWgkiOixXW5KoBiK4HMWru3aNW7ukiQP6wCm4ShO4
+   5YsA/XUxdEv02BrVXkSObgfW9UFgYbVjUvSeO4FK6B40Spi25P/kSyoXD
+   ak4w8w9jiORwyOBMQGLDpLNplDnu+H7ohIlDvHhdskRI8ciVka9FJyVmK
+   fSMUTbEGG3ECeMdOSoPxcJ5XfWt+A9z5JXbzptLaUAMzReo1jvOsLAb8k
+   g==;
+X-IronPort-AV: E=Sophos;i="5.90,169,1643644800"; 
+   d="scan'208";a="199742223"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Mar 2022 07:38:44 +0800
+IronPort-SDR: tVj8yoXafkJYBSmv2fwJHvGNmOI9V2R376lVdV5K5LWfr9ChEPMC3xUcNLWH6vjVhm50SU5t2L
+ xnkZVJJyXo8SbetUfazTK46R68Gmhk5klwbE0zzurSksaswJ0DBWNX5C544zv7cgJNwGqk76dU
+ kZDU+VhfI/tVKOZOrpoNXC2oKxbPLUtzkR+/18gtsZPkK+vxuw7rOkvZV2ev37HeECksHPcPwG
+ MEgSbIKus1YLAHP7GvwzlCkFK19S0ZqIyu1h/3PubFq5M1K+5xclLaXNz7I5H2PdA+/yQ19a2T
+ 6na6v3VmroMytxtjLNDtPuR+
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2022 15:10:00 -0800
+IronPort-SDR: ZoPzK5REygzZ3jOuyFy1O/EPB/wjHIk1DPr2FO88bETgKi4o3mGNJbVrHYR4XE7mwli7hGbEoi
+ 8LnFDRTGl55IH8Ffkj4tQzjsBdw1zYrctNWgWOHBkv8XzzzgXajN9kD88ziBO9v6N4k0PqvrZk
+ 4toV/RZ8b5ZowBdwbi8L0+uVkMsRds1cBvu6KSu6LK5skJI3mqUBQPatyWOa+VibGxXZQfiTna
+ IoOO3HVyKCTnYXQCwFqxr314RGBjIosU+hwNjTcaTDx0gtoB+2/+QwnZNhO70epfUm83CyroOg
+ aJw=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2022 15:38:46 -0800
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KDTD55cdnz1SVp2
+        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 15:38:45 -0800 (PST)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1646869125; x=1649461126; bh=JMGoeshEilmr9wN9LzBTTFszPTSbN9GXN6C
+        +EEWgFW8=; b=kLjKIP1MxWW/DJ3drnywQr67Y4/LcbTmN0vZRzkCpuyqazCF+no
+        Ysm12LdNMwDOn6roqTB92gj038q7xUYLvX2/mIBn3nZsIRhr+ie/vt3o1Oh81CQh
+        kJLZ303tMzlcniXyfkzup0bexSuMUqUsafSvtjCg0YYMcdtGROmLyRp8V3s3+Kno
+        D2FKGf5UVzh+yiPBV3EroIzemzuv+1FXCSqsm87mdWNUpJfeoiZGDbbEQbdeKkoQ
+        1sl3GLEdBjdz7AuIPMfvaPk7tust9feoOyOUnJGvCu1kfbYwKShgozAS/g4pR1wB
+        MpuW4PE6MJ4uXQal1iwqYJ/Yrc+scCBFrqg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id HjWqI3JhQRHQ for <linux-block@vger.kernel.org>;
+        Wed,  9 Mar 2022 15:38:45 -0800 (PST)
+Received: from [10.225.163.91] (unknown [10.225.163.91])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KDTD42XX9z1Rvlx;
+        Wed,  9 Mar 2022 15:38:44 -0800 (PST)
+Message-ID: <1dd210d4-a3d7-30d4-341a-d7b308679008@opensource.wdc.com>
+Date:   Thu, 10 Mar 2022 08:38:42 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.126.230.35]
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: f16cc603-d673-4140-dcd1-08da02188b79
-X-MS-TrafficTypeDiagnostic: BN8PR12MB3026:EE_
-X-Microsoft-Antispam-PRVS: <BN8PR12MB302620A9F8F5C3A206CA5B93A30A9@BN8PR12MB3026.namprd12.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: cfRKf/b4XFO0wJnj69nTZbRFPGahYgwWsUAk0ypwGLmyyZKYV9NjxCUOEgHjF+m/B4erSW00Cr8SakUx2m+fVMNP1YhpWfNZKvs4az+cRTKOQ2CwAp+rLWVs59eI7abbwz0lakUN6MLmx/XYZJi8HH3VaHdPFRJ0UTDbHuUjy5hV8roEDSR5zxgJ9iwgSIudIh0irHAqxtAeEO/9GpZDU7Vde15xFaDutGthNmVQVTls4vP+MM2o3Iz3+BYxTjO0Gi6CBb0J+LXnmvhz7FtA5MWv9n6njbGq2nRfCkx0UlWTsswmnselWTqLp4jGnkUqlgsoN0PLRz1K2f0dPNIuY1R2EKuZ1nMZ5G9OE549OHxbhGYsqKqvoZwe39s0bhV+KJ6Q/1sAv6FYwLf4K2OLTJFohLPSqM+mo/DZsrErRrl639q304BY4WHfyFPjWFd5i3JguZBy3neErqIaEr+iVJUuUbPw57/kAXN50jgysTmR02W5wSoxXr9wCllE0H0xZbkpDRefsYumHmS9jXkgq7f/aUjW5AhgMB7WxaC75GnLri+lo5lZ0cPPhxQZNh4BdWmrsBWbhsNv+NK3PA95SbvdsLNJeCxoru3IOErdShtgxLCZ/+7BaswnvAUorUCidRz+iD7rLM0vqdY80B2yxy4Fl6lkn9qFu6Ynwz0l//Fl5m57uwQ2Zcz/aKTyPbtsrx7MzpZUiK0ktJ986uLV+A==
-X-Forefront-Antispam-Report: CIP:12.22.5.236;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:mail.nvidia.com;PTR:InfoNoRecords;CAT:NONE;SFS:(13230001)(4636009)(40470700004)(36840700001)(46966006)(54906003)(2616005)(6916009)(81166007)(336012)(426003)(1076003)(4326008)(186003)(6666004)(36756003)(83380400001)(8676002)(356005)(16526019)(70206006)(70586007)(26005)(7696005)(40460700003)(508600001)(47076005)(36860700001)(316002)(8936002)(5660300002)(82310400004)(2906002)(4744005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2022 22:02:46.7430
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f16cc603-d673-4140-dcd1-08da02188b79
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[12.22.5.236];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT065.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR12MB3026
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 1/1] null-blk: replace deprecated ida_simple_xxx()
+Content-Language: en-US
+To:     Chaitanya Kulkarni <kch@nvidia.com>, linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, damien.lemoal@wdc.com, ming.lei@redhat.com,
+        shinichiro.kawasaki@wdc.com
+References: <20220309220222.20931-1-kch@nvidia.com>
+ <20220309220222.20931-2-kch@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220309220222.20931-2-kch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Like various places in kernel replace deprecated ida_simple_get() and
-ida_simple_remove with ida_alloc() and ida_free().
+On 3/10/22 07:02, Chaitanya Kulkarni wrote:
+> Like various places in kernel replace deprecated ida_simple_get() and
+> ida_simple_remove with ida_alloc() and ida_free().
+> 
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> ---
+>  drivers/block/null_blk/main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 05b1120e6623..e077be800606 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1724,7 +1724,7 @@ static void null_del_dev(struct nullb *nullb)
+>  
+>  	dev = nullb->dev;
+>  
+> -	ida_simple_remove(&nullb_indexes, nullb->index);
+> +	ida_free(&nullb_indexes, nullb->index);
+>  
+>  	list_del_init(&nullb->list);
+>  
+> @@ -2044,7 +2044,7 @@ static int null_add_dev(struct nullb_device *dev)
+>  	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, nullb->q);
+>  
+>  	mutex_lock(&lock);
+> -	nullb->index = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
+> +	nullb->index = ida_alloc(&nullb_indexes, GFP_KERNEL);
 
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
----
- drivers/block/null_blk/main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Do we need error check here ? Not entirely sure if ida_free() tolerates
+being passed a failed ida_alloc() nullb_indexes... A quick look at
+ida_free() does not show anything obvious, so it may be worth checking
+in detail.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 05b1120e6623..e077be800606 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1724,7 +1724,7 @@ static void null_del_dev(struct nullb *nullb)
- 
- 	dev = nullb->dev;
- 
--	ida_simple_remove(&nullb_indexes, nullb->index);
-+	ida_free(&nullb_indexes, nullb->index);
- 
- 	list_del_init(&nullb->list);
- 
-@@ -2044,7 +2044,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, nullb->q);
- 
- 	mutex_lock(&lock);
--	nullb->index = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
-+	nullb->index = ida_alloc(&nullb_indexes, GFP_KERNEL);
- 	dev->index = nullb->index;
- 	mutex_unlock(&lock);
- 
+>  	dev->index = nullb->index;
+>  	mutex_unlock(&lock);
+>  
+
+
 -- 
-2.29.0
-
+Damien Le Moal
+Western Digital Research
