@@ -2,62 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B09FC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 14:33:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C79C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 14:43:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232975AbiCIOeM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 09:34:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34264 "EHLO
+        id S233606AbiCIOn7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 09:43:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229703AbiCIOeL (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 09:34:11 -0500
+        with ESMTP id S233641AbiCIOnz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 09:43:55 -0500
 Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E27B83BA60
-        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 06:33:10 -0800 (PST)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220309143309euoutp02371231e287f5881a3e4704484f5696dd~avPiHZsEY2181621816euoutp02I
-        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 14:33:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220309143309euoutp02371231e287f5881a3e4704484f5696dd~avPiHZsEY2181621816euoutp02I
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E4827B35
+        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 06:42:54 -0800 (PST)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220309144253euoutp0232164256f80e51a505a07e938c039a80~avYBq1pPB3213532135euoutp02F
+        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 14:42:53 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220309144253euoutp0232164256f80e51a505a07e938c039a80~avYBq1pPB3213532135euoutp02F
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1646836389;
-        bh=ASTEztd/FODMNbtIOyvsGPvpdt50iF3JQ1WxV3pomFI=;
+        s=mail20170921; t=1646836973;
+        bh=YD5d2G1dkPAvxZK3dGgIzBtvm6sOZtqRmFfMOg5VGyA=;
         h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=shXY8JDZjsi+XGpvoQ31AsIjoVn/0tH8bXhNupMLuPawbq7BwAfRqh93xaEcAGpUQ
-         rGjP2c5YwODgSzIERTkg8/HnSxxD8GH4vG6fh1xiSJeSk9Fwhgbva8M2WXgjEGKFXi
-         53oR7/tP8E5Y9tej0wD3gHaQ0fUc/GrUhb/FDEtQ=
+        b=HfckMAX+z49YBOezMlBjoQMctfLbY8jbmDUQjyYlSy5ULjsT3XBaZqEqEJL4orbgR
+         BP/8ts/GbwF6wdiK9QWV+Pxxtq/jMRQ1lWeCMjwnu476l2WWbOdmRUSG43ZBoivCKJ
+         uQzJBAmavqijyMeKRSH6b5Dh/xS+fNbLZsCNlfgo=
 Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220309143308eucas1p265cb68b95267ade7e0c74a5daaee3ff9~avPhuEo7V2599125991eucas1p2K;
-        Wed,  9 Mar 2022 14:33:08 +0000 (GMT)
+        20220309144252eucas1p2ec1d5de65177cf870145096de8eb1221~avYBVJw_U1920719207eucas1p2e;
+        Wed,  9 Mar 2022 14:42:52 +0000 (GMT)
 Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id DC.B2.09887.4AAB8226; Wed,  9
-        Mar 2022 14:33:08 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id CF.54.09887.CECB8226; Wed,  9
+        Mar 2022 14:42:52 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
         eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220309143308eucas1p13bd486d41c1e4f4126d00fdfccf2a647~avPhLSi5E1276912769eucas1p1Z;
-        Wed,  9 Mar 2022 14:33:08 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220309143308eusmtrp1f4581d5c4b74493dbbbc412ccefe5a31~avPhKPHqH2280722807eusmtrp1E;
-        Wed,  9 Mar 2022 14:33:08 +0000 (GMT)
-X-AuditID: cbfec7f4-471ff7000000269f-0e-6228baa4644f
+        20220309144252eucas1p124afc2916b9f5845830d2e0c0893b1ad~avYA_PSfx2862928629eucas1p1w;
+        Wed,  9 Mar 2022 14:42:52 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220309144252eusmtrp219fb4a2029eb4906a92d390fe2395c24~avYA9a4OL0784707847eusmtrp2W;
+        Wed,  9 Mar 2022 14:42:52 +0000 (GMT)
+X-AuditID: cbfec7f4-45bff7000000269f-7d-6228bcecfc44
 Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id BC.F0.09522.4AAB8226; Wed,  9
-        Mar 2022 14:33:08 +0000 (GMT)
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 52.E5.09404.CECB8226; Wed,  9
+        Mar 2022 14:42:52 +0000 (GMT)
 Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
         eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220309143308eusmtip1a53b450a70b6f5e6f2854d960aa02998~avPg-wnHX1616516165eusmtip1x;
-        Wed,  9 Mar 2022 14:33:08 +0000 (GMT)
+        20220309144252eusmtip1f44a014003811ef31ecc3a7f1bf3d768~avYAvarsL1616816168eusmtip13;
+        Wed,  9 Mar 2022 14:42:52 +0000 (GMT)
 Received: from [192.168.8.130] (106.210.248.212) by CAMSVWEXC01.scsc.local
         (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 9 Mar 2022 14:33:03 +0000
-Message-ID: <cf527b75-8fba-96ba-659d-fbb46fbe9de7@samsung.com>
-Date:   Wed, 9 Mar 2022 15:33:02 +0100
+        Wed, 9 Mar 2022 14:42:46 +0000
+Message-ID: <c76d8778-626f-ea60-47d6-3c785a4fb8a9@samsung.com>
+Date:   Wed, 9 Mar 2022 15:42:45 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
         Thunderbird/91.5.0
-Subject: Re: [PATCH 4/6] nvme: zns: Add support for power_of_2 emulation to
- NVMe ZNS devices
+Subject: Re: [PATCH 6/6] null_blk: Add support for power_of_2 emulation to
+ the null blk device
 Content-Language: en-US
 To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Luis Chamberlain <mcgrof@kernel.org>,
@@ -73,402 +73,103 @@ CC:     Pankaj Raghav <pankydev8@gmail.com>,
         Kanchan Joshi <joshiiitr@gmail.com>,
         <linux-block@vger.kernel.org>, <linux-nvme@lists.infradead.org>
 From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <d13c40a5-3f87-fb2c-155e-dd64535067ac@opensource.wdc.com>
+In-Reply-To: <91d1f4c8-946d-c6b2-d30e-f9af4424221f@opensource.wdc.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
 X-Originating-IP: [106.210.248.212]
 X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
         CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNKsWRmVeSWpSXmKPExsWy7djPc7pLdmkkGby8ZGqx+m4/m8Xvs+eZ
-        LVauPspk0XPgA4vF+beHmSwmHbrGaLH3lrbF/GVP2S0mtH1ltrgx4SmjxZqbT1ks1r1+z+LA
-        4/HvxBo2j52z7rJ7nL+3kcXj8tlSj02rOtk8Ni+p99h9swEo13qf1ePzJjmP9gPdTAFcUVw2
-        Kak5mWWpRfp2CVwZqz+uYSm4HVuxdo57A+N37y5GTg4JAROJJ4famLoYuTiEBFYwShx98YId
-        JCEk8IVR4vBaAYjEZ0aJ65M2sMB0rHq9ixUisZxR4uCGZWxwVY/Wr2eBcHYxSmzbdw4ow8HB
-        K2AnMXsVH0g3i4CKRPvRG8wgNq+AoMTJmU/ApooKREi8PPKXCaRcWCBO4sTbHJAws4C4xK0n
-        88HOExE4xyxxsWMyK0RiIqNE5y5zkHo2AS2Jxk6wqzkF3CT23LrMDFGiKdG6/Tc7hC0vsf3t
-        HGaQcgkBZYnX620gfqmVWHvsDDvIeAmBU5wSWzZfZ4JIuEjs+L4WyhaWeHV8CzuELSNxenIP
-        C0RDP6PE1JY/TBDODEaJnsObmSA2WEv0ncmBMB0lXn4ugDD5JG68FYQ4h09i0rbpzBMYVWch
-        BcQsJB/PQvLBLCQfLGBkWcUonlpanJueWmyUl1quV5yYW1yal66XnJ+7iRGY3k7/O/5lB+Py
-        Vx/1DjEycTAeYpTgYFYS4W0K1UgS4k1JrKxKLcqPLyrNSS0+xCjNwaIkzpucuSFRSCA9sSQ1
-        OzW1ILUIJsvEwSnVwCRXt+S8TabxgqUHNOasf9Kx5p3S1msualOnMJ+28851j/TbffBCgYLo
-        y1+fnoufjrx0qzI/aq7++WCzWlHtn03eYl7nHV1r+s2XLX5//ZNzR4uXc6qZ33ujc1Id8+1e
-        7+Gew/F1geSsRA9FidbZa6o5V4fIXD2kx/2d2ewbrwPzUu+z5sH5V5kev7mVyvT/6YKI8wmc
-        V128xCqlVx+WOv8g6C7fssr03uRQ9dR2fdZtltERHswHpxlsaNqw9MOl/zkmstcXvp51YHnv
-        W1Ut1e6T8QHMa632nKv/O1ctovxooNkKnYsN10o4Dy6a8z92929psRe3mbh8noXqK+57ax7A
-        3DXfRmFfU0fE7uA6ISWW4oxEQy3mouJEAMmnGKveAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpileLIzCtJLcpLzFFi42I5/e/4Xd0luzSSDP7OErBYfbefzeL32fPM
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrPKsWRmVeSWpSXmKPExsWy7djPc7pv9mgkGTTdUbFYfbefzeL32fPM
+        FitXH2Wy6DnwgcXi/NvDTBaTDl1jtNh7S9ti/rKn7BYT2r4yW9yY8JTRYs3NpywW616/Z3Hg
+        8fh3Yg2bx85Zd9k9zt/byOJx+Wypx6ZVnWwem5fUe+y+2QCUa73P6vF5k5xH+4FupgCuKC6b
+        lNSczLLUIn27BK6M6e+uMhes5K9oPHuOqYGxnaeLkZNDQsBE4tT6lexdjFwcQgIrGCXmXtoD
+        5XxhlPhw7w8ThPOZUeLZ1qPMMC0nfz1gA7GFBJYzSnSuyIEretH5mBXC2cUocWzlcyaQKl4B
+        O4kNS26zgNgsAioS2w/OYoGIC0qcnPkEzBYViJB4eeQvWL2wQIJE+8VJYBuYBcQlbj2ZD3aG
+        iMA5ZomLHZNZIRITgVbvMu9i5OBgE9CSaOxkBwlzCrhJNB9eCdWrKdG6/Tc7hC0vsf3tHGaQ
+        cgkBZYnX620gnqmVWHvsDNjLEgLnOCXeT9nKCJFwkbi+4xoLhC0s8er4FnYIW0bi/06IeyQE
+        +hklprb8gXJmMEr0HN7MBLHBWqLvTA5Eg6PEsQNHocJ8EjfeCkLcwycxadt05gmMqrOQgmIW
+        kpdnIXlhFpIXFjCyrGIUTy0tzk1PLTbKSy3XK07MLS7NS9dLzs/dxAhMc6f/Hf+yg3H5q496
+        hxiZOBgPMUpwMCuJ8DaFaiQJ8aYkVlalFuXHF5XmpBYfYpTmYFES503O3JAoJJCeWJKanZpa
+        kFoEk2Xi4JRqYKpeu3j9++SDK48Z2LPKVYgcil1le62V9eafh9Kc+/p04nZ4ZNkzy+vuay9T
+        9v5pw3nbWzhLt0msV0n/tFWU4/6brqek/4dc2yPZzZKwJH8Lr8BNrse1z90WvH6/r07j5b+M
+        nT6nZ3QfviF3117+1Vkx0YfLFQPdr27ULk5ZsfZKuNXvuRP/Ptq/ekalukP9vUt/rU7tfne6
+        a+J0qw8rvla88P6yxKzdhk01cU1rrmWAwkOhx3lr2SPPzubIPfdZbdGb6IrT2y7a8E7N6Zyw
+        NMXk7o7O7DXbv6xo8f//fHn8jh2rD3mvapbYkLBBLmunkVHQq1+853J/nLj57UVEmJdkkNOB
+        Zs51DJKuK9gyd3gosRRnJBpqMRcVJwIAbs5+h+IDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmplleLIzCtJLcpLzFFi42I5/e/4Xd03ezSSDOafY7NYfbefzeL32fPM
         FitXH2Wy6DnwgcXi/NvDTBaTDl1jtNh7S9ti/rKn7BYT2r4yW9yY8JTRYs3NpywW616/Z3Hg
         8fh3Yg2bx85Zd9k9zt/byOJx+Wypx6ZVnWwem5fUe+y+2QCUa73P6vF5k5xH+4FupgCuKD2b
-        ovzSklSFjPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2M1R/XsBTc
-        jq1YO8e9gfG7dxcjJ4eEgInEqte7WLsYuTiEBJYySrzetpQVIiEj8enKR3YIW1jiz7UuNoii
-        j4wSjefeQDm7GCXOfp3P2MXIwcErYCcxexUfSAOLgIpE+9EbzCA2r4CgxMmZT1hAbFGBCIm2
-        ZVOYQcqFBeIkTrzNAQkzC4hL3HoynwlkpIjAOWaJix2TwS5iFuhnlFgy5QfUeb8ZJTb+7WIF
-        6WYT0JJo7AS7jlPATWLPrcvMEJM0JVq3/2aHsOUltr+dA7ZMQkBZ4vV6G4hnaiVe3d/NOIFR
-        dBaS82YhuWMWkkmzkExawMiyilEktbQ4Nz232FCvODG3uDQvXS85P3cTIzAxbDv2c/MOxnmv
-        PuodYmTiYDzEKMHBrCTC2xSqkSTEm5JYWZValB9fVJqTWnyI0RQYRhOZpUST84GpKa8k3tDM
-        wNTQxMzSwNTSzFhJnNezoCNRSCA9sSQ1OzW1ILUIpo+Jg1OqgSlOrtb5036245YX+KfOFd7E
-        9q6ag1XwsmjljCTrp8XMEbX5tmnfZyyJWRQxz4irz4JRVac2trd3Uc3cj+zn0o+rHo9qj+Wt
-        mNV0LeT4NNu5/8+dj3FY0jf/3YrQIzb/P1xuVNHW757Rv7NKzCphh+3yP2eaouNf+Gn4h5Ue
-        ywyakPFKkrGs8wTf9CqRXXEeSX8rk04L/m9+XsYU82bb1NuanIe3/O1LmC2g+sLUlGNP0qa/
-        p3Y3xCdzTFM/8jN6Zuw23w+1GxW3OPp+6b0Vr8S1fp7h/CIjhp/XNf9WNl+pY+79y/3UasGc
-        6RrK3+XC9ZeE2Ip9/r9ItGmm/zTdJD/2ODXmmSG/A70uN5z4ocRSnJFoqMVcVJwIAGXPyIGV
-        AwAA
-X-CMS-MailID: 20220309143308eucas1p13bd486d41c1e4f4126d00fdfccf2a647
+        ovzSklSFjPziElulaEMLIz1DSws9IxNLPUNj81grI1MlfTublNSczLLUIn27BL2M6e+uMhes
+        5K9oPHuOqYGxnaeLkZNDQsBE4uSvB2xdjFwcQgJLGSWuPLjJDpGQkfh05SOULSzx51oXVNFH
+        RolNK05DObsYJV7Pec4IUsUrYCexYcltFhCbRUBFYvvBWSwQcUGJkzOfgNmiAhESbcumMIPY
+        wgIJEjdefmcCsZkFxCVuPZnPBDJUROAcs8TFjsmsIA6zQD+jxJIpP1gh1v1mlFj6YhGQw8HB
+        JqAl0dgJdh+ngJtE8+GVbBCTNCVat/9mh7DlJba/ncMMUi4hoCzxer0NxDu1Eq/u72acwCg6
+        C8l9s5DcMQvJpFlIJi1gZFnFKJJaWpybnltspFecmFtcmpeul5yfu4kRmB62Hfu5ZQfjylcf
+        9Q4xMnEwHmKU4GBWEuFtCtVIEuJNSaysSi3Kjy8qzUktPsRoCgykicxSosn5wASVVxJvaGZg
+        amhiZmlgamlmrCTO61nQkSgkkJ5YkpqdmlqQWgTTx8TBKdXApBkUEXT/HcPXuqPbXs1+fTKU
+        6Rzbbs91cRarjs26VM0q45sscOJ7lPHPBfoS0Sumq/kzOc1dOcfwieonbpXs3omSaewL1hwV
+        mCWVvfyu1xeRee4Pb+h1aC2b8vgrZ9kxn8nz3K/eid/04fy555qC/AG2u646GkyLmL0jddL+
+        1Ya3eph6WHassEnYsfHiE85Fs/OZHrBleMxI2PnSJyvSzCHsuKtQS4jiSYWT6841/OITvJG6
+        KWia3a7ttZ4TK67pv/giapJeur7iRX6tPsP6aMtZq+IvRrSV5O19Jn874fGKPBXWXNMzL5d4
+        2mleeu7whTtAIYvBw/Mi80e+L7KfSrkbFj4sn3HvU/I11aeTVyuxFGckGmoxFxUnAgC5iPvd
+        mAMAAA==
+X-CMS-MailID: 20220309144252eucas1p124afc2916b9f5845830d2e0c0893b1ad
 X-Msg-Generator: CA
-X-RootMTR: 20220308165436eucas1p1b76f3cb5b4fa1f7d78b51a3b1b44d160
+X-RootMTR: 20220308165448eucas1p12c7c302a4b239db64b49d54cc3c1f0ac
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20220308165436eucas1p1b76f3cb5b4fa1f7d78b51a3b1b44d160
+X-CMS-RootMailID: 20220308165448eucas1p12c7c302a4b239db64b49d54cc3c1f0ac
 References: <20220308165349.231320-1-p.raghav@samsung.com>
-        <CGME20220308165436eucas1p1b76f3cb5b4fa1f7d78b51a3b1b44d160@eucas1p1.samsung.com>
-        <20220308165349.231320-5-p.raghav@samsung.com>
-        <d13c40a5-3f87-fb2c-155e-dd64535067ac@opensource.wdc.com>
+        <CGME20220308165448eucas1p12c7c302a4b239db64b49d54cc3c1f0ac@eucas1p1.samsung.com>
+        <20220308165349.231320-7-p.raghav@samsung.com>
+        <91d1f4c8-946d-c6b2-d30e-f9af4424221f@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022-03-09 05:04, Damien Le Moal wrote:
+On 2022-03-09 05:09, Damien Le Moal wrote:
 > On 3/9/22 01:53, Pankaj Raghav wrote:
- 
-> Contradiction: reducing the impact of performance regression is not the
-> same as "does not create a performance regression". So which one is it ?
-> Please add performance numbers to this commit message.
+>> power_of_2(PO2) emulation support is added to the null blk device to
+>> measure performance.
+>>
+>> Callbacks are added in the hotpaths that require PO2 emulation specific
+>> behaviour to reduce the impact on exisiting path.
+>>
+>> The power_of_2 emulation support is wired up for both the request and
+>> the bio queue mode and it is automatically enabled when the given zone
+>> size is non-power_of_2.
+> 
+> This does not make any sense. Why would you want to add power of 2 zone
+> size emulation to nullblk ? Just set the zone size to be a power of 2...
+> 
+> If this is for test purpose, then use QEMU. These changes make no sense
+> to me here.
+> 
+I see your point but this was mainly added to measure the performance impact.
 
-> And also please actually explain what the patch is changing. This commit
-> message is about the why, but nothing on the how.
->
-I will reword and add a bit more context to the commit log with perf numbers
-in the next revision
->> +EXPORT_SYMBOL_GPL(nvme_fail_po2_zone_emu_violation);
->> +
-> 
-> This should go in zns.c, not in the core.
-> 
-Ok.
+I ran the conformance test with different configurations in QEMU but I don't
+think QEMU would be a preferred option to measure performance, especially, if we
+want to account for changes we did to the hot path with a indirection. 
 
->> +
->> +static void nvme_npo2_zone_setup(struct gendisk *disk)
->> +{
->> +	nvme_ns_po2_zone_emu_setup(disk->private_data);
->> +}
-> 
-> This helper seems useless.
->
-I tried to retain the pattern with report_zones which is currently like this:
-static int nvme_report_zones(struct gendisk *disk, sector_t sector,
-		unsigned int nr_zones, report_zones_cb cb, void *data)
-{
-	return nvme_ns_report_zones(disk->private_data, sector, nr_zones, cb,
-			data);
-}
+As ZNS drives are not available in retail stores, this patch also provides a way
+for the community to reproduce the performance analysis that we did without needing
+a real device.
 
-But I can just remove this helper and use nvme_ns_po2_zone_emu_setup cb directly
-in nvme_bdev_fops.
+> A change that would make sense in the context of this series is to allow
+> for setting a zoned null_blk device zone size to a non power of 2 size.
+This is not possible with the block layer expecting the zone sizes to be po2.
+A null blk device with non po2 zone size will only work with the emulation that is
+added as a part of this patch.
 
->> +
->>  /*
->>   * Convert a 512B sector number to a device logical block number.
->>   */
->>  static inline u64 nvme_sect_to_lba(struct nvme_ns *ns, sector_t sector)
->>  {
->> -	return sector >> (ns->lba_shift - SECTOR_SHIFT);
->> +#ifdef CONFIG_BLK_DEV_ZONED
->> +	return ns->sect_to_lba(ns, sector);
+As I said before, once we relax the block layer requirement, then we could allow
+non po2 zone sizes without a lot of changes to the null blk device.
+> But this series does not actually deal with that. So do not touch this
+> driver please.
 > 
-> So for a power of 2 zone sized device, you are forcing an indirect call,
-> always. Not acceptable. What is the point of that po2_zone_emu boolean
-> you added to the queue ?
-This is a good point and we had a discussion about this internally.
-Initially I had something like this:
-if (!blk_queue_is_po2_zone_emu(disk))
-	return sector >> (ns->lba_shift - SECTOR_SHIFT);
-else
-	return __nvme_sect_to_lba_po2(ns, sec);
-
-But @Luis indicated that it was better to set an op which comes at a cost of indirection
-instead of having a runtime check with a if/else in the **hot path**. The code also looks
-more clear with having an op.
-
-The performance analysis that we performed did not show any regression while using the indirection
-for po2 zone sizes, at least on the x86_64 architecture.
-So maybe we could use this opportunity to discuss which approach could be used here.
-
-
->> +
->> +		sector = nvme_lba_to_sect(ns,
->> +					  le64_to_cpu(nvme_req(req)->result.u64));
->> +
->> +		sector = ns->update_sector_append(ns, sector);
-> 
-> Why not assign that to req->__sector directly ?
-> And again here, you are forcing the indirect function call for *all* zns
-> devices, even those that have a power of 2 zone size.
->
-Same answer as above. I will adapt them based on the outcome of our
-discussions.
->> +
->> +		req->__sector = sector;
->> +	}
->> +
->> +static inline bool nvme_po2_zone_emu_violation(struct request *req)
->> +{
->> +	return req->rq_flags & RQF_ZONE_EMU_VIOLATION;
->> +}
-> 
-> This helper makes the code unreadable in my opinion.
->
-I will open code it then.
->> +#else
->> +static inline void nvme_end_req_zoned(struct request *req)
->> +{
->> +}
->> +
->> +static inline void nvme_verify_sector_value(struct nvme_ns *ns, struct request *req)
->> +{
->> +}
->> +
->> +static inline bool nvme_po2_zone_emu_violation(struct request *req)
->> +{
->> +	return false;
->> +}
->> +
->> +#endif
->> +
->>  /*
->>   * Convert byte length to nvme's 0-based num dwords
->>   */
->> @@ -752,6 +842,7 @@ long nvme_ns_head_chr_ioctl(struct file *file, unsigned int cmd,
->>  long nvme_dev_ioctl(struct file *file, unsigned int cmd,
->>  		unsigned long arg);
->>  int nvme_getgeo(struct block_device *bdev, struct hd_geometry *geo);
->> +blk_status_t nvme_fail_po2_zone_emu_violation(struct request *req);
->>  
->>  extern const struct attribute_group *nvme_ns_id_attr_groups[];
->>  extern const struct pr_ops nvme_pr_ops;
->> @@ -873,11 +964,13 @@ static inline void nvme_mpath_default_iopolicy(struct nvme_subsystem *subsys)
->>  int nvme_revalidate_zones(struct nvme_ns *ns);
->>  int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>  		unsigned int nr_zones, report_zones_cb cb, void *data);
->> +void nvme_ns_po2_zone_emu_setup(struct nvme_ns *ns);
->>  #ifdef CONFIG_BLK_DEV_ZONED
->>  int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf);
->>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
->>  				       struct nvme_command *cmnd,
->>  				       enum nvme_zone_mgmt_action action);
->> +blk_status_t nvme_zone_handle_po2_emu_violation(struct request *req);
->>  #else
->>  static inline blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns,
->>  		struct request *req, struct nvme_command *cmnd,
->> @@ -892,6 +985,11 @@ static inline int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
->>  		 "Please enable CONFIG_BLK_DEV_ZONED to support ZNS devices\n");
->>  	return -EPROTONOSUPPORT;
->>  }
->> +
->> +static inline blk_status_t nvme_zone_handle_po2_emu_violation(struct request *req)
->> +{
->> +	return BLK_STS_OK;
->> +}
->>  #endif
->>  
->>  static inline struct nvme_ns *nvme_get_ns_from_dev(struct device *dev)
->> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
->> index 6a99ed680915..fc022df3f98e 100644
->> --- a/drivers/nvme/host/pci.c
->> +++ b/drivers/nvme/host/pci.c
->> @@ -960,6 +960,10 @@ static blk_status_t nvme_queue_rq(struct blk_mq_hw_ctx *hctx,
->>  		return nvme_fail_nonready_command(&dev->ctrl, req);
->>  
->>  	ret = nvme_prep_rq(dev, req);
->> +
->> +	if (unlikely(nvme_po2_zone_emu_violation(req)))
->> +		return nvme_fail_po2_zone_emu_violation(req);
->> +
->>  	if (unlikely(ret))
->>  		return ret;
->>  	spin_lock(&nvmeq->sq_lock);
->> diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
->> index ad02c61c0b52..25516a5ae7e2 100644
->> --- a/drivers/nvme/host/zns.c
->> +++ b/drivers/nvme/host/zns.c
->> @@ -3,7 +3,9 @@
->>   * Copyright (C) 2020 Western Digital Corporation or its affiliates.
->>   */
->>  
->> +#include <linux/log2.h>
->>  #include <linux/blkdev.h>
->> +#include <linux/math.h>
->>  #include <linux/vmalloc.h>
->>  #include "nvme.h"
->>  
->> @@ -46,6 +48,18 @@ static int nvme_set_max_append(struct nvme_ctrl *ctrl)
->>  	return 0;
->>  }
->>  
->> +static sector_t nvme_zone_size(struct nvme_ns *ns)
->> +{
->> +	sector_t zone_size;
->> +
->> +	if (blk_queue_is_po2_zone_emu(ns->queue))
->> +		zone_size = ns->zsze_po2;
->> +	else
->> +		zone_size = ns->zsze;
->> +
->> +	return zone_size;
->> +}
->> +
->>  int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
->>  {
->>  	struct nvme_effects_log *log = ns->head->effects;
->> @@ -122,7 +136,7 @@ static void *nvme_zns_alloc_report_buffer(struct nvme_ns *ns,
->>  				   sizeof(struct nvme_zone_descriptor);
->>  
->>  	nr_zones = min_t(unsigned int, nr_zones,
->> -			 get_capacity(ns->disk) / ns->zsze);
->> +			 get_capacity(ns->disk) / nvme_zone_size(ns));
->>  
->>  	bufsize = sizeof(struct nvme_zone_report) +
->>  		nr_zones * sizeof(struct nvme_zone_descriptor);
->> @@ -147,6 +161,8 @@ static int nvme_zone_parse_entry(struct nvme_ns *ns,
->>  				 void *data)
->>  {
->>  	struct blk_zone zone = { };
->> +	u64 zone_gap = 0;
->> +	u32 zone_idx;
->>  
->>  	if ((entry->zt & 0xf) != NVME_ZONE_TYPE_SEQWRITE_REQ) {
->>  		dev_err(ns->ctrl->device, "invalid zone type %#x\n",
->> @@ -159,10 +175,19 @@ static int nvme_zone_parse_entry(struct nvme_ns *ns,
->>  	zone.len = ns->zsze;
->>  	zone.capacity = nvme_lba_to_sect(ns, le64_to_cpu(entry->zcap));
->>  	zone.start = nvme_lba_to_sect(ns, le64_to_cpu(entry->zslba));
->> +
->> +	if (blk_queue_is_po2_zone_emu(ns->queue)) {
->> +		zone_idx = zone.start / zone.len;
->> +		zone_gap = zone_idx * ns->zsze_diff;
->> +		zone.start += zone_gap;
->> +		zone.len = ns->zsze_po2;
->> +	}
->> +
->>  	if (zone.cond == BLK_ZONE_COND_FULL)
->>  		zone.wp = zone.start + zone.len;
->>  	else
->> -		zone.wp = nvme_lba_to_sect(ns, le64_to_cpu(entry->wp));
->> +		zone.wp =
->> +			nvme_lba_to_sect(ns, le64_to_cpu(entry->wp)) + zone_gap;
->>  
->>  	return cb(&zone, idx, data);
->>  }
->> @@ -173,6 +198,7 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>  	struct nvme_zone_report *report;
->>  	struct nvme_command c = { };
->>  	int ret, zone_idx = 0;
->> +	u64 zone_size = nvme_zone_size(ns);
->>  	unsigned int nz, i;
->>  	size_t buflen;
->>  
->> @@ -190,7 +216,7 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>  	c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
->>  	c.zmr.pr = NVME_REPORT_ZONE_PARTIAL;
->>  
->> -	sector &= ~(ns->zsze - 1);
->> +	sector = rounddown(sector, zone_size);
->>  	while (zone_idx < nr_zones && sector < get_capacity(ns->disk)) {
->>  		memset(report, 0, buflen);
->>  
->> @@ -214,7 +240,7 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>  			zone_idx++;
->>  		}
->>  
->> -		sector += ns->zsze * nz;
->> +		sector += zone_size * nz;
->>  	}
->>  
->>  	if (zone_idx > 0)
->> @@ -226,6 +252,32 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
->>  	return ret;
->>  }
->>  
->> +void nvme_ns_po2_zone_emu_setup(struct nvme_ns *ns)
->> +{
->> +	u32 nr_zones;
->> +	sector_t capacity;
->> +
->> +	if (is_power_of_2(ns->zsze))
->> +		return;
->> +
->> +	if (!get_capacity(ns->disk))
->> +		return;
->> +
->> +	blk_mq_freeze_queue(ns->disk->queue);
->> +
->> +	blk_queue_po2_zone_emu(ns->queue, 1);
->> +	ns->zsze_po2 = 1 << get_count_order_long(ns->zsze);
->> +	ns->zsze_diff = ns->zsze_po2 - ns->zsze;
->> +
->> +	nr_zones = get_capacity(ns->disk) / ns->zsze;
->> +	capacity = nr_zones * ns->zsze_po2;
->> +	set_capacity_and_notify(ns->disk, capacity);
->> +	ns->sect_to_lba = __nvme_sect_to_lba_po2;
->> +	ns->update_sector_append = nvme_update_sector_append_po2_zone_emu;
->> +
->> +	blk_mq_unfreeze_queue(ns->disk->queue);
->> +}
->> +
->>  blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
->>  		struct nvme_command *c, enum nvme_zone_mgmt_action action)
->>  {
->> @@ -239,5 +291,24 @@ blk_status_t nvme_setup_zone_mgmt_send(struct nvme_ns *ns, struct request *req,
->>  	if (req_op(req) == REQ_OP_ZONE_RESET_ALL)
->>  		c->zms.select_all = 1;
->>  
->> +	nvme_verify_sector_value(ns, req);
->> +	return BLK_STS_OK;
->> +}
->> +
->> +blk_status_t nvme_zone_handle_po2_emu_violation(struct request *req)
->> +{
->> +	/*  The spec mentions that read from ZCAP until ZSZE shall behave
->> +	 *  like a deallocated block. Deallocated block reads are
->> +	 *  deterministic, hence we fill zero.
->> +	 * The spec does not clearly define the result for other opreation.
->> +	 */
-> 
-> Comment style and indentation is weird.
->
-Ack.
->> +	if (req_op(req) == REQ_OP_READ) {
->> +		zero_fill_bio(req->bio);
->> +		nvme_req(req)->status = NVME_SC_SUCCESS;
->> +	} else {
->> +		nvme_req(req)->status = NVME_SC_WRITE_FAULT;
->> +	}
-> 
-> What about requests that straddle the zone capacity ? They need to be
-> partially zeroed too, otherwise data from the next zone may be exposed.
->
-Good point. I will add this support in the next revision. Thanks.
->> +	blk_mq_set_request_complete(req);
->> +	nvme_complete_rq(req);
->>  	return BLK_STS_OK;
->>  }
->> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
->> index 3a41d50b85d3..9ec59183efcd 100644
->> --- a/include/linux/blk-mq.h
->> +++ b/include/linux/blk-mq.h
->> @@ -57,6 +57,8 @@ typedef __u32 __bitwise req_flags_t;
->>  #define RQF_TIMED_OUT		((__force req_flags_t)(1 << 21))
->>  /* queue has elevator attached */
->>  #define RQF_ELV			((__force req_flags_t)(1 << 22))
->> +/* request to do IO in the emulated area with po2 zone emulation */
->> +#define RQF_ZONE_EMU_VIOLATION	((__force req_flags_t)(1 << 23))
->>  
->>  /* flags that prevent us from merging requests: */
->>  #define RQF_NOMERGE_FLAGS \
-> 
-> 
-
+If you really think it doesn't belong here, then I can take it out in the next
+revision.
 -- 
 Regards,
 Pankaj
