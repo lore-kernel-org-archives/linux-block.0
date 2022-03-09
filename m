@@ -2,97 +2,150 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF8DDC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 08:45:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84653C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 08:52:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229920AbiCIIqC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 03:46:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55438 "EHLO
+        id S231270AbiCIIxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 03:53:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49836 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiCIIqB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 03:46:01 -0500
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CC591617EC;
-        Wed,  9 Mar 2022 00:45:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1646815503; x=1678351503;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nwdrdtIz1xZUJ3NnrUm2mtAL8wyUtGdo/sQn/e6jGLw=;
-  b=BgCd8HJbxykinzx7MuWUiWlMHd3WIx8eiFfsSOcUeB5yRyM77YA9kQSH
-   3SdbXtumQLfaGxJob2q8Ptwt0AGr/xjSSj11gy9TkjTApuQmJGopFERqG
-   iSsGPvh+00Jqj6MKIVlI5nk3sYRMBWtcHzNiv9Ox7Anofx+fSSK117xxq
-   LrIprzFKlrzKzrdAp3SvWvxvYuf1FGknP2COxNNCAtIEQCtr+okZtW3Hd
-   Afvwd/ciDJIBtWlER14li2pFyIJ4W+2iBHuPv/MDzIohPdI5FMRL596cB
-   fniE7eD4XcOo7c/ADDTHjYeTexpmgm8vzrYnYAYxfznwTgwhtP6hO8ja8
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10280"; a="242367230"
-X-IronPort-AV: E=Sophos;i="5.90,167,1643702400"; 
-   d="scan'208";a="242367230"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2022 00:45:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,167,1643702400"; 
-   d="scan'208";a="495767951"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga003.jf.intel.com with ESMTP; 09 Mar 2022 00:45:00 -0800
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nRrwJ-0002wq-Iz; Wed, 09 Mar 2022 08:44:59 +0000
-Date:   Wed, 9 Mar 2022 16:44:06 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     kbuild-all@lists.01.org, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 01/16] pata_parport: add core driver (PARIDE replacement)
-Message-ID: <202203091613.dsoQnVk9-lkp@intel.com>
-References: <20220305201411.501-2-linux@zary.sk>
+        with ESMTP id S231593AbiCIIww (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 03:52:52 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D1404162024
+        for <linux-block@vger.kernel.org>; Wed,  9 Mar 2022 00:51:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646815912;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=TELtE/TvhBTmc9AcQH+J/FPyzAIaQTdybvoTEfYZI7Y=;
+        b=X5hZQrWTY8LlbpAIJVUyymavCGqHEqnPBwHuxrfc+wVeh7aoJoWQF4XXO1Up+qZzpzH7RC
+        2aAU0kr1KHgqh8YVEM1KpqbnWrWNcAwObjE3qNWzzCkPMQw13YcAZM+NZ3IXd9vAL0L/9D
+        90gkZkSqwzV79n0mc5I/wN9d9H8oZko=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-483-V9um9J1zMVaV3d3evW_INQ-1; Wed, 09 Mar 2022 03:51:49 -0500
+X-MC-Unique: V9um9J1zMVaV3d3evW_INQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 432A81091DA1;
+        Wed,  9 Mar 2022 08:51:45 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D016083168;
+        Wed,  9 Mar 2022 08:51:43 +0000 (UTC)
+Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 2298pgJ3020462;
+        Wed, 9 Mar 2022 03:51:42 -0500
+Received: from localhost (mpatocka@localhost)
+        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 2298pfEp020453;
+        Wed, 9 Mar 2022 03:51:41 -0500
+X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
+Date:   Wed, 9 Mar 2022 03:51:41 -0500 (EST)
+From:   Mikulas Patocka <mpatocka@redhat.com>
+X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
+To:     Nikos Tsironis <ntsironis@arrikto.com>
+cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        "msnitzer@redhat.com >> msnitzer@redhat.com" <msnitzer@redhat.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "martin.petersen@oracle.com >> Martin K. Petersen" 
+        <martin.petersen@oracle.com>,
+        "roland@purestorage.com" <roland@purestorage.com>,
+        Hannes Reinecke <hare@suse.de>,
+        "kbus @imap.gmail.com>> Keith Busch" <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        "Frederick.Knight@netapp.com" <Frederick.Knight@netapp.com>,
+        "zach.brown@ni.com" <zach.brown@ni.com>,
+        "osandov@fb.com" <osandov@fb.com>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>,
+        "djwong@kernel.org" <djwong@kernel.org>,
+        "josef@toxicpanda.com" <josef@toxicpanda.com>,
+        "clm@fb.com" <clm@fb.com>, "dsterba@suse.com" <dsterba@suse.com>,
+        "tytso@mit.edu" <tytso@mit.edu>, "jack@suse.com" <jack@suse.com>
+Subject: Re: [LSF/MM/BFP ATTEND] [LSF/MM/BFP TOPIC] Storage: Copy Offload
+In-Reply-To: <23895da7-bcec-d092-373a-c3d961ab5c48@arrikto.com>
+Message-ID: <alpine.LRH.2.02.2203090347500.17712@file01.intranet.prod.int.rdu2.redhat.com>
+References: <f0e19ae4-b37a-e9a3-2be7-a5afb334a5c3@nvidia.com> <012723a9-2e9c-c638-4944-fa560e1b0df0@arrikto.com> <c4124f39-1ee9-8f34-e731-42315fee15f9@nvidia.com> <23895da7-bcec-d092-373a-c3d961ab5c48@arrikto.com>
+User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220305201411.501-2-linux@zary.sk>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Type: MULTIPART/MIXED; BOUNDARY="185206533-1881345822-1646815902=:17712"
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ondrej,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Thank you for the patch! Yet something to improve:
+--185206533-1881345822-1646815902=:17712
+Content-Type: TEXT/PLAIN; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-[auto build test ERROR on hch-configfs/for-next]
-[also build test ERROR on linux/master linus/master v5.17-rc7 next-20220308]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
 
-url:    https://github.com/0day-ci/linux/commits/Ondrej-Zary/pata_parport-add-core-driver-PARIDE-replacement/20220307-142912
-base:   git://git.infradead.org/users/hch/configfs.git for-next
-config: ia64-allyesconfig (https://download.01.org/0day-ci/archive/20220309/202203091613.dsoQnVk9-lkp@intel.com/config)
-compiler: ia64-linux-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/05539e2a04721c2710e7d1f6ae49926474bdf918
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Ondrej-Zary/pata_parport-add-core-driver-PARIDE-replacement/20220307-142912
-        git checkout 05539e2a04721c2710e7d1f6ae49926474bdf918
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=ia64 SHELL=/bin/bash
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+On Tue, 8 Mar 2022, Nikos Tsironis wrote:
 
-All errors (new ones prefixed by >>):
+> My work focuses mainly on improving the IOPs and latency of the
+> dm-snapshot target, in order to bring the performance of short-lived
+> snapshots as close as possible to bare-metal performance.
+> 
+> My initial performance evaluation of dm-snapshot had revealed a big
+> performance drop, while the snapshot is active; a drop which is not
+> justified by COW alone.
+> 
+> Using fio with blktrace I had noticed that the per-CPU I/O distribution
+> was uneven. Although many threads were doing I/O, only a couple of the
+> CPUs ended up submitting I/O requests to the underlying device.
+> 
+> The same issue also affects dm-clone, when doing I/O with sizes smaller
+> than the target's region size, where kcopyd is used for COW.
+> 
+> The bottleneck here is kcopyd serializing all I/O. Users of kcopyd, such
+> as dm-snapshot and dm-clone, cannot take advantage of the increased I/O
+> parallelism that comes with using blk-mq in modern multi-core systems,
+> because I/Os are issued only by a single CPU at a time, the one on which
+> kcopyd’s thread happens to be running.
+> 
+> So, I experimented redesigning kcopyd to prevent I/O serialization by
+> respecting thread locality for I/Os and their completions. This made the
+> distribution of I/O processing uniform across CPUs.
+> 
+> My measurements had shown that scaling kcopyd, in combination with
+> scaling dm-snapshot itself [1] [2], can lead to an eventual performance
+> improvement of ~300% increase in sustained throughput and ~80% decrease
+> in I/O latency for transient snapshots, over the null_blk device.
+> 
+> The work for scaling dm-snapshot has been merged [1], but,
+> unfortunately, I haven't been able to send upstream my work on kcopyd
+> yet, because I have been really busy with other things the last couple
+> of years.
+> 
+> I haven't looked into the details of copy offload yet, but it would be
+> really interesting to see how it affects the performance of random and
+> sequential workloads, and to check how, and if, scaling kcopyd affects
+> the performance, in combination with copy offload.
+> 
+> Nikos
 
-   ia64-linux-ld: drivers/block/paride/paride.o: in function `pi_release':
->> (.text+0x600): multiple definition of `pi_release'; drivers/ata/pata_parport/pata_parport.o:(.text+0x36c0): first defined here
+Hi
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Note that you must submit kcopyd callbacks from a single thread, otherwise 
+there's a race condition in snapshot.
+
+The snapshot code doesn't take locks in the copy_callback and it expects 
+that the callbacks are serialized.
+
+Maybe, adding the locks to copy_callback would solve it.
+
+Mikulas
+--185206533-1881345822-1646815902=:17712--
+
