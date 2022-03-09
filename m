@@ -2,102 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DF86C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 06:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1EDC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 07:04:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbiCIGnu convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 01:43:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46384 "EHLO
+        id S230003AbiCIHE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 02:04:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbiCIGnq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 01:43:46 -0500
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 875A7A9E13
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 22:42:45 -0800 (PST)
-Received: from pps.filterd (m0044012.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.16.1.2/8.16.1.2) with ESMTP id 228Iormd017320
-        for <linux-block@vger.kernel.org>; Tue, 8 Mar 2022 22:42:45 -0800
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3ep52tq76w-4
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 22:42:45 -0800
-Received: from twshared33837.14.frc2.facebook.com (2620:10d:c085:108::4) by
- mail.thefacebook.com (2620:10d:c085:11d::4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 8 Mar 2022 22:42:43 -0800
-Received: by devbig932.frc1.facebook.com (Postfix, from userid 4523)
-        id 1FC6D1EBC0D9; Tue,  8 Mar 2022 22:42:40 -0800 (PST)
-From:   Song Liu <song@kernel.org>
-To:     <linux-block@vger.kernel.org>, <linux-raid@vger.kernel.org>
-CC:     <axboe@kernel.dk>, Song Liu <song@kernel.org>,
-        <stable@vger.kernel.org>,
-        Larkin Lowrey <llowrey@nuclearwinter.com>,
-        Wilson Jonathan <i400sjon@gmail.com>,
-        Roger Heflin <rogerheflin@gmail.com>
-Subject: [PATCH] block: check more requests for multiple_queues in blk_attempt_plug_merge
-Date:   Tue, 8 Mar 2022 22:42:09 -0800
-Message-ID: <20220309064209.4169303-1-song@kernel.org>
-X-Mailer: git-send-email 2.30.2
+        with ESMTP id S229501AbiCIHE7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 02:04:59 -0500
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B231E02EC;
+        Tue,  8 Mar 2022 23:04:01 -0800 (PST)
+Received: by mail-lf1-x12f.google.com with SMTP id bt26so2103956lfb.3;
+        Tue, 08 Mar 2022 23:04:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=kC1honlpPqbd0U19UJ9XJiEx07PrOqmIT4xgwjmDqYg=;
+        b=Knzq25TFwbkPITtv1ULPzaKty7jBithqFlOsAvow2l/wAuKTTUEE0S3N0j5qpidCIg
+         izQAm/jZ1wt2Uxaox/LfySimB9y9lUIvTh2EN519keNpXM9TXfgTUR1yQPr87uFCA9vo
+         YWnoTlzOURUvo/HioIA4CXjQLwcpof8QBCiF+TFYkW5Ur0g/gYqxG6cjwVNVa1ltLRlw
+         B6YHi2wSB5N3cAKDPJOXvnoECyU17Y6XPa1LhJXmt3f4pDUX/i1s4Nk00KUS0fWzLuz3
+         56Ism2Fn5Y5FOHGqDC27gY/T9AiBiSwlK+KvcvKByANLjtV7NaMIMPJdZ5vC+rfv6mQJ
+         Fwxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=kC1honlpPqbd0U19UJ9XJiEx07PrOqmIT4xgwjmDqYg=;
+        b=weq6g/Nx50g9Rn0uZlYlM7Nyqz3/JJZNwezCqi3fElFpvsvTlYitdyZJqIFKxeP4n0
+         VCWFk+e8mh+u1bDVRZ34yF5lf1SK3oDnH8bGzWUtvIA3HH8N0lwCKiZmk9Cs5taLINBd
+         SZ44dVeumkVCd2CyeYshU4K9s0eQzvitEWHxc2O2FhqEzXNHifkaTe8bnBXMNihCH7yD
+         j2UQG+67Z+noxEx1nK3tl1qzbpUedHBN/YSnQBnPORCaI1Z5rOSatpLv5pQTz37cQCYL
+         JRUBOlhCG1TR/t+T3W9kKvlq4QsCgyTnPzEkHpQkKF2oqPevPftOT7q1big9FV0ZYvFZ
+         Wm+g==
+X-Gm-Message-State: AOAM533/uhN9b7f6sa+LWFGypG3H+l6nC3qK3sNwwyokdDD/EXKjAU4D
+        mu8savwgAkasqzTEmIWeh++Saf+PLXe9CQgncd0=
+X-Google-Smtp-Source: ABdhPJxiZsMxro7KEvH5gOFU6sYzzt0XHyhxDRv99yW+yYyLcHrIK88FJIeNr54w++1JqViFN/NVfgMOg9rH0RyjPZ0=
+X-Received: by 2002:a05:6512:1111:b0:439:6328:c168 with SMTP id
+ l17-20020a056512111100b004396328c168mr13012310lfg.650.1646809439303; Tue, 08
+ Mar 2022 23:03:59 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8BIT
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: cIhkDlCtbyQfP_IZQTlYF0vagpPa1ucp
-X-Proofpoint-GUID: cIhkDlCtbyQfP_IZQTlYF0vagpPa1ucp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.816,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-09_02,2022-03-04_01,2022-02-23_01
+References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152720epcas5p19653942458e160714444942ddb8b8579@epcas5p1.samsung.com>
+ <20220308152105.309618-14-joshi.k@samsung.com> <20220308170857.GA3501708@dhcp-10-100-145-180.wdc.com>
+In-Reply-To: <20220308170857.GA3501708@dhcp-10-100-145-180.wdc.com>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Wed, 9 Mar 2022 12:33:33 +0530
+Message-ID: <CA+1E3rLEJ49jp678Us1C3ux2iu4KWT9FF+iMjY5_Ug2MAU1q7w@mail.gmail.com>
+Subject: Re: [PATCH 13/17] nvme: allow user passthrough commands to poll
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Christoph Hellwig <hch@lst.de>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RAID arrays check/repair operations benefit a lot from merging requests.
-If we only check the previous entry for merge attempt, many merge will be
-missed. As a result, significant regression is observed for RAID check
-and repair.
+On Tue, Mar 8, 2022 at 10:39 PM Keith Busch <kbusch@kernel.org> wrote:
+>
+> On Tue, Mar 08, 2022 at 08:51:01PM +0530, Kanchan Joshi wrote:
+> >       if (copy_from_user(&io, uio, sizeof(io)))
+> >               return -EFAULT;
+> > -     if (io.flags)
+> > -             return -EINVAL;
+> > +     if (io.flags & NVME_HIPRI)
+> > +             rq_flags |= REQ_POLLED;
+>
+> I'm pretty sure we can repurpose this previously reserved field for this
+> kind of special handling without an issue now, but we should continue
+> returning EINVAL if any unknown flags are set. I have no idea what, if
+> any, new flags may be defined later, so we shouldn't let a future
+> application think an older driver honored something we are not handling.
 
-Fix this by checking more than just the previous entry when
-plug->multiple_queues == true.
-
-This improves the check/repair speed of a 20-HDD raid6 from 19 MB/s to
-103 MB/s.
-
-Fixes: d38a9c04c0d5 ("block: only check previous entry for plug merge attempt")
-Cc: stable@vger.kernel.org # v5.16
-Reported-by: Larkin Lowrey <llowrey@nuclearwinter.com>
-Reported-by: Wilson Jonathan <i400sjon@gmail.com>
-Reported-by: Roger Heflin <rogerheflin@gmail.com>
-Signed-off-by: Song Liu <song@kernel.org>
----
- block/blk-merge.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
-
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 4de34a332c9f..57e2075fb2f4 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -1089,12 +1089,14 @@ bool blk_attempt_plug_merge(struct request_queue *q, struct bio *bio,
- 	if (!plug || rq_list_empty(plug->mq_list))
- 		return false;
- 
--	/* check the previously added entry for a quick merge attempt */
--	rq = rq_list_peek(&plug->mq_list);
--	if (rq->q == q) {
--		if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
--				BIO_MERGE_OK)
--			return true;
-+	rq_list_for_each(&plug->mq_list, rq) {
-+		if (rq->q == q) {
-+			if (blk_attempt_bio_merge(q, rq, bio, nr_segs, false) ==
-+			    BIO_MERGE_OK)
-+				return true;
-+		}
-+		if (!plug->multiple_queues)
-+			break;
- 	}
- 	return false;
- }
--- 
-2.30.2
-
+Would it be better if we don't try to pass NVME_HIPRI by any means
+(flags or rsvd1/rsvd2), and that means not enabling sync-polling and
+killing this patch.
+We have another flag "IO_URING_F_UCMD_POLLED" in ioucmd->flags, and we
+can use that instead to enable only the async polling. What do you
+think?
