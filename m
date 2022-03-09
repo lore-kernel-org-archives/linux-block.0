@@ -2,81 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC87C4321E
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 01:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09044C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 01:13:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230326AbiCIBON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 20:14:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33898 "EHLO
+        id S230001AbiCIBOZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 20:14:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230340AbiCIBMv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:12:51 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2466BBC27
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 16:55:25 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id q13so582265plk.12
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 16:55:25 -0800 (PST)
+        with ESMTP id S229960AbiCIBOG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:14:06 -0500
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2E6415DDF3
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 17:01:05 -0800 (PST)
+Received: by mail-pf1-x42c.google.com with SMTP id f8so871931pfj.5
+        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 17:01:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=TSJygurfY607jvzpaSXbGkChO2r02RRc4zcT8idFGSc=;
-        b=cQj5MIXnnya8S4VuATtZHow3Gb7EiUuI/OjHbe4Bsz6nWy6G0t+5bypUdRMHtyDyqv
-         0+m047whb+wGAaimM0vhqdm7fHE2tK7e8v4MVMOHyevRhE0Ekma2X7+vVuYJzUQzBxpg
-         igFv6lDEkbUr5HIsAwfE81MjZaPPKYxQhxuHQAntNEYj9UfnCRS5/JFQ/UUwM0e4XYOi
-         1Y55fztpUG/ZzqjfLMbFkiRI5c6QHvPbIRyAFN9d2XCdb6R/Ud/CQK5iMUGGgkB7eOlR
-         7f1UTVAhJCnEsUjpykO6HRnSTzwIP7w6kTV4dHA9oAHljTpNn/dqezd7EXa8/J+2teX2
-         lZwA==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=6ZZxOF1UZdYmWcsF+G4Cy++VZ4bnPtZUo2Vt4FjwtGI=;
+        b=DQxbQK1fevCYyx0kq2IKm56w/874AbayfV9yVDuyiFJaIQ7K0/8V7lvVz5sxKW2Lkt
+         dOBalK2O2h5Ngs0kz2JjR4XOlOWzP+XryVqlHCfOgZoJUTBSRsTvVeyLV9zugd2eUeIG
+         kML7zgBRQAXUoy9KDOdGsWuwMzMDtktXbfdl8nwsLDGIouXRclNj4iV3xYgD8qJBCwMz
+         1ukxg/sK8FyyZLHDMJ9tN9jE/75W63uClTM6GJeUuyZFzNFhcLSJAmIDrQY55Xp3VkGh
+         ekqiwOQ6SRGD7CC6bsb2h1B4JqVHVNilB2qKqsdFCtcIA8YJISaBuu80h4umTlld/w2L
+         +Xug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=TSJygurfY607jvzpaSXbGkChO2r02RRc4zcT8idFGSc=;
-        b=iAttUJxSlYaOC4PdJJVte8HJy1ukGx1o2lXSXRidwJsePTJC0fvzEdW8/X6irEixXh
-         sYtI2qlkxKllMAeMk/kCU4X8NGS0WBqhXKAraGp94GiipgeabtJLCCtlaIj+yp4b1uRi
-         Yl/Htyn7Tlz9b4yI/zjMrgIw12ZMDX/79ktS+sRHYR8Ii8Zmg0LKeS8rg7AZEEBKfD0C
-         qw2u5tZdJ0Em/Z6yuFoVxBCKjGRKdvq3xv5/WKKcxHxCDnb1YelFM5b41ejW8pOAs5n0
-         PbTvqiEqe+uz+iye1dlp0JWDIL3PyxV5AsJTPzbwSQ99L8ONxRmSaeebgW1UgKuptI42
-         Pudg==
-X-Gm-Message-State: AOAM533w2PBbo/u7lKWjK4jGvEdv8SoDpNP1o48SfbmcdFu7zLQkMxfR
-        FjNn+ZY/7COSHNUMbzCeyRk8JzW5Iznr3GqL
-X-Google-Smtp-Source: ABdhPJzfqta+y5PFpcb2NM6oBxTMwg6z2yK87C1eg5Zj+O7aeUBAto+BmzlkGOcXJ73dc5f0rNRmPw==
-X-Received: by 2002:a17:90a:4682:b0:1bc:236:7e46 with SMTP id z2-20020a17090a468200b001bc02367e46mr7473627pjf.212.1646787324421;
-        Tue, 08 Mar 2022 16:55:24 -0800 (PST)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j9-20020a056a00130900b004f73df40914sm299756pfu.82.2022.03.08.16.55.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 16:55:23 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-In-Reply-To: <20220308060529.736277-2-hch@lst.de>
-References: <20220308060529.736277-1-hch@lst.de> <20220308060529.736277-2-hch@lst.de>
-Subject: Re: [PATCH 1/2] fs: remove kiocb.ki_hint
-Message-Id: <164678732353.405180.15951772868993926898.b4-ty@kernel.dk>
-Date:   Tue, 08 Mar 2022 17:55:23 -0700
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6ZZxOF1UZdYmWcsF+G4Cy++VZ4bnPtZUo2Vt4FjwtGI=;
+        b=W32auq+bruNQb/VGuZq+cFp5ir+Shzx8vFBM36IW1E9+53yUFrgaRXACG/Uai832MP
+         xMEcXaBUi37E1/Vm/XafMQurufezbgL6xP8E/HCzHhWV1M136rDVa4JGdcZsqmzmzTEc
+         DoSSjmiOHgiimqJxKuozaH2Xf6CVsatqbg55BFan8zix9XjRwRp9U8VEGf9ON80HkpBh
+         KRlafEtZr3SIA03AqAPXyw+0/I9wDz9yWNEgbN92DFCCydreMjN5ss83epoy0zTboLHz
+         EpeTC5LBNtLisfR/N8w5nB8iNZTwa4snvtmXQoM26LZ6AR08s/JKVL4YXwA2OOY1To3z
+         J0lg==
+X-Gm-Message-State: AOAM531Fo54I2lawSpaOlSBsOUOZBBHgPIiYERNlEoobPtOlOkB9LD3+
+        iwgbH3mFWzObkbs9ZKY6OcZTRA==
+X-Google-Smtp-Source: ABdhPJw8wYMUJ1TT+e5LCWPQcdeiQMTk8yoPMpHmtMfDIfhMY1+qfTodpbwOyZdHUV1wJnmVdVHYuw==
+X-Received: by 2002:a05:6a00:bc8:b0:4f6:ff68:50ba with SMTP id x8-20020a056a000bc800b004f6ff6850bamr13433133pfu.69.1646787665250;
+        Tue, 08 Mar 2022 17:01:05 -0800 (PST)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d20-20020a056a0010d400b004f7093700c4sm308968pfu.76.2022.03.08.17.01.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 08 Mar 2022 17:01:04 -0800 (PST)
+Message-ID: <70895fbc-392d-5ac6-4f7d-4593de5f74bb@kernel.dk>
+Date:   Tue, 8 Mar 2022 18:01:03 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH v6 1/2] block: add ->poll_bio to block_device_operations
+Content-Language: en-US
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+References: <20220307185303.71201-1-snitzer@redhat.com>
+ <20220307185303.71201-2-snitzer@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220307185303.71201-2-snitzer@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 8 Mar 2022 07:05:28 +0100, Christoph Hellwig wrote:
-> This field is entirely unused now except for a tracepoint in f2fs, so
-> remove it.
+On 3/7/22 11:53 AM, Mike Snitzer wrote:
+> From: Ming Lei <ming.lei@redhat.com>
 > 
+> Prepare for supporting IO polling for bio-based driver.
 > 
+> Add ->poll_bio callback so that bio-based driver can provide their own
+> logic for polling bio.
+> 
+> Also fix ->submit_bio_bio typo in comment block above
+> __submit_bio_noacct.
 
-Applied, thanks!
+Assuming you want to take this through the dm tree:
 
-[1/2] fs: remove kiocb.ki_hint
-      commit: 41d36a9f3e5336f5b48c3adba0777b8e217020d7
-[2/2] fs: remove fs.f_write_hint
-      commit: 7b12e49669c99f63bc12351c57e581f1f14d4adf
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Best regards,
 -- 
 Jens Axboe
-
 
