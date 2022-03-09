@@ -2,113 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9220AC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 01:13:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADAE5C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 01:15:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230256AbiCIBOm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 20:14:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51574 "EHLO
+        id S230258AbiCIBQw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 20:16:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231958AbiCIBNy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:13:54 -0500
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CB8315B3FE
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 16:58:28 -0800 (PST)
-Received: by mail-pj1-x1030.google.com with SMTP id mr24-20020a17090b239800b001bf0a375440so3727320pjb.4
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 16:58:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=n3kOWYi00wB/JSBNH3Nkdw571Dwb7Z4bxoeFT/f7d74=;
-        b=qDe3CBPnszracgGZ3QHhnX2rqwCMCDyq1b/oMf/CwBtfCmovbYpnAA+VSbJJn6Xa48
-         JtAXVaWA/XjICwCBqyZLkWAgL4gh3yktjXHABN4AEkIRHgy9Cog0P4jN2vZFDx3MEgHx
-         nWDKS8ytclYRe1YHJKzjrhpXXxuI+ewUOlf/Jlbh2/zBxchqIrPm+qTJzFMIGMJitB9i
-         puba+9tOjqVVXsS6wSeZZ7lEUVsEhWIPolVuFEBHYjkXuf3VXVu7ggF0vTR3+lI80jWl
-         ECTGd9vaoR8txjEJk8EqcxqVLMahgNMBWlKkHgTwwuXvp/rlnSIwoN1V5Sg4HWvF8tCn
-         1t5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=n3kOWYi00wB/JSBNH3Nkdw571Dwb7Z4bxoeFT/f7d74=;
-        b=xGen0dhJIzaKhrmmaifIXqONFZfQdu1PHeRfEr66jVDWwLT1q1JsMFCozQP9blEAPW
-         gwiaXtiMg6wAb8lpkaa6+m9IbKFeennUE11hrWdMevCu2BtiIezmEHQne4vNLfWb/eQD
-         a2/8O48upTFe8qI3kFcnrELBCtJRNTVQGGMgRQMi9ejyxogLx6Y3b/iSpiBre/yn89Em
-         06w2GOyJXHI+g1kiMUXE65nv9RaXAGQqjAQBOh+b0Pl/lh8Fo0Mdrskq1v1XyjD7o5Ey
-         u8ErLzH1YtcTdpZ1XV/Vu5bI1n24QA3ibQad0upiSD+cO2XOqhsFSVS1XqnbSPDmzHEg
-         ADRA==
-X-Gm-Message-State: AOAM532MqNiHN8b/guEkgSUSYXzblwUpSqF4rjNV5eGNWwvv65U3Cjqn
-        AZGLdFvBiCxRD1wTgYVtLmpI3e7epo3k7PXx
-X-Google-Smtp-Source: ABdhPJydwoFGLZgcz4NmuS/ionLpQBPtHiioJnqmd0mjxHWgfmJTXxpQKkwIkBWtrUrCPm/y2MEKAw==
-X-Received: by 2002:a17:902:930b:b0:14d:b0c0:1f71 with SMTP id bc11-20020a170902930b00b0014db0c01f71mr20409658plb.113.1646787507899;
-        Tue, 08 Mar 2022 16:58:27 -0800 (PST)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e14-20020a056a001a8e00b004e136d54a15sm298627pfv.105.2022.03.08.16.58.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 16:58:27 -0800 (PST)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-In-Reply-To: <20220308055200.735835-1-hch@lst.de>
-References: <20220308055200.735835-1-hch@lst.de>
-Subject: Re: move more work to disk_release v4
-Message-Id: <164678750695.407482.16938028641587368987.b4-ty@kernel.dk>
-Date:   Tue, 08 Mar 2022 17:58:26 -0700
+        with ESMTP id S230189AbiCIBQr (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:16:47 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 858B2D21E0
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 17:06:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646787984;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Q8m85lnJLq03SGtqd1pZEbZANvTc5wOe33M+qWpdorc=;
+        b=FSZf4rNiYNTgouDb+j3D4jCAO53giYz9ZlJQ/ZbWRlZfxUuCi+mBLNomfEY2Kx7fwWl4Fe
+        lyTghlQnjUj5+wb+h3H2AQyLEBdBUzXwXKv2LJH4+3Pvy40f8pS+6ZKcIPCVffHTJ+ZFJN
+        r3uiS7UyFunwCxOFeV3S0fe0H4v5Aoc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-345-hnCHeVVkOqmGqNkgxz2nRA-1; Tue, 08 Mar 2022 20:06:21 -0500
+X-MC-Unique: hnCHeVVkOqmGqNkgxz2nRA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 38B3A1006AA7;
+        Wed,  9 Mar 2022 01:06:20 +0000 (UTC)
+Received: from T590 (ovpn-8-34.pek2.redhat.com [10.72.8.34])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 5BFFF60C66;
+        Wed,  9 Mar 2022 01:06:05 +0000 (UTC)
+Date:   Wed, 9 Mar 2022 09:06:01 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH V2] blk-mq: kill warning when building
+ block/blk-mq-debugfs-zoned.c
+Message-ID: <Yif9efz0Gv1YNwpW@T590>
+References: <20220302003431.1253287-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220302003431.1253287-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 8 Mar 2022 06:51:46 +0100, Christoph Hellwig wrote:
-> this series resurrects and forward ports ports larger parts of the
-> "block: don't drain file system I/O on del_gendisk" series from Ming,
-> but does not remove the draining in del_gendisk, but instead the one
-> in the sd driver, which always was a bit ad-hoc.  As part of that sd
-> and sr are switched to use the new ->free_disk method to avoid having
-> to clear disk->private_data and the way to lookup the SCSI ULP is
-> cleaned up as well.
+On Wed, Mar 02, 2022 at 08:34:31AM +0800, Ming Lei wrote:
+> Fix the following warning when building block/blk-mq-debugfs-zoned.c:
 > 
-> [...]
+> In file included from block/blk-mq-debugfs-zoned.c:7:
+> block/blk-mq-debugfs.h:24:14: warning: ‘struct blk_mq_hw_ctx’ declared inside parameter list will not be visible outside of this definition or declaration
+>    24 |       struct blk_mq_hw_ctx *hctx);
+>       |              ^~~~~~~~~~~~~
+> 
+> Cc: Christoph Hellwig <hch@lst.de>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> ---
+> V2:
+> 	- forward declaration of struct blk_mq_hw_ctx instead of including
+> 	  header, as suggested by Christoph
 
-Applied, thanks!
+Hello Jens,
 
-[01/14] blk-mq: do not include passthrough requests in I/O accounting
-        commit: 00baefa025651b33a67fefcf8f6bf527af7b085f
-[02/14] blk-mq: handle already freed tags gracefully in blk_mq_free_rqs
-        commit: abcc148ab9236abce466d5e5070f43d290cf72c7
-[03/14] scsi: don't use disk->private_data to find the scsi_driver
-        commit: b55ac66299345b24a81444d9222bf0362920b829
-[04/14] sd: rename the scsi_disk.dev field
-        commit: 695a5b27e06242cfc89988d342016697c5f5ab5f
-[05/14] sd: call sd_zbc_release_disk before releasing the scsi_device reference
-        commit: a22da9716c1375b8c0563b607cacdb422680233b
-[06/14] sd: delay calling free_opal_dev
-        commit: f3ca592e32b3b7a74a57b77bf24cdefff1ea53fc
-[07/14] sd: implement ->free_disk to simplify refcounting
-        commit: d31ece5f112968d7efe70fdffa4d39ed6b876f40
-[08/14] sr: implement ->free_disk to simplify refcounting
-        commit: 719468c6d02fdc1a17d7b40ec73cec155cf05945
-[09/14] block: move blkcg initialization/destroy into disk allocation/release handler
-        commit: 754ddb47bbc48c987cd3c718a1ee9f1d83c001f7
-[10/14] block: don't remove hctx debugfs dir from blk_mq_exit_queue
-        commit: f58dfe31e0cd242f1de93d1aad0fbe8af7a09dc2
-[11/14] block: move q_usage_counter release into blk_queue_release
-        commit: 5407dfa49e67160724567e565fa58086a3ec1b8c
-[12/14] block: move blk_exit_queue into disk_release
-        commit: 0f426c2c2c7ea134562e64d7b6ce0acaef67146e
-[13/14] block: do more work in elevator_exit
-        commit: 3e8f2f0ef1000649dbc7d0dd41c714617a1dbc9c
-[14/14] block: move rq_qos_exit() into disk_release()
-        commit: 641fde02765e74b8b5ae8426a02c21abf0ce3a29
+This patch looks missed, can you take a look?
 
-Best regards,
--- 
-Jens Axboe
-
+Thanks,
+Ming
 
