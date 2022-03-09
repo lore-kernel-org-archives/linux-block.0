@@ -2,91 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1EDC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 07:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F34C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 07:11:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230003AbiCIHE7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 02:04:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52766 "EHLO
+        id S230234AbiCIHMz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 02:12:55 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40590 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229501AbiCIHE7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 02:04:59 -0500
-Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B231E02EC;
-        Tue,  8 Mar 2022 23:04:01 -0800 (PST)
-Received: by mail-lf1-x12f.google.com with SMTP id bt26so2103956lfb.3;
-        Tue, 08 Mar 2022 23:04:01 -0800 (PST)
+        with ESMTP id S229920AbiCIHMz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 02:12:55 -0500
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6396ECC57;
+        Tue,  8 Mar 2022 23:11:56 -0800 (PST)
+Received: by mail-pj1-x1034.google.com with SMTP id e3so1388944pjm.5;
+        Tue, 08 Mar 2022 23:11:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=kC1honlpPqbd0U19UJ9XJiEx07PrOqmIT4xgwjmDqYg=;
-        b=Knzq25TFwbkPITtv1ULPzaKty7jBithqFlOsAvow2l/wAuKTTUEE0S3N0j5qpidCIg
-         izQAm/jZ1wt2Uxaox/LfySimB9y9lUIvTh2EN519keNpXM9TXfgTUR1yQPr87uFCA9vo
-         YWnoTlzOURUvo/HioIA4CXjQLwcpof8QBCiF+TFYkW5Ur0g/gYqxG6cjwVNVa1ltLRlw
-         B6YHi2wSB5N3cAKDPJOXvnoECyU17Y6XPa1LhJXmt3f4pDUX/i1s4Nk00KUS0fWzLuz3
-         56Ism2Fn5Y5FOHGqDC27gY/T9AiBiSwlK+KvcvKByANLjtV7NaMIMPJdZ5vC+rfv6mQJ
-         Fwxw==
+        bh=fRcojdKFkUrzcCxTuVNdK1onU1312nQ1Uevvd7PHIkI=;
+        b=KXYwwrpv7fPdjKDvyfPqgrR0KKByHaugnhUItQbb8kh2d2NiBboHduKjSD5mSTS4DK
+         L97VgyDwqow5cNP8VyVZktho6f3hp2W+EuCoohYVa6u9A9jCOi6uzrU3q8cMrfGFo1G/
+         cvG/woSM6AMp1+AGpvU8/qwcNpnVbMGl2txaPDASXmBs3W6JcoEdVDzj3gPw766vMI8U
+         FfYLgJN0qZQrx8SGQT7i+/+EQTiZZ3CHDTXXzcMy3GI+Es2GkrKPjbDnpZAlJ/PoeD00
+         xGUiPGo9vrNr3vLkhnfkT4IwJumJQPONK8JF4jXf1eU4s+SOvPYKXTBJ6mVRH9DbYxjv
+         kYWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=kC1honlpPqbd0U19UJ9XJiEx07PrOqmIT4xgwjmDqYg=;
-        b=weq6g/Nx50g9Rn0uZlYlM7Nyqz3/JJZNwezCqi3fElFpvsvTlYitdyZJqIFKxeP4n0
-         VCWFk+e8mh+u1bDVRZ34yF5lf1SK3oDnH8bGzWUtvIA3HH8N0lwCKiZmk9Cs5taLINBd
-         SZ44dVeumkVCd2CyeYshU4K9s0eQzvitEWHxc2O2FhqEzXNHifkaTe8bnBXMNihCH7yD
-         j2UQG+67Z+noxEx1nK3tl1qzbpUedHBN/YSnQBnPORCaI1Z5rOSatpLv5pQTz37cQCYL
-         JRUBOlhCG1TR/t+T3W9kKvlq4QsCgyTnPzEkHpQkKF2oqPevPftOT7q1big9FV0ZYvFZ
-         Wm+g==
-X-Gm-Message-State: AOAM533/uhN9b7f6sa+LWFGypG3H+l6nC3qK3sNwwyokdDD/EXKjAU4D
-        mu8savwgAkasqzTEmIWeh++Saf+PLXe9CQgncd0=
-X-Google-Smtp-Source: ABdhPJxiZsMxro7KEvH5gOFU6sYzzt0XHyhxDRv99yW+yYyLcHrIK88FJIeNr54w++1JqViFN/NVfgMOg9rH0RyjPZ0=
-X-Received: by 2002:a05:6512:1111:b0:439:6328:c168 with SMTP id
- l17-20020a056512111100b004396328c168mr13012310lfg.650.1646809439303; Tue, 08
- Mar 2022 23:03:59 -0800 (PST)
+        bh=fRcojdKFkUrzcCxTuVNdK1onU1312nQ1Uevvd7PHIkI=;
+        b=MO8vcgtEe4sQk/leXTKlR0M+Cbpp8k8wumr/V1/i1nrua4VkYzwhWO2R8li1QJDEPv
+         0RvMIRcb6Oa9R6dSjpe17pzYra9zPxY9G5S+B6SXgzZzgMyYQ1YSeNkJ3sAGoUY8tNvg
+         lXftSZxpWCoHeB3zT3MlX8WgUvthMV2bdgyep666nO17lVp2zLWEgjb9E1l5452l+8KC
+         vbOlDOIAOVTSLFVQPjzLOUNSM2xz8WbwsdIdBDHbJNKwMstZQYmpjCuPhJK+Oq7vdFYL
+         GDuhxn3HtuFK5kTyTJUgZnT25XoyCAWyygERF+BSxO3p9Euz9/WWBtmgR2XB8Mn/crb9
+         XJ1g==
+X-Gm-Message-State: AOAM533JhdWB6l/NYji22Ef/ZEyYgWTiL9WA5utr4BFqIvQ726d7yV5J
+        1D5HSApopPOfDGrQALEaOHKwd56eXHTgsjQWGA==
+X-Google-Smtp-Source: ABdhPJx7Y9tMsgrHNCFHvVb+R6kcxLDVwEdD+wPmSxpzfNfTeIicJ0IQT3rT29l/gVAxaOVxTDHZSM1g6Fy0HM3gq1Q=
+X-Received: by 2002:a17:902:8a91:b0:14f:969b:f6be with SMTP id
+ p17-20020a1709028a9100b0014f969bf6bemr21600350plo.161.1646809914993; Tue, 08
+ Mar 2022 23:11:54 -0800 (PST)
 MIME-Version: 1.0
-References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152720epcas5p19653942458e160714444942ddb8b8579@epcas5p1.samsung.com>
- <20220308152105.309618-14-joshi.k@samsung.com> <20220308170857.GA3501708@dhcp-10-100-145-180.wdc.com>
-In-Reply-To: <20220308170857.GA3501708@dhcp-10-100-145-180.wdc.com>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Wed, 9 Mar 2022 12:33:33 +0530
-Message-ID: <CA+1E3rLEJ49jp678Us1C3ux2iu4KWT9FF+iMjY5_Ug2MAU1q7w@mail.gmail.com>
-Subject: Re: [PATCH 13/17] nvme: allow user passthrough commands to poll
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
+References: <CAMhUBj=i4MJ6KH_UU5dy8e+DmviRg4EFA-D5zyD=XfRi9Ma=pg@mail.gmail.com>
+ <YihJm4xuJEDXbcJx@infradead.org>
+In-Reply-To: <YihJm4xuJEDXbcJx@infradead.org>
+From:   Zheyu Ma <zheyuma97@gmail.com>
+Date:   Wed, 9 Mar 2022 15:11:43 +0800
+Message-ID: <CAMhUBj=ZXeGvRv4fJqSKLEkwAm8x664X=sh4PVr7DR83CB7zbA@mail.gmail.com>
+Subject: Re: [BUG] block: sx8: Invalid wait context in carm_queue_rq()
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 8, 2022 at 10:39 PM Keith Busch <kbusch@kernel.org> wrote:
+On Wed, Mar 9, 2022 at 2:30 PM Christoph Hellwig <hch@infradead.org> wrote:
 >
-> On Tue, Mar 08, 2022 at 08:51:01PM +0530, Kanchan Joshi wrote:
-> >       if (copy_from_user(&io, uio, sizeof(io)))
-> >               return -EFAULT;
-> > -     if (io.flags)
-> > -             return -EINVAL;
-> > +     if (io.flags & NVME_HIPRI)
-> > +             rq_flags |= REQ_POLLED;
->
-> I'm pretty sure we can repurpose this previously reserved field for this
-> kind of special handling without an issue now, but we should continue
-> returning EINVAL if any unknown flags are set. I have no idea what, if
-> any, new flags may be defined later, so we shouldn't let a future
-> application think an older driver honored something we are not handling.
+> I guess you don't actually have the hardware and just built it into the
+> kernel?
 
-Would it be better if we don't try to pass NVME_HIPRI by any means
-(flags or rsvd1/rsvd2), and that means not enabling sync-polling and
-killing this patch.
-We have another flag "IO_URING_F_UCMD_POLLED" in ioucmd->flags, and we
-can use that instead to enable only the async polling. What do you
-think?
+Yes, I use the virtual machine instead of the real hardware.
+
+> Because I've been pretty sure that this driver is pretty much dead,
+> so maybe we need to go ahead and just remove it.
+
+I found that there were a few active commits to this driver last year,
+so I assumed it was still "alive".
+Maybe it's time to clean up these unused drivers.
+
+Thanks,
+Zheyu Ma
