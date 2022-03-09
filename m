@@ -2,60 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9443C43219
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC87C4321E
 	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 01:13:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbiCIBOM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 8 Mar 2022 20:14:12 -0500
+        id S230326AbiCIBON (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 8 Mar 2022 20:14:13 -0500
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231723AbiCIBNe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:13:34 -0500
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7825015A202
-        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 16:57:43 -0800 (PST)
-Received: by mail-pf1-x433.google.com with SMTP id a5so881937pfv.2
-        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 16:57:43 -0800 (PST)
+        with ESMTP id S230340AbiCIBMv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 8 Mar 2022 20:12:51 -0500
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2466BBC27
+        for <linux-block@vger.kernel.org>; Tue,  8 Mar 2022 16:55:25 -0800 (PST)
+Received: by mail-pl1-x636.google.com with SMTP id q13so582265plk.12
+        for <linux-block@vger.kernel.org>; Tue, 08 Mar 2022 16:55:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=ibcGiXk54OeOBvZ0Vlw4BQsX8FRRv0YjF+xcJTv4Uo0=;
-        b=UOTc77FA0Rwox8zdOgpA7CUmPD50ywbmTa3N19iM2XyrZc0FqA/+xYy8fE5+e4DRXy
-         yd+3fLuYiRpEOWiV9e4oMomqLzYSnknSExKr48gq0Qphs5b+9WaY2yQhBBy1OAAH9x3o
-         GkxSH/EWinYST+JcuJLsaiPQyYEBEkQb2hyfgdgu5BWjy3x4bEg4MfVlQ2Is5kGm/K23
-         tSUg40/um9ETrFYQsYXJO00ly4fVZZAvnGtEmNUjWIhXmrukgMMqKuMaFkJI/I2/hvWU
-         d8OhAw3iVZ00xgNVPWIWxNlO6VdB+mG3c7dhWgHRp+fBIJ21bQxKJ274+iCA7xJPbdDP
-         su1g==
+        bh=TSJygurfY607jvzpaSXbGkChO2r02RRc4zcT8idFGSc=;
+        b=cQj5MIXnnya8S4VuATtZHow3Gb7EiUuI/OjHbe4Bsz6nWy6G0t+5bypUdRMHtyDyqv
+         0+m047whb+wGAaimM0vhqdm7fHE2tK7e8v4MVMOHyevRhE0Ekma2X7+vVuYJzUQzBxpg
+         igFv6lDEkbUr5HIsAwfE81MjZaPPKYxQhxuHQAntNEYj9UfnCRS5/JFQ/UUwM0e4XYOi
+         1Y55fztpUG/ZzqjfLMbFkiRI5c6QHvPbIRyAFN9d2XCdb6R/Ud/CQK5iMUGGgkB7eOlR
+         7f1UTVAhJCnEsUjpykO6HRnSTzwIP7w6kTV4dHA9oAHljTpNn/dqezd7EXa8/J+2teX2
+         lZwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=ibcGiXk54OeOBvZ0Vlw4BQsX8FRRv0YjF+xcJTv4Uo0=;
-        b=dJMNTojse9sgUCILCKGVr39Q1NN2c5Nir/PYqzEoXuoWa6y28yILwlfDVaSRj/Uqun
-         ktFI4GNUps4DSwAe6zIomPU1qlQtyXtQ3zTyRT/KH96KxaEwYCyx0+qgPrcDNj5oDY7h
-         34UpGL6Pf0OKHXrKCQ8PnJ2JP1OfD3dPzg7U7HXHTHzvt9UKZ7bGqqYJE1M/nvoKvpH/
-         dAHdqzbOtaKf3m/LGnqPCs4c4I8mZYfBm7W+vSHJNVAAfICqcdA4Guzho2JeWEAXm+e2
-         V9rVahVWMlO7jQHZ7ZijYxsf78sx/wbPaih8iFflfWb8bP9q3x9JdDOGCX/w5pqwQRnL
-         /sbQ==
-X-Gm-Message-State: AOAM5316Ji7Ox/ABwNzG8yGNlZn2Y4hpAHYw4l5go/tF2r/KylebW/Sz
-        9Vjhd+TA49XlgQ/plnxE938Q27aCXAssjnFh
-X-Google-Smtp-Source: ABdhPJz+xKfxwokBKXnHLHFlCfMI5IKWjfXAWA5GZk+/gdwzZHhH4ItVropgdyfDbqnvnSgHwpfRLg==
-X-Received: by 2002:aa7:9e07:0:b0:4f6:a7e3:1b57 with SMTP id y7-20020aa79e07000000b004f6a7e31b57mr20824465pfq.13.1646787462899;
-        Tue, 08 Mar 2022 16:57:42 -0800 (PST)
+        bh=TSJygurfY607jvzpaSXbGkChO2r02RRc4zcT8idFGSc=;
+        b=iAttUJxSlYaOC4PdJJVte8HJy1ukGx1o2lXSXRidwJsePTJC0fvzEdW8/X6irEixXh
+         sYtI2qlkxKllMAeMk/kCU4X8NGS0WBqhXKAraGp94GiipgeabtJLCCtlaIj+yp4b1uRi
+         Yl/Htyn7Tlz9b4yI/zjMrgIw12ZMDX/79ktS+sRHYR8Ii8Zmg0LKeS8rg7AZEEBKfD0C
+         qw2u5tZdJ0Em/Z6yuFoVxBCKjGRKdvq3xv5/WKKcxHxCDnb1YelFM5b41ejW8pOAs5n0
+         PbTvqiEqe+uz+iye1dlp0JWDIL3PyxV5AsJTPzbwSQ99L8ONxRmSaeebgW1UgKuptI42
+         Pudg==
+X-Gm-Message-State: AOAM533w2PBbo/u7lKWjK4jGvEdv8SoDpNP1o48SfbmcdFu7zLQkMxfR
+        FjNn+ZY/7COSHNUMbzCeyRk8JzW5Iznr3GqL
+X-Google-Smtp-Source: ABdhPJzfqta+y5PFpcb2NM6oBxTMwg6z2yK87C1eg5Zj+O7aeUBAto+BmzlkGOcXJ73dc5f0rNRmPw==
+X-Received: by 2002:a17:90a:4682:b0:1bc:236:7e46 with SMTP id z2-20020a17090a468200b001bc02367e46mr7473627pjf.212.1646787324421;
+        Tue, 08 Mar 2022 16:55:24 -0800 (PST)
 Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id lb4-20020a17090b4a4400b001b9b20eabc4sm305044pjb.5.2022.03.08.16.57.42
+        by smtp.gmail.com with ESMTPSA id j9-20020a056a00130900b004f73df40914sm299756pfu.82.2022.03.08.16.55.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Mar 2022 16:57:42 -0800 (PST)
+        Tue, 08 Mar 2022 16:55:23 -0800 (PST)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Yu Kuai <yukuai3@huawei.com>, Christoph Hellwig <hch@lst.de>,
-        linux-block@vger.kernel.org
-In-Reply-To: <20220308073219.91173-1-ming.lei@redhat.com>
-References: <20220308073219.91173-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V4 0/6] blk-mq: update_nr_hw_queues related improvement & bugfix
-Message-Id: <164678746208.406543.6112092653609180672.b4-ty@kernel.dk>
-Date:   Tue, 08 Mar 2022 17:57:42 -0700
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+In-Reply-To: <20220308060529.736277-2-hch@lst.de>
+References: <20220308060529.736277-1-hch@lst.de> <20220308060529.736277-2-hch@lst.de>
+Subject: Re: [PATCH 1/2] fs: remove kiocb.ki_hint
+Message-Id: <164678732353.405180.15951772868993926898.b4-ty@kernel.dk>
+Date:   Tue, 08 Mar 2022 17:55:23 -0700
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -63,32 +62,18 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 8 Mar 2022 15:32:13 +0800, Ming Lei wrote:
-> The 1st patch figures out correct numa node for each kind of hw queue.
+On Tue, 8 Mar 2022 07:05:28 +0100, Christoph Hellwig wrote:
+> This field is entirely unused now except for a tracepoint in f2fs, so
+> remove it.
 > 
-> The 2nd patch simplifies reallocation of q->queue_hw_ctx a bit.
 > 
-> The 3rd patch re-configures poll capability after queue map is changed.
-> 
-> The 4th patch changes mtip32xx to avoid to refer to q->queue_hw_ctx
-> directly.
-> 
-> [...]
 
 Applied, thanks!
 
-[1/6] blk-mq: figure out correct numa node for hw queue
-      commit: 4d805131abf219e0019715f1cf29763c613aae07
-[2/6] blk-mq: simplify reallocation of hw ctxs a bit
-      commit: 306f13ee16424805d602d427a66ea38078d473b0
-[3/6] blk-mq: reconfigure poll after queue map is changed
-      commit: 42ee3061293e206bc0f3a084feea1304c61c137a
-[4/6] block: mtip32xx: don't touch q->queue_hw_ctx
-      commit: de0328d3a253a339be14a80fe2a0256ec26867da
-[5/6] blk-mq: prepare for implementing hctx table via xarray
-      commit: 4f481208749a22d3570073e629dbc27d7d27c8da
-[6/6] blk-mq: manage hctx map via xarray
-      commit: 5b3d92d1f9ac5c21b19c90a16c4a1668827aa75b
+[1/2] fs: remove kiocb.ki_hint
+      commit: 41d36a9f3e5336f5b48c3adba0777b8e217020d7
+[2/2] fs: remove fs.f_write_hint
+      commit: 7b12e49669c99f63bc12351c57e581f1f14d4adf
 
 Best regards,
 -- 
