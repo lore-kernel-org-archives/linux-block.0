@@ -2,77 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F34C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 07:11:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0B8AC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  9 Mar 2022 08:24:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230234AbiCIHMz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 9 Mar 2022 02:12:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40590 "EHLO
+        id S231161AbiCIIZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 9 Mar 2022 03:25:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbiCIHMz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 02:12:55 -0500
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6396ECC57;
-        Tue,  8 Mar 2022 23:11:56 -0800 (PST)
-Received: by mail-pj1-x1034.google.com with SMTP id e3so1388944pjm.5;
-        Tue, 08 Mar 2022 23:11:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fRcojdKFkUrzcCxTuVNdK1onU1312nQ1Uevvd7PHIkI=;
-        b=KXYwwrpv7fPdjKDvyfPqgrR0KKByHaugnhUItQbb8kh2d2NiBboHduKjSD5mSTS4DK
-         L97VgyDwqow5cNP8VyVZktho6f3hp2W+EuCoohYVa6u9A9jCOi6uzrU3q8cMrfGFo1G/
-         cvG/woSM6AMp1+AGpvU8/qwcNpnVbMGl2txaPDASXmBs3W6JcoEdVDzj3gPw766vMI8U
-         FfYLgJN0qZQrx8SGQT7i+/+EQTiZZ3CHDTXXzcMy3GI+Es2GkrKPjbDnpZAlJ/PoeD00
-         xGUiPGo9vrNr3vLkhnfkT4IwJumJQPONK8JF4jXf1eU4s+SOvPYKXTBJ6mVRH9DbYxjv
-         kYWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fRcojdKFkUrzcCxTuVNdK1onU1312nQ1Uevvd7PHIkI=;
-        b=MO8vcgtEe4sQk/leXTKlR0M+Cbpp8k8wumr/V1/i1nrua4VkYzwhWO2R8li1QJDEPv
-         0RvMIRcb6Oa9R6dSjpe17pzYra9zPxY9G5S+B6SXgzZzgMyYQ1YSeNkJ3sAGoUY8tNvg
-         lXftSZxpWCoHeB3zT3MlX8WgUvthMV2bdgyep666nO17lVp2zLWEgjb9E1l5452l+8KC
-         vbOlDOIAOVTSLFVQPjzLOUNSM2xz8WbwsdIdBDHbJNKwMstZQYmpjCuPhJK+Oq7vdFYL
-         GDuhxn3HtuFK5kTyTJUgZnT25XoyCAWyygERF+BSxO3p9Euz9/WWBtmgR2XB8Mn/crb9
-         XJ1g==
-X-Gm-Message-State: AOAM533JhdWB6l/NYji22Ef/ZEyYgWTiL9WA5utr4BFqIvQ726d7yV5J
-        1D5HSApopPOfDGrQALEaOHKwd56eXHTgsjQWGA==
-X-Google-Smtp-Source: ABdhPJx7Y9tMsgrHNCFHvVb+R6kcxLDVwEdD+wPmSxpzfNfTeIicJ0IQT3rT29l/gVAxaOVxTDHZSM1g6Fy0HM3gq1Q=
-X-Received: by 2002:a17:902:8a91:b0:14f:969b:f6be with SMTP id
- p17-20020a1709028a9100b0014f969bf6bemr21600350plo.161.1646809914993; Tue, 08
- Mar 2022 23:11:54 -0800 (PST)
+        with ESMTP id S229668AbiCIIZp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 9 Mar 2022 03:25:45 -0500
+Received: from mx1.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A606D4A909;
+        Wed,  9 Mar 2022 00:24:46 -0800 (PST)
+Received: from [192.168.0.3] (ip5f5aef7a.dynamic.kabel-deutschland.de [95.90.239.122])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id EBC2361E64846;
+        Wed,  9 Mar 2022 09:24:44 +0100 (CET)
+Message-ID: <487079ff-356c-a50f-097c-45c4a968d44c@molgen.mpg.de>
+Date:   Wed, 9 Mar 2022 09:24:44 +0100
 MIME-Version: 1.0
-References: <CAMhUBj=i4MJ6KH_UU5dy8e+DmviRg4EFA-D5zyD=XfRi9Ma=pg@mail.gmail.com>
- <YihJm4xuJEDXbcJx@infradead.org>
-In-Reply-To: <YihJm4xuJEDXbcJx@infradead.org>
-From:   Zheyu Ma <zheyuma97@gmail.com>
-Date:   Wed, 9 Mar 2022 15:11:43 +0800
-Message-ID: <CAMhUBj=ZXeGvRv4fJqSKLEkwAm8x664X=sh4PVr7DR83CB7zbA@mail.gmail.com>
-Subject: Re: [BUG] block: sx8: Invalid wait context in carm_queue_rq()
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH 2/2] block: remove the per-bio/request write hint.
+Content-Language: en-US
+To:     Manjong Lee <mj0123.lee@samsung.com>
+Cc:     david@fromorbit.com, axboe@kernel.dk, hch@lst.de,
+        kbusch@kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-raid@vger.kernel.org, sagi@grimberg.me, song@kernel.org,
+        seunghwan.hyun@samsung.com, sookwan7.kim@samsung.com,
+        nanich.lee@samsung.com, woosung2.lee@samsung.com,
+        yt0928.kim@samsung.com, junho89.kim@samsung.com,
+        jisoo2146.oh@samsung.com
+References: <20220306231727.GP3927073@dread.disaster.area>
+ <CGME20220309042324epcas1p111312e20f4429dc3a17172458284a923@epcas1p1.samsung.com>
+ <20220309133119.6915-1-mj0123.lee@samsung.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20220309133119.6915-1-mj0123.lee@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 9, 2022 at 2:30 PM Christoph Hellwig <hch@infradead.org> wrote:
->
-> I guess you don't actually have the hardware and just built it into the
-> kernel?
+Dear Manjong,
 
-Yes, I use the virtual machine instead of the real hardware.
 
-> Because I've been pretty sure that this driver is pretty much dead,
-> so maybe we need to go ahead and just remove it.
+Am 09.03.22 um 14:31 schrieb Manjong Lee:
 
-I found that there were a few active commits to this driver last year,
-so I assumed it was still "alive".
-Maybe it's time to clean up these unused drivers.
+Just a small note, that your message date is from the future. Please 
+check your system clock.
 
-Thanks,
-Zheyu Ma
+
+Kind regards,
+
+Paul
