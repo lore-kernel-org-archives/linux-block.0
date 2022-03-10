@@ -2,150 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20628C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 15:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36938C35273
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 16:17:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238145AbiCJPlG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 10:41:06 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40192 "EHLO
+        id S242153AbiCJQSl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 11:18:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237833AbiCJPlG (ORCPT
+        with ESMTP id S242204AbiCJQSG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 10:41:06 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEC74182D89;
-        Thu, 10 Mar 2022 07:40:04 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 9676AB81FE1;
-        Thu, 10 Mar 2022 15:40:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0164C340F4;
-        Thu, 10 Mar 2022 15:40:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646926802;
-        bh=cahBW4asS7o8MJX61wLf9y+Vbrl7xpiX2UzUluQj068=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bV6P7OEKz9RqdRT5K1aiRe0ithJo1T4P2oAHJa/2szOqFfjjMr+IV+Wu54dzoRCHb
-         Ol5TE6ygAHhNT8vCpk7kQqrPbdNbiF2P7JexDmKAhy/G81s7PgGyGdVcbQYqmjFSBQ
-         m3I8G2j6F/95D1/4f7dUCcJ3zk85IrsH6I76tfVJms6vNuPSePkjF1YSNK7E3twKnM
-         JcBmhkrL4VZu07r/8y+n+csGTnLd/fmMOEzMIZkDXpnWEo5ckiuHibMRN2s0qD4hGG
-         /3JXwueNtGLsJqCh5r+zplsUxmvr8GIOwusVHyIeTa8IcrEGy4m9X7Fa8/wIKOT4M8
-         tmy7HfBg2SiMQ==
-Date:   Thu, 10 Mar 2022 07:39:59 -0800
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
-Message-ID: <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-7-kbusch@kernel.org>
- <your-ad-here.call-01646770901-ext-3299@work.hours>
- <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
- <YigzoKRJ1EHFRZY9@sol.localdomain>
- <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
- <YikEs7RNgPXTQolv@gmail.com>
+        Thu, 10 Mar 2022 11:18:06 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67CC8190B7A
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 08:17:01 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id a1so4972569qta.13
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 08:17:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=o3XiKem00gLr34GESQrNS9nG0HHXcvKwNDWv//lSnUM=;
+        b=1fMvNcrI8SVPpYX5QeQXT/4iXJRVTUzJeQd1sa60b2pCKrmUm9NbtttV/Kyt8R5muB
+         bwwpBmP5tj0wbJabkvNrWbTYUMXQ1ir91xgoRqdvbXkVfhQPTYQ2Y58FwiFCM26tzVbr
+         rroGMlE+9VDqfWr13l06K8AMZkyhLkkDKU694V6IZoQSJyDXELYvYuJ4s+lSC5LUu0g/
+         0arzgD1FEFOxFyaqL4DMiESYWo/unfntY4t++86tkpIS0ezudYQGGho2nAf+HLE9zipp
+         kEEr1OwgMF4GSXwLeMJUoCjOrHkm8LUYuUshvd6q/YZLWgS2P5DB8KKNgkzJ9IqxuIbK
+         atyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=o3XiKem00gLr34GESQrNS9nG0HHXcvKwNDWv//lSnUM=;
+        b=Ts4+CrpccEsxn0Ct1W2PjKhDj2YY3dNrLL1QDQs2mCsiO/qf1keWrLgtIvMShgmd+A
+         5PHmho+K5eFvnER01asq+KB2Z/64VxT03G5ZqA0J8SPDRAZDfXXViQ71XtWQHDLlebet
+         pNEKnbPcKeV54putMTOWtHM0y1xDbfHfpPMKbFJQdve6EFkUvRu/BGIZK20ZZfEu3Qyr
+         5ScIkPTPvbeICThENj5oyz1sBtzEB7Lte95fUhYOEsE7PgtQssjSyfPCNVN42uR5K0lt
+         9WBJP9VTSsd80IxQ0tdlqPAwwgD1HAJ0QKq1I7xitHz28+RMVR6e/K1sw85G/Ang8Alh
+         03vQ==
+X-Gm-Message-State: AOAM532YdQNDB/ugGdOO8Jf68nWZmM4IQVUhzrtwtLF0/D3+IeDs2Fga
+        HiFDfj6tSkDXnK4wwS18IQxw0g==
+X-Google-Smtp-Source: ABdhPJxHk9T5sCR1iHYOfvBRYoGqWAwMh2DfAxFoPQdXl/cWJ0bsam+OAT9uib4F75e/XrCLQt9oiw==
+X-Received: by 2002:ac8:5fd1:0:b0:2d9:4547:9ddb with SMTP id k17-20020ac85fd1000000b002d945479ddbmr4468324qta.149.1646929020380;
+        Thu, 10 Mar 2022 08:17:00 -0800 (PST)
+Received: from localhost ([2620:10d:c091:480::1:5de6])
+        by smtp.gmail.com with ESMTPSA id f14-20020ac8068e000000b002dd1bc00eadsm3187735qth.93.2022.03.10.08.16.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 10 Mar 2022 08:17:00 -0800 (PST)
+Date:   Thu, 10 Mar 2022 11:16:41 -0500
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     cgel.zte@gmail.com, axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
+        Yang Yang <yang.yang29@zte.com.cn>,
+        Ran Xiaokai <ran.xiaokai@zte.com.cn>
+Subject: Re: [PATCH] block/psi: remove PSI annotations from submit_bio
+Message-ID: <YiokaQLWeulWpiCx@cmpxchg.org>
+References: <20220309094323.2082884-1-yang.yang29@zte.com.cn>
+ <Yij9eygSYy5MSIA0@cmpxchg.org>
+ <Yime3HdbEqFgRVtO@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YikEs7RNgPXTQolv@gmail.com>
+In-Reply-To: <Yime3HdbEqFgRVtO@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 09, 2022 at 07:49:07PM +0000, Eric Biggers wrote:
-> The issue is that every other "shash" algorithm besides crct10dif, including
-> crc32 and crc32c, follow the convention of treating the digest as bytes.  Doing
-> otherwise is unusual for the crypto API.  So I have a slight preference for
-> treating it as bytes.  Perhaps see what Herbert Xu (maintainer of the crypto
-> API, Cc'ed) recommends?
+On Wed, Mar 09, 2022 at 10:46:52PM -0800, Christoph Hellwig wrote:
+> On Wed, Mar 09, 2022 at 02:18:19PM -0500, Johannes Weiner wrote:
+> > On Wed, Mar 09, 2022 at 09:43:24AM +0000, cgel.zte@gmail.com wrote:
+> > > From: Yang Yang <yang.yang29@zte.com.cn>
+> > > 
+> > > psi tracks the time spent submitting the IO of refaulting pages[1].
+> > > But after we tracks refault stalls from swap_readpage[2][3], there
+> > > is no need to do so anymore. Since swap_readpage already includes
+> > > IO submitting time.
+> > > 
+> > > [1] commit b8e24a9300b0 ("block: annotate refault stalls from IO submission")
+> > > [2] commit 937790699be9 ("mm/page_io.c: annotate refault stalls from swap_readpage")
+> > > [3] commit 2b413a1a728f ("mm: page_io: fix psi memory pressure error on cold swapins")
+> > > 
+> > > Signed-off-by: Yang Yang <yang.yang29@zte.com.cn>
+> > > Reviewed-by: Ran Xiaokai <ran.xiaokai@zte.com.cn>
+> > 
+> > It's still needed by file cache refaults!
+> 
+> Can we get proper annotations for those please?  These bio-level hooks are
+> horrible and a maintainance nightmware.
 
-I'm okay either way, they're both simple enough. Here is an update atop
-this series to match the other shash conventions if this is preferred
-over my previous fix:
+The first version did that, but it was sprawling and not well-received:
 
----
-diff --git a/block/t10-pi.c b/block/t10-pi.c
-index 914d8cddd43a..f9eb45571bc7 100644
---- a/block/t10-pi.c
-+++ b/block/t10-pi.c
-@@ -282,7 +282,7 @@ EXPORT_SYMBOL(t10_pi_type3_ip);
- 
- static __be64 ext_pi_crc64(void *data, unsigned int len)
- {
--	return cpu_to_be64(crc64_rocksoft(data, len));
-+	return cpu_to_be64(le64_to_cpu(crc64_rocksoft(data, len)));
- }
- 
- static blk_status_t ext_pi_crc64_generate(struct blk_integrity_iter *iter,
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index f1a22794c404..f9e5f601c657 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -3686,11 +3686,11 @@ static const struct hash_testvec crc64_rocksoft_tv_template[] = {
- 	{
- 		.plaintext	= zeroes,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0x6482d367eb22b64eull },
-+		.digest		= "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
- 	}, {
- 		.plaintext	= ones,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0xc0ddba7302eca3acull },
-+		.digest		= "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
- 	}
- };
- 
-diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-index e044c60d1e61..5319f9a9fc19 100644
---- a/include/linux/crc64.h
-+++ b/include/linux/crc64.h
-@@ -12,7 +12,7 @@
- u64 __pure crc64_be(u64 crc, const void *p, size_t len);
- u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
- 
--u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
--u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
-+__le64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-+__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
- 
- #endif /* _LINUX_CRC64_H */
-diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
-index fc9ae0da5df7..215acb79a15d 100644
---- a/lib/crc64-rocksoft.c
-+++ b/lib/crc64-rocksoft.c
-@@ -54,16 +54,16 @@ static struct notifier_block crc64_rocksoft_nb = {
- 	.notifier_call = crc64_rocksoft_notify,
- };
- 
--u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
-+__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
- {
- 	struct {
- 		struct shash_desc shash;
--		u64 crc;
-+		__le64 crc;
- 	} desc;
- 	int err;
- 
- 	if (static_branch_unlikely(&crc64_rocksoft_fallback))
--		return crc64_rocksoft_generic(crc, buffer, len);
-+		return cpu_to_le64(crc64_rocksoft_generic(crc, buffer, len));
- 
- 	rcu_read_lock();
- 	desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
-@@ -77,7 +77,7 @@ u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
- }
- EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
- 
--u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
-+__le64 crc64_rocksoft(const unsigned char *buffer, size_t len)
- {
- 	return crc64_rocksoft_update(0, buffer, len);
- }
---
+https://lkml.org/lkml/2019/7/22/1261
