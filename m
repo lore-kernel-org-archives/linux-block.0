@@ -2,123 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E92C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 15:16:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6986BC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 15:17:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230427AbiCJPRg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 10:17:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60984 "EHLO
+        id S233857AbiCJPS6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 10:18:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232609AbiCJPRf (ORCPT
+        with ESMTP id S238147AbiCJPSv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 10:17:35 -0500
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FB45F5D
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 07:16:30 -0800 (PST)
-Received: by mail-wr1-x436.google.com with SMTP id x15so8438396wru.13
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 07:16:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=dRNE1Q3UHcAv6Ct12abpAnXUsUnbwAcbxOzLZWSk128=;
-        b=j9fj+0YOsW71ldzLgCBoUAGcbVKjFIK6ZRvCAMZRypA/XSyKwDDMydzdGnTXQtDQHm
-         ixEaVK1IyqfaAPq1O6W67jzIO0cFZcmjT6I1DcPxOwvehTFhaw2+Xi2K3NsROy8CjG7W
-         qmJ/MmZ43pez3z9Aan/E/w+zMs/qFZ7qKcwpI2d4FWIbg9gjhlTNh0RHndjlsjnyXshr
-         PgSaPiYkq+PkTdPGfsTobMqrKnrQ9ky53l/8IHw3KXwaMm6Gz+GWGUHZ6IeqdoOgid69
-         TJKWYxq+BFtGjhvCFNLAulrVzMrmTjHwgPgIEGLAQbEEDBRhJ+MiK+p+I+k63ofbzHEA
-         W9CA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=dRNE1Q3UHcAv6Ct12abpAnXUsUnbwAcbxOzLZWSk128=;
-        b=jgXjYb64Hi6wcRXicy/piI4GAHKuIxdKuYRWeSLD1R52PGViOEpxCXBWRQtnwxYWnQ
-         Gc7LaDNW8vu243y3BWkPG8oRNLp2eB5fgAyzCUZTa/Pb+i9LIFttqOi+RgYYvN/kvpSt
-         Hbpb+eraAL7NuLiZhpi7jHV/cuqlIPNQ4ooc3etE8TlJpUYqJhLQ7G7TVUyQ9UDX+E1d
-         i3aqrMthO8Mx0M7tbWyFbfzgaLfuSxkTb6ap0BICR7xTdkwFG5K+ChO/jgiq+S/no42t
-         P3Cal1ut6PQzNRR3f/Xa6CCSFDp7TC4t99VyTe6hE05Z6U9SxUyjeP8CKUFblPPf9l46
-         Vnwg==
-X-Gm-Message-State: AOAM533TN0j/NFP1MjmNgmurdHqHMCAVib+g2ONwkRN+49w3R0TVnR4p
-        BBn3Q57movfyfPypvQKC0eWU0Q==
-X-Google-Smtp-Source: ABdhPJzUi+LPZUiXwebXV78bx1zgz6gydw/BcJqlaUAKuEgMiIAzEW/wR7qbM0cLhgpzF1q28AZJ5Q==
-X-Received: by 2002:a05:6000:188e:b0:1f1:f8f0:f75a with SMTP id a14-20020a056000188e00b001f1f8f0f75amr3772099wri.682.1646925389123;
-        Thu, 10 Mar 2022 07:16:29 -0800 (PST)
-Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
-        by smtp.gmail.com with ESMTPSA id g5-20020a5d64e5000000b00203914f5313sm818592wri.114.2022.03.10.07.16.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 07:16:28 -0800 (PST)
-Date:   Thu, 10 Mar 2022 16:16:28 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Matias =?utf-8?B?QmrDuHJsaW5n?= <Matias.Bjorling@wdc.com>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <20220310151628.awfihyvsjc7hawnz@ArmHalley.local>
-References: <BYAPR04MB4968FA68FA8B670163EEC1EFF10B9@BYAPR04MB4968.namprd04.prod.outlook.com>
- <C2710A6C-340D-4BFC-A8DB-28D456095468@javigon.com>
- <BYAPR04MB49684A8C6FEDA0B999ABCBB2F10B9@BYAPR04MB4968.namprd04.prod.outlook.com>
- <20220310150730.GA329710@dhcp-10-100-145-180.wdc.com>
+        Thu, 10 Mar 2022 10:18:51 -0500
+Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8FC1C136
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 07:17:40 -0800 (PST)
+Received: from [10.43.0.34]
+        by iris.vrvis.at with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <valentin@vrvis.at>)
+        id 1nSKXp-0001fg-JI; Thu, 10 Mar 2022 16:17:38 +0100
+Message-ID: <07bafc71-a6d2-ad6d-4706-7c99047b3228@vrvis.at>
+Date:   Thu, 10 Mar 2022 16:17:37 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220310150730.GA329710@dhcp-10-100-145-180.wdc.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Content-Language: en-US
+To:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Justin Sanders <justin@coraid.com>,
+        Jens Axboe <axboe@kernel.dk>
+From:   Valentin Kleibel <valentin@vrvis.at>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [PATCH] block: aoe: handle device timeouts atomic-safe
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10.03.2022 07:07, Keith Busch wrote:
->On Thu, Mar 10, 2022 at 02:58:07PM +0000, Matias Bjørling wrote:
->>  >> Yes, these drives are intended for Linux users that would use the
->> > >> zoned block device. Append is supported but holes in the LBA space
->> > >> (due to diff in zone cap and zone size) is still a problem for these users.
->> > >
->> > > With respect to the specific users, what does it break specifically? What are
->> > key features are they missing when there's holes?
->> >
->> > What we hear is that it breaks existing mapping in applications, where the
->> > address space is seen as contiguous; with holes it needs to account for the
->> > unmapped space. This affects performance and and CPU due to unnecessary
->> > splits. This is for both reads and writes.
->> >
->> > For more details, I guess they will have to jump in and share the parts that
->> > they consider is proper to share in the mailing list.
->> >
->> > I guess we will have more conversations around this as we push the block
->> > layer changes after this series.
->>
->> Ok, so I hear that one issue is I/O splits - If I assume that reads
->> are sequential, zone cap/size between 100MiB and 1GiB, then my gut
->> feeling would tell me its less CPU intensive to split every 100MiB to
->> 1GiB of reads, than it would be to not have power of 2 zones due to
->> the extra per io calculations.
->
->Don't you need to split anyway when spanning two zones to avoid the zone
->boundary error?
+If an aoe device does not respond to any packet on the network layer 
+within aoe_deadsecs, the driver tries to mark the device as down, fail 
+all I/O and clean out the queue.
 
-If you have size = capacity then you can do a cross-zone read. This is
-only a problem when we have gaps.
+This currently produces a "BUG: scheduling while atomic" and never finishes.
+relevant dmesg output:
+[....]
+[  408.620155] blk_update_request: I/O error, dev etherd/e42.0, sector
+4096 op 0x0:(READ) flags 0x0 phys_seg 2 prio class 0
+[  408.620235] blk_update_request: I/O error, dev etherd/e42.0, sector 0
+op 0x0:(READ) flags 0x0 phys_seg 2 prio class 0
+[  408.620290] BUG: scheduling while atomic: swapper/16/0/0x00000100
+[  408.620325] Modules linked in: sctp bridge 8021q garp stp mrp llc
+psmouse dlm configfs aoe ipmi_ssif amd64_edac_mod edac_mce_amd
+amd_energy kvm_amd kvm irqbypass ghash_clmulni_intel aesni_intel libaes
+crypto_simd cryptd glue_helper rapl pcspkr ast drm_vram_helper
+drm_ttm_helper ttm drm_kms_helper cec drm evdev joydev ccp sg sp5100_tco
+rng_core watchdog k10temp acpi_ipmi ipmi_si ipmi_devintf ipmi_msghandler
+acpi_cpufreq button ext4 crc16 mbcache jbd2 dm_mod raid10 raid456
+async_raid6_recov async_memcpy async_pq async_xor async_tx xor raid6_pq
+libcrc32c crc32c_generic raid0 multipath linear mlx4_ib ib_uverbs
+mlx4_en raid1 md_mod sd_mod t10_pi crc_t10dif crct10dif_generic ib_core
+hid_generic usbhid hid crct10dif_pclmul crct10dif_common crc32_pclmul
+crc32c_intel xhci_pci igb mpt3sas xhci_hcd ahci libahci i2c_algo_bit dca
+ptp libata pps_core raid_class usbcore scsi_transport_sas mlx4_core
+scsi_mod i2c_piix4 usb_common
+[  408.620422] CPU: 16 PID: 0 Comm: swapper/16 Not tainted
+5.10.0-5-amd64 #1 Debian 5.10.26-1
+[  408.620424] Hardware name: Supermicro AS -2013S-C0R/H11SSL-C, BIOS
+2.1 02/21/2020
+[  408.620425] Call Trace:
+[  408.620428]  <IRQ>
+[  408.620437]  dump_stack+0x6b/0x83
+[  408.620442]  __schedule_bug.cold+0x4c/0x58
+[  408.620446]  __schedule+0x719/0x870
+[  408.620449]  schedule+0x46/0xb0
+[  408.620453]  blk_mq_freeze_queue_wait+0x62/0x90
+[  408.620458]  ? add_wait_queue_exclusive+0x70/0x70
+[  408.620466]  aoedev_downdev+0x106/0x150 [aoe]
+[  408.620471]  rexmit_timer+0x4ea/0x500 [aoe]
+[  408.620476]  ? rexmit_deferred+0x380/0x380 [aoe]
+[  408.620480]  call_timer_fn+0x29/0xf0
+[  408.620483]  __run_timers.part.0+0x1d3/0x240
+[  408.620485]  ? ktime_get+0x38/0xa0
+[  408.620488]  ? lapic_next_event+0x1d/0x20
+[  408.620491]  ? clockevents_program_event+0x8d/0xf0
+[  408.620494]  run_timer_softirq+0x26/0x50
+[  408.620496]  __do_softirq+0xc5/0x275
+[  408.620499]  asm_call_irq_on_stack+0x12/0x20
+[  408.620501]  </IRQ>
+[  408.620505]  do_softirq_own_stack+0x37/0x40
+[  408.620509]  irq_exit_rcu+0x8e/0xc0
+[  408.620512]  sysvec_apic_timer_interrupt+0x36/0x80
+[  408.620515]  asm_sysvec_apic_timer_interrupt+0x12/0x20
+[  408.620520] RIP: 0010:cpuidle_enter_state+0xc7/0x350
 
->Maybe this is a silly idea, but it would be a trivial device-mapper
->to remap the gaps out of the lba range.
+The timeout is handled in rexmit_timer() [drivers/block/aoe/aoecmd.c 
+L727ff] which is registered as a timer callback function and never 
+explicitly called. For this reason rexmit_timer() is always called from 
+an interrupt context.
+When the timeout exceeds aoe_deadsecs aoedev_downdev() is called from 
+rexmit_timer() in L782.
+aoedev_downdev() then tries to clean out the queue 
+[drivers/block/aoe/aoedev.c L227ff] using blk_mq_freeze_queue() and 
+blk_mq_quiesce_queue(). These functions will sleep and, in the context 
+of an interrupt, trigger the "BUG: scheduling while atomic" message, 
+ultimately leading to hung tasks and an unusable system.
 
-One thing we have considered is that as we remove the PO2 constraint
-from the block layer is that devices exposing PO2 zone sizes are able to
-do the emulation the other way around to support things like this.
+Before the change to blk_mq (commit 3582dd291788) the queue was emptied 
+by iterating over all requests in the queue and failing them 1 by 1 
+while no new requests were accepted due to ~DEVFL_UP being set.
+To fail the queue in an atomic-safe way, this patch restores the 
+previous behavior and adapts it to blk_mq.
+Fetching requests from the queue is borrowed from nextbuf() 
+[drivers/block/aoe/aoecmd.c L850] and finally failing them is done with 
+aoe_end_request() [drivers/block/aoe/aoecmd.c L1030]. This is done while 
+the ~DEVFL_UP flag is set which prevents aoeblk_queue_rq() 
+[drivers/block/aoe/aoeblk.c L262] to enqueue new requests.
 
-A device mapper is also a fine place to put this, but it seems like a
-very simple task. Is it worth all the boilerplate code for the device
-mapper only for this?
+Fixes: 3582dd291788 (aoe: convert aoeblk to blk-mq)
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=212665
+Signed-off-by: Valentin Kleibel <valentin@vrvis.at>
+---
+  drivers/block/aoe/aoedev.c | 13 ++++++++-----
+  1 file changed, 8 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index c5753c6bfe80..0740acefed4c 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -198,6 +198,7 @@ aoedev_downdev(struct aoedev *d)
+  {
+         struct aoetgt *t, **tt, **te;
+         struct list_head *head, *pos, *nx;
++       struct request *rq;
+         int i;
+
+         d->flags &= ~DEVFL_UP;
+@@ -225,11 +226,13 @@ aoedev_downdev(struct aoedev *d)
+
+         /* fast fail all pending I/O */
+         if (d->blkq) {
+-               /* UP is cleared, freeze+quiesce to insure all are 
+errored */
+-               blk_mq_freeze_queue(d->blkq);
+-               blk_mq_quiesce_queue(d->blkq);
+-               blk_mq_unquiesce_queue(d->blkq);
+-               blk_mq_unfreeze_queue(d->blkq);
++               /* UP is cleared, error all requests without sleeping */
++               while ((rq = list_first_entry_or_null(&d->rq_list, 
+struct request,
++                               queuelist))) {
++                       list_del_init(&rq->queuelist);
++                       blk_mq_start_request(rq);
++                       aoe_end_request(d, rq, 1);
++               }
+         }
+
+         if (d->gd)
