@@ -2,114 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32BBAC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 10:01:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EA54C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 10:05:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234373AbiCJKCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 05:02:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38066 "EHLO
+        id S231982AbiCJKGa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 05:06:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231982AbiCJKCV (ORCPT
+        with ESMTP id S239862AbiCJKG3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 05:02:21 -0500
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5A8013D578
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 02:01:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1646906480;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0UPaY2/tHCrOdvsv0aFffLM+jcSR/3Ygze3nVa3wohE=;
-        b=i5/10t2Myviv4aSSVeI4uGiPeKamZqJxniOwYzl/IAoFRQnUpGiafNigdASWMT0/YY5IyH
-        WLtcxikJKLvQdcedRgn70CYeGXJwf6ZeN5v08paViqByJC5slpOx7gEgQwDFIBi8IHIA7l
-        pldpRWB50KJBk3oRScOSC6HxqM4Y+l8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-10ocabzoPySLEeFLWPesDQ-1; Thu, 10 Mar 2022 05:01:14 -0500
-X-MC-Unique: 10ocabzoPySLEeFLWPesDQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B8F51091DA0;
-        Thu, 10 Mar 2022 10:01:13 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 115D8105958D;
-        Thu, 10 Mar 2022 10:01:00 +0000 (UTC)
-Date:   Thu, 10 Mar 2022 18:00:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [bug report] worker watchdog timeout in dispatch loop for
- null_blk
-Message-ID: <YinMWPiuUluinom8@T590>
-References: <20220310091649.zypaem5lkyfadymg@shindev>
+        Thu, 10 Mar 2022 05:06:29 -0500
+Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F8213D578;
+        Thu, 10 Mar 2022 02:05:28 -0800 (PST)
+Received: by mail-lf1-x12b.google.com with SMTP id s25so8464987lfs.10;
+        Thu, 10 Mar 2022 02:05:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g1v6ovUNSf+kFskR5R+v2NInQ6xsMS01QhfDEC1m/98=;
+        b=ns33X3mSvUp/dV4LlGedMNO7aMi7dLjkJEUK4S+oJGMyRCgCRbpIY/bN1lKR7coIXt
+         fgnlmrPnvIUWbzXLZXsahgLPJJhWkeuczEbUHP5ElqKexNzJYP0gAxHjGPJX/CqPQ8QH
+         kpmjVHzhjJ7tMioIgTAfkNZ4h0efJFIsYgBVKYRvA4/s8c3a3BH+AEJgU8qpbf+bbY2g
+         uXSUBVqregysJ4ss/HApTFtigwZZsAH+zVvVgLhTS54BwnE+AcGY/PjPVE3mFH+r28D8
+         p/MNit5koONLvhhlYyCG0wohubRoqL2ukmTOS7AqUs+r4XjBh3AtK8PrI0HUlMBfQFsM
+         zNaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g1v6ovUNSf+kFskR5R+v2NInQ6xsMS01QhfDEC1m/98=;
+        b=6fzY7q3np4SYhAlcXyg4nAaT33aMFOC2EidjgQ73GORPPT3b3xwZdZpjXTznCjuJk8
+         c1rTNfJtMW/xtjHD+NTl2Ox78krv6wi2YwILPqPV/QS6PzyGeJfJ63ydeWmBoBHTcESQ
+         PQ5gEDlOJ+10nk0uo+zPhprVgUoyZEHEqFlWoIvHHwMTaP1mUm6g71vYHxICH+QwUzj4
+         cBu0O3rR2Q45NYNSvOvFwFlAR/6W6zB8KLTNm3R7G5hIS71QxOTYCueOwRViusxmk75T
+         9SMpd0QTJBpSfkLK6TXzGDWiXJz/dt6xyfWpZ3jQvxYCvGHnAsyqFQIzRHWtzI+JjGZK
+         xPdw==
+X-Gm-Message-State: AOAM531UD7kX93AdyvngN6V/FCCwv2ZcsF4f/DyImpS/ik/pAtGqd1jh
+        whYdZSTF32EY3itf6ZlAGk2vih1OTxiQ+r7IKno=
+X-Google-Smtp-Source: ABdhPJwDzqA1hnug0wbCxuMMC9bwFUJgrX7k50AuAyOlBBQCCbHd+EQ98+xL/K6bjR+dxXF673VzxbFS2cGid0d5Jgc=
+X-Received: by 2002:a05:6512:2208:b0:448:5c7a:6dd9 with SMTP id
+ h8-20020a056512220800b004485c7a6dd9mr2577551lfu.334.1646906726687; Thu, 10
+ Mar 2022 02:05:26 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220310091649.zypaem5lkyfadymg@shindev>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
+ <20220308152105.309618-1-joshi.k@samsung.com> <20220310082926.GA26614@lst.de>
+In-Reply-To: <20220310082926.GA26614@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Thu, 10 Mar 2022 15:35:02 +0530
+Message-ID: <CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com>
+Subject: Re: [PATCH 00/17] io_uring passthru over nvme
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 09:16:50AM +0000, Shinichiro Kawasaki wrote:
-> This issue does not look critical, but let me share it to ask comments for fix.
-> 
-> When fio command with 40 jobs [1] is run for a null_blk device with memory
-> backing and mq-deadline scheduler, kernel reports a BUG message [2]. The
-> workqueue watchdog reports that kblockd blk_mq_run_work_fn keeps on running
-> more than 30 seconds and other work can not run. The 40 fio jobs keep on
-> creating many read requests to a single null_blk device, then the every time
-> the mq_run task calls __blk_mq_do_dispatch_sched(), it returns ret == 1 which
-> means more than one request was dispatched. Hence, the while loop in
-> blk_mq_do_dispatch_sched() does not break.
-> 
-> static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> {
->         int ret;
-> 
->         do {
->                ret = __blk_mq_do_dispatch_sched(hctx);
->         } while (ret == 1);
-> 
->         return ret;
-> }
-> 
-> The BUG message was observed when I ran blktests block/005 with various
-> conditions on a system with 40 CPUs. It was observed with kernel version
-> v5.16-rc1 through v5.17-rc7. The trigger commit was 0a593fbbc245 ("null_blk:
-> poll queue support"). This commit added blk_mq_ops.map_queues callback. I
-> guess it changed dispatch behavior for null_blk devices and triggered the
-> BUG message.
+On Thu, Mar 10, 2022 at 1:59 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> What branch is this against?
+Sorry I missed that in the cover.
+Two options -
+(a) https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-big-sqe
+first patch ("128 byte sqe support") is already there.
+(b) for-next (linux-block), series will fit on top of commit 9e9d83faa
+("io_uring: Remove unneeded test in io_run_task_work_sig")
 
-It is one blk-mq soft lockup issue in dispatch side, and shouldn't be related
-with 0a593fbbc245.
+> Do you have a git tree available?
+Not at the moment.
 
-If queueing requests is faster than dispatching, the issue will be triggered
-sooner or later, especially easy to trigger in SQ device. I am sure it can
-be triggered on scsi debug, even saw such report on ahci.
+@Jens: Please see if it is possible to move patches to your
+io_uring-big-sqe branch (and maybe rename that to big-sqe-pt.v1).
 
-> 
-> I'm not so sure if we really need to fix this issue. It does not seem the real
-> world problem since it is observed only with null_blk. The real block devices
-> have slower IO operation then the dispatch should stop sooner when the hardware
-> queue gets full. Also the 40 jobs for single device is not realistic workload.
-> 
-> Having said that, it does not feel right that other works are pended during
-> dispatch for null_blk devices. To avoid the BUG message, I can think of two
-> fix approaches. First one is to break the while loop in blk_mq_do_dispatch_sched
-> using a loop counter [3] (or jiffies timeout check).
-
-This way could work, but the queue need to be re-run after breaking
-caused by max dispatch number. cond_resched() might be the simplest way,
-but it can't be used here because of rcu/srcu read lock.
-
-
-
-Thanks,
-Ming
-
+Thanks.
