@@ -2,75 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D79AC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:03:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8345CC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:15:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234070AbiCJMEu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 07:04:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36620 "EHLO
+        id S241919AbiCJMQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 07:16:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229781AbiCJMEu (ORCPT
+        with ESMTP id S241922AbiCJMQP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 07:04:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9835813F9B;
-        Thu, 10 Mar 2022 04:03:48 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3653861709;
-        Thu, 10 Mar 2022 12:03:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49828C340E8;
-        Thu, 10 Mar 2022 12:03:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1646913827;
-        bh=NfICtKlhZL/pMZsaGdp5C1Kw7skOJL1B0NVOs+Q11Wc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=DGvOLeGtrSZGReY8A+RY7A8L8uExwew5D50e8BJ6R8bcAf4KfsSwC6EqING9AC+Uo
-         v8G5Sl5eHvZlqWP6Td4u0yBkrBCZGFE3H93RfQPd0OdPZoW4U0PMV2qOskbHyrJN0i
-         5FQ0pUkXfzBOoSxrLt/sVDSE3LrbOS5aLK48UL+U=
-Date:   Thu, 10 Mar 2022 13:03:44 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Valentin Kleibel <valentin@vrvis.at>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: aoe: fix page fault in freedev()
-Message-ID: <YinpIKY0HVlJ+TLR@kroah.com>
-References: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
+        Thu, 10 Mar 2022 07:16:15 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A20761480DD
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 04:15:14 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id kx6-20020a17090b228600b001bf859159bfso8066565pjb.1
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 04:15:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=hoPWBro4VveouJ4vx2nAAxYFxr+KDw+cTxYyidREMFo=;
+        b=3lHvgXyOZWgBu7xmQFS37eeUDuf1cB/DlgDJKt7JktscFsHvnp2Z8HCO7AOl2uhI4v
+         IfKhXbGVbCyxw6KBqmCJJj9pXcgNwwx8ywoRtiOyPNStQnrxq6KFtxGsd3biz/AqcHWW
+         j/w7UdCS6+jAfG4hgQcTgSKFx6XIqC3Hw8YADTHIrxFAt+0Rmac4VbfJyn/Y1VvMEj6d
+         VMO8rDYU5jzoD8Ukc1lKq/tWuwpvqQxOdscRi7bEgiCGO5gHq1sZuu1Qy9OGPoqkq6Bb
+         HqFsp7iKPtFoQ8ApxZav7UKCYUNl9udtO7+ktT1RlPCAqGWAg58SD0xHYkrZOrmdn/8K
+         1cUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hoPWBro4VveouJ4vx2nAAxYFxr+KDw+cTxYyidREMFo=;
+        b=4AGldPg1iCvU66U/4zTYyPxid+khY4ryX9lQ+wyyDHq0p9QbD7uqfsv+tqwK3M4Gnw
+         FYb0hRaA02jMDv/rKHfcxLpvh0k+PUWmGDgCcowaQ3q/9s62CLMR7r7lcO3orzEGWxoE
+         Y6B39feb5ZPpSOnb95QE843OZQEpm9a0bfEg7fQSgjaD2eHxty2R6oMkECtlz+YWYDTW
+         L4W51J1fkioQYCHZtND5NYFvJAuGuhDvgfxKNbX2y5NDJvMhxzJaCRy5ytOOkafOAXkw
+         dpMxgF9n0uNQec4G4p0cCx6FvcTxkb/gotlj0CwFysob3C5TvSXUzcW42VRLTbiHRLtT
+         HGzQ==
+X-Gm-Message-State: AOAM531i8gV//hZ1Et2TXqbf86C3ksfWyPpJcP5YIjXoD+cZHfhpoAKC
+        0RDF0UgUpI8hRHAWgXNz+Z3oTQ==
+X-Google-Smtp-Source: ABdhPJzSQmxtoIBTxfTuTtDJblYzgJmRRteHsYoyEbd/AE8Ym0coXr6/kU1kFb735T1a56f84F6JHQ==
+X-Received: by 2002:a17:90b:3a8f:b0:1bf:ccc:59bc with SMTP id om15-20020a17090b3a8f00b001bf0ccc59bcmr4730847pjb.234.1646914513229;
+        Thu, 10 Mar 2022 04:15:13 -0800 (PST)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id o66-20020a17090a0a4800b001bf388fc96esm5918336pjo.21.2022.03.10.04.15.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Mar 2022 04:15:12 -0800 (PST)
+Message-ID: <e98948ae-1709-32ef-e1e4-063be38609b1@kernel.dk>
+Date:   Thu, 10 Mar 2022 05:15:10 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write
+ hint.
+Content-Language: en-US
+To:     "Luca Porzio (lporzio)" <lporzio@micron.com>,
+        Manjong Lee <mj0123.lee@samsung.com>,
+        "david@fromorbit.com" <david@fromorbit.com>
+Cc:     "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "song@kernel.org" <song@kernel.org>,
+        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
+        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
+        "nanich.lee@samsung.com" <nanich.lee@samsung.com>,
+        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
+        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
+        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
+        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>
+References: <20220306231727.GP3927073@dread.disaster.area>
+ <CGME20220309042324epcas1p111312e20f4429dc3a17172458284a923@epcas1p1.samsung.com>
+ <20220309133119.6915-1-mj0123.lee@samsung.com>
+ <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 12:53:01PM +0100, Valentin Kleibel wrote:
-> There is a bug in the aoe driver module where every forcible removal of an
-> aoe device (eg. "rmmod aoe" with aoe devices available or "aoe-flush ex.x")
-> leads to a page fault.
-> The code in freedev() calls blk_mq_free_tag_set() before running
-> blk_cleanup_queue() which leads to this issue (drivers/block/aoe/aoedev.c
-> L281ff).
-> This issue was fixed upstream in commit 6560ec9 (aoe: use blk_mq_alloc_disk
-> and blk_cleanup_disk) with the introduction and use of the function
-> blk_cleanup_disk().
+On 3/10/22 4:34 AM, Luca Porzio (lporzio) wrote:
+>> -----Original Message-----
+>> From: Manjong Lee <mj0123.lee@samsung.com>
+>> Sent: Wednesday, March 9, 2022 2:31 PM
+>> To: david@fromorbit.com
+>> Cc: axboe@kernel.dk; hch@lst.de; kbusch@kernel.org; linux-
+>> block@vger.kernel.org; linux-fsdevel@vger.kernel.org; linux-
+>> nvme@lists.infradead.org; linux-raid@vger.kernel.org; sagi@grimberg.me;
+>> song@kernel.org; seunghwan.hyun@samsung.com;
+>> sookwan7.kim@samsung.com; nanich.lee@samsung.com;
+>> woosung2.lee@samsung.com; yt0928.kim@samsung.com;
+>> junho89.kim@samsung.com; jisoo2146.oh@samsung.com
+>> Subject: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write hint.
+>>
+>> CAUTION: EXTERNAL EMAIL. Do not click links or open attachments unless
+>> you recognize the sender and were expecting this message.
+>>
+>>
+>>> On Sun, ddMar 06, 2022 at 11:06:12AM -0700, Jens Axboe wrote:
+>>>> On 3/6/22 11:01 AM, Christoph Hellwig wrote:
+>>>>> On Sun, Mar 06, 2022 at 10:11:46AM -0700, Jens Axboe wrote:
+>>>>>> Yes, I think we should kill it. If we retain the inode hint, the
+>>>>>> f2fs doesn't need a any changes. And it should be safe to make the
+>>>>>> per-file fcntl hints return EINVAL, which they would on older kernels
+>> anyway.
+>>>>>> Untested, but something like the below.
+>>>>>
+>>>>> I've sent this off to the testing farm this morning, but EINVAL
+>>>>> might be even better:
+>>>>>
+>>>>> https://urldefense.com/v3/__http://git.infradead.org/users/hch/bloc
+>>>>> k.git/shortlog/refs/heads/more-hint-
+>> removal__;!!KZTdOCjhgt4hgw!qsgy
+>>>>>
+>> oejchUYPeorpCL0Ov3jPGvXpXgxa7hpSCViD7XQy7uJDMDLo3U8v_bmoUtg$
+>>>
+>>> Yup, I like that.
+>>>
+>>>> I do think EINVAL is better, as it just tells the app it's not
+>>>> available like we would've done before. With just doing zeroes, that
+>>>> might break applications that set-and-verify. Of course there's also
+>>>> the risk of that since we retain inode hints (so they work), but fail file
+>> hints.
+>>>> That's a lesser risk though, and we only know of the inode hints
+>>>> being used.
+>>>
+>>> Agreed, I think EINVAL would be better here - jsut make it behave like
+>>> it would on a kernel that never supported this functionality in the
+>>> first place. Seems simpler to me for user applications if we do that.
+>>>
+>>> Cheers,
+>>>
+>>> Dave.
+>>> --
+>>> Dave Chinner
+>>> david@fromorbit.com
+>>>
+>>
+>> Currently, UFS device also supports hot/cold data separation and uses
+>> existing write_hint code.
+>>
+>> In other words, the function is also being used in storage other than NVMe,
+>> and if it is removed, it is thought that there will be an operation problem.
+>>
+>> If the code is removed, I am worried about how other devices that use the
+>> function.
+>>
+>> Is there a good alternative?
 > 
-> This patch applies to kernels 5.4 and 5.10.
-
-We need a fix for Linus's tree first before we can backport anything to
-older kernels.  Does this also work there?
-
+> Hi all,
 > 
-> The function calls are reordered to match the behavior of blk_cleanup_disk()
-> to mitigate this issue.
+> I work for Micron UFS team. I confirm and support Manjong message above.
+> There are UFS customers using custom write_hint in Android and due to the 
+> "upstream first" policy from Google, if you remove write_hints in block device,
+> The Android ecosystem will suffer this lack.
 > 
-> Fixes: 3582dd2 (aoe: convert aoeblk to blk-mq)
+> Can we revert back this decision? Or think of an alternative solution which 
+> may work?
 
-A few more digits in the sha1 here would be good, otherwise our tools
-will complain.  It should look like:
-Fixes: 3582dd291788 ("aoe: convert aoeblk to blk-mq")
+You do both realize that this is just the file specific hint? Inode
+based hints will still work fine for UFS.
 
-thanks,
+-- 
+Jens Axboe
 
-greg k-h
