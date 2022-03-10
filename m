@@ -2,76 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D657CC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:29:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F15C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:40:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237432AbiCJMa6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 07:30:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48268 "EHLO
+        id S239936AbiCJMlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 07:41:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56962 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235393AbiCJMa6 (ORCPT
+        with ESMTP id S239897AbiCJMlf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 07:30:58 -0500
-Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7990E818A5;
-        Thu, 10 Mar 2022 04:29:57 -0800 (PST)
-Received: from [10.43.0.34]
-        by iris.vrvis.at with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <valentin@vrvis.at>)
-        id 1nSHLq-0005Vw-31; Thu, 10 Mar 2022 12:53:02 +0100
-Message-ID: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
-Date:   Thu, 10 Mar 2022 12:53:01 +0100
+        Thu, 10 Mar 2022 07:41:35 -0500
+Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA775148909;
+        Thu, 10 Mar 2022 04:40:34 -0800 (PST)
+Received: by mail-lj1-x22d.google.com with SMTP id o6so7526850ljp.3;
+        Thu, 10 Mar 2022 04:40:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DAtfKJxhTlUfLfh7FDdHLWXEZv3s/cYhD3RWZTonYVc=;
+        b=CNx5wp3+3lfwtIyoCM9pRl1cXVqdYbE6/d4Op9YI4mLz2vYcAduj4xLyqq95HxWX8Y
+         /UqkC3O3uouwq15gtsKUA6ISPm+F1W/NRnQEkLSibFQOOlM9Ou0pWViE0PSFvdm+i6hE
+         cVbSFHOo87qTdoL+ls2yBlZrEyEryORUwE8MY9mVRruJmSXBKW5MO0pjMPclHlgbe35v
+         vv73luUALWmVAxQhjuYyrg1o3+DZ5JaBwo7pgQE7XuCtVhXNxaEdVMhp+gJpOh3jpDla
+         hYADDMd0nJAtdtyPxuB/9RzMmIl5x5EZmsyiZDBHc7/PTZkR5jNUByZbxz54s09DOrJC
+         evqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DAtfKJxhTlUfLfh7FDdHLWXEZv3s/cYhD3RWZTonYVc=;
+        b=NDluLH0wklj+oY8FpnZswnnJ6vVfQxwBfNokY/zYVlLAenwrGPY2CgW4ZX3ytnMbQ3
+         52znFy539AqKtxqJ899L5S8MpCWKsVrxyP7IKppso8+9g49/Q7tJp/Jszn/sAIQAnA5v
+         z26moadzY13YhApQ+aAFQ3rfaeNPZ2gtEMeoy1ycrOHtw2Rf4HbFfwaoCPv+EY3dwDb5
+         G1FNSYJ1VLj8AKqAxFdJ5KFb7NMezMuRd6nYBdrGJ89cunhYZLxcWky0Tr5gs43/uUoh
+         pkJsnwguGKfznYbpXt90gxnx8By9bv29u8EeEje8A2D/gmL/sdnDmRvXBLKBB2tlROnp
+         +BcQ==
+X-Gm-Message-State: AOAM531KzQ+R3siFeV/PO/RJOpGGwCb0PA8LvSL0K79zpD/MvVO1rzkt
+        ZfPVH2w1uQjKdJ4e8svTBzURmsbxVp/mnw6UTIc=
+X-Google-Smtp-Source: ABdhPJyOXMDOJXEweNjgQ/Heimakq+LFmrhTTQqxKwAXvx1dEWUO11jTrEOo7xbbSHGosGfV5AfpN6e8NUahPBFVAbw=
+X-Received: by 2002:a2e:3004:0:b0:223:c126:5d1a with SMTP id
+ w4-20020a2e3004000000b00223c1265d1amr2931647ljw.408.1646916033166; Thu, 10
+ Mar 2022 04:40:33 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Content-Language: en-US
-To:     stable@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-From:   Valentin Kleibel <valentin@vrvis.at>
-Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [PATCH] block: aoe: fix page fault in freedev()
+References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152714epcas5p4c5a0d16512fd7054c9a713ee28ede492@epcas5p4.samsung.com>
+ <20220308152105.309618-11-joshi.k@samsung.com> <20220310083400.GD26614@lst.de>
+In-Reply-To: <20220310083400.GD26614@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Thu, 10 Mar 2022 18:10:08 +0530
+Message-ID: <CA+1E3rJMSc33tkpXUdnftSuxE5yZ8kXpAi+czSNhM74gQgk_Ag@mail.gmail.com>
+Subject: Re: [PATCH 10/17] block: wire-up support for plugging
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is a bug in the aoe driver module where every forcible removal of 
-an aoe device (eg. "rmmod aoe" with aoe devices available or "aoe-flush 
-ex.x") leads to a page fault.
-The code in freedev() calls blk_mq_free_tag_set() before running 
-blk_cleanup_queue() which leads to this issue 
-(drivers/block/aoe/aoedev.c L281ff).
-This issue was fixed upstream in commit 6560ec9 (aoe: use 
-blk_mq_alloc_disk and blk_cleanup_disk) with the introduction and use of 
-the function blk_cleanup_disk().
+On Thu, Mar 10, 2022 at 2:04 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Tue, Mar 08, 2022 at 08:50:58PM +0530, Kanchan Joshi wrote:
+> > From: Jens Axboe <axboe@kernel.dk>
+> >
+> > Add support to use plugging if it is enabled, else use default path.
+>
+> The subject and this comment don't really explain what is done, and
+> also don't mention at all why it is done.
 
-This patch applies to kernels 5.4 and 5.10.
-
-The function calls are reordered to match the behavior of 
-blk_cleanup_disk() to mitigate this issue.
-
-Fixes: 3582dd2 (aoe: convert aoeblk to blk-mq)
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=215647
-Signed-off-by: Valentin Kleibel <valentin@vrvis.at>
----
-  drivers/block/aoe/aoedev.c | 2 +-
-  1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index e2ea2356da06..08c98ea724ea 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -277,9 +277,9 @@ freedev(struct aoedev *d)
-         if (d->gd) {
-                 aoedisk_rm_debugfs(d);
-                 del_gendisk(d->gd);
-+               blk_cleanup_queue(d->blkq);
-                 put_disk(d->gd);
-                 blk_mq_free_tag_set(&d->tag_set);
--               blk_cleanup_queue(d->blkq);
-         }
-         t = d->targets;
-         e = t + d->ntargets;
+Missed out, will fix up. But plugging gave a very good hike to IOPS.
+Especially while comparing this with io-uring's block-io path that
+keeps .plug enabled. Patch 9 (that enables .plug for uring-cmd) and
+this goes hand in hand.
