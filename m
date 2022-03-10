@@ -2,94 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E913C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 20:35:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC645C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 20:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232725AbiCJUgd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 15:36:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40424 "EHLO
+        id S234226AbiCJU4q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 15:56:46 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229868AbiCJUgb (ORCPT
+        with ESMTP id S232920AbiCJU4p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 15:36:31 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBEB7136861
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 12:35:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=HYl7HLa06XTzSBAzIC7meEiGYtTOJ6AeMHykAerkVEs=; b=Iyz8sAbvXcAkmVRuwKso8RUfZv
-        0nlMOQmgUlG6Z7DCjqtLlhcebNENoZz3XJH5jysGT8o5IcAXAwA7sxL5B3Uzy32jC75tCetbrDr5X
-        q9Xw3VFzpxXSTstk+9m7tRJk0vnnDQSMSHTuGHPEDE9kRYkepl908lmvUN3asMLH5NNBZf3stnTnS
-        4vdSvRRECJnk84z0p3dwv5fWepVnyQe9u/PvGvVlzUO95hcBKwV5IgUsqYYmgA55NCkNVcJB736CX
-        axPvg2sN7AoHdomZbCSNIFfTICIL9mgVmIeANt3CZMtZkMP3AZmsgyCtcwaR4ykQaQtZTN9xseUPp
-        7nS3ckHw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSPVH-00DzAa-RX; Thu, 10 Mar 2022 20:35:19 +0000
-Date:   Thu, 10 Mar 2022 12:35:19 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-        jiangbo.365@bytedance.com, Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 4/6] nvme: zns: Add support for power_of_2 emulation to
- NVMe ZNS devices
-Message-ID: <YiphB2Me63kD7T5t@bombadil.infradead.org>
-References: <20220308165349.231320-1-p.raghav@samsung.com>
- <CGME20220308165436eucas1p1b76f3cb5b4fa1f7d78b51a3b1b44d160@eucas1p1.samsung.com>
- <20220308165349.231320-5-p.raghav@samsung.com>
- <d13c40a5-3f87-fb2c-155e-dd64535067ac@opensource.wdc.com>
- <cf527b75-8fba-96ba-659d-fbb46fbe9de7@samsung.com>
- <bdb92eac-59ef-3ba1-16cb-31219e3a264b@opensource.wdc.com>
+        Thu, 10 Mar 2022 15:56:45 -0500
+Received: from mail-io1-xd2e.google.com (mail-io1-xd2e.google.com [IPv6:2607:f8b0:4864:20::d2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A86F8190B41
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 12:55:43 -0800 (PST)
+Received: by mail-io1-xd2e.google.com with SMTP id x4so7910852iom.12
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 12:55:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to
+         :content-language:content-transfer-encoding;
+        bh=OZ5w5qcBb5By4pEzzTFtlfbNxuZ0xF0TsMUdVKKSC2s=;
+        b=V/H/icaOX+rjpjog/4MbOUNey/ef5oTcJNVpD6JjyktIQRxOzTkVHFwkmDOxmJJ/ss
+         vGuFY8dXnfb3Zwm5PtRUA6QXqBH/oCfq24mTZWP0feirus4qNVqYtUofJQ2/ImYr577U
+         yiOdjP+a/vZlkGaGJJhcqtqjwJLcmT8hIvTgxzPG2t7XTx54sQvv/sHxM0jppS9pmCox
+         BwVb0tJVQ7qub9jhuiNOp0m3DCVordBUfLuyGl9u1buTq5Y+4k3XfJmDNYjGX9mlkdLX
+         7idcarTSmaI/Jy+bzYb4tiMcEJdr3M8U0nPiYFoOGjxm8B+Ap7hKZXFQDPnHKhz+keN+
+         WLug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:content-language:content-transfer-encoding;
+        bh=OZ5w5qcBb5By4pEzzTFtlfbNxuZ0xF0TsMUdVKKSC2s=;
+        b=YfS6tKaOXrL5W1oeIswTc8CnxI5GtBq8z4NjMka4LskE8DyyoBt4JyqOBb/GmI1QJr
+         JJ8hyARe7/oztqcz+FC6Aj2UxGq/TCJrAOLRD2gUCPF0trffjcROymPNJToP6ydYJ+3U
+         AGBXmFzWcO9PiuGyTZs/HoRojHE1/ypOmj/wq0Hbj1UhszoJNaoJ75vVGQIxgkXNsmut
+         aVY07V7G0QjUpyEhvUrPen9+35xfOSvzgff3eXND/S4MfWM3qZnZ9OeAB+qYIsejREyB
+         6nzA2gKuyM7fNwdUibMusOF6r6ytOhKvAzqYH9z5jr0p88rAoJLoIUhIzPJyzhzpBpip
+         943Q==
+X-Gm-Message-State: AOAM5338H9Pr7nKMlQ/L3x6Er0CeeI/5x0AqjOb71PLtwFsvs7gKSOLs
+        kvts70E70EGUc+Rpnvda4+zYkkgZTm72y1m1
+X-Google-Smtp-Source: ABdhPJztNmqyUKBMGNwt6tvbGzSXkYvP4nkbKslrE7DSjtUddxDDr/MfgIFWxsjJ8VcL2qkkvcflFA==
+X-Received: by 2002:a6b:4f03:0:b0:646:c48:ef13 with SMTP id d3-20020a6b4f03000000b006460c48ef13mr5387855iob.24.1646945742991;
+        Thu, 10 Mar 2022 12:55:42 -0800 (PST)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id s13-20020a6bdc0d000000b006408888551dsm3069827ioc.8.2022.03.10.12.55.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Mar 2022 12:55:42 -0800 (PST)
+Message-ID: <70ff8ffa-f118-61d7-d8ab-8c1106d7574e@kernel.dk>
+Date:   Thu, 10 Mar 2022 13:55:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bdb92eac-59ef-3ba1-16cb-31219e3a264b@opensource.wdc.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 5.17-final
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 06:43:47AM +0900, Damien Le Moal wrote:
-> On 3/9/22 23:33, Pankaj Raghav wrote:
-> > On 2022-03-09 05:04, Damien Le Moal wrote:
-> >> So for a power of 2 zone sized device, you are forcing an indirect call,
-> >> always. Not acceptable. What is the point of that po2_zone_emu boolean
-> >> you added to the queue ?
-> > This is a good point and we had a discussion about this internally.
-> > Initially I had something like this:
-> > if (!blk_queue_is_po2_zone_emu(disk))
-> > 	return sector >> (ns->lba_shift - SECTOR_SHIFT);
-> > else
-> > 	return __nvme_sect_to_lba_po2(ns, sec);
-> 
-> No need for the else.
+Hi Linus,
 
-If true then great.
+Just a single fix for a regression that occured in this merge window.
 
-> > But @Luis indicated that it was better to set an op which comes at a cost of indirection
-> > instead of having a runtime check with a if/else in the **hot path**. The code also looks
-> > more clear with having an op.
-> 
-> The indirect call using a function pointer makes the code obscure. And
-> the cost of that call is far greater and always present compared to the
-> CPU branch prediction which will luckily avoid most of the time taking
-> the wrong branch of an if.
+Please pull!
 
-The goal was to ensure no performance impact, and given a hot path
-was involved and we simply cannot microbench append as there is no
-way / API to do that, we can't be sure. But if you are certain that
-there is no perf impact, it would be wonderful to live without it.
 
-Thanks for the suggestion and push!
+The following changes since commit 30939293262eb433c960c4532a0d59c4073b2b84:
 
-  Luis
+  blktrace: fix use after free for struct blk_trace (2022-02-28 06:36:33 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-03-10
+
+for you to fetch changes up to 0a5aa8d161d19a1b12fd25b434b32f7c885c73bb:
+
+  block: fix blk_mq_attempt_bio_merge and rq_qos_throttle protection (2022-03-08 17:48:39 -0700)
+
+----------------------------------------------------------------
+block-5.17-2022-03-10
+
+----------------------------------------------------------------
+Shin'ichiro Kawasaki (1):
+      block: fix blk_mq_attempt_bio_merge and rq_qos_throttle protection
+
+ block/blk-mq.c | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
+
+-- 
+Jens Axboe
+
