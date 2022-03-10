@@ -2,64 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BF79C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 09:47:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32BBAC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 10:01:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232513AbiCJJsd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 04:48:33 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46912 "EHLO
+        id S234373AbiCJKCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 05:02:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38066 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236977AbiCJJsb (ORCPT
+        with ESMTP id S231982AbiCJKCV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 04:48:31 -0500
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E3A7D76FE
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 01:47:30 -0800 (PST)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id DFE0468AFE; Thu, 10 Mar 2022 10:47:25 +0100 (CET)
-Date:   Thu, 10 Mar 2022 10:47:25 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-        jiangbo.365@bytedance.com, Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <20220310094725.GA28499@lst.de>
-References: <CGME20220308165414eucas1p106df0bd6a901931215cfab81660a4564@eucas1p1.samsung.com> <20220308165349.231320-1-p.raghav@samsung.com>
+        Thu, 10 Mar 2022 05:02:21 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D5A8013D578
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 02:01:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646906480;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0UPaY2/tHCrOdvsv0aFffLM+jcSR/3Ygze3nVa3wohE=;
+        b=i5/10t2Myviv4aSSVeI4uGiPeKamZqJxniOwYzl/IAoFRQnUpGiafNigdASWMT0/YY5IyH
+        WLtcxikJKLvQdcedRgn70CYeGXJwf6ZeN5v08paViqByJC5slpOx7gEgQwDFIBi8IHIA7l
+        pldpRWB50KJBk3oRScOSC6HxqM4Y+l8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-669-10ocabzoPySLEeFLWPesDQ-1; Thu, 10 Mar 2022 05:01:14 -0500
+X-MC-Unique: 10ocabzoPySLEeFLWPesDQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com [10.5.11.22])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3B8F51091DA0;
+        Thu, 10 Mar 2022 10:01:13 +0000 (UTC)
+Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 115D8105958D;
+        Thu, 10 Mar 2022 10:01:00 +0000 (UTC)
+Date:   Thu, 10 Mar 2022 18:00:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [bug report] worker watchdog timeout in dispatch loop for
+ null_blk
+Message-ID: <YinMWPiuUluinom8@T590>
+References: <20220310091649.zypaem5lkyfadymg@shindev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220308165349.231320-1-p.raghav@samsung.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220310091649.zypaem5lkyfadymg@shindev>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is complete bonkers.  IFF we have a good reason to support non
-power of two zones size (and I'd like to see evidence for that) we'll
-need to go through all the layers to support it.  But doing this emulation
-is just idiotic and will at tons of code just to completely confuse users.
-
-On Tue, Mar 08, 2022 at 05:53:43PM +0100, Pankaj Raghav wrote:
+On Thu, Mar 10, 2022 at 09:16:50AM +0000, Shinichiro Kawasaki wrote:
+> This issue does not look critical, but let me share it to ask comments for fix.
 > 
-> #Motivation:
-> There are currently ZNS drives that are produced and deployed that do
-> not have power_of_2(PO2) zone size. The NVMe spec for ZNS does not
-> specify the PO2 requirement but the linux block layer currently checks
-> for zoned devices to have power_of_2 zone sizes.
+> When fio command with 40 jobs [1] is run for a null_blk device with memory
+> backing and mq-deadline scheduler, kernel reports a BUG message [2]. The
+> workqueue watchdog reports that kblockd blk_mq_run_work_fn keeps on running
+> more than 30 seconds and other work can not run. The 40 fio jobs keep on
+> creating many read requests to a single null_blk device, then the every time
+> the mq_run task calls __blk_mq_do_dispatch_sched(), it returns ret == 1 which
+> means more than one request was dispatched. Hence, the while loop in
+> blk_mq_do_dispatch_sched() does not break.
+> 
+> static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> {
+>         int ret;
+> 
+>         do {
+>                ret = __blk_mq_do_dispatch_sched(hctx);
+>         } while (ret == 1);
+> 
+>         return ret;
+> }
+> 
+> The BUG message was observed when I ran blktests block/005 with various
+> conditions on a system with 40 CPUs. It was observed with kernel version
+> v5.16-rc1 through v5.17-rc7. The trigger commit was 0a593fbbc245 ("null_blk:
+> poll queue support"). This commit added blk_mq_ops.map_queues callback. I
+> guess it changed dispatch behavior for null_blk devices and triggered the
+> BUG message.
 
-Well, apparently whoever produces these drives never cared about supporting
-Linux as the power of two requirement goes back to SMR HDDs, which also
-don't have that requirement in the spec (and even allow non-uniform zone
-size), but Linux decided that we want this for sanity.
+It is one blk-mq soft lockup issue in dispatch side, and shouldn't be related
+with 0a593fbbc245.
 
-Do these drives even support Zone Append?
+If queueing requests is faster than dispatching, the issue will be triggered
+sooner or later, especially easy to trigger in SQ device. I am sure it can
+be triggered on scsi debug, even saw such report on ahci.
+
+> 
+> I'm not so sure if we really need to fix this issue. It does not seem the real
+> world problem since it is observed only with null_blk. The real block devices
+> have slower IO operation then the dispatch should stop sooner when the hardware
+> queue gets full. Also the 40 jobs for single device is not realistic workload.
+> 
+> Having said that, it does not feel right that other works are pended during
+> dispatch for null_blk devices. To avoid the BUG message, I can think of two
+> fix approaches. First one is to break the while loop in blk_mq_do_dispatch_sched
+> using a loop counter [3] (or jiffies timeout check).
+
+This way could work, but the queue need to be re-run after breaking
+caused by max dispatch number. cond_resched() might be the simplest way,
+but it can't be used here because of rcu/srcu read lock.
+
+
+
+Thanks,
+Ming
+
