@@ -2,157 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1601AC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 18:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619E5C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 18:43:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234815AbiCJShv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 13:37:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54754 "EHLO
+        id S240150AbiCJSox (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 13:44:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234691AbiCJShu (ORCPT
+        with ESMTP id S236708AbiCJSow (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 13:37:50 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF2DB19D630;
-        Thu, 10 Mar 2022 10:36:49 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4890E61E79;
-        Thu, 10 Mar 2022 18:36:49 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FE8FC340E8;
-        Thu, 10 Mar 2022 18:36:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646937408;
-        bh=RdgCysgl6dR7J0j7duKi30HlTSNbetlrjcptAA8yIP4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ORaAk5KDQ7MKF/ON/55HLWHpH4hL8dCDmsb+0tiseGNVUI7173pEQRS2YRjDFuP2d
-         g8voDYpZnRnm6Hlf9R7Ql/GPkOSM56Jfkhq/MXjURxh9/Ikr4UNUstBWB8objSCEGv
-         YDdg4YOl/OwUFVwmSjIM8h4lxYXLDbnXd/05buJtiyPxJ6fnhqL6afwtEAxWnfbDWK
-         XfqNfUFABIZ8dfrnkccAs1AfHA5Ooo/nwVEcdv5fPuelqf3m2qThPB7ZTDk5tBiCF3
-         lXwmN1oxcs+ruTpO0WT/iQgjJWF/goswaST0dk4R3X/7Rh5BwzJrB3X+NkMXBQRZZg
-         v0pnRLNb5v6+A==
-Date:   Thu, 10 Mar 2022 18:36:47 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Vasily Gorbik <gor@linux.ibm.com>, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
-        martin.petersen@oracle.com,
-        Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: [PATCHv4 6/8] crypto: add rocksoft 64b crc guard tag framework
-Message-ID: <YipFP8B8MxMxTVBR@gmail.com>
-References: <20220303201312.3255347-1-kbusch@kernel.org>
- <20220303201312.3255347-7-kbusch@kernel.org>
- <your-ad-here.call-01646770901-ext-3299@work.hours>
- <20220308202747.GA3502158@dhcp-10-100-145-180.wdc.com>
- <YigzoKRJ1EHFRZY9@sol.localdomain>
- <20220309193126.GA3950874@dhcp-10-100-145-180.wdc.com>
- <YikEs7RNgPXTQolv@gmail.com>
- <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
+        Thu, 10 Mar 2022 13:44:52 -0500
+Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 900C9102408;
+        Thu, 10 Mar 2022 10:43:50 -0800 (PST)
+Received: by mail-lj1-x22e.google.com with SMTP id o6so9038022ljp.3;
+        Thu, 10 Mar 2022 10:43:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=f2tYdizKTIshWFThjBTeAJGUpF74jo5FnvbdsKAlPgg=;
+        b=L+NAx3DQW/kLZvssrOMcN20V+NDmLBkLyZ7yh4g09+9QiiNtUZZrTYVFbgyuJwgRa0
+         npVQz+VlciSI4GFCb5GeQs1B67E4W4gQWwcHLKvG/i0BH3YJ+E1kTSKHlU0Rh2G8ve8O
+         bwwzm0UVfMCfPzvN22b9mEBjHMCE3t6IgTCCu1XzJszdmF0YJsK4INNTpjOx5G5eHOEE
+         Lpi1zSGNmgPo3EyAqProc37ugId5l3l+RcRz8AgVLPdfMJ0iyy72qqUPhp5ARp9q+X5A
+         W1RZMimkPG7xwcQpRyzGjMrlPJoOP573x1t+jxsFAl80LDq7uV+YhJjLY0STZFoO90MH
+         qzsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=f2tYdizKTIshWFThjBTeAJGUpF74jo5FnvbdsKAlPgg=;
+        b=waWrz5VKhfrQwUPp8rSvaR+ootT3gNGCG/hyh/TcuwefWSSOsYCh6m7TbUP3yolPWp
+         Z5O7T8bhEEyutBNWJWio6rsjQwx4i2oY9ATtJGAkE+uCvAL/jGz5kQTlpOFiS07aVYHm
+         K+xR9GSobUJB6ltO5M9zzizKhNUbgqjP1pU6V1ijkHA/A8ePKnnURkbuXGennIGpBpcb
+         Tce5yHQT3hgvyJnTfWy3HnCkfAwSxrPZYs21YIwvzB4gVQ82C4lTqKUweG/0mo3v4mPn
+         3NGHBN/BEpvC5HeNlFrGr2Fz1NQQKPBADSKIfAI+SKLLS55zCLdP+BVoTxtGfsciw+a7
+         yq1Q==
+X-Gm-Message-State: AOAM530jlZtWupTF8hbqMZXYZ0L2YFMZ0X7viEQmaYWKHI3NKprPt/6x
+        2mDf2klLuAb6oxiaXVd+l87oaXsaPlj4I3uc4W0=
+X-Google-Smtp-Source: ABdhPJzQL58I6OV6Ntzjf1Sx72ym4uZ1I9t+0tr8hmh2IxxfBECQKSnK2+rNZtDoJC83aKh8L8hI7BYJ/Rb/x0njv+8=
+X-Received: by 2002:a2e:8403:0:b0:248:31d:3e35 with SMTP id
+ z3-20020a2e8403000000b00248031d3e35mr3682631ljg.445.1646937828736; Thu, 10
+ Mar 2022 10:43:48 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220310153959.GB329710@dhcp-10-100-145-180.wdc.com>
+References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
+ <20220308152105.309618-18-joshi.k@samsung.com> <20220310083652.GF26614@lst.de>
+ <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com> <20220310141945.GA890@lst.de>
+In-Reply-To: <20220310141945.GA890@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Fri, 11 Mar 2022 00:13:24 +0530
+Message-ID: <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
+Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 07:39:59AM -0800, Keith Busch wrote:
-> On Wed, Mar 09, 2022 at 07:49:07PM +0000, Eric Biggers wrote:
-> > The issue is that every other "shash" algorithm besides crct10dif, including
-> > crc32 and crc32c, follow the convention of treating the digest as bytes.  Doing
-> > otherwise is unusual for the crypto API.  So I have a slight preference for
-> > treating it as bytes.  Perhaps see what Herbert Xu (maintainer of the crypto
-> > API, Cc'ed) recommends?
-> 
-> I'm okay either way, they're both simple enough. Here is an update atop
-> this series to match the other shash conventions if this is preferred
-> over my previous fix:
-> 
-> ---
-> diff --git a/block/t10-pi.c b/block/t10-pi.c
-> index 914d8cddd43a..f9eb45571bc7 100644
-> --- a/block/t10-pi.c
-> +++ b/block/t10-pi.c
-> @@ -282,7 +282,7 @@ EXPORT_SYMBOL(t10_pi_type3_ip);
->  
->  static __be64 ext_pi_crc64(void *data, unsigned int len)
->  {
-> -	return cpu_to_be64(crc64_rocksoft(data, len));
-> +	return cpu_to_be64(le64_to_cpu(crc64_rocksoft(data, len)));
->  }
->  
->  static blk_status_t ext_pi_crc64_generate(struct blk_integrity_iter *iter,
-> diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-> index f1a22794c404..f9e5f601c657 100644
-> --- a/crypto/testmgr.h
-> +++ b/crypto/testmgr.h
-> @@ -3686,11 +3686,11 @@ static const struct hash_testvec crc64_rocksoft_tv_template[] = {
->  	{
->  		.plaintext	= zeroes,
->  		.psize		= 4096,
-> -		.digest		= (u8 *)(u64[]){ 0x6482d367eb22b64eull },
-> +		.digest		= "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
->  	}, {
->  		.plaintext	= ones,
->  		.psize		= 4096,
-> -		.digest		= (u8 *)(u64[]){ 0xc0ddba7302eca3acull },
-> +		.digest		= "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
->  	}
->  };
->  
-> diff --git a/include/linux/crc64.h b/include/linux/crc64.h
-> index e044c60d1e61..5319f9a9fc19 100644
-> --- a/include/linux/crc64.h
-> +++ b/include/linux/crc64.h
-> @@ -12,7 +12,7 @@
->  u64 __pure crc64_be(u64 crc, const void *p, size_t len);
->  u64 __pure crc64_rocksoft_generic(u64 crc, const void *p, size_t len);
->  
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
-> +__le64 crc64_rocksoft(const unsigned char *buffer, size_t len);
-> +__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len);
->  
->  #endif /* _LINUX_CRC64_H */
-> diff --git a/lib/crc64-rocksoft.c b/lib/crc64-rocksoft.c
-> index fc9ae0da5df7..215acb79a15d 100644
-> --- a/lib/crc64-rocksoft.c
-> +++ b/lib/crc64-rocksoft.c
-> @@ -54,16 +54,16 @@ static struct notifier_block crc64_rocksoft_nb = {
->  	.notifier_call = crc64_rocksoft_notify,
->  };
->  
-> -u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
-> +__le64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
->  {
->  	struct {
->  		struct shash_desc shash;
-> -		u64 crc;
-> +		__le64 crc;
->  	} desc;
->  	int err;
->  
->  	if (static_branch_unlikely(&crc64_rocksoft_fallback))
-> -		return crc64_rocksoft_generic(crc, buffer, len);
-> +		return cpu_to_le64(crc64_rocksoft_generic(crc, buffer, len));
->  
->  	rcu_read_lock();
->  	desc.shash.tfm = rcu_dereference(crc64_rocksoft_tfm);
-> @@ -77,7 +77,7 @@ u64 crc64_rocksoft_update(u64 crc, const unsigned char *buffer, size_t len)
->  }
->  EXPORT_SYMBOL_GPL(crc64_rocksoft_update);
->  
-> -u64 crc64_rocksoft(const unsigned char *buffer, size_t len)
-> +__le64 crc64_rocksoft(const unsigned char *buffer, size_t len)
->  {
->  	return crc64_rocksoft_update(0, buffer, len);
->  }
-> --
+On Thu, Mar 10, 2022 at 7:49 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Thu, Mar 10, 2022 at 05:20:13PM +0530, Kanchan Joshi wrote:
+> > In sync ioctl, we always update this result field by doing put_user on
+> > completion.
+> > For async ioctl, since command is inside the the sqe, its lifetime is
+> > only upto submission. SQE may get reused post submission, leaving no
+> > way to update the "result" field on completion. Had this field been a
+> > pointer, we could have saved this on submission and updated on
+> > completion. But that would require redesigning this structure and
+> > adding newer ioctl in nvme.
+>
+> Why would it required adding an ioctl to nvme?  The whole io_uring
+> async_cmd infrastructure is completely independent from ioctls.
 
-I think the lib functions should still use native endianness, like what crc32
-does.
+io_uring is sure not peeking into ioctl and its command-structure but
+offering the facility to use its sqe to store that ioctl-command
+inline.
+Problem is, the inline facility does not go very well with this
+particular nvme-passthru ioctl (NVME_IOCTL_IO64_CMD).
+And that's because this ioctl requires additional "__u64 result;" to
+be updated within "struct nvme_passthru_cmd64".
+To update that during completion, we need, at the least, the result
+field to be a pointer "__u64 result_ptr" inside the struct
+nvme_passthru_cmd64.
+Do you see that is possible without adding a new passthru ioctl in nvme?
 
-- Eric
+> > Coming back, even though sync-ioctl alway updates this result to
+> > user-space, only a few nvme io commands (e.g. zone-append, copy,
+> > zone-mgmt-send) can return this additional result (spec-wise).
+> > Therefore in nvme, when we are dealing with inline-sqe commands from
+> > io_uring, we never attempt to update the result. And since we don't
+> > update the result, we limit support to only read/write passthru
+> > commands. And fail any other command during submission itself (Patch
+> > 2).
+>
+> Yikes.  That is outright horrible.  passthrough needs to be command
+> agnostic and future proof to any newly added nvme command.
+
+This patch (along with patch 16) does exactly that. Makes it
+command-agnostic and future-proof. All nvme-commands will work with
+it.
+Just that application needs to pass the pointer of ioctl-command and
+not place it inline inside the sqe.
+
+Overall, I think at io_uring infra level both submission makes sense:
+big-sqe based inline submission (more efficient for <= 80 bytes) and
+normal-sqe based non-inline/indirect submissions.
+At nvme-level, we have to pick (depending on ioctl in hand). Currently
+we are playing with both and constructing a sort of fast-path (for all
+commands) and another faster-path (only for read/write commands).
+Should we (at nvme-level) rather opt out and use only indirect
+(because it works for all commands) or must we build a way to enable
+inline-one for all commands?
+
+> > > Overly long line.
+> >
+> > Under 100, but sure, can fold it under 80.
+>
+> You can only use 100 sparingly if it makes the code more readable.  Which
+> I know is fuzzy, and in practice never does.  Certainly not in nvme and
+> block code.
+
+Clears up, thanks.
+
+-- 
+Kanchan
