@@ -2,62 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4923EC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D657CC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 10 Mar 2022 12:29:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241988AbiCJM1o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 07:27:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42896 "EHLO
+        id S237432AbiCJMa6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 07:30:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236984AbiCJM1n (ORCPT
+        with ESMTP id S235393AbiCJMa6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 07:27:43 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59BF81480F3;
-        Thu, 10 Mar 2022 04:26:43 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 13E15B825C4;
-        Thu, 10 Mar 2022 12:26:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 773CEC340E8;
-        Thu, 10 Mar 2022 12:26:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1646915200;
-        bh=j9kbFAFVYrcTjwCyYTeY1V6XjDrPlAA8uuO+/0oacRk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ozVMW2eOCOfrZ2zi8XyEK/zevIbFxjuOusPKicJkb6dBFiaw29irn6QyWsqWRZ++4
-         DFepAH4zX/+6KAV5KVpIszGCkYN4csMQXfFUd/C0R082QO8tE0iEZexxWqYnXMCPZU
-         k00H/458PY5uii1n212X5p25fh/XlyWkztgPpK2Q=
-Date:   Thu, 10 Mar 2022 13:26:38 +0100
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Valentin Kleibel <valentin@vrvis.at>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: aoe: fix page fault in freedev()
-Message-ID: <YinufgnQtSeTA18w@kroah.com>
-References: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
- <YinpIKY0HVlJ+TLR@kroah.com>
- <50ddedf1-5ac3-91c3-0b50-645ceb541071@vrvis.at>
+        Thu, 10 Mar 2022 07:30:58 -0500
+Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7990E818A5;
+        Thu, 10 Mar 2022 04:29:57 -0800 (PST)
+Received: from [10.43.0.34]
+        by iris.vrvis.at with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <valentin@vrvis.at>)
+        id 1nSHLq-0005Vw-31; Thu, 10 Mar 2022 12:53:02 +0100
+Message-ID: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
+Date:   Thu, 10 Mar 2022 12:53:01 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <50ddedf1-5ac3-91c3-0b50-645ceb541071@vrvis.at>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Content-Language: en-US
+To:     stable@vger.kernel.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+From:   Valentin Kleibel <valentin@vrvis.at>
+Cc:     Jens Axboe <axboe@kernel.dk>, Justin Sanders <justin@coraid.com>,
+        linux-block@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Subject: [PATCH] block: aoe: fix page fault in freedev()
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 01:24:38PM +0100, Valentin Kleibel wrote:
-> On 10/03/2022 13:03, Greg Kroah-Hartman wrote:
-> > > This patch applies to kernels 5.4 and 5.10.
-> > 
-> > We need a fix for Linus's tree first before we can backport anything to
-> > older kernels.  Does this also work there?
-> 
-> It is fixed in Linus' tree starting with 5.14.
+There is a bug in the aoe driver module where every forcible removal of 
+an aoe device (eg. "rmmod aoe" with aoe devices available or "aoe-flush 
+ex.x") leads to a page fault.
+The code in freedev() calls blk_mq_free_tag_set() before running 
+blk_cleanup_queue() which leads to this issue 
+(drivers/block/aoe/aoedev.c L281ff).
+This issue was fixed upstream in commit 6560ec9 (aoe: use 
+blk_mq_alloc_disk and blk_cleanup_disk) with the introduction and use of 
+the function blk_cleanup_disk().
 
-What commit fixes it there?  Why not just backport that one only?
+This patch applies to kernels 5.4 and 5.10.
 
-thanks,
+The function calls are reordered to match the behavior of 
+blk_cleanup_disk() to mitigate this issue.
 
-greg k-h
+Fixes: 3582dd2 (aoe: convert aoeblk to blk-mq)
+Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=215647
+Signed-off-by: Valentin Kleibel <valentin@vrvis.at>
+---
+  drivers/block/aoe/aoedev.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index e2ea2356da06..08c98ea724ea 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -277,9 +277,9 @@ freedev(struct aoedev *d)
+         if (d->gd) {
+                 aoedisk_rm_debugfs(d);
+                 del_gendisk(d->gd);
++               blk_cleanup_queue(d->blkq);
+                 put_disk(d->gd);
+                 blk_mq_free_tag_set(&d->tag_set);
+-               blk_cleanup_queue(d->blkq);
+         }
+         t = d->targets;
+         e = t + d->ntargets;
