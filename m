@@ -2,105 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E61CC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 05:18:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E211C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 05:32:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235482AbiCKFTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 00:19:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41958 "EHLO
+        id S232824AbiCKFdH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 00:33:07 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346387AbiCKFTt (ORCPT
+        with ESMTP id S234001AbiCKFdE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 00:19:49 -0500
+        Fri, 11 Mar 2022 00:33:04 -0500
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E526A53B40;
-        Thu, 10 Mar 2022 21:18:46 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D9111AC287;
+        Thu, 10 Mar 2022 21:32:00 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 52591B82A78;
-        Fri, 11 Mar 2022 05:18:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EA5C340EC;
-        Fri, 11 Mar 2022 05:18:43 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 0BD32B82A83;
+        Fri, 11 Mar 2022 05:31:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E1FDC340EC;
+        Fri, 11 Mar 2022 05:31:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646975923;
-        bh=5iTm8AeQHWcspGp/ADW+jMjLy3o3qtcRvAvIkXEZzfg=;
+        s=k20201202; t=1646976717;
+        bh=WZxaV6Pf7jSxcq9QhrqU6a6XmApG4E+JJxhTiL/TA4o=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=hjo2jWAf5hpi3mLDP7pod3VhSowZ8b9tCqUFwFAGXsH4lLvV8Ji3hQdeQiLrfHvsS
-         zFQhCr2Bp+8DndACGpNH0eC5Nwc/puIVOxbOZMsJYnvDLuWbSDZQ6gJVVL6VKVYVJY
-         UIY/kg3zoYjxc/zzF8heQCT/2rv5Ir3lLOKPIl/OuaMml6Gy1o3jQWkk/7UsSRM5YK
-         ffGGyVJFju0VBTwmtWc7DJBTaYB9vvxsXLp48vOfYFFPPIDmvOWJNkYsy4oabsxCpu
-         /oxkfczBlfSN6h7Y68Lb82OapBKBnM+5iKH32wC9gcOd5/X5ueF08wBiilzvAWxOhz
-         xpvm1FfvWTU2A==
-Date:   Thu, 10 Mar 2022 21:18:42 -0800
+        b=ob5ZHIgSUc7ffS1WUTii9bnVJtzk8WPUoL3UEGmI8LA/pPfuNB7aJAOSKJzkWpSQi
+         6LyEO8syF9aVEj5/kWXYkHf64UtKZowR1dt+yzXVzuHt8QOILVdmvn14AWZfemWF8Z
+         gRioblA5Yz3SMTchKuF0GTeIOFpHmvK2xP0Mt+8Racw4eelPzbjPuQLoTUM9PoLYpb
+         lOoPGvSqe3ouw9n3e/szesfGwcLH1zHCJEA3pyUnIMcJq/RMLFZ79HFRQCQJf92kuL
+         uu20kCmRhPJKE+nq/8Zu1kvu65ugM6zpbwbC3JAuQP+nEoBNPld58rMB3p3IbgSHYE
+         ls+X6siohQP0A==
+Date:   Thu, 10 Mar 2022 21:31:55 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
 To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
-        kernel-team@android.com,
-        Gaurav Kashyap <quic_gaurkash@quicinc.com>,
-        Israel Rukshin <israelr@nvidia.com>
-Subject: Re: [PATCH v5 3/3] fscrypt: add support for hardware-wrapped keys
-Message-ID: <YirbspMr5CAnlWAC@sol.localdomain>
-References: <20220228070520.74082-1-ebiggers@kernel.org>
- <20220228070520.74082-4-ebiggers@kernel.org>
- <c1da8aec-7bb9-dd88-7500-a09d29bbc1e4@acm.org>
+Cc:     "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Luca Porzio (lporzio)" <lporzio@micron.com>,
+        Manjong Lee <mj0123.lee@samsung.com>,
+        "david@fromorbit.com" <david@fromorbit.com>,
+        "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "song@kernel.org" <song@kernel.org>,
+        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
+        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
+        "nanich.lee@samsung.com" <nanich.lee@samsung.com>,
+        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
+        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
+        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
+        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        linux-f2fs-devel@lists.sourceforge.net
+Subject: Re: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write
+ hint.
+Message-ID: <YireyyQvUnC7cik+@sol.localdomain>
+References: <20220306231727.GP3927073@dread.disaster.area>
+ <CGME20220309042324epcas1p111312e20f4429dc3a17172458284a923@epcas1p1.samsung.com>
+ <20220309133119.6915-1-mj0123.lee@samsung.com>
+ <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+ <e98948ae-1709-32ef-e1e4-063be38609b1@kernel.dk>
+ <CO3PR08MB797562AAE72BC201EB951C6CDC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+ <d477c7bf-f3a7-ccca-5472-f9cbb05b83c1@kernel.dk>
+ <c27a5ec3-f683-d2a7-d5e7-fd54d2baa278@acm.org>
+ <PH0PR08MB7889642784B2E1FC1799A828DB0B9@PH0PR08MB7889.namprd08.prod.outlook.com>
+ <9d645cf0-1685-437a-23e4-b2a01553bba5@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c1da8aec-7bb9-dd88-7500-a09d29bbc1e4@acm.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9d645cf0-1685-437a-23e4-b2a01553bba5@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 03, 2022 at 05:03:10PM -0800, Bart Van Assche wrote:
-> On 2/27/22 23:05, Eric Biggers wrote:
-> > diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
-> > index 9f4428be3e362..884c5bf526a05 100644
-> > --- a/include/uapi/linux/fscrypt.h
-> > +++ b/include/uapi/linux/fscrypt.h
-> > @@ -20,6 +20,7 @@
-> >   #define FSCRYPT_POLICY_FLAG_DIRECT_KEY		0x04
-> >   #define FSCRYPT_POLICY_FLAG_IV_INO_LBLK_64	0x08
-> >   #define FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32	0x10
-> > +#define FSCRYPT_POLICY_FLAG_HW_WRAPPED_KEY	0x20
-> >   /* Encryption algorithms */
-> >   #define FSCRYPT_MODE_AES_256_XTS		1
-> > @@ -115,7 +116,7 @@ struct fscrypt_key_specifier {
-> >    */
-> >   struct fscrypt_provisioning_key_payload {
-> >   	__u32 type;
-> > -	__u32 __reserved;
-> > +	__u32 flags;
-> >   	__u8 raw[];
-> >   };
-> > @@ -124,7 +125,9 @@ struct fscrypt_add_key_arg {
-> >   	struct fscrypt_key_specifier key_spec;
-> >   	__u32 raw_size;
-> >   	__u32 key_id;
-> > -	__u32 __reserved[8];
-> > +#define FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED			0x00000001
-> > +	__u32 flags;
-> > +	__u32 __reserved[7];
-> >   	__u8 raw[];
-> >   };
+On Thu, Mar 10, 2022 at 02:18:19PM -0800, Bart Van Assche wrote:
+> On 3/10/22 13:52, Bean Huo (beanhuo) wrote:
+> > Yes, in upstream linux and upstream android, there is no such code. But as we know,
+> > mobile customers have used bio->bi_write_hint in their products for years. And the
+> > group ID is set according to bio->bi_write_hint before passing the CDB to UFS.
+> > 
+> > 
+> > 	lrbp = &hba->lrb[tag];
+> >                WARN_ON(lrbp->cmd);
+> >               + if(cmd->cmnd[0] == WRITE_10)
+> >                +{
+> >                  +             cmd->cmnd[6] = (0x1f& cmd->request->bio->bi_write_hint);
+> >                +}
+> >                lrbp->cmd = cmd;
+> >                lrbp->sense_bufflen = UFS_SENSE_SIZE;
+> >                lrbp->sense_buffer = cmd->sense_buffer;
+> > 
+> > I don't know why they don't push these changes to the community, maybe
+> > it's because changes across the file system and block layers are unacceptable to the
+> > block layer and FS. but for sure we should now warn them to push to the
+> > community as soon as possible.
 > 
-> Is it allowed to use _Static_assert() in UAPI header files? There are
-> already some static_assert() checks under include/linux to verify the size
-> of certain data structures. gcc supports _Static_assert() since version 4.6.
-> That is older than the minimum required gcc version to build the kernel.
+> Thanks Bean for having shared this information. I think the above code sets the GROUP
+> NUMBER information in the WRITE(10) command and also that the following text from the
+> UFS specification applies to that information:
+> <quote>
+> GROUP NUMBER: Notifies the Target device that the data linked to a ContextID:
+>  -----------------------------------------------------------------------------------------
+>     GROUP NUMBER Value     |  Function
+>  -----------------------------------------------------------------------------------------
+>  00000b                    | Default, no Context ID is associated with the read operation.
+>  00001b to 01111b (0XXXXb) | Context ID. (XXXX I from 0001b to 1111b ‐ Context ID value)
+>  10000b                    | Data has System Data characteristics
+>  10001b to 11111b          | Reserved
+>  -----------------------------------------------------------------------------------------
+> 
+> In case the GROUP NUMBER is set to a reserved value, the operation shall fail and a status
+> response of CHECK CONDITION will be returned along with the sense key set to ILLEGAL REQUEST.
+> </quote>
+> 
+> Since there is a desire to remove the write hint information from struct bio, is there
+> any other information the "system data characteristics" information can be derived from?
+> How about e.g. deriving that information from request flags like REQ_SYNC, REQ_META and/or
+> REQ_IDLE?
 > 
 
-Are you requesting static assertions that verify that the size of each fscrypt
-UAPI struct is a certain value?  Kernel UAPIs generally don't bother with that
-sort of thing, but it does seem like a good idea.  I'll add them as a cleanup,
-but it's orthogonal to this patch series.
+[+Cc linux-f2fs-devel]
 
-To answer your direct question, I believe that _Static_assert generally can't be
-used in UAPI header files, as it's a C11 feature and UAPI headers are included
-by arbitrary userspace programs.  These assertions will need to be in
-kernel-only code, either in a kernel-only file such as include/linux/fscrypt.h,
-or in an #ifdef __KERNEL__ section of the UAPI header.  Also, the kernel already
-conventionally uses BUILD_BUG_ON() for static assertions.
+I think the f2fs developers will need to chime in here, as it looks like f2fs
+uses the write hints for different data categories like hot/cold/warm.  I'm not
+sure those can be fully represented by other bio flags.
+
+Either way, the good news is that it sounds like this "GROUP NUMBER" thing is
+part of the UFS standard.  So whatever the best way to support it is, it can
+just be submitted upstream like any other standard UFS feature.  Why hasn't that
+been done?
 
 - Eric
