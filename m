@@ -2,104 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 781C0C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 07:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73766C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 08:10:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243779AbiCKHyX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 02:54:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45902 "EHLO
+        id S1345348AbiCKILA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 03:11:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241753AbiCKHyX (ORCPT
+        with ESMTP id S238609AbiCKILA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 02:54:23 -0500
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A03913CA77
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 23:53:20 -0800 (PST)
-Received: by mail-wm1-x334.google.com with SMTP id bg31-20020a05600c3c9f00b00381590dbb33so4842226wmb.3
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 23:53:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xwb70iZvFY3Ug69wBXrwkmTUB5j/QKwDZ/9LSmzVgoE=;
-        b=hlivmh7hpdycrkE58yN/AKpN3BjGkgS14lhr/ZALDbCf3CHYm+LsaCW4TsOKhVU9fH
-         HoSoWoXsaTDi34bCZVHib4WZ8R5tDpCTgd/milsDKvmXI11ndzsnzTKVfXEUaqmI0iOV
-         sMabHJkfpBrKPDNakDSoMOsY5JLdb9UMv2YWR4usVTNOlUk+HW8P8ZvjyZpCFDm880Ew
-         1qAjaWym74AqgyniqM1Dv1uQQaNUrCJTZ4pdnVwUduNlFz66yDr6vWOMfP9CQdw7HRSI
-         lgD64tVAsh7i2ssmgUEKU8ymxxWcpUQsO/5MJM60ezc08cBzHNLPXdoICP+aKwuSxa4G
-         AoUg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=xwb70iZvFY3Ug69wBXrwkmTUB5j/QKwDZ/9LSmzVgoE=;
-        b=SugA3/PorZGuuluIiof3/iXYCRYd3UGOR2KL16qkvfDGA7wBl7ynLqSk4GJ0if5tUD
-         MKyXH8GvJODaQH8Ej8QqpTlVnjvWiEDRXFBd4K1vznnqgII1fwiHFwiwF8EWkotWSH6o
-         vzaZL7uwuYwR6843ry+9exXiTV6tMQwirigo3NXY0bPUHIDHcMIr3CfRP1QoxBYV8yZa
-         1X+oWYC1yZOLq0y4bOXKYwzZXuzgaEUKg5QC120BszFh6lCg5Vv1XL0rMLh8ux3ZpSia
-         TUWKqIqfdv9geiiQ8AlcG+15Hu75LZUx5Hi6IL9h6lnkKIgW32v/NeFvnbWDqwpncPhS
-         tGBg==
-X-Gm-Message-State: AOAM532jy+z23L2VydzlFOyHuQDJppKxIZkw6RrKzhuzSFV5FUNNgPs4
-        o85CInHRuQceMytjraJsQx/4wA==
-X-Google-Smtp-Source: ABdhPJy/MRgCRkxNvQp+v2QGs4GsetEVTW4/ulUZAQQ1nVD5qskJ9yUZmwvUd1FbdLzu4s1hs1KL/g==
-X-Received: by 2002:a05:600c:3c8b:b0:37f:1546:40c9 with SMTP id bg11-20020a05600c3c8b00b0037f154640c9mr6350055wmb.161.1646985199202;
-        Thu, 10 Mar 2022 23:53:19 -0800 (PST)
-Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
-        by smtp.gmail.com with ESMTPSA id e10-20020a056000178a00b0020393321552sm1892851wrg.85.2022.03.10.23.53.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Mar 2022 23:53:18 -0800 (PST)
-Date:   Fri, 11 Mar 2022 08:53:17 +0100
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        James Bottomley <James.Bottomley@hansenpartnership.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Dave Chinner <david@fromorbit.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        lsf-pc@lists.linux-foundation.org,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Keith Busch <keith.busch@wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Nitesh Shetty <nj.shetty@samsung.com>
-Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
-Message-ID: <20220311075317.fjn3mj25dpicnpgi@ArmHalley.local>
-References: <69932637edee8e6d31bafa5fd39e19a9790dd4ab.camel@HansenPartnership.com>
- <DD05D9B0-195F-49EF-80DA-1AA0E4FA281F@javigon.com>
- <20220307151556.GB3260574@dhcp-10-100-145-180.wdc.com>
- <8f8255c3-5fa8-310b-9925-1e4e8b105547@opensource.wdc.com>
- <20220311072101.k52rkmsnecolsoel@ArmHalley.localdomain>
- <61c1b49c-cd34-614a-876a-29b796e4ff0d@opensource.wdc.com>
- <Yir9a8HusXWApk5l@infradead.org>
+        Fri, 11 Mar 2022 03:11:00 -0500
+Received: from smtp.hosts.co.uk (smtp.hosts.co.uk [85.233.160.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C99BE1B8C95;
+        Fri, 11 Mar 2022 00:09:55 -0800 (PST)
+Received: from host86-155-180-61.range86-155.btcentralplus.com ([86.155.180.61] helo=[192.168.1.218])
+        by smtp.hosts.co.uk with esmtpa (Exim)
+        (envelope-from <antlists@youngman.org.uk>)
+        id 1nSaLR-0001Lq-4K;
+        Fri, 11 Mar 2022 08:09:53 +0000
+Message-ID: <8765a56b-3557-b659-96dc-90fe57506b7e@youngman.org.uk>
+Date:   Fri, 11 Mar 2022 08:09:52 +0000
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
-In-Reply-To: <Yir9a8HusXWApk5l@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH] block: check more requests for multiple_queues in
+ blk_attempt_plug_merge
+Content-Language: en-GB
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
+Cc:     Song Liu <song@kernel.org>, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, stable@vger.kernel.org,
+        Larkin Lowrey <llowrey@nuclearwinter.com>,
+        Wilson Jonathan <i400sjon@gmail.com>,
+        Roger Heflin <rogerheflin@gmail.com>
+References: <20220309064209.4169303-1-song@kernel.org>
+ <9516f407-bb91-093b-739d-c32bda1b5d8d@kernel.dk>
+ <CAPhsuW5zX96VaBMu-o=JUqDz2KLRBcNFM_gEsT=tHjeYqrngSQ@mail.gmail.com>
+ <38f7aaf5-2043-b4f4-1fa5-52a7c883772b@kernel.dk>
+ <CAPhsuW7zdYZqxaJ7SOWdnVOx-cASSoXS4OwtWVbms_jOHNh=Kw@mail.gmail.com>
+ <2b437948-ba2a-c59c-1059-e937ea8636bd@kernel.dk>
+ <CAPhsuW6ueGM_DZuAWvMbaB4PNftA5_MaqzMiY8_Bz7Bqy-ahZA@mail.gmail.com>
+ <40ae10bd-6839-2246-c2d7-aa11e671d7d4@kernel.dk> <Yiqijd9S6Y92DnBu@T590>
+ <0d7bb070-11a3-74b1-22d5-86001818018b@kernel.dk> <YiqmsypjvdPN/K3w@T590>
+ <9e14586a-4f2a-fe9b-e32e-3bf05d6b4c5c@kernel.dk>
+From:   Wols Lists <antlists@youngman.org.uk>
+In-Reply-To: <9e14586a-4f2a-fe9b-e32e-3bf05d6b4c5c@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10.03.2022 23:42, Christoph Hellwig wrote:
->On Fri, Mar 11, 2022 at 04:39:12PM +0900, Damien Le Moal wrote:
->> > (we need to look into it). F2FS will use the emulation layer for now;
->> > only !PO2 devices will pay the price. We will add a knob in the block
->> > layer so that F2FS can force enable the emulation.
+On 11/03/2022 01:35, Jens Axboe wrote:
+> On 3/10/22 6:32 PM, Ming Lei wrote:
+>> On Thu, Mar 10, 2022 at 06:21:33PM -0700, Jens Axboe wrote:
+>>> On 3/10/22 6:14 PM, Ming Lei wrote:
+>>>> On Thu, Mar 10, 2022 at 05:36:44PM -0700, Jens Axboe wrote:
+>>>>> On 3/10/22 5:31 PM, Song Liu wrote:
+>>>>>> On Thu, Mar 10, 2022 at 4:07 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>
+>>>>>>> On 3/10/22 4:33 PM, Song Liu wrote:
+>>>>>>>> On Thu, Mar 10, 2022 at 3:02 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>
+>>>>>>>>> On 3/10/22 3:37 PM, Song Liu wrote:
+>>>>>>>>>> On Thu, Mar 10, 2022 at 2:15 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>>>>>>>>>>
+>>>>>>>>>>> On 3/8/22 11:42 PM, Song Liu wrote:
+>>>>>>>>>>>> RAID arrays check/repair operations benefit a lot from merging requests.
+>>>>>>>>>>>> If we only check the previous entry for merge attempt, many merge will be
+>>>>>>>>>>>> missed. As a result, significant regression is observed for RAID check
+>>>>>>>>>>>> and repair.
+>>>>>>>>>>>>
+>>>>>>>>>>>> Fix this by checking more than just the previous entry when
+>>>>>>>>>>>> plug->multiple_queues == true.
+>>>>>>>>>>>>
+>>>>>>>>>>>> This improves the check/repair speed of a 20-HDD raid6 from 19 MB/s to
+>>>>>>>>>>>> 103 MB/s.
+>>>>>>>>>>>
+>>>>>>>>>>> Do the underlying disks not have an IO scheduler attached? Curious why
+>>>>>>>>>>> the merges aren't being done there, would be trivial when the list is
+>>>>>>>>>>> flushed out. Because if the perf difference is that big, then other
+>>>>>>>>>>> workloads would be suffering they are that sensitive to being within a
+>>>>>>>>>>> plug worth of IO.
+>>>>>>>>>>
+>>>>>>>>>> The disks have mq-deadline by default. I also tried kyber, the result
+>>>>>>>>>> is the same. Raid repair work sends IOs to all the HDDs in a
+>>>>>>>>>> round-robin manner. If we only check the previous request, there isn't
+>>>>>>>>>> much opportunity for merge. I guess other workloads may have different
+>>>>>>>>>> behavior?
+>>>>>>>>>
+>>>>>>>>> Round robin one at the time? I feel like there's something odd or
+>>>>>>>>> suboptimal with the raid rebuild, if it's that sensitive to plug
+>>>>>>>>> merging.
+>>>>>>>>
+>>>>>>>> It is not one request at a time, but more like (for raid456):
+>>>>>>>>     read 4kB from HDD1, HDD2, HDD3...,
+>>>>>>>>     then read another 4kB from HDD1, HDD2, HDD3, ...
+>>>>>>>
+>>>>>>> Ehm, that very much looks like one-at-the-time from each drive, which is
+>>>>>>> pretty much the worst way to do it :-)
+>>>>>>>
+>>>>>>> Is there a reason for that? Why isn't it using 64k chunks or something
+>>>>>>> like that? You could still do that as a kind of read-ahead, even if
+>>>>>>> you're still processing in chunks of 4k.
+>>>>>>
+>>>>>> raid456 handles logic in the granularity of stripe. Each stripe is 4kB from
+>>>>>> every HDD in the array. AFAICT, we need some non-trivial change to
+>>>>>> enable the read ahead.
+>>>>>
+>>>>> Right, you'd need to stick some sort of caching in between so instead of
+>>>>> reading 4k directly, you ask the cache for 4k and that can manage
+>>>>> read-ahead.
+>>>>>
+>>>>>>>>> Plug merging is mainly meant to reduce the overhead of merging,
+>>>>>>>>> complement what the scheduler would do. If there's a big drop in
+>>>>>>>>> performance just by not getting as efficient merging on the plug side,
+>>>>>>>>> that points to an issue with something else.
+>>>>>>>>
+>>>>>>>> We introduced blk_plug_max_rq_count() to give md more opportunities to
+>>>>>>>> merge at plug side, so I guess the behavior has been like this for a
+>>>>>>>> long time. I will take a look at the scheduler side and see whether we
+>>>>>>>> can just merge later, but I am not very optimistic about it.
+>>>>>>>
+>>>>>>> Yeah I remember, and that also kind of felt like a work-around for some
+>>>>>>> underlying issue. Maybe there's something about how the IO is issued
+>>>>>>> that makes it go straight to disk and we never get any merging? Is it
+>>>>>>> because they are sync reads?
+>>>>>>>
+>>>>>>> In any case, just doing larger reads would likely help quite a bit, but
+>>>>>>> would still be nice to get to the bottom of why we're not seeing the
+>>>>>>> level of merging we expect.
+>>>>>>
+>>>>>> Let me look more into this. Maybe we messed something up in the
+>>>>>> scheduler.
+>>>>>
+>>>>> I'm assuming you have a plug setup for doing the reads, which is why you
+>>>>> see the big difference (or there would be none). But
+>>>>> blk_mq_flush_plug_list() should really take care of this when the plug
+>>>>> is flushed, requests should be merged at that point. And from your
+>>>>> description, doesn't sound like they are at all.
+>>>>
+>>>> requests are shared, when running out of request, plug list will be
+>>>> flushed early.
+>>>
+>>> That is true, but I don't think that's the problem here with the round
+>>> robin approach. Seems like it'd drive a pretty low queue depth, even
+>>> considering SATA.
 >>
->> No. The FS has no business changing the device.
+>> Another one may be plug list not sorted before inserting requests to
+>> scheduler in blk_mq_flush_plug_list(), looks you have mentioned.
+> 
+> Yep, it'd probably be the first thing I'd try... The way the IO is
+> issued, it's pretty much guaranteed that the plug list will be fully
+> interleaved with different queues and we're then issuine one-by-one and
+> running the queue each time.
+> 
+Naive question, but can you make the flush flush the first one, then 
+scan the queue for all bios for the same device, then go back and start 
+again? Simple approach if it'll work, at the expense of scanning the 
+queue once per device.
 
-Ok. Then it can be something the user can set.
-
->
->And nvme will not support any kind of emulation if that wasn't clear.
-
-How do you propose we meed the request from Damien to support _all_
-existing users if we remove the PO2 constraint from the block layer?
-
-The emulation is not the goal, but it seems to be a requirement
-
+Cheers,
+Wol
