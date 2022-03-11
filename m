@@ -2,164 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73766C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 08:10:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08266C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 08:46:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345348AbiCKILA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 03:11:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60240 "EHLO
+        id S235408AbiCKIrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 03:47:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52168 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238609AbiCKILA (ORCPT
+        with ESMTP id S229886AbiCKIrS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 03:11:00 -0500
-Received: from smtp.hosts.co.uk (smtp.hosts.co.uk [85.233.160.19])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C99BE1B8C95;
-        Fri, 11 Mar 2022 00:09:55 -0800 (PST)
-Received: from host86-155-180-61.range86-155.btcentralplus.com ([86.155.180.61] helo=[192.168.1.218])
-        by smtp.hosts.co.uk with esmtpa (Exim)
-        (envelope-from <antlists@youngman.org.uk>)
-        id 1nSaLR-0001Lq-4K;
-        Fri, 11 Mar 2022 08:09:53 +0000
-Message-ID: <8765a56b-3557-b659-96dc-90fe57506b7e@youngman.org.uk>
-Date:   Fri, 11 Mar 2022 08:09:52 +0000
+        Fri, 11 Mar 2022 03:47:18 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 712A01BA927;
+        Fri, 11 Mar 2022 00:46:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=BjiPEUQ71tUca48iumOg0cUwE/Qm4Dl7SatHwSELFAc=; b=may5sVdzPgFlyETPK7ghtZvL5M
+        vgNtRztfRnK9qJofT147hObMIaiwlMnNzQS6+E3AVeQ8wktFUGXwjTxmUSD/nOxOgkKTY4D7uUlg6
+        xeWvW3cVT05G3RaquuEhz35yEAcFJVpVAt8HpwoOHhOFEE6SXlK0STmk0sIADpqfHMKKoj6nCQG/T
+        316KJGS4RYxR9p4hbSLWL2W+aC9lI3IMG/wS3KNg/D08NaT/Me2VtgXtigQBWktQWocclIzzVk9Wp
+        lQd1Ls9dsXT0vyllvRqMl03m3dl4fJozm7AyeuUb27ZCQ1apO6f//LEvwk4q2LCAiSRec3JrkVRfm
+        3pdjhvqg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nSauY-00Ffe1-PO; Fri, 11 Mar 2022 08:46:10 +0000
+Date:   Fri, 11 Mar 2022 00:46:10 -0800
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        James Bottomley <James.Bottomley@hansenpartnership.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Dave Chinner <david@fromorbit.com>,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        lsf-pc@lists.linux-foundation.org,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <keith.busch@wdc.com>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+Subject: Re: [LSF/MM/BPF BoF] BoF for Zoned Storage
+Message-ID: <YisMUruNKNlV8FhW@infradead.org>
+References: <69932637edee8e6d31bafa5fd39e19a9790dd4ab.camel@HansenPartnership.com>
+ <DD05D9B0-195F-49EF-80DA-1AA0E4FA281F@javigon.com>
+ <20220307151556.GB3260574@dhcp-10-100-145-180.wdc.com>
+ <8f8255c3-5fa8-310b-9925-1e4e8b105547@opensource.wdc.com>
+ <20220311072101.k52rkmsnecolsoel@ArmHalley.localdomain>
+ <61c1b49c-cd34-614a-876a-29b796e4ff0d@opensource.wdc.com>
+ <Yir9a8HusXWApk5l@infradead.org>
+ <20220311075317.fjn3mj25dpicnpgi@ArmHalley.local>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH] block: check more requests for multiple_queues in
- blk_attempt_plug_merge
-Content-Language: en-GB
-To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
-Cc:     Song Liu <song@kernel.org>, linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, stable@vger.kernel.org,
-        Larkin Lowrey <llowrey@nuclearwinter.com>,
-        Wilson Jonathan <i400sjon@gmail.com>,
-        Roger Heflin <rogerheflin@gmail.com>
-References: <20220309064209.4169303-1-song@kernel.org>
- <9516f407-bb91-093b-739d-c32bda1b5d8d@kernel.dk>
- <CAPhsuW5zX96VaBMu-o=JUqDz2KLRBcNFM_gEsT=tHjeYqrngSQ@mail.gmail.com>
- <38f7aaf5-2043-b4f4-1fa5-52a7c883772b@kernel.dk>
- <CAPhsuW7zdYZqxaJ7SOWdnVOx-cASSoXS4OwtWVbms_jOHNh=Kw@mail.gmail.com>
- <2b437948-ba2a-c59c-1059-e937ea8636bd@kernel.dk>
- <CAPhsuW6ueGM_DZuAWvMbaB4PNftA5_MaqzMiY8_Bz7Bqy-ahZA@mail.gmail.com>
- <40ae10bd-6839-2246-c2d7-aa11e671d7d4@kernel.dk> <Yiqijd9S6Y92DnBu@T590>
- <0d7bb070-11a3-74b1-22d5-86001818018b@kernel.dk> <YiqmsypjvdPN/K3w@T590>
- <9e14586a-4f2a-fe9b-e32e-3bf05d6b4c5c@kernel.dk>
-From:   Wols Lists <antlists@youngman.org.uk>
-In-Reply-To: <9e14586a-4f2a-fe9b-e32e-3bf05d6b4c5c@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220311075317.fjn3mj25dpicnpgi@ArmHalley.local>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 11/03/2022 01:35, Jens Axboe wrote:
-> On 3/10/22 6:32 PM, Ming Lei wrote:
->> On Thu, Mar 10, 2022 at 06:21:33PM -0700, Jens Axboe wrote:
->>> On 3/10/22 6:14 PM, Ming Lei wrote:
->>>> On Thu, Mar 10, 2022 at 05:36:44PM -0700, Jens Axboe wrote:
->>>>> On 3/10/22 5:31 PM, Song Liu wrote:
->>>>>> On Thu, Mar 10, 2022 at 4:07 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>
->>>>>>> On 3/10/22 4:33 PM, Song Liu wrote:
->>>>>>>> On Thu, Mar 10, 2022 at 3:02 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>
->>>>>>>>> On 3/10/22 3:37 PM, Song Liu wrote:
->>>>>>>>>> On Thu, Mar 10, 2022 at 2:15 PM Jens Axboe <axboe@kernel.dk> wrote:
->>>>>>>>>>>
->>>>>>>>>>> On 3/8/22 11:42 PM, Song Liu wrote:
->>>>>>>>>>>> RAID arrays check/repair operations benefit a lot from merging requests.
->>>>>>>>>>>> If we only check the previous entry for merge attempt, many merge will be
->>>>>>>>>>>> missed. As a result, significant regression is observed for RAID check
->>>>>>>>>>>> and repair.
->>>>>>>>>>>>
->>>>>>>>>>>> Fix this by checking more than just the previous entry when
->>>>>>>>>>>> plug->multiple_queues == true.
->>>>>>>>>>>>
->>>>>>>>>>>> This improves the check/repair speed of a 20-HDD raid6 from 19 MB/s to
->>>>>>>>>>>> 103 MB/s.
->>>>>>>>>>>
->>>>>>>>>>> Do the underlying disks not have an IO scheduler attached? Curious why
->>>>>>>>>>> the merges aren't being done there, would be trivial when the list is
->>>>>>>>>>> flushed out. Because if the perf difference is that big, then other
->>>>>>>>>>> workloads would be suffering they are that sensitive to being within a
->>>>>>>>>>> plug worth of IO.
->>>>>>>>>>
->>>>>>>>>> The disks have mq-deadline by default. I also tried kyber, the result
->>>>>>>>>> is the same. Raid repair work sends IOs to all the HDDs in a
->>>>>>>>>> round-robin manner. If we only check the previous request, there isn't
->>>>>>>>>> much opportunity for merge. I guess other workloads may have different
->>>>>>>>>> behavior?
->>>>>>>>>
->>>>>>>>> Round robin one at the time? I feel like there's something odd or
->>>>>>>>> suboptimal with the raid rebuild, if it's that sensitive to plug
->>>>>>>>> merging.
->>>>>>>>
->>>>>>>> It is not one request at a time, but more like (for raid456):
->>>>>>>>     read 4kB from HDD1, HDD2, HDD3...,
->>>>>>>>     then read another 4kB from HDD1, HDD2, HDD3, ...
->>>>>>>
->>>>>>> Ehm, that very much looks like one-at-the-time from each drive, which is
->>>>>>> pretty much the worst way to do it :-)
->>>>>>>
->>>>>>> Is there a reason for that? Why isn't it using 64k chunks or something
->>>>>>> like that? You could still do that as a kind of read-ahead, even if
->>>>>>> you're still processing in chunks of 4k.
->>>>>>
->>>>>> raid456 handles logic in the granularity of stripe. Each stripe is 4kB from
->>>>>> every HDD in the array. AFAICT, we need some non-trivial change to
->>>>>> enable the read ahead.
->>>>>
->>>>> Right, you'd need to stick some sort of caching in between so instead of
->>>>> reading 4k directly, you ask the cache for 4k and that can manage
->>>>> read-ahead.
->>>>>
->>>>>>>>> Plug merging is mainly meant to reduce the overhead of merging,
->>>>>>>>> complement what the scheduler would do. If there's a big drop in
->>>>>>>>> performance just by not getting as efficient merging on the plug side,
->>>>>>>>> that points to an issue with something else.
->>>>>>>>
->>>>>>>> We introduced blk_plug_max_rq_count() to give md more opportunities to
->>>>>>>> merge at plug side, so I guess the behavior has been like this for a
->>>>>>>> long time. I will take a look at the scheduler side and see whether we
->>>>>>>> can just merge later, but I am not very optimistic about it.
->>>>>>>
->>>>>>> Yeah I remember, and that also kind of felt like a work-around for some
->>>>>>> underlying issue. Maybe there's something about how the IO is issued
->>>>>>> that makes it go straight to disk and we never get any merging? Is it
->>>>>>> because they are sync reads?
->>>>>>>
->>>>>>> In any case, just doing larger reads would likely help quite a bit, but
->>>>>>> would still be nice to get to the bottom of why we're not seeing the
->>>>>>> level of merging we expect.
->>>>>>
->>>>>> Let me look more into this. Maybe we messed something up in the
->>>>>> scheduler.
->>>>>
->>>>> I'm assuming you have a plug setup for doing the reads, which is why you
->>>>> see the big difference (or there would be none). But
->>>>> blk_mq_flush_plug_list() should really take care of this when the plug
->>>>> is flushed, requests should be merged at that point. And from your
->>>>> description, doesn't sound like they are at all.
->>>>
->>>> requests are shared, when running out of request, plug list will be
->>>> flushed early.
->>>
->>> That is true, but I don't think that's the problem here with the round
->>> robin approach. Seems like it'd drive a pretty low queue depth, even
->>> considering SATA.
->>
->> Another one may be plug list not sorted before inserting requests to
->> scheduler in blk_mq_flush_plug_list(), looks you have mentioned.
-> 
-> Yep, it'd probably be the first thing I'd try... The way the IO is
-> issued, it's pretty much guaranteed that the plug list will be fully
-> interleaved with different queues and we're then issuine one-by-one and
-> running the queue each time.
-> 
-Naive question, but can you make the flush flush the first one, then 
-scan the queue for all bios for the same device, then go back and start 
-again? Simple approach if it'll work, at the expense of scanning the 
-queue once per device.
+On Fri, Mar 11, 2022 at 08:53:17AM +0100, Javier González wrote:
+> How do you propose we meed the request from Damien to support _all_
+> existing users if we remove the PO2 constraint from the block layer?
 
-Cheers,
-Wol
+By actually making the users support it.  Not by adding crap to
+block drivers to pretend that they are exposing something totally
+different than what they actually are.
