@@ -2,83 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68F1CC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 00:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64DA7C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 01:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235415AbiCKA6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 19:58:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59090 "EHLO
+        id S1345273AbiCKBQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 20:16:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345255AbiCKA5z (ORCPT
+        with ESMTP id S1345268AbiCKBQb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 19:57:55 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14ACD1A3618
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 16:56:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=yPaic9724hgJl0T3m1YjW9i3tNRmigXgOWKo9zDkfic=; b=cpZLI3vXqJCz7rBbFP6U+eWyhc
-        uzujwvOq0a0PQcB5rDyQADRN7vlCYh1/MeAirwOCHdRicBA8bsswQOKf2fJbbmMHZQFz5NKPyktkw
-        TkEJ8OpIFcLj6Q8w6UEXLWmhj3Vf21tGE2KrIHOVUsKcCACnfUnJrvD8UEOewXV2uFdhzv/AgWqkf
-        emLzTjXKctQ5tEDTj7V00mtTs8agon4T3qNtUwv2+txMAgJ68avTgPte9ELtH+jZ+JRV60mpZ3Mxi
-        AbgsyUtuGyeXiq7FJKV76qlZ/5C2SvkOg/fFQJum6pmF5Q1vmFAAy1bSH8SufgbY8/eA58KBRuROk
-        ZDJK7HlQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSTaJ-00ESJP-TU; Fri, 11 Mar 2022 00:56:47 +0000
-Date:   Thu, 10 Mar 2022 16:56:47 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-        jiangbo.365@bytedance.com, Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 4/6] nvme: zns: Add support for power_of_2 emulation to
- NVMe ZNS devices
-Message-ID: <YiqeT+lru+AmHeuK@bombadil.infradead.org>
-References: <20220308165349.231320-1-p.raghav@samsung.com>
- <CGME20220308165436eucas1p1b76f3cb5b4fa1f7d78b51a3b1b44d160@eucas1p1.samsung.com>
- <20220308165349.231320-5-p.raghav@samsung.com>
- <d13c40a5-3f87-fb2c-155e-dd64535067ac@opensource.wdc.com>
- <cf527b75-8fba-96ba-659d-fbb46fbe9de7@samsung.com>
- <bdb92eac-59ef-3ba1-16cb-31219e3a264b@opensource.wdc.com>
- <YiphB2Me63kD7T5t@bombadil.infradead.org>
- <b95a7400-8338-a696-5742-fcb8fc2693b0@opensource.wdc.com>
+        Thu, 10 Mar 2022 20:16:31 -0500
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 845EF19D615
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 17:15:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1646961326;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=slJ5zThoyjKzVe2FaJh6UGw4Z6ANQwnsVIpKCkOgWGE=;
+        b=eL4QVlCZrJMQlZfenDvAdsIZRsi8pvRUnCvfpwaFTUJGiR9t2878VTxC9ICaHzeMhdhNjK
+        qxMTVZOIxn0I+huI+RcOLRQxcoYzerKTri9Kk4uh/w7c3VeTumlDNT/meAZexA08vGz433
+        RJ735i52EGmM0Qy01UqfxtPMuMvaZF8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-375-evdSIuyCOPGE3HRHAqQ8mA-1; Thu, 10 Mar 2022 20:15:23 -0500
+X-MC-Unique: evdSIuyCOPGE3HRHAqQ8mA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8CFD7801FCE;
+        Fri, 11 Mar 2022 01:15:21 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7F65A60C17;
+        Fri, 11 Mar 2022 01:14:57 +0000 (UTC)
+Date:   Fri, 11 Mar 2022 09:14:53 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Song Liu <song@kernel.org>, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, stable@vger.kernel.org,
+        Larkin Lowrey <llowrey@nuclearwinter.com>,
+        Wilson Jonathan <i400sjon@gmail.com>,
+        Roger Heflin <rogerheflin@gmail.com>
+Subject: Re: [PATCH] block: check more requests for multiple_queues in
+ blk_attempt_plug_merge
+Message-ID: <Yiqijd9S6Y92DnBu@T590>
+References: <20220309064209.4169303-1-song@kernel.org>
+ <9516f407-bb91-093b-739d-c32bda1b5d8d@kernel.dk>
+ <CAPhsuW5zX96VaBMu-o=JUqDz2KLRBcNFM_gEsT=tHjeYqrngSQ@mail.gmail.com>
+ <38f7aaf5-2043-b4f4-1fa5-52a7c883772b@kernel.dk>
+ <CAPhsuW7zdYZqxaJ7SOWdnVOx-cASSoXS4OwtWVbms_jOHNh=Kw@mail.gmail.com>
+ <2b437948-ba2a-c59c-1059-e937ea8636bd@kernel.dk>
+ <CAPhsuW6ueGM_DZuAWvMbaB4PNftA5_MaqzMiY8_Bz7Bqy-ahZA@mail.gmail.com>
+ <40ae10bd-6839-2246-c2d7-aa11e671d7d4@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <b95a7400-8338-a696-5742-fcb8fc2693b0@opensource.wdc.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <40ae10bd-6839-2246-c2d7-aa11e671d7d4@kernel.dk>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 08:50:47AM +0900, Damien Le Moal wrote:
-> On 3/11/22 05:35, Luis Chamberlain wrote:
-> > On Thu, Mar 10, 2022 at 06:43:47AM +0900, Damien Le Moal wrote:
-> >> The indirect call using a function pointer makes the code obscure. And
-> >> the cost of that call is far greater and always present compared to the
-> >> CPU branch prediction which will luckily avoid most of the time taking
-> >> the wrong branch of an if.
+On Thu, Mar 10, 2022 at 05:36:44PM -0700, Jens Axboe wrote:
+> On 3/10/22 5:31 PM, Song Liu wrote:
+> > On Thu, Mar 10, 2022 at 4:07 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> On 3/10/22 4:33 PM, Song Liu wrote:
+> >>> On Thu, Mar 10, 2022 at 3:02 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>>
+> >>>> On 3/10/22 3:37 PM, Song Liu wrote:
+> >>>>> On Thu, Mar 10, 2022 at 2:15 PM Jens Axboe <axboe@kernel.dk> wrote:
+> >>>>>>
+> >>>>>> On 3/8/22 11:42 PM, Song Liu wrote:
+> >>>>>>> RAID arrays check/repair operations benefit a lot from merging requests.
+> >>>>>>> If we only check the previous entry for merge attempt, many merge will be
+> >>>>>>> missed. As a result, significant regression is observed for RAID check
+> >>>>>>> and repair.
+> >>>>>>>
+> >>>>>>> Fix this by checking more than just the previous entry when
+> >>>>>>> plug->multiple_queues == true.
+> >>>>>>>
+> >>>>>>> This improves the check/repair speed of a 20-HDD raid6 from 19 MB/s to
+> >>>>>>> 103 MB/s.
+> >>>>>>
+> >>>>>> Do the underlying disks not have an IO scheduler attached? Curious why
+> >>>>>> the merges aren't being done there, would be trivial when the list is
+> >>>>>> flushed out. Because if the perf difference is that big, then other
+> >>>>>> workloads would be suffering they are that sensitive to being within a
+> >>>>>> plug worth of IO.
+> >>>>>
+> >>>>> The disks have mq-deadline by default. I also tried kyber, the result
+> >>>>> is the same. Raid repair work sends IOs to all the HDDs in a
+> >>>>> round-robin manner. If we only check the previous request, there isn't
+> >>>>> much opportunity for merge. I guess other workloads may have different
+> >>>>> behavior?
+> >>>>
+> >>>> Round robin one at the time? I feel like there's something odd or
+> >>>> suboptimal with the raid rebuild, if it's that sensitive to plug
+> >>>> merging.
+> >>>
+> >>> It is not one request at a time, but more like (for raid456):
+> >>>    read 4kB from HDD1, HDD2, HDD3...,
+> >>>    then read another 4kB from HDD1, HDD2, HDD3, ...
+> >>
+> >> Ehm, that very much looks like one-at-the-time from each drive, which is
+> >> pretty much the worst way to do it :-)
+> >>
+> >> Is there a reason for that? Why isn't it using 64k chunks or something
+> >> like that? You could still do that as a kind of read-ahead, even if
+> >> you're still processing in chunks of 4k.
 > > 
-> > The goal was to ensure no performance impact, and given a hot path
-> > was involved and we simply cannot microbench append as there is no
-> > way / API to do that, we can't be sure. But if you are certain that
-> > there is no perf impact, it would be wonderful to live without it.
+> > raid456 handles logic in the granularity of stripe. Each stripe is 4kB from
+> > every HDD in the array. AFAICT, we need some non-trivial change to
+> > enable the read ahead.
 > 
-> Use zonefs. It uses zone append.
+> Right, you'd need to stick some sort of caching in between so instead of
+> reading 4k directly, you ask the cache for 4k and that can manage
+> read-ahead.
+> 
+> >>>> Plug merging is mainly meant to reduce the overhead of merging,
+> >>>> complement what the scheduler would do. If there's a big drop in
+> >>>> performance just by not getting as efficient merging on the plug side,
+> >>>> that points to an issue with something else.
+> >>>
+> >>> We introduced blk_plug_max_rq_count() to give md more opportunities to
+> >>> merge at plug side, so I guess the behavior has been like this for a
+> >>> long time. I will take a look at the scheduler side and see whether we
+> >>> can just merge later, but I am not very optimistic about it.
+> >>
+> >> Yeah I remember, and that also kind of felt like a work-around for some
+> >> underlying issue. Maybe there's something about how the IO is issued
+> >> that makes it go straight to disk and we never get any merging? Is it
+> >> because they are sync reads?
+> >>
+> >> In any case, just doing larger reads would likely help quite a bit, but
+> >> would still be nice to get to the bottom of why we're not seeing the
+> >> level of merging we expect.
+> > 
+> > Let me look more into this. Maybe we messed something up in the
+> > scheduler.
+> 
+> I'm assuming you have a plug setup for doing the reads, which is why you
+> see the big difference (or there would be none). But
+> blk_mq_flush_plug_list() should really take care of this when the plug
+> is flushed, requests should be merged at that point. And from your
+> description, doesn't sound like they are at all.
 
-That'd be a microbench on zonefs append, not raw append, and so I
-suspect a simple branch cannot make a difference and would get lost
-as noise. So I don't think a perf test is required here. Please
-let me know.
+requests are shared, when running out of request, plug list will be flushed
+early.
 
-  Luis
+Maybe we can just put bios into plug list directly, then handle them all in
+blk_mq_flush_plug_list.
+
+
+thanks,
+Ming
+
