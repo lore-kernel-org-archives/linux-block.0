@@ -2,89 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B735AC4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 22:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E924C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 22:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229513AbiCKWrM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 17:47:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49720 "EHLO
+        id S229493AbiCKWrO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 17:47:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49508 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229685AbiCKWqs (ORCPT
+        with ESMTP id S229651AbiCKWqr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 17:46:48 -0500
+        Fri, 11 Mar 2022 17:46:47 -0500
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3F9812AEA
-        for <linux-block@vger.kernel.org>; Fri, 11 Mar 2022 14:37:08 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F2452DBB9D;
+        Fri, 11 Mar 2022 14:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=h3izCrrB93CBYwtoMxE0Bi7jHqe4dGvNIGbN9crwFws=; b=CZvXMT9hH+Xs1E4x/snbSq8WWb
-        a/B0gJIjgmFq2iZnK4ysmFZZ6lYdiazSsIMJya78DJ9jSryyWtqbYlm79Yuyb3m4NEDeUmvFeZngk
-        +GBRPyRqPMyYz/cGGaOcNbBniYOUy60NW1a4+uaNpP9x2ZreWshKfZE0tf6z7hg4lOw1n9pdmy06m
-        dAGxewIq4N8yc0BJT/KN85I0EWBbL8GUmY6+OWZxe6p/aGr7WMUlz0XJGvwXJS1bhMK+cDAtaY6V6
-        1zfuZ5JQ0YCK/94LII7wt0zULT7dBSlzcDUFDPiW01l+vXrOurEvC8gaYqj0bxePJFjHpEFse0uHs
-        jdzRBprw==;
+        bh=xrkMsT6XPANqLk5GgYC5BUODbPJFQSrD5uKd2h8hjI0=; b=o8WKllppkLb2BIVSD+J4aLbTwv
+        5gndsfeuUbWil76bV48Bod+g3Z5FKYD8Md3X7HpaRu39sq8Skg1QymZXtK9BLncxzpiY8UgM0li1s
+        pZuv9prfNIM9TegktC/YEVt7l2Dq/yttoxdX1XntcxnmNy4Ma6fIZGadRlHp0LKSrkFN9IHVbPn4s
+        XOH7C5FhCMqu3TWY8rAEv3sOJeOAzuriUSFCH4jr0drJrWuHh7OZ0LlDhnnqLiT+E9TKvSwvE+8X+
+        As5LQIFAdh+nBqeoIYFKxkFyYJnfd+jOdq1kzigY6IFY58pyMCjlzEsXtsU7HvOTMkxDqGcxf1F5c
+        WMD02f6g==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSmR9-000HGX-64; Fri, 11 Mar 2022 21:04:35 +0000
-Date:   Fri, 11 Mar 2022 13:04:35 -0800
+        id 1nSmOw-000GrH-B8; Fri, 11 Mar 2022 21:02:18 +0000
+Date:   Fri, 11 Mar 2022 13:02:18 -0800
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
-        jiangbo.365@bytedance.com, kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <Yiu5YzxU/PjxLiUL@bombadil.infradead.org>
-References: <CGME20220308165414eucas1p106df0bd6a901931215cfab81660a4564@eucas1p1.samsung.com>
- <20220308165349.231320-1-p.raghav@samsung.com>
- <20220310094725.GA28499@lst.de>
- <e02dfd21-31c6-95b6-1127-3f18c79116ee@samsung.com>
- <20220310144449.GA1695@lst.de>
- <Yiuu2h38owO9ioIW@bombadil.infradead.org>
- <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
+To:     Paul Moore <paul@paul-moore.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>,
+        James Morris <jmorris@namei.org>,
+        "Serge E. Hallyn" <serge@hallyn.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <kafai@fb.com>,
+        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>,
+        linux-security-module@vger.kernel.org, axboe@kernel.dk, hch@lst.de,
+        kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
+        a.manzanares@samsung.com, joshiiitr@gmail.com, anuj20.g@samsung.com
+Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Message-ID: <Yiu42rLif7FSwrjP@bombadil.infradead.org>
+References: <20220308152105.309618-1-joshi.k@samsung.com>
+ <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
+ <20220308152105.309618-6-joshi.k@samsung.com>
+ <YiuNZ7+KUjLtuYkr@bombadil.infradead.org>
+ <CAHC9VhTnpO6LyaYWDTjJAy_ztGw+qqf-YS0W7S-djyZVnydVHg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
+In-Reply-To: <CAHC9VhTnpO6LyaYWDTjJAy_ztGw+qqf-YS0W7S-djyZVnydVHg@mail.gmail.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:51:35PM -0800, Keith Busch wrote:
-> On Fri, Mar 11, 2022 at 12:19:38PM -0800, Luis Chamberlain wrote:
-> > NAND has no PO2 requirement. The emulation effort was only done to help
-> > add support for !PO2 devices because there is no alternative. If we
-> > however are ready instead to go down the avenue of removing those
-> > restrictions well let's go there then instead. If that's not even
-> > something we are willing to consider I'd really like folks who stand
-> > behind the PO2 requirement to stick their necks out and clearly say that
-> > their hw/fw teams are happy to deal with this requirement forever on ZNS.
+On Fri, Mar 11, 2022 at 01:53:03PM -0500, Paul Moore wrote:
+> On Fri, Mar 11, 2022 at 12:56 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > On Tue, Mar 08, 2022 at 08:50:53PM +0530, Kanchan Joshi wrote:
+> > > diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
+> > > index 5c9cd9695519..1df270b47af5 100644
+> > > --- a/drivers/nvme/host/ioctl.c
+> > > +++ b/drivers/nvme/host/ioctl.c
+> > > @@ -369,6 +469,33 @@ long nvme_ns_chr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+> > >       return __nvme_ioctl(ns, cmd, (void __user *)arg);
+> > >  }
+> > >
+> > > +static int nvme_ns_async_ioctl(struct nvme_ns *ns, struct io_uring_cmd *ioucmd)
+> > > +{
+> > > +     int ret;
+> > > +
+> > > +     BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > sizeof(ioucmd->pdu));
+> > > +
+> > > +     switch (ioucmd->cmd_op) {
+> > > +     case NVME_IOCTL_IO64_CMD:
+> > > +             ret = nvme_user_cmd64(ns->ctrl, ns, NULL, ioucmd);
+> > > +             break;
+> > > +     default:
+> > > +             ret = -ENOTTY;
+> > > +     }
+> > > +
+> > > +     if (ret >= 0)
+> > > +             ret = -EIOCBQUEUED;
+> > > +     return ret;
+> > > +}
+> >
+> > And here I think we'll need something like this:
 > 
-> Regardless of the merits of the current OS requirement, it's a trivial
-> matter for firmware to round up their reported zone size to the next
-> power of 2. This does not create a significant burden on their part, as
-> far as I know.
+> If we can promise that we will have a LSM hook for all of the
+> file_operations::async_cmd implementations that are security relevant
+> we could skip the LSM passthrough hook at the io_uring layer.
 
-Sure sure.. fw can do crap like that too...
+There is no way to ensure this unless perhaps we cake that into
+the API somehow... Or have a registration system for setting the
+respctive file ops / LSM.
 
-> And po2 does not even seem to be the real problem here. The holes seem
-> to be what's causing a concern, which you have even without po2 zones.
+> It
+> would potentially make life easier in that we don't have to worry
+> about putting the passthrough op in the right context, but risks
+> missing a LSM hook control point (it will happen at some point and
+> *boom* CVE).
 
-Exactly.
+Precicely my concern. So we either open code this and ask folks
+to do this or I think we do a registration and require both ops
+and the the LSM hook at registration.
 
-> I'm starting to like the previous idea of creating an unholey
-> device-mapper for such users...
-
-Won't that restrict nvme with chunk size crap. For instance later if we
-want much larger block sizes.
+I think this should be enough information to get Kanchan rolling
+on the LSM side.
 
   Luis
