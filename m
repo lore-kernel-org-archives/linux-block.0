@@ -2,85 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4803CC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 16:59:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECACFC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 17:12:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245606AbiCKRAW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 12:00:22 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59830 "EHLO
+        id S1350634AbiCKRNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 12:13:05 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60000 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350414AbiCKRAW (ORCPT
+        with ESMTP id S1349557AbiCKRNE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:00:22 -0500
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7045694B8;
-        Fri, 11 Mar 2022 08:59:18 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 3E63C61D85;
-        Fri, 11 Mar 2022 16:59:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6251C340EE;
-        Fri, 11 Mar 2022 16:59:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647017957;
-        bh=TfUoDniLNAUWpN5c0ZvcL19CsqAGIJipVHp+JX8IZYU=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=IGNZyrBivI/tTqZCSj1SnNnLybgw7ILcz/GOPJIbv9s5TofQZKuRam1jdoh8quoAH
-         RpfhJqKAOuD+BMhM98wO11QJaJCPGonkuOORU0/BvxI/Cm4Y/5+NLoASTIy1tIrCId
-         1UPuuHbLLcwa7If6D3lkZj0Dc4vjDL0GPjeZzh1zASE22jHf5EfN2pv0ViRm52ePDk
-         hF/Tt9Ob0GO16bmDuA7zZAWSdjYkAdFOVMpzzHJStzsoIqYVP/obqTM+ArqCqytbpd
-         HAIxODjbQgivDWVj8xIhAc7chRx3TxvHcKeIdo6vSpQ8l2FFUkl0+pICp1EZYxF0TP
-         euJFwelKIZxmw==
-Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-2dc348dab52so100167267b3.6;
-        Fri, 11 Mar 2022 08:59:17 -0800 (PST)
-X-Gm-Message-State: AOAM532Z4Mk9g0rl+RDeGxH38EjAA1flOcSiVIVwutt5yD1yF8lUS6Z2
-        xNIUNh4nc3qoUljz2rKooBBuS2oQZJkWfmxP7ko=
-X-Google-Smtp-Source: ABdhPJyjs53YNBDzki/gNd5IjlxDqN3gpH+kRPQ8Tg0rq78PB5ym7q5nPhRgFnuoO2cOP4YEesEHrF0VH/xjHrloqiw=
-X-Received: by 2002:a81:23ce:0:b0:2dc:b20:cc73 with SMTP id
- j197-20020a8123ce000000b002dc0b20cc73mr9213650ywj.130.1647017956691; Fri, 11
- Mar 2022 08:59:16 -0800 (PST)
+        Fri, 11 Mar 2022 12:13:04 -0500
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E2A14A204;
+        Fri, 11 Mar 2022 09:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Ir0s1se4x0bETqIpYVQGZ4KXE3aSi7t4vWQRES8qUTk=; b=DUt5Zb7a+snlbXWsaJ5q3hLPTH
+        awcuGaJmqxRufupiS7ucn4F44o9tmXSzKN5jHRlqSqJOvkLWGjEmIluiTumy2l6D9pimo0rzr8HPd
+        6Pc1rqGrN/+oxIF6nVEdX/05eGCfy4v4cd+EQIdkZGLaC4yAgNP8vKAxHZVIRwd3kjbDKXnBGx+zW
+        ef6GPdnW42qv6/tsEft5UCh25P4zpfCGk7zY79ZzB+URv2uVpgIkfi9jFHFNtLvEztM7ObNl//jMy
+        l/xzdckppVv5eFJK/VFdlropqF3t29HyuHbDxiUREMLIPDOuz6j+V71MzMZ1xB9gjgsBaeJtJ1+/8
+        MrWdXsBQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nSint-00HSKY-LR; Fri, 11 Mar 2022 17:11:49 +0000
+Date:   Fri, 11 Mar 2022 09:11:49 -0800
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>, Paul Moore <paul@paul-moore.com>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, jmorris@namei.org,
+        serge@hallyn.com, ast@kernel.org, daniel@iogearbox.net,
+        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
+        john.fastabend@gmail.com, kpsingh@kernel.org,
+        linux-security-module@vger.kernel.org, hch@lst.de,
+        kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
+        a.manzanares@samsung.com, joshiiitr@gmail.com, anuj20.g@samsung.com
+Subject: Re: [PATCH 03/17] io_uring: add infra and support for
+ IORING_OP_URING_CMD
+Message-ID: <YiuC1fhEiRdo5bPd@bombadil.infradead.org>
+References: <20220308152105.309618-1-joshi.k@samsung.com>
+ <CGME20220308152658epcas5p3929bd1fcf75edc505fec71901158d1b5@epcas5p3.samsung.com>
+ <20220308152105.309618-4-joshi.k@samsung.com>
+ <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
+ <e3bfd028-ece7-d969-f47c-1181b17ac919@kernel.dk>
 MIME-Version: 1.0
-References: <20220309064209.4169303-1-song@kernel.org> <9516f407-bb91-093b-739d-c32bda1b5d8d@kernel.dk>
- <CAPhsuW5zX96VaBMu-o=JUqDz2KLRBcNFM_gEsT=tHjeYqrngSQ@mail.gmail.com>
- <38f7aaf5-2043-b4f4-1fa5-52a7c883772b@kernel.dk> <CAPhsuW7zdYZqxaJ7SOWdnVOx-cASSoXS4OwtWVbms_jOHNh=Kw@mail.gmail.com>
- <2b437948-ba2a-c59c-1059-e937ea8636bd@kernel.dk> <84310ba2-a413-22f4-1349-59a09f4851a1@kernel.dk>
-In-Reply-To: <84310ba2-a413-22f4-1349-59a09f4851a1@kernel.dk>
-From:   Song Liu <song@kernel.org>
-Date:   Fri, 11 Mar 2022 08:59:05 -0800
-X-Gmail-Original-Message-ID: <CAPhsuW492+zrVCyckgct_ju+5V_2grn4-s--TU2QVA7pkYtyzA@mail.gmail.com>
-Message-ID: <CAPhsuW492+zrVCyckgct_ju+5V_2grn4-s--TU2QVA7pkYtyzA@mail.gmail.com>
-Subject: Re: [PATCH] block: check more requests for multiple_queues in blk_attempt_plug_merge
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        linux-raid <linux-raid@vger.kernel.org>, stable@vger.kernel.org,
-        Larkin Lowrey <llowrey@nuclearwinter.com>,
-        Wilson Jonathan <i400sjon@gmail.com>,
-        Roger Heflin <rogerheflin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e3bfd028-ece7-d969-f47c-1181b17ac919@kernel.dk>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On Thu, Mar 10, 2022 at 07:43:04PM -0700, Jens Axboe wrote:
+> On 3/10/22 6:51 PM, Luis Chamberlain wrote:
+> > On Tue, Mar 08, 2022 at 08:50:51PM +0530, Kanchan Joshi wrote:
+> >> From: Jens Axboe <axboe@kernel.dk>
+> >>
+> >> This is a file private kind of request. io_uring doesn't know what's
+> >> in this command type, it's for the file_operations->async_cmd()
+> >> handler to deal with.
+> >>
+> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+> >> ---
+> > 
+> > <-- snip -->
+> > 
+> >> +static int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
+> >> +{
+> >> +	struct file *file = req->file;
+> >> +	int ret;
+> >> +	struct io_uring_cmd *ioucmd = &req->uring_cmd;
+> >> +
+> >> +	ioucmd->flags |= issue_flags;
+> >> +	ret = file->f_op->async_cmd(ioucmd);
+> > 
+> > I think we're going to have to add a security_file_async_cmd() check
+> > before this call here. Because otherwise we're enabling to, for
+> > example, bypass security_file_ioctl() for example using the new
+> > iouring-cmd interface.
+> > 
+> > Or is this already thought out with the existing security_uring_*() stuff?
+> 
+> Unless the request sets .audit_skip, it'll be included already in terms
+> of logging.
 
-On Fri, Mar 11, 2022 at 6:16 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> On 3/10/22 5:07 PM, Jens Axboe wrote:
-> > In any case, just doing larger reads would likely help quite a bit, but
-> > would still be nice to get to the bottom of why we're not seeing the
-> > level of merging we expect.
->
-> Song, can you try this one? It'll do the dispatch in a somewhat saner
-> fashion, bundling identical queues. And we'll keep iterating the plug
-> list for a merge if we have multiple disks, until we've seen a queue
-> match and checked.
+Neat.
 
-This one works great! We are seeing 99% read request merge and
-500kB+ average read size. The original patch in this thread only got
-88% and 34kB for these two metrics.
+> But I'd prefer not to lodge this in with ioctls, unless
+> we're going to be doing actual ioctls.
 
-Thanks,
-Song
+Oh sure, I have been an advocate to ensure folks don't conflate async_cmd
+with ioctl. However it *can* enable subsystems to enable ioctl
+passthrough, but each of those subsystems need to vet for this on their
+own terms. I'd hate to see / hear some LSM surprises later.
 
-[...]
+> But definitely something to keep in mind and make sure that we're under
+> the right umbrella in terms of auditing and security.
+
+Paul, how about something like this for starters (and probably should
+be squashed into this series so its not a separate commit) ?
+
+From f3ddbe822374cc1c7002bd795c1ae486d370cbd1 Mon Sep 17 00:00:00 2001
+From: Luis Chamberlain <mcgrof@kernel.org>
+Date: Fri, 11 Mar 2022 08:55:50 -0800
+Subject: [PATCH] lsm,io_uring: add LSM hooks to for the new async_cmd file op
+
+io-uring is extending the struct file_operations to allow a new
+command which each subsystem can use to enable command passthrough.
+Add an LSM specific for the command passthrough which enables LSMs
+to inspect the command details.
+
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ fs/io_uring.c                 | 5 +++++
+ include/linux/lsm_hook_defs.h | 1 +
+ include/linux/lsm_hooks.h     | 3 +++
+ include/linux/security.h      | 5 +++++
+ security/security.c           | 4 ++++
+ 5 files changed, 18 insertions(+)
+
+diff --git a/fs/io_uring.c b/fs/io_uring.c
+index 3f6eacc98e31..1c4e6b2cb61a 100644
+--- a/fs/io_uring.c
++++ b/fs/io_uring.c
+@@ -4190,6 +4190,11 @@ static int io_uring_cmd_prep(struct io_kiocb *req,
+ 	struct io_ring_ctx *ctx = req->ctx;
+ 	struct io_uring_cmd *ioucmd = &req->uring_cmd;
+ 	u32 ucmd_flags = READ_ONCE(sqe->uring_cmd_flags);
++	int ret;
++
++	ret = security_uring_async_cmd(ioucmd);
++	if (ret)
++		return ret;
+ 
+ 	if (!req->file->f_op->async_cmd)
+ 		return -EOPNOTSUPP;
+diff --git a/include/linux/lsm_hook_defs.h b/include/linux/lsm_hook_defs.h
+index 819ec92dc2a8..4a20f8e6b295 100644
+--- a/include/linux/lsm_hook_defs.h
++++ b/include/linux/lsm_hook_defs.h
+@@ -404,4 +404,5 @@ LSM_HOOK(int, 0, perf_event_write, struct perf_event *event)
+ #ifdef CONFIG_IO_URING
+ LSM_HOOK(int, 0, uring_override_creds, const struct cred *new)
+ LSM_HOOK(int, 0, uring_sqpoll, void)
++LSM_HOOK(int, 0, uring_async_cmd, struct io_uring_cmd *ioucmd)
+ #endif /* CONFIG_IO_URING */
+diff --git a/include/linux/lsm_hooks.h b/include/linux/lsm_hooks.h
+index 3bf5c658bc44..21b18cf138c2 100644
+--- a/include/linux/lsm_hooks.h
++++ b/include/linux/lsm_hooks.h
+@@ -1569,6 +1569,9 @@
+  *      Check whether the current task is allowed to spawn a io_uring polling
+  *      thread (IORING_SETUP_SQPOLL).
+  *
++ * @uring_async_cmd:
++ *      Check whether the file_operations async_cmd is allowed to run.
++ *
+  */
+ union security_list_options {
+ 	#define LSM_HOOK(RET, DEFAULT, NAME, ...) RET (*NAME)(__VA_ARGS__);
+diff --git a/include/linux/security.h b/include/linux/security.h
+index 6d72772182c8..4d7f72813d75 100644
+--- a/include/linux/security.h
++++ b/include/linux/security.h
+@@ -2041,6 +2041,7 @@ static inline int security_perf_event_write(struct perf_event *event)
+ #ifdef CONFIG_SECURITY
+ extern int security_uring_override_creds(const struct cred *new);
+ extern int security_uring_sqpoll(void);
++extern int security_uring_async_cmd(struct io_uring_cmd *ioucmd);
+ #else
+ static inline int security_uring_override_creds(const struct cred *new)
+ {
+@@ -2050,6 +2051,10 @@ static inline int security_uring_sqpoll(void)
+ {
+ 	return 0;
+ }
++static inline int security_uring_async_cmd(struct io_uring_cmd *ioucmd)
++{
++	return 0;
++}
+ #endif /* CONFIG_SECURITY */
+ #endif /* CONFIG_IO_URING */
+ 
+diff --git a/security/security.c b/security/security.c
+index 22261d79f333..ef96be2f953a 100644
+--- a/security/security.c
++++ b/security/security.c
+@@ -2640,4 +2640,8 @@ int security_uring_sqpoll(void)
+ {
+ 	return call_int_hook(uring_sqpoll, 0);
+ }
++int security_uring_async_cmd(struct io_uring_cmd *ioucmd)
++{
++	return call_int_hook(uring_async_cmd, 0, ioucmd);
++}
+ #endif /* CONFIG_IO_URING */
+-- 
+2.34.1
+
