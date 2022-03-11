@@ -2,200 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14BD6C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 20:58:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96755C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 22:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230346AbiCKU7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 15:59:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49540 "EHLO
+        id S229626AbiCKWo3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 17:44:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229655AbiCKU67 (ORCPT
+        with ESMTP id S229637AbiCKWoV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 15:58:59 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC7E1768DA;
-        Fri, 11 Mar 2022 12:57:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=eMQHTaULL4DYk//ji2yCOo0Dmn4myt1H30g/N/roRy4=; b=U25RVHWnNCFaEL1Ln9Wozt7+d/
-        RPI294B2un79E/20bRCIiRF3U/75J7nPDqT4DChC9XZjkFNCVd6SGczeyUeujIRTcu8dQZ037uPWv
-        tk+IZh+PuVUXBSRUnSJuVjPBz0XIq36vSvBWc76uudEQFl4scHaSLSpQWcj9yz/e0PviNG6foGn51
-        E3O2r2awjzz8oZuXsWh57vC2YEc1HyhBWwsS9AjHZusQRRRtmg+hvJOwhdI7yC7j4ZUlgUEXaRICV
-        1npV3y2xRwmUIEuwql7kxZZx32u5bi5e+uYVk0xLhlhcfp60dZlXww9OdIT4se4D55aq1WGOeJkPd
-        q9k75Fyg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSmKV-000GNc-65; Fri, 11 Mar 2022 20:57:43 +0000
-Date:   Fri, 11 Mar 2022 12:57:43 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Paul Moore <paul@paul-moore.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-security-module@vger.kernel.org, linux-audit@redhat.com,
-        Kanchan Joshi <joshi.k@samsung.com>, jmorris@namei.org,
-        serge@hallyn.com, ast@kernel.org, daniel@iogearbox.net,
-        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        john.fastabend@gmail.com, kpsingh@kernel.org, hch@lst.de,
-        kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
-        a.manzanares@samsung.com, joshiiitr@gmail.com,
-        anuj20.g@samsung.com, selinux@vger.kernel.org
-Subject: Re: [PATCH 03/17] io_uring: add infra and support for
- IORING_OP_URING_CMD
-Message-ID: <Yiu3x/Fxt/b5rNWB@bombadil.infradead.org>
-References: <20220308152105.309618-1-joshi.k@samsung.com>
- <CGME20220308152658epcas5p3929bd1fcf75edc505fec71901158d1b5@epcas5p3.samsung.com>
- <20220308152105.309618-4-joshi.k@samsung.com>
- <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
- <e3bfd028-ece7-d969-f47c-1181b17ac919@kernel.dk>
- <YiuC1fhEiRdo5bPd@bombadil.infradead.org>
- <CAHC9VhSNMH8XAKa43kCR8fZj-B1ucCd3R6WXOo3B4z80Bw2Kkw@mail.gmail.com>
+        Fri, 11 Mar 2022 17:44:21 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A579C5E157;
+        Fri, 11 Mar 2022 14:40:25 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 604C9B80EE0;
+        Fri, 11 Mar 2022 22:40:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D65ACC340E9;
+        Fri, 11 Mar 2022 22:40:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647038422;
+        bh=edOeCCGPidsfDBta24UEYMa+thqJbgXW3F+tYAjMV38=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=VrnWZOKoLwD0hxybT0jAHa2JNb1l6NsPOnrQGfKb0xmWhjH+IA+rkJCPYu/bXzixb
+         YeO7kOcNOBXVy+3aHD1tSw99WdDOLiXtqL76Li3tQhNIvW0XaNA5xMVriz5CiDfbU8
+         KiVZM05waHJHgFDX2Dl+tS8IW248Pda4Z+bdxgSvzWkmms/FNqzhkdbhCn1k+k2G0f
+         7R+2xLNVNgOIV0vyfZr8Thz/3OWfcHXuauaXrTxjq4WTxHblWPA9tuTGeZc3H964kJ
+         oa/pfyTY+f7JFLm9GS7tRZlihFXns41Kr38xPKo+2O07kmfJEgICj4ySLUQ4v9XK5j
+         gn9X/wfszx9yA==
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-2dbd8777564so109970897b3.0;
+        Fri, 11 Mar 2022 14:40:22 -0800 (PST)
+X-Gm-Message-State: AOAM530iApPMdwl+xJok8nlFdg9S/j0SMo6gywNmJrTRHG3cNvbxCcgg
+        op1IOq8cqn5XowIpeWFBYb7nciBbLNzaIr7IbxE=
+X-Google-Smtp-Source: ABdhPJwC/f7TuYoXOvpNtGSwGatK99lRZca8plSgnId5Q0KVNB/jut3lyLb3jr6fZyOpB4fJxzANJy1VJktVfo0a/9A=
+X-Received: by 2002:a81:7814:0:b0:2ca:287c:6c2e with SMTP id
+ t20-20020a817814000000b002ca287c6c2emr10183626ywc.211.1647038421914; Fri, 11
+ Mar 2022 14:40:21 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHC9VhSNMH8XAKa43kCR8fZj-B1ucCd3R6WXOo3B4z80Bw2Kkw@mail.gmail.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <20220309064209.4169303-1-song@kernel.org> <9516f407-bb91-093b-739d-c32bda1b5d8d@kernel.dk>
+ <CAPhsuW5zX96VaBMu-o=JUqDz2KLRBcNFM_gEsT=tHjeYqrngSQ@mail.gmail.com>
+ <38f7aaf5-2043-b4f4-1fa5-52a7c883772b@kernel.dk> <CAPhsuW7zdYZqxaJ7SOWdnVOx-cASSoXS4OwtWVbms_jOHNh=Kw@mail.gmail.com>
+ <2b437948-ba2a-c59c-1059-e937ea8636bd@kernel.dk> <84310ba2-a413-22f4-1349-59a09f4851a1@kernel.dk>
+ <CAPhsuW492+zrVCyckgct_ju+5V_2grn4-s--TU2QVA7pkYtyzA@mail.gmail.com> <11a4c611-ed0c-789f-b5d0-8a127539daf1@molgen.mpg.de>
+In-Reply-To: <11a4c611-ed0c-789f-b5d0-8a127539daf1@molgen.mpg.de>
+From:   Song Liu <song@kernel.org>
+Date:   Fri, 11 Mar 2022 14:40:10 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW4yZBEj1ObEV0b0O7yFYs5VqAeYBCgc39qL2dOp4FBeFw@mail.gmail.com>
+Message-ID: <CAPhsuW4yZBEj1ObEV0b0O7yFYs5VqAeYBCgc39qL2dOp4FBeFw@mail.gmail.com>
+Subject: Re: [PATCH] block: check more requests for multiple_queues in blk_attempt_plug_merge
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>, stable@vger.kernel.org,
+        Larkin Lowrey <llowrey@nuclearwinter.com>,
+        Wilson Jonathan <i400sjon@gmail.com>,
+        Roger Heflin <rogerheflin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 01:47:51PM -0500, Paul Moore wrote:
-> On Fri, Mar 11, 2022 at 12:11 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
-> > On Thu, Mar 10, 2022 at 07:43:04PM -0700, Jens Axboe wrote:
-> > > On 3/10/22 6:51 PM, Luis Chamberlain wrote:
-> > > > On Tue, Mar 08, 2022 at 08:50:51PM +0530, Kanchan Joshi wrote:
-> > > >> From: Jens Axboe <axboe@kernel.dk>
-> > > >>
-> > > >> This is a file private kind of request. io_uring doesn't know what's
-> > > >> in this command type, it's for the file_operations->async_cmd()
-> > > >> handler to deal with.
-> > > >>
-> > > >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> > > >> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> > > >> ---
-> > > >
-> > > > <-- snip -->
-> > > >
-> > > >> +static int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
-> > > >> +{
-> > > >> +  struct file *file = req->file;
-> > > >> +  int ret;
-> > > >> +  struct io_uring_cmd *ioucmd = &req->uring_cmd;
-> > > >> +
-> > > >> +  ioucmd->flags |= issue_flags;
-> > > >> +  ret = file->f_op->async_cmd(ioucmd);
-> > > >
-> > > > I think we're going to have to add a security_file_async_cmd() check
-> > > > before this call here. Because otherwise we're enabling to, for
-> > > > example, bypass security_file_ioctl() for example using the new
-> > > > iouring-cmd interface.
-> > > >
-> > > > Or is this already thought out with the existing security_uring_*() stuff?
-> > >
-> > > Unless the request sets .audit_skip, it'll be included already in terms
-> > > of logging.
+On Fri, Mar 11, 2022 at 1:42 PM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Song,
+>
+>
+> Am 11.03.22 um 17:59 schrieb Song Liu:
+>
+> > On Fri, Mar 11, 2022 at 6:16 AM Jens Axboe <axboe@kernel.dk> wrote:
+> >>
+> >> On 3/10/22 5:07 PM, Jens Axboe wrote:
+> >>> In any case, just doing larger reads would likely help quite a bit, but
+> >>> would still be nice to get to the bottom of why we're not seeing the
+> >>> level of merging we expect.
+> >>
+> >> Song, can you try this one? It'll do the dispatch in a somewhat saner
+> >> fashion, bundling identical queues. And we'll keep iterating the plug
+> >> list for a merge if we have multiple disks, until we've seen a queue
+> >> match and checked.
 > >
-> > Neat.
-> 
-> [NOTE: added the audit and SELinux lists to the To/CC line]
-> 
-> Neat, but I think we will need to augment things to support this new
-> passthrough mechanism.
+> > This one works great! We are seeing 99% read request merge and
+> > 500kB+ average read size. The original patch in this thread only got
+> > 88% and 34kB for these two metrics.
+>
+> Nice. I am curious, how these metrics can be obtained?
+>
 
-That's what my spidey instincts told me.
+We can use tools as iostat:
+iostat -mx 2
+Device            r/s     w/s     rMB/s     wMB/s   rrqm/s   wrqm/s
+%rrqm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+sdb           3176.50    1.00    100.57      0.00 22503.00     0.00
+87.63   0.00   10.22    3.50  32.46    32.42     4.00   0.24  76.60
+sdi           3167.00    1.00    100.57      0.00 22512.50     0.00
+87.67   0.00   11.58    4.00  36.68    32.52     4.00   0.24  77.55
 
-> The issue is that folks who look at audit logs need to be able to
-> piece together what happened on the system using just what they have
-> in the logs themselves.  As things currently stand with this patchset,
-> the only bit of information they would have to go on would be
-> "uring_op=<IORING_OP_URING_CMD>" which isn't very informative :)
-> 
-> You'll see a similar issue in the newly proposed LSM hook below, we
-> need to be able to record information about not only the passthrough
-> command, e.g. io_uring_cmd::cmd_op, but also the underlying
-> device/handler so that we can put the passthrough command in the right
-> context (as far as I can tell io_uring_cmd::cmd_op is specific to the
-> device).  We might be able to leverage file_operations::owner::name
-> for this, e.g. "uring_passthru_dev=nvme
-> uring_passthru_op=<NVME_IOCTL_IO64_CMD>".
+The two metrics we used here are %rrqm and rareq-sz.
 
-OK...
-
-> > > But I'd prefer not to lodge this in with ioctls, unless
-> > > we're going to be doing actual ioctls.
-> >
-> > Oh sure, I have been an advocate to ensure folks don't conflate async_cmd
-> > with ioctl. However it *can* enable subsystems to enable ioctl
-> > passthrough, but each of those subsystems need to vet for this on their
-> > own terms. I'd hate to see / hear some LSM surprises later.
-> 
-> Same :)  Thanks for bringing this up with us while the patches are
-> still in-progress/under-review, I think it makes for a much more
-> pleasant experience for everyone.
-
-Sure thing.
-
-> > > But definitely something to keep in mind and make sure that we're under
-> > > the right umbrella in terms of auditing and security.
-> >
-> > Paul, how about something like this for starters (and probably should
-> > be squashed into this series so its not a separate commit) ?
-> >
-> > From f3ddbe822374cc1c7002bd795c1ae486d370cbd1 Mon Sep 17 00:00:00 2001
-> > From: Luis Chamberlain <mcgrof@kernel.org>
-> > Date: Fri, 11 Mar 2022 08:55:50 -0800
-> > Subject: [PATCH] lsm,io_uring: add LSM hooks to for the new async_cmd file op
-> >
-> > io-uring is extending the struct file_operations to allow a new
-> > command which each subsystem can use to enable command passthrough.
-> > Add an LSM specific for the command passthrough which enables LSMs
-> > to inspect the command details.
-> >
-> > Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> > ---
-> >  fs/io_uring.c                 | 5 +++++
-> >  include/linux/lsm_hook_defs.h | 1 +
-> >  include/linux/lsm_hooks.h     | 3 +++
-> >  include/linux/security.h      | 5 +++++
-> >  security/security.c           | 4 ++++
-> >  5 files changed, 18 insertions(+)
-> >
-> > diff --git a/fs/io_uring.c b/fs/io_uring.c
-> > index 3f6eacc98e31..1c4e6b2cb61a 100644
-> > --- a/fs/io_uring.c
-> > +++ b/fs/io_uring.c
-> > @@ -4190,6 +4190,11 @@ static int io_uring_cmd_prep(struct io_kiocb *req,
-> >         struct io_ring_ctx *ctx = req->ctx;
-> >         struct io_uring_cmd *ioucmd = &req->uring_cmd;
-> >         u32 ucmd_flags = READ_ONCE(sqe->uring_cmd_flags);
-> > +       int ret;
-> > +
-> > +       ret = security_uring_async_cmd(ioucmd);
-> > +       if (ret)
-> > +               return ret;
-> 
-> As a quick aside, for the LSM/audit folks the lore link for the full
-> patchset is here:
-> https://lore.kernel.org/io-uring/CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com/T/#m605e2fb7caf33e8880683fe6b57ade4093ed0643
-> 
-> Similar to what was discussed above with respect to auditing, I think
-> we need to do some extra work here to make it easier for a LSM to put
-> the IO request in the proper context.  We have io_uring_cmd::cmd_op
-> via the @ioucmd parameter, which is good, but we need to be able to
-> associate that with a driver to make sense of it.
-
-It may not always be a driver, it can be built-in stuff.
-
-> In the case of
-> audit we could simply use the module name string, which is probably
-> ideal as we would want a string anyway, but LSMs will likely want
-> something more machine friendly.  That isn't to say we couldn't do a
-> strcmp() on the module name string, but for something that aims to
-> push performance as much as possible, doing a strcmp() on each
-> operation seems a little less than optimal ;)
-
-Yes this is a super hot path...
-
-  Luis
+Thanks,
+Song
