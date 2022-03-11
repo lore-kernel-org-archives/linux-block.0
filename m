@@ -2,117 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB7F7C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 17:57:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DCD86C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 18:00:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350411AbiCKR6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 12:58:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46934 "EHLO
+        id S1344592AbiCKSBu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 13:01:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56840 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350354AbiCKR6H (ORCPT
+        with ESMTP id S236099AbiCKSBr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 12:58:07 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B2F71C1EF1;
-        Fri, 11 Mar 2022 09:57:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=psnf2vdFKAXENOq8/6XBZUZW2zI3JLp3NA3ERkqxEA8=; b=T70rAqZKUfG6gAOdpjYiYM5Fml
-        LRYWnV4P15wi2p18JaBEiLnO/57xcO6XaFzR+QC6RYyc9M4qALmWQIpttC9OmZEk9Z9x1BQUH0MfU
-        CQJU8J2fCyR5s2pXXFkDfCBkqNIh4awosb6gXTWOInVHRQQ0M7vwmmQ2IAaeLn+qbDyQD8iFqlFWP
-        yW+ypP9IQYq95aB8O4NXoturP+pWMPmTNwXtK/o3u50MupWv3SztMvwKY9FFRiuTHqOSjM5UULtjt
-        NPB34MI3JHz6P/Qa2H0o0WvgsHVvkjoJDxfB8pEWDKAyGajf+MyeuPwrmGGztC53Dtgz0ill5NeJk
-        nywOl+Lg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSjVX-00HY4Q-94; Fri, 11 Mar 2022 17:56:55 +0000
-Date:   Fri, 11 Mar 2022 09:56:55 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>,
-        Paul Moore <paul@paul-moore.com>,
-        James Morris <jmorris@namei.org>,
-        "Serge E. Hallyn" <serge@hallyn.com>,
-        Alexei Starovoitov <ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Andrii Nakryiko <andrii@kernel.org>,
-        Martin KaFai Lau <kafai@fb.com>,
-        Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        KP Singh <kpsingh@kernel.org>,
-        linux-security-module@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        asml.silence@gmail.com, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        sbates@raithlin.com, logang@deltatee.com, pankydev8@gmail.com,
-        javier@javigon.com, a.manzanares@samsung.com, joshiiitr@gmail.com,
-        anuj20.g@samsung.com
-Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
- char-device.
-Message-ID: <YiuNZ7+KUjLtuYkr@bombadil.infradead.org>
-References: <20220308152105.309618-1-joshi.k@samsung.com>
- <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
- <20220308152105.309618-6-joshi.k@samsung.com>
+        Fri, 11 Mar 2022 13:01:47 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6181D3DAA;
+        Fri, 11 Mar 2022 10:00:43 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 8B069B82C8B;
+        Fri, 11 Mar 2022 18:00:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D32BC340F4;
+        Fri, 11 Mar 2022 18:00:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1647021641;
+        bh=1B9M6WufRHwLGHxN5N+jVnheJKyKK97qoYyy0r2cmFE=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=aPRXRlocTDs7NSoF+9ir0ya+MiC80Lovu0lYXiiadwUTVfHam8f7WRn8lEv/k8LjT
+         ebfB4Ltmps4fgKQrFXkyp6EV+5AgOfDuhlwqzvK0Wmvjgsx4BbPBxjNE3i92+RbxRb
+         DPbX3l4bdy+Q8OHHVmURu83vbiOYC0E9Nptm9UBoskr/VoJjlqQwFX8ufvD8+AQ3ZT
+         O+5iBh45Di1CmpvOsiYw3+7k7vewTUMcXlyEz4Udj5dhB52xTGkYs6n+sYG5FgsOI6
+         ts7aP7bbU11fxF4x+VrQ+uiHQpy/ntAekx1ho0V6IpmK5m/A60So27+VGkM0C2yc17
+         sATy63kvXw7uQ==
+Received: by mail-yb1-f172.google.com with SMTP id j2so18642076ybu.0;
+        Fri, 11 Mar 2022 10:00:41 -0800 (PST)
+X-Gm-Message-State: AOAM532XYLOyFOLcYDW8eLel1I+YexCwX7jl7btp8tEF14yeWAbJf/P4
+        aPRAS9mvyiwl+/N5YUXmUYIy5FHOXcFk+2J9UAA=
+X-Google-Smtp-Source: ABdhPJz2EHkavaai5y+jnroPDDtI+Nu4A9jqDtHhb9kQ5D87ZPlcYUh5gu7T/OHYpQYHCW4UC0hwFCs/C0BIUeHxCPA=
+X-Received: by 2002:a05:6902:1ca:b0:624:e2a1:2856 with SMTP id
+ u10-20020a05690201ca00b00624e2a12856mr8788676ybh.389.1647021640233; Fri, 11
+ Mar 2022 10:00:40 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220308152105.309618-6-joshi.k@samsung.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+References: <20220311173041.165948-1-axboe@kernel.dk>
+In-Reply-To: <20220311173041.165948-1-axboe@kernel.dk>
+From:   Song Liu <song@kernel.org>
+Date:   Fri, 11 Mar 2022 10:00:28 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW4Q5y8Z3=xafPa92Zg-dsU634AfqquFacQADXjU5RJViw@mail.gmail.com>
+Message-ID: <CAPhsuW4Q5y8Z3=xafPa92Zg-dsU634AfqquFacQADXjU5RJViw@mail.gmail.com>
+Subject: Re: [PATCHSET 0/2] Fix raid rebuild performance regression
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        linux-raid <linux-raid@vger.kernel.org>,
+        Larkin Lowrey <llowrey@nuclearwinter.com>,
+        Wilson Jonathan <i400sjon@gmail.com>,
+        Roger Heflin <rogerheflin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 08:50:53PM +0530, Kanchan Joshi wrote:
-> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-> index 5c9cd9695519..1df270b47af5 100644
-> --- a/drivers/nvme/host/ioctl.c
-> +++ b/drivers/nvme/host/ioctl.c
-> @@ -369,6 +469,33 @@ long nvme_ns_chr_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
->  	return __nvme_ioctl(ns, cmd, (void __user *)arg);
->  }
->  
-> +static int nvme_ns_async_ioctl(struct nvme_ns *ns, struct io_uring_cmd *ioucmd)
-> +{
-> +	int ret;
-> +
-> +	BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > sizeof(ioucmd->pdu));
-> +
-> +	switch (ioucmd->cmd_op) {
-> +	case NVME_IOCTL_IO64_CMD:
-> +		ret = nvme_user_cmd64(ns->ctrl, ns, NULL, ioucmd);
-> +		break;
-> +	default:
-> +		ret = -ENOTTY;
-> +	}
-> +
-> +	if (ret >= 0)
-> +		ret = -EIOCBQUEUED;
-> +	return ret;
-> +}
+On Fri, Mar 11, 2022 at 9:30 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Hi,
+>
+> This should fix the reported RAID rebuild regression, while also
+> providing better performance for other workloads particularly on
+> rotating storage.
 
-And here I think we'll need something like this:
+Thanks for the fix!
 
-diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c
-index ddb7e5864be6..83529adf130d 100644
---- a/drivers/nvme/host/ioctl.c
-+++ b/drivers/nvme/host/ioctl.c
-@@ -5,6 +5,7 @@
-  */
- #include <linux/ptrace.h>	/* for force_successful_syscall_return */
- #include <linux/nvme_ioctl.h>
-+#include <linux/security.h>
- #include "nvme.h"
- 
- /*
-@@ -524,6 +525,11 @@ static int nvme_ns_async_ioctl(struct nvme_ns *ns, struct io_uring_cmd *ioucmd)
- 
- 	BUILD_BUG_ON(sizeof(struct nvme_uring_cmd_pdu) > sizeof(ioucmd->pdu));
- 
-+	ret = security_file_ioctl(ioucmd->file, ioucmd->cmd_op,
-+				  (unsigned long) ioucmd->cmd);
-+	if (ret)
-+		return ret;
-+
- 	switch (ioucmd->cmd_op) {
- 	case NVME_IOCTL_IO64_CMD:
- 		ret = nvme_user_cmd64(ns->ctrl, ns, NULL, ioucmd);
+Reviewed-by: Song Liu <songliubraving@fb.com>
