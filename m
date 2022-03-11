@@ -2,86 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 569E3C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 01:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8221AC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 02:43:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244601AbiCKBwf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 20:52:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58058 "EHLO
+        id S1345702AbiCKCoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 21:44:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238035AbiCKBwe (ORCPT
+        with ESMTP id S240820AbiCKCoO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 20:52:34 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4F117B88A;
-        Thu, 10 Mar 2022 17:51:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=z4x2hBPkj+jEGWmrRVyRt/pxXSV3iAHniQAONJ1aiFU=; b=v74GbM3lNawZ8OCADSP2zPJxjR
-        MzG+bFSw0KM7uz7hTY24330lowcuhv9cbU1UFb5Lf7Tlg+/aGIrtS4HlgTSg082cXgOb6n54hsWSJ
-        Zf4ePwaISlU7Kya+rFBJEifCI8lbTQYNZxXxPu9klnNH1ScxZvZz/5oVsu1YBzZoXbq3Cdg1yPN0r
-        rlAWbCJVy0OypTSHgIYBlvrhAECF0wnEcscHQmnM1omByhhgOddhJMdjAn1syAiTktdMYaBtF9jAC
-        ZDJvfZHTKxukYSZfAEyUCvZhR84Q7sdoiZL/l0l18g6MUK9pNfWzB+7pY4991N8qwN4+oCjyHQkmB
-        LCZFXLMQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nSUR1-00EX8e-P7; Fri, 11 Mar 2022 01:51:15 +0000
-Date:   Thu, 10 Mar 2022 17:51:15 -0800
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Kanchan Joshi <joshi.k@samsung.com>, jmorris@namei.org,
+        Thu, 10 Mar 2022 21:44:14 -0500
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 525CBF3907
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 18:43:11 -0800 (PST)
+Received: by mail-pj1-x1036.google.com with SMTP id v4so6982465pjh.2
+        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 18:43:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=qM/UV7FHcZxY+IHV+9o1h4m2AAXBVlhwLsCWQjNFw6I=;
+        b=ydMQnwYy5mk0UrEDpFa+OzSqWyno7VdmtQZ4bfjscLiVtXeeYVJVHVu+Mb0h4Vw71X
+         E68oqQvdJ3eJnjrN7LMFdsbQp+X/kQR+b5pTXoHqtJJ0G3cy9tx5mAW3nACCkJbRvM4v
+         EdCOHa+OmJlmb8Pwo1s8JJQOmxxHn7wWh8kDfOtJYSFSqRGDndPW0eep+1xcaLzpklDl
+         OWKyTEVLemVTMmWChdzBievwdhqW8ewCBeTaTyeCznVALCNKda8tXPHMFl633q7NQsRH
+         jPSdf4WiEE6bUCFmPOXjx6QaQhT9JsVH2qu17vIbBtAFWu8LN8fSWPVolwDwwFOvyurF
+         WkjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=qM/UV7FHcZxY+IHV+9o1h4m2AAXBVlhwLsCWQjNFw6I=;
+        b=NCXiDGgh4l/HXMbohVH1C0Gelc3fGeVaodbHDvubTBvHATiW3zmiMsOFOKrDAWoEIV
+         suajcrH/NW9MW94YHPoU5YpQFlNYVz0x3tKETQvD4bYFJ/cZDtSsnTOVdMPrfFQMF0ky
+         0SxfzSHF0cs6rKi2XINE4DZSymB8baWdwdUCdeUPhV4LwoPDWW66/dY0HW9h0wWgTK0o
+         d/4E9dGqQfO348BqI1UHeBPPLE4CBR6hfi/ou2SYZrQXxfg56vSvRHmE17qyvHBp7Rn9
+         R6NQ+HUZdeMD0GK/7dEulQo2rF2lj72MVP4CwkHNDQvC7ZP+eCNx6ESE5LkgdNCw39I0
+         +QDw==
+X-Gm-Message-State: AOAM532f7+FvrT+3AAV8idFWOIOcVbh6N9JfpDDnl5OQUTonrfuIWEX4
+        dwDGDTC/2ZOpUrN13xV8vgTSew==
+X-Google-Smtp-Source: ABdhPJxncp1/88IEQE5teKvz0gCS+nBv5XeRvmq3TMQgymIIQ+EEz1/9y6h1o6JnJMOSOqyGfVWtBw==
+X-Received: by 2002:a17:902:c215:b0:14f:f1c2:9fe3 with SMTP id 21-20020a170902c21500b0014ff1c29fe3mr8274323pll.145.1646966590724;
+        Thu, 10 Mar 2022 18:43:10 -0800 (PST)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d16-20020a17090ad99000b001bcbc4247a0sm7161458pjv.57.2022.03.10.18.43.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 10 Mar 2022 18:43:10 -0800 (PST)
+Message-ID: <e3bfd028-ece7-d969-f47c-1181b17ac919@kernel.dk>
+Date:   Thu, 10 Mar 2022 19:43:04 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH 03/17] io_uring: add infra and support for
+ IORING_OP_URING_CMD
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Kanchan Joshi <joshi.k@samsung.com>, jmorris@namei.org,
         serge@hallyn.com, ast@kernel.org, daniel@iogearbox.net,
         andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
         john.fastabend@gmail.com, kpsingh@kernel.org,
         linux-security-module@vger.kernel.org
-Cc:     axboe@kernel.dk, hch@lst.de, kbusch@kernel.org,
-        asml.silence@gmail.com, io-uring@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        sbates@raithlin.com, logang@deltatee.com, pankydev8@gmail.com,
-        javier@javigon.com, a.manzanares@samsung.com, joshiiitr@gmail.com,
-        anuj20.g@samsung.com
-Subject: Re: [PATCH 03/17] io_uring: add infra and support for
- IORING_OP_URING_CMD
-Message-ID: <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
+Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
+        a.manzanares@samsung.com, joshiiitr@gmail.com, anuj20.g@samsung.com
 References: <20220308152105.309618-1-joshi.k@samsung.com>
  <CGME20220308152658epcas5p3929bd1fcf75edc505fec71901158d1b5@epcas5p3.samsung.com>
  <20220308152105.309618-4-joshi.k@samsung.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220308152105.309618-4-joshi.k@samsung.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+ <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 08, 2022 at 08:50:51PM +0530, Kanchan Joshi wrote:
-> From: Jens Axboe <axboe@kernel.dk>
+On 3/10/22 6:51 PM, Luis Chamberlain wrote:
+> On Tue, Mar 08, 2022 at 08:50:51PM +0530, Kanchan Joshi wrote:
+>> From: Jens Axboe <axboe@kernel.dk>
+>>
+>> This is a file private kind of request. io_uring doesn't know what's
+>> in this command type, it's for the file_operations->async_cmd()
+>> handler to deal with.
+>>
+>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> ---
 > 
-> This is a file private kind of request. io_uring doesn't know what's
-> in this command type, it's for the file_operations->async_cmd()
-> handler to deal with.
+> <-- snip -->
 > 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
-> ---
+>> +static int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
+>> +{
+>> +	struct file *file = req->file;
+>> +	int ret;
+>> +	struct io_uring_cmd *ioucmd = &req->uring_cmd;
+>> +
+>> +	ioucmd->flags |= issue_flags;
+>> +	ret = file->f_op->async_cmd(ioucmd);
+> 
+> I think we're going to have to add a security_file_async_cmd() check
+> before this call here. Because otherwise we're enabling to, for
+> example, bypass security_file_ioctl() for example using the new
+> iouring-cmd interface.
+> 
+> Or is this already thought out with the existing security_uring_*() stuff?
 
-<-- snip -->
+Unless the request sets .audit_skip, it'll be included already in terms
+of logging. But I'd prefer not to lodge this in with ioctls, unless
+we're going to be doing actual ioctls.
 
-> +static int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
-> +{
-> +	struct file *file = req->file;
-> +	int ret;
-> +	struct io_uring_cmd *ioucmd = &req->uring_cmd;
-> +
-> +	ioucmd->flags |= issue_flags;
-> +	ret = file->f_op->async_cmd(ioucmd);
+But definitely something to keep in mind and make sure that we're under
+the right umbrella in terms of auditing and security.
 
-I think we're going to have to add a security_file_async_cmd() check
-before this call here. Because otherwise we're enabling to, for
-example, bypass security_file_ioctl() for example using the new
-iouring-cmd interface.
+-- 
+Jens Axboe
 
-Or is this already thought out with the existing security_uring_*() stuff?
-
-  Luis
