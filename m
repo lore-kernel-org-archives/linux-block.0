@@ -2,121 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8221AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 02:43:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EC1C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 02:43:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345702AbiCKCoP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 10 Mar 2022 21:44:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53354 "EHLO
+        id S1345698AbiCKCoU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 10 Mar 2022 21:44:20 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53438 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240820AbiCKCoO (ORCPT
+        with ESMTP id S240820AbiCKCoQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 10 Mar 2022 21:44:14 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 525CBF3907
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 18:43:11 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id v4so6982465pjh.2
-        for <linux-block@vger.kernel.org>; Thu, 10 Mar 2022 18:43:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=qM/UV7FHcZxY+IHV+9o1h4m2AAXBVlhwLsCWQjNFw6I=;
-        b=ydMQnwYy5mk0UrEDpFa+OzSqWyno7VdmtQZ4bfjscLiVtXeeYVJVHVu+Mb0h4Vw71X
-         E68oqQvdJ3eJnjrN7LMFdsbQp+X/kQR+b5pTXoHqtJJ0G3cy9tx5mAW3nACCkJbRvM4v
-         EdCOHa+OmJlmb8Pwo1s8JJQOmxxHn7wWh8kDfOtJYSFSqRGDndPW0eep+1xcaLzpklDl
-         OWKyTEVLemVTMmWChdzBievwdhqW8ewCBeTaTyeCznVALCNKda8tXPHMFl633q7NQsRH
-         jPSdf4WiEE6bUCFmPOXjx6QaQhT9JsVH2qu17vIbBtAFWu8LN8fSWPVolwDwwFOvyurF
-         WkjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=qM/UV7FHcZxY+IHV+9o1h4m2AAXBVlhwLsCWQjNFw6I=;
-        b=NCXiDGgh4l/HXMbohVH1C0Gelc3fGeVaodbHDvubTBvHATiW3zmiMsOFOKrDAWoEIV
-         suajcrH/NW9MW94YHPoU5YpQFlNYVz0x3tKETQvD4bYFJ/cZDtSsnTOVdMPrfFQMF0ky
-         0SxfzSHF0cs6rKi2XINE4DZSymB8baWdwdUCdeUPhV4LwoPDWW66/dY0HW9h0wWgTK0o
-         d/4E9dGqQfO348BqI1UHeBPPLE4CBR6hfi/ou2SYZrQXxfg56vSvRHmE17qyvHBp7Rn9
-         R6NQ+HUZdeMD0GK/7dEulQo2rF2lj72MVP4CwkHNDQvC7ZP+eCNx6ESE5LkgdNCw39I0
-         +QDw==
-X-Gm-Message-State: AOAM532f7+FvrT+3AAV8idFWOIOcVbh6N9JfpDDnl5OQUTonrfuIWEX4
-        dwDGDTC/2ZOpUrN13xV8vgTSew==
-X-Google-Smtp-Source: ABdhPJxncp1/88IEQE5teKvz0gCS+nBv5XeRvmq3TMQgymIIQ+EEz1/9y6h1o6JnJMOSOqyGfVWtBw==
-X-Received: by 2002:a17:902:c215:b0:14f:f1c2:9fe3 with SMTP id 21-20020a170902c21500b0014ff1c29fe3mr8274323pll.145.1646966590724;
-        Thu, 10 Mar 2022 18:43:10 -0800 (PST)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d16-20020a17090ad99000b001bcbc4247a0sm7161458pjv.57.2022.03.10.18.43.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 10 Mar 2022 18:43:10 -0800 (PST)
-Message-ID: <e3bfd028-ece7-d969-f47c-1181b17ac919@kernel.dk>
-Date:   Thu, 10 Mar 2022 19:43:04 -0700
+        Thu, 10 Mar 2022 21:44:16 -0500
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B1F1F3907;
+        Thu, 10 Mar 2022 18:43:14 -0800 (PST)
+Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KF9DC1HJPzBrKj;
+        Fri, 11 Mar 2022 10:41:15 +0800 (CST)
+Received: from [10.174.176.103] (10.174.176.103) by
+ dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.21; Fri, 11 Mar 2022 10:43:11 +0800
+Message-ID: <0e5faf35-5adb-3ea1-9f7f-7c4f61a623b2@huawei.com>
+Date:   Fri, 11 Mar 2022 10:43:10 +0800
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 03/17] io_uring: add infra and support for
- IORING_OP_URING_CMD
-Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Kanchan Joshi <joshi.k@samsung.com>, jmorris@namei.org,
-        serge@hallyn.com, ast@kernel.org, daniel@iogearbox.net,
-        andrii@kernel.org, kafai@fb.com, songliubraving@fb.com, yhs@fb.com,
-        john.fastabend@gmail.com, kpsingh@kernel.org,
-        linux-security-module@vger.kernel.org
-Cc:     hch@lst.de, kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
-        a.manzanares@samsung.com, joshiiitr@gmail.com, anuj20.g@samsung.com
-References: <20220308152105.309618-1-joshi.k@samsung.com>
- <CGME20220308152658epcas5p3929bd1fcf75edc505fec71901158d1b5@epcas5p3.samsung.com>
- <20220308152105.309618-4-joshi.k@samsung.com>
- <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YiqrE4K5TWeB7aLd@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH -next] nbd: fix possible overflow on 'first_minor' in
+ nbd_dev_add()
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>, <yukuai3@huawei.com>
+References: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
+From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
+In-Reply-To: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.103]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggeme756-chm.china.huawei.com (10.3.19.102)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/10/22 6:51 PM, Luis Chamberlain wrote:
-> On Tue, Mar 08, 2022 at 08:50:51PM +0530, Kanchan Joshi wrote:
->> From: Jens Axboe <axboe@kernel.dk>
->>
->> This is a file private kind of request. io_uring doesn't know what's
->> in this command type, it's for the file_operations->async_cmd()
->> handler to deal with.
->>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
->> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
->> ---
-> 
-> <-- snip -->
-> 
->> +static int io_uring_cmd(struct io_kiocb *req, unsigned int issue_flags)
->> +{
->> +	struct file *file = req->file;
->> +	int ret;
->> +	struct io_uring_cmd *ioucmd = &req->uring_cmd;
->> +
->> +	ioucmd->flags |= issue_flags;
->> +	ret = file->f_op->async_cmd(ioucmd);
-> 
-> I think we're going to have to add a security_file_async_cmd() check
-> before this call here. Because otherwise we're enabling to, for
-> example, bypass security_file_ioctl() for example using the new
-> iouring-cmd interface.
-> 
-> Or is this already thought out with the existing security_uring_*() stuff?
+friendly ping...
 
-Unless the request sets .audit_skip, it'll be included already in terms
-of logging. But I'd prefer not to lodge this in with ioctls, unless
-we're going to be doing actual ioctls.
-
-But definitely something to keep in mind and make sure that we're under
-the right umbrella in terms of auditing and security.
-
--- 
-Jens Axboe
-
+在 2022/3/10 17:32, Zhang Wensheng 写道:
+> When 'index' is a big numbers, it may become negative which forced
+> to 'int'. then 'index << part_shift' might overflow to a positive
+> value that is not greater than '0xfffff', then sysfs might complains
+> about duplicate creation. Because of this, move the 'index' judgment
+> to the front will fix it and be better.
+>
+> Fixes: b0d9111a2d53 ("nbd: use an idr to keep track of nbd devices")
+> Fixes: 940c264984fd ("nbd: fix possible overflow for 'first_minor' in nbd_dev_add()")
+> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+> ---
+>   drivers/block/nbd.c | 24 ++++++++++++------------
+>   1 file changed, 12 insertions(+), 12 deletions(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5a1f98494ddd..b3cdfc0ffb98 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1800,17 +1800,6 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+>   	refcount_set(&nbd->refs, 0);
+>   	INIT_LIST_HEAD(&nbd->list);
+>   	disk->major = NBD_MAJOR;
+> -
+> -	/* Too big first_minor can cause duplicate creation of
+> -	 * sysfs files/links, since index << part_shift might overflow, or
+> -	 * MKDEV() expect that the max bits of first_minor is 20.
+> -	 */
+> -	disk->first_minor = index << part_shift;
+> -	if (disk->first_minor < index || disk->first_minor > MINORMASK) {
+> -		err = -EINVAL;
+> -		goto out_free_work;
+> -	}
+> -
+>   	disk->minors = 1 << part_shift;
+>   	disk->fops = &nbd_fops;
+>   	disk->private_data = nbd;
+> @@ -1915,8 +1904,19 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+>   	if (!netlink_capable(skb, CAP_SYS_ADMIN))
+>   		return -EPERM;
+>   
+> -	if (info->attrs[NBD_ATTR_INDEX])
+> +	if (info->attrs[NBD_ATTR_INDEX]) {
+>   		index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
+> +
+> +		/*
+> +		 * Too big first_minor can cause duplicate creation of
+> +		 * sysfs files/links, since index << part_shift might overflow, or
+> +		 * MKDEV() expect that the max bits of first_minor is 20.
+> +		 */
+> +		if (index < 0 || index > MINORMASK >> part_shift) {
+> +			printk(KERN_ERR "nbd: illegal input index %d\n", index);
+> +			return -EINVAL;
+> +		}
+> +	}
+>   	if (!info->attrs[NBD_ATTR_SOCKETS]) {
+>   		printk(KERN_ERR "nbd: must specify at least one socket\n");
+>   		return -EINVAL;
