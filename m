@@ -2,81 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F931C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 05:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E61CC433FE
+	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 05:18:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237708AbiCKFHO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 00:07:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47180 "EHLO
+        id S235482AbiCKFTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 00:19:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233316AbiCKFHN (ORCPT
+        with ESMTP id S1346387AbiCKFTt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 00:07:13 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D0DD1AC28A;
-        Thu, 10 Mar 2022 21:06:11 -0800 (PST)
+        Fri, 11 Mar 2022 00:19:49 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E526A53B40;
+        Thu, 10 Mar 2022 21:18:46 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1F1C1B82A7D;
-        Fri, 11 Mar 2022 05:06:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 384E1C340ED;
-        Fri, 11 Mar 2022 05:06:08 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 52591B82A78;
+        Fri, 11 Mar 2022 05:18:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7EA5C340EC;
+        Fri, 11 Mar 2022 05:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1646975168;
-        bh=AKcJwdPPGCmC8fnT+SzRmfs6FPJaBvqwnNz4bzPIPRI=;
+        s=k20201202; t=1646975923;
+        bh=5iTm8AeQHWcspGp/ADW+jMjLy3o3qtcRvAvIkXEZzfg=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=gwWXoihYFEXXdqVuediOElDChCGopC96LqjN28ounv6QQ4t/nM6nQ7zaEaW74K00I
-         VU+JqBS/dFskSGFDaX8oATaI3CDAz/mEXDUUCbQG1m5Q0vxLet99mwu/eGHpBrJgK3
-         KGB4n9QfE7o6GOj3CEWYKcKACgXEQBwVLBA336ZWe8Z+kR3OJT1u9gIPtv8kdNJKO0
-         OhBBIq0xXlhD0H37V5rvzy2MIn13nbIEosxwBa37jdA7LHwr8B05do7MhB+FZRxK+V
-         g7E6xbqhpFY1ZRpxP/zwLkkaqom62qVk8+xNwD/c+ZjczSPOLRa5PXgmTnaGiuVeQt
-         chMhruCRIAHuA==
-Date:   Thu, 10 Mar 2022 21:06:06 -0800
+        b=hjo2jWAf5hpi3mLDP7pod3VhSowZ8b9tCqUFwFAGXsH4lLvV8Ji3hQdeQiLrfHvsS
+         zFQhCr2Bp+8DndACGpNH0eC5Nwc/puIVOxbOZMsJYnvDLuWbSDZQ6gJVVL6VKVYVJY
+         UIY/kg3zoYjxc/zzF8heQCT/2rv5Ir3lLOKPIl/OuaMml6Gy1o3jQWkk/7UsSRM5YK
+         ffGGyVJFju0VBTwmtWc7DJBTaYB9vvxsXLp48vOfYFFPPIDmvOWJNkYsy4oabsxCpu
+         /oxkfczBlfSN6h7Y68Lb82OapBKBnM+5iKH32wC9gcOd5/X5ueF08wBiilzvAWxOhz
+         xpvm1FfvWTU2A==
+Date:   Thu, 10 Mar 2022 21:18:42 -0800
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Luca Porzio (lporzio)" <lporzio@micron.com>
-Cc:     "hch@lst.de" <hch@lst.de>, Manjong Lee <mj0123.lee@samsung.com>,
-        "david@fromorbit.com" <david@fromorbit.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "kbusch@kernel.org" <kbusch@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "song@kernel.org" <song@kernel.org>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "nanich.lee@samsung.com" <nanich.lee@samsung.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>
-Subject: Re: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write
- hint.
-Message-ID: <YirYvvIBW+XNGvxP@sol.localdomain>
-References: <20220306231727.GP3927073@dread.disaster.area>
- <CGME20220309042324epcas1p111312e20f4429dc3a17172458284a923@epcas1p1.samsung.com>
- <20220309133119.6915-1-mj0123.lee@samsung.com>
- <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
- <20220310142148.GA1069@lst.de>
- <CO3PR08MB7975AB3E282C7DA35A5B1CF0DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, linux-scsi@vger.kernel.org,
+        kernel-team@android.com,
+        Gaurav Kashyap <quic_gaurkash@quicinc.com>,
+        Israel Rukshin <israelr@nvidia.com>
+Subject: Re: [PATCH v5 3/3] fscrypt: add support for hardware-wrapped keys
+Message-ID: <YirbspMr5CAnlWAC@sol.localdomain>
+References: <20220228070520.74082-1-ebiggers@kernel.org>
+ <20220228070520.74082-4-ebiggers@kernel.org>
+ <c1da8aec-7bb9-dd88-7500-a09d29bbc1e4@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CO3PR08MB7975AB3E282C7DA35A5B1CF0DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
+In-Reply-To: <c1da8aec-7bb9-dd88-7500-a09d29bbc1e4@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 10, 2022 at 06:51:39PM +0000, Luca Porzio (lporzio) wrote:
->
-> Micron Confidential
+On Thu, Mar 03, 2022 at 05:03:10PM -0800, Bart Van Assche wrote:
+> On 2/27/22 23:05, Eric Biggers wrote:
+> > diff --git a/include/uapi/linux/fscrypt.h b/include/uapi/linux/fscrypt.h
+> > index 9f4428be3e362..884c5bf526a05 100644
+> > --- a/include/uapi/linux/fscrypt.h
+> > +++ b/include/uapi/linux/fscrypt.h
+> > @@ -20,6 +20,7 @@
+> >   #define FSCRYPT_POLICY_FLAG_DIRECT_KEY		0x04
+> >   #define FSCRYPT_POLICY_FLAG_IV_INO_LBLK_64	0x08
+> >   #define FSCRYPT_POLICY_FLAG_IV_INO_LBLK_32	0x10
+> > +#define FSCRYPT_POLICY_FLAG_HW_WRAPPED_KEY	0x20
+> >   /* Encryption algorithms */
+> >   #define FSCRYPT_MODE_AES_256_XTS		1
+> > @@ -115,7 +116,7 @@ struct fscrypt_key_specifier {
+> >    */
+> >   struct fscrypt_provisioning_key_payload {
+> >   	__u32 type;
+> > -	__u32 __reserved;
+> > +	__u32 flags;
+> >   	__u8 raw[];
+> >   };
+> > @@ -124,7 +125,9 @@ struct fscrypt_add_key_arg {
+> >   	struct fscrypt_key_specifier key_spec;
+> >   	__u32 raw_size;
+> >   	__u32 key_id;
+> > -	__u32 __reserved[8];
+> > +#define FSCRYPT_ADD_KEY_FLAG_HW_WRAPPED			0x00000001
+> > +	__u32 flags;
+> > +	__u32 __reserved[7];
+> >   	__u8 raw[];
+> >   };
+> 
+> Is it allowed to use _Static_assert() in UAPI header files? There are
+> already some static_assert() checks under include/linux to verify the size
+> of certain data structures. gcc supports _Static_assert() since version 4.6.
+> That is older than the minimum required gcc version to build the kernel.
+> 
 
-This is a public mailing list, so please do not use this header/footer.
+Are you requesting static assertions that verify that the size of each fscrypt
+UAPI struct is a certain value?  Kernel UAPIs generally don't bother with that
+sort of thing, but it does seem like a good idea.  I'll add them as a cleanup,
+but it's orthogonal to this patch series.
 
-> it is used across the (Android) ecosystem.
-
-So why hasn't it been submitted upstream?
+To answer your direct question, I believe that _Static_assert generally can't be
+used in UAPI header files, as it's a C11 feature and UAPI headers are included
+by arbitrary userspace programs.  These assertions will need to be in
+kernel-only code, either in a kernel-only file such as include/linux/fscrypt.h,
+or in an #ifdef __KERNEL__ section of the UAPI header.  Also, the kernel already
+conventionally uses BUILD_BUG_ON() for static assertions.
 
 - Eric
