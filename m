@@ -2,173 +2,289 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6280C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 11 Mar 2022 23:35:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09FE8C43217
+	for <linux-block@archiver.kernel.org>; Sat, 12 Mar 2022 01:53:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbiCKXgT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 11 Mar 2022 18:36:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42986 "EHLO
+        id S229493AbiCLByp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 11 Mar 2022 20:54:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiCKXgQ (ORCPT
+        with ESMTP id S229447AbiCLByo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 11 Mar 2022 18:36:16 -0500
-Received: from mailout1.w2.samsung.com (mailout1.w2.samsung.com [211.189.100.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07400E72
-        for <linux-block@vger.kernel.org>; Fri, 11 Mar 2022 15:35:11 -0800 (PST)
-Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
-        by mailout1.w2.samsung.com (KnoxPortal) with ESMTP id 20220311233509usoutp01a8e84a76172d310f12762728ede84164~bd7Vx9VAV2581625816usoutp01D;
-        Fri, 11 Mar 2022 23:35:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w2.samsung.com 20220311233509usoutp01a8e84a76172d310f12762728ede84164~bd7Vx9VAV2581625816usoutp01D
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1647041709;
-        bh=p1cJHc2jRcoRjfZs31QEpSlK6mPhfM74YG5Z7tTaP1Q=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=CYgpujSb1n2I39fN4vsCwYcxSOM6u9VCUjg70ev8JfKmy9yGaFpQOthbQYpf9MiCs
-         gXADwfQtXD62mippJ9srkG91GCUTCY6TgXxDvyl8EWW05hKMqK6seuKZRgPl00wqKX
-         V3RcSbUvMugIAN/jkI3I1aHDl1eJF+YabA/eFUE0=
-Received: from ussmges1new.samsung.com (u109.gpu85.samsung.co.kr
-        [203.254.195.109]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220311233509uscas1p1a0ad15c6386c4626d500e2907a3e1cac~bd7Vj9ccB0406904069uscas1p1N;
-        Fri, 11 Mar 2022 23:35:09 +0000 (GMT)
-Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-        ussmges1new.samsung.com (USCPEMTA) with SMTP id 3E.84.09744.DACDB226; Fri,
-        11 Mar 2022 18:35:09 -0500 (EST)
-Received: from ussmgxs3new.samsung.com (u92.gpu85.samsung.co.kr
-        [203.254.195.92]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220311233509uscas1p18451ff7aa07eb7dfb078af21087e6f39~bd7VMM6Gu0406904069uscas1p1M;
-        Fri, 11 Mar 2022 23:35:09 +0000 (GMT)
-X-AuditID: cbfec36d-879ff70000002610-e5-622bdcadb67f
-Received: from SSI-EX4.ssi.samsung.com ( [105.128.2.145]) by
-        ussmgxs3new.samsung.com (USCPEXMTA) with SMTP id D4.E4.09657.CACDB226; Fri,
-        11 Mar 2022 18:35:09 -0500 (EST)
-Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
-        SSI-EX4.ssi.samsung.com (105.128.2.229) with Microsoft SMTP Server
-        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Fri, 11 Mar 2022 15:35:08 -0800
-Received: from SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36]) by
-        SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36%3]) with mapi id
-        15.01.2242.008; Fri, 11 Mar 2022 15:35:08 -0800
-From:   Adam Manzanares <a.manzanares@samsung.com>
-To:     Luis Chamberlain <mcgrof@kernel.org>
-CC:     Kanchan Joshi <joshiiitr@gmail.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Keith Busch" <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "sbates@raithlin.com" <sbates@raithlin.com>,
-        "logang@deltatee.com" <logang@deltatee.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
-        Anuj Gupta <anuj20.g@samsung.com>,
-        "j.granados@samsung.com" <j.granados@samsung.com>,
-        "j.devantier@samsung.com" <j.devantier@samsung.com>
-Subject: Re: [PATCH 00/17] io_uring passthru over nvme
-Thread-Topic: [PATCH 00/17] io_uring passthru over nvme
-Thread-Index: AQHYMwMGkOxasisH10Kgb51ozZAKiKy40f0AgAAatgCAAgGiAIAAcwUA
-Date:   Fri, 11 Mar 2022 23:35:07 +0000
-Message-ID: <20220311233501.GA6435@bgt-140510-bm01>
-In-Reply-To: <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [105.128.2.176]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <5400D1787D21494DBEE14042D58251F7@ssi.samsung.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 11 Mar 2022 20:54:44 -0500
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78FC2105AB0;
+        Fri, 11 Mar 2022 17:53:40 -0800 (PST)
+Received: by mail-pg1-x52d.google.com with SMTP id q29so7896471pgn.7;
+        Fri, 11 Mar 2022 17:53:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=Ht6HTWzeDDSjzovkz/Dn5LtCoWbKyGL4ZoLDTCpXzFw=;
+        b=lRkZKAti5NwwJX2TYq75LN9EBk9uqoLtaYNaQnZDeu3+Sf/XjTTgejpFa8+Sb73SRY
+         jzpe3Iw1q/hQaseI0Z/mv2D7qYOnI0q3idU0NreqsLflIAoFHQGJQ4/n3+My7FtlBUTn
+         HQakjAM5qhEpfMgDFTr4TE8sKLZZzwf+nfPHAtiBdusOJZ7ktaxvwXBOlBREzNUrQEOH
+         Us2RJX6HG3CaZSlixhiw1LzTjT/P1emF4LjK+ZkzTurrFrIAJOJMG+1+pTtU9Tgch1Kj
+         lsNtFUJzabqwZMuMxVwWjTFNp2V+uve/mPDCMda0UXXoiTyxIL92a8Lr2yQdkSoopMGg
+         UD9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Ht6HTWzeDDSjzovkz/Dn5LtCoWbKyGL4ZoLDTCpXzFw=;
+        b=z8vhIUv42sps1RGw29rrgtDeWnrhk/v6Yr0BXSyx5QQuGx95D8Chr+8MlbNkLJ1kW9
+         Q6qRncI1Rl3VbAVewnb4WgnY/EjnRpf1njdnUyM2X1DiW5YcAJaVV5qQbIFHJmZLdYpL
+         9tQiquJhYpUlyvOiZd+mNI6l5siFI0tlAIyidSArxIIsN4TYKS/L1JFSXoxil3HT/WOk
+         pn1mC5bBUO3Z6HTSQv/L8la4PhF7L35eYs1HxGA2gUI2k2i+3Y6P49v7fjTuvR9MH3Vn
+         HHXqDNpvAc/XPeodz9JjcF6c1gQFR2xCovkVJyYppyoGUSMLxfGSL7hh9PSL1NxCXm6r
+         nYdw==
+X-Gm-Message-State: AOAM530+Axif6gjhmG1amLbNLWHJSiCBsxb3W4Smd6xVG20dAv10+tCE
+        3rymQOqDCru0Mf49lxJ7dtQ=
+X-Google-Smtp-Source: ABdhPJzdGk36Vq6Yg4JEbEgfF+GRvGA4uY/jGiPc+8DxmmxqOYymmUob+gZ8lyghyS+C/lIVFYSSXA==
+X-Received: by 2002:a62:1515:0:b0:4f7:83b1:2e34 with SMTP id 21-20020a621515000000b004f783b12e34mr8976716pfv.66.1647050019979;
+        Fri, 11 Mar 2022 17:53:39 -0800 (PST)
+Received: from ip-172-31-19-208.ap-northeast-1.compute.internal (ec2-18-181-137-102.ap-northeast-1.compute.amazonaws.com. [18.181.137.102])
+        by smtp.gmail.com with ESMTPSA id e13-20020a63370d000000b003810782e0cdsm3457862pga.56.2022.03.11.17.53.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 11 Mar 2022 17:53:39 -0800 (PST)
+Date:   Sat, 12 Mar 2022 01:53:26 +0000
+From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        bfields@fieldses.org, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
+        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+        djwong@kernel.org, dri-devel@lists.freedesktop.org,
+        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com
+Subject: Re: [PATCH v4 00/24] DEPT(Dependency Tracker)
+Message-ID: <Yiv9Fn4kcRbXJLmu@ip-172-31-19-208.ap-northeast-1.compute.internal>
+References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDKsWRmVeSWpSXmKPExsWy7djXc7pr72gnGRw6rmwxZ9U2RovVd/vZ
-        LFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saEp4wWa24+ZbH4
-        fGYeqwOvx7Orzxg9ds66y+7RvOAOi8fls6Uem1Z1snlsXlLvsftmA5vHtsUvWT0+b5IL4Izi
-        sklJzcksSy3St0vgyvi+/wJ7wVv+iu0nTrA1MK7i7WLk5JAQMJH42HeGDcQWEljJKPG0z6yL
-        kQvIbmWSWPtwFjNM0Yx309ghEmsZJX58/c4C0fGRUeJUUzRE4gCjxNYHU1lBEmwCBhK/j28E
-        6xYR0JDYN6GXCaSIWeAJq8Sh9xPA9gkLmEmc+t7MDlFkLvF70QRWCNtN4sPJ+WBxFgFVia7X
-        PWD1vALGEhdX7QeKc3BwAvUeXWwNEmYUEJP4fmoNE4jNLCAucevJfCaIqwUlFs3eA/WBmMS/
-        XQ/ZIGxFifvfX7JD1OtJ3Jg6hQ3CtpPo+7WcEcLWlli28DUzxFpBiZMzn7BA9EpKHFxxgwXk
-        FwmBxZwSS0/1QA11kTjY/J4VwpaWmL7mMlTRKkaJKd/a2CGczYwSM35dgDrPWuJf5zX2CYwq
-        s5BcPgvJVbOQXDULyVWzkFy1gJF1FaN4aXFxbnpqsWFearlecWJucWleul5yfu4mRmACPP3v
-        cO4Oxh23PuodYmTiYDzEKMHBrCTC2xSqkSTEm5JYWZValB9fVJqTWnyIUZqDRUmcd1nmhkQh
-        gfTEktTs1NSC1CKYLBMHp1QDk4Zx2kkp/g9VbxZcTnzSm7XExbdRmy+r6Pnl5o0MDUapT173
-        F/myfve9LctTfcw3zPmEWJjSGbuajrizfXzfG5Z+/D4v42vBLMYaJSMX3rnzmXdHZXpJTtrA
-        MDmOO9o3O0lkY8sFz2BLVu9Z9T6Hc49peV3Zd0i4qVdNJtlB8OId/WVTnSTaZ81h+Lzk4ufQ
-        7+ydz36xtWgd27l+W/rzo4tny3Q77bR5vCpSc/mxUO6oHfsK9xc5Psu5Vty0WGBJ0ykhCa5l
-        R28dCvijxOF9M5HlkTrP74dGV3YJxG1W+dCjuLS7o3hh5xM24bnCGROKffpNn5/4v/qMq42w
-        V/lqv/PydZqPXLp+3a1p2q+jxFKckWioxVxUnAgAlNazDu8DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrJIsWRmVeSWpSXmKPExsWS2cA0UXftHe0kgxOLOC3mrNrGaLH6bj+b
-        xcrVR5ks3rWeY7HoPH2ByeL828NMFpMOXWO02HtL22L+sqfsFktaj7NZ3JjwlNFizc2nLBaf
-        z8xjdeD1eHb1GaPHzll32T2aF9xh8bh8ttRj06pONo/NS+o9dt9sYPPYtvglq8fnTXIBnFFc
-        NimpOZllqUX6dglcGd/3X2AveMtfsf3ECbYGxlW8XYycHBICJhIz3k1j72Lk4hASWM0o0dGw
-        nh0kISTwkVFi5XUBiMQBRolDixezgiTYBAwkfh/fyAxiiwhoSOyb0MsEUsQs8IRV4tD7CWwg
-        CWEBM4lT35vZIYrMJX4vmsAKYbtJfDg5HyzOIqAq0fW6B6yeV8BY4uKq/VBnLGCS+HFoIdAG
-        Dg5OoEFHF1uD1DAKiEl8P7WGCcRmFhCXuPVkPhPECwISS/acZ4awRSVePv7HCmErStz//pId
-        ol5P4sbUKWwQtp1E36/ljBC2tsSyha+ZIW4QlDg58wkLRK+kxMEVN1gmMErMQrJuFpJRs5CM
-        moVk1CwkoxYwsq5iFC8tLs5Nryg2zkst1ytOzC0uzUvXS87P3cQITB2n/x2O2cF479ZHvUOM
-        TByMhxglOJiVRHibQjWShHhTEiurUovy44tKc1KLDzFKc7AoifN6xE6MFxJITyxJzU5NLUgt
-        gskycXBKNTB1WM9d8NyBS/7Bfy/JsE0nSo4+29dc5pb6LOCJ5enZu9SLzq///Ya5M9Y1zsbu
-        enlYx4Ef+66sbRJY3+tsEn74RawGL8PXRaeUHY6VRlzV49p0fMXFeIkrZkLdB29Pq77QvSVN
-        7NFzM8sdfx++VtFzVdwxp/Wow9a0CYsfdGurXH4cYdu/sGLirVNnTHYllcVus9z2eN0n8dXZ
-        S8SXP7zdKq/FKtDEuTFkomKMfOjeYwZ886+rh9vH+53ZdM12RmT/lWVP6ph/cXH+vfB61mv1
-        74IrZecp+UmyX7rO8n3DlLZs0QOf7hi9SJZpeRN90F5f7fTEp9VzOWbyWB2Olr3B1bynwXCz
-        2IwZgffEH5QcV2Ipzkg01GIuKk4EAA8jEVaMAwAA
-X-CMS-MailID: 20220311233509uscas1p18451ff7aa07eb7dfb078af21087e6f39
-CMS-TYPE: 301P
-X-CMS-RootMailID: 20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696
-References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
-        <20220308152105.309618-1-joshi.k@samsung.com>
-        <20220310082926.GA26614@lst.de>
-        <CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com>
-        <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 08:43:24AM -0800, Luis Chamberlain wrote:
-> On Thu, Mar 10, 2022 at 03:35:02PM +0530, Kanchan Joshi wrote:
-> > On Thu, Mar 10, 2022 at 1:59 PM Christoph Hellwig <hch@lst.de> wrote:
-> > >
-> > > What branch is this against?
-> > Sorry I missed that in the cover.
-> > Two options -
-> > (a) https://urldefense.com/v3/__https://protect2.fireeye.com/v1/url?k=
-=3D03500d22-5ccb341f-0351866d-0cc47a31309a-6f95e6932e414a1d&q=3D1&e=3D4ca7b=
-05e-2fe6-40d9-bbcf-a4ed687eca9f&u=3Dhttps*3A*2F*2Fgit.kernel.dk*2Fcgit*2Fli=
-nux-block*2Flog*2F*3Fh*3Dio_uring-big-sqe__;JSUlJSUlJSUl!!EwVzqGoTKBqv-0DWA=
-JBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDh8_2-U9$=20
-> > first patch ("128 byte sqe support") is already there.
-> > (b) for-next (linux-block), series will fit on top of commit 9e9d83faa
-> > ("io_uring: Remove unneeded test in io_run_task_work_sig")
-> >=20
-> > > Do you have a git tree available?
-> > Not at the moment.
-> >=20
-> > @Jens: Please see if it is possible to move patches to your
-> > io_uring-big-sqe branch (and maybe rename that to big-sqe-pt.v1).
->=20
-> Since Jens might be busy, I've put up a tree with all this stuff:
->=20
-> https://urldefense.com/v3/__https://git.kernel.org/pub/scm/linux/kernel/g=
-it/mcgrof/linux-next.git/log/?h=3D20220311-io-uring-cmd__;!!EwVzqGoTKBqv-0D=
-WAJBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDiTF0Q7F$=
-=20
->=20
-> It is based on option (b) mentioned above, I took linux-block for-next
-> and reset the tree to commit "io_uring: Remove unneeded test in
-> io_run_task_work_sig" before applying the series.
+On Fri, Mar 04, 2022 at 04:06:19PM +0900, Byungchul Park wrote:
+> Hi Linus and folks,
+> 
+> I've been developing a tool for detecting deadlock possibilities by
+> tracking wait/event rather than lock(?) acquisition order to try to
+> cover all synchonization machanisms. It's done on v5.17-rc1 tag.
+> 
+> https://github.com/lgebyungchulpark/linux-dept/commits/dept1.14_on_v5.17-rc1
+>
 
-FYI I can be involved in testing this and have added some colleagues that c=
-an=20
-help in this regard. We have been using some form of this work for several=
-=20
-months now and haven't had any issues. That being said some simple tests I =
-have
-are not currently working with the above git tree :). I will work to get th=
-is=20
-resolved and post an update here.=20
+Small feedback unrelated to thread:
+I'm not sure "Need to expand the ring buffer" is something to call
+WARN(). Is this stack trace useful for something?
+========
 
->=20
->   Luis=
+Hello Byungchul. These are two warnings of DEPT on system.
+Both cases look similar.
+
+In what case DEPT says (unknown)?
+I'm not sure we can properly debug this.
+
+===================================================
+DEPT: Circular dependency has been detected.
+5.17.0-rc1+ #3 Tainted: G        W        
+---------------------------------------------------
+summary
+---------------------------------------------------
+*** AA DEADLOCK ***
+
+context A
+    [S] (unknown)(&vfork:0)
+    [W] wait_for_completion_killable(&vfork:0)
+    [E] complete(&vfork:0)
+
+[S]: start of the event context
+[W]: the wait blocked
+[E]: the event not reachable
+---------------------------------------------------
+context A's detail
+---------------------------------------------------
+context A
+    [S] (unknown)(&vfork:0)
+    [W] wait_for_completion_killable(&vfork:0)
+    [E] complete(&vfork:0)
+
+[S] (unknown)(&vfork:0):
+(N/A)
+
+[W] wait_for_completion_killable(&vfork:0):
+[<ffffffc00802204c>] kernel_clone+0x25c/0x2b8
+stacktrace:
+      dept_wait+0x74/0x88
+      wait_for_completion_killable+0x60/0xa0
+      kernel_clone+0x25c/0x2b8
+      __do_sys_clone+0x5c/0x74
+      __arm64_sys_clone+0x18/0x20
+      invoke_syscall.constprop.0+0x78/0xc4
+      do_el0_svc+0x98/0xd0
+      el0_svc+0x44/0xe4
+      el0t_64_sync_handler+0xb0/0x12c
+      el0t_64_sync+0x158/0x15c
+
+[E] complete(&vfork:0):
+[<ffffffc00801f49c>] mm_release+0x7c/0x90
+stacktrace:
+      dept_event+0xe0/0x100
+      complete+0x48/0x98
+      mm_release+0x7c/0x90
+      exit_mm_release+0xc/0x14
+      do_exit+0x1b4/0x81c
+      do_group_exit+0x30/0x9c
+      __wake_up_parent+0x0/0x24
+      invoke_syscall.constprop.0+0x78/0xc4
+      do_el0_svc+0x98/0xd0
+      el0_svc+0x44/0xe4
+      el0t_64_sync_handler+0xb0/0x12c
+      el0t_64_sync+0x158/0x15c
+---------------------------------------------------
+information that might be helpful
+---------------------------------------------------
+CPU: 6 PID: 229 Comm: start-stop-daem Tainted: G        W         5.17.0-rc1+ #3
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace.part.0+0x9c/0xc4
+ show_stack+0x14/0x28
+ dump_stack_lvl+0x9c/0xcc
+ dump_stack+0x14/0x2c
+ print_circle+0x2d4/0x438
+ cb_check_dl+0x44/0x70
+ bfs+0x60/0x168
+ add_dep+0x88/0x11c
+ do_event.constprop.0+0x19c/0x2c0
+ dept_event+0xe0/0x100
+ complete+0x48/0x98
+ mm_release+0x7c/0x90
+ exit_mm_release+0xc/0x14
+ do_exit+0x1b4/0x81c
+ do_group_exit+0x30/0x9c
+ __wake_up_parent+0x0/0x24
+ invoke_syscall.constprop.0+0x78/0xc4
+ do_el0_svc+0x98/0xd0
+ el0_svc+0x44/0xe4
+ el0t_64_sync_handler+0xb0/0x12c
+ el0t_64_sync+0x158/0x15c
+
+
+
+
+===================================================
+DEPT: Circular dependency has been detected.
+5.17.0-rc1+ #3 Tainted: G        W        
+---------------------------------------------------
+summary
+---------------------------------------------------
+*** AA DEADLOCK ***
+
+context A
+    [S] (unknown)(&try_completion:0)
+    [W] wait_for_completion_timeout(&try_completion:0)
+    [E] complete(&try_completion:0)
+
+[S]: start of the event context
+[W]: the wait blocked
+[E]: the event not reachable
+---------------------------------------------------
+context A's detail
+---------------------------------------------------
+context A
+    [S] (unknown)(&try_completion:0)
+    [W] wait_for_completion_timeout(&try_completion:0)
+    [E] complete(&try_completion:0)
+
+[S] (unknown)(&try_completion:0):
+(N/A)
+
+[W] wait_for_completion_timeout(&try_completion:0):
+[<ffffffc008166bf4>] kunit_try_catch_run+0xb4/0x160
+stacktrace:
+      dept_wait+0x74/0x88
+      wait_for_completion_timeout+0x64/0xa0
+      kunit_try_catch_run+0xb4/0x160
+      kunit_test_try_catch_successful_try_no_catch+0x3c/0x98
+      kunit_try_run_case+0x9c/0xa0
+      kunit_generic_run_threadfn_adapter+0x1c/0x28
+      kthread+0xd4/0xe4
+      ret_from_fork+0x10/0x20
+
+[E] complete(&try_completion:0):
+[<ffffffc00803dce4>] kthread_complete_and_exit+0x18/0x20
+stacktrace:
+      dept_event+0xe0/0x100
+      complete+0x48/0x98
+      kthread_complete_and_exit+0x18/0x20
+      kunit_try_catch_throw+0x0/0x1c
+      kthread+0xd4/0xe4
+      ret_from_fork+0x10/0x20
+
+---------------------------------------------------
+information that might be helpful
+---------------------------------------------------
+CPU: 15 PID: 132 Comm: kunit_try_catch Tainted: G        W         5.17.0-rc1+ #3
+Hardware name: linux,dummy-virt (DT)
+Call trace:
+ dump_backtrace.part.0+0x9c/0xc4
+ show_stack+0x14/0x28
+ dump_stack_lvl+0x9c/0xcc
+ dump_stack+0x14/0x2c
+ print_circle+0x2d4/0x438
+ cb_check_dl+0x44/0x70
+ bfs+0x60/0x168
+ add_dep+0x88/0x11c
+ do_event.constprop.0+0x19c/0x2c0
+ dept_event+0xe0/0x100
+ complete+0x48/0x98
+ kthread_complete_and_exit+0x18/0x20
+ kunit_try_catch_throw+0x0/0x1c
+ kthread+0xd4/0xe4
+ ret_from_fork+0x10/0x20
+
+
+> Benifit:
+> 
+> 	0. Works with all lock primitives.
+> 	1. Works with wait_for_completion()/complete().
+> 	2. Works with 'wait' on PG_locked.
+> 	3. Works with 'wait' on PG_writeback.
+> 	4. Works with swait/wakeup.
+> 	5. Works with waitqueue.
+> 	6. Multiple reports are allowed.
+> 	7. Deduplication control on multiple reports.
+> 	8. Withstand false positives thanks to 6.
+> 	9. Easy to tag any wait/event.
+> 
+> Future work:
+
+[...]
+
+> -- 
+> 1.9.1
+> 
+
+-- 
+Thank you, You are awesome!
+Hyeonggon :-)
