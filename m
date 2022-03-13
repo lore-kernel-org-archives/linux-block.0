@@ -2,102 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05930C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 05:10:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF73BC433F5
+	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 10:10:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232005AbiCMFL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Mar 2022 00:11:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44864 "EHLO
+        id S234231AbiCMKL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Mar 2022 06:11:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiCMFLz (ORCPT
+        with ESMTP id S229475AbiCMKL3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Mar 2022 00:11:55 -0500
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BFB62A24;
-        Sat, 12 Mar 2022 21:10:47 -0800 (PST)
-Received: by mail-lf1-x12c.google.com with SMTP id h14so21704748lfk.11;
-        Sat, 12 Mar 2022 21:10:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/2a/Y/9RxUg+RQvi15qObMdwkcPWgNkuVkFYsEACDhk=;
-        b=dGMG4CGvo7ZEusw/Ld484ohSc3fYw9xqgxsiNBnbP8RjQymD23frQDRtA4TW3JRFVz
-         jyAX5CFAD+gbxRCxqPKxnI0UAy07HAt1Y2vEaYJwOB5vjA3P4ANAdITS01kxTKXz8O2D
-         +sSzFavIAAfwkUgBVvkMttK1YxbvW+aNqAj+6/2zqODavQLvBpF618r1pqPQcVPiHKqi
-         RIH32k+3xmJ/nEgrsm7XoAGIn0j2XfYCxTMYQ5Dx+oqIfQJwENAOnkszZe1FHWBjeUR3
-         JqVzOIVmSfHNscDmoynYYFTViaH43dYTwpWhDE1vVrSoNYbMx5rYUTbi9qjH/u9GzdZ9
-         kMrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/2a/Y/9RxUg+RQvi15qObMdwkcPWgNkuVkFYsEACDhk=;
-        b=3XlaxNDOtRcvBGpdb/sICxioMF69U8osDt0tsEbaZGd7YysK9fFkpdlrx/We0dmQ5h
-         QpeLtITlYsIujUBPypZTtRmYDWTBBphz8WHsV5IKb92WXRU8l5v0+jyE56OEKRXfRyKB
-         0zKQwJHDF8uUPZ5HOowfbZ2dNBkSB0+xPsDnklBtWZv/+ngfZNMRoGWRiuGThJFOYv8m
-         bnjwYqGi1QBeosXKN4be3kTZ7SKgSqURNbIFQVierH2UsjbF1MGfci6SmnznfyvILEw8
-         ByqCA3ka/flyAPNSZJBiYnT5ukE9HlShtK9HrfYgeH7bjDgVTur/r64H4DrjVellYBlF
-         tRtg==
-X-Gm-Message-State: AOAM5334va/nVGXRMKLvJ1ndzKXJevqWbWhRAtbC/6n64ZOLXVUDxrTy
-        6nI127QusMPHp7LUAXzeCLvilqbKSY0UJ6yXl4s=
-X-Google-Smtp-Source: ABdhPJyU6aJ5LvlLIm1T0ym3uRSz5wd5N0P5WXOILbF4l1t4ugCeri+GG6bQDZpgXFpiYUZyRYDJV79MInjH6/VIu7A=
-X-Received: by 2002:a05:6512:3f99:b0:447:7fc0:8d3 with SMTP id
- x25-20020a0565123f9900b004477fc008d3mr10460588lfa.671.1647148245909; Sat, 12
- Mar 2022 21:10:45 -0800 (PST)
+        Sun, 13 Mar 2022 06:11:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3CD8545061
+        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 03:10:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647166221;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=k2FADEf28TqJAPkif0KyeCNyGcMlkFHLeXIWnUuPnn8=;
+        b=a/pB/CYDJh07eF2LWt5RFaHkDkM5Gy9tUWZ0V0ASusF+e92BTNy1KlBULtlC3PDBpc75MP
+        rplhhrc0lRTNTJpJ4/aSWTEH6vbsch7CA00RSJpYW7ak7xamzJOG9yIfui0peDlTTg4ktH
+        CpQkMvJsEorAGv46To1fw6aAFHZJus0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-31-dTHlVspjN6SRUFTa_5iuKA-1; Sun, 13 Mar 2022 06:10:18 -0400
+X-MC-Unique: dTHlVspjN6SRUFTa_5iuKA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7DFB4801597;
+        Sun, 13 Mar 2022 10:10:17 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6410400F3F8;
+        Sun, 13 Mar 2022 10:10:11 +0000 (UTC)
+Date:   Sun, 13 Mar 2022 18:10:05 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     syzbot <syzbot+b42749a851a47a0f581b@syzkaller.appspotmail.com>
+Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, tj@kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [syzbot] memory leak in blk_iolatency_init (2)
+Message-ID: <Yi3C/Xai8TepwBeE@T590>
+References: <0000000000007414e805da0c5de4@google.com>
 MIME-Version: 1.0
-References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
- <20220308152105.309618-1-joshi.k@samsung.com> <20220310082926.GA26614@lst.de>
- <CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com> <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
-In-Reply-To: <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Sun, 13 Mar 2022 10:40:20 +0530
-Message-ID: <CA+1E3rKgGgOQonGpjjwdAFc2FAXH5UkGKNXh0RqrBo9_=H6VSQ@mail.gmail.com>
-Subject: Re: [PATCH 00/17] io_uring passthru over nvme
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000007414e805da0c5de4@google.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 10:13 PM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> On Thu, Mar 10, 2022 at 03:35:02PM +0530, Kanchan Joshi wrote:
-> > On Thu, Mar 10, 2022 at 1:59 PM Christoph Hellwig <hch@lst.de> wrote:
-> > >
-> > > What branch is this against?
-> > Sorry I missed that in the cover.
-> > Two options -
-> > (a) https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-big-sqe
-> > first patch ("128 byte sqe support") is already there.
-> > (b) for-next (linux-block), series will fit on top of commit 9e9d83faa
-> > ("io_uring: Remove unneeded test in io_run_task_work_sig")
-> >
-> > > Do you have a git tree available?
-> > Not at the moment.
-> >
-> > @Jens: Please see if it is possible to move patches to your
-> > io_uring-big-sqe branch (and maybe rename that to big-sqe-pt.v1).
->
-> Since Jens might be busy, I've put up a tree with all this stuff:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/mcgrof/linux-next.git/log/?h=20220311-io-uring-cmd
->
-> It is based on option (b) mentioned above, I took linux-block for-next
-> and reset the tree to commit "io_uring: Remove unneeded test in
-> io_run_task_work_sig" before applying the series.
+On Sat, Mar 12, 2022 at 01:45:25PM -0800, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    79b00034e9dc Merge tag 'drm-fixes-2022-03-11' of git://ano..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=15cf8329700000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=c9e1a3a8e38b9582
+> dashboard link: https://syzkaller.appspot.com/bug?extid=b42749a851a47a0f581b
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101cc4ee700000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1270b5e9700000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+b42749a851a47a0f581b@syzkaller.appspotmail.com
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888103f8fa00 (size 96):
+>   comm "kworker/u4:0", pid 8, jiffies 4294937736 (age 503.480s)
+>   hex dump (first 32 bytes):
+>     40 5d ca 85 ff ff ff ff 38 c8 26 04 81 88 ff ff  @]......8.&.....
+>     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff8228f408>] kmalloc include/linux/slab.h:581 [inline]
+>     [<ffffffff8228f408>] kzalloc include/linux/slab.h:714 [inline]
+>     [<ffffffff8228f408>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:725
+>     [<ffffffff82285ede>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1206
+>     [<ffffffff8224b1aa>] blk_alloc_queue+0x24a/0x4a0 block/blk-core.c:495
+>     [<ffffffff822647a5>] blk_mq_init_queue_data block/blk-mq.c:3883 [inline]
+>     [<ffffffff822647a5>] blk_mq_init_queue+0x35/0x90 block/blk-mq.c:3897
+>     [<ffffffff8277f2b1>] scsi_alloc_sdev+0x231/0x3b0 drivers/scsi/scsi_scan.c:330
+>     [<ffffffff82780425>] scsi_probe_and_add_lun+0xff5/0x17e0 drivers/scsi/scsi_scan.c:1167
+>     [<ffffffff827812df>] __scsi_scan_target+0x14f/0x9a0 drivers/scsi/scsi_scan.c:1649
+>     [<ffffffff82781da7>] scsi_scan_channel drivers/scsi/scsi_scan.c:1737 [inline]
+>     [<ffffffff82781da7>] scsi_scan_channel+0xb7/0x100 drivers/scsi/scsi_scan.c:1713
+>     [<ffffffff82781faf>] scsi_scan_host_selected+0x1bf/0x220 drivers/scsi/scsi_scan.c:1766
+>     [<ffffffff827820d0>] do_scsi_scan_host+0xc0/0xd0 drivers/scsi/scsi_scan.c:1905
+>     [<ffffffff82782359>] do_scan_async+0x19/0x200 drivers/scsi/scsi_scan.c:1915
+>     [<ffffffff8127cff4>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+>     [<ffffffff8126b43f>] process_one_work+0x2bf/0x600 kernel/workqueue.c:2307
+>     [<ffffffff8126bd69>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2454
+>     [<ffffffff81275725>] kthread+0x125/0x160 kernel/kthread.c:377
+>     [<ffffffff810021ef>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-Thanks for putting this up.
+This is caused by 8e141f9eb803 ("block: drain file system I/O on del_gendisk").
 
--- 
-Joshi
+rq_qos_exit() is for calling blkcg_iolatency_exit() to release data
+allocated in blk_iolatency_init(). Since 8e141f9eb803, rq_qos_exit() is
+moved to del_gendisk() from blk_cleanup_queue, it becomes not possible
+to free the data when scanning un-present luns.
+
+The following patch should fix it for v5.16/v5.17, and V5.18 needn't that
+since v5.18 will move blkcg init/uninit into gendisk alloc/release.
+
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ce08f0aa9dfc..1ea7e523960c 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -321,6 +321,7 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	blk_freeze_queue(q);
+ 
++	rq_qos_exit(q);
+ 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
+ 
+ 	blk_sync_queue(q);
+
+
+Thanks,
+Ming
+
