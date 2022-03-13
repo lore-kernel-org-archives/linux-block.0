@@ -2,130 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF73BC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 10:10:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C15EC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 10:37:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234231AbiCMKL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Mar 2022 06:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39148 "EHLO
+        id S232589AbiCMKim (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Mar 2022 06:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229475AbiCMKL3 (ORCPT
+        with ESMTP id S231672AbiCMKik (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Mar 2022 06:11:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3CD8545061
-        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 03:10:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647166221;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=k2FADEf28TqJAPkif0KyeCNyGcMlkFHLeXIWnUuPnn8=;
-        b=a/pB/CYDJh07eF2LWt5RFaHkDkM5Gy9tUWZ0V0ASusF+e92BTNy1KlBULtlC3PDBpc75MP
-        rplhhrc0lRTNTJpJ4/aSWTEH6vbsch7CA00RSJpYW7ak7xamzJOG9yIfui0peDlTTg4ktH
-        CpQkMvJsEorAGv46To1fw6aAFHZJus0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-31-dTHlVspjN6SRUFTa_5iuKA-1; Sun, 13 Mar 2022 06:10:18 -0400
-X-MC-Unique: dTHlVspjN6SRUFTa_5iuKA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7DFB4801597;
-        Sun, 13 Mar 2022 10:10:17 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D6410400F3F8;
-        Sun, 13 Mar 2022 10:10:11 +0000 (UTC)
-Date:   Sun, 13 Mar 2022 18:10:05 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     syzbot <syzbot+b42749a851a47a0f581b@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tj@kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [syzbot] memory leak in blk_iolatency_init (2)
-Message-ID: <Yi3C/Xai8TepwBeE@T590>
-References: <0000000000007414e805da0c5de4@google.com>
+        Sun, 13 Mar 2022 06:38:40 -0400
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2089.outbound.protection.outlook.com [40.107.93.89])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25491F65DB
+        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 03:37:31 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Hfz3efzABf2UD8AbWXZT8sLlqrhS6OPgdfBnmOSsAaZEcTPxMdJBrLuhGu6tJ70mutT11Iu0nvFHQE0J+WYB+ItkzeTQdRA8XhwCoXRXMrVnPaQpx9wogzBo30cUBcB4kqSPEgNJxT4z5wmgtwrQlA43Prgk/U+wGVRimHSl1uFoTqiYJkkUr0tVVk+Ux/I8jXqZ/gnNHo0U7APPixKAb4Af6iGSVkSj41FylSeg25c6vUuIkJuo5vfCcD3iiX3UCX3WWSVAZztbavSQeHYOMaA6Hq9v1Re4fJF+an64dmrydRt6eRa10BnqXTG5hb7HNDP1VwISJBY8lA80AaxTGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uBN0spg5xQXEqq0jaBW/pUFkUdKkHr1ESbVKIZZ2Twg=;
+ b=IehPDMlNzc/8bZCNZVdXHibJAIDZ0yrLpWVu8PVWI7m1twmw25FawPHLdcJLEO4E4peWQlTXCwFBVhGmKoZ2xNUsitMmq64gNvNEwN2EVIlzNVqsl4lEWEmpFMu/KSbQ8ddK/drIy4dIlfyWM/T/QLPj185etwQt2XVcyuZfWaUKKjcGGrF0digCmAwzBdzF6yijmOvhPfaZ4CZtTES7q5gEUmsX1dhexbAkkA+1qkdJG5m//JlPeUTiA9ooUauAStCKvr/vqgU99GmS2gXCG4ZzxwUGQm8UT63nsZDH7p7rsem6mV00htVhQXn0vaUYCAo+lJZwcPkvBiG155r3hA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uBN0spg5xQXEqq0jaBW/pUFkUdKkHr1ESbVKIZZ2Twg=;
+ b=JIni7mmMKjbbuNN7ec5N5hitHmhNuTQekh/FGMp00SMIKHXOutoKIStJtiMO9+6QRrOvblqBZNwCtpY3K7fz1KCkBzZLlTf621uBzDgwMXVu4SKHNg01ibBewpmHeHwBVNdwHJwAhmC0dRV671hmIoUfaE1Edm5xd+biuJidWWb5VYsO81/47PiC1mwjAvX2h6fp6fVan7vHd4pwJNDLz+ifE/JamK1otsVDUH2CFtZEXChILF4lls/+puMYwJ+6MhKvssUlSQZYb0yq0rydcnIBmqtCeKAmYBiO0RvwKi3mFgSqfOcwyv610lfa2ougFRxEvXiOBZsqFLObOinAJw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
+ by MN2PR12MB4357.namprd12.prod.outlook.com (2603:10b6:208:262::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.21; Sun, 13 Mar
+ 2022 10:37:28 +0000
+Received: from DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::f037:e2a1:f108:125a]) by DM4PR12MB5040.namprd12.prod.outlook.com
+ ([fe80::f037:e2a1:f108:125a%8]) with mapi id 15.20.5061.026; Sun, 13 Mar 2022
+ 10:37:28 +0000
+Message-ID: <c91ad1e9-8c5b-ff1e-7e7f-8590ea6c67e8@nvidia.com>
+Date:   Sun, 13 Mar 2022 12:37:21 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH] virtio-blk: support polling I/O
+Content-Language: en-US
+To:     Suwan Kim <suwan.kim027@gmail.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     jasowang@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, suwan.kim027@gamil.com
+References: <20220311152832.17703-1-suwan.kim027@gmail.com>
+ <20220311103549-mutt-send-email-mst@kernel.org>
+ <YitzuxYHywdCRKVO@localhost.localdomain>
+From:   Max Gurtovoy <mgurtovoy@nvidia.com>
+In-Reply-To: <YitzuxYHywdCRKVO@localhost.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AM6P194CA0106.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:209:8f::47) To DM4PR12MB5040.namprd12.prod.outlook.com
+ (2603:10b6:5:38b::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000007414e805da0c5de4@google.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 287eb324-65a2-4b18-5749-08da04dd7899
+X-MS-TrafficTypeDiagnostic: MN2PR12MB4357:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR12MB435781A8ED39049718B325D1DE0E9@MN2PR12MB4357.namprd12.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: zkIWg+5X0xiqqPsDaBOO5MorYSWSN/41XhiAyjqM6UY26sm6nqoLUU+pioAdCLKnBh9keLftVQpj7kkTLHv7gWUj9O1JKNe8udgaveGLdEIWLavRKzHuV1eR+HU5cDnm2SvpHUlh9mlp951rw+KuUqyW3Hlmot6SXTqmiDCEYiVpOAFoyAg2V55JXmemEVLT50VEbf7S31+R1Xb/8SH+4YAkw38bwMrlWA1BZXTOrmoD8EaK5HV49EdCtDwI6O15MHdalg9op+uYVaz4gIzW+0xsesMaI5X+HsHYFctnwrmiga8TcC+QIbMVJtdedYjHlhl7ukLLmtuZED6b+q5j1mcEyx+sE4PHtn5zhFI0iKcm0gaE+gpAbD1DTnqUlcYnCIv1zsnWovwdyHJ0+OkpvwNep7JpeN6QtHxkG6IIEXn9MR6IxfuMKMh3zuP4ADf2NLbT3d6M+fnhz5C2NCTkQdAc4xuRiNXmROAYb4lZlihP3l/3ILzYmBCmeeNlxFJGlFHVnXPXK5IiBEKPA4qy7RJmtG9UKdjSKekf8hFlluSI5cFHjgliK7zz+eAnVkCNlB/fi9u1IcFdkiKzKQ1XbVW7UNFbP5XPuqrIwS51/Ammw/J2f0MAGPXMXBAv0n22CKzXxhsFO6M8JxhLFB2CW3Rx0dbWrqqmrTEevseDiy+P1kvZ8MxBQvUN7C09y19glJL+PiOZJuF3/3pL3JCNMxjV3Czz3UYw2ixRhg0RrhbHw/sZtnxyV2AMu7jlZVEN
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(8936002)(5660300002)(6486002)(316002)(31696002)(66556008)(186003)(4326008)(8676002)(66476007)(66946007)(26005)(53546011)(38100700002)(6512007)(6506007)(2616005)(508600001)(110136005)(2906002)(31686004)(6666004)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d1hJQ1Z0bXhieWdlZURZTm1rUytQS05STkRHUmU1VVhhV1VhRENYRlBQT25s?=
+ =?utf-8?B?RmxFa3BnYjNrV1B1cnEzcXBOejRLUzBPVkZpM05mbE1FYzYyVUl3aUppY3dq?=
+ =?utf-8?B?bnpiUkdxaVVnOVYyODBVdjBVbVZVUFdFb1dRRWVmblJSdUphYUp3Mjd3U0gz?=
+ =?utf-8?B?WDUraER0dHVMZ1lNVlhKYmJEK3FTUFNSUlJMcmFoQnUwb2doUDcvazc5cytQ?=
+ =?utf-8?B?YTAvZVk1NjltckZFMUg2SDhYOWkyaVEzU3YyN0NGR2tQL2tNeGo3dXRiK0tq?=
+ =?utf-8?B?RmN3Wmp4aHpPZG9wYWMyZnVyRUQ3aWtxN3h2LzZjWnFsRjUyczBiRmZtU0JD?=
+ =?utf-8?B?NTlzNjEzUUtGRFNnaE5SR1RtYzdLL21IcFBlakF1TlVjQ3lPWHpMWTlhTldD?=
+ =?utf-8?B?M2VGelorRmM4Qmd4N214RHJPTWNhalo0TkhwT2hTRWRSeUhIZ2dSN3B6cHJt?=
+ =?utf-8?B?QkcrS0NzbWVuMXppTDlPZXE1dEpmZGVrSFg5WGV1S2VodzB4aDRHQjdFWHBT?=
+ =?utf-8?B?a0tpWVVCOFN6WGRkTFRUcUdjeU45ejA0aVREMWlTOFBNdDZrQXo2d1F4c3FI?=
+ =?utf-8?B?d2syMWZCRzJHZndsY0l5eWxQMXB5b213YS94aE85MFVlek4wZWluRjBwNlVS?=
+ =?utf-8?B?dHMvVTRPUCs4aHdXbVJyTlY4YkNsTFJRakpDa0xFK1gwc3JVS2dLY3dOeFdQ?=
+ =?utf-8?B?RVhLMzF5N2E0eU1VLzAzZFBPaC9WcmRyelhpZWJUQkVHVGdZbzlTaVRWanNp?=
+ =?utf-8?B?U3ZkTG90dnRzbUptZk5JTm9Oc1hlMUQ0ZGZMbktOaXNweXYzUmZvd1pYdVJY?=
+ =?utf-8?B?VHVsQlhxNy9hUEJPQU1xdFJoRG0rVmNTeUxubmN0RnlOb25KQVlHNjEzcEF3?=
+ =?utf-8?B?N1hzazZycmQzTXVQSmQyZENIdmM3T1A4YzZSSzNSbFkvQ1JDZ1l5VGtxSU4x?=
+ =?utf-8?B?SG9lME4ydTE4dzdYMmE3U3NLdWdqZzl4RHFXOE10ZE5vc1B5SEZtWWxLT2pz?=
+ =?utf-8?B?YmU1NmpPbjBWQTJ6bURkWTVZU1Yyc0U2eGtFdTlCb0loVm92L3hDYS9uLytV?=
+ =?utf-8?B?dFVveVdyMnFGRWNYSjRYN3BWTUR5cDU5dFhjSDdGck5HUDV2cVlxR3haMHVk?=
+ =?utf-8?B?Y2lqM2w0Y2NVaG5aSXhWUFlCQ1MyaS9mU3NyY2hxRXZzQ1g1cGNoc0pBR3RU?=
+ =?utf-8?B?Q0ZVQVFIZG5XSWVZa25jWUdqT0pSUW9nTkhoWGl3Z2Z4clZGejU5REtYY0ty?=
+ =?utf-8?B?WkNxZ1pRYmtMRHhBT1Y5NWtCaE9LWjk2anZOSStTQThDMnhGdlBwWnFlbG11?=
+ =?utf-8?B?L1czQVF4RWZyOTFNemNVTXZteWd6em1ySGphTkFQdEwzMjBhQkIyYzJ6YU56?=
+ =?utf-8?B?RTVodGpSbFN5YVpCWkM5WkRia1pzTjdZeDJCbXVpZ3dYTVlFaDZzVGhpb0Uy?=
+ =?utf-8?B?dXl5TCtiOEtJQ1dYNGZDN25FLzNHUFE5M3ZST05xOHRDS0pPYXhMQS9xUWl5?=
+ =?utf-8?B?eE5xZTNMeUFsK0k3Ti9ESm9jblVTbG03YXljM2lHa1ZHOXlNY0k5TG5uVXNn?=
+ =?utf-8?B?VmlJQ3BpWDRSRXVXZ3Yvc0lqdS8yRStFdy9Ic0xOZUl6L2pxQno4MnNJZmk4?=
+ =?utf-8?B?bHVqR21pZmQvOW5qeUE1U0pMd1dZRTZJcHhyb0ZSVWhvM0JOc2dyU3dlRFEz?=
+ =?utf-8?B?U1E1ZEM5WUpRNitEb1YvNWx4cTk5QTdjbUpKaFNJdDVzemwyQ1lZK09Demdy?=
+ =?utf-8?B?MTZYa1ptRzV5YjdMQnpLVkE5SE5SV29IZnMzOGFGUlRQWVBpUjh0ZG9sUjBU?=
+ =?utf-8?B?ejN3dEVtUk1nbm1yMklLSWNERktKbWl5ZjdvTlNlTk5uNDVhRU1Xd3pWRVMz?=
+ =?utf-8?B?eCtsYlN1c09IWDBFUXNJbndFYi9jNDJSMU1qZ3pON0JINlduSFNmOUZmSG81?=
+ =?utf-8?B?bzZEcjJEckEzK0Q0UlBOcTUweFFqZjR0RUlDT1JPcGJQTkZHMjQydHFuZEZF?=
+ =?utf-8?B?bU1YcHJhdG1RPT0=?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 287eb324-65a2-4b18-5749-08da04dd7899
+X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2022 10:37:28.6912
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VTqsv680omz4hvohmBcItwHnZ2m8g5bWxv5Kfw6vlaGmq9uLj54wxuWd6LeSgTX/Ktm6lO25bBfGu2kXk7TKHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB4357
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 12, 2022 at 01:45:25PM -0800, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    79b00034e9dc Merge tag 'drm-fixes-2022-03-11' of git://ano..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=15cf8329700000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=c9e1a3a8e38b9582
-> dashboard link: https://syzkaller.appspot.com/bug?extid=b42749a851a47a0f581b
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=101cc4ee700000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1270b5e9700000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+b42749a851a47a0f581b@syzkaller.appspotmail.com
-> 
-> BUG: memory leak
-> unreferenced object 0xffff888103f8fa00 (size 96):
->   comm "kworker/u4:0", pid 8, jiffies 4294937736 (age 503.480s)
->   hex dump (first 32 bytes):
->     40 5d ca 85 ff ff ff ff 38 c8 26 04 81 88 ff ff  @]......8.&.....
->     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->   backtrace:
->     [<ffffffff8228f408>] kmalloc include/linux/slab.h:581 [inline]
->     [<ffffffff8228f408>] kzalloc include/linux/slab.h:714 [inline]
->     [<ffffffff8228f408>] blk_iolatency_init+0x28/0x190 block/blk-iolatency.c:725
->     [<ffffffff82285ede>] blkcg_init_queue+0xee/0x1c0 block/blk-cgroup.c:1206
->     [<ffffffff8224b1aa>] blk_alloc_queue+0x24a/0x4a0 block/blk-core.c:495
->     [<ffffffff822647a5>] blk_mq_init_queue_data block/blk-mq.c:3883 [inline]
->     [<ffffffff822647a5>] blk_mq_init_queue+0x35/0x90 block/blk-mq.c:3897
->     [<ffffffff8277f2b1>] scsi_alloc_sdev+0x231/0x3b0 drivers/scsi/scsi_scan.c:330
->     [<ffffffff82780425>] scsi_probe_and_add_lun+0xff5/0x17e0 drivers/scsi/scsi_scan.c:1167
->     [<ffffffff827812df>] __scsi_scan_target+0x14f/0x9a0 drivers/scsi/scsi_scan.c:1649
->     [<ffffffff82781da7>] scsi_scan_channel drivers/scsi/scsi_scan.c:1737 [inline]
->     [<ffffffff82781da7>] scsi_scan_channel+0xb7/0x100 drivers/scsi/scsi_scan.c:1713
->     [<ffffffff82781faf>] scsi_scan_host_selected+0x1bf/0x220 drivers/scsi/scsi_scan.c:1766
->     [<ffffffff827820d0>] do_scsi_scan_host+0xc0/0xd0 drivers/scsi/scsi_scan.c:1905
->     [<ffffffff82782359>] do_scan_async+0x19/0x200 drivers/scsi/scsi_scan.c:1915
->     [<ffffffff8127cff4>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
->     [<ffffffff8126b43f>] process_one_work+0x2bf/0x600 kernel/workqueue.c:2307
->     [<ffffffff8126bd69>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2454
->     [<ffffffff81275725>] kthread+0x125/0x160 kernel/kthread.c:377
->     [<ffffffff810021ef>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-This is caused by 8e141f9eb803 ("block: drain file system I/O on del_gendisk").
+On 3/11/2022 6:07 PM, Suwan Kim wrote:
+> On Fri, Mar 11, 2022 at 10:38:07AM -0500, Michael S. Tsirkin wrote:
+>> On Sat, Mar 12, 2022 at 12:28:32AM +0900, Suwan Kim wrote:
+>>> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
+>>> index d888f013d9ff..3fcaf937afe1 100644
+>>> --- a/include/uapi/linux/virtio_blk.h
+>>> +++ b/include/uapi/linux/virtio_blk.h
+>>> @@ -119,8 +119,9 @@ struct virtio_blk_config {
+>>>   	 * deallocation of one or more of the sectors.
+>>>   	 */
+>>>   	__u8 write_zeroes_may_unmap;
+>>> +	__u8 unused1;
+>>>   
+>>> -	__u8 unused1[3];
+>>> +	__virtio16 num_poll_queues;
+>>>   } __attribute__((packed));
+>> Same as any virtio UAPI change, this has to go through the virtio TC.
+>> In particular I don't think gating a new config field on
+>> an existing feature flag is a good idea.
+> Did you mean that the polling should be based on a new feature like
+> "VIRTIO_BLK_F_POLL" and be added at the end of features_legacy[]
+> and features[]? If then, I will add the new feture flag and resend it.
 
-rq_qos_exit() is for calling blkcg_iolatency_exit() to release data
-allocated in blk_iolatency_init(). Since 8e141f9eb803, rq_qos_exit() is
-moved to del_gendisk() from blk_cleanup_queue, it becomes not possible
-to free the data when scanning un-present luns.
-
-The following patch should fix it for v5.16/v5.17, and V5.18 needn't that
-since v5.18 will move blkcg init/uninit into gendisk alloc/release.
+Isn't there a way in the SPEC today to create a queue without interrupt 
+vector ?
 
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ce08f0aa9dfc..1ea7e523960c 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -321,6 +321,7 @@ void blk_cleanup_queue(struct request_queue *q)
- 	 */
- 	blk_freeze_queue(q);
- 
-+	rq_qos_exit(q);
- 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
- 
- 	blk_sync_queue(q);
-
-
-Thanks,
-Ming
-
+>
+> Regards,
+> Suwan Kim
