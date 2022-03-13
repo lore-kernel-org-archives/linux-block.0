@@ -2,86 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04DA2C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 21:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEB7C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 23:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234458AbiCMVyu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Mar 2022 17:54:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34098 "EHLO
+        id S235654AbiCMXUn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Mar 2022 19:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231156AbiCMVyt (ORCPT
+        with ESMTP id S229870AbiCMXUm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Mar 2022 17:54:49 -0400
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DA5B15A10;
-        Sun, 13 Mar 2022 14:53:41 -0700 (PDT)
-Received: by mail-ej1-f49.google.com with SMTP id r13so30080277ejd.5;
-        Sun, 13 Mar 2022 14:53:41 -0700 (PDT)
+        Sun, 13 Mar 2022 19:20:42 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C358959A74
+        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 16:19:32 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 27so12258289pgk.10
+        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 16:19:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=O+R/kHfFmKvufqO2riNM3OWBvfh7c4oC4bBgk3OU4rs=;
+        b=k3b9zmByTfeqCsDmj2OjLn7GtvpJQ4h7Qdl6jkXZMEccR9nZgcHG8sJDsQDN8z1IVi
+         ROHqfRcFP9KwmTICy7QqoS2veuIAoNtR7q5pLgURwzE3L94HehTh4ezkD3nz/NmCptbt
+         hIXZdwtmlB/KwhUVUArqvsGFDTVSS55RSDzPC5Nur5ejlMgsq1BR305zCkExbqcwOtQW
+         SMN+L5sJmCJUA6wHWg+i305S0OQAvSceAfHUd13zZQGkzPL6pc6guvhRu8DhRDZvPgrM
+         6961UYpKQlA5GHHkQN1zUJHNyOnbzmN4I6j3F6q01O5gBD0VXv0WW1QpHldtWDzLXXWK
+         AmmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=GhvMlaLXIBl69d2e2I1DBwNJZfAkADFlzhCg7cXuE7k=;
-        b=xT+6CZydUyXijY4NFZ9DRytUZo0z1IGpqYev9Pj8Fi+PcOMVpkbby4+2KjOR84qqXS
-         8n2AmNX5Du8M7s+P3JTgHHRuGF0/08St/iVyuie22ERNKpxa6eYfGRrs/Qsa/m2ZT3nI
-         nW3zxLtEA1rUybxfYqB3yCZ6P6DyjrRTOYprg4o9Oo6Krcy6otqMigWBGwACenLJHyJh
-         z8noWqHXuB7yIbiw9KHAXNrPTCEEsQpVvV8BQtz3QxzT58FJqRdjG9QNCN3ovIywpkv1
-         twMkkgEKK4p/jkyUcSJwoFJSynsLxQs6wK6eIA4pvHVHyfc/P808I3JT0a1UQ+yBZbfp
-         Bk0w==
-X-Gm-Message-State: AOAM530cr8efXgywVbiCno2XJjfCV7ew/yJgBC/v8baTkpD6fQ3IL0js
-        kAqPtCtgUh1XRyuR6UdMSCg=
-X-Google-Smtp-Source: ABdhPJxed+q6AT46dUxx+14XZWsrYC4Q4t/biXHM77QpXqFMCGdDrmRX1buo2MOHsW3KyPhpW3Z1qQ==
-X-Received: by 2002:a17:906:2695:b0:6cf:e1b4:118b with SMTP id t21-20020a170906269500b006cfe1b4118bmr16156282ejc.348.1647208419888;
-        Sun, 13 Mar 2022 14:53:39 -0700 (PDT)
-Received: from [10.100.102.14] (46-117-116-119.bb.netvision.net.il. [46.117.116.119])
-        by smtp.gmail.com with ESMTPSA id q16-20020a170906145000b006bdaf981589sm5997845ejc.81.2022.03.13.14.53.37
+        bh=O+R/kHfFmKvufqO2riNM3OWBvfh7c4oC4bBgk3OU4rs=;
+        b=B4uVhLgk1A72oszac6A1ykT721PsTpjmXn3aiVrZJ9QM6i+G++kWoCoGF3I61wJX70
+         ENZnjjLDeS5aLxRxxADeTLKmUtByi0dxPA+7PJXJv7Zmv2b/bEKYFiM0DBzcaVlRRTWX
+         W+QLRQsxbxcLFdkr73INoIKKOe9e5Z4V7FoshN/Z43T5zjQh4R4edeySj2PnfyUpIZuQ
+         hIP8ya43gqLbMq9fOUt9hP5hZq4M9fq77M9PJckaaNedfIlvHR6BvKbBDwA4aCYrUzgU
+         /7vesDVgGLhbPRhDu+4Pqomz3luTCOLtc81AIYrWxo/2cU+UxKoP8VL0hKVxc9kKFiP/
+         YhYg==
+X-Gm-Message-State: AOAM533e5f1miexDRJYgXggh30z9tZMKucIYMNJvpnhUfCpJgmOPV/7g
+        cWXeN1EiltZuH1cBRW5uOft/Zw==
+X-Google-Smtp-Source: ABdhPJxFFfe7G0EiRmfWJPZDD5DaUMiZ6TuJl+HtQHVUuPDU05p4QrVBskLCBxlXAnKDFQVqZM8/uQ==
+X-Received: by 2002:aa7:859a:0:b0:4f6:aaa1:832f with SMTP id w26-20020aa7859a000000b004f6aaa1832fmr21060567pfn.9.1647213572064;
+        Sun, 13 Mar 2022 16:19:32 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p15-20020a056a000b4f00b004f7b71f8bd6sm4199082pfo.47.2022.03.13.16.19.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 13 Mar 2022 14:53:39 -0700 (PDT)
-Message-ID: <7a123895-1102-4b36-2d6e-1e00e978d03d@grimberg.me>
-Date:   Sun, 13 Mar 2022 23:53:37 +0200
+        Sun, 13 Mar 2022 16:19:31 -0700 (PDT)
+Message-ID: <5161ed17-5f55-e851-c2e2-5340cc62fa3b@kernel.dk>
+Date:   Sun, 13 Mar 2022 17:19:30 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
- char-device.
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
 Content-Language: en-US
-To:     Kanchan Joshi <joshi.k@samsung.com>, axboe@kernel.dk, hch@lst.de,
-        kbusch@kernel.org, asml.silence@gmail.com
-Cc:     io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
-        mcgrof@kernel.org, a.manzanares@samsung.com, joshiiitr@gmail.com,
-        anuj20.g@samsung.com
-References: <20220308152105.309618-1-joshi.k@samsung.com>
- <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
- <20220308152105.309618-6-joshi.k@samsung.com>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20220308152105.309618-6-joshi.k@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Ondrej Zary <linux@zary.sk>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>,
+        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
+        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk>
+ <202203132015.18183.linux@zary.sk>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <202203132015.18183.linux@zary.sk>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 3/13/22 1:15 PM, Ondrej Zary wrote:
+> On Saturday 12 March 2022 15:44:15 Ondrej Zary wrote:
+>> The pata_parport is a libata-based replacement of the old PARIDE
+>> subsystem - driver for parallel port IDE devices.
+>> It uses the original paride low-level protocol drivers but does not
+>> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
+>> behind parallel port adapters are handled by the ATA layer.
+>>
+>> This will allow paride and its high-level drivers to be removed.
+>>
+>> paride and pata_parport are mutually exclusive because the compiled
+>> protocol drivers are incompatible.
+>>
+>> Tested with Imation SuperDisk LS-120 and HP C4381A (both use EPAT
+>> chip).
+>>
+>> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
+>> drivers - they don't handle non-multiple-of-4 block transfers
+>> correctly. This causes problems with LS-120 drive.
+>> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
+>> or 8-bit mode is used first (probably some initialization missing?).
+>> Once the device is initialized, EPP works until power cycle.
+>>
+>> So after device power on, you have to:
+>> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
+>> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
+>> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
+>> (autoprobe will initialize correctly as it tries the slowest modes
+>> first but you'll get the broken EPP-32 mode)
+> 
+> Found a bug - the same device can be registered multiple times. Fix
+> will be in v2. But this revealed a bigger problem: pi_connect can
+> sleep (uses parport_claim_or_block) and libata does not like that. Any
+> ideas how to fix this?
 
-> +int nvme_ns_head_chr_async_cmd(struct io_uring_cmd *ioucmd)
-> +{
-> +	struct cdev *cdev = file_inode(ioucmd->file)->i_cdev;
-> +	struct nvme_ns_head *head = container_of(cdev, struct nvme_ns_head, cdev);
-> +	int srcu_idx = srcu_read_lock(&head->srcu);
-> +	struct nvme_ns *ns = nvme_find_path(head);
-> +	int ret = -EWOULDBLOCK;
-> +
-> +	if (ns)
-> +		ret = nvme_ns_async_ioctl(ns, ioucmd);
-> +	srcu_read_unlock(&head->srcu, srcu_idx);
-> +	return ret;
-> +}
+I think you'd need two things here:
 
-No one cares that this has no multipathing capabilities what-so-ever?
-despite being issued on the mpath device node?
+- The blk-mq queue should be registered with BLK_MQ_F_BLOCKING, which
+  will allow blocking off the queue_rq path.
 
-I know we are not doing multipathing for userspace today, but this
-feels like an alternative I/O interface for nvme, seems a bit cripled
-with zero multipathing capabilities...
+- You need to look at making libata safe wrt calling ata_qc_issue()
+  outside the lock. Should probably be fine if you just gate that on
+  whether or not the queue was setup in blocking mode, as that doesn't
+  currently exist in libata.
+
+-- 
+Jens Axboe
+
