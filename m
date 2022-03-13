@@ -2,463 +2,275 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51D91C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 15:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 895C1C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 13 Mar 2022 19:15:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231240AbiCMPQv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 13 Mar 2022 11:16:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58608 "EHLO
+        id S234357AbiCMTQc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 13 Mar 2022 15:16:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230467AbiCMPQu (ORCPT
+        with ESMTP id S229518AbiCMTQc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 13 Mar 2022 11:16:50 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FD505FDE
-        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 08:15:40 -0700 (PDT)
-Received: from fsav414.sakura.ne.jp (fsav414.sakura.ne.jp [133.242.250.113])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22DFFNY3056287;
-        Mon, 14 Mar 2022 00:15:23 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav414.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp);
- Mon, 14 Mar 2022 00:15:23 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav414.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22DFFNiU056282
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 14 Mar 2022 00:15:23 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <613b094e-2b76-11b7-458b-553aafaf0df7@I-love.SAKURA.ne.jp>
-Date:   Mon, 14 Mar 2022 00:15:22 +0900
+        Sun, 13 Mar 2022 15:16:32 -0400
+Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E59074601;
+        Sun, 13 Mar 2022 12:15:22 -0700 (PDT)
+Received: from [192.168.0.2] (chello089173232159.chello.sk [89.173.232.159])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by hosting.gsystem.sk (Postfix) with ESMTPSA id 53AD27A00E1;
+        Sun, 13 Mar 2022 20:15:20 +0100 (CET)
+From:   Ondrej Zary <linux@zary.sk>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+Date:   Sun, 13 Mar 2022 20:15:17 +0100
+User-Agent: KMail/1.9.10
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Tim Waugh <tim@cyberelk.net>, linux-block@vger.kernel.org,
+        linux-parport@lists.infradead.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220312144415.20010-1-linux@zary.sk>
+In-Reply-To: <20220312144415.20010-1-linux@zary.sk>
+X-KMail-QuotePrefix: > 
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: [PATCH v2] loop: don't hold lo->lo_mutex from lo_open() and
- lo_release()
-Content-Language: en-US
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To:     Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>
-Cc:     syzbot <syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org
-References: <00000000000099c4ca05da07e42f@google.com>
- <bbdd20da-bccb-2dbb-7c46-be06dcfc26eb@I-love.SAKURA.ne.jp>
-In-Reply-To: <bbdd20da-bccb-2dbb-7c46-be06dcfc26eb@I-love.SAKURA.ne.jp>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: Text/Plain;
+  charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Content-Disposition: inline
+Message-Id: <202203132015.18183.linux@zary.sk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot is reporting circular locking problem at __loop_clr_fd() [1], for
-commit 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
-is calling destroy_workqueue() with disk->open_mutex held.
+On Saturday 12 March 2022 15:44:15 Ondrej Zary wrote:
+> The pata_parport is a libata-based replacement of the old PARIDE
+> subsystem - driver for parallel port IDE devices.
+> It uses the original paride low-level protocol drivers but does not
+> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
+> behind parallel port adapters are handled by the ATA layer.
+> 
+> This will allow paride and its high-level drivers to be removed.
+> 
+> paride and pata_parport are mutually exclusive because the compiled
+> protocol drivers are incompatible.
+> 
+> Tested with Imation SuperDisk LS-120 and HP C4381A (both use EPAT
+> chip).
+> 
+> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
+> drivers - they don't handle non-multiple-of-4 block transfers
+> correctly. This causes problems with LS-120 drive.
+> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
+> or 8-bit mode is used first (probably some initialization missing?).
+> Once the device is initialized, EPP works until power cycle.
+> 
+> So after device power on, you have to:
+> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
+> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
+> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
+> (autoprobe will initialize correctly as it tries the slowest modes
+> first but you'll get the broken EPP-32 mode)
 
-Commit 322c4293ecc58110 ("loop: make autoclear operation asynchronous")
-tried to fix this problem by deferring __loop_clr_fd() from lo_release()
-to a WQ context, but that commit was reverted because there are userspace
-programs which depend on that __loop_clr_fd() completes by the moment
-close() returns to user mode.
+Found a bug - the same device can be registered multiple times. Fix will be in
+v2. But this revealed a bigger problem: pi_connect can sleep (uses
+parport_claim_or_block) and libata does not like that.
+Any ideas how to fix this?
 
-This time, we try to fix this problem by deferring __loop_clr_fd() from
-lo_release() to a task work context. Since task_work_add() is not exported
-but Christoph does not want to export it, this patch uses anonymous inode
-interface as a wrapper for calling task_work_add() via fput().
+Mar 12 18:47:13 test kernel: [  348.863534] pata_parport: protocol epat registered
+Mar 12 18:47:16 test kernel: [  352.226932] (null): epat 1.02, Shuttle EPAT chip c6 at 0x378,
+Mar 12 18:47:16 test kernel: [  352.226943] mode 2 (8-bit), delay 1
+Mar 12 18:47:16 test kernel: [  352.255210] scsi host4: pata_parport
+Mar 12 18:47:16 test kernel: [  352.255359] ata5: PATA max PIO0 port parport0 protocol epat
+Mar 12 18:47:17 test kernel: [  352.489441] ata5.00: ATAPI: LS-120 COSM   04              UHD Floppy, 0270M09T, max PIO2
+Mar 12 18:47:17 test kernel: [  352.572733] scsi 4:0:0:0: Direct-Access     MATSHITA LS-120 COSM   04 0270 PQ: 0 ANSI: 5
+Mar 12 18:47:17 test kernel: [  352.608160] sd 4:0:0:0: Attached scsi generic sg1 type 0
+Mar 12 18:47:17 test kernel: [  352.635053] sd 4:0:0:0: [sdb] Media removed, stopped polling
+Mar 12 18:47:17 test kernel: [  352.658924] sd 4:0:0:0: [sdb] Attached SCSI removable disk
+Mar 12 18:47:31 test kernel: [  366.811817] (null): epat 1.02, Shuttle EPAT chip c6 at 0x378,
+Mar 12 18:47:31 test kernel: [  366.811828] mode 2 (8-bit), delay 1
+Mar 12 18:47:31 test kernel: [  366.846397] scsi host5: pata_parport
+Mar 12 18:47:31 test kernel: [  366.846557] ata6: PATA max PIO0 port parport0 protocol epat
+Mar 12 18:47:31 test kernel: [  367.076726] ata6.00: ATAPI: LS-120 COSM   04              UHD Floppy, 0270M09T, max PIO2
+Mar 12 18:47:31 test kernel: [  367.157050] scsi 5:0:0:0: Direct-Access     MATSHITA LS-120 COSM   04 0270 PQ: 0 ANSI: 5
+Mar 12 18:47:31 test kernel: [  367.192614] sd 5:0:0:0: Attached scsi generic sg2 type 0
+Mar 12 18:47:31 test kernel: [  367.219398] sd 5:0:0:0: [sdc] Media removed, stopped polling
+Mar 12 18:47:31 test kernel: [  367.243247] sd 5:0:0:0: [sdc] Attached SCSI removable disk
+Mar 12 18:47:32 test kernel: [  367.542155] Modules linked in: epat pata_parport nouveau snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm psmouse snd_timer snd soundcore wmi
+hwmon serio_raw drm_ttm_helper 8139cp sg intel_agp i2c_dev parport_pc parport fuse
+Mar 12 18:47:32 test kernel: [  367.542219] CPU: 0 PID: 17 Comm: kworker/0:1 Not tainted 5.17.0-rc2+ #441
+Mar 12 18:47:32 test kernel: [  367.542227] Hardware name:  /848P-ICH5, BIOS 6.00 PG 02/03/2005
+Mar 12 18:47:32 test kernel: [  367.542232] Workqueue: events_freezable_power_ disk_events_workfn
+Mar 12 18:47:32 test kernel: [  367.542242] Call Trace:
+Mar 12 18:47:32 test kernel: [  367.542250]  dump_stack_lvl+0x32/0x41
+Mar 12 18:47:32 test kernel: [  367.542259]  ? preempt_count_add+0x4c/0x51
+Mar 12 18:47:32 test kernel: [  367.542266]  dump_stack+0xd/0x10
+Mar 12 18:47:32 test kernel: [  367.542271]  __schedule_bug+0x90/0xa1
+Mar 12 18:47:32 test kernel: [  367.542281]  __schedule+0x3b/0x456
+Mar 12 18:47:32 test kernel: [  367.542289]  schedule+0x68/0xa3
+Mar 12 18:47:32 test kernel: [  367.542296]  parport_claim_or_block+0x68/0xa5 [parport]
+Mar 12 18:47:32 test kernel: [  367.542307]  ? init_wait_entry+0x21/0x21
+Mar 12 18:47:32 test kernel: [  367.542315]  pi_connect+0x2b/0x3e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542323]  pata_parport_check_status+0x16/0x4e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542329]  ? pata_parport_lost_interrupt+0x7c/0x7c [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542336]  ata_sff_busy_wait+0x27/0x3b
+Mar 12 18:47:32 test kernel: [  367.542345]  ata_wait_idle+0x12/0x14
+Mar 12 18:47:32 test kernel: [  367.542350]  ata_sff_qc_issue+0x27/0x106
+Mar 12 18:47:32 test kernel: [  367.542357]  ata_qc_issue+0x14b/0x16b
+Mar 12 18:47:32 test kernel: [  367.542364]  __ata_scsi_queuecmd+0x1c7/0x1d4
+Mar 12 18:47:32 test kernel: [  367.542369]  ? ata_scsiop_inq_83+0xb3/0xb3
+Mar 12 18:47:32 test kernel: [  367.542375]  ata_scsi_queuecmd+0x36/0x5f
+Mar 12 18:47:32 test kernel: [  367.542380]  scsi_queue_rq+0x577/0x69e
+Mar 12 18:47:32 test kernel: [  367.542389]  blk_mq_dispatch_rq_list+0x229/0x3e4
+Mar 12 18:47:32 test kernel: [  367.542395]  ? __sbitmap_get_word+0x28/0x5a
+Mar 12 18:47:32 test kernel: [  367.542405]  __blk_mq_sched_dispatch_requests+0x7b/0xdb
+Mar 12 18:47:32 test kernel: [  367.542411]  blk_mq_sched_dispatch_requests+0x25/0x46
+Mar 12 18:47:32 test kernel: [  367.542417]  __blk_mq_run_hw_queue+0x36/0x6b
+Mar 12 18:47:32 test kernel: [  367.542424]  __blk_mq_delay_run_hw_queue+0x54/0x11d
+Mar 12 18:47:32 test kernel: [  367.542431]  blk_mq_run_hw_queue+0xa5/0xab
+Mar 12 18:47:32 test kernel: [  367.542437]  blk_mq_sched_insert_request+0xa2/0xaa
+Mar 12 18:47:32 test kernel: [  367.542443]  ? update_io_ticks+0x2a/0x5b
+Mar 12 18:47:32 test kernel: [  367.542451]  blk_execute_rq_nowait+0x3f/0x47
+Mar 12 18:47:32 test kernel: [  367.542457]  blk_execute_rq+0x3a/0xa4
+Mar 12 18:47:32 test kernel: [  367.542463]  __scsi_execute+0x90/0x133
+Mar 12 18:47:32 test kernel: [  367.542470]  scsi_test_unit_ready+0x43/0x95
+Mar 12 18:47:32 test kernel: [  367.542477]  sd_check_events+0x8b/0xf6
+Mar 12 18:47:32 test kernel: [  367.542483]  ? media_not_present+0x3b/0x3b
+Mar 12 18:47:32 test kernel: [  367.542489]  disk_check_events+0x26/0xa3
+Mar 12 18:47:32 test kernel: [  367.542495]  disk_events_workfn+0x10/0x12
+Mar 12 18:47:32 test kernel: [  367.542499]  process_one_work+0x107/0x198
+Mar 12 18:47:32 test kernel: [  367.542508]  worker_thread+0x151/0x1e3
+Mar 12 18:47:32 test kernel: [  367.542514]  kthread+0xd2/0xd7
+Mar 12 18:47:32 test kernel: [  367.542519]  ? rescuer_thread+0x1ec/0x1ec
+Mar 12 18:47:32 test kernel: [  367.542525]  ? kthread_complete_and_exit+0x16/0x16
+Mar 12 18:47:32 test kernel: [  367.542531]  ret_from_fork+0x19/0x28
+Mar 12 18:47:32 test kernel: [  367.542540] ------------[ cut here ]------------
+Mar 12 18:47:32 test kernel: [  367.542543] Voluntary context switch within RCU read-side critical section!
+Mar 12 18:47:32 test kernel: [  367.542552] WARNING: CPU: 0 PID: 17 at kernel/rcu/tree_plugin.h:318 rcu_note_context_switch+0x4e/0x27f
+Mar 12 18:47:32 test kernel: [  367.542568] Modules linked in: epat pata_parport nouveau snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm psmouse snd_timer snd soundcore wmi hwmon serio_raw drm_ttm_helper 8139cp sg intel_agp i2c_dev parport_pc parport fuse
+Mar 12 18:47:32 test kernel: [  367.542605] CPU: 0 PID: 17 Comm: kworker/0:1 Tainted: G        W         5.17.0-rc2+ #441
+Mar 12 18:47:32 test kernel: [  367.542612] Hardware name:  /848P-ICH5, BIOS 6.00 PG 02/03/2005
+Mar 12 18:47:32 test kernel: [  367.542616] Workqueue: events_freezable_power_ disk_events_workfn
+Mar 12 18:47:32 test kernel: [  367.542624] EIP: rcu_note_context_switch+0x4e/0x27f
+Mar 12 18:47:32 test kernel: [  367.542631] Code: 80 7d e3 00 75 27 8b 86 fc 01 00 00 85 c0 7e 1d 80 3d 95 06 87 d8 00 75 14 68 43 ad 6e d8 c6 05 95 06 87 d8 01 e8 ce e9 50 00 <0f> 0b 58 64 a1 cc 86 90 d8 8b 80 fc 01 00 00 85 c0 0f 8e dc 01 00
+Mar 12 18:47:32 test kernel: [  367.542637] EAX: 0000003f EBX: c10bb780 ECX: ef9939cc EDX: 00000002
+Mar 12 18:47:32 test kernel: [  367.542643] ESI: c10bb780 EDI: ef997840 EBP: c1093c5c ESP: c1093c38
+Mar 12 18:47:32 test kernel: [  367.542648] DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010096
+Mar 12 18:47:32 test kernel: [  367.542654] CR0: 80050033 CR2: b5126000 CR3: 0d97c000 CR4: 00000690
+Mar 12 18:47:32 test kernel: [  367.542660] Call Trace:
+Mar 12 18:47:32 test kernel: [  367.542665]  ? preempt_count_add+0x4c/0x51
+Mar 12 18:47:32 test kernel: [  367.542672]  ? dump_stack+0xd/0x10
+Mar 12 18:47:32 test kernel: [  367.542677]  ? preempt_count_add+0x4c/0x51
+Mar 12 18:47:32 test kernel: [  367.542683]  __schedule+0x63/0x456
+Mar 12 18:47:32 test kernel: [  367.542691]  schedule+0x68/0xa3
+Mar 12 18:47:32 test kernel: [  367.542697]  parport_claim_or_block+0x68/0xa5 [parport]
+Mar 12 18:47:32 test kernel: [  367.542706]  ? init_wait_entry+0x21/0x21
+Mar 12 18:47:32 test kernel: [  367.542713]  pi_connect+0x2b/0x3e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542720]  pata_parport_check_status+0x16/0x4e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542726]  ? pata_parport_lost_interrupt+0x7c/0x7c [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.542733]  ata_sff_busy_wait+0x27/0x3b
+Mar 12 18:47:32 test kernel: [  367.542740]  ata_wait_idle+0x12/0x14
+Mar 12 18:47:32 test kernel: [  367.542745]  ata_sff_qc_issue+0x27/0x106
+Mar 12 18:47:32 test kernel: [  367.542752]  ata_qc_issue+0x14b/0x16b
+Mar 12 18:47:32 test kernel: [  367.542758]  __ata_scsi_queuecmd+0x1c7/0x1d4
+Mar 12 18:47:32 test kernel: [  367.542763]  ? ata_scsiop_inq_83+0xb3/0xb3
+Mar 12 18:47:32 test kernel: [  367.542769]  ata_scsi_queuecmd+0x36/0x5f
+Mar 12 18:47:32 test kernel: [  367.542774]  scsi_queue_rq+0x577/0x69e
+Mar 12 18:47:32 test kernel: [  367.542782]  blk_mq_dispatch_rq_list+0x229/0x3e4
+Mar 12 18:47:32 test kernel: [  367.542789]  ? __sbitmap_get_word+0x28/0x5a
+Mar 12 18:47:32 test kernel: [  367.542797]  __blk_mq_sched_dispatch_requests+0x7b/0xdb
+Mar 12 18:47:32 test kernel: [  367.542804]  blk_mq_sched_dispatch_requests+0x25/0x46
+Mar 12 18:47:32 test kernel: [  367.542809]  __blk_mq_run_hw_queue+0x36/0x6b
+Mar 12 18:47:32 test kernel: [  367.542816]  __blk_mq_delay_run_hw_queue+0x54/0x11d
+Mar 12 18:47:32 test kernel: [  367.542823]  blk_mq_run_hw_queue+0xa5/0xab
+Mar 12 18:47:32 test kernel: [  367.542829]  blk_mq_sched_insert_request+0xa2/0xaa
+Mar 12 18:47:32 test kernel: [  367.542835]  ? update_io_ticks+0x2a/0x5b
+Mar 12 18:47:32 test kernel: [  367.542842]  blk_execute_rq_nowait+0x3f/0x47
+Mar 12 18:47:32 test kernel: [  367.542848]  blk_execute_rq+0x3a/0xa4
+Mar 12 18:47:32 test kernel: [  367.542854]  __scsi_execute+0x90/0x133
+Mar 12 18:47:32 test kernel: [  367.542861]  scsi_test_unit_ready+0x43/0x95
+Mar 12 18:47:32 test kernel: [  367.542868]  sd_check_events+0x8b/0xf6
+Mar 12 18:47:32 test kernel: [  367.542874]  ? media_not_present+0x3b/0x3b
+Mar 12 18:47:32 test kernel: [  367.542879]  disk_check_events+0x26/0xa3
+Mar 12 18:47:32 test kernel: [  367.542885]  disk_events_workfn+0x10/0x12
+Mar 12 18:47:32 test kernel: [  367.542890]  process_one_work+0x107/0x198
+Mar 12 18:47:32 test kernel: [  367.542898]  worker_thread+0x151/0x1e3
+Mar 12 18:47:32 test kernel: [  367.542904]  kthread+0xd2/0xd7
+Mar 12 18:47:32 test kernel: [  367.542909]  ? rescuer_thread+0x1ec/0x1ec
+Mar 12 18:47:32 test kernel: [  367.542915]  ? kthread_complete_and_exit+0x16/0x16
+Mar 12 18:47:32 test kernel: [  367.542921]  ret_from_fork+0x19/0x28
+Mar 12 18:47:32 test kernel: [  367.542928] ---[ end trace 0000000000000000 ]---
+Mar 12 18:47:32 test kernel: [  367.650552] ------------[ cut here ]------------
+Mar 12 18:47:32 test kernel: [  367.650568] DEBUG_LOCKS_WARN_ON(val > preempt_count())
+Mar 12 18:47:32 test kernel: [  367.650576] WARNING: CPU: 0 PID: 17 at kernel/sched/core.c:5474 preempt_count_sub+0x3e/0x7f
+Mar 12 18:47:32 test kernel: [  367.650595] Modules linked in: epat pata_parport nouveau snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm psmouse snd_timer snd soundcore wmi hwmon serio_raw drm_ttm_helper 8139cp sg intel_agp i2c_dev parport_pc parport fuse
+Mar 12 18:47:32 test kernel: [  367.650641] CPU: 0 PID: 17 Comm: kworker/0:1 Tainted: G        W         5.17.0-rc2+ #441
+Mar 12 18:47:32 test kernel: [  367.650649] Hardware name:  /848P-ICH5, BIOS 6.00 PG 02/03/2005
+Mar 12 18:47:32 test kernel: [  367.650655] Workqueue: events_freezable_power_ disk_events_workfn
+Mar 12 18:47:32 test kernel: [  367.650665] EIP: preempt_count_sub+0x3e/0x7f
+Mar 12 18:47:32 test kernel: [  367.650672] Code: e2 ff ff ff 7f 39 c2 7d 25 e8 9d f4 19 00 85 c0 74 57 83 3d b4 2c 87 d8 00 75 4e 68 0a 6c 6e d8 68 db a7 6d d8 e8 3d b4 53 00 <0f> 0b eb 2e 3d fe 00 00 00 77 2b 84 d2 75 27 e8 6d f4 19 00 85 c0
+Mar 12 18:47:32 test kernel: [  367.650679] EAX: 0000002a EBX: 00000000 ECX: ef9939cc EDX: 00000001
+Mar 12 18:47:32 test kernel: [  367.650685] ESI: d4974000 EDI: 00000293 EBP: c1093d30 ESP: c1093d28
+Mar 12 18:47:32 test kernel: [  367.650690] DS: 007b ES: 007b FS: 00d8 GS: 0000 SS: 0068 EFLAGS: 00010292
+Mar 12 18:47:32 test kernel: [  367.650697] CR0: 80050033 CR2: b0eae6ec CR3: 035b5000 CR4: 00000690
+Mar 12 18:47:32 test kernel: [  367.650704] Call Trace:
+Mar 12 18:47:32 test kernel: [  367.650711]  _raw_spin_unlock_irqrestore+0x17/0x28
+Mar 12 18:47:32 test kernel: [  367.650720]  ata_scsi_queuecmd+0x57/0x5f
+Mar 12 18:47:32 test kernel: [  367.650728]  scsi_queue_rq+0x577/0x69e
+Mar 12 18:47:32 test kernel: [  367.650737]  blk_mq_dispatch_rq_list+0x229/0x3e4
+Mar 12 18:47:32 test kernel: [  367.650743]  ? __sbitmap_get_word+0x28/0x5a
+Mar 12 18:47:32 test kernel: [  367.650753]  __blk_mq_sched_dispatch_requests+0x7b/0xdb
+Mar 12 18:47:32 test kernel: [  367.650760]  blk_mq_sched_dispatch_requests+0x25/0x46
+Mar 12 18:47:32 test kernel: [  367.650766]  __blk_mq_run_hw_queue+0x36/0x6b
+Mar 12 18:47:32 test kernel: [  367.650774]  __blk_mq_delay_run_hw_queue+0x54/0x11d
+Mar 12 18:47:32 test kernel: [  367.650781]  blk_mq_run_hw_queue+0xa5/0xab
+Mar 12 18:47:32 test kernel: [  367.650788]  blk_mq_sched_insert_request+0xa2/0xaa
+Mar 12 18:47:32 test kernel: [  367.650793]  ? update_io_ticks+0x2a/0x5b
+Mar 12 18:47:32 test kernel: [  367.650801]  blk_execute_rq_nowait+0x3f/0x47
+Mar 12 18:47:32 test kernel: [  367.650808]  blk_execute_rq+0x3a/0xa4
+Mar 12 18:47:32 test kernel: [  367.650815]  __scsi_execute+0x90/0x133
+Mar 12 18:47:32 test kernel: [  367.650822]  scsi_test_unit_ready+0x43/0x95
+Mar 12 18:47:32 test kernel: [  367.650830]  sd_check_events+0x8b/0xf6
+Mar 12 18:47:32 test kernel: [  367.650836]  ? media_not_present+0x3b/0x3b
+Mar 12 18:47:32 test kernel: [  367.650842]  disk_check_events+0x26/0xa3
+Mar 12 18:47:32 test kernel: [  367.650848]  disk_events_workfn+0x10/0x12
+Mar 12 18:47:32 test kernel: [  367.650853]  process_one_work+0x107/0x198
+Mar 12 18:47:32 test kernel: [  367.650862]  worker_thread+0x151/0x1e3
+Mar 12 18:47:32 test kernel: [  367.650868]  kthread+0xd2/0xd7
+Mar 12 18:47:32 test kernel: [  367.650874]  ? rescuer_thread+0x1ec/0x1ec
+Mar 12 18:47:32 test kernel: [  367.650880]  ? kthread_complete_and_exit+0x16/0x16
+Mar 12 18:47:32 test kernel: [  367.650886]  ret_from_fork+0x19/0x28
+Mar 12 18:47:32 test kernel: [  367.650895] ---[ end trace 0000000000000000 ]---
+Mar 12 18:47:32 test kernel: [  367.658169] Modules linked in: epat pata_parport nouveau snd_intel8x0 snd_ac97_codec ac97_bus snd_pcm psmouse snd_timer snd soundcore wmi hwmon serio_raw drm_ttm_helper 8139cp sg intel_agp i2c_dev parport_pc parport fuse
+Mar 12 18:47:32 test kernel: [  367.658232] CPU: 0 PID: 561 Comm: scsi_eh_5 Tainted: G        W         5.17.0-rc2+ #441
+Mar 12 18:47:32 test kernel: [  367.658240] Hardware name:  /848P-ICH5, BIOS 6.00 PG 02/03/2005
+Mar 12 18:47:32 test kernel: [  367.658244] Call Trace:
+Mar 12 18:47:32 test kernel: [  367.658251]  dump_stack_lvl+0x32/0x41
+Mar 12 18:47:32 test kernel: [  367.658260]  ? preempt_count_add+0x4c/0x51
+Mar 12 18:47:32 test kernel: [  367.658266]  dump_stack+0xd/0x10
+Mar 12 18:47:32 test kernel: [  367.658272]  __schedule_bug+0x90/0xa1
+Mar 12 18:47:32 test kernel: [  367.658278]  __schedule+0x3b/0x456
+Mar 12 18:47:32 test kernel: [  367.658286]  ? _raw_spin_lock_irqsave+0x1b/0x21
+Mar 12 18:47:32 test kernel: [  367.658293]  schedule+0x68/0xa3
+Mar 12 18:47:32 test kernel: [  367.658300]  parport_claim_or_block+0x68/0xa5 [parport]
+Mar 12 18:47:32 test kernel: [  367.658313]  ? init_wait_entry+0x21/0x21
+Mar 12 18:47:32 test kernel: [  367.658321]  pi_connect+0x2b/0x3e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.658329]  pata_parport_check_status+0x16/0x4e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.658338]  pata_parport_drain_fifo+0x2b/0x7c [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.658345]  ? ata_sff_prereset+0x7e/0x7e
+Mar 12 18:47:32 test kernel: [  367.658354]  ata_sff_error_handler+0x68/0xb6
+Mar 12 18:47:32 test kernel: [  367.658361]  ? pata_parport_devchk+0x11e/0x11e [pata_parport]
+Mar 12 18:47:32 test kernel: [  367.658369]  ata_scsi_port_error_handler+0x1cf/0x46a
+Mar 12 18:47:32 test kernel: [  367.658376]  ata_scsi_error+0x74/0x85
+Mar 12 18:47:32 test kernel: [  367.658383]  scsi_error_handler+0x11a/0x461
+Mar 12 18:47:32 test kernel: [  367.658391]  ? _raw_spin_lock_irqsave+0x1b/0x21
+Mar 12 18:47:32 test kernel: [  367.658397]  ? _raw_spin_unlock_irqrestore+0x17/0x28
+Mar 12 18:47:32 test kernel: [  367.658402]  ? __kthread_parkme+0x2c/0x70
+Mar 12 18:47:32 test kernel: [  367.658409]  kthread+0xd2/0xd7
+Mar 12 18:47:32 test kernel: [  367.658415]  ? scsi_eh_get_sense+0x176/0x176
+Mar 12 18:47:32 test kernel: [  367.658421]  ? kthread_complete_and_exit+0x16/0x16
+Mar 12 18:47:32 test kernel: [  367.658427]  ret_from_fork+0x19/0x28
+Mar 12 18:47:32 test kernel: [  367.815293] sd 5:0:0:0: [sdc] Media removed, stopped polling
 
-Although Jan has found two bugs in /bin/mount where one of these was fixed
-in util-linux package [2], I found that not holding lo->lo_mutex from
-lo_open() causes occasional I/O error [3] (due to
 
-	if (lo->lo_state != Lo_bound)
-		return BLK_STS_IOERR;
-
-check in loop_queue_rq()) when systemd-udevd opens a loop device and
-reads from it before loop_configure() updates lo->lo_state to Lo_bound.
-
-That is, not only we need to wait for __loop_clr_fd() upon close() event
-(in order to avoid unexpected umount() failure) but also we need to wait
-for lo->lo_mutex upon open() event (in order to avoid unexpected I/O
-errors). Therefore, schedule a task work from both lo_open() and
-lo_release().
-
-Link: https://syzkaller.appspot.com/bug?extid=6479585dfd4dedd3f7e1 [1]
-Link: https://github.com/util-linux/util-linux/commit/3e1fc3bbee99384c [2]
-Link: https://lkml.kernel.org/r/a72c59c6-298b-e4ba-b1f5-2275afab49a1@I-love.SAKURA.ne.jp [3]
-Reported-by: syzbot <syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com>
-Cc: Jan Kara <jack@suse.cz>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- drivers/block/loop.c | 244 +++++++++++++++++++++++++++++++------------
- drivers/block/loop.h |   1 +
- 2 files changed, 180 insertions(+), 65 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 19fe19eaa50e..2f60356ad428 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -80,6 +80,7 @@
- #include <linux/blk-cgroup.h>
- #include <linux/sched/mm.h>
- #include <linux/statfs.h>
-+#include <linux/anon_inodes.h>
- 
- #include "loop.h"
- 
-@@ -90,6 +91,8 @@
- static DEFINE_IDR(loop_index_idr);
- static DEFINE_MUTEX(loop_ctl_mutex);
- static DEFINE_MUTEX(loop_validate_mutex);
-+static DEFINE_SPINLOCK(loop_delete_spinlock);
-+static DECLARE_WAIT_QUEUE_HEAD(loop_rundown_wait);
- 
- /**
-  * loop_global_lock_killable() - take locks for safe loop_validate_file() test
-@@ -1088,7 +1091,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	return error;
- }
- 
--static void __loop_clr_fd(struct loop_device *lo, bool release)
-+static void __loop_clr_fd(struct loop_device *lo)
- {
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
-@@ -1150,8 +1153,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	/* let user-space know about this change */
- 	kobject_uevent(&disk_to_dev(lo->lo_disk)->kobj, KOBJ_CHANGE);
- 	mapping_set_gfp_mask(filp->f_mapping, gfp);
--	/* This is safe: open() is still holding a reference. */
--	module_put(THIS_MODULE);
- 	blk_mq_unfreeze_queue(lo->lo_queue);
- 
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
-@@ -1159,37 +1160,18 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (lo->lo_flags & LO_FLAGS_PARTSCAN) {
- 		int err;
- 
--		/*
--		 * open_mutex has been held already in release path, so don't
--		 * acquire it if this function is called in such case.
--		 *
--		 * If the reread partition isn't from release path, lo_refcnt
--		 * must be at least one and it can only become zero when the
--		 * current holder is released.
--		 */
--		if (!release)
--			mutex_lock(&lo->lo_disk->open_mutex);
-+		mutex_lock(&lo->lo_disk->open_mutex);
- 		err = bdev_disk_changed(lo->lo_disk, false);
--		if (!release)
--			mutex_unlock(&lo->lo_disk->open_mutex);
-+		mutex_unlock(&lo->lo_disk->open_mutex);
- 		if (err)
- 			pr_warn("%s: partition scan of loop%d failed (rc=%d)\n",
- 				__func__, lo->lo_number, err);
- 		/* Device is gone, no point in returning error */
- 	}
- 
--	/*
--	 * lo->lo_state is set to Lo_unbound here after above partscan has
--	 * finished. There cannot be anybody else entering __loop_clr_fd() as
--	 * Lo_rundown state protects us from all the other places trying to
--	 * change the 'lo' device.
--	 */
- 	lo->lo_flags = 0;
- 	if (!part_shift)
- 		lo->lo_disk->flags |= GENHD_FL_NO_PART;
--	mutex_lock(&lo->lo_mutex);
--	lo->lo_state = Lo_unbound;
--	mutex_unlock(&lo->lo_mutex);
- 
- 	/*
- 	 * Need not hold lo_mutex to fput backing file. Calling fput holding
-@@ -1197,6 +1179,11 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	 * fput can take open_mutex which is usually taken before lo_mutex.
- 	 */
- 	fput(filp);
-+	mutex_lock(&lo->lo_mutex);
-+	lo->lo_state = Lo_unbound;
-+	mutex_unlock(&lo->lo_mutex);
-+	wake_up_all(&loop_rundown_wait);
-+	module_put(THIS_MODULE);
- }
- 
- static int loop_clr_fd(struct loop_device *lo)
-@@ -1228,7 +1215,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	lo->lo_state = Lo_rundown;
- 	mutex_unlock(&lo->lo_mutex);
- 
--	__loop_clr_fd(lo, false);
-+	__loop_clr_fd(lo);
- 	return 0;
- }
- 
-@@ -1720,52 +1707,176 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- }
- #endif
- 
--static int lo_open(struct block_device *bdev, fmode_t mode)
-+static int lo_no_open(struct inode *inode, struct file *file)
- {
--	struct loop_device *lo = bdev->bd_disk->private_data;
--	int err;
-+	return -ENXIO;
-+}
- 
--	err = mutex_lock_killable(&lo->lo_mutex);
--	if (err)
--		return err;
--	if (lo->lo_state == Lo_deleting)
--		err = -ENXIO;
--	else
--		atomic_inc(&lo->lo_refcnt);
--	mutex_unlock(&lo->lo_mutex);
--	return err;
-+static int lo_post_open(struct inode *inode, struct file *file)
-+{
-+	struct loop_device *lo = file->private_data;
-+
-+	/* Nothing to do if lo_open() failed. */
-+	if (!lo)
-+		return 0;
-+	/* Wait for loop_configure()/loop_post_release() to complete. */
-+	if (mutex_lock_killable(&lo->lo_mutex) == 0)
-+		mutex_unlock(&lo->lo_mutex);
-+	/*
-+	 * Also wait for __loop_clr_fd() to complete because
-+	 * loop_post_release() releases lo->lo_mutex before __loop_clr_fd()
-+	 * is called.
-+	 */
-+	wait_event_killable(loop_rundown_wait, data_race(lo->lo_state) != Lo_rundown);
-+	atomic_dec(&lo->async_pending);
-+	return 0;
- }
- 
--static void lo_release(struct gendisk *disk, fmode_t mode)
-+static const struct file_operations loop_open_fops = {
-+	.open = lo_no_open,
-+	.release = lo_post_open,
-+};
-+
-+static int lo_post_release(struct inode *inode, struct file *file)
- {
--	struct loop_device *lo = disk->private_data;
-+	struct gendisk *disk = file->private_data;
-+	struct loop_device *lo;
- 
-+	/* Nothing to do if lo_open() failed. */
-+	if (!disk)
-+		return 0;
-+	lo = disk->private_data;
- 	mutex_lock(&lo->lo_mutex);
--	if (atomic_dec_return(&lo->lo_refcnt))
-+	/* Check whether this loop device can be cleared. */
-+	if (atomic_dec_return(&lo->lo_refcnt) || lo->lo_state != Lo_bound)
- 		goto out_unlock;
--
-+	/*
-+	 * Clear this loop device since nobody is using. Note that since
-+	 * lo_open() increments lo->lo_refcnt without holding lo->lo_mutex,
-+	 * I might become no longer the last user, but there is a fact that
-+	 * there was no user.
-+	 *
-+	 * In autoclear mode, destroy WQ and remove configuration.
-+	 * Otherwise flush possible ongoing bios in WQ and keep configuration.
-+	 */
- 	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
--		if (lo->lo_state != Lo_bound)
--			goto out_unlock;
- 		lo->lo_state = Lo_rundown;
- 		mutex_unlock(&lo->lo_mutex);
--		/*
--		 * In autoclear mode, stop the loop thread
--		 * and remove configuration after last close.
--		 */
--		__loop_clr_fd(lo, true);
--		return;
--	} else if (lo->lo_state == Lo_bound) {
--		/*
--		 * Otherwise keep thread (if running) and config,
--		 * but flush possible ongoing bios in thread.
--		 */
-+		__loop_clr_fd(lo);
-+		goto done;
-+	} else {
- 		blk_mq_freeze_queue(lo->lo_queue);
- 		blk_mq_unfreeze_queue(lo->lo_queue);
- 	}
- 
- out_unlock:
- 	mutex_unlock(&lo->lo_mutex);
-+done:
-+	/* Drop references which would have been dropped after lo_release(). */
-+	kobject_put(&disk_to_dev(disk)->kobj);
-+	module_put(disk->fops->owner);
-+	atomic_dec(&lo->async_pending);
-+	return 0;
-+}
-+
-+static const struct file_operations loop_close_fops = {
-+	.open = lo_no_open,
-+	.release = lo_post_release,
-+};
-+
-+struct release_event {
-+	struct list_head head;
-+	struct file *file;
-+};
-+
-+static LIST_HEAD(release_event_spool);
-+static DEFINE_SPINLOCK(release_event_spinlock);
-+
-+static int lo_open(struct block_device *bdev, fmode_t mode)
-+{
-+	struct loop_device *lo = bdev->bd_disk->private_data;
-+	int err = 0;
-+	/*
-+	 * Reserve an anon_inode for calling lo_post_open() before returning to
-+	 * user mode. Since fput() by kernel thread defers actual cleanup to WQ
-+	 * context, there is no point with calling lo_post_open() from kernel
-+	 * threads.
-+	 */
-+	struct file *open = (current->flags & PF_KTHREAD) ? NULL :
-+		anon_inode_getfile("loop.open", &loop_open_fops, NULL, O_CLOEXEC);
-+	/*
-+	 * Reserve an anon_inode for calling lo_post_release() from
-+	 * lo_release() before returning to user mode.
-+	 */
-+	struct file *close = anon_inode_getfile("loop.close", &loop_close_fops, NULL, O_CLOEXEC);
-+	struct release_event *ev = kmalloc(sizeof(*ev), GFP_KERNEL | __GFP_NOWARN);
-+
-+	if (!ev || IS_ERR(open) || IS_ERR(close)) {
-+		err = -ENOMEM;
-+		goto cleanup;
-+	}
-+
-+	spin_lock(&loop_delete_spinlock);
-+	/* lo->lo_state may be changed to any Lo_* but Lo_deleting. */
-+	if (data_race(lo->lo_state) == Lo_deleting)
-+		err = -ENXIO;
-+	else
-+		atomic_inc(&lo->lo_refcnt);
-+	spin_unlock(&loop_delete_spinlock);
-+	if (err)
-+		goto cleanup;
-+
-+	/* close->private_data is set when lo_release() is called. */
-+	ev->file = close;
-+	spin_lock(&release_event_spinlock);
-+	list_add(&ev->head, &release_event_spool);
-+	spin_unlock(&release_event_spinlock);
-+
-+	/*
-+	 * Try to avoid accessing Lo_rundown loop device.
-+	 *
-+	 * Since the task_work list is LIFO, lo_post_release() will run before
-+	 * lo_post_open() runs if an error occur between returned from
-+	 * lo_open() and returning to user mode. This means that lo->refcnt may
-+	 * be already 0 when lo_post_open() runs. Therefore, use
-+	 * lo->async_pending in order to prevent loop_remove() from releasing
-+	 * this loop device.
-+	 */
-+	if (open) {
-+		open->private_data = lo;
-+		atomic_inc(&lo->async_pending);
-+		fput(open);
-+	}
-+	return 0;
-+ cleanup:
-+	if (!IS_ERR_OR_NULL(open))
-+		fput(open);
-+	if (!IS_ERR(close))
-+		fput(close);
-+	kfree(ev);
-+	return err;
-+}
-+
-+static void lo_release(struct gendisk *disk, fmode_t mode)
-+{
-+	struct loop_device *lo = disk->private_data;
-+	struct release_event *ev;
-+
-+	atomic_inc(&lo->async_pending);
-+	/*
-+	 * Fetch from spool. Since a successful lo_open() call is coupled with
-+	 * a lo_release() call, we are guaranteed that spool is not empty.
-+	 */
-+	spin_lock(&release_event_spinlock);
-+	ev = list_first_entry(&release_event_spool, typeof(*ev), head);
-+	list_del(&ev->head);
-+	spin_unlock(&release_event_spinlock);
-+	/* Hold references which will be dropped after lo_release(). */
-+	__module_get(disk->fops->owner);
-+	kobject_get(&disk_to_dev(disk)->kobj);
-+	ev->file->private_data = disk;
-+	fput(ev->file);
-+	kfree(ev);
- }
- 
- static const struct block_device_operations lo_fops = {
-@@ -2029,6 +2140,7 @@ static int loop_add(int i)
- 	if (!part_shift)
- 		disk->flags |= GENHD_FL_NO_PART;
- 	atomic_set(&lo->lo_refcnt, 0);
-+	atomic_set(&lo->async_pending, 0);
- 	mutex_init(&lo->lo_mutex);
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
-@@ -2070,6 +2182,9 @@ static int loop_add(int i)
- 
- static void loop_remove(struct loop_device *lo)
- {
-+	/* Wait for task work and/or WQ to complete. */
-+	while (atomic_read(&lo->async_pending))
-+		schedule_timeout_uninterruptible(1);
- 	/* Make this loop device unreachable from pathname. */
- 	del_gendisk(lo->lo_disk);
- 	blk_cleanup_disk(lo->lo_disk);
-@@ -2118,19 +2233,18 @@ static int loop_control_remove(int idx)
- 	ret = mutex_lock_killable(&lo->lo_mutex);
- 	if (ret)
- 		goto mark_visible;
--	if (lo->lo_state != Lo_unbound ||
--	    atomic_read(&lo->lo_refcnt) > 0) {
--		mutex_unlock(&lo->lo_mutex);
-+	spin_lock(&loop_delete_spinlock);
-+	/* Mark this loop device no longer open()-able if nobody is using. */
-+	if (lo->lo_state != Lo_unbound || atomic_read(&lo->lo_refcnt) > 0)
- 		ret = -EBUSY;
--		goto mark_visible;
--	}
--	/* Mark this loop device no longer open()-able. */
--	lo->lo_state = Lo_deleting;
-+	else
-+		lo->lo_state = Lo_deleting;
-+	spin_unlock(&loop_delete_spinlock);
- 	mutex_unlock(&lo->lo_mutex);
--
--	loop_remove(lo);
--	return 0;
--
-+	if (!ret) {
-+		loop_remove(lo);
-+		return 0;
-+	}
- mark_visible:
- 	/* Show this loop device again. */
- 	mutex_lock(&loop_ctl_mutex);
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 082d4b6bfc6a..20fc5eebe455 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -56,6 +56,7 @@ struct loop_device {
- 	struct gendisk		*lo_disk;
- 	struct mutex		lo_mutex;
- 	bool			idr_visible;
-+	atomic_t		async_pending;
- };
- 
- struct loop_cmd {
 -- 
-2.32.0
-
+Ondrej Zary
