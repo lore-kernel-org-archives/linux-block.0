@@ -2,203 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C48EC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 16:33:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F28BC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 17:04:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbiCNQe3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 12:34:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37216 "EHLO
+        id S242233AbiCNRF3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 13:05:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232757AbiCNQe2 (ORCPT
+        with ESMTP id S236660AbiCNRF1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 12:34:28 -0400
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2076.outbound.protection.outlook.com [40.107.236.76])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 383B462EB
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 09:33:17 -0700 (PDT)
+        Mon, 14 Mar 2022 13:05:27 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF7D1D314
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 10:04:16 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22EFScww011211;
+        Mon, 14 Mar 2022 17:04:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=corp-2021-07-09;
+ bh=PWCT3UHiiNGvIPu985RvECJxcUv4eTU795k52rkB1qM=;
+ b=YhpoDdnaLIC47DZf7UAQPym+nyX7XpuTXsfaTwkdRf6bukUxCb9kXI9i4Zb8JVunSXpc
+ MZoQkSJ6RNqtiRy/jKlmsBzwMPQdmzuWAQa3yx7NK1OEOGXrTzk6p7Av1MIZFUXWE/x3
+ 1814psV8mipupX6tXqzuiBId3Dh+2LVT36f8tEyUDzxjKfyGM5uA5fFpyvjpbAclLqZb
+ sp1ZmZMIUqsfrotf2+FgdPOivBP3cYOfB7RfKeVpAhp+yPSnD2T+8aQPl8aoMdphry3i
+ CZEKrB6DZi5QioQX2UjNKDnvkWRbrp4hdvhs5eWQbRe+UkeyihEWQ/bFs5ES4NSBqyPB Ig== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3et60rgv22-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Mar 2022 17:04:11 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 22EGp0Zt018066;
+        Mon, 14 Mar 2022 17:04:10 GMT
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2170.outbound.protection.outlook.com [104.47.57.170])
+        by userp3030.oracle.com with ESMTP id 3et65nwkqc-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Mon, 14 Mar 2022 17:04:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B01HfEbCCDPRPhwD2mIlaSW5yeNQ5qspUj9n89KSuyWHVQHUJ37A4gug2BPJ+d4PlrL5Qzjco/anVrowm5tiDY/EWLUwg6swrikc3QU4nOrn4pbkEoIHzPUPULYpvpe97xxh8K3mJ5RuXaAk55fRWRfgX1/PWFBYnWKS405ckhe6FV6N9cfn1TLCNMK9KBrAzlsaX2AKCgDgAcg5QWQcM3rptb4ITDtgBkVP7Rbxqs/eLa5bwulg0FFBsYjPkZALUMNzYBVW2x5apiUboU919Me3VgXCA6RMzSV5ohxTBG52Y1+E2+uP+1jEcSwlULj/1PCE/BHav3Sqbcm1IFZ/kA==
+ b=ju4yAefHIDq8YTI0dauSs7z9NwxLyrDkBhcjKBOZzUbMOy5zgfbC6ArOVMDY0Q0O5RCg4fRe8ZB9schBbAmj5lH+rZQ9GXLEpqbCnKw8rrABEwlMaST8Gx10j0hzwXYefVTrGM77JCHkR8n4t+tqi++nz9vbS8nMZNyk/qoqIP2jfLXv0LjIvFPDJpn+NtWtTMP9av5ADZpu3W2qOHgfB8RUxdOMj0t2u3LxMvrJq3G0apQ3WnuqYSJukXLSGXBMONp0HpEPw4etz2EVWEQ+il9m9XwEHupM/XD18xcdcmGXLvuQQ6ys0qyeQa6FFRA+7x+SR2a805o5eM76IpKGMw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C0YEizlfw8xj3cO0Zqj75NTL/gg9mp0Ztkwm4mxcbjc=;
- b=SlhrQgrAqE9Wdqjf/2dObb389eQaUuKEhmJsBm3Wr8b5IFMj9dLZp/kvYHjSwZlYnUuxXzjkfcwNKT6A60Yf84aXiNRYS/QQCLjcO+GfYN0nxv7YyCG+qMfRFfR7aajDovZKSPYEqS+cU/s3vG7leeYF4WUp4jyxQ1ma5ahuztgVbN1auVDj9WIVp9SoJMcppNp5nH057KNHfsnmyjIL4pQvdDq6JuSOXz1rbgdKymaxmbvqUGWOfS5Sy0yQ+gOYrUdI0MN9OclVYcG5jboowMe6I9ScEiZ1qQACQdagKkKCFKzU67BZ/BI9IQga9ap79s8ZFrpT8n0Ww/KAFGcYsw==
+ bh=PWCT3UHiiNGvIPu985RvECJxcUv4eTU795k52rkB1qM=;
+ b=kBN5zcfCgcmd2DYYf299oPgMfoCKTz0GIsb8UdNpiv3GOaxf77XVst868DLMErV6VxSszAVHrmcAzCQwdJ79jnp7WY1bD0vKd/Zgr5J2ez94fDU8/CD/i1TpYHt/LKCfo0Eu8pkxmPAtc2eGDH/YXfh+6DiCG3wMEOkLK7/OY+F7zL/FdQchxpqhFwY9S4YeL45N+dJNWdGBs7mRla7634aQXtw3MtjbrbAiElb9Lw2BwFaamMZ7B/BD6Kj+hAmrNf+nWI7TuRYxuvd8RX6cshRE3oBd8Akep83IHtxk9S4CjRUAbfBnjs8rOqip9hTWFIye5nZDyOllWO98pZKIPw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C0YEizlfw8xj3cO0Zqj75NTL/gg9mp0Ztkwm4mxcbjc=;
- b=J4gi8JLipAGlUZtxZhqTdFiuIXZ0YIQlvQVAwvXzNZq5XCVwXdJju909E/Ahrq1LBgxLalzz9sj/B88myfmb1YZV9qjJ8qIP1ZrShwTm9lxDDSa+2P3I6fkT/meJTMyO8iKej0tl2Rl5dbMvF9S+zgEd0GwATq5zSq+N2nQK4gZVP4NOsG/Y0hTCOO94nJAJnGJFkEg3TaI5KTkPTp3TrYvM8JB9Oi3gDFs/43veKCREt0cJRHMInCRrYL0AnKmhn58maOazUwC5BOBYkvh8lM+Zx+vNFSX8/+DWMjC7YDbhyxbcOdf+YD3nPAyF35KZUGLqlbhIGSIJKu6vlsreOg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com (2603:10b6:5:38b::19)
- by MWHPR1201MB2559.namprd12.prod.outlook.com (2603:10b6:300:e0::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.22; Mon, 14 Mar
- 2022 16:33:13 +0000
-Received: from DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::f037:e2a1:f108:125a]) by DM4PR12MB5040.namprd12.prod.outlook.com
- ([fe80::f037:e2a1:f108:125a%8]) with mapi id 15.20.5061.028; Mon, 14 Mar 2022
- 16:33:13 +0000
-Message-ID: <332c35ec-734b-d2bd-dd0f-c577b1c6174b@nvidia.com>
-Date:   Mon, 14 Mar 2022 18:33:06 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [PATCH] virtio-blk: support polling I/O
+ bh=PWCT3UHiiNGvIPu985RvECJxcUv4eTU795k52rkB1qM=;
+ b=NcCaDlOl696ZbsvFqQJ5DZyGZfMqgCD482/TUxI3ImlegxdxTPKlEee4cjIYA1xoS3ly1TnuqVPA9w3xzA8bXVyGsOgHo1PUAXuVXb2I6EsdZA6SMBc3LTWmgMDq7KJXpo7N2Ejk2M4CVH6UrBFAdRJ/sogctrQQcAwDNXOrOSA=
+Received: from DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7) by
+ CO1PR10MB4499.namprd10.prod.outlook.com (2603:10b6:303:6d::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5061.21; Mon, 14 Mar 2022 17:04:08 +0000
+Received: from DM5PR10MB1466.namprd10.prod.outlook.com
+ ([fe80::3dd8:6b8:e2e6:c3a2]) by DM5PR10MB1466.namprd10.prod.outlook.com
+ ([fe80::3dd8:6b8:e2e6:c3a2%12]) with mapi id 15.20.5061.028; Mon, 14 Mar 2022
+ 17:04:07 +0000
+Message-ID: <49964bde-da7b-24be-19ae-9d14c72ce631@oracle.com>
+Date:   Mon, 14 Mar 2022 12:04:06 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
 Content-Language: en-US
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     Suwan Kim <suwan.kim027@gmail.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, jasowang@redhat.com,
-        pbonzini@redhat.com, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-References: <20220311152832.17703-1-suwan.kim027@gmail.com>
- <20220311103549-mutt-send-email-mst@kernel.org>
- <YitzuxYHywdCRKVO@localhost.localdomain>
- <c91ad1e9-8c5b-ff1e-7e7f-8590ea6c67e8@nvidia.com>
- <Yi8OSE2hYoS8rSEo@localhost.localdomain>
- <e441429b-90ef-a2e4-1365-3f55c7ff21d0@nvidia.com>
- <20220314071222-mutt-send-email-mst@kernel.org>
- <d9121e3c-abe5-fe4d-8088-8339c418c7a8@nvidia.com>
- <20220314111306-mutt-send-email-mst@kernel.org>
-From:   Max Gurtovoy <mgurtovoy@nvidia.com>
-In-Reply-To: <20220314111306-mutt-send-email-mst@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: AM6PR04CA0029.eurprd04.prod.outlook.com
- (2603:10a6:20b:92::42) To DM4PR12MB5040.namprd12.prod.outlook.com
- (2603:10b6:5:38b::19)
+To:     Hannes Reinecke <hare@suse.de>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        lsf-pc@lists.linux-foundation.org
+Cc:     linux-block@vger.kernel.org
+References: <87tucsf0sr.fsf@collabora.com>
+ <526a8360-d7d3-1211-087b-c86d5a68380b@oracle.com>
+ <57af4fe0-9042-729a-18e9-839a5f0a84ac@suse.de>
+From:   Mike Christie <michael.christie@oracle.com>
+In-Reply-To: <57af4fe0-9042-729a-18e9-839a5f0a84ac@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: DM5PR06CA0084.namprd06.prod.outlook.com (2603:10b6:3:4::22)
+ To DM5PR10MB1466.namprd10.prod.outlook.com (2603:10b6:3:b::7)
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ea95ec18-ea4f-4426-e52e-08da05d85547
-X-MS-TrafficTypeDiagnostic: MWHPR1201MB2559:EE_
-X-Microsoft-Antispam-PRVS: <MWHPR1201MB255992F59C0628525B9C38AADE0F9@MWHPR1201MB2559.namprd12.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: 81043d52-24f4-4af4-d14f-08da05dca6c9
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4499:EE_
+X-Microsoft-Antispam-PRVS: <CO1PR10MB4499CB770A29FCC7DBA98959F10F9@CO1PR10MB4499.namprd10.prod.outlook.com>
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: njP4oOZGH1vVZgofRRBYaaHuIxdbaQLa+glHj75HPkveDJpCl+MbsdKHDRofFQHEP3/P+PfxC0d0a7XYjXA6qcpcaq0aB3S6g/d1C3waxMl1QcH2ktPAvRIdZ1NxMH7hBXTXxbd5KDA9kFCGMHcdhUEzmUIvJjVJoqnUgycZ+BcoiQqBYxO9EjmXSiLhn+ilD5DoosfDd01qntsdqqsINHxJfkdN6rj1US17nZ/j9U4i5rJTYbvoyVhTIePwnlT4knMLw/tFAEL7Um/JCRkAz4tEVv/37gAWkf6I6Bof4jCfnE+wTWeQugDt3ROdXE71n1ZceYa2zSAHE64Zpz9QbEtDRNXX+TkOkCXKMC7BpBc6tU3T0wOhcCif3IfYDPByTeNvRGkNPXxsEAqvl+5UuDrv/LMj3EBxJIgdym1ETgpu/tPb0qToxUUJlgWqYFY7Qsb3ddnFoQxgyCKhBrEWr/3d/SubbJ21abXgBBhap/JO7O+k16jaGWFJY/ZPA+jI5Lji/hVEeqFHm2KUg5vce8nJYsJrcmEms/JJ2iA+NjbRaWDfRAsgIQQ9jlICI49x1aNQA00+sL2Ob1I8ow0xODECwwFIx4auqvI7yBnk1EQBLGiyENDWcbyVX4j/68dzFIDVwpqunkJPdV1DcMZh447ZJHqODN85muSgLRlfZCw7UhBzW3y4h6FoR1ZACZysXw2dHolvq4tGS8knTj3AntjyBiJ8f1Pc4izuwF12UsfN8HvxLomoVw6j5K0KU3Bl
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5040.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38100700002)(2616005)(316002)(508600001)(4326008)(8676002)(66946007)(66556008)(66476007)(6486002)(26005)(31686004)(53546011)(6506007)(83380400001)(36756003)(186003)(2906002)(6512007)(5660300002)(54906003)(6916009)(31696002)(8936002)(86362001)(6666004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-Microsoft-Antispam-Message-Info: pzhBVmuY/RU46EkorOS6MNlHTKOOgRXO7dXTTlmT7ne24iD8esthkYn47wGmFWB+R4wpJJ0pXIEvADipU806Mrkl/1Sn8Sts8qkmt1uZ7b4tSfrhzhe8V+zNHwpfZHjw4Oot922zf9hZK8Up8CK20I6ye07pNhtBeiXqelLed8qYcpMnyb5DVMDk0gpDZgVWlE5uxiImY/Eb/2ALRbVOJAdrFhtTwGYtWY50g/Va2HxqnGy99sEwWA/z9rub0x5yFJFgYFv5JACWqVzlysTt5GPdKUxuQzyceV8X4JKlvF8H1dS/0s09FtNLLMFRLJOMnPvptUkHvc16ZJeFsMZ4yLBVkUUdOfUhIR+FpdEweh6K9slMviuUTf2sp8wvjS0B5LYhv5fr6WGz8qHiSzuCxgwCiEkQtPdSpby8ykA2p/UFKPwmS/unxrPEa8uHzwMi4f1ukZeZ2Z8ASOWBLU/q4JjB2su/GWlh2Fahh5GbgOr+uhReIkLZuCbzGuZPcTFl4vV3zWFjz5lNzQE5lrQWIYd6Wgn6dCouKlnIwRhDrgRbZPn5TmKNNjcYmVQpQ+U7IASWHP48Qu/xLezWlS+mOHognBETl4SZS7+Y3dcFTkuy1DutBY8RJFgpG8AVMMqg1wZABExapplEjVPEAUrRb0aHWakw+519O0OelkXeSGYH3hdag5Gm7v9ok5Y3cQkAwmzKLsjCklNbqHAW7gQ1SKKeAK3vNuiWkpHbKVu/m8K7yJ7SnwgxQwgsUpW2SrGw6G56CBXve1o49IfN10QBuinAqIM2M4N41bXNczfcwl04D6H7soW22qEoCstb7tCP
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR10MB1466.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(2616005)(31696002)(5660300002)(6512007)(31686004)(2906002)(83380400001)(36756003)(8936002)(66476007)(66556008)(4326008)(26005)(186003)(8676002)(38100700002)(66946007)(53546011)(6506007)(86362001)(316002)(110136005)(6486002)(966005)(508600001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UDN0SFBXM05ndzlBQ054OVhIL0ZpS2VrRnVua2g1Z3hmanRiYlRaeHYwMHIx?=
- =?utf-8?B?S2lSUzhaNm9uQ1VQT1BYS1hrL3lQWmZHUW5xUnBzeVF1OU93ODQ3cENsMXBN?=
- =?utf-8?B?Z3pLV09jdXJTQTNZeExVOGNHRUlJZTdJUGpXejdya0dEejBRQTFnRkFDWElu?=
- =?utf-8?B?M0VqWW1penVpektoTkRFR285Wkh6eVVuSWE5eDJnT0tDSDFGczVscktoa0g3?=
- =?utf-8?B?WXQxVlNuUWkwWmdSR0thMi9GVFgyUEloVmorajU4eTcxVURzV1ZSTWk3ODVQ?=
- =?utf-8?B?dndtNUF3RDhtZmZmQXZiR1JRNTNVb0J5bERWTEVFMElpR2l6NTNXYWNRR1dZ?=
- =?utf-8?B?VzZYVWttMjhLRGJLMXNpdE42QVJLcVJDYnVCTVA4ekMvZndDb0RwNk9NOXp2?=
- =?utf-8?B?Z0JaT2ZYamdJcnR4UjdKL3F6bFVJaWFtOWkrT1MrV0ZzZ21nSVZpdjV6cWZw?=
- =?utf-8?B?My8zQnEzSWNlejJ2TFdVQytnY1JucXlwR1M0ZThaK1NPei8zOVpLSWhsVDM4?=
- =?utf-8?B?Y3o2a0p0WGx6K29kS2Zua3l0dzVPSzAva2YzTWJTaVh4ZVZRMWZack5jczNW?=
- =?utf-8?B?N2lqNVVFanlkcWlXQjU5dE1ETFpVRXVVY1FKTkpiTmttc0tMekdYRy93UG0z?=
- =?utf-8?B?NTR1em44SGt6REI0MHlxeTdFZ2JQWUE4bVA3RGNWYy9qOG5xZDNXZXlMbUc5?=
- =?utf-8?B?a21ZZVhoeDBBSkduRWRGZytOakQvdW5xODY0MXFqR3UvR1JCRWhjcis4RDZr?=
- =?utf-8?B?VzhOaHlIZGhHOTBia1ZYWSszblh5Mm1GSnEwOUhSUWFOV1BqbUVMbjdEUmpi?=
- =?utf-8?B?cTB2cTdzdkdySHNGbmJUMnNnek9CV2VHTjEyd1RTUmRVRnNkMnJXaUlZOEhv?=
- =?utf-8?B?UEVIc25EaHYyUFlvT1F6a3QxZXFSMGc2cjVJT3ZNU2NDTGJOK2xobWxybW5F?=
- =?utf-8?B?SWlLRzNINFUxOEczVFNBdHhFay8rTjhzd2JjdjN5aGNlVDFFTlFNSVNTdkVz?=
- =?utf-8?B?K3Zna3NJdlZPUS9CdU9pcGN2eGZveDR5L0FiNkNkZXZXMWhzOTA5d21ocTFo?=
- =?utf-8?B?L3c4RWhHUjgraUNsclZxQkk2dUFDTmZoejQ3d1F6eUU0Zm5KS1hwTHJ6SGJI?=
- =?utf-8?B?S0ZYVjlkUjVZSElsdmFVbGdjbVdrTVJXNC9NdTZOR2pHZ2hobXZLN1l6QWhD?=
- =?utf-8?B?NWt0bUM4QkRtY0FFemlWQ0pyellmNTZJbVZpOTdpTURyY2hmYjRob1JHSjky?=
- =?utf-8?B?VUU2aEtvUTdWRlBCd0h6K0lmK0czL1hvdGZsWG5TMXkwMUZVN3hnTjIvZ3dV?=
- =?utf-8?B?VFRTSjhBZWxmTnp2ZkRPeVZMZU9MdkxubUtCRGp2anlsUWo2Q05OQTZVSjhl?=
- =?utf-8?B?TURWR2Zna1ZqZ000NG92ZGgzcXlxQnhlVUU0NGlKczh5RlFza1NGNzhFb0tS?=
- =?utf-8?B?ZzJ4QU1mU2JpNi93U0pFRHJsTHd2djVNRDZOWGp1NWR0VnIyRlVvSjdBUmR5?=
- =?utf-8?B?cUlDOGpERDJ3ZmVsbDdCWGZTQXhDVVJXdDBvMGFhbmo2QmRZYVc5NTZzOEZz?=
- =?utf-8?B?YTZhUm5FZERMa0hDaks1aC9PcUZYTGZtYmVCSmh2NlRLQlNzZWRudkovcE10?=
- =?utf-8?B?YjBQOEZibFdVOEVwWFNycXhNUEd3VHdxTSs1Nmt2V1VSTUZoUFV5N1RlcWh0?=
- =?utf-8?B?NFBDUzVJTGJjMWkrUGNNdnlObnhySVVzUTNjQ2NYZ1RaVkF3UHprSGF0dVZl?=
- =?utf-8?B?cTNDTmJqa3BxbnZFLzd6a2V1VisrTTdTakZvejBua0l3VDZob2ZBVmhKU2FI?=
- =?utf-8?B?dDhoRHV3ZnhMb1hnbWNCZHpiL2xMQm85RnJBNjNOYU1mSDk3MnBEWnlwTGl5?=
- =?utf-8?B?S1ZuTldIenByUEdYUjdWSFIxSy9KRHAvdkVpTGFiR3VpZTNoaEE0N3lIZ3pY?=
- =?utf-8?B?cDRvNHJUUG5GWEZiTmE0SmxNcXR5L0IyZmpQVU9NR2tKcnRNUXBmNGliZkFn?=
- =?utf-8?B?amd0d29qTXNBPT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea95ec18-ea4f-4426-e52e-08da05d85547
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5040.namprd12.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dDVzNjlDZE9XNk1iL0F4eE0xaE4wendOYyszenQrSHNLb3ZIaXBpNjRpQ2xs?=
+ =?utf-8?B?ZVkzNnFjSUhFdlpUTklBVW02L3Q4Wm41NngwY0NiZlZwZE9WRWF0dk5SNkRW?=
+ =?utf-8?B?bGhsLzV2R2NlZjJ4QzlYQ3NpZVowRGMzUWRtNnlNc3J0MnNzKzhlVXpxekpP?=
+ =?utf-8?B?KzIzNWhIdUgvRFNXTkpiUUMwVnFMK0I1ODFDL1hodDJvSVpXMldvSkFHR3pY?=
+ =?utf-8?B?UWpRUGI2d00zV3RKaFNudVNtODlQT0w4ZHRMMGdSQXdBS0YrUGxsazUyZ3Ns?=
+ =?utf-8?B?eW12WDVtZ2h5RWlPUlNCOEorbFRZSUJpa3lVTTUwWUJidGNVeWFCRm9vaXc0?=
+ =?utf-8?B?dUthYnNoaEhLYVJHKzYwNlVFeHdOUEpmRjlpUDlVelhmLzlkejRsNTVmREtM?=
+ =?utf-8?B?eUpkNHNmMzU0eVVFYjNOY0MrNDBBL25kOVFqaU9wRENYNTUrQXlRcy84ZzNV?=
+ =?utf-8?B?Ulo5TmxHUm1TVFJsN3ZhT2JOQ29FNTZ3OEcydnM3ZlpzMXBKSlZXeHpBV1Rh?=
+ =?utf-8?B?YUsybnBIcEdEK2RXVlYxVlZuR0wyUmprU29KaFZ4a0pyb3FGbGkrRHhyMXJI?=
+ =?utf-8?B?VnVxQTdOY0VGU1RkY3ZwMG05eGM3VitabGpienFpZ2NKVnNVb3RDb01tdGxn?=
+ =?utf-8?B?cTRQZFpreXIvRy9va0xxVTc3aG5zQU01d1A4YXhQdTBRMDQ5VCt1aHprZHNL?=
+ =?utf-8?B?WnZIZUszZkdFWWxjbU5MRUUxbEQ3ZTIzWjJ4TFZjL2FSY2FzZTdoNTdqVnJw?=
+ =?utf-8?B?UDY3VEZxc3J4TFAwM0F0Y3ZYSW04MFY3TFVxZEFLblk5dFhOZ1FWZnVTUVN5?=
+ =?utf-8?B?YVl3NlVkNytUK2R3a2pnK3ZQQ3JhRmc0NGNzSDF6YkFXVW8rWXA4V0N5RER3?=
+ =?utf-8?B?eU5XSkNpM1d6TVJmNjNsM045NzJudDc1TlNFbHlFOEh1VHVHNTMzaDVSNkFN?=
+ =?utf-8?B?UnhOWkN1ZmowakFzVkZJM2hZTlVlSHk4VEdKVGtqTFhiOWh2LzYvWHphYjRa?=
+ =?utf-8?B?VWFuN2hmaktGV3I0THA2Ykp6OVRhWnBUQ2FWanpqN0RNbGhoTzBwOHl0WUZC?=
+ =?utf-8?B?OFNhZ1dkQTEwTUhvZXNYbzZNZERvczJKKzhxYWZIM2NXcjFBNXpNV0J2eU9o?=
+ =?utf-8?B?NXIzMVlHRUVhaU9YbVhMallLUnBBQ3pRckdEVGswbkd5NDJJQk9mZmU0M0FO?=
+ =?utf-8?B?cnpJYk1YeU5NNENqWDdOTlBZMU5rTm01RDZhbWo4OTZ5YjMvekRicUhNNHFn?=
+ =?utf-8?B?cW1pRzBNM2lMWk15VjNUa21ObGNvOHJEemdDYjZJWDJnM3d0cWkzRVJBd0x3?=
+ =?utf-8?B?QWsvUDZmSXVUcnE4eStZN3JRQnRXZ04rYUxFVzBZTmNVS3ZaclJZMXp5Rmtx?=
+ =?utf-8?B?TmM3R3Q1bkJwS0k2RHZvemFtMlZ6VGpqZHJ6V0hzNkpYRWxtTks0Mi9MS1pV?=
+ =?utf-8?B?RmloSnNYOUY4bnVSSW45NjRVcjBlSi9xL2RrbUJialpETStOK2FLT2hKYTg4?=
+ =?utf-8?B?Mlc3K1kvT3dwcGRyWlV4UTVjbkkycXFnMnhmRytodk5BS1F4VkhVK1IxOGFU?=
+ =?utf-8?B?ZTZIcHkvSGp6U0UvQ2lINlN0bzE5OWlqazlhQ1krTVBaZERxNVFOS3FwQXNS?=
+ =?utf-8?B?UWd0QVZFbE9wV0QzRkhhS1JPcmpyQ1VwUjZRM0VwaFRoUkRDZEdYQUNFc3hh?=
+ =?utf-8?B?RXA2VDdPM3dkSFB0OTA4RGdFUk1jRzJOMTlhMENzbFFDY3NhNHliWnNobldr?=
+ =?utf-8?B?NTNMZHMwN2FrTDIzdUUyWlJKSTVzWFAwWVd6cTZPdVhHenVDN1U3dXVwZHhU?=
+ =?utf-8?B?Ymg1YWpZN2F3Mk5FWksvZU1CNDJTWFc3SlcxZFhKZEw3dVZEajA0QlF4cnBY?=
+ =?utf-8?B?ajhTRVljTjZxR2l3dzlSOTk3MEczLzJvakhHNzdpeldhd3JYTC9ESjNrdlNp?=
+ =?utf-8?B?OE54eWNlbC9LMjkvRm1yaVNSdW5ONWtEYmJwb1dpL2tDODdsSXl4SnJ1Y2hI?=
+ =?utf-8?B?Umd6Rkg4R0xRPT0=?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 81043d52-24f4-4af4-d14f-08da05dca6c9
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR10MB1466.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2022 16:33:13.0539
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2022 17:04:07.7409
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YZjXvESoVCVOB0RNzggSqSTkMgkStYRmIIAYR1ajTJ0ROo3pPK+h7HaxjcNcyZf9ELoq0kz+hd/ehMjjTXsrqw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR1201MB2559
+X-MS-Exchange-CrossTenant-UserPrincipalName: N94lB7XW20EU8TaS9tQfFORE0ViZyBng/aSz87nGGNjKANO+qbe5BRwSCDwkKM8emvim50Oq8fgtG/uYFs4IAkdiXFYWF5mNZ3EGt/hA4Jc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4499
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10285 signatures=693139
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=994 phishscore=0
+ suspectscore=0 adultscore=0 spamscore=0 bulkscore=0 malwarescore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203140104
+X-Proofpoint-ORIG-GUID: MkFYv5kpAyjSBusCQfgGxV0X6amI-hpb
+X-Proofpoint-GUID: MkFYv5kpAyjSBusCQfgGxV0X6amI-hpb
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 3/3/22 1:09 AM, Hannes Reinecke wrote:
+> On 3/2/22 17:52, Mike Christie wrote:
+>> On 2/21/22 1:59 PM, Gabriel Krisman Bertazi wrote:
+>>> I'd like to discuss an interface to implement user space block devices,
+>>> while avoiding local network NBD solutions.  There has been reiterated
+>>
+>> Besides the tcmu approach, I've also worked on the local nbd based
+>> solution like here:
+>>
+>> https://urldefense.com/v3/__https://github.com/gluster/nbd-runner__;!!ACWV5N9M2RV99hQ!YY39rbV9MpaNUtr7ElzgcG1TyPznVEt1yppLwAGkq32-Fw9rQkqB6FzcaHiwIdgXp00K$
+>> Have you looked into a modern take that uses io_uring's socket features
+>> with the zero copy work that's being worked on for it? If so, what are
+>> the issues you have hit with that? Was it mostly issues with the zero
+>> copy part of it?
+>>
+>>
+> Problem is that we'd need an _inverse_ io_uring interface.
+> The current io_uring interface writes submission queue elements,
+> and waits for completion queue elements.
 
-On 3/14/2022 5:15 PM, Michael S. Tsirkin wrote:
-> On Mon, Mar 14, 2022 at 03:26:13PM +0200, Max Gurtovoy wrote:
->> On 3/14/2022 1:15 PM, Michael S. Tsirkin wrote:
->>> On Mon, Mar 14, 2022 at 12:25:08PM +0200, Max Gurtovoy wrote:
->>>> On 3/14/2022 11:43 AM, Suwan Kim wrote:
->>>>> On Sun, Mar 13, 2022 at 12:37:21PM +0200, Max Gurtovoy wrote:
->>>>>> On 3/11/2022 6:07 PM, Suwan Kim wrote:
->>>>>>> On Fri, Mar 11, 2022 at 10:38:07AM -0500, Michael S. Tsirkin wrote:
->>>>>>>> On Sat, Mar 12, 2022 at 12:28:32AM +0900, Suwan Kim wrote:
->>>>>>>>> diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
->>>>>>>>> index d888f013d9ff..3fcaf937afe1 100644
->>>>>>>>> --- a/include/uapi/linux/virtio_blk.h
->>>>>>>>> +++ b/include/uapi/linux/virtio_blk.h
->>>>>>>>> @@ -119,8 +119,9 @@ struct virtio_blk_config {
->>>>>>>>>      	 * deallocation of one or more of the sectors.
->>>>>>>>>      	 */
->>>>>>>>>      	__u8 write_zeroes_may_unmap;
->>>>>>>>> +	__u8 unused1;
->>>>>>>>> -	__u8 unused1[3];
->>>>>>>>> +	__virtio16 num_poll_queues;
->>>>>>>>>      } __attribute__((packed));
->>>>>>>> Same as any virtio UAPI change, this has to go through the virtio TC.
->>>>>>>> In particular I don't think gating a new config field on
->>>>>>>> an existing feature flag is a good idea.
->>>>>>> Did you mean that the polling should be based on a new feature like
->>>>>>> "VIRTIO_BLK_F_POLL" and be added at the end of features_legacy[]
->>>>>>> and features[]? If then, I will add the new feture flag and resend it.
->>>>>> Isn't there a way in the SPEC today to create a queue without interrupt
->>>>>> vector ?
->>>>> It seems that it is not possible to create a queue without interrupt
->>>>> vector. If it is possible, we can expect more polling improvement.
->>> Yes, it's possible:
->>>
->>> Writing a valid MSI-X Table entry number, 0 to 0x7FF, to
->>> \field{config_msix_vector}/\field{queue_msix_vector} maps interrupts triggered
->>> by the configuration change/selected queue events respectively to
->>> the corresponding MSI-X vector. To disable interrupts for an
->>> event type, the driver unmaps this event by writing a special NO_VECTOR
->>> value:
->>>
->>> \begin{lstlisting}
->>> /* Vector value used to disable MSI for queue */
->>> #define VIRTIO_MSI_NO_VECTOR            0xffff
->>> \end{lstlisting}
->>>
->>>
->>>
->>>> MST/Jason/Stefan,
->>>>
->>>> can you confirm that please ?
->>>>
->>>> what does VIRTQ_AVAIL_F_NO_INTERRUPT supposed to do ?
->>> This is a hint to the device not to send interrupts.
->> Why do you need a hint if the driver implicitly wrote 0xffff to disable MSI
->> for a virtqueue ?
->
-> VIRTIO_MSI_NO_VECTOR is an expensive write into config space, followed
-> by an even more expensive read. Reliable and appropriate if you turn
-> events on/off very rarely.
->
-> VIRTQ_AVAIL_F_NO_INTERRUPT is an in-memory write so it's much cheaper,
-> but it's less reliable. Appropriate if you need to turn events on/off a
-> lot.
+I'm not sure what you meant here.
 
-An "expensive" operation in the ctrl path during vq creation is fine IMO.
+io_uring can do recvs right? So userspace nbd would do
+IORING_OP_RECVMSG to wait for drivers/block/nbd.c to send userspace
+cmds via the local socket. Userspace nbd would do IORING_OP_SENDMSG
+to send drivers/block/nbd.c the cmd response.
 
-I see that nobody even used VIRTQ_AVAIL_F_NO_INTERRUPT in-memory write 
-in Linux.
-
->
->
->>>>> Regards,
->>>>> Suwan Kim
+drivers/block/nbd doesn't know/care what userspace did. It's just
+reading/writing from/to the socket.
