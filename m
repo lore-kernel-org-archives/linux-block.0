@@ -2,56 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C25C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 08:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CD1C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 08:12:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233190AbiCNIKT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 04:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52304 "EHLO
+        id S237624AbiCNINg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 04:13:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237593AbiCNIKS (ORCPT
+        with ESMTP id S237733AbiCNINL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 04:10:18 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3D89140C1;
-        Mon, 14 Mar 2022 01:09:08 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 47B1C68B05; Mon, 14 Mar 2022 09:00:03 +0100 (CET)
-Date:   Mon, 14 Mar 2022 09:00:01 +0100
-From:   "hch@lst.de" <hch@lst.de>
-To:     Avi Shchislowski <Avi.Shchislowski@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        "Bean Huo (beanhuo)" <beanhuo@micron.com>,
-        "Luca Porzio (lporzio)" <lporzio@micron.com>,
-        Manjong Lee <mj0123.lee@samsung.com>,
-        "david@fromorbit.com" <david@fromorbit.com>,
-        "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "song@kernel.org" <song@kernel.org>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "nanich.lee@samsung.com" <nanich.lee@samsung.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: Re: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write
- hint.
-Message-ID: <20220314080001.GB4921@lst.de>
-References: <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com> <e98948ae-1709-32ef-e1e4-063be38609b1@kernel.dk> <CO3PR08MB797562AAE72BC201EB951C6CDC0B9@CO3PR08MB7975.namprd08.prod.outlook.com> <d477c7bf-f3a7-ccca-5472-f9cbb05b83c1@kernel.dk> <c27a5ec3-f683-d2a7-d5e7-fd54d2baa278@acm.org> <PH0PR08MB7889642784B2E1FC1799A828DB0B9@PH0PR08MB7889.namprd08.prod.outlook.com> <ef77ef36-df95-8658-ff54-7d8046f5d0e7@kernel.dk> <bf221ef4-f4d0-4431-02f3-ef3bea0e8cb2@acm.org> <800fa121-5da2-e4c0-d756-991f007f0ad4@kernel.dk> <SN6PR04MB3872231050F8585FFC6824C59A0F9@SN6PR04MB3872.namprd04.prod.outlook.com>
+        Mon, 14 Mar 2022 04:13:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DC7383DA6D
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 01:12:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647245521;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=e3fpUD1WBNJDewOagkvGRBUT0zzMkStT2pshcTX95+8=;
+        b=M4Ls4c9Uv88rwcC95NVi0yT/lccGWtH+Wv3vVt7nArIoVe9+IcRxrnFrSfWoM7Asl/cCW6
+        yfFWtA44aV7ClcuCWPzussc5muW8SKkTD/KmxxqvDMw65LC34467Y0N1P6ydW3v4sWcO51
+        8ygJt98KkSjCl6jOcKmhO0TdKjhqCS4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-373-XB3U27EkODunVOXDt7E-wA-1; Mon, 14 Mar 2022 04:11:57 -0400
+X-MC-Unique: XB3U27EkODunVOXDt7E-wA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3941C185A79C;
+        Mon, 14 Mar 2022 08:11:57 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 782EB40D019C;
+        Mon, 14 Mar 2022 08:11:50 +0000 (UTC)
+Date:   Mon, 14 Mar 2022 16:11:44 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        Yu Kuai <yukuai3@huawei.com>, Saravanan D <saravanand@fb.com>,
+        Christopher Obbard <chris.obbard@collabora.com>
+Subject: Re: [PATCH block-5.17] fix rq-qos breakage from skipping
+ rq_qos_done_bio()
+Message-ID: <Yi74wAHBvU+8QGrP@T590>
+References: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <SN6PR04MB3872231050F8585FFC6824C59A0F9@SN6PR04MB3872.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Which part of "the Linux kernel does not keep unused code around" is still
-not clear to you after explaining it three times in this thread?
+On Sun, Mar 13, 2022 at 09:15:02PM -1000, Tejun Heo wrote:
+> a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't
+> tracked") made bio_endio() skip rq_qos_done_bio() if BIO_TRACKED is not set.
+> While this fixed a potential oops, it also broke blk-iocost by skipping the
+> done_bio callback for merged bios.
+> 
+> Before, whether a bio goes through rq_qos_throttle() or rq_qos_merge(),
+> rq_qos_done_bio() would be called on the bio on completion with BIO_TRACKED
+> distinguishing the former from the latter. rq_qos_done_bio() is not called
+> for bios which wenth through rq_qos_merge(). This royally confuses
+> blk-iocost as the merged bios never finish and are considered perpetually
+> in-flight.
+> 
+> One reliably reproducible failure mode is an intermediate cgroup geting
+> stuck active preventing its children from being activated due to the
+> leaf-only rule, leading to loss of control. The following is from
+> resctl-bench protection scenario which emulates isolating a web server like
+> workload from a memory bomb run on an iocost configuration which should
+> yield a reasonable level of protection.
+> 
+>   # cat /sys/block/nvme2n1/device/model
+>   Samsung SSD 970 PRO 512GB               
+>   # cat /sys/fs/cgroup/io.cost.model
+>   259:0 ctrl=user model=linear rbps=834913556 rseqiops=93622 rrandiops=102913 wbps=618985353 wseqiops=72325 wrandiops=71025
+>   # cat /sys/fs/cgroup/io.cost.qos
+>   259:0 enable=1 ctrl=user rpct=95.00 rlat=18776 wpct=95.00 wlat=8897 min=60.00 max=100.00
+>   # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
+>   ...
+>   Memory Hog Summary
+>   ==================
+> 
+>   IO Latency: R p50=242u:336u/2.5m p90=794u:1.4m/7.5m p99=2.7m:8.0m/62.5m max=8.0m:36.4m/350m
+>               W p50=221u:323u/1.5m p90=709u:1.2m/5.5m p99=1.5m:2.5m/9.5m max=6.9m:35.9m/350m
+> 
+>   Isolation and Request Latency Impact Distributions:
+> 
+>                 min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
+>   isol%       15.90 15.90 15.90 40.05 57.24 59.07 60.01 74.63 74.63 90.35 90.35 58.12 15.82 
+>   lat-imp%        0     0     0     0     0  4.55 14.68 15.54 233.5 548.1 548.1 53.88 143.6 
+> 
+>   Result: isol=58.12:15.82% lat_imp=53.88%:143.6 work_csv=100.0% missing=3.96%
+> 
+> The isolation result of 58.12% is close to what this device would show
+> without any IO control.
+> 
+> Fix it by introducing a new flag BIO_QOS_MERGED to mark merged bios and
+> calling rq_qos_done_bio() on them too. For consistency and clarity, rename
+> BIO_TRACKED to BIO_QOS_THROTTLED. The flag checks are moved into
+> rq_qos_done_bio() so that it's next to the code paths that set the flags.
+> 
+> With the patch applied, the above same benchmark shows:
+> 
+>   # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
+>   ...
+>   Memory Hog Summary
+>   ==================
+> 
+>   IO Latency: R p50=123u:84.4u/985u p90=322u:256u/2.5m p99=1.6m:1.4m/9.5m max=11.1m:36.0m/350m
+>               W p50=429u:274u/995u p90=1.7m:1.3m/4.5m p99=3.4m:2.7m/11.5m max=7.9m:5.9m/26.5m
+> 
+>   Isolation and Request Latency Impact Distributions:
+> 
+>                 min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
+>   isol%       84.91 84.91 89.51 90.73 92.31 94.49 96.36 98.04 98.71 100.0 100.0 94.42  2.81 
+>   lat-imp%        0     0     0     0     0  2.81  5.73 11.11 13.92 17.53 22.61  4.10  4.68 
+> 
+>   Result: isol=94.42:2.81% lat_imp=4.10%:4.68 work_csv=58.34% missing=0%
+> 
+> Signed-off-by: Tejun Heo <tj@kernel.org>
+> Fixes: a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't tracked")
+> Cc: stable@vger.kernel.org # v5.15+
+> Cc: Ming Lei <ming.lei@redhat.com>
+> Cc: Yu Kuai <yukuai3@huawei.com>
+
+Looks fine since rq always holds one .q_usage_counter in case of merge:
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+
+
+
+Thanks,
+Ming
+
