@@ -2,88 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD28DC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 18:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A647C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 19:21:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242312AbiCNSUW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 14:20:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45684 "EHLO
+        id S237481AbiCNTWo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 15:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238339AbiCNSUV (ORCPT
+        with ESMTP id S232224AbiCNTWn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 14:20:21 -0400
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5FA8340F7;
-        Mon, 14 Mar 2022 11:19:10 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id h11so23189699ljb.2;
-        Mon, 14 Mar 2022 11:19:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7fVndOlXJqJd979kieplvxiXM/JaHGBg6vQFdeCNUz8=;
-        b=BagW69PkeXTRL6hqswtUtlLfYVJLt+XItvKTC2u5jVa5FnN23pO/GEQj4BkxUpwpPF
-         H9eMkQBImNLuy3zQVapLBfqxVVIOAodw/zKSahmsURAiWyLkcjMjsj9h+Xuky8LGvoDf
-         kXVhHHRwykJDUB2Sno8FQLYWPE4SwC/vH5kOTQlI/U8+Dj8kZP5cMyQxdAizy7Z+40JI
-         cE73atXBfyEzaluc+37TVW+ss+pt6osXH4yFQG92yzd8Eui1fws1rnoiIRpMLeYsxyOX
-         M+nbMscPgY2x4bXSOzRJEpsoBvvIqe2TU48LyBLNPwnE1JxvR/PnU7YZUwKGww0nKAPD
-         EdLg==
+        Mon, 14 Mar 2022 15:22:43 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2F531AF1E
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 12:21:32 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id s42so15717278pfg.0
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 12:21:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7fVndOlXJqJd979kieplvxiXM/JaHGBg6vQFdeCNUz8=;
-        b=lbd/jdON0DKy3gzYN1VY8+gRbQyW0VRi/pAjZ/hWhd7Q0eGHMPWreuElfTnV3QuZww
-         T4ckEMWW3JW1jPpdYxqIOPp+FdRsUPOeJWwAzCfmfG2xpztNFJ56ofZzpL7kI8JFWwXK
-         dRLm6eXzvHvZZHPxpcNxX0f41yakHp5L/u/bTnFx4yMCnK84J6l77IWpgMn77lhPxk0V
-         DlVuR7H4m/aWUJqgmzOWmcUpzun+4VzPASPuAr6aoXxmIxaVvnhxe8BqkGu/QpuyYQTj
-         iD8LjLF45oJ3V82/ShyXe8wfoOq/tNW/yLxkS/YspxC9Egplg71uyocIpOVHdPhVZvpu
-         L+MQ==
-X-Gm-Message-State: AOAM532hxc2Sm4FlmqGtSMpRFqNjI3j16blfeCvch57xUvAQxBh6VMAD
-        X/STIOqDEtlb9ViNQ7KnGXWuhnVpdf/umqqnS9M=
-X-Google-Smtp-Source: ABdhPJyV9Q/Oyg2T1KbYTiQ1l2Nl9hOAFzmuE2Vay8VGsiTVI+nXxEk2zzSRNFXp41eOl7Rdlpa6NXuZbJ3vaiqrPIo=
-X-Received: by 2002:a2e:3004:0:b0:223:c126:5d1a with SMTP id
- w4-20020a2e3004000000b00223c1265d1amr15017686ljw.408.1647281949100; Mon, 14
- Mar 2022 11:19:09 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:references:content-language:in-reply-to
+         :content-transfer-encoding;
+        bh=XBeleSpo4k5n0rTQVTQfZZ7q/vMHmp0sZEUmI42WB8k=;
+        b=Lp53dBfc2OKxgUlo7RvSg7dkjNEN4hVkVe7VawGwkwHEran20tL2+haIf9UxnqCrAm
+         Vh4gSo28gS+vHD/DUnjk4vw8OGOuZINMY9wkJqU4ZGt/xJRq0hN3u0xQXcJ/aHTdpHgd
+         fUyAPPTQzPV4uE2idT4cYPeSgLWwY2z0q1hO/2G4BsgEYXwZk8SfNniIqoXcZAR1I8ub
+         Hz5FnI6XU62vpfy5vXcxmt+VBBrdgakcqT/PTR5CttPEzEzArNgKIkWXvqdI4dcv+HRN
+         PtVPe2fH4YF2SyM2NEGVR3bxYqfDP9cSmT7qBDyVNMR6aNQL+l6TZBVhhlYpraaoN8BY
+         6zlA==
+X-Gm-Message-State: AOAM532Nr8TZpM6o4tA4afnO0sKr+YGxB/e/Bq7VRGLRcpHcfDHT+ogD
+        vXKvE1Fd16sgA3h1RRX+PgQ=
+X-Google-Smtp-Source: ABdhPJwsNaYPnfyK7Plv+cpXOVrsj8GkLOWV1LHKoS7ayN9+B/pYc4bWCj1zThJZCMAlVy5JqlMqcg==
+X-Received: by 2002:a05:6a00:8cc:b0:4bc:3def:b616 with SMTP id s12-20020a056a0008cc00b004bc3defb616mr24890706pfu.18.1647285692238;
+        Mon, 14 Mar 2022 12:21:32 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:d3f4:bcc8:20ea:11af? ([2620:15c:211:201:d3f4:bcc8:20ea:11af])
+        by smtp.gmail.com with ESMTPSA id v66-20020a622f45000000b004f129e7767fsm20383575pfv.130.2022.03.14.12.21.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 14 Mar 2022 12:21:31 -0700 (PDT)
+Message-ID: <0b85385b-e8cf-2ab3-ce22-c63d4346cc16@acm.org>
+Date:   Mon, 14 Mar 2022 12:21:30 -0700
 MIME-Version: 1.0
-References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152718epcas5p3afd2c8a628f4e9733572cbb39270989d@epcas5p3.samsung.com>
- <20220308152105.309618-13-joshi.k@samsung.com> <20220311064847.GA17728@lst.de>
-In-Reply-To: <20220311064847.GA17728@lst.de>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Mon, 14 Mar 2022 23:48:43 +0530
-Message-ID: <CA+1E3rJshMVkLwpAQwM1L6L_xcrK9drKP+rpcrfizYuFsQOGjA@mail.gmail.com>
-Subject: Re: [PATCH 12/17] nvme: enable bio-cache for fixed-buffer passthru
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   Bart Van Assche <bvanassche@acm.org>
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+To:     Sagi Grimberg <sagi@grimberg.me>,
+        Mike Christie <michael.christie@oracle.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc:     Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+References: <87tucsf0sr.fsf@collabora.com>
+ <986caf55-65d1-0755-383b-73834ec04967@suse.de>
+ <b6bb4435-d83c-b129-c761-00a74e7e0739@grimberg.me>
+ <87bkyyg4jc.fsf@collabora.com>
+ <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
+ <45caea9d-53d0-6f06-bb98-9174a08972d4@oracle.com>
+ <6d831f69-06f4-fafe-ce17-13596e6f3f6d@grimberg.me>
+Content-Language: en-US
+In-Reply-To: <6d831f69-06f4-fafe-ce17-13596e6f3f6d@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 11, 2022 at 12:18 PM Christoph Hellwig <hch@lst.de> wrote:
+On 3/13/22 14:15, Sagi Grimberg wrote:
 >
-> On Tue, Mar 08, 2022 at 08:51:00PM +0530, Kanchan Joshi wrote:
-> > Since we do submission/completion in task, we can have this up.
-> > Add a bio-set for nvme as we need that for bio-cache.
+>> We don't want to re-use tcmu's interface.
+>>
+>> Bodo has been looking into on a new interface to avoid issues tcmu has
+>> and to improve performance. If it's allowed to add a tcmu like backend to
+>> nvmet then it would be great because lio was not really made with mq and
+>> perf in mind so it already starts with issues. I just started doing the
+>> basics like removing locks from the main lio IO path but it seems like
+>> there is just so much work.
 >
-> Well, passthrough I/O should just use kmalloced bios anyway, as there
-> is no need for the mempool to start with.  Take a look at the existing
-> code in blk-map.c.
+> Good to know...
+>
+> So I hear there is a desire to do this. So I think we should list the
+> use-cases for this first because that would lead to different design
+> choices.. For example one use-case is just to send read/write/flush
+> to userspace, another may want to passthru nvme commands to userspace
+> and there may be others...
 
-Yes, the only reason to switch from kmalloc to bio-set was being able
-to use bio-cache.
-Towards the goal of matching peak perf of io_uring's block io path.
-Is it too bad to go down this route; Is there any different way to
-enable bio-cache for passthru.
+(resending my reply without truncating the Cc-list)
 
--- 
-Kanchan
+Hi Sagi,
+
+Haven't these use cases already been mentioned in the email at the start 
+of this thread? The use cases I am aware of are implementing 
+cloud-specific block storage functionality and also block storage in 
+user space for Android. Having to parse NVMe commands and PRP or SGL 
+lists would be an unnecessary source of complexity and overhead for 
+these use cases. My understanding is that what is needed for these use 
+cases is something that is close to the block layer request interface 
+(REQ_OP_* + request flags + data buffer).
+
+Thanks,
+
+Bart.
