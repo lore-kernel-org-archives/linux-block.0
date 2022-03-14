@@ -2,67 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D83B4C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 15:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25CB1C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 15:15:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233575AbiCNPOK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 11:14:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60140 "EHLO
+        id S234434AbiCNPQz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 11:16:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41348 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234130AbiCNPOI (ORCPT
+        with ESMTP id S241574AbiCNPQy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 11:14:08 -0400
+        Mon, 14 Mar 2022 11:16:54 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D6AC3E50
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 08:12:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 744396365
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 08:15:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647270777;
+        s=mimecast20190719; t=1647270942;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=Xm5VItqmMeZ6zs2ROdtREMMlUCtcYW6wNdINQGNfwNM=;
-        b=TQuv7wTeFM56xiFtqtZrfXy3HP9qra5+64JDSMheFlDQzx+27ctkREUT+aPd8J89R7wzSb
-        qcmxtJ9O/m1SIV/10OwV7wVhlVnQbbewMOTds4ycuLKAk8VrEm5/xNom9Mp+THFu00fDw2
-        6k+NhaEnuamgJxQBin98wmo+1lEC/AE=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=SvxQBenhY0K2tHuSKRLu17L4DvLSraMyryG81r/SsG8=;
+        b=cdWpw1RO79FSQ7zKZcRJbrnSh4dvr0zACwxLbVVf4dqJXfkT2d26rlyFVVUJhBGIiIp8Fu
+        Z0lil7/NG/DGs7puMDYcOJjkqShhG90aflLXMMsY3B0uuNnHqGwEoPPHn0TcXtVUUTpcLa
+        HnIE1BPbLzFOfwvwUb4p3QysO7sjWM0=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-246-mbAzPj-MMfy0bWXIYSFLMA-1; Mon, 14 Mar 2022 11:12:55 -0400
-X-MC-Unique: mbAzPj-MMfy0bWXIYSFLMA-1
-Received: by mail-wr1-f71.google.com with SMTP id b9-20020a05600003c900b00203647caa11so4480570wrg.5
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 08:12:55 -0700 (PDT)
+ us-mta-492-XT3XVSD1MsaBo_PVqe7znw-1; Mon, 14 Mar 2022 11:15:41 -0400
+X-MC-Unique: XT3XVSD1MsaBo_PVqe7znw-1
+Received: by mail-wm1-f70.google.com with SMTP id 3-20020a05600c230300b00384e15ceae4so9751383wmo.7
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 08:15:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=Xm5VItqmMeZ6zs2ROdtREMMlUCtcYW6wNdINQGNfwNM=;
-        b=r12+C1FLuJl9xuJrVha4hyZ+zw6+9VdXXxj7DLdKGQL97eavpkr7+E0XLYVPNrqlI3
-         kJO2BlSURIn6en8C3jjsdQCePRMWzA36ngtQRE0LdwvGM0pOxTfXE597J0AHvjEzQKvT
-         21gwDuB+SwOR4JTBcEsoZTd4bAOOp52QJcQP5d0v3qNMXY3HUEj1voRgMxz/lk2Om75h
-         MCrR1+E71a4Wuds5LCzAKppnE5P/KL2v9FdZFKBfPKKkcS5Qq+2L64XNGc/9IJuLBuQk
-         kEVxnywgWAN6Er5E9+tAVxcb6sqCi6moirBR6NFk2hltgqmf3UAlN8zg4WC3Zz4bDev+
-         SEew==
-X-Gm-Message-State: AOAM530FdxORb+11D/Nsh4c1oGPuNb/vPleGjgEtMDNpczLWsK3DpltX
-        t5W9O4xvqdmiRoaFSMhzEf0Sbxs0T3xxOn3Ft7qiwoDME8vj4tbnE3yYEEG71utCIaNYgzGWNpB
-        OO5VOVRsBgVlTr9tQtSV64+s=
-X-Received: by 2002:a5d:62cd:0:b0:1f0:23d2:b38c with SMTP id o13-20020a5d62cd000000b001f023d2b38cmr17563840wrv.82.1647270774507;
-        Mon, 14 Mar 2022 08:12:54 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXqZHlp62TJ7mYscv84hghthLLQrKhjSIjAq6n5pdy+N/m2JFUJhUTeMR6qQTGPLmhq1InIw==
-X-Received: by 2002:a5d:62cd:0:b0:1f0:23d2:b38c with SMTP id o13-20020a5d62cd000000b001f023d2b38cmr17563826wrv.82.1647270774280;
-        Mon, 14 Mar 2022 08:12:54 -0700 (PDT)
-Received: from redhat.com ([2.55.155.245])
-        by smtp.gmail.com with ESMTPSA id c2-20020a056000184200b002037b40de23sm13481923wri.8.2022.03.14.08.12.52
+        bh=SvxQBenhY0K2tHuSKRLu17L4DvLSraMyryG81r/SsG8=;
+        b=74c0GfuGiCqhAcY6QMP6QpkyRJKHA++RAHLr7eBZJAOuMrrgAQcYN3iprCAH2hofuY
+         P5uCXWpGCtA13WxPuYwe45/385wcAvGlMXuZUuAALvdu+Tuf4QbircTJDtjr26m+QHAr
+         CFiFcGkQxXGVw0/TWiF1Z1vhmgxgxSRXm9zOdvzcaNHdyJx9dDF7hr3ZGcE6FpggayVZ
+         MufTJXOXm8kYllEOZE0BB1b0AIfJD8GSaVXtxvEV4EU6nzVracpl0X2YOnBKgH/T1J4q
+         n6xubxxKHu4OztYz0u6jiNs+DopyNZgI06D9wOcO2ApYbH0+stCFFEWZhLk2qWZ1linH
+         O/lQ==
+X-Gm-Message-State: AOAM5324cQVPXM61LG9T6yTBtD0rE4UEWRy66wq/q3j3Yad77bQ+IvRi
+        LBT3VlxeLh6Jpqe7r5zdBmlYYqVhiAijycUAbq0DvqCYRPclo0vKB8z0xighlIWFZ022JK+bxHY
+        sSK2e1hTI9YigkcTkOtWXqjs=
+X-Received: by 2002:a05:600c:3590:b0:389:f1c5:fd10 with SMTP id p16-20020a05600c359000b00389f1c5fd10mr12013117wmq.76.1647270939755;
+        Mon, 14 Mar 2022 08:15:39 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz2JUgYXrReL9oDX4OetYT3pAzApLUMhnT7wy2uiAQTaGcAYO4gYWtQTf+/ly9jGC4djagRlg==
+X-Received: by 2002:a05:600c:3590:b0:389:f1c5:fd10 with SMTP id p16-20020a05600c359000b00389f1c5fd10mr12013100wmq.76.1647270939561;
+        Mon, 14 Mar 2022 08:15:39 -0700 (PDT)
+Received: from redhat.com ([2.55.183.53])
+        by smtp.gmail.com with ESMTPSA id l5-20020a5d6745000000b001f1e4e40e42sm13479732wrw.77.2022.03.14.08.15.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 08:12:53 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 11:12:50 -0400
+        Mon, 14 Mar 2022 08:15:39 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 11:15:35 -0400
 From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     Max Gurtovoy <mgurtovoy@nvidia.com>,
+To:     Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc:     Suwan Kim <suwan.kim027@gmail.com>,
         Stefan Hajnoczi <stefanha@redhat.com>, jasowang@redhat.com,
         pbonzini@redhat.com, virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org
 Subject: Re: [PATCH] virtio-blk: support polling I/O
-Message-ID: <20220314111239-mutt-send-email-mst@kernel.org>
+Message-ID: <20220314111306-mutt-send-email-mst@kernel.org>
 References: <20220311152832.17703-1-suwan.kim027@gmail.com>
  <20220311103549-mutt-send-email-mst@kernel.org>
  <YitzuxYHywdCRKVO@localhost.localdomain>
@@ -70,19 +70,19 @@ References: <20220311152832.17703-1-suwan.kim027@gmail.com>
  <Yi8OSE2hYoS8rSEo@localhost.localdomain>
  <e441429b-90ef-a2e4-1365-3f55c7ff21d0@nvidia.com>
  <20220314071222-mutt-send-email-mst@kernel.org>
- <Yi9BeVK3GbFrxIgB@localhost.localdomain>
+ <d9121e3c-abe5-fe4d-8088-8339c418c7a8@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yi9BeVK3GbFrxIgB@localhost.localdomain>
+In-Reply-To: <d9121e3c-abe5-fe4d-8088-8339c418c7a8@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 10:22:01PM +0900, Suwan Kim wrote:
-> On Mon, Mar 14, 2022 at 07:15:18AM -0400, Michael S. Tsirkin wrote:
+On Mon, Mar 14, 2022 at 03:26:13PM +0200, Max Gurtovoy wrote:
+> 
+> On 3/14/2022 1:15 PM, Michael S. Tsirkin wrote:
 > > On Mon, Mar 14, 2022 at 12:25:08PM +0200, Max Gurtovoy wrote:
-> > > 
 > > > On 3/14/2022 11:43 AM, Suwan Kim wrote:
 > > > > On Sun, Mar 13, 2022 at 12:37:21PM +0200, Max Gurtovoy wrote:
 > > > > > On 3/11/2022 6:07 PM, Suwan Kim wrote:
@@ -93,13 +93,13 @@ On Mon, Mar 14, 2022 at 10:22:01PM +0900, Suwan Kim wrote:
 > > > > > > > > --- a/include/uapi/linux/virtio_blk.h
 > > > > > > > > +++ b/include/uapi/linux/virtio_blk.h
 > > > > > > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
-> > > > > > > >    	 * deallocation of one or more of the sectors.
-> > > > > > > >    	 */
-> > > > > > > >    	__u8 write_zeroes_may_unmap;
+> > > > > > > >     	 * deallocation of one or more of the sectors.
+> > > > > > > >     	 */
+> > > > > > > >     	__u8 write_zeroes_may_unmap;
 > > > > > > > > +	__u8 unused1;
 > > > > > > > > -	__u8 unused1[3];
 > > > > > > > > +	__virtio16 num_poll_queues;
-> > > > > > > >    } __attribute__((packed));
+> > > > > > > >     } __attribute__((packed));
 > > > > > > > Same as any virtio UAPI change, this has to go through the virtio TC.
 > > > > > > > In particular I don't think gating a new config field on
 > > > > > > > an existing feature flag is a good idea.
@@ -110,7 +110,6 @@ On Mon, Mar 14, 2022 at 10:22:01PM +0900, Suwan Kim wrote:
 > > > > > vector ?
 > > > > It seems that it is not possible to create a queue without interrupt
 > > > > vector. If it is possible, we can expect more polling improvement.
-> > 
 > > Yes, it's possible:
 > > 
 > > Writing a valid MSI-X Table entry number, 0 to 0x7FF, to
@@ -124,27 +123,32 @@ On Mon, Mar 14, 2022 at 10:22:01PM +0900, Suwan Kim wrote:
 > > /* Vector value used to disable MSI for queue */
 > > #define VIRTIO_MSI_NO_VECTOR            0xffff
 > > \end{lstlisting}
->  
-> Thanks for the information.
+> > 
+> > 
+> > 
+> > > MST/Jason/Stefan,
+> > > 
+> > > can you confirm that please ?
+> > > 
+> > > what does VIRTQ_AVAIL_F_NO_INTERRUPT supposed to do ?
+> > This is a hint to the device not to send interrupts.
 > 
-> Then, in function vp_find_vqs_msix() at virtio_pci_common.c, it sets
-> VIRTIO_MSI_NO_VECTOR if vritqueue->callback is NULL as below code.
-> 
-> static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned nvqs,
-> 		struct virtqueue *vqs[], vq_callback_t *callbacks[],
-> ...
-> 		if (!callbacks[i])
-> 			msix_vec = VIRTIO_MSI_NO_VECTOR;
-> ...
-> 
-> In oder to create poll queue in virtio-blk, I set NULL callback for
-> poll virtqueues and it will create queue without irq.
-> 
-> Regards,
-> Suwan Kim
+> Why do you need a hint if the driver implicitly wrote 0xffff to disable MSI
+> for a virtqueue ?
 
-Yes, it will.
 
--- 
-MST
+VIRTIO_MSI_NO_VECTOR is an expensive write into config space, followed
+by an even more expensive read. Reliable and appropriate if you turn
+events on/off very rarely.
+
+VIRTQ_AVAIL_F_NO_INTERRUPT is an in-memory write so it's much cheaper,
+but it's less reliable. Appropriate if you need to turn events on/off a
+lot.
+
+
+
+> 
+> > 
+> > > > Regards,
+> > > > Suwan Kim
 
