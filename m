@@ -2,224 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E35C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 07:15:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A40C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 07:35:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234061AbiCNHQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 03:16:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44824 "EHLO
+        id S235208AbiCNHgv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 03:36:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233253AbiCNHQO (ORCPT
+        with ESMTP id S229747AbiCNHgv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 03:16:14 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808123FDA8;
-        Mon, 14 Mar 2022 00:15:05 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id h5so11399338plf.7;
-        Mon, 14 Mar 2022 00:15:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=x5dGbI9er1juJt9+jRuZHplHMW2zg96TRIfl5f163Ps=;
-        b=KkBh65zDFpi3DrxawldNVBS0EodkeO3TgixoX7BO0BUESgMRnvGRDpsB9Q0rxr+nl5
-         A/vp9aIarusXjOgc2A+3RvGfSAh08uQCu0yzXaZwArIlE7/QK1cTg/+78VAZqW1AVmXZ
-         o+cyYUdVlUMi0xbF6n+gmFFxMkostlVsjecmPa18FYk8++TYifULQiEJlOJI3LQxwaNP
-         /zc548vVYMIouQGYGz3fMQn0icHzyk0gCxpwJX0KCRHX4x+m0YQDcRYgkKCEGFwXqL3x
-         xydy9Gpy75CDKjxIKoXXY7MPVDaHHb8YXYoJuWpg+vJYWRP/VOK7Bgim+qyWmxkwiQA0
-         +qQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=x5dGbI9er1juJt9+jRuZHplHMW2zg96TRIfl5f163Ps=;
-        b=PwET1iXFnIAsfDsk6zMJb0MD8koQkJ0dPgGRtjgBwjsJOjY+htYaRok6MYQ2RQQYro
-         cAUSzUeXxksSmCwOCc4GiamXu9bykUcGdv38ScOb72K3x5p3BUGDvHR3ctR+VUqhNQjR
-         f5wLuKm9qkyxIVyZIRwn5WxuXwqqJ+VHe+EVwUY7pwOXQ8lDhzWG8l3bp9S5Pn05VtER
-         O0Pwxg0ewFkK8VlsLcIDbybltXyq7rFJaJRUVYjUJoOrQewvyyZ7mRcfKHMW/8Lc26Vj
-         +hsYIGAGUMhSbOifeQ5AUwbFxY4QKiCrpYihIBF/oEltFxM4xgjkgHQfz2Jxsg7B9dba
-         La4Q==
-X-Gm-Message-State: AOAM530Cn3sSYKkZPzPPV5s9HlL7ZFLzWmSemOO6lrLaTo0K9Pi0ugNj
-        +kEpRrqKK/Gt9Y0YUR3ZVgS2tIygUsTKMQ==
-X-Google-Smtp-Source: ABdhPJzfHWBGI4ZCMEnl4r0HK1W1QJikDHZN62HtqgaZCXHutHwo+25NC/N5dwTNKEnNJZ5QqnSF5w==
-X-Received: by 2002:a17:903:4111:b0:153:8726:9fe1 with SMTP id r17-20020a170903411100b0015387269fe1mr539739pld.170.1647242104807;
-        Mon, 14 Mar 2022 00:15:04 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id ob13-20020a17090b390d00b001becfd7c6f3sm16845447pjb.27.2022.03.14.00.15.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 00:15:04 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sun, 13 Mar 2022 21:15:02 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>,
-        Yu Kuai <yukuai3@huawei.com>, Saravanan D <saravanand@fb.com>,
-        Christopher Obbard <chris.obbard@collabora.com>
-Subject: [PATCH block-5.17] fix rq-qos breakage from skipping
- rq_qos_done_bio()
-Message-ID: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
+        Mon, 14 Mar 2022 03:36:51 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAEF840E48
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 00:35:41 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D43EF68AFE; Mon, 14 Mar 2022 08:35:37 +0100 (CET)
+Date:   Mon, 14 Mar 2022 08:35:37 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        jiangbo.365@bytedance.com, kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Message-ID: <20220314073537.GA4204@lst.de>
+References: <20220308165349.231320-1-p.raghav@samsung.com> <20220310094725.GA28499@lst.de> <e02dfd21-31c6-95b6-1127-3f18c79116ee@samsung.com> <20220310144449.GA1695@lst.de> <Yiuu2h38owO9ioIW@bombadil.infradead.org> <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com> <Yiu5YzxU/PjxLiUL@bombadil.infradead.org> <20220311213102.GA2309@dhcp-10-100-145-180.wdc.com> <YivMBj7+j/EZcMVV@bombadil.infradead.org> <bc0e53a9-f623-c69f-002e-d62e697a43d1@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <bc0e53a9-f623-c69f-002e-d62e697a43d1@opensource.wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't
-tracked") made bio_endio() skip rq_qos_done_bio() if BIO_TRACKED is not set.
-While this fixed a potential oops, it also broke blk-iocost by skipping the
-done_bio callback for merged bios.
+On Sat, Mar 12, 2022 at 04:58:08PM +0900, Damien Le Moal wrote:
+> The reason for the power of 2 requirement is 2 fold:
+> 1) At the time we added zone support for SMR, chunk_sectors had to be a
+> power of 2 number of sectors.
+> 2) SMR users did request power of 2 zone sizes and that all zones have
+> the same size as that simplified software design. There was even a
+> de-facto agreement that 256MB zone size is a good compromise between
+> usability and overhead of zone reclaim/GC. But that particular number is
+> for HDD due to their performance characteristics.
 
-Before, whether a bio goes through rq_qos_throttle() or rq_qos_merge(),
-rq_qos_done_bio() would be called on the bio on completion with BIO_TRACKED
-distinguishing the former from the latter. rq_qos_done_bio() is not called
-for bios which wenth through rq_qos_merge(). This royally confuses
-blk-iocost as the merged bios never finish and are considered perpetually
-in-flight.
+Also for NVMe we initially went down the road to try to support
+non power of two sizes.  But there was another major early host that
+really wanted the power of two zone sizes to support hardware based
+hosts that can cheaply do shifts but not divisions.  The variable
+zone capacity feature (something that Linux does not currently support)
+is a feature requested by NVMe members on the host and device side
+also can only be supported with the the zone size / zone capacity split.
 
-One reliably reproducible failure mode is an intermediate cgroup geting
-stuck active preventing its children from being activated due to the
-leaf-only rule, leading to loss of control. The following is from
-resctl-bench protection scenario which emulates isolating a web server like
-workload from a memory bomb run on an iocost configuration which should
-yield a reasonable level of protection.
+> The other solution would be adding a dm-unhole target to remap sectors
+> to remove the holes from the device address space. Such target would be
+> easy to write, but in my opinion, this would still not change the fact
+> that applications still have to deal with error recovery and active/open
+> zone resources. So they still have to be zone aware and operate per zone.
 
-  # cat /sys/block/nvme2n1/device/model
-  Samsung SSD 970 PRO 512GB               
-  # cat /sys/fs/cgroup/io.cost.model
-  259:0 ctrl=user model=linear rbps=834913556 rseqiops=93622 rrandiops=102913 wbps=618985353 wseqiops=72325 wrandiops=71025
-  # cat /sys/fs/cgroup/io.cost.qos
-  259:0 enable=1 ctrl=user rpct=95.00 rlat=18776 wpct=95.00 wlat=8897 min=60.00 max=100.00
-  # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
-  ...
-  Memory Hog Summary
-  ==================
+I don't think we even need a new target for it.  I think you can do
+this with a table using multiple dm-linear sections already if you
+want.
 
-  IO Latency: R p50=242u:336u/2.5m p90=794u:1.4m/7.5m p99=2.7m:8.0m/62.5m max=8.0m:36.4m/350m
-              W p50=221u:323u/1.5m p90=709u:1.2m/5.5m p99=1.5m:2.5m/9.5m max=6.9m:35.9m/350m
+> My answer to your last question ("Are we sure?") is thus: No. I am not
+> sure this is a good idea. But as always, I would be happy to be proven
+> wrong. So far, I have not seen any argument doing that.
 
-  Isolation and Request Latency Impact Distributions:
-
-                min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
-  isol%       15.90 15.90 15.90 40.05 57.24 59.07 60.01 74.63 74.63 90.35 90.35 58.12 15.82 
-  lat-imp%        0     0     0     0     0  4.55 14.68 15.54 233.5 548.1 548.1 53.88 143.6 
-
-  Result: isol=58.12:15.82% lat_imp=53.88%:143.6 work_csv=100.0% missing=3.96%
-
-The isolation result of 58.12% is close to what this device would show
-without any IO control.
-
-Fix it by introducing a new flag BIO_QOS_MERGED to mark merged bios and
-calling rq_qos_done_bio() on them too. For consistency and clarity, rename
-BIO_TRACKED to BIO_QOS_THROTTLED. The flag checks are moved into
-rq_qos_done_bio() so that it's next to the code paths that set the flags.
-
-With the patch applied, the above same benchmark shows:
-
-  # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
-  ...
-  Memory Hog Summary
-  ==================
-
-  IO Latency: R p50=123u:84.4u/985u p90=322u:256u/2.5m p99=1.6m:1.4m/9.5m max=11.1m:36.0m/350m
-              W p50=429u:274u/995u p90=1.7m:1.3m/4.5m p99=3.4m:2.7m/11.5m max=7.9m:5.9m/26.5m
-
-  Isolation and Request Latency Impact Distributions:
-
-                min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
-  isol%       84.91 84.91 89.51 90.73 92.31 94.49 96.36 98.04 98.71 100.0 100.0 94.42  2.81 
-  lat-imp%        0     0     0     0     0  2.81  5.73 11.11 13.92 17.53 22.61  4.10  4.68 
-
-  Result: isol=94.42:2.81% lat_imp=4.10%:4.68 work_csv=58.34% missing=0%
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Fixes: a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't tracked")
-Cc: stable@vger.kernel.org # v5.15+
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Yu Kuai <yukuai3@huawei.com>
----
- block/bio.c               |    3 +--
- block/blk-iolatency.c     |    2 +-
- block/blk-rq-qos.h        |   20 +++++++++++---------
- include/linux/blk_types.h |    3 ++-
- 4 files changed, 15 insertions(+), 13 deletions(-)
-
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1486,8 +1486,7 @@ again:
- 	if (!bio_integrity_endio(bio))
- 		return;
- 
--	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACKED))
--		rq_qos_done_bio(bdev_get_queue(bio->bi_bdev), bio);
-+	rq_qos_done_bio(bio);
- 
- 	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
- 		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev), bio);
---- a/block/blk-iolatency.c
-+++ b/block/blk-iolatency.c
-@@ -598,7 +598,7 @@ static void blkcg_iolatency_done_bio(str
- 	int inflight = 0;
- 
- 	blkg = bio->bi_blkg;
--	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
-+	if (!blkg || !bio_flagged(bio, BIO_QOS_THROTTLED))
- 		return;
- 
- 	iolat = blkg_to_lat(bio->bi_blkg);
---- a/block/blk-rq-qos.h
-+++ b/block/blk-rq-qos.h
-@@ -177,20 +177,20 @@ static inline void rq_qos_requeue(struct
- 		__rq_qos_requeue(q->rq_qos, rq);
- }
- 
--static inline void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
-+static inline void rq_qos_done_bio(struct bio *bio)
- {
--	if (q->rq_qos)
--		__rq_qos_done_bio(q->rq_qos, bio);
-+	if (bio->bi_bdev && (bio_flagged(bio, BIO_QOS_THROTTLED) ||
-+			     bio_flagged(bio, BIO_QOS_MERGED))) {
-+		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-+		if (q->rq_qos)
-+			__rq_qos_done_bio(q->rq_qos, bio);
-+	}
- }
- 
- static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
- {
--	/*
--	 * BIO_TRACKED lets controllers know that a bio went through the
--	 * normal rq_qos path.
--	 */
- 	if (q->rq_qos) {
--		bio_set_flag(bio, BIO_TRACKED);
-+		bio_set_flag(bio, BIO_QOS_THROTTLED);
- 		__rq_qos_throttle(q->rq_qos, bio);
- 	}
- }
-@@ -205,8 +205,10 @@ static inline void rq_qos_track(struct r
- static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
- 				struct bio *bio)
- {
--	if (q->rq_qos)
-+	if (q->rq_qos) {
-+		bio_set_flag(bio, BIO_QOS_MERGED);
- 		__rq_qos_merge(q->rq_qos, rq, bio);
-+	}
- }
- 
- static inline void rq_qos_queue_depth_changed(struct request_queue *q)
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -317,7 +317,8 @@ enum {
- 	BIO_TRACE_COMPLETION,	/* bio_endio() should trace the final completion
- 				 * of this bio. */
- 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
--	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
-+	BIO_QOS_THROTTLED,	/* bio went through rq_qos throttle path */
-+	BIO_QOS_MERGED,		/* but went through rq_qos merge path */
- 	BIO_REMAPPED,
- 	BIO_ZONE_WRITE_LOCKED,	/* Owns a zoned device zone write lock */
- 	BIO_PERCPU_CACHE,	/* can participate in per-cpu alloc cache */
+Agreed. Supporting non-power of two sizes in the block layer is fairly
+easy as shown by some of the patches seens in this series.  Supporting
+them properly in the whole ecosystem is not trivial and will create a
+long-term burden.  We could do that, but we'd rather have a really good
+reason for it, and right now I don't see that.
