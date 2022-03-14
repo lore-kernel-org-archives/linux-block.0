@@ -2,137 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF1BBC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 10:49:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D441C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 11:13:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238687AbiCNKuw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 06:50:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48646 "EHLO
+        id S231894AbiCNLOR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 07:14:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230147AbiCNKuv (ORCPT
+        with ESMTP id S236122AbiCNLOQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 06:50:51 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28CB30F49
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 03:49:41 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id kt27so33004991ejb.0
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 03:49:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=from:date:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=5v+MbMpFwg12ZX2fkGk7jqjd92RrZHcnEuh9hvS+YHI=;
-        b=dZ8KDEoSKuDC9blyTD9k4H0c1K4dMSqu+QpOBBRWjMxP4Rpt4fdnjF7ebkvyeUl+8M
-         ekRE0TP43x9TzYVgrWobsnR8jTXAfL3xMdGCx8uu+VDGtfXIwHKIzeiCm6Gd2TsH0Y1V
-         9rSDwAgcFQlPflwVi7xekZhZsFkE8WXgbeymcEARdnSksRP5uee88/YGTb3F1h4097r1
-         xtdxtMmzAhc7jLqqkjBtGY7+SIMrPdRntgjTfdDxbph/wK3nh3zHJ4Zk4nX5DVsxSujV
-         JfRJosLqrIJR1XwqOoiCj5HwAY1AVKs55LcByxjGE6yYYRPZkzP6P0CjmGydgaCsLuKi
-         3Nvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:date:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=5v+MbMpFwg12ZX2fkGk7jqjd92RrZHcnEuh9hvS+YHI=;
-        b=1nipPmELaF7OT2i8yIpxA2vBBF4w7ekWkESANlu0IJTCDTIMjGYI5dwZSRswYAJ2zk
-         xZKAVpcrB6W8TvENHgDES+xDKTZtT9Su3q3pJ/2gZ9BJOtbPMxb/X5Ego7kTxjmq6dWk
-         +JJLHD0p2v6F/cWr5J9aL6CJiEq4Qo0F2AcPtDeRg3R66rtQjd4TpB0m0GArfGvrxs8D
-         Us6gjngiA0P3B+eJGLty03F4945QNHCvxoTFlm+w3SN45f0QHQQKVb3ai5jOfjZc7xl7
-         ZrSYW81EsEZo5vKdYKyGnA/ngeHQpG11Bpk7TkGLYnZ6+oGijXVvfvLcUxKtEqPty2u8
-         8xvQ==
-X-Gm-Message-State: AOAM532lCbmGHo8mrqFrDhdm7AAf2zLQuFPrSFqSi9Jv6qRsnhoOQ5WE
-        5ggdZrw5eS2fP/RLVovl42949g==
-X-Google-Smtp-Source: ABdhPJwUB7QvmU2/DQ4a1BV7hvOsqGzdgORi48giRQu8+k6H2+I+u0SCcfcXrBNmoQAUv9JH+vVwyA==
-X-Received: by 2002:a17:906:8585:b0:6db:2c85:2bc8 with SMTP id v5-20020a170906858500b006db2c852bc8mr17716374ejx.747.1647254980245;
-        Mon, 14 Mar 2022 03:49:40 -0700 (PDT)
-Received: from localhost ([194.62.217.57])
-        by smtp.gmail.com with ESMTPSA id l9-20020a056402254900b00416b0ec98b5sm6434619edb.45.2022.03.14.03.49.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 03:49:39 -0700 (PDT)
-From:   "Javier =?utf-8?B?R29uesOhbGV6?=" <javier@javigon.com>
-X-Google-Original-From: Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-Date:   Mon, 14 Mar 2022 11:49:38 +0100
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        jiangbo.365@bytedance.com, kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Matias =?utf-8?B?QmrDuHJsaW5n?= <matias.bjorling@wdc.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
-References: <e02dfd21-31c6-95b6-1127-3f18c79116ee@samsung.com>
- <20220310144449.GA1695@lst.de>
- <Yiuu2h38owO9ioIW@bombadil.infradead.org>
- <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
- <Yiu5YzxU/PjxLiUL@bombadil.infradead.org>
- <20220311213102.GA2309@dhcp-10-100-145-180.wdc.com>
- <YivMBj7+j/EZcMVV@bombadil.infradead.org>
- <bc0e53a9-f623-c69f-002e-d62e697a43d1@opensource.wdc.com>
- <20220314073537.GA4204@lst.de>
- <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
+        Mon, 14 Mar 2022 07:14:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4775193FC;
+        Mon, 14 Mar 2022 04:13:05 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3EE05B80DB2;
+        Mon, 14 Mar 2022 11:13:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60781C340EC;
+        Mon, 14 Mar 2022 11:13:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1647256382;
+        bh=l/hxgotm0hSGY59mDBqokaTQVQapfKciLxrWRyysYwQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=cl6/l06IGfQAreUkW/QBqaU+oDXAYZAX8lxdnuA0LdHjUM7JXEa6Tr21++Xflx080
+         ks+xW7B5lb3bG//mKfI+YWQIiai0ycu5BF3uIVhiB1G2FVA5rmr1Zma+3PeO6WGiTu
+         NN73lPTuQJ78nSmkYlwJBf5YYNamUOoY2drb7PnM=
+Date:   Mon, 14 Mar 2022 12:12:59 +0100
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     Valentin Kleibel <valentin@vrvis.at>
+Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: aoe: fix page fault in freedev()
+Message-ID: <Yi8jO3Q+xbPx0JwF@kroah.com>
+References: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
+ <YinpIKY0HVlJ+TLR@kroah.com>
+ <50ddedf1-5ac3-91c3-0b50-645ceb541071@vrvis.at>
+ <YinufgnQtSeTA18w@kroah.com>
+ <9dd4a25a-7deb-fcdf-0c05-d37d4c894d86@vrvis.at>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
+In-Reply-To: <9dd4a25a-7deb-fcdf-0c05-d37d4c894d86@vrvis.at>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14.03.2022 16:45, Damien Le Moal wrote:
->On 3/14/22 16:35, Christoph Hellwig wrote:
->> On Sat, Mar 12, 2022 at 04:58:08PM +0900, Damien Le Moal wrote:
->>> The reason for the power of 2 requirement is 2 fold:
->>> 1) At the time we added zone support for SMR, chunk_sectors had to be a
->>> power of 2 number of sectors.
->>> 2) SMR users did request power of 2 zone sizes and that all zones have
->>> the same size as that simplified software design. There was even a
->>> de-facto agreement that 256MB zone size is a good compromise between
->>> usability and overhead of zone reclaim/GC. But that particular number is
->>> for HDD due to their performance characteristics.
->>
->> Also for NVMe we initially went down the road to try to support
->> non power of two sizes.  But there was another major early host that
->> really wanted the power of two zone sizes to support hardware based
->> hosts that can cheaply do shifts but not divisions.  The variable
->> zone capacity feature (something that Linux does not currently support)
->> is a feature requested by NVMe members on the host and device side
->> also can only be supported with the the zone size / zone capacity split.
->>
->>> The other solution would be adding a dm-unhole target to remap sectors
->>> to remove the holes from the device address space. Such target would be
->>> easy to write, but in my opinion, this would still not change the fact
->>> that applications still have to deal with error recovery and active/open
->>> zone resources. So they still have to be zone aware and operate per zone.
->>
->> I don't think we even need a new target for it.  I think you can do
->> this with a table using multiple dm-linear sections already if you
->> want.
->
->Nope, this is currently not possible: DM requires the target zone size
->to be the same as the underlying device zone size. So that would not work.
->
->>
->>> My answer to your last question ("Are we sure?") is thus: No. I am not
->>> sure this is a good idea. But as always, I would be happy to be proven
->>> wrong. So far, I have not seen any argument doing that.
->>
->> Agreed. Supporting non-power of two sizes in the block layer is fairly
->> easy as shown by some of the patches seens in this series.  Supporting
->> them properly in the whole ecosystem is not trivial and will create a
->> long-term burden.  We could do that, but we'd rather have a really good
->> reason for it, and right now I don't see that.
+On Thu, Mar 10, 2022 at 01:55:25PM +0100, Valentin Kleibel wrote:
+> On 10/03/2022 13:26, Greg Kroah-Hartman wrote:
+> > On Thu, Mar 10, 2022 at 01:24:38PM +0100, Valentin Kleibel wrote:
+> > > On 10/03/2022 13:03, Greg Kroah-Hartman wrote:
+> > > > > This patch applies to kernels 5.4 and 5.10.
+> > > > 
+> > > > We need a fix for Linus's tree first before we can backport anything to
+> > > > older kernels.  Does this also work there?
+> > > 
+> > > It is fixed in Linus' tree starting with 5.14.
+> > 
+> > What commit fixes it there?  Why not just backport that one only?
+> 
+> commit 6560ec961a08 (aoe: use blk_mq_alloc_disk and blk_cleanup_disk)
+> This commit uses the function blk_cleanup_disk() in freedev() in
+> drivers/block/aoe/aoedev.c which fixes the issue.
+> The function was introduced in f525464a8000 (block: add blk_alloc_disk and
+> blk_cleanup_disk APIs):
+> void blk_cleanup_disk(struct gendisk *disk)
+> {
+> 	blk_cleanup_queue(disk->queue);
+> 	put_disk(disk);
+> }
+> EXPORT_SYMBOL(blk_cleanup_disk);
+> 
+> I tried to backport the fix to the lts kernels without introducing a new API
+> by just adjusting the order of the two function calls.
+> Is it preferable to introduce and use the function blk_cleanup_disk()?
 
-I think that Bo's use-case is an example of a major upstream Linux host
-that is struggling with unmmapped LBAs. Can we focus on this use-case
-and the parts that we are missing to support Bytedance?
+I do not know, sorry.  But we prefer the upstream commits as much as
+possible as one-off changes like this are almost always buggy and wrong
+in the end.
 
-If you agree to this, I believe we can add support for ZoneFS pretty
-easily. We also have a POC in btrfs that we will follow on. For the time
-being, F2FS would fail at mkfs time if zone size is not a PO2.
+Try doing the backports and see what that looks like please.
 
-What do you think?
+thanks,
+
+greg k-h
