@@ -2,102 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A039DC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 09:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88EEEC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 09:55:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237999AbiCNJox (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 05:44:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48658 "EHLO
+        id S231722AbiCNJ5D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 05:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238035AbiCNJow (ORCPT
+        with ESMTP id S231392AbiCNJ5D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 05:44:52 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7241FE0B9
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 02:43:42 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id b8so13993873pjb.4
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 02:43:42 -0700 (PDT)
+        Mon, 14 Mar 2022 05:57:03 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4092834B98
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 02:55:54 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id t22so1828037plo.0
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 02:55:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=j0csP/ie2PCD7vyyosbKH7s1Y4gbhaiRFYIEX+vyAV0=;
-        b=oTfS94QWomJ0NstLPMLDuyKtAC3pnunh6hPDlX1PEGp7lUjb2IHR/RFSmU44OMhgkx
-         b2DDqUCpen/7QZys2QlxNtkGdr6qPiGltKA3DKVLHJvzNDFFM0kz8uejFcpl0/Sxb9US
-         6Gu0sAgZkpjisR7Qo7yAqJpPTBJRsUpyjIMQYTRq8TPhZ6EZzAmgUo2nCjlZho2YAFx7
-         wNYGEL95LFEPuvoOk+ZTCKrFCaS8gfADVWJAfBOGoujCIXeGxgO+p0Hosz4EhmkldbCT
-         YgBBDwOkHPR9rc9uEUEF61O1T3LouVeg7GsgqH9MHp74+tgg101Pkz9E+A0W0KmbVElb
-         PWwQ==
+        bh=gNT8l/5DJR/KFmEDvTGTz/MWUJ9Ykrp+Vhri+d4qxt0=;
+        b=BGWUEoW7LQv4eGN4gJ3VPhS8/fgozF1RE3vAC3mQERlERaUKOaDAY6YVARC7Fl58fr
+         lKTooSvsP/Iyu9WGT/DVJicu6MQrbTF/aAflM9f1ilO8+kC45oa3auoT94NcmXiFKJa+
+         yQShywR99235ZCmXO6PFfSSEmhNTGyVm4kVGSHP+cV/4h1Wc+soxIJDNY85qqf5wKJhQ
+         D0yxBkVRuWFGztkdXpdEpk5D/os1Q+TxHq0LdbSdDWSeIjaxRL1IF06lTTOqLo1op1xo
+         zsobFWRtSeyLRD8QXRO6aOqiw8ET502Opb8Ezq4LbSQWOyhhOE/3l18lJU5WBD+bT4/8
+         MF6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=j0csP/ie2PCD7vyyosbKH7s1Y4gbhaiRFYIEX+vyAV0=;
-        b=Xx1SOjB4F31/iFQklIbmuZogSqMYMofJPY2Jqo1NPNSbPwKVlMr0eOO8okVQSWDutk
-         7MaonP90/zdMMeNMF1xeBl+CuVL+NLjL1/3jxwfeiuPyWi4rzBEyWRYab19Mr34/uFAa
-         hIaJAaaKzh+mXV6v72NQDwexYlDgoKSQyJmdOOdD+WaYko23gnE8v8jzHUx43opOctsz
-         aJrlPk1a5SsQDg1m6HVLeZxe5RCuFk90bpqEVjtuLPc0CtUotRXMTfjqkqXlatrf0G/t
-         mAF2SGQVJQa9qCylHrlNUsq7xaRl9oGDuR+3WAWVuT/bLFNRlEQvYbJrYsKNJMM2i5Qq
-         SQ+w==
-X-Gm-Message-State: AOAM533CA8I4JC3TUCh6jpO5ueD2Oa/PizUYZnferYqv85ryz9hL01NO
-        7kjlXd8YH2sK8YQWNR3SmtQ=
-X-Google-Smtp-Source: ABdhPJzGIJgwIj/Wo+qdqrF2mPhHOqdjNkKkorQQQo8vyL4+43ePkoyPJCgXqHlX667Nyl5Dr4QIGA==
-X-Received: by 2002:a17:902:c086:b0:153:56:da0e with SMTP id j6-20020a170902c08600b001530056da0emr22566271pld.146.1647251021784;
-        Mon, 14 Mar 2022 02:43:41 -0700 (PDT)
+        bh=gNT8l/5DJR/KFmEDvTGTz/MWUJ9Ykrp+Vhri+d4qxt0=;
+        b=qEccHX7X7LmHzXr4S8cue2u1IM1LuktUgnxOI6m84gHQfLgqtkiru1GzxTDeKBrxWp
+         JEAekD3g3f7xd4gfFfatm1yEcSa1OQQMtr+8qasNDGLCwYlTmasrRoeQFVR+/29j4IqF
+         bAwbNXJY+AhiwIqDA19LvD/9gFY+3gV5yMZAPz8S9cqVy8aeJ6oEtxKFSw/dc+mKB8Jz
+         XoHB8/T1h29bH2tCB3/ztoeN2A+Vhh36uX1xgaGsEKKWnb20OF5k9aP6RLtZqLU8bgZ7
+         7qpZCeRykI7H93XiwD4WugycxJgER5kpudYXkzK5X5IBcVr0WXGbZzjPTwOqb4RSCPwX
+         fEYg==
+X-Gm-Message-State: AOAM532G39xKeJuXzavGOjNSWm9Hqn0aqDn10EYb1m+iflI4pyOWimoC
+        WQrRtxNME19qM9n450d/DQ0=
+X-Google-Smtp-Source: ABdhPJxSbkUcrfythTFLpiGJaKbQctzgHtPt/TUSphf0qDLo9O7QyPYNcS/QFBWdmfE2Y3bCNDnf/A==
+X-Received: by 2002:a17:902:8a91:b0:14f:969b:f6be with SMTP id p17-20020a1709028a9100b0014f969bf6bemr22772487plo.161.1647251753534;
+        Mon, 14 Mar 2022 02:55:53 -0700 (PDT)
 Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.gmail.com with ESMTPSA id s30-20020a056a001c5e00b004f73f27aa40sm19046708pfw.161.2022.03.14.02.43.38
+        by smtp.gmail.com with ESMTPSA id f21-20020a056a0022d500b004f7a420c330sm8699242pfj.12.2022.03.14.02.55.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 02:43:40 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 18:43:36 +0900
+        Mon, 14 Mar 2022 02:55:53 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 18:55:48 +0900
 From:   Suwan Kim <suwan.kim027@gmail.com>
 To:     Max Gurtovoy <mgurtovoy@nvidia.com>
-Cc:     "Michael S. Tsirkin" <mst@redhat.com>, jasowang@redhat.com,
-        pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, suwan.kim027@gmail.com
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        stefanha@redhat.com, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, suwan027.kim@gmail.com
 Subject: Re: [PATCH] virtio-blk: support polling I/O
-Message-ID: <Yi8OSE2hYoS8rSEo@localhost.localdomain>
+Message-ID: <Yi8RJHO4XDDKYHAF@localhost.localdomain>
 References: <20220311152832.17703-1-suwan.kim027@gmail.com>
- <20220311103549-mutt-send-email-mst@kernel.org>
- <YitzuxYHywdCRKVO@localhost.localdomain>
- <c91ad1e9-8c5b-ff1e-7e7f-8590ea6c67e8@nvidia.com>
+ <c851906c-c619-4e87-3272-9c41ac256052@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c91ad1e9-8c5b-ff1e-7e7f-8590ea6c67e8@nvidia.com>
+In-Reply-To: <c851906c-c619-4e87-3272-9c41ac256052@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 13, 2022 at 12:37:21PM +0200, Max Gurtovoy wrote:
+On Sun, Mar 13, 2022 at 12:42:58PM +0200, Max Gurtovoy wrote:
 > 
-> On 3/11/2022 6:07 PM, Suwan Kim wrote:
-> > On Fri, Mar 11, 2022 at 10:38:07AM -0500, Michael S. Tsirkin wrote:
-> > > On Sat, Mar 12, 2022 at 12:28:32AM +0900, Suwan Kim wrote:
-> > > > diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> > > > index d888f013d9ff..3fcaf937afe1 100644
-> > > > --- a/include/uapi/linux/virtio_blk.h
-> > > > +++ b/include/uapi/linux/virtio_blk.h
-> > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
-> > > >   	 * deallocation of one or more of the sectors.
-> > > >   	 */
-> > > >   	__u8 write_zeroes_may_unmap;
-> > > > +	__u8 unused1;
-> > > > -	__u8 unused1[3];
-> > > > +	__virtio16 num_poll_queues;
-> > > >   } __attribute__((packed));
-> > > Same as any virtio UAPI change, this has to go through the virtio TC.
-> > > In particular I don't think gating a new config field on
-> > > an existing feature flag is a good idea.
-> > Did you mean that the polling should be based on a new feature like
-> > "VIRTIO_BLK_F_POLL" and be added at the end of features_legacy[]
-> > and features[]? If then, I will add the new feture flag and resend it.
+> On 3/11/2022 5:28 PM, Suwan Kim wrote:
+> > This patch supports polling I/O via virtio-blk driver. Polling
+> > feature is enabled based on "VIRTIO_BLK_F_MQ" feature and the number
+> > of polling queues can be set by QEMU virtio-blk-pci property
+> > "num-poll-queues=N". This patch improves the polling I/O throughput
+> > and latency.
+> > 
+> > The virtio-blk driver doesn't not have a poll function and a poll
+> > queue and it has been operating in interrupt driven method even if
+> > the polling function is called in the upper layer.
+> > 
+> > virtio-blk polling is implemented upon 'batched completion' of block
+> > layer. virtblk_poll() queues completed request to io_comp_batch->req_list
+> > and later, virtblk_complete_batch() calls unmap function and ends
+> > the requests in batch.
 > 
-> Isn't there a way in the SPEC today to create a queue without interrupt
-> vector ?
+> Maybe we can do the batch in separate commit ?
+> 
+> For implementing batch in the right way you need to implement .queue_rqs
+> call back.
+> 
+> See NVMe PCI driver implementation.
+> 
+> If we're here, I would really like to see an implementation of
+> blk_mq_ops.timeout callback in virtio-blk.
+> 
+> I think it will take this driver to the next level.
 
-It seems that it is not possible to create a queue without interrupt
-vector. If it is possible, we can expect more polling improvement.
+Thanks for the feedback. I will implement .queue_rqs for virtio-blk
+and make a seperate commit. Later, I will try to implement
+blk_mq_ops.timeout as you mentioned.
+
+I will send the patch series soon as below.
+[1] support .queue_rqs for batch submission
+[2] support polling I/O
 
 Regards,
 Suwan Kim
