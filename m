@@ -2,137 +2,238 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F73C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 20:29:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09887C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 20:30:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239151AbiCNUae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 16:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
+        id S245030AbiCNUb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 16:31:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235159AbiCNUad (ORCPT
+        with ESMTP id S234197AbiCNUb4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 16:30:33 -0400
-Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5B9FFD28
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 13:29:22 -0700 (PDT)
-Received: by mail-il1-x134.google.com with SMTP id x9so5316049ilc.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 13:29:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=adXU5jvKdTeVUXf7FxN5XUsW/sqJcSLYktYqOlUAuGU=;
-        b=YMaAzpTJ/gtwOmU/jO4rVspaaaENPjTYPf8fMMpYAvUtktldwYaURpBUJTghtO3gb/
-         WaKY0lNhSy8SG8TjDP+WAEBn6c4q4PzqXRWvemkAHFK1ZX80feH+2MdWJDfnPEvGQ6AG
-         2PK3toOPhslyKZJ2N1It0wSXSgfGxCd2YXpuTyGn+RP3MBJAGsqNuElspn5ZIExsWYfZ
-         0dYlx6MHOnSvJ0dfAxAz2TqpqfnmExSDQHvtx7S2K3ZttkmnvYpyyodxXgo3XoqB2Pnx
-         GYrloOG9Wg0hjCeiQenx8eIuf8m9C5N0FHXlGxDsL0OTggtaee9aGxruVHMQyvF8iY+Z
-         BX2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=adXU5jvKdTeVUXf7FxN5XUsW/sqJcSLYktYqOlUAuGU=;
-        b=EPPSrvc/a+HgsdLNZeCsU59SdS1+0zFx/UlXynCYrhNZaExmzc23a6xR2D1EGBmE6Y
-         3yMho+ahKxsP1xTkAPMENrcJjshW2nssPwTWKeiuGJ+WZGCtQm80SyiRedcJCJaA4wZL
-         JUwhniS+VZPFLBNG1EDP2/xEXr5+JugU8hIicKjyenwZxtgL+ZjKd34r2bHFyoxuFJwr
-         7Y9gOsJIK5FmBYSnZlT7EXmbCxNaRid3AgT4hg2DGd7xOT+/T563RPQD7dUVXgOSDMFp
-         biJIMkznzXHvXIsK2yy7Hi15DAhP+FA7OFgcSK4kjAPgCS9o0y6lvIl2LX1LMu4WG7FC
-         syow==
-X-Gm-Message-State: AOAM533VuV6I1srWzOcQRzTUlFZZWR9D/Iv2GzUbyIdU5Hw5uvuLuNzH
-        FRR/SsQ5lLRmOgoDkPfq+oQqkw==
-X-Google-Smtp-Source: ABdhPJzQQ8K0nRbPG+0HNAXbsPOTCihXiooGxuoIC/3yrAozV0/AYejpQjvJnYoxarWBPBHqW8IVxw==
-X-Received: by 2002:a05:6e02:13c3:b0:2c6:229a:73b8 with SMTP id v3-20020a056e0213c300b002c6229a73b8mr20479980ilj.260.1647289762114;
-        Mon, 14 Mar 2022 13:29:22 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q5-20020a056e0220e500b002c79a587c4bsm3004499ilv.4.2022.03.14.13.29.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 14 Mar 2022 13:29:21 -0700 (PDT)
-Message-ID: <f8c176d4-74f0-3e4f-446f-2a5f8ace3b28@kernel.dk>
-Date:   Mon, 14 Mar 2022 14:29:20 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+        Mon, 14 Mar 2022 16:31:56 -0400
+Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE5D39B81;
+        Mon, 14 Mar 2022 13:30:45 -0700 (PDT)
+Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220314203041usoutp02044e252abdab00f5251620273718f920~cWWIs1c5g0567605676usoutp02L;
+        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220314203041usoutp02044e252abdab00f5251620273718f920~cWWIs1c5g0567605676usoutp02L
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1647289841;
+        bh=ZpxuttbwKow/Z0kqApTGYaW7moCIuKJs+JGqfcJDvtQ=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=cMhawn4p7xPcV7tvp8/3rC8ccF9/eNxl8jwzCh/fQ7fn4vV/+0wyuobXYSPBuMOaw
+         k4uSxqmvkS0o322iGOdg0LOXJPODZp7oZgjz5hP6MTm8/ld7rXOyz0Ghhp8fgZalp7
+         OxsvNYQGPNGcvvNjZpEgHRI1RpBx4HdgCat41toU=
+Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
+        [203.254.195.111]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220314203041uscas1p2e3ca25dd62ace0d3057b54c67d1228b7~cWWIitEQw0453604536uscas1p2Y;
+        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
+Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
+        ussmges2new.samsung.com (USCPEMTA) with SMTP id 5A.08.10104.1F5AF226; Mon,
+        14 Mar 2022 16:30:41 -0400 (EDT)
+Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
+        [203.254.195.91]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220314203041uscas1p1ffe9fa1fd864780a38861498f940039e~cWWIK2bb41325113251uscas1p1r;
+        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
+X-AuditID: cbfec36f-315ff70000002778-91-622fa5f1cb05
+Received: from SSI-EX3.ssi.samsung.com ( [105.128.2.146]) by
+        ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id 96.3C.10042.1F5AF226; Mon,
+        14 Mar 2022 16:30:41 -0400 (EDT)
+Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
+        SSI-EX3.ssi.samsung.com (105.128.2.228) with Microsoft SMTP Server
+        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+        15.1.2242.4; Mon, 14 Mar 2022 13:30:40 -0700
+Received: from SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36]) by
+        SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36%3]) with mapi id
+        15.01.2242.008; Mon, 14 Mar 2022 13:30:40 -0700
+From:   Adam Manzanares <a.manzanares@samsung.com>
+To:     Kanchan Joshi <joshiiitr@gmail.com>
+CC:     Luis Chamberlain <mcgrof@kernel.org>,
+        Christoph Hellwig <hch@lst.de>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Keith Busch" <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "sbates@raithlin.com" <sbates@raithlin.com>,
+        "logang@deltatee.com" <logang@deltatee.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
+        Anuj Gupta <anuj20.g@samsung.com>,
+        "j.granados@samsung.com" <j.granados@samsung.com>,
+        "j.devantier@samsung.com" <j.devantier@samsung.com>
+Subject: Re: [PATCH 00/17] io_uring passthru over nvme
+Thread-Topic: [PATCH 00/17] io_uring passthru over nvme
+Thread-Index: AQHYMwMGkOxasisH10Kgb51ozZAKiKy40f0AgAAatgCAAgGiAIAAcwUAgAAwNQCAAa5ZgIAClCMA
+Date:   Mon, 14 Mar 2022 20:30:40 +0000
+Message-ID: <20220314203033.GA35883@bgt-140510-bm01>
+In-Reply-To: <CA+1E3rJNcqFT58eg1O+wDFyAkhCjHjnN6Hntms6jQxhLt1gtaQ@mail.gmail.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220312144415.20010-1-linux@zary.sk>
- <202203132015.18183.linux@zary.sk>
- <5161ed17-5f55-e851-c2e2-5340cc62fa3b@kernel.dk>
- <202203142125.40532.linux@zary.sk>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <202203142125.40532.linux@zary.sk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [105.128.2.176]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-ID: <B82CD83EA2E6134F9A41A98416F976AE@ssi.samsung.com>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHKsWRmVeSWpSXmKPExsWy7djXc7ofl+onGUy5qWExZ9U2RovVd/vZ
+        LFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saEp4wWa24+ZbH4
+        fGYeqwOvx7Orzxg9ds66y+7RvOAOi8fls6Uem1Z1snlsXlLvsftmA5vHtsUvWT0+b5IL4Izi
+        sklJzcksSy3St0vgyjjefoSl4Ityxemjz1kaGP/JdDFyckgImEi8WTmBpYuRi0NIYCWjxJmf
+        71lAEkICrUwSHx/YwRTdeDWJDaJoLaPE7RdboTo+MkocWnqZGcI5wCjR/2A7K0gLm4CBxO/j
+        G5lBbBEBdYkv6ycyghQxCzxllZjTc40NJCEsYCZx6nszO0SRucTvRRNYIewoiRVH1zKC2CwC
+        qhI9XUfBBvEC3fF82xOw+zgFAiV6z68E62UUEJP4fmoNE4jNLCAucevJfCaIuwUlFs3ewwxh
+        i0n82/WQDcJWlLj//SU7RL2exI2pU9ggbDuJhyvfskDY2hLLFr6G2isocXImxF4JAUmJgytu
+        gL0vITCfU+LJhh5WiISLRMfC+1CLpSX+3l3GBFG0ilFiyrc2dghnM6PEjF8XoKqsJf51XmOf
+        wKgyC8nls5BcNQvJVbOQXDULyVULGFlXMYqXFhfnpqcWG+WllusVJ+YWl+al6yXn525iBCbB
+        0/8O5+9gvH7ro94hRiYOxkOMEhzMSiK89RX6SUK8KYmVValF+fFFpTmpxYcYpTlYlMR5l2Vu
+        SBQSSE8sSc1OTS1ILYLJMnFwSjUw6RW8KkhZf5R3YRX/JX85U9dF7SYcx6OfRHCILfwc+i3T
+        9vZf8//Lg0ttYv9ra/mtqDaMmvvPZjnj97Pls2wyJHdU3j/EkbKzWOGYToHirmlC7/V3rk6/
+        89Dq6iu/JtfeexJpOz8snL5u9brME6Xcf3tN93JVPos6uSYgRfnQjbJ7yd3h1yXb/5+r1Lz0
+        YNayxQ+UF33fvbZgyvk+X7/DHZff+99m3fXU/KxSf5m/wMGOiRdPPZyr9dBmEa+Hw/3ZyaUH
+        Lpz4z5Eckuf4d1turaF0e9WHuJIbjz37Goo/lhzZuWJa8O8rd+PzV2zOvzKL1fqtXKVryfub
+        0hXHHx1m3uciHmW+9kBodvyEH4/09imxFGckGmoxFxUnAgBj7WeV8QMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsWS2cA0SffjUv0kg2vPZS3mrNrGaLH6bj+b
+        xcrVR5ks3rWeY7HoPH2ByeL828NMFpMOXWO02HtL22L+sqfsFktaj7NZ3JjwlNFizc2nLBaf
+        z8xjdeD1eHb1GaPHzll32T2aF9xh8bh8ttRj06pONo/NS+o9dt9sYPPYtvglq8fnTXIBnFFc
+        NimpOZllqUX6dglcGcfbj7AUfFGuOH30OUsD4z+ZLkZODgkBE4kbryaxdTFycQgJrGaUODDt
+        NyuE85FRYuO1E1DOAUaJ/k/3mUBa2AQMJH4f38gMYosIqEt8WT+REaSIWeApq8ScnmtsIAlh
+        ATOJU9+b2SGKzCV+L5rACmFHSaw4upYRxGYRUJXo6ToKNogX6I7n256wQGzbwyyx5OkDsCJO
+        gUCJ3vMrwQYxCohJfD+1BuwKZgFxiVtP5jNBPCEgsWTPeWYIW1Ti5eN/rBC2osT97y/ZIer1
+        JG5MncIGYdtJPFz5lgXC1pZYtvA11BGCEidnPmGB6JWUOLjiBssERolZSNbNQjJqFpJRs5CM
+        moVk1AJG1lWM4qXFxbnpFcVGeanlesWJucWleel6yfm5mxiB6eP0v8PROxhv3/qod4iRiYPx
+        EKMEB7OSCG99hX6SEG9KYmVValF+fFFpTmrxIUZpDhYlcd6XURPjhQTSE0tSs1NTC1KLYLJM
+        HJxSDUzW+yPntc8rzup+3mlr2nrq4Ics6c0rDQ5v6nGX6orbkcf4tNn7zye7xyL7ZXgeT1zE
+        lX9F71L4Hfevztf+z3nanlaml2Btl9x7y6qtODhU6EMgQxP/bDuv+OtHZ3x0//76hI5X0j0J
+        9ej9zV/lXf0DXLxNbi6J/77snqxWVsLlP7PzuWwm/jiVu2D2MXOPvr99sZpyYTpua0y8/fJ3
+        hJ/4+00qJL+s8UipvpKvIuPRzwUrj75z0YvvTLtT27JRqiUj/VqL2yKXLcm9b88eKHNZJm7s
+        kem6NjHpwpOKyxlyXFdnX/mz/lzEU+miNbahS9//5Ew5kXeHvZX9zf69B69rvTS5XjLnzf07
+        Vpe5liixFGckGmoxFxUnAgCk4g55jgMAAA==
+X-CMS-MailID: 20220314203041uscas1p1ffe9fa1fd864780a38861498f940039e
+CMS-TYPE: 301P
+X-CMS-RootMailID: 20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696
+References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
+        <20220308152105.309618-1-joshi.k@samsung.com>
+        <20220310082926.GA26614@lst.de>
+        <CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com>
+        <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
+        <20220311233501.GA6435@bgt-140510-bm01>
+        <20220312022732.GA10120@bgt-140510-bm01>
+        <CA+1E3rJNcqFT58eg1O+wDFyAkhCjHjnN6Hntms6jQxhLt1gtaQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/22 2:25 PM, Ondrej Zary wrote:
-> On Monday 14 March 2022 00:19:30 Jens Axboe wrote:
->> On 3/13/22 1:15 PM, Ondrej Zary wrote:
->>> On Saturday 12 March 2022 15:44:15 Ondrej Zary wrote:
->>>> The pata_parport is a libata-based replacement of the old PARIDE
->>>> subsystem - driver for parallel port IDE devices.
->>>> It uses the original paride low-level protocol drivers but does not
->>>> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
->>>> behind parallel port adapters are handled by the ATA layer.
->>>>
->>>> This will allow paride and its high-level drivers to be removed.
->>>>
->>>> paride and pata_parport are mutually exclusive because the compiled
->>>> protocol drivers are incompatible.
->>>>
->>>> Tested with Imation SuperDisk LS-120 and HP C4381A (both use EPAT
->>>> chip).
->>>>
->>>> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
->>>> drivers - they don't handle non-multiple-of-4 block transfers
->>>> correctly. This causes problems with LS-120 drive.
->>>> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
->>>> or 8-bit mode is used first (probably some initialization missing?).
->>>> Once the device is initialized, EPP works until power cycle.
->>>>
->>>> So after device power on, you have to:
->>>> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
->>>> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
->>>> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
->>>> (autoprobe will initialize correctly as it tries the slowest modes
->>>> first but you'll get the broken EPP-32 mode)
->>>
->>> Found a bug - the same device can be registered multiple times. Fix
->>> will be in v2. But this revealed a bigger problem: pi_connect can
->>> sleep (uses parport_claim_or_block) and libata does not like that. Any
->>> ideas how to fix this?
->>
->> I think you'd need two things here:
->>
->> - The blk-mq queue should be registered with BLK_MQ_F_BLOCKING, which
->>   will allow blocking off the queue_rq path.
-> 
-> My knowledge about blk-mq is exactly zero. After grepping the code, I
-> guess that BLK_MQ_F_BLOCKING should be used by the block device
-> drivers - sd and sr?
+On Sun, Mar 13, 2022 at 10:37:53AM +0530, Kanchan Joshi wrote:
+> On Sat, Mar 12, 2022 at 7:57 AM Adam Manzanares
+> <a.manzanares@samsung.com> wrote:
+> >
+> > On Fri, Mar 11, 2022 at 03:35:04PM -0800, Adam Manzanares wrote:
+> > > On Fri, Mar 11, 2022 at 08:43:24AM -0800, Luis Chamberlain wrote:
+> > > > On Thu, Mar 10, 2022 at 03:35:02PM +0530, Kanchan Joshi wrote:
+> > > > > On Thu, Mar 10, 2022 at 1:59 PM Christoph Hellwig <hch@lst.de> wr=
+ote:
+> > > > > >
+> > > > > > What branch is this against?
+> > > > > Sorry I missed that in the cover.
+> > > > > Two options -
+> > > > > (a) https://urldefense.com/v3/__https://protect2.fireeye.com/v1/u=
+rl?k=3D03500d22-5ccb341f-0351866d-0cc47a31309a-6f95e6932e414a1d&q=3D1&e=3D4=
+ca7b05e-2fe6-40d9-bbcf-a4ed687eca9f&u=3Dhttps*3A*2F*2Fgit.kernel.dk*2Fcgit*=
+2Flinux-block*2Flog*2F*3Fh*3Dio_uring-big-sqe__;JSUlJSUlJSUl!!EwVzqGoTKBqv-=
+0DWAJBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDh8_2-U=
+9$
+> > > > > first patch ("128 byte sqe support") is already there.
+> > > > > (b) for-next (linux-block), series will fit on top of commit 9e9d=
+83faa
+> > > > > ("io_uring: Remove unneeded test in io_run_task_work_sig")
+> > > > >
+> > > > > > Do you have a git tree available?
+> > > > > Not at the moment.
+> > > > >
+> > > > > @Jens: Please see if it is possible to move patches to your
+> > > > > io_uring-big-sqe branch (and maybe rename that to big-sqe-pt.v1).
+> > > >
+> > > > Since Jens might be busy, I've put up a tree with all this stuff:
+> > > >
+> > > > https://urldefense.com/v3/__https://git.kernel.org/pub/scm/linux/ke=
+rnel/git/mcgrof/linux-next.git/log/?h=3D20220311-io-uring-cmd__;!!EwVzqGoTK=
+Bqv-0DWAJBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDiT=
+F0Q7F$
+> > > >
+> > > > It is based on option (b) mentioned above, I took linux-block for-n=
+ext
+> > > > and reset the tree to commit "io_uring: Remove unneeded test in
+> > > > io_run_task_work_sig" before applying the series.
+> > >
+> > > FYI I can be involved in testing this and have added some colleagues =
+that can
+> > > help in this regard. We have been using some form of this work for se=
+veral
+> > > months now and haven't had any issues. That being said some simple te=
+sts I have
+> > > are not currently working with the above git tree :). I will work to =
+get this
+> > > resolved and post an update here.
+> >
+> > Sorry for the noise, I jumped up the stack too quickly with my tests. T=
+he
+> > "simple test" actually depends on several pieces of SW not related to t=
+he
+> > kernel.
+>=20
+> Did you read the cover letter? It's not the same *user-interface* as
+> the previous series.
+> If you did not modify those out-of-kernel layers for the new
+> interface, you're bound to see what you saw.
+> If you did, please specify what the simple test was. I'll fix that in v2.
 
-The controller would set
+I got a little ahead of myself. Looking forward to leveraging this work in =
+the=20
+near future ;)
 
-->needs_blocking_queue_rq = true;
+>=20
+> Otherwise, the throwaway remark "simple tests not working" - only
+> infers this series is untested. Nothing could be further from the
+> truth.
+> Rather this series is more robust than the previous one.
 
-or something, and we'd default to false. And if that is set, when the
-blk-mq queue is created, then we'd set BLK_MQ_F_BLOCKING upon creation
-if that flag is true.
+Excellent, to hear that this series is robust. My intent was not to claim
+this series was untested. It is clear I need to do more hw before making an=
+=20
+attempt to help with testing.
 
-That's the block layer side. Then in libata you'd need to ensure that
-you check that same setting and invoke ata_qc_issue() appropriately.
+>=20
+> Let me expand bit more on testing part that's already there in cover:
+>=20
+> fio -iodepth=3D256 -rw=3Drandread -ioengine=3Dio_uring -bs=3D512 -numjobs=
+=3D1
+> -runtime=3D60 -group_reporting -iodepth_batch_submit=3D64
+> -iodepth_batch_complete_min=3D1 -iodepth_batch_complete_max=3D64
+> -fixedbufs=3D1 -hipri=3D1 -sqthread_poll=3D0 -filename=3D/dev/ng0n1
+> -name=3Dio_uring_256 -uring_cmd=3D1
+>=20
+> When I reduce the above command-line to do single IO, I call that a simpl=
+e test.
+> Simple test that touches almost *everything* that patches build (i.e
+> async, fixed-buffer, plugging, fixed-buffer, bio-cache, polling).
+> And larger tests combine these knobs in various ways, QD ranging from
+> 1, 2, 4...upto 256; on general and perf-optimized kernel config; with
+> big-sqe and normal-sqe (pointer one). And all this is repeated on the
+> block interface (regular io) too, which covers the regression part.
+> Sure, I can add more tests for checking regression. But no, I don't
+> expect any simple test to fail. And that applies to Luis' tree as
+> well. Tried that too again.
 
-Very top level stuff, there might be more things lurking below. But
-you'll probably find them as you test this stuff...
+Looks like you have all of your based covered. Keep up the good work.
 
--- 
-Jens Axboe
-
+>=20
+>=20
+> --=20
+> Joshi=
