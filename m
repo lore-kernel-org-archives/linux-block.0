@@ -2,123 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD03C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 14:48:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 007B7C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 15:03:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241200AbiCNOta (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 10:49:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34120 "EHLO
+        id S242320AbiCNPFB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 11:05:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240684AbiCNOt3 (ORCPT
+        with ESMTP id S241977AbiCNPE7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 10:49:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 81395304
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 07:48:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647269293;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4GMiQH1LonPMifl6a0QGWi66yOtSeKNsLnwJKGhjtJ4=;
-        b=IgLHMk1Pv5z4uJtVpYYfKcMC/RwnzHxReXEB/WhxropQDucRsh3yUlT8HI1l0GpeZcqRVw
-        2V2LwMatElvJUCBTfCFtOMUp+7jPIAVKPmKyw04nvm5nkTxpVioNcoKYn+/wRam+E4XjU8
-        Zkh3UHmQ7yIN5oAfNfi689+xeda72qU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-281-_AiYtbFCNPSqn4Ye0dIA2g-1; Mon, 14 Mar 2022 10:48:10 -0400
-X-MC-Unique: _AiYtbFCNPSqn4Ye0dIA2g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07DEA85A5BC;
-        Mon, 14 Mar 2022 14:48:09 +0000 (UTC)
-Received: from localhost (unknown [10.39.195.99])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 93ACDC33260;
-        Mon, 14 Mar 2022 14:48:08 +0000 (UTC)
-Date:   Mon, 14 Mar 2022 14:48:07 +0000
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     Jason Wang <jasowang@redhat.com>, mst@redhat.com,
-        pbonzini@redhat.com, virtualization@lists.linux-foundation.org,
+        Mon, 14 Mar 2022 11:04:59 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7430B3E5F9;
+        Mon, 14 Mar 2022 08:03:49 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id t11so24444972wrm.5;
+        Mon, 14 Mar 2022 08:03:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=s9afH/O5dsvmhKf0xLBy1pTIXzqvR2poyDjCQitPnEo=;
+        b=qfRD3pKDrDX47pmXSjGhNqcjA7KM+hfWLwQM0iFWiIeul9+y0qGGCT1FHQdZRds8vE
+         rlD8MF93CHJIRVUqf+UB7bHOrFpDrf+esCnBJBZd5HMW4Qsj8xLzYgIVo9oSLFQ63Ex6
+         kyp6MMBK7Tnsnt5SRHWKZpREIkF/rHNqGdUlKhAYRli7ZkPQiF98SSn6NBFd9wjzPCvz
+         qshV0Z88R9mJiX/I4yt1k1rVulf0TniklKm8pYqeRSo/kuymwRKuk0KoIAnhNY4+5rxo
+         qZLiiXms1Q1OuiJtiSwt68dLbGNeOEIPdJ9jHl08i7QKOgNRuiz+Zp6jDGyJ0LwWA0qo
+         Ge0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=s9afH/O5dsvmhKf0xLBy1pTIXzqvR2poyDjCQitPnEo=;
+        b=ofGLPVEYcpvbhZ5pYKSKoYQApAwmH6tz3K7tzUrZd7sGvMCGNflEyN5Nc8J/rXn4qm
+         C+mQ+eyaf3S9CjaxI29XSad5i3wOubwDAmvwAWuiKvzxpdZK08W0w/l9OKFGE/jjfYo9
+         ZcYqztIBq078RN/dbgnYO8ouHi+9ca3awHhTmkwrVyPJnizj19g8nYul6iF+bU8ZGiU/
+         fHvUtJ7LbnXqFIBCk/5mcmNfc3zFh/LTm4xDv2qSNey/s25cgm6W1MQcrDfQ1iWi0u6o
+         pXiDblVq2s0oAqsEldt1mGSv0HRCV9fFnIXyoT7JEdDjVYwJ51rIn7a8w3W8/U+4A2xY
+         0ETA==
+X-Gm-Message-State: AOAM532xSquo8tQPybGwFtK+krgVryHTO6HGlsE3awXYVA1V6N7S4xCc
+        QiHhnf4TFWZ9uwekRj/Eqfc=
+X-Google-Smtp-Source: ABdhPJx6tlK4XTUgp3t2NhLgW6fI5LZXMa6JxSyqNy1w53t5oFfFJVnfI1IC5qUXdBorh3/4e6raHg==
+X-Received: by 2002:a05:6000:1868:b0:203:732f:d657 with SMTP id d8-20020a056000186800b00203732fd657mr16382494wri.664.1647270227888;
+        Mon, 14 Mar 2022 08:03:47 -0700 (PDT)
+Received: from felia.fritz.box (200116b82624ff0060a4091d550340a9.dip.versatel-1u1.de. [2001:16b8:2624:ff00:60a4:91d:5503:40a9])
+        by smtp.gmail.com with ESMTPSA id l25-20020a1c7919000000b0038999b380e9sm14984749wme.38.2022.03.14.08.03.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 08:03:47 -0700 (PDT)
+From:   Lukas Bulwahn <lukas.bulwahn@gmail.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
         linux-block@vger.kernel.org
-Subject: Re: [PATCH] virtio-blk: support polling I/O
-Message-ID: <Yi9Vp3+wkpH8VMNU@stefanha-x1.localdomain>
-References: <20220311152832.17703-1-suwan.kim027@gmail.com>
- <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
- <Yi82BL9KecQsVfgX@localhost.localdomain>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="m9x06S17g2qlOLVa"
-Content-Disposition: inline
-In-Reply-To: <Yi82BL9KecQsVfgX@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Cc:     "James E . J . Bottomley" <jejb@linux.ibm.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org, linux-kernel@vger.kernel.org,
+        clang-built-linux@googlegroups.com,
+        kernel-janitors@vger.kernel.org,
+        Lukas Bulwahn <lukas.bulwahn@gmail.com>
+Subject: [PATCH] sr: simplify the local variable initialization in sr_block_open()
+Date:   Mon, 14 Mar 2022 16:03:21 +0100
+Message-Id: <20220314150321.17720-1-lukas.bulwahn@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Commit 01d0c698536f ("sr: implement ->free_disk to simplify refcounting")
+refactored sr_block_open(), initialized one variable with a duplicate
+assignment (probably an unintended copy & paste duplication) and turned one
+error case into an early return, which makes the initialization of the
+return variable needless.
 
---m9x06S17g2qlOLVa
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+So, simplify the local variable initialization in sr_block_open() to make
+the code a bit more clear.
 
-On Mon, Mar 14, 2022 at 09:33:08PM +0900, Suwan Kim wrote:
-> On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
-> >=20
-> > =E5=9C=A8 2022/3/11 =E4=B8=8B=E5=8D=8811:28, Suwan Kim =E5=86=99=E9=81=
-=93:
-> > > diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/vir=
-tio_blk.h
-> > > index d888f013d9ff..3fcaf937afe1 100644
-> > > --- a/include/uapi/linux/virtio_blk.h
-> > > +++ b/include/uapi/linux/virtio_blk.h
-> > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
-> > >   	 * deallocation of one or more of the sectors.
-> > >   	 */
-> > >   	__u8 write_zeroes_may_unmap;
-> > > +	__u8 unused1;
-> > > -	__u8 unused1[3];
-> > > +	__virtio16 num_poll_queues;
-> > >   } __attribute__((packed));
-> >=20
-> >=20
-> > This looks like a implementation specific (virtio-blk-pci) optimization=
-, how
-> > about other implementation like vhost-user-blk?
->=20
-> I didn=E2=80=99t consider vhost-user-blk yet. But does vhost-user-blk also
-> use vritio_blk_config as kernel-qemu interface?
->=20
-> Does vhost-user-blk need additional modification to support polling
-> in kernel side?
+No functional change. No change in resulting object code.
 
-I think QEMU's --device vhost-user-blk-pci will work with this patch
-series because QEMU passes the struct virtio_blk_config from the
-vhost-user-blk server to the guest. If a new vhost-user-blk server
-supports num_poll_queues then the guest will see the config field.
+Signed-off-by: Lukas Bulwahn <lukas.bulwahn@gmail.com>
+---
+Christoph, please ack.
 
-However, the new feature bit that was discussed in another sub-thread
-needs to be added to hw/block/vhost-user-blk.c:user_feature_bits[] and
-QEMU needs to be recompiled.
+Jens, please pick this minor clean-up on your -next branch on top of the
+commit above.
 
-Stefan
+ drivers/scsi/sr.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---m9x06S17g2qlOLVa
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmIvVacACgkQnKSrs4Gr
-c8gNdAf/QqaaX2nmChWxko1xxMTk7lYZ5ul9IpAj5Thd3yrP/UoXspWLVgNJ0DJE
-wJGOkll8hsc7/vGALzp7Z3d1ZOnridtMXJvFnsSLzVdLvP7EjKuJ62RdrWZIrezd
-Gf52L9Lq1C4UOekVfz2Lv6Sap4ELCLn8xhfkWK1ktb8qMNmsFKl1jXaBpTfZpGUO
-17+/oi2P0upSgFN9sYN4hjgnFspCiEJgrTloYpuPCKPkkw+Lh7fu5HTGtF9UiXWN
-y5QZqhqTj0jvvLgDZPTazWvr5XPmIACjiSV4w+khaJV3OWDk+EoDgugVzbLiCoFO
-rNxlQlEYNOmg6tFXYKg/VduyB5N+LQ==
-=L947
------END PGP SIGNATURE-----
-
---m9x06S17g2qlOLVa--
+diff --git a/drivers/scsi/sr.c b/drivers/scsi/sr.c
+index 00142095522a..5ba9df334968 100644
+--- a/drivers/scsi/sr.c
++++ b/drivers/scsi/sr.c
+@@ -483,9 +483,9 @@ static void sr_revalidate_disk(struct scsi_cd *cd)
+ 
+ static int sr_block_open(struct block_device *bdev, fmode_t mode)
+ {
+-	struct scsi_cd *cd = cd = scsi_cd(bdev->bd_disk);
++	struct scsi_cd *cd = scsi_cd(bdev->bd_disk);
+ 	struct scsi_device *sdev = cd->device;
+-	int ret = -ENXIO;
++	int ret;
+ 
+ 	if (scsi_device_get(cd->device))
+ 		return -ENXIO;
+-- 
+2.17.1
 
