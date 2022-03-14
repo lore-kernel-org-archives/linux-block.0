@@ -2,238 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09887C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 20:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94670C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 20:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245030AbiCNUb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 16:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        id S245190AbiCNUnH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 16:43:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34842 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234197AbiCNUb4 (ORCPT
+        with ESMTP id S236259AbiCNUmv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 16:31:56 -0400
-Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEE5D39B81;
-        Mon, 14 Mar 2022 13:30:45 -0700 (PDT)
-Received: from uscas1p1.samsung.com (unknown [182.198.245.206])
-        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220314203041usoutp02044e252abdab00f5251620273718f920~cWWIs1c5g0567605676usoutp02L;
-        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220314203041usoutp02044e252abdab00f5251620273718f920~cWWIs1c5g0567605676usoutp02L
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1647289841;
-        bh=ZpxuttbwKow/Z0kqApTGYaW7moCIuKJs+JGqfcJDvtQ=;
-        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=cMhawn4p7xPcV7tvp8/3rC8ccF9/eNxl8jwzCh/fQ7fn4vV/+0wyuobXYSPBuMOaw
-         k4uSxqmvkS0o322iGOdg0LOXJPODZp7oZgjz5hP6MTm8/ld7rXOyz0Ghhp8fgZalp7
-         OxsvNYQGPNGcvvNjZpEgHRI1RpBx4HdgCat41toU=
-Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
-        [203.254.195.111]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220314203041uscas1p2e3ca25dd62ace0d3057b54c67d1228b7~cWWIitEQw0453604536uscas1p2Y;
-        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
-Received: from uscas1p1.samsung.com ( [182.198.245.206]) by
-        ussmges2new.samsung.com (USCPEMTA) with SMTP id 5A.08.10104.1F5AF226; Mon,
-        14 Mar 2022 16:30:41 -0400 (EDT)
-Received: from ussmgxs2new.samsung.com (u91.gpu85.samsung.co.kr
-        [203.254.195.91]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220314203041uscas1p1ffe9fa1fd864780a38861498f940039e~cWWIK2bb41325113251uscas1p1r;
-        Mon, 14 Mar 2022 20:30:41 +0000 (GMT)
-X-AuditID: cbfec36f-315ff70000002778-91-622fa5f1cb05
-Received: from SSI-EX3.ssi.samsung.com ( [105.128.2.146]) by
-        ussmgxs2new.samsung.com (USCPEXMTA) with SMTP id 96.3C.10042.1F5AF226; Mon,
-        14 Mar 2022 16:30:41 -0400 (EDT)
-Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
-        SSI-EX3.ssi.samsung.com (105.128.2.228) with Microsoft SMTP Server
-        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
-        15.1.2242.4; Mon, 14 Mar 2022 13:30:40 -0700
-Received: from SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36]) by
-        SSI-EX3.ssi.samsung.com ([fe80::8d80:5816:c578:8c36%3]) with mapi id
-        15.01.2242.008; Mon, 14 Mar 2022 13:30:40 -0700
-From:   Adam Manzanares <a.manzanares@samsung.com>
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-CC:     Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Keith Busch" <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "sbates@raithlin.com" <sbates@raithlin.com>,
-        "logang@deltatee.com" <logang@deltatee.com>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
-        Anuj Gupta <anuj20.g@samsung.com>,
-        "j.granados@samsung.com" <j.granados@samsung.com>,
-        "j.devantier@samsung.com" <j.devantier@samsung.com>
-Subject: Re: [PATCH 00/17] io_uring passthru over nvme
-Thread-Topic: [PATCH 00/17] io_uring passthru over nvme
-Thread-Index: AQHYMwMGkOxasisH10Kgb51ozZAKiKy40f0AgAAatgCAAgGiAIAAcwUAgAAwNQCAAa5ZgIAClCMA
-Date:   Mon, 14 Mar 2022 20:30:40 +0000
-Message-ID: <20220314203033.GA35883@bgt-140510-bm01>
-In-Reply-To: <CA+1E3rJNcqFT58eg1O+wDFyAkhCjHjnN6Hntms6jQxhLt1gtaQ@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [105.128.2.176]
-Content-Type: text/plain; charset="iso-8859-1"
-Content-ID: <B82CD83EA2E6134F9A41A98416F976AE@ssi.samsung.com>
-Content-Transfer-Encoding: quoted-printable
+        Mon, 14 Mar 2022 16:42:51 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0457433E97;
+        Mon, 14 Mar 2022 13:41:41 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id a5so16045480pfv.2;
+        Mon, 14 Mar 2022 13:41:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dMQU9SMKR/lWX9t7ZKrdc0ixf/awYY/e1sBD6vIkKPI=;
+        b=RrxHYKMJBnyETq0qfUtJd1iGBLZXpi7mjMJFEVIjz11p6q7xjGkQSY/3iLk2WZMasM
+         x6fp47eS7duSMT81i4O+nfNKXkZbpkCBpzbOY3d5w3C4krYwww86shhuA/QzhDJrvFO0
+         lvJXrhQhnqoxiq/J4nZXspxAzMDT2XdWMwluYz10w9pQIlDB7Thpd6aNvzUkBNRRcgMw
+         z2AnC5JRv20+GCgX4GbusF7eF2MuuEBBWy7JY4ubO9gBhDJaESYPgAMyJ/BXCKZjziF7
+         eHLr8ucXJ6+HWfMgvHLv5Z5JhVi8iAYcg+EsBRFaGvdXwvcbvhRgOa4Bz5rsTcXNs+/G
+         6g9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=dMQU9SMKR/lWX9t7ZKrdc0ixf/awYY/e1sBD6vIkKPI=;
+        b=bEsSwOv5KCXl+AX+xjLcnCWzdohlTQHkh/DGaQt/nNWB8THigQRc89OAMcEcW0bv9F
+         hiDiz2OtOWYXOfSQVSDgldlb9STeEZB6gWYk58NJBlSZHU6z5WF5omw4b4iK/iXpixww
+         uzgviNLMq/0ct9bDSXUdEWr9xQmEM+VP6v+8Wu+AYgCCitQaWq9eq7OOmB2iVVf61vgA
+         wsYzh15SSXeES9jMur4koASsA3J9e5IBODJ0rAoQ5FCDYgaqMJ++Q44pR2sEinni4Ofa
+         nmwtWZ5yDCKf6FYoq7ng63V13M078XZIDSdl251w+7GOp7LbsRfeSWEgvdtVJrb4psaz
+         eKGQ==
+X-Gm-Message-State: AOAM533CHfKFTgeUNiTXMJuZZ+eeenZ+Im2K5ITsDv4tnKlAI3XWg3WU
+        JBSRXonqQM8DmyAkGdat4FY=
+X-Google-Smtp-Source: ABdhPJx3MBfRuN5zDbXZ+FLahPq7ftjfuDQAvsx25iJ5KKvDXeil8IvDJMbAZNuRbVSLLAVRY+z0sw==
+X-Received: by 2002:a65:670a:0:b0:37f:f344:76c1 with SMTP id u10-20020a65670a000000b0037ff34476c1mr21557392pgf.204.1647290500367;
+        Mon, 14 Mar 2022 13:41:40 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id na8-20020a17090b4c0800b001bf191ee347sm352677pjb.27.2022.03.14.13.41.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 13:41:40 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 14 Mar 2022 10:41:38 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, kernel-team@fb.com,
+        linux-kernel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [PATCH block-5.17] block: don't merge across cgroup boundaries
+ if iocost or iolatency is active
+Message-ID: <Yi+ogt9ahz3yr9RE@slm.duckdns.org>
+References: <Yi71WZ3O9/YViHSb@slm.duckdns.org>
+ <107965ce-a29a-b5f4-ef87-63b753380891@kernel.dk>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHKsWRmVeSWpSXmKPExsWy7djXc7ofl+onGUy5qWExZ9U2RovVd/vZ
-        LFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saEp4wWa24+ZbH4
-        fGYeqwOvx7Orzxg9ds66y+7RvOAOi8fls6Uem1Z1snlsXlLvsftmA5vHtsUvWT0+b5IL4Izi
-        sklJzcksSy3St0vgyjjefoSl4Ityxemjz1kaGP/JdDFyckgImEi8WTmBpYuRi0NIYCWjxJmf
-        71lAEkICrUwSHx/YwRTdeDWJDaJoLaPE7RdboTo+MkocWnqZGcI5wCjR/2A7K0gLm4CBxO/j
-        G5lBbBEBdYkv6ycyghQxCzxllZjTc40NJCEsYCZx6nszO0SRucTvRRNYIewoiRVH1zKC2CwC
-        qhI9XUfBBvEC3fF82xOw+zgFAiV6z68E62UUEJP4fmoNE4jNLCAucevJfCaIuwUlFs3ewwxh
-        i0n82/WQDcJWlLj//SU7RL2exI2pU9ggbDuJhyvfskDY2hLLFr6G2isocXImxF4JAUmJgytu
-        gL0vITCfU+LJhh5WiISLRMfC+1CLpSX+3l3GBFG0ilFiyrc2dghnM6PEjF8XoKqsJf51XmOf
-        wKgyC8nls5BcNQvJVbOQXDULyVULGFlXMYqXFhfnpqcWG+WllusVJ+YWl+al6yXn525iBCbB
-        0/8O5+9gvH7ro94hRiYOxkOMEhzMSiK89RX6SUK8KYmVValF+fFFpTmpxYcYpTlYlMR5l2Vu
-        SBQSSE8sSc1OTS1ILYLJMnFwSjUw6RW8KkhZf5R3YRX/JX85U9dF7SYcx6OfRHCILfwc+i3T
-        9vZf8//Lg0ttYv9ra/mtqDaMmvvPZjnj97Pls2wyJHdU3j/EkbKzWOGYToHirmlC7/V3rk6/
-        89Dq6iu/JtfeexJpOz8snL5u9brME6Xcf3tN93JVPos6uSYgRfnQjbJ7yd3h1yXb/5+r1Lz0
-        YNayxQ+UF33fvbZgyvk+X7/DHZff+99m3fXU/KxSf5m/wMGOiRdPPZyr9dBmEa+Hw/3ZyaUH
-        Lpz4z5Eckuf4d1turaF0e9WHuJIbjz37Goo/lhzZuWJa8O8rd+PzV2zOvzKL1fqtXKVryfub
-        0hXHHx1m3uciHmW+9kBodvyEH4/09imxFGckGmoxFxUnAgBj7WeV8QMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsWS2cA0SffjUv0kg2vPZS3mrNrGaLH6bj+b
-        xcrVR5ks3rWeY7HoPH2ByeL828NMFpMOXWO02HtL22L+sqfsFktaj7NZ3JjwlNFizc2nLBaf
-        z8xjdeD1eHb1GaPHzll32T2aF9xh8bh8ttRj06pONo/NS+o9dt9sYPPYtvglq8fnTXIBnFFc
-        NimpOZllqUX6dglcGcfbj7AUfFGuOH30OUsD4z+ZLkZODgkBE4kbryaxdTFycQgJrGaUODDt
-        NyuE85FRYuO1E1DOAUaJ/k/3mUBa2AQMJH4f38gMYosIqEt8WT+REaSIWeApq8ScnmtsIAlh
-        ATOJU9+b2SGKzCV+L5rACmFHSaw4upYRxGYRUJXo6ToKNogX6I7n256wQGzbwyyx5OkDsCJO
-        gUCJ3vMrwQYxCohJfD+1BuwKZgFxiVtP5jNBPCEgsWTPeWYIW1Ti5eN/rBC2osT97y/ZIer1
-        JG5MncIGYdtJPFz5lgXC1pZYtvA11BGCEidnPmGB6JWUOLjiBssERolZSNbNQjJqFpJRs5CM
-        moVk1AJG1lWM4qXFxbnpFcVGeanlesWJucWleel6yfm5mxiB6eP0v8PROxhv3/qod4iRiYPx
-        EKMEB7OSCG99hX6SEG9KYmVValF+fFFpTmrxIUZpDhYlcd6XURPjhQTSE0tSs1NTC1KLYLJM
-        HJxSDUzW+yPntc8rzup+3mlr2nrq4Ics6c0rDQ5v6nGX6orbkcf4tNn7zye7xyL7ZXgeT1zE
-        lX9F71L4Hfevztf+z3nanlaml2Btl9x7y6qtODhU6EMgQxP/bDuv+OtHZ3x0//76hI5X0j0J
-        9ej9zV/lXf0DXLxNbi6J/77snqxWVsLlP7PzuWwm/jiVu2D2MXOPvr99sZpyYTpua0y8/fJ3
-        hJ/4+00qJL+s8UipvpKvIuPRzwUrj75z0YvvTLtT27JRqiUj/VqL2yKXLcm9b88eKHNZJm7s
-        kem6NjHpwpOKyxlyXFdnX/mz/lzEU+miNbahS9//5Ew5kXeHvZX9zf69B69rvTS5XjLnzf07
-        Vpe5liixFGckGmoxFxUnAgCk4g55jgMAAA==
-X-CMS-MailID: 20220314203041uscas1p1ffe9fa1fd864780a38861498f940039e
-CMS-TYPE: 301P
-X-CMS-RootMailID: 20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696
-References: <CGME20220308152651epcas5p1ebd2dc7fa01db43dd587c228a3695696@epcas5p1.samsung.com>
-        <20220308152105.309618-1-joshi.k@samsung.com>
-        <20220310082926.GA26614@lst.de>
-        <CA+1E3rJ17F0Rz5UKUnW-LPkWDfPHXG5aeq-ocgNxHfGrxYtAuw@mail.gmail.com>
-        <Yit8LFAMK3t0nY/q@bombadil.infradead.org>
-        <20220311233501.GA6435@bgt-140510-bm01>
-        <20220312022732.GA10120@bgt-140510-bm01>
-        <CA+1E3rJNcqFT58eg1O+wDFyAkhCjHjnN6Hntms6jQxhLt1gtaQ@mail.gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <107965ce-a29a-b5f4-ef87-63b753380891@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Mar 13, 2022 at 10:37:53AM +0530, Kanchan Joshi wrote:
-> On Sat, Mar 12, 2022 at 7:57 AM Adam Manzanares
-> <a.manzanares@samsung.com> wrote:
-> >
-> > On Fri, Mar 11, 2022 at 03:35:04PM -0800, Adam Manzanares wrote:
-> > > On Fri, Mar 11, 2022 at 08:43:24AM -0800, Luis Chamberlain wrote:
-> > > > On Thu, Mar 10, 2022 at 03:35:02PM +0530, Kanchan Joshi wrote:
-> > > > > On Thu, Mar 10, 2022 at 1:59 PM Christoph Hellwig <hch@lst.de> wr=
-ote:
-> > > > > >
-> > > > > > What branch is this against?
-> > > > > Sorry I missed that in the cover.
-> > > > > Two options -
-> > > > > (a) https://urldefense.com/v3/__https://protect2.fireeye.com/v1/u=
-rl?k=3D03500d22-5ccb341f-0351866d-0cc47a31309a-6f95e6932e414a1d&q=3D1&e=3D4=
-ca7b05e-2fe6-40d9-bbcf-a4ed687eca9f&u=3Dhttps*3A*2F*2Fgit.kernel.dk*2Fcgit*=
-2Flinux-block*2Flog*2F*3Fh*3Dio_uring-big-sqe__;JSUlJSUlJSUl!!EwVzqGoTKBqv-=
-0DWAJBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDh8_2-U=
-9$
-> > > > > first patch ("128 byte sqe support") is already there.
-> > > > > (b) for-next (linux-block), series will fit on top of commit 9e9d=
-83faa
-> > > > > ("io_uring: Remove unneeded test in io_run_task_work_sig")
-> > > > >
-> > > > > > Do you have a git tree available?
-> > > > > Not at the moment.
-> > > > >
-> > > > > @Jens: Please see if it is possible to move patches to your
-> > > > > io_uring-big-sqe branch (and maybe rename that to big-sqe-pt.v1).
-> > > >
-> > > > Since Jens might be busy, I've put up a tree with all this stuff:
-> > > >
-> > > > https://urldefense.com/v3/__https://git.kernel.org/pub/scm/linux/ke=
-rnel/git/mcgrof/linux-next.git/log/?h=3D20220311-io-uring-cmd__;!!EwVzqGoTK=
-Bqv-0DWAJBm!FujuZ927K3fuIklgYjkWtodmdQnQyBqOw4Ge4M08DU_0oD5tPm0-wS2SZg0MDiT=
-F0Q7F$
-> > > >
-> > > > It is based on option (b) mentioned above, I took linux-block for-n=
-ext
-> > > > and reset the tree to commit "io_uring: Remove unneeded test in
-> > > > io_run_task_work_sig" before applying the series.
-> > >
-> > > FYI I can be involved in testing this and have added some colleagues =
-that can
-> > > help in this regard. We have been using some form of this work for se=
-veral
-> > > months now and haven't had any issues. That being said some simple te=
-sts I have
-> > > are not currently working with the above git tree :). I will work to =
-get this
-> > > resolved and post an update here.
-> >
-> > Sorry for the noise, I jumped up the stack too quickly with my tests. T=
-he
-> > "simple test" actually depends on several pieces of SW not related to t=
-he
-> > kernel.
->=20
-> Did you read the cover letter? It's not the same *user-interface* as
-> the previous series.
-> If you did not modify those out-of-kernel layers for the new
-> interface, you're bound to see what you saw.
-> If you did, please specify what the simple test was. I'll fix that in v2.
+On Mon, Mar 14, 2022 at 02:12:34PM -0600, Jens Axboe wrote:
+> > * Add WARN_ON_ONCE() on blkg mismatch in ioc_rqos_merge() so that we can
+> >   easily notice similar failures in the future.
+> > 
+> > * Make sure iocost enable/disable transitions only happen when iocost is
+> >   actually enabled / disabled.
+> 
+> Is there really no better way to do this than add a lot of expensive
+> checks to the fast path?
+> 
+> Even just inverting the checks so that
+> 
+> if (req->bio->bi_blkg != bio->bi_blkg)
+> 	...
+> 
+> is checked first would seem a lot saner.
+> 
+> In any case, since this isn't a new regression, I'd feel a lot better
+> deferring it to 5.18.
 
-I got a little ahead of myself. Looking forward to leveraging this work in =
-the=20
-near future ;)
+As discussed, the only risk of removing the disable/enable switch and always
+testing is ruining some merges for cases where blkcg is enabled but no
+control is applied, which shouldn't be a big problem. I'll redo the patch.
 
->=20
-> Otherwise, the throwaway remark "simple tests not working" - only
-> infers this series is untested. Nothing could be further from the
-> truth.
-> Rather this series is more robust than the previous one.
+Thanks.
 
-Excellent, to hear that this series is robust. My intent was not to claim
-this series was untested. It is clear I need to do more hw before making an=
-=20
-attempt to help with testing.
-
->=20
-> Let me expand bit more on testing part that's already there in cover:
->=20
-> fio -iodepth=3D256 -rw=3Drandread -ioengine=3Dio_uring -bs=3D512 -numjobs=
-=3D1
-> -runtime=3D60 -group_reporting -iodepth_batch_submit=3D64
-> -iodepth_batch_complete_min=3D1 -iodepth_batch_complete_max=3D64
-> -fixedbufs=3D1 -hipri=3D1 -sqthread_poll=3D0 -filename=3D/dev/ng0n1
-> -name=3Dio_uring_256 -uring_cmd=3D1
->=20
-> When I reduce the above command-line to do single IO, I call that a simpl=
-e test.
-> Simple test that touches almost *everything* that patches build (i.e
-> async, fixed-buffer, plugging, fixed-buffer, bio-cache, polling).
-> And larger tests combine these knobs in various ways, QD ranging from
-> 1, 2, 4...upto 256; on general and perf-optimized kernel config; with
-> big-sqe and normal-sqe (pointer one). And all this is repeated on the
-> block interface (regular io) too, which covers the regression part.
-> Sure, I can add more tests for checking regression. But no, I don't
-> expect any simple test to fail. And that applies to Luis' tree as
-> well. Tried that too again.
-
-Looks like you have all of your based covered. Keep up the good work.
-
->=20
->=20
-> --=20
-> Joshi=
+-- 
+tejun
