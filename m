@@ -2,257 +2,248 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39BC5C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 06:59:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB57C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 07:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236496AbiCNHAy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 03:00:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43790 "EHLO
+        id S236475AbiCNHB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 03:01:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233747AbiCNHAx (ORCPT
+        with ESMTP id S231877AbiCNHB2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 03:00:53 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1C70C40908
-        for <linux-block@vger.kernel.org>; Sun, 13 Mar 2022 23:59:42 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.53 with ESMTP; 14 Mar 2022 15:59:40 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.126 with ESMTP; 14 Mar 2022 15:59:40 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Mon, 14 Mar 2022 15:59:06 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH v4 00/24] DEPT(Dependency Tracker)
-Message-ID: <20220314065906.GA6255@X58A-UD3R>
-References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
- <Yiv9Fn4kcRbXJLmu@ip-172-31-19-208.ap-northeast-1.compute.internal>
+        Mon, 14 Mar 2022 03:01:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8902E40900
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 00:00:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647241218;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3jsmSRbQAyLumWypnn3oe4S1peFrLuJMeMjB9icAC+g=;
+        b=NL2jPtTRvyevvfoHKAMF5Bap9GpK+XJCA4/5L38cU1iJ8uoHDUUClmhS/3awwld5Szj6uG
+        bzxmVvea1JSgfXW0LT68CMhht5W/jvfZNQPjt+AtUzMB5Rmaljev/st8XWczi5X8WaBuS1
+        244mUax5Ed2tf251QcMEAezbkJSA15c=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-645-y1MEpWqzNtGrAIzQ0QrAtg-1; Mon, 14 Mar 2022 03:00:16 -0400
+X-MC-Unique: y1MEpWqzNtGrAIzQ0QrAtg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3038219705A9;
+        Mon, 14 Mar 2022 07:00:16 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E380C44AE6;
+        Mon, 14 Mar 2022 07:00:11 +0000 (UTC)
+Date:   Mon, 14 Mar 2022 15:00:06 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [bug report] worker watchdog timeout in dispatch loop for
+ null_blk
+Message-ID: <Yi7n9mgblKcC7msM@T590>
+References: <20220310091649.zypaem5lkyfadymg@shindev>
+ <YinMWPiuUluinom8@T590>
+ <20220310124023.tkax52chul265bus@shindev>
+ <a6d6b858-4bee-10da-884c-20b16e4ad0de@kernel.dk>
+ <20220311062441.vsa54rie5fxhjtps@shindev>
+ <YisblCKgf6xC0/ai@T590>
+ <20220314052434.zud5zb5wqrjljk4b@shindev>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yiv9Fn4kcRbXJLmu@ip-172-31-19-208.ap-northeast-1.compute.internal>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20220314052434.zud5zb5wqrjljk4b@shindev>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Mar 12, 2022 at 01:53:26AM +0000, Hyeonggon Yoo wrote:
-> On Fri, Mar 04, 2022 at 04:06:19PM +0900, Byungchul Park wrote:
-> > Hi Linus and folks,
+On Mon, Mar 14, 2022 at 05:24:34AM +0000, Shinichiro Kawasaki wrote:
+> On Mar 11, 2022 / 17:51, Ming Lei wrote:
+> > On Fri, Mar 11, 2022 at 06:24:41AM +0000, Shinichiro Kawasaki wrote:
+> > > On Mar 10, 2022 / 05:47, Jens Axboe wrote:
+> > > > On 3/10/22 5:40 AM, Shinichiro Kawasaki wrote:
+> > > > > On Mar 10, 2022 / 18:00, Ming Lei wrote:
+> > > > >> On Thu, Mar 10, 2022 at 09:16:50AM +0000, Shinichiro Kawasaki wrote:
+> > > > >>> This issue does not look critical, but let me share it to ask comments for fix.
+> > > > >>>
+> > > > >>> When fio command with 40 jobs [1] is run for a null_blk device with memory
+> > > > >>> backing and mq-deadline scheduler, kernel reports a BUG message [2]. The
+> > > > >>> workqueue watchdog reports that kblockd blk_mq_run_work_fn keeps on running
+> > > > >>> more than 30 seconds and other work can not run. The 40 fio jobs keep on
+> > > > >>> creating many read requests to a single null_blk device, then the every time
+> > > > >>> the mq_run task calls __blk_mq_do_dispatch_sched(), it returns ret == 1 which
+> > > > >>> means more than one request was dispatched. Hence, the while loop in
+> > > > >>> blk_mq_do_dispatch_sched() does not break.
+> > > > >>>
+> > > > >>> static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > >>> {
+> > > > >>>         int ret;
+> > > > >>>
+> > > > >>>         do {
+> > > > >>>                ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > >>>         } while (ret == 1);
+> > > > >>>
+> > > > >>>         return ret;
+> > > > >>> }
+> > > > >>>
+> > > > >>> The BUG message was observed when I ran blktests block/005 with various
+> > > > >>> conditions on a system with 40 CPUs. It was observed with kernel version
+> > > > >>> v5.16-rc1 through v5.17-rc7. The trigger commit was 0a593fbbc245 ("null_blk:
+> > > > >>> poll queue support"). This commit added blk_mq_ops.map_queues callback. I
+> > > > >>> guess it changed dispatch behavior for null_blk devices and triggered the
+> > > > >>> BUG message.
+> > > > >>
+> > > > >> It is one blk-mq soft lockup issue in dispatch side, and shouldn't be related
+> > > > >> with 0a593fbbc245.
+> > > > >>
+> > > > >> If queueing requests is faster than dispatching, the issue will be triggered
+> > > > >> sooner or later, especially easy to trigger in SQ device. I am sure it can
+> > > > >> be triggered on scsi debug, even saw such report on ahci.
+> > > > > 
+> > > > > Thank you for the comments. Then this is the real problem.
+> > > > > 
+> > > > >>
+> > > > >>>
+> > > > >>> I'm not so sure if we really need to fix this issue. It does not seem the real
+> > > > >>> world problem since it is observed only with null_blk. The real block devices
+> > > > >>> have slower IO operation then the dispatch should stop sooner when the hardware
+> > > > >>> queue gets full. Also the 40 jobs for single device is not realistic workload.
+> > > > >>>
+> > > > >>> Having said that, it does not feel right that other works are pended during
+> > > > >>> dispatch for null_blk devices. To avoid the BUG message, I can think of two
+> > > > >>> fix approaches. First one is to break the while loop in blk_mq_do_dispatch_sched
+> > > > >>> using a loop counter [3] (or jiffies timeout check).
+> > > > >>
+> > > > >> This way could work, but the queue need to be re-run after breaking
+> > > > >> caused by max dispatch number. cond_resched() might be the simplest way,
+> > > > >> but it can't be used here because of rcu/srcu read lock.
+> > > > > 
+> > > > > As far as I understand, blk_mq_run_work_fn() should return after the loop break
+> > > > > to yield the worker to other works. How about to call
+> > > > > blk_mq_delay_run_hw_queue() at the loop break? Does this re-run the dispatch?
+> > > > > 
+> > > > > 
+> > > > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > > > > index 55488ba978232..faa29448a72a0 100644
+> > > > > --- a/block/blk-mq-sched.c
+> > > > > +++ b/block/blk-mq-sched.c
+> > > > > @@ -178,13 +178,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > >  	return !!dispatched;
+> > > > >  }
+> > > > >  
+> > > > > +#define MQ_DISPATCH_MAX 0x10000
+> > > > > +
+> > > > >  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > >  {
+> > > > >  	int ret;
+> > > > > +	unsigned int count = MQ_DISPATCH_MAX;
+> > > > >  
+> > > > >  	do {
+> > > > >  		ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > > -	} while (ret == 1);
+> > > > > +	} while (ret == 1 && count--);
+> > > > > +
+> > > > > +	if (ret == 1 && !count)
+> > > > > +		blk_mq_delay_run_hw_queue(hctx, 0);
+> > > > >  
+> > > > >  	return ret;
+> > > > >  }
+> > > > 
+> > > > Why not just gate it on needing to reschedule, rather than some random
+> > > > value?
+> > > > 
+> > > > static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > {
+> > > > 	int ret;
+> > > > 
+> > > > 	do {
+> > > > 		ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > 	} while (ret == 1 && !need_resched());
+> > > > 
+> > > > 	if (ret == 1 && need_resched())
+> > > > 		blk_mq_delay_run_hw_queue(hctx, 0);
+> > > > 
+> > > > 	return ret;
+> > > > }
+> > > > 
+> > > > or something like that.
+> > > 
+> > > Jens, thanks for the idea, but need_resched() check does not look working here.
+> > > I tried the code above but still the BUG message is observed. My guess is that
+> > > in the call stack below, every __blk_mq_do_dispatch_sched() call results in
+> > > might_sleep_if() call, then need_resched() does not work as expected, probably.
+> > > 
+> > > __blk_mq_do_dispatch_sched
+> > >   blk_mq_dispatch_rq_list
+> > >     q->mq_ops->queue_rq
+> > >       null_queue_rq
+> > >         might_sleep_if
+> > > 
+> > > Now I'm trying to find similar way as need_resched() to avoid the random number.
+> > > So far I haven't found good idea yet.
 > > 
-> > I've been developing a tool for detecting deadlock possibilities by
-> > tracking wait/event rather than lock(?) acquisition order to try to
-> > cover all synchonization machanisms. It's done on v5.17-rc1 tag.
+> > Jens patch using need_resched() looks improving the situation, also the
+> > scsi_debug case won't set BLOCKING:
 > > 
-> > https://github.com/lgebyungchulpark/linux-dept/commits/dept1.14_on_v5.17-rc1
-> >
+> > 1) without the patch, it can be easy to trigger lockup with the
+> > following test.
+> > 
+> > - modprobe scsi_debug virtual_gb=128 delay=0 dev_size_mb=2048
+> > - fio --bs=512k --ioengine=sync --iodepth=128 --numjobs=4 --rw=randrw \
+> > 	--name=sdc-sync-randrw-512k --filename=/dev/sdc --direct=1 --size=60G --runtime=120
+> > 
+> > #sdc is the created scsi_debug disk
 > 
-> Small feedback unrelated to thread:
-> I'm not sure "Need to expand the ring buffer" is something to call
-> WARN(). Is this stack trace useful for something?
+> Thanks. I tried the work load above and observed the lockup BUG message on my
+> system. So, I reconfirmed that the problem happens with both BLOCKING and
+> non-BLOCKING drivers.
+> 
+> Regarding the solution, I can not think of any good one. I tried to remove the
+> WQ_HIGHPRI flag from kblockd_workqueue, but it did not look affecting
+> need_resched() behavior. I walked through workqueue API, but was not able
+> to find anything useful.
+> 
+> As far as I understand, it is assumed and expected the each work item gets
+> completed within decent time. Then this blk_mq_run_work_fn must stop within
+> decent time by breaking the loop at some point. As the loop break conditions
+> other than need_resched(), I can think of 1) loop count, 2) number of requests
+> dispatched or 3) time spent in the loop. All of the three require a magic random
+> number as the limit... Is there any other better way?
+> 
+> If we need to choose one of the 3 options, I think '3) time spent in the loop'
+> is better than others, since workqueue watchdog monitors _time_ to check lockup
+> and report the BUG message.
 
-Yeah. It seems to happen too often. I won't warn it. Thanks.
+BTW, just tried 3), then the lockup issue can't be reproduced any more:
 
-> ========
-> 
-> Hello Byungchul. These are two warnings of DEPT on system.
-> Both cases look similar.
-> 
-> In what case DEPT says (unknown)?
-> I'm not sure we can properly debug this.
-> 
-> ===================================================
-> DEPT: Circular dependency has been detected.
-> 5.17.0-rc1+ #3 Tainted: G        W        
-> ---------------------------------------------------
-> summary
-> ---------------------------------------------------
-> *** AA DEADLOCK ***
-> 
-> context A
->     [S] (unknown)(&vfork:0)
->     [W] wait_for_completion_killable(&vfork:0)
->     [E] complete(&vfork:0)
-
-All the reports look like having to do with kernel_clone(). I need to
-check it more. Thank you very much.
-
-You are awesome, Hyeonggon.
-
-Thank you,
-Byungchul
-
-> [S]: start of the event context
-> [W]: the wait blocked
-> [E]: the event not reachable
-> ---------------------------------------------------
-> context A's detail
-> ---------------------------------------------------
-> context A
->     [S] (unknown)(&vfork:0)
->     [W] wait_for_completion_killable(&vfork:0)
->     [E] complete(&vfork:0)
-> 
-> [S] (unknown)(&vfork:0):
-> (N/A)
-> 
-> [W] wait_for_completion_killable(&vfork:0):
-> [<ffffffc00802204c>] kernel_clone+0x25c/0x2b8
-> stacktrace:
->       dept_wait+0x74/0x88
->       wait_for_completion_killable+0x60/0xa0
->       kernel_clone+0x25c/0x2b8
->       __do_sys_clone+0x5c/0x74
->       __arm64_sys_clone+0x18/0x20
->       invoke_syscall.constprop.0+0x78/0xc4
->       do_el0_svc+0x98/0xd0
->       el0_svc+0x44/0xe4
->       el0t_64_sync_handler+0xb0/0x12c
->       el0t_64_sync+0x158/0x15c
-> 
-> [E] complete(&vfork:0):
-> [<ffffffc00801f49c>] mm_release+0x7c/0x90
-> stacktrace:
->       dept_event+0xe0/0x100
->       complete+0x48/0x98
->       mm_release+0x7c/0x90
->       exit_mm_release+0xc/0x14
->       do_exit+0x1b4/0x81c
->       do_group_exit+0x30/0x9c
->       __wake_up_parent+0x0/0x24
->       invoke_syscall.constprop.0+0x78/0xc4
->       do_el0_svc+0x98/0xd0
->       el0_svc+0x44/0xe4
->       el0t_64_sync_handler+0xb0/0x12c
->       el0t_64_sync+0x158/0x15c
-> ---------------------------------------------------
-> information that might be helpful
-> ---------------------------------------------------
-> CPU: 6 PID: 229 Comm: start-stop-daem Tainted: G        W         5.17.0-rc1+ #3
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x9c/0xc4
->  show_stack+0x14/0x28
->  dump_stack_lvl+0x9c/0xcc
->  dump_stack+0x14/0x2c
->  print_circle+0x2d4/0x438
->  cb_check_dl+0x44/0x70
->  bfs+0x60/0x168
->  add_dep+0x88/0x11c
->  do_event.constprop.0+0x19c/0x2c0
->  dept_event+0xe0/0x100
->  complete+0x48/0x98
->  mm_release+0x7c/0x90
->  exit_mm_release+0xc/0x14
->  do_exit+0x1b4/0x81c
->  do_group_exit+0x30/0x9c
->  __wake_up_parent+0x0/0x24
->  invoke_syscall.constprop.0+0x78/0xc4
->  do_el0_svc+0x98/0xd0
->  el0_svc+0x44/0xe4
->  el0t_64_sync_handler+0xb0/0x12c
->  el0t_64_sync+0x158/0x15c
-> 
-> 
-> 
-> 
-> ===================================================
-> DEPT: Circular dependency has been detected.
-> 5.17.0-rc1+ #3 Tainted: G        W        
-> ---------------------------------------------------
-> summary
-> ---------------------------------------------------
-> *** AA DEADLOCK ***
-> 
-> context A
->     [S] (unknown)(&try_completion:0)
->     [W] wait_for_completion_timeout(&try_completion:0)
->     [E] complete(&try_completion:0)
-> 
-> [S]: start of the event context
-> [W]: the wait blocked
-> [E]: the event not reachable
-> ---------------------------------------------------
-> context A's detail
-> ---------------------------------------------------
-> context A
->     [S] (unknown)(&try_completion:0)
->     [W] wait_for_completion_timeout(&try_completion:0)
->     [E] complete(&try_completion:0)
-> 
-> [S] (unknown)(&try_completion:0):
-> (N/A)
-> 
-> [W] wait_for_completion_timeout(&try_completion:0):
-> [<ffffffc008166bf4>] kunit_try_catch_run+0xb4/0x160
-> stacktrace:
->       dept_wait+0x74/0x88
->       wait_for_completion_timeout+0x64/0xa0
->       kunit_try_catch_run+0xb4/0x160
->       kunit_test_try_catch_successful_try_no_catch+0x3c/0x98
->       kunit_try_run_case+0x9c/0xa0
->       kunit_generic_run_threadfn_adapter+0x1c/0x28
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> [E] complete(&try_completion:0):
-> [<ffffffc00803dce4>] kthread_complete_and_exit+0x18/0x20
-> stacktrace:
->       dept_event+0xe0/0x100
->       complete+0x48/0x98
->       kthread_complete_and_exit+0x18/0x20
->       kunit_try_catch_throw+0x0/0x1c
->       kthread+0xd4/0xe4
->       ret_from_fork+0x10/0x20
-> 
-> ---------------------------------------------------
-> information that might be helpful
-> ---------------------------------------------------
-> CPU: 15 PID: 132 Comm: kunit_try_catch Tainted: G        W         5.17.0-rc1+ #3
-> Hardware name: linux,dummy-virt (DT)
-> Call trace:
->  dump_backtrace.part.0+0x9c/0xc4
->  show_stack+0x14/0x28
->  dump_stack_lvl+0x9c/0xcc
->  dump_stack+0x14/0x2c
->  print_circle+0x2d4/0x438
->  cb_check_dl+0x44/0x70
->  bfs+0x60/0x168
->  add_dep+0x88/0x11c
->  do_event.constprop.0+0x19c/0x2c0
->  dept_event+0xe0/0x100
->  complete+0x48/0x98
->  kthread_complete_and_exit+0x18/0x20
->  kunit_try_catch_throw+0x0/0x1c
->  kthread+0xd4/0xe4
->  ret_from_fork+0x10/0x20
+diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+index e6ad8f761474..b4de5a7ec606 100644
+--- a/block/blk-mq-sched.c
++++ b/block/blk-mq-sched.c
+@@ -181,10 +181,14 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+ {
+        int ret;
++       unsigned long start = jiffies;
+ 
+        do {
+                ret = __blk_mq_do_dispatch_sched(hctx);
+-       } while (ret == 1);
++       } while (ret == 1 && !need_resched() && (jiffies - start) < HZ);
++
++       if (ret == 1 && (need_resched() || jiffies - start >= HZ))
++                blk_mq_delay_run_hw_queue(hctx, 0);
+ 
+        return ret;
+ }
 
 
-> -- 
-> Thank you, You are awesome!
-> Hyeonggon :-)
+
+Thanks, 
+Ming
+
