@@ -2,76 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AA1EC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 08:05:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCCA2C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 08:05:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237376AbiCNIGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 04:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42544 "EHLO
+        id S237466AbiCNIGY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 04:06:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237070AbiCNICD (ORCPT
+        with ESMTP id S237983AbiCNID0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 04:02:03 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D316633EBE;
-        Mon, 14 Mar 2022 00:58:34 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id e13so12860832plh.3;
-        Mon, 14 Mar 2022 00:58:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=9NGaqnU5WKGBCSdUXb/re6i7ekcV7E4ukQg8QFjXiKo=;
-        b=f+47SjE/WT3rYCIs/VBNHq+tnt+oBqJNBhKlhP3v5pbqsSjlsg1KAJbOBzwYshCUTu
-         Oe5oUV82paRUAvtcKh1O7Dbn2UH98eOUFiTYVMlQ1r07NytdweJzIj52AKr7clWIGa5j
-         evtgtfihJeZ4YphvwPJsRoq7/wBrVsKGEUg9i1u2+v0fIfK0Oqn8CLOST89LLa+uWtVL
-         6Brc/fgYOPRZR5ouZGT8ZHIWYCVHTallvf5tuJBxVqU/zshI3307wWlyhhqQRMOETo2L
-         h68lxwc6S4QjGphAYwdo0MdMO//ykl3iEwFwetTfJm8yxde4zOGKcZG900VeW/ERqRjP
-         9qSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=9NGaqnU5WKGBCSdUXb/re6i7ekcV7E4ukQg8QFjXiKo=;
-        b=NslJKRImmKTyEPHEolXvv/0r/P7MNtZdjkq/CTsbiACqaz6RAb95P22chOXk8HtQdw
-         kfB7QG/81QfpbuAVuwRjaD3pbpwbeFrqhEkwJuxR7Rf/oqR5w0vrBneoUhsExf8vZI+G
-         4dgMTpucvX8vfejeffa5IUl3F1SH/uGfg6/rbWTKao9HiuKJfEkLDV6ckEv6Gcqb0c9W
-         kzJHbkTDsFftN4Q1hCACwpEDiP2i1ulxwR/BRnMq6A9UaibZICNhRk+gtLDmMqXa6AET
-         pgHLJXg1uAsBdwULEY4R8HQFW4K1wFZk05pydAuFft9Obek2v5uModObzc7Mz55GGuxi
-         Jgdg==
-X-Gm-Message-State: AOAM533kQj1LLsREEtxtkExDLLQ9Q7mzGzFAzrLyj69O1/ihF44JqkTC
-        mik8ElyWUwhcnWqhvATkkDU=
-X-Google-Smtp-Source: ABdhPJyMEYuuP93Wt4kDxa57+ULt97SXAAu7ldWDqXEFX5Af/fOhK3uxxf6opMb661cL3vcFzB9A0w==
-X-Received: by 2002:a17:90a:8c14:b0:1be:e8cc:96bb with SMTP id a20-20020a17090a8c1400b001bee8cc96bbmr35087522pjo.176.1647244712164;
-        Mon, 14 Mar 2022 00:58:32 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id r32-20020a17090a43a300b001bf48047434sm16412408pjg.32.2022.03.14.00.58.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 00:58:31 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Sun, 13 Mar 2022 21:58:30 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>,
-        Yu Kuai <yukuai3@huawei.com>, Saravanan D <saravanand@fb.com>,
-        Christopher Obbard <chris.obbard@collabora.com>
-Subject: Re: [PATCH block-5.17] fix rq-qos breakage from skipping
- rq_qos_done_bio()
-Message-ID: <Yi71pvinlDAqVik8@slm.duckdns.org>
-References: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
+        Mon, 14 Mar 2022 04:03:26 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20BBCB7FB
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 00:59:57 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 929E468AFE; Mon, 14 Mar 2022 08:58:58 +0100 (CET)
+Date:   Mon, 14 Mar 2022 08:58:58 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        jiangbo.365@bytedance.com, kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <matias.bjorling@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Message-ID: <20220314075858.GA4921@lst.de>
+References: <e02dfd21-31c6-95b6-1127-3f18c79116ee@samsung.com> <20220310144449.GA1695@lst.de> <Yiuu2h38owO9ioIW@bombadil.infradead.org> <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com> <Yiu5YzxU/PjxLiUL@bombadil.infradead.org> <20220311213102.GA2309@dhcp-10-100-145-180.wdc.com> <YivMBj7+j/EZcMVV@bombadil.infradead.org> <bc0e53a9-f623-c69f-002e-d62e697a43d1@opensource.wdc.com> <20220314073537.GA4204@lst.de> <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
+In-Reply-To: <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ah, I forgot "block: " in the subject line. Please let me know if you want
-the patch resent.
+On Mon, Mar 14, 2022 at 04:45:12PM +0900, Damien Le Moal wrote:
+> Nope, this is currently not possible: DM requires the target zone size
+> to be the same as the underlying device zone size. So that would not work.
 
-Thanks.
-
--- 
-tejun
+Indeed.
