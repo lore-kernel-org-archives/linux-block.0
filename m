@@ -2,248 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBB57C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 07:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03E35C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 07:15:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236475AbiCNHB3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 03:01:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46354 "EHLO
+        id S234061AbiCNHQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 03:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231877AbiCNHB2 (ORCPT
+        with ESMTP id S233253AbiCNHQO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 03:01:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8902E40900
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 00:00:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647241218;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3jsmSRbQAyLumWypnn3oe4S1peFrLuJMeMjB9icAC+g=;
-        b=NL2jPtTRvyevvfoHKAMF5Bap9GpK+XJCA4/5L38cU1iJ8uoHDUUClmhS/3awwld5Szj6uG
-        bzxmVvea1JSgfXW0LT68CMhht5W/jvfZNQPjt+AtUzMB5Rmaljev/st8XWczi5X8WaBuS1
-        244mUax5Ed2tf251QcMEAezbkJSA15c=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-645-y1MEpWqzNtGrAIzQ0QrAtg-1; Mon, 14 Mar 2022 03:00:16 -0400
-X-MC-Unique: y1MEpWqzNtGrAIzQ0QrAtg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3038219705A9;
-        Mon, 14 Mar 2022 07:00:16 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4E380C44AE6;
-        Mon, 14 Mar 2022 07:00:11 +0000 (UTC)
-Date:   Mon, 14 Mar 2022 15:00:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Damien Le Moal <Damien.LeMoal@wdc.com>
-Subject: Re: [bug report] worker watchdog timeout in dispatch loop for
- null_blk
-Message-ID: <Yi7n9mgblKcC7msM@T590>
-References: <20220310091649.zypaem5lkyfadymg@shindev>
- <YinMWPiuUluinom8@T590>
- <20220310124023.tkax52chul265bus@shindev>
- <a6d6b858-4bee-10da-884c-20b16e4ad0de@kernel.dk>
- <20220311062441.vsa54rie5fxhjtps@shindev>
- <YisblCKgf6xC0/ai@T590>
- <20220314052434.zud5zb5wqrjljk4b@shindev>
+        Mon, 14 Mar 2022 03:16:14 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 808123FDA8;
+        Mon, 14 Mar 2022 00:15:05 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id h5so11399338plf.7;
+        Mon, 14 Mar 2022 00:15:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=x5dGbI9er1juJt9+jRuZHplHMW2zg96TRIfl5f163Ps=;
+        b=KkBh65zDFpi3DrxawldNVBS0EodkeO3TgixoX7BO0BUESgMRnvGRDpsB9Q0rxr+nl5
+         A/vp9aIarusXjOgc2A+3RvGfSAh08uQCu0yzXaZwArIlE7/QK1cTg/+78VAZqW1AVmXZ
+         o+cyYUdVlUMi0xbF6n+gmFFxMkostlVsjecmPa18FYk8++TYifULQiEJlOJI3LQxwaNP
+         /zc548vVYMIouQGYGz3fMQn0icHzyk0gCxpwJX0KCRHX4x+m0YQDcRYgkKCEGFwXqL3x
+         xydy9Gpy75CDKjxIKoXXY7MPVDaHHb8YXYoJuWpg+vJYWRP/VOK7Bgim+qyWmxkwiQA0
+         +qQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=x5dGbI9er1juJt9+jRuZHplHMW2zg96TRIfl5f163Ps=;
+        b=PwET1iXFnIAsfDsk6zMJb0MD8koQkJ0dPgGRtjgBwjsJOjY+htYaRok6MYQ2RQQYro
+         cAUSzUeXxksSmCwOCc4GiamXu9bykUcGdv38ScOb72K3x5p3BUGDvHR3ctR+VUqhNQjR
+         f5wLuKm9qkyxIVyZIRwn5WxuXwqqJ+VHe+EVwUY7pwOXQ8lDhzWG8l3bp9S5Pn05VtER
+         O0Pwxg0ewFkK8VlsLcIDbybltXyq7rFJaJRUVYjUJoOrQewvyyZ7mRcfKHMW/8Lc26Vj
+         +hsYIGAGUMhSbOifeQ5AUwbFxY4QKiCrpYihIBF/oEltFxM4xgjkgHQfz2Jxsg7B9dba
+         La4Q==
+X-Gm-Message-State: AOAM530Cn3sSYKkZPzPPV5s9HlL7ZFLzWmSemOO6lrLaTo0K9Pi0ugNj
+        +kEpRrqKK/Gt9Y0YUR3ZVgS2tIygUsTKMQ==
+X-Google-Smtp-Source: ABdhPJzfHWBGI4ZCMEnl4r0HK1W1QJikDHZN62HtqgaZCXHutHwo+25NC/N5dwTNKEnNJZ5QqnSF5w==
+X-Received: by 2002:a17:903:4111:b0:153:8726:9fe1 with SMTP id r17-20020a170903411100b0015387269fe1mr539739pld.170.1647242104807;
+        Mon, 14 Mar 2022 00:15:04 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id ob13-20020a17090b390d00b001becfd7c6f3sm16845447pjb.27.2022.03.14.00.15.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 00:15:04 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Sun, 13 Mar 2022 21:15:02 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, Ming Lei <ming.lei@redhat.com>,
+        Yu Kuai <yukuai3@huawei.com>, Saravanan D <saravanand@fb.com>,
+        Christopher Obbard <chris.obbard@collabora.com>
+Subject: [PATCH block-5.17] fix rq-qos breakage from skipping
+ rq_qos_done_bio()
+Message-ID: <Yi7rdrzQEHjJLGKB@slm.duckdns.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220314052434.zud5zb5wqrjljk4b@shindev>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 05:24:34AM +0000, Shinichiro Kawasaki wrote:
-> On Mar 11, 2022 / 17:51, Ming Lei wrote:
-> > On Fri, Mar 11, 2022 at 06:24:41AM +0000, Shinichiro Kawasaki wrote:
-> > > On Mar 10, 2022 / 05:47, Jens Axboe wrote:
-> > > > On 3/10/22 5:40 AM, Shinichiro Kawasaki wrote:
-> > > > > On Mar 10, 2022 / 18:00, Ming Lei wrote:
-> > > > >> On Thu, Mar 10, 2022 at 09:16:50AM +0000, Shinichiro Kawasaki wrote:
-> > > > >>> This issue does not look critical, but let me share it to ask comments for fix.
-> > > > >>>
-> > > > >>> When fio command with 40 jobs [1] is run for a null_blk device with memory
-> > > > >>> backing and mq-deadline scheduler, kernel reports a BUG message [2]. The
-> > > > >>> workqueue watchdog reports that kblockd blk_mq_run_work_fn keeps on running
-> > > > >>> more than 30 seconds and other work can not run. The 40 fio jobs keep on
-> > > > >>> creating many read requests to a single null_blk device, then the every time
-> > > > >>> the mq_run task calls __blk_mq_do_dispatch_sched(), it returns ret == 1 which
-> > > > >>> means more than one request was dispatched. Hence, the while loop in
-> > > > >>> blk_mq_do_dispatch_sched() does not break.
-> > > > >>>
-> > > > >>> static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > > >>> {
-> > > > >>>         int ret;
-> > > > >>>
-> > > > >>>         do {
-> > > > >>>                ret = __blk_mq_do_dispatch_sched(hctx);
-> > > > >>>         } while (ret == 1);
-> > > > >>>
-> > > > >>>         return ret;
-> > > > >>> }
-> > > > >>>
-> > > > >>> The BUG message was observed when I ran blktests block/005 with various
-> > > > >>> conditions on a system with 40 CPUs. It was observed with kernel version
-> > > > >>> v5.16-rc1 through v5.17-rc7. The trigger commit was 0a593fbbc245 ("null_blk:
-> > > > >>> poll queue support"). This commit added blk_mq_ops.map_queues callback. I
-> > > > >>> guess it changed dispatch behavior for null_blk devices and triggered the
-> > > > >>> BUG message.
-> > > > >>
-> > > > >> It is one blk-mq soft lockup issue in dispatch side, and shouldn't be related
-> > > > >> with 0a593fbbc245.
-> > > > >>
-> > > > >> If queueing requests is faster than dispatching, the issue will be triggered
-> > > > >> sooner or later, especially easy to trigger in SQ device. I am sure it can
-> > > > >> be triggered on scsi debug, even saw such report on ahci.
-> > > > > 
-> > > > > Thank you for the comments. Then this is the real problem.
-> > > > > 
-> > > > >>
-> > > > >>>
-> > > > >>> I'm not so sure if we really need to fix this issue. It does not seem the real
-> > > > >>> world problem since it is observed only with null_blk. The real block devices
-> > > > >>> have slower IO operation then the dispatch should stop sooner when the hardware
-> > > > >>> queue gets full. Also the 40 jobs for single device is not realistic workload.
-> > > > >>>
-> > > > >>> Having said that, it does not feel right that other works are pended during
-> > > > >>> dispatch for null_blk devices. To avoid the BUG message, I can think of two
-> > > > >>> fix approaches. First one is to break the while loop in blk_mq_do_dispatch_sched
-> > > > >>> using a loop counter [3] (or jiffies timeout check).
-> > > > >>
-> > > > >> This way could work, but the queue need to be re-run after breaking
-> > > > >> caused by max dispatch number. cond_resched() might be the simplest way,
-> > > > >> but it can't be used here because of rcu/srcu read lock.
-> > > > > 
-> > > > > As far as I understand, blk_mq_run_work_fn() should return after the loop break
-> > > > > to yield the worker to other works. How about to call
-> > > > > blk_mq_delay_run_hw_queue() at the loop break? Does this re-run the dispatch?
-> > > > > 
-> > > > > 
-> > > > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> > > > > index 55488ba978232..faa29448a72a0 100644
-> > > > > --- a/block/blk-mq-sched.c
-> > > > > +++ b/block/blk-mq-sched.c
-> > > > > @@ -178,13 +178,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > > >  	return !!dispatched;
-> > > > >  }
-> > > > >  
-> > > > > +#define MQ_DISPATCH_MAX 0x10000
-> > > > > +
-> > > > >  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > > >  {
-> > > > >  	int ret;
-> > > > > +	unsigned int count = MQ_DISPATCH_MAX;
-> > > > >  
-> > > > >  	do {
-> > > > >  		ret = __blk_mq_do_dispatch_sched(hctx);
-> > > > > -	} while (ret == 1);
-> > > > > +	} while (ret == 1 && count--);
-> > > > > +
-> > > > > +	if (ret == 1 && !count)
-> > > > > +		blk_mq_delay_run_hw_queue(hctx, 0);
-> > > > >  
-> > > > >  	return ret;
-> > > > >  }
-> > > > 
-> > > > Why not just gate it on needing to reschedule, rather than some random
-> > > > value?
-> > > > 
-> > > > static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
-> > > > {
-> > > > 	int ret;
-> > > > 
-> > > > 	do {
-> > > > 		ret = __blk_mq_do_dispatch_sched(hctx);
-> > > > 	} while (ret == 1 && !need_resched());
-> > > > 
-> > > > 	if (ret == 1 && need_resched())
-> > > > 		blk_mq_delay_run_hw_queue(hctx, 0);
-> > > > 
-> > > > 	return ret;
-> > > > }
-> > > > 
-> > > > or something like that.
-> > > 
-> > > Jens, thanks for the idea, but need_resched() check does not look working here.
-> > > I tried the code above but still the BUG message is observed. My guess is that
-> > > in the call stack below, every __blk_mq_do_dispatch_sched() call results in
-> > > might_sleep_if() call, then need_resched() does not work as expected, probably.
-> > > 
-> > > __blk_mq_do_dispatch_sched
-> > >   blk_mq_dispatch_rq_list
-> > >     q->mq_ops->queue_rq
-> > >       null_queue_rq
-> > >         might_sleep_if
-> > > 
-> > > Now I'm trying to find similar way as need_resched() to avoid the random number.
-> > > So far I haven't found good idea yet.
-> > 
-> > Jens patch using need_resched() looks improving the situation, also the
-> > scsi_debug case won't set BLOCKING:
-> > 
-> > 1) without the patch, it can be easy to trigger lockup with the
-> > following test.
-> > 
-> > - modprobe scsi_debug virtual_gb=128 delay=0 dev_size_mb=2048
-> > - fio --bs=512k --ioengine=sync --iodepth=128 --numjobs=4 --rw=randrw \
-> > 	--name=sdc-sync-randrw-512k --filename=/dev/sdc --direct=1 --size=60G --runtime=120
-> > 
-> > #sdc is the created scsi_debug disk
-> 
-> Thanks. I tried the work load above and observed the lockup BUG message on my
-> system. So, I reconfirmed that the problem happens with both BLOCKING and
-> non-BLOCKING drivers.
-> 
-> Regarding the solution, I can not think of any good one. I tried to remove the
-> WQ_HIGHPRI flag from kblockd_workqueue, but it did not look affecting
-> need_resched() behavior. I walked through workqueue API, but was not able
-> to find anything useful.
-> 
-> As far as I understand, it is assumed and expected the each work item gets
-> completed within decent time. Then this blk_mq_run_work_fn must stop within
-> decent time by breaking the loop at some point. As the loop break conditions
-> other than need_resched(), I can think of 1) loop count, 2) number of requests
-> dispatched or 3) time spent in the loop. All of the three require a magic random
-> number as the limit... Is there any other better way?
-> 
-> If we need to choose one of the 3 options, I think '3) time spent in the loop'
-> is better than others, since workqueue watchdog monitors _time_ to check lockup
-> and report the BUG message.
+a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't
+tracked") made bio_endio() skip rq_qos_done_bio() if BIO_TRACKED is not set.
+While this fixed a potential oops, it also broke blk-iocost by skipping the
+done_bio callback for merged bios.
 
-BTW, just tried 3), then the lockup issue can't be reproduced any more:
+Before, whether a bio goes through rq_qos_throttle() or rq_qos_merge(),
+rq_qos_done_bio() would be called on the bio on completion with BIO_TRACKED
+distinguishing the former from the latter. rq_qos_done_bio() is not called
+for bios which wenth through rq_qos_merge(). This royally confuses
+blk-iocost as the merged bios never finish and are considered perpetually
+in-flight.
 
-diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-index e6ad8f761474..b4de5a7ec606 100644
---- a/block/blk-mq-sched.c
-+++ b/block/blk-mq-sched.c
-@@ -181,10 +181,14 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
- {
-        int ret;
-+       unsigned long start = jiffies;
+One reliably reproducible failure mode is an intermediate cgroup geting
+stuck active preventing its children from being activated due to the
+leaf-only rule, leading to loss of control. The following is from
+resctl-bench protection scenario which emulates isolating a web server like
+workload from a memory bomb run on an iocost configuration which should
+yield a reasonable level of protection.
+
+  # cat /sys/block/nvme2n1/device/model
+  Samsung SSD 970 PRO 512GB               
+  # cat /sys/fs/cgroup/io.cost.model
+  259:0 ctrl=user model=linear rbps=834913556 rseqiops=93622 rrandiops=102913 wbps=618985353 wseqiops=72325 wrandiops=71025
+  # cat /sys/fs/cgroup/io.cost.qos
+  259:0 enable=1 ctrl=user rpct=95.00 rlat=18776 wpct=95.00 wlat=8897 min=60.00 max=100.00
+  # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
+  ...
+  Memory Hog Summary
+  ==================
+
+  IO Latency: R p50=242u:336u/2.5m p90=794u:1.4m/7.5m p99=2.7m:8.0m/62.5m max=8.0m:36.4m/350m
+              W p50=221u:323u/1.5m p90=709u:1.2m/5.5m p99=1.5m:2.5m/9.5m max=6.9m:35.9m/350m
+
+  Isolation and Request Latency Impact Distributions:
+
+                min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
+  isol%       15.90 15.90 15.90 40.05 57.24 59.07 60.01 74.63 74.63 90.35 90.35 58.12 15.82 
+  lat-imp%        0     0     0     0     0  4.55 14.68 15.54 233.5 548.1 548.1 53.88 143.6 
+
+  Result: isol=58.12:15.82% lat_imp=53.88%:143.6 work_csv=100.0% missing=3.96%
+
+The isolation result of 58.12% is close to what this device would show
+without any IO control.
+
+Fix it by introducing a new flag BIO_QOS_MERGED to mark merged bios and
+calling rq_qos_done_bio() on them too. For consistency and clarity, rename
+BIO_TRACKED to BIO_QOS_THROTTLED. The flag checks are moved into
+rq_qos_done_bio() so that it's next to the code paths that set the flags.
+
+With the patch applied, the above same benchmark shows:
+
+  # resctl-bench -m 29.6G -r out.json run protection::scenario=mem-hog,loops=1
+  ...
+  Memory Hog Summary
+  ==================
+
+  IO Latency: R p50=123u:84.4u/985u p90=322u:256u/2.5m p99=1.6m:1.4m/9.5m max=11.1m:36.0m/350m
+              W p50=429u:274u/995u p90=1.7m:1.3m/4.5m p99=3.4m:2.7m/11.5m max=7.9m:5.9m/26.5m
+
+  Isolation and Request Latency Impact Distributions:
+
+                min   p01   p05   p10   p25   p50   p75   p90   p95   p99   max  mean stdev
+  isol%       84.91 84.91 89.51 90.73 92.31 94.49 96.36 98.04 98.71 100.0 100.0 94.42  2.81 
+  lat-imp%        0     0     0     0     0  2.81  5.73 11.11 13.92 17.53 22.61  4.10  4.68 
+
+  Result: isol=94.42:2.81% lat_imp=4.10%:4.68 work_csv=58.34% missing=0%
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Fixes: a647a524a467 ("block: don't call rq_qos_ops->done_bio if the bio isn't tracked")
+Cc: stable@vger.kernel.org # v5.15+
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bio.c               |    3 +--
+ block/blk-iolatency.c     |    2 +-
+ block/blk-rq-qos.h        |   20 +++++++++++---------
+ include/linux/blk_types.h |    3 ++-
+ 4 files changed, 15 insertions(+), 13 deletions(-)
+
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1486,8 +1486,7 @@ again:
+ 	if (!bio_integrity_endio(bio))
+ 		return;
  
-        do {
-                ret = __blk_mq_do_dispatch_sched(hctx);
--       } while (ret == 1);
-+       } while (ret == 1 && !need_resched() && (jiffies - start) < HZ);
-+
-+       if (ret == 1 && (need_resched() || jiffies - start >= HZ))
-+                blk_mq_delay_run_hw_queue(hctx, 0);
+-	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACKED))
+-		rq_qos_done_bio(bdev_get_queue(bio->bi_bdev), bio);
++	rq_qos_done_bio(bio);
  
-        return ret;
+ 	if (bio->bi_bdev && bio_flagged(bio, BIO_TRACE_COMPLETION)) {
+ 		trace_block_bio_complete(bdev_get_queue(bio->bi_bdev), bio);
+--- a/block/blk-iolatency.c
++++ b/block/blk-iolatency.c
+@@ -598,7 +598,7 @@ static void blkcg_iolatency_done_bio(str
+ 	int inflight = 0;
+ 
+ 	blkg = bio->bi_blkg;
+-	if (!blkg || !bio_flagged(bio, BIO_TRACKED))
++	if (!blkg || !bio_flagged(bio, BIO_QOS_THROTTLED))
+ 		return;
+ 
+ 	iolat = blkg_to_lat(bio->bi_blkg);
+--- a/block/blk-rq-qos.h
++++ b/block/blk-rq-qos.h
+@@ -177,20 +177,20 @@ static inline void rq_qos_requeue(struct
+ 		__rq_qos_requeue(q->rq_qos, rq);
  }
-
-
-
-Thanks, 
-Ming
-
+ 
+-static inline void rq_qos_done_bio(struct request_queue *q, struct bio *bio)
++static inline void rq_qos_done_bio(struct bio *bio)
+ {
+-	if (q->rq_qos)
+-		__rq_qos_done_bio(q->rq_qos, bio);
++	if (bio->bi_bdev && (bio_flagged(bio, BIO_QOS_THROTTLED) ||
++			     bio_flagged(bio, BIO_QOS_MERGED))) {
++		struct request_queue *q = bdev_get_queue(bio->bi_bdev);
++		if (q->rq_qos)
++			__rq_qos_done_bio(q->rq_qos, bio);
++	}
+ }
+ 
+ static inline void rq_qos_throttle(struct request_queue *q, struct bio *bio)
+ {
+-	/*
+-	 * BIO_TRACKED lets controllers know that a bio went through the
+-	 * normal rq_qos path.
+-	 */
+ 	if (q->rq_qos) {
+-		bio_set_flag(bio, BIO_TRACKED);
++		bio_set_flag(bio, BIO_QOS_THROTTLED);
+ 		__rq_qos_throttle(q->rq_qos, bio);
+ 	}
+ }
+@@ -205,8 +205,10 @@ static inline void rq_qos_track(struct r
+ static inline void rq_qos_merge(struct request_queue *q, struct request *rq,
+ 				struct bio *bio)
+ {
+-	if (q->rq_qos)
++	if (q->rq_qos) {
++		bio_set_flag(bio, BIO_QOS_MERGED);
+ 		__rq_qos_merge(q->rq_qos, rq, bio);
++	}
+ }
+ 
+ static inline void rq_qos_queue_depth_changed(struct request_queue *q)
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -317,7 +317,8 @@ enum {
+ 	BIO_TRACE_COMPLETION,	/* bio_endio() should trace the final completion
+ 				 * of this bio. */
+ 	BIO_CGROUP_ACCT,	/* has been accounted to a cgroup */
+-	BIO_TRACKED,		/* set if bio goes through the rq_qos path */
++	BIO_QOS_THROTTLED,	/* bio went through rq_qos throttle path */
++	BIO_QOS_MERGED,		/* but went through rq_qos merge path */
+ 	BIO_REMAPPED,
+ 	BIO_ZONE_WRITE_LOCKED,	/* Owns a zoned device zone write lock */
+ 	BIO_PERCPU_CACHE,	/* can participate in per-cpu alloc cache */
