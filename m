@@ -2,97 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 576ECC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 12:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DE62C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 13:06:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241841AbiCNMmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 08:42:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44002 "EHLO
+        id S235805AbiCNNH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 09:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52104 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234449AbiCNMg4 (ORCPT
+        with ESMTP id S232939AbiCNNHy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 08:36:56 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3E91192A5
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 05:33:14 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id e13so13411629plh.3
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 05:33:14 -0700 (PDT)
+        Mon, 14 Mar 2022 09:07:54 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7B9DDF7D;
+        Mon, 14 Mar 2022 06:06:43 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id e6so20397575lfc.1;
+        Mon, 14 Mar 2022 06:06:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=TASiAYWHV6s42bG7I6XgggS2QjYdX7TpQEABV+Awx48=;
-        b=LdJ4gzjbsl+ZzJxMMTDYBfkT5uw8oPWc41Vmtsc7UNR21MkVn8x7Bf+WGLashl1aq5
-         Zss3FVdbgVXdW4LoN70Hgq9K0zHRnXVxL3IUvsuQkCFa884Hfgzdv3pDXP/B1HGfjypR
-         SGkhCkMsSk4MTdQoDcjQL8Us9ba+ba8Q/rRtE1sdMO0Yr6pdy79Amr9/ovR35Zc5JuR9
-         gvI/KtVQhIVwB1DoAUNDRj47y2HAoh6nlZjfCwQF+OTHh4Qgl4wSDYpX2K37Pov+/KhL
-         FIdejxLLnAioVY2rd5f+xruczaJrPUcOwjt44vsIbhzB0yDRsAZO7iCCMkesfpE516p6
-         p50g==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=BOlO6xEd5yx0VwcP8XWEvIq5tVmdflWzEZnP6Ir9Ujc=;
+        b=eg5+VRwSBYiF1RlBhiqx8YBZfrTp8tDo2CBqIiHVxbW/cy7mI9mctOY5WA6nmA1sIU
+         F52i8oNVLQ3VQHNOQ42PKTdDBtczLN7iHpElSmgiuhn7yu33HCY8LNHjSp5CQI5IRT4O
+         hEPFfRJpfwJkbuCzQeDkkDseOxtWW/UtmW1Kud3IcO+kyNOWIPfJS3dS9EwfwQVHi9RL
+         Rx9zDZ61EsdOMjPWC2CEULkoVP6ZRQRb0HWHRXq4M0H8rW6qtFairBPqk+9x0UFWOcWW
+         fDHBFCuuW4enFi5mEKHF26oTEJ/lDz/+88pLprKNzBV5abucsFvpuH/ZPm/gxvQLA2KO
+         414A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=TASiAYWHV6s42bG7I6XgggS2QjYdX7TpQEABV+Awx48=;
-        b=6uNbGSW64qdZ046NWHCcP+xqD0BgBa3f0TOQ/bTsVqID8jtWPGPTBUOCNyhKFa8GvE
-         7JZFQKBS/yLhF+E06OPkfVCkqK5pH/FMJ0rF+LdPowhR5/xIMcxu4LJW/pJRHEmgeLbP
-         OrxJvhdFSiGTyUOcYuczac3mEfyKstmBJk6JQsd/2icC6R/gMKS/ZnNC4lpHdE+afUyS
-         s60YQuRNZxS7bDHChJ2uVGxkdJHmNqWXOBpe46YD0uSgZ+f07z9K0I8/pXVr0zNMkf+9
-         fCmQo3+GOfdTq2kYLl1gBGptWIG33UyCy5K6OHTmWMVQAAS1CWCbh7zhb7gbDXQyhBv0
-         W9ew==
-X-Gm-Message-State: AOAM532Jupj9RoOU0WpZ7UugHz6cz03chibFb+uS6VG6adVIXJlS5oAL
-        sypeuInS7G+4iKCrvaj9d8M=
-X-Google-Smtp-Source: ABdhPJwB0tflLx+3kx7WyHj779wsQesqlRf81af508ubvk0YuCIK/6+fgt/2P9aFMXJ//3HLgY1OTg==
-X-Received: by 2002:a17:90a:c252:b0:1bc:52a8:cac8 with SMTP id d18-20020a17090ac25200b001bc52a8cac8mr35683303pjx.61.1647261193907;
-        Mon, 14 Mar 2022 05:33:13 -0700 (PDT)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.gmail.com with ESMTPSA id k5-20020aa788c5000000b004f7a02d2724sm9851998pff.50.2022.03.14.05.33.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 05:33:13 -0700 (PDT)
-Date:   Mon, 14 Mar 2022 21:33:08 +0900
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst@redhat.com, pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] virtio-blk: support polling I/O
-Message-ID: <Yi82BL9KecQsVfgX@localhost.localdomain>
-References: <20220311152832.17703-1-suwan.kim027@gmail.com>
- <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=BOlO6xEd5yx0VwcP8XWEvIq5tVmdflWzEZnP6Ir9Ujc=;
+        b=fd4qiqhFXE+dyAltx75Z50mIcHv5wY5Oc7EnvMjbae5bKSeMWaayDvnspOnfjC3s4l
+         dXEMN5oG+yUUez304i4JEUuK+xR0cPAE2SQQ2lieaxGffPdkdO6vxYCk1iLvXtaCptVY
+         X0hPoWh7pEIu1KtaEMKMoInZ7//k3jKXy1Pe5BFOw9pVWI3FPGEYjzzkKpVI5S2Hob1i
+         dcyyLzxL4QS5Bv6RRzmn/OZ22Pi+iAz43wvVM4nfBm3ylsIH6ZpN2XUy2BEJ6Iw+VLZz
+         1sH0e0/oqKgfCP9tydAcMDrsXsnh/jm1I8mefbLvggssb4IvDwmiqeglYUJfKs/YFlMa
+         ysxQ==
+X-Gm-Message-State: AOAM530GGEwey92JyGDJVaHvcpeNFahya7FbVi46f/xHPjf0dsG5dap3
+        eW2pZR3tn/0Q6iT1JrUSj9KSMKAv0KfK3qQIo+c=
+X-Google-Smtp-Source: ABdhPJyKsx6rDrIjB2kvaUMha+gSykJsyREiIENgJXnLx/p7Ae+DAKriux6QPaRucljomwqpUfAhuVOouegoMHfpJXo=
+X-Received: by 2002:a05:6512:2353:b0:448:92cd:d1fb with SMTP id
+ p19-20020a056512235300b0044892cdd1fbmr3524447lfu.355.1647263201992; Mon, 14
+ Mar 2022 06:06:41 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
+References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152709epcas5p1f9d274a0214dc462c22c278a72d8697c@epcas5p1.samsung.com>
+ <20220308152105.309618-9-joshi.k@samsung.com> <20220311064321.GC17232@lst.de>
+In-Reply-To: <20220311064321.GC17232@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Mon, 14 Mar 2022 18:36:17 +0530
+Message-ID: <CA+1E3rKnsdap7wb4RqO7HCBq8hxjF48k9NydMRAKht43xnhB9A@mail.gmail.com>
+Subject: Re: [PATCH 08/17] nvme: enable passthrough with fixed-buffer
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
-> 
-> 在 2022/3/11 下午11:28, Suwan Kim 写道:
-> > diff --git a/include/uapi/linux/virtio_blk.h b/include/uapi/linux/virtio_blk.h
-> > index d888f013d9ff..3fcaf937afe1 100644
-> > --- a/include/uapi/linux/virtio_blk.h
-> > +++ b/include/uapi/linux/virtio_blk.h
-> > @@ -119,8 +119,9 @@ struct virtio_blk_config {
-> >   	 * deallocation of one or more of the sectors.
-> >   	 */
-> >   	__u8 write_zeroes_may_unmap;
-> > +	__u8 unused1;
-> > -	__u8 unused1[3];
-> > +	__virtio16 num_poll_queues;
-> >   } __attribute__((packed));
-> 
-> 
-> This looks like a implementation specific (virtio-blk-pci) optimization, how
-> about other implementation like vhost-user-blk?
+On Fri, Mar 11, 2022 at 12:13 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> > +int blk_rq_map_user_fixedb(struct request_queue *q, struct request *rq,
+> > +                  u64 ubuf, unsigned long len, gfp_t gfp_mask,
+> > +                  struct io_uring_cmd *ioucmd)
+>
+> Looking at this a bit more, I don't think this is a good interface or
+> works at all for that matter.
+>
+> > +{
+> > +     struct iov_iter iter;
+> > +     size_t iter_count, nr_segs;
+> > +     struct bio *bio;
+> > +     int ret;
+> > +
+> > +     /*
+> > +      * Talk to io_uring to obtain BVEC iterator for the buffer.
+> > +      * And use that iterator to form bio/request.
+> > +      */
+> > +     ret = io_uring_cmd_import_fixed(ubuf, len, rq_data_dir(rq), &iter,
+> > +                     ioucmd);
+>
+> Instead of pulling the io-uring dependency into blk-map.c we could just
+> pass the iter to a helper function and have that as the block layer
+> abstraction if we really want one.  But:
+>
+> > +     if (unlikely(ret < 0))
+> > +             return ret;
+> > +     iter_count = iov_iter_count(&iter);
+> > +     nr_segs = iter.nr_segs;
+> > +
+> > +     if (!iter_count || (iter_count >> 9) > queue_max_hw_sectors(q))
+> > +             return -EINVAL;
+> > +     if (nr_segs > queue_max_segments(q))
+> > +             return -EINVAL;
+> > +     /* no iovecs to alloc, as we already have a BVEC iterator */
+> > +     bio = bio_alloc(gfp_mask, 0);
+> > +     if (!bio)
+> > +             return -ENOMEM;
+> > +
+> > +     ret = bio_iov_iter_get_pages(bio, &iter);
+>
+> I can't see how this works at all.   block drivers have a lot more
+> requirements than just total size and number of segments.  Very typical
+> is a limit on the size of each sector, and for nvme we also have the
+> weird virtual boundary for the PRPs.  None of that is being checked here.
+> You really need to use bio_add_pc_page or open code the equivalent checks
+> for passthrough I/O.
 
-I didn’t consider vhost-user-blk yet. But does vhost-user-blk also
-use vritio_blk_config as kernel-qemu interface?
+Indeed, I'm missing those checks. Will fix up.
 
-Does vhost-user-blk need additional modification to support polling
-in kernel side?
+> > +             if (likely(nvme_is_fixedb_passthru(ioucmd)))
+> > +                     ret = blk_rq_map_user_fixedb(q, req, ubuffer, bufflen,
+> > +                                     GFP_KERNEL, ioucmd);
+>
+> And I'm also really worried about only supporting fixed buffers.  Fixed
+> buffers are a really nice benchmarketing feature, but without supporting
+> arbitrary buffers this is rather useless in real life.
 
-Regards,
-Suwan Kim
+Sorry, I did not get your point on arbitrary buffers.
+The goal has been to match/surpass io_uring's block-io peak perf, so
+pre-mapped buffers had to be added.
+
+-- 
+Kanchan
