@@ -2,37 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DC6C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 19:52:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE2EC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 14 Mar 2022 19:55:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244681AbiCNTxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 15:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38202 "EHLO
+        id S244322AbiCNT5F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 15:57:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244740AbiCNTxW (ORCPT
+        with ESMTP id S244221AbiCNT5E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 15:53:22 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04772403D5
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 12:51:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
-        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
-        bh=+wsPOqK3FstI9n8pFDvW37SeuLy3op5m91iOleqnoB8=; b=g1sxDQyzAfNmAAQiPYm+lLs/WA
-        6Uj0hiegYaTOUwt3dRxNF8JJ7ll66t8rUkaLbxZ7PFuNJdkX6vFIV+9WbbvtFY3QxJyXhFkCD7kWl
-        KvqGG2pzGIGmIPUOsSXOZXJQ/uYunN80ZBMYzCn5C8ZvCFa55GFY6THDd4jG5nGlSY1PqzMeEGwKU
-        n04AGtJFDJgzXJYriCa219sluBOCkVg2cZNwda1xl8JPPJkEiwyz6Yadkbif8wZZnFvPSWzkgZTP6
-        zGbCOq9R+9hxtkUv6cCdwaoF/716k2vzKLRXSBONPdxXrFWH8ym2+SH20dxfgXdHpq/4XAPPDKQ9f
-        LDQdPKzQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nTqjB-006eed-0E; Mon, 14 Mar 2022 19:51:37 +0000
-Date:   Mon, 14 Mar 2022 12:51:36 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>
-Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Mon, 14 Mar 2022 15:57:04 -0400
+Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65F11117B
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 12:55:54 -0700 (PDT)
+Received: by mail-wr1-x42f.google.com with SMTP id h15so25737008wrc.6
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 12:55:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=javigon-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=2Hk3B55ZqkeAB3AADrQYItrSmT5x8nVHCaq2sovky6w=;
+        b=oqHAJyqH40KbnVUZYh8YWeQz2EHXN0lf9GsjikkHW0/PdLytLdNUbbiNmdaItLokoA
+         iI9aXSLoO0EC3N8pYtgX9abm20lSDhFItHZo4FUBzezeNlUo+Day+DTQRrMI2Zb58r/4
+         vNhV4dDfL3k4Y0tX9PZMYJiNocWIl9X7yjfafiefA4pEQaIaq0b0ZRfOh+dOIKKAWGgR
+         drWVFzSukmhwDqsMtn5JhbY3HbL6hCeItNJW6W55VLXb/D8Py++wdR/whcpY9Z3BZk/+
+         3ZH9IFCiD1BSyerxNntVE3yryw6fBAS2y4ygkPHB7bqw6tHFBGLevYCsV9I/aBsBaBwV
+         wwNQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=2Hk3B55ZqkeAB3AADrQYItrSmT5x8nVHCaq2sovky6w=;
+        b=Ra3nCQz71HBfH+ULDLnGToRxzZ8JoYlqCHNPH1Ag16nJsI8V429I9OtIgRtJJVTXU+
+         B1arnMXqOHlyYoKTZY9vFgao4vhqqM4JczAF6v+E0zrA+u0DXBcW/hBYYUooWni7XHit
+         rCSas1AIq2OheQwnN7yr/4xDsqAznsbiWkEsF0+9I53dVXmwC5IHwlUI536HABq0TbvG
+         Q1VE52tMyV3hWHnvlnhbzWh97d/IdTrcU0IYv2GUb1k6tZEVweuOlQkwob48wCTsohWm
+         55W2zJBGVTr966RIyxQPN4xCaxFKuWZFciGJM3+YnIUNiSOaselUL2c49cQ4x+k8xDoy
+         IaqA==
+X-Gm-Message-State: AOAM532AdDzEQTcrnN52IwLa1hyWxUlwup2OF9sr0KHeyI+cPGPFddAu
+        winaxe30wx6GpQlEqczt/DFnIQ==
+X-Google-Smtp-Source: ABdhPJw/dNd3SM6HQqoRh/j2Cu426pE5a5vSXgfYJsX3tJtfqwKBUg1b/9Wa6kRaNBQKA2hWYgdnVQ==
+X-Received: by 2002:adf:e746:0:b0:1ef:8476:dab3 with SMTP id c6-20020adfe746000000b001ef8476dab3mr18077872wrn.449.1647287752873;
+        Mon, 14 Mar 2022 12:55:52 -0700 (PDT)
+Received: from localhost (5.186.121.195.cgn.fibianet.dk. [5.186.121.195])
+        by smtp.gmail.com with ESMTPSA id 10-20020adf808a000000b001edd413a952sm14072789wrl.95.2022.03.14.12.55.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 12:55:52 -0700 (PDT)
+Date:   Mon, 14 Mar 2022 20:55:51 +0100
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>
+To:     Matias =?utf-8?B?QmrDuHJsaW5n?= <Matias.Bjorling@wdc.com>
+Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Christoph Hellwig <hch@lst.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
         Keith Busch <kbusch@kernel.org>,
         Pankaj Raghav <p.raghav@samsung.com>,
         Adam Manzanares <a.manzanares@samsung.com>,
@@ -44,8 +66,10 @@ Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
 Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <Yi+cyIHeaTzc/cpq@bombadil.infradead.org>
-References: <Yiu5YzxU/PjxLiUL@bombadil.infradead.org>
+Message-ID: <20220314195551.sbwkksv33ylhlyx2@ArmHalley.local>
+References: <Yiuu2h38owO9ioIW@bombadil.infradead.org>
+ <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
+ <Yiu5YzxU/PjxLiUL@bombadil.infradead.org>
  <20220311213102.GA2309@dhcp-10-100-145-180.wdc.com>
  <YivMBj7+j/EZcMVV@bombadil.infradead.org>
  <bc0e53a9-f623-c69f-002e-d62e697a43d1@opensource.wdc.com>
@@ -53,116 +77,51 @@ References: <Yiu5YzxU/PjxLiUL@bombadil.infradead.org>
  <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
  <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
  <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
- <Yi9sFmQ3pN6+drKE@bombadil.infradead.org>
- <BYAPR04MB49681A28DEBF815225019BECF10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <BYAPR04MB49681A28DEBF815225019BECF10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 07:30:25PM +0000, Matias Bjørling wrote:
-> > -----Original Message-----
-> > From: Luis Chamberlain <mcgrof@infradead.org> On Behalf Of Luis
-> > Chamberlain
-> > Sent: Monday, 14 March 2022 17.24
-> > To: Matias Bjørling <Matias.Bjorling@wdc.com>
-> > Cc: Javier González <javier@javigon.com>; Damien Le Moal
-> > <damien.lemoal@opensource.wdc.com>; Christoph Hellwig <hch@lst.de>;
-> > Keith Busch <kbusch@kernel.org>; Pankaj Raghav <p.raghav@samsung.com>;
-> > Adam Manzanares <a.manzanares@samsung.com>;
-> > jiangbo.365@bytedance.com; kanchan Joshi <joshi.k@samsung.com>; Jens
-> > Axboe <axboe@kernel.dk>; Sagi Grimberg <sagi@grimberg.me>; Pankaj
-> > Raghav <pankydev8@gmail.com>; Kanchan Joshi <joshiiitr@gmail.com>; linux-
-> > block@vger.kernel.org; linux-nvme@lists.infradead.org
-> > Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-> > 
-> > On Mon, Mar 14, 2022 at 02:16:36PM +0000, Matias Bjørling wrote:
-> > > I want to turn the argument around to see it from the kernel
-> > > developer's point of view. They have communicated the PO2 requirement
-> > > clearly,
-> > 
-> > Such requirement is based on history and effort put in place to assume a PO2
-> > requirement for zone storage, and clearly it is not. And clearly even vendors
-> > who have embraced PO2 don't know for sure they'll always be able to stick to
-> > PO2...
-> 
-> Sure - It'll be naïve to give a carte blanche promise.
+On 14.03.2022 14:16, Matias BjÃ¸rling wrote:
+>> >> Agreed. Supporting non-power of two sizes in the block layer is
+>> >> fairly easy as shown by some of the patches seens in this series.
+>> >> Supporting them properly in the whole ecosystem is not trivial and
+>> >> will create a long-term burden.  We could do that, but we'd rather
+>> >> have a really good reason for it, and right now I don't see that.
+>>
+>> I think that Bo's use-case is an example of a major upstream Linux host that is
+>> struggling with unmmapped LBAs. Can we focus on this use-case and the parts
+>> that we are missing to support Bytedance?
+>
+>Any application that uses zoned storage devices would have to manage
+>unmapped LBAs due to the potential of zones being/becoming offline (no
+>reads/writes allowed). Eliminating the difference between zone cap and
+>zone size will not remove this requirement, and holes will continue to
+>exist. Furthermore, writing to LBAs across zones is not allowed by the
+>specification and must also be managed.
+>
+>Given the above, applications have to be conscious of zones in general and work within their boundaries. I don't understand how applications can work without having per-zone knowledge. An application would have to know about zones and their writeable capacity. To decide where and how data is written, an application must manage writing across zones, specific offline zones, and (currently) its writeable capacity. I.e., knowledge about zones and holes is required for writing to zoned devices and isn't eliminated by removing the PO2 zone size requirement.
 
-Exactly. So taking a position to not support NPO2 I think seems counter
-productive to the future of ZNS, the question whould be, *how* to best
-do this in light of what we need to support / avoid performance
-regressions / strive towards avoiding fragmentation.
+Supporting offlines zones is optional in the ZNS spec? We are not
+considering supporting this in the host. This will be handled by the
+device for exactly maintaining the SW stack simpler.
+>
+>For years, the PO2 requirement has been known in the Linux community and by the ZNS SSD vendors. Some SSD implementors have chosen not to support PO2 zone sizes, which is a perfectly valid decision. But its implementors knowingly did that while knowing that the Linux kernel didn't support it.
+>
+>I want to turn the argument around to see it from the kernel developer's point of view. They have communicated the PO2 requirement clearly, there's good precedence working with PO2 zone sizes, and at last, holes can't be avoided and are part of the overall design of zoned storage devices. So why should the kernel developer's take on the long-term maintenance burden of NPO2 zone sizes?
 
-> However, you're skipping the next two elements, which state that there
-> are both good precedence working with PO2 zone sizes and that
-> holes/unmapped LBAs can't be avoided.
+You have a good point, and that is the question we need to help answer.
+As I see it, requirements evolve and the kernel changes with it as long
+as there are active upstream users for it.
 
-I'm not, but I admit that it's a good point of having the possibility of
-zones being taken offline also implicates holes. I also think it was a
-good excercise to discuss and evaluate emulation given I don't think
-this point you made would have been made clear otherwise. This is why
-I treat ZNS as evolving effort, and I can't seriously take any position
-stating all answers are known.
+The main constraint for PO2 is removed in the block layer, we have Linux
+hosts stating that unmapped LBAs are a problem, and we have HW
+supporting size=capacity.
 
-> Making an argument for why NPO2
-> zone sizes may not bring what one is looking for. It's a lot of work
-> for little practical change, if any. 
+I would be happy to hear what else you would like to see for this to be
+of use to the kernel community.
 
-NAND does not incur a PO2 requirement, that should be enough to
-implicate that PO2 zones *can* be expected. If no vendor wants
-to take a position that they know for a fact they'll never adopt
-PO2 zones should be enough to keep an open mind to consider *how*
-to support them.
-
-> > > there's good precedence working with PO2 zone sizes, and at last,
-> > > holes can't be avoided and are part of the overall design of zoned
-> > > storage devices. So why should the kernel developer's take on the
-> > > long-term maintenance burden of NPO2 zone sizes?
-> > 
-> > I think the better question to address here is:
-> > 
-> > Do we *not* want to support NPO2 zone sizes in Linux out of principal?
-> > 
-> > If we *are* open to support NPO2 zone sizes, what path should we take to
-> > incur the least pain and fragmentation?
-> > 
-> > Emulation was a path being considered, and I think at this point the answer to
-> > eveluating that path is: this is cumbersome, probably not.
-> > 
-> > The next question then is: are we open to evaluate what it looks like to slowly
-> > shave off the PO2 requirement in different layers, with an goal to avoid further
-> > fragmentation? There is effort on evaluating that path and it doesn't seem to
-> > be that bad.
-> > 
-> > So I'd advise to evaluate that, there is nothing to loose other than awareness of
-> > what that path might look like.
-> > 
-> > Uness of course we already have a clear path forward for NPO2 we can all
-> > agree on.
-> 
-> It looks like there isn't currently one that can be agreed upon.
-
-I'm not quite sure that is the case. To reach consensus one has
-to take a position of accepting the right answer may not be known
-and we evaluate all prospects. It is not clear to me that we've done
-that yet and it is why I think a venue such as LSFMM may be good to
-review these things.
-
-> If evaluating different approaches, it would be helpful to the
-> reviewers if interfaces and all of its kernel users are converted in a
-> single patchset. This would also help to avoid users getting hit by
-> what is supported, and what isn't supported by a particular device
-> implementation and allow better to review the full set of changes
-> required to add the support.
-
-Sorry I didn't understand the suggestion here, can you clarify what it
-is you are suggesting?
-
-Thanks!
-
-  Luis
