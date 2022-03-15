@@ -2,183 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D396C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 18:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38473C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 18:49:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351154AbiCOSst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 14:48:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53958 "EHLO
+        id S240320AbiCOSul (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 14:50:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351141AbiCOSss (ORCPT
+        with ESMTP id S236306AbiCOSul (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 14:48:48 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B59545882A
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 11:47:34 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id w7so23326651ioj.5
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 11:47:34 -0700 (PDT)
+        Tue, 15 Mar 2022 14:50:41 -0400
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B294256C3B
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 11:49:28 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id r2so23305929iod.9
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 11:49:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=cIPs2FR2ApyCopO+HLMBaqkZDQxu1F/Xt97YZpRqbvQ=;
-        b=mwMzvQstbyUqHMwavpoz/YeHSRNIQfWFTHo3Jz8ugO4WJQ4rc8TasuNrTwcze88TYi
-         KB21PnA9aW1wgJsehUFFud68M2IZJL+kiRR4BpYP14mYwdGxe2OCqlAvHmjSWS5Fq+HW
-         d810xykST7Zhv6y0yiY7hbWmiDlnB4ICa4COhB0EJ1iTRY3ET8cgU+UNvB8hG+PrlNzs
-         QlV6E9OHeTUQh+QbUsNlOpUVPgJnkfWZwEXlcySYzzg9kniXJDyh2670qKmQLG8MnmDe
-         CIfoS1GKkMg/DKGvRxHau2Nc5nzVKr4jikc0BRB5hBxd/N/MLSnHr1lyyh48KO22bUl3
-         Pd5g==
+        bh=cORsAlIX7zzOarO0bTHYYLV3HdWm+OFM0nlE4vO9J+k=;
+        b=H1M9XNpff862ictrDTtA4W+X+AjZlyaxk6dBj7Ob40oacCELaSLRjVnmcXzYZrJMCK
+         AtTeT3wY9EGrw1TfxVO4YBxs9zOm4mLL3/EVfWU5bvb4Mpy7q2753WhsPsjNEfqDG9s4
+         y0vJ9U6eHFl9kIdeC42yDTYkEgJEkuhxI/Jr/q2INY7Skt7gXo0VdikaQhWinooC/xLB
+         yzj4ArKEOynLzJEYvsfH07iepeg2goxr+GUaoC0d5VGT/Rs8TsU8LC2kon9vAp56COpa
+         eeIXLtBEBRWCw0rrnd3J7cPsLNYb3Dz9tNtNvJK+URDJxfXSIKxR+wwAnvAQZXtpmhw7
+         dEeQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=cIPs2FR2ApyCopO+HLMBaqkZDQxu1F/Xt97YZpRqbvQ=;
-        b=bWtwNdR2xfQpeSdnBi020KXwYk1U52/fpbHq3jLvrVZXAgVPSyyo26H+JGdWFrpq6p
-         PNWTNR1BItuRPf/w9nIFTpJtXkOl3MG/NKQrLjN1ozqDH4B3JPfe2FPjwkX0rVTYEXJg
-         Q1FhPEkdV6SVANRKBsPySVnLONfS5j7dDU+aDm0C+/JfqF8B/Lc5B2KGsHe0q4GPkxyE
-         WA9gf8JVq98rvo+5prnTbS89hjDgAV8u9d5ltOXdl7EW/IJNVv3Rr6FXWWPV3fdoqpko
-         SCkDOMDDHfQJdJbporXEj36z6D+1Ly2W4uuqfi5m6cpaG69IyhckuIodk0qTGHn4Q135
-         HYOQ==
-X-Gm-Message-State: AOAM531Jf8NH2BBZwgeBXxBEJG/JdZwrCmdQ0utGXcFkVI7S8Q8cuvlI
-        Evrir19Ucp87HtLge794pZaNEQ==
-X-Google-Smtp-Source: ABdhPJycAQ7BbvL2ovGL5p618ppCCbLknLrruCnerQ0/nEraueDPerJPVuQUiaVbprg9Q2YdMZvJrQ==
-X-Received: by 2002:a05:6638:4115:b0:319:d141:3db with SMTP id ay21-20020a056638411500b00319d14103dbmr19569856jab.26.1647370054025;
-        Tue, 15 Mar 2022 11:47:34 -0700 (PDT)
+        bh=cORsAlIX7zzOarO0bTHYYLV3HdWm+OFM0nlE4vO9J+k=;
+        b=E9AoZZRs4Cu8h+aLN2KBAlz4w7zRwp0C+RK3KNwsM8pyz8GSdDTH7u6RIX2vKXipKs
+         YHWmiiIpo/pz3AFneUE1MX7mH1HfXdtP67OCopDqNG0y1CjrTo1SQJaqxeavC+ZE5zvG
+         wBUVA+JF38c3kiO3g+MP5AtrUQ5xgWLnkqwqpDLbpsRk+foedeLNFHGvxtZlZETM4kxx
+         tfM/i6+UgWWFymum09SPfOj/W0YjhMIU6ksqK73LVF4rOqisFHfcpg+9vhYiWWwIVGhd
+         wHZEBAnJsfFQbenIqKPYCsbABLdprCv4LkR/CiSAmPaSV4mGqwukXeh+ZVXlu0xsCZai
+         bhRQ==
+X-Gm-Message-State: AOAM5329sUlC6ADKunWz0cASEhpfG6800NnEiBM9EkFy5f9XyIJHVjph
+        Z9tpb/omPWI1xeNniwkjr7S48A==
+X-Google-Smtp-Source: ABdhPJxwUJgIH3TEDvw6U5it/Vn5hCieZq3WxdugizjyU+4ugaXfEhlmUzKGOXGaMSy/pKVRAGCq6Q==
+X-Received: by 2002:a02:9402:0:b0:31a:5a8:81a5 with SMTP id a2-20020a029402000000b0031a05a881a5mr7932751jai.83.1647370167824;
+        Tue, 15 Mar 2022 11:49:27 -0700 (PDT)
 Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q4-20020a056e0215c400b002c5fdff3087sm11673740ilu.29.2022.03.15.11.47.32
+        by smtp.gmail.com with ESMTPSA id i11-20020a056e020d8b00b002c79690d56esm5002301ilj.10.2022.03.15.11.49.26
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Mar 2022 11:47:33 -0700 (PDT)
-Message-ID: <1b7a45ff-31d4-4b5a-81e2-a35e7cb0b471@kernel.dk>
-Date:   Tue, 15 Mar 2022 12:47:32 -0600
+        Tue, 15 Mar 2022 11:49:27 -0700 (PDT)
+Message-ID: <4cfa6143-3082-52ee-6d6d-b127457ac2e4@kernel.dk>
+Date:   Tue, 15 Mar 2022 12:49:26 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.6.2
-Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
+Subject: Re: [EXT] [LSF/MM/BPF BoF] BoF for Zoned Storage
 Content-Language: en-US
-To:     Ondrej Zary <linux@zary.sk>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220312144415.20010-1-linux@zary.sk>
- <f8c176d4-74f0-3e4f-446f-2a5f8ace3b28@kernel.dk>
- <8f32b2ed-13d6-c357-e417-b86a57a285db@opensource.wdc.com>
- <202203151944.44834.linux@zary.sk>
+To:     "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Luca Porzio (lporzio)" <lporzio@micron.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <CO3PR08MB7975BCC4FF096DD6190DEF5DDC109@CO3PR08MB7975.namprd08.prod.outlook.com>
+ <73adf81b-0bca-324e-9f4f-478171a1f617@acm.org>
+ <PH0PR08MB7889A1EB0A223630E8747A53DB109@PH0PR08MB7889.namprd08.prod.outlook.com>
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <202203151944.44834.linux@zary.sk>
+In-Reply-To: <PH0PR08MB7889A1EB0A223630E8747A53DB109@PH0PR08MB7889.namprd08.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/15/22 12:44 PM, Ondrej Zary wrote:
-> On Tuesday 15 March 2022 05:22:47 Damien Le Moal wrote:
->> On 3/15/22 05:29, Jens Axboe wrote:
->>> On 3/14/22 2:25 PM, Ondrej Zary wrote:
->>>> On Monday 14 March 2022 00:19:30 Jens Axboe wrote:
->>>>> On 3/13/22 1:15 PM, Ondrej Zary wrote:
->>>>>> On Saturday 12 March 2022 15:44:15 Ondrej Zary wrote:
->>>>>>> The pata_parport is a libata-based replacement of the old PARIDE
->>>>>>> subsystem - driver for parallel port IDE devices.
->>>>>>> It uses the original paride low-level protocol drivers but does not
->>>>>>> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
->>>>>>> behind parallel port adapters are handled by the ATA layer.
->>>>>>>
->>>>>>> This will allow paride and its high-level drivers to be removed.
->>>>>>>
->>>>>>> paride and pata_parport are mutually exclusive because the compiled
->>>>>>> protocol drivers are incompatible.
->>>>>>>
->>>>>>> Tested with Imation SuperDisk LS-120 and HP C4381A (both use EPAT
->>>>>>> chip).
->>>>>>>
->>>>>>> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
->>>>>>> drivers - they don't handle non-multiple-of-4 block transfers
->>>>>>> correctly. This causes problems with LS-120 drive.
->>>>>>> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
->>>>>>> or 8-bit mode is used first (probably some initialization missing?).
->>>>>>> Once the device is initialized, EPP works until power cycle.
->>>>>>>
->>>>>>> So after device power on, you have to:
->>>>>>> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
->>>>>>> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
->>>>>>> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
->>>>>>> (autoprobe will initialize correctly as it tries the slowest modes
->>>>>>> first but you'll get the broken EPP-32 mode)
->>>>>>
->>>>>> Found a bug - the same device can be registered multiple times. Fix
->>>>>> will be in v2. But this revealed a bigger problem: pi_connect can
->>>>>> sleep (uses parport_claim_or_block) and libata does not like that. Any
->>>>>> ideas how to fix this?
->>>>>
->>>>> I think you'd need two things here:
->>>>>
->>>>> - The blk-mq queue should be registered with BLK_MQ_F_BLOCKING, which
->>>>>   will allow blocking off the queue_rq path.
->>>>
->>>> My knowledge about blk-mq is exactly zero. After grepping the code, I
->>>> guess that BLK_MQ_F_BLOCKING should be used by the block device
->>>> drivers - sd and sr?
->>>
->>> The controller would set
->>>
->>> ->needs_blocking_queue_rq = true;
->>>
->>> or something, and we'd default to false. And if that is set, when the
->>> blk-mq queue is created, then we'd set BLK_MQ_F_BLOCKING upon creation
->>> if that flag is true.
->>>
->>> That's the block layer side. Then in libata you'd need to ensure that
->>> you check that same setting and invoke ata_qc_issue() appropriately.
->>>
->>> Very top level stuff, there might be more things lurking below. But
->>> you'll probably find them as you test this stuff...
->>
->> Yes, the ata_port spinlock being held when calling ata_qc_issue() is
->> mandatory. But since I am assuming that all the IDE devices connected to
->> this adapter are QD=1 maximum, there can only be only one command in
->> flight. So it may be OK to release that lock before calling pi_connect()
->> and retake it right after it. libsas actually does something similar
->> (for no good reasons in that case though).
->>
->> Jens point remain though that since pi_connect() can sleep, marking the
->> device queue with BLK_MQ_F_BLOCKING is mandatory.
->  
-> Something like this? Requires Mike's SCSI BLK_MQ_F_BLOCKING patch:
-> https://lore.kernel.org/all/20220308003957.123312-2-michael.christie%40oracle.com/
+On 3/15/22 12:47 PM, Bean Huo (beanhuo) wrote:
+> Micron Confidential
+ 
 > 
-> #define PATA_PARPORT_SHT(drv_name)      \
->         ATA_PIO_SHT(drv_name),          \
->         .queuecommand_blocks    = true,
-> 
-> static void pi_connect(struct ata_port *ap)
-> {
-> 	struct pi_adapter *pi = ap->host->private_data;
-> 
-> 	del_timer_sync(&pi->timer);
-> 	if (!pi->claimed) {
-> 		bool locked = spin_is_locked(ap->lock);
-> 		pi->claimed = true;
-> 		if (locked)
-> 			spin_unlock(ap->lock);
-> 		parport_claim_or_block(pi->pardev);
-> 		if (locked)
-> 			spin_lock(ap->lock);
-> 		pi->proto->connect(pi);
-> 	}
-> }
-> 
-> spin_is_locked is needed because the lock is not always held. It seems
-> to work - no more stack traces after device double registration (only
-> ATA errors but that's expected).
+> Micron Confidential
 
-That's a very bad paradigm. What if it is locked, but the caller isn't
-the one that locked it? Would be better to either make the locking state
-consistent, or provide an unlocked variant (if feasible, doesn't always
-work if it's a provided helper already in a struct of ops), or even
-resorting to passing in locking state as a last resort.
+Must be very confidential if it needs two?
+
+Please get rid of these useless disclaimers in public emails, they make
+ZERO sense.
 
 -- 
 Jens Axboe
