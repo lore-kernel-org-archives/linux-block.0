@@ -2,188 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C135EC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 14:31:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C11C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 14:43:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349356AbiCOOdJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 10:33:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39598 "EHLO
+        id S237902AbiCOOoi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 10:44:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349300AbiCOOcz (ORCPT
+        with ESMTP id S232537AbiCOOoh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 10:32:55 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B15D54FA5;
-        Tue, 15 Mar 2022 07:31:43 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 0A4571F391;
-        Tue, 15 Mar 2022 14:31:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1647354702;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=X4cn6JV8O5AWRhPuK4Wz8bFqAnv8oC3Dsib+SHAacxc=;
-        b=AeePv1tYMjuFa+aHT+vLeUHCFANUp2upgQvR8FONiCoHkfgRPwtYn+YcU47g8mQR8xGMjj
-        dF8lRdVfTicMFe2IfCiJWp6NsR35uAjZHmWjG+23uQTEi+1BZcWZ4Dn05qtApxxz8hgCKN
-        /KHQseXyUpbpX4EqAUILwbcg7z/PUQ4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1647354702;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=X4cn6JV8O5AWRhPuK4Wz8bFqAnv8oC3Dsib+SHAacxc=;
-        b=taUQzUafQQZZAq34Z4BXfJfJMlBB/yEH93K5d2DJbUxkQyKCDrlRYIsIzerMcwkYGj5E20
-        MrNXb5dXtx/3sNAg==
-Received: from ds.suse.cz (ds.suse.cz [10.100.12.205])
-        by relay2.suse.de (Postfix) with ESMTP id 196C0A3B81;
-        Tue, 15 Mar 2022 14:31:39 +0000 (UTC)
-Received: by ds.suse.cz (Postfix, from userid 10065)
-        id 22423DA7E1; Tue, 15 Mar 2022 15:27:40 +0100 (CET)
-Date:   Tue, 15 Mar 2022 15:27:40 +0100
-From:   David Sterba <dsterba@suse.cz>
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-btrfs @ vger . kernel . org" <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <20220315142740.GU12643@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-btrfs @ vger . kernel . org" <linux-btrfs@vger.kernel.org>
-References: <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
- <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
- <20220314195551.sbwkksv33ylhlyx2@ArmHalley.local>
- <BYAPR04MB49688BD817284E5C317DD5D8F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
- <20220315130501.q7fjpqzutadadfu3@ArmHalley.localdomain>
- <BYAPR04MB49689803ED6E1E32C49C6413F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
- <20220315132611.g5ert4tzuxgi7qd5@unifi>
- <20220315133052.GA12593@lst.de>
- <20220315135245.eqf4tqngxxb7ymqa@unifi>
- <PH0PR04MB74167377D7D86C60C290DAB29B109@PH0PR04MB7416.namprd04.prod.outlook.com>
+        Tue, 15 Mar 2022 10:44:37 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E89C2631C
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 07:43:24 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id o6-20020a17090a9f8600b001c6562049d9so90208pjp.3
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 07:43:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=s2Fo8cFhNIIc04Q+dLxt9o39hs6qWMAmWn+8C9PjvUQ=;
+        b=qvc2AxZC04cEbvTPKDFsrmCvTQuUktI3F8dUPlB2ZmwZB9r4i6t3cUiDt5VFzlQ29/
+         UJarmdlnlcfk6zbv0/RmPkGaLQ0IcAUFeN5iW7sw86JvImfMvhjpu2ojzNxygZGJF+KW
+         iA7NZDhpgTFpd30jw69dUvs8oP7e9g+skJHqb2OBlrYMIRj8JpOqCjvxFQPpv6V9brGe
+         o3aBE/tgb1MMljwPsDKliboDrWqHfn8vPyP5q99s3yXnA/6vzPPsqB17SGhZLDKP8ABW
+         eICMviKMLqQYthwNeyHMF1xoJeGahwUeZ2h0UwGCIG8dgFSq0N/8FOO/0iRtXnbDSmSw
+         XA/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=s2Fo8cFhNIIc04Q+dLxt9o39hs6qWMAmWn+8C9PjvUQ=;
+        b=0cKUAKVBnxkSGIfUm5Lugs33lf439LJehOh4pLArwqDYm+4ZGBLuqScqzN2SNmC4k2
+         iJxRbU/qyFd8mJ/DrB5Yz0i4yOAM8l1tpSd4MzCd68dEPVixUnw9ZIMCqr03ge9HyEVZ
+         8gsQaalHPyCIcHSZJhnImesjChLYgduY6N8zHHavWOLxk03K+J2iPvDckfexHd8/yZjN
+         M/MDBW5RY7kugaTCWzPOQ6o8V44QtDxOpplsq8cbGHpPPl1CpzQm++6wIbtPg1+6I0cO
+         Pd9aeDXiD6gQYdvwf650VLzDsyloj4GOC3X1AvTXYjPil21SrcyM4XpP76DQRyIkaZuu
+         TUtQ==
+X-Gm-Message-State: AOAM532mkjRKn5LtHJJzBuCOhYi1VDp9KcB5iDkHTlR95ppBX/3Tr3XQ
+        p9g+CD0OE19SrB7A4JjkCIo=
+X-Google-Smtp-Source: ABdhPJwWZ3Zd3quUZ02+D8WG9japUmMBVWiWS66RcKjOBEIv1rSxJjEWtqJ5xYlN+aek6hCVlBsd+A==
+X-Received: by 2002:a17:903:2303:b0:151:d3dc:42b3 with SMTP id d3-20020a170903230300b00151d3dc42b3mr28845731plh.85.1647355404428;
+        Tue, 15 Mar 2022 07:43:24 -0700 (PDT)
+Received: from localhost.localdomain ([114.200.4.15])
+        by smtp.gmail.com with ESMTPSA id mt3-20020a17090b230300b001c633aca1e1sm3474740pjb.18.2022.03.15.07.43.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Mar 2022 07:43:23 -0700 (PDT)
+Date:   Tue, 15 Mar 2022 23:43:18 +0900
+From:   Suwan Kim <suwan.kim027@gmail.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst <mst@redhat.com>, pbonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] virtio-blk: support polling I/O
+Message-ID: <YjCmBkjgtQZffiXw@localhost.localdomain>
+References: <20220311152832.17703-1-suwan.kim027@gmail.com>
+ <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
+ <Yi82BL9KecQsVfgX@localhost.localdomain>
+ <CACGkMEujXYNE-88=m9ohjbeAj2F7CqEUes8gOUmasTNtwn2bUA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <PH0PR04MB74167377D7D86C60C290DAB29B109@PH0PR04MB7416.namprd04.prod.outlook.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <CACGkMEujXYNE-88=m9ohjbeAj2F7CqEUes8gOUmasTNtwn2bUA@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 02:14:23PM +0000, Johannes Thumshirn wrote:
-> On 15/03/2022 14:52, Javier Gonz�lez wrote:
-> > On 15.03.2022 14:30, Christoph Hellwig wrote:
-> >> On Tue, Mar 15, 2022 at 02:26:11PM +0100, Javier Gonz�lez wrote:
-> >>> but we do not see a usage for ZNS in F2FS, as it is a mobile
-> >>> file-system. As other interfaces arrive, this work will become natural.
-> >>>
-> >>> ZoneFS and butrfs are good targets for ZNS and these we can do. I would
-> >>> still do the work in phases to make sure we have enough early feedback
-> >>> from the community.
-> >>>
-> >>> Since this thread has been very active, I will wait some time for
-> >>> Christoph and others to catch up before we start sending code.
-> >>
-> >> Can someone summarize where we stand?  Between the lack of quoting
-> >> from hell and overly long lines from corporate mail clients I've
-> >> mostly stopped reading this thread because it takes too much effort
-> >> actually extract the information.
-> > 
-> > Let me give it a try:
-> > 
-> >   - PO2 emulation in NVMe is a no-go. Drop this.
-> > 
-> >   - The arguments against supporting PO2 are:
-> >       - It makes ZNS depart from a SMR assumption of PO2 zone sizes. This
-> >         can create confusion for users of both SMR and ZNS
-> > 
-> >       - Existing applications assume PO2 zone sizes, and probably do
-> >         optimizations for these. These applications, if wanting to use
-> >         ZNS will have to change the calculations
-> > 
-> >       - There is a fear for performance regressions.
-> > 
-> >       - It adds more work to you and other maintainers
-> > 
-> >   - The arguments in favour of PO2 are:
-> >       - Unmapped LBAs create holes that applications need to deal with.
-> >         This affects mapping and performance due to splits. Bo explained
-> >         this in a thread from Bytedance's perspective.  I explained in an
-> >         answer to Matias how we are not letting zones transition to
-> >         offline in order to simplify the host stack. Not sure if this is
-> >         something we want to bring to NVMe.
-> > 
-> >       - As ZNS adds more features and other protocols add support for
-> >         zoned devices we will have more use-cases for the zoned block
-> >         device. We will have to deal with these fragmentation at some
-> >         point.
-> > 
-> >       - This is used in production workloads in Linux hosts. I would
-> >         advocate for this not being off-tree as it will be a headache for
-> >         all in the future.
-> > 
-> >   - If you agree that removing PO2 is an option, we can do the following:
-> >       - Remove the constraint in the block layer and add ZoneFS support
-> >         in a first patch.
-> > 
-> >       - Add btrfs support in a later patch
+On Tue, Mar 15, 2022 at 04:59:23PM +0800, Jason Wang wrote:
+> On Mon, Mar 14, 2022 at 8:33 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
 > 
-> (+ linux-btrfs )
+> > On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
+> > >
+> > > 在 2022/3/11 下午11:28, Suwan Kim 写道:
+> > > > diff --git a/include/uapi/linux/virtio_blk.h
+> > b/include/uapi/linux/virtio_blk.h
+> > > > index d888f013d9ff..3fcaf937afe1 100644
+> > > > --- a/include/uapi/linux/virtio_blk.h
+> > > > +++ b/include/uapi/linux/virtio_blk.h
+> > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
+> > > >      * deallocation of one or more of the sectors.
+> > > >      */
+> > > >     __u8 write_zeroes_may_unmap;
+> > > > +   __u8 unused1;
+> > > > -   __u8 unused1[3];
+> > > > +   __virtio16 num_poll_queues;
+> > > >   } __attribute__((packed));
+> > >
+> > >
+> > > This looks like a implementation specific (virtio-blk-pci) optimization,
+> > how
+> > > about other implementation like vhost-user-blk?
+> >
+> > I didn’t consider vhost-user-blk yet. But does vhost-user-blk also
+> > use vritio_blk_config as kernel-qemu interface?
+> >
 > 
-> Please also make sure to support btrfs and not only throw some patches 
-> over the fence. Zoned device support in btrfs is complex enough and has 
-> quite some special casing vs regular btrfs, which we're working on getting
-> rid of. So having non-power-of-2 zone size, would also mean having NPO2
-> block-groups (and thus block-groups not aligned to the stripe size).
+> Yes, but see below.
 > 
-> Just thinking of this and knowing I need to support it gives me a 
-> headache.
+> 
+> >
+> > Does vhost-user-blk need additional modification to support polling
+> > in kernel side?
+> >
+> 
+> 
+> No, but the issue is, things like polling looks not a good candidate for
+> the attributes belonging to the device but the driver. So I have more
+> questions:
+> 
+> 1) what does it really mean for hardware virtio block devices?
+> 2) Does driver polling help for the qemu implementation without polling?
+> 3) Using blk_config means we can only get the benefit from the new device
 
-PO2 is really easy to work with and I guess allocation on the physical
-device could also benefit from that, I'm still puzzled why the NPO2 is
-even proposed.
+1) what does it really mean for hardware virtio block devices?
+3) Using blk_config means we can only get the benefit from the new device
 
-We can possibly hide the calculations behind some API so I hope in the
-end it should be bearable. The size of block groups is flexible we only
-want some reasonable alignment.
+This patch adds dedicated HW queue for polling purpose to virtio
+block device.
 
-> Also please consult the rest of the btrfs developers for thoughts on this.
-> After all btrfs has full zoned support (including ZNS, not saying it's 
-> perfect) and is also the default FS for at least two Linux distributions.
+So I think it can be a new hw feature. And it can be a new device
+that supports hw poll queue.
 
-I haven't read the whole thread yet, my impression is that some hardware
-is deliberately breaking existing assumptions about zoned devices and in
-turn breaking btrfs support. I hope I'm wrong on that or at least that
-it's possible to work around it.
+BTW, I have other idea about it.
+
+How about adding “num-poll-queues" property as a driver parameter
+like NVMe driver, not to QEMU virtio-blk-pci property?
+
+If then, we don’t need to modify virtio_blk_config.
+And we can apply the polling feature only to virtio-blk-pci.
+But can QEMU pass “num-poll-queues" to virtio-blk driver param?
+
+
+
+2) Does driver polling help for the qemu implementation without polling?
+
+Sorry, I didn't understand your question. Could you please explain more about?
+
+Regards,
+Suwan Kim
