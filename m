@@ -2,157 +2,448 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80ED9C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 21:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CB2C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 22:09:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245655AbiCOVTR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 17:19:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42104 "EHLO
+        id S229655AbiCOWKa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 18:10:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60244 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351237AbiCOVTO (ORCPT
+        with ESMTP id S229457AbiCOWK3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 17:19:14 -0400
-Received: from hosting.gsystem.sk (hosting.gsystem.sk [212.5.213.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5CE751263C;
-        Tue, 15 Mar 2022 14:17:58 -0700 (PDT)
-Received: from [192.168.0.2] (chello089173232159.chello.sk [89.173.232.159])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by hosting.gsystem.sk (Postfix) with ESMTPSA id D96007A02F6;
-        Tue, 15 Mar 2022 22:17:56 +0100 (CET)
-From:   Ondrej Zary <linux@zary.sk>
-To:     Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH] pata_parport: add driver (PARIDE replacement)
-Date:   Tue, 15 Mar 2022 22:17:52 +0100
-User-Agent: KMail/1.9.10
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Christoph Hellwig <hch@lst.de>, Tim Waugh <tim@cyberelk.net>,
-        linux-block@vger.kernel.org, linux-parport@lists.infradead.org,
-        linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220312144415.20010-1-linux@zary.sk> <202203151944.44834.linux@zary.sk> <1b7a45ff-31d4-4b5a-81e2-a35e7cb0b471@kernel.dk>
-In-Reply-To: <1b7a45ff-31d4-4b5a-81e2-a35e7cb0b471@kernel.dk>
-X-KMail-QuotePrefix: > 
+        Tue, 15 Mar 2022 18:10:29 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9502D1F7;
+        Tue, 15 Mar 2022 15:09:16 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id n2so288838plf.4;
+        Tue, 15 Mar 2022 15:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=IEPtWXm+YZxtD5a1sP7FNYuu23Vj6ZCBZKFquziIeF0=;
+        b=N8n+u6HPci4I1XG4IO9q4KbRmx40H/7sazapFVCBtQc9zoDdpuoXpgWihK+Wb0cHoe
+         53sIo1HQP37qclrkH7cVc6E8veEsWrn/y/mB6gp2r9zBHt1pBLwsqEWoAyG3vl68u3W4
+         MYwPM62kC5gVlCmelg6Vp4DqMtN1n9Q+tB77bx6ND+Ch7leQteIsGFTvyYWdp5V+C7JQ
+         yATB3By+cW5LiTGbBzVDN99nVc6p7rWqRveVBWpY9vPwQl+keDECLrDfqpqv3YTdXlr1
+         e6YSHOv/SwBJ0CHnreTo6elFPXTFv49f4QWZSEPI5JI0M2lPjF9SH5uHc83oPwqJzOmw
+         YVDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=IEPtWXm+YZxtD5a1sP7FNYuu23Vj6ZCBZKFquziIeF0=;
+        b=FbqcHwWKcWC5pjs0BIepDitCRGtAKnncZmY8VncgoLJXxw7RBssIKQvgUZW2zLgZga
+         ScnO4SGM8jbm0uRUp7ik1s+PbrY8a4p7ld4MAJIT4f5dHN1y9x4w8NtOUallwjTllhrO
+         96NKV/OnoTsq7Jt5/m6xSzuQYfl0cgwvUrxibVmEUzXYt156g/wRNPvqkEgicaWDOzAX
+         HwYnSw+dusx8IAamG3pJ0JOMtjN1iVsnE1YIPp1z6vFSugQbcPNStXf23KXckEDQ/wB/
+         /J8UPbGlz8DmfKge0YfSU3ND9H1ChbOGgBQgofMM/iVt+O5jwUZo25yR0CY/oFYEcemN
+         Yt7w==
+X-Gm-Message-State: AOAM531A3ltv1MR19KILM3hUd/G7xc4kLJ7JYmR5xMDhrbpfPgFiurZ1
+        JHnhrx7ZLMCvsILKlcTPSqk=
+X-Google-Smtp-Source: ABdhPJyri1CtzErYDooztz6csN5/W754nhRfffdfWYJ3fiIktC2Xr3IjBAvNxD9xyGiisCHLuTninQ==
+X-Received: by 2002:a17:90a:db96:b0:1bf:a7c9:9571 with SMTP id h22-20020a17090adb9600b001bfa7c99571mr7062403pjv.173.1647382155519;
+        Tue, 15 Mar 2022 15:09:15 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:7484:dc22:fe49:91cb])
+        by smtp.gmail.com with ESMTPSA id s30-20020a056a001c5e00b004f73f27aa40sm78342pfw.161.2022.03.15.15.09.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Mar 2022 15:09:15 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Tue, 15 Mar 2022 15:09:13 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Ivan Babrou <ivan@cloudflare.com>
+Cc:     Linux MM <linux-mm@kvack.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        kernel-team <kernel-team@cloudflare.com>
+Subject: Re: zram corruption due to uninitialized do_swap_page fault
+Message-ID: <YjEOiZCLBMgbw8oc@google.com>
+References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
+ <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
+ <YjA439FwajtHsahr@google.com>
 MIME-Version: 1.0
-Content-Type: Text/Plain;
-  charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Message-Id: <202203152217.52855.linux@zary.sk>
+In-Reply-To: <YjA439FwajtHsahr@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tuesday 15 March 2022 19:47:32 Jens Axboe wrote:
-> On 3/15/22 12:44 PM, Ondrej Zary wrote:
-> > On Tuesday 15 March 2022 05:22:47 Damien Le Moal wrote:
-> >> On 3/15/22 05:29, Jens Axboe wrote:
-> >>> On 3/14/22 2:25 PM, Ondrej Zary wrote:
-> >>>> On Monday 14 March 2022 00:19:30 Jens Axboe wrote:
-> >>>>> On 3/13/22 1:15 PM, Ondrej Zary wrote:
-> >>>>>> On Saturday 12 March 2022 15:44:15 Ondrej Zary wrote:
-> >>>>>>> The pata_parport is a libata-based replacement of the old PARIDE
-> >>>>>>> subsystem - driver for parallel port IDE devices.
-> >>>>>>> It uses the original paride low-level protocol drivers but does not
-> >>>>>>> need the high-level drivers (pd, pcd, pf, pt, pg). The IDE devices
-> >>>>>>> behind parallel port adapters are handled by the ATA layer.
-> >>>>>>>
-> >>>>>>> This will allow paride and its high-level drivers to be removed.
-> >>>>>>>
-> >>>>>>> paride and pata_parport are mutually exclusive because the compiled
-> >>>>>>> protocol drivers are incompatible.
-> >>>>>>>
-> >>>>>>> Tested with Imation SuperDisk LS-120 and HP C4381A (both use EPAT
-> >>>>>>> chip).
-> >>>>>>>
-> >>>>>>> Note: EPP-32 mode is buggy in EPAT - and also in all other protocol
-> >>>>>>> drivers - they don't handle non-multiple-of-4 block transfers
-> >>>>>>> correctly. This causes problems with LS-120 drive.
-> >>>>>>> There is also another bug in EPAT: EPP modes don't work unless a 4-bit
-> >>>>>>> or 8-bit mode is used first (probably some initialization missing?).
-> >>>>>>> Once the device is initialized, EPP works until power cycle.
-> >>>>>>>
-> >>>>>>> So after device power on, you have to:
-> >>>>>>> echo "parport0 epat 0" >/sys/bus/pata_parport/new_device
-> >>>>>>> echo pata_parport.0 >/sys/bus/pata_parport/delete_device
-> >>>>>>> echo "parport0 epat 4" >/sys/bus/pata_parport/new_device
-> >>>>>>> (autoprobe will initialize correctly as it tries the slowest modes
-> >>>>>>> first but you'll get the broken EPP-32 mode)
-> >>>>>>
-> >>>>>> Found a bug - the same device can be registered multiple times. Fix
-> >>>>>> will be in v2. But this revealed a bigger problem: pi_connect can
-> >>>>>> sleep (uses parport_claim_or_block) and libata does not like that. Any
-> >>>>>> ideas how to fix this?
-> >>>>>
-> >>>>> I think you'd need two things here:
-> >>>>>
-> >>>>> - The blk-mq queue should be registered with BLK_MQ_F_BLOCKING, which
-> >>>>>   will allow blocking off the queue_rq path.
-> >>>>
-> >>>> My knowledge about blk-mq is exactly zero. After grepping the code, I
-> >>>> guess that BLK_MQ_F_BLOCKING should be used by the block device
-> >>>> drivers - sd and sr?
-> >>>
-> >>> The controller would set
-> >>>
-> >>> ->needs_blocking_queue_rq = true;
-> >>>
-> >>> or something, and we'd default to false. And if that is set, when the
-> >>> blk-mq queue is created, then we'd set BLK_MQ_F_BLOCKING upon creation
-> >>> if that flag is true.
-> >>>
-> >>> That's the block layer side. Then in libata you'd need to ensure that
-> >>> you check that same setting and invoke ata_qc_issue() appropriately.
-> >>>
-> >>> Very top level stuff, there might be more things lurking below. But
-> >>> you'll probably find them as you test this stuff...
-> >>
-> >> Yes, the ata_port spinlock being held when calling ata_qc_issue() is
-> >> mandatory. But since I am assuming that all the IDE devices connected to
-> >> this adapter are QD=1 maximum, there can only be only one command in
-> >> flight. So it may be OK to release that lock before calling pi_connect()
-> >> and retake it right after it. libsas actually does something similar
-> >> (for no good reasons in that case though).
-> >>
-> >> Jens point remain though that since pi_connect() can sleep, marking the
-> >> device queue with BLK_MQ_F_BLOCKING is mandatory.
-> >  
-> > Something like this? Requires Mike's SCSI BLK_MQ_F_BLOCKING patch:
-> > https://lore.kernel.org/all/20220308003957.123312-2-michael.christie%40oracle.com/
+On Mon, Mar 14, 2022 at 11:57:35PM -0700, Minchan Kim wrote:
+> On Mon, Mar 14, 2022 at 09:18:43PM -0700, Ivan Babrou wrote:
+> > On Fri, Mar 11, 2022 at 11:51 AM Ivan Babrou <ivan@cloudflare.com> wrote:
+> > >
+> > > Hello,
+> > >
+> > > We're looking into using zram, but unfortunately we ran into some
+> > > corruption issues. We've seen rocksdb complaining about "Corruption:
+> > > bad entry in block", and we've also seen some coredumps that point at
+> > > memory being zeroed out. One of our Rust processes coredumps contains
+> > > a non-null pointer pointing at zero, among other things:
+> > >
+> > > * core::ptr::non_null::NonNull<u8> {pointer: 0x0}
+> > >
+> > > In fact, a whole bunch of memory around this pointer was all zeros.
+> > >
+> > > Disabling zram resolves all issues, and we can't reproduce any of
+> > > these issues with other swap setups. I've tried adding crc32
+> > > checksumming for pages that are compressed, but it didn't catch the
+> > > issue either, even though userspace facing symptoms were present. My
+> > > crc32 code doesn't touch ZRAM_SAME pages, though.
+> > >
+> > > Unfortunately, this isn't trivial to replicate, and I believe that it
+> > > depends on zram used for swap specifically, not for zram as a block
+> > > device. Specifically, swap_slot_free_notify looks suspicious.
+> > >
+> > > Here's a patch that I have to catch the issue in the act:
+> > >
+> > > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> > > index 438ce34ee760..fea46a70a3c9 100644
+> > > --- a/drivers/block/zram/zram_drv.c
+> > > +++ b/drivers/block/zram/zram_drv.c
+> > > @@ -1265,6 +1265,9 @@ static int __zram_bvec_read(struct zram *zram,
+> > > struct page *page, u32 index,
+> > >   unsigned long value;
+> > >   void *mem;
+> > >
+> > > + if (WARN_ON(!handle && !zram_test_flag(zram, index, ZRAM_SAME)))
+> > > + pr_warn("Page %u read from zram without previous write\n", index);
+> > > +
+> > >   value = handle ? zram_get_element(zram, index) : 0;
+> > >   mem = kmap_atomic(page);
+> > >   zram_fill_page(mem, PAGE_SIZE, value);
+> > >
+> > > In essence, it warns whenever a page is read from zram that was not
+> > > previously written to. To make this work, one needs to zero out zram
+> > > prior to running mkswap on it.
+> > >
+> > > I have prepared a GitHub repo with my observations and a reproduction:
+> > >
+> > > * https://github.com/bobrik/zram-corruptor
+> > >
+> > > I'm able to trigger the following in an aarch64 VM with two threads
+> > > reading the same memory out of swap:
+> > >
+> > > [ 512.651752][ T7285] ------------[ cut here ]------------
+> > > [ 512.652279][ T7285] WARNING: CPU: 0 PID: 7285 at
+> > > drivers/block/zram/zram_drv.c:1285 __zram_bvec_read+0x28c/0x2e8 [zram]
+> > > [ 512.653923][ T7285] Modules linked in: zram zsmalloc kheaders nfsv3
+> > > nfs lockd grace sunrpc xt_conntrack nft_chain_nat xt_MASQUERADE nf_nat
+> > > nf_conntrack_netlink nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
+> > > nft_counter xt_addrtype nft_compat nf_tables nfnetlink bridge stp llc
+> > > overlay xfs libcrc32c zstd zstd_compress af_packet aes_ce_blk
+> > > aes_ce_cipher ghash_ce gf128mul virtio_net sha3_ce net_failover
+> > > sha3_generic failover sha512_ce sha512_arm64 sha2_ce sha256_arm64
+> > > virtio_mmio virtio_ring qemu_fw_cfg rtc_pl031 virtio fuse ip_tables
+> > > x_tables ext4 mbcache crc16 jbd2 nvme nvme_core pci_host_generic
+> > > pci_host_common unix [last unloaded: zsmalloc]
+> > > [ 512.659238][ T7285] CPU: 0 PID: 7285 Comm: zram-corruptor Tainted: G
+> > > W 5.16.0-ivan #1 0877d306c6dc0716835d43cafe4399473d09e406
+> > > [ 512.660413][ T7285] Hardware name: linux,dummy-virt (DT)
+> > > [ 512.661077][ T7285] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT
+> > > -SSBS BTYPE=--)
+> > > [ 512.661788][ T7285] pc : __zram_bvec_read+0x28c/0x2e8 [zram]
+> > > [ 512.662099][ T7285] lr : zram_bvec_rw+0x70/0x204 [zram]
+> > > [ 512.662422][ T7285] sp : ffffffc01018bac0
+> > > [ 512.662720][ T7285] x29: ffffffc01018bae0 x28: ffffff9e4e725280 x27:
+> > > ffffff9e4e725280
+> > > [ 512.663122][ T7285] x26: ffffff9e4e725280 x25: 00000000000001f6 x24:
+> > > 0000000100033e6c
+> > > [ 512.663601][ T7285] x23: 00000000000001f6 x22: 0000000000000000 x21:
+> > > fffffffe7a36d840
+> > > [ 512.664252][ T7285] x20: 00000000000001f6 x19: ffffff9e69423c00 x18:
+> > > ffffffc010711068
+> > > [ 512.664812][ T7285] x17: 0000000000000008 x16: ffffffd34aed51bc x15:
+> > > 0000000000000000
+> > > [ 512.665507][ T7285] x14: 0000000000000a88 x13: 0000000000000000 x12:
+> > > 0000000000000000
+> > > [ 512.666183][ T7285] x11: 0000000100033e6c x10: ffffffc01091d000 x9 :
+> > > 0000000001000000
+> > > [ 512.666627][ T7285] x8 : 0000000000002f10 x7 : 80b75f8fb90b52c4 x6 :
+> > > 051609fe50833de3
+> > > [ 512.667276][ T7285] x5 : 0000000000000000 x4 : 0000000000000000 x3 :
+> > > 0000000000000000
+> > > [ 512.667875][ T7285] x2 : 00000000000001f6 x1 : 00000000000001f6 x0 :
+> > > ffffffd305b746af
+> > > [ 512.668483][ T7285] Call trace:
+> > > [ 512.668682][ T7285] __zram_bvec_read+0x28c/0x2e8 [zram
+> > > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
+> > > [ 512.669405][ T7285] zram_bvec_rw+0x70/0x204 [zram
+> > > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
+> > > [ 512.670066][ T7285] zram_rw_page+0xb4/0x16c [zram
+> > > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
+> > > [ 512.670584][ T7285] bdev_read_page+0x74/0xac
+> > > [ 512.670843][ T7285] swap_readpage+0x5c/0x2e4
+> > > [ 512.671243][ T7285] do_swap_page+0x2f4/0x988
+> > > [ 512.671560][ T7285] handle_pte_fault+0xcc/0x1fc
+> > > [ 512.671935][ T7285] handle_mm_fault+0x284/0x4a8
+> > > [ 512.672412][ T7285] do_page_fault+0x274/0x428
+> > > [ 512.672704][ T7285] do_translation_fault+0x5c/0xf8
+> > > [ 512.673083][ T7285] do_mem_abort+0x50/0xc8
+> > > [ 512.673293][ T7285] el0_da+0x3c/0x74
+> > > [ 512.673549][ T7285] el0t_64_sync_handler+0xc4/0xec
+> > > [ 512.673972][ T7285] el0t_64_sync+0x1a4/0x1a8
+> > > [ 512.674495][ T7285] ---[ end trace cf983b7507c20343 ]---
+> > > [ 512.675359][ T7285] zram: Page 502 read from zram without previous write
+> > >
+> > > I can also trace accesses to zram to catch the unfortunate sequence:
+> > >
+> > > zram_bvec_write index = 502 [cpu = 3, tid = 7286]
+> > > zram_free_page index = 502 [cpu = 3, tid = 7286]
+> > > zram_bvec_read index = 502 [cpu = 3, tid = 7286]
+> > > zram_free_page index = 502 [cpu = 3, tid = 7286] <-- problematic free
+> > > zram_bvec_read index = 502 [cpu = 0, tid = 7285] <-- problematic read
+> > >
+> > > With stacks for zram_free_page:
+> > >
+> > > zram_bvec_write index = 502 [cpu = 3, tid = 7286]
+> > > zram_free_page  index = 502 [cpu = 3, tid = 7286]
+> > >
+> > >         zram_free_page+0
+> > >         $x.97+32
+> > >         zram_rw_page+180
+> > >         bdev_write_page+124
+> > >         __swap_writepage+116
+> > >         swap_writepage+160
+> > >         pageout+284
+> > >         shrink_page_list+2892
+> > >         shrink_inactive_list+688
+> > >         shrink_lruvec+360
+> > >         shrink_node_memcgs+148
+> > >         shrink_node+860
+> > >         shrink_zones+368
+> > >         do_try_to_free_pages+232
+> > >         try_to_free_mem_cgroup_pages+292
+> > >         try_charge_memcg+608
+> > >
+> > > zram_bvec_read  index = 502 [cpu = 3, tid = 7286]
+> > > zram_free_page  index = 502 [cpu = 3, tid = 7286] <-- problematic free
+> > >
+> > >         zram_free_page+0
+> > >         swap_range_free+220
+> > >         swap_entry_free+244
+> > >         swapcache_free_entries+152
+> > >         free_swap_slot+288
+> > >         __swap_entry_free+216
+> > >         swap_free+108
+> > >         do_swap_page+1776
+> > >         handle_pte_fault+204
+> > >         handle_mm_fault+644
+> > >         do_page_fault+628
+> > >         do_translation_fault+92
+> > >         do_mem_abort+80
+> > >         el0_da+60
+> > >         el0t_64_sync_handler+196
+> > >         el0t_64_sync+420
+> > >
+> > > zram_bvec_read  index = 502 [cpu = 0, tid = 7285] <-- problematic read
+> > >
+> > > The very last read is the same one that triggered the warning from my
+> > > patch in dmesg. You can see that the slot is freed before reading by
+> > > swapcache_free_entries. As far as I can see, only zram implements
+> > > swap_slot_free_notify. Swapping in an uninitialized zram page results
+> > > in all zeroes copied, which matches the symptoms.
+> > >
+> > > The issue doesn't reproduce if I pin both threads to the same CPU. It
+> > > also doesn't reproduce with a single thread. All of this seems to
+> > > point at some sort of race condition.
+> > >
+> > > I was able to reproduce this on x86_64 bare metal server as well.
+> > >
+> > > I'm happy to try out mitigation approaches for this. If my
+> > > understanding here is incorrect, I'm also happy to try out patches
+> > > that could help me catch the issue in the wild.
 > > 
-> > #define PATA_PARPORT_SHT(drv_name)      \
-> >         ATA_PIO_SHT(drv_name),          \
-> >         .queuecommand_blocks    = true,
+> > I poked around the swapping code a bit. In the failing read stack:
 > > 
-> > static void pi_connect(struct ata_port *ap)
-> > {
-> > 	struct pi_adapter *pi = ap->host->private_data;
+> > [ 1298.167823][ T7004]  swap_readpage+0x60/0x328
+> > [ 1298.168317][ T7004]  do_swap_page+0x438/0x904
 > > 
-> > 	del_timer_sync(&pi->timer);
-> > 	if (!pi->claimed) {
-> > 		bool locked = spin_is_locked(ap->lock);
-> > 		pi->claimed = true;
-> > 		if (locked)
-> > 			spin_unlock(ap->lock);
-> > 		parport_claim_or_block(pi->pardev);
-> > 		if (locked)
-> > 			spin_lock(ap->lock);
-> > 		pi->proto->connect(pi);
-> > 	}
-> > }
+> > You can see that swap_readpage is only called from do_swap_page for
+> > synchronous IO:
 > > 
-> > spin_is_locked is needed because the lock is not always held. It seems
-> > to work - no more stack traces after device double registration (only
-> > ATA errors but that's expected).
+> > if (data_race(si->flags & SWP_SYNCHRONOUS_IO) &&
+> >     __swap_count(entry) == 1) {
+> >     // ...
+> >     if (page) {
+> >         // ...
+> >         swap_readpage(page, true);
+> > 
+> > See: https://elixir.bootlin.com/linux/v5.15.28/source/mm/memory.c#L3548
+> > 
+> > I looked around some more and found 0bcac06f27d7:
+> > 
+> > * mm, swap: skip swapcache for swapin of synchronous device
+> > 
+> > Zram is considered fast synchronous storage. Reverting that notion
+> > makes my reproduction not complain anymore:
 > 
-> That's a very bad paradigm. What if it is locked, but the caller isn't
-> the one that locked it? Would be better to either make the locking state
-> consistent, or provide an unlocked variant (if feasible, doesn't always
-> work if it's a provided helper already in a struct of ops), or even
-> resorting to passing in locking state as a last resort.
+> 
+> Yeah, that was the part I was chasing since we had problem there
+> 
+> 5df373e95689b, mm/page_io.c: do not free shared swap slots
+> 
+> Initially, I suspected __swap_count race(I still believe it has
+> swap_slot_free_notify and do_swap_page) and fixed the race
+> with workaround but the problem still happened. 
+> 
+> Looks like your test program clone the child with CLONE_VM
+> which never call swap_duplicate to increase swap_map count.
+> It means the 0bcac06f27d7 and 5df373e95689b couldn't work
+> with CLONE_VM.
+> 
+> I think reverting them is best at this moment unless someone
+> has an idea.
+
+I think the problem with CLONE_VM is following race
+
+CPU A                        CPU B
+
+do_swap_page                do_swap_page
+SWP_SYNCHRONOUS_IO path     SWP_SYNCHRONOUS_IO path
+swap_readpage original data
+  swap_slot_free_notify
+    delete zram entry
+                            swap_readpage zero data
+                            pte_lock
+                            map the *zero data* to userspace
+                            pte_unlock
+pte_lock
+if (!pte_same)
+  goto out_nomap;
+pte_unlock
+return and next refault will
+read zero data
+
+So, CPU A and B see zero data. With patchset below, it changes 
+
+
+CPU A                        CPU B
+
+do_swap_page                do_swap_page
+SWP_SYNCHRONOUS_IO path     SWP_SYNCHRONOUS_IO path
+                            swap_readpage original data
+                            pte_lock
+                            map the original data
+                            swap_free
+                              swap_range_free
+                                bd_disk->fops->swap_slot_free_notify
+swap_readpage read zero data
+                            pte_unlock
+pte_lock
+if (!pte_same)
+  goto out_nomap;
+pte_unlock
+return and next refault will
+read correct data again
+
+Here, CPU A could read zero data from zram but that's not a bug
+(IOW, warning injected doesn't mean bug).
+
+The concern of the patch would increase memory size since it could
+increase wasted memory with compressed form in zram and uncompressed
+form in address space.  However, most of cases of zram uses no
+readahead and then, do_swap_page is followed by swap_free so it will
+free the compressed from in zram quickly.
+
+Ivan, with this patch, you can see the warning you added in the zram
+but it shouldn't trigger the userspace corruption as mentioned above
+if I understand correctly.
+
+Could you test whether the patch prevent userspace broken?
+
+From 71d8b7dce1f5e11fbae4a282ef7d45253ec2087d Mon Sep 17 00:00:00 2001
+From: Minchan Kim <minchan@kernel.org>
+Date: Tue, 15 Mar 2022 14:14:23 -0700
+Subject: [PATCH] fix
+
+Not-Yet-Signed-off-by: Minchan Kim <minchan@kernel.org>
+---
+ mm/page_io.c | 54 ----------------------------------------------------
+ 1 file changed, 54 deletions(-)
+
+diff --git a/mm/page_io.c b/mm/page_io.c
+index 0bf8e40f4e57..d3eea0a3f1af 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -51,54 +51,6 @@ void end_swap_bio_write(struct bio *bio)
+ 	bio_put(bio);
+ }
  
-libata locking seems to be very complex and our functions seem to be called with various lock states. I'm lost.
-
-Might be easier to add connect() and disconnect() to struct ata_port_operations...
-
+-static void swap_slot_free_notify(struct page *page)
+-{
+-	struct swap_info_struct *sis;
+-	struct gendisk *disk;
+-	swp_entry_t entry;
+-
+-	/*
+-	 * There is no guarantee that the page is in swap cache - the software
+-	 * suspend code (at least) uses end_swap_bio_read() against a non-
+-	 * swapcache page.  So we must check PG_swapcache before proceeding with
+-	 * this optimization.
+-	 */
+-	if (unlikely(!PageSwapCache(page)))
+-		return;
+-
+-	sis = page_swap_info(page);
+-	if (data_race(!(sis->flags & SWP_BLKDEV)))
+-		return;
+-
+-	/*
+-	 * The swap subsystem performs lazy swap slot freeing,
+-	 * expecting that the page will be swapped out again.
+-	 * So we can avoid an unnecessary write if the page
+-	 * isn't redirtied.
+-	 * This is good for real swap storage because we can
+-	 * reduce unnecessary I/O and enhance wear-leveling
+-	 * if an SSD is used as the as swap device.
+-	 * But if in-memory swap device (eg zram) is used,
+-	 * this causes a duplicated copy between uncompressed
+-	 * data in VM-owned memory and compressed data in
+-	 * zram-owned memory.  So let's free zram-owned memory
+-	 * and make the VM-owned decompressed page *dirty*,
+-	 * so the page should be swapped out somewhere again if
+-	 * we again wish to reclaim it.
+-	 */
+-	disk = sis->bdev->bd_disk;
+-	entry.val = page_private(page);
+-	if (disk->fops->swap_slot_free_notify && __swap_count(entry) == 1) {
+-		unsigned long offset;
+-
+-		offset = swp_offset(entry);
+-
+-		SetPageDirty(page);
+-		disk->fops->swap_slot_free_notify(sis->bdev,
+-				offset);
+-	}
+-}
+-
+ static void end_swap_bio_read(struct bio *bio)
+ {
+ 	struct page *page = bio_first_page_all(bio);
+@@ -114,7 +66,6 @@ static void end_swap_bio_read(struct bio *bio)
+ 	}
+ 
+ 	SetPageUptodate(page);
+-	swap_slot_free_notify(page);
+ out:
+ 	unlock_page(page);
+ 	WRITE_ONCE(bio->bi_private, NULL);
+@@ -392,11 +343,6 @@ int swap_readpage(struct page *page, bool synchronous)
+ 	if (sis->flags & SWP_SYNCHRONOUS_IO) {
+ 		ret = bdev_read_page(sis->bdev, swap_page_sector(page), page);
+ 		if (!ret) {
+-			if (trylock_page(page)) {
+-				swap_slot_free_notify(page);
+-				unlock_page(page);
+-			}
+-
+ 			count_vm_event(PSWPIN);
+ 			goto out;
+ 		}
 -- 
-Ondrej Zary
+2.35.1.723.g4982287a31-goog
+
