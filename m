@@ -2,169 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18FBAC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 00:24:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9BD0C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 00:30:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343532AbiCOAZi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 14 Mar 2022 20:25:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43408 "EHLO
+        id S1343898AbiCOAbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 14 Mar 2022 20:31:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343567AbiCOAZg (ORCPT
+        with ESMTP id S241316AbiCOAbe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 14 Mar 2022 20:25:36 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9733CFF4
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 17:24:24 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id j2so34329639ybu.0
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 17:24:24 -0700 (PDT)
+        Mon, 14 Mar 2022 20:31:34 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AA825F79;
+        Mon, 14 Mar 2022 17:30:14 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id f8so16873255pfj.5;
+        Mon, 14 Mar 2022 17:30:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=i5cXQ6+7k4HoHwif17IVrXXyVjB2qlIH0Mm4cn4G968=;
-        b=fSg080hgTEJBSojXJAAC++QVhl5gL4M8QBoMTbmYICmM1ugvzme37B82MfwLag39QC
-         MZcBXoSGX/S5ouXPAvyxXGbY4Hkw1isCEfusHGIRHBHp3UIwUqyUPhH8s2ueDWsS8pWG
-         QF1hvlLXBkv8DJ5EzSajVTGPV+EejUaIg1y3w=
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=FQ+NL1NN1x8pYLTJ+g3gU9ANpdXUS10s75AnCPDljs4=;
+        b=b7rg5nnl1ZxAATjJ11QcboLu/pwe2mq/n7Uqk6P7gqqcTRZ1OH8lEbsZhV8n/I/Jsm
+         Z/gWWt5o2LobP5+MPZU7oLLDBLPYZk9KOY20dItbg8u7CK/0smQ7G5PGLNcLP1I7aebA
+         ts6AhkcMfX81AEBDV4cbgQ/KlsEEI7hoP6jhNs3VHJIuErI+wxNFdWr79KoSQ6XCYRdS
+         TiFrd8Rrcr6PrRPliVFvvcnV2EsXqJoLRc7yS3pzfNGEFzoRJSZ8S3vja85uUZD2kDys
+         j0ASK8s6J1jP93DYwXtPEUrOOBmJQLJFYOw0Iinw3bPoVElE+54vi7erPHefuaAYewO+
+         bg3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=i5cXQ6+7k4HoHwif17IVrXXyVjB2qlIH0Mm4cn4G968=;
-        b=C3xXK9U+yiGfXN8U+efhj3MtBdRqEJ9LjBe1EXfLyAdhdWD+lMvEwdtYTM8XPJYLcy
-         i24oizeVMCgYu52FadZtZZ0DpwjuOf9gOEibWdCgLC6SrOpAZFKGi0bQrsMuuN6lzeYm
-         euEVr4356HX9Jr0ROhNSZIl1/WeAV8KNonPrhsQr/ZN/yCpYUKN4bfEsJMImJtFhgr3R
-         SpuKXti/bOr4Sdy5GCdfxUqE/uXH64ZFogNqhhdwAzH/AaI5jsKk8ymuUUG2DezX+CDS
-         IhE/WaM1Mv9wNlSC49Cdvyx6n6s8qfP3O7bmhpzHf4VNTibdxFtjV9dihGsp4DPmuT7H
-         QpAg==
-X-Gm-Message-State: AOAM533qj/Nm37I4G7wyKan/cV2GsOgJZE4WuDrjvBR77GKNzyTh0Flq
-        b2Bfpttv24W9o994giezM7l6Au1+uZp7XPs0Ds8GYg==
-X-Google-Smtp-Source: ABdhPJz3sM7LoRO7mKg0fghZnrEKx+tUe0HfZuVIwOfiaSrHEdEoFAs2vItnt7SphCK3vVJ9nilYHMwLQEJBktpNOlk=
-X-Received: by 2002:a25:bc8:0:b0:628:80d9:526c with SMTP id
- 191-20020a250bc8000000b0062880d9526cmr20532878ybl.115.1647303864105; Mon, 14
- Mar 2022 17:24:24 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=FQ+NL1NN1x8pYLTJ+g3gU9ANpdXUS10s75AnCPDljs4=;
+        b=Q0PX/v/vu75KZTzrItRd3KK9vxissAr8g4sVbKQqREl9iIVlGD/5v4GmB8LsVjNQpG
+         W/u2UHLKsar5Fc2XaVa0Pl4H/2PrOjrSxlwUxVhKLsWBuIADYVBVakgRhKz5G//H7QL9
+         209tUWjOwLUYqNkMbc14pDK3fb0P8EF2BCC18PDpjcxHEwteQNtlj3KREpidsn8Pvkx6
+         6LUu8JzQwOBwF8pfePW+ujMi0MHRvAn5iIpnuOOg6MgEbuS21JvHjar8y0E3fy5h0prQ
+         pRqU8I18k+0PPvlyOtb76RDlnZsGDOA25qrOS06Kfo1MQUbrirS2pki0T0DPwxuxgSbe
+         Dq/Q==
+X-Gm-Message-State: AOAM533MvRrTnM8WnGcAIlDXlAr3Z6ac3J5yDzQWXWO+oX5Jd+zK9yFw
+        u9yrSmWh35AXmixxmw1t1wE=
+X-Google-Smtp-Source: ABdhPJwCfhELIM3jz3VRuEk47PsaRwT0E56T2oGNhQAu9nzHa86botOmhV120/HahGAB3gvOg25C1A==
+X-Received: by 2002:a63:4e52:0:b0:380:7c35:fc9a with SMTP id o18-20020a634e52000000b003807c35fc9amr21731686pgl.376.1647304213596;
+        Mon, 14 Mar 2022 17:30:13 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id k14-20020aa7972e000000b004f7b8b43d96sm7602198pfg.51.2022.03.14.17.30.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Mar 2022 17:30:13 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 14 Mar 2022 14:30:11 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, kernel-team@fb.com,
+        linux-kernel@vger.kernel.org, Josef Bacik <josef@toxicpanda.com>
+Subject: [PATCH v3 for-5.18/block] block: don't merge across cgroup
+ boundaries if blkcg is enabled
+Message-ID: <Yi/eE/6zFNyWJ+qd@slm.duckdns.org>
+References: <Yi71WZ3O9/YViHSb@slm.duckdns.org>
+ <Yi/Us896/ftt5l4f@slm.duckdns.org>
 MIME-Version: 1.0
-References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
- <Yi/EdMA8re7PCNeU@google.com>
-In-Reply-To: <Yi/EdMA8re7PCNeU@google.com>
-From:   Ivan Babrou <ivan@cloudflare.com>
-Date:   Mon, 14 Mar 2022 17:24:13 -0700
-Message-ID: <CABWYdi2-2ijsA2r+3_p5AoiBGt=ke7saULVum=Din3jJut_LFQ@mail.gmail.com>
-Subject: Re: zram corruption due to uninitialized do_swap_page fault
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Linux MM <linux-mm@kvack.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yi/Us896/ftt5l4f@slm.duckdns.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 3:40 PM Minchan Kim <minchan@kernel.org> wrote:
-> Could you reproduce the problem with this workaround?
->
-> diff --git a/mm/page_io.c b/mm/page_io.c
-> index 0bf8e40f4e57..f2438a5101a7 100644
-> --- a/mm/page_io.c
-> +++ b/mm/page_io.c
-> @@ -114,7 +114,7 @@ static void end_swap_bio_read(struct bio *bio)
->         }
->
->         SetPageUptodate(page);
-> -       swap_slot_free_notify(page);
-> +       // swap_slot_free_notify(page);
->  out:
->         unlock_page(page);
->         WRITE_ONCE(bio->bi_private, NULL);
->
+blk-iocost and iolatency are cgroup aware rq-qos policies but they didn't
+disable merges across different cgroups. This obviously can lead to
+accounting and control errors but more importantly to priority inversions -
+e.g. an IO which belongs to a higher priority cgroup or IO class may end up
+getting throttled incorrectly because it gets merged to an IO issued from a
+low priority cgroup.
 
-Yes:
+Fix it by adding blk_cgroup_mergeable() which is called from merge paths and
+rejects cross-cgroup and cross-issue_as_root merges.
 
-zram_bvec_write index = 346 [cpu = 5, tid = 7003, nsecs = 956579989]
-zram_free_page  index = 346 [cpu = 5, tid = 7003, nsecs = 956620031]
-zram_bvec_read  index = 346 [cpu = 2, tid = 7005, nsecs = 967421676]
-zram_free_page  index = 346 [cpu = 2, tid = 7005, nsecs = 967502177]
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Fixes: d70675121546 ("block: introduce blk-iolatency io controller")
+Cc: stable@vger.kernel.org # v4.19+
+Cc: Josef Bacik <jbacik@fb.com>
+---
+v2 was tagged for-5.18/block but was still based on block-for-5.17. Refresh
+on top of for-5.18/block. My apologies about all the messiness.
 
-        zram_free_page+0
-        swap_range_free+220
-        swap_entry_free+244
-        swapcache_free_entries+152
-        free_swap_slot+288
-        __swap_entry_free+216
-        swap_free+108
-        do_swap_page+1624
-        handle_pte_fault+204
-        handle_mm_fault+644
-        do_page_fault+628
-        do_translation_fault+92
-        do_mem_abort+80
-        el0_da+60
-        el0t_64_sync_handler+196
-        el0t_64_sync+420
+v3: Actually rebased on top of block/for-5.18.
 
-zram_bvec_read  index = 346 [cpu = 6, tid = 7004, nsecs = 974478898]
+v2: Dropped conditional enabling. Always disallow cross-blkcg merges for
+    simpilcity. While this may spuriously prevent some merges for cases
+    where blkcg is enabled but no control is applied, that is a small cross
+    section.
 
-[ 1298.139588][ T7004] ------------[ cut here ]------------
-[ 1298.140574][ T7004] WARNING: CPU: 6 PID: 7004 at
-drivers/block/zram/zram_drv.c:1285 __zram_bvec_read+0x28c/0x2e8 [zram]
-[ 1298.142199][ T7004] Modules linked in: zram zsmalloc kheaders nfsv3
-nfs lockd grace sunrpc xt_conntrack nft_chain_nat xt_MASQUERADE nf_nat
-nf_conntrack_netlink nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
-xt_addrtype nft_compat nf_tables nfnetlink bridge stp llc overlay xfs
-libcrc32c zstd zstd_compress aes_ce_blk aes_ce_cipher af_packet
-ghash_ce gf128mul sha3_ce virtio_net sha3_generic net_failover
-sha512_ce failover sha512_arm64 sha2_ce sha256_arm64 virtio_mmio
-virtio_ring rtc_pl031 qemu_fw_cfg virtio fuse ip_tables x_tables ext4
-mbcache crc16 jbd2 nvme nvme_core pci_host_generic pci_host_common
-unix [last unloaded: zsmalloc]
-[ 1298.149549][ T7004] CPU: 6 PID: 7004 Comm: zram-corruptor Tainted:
-G        W         5.17.0-rc7-ivan #1
-0b29b2552ab8a22d5ba4845528328b4b4bb50082
-[ 1298.151293][ T7004] Hardware name: linux,dummy-virt (DT)
-[ 1298.151826][ T7004] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT
--SSBS BTYPE=--)
-[ 1298.152722][ T7004] pc : __zram_bvec_read+0x28c/0x2e8 [zram]
-[ 1298.153501][ T7004] lr : zram_bvec_rw+0x70/0x214 [zram]
-[ 1298.154597][ T7004] sp : ffffffc00aefbac0
-[ 1298.155417][ T7004] x29: ffffffc00aefbae0 x28: ffffff9bc5770400
-x27: ffffff9bc20da100
-[ 1298.155838][ T7004] x26: ffffff9bc20da100 x25: 000000000000015a
-x24: 00000001000f3aa7
-[ 1298.156991][ T7004] x23: 000000000000015a x22: 0000000000000000
-x21: fffffffe70cf5580
-[ 1298.157718][ T7004] x20: 000000000000015a x19: ffffff9bcbbf3000
-x18: ffffffc008755068
-[ 1298.158907][ T7004] x17: 0000000000000008 x16: ffffffd7d92df0cc
-x15: 0000000000000000
-[ 1298.159705][ T7004] x14: 0000000000000000 x13: 00000000000000a0
-x12: 0000000000000000
-[ 1298.161758][ T7004] x11: 0000000000000000 x10: ffffffc0086fb000 x9
-: 0000000001000000
-[ 1298.162334][ T7004] x8 : 0000000000002070 x7 : 04f2046406c06e04 x6
-: 4929b081d81d4b1b
-[ 1298.163165][ T7004] x5 : 0000000000000000 x4 : 0000000000000000 x3
-: 0000000000000000
-[ 1298.163895][ T7004] x2 : 000000000000015a x1 : 000000000000015a x0
-: ffffffd77fd576af
-[ 1298.164830][ T7004] Call trace:
-[ 1298.165153][ T7004]  __zram_bvec_read+0x28c/0x2e8 [zram
-d8b02cd0fd062c13f68799e6d1953bf67d996403]
-[ 1298.165900][ T7004]  zram_bvec_rw+0x70/0x214 [zram
-d8b02cd0fd062c13f68799e6d1953bf67d996403]
-[ 1298.166592][ T7004]  zram_rw_page+0xb4/0x170 [zram
-d8b02cd0fd062c13f68799e6d1953bf67d996403]
-[ 1298.167529][ T7004]  bdev_read_page+0x74/0xac
-[ 1298.167823][ T7004]  swap_readpage+0x60/0x328
-[ 1298.168317][ T7004]  do_swap_page+0x438/0x904
-[ 1298.168841][ T7004]  handle_pte_fault+0xcc/0x1fc
-[ 1298.169250][ T7004]  handle_mm_fault+0x284/0x4a8
-[ 1298.169802][ T7004]  do_page_fault+0x274/0x428
-[ 1298.170217][ T7004]  do_translation_fault+0x5c/0xf8
-[ 1298.170650][ T7004]  do_mem_abort+0x50/0x100
-[ 1298.171070][ T7004]  el0_da+0x3c/0x74
-[ 1298.171422][ T7004]  el0t_64_sync_handler+0xc4/0xec
-[ 1298.172102][ T7004]  el0t_64_sync+0x1a4/0x1a8
-[ 1298.172773][ T7004] ---[ end trace 0000000000000000 ]---
-[ 1298.173596][ T7004] zram: Page 346 read from zram without previous write
+ block/blk-cgroup.h | 17 +++++++++++++++++
+ block/blk-merge.c  | 11 +++++++++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
+index 3e91803c4a555..47e1e38390c96 100644
+--- a/block/blk-cgroup.h
++++ b/block/blk-cgroup.h
+@@ -15,6 +15,7 @@
+  */
+ 
+ #include <linux/blk-cgroup.h>
++#include <linux/blk-mq.h>
+ 
+ /* percpu_counter batch for blkg_[rw]stats, per-cpu drift doesn't matter */
+ #define BLKG_STAT_CPU_BATCH	(INT_MAX / 2)
+@@ -428,6 +429,21 @@ static inline void blkcg_clear_delay(struct blkcg_gq *blkg)
+ 		atomic_dec(&blkg->blkcg->css.cgroup->congestion_count);
+ }
+ 
++/**
++ * blk_cgroup_mergeable - Determine whether to allow or disallow merges
++ * @rq: request to merge into
++ * @bio: bio to merge
++ *
++ * @bio and @rq should belong to the same cgroup and their issue_as_root should
++ * match. The latter is necessary as we don't want to throttle e.g. a metadata
++ * update because it happens to be next to a regular IO.
++ */
++static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio)
++{
++	return rq->bio->bi_blkg == bio->bi_blkg &&
++		bio_issue_as_root_blkg(rq->bio) == bio_issue_as_root_blkg(bio);
++}
++
+ void blk_cgroup_bio_start(struct bio *bio);
+ void blkcg_add_delay(struct blkcg_gq *blkg, u64 now, u64 delta);
+ #else	/* CONFIG_BLK_CGROUP */
+@@ -467,6 +483,7 @@ static inline void blkg_put(struct blkcg_gq *blkg) { }
+ static inline bool blkcg_punt_bio_submit(struct bio *bio) { return false; }
+ static inline void blkcg_bio_issue_init(struct bio *bio) { }
+ static inline void blk_cgroup_bio_start(struct bio *bio) { }
++static inline bool blk_cgroup_mergeable(struct request *rq, struct bio *bio) { return true; }
+ 
+ #define blk_queue_for_each_rl(rl, q)	\
+ 	for ((rl) = &(q)->root_rl; (rl); (rl) = NULL)
+diff --git a/block/blk-merge.c b/block/blk-merge.c
+index 8d8177f71ebdb..ea6968313b4a8 100644
+--- a/block/blk-merge.c
++++ b/block/blk-merge.c
+@@ -9,6 +9,7 @@
+ #include <linux/blk-integrity.h>
+ #include <linux/scatterlist.h>
+ #include <linux/part_stat.h>
++#include <linux/blk-cgroup.h>
+ 
+ #include <trace/events/block.h>
+ 
+@@ -598,6 +599,9 @@ static inline unsigned int blk_rq_get_max_sectors(struct request *rq,
+ static inline int ll_new_hw_segment(struct request *req, struct bio *bio,
+ 		unsigned int nr_phys_segs)
+ {
++	if (!blk_cgroup_mergeable(req, bio))
++		goto no_merge;
++
+ 	if (blk_integrity_merge_bio(req->q, req, bio) == false)
+ 		goto no_merge;
+ 
+@@ -694,6 +698,9 @@ static int ll_merge_requests_fn(struct request_queue *q, struct request *req,
+ 	if (total_phys_segments > blk_rq_get_max_segments(req))
+ 		return 0;
+ 
++	if (!blk_cgroup_mergeable(req, next->bio))
++		return 0;
++
+ 	if (blk_integrity_merge_rq(q, req, next) == false)
+ 		return 0;
+ 
+@@ -902,6 +909,10 @@ bool blk_rq_merge_ok(struct request *rq, struct bio *bio)
+ 	if (bio_data_dir(bio) != rq_data_dir(rq))
+ 		return false;
+ 
++	/* don't merge across cgroup boundaries */
++	if (!blk_cgroup_mergeable(rq, bio))
++		return false;
++
+ 	/* only merge integrity protected bio into ditto rq */
+ 	if (blk_integrity_merge_bio(rq->q, rq, bio) == false)
+ 		return false;
+-- 
+2.35.1
+
