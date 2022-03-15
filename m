@@ -2,296 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4795BC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 06:57:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64494C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 08:03:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244832AbiCOG6v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 02:58:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59264 "EHLO
+        id S1345631AbiCOIFH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 04:05:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242365AbiCOG6u (ORCPT
+        with ESMTP id S229500AbiCOIFH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 02:58:50 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B14948E68;
-        Mon, 14 Mar 2022 23:57:39 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id t5so18142628pfg.4;
-        Mon, 14 Mar 2022 23:57:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=UBeQBCJmOepMxU2vOhtDNrSPsuDmo4uuTc3HaJMT3LU=;
-        b=MtybojESzRQB06WcKD5WS+9xp51kMNkkDxPuwFiFHEvmgy3Nzs2rN6CiWA8YJjXjCl
-         x8hF35c/ERyPNDI8/DoAd5lQFOg1lXB8+1TjKkQ5dmmxd3OADLsFC24KWB0ZfpOSqMJY
-         hur7QbUH2RDNzQcJFdhSkkC5RkCEFHVBajirg6/aBp5eUs6GUgxCC+LGXDY2aw063l/Z
-         HxpH3EXsv3YZs61t+1Q2DI9NJaYREUf/PQ/vzXzaNC6st1uWY3la2so6mSZ6GuG4p1Eh
-         R/uWPysUKPW6PySVuP04JFAuCZ3J/1//6q2TNmfQKFotQPQW5y78thROKnfbUI5k/ZI8
-         88gg==
+        Tue, 15 Mar 2022 04:05:07 -0400
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B6F236153
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 01:03:54 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id e24so27606612wrc.10
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 01:03:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=UBeQBCJmOepMxU2vOhtDNrSPsuDmo4uuTc3HaJMT3LU=;
-        b=gWEs5azt9VgzEaVfbMcE1u2wpk/ZSv2FZdwXOnc4WP2aMttoULfH0LQbfV5clgZi45
-         Ki9OkA1BFaMCfnUdwRnuEcuD+CI0U1cn8/Wir0ObyqK8OiH7Yjeq9fk7i7Qq7qIBCHnI
-         q3muTA7NWZki7AyuRGi0yoGs9yDkK8czNATYQxpSnsv7tVrOluviZCYVfKRVHAuHipnU
-         LBZIvA79rRpu+9UUfZlHrdhRZCn8pENB6JPmmoZs40NBAtYjotQpV3fkxsSkRySvk9QF
-         iZS4AT6ZY51kQWFqaqDInFNvfJuApG7sP/o+XgLgYtLsYt/V+um1gZUMbWhrh2B+g53s
-         2P3g==
-X-Gm-Message-State: AOAM532Y/5y/4lgkUlkYaQQifKEXjrJyBtkHFNxcfdGmpUnn9TPOKZ7U
-        gC2FJz6nf9BUkmIZyGVTeSI=
-X-Google-Smtp-Source: ABdhPJxVBy4oSOWYnDp0lFYUio2rIOXmDQSWdXyliWWSHRf8OTRm0lla6zNstZvf/hfNShX82i9Rfg==
-X-Received: by 2002:a05:6a00:1824:b0:4f6:9b4a:4a with SMTP id y36-20020a056a00182400b004f69b4a004amr26916131pfa.8.1647327458125;
-        Mon, 14 Mar 2022 23:57:38 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:9e2b:8986:bc6:f3b6])
-        by smtp.gmail.com with ESMTPSA id d14-20020a056a0024ce00b004f7281cda21sm22110677pfv.167.2022.03.14.23.57.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 14 Mar 2022 23:57:37 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Mon, 14 Mar 2022 23:57:35 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Ivan Babrou <ivan@cloudflare.com>
-Cc:     Linux MM <linux-mm@kvack.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-team <kernel-team@cloudflare.com>
-Subject: Re: zram corruption due to uninitialized do_swap_page fault
-Message-ID: <YjA439FwajtHsahr@google.com>
-References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
- <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=lPaiPZxGEpEpkm8pNrCymMDcaFj4w7Q4PkUpBC9Mq5o=;
+        b=WkebNT3wFl41dC6Szby+oyEiDCWb9po6HyvW3MsVUlQiragkM6SproqsqhwfpnnUti
+         3tkFIXwLJNLjDyGKa3Pjw+Amr/GICzpasmp4LoeK4FZXnVy1y1jrQpwNcjMt3NLC4IiV
+         FXKKxMNSRLkSkrPoyiOi3fqXQ46DYJBb+Z/OdaM/O8YDSWbXJXEDdDRRN1QhhyUlpsm5
+         S7UdvdbWGfAoUtE1zvVK9S1MX9XMr1oHRNvJxeVF+sfBOUCcl9X9JGW7rZceHCKPDNQv
+         ONvpjf2yWPlZVgSgSBZMXKrdB6rO6wcMxSlXSWoj2nZlH8vX0eEuVsva0TYoAo2DQG4Y
+         kKQA==
+X-Gm-Message-State: AOAM532cmAmlBVBMgNmL5qG9knE5CGpnvJHe17W6PFpHyzB63YKLU0WO
+        gmW5NqXrMy+/t/rVn4aqBGrstt46V3E=
+X-Google-Smtp-Source: ABdhPJyCneij0ZT/mDNBoHprDyYDtZfqJL9KNv4hlWlKP/8kzM/POm8f+KvQq3mCharhtBzNuJXZuQ==
+X-Received: by 2002:adf:910a:0:b0:1ed:c3fc:2dcf with SMTP id j10-20020adf910a000000b001edc3fc2dcfmr19534449wrj.430.1647331432738;
+        Tue, 15 Mar 2022 01:03:52 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id j34-20020a05600c1c2200b0038995cb915fsm2733866wms.9.2022.03.15.01.03.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Mar 2022 01:03:52 -0700 (PDT)
+Message-ID: <9749b5c1-e990-a08c-5be5-5df19a3ebc7d@grimberg.me>
+Date:   Tue, 15 Mar 2022 10:03:50 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Content-Language: en-US
+To:     Mike Christie <michael.christie@oracle.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc:     Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+References: <87tucsf0sr.fsf@collabora.com>
+ <986caf55-65d1-0755-383b-73834ec04967@suse.de>
+ <b6bb4435-d83c-b129-c761-00a74e7e0739@grimberg.me>
+ <87bkyyg4jc.fsf@collabora.com>
+ <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
+ <45caea9d-53d0-6f06-bb98-9174a08972d4@oracle.com>
+ <6d831f69-06f4-fafe-ce17-13596e6f3f6d@grimberg.me>
+ <50379fbf-0344-7471-365e-76bab8dc949e@oracle.com>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <50379fbf-0344-7471-365e-76bab8dc949e@oracle.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Mar 14, 2022 at 09:18:43PM -0700, Ivan Babrou wrote:
-> On Fri, Mar 11, 2022 at 11:51 AM Ivan Babrou <ivan@cloudflare.com> wrote:
-> >
-> > Hello,
-> >
-> > We're looking into using zram, but unfortunately we ran into some
-> > corruption issues. We've seen rocksdb complaining about "Corruption:
-> > bad entry in block", and we've also seen some coredumps that point at
-> > memory being zeroed out. One of our Rust processes coredumps contains
-> > a non-null pointer pointing at zero, among other things:
-> >
-> > * core::ptr::non_null::NonNull<u8> {pointer: 0x0}
-> >
-> > In fact, a whole bunch of memory around this pointer was all zeros.
-> >
-> > Disabling zram resolves all issues, and we can't reproduce any of
-> > these issues with other swap setups. I've tried adding crc32
-> > checksumming for pages that are compressed, but it didn't catch the
-> > issue either, even though userspace facing symptoms were present. My
-> > crc32 code doesn't touch ZRAM_SAME pages, though.
-> >
-> > Unfortunately, this isn't trivial to replicate, and I believe that it
-> > depends on zram used for swap specifically, not for zram as a block
-> > device. Specifically, swap_slot_free_notify looks suspicious.
-> >
-> > Here's a patch that I have to catch the issue in the act:
-> >
-> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> > index 438ce34ee760..fea46a70a3c9 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -1265,6 +1265,9 @@ static int __zram_bvec_read(struct zram *zram,
-> > struct page *page, u32 index,
-> >   unsigned long value;
-> >   void *mem;
-> >
-> > + if (WARN_ON(!handle && !zram_test_flag(zram, index, ZRAM_SAME)))
-> > + pr_warn("Page %u read from zram without previous write\n", index);
-> > +
-> >   value = handle ? zram_get_element(zram, index) : 0;
-> >   mem = kmap_atomic(page);
-> >   zram_fill_page(mem, PAGE_SIZE, value);
-> >
-> > In essence, it warns whenever a page is read from zram that was not
-> > previously written to. To make this work, one needs to zero out zram
-> > prior to running mkswap on it.
-> >
-> > I have prepared a GitHub repo with my observations and a reproduction:
-> >
-> > * https://github.com/bobrik/zram-corruptor
-> >
-> > I'm able to trigger the following in an aarch64 VM with two threads
-> > reading the same memory out of swap:
-> >
-> > [ 512.651752][ T7285] ------------[ cut here ]------------
-> > [ 512.652279][ T7285] WARNING: CPU: 0 PID: 7285 at
-> > drivers/block/zram/zram_drv.c:1285 __zram_bvec_read+0x28c/0x2e8 [zram]
-> > [ 512.653923][ T7285] Modules linked in: zram zsmalloc kheaders nfsv3
-> > nfs lockd grace sunrpc xt_conntrack nft_chain_nat xt_MASQUERADE nf_nat
-> > nf_conntrack_netlink nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4
-> > nft_counter xt_addrtype nft_compat nf_tables nfnetlink bridge stp llc
-> > overlay xfs libcrc32c zstd zstd_compress af_packet aes_ce_blk
-> > aes_ce_cipher ghash_ce gf128mul virtio_net sha3_ce net_failover
-> > sha3_generic failover sha512_ce sha512_arm64 sha2_ce sha256_arm64
-> > virtio_mmio virtio_ring qemu_fw_cfg rtc_pl031 virtio fuse ip_tables
-> > x_tables ext4 mbcache crc16 jbd2 nvme nvme_core pci_host_generic
-> > pci_host_common unix [last unloaded: zsmalloc]
-> > [ 512.659238][ T7285] CPU: 0 PID: 7285 Comm: zram-corruptor Tainted: G
-> > W 5.16.0-ivan #1 0877d306c6dc0716835d43cafe4399473d09e406
-> > [ 512.660413][ T7285] Hardware name: linux,dummy-virt (DT)
-> > [ 512.661077][ T7285] pstate: 80400005 (Nzcv daif +PAN -UAO -TCO -DIT
-> > -SSBS BTYPE=--)
-> > [ 512.661788][ T7285] pc : __zram_bvec_read+0x28c/0x2e8 [zram]
-> > [ 512.662099][ T7285] lr : zram_bvec_rw+0x70/0x204 [zram]
-> > [ 512.662422][ T7285] sp : ffffffc01018bac0
-> > [ 512.662720][ T7285] x29: ffffffc01018bae0 x28: ffffff9e4e725280 x27:
-> > ffffff9e4e725280
-> > [ 512.663122][ T7285] x26: ffffff9e4e725280 x25: 00000000000001f6 x24:
-> > 0000000100033e6c
-> > [ 512.663601][ T7285] x23: 00000000000001f6 x22: 0000000000000000 x21:
-> > fffffffe7a36d840
-> > [ 512.664252][ T7285] x20: 00000000000001f6 x19: ffffff9e69423c00 x18:
-> > ffffffc010711068
-> > [ 512.664812][ T7285] x17: 0000000000000008 x16: ffffffd34aed51bc x15:
-> > 0000000000000000
-> > [ 512.665507][ T7285] x14: 0000000000000a88 x13: 0000000000000000 x12:
-> > 0000000000000000
-> > [ 512.666183][ T7285] x11: 0000000100033e6c x10: ffffffc01091d000 x9 :
-> > 0000000001000000
-> > [ 512.666627][ T7285] x8 : 0000000000002f10 x7 : 80b75f8fb90b52c4 x6 :
-> > 051609fe50833de3
-> > [ 512.667276][ T7285] x5 : 0000000000000000 x4 : 0000000000000000 x3 :
-> > 0000000000000000
-> > [ 512.667875][ T7285] x2 : 00000000000001f6 x1 : 00000000000001f6 x0 :
-> > ffffffd305b746af
-> > [ 512.668483][ T7285] Call trace:
-> > [ 512.668682][ T7285] __zram_bvec_read+0x28c/0x2e8 [zram
-> > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
-> > [ 512.669405][ T7285] zram_bvec_rw+0x70/0x204 [zram
-> > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
-> > [ 512.670066][ T7285] zram_rw_page+0xb4/0x16c [zram
-> > 745969ed35ea0fb382bfd518d6f70e13966e9b52]
-> > [ 512.670584][ T7285] bdev_read_page+0x74/0xac
-> > [ 512.670843][ T7285] swap_readpage+0x5c/0x2e4
-> > [ 512.671243][ T7285] do_swap_page+0x2f4/0x988
-> > [ 512.671560][ T7285] handle_pte_fault+0xcc/0x1fc
-> > [ 512.671935][ T7285] handle_mm_fault+0x284/0x4a8
-> > [ 512.672412][ T7285] do_page_fault+0x274/0x428
-> > [ 512.672704][ T7285] do_translation_fault+0x5c/0xf8
-> > [ 512.673083][ T7285] do_mem_abort+0x50/0xc8
-> > [ 512.673293][ T7285] el0_da+0x3c/0x74
-> > [ 512.673549][ T7285] el0t_64_sync_handler+0xc4/0xec
-> > [ 512.673972][ T7285] el0t_64_sync+0x1a4/0x1a8
-> > [ 512.674495][ T7285] ---[ end trace cf983b7507c20343 ]---
-> > [ 512.675359][ T7285] zram: Page 502 read from zram without previous write
-> >
-> > I can also trace accesses to zram to catch the unfortunate sequence:
-> >
-> > zram_bvec_write index = 502 [cpu = 3, tid = 7286]
-> > zram_free_page index = 502 [cpu = 3, tid = 7286]
-> > zram_bvec_read index = 502 [cpu = 3, tid = 7286]
-> > zram_free_page index = 502 [cpu = 3, tid = 7286] <-- problematic free
-> > zram_bvec_read index = 502 [cpu = 0, tid = 7285] <-- problematic read
-> >
-> > With stacks for zram_free_page:
-> >
-> > zram_bvec_write index = 502 [cpu = 3, tid = 7286]
-> > zram_free_page  index = 502 [cpu = 3, tid = 7286]
-> >
-> >         zram_free_page+0
-> >         $x.97+32
-> >         zram_rw_page+180
-> >         bdev_write_page+124
-> >         __swap_writepage+116
-> >         swap_writepage+160
-> >         pageout+284
-> >         shrink_page_list+2892
-> >         shrink_inactive_list+688
-> >         shrink_lruvec+360
-> >         shrink_node_memcgs+148
-> >         shrink_node+860
-> >         shrink_zones+368
-> >         do_try_to_free_pages+232
-> >         try_to_free_mem_cgroup_pages+292
-> >         try_charge_memcg+608
-> >
-> > zram_bvec_read  index = 502 [cpu = 3, tid = 7286]
-> > zram_free_page  index = 502 [cpu = 3, tid = 7286] <-- problematic free
-> >
-> >         zram_free_page+0
-> >         swap_range_free+220
-> >         swap_entry_free+244
-> >         swapcache_free_entries+152
-> >         free_swap_slot+288
-> >         __swap_entry_free+216
-> >         swap_free+108
-> >         do_swap_page+1776
-> >         handle_pte_fault+204
-> >         handle_mm_fault+644
-> >         do_page_fault+628
-> >         do_translation_fault+92
-> >         do_mem_abort+80
-> >         el0_da+60
-> >         el0t_64_sync_handler+196
-> >         el0t_64_sync+420
-> >
-> > zram_bvec_read  index = 502 [cpu = 0, tid = 7285] <-- problematic read
-> >
-> > The very last read is the same one that triggered the warning from my
-> > patch in dmesg. You can see that the slot is freed before reading by
-> > swapcache_free_entries. As far as I can see, only zram implements
-> > swap_slot_free_notify. Swapping in an uninitialized zram page results
-> > in all zeroes copied, which matches the symptoms.
-> >
-> > The issue doesn't reproduce if I pin both threads to the same CPU. It
-> > also doesn't reproduce with a single thread. All of this seems to
-> > point at some sort of race condition.
-> >
-> > I was able to reproduce this on x86_64 bare metal server as well.
-> >
-> > I'm happy to try out mitigation approaches for this. If my
-> > understanding here is incorrect, I'm also happy to try out patches
-> > that could help me catch the issue in the wild.
-> 
-> I poked around the swapping code a bit. In the failing read stack:
-> 
-> [ 1298.167823][ T7004]  swap_readpage+0x60/0x328
-> [ 1298.168317][ T7004]  do_swap_page+0x438/0x904
-> 
-> You can see that swap_readpage is only called from do_swap_page for
-> synchronous IO:
-> 
-> if (data_race(si->flags & SWP_SYNCHRONOUS_IO) &&
->     __swap_count(entry) == 1) {
->     // ...
->     if (page) {
->         // ...
->         swap_readpage(page, true);
-> 
-> See: https://elixir.bootlin.com/linux/v5.15.28/source/mm/memory.c#L3548
-> 
-> I looked around some more and found 0bcac06f27d7:
-> 
-> * mm, swap: skip swapcache for swapin of synchronous device
-> 
-> Zram is considered fast synchronous storage. Reverting that notion
-> makes my reproduction not complain anymore:
 
 
-Yeah, that was the part I was chasing since we had problem there
+On 3/14/22 19:12, Mike Christie wrote:
+> On 3/13/22 4:15 PM, Sagi Grimberg wrote:
+>>
+>>>>>>> Actually, I'd rather have something like an 'inverse io_uring', where
+>>>>>>> an application creates a memory region separated into several 'ring'
+>>>>>>> for submission and completion.
+>>>>>>> Then the kernel could write/map the incoming data onto the rings, and
+>>>>>>> application can read from there.
+>>>>>>> Maybe it'll be worthwhile to look at virtio here.
+>>>>>>
+>>>>>> There is lio loopback backed by tcmu... I'm assuming that nvmet can
+>>>>>> hook into the same/similar interface. nvmet is pretty lean, and we
+>>>>>> can probably help tcmu/equivalent scale better if that is a concern...
+>>>>>
+>>>>> Sagi,
+>>>>>
+>>>>> I looked at tcmu prior to starting this work.  Other than the tcmu
+>>>>> overhead, one concern was the complexity of a scsi device interface
+>>>>> versus sending block requests to userspace.
+>>>>
+>>>> The complexity is understandable, though it can be viewed as a
+>>>> capability as well. Note I do not have any desire to promote tcmu here,
+>>>> just trying to understand if we need a brand new interface rather than
+>>>> making the existing one better.
+>>>
+>>> Ccing tcmu maintainer Bodo.
+>>>
+>>> We don't want to re-use tcmu's interface.
+>>>
+>>> Bodo has been looking into on a new interface to avoid issues tcmu has
+>>> and to improve performance. If it's allowed to add a tcmu like backend to
+>>> nvmet then it would be great because lio was not really made with mq and
+>>> perf in mind so it already starts with issues. I just started doing the
+>>> basics like removing locks from the main lio IO path but it seems like
+>>> there is just so much work.
+>>
+>> Good to know...
+>>
+>> So I hear there is a desire to do this. So I think we should list the
+>> use-cases for this first because that would lead to different design
+>> choices.. For example one use-case is just to send read/write/flush
+>> to userspace, another may want to passthru nvme commands to userspace
+>> and there may be others...
+> 
+> We might want to discuss at OLS or start a new thread.
+> 
+> Based on work we did for tcmu and local nbd, the issue is how complex
+> can handling nvme commands in the kernel get? If you want to run nvmet
+> on a single node then you can pass just read/write/flush to userspace
+> and it's not really an issue.
 
-5df373e95689b, mm/page_io.c: do not free shared swap slots
+As I said, I can see other use-cases that may want raw nvme commands
+in a backend userspace driver...
 
-Initially, I suspected __swap_count race(I still believe it has
-swap_slot_free_notify and do_swap_page) and fixed the race
-with workaround but the problem still happened. 
+> 
+> For tcmu/nbd the issue we are hitting is how to handle SCSI PGRs when
+> you are running lio on multiple nodes and the nodes export the same
+> LU to the same initiators. You can do it all in kernel like Bart did
+> for SCST and DLM
+> (https://blog.linuxplumbersconf.org/2015/ocw/sessions/2691.html).
+> However, for lio and tcmu some users didn't want pacemaker/corosync and
+> instead wanted to use their project's clustering or message passing
+> So pushing to user space is nice for these commands.
 
-Looks like your test program clone the child with CLONE_VM
-which never call swap_duplicate to increase swap_map count.
-It means the 0bcac06f27d7 and 5df373e95689b couldn't work
-with CLONE_VM.
+For this use-case we'd probably want to scan the config knobs to see
+that we have what's needed (I think we should have enough to enable this
+use-case).
 
-I think reverting them is best at this moment unless someone
-has an idea.
+> 
+> There are/were also issues with things like ALUA commands and handling
+> failover across nodes but I think nvme ANA avoids them. Like there
+> is nothing in nvme ANA like the SET_TARGET_PORT_GROUPS command which can
+> set the state of what would be remote ports right?
+
+Right.
