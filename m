@@ -2,181 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FFBC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 18:51:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A825C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 19:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245548AbiCOSw0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 14:52:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36524 "EHLO
+        id S1350419AbiCOTSO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 15:18:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236522AbiCOSwZ (ORCPT
+        with ESMTP id S1344185AbiCOTSN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 14:52:25 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5498A56C3B
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 11:51:12 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220315185109euoutp0119f9939f73f53ac92a27e8325d567995~coog0bdD_0174201742euoutp01I
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 18:51:09 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220315185109euoutp0119f9939f73f53ac92a27e8325d567995~coog0bdD_0174201742euoutp01I
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1647370269;
-        bh=nkc3Du4QNPEyOxxUTfMg29rYgsADp+pzAtd3I3uhNLw=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=UuqQhoAJRFtGGJX3trDcExa3z/fuvUiCuFg/Oll6LIW0nInDUqUrNkBaudTmcMpdG
-         iH7lAimVgYmhbBUWzewo7JafQ11RuAcm1qD6ROhEd89zIunkLc4RhXNAYyVTBai4VL
-         DLHy5j/ml8g352i5nqto9a6FBXkLEj/xuqEPlGdA=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220315185108eucas1p28935b32e6b129c3d05201b94aaf8cd05~coofxZYQ81376113761eucas1p2b;
-        Tue, 15 Mar 2022 18:51:08 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 25.EE.10260.C10E0326; Tue, 15
-        Mar 2022 18:51:08 +0000 (GMT)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220315185107eucas1p10d346295af21f069148baf696b14951c~coofJQ1T71940519405eucas1p1w;
-        Tue, 15 Mar 2022 18:51:07 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220315185107eusmtrp1e432ee2b21badd22a26cb054eb36f85a~coofIdjiG0311703117eusmtrp1g;
-        Tue, 15 Mar 2022 18:51:07 +0000 (GMT)
-X-AuditID: cbfec7f5-bf3ff70000002814-04-6230e01ce196
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id 6F.BF.09522.B10E0326; Tue, 15
-        Mar 2022 18:51:07 +0000 (GMT)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220315185107eusmtip1bc14dc9482a4ca69f6eda7fd69aa01cf~cooe_VQJM0357103571eusmtip1r;
-        Tue, 15 Mar 2022 18:51:07 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.212) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Tue, 15 Mar 2022 18:51:04 +0000
-Message-ID: <f034dc8c-ab78-3c4e-3ed4-8173dcdb2819@samsung.com>
-Date:   Tue, 15 Mar 2022 19:51:03 +0100
+        Tue, 15 Mar 2022 15:18:13 -0400
+Received: from mail-il1-x12f.google.com (mail-il1-x12f.google.com [IPv6:2607:f8b0:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C59A366BC
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 12:17:00 -0700 (PDT)
+Received: by mail-il1-x12f.google.com with SMTP id p2so150284ile.2
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 12:17:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=eL4sEejnIjRxB4JWoRE5TkBnrkIdyteUkUcF+BL1sSQ=;
+        b=iWusSnyufgd83jlYqM4JHVKtsPOkpeX26OBrpct/3WmiG7LnWH9Sw3iFkRchjrkllG
+         fCOnkNOL47gKyFwFk34esKLgS5xwFS43UsOhSq2K5J9AL7OXoQtrYAypDSeWnX9UnANu
+         tlzklxEUzzZ7P42WwYpfCZ/HjZjaIM9p422WSLNBo86IEpP09x96xNThPURpZGqnhEIL
+         /Q0iYgmlitOsg5E6LDgge/udLSlvl+Yl9xHUrXwYfehcdT60LYL/M4+ft5fpu0fLaTKI
+         9Dt8Je9d2Uaat5Lb5PSG5MXaCRvDfO5dGKQMtyywtqZLztL4u388vFvuBJf3r7mrrJ0U
+         HXMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=eL4sEejnIjRxB4JWoRE5TkBnrkIdyteUkUcF+BL1sSQ=;
+        b=PFQ44QYwS+ZIHmqwRtPOc+k9X7+9OUPowxM8806UN/1Xu06CzbauurMZnoLGnBg64I
+         RizZNlUhHyhP3BtmUvuV/OLHYa/gLvV3hMt3HMPoPMfFwBcscTuTR8OhllNyitbsKdfc
+         iL1k/c/InOzWLiwxZv9hM8oV+KoMmuBCUPoxNCzgCb7oSNiS3xJhXabxIt1z6hdwOHy3
+         h10hj8O/ZHGDuzICN6uGjH1ajzZik5xkilGj7GroBTdPL8eVG4yUjPIWzr68tIE79Or4
+         jL4633L35kwo9b/DUCxp/xGuCZf/WTknLAEA1wqSP1SKU9bc0IroyMiFTamGJZjPXBU7
+         memw==
+X-Gm-Message-State: AOAM531EfDDnAoEtJc+ZS7k/vFBgrHTEy157cr2YMSOIb41QbFP7YVZz
+        z0mTaQX9KksuZ0PwsxHZgOgf/g==
+X-Google-Smtp-Source: ABdhPJwfwkhPbUSNuER4dSGumai8h5J30xjSdLJssPXV9o5H9SJSGbfw+XVUNtU2YWf8x+hLHgfNHQ==
+X-Received: by 2002:a05:6e02:2190:b0:2c6:45ba:f3cc with SMTP id j16-20020a056e02219000b002c645baf3ccmr22364960ila.141.1647371819959;
+        Tue, 15 Mar 2022 12:16:59 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id l6-20020a056e0212e600b002c7a2a977c3sm3831995iln.20.2022.03.15.12.16.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 15 Mar 2022 12:16:59 -0700 (PDT)
+Message-ID: <72af146c-3cbf-73ce-4788-d999518d47a4@kernel.dk>
+Date:   Tue, 15 Mar 2022 13:16:58 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.5.0
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [EXT] [LSF/MM/BPF BoF] BoF for Zoned Storage
 Content-Language: en-US
-To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Christoph Hellwig <hch@lst.de>
-CC:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+To:     "Bean Huo (beanhuo)" <beanhuo@micron.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "Luca Porzio (lporzio)" <lporzio@micron.com>,
         Luis Chamberlain <mcgrof@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-btrfs @ vger . kernel . org" <linux-btrfs@vger.kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <PH0PR04MB74167377D7D86C60C290DAB29B109@PH0PR04MB7416.namprd04.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+Cc:     =?UTF-8?Q?Matias_Bj=c3=b8rling?= <Matias.Bjorling@wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Keith Busch <Keith.Busch@wdc.com>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Naohiro Aota <Naohiro.Aota@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Nitesh Shetty <nj.shetty@samsung.com>
+References: <YiASVnlEEsyj8kzN@bombadil.infradead.org>
+ <CO3PR08MB7975BCC4FF096DD6190DEF5DDC109@CO3PR08MB7975.namprd08.prod.outlook.com>
+ <73adf81b-0bca-324e-9f4f-478171a1f617@acm.org>
+ <PH0PR08MB7889A1EB0A223630E8747A53DB109@PH0PR08MB7889.namprd08.prod.outlook.com>
+ <4cfa6143-3082-52ee-6d6d-b127457ac2e4@kernel.dk>
+ <PH0PR08MB7889314A7E3C8FEC1E7A491CDB109@PH0PR08MB7889.namprd08.prod.outlook.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <PH0PR08MB7889314A7E3C8FEC1E7A491CDB109@PH0PR08MB7889.namprd08.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.212]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKKsWRmVeSWpSXmKPExsWy7djPc7oyDwySDO4dE7ZYfbefzeL32fPM
-        FitXH2Wy6Dx9gcmi58AHFou/XfeYLM6/PcxkMenQNUaLvbe0LS49XsFuMX/ZU3aLCW1fmS1u
-        THjKaLHm5lMWi3Wv37M48Hv8O7GGzWPnrLvsHufvbWTxaF5wh8Xj8tlSj02rOtk8Ni+p99h9
-        swGooPU+q8fnTXIe7Qe6mQK4o7hsUlJzMstSi/TtErgyJux8zlZwgq/iUUM3YwPjae4uRk4O
-        CQETibOde1i7GLk4hARWMEoc2/WeHcL5wijxbMl6JgjnM6PEmsWfmWBaHhz8DtWynFHi/IHF
-        7HBVd15dY4RwdjNKrL48ixWkhVfATuLVns/sIDaLgKrEw1cHmSHighInZz5hAbFFBSIkXh75
-        C7ZCWMBLouPtWrB6ZgFxiVtP5oPdISLQxyjR8OM22AZmgYWsEs1NH4C6OTjYBLQkGjvBGjgF
-        YiW+rT/IAtGsKdG6/TfUIHmJ7W/nMIOUSwgoS7xebwPxTq3E2mNnwD6QEHjEKbF71g92iISL
-        xOpVs6FsYYlXx7dA2TISpyf3sEA09DNKTG35wwThzGCU6Dm8mQlig7VE35kciAZHiXdtG1kg
-        wnwSN94KQtzDJzFp23TmCYyqs5DCYhaSn2cheWEWkhcWMLKsYhRPLS3OTU8tNs5LLdcrTswt
-        Ls1L10vOz93ECEyJp/8d/7qDccWrj3qHGJk4GA8xSnAwK4nwnnmhnyTEm5JYWZValB9fVJqT
-        WnyIUZqDRUmcNzlzQ6KQQHpiSWp2ampBahFMlomDU6qBKcL/Fd8X9e3HxZdkvTP2fKB8uEWj
-        26zCtMrzV+in0JU8G4IkvXzvti/ZEfy+QGN+/Pzt3nI/ODSitPc8dPX1Fn3ZcDGE+3vqxq8t
-        n/P5ZEo4W6+3R1UUVv3cs+fVpHMm+d7Wd3/96uj9sXxB9gKThKTvQe2/GPxWF0pMbrU70fA2
-        Rl/k566a2GiH/9GzxM+cTLzUsFI7u7py11MXGdUHbevW+3q9Vtoru2mD3/vYixvdPZJ1pr9t
-        Ksmx8bp/IO/1p+oAk9XnYsW258lllrod9GGUvrHT7cCzOfFcq9JO2V177PrVrVXbZEn0hu3P
-        rvxdWL9761JxlxTrKTy7+TssDkrxWbctVTv+fd4OrdsTlViKMxINtZiLihMBZiKlFPgDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJKsWRmVeSWpSXmKPExsVy+t/xu7rSDwySDA4/1LJYfbefzeL32fPM
-        FitXH2Wy6Dx9gcmi58AHFou/XfeYLM6/PcxkMenQNUaLvbe0LS49XsFuMX/ZU3aLCW1fmS1u
-        THjKaLHm5lMWi3Wv37M48Hv8O7GGzWPnrLvsHufvbWTxaF5wh8Xj8tlSj02rOtk8Ni+p99h9
-        swGooPU+q8fnTXIe7Qe6mQK4o/RsivJLS1IVMvKLS2yVog0tjPQMLS30jEws9QyNzWOtjEyV
-        9O1sUlJzMstSi/TtEvQyJux8zlZwgq/iUUM3YwPjae4uRk4OCQETiQcHv7N2MXJxCAksZZRY
-        +6CXESIhI/Hpykd2CFtY4s+1LjaIoo+MEp0PW6A6djNK7Dy9HKyKV8BO4tWez2A2i4CqxMNX
-        B5kh4oISJ2c+YQGxRQUiJNqWTQGLCwt4SXS8XQtWzywgLnHryXwmkKEiAn2MEg0/bjOCOMwC
-        C1klbvVvY4ZYN4dNovfnP6DdHBxsAloSjZ1g3ZwCsRLf1h9kgZikKdG6/TfUVHmJ7W/nMIOU
-        SwgoS7xebwPxTq3Eq/u7GScwis5Cct8sJHfMQjJpFpJJCxhZVjGKpJYW56bnFhvqFSfmFpfm
-        pesl5+duYgSmkW3Hfm7ewTjv1Ue9Q4xMHIyHGCU4mJVEeM+80E8S4k1JrKxKLcqPLyrNSS0+
-        xGgKDKSJzFKiyfnARJZXEm9oZmBqaGJmaWBqaWasJM7rWdCRKCSQnliSmp2aWpBaBNPHxMEp
-        1cAkduXF9amfDpkFJTVfKoxte//VNuS+V3XDYovSkuvOhb+yv7QLV5xdLs2Svjb3pXquTW6V
-        1svi9gkejSf3HHYSjndvE330XlMvqavpPMPOgGllDW5r5ZV+G1SsL85oZHv14cZzuSjLjAyF
-        2UaZvmrHrjPIzduwXFEsVXn5TY8ku+5Uw5amaR1i3OWSIjfNZsmtPxe3Z75WuI+llpzvyvDQ
-        bY7X93Au823aEHUroVYrS8QphyfbINP+WpfmqY19zm4Ou4IsLi5NlP8YPPVSlv2+wD/LLp7T
-        uWXjOvOfd+3EWq3S0B9RdwqP33IofHUtJ1/i76e/09Y+/G/aO6Fl+X5J75XuHL4STxiKv2Rv
-        VWIpzkg01GIuKk4EAPCaR86sAwAA
-X-CMS-MailID: 20220315185107eucas1p10d346295af21f069148baf696b14951c
-X-Msg-Generator: CA
-X-RootMTR: 20220315141431eucas1p211ee887321bb49977a7ce30543bbbf3c
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220315141431eucas1p211ee887321bb49977a7ce30543bbbf3c
-References: <20220314073537.GA4204@lst.de>
-        <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
-        <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
-        <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
-        <20220314195551.sbwkksv33ylhlyx2@ArmHalley.local>
-        <BYAPR04MB49688BD817284E5C317DD5D8F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
-        <20220315130501.q7fjpqzutadadfu3@ArmHalley.localdomain>
-        <BYAPR04MB49689803ED6E1E32C49C6413F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
-        <20220315132611.g5ert4tzuxgi7qd5@unifi> <20220315133052.GA12593@lst.de>
-        <20220315135245.eqf4tqngxxb7ymqa@unifi>
-        <CGME20220315141431eucas1p211ee887321bb49977a7ce30543bbbf3c@eucas1p2.samsung.com>
-        <PH0PR04MB74167377D7D86C60C290DAB29B109@PH0PR04MB7416.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Johannes,
+On 3/15/22 1:04 PM, Bean Huo (beanhuo) wrote:
+>> -----Original Message-----
+>> From: Jens Axboe <axboe@kernel.dk>
+>> Sent: Tuesday, March 15, 2022 7:49 PM
+>> To: Bean Huo (beanhuo) <beanhuo@micron.com>; Bart Van Assche
+>> <bvanassche@acm.org>; Luca Porzio (lporzio) <lporzio@micron.com>; Luis
+>> Chamberlain <mcgrof@kernel.org>; linux-block@vger.kernel.org; linux-
+>> fsdevel@vger.kernel.org; lsf-pc@lists.linux-foundation.org
+>> Cc: Matias Bj?rling <Matias.Bjorling@wdc.com>; Javier Gonz?lez
+>> <javier.gonz@samsung.com>; Damien Le Moal <Damien.LeMoal@wdc.com>;
+>> Adam Manzanares <a.manzanares@samsung.com>; Keith Busch
+>> <Keith.Busch@wdc.com>; Johannes Thumshirn <Johannes.Thumshirn@wdc.com>;
+>> Naohiro Aota <Naohiro.Aota@wdc.com>; Pankaj Raghav
+>> <pankydev8@gmail.com>; Kanchan Joshi <joshi.k@samsung.com>; Nitesh Shetty
+>> <nj.shetty@samsung.com>
+>> Subject: Re: [EXT] [LSF/MM/BPF BoF] BoF for Zoned Storage
 
-On 2022-03-15 15:14, Johannes Thumshirn wrote:
-> Please also make sure to support btrfs and not only throw some patches 
-> over the fence. Zoned device support in btrfs is complex enough and has 
-> quite some special casing vs regular btrfs, which we're working on getting
-> rid of. So having non-power-of-2 zone size, would also mean having NPO2
+All of this is duplicated info too, it just makes your emails have poor
+signal to noise ratio...
 
-I already made a simple btrfs npo2 poc and it involved mostly changing
-the po2 calculation to be based on generic calculation. I understand
-that changing the calculations from using log & shifts to division will
-incur some performance penalty but I think we can wrap them with helpers
-to minimize those impact.
+>> CAUTION: EXTERNAL EMAIL. Do not click links or open attachments unless you
+>> recognize the sender and were expecting this message.
 
-> So having non-power-of-2 zone size, would also mean having NPO2
-> block-groups (and thus block-groups not aligned to the stripe size).
->
+Same
 
-I agree with your point that we risk not aligning to stripe size when we
-move to npo2 zone size which I believe the minimum is 64K (please
-correct me if I am wrong). As David Sterba mentioned in his email, we
-could agree on some reasonable alignment, which I believe would be the
-minimum stripe size of 64k to avoid added complexity to the existing
-btrfs zoned support. And it is a much milder constraint that most
-devices can naturally adhere compared to the po2 zone size requirement.
-
-> Just thinking of this and knowing I need to support it gives me a 
-> headache.
+>>> Micron Confidential
+>>
+>>>
+>>> Micron Confidential
+>>
+>> Must be very confidential if it needs two?
+>>
+>> Please get rid of these useless disclaimers in public emails, they make ZERO sense.
+>>
 > 
-This is definitely not some one off patch that we want upstream and
-disappear. As Javier already pointed out, we would be more than happy
-help you out here.
-> Also please consult the rest of the btrfs developers for thoughts on this.
-> After all btrfs has full zoned support (including ZNS, not saying it's 
-> perfect) and is also the default FS for at least two Linux distributions.
-> 
-> Thanks a lot,
-> 	Johannes
+> Sorry for that. They are added by outlook automatically, seems I can
+> turn it off, let me see if this email has this message.
+
+In general, advise for open source or open list emails:
+
+- Don't include any "Foo company confidential", which by definition is
+  nonsensical because the email is sent out publically.
+
+- Wrap lines in emails. Wrapping them at 74 chars or something like that
+  makes them a LOT easier to read, and means I don't have to wrap your
+  replies when I reply.
+
+- Don't include huge headers of who got the email. That part is in the
+  email headers already, and it's just noise in the body of the email.
+
+- Trim replies! Nothing worse than browsing page after page of just
+  quoted text to get to the meat of it.
+
+That's just the basics, but it goes a long way towards making email a
+more useful medium. And making the sender/company look like they
+understand how open source collaborations and communication works.
 
 -- 
-Regards,
-Pankaj
+Jens Axboe
+
