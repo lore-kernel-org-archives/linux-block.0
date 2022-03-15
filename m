@@ -2,124 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A319FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 06:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C80C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 06:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235923AbiCOGq0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 02:46:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38284 "EHLO
+        id S1345296AbiCOGxv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 02:53:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235086AbiCOGqZ (ORCPT
+        with ESMTP id S240312AbiCOGxv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 02:46:25 -0400
+        Tue, 15 Mar 2022 02:53:51 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107422F01E
-        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 23:45:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF1CD49933
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 23:52:39 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id B92EA21906;
-        Tue, 15 Mar 2022 06:45:12 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 73E332190B;
+        Tue, 15 Mar 2022 06:52:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1647326712; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1647327158; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DLDEwHTq6OeDD06wchGhc+SIAoEHQdz8GdEdmP1IkzM=;
-        b=tt33XCVIzBf+GGITJDwHeen3c6g5SaGVLdPNCDwRpdFhdl5fzcnMixpTG7YtrrbVW+0DVK
-        2rHKQLkKIRcY97We4v4gjPAvYNh5z6h58jqWLHbFXcVuMlkANwuVOLGJCwvaoQ0QR/i6Bw
-        an5pVoM1unqs1VvSux8TTwaef9Tkj9E=
+        bh=6ar8v4BiBpmu/TvMCHiesaQ6mcYgVEFoLZ5vraRFMFk=;
+        b=1LH4L1ys4/RMNOkXmvooKDn0VaMVYXLGK8c9bl94HWBjOXxG+aGxXXEJuUVK66JE5a/ebt
+        OA1TUJSHNEuRrNLlDMRv7GCdPeijRDNYYLQy42+n7p4dvh5Ic2oubmDCvCFqQPNr8I9k7j
+        LfCKCaiOl4PDJsChaLxZYyAAEDIjD+M=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1647326712;
+        s=susede2_ed25519; t=1647327158;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=DLDEwHTq6OeDD06wchGhc+SIAoEHQdz8GdEdmP1IkzM=;
-        b=89jInKPWctZbuHhtwvIHqi6rEJwBo2YdXs7pghvODSG2LD1PbvhIene+qI6AwO/SdHChAW
-        /ZpmW0mWiaXsCZCg==
+        bh=6ar8v4BiBpmu/TvMCHiesaQ6mcYgVEFoLZ5vraRFMFk=;
+        b=BjUMJxoi7JQiS9Hc+jpYGFnIgMKRsj+pUlpWLZlBMdUuBnbJcgyC+ajllTxfQY8dgujIJX
+        G/P4xu3H6hOWesAA==
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 8E48613B4E;
-        Tue, 15 Mar 2022 06:45:12 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 412C413B4E;
+        Tue, 15 Mar 2022 06:52:38 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id JVxQIfg1MGJRPgAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 15 Mar 2022 06:45:12 +0000
-Message-ID: <af66086d-a6c2-3a44-d9fd-d20e9408266f@suse.de>
-Date:   Tue, 15 Mar 2022 07:45:12 +0100
+        id QPCSC7Y3MGKEQAAAMHmgww
+        (envelope-from <hare@suse.de>); Tue, 15 Mar 2022 06:52:38 +0000
+Message-ID: <c618c809-4ec0-69f9-0cab-87149ad6b45a@suse.de>
+Date:   Tue, 15 Mar 2022 07:52:37 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
 Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
 Content-Language: en-US
-To:     Mike Christie <michael.christie@oracle.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        lsf-pc@lists.linux-foundation.org
-Cc:     linux-block@vger.kernel.org
+To:     Bart Van Assche <bvanassche@acm.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Mike Christie <michael.christie@oracle.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>
+Cc:     lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
 References: <87tucsf0sr.fsf@collabora.com>
- <526a8360-d7d3-1211-087b-c86d5a68380b@oracle.com>
- <57af4fe0-9042-729a-18e9-839a5f0a84ac@suse.de>
- <49964bde-da7b-24be-19ae-9d14c72ce631@oracle.com>
+ <986caf55-65d1-0755-383b-73834ec04967@suse.de>
+ <b6bb4435-d83c-b129-c761-00a74e7e0739@grimberg.me>
+ <87bkyyg4jc.fsf@collabora.com>
+ <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
+ <45caea9d-53d0-6f06-bb98-9174a08972d4@oracle.com>
+ <6d831f69-06f4-fafe-ce17-13596e6f3f6d@grimberg.me>
+ <0b85385b-e8cf-2ab3-ce22-c63d4346cc16@acm.org>
 From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <49964bde-da7b-24be-19ae-9d14c72ce631@oracle.com>
+In-Reply-To: <0b85385b-e8cf-2ab3-ce22-c63d4346cc16@acm.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/14/22 18:04, Mike Christie wrote:
-> On 3/3/22 1:09 AM, Hannes Reinecke wrote:
->> On 3/2/22 17:52, Mike Christie wrote:
->>> On 2/21/22 1:59 PM, Gabriel Krisman Bertazi wrote:
->>>> I'd like to discuss an interface to implement user space block devices,
->>>> while avoiding local network NBD solutions.  There has been reiterated
+On 3/14/22 20:21, Bart Van Assche wrote:
+> On 3/13/22 14:15, Sagi Grimberg wrote:
+>>
+>>> We don't want to re-use tcmu's interface.
 >>>
->>> Besides the tcmu approach, I've also worked on the local nbd based
->>> solution like here:
->>>
->>> https://urldefense.com/v3/__https://github.com/gluster/nbd-runner__;!!ACWV5N9M2RV99hQ!YY39rbV9MpaNUtr7ElzgcG1TyPznVEt1yppLwAGkq32-Fw9rQkqB6FzcaHiwIdgXp00K$
->>> Have you looked into a modern take that uses io_uring's socket features
->>> with the zero copy work that's being worked on for it? If so, what are
->>> the issues you have hit with that? Was it mostly issues with the zero
->>> copy part of it?
->>>
->>>
->> Problem is that we'd need an _inverse_ io_uring interface.
->> The current io_uring interface writes submission queue elements,
->> and waits for completion queue elements.
+>>> Bodo has been looking into on a new interface to avoid issues tcmu has
+>>> and to improve performance. If it's allowed to add a tcmu like 
+>>> backend to
+>>> nvmet then it would be great because lio was not really made with mq and
+>>> perf in mind so it already starts with issues. I just started doing the
+>>> basics like removing locks from the main lio IO path but it seems like
+>>> there is just so much work.
+>>
+>> Good to know...
+>>
+>> So I hear there is a desire to do this. So I think we should list the
+>> use-cases for this first because that would lead to different design
+>> choices.. For example one use-case is just to send read/write/flush
+>> to userspace, another may want to passthru nvme commands to userspace
+>> and there may be others...
 > 
-> I'm not sure what you meant here.
+> (resending my reply without truncating the Cc-list)
 > 
-> io_uring can do recvs right? So userspace nbd would do
-> IORING_OP_RECVMSG to wait for drivers/block/nbd.c to send userspace
-> cmds via the local socket. Userspace nbd would do IORING_OP_SENDMSG
-> to send drivers/block/nbd.c the cmd response.
+> Hi Sagi,
 > 
-> drivers/block/nbd doesn't know/care what userspace did. It's just
-> reading/writing from/to the socket.
+> Haven't these use cases already been mentioned in the email at the start 
+> of this thread? The use cases I am aware of are implementing 
+> cloud-specific block storage functionality and also block storage in 
+> user space for Android. Having to parse NVMe commands and PRP or SGL 
+> lists would be an unnecessary source of complexity and overhead for 
+> these use cases. My understanding is that what is needed for these use 
+> cases is something that is close to the block layer request interface 
+> (REQ_OP_* + request flags + data buffer).
+> 
 
-I was talking about the internal layout of io_uring.
-It sets up submission and completion rings, writes the command & data
-into the submission rings, and waits for the corresponding completion
-to show up on the completion rings.
-
-A userspace block driver would need the inverse; waiting for submissions
-to show up in the submission rings, and writing completions into the 
-completion ring.
-
-recvmsg feels awkward here as one would need to write a recvmsg op into 
-the submission ring, get the completion, handle the I/O, write a sendmsg 
-op, wait for the completion.
-IE we would double the number of operations.
-
-Sure it's doable, and admittedly doesn't need (much) modifications for 
-io_uring. But still feels like a waste, and we certainly can't reach max 
-performance with that setup.
+Curiously, the former was exactly my idea. I was thinking about having a 
+simple nvmet userspace driver where all the transport 'magic' was 
+handled in the nvmet driver, and just the NVMe SQEs passed on to the 
+userland driver. The userland driver would then send the CQEs back to 
+the driver.
+With that the kernel driver becomes extremely simple, and would allow 
+userspace to do all the magic it wants. More to the point, one could 
+implement all sorts of fancy features which are out of scope for the 
+current nvmet implementation.
+Which is why I've been talking about 'inverse' io_uring; the userland 
+driver will have to wait for SQEs, and write CQEs back to the driver.
 
 Cheers,
 
