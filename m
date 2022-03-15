@@ -2,158 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2B2C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 15:44:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD46C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 17:01:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237275AbiCOPqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 11:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55340 "EHLO
+        id S1349693AbiCORCY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 13:02:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244446AbiCOPqJ (ORCPT
+        with ESMTP id S233441AbiCORCX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 11:46:09 -0400
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5987A13D6D
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 08:44:56 -0700 (PDT)
-Received: by mail-il1-x12e.google.com with SMTP id q6so890283ilv.6
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 08:44:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=kU+GLJEFYIiN6NGm+q/bq337K/F3drtFqv3LO1H4fKE=;
-        b=gT6Y1bbmKjfoWVGM6TuXc6Ew3txTgEY9NUokJyBPFxsps4dxNt108edzQMlliVyula
-         oSIaGoB2zOd7tJBXXETitXby9wwwghsCALOxo9SclxNe/c2zLW2xT7DuzfGcx2oj1B+d
-         xUaer0hBghpARihJCQG30tsZLNXZpVr0PU0tzOsBSY4KT6vt2STQAbQ4ZmCFXva3rwtk
-         8q7qLksIoMvpIw/WA2Kbc2QvQ2NIV4aADl5cST4HOY2frRlQWn1fH23PbDGkRljqI9NN
-         isLqrW4T0Ot7sJZElLaOFWkBsmvrMFUQ21PRhs8farpcJiB9D4vvpUd0tvp1DFjMtJWo
-         41wQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kU+GLJEFYIiN6NGm+q/bq337K/F3drtFqv3LO1H4fKE=;
-        b=iHTM5C/JLzhtVvy15Tf/KshBBQznumyM4BaT51Q8e+Dy+ENDSjhbMtNWQG43aD+9XD
-         Ab9cZz/dzf9si4AiNLSKJxanOuJuYcNS5ZjFVHFoPPpLYMKNy8K5Dd1hssWS7NnxpZ3S
-         +0cPf4Nv/6kOD4Vk2ojY6M9HpQuk8Ok0oOBzBTmML7G7LBEqdR0msN1m+7hk9u8TWfOZ
-         +H0GOjw13MiBL9EHl4AtLKSQVfMc0zeXoN2+0xAKPUkaVvkQ/Q8533iA4dG5H6VTHw6U
-         3sfrFPWMGMSPjGDS+Le5bxA6Qu9Hu80ntB8aCEL97rP9MQhrHoxy64IhmokaQqNdTzjn
-         eprw==
-X-Gm-Message-State: AOAM532nVP+j8+5bAX9qCzmH3sOJZI0XIijNAu6cpe578hZ7Lad7HEsn
-        OqMkzJYXyXjCYOeUdJeKGR310w==
-X-Google-Smtp-Source: ABdhPJyych0DqX/cH/hqdWSDTCrkBK3odSgH+RTperxlzi4UKTip9ytPQ9AbkvcaBJmp6mZx9NU3nA==
-X-Received: by 2002:a92:ca45:0:b0:2c7:c473:6785 with SMTP id q5-20020a92ca45000000b002c7c4736785mr800177ilo.40.1647359095651;
-        Tue, 15 Mar 2022 08:44:55 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s10-20020a6b740a000000b006413d13477dsm10427409iog.33.2022.03.15.08.44.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 15 Mar 2022 08:44:55 -0700 (PDT)
-Message-ID: <95588225-b2af-72b6-2feb-811a3b346f9f@kernel.dk>
-Date:   Tue, 15 Mar 2022 09:44:52 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [EXT] Re: [PATCH 2/2] block: remove the per-bio/request write
- hint.
-Content-Language: en-US
-To:     "Luca Porzio (lporzio)" <lporzio@micron.com>,
-        Avi Shchislowski <Avi.Shchislowski@wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        "Bean Huo (beanhuo)" <beanhuo@micron.com>,
-        Manjong Lee <mj0123.lee@samsung.com>,
-        "david@fromorbit.com" <david@fromorbit.com>
-Cc:     "hch@lst.de" <hch@lst.de>, "kbusch@kernel.org" <kbusch@kernel.org>,
+        Tue, 15 Mar 2022 13:02:23 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB3A85714B
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 10:01:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+        bh=slXPPIwOr/e+nHDO1AyOwiyeK0RtqT4vlXauKr5bsUE=; b=dHzKCGUbATmDACvc1b0gjLJVJz
+        hZFNiGucb1KNMRepifYYesVtbiqfQ/wilRx5tYKYbt1j0zR9i7wQwKPezhFYPdhqlYgwyFKmNI0a4
+        zu82uFytvJO7V2T3v9T6vtOdDcC8/bkace3IFVsKS7Ibkamp5GvvDdjGOobHbpzjf45j4dZn2Pepe
+        9tK/0qXFht/yTSfLhlbLDsGdrKvlwmO7e75FsZYYx4E7dOHLTbcfudtAPrglJ0n6ADqSBXhMJfmCp
+        gRQLFeFPmTpxIWXEo/q0I7A9ld9u6M26FoCLl3L+JUwz3TAEr7ygMP29GBEcY6P8npuKgMCtEhJig
+        ijpYha+A==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nUAXb-009y8M-JY; Tue, 15 Mar 2022 17:00:59 +0000
+Date:   Tue, 15 Mar 2022 10:00:59 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
+        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "song@kernel.org" <song@kernel.org>,
-        "seunghwan.hyun@samsung.com" <seunghwan.hyun@samsung.com>,
-        "sookwan7.kim@samsung.com" <sookwan7.kim@samsung.com>,
-        "nanich.lee@samsung.com" <nanich.lee@samsung.com>,
-        "woosung2.lee@samsung.com" <woosung2.lee@samsung.com>,
-        "yt0928.kim@samsung.com" <yt0928.kim@samsung.com>,
-        "junho89.kim@samsung.com" <junho89.kim@samsung.com>,
-        "jisoo2146.oh@samsung.com" <jisoo2146.oh@samsung.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20220306231727.GP3927073@dread.disaster.area>
- <CGME20220309042324epcas1p111312e20f4429dc3a17172458284a923@epcas1p1.samsung.com>
- <20220309133119.6915-1-mj0123.lee@samsung.com>
- <CO3PR08MB797524ACBF04B861D48AF612DC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
- <e98948ae-1709-32ef-e1e4-063be38609b1@kernel.dk>
- <CO3PR08MB797562AAE72BC201EB951C6CDC0B9@CO3PR08MB7975.namprd08.prod.outlook.com>
- <d477c7bf-f3a7-ccca-5472-f9cbb05b83c1@kernel.dk>
- <c27a5ec3-f683-d2a7-d5e7-fd54d2baa278@acm.org>
- <PH0PR08MB7889642784B2E1FC1799A828DB0B9@PH0PR08MB7889.namprd08.prod.outlook.com>
- <ef77ef36-df95-8658-ff54-7d8046f5d0e7@kernel.dk>
- <bf221ef4-f4d0-4431-02f3-ef3bea0e8cb2@acm.org>
- <800fa121-5da2-e4c0-d756-991f007f0ad4@kernel.dk>
- <SN6PR04MB3872231050F8585FFC6824C59A0F9@SN6PR04MB3872.namprd04.prod.outlook.com>
- <0c40073d-3920-8835-fc50-b17d4da099f0@kernel.dk>
- <CO3PR08MB7975EF4B014E211ACFAB7AF4DC109@CO3PR08MB7975.namprd08.prod.outlook.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CO3PR08MB7975EF4B014E211ACFAB7AF4DC109@CO3PR08MB7975.namprd08.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Message-ID: <YjDGS6ROx6tI5FBR@bombadil.infradead.org>
+References: <20220314073537.GA4204@lst.de>
+ <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
+ <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
+ <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220314195551.sbwkksv33ylhlyx2@ArmHalley.local>
+ <BYAPR04MB49688BD817284E5C317DD5D8F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220315130501.q7fjpqzutadadfu3@ArmHalley.localdomain>
+ <BYAPR04MB49689803ED6E1E32C49C6413F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220315132611.g5ert4tzuxgi7qd5@unifi>
+ <20220315133052.GA12593@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220315133052.GA12593@lst.de>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/15/22 9:36 AM, Luca Porzio (lporzio) wrote:
->>
->> This isn't some setup to solicit votes on who supports what. If the code isn't
->> upstream, it by definition doesn't exist to the kernel. No amount of "we're
->> also interested in this" changes that.
->>
->> What I wrote earlier still applies - whoever is interested in supporting lifetime
->> hints should submit that code upstream. The existing patchset to clean this
->> up doesn't change that process AT ALL. As mentioned, the only difference is
->> what the baseline looks like in terms of what the patchset is based on.
->>
+On Tue, Mar 15, 2022 at 02:30:52PM +0100, Christoph Hellwig wrote:
+> On Tue, Mar 15, 2022 at 02:26:11PM +0100, Javier González wrote:
+> > but we do not see a usage for ZNS in F2FS, as it is a mobile
+> > file-system. As other interfaces arrive, this work will become natural.
+> >
+> > ZoneFS and butrfs are good targets for ZNS and these we can do. I would
+> > still do the work in phases to make sure we have enough early feedback
+> > from the community.
+> >
+> > Since this thread has been very active, I will wait some time for
+> > Christoph and others to catch up before we start sending code.
 > 
-> Jens, 
-> 
-> Actually we might work to issue a patch and revert the patch plus add
-> the code that Bean and Bart mentioned which is currently Android only.
-> The reason it has not been done before is because for now it's not
-> production yet but it may soon be that case.
-> 
-> Would this patch revert be an option and accepted as a closure for
-> this discussion?
+> Can someone summarize where we stand?
 
-What patch revert? It's not clear to me which patch you're talking about
-here. If you're talking about the "remove the per-bio/request write
-hint" patch, then no, that's certainly not being reverted. See previous
-replies I made and also below for why, and let's please stop beating
-this dead horse.
+RFCs should be posted to help review and evaluate direct NPO2 support
+(not emulation) given we have no vendor willing to take a position that
+NPO2 will *never* be supported on ZNS, and its not clear yet how many
+vendors other than Samsung actually require NPO2 support. The other
+reason is existing NPO2 customers currently cake in hacks to Linux to
+supoport NPO2 support, and so a fragmentation already exists. To help
+address this it's best to evaluate what the world of NPO2 support would
+look like and put the effort to do the work for that and review that.
 
-> Another option (which I actually prefer), if I ask for a MM & Storage
-> BoF discussion on storage hints where I can show you the status of
-> temperature management and my studies on how this is beneficial for
-> storage devices. 
-
-As long as it's accompanied by code that implements it, then that would
-be fine.
-
-> Would this be more beneficial and maybe get some wider consensus on
-> the write hints?
-> 
-> After that consensus reverting (or agreeing on a new approach) will be
-> easier.
-
-As I've said multiple times, whenever code is available, it'll be
-reviewed and discussed. I don't like to discuss hypotheticals as too
-many times in the past there's a promise made and expectations built
-only for nothing to materialize. As it stands, the only in-kernel user
-of the hints is gone, and that means that the support code is being
-removed. We NEVER keep code in the kernel that doesn't have a user, as
-it can't get tested.
-
-Submit your patches when they are ready, it really has no bearing on the
-currently queued up changes to write hints.
-
--- 
-Jens Axboe
-
+  Luis
