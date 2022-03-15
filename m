@@ -2,151 +2,296 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13477C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 05:58:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0C22C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 15 Mar 2022 06:10:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233875AbiCOF7l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 01:59:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60516 "EHLO
+        id S243692AbiCOGLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 02:11:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232198AbiCOF7l (ORCPT
+        with ESMTP id S236932AbiCOGLx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 01:59:41 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2045.outbound.protection.outlook.com [40.107.223.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4528237DC;
-        Mon, 14 Mar 2022 22:58:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EVlUyJD1GYu1Dn+vulIq+sM7rK2zGvfgkU8fnp8Wnhuo/tHZ1cvju2owXg5/6INpKJ7zLVUmygkWAArlqWp/8GQHWW1XGZnJX0I8u95SwcxgoQsZyOIaym5yqQkESf0hCHE0nJWkzr1Vs7sii4LAifdEpVcmpp2QF1p72htqSxBLbpVO81AKblRiuV2R8Dt0TQ2garqgyW5xStylnfI/kPJDOZLsnsymieilIB0ow6KVezGwNEEZ5RxmIZCdHy3HIvySNW65C7dmTXRB8m71+JaEt2Sdqoj85VAtWDiqePk8QtH5zhgtcNU8VVt0DXNF+o9OqON3lfA+nle3BBSMdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ueWXr7qOxv4xWES+OPkkxV2GUCXSPlUF1D/LM4ln6+0=;
- b=PMoRW0XSvczPPZhH4u0B4FD9N1h3f2TEgPfIdmiiyG4QLwf2DUPbxvCXTc8ueWq/aWYydlDiEkgTcNBj7MtZe7jp4VcyZlsd2dhdktQbswDmDKF5mbg5iFKsorDtfmDNgWzgZZNnrpCzzY408KpOnqojD/+izHVA6GvgMVILYSLFdt4dz6z63EWIMVvqSIS8V/6xDcNFGJ+9sgsK6k4zaaQutYLBiKJ+L16Rz51/kypUNRAx+dDR2zGwU7Z4YtbtP2KhV+hIDa50MCCfFOZNZCVESN6dw7Mh//KCKM344BzoeCWmTVz1CLFouqPL67gIeUGgKZ1G2I4cimHttepjig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ueWXr7qOxv4xWES+OPkkxV2GUCXSPlUF1D/LM4ln6+0=;
- b=lW/ZoPJpvzvYzxf3yWRhV1lQO2U3D1u0Q9TwzJ019kYRSoL0woA/UBNc6SBRB6hS/XIxteZ34aAYv+4TxcdfXuS7yVY4onY/XMp7/F4ZqFe5gzH8ZxcolrFB7sWs20KNx8zcI6EBpC/lM0GEuPUzYQhpV3RGxSkX3pXYUsua2roXE5tuogaNNRjUVL1iVv3zTF22prEapzhzBW/hwrgXggMz08r+/ospzJRwLiBOU0EfJpFBx6vL5gX1X1MF9/SqZeXaxBJ7VWKwrYVxS90rtHq6JJsjvcZIDseGIlBpDvr3MhB+Ouem/3hs/oZKvrVRqOilLYbGzaVi3zRjVHe+NA==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by CH2PR12MB3832.namprd12.prod.outlook.com (2603:10b6:610:24::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.26; Tue, 15 Mar
- 2022 05:58:26 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::204b:bbcb:d388:64a2]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::204b:bbcb:d388:64a2%4]) with mapi id 15.20.5061.026; Tue, 15 Mar 2022
- 05:58:26 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>,
-        "paulmck@kernel.org" <paulmck@kernel.org>
-Subject: Re: [LSF/MM/BPF TOPIC] Changes in RCU over the past few years
-Thread-Topic: [LSF/MM/BPF TOPIC] Changes in RCU over the past few years
-Thread-Index: AQHYL3seqjjNDeUGbEaP33FaQ3WZT6yzThOAgARPEYCACGdFAA==
-Date:   Tue, 15 Mar 2022 05:58:26 +0000
-Message-ID: <42a52088-4e8f-a0bd-a4e7-0efcd214f075@nvidia.com>
-References: <20220304035116.GA8858@paulmck-ThinkPad-P17-Gen-1>
- <d25f8c3e-e0d6-cc1c-49ed-7357138aebc3@nvidia.com>
- <20220309213845.GG4285@paulmck-ThinkPad-P17-Gen-1>
-In-Reply-To: <20220309213845.GG4285@paulmck-ThinkPad-P17-Gen-1>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: a6b6ccc0-5e9e-49c9-8402-08da0648d28c
-x-ms-traffictypediagnostic: CH2PR12MB3832:EE_
-x-microsoft-antispam-prvs: <CH2PR12MB3832ED0EE12D2C53B8634611A3109@CH2PR12MB3832.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /5YD+5/2beFS3LpkpePQV99WTuTs1YGE2bJNoVeTaoyYYTCkBJKl1fIM2bjYA6d05S0jRfLpoCgJlVkl1UOLgAzzRNZKrcL1UoJn8LlSoq/MlkLEBHj/LIWNeAXH4FppUEeOMtpCS1Cf+REEleFm02Lc+WQCZvsdQi7NBf7wOrEEYiLIeF+S/IKpzHIdd7/B9gFIIlWE5v2NZ3a8FeI5cdFeKZynkUCqJ2WM1ztwWcJfN561ZzXdJOuMV8Zbcx/oAIUUp/eNNrzbvBe/1WtgJcHeVD98alCV80p8J9lvGIAizzFO8XPziDtd9wOwy0tvXjm7F4m/n9+VylIWiIc31Zp5m251qoCNK5ekwLxR1OPjc9P5AYLmDAuUbeM+E78oNVS++f29djMFaYt1P59IDEwmWgkMhvyySmmzRpjN3wJjeB8o2PnMYZBIDkSgF72qz7l5GZpm5eNZ7+Qw8aE0g3tUquYphVov3tWtnPZgox25uYl7qK5T46ifUtiwS4YzSdtbEJggW/UIXpHCFU770iKULE/unhRzgMRbBxz2ZToAQuR1l1ZAQdNN9VmxP6va2uPu3qtgfx4LKf/5k5T4vjAOa8uXOA6pqcdS5YvROitcEYwDaGHxuBC5EdeYWeOtdaI90iHPyVL3vm9ENUVDomgYt2tSZaQVGZR8nH7ScjIYMwgwri14jYAjyfGF64vaMWYotZDhHuEJWSDHBl3ajiB+8LWndboAzSIKzS88T3QsX2OFM8HR2T0Uncz3atTkHvZhS1KAhIEd5uMZiVx6PA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(122000001)(38070700005)(38100700002)(83380400001)(508600001)(6486002)(5660300002)(8936002)(31696002)(316002)(2616005)(76116006)(8676002)(66556008)(66446008)(91956017)(64756008)(66476007)(66946007)(86362001)(110136005)(31686004)(36756003)(186003)(6506007)(53546011)(6512007)(54906003)(2906002)(71200400001)(4326008)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?V2p6bm0reW0xMldNTmordDgvUjJ2YXpGZi8yRVV3Tk9mcjNoTmdTY2ZyWU4z?=
- =?utf-8?B?eUN0d0dRTU40cXBoRGtoejZaN3kyTm83enBnTzVJWXF6MUNhTFc1WFh1eWVS?=
- =?utf-8?B?NVZENE5EQ2h5RlVwc3I3ZlFvSU9hSjllM1pYVHZGY3BkQko5UUc3UmZIbWx3?=
- =?utf-8?B?VkZXN1ZZTmNJalpMQXNZbGp3cVlVR3d0R3h4RXZvL0cyY0FEbjBlZ04zQVlW?=
- =?utf-8?B?eGM3bmZweWRTRUdtODhxSW5IMUlTdW0xbDluMHZXbkRaTllGSGpZZ0I4Misx?=
- =?utf-8?B?MzFobVZjVUZzdHFvK3FnNUtxazhQaHdYSzRINUJQOGJRNjlFRGIvSHhiNUFh?=
- =?utf-8?B?clpBZUxqYXQrN2lXRmJVQVdCeHZVNVZqRTNwUFBaeXhEK3VUbFVoMkcvNkRw?=
- =?utf-8?B?cFlTVXlYKy9hem1RQWRIRXU0TXlkMkIrSml4d2NpZlBTdGo0TzdZL3ZCTHBP?=
- =?utf-8?B?RnNXYmFxUVN3bHRGOE9qNHg5T01UeFZmU0lOQlZsUThGSlBJeUpGbFVuQ1lm?=
- =?utf-8?B?QjB3dTYvOVhQL3hzRkhkUGNTSm1SQzgwVHJYcGJmUmlHU3IraUUyTmZrTVJ6?=
- =?utf-8?B?bGJXUzdBTjN6VjhndUJYaGYwdW9WZHpkanhMcmEyWUFlNzV6QmE0RVdFTzAv?=
- =?utf-8?B?aG05bWVZcEhPd1dadUxRNjVPbmxIVmVLbFVFeUFJRWRYaVJDQllWUU41MDlL?=
- =?utf-8?B?dW9QTU9pYU1TWVRvTDVGMTZBdWlQcmtMejJlcGk5a2dLMlZwTUQ0RE5KZVRK?=
- =?utf-8?B?bTlkSHZPd0MzbUNxVU14UmhJZHhRWlBCb3BUVTlTYnU3YWVKbEV4SWErelZs?=
- =?utf-8?B?ak9ha3lqRWZ0ZDBuMXNLVmN2ZitsRVd3YzRpR2NuejRpL0hFc29IbHdPUWo4?=
- =?utf-8?B?Z1pkYnN3aitiZVVUQ1JYZkhKbGwwdm1LdGF1OXBoeE8wR0R5TWp3aUZ2dHVX?=
- =?utf-8?B?SVhRSUgrQ2ltZTY5Q0xYV2M2djJ2M0VNRTFoWFBaZzFTWGlVTFNRU050S3Z5?=
- =?utf-8?B?L01RSjZiTWtudGlVejl6U2lqZjQ2SVVEVEx4MjVJKy90anhtSmZhSWJGQ0JQ?=
- =?utf-8?B?bUtwQlpBM3FHTjVUQjhtWFY0SGR5eEVtY0w5ZWNlU25FYWVKZlVoT2lJLzZ6?=
- =?utf-8?B?bHFQckFIMWd3V2VRWGp5cXZubDVhak1IQ1FOWW9Qd1p3K1AwQ3pnWFRldFFJ?=
- =?utf-8?B?REFCK2tNektsSHpKcEV1WWFhMHVFN1phU3ZURjJqR0l2TDE0Z1JOdE4vQU5W?=
- =?utf-8?B?MGhDOUJidHp2UHhrcjh2MG9aZFBKZkg4bVB2TEpSbzc2MVpLNDVaelZrRWta?=
- =?utf-8?B?OGJURkNscXVtRlNoRWV3S2JibmhuVWczUVZ2TmRCQXRmeURFcG5hTVJxa3R3?=
- =?utf-8?B?bkhwWEZ1SW9zTkxjWmh1YVIrK1F5NWc0VnhjRHFKQlYvczl1YWFiZEFTWU5B?=
- =?utf-8?B?eEV6UTkyRnRoOVZyNFhXK09FVDdsY1diV0NWQWx1SXlJdUVVN0V2emg1Q1Zt?=
- =?utf-8?B?a2Nxd2FYQ2g4KzE0MnNpelM0Q2RWZ20xMFgzcWJxcUJTSW96clp6bUNKWnRH?=
- =?utf-8?B?U1V3eEFNOGxtT2pDbWk2ajdKZUR5NXVTSGlRNURvckpEZ3doTGhrRy91WS9J?=
- =?utf-8?B?bGtXTEsyalhCbnRYcVllbzFnSkQ1U1Zsck54c1JzZHc5MWpjTlVMbFY0OUhB?=
- =?utf-8?B?TTZjcDBybmE0azRJblZLZlNxTTJxU0JEczF5ZDdtVko3NHBZTk9UWGNZSWtv?=
- =?utf-8?B?WnErRFdsanBDRi9SRDJrV1VxSXFEanpXY2c4NktPSld6SmFWdTlpQkxwR3cr?=
- =?utf-8?B?N0lFWkxtbVFpLy80Sy9Ca2c0enhOQ3Y1S2gvNVhDWDRuQVZGQUV1OG9paEZD?=
- =?utf-8?B?QlYvdlQwSStnSm5UYnVOYkxuVVJjS0pDdVdKYi9jeWtyNzYxbzg1YmVORC9s?=
- =?utf-8?B?MHZOZGowbDBSeFVzOVZNSCtqekh4L0FCSXNvRlBlZ0Yxa003aFdCYlVXYnc4?=
- =?utf-8?B?N3ZrVUp3TC90VEdnUWsxZy9qdWFaekJzU09PRjMvZUwxNC8wU1ZSRUt3WFpu?=
- =?utf-8?Q?LyDcKs?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <15AE11F3576C3D48AE61EF21EE2B4038@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 15 Mar 2022 02:11:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C01D049FA9
+        for <linux-block@vger.kernel.org>; Mon, 14 Mar 2022 23:10:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647324640;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qYZPhjOXzmAdEzQgqhquFgAkAbg5n3v5TRFMKwkCfjk=;
+        b=IAwgo2MRj9FLrbrCL3/TK+Rh935vl1qXuAll/YIgGrxoLytUUN1zllpvCbpJkxK2gn1Fmo
+        7IWRdJRioInIe5t6mPDr4uVCOnHeAYWbnOO90U9yaXEEVIo1s+gBIcA5xuGepUDT6oVwly
+        31+qE6J1EbocQrkj8kg0HSkYyu1l9I8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-655-yW1hA47XPn6tEgBBVTGgSQ-1; Tue, 15 Mar 2022 02:10:36 -0400
+X-MC-Unique: yW1hA47XPn6tEgBBVTGgSQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 135BB80159B;
+        Tue, 15 Mar 2022 06:10:36 +0000 (UTC)
+Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7C94E140EBFE;
+        Tue, 15 Mar 2022 06:10:31 +0000 (UTC)
+Date:   Tue, 15 Mar 2022 14:10:25 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Damien Le Moal <Damien.LeMoal@wdc.com>
+Subject: Re: [bug report] worker watchdog timeout in dispatch loop for
+ null_blk
+Message-ID: <YjAt0adsedXWldSI@T590>
+References: <20220310091649.zypaem5lkyfadymg@shindev>
+ <YinMWPiuUluinom8@T590>
+ <20220310124023.tkax52chul265bus@shindev>
+ <a6d6b858-4bee-10da-884c-20b16e4ad0de@kernel.dk>
+ <20220311062441.vsa54rie5fxhjtps@shindev>
+ <YisblCKgf6xC0/ai@T590>
+ <20220314052434.zud5zb5wqrjljk4b@shindev>
+ <Yi7n9mgblKcC7msM@T590>
+ <20220315052431.zhj6d7srkhjudiua@shindev>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6b6ccc0-5e9e-49c9-8402-08da0648d28c
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2022 05:58:26.5088
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: cT2nnjBifvl02H461S885SJLwTasxXu0/ewQ91udy+cvM7cWGKtOtlG4957OEoHXB+udi6nCV8ixSXH0w3sXKw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB3832
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220315052431.zhj6d7srkhjudiua@shindev>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gMy85LzIyIDEzOjM4LCBQYXVsIEUuIE1jS2VubmV5IHdyb3RlOg0KPiBPbiBNb24sIE1hciAw
-NywgMjAyMiBhdCAwMzo1MDo0M0FNICswMDAwLCBDaGFpdGFueWEgS3Vsa2Fybmkgd3JvdGU6DQo+
-PiBPbiAzLzMvMjIgMTk6NTEsIFBhdWwgRS4gTWNLZW5uZXkgd3JvdGU6DQo+Pj4gSGVsbG8hDQo+
-Pj4NCj4+PiBUaGVyZSBoYXZlIGJlZW4gYSBudW1iZXIgb2YgY2hhbmdlcyB0byBSQ1Ugb3ZlciB0
-aGUgcGFzdCBmZXcgeWVhcnMsDQo+Pj4gaW5jbHVkaW5nIGNvbnNvbGlkYXRpbmcgdGhlIHVwZGF0
-ZS1zaWRlIFJDVS1wcmVlbXB0LCBSQ1Utc2NoZWQsDQo+Pj4gYW5kIFJDVS1iaCBmbGF2b3JzLCB0
-aGUgYWRkaXRpb24gb2YgVFJFRSBTUkNVLCBub24tc2xlZXBpbmcgcG9sbGVkDQo+Pj4gZ3JhY2Ut
-cGVyaW9kIGludGVyZmFjZXMgZm9yIFJDVSBhbmQgU1JDVSwgYW5kIGFkZGl0aW9uIG9mIGEgY291
-cGxlDQo+Pj4gdmFyaWFudHMgb2YgVGFza3MgUkNVLiAgVGhpcyB0b3BpYyB3b3VsZCBpbmNsdWRl
-IGEgcXVpY2sgb3ZlcnZpZXcgb2YNCj4+PiB0aGVzZSBjaGFuZ2VzLCB3aXRoIHNwZWNpYWwgYXR0
-ZW50aW9uIHRvIGNoYWxsZW5nZXMgd2hlbiBiYWNrIHBvcnRpbmcgdG8NCj4+PiBwcmUtY29uc29s
-aWRhdGVkLVJDVSBrZXJuZWxzLiAgVGltZSBwZXJtaXR0aW5nLCBpdCBtaWdodCBhbHNvIGJlIHVz
-ZWZ1bA0KPj4+IHRvIGxvb2sgYXQgc29tZSBvZiB0aGUgbnVhbmNlcyBvZiBTTEFCX0RFU1RST1lf
-QllfUkNVLg0KPj4+DQo+Pj4gVGhpcyB3b3VsZCBhbHNvIGJlIGFuIG9wcG9ydHVuaXR5IHRvIGRp
-c2N1c3MgUkNVIHVzZSBjYXNlcyBhbmQgcG90ZW50aWFsDQo+Pj4gY2hhbmdlcyB0byBSQ1UgaXRz
-ZWxmLg0KPj4+DQo+Pj4gCQkJCQkJVGhhbngsIFBhdWwNCj4+Pg0KPj4NCj4+IEknbGwgYmUgdmVy
-eSBtdWNoIGludGVyZXN0ZWQgaW4gdGhpcyB0b3BpYyBhbmQgSSB0aGluayBldmVyeW9uZQ0KPj4g
-bm9uLW9ubHkgbW0gYnV0IGZzL3N0b3JhZ2UgdHJhY2tzIGNhbiBhbHNvIGJlbmVmaXQgZnJvbSB0
-aGlzLg0KPj4NCj4+IFBlcmhhcHMgd2Ugc2hvdWxkIGFkZCByZXNwZWN0aXZlIG1haWxpbmcgbGlz
-dCB0byB0aGlzIHRocmVhZCA/DQo+PiAobGludXgtYmxvY2sgYW5kIGxpbnV4LWZzZGV2ZWwpDQo+
-IA0KPiBXb3JrcyBmb3IgbWUhDQo+IA0KPiAJCQkJCQkJVGhhbngsIFBhdWwNCj4gDQoNCmFkZGlu
-ZyBsaW51eC1ibG9jaywgbGludXgtbnZtZSBhbmQgbGludXgtZnNkZXZlbC4NCg0KLWNrDQoNCg0K
+On Tue, Mar 15, 2022 at 05:24:32AM +0000, Shinichiro Kawasaki wrote:
+> On Mar 14, 2022 / 15:00, Ming Lei wrote:
+> > On Mon, Mar 14, 2022 at 05:24:34AM +0000, Shinichiro Kawasaki wrote:
+> > > On Mar 11, 2022 / 17:51, Ming Lei wrote:
+> > > > On Fri, Mar 11, 2022 at 06:24:41AM +0000, Shinichiro Kawasaki wrote:
+> > > > > On Mar 10, 2022 / 05:47, Jens Axboe wrote:
+> > > > > > On 3/10/22 5:40 AM, Shinichiro Kawasaki wrote:
+> > > > > > > On Mar 10, 2022 / 18:00, Ming Lei wrote:
+> > > > > > >> On Thu, Mar 10, 2022 at 09:16:50AM +0000, Shinichiro Kawasaki wrote:
+> > > > > > >>> This issue does not look critical, but let me share it to ask comments for fix.
+> > > > > > >>>
+> > > > > > >>> When fio command with 40 jobs [1] is run for a null_blk device with memory
+> > > > > > >>> backing and mq-deadline scheduler, kernel reports a BUG message [2]. The
+> > > > > > >>> workqueue watchdog reports that kblockd blk_mq_run_work_fn keeps on running
+> > > > > > >>> more than 30 seconds and other work can not run. The 40 fio jobs keep on
+> > > > > > >>> creating many read requests to a single null_blk device, then the every time
+> > > > > > >>> the mq_run task calls __blk_mq_do_dispatch_sched(), it returns ret == 1 which
+> > > > > > >>> means more than one request was dispatched. Hence, the while loop in
+> > > > > > >>> blk_mq_do_dispatch_sched() does not break.
+> > > > > > >>>
+> > > > > > >>> static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > > > >>> {
+> > > > > > >>>         int ret;
+> > > > > > >>>
+> > > > > > >>>         do {
+> > > > > > >>>                ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > > > >>>         } while (ret == 1);
+> > > > > > >>>
+> > > > > > >>>         return ret;
+> > > > > > >>> }
+> > > > > > >>>
+> > > > > > >>> The BUG message was observed when I ran blktests block/005 with various
+> > > > > > >>> conditions on a system with 40 CPUs. It was observed with kernel version
+> > > > > > >>> v5.16-rc1 through v5.17-rc7. The trigger commit was 0a593fbbc245 ("null_blk:
+> > > > > > >>> poll queue support"). This commit added blk_mq_ops.map_queues callback. I
+> > > > > > >>> guess it changed dispatch behavior for null_blk devices and triggered the
+> > > > > > >>> BUG message.
+> > > > > > >>
+> > > > > > >> It is one blk-mq soft lockup issue in dispatch side, and shouldn't be related
+> > > > > > >> with 0a593fbbc245.
+> > > > > > >>
+> > > > > > >> If queueing requests is faster than dispatching, the issue will be triggered
+> > > > > > >> sooner or later, especially easy to trigger in SQ device. I am sure it can
+> > > > > > >> be triggered on scsi debug, even saw such report on ahci.
+> > > > > > > 
+> > > > > > > Thank you for the comments. Then this is the real problem.
+> > > > > > > 
+> > > > > > >>
+> > > > > > >>>
+> > > > > > >>> I'm not so sure if we really need to fix this issue. It does not seem the real
+> > > > > > >>> world problem since it is observed only with null_blk. The real block devices
+> > > > > > >>> have slower IO operation then the dispatch should stop sooner when the hardware
+> > > > > > >>> queue gets full. Also the 40 jobs for single device is not realistic workload.
+> > > > > > >>>
+> > > > > > >>> Having said that, it does not feel right that other works are pended during
+> > > > > > >>> dispatch for null_blk devices. To avoid the BUG message, I can think of two
+> > > > > > >>> fix approaches. First one is to break the while loop in blk_mq_do_dispatch_sched
+> > > > > > >>> using a loop counter [3] (or jiffies timeout check).
+> > > > > > >>
+> > > > > > >> This way could work, but the queue need to be re-run after breaking
+> > > > > > >> caused by max dispatch number. cond_resched() might be the simplest way,
+> > > > > > >> but it can't be used here because of rcu/srcu read lock.
+> > > > > > > 
+> > > > > > > As far as I understand, blk_mq_run_work_fn() should return after the loop break
+> > > > > > > to yield the worker to other works. How about to call
+> > > > > > > blk_mq_delay_run_hw_queue() at the loop break? Does this re-run the dispatch?
+> > > > > > > 
+> > > > > > > 
+> > > > > > > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > > > > > > index 55488ba978232..faa29448a72a0 100644
+> > > > > > > --- a/block/blk-mq-sched.c
+> > > > > > > +++ b/block/blk-mq-sched.c
+> > > > > > > @@ -178,13 +178,19 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > > > >  	return !!dispatched;
+> > > > > > >  }
+> > > > > > >  
+> > > > > > > +#define MQ_DISPATCH_MAX 0x10000
+> > > > > > > +
+> > > > > > >  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > > > >  {
+> > > > > > >  	int ret;
+> > > > > > > +	unsigned int count = MQ_DISPATCH_MAX;
+> > > > > > >  
+> > > > > > >  	do {
+> > > > > > >  		ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > > > > -	} while (ret == 1);
+> > > > > > > +	} while (ret == 1 && count--);
+> > > > > > > +
+> > > > > > > +	if (ret == 1 && !count)
+> > > > > > > +		blk_mq_delay_run_hw_queue(hctx, 0);
+> > > > > > >  
+> > > > > > >  	return ret;
+> > > > > > >  }
+> > > > > > 
+> > > > > > Why not just gate it on needing to reschedule, rather than some random
+> > > > > > value?
+> > > > > > 
+> > > > > > static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> > > > > > {
+> > > > > > 	int ret;
+> > > > > > 
+> > > > > > 	do {
+> > > > > > 		ret = __blk_mq_do_dispatch_sched(hctx);
+> > > > > > 	} while (ret == 1 && !need_resched());
+> > > > > > 
+> > > > > > 	if (ret == 1 && need_resched())
+> > > > > > 		blk_mq_delay_run_hw_queue(hctx, 0);
+> > > > > > 
+> > > > > > 	return ret;
+> > > > > > }
+> > > > > > 
+> > > > > > or something like that.
+> > > > > 
+> > > > > Jens, thanks for the idea, but need_resched() check does not look working here.
+> > > > > I tried the code above but still the BUG message is observed. My guess is that
+> > > > > in the call stack below, every __blk_mq_do_dispatch_sched() call results in
+> > > > > might_sleep_if() call, then need_resched() does not work as expected, probably.
+> > > > > 
+> > > > > __blk_mq_do_dispatch_sched
+> > > > >   blk_mq_dispatch_rq_list
+> > > > >     q->mq_ops->queue_rq
+> > > > >       null_queue_rq
+> > > > >         might_sleep_if
+> > > > > 
+> > > > > Now I'm trying to find similar way as need_resched() to avoid the random number.
+> > > > > So far I haven't found good idea yet.
+> > > > 
+> > > > Jens patch using need_resched() looks improving the situation, also the
+> > > > scsi_debug case won't set BLOCKING:
+> > > > 
+> > > > 1) without the patch, it can be easy to trigger lockup with the
+> > > > following test.
+> > > > 
+> > > > - modprobe scsi_debug virtual_gb=128 delay=0 dev_size_mb=2048
+> > > > - fio --bs=512k --ioengine=sync --iodepth=128 --numjobs=4 --rw=randrw \
+> > > > 	--name=sdc-sync-randrw-512k --filename=/dev/sdc --direct=1 --size=60G --runtime=120
+> > > > 
+> > > > #sdc is the created scsi_debug disk
+> > > 
+> > > Thanks. I tried the work load above and observed the lockup BUG message on my
+> > > system. So, I reconfirmed that the problem happens with both BLOCKING and
+> > > non-BLOCKING drivers.
+> > > 
+> > > Regarding the solution, I can not think of any good one. I tried to remove the
+> > > WQ_HIGHPRI flag from kblockd_workqueue, but it did not look affecting
+> > > need_resched() behavior. I walked through workqueue API, but was not able
+> > > to find anything useful.
+> > > 
+> > > As far as I understand, it is assumed and expected the each work item gets
+> > > completed within decent time. Then this blk_mq_run_work_fn must stop within
+> > > decent time by breaking the loop at some point. As the loop break conditions
+> > > other than need_resched(), I can think of 1) loop count, 2) number of requests
+> > > dispatched or 3) time spent in the loop. All of the three require a magic random
+> > > number as the limit... Is there any other better way?
+> > > 
+> > > If we need to choose one of the 3 options, I think '3) time spent in the loop'
+> > > is better than others, since workqueue watchdog monitors _time_ to check lockup
+> > > and report the BUG message.
+> > 
+> > BTW, just tried 3), then the lockup issue can't be reproduced any more:
+> > 
+> > diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> > index e6ad8f761474..b4de5a7ec606 100644
+> > --- a/block/blk-mq-sched.c
+> > +++ b/block/blk-mq-sched.c
+> > @@ -181,10 +181,14 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+> >  {
+> >         int ret;
+> > +       unsigned long start = jiffies;
+> >  
+> >         do {
+> >                 ret = __blk_mq_do_dispatch_sched(hctx);
+> > -       } while (ret == 1);
+> > +       } while (ret == 1 && !need_resched() && (jiffies - start) < HZ);
+> > +
+> > +       if (ret == 1 && (need_resched() || jiffies - start >= HZ))
+> > +                blk_mq_delay_run_hw_queue(hctx, 0);
+> >  
+> >         return ret;
+> >  }
+> 
+> It sounds a good idea to check both need_resched() and 3) time spent in the
+> loop. I also confirmed that this fix avoids the BUG message on the scsi_debug
+> workload as well as null_blk with memory backing. Looks good. For this
+> confirmation, I modified the hunk above to avoid duplicated checks [1].
+> 
+> As for the loop break limit, I think HZ = 1 second is appropriate. The workqueue
+> watchdog checks lockup with duration 'wq_watchdog_thresh' defined in
+> kernel/workqueue.c. In the worst case, its number is 1, meaning 1 second. Then,
+> 1 second loop break in blk_mq_do_dispatch_sched() should avoid the BUG message.
+> 
+> To reduce influence on the performance, it would be good to make this number
+> larger. One idea was to refer the wq_watchdog_thresh as the limit for the loop
+> break. However, the variable is static and defined only when CONFIG_WQ_WATCHDOG
+> is enabled. So, I don't think block layer can refer it.
+> 
+> Assuming this fix approach is ok, I would like to have a formal patch. Ming,
+> would your mind to create it? Or if you want, I'm willing to do that.
+> 
+> [1]
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55488ba978232..64941615befc6 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -181,9 +181,15 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	int ret;
+> +	unsigned long end = jiffies + HZ;
+>  
+>  	do {
+>  		ret = __blk_mq_do_dispatch_sched(hctx);
+> +		if (ret == 1 &&
+> +		    (need_resched() || time_is_after_jiffies(end))) {
+> +			blk_mq_delay_run_hw_queue(hctx, 0);
+> +			break;
+> +		}
+>  	} while (ret == 1);
+
+I am fine with this patch, so please prepare one formal patch and see
+if Jens and guys are fine with it.
+
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Tested-by: Ming Lei <ming.lei@redhat.com>
+
+
+Thanks,
+Ming
+
