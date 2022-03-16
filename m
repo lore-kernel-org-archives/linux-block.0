@@ -2,227 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E2DC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 07:35:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FDFAC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 08:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241505AbiCPHgl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 03:36:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
+        id S243048AbiCPIi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 04:38:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234688AbiCPHgj (ORCPT
+        with ESMTP id S233630AbiCPIiz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 03:36:39 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5FC606E7
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 00:35:23 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220316073520epoutp037a1dcca6eab59139a0aa17f5d3ba1c51~czDuxy6E-0272402724epoutp03G
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 07:35:20 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220316073520epoutp037a1dcca6eab59139a0aa17f5d3ba1c51~czDuxy6E-0272402724epoutp03G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1647416120;
-        bh=0ch16WX5sxYc+WOht+eFe2RkcmpBFB4vfsqCaL2z36M=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=at5FIj/VsuPyPzHfOi83uqZ1+1jCSzwcdFhzTzVIVe8gDdycsTzBiaqwTcqM0T2by
-         ZOG5ae/WafP4zKbNxl+cYhRif77u1vQPvV0KKFLJTFugJraSlk4XuCYG6GlBOzaOAn
-         pTVHWbeodhWDl9FLnNNxM7hL24dO1Ft1QwwzJZTA=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
-        20220316073519epcas5p2c43131a53bdc2868f6aa1e49d08cb7d5~czDuJqTFf2807628076epcas5p2q;
-        Wed, 16 Mar 2022 07:35:19 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4KJMW06rT1z4x9QT; Wed, 16 Mar
-        2022 07:35:08 +0000 (GMT)
-Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        53.EC.05590.52391326; Wed, 16 Mar 2022 16:35:01 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20220316073230epcas5p47458b509510ee55be5bfa5152fad991b~czBQITy3w2400724007epcas5p4H;
-        Wed, 16 Mar 2022 07:32:30 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220316073230epsmtrp1ac86bafccc6d7619a09cd86cb9e4f0cc~czBQHZRMF1062610626epsmtrp1P;
-        Wed, 16 Mar 2022 07:32:30 +0000 (GMT)
-X-AuditID: b6c32a4b-739ff700000015d6-3b-62319325b78c
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        EF.92.03370.D8291326; Wed, 16 Mar 2022 16:32:30 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220316073227epsmtip267db15d1cd03c9e484f7eefb9176d97a~czBN9SbvN2834028340epsmtip2l;
-        Wed, 16 Mar 2022 07:32:27 +0000 (GMT)
-Date:   Wed, 16 Mar 2022 12:57:27 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, kbusch@kernel.org, asml.silence@gmail.com,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
-        mcgrof@kernel.org, a.manzanares@samsung.com, joshiiitr@gmail.com,
-        anuj20.g@samsung.com
-Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
- char-device.
-Message-ID: <20220316072727.GA2104@test-zns>
+        Wed, 16 Mar 2022 04:38:55 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9357663BE5;
+        Wed, 16 Mar 2022 01:37:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1647419859; x=1678955859;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=p6TysjhLf7ro/HSYcECNBtU38QMuSowJQSTefukd1aw=;
+  b=UJY7px2y0wofFJ7nNm2TARW5HgdJxHYvRLu50p02pnm4qtOsEls9OQT5
+   2WruUpJOk4CU1z0F/tXK4DCH3X4Z0aycDcuPnnvbtEHIFYbGRXSafFjFk
+   yQPqmQhTY5NI4cdBvb2Zkz50y+AXpzm9IYYGJAB85ds5v6YKYd/qz4mtQ
+   5ETBdGdtEZ++CqYsuomxY5o3lwtB6ZKn4e8DYKH2fpErTbnG50a1IDLkq
+   HYaG55LWA9b4iX69LNu1fM0+zYVbj1yVCNRfcuSfq8hhOsr1Wnucf3nGp
+   9EC+1SNAGY8OLcav6rElBLX21xb+WolZi8oLZB/XOkADYv1aZrVLFvUne
+   A==;
+X-IronPort-AV: E=Sophos;i="5.90,186,1643644800"; 
+   d="scan'208";a="200332736"
+Received: from mail-dm6nam11lp2173.outbound.protection.outlook.com (HELO NAM11-DM6-obe.outbound.protection.outlook.com) ([104.47.57.173])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Mar 2022 16:37:37 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jXdtkOexvB6h80UMw5xxlChrsPGkie8Bts/ft0pz8CrjPJgEkpMUo1OW6+ytpFQnpgRkUxhA2Pwv22i15koiiPxIZsA2yTHOIYuEuGnojpzDTGjumi+iXPXTqWHfDgFmT6g6fqJ8vp9LW1ANQP0E6dSC9+3Qojb+HNZlSGCdjR4M/Em8d9Ifq6A5oV3WcvmXB+pSsX/lg1cYCIxfmulWR6NlZDTlccZA4P3l5OKfaaZLQT2lRdiYOJj5DW4mJqljNz7iGqRhRhMJw2xdqZcc+VXOTaSkisgyZ2Tj+fwH5ZCTZXrsbchenFKD1Q5sax7taI6dW1m0RimHs9UGiQeTPg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=p6TysjhLf7ro/HSYcECNBtU38QMuSowJQSTefukd1aw=;
+ b=Zk5Frl/xP8Yu0EUylxPVE68ng1AV4GOWADGlLPz5HhehRHBYgrRaVzVGMGMsYzPOKo0Uw06beBVWOCSpNvdEeLS2uNOXts9NowoYt97MSJoQaLSXHoy1NIumjf1z7HJ6XLaRzaPOD/cr3tBosfJQQPZ7+pPRdu3W8bMkhPwlXd2tAv8TNFf2w5kiT7wVtBvM/fw/K5s39mFsN4ohxZ6+iR86T89lY/zGGxsZoUkdxnX2yhgv0kBnjf5tElft3dYWDwHOyVL2gll/Lmf9qwFhQ/lTg0CKfPVHMtCYWvOVB8ITC8wPR4brvKp0N/APoIaeWYMFcKbhSuchB/db9VKGdg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=p6TysjhLf7ro/HSYcECNBtU38QMuSowJQSTefukd1aw=;
+ b=K/FuWofz+IMPyMNR99TQyk/H9nDVfcCu8tNNsntPsTf0fmJcZY6NlVeGCz3doNSAdp60C2OvzEaI5sCF++Y8hKrRWUgwzggRnYjY68Wfrtl3bB+mCUqzLzlIPpeqZEirrxyqVIxod1aNEcaVrGHNMqNrnqpxm85a0d0YEd8SQxI=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by CY1PR04MB2138.namprd04.prod.outlook.com (2a01:111:e400:c616::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5061.25; Wed, 16 Mar
+ 2022 08:37:38 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::e8b1:ea93:ffce:60f6]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::e8b1:ea93:ffce:60f6%6]) with mapi id 15.20.5081.014; Wed, 16 Mar 2022
+ 08:37:38 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>,
+        =?iso-8859-1?Q?Javier_Gonz=E1lez?= <javier@javigon.com>,
+        Christoph Hellwig <hch@lst.de>
+CC:     =?iso-8859-1?Q?Matias_Bj=F8rling?= <Matias.Bjorling@wdc.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-btrfs @ vger . kernel . org" <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Thread-Topic: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Thread-Index: AQHYMw0u9PVwGbb7iEezZy7Ka/EIBg==
+Date:   Wed, 16 Mar 2022 08:37:38 +0000
+Message-ID: <PH0PR04MB741644DA1FE00A2563CCF3BD9B119@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20220314073537.GA4204@lst.de>
+ <05a1fde2-12bd-1059-6177-2291307dbd8d@opensource.wdc.com>
+ <20220314104938.hv26bf5vah4x32c2@ArmHalley.local>
+ <BYAPR04MB49682B9263F21EE67070A4B1F10F9@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220314195551.sbwkksv33ylhlyx2@ArmHalley.local>
+ <BYAPR04MB49688BD817284E5C317DD5D8F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220315130501.q7fjpqzutadadfu3@ArmHalley.localdomain>
+ <BYAPR04MB49689803ED6E1E32C49C6413F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
+ <20220315132611.g5ert4tzuxgi7qd5@unifi> <20220315133052.GA12593@lst.de>
+ <20220315135245.eqf4tqngxxb7ymqa@unifi>
+ <CGME20220315141431eucas1p211ee887321bb49977a7ce30543bbbf3c@eucas1p2.samsung.com>
+ <PH0PR04MB74167377D7D86C60C290DAB29B109@PH0PR04MB7416.namprd04.prod.outlook.com>
+ <f034dc8c-ab78-3c4e-3ed4-8173dcdb2819@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e7d761ad-3c58-4e90-72c5-08da07283a4b
+x-ms-traffictypediagnostic: CY1PR04MB2138:EE_
+x-microsoft-antispam-prvs: <CY1PR04MB2138D0CAAAF3FA860F6E3EC89B119@CY1PR04MB2138.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: KXD0gOfAEY1Hn/nE5FdsYgH0e3SZ9aWXebaDANwSyYmNYpQr3Yxn5byNXyRUzBcVqXadROdKQiP176p55vw6lkwwnrHqIPJvxf+LL8zlsumNyFTUlGkFCmgDFC0x7pRL3pqEFU3ZpVn33IoYr5fVC43beqnOv8lapiE/+VCTVnLqWFuZC2Xy2HajFVOsqDO18cKukQWJ5efDqLR2QBV3PNrPN258FBmu2YFj3PUzwKg9JdjfRVnMY9LttHDD8s9VupCljHq+/PG4oxQXTdmCbqv3a2PEAJUEHhwUeBhS8PV3iEikdH6mv5oJrQ/WrBIlAFlWORqNNYo4xi1PBAltkNpOu47Zf7uC50vJ1dSJOjkQmg/qVf0chscYJ5qSgvf6UC2Q8bgNqsVnx+HenKnwg4+ijCvQjlqyeLO9Kif6t5lhLQo1G5yN2Nizy4JCPN6tHBz2lMxzOszJ1gqjF86xYp2AiP6DgiSN1F+fYLDSRsqAqOLapJWZ75k2zmqxyMCNn99dUcvqgzUdCMITG5IOEjG8wUTs2l9gHJSXyU/mGmluutIyh9KvbiTWBufDE+LDu62UcnfnAJKb0QyF51U/29RsKAqd68dxR7rbKhbSuOx2CkHg1TtCkKu7kJtlOrcRu+udfuXW4mhBBpnaoenJYUW5NZBeNh1o+2+0sBgtNUTjPET4dYjE4jYFd9euhKq2GyaYyrqNPhKm1hIjaFjnQQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(316002)(9686003)(76116006)(508600001)(54906003)(6506007)(7696005)(110136005)(55016003)(66476007)(33656002)(66556008)(66446008)(64756008)(66946007)(83380400001)(8676002)(4326008)(38070700005)(4744005)(86362001)(122000001)(2906002)(71200400001)(8936002)(82960400001)(53546011)(52536014)(7416002)(38100700002)(5660300002)(186003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?Spa+eBobyNmd31dqczOJEc59c96IZNWVzBxIrOxc1t1T//g6cej9kxhtDr?=
+ =?iso-8859-1?Q?tpHgpLMRGaUdm0Hwa36VJ0hqCkww2+dD2cWfAWsaftQGsJ5k8Oecjk2KOc?=
+ =?iso-8859-1?Q?gEheAO49GFkjPNsWXWAeve1oZAItw1YFv9g2IEXfwAA1+hEjjOdo7tIto0?=
+ =?iso-8859-1?Q?FDy2wbCNYzEMHhxyNm3+BZE6LF+qhYDiSPFf2LCRU96+CiNRpw3xmn3IhS?=
+ =?iso-8859-1?Q?U01zwGZCbtYQu5r16KFKzInrkO2jxFlMsuMzB73IyVIQ0R7pElfHTa3q0/?=
+ =?iso-8859-1?Q?uEcKJVbdjvur4ZUTwpZxX+p23nTmt6BkkckANV7TGCMmxGCnVjE+N5wYkI?=
+ =?iso-8859-1?Q?urHkMgpGt9Qknqmjtwc+N8U+1cDSfzGYKosTz2eCtApGfp3bcTGzlwhIbr?=
+ =?iso-8859-1?Q?xdFr7NlqDa3joAxaDkx50fzCcyP6HDB0GC/V8QcpBdwx0AmpGcgNceEzkM?=
+ =?iso-8859-1?Q?bMruEQ7uJFbX7bgkeDIGjQK0I7D5KoPrGyEMOl+4FxZWS3E21hwtOuVG22?=
+ =?iso-8859-1?Q?4LOmiOgWvncWb8x5kciyjy+JeIbX4yhWjHprmcBPOQq2vYSd5X9xHd2dPQ?=
+ =?iso-8859-1?Q?zP4GFCgdzHfMJJRyzbJZR1y27bg4nH9MtBGWDclxjFdCNsnleQVPQc8iI0?=
+ =?iso-8859-1?Q?miZpIw8kO2NJvAFjkmhoCfy4CtJcjk4SN9rNLRo/8CcLXPZFlxuoQ0zbNM?=
+ =?iso-8859-1?Q?OqULok1k+fCEPmAvHnA006KSDa0GpzwvNChR8rVXLObaLuSw/kpU2XEX9w?=
+ =?iso-8859-1?Q?JzCf0C//BOWmG+I4hh20mC4fD2l6ipECiHGhucZkjGX4JrItGh9aCU2aeZ?=
+ =?iso-8859-1?Q?/DTDypX0m0dfJiHyjjErQwDVOndBC9SGXsH54cVwUT3LR8mu54N+g5SF1X?=
+ =?iso-8859-1?Q?RJ276LbrJt7vIuKZKgOulzq70tWiAbS6V6/b23HDTgi8ymRkylIqtg2P9P?=
+ =?iso-8859-1?Q?lOBSwdf5z9oRSdKvN0xo7IXInaKaBFbsNPpd7VuKNvodU7DMUMVgsNTVh4?=
+ =?iso-8859-1?Q?aPcHJ1RvqrvWVcxUBGmwzSGyE4+6rqwz8Ui2HY2BTuEogNIBvRM+AcbV9r?=
+ =?iso-8859-1?Q?xcGxxpjwBQBFQuj7qrYosZq+1RBKRrfUeuko4J2wSKDUCPEIOaXF1O9dfx?=
+ =?iso-8859-1?Q?hpRvpflQYmfeV0VjotbmAq5H+GDxUnzLkJrjnt3g76K9wjUlEWnBkIC03e?=
+ =?iso-8859-1?Q?hI/EB9QQ/mv68pyBNy0j1QWcYnYbeRrFWJQsBrRt5TgILUqeb+49xgWGNa?=
+ =?iso-8859-1?Q?ptuabX3/Q30SwueeFrZCXmiVySmAFB6DAKA5ZrQuD2dCrO/LAMhXsK6j2B?=
+ =?iso-8859-1?Q?X40O9XwCCAjF8Y90RRXB4v8uFkmGgbLqxlZWsVtU5WYyczPAZiMdMrXABT?=
+ =?iso-8859-1?Q?T7U8qctgueFAyKbU+SNvKleaJIC4Vj/eDDyOHLgzbSqOyZpEf3gqq/FZa1?=
+ =?iso-8859-1?Q?UxOpQpvQrU5haU7dBbIN2vnvp+WWiX4mZ6Gjyl3INUrE0/FhUtzTfv+RBr?=
+ =?iso-8859-1?Q?KyXsCqEndwVXrvjV846I7EhzNGu1LgXtpJpH+RbAKrYSMnTn/sCduHqGTw?=
+ =?iso-8859-1?Q?jMIqAy4jVrxhooVE61q9MC1SvBHWAPQGSc8q947PuvCyo9EA+dG6vEzHAB?=
+ =?iso-8859-1?Q?S5hLnmaJdWHkA=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20220315085410.GA4132@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTVxzeubctlyaFOwQ50mzAJWAAgXaW7sJgL4neqFmaGbbE4OACd0AK
-        t01vO19jYyoLZeGhiLw7EBwOHDLoGnmYSRELIi+ZIEQZOCCDRUGZi3GBrOWWxf++3/f7vnO+
-        33lgqMeUyAfLYPWMjqUzCZFYYOkN3hkWWCJPlk3VepNlvf7kqeJ1lKxusgCy+WGRiPyxuQ8h
-        n+QOC0jj4ChCjjzuRchz1glAXp8OJb//YcGFbMi1icj7xQuAvDK1ICDX7piE77tTi/cWAdVR
-        +dCFOl37QECNDxmotiajiGpv+JrqmsoRUZb6JSFVaG4C1FrbmyrxYXVMOkOnMjo/hk3RpGaw
-        abHEgUOJexIjlTJ5mDyKfJvwY+ksJpaIO6gK25uRaZ+B8PuCzjTYKRXNcUTEuzE6jUHP+KVr
-        OH0swWhTM7UKbThHZ3EGNi2cZfTRcpnsrUi7MEmdPl3wFNE2Bhy7d3dWmAOuS/OBKwZxBXxR
-        kIfmAzHmgXcB+LjrFsIXzwAc6VgV8MUagI+elLlsWcxnCoV8oxPAlpVWZ7EI4F/d/cChEuCB
-        sDrvO/taGCbCg+FoicFBe+IEXFgeAg49ivcjsGbGhDga2/B4eCaX10vwXXAtj3LQEvx1OFAx
-        L3BgVzwUlvSXow7shQfAGxbbZlSI/4bB+hflgE8XB1fMA86k2+CyzezEPnCp6Fsn5uDLB30o
-        b84DcDKnQsA33oNj3eubgVA8A853/IHw/Buw9HaLk3eDBf/OO3kJvGbawv5w5tyCkMfecK68
-        QegYBuIUbKiS8gd0EYGWGzWCYuBb+cpwla9sx+NoaFw9Jay021FcChs3MB4Gw6udEbVA2AR2
-        MFouK43hIrW7Webo/zeeoslqA5tvPOTANfBodjXcChAMWAHEUMJTcufPiGQPSSp9/ASj0yTq
-        DJkMZwWR9rs6i/p4pWjsn4TVJ8oVUTKFUqlURO1Wyglvye20VtoDT6P1jJphtIxuy4dgrj45
-        iCK72X/4Z+ll1cmJm4mXTotMLnWqbq163OSVFLJHTC22NZYdTwj9bK6wzkgNWIZda0taG3w7
-        1xPcq6br8IlB03aLuD+/9PnS0av+MR9d3lDHvRx5zTOwPjmuK/ud7CsnZq09Naz16bMiTdRg
-        Z0zKjm80x7rP7vNVTob3zKC/7tmlPr/T7fz+5U/d9x3h4i9xtoGVoM+t1R9/EHF3fv9PN1tY
-        23jUP0GquiKF+pbb3P1yzZftY7YKzYaqr3UoWgqnzMn5E78EySdHD3dc7En46sLfXrKAFWas
-        87m+vck3+xNEeCTwUEBpvHE60ASM281S0Yd7k8QH3UN/D9YzAScNVTkFhIBLp+UhqI6j/wP7
-        45vZbAQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSvG7fJMMkg8YGRovphxUtmib8ZbaY
-        s2obo8Xqu/1sFitXH2WyeNd6jsWi8/QFJovzbw8zWUw6dI3RYu8tbYv5y56yWyxpPc5mcWPC
-        U0aLNTefslh8PjOP1YHf49nVZ4weO2fdZfdoXnCHxePy2VKPTas62Tw2L6n32H2zgc1j2+KX
-        rB59W1YxenzeJBfAFcVlk5Kak1mWWqRvl8CVMaFjOnvBNYWK01+fsjQwtkl2MXJySAiYSGxp
-        6WMFsYUEdjBKNCxkhoiLSzRf+8EOYQtLrPz3HMjmAqp5wijx9f4CsAYWAVWJOR3dTF2MHBxs
-        ApoSFyaXgoRFBJQknr46ywhSzyxwikmiYds7sEHCAqESLa0Q9bwCOhKfOzwg9i5hkth+Sg/E
-        5hUQlDg58wkLiM0sYCYxb/NDZpByZgFpieX/OEDCnALaEpNPzAA7U1RAWeLAtuNMExgFZyHp
-        noWkexZC9wJG5lWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMGRp6W1g3HPqg96hxiZ
-        OBgPMUpwMCuJ8J55oZ8kxJuSWFmVWpQfX1Sak1p8iFGag0VJnPdC18l4IYH0xJLU7NTUgtQi
-        mCwTB6dUA9OGKT8Uj2mfXL7s+ZNyoe3q983+bVQ8kFHzMmtLkkxPgfgW6bMRf6asSzSYLqIS
-        8yvnbRabaNC2KrECDdPCQO9vk3Rafj3y/JI8603zvhAjey+f1BXiXa+fJf59aV8U8dswVyBU
-        MIyZzbF6L3/VaZN7Ct9y3uu//JjI09Az8cM3J0/RaskJOvFP2PetneHr9EdY8+b6kJxXzXWP
-        isqMBBOiOmQijuiUqghfut0cn5e0+Yiz0qs5P7eu+vk2oy3o7J1DgVuTrdb41Cle2rh4wlGR
-        r8cF8vfWr2I48ehj1s+fUYzWES+mnlJo32Dlv5jvpcoew9o7/sxnN0RJt/O0uqxwfXbjkfoC
-        KZubWUGci5VYijMSDbWYi4oTAZrfQggrAwAA
-X-CMS-MailID: 20220316073230epcas5p47458b509510ee55be5bfa5152fad991b
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78
-References: <20220308152105.309618-1-joshi.k@samsung.com>
-        <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
-        <20220308152105.309618-6-joshi.k@samsung.com>
-        <20220311070148.GA17881@lst.de> <20220314162356.GA13902@test-zns>
-        <20220315085410.GA4132@lst.de>
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e7d761ad-3c58-4e90-72c5-08da07283a4b
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Mar 2022 08:37:38.3362
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +RgwOcqVv9JdXI+b/cjQTpqEXkEaCI9gVdnzZsfswqY5QEYuHqHYegtL1xOOJ8WJdAyVVl4O+ujQlzvijdtltppeEKO2TArdNiwcnXVzNyQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY1PR04MB2138
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
-
-On Tue, Mar 15, 2022 at 09:54:10AM +0100, Christoph Hellwig wrote:
->On Mon, Mar 14, 2022 at 09:53:56PM +0530, Kanchan Joshi wrote:
->>>> +struct nvme_uring_cmd_pdu {
->>>> +	u32 meta_len;
->>>> +	union {
->>>> +		struct bio *bio;
->>>> +		struct request *req;
->>>> +	};
->>>> +	void *meta; /* kernel-resident buffer */
->>>> +	void __user *meta_buffer;
->>>> +} __packed;
->>>
->>> Why is this marked __packed?
->> Did not like doing it, but had to.
->> If not packed, this takes 32 bytes of space. While driver-pdu in struct
->> io_uring_cmd can take max 30 bytes. Packing nvme-pdu brought it down to
->> 28 bytes, which fits and gives 2 bytes back.
->
->What if you move meta_len to the end?  Even if we need the __packed
->that will avoid all the unaligned access to pointers, which on some
->architectures will crash the kernel.
-ah, right. Will move that to the end.
-
->> And on moving meta elements outside the driver, my worry is that it
->> reduces scope of uring-cmd infra and makes it nvme passthru specific.
->> At this point uring-cmd is still generic async ioctl/fsctl facility
->> which may find other users (than nvme-passthru) down the line. Organization
->> of fields within "struct io_uring_cmd" is around the rule
->> that a field is kept out (of 28 bytes pdu) only if is accessed by both
->> io_uring and driver.
->
->We have plenty of other interfaces of that kind.  Sockets are one case
->already, and regular read/write with protection information will be
->another one.  So having some core infrastrucure for "secondary data"
->seems very useful.
-So what is the picture that you have in mind for struct io_uring_cmd?
-Moving meta fields out makes it look like this - 
-
-@@ -28,7 +28,10 @@ struct io_uring_cmd {
-        u32             cmd_op;
-        u16             cmd_len;
-        u16             unused;
--       u8              pdu[28]; /* available inline for free use */
-+       void __user     *meta_buffer; /* nvme pt specific */
-+       u32             meta_len; /* nvme pt specific */
-+       u8              pdu[16]; /* available inline for free use */
-+
- };
-And corresponding nvme 16 byte pdu - 
- struct nvme_uring_cmd_pdu {
--       u32 meta_len;
-        union {
-                struct bio *bio;
-                struct request *req;
-        };
-        void *meta; /* kernel-resident buffer */
--       void __user *meta_buffer;
- } __packed;
-
-I do not understand how this helps. Only the generic space (28 bytes)
-got reduced to 16 bytes.
-
->> I see, so there is room for adding some efficiency.
->> Hope it will be ok if I carry this out as a separate effort.
->> Since this is about touching blk_mq_complete_request at its heart, and
->> improving sync-direct-io, this does not seem best-fit and slow this
->> series down.
->
->I really rather to this properly.  Especially as the current effort
->adds new exported interfaces.
-
-Seems you are referring to io_uring_cmd_complete_in_task().
-
-We would still need to use/export that even if we somehow manage to move
-task-work trigger from nvme-function to blk_mq_complete_request.
-io_uring's task-work infra is more baked than raw task-work infra.
-It would not be good to repeat all that code elsewhere.
-I tried raw one in the first attempt, and Jens suggested to move to baked
-one. Here is the link that gave birth to this interface -
-https://lore.kernel.org/linux-nvme/6d847f4a-65a5-bc62-1d36-52e222e3d142@kernel.dk/
- 
-
->> Deferring by ipi or softirq never occured. Neither for block nor for
->> char. Softirq is obvious since I was not running against scsi (or nvme with
->> single queue). I could not spot whether this is really a overhead, at
->> least for nvme.
->
->This tends to kick in if you have less queues than cpu cores.  Quite
->command with either a high core cound or a not very high end nvme
->controller.
-I will check that.
-But swtiching (irq to task-work) is more generic and not about this series.
-Triggering task-work anyway happens for regular read/write
-completion too (in io_uring)...in the same return path involving
-blk_mq_complete_request. For passthru, we are just triggering this
-somewhat earlier in the completion path. 
-
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_
-Content-Type: text/plain; charset="utf-8"
-
-
-------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_--
+On 15/03/2022 19:51, Pankaj Raghav wrote:=0A=
+>> ck-groups (and thus block-groups not aligned to the stripe size).=0A=
+>>=0A=
+> I agree with your point that we risk not aligning to stripe size when we=
+=0A=
+> move to npo2 zone size which I believe the minimum is 64K (please=0A=
+> correct me if I am wrong). As David Sterba mentioned in his email, we=0A=
+> could agree on some reasonable alignment, which I believe would be the=0A=
+> minimum stripe size of 64k to avoid added complexity to the existing=0A=
+> btrfs zoned support. And it is a much milder constraint that most=0A=
+> devices can naturally adhere compared to the po2 zone size requirement.=
+=0A=
+> =0A=
+=0A=
+What could be done is rounding a zone down to the next po2 (64k aligned),=
+=0A=
+but then we need to explicitly finish the zones.=0A=
