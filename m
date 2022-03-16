@@ -2,178 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5A0C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 06:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45E2DC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 07:35:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346570AbiCPG43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 02:56:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35202 "EHLO
+        id S241505AbiCPHgl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 03:36:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239264AbiCPG42 (ORCPT
+        with ESMTP id S234688AbiCPHgj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 02:56:28 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E095EBCF
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 23:55:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1647413714; x=1678949714;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=Nh3QpcN3O3uzkHoTd6unJET9stO5ehOKv8zxVHcnBhs=;
-  b=TI+UUXLTj7UqzwnjxmC79uXf+4r6Qbvh64M2wGCt2j5+NrTIAwaMjalL
-   voKnNyko+P5+owr8jC9VmdAD9VwuHZtrJaVCBREfJaBXh5d+vj7/lF1ck
-   PM4dGrZJ9Bi8j8HakL6a5EV6W+lrX5vxT8BEBM3zskJX+L4dD9o405rIo
-   JAH3j4mYiz2+ub2RaOG0BqtjRCRyRLR0otLAnFLkqTRNcRhX5TtnyPruA
-   PemIdWs+SXljVQbjNjLI1m//pphnDQSR13tqDwFjKq+AGiL8nvvg8CFAp
-   QPsQoGZeYi9wOOpMi+e9jHBoNzDa2GJ/Qqql6ErP+ZwfTKKwHamHCfS1h
-   w==;
-X-IronPort-AV: E=Sophos;i="5.90,186,1643644800"; 
-   d="scan'208";a="307434834"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Mar 2022 14:55:14 +0800
-IronPort-SDR: zo2rmN6Eub8Ss9V0X/VUNvz8c9QY27segTT8BOo35AnDeE8MegUplxCXCQU6xWDxR8viOCtDJi
- fByiZnbJbbK6SgJVm9u8QH/ha902JWrzZ5fXSodJ2rJ+jXxP1u3Lioyo8OAoqgjuveDXenaiGS
- zFjb6kbQTktbuVAz48oApYIAiv7Q3q6OqLKpQP1M1/Dn9aHGeyL3rAEX/bILTV2AFe9PLFyv0q
- UsA69QlalTscL74LL25ejDbjDM3xTXt4DljoYVhisANvSMZ6ym0Bf6JFzi8+ZelS7w/hpNl0uh
- 9Ddbc1KOy5LDCq0Cy3bJOEG9
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 23:27:19 -0700
-IronPort-SDR: 4Kp92/XGqvbd9Gu5uK3LsaoLhQndj02EouzU96+VWW3gqTlxTILHtbEeBEZY59EgU5qGur1SVK
- eHxLdjkSvi9g7G+yr8UMXCyU3HRKuycOt9Q+fYCVsRaqRoD1t5ODqXFSvv8AKhS2DPfboiJa0V
- 22/xf//o9iqPkHbhd8qxGD51033IgtYw0PY2RLxLtI4ReFDIlMqRL9iyxRmKwe7rejNA9h/JOa
- +GO4acFBmeSSSxrx1DVviJl1qonF79ZWmyBJVVqcT/GSUjqBQZ7dl7UTijaReslgidhgYtWRUn
- rwE=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 23:55:15 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KJLcy21RHz1Rwrw
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 23:55:14 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1647413713; x=1650005714; bh=Nh3QpcN3O3uzkHoTd6unJET9stO5ehOKv8z
-        xVHcnBhs=; b=qKCVuuyUUBxlPddsS75RbCM+lcynigkPn6FlKZeLtPQgVyipkL3
-        qQGVkNZ1nvn5jPnoDrbnZffoNvakUi7QrYtT5l1qfcpfufnY6G7nc5hY8BUfUaI2
-        YH09jEtlfiK11UDTu29eUmrTZ/g6ZvzBFFEXtE+GofuCQZbxqFSflT4KLAnmXm4+
-        yJfX5kBdn7NDPdjR0LP6XFT/U/a1ML0UEQK5THyFJZoexbIYLxYrivrJXNvmvLyJ
-        Xrr9OTPOPKAT3GA8r/OXAFuyei6b/qmk2M/CLgCu6SzkQI8tFzpZJAFKGzbY67e7
-        QA1vcN2rYnXD487En3PCEWh4Xf3lXu1sV6w==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id BfmJs81hHddl for <linux-block@vger.kernel.org>;
-        Tue, 15 Mar 2022 23:55:13 -0700 (PDT)
-Received: from [10.225.163.101] (unknown [10.225.163.101])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KJLcx0LpWz1Rvlx;
-        Tue, 15 Mar 2022 23:55:12 -0700 (PDT)
-Message-ID: <c6e917ca-0192-4ef1-5483-284b2007ecf4@opensource.wdc.com>
-Date:   Wed, 16 Mar 2022 15:55:11 +0900
+        Wed, 16 Mar 2022 03:36:39 -0400
+Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5FC606E7
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 00:35:23 -0700 (PDT)
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220316073520epoutp037a1dcca6eab59139a0aa17f5d3ba1c51~czDuxy6E-0272402724epoutp03G
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 07:35:20 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220316073520epoutp037a1dcca6eab59139a0aa17f5d3ba1c51~czDuxy6E-0272402724epoutp03G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1647416120;
+        bh=0ch16WX5sxYc+WOht+eFe2RkcmpBFB4vfsqCaL2z36M=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=at5FIj/VsuPyPzHfOi83uqZ1+1jCSzwcdFhzTzVIVe8gDdycsTzBiaqwTcqM0T2by
+         ZOG5ae/WafP4zKbNxl+cYhRif77u1vQPvV0KKFLJTFugJraSlk4XuCYG6GlBOzaOAn
+         pTVHWbeodhWDl9FLnNNxM7hL24dO1Ft1QwwzJZTA=
+Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20220316073519epcas5p2c43131a53bdc2868f6aa1e49d08cb7d5~czDuJqTFf2807628076epcas5p2q;
+        Wed, 16 Mar 2022 07:35:19 +0000 (GMT)
+Received: from epsmges5p3new.samsung.com (unknown [182.195.38.183]) by
+        epsnrtp1.localdomain (Postfix) with ESMTP id 4KJMW06rT1z4x9QT; Wed, 16 Mar
+        2022 07:35:08 +0000 (GMT)
+Received: from epcas5p1.samsung.com ( [182.195.41.39]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        53.EC.05590.52391326; Wed, 16 Mar 2022 16:35:01 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20220316073230epcas5p47458b509510ee55be5bfa5152fad991b~czBQITy3w2400724007epcas5p4H;
+        Wed, 16 Mar 2022 07:32:30 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220316073230epsmtrp1ac86bafccc6d7619a09cd86cb9e4f0cc~czBQHZRMF1062610626epsmtrp1P;
+        Wed, 16 Mar 2022 07:32:30 +0000 (GMT)
+X-AuditID: b6c32a4b-739ff700000015d6-3b-62319325b78c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        EF.92.03370.D8291326; Wed, 16 Mar 2022 16:32:30 +0900 (KST)
+Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220316073227epsmtip267db15d1cd03c9e484f7eefb9176d97a~czBN9SbvN2834028340epsmtip2l;
+        Wed, 16 Mar 2022 07:32:27 +0000 (GMT)
+Date:   Wed, 16 Mar 2022 12:57:27 +0530
+From:   Kanchan Joshi <joshi.k@samsung.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, kbusch@kernel.org, asml.silence@gmail.com,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, pankydev8@gmail.com, javier@javigon.com,
+        mcgrof@kernel.org, a.manzanares@samsung.com, joshiiitr@gmail.com,
+        anuj20.g@samsung.com
+Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Message-ID: <20220316072727.GA2104@test-zns>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [PATCH] block: limit request dispatch loop duration
-Content-Language: en-US
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220316061134.3812309-1-shinichiro.kawasaki@wdc.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220316061134.3812309-1-shinichiro.kawasaki@wdc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220315085410.GA4132@lst.de>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Te0xTVxzeubctlyaFOwQ50mzAJWAAgXaW7sJgL4neqFmaGbbE4OACd0AK
+        t01vO19jYyoLZeGhiLw7EBwOHDLoGnmYSRELIi+ZIEQZOCCDRUGZi3GBrOWWxf++3/f7vnO+
+        33lgqMeUyAfLYPWMjqUzCZFYYOkN3hkWWCJPlk3VepNlvf7kqeJ1lKxusgCy+WGRiPyxuQ8h
+        n+QOC0jj4ChCjjzuRchz1glAXp8OJb//YcGFbMi1icj7xQuAvDK1ICDX7piE77tTi/cWAdVR
+        +dCFOl37QECNDxmotiajiGpv+JrqmsoRUZb6JSFVaG4C1FrbmyrxYXVMOkOnMjo/hk3RpGaw
+        abHEgUOJexIjlTJ5mDyKfJvwY+ksJpaIO6gK25uRaZ+B8PuCzjTYKRXNcUTEuzE6jUHP+KVr
+        OH0swWhTM7UKbThHZ3EGNi2cZfTRcpnsrUi7MEmdPl3wFNE2Bhy7d3dWmAOuS/OBKwZxBXxR
+        kIfmAzHmgXcB+LjrFsIXzwAc6VgV8MUagI+elLlsWcxnCoV8oxPAlpVWZ7EI4F/d/cChEuCB
+        sDrvO/taGCbCg+FoicFBe+IEXFgeAg49ivcjsGbGhDga2/B4eCaX10vwXXAtj3LQEvx1OFAx
+        L3BgVzwUlvSXow7shQfAGxbbZlSI/4bB+hflgE8XB1fMA86k2+CyzezEPnCp6Fsn5uDLB30o
+        b84DcDKnQsA33oNj3eubgVA8A853/IHw/Buw9HaLk3eDBf/OO3kJvGbawv5w5tyCkMfecK68
+        QegYBuIUbKiS8gd0EYGWGzWCYuBb+cpwla9sx+NoaFw9Jay021FcChs3MB4Gw6udEbVA2AR2
+        MFouK43hIrW7Webo/zeeoslqA5tvPOTANfBodjXcChAMWAHEUMJTcufPiGQPSSp9/ASj0yTq
+        DJkMZwWR9rs6i/p4pWjsn4TVJ8oVUTKFUqlURO1Wyglvye20VtoDT6P1jJphtIxuy4dgrj45
+        iCK72X/4Z+ll1cmJm4mXTotMLnWqbq163OSVFLJHTC22NZYdTwj9bK6wzkgNWIZda0taG3w7
+        1xPcq6br8IlB03aLuD+/9PnS0av+MR9d3lDHvRx5zTOwPjmuK/ud7CsnZq09Naz16bMiTdRg
+        Z0zKjm80x7rP7vNVTob3zKC/7tmlPr/T7fz+5U/d9x3h4i9xtoGVoM+t1R9/EHF3fv9PN1tY
+        23jUP0GquiKF+pbb3P1yzZftY7YKzYaqr3UoWgqnzMn5E78EySdHD3dc7En46sLfXrKAFWas
+        87m+vck3+xNEeCTwUEBpvHE60ASM281S0Yd7k8QH3UN/D9YzAScNVTkFhIBLp+UhqI6j/wP7
+        45vZbAQAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprBIsWRmVeSWpSXmKPExsWy7bCSvG7fJMMkg8YGRovphxUtmib8ZbaY
+        s2obo8Xqu/1sFitXH2WyeNd6jsWi8/QFJovzbw8zWUw6dI3RYu8tbYv5y56yWyxpPc5mcWPC
+        U0aLNTefslh8PjOP1YHf49nVZ4weO2fdZfdoXnCHxePy2VKPTas62Tw2L6n32H2zgc1j2+KX
+        rB59W1YxenzeJBfAFcVlk5Kak1mWWqRvl8CVMaFjOnvBNYWK01+fsjQwtkl2MXJySAiYSGxp
+        6WMFsYUEdjBKNCxkhoiLSzRf+8EOYQtLrPz3HMjmAqp5wijx9f4CsAYWAVWJOR3dTF2MHBxs
+        ApoSFyaXgoRFBJQknr46ywhSzyxwikmiYds7sEHCAqESLa0Q9bwCOhKfOzwg9i5hkth+Sg/E
+        5hUQlDg58wkLiM0sYCYxb/NDZpByZgFpieX/OEDCnALaEpNPzAA7U1RAWeLAtuNMExgFZyHp
+        noWkexZC9wJG5lWMkqkFxbnpucWGBUZ5qeV6xYm5xaV56XrJ+bmbGMGRp6W1g3HPqg96hxiZ
+        OBgPMUpwMCuJ8J55oZ8kxJuSWFmVWpQfX1Sak1p8iFGag0VJnPdC18l4IYH0xJLU7NTUgtQi
+        mCwTB6dUA9OGKT8Uj2mfXL7s+ZNyoe3q983+bVQ8kFHzMmtLkkxPgfgW6bMRf6asSzSYLqIS
+        8yvnbRabaNC2KrECDdPCQO9vk3Rafj3y/JI8603zvhAjey+f1BXiXa+fJf59aV8U8dswVyBU
+        MIyZzbF6L3/VaZN7Ct9y3uu//JjI09Az8cM3J0/RaskJOvFP2PetneHr9EdY8+b6kJxXzXWP
+        isqMBBOiOmQijuiUqghfut0cn5e0+Yiz0qs5P7eu+vk2oy3o7J1DgVuTrdb41Cle2rh4wlGR
+        r8cF8vfWr2I48ehj1s+fUYzWES+mnlJo32Dlv5jvpcoew9o7/sxnN0RJt/O0uqxwfXbjkfoC
+        KZubWUGci5VYijMSDbWYi4oTAZrfQggrAwAA
+X-CMS-MailID: 20220316073230epcas5p47458b509510ee55be5bfa5152fad991b
+X-Msg-Generator: CA
+Content-Type: multipart/mixed;
+        boundary="----7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78
+References: <20220308152105.309618-1-joshi.k@samsung.com>
+        <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
+        <20220308152105.309618-6-joshi.k@samsung.com>
+        <20220311070148.GA17881@lst.de> <20220314162356.GA13902@test-zns>
+        <20220315085410.GA4132@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/16/22 15:11, Shin'ichiro Kawasaki wrote:
-> When IO requests are made continuously and the target block device
-> handles requests faster than request arrival, the request dispatch loop
-> keeps on repeating to dispatch the arriving requests very long time,
-> more than a minute. Since the loop runs as a workqueue worker task, the
-> very long loop duration triggers workqueue watchdog timeout and BUG [1].
-> 
-> To avoid the very long loop duration, break the loop periodically. When
-> opportunity to dispatch requests still exists, check need_resched(). If
-> need_resched() returns true, the dispatch loop already consumed its time
-> slice, then reschedule the dispatch work and break the loop. With heavy
-> IO load, need_resched() does not return true for 20~30 seconds. To cover
-> such case, check time spent in the dispatch loop with jiffies. If more
-> than 1 second is spent, reschedule the dispatch work and break the loop.
-> 
-> [1]
-> 
-> [  609.691437] BUG: workqueue lockup - pool cpus=10 node=1 flags=0x0 nice=-20 stuck for 35s!
-> [  609.701820] Showing busy workqueues and worker pools:
-> [  609.707915] workqueue events: flags=0x0
-> [  609.712615]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-> [  609.712626]     pending: drm_fb_helper_damage_work [drm_kms_helper]
-> [  609.712687] workqueue events_freezable: flags=0x4
-> [  609.732943]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-> [  609.732952]     pending: pci_pme_list_scan
-> [  609.732968] workqueue events_power_efficient: flags=0x80
-> [  609.751947]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-> [  609.751955]     pending: neigh_managed_work
-> [  609.752018] workqueue kblockd: flags=0x18
-> [  609.769480]   pwq 21: cpus=10 node=1 flags=0x0 nice=-20 active=3/256 refcnt=4
-> [  609.769488]     in-flight: 1020:blk_mq_run_work_fn
-> [  609.769498]     pending: blk_mq_timeout_work, blk_mq_run_work_fn
-> [  609.769744] pool 21: cpus=10 node=1 flags=0x0 nice=-20 hung=35s workers=2 idle: 67
-> [  639.899730] BUG: workqueue lockup - pool cpus=10 node=1 flags=0x0 nice=-20 stuck for 66s!
-> [  639.909513] Showing busy workqueues and worker pools:
-> [  639.915404] workqueue events: flags=0x0
-> [  639.920197]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
-> [  639.920215]     pending: drm_fb_helper_damage_work [drm_kms_helper]
-> [  639.920365] workqueue kblockd: flags=0x18
-> [  639.939932]   pwq 21: cpus=10 node=1 flags=0x0 nice=-20 active=3/256 refcnt=4
-> [  639.939942]     in-flight: 1020:blk_mq_run_work_fn
-> [  639.939955]     pending: blk_mq_timeout_work, blk_mq_run_work_fn
-> [  639.940212] pool 21: cpus=10 node=1 flags=0x0 nice=-20 hung=66s workers=2 idle: 67
-> 
-> Fixes: 6e6fcbc27e778 ("blk-mq: support batching dispatch in case of io")
-> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> Cc: stable@vger.kernel.org # v5.10+
-> Link: https://lore.kernel.org/linux-block/20220310091649.zypaem5lkyfadymg@shindev/
-> Reviewed-by: Ming Lei <ming.lei@redhat.com>
-> Tested-by: Ming Lei <ming.lei@redhat.com>
-> ---
->  block/blk-mq-sched.c | 6 ++++++
->  1 file changed, 6 insertions(+)
-> 
-> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
-> index 55488ba97823..64941615befc 100644
-> --- a/block/blk-mq-sched.c
-> +++ b/block/blk-mq-sched.c
-> @@ -181,9 +181,15 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
->  {
->  	int ret;
-> +	unsigned long end = jiffies + HZ;
->  
->  	do {
->  		ret = __blk_mq_do_dispatch_sched(hctx);
-> +		if (ret == 1 &&
-> +		    (need_resched() || time_is_after_jiffies(end))) {
-> +			blk_mq_delay_run_hw_queue(hctx, 0);
-> +			break;
+------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Disposition: inline
 
-Minor nit: you could "return 1;" directly here.
+On Tue, Mar 15, 2022 at 09:54:10AM +0100, Christoph Hellwig wrote:
+>On Mon, Mar 14, 2022 at 09:53:56PM +0530, Kanchan Joshi wrote:
+>>>> +struct nvme_uring_cmd_pdu {
+>>>> +	u32 meta_len;
+>>>> +	union {
+>>>> +		struct bio *bio;
+>>>> +		struct request *req;
+>>>> +	};
+>>>> +	void *meta; /* kernel-resident buffer */
+>>>> +	void __user *meta_buffer;
+>>>> +} __packed;
+>>>
+>>> Why is this marked __packed?
+>> Did not like doing it, but had to.
+>> If not packed, this takes 32 bytes of space. While driver-pdu in struct
+>> io_uring_cmd can take max 30 bytes. Packing nvme-pdu brought it down to
+>> 28 bytes, which fits and gives 2 bytes back.
+>
+>What if you move meta_len to the end?  Even if we need the __packed
+>that will avoid all the unaligned access to pointers, which on some
+>architectures will crash the kernel.
+ah, right. Will move that to the end.
 
-> +		}
->  	} while (ret == 1);
->  
->  	return ret;
+>> And on moving meta elements outside the driver, my worry is that it
+>> reduces scope of uring-cmd infra and makes it nvme passthru specific.
+>> At this point uring-cmd is still generic async ioctl/fsctl facility
+>> which may find other users (than nvme-passthru) down the line. Organization
+>> of fields within "struct io_uring_cmd" is around the rule
+>> that a field is kept out (of 28 bytes pdu) only if is accessed by both
+>> io_uring and driver.
+>
+>We have plenty of other interfaces of that kind.  Sockets are one case
+>already, and regular read/write with protection information will be
+>another one.  So having some core infrastrucure for "secondary data"
+>seems very useful.
+So what is the picture that you have in mind for struct io_uring_cmd?
+Moving meta fields out makes it look like this - 
 
-Otherwise, looks good.
+@@ -28,7 +28,10 @@ struct io_uring_cmd {
+        u32             cmd_op;
+        u16             cmd_len;
+        u16             unused;
+-       u8              pdu[28]; /* available inline for free use */
++       void __user     *meta_buffer; /* nvme pt specific */
++       u32             meta_len; /* nvme pt specific */
++       u8              pdu[16]; /* available inline for free use */
++
+ };
+And corresponding nvme 16 byte pdu - 
+ struct nvme_uring_cmd_pdu {
+-       u32 meta_len;
+        union {
+                struct bio *bio;
+                struct request *req;
+        };
+        void *meta; /* kernel-resident buffer */
+-       void __user *meta_buffer;
+ } __packed;
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+I do not understand how this helps. Only the generic space (28 bytes)
+got reduced to 16 bytes.
 
--- 
-Damien Le Moal
-Western Digital Research
+>> I see, so there is room for adding some efficiency.
+>> Hope it will be ok if I carry this out as a separate effort.
+>> Since this is about touching blk_mq_complete_request at its heart, and
+>> improving sync-direct-io, this does not seem best-fit and slow this
+>> series down.
+>
+>I really rather to this properly.  Especially as the current effort
+>adds new exported interfaces.
+
+Seems you are referring to io_uring_cmd_complete_in_task().
+
+We would still need to use/export that even if we somehow manage to move
+task-work trigger from nvme-function to blk_mq_complete_request.
+io_uring's task-work infra is more baked than raw task-work infra.
+It would not be good to repeat all that code elsewhere.
+I tried raw one in the first attempt, and Jens suggested to move to baked
+one. Here is the link that gave birth to this interface -
+https://lore.kernel.org/linux-nvme/6d847f4a-65a5-bc62-1d36-52e222e3d142@kernel.dk/
+ 
+
+>> Deferring by ipi or softirq never occured. Neither for block nor for
+>> char. Softirq is obvious since I was not running against scsi (or nvme with
+>> single queue). I could not spot whether this is really a overhead, at
+>> least for nvme.
+>
+>This tends to kick in if you have less queues than cpu cores.  Quite
+>command with either a high core cound or a not very high end nvme
+>controller.
+I will check that.
+But swtiching (irq to task-work) is more generic and not about this series.
+Triggering task-work anyway happens for regular read/write
+completion too (in io_uring)...in the same return path involving
+blk_mq_complete_request. For passthru, we are just triggering this
+somewhat earlier in the completion path. 
+
+------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_
+Content-Type: text/plain; charset="utf-8"
+
+
+------7Im1L.vKorTl163deO4rxYDAHxkziUWsBhtki-3JrW1s26Hg=_11b0d6_--
