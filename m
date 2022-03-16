@@ -2,79 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B128C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:13:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0A44C43219
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbiCPCOv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 22:14:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54522 "EHLO
+        id S1352742AbiCPC21 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 22:28:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345597AbiCPCOs (ORCPT
+        with ESMTP id S1351128AbiCPC21 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 22:14:48 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82FA9CE4
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:13:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=vG1Hmk74Aif2YazQJqrchYYEWEpwf++vOsVZXzznyFI=; b=QjqpDOwUQy5RDhnxJ+cb6/4l0T
-        76sNHG1HJaGYasmr/wQy14g7ZRbROk1gri97uUywWvnzazLWqIMsJLwKgNxhsJpNxRVkrsOug5sHC
-        9m+ubFikokcJZMrfV70bbJmwjKb9Rir5D/Byy3kvWHzwDDzJRU/p7orrbbskdrM/ELxkEQArNJCgE
-        uOHUDEmHyzA9zulkcJUKHiMP93T6/slG0lxaOCpz/e9A4a/ZijJ50djYo8aNgJvW3rAnMmNdeH+mp
-        wnCMKUre0smmLaIJlJ7Q6I1/2RECG1L3Kc6jaWDBI8oNhdk9GKexwuTrKWC1ydXF7Q9vxcpaWrZeD
-        G1eYHfxg==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUJA6-00BBBU-M8; Wed, 16 Mar 2022 02:13:18 +0000
-Date:   Tue, 15 Mar 2022 19:13:18 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
-        Matias =?iso-8859-1?Q?Bj=F8rling?= <Matias.Bjorling@wdc.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        kanchan Joshi <joshi.k@samsung.com>,
-        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Kanchan Joshi <joshiiitr@gmail.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
-Message-ID: <YjFHvuKshW6Sg6ZT@bombadil.infradead.org>
-References: <20220315130501.q7fjpqzutadadfu3@ArmHalley.localdomain>
- <BYAPR04MB49689803ED6E1E32C49C6413F1109@BYAPR04MB4968.namprd04.prod.outlook.com>
- <20220315132611.g5ert4tzuxgi7qd5@unifi>
- <20220315133052.GA12593@lst.de>
- <YjDGS6ROx6tI5FBR@bombadil.infradead.org>
- <62ed2891-f4b2-d63c-553d-8cae49b586bc@opensource.wdc.com>
- <YjEuAv/RNpF4GvsJ@bombadil.infradead.org>
- <c3d71cd7-cf95-c290-bfc6-29d307b7b4e8@opensource.wdc.com>
- <YjE8VZ1bbdE9nV0C@bombadil.infradead.org>
- <8e842ca0-1885-4738-0099-24409c108b2a@opensource.wdc.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8e842ca0-1885-4738-0099-24409c108b2a@opensource.wdc.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+        Tue, 15 Mar 2022 22:28:27 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88AB45DA78
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:27:10 -0700 (PDT)
+Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
+        by 156.147.23.53 with ESMTP; 16 Mar 2022 11:27:09 +0900
+X-Original-SENDERIP: 156.147.1.151
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
+        by 156.147.1.151 with ESMTP; 16 Mar 2022 11:27:09 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     torvalds@linux-foundation.org
+Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
+        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+        amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: [PATCH RFC v5 01/21] llist: Move llist_{head,node} definition to types.h
+Date:   Wed, 16 Mar 2022 11:26:13 +0900
+Message-Id: <1647397593-16747-2-git-send-email-byungchul.park@lge.com>
+X-Mailer: git-send-email 1.9.1
+In-Reply-To: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
+References: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 10:44:56AM +0900, Damien Le Moal wrote:
-> On 3/16/22 10:24, Luis Chamberlain wrote:
-> > SMR != ZNS
-> 
-> Not for the block layer nor for any in-kernel <etc>
+llist_head and llist_node can be used by very primitives. For example,
+Dept for tracking dependency uses llist things in its header. To avoid
+header dependency, move those to types.h.
 
-Back to kernel, I thought you wanted to focus on applications.
+Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+---
+ include/linux/llist.h | 8 --------
+ include/linux/types.h | 8 ++++++++
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-> Considering the zone size requirement problem in the context of ZNS only
-> is thus far from ideal in my opinion, to say the least.
+diff --git a/include/linux/llist.h b/include/linux/llist.h
+index 85bda2d..99cc3c3 100644
+--- a/include/linux/llist.h
++++ b/include/linux/llist.h
+@@ -53,14 +53,6 @@
+ #include <linux/stddef.h>
+ #include <linux/types.h>
+ 
+-struct llist_head {
+-	struct llist_node *first;
+-};
+-
+-struct llist_node {
+-	struct llist_node *next;
+-};
+-
+ #define LLIST_HEAD_INIT(name)	{ NULL }
+ #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+ 
+diff --git a/include/linux/types.h b/include/linux/types.h
+index ac825ad..4662d6e 100644
+--- a/include/linux/types.h
++++ b/include/linux/types.h
+@@ -187,6 +187,14 @@ struct hlist_node {
+ 	struct hlist_node *next, **pprev;
+ };
+ 
++struct llist_head {
++	struct llist_node *first;
++};
++
++struct llist_node {
++	struct llist_node *next;
++};
++
+ struct ustat {
+ 	__kernel_daddr_t	f_tfree;
+ #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
+-- 
+1.9.1
 
-It's the reality for ZNS though.
-
-  Luis
