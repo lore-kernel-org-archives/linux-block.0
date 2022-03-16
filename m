@@ -2,41 +2,42 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAD5C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 08:45:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A725C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 08:45:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348751AbiCPIrA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 04:47:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38202 "EHLO
+        id S1354632AbiCPIrE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 04:47:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38300 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354624AbiCPIq7 (ORCPT
+        with ESMTP id S1354627AbiCPIrD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 04:46:59 -0400
+        Wed, 16 Mar 2022 04:47:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EEBC63BFA
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 01:45:46 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 429A463BFB
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 01:45:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=VytvXi/ofTXtBnUa851r1k2mUlJR5hNmhRa8J5sSdpE=; b=UcI8b2vXWChXCkQyh3fotWCxgu
-        NGA1gv3IAmM/dPfG2TeYI7lcsruJ/2VPmb/wXPYi81J2hrcp9IV5n9UNJ6a5o68Zs0TF0KRZoZUWk
-        M9Jnv/ajN5se4XC6ZpOxFMqlX1kOmxpgP8EMDFBLgbjVMpNlDuxLR5j8VHIQaZ6rYmBmk+U4LSWgS
-        G8QosajCQaD8HztNbz85sbCNyreQ8Mf0xocDXymfllh9izX+xjUA47axpol5XqWsxbhHPH8wFtZMI
-        kWivDuVAj6nzxT4/b+9lsYqZwm4FUBxzP9zAs9kK0RNLeBXyBUwUSEXG5hqDnxTyR4im6J17/I3jC
-        gZhH4tGA==;
+        bh=ElK6DPhqE0Oj8jmV2s8FSaguDMVHjao6McD2FDCKrfE=; b=X8wSJ6JhnZIMNqhRzSFR2c4Kyn
+        0ocFR7uoseqLFFNH9bdHPPq5s+86yprEQkudTsTjKpTduQHdCqgRDqsZg6xaY2Lo7QDz3pN3UsZtz
+        2nDnNetcLrx9KaQmCbHknf4LfJH/RsSaA9uvJu2GpaJOgecnDGtgFt7YxS1AdFqbExxQyHnV5blTt
+        QygFtGny3ByQpg/HUIzbS9Tt0cxFdet+BeeKNXYyedCsQjTHmLMy69j6AVlmEOdjeEnCdscSWyL4U
+        NP5iML+oeLqikYQMGMEIHLbnokAgXJB32gk+mEIxnSR+raaeCPY2yKGehAUmfVyh2L5Hof32O9Uew
+        FzQLbkXg==;
 Received: from [46.140.54.162] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUPHq-00CCH8-Dl; Wed, 16 Mar 2022 08:45:42 +0000
+        id 1nUPHt-00CCIi-JZ; Wed, 16 Mar 2022 08:45:46 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         Jan Kara <jack@suse.cz>,
         "Darrick J . Wong" <djwong@kernel.org>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH 7/8] loop: remove lo_refcount and avoid lo_mutex in ->open / ->release
-Date:   Wed, 16 Mar 2022 09:45:18 +0100
-Message-Id: <20220316084519.2850118-8-hch@lst.de>
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com
+Subject: [PATCH 8/8] loop: don't destroy lo->workqueue in __loop_clr_fd
+Date:   Wed, 16 Mar 2022 09:45:19 +0100
+Message-Id: <20220316084519.2850118-9-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220316084519.2850118-1-hch@lst.de>
 References: <20220316084519.2850118-1-hch@lst.de>
@@ -47,125 +48,90 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-lo_refcount counts how many openers a loop device has, but that count
-is already provided by the block layer in the bd_openers field of the
-whole-disk block_device.  Remove lo_refcount and allow opens to
-succeed even on devices beeing deleted - now that ->free_disk is
-implemented we can handle that race gracefull and all I/O on it will
-just fail. Similarly there is a small race window now where
-loop_control_remove does not synchronize the delete vs the remove
-due do bd_openers not being under lo_mutex protection, but we can
-handle that just as gracefully.
+There is no need to destroy the workqueue when clearing unbinding
+a loop device from a backing file.  Not doing so on the other hand
+avoid creating a complex lock dependency chain involving the global
+system_transition_mutex.
 
+Based on a patch from Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>.
+
+Reported-by: syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/loop.c | 36 +++++++-----------------------------
- drivers/block/loop.h |  1 -
- 2 files changed, 7 insertions(+), 30 deletions(-)
+ drivers/block/loop.c | 26 +++++++++++++-------------
+ 1 file changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index cbaa18bcad1fe..c270f3715d829 100644
+index c270f3715d829..ffc9f00c433cd 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1244,7 +1244,7 @@ static int loop_clr_fd(struct loop_device *lo)
- 	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
- 	 * command to fail with EBUSY.
- 	 */
--	if (atomic_read(&lo->lo_refcnt) > 1) {
-+	if (lo->lo_disk->part0->bd_openers > 1) {
- 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
- 		mutex_unlock(&lo->lo_mutex);
- 		return 0;
-@@ -1724,33 +1724,15 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
- }
- #endif
+@@ -808,7 +808,6 @@ struct loop_worker {
+ };
  
--static int lo_open(struct block_device *bdev, fmode_t mode)
--{
--	struct loop_device *lo = bdev->bd_disk->private_data;
--	int err;
+ static void loop_workfn(struct work_struct *work);
+-static void loop_rootcg_workfn(struct work_struct *work);
+ 
+ #ifdef CONFIG_BLK_CGROUP
+ static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
+@@ -1043,20 +1042,19 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	    !file->f_op->write_iter)
+ 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
+ 
+-	lo->workqueue = alloc_workqueue("loop%d",
+-					WQ_UNBOUND | WQ_FREEZABLE,
+-					0,
+-					lo->lo_number);
+ 	if (!lo->workqueue) {
+-		error = -ENOMEM;
+-		goto out_unlock;
++		lo->workqueue = alloc_workqueue("loop%d",
++						WQ_UNBOUND | WQ_FREEZABLE,
++						0, lo->lo_number);
++		if (!lo->workqueue) {
++			error = -ENOMEM;
++			goto out_unlock;
++		}
+ 	}
+ 
+ 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+ 	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
+ 
+-	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
+-	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
+ 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
+ 	lo->lo_device = bdev;
+ 	lo->lo_backing_file = file;
+@@ -1152,10 +1150,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	if (!release)
+ 		blk_mq_freeze_queue(lo->lo_queue);
+ 
+-	destroy_workqueue(lo->workqueue);
+-	loop_free_idle_workers(lo, true);
+-	del_timer_sync(&lo->timer);
 -
--	err = mutex_lock_killable(&lo->lo_mutex);
--	if (err)
--		return err;
--	if (lo->lo_state == Lo_deleting)
--		err = -ENXIO;
--	else
--		atomic_inc(&lo->lo_refcnt);
--	mutex_unlock(&lo->lo_mutex);
--	return err;
--}
--
- static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	spin_lock_irq(&lo->lo_lock);
+ 	filp = lo->lo_backing_file;
+ 	lo->lo_backing_file = NULL;
+@@ -1749,6 +1743,10 @@ static void lo_free_disk(struct gendisk *disk)
  {
  	struct loop_device *lo = disk->private_data;
  
--	mutex_lock(&lo->lo_mutex);
--	if (atomic_dec_return(&lo->lo_refcnt))
--		goto out_unlock;
-+	if (disk->part0->bd_openers > 0)
-+		return;
- 
--	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
--		if (lo->lo_state != Lo_bound)
--			goto out_unlock;
-+	mutex_lock(&lo->lo_mutex);
-+	if (lo->lo_state == Lo_bound && (lo->lo_flags & LO_FLAGS_AUTOCLEAR)) {
- 		lo->lo_state = Lo_rundown;
- 		mutex_unlock(&lo->lo_mutex);
- 		/*
-@@ -1760,8 +1742,6 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
- 		__loop_clr_fd(lo, true);
- 		return;
- 	}
--
--out_unlock:
- 	mutex_unlock(&lo->lo_mutex);
++	if (lo->workqueue)
++		destroy_workqueue(lo->workqueue);
++	loop_free_idle_workers(lo, true);
++	del_timer_sync(&lo->timer);
+ 	mutex_destroy(&lo->lo_mutex);
+ 	kfree(lo);
  }
- 
-@@ -1775,7 +1755,6 @@ static void lo_free_disk(struct gendisk *disk)
- 
- static const struct block_device_operations lo_fops = {
- 	.owner =	THIS_MODULE,
--	.open =		lo_open,
- 	.release =	lo_release,
- 	.ioctl =	lo_ioctl,
- #ifdef CONFIG_COMPAT
-@@ -2029,7 +2008,6 @@ static int loop_add(int i)
- 	 */
- 	if (!part_shift)
- 		disk->flags |= GENHD_FL_NO_PART;
--	atomic_set(&lo->lo_refcnt, 0);
- 	mutex_init(&lo->lo_mutex);
+@@ -2012,6 +2010,8 @@ static int loop_add(int i)
  	lo->lo_number		= i;
  	spin_lock_init(&lo->lo_lock);
-@@ -2119,12 +2097,12 @@ static int loop_control_remove(int idx)
- 	if (ret)
- 		goto mark_visible;
- 	if (lo->lo_state != Lo_unbound ||
--	    atomic_read(&lo->lo_refcnt) > 0) {
-+	    lo->lo_disk->part0->bd_openers > 0) {
- 		mutex_unlock(&lo->lo_mutex);
- 		ret = -EBUSY;
- 		goto mark_visible;
- 	}
--	/* Mark this loop device no longer open()-able. */
-+	/* Mark this loop device as no more bound, but not quite unbound yet */
- 	lo->lo_state = Lo_deleting;
- 	mutex_unlock(&lo->lo_mutex);
- 
-diff --git a/drivers/block/loop.h b/drivers/block/loop.h
-index 082d4b6bfc6a6..449d562738c52 100644
---- a/drivers/block/loop.h
-+++ b/drivers/block/loop.h
-@@ -28,7 +28,6 @@ struct loop_func_table;
- 
- struct loop_device {
- 	int		lo_number;
--	atomic_t	lo_refcnt;
- 	loff_t		lo_offset;
- 	loff_t		lo_sizelimit;
- 	int		lo_flags;
+ 	spin_lock_init(&lo->lo_work_lock);
++	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
++	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
+ 	disk->major		= LOOP_MAJOR;
+ 	disk->first_minor	= i << part_shift;
+ 	disk->minors		= 1 << part_shift;
 -- 
 2.30.2
 
