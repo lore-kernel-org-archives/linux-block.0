@@ -2,129 +2,213 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1586EC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 18:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD291C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 19:20:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349571AbiCPS1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 14:27:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55664 "EHLO
+        id S1346447AbiCPTVi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 15:21:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237492AbiCPS1r (ORCPT
+        with ESMTP id S235986AbiCPTVh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 14:27:47 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40D266D961
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 11:26:32 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id l2so5972537ybe.8
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 11:26:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+VVGHpNw2aToH4nlv/qP4fsUY4xFNKKSta7CoxCOLqU=;
-        b=Im3UELGk/iBvvXDdwloE1LayQw78/8xAF5xIkzHUcYNoTmJQWTbW5FnZyqyYEgkf/2
-         u6yjX7f4cTiiB6Xl/VU6E5cj6YVeOpmIafJOgwchCrZVrCmBGaGiUTzK8ypCnXwxX13n
-         /DVouNRz5uqNvN42UYjat3gLTPyDsihe7EGdA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+VVGHpNw2aToH4nlv/qP4fsUY4xFNKKSta7CoxCOLqU=;
-        b=TPLolZxtISnG9zZoJ1Xp3HG68msmeZfwOONdq7i6aP/L9TTpVTOyGBYoIjBXdQ1/sn
-         WxpCP2AJvkZ20rJLir276+koE5jRna8JXX486dDch+qt1D1vh5gmcPV8/1jz5l1q77oX
-         L31dGTT5X6cr4gC+Opms+jYNOl7NQKuBTtl0vrF8bxYDwrvi7UYJFY9c5cYwra5M7svI
-         WXxM150w6IWMwl2tynbdcwZSuBq0EP7oh2VTkmIyRReXT2lGJqYyiWM3qC2BYImJ8587
-         zh+KVIGmFLPKhN3ONNtYNcOVrqhPXHenokOIUpAfOTIvJLuJ5BfkWpBsh6cWGrhKSVdY
-         aGOw==
-X-Gm-Message-State: AOAM531xeQdxRUARAq2hQku8wK0acIXic2mHumFaW+kTdazQLLqbiRow
-        TiFUQ89BdxSJJ9tzKpjSsaQRRzIT5XW3h3LN2uafrQ==
-X-Google-Smtp-Source: ABdhPJxgt41Y/UgMqCYCVzLLEzyZ00uN4v/bBuIogqY9sdSDfrECHl2+T+gNWPVLRmPOUuKWlmIHWV6lhzeCmDlncpY=
-X-Received: by 2002:a25:918f:0:b0:633:6f7d:6d78 with SMTP id
- w15-20020a25918f000000b006336f7d6d78mr1343447ybl.134.1647455191504; Wed, 16
- Mar 2022 11:26:31 -0700 (PDT)
+        Wed, 16 Mar 2022 15:21:37 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706B6532CF;
+        Wed, 16 Mar 2022 12:20:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        Content-Type:MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=X2j8KWKH7mPGrGuSOCsj6/Zr05knYdm/d0qKjoRqe/A=; b=bdC3zFz0aD/kHDcjfAyZbfQHBp
+        7D/NlBM1amLmkH4B4sqKV2ufqUvJD88hTlKpyZ6VqDgekjK4FNGYILRpxkEqmQPADEL6WPYAAzU3c
+        Sgrf+0emCMPKxF4geOisKrAEZIi126v6w7X5ziKEvg+Vo5Kfv7gQeEp68Rya/2NrsCbuCdD1F1eRO
+        BniaXaZDMgIYFHq/3z0YvLS2w5qVtTdqdrrvR04+Nr2xp3obBSzkGzIwryyT9w7ppsZfrvdhEgpU1
+        CvVbeb1+V8VRryF0rtfXsRiz/tX5kbeNaIbViAt6lEitADJHoianGTvyLAizZrpPdjB0SFmWrUO/U
+        gzvEtNsQ==;
+Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nUZBu-00EArp-Lx; Wed, 16 Mar 2022 19:20:14 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: [PATCH 0/9] treewide: eliminate anonymous module_init & module_exit
+Date:   Wed, 16 Mar 2022 12:20:01 -0700
+Message-Id: <20220316192010.19001-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
- <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
- <YjA439FwajtHsahr@google.com> <YjEOiZCLBMgbw8oc@google.com>
-In-Reply-To: <YjEOiZCLBMgbw8oc@google.com>
-From:   Ivan Babrou <ivan@cloudflare.com>
-Date:   Wed, 16 Mar 2022 11:26:20 -0700
-Message-ID: <CABWYdi0jd_pG_qqAnnGK6otNNXeNoiAWtmC14Jv+tiSadJPw0w@mail.gmail.com>
-Subject: Re: zram corruption due to uninitialized do_swap_page fault
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Linux MM <linux-mm@kvack.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 15, 2022 at 3:09 PM Minchan Kim <minchan@kernel.org> wrote:
-> I think the problem with CLONE_VM is following race
->
-> CPU A                        CPU B
->
-> do_swap_page                do_swap_page
-> SWP_SYNCHRONOUS_IO path     SWP_SYNCHRONOUS_IO path
-> swap_readpage original data
->   swap_slot_free_notify
->     delete zram entry
->                             swap_readpage zero data
->                             pte_lock
->                             map the *zero data* to userspace
->                             pte_unlock
-> pte_lock
-> if (!pte_same)
->   goto out_nomap;
-> pte_unlock
-> return and next refault will
-> read zero data
->
-> So, CPU A and B see zero data. With patchset below, it changes
->
->
-> CPU A                        CPU B
->
-> do_swap_page                do_swap_page
-> SWP_SYNCHRONOUS_IO path     SWP_SYNCHRONOUS_IO path
->                             swap_readpage original data
->                             pte_lock
->                             map the original data
->                             swap_free
->                               swap_range_free
->                                 bd_disk->fops->swap_slot_free_notify
-> swap_readpage read zero data
->                             pte_unlock
-> pte_lock
-> if (!pte_same)
->   goto out_nomap;
-> pte_unlock
-> return and next refault will
-> read correct data again
->
-> Here, CPU A could read zero data from zram but that's not a bug
-> (IOW, warning injected doesn't mean bug).
->
-> The concern of the patch would increase memory size since it could
-> increase wasted memory with compressed form in zram and uncompressed
-> form in address space.  However, most of cases of zram uses no
-> readahead and then, do_swap_page is followed by swap_free so it will
-> free the compressed from in zram quickly.
->
-> Ivan, with this patch, you can see the warning you added in the zram
-> but it shouldn't trigger the userspace corruption as mentioned above
-> if I understand correctly.
->
-> Could you test whether the patch prevent userspace broken?
+There are a number of drivers that use "module_init(init)" and
+"module_exit(exit)", which are anonymous names and can lead to
+confusion or ambiguity when reading System.map, crashes/oops/bugs,
+or an initcall_debug log.
 
-I'm making an internal build and will push it to some location to see
-how it behaves, but it might take a few days to get any sort of
-confidence in the results (unless it breaks immediately).
+Give each of these init and exit functions unique driver-specific
+names to eliminate the anonymous names.
 
-I've also pushed my patch that disables SWP_SYNCHRONOUS_IO to a few
-locations yesterday to see how it fares.
+Example 1: (System.map)
+ ffffffff832fc78c t init
+ ffffffff832fc79e t init
+ ffffffff832fc8f8 t init
+ ffffffff832fca05 t init
+ ffffffff832fcbd2 t init
+ ffffffff83328f0e t init
+ ffffffff8332c5b1 t init
+ ffffffff8332d9eb t init
+ ffffffff8332f0aa t init
+ ffffffff83330e25 t init
+ ffffffff833317a5 t init
+ ffffffff8333dd6b t init
+
+Example 2: (initcall_debug log)
+ calling  init+0x0/0x12 @ 1
+ initcall init+0x0/0x12 returned 0 after 15 usecs
+ calling  init+0x0/0x60 @ 1
+ initcall init+0x0/0x60 returned 0 after 2 usecs
+ calling  init+0x0/0x9a @ 1
+ initcall init+0x0/0x9a returned 0 after 74 usecs
+ calling  init+0x0/0x73 @ 1
+ initcall init+0x0/0x73 returned 0 after 6 usecs
+ calling  init+0x0/0x73 @ 1
+ initcall init+0x0/0x73 returned 0 after 4 usecs
+ calling  init+0x0/0xf5 @ 1
+ initcall init+0x0/0xf5 returned 0 after 27 usecs
+ calling  init+0x0/0x7d @ 1
+ initcall init+0x0/0x7d returned 0 after 11 usecs
+ calling  init+0x0/0xc9 @ 1
+ initcall init+0x0/0xc9 returned 0 after 19 usecs
+ calling  init+0x0/0x9d @ 1
+ initcall init+0x0/0x9d returned 0 after 37 usecs
+ calling  init+0x0/0x63f @ 1
+ initcall init+0x0/0x63f returned 0 after 411 usecs
+ calling  init+0x0/0x171 @ 1
+ initcall init+0x0/0x171 returned 0 after 61 usecs
+ calling  init+0x0/0xef @ 1
+ initcall init+0x0/0xef returned 0 after 3 usecs
+
+Cc: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: Amit Shah <amit@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Eli Cohen <eli@mellanox.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>
+Cc: Leon Romanovsky <leon@kernel.org>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
+Cc: Florian Westphal <fw@strlen.de>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
+Cc: "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc: Felipe Balbi <felipe.balbi@linux.intel.com>
+Cc: Michał Mirosław <mirq-linux@rere.qmqm.pl>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Krzysztof Opasiak <k.opasiak@samsung.com>
+Cc: Igor Kotrasinski <i.kotrasinsk@samsung.com>
+Cc: Valentina Manea <valentina.manea.m@gmail.com>
+Cc: Shuah Khan <shuah@kernel.org>
+Cc: Shuah Khan <skhan@linuxfoundation.org>
+Cc: Jussi Kivilinna <jussi.kivilinna@mbnet.fi>
+Cc: Joachim Fritschi <jfritschi@freenet.de>
+Cc: Herbert Xu <herbert@gondor.apana.org.au>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Steven Rostedt <rostedt@goodmis.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Karol Herbst <karolherbst@gmail.com>
+Cc: Pekka Paalanen <ppaalanen@gmail.com>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Peter Zijlstra <peterz@infradead.org>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: "H. Peter Anvin" <hpa@zytor.com>
+Cc: netfilter-devel@vger.kernel.org
+Cc: coreteam@netfilter.org
+Cc: netdev@vger.kernel.org
+Cc: linux-block@vger.kernel.org
+Cc: linux-crypto@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+Cc: linux-scsi@vger.kernel.org
+Cc: linux-usb@vger.kernel.org
+Cc: nouveau@lists.freedesktop.org
+Cc: virtualization@lists.linux-foundation.org
+Cc: x86@kernel.org
+
+patches:
+ [PATCH 1/9] virtio_blk: eliminate anonymous module_init & module_exit
+ [PATCH 2/9] virtio_console: eliminate anonymous module_init & module_exit
+ [PATCH 3/9] net: mlx5: eliminate anonymous module_init & module_exit
+ [PATCH 4/9] netfilter: h323: eliminate anonymous module_init & module_exit
+ [PATCH 5/9] virtio-scsi: eliminate anonymous module_init & module_exit
+ [PATCH 6/9] usb: gadget: eliminate anonymous module_init & module_exit
+ [PATCH 7/9] usb: usbip: eliminate anonymous module_init & module_exit
+ [PATCH 8/9] x86/crypto: eliminate anonymous module_init & module_exit
+ [PATCH 9/9] testmmiotrace: eliminate anonymous module_init & module_exit
+
+diffstat:
+ arch/x86/crypto/blowfish_glue.c                |    8 ++++----
+ arch/x86/crypto/camellia_glue.c                |    8 ++++----
+ arch/x86/crypto/serpent_avx2_glue.c            |    8 ++++----
+ arch/x86/crypto/twofish_glue.c                 |    8 ++++----
+ arch/x86/crypto/twofish_glue_3way.c            |    8 ++++----
+ arch/x86/mm/testmmiotrace.c                    |    8 ++++----
+ drivers/block/virtio_blk.c                     |    8 ++++----
+ drivers/char/virtio_console.c                  |    8 ++++----
+ drivers/net/ethernet/mellanox/mlx5/core/main.c |    8 ++++----
+ drivers/scsi/virtio_scsi.c                     |    8 ++++----
+ drivers/usb/gadget/legacy/inode.c              |    8 ++++----
+ drivers/usb/gadget/legacy/serial.c             |   10 +++++-----
+ drivers/usb/gadget/udc/dummy_hcd.c             |    8 ++++----
+ drivers/usb/usbip/vudc_main.c                  |    8 ++++----
+ net/ipv4/netfilter/nf_nat_h323.c               |    8 ++++----
+ 15 files changed, 61 insertions(+), 61 deletions(-)
