@@ -2,25 +2,25 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4912C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2316FC43217
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:29:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353304AbiCPCa2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 22:30:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55210 "EHLO
+        id S1353294AbiCPCab (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 22:30:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353303AbiCPC3q (ORCPT
+        with ESMTP id S234713AbiCPC3q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Tue, 15 Mar 2022 22:29:46 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A0E5E5E763
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:27:17 -0700 (PDT)
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 852395F262
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:27:13 -0700 (PDT)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.53 with ESMTP; 16 Mar 2022 11:27:09 +0900
+        by 156.147.23.51 with ESMTP; 16 Mar 2022 11:27:11 +0900
 X-Original-SENDERIP: 156.147.1.151
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.151 with ESMTP; 16 Mar 2022 11:27:09 +0900
+        by 156.147.1.151 with ESMTP; 16 Mar 2022 11:27:11 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH RFC v5 04/21] dept: Apply Dept to spinlock
-Date:   Wed, 16 Mar 2022 11:26:16 +0900
-Message-Id: <1647397593-16747-5-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v5 18/21] dept: Disable Dept within the wait_bit layer by default
+Date:   Wed, 16 Mar 2022 11:26:30 +0900
+Message-Id: <1647397593-16747-19-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
 References: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
@@ -57,121 +57,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by spinlock.
+The struct wait_queue_head array, bit_wait_table[] in sched/wait_bit.c
+are shared by all its users, which unfortunately vary in terms of class.
+So each should've been assigned its own class to avoid false positives.
+
+It'd better let Dept work at a higher layer than wait_bit. So disabled
+Dept within the wait_bit layer by default.
+
+It's worth noting that Dept is still working with the other struct
+wait_queue_head ones that are mostly well-classified.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/lockdep.h            | 18 +++++++++++++++---
- include/linux/spinlock.h           | 25 +++++++++++++++++++++++++
- include/linux/spinlock_types_raw.h | 13 +++++++++++++
- 3 files changed, 53 insertions(+), 3 deletions(-)
+ kernel/sched/wait_bit.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 2aab445..01e7427 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -583,9 +583,21 @@ static inline void print_irqtrace_events(struct task_struct *curr)
- #define lock_acquire_shared(l, s, t, n, i)		lock_acquire(l, s, t, 1, 1, n, i)
- #define lock_acquire_shared_recursive(l, s, t, n, i)	lock_acquire(l, s, t, 2, 1, n, i)
+diff --git a/kernel/sched/wait_bit.c b/kernel/sched/wait_bit.c
+index 02ce292..3e5a3eb 100644
+--- a/kernel/sched/wait_bit.c
++++ b/kernel/sched/wait_bit.c
+@@ -3,6 +3,7 @@
+  * The implementation of the wait_bit*() and related waiting APIs:
+  */
+ #include "sched.h"
++#include <linux/dept.h>
  
--#define spin_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
--#define spin_acquire_nest(l, s, t, n, i)	lock_acquire_exclusive(l, s, t, n, i)
--#define spin_release(l, i)			lock_release(l, i)
-+#define spin_acquire(l, s, t, i)					\
-+do {									\
-+	lock_acquire_exclusive(l, s, t, NULL, i);			\
-+	dept_spin_lock(&(l)->dmap, s, t, NULL, "spin_unlock", i);	\
-+} while (0)
-+#define spin_acquire_nest(l, s, t, n, i)				\
-+do {									\
-+	lock_acquire_exclusive(l, s, t, n, i);				\
-+	dept_spin_lock(&(l)->dmap, s, t, (n) ? &(n)->dmap : NULL, "spin_unlock", i); \
-+} while (0)
-+#define spin_release(l, i)						\
-+do {									\
-+	lock_release(l, i);						\
-+	dept_spin_unlock(&(l)->dmap, i);				\
-+} while (0)
+ #define WAIT_TABLE_BITS 8
+ #define WAIT_TABLE_SIZE (1 << WAIT_TABLE_BITS)
+@@ -246,6 +247,8 @@ void __init wait_bit_init(void)
+ {
+ 	int i;
  
- #define rwlock_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
- #define rwlock_acquire_read(l, s, t, i)					\
-diff --git a/include/linux/spinlock.h b/include/linux/spinlock.h
-index 5c0c517..0e2c28d 100644
---- a/include/linux/spinlock.h
-+++ b/include/linux/spinlock.h
-@@ -95,6 +95,31 @@
- # include <linux/spinlock_up.h>
- #endif
- 
-+#ifdef CONFIG_DEPT
-+#define dept_spin_lock(m, ne, t, n, e_fn, ip)				\
-+do {									\
-+	if (t) {							\
-+		dept_ecxt_enter(m, 1UL, ip, __func__, e_fn, ne);	\
-+		dept_ask_event(m);					\
-+	} else if (n) {							\
-+		dept_ecxt_enter_nokeep(m);				\
-+		dept_ask_event(m);					\
-+	} else {							\
-+		dept_wait(m, 1UL, ip, __func__, ne);			\
-+		dept_ecxt_enter(m, 1UL, ip, __func__, e_fn, ne);	\
-+		dept_ask_event(m);					\
-+	}								\
-+} while (0)
-+#define dept_spin_unlock(m, ip)						\
-+do {									\
-+	dept_event(m, 1UL, ip, __func__);				\
-+	dept_ecxt_exit(m, 1UL, ip);					\
-+} while (0)
-+#else
-+#define dept_spin_lock(m, ne, t, n, e_fn, ip)	do { } while (0)
-+#define dept_spin_unlock(m, ip)			do { } while (0)
-+#endif
-+
- #ifdef CONFIG_DEBUG_SPINLOCK
-   extern void __raw_spin_lock_init(raw_spinlock_t *lock, const char *name,
- 				   struct lock_class_key *key, short inner);
-diff --git a/include/linux/spinlock_types_raw.h b/include/linux/spinlock_types_raw.h
-index 91cb36b..5a9b25d 100644
---- a/include/linux/spinlock_types_raw.h
-+++ b/include/linux/spinlock_types_raw.h
-@@ -26,16 +26,28 @@
- 
- #define SPINLOCK_OWNER_INIT	((void *)-1L)
- 
-+#ifdef CONFIG_DEPT
-+# define RAW_SPIN_DMAP_INIT(lockname)	.dmap = { .name = #lockname },
-+# define SPIN_DMAP_INIT(lockname)	.dmap = { .name = #lockname },
-+# define LOCAL_SPIN_DMAP_INIT(lockname)	.dmap = { .name = #lockname },
-+#else
-+# define RAW_SPIN_DMAP_INIT(lockname)
-+# define SPIN_DMAP_INIT(lockname)
-+# define LOCAL_SPIN_DMAP_INIT(lockname)
-+#endif
-+
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- # define RAW_SPIN_DEP_MAP_INIT(lockname)		\
- 	.dep_map = {					\
- 		.name = #lockname,			\
- 		.wait_type_inner = LD_WAIT_SPIN,	\
-+		RAW_SPIN_DMAP_INIT(lockname)		\
- 	}
- # define SPIN_DEP_MAP_INIT(lockname)			\
- 	.dep_map = {					\
- 		.name = #lockname,			\
- 		.wait_type_inner = LD_WAIT_CONFIG,	\
-+		SPIN_DMAP_INIT(lockname)		\
- 	}
- 
- # define LOCAL_SPIN_DEP_MAP_INIT(lockname)		\
-@@ -43,6 +55,7 @@
- 		.name = #lockname,			\
- 		.wait_type_inner = LD_WAIT_CONFIG,	\
- 		.lock_type = LD_LOCK_PERCPU,		\
-+		LOCAL_SPIN_DMAP_INIT(lockname)		\
- 	}
- #else
- # define RAW_SPIN_DEP_MAP_INIT(lockname)
+-	for (i = 0; i < WAIT_TABLE_SIZE; i++)
++	for (i = 0; i < WAIT_TABLE_SIZE; i++) {
+ 		init_waitqueue_head(bit_wait_table + i);
++		dept_map_nocheck(&(bit_wait_table + i)->dmap);
++	}
+ }
 -- 
 1.9.1
 
