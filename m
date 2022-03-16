@@ -2,149 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 548A7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 19:20:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1CAC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 19:46:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357424AbiCPTVj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 15:21:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51048 "EHLO
+        id S1351285AbiCPTrc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 15:47:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230130AbiCPTVh (ORCPT
+        with ESMTP id S1344900AbiCPTrc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 15:21:37 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 710C65FF32;
-        Wed, 16 Mar 2022 12:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=bxcgHAl0Vjaoi9igyOuuv3t+bDn9tO/RrS7lBi/KU+M=; b=f6hRy706t/BpNpFO1C9Km2RrDC
-        QpQAZACubPMNHVjc1Qg4uTBS8JBsSkx6wWoOO6MkPJLDnRMPb4gvs6j+IxwOBV3OSeMK+SM4Bc/qr
-        cbVKkVwZ7HPLsk4PUNHYTJtLurqFWxXaUdf1VQas1wSqg474f4RVgG74C1IMA8nhCoibwkT0pOmOU
-        GBglyb2fZdt3taUHK7+NnvqDf/kegkuSfBz7kIBCvuVIgmTmTlKHaYbML2syZZpq1QELYE2/RzZoa
-        l0az3lska8YewVS5FuOdlrR7fZdGroVN4nksyhhqrm4CGqbCEJyDuxhNl+9rqNtKe/b3GXlgFM8kV
-        vY7z0i7Q==;
-Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUZBy-00EArp-Bl; Wed, 16 Mar 2022 19:20:18 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?UTF-8?q?Micha=C5=82=20Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: [PATCH 2/9] virtio_console: eliminate anonymous module_init & module_exit
-Date:   Wed, 16 Mar 2022 12:20:03 -0700
-Message-Id: <20220316192010.19001-3-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220316192010.19001-1-rdunlap@infradead.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
+        Wed, 16 Mar 2022 15:47:32 -0400
+Received: from mail-qt1-x829.google.com (mail-qt1-x829.google.com [IPv6:2607:f8b0:4864:20::829])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E9A3286D9
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 12:46:17 -0700 (PDT)
+Received: by mail-qt1-x829.google.com with SMTP id s11so2733829qtc.3
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 12:46:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=E10/RHxqxdnO02yRvPfaNr/v1jdUvJvGTwpcCM2UuCE=;
+        b=fB361frlMZcmPFNRJnWIY0N33kIHBkuzrYHZNokfoqCoIzuZEL0MDnT3DmDnAo37Jw
+         fPQu/v32EjcIBE/hNQPZr9Shi2+Jtq4zrV/0lCwUNcHOXPWX6IHLl9BTBQZSmJ3H1Mgq
+         CecWI2kv9rrCpqL+b+spCjWoBlrunZlxpEvQAoSThY/Oj0WOshxw3phyvhfNkFPRiong
+         l8CcCWsIwg02zaY9Fjb+60SVFPzp8U17cxiG4fb2JMEMx/FnQvbtXMsuIRuhHx+k5+wR
+         yyLIKC8meKzEVsJK9OJL1fGNJGstG4eX7Zvo6by02gx6PkRMmQxxsnYadDeyre6672oh
+         LY5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=E10/RHxqxdnO02yRvPfaNr/v1jdUvJvGTwpcCM2UuCE=;
+        b=c66HzRS0G3qGjUeWAtb8TYQBEkGqxdM3HJ4TNFtYewYg7/6hWVUJ8A6r+Z7cnRcUBk
+         cCmhvvRQQhoHHImVVa/RI1zo4xdC2XnBCIWAYMxsGkB5fVjsUNbnS8iSfQ/NPiu/SI3e
+         PmdF91esQ7xxle0rYjg9gBJeGBwmcPkEjv7BOOZRzSY/1pCNXLjG9LBqEcr7A2JTRLhp
+         w341HbqOEnO42FKNLFoHpwYzI8J3zDSpOSmj6PTmDPD6JUPvGBvIjt/JshSDRlqRXfVl
+         QHfWmSnTk8DXcxB/gUiuQkh1hg8DZ6uJTaBIBCsdy8iqSYBl9Tf/nyMCk4FW5R2ohj0a
+         79pw==
+X-Gm-Message-State: AOAM532QUOjngj7pVqiEPFI6U4he15i/DBsJxkFI0BuP9fC8wyZMYAa2
+        In2WU7c8hB9puqlitgSo85ubWw==
+X-Google-Smtp-Source: ABdhPJzdid00/41lxSbckANfhz3hmgkLiL0sjFGBBL7VjSFouD738FwEvMgn4bxoZSVrvIQ/cKsiQg==
+X-Received: by 2002:a05:622a:490:b0:2e1:cd32:f3da with SMTP id p16-20020a05622a049000b002e1cd32f3damr1206863qtx.339.1647459976253;
+        Wed, 16 Mar 2022 12:46:16 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id a14-20020a05620a066e00b0067d36cc5b12sm1253247qkh.87.2022.03.16.12.46.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Mar 2022 12:46:15 -0700 (PDT)
+Date:   Wed, 16 Mar 2022 15:46:14 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Qu Wenruo <wqu@suse.com>
+Cc:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com
+Subject: Re: [PATCH 11/17] btrfs: make dec_and_test_compressed_bio() to be
+ split bio compatible
+Message-ID: <YjI+hkhhTTWMmPkz@localhost.localdomain>
+References: <20211201051756.53742-1-wqu@suse.com>
+ <20211201051756.53742-12-wqu@suse.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211201051756.53742-12-wqu@suse.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Eliminate anonymous module_init() and module_exit(), which can lead to
-confusion or ambiguity when reading System.map, crashes/oops/bugs,
-or an initcall_debug log.
+On Wed, Dec 01, 2021 at 01:17:50PM +0800, Qu Wenruo wrote:
+> For compression read write endio functions, they all rely on
+> dec_and_test_compressed_bio() to determine if they are the last bio.
+> 
+> So here we only need to convert the bio_for_each_segment_all() call into
+> __bio_for_each_segment() so that compression read/write endio functions
+> will handle both split and unsplit bios well.
+> 
+> Signed-off-by: Qu Wenruo <wqu@suse.com>
+> ---
+>  fs/btrfs/compression.c | 14 +++++---------
+>  1 file changed, 5 insertions(+), 9 deletions(-)
+> 
+> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
+> index 8668c5190805..8b4b84b59b0c 100644
+> --- a/fs/btrfs/compression.c
+> +++ b/fs/btrfs/compression.c
+> @@ -205,18 +205,14 @@ static int check_compressed_csum(struct btrfs_inode *inode, struct bio *bio,
+>  static bool dec_and_test_compressed_bio(struct compressed_bio *cb, struct bio *bio)
+>  {
+>  	struct btrfs_fs_info *fs_info = btrfs_sb(cb->inode->i_sb);
+> +	struct bio_vec bvec;
+> +	struct bvec_iter iter;
+>  	unsigned int bi_size = 0;
+>  	bool last_io = false;
+> -	struct bio_vec *bvec;
+> -	struct bvec_iter_all iter_all;
+>  
+> -	/*
+> -	 * At endio time, bi_iter.bi_size doesn't represent the real bio size.
+> -	 * Thus here we have to iterate through all segments to grab correct
+> -	 * bio size.
+> -	 */
+> -	bio_for_each_segment_all(bvec, bio, iter_all)
+> -		bi_size += bvec->bv_len;
+> +	ASSERT(btrfs_bio(bio)->iter.bi_size);
 
-Give each of these init and exit functions unique driver-specific
-names to eliminate the anonymous names.
+We're tripping this assert with generic/476 with -o compress, so I assume
+there's some error condition that isn't being handled properly.  Thanks,
 
-Example 1: (System.map)
- ffffffff832fc78c t init
- ffffffff832fc79e t init
- ffffffff832fc8f8 t init
-
-Example 2: (initcall_debug log)
- calling  init+0x0/0x12 @ 1
- initcall init+0x0/0x12 returned 0 after 15 usecs
- calling  init+0x0/0x60 @ 1
- initcall init+0x0/0x60 returned 0 after 2 usecs
- calling  init+0x0/0x9a @ 1
- initcall init+0x0/0x9a returned 0 after 74 usecs
-
-Fixes: 31610434bc35 ("Virtio console driver")
-Fixes: 7177876fea83 ("virtio: console: Add ability to remove module")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Cc: Amit Shah <amit@kernel.org>
-Cc: virtualization@lists.linux-foundation.org
-Cc: Arnd Bergmann <arnd@arndb.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/char/virtio_console.c |    8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
-
---- lnx-517-rc8.orig/drivers/char/virtio_console.c
-+++ lnx-517-rc8/drivers/char/virtio_console.c
-@@ -2245,7 +2245,7 @@ static struct virtio_driver virtio_rproc
- 	.remove =	virtcons_remove,
- };
- 
--static int __init init(void)
-+static int __init virtio_console_init(void)
- {
- 	int err;
- 
-@@ -2280,7 +2280,7 @@ free:
- 	return err;
- }
- 
--static void __exit fini(void)
-+static void __exit virtio_console_fini(void)
- {
- 	reclaim_dma_bufs();
- 
-@@ -2290,8 +2290,8 @@ static void __exit fini(void)
- 	class_destroy(pdrvdata.class);
- 	debugfs_remove_recursive(pdrvdata.debugfs_dir);
- }
--module_init(init);
--module_exit(fini);
-+module_init(virtio_console_init);
-+module_exit(virtio_console_fini);
- 
- MODULE_DESCRIPTION("Virtio console driver");
- MODULE_LICENSE("GPL");
+Josef
