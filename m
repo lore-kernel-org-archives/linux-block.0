@@ -2,166 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FC6BC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 06:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5A0C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 06:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236709AbiCPGlh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 02:41:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41850 "EHLO
+        id S1346570AbiCPG43 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 02:56:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345476AbiCPGlh (ORCPT
+        with ESMTP id S239264AbiCPG42 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 02:41:37 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AABFD61A04;
-        Tue, 15 Mar 2022 23:40:23 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id bx5so1370544pjb.3;
-        Tue, 15 Mar 2022 23:40:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cebtj685AgXtmcsyJeJda1YE4pGqoQ5q0ZmxYFaVukE=;
-        b=cId/x0+Y02qWXqJjrz+j5kvVvjxdnNmc0MoDuR/QRitRTBb8lAiXSPTt9b0VDMtSnb
-         b8Ou6vIS2LpElxp8a6yllSdCrQNVa9igL0DUprJyPMDGxp9cQ/fVV/Khp28zOUU34on4
-         YWwfdNgu8tLoroJKovuXnmu0jWgktPHRLbObM3zZ1qKW989xbevFIQkprSy8ZZTYJcKY
-         vfEWFWIjbMPCdp17om0vTPiUNdVJt9Xftw0t5JrRWO2Rsm4KwgxSBl/7iTa3FDA8WrYw
-         RVlQNOCI6HkeyLr94RPj7LYj/b0Rv+7aSTQeGA4sSocOD7RRJnYUaXjfXxi+UFq/CT+o
-         bYRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cebtj685AgXtmcsyJeJda1YE4pGqoQ5q0ZmxYFaVukE=;
-        b=C1XOk8gHy9yJBBU+69K8vp/PAY36VlUMvULZKd6DsM+wVUA4u+YwE/2D10KJKvkrEG
-         mUtvbtgR0u54iaSNHeP0Vu+r4UjBcu0atgrCxyRubLj1qLNFNIcPlS3B5Kj1/6G/g6+v
-         BjyLOTcmxyrGp4y3Q9xb5dCIwP4C5Ffb39N5za15UDe3Vq7K2XX/VPqPGEHKdEu6MNA7
-         jFiVX+EtwM5CL+aKAItEP6HQypwZhd07ADRzPiBHt754G8+fWipqiDr42c392zwyoNFt
-         U7i1qZz5Gx6rXyIrE1dEMYhmu8kVALk+7kkrCbjJ6i3OlEwir3h0aviuYH17P8I+Nkyc
-         wTSw==
-X-Gm-Message-State: AOAM533tlmRJmNECjleYl5g1wdAHXEBepaUXrU9dyPtb/8h3l1YpXZGG
-        rCrpfa15EyPDRuMUApeFYB8=
-X-Google-Smtp-Source: ABdhPJxngJoehZOIScA2hpCHNvTTlrD0qoP4/ZWAWYTzYBjd/Me9vnzrVK/QMH+SLwT2jRid5JAoWw==
-X-Received: by 2002:a17:903:2312:b0:153:1d6f:83a3 with SMTP id d18-20020a170903231200b001531d6f83a3mr30327619plh.157.1647412823092;
-        Tue, 15 Mar 2022 23:40:23 -0700 (PDT)
-Received: from localhost.localdomain ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id m79-20020a628c52000000b004f6f249d298sm1323485pfd.80.2022.03.15.23.40.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 15 Mar 2022 23:40:22 -0700 (PDT)
-From:   cgel.zte@gmail.com
-X-Google-Original-From: yang.yang29@zte.com.cn
-To:     axboe@kernel.dk, viro@zeniv.linux.org.uk, hannes@cmpxchg.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-        Yang Yang <yang.yang29@zte.com.cn>,
-        Ran Xiaokai <ran.xiaokai@zte.com.cn>
-Subject: [PATCH] block/psi: make PSI annotations of submit_bio only work for file pages
-Date:   Wed, 16 Mar 2022 06:39:28 +0000
-Message-Id: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
-X-Mailer: git-send-email 2.25.1
+        Wed, 16 Mar 2022 02:56:28 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19E095EBCF
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 23:55:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1647413714; x=1678949714;
+  h=message-id:date:mime-version:subject:to:references:from:
+   in-reply-to:content-transfer-encoding;
+  bh=Nh3QpcN3O3uzkHoTd6unJET9stO5ehOKv8zxVHcnBhs=;
+  b=TI+UUXLTj7UqzwnjxmC79uXf+4r6Qbvh64M2wGCt2j5+NrTIAwaMjalL
+   voKnNyko+P5+owr8jC9VmdAD9VwuHZtrJaVCBREfJaBXh5d+vj7/lF1ck
+   PM4dGrZJ9Bi8j8HakL6a5EV6W+lrX5vxT8BEBM3zskJX+L4dD9o405rIo
+   JAH3j4mYiz2+ub2RaOG0BqtjRCRyRLR0otLAnFLkqTRNcRhX5TtnyPruA
+   PemIdWs+SXljVQbjNjLI1m//pphnDQSR13tqDwFjKq+AGiL8nvvg8CFAp
+   QPsQoGZeYi9wOOpMi+e9jHBoNzDa2GJ/Qqql6ErP+ZwfTKKwHamHCfS1h
+   w==;
+X-IronPort-AV: E=Sophos;i="5.90,186,1643644800"; 
+   d="scan'208";a="307434834"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Mar 2022 14:55:14 +0800
+IronPort-SDR: zo2rmN6Eub8Ss9V0X/VUNvz8c9QY27segTT8BOo35AnDeE8MegUplxCXCQU6xWDxR8viOCtDJi
+ fByiZnbJbbK6SgJVm9u8QH/ha902JWrzZ5fXSodJ2rJ+jXxP1u3Lioyo8OAoqgjuveDXenaiGS
+ zFjb6kbQTktbuVAz48oApYIAiv7Q3q6OqLKpQP1M1/Dn9aHGeyL3rAEX/bILTV2AFe9PLFyv0q
+ UsA69QlalTscL74LL25ejDbjDM3xTXt4DljoYVhisANvSMZ6ym0Bf6JFzi8+ZelS7w/hpNl0uh
+ 9Ddbc1KOy5LDCq0Cy3bJOEG9
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 23:27:19 -0700
+IronPort-SDR: 4Kp92/XGqvbd9Gu5uK3LsaoLhQndj02EouzU96+VWW3gqTlxTILHtbEeBEZY59EgU5qGur1SVK
+ eHxLdjkSvi9g7G+yr8UMXCyU3HRKuycOt9Q+fYCVsRaqRoD1t5ODqXFSvv8AKhS2DPfboiJa0V
+ 22/xf//o9iqPkHbhd8qxGD51033IgtYw0PY2RLxLtI4ReFDIlMqRL9iyxRmKwe7rejNA9h/JOa
+ +GO4acFBmeSSSxrx1DVviJl1qonF79ZWmyBJVVqcT/GSUjqBQZ7dl7UTijaReslgidhgYtWRUn
+ rwE=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2022 23:55:15 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KJLcy21RHz1Rwrw
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 23:55:14 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1647413713; x=1650005714; bh=Nh3QpcN3O3uzkHoTd6unJET9stO5ehOKv8z
+        xVHcnBhs=; b=qKCVuuyUUBxlPddsS75RbCM+lcynigkPn6FlKZeLtPQgVyipkL3
+        qQGVkNZ1nvn5jPnoDrbnZffoNvakUi7QrYtT5l1qfcpfufnY6G7nc5hY8BUfUaI2
+        YH09jEtlfiK11UDTu29eUmrTZ/g6ZvzBFFEXtE+GofuCQZbxqFSflT4KLAnmXm4+
+        yJfX5kBdn7NDPdjR0LP6XFT/U/a1ML0UEQK5THyFJZoexbIYLxYrivrJXNvmvLyJ
+        Xrr9OTPOPKAT3GA8r/OXAFuyei6b/qmk2M/CLgCu6SzkQI8tFzpZJAFKGzbY67e7
+        QA1vcN2rYnXD487En3PCEWh4Xf3lXu1sV6w==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id BfmJs81hHddl for <linux-block@vger.kernel.org>;
+        Tue, 15 Mar 2022 23:55:13 -0700 (PDT)
+Received: from [10.225.163.101] (unknown [10.225.163.101])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KJLcx0LpWz1Rvlx;
+        Tue, 15 Mar 2022 23:55:12 -0700 (PDT)
+Message-ID: <c6e917ca-0192-4ef1-5483-284b2007ecf4@opensource.wdc.com>
+Date:   Wed, 16 Mar 2022 15:55:11 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH] block: limit request dispatch loop duration
+Content-Language: en-US
+To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220316061134.3812309-1-shinichiro.kawasaki@wdc.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220316061134.3812309-1-shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yang Yang <yang.yang29@zte.com.cn>
+On 3/16/22 15:11, Shin'ichiro Kawasaki wrote:
+> When IO requests are made continuously and the target block device
+> handles requests faster than request arrival, the request dispatch loop
+> keeps on repeating to dispatch the arriving requests very long time,
+> more than a minute. Since the loop runs as a workqueue worker task, the
+> very long loop duration triggers workqueue watchdog timeout and BUG [1].
+> 
+> To avoid the very long loop duration, break the loop periodically. When
+> opportunity to dispatch requests still exists, check need_resched(). If
+> need_resched() returns true, the dispatch loop already consumed its time
+> slice, then reschedule the dispatch work and break the loop. With heavy
+> IO load, need_resched() does not return true for 20~30 seconds. To cover
+> such case, check time spent in the dispatch loop with jiffies. If more
+> than 1 second is spent, reschedule the dispatch work and break the loop.
+> 
+> [1]
+> 
+> [  609.691437] BUG: workqueue lockup - pool cpus=10 node=1 flags=0x0 nice=-20 stuck for 35s!
+> [  609.701820] Showing busy workqueues and worker pools:
+> [  609.707915] workqueue events: flags=0x0
+> [  609.712615]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
+> [  609.712626]     pending: drm_fb_helper_damage_work [drm_kms_helper]
+> [  609.712687] workqueue events_freezable: flags=0x4
+> [  609.732943]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
+> [  609.732952]     pending: pci_pme_list_scan
+> [  609.732968] workqueue events_power_efficient: flags=0x80
+> [  609.751947]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
+> [  609.751955]     pending: neigh_managed_work
+> [  609.752018] workqueue kblockd: flags=0x18
+> [  609.769480]   pwq 21: cpus=10 node=1 flags=0x0 nice=-20 active=3/256 refcnt=4
+> [  609.769488]     in-flight: 1020:blk_mq_run_work_fn
+> [  609.769498]     pending: blk_mq_timeout_work, blk_mq_run_work_fn
+> [  609.769744] pool 21: cpus=10 node=1 flags=0x0 nice=-20 hung=35s workers=2 idle: 67
+> [  639.899730] BUG: workqueue lockup - pool cpus=10 node=1 flags=0x0 nice=-20 stuck for 66s!
+> [  639.909513] Showing busy workqueues and worker pools:
+> [  639.915404] workqueue events: flags=0x0
+> [  639.920197]   pwq 0: cpus=0 node=0 flags=0x0 nice=0 active=1/256 refcnt=2
+> [  639.920215]     pending: drm_fb_helper_damage_work [drm_kms_helper]
+> [  639.920365] workqueue kblockd: flags=0x18
+> [  639.939932]   pwq 21: cpus=10 node=1 flags=0x0 nice=-20 active=3/256 refcnt=4
+> [  639.939942]     in-flight: 1020:blk_mq_run_work_fn
+> [  639.939955]     pending: blk_mq_timeout_work, blk_mq_run_work_fn
+> [  639.940212] pool 21: cpus=10 node=1 flags=0x0 nice=-20 hung=66s workers=2 idle: 67
+> 
+> Fixes: 6e6fcbc27e778 ("blk-mq: support batching dispatch in case of io")
+> Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> Cc: stable@vger.kernel.org # v5.10+
+> Link: https://lore.kernel.org/linux-block/20220310091649.zypaem5lkyfadymg@shindev/
+> Reviewed-by: Ming Lei <ming.lei@redhat.com>
+> Tested-by: Ming Lei <ming.lei@redhat.com>
+> ---
+>  block/blk-mq-sched.c | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
+> diff --git a/block/blk-mq-sched.c b/block/blk-mq-sched.c
+> index 55488ba97823..64941615befc 100644
+> --- a/block/blk-mq-sched.c
+> +++ b/block/blk-mq-sched.c
+> @@ -181,9 +181,15 @@ static int __blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  static int blk_mq_do_dispatch_sched(struct blk_mq_hw_ctx *hctx)
+>  {
+>  	int ret;
+> +	unsigned long end = jiffies + HZ;
+>  
+>  	do {
+>  		ret = __blk_mq_do_dispatch_sched(hctx);
+> +		if (ret == 1 &&
+> +		    (need_resched() || time_is_after_jiffies(end))) {
+> +			blk_mq_delay_run_hw_queue(hctx, 0);
+> +			break;
 
-psi tracks the time spent on submitting the IO of refaulting file pages
-and anonymous pages[1]. But after we tracks refaulting anonymous pages
-in swap_readpage[2][3], there is no need to track refaulting anonymous
-pages in submit_bio.
+Minor nit: you could "return 1;" directly here.
 
-So this patch can reduce redundant calling of psi_memstall_enter. And
-make it easier to track refaulting file pages and anonymous pages
-separately.
+> +		}
+>  	} while (ret == 1);
+>  
+>  	return ret;
 
-[1] commit b8e24a9300b0 ("block: annotate refault stalls from IO submission")
-[2] commit 937790699be9 ("mm/page_io.c: annotate refault stalls from swap_readpage")
-[3] commit 2b413a1a728f ("mm: page_io: fix psi memory pressure error on cold swapins")
+Otherwise, looks good.
 
-Signed-off-by: Yang Yang <yang.yang29@zte.com.cn>
-Reviewed-by: Ran Xiaokai <ran.xiaokai@zte.com.cn>
----
- block/bio.c               | 9 +++++----
- block/blk-core.c          | 2 +-
- fs/direct-io.c            | 2 +-
- include/linux/blk_types.h | 2 +-
- 4 files changed, 8 insertions(+), 7 deletions(-)
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-diff --git a/block/bio.c b/block/bio.c
-index 3c57b3ba727d..54b60be4f3b0 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1035,8 +1035,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
- 	bio->bi_iter.bi_size += len;
- 	bio->bi_vcnt++;
- 
--	if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
--		bio_set_flag(bio, BIO_WORKINGSET);
-+	if (!bio_flagged(bio, BIO_WORKINGSET_FILE) &&
-+	    unlikely(PageWorkingset(page)) && !PageSwapBacked(page))
-+		bio_set_flag(bio, BIO_WORKINGSET_FILE);
- }
- EXPORT_SYMBOL_GPL(__bio_add_page);
- 
-@@ -1254,7 +1255,7 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
-  * is returned only if 0 pages could be pinned.
-  *
-  * It's intended for direct IO, so doesn't do PSI tracking, the caller is
-- * responsible for setting BIO_WORKINGSET if necessary.
-+ * responsible for setting BIO_WORKINGSET_FILE if necessary.
-  */
- int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- {
-@@ -1274,7 +1275,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
- 
- 	/* don't account direct I/O as memory stall */
--	bio_clear_flag(bio, BIO_WORKINGSET);
-+	bio_clear_flag(bio, BIO_WORKINGSET_FILE);
- 	return bio->bi_vcnt ? 0 : ret;
- }
- EXPORT_SYMBOL_GPL(bio_iov_iter_get_pages);
-diff --git a/block/blk-core.c b/block/blk-core.c
-index ddac62aebc55..9a955323734b 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -918,7 +918,7 @@ void submit_bio(struct bio *bio)
- 	 * part of overall IO time.
- 	 */
- 	if (unlikely(bio_op(bio) == REQ_OP_READ &&
--	    bio_flagged(bio, BIO_WORKINGSET))) {
-+	    bio_flagged(bio, BIO_WORKINGSET_FILE))) {
- 		unsigned long pflags;
- 
- 		psi_memstall_enter(&pflags);
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index aef06e607b40..7cdec50fb27b 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -420,7 +420,7 @@ static inline void dio_bio_submit(struct dio *dio, struct dio_submit *sdio)
- 
- 	bio->bi_private = dio;
- 	/* don't account direct I/O as memory stall */
--	bio_clear_flag(bio, BIO_WORKINGSET);
-+	bio_clear_flag(bio, BIO_WORKINGSET_FILE);
- 
- 	spin_lock_irqsave(&dio->bio_lock, flags);
- 	dio->refcount++;
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 0c7a9a1f06c8..a1aaba4767e9 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -314,7 +314,7 @@ enum {
- 	BIO_NO_PAGE_REF,	/* don't put release vec pages */
- 	BIO_CLONED,		/* doesn't own data */
- 	BIO_BOUNCED,		/* bio is a bounce bio */
--	BIO_WORKINGSET,		/* contains userspace workingset pages */
-+	BIO_WORKINGSET_FILE,	/* contains userspace workingset file pages */
- 	BIO_QUIET,		/* Make BIO Quiet */
- 	BIO_CHAIN,		/* chained bio, ->bi_remaining in effect */
- 	BIO_REFFED,		/* bio has elevated ->bi_cnt */
 -- 
-2.25.1
-
+Damien Le Moal
+Western Digital Research
