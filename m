@@ -2,110 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B1BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 14:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B931C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 15:33:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237596AbiCPOwL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 10:52:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40884 "EHLO
+        id S232387AbiCPPeO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 11:34:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236677AbiCPOwK (ORCPT
+        with ESMTP id S239882AbiCPPeN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 10:52:10 -0400
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A45A35F4C6;
-        Wed, 16 Mar 2022 07:50:56 -0700 (PDT)
-Received: by mail-wr1-f45.google.com with SMTP id x15so3286264wru.13;
-        Wed, 16 Mar 2022 07:50:56 -0700 (PDT)
+        Wed, 16 Mar 2022 11:34:13 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E6464C5
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 08:32:57 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id t187so498700pgb.1
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 08:32:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=rnmipZJmwwd9sb/WiPh6QaespcJoC4jwrIz9QyEhPMs=;
+        b=AWVDfJdkIC6Zzq9kh2L5pNVzRnxx1dgr4jBmrOS3T0JQvBto6nLV8dc3xbynxSeyOw
+         ZPKVJ2zwJlPli7Af1V6rGGcQisBKYd+JOnscSYe04mUtissjRgBDEYvPVaK3Us5CqLsu
+         4EGohBkuM7XTXan2OTIKDPFRffhsS8/jygeqdsMrMggVYjIRGEfW4jkMJ7S/TbrXB59r
+         H+UASXthXBIcsLIqroNDSBar80AaPKfWazl5ZIQFq8QN2g/ExQBA3ZCifNrVoAqdMG4R
+         2sa9/91kxwLKx4+QP9vdj5d/0po40pHej5fhz9Uvl0KRq3R0AikXs5wTmNERTZoePP3g
+         fBgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bI4ZhjQL8dIuJvz21TfUD5JbGeAx7Qdq2Uugzf6XgB0=;
-        b=T8eaUq22SmrqQEkehJYK1KwHHKCraiQH+4hHcqgNBQs+Scx79ozCBs1JN48AnC9eP1
-         5EUEn4qjPWOW2TbrGeYkC2iLd0GC6DDMqbvmjsWZnf3XbKjH4Luhifn4MOmifOlTfCWR
-         nu7xZ4PzuwCbBITZUatpCMQA/OdZMGPyTZSbip6YaX7d9Q6Dr8fG433rs7yAS1B31FF7
-         mflix6gZ/mx7PVKzRv76SOvWLGJBCT09PPCaLwIqvxFjQYSzlPS2I0dGL6u6jCHLj20b
-         36K3MSO1TOnq5ci4kDV8DMTPYs3I/5QsdLcVr+dKc9DA3jWLIKuOi4zYvGxlGLWPjAyM
-         I80g==
-X-Gm-Message-State: AOAM533EY5CgNqtUTieYVFhwclZbpMGUF4U7O54hDoSm6lirKT40g63Y
-        i84O2P/Wwrm6e8rb6mlRS38=
-X-Google-Smtp-Source: ABdhPJzrRH5zBsn9fYkNcZjd08EnDBOCdVlS4Q3hFeb7W2Pq1bG2CpbUzWEW5D36WNgcL+UcKvbCng==
-X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id r11-20020a5d6c6b000000b001ea77eadde8mr271610wrz.690.1647442255234;
-        Wed, 16 Mar 2022 07:50:55 -0700 (PDT)
-Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id r4-20020a05600c35c400b00389f368cf1esm513959wmq.40.2022.03.16.07.50.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 16 Mar 2022 07:50:54 -0700 (PDT)
-Message-ID: <28b53100-9930-92d4-ba3b-f9c5e8773808@grimberg.me>
-Date:   Wed, 16 Mar 2022 16:50:53 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=rnmipZJmwwd9sb/WiPh6QaespcJoC4jwrIz9QyEhPMs=;
+        b=e0V8TMWX5F3fhpsNSncgiNOVSUO6nUpQAh2YAEsrs2IhgLHyLUggu6w3D8AkgYZFhD
+         xZIkiG6xrkAbi1+5lj6GWe18+4wg3ZaUkS2nZc2zZG2ZEg5yQLrp56Ox3IDqFOe6V5dL
+         mHqdx51UvXaDrZLYqfH8tEWwDZ4dxT4NVtzwV354DGQSwX3aNJxbejUPFNmQUWzbdqg6
+         vmMFPTIqkO5QfiRt2vLVbdjD1mfSK13s2ZctpIfWcS3DRhJuqqGPZAyD6lVHwijlXmHr
+         O75ZogGaKn5mf+TrlO2eP6sDki5L03c93zCBXwU5i1F/GXXNgwJq71MS4ARVvizdj8F7
+         w5+Q==
+X-Gm-Message-State: AOAM533wU9EbJWOXGSFv2x96EoW4+QDYRiUDj3UvzqD6/5G0Gu3JZfXm
+        0SBxu+3gg+C321Ywa3JftDY=
+X-Google-Smtp-Source: ABdhPJwadgEWXpq/oaf+CfhRVgSj/2ZKwEVchkeNCdBRyGf7kRZkoCaRfUrH+5byFGICg7mWq3UtXw==
+X-Received: by 2002:aa7:8889:0:b0:4f7:7283:e378 with SMTP id z9-20020aa78889000000b004f77283e378mr441260pfe.36.1647444776677;
+        Wed, 16 Mar 2022 08:32:56 -0700 (PDT)
+Received: from localhost.localdomain ([114.200.4.15])
+        by smtp.gmail.com with ESMTPSA id j16-20020a63e750000000b00373598b8cbfsm2806773pgk.74.2022.03.16.08.32.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 16 Mar 2022 08:32:55 -0700 (PDT)
+Date:   Thu, 17 Mar 2022 00:32:50 +0900
+From:   Suwan Kim <suwan.kim027@gmail.com>
+To:     Jason Wang <jasowang@redhat.com>
+Cc:     mst <mst@redhat.com>, pbonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org, mgurtovoy@nvidia.com
+Subject: Re: [PATCH] virtio-blk: support polling I/O
+Message-ID: <YjIDIjUwuwkfRS2d@localhost.localdomain>
+References: <20220311152832.17703-1-suwan.kim027@gmail.com>
+ <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
+ <Yi82BL9KecQsVfgX@localhost.localdomain>
+ <CACGkMEujXYNE-88=m9ohjbeAj2F7CqEUes8gOUmasTNtwn2bUA@mail.gmail.com>
+ <YjCmBkjgtQZffiXw@localhost.localdomain>
+ <CACGkMEtxadf1+0Db06nE3SuQZhvyELq7ZwvKaH8x_utj91dRdg@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
- char-device.
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <20220308152105.309618-1-joshi.k@samsung.com>
- <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
- <20220308152105.309618-6-joshi.k@samsung.com>
- <7a123895-1102-4b36-2d6e-1e00e978d03d@grimberg.me>
- <CA+1E3rK8wnABptQLQrEo8XRdsbua9t_88e3ZP-Ass3CnxHv+oA@mail.gmail.com>
- <8f45a761-5ecb-5911-1064-9625a285c93d@grimberg.me>
- <20220316092153.GA4885@test-zns>
- <11f9e933-cfc8-2e3b-c815-c49a4b7db4ec@grimberg.me>
- <CA+1E3r+_DEw5ABPbLzSp9Gvg6L8XU-2HBoLK7kuXucLjr=+Ezw@mail.gmail.com>
- <3ed01280-5487-7206-a326-0cd110118b65@grimberg.me>
- <666deb0e-fa10-8a39-c1aa-cf3908b3795c@kernel.dk>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <666deb0e-fa10-8a39-c1aa-cf3908b3795c@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtxadf1+0Db06nE3SuQZhvyELq7ZwvKaH8x_utj91dRdg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->> [...]
->>
->>> Got it, thanks. Passthrough (sync or async) just returns the failure
->>> to user-space if that fails.
->>> No attempt to retry/requeue as the block path does.
->>
->> I know, and that was my original question, no one cares that this
->> interface completely lacks this capability? Maybe it is fine, but
->> it is not a trivial assumption given that this is designed to be more
->> than an interface to send admin/vs commands to the controller...
+On Wed, Mar 16, 2022 at 10:02:13AM +0800, Jason Wang wrote:
+> On Tue, Mar 15, 2022 at 10:43 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+> >
+> > On Tue, Mar 15, 2022 at 04:59:23PM +0800, Jason Wang wrote:
+> > > On Mon, Mar 14, 2022 at 8:33 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+> > >
+> > > > On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
+> > > > >
+> > > > > 在 2022/3/11 下午11:28, Suwan Kim 写道:
+> > > > > > diff --git a/include/uapi/linux/virtio_blk.h
+> > > > b/include/uapi/linux/virtio_blk.h
+> > > > > > index d888f013d9ff..3fcaf937afe1 100644
+> > > > > > --- a/include/uapi/linux/virtio_blk.h
+> > > > > > +++ b/include/uapi/linux/virtio_blk.h
+> > > > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
+> > > > > >      * deallocation of one or more of the sectors.
+> > > > > >      */
+> > > > > >     __u8 write_zeroes_may_unmap;
+> > > > > > +   __u8 unused1;
+> > > > > > -   __u8 unused1[3];
+> > > > > > +   __virtio16 num_poll_queues;
+> > > > > >   } __attribute__((packed));
+> > > > >
+> > > > >
+> > > > > This looks like a implementation specific (virtio-blk-pci) optimization,
+> > > > how
+> > > > > about other implementation like vhost-user-blk?
+> > > >
+> > > > I didn’t consider vhost-user-blk yet. But does vhost-user-blk also
+> > > > use vritio_blk_config as kernel-qemu interface?
+> > > >
+> > >
+> > > Yes, but see below.
+> > >
+> > >
+> > > >
+> > > > Does vhost-user-blk need additional modification to support polling
+> > > > in kernel side?
+> > > >
+> > >
+> > >
+> > > No, but the issue is, things like polling looks not a good candidate for
+> > > the attributes belonging to the device but the driver. So I have more
+> > > questions:
+> > >
+> > > 1) what does it really mean for hardware virtio block devices?
+> > > 2) Does driver polling help for the qemu implementation without polling?
+> > > 3) Using blk_config means we can only get the benefit from the new device
+> >
+> > 1) what does it really mean for hardware virtio block devices?
+> > 3) Using blk_config means we can only get the benefit from the new device
+> >
+> > This patch adds dedicated HW queue for polling purpose to virtio
+> > block device.
+> >
+> > So I think it can be a new hw feature. And it can be a new device
+> > that supports hw poll queue.
 > 
-> Most people don't really care about or use multipath, so it's not a
-> primary goal.
+> One possible issue is that the "poll" looks more like a
+> software/driver concept other than the device/hardware.
+> 
+> >
+> > BTW, I have other idea about it.
+> >
+> > How about adding “num-poll-queues" property as a driver parameter
+> > like NVMe driver, not to QEMU virtio-blk-pci property?
+> 
+> It should be fine, but we need to listen to others.
 
-This statement is generally correct. However what application would be 
-interested in speaking raw nvme to a device and gaining performance that
-is even higher than the block layer (which is great to begin with)?
+To Michael, Stefan, Max
 
-First thing that comes to mind is a high-end storage array, where
-dual-ported drives are considered to be the standard. I could argue the
-same for a high-end oracle appliance or something like that... Although
-in a lot of cases, each nvme port will connect to a different host...
+How about using driver parameter instead of virio_blk_config?
 
-What are the use-cases that need this interface that are the target
-here? Don't remember seeing this come up in the cover-letter or previous
-iterations...
-
-> For passthrough, most of request types should hit the
-> exact target, I would suggest that if someone cares about multipath for
-> specific commands, that they be flagged as such.
-What do you mean by "they be flagged as such"?
+Regards,
+Suwan Kim
