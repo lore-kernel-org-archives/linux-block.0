@@ -2,21 +2,21 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2817BC4321E
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D40F6C3527B
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 02:27:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351128AbiCPC2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 15 Mar 2022 22:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55212 "EHLO
+        id S1353082AbiCPC2l (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 15 Mar 2022 22:28:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353085AbiCPC2f (ORCPT
+        with ESMTP id S1350876AbiCPC23 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 15 Mar 2022 22:28:35 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 676C35E764
-        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:27:11 -0700 (PDT)
+        Tue, 15 Mar 2022 22:28:29 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D776A5E75A
+        for <linux-block@vger.kernel.org>; Tue, 15 Mar 2022 19:27:10 -0700 (PDT)
 Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
-        by 156.147.23.51 with ESMTP; 16 Mar 2022 11:27:10 +0900
+        by 156.147.23.52 with ESMTP; 16 Mar 2022 11:27:10 +0900
 X-Original-SENDERIP: 156.147.1.151
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
@@ -47,9 +47,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com
-Subject: [PATCH RFC v5 09/21] dept: Apply Dept to rwsem
-Date:   Wed, 16 Mar 2022 11:26:21 +0900
-Message-Id: <1647397593-16747-10-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v5 07/21] dept: Apply Dept to wait_for_completion()/complete()
+Date:   Wed, 16 Mar 2022 11:26:19 +0900
+Message-Id: <1647397593-16747-8-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
 References: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
@@ -57,127 +57,137 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by rwsem.
+Makes Dept able to track dependencies by
+wait_for_completion()/complete().
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/lockdep.h      | 24 ++++++++++++++++++++----
- include/linux/percpu-rwsem.h | 10 +++++++++-
- include/linux/rwsem.h        | 32 ++++++++++++++++++++++++++++++++
- 3 files changed, 61 insertions(+), 5 deletions(-)
+ include/linux/completion.h | 42 ++++++++++++++++++++++++++++++++++++++++--
+ kernel/sched/completion.c  | 12 ++++++++++--
+ 2 files changed, 50 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 91f8783..fb354c4 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -645,10 +645,26 @@ static inline void print_irqtrace_events(struct task_struct *curr)
- 	dept_mutex_unlock(&(l)->dmap, i);				\
- } while (0)
- 
--#define rwsem_acquire(l, s, t, i)		lock_acquire_exclusive(l, s, t, NULL, i)
--#define rwsem_acquire_nest(l, s, t, n, i)	lock_acquire_exclusive(l, s, t, n, i)
--#define rwsem_acquire_read(l, s, t, i)		lock_acquire_shared(l, s, t, NULL, i)
--#define rwsem_release(l, i)			lock_release(l, i)
-+#define rwsem_acquire(l, s, t, i)					\
-+do {									\
-+	lock_acquire_exclusive(l, s, t, NULL, i);			\
-+	dept_rwsem_lock(&(l)->dmap, s, t, NULL, "up_write", i);		\
-+} while (0)
-+#define rwsem_acquire_nest(l, s, t, n, i)				\
-+do {									\
-+	lock_acquire_exclusive(l, s, t, n, i);				\
-+	dept_rwsem_lock(&(l)->dmap, s, t, (n) ? &(n)->dmap : NULL, "up_write", i);\
-+} while (0)
-+#define rwsem_acquire_read(l, s, t, i)					\
-+do {									\
-+	lock_acquire_shared(l, s, t, NULL, i);				\
-+	dept_rwsem_lock(&(l)->dmap, s, t, NULL, "up_read", i);		\
-+} while (0)
-+#define rwsem_release(l, i)						\
-+do {									\
-+	lock_release(l, i);						\
-+	dept_rwsem_unlock(&(l)->dmap, i);				\
-+} while (0)
- 
- #define lock_map_acquire(l)			lock_acquire_exclusive(l, 0, 0, NULL, _THIS_IP_)
- #define lock_map_acquire_read(l)		lock_acquire_shared_recursive(l, 0, 0, NULL, _THIS_IP_)
-diff --git a/include/linux/percpu-rwsem.h b/include/linux/percpu-rwsem.h
-index 5fda40f..7ec5625 100644
---- a/include/linux/percpu-rwsem.h
-+++ b/include/linux/percpu-rwsem.h
-@@ -20,8 +20,16 @@ struct percpu_rw_semaphore {
- #endif
+diff --git a/include/linux/completion.h b/include/linux/completion.h
+index 51d9ab0..76b4a2d 100644
+--- a/include/linux/completion.h
++++ b/include/linux/completion.h
+@@ -26,14 +26,48 @@
+ struct completion {
+ 	unsigned int done;
+ 	struct swait_queue_head wait;
++	struct dept_map dmap;
  };
  
 +#ifdef CONFIG_DEPT
-+#define __PERCPU_RWSEM_DMAP_INIT(lockname) .dmap = { .name = #lockname }
-+#else
-+#define __PERCPU_RWSEM_DMAP_INIT(lockname)
-+#endif
-+
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
--#define __PERCPU_RWSEM_DEP_MAP_INIT(lockname)	.dep_map = { .name = #lockname },
-+#define __PERCPU_RWSEM_DEP_MAP_INIT(lockname)	.dep_map = {	\
-+	.name = #lockname,					\
-+	__PERCPU_RWSEM_DMAP_INIT(lockname) },
- #else
- #define __PERCPU_RWSEM_DEP_MAP_INIT(lockname)
- #endif
-diff --git a/include/linux/rwsem.h b/include/linux/rwsem.h
-index f934876..f0772c2 100644
---- a/include/linux/rwsem.h
-+++ b/include/linux/rwsem.h
-@@ -16,11 +16,18 @@
- #include <linux/atomic.h>
- #include <linux/err.h>
- 
-+#ifdef CONFIG_DEPT
-+# define RWSEM_DMAP_INIT(lockname)	.dmap = { .name = #lockname },
-+#else
-+# define RWSEM_DMAP_INIT(lockname)
-+#endif
-+
- #ifdef CONFIG_DEBUG_LOCK_ALLOC
- # define __RWSEM_DEP_MAP_INIT(lockname)			\
- 	.dep_map = {					\
- 		.name = #lockname,			\
- 		.wait_type_inner = LD_WAIT_SLEEP,	\
-+		RWSEM_DMAP_INIT(lockname)		\
- 	},
- #else
- # define __RWSEM_DEP_MAP_INIT(lockname)
-@@ -32,6 +39,31 @@
- #include <linux/osq_lock.h>
- #endif
- 
-+#ifdef CONFIG_DEPT
-+#define dept_rwsem_lock(m, ne, t, n, e_fn, ip)				\
++#define dept_wfc_init(m, k, s, n)		dept_map_init(m, k, s, n)
++#define dept_wfc_reinit(m)			dept_map_reinit(m)
++#define dept_wfc_wait(m, ip)						\
 +do {									\
-+	if (t) {							\
-+		dept_ecxt_enter(m, 1UL, ip, __func__, e_fn, ne);	\
-+		dept_ask_event(m);					\
-+	} else if (n) {							\
-+		dept_ecxt_enter_nokeep(m);				\
-+		dept_ask_event(m);					\
-+	} else {							\
-+		dept_wait(m, 1UL, ip, __func__, ne);			\
-+		dept_ecxt_enter(m, 1UL, ip, __func__, e_fn, ne);	\
-+		dept_ask_event(m);					\
-+	}								\
++	dept_ask_event(m);						\
++	dept_wait(m, 1UL, ip, __func__, 0);				\
 +} while (0)
-+#define dept_rwsem_unlock(m, ip)					\
-+do {									\
-+	dept_event(m, 1UL, ip, __func__);				\
-+	dept_ecxt_exit(m, 1UL, ip);					\
-+} while (0)
++#define dept_wfc_complete(m, ip)		dept_event(m, 1UL, ip, __func__)
++#define dept_wfc_enter(m, ip)			dept_ecxt_enter(m, 1UL, ip, "completion_context_enter", "complete", 0)
++#define dept_wfc_exit(m, ip)			dept_ecxt_exit(m, 1UL, ip)
 +#else
-+#define dept_rwsem_lock(m, ne, t, n, e_fn, ip)	do { } while (0)
-+#define dept_rwsem_unlock(m, ip)		do { } while (0)
++#define dept_wfc_init(m, k, s, n)		do { (void)(n); (void)(k); } while (0)
++#define dept_wfc_reinit(m)			do { } while (0)
++#define dept_wfc_wait(m, ip)			do { } while (0)
++#define dept_wfc_complete(m, ip)		do { } while (0)
++#define dept_wfc_enter(m, ip)			do { } while (0)
++#define dept_wfc_exit(m, ip)			do { } while (0)
 +#endif
 +
- /*
-  * For an uncontended rwsem, count and owner are the only fields a task
-  * needs to touch when acquiring the rwsem. So they are put next to each
++#ifdef CONFIG_DEPT
++#define WFC_DEPT_MAP_INIT(work) .dmap = { .name = #work }
++#else
++#define WFC_DEPT_MAP_INIT(work)
++#endif
++
++#define init_completion(x)					\
++	do {							\
++		static struct dept_key __dkey;			\
++		__init_completion(x, &__dkey, #x);		\
++	} while (0)
++
+ #define init_completion_map(x, m) init_completion(x)
+ static inline void complete_acquire(struct completion *x) {}
+ static inline void complete_release(struct completion *x) {}
+ 
+ #define COMPLETION_INITIALIZER(work) \
+-	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
++	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), \
++	WFC_DEPT_MAP_INIT(work) }
+ 
+ #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
+ 	(*({ init_completion_map(&(work), &(map)); &(work); }))
+@@ -81,9 +115,12 @@ static inline void complete_release(struct completion *x) {}
+  * This inline function will initialize a dynamically created completion
+  * structure.
+  */
+-static inline void init_completion(struct completion *x)
++static inline void __init_completion(struct completion *x,
++				     struct dept_key *dkey,
++				     const char *name)
+ {
+ 	x->done = 0;
++	dept_wfc_init(&x->dmap, dkey, 0, name);
+ 	init_swait_queue_head(&x->wait);
+ }
+ 
+@@ -97,6 +134,7 @@ static inline void init_completion(struct completion *x)
+ static inline void reinit_completion(struct completion *x)
+ {
+ 	x->done = 0;
++	dept_wfc_reinit(&x->dmap);
+ }
+ 
+ extern void wait_for_completion(struct completion *);
+diff --git a/kernel/sched/completion.c b/kernel/sched/completion.c
+index a778554..6e31cc0 100644
+--- a/kernel/sched/completion.c
++++ b/kernel/sched/completion.c
+@@ -29,6 +29,7 @@ void complete(struct completion *x)
+ {
+ 	unsigned long flags;
+ 
++	dept_wfc_complete(&x->dmap, _RET_IP_);
+ 	raw_spin_lock_irqsave(&x->wait.lock, flags);
+ 
+ 	if (x->done != UINT_MAX)
+@@ -58,6 +59,7 @@ void complete_all(struct completion *x)
+ {
+ 	unsigned long flags;
+ 
++	dept_wfc_complete(&x->dmap, _RET_IP_);
+ 	lockdep_assert_RT_in_threaded_ctx();
+ 
+ 	raw_spin_lock_irqsave(&x->wait.lock, flags);
+@@ -112,17 +114,23 @@ void complete_all(struct completion *x)
+ }
+ 
+ static long __sched
+-wait_for_common(struct completion *x, long timeout, int state)
++_wait_for_common(struct completion *x, long timeout, int state)
+ {
+ 	return __wait_for_common(x, schedule_timeout, timeout, state);
+ }
+ 
+ static long __sched
+-wait_for_common_io(struct completion *x, long timeout, int state)
++_wait_for_common_io(struct completion *x, long timeout, int state)
+ {
+ 	return __wait_for_common(x, io_schedule_timeout, timeout, state);
+ }
+ 
++#define wait_for_common(x, t, s)					\
++({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common(x, t, s); })
++
++#define wait_for_common_io(x, t, s)					\
++({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common_io(x, t, s); })
++
+ /**
+  * wait_for_completion: - waits for completion of a task
+  * @x:  holds the state of this particular completion
 -- 
 1.9.1
 
