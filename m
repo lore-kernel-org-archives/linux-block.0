@@ -2,150 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB8EC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 10:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7669C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 11:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347406AbiCPLBD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 07:01:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49830 "EHLO
+        id S1348140AbiCPLYQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 07:24:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343563AbiCPLBB (ORCPT
+        with ESMTP id S245571AbiCPLYP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 07:01:01 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764AF60077
-        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 03:59:47 -0700 (PDT)
-Received: from fsav412.sakura.ne.jp (fsav412.sakura.ne.jp [133.242.250.111])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22GAxJS5052619;
-        Wed, 16 Mar 2022 19:59:19 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav412.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp);
- Wed, 16 Mar 2022 19:59:19 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav412.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22GAxJbl052613
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 16 Mar 2022 19:59:19 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <18f892e5-09f9-ee87-b82b-5458d2f6d5cf@I-love.SAKURA.ne.jp>
-Date:   Wed, 16 Mar 2022 19:59:15 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: yet another approach to fix the loop lock order inversions v3
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Jan Kara <jack@suse.cz>, "Darrick J . Wong" <djwong@kernel.org>,
+        Wed, 16 Mar 2022 07:24:15 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 321C132991
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 04:23:00 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id B7FA121123;
+        Wed, 16 Mar 2022 11:22:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1647429778; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=36zD6y1IL8V1LtkkkK3OzWNglp6FD/lvZtQELa++Kmk=;
+        b=jh0wL69AWozALfmFRdHTjqajbDKm7IOOtBNzJZ6AzCtEHevw6ZJ5y5EovF9k8kDYZUFrPI
+        Ex0c0enIkDFH+NUF4CvQoTumco9HkiEG47ZEWB3EcDe6D0gCuWlOGA4VBvyuXFbB3pMGK2
+        Ip86wjhSrG+RExe1fFHcvIQ4KcUK/7I=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1647429778;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=36zD6y1IL8V1LtkkkK3OzWNglp6FD/lvZtQELa++Kmk=;
+        b=B16dDQeFIJkd/l1WDVeORhlOnfo8S3Xa2gGTBcrT68NRvOhS3yDBuEYCcW/FwrzCK0R8qM
+        T3YFuwvjQ53xOoCw==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 9B9ECA3B98;
+        Wed, 16 Mar 2022 11:22:58 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 44EB7A0615; Wed, 16 Mar 2022 12:22:58 +0100 (CET)
+Date:   Wed, 16 Mar 2022 12:22:58 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>,
+        "Darrick J . Wong" <djwong@kernel.org>,
         linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH 7/8] loop: remove lo_refcount and avoid lo_mutex in
+ ->open / ->release
+Message-ID: <20220316112258.6hjksrv7yqiqcncu@quack3.lan>
 References: <20220316084519.2850118-1-hch@lst.de>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220316084519.2850118-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+ <20220316084519.2850118-8-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220316084519.2850118-8-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I tested this series using next-20220315.
-I can't test locking dependency because lockdep is turned off upon boot.
+On Wed 16-03-22 09:45:18, Christoph Hellwig wrote:
+> lo_refcount counts how many openers a loop device has, but that count
+> is already provided by the block layer in the bd_openers field of the
+> whole-disk block_device.  Remove lo_refcount and allow opens to
+> succeed even on devices beeing deleted - now that ->free_disk is
+> implemented we can handle that race gracefull and all I/O on it will
+> just fail. Similarly there is a small race window now where
+> loop_control_remove does not synchronize the delete vs the remove
+> due do bd_openers not being under lo_mutex protection, but we can
+> handle that just as gracefully.
 
-[   30.251160] ======================================================
-[   30.251162] WARNING: possible circular locking dependency detected
-[   30.251164] 5.17.0-rc8-next-20220315+ #22 Not tainted
-[   30.251166] ------------------------------------------------------
-[   30.251168] mount/407 is trying to acquire lock:
-[   30.251170] ffff8881003c8898 (&p->pi_lock){-.-.}-{2:2}, at: try_to_wake_up+0x4f/0x4d0
-[   30.251185] 
-[   30.251185] but task is already holding lock:
-[   30.251186] ffffffff830f7798 ((console_sem).lock){-.-.}-{2:2}, at: up+0xd/0x50
-[   30.251195] 
-[   30.251195] which lock already depends on the new lock.
-(...snipped...)
-[   30.251433] Chain exists of:
-[   30.251433]   &p->pi_lock --> &rq->__lock --> (console_sem).lock
-[   30.251433] 
-[   30.251440]  Possible unsafe locking scenario:
-[   30.251440] 
-[   30.251441]        CPU0                    CPU1
-[   30.251443]        ----                    ----
-[   30.251444]   lock((console_sem).lock);
-[   30.251446]                                lock(&rq->__lock);
-[   30.251458]                                lock((console_sem).lock);
-[   30.251461]   lock(&p->pi_lock);
-[   30.251464] 
-[   30.251464]  *** DEADLOCK ***
-[   30.251464] 
-[   30.251465] 2 locks held by mount/407:
-[   30.251467]  #0: ffffffff830c7878 (low_water_lock){+.+.}-{2:2}, at: do_exit+0x7ff/0xeb0
-[   30.251486]  #1: ffffffff830f7798 ((console_sem).lock){-.-.}-{2:2}, at: up+0xd/0x50
+Honestly, I'm a bit uneasy about these races and ability to have open
+removed loop device (given use of loop devices in container environments
+potential problems could have security implications). But I guess it is no
+different to having open hot-unplugged scsi disk. There may be just an
+expectation from userspace that your open either blocks loop device removal
+or open fails. But I guess we can deal with that if some real breakage
+happens - it does not seem that hard to solve - we just need
+loop_control_remove() to grab disk->open_mutex to make transition to
+Lo_deleting state safe and keep Lo_deleting check in lo_open(). Plus we'd
+need to use READ_ONCE / WRITE_ONCE for lo_state accesses.
 
-But I can see that due to no longer waiting for lo->lo_mutex from lo_open(),
-there are occasional I/O errors. What is your plan to avoid this?
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  drivers/block/loop.c | 36 +++++++-----------------------------
+>  drivers/block/loop.h |  1 -
+>  2 files changed, 7 insertions(+), 30 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index cbaa18bcad1fe..c270f3715d829 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1244,7 +1244,7 @@ static int loop_clr_fd(struct loop_device *lo)
+>  	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
+>  	 * command to fail with EBUSY.
+>  	 */
+> -	if (atomic_read(&lo->lo_refcnt) > 1) {
+> +	if (lo->lo_disk->part0->bd_openers > 1) {
 
-----------------------------------------
-[  148.444639] loop56: detected capacity change from 0 to 2048
-[  148.448298] I/O error, dev loop56, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  148.456250] loop57: detected capacity change from 0 to 2048
---
-[  149.264210] loop70: detected capacity change from 0 to 2048
-[  149.267449] I/O error, dev loop70, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  149.314558] loop71: detected capacity change from 0 to 2048
---
-[  154.708948] loop172: detected capacity change from 0 to 2048
-[  154.712403] I/O error, dev loop172, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  154.760841] loop173: detected capacity change from 0 to 2048
-[  154.763728] I/O error, dev loop173, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  154.789921] loop174: detected capacity change from 0 to 2048
---
-[  155.469135] loop185: detected capacity change from 0 to 2048
-[  155.470800] I/O error, dev loop185, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  155.483457] loop186: detected capacity change from 0 to 2048
---
-[  155.568911] loop190: detected capacity change from 0 to 2048
-[  155.570783] I/O error, dev loop190, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  155.576789] loop191: detected capacity change from 0 to 2048
---
-[  159.671039] loop259: detected capacity change from 0 to 2048
-[  159.674879] I/O error, dev loop259, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  159.706059] loop260: detected capacity change from 0 to 2048
---
-[  162.845545] loop309: detected capacity change from 0 to 2048
-[  162.848151] I/O error, dev loop309, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  162.873731] loop310: detected capacity change from 0 to 2048
---
-[  162.940326] loop313: detected capacity change from 0 to 2048
-[  162.943770] I/O error, dev loop313, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  163.012664] loop314: detected capacity change from 0 to 2048
---
-[  164.725370] loop338: detected capacity change from 0 to 2048
-[  164.728747] I/O error, dev loop338, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  164.734669] loop339: detected capacity change from 0 to 2048
---
-[  166.463447] loop370: detected capacity change from 0 to 2048
-[  166.468262] I/O error, dev loop370, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  166.476621] loop371: detected capacity change from 0 to 2048
---
-[  169.133011] loop417: detected capacity change from 0 to 2048
-[  169.136747] I/O error, dev loop417, sector 0 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0
-[  169.140203] I/O error, dev loop417, sector 0 op 0x0:(READ) flags 0x0 phys_seg 1 prio class 0
-[  169.152730] Buffer I/O error on dev loop417, logical block 0, async page read
-[  169.299206] loop418: detected capacity change from 0 to 2048
-----------------------------------------
+But bd_openers can be read safely only under disk->open_mutex. So for this
+to be safe against compiler playing nasty tricks with optimizations, we
+need to either make bd_openers atomic_t or use READ_ONCE / WRITE_ONCE when
+accessing it.
+
+> @@ -1724,33 +1724,15 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+>  }
+>  #endif
+>  
+> -static int lo_open(struct block_device *bdev, fmode_t mode)
+> -{
+> -	struct loop_device *lo = bdev->bd_disk->private_data;
+> -	int err;
+> -
+> -	err = mutex_lock_killable(&lo->lo_mutex);
+> -	if (err)
+> -		return err;
+> -	if (lo->lo_state == Lo_deleting)
+> -		err = -ENXIO;
+> -	else
+> -		atomic_inc(&lo->lo_refcnt);
+> -	mutex_unlock(&lo->lo_mutex);
+> -	return err;
+> -}
+> -
+
+Tetsuo has observed [1] that not grabbing lo_mutex when opening loop device
+tends to break systemd-udevd because in loop_configure() we send
+DISK_EVENT_MEDIA_CHANGE event before the device is fully configured (but
+the configuration gets finished before we release the lo_mutex) and so
+systemd-udev gets spurious IO errors when probing new loop devices and is
+unhappy. So I think this is the right way to go but we need to reshuffle
+loop_configure() a bit first.
+
+[1] https://lore.kernel.org/all/a72c59c6-298b-e4ba-b1f5-2275afab49a1@I-love.SAKURA.ne.jp/T/#u
 
 
+								Honza
 
-By the way, if CONFIG_BLOCK_LEGACY_AUTOLOAD=n,
-
-# mount -o loop,ro isofs.iso isofs/
-
-unconditionally fails with
-
-mount: isofs/: failed to setup loop device for isofs.iso.
-
-message. Commit 451f0b6f4c44d7b6 ("block: default BLOCK_LEGACY_AUTOLOAD to y")
-says "if the device node already exists because old scripts created it manually".
-But it is not always manual creation of loop devices; I think it is
-ioctl(LOOP_CTL_GET_FREE) in my case.
-
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
