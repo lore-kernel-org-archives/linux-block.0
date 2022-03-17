@@ -2,97 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98B74C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 02:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7014FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 02:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239610AbiCQCT0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 22:19:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38216 "EHLO
+        id S238405AbiCQCVg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 22:21:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229966AbiCQCTZ (ORCPT
+        with ESMTP id S233729AbiCQCVf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 22:19:25 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2663C1ADBB;
-        Wed, 16 Mar 2022 19:18:06 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id gb19so3729234pjb.1;
-        Wed, 16 Mar 2022 19:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:from:to:cc:subject:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=k5/SI47mYCkmTkd+Jtlw5qMaLp/W2C5Pn4N4ppaWA9s=;
-        b=UtxNRLaSAiCeSdDwtocXLOJ+R6Zo0CD5IHp8vWaZ8PZWfwN+AzCwQ8P0MW/w6jKNo4
-         LoYWI4WyYaxuYNnJdM8A8k+oc8kXDe1OP3T5I7e0nM7EaFR4JP00SohjsPuizUn8/7mY
-         rQuQFSa/Ucv5UTUB3EvYb3KVd9jyKTrEH9TrRW83LeIndXehQjvaALzXs6fFLGnq4sWA
-         oSTjNRRIz2eDb6BgxE628hX9mOhqQVj9uSFWh2XgIge3vIYIcNTBacZIuZoFKVYfgHb3
-         jKPJ8Hbs9qpGBGZeSk2W31Zb2fvT1VOTqtSQh346NWlDQRNPaBVAp4zutlq6SWCDcf8C
-         mMFg==
+        Wed, 16 Mar 2022 22:21:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 71ECD1BE92
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 19:20:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647483619;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=nPCfzxyjMhxLP4qSRwQ+hURc5goubZq4R+xZPtQNplE=;
+        b=FZh+BFUO7Y9ZW6k1zK66mexuOBvAvp8u5RtYhqLoIK+dmTm8rraxj/QdjA6OLGlwBNE5qJ
+        kv0DBo6XlO6dlM8W+WEfcq7YzLSBI1VgblRFkhuc3jHy8+ux4RZ7xhv4cDeIcY8cW9+nF5
+        0GvrynipnkP1OxvGPGZobaw3nT+XwJg=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-146-JBTwAllqNUu2MAteK9q4sw-1; Wed, 16 Mar 2022 22:20:18 -0400
+X-MC-Unique: JBTwAllqNUu2MAteK9q4sw-1
+Received: by mail-lj1-f200.google.com with SMTP id 185-20020a2e05c2000000b002463aff775aso1551739ljf.17
+        for <linux-block@vger.kernel.org>; Wed, 16 Mar 2022 19:20:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:from:to:cc:subject:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=k5/SI47mYCkmTkd+Jtlw5qMaLp/W2C5Pn4N4ppaWA9s=;
-        b=zbW2XuS67fEQnCWjec5yw0tSW/ynY7yc6DZrY/4Amag/wCbDbgXa5+5jI5qZqJv0D2
-         se9p6Ovf7mSp5nsM9y+eix6FpKeahE+F/k2t07SGmasTLPcJRk8s7Cu7NxFLPg8gTDm8
-         pGnYKjGtX6Gytdg+f9i830qVlw7nHVUifDX7PBJ4h0BHHodeShmnTInI+bAUncWpjv3O
-         PyPcbx0i8pWnPwl8i8uc0/RlQPXZjBPo3sZFyujPeSNml6Jvnd6bpdEOrGZkJ0LKT1iX
-         f3l6ZeBgDpikzBzZjBmP87RStpgRC32k9YGM8SjnjHXp2FmRFwpJ51927Errc5k7S/1z
-         bNMA==
-X-Gm-Message-State: AOAM5338FBUdiXIXUcQht5sMRg6NlmeEto3ft+aOsuxFOMls2iFIJqhi
-        XQp5A5f5xpuDW/9xev7vSXcrz9X6Xbk=
-X-Google-Smtp-Source: ABdhPJzkTj1plz8qCSaAmWgG/0AJT06edV5geQtEmqo54L2We0Ceuv32vzPgPLjWI9kOSRoG/gATtw==
-X-Received: by 2002:a17:902:f64d:b0:151:3895:46bf with SMTP id m13-20020a170902f64d00b00151389546bfmr2342537plg.31.1647483485628;
-        Wed, 16 Mar 2022 19:18:05 -0700 (PDT)
-Received: from localhost ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id mt3-20020a17090b230300b001c633aca1e1sm8011609pjb.18.2022.03.16.19.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 16 Mar 2022 19:18:05 -0700 (PDT)
-Message-ID: <62329a5d.1c69fb81.13868.4b52@mx.google.com>
-X-Google-Original-Message-ID: <20220317021803.GB2135497@cgel.zte@gmail.com>
-Date:   Thu, 17 Mar 2022 02:18:03 +0000
-From:   CGEL <cgel.zte@gmail.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk, hannes@cmpxchg.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-        Yang Yang <yang.yang29@zte.com.cn>,
-        Ran Xiaokai <ran.xiaokai@zte.com.cn>
-Subject: Re: [PATCH] block/psi: make PSI annotations of submit_bio only work
- for file pages
-References: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
- <YjGkRT+ccoZ0ZNDq@infradead.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=nPCfzxyjMhxLP4qSRwQ+hURc5goubZq4R+xZPtQNplE=;
+        b=M0mJjjSCAYjq/NMlNVK6tnt5ibX0psAj96vVQct63KrFY2TVtjAWaYWirPFfkj5uiW
+         gYfxKA3XAy+PCJ9oy2oUYZjQjF/5jSW7mWRL1d8vpJ1Q+jGVMi2dGa7k4jloqCc7626o
+         dbPxj/IcJMrp7+2xY/G+83W4cw8sE3IKf6gIgqTKbcDZuL5Uwx3CJNMMu2xk/1Bx5j/c
+         DN3C71Ulb7rB8BA0WyUKbi3G2YJSqzTfrJahSEebykZFbCRf/eqo3/GdCAK98u5U4Mcz
+         CCYgK+EGIZtz2rKrXRzsFg4lpHP7DchqqZYhMPqpRRyocpQcYRJ8kV1LL70DRwsK0R++
+         k9eQ==
+X-Gm-Message-State: AOAM532sSsOjVpFZgfm0iA+Jt9t3DmAApOmKhIVS4TXcijBnWGUVd8Ha
+        +iUd7YafZ2AiQdPBQjJ6jXCNbBX12R+0noBK1pA0Qy/8GQQ+oWe7Dx2xLSXNNpNZfarfPNEqBYc
+        AX6KC6ocPYYXZkm5qImGcXdAYroTf0cv99GLksUI=
+X-Received: by 2002:a05:651c:b23:b0:247:ee17:e9ed with SMTP id b35-20020a05651c0b2300b00247ee17e9edmr1466185ljr.243.1647483616418;
+        Wed, 16 Mar 2022 19:20:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxBCg7wlhjy6Rcdi31sE5bb7ELPAmbhPDTsbU5Jc7PjWTT/34HozDuP3hNEXZTNkG2RGvy9B9CMVr5KB2Cun9k=
+X-Received: by 2002:a05:651c:b23:b0:247:ee17:e9ed with SMTP id
+ b35-20020a05651c0b2300b00247ee17e9edmr1466175ljr.243.1647483616214; Wed, 16
+ Mar 2022 19:20:16 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjGkRT+ccoZ0ZNDq@infradead.org>
+References: <20220311152832.17703-1-suwan.kim027@gmail.com>
+ <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com> <Yi82BL9KecQsVfgX@localhost.localdomain>
+ <CACGkMEujXYNE-88=m9ohjbeAj2F7CqEUes8gOUmasTNtwn2bUA@mail.gmail.com>
+ <YjCmBkjgtQZffiXw@localhost.localdomain> <CACGkMEtxadf1+0Db06nE3SuQZhvyELq7ZwvKaH8x_utj91dRdg@mail.gmail.com>
+ <YjIDIjUwuwkfRS2d@localhost.localdomain>
+In-Reply-To: <YjIDIjUwuwkfRS2d@localhost.localdomain>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Thu, 17 Mar 2022 10:20:05 +0800
+Message-ID: <CACGkMEu8T8_9gJMGybMZVCT9zCrw+OaTtbhtvnUNUORNmYKw-A@mail.gmail.com>
+Subject: Re: [PATCH] virtio-blk: support polling I/O
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     mst <mst@redhat.com>, pbonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        virtualization <virtualization@lists.linux-foundation.org>,
+        linux-block@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 01:48:05AM -0700, Christoph Hellwig wrote:
-> > @@ -1035,8 +1035,9 @@ void __bio_add_page(struct bio *bio, struct page *page,
-> >  	bio->bi_iter.bi_size += len;
-> >  	bio->bi_vcnt++;
-> >  
-> > -	if (!bio_flagged(bio, BIO_WORKINGSET) && unlikely(PageWorkingset(page)))
-> > -		bio_set_flag(bio, BIO_WORKINGSET);
-> > +	if (!bio_flagged(bio, BIO_WORKINGSET_FILE) &&
-> > +	    unlikely(PageWorkingset(page)) && !PageSwapBacked(page))
-> > +		bio_set_flag(bio, BIO_WORKINGSET_FILE);
-> 
-> This needs to go out of the block I/O fast path, not grow even more
-> checks.
+On Wed, Mar 16, 2022 at 11:33 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
+>
+> On Wed, Mar 16, 2022 at 10:02:13AM +0800, Jason Wang wrote:
+> > On Tue, Mar 15, 2022 at 10:43 PM Suwan Kim <suwan.kim027@gmail.com> wro=
+te:
+> > >
+> > > On Tue, Mar 15, 2022 at 04:59:23PM +0800, Jason Wang wrote:
+> > > > On Mon, Mar 14, 2022 at 8:33 PM Suwan Kim <suwan.kim027@gmail.com> =
+wrote:
+> > > >
+> > > > > On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
+> > > > > >
+> > > > > > =E5=9C=A8 2022/3/11 =E4=B8=8B=E5=8D=8811:28, Suwan Kim =E5=86=
+=99=E9=81=93:
+> > > > > > > diff --git a/include/uapi/linux/virtio_blk.h
+> > > > > b/include/uapi/linux/virtio_blk.h
+> > > > > > > index d888f013d9ff..3fcaf937afe1 100644
+> > > > > > > --- a/include/uapi/linux/virtio_blk.h
+> > > > > > > +++ b/include/uapi/linux/virtio_blk.h
+> > > > > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
+> > > > > > >      * deallocation of one or more of the sectors.
+> > > > > > >      */
+> > > > > > >     __u8 write_zeroes_may_unmap;
+> > > > > > > +   __u8 unused1;
+> > > > > > > -   __u8 unused1[3];
+> > > > > > > +   __virtio16 num_poll_queues;
+> > > > > > >   } __attribute__((packed));
+> > > > > >
+> > > > > >
+> > > > > > This looks like a implementation specific (virtio-blk-pci) opti=
+mization,
+> > > > > how
+> > > > > > about other implementation like vhost-user-blk?
+> > > > >
+> > > > > I didn=E2=80=99t consider vhost-user-blk yet. But does vhost-user=
+-blk also
+> > > > > use vritio_blk_config as kernel-qemu interface?
+> > > > >
+> > > >
+> > > > Yes, but see below.
+> > > >
+> > > >
+> > > > >
+> > > > > Does vhost-user-blk need additional modification to support polli=
+ng
+> > > > > in kernel side?
+> > > > >
+> > > >
+> > > >
+> > > > No, but the issue is, things like polling looks not a good candidat=
+e for
+> > > > the attributes belonging to the device but the driver. So I have mo=
+re
+> > > > questions:
+> > > >
+> > > > 1) what does it really mean for hardware virtio block devices?
+> > > > 2) Does driver polling help for the qemu implementation without pol=
+ling?
+> > > > 3) Using blk_config means we can only get the benefit from the new =
+device
+> > >
+> > > 1) what does it really mean for hardware virtio block devices?
+> > > 3) Using blk_config means we can only get the benefit from the new de=
+vice
+> > >
+> > > This patch adds dedicated HW queue for polling purpose to virtio
+> > > block device.
+> > >
+> > > So I think it can be a new hw feature. And it can be a new device
+> > > that supports hw poll queue.
+> >
+> > One possible issue is that the "poll" looks more like a
+> > software/driver concept other than the device/hardware.
+> >
+> > >
+> > > BTW, I have other idea about it.
+> > >
+> > > How about adding =E2=80=9Cnum-poll-queues" property as a driver param=
+eter
+> > > like NVMe driver, not to QEMU virtio-blk-pci property?
+> >
+> > It should be fine, but we need to listen to others.
+>
+> To Michael, Stefan, Max
+>
+> How about using driver parameter instead of virio_blk_config?
 
-Thanks for your replying.
+I agree.
 
-First, Johannes Weiner had made his state, see:
-https://lore.kernel.org/all/Yio17pXawRuuVJFO@cmpxchg.org/
+Thanks
 
-Second, I understand your concern, but actually there seems no better
-way to do file pages workingset delay accounting, because this is no
-unique function to track file pages submitting, kernel do this in
-multiple sub-system.
+>
+> Regards,
+> Suwan Kim
+>
 
-Thirdly, this patch doesn't make it worse, indeed it reduce unnecessary
-psi accounting in submit_bio.
