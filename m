@@ -2,139 +2,160 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9346DC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 16 Mar 2022 23:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 586C3C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 01:49:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235649AbiCPXb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 16 Mar 2022 19:31:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37836 "EHLO
+        id S239498AbiCQBug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 16 Mar 2022 21:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52820 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232408AbiCPXb5 (ORCPT
+        with ESMTP id S1348344AbiCQBug (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 16 Mar 2022 19:31:57 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85E66167C0;
-        Wed, 16 Mar 2022 16:30:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1647473434;
-        bh=rK/jWEulh9ssWmz2krX0rC0OcdJw22aqasKTpxCx6ws=;
-        h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:In-Reply-To;
-        b=TfUOVntrqKpRQSwwyVS1p2X6E6DBz3uJWhwAoouuK/HuCOPUXsQ4XgL4/SShcU+27
-         tVR+3Mg9J54KWoTXI7S7pvU4X7kYO79nqEdBh/ApDT6l1BGEDPX110uUbG5yEmPR7X
-         5SxCa8rbAd5R2ZcvoisNJb85DW05STzlO70gqPfw=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MNKhm-1njOoy0auw-00Oq4X; Thu, 17
- Mar 2022 00:30:34 +0100
-Message-ID: <99f7371d-f818-f533-d82b-71729a5bfb9d@gmx.com>
-Date:   Thu, 17 Mar 2022 07:30:30 +0800
+        Wed, 16 Mar 2022 21:50:36 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9313115A00;
+        Wed, 16 Mar 2022 18:49:20 -0700 (PDT)
+Received: from kwepemi100026.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KJqgl4t78zcb2M;
+        Thu, 17 Mar 2022 09:44:19 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100026.china.huawei.com (7.221.188.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 17 Mar 2022 09:49:18 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 17 Mar 2022 09:49:17 +0800
+Subject: Re: [PATCH -next 00/11] support concurrent sync io for bfq on a
+ specail occasion
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <jack@suse.cz>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220305091205.4188398-1-yukuai3@huawei.com>
+ <e299180e-cdbd-0837-8478-5e397ac8166b@huawei.com>
+Message-ID: <11fda851-a552-97ea-d083-d0288c17ba53@huawei.com>
+Date:   Thu, 17 Mar 2022 09:49:16 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 11/17] btrfs: make dec_and_test_compressed_bio() to be
- split bio compatible
-Content-Language: en-US
-To:     Josef Bacik <josef@toxicpanda.com>, Qu Wenruo <wqu@suse.com>
-Cc:     linux-btrfs@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-References: <20211201051756.53742-1-wqu@suse.com>
- <20211201051756.53742-12-wqu@suse.com>
- <YjI+hkhhTTWMmPkz@localhost.localdomain>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-In-Reply-To: <YjI+hkhhTTWMmPkz@localhost.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gIK32EJoOO5bu//AY9fiTTXVQGmcy8/RH/SJQkoLy1CqCCD6YXU
- Aj7i0u6LDFMEVOMHUFzRgdiGVdhM5b/YEVbhmI1oH9t2Xya7fdVSWDF8NV6vqlQVEyb5yIG
- gSt4ibL2JA2J8+L1sWs6/VWl3GpOD0YfauA9tJ4pAIY6tMWbN3EKSTvfiDq0Q0iZhO18I95
- 0ynMUpHrleUlAOhHlcB3Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:G/+nrPI6jcc=:K/mLfXhJc31KhMjgACSmUf
- yPezyPL/7b7u6w5LSlGltvz6UozPQxuboZ/K6cPrzPI5fFA6P7FuStf05UA/uURA3mNTuZE+F
- WRqvEU/yCMGnIzf3NuqJEjnPe9UCIEGPk9Z24wRgU+oz0O18acjEFc5KobhkUA4h0SmKLmKeS
- yvsLBiPbftH1BvvGg4fiE4fYyK8lQR0oTJLfF6drx+79qehBslYlhc5Xlro/byHGw9Ea39QLg
- ip9v7vyAJxw3xWhIt8/HPZMvlTJ9kzd0tdPGVQ+0GCtj9WGACdoR4VNDBJ//0Rxo89FwcWFN/
- JFTYqiq5BKeHMlpj+99lE+Q5sS3xqV9DNZXDkZC7Yi2ITbBQt+YtihPhs5A9yKndLO/4Bn3pH
- HgoWU1nM8HpPmrgDjRlUngUbVdHLuA6oNznkO5bVppm3Yts34Ai6vNPp0uA5sb0VETUWgCCQd
- rzq0LzkxsaYtkKJKa36ajxaxGqlFCp4Qj7x+lEEUepeiR7dwtkmlNajWPmDanfNJMinujhw1y
- YSYL3apD2oUkxtLNnWMpKVbYnXiMVA1Q/xU1+f1CsC5CGsMEQognWfGyAeU1wSiz+BIqyc7/i
- LeSDqiN/N23UD35mnu2h+4ci1awwPmbKCyWC+HXb5d3j5tUj9wpuOZqYa5NP7rTPaFKhzmcyk
- rNQEduop8lz0OYWOybr2zvHHiDajsJg4SDP4qDFcpaVuKdXD0QMtjwZYEKjSZ/HcJqa7j2W7s
- aD07hMJgRUR/X7YKQqDOKIALzX+zu9kskvJVIEdq+ovi1Do9yPVsur8BwkwMW/RHxMuGjImkA
- iYTb6yA/nZUCm+6N037oo7c6oGTf9u9LTNXargMkQdIKhA7tis30pXIMBiod6wgguinkZCm5+
- PcG3utB8XI08CG9f/P0li+YPFIgHMq02cq6cqZgUUtdtv59BHGKzyQN7M4TVJUY/nexmTLu1D
- Vz5LwQL2RRrWIFFPB3NezuKYHXcOjZcLUTYCYtqjMGKV89bNw+/M6emRvNFE7DGdeZfo9gaor
- KNIowE6OiqraVG2/mmIfASVbgJGExuJPOM4ebfBHD2da6uoSMl+4WUZyv+ROL+uB+L9W539+Q
- bPc//0d8l07/ng=
+In-Reply-To: <e299180e-cdbd-0837-8478-5e397ac8166b@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+friendly ping ...
 
-
-On 2022/3/17 03:46, Josef Bacik wrote:
-> On Wed, Dec 01, 2021 at 01:17:50PM +0800, Qu Wenruo wrote:
->> For compression read write endio functions, they all rely on
->> dec_and_test_compressed_bio() to determine if they are the last bio.
+在 2022/03/11 14:31, yukuai (C) 写道:
+> friendly ping ...
+> 
+> 在 2022/03/05 17:11, Yu Kuai 写道:
+>> Currently, bfq can't handle sync io concurrently as long as they
+>> are not issued from root group. This is because
+>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>> bfq_asymmetric_scenario().
 >>
->> So here we only need to convert the bio_for_each_segment_all() call int=
-o
->> __bio_for_each_segment() so that compression read/write endio functions
->> will handle both split and unsplit bios well.
+>> This patchset tries to support concurrent sync io if all the sync ios
+>> are issued from the same cgroup:
 >>
->> Signed-off-by: Qu Wenruo <wqu@suse.com>
->> ---
->>   fs/btrfs/compression.c | 14 +++++---------
->>   1 file changed, 5 insertions(+), 9 deletions(-)
+>> 1) Count root_group into 'num_groups_with_pending_reqs', patch 1-5;
 >>
->> diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
->> index 8668c5190805..8b4b84b59b0c 100644
->> --- a/fs/btrfs/compression.c
->> +++ b/fs/btrfs/compression.c
->> @@ -205,18 +205,14 @@ static int check_compressed_csum(struct btrfs_ino=
-de *inode, struct bio *bio,
->>   static bool dec_and_test_compressed_bio(struct compressed_bio *cb, st=
-ruct bio *bio)
->>   {
->>   	struct btrfs_fs_info *fs_info =3D btrfs_sb(cb->inode->i_sb);
->> +	struct bio_vec bvec;
->> +	struct bvec_iter iter;
->>   	unsigned int bi_size =3D 0;
->>   	bool last_io =3D false;
->> -	struct bio_vec *bvec;
->> -	struct bvec_iter_all iter_all;
+>> 2) Don't idle if 'num_groups_with_pending_reqs' is 1, patch 6;
 >>
->> -	/*
->> -	 * At endio time, bi_iter.bi_size doesn't represent the real bio size=
-.
->> -	 * Thus here we have to iterate through all segments to grab correct
->> -	 * bio size.
->> -	 */
->> -	bio_for_each_segment_all(bvec, bio, iter_all)
->> -		bi_size +=3D bvec->bv_len;
->> +	ASSERT(btrfs_bio(bio)->iter.bi_size);
->
-> We're tripping this assert with generic/476 with -o compress, so I assum=
-e
-> there's some error condition that isn't being handled properly.  Thanks,
-
-Thank you very much for catching it.
-
-It turns out the ASSERT() is really helpful to detect uninitialized
-btrfs_bio::iter.
-
-The problem is related to two call sites:
-- btrfs_submit_compressed_read()
-- btrfs_submit_compressed_write()
-
-The compressed bio doesn't have its iter properly initialized for error
-path, thus it's causing the problem.
-
-Just two new lines and the problem can be fixed.
-
-I'll refresh the patchset.
-
-Thank you again for catching this,
-Qu
-
->
-> Josef
+>> 3) Don't count the group if the group doesn't have pending requests,
+>> while it's child groups may have pending requests, patch 7;
+>>
+>> This is because, for example:
+>> if sync ios are issued from cgroup /root/c1/c2, root, c1 and c2
+>> will all be counted into 'num_groups_with_pending_reqs',
+>> which makes it impossible to handle sync ios concurrently.
+>>
+>> 4) Decrease 'num_groups_with_pending_reqs' when the last queue completes
+>> all the requests, while child groups may still have pending
+>> requests, patch 8-10;
+>>
+>> This is because, for example:
+>> t1 issue sync io on root group, t2 and t3 issue sync io on the same
+>> child group. num_groups_with_pending_reqs is 2 now.
+>> After t1 stopped, num_groups_with_pending_reqs is still 2. sync io from
+>> t2 and t3 still can't be handled concurrently.
+>>
+>> fio test script: startdelay is used to avoid queue merging
+>> [global]
+>> filename=/dev/nvme0n1
+>> allow_mounted_write=0
+>> ioengine=psync
+>> direct=1
+>> ioscheduler=bfq
+>> offset_increment=10g
+>> group_reporting
+>> rw=randwrite
+>> bs=4k
+>>
+>> [test1]
+>> numjobs=1
+>>
+>> [test2]
+>> startdelay=1
+>> numjobs=1
+>>
+>> [test3]
+>> startdelay=2
+>> numjobs=1
+>>
+>> [test4]
+>> startdelay=3
+>> numjobs=1
+>>
+>> [test5]
+>> startdelay=4
+>> numjobs=1
+>>
+>> [test6]
+>> startdelay=5
+>> numjobs=1
+>>
+>> [test7]
+>> startdelay=6
+>> numjobs=1
+>>
+>> [test8]
+>> startdelay=7
+>> numjobs=1
+>>
+>> test result:
+>> running fio on root cgroup
+>> v5.17-rc6:       550 Mib/s
+>> v5.17-rc6-patched: 550 Mib/s
+>>
+>> running fio on non-root cgroup
+>> v5.17-rc6:       349 Mib/s
+>> v5.17-rc6-patched: 550 Mib/s
+>>
+>> Yu Kuai (11):
+>>    block, bfq: add new apis to iterate bfq entities
+>>    block, bfq: apply news apis where root group is not expected
+>>    block, bfq: cleanup for __bfq_activate_requeue_entity()
+>>    block, bfq: move the increasement of 'num_groups_with_pending_reqs' to
+>>      it's caller
+>>    block, bfq: count root group into 'num_groups_with_pending_reqs'
+>>    block, bfq: do not idle if only one cgroup is activated
+>>    block, bfq: only count parent bfqg when bfqq is activated
+>>    block, bfq: record how many queues have pending requests in bfq_group
+>>    block, bfq: move forward __bfq_weights_tree_remove()
+>>    block, bfq: decrease 'num_groups_with_pending_reqs' earlier
+>>    block, bfq: cleanup bfqq_group()
+>>
+>>   block/bfq-cgroup.c  | 13 +++----
+>>   block/bfq-iosched.c | 87 +++++++++++++++++++++++----------------------
+>>   block/bfq-iosched.h | 41 +++++++++++++--------
+>>   block/bfq-wf2q.c    | 56 +++++++++++++++--------------
+>>   4 files changed, 106 insertions(+), 91 deletions(-)
+>>
