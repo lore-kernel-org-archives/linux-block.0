@@ -2,338 +2,173 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D64DC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 09:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D8CFC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 09:58:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232145AbiCQJp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 05:45:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45070 "EHLO
+        id S232020AbiCQJ7U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 05:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230144AbiCQJp4 (ORCPT
+        with ESMTP id S230232AbiCQJ7T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 05:45:56 -0400
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6035B19E3BE
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 02:44:39 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id bt26so8059754lfb.3
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 02:44:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9EPdn0777KfRbw324TfNEswtJdM3YIyLThIddk+dLTk=;
-        b=hoqHdW1Xgu8Dumbv+Wu4HJQzt2T9W9GRP/YCD2GpIGdXayUC+5GEYHQt5PrhpB0wbf
-         vEE/CMa9eLPYV48lKdh7gq4qoAq1WRJKVu3EXuWdjtjpTpdrnZclgypMXVOf7H3cIVVk
-         pM3wyySWLAiyKNUjvaR0gCAkPvdTFPKAffucfrK5f7Mma0S9eg4yeYrpgoOyX8G4j+J4
-         Ks9H+8V3s9f14v4OseslZJCCLdA3+6wJjQR1sslhABcycL3aoDf3w345yfrHkkzrTWBL
-         M6j0Rf7giImA0bCIsMIGDmA4sH5yD+QbH7Oo0ligvUkfdi4Wss4FP30TMUP2UO9pajfh
-         X1jQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9EPdn0777KfRbw324TfNEswtJdM3YIyLThIddk+dLTk=;
-        b=3WrKXOHmkzp1Dtb46lq4UjjkZelC8Pjk+aiJxUUyU3hEExvmgmtjOHCT5txPnTC3JU
-         WxUkr08gaPAmtkMxpjQXmZGzGV6G4q+bDjn394c2zxw9IcmdNdylVeWcIKXQFeylUEoz
-         xg75u0+YtiXfikfWcbMkE6/kzKthDmFQGFLUTqXYs8CgMht+Nkey8qIy4lLgp6ZaUv2x
-         2eXsf70Ru6UVBrBlsUuAmmN1qf12aAqjhXsFciYOHbslp8o4VgoMwro+7z4BVeKHw2/w
-         jxy5pZ/MEoMHi6CUdyRDogdGgZvmKgZ8mh6HkJhGowwCtmId6ZstYK5mjcksN8A/mKHU
-         fd+g==
-X-Gm-Message-State: AOAM530z6mCuU9lfDAbqU/bWWc8yGs/QdBbX7oOzD5ML/zBnplN8fT7e
-        S9FKL0JzIPW+KxxTB7bbmNB1nis00JNe9XYA91gOBw==
-X-Google-Smtp-Source: ABdhPJy3tN+hW6Ai7ZXE8IBo6PFt7Sr8mILD2yKlyR5i8wl0U6iztfagIBIGOgeNu3R17kn62hYSDTxE/MwBPeKmeMw=
-X-Received: by 2002:a05:6512:260b:b0:445:c54c:4157 with SMTP id
- bt11-20020a056512260b00b00445c54c4157mr2385031lfb.254.1647510277462; Thu, 17
- Mar 2022 02:44:37 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220316093740.GA7714@lst.de> <20220316093855.GC7714@lst.de>
-In-Reply-To: <20220316093855.GC7714@lst.de>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 17 Mar 2022 10:44:01 +0100
-Message-ID: <CAPDyKFrH4L2Y2TOFyWPJ+_rrgvJPixR05XX_HWUU99h0MZhLuA@mail.gmail.com>
-Subject: Re: [PATCH alternative 2] block: fix the REQ_OP_SECURE_ERASE handling
- to not leak erased data
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, jaegeuk@kernel.org, chao@kernel.org,
+        Thu, 17 Mar 2022 05:59:19 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF7FC2603;
+        Thu, 17 Mar 2022 02:58:00 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220317095759euoutp01be2f4db1af9b176f7780903843364ec3~dIpkhDH5r2797527975euoutp01B;
+        Thu, 17 Mar 2022 09:57:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220317095759euoutp01be2f4db1af9b176f7780903843364ec3~dIpkhDH5r2797527975euoutp01B
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1647511079;
+        bh=T6TenN2I/uyDLRmMdUEMeMHXdwnk7QTMC8eQ3Q8o8cU=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=Jj9Z/cdI+qBtdL95ufFyEC6KJN8uAmszFzVQ1tuHtC5iDKyTlPrU3iXVJq0/5pp4+
+         Zr3izoU6gV+WpI0aVtOPh3ZvwooPQ+kA+ZQTSPzgcsrRYtujbNm9HQWWmJnExbZ5c4
+         1SBj33pZzj/oLhT+7+oB4PZ1e84+1c57uvgYH03U=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220317095759eucas1p10b2422659ae2dc709f26b176ac203882~dIpkHjbaM0849708497eucas1p1i;
+        Thu, 17 Mar 2022 09:57:59 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 01.07.10009.72603326; Thu, 17
+        Mar 2022 09:57:59 +0000 (GMT)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220317095758eucas1p2a206819e4c3e0e38f685b40df8b0ca37~dIpjny6dv1831218312eucas1p25;
+        Thu, 17 Mar 2022 09:57:58 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220317095758eusmtrp216038a0e1495487701416f5f87b5317f~dIpjnDdtH2513325133eusmtrp27;
+        Thu, 17 Mar 2022 09:57:58 +0000 (GMT)
+X-AuditID: cbfec7f2-e7fff70000002719-bf-62330627a54a
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 7C.BC.09404.62603326; Thu, 17
+        Mar 2022 09:57:58 +0000 (GMT)
+Received: from localhost (unknown [106.210.248.204]) by eusmtip1.samsung.com
+        (KnoxPortal) with ESMTPA id
+        20220317095758eusmtip1b9f4b888cc3451d6c52bec379b7f159c~dIpjXAFUZ2291222912eusmtip1b;
+        Thu, 17 Mar 2022 09:57:58 +0000 (GMT)
+Date:   Thu, 17 Mar 2022 10:57:56 +0100
+From:   Joel Granados <j.granados@samsung.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        jaegeuk@kernel.org, chao@kernel.org, ulf.hansson@linaro.org,
         Adrian Hunter <adrian.hunter@intel.com>,
         Daeho Jeong <daehojeong@google.com>,
-        Eric Biggers <ebiggers@google.com>,
         linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-mmc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: security issue: data exposure when using block layer secure
+ erase
+Message-ID: <20220317095756.vqfdxb5gd5nvuank@joelS1.panther.com>
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg="pgp-sha512";
+        protocol="application/pgp-signature"; boundary="ytpb7p6j66wf776p"
+Content-Disposition: inline
+In-Reply-To: <YjIm6f6pSX1CKeqb@gmail.com>
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrMKsWRmVeSWpSXmKPExsWy7djPc7rqbMZJBpMn8VmcfLKGzWL13X42
+        i9NTzzJZTG3fy2ixds8fZouVq48yWTxZP4vZYu8tbYvLu+awWRz5389ocXxtuAO3x4JNpR6L
+        97xk8rh8ttRj06pONo871/aweey+2cDm8XmTXAB7FJdNSmpOZllqkb5dAlfGkyU72QqWC1dM
+        6N3C3MC4RaCLkZNDQsBEYtWP4yxdjFwcQgIrGCXe3T/EBOF8YZS4dmsLK4TzmVHi8/09zDAt
+        K5d9ZYZILGeUOLp5KiOE85JRYuG6BnaQKhYBVYmWvt9sIDabgI7E+Td3gDo4OEQE1CSOLfUH
+        qWcWmMMksfPHfbAaYYEAicbWz0wgNq+Ag8SWg+dYIGxBiZMzn4DZzAIVEtsePWQFmcMsIC2x
+        /B8HSJhTQFNif/t1dpCZEgKzOSWefrjGDlIjIeAi8eF/CcTRwhKvjm9hh7BlJP7vnM8EYVdL
+        tFxbBBVvYZRYf04botVaou9MDkTYUWLVn7NsEGE+iRtvBSGO4ZOYtG06M0SYV6KjTQiiWkWi
+        b+kUFghbSuL65Z1QnR4Sb9YWgYSFBOYySrScrpjAqDALyYezkHw4C+FDiLCOxILdn9gwhLUl
+        li18zQxh20qsW/eeZQEj+ypG8dTS4tz01GLDvNRyveLE3OLSvHS95PzcTYzAtHf63/FPOxjn
+        vvqod4iRiYPxEKMKUPOjDasvMEqx5OXnpSqJ8J55oZ8kxJuSWFmVWpQfX1Sak1p8iFGag0VJ
+        nDc5c0OikEB6YklqdmpqQWoRTJaJg1OqgSk+aVLX/Lb850ftmZnmCM/gVk+9sNzvyqKw/Y0X
+        mzU2vIlYdupq+TGb2nnKq/a+j9HLFN8jIDKhU7eq7suniDz2SeeYOYW2u5422en1y1H8ztG7
+        28TauO6JKPxa+ib7oXCuq18fj39N/9yFykd0v2+IfZDdq/TrIM+P8Ftffm6vFgrWlOtasn3l
+        6/j7Ep9aQrbVWMw++uJK+yzmLyVNBqyrnzcW1EypsLIuz9pUfeuX+BVPFV1fviN8nzyu6Hvc
+        4fgsNMlDa5qFchrrnvJZhxUS+4QkjV8kPzbbXhl5dPXcOA2uRX0nrSre6Vs+SEjiuSl36EiT
+        aebSgs7tRcrbYm7z3z7d2Wnv1Pdbdn1ShRJLcUaioRZzUXEiAOisSbr2AwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHIsWRmVeSWpSXmKPExsVy+t/xu7pqbMZJBjtPaVicfLKGzWL13X42
+        i9NTzzJZTG3fy2ixds8fZouVq48yWTxZP4vZYu8tbYvLu+awWRz5389ocXxtuAO3x4JNpR6L
+        97xk8rh8ttRj06pONo871/aweey+2cDm8XmTXAB7lJ5NUX5pSapCRn5xia1StKGFkZ6hpYWe
+        kYmlnqGxeayVkamSvp1NSmpOZllqkb5dgl7Gnf5NzAVLhSs+7zvF2MC4SaCLkZNDQsBEYuWy
+        r8wgtpDAUkaJHw/Yuxg5gOJSEt+XcUKUCEv8udbF1sXIBVTynFHi34ztjCAJFgFViZa+32wg
+        NpuAjsT5N3eYQXpFBNQkji31B6lnFpjDJHHo61Z2kBphAT+g3iVMIDavgIPEloPnWCCGzmWU
+        mHdnDiNEQlDi5MwnLCA2s0CZxOFTr8GGMgtISyz/xwES5hTQlNjffp19AqPALCQds5B0zELo
+        gAhrSdz495IJQ1hbYtlCkGoQ21Zi3br3LAsY2VcxiqSWFuem5xYb6RUn5haX5qXrJefnbmIE
+        Ru62Yz+37GBc+eqj3iFGJg7GQ4wqQJ2PNqy+wCjFkpefl6okwnvmhX6SEG9KYmVValF+fFFp
+        TmrxIUZTYGhNZJYSTc4HppS8knhDMwNTQxMzSwNTSzNjJXFez4KORCGB9MSS1OzU1ILUIpg+
+        Jg5OqQYmqUsrshe/+yKZsXr5XYtqM53F6pPXubc85/5wrOtLg1OpzRGG41at0ypeyz7TNtH5
+        JeTNfW6JbuHm1dIf7zPcWfyjSLhBg0e43r+E5cY3TqO8nWYqkou+lB6b4OxVHugi9/qw0VNx
+        treN+SlqTEXnN81w4FXu/7Cx12KuL5PYER8Om7aKp/sE7yjwcqn4leXdzozyyg1l2baP8/96
+        sSlfpv0UNckUf2NQ9zk6q3C+QfTZUgs5/+zPWd+V7zDd8fteovft0CO5LSsan8TwnuUKndp1
+        N9Dmg5bCrOAbbW68vxp1mdkire6UeFns8qjunW36+PrMn14KLReP+bvV6rJkyb1VaJ0WGZbx
+        KlC2UImlOCPRUIu5qDgRANhiyHtxAwAA
+X-CMS-MailID: 20220317095758eucas1p2a206819e4c3e0e38f685b40df8b0ca37
+X-Msg-Generator: CA
+X-RootMTR: 20220316180540eucas1p2179a720cb484c46f396978eaec8c6aa6
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220316180540eucas1p2179a720cb484c46f396978eaec8c6aa6
+References: <20220316093740.GA7714@lst.de>
+        <CGME20220316180540eucas1p2179a720cb484c46f396978eaec8c6aa6@eucas1p2.samsung.com>
+        <YjIm6f6pSX1CKeqb@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 16 Mar 2022 at 10:38, Christoph Hellwig <hch@lst.de> wrote:
->
-> The support for this "secure erase" is completely broken, given that
-> the blk-lib code aligns it to the discard granularity and alignment
-> and thus skips parts of the two be discarded area, leaking plenty of
-> securely erased data.  Fix this by adding a new blkdev_secure_erase
-> helper instead.
->
-> Note that even if with these rounding errors fixed, a LBA based
-> "secure erase" can't actually work on flash media.  As flash media
-> requires erase cycles before writing instead of overwrites there
-> usually will be copied of this data left somewhere on the media.
+--ytpb7p6j66wf776p
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Stating that it can't work is probably not a correct statement.
-Certainly it can, but it depends on how "secure" (or clever) the
-implementation of the FTL is in the flash media. I mean, nothing
-prevents the FTL from doing a real erase on erase block level and
-simply let the "secure erase" request wait on that operation to be
-completed.
+On Wed, Mar 16, 2022 at 06:05:29PM +0000, Eric Biggers wrote:
+> On Wed, Mar 16, 2022 at 10:37:40AM +0100, Christoph Hellwig wrote:
+> > Hi all,
+> >=20
+> > while staring at the block layer code I found what I think is a major
+> > security issue with the use of REQ_OP_SECURE_ERASE.
+> >=20
+> > The issue is not about the actual protocol implementation, which only
+> > exists for eMMC [1], but about we handle issuing the operation in the
+> > block layer.  That is done through __blkdev_issue_discard, which
+> > takes various parameters into account to align the issue discard
+> > request to what the hardware prefers.  Which is perfectly fine for
+> > discard as an advisory operation, but deadly for an operation that
+> > wants to make data inaccessible.  The problem has existed ever since
+> > secure erase support was added to the kernel with commit
+> > 8d57a98ccd0b ("block: add secure discard"), which added secure erase
+> > support as a REQ_SECURE flag to the discard operation.
+>=20
+> __blkdev_issue_discard() can break up the region into multiple bios, but =
+I don't
+> see where it actually skips parts of the region.  Can you explain more
+> specifically where the problem is?
+>=20
+> - Eric
 
-It looks like the use-cases for "secure erase" are just trying with a
-"best effort" in mind. There are no guarantees that the data is really
-wiped out from flash, but if it can, it's better than keeping it
-around. I guess the real problem comes when the use-case actually
-believes that the data is guaranteed to be wiped out, while it may
-not.
+I'm also not seeing it.
 
-I really don't have a strong opinion on what way we want to go with
-this. Both alternative 1 and alternative 2 work for me, so I leave the
-call to you and others.
+As I read the __blkdev_issue_discard() function it uses
+discard_granularity to define the required sectors (req_sects) for each
+bio. req_sects can change on every iteration of the while loop, but
+all consecutive bios then start where the previous one ended.
 
-Kind regards
-Uffe
+Am I missing something?
 
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/blk-lib.c                     | 55 +++++++++++++++++++++++------
->  block/ioctl.c                       | 43 +++++++++++++++++-----
->  drivers/block/xen-blkback/blkback.c | 15 ++++----
->  fs/f2fs/file.c                      |  9 ++---
->  include/linux/blkdev.h              |  4 +--
->  5 files changed, 95 insertions(+), 31 deletions(-)
->
-> diff --git a/block/blk-lib.c b/block/blk-lib.c
-> index 9f09beadcbe30..5fc2c0bf5c940 100644
-> --- a/block/blk-lib.c
-> +++ b/block/blk-lib.c
-> @@ -29,7 +29,7 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->  {
->         struct request_queue *q = bdev_get_queue(bdev);
->         struct bio *bio = *biop;
-> -       unsigned int op;
-> +       unsigned int op = REQ_OP_DISCARD;
->         sector_t bs_mask, part_offset = 0;
->
->         if (!q)
-> @@ -38,15 +38,8 @@ int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->         if (bdev_read_only(bdev))
->                 return -EPERM;
->
-> -       if (flags & BLKDEV_DISCARD_SECURE) {
-> -               if (!blk_queue_secure_erase(q))
-> -                       return -EOPNOTSUPP;
-> -               op = REQ_OP_SECURE_ERASE;
-> -       } else {
-> -               if (!blk_queue_discard(q))
-> -                       return -EOPNOTSUPP;
-> -               op = REQ_OP_DISCARD;
-> -       }
-> +       if (!blk_queue_discard(q))
-> +               return -EOPNOTSUPP;
->
->         /* In case the discard granularity isn't set by buggy device driver */
->         if (WARN_ON_ONCE(!q->limits.discard_granularity)) {
-> @@ -440,3 +433,45 @@ int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
->         return ret;
->  }
->  EXPORT_SYMBOL(blkdev_issue_zeroout);
-> +
-> +int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
-> +               sector_t nr_sects, gfp_t gfp)
-> +{
-> +       sector_t bs_mask = (bdev_logical_block_size(bdev) >> 9) - 1;
-> +       unsigned int max_sectors =
-> +               bdev_get_queue(bdev)->limits.max_discard_sectors;
-> +       struct bio *bio = NULL;
-> +       struct blk_plug plug;
-> +       int ret = 0;
-> +
-> +       if (max_sectors == 0)
-> +               return -EOPNOTSUPP;
-> +       if ((sector | nr_sects) & bs_mask)
-> +               return -EINVAL;
-> +       if (bdev_read_only(bdev))
-> +               return -EPERM;
-> +
-> +       blk_start_plug(&plug);
-> +       for (;;) {
-> +               unsigned int len = min_t(sector_t, nr_sects, max_sectors);
-> +
-> +               bio = blk_next_bio(bio, 0, gfp);
-> +               bio_set_dev(bio, bdev);
-> +               bio->bi_opf = REQ_OP_SECURE_ERASE;
-> +               bio->bi_iter.bi_sector = sector;
-> +               bio->bi_iter.bi_size = len;
-> +
-> +               sector += len << SECTOR_SHIFT;
-> +               nr_sects -= len << SECTOR_SHIFT;
-> +               if (!nr_sects) {
-> +                       ret = submit_bio_wait(bio);
-> +                       bio_put(bio);
-> +                       break;
-> +               }
-> +               cond_resched();
-> +       }
-> +       blk_finish_plug(&plug);
-> +
-> +       return ret;
-> +}
-> +EXPORT_SYMBOL(blkdev_issue_secure_erase);
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 4a86340133e46..0821142f921d7 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -83,7 +83,7 @@ static int compat_blkpg_ioctl(struct block_device *bdev,
->  #endif
->
->  static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
-> -               unsigned long arg, unsigned long flags)
-> +               unsigned long arg)
->  {
->         uint64_t range[2];
->         uint64_t start, len;
-> @@ -115,15 +115,43 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
->         err = truncate_bdev_range(bdev, mode, start, start + len - 1);
->         if (err)
->                 goto fail;
-> -
-> -       err = blkdev_issue_discard(bdev, start >> 9, len >> 9,
-> -                                  GFP_KERNEL, flags);
-> -
-> +       err = blkdev_issue_discard(bdev, start >> 9, len >> 9, GFP_KERNEL, 0);
->  fail:
->         filemap_invalidate_unlock(inode->i_mapping);
->         return err;
->  }
->
-> +static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t mode,
-> +               void __user *argp)
-> +{
-> +       uint64_t start, len;
-> +       uint64_t range[2];
-> +       int err;
-> +
-> +       if (!(mode & FMODE_WRITE))
-> +               return -EBADF;
-> +       if (!blk_queue_discard(bdev_get_queue(bdev)))
-> +               return -EOPNOTSUPP;
-> +       if (copy_from_user(range, argp, sizeof(range)))
-> +               return -EFAULT;
-> +
-> +       start = range[0];
-> +       len = range[1];
-> +       if ((start & 511) || (len & 511))
-> +               return -EINVAL;
-> +       if (start + len > bdev_nr_bytes(bdev))
-> +               return -EINVAL;
-> +
-> +       filemap_invalidate_lock(bdev->bd_inode->i_mapping);
-> +       err = truncate_bdev_range(bdev, mode, start, start + len - 1);
-> +       if (!err)
-> +               err = blkdev_issue_secure_erase(bdev, start >> 9, len >> 9,
-> +                                               GFP_KERNEL);
-> +       filemap_invalidate_unlock(bdev->bd_inode->i_mapping);
-> +       return err;
-> +}
-> +
-> +
->  static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
->                 unsigned long arg)
->  {
-> @@ -451,10 +479,9 @@ static int blkdev_common_ioctl(struct block_device *bdev, fmode_t mode,
->         case BLKROSET:
->                 return blkdev_roset(bdev, mode, cmd, arg);
->         case BLKDISCARD:
-> -               return blk_ioctl_discard(bdev, mode, arg, 0);
-> +               return blk_ioctl_discard(bdev, mode, arg);
->         case BLKSECDISCARD:
-> -               return blk_ioctl_discard(bdev, mode, arg,
-> -                               BLKDEV_DISCARD_SECURE);
-> +               return blk_ioctl_secure_erase(bdev, mode, argp);
->         case BLKZEROOUT:
->                 return blk_ioctl_zeroout(bdev, mode, arg);
->         case BLKGETDISKSEQ:
-> diff --git a/drivers/block/xen-blkback/blkback.c b/drivers/block/xen-blkback/blkback.c
-> index 14e452896d04c..12f741068bcdf 100644
-> --- a/drivers/block/xen-blkback/blkback.c
-> +++ b/drivers/block/xen-blkback/blkback.c
-> @@ -970,7 +970,6 @@ static int dispatch_discard_io(struct xen_blkif_ring *ring,
->         int status = BLKIF_RSP_OKAY;
->         struct xen_blkif *blkif = ring->blkif;
->         struct block_device *bdev = blkif->vbd.bdev;
-> -       unsigned long secure;
->         struct phys_req preq;
->
->         xen_blkif_get(blkif);
-> @@ -987,13 +986,15 @@ static int dispatch_discard_io(struct xen_blkif_ring *ring,
->         }
->         ring->st_ds_req++;
->
-> -       secure = (blkif->vbd.discard_secure &&
-> -                (req->u.discard.flag & BLKIF_DISCARD_SECURE)) ?
-> -                BLKDEV_DISCARD_SECURE : 0;
-> +       if (blkif->vbd.discard_secure &&
-> +           (req->u.discard.flag & BLKIF_DISCARD_SECURE))
-> +               err = blkdev_issue_secure_erase(bdev,
-> +                               req->u.discard.sector_number,
-> +                               req->u.discard.nr_sectors, GFP_KERNEL);
-> +       else
-> +               err = blkdev_issue_discard(bdev, req->u.discard.sector_number,
-> +                               req->u.discard.nr_sectors, GFP_KERNEL, 0);
->
-> -       err = blkdev_issue_discard(bdev, req->u.discard.sector_number,
-> -                                  req->u.discard.nr_sectors,
-> -                                  GFP_KERNEL, secure);
->  fail_response:
->         if (err == -EOPNOTSUPP) {
->                 pr_debug("discard op failed, not supported\n");
-> diff --git a/fs/f2fs/file.c b/fs/f2fs/file.c
-> index 3c98ef6af97d1..a83548ad7171f 100644
-> --- a/fs/f2fs/file.c
-> +++ b/fs/f2fs/file.c
-> @@ -3691,10 +3691,11 @@ static int f2fs_secure_erase(struct block_device *bdev, struct inode *inode,
->         if (!q)
->                 return -ENXIO;
->
-> -       if (flags & F2FS_TRIM_FILE_DISCARD)
-> -               ret = blkdev_issue_discard(bdev, sector, nr_sects, GFP_NOFS,
-> -                                               blk_queue_secure_erase(q) ?
-> -                                               BLKDEV_DISCARD_SECURE : 0);
-> +       if ((flags & F2FS_TRIM_FILE_DISCARD) && blk_queue_secure_erase(q))
-> +               ret = blkdev_issue_secure_erase(bdev, sector, nr_sects,
-> +                                               GFP_NOFS);
-> +       else if (flags & F2FS_TRIM_FILE_DISCARD)
-> +               ret = blkdev_issue_discard(bdev, sector, nr_sects, GFP_NOFS, 0);
->
->         if (!ret && (flags & F2FS_TRIM_FILE_ZEROOUT)) {
->                 if (IS_ENCRYPTED(inode))
-> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-> index 16b47035e4b06..6cfc60090b119 100644
-> --- a/include/linux/blkdev.h
-> +++ b/include/linux/blkdev.h
-> @@ -846,13 +846,13 @@ extern void blk_io_schedule(void);
->  extern int blkdev_issue_write_same(struct block_device *bdev, sector_t sector,
->                 sector_t nr_sects, gfp_t gfp_mask, struct page *page);
->
-> -#define BLKDEV_DISCARD_SECURE  (1 << 0)        /* issue a secure erase */
-> -
->  extern int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->                 sector_t nr_sects, gfp_t gfp_mask, unsigned long flags);
->  extern int __blkdev_issue_discard(struct block_device *bdev, sector_t sector,
->                 sector_t nr_sects, gfp_t gfp_mask, int flags,
->                 struct bio **biop);
-> +int blkdev_issue_secure_erase(struct block_device *bdev, sector_t sector,
-> +               sector_t nr_sects, gfp_t gfp);
->
->  #define BLKDEV_ZERO_NOUNMAP    (1 << 0)  /* do not free blocks */
->  #define BLKDEV_ZERO_NOFALLBACK (1 << 1)  /* don't write explicit zeroes */
-> --
-> 2.30.2
->
+Joel
+
+--ytpb7p6j66wf776p
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmIzBh0ACgkQupfNUreW
+QU9p7Qv/UfKXFyL6aVj6F7OKUsiqBC100Z9LAW/CcxJj1VRxfvO2OF3NKt+hunId
+Wct6qqrxzvTv0WG3qb0mKLkGj+hbMiJg3SuIVAYewlQHFxsmFExuACV7KFLt/wUJ
+N+/tQtzf3QRwzvB5L2nQ+nn0MrS/32iStn4mpyZuR8E3FSD9ArlPB9mZdwS+Lq85
+dhYMLkRcd491uYZtBZYEJ+fFtR7xbw5vy+LcmnvJoLeBjNGEiLUQCO7rXGFOBNPP
+M2Kc73Jl/7wZLZOdmxEti6ecNtLkfC3DAQSM74utDZjAsunqK7PYvwPOsc288hOC
+fwfZfY1+yW1cGHsu+JZQJc9bMsNfk41qmyM74cPqhFM3Iar77c6g9UC5lbY9aj3X
+LiAKoVORGCH85CQb9tqi/20GLdxo2iOfM4TbcxxT8eJMPhT0PHV0JJy2C5eXwyGq
+FpMgixPMKgkYxcarDwhuVLqXPtMvIBVDoVXtWZVZZeQw01DEGipmOo7VufKnnjS+
+F2Lvrrqw
+=4Qk6
+-----END PGP SIGNATURE-----
+
+--ytpb7p6j66wf776p--
