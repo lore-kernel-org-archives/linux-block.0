@@ -2,113 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83AEAC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 13:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD24C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 14:06:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230362AbiCQNGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 09:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33220 "EHLO
+        id S234939AbiCQOHf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 10:07:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229841AbiCQNGu (ORCPT
+        with ESMTP id S234948AbiCQOHe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 09:06:50 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 428A31557CA;
-        Thu, 17 Mar 2022 06:05:33 -0700 (PDT)
-Received: from dggeme756-chm.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4KK6hy4lDNz9smw;
-        Thu, 17 Mar 2022 21:01:22 +0800 (CST)
-Received: from [10.174.176.103] (10.174.176.103) by
- dggeme756-chm.china.huawei.com (10.3.19.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.21; Thu, 17 Mar 2022 21:05:11 +0800
-Message-ID: <8139ea99-09fa-eb84-e9ef-f1fb470b5b88@huawei.com>
-Date:   Thu, 17 Mar 2022 21:05:11 +0800
+        Thu, 17 Mar 2022 10:07:34 -0400
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61245136660;
+        Thu, 17 Mar 2022 07:06:18 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id mz9-20020a17090b378900b001c657559290so5285575pjb.2;
+        Thu, 17 Mar 2022 07:06:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=l5TJbPNzDqPASdkDHCLk62DytQZBW+wKClOw+PHQQjc=;
+        b=Nx9GdB+OwF0Pai9M39tso/lBKaWwCYr/T/8yjX2C2nMSEDAV5zs6+8gbBqwNRTX61l
+         4bG9EVIxs8ysO2B46J8jb1lQ+moEoCGW6r25FZWuGUzpi5q7FYGeDSbNqZShf+6qu/X5
+         faRuUJlBC9bL3t9l/vzJn77gRuxToRaOL+Y5l99gFVx7hrCLbOI9AMpPwF6oQ2qO79Pv
+         8bhfXXp648tsz+l2vm0k7OVRWrG3fMOlvHEYOuwh7b1ifoD4E/5+bCoHIdTQhusMaNI7
+         AVTRFTax2x/n5zZwCEkMdnVNFV07l+OU7Dm/tA7qCjcSStOIwxE/e/AmEj1xYhhnoHPw
+         pUug==
+X-Gm-Message-State: AOAM533rK3AN72GmFi8H/jxVPF2+ZnvKG4Upg11f6pq1iLG2DrKymtgj
+        yFitzGswO7FWH5CxivlBxUs=
+X-Google-Smtp-Source: ABdhPJw+trXwAO+jp5KEgP7+0YMzXFmtnQ7Oi+H6HoOCE18jVvu7LSrsSPwBrEX4TkUVY2eHcaADhA==
+X-Received: by 2002:a17:902:e94f:b0:14f:1636:c8a8 with SMTP id b15-20020a170902e94f00b0014f1636c8a8mr4952381pll.130.1647525977380;
+        Thu, 17 Mar 2022 07:06:17 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id na8-20020a17090b4c0800b001bf191ee347sm10381694pjb.27.2022.03.17.07.06.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Mar 2022 07:06:17 -0700 (PDT)
+Message-ID: <22cd48e9-fe36-414c-942e-382b8139ab4b@acm.org>
+Date:   Thu, 17 Mar 2022 07:06:15 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH -next] nbd: fix possible overflow on 'first_minor' in
- nbd_dev_add()
-From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>, <yukuai3@huawei.com>
-References: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
- <0e5faf35-5adb-3ea1-9f7f-7c4f61a623b2@huawei.com>
-In-Reply-To: <0e5faf35-5adb-3ea1-9f7f-7c4f61a623b2@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.103]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggeme756-chm.china.huawei.com (10.3.19.102)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH 1/3] block: don't show disk stats if io accounting is
+ disabled
+Content-Language: en-US
+To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk, mpatocka@redhat.com,
+        snitzer@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220317112653.1019490-1-yukuai3@huawei.com>
+ <20220317112653.1019490-2-yukuai3@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220317112653.1019490-2-yukuai3@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping...
+On 3/17/22 04:26, Yu Kuai wrote:
+> If io accounting is disabled, there is no point to handle such device
+> in diskstats_show(), and it can be confused for users because all fields
+> in iostat are zero while the disk is handling io.
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   block/genhd.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index c3b32c665aec..e5307f512185 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -937,6 +937,9 @@ ssize_t part_stat_show(struct device *dev,
+>   	struct disk_stats stat;
+>   	unsigned int inflight;
+>   
+> +	if (!blk_queue_io_stat(q))
+> +		return sprintf(buf, "io accounting is disabled\n");
+> +
 
-在 2022/3/11 10:43, zhangwensheng (E) 写道:
-> friendly ping...
->
-> 在 2022/3/10 17:32, Zhang Wensheng 写道:
->> When 'index' is a big numbers, it may become negative which forced
->> to 'int'. then 'index << part_shift' might overflow to a positive
->> value that is not greater than '0xfffff', then sysfs might complains
->> about duplicate creation. Because of this, move the 'index' judgment
->> to the front will fix it and be better.
->>
->> Fixes: b0d9111a2d53 ("nbd: use an idr to keep track of nbd devices")
->> Fixes: 940c264984fd ("nbd: fix possible overflow for 'first_minor' in 
->> nbd_dev_add()")
->> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
->> ---
->>   drivers/block/nbd.c | 24 ++++++++++++------------
->>   1 file changed, 12 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index 5a1f98494ddd..b3cdfc0ffb98 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -1800,17 +1800,6 @@ static struct nbd_device *nbd_dev_add(int 
->> index, unsigned int refs)
->>       refcount_set(&nbd->refs, 0);
->>       INIT_LIST_HEAD(&nbd->list);
->>       disk->major = NBD_MAJOR;
->> -
->> -    /* Too big first_minor can cause duplicate creation of
->> -     * sysfs files/links, since index << part_shift might overflow, or
->> -     * MKDEV() expect that the max bits of first_minor is 20.
->> -     */
->> -    disk->first_minor = index << part_shift;
->> -    if (disk->first_minor < index || disk->first_minor > MINORMASK) {
->> -        err = -EINVAL;
->> -        goto out_free_work;
->> -    }
->> -
->>       disk->minors = 1 << part_shift;
->>       disk->fops = &nbd_fops;
->>       disk->private_data = nbd;
->> @@ -1915,8 +1904,19 @@ static int nbd_genl_connect(struct sk_buff 
->> *skb, struct genl_info *info)
->>       if (!netlink_capable(skb, CAP_SYS_ADMIN))
->>           return -EPERM;
->>   -    if (info->attrs[NBD_ATTR_INDEX])
->> +    if (info->attrs[NBD_ATTR_INDEX]) {
->>           index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
->> +
->> +        /*
->> +         * Too big first_minor can cause duplicate creation of
->> +         * sysfs files/links, since index << part_shift might 
->> overflow, or
->> +         * MKDEV() expect that the max bits of first_minor is 20.
->> +         */
->> +        if (index < 0 || index > MINORMASK >> part_shift) {
->> +            printk(KERN_ERR "nbd: illegal input index %d\n", index);
->> +            return -EINVAL;
->> +        }
->> +    }
->>       if (!info->attrs[NBD_ATTR_SOCKETS]) {
->>           printk(KERN_ERR "nbd: must specify at least one socket\n");
->>           return -EINVAL;
-> .
+Hmm ... the above looks sub-optimal to me. Has it been considered to 
+return an error code instead or even better to hide the stat attribute 
+if I/O accounting is disabled? The latter can be achieved by modifying 
+disk_visible().
+
+Thanks,
+
+Bart.
