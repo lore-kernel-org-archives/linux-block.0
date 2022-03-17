@@ -2,243 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EAE3C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 06:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E072C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 07:33:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229647AbiCQGUP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 02:20:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54880 "EHLO
+        id S230311AbiCQHeo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 03:34:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiCQGUH (ORCPT
+        with ESMTP id S229943AbiCQHen (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 02:20:07 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F164AFA233;
-        Wed, 16 Mar 2022 23:09:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=bTtyCTv8jHiRySjv+joBkY5T4kiLsInhhDpfMbwTL1s=; b=os+6uLP+YQvzPOsl13Jv5guvuH
-        c88qjXZH5IySVlxqAYUihC2hbNJHZhERaN/9M1O+TRZA8WFEmSQGTv+E/uOHf9IEu5y58HmvUView
-        tJqv1oexE/7GCbLX/RqjjjPHc0Nz4QT1PCSUsF7D8Jb/EYTGiFjELEvWYE7Gu9MYUTFHov/uRCRY7
-        /x9sJUmFziSe300ACpWlnZupzoQCtmqCqtEMV0UdvwGyry98Nfw5QdyjOvLJ0JePVDhb/0YX8qdJT
-        w7vRAVMjNtBdhuXSlAfQdRkRsVo81YE8w/5mlAJkMGGTpqeQHzUxEbTrcOVom5D0PCqAQ3d5CQPbP
-        DH34JIfA==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nUiEF-001mlP-TU; Thu, 17 Mar 2022 04:59:16 +0000
-Message-ID: <5db1feea-f630-79e6-15cc-77babf58a429@infradead.org>
-Date:   Wed, 16 Mar 2022 21:59:01 -0700
+        Thu, 17 Mar 2022 03:34:43 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C06199ED5
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 00:33:26 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id 3-20020a056e020ca300b002c2cf74037cso2571347ilg.6
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 00:33:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=TXD53onF7jSioPaLEzYkXjzZs5nYo1PBwcqv+vMPmy8=;
+        b=Kr2l4o/VyvbfZDKVUh9C4XdT8SJkXTgEilInzud/WMbL8XmqsdGz7RQ2zXcv7a3mlU
+         XmnnHKfTd9UZ/PEjF4LniLzCb8Al2ib+G+U7D7EdZqM8/K6gPsjLU0RF1Oa2OBo3teiR
+         WO+KLCFpSeCI+dLgLOY5EYlF/5VSwQjOkXhTBJoazXMkvq2ZB5TYD8mkBkV7Gv6Wwdzk
+         VH3Hrz4qwhCSxolbSle61gEyNtg/DO0lRa/v/OsZarBhTMKFZewcPWUta6bKpznLtkoc
+         5qa7FrWrVSzPGUO69HB/NYT5msdZ1sVAQfBloCXi9/ZeeB4UgNPCovRrVbL/o6DnAWdQ
+         EjLw==
+X-Gm-Message-State: AOAM532xZ45psQvqYsGU6eNMPZkIkP1cmRm40sDD/JPF8BZV8LEfQf8d
+        SXaWYBrUM0CIYMp+JwRI4Eo7HsbTIuWUFN7UHOJAMwgyH3Uu
+X-Google-Smtp-Source: ABdhPJwkMsObrWiRRCcevnjxPP3cfk10pnUm5dioTbyRul+6q+oOx8iVwSNT7x/WskYwDn+9bOeOKnX3v5iNHKNV6xjOLgsLAcF+
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 6/9] usb: gadget: eliminate anonymous module_init &
- module_exit
-Content-Language: en-US
-To:     Ira Weiny <ira.weiny@intel.com>
-Cc:     linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org,
-        Felipe Balbi <balbi@kernel.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-7-rdunlap@infradead.org>
- <YjKrMyRvHh7nzHwW@iweiny-desk3>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <YjKrMyRvHh7nzHwW@iweiny-desk3>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6602:1583:b0:648:c289:2dab with SMTP id
+ e3-20020a056602158300b00648c2892dabmr1602791iow.60.1647502405971; Thu, 17 Mar
+ 2022 00:33:25 -0700 (PDT)
+Date:   Thu, 17 Mar 2022 00:33:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000acb4b105da650b31@google.com>
+Subject: [syzbot] WARNING in floppy_revalidate
+From:   syzbot <syzbot+c5732f0517748c2c8051@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    aad611a868d1 Merge tag 'perf-tools-fixes-for-v5.17-2022-03..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=160538d5700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=aba0ab2928a512c2
+dashboard link: https://syzkaller.appspot.com/bug?extid=c5732f0517748c2c8051
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=144e717e700000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10909745700000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c5732f0517748c2c8051@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 3729 at drivers/block/floppy.c:1000 schedule_bh drivers/block/floppy.c:1000 [inline]
+WARNING: CPU: 1 PID: 3729 at drivers/block/floppy.c:1000 process_fd_request drivers/block/floppy.c:2851 [inline]
+WARNING: CPU: 1 PID: 3729 at drivers/block/floppy.c:1000 floppy_revalidate.isra.0+0x841/0xae0 drivers/block/floppy.c:4195
+Modules linked in:
+CPU: 1 PID: 3729 Comm: syz-executor117 Not tainted 5.17.0-rc7-syzkaller-00235-gaad611a868d1 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:1000 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2851 [inline]
+RIP: 0010:floppy_revalidate.isra.0+0x841/0xae0 drivers/block/floppy.c:4195
+Code: 0f 0b e9 30 f9 ff ff 48 89 de 48 c7 c7 80 7b 6a 8c e8 63 d7 84 ff e9 84 f8 ff ff e8 b9 48 42 fd e9 11 fb ff ff e8 cf 62 fb fc <0f> 0b e9 16 fc ff ff e8 c3 62 fb fc 48 83 fb 07 0f 87 3b 02 00 00
+RSP: 0018:ffffc900026ef8b0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff888025c14200 RSI: ffffffff847c92c1 RDI: 0000000000000003
+RBP: 0000000000000001 R08: 0000000000000000 R09: ffffffff8c6ae647
+R10: ffffffff847c8ed5 R11: 0000000000000000 R12: ffffffff90804b10
+R13: ffff888011a38800 R14: 0000000000000050 R15: 0000000000000001
+FS:  000055555708b300(0000) GS:ffff88802cb00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020002e48 CR3: 000000001c6d3000 CR4: 0000000000150ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_open+0xac5/0xd70 drivers/block/floppy.c:4041
+ blkdev_get_whole+0x99/0x2d0 block/bdev.c:666
+ blkdev_get_by_dev.part.0+0x5c6/0xc70 block/bdev.c:813
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:847
+ blkdev_open+0x154/0x2e0 block/fops.c:503
+ do_dentry_open+0x4b9/0x1250 fs/open.c:824
+ do_open fs/namei.c:3476 [inline]
+ path_openat+0x1c9e/0x2940 fs/namei.c:3609
+ do_filp_open+0x1aa/0x400 fs/namei.c:3636
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1214
+ do_sys_open fs/open.c:1230 [inline]
+ __do_sys_openat fs/open.c:1246 [inline]
+ __se_sys_openat fs/open.c:1241 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1241
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f6b20681597
+Code: 25 00 00 41 00 3d 00 00 41 00 74 47 64 8b 04 25 18 00 00 00 85 c0 75 6b 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 95 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
+RSP: 002b:00007ffd9192d9d0 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007f6b20681597
+RDX: 0000000000000000 RSI: 00007ffd9192da50 RDI: 00000000ffffff9c
+RBP: 00007ffd9192da50 R08: 000000000000ffff R09: 00007ffd9192d8e0
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
 
 
-On 3/16/22 20:29, Ira Weiny wrote:
-> On Wed, Mar 16, 2022 at 12:20:07PM -0700, Randy Dunlap wrote:
->> Eliminate anonymous module_init() and module_exit(), which can lead to
->> confusion or ambiguity when reading System.map, crashes/oops/bugs,
->> or an initcall_debug log.
->>
->> Give each of these init and exit functions unique driver-specific
->> names to eliminate the anonymous names.
->>
->> Example 1: (System.map)
->>  ffffffff832fc78c t init
->>  ffffffff832fc79e t init
->>  ffffffff832fc8f8 t init
->>
->> Example 2: (initcall_debug log)
->>  calling  init+0x0/0x12 @ 1
->>  initcall init+0x0/0x12 returned 0 after 15 usecs
->>  calling  init+0x0/0x60 @ 1
->>  initcall init+0x0/0x60 returned 0 after 2 usecs
->>  calling  init+0x0/0x9a @ 1
->>  initcall init+0x0/0x9a returned 0 after 74 usecs
->>
->> Fixes: bd25a14edb75 ("usb: gadget: legacy/serial: allow dynamic removal")
->> Fixes: 7bb5ea54be47 ("usb gadget serial: use composite gadget framework")
->> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> 
-> I continue to be confused about the latest rules for the Fixes tag but this one
-> in particular seems completely useless.  This is the 'beginning of time' commit
-> by Linus AFAICT.  So do any of these Fixes tags need to be in this series?
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-I guess it mostly depends on whether they get applied to stable trees, but
-it's entirely fine with me if they don't.
-
-{I also corrected Felipe's email address here.}
-
-> Regardless:
-> 
-> Reviewed-by: Ira Weiny <ira.weiny@intel.com>
-
-Thanks.
-
-> 
->> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
->> Cc: Felipe Balbi <felipe.balbi@linux.intel.com>
->> Cc: Michał Mirosław <mirq-linux@rere.qmqm.pl>
->> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
->> Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
->> Cc: linux-usb@vger.kernel.org
->> ---
->>  drivers/usb/gadget/legacy/inode.c  |    8 ++++----
->>  drivers/usb/gadget/legacy/serial.c |   10 +++++-----
->>  drivers/usb/gadget/udc/dummy_hcd.c |    8 ++++----
->>  3 files changed, 13 insertions(+), 13 deletions(-)
->>
->> --- lnx-517-rc8.orig/drivers/usb/gadget/legacy/serial.c
->> +++ lnx-517-rc8/drivers/usb/gadget/legacy/serial.c
->> @@ -273,7 +273,7 @@ static struct usb_composite_driver gseri
->>  static int switch_gserial_enable(bool do_enable)
->>  {
->>  	if (!serial_config_driver.label)
->> -		/* init() was not called, yet */
->> +		/* gserial_init() was not called, yet */
->>  		return 0;
->>  
->>  	if (do_enable)
->> @@ -283,7 +283,7 @@ static int switch_gserial_enable(bool do
->>  	return 0;
->>  }
->>  
->> -static int __init init(void)
->> +static int __init gserial_init(void)
->>  {
->>  	/* We *could* export two configs; that'd be much cleaner...
->>  	 * but neither of these product IDs was defined that way.
->> @@ -314,11 +314,11 @@ static int __init init(void)
->>  
->>  	return usb_composite_probe(&gserial_driver);
->>  }
->> -module_init(init);
->> +module_init(gserial_init);
->>  
->> -static void __exit cleanup(void)
->> +static void __exit gserial_cleanup(void)
->>  {
->>  	if (enable)
->>  		usb_composite_unregister(&gserial_driver);
->>  }
->> -module_exit(cleanup);
->> +module_exit(gserial_cleanup);
->> --- lnx-517-rc8.orig/drivers/usb/gadget/udc/dummy_hcd.c
->> +++ lnx-517-rc8/drivers/usb/gadget/udc/dummy_hcd.c
->> @@ -2765,7 +2765,7 @@ static struct platform_driver dummy_hcd_
->>  static struct platform_device *the_udc_pdev[MAX_NUM_UDC];
->>  static struct platform_device *the_hcd_pdev[MAX_NUM_UDC];
->>  
->> -static int __init init(void)
->> +static int __init dummy_hcd_init(void)
->>  {
->>  	int	retval = -ENOMEM;
->>  	int	i;
->> @@ -2887,9 +2887,9 @@ err_alloc_udc:
->>  		platform_device_put(the_hcd_pdev[i]);
->>  	return retval;
->>  }
->> -module_init(init);
->> +module_init(dummy_hcd_init);
->>  
->> -static void __exit cleanup(void)
->> +static void __exit dummy_hcd_cleanup(void)
->>  {
->>  	int i;
->>  
->> @@ -2905,4 +2905,4 @@ static void __exit cleanup(void)
->>  	platform_driver_unregister(&dummy_udc_driver);
->>  	platform_driver_unregister(&dummy_hcd_driver);
->>  }
->> -module_exit(cleanup);
->> +module_exit(dummy_hcd_cleanup);
->> --- lnx-517-rc8.orig/drivers/usb/gadget/legacy/inode.c
->> +++ lnx-517-rc8/drivers/usb/gadget/legacy/inode.c
->> @@ -2101,7 +2101,7 @@ MODULE_ALIAS_FS("gadgetfs");
->>  
->>  /*----------------------------------------------------------------------*/
->>  
->> -static int __init init (void)
->> +static int __init gadgetfs_init (void)
->>  {
->>  	int status;
->>  
->> @@ -2111,12 +2111,12 @@ static int __init init (void)
->>  			shortname, driver_desc);
->>  	return status;
->>  }
->> -module_init (init);
->> +module_init (gadgetfs_init);
->>  
->> -static void __exit cleanup (void)
->> +static void __exit gadgetfs_cleanup (void)
->>  {
->>  	pr_debug ("unregister %s\n", shortname);
->>  	unregister_filesystem (&gadgetfs_type);
->>  }
->> -module_exit (cleanup);
->> +module_exit (gadgetfs_cleanup);
->>  
-
--- 
-~Randy
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
