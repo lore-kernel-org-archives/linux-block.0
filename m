@@ -2,91 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD24C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 14:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD63BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 14:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234939AbiCQOHf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 10:07:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48662 "EHLO
+        id S234950AbiCQOKA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 10:10:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234948AbiCQOHe (ORCPT
+        with ESMTP id S229480AbiCQOJ7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 10:07:34 -0400
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61245136660;
-        Thu, 17 Mar 2022 07:06:18 -0700 (PDT)
-Received: by mail-pj1-f49.google.com with SMTP id mz9-20020a17090b378900b001c657559290so5285575pjb.2;
-        Thu, 17 Mar 2022 07:06:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=l5TJbPNzDqPASdkDHCLk62DytQZBW+wKClOw+PHQQjc=;
-        b=Nx9GdB+OwF0Pai9M39tso/lBKaWwCYr/T/8yjX2C2nMSEDAV5zs6+8gbBqwNRTX61l
-         4bG9EVIxs8ysO2B46J8jb1lQ+moEoCGW6r25FZWuGUzpi5q7FYGeDSbNqZShf+6qu/X5
-         faRuUJlBC9bL3t9l/vzJn77gRuxToRaOL+Y5l99gFVx7hrCLbOI9AMpPwF6oQ2qO79Pv
-         8bhfXXp648tsz+l2vm0k7OVRWrG3fMOlvHEYOuwh7b1ifoD4E/5+bCoHIdTQhusMaNI7
-         AVTRFTax2x/n5zZwCEkMdnVNFV07l+OU7Dm/tA7qCjcSStOIwxE/e/AmEj1xYhhnoHPw
-         pUug==
-X-Gm-Message-State: AOAM533rK3AN72GmFi8H/jxVPF2+ZnvKG4Upg11f6pq1iLG2DrKymtgj
-        yFitzGswO7FWH5CxivlBxUs=
-X-Google-Smtp-Source: ABdhPJw+trXwAO+jp5KEgP7+0YMzXFmtnQ7Oi+H6HoOCE18jVvu7LSrsSPwBrEX4TkUVY2eHcaADhA==
-X-Received: by 2002:a17:902:e94f:b0:14f:1636:c8a8 with SMTP id b15-20020a170902e94f00b0014f1636c8a8mr4952381pll.130.1647525977380;
-        Thu, 17 Mar 2022 07:06:17 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id na8-20020a17090b4c0800b001bf191ee347sm10381694pjb.27.2022.03.17.07.06.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Mar 2022 07:06:17 -0700 (PDT)
-Message-ID: <22cd48e9-fe36-414c-942e-382b8139ab4b@acm.org>
-Date:   Thu, 17 Mar 2022 07:06:15 -0700
+        Thu, 17 Mar 2022 10:09:59 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCFA147AD9
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 07:08:37 -0700 (PDT)
+Received: from fsav315.sakura.ne.jp (fsav315.sakura.ne.jp [153.120.85.146])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22HE87Wl019444;
+        Thu, 17 Mar 2022 23:08:07 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav315.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp);
+ Thu, 17 Mar 2022 23:08:07 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav315.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22HE86Vh019435
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Thu, 17 Mar 2022 23:08:07 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <e0a0bc94-e6de-b0e5-ee46-a76cd1570ea6@I-love.SAKURA.ne.jp>
+Date:   Thu, 17 Mar 2022 23:08:04 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 1/3] block: don't show disk stats if io accounting is
- disabled
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
 Content-Language: en-US
-To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk, mpatocka@redhat.com,
-        snitzer@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220317112653.1019490-1-yukuai3@huawei.com>
- <20220317112653.1019490-2-yukuai3@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220317112653.1019490-2-yukuai3@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>
+Cc:     linux-block <linux-block@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/17/22 04:26, Yu Kuai wrote:
-> If io accounting is disabled, there is no point to handle such device
-> in diskstats_show(), and it can be confused for users because all fields
-> in iostat are zero while the disk is handling io.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   block/genhd.c | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index c3b32c665aec..e5307f512185 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -937,6 +937,9 @@ ssize_t part_stat_show(struct device *dev,
->   	struct disk_stats stat;
->   	unsigned int inflight;
->   
-> +	if (!blk_queue_io_stat(q))
-> +		return sprintf(buf, "io accounting is disabled\n");
-> +
+Commit b5dd2f6047ca1080 ("block: loop: improve performance via blk-mq")
+started using a global WQ_MEM_RECLAIM workqueue.
 
-Hmm ... the above looks sub-optimal to me. Has it been considered to 
-return an error code instead or even better to hide the stat attribute 
-if I/O accounting is disabled? The latter can be achieved by modifying 
-disk_visible().
++       loop_wq = alloc_workqueue("kloopd",
++                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0);
 
-Thanks,
+Commit f4aa4c7bbac6c4af ("block: loop: convert to per-device workqueue")
+started using per device WQ_MEM_RECLAIM workqueue.
 
-Bart.
+-       loop_wq = alloc_workqueue("kloopd",
+-                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0);
++       lo->wq = alloc_workqueue("kloopd%d",
++                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0,
++                       lo->lo_number);
+
+Commit 4d4e41aef9429872 ("block: loop: avoiding too many pending per work
+I/O") adjusted max_active parameter.
+
+-                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 0,
++                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 16,
+
+Commit e03a3d7a94e2485b ("block: loop: use kthread_work") started using
+per device kthread.
+
+-       lo->wq = alloc_workqueue("kloopd%d",
+-                       WQ_MEM_RECLAIM | WQ_HIGHPRI | WQ_UNBOUND, 16,
+-                       lo->lo_number);
++       lo->worker_task = kthread_run(kthread_worker_fn,
++                       &lo->worker, "loop%d", lo->lo_number);
+
+Commit 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
+again started using per device workqueue
+
+-       lo->worker_task = kthread_run(loop_kthread_worker_fn,
+-                       &lo->worker, "loop%d", lo->lo_number);
++       lo->workqueue = alloc_workqueue("loop%d",
++                                       WQ_UNBOUND | WQ_FREEZABLE,
++                                       0,
++                                       lo->lo_number);
+
+but forgot to restore WQ_MEM_RECLAIM flag.
+
+We should reserve one "struct task_struct" to each loop device in order
+to guarantee that I/O request for writeback operation can make forward
+progress even under memory pressure. I don't know why WQ_FREEZABLE flag
+was added, but let's add WQ_MEM_RECLAIM flag like commit f4aa4c7bbac6c4af
+("block: loop: convert to per-device workqueue") describes.
+
+Fixes: 87579e9b7d8dc36e ("loop: use worker per cgroup instead of kworker")
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ drivers/block/loop.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 19fe19eaa50e..60dfebcedd95 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1013,7 +1013,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
+ 
+ 	lo->workqueue = alloc_workqueue("loop%d",
+-					WQ_UNBOUND | WQ_FREEZABLE,
++					WQ_MEM_RECLAIM | WQ_UNBOUND | WQ_FREEZABLE,
+ 					0,
+ 					lo->lo_number);
+ 	if (!lo->workqueue) {
+-- 
+2.32.0
+
