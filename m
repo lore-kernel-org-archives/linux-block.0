@@ -2,160 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42639C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 15:03:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07D50C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 15:48:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235613AbiCQPFL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 11:05:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33640 "EHLO
+        id S236130AbiCQPtb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 11:49:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235612AbiCQPFJ (ORCPT
+        with ESMTP id S236102AbiCQPt3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 11:05:09 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF41F1E92
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 08:03:52 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id h2so7034238pfh.6
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 08:03:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=8mMGx+ZnWLWdjrgKj6NDxk2i+A2zefzeOSXhji5DzeI=;
-        b=czvfcSx2YzYv0/j5TWj1jJU6ExaY3s2iqlFhKcuXULsi6kTpRzc0TcHKzw3yjnw2iY
-         WkfTRy2tSoNxHW6lagD88MerJyJADcujGUSQaJei1u5SdPkFie7VrEVycp6bDMa6mCq+
-         eDil/0YWOC3p44tOWIVZ1Ja49yNJtkAwSGapXgEdO04sdmzqLXRhHMrNThvSM1p3zf+r
-         b79Nx4lcTBPAKmTHHryRYpC/HJddr5/iFelKV/Y1bzXtAsBHy04YnQOQF/G4NCa5iyWk
-         WadXAdqSIVSSkJPKNp67bxxjRktruKgl0nscdMo5fnak03gvoixnYRD7OuYm4sXzqzvK
-         +niw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=8mMGx+ZnWLWdjrgKj6NDxk2i+A2zefzeOSXhji5DzeI=;
-        b=3gvbVeGQ93W+QJU7KzfnAFhWn1oP6L5BaD2hq9z851B4rksbbw+duMk4tjIhI7NX95
-         qfctv16a86SIMBrRbLc+sOofY6PD//FO/lhCTZJsgzNp7GDSt21nN4H/RW98kiyGdCmj
-         2/C1kK2h3wcYzFfCxh4uLvg0iN5fZZODjbUbAls8lEmjQXthjWRH8Le61C1uHHxfHVI6
-         qr3a6JO1qCT5EbwT2gcaQek1kdI3BOjrkswKzEB9aEKHYaHlAdIqbWId38S8fDl1VC9H
-         DFJ9/Kvs//8sjFFivLWJvy+7rsjtyvOfUk+1VGsTH1JJvkSBga6RyMTHHGxIi4GNUis7
-         RaUw==
-X-Gm-Message-State: AOAM532gRlM8ftPypiWz4nHMFsjKQBCd4N0qtg4K5UoJXrMWbNol+Gbg
-        zuTAMLv1gv59TTUR2M8a4OAoGm+v6NpVDQ==
-X-Google-Smtp-Source: ABdhPJxP6uBbe0/HpAqakDmXN+GQFDXgrkwx9BFiaY/ItUptDgz3KzUM6ln1MbUFFhvdEj/9n5El0w==
-X-Received: by 2002:a65:6cc7:0:b0:380:6a04:cecc with SMTP id g7-20020a656cc7000000b003806a04ceccmr4045919pgw.455.1647529431179;
-        Thu, 17 Mar 2022 08:03:51 -0700 (PDT)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.gmail.com with ESMTPSA id e19-20020a637453000000b003821bdb8103sm1131323pgn.83.2022.03.17.08.03.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Mar 2022 08:03:50 -0700 (PDT)
-Date:   Fri, 18 Mar 2022 00:03:44 +0900
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     Jason Wang <jasowang@redhat.com>
-Cc:     mst <mst@redhat.com>, pbonzini <pbonzini@redhat.com>,
+        Thu, 17 Mar 2022 11:49:29 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55FA138B8;
+        Thu, 17 Mar 2022 08:48:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=ThAyvdoG1U35K2Hzsm1O2USOWq/3qlMrhSaUoYHrsOs=; b=F6Vs/65oeZV/y3wN6Bw/M7u1FQ
+        5O+4lQTnS32R0VfdvOK1oVjLmv61tBR4yMMjN/NVDsOnHzoBbLMjP382aAGEyJMaumvolGSgA+m71
+        1Ehmx8UPj/GCllYWg+tBYociITo9JftToXJThRJBZ9nw2p07B62DgVCik4yzpt77Z8S9KNWcKP8vq
+        3tLkrgPZtcMac/dncj65oYGZ4SvtO6CK7F7u84MgNbC6goRbCxod26J//CJV7WZO58VGV5QhSn55l
+        /KYfPXjDju0sdq2JANUCt29NuoEjYNFSGZB5nEbrQ97N+XXeTVv8WhJJ+KmWXn+usTtelySDGt3Ln
+        87L6gQCw==;
+Received: from [54.239.6.186] (helo=freeip.amazon.com)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nUsLq-0075ta-2M; Thu, 17 Mar 2022 15:47:46 +0000
+Message-ID: <f7b858bb438d1979c1f092e105e0db4c7af47758.camel@infradead.org>
+Subject: Re: [PATCH 2/9] virtio_console: eliminate anonymous module_init &
+ module_exit
+From:   Amit Shah <amit@infradead.org>
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
         Stefan Hajnoczi <stefanha@redhat.com>,
-        virtualization <virtualization@lists.linux-foundation.org>,
-        linux-block@vger.kernel.org, Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: Re: [PATCH] virtio-blk: support polling I/O
-Message-ID: <YjNN0Id5Hhus1CwB@localhost.localdomain>
-References: <20220311152832.17703-1-suwan.kim027@gmail.com>
- <ea838f63-5f63-6f3b-f49e-1107b43f7d1c@redhat.com>
- <Yi82BL9KecQsVfgX@localhost.localdomain>
- <CACGkMEujXYNE-88=m9ohjbeAj2F7CqEUes8gOUmasTNtwn2bUA@mail.gmail.com>
- <YjCmBkjgtQZffiXw@localhost.localdomain>
- <CACGkMEtxadf1+0Db06nE3SuQZhvyELq7ZwvKaH8x_utj91dRdg@mail.gmail.com>
- <YjIDIjUwuwkfRS2d@localhost.localdomain>
- <CACGkMEu8T8_9gJMGybMZVCT9zCrw+OaTtbhtvnUNUORNmYKw-A@mail.gmail.com>
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?UTF-8?Q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Date:   Thu, 17 Mar 2022 16:47:42 +0100
+In-Reply-To: <20220316192010.19001-3-rdunlap@infradead.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+         <20220316192010.19001-3-rdunlap@infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEu8T8_9gJMGybMZVCT9zCrw+OaTtbhtvnUNUORNmYKw-A@mail.gmail.com>
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 17, 2022 at 10:20:05AM +0800, Jason Wang wrote:
-> On Wed, Mar 16, 2022 at 11:33 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
-> >
-> > On Wed, Mar 16, 2022 at 10:02:13AM +0800, Jason Wang wrote:
-> > > On Tue, Mar 15, 2022 at 10:43 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
-> > > >
-> > > > On Tue, Mar 15, 2022 at 04:59:23PM +0800, Jason Wang wrote:
-> > > > > On Mon, Mar 14, 2022 at 8:33 PM Suwan Kim <suwan.kim027@gmail.com> wrote:
-> > > > >
-> > > > > > On Mon, Mar 14, 2022 at 02:14:53PM +0800, Jason Wang wrote:
-> > > > > > >
-> > > > > > > 在 2022/3/11 下午11:28, Suwan Kim 写道:
-> > > > > > > > diff --git a/include/uapi/linux/virtio_blk.h
-> > > > > > b/include/uapi/linux/virtio_blk.h
-> > > > > > > > index d888f013d9ff..3fcaf937afe1 100644
-> > > > > > > > --- a/include/uapi/linux/virtio_blk.h
-> > > > > > > > +++ b/include/uapi/linux/virtio_blk.h
-> > > > > > > > @@ -119,8 +119,9 @@ struct virtio_blk_config {
-> > > > > > > >      * deallocation of one or more of the sectors.
-> > > > > > > >      */
-> > > > > > > >     __u8 write_zeroes_may_unmap;
-> > > > > > > > +   __u8 unused1;
-> > > > > > > > -   __u8 unused1[3];
-> > > > > > > > +   __virtio16 num_poll_queues;
-> > > > > > > >   } __attribute__((packed));
-> > > > > > >
-> > > > > > >
-> > > > > > > This looks like a implementation specific (virtio-blk-pci) optimization,
-> > > > > > how
-> > > > > > > about other implementation like vhost-user-blk?
-> > > > > >
-> > > > > > I didn’t consider vhost-user-blk yet. But does vhost-user-blk also
-> > > > > > use vritio_blk_config as kernel-qemu interface?
-> > > > > >
-> > > > >
-> > > > > Yes, but see below.
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > Does vhost-user-blk need additional modification to support polling
-> > > > > > in kernel side?
-> > > > > >
-> > > > >
-> > > > >
-> > > > > No, but the issue is, things like polling looks not a good candidate for
-> > > > > the attributes belonging to the device but the driver. So I have more
-> > > > > questions:
-> > > > >
-> > > > > 1) what does it really mean for hardware virtio block devices?
-> > > > > 2) Does driver polling help for the qemu implementation without polling?
-> > > > > 3) Using blk_config means we can only get the benefit from the new device
-> > > >
-> > > > 1) what does it really mean for hardware virtio block devices?
-> > > > 3) Using blk_config means we can only get the benefit from the new device
-> > > >
-> > > > This patch adds dedicated HW queue for polling purpose to virtio
-> > > > block device.
-> > > >
-> > > > So I think it can be a new hw feature. And it can be a new device
-> > > > that supports hw poll queue.
-> > >
-> > > One possible issue is that the "poll" looks more like a
-> > > software/driver concept other than the device/hardware.
-> > >
-> > > >
-> > > > BTW, I have other idea about it.
-> > > >
-> > > > How about adding “num-poll-queues" property as a driver parameter
-> > > > like NVMe driver, not to QEMU virtio-blk-pci property?
-> > >
-> > > It should be fine, but we need to listen to others.
-> >
-> > To Michael, Stefan, Max
-> >
-> > How about using driver parameter instead of virio_blk_config?
+On Wed, 2022-03-16 at 12:20 -0700, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
 > 
-> I agree.
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
 > 
-> Thanks
- 
-Okay. Then I will send v2 with .queue_rqs patch
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
+> 
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
+> 
+> Fixes: 31610434bc35 ("Virtio console driver")
+> Fixes: 7177876fea83 ("virtio: console: Add ability to remove module")
+> Signed-off-by: Randy Dunlap <
+> rdunlap@infradead.org
+> >
+> Cc: Amit Shah <
+> amit@kernel.org
+> >
+> Cc: 
+> virtualization@lists.linux-foundation.org
+> 
+> Cc: Arnd Bergmann <
+> arnd@arndb.de
+> >
+> Cc: Greg Kroah-Hartman <
+> gregkh@linuxfoundation.org
+> >
+> ---
+>  drivers/char/virtio_console.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
-Regards,
-Suwan Kim
+Reviewed-by: Amit Shah <amit@kernel.org>
+
+I don't think the Fixes-by really applies here, though - we don't
+really want to push this into stable, nor do we want any automated
+tools to pick this up because of that tag..
+
+		Amit
+
