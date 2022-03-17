@@ -2,125 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FCE2C43219
-	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 16:11:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D664EC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 17 Mar 2022 17:08:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236371AbiCQQM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 12:12:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55976 "EHLO
+        id S236653AbiCQRJn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 13:09:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43674 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236366AbiCQQM6 (ORCPT
+        with ESMTP id S231339AbiCQRJm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 12:12:58 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FE57214F95
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 09:11:40 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id w4so4812830ply.13
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 09:11:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=wywg4x91ht1wDsZE8LDgwKs/937jDdBiI3aoJq8Icig=;
-        b=EcRFu47wdTKbqMSAq17bN6l3fW68je9I7sz6dNGS5tKD2WRbtx22XzizUZtR0qkyAQ
-         QWP1OHwCDN5A0Nw0t3Q7qmd76Q7jNga+edrTyslT2xibkPds1nD37wWbuAnO8SwFuhrO
-         gsVcYZtwJfnoFR7QpeZ53g8ha9BP7vQeAQagIeRfmuB8NZSh871Oy/O22T8GKZQsso7+
-         GAqKZ5LuYXbJaI8VOrspWlTrq9NYT2zp8TS48/UvpIibmW0S8anvsp+TLqAO1q5KW6Bh
-         lxRLQvTEz/3EMFmPsbBbDBLIo1E7GTCaZssTwBenfG227MP1XIuXr1IbCZbQ1ApUnFqh
-         aueg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=wywg4x91ht1wDsZE8LDgwKs/937jDdBiI3aoJq8Icig=;
-        b=lzaeTomjKJius2Sr9jRaXp7bta9qWfzchi7WM7aiHYmw6xvNsz3XmBdzfxLZaeXlUH
-         jdTuoRLi1AdFjM79a5iypiByKH01Cz8gH1ZD2fvEiS4aqlb6mcn7wj8IupV9iarY72sh
-         NFpXb8cfs4tb3N5FaPJGCInI4nDQxTDdxLYTS7uQNn1WEDKxImAHeZlQc4YQIAVsMCI3
-         ZtKVowjGnVkRtRsMW8oF88T/Ls2OHtf5ECjOj3qiTHNUglBh3peim+QGYUSGzaXGjiv1
-         Mumn9O8YMYD1OOLhLImsDTyYKnYr8hniXz/FHfausXWZj0HL4owcoVeT3f/jwhoU3zIh
-         vLqQ==
-X-Gm-Message-State: AOAM532l+Q10oaGA+hziWPHxdiZH5b8NMHnruyxf5FG2fvXg5lbdgkw2
-        ZilT1xsIpFKHGHbStp7tEynBGg==
-X-Google-Smtp-Source: ABdhPJzujChC6izQDJEHNAPYk2A2y6Fs/ty0Hxcz37xAtsWb7B2FaolAnh/R0gH50blU6B7YVSPE4w==
-X-Received: by 2002:a17:902:7613:b0:151:6e1c:c49c with SMTP id k19-20020a170902761300b001516e1cc49cmr5906213pll.109.1647533499805;
-        Thu, 17 Mar 2022 09:11:39 -0700 (PDT)
-Received: from [127.0.1.1] ([2620:10d:c090:400::5:d2fd])
-        by smtp.gmail.com with ESMTPSA id q10-20020a056a00088a00b004f7ceff389esm7702590pfj.152.2022.03.17.09.11.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Mar 2022 09:11:39 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     linux-kernel@vger.kernel.org, Randy Dunlap <rdunlap@infradead.org>
-Cc:     Arnd Bergmann <arnd@arndb.de>, linux-scsi@vger.kernel.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Florian Westphal <fw@strlen.de>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Eli Cohen <eli@mellanox.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>, x86@kernel.org,
-        netfilter-devel@vger.kernel.org,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Shuah Khan <shuah@kernel.org>, Ingo Molnar <mingo@kernel.org>,
-        Amit Shah <amit@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Andy Lutomirski <luto@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        linux-block@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>,
-        linux-usb@vger.kernel.org, coreteam@netfilter.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        nouveau@lists.freedesktop.org, Jason Wang <jasowang@redhat.com>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        virtualization@lists.linux-foundation.org,
-        Leon Romanovsky <leon@kernel.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        linux-rdma@vger.kernel.org,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Joachim Fritschi <jfritschi@freenet.de>
-In-Reply-To: <20220316192010.19001-1-rdunlap@infradead.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
-Subject: Re: (subset) [PATCH 0/9] treewide: eliminate anonymous module_init & module_exit
-Message-Id: <164753349550.89091.10994175450707575992.b4-ty@kernel.dk>
-Date:   Thu, 17 Mar 2022 10:11:35 -0600
+        Thu, 17 Mar 2022 13:09:42 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B1D29859D
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 10:08:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
+        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=lQ3egY4aIxLGH+D0H1ibKTPYVnLPBH+PAR5tYmFKY7s=; b=AXiMADfx5jdzlXRHTfy5GwNMRY
+        2/jGXAvwSNPiarDVbA0uzNCdzJP1wwwJkBvufa/6StDy1W2I6KMFUng5h1mH/WccasAmB31IkZAJD
+        EbEdqPxzY/G0IpTryw3iu4ECVlFhwaTYYYsEtcZbMKYRIYu+ZZS2W0u0LW/wxa/y6pE5LxxshQqv1
+        S5pieKTZOVEu0l82BX2Zr3kunCd+7rxsQVN3CtIgc5P7z23jw0haO7BtmZJaOm5Km7kgDzb/fpObp
+        R2eCELUTW/FxPv1fochwqNy4Xnutvyuia3+qxrTcI0Qr0vr5JCnUD3mwLKD87EIRu4SZdEWjpw1dL
+        twqUhsWg==;
+Received: from [46.140.54.162] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nUtbo-00Gsfc-Ps; Thu, 17 Mar 2022 17:08:21 +0000
+Date:   Thu, 17 Mar 2022 18:08:18 +0100
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+Subject: [GIT PULL] second round of nvme updates for Linux 5.18
+Message-ID: <YjNrAsjvdSd+abfu@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 16 Mar 2022 12:20:01 -0700, Randy Dunlap wrote:
-> There are a number of drivers that use "module_init(init)" and
-> "module_exit(exit)", which are anonymous names and can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
-> 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
-> 
-> [...]
+The following changes since commit 85d9abcd7331566781b93ff46e4bccd4806ef2b2:
 
-Applied, thanks!
+  xen/blkfront: speed up purge_persistent_grants() (2022-03-11 05:15:33 -0700)
 
-[1/9] virtio_blk: eliminate anonymous module_init & module_exit
-      commit: bcfe9b6cbb4438b8c1cc4bd475221652c8f9301b
+are available in the Git repository at:
 
-Best regards,
--- 
-Jens Axboe
+  git://git.infradead.org/nvme.git tags/nvme-5.18-2022-03-17
 
+for you to fetch changes up to ce8d78616a6b637d1b763eb18e32045687a84305:
 
+  nvme: warn about shared namespaces without CONFIG_NVME_MULTIPATH (2022-03-16 16:48:00 +0100)
+
+----------------------------------------------------------------
+second round of nvme updates for Linux 5.18
+
+ - add lockdep annotations for in-kernel sockets (Chris Leech)
+ - use vmalloc for ANA log buffer (Hannes Reinecke)
+ - kerneldoc fixes (Chaitanya Kulkarni)
+ - cleanups (Guoqing Jiang, Chaitanya Kulkarni, me)
+ - warn about shared namespaces without multipathing (me)
+
+----------------------------------------------------------------
+Chaitanya Kulkarni (7):
+      nvme-tcp: don't initialize ret variable
+      nvme-tcp: don't fold the line
+      nvmet-fc: fix kernel-doc warning for nvmet_fc_register_targetport
+      nvmet-fc: fix kernel-doc warning for nvmet_fc_unregister_targetport
+      nvmet-rdma: fix kernel-doc warning for nvmet_rdma_device_removal
+      nvmet: don't fold lines
+      nvmet: use snprintf() with PAGE_SIZE in configfs
+
+Chris Leech (1):
+      nvme-tcp: lockdep: annotate in-kernel sockets
+
+Christoph Hellwig (4):
+      nvmet: move the call to nvmet_ns_changed out of nvmet_ns_revalidate
+      nvme: cleanup how disk->disk_name is assigned
+      nvme: remove nvme_alloc_request and nvme_alloc_request_qid
+      nvme: warn about shared namespaces without CONFIG_NVME_MULTIPATH
+
+Guoqing Jiang (1):
+      nvme-multipath: call bio_io_error in nvme_ns_head_submit_bio
+
+Hannes Reinecke (1):
+      nvme-multipath: use vmalloc for ANA log buffer
+
+ drivers/block/loop.c            |  1 +
+ drivers/nvme/host/core.c        | 76 ++++++++++++++++++++---------------------
+ drivers/nvme/host/ioctl.c       |  3 +-
+ drivers/nvme/host/multipath.c   | 32 +++--------------
+ drivers/nvme/host/nvme.h        | 16 ++++-----
+ drivers/nvme/host/pci.c         | 17 +++++----
+ drivers/nvme/host/tcp.c         | 45 ++++++++++++++++++++++--
+ drivers/nvme/target/admin-cmd.c |  6 +++-
+ drivers/nvme/target/configfs.c  | 30 ++++++++--------
+ drivers/nvme/target/core.c      |  5 ++-
+ drivers/nvme/target/fc.c        |  4 +--
+ drivers/nvme/target/nvmet.h     |  2 +-
+ drivers/nvme/target/passthru.c  |  3 +-
+ drivers/nvme/target/rdma.c      |  2 +-
+ drivers/nvme/target/zns.c       |  6 +++-
+ 15 files changed, 138 insertions(+), 110 deletions(-)
