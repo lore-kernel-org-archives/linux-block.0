@@ -2,152 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 254A7C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 08:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5FD8C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 09:11:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233581AbiCRILa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Mar 2022 04:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
+        id S234239AbiCRJMR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Mar 2022 05:12:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36378 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233610AbiCRIL3 (ORCPT
+        with ESMTP id S232673AbiCRJMR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Mar 2022 04:11:29 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D479C25CB9F;
-        Fri, 18 Mar 2022 01:10:10 -0700 (PDT)
-Received: from kwepemi100002.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KKc8l4gMmzfYr1;
-        Fri, 18 Mar 2022 16:08:39 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100002.china.huawei.com (7.221.188.188) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Mar 2022 16:10:00 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 18 Mar
- 2022 16:09:59 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
-        <yukuai3@huawei.com>, <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH RFC -next 3/3] sbitmap: improve the fairness of waitqueues' wake up
-Date:   Fri, 18 Mar 2022 16:25:05 +0800
-Message-ID: <20220318082505.3025427-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220318082505.3025427-1-yukuai3@huawei.com>
-References: <20220318082505.3025427-1-yukuai3@huawei.com>
+        Fri, 18 Mar 2022 05:12:17 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AA331905BE;
+        Fri, 18 Mar 2022 02:10:58 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id DA4B268AFE; Fri, 18 Mar 2022 10:10:54 +0100 (CET)
+Date:   Fri, 18 Mar 2022 10:10:54 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        jaegeuk@kernel.org, chao@kernel.org, ulf.hansson@linaro.org,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Daeho Jeong <daehojeong@google.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-mmc@vger.kernel.org
+Subject: Re: security issue: data exposure when using block layer secure
+ erase
+Message-ID: <20220318091054.GA31758@lst.de>
+References: <20220316093740.GA7714@lst.de> <YjIm6f6pSX1CKeqb@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjIm6f6pSX1CKeqb@gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, same waitqueue might be woken up continuously:
+On Wed, Mar 16, 2022 at 06:05:29PM +0000, Eric Biggers wrote:
+> __blkdev_issue_discard() can break up the region into multiple bios, but I don't
+> see where it actually skips parts of the region.  Can you explain more
+> specifically where the problem is?
 
-__sbq_wake_up			__sbq_wake_up
- sbq_wake_ptr -> assume	0	 sbq_wake_ptr -> 0
- atomic_dec_return
-				 atomic_dec_return
- atomic_cmpxchg -> succeed
-				 atomic_cmpxchg -> failed
-				  return true
-				__sbq_wake_up
-				 sbq_wake_ptr
-				  atomic_read(&sbq->wake_index) -> 0
- sbq_index_atomic_inc -> inc to 1
-				  if (waitqueue_active(&ws->wait))
-				   if (wake_index != atomic_read(&sbq->wake_index))
-				    atomic_set(&sbq->wake_index, wake_index); -> reset from 1 to 0
- wake_up_nr -> wake up first waitqueue
-				    // continue to wake up in first waitqueue
-
-To fix the problem, add a detection in sbq_wake_ptr() to avoid choose
-the same waitqueue; and refactor __sbq_wake_up() to increase
-'wake_index' before updating 'wait_cnt'.
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- lib/sbitmap.c | 50 ++++++++++++++++++++++++++------------------------
- 1 file changed, 26 insertions(+), 24 deletions(-)
-
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index bde0783e4ace..86b18eed83aa 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -583,6 +583,10 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 		return NULL;
- 
- 	wake_index = atomic_read(&sbq->wake_index);
-+
-+	/* If this waitqueue is about to wake up, switch to the next */
-+	if (atomic_read(&sbq->ws[wake_index].wait_cnt) <= 0)
-+		wake_index = sbq_index_inc(wake_index);
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
- 
-@@ -609,33 +613,31 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 		return false;
- 
- 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
--	if (wait_cnt <= 0) {
--		int ret;
--
--		wake_batch = READ_ONCE(sbq->wake_batch);
--
--		/*
--		 * Pairs with the memory barrier in sbitmap_queue_resize() to
--		 * ensure that we see the batch size update before the wait
--		 * count is reset.
--		 */
--		smp_mb__before_atomic();
-+	if (wait_cnt > 0)
-+		return false;
-+	/*
-+	 * Concurrent callers should call this function again
-+	 * to wakeup a new batch on a different 'ws'.
-+	 */
-+	else if (wait_cnt < 0)
-+		return true;
- 
--		/*
--		 * For concurrent callers of this, the one that failed the
--		 * atomic_cmpxhcg() race should call this function again
--		 * to wakeup a new batch on a different 'ws'.
--		 */
--		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
--		if (ret == wait_cnt) {
--			sbq_index_atomic_inc(&sbq->wake_index);
--			wake_up_nr(&ws->wait, wake_batch);
--			return false;
--		}
-+	/*
-+	 * Increase 'wake_index' before updating 'wake_batch', in case that
-+	 * concurrent callers wake up the same 'ws' again.
-+	 */
-+	sbq_index_atomic_inc(&sbq->wake_index);
-+	wake_batch = READ_ONCE(sbq->wake_batch);
- 
--		return true;
--	}
-+	/*
-+	 * Pairs with the memory barrier in sbitmap_queue_resize() to
-+	 * ensure that we see the batch size update before the wait
-+	 * count is reset.
-+	 */
-+	smp_mb__before_atomic();
- 
-+	atomic_set(&ws->wait_cnt, wake_batch);
-+	wake_up_nr(&ws->wait, wake_batch);
- 	return false;
- }
- 
--- 
-2.31.1
-
+You're right.  We used to skip misaligned parts, but that was actually
+fixed two years ago.
