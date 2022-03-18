@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D3DC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 08:10:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 254A7C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 08:10:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233559AbiCRILV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Mar 2022 04:11:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33330 "EHLO
+        id S233581AbiCRILa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Mar 2022 04:11:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233551AbiCRILT (ORCPT
+        with ESMTP id S233610AbiCRIL3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Mar 2022 04:11:19 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16C2F25719F;
-        Fri, 18 Mar 2022 01:10:00 -0700 (PDT)
-Received: from kwepemi100003.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KKc8Y35xqzfYnN;
-        Fri, 18 Mar 2022 16:08:29 +0800 (CST)
+        Fri, 18 Mar 2022 04:11:29 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D479C25CB9F;
+        Fri, 18 Mar 2022 01:10:10 -0700 (PDT)
+Received: from kwepemi100002.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KKc8l4gMmzfYr1;
+        Fri, 18 Mar 2022 16:08:39 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100003.china.huawei.com (7.221.188.122) with Microsoft SMTP Server
+ kwepemi100002.china.huawei.com (7.221.188.188) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Mar 2022 16:09:58 +0800
+ 15.1.2308.21; Fri, 18 Mar 2022 16:10:00 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 18 Mar
- 2022 16:09:58 +0800
+ 2022 16:09:59 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
         <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
         <yukuai3@huawei.com>, <bvanassche@acm.org>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <yi.zhang@huawei.com>
-Subject: [PATCH RFC -next 1/3] sbitmap: record the number of waiters for each waitqueue
-Date:   Fri, 18 Mar 2022 16:25:03 +0800
-Message-ID: <20220318082505.3025427-2-yukuai3@huawei.com>
+Subject: [PATCH RFC -next 3/3] sbitmap: improve the fairness of waitqueues' wake up
+Date:   Fri, 18 Mar 2022 16:25:05 +0800
+Message-ID: <20220318082505.3025427-4-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220318082505.3025427-1-yukuai3@huawei.com>
 References: <20220318082505.3025427-1-yukuai3@huawei.com>
@@ -49,71 +49,105 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This is just a helper to provide a api to see if waitqueues are
-balanced.
+Currently, same waitqueue might be woken up continuously:
+
+__sbq_wake_up			__sbq_wake_up
+ sbq_wake_ptr -> assume	0	 sbq_wake_ptr -> 0
+ atomic_dec_return
+				 atomic_dec_return
+ atomic_cmpxchg -> succeed
+				 atomic_cmpxchg -> failed
+				  return true
+				__sbq_wake_up
+				 sbq_wake_ptr
+				  atomic_read(&sbq->wake_index) -> 0
+ sbq_index_atomic_inc -> inc to 1
+				  if (waitqueue_active(&ws->wait))
+				   if (wake_index != atomic_read(&sbq->wake_index))
+				    atomic_set(&sbq->wake_index, wake_index); -> reset from 1 to 0
+ wake_up_nr -> wake up first waitqueue
+				    // continue to wake up in first waitqueue
+
+To fix the problem, add a detection in sbq_wake_ptr() to avoid choose
+the same waitqueue; and refactor __sbq_wake_up() to increase
+'wake_index' before updating 'wait_cnt'.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- include/linux/sbitmap.h | 5 +++++
- lib/sbitmap.c           | 7 +++++--
- 2 files changed, 10 insertions(+), 2 deletions(-)
+ lib/sbitmap.c | 50 ++++++++++++++++++++++++++------------------------
+ 1 file changed, 26 insertions(+), 24 deletions(-)
 
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index dffeb8281c2d..18c68e7f5362 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -91,6 +91,11 @@ struct sbq_wait_state {
- 	 */
- 	atomic_t wait_cnt;
- 
-+	/**
-+	 * @waiters_cnt: Number of active waiters
-+	 */
-+	atomic_t waiters_cnt;
-+
- 	/**
- 	 * @wait: Wait queue.
- 	 */
 diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 2eb3de18ded3..bde0783e4ace 100644
+index bde0783e4ace..86b18eed83aa 100644
 --- a/lib/sbitmap.c
 +++ b/lib/sbitmap.c
-@@ -444,6 +444,7 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
+@@ -583,6 +583,10 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+ 		return NULL;
+ 
+ 	wake_index = atomic_read(&sbq->wake_index);
++
++	/* If this waitqueue is about to wake up, switch to the next */
++	if (atomic_read(&sbq->ws[wake_index].wait_cnt) <= 0)
++		wake_index = sbq_index_inc(wake_index);
  	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		init_waitqueue_head(&sbq->ws[i].wait);
- 		atomic_set(&sbq->ws[i].wait_cnt, sbq->wake_batch);
-+		atomic_set(&sbq->ws[i].waiters_cnt, 0);
- 	}
+ 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
  
- 	return 0;
-@@ -759,9 +760,9 @@ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m)
- 	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
- 		struct sbq_wait_state *ws = &sbq->ws[i];
+@@ -609,33 +613,31 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ 		return false;
  
--		seq_printf(m, "\t{.wait_cnt=%d, .wait=%s},\n",
-+		seq_printf(m, "\t{.wait_cnt=%d, .waiters_cnt=%d},\n",
- 			   atomic_read(&ws->wait_cnt),
--			   waitqueue_active(&ws->wait) ? "active" : "inactive");
-+			   atomic_read(&ws->waiters_cnt));
- 	}
- 	seq_puts(m, "}\n");
+ 	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+-	if (wait_cnt <= 0) {
+-		int ret;
+-
+-		wake_batch = READ_ONCE(sbq->wake_batch);
+-
+-		/*
+-		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+-		 * ensure that we see the batch size update before the wait
+-		 * count is reset.
+-		 */
+-		smp_mb__before_atomic();
++	if (wait_cnt > 0)
++		return false;
++	/*
++	 * Concurrent callers should call this function again
++	 * to wakeup a new batch on a different 'ws'.
++	 */
++	else if (wait_cnt < 0)
++		return true;
  
-@@ -798,6 +799,7 @@ void sbitmap_prepare_to_wait(struct sbitmap_queue *sbq,
- {
- 	if (!sbq_wait->sbq) {
- 		atomic_inc(&sbq->ws_active);
-+		atomic_inc(&ws->waiters_cnt);
- 		sbq_wait->sbq = sbq;
- 	}
- 	prepare_to_wait_exclusive(&ws->wait, &sbq_wait->wait, state);
-@@ -810,6 +812,7 @@ void sbitmap_finish_wait(struct sbitmap_queue *sbq, struct sbq_wait_state *ws,
- 	finish_wait(&ws->wait, &sbq_wait->wait);
- 	if (sbq_wait->sbq) {
- 		atomic_dec(&sbq->ws_active);
-+		atomic_dec(&ws->waiters_cnt);
- 		sbq_wait->sbq = NULL;
- 	}
+-		/*
+-		 * For concurrent callers of this, the one that failed the
+-		 * atomic_cmpxhcg() race should call this function again
+-		 * to wakeup a new batch on a different 'ws'.
+-		 */
+-		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+-		if (ret == wait_cnt) {
+-			sbq_index_atomic_inc(&sbq->wake_index);
+-			wake_up_nr(&ws->wait, wake_batch);
+-			return false;
+-		}
++	/*
++	 * Increase 'wake_index' before updating 'wake_batch', in case that
++	 * concurrent callers wake up the same 'ws' again.
++	 */
++	sbq_index_atomic_inc(&sbq->wake_index);
++	wake_batch = READ_ONCE(sbq->wake_batch);
+ 
+-		return true;
+-	}
++	/*
++	 * Pairs with the memory barrier in sbitmap_queue_resize() to
++	 * ensure that we see the batch size update before the wait
++	 * count is reset.
++	 */
++	smp_mb__before_atomic();
+ 
++	atomic_set(&ws->wait_cnt, wake_batch);
++	wake_up_nr(&ws->wait, wake_batch);
+ 	return false;
  }
+ 
 -- 
 2.31.1
 
