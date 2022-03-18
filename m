@@ -2,78 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F333EC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 02:47:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FEBFC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 03:10:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230241AbiCRCsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 22:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
+        id S232031AbiCRDME (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 23:12:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229921AbiCRCsZ (ORCPT
+        with ESMTP id S229998AbiCRDME (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 22:48:25 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1682CCA06
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id t2so8363755pfj.10
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=yHHce095Z+cMMKE90z3st8GfylQGCRwqvgLzXY2KQ3k=;
-        b=e4esWQq4NmSxkwXv2sqcgG8JpNP3nGmnaKZqkMPdAoRV+iF+1Nxk+/eKQEUK8EnmyV
-         Kk1y1Y7l/8Ld/iPiI9cH/FxPjefkXOfVhdqaTyAeMlwg5QToCWSifxGqEw7FHzLmQDJf
-         2W9ISug8XRsyYf81mRY9Xixi5H51D2sNK9XkfUekInKVE82hB9VpWHw5kY0Odm7SvQ1Y
-         3/Q6zMkYFXTnzLiCrBFHuoGQx+triCWxpI61t+LicydFp0HxQx0fCBd9WLHuGBYsuTi0
-         i7xb1YFy7Fgp7XjMIULHvVr5ZPZW5L9WEpohjcPB/4JhvvmitGrixBFhdf8ggHQURzj3
-         AHXg==
+        Thu, 17 Mar 2022 23:12:04 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1704EC558D;
+        Thu, 17 Mar 2022 20:10:46 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id bx24-20020a17090af49800b001c6872a9e4eso3148198pjb.5;
+        Thu, 17 Mar 2022 20:10:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=yHHce095Z+cMMKE90z3st8GfylQGCRwqvgLzXY2KQ3k=;
-        b=GKpIIcN2mf5Ij5tb6L5UKrGP1xwIuBet4xt7ndbhZBm56mZ97siBMA7f/8dj9ln/86
-         thkC3y0irb++E9PtGr3bMk19uL8oonjBy9ZnHH5Fp89+nlsAdfTuhIqRD811So/R/RMq
-         CSD3lZD4v0Sy6qVA09Kwg3e377LblfjfaEZIMWYrjOUsvwSRBlLYpN8pTotahd7jd9KK
-         +zM8zUZCvxbiFfXDmXFnRWgriVmrQ1+mYtjlc8oow0ImuIotgmOvMxuNKGw/mKt4uahK
-         Y8QEIwjEXeET3Ujqv5fZ7N0Je5gva7OdSFIGCdrd8Pwb/L6Jg5dt6Av19Sp+Kp3H2ise
-         purg==
-X-Gm-Message-State: AOAM53299SqbzXQInu24Pyjhg1uVOLpwmVh9AJ5gJWlrGnSnYDL8DVmZ
-        18rAlA1JmNwGBBN/+D7Rnr55gRasrRq5Z2O0
-X-Google-Smtp-Source: ABdhPJw+LjoCQsY5qugenJ+cnDZOuejYF1SQfesGpmzqOhfpTyT+Ly6jPqb1DIN+ujPfOIEdnAyLKA==
-X-Received: by 2002:a05:6a00:14c9:b0:4f7:763b:2efd with SMTP id w9-20020a056a0014c900b004f7763b2efdmr8016623pfu.55.1647571627260;
-        Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j16-20020a63e750000000b00373598b8cbfsm6210563pgk.74.2022.03.17.19.47.06
+        bh=Haz+GoKyB3RSep3ECvx7j8Nv1Ufqm9H0K//j2fwFt60=;
+        b=vOJxbuI4WYSAL5OgRiDikT2Od5sbYakHcx9WJhXDlbLt/jMAeQY1U4eLVqieK8cALI
+         NsccIoe76plmYCsOtfpOqPNcG2M9lsG8hNC64e7voDQR2tyvzP0R4jg7IYZ8USInzkVm
+         qrYwr/D1cS4ppyQWHP59pNPpWbAz8A7XG89eVqzAWLxQxO7lUrtppB95EbXU04HdSAEp
+         vzwODq+YuFmW9y8T3DglGK/X92A2YqzBw2nfrWJYxvkeZLWeZeChl6kIAAFTLg/5h1rD
+         98CipiXy4ye0EF0soLLiyzIjsB2RKFpAj6oSOGCxDgRVETGf296dq43vbuIcWTtUahPq
+         Oe+A==
+X-Gm-Message-State: AOAM530GCamPArO5XSU+pceD015V4B1xEHld10kMbuTNdkbVZ4nrdTFS
+        9P1xht2UMxgqvQbZy+r57Yiz+C1XZlw=
+X-Google-Smtp-Source: ABdhPJxf4ee0q3k3GEsPwEFvGnMbi9h8ql49UgY9UGkxNYVB8h8rMExIzTzQr8b69UOcIYIiDmGfVQ==
+X-Received: by 2002:a17:902:7802:b0:150:baa:bc1a with SMTP id p2-20020a170902780200b001500baabc1amr8265239pll.110.1647573045319;
+        Thu, 17 Mar 2022 20:10:45 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id g12-20020a056a0023cc00b004f707cc97f9sm8461505pfc.52.2022.03.17.20.10.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 17 Mar 2022 19:47:06 -0700 (PDT)
-Message-ID: <0657d1b4-fedd-09a3-1ab6-fffdbd158b6d@kernel.dk>
-Date:   Thu, 17 Mar 2022 20:47:05 -0600
+        Thu, 17 Mar 2022 20:10:44 -0700 (PDT)
+Message-ID: <132f9c86-5a2b-6770-377a-9323ba344402@acm.org>
+Date:   Thu, 17 Mar 2022 20:10:43 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [GIT PULL] second round of nvme updates for Linux 5.18
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH 1/3] block: don't show disk stats if io accounting is
+ disabled
 Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YjNrAsjvdSd+abfu@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YjNrAsjvdSd+abfu@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
+        mpatocka@redhat.com, snitzer@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220317112653.1019490-1-yukuai3@huawei.com>
+ <20220317112653.1019490-2-yukuai3@huawei.com>
+ <22cd48e9-fe36-414c-942e-382b8139ab4b@acm.org>
+ <32a69b87-270e-479a-6207-24de3d70e9ed@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <32a69b87-270e-479a-6207-24de3d70e9ed@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/17/22 11:08 AM, Christoph Hellwig wrote:
-> git://git.infradead.org/nvme.git tags/nvme-5.18-2022-03-17
+On 3/17/22 18:36, yukuai (C) wrote:
+> 在 2022/03/17 22:06, Bart Van Assche 写道:
+>> On 3/17/22 04:26, Yu Kuai wrote:
+>>> If io accounting is disabled, there is no point to handle such device
+>>> in diskstats_show(), and it can be confused for users because all fields
+>>> in iostat are zero while the disk is handling io.
+>>>
+>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>> ---
+>>>   block/genhd.c | 5 +++++
+>>>   1 file changed, 5 insertions(+)
+>>>
+>>> diff --git a/block/genhd.c b/block/genhd.c
+>>> index c3b32c665aec..e5307f512185 100644
+>>> --- a/block/genhd.c
+>>> +++ b/block/genhd.c
+>>> @@ -937,6 +937,9 @@ ssize_t part_stat_show(struct device *dev,
+>>>       struct disk_stats stat;
+>>>       unsigned int inflight;
+>>> +    if (!blk_queue_io_stat(q))
+>>> +        return sprintf(buf, "io accounting is disabled\n");
+>>> +
+>>
+>> Hmm ... the above looks sub-optimal to me. Has it been considered to 
+>> return an error code instead or even better to hide the stat attribute 
+>> if I/O accounting is disabled? The latter can be achieved by modifying 
+>> disk_visible().
+ >
+> It's right this way is much better, i'll hide the 'stat' in next
+> iteration.
 
-Pulled, thanks.
+Please note that modifying disk_visible() only is not sufficient. 
+sysfs_update_group() needs to be called to trigger a call to 
+disk_visible() if a variable has changed that affects the return value 
+of disk_visible().
 
--- 
-Jens Axboe
+> BTW, do you have any suggestion about patch 3?
 
+I need more time to analyze that patch.
+
+Thanks,
+
+Bart.
