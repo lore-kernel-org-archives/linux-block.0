@@ -2,108 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65391C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 06:12:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6B44C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 07:04:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232676AbiCRGNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Mar 2022 02:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
+        id S232900AbiCRHFr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Mar 2022 03:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232626AbiCRGNo (ORCPT
+        with ESMTP id S232904AbiCRHFm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Mar 2022 02:13:44 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFD52856B7;
-        Thu, 17 Mar 2022 23:12:25 -0700 (PDT)
-Received: from kwepemi100012.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KKYXB6WKMzCqsh;
-        Fri, 18 Mar 2022 14:10:18 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100012.china.huawei.com (7.221.188.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Mar 2022 14:12:21 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 18 Mar 2022 14:12:20 +0800
-Subject: Re: [PATCH 1/3] block: don't show disk stats if io accounting is
- disabled
-To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <mpatocka@redhat.com>, <snitzer@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220317112653.1019490-1-yukuai3@huawei.com>
- <20220317112653.1019490-2-yukuai3@huawei.com>
- <22cd48e9-fe36-414c-942e-382b8139ab4b@acm.org>
- <32a69b87-270e-479a-6207-24de3d70e9ed@huawei.com>
- <132f9c86-5a2b-6770-377a-9323ba344402@acm.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <a8a21d0c-5254-2942-c6d1-319ed53b5692@huawei.com>
-Date:   Fri, 18 Mar 2022 14:12:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 18 Mar 2022 03:05:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A1A39261DFA
+        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 00:04:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647587060;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=dRxKY2ALGuJ0XownOAjggWtKbSTTBHbjSbBWPLWoaKg=;
+        b=PeMnVBPXVaEOI0qir+CS71SreFVbmwbSlsDBZ1sG6oE0O9+cdJOKWlqYzaInIlBbiA9uGA
+        TCqV6++qI8qOynAaSn2E8dzXWuotNfGKuTKmz5i9auBVlwSv8jKi3jup91lLgMcPGgeRjE
+        Zh3AxjTxca8CYCjyycZcmkVZeLMqcMc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-370-jfQBtssXPX6_DDe79gYaYw-1; Fri, 18 Mar 2022 03:04:17 -0400
+X-MC-Unique: jfQBtssXPX6_DDe79gYaYw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 00B11802809;
+        Fri, 18 Mar 2022 07:04:17 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 4B7E72156897;
+        Fri, 18 Mar 2022 07:04:06 +0000 (UTC)
+Date:   Fri, 18 Mar 2022 15:04:00 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, tj@kernel.org,
+        axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH v9] block: cancel all throttled bios in del_gendisk()
+Message-ID: <YjQu4FfpUq33pyDx@T590>
+References: <20220210115637.1074927-1-yukuai3@huawei.com>
+ <YhuyBgZSS6m/Mwu6@infradead.org>
+ <Yhxnkg0AEaj36t+a@T590>
+ <YhyYpWHGVhs3J/dk@infradead.org>
+ <Yh31bQu3gbXoDBuK@T590>
+ <836f0686-4ac8-327d-2bab-64a762ea8673@huawei.com>
+ <Yh6/dH2CERzsBPJd@T590>
+ <f46c8512-400b-144f-e2ba-c57cc895fca8@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <132f9c86-5a2b-6770-377a-9323ba344402@acm.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+In-Reply-To: <f46c8512-400b-144f-e2ba-c57cc895fca8@huawei.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/03/18 11:10, Bart Van Assche 写道:
-> On 3/17/22 18:36, yukuai (C) wrote:
->> 在 2022/03/17 22:06, Bart Van Assche 写道:
->>> On 3/17/22 04:26, Yu Kuai wrote:
->>>> If io accounting is disabled, there is no point to handle such device
->>>> in diskstats_show(), and it can be confused for users because all 
->>>> fields
->>>> in iostat are zero while the disk is handling io.
->>>>
->>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>>> ---
->>>>   block/genhd.c | 5 +++++
->>>>   1 file changed, 5 insertions(+)
->>>>
->>>> diff --git a/block/genhd.c b/block/genhd.c
->>>> index c3b32c665aec..e5307f512185 100644
->>>> --- a/block/genhd.c
->>>> +++ b/block/genhd.c
->>>> @@ -937,6 +937,9 @@ ssize_t part_stat_show(struct device *dev,
->>>>       struct disk_stats stat;
->>>>       unsigned int inflight;
->>>> +    if (!blk_queue_io_stat(q))
->>>> +        return sprintf(buf, "io accounting is disabled\n");
->>>> +
->>>
->>> Hmm ... the above looks sub-optimal to me. Has it been considered to 
->>> return an error code instead or even better to hide the stat 
->>> attribute if I/O accounting is disabled? The latter can be achieved 
->>> by modifying disk_visible().
->  >
->> It's right this way is much better, i'll hide the 'stat' in next
->> iteration.
+On Thu, Mar 17, 2022 at 07:22:04PM +0800, yukuai (C) wrote:
+> 在 2022/03/02 8:51, Ming Lei 写道:
+> > On Tue, Mar 01, 2022 at 09:54:28PM +0800, yukuai (C) wrote:
+> > > 在 2022/03/01 18:29, Ming Lei 写道:
+> > > > On Mon, Feb 28, 2022 at 01:40:53AM -0800, Christoph Hellwig wrote:
+> > > > > On Mon, Feb 28, 2022 at 02:11:30PM +0800, Ming Lei wrote:
+> > > > > > > FYI, this crashed left rigt and center when running xfstests with
+> > > > > > > traces pointing to throtl_pending_timer_fn.
+> > > > > > 
+> > > > > > Can you share the exact xfstests test(fs, test)? Or panic log?
+> > > > > > 
+> > > > > > I can't reproduce it when running './check -g auto' on XFS, meantime
+> > > > > > tracking throtl_pending_timer_fn().
+> > > > > 
+> > > > >   From a quick run using f2fs:
+> > > > > 
+> > > > > generic/081 files ... [  316.487861] run fstests generic/081 at 2022-02-28 09:38:40
+> > > > 
+> > > > Thanks for providing the reproducer.
+> > > > 
+> > > > The reason is that the pending timer is deleted in blkg's release
+> > > > handler, so the timer can still be live after request queue is released.
+> > > > 
+> > > > The patch of 'block: cancel all throttled bios in del_gendisk()' should just
+> > > > make it easier to trigger.
+> > > > 
+> > > > After patch of "block: move blkcg initialization/destroy into disk allocation/
+> > > > release handler" lands, the issue can be fixed easily by:
 > 
-> Please note that modifying disk_visible() only is not sufficient. 
-> sysfs_update_group() needs to be called to trigger a call to 
-> disk_visible() if a variable has changed that affects the return value 
-> of disk_visible().
-
-Hi,
-
-Thanks for your advice, I wonder can the queue flag
-'QUEUE_FLAG_IO_STAT' change after the disk is created? I don't
-see it can change anywhere. In this case, perhaps we don't need
-to consider calling sysfs_update_group().
-
+> Hi, Ming
 > 
->> BTW, do you have any suggestion about patch 3?
-> 
-> I need more time to analyze that patch.
+> Now that the above patch is landed in linux-next, do you intend to fix
+> the above problem? Or I can take over if you don't mind.
 
-Thanks for sending time on the patch.
+Hi Yu Kuai, 
 
-Kuai
+I will send one fix and your V9 later.
+
+
+Thanks,
+Ming
+
