@@ -2,162 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43B79C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 16:51:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55917C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 17:05:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239409AbiCRQxM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Mar 2022 12:53:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51162 "EHLO
+        id S231357AbiCRRG2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Mar 2022 13:06:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239407AbiCRQxL (ORCPT
+        with ESMTP id S239496AbiCRRG1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Mar 2022 12:53:11 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 270F3170DA5
-        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 09:51:52 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id b15so10953780edn.4
-        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 09:51:52 -0700 (PDT)
+        Fri, 18 Mar 2022 13:06:27 -0400
+Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D03C30DC5E
+        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 10:05:08 -0700 (PDT)
+Received: by mail-io1-xd34.google.com with SMTP id b16so9994982ioz.3
+        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 10:05:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZoPZaaC2NKmWX4pMUWovHOkjyoMteKBE1HWqQdjxHic=;
-        b=HeWOIunJl0UAOOBuf3sFMoQ5H0G4YvHE64MUshpGXCqPohbLwWv6CprzWDDtvQZV4a
-         gZp/IxMUTTx1ov0X4+Vytt7su/e4jtYsO/D7+kTb9CU6ARrJw3MeR8b7NRqQIiLqbZ+u
-         j0aPEH4e2LjldUZc5ZiqUuKcRxGdW0FHrgLL4hB6guAKbnFpXj4HPtEHgcCnG4QCJ52d
-         8sGtuj8e3Awdr6ViUqdpWzBCCokYpw3AL06YpXiNcCaFQKGz+GcgpjJZoJ7sHuMpdpCs
-         ymr/6dX8jq2mXYwwEaHQ6nDbFH7a9NCUu3d4CU2qQvzNicnQV+J46JfBwgvGB6WAPUvK
-         o4RQ==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=gnGhXbv42l+coz8zYUiKIZoMSVg6YT1PKWPDZgBEbS0=;
+        b=ITKJ3Xjg09M53AfQOEzxAlKEWBoUe54Icg4/uNoh9EGzH3hpMPHU9qpGtgjMtaai9x
+         JMJ6PX8nxuUpWkttk5Ys0vi3IT1osiDgdzrkOIHcahyE6i0S34u1L6WT/lvHOUQf4DQZ
+         O1tdLjO/WUYECqSgHUxFi+rGe0CaRs/xNsG9EmsbtBmhatE++BgCNNPk4swTOCMQwDbG
+         LmMLVB3JmV45DtSY8qVY1hcxNi9i/0zywdpAFBW2Gktptn9nM9Muknw+MaWE3IWRLg19
+         A007Jm+TJpzyRlrvViC60h8sMfZPr64qZS0asG2CXDjMt+AWvDXEJKzil7pg1eKnJhVZ
+         fBGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZoPZaaC2NKmWX4pMUWovHOkjyoMteKBE1HWqQdjxHic=;
-        b=5PqtMWN3cLihOiJs0HC8ZOHsJtyFEPieHfUMm4ghCwtk1dKQi9fFEPfsJUh87l8J9v
-         5cHklJlF3CXIznKXYSv+AL/zNJf7Fc1gKcH7/jeu+a2iDf2ojAF7nx2D5xo6bFKQK9u4
-         RYVKJsGFbS2dYhLE/Y+aSrTe1P7WitPWy/klZNC1fdIjRMZJDF18aco/YPC0eK2py6WG
-         msrNYdXAbaYNdXWVYCF+awVA8TF/YJD2Y2FAYXkuvF9v2979KzhVSpbvIjuaUoYoln8m
-         5GiBm+uzbrBYcfR9fZzulYPC1nERGtXb6TbfW33Fn5MLA7rLllcTNbcmUpSFYcUW973l
-         PXAA==
-X-Gm-Message-State: AOAM532fWAWSka6u6teLXHptBKqPxOcH5ShnvskPZNnObFJg4tvHu0Vp
-        lNmGRO0hm591VLY80H1XJav+L0+E245HwhNh1shQ2Q==
-X-Google-Smtp-Source: ABdhPJy1ogHfzAiq8bCYwvn4PC5AAKNI1WF+ewG3yPW/hiP3cfUSSMXviPUH6oLPM47jn5XKjLbfbX9S5ZFPtLR/S0Y=
-X-Received: by 2002:a05:6402:289d:b0:419:437:ef4f with SMTP id
- eg29-20020a056402289d00b004190437ef4fmr5976676edb.110.1647622310479; Fri, 18
- Mar 2022 09:51:50 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=gnGhXbv42l+coz8zYUiKIZoMSVg6YT1PKWPDZgBEbS0=;
+        b=E5gtXjadvBY+CqTaqIs0kkrMTTsRaTJfCsWleVLU+oCld6BwBY9lvYg1dNBuYo8Vk8
+         S8+XfwWtXZJ3vvgmTWzFyaoYwAYr9pXI2jMOxnjpze539SmhwwsNGzfL6keS++4V+B/Q
+         0UkVQ4kdbv21yfbJZ2Zci8fC4VlmvELCgNJqfDwZ48oRk7QNqtk9cfwfCx7PAzxQivBR
+         aIG0ewZfHJK2QZ0E5+An9/0zHWQhzw/ztCsyPxQv8RNb40zF47QTKazlxZFFiQYjRUMK
+         4rTvpBwdu3gY2N1toY/AgHTBLwzeUOMv1QFyWW9+Unhju0Kyc1/QMAPgXULISCqiE96Y
+         dUAw==
+X-Gm-Message-State: AOAM531va6xehs/X9msQdV7VXWDcZrzYKNH3RXQBALB01wUibHTGUjt4
+        aq66UGSD1cHChL/JoKn9KZxagscZFfYJtcb/
+X-Google-Smtp-Source: ABdhPJzLZPrN2N/WawdhgABOCvwsTvsRwQxsrFoCFeAUj1MPfo+LXQdOsH+qED9284HXZn1JJiKUew==
+X-Received: by 2002:a5e:990b:0:b0:645:e9e5:3a9b with SMTP id t11-20020a5e990b000000b00645e9e53a9bmr4689428ioj.164.1647623107653;
+        Fri, 18 Mar 2022 10:05:07 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id m4-20020a0566022e8400b006463059bf2fsm4798303iow.49.2022.03.18.10.05.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 18 Mar 2022 10:05:07 -0700 (PDT)
+Message-ID: <667d556f-dc12-0cc2-2abf-5a478fd93d35@kernel.dk>
+Date:   Fri, 18 Mar 2022 11:05:06 -0600
 MIME-Version: 1.0
-References: <20220315172221.9522-1-bgeffon@google.com> <YjS2SJU7VE1bGb/F@google.com>
-In-Reply-To: <YjS2SJU7VE1bGb/F@google.com>
-From:   Brian Geffon <bgeffon@google.com>
-Date:   Fri, 18 Mar 2022 12:51:14 -0400
-Message-ID: <CADyq12wQ=vGaGoqt5RXJ5aYM1tQJ2BCT8cav-ONpPrCc85q-5Q@mail.gmail.com>
-Subject: Re: [PATCH] zram: Add a huge_idle writeback mode
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] block fixes for 5.17-final
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 12:41 PM Minchan Kim <minchan@kernel.org> wrote:
->
-> On Tue, Mar 15, 2022 at 10:22:21AM -0700, Brian Geffon wrote:
-> > Today it's only possible to write back as a page, idle, or huge.
-> > A user might want to writeback pages which are huge and idle first
-> > as these idle pages do not require decompression and make a good
-> > first pass for writeback.
->
-> Hi Brian,
->
-> I am not sure how much the decompression overhead matter for idle pages
-> writeback since it's already *very slow* path in zram but I agree that
-> it would be a good first pass since the memory saving for huge writing
-> would be cost efficient.
->
-> Just out of curiosity. Do you have real usecase?
+Hi Linus,
 
-Hi Minchan,
-Thank you for taking a look. When we are thinking about writeback
-we're trying to be very sensitive to our devices storage endurance,
-for this reason we will have a fairly conservative writeback limit.
-Given that, we want to make sure we're maximizing what lands on disk
-while still minimizing the refault time. We could take the approach
-where we always writeback huge pages but then we may result in very
-quick refaults which would be a huge waste of time. So idle writeback
-is a must for us and being able to writeback the pages which have
-maximum value (huge) would be very useful.
+Two fixes that should make 5.17:
 
-Brian
+- Revert of a nvme target feature (Hannes)
+
+- Fix a memory leak with rq-qos (Ming)
+
+Please pull!
 
 
+The following changes since commit 0a5aa8d161d19a1b12fd25b434b32f7c885c73bb:
 
+  block: fix blk_mq_attempt_bio_merge and rq_qos_throttle protection (2022-03-08 17:48:39 -0700)
 
->
-> >
-> > Signed-off-by: Brian Geffon <bgeffon@google.com>
-> > ---
-> >  Documentation/admin-guide/blockdev/zram.rst |  6 ++++++
-> >  drivers/block/zram/zram_drv.c               | 10 ++++++----
-> >  2 files changed, 12 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-> > index 3e11926a4df9..af1123bfaf92 100644
-> > --- a/Documentation/admin-guide/blockdev/zram.rst
-> > +++ b/Documentation/admin-guide/blockdev/zram.rst
-> > @@ -343,6 +343,12 @@ Admin can request writeback of those idle pages at right timing via::
-> >
-> >  With the command, zram writeback idle pages from memory to the storage.
-> >
-> > +Additionally, if a user choose to writeback only huge and idle pages
-> > +this can be accomplished with::
-> > +
-> > +        echo huge_idle > /sys/block/zramX/writeback
-> > +
-> > +
-> >  If admin want to write a specific page in zram device to backing device,
-> >  they could write a page index into the interface.
-> >
-> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> > index cb253d80d72b..f196902ae554 100644
-> > --- a/drivers/block/zram/zram_drv.c
-> > +++ b/drivers/block/zram/zram_drv.c
-> > @@ -643,8 +643,8 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
-> >  #define PAGE_WB_SIG "page_index="
-> >
-> >  #define PAGE_WRITEBACK 0
-> > -#define HUGE_WRITEBACK 1
-> > -#define IDLE_WRITEBACK 2
-> > +#define HUGE_WRITEBACK (1<<0)
-> > +#define IDLE_WRITEBACK (1<<1)
-> >
-> >
-> >  static ssize_t writeback_store(struct device *dev,
-> > @@ -664,6 +664,8 @@ static ssize_t writeback_store(struct device *dev,
-> >               mode = IDLE_WRITEBACK;
-> >       else if (sysfs_streq(buf, "huge"))
-> >               mode = HUGE_WRITEBACK;
-> > +     else if (sysfs_streq(buf, "huge_idle"))
-> > +             mode = IDLE_WRITEBACK | HUGE_WRITEBACK;
-> >       else {
-> >               if (strncmp(buf, PAGE_WB_SIG, sizeof(PAGE_WB_SIG) - 1))
-> >                       return -EINVAL;
-> > @@ -725,10 +727,10 @@ static ssize_t writeback_store(struct device *dev,
-> >                               zram_test_flag(zram, index, ZRAM_UNDER_WB))
-> >                       goto next;
-> >
-> > -             if (mode == IDLE_WRITEBACK &&
-> > +             if (mode & IDLE_WRITEBACK &&
-> >                         !zram_test_flag(zram, index, ZRAM_IDLE))
-> >                       goto next;
-> > -             if (mode == HUGE_WRITEBACK &&
-> > +             if (mode & HUGE_WRITEBACK &&
-> >                         !zram_test_flag(zram, index, ZRAM_HUGE))
-> >                       goto next;
-> >               /*
-> > --
-> > 2.35.1.723.g4982287a31-goog
-> >
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.17-2022-03-18
+
+for you to fetch changes up to f6189589fa7cc4fb6b53f2929f69f0505123202f:
+
+  Merge tag 'nvme-5.17-2022-03-16' of git://git.infradead.org/nvme into block-5.17 (2022-03-16 05:43:25 -0600)
+
+----------------------------------------------------------------
+block-5.17-2022-03-18
+
+----------------------------------------------------------------
+Hannes Reinecke (1):
+      nvmet: revert "nvmet: make discovery NQN configurable"
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.17-2022-03-16' of git://git.infradead.org/nvme into block-5.17
+
+Ming Lei (1):
+      block: release rq qos structures for queue without disk
+
+ block/blk-core.c               |  4 ++++
+ drivers/nvme/target/configfs.c | 39 ---------------------------------------
+ drivers/nvme/target/core.c     |  3 +--
+ 3 files changed, 5 insertions(+), 41 deletions(-)
+
+-- 
+Jens Axboe
+
