@@ -2,92 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114BBC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 02:41:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F333EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 02:47:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231683AbiCRCmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 17 Mar 2022 22:42:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59150 "EHLO
+        id S230241AbiCRCsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 17 Mar 2022 22:48:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231853AbiCRCmS (ORCPT
+        with ESMTP id S229921AbiCRCsZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 17 Mar 2022 22:42:18 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F59F108745
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:41:01 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id o13so4097001pgc.12
-        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:41:01 -0700 (PDT)
+        Thu, 17 Mar 2022 22:48:25 -0400
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE1682CCA06
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
+Received: by mail-pf1-x435.google.com with SMTP id t2so8363755pfj.10
+        for <linux-block@vger.kernel.org>; Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=rD4sg48jtdha54PBbmThOR/GizumOsGvmi0qYjN75KI=;
-        b=IEUcAmqKFhD1aUPPp+1Zu0L7be8UfGG9ZvVvHYrpa005mZfj+ReGp4WngVe71rKC0T
-         +HCjQwmoc/K0HjwD+HfeCRXWiCQDYZxwxhuxo+8+VYykD7mpqnqUBEny/wUvynbrfeRH
-         wXsxgbF2M5zB+YFJlSy3pdqo0yaoAXJACwhYgt8W2gsuhshcmNQI0vVKWS0HOrcrcbPL
-         yPQjjO95tPFW9ge+LcBm3Fcd6ops96p8RA/29FXICUVuBPMxZMfvclM5eT7OnnJOSYNT
-         AR5fGhHw+tjbH7buZMfwHDxPrJI6cz6oDTmv4YN5UNWoS+DQcRbm/GCnFnNSmZEruqqc
-         xGEQ==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=yHHce095Z+cMMKE90z3st8GfylQGCRwqvgLzXY2KQ3k=;
+        b=e4esWQq4NmSxkwXv2sqcgG8JpNP3nGmnaKZqkMPdAoRV+iF+1Nxk+/eKQEUK8EnmyV
+         Kk1y1Y7l/8Ld/iPiI9cH/FxPjefkXOfVhdqaTyAeMlwg5QToCWSifxGqEw7FHzLmQDJf
+         2W9ISug8XRsyYf81mRY9Xixi5H51D2sNK9XkfUekInKVE82hB9VpWHw5kY0Odm7SvQ1Y
+         3/Q6zMkYFXTnzLiCrBFHuoGQx+triCWxpI61t+LicydFp0HxQx0fCBd9WLHuGBYsuTi0
+         i7xb1YFy7Fgp7XjMIULHvVr5ZPZW5L9WEpohjcPB/4JhvvmitGrixBFhdf8ggHQURzj3
+         AHXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=rD4sg48jtdha54PBbmThOR/GizumOsGvmi0qYjN75KI=;
-        b=LbjQab1oAV8rmbdo3vZVREf/VQC+9DEBqFKniILcbBbMRpqMZ2LSHMMIlDBQSDMSYf
-         9ROgC0ZtdoQS73/6UDrOZCghPtFQTz20+Whsf9ztmVBEL4vEjrPFcyh89GlXXYsgYQgM
-         8Ve/IKMI6gOjeZ4xLUVPBCTYHD7bCdP17LjVBkSYsLWQiMhXxvPjHNS8La0u4tAJrjsl
-         0oSQrINkPHoq5DhB3PlxShlt0XaC1jP3PXXuxd+fEbUZ1y32DgvF2zI+TLMiiUOE9xMf
-         DpPcRpp2ZEMhVvD2mW6lAG2m/FFPuRYaYLe7pm/ZmvW8USXPqeXpgcWtM1q/TaNXlN2r
-         vfRQ==
-X-Gm-Message-State: AOAM530+C1tsMWJ9b83BinX6Vcj/nu9ZZr0wwF3+IfD47N9RHYVvDsBA
-        bXC9CELmqJculWrFu+RgdrkW7WNeB+sn6Qhy
-X-Google-Smtp-Source: ABdhPJw4cd/P017n4qwqfg/ZddFzMBl8yxhZ/05IjlnQ0PZRAhBxhSLZJyOcVhIZJSIxetqd2aq/RQ==
-X-Received: by 2002:a05:6a02:182:b0:374:5a57:cbf9 with SMTP id bj2-20020a056a02018200b003745a57cbf9mr6074298pgb.616.1647571260621;
-        Thu, 17 Mar 2022 19:41:00 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id pj13-20020a17090b4f4d00b001bf2ff56430sm11389086pjb.30.2022.03.17.19.40.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 17 Mar 2022 19:41:00 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-In-Reply-To: <20220318022641.133484-1-shinichiro.kawasaki@wdc.com>
-References: <20220318022641.133484-1-shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH v2] block: limit request dispatch loop duration
-Message-Id: <164757125962.111185.1072718598998010222.b4-ty@kernel.dk>
-Date:   Thu, 17 Mar 2022 20:40:59 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yHHce095Z+cMMKE90z3st8GfylQGCRwqvgLzXY2KQ3k=;
+        b=GKpIIcN2mf5Ij5tb6L5UKrGP1xwIuBet4xt7ndbhZBm56mZ97siBMA7f/8dj9ln/86
+         thkC3y0irb++E9PtGr3bMk19uL8oonjBy9ZnHH5Fp89+nlsAdfTuhIqRD811So/R/RMq
+         CSD3lZD4v0Sy6qVA09Kwg3e377LblfjfaEZIMWYrjOUsvwSRBlLYpN8pTotahd7jd9KK
+         +zM8zUZCvxbiFfXDmXFnRWgriVmrQ1+mYtjlc8oow0ImuIotgmOvMxuNKGw/mKt4uahK
+         Y8QEIwjEXeET3Ujqv5fZ7N0Je5gva7OdSFIGCdrd8Pwb/L6Jg5dt6Av19Sp+Kp3H2ise
+         purg==
+X-Gm-Message-State: AOAM53299SqbzXQInu24Pyjhg1uVOLpwmVh9AJ5gJWlrGnSnYDL8DVmZ
+        18rAlA1JmNwGBBN/+D7Rnr55gRasrRq5Z2O0
+X-Google-Smtp-Source: ABdhPJw+LjoCQsY5qugenJ+cnDZOuejYF1SQfesGpmzqOhfpTyT+Ly6jPqb1DIN+ujPfOIEdnAyLKA==
+X-Received: by 2002:a05:6a00:14c9:b0:4f7:763b:2efd with SMTP id w9-20020a056a0014c900b004f7763b2efdmr8016623pfu.55.1647571627260;
+        Thu, 17 Mar 2022 19:47:07 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id j16-20020a63e750000000b00373598b8cbfsm6210563pgk.74.2022.03.17.19.47.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Mar 2022 19:47:06 -0700 (PDT)
+Message-ID: <0657d1b4-fedd-09a3-1ab6-fffdbd158b6d@kernel.dk>
+Date:   Thu, 17 Mar 2022 20:47:05 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [GIT PULL] second round of nvme updates for Linux 5.18
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YjNrAsjvdSd+abfu@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YjNrAsjvdSd+abfu@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 18 Mar 2022 11:26:41 +0900, Shin'ichiro Kawasaki wrote:
-> When IO requests are made continuously and the target block device
-> handles requests faster than request arrival, the request dispatch loop
-> keeps on repeating to dispatch the arriving requests very long time,
-> more than a minute. Since the loop runs as a workqueue worker task, the
-> very long loop duration triggers workqueue watchdog timeout and BUG [1].
-> 
-> To avoid the very long loop duration, break the loop periodically. When
-> opportunity to dispatch requests still exists, check need_resched(). If
-> need_resched() returns true, the dispatch loop already consumed its time
-> slice, then reschedule the dispatch work and break the loop. With heavy
-> IO load, need_resched() does not return true for 20~30 seconds. To cover
-> such case, check time spent in the dispatch loop with jiffies. If more
-> than 1 second is spent, reschedule the dispatch work and break the loop.
-> 
-> [...]
+On 3/17/22 11:08 AM, Christoph Hellwig wrote:
+> git://git.infradead.org/nvme.git tags/nvme-5.18-2022-03-17
 
-Applied, thanks!
+Pulled, thanks.
 
-[1/1] block: limit request dispatch loop duration
-      commit: 572299f03afd676dd4e20669cdaf5ed0fe1379d4
-
-Best regards,
 -- 
 Jens Axboe
-
 
