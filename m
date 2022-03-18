@@ -2,107 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6245C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 21:59:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E4EAC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 18 Mar 2022 22:46:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241229AbiCRWA4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 18 Mar 2022 18:00:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52664 "EHLO
+        id S241324AbiCRWrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 18 Mar 2022 18:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241223AbiCRWAz (ORCPT
+        with ESMTP id S234187AbiCRWrS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 18 Mar 2022 18:00:55 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CD7F9557
-        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 14:59:36 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 6so5946478pgg.0
-        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 14:59:36 -0700 (PDT)
+        Fri, 18 Mar 2022 18:47:18 -0400
+Received: from mail-oo1-xc32.google.com (mail-oo1-xc32.google.com [IPv6:2607:f8b0:4864:20::c32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79AB3229C85
+        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 15:45:58 -0700 (PDT)
+Received: by mail-oo1-xc32.google.com with SMTP id h16-20020a4a6f10000000b00320507b9ccfso11886266ooc.7
+        for <linux-block@vger.kernel.org>; Fri, 18 Mar 2022 15:45:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:from:subject:to:cc
-         :content-language:content-transfer-encoding;
-        bh=TMeyZ9NnVRM5GREL8gFa0wSK7oQqM4TfIg29eo0Xlc8=;
-        b=VGABW2s0R5TfwfeDe8ybLbH1k5L+My8+JAIm0UNuuKF7kDM1Azc8telsmTF8Bl126a
-         9BYJbAdjxkZUu+8Ni1YlzzR7JSTXUg5hFUrT5U/GRngayw4PIsKm8dYNfZtDuxWXqJdy
-         MF2LrYk0n688uf1Gd/3iKXUwwFUYC8ARiHcZxvyAYhl3dG5ydAuZWKyjpQbnV4ehseCB
-         s+4uUoycFZiV+1ZUqTHxo3QZoIVgKlTXKfQEabDjha442yr82x/OJhVvalOjBLsFGXn9
-         UYMS/z3/9+96qtQPJ7C8mPTy+6qFbfec2CZLQ+mMcFLH5S+EF0ZW1Xnl5VCG5ecVyM3T
-         mVDA==
+        d=linuxfoundation.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=ekiD2sX45IwGk6wtsqdwxLttTAGZcGccRjZl1i6g1JA=;
+        b=dMDapo5gWo0mYQwoT0A/aOZqMdPyZSCOVsL5zPGffJvLJZp0AfN2E9xdlck/nSLv/N
+         hEsSe5KNbjsmefIhgIIv1yDVHMP+6YIgd44fW9U2d/c1Akfns382n70WbM/10yIkuHjZ
+         SUNIZp82WOT2MEcG49QwDBCrffF4++Gcu4CkY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
-         :subject:to:cc:content-language:content-transfer-encoding;
-        bh=TMeyZ9NnVRM5GREL8gFa0wSK7oQqM4TfIg29eo0Xlc8=;
-        b=KuuxbfU3gcjiixRYb+SP1Rm1saX5zr/tCsTMogo1Fjkxpqh9JYBnvSt2+YvaVtNgzF
-         qYuWpbOG1JnJVWngSsZoF8K4NfCVaKpCm2s+90YMK9aDsUBjSI4p85DPtRBw484itmqI
-         8kWaDxsijCM/09wW61xs+And+1M9XNA/JRSwqV4qAkweYML0CABoLDJXKj0/7hDTUKaM
-         FgrgCJFhTht9yuIB30DjE+3eZATK8u+OOAme3fShwo1dmZtOzv6KuVmv1VcZ7qsQfDLc
-         hGV+hgcH0UmUJvpz7mVKFmS8gpeflvcNifVPrfiRKq9fHCTnin2EpGybPQyz7azy4yrr
-         I3Eg==
-X-Gm-Message-State: AOAM532H8sFI/p4ueE1M2yjtVs+b/d6iKaQYolm3dwdDrKglfNzYuLfE
-        4JDn/kQFIZDwggxAfBKTEoRpXw==
-X-Google-Smtp-Source: ABdhPJwstiJLeh3J1jqEV65XlkLuUjE3fTbLTq9jczVR8TvRS5c+HHT6m20zD3QyYwfdhMX2IcsqyQ==
-X-Received: by 2002:a63:6b81:0:b0:380:4fc1:ee7b with SMTP id g123-20020a636b81000000b003804fc1ee7bmr9497789pgc.298.1647640775660;
-        Fri, 18 Mar 2022 14:59:35 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w12-20020a056a0014cc00b004f790cdbf9dsm11212815pfu.183.2022.03.18.14.59.34
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=ekiD2sX45IwGk6wtsqdwxLttTAGZcGccRjZl1i6g1JA=;
+        b=q0HJUvrsYUkfP5TQYxHYBqkjMq/ARV3UP1ePyMQYWbi5gmLgjqhd3NHHPpH28BHIYP
+         bXwZ1/+RYuYxdDLXE65+WXUTm3VJhKeTic1CvJKg4+t5ooQh+5azn9hIeqhQSZ7EpG9H
+         UCalSXAw92x9eOVnNzJYDoJF3ryywS2vhgIR0hSj7M0EIqTy2W7u19QgaGZfDdXesBh0
+         8JvsrzGV25BHCQLmTOAfQp8WlTSuAASNObd7WexZl2QY6OeEp88Dds5enMs1cjJgI/nY
+         rQndeF+UH1/st8ByGpk3J9KIXWzfV9Hw0rmdzlwzJioIAhbEpAfz8aQP/VXSTgagr427
+         SewQ==
+X-Gm-Message-State: AOAM530CyxMzDaQX014Id0/01phaoR+MxrUCMtJWKS/gtAVwsMGD0Wwm
+        6cp5Six7inWC2KrZD+T1RJo7sg==
+X-Google-Smtp-Source: ABdhPJziihDBziDyTkE7iKcLTBW6BUUFUpCgkLWdsk/9MySxxcozoxXb4xoR4U6FbxLxPWes+cEMkA==
+X-Received: by 2002:a05:6820:814:b0:322:b1b2:2456 with SMTP id bg20-20020a056820081400b00322b1b22456mr3591951oob.0.1647643557718;
+        Fri, 18 Mar 2022 15:45:57 -0700 (PDT)
+Received: from [192.168.1.128] ([71.205.29.0])
+        by smtp.gmail.com with ESMTPSA id x12-20020a056830244c00b005ad233e0ba3sm4330223otr.48.2022.03.18.15.45.55
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 18 Mar 2022 14:59:35 -0700 (PDT)
-Message-ID: <212e39c2-2e2a-24af-647b-67f3168ea558@kernel.dk>
-Date:   Fri, 18 Mar 2022 15:59:34 -0600
+        Fri, 18 Mar 2022 15:45:57 -0700 (PDT)
+Subject: Re: [PATCH 7/9] usb: usbip: eliminate anonymous module_init &
+ module_exit
+To:     Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc:     "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?UTF-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org,
+        Shuah Khan <skhan@linuxfoundation.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+ <20220316192010.19001-8-rdunlap@infradead.org>
+From:   Shuah Khan <skhan@linuxfoundation.org>
+Message-ID: <282f4857-7b4f-810e-af0e-e9ca8129c7fc@linuxfoundation.org>
+Date:   Fri, 18 Mar 2022 16:45:54 -0600
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] File system related bio_alloc() cleanups
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>
+In-Reply-To: <20220316192010.19001-8-rdunlap@infradead.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 3/16/22 1:20 PM, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
+> 
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
+> 
+> Example 1: (System.map)
+>   ffffffff832fc78c t init
+>   ffffffff832fc79e t init
+>   ffffffff832fc8f8 t init
+> 
+> Example 2: (initcall_debug log)
+>   calling  init+0x0/0x12 @ 1
+>   initcall init+0x0/0x12 returned 0 after 15 usecs
+>   calling  init+0x0/0x60 @ 1
+>   initcall init+0x0/0x60 returned 0 after 2 usecs
+>   calling  init+0x0/0x9a @ 1
+>   initcall init+0x0/0x9a returned 0 after 74 usecs
+> 
+> Fixes: 80fd9cd52de6 ("usbip: vudc: Add VUDC main file")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: Krzysztof Opasiak <k.opasiak@samsung.com>
+> Cc: Igor Kotrasinski <i.kotrasinsk@samsung.com>
+> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Cc: Valentina Manea <valentina.manea.m@gmail.com>
+> Cc: Shuah Khan <shuah@kernel.org>
+> Cc: Shuah Khan <skhan@linuxfoundation.org>
+> Cc: linux-usb@vger.kernel.org
+> ---
+>   drivers/usb/usbip/vudc_main.c |    8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> --- lnx-517-rc8.orig/drivers/usb/usbip/vudc_main.c
+> +++ lnx-517-rc8/drivers/usb/usbip/vudc_main.c
+> @@ -28,7 +28,7 @@ static struct platform_driver vudc_drive
+>   
+>   static struct list_head vudc_devices = LIST_HEAD_INIT(vudc_devices);
+>   
+> -static int __init init(void)
+> +static int __init vudc_init(void)
+>   {
+>   	int retval = -ENOMEM;
+>   	int i;
+> @@ -86,9 +86,9 @@ cleanup:
+>   out:
+>   	return retval;
+>   }
+> -module_init(init);
+> +module_init(vudc_init);
+>   
+> -static void __exit cleanup(void)
+> +static void __exit vudc_cleanup(void)
+>   {
+>   	struct vudc_device *udc_dev = NULL, *udc_dev2 = NULL;
+>   
+> @@ -103,7 +103,7 @@ static void __exit cleanup(void)
+>   	}
+>   	platform_driver_unregister(&vudc_driver);
+>   }
+> -module_exit(cleanup);
+> +module_exit(vudc_cleanup);
+>   
+>   MODULE_DESCRIPTION("USB over IP Device Controller");
+>   MODULE_AUTHOR("Krzysztof Opasiak, Karol Kosik, Igor Kotrasinski");
+> 
 
-On top of the core block driver branch, here are a set of fs related
-cleanups to bio allocations.
+Thanks for fixing this.
 
-Please pull!
+Acked-by: Shuah Khan <skhan@linuxfoundation.org>
 
-
-The following changes since commit 451f0b6f4c44d7b649ae609157b114b71f6d7875:
-
-  block: default BLOCK_LEGACY_AUTOLOAD to y (2022-02-27 14:49:23 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/for-5.18/alloc-cleanups-2022-03-18
-
-for you to fetch changes up to 64bf0eef0171912f7c2f3ea30ee6ad7a2ad0a511:
-
-  f2fs: pass the bio operation to bio_alloc_bioset (2022-03-08 17:59:03 -0700)
-
-----------------------------------------------------------------
-for-5.18/alloc-cleanups-2022-03-18
-
-----------------------------------------------------------------
-Christoph Hellwig (5):
-      mpage: pass the operation to bio_alloc
-      ext4: pass the operation to bio_alloc
-      nilfs2: pass the operation to bio_alloc
-      f2fs: don't pass a bio to f2fs_target_device
-      f2fs: pass the bio operation to bio_alloc_bioset
-
- fs/ext4/page-io.c  |  7 ++---
- fs/f2fs/data.c     | 89 ++++++++++++++++++++++++------------------------------
- fs/f2fs/f2fs.h     |  2 +-
- fs/mpage.c         | 50 +++++++++++++-----------------
- fs/nilfs2/segbuf.c | 20 ++++++------
- 5 files changed, 73 insertions(+), 95 deletions(-)
-
--- 
-Jens Axboe
-
+thanks,
+-- Shuah
