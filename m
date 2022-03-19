@@ -2,62 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08DB2C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 19 Mar 2022 17:14:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E09FC43217
+	for <linux-block@archiver.kernel.org>; Sat, 19 Mar 2022 22:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237784AbiCSRPx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 19 Mar 2022 13:15:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57750 "EHLO
+        id S244307AbiCSWug (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 19 Mar 2022 18:50:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233507AbiCSRPx (ORCPT
+        with ESMTP id S244305AbiCSWuf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 19 Mar 2022 13:15:53 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92A5C28AC69
-        for <linux-block@vger.kernel.org>; Sat, 19 Mar 2022 10:14:32 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id EA0C381
-        for <linux-block@vger.kernel.org>; Sat, 19 Mar 2022 10:14:31 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id 6RvKu1QlmWX1 for <linux-block@vger.kernel.org>;
-        Sat, 19 Mar 2022 10:14:31 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 29D2540
-        for <linux-block@vger.kernel.org>; Sat, 19 Mar 2022 10:14:31 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 29D2540
-Date:   Sat, 19 Mar 2022 10:14:29 -0700 (PDT)
-From:   Eric Wheeler <linux-block@lists.ewheeler.net>
-To:     linux-block@vger.kernel.org
-Subject: loop: it looks like REQ_OP_FLUSH could return before IO
- completion.
-Message-ID: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
+        Sat, 19 Mar 2022 18:50:35 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5BAB49912;
+        Sat, 19 Mar 2022 15:49:11 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 22JMn9qk026585
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Sat, 19 Mar 2022 18:49:10 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 6AFEB15C0038; Sat, 19 Mar 2022 18:49:09 -0400 (EDT)
+Date:   Sat, 19 Mar 2022 18:49:09 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: [PATCH RFC v5 00/21] DEPT(Dependency Tracker)
+Message-ID: <YjZd5ff1DiKQnsrv@mit.edu>
+References: <1647397593-16747-1-git-send-email-byungchul.park@lge.com>
+ <YjKtZxjIKDJqsSrP@mit.edu>
+ <20220318074945.GA17484@X58A-UD3R>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220318074945.GA17484@X58A-UD3R>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello all,
+On Fri, Mar 18, 2022 at 04:49:45PM +0900, Byungchul Park wrote:
+> 
+> I guess it was becasue of the commit b1fca27d384e8("kernel debug:
+> support resetting WARN*_ONCE"). Your script seems to reset WARN*_ONCE
+> repeatedly.
 
-In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
-it does not appear that lo_req_flush() does anything to make sure 
-ki_complete has been called for pending work, it just calls vfs_fsync().
+I wasn't aware this was being done, but your guess was correct.  The
+WARN_ONCE state is getting cleared between each test in xfstests, with
+the rationale (which IMO is quite reasonable) why this done in the
+xfstests commit descrition:
 
-Is this a consistency problem?
+commit c67ea2347454aebbe8eb6e825e9314d099b683da
+Author: Lukas Czerner <lczerner@redhat.com>
+Date:   Wed Jul 15 13:42:19 2020 +0200
 
-For example, if the loop driver has queued async kiocb's to the filesystem 
-via .read_iter/.write_iter, is it the filesystem's responsibility to 
-complete that work before returning from vfs_sync() or is it possible that 
-the vfs_sync() completes before ->ki_complete() is called?
+    check: clear WARN_ONCE state before each test
+    
+    clear WARN_ONCE state before each test to allow a potential problem
+    to be reported for each test
+    
+    [Eryu: replace "/sys/kernel/debug" with $DEBUGFS_MNT ]
+    
+    Signed-off-by: Lukas Czerner <lczerner@redhat.com>
+    Reviewed-by: Zorro Lang <zlang@redhat.com>
+    Signed-off-by: Eryu Guan <guaneryu@gmail.com>
 
-Relatedly, does vfs_fsync() do anything for direct IO?  Ultimately 
-f_op->fsync() is called so maybe the FS is told to commit its structures 
-like sparse allocations that may not be on disk yet.
+Cheers,
 
-
---
-Eric Wheeler
+						- Ted
