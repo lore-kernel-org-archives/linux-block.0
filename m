@@ -2,390 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9FD9C4332F
-	for <linux-block@archiver.kernel.org>; Sun, 20 Mar 2022 10:58:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F662C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 20 Mar 2022 12:04:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244225AbiCTK7r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Mar 2022 06:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37714 "EHLO
+        id S245007AbiCTMF4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Mar 2022 08:05:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237348AbiCTK7q (ORCPT
+        with ESMTP id S244994AbiCTMFi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Mar 2022 06:59:46 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 387B72CE2B
-        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 03:58:21 -0700 (PDT)
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.51 with ESMTP; 20 Mar 2022 19:58:21 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 20 Mar 2022 19:58:21 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Sun, 20 Mar 2022 19:57:41 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH v4 00/24] DEPT(Dependency Tracker)
-Message-ID: <20220320105740.GB11318@X58A-UD3R>
-References: <1646377603-19730-1-git-send-email-byungchul.park@lge.com>
- <Yiv9Fn4kcRbXJLmu@ip-172-31-19-208.ap-northeast-1.compute.internal>
- <20220316043212.GA5715@X58A-UD3R>
- <YjGuGmdiZCpRt98n@ip-172-31-19-208.ap-northeast-1.compute.internal>
- <20220318075129.GB17484@X58A-UD3R>
+        Sun, 20 Mar 2022 08:05:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3DC1B3701F
+        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 05:04:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647777854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=9OfrrvJ+JSNxjBs8qAJPKPxz/pmLtZ2ITjpHEArPw5E=;
+        b=RNM2hDPx/BuydcEGMaDPuIaI2BD33giuOYfEV6AIYnkPJcwIUzDFtdoLqcM196GMiiYXie
+        fsR6ecLotW6stPnE40yLWRCsxB7cM4329NQ3ELfBZ8aegmWwpK/MHPjtLxIoZyzQfrKLEv
+        OVS4dIDn/qxWT1EUxoErDFf8VqEPKc0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-486-ahb054MJPoa2X9FZ5NmCWA-1; Sun, 20 Mar 2022 08:04:12 -0400
+X-MC-Unique: ahb054MJPoa2X9FZ5NmCWA-1
+Received: by mail-ej1-f69.google.com with SMTP id zd21-20020a17090698d500b006df778721f7so5924405ejb.3
+        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 05:04:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=9OfrrvJ+JSNxjBs8qAJPKPxz/pmLtZ2ITjpHEArPw5E=;
+        b=xksSj+HgFtVsgf8M+6nxKALs2OpfxYBPI+C/dCo0IcVm0qpd6Gw8Ay+uvZb5tu/AhW
+         3EBEi14yG+pQLZDmrqvCPGR6LR4/0OTfSeymHrygum6zdvKtj4+sQHv5Ofa6Crc3fhR7
+         MLe+IxT26NwspYbjY6HrT0+fzjx6kj1eo7KS7pPaX2UN21iOW1kQzpn9f2/hRsT4R88F
+         6D029Xiz+sUBkOVWq+7L8y8+AsAH0ruZATUkQxIK2PVM50orS2tgvBuLw0VYNl3Ig8yy
+         IKSWq6FIJ/QeyRIuSfHYymyy/k2dCg2gLG5YWebIoJ4Ag/WpTC2xSQIxKn/OAsOAeA2U
+         eq+Q==
+X-Gm-Message-State: AOAM533Oefg4sWRu1QBfmB/MiGHE3c03/Nn81FllTGExmKmUuIUQUyo6
+        VXuqpwocrmD54ITy6vMA8wgVj7iufJGmPUTRyUxP5ZIsKAkrygMy65oTHcCUBW9d3VQinrndlc6
+        08PT21FNGi4aIgpma3c2r49w=
+X-Received: by 2002:a17:907:7e88:b0:6db:ad88:2294 with SMTP id qb8-20020a1709077e8800b006dbad882294mr16017827ejc.371.1647777851546;
+        Sun, 20 Mar 2022 05:04:11 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJybuaY3RTwLFhNmn8ph3qfEMlXOeFvtOmTr+FUYne4h/XgSMGx9RwM3ZmeWDHdWHYLvNIiqSA==
+X-Received: by 2002:a17:907:7e88:b0:6db:ad88:2294 with SMTP id qb8-20020a1709077e8800b006dbad882294mr16017754ejc.371.1647777851178;
+        Sun, 20 Mar 2022 05:04:11 -0700 (PDT)
+Received: from redhat.com ([2.55.132.0])
+        by smtp.gmail.com with ESMTPSA id hb6-20020a170907160600b006dff6a979fdsm856220ejc.51.2022.03.20.05.04.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 20 Mar 2022 05:04:10 -0700 (PDT)
+Date:   Sun, 20 Mar 2022 08:04:00 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: Re: [PATCH 1/9] virtio_blk: eliminate anonymous module_init &
+ module_exit
+Message-ID: <20220320080242-mutt-send-email-mst@kernel.org>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+ <20220316192010.19001-2-rdunlap@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220318075129.GB17484@X58A-UD3R>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <20220316192010.19001-2-rdunlap@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 04:51:29PM +0900, Byungchul Park wrote:
-> On Wed, Mar 16, 2022 at 09:30:02AM +0000, Hyeonggon Yoo wrote:
-> > On Wed, Mar 16, 2022 at 01:32:13PM +0900, Byungchul Park wrote:
-> > > On Sat, Mar 12, 2022 at 01:53:26AM +0000, Hyeonggon Yoo wrote:
-> > > > On Fri, Mar 04, 2022 at 04:06:19PM +0900, Byungchul Park wrote:
-> > > > > Hi Linus and folks,
-> > > > > 
-> > > > > I've been developing a tool for detecting deadlock possibilities by
-> > > > > tracking wait/event rather than lock(?) acquisition order to try to
-> > > > > cover all synchonization machanisms. It's done on v5.17-rc1 tag.
-> > > > > 
-> > > > > https://github.com/lgebyungchulpark/linux-dept/commits/dept1.14_on_v5.17-rc1
-> > > > >
-> > > > 
-> > > > Small feedback unrelated to thread:
-> > > > I'm not sure "Need to expand the ring buffer" is something to call
-> > > > WARN(). Is this stack trace useful for something?
-> > > > ========
-> > > > 
-> > > > Hello Byungchul. These are two warnings of DEPT on system.
-> > > 
-> > > Hi Hyeonggon,
-> > > 
-> > > Could you run scripts/decode_stacktrace.sh and share the result instead
-> > > of the raw format below if the reports still appear with PATCH v5? It'd
-> > > be appreciated (:
-> > >
-> > 
-> > Hi Byungchul.
-> > 
-> > on dept1.18_on_v5.17-rc7, the kernel_clone() warning has gone.
-> > There is one warning remaining on my system:
-> > 
-> > It warns when running kunit-try-catch-test testcase.
+On Wed, Mar 16, 2022 at 12:20:02PM -0700, Randy Dunlap wrote:
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs,
+> or an initcall_debug log.
 > 
-> Hi Hyeonggon,
+> Give each of these init and exit functions unique driver-specific
+> names to eliminate the anonymous names.
 > 
-> I can reproduce it thanks to you. I will let you know on all works done.
-
-Hi Hyeonggon,
-
-All works wrt this issue have been done. I've just updated the same
-branch.
-
-https://github.com/lgebyungchulpark/linux-dept/commits/dept1.18_on_v5.17-rc7
-
-This is just for your information.
-
-Thanks,
-Byungchul
-
+> Example 1: (System.map)
+>  ffffffff832fc78c t init
+>  ffffffff832fc79e t init
+>  ffffffff832fc8f8 t init
 > 
-> Thanks,
-> Byungchul
+> Example 2: (initcall_debug log)
+>  calling  init+0x0/0x12 @ 1
+>  initcall init+0x0/0x12 returned 0 after 15 usecs
+>  calling  init+0x0/0x60 @ 1
+>  initcall init+0x0/0x60 returned 0 after 2 usecs
+>  calling  init+0x0/0x9a @ 1
+>  initcall init+0x0/0x9a returned 0 after 74 usecs
 > 
-> > ===================================================
-> > DEPT: Circular dependency has been detected.
-> > 5.17.0-rc7+ #4 Not tainted
-> > ---------------------------------------------------
-> > summary
-> > ---------------------------------------------------
-> > *** AA DEADLOCK ***
-> > 
-> > context A
-> > [S] (unknown)(&try_completion:0)
-> > [W] wait_for_completion_timeout(&try_completion:0)
-> > [E] complete(&try_completion:0)
-> > 
-> > [S]: start of the event context
-> > [W]: the wait blocked
-> > [E]: the event not reachable
-> > ---------------------------------------------------
-> > context A's detail
-> > ---------------------------------------------------
-> > context A
-> > [S] (unknown)(&try_completion:0)
-> > [W] wait_for_completion_timeout(&try_completion:0)
-> > [E] complete(&try_completion:0)
-> > 
-> > [S] (unknown)(&try_completion:0):
-> > (N/A)
-> > 
-> > [W] wait_for_completion_timeout(&try_completion:0):
-> > kunit_try_catch_run (lib/kunit/try-catch.c:78 (discriminator 1)) 
-> > stacktrace:
-> > dept_wait (kernel/dependency/dept.c:2149) 
-> > wait_for_completion_timeout (kernel/sched/completion.c:119 (discriminator 4) kernel/sched/completion.c:165 (discriminator 4)) 
-> > kunit_try_catch_run (lib/kunit/try-catch.c:78 (discriminator 1)) 
-> > kunit_test_try_catch_successful_try_no_catch (lib/kunit/kunit-test.c:43) 
-> > kunit_try_run_case (lib/kunit/test.c:333 lib/kunit/test.c:374) 
-> > kunit_generic_run_threadfn_adapter (lib/kunit/try-catch.c:30) 
-> > kthread (kernel/kthread.c:379) 
-> > ret_from_fork (arch/arm64/kernel/entry.S:757)
-> > 
-> > [E] complete(&try_completion:0):
-> > kthread_complete_and_exit (kernel/kthread.c:327) 
-> > stacktrace:
-> > dept_event (kernel/dependency/dept.c:2376 (discriminator 2)) 
-> > complete (kernel/sched/completion.c:33 (discriminator 4)) 
-> > kthread_complete_and_exit (kernel/kthread.c:327) 
-> > kunit_try_catch_throw (lib/kunit/try-catch.c:18) 
-> > kthread (kernel/kthread.c:379) 
-> > ret_from_fork (arch/arm64/kernel/entry.S:757) 
-> > 
-> > ---------------------------------------------------
-> > information that might be helpful
-> > ---------------------------------------------------
-> > Hardware name: linux,dummy-virt (DT)
-> > Call trace:
-> > dump_backtrace.part.0 (arch/arm64/kernel/stacktrace.c:186) 
-> > show_stack (arch/arm64/kernel/stacktrace.c:193) 
-> > dump_stack_lvl (lib/dump_stack.c:107 (discriminator 4)) 
-> > dump_stack (lib/dump_stack.c:114) 
-> > print_circle (./arch/arm64/include/asm/atomic_ll_sc.h:112 ./arch/arm64/include/asm/atomic.h:30 ./include/linux/atomic/atomic-arch-fallback.h:511 ./include/linux/atomic/atomic-instrumented.h:258 kernel/dependency/dept.c:140 kernel/dependency/dept.c:748) 
-> > cb_check_dl (kernel/dependency/dept.c:1083 kernel/dependency/dept.c:1064) 
-> > bfs (kernel/dependency/dept.c:833) 
-> > add_dep (kernel/dependency/dept.c:1409) 
-> > do_event (kernel/dependency/dept.c:175 kernel/dependency/dept.c:1644) 
-> > dept_event (kernel/dependency/dept.c:2376 (discriminator 2)) 
-> > complete (kernel/sched/completion.c:33 (discriminator 4)) 
-> > kthread_complete_and_exit (kernel/kthread.c:327) 
-> > kunit_try_catch_throw (lib/kunit/try-catch.c:18) 
-> > kthread (kernel/kthread.c:379) 
-> > ret_from_fork (arch/arm64/kernel/entry.S:757)
-> > 
-> > -- 
-> > Thank you, You are awesome!
-> > Hyeonggon :-)
-> > 
-> > > https://lkml.org/lkml/2022/3/15/1277
-> > > (or https://github.com/lgebyungchulpark/linux-dept/commits/dept1.18_on_v5.17-rc7)
-> > > 
-> > > Thank you very much!
-> > > 
-> > > --
-> > > Byungchul
-> > > 
-> > > > Both cases look similar.
-> > > > 
-> > > > In what case DEPT says (unknown)?
-> > > > I'm not sure we can properly debug this.
-> > > > 
-> > > > ===================================================
-> > > > DEPT: Circular dependency has been detected.
-> > > > 5.17.0-rc1+ #3 Tainted: G        W        
-> > > > ---------------------------------------------------
-> > > > summary
-> > > > ---------------------------------------------------
-> > > > *** AA DEADLOCK ***
-> > > > 
-> > > > context A
-> > > >     [S] (unknown)(&vfork:0)
-> > > >     [W] wait_for_completion_killable(&vfork:0)
-> > > >     [E] complete(&vfork:0)
-> > > > 
-> > > > [S]: start of the event context
-> > > > [W]: the wait blocked
-> > > > [E]: the event not reachable
-> > > > ---------------------------------------------------
-> > > > context A's detail
-> > > > ---------------------------------------------------
-> > > > context A
-> > > >     [S] (unknown)(&vfork:0)
-> > > >     [W] wait_for_completion_killable(&vfork:0)
-> > > >     [E] complete(&vfork:0)
-> > > > 
-> > > > [S] (unknown)(&vfork:0):
-> > > > (N/A)
-> > > > 
-> > > > [W] wait_for_completion_killable(&vfork:0):
-> > > > [<ffffffc00802204c>] kernel_clone+0x25c/0x2b8
-> > > > stacktrace:
-> > > >       dept_wait+0x74/0x88
-> > > >       wait_for_completion_killable+0x60/0xa0
-> > > >       kernel_clone+0x25c/0x2b8
-> > > >       __do_sys_clone+0x5c/0x74
-> > > >       __arm64_sys_clone+0x18/0x20
-> > > >       invoke_syscall.constprop.0+0x78/0xc4
-> > > >       do_el0_svc+0x98/0xd0
-> > > >       el0_svc+0x44/0xe4
-> > > >       el0t_64_sync_handler+0xb0/0x12c
-> > > >       el0t_64_sync+0x158/0x15c
-> > > > 
-> > > > [E] complete(&vfork:0):
-> > > > [<ffffffc00801f49c>] mm_release+0x7c/0x90
-> > > > stacktrace:
-> > > >       dept_event+0xe0/0x100
-> > > >       complete+0x48/0x98
-> > > >       mm_release+0x7c/0x90
-> > > >       exit_mm_release+0xc/0x14
-> > > >       do_exit+0x1b4/0x81c
-> > > >       do_group_exit+0x30/0x9c
-> > > >       __wake_up_parent+0x0/0x24
-> > > >       invoke_syscall.constprop.0+0x78/0xc4
-> > > >       do_el0_svc+0x98/0xd0
-> > > >       el0_svc+0x44/0xe4
-> > > >       el0t_64_sync_handler+0xb0/0x12c
-> > > >       el0t_64_sync+0x158/0x15c
-> > > > ---------------------------------------------------
-> > > > information that might be helpful
-> > > > ---------------------------------------------------
-> > > > CPU: 6 PID: 229 Comm: start-stop-daem Tainted: G        W         5.17.0-rc1+ #3
-> > > > Hardware name: linux,dummy-virt (DT)
-> > > > Call trace:
-> > > >  dump_backtrace.part.0+0x9c/0xc4
-> > > >  show_stack+0x14/0x28
-> > > >  dump_stack_lvl+0x9c/0xcc
-> > > >  dump_stack+0x14/0x2c
-> > > >  print_circle+0x2d4/0x438
-> > > >  cb_check_dl+0x44/0x70
-> > > >  bfs+0x60/0x168
-> > > >  add_dep+0x88/0x11c
-> > > >  do_event.constprop.0+0x19c/0x2c0
-> > > >  dept_event+0xe0/0x100
-> > > >  complete+0x48/0x98
-> > > >  mm_release+0x7c/0x90
-> > > >  exit_mm_release+0xc/0x14
-> > > >  do_exit+0x1b4/0x81c
-> > > >  do_group_exit+0x30/0x9c
-> > > >  __wake_up_parent+0x0/0x24
-> > > >  invoke_syscall.constprop.0+0x78/0xc4
-> > > >  do_el0_svc+0x98/0xd0
-> > > >  el0_svc+0x44/0xe4
-> > > >  el0t_64_sync_handler+0xb0/0x12c
-> > > >  el0t_64_sync+0x158/0x15c
-> > > > 
-> > > > 
-> > > > 
-> > > > 
-> > > > ===================================================
-> > > > DEPT: Circular dependency has been detected.
-> > > > 5.17.0-rc1+ #3 Tainted: G        W        
-> > > > ---------------------------------------------------
-> > > > summary
-> > > > ---------------------------------------------------
-> > > > *** AA DEADLOCK ***
-> > > > 
-> > > > context A
-> > > >     [S] (unknown)(&try_completion:0)
-> > > >     [W] wait_for_completion_timeout(&try_completion:0)
-> > > >     [E] complete(&try_completion:0)
-> > > > 
-> > > > [S]: start of the event context
-> > > > [W]: the wait blocked
-> > > > [E]: the event not reachable
-> > > > ---------------------------------------------------
-> > > > context A's detail
-> > > > ---------------------------------------------------
-> > > > context A
-> > > >     [S] (unknown)(&try_completion:0)
-> > > >     [W] wait_for_completion_timeout(&try_completion:0)
-> > > >     [E] complete(&try_completion:0)
-> > > > 
-> > > > [S] (unknown)(&try_completion:0):
-> > > > (N/A)
-> > > > 
-> > > > [W] wait_for_completion_timeout(&try_completion:0):
-> > > > [<ffffffc008166bf4>] kunit_try_catch_run+0xb4/0x160
-> > > > stacktrace:
-> > > >       dept_wait+0x74/0x88
-> > > >       wait_for_completion_timeout+0x64/0xa0
-> > > >       kunit_try_catch_run+0xb4/0x160
-> > > >       kunit_test_try_catch_successful_try_no_catch+0x3c/0x98
-> > > >       kunit_try_run_case+0x9c/0xa0
-> > > >       kunit_generic_run_threadfn_adapter+0x1c/0x28
-> > > >       kthread+0xd4/0xe4
-> > > >       ret_from_fork+0x10/0x20
-> > > > 
-> > > > [E] complete(&try_completion:0):
-> > > > [<ffffffc00803dce4>] kthread_complete_and_exit+0x18/0x20
-> > > > stacktrace:
-> > > >       dept_event+0xe0/0x100
-> > > >       complete+0x48/0x98
-> > > >       kthread_complete_and_exit+0x18/0x20
-> > > >       kunit_try_catch_throw+0x0/0x1c
-> > > >       kthread+0xd4/0xe4
-> > > >       ret_from_fork+0x10/0x20
-> > > > 
-> > > > ---------------------------------------------------
-> > > > information that might be helpful
-> > > > ---------------------------------------------------
-> > > > CPU: 15 PID: 132 Comm: kunit_try_catch Tainted: G        W         5.17.0-rc1+ #3
-> > > > Hardware name: linux,dummy-virt (DT)
-> > > > Call trace:
-> > > >  dump_backtrace.part.0+0x9c/0xc4
-> > > >  show_stack+0x14/0x28
-> > > >  dump_stack_lvl+0x9c/0xcc
-> > > >  dump_stack+0x14/0x2c
-> > > >  print_circle+0x2d4/0x438
-> > > >  cb_check_dl+0x44/0x70
-> > > >  bfs+0x60/0x168
-> > > >  add_dep+0x88/0x11c
-> > > >  do_event.constprop.0+0x19c/0x2c0
-> > > >  dept_event+0xe0/0x100
-> > > >  complete+0x48/0x98
-> > > >  kthread_complete_and_exit+0x18/0x20
-> > > >  kunit_try_catch_throw+0x0/0x1c
-> > > >  kthread+0xd4/0xe4
-> > > >  ret_from_fork+0x10/0x20
-> > > > 
-> > > > 
-> > > > > Benifit:
-> > > > > 
-> > > > > 	0. Works with all lock primitives.
-> > > > > 	1. Works with wait_for_completion()/complete().
-> > > > > 	2. Works with 'wait' on PG_locked.
-> > > > > 	3. Works with 'wait' on PG_writeback.
-> > > > > 	4. Works with swait/wakeup.
-> > > > > 	5. Works with waitqueue.
-> > > > > 	6. Multiple reports are allowed.
-> > > > > 	7. Deduplication control on multiple reports.
-> > > > > 	8. Withstand false positives thanks to 6.
-> > > > > 	9. Easy to tag any wait/event.
-> > > > > 
-> > > > > Future work:
-> > > > 
-> > > > [...]
-> > > > 
-> > > > > -- 
-> > > > > 1.9.1
-> > > > > 
-> > > > 
-> > > > -- 
-> > > > Thank you, You are awesome!
-> > > > Hyeonggon :-)
+> Fixes: e467cde23818 ("Block driver using virtio.")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Cc: "Michael S. Tsirkin" <mst@redhat.com>
+> Cc: Jason Wang <jasowang@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Stefan Hajnoczi <stefanha@redhat.com>
+> Cc: virtualization@lists.linux-foundation.org
+> Cc: Jens Axboe <axboe@kernel.dk>
+> Cc: linux-block@vger.kernel.org
+
+
+If this is done tree-wide, it's ok to do it for virtio too.
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+No real opinion on whether it's a good idea.
+
+> ---
+>  drivers/block/virtio_blk.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> --- lnx-517-rc8.orig/drivers/block/virtio_blk.c
+> +++ lnx-517-rc8/drivers/block/virtio_blk.c
+> @@ -1058,7 +1058,7 @@ static struct virtio_driver virtio_blk =
+>  #endif
+>  };
+>  
+> -static int __init init(void)
+> +static int __init virtio_blk_init(void)
+>  {
+>  	int error;
+>  
+> @@ -1084,14 +1084,14 @@ out_destroy_workqueue:
+>  	return error;
+>  }
+>  
+> -static void __exit fini(void)
+> +static void __exit virtio_blk_fini(void)
+>  {
+>  	unregister_virtio_driver(&virtio_blk);
+>  	unregister_blkdev(major, "virtblk");
+>  	destroy_workqueue(virtblk_wq);
+>  }
+> -module_init(init);
+> -module_exit(fini);
+> +module_init(virtio_blk_init);
+> +module_exit(virtio_blk_fini);
+>  
+>  MODULE_DEVICE_TABLE(virtio, id_table);
+>  MODULE_DESCRIPTION("Virtio block driver");
+
