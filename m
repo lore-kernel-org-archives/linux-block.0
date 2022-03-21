@@ -2,166 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2BFC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 07:23:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED7BC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 10:00:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344878AbiCUHZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 03:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58164 "EHLO
+        id S233782AbiCUKBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 06:01:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55520 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344879AbiCUHZB (ORCPT
+        with ESMTP id S232096AbiCUKBv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 03:25:01 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 501D33EF18
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 00:23:33 -0700 (PDT)
-Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220321072328epoutp01673e562e705d035c15664219821f807b~eVHzPhgp22756627566epoutp01V
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 07:23:28 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220321072328epoutp01673e562e705d035c15664219821f807b~eVHzPhgp22756627566epoutp01V
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1647847408;
-        bh=/XGZRHl7h1kPsQl3N/THXbHPKp+VetuF/lpvFocL3Ao=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=gSma7kbtxXpqoRZzqFqFtEH9KZIMjOFzXC4MfpCZTDKmFb9GHpLH93J4Qa4A9hbIQ
-         1eH7x9z1IROkXmnZf6YA817YryQawAFNHK5Z0DBWvnYrWsM9rfmdl5Tg/hlFtGXjPx
-         IB5wWGAoUaBhQw4y0jLBAfQtYaDTEOjx4tDocbec=
-Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220321072328epcas5p48fe0b3f570ee5b5ffb9ffe96669da3dc~eVHyw2L6C1086310863epcas5p4M;
-        Mon, 21 Mar 2022 07:23:28 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.180]) by
-        epsnrtp4.localdomain (Postfix) with ESMTP id 4KMR141sg5z4x9QN; Mon, 21 Mar
-        2022 07:23:20 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A7.AD.12523.4E728326; Mon, 21 Mar 2022 16:23:16 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220321070713epcas5p1826cc38562ac865cc1deff8b2c6fda41~eU5mt68lG0400904009epcas5p1-;
-        Mon, 21 Mar 2022 07:07:13 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220321070713epsmtrp1735ef0e08fb0a5cc56965857c3c9666b~eU5ms4IZG1883718837epsmtrp1R;
-        Mon, 21 Mar 2022 07:07:13 +0000 (GMT)
-X-AuditID: b6c32a4a-5b7ff700000030eb-fe-623827e4b334
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        3C.22.29871.02428326; Mon, 21 Mar 2022 16:07:12 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220321070710epsmtip27cc547b5b0ccf510e7767bb286ed7a07~eU5kTmEwD0845808458epsmtip2T;
-        Mon, 21 Mar 2022 07:07:10 +0000 (GMT)
-Date:   Mon, 21 Mar 2022 12:32:08 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
-        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 10/17] block: wire-up support for plugging
-Message-ID: <20220321070208.GA5107@test-zns>
+        Mon, 21 Mar 2022 06:01:51 -0400
+Received: from esa3.hc3370-68.iphmx.com (esa3.hc3370-68.iphmx.com [216.71.145.155])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5EA660F9;
+        Mon, 21 Mar 2022 03:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=citrix.com; s=securemail; t=1647856824;
+  h=date:from:to:cc:subject:message-id:references:
+   content-transfer-encoding:in-reply-to:mime-version;
+  bh=4RckOyHuQ5kYI0KTpTlxEdTuSeWl8kDZa4B0qCmjOyw=;
+  b=Lo1gg80pLusbju6jdA6LvDPahNROEAnJcgd/PyVdDOySTWhAZ0rS7DgV
+   PwmDXbQM2dkPT4Hi+wnXaQnYg+CezyTq+CSXQNaZhX2V8OphRkhlKAn/K
+   rZVek8F7K2Pwv9TKPud7sSWZwBUzK5DTH1ho8ZwgT7Gf/q1VGUAP9Wm/9
+   I=;
+Authentication-Results: esa3.hc3370-68.iphmx.com; dkim=pass (signature verified) header.i=@citrix.onmicrosoft.com
+X-SBRS: 5.1
+X-MesageID: 66745199
+X-Ironport-Server: esa3.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.156.83
+X-Policy: $RELAYED
+IronPort-Data: A9a23:A0pLa6nPgzHnKsQaygorzzro5gwGJkRdPkR7XQ2eYbSJt1+Wr1Gzt
+ xIaD2nSbv7YN2T8f9snOY2/9EwCvcPRnIBrSFBo/npnRCMWpZLJC+rCIxarNUt+DCFioGGLT
+ Sk6QoOdRCzhZiaE/n9BCpC48T8kk/vgqoPUUIYoAAgoLeNfYHpn2EoLd9IR2NYy24DiWVrV4
+ LsenuWEULOb828sWo4rw/rrRCNH5JwebxtB4zTSzdgS1LPvvyF94KA3fMldHFOhKmVgJcaoR
+ v6r8V2M1jixEyHBqD+Suu2TnkUiGtY+NOUV45Zcc/DKbhNq/kTe3kunXRa1hIg+ZzihxrhMJ
+ NtxWZOYGRclNJHtksshTzpTTCdAOLJcpIDKCC3q2SCT5xWun3rExvxvCAc9PJEC+/YxCmZLn
+ RAaAGlTNFbZ3bvwme/lDLk37iggBJCD0Ic3oHZvwCufFf87aZvCX7/L9ZlT2zJYasVmQ6iBO
+ 5dAOGsHgBLoXS8VFFkFCosHjMjzuWTdSC1qolDFqv9ii4TU5FMoi+W8WDbPQfSJSN9Tk0Ldp
+ GvA/nj+GAoyKtOS03yG/2iqi+uJmjn0MKoWFbul5rtpjUeVy2g7FhIbTx24rOO/h0r4XMhQQ
+ 2QQ/jQrhawz71CwCN38WQCo5nKJoHY0X9tWDv1/4gWKwan8/QmUHC4HQyRHZdhgs9U5LRQh0
+ VuImZXoQz9utrK9RneU97PSpjS3UQAcPWUFaAcHQBED7t2lrIJbpgLCSJNvHbC4ivXxGCrs2
+ HaaoS4mnbIRgMUXkaKh8jj6bymE/8aTCFRvv0OOAzzjvlgRiJOZi5KAuUjX58phJqmlUnqK4
+ 346nteEsN8DJMTY/MCSe9klELas7veDFTTTh19zApUsnwiQF26fkZN4u28nehowWioQUXqwO
+ RKI51sNjHNGFCHyBZKbdb5dHCjDIULIMd3+Hs7ZYdNVCnSaXF/WpXo+DaJ8Mo2EraTNrU3dE
+ crAGSpPJSxDYUiC8NZRb71BuYLHPghkmQvuqWnTlnxLK4a2an+PUqsiO1CTdO0/567siFyLr
+ 4kPbpPTkkUGC7yWjszrHWk7dw1iEJTGLcqu95w/mhCrfGKK513N+9eOmOh8KuSJboxel/vS/
+ 2HVZ6Or4AGXuJEzEi3TMioLQOq2Bf5X9CtnVQRxbQfA8yVyOu6HsfZAH6bbiJF6rYSPO9YvF
+ KJbEyhBa9wSIgn6F8M1NsCs8tY9KEz12Wpj/UONOVACQnKpfCSQkvfMdQrz7igeSC2xsMo1u
+ bq70Q3HB5EEQmxf4Az+MppDE3vZUaAhpd9P
+IronPort-HdrOrdr: A9a23:vQWcVaPv/ZwJfcBcTyP155DYdb4zR+YMi2TDiHofdfUFSKClfp
+ 6V8cjztSWUtN4QMEtQ/uxoHJPwO080kqQFnLX5XI3SJzUO3VHHEGgM1/qB/9SNIVyaygcZ79
+ YdT0EcMqyAMbEZt7eC3ODQKb9Jq7PmgcOVbKXlvg9QpGlRGt9dBmxCe2Cm+yNNNW177c1TLu
+ vi2iMLnUvpRV0nKuCAQlUVVenKoNPG0LrgfB49HhYirC2Dlymh5rLWGwWRmk52aUIE/Z4StU
+ z+1yDp7KSqtP+2jjfaym/o9pxT3P/s0MFKCsCggtUcbh/slgGrToJ8XKDqhkF/nMifrHIR1P
+ XcqRYpOMp+r1vXY2GOuBPonzLt1T4/gkWSvmOwsD/Gm4jUVTg6A81OicZyaR3C8Xctu9l6ze
+ Ziw3+Zn4A/N2KOoA3No/zzEz16nEu9pnQv1cQJiWZEbIcYYLhN6aQC4UJuFosaFi6S0vFqLA
+ BXNrCc2B9qSyLbU5iA1VMfg+BEH05DUytue3Jy9PB8iFNt7TJEJ0hx/r1qop5PzuN5d3B+3Z
+ W2Dk1ZrsA/ciYoV9MOOA4ge7rANoWfe2OEDIqtSW6XYZ3vfUi976LK3A==
+X-IronPort-AV: E=Sophos;i="5.90,198,1643691600"; 
+   d="scan'208";a="66745199"
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FH0GUeUe9+XOTHqYtAraBj4C2XnrHeoM96AcgSsK6b1nc7vdtInAi9j/B3XqkqFITd1+oXJFfAlPpWPTEqNAh+06GcJo5wEQB6KCxdAcoCtzcahmTM7lByxJwjcqOmG74ANE9rFI70JW84OZ+Ypp9bVuiBM/oZarVsu1VP1uacPKPEztsFwuEattbPIjEKVdJPgY+XNmBlUwo7ebtKvbOwfzWU1LypnvxDWTT0KUWoY6uu7z5NOY5dX/rd5QBgQBYDJXoOJ2pAmFyP2A7EZHGxpBnRd4L+9I+cvnrcvYzjCvyzOSVJ+CrYCZ1JxoThKBcQJsP9ZOVDaJIHT0u552Bg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LJxLXOd/g+NcgzFBMKk/6O/8OuPEssPXeeYfnKDPtG0=;
+ b=A50FAf01qR7bF9Glx54iJv603uLfyzarwcGG7uNUmVlxIhelTJUzuRsK51wYIH8ZOWuV/CTKH5V4t8Jc/YHEozMFC7D31/2vt2eK7HZxYss+ha4HrIPhibc59Om8xtVhte8bLo8wDptFDzYXrMFjN6vOWbpXU/3R+FvH22TDA61EREtUaat0ZFW87QARNaHHrAyJTN5G8MWyoCeMLczVWEK6b9KQlIyFpdJFwHyoYfgxp4ARUmtV4yZDFZ03UfBgJSTphWCYb5yn1pIeI6gJrqWe1mzitKFfNFQ7aRk+HsTplId7ww+KD+3bql750poKtKHLkY13rgrA2uElElFQmA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=citrix.com; dmarc=pass action=none header.from=citrix.com;
+ dkim=pass header.d=citrix.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=citrix.onmicrosoft.com; s=selector2-citrix-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LJxLXOd/g+NcgzFBMKk/6O/8OuPEssPXeeYfnKDPtG0=;
+ b=hRlQ2QNydZbs7MZMO1KvtkrBRuRkLZwBUG42Ek518GlXXVSXk9JCG38xpjCQ7vE6jramEwoBU8J3HQusSfaqVqER5N8dAFW1eWsVrb2GU9mMpRDLlENrDtGn2a19wC6NTe2unGeWHN4T1WhIk1rA6k12Qe9IewvCcUyZp3upkl8=
+Date:   Mon, 21 Mar 2022 11:00:13 +0100
+From:   Roger Pau =?utf-8?B?TW9ubsOp?= <roger.pau@citrix.com>
+To:     Colin Ian King <colin.i.king@gmail.com>
+CC:     Jens Axboe <axboe@kernel.dk>, <xen-devel@lists.xenproject.org>,
+        <linux-block@vger.kernel.org>, <kernel-janitors@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <llvm@lists.linux.dev>
+Subject: Re: [PATCH] xen-blkback: remove redundant assignment to variable i
+Message-ID: <YjhMre8vckI1HbSS@Air-de-Roger>
+References: <20220317234646.78158-1-colin.i.king@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220317234646.78158-1-colin.i.king@gmail.com>
+X-ClientProxiedBy: LO2P265CA0241.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8a::13) To DS7PR03MB5608.namprd03.prod.outlook.com
+ (2603:10b6:5:2c9::18)
 MIME-Version: 1.0
-In-Reply-To: <Yi9T9UBIz/Qfciok@T590>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Te0xTVxzHc+7tC1iXuwLhWOPEq8tWWKGVtlyQxxLddjfZQpjLlv0hXOCm
-        ZdBH+sAHERGCCpGH4AQ6LDAoC4+g8mgYDIcFAwjDx1AGCMNBGbiJVTa2gZi1tCz+9znf3/d3
-        fuf8fudwUN4ci89JUelprYpKw1meDEuf4C3h/JtEomjOJiTK+nYR2cUbKFHZaAFE03QRi2ho
-        uoEQy7mjDCJv+DZC3HrchxAl1vuA6JkMJKrqbWyiLneARfxcbAOEtTQHIZonbAxiZcTEfAcj
-        F+4tAPI74zSbzKl+wCB/+tFAtjbmsci2upNk90QWi7TULjHJJ9fuscjC9kZArrS+Huv1RWqE
-        gqaSaa0/rUpSJ6eo5JH4wU/i98dLZSKxUBxGhOL+KkpJR+IHYmKF76WkOW6D+6dTaQaHFEvp
-        dHhwVIRWbdDT/gq1Th+J05rkNI1EE6SjlDqDSh6kovXhYpFor9RhTEhVPM+dYGlmXzn6zeIk
-        kgUueuYDDw7EJPDPX2pBPvDk8LBuADvX+1HX4hmAIyu97sgqgA32u+hWSmnLEtsV6AHQ3HHO
-        vVgAcLjtL+B0MbA34NPpfCQfcDgsTABvlxqcsg+Gw+nppk0/ihUy4Nk7pk2/NxYFi9ZymU4/
-        F3sb9p466pS52GtwqGKe4WQPbA80jT5GnOyL7Ya9lgHEuQ/EFjmwouMf4DrdAVj2bMbN3vDR
-        QDvbxXy4VHTazTq49uAG6ko+C+B4VgXDFYiGd77f2KyAYimweaSD5dJ3wK9utrj1V2HB+jzi
-        0rmw07TFu+BMiY3pYj/4sLzOzSSc/+P6Zut42HUE9nVIisFO40uXM75UzsXhMM+ezTQ6eoFi
-        2+G3LzguFMDLXcHVgNkIttEanVJO66SavSr6yP8TT1IrW8Hmaw/4sBM8nLUHWQHCAVYAOSju
-        w621hybyuMnUseO0Vh2vNaTROiuQOmZ1HuX7Jqkd30WljxdLwkQSmUwmCQuRiXE/7rD8CsXD
-        5JSeTqVpDa3dykM4HvwspGtREEiFZyvIfxWWw79/dqLA6zwtOlnix2+rW1uwnbkMplZjBr8c
-        Nx9uCeg2vb+q3Hbuwg9dd8vSo/fVHyQSxg716zuVkOG9xsx5+vm+mcCuXqm5wSorjxsdDxF2
-        FI1NeW8Psn+9OrfnQmV4j1WY98gcMpjb3zUv5lcPeQTWjF2VF/QyPfOqKvYXiGrK6zdk5laf
-        TFt1dBwvcdmXbfxoNpzX5rX85FjmccHNIeOMdOHSuteJbm7lTs21T9+9j04JfosSZJTLVFWT
-        wrj250f4H7xQpQsv+siHg2N3j5xi+3XfunQowRKBXz2dEdrQkOFtjvm70Z45XtM8+PEVxo4z
-        hb/iDJ2CEgegWh31H6hDUD52BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrMIsWRmVeSWpSXmKPExsWy7bCSvK6CikWSwZsnNhbTDytaNE34y2wx
-        Z9U2RovVd/vZLFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saE
-        p4wWhyY3M1msufmUxeLzmXmsDgIez64+Y/TYOesuu0fzgjssHpfPlnpsWtXJ5rF5Sb3H7psN
-        bB7bFr9k9Xi/7yqbR9+WVYwenzfJBXBHcdmkpOZklqUW6dslcGXs2fOQraCfq+L9qyPMDYz3
-        2bsYOTkkBEwkJq97CWRzcQgJ7GaU6Hz1hBkiIS7RfO0HVJGwxMp/z8FsIYEnjBLr59SC2CwC
-        qhIf73YxdTFycLAJaEpcmFwKEhYRUJK4e3c12ExmgUksEtfP3ADrFRawk+j/1coKUs8roCNx
-        oLECYu9BJomrHSfZQGp4BQQlTs58wgJiMwuYSczb/JAZpJ5ZQFpi+T8OkDCngIrEvHNvmUBs
-        UQFliQPbjjNNYBSchaR7FpLuWQjdCxiZVzFKphYU56bnFhsWGOallusVJ+YWl+al6yXn525i
-        BMejluYOxu2rPugdYmTiYDzEKMHBrCTCu/iDeZIQb0piZVVqUX58UWlOavEhRmkOFiVx3gtd
-        J+OFBNITS1KzU1MLUotgskwcnFINTJylLHu8t/8Isv/9/E/oHh8nBZf+j1PmbJZ+t+DBdpb6
-        O/XaYnaOcj/W1Hw89lT60233As3PfoIJeW/jPNxMquomnV7c7Db99uLsnsUn9JnvVtp2sYR8
-        THt1/u9tddOZwhrXX7xbrfFSnsE3R0RmpmLCkyzTi2++lvfkl97536Xx7OyB5GuXObiUf2bs
-        eOxz5rx82r4dz/58VgwRUdTc1/2ZV8drDuurYy4+/Ee2uzu98I+cXFW3I+XlOvPepHPPHM7X
-        tzUmNDYxMU2t+lZ068mxo6l3yo7tVrzaKbdw2/t6hvuvQxS2qX67cuO43z4RQ8UNtlqy/vPa
-        96S8vrLX2VS8ZL9xqg0ri+ZuXUbnEiWW4oxEQy3mouJEADTvNOY2AwAA
-X-CMS-MailID: 20220321070713epcas5p1826cc38562ac865cc1deff8b2c6fda41
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_1325e8_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220308152714epcas5p4c5a0d16512fd7054c9a713ee28ede492
-References: <20220308152105.309618-1-joshi.k@samsung.com>
-        <CGME20220308152714epcas5p4c5a0d16512fd7054c9a713ee28ede492@epcas5p4.samsung.com>
-        <20220308152105.309618-11-joshi.k@samsung.com>
-        <20220310083400.GD26614@lst.de>
-        <CA+1E3rJMSc33tkpXUdnftSuxE5yZ8kXpAi+czSNhM74gQgk_Ag@mail.gmail.com>
-        <Yi9T9UBIz/Qfciok@T590>
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 889f5f94-f5a8-48a9-f05d-08da0b219ab6
+X-MS-TrafficTypeDiagnostic: PH7PR03MB6944:EE_
+X-Microsoft-Antispam-PRVS: <PH7PR03MB6944166296D4E2C6802A04878F169@PH7PR03MB6944.namprd03.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 50Mk5dI1AbaE+zveTAmqMcD0J+N9zbjq1kfTbL/bTjpVrYDLFXnAPg19bmMHVyDxes7bnAyfoBKE3YmMO2tFNznIPE0JfPa643m1fxYaVwq2xgD4WfhEL4Lg0L2j9NZL3EfkbKJ01KLdKWcPqtjYxmip5RRFku1HilWblK14SIImo9Cu9sYUPJHLTHc6ay62iEiAxcibnIhBL9ly9BDYgPdJFAFeMxALad0rq7i6LxKnlgBl7QPP+U+XhflYwNn3vFHUGz5qkwto3qHQrg0hupd/wfZyufmcZAoMkWbTJaaLTf+NxMXzpHSZKhG8yMAEG6fdqqqrbT9zHWFsvH9abyHuoHB8JIwOtIxDJ6fAMgHQWzBWoAu5c6SB1jWq5haYcsh0cmfNKN61TNhdOI8Vlz+wYGy6fZlM05SnT6lUZ/5GEbEnf8EFe6ZHvW+rSgtdw50z8j1+BOQojAMWIwYpFcfaV6r5C8QgpJfRMuYy+qyS0g8iy6Spy9qSQZ/38Ap2h4RSofGXLzc/bkC/rW14baDdAXCe9gPOohCZzkcski2/9zSvziJsvAXqg0WFOA8byPpm02Xoh/9qiU9kML9aBSXyrBKtDAm1JkYVL41NJ0odaiFzRhoII1Iw7rKCip1gQ7BENc/4HhRoSXqxsGmBpV0BqkaAqS21m3ZOX7ErtO1OVgERI8VSJBJnmPSoQ5QUS4JizGNYQmu7u1faxEKJNg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR03MB5608.namprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(2906002)(9686003)(6512007)(6666004)(33716001)(86362001)(83380400001)(66946007)(66556008)(8936002)(66476007)(85182001)(4326008)(508600001)(8676002)(6506007)(26005)(82960400001)(186003)(6916009)(4744005)(5660300002)(316002)(6486002)(38100700002)(129723003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OGMvakdRM2dwR1ZGQUk0SVIwclhVdFpwaTRVQ0lhWUMxbDFabEYxOHcxa0tI?=
+ =?utf-8?B?OTg4SEpwOC9meDNPcHVFYWVyVFEyZ0Q4eXFSSk9MZnVYMzNNOTRIeWtVMEpF?=
+ =?utf-8?B?UERrWnAyZkYyVnRCRWVsMzF6bG9YU0NhdzR4Q3RvSXpDa21LcDZLTzRQVTRC?=
+ =?utf-8?B?cFF2cCtqMDlLSXVoR2pDSUErVGo2aDdZRlJyNlhBM1BRS3FoWUlnR1lJMGpG?=
+ =?utf-8?B?YjZidFRSV1BlN1pkVitkVldrUGhDaEplMkdHem9Cbk5ZSk41WjNCOXN3MCti?=
+ =?utf-8?B?UEF1MDhRK1hBdkJnRWlTdy94ZVZZWjZrMUZkTElyd1QvR085aFhZVFdkdlpL?=
+ =?utf-8?B?NFJFdnA3NE5Gazk4M253Sldrb0JlTXBQYTNHd1hRVndlUEF5bllNMmtLZllQ?=
+ =?utf-8?B?U1o1YjFLUHNCNEdsQ1BNS2UzRlIwZTBYN3prNGZoM2xmU202d1NhUUxQby8w?=
+ =?utf-8?B?ZG1BMVRqK1hlTDVRTjZQSzF1UzI5RGFjWXdFQWJadC9UYzBEalJpdjFGYUNZ?=
+ =?utf-8?B?bWVEQ0N1bGxzNloxMVNIbmdCdmp4NmUyUDhQMVlYOFNBUmxkT1hPRjdPcGxk?=
+ =?utf-8?B?d3VlY2ppS01GT2RkMEVQYWpTQnZETTRKMmtYemNwMWx3dVpaQXozcHg4aWdO?=
+ =?utf-8?B?ekRxTkQxblUzT2kwMG9KbnhNK2h2TXFGWmNLN2Z4NlJDcDhhTVlkbTVGaDU3?=
+ =?utf-8?B?UEwvaHlFTEp3d2tHR1hIZklEeTdlUDNIbHVET3gwRXp0YzZxNXNiM0FmL3Rt?=
+ =?utf-8?B?VElIMlF3dGw3ZjM4Rzg1K0JsbU4vUzhMWTA3T0RSR25HYzNtYld3YWVYU2gz?=
+ =?utf-8?B?QnBNdlo3Nk52RzBNQW10L0ltY3dJL0h2NUR1UTdkT0pUKy9WN1V1SGh3eGlJ?=
+ =?utf-8?B?TVorT2o4eDZkdFJ2MGNSS0czVlBZek5sRFVTOEVJUDZVUWY5M0JLam5PSTB6?=
+ =?utf-8?B?ZWI5N25IRzBndE5rY2ZJK2pQbm5YWVJTU1Y4S240N0hKanc5RWV0YlJZc296?=
+ =?utf-8?B?cGpNcWxyNXJNRTQvSktudlRlVzl0ZlozaE83ZDB1ZlNhZ3dUQXJzamo2UDYz?=
+ =?utf-8?B?VHUyY1BIbnQwMzYvbnZpb0FqLzl2UFZaQ0tkN1dQWVFDeXRLcXAzM3NleCt1?=
+ =?utf-8?B?aGpXcDZrWG1UUy9WSGNLVUZZNmpsZVFkdUFNU2tGV2s0MUlyY050bThCNVJY?=
+ =?utf-8?B?S1lQVC9wcllJdDVKSStKMHZwWWQzaWVNbS84MmRkelFSUEtCdmZrUm1kU2F5?=
+ =?utf-8?B?N1FQMHJMQWhRcWV2RThGYXVRRWRpeFdMZXVYNW40bVpOalVTODRmRjBNYU02?=
+ =?utf-8?B?am85SGY2ZUFCQU93MkZOZ213NVNBWS93ckpOL2xIUkpOSzdGSTlYVFd3OFI3?=
+ =?utf-8?B?cEZVNUlwbVhnRmw1QzI5VGRkbXAwVE1iSjlLVVREOE5EbHJ6cHBkcVhjcEVZ?=
+ =?utf-8?B?T1NjbTdKK0JMaGZnOWdkUjRjSDRJQW16MGg0cTNiN2I2RVVkdHZFQ3NqV1RV?=
+ =?utf-8?B?QXQ2dGp0WlJWSmZiaFREMFNRWWRFdE8vYll3MUx1NHg1OEZjUm5mZ3lEZFlt?=
+ =?utf-8?B?c0FCdE9Yb3NYOFhqR251VXovOFpoeDM2S0ZTTUFjVVFlaHNMU0JVay9LSE8z?=
+ =?utf-8?B?d2FJTThtYVM0YlUxVnV4SENZbmk3UWt1YnZGUXpOdzkyWnEyMGZoQ210bmY5?=
+ =?utf-8?B?cDQ5Z3JrMmRrOHNObVBUc0hKcVpwdlBrc0JKeUZiVjJ5MXVDaHFRd0dncmtw?=
+ =?utf-8?B?ZStJZGFBQURXcHNFZHQyaEhnbTF6WUY0MHdLRnlCYWcyblJXT1lUc1oybW1j?=
+ =?utf-8?B?T1VmcXpvTjNRUXV4ajFZTW9PU3ZaOHVHVWhtS1RJallTcFhSelo1aklsVUNO?=
+ =?utf-8?B?QmxPOFJWY0xDcnNFNFpITURTamJLbUZvTE5ZTE5wMW43TDE5TXdaMFBQWTla?=
+ =?utf-8?B?OVFuRzJQOHBUNVlLSTRVNFJIcGxycXZPK21VOURUTUVNeW9UdnpBMDJra0Nk?=
+ =?utf-8?B?aGdHalI4dXdRPT0=?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 889f5f94-f5a8-48a9-f05d-08da0b219ab6
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR03MB5608.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2022 10:00:18.4946
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 335836de-42ef-43a2-b145-348c2ee9ca5b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: CSxd25QMo8d1nkDYATJGnZ8HAwfUk1uR9jct47LiURPY7APTQhZEWmnH0+gTsdkiPbgzEUQb9E+hBeBygge2Cg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR03MB6944
+X-OriginatorOrg: citrix.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_1325e8_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Thu, Mar 17, 2022 at 11:46:46PM +0000, Colin Ian King wrote:
+> Variable i is being assigned a value that is never read, it is being
+> re-assigned later in a for-loop. The assignment is redundant and can
+> be removed.
+> 
+> Cleans up clang scan build warning:
+> drivers/block/xen-blkback/blkback.c:934:14: warning: Although the value
+> stored to 'i' is used in the enclosing expression, the value is never
+> actually read from 'i' [deadcode.DeadStores]
+> 
+> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
 
-On Mon, Mar 14, 2022 at 10:40:53PM +0800, Ming Lei wrote:
->On Thu, Mar 10, 2022 at 06:10:08PM +0530, Kanchan Joshi wrote:
->> On Thu, Mar 10, 2022 at 2:04 PM Christoph Hellwig <hch@lst.de> wrote:
->> >
->> > On Tue, Mar 08, 2022 at 08:50:58PM +0530, Kanchan Joshi wrote:
->> > > From: Jens Axboe <axboe@kernel.dk>
->> > >
->> > > Add support to use plugging if it is enabled, else use default path.
->> >
->> > The subject and this comment don't really explain what is done, and
->> > also don't mention at all why it is done.
->>
->> Missed out, will fix up. But plugging gave a very good hike to IOPS.
->
->But how does plugging improve IOPS here for passthrough request? Not
->see plug->nr_ios is wired to data.nr_tags in blk_mq_alloc_request(),
->which is called by nvme_submit_user_cmd().
+Acked-by: Roger Pau Monné <roger.pau@citrix.com>
 
-Yes, one tag at a time for each request, but none of the request gets
-dispatched and instead added to the plug. And when io_uring ends the
-plug, the whole batch gets dispatched via ->queue_rqs (otherwise it used
-to be via ->queue_rq, one request at a time).
-
-Only .plug impact looks like this on passthru-randread:
-
-KIOPS(depth_batch)  1_1    8_2    64_16    128_32
-Without plug        159    496     784      785
-With plug           159    525     991     1044
-
-Hope it does clarify.
-
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_1325e8_
-Content-Type: text/plain; charset="utf-8"
-
-
-------.rW42XXn7_Ji6OxwuAF4RAMbP.qed.OeqKlvEhSLhB3noATS=_1325e8_--
+Thanks, Roger.
