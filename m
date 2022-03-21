@@ -2,109 +2,174 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10E40C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 23:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D22C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 23:46:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232673AbiCUXaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 19:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59134 "EHLO
+        id S233291AbiCUXr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 19:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233008AbiCUX3j (ORCPT
+        with ESMTP id S233428AbiCUXr0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 19:29:39 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A695D328A85;
-        Mon, 21 Mar 2022 16:27:28 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id mp6-20020a17090b190600b001c6841b8a52so789229pjb.5;
-        Mon, 21 Mar 2022 16:27:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=Hh1RoZK4FawxC3f0a2bLkgNzcQFznKw/bRPe/9nXSXc=;
-        b=YD4Z62P0H6wDspxBlxgwXmL3Ye9mMkA/YC8aX1BB5EiLzbij/mmBIw0B6aHNRPEBS6
-         fVq4K03nZLOn6aJ8/gCbJ7g3HQzejqVrxQys063SfqpPdw6P9GQCdtdXX75ocewRlC5g
-         1opg7QvRnNzy+kT4EsWXPdTY+gfEppQ6VrAYL1kCDax1mpJ9DnEHviARGDLpAdf6c7aL
-         eu4UwnD8+t5wzJJRH02jUYmC2/j9KQFzMofrMby/jjF8J6du+qd+3vQCBaKhvFK2Ajc2
-         DdBsn7omCoJiVwvKYOSQUi0IpaCQ42c/MTdDQgIV2APKxEceSTBnKLYz5M/pR4oRn6e2
-         BeMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=Hh1RoZK4FawxC3f0a2bLkgNzcQFznKw/bRPe/9nXSXc=;
-        b=KyTAsp6j8KCOWgzswA4IKRUnp9WutcOdp1g07HB6T8eQNphogj2pYjeTofz+aHedFY
-         rTZEgSmKXKbU9DhXfKI4NyoL4e806s0QcRRMgqDCEl4np7WEumZ3dDEtXKhjGpBQHE8M
-         0/fatFLcH3ijI77Y2EjHDGN99LcJ0eFcGSd4MuR6uDEcTPNbIkW0S/PpVnFqzQ/livzw
-         xxyflNk8aGNLaNy9KuGQkQmFGXuCmGMMbAl9XpDGhja5p1z0nPG6uf/jP4ZfkxVFJSuw
-         1z2nOSRWw9Z8LUf1IsMFao/JmeczND3/AVIgP0BlXNXxGReAt4hl3sP6e1rNBy4hP0jC
-         doSA==
-X-Gm-Message-State: AOAM530/JKQ4VRsDX0x6qO8d7YrnJ/rekEaAo3bhsPQFtkpHN0yZZMCJ
-        Mo/pIRnR4k513k4TGJp7NcM=
-X-Google-Smtp-Source: ABdhPJx4S150ue7FtCtDBwGeTVJo5HvHWBmr5O+oCyOd4BodvDzriJEC2IJbwLEmKIzOISICdNTUxw==
-X-Received: by 2002:a17:90a:3e4e:b0:1c6:586a:4d6a with SMTP id t14-20020a17090a3e4e00b001c6586a4d6amr1639142pjm.214.1647905248034;
-        Mon, 21 Mar 2022 16:27:28 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id s3-20020a056a00194300b004f6664d26eesm20165727pfk.88.2022.03.21.16.27.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 21 Mar 2022 16:27:27 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 21 Mar 2022 13:27:25 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+        Mon, 21 Mar 2022 19:47:26 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C381697A1
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 16:45:59 -0700 (PDT)
+Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22LMrtkt061922;
+        Tue, 22 Mar 2022 07:53:55 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
+ Tue, 22 Mar 2022 07:53:55 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22LMrs9u061919
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 22 Mar 2022 07:53:54 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <886dee4b-ea74-a352-c9bf-cac16acffaa9@I-love.SAKURA.ne.jp>
+Date:   Tue, 22 Mar 2022 07:53:49 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
 Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
         Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
         Andrew Morton <akpm@linux-foundation.org>,
         Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
         linux-block <linux-block@vger.kernel.org>,
         linux-xfs <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
-Message-ID: <YjkJ3S/1c8PxiA2Q@slm.duckdns.org>
 References: <e0a0bc94-e6de-b0e5-ee46-a76cd1570ea6@I-love.SAKURA.ne.jp>
  <YjNHzyTFHjh9v6k4@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
  <5542ef88-dcc9-0db5-7f01-ad5779d9bc07@I-love.SAKURA.ne.jp>
  <YjS+Jr6QudSKMSGy@slm.duckdns.org>
  <61f41e56-3650-f0fc-9ef5-7e19fe84e6b7@I-love.SAKURA.ne.jp>
  <YjiuGnLVjj0Ouxtd@slm.duckdns.org>
- <886dee4b-ea74-a352-c9bf-cac16acffaa9@I-love.SAKURA.ne.jp>
- <YjkEjYVjLuo8imtn@slm.duckdns.org>
- <1c455861-3b42-c530-a99e-cce13e932f53@I-love.SAKURA.ne.jp>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1c455861-3b42-c530-a99e-cce13e932f53@I-love.SAKURA.ne.jp>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+In-Reply-To: <YjiuGnLVjj0Ouxtd@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 08:17:43AM +0900, Tetsuo Handa wrote:
-> On 2022/03/22 8:04, Tejun Heo wrote:
-> > But why are you dropping the flag from their intended users?
-> 
-> As far as I can see, the only difference __WQ_LEGACY makes is whether
-> "workqueue: WQ_MEM_RECLAIM %s:%ps is flushing !WQ_MEM_RECLAIM %s:%ps"
-> warning is printed or not. What are the intended users?
+On 2022/03/22 1:55, Tejun Heo wrote:
+> No, just fix the abusers. There are four abusers in the kernel and they
+> aren't difficult to fix.
 
-The old create_workqueue() and friends always imply WQ_MEM_RECLAIM because
-they all used to be served dedicated kthreads. The growing number of
-kthreads used this way became a headache. There were too many of these
-kthreads sitting around doing nothing. In some niche configurations, they
-ate up enough PIDs to cause boot failrues.
+So, are you expecting that a change shown below happens, by adding WQ_MEM_RECLAIM
+flag to all WQs which may hit "workqueue: WQ_MEM_RECLAIM %s:%ps is flushing
+!WQ_MEM_RECLAIM %s:%ps" warning? Otherwise, __WQ_LEGACY flag will continue
+serving as a hack for suppressing this warning.
 
-To address the issue, the new implementation made the workqueues share pools
-of workers. However, this means that forward progress can't be guaranteed
-under memory pressure, so workqueues which are depended upon during memory
-reclaim now need to set WQ_MEM_RECLAIM explicitly to request a dedicated
-rescuer thread.
+---
+ drivers/cpufreq/tegra194-cpufreq.c  | 2 +-
+ drivers/scsi/hosts.c                | 2 +-
+ drivers/scsi/libiscsi.c             | 2 +-
+ drivers/scsi/scsi_transport_iscsi.c | 2 +-
+ include/linux/workqueue.h           | 7 +++----
+ kernel/workqueue.c                  | 3 +--
+ 6 files changed, 8 insertions(+), 10 deletions(-)
 
-The legacy flushing warning is telling us that those workqueues can be
-converted to alloc_workqueue + WQ_MEM_RECLAIM as we know them to be
-participating in memory reclaim (as they're flushing one of the explicitly
-marked workqueues). So, if you spot them, the right thing to do is
-converting all the involved workqueues to use alloc_workqueue() +
-WQ_MEM_RECLAIM.
-
-Thanks.
-
+diff --git a/drivers/cpufreq/tegra194-cpufreq.c b/drivers/cpufreq/tegra194-cpufreq.c
+index ac381db25dbe..5d72ef07f9ed 100644
+--- a/drivers/cpufreq/tegra194-cpufreq.c
++++ b/drivers/cpufreq/tegra194-cpufreq.c
+@@ -379,7 +379,7 @@ static int tegra194_cpufreq_probe(struct platform_device *pdev)
+ 	if (IS_ERR(bpmp))
+ 		return PTR_ERR(bpmp);
+ 
+-	read_counters_wq = alloc_workqueue("read_counters_wq", __WQ_LEGACY, 1);
++	read_counters_wq = alloc_workqueue("read_counters_wq", 0, 1);
+ 	if (!read_counters_wq) {
+ 		dev_err(&pdev->dev, "fail to create_workqueue\n");
+ 		err = -EINVAL;
+diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+index f69b77cbf538..4485f65d5e92 100644
+--- a/drivers/scsi/hosts.c
++++ b/drivers/scsi/hosts.c
+@@ -277,7 +277,7 @@ int scsi_add_host_with_dma(struct Scsi_Host *shost, struct device *dev,
+ 		snprintf(shost->work_q_name, sizeof(shost->work_q_name),
+ 			 "scsi_wq_%d", shost->host_no);
+ 		shost->work_q = alloc_workqueue("%s",
+-			WQ_SYSFS | __WQ_LEGACY | WQ_MEM_RECLAIM | WQ_UNBOUND,
++			WQ_SYSFS | WQ_MEM_RECLAIM | WQ_UNBOUND,
+ 			1, shost->work_q_name);
+ 
+ 		if (!shost->work_q) {
+diff --git a/drivers/scsi/libiscsi.c b/drivers/scsi/libiscsi.c
+index 059dae8909ee..c923d2a1086e 100644
+--- a/drivers/scsi/libiscsi.c
++++ b/drivers/scsi/libiscsi.c
+@@ -2801,7 +2801,7 @@ struct Scsi_Host *iscsi_host_alloc(struct scsi_host_template *sht,
+ 		snprintf(ihost->workq_name, sizeof(ihost->workq_name),
+ 			"iscsi_q_%d", shost->host_no);
+ 		ihost->workq = alloc_workqueue("%s",
+-			WQ_SYSFS | __WQ_LEGACY | WQ_MEM_RECLAIM | WQ_UNBOUND,
++			WQ_SYSFS | WQ_MEM_RECLAIM | WQ_UNBOUND,
+ 			1, ihost->workq_name);
+ 		if (!ihost->workq)
+ 			goto free_host;
+diff --git a/drivers/scsi/scsi_transport_iscsi.c b/drivers/scsi/scsi_transport_iscsi.c
+index 554b6f784223..b4f0b7584112 100644
+--- a/drivers/scsi/scsi_transport_iscsi.c
++++ b/drivers/scsi/scsi_transport_iscsi.c
+@@ -4876,7 +4876,7 @@ static __init int iscsi_transport_init(void)
+ 	}
+ 
+ 	iscsi_eh_timer_workq = alloc_workqueue("%s",
+-			WQ_SYSFS | __WQ_LEGACY | WQ_MEM_RECLAIM | WQ_UNBOUND,
++			WQ_SYSFS | WQ_MEM_RECLAIM | WQ_UNBOUND,
+ 			1, "iscsi_eh");
+ 	if (!iscsi_eh_timer_workq) {
+ 		err = -ENOMEM;
+diff --git a/include/linux/workqueue.h b/include/linux/workqueue.h
+index 7fee9b6cfede..666c4cc73f6b 100644
+--- a/include/linux/workqueue.h
++++ b/include/linux/workqueue.h
+@@ -337,7 +337,6 @@ enum {
+ 
+ 	__WQ_DRAINING		= 1 << 16, /* internal: workqueue is draining */
+ 	__WQ_ORDERED		= 1 << 17, /* internal: workqueue is ordered */
+-	__WQ_LEGACY		= 1 << 18, /* internal: create*_workqueue() */
+ 	__WQ_ORDERED_EXPLICIT	= 1 << 19, /* internal: alloc_ordered_workqueue() */
+ 
+ 	WQ_MAX_ACTIVE		= 512,	  /* I like 512, better ideas? */
+@@ -420,12 +419,12 @@ alloc_workqueue(const char *fmt, unsigned int flags, int max_active, ...);
+ 			__WQ_ORDERED_EXPLICIT | (flags), 1, ##args)
+ 
+ #define create_workqueue(name)						\
+-	alloc_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM, 1, (name))
++	alloc_workqueue("%s", WQ_MEM_RECLAIM, 1, (name))
+ #define create_freezable_workqueue(name)				\
+-	alloc_workqueue("%s", __WQ_LEGACY | WQ_FREEZABLE | WQ_UNBOUND |	\
++	alloc_workqueue("%s", WQ_FREEZABLE | WQ_UNBOUND |	\
+ 			WQ_MEM_RECLAIM, 1, (name))
+ #define create_singlethread_workqueue(name)				\
+-	alloc_ordered_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM, name)
++	alloc_ordered_workqueue("%s", WQ_MEM_RECLAIM, name)
+ 
+ extern void destroy_workqueue(struct workqueue_struct *wq);
+ 
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 33f1106b4f99..aba3b1505292 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -2643,8 +2643,7 @@ static void check_flush_dependency(struct workqueue_struct *target_wq,
+ 	WARN_ONCE(current->flags & PF_MEMALLOC,
+ 		  "workqueue: PF_MEMALLOC task %d(%s) is flushing !WQ_MEM_RECLAIM %s:%ps",
+ 		  current->pid, current->comm, target_wq->name, target_func);
+-	WARN_ONCE(worker && ((worker->current_pwq->wq->flags &
+-			      (WQ_MEM_RECLAIM | __WQ_LEGACY)) == WQ_MEM_RECLAIM),
++	WARN_ONCE(worker && (worker->current_pwq->wq->flags & WQ_MEM_RECLAIM),
+ 		  "workqueue: WQ_MEM_RECLAIM %s:%ps is flushing !WQ_MEM_RECLAIM %s:%ps",
+ 		  worker->current_pwq->wq->name, worker->current_func,
+ 		  target_wq->name, target_func);
 -- 
-tejun
+2.32.0
+
+
