@@ -2,287 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EAEC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 16:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F82DC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 16:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350638AbiCUQIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 12:08:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
+        id S1348546AbiCUQXh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 12:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349753AbiCUQHu (ORCPT
+        with ESMTP id S1351059AbiCUQW5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 12:07:50 -0400
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7CF65179
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 09:06:24 -0700 (PDT)
-Received: by mail-io1-f70.google.com with SMTP id g11-20020a056602072b00b00645cc0735d7so10757436iox.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 09:06:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=fDjRP2JQcEzLDeioLLRFp9lQSMrewPMiB1BiU2Impu0=;
-        b=gtJ8IFvknukWue9p2oxG+Sc3kNS8s5cdLON0sUQXRGlVLg6QGGu+vymu5Q1zMzmdf/
-         Ick25+yelrH9akJql4rapjYnm5dmc5oI57XvaMeuC5sOovbe5VyypG/12POz6MhWTM1X
-         rAt1tY4wyIAITppC/1rydqJzsx2HK+vhnXfVC6Iga7yacbpRiQnSp8N1qlWdN53COzj2
-         uNb4gnrmCIbUxwYywWN0Vt6ZcTR68lHlyzJdvrr4kxfnBCZ82jTfhgnrBVZwRCzSVdf5
-         AKqb0jXlHVszxyLnN+kSqYae+S6mhK/v8Fzu3VN2kUPQ+nTASyFT1VOTtIEsSnvfr+St
-         JpZQ==
-X-Gm-Message-State: AOAM533+iuPB+1UgW8ZwcHLG+OC76OBKBf+sN+vXUJWrJP2+0wrTraws
-        q8oKOkD6jVn85eVMbxPIz35P7R8xhRGZP55hr6vdCZwvAXbB
-X-Google-Smtp-Source: ABdhPJy/U9Q84+ldbJJAWRqTcdkejSYo9is9zrjm0+4QQd5ALc1reFuRQn8+8mEiuyQxVDG1bMIvg+sAV8RQpMW1MwKhOFbv2A9H
+        Mon, 21 Mar 2022 12:22:57 -0400
+Received: from out2.migadu.com (out2.migadu.com [IPv6:2001:41d0:2:aacc::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9004ABF7E
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 09:21:31 -0700 (PDT)
+Message-ID: <a707d1c9-3af8-d573-6d71-e4b8168a7ced@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1647879688;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=DixqukwzuS2LIzDuWHjwAsxz7jLNGz0GtACZ41hJOyo=;
+        b=nqhpik62lwaJupQ2i0fizF35jRpWCnW828uBzWnTA/uKigz/781a7sTOcekSioEKjVRHS5
+        hab4EMW08OHHdz5/NAje1/GW2MN3YBCgbDUWODzzTToOtTFfT2IFfpiAUngDb+6lDNrgju
+        hXh3k6ehayg7ub1ieEXBl+7rAWxdlMw=
+Date:   Mon, 21 Mar 2022 10:21:36 -0600
 MIME-Version: 1.0
-X-Received: by 2002:a5e:c012:0:b0:649:ab74:a3c6 with SMTP id
- u18-20020a5ec012000000b00649ab74a3c6mr2345688iol.182.1647878783824; Mon, 21
- Mar 2022 09:06:23 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 09:06:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000008af91005dabcad4f@google.com>
-Subject: [syzbot] INFO: task hung in nbd_add_socket (2)
-From:   syzbot <syzbot+cbb4b1ebc70d0c5a8c29@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH 0/6] power_of_2 emulation support for NVMe ZNS devices
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        jiangbo.365@bytedance.com, kanchan Joshi <joshi.k@samsung.com>,
+        Jens Axboe <axboe@kernel.dk>, Sagi Grimberg <sagi@grimberg.me>,
+        =?UTF-8?Q?Matias_Bj=c3=b8rling?= <matias.bjorling@wdc.com>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Kanchan Joshi <joshiiitr@gmail.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <CGME20220308165414eucas1p106df0bd6a901931215cfab81660a4564@eucas1p1.samsung.com>
+ <20220308165349.231320-1-p.raghav@samsung.com>
+ <20220310094725.GA28499@lst.de>
+ <e02dfd21-31c6-95b6-1127-3f18c79116ee@samsung.com>
+ <20220310144449.GA1695@lst.de> <Yiuu2h38owO9ioIW@bombadil.infradead.org>
+ <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Jonathan Derrick <jonathan.derrick@linux.dev>
+In-Reply-To: <20220311205135.GA413653@dhcp-10-100-145-180.wdc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    56e337f2cf13 Revert "gpio: Revert regression in sysfs-gpio..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=14b09f89700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d35f9bc6884af6c9
-dashboard link: https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b3f519700000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cbb4b1ebc70d0c5a8c29@syzkaller.appspotmail.com
-
-INFO: task syz-executor.3:3748 blocked for more than 143 seconds.
-      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.3  state:D stack:28456 pid: 3748 ppid:  3641 flags:0x00000004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:4995 [inline]
- __schedule+0xa94/0x4910 kernel/sched/core.c:6304
- schedule+0xd2/0x260 kernel/sched/core.c:6377
- blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
- nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
- __nbd_ioctl drivers/block/nbd.c:1454 [inline]
- nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
- blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f6ce3d6b049
-RSP: 002b:00007f6ce34e0168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f6ce3e7df60 RCX: 00007f6ce3d6b049
-RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
-RBP: 00007f6ce3dc508d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007fff39c20b5f R14: 00007f6ce34e0300 R15: 0000000000022000
- </TASK>
-INFO: task syz-executor.0:3762 blocked for more than 143 seconds.
-      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.0  state:D stack:28456 pid: 3762 ppid:  3643 flags:0x00000004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:4995 [inline]
- __schedule+0xa94/0x4910 kernel/sched/core.c:6304
- schedule+0xd2/0x260 kernel/sched/core.c:6377
- blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
- nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
- __nbd_ioctl drivers/block/nbd.c:1454 [inline]
- nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
- blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f76c6cb0049
-RSP: 002b:00007f76c6425168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f76c6dc2f60 RCX: 00007f76c6cb0049
-RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
-RBP: 00007f76c6d0a08d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffc1647f5cf R14: 00007f76c6425300 R15: 0000000000022000
- </TASK>
-INFO: task syz-executor.1:3786 blocked for more than 143 seconds.
-      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.1  state:D stack:28456 pid: 3786 ppid:  3644 flags:0x00000004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:4995 [inline]
- __schedule+0xa94/0x4910 kernel/sched/core.c:6304
- schedule+0xd2/0x260 kernel/sched/core.c:6377
- blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
- nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
- __nbd_ioctl drivers/block/nbd.c:1454 [inline]
- nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
- blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f771e10a049
-RSP: 002b:00007f771d87f168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f771e21cf60 RCX: 00007f771e10a049
-RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
-RBP: 00007f771e16408d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffd29c3466f R14: 00007f771d87f300 R15: 0000000000022000
- </TASK>
-INFO: task syz-executor.2:3796 blocked for more than 144 seconds.
-      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor.2  state:D stack:28456 pid: 3796 ppid:  3646 flags:0x00000004
-Call Trace:
- <TASK>
- context_switch kernel/sched/core.c:4995 [inline]
- __schedule+0xa94/0x4910 kernel/sched/core.c:6304
- schedule+0xd2/0x260 kernel/sched/core.c:6377
- blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
- nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
- __nbd_ioctl drivers/block/nbd.c:1454 [inline]
- nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
- blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:874 [inline]
- __se_sys_ioctl fs/ioctl.c:860 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f5cb8d4e049
-RSP: 002b:00007f5cb84c3168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00007f5cb8e60f60 RCX: 00007f5cb8d4e049
-RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
-RBP: 00007f5cb8da808d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffc915ce70f R14: 00007f5cb84c3300 R15: 0000000000022000
- </TASK>
-
-Showing all locks held in the system:
-1 lock held by khungtaskd/27:
- #0: ffffffff8bb84ca0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6460
-2 locks held by getty/3274:
- #0: ffff88814ac35098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
- #1: ffffc90002b632e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xcf0/0x1230 drivers/tty/n_tty.c:2075
-1 lock held by syz-executor.3/3748:
- #0: ffff88801ab4b198 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
-1 lock held by syz-executor.0/3762:
- #0: ffff88801aa43998 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
-1 lock held by syz-executor.1/3786:
- #0: ffff88801ab90198 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
-1 lock held by syz-executor.2/3796:
- #0: ffff88801ab97998 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
-
-=============================================
-
-NMI backtrace for cpu 0
-CPU: 0 PID: 27 Comm: khungtaskd Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
- nmi_trigger_cpumask_backtrace+0x1e6/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:212 [inline]
- watchdog+0xc1d/0xf50 kernel/hung_task.c:369
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 3678 Comm: kworker/u4:2 Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: phy10 ieee80211_iface_work
-RIP: 0010:stackdepot_memcmp lib/stackdepot.c:217 [inline]
-RIP: 0010:find_stack lib/stackdepot.c:233 [inline]
-RIP: 0010:__stack_depot_save+0x145/0x500 lib/stackdepot.c:373
-Code: 29 48 85 ed 75 12 e9 92 00 00 00 48 8b 6d 00 48 85 ed 0f 84 85 00 00 00 39 5d 08 75 ee 44 3b 7d 0c 75 e8 31 c0 48 8b 74 c5 18 <49> 39 34 c6 75 db 48 83 c0 01 48 39 c2 75 ec 48 8b 7c 24 28 48 85
-RSP: 0018:ffffc90002adf418 EFLAGS: 00000202
-RAX: 0000000000000007 RBX: 00000000fcc93932 RCX: ffff88823b89c990
-RDX: 000000000000000b RSI: ffffffff814cca4c RDI: 00000000231130b5
-RBP: ffff88806d495930 R08: 00000000faa8e072 R09: 0000000000000001
-R10: fffff5200055be77 R11: 0000000000088078 R12: 0000000000000001
-R13: 0000000000000b20 R14: ffffc90002adf488 R15: 000000000000000b
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffd0058e108 CR3: 000000007f38a000 CR4: 0000000000350ee0
-Call Trace:
- <TASK>
- kasan_save_stack+0x2e/0x40 mm/kasan/common.c:39
- kasan_set_track mm/kasan/common.c:45 [inline]
- set_alloc_info mm/kasan/common.c:436 [inline]
- ____kasan_kmalloc mm/kasan/common.c:515 [inline]
- ____kasan_kmalloc mm/kasan/common.c:474 [inline]
- __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:524
- kmalloc include/linux/slab.h:586 [inline]
- kzalloc include/linux/slab.h:714 [inline]
- cfg80211_inform_single_bss_frame_data+0x34b/0xf40 net/wireless/scan.c:2436
- cfg80211_inform_bss_frame_data+0xa7/0xb50 net/wireless/scan.c:2497
- ieee80211_bss_info_update+0x35b/0xb00 net/mac80211/scan.c:190
- ieee80211_rx_bss_info net/mac80211/ibss.c:1119 [inline]
- ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1610 [inline]
- ieee80211_ibss_rx_queued_mgmt+0x19cf/0x3150 net/mac80211/ibss.c:1639
- ieee80211_iface_process_skb net/mac80211/iface.c:1527 [inline]
- ieee80211_iface_work+0xa69/0xd00 net/mac80211/iface.c:1581
- process_one_work+0x9ac/0x1650 kernel/workqueue.c:2307
- worker_thread+0x657/0x1110 kernel/workqueue.c:2454
- kthread+0x2e9/0x3a0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	29 48 85             	sub    %ecx,-0x7b(%rax)
-   3:	ed                   	in     (%dx),%eax
-   4:	75 12                	jne    0x18
-   6:	e9 92 00 00 00       	jmpq   0x9d
-   b:	48 8b 6d 00          	mov    0x0(%rbp),%rbp
-   f:	48 85 ed             	test   %rbp,%rbp
-  12:	0f 84 85 00 00 00    	je     0x9d
-  18:	39 5d 08             	cmp    %ebx,0x8(%rbp)
-  1b:	75 ee                	jne    0xb
-  1d:	44 3b 7d 0c          	cmp    0xc(%rbp),%r15d
-  21:	75 e8                	jne    0xb
-  23:	31 c0                	xor    %eax,%eax
-  25:	48 8b 74 c5 18       	mov    0x18(%rbp,%rax,8),%rsi
-* 2a:	49 39 34 c6          	cmp    %rsi,(%r14,%rax,8) <-- trapping instruction
-  2e:	75 db                	jne    0xb
-  30:	48 83 c0 01          	add    $0x1,%rax
-  34:	48 39 c2             	cmp    %rax,%rdx
-  37:	75 ec                	jne    0x25
-  39:	48 8b 7c 24 28       	mov    0x28(%rsp),%rdi
-  3e:	48                   	rex.W
-  3f:	85                   	.byte 0x85
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+On 3/11/2022 1:51 PM, Keith Busch wrote:
+> On Fri, Mar 11, 2022 at 12:19:38PM -0800, Luis Chamberlain wrote:
+>> NAND has no PO2 requirement. The emulation effort was only done to help
+>> add support for !PO2 devices because there is no alternative. If we
+>> however are ready instead to go down the avenue of removing those
+>> restrictions well let's go there then instead. If that's not even
+>> something we are willing to consider I'd really like folks who stand
+>> behind the PO2 requirement to stick their necks out and clearly say that
+>> their hw/fw teams are happy to deal with this requirement forever on ZNS.
+> 
+> Regardless of the merits of the current OS requirement, it's a trivial
+> matter for firmware to round up their reported zone size to the next
+> power of 2. This does not create a significant burden on their part, as
+> far as I know.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+Sure wonder why !PO2 keeps coming up if it's so trivial to fix in firmware as you claim.
+I actually find the hubris of the Linux community wrt the whole PO2 requirement
+pretty exhausting.
+
+Consider that some SSD manufacturers are having to rely on a NAND shortage and
+existing ASIC architecture limitations that may define the sizes of their erase blocks
+and write units. A !PO2 implementation in the Linux kernel would enable consumers
+to be able to choose more options in the marketplace for their Linux ZNS application.
