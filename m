@@ -2,146 +2,287 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33634C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 14:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EAEC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 16:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244383AbiCUOwH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 10:52:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53166 "EHLO
+        id S1350638AbiCUQIK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 12:08:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240387AbiCUOwH (ORCPT
+        with ESMTP id S1349753AbiCUQHu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 10:52:07 -0400
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5C563D0
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 07:50:41 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2d2d45c0df7so126939557b3.1
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 07:50:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=j/FXTEmOSxH0gjgjdSzeFMh8shZcXNYs1S5aZMLLEM4=;
-        b=SBrVSoKXdDsuaByiB5bpEuvHlzX6PEE7ScTFdcnyvBB3LM8FjBIxb4HE452P7nW/1P
-         x8Uhx569twf4z5ULHgqQdUEGzVl4SU+QwvbLAIFQyuTyB21bcIOsfkT6/PBkBr+1n4Y9
-         hsFezBjQyP+3jHyQKzGIyLT/UH4/gWuwY3xOeR6unA65Om/6xbAmfUO+De3vhuy15UEC
-         zrrJLt9FdxLdYyM926/tTlpnRZTG53MfuP8rZklNPPTyNZfK1RA5vggICA2wqeExGlfZ
-         AfbURLvOReHTpT55NHCBSLztJoEA6UoKzhUD4WkTaY5lbkIRXroMJHZHY4psJj9DqtPU
-         W+LA==
+        Mon, 21 Mar 2022 12:07:50 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D7CF65179
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 09:06:24 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id g11-20020a056602072b00b00645cc0735d7so10757436iox.1
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 09:06:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=j/FXTEmOSxH0gjgjdSzeFMh8shZcXNYs1S5aZMLLEM4=;
-        b=1uUnsjxpJm65jGfg4auJ1qYjJzMV43u+kg7stOipHtEij65A4oa0dRXoH1Hm/hR6wC
-         iFpRjSaxd+mkSIsWW0yv2EuISoKhjVEOKjJ2/O+eAj1rtlN7ONFyW1RDxShjyFd+Jwuc
-         9uKdhYts7yudh0vOSnVdcAYVAK3MZN2Y5aj9NUHK61kUNPtvF5N2fjUgpM/nHhs+wvWF
-         CYlqy+GkFlJfumYX/tJRgXQmDSwsfu1LVzHqiOxxL0nj5B1l6wS7xckf/lqu96S1pl2X
-         MZhyFpxpt22tN8/uJQeCjgWZIwKh0cJ2w2lfr1rc6Ourez/H+1Pl8/7HX2M/FWczJtTq
-         Dfjw==
-X-Gm-Message-State: AOAM533c9RExPoMhx04sFfRPNtByvbSNjQZAZzHckf/OZP9ltjwg4j2M
-        b3dpQAz5o4oHCl0yhIzgx0oPWmkY3T83
-X-Google-Smtp-Source: ABdhPJxLCtNARAk+EJOSYZ01zh/M9UDj+P8uAmI3Yand6sFtWYVr5ajlQJ7KLCg0hyNWZ/skpNcv8bBOhH9u
-X-Received: from bg.sfo.corp.google.com ([2620:15c:11a:202:3257:ddd6:5193:4ceb])
- (user=bgeffon job=sendgmr) by 2002:a25:7686:0:b0:633:bdb7:1e75 with SMTP id
- r128-20020a257686000000b00633bdb71e75mr14061753ybc.634.1647874240929; Mon, 21
- Mar 2022 07:50:40 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 07:50:37 -0700
-In-Reply-To: <20220315172221.9522-1-bgeffon@google.com>
-Message-Id: <20220321145037.1024083-1-bgeffon@google.com>
-Mime-Version: 1.0
-References: <20220315172221.9522-1-bgeffon@google.com>
-X-Mailer: git-send-email 2.35.1.894.gb6a874cedc-goog
-Subject: [PATCH] zram: Add a huge_idle writeback mode
-From:   Brian Geffon <bgeffon@google.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, Brian Geffon <bgeffon@google.com>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=fDjRP2JQcEzLDeioLLRFp9lQSMrewPMiB1BiU2Impu0=;
+        b=gtJ8IFvknukWue9p2oxG+Sc3kNS8s5cdLON0sUQXRGlVLg6QGGu+vymu5Q1zMzmdf/
+         Ick25+yelrH9akJql4rapjYnm5dmc5oI57XvaMeuC5sOovbe5VyypG/12POz6MhWTM1X
+         rAt1tY4wyIAITppC/1rydqJzsx2HK+vhnXfVC6Iga7yacbpRiQnSp8N1qlWdN53COzj2
+         uNb4gnrmCIbUxwYywWN0Vt6ZcTR68lHlyzJdvrr4kxfnBCZ82jTfhgnrBVZwRCzSVdf5
+         AKqb0jXlHVszxyLnN+kSqYae+S6mhK/v8Fzu3VN2kUPQ+nTASyFT1VOTtIEsSnvfr+St
+         JpZQ==
+X-Gm-Message-State: AOAM533+iuPB+1UgW8ZwcHLG+OC76OBKBf+sN+vXUJWrJP2+0wrTraws
+        q8oKOkD6jVn85eVMbxPIz35P7R8xhRGZP55hr6vdCZwvAXbB
+X-Google-Smtp-Source: ABdhPJy/U9Q84+ldbJJAWRqTcdkejSYo9is9zrjm0+4QQd5ALc1reFuRQn8+8mEiuyQxVDG1bMIvg+sAV8RQpMW1MwKhOFbv2A9H
+MIME-Version: 1.0
+X-Received: by 2002:a5e:c012:0:b0:649:ab74:a3c6 with SMTP id
+ u18-20020a5ec012000000b00649ab74a3c6mr2345688iol.182.1647878783824; Mon, 21
+ Mar 2022 09:06:23 -0700 (PDT)
+Date:   Mon, 21 Mar 2022 09:06:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000008af91005dabcad4f@google.com>
+Subject: [syzbot] INFO: task hung in nbd_add_socket (2)
+From:   syzbot <syzbot+cbb4b1ebc70d0c5a8c29@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Today it's only possible to write back as a page, idle, or huge.
-A user might want to writeback pages which are huge and idle first
-as these idle pages do not require decompression and make a good
-first pass for writeback.
+Hello,
 
-Idle writeback specifically has the advantage that a refault is
-unlikely given that the page has been swapped for some amount of
-time without being refaulted.
+syzbot found the following issue on:
 
-Huge writeback has the advantage that you're guaranteed to get
-the maximum benefit from a single page writeback, that is, you're
-reclaiming one full page of memory. Pages which are compressed in
-zram being written back result in some benefit which is always
-less than a page size because of the fact that it was compressed.
+HEAD commit:    56e337f2cf13 Revert "gpio: Revert regression in sysfs-gpio..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b09f89700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d35f9bc6884af6c9
+dashboard link: https://syzkaller.appspot.com/bug?extid=cbb4b1ebc70d0c5a8c29
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12b3f519700000
 
-This change allows for users to write back huge pages which are
-also idle.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cbb4b1ebc70d0c5a8c29@syzkaller.appspotmail.com
 
-Signed-off-by: Brian Geffon <bgeffon@google.com>
+INFO: task syz-executor.3:3748 blocked for more than 143 seconds.
+      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.3  state:D stack:28456 pid: 3748 ppid:  3641 flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:4995 [inline]
+ __schedule+0xa94/0x4910 kernel/sched/core.c:6304
+ schedule+0xd2/0x260 kernel/sched/core.c:6377
+ blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
+ nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
+ __nbd_ioctl drivers/block/nbd.c:1454 [inline]
+ nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
+ blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f6ce3d6b049
+RSP: 002b:00007f6ce34e0168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f6ce3e7df60 RCX: 00007f6ce3d6b049
+RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
+RBP: 00007f6ce3dc508d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fff39c20b5f R14: 00007f6ce34e0300 R15: 0000000000022000
+ </TASK>
+INFO: task syz-executor.0:3762 blocked for more than 143 seconds.
+      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.0  state:D stack:28456 pid: 3762 ppid:  3643 flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:4995 [inline]
+ __schedule+0xa94/0x4910 kernel/sched/core.c:6304
+ schedule+0xd2/0x260 kernel/sched/core.c:6377
+ blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
+ nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
+ __nbd_ioctl drivers/block/nbd.c:1454 [inline]
+ nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
+ blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f76c6cb0049
+RSP: 002b:00007f76c6425168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f76c6dc2f60 RCX: 00007f76c6cb0049
+RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
+RBP: 00007f76c6d0a08d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffc1647f5cf R14: 00007f76c6425300 R15: 0000000000022000
+ </TASK>
+INFO: task syz-executor.1:3786 blocked for more than 143 seconds.
+      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.1  state:D stack:28456 pid: 3786 ppid:  3644 flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:4995 [inline]
+ __schedule+0xa94/0x4910 kernel/sched/core.c:6304
+ schedule+0xd2/0x260 kernel/sched/core.c:6377
+ blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
+ nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
+ __nbd_ioctl drivers/block/nbd.c:1454 [inline]
+ nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
+ blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f771e10a049
+RSP: 002b:00007f771d87f168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f771e21cf60 RCX: 00007f771e10a049
+RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
+RBP: 00007f771e16408d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffd29c3466f R14: 00007f771d87f300 R15: 0000000000022000
+ </TASK>
+INFO: task syz-executor.2:3796 blocked for more than 144 seconds.
+      Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.2  state:D stack:28456 pid: 3796 ppid:  3646 flags:0x00000004
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:4995 [inline]
+ __schedule+0xa94/0x4910 kernel/sched/core.c:6304
+ schedule+0xd2/0x260 kernel/sched/core.c:6377
+ blk_mq_freeze_queue_wait+0x112/0x160 block/blk-mq.c:178
+ nbd_add_socket+0x166/0x810 drivers/block/nbd.c:1109
+ __nbd_ioctl drivers/block/nbd.c:1454 [inline]
+ nbd_ioctl+0x38c/0xb10 drivers/block/nbd.c:1511
+ blkdev_ioctl+0x37a/0x800 block/ioctl.c:588
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:874 [inline]
+ __se_sys_ioctl fs/ioctl.c:860 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:860
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f5cb8d4e049
+RSP: 002b:00007f5cb84c3168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f5cb8e60f60 RCX: 00007f5cb8d4e049
+RDX: 0000000000000004 RSI: 000000000000ab00 RDI: 0000000000000003
+RBP: 00007f5cb8da808d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffc915ce70f R14: 00007f5cb84c3300 R15: 0000000000022000
+ </TASK>
+
+Showing all locks held in the system:
+1 lock held by khungtaskd/27:
+ #0: ffffffff8bb84ca0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6460
+2 locks held by getty/3274:
+ #0: ffff88814ac35098 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x22/0x80 drivers/tty/tty_ldisc.c:244
+ #1: ffffc90002b632e8 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0xcf0/0x1230 drivers/tty/n_tty.c:2075
+1 lock held by syz-executor.3/3748:
+ #0: ffff88801ab4b198 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
+1 lock held by syz-executor.0/3762:
+ #0: ffff88801aa43998 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
+1 lock held by syz-executor.1/3786:
+ #0: ffff88801ab90198 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
+1 lock held by syz-executor.2/3796:
+ #0: ffff88801ab97998 (&nbd->config_lock){+.+.}-{3:3}, at: nbd_ioctl+0x151/0xb10 drivers/block/nbd.c:1504
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 PID: 27 Comm: khungtaskd Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:111
+ nmi_trigger_cpumask_backtrace+0x1e6/0x230 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:212 [inline]
+ watchdog+0xc1d/0xf50 kernel/hung_task.c:369
+ kthread+0x2e9/0x3a0 kernel/kthread.c:377
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 3678 Comm: kworker/u4:2 Not tainted 5.17.0-rc8-syzkaller-00003-g56e337f2cf13 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: phy10 ieee80211_iface_work
+RIP: 0010:stackdepot_memcmp lib/stackdepot.c:217 [inline]
+RIP: 0010:find_stack lib/stackdepot.c:233 [inline]
+RIP: 0010:__stack_depot_save+0x145/0x500 lib/stackdepot.c:373
+Code: 29 48 85 ed 75 12 e9 92 00 00 00 48 8b 6d 00 48 85 ed 0f 84 85 00 00 00 39 5d 08 75 ee 44 3b 7d 0c 75 e8 31 c0 48 8b 74 c5 18 <49> 39 34 c6 75 db 48 83 c0 01 48 39 c2 75 ec 48 8b 7c 24 28 48 85
+RSP: 0018:ffffc90002adf418 EFLAGS: 00000202
+RAX: 0000000000000007 RBX: 00000000fcc93932 RCX: ffff88823b89c990
+RDX: 000000000000000b RSI: ffffffff814cca4c RDI: 00000000231130b5
+RBP: ffff88806d495930 R08: 00000000faa8e072 R09: 0000000000000001
+R10: fffff5200055be77 R11: 0000000000088078 R12: 0000000000000001
+R13: 0000000000000b20 R14: ffffc90002adf488 R15: 000000000000000b
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007ffd0058e108 CR3: 000000007f38a000 CR4: 0000000000350ee0
+Call Trace:
+ <TASK>
+ kasan_save_stack+0x2e/0x40 mm/kasan/common.c:39
+ kasan_set_track mm/kasan/common.c:45 [inline]
+ set_alloc_info mm/kasan/common.c:436 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:515 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:474 [inline]
+ __kasan_kmalloc+0xa9/0xd0 mm/kasan/common.c:524
+ kmalloc include/linux/slab.h:586 [inline]
+ kzalloc include/linux/slab.h:714 [inline]
+ cfg80211_inform_single_bss_frame_data+0x34b/0xf40 net/wireless/scan.c:2436
+ cfg80211_inform_bss_frame_data+0xa7/0xb50 net/wireless/scan.c:2497
+ ieee80211_bss_info_update+0x35b/0xb00 net/mac80211/scan.c:190
+ ieee80211_rx_bss_info net/mac80211/ibss.c:1119 [inline]
+ ieee80211_rx_mgmt_probe_beacon net/mac80211/ibss.c:1610 [inline]
+ ieee80211_ibss_rx_queued_mgmt+0x19cf/0x3150 net/mac80211/ibss.c:1639
+ ieee80211_iface_process_skb net/mac80211/iface.c:1527 [inline]
+ ieee80211_iface_work+0xa69/0xd00 net/mac80211/iface.c:1581
+ process_one_work+0x9ac/0x1650 kernel/workqueue.c:2307
+ worker_thread+0x657/0x1110 kernel/workqueue.c:2454
+ kthread+0x2e9/0x3a0 kernel/kthread.c:377
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	29 48 85             	sub    %ecx,-0x7b(%rax)
+   3:	ed                   	in     (%dx),%eax
+   4:	75 12                	jne    0x18
+   6:	e9 92 00 00 00       	jmpq   0x9d
+   b:	48 8b 6d 00          	mov    0x0(%rbp),%rbp
+   f:	48 85 ed             	test   %rbp,%rbp
+  12:	0f 84 85 00 00 00    	je     0x9d
+  18:	39 5d 08             	cmp    %ebx,0x8(%rbp)
+  1b:	75 ee                	jne    0xb
+  1d:	44 3b 7d 0c          	cmp    0xc(%rbp),%r15d
+  21:	75 e8                	jne    0xb
+  23:	31 c0                	xor    %eax,%eax
+  25:	48 8b 74 c5 18       	mov    0x18(%rbp,%rax,8),%rsi
+* 2a:	49 39 34 c6          	cmp    %rsi,(%r14,%rax,8) <-- trapping instruction
+  2e:	75 db                	jne    0xb
+  30:	48 83 c0 01          	add    $0x1,%rax
+  34:	48 39 c2             	cmp    %rax,%rdx
+  37:	75 ec                	jne    0x25
+  39:	48 8b 7c 24 28       	mov    0x28(%rsp),%rdi
+  3e:	48                   	rex.W
+  3f:	85                   	.byte 0x85
+
+
 ---
- Documentation/admin-guide/blockdev/zram.rst |  6 ++++++
- drivers/block/zram/zram_drv.c               | 10 ++++++----
- 2 files changed, 12 insertions(+), 4 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-index 3e11926a4df9..af1123bfaf92 100644
---- a/Documentation/admin-guide/blockdev/zram.rst
-+++ b/Documentation/admin-guide/blockdev/zram.rst
-@@ -343,6 +343,12 @@ Admin can request writeback of those idle pages at right timing via::
- 
- With the command, zram writeback idle pages from memory to the storage.
- 
-+Additionally, if a user choose to writeback only huge and idle pages
-+this can be accomplished with::
-+
-+        echo huge_idle > /sys/block/zramX/writeback
-+
-+
- If admin want to write a specific page in zram device to backing device,
- they could write a page index into the interface.
- 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index cb253d80d72b..f196902ae554 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -643,8 +643,8 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
- #define PAGE_WB_SIG "page_index="
- 
- #define PAGE_WRITEBACK 0
--#define HUGE_WRITEBACK 1
--#define IDLE_WRITEBACK 2
-+#define HUGE_WRITEBACK (1<<0)
-+#define IDLE_WRITEBACK (1<<1)
- 
- 
- static ssize_t writeback_store(struct device *dev,
-@@ -664,6 +664,8 @@ static ssize_t writeback_store(struct device *dev,
- 		mode = IDLE_WRITEBACK;
- 	else if (sysfs_streq(buf, "huge"))
- 		mode = HUGE_WRITEBACK;
-+	else if (sysfs_streq(buf, "huge_idle"))
-+		mode = IDLE_WRITEBACK | HUGE_WRITEBACK;
- 	else {
- 		if (strncmp(buf, PAGE_WB_SIG, sizeof(PAGE_WB_SIG) - 1))
- 			return -EINVAL;
-@@ -725,10 +727,10 @@ static ssize_t writeback_store(struct device *dev,
- 				zram_test_flag(zram, index, ZRAM_UNDER_WB))
- 			goto next;
- 
--		if (mode == IDLE_WRITEBACK &&
-+		if (mode & IDLE_WRITEBACK &&
- 			  !zram_test_flag(zram, index, ZRAM_IDLE))
- 			goto next;
--		if (mode == HUGE_WRITEBACK &&
-+		if (mode & HUGE_WRITEBACK &&
- 			  !zram_test_flag(zram, index, ZRAM_HUGE))
- 			goto next;
- 		/*
--- 
-2.35.1.894.gb6a874cedc-goog
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
