@@ -2,186 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0304EC433F5
-	for <linux-block@archiver.kernel.org>; Sun, 20 Mar 2022 12:05:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6020DC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 00:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245025AbiCTMG0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 20 Mar 2022 08:06:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40528 "EHLO
+        id S1343852AbiCUAXm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 20 Mar 2022 20:23:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245015AbiCTMGZ (ORCPT
+        with ESMTP id S234559AbiCUAXm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 20 Mar 2022 08:06:25 -0400
+        Sun, 20 Mar 2022 20:23:42 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A24ED37036
-        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 05:05:01 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 44C62D95C3
+        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 17:22:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647777900;
+        s=mimecast20190719; t=1647822137;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=dluyFNWHj0wdqGZD9WiZi8hb8qI80pWjkbX+xynrT7U=;
-        b=NatXzc0l1hN+DWDEjPhDLQWVCskvBWypGy0/f3JsM9la9Fem8I1WVXP33pw+FTDZ8EuMdk
-        ecThVAuHL7OiXJFuy4MV+aaotNm88zM6FWkAPaVh3A77efiyU6Zz2Qk1S062nUElNwFZ3i
-        XJRCrJqBaQxcHKASe9+UIymvmIj7i/Y=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=TwNDEBQSXgyzJrzHPsAGTVA2nojzVDJdIzMqJvcnmzs=;
+        b=NnKXEYRQplog5ImwXmgs7K7J9fqx7pJBUjczr4zZRCVx8JYbiGLBFix1walR4t5HynrW3R
+        OcA2sHh6FxUQ7TsZksWjv1Mk4N/R2CnXovpbRYXJvoLrrmu3DA6Zkk9YdLowivkv5sVwXi
+        DuoL226ntWElapWVrwZNS/qNNbyObLc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-77-YTYOgDvoMoeFTdAG7N3upA-1; Sun, 20 Mar 2022 08:04:59 -0400
-X-MC-Unique: YTYOgDvoMoeFTdAG7N3upA-1
-Received: by mail-ej1-f69.google.com with SMTP id m12-20020a1709062acc00b006cfc98179e2so5972596eje.6
-        for <linux-block@vger.kernel.org>; Sun, 20 Mar 2022 05:04:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=dluyFNWHj0wdqGZD9WiZi8hb8qI80pWjkbX+xynrT7U=;
-        b=Tc3ASDyqtdNLIthYvXOlFZplJP/4dKRKktUGw9eK7nxWA/qoiq9AVL3ELuRNFPzlBV
-         bbNjMFo4OkcMQXhzeLueLLRUC7F1egKMzp3u6tcIo7yMKEE9CBpgtpjrV1iKj+XEDZco
-         2JqD/KZX7L4wnPxdzIuShdhaJemK3h0FKgtmpFo9aBFGhmTIZOuFopnIEVpaUpk/WPbu
-         lhcmFsBZk2j9ND7POl20V6TvVkaDHRlGcn+rKSpYIB5KJr49E8tLFQ/0RK4h0FDXwShm
-         EzypBdXRYq75Br8gDbC+f01bwq/xiyUFJRX5PaqwOxU53ipLLipL0Y7dPOpJRZI/8WSI
-         Yf3A==
-X-Gm-Message-State: AOAM532Hjp4SP7cxNrWUi35F/R9Hbsxzs0Fi6NivJarUP/fKvwhnqvbu
-        uA5axmzBOssvlzc3QnKX4jV74a5RHlu3MHoB/nu+5MDwOnZwbXugI6gNwBVKFKkdx8WEXCXJlpa
-        mLSxuRIsSmoHEBb2b+0XoSfY=
-X-Received: by 2002:a05:6402:40c5:b0:418:e73c:a1ab with SMTP id z5-20020a05640240c500b00418e73ca1abmr18517074edb.52.1647777898142;
-        Sun, 20 Mar 2022 05:04:58 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfAQhzmlNy6q9yY+EnFX+2g1gYETe+axmQh3kzhVOc32at9/0TqUx+j50nzMAK4FS++1BWlA==
-X-Received: by 2002:a05:6402:40c5:b0:418:e73c:a1ab with SMTP id z5-20020a05640240c500b00418e73ca1abmr18517008edb.52.1647777897820;
-        Sun, 20 Mar 2022 05:04:57 -0700 (PDT)
-Received: from redhat.com ([2.55.132.0])
-        by smtp.gmail.com with ESMTPSA id 27-20020a17090600db00b006df6b34d9b8sm5854831eji.211.2022.03.20.05.04.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 20 Mar 2022 05:04:57 -0700 (PDT)
-Date:   Sun, 20 Mar 2022 08:04:48 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Leon Romanovsky <leon@kernel.org>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: Re: [PATCH 2/9] virtio_console: eliminate anonymous module_init &
- module_exit
-Message-ID: <20220320080438-mutt-send-email-mst@kernel.org>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-3-rdunlap@infradead.org>
+ us-mta-387-Sbp7BK2LN3q9N2Ru0XK1WA-1; Sun, 20 Mar 2022 20:22:13 -0400
+X-MC-Unique: Sbp7BK2LN3q9N2Ru0XK1WA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 87837185A79C;
+        Mon, 21 Mar 2022 00:22:13 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 670DF2026D60;
+        Mon, 21 Mar 2022 00:22:00 +0000 (UTC)
+Date:   Mon, 21 Mar 2022 08:21:50 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Eric Wheeler <linux-block@lists.ewheeler.net>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
+ completion.
+Message-ID: <YjfFHvTCENCC29WS@T590>
+References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220316192010.19001-3-rdunlap@infradead.org>
+In-Reply-To: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 12:20:03PM -0700, Randy Dunlap wrote:
-> Eliminate anonymous module_init() and module_exit(), which can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
+On Sat, Mar 19, 2022 at 10:14:29AM -0700, Eric Wheeler wrote:
+> Hello all,
 > 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
+> In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
+> it does not appear that lo_req_flush() does anything to make sure 
+> ki_complete has been called for pending work, it just calls vfs_fsync().
 > 
-> Example 1: (System.map)
->  ffffffff832fc78c t init
->  ffffffff832fc79e t init
->  ffffffff832fc8f8 t init
-> 
-> Example 2: (initcall_debug log)
->  calling  init+0x0/0x12 @ 1
->  initcall init+0x0/0x12 returned 0 after 15 usecs
->  calling  init+0x0/0x60 @ 1
->  initcall init+0x0/0x60 returned 0 after 2 usecs
->  calling  init+0x0/0x9a @ 1
->  initcall init+0x0/0x9a returned 0 after 74 usecs
-> 
-> Fixes: 31610434bc35 ("Virtio console driver")
-> Fixes: 7177876fea83 ("virtio: console: Add ability to remove module")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Amit Shah <amit@kernel.org>
-> Cc: virtualization@lists.linux-foundation.org
-> Cc: Arnd Bergmann <arnd@arndb.de>
-> Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Is this a consistency problem?
+
+No. What FLUSH command provides is just flushing cache in device side to
+storage medium, so it is nothing to do with pending request.
 
 
-If this is done tree-wide, it's ok to do it for virtio too.
-
-Acked-by: Michael S. Tsirkin <mst@redhat.com>
-
-No real opinion on whether it's a good idea.
-
-
-> ---
->  drivers/char/virtio_console.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> --- lnx-517-rc8.orig/drivers/char/virtio_console.c
-> +++ lnx-517-rc8/drivers/char/virtio_console.c
-> @@ -2245,7 +2245,7 @@ static struct virtio_driver virtio_rproc
->  	.remove =	virtcons_remove,
->  };
->  
-> -static int __init init(void)
-> +static int __init virtio_console_init(void)
->  {
->  	int err;
->  
-> @@ -2280,7 +2280,7 @@ free:
->  	return err;
->  }
->  
-> -static void __exit fini(void)
-> +static void __exit virtio_console_fini(void)
->  {
->  	reclaim_dma_bufs();
->  
-> @@ -2290,8 +2290,8 @@ static void __exit fini(void)
->  	class_destroy(pdrvdata.class);
->  	debugfs_remove_recursive(pdrvdata.debugfs_dir);
->  }
-> -module_init(init);
-> -module_exit(fini);
-> +module_init(virtio_console_init);
-> +module_exit(virtio_console_fini);
->  
->  MODULE_DESCRIPTION("Virtio console driver");
->  MODULE_LICENSE("GPL");
+Thanks, 
+Ming
 
