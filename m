@@ -2,120 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4464EC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 11:41:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67050C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 12:01:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237622AbiCULme (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 07:42:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42354 "EHLO
+        id S1346746AbiCUMDQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 08:03:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346173AbiCULmc (ORCPT
+        with ESMTP id S1347050AbiCUMDP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 07:42:32 -0400
+        Mon, 21 Mar 2022 08:03:15 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0E3ADDAFE9
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 04:41:07 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CD36C53E2F
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 05:01:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647862867;
+        s=mimecast20190719; t=1647864108;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=1ptvizDovPmtjs9XVYgTQTlGfG8IkPLM6FzokPxfJF4=;
-        b=XVtscEu4XEgpDxHme4fvh5AUz70Qt4kRoQf6q9qti/fZOx1LPWf48HidBMr73Gc12wt475
-        0/Xcs20yEk9IqorIfrbu8xC8KaVxeh/R2lybl9ilLbVngH5YDYvAe3SvrtzcQsDs+5hXdo
-        jHJW4V7WwXkaLNhDnpXtRNIFbx9NqZ8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=hjyieAFQj3bcVjxdPEDIjVTjL278YKH95kf+yFJHAWk=;
+        b=XkJGtS4eAvnKpNIaz8QX4XLpjNLeFWhPWGhL/JOamaVjjwehye3806k+MYCJrWratEPnEa
+        LyVJjd3lu9DdOcuWtCyrXhxDgOKA9EUQqna9c1nvchluMlIwQu89hbRUEw02SF4tdDIgqw
+        I3dLrcBpoVWGsfOb7mgku2bRCaVmmPM=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-135-I-wrUeCmMYa9uVc-plCmtQ-1; Mon, 21 Mar 2022 07:41:03 -0400
-X-MC-Unique: I-wrUeCmMYa9uVc-plCmtQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 53F4685A5BC;
-        Mon, 21 Mar 2022 11:41:03 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CEDD0C26E8E;
-        Mon, 21 Mar 2022 11:41:02 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-        Bikal Lem <gbikal+git@gmail.com>
-Subject: [PATCH] src/Makefile: re-add major version number to soname
-Date:   Mon, 21 Mar 2022 11:41:01 +0000
-Message-Id: <20220321114101.682270-1-stefanha@redhat.com>
+ us-mta-605-Gc-YAZZgOtODheWWLJZmdg-1; Mon, 21 Mar 2022 08:01:47 -0400
+X-MC-Unique: Gc-YAZZgOtODheWWLJZmdg-1
+Received: by mail-wr1-f69.google.com with SMTP id f18-20020adf9f52000000b00203d86759beso3027217wrg.11
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 05:01:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=hjyieAFQj3bcVjxdPEDIjVTjL278YKH95kf+yFJHAWk=;
+        b=BH7JHRle8tY2SXHas16TI5Hc3dHk2sWFUNZBt+QUThdMEXbamUnTtAm3Hgd3FTa+1J
+         uohT7S6kYuxoVdmoNcbrqUqvuhW1ytrmM0PSJIfCG94yUnvwDITvXFwJzZ5OWFGDAHCy
+         IiiSGfuQntfEUsjoGtdP0hj2P8ZpDjnEd/P4hziCcOM81mXgIY4Fs5osTIG3kFug7uy2
+         Ko0EIEISsjxlQ4RT1R+HcCbMlppB9nTnTDqhta9GqxkqkK725cIMQrhFh+t9QBZO46x0
+         bthHLL8ytdIZkVjn4ntYm1rR95DvZ5oIwZgsMc3tE3bxsVKYqcjjYSEHLweTdQEEISfF
+         OguA==
+X-Gm-Message-State: AOAM533+ollxf02BAIjqKqkneCRbOntpqL8mAV1kCYYyQh+NujDJ2v6c
+        L4EuBvKKrFZYRTh5DyaA381rdevME2cDosCPGiO+jtg9mqBCIW2Ig9ObW0syzyLcXFJo1gDO8+q
+        G6F4VWbcTB0GElsWTXfk9BwA=
+X-Received: by 2002:a5d:6405:0:b0:204:1ef:56e8 with SMTP id z5-20020a5d6405000000b0020401ef56e8mr8378175wru.677.1647864106165;
+        Mon, 21 Mar 2022 05:01:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwhZuEfJSaXjpaErJyh2L9DkMAaRb0WEaJXZhhj0Z+2/QVCT0rFeZuYjApA/Lz7WeWZRTfZiw==
+X-Received: by 2002:a5d:6405:0:b0:204:1ef:56e8 with SMTP id z5-20020a5d6405000000b0020401ef56e8mr8378159wru.677.1647864105940;
+        Mon, 21 Mar 2022 05:01:45 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c704:4900:849b:f76e:5e1f:ff95? (p200300cbc7044900849bf76e5e1fff95.dip0.t-ipconnect.de. [2003:cb:c704:4900:849b:f76e:5e1f:ff95])
+        by smtp.gmail.com with ESMTPSA id a1-20020a056000188100b002041a652dfdsm1639674wri.25.2022.03.21.05.01.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Mar 2022 05:01:45 -0700 (PDT)
+Message-ID: <a37e9ba2-354b-0b75-cb05-bc730cb30151@redhat.com>
+Date:   Mon, 21 Mar 2022 13:01:44 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [RFC 2/3] mm: export zap_page_range()
+Content-Language: en-US
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-mm@kvack.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, xuyu@linux.alibaba.com,
+        bostroesser@gmail.com
+References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
+ <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit c0b43df28a982747e081343f23289357ab4615db ("src/Makefile: use
-VERSION variable consistently") changed the library soname from
-liburing.so.2 to liburing.so.
+On 18.03.22 10:55, Xiaoguang Wang wrote:
+> Module target_core_user will use it to implement zero copy feature.
+> 
+> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+> ---
+>  mm/memory.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 1f745e4d11c2..9974d0406dad 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -1664,6 +1664,7 @@ void zap_page_range(struct vm_area_struct *vma, unsigned long start,
+>  	mmu_notifier_invalidate_range_end(&range);
+>  	tlb_finish_mmu(&tlb);
+>  }
+> +EXPORT_SYMBOL_GPL(zap_page_range);
+>  
+>  /**
+>   * zap_page_range_single - remove user pages in a given range
 
-The idea of soname is that executables linked against liburing.so.2
-continue to work with liburing.so.2.1, liburing.so.2.2, etc because the
-soname matches. They must not work against liburing.so.1 or
-liburing.so.3 though since those major versions are incompatible.
+To which VMAs will you be applying zap_page_range? I assume only to some
+special ones where you previously vm_insert_page(s)_mkspecial'ed pages,
+not to some otherwise random VMAs, correct?
 
-Dropping the major version makes the soname unversioned and executables
-will link against future liburing releases that are not compatible.
-
-Fix the soname compatibility problem by re-adding the major version
-number. Compute it from the VERSION value instead of hardcoding it in
-the Makefile.
-
-liburing 2.1:
-  $ readelf -a src/liburing.so.2.1 | grep SON
-   0x000000000000000e (SONAME)             Library soname: [liburing.so.2]
-
-commit c0b43df28a98:
-  $ readelf -a src/liburing.so.2.2 | grep SON
-   0x000000000000000e (SONAME)             Library soname: [liburing.so]
-
-With this fix:
-  $ readelf -a src/liburing.so.2.2 | grep SON
-   0x000000000000000e (SONAME)             Library soname: [liburing.so.2]
-
-Fixes: c0b43df28a982747e081343f23289357ab4615db ("src/Makefile: use VERSION variable consistently")
-Reported-by: Daniel P. Berrangé <berrange@redhat.com>
-Cc: Bikal Lem <gbikal+git@gmail.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- Makefile.common | 1 +
- src/Makefile    | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/Makefile.common b/Makefile.common
-index e7c9412..27fc233 100644
---- a/Makefile.common
-+++ b/Makefile.common
-@@ -2,4 +2,5 @@ TOP := $(dir $(CURDIR)/$(word $(words $(MAKEFILE_LIST)),$(MAKEFILE_LIST)))
- NAME=liburing
- SPECFILE=$(TOP)/$(NAME).spec
- VERSION=$(shell awk '/Version:/ { print $$2 }' $(SPECFILE))
-+VERSION_MAJOR=$(shell echo $(VERSION) | cut -d. -f1)
- TAG = $(NAME)-$(VERSION)
-diff --git a/src/Makefile b/src/Makefile
-index 0e04986..12cf49f 100644
---- a/src/Makefile
-+++ b/src/Makefile
-@@ -16,8 +16,8 @@ LINK_FLAGS=
- LINK_FLAGS+=$(LDFLAGS)
- ENABLE_SHARED ?= 1
- 
--soname=liburing.so
--libname=$(soname).$(VERSION)
-+soname=liburing.so.$(VERSION_MAJOR)
-+libname=liburing.so.$(VERSION)
- all_targets += liburing.a
- 
- ifeq ($(ENABLE_SHARED),1)
 -- 
-2.35.1
+Thanks,
+
+David / dhildenb
 
