@@ -2,136 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A41B2C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 20:37:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C2D8C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 21 Mar 2022 23:15:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351072AbiCUUjB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 16:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36166 "EHLO
+        id S231322AbiCUXQx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 19:16:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351883AbiCUUjA (ORCPT
+        with ESMTP id S232316AbiCUXQf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 16:39:00 -0400
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD36A173374
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 13:37:33 -0700 (PDT)
-Received: by mail-il1-f200.google.com with SMTP id m3-20020a056e02158300b002b6e3d1f97cso8064706ilu.19
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 13:37:33 -0700 (PDT)
+        Mon, 21 Mar 2022 19:16:35 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6116E287;
+        Mon, 21 Mar 2022 16:04:51 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id o3-20020a17090a3d4300b001c6bc749227so622393pjf.1;
+        Mon, 21 Mar 2022 16:04:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=G7jMixt6b3OD+MuuupnMNeSqFlpF3eH8Wb+10CWse58=;
+        b=c/GhpERwWgOUyotaWXt3IX8NNAUnZG3abweOaWHFJXQMr5D08GbkkDm+p5BPq7smAt
+         rRyU/37PLJs1BoTkWveaY2r4ixixGCp3FHDojfssZcHoCJQR5QL6ezn5lDEHseLrHp8V
+         VZzg6rf9EpVXaKpw9V7DBGj8S+h4C9u+FtHvtnSfgSdx8jmlOt9TZwYolDbjk8IbJpvQ
+         kkP+Fy6hosnuDr5McMcS9ewZ/S1TEwa9ywHfy8AyLbWLIOSPMcCIKogcx0XXuIObxW0k
+         0jTmHp89Ny3QQaRBPs8Vh4wHUxCzz8YJfe2uksDapZzwU2iafneVkKWeLZmn22D+3QRO
+         8ALQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=SUwtGSAW8MMzqRMHGMLu+LQIXzYxE9UsH0DlufN6LeU=;
-        b=CvB2oV6cdH8xlrkBUHOtisr5PYuTtrwMbaR+FR4pnBNv2sAf7MPM4z4cZfTEthyS0D
-         ZL0epngl9tmzIzbDmsYDo5L0t+bSmdbAz3XIqjBPSw2tZ8vLBrzQFX4E6hjzLTJtWLqu
-         YAOXGjO8ZH3akvcA7/N+P3E0ee2pai6nspaUBdbNHSN1YPTTELu15F9qb2k2xWQUOHDi
-         dzewGt2JF5Aqq+4UjJ0Vy5JQxSUGyRiISSUy3Dkf0IQsm51XJxWQUtre9JddYt4gTTXa
-         UhLTjNmdjXHdz+TxPkQfen8Oa2FfOSFOLdonTVhYPkHfhk0VOdM+6iwHfAJaORwtYYN2
-         scLQ==
-X-Gm-Message-State: AOAM532cSGoQhJcGyc5JxhF3M7ekTMNsueT9UY64+E0Wopq2Y8dhgUcm
-        DOLhovNKnZ3I2TyLnLj3gNnAZMSpjJkcYJUrxEY+x0GQkhEg
-X-Google-Smtp-Source: ABdhPJwKTDzyXORVwoKfIj+AtNMIGVq2e/lKaKXQhn+gh8RogL9w1Z6Eaua0SIjw8/7Q4P/D64l7R6CLqB+u1eZUhMRKngWlKXjs
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=G7jMixt6b3OD+MuuupnMNeSqFlpF3eH8Wb+10CWse58=;
+        b=pX/UDvy8QpDdOSeuSqE1jhR6/KAxXqSkHxwD7cFJaMzRhaqRRHzleSKkJoJVTiWOlr
+         BOp/nvcn64suvIBidDkQDXnxx9BNHmjlAUDewfnBFb9PFhtPKGT3YMStqT+1kPVfIZsw
+         dCPJCNrE/ijsNkClEy8Cq0wrZaLKYIlcHYOdqe21KPhd45o5tvv6H1Sl/3Gx3JOgR/v6
+         zdf+BtK3gzbgA/tht7DL7mOgYpbIbPFLMeRPpdS2up0HHSAKhmKVe2rFNAfiQO2tU6hr
+         50CjuB69aifnIGNVYoxktkn3AcgSpwoTUzMLkrjmA1w/cpiytYgKevtC7+j2xaW6fJuA
+         HaLg==
+X-Gm-Message-State: AOAM531nLiwYnjcNhT6aDfznVXphzDgMUznmfD5mMq/mDzAqZ6nkTRNz
+        ns6XuRNv68+sy1CikuusKMc=
+X-Google-Smtp-Source: ABdhPJzHx2j4/gUSvgpsWO4s5x+rir2NZ9b3fHiwscgWR7iKd2BJplomhH8zi0yvqOArOWOC83yRkA==
+X-Received: by 2002:a17:902:ab41:b0:153:2c4b:4eee with SMTP id ij1-20020a170902ab4100b001532c4b4eeemr15562810plb.48.1647903886856;
+        Mon, 21 Mar 2022 16:04:46 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
+        by smtp.gmail.com with ESMTPSA id cd20-20020a056a00421400b004fa7d1b35b6sm10343972pfb.80.2022.03.21.16.04.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Mar 2022 16:04:46 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 21 Mar 2022 13:04:45 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>
+Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
+Message-ID: <YjkEjYVjLuo8imtn@slm.duckdns.org>
+References: <e0a0bc94-e6de-b0e5-ee46-a76cd1570ea6@I-love.SAKURA.ne.jp>
+ <YjNHzyTFHjh9v6k4@dschatzberg-fedora-PC0Y6AEN.dhcp.thefacebook.com>
+ <5542ef88-dcc9-0db5-7f01-ad5779d9bc07@I-love.SAKURA.ne.jp>
+ <YjS+Jr6QudSKMSGy@slm.duckdns.org>
+ <61f41e56-3650-f0fc-9ef5-7e19fe84e6b7@I-love.SAKURA.ne.jp>
+ <YjiuGnLVjj0Ouxtd@slm.duckdns.org>
+ <886dee4b-ea74-a352-c9bf-cac16acffaa9@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:148d:b0:2c8:a1a:ab98 with SMTP id
- n13-20020a056e02148d00b002c80a1aab98mr6684829ilk.194.1647895053265; Mon, 21
- Mar 2022 13:37:33 -0700 (PDT)
-Date:   Mon, 21 Mar 2022 13:37:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000046f08405dac07714@google.com>
-Subject: [syzbot] WARNING in blk_release_queue
-From:   syzbot <syzbot+bd9d63403ded496c6d3c@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <886dee4b-ea74-a352-c9bf-cac16acffaa9@I-love.SAKURA.ne.jp>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hello,
 
-syzbot found the following issue on:
+On Tue, Mar 22, 2022 at 07:53:49AM +0900, Tetsuo Handa wrote:
+> On 2022/03/22 1:55, Tejun Heo wrote:
+> > No, just fix the abusers. There are four abusers in the kernel and they
+> > aren't difficult to fix.
+> 
+> So, are you expecting that a change shown below happens, by adding WQ_MEM_RECLAIM
+> flag to all WQs which may hit "workqueue: WQ_MEM_RECLAIM %s:%ps is flushing
+> !WQ_MEM_RECLAIM %s:%ps" warning? Otherwise, __WQ_LEGACY flag will continue
+> serving as a hack for suppressing this warning.
 
-HEAD commit:    f9006d9269ea Add linux-next specific files for 20220321
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1768caeb700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c1619ffa2b0259a1
-dashboard link: https://syzkaller.appspot.com/bug?extid=bd9d63403ded496c6d3c
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+If you convert them to all of them in the flush chain to use
+alloc_workqueue() w/ MEM_RECLAIM, the warning will go away.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+>  #define create_workqueue(name)						\
+> -	alloc_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM, 1, (name))
+> +	alloc_workqueue("%s", WQ_MEM_RECLAIM, 1, (name))
+>  #define create_freezable_workqueue(name)				\
+> -	alloc_workqueue("%s", __WQ_LEGACY | WQ_FREEZABLE | WQ_UNBOUND |	\
+> +	alloc_workqueue("%s", WQ_FREEZABLE | WQ_UNBOUND |	\
+>  			WQ_MEM_RECLAIM, 1, (name))
+>  #define create_singlethread_workqueue(name)				\
+> -	alloc_ordered_workqueue("%s", __WQ_LEGACY | WQ_MEM_RECLAIM, name)
+> +	alloc_ordered_workqueue("%s", WQ_MEM_RECLAIM, name)
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bd9d63403ded496c6d3c@syzkaller.appspotmail.com
+But why are you dropping the flag from their intended users?
 
-------------[ cut here ]------------
-do not call blocking ops when !TASK_RUNNING; state=2 set at [<ffffffff815a3faa>] prepare_to_wait_exclusive+0x7a/0x2b0 kernel/sched/wait.c:286
-WARNING: CPU: 1 PID: 5480 at kernel/sched/core.c:9689 __might_sleep+0x105/0x150 kernel/sched/core.c:9689
-Modules linked in:
-CPU: 1 PID: 5480 Comm: syz-executor.3 Tainted: G        W         5.17.0-next-20220321-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:__might_sleep+0x105/0x150 kernel/sched/core.c:9689
-Code: 70 02 00 48 8d bb f8 16 00 00 48 89 fa 48 c1 ea 03 80 3c 02 00 75 34 48 8b 93 f8 16 00 00 48 c7 c7 60 dc cb 89 e8 67 74 c8 07 <0f> 0b e9 75 ff ff ff e8 4f 37 73 00 e9 26 ff ff ff 89 34 24 e8 52
-RSP: 0018:ffffc900001e0d88 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff88801c178000 RCX: 0000000000000000
-RDX: ffff88801c178000 RSI: ffffffff815fc918 RDI: fffff5200003c1a3
-RBP: ffffffff8a2485c0 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff815f72de R11: 0000000000000000 R12: 00000000000002fe
-R13: 0000000000000000 R14: ffffffff8a2489c0 R15: 0000000000000000
-FS:  00007f37479ec700(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002000c000 CR3: 000000007c560000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- blk_release_queue+0x1f/0x320 block/blk-sysfs.c:766
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- blkg_free.part.0+0x112/0x1f0 block/blk-cgroup.c:86
- blkg_free block/blk-cgroup.c:78 [inline]
- __blkg_release+0x105/0x160 block/blk-cgroup.c:102
- rcu_do_batch kernel/rcu/tree.c:2535 [inline]
- rcu_core+0x7b1/0x1880 kernel/rcu/tree.c:2786
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- do_softirq.part.0+0xde/0x130 kernel/softirq.c:459
- </IRQ>
- <TASK>
- do_softirq kernel/softirq.c:451 [inline]
- __local_bh_enable_ip+0x102/0x120 kernel/softirq.c:383
- spin_unlock_bh include/linux/spinlock.h:399 [inline]
- __lock_sock+0x138/0x260 net/core/sock.c:2769
- lock_sock_nested+0xd6/0xf0 net/core/sock.c:3317
- lock_sock include/net/sock.h:1682 [inline]
- sk_wait_data+0x20a/0x450 net/core/sock.c:2836
- tcp_recvmsg_locked+0xe28/0x1fd0 net/ipv4/tcp.c:2459
- tcp_recvmsg+0x137/0x610 net/ipv4/tcp.c:2574
- inet_recvmsg+0x11b/0x5e0 net/ipv4/af_inet.c:850
- sock_recvmsg_nosec net/socket.c:948 [inline]
- sock_recvmsg net/socket.c:966 [inline]
- sock_recvmsg net/socket.c:962 [inline]
- ____sys_recvmsg+0x2c4/0x600 net/socket.c:2632
- ___sys_recvmsg+0x127/0x200 net/socket.c:2674
- __sys_recvmsg+0xe2/0x1a0 net/socket.c:2704
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0x80 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7f3746889049
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f37479ec168 EFLAGS: 00000246 ORIG_RAX: 000000000000002f
-RAX: ffffffffffffffda RBX: 00007f374699c030 RCX: 00007f3746889049
-RDX: 0000000000000100 RSI: 0000000020001500 RDI: 0000000000000003
-RBP: 00007f37468e308d R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffd774bdcef R14: 00007f37479ec300 R15: 0000000000022000
- </TASK>
+Thanks.
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+-- 
+tejun
