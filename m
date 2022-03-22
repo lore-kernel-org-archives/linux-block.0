@@ -2,78 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54E8DC43219
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 14:26:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D8BC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 14:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237710AbiCVO14 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 10:27:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35334 "EHLO
+        id S233957AbiCVOcl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 10:32:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240316AbiCVOZc (ORCPT
+        with ESMTP id S231888AbiCVOck (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 10:25:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8A5D89336
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 07:21:12 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 526D161677
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 14:21:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C77DC340EC;
-        Tue, 22 Mar 2022 14:21:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1647958871;
-        bh=txgtubzGy2YJGb38zTZrSN3pOik458Vk300gTIDwqnk=;
-        h=From:To:Cc:Subject:Date:From;
-        b=AzTIk4BYTOdbBYGkIo9rtjdijcBFHK6onxL4MqDTufqE59tEjk+XXna5yYbfIQsz4
-         LAAxy4DxTlcbGFJo+fn96+9vTJpS2Z9ij/IL9seeR9zJjTzptNE8sYH1xYu3Ng1hAr
-         FVpMsLbY6aJdnCQf6HNnvbO63XDrJLNdQ65uwDWZO2DFagtKVYsZxUrNcnx43hymIV
-         b1q5l/U0RFJjVj6OvVMoR0pTBArUgbBi2ipTO2eN+TU0W4yfveBy9x0cMjQb1x42pF
-         ASeWCaaQtQBUwF++IW/TsPW2FYpbf9uJM2bCJ87R0eNQgnJ8c1T+SdL6tBG0tW+oU4
-         zlyl5UX7GenzQ==
-From:   kbusch@kernel.org
-To:     linux-block@vger.kernel.org, axboe@kernel.dk
-Cc:     ebiggers@kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: [PATCH] crytpo: fix crc64 testmgr digest byte order
-Date:   Tue, 22 Mar 2022 08:21:07 -0600
-Message-Id: <20220322142107.4581-1-kbusch@kernel.org>
-X-Mailer: git-send-email 2.17.2
+        Tue, 22 Mar 2022 10:32:40 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 930DF6A033
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 07:31:09 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id q11so20377345iod.6
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 07:31:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=t05Th32JwFDrspvfCaVps5qrLbDP0ziOmcXOCj+YI1c=;
+        b=e/h6mYvfKkqxTpmfWQ4Yuch+bsPz50kWhMGT4l/YW+ZUMSiC+HAxDHyDfiQRoIWlLg
+         XbsiamVpeAR6paILZHVtuwl4io+JDT/UTXpJx/ifbxA5FgCuChqbwLGjhB+VwNaODHwh
+         C68qtxVrNwkTrUt0pLGYK9bCod8NIgLD/Hr3HZq7UVe4ZVf0DxY3aGTw4oF+9ltL2/eJ
+         kveQWUYXUt7108qSTWcXa74azYygc/kfmFDJXzVPl3HJkp4Pe07AQBxg6uFTUwZIB5cQ
+         jDLv6gFYA01yyocGVKhCzzl662QwDOFJfc0JSOByck06+rZeIV5/tnD3FJhXPdkgRt8s
+         EYFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=t05Th32JwFDrspvfCaVps5qrLbDP0ziOmcXOCj+YI1c=;
+        b=R8ruiXRXUu+lpQY3CiPfeVUcwMymWhQg4QwqeIrrE2ZobfrML+ku8AhPogQEjgGiYP
+         DoNvzDSU6B4pEL1r15XDWQOIliQeieUbtjnqvDAz2ndPE+I3XAmoWCZv7m6vbp290zks
+         TMrJ7Hlh7F/fU6m0awZZ7WSf/lEnSkpovUPsTObhA4UlQPuTCkBGY0PTw+Mm6H8z/x/w
+         vDRh4R2ut2acn2sDhln/D4mJc5Xu1EkKvGXbH3r/8vxyEtpY8kPAf7upImHQ2J99uFBL
+         xVpqfjmoZDg6vWg5ftt2wGg2iqbiY8vhtUWB0s2/nDjfrNe/i7YsEPvCbcsDivetlEaF
+         iFJw==
+X-Gm-Message-State: AOAM533rIRUGDXs+fFYpWyS84R5sJHq2O1K1sn+tqJQ18ZY/zT9EgXxP
+        bG2zaKVWjA8js399OJK4kUVgx7ElkokwsSUj
+X-Google-Smtp-Source: ABdhPJyL05WI+j4IktJzVYTnog/rwnAH3sVPkcM+bD/hYlkNZ9jNT1Im0yNBjJJS3zyQCWcJBHeHrw==
+X-Received: by 2002:a05:6602:1541:b0:649:94e:3cf7 with SMTP id h1-20020a056602154100b00649094e3cf7mr12679902iow.10.1647959468866;
+        Tue, 22 Mar 2022 07:31:08 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id b1-20020a926701000000b002c25d28d378sm10625894ilc.71.2022.03.22.07.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 07:31:08 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     kbusch@kernel.org, linux-block@vger.kernel.org
+Cc:     ebiggers@kernel.org
+In-Reply-To: <20220322142107.4581-1-kbusch@kernel.org>
+References: <20220322142107.4581-1-kbusch@kernel.org>
+Subject: Re: [PATCH] crytpo: fix crc64 testmgr digest byte order
+Message-Id: <164795946811.117115.14257315669178285596.b4-ty@kernel.dk>
+Date:   Tue, 22 Mar 2022 08:31:08 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On Tue, 22 Mar 2022 08:21:07 -0600, kbusch@kernel.org wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> The result is set in little endian, so the expected digest needs to
+> be consistent for big endian machines.
+> 
+> 
 
-The result is set in little endian, so the expected digest needs to
-be consistent for big endian machines.
+Applied, thanks!
 
-Fixes: commit f3813f4b287e4 ("crypto: add rocksoft 64b crc guard tag framework")
-Reported-by: Vasily Gorbik <gor@linux.ibm.com>
-Reported-by: Corentin Labbe <clabbe.montjoie@gmail.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- crypto/testmgr.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+[1/1] crytpo: fix crc64 testmgr digest byte order
+      commit: c30cf83999ad58135fa01fbf9f2b15ce15b5cc4a
 
-diff --git a/crypto/testmgr.h b/crypto/testmgr.h
-index f1a22794c404..59919a636508 100644
---- a/crypto/testmgr.h
-+++ b/crypto/testmgr.h
-@@ -3686,11 +3686,11 @@ static const struct hash_testvec crc64_rocksoft_tv_template[] = {
- 	{
- 		.plaintext	= zeroes,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0x6482d367eb22b64eull },
-+		.digest         = "\x4e\xb6\x22\xeb\x67\xd3\x82\x64",
- 	}, {
- 		.plaintext	= ones,
- 		.psize		= 4096,
--		.digest		= (u8 *)(u64[]){ 0xc0ddba7302eca3acull },
-+		.digest         = "\xac\xa3\xec\x02\x73\xba\xdd\xc0",
- 	}
- };
- 
+Best regards,
 -- 
-2.17.2
+Jens Axboe
+
 
