@@ -2,148 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0820C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 21:58:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17654C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 22:00:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237241AbiCVV74 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 17:59:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35024 "EHLO
+        id S230388AbiCVWBl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 18:01:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237219AbiCVV7z (ORCPT
+        with ESMTP id S230328AbiCVWBk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 17:59:55 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D54BC9FF7
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 14:58:25 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x127-20020a25e085000000b0063372775c9aso15469571ybg.17
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 14:58:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=qCgb1rQ2NSk0/+tpvGzgIXhekPoKGmbH5RRhGZElgeQ=;
-        b=AC4IZ0WRGywgszT2I5C1P7dkLhuWoxBlmhwDw53CtgGHdsX1XZuBCegossGZ4XTGVh
-         6S4N4oQaQdhlMdrBCgGhf4lQ2pnJagMl/jGZztRvWWHTymvbJJJFcyQHhAndqjxSU3Wk
-         fXrGZdl1QEPw7YKhm+mCPGOHOwyW2uHeZOQtvP+gyGxAXBXjzJtdTcL+0tE6ySD0c7P/
-         8zdQ56X4s24Fz+wk+QFGQo/Z3kT50NzTGZjZ66ukn/OHGkR3IiwQZDXADaAJ1HcxiCt1
-         vjA2m00j2/b1z8aBVM7zJbifXusEo/fG0mt3Lfj5NmfV4twBUoUpDVdv+deCPPlfE1j9
-         IkVw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=qCgb1rQ2NSk0/+tpvGzgIXhekPoKGmbH5RRhGZElgeQ=;
-        b=7tI0B0N9Ft2cK5hh92DON3IMdyGVSoE+DoL8HCsHy/imGQCNU199FUCJd5CZSZuY81
-         e1VwGxJMVhjLVbQ/Xlx/9vTikvMSZeSSE6cG6DCdMWJ9boUCMqmOiGKcj2B5uu51w0g1
-         tYE8yRjS3GrqaYSXuA2Viw+HyZzQkDh227Ij+DW1PPE0tgpKkK2yZHe757haToGrIm/l
-         duOaEsw6tXYXXHbmuT/uKCh2xSyM2zVeT83n2JsCicSnIX96jonbdyST7K6eCMcgvUmh
-         TfrpJtV2cled8os89/rCseUy2i/EWbKp80olP9y3MzbkioKl5RA2mRwWL3ohddYTSuHe
-         o2ow==
-X-Gm-Message-State: AOAM5329JnT+SGdnNtjFxcACnZRh47dHiCBaAOEe/dDtr9nomBmdc/ZL
-        SLtIrxJIt683wFpqeKZvQpScRS3UC9iM
-X-Google-Smtp-Source: ABdhPJyTdOXDPQvbHdvKPmPexGJUYUoBc9yHFZ2ap2avIfYjKIg2RKMrG2cddv1xdLke9d6CIuYnATU3Fcja
-X-Received: from bg.sfo.corp.google.com ([2620:15c:11a:202:49:910f:4d0:9fd7])
- (user=bgeffon job=sendgmr) by 2002:a05:6902:c8:b0:633:ee0c:bca2 with SMTP id
- i8-20020a05690200c800b00633ee0cbca2mr14920563ybs.82.1647986305071; Tue, 22
- Mar 2022 14:58:25 -0700 (PDT)
-Date:   Tue, 22 Mar 2022 14:58:21 -0700
-In-Reply-To: <20220315172221.9522-1-bgeffon@google.com>
-Message-Id: <20220322215821.1196994-1-bgeffon@google.com>
-Mime-Version: 1.0
-References: <20220315172221.9522-1-bgeffon@google.com>
-X-Mailer: git-send-email 2.35.1.1021.g381101b075-goog
-Subject: [PATCH v2] zram: Add a huge_idle writeback mode
-From:   Brian Geffon <bgeffon@google.com>
-To:     Andrew Morton <akpm@linux-foundation.org>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, Brian Geffon <bgeffon@google.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 22 Mar 2022 18:01:40 -0400
+Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A0D85DE9F;
+        Tue, 22 Mar 2022 15:00:12 -0700 (PDT)
+Received: from dread.disaster.area (pa49-186-150-27.pa.vic.optusnet.com.au [49.186.150.27])
+        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id B6CFA5339C5;
+        Wed, 23 Mar 2022 09:00:10 +1100 (AEDT)
+Received: from dave by dread.disaster.area with local (Exim 4.92.3)
+        (envelope-from <david@fromorbit.com>)
+        id 1nWmXv-008fmY-6S; Wed, 23 Mar 2022 09:00:07 +1100
+Date:   Wed, 23 Mar 2022 09:00:07 +1100
+From:   Dave Chinner <david@fromorbit.com>
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Dan Schatzberg <schatzberg.dan@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-xfs <linux-xfs@vger.kernel.org>
+Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
+Message-ID: <20220322220007.GQ1544202@dread.disaster.area>
+References: <5542ef88-dcc9-0db5-7f01-ad5779d9bc07@I-love.SAKURA.ne.jp>
+ <YjS+Jr6QudSKMSGy@slm.duckdns.org>
+ <61f41e56-3650-f0fc-9ef5-7e19fe84e6b7@I-love.SAKURA.ne.jp>
+ <YjiuGnLVjj0Ouxtd@slm.duckdns.org>
+ <886dee4b-ea74-a352-c9bf-cac16acffaa9@I-love.SAKURA.ne.jp>
+ <YjkEjYVjLuo8imtn@slm.duckdns.org>
+ <1c455861-3b42-c530-a99e-cce13e932f53@I-love.SAKURA.ne.jp>
+ <YjkJ3S/1c8PxiA2Q@slm.duckdns.org>
+ <2ce1e26c-9050-9a4d-03b1-fb6ad57a5ccf@I-love.SAKURA.ne.jp>
+ <Yjn+vpHZzvxiAUaK@slm.duckdns.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yjn+vpHZzvxiAUaK@slm.duckdns.org>
+X-Optus-CM-Score: 0
+X-Optus-CM-Analysis: v=2.4 cv=deDjYVbe c=1 sm=1 tr=0 ts=623a46ec
+        a=sPqof0Mm7fxWrhYUF33ZaQ==:117 a=sPqof0Mm7fxWrhYUF33ZaQ==:17
+        a=kj9zAlcOel0A:10 a=o8Y5sQTvuykA:10 a=7-415B0cAAAA:8
+        a=EANVev_lTrBuq7RzdLAA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Today it's only possible to write back as a page, idle, or huge.
-A user might want to writeback pages which are huge and idle first
-as these idle pages do not require decompression and make a good
-first pass for writeback.
+On Tue, Mar 22, 2022 at 06:52:14AM -1000, Tejun Heo wrote:
+> Hello,
+> 
+> On Tue, Mar 22, 2022 at 09:09:53AM +0900, Tetsuo Handa wrote:
+> > > The legacy flushing warning is telling us that those workqueues can be
+> > 
+> > s/can be/must be/ ?
+> 
+> Well, one thing that we can but don't want to do is converting all
+> create_workqueue() users to alloc_workqueue() with MEM_RECLAIM, which is
+> wasteful but won't break anything. We know for sure that the workqueues
+> which trigger the legacy warning are participating in memory reclaim and
+> thus need MEM_RECLAIM. So, yeah, the warning tells us that they need
+> MEM_RECLAIM and should be converted.
+> 
+> > ? Current /* internal: create*_workqueue() */ tells me nothing.
+> 
+> It's trying to say that it shouldn't be used outside workqueue proper and
+> the warning message is supposed to trigger the conversion. But, yeah, a
+> stronger comment can help.
+> 
+> > My question is: I want to add WQ_MEM_RECLAIM flag to the WQ used by loop module
+> > because this WQ is involved upon writeback operation. But unless I add both
+> > __WQ_LEGACY | WQ_MEM_RECLAIM flags to the WQ used by loop module, we will hit
+> > 
+> > 	WARN_ONCE(worker && ((worker->current_pwq->wq->flags &
+> > 			      (WQ_MEM_RECLAIM | __WQ_LEGACY)) == WQ_MEM_RECLAIM),
+> > 
+> > warning because e.g. xfs-sync WQ used by xfs module is not using WQ_MEM_RECLAIM flag.
+> > 
+> > 	mp->m_sync_workqueue = alloc_workqueue("xfs-sync/%s",
+> > 				XFS_WQFLAGS(WQ_FREEZABLE), 0, mp->m_super->s_id);
+> > 
+> > You are suggesting that the correct approach is to add WQ_MEM_RECLAIM flag to WQs
+> > used by filesystems when adding WQ_MEM_RECLAIM flag to the WQ used by loop module
+> > introduces possibility of hitting
+> > 
+> > 	WARN_ONCE(worker && ((worker->current_pwq->wq->flags &
+> > 			      (WQ_MEM_RECLAIM | __WQ_LEGACY)) == WQ_MEM_RECLAIM),
+> > 
+> > warning (instead of either adding __WQ_LEGACY | WQ_MEM_RECLAIM flags to the WQ used
+> > by loop module or giving up WQ_MEM_RECLAIM flag for the WQ used by loop module),
+> > correct?
+> 
+> Yeah, you detected multiple issues at the same time. xfs sync is
+> participating in memory reclaim
 
-Idle writeback specifically has the advantage that a refault is
-unlikely given that the page has been swapped for some amount of
-time without being refaulted.
+No it isn't. What makes you think it is part of memory reclaim?
 
-Huge writeback has the advantage that you're guaranteed to get
-the maximum benefit from a single page writeback, that is, you're
-reclaiming one full page of memory. Pages which are compressed in
-zram being written back result in some benefit which is always
-less than a page size because of the fact that it was compressed.
+The xfs-sync workqueue exists solely to perform async flushes of
+dirty data at ENOSPC via sync_inodes_sb() because we can't call
+sync_inodes_sb directly in the context that hit ENOSPC due to locks
+and transaction contexts held. The paths that need this are
+buffered writes and file create (on disk inode allocation), neither
+of which are in the the memory reclaim path, either.
 
-The primary use of this is for minimizing refaults in situations
-where the device has to be sensitive to storage endurance. On
-ChromeOS we have devices with slow eMMC and repeated writes and
-refaults can negatively affect performance and endurance.
+So this work has nothing to do with memory reclaim, and as such it's
+not tagged with WQ_MEM_RECLAIM.
 
-Signed-off-by: Brian Geffon <bgeffon@google.com>
-Acked-by: Minchan Kim <minchan@kernel.org>
----
- Documentation/admin-guide/blockdev/zram.rst |  5 +++++
- drivers/block/zram/zram_drv.c               | 10 ++++++----
- 2 files changed, 11 insertions(+), 4 deletions(-)
+Cheers,
 
-diff --git a/Documentation/admin-guide/blockdev/zram.rst b/Documentation/admin-guide/blockdev/zram.rst
-index 54fe63745ed8..c73b16930449 100644
---- a/Documentation/admin-guide/blockdev/zram.rst
-+++ b/Documentation/admin-guide/blockdev/zram.rst
-@@ -343,6 +343,11 @@ Admin can request writeback of those idle pages at right timing via::
- 
- With the command, zram will writeback idle pages from memory to the storage.
- 
-+Additionally, if a user choose to writeback only huge and idle pages
-+this can be accomplished with::
-+
-+        echo huge_idle > /sys/block/zramX/writeback
-+
- If an admin wants to write a specific page in zram device to the backing device,
- they could write a page index into the interface.
- 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index e9474b02012d..8562a7cce558 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -639,8 +639,8 @@ static int read_from_bdev_async(struct zram *zram, struct bio_vec *bvec,
- #define PAGE_WB_SIG "page_index="
- 
- #define PAGE_WRITEBACK 0
--#define HUGE_WRITEBACK 1
--#define IDLE_WRITEBACK 2
-+#define HUGE_WRITEBACK (1<<0)
-+#define IDLE_WRITEBACK (1<<1)
- 
- 
- static ssize_t writeback_store(struct device *dev,
-@@ -660,6 +660,8 @@ static ssize_t writeback_store(struct device *dev,
- 		mode = IDLE_WRITEBACK;
- 	else if (sysfs_streq(buf, "huge"))
- 		mode = HUGE_WRITEBACK;
-+	else if (sysfs_streq(buf, "huge_idle"))
-+		mode = IDLE_WRITEBACK | HUGE_WRITEBACK;
- 	else {
- 		if (strncmp(buf, PAGE_WB_SIG, sizeof(PAGE_WB_SIG) - 1))
- 			return -EINVAL;
-@@ -721,10 +723,10 @@ static ssize_t writeback_store(struct device *dev,
- 				zram_test_flag(zram, index, ZRAM_UNDER_WB))
- 			goto next;
- 
--		if (mode == IDLE_WRITEBACK &&
-+		if (mode & IDLE_WRITEBACK &&
- 			  !zram_test_flag(zram, index, ZRAM_IDLE))
- 			goto next;
--		if (mode == HUGE_WRITEBACK &&
-+		if (mode & HUGE_WRITEBACK &&
- 			  !zram_test_flag(zram, index, ZRAM_HUGE))
- 			goto next;
- 		/*
+Dave.
 -- 
-2.35.1.894.gb6a874cedc-goog
-
+Dave Chinner
+david@fromorbit.com
