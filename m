@@ -2,152 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3ABB2C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 13:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D545C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 13:28:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235262AbiCVNSl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 09:18:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60094 "EHLO
+        id S235570AbiCVN3a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 09:29:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38624 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233647AbiCVNSl (ORCPT
+        with ESMTP id S235554AbiCVN33 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 09:18:41 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07CF263BF4;
-        Tue, 22 Mar 2022 06:17:12 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R921e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0V7wMyaL_1647955029;
-Received: from 30.225.28.195(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0V7wMyaL_1647955029)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 22 Mar 2022 21:17:10 +0800
-Message-ID: <36b5a8e5-c8e9-6a1f-834c-6bf9bf920f4c@linux.alibaba.com>
-Date:   Tue, 22 Mar 2022 21:17:07 +0800
+        Tue, 22 Mar 2022 09:29:29 -0400
+Received: from mail-qv1-xf2c.google.com (mail-qv1-xf2c.google.com [IPv6:2607:f8b0:4864:20::f2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C472CCBA
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 06:28:00 -0700 (PDT)
+Received: by mail-qv1-xf2c.google.com with SMTP id gi14so2807633qvb.0
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 06:28:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cmpxchg-org.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=F6f3afV4tqtncF73mZhO2dGGO3BMaajonDRieyQCctk=;
+        b=Bkl2XAz6E8KGmYNmKGhq2KqHYHZulnIzry2lGn5C0jSspo+Oj1bGpBF7hRebnGm1ro
+         gUxe+Z1iIWvYN+soEo1YYLxJG0AYb1JzTDdMxHFwPfhu0vJQahs6KAl0X7HZSZS+HGDZ
+         RQDPlBS0zxYVzblUj9IltsrR2Q6xsv+HbHSAQ2OpYkQoN3c/TpI4QY7FrS3Du1MHHEk5
+         xMfrQmvwR2JNO29BzZ8MWEOTFEeSFqDOO0eN+AdmssOkpO6tMjoKKPv58LWUzBYWJKw3
+         RHopVEXO8j8Xl/DZZKB7zfPr67zMIlXhVKSZSmK8BDrnpRnukEMqe55+Sqz+ojEx9aW0
+         wyGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=F6f3afV4tqtncF73mZhO2dGGO3BMaajonDRieyQCctk=;
+        b=ymPyzdk33i7dY43iC0FSA9AGmJ5qTDFlvrlDztfraHywsLR3SGmUk+1VIoPKuQAmR7
+         BG+9i/DxODCt2zjJYbHLu1bkJsvUeU7IHjnasoSZh7Mk9KGqu0U8/jrPPzIKxIbKyL+3
+         qfraAg/fgpTIqG3J0HW7xOjTp7LWobWiO2mgxjrZgK/X60a/693mib4xPqoPVaYjLiPT
+         i5ZSq0OO9K8Ry+4GZTwYxQrR8D2qCe3apc7EpxMyYW6dgw11UxxaPfJ+PIXZFO82F+wY
+         mk3/D8BGi1618isBSi6VAoPAYAjjKjLdANCZv4puHn+pskM3qdrRNPXHTiYpQivV0YoG
+         Cypg==
+X-Gm-Message-State: AOAM531B5b7PYmzb1k4QTL45pbnjLEef6oT3zopC6USKW+iaps/5TF4e
+        4mXiJE1VH7KqhKX8iy+wJBHL6Px9AsTcTw==
+X-Google-Smtp-Source: ABdhPJxyu3mAkevGNq3TrkT+TrWR/F8CTnpZC9QiUtL8T0XWIE+cAVlAe4rnnsYArb7XiDZ32JeJUQ==
+X-Received: by 2002:a0c:fc46:0:b0:440:f78f:f4c4 with SMTP id w6-20020a0cfc46000000b00440f78ff4c4mr16130924qvp.108.1647955679440;
+        Tue, 22 Mar 2022 06:27:59 -0700 (PDT)
+Received: from localhost (cpe-98-15-154-102.hvc.res.rr.com. [98.15.154.102])
+        by smtp.gmail.com with ESMTPSA id l126-20020a37bb84000000b0067b3c2bcc0dsm9349493qkf.1.2022.03.22.06.27.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 06:27:59 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 09:27:58 -0400
+From:   Johannes Weiner <hannes@cmpxchg.org>
+To:     CGEL <cgel.zte@gmail.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
+        Yang Yang <yang.yang29@zte.com.cn>,
+        Ran Xiaokai <ran.xiaokai@zte.com.cn>
+Subject: Re: [PATCH] block/psi: make PSI annotations of submit_bio only work
+ for file pages
+Message-ID: <YjnO3p6vvAjeMCFC@cmpxchg.org>
+References: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
+ <YjiMsGoXoDU+FwsS@cmpxchg.org>
+ <623938d1.1c69fb81.52716.030f@mx.google.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [RFC 0/3] Add zero copy feature for tcmu
-Content-Language: en-US
-To:     Bodo Stroesser <bostroesser@gmail.com>, linux-mm@kvack.org,
-        target-devel@vger.kernel.org, linux-scsi@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, xuyu@linux.alibaba.com
-References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
- <abbe51c4-873f-e96e-d421-85906689a55a@gmail.com>
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-In-Reply-To: <abbe51c4-873f-e96e-d421-85906689a55a@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <623938d1.1c69fb81.52716.030f@mx.google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hi,
+On Tue, Mar 22, 2022 at 02:47:42AM +0000, CGEL wrote:
+> On Mon, Mar 21, 2022 at 10:33:20AM -0400, Johannes Weiner wrote:
+> > On Wed, Mar 16, 2022 at 06:39:28AM +0000, cgel.zte@gmail.com wrote:
+> > > From: Yang Yang <yang.yang29@zte.com.cn>
+> > > 
+> > > psi tracks the time spent on submitting the IO of refaulting file pages
+> > > and anonymous pages[1]. But after we tracks refaulting anonymous pages
+> > > in swap_readpage[2][3], there is no need to track refaulting anonymous
+> > > pages in submit_bio.
+> > > 
+> > > So this patch can reduce redundant calling of psi_memstall_enter. And
+> > > make it easier to track refaulting file pages and anonymous pages
+> > > separately.
+> > 
+> > I don't think this is an improvement.
+> > 
+> > psi_memstall_enter() will check current->in_memstall once, detect the
+> > nested call, and bail. Your patch checks PageSwapBacked for every page
+> > being added. It's more branches for less robust code.
+> 
+> We are also working for a new patch to classify different reasons cause
+> psi_memstall_enter(): reclaim, thrashing, compact, etc. This will help
+> user to tuning sysctl, for example, if user see high compact delay, he
+> may try do adjust THP sysctl to reduce the compact delay.
+> 
+> To support that, we should distinguish what's the reason cause psi in
+> submit_io(), this patch does the job.
 
-> On 18.03.22 10:55, Xiaoguang Wang wrote:
->> The core idea to implement tcmu zero copy feature is really straight,
->> which just maps block device io request's sgl pages to tcmu user space
->> backstore, then we can avoid extra copy overhead between sgl pages and
->> tcmu internal data area(which really impacts io throughput), please see
->> https://www.spinics.net/lists/target-devel/msg21121.html for detailed
->> info.
->>
->
-> Can you please tell us, how big the performance improvement is and
-> which configuration you are using for measurenments?
-Sorry, I should have attached test results here. Initially I tried to use
-tcmu user:fbo backstore to evaluate performance improvements, but
-it only shows about 10%~15% io throughput improvement. Fio config
-is numjobs=1, iodepth=8, bs=256k, which isn't very impressive. The
-reason is that user:fbo backstore does buffered reads, it consumes most
-of cpu.
-
-Then I test this zero copy feature for our real workload, whose backstore
-is a network program visiting distributed file system and it's 
-multi-threaded.
-For 4 job, 8 depth, 256 kb io size, the write throughput improves from
-3.6GB/s to 10GB/s.
-
-Regards,
-Xiaoguang Wang
-
->
->> Initially I use remap_pfn_range or vm_insert_pages to map sgl pages to
->> user space, but both of them have limits:
->> 1)  Use vm_insert_pages
->> which is like tcp getsockopt(TCP_ZEROCOPY_RECEIVE), but there're two
->> restrictions:
->>    1. anonymous pages can not be mmaped to user spacea.
->>      ==> vm_insert_pages
->>      ====> insert_pages
->>      ======> insert_page_in_batch_locked
->>      ========> validate_page_before_insert
->>      In validate_page_before_insert(), it shows that anonymous page 
->> can not
->>      be mapped to use space, we know that if issuing direct io to block
->>      device, io request's sgl pages mostly comes from anonymous page.
->>          if (PageAnon(page) || PageSlab(page) || page_has_type(page))
->>              return -EINVAL;
->>      I'm not sure why there is such restriction? for safety reasons ?
->>
->>    2. warn_on triggered in __folio_mark_dirty
->>      When calling zap_page_range in tcmu user space backstore when io
->>      completes, there is a warn_on triggered in __folio_mark_dirty:
->>         if (folio->mapping) {   /* Race with truncate? */
->>             WARN_ON_ONCE(warn && !folio_test_uptodate(folio));
->>
->>      I'm not familiar with folio yet, but I think the reason is that 
->> when
->>      issuing a buffered read to tcmu block device, it's page cache 
->> mapped
->>      to user space, backstore write this page and pte will be 
->> dirtied. but
->>      initially it's newly allocated, hence page_update flag not set.
->>      In zap_pte_range(), there is such codes:
->>         if (!PageAnon(page)) {
->>             if (pte_dirty(ptent)) {
->>                 force_flush = 1;
->>                 set_page_dirty(page);
->>             }
->>     So this warn_on is reasonable.
->>     Indeed what I want is just to map io request sgl pages to tcmu user
->>     space backstore, then backstore can read or write data to mapped 
->> area,
->>     I don't want to care about page or its mapping status, so I 
->> choose to
->>     use remap_pfn_range.
->>
->> 2) Use remap_pfn_range()
->>    remap_pfn_range works well, but it has somewhat obvious overhead. 
->> For a
->>    512kb io request, it has 128 pages, and usually this 128 page's 
->> pfn are
->>    not consecutive, so in worst cases, for a 512kb io request, I'd 
->> need to
->>    issue 128 calls to remap_pfn_range, it's horrible. And in 
->> remap_pfn_range,
->>    if x86 page attribute table feature is enabled, lookup_memtype 
->> called by
->>    track_pfn_remap() also introduces obvious overhead.
->>
->> Finally in order to solve these problems, Xu Yu helps to implment a new
->> helper, which accepts an array of pages as parameter, anonymous pages 
->> can
->> be mapped to user space, pages would be treated as special 
->> pte(pte_special
->> returns true), so vm_normal_page returns NULL, above folio warn_on won't
->> trigger.
->>
->> Thanks.
->>
->> Xiaoguang Wang (2):
->>    mm: export zap_page_range()
->>    scsi: target: tcmu: Support zero copy
->>
->> Xu Yu (1):
->>    mm/memory.c: introduce vm_insert_page(s)_mkspecial
->>
->>   drivers/target/target_core_user.c | 257 
->> +++++++++++++++++++++++++++++++++-----
->>   include/linux/mm.h                |   2 +
->>   mm/memory.c                       | 183 +++++++++++++++++++++++++++
->>   3 files changed, 414 insertions(+), 28 deletions(-)
->>
-
+Please submit these patches together then. On its own, this patch
+isn't desirable.
