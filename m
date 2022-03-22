@@ -2,84 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58877C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 20:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3523C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 20:16:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232898AbiCVUNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 16:13:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60768 "EHLO
+        id S233181AbiCVURp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 16:17:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232900AbiCVUNO (ORCPT
+        with ESMTP id S229468AbiCVURo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 16:13:14 -0400
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3273765172
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 13:11:46 -0700 (PDT)
-Received: by mail-qk1-x731.google.com with SMTP id r127so14838611qke.13
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 13:11:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=v00bZ5/GrtJkHwEVsUd7zi7yA5VU4pS81+ixMGyiNzw=;
-        b=t+zVhg/8DWIoJ9+TtqA9MfYhQixNsuvDLGpv2FtmuHR13aC4IiMRykbt24V7fLjGf0
-         KIp2nF82eLjNJn28YsTWtPDfhcIaeQ4w21KrccvrBOa9CmL6MRroZq2Me3AE1FTNQVoA
-         UjWD1Wt+diwfRBF/jNshIDtN0nzoIK3pD2E1+x64Qn1Ct1NyY2TOlZNC0nDppzi2+MLT
-         +9j0GwAgchYoFywDRL4PUiopvWmZSd0jAPkFiglav9xAvzA6+mId1xcPZnVm8vfGicTp
-         cuUpL4VSxX0aN/KYHdyZjA4pBjttMlcN6fP50/DO/FAPZyZDsf8PwH+7JF3AGii+1ZL9
-         s5TQ==
+        Tue, 22 Mar 2022 16:17:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9E39F245B5
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 13:16:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1647980175;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SMIp8B08FhcwythTG96yiDlyPxpSOrWGy+SCbNXTRzE=;
+        b=QKYtm5cMvFXzRyponkxzJNZv6WTgd8CgK8VdDDpFKSZYz61M4Ko7WT/XZ2aM3FyOKBGMVB
+        fMjMdv3XLq43aGDRcMQHE4xSW4knompUueENxXsRbDaqz93WiKSWfwFjefUStcnXDJedZL
+        kmRFVH9Pcfp2BeqS/MDLrVioVl13dm8=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-126-8e7Vbiu0NjivuJOBHlkcnA-1; Tue, 22 Mar 2022 16:16:10 -0400
+X-MC-Unique: 8e7Vbiu0NjivuJOBHlkcnA-1
+Received: by mail-qt1-f199.google.com with SMTP id t19-20020ac86a13000000b002e1fd2c4ce5so9278356qtr.5
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 13:16:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=v00bZ5/GrtJkHwEVsUd7zi7yA5VU4pS81+ixMGyiNzw=;
-        b=y0Q6TjhldT/TWzEQ5BJRk5iPX6lhQvaBxugQOmpMYcyonPoDABj3YJEjUsZXlKSeTJ
-         VfAc5IaMh7leoConOKTx43wy4opU64f3KKDs9kpBNP5jYPLQ9IuAHZrdgEvy5QE15EY+
-         PjY6ZFLijN+IEl3AfUyyZBKQN3P8LgBAKw4QvdAnmfiYXvnvHtpS5Kp9nf2uINoVmOVf
-         NBw9mGKVOJnGmylfKl8mvThUKgUsMxEuPRS5H5/BjK/YjNefxy/zkabvifU1rY3ezUZg
-         2FMjW5UgcV+vl5wNGUBsKF3KUBfLtSppk2YKnFh5zyGy9w8zIqW5fBYOXIhgmna3aRPO
-         wi9w==
-X-Gm-Message-State: AOAM532ZFv7o52mb0psEjD3TU2WFWSF66a9ugo/ciggf0ufX8JA6R2Dj
-        6oOQ+6ZclQwmgvoBFnT0xDZbqg==
-X-Google-Smtp-Source: ABdhPJw2EzkiZtzBMvlZNpbdB92S79Fvr6YfPQrZJ+/2xT2gVC35TkQhMhJqaM4L+dUFXDBlTAKjmg==
-X-Received: by 2002:a05:620a:200f:b0:67b:3fb7:8784 with SMTP id c15-20020a05620a200f00b0067b3fb78784mr16519494qka.336.1647979905206;
-        Tue, 22 Mar 2022 13:11:45 -0700 (PDT)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id a16-20020a05622a02d000b002e20e4bf4aesm7517324qtx.23.2022.03.22.13.11.44
+        bh=SMIp8B08FhcwythTG96yiDlyPxpSOrWGy+SCbNXTRzE=;
+        b=RowPTWiLiSJWxY656sGBiKktK50vNeRxS+jmjj4gs1Vhllt81bjujyQOlruyBRYusV
+         v680RmoEPz1UOl11R208RDOHAZnxecnLxwIWcA7YMxgRNwk4/jG9lclJVkyrpfh3FvaC
+         9qv27QG4Sw9RulT0QDC6SfJ+Heo61Xd+3Xs9d82lpRHm+MvoNMj3ABS5QDpc+JxEbepr
+         w6xfHNqqQeDh+Sbnh96I/t7MKRxFO9aIEVkra7F7n2aNeYcQHGrWBfhUMdh7k4dfmRK1
+         PBhw5AyOHhNWqmHreK6ijaBr+OxDN5lPpdTTfS3CUznmOd8NVsn384ustEQ/ZMuGDpyS
+         T8Wg==
+X-Gm-Message-State: AOAM531zHa32B5tyNXuKz7QzVdTdyqWTcDgApXv8jkI8CiTpTZ0fOUAe
+        xclpofX+v8oGgS1ia0c/X9QAy3dYfLrpQ6jv8YRX0/H4FZTeKh4bGh9Qa4Gfq3Ztd0I+JTe5VNM
+        Ll+SE2rf53Pax/FxST3Orog==
+X-Received: by 2002:a37:a709:0:b0:67b:2dcc:d5dd with SMTP id q9-20020a37a709000000b0067b2dccd5ddmr16435884qke.597.1647980169558;
+        Tue, 22 Mar 2022 13:16:09 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzy4M1xgu67X23+CzQE3qXZ4axFIbR/sutU3hs8It5LtcZhX/53Fs9XBKlHWYcaLv5svtBBsQ==
+X-Received: by 2002:a37:a709:0:b0:67b:2dcc:d5dd with SMTP id q9-20020a37a709000000b0067b2dccd5ddmr16435868qke.597.1647980169349;
+        Tue, 22 Mar 2022 13:16:09 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id bp31-20020a05622a1b9f00b002e21e80ecd8sm2736443qtb.45.2022.03.22.13.16.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 13:11:44 -0700 (PDT)
-Date:   Tue, 22 Mar 2022 16:11:38 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     Xie Yongji <xieyongji@bytedance.com>
-Cc:     axboe@kernel.dk, bvanassche@acm.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
-Message-ID: <YjotekJZcSvwoZhp@localhost.localdomain>
-References: <20211227091241.103-1-xieyongji@bytedance.com>
+        Tue, 22 Mar 2022 13:16:08 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 16:16:07 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, ming.lei@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: allow BIOSET_PERCPU_CACHE use from
+ bio_alloc_clone
+Message-ID: <Yjouh9C7MaVrTnLh@redhat.com>
+References: <20220322194927.42778-1-snitzer@kernel.org>
+ <20220322194927.42778-2-snitzer@kernel.org>
+ <20220322195414.GA8650@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211227091241.103-1-xieyongji@bytedance.com>
+In-Reply-To: <20220322195414.GA8650@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
-> The rescuer thread might take over the works queued on
-> the workqueue when the worker thread creation timed out.
-> If this happens, we have no chance to create multiple
-> recv threads which causes I/O hung on this nbd device.
+On Tue, Mar 22 2022 at  3:54P -0400,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> On Tue, Mar 22, 2022 at 03:49:25PM -0400, Mike Snitzer wrote:
+> > -	bio = bio_alloc_bioset(bdev, 0, bio_src->bi_opf, gfp, bs);
+> > +	if (bs->cache && bio_src->bi_opf & REQ_POLLED)
+> > +		bio = bio_alloc_percpu_cache(bdev, 0, bio_src->bi_opf, gfp, bs);
+> > +	else
 > 
-> To fix it, we can not simply remove the WQ_MEM_RECLAIM
-> flag since the recv work is in the memory reclaim path.
-> So this patch tries to create kthreads directly to
-> handle the recv work instead of using workqueue.
+> I don't think we can just unconditionally do this based on REQ_POLLED.
+> We'd either need a flag for bio_alloc_bioset or (probably better)
+> a separate interface.
 > 
 
-I still don't understand why we can't drop WQ_MEM_RECLAIM.  IIRC your argument
-is that we need it because a reconnect could happen under memory pressure and we
-need to be able to queue work for that.  However your code makes it so we're
-just doing a kthread_create(), which isn't coming out of some emergency pool, so
-it's just as likely to fail as a !WQ_MEM_RECLAIM workqueue.  Thanks,
+I did initially think it worthwhile to push the use of
+bio_alloc_percpu_cache() down to bio_alloc_bioset() rather than
+bio_alloc_clone() -- but I started slower with more targetted change
+for DM's needs.
 
-Josef
+And yeah, since there isn't a REQ_ flag equivalent for IOCB_ALLOC_CACHE
+(other than just allowing all REQ_POLLED access) there isn't a
+meaningful way to limit access to the bioset's percpu cache.
+
+Curious: how do bio_alloc_kiocb() callers know when it appropriate to
+set IOCB_ALLOC_CACHE or not?  Seems io_uring is only one and it
+unilaterally does:
+kiocb->ki_flags |= IOCB_HIPRI | IOCB_ALLOC_CACHE;
+
+So like IOCB_HIPRI maps to REQ_POLL, should IOCB_ALLOC_CACHE map to
+REQ_ALLOC_CACHE? Or better name?
+
+Open to further suggestions on which way to go with these details.
+
+Thanks,
+Mike
+
