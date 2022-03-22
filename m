@@ -2,127 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8484C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 01:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63200C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 02:01:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235220AbiCVB6H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 21 Mar 2022 21:58:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34770 "EHLO
+        id S235307AbiCVCDM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 21 Mar 2022 22:03:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54012 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235261AbiCVB6G (ORCPT
+        with ESMTP id S235295AbiCVCDL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 21 Mar 2022 21:58:06 -0400
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B54037BFB
-        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 18:56:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1647914200; x=1679450200;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ulc+oGET9j6DNlpWj/HczbXJfqJE/opE8gnWWtf+C1Y=;
-  b=ieJHwQPoeQuko778Bpd9LlEqoOYzy06cZVvNtsc7Vj1JucErs1excKAk
-   CVi5LQ296ChTQWZ8tVJvLz4VzV/rgmwxTlBe99Z6f7pt+u9C2cwcfTreS
-   A3KmICh3VWYxLyaxuXqlakVfhWiSX2kI4teuVo128u3xjkvRLLmBGCufT
-   Xh3K00Sdrhag7JXXl4ijVFEPJwnv9qc1CiQ42qx9EA6jiGbsuQon+g698
-   OaPxvwxXvEqXlAawRwj0FjxogLwstZsKML6l75YmEhQ9rWnKeILG4lOB8
-   qYCVbvy5o8JRCbfBI9giIP1rPbc0jFS9ptcA6cxOL1Dt1NrgEDiRlvPP3
-   Q==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10293"; a="239855254"
-X-IronPort-AV: E=Sophos;i="5.90,200,1643702400"; 
-   d="scan'208";a="239855254"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2022 18:56:39 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.90,200,1643702400"; 
-   d="scan'208";a="716723862"
-Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 21 Mar 2022 18:56:37 -0700
-Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1nWTlE-000ILI-LX; Tue, 22 Mar 2022 01:56:36 +0000
-Date:   Tue, 22 Mar 2022 09:56:31 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>, mst@redhat.com,
-        jasowang@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
-        mgurtovoy@nvidia.com
-Cc:     kbuild-all@lists.01.org, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: Re: [PATCH v2 1/2] virtio-blk: support polling I/O
-Message-ID: <202203220946.YKj9GuI8-lkp@intel.com>
-References: <20220321142441.132888-2-suwan.kim027@gmail.com>
+        Mon, 21 Mar 2022 22:03:11 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDDAE765A1
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 19:01:22 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id mp6-20020a17090b190600b001c6841b8a52so1085804pjb.5
+        for <linux-block@vger.kernel.org>; Mon, 21 Mar 2022 19:01:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=ZBO+N7zoUM4gDOQ0yx3biP9Qz4QBn61Ix+9+pIvZ9Zo=;
+        b=kMtzp7UGiNnCZrIRX+6DrQnnikhlYMVVPm8fANQ3wWG8BEARuXSPsjYzD0mV8BGl9o
+         AYR6ryQRQdZTDOfeYyPzvC1mvxS93YnslUstw1q6Ha45+nx3HjhPU/wTb4uIo5BTeCgL
+         c4QI0L5h5oJmXddI5OCpIBYhrvQJJesnyGGNfARGdNSisczH9JzBTWTCk2FCG01hE/fk
+         upjHisj7DiNAI5iyHYSs6hBtw6g3qamotY1Nd80XJhlFpbK4H2QKljHaelcgoP+9lWfy
+         +YbdRZ55XfbjvpGAnfXQ9JHJtlb6nOPtNlZwAZC/Roycl2djwPTHXlKy40VXYzZdc782
+         mpoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ZBO+N7zoUM4gDOQ0yx3biP9Qz4QBn61Ix+9+pIvZ9Zo=;
+        b=dbUTXp+J7ygkTp5xML40Bplz20mqwy+j+d+wVDOJOgURVDg0vml4uXgjli1QoBY6zD
+         fWPe19SzUDYI8I60daK9RTLJnamCeVRgCds9uQ1oL03/a+B5XR8a2PaShFqSp5ovI4If
+         3RwiL2us1incPsXgygMFazYJRX7awUayRJ2xNwglvc6Dr89WRSt64JDDJwpyRx640jcy
+         79UvN52BQQ5ln6pLryCFv8CB+1I5POkJshToFMFyd+0o2wPDFQJC/0IjMNByxCZ008KA
+         lbDpL05SRrwihRoWIYQN3iXfLYHRx49nc8rIZqEReop1YO5yZjMYRiOZoXSSaCR8TBlK
+         d6SA==
+X-Gm-Message-State: AOAM531khqTUQZTz9DM0x4RLA9MDQU+djZTIHhu4+snlNZBAQrWOqVyh
+        i7zThdiA2Ssdpy78ARw+zWpGKQ==
+X-Google-Smtp-Source: ABdhPJxEcKX03HpD8he6/N/6lmGw8Ux4jkEF+dlcEtPobUzrHGes92lxQ7HNMRXChIE8/CiTjTR+fw==
+X-Received: by 2002:a17:902:bf06:b0:14d:8c72:96c6 with SMTP id bi6-20020a170902bf0600b0014d8c7296c6mr15687811plb.156.1647914482140;
+        Mon, 21 Mar 2022 19:01:22 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p17-20020a056a000b5100b004fa6304632esm15468388pfo.66.2022.03.21.19.01.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 21 Mar 2022 19:01:21 -0700 (PDT)
+Message-ID: <9e78f4fb-f7c4-3f4f-cac1-40d4ee9455d5@kernel.dk>
+Date:   Mon, 21 Mar 2022 20:01:20 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220321142441.132888-2-suwan.kim027@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] lib/sbitmap: allocate sb->map via kvzalloc_node
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, "Ewan D . Milne" <emilne@redhat.com>
+References: <20220316012708.354668-1-ming.lei@redhat.com>
+ <YjkXenfaI7iSewSC@T590>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YjkXenfaI7iSewSC@T590>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Suwan,
+On 3/21/22 6:25 PM, Ming Lei wrote:
+> Hello,
+> 
+> On Wed, Mar 16, 2022 at 09:27:08AM +0800, Ming Lei wrote:
+>> sbitmap has been used in scsi for replacing atomic operations on
+>> sdev->device_busy, so IOPS on some fast scsi storage can be improved.
+>>
+>> However, sdev->device_busy can be changed in fast path, so we have to
+>> allocate the sb->map statically. sdev->device_busy has been capped to 1024,
+>> but some drivers may configure the default depth as < 8, then
+>> cause each sbitmap word to hold only one bit. Finally 1024 * 128(
+>> sizeof(sbitmap_word)) bytes is needed for sb->map, given it is order 5
+>> allocation, sometimes it may fail.
+>>
+>> Avoid the issue by using kvzalloc_node() for allocating sb->map.
+>>
+>> Cc: Ewan D. Milne <emilne@redhat.com>
+>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> 
+> Ping...
 
-Thank you for the patch! Perhaps something to improve:
-
-[auto build test WARNING on v5.17]
-[also build test WARNING on next-20220321]
-[cannot apply to axboe-block/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Suwan-Kim/virtio-blk-support-polling-I-O-and-mq_ops-queue_rqs/20220321-223027
-base:    f443e374ae131c168a065ea1748feac6b2e76613
-config: x86_64-rhel-8.3-kselftests (https://download.01.org/0day-ci/archive/20220322/202203220946.YKj9GuI8-lkp@intel.com/config)
-compiler: gcc-9 (Ubuntu 9.4.0-1ubuntu1~20.04) 9.4.0
-reproduce:
-        # apt-get install sparse
-        # sparse version: v0.6.4-dirty
-        # https://github.com/0day-ci/linux/commit/5388c0729248236712cf865643a2190989dabbb5
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Suwan-Kim/virtio-blk-support-polling-I-O-and-mq_ops-queue_rqs/20220321-223027
-        git checkout 5388c0729248236712cf865643a2190989dabbb5
-        # save the config file to linux build tree
-        mkdir build_dir
-        make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/block/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-
-sparse warnings: (new ones prefixed by >>)
->> drivers/block/virtio_blk.c:803:66: sparse: sparse: incorrect type in argument 3 (different base types) @@     expected int ioerror @@     got restricted blk_status_t @@
-   drivers/block/virtio_blk.c:803:66: sparse:     expected int ioerror
-   drivers/block/virtio_blk.c:803:66: sparse:     got restricted blk_status_t
-
-vim +803 drivers/block/virtio_blk.c
-
-   788	
-   789	static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
-   790	{
-   791		struct virtio_blk_vq *vq = hctx->driver_data;
-   792		struct virtblk_req *vbr;
-   793		unsigned long flags;
-   794		unsigned int len;
-   795		int found = 0;
-   796	
-   797		spin_lock_irqsave(&vq->lock, flags);
-   798	
-   799		while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
-   800			struct request *req = blk_mq_rq_from_pdu(vbr);
-   801	
-   802			found++;
- > 803			if (!blk_mq_add_to_batch(req, iob, virtblk_result(vbr),
-   804							virtblk_complete_batch))
-   805				blk_mq_complete_request(req);
-   806		}
-   807	
-   808		spin_unlock_irqrestore(&vq->lock, flags);
-   809	
-   810		return found;
-   811	}
-   812	
+Was waiting on a response to the question on why we don't make this
+dependent on size, but upon look at kvzalloc_node(), this is already
+what it does. So I guess this looks fine to me too.
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Jens Axboe
+
