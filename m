@@ -2,102 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F2D0C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 10:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 389BDC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 10:45:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231874AbiCVKZS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 06:25:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48354 "EHLO
+        id S232231AbiCVKrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 06:47:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232053AbiCVKZP (ORCPT
+        with ESMTP id S230082AbiCVKrK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 06:25:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id F28521277F
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 03:23:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647944628;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=h2SF0iSQFgUmlddp/pafkRXpPNV0Sazq6IX6L9LQLhc=;
-        b=dXjxEan/SRvu0QiNuJMRgq6O/9vmFhdARcKxU1IPFMi0JooLd/1nWyIfBtuhZyKboc5O+f
-        JOlXn0K69rztEYFOccExYuTN5tNwHYu8sfVipmFckbsRxX9sKZfPfncpHgkfSCGAUPxDbS
-        My2U+Cv3QIDT+TLQ4bAOZgP9MF0kspQ=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-569-Tds3AznoOIS0_lFcaJDdkw-1; Tue, 22 Mar 2022 06:23:44 -0400
-X-MC-Unique: Tds3AznoOIS0_lFcaJDdkw-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4F6653803913;
-        Tue, 22 Mar 2022 10:23:44 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3681DC26E9A;
-        Tue, 22 Mar 2022 10:23:39 +0000 (UTC)
-Date:   Tue, 22 Mar 2022 18:23:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Tejun Heo <tj@kernel.org>, Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH 2/3] block: let blkcg_gq grab request queue's refcnt
-Message-ID: <YjmjplwpQpkOlimQ@T590>
-References: <20220318130144.1066064-1-ming.lei@redhat.com>
- <20220318130144.1066064-3-ming.lei@redhat.com>
- <20220322093322.GA27283@lst.de>
+        Tue, 22 Mar 2022 06:47:10 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97A3912752;
+        Tue, 22 Mar 2022 03:45:42 -0700 (PDT)
+Received: from fraeml704-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KN7PY4fsNz67Q1X;
+        Tue, 22 Mar 2022 18:43:29 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml704-chm.china.huawei.com (10.206.15.53) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2375.24; Tue, 22 Mar 2022 11:45:39 +0100
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Tue, 22 Mar 2022 10:45:36 +0000
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
+        <bvanassche@acm.org>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <hch@lst.de>, <ming.lei@redhat.com>,
+        <hare@suse.de>
+CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <dm-devel@redhat.com>,
+        <beanhuo@micron.com>, John Garry <john.garry@huawei.com>
+Subject: [PATCH RFC 00/11] blk-mq/libata/scsi: SCSI driver tagging improvements
+Date:   Tue, 22 Mar 2022 18:39:34 +0800
+Message-ID: <1647945585-197349-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220322093322.GA27283@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 10:33:22AM +0100, Christoph Hellwig wrote:
-> On Fri, Mar 18, 2022 at 09:01:43PM +0800, Ming Lei wrote:
-> > In the whole lifetime of blkcg_gq instance, ->q will be referred, such
-> > as, ->pd_free_fn() is called in blkg_free, and throtl_pd_free() still
-> > may touch the request queue via &tg->service_queue.pending_timer which
-> > is handled by throtl_pending_timer_fn(), so it is reasonable to grab
-> > request queue's refcnt by blkcg_gq instance.
-> > 
-> > Previously blkcg_exit_queue() is called from blk_release_queue, and it
-> > is hard to avoid the use-after-free. But recently commit 1059699f87eb ("block:
-> > move blkcg initialization/destroy into disk allocation/release handler")
-> > is merged to for-5.18/block, it becomes simple to fix the issue by simply
-> > grabbing request queue's refcnt.
-> > 
-> > Reported-by: Christoph Hellwig <hch@lst.de>
-> > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > ---
-> >  block/blk-cgroup.c | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> > 
-> > diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> > index fa063c6c0338..d53b0d69dd73 100644
-> > --- a/block/blk-cgroup.c
-> > +++ b/block/blk-cgroup.c
-> > @@ -82,6 +82,8 @@ static void blkg_free(struct blkcg_gq *blkg)
-> >  		if (blkg->pd[i])
-> >  			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
-> >  
-> > +	if (blkg->q)
-> > +		blk_put_queue(blkg->q);
-> 
-> blkg_free can be called from RCU context, while blk_put_queue must
-> not be called from RCU context.  This causes regular splats when running
-> xfstests like:
+Currently SCSI low-level drivers are required to manage tags for commands
+which do not come via the block layer - libata internal commands would be
+an example of one of these.
 
-Thanks for the report.
+There was some work to provide "reserved commands" support in such series
+as https://lore.kernel.org/linux-scsi/20211125151048.103910-1-hare@suse.de/
 
-One solution is to delay 'blk_put_queue(blkg->q)' and 'kfree(blkg)'
-into one work function by reusing blkg->async_bio_work as release_work.
+This was based on allocating a request for the lifetime of the "internal"
+command.
 
-I will prepare one patch for addressing the issue.
+This series tries to solve that problem by not just allocating the request
+but also sending it through the block layer, that being the normal flow
+for a request. We need to do this as we may only poll completion of
+requests through the block layer, so would need to do this for poll queue
+support.
 
-Thanks,
-Ming
+There is still scope to allocate commands just to get a tag as token as
+that may suit some other scenarios, but it's not what we do here.
+
+This series extends blk-mq to support a request queue having a custom set
+of ops. In addition SCSI core code adds support for these type of requests.
+
+This series does not include SCSI core handling for enabling reserved
+tags per tagset, but that would be easy to add.
+
+Based on mkp-scsi 5.18/scsi-staging @ 66daf3e6b993 
+
+Please consider as an RFC for now. I think that the libata change has the
+largest scope for improvement...
+
+John Garry (11):
+  blk-mq: Add blk_mq_init_queue_ops()
+  scsi: core: Add SUBMITTED_BY_SCSI_CUSTOM_OPS
+  libata: Send internal commands through the block layer
+  scsi: libsas: Send SMP commands through the block layer
+  scsi: libsas: Send TMF commands through the block layer
+  scsi: core: Add scsi_alloc_request_hwq()
+  scsi: libsas: Send internal abort commands through the block layer
+  scsi: libsas: Change ATA support to deal with each qc having a SCSI
+    command
+  scsi: libsas: Add sas_task_to_unique_tag()
+  scsi: libsas: Add sas_task_to_hwq()
+  scsi: hisi_sas: Remove private tag management
+
+ block/blk-mq.c                         |  23 +++-
+ drivers/ata/libata-core.c              | 121 +++++++++++++------
+ drivers/md/dm-rq.c                     |   2 +-
+ drivers/scsi/hisi_sas/hisi_sas_main.c  |  66 +----------
+ drivers/scsi/hisi_sas/hisi_sas_v2_hw.c |   3 +-
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |   3 +-
+ drivers/scsi/libsas/sas_ata.c          |  11 +-
+ drivers/scsi/libsas/sas_expander.c     |  38 ++++--
+ drivers/scsi/libsas/sas_internal.h     |   1 +
+ drivers/scsi/libsas/sas_scsi_host.c    | 153 ++++++++++++++++++++-----
+ drivers/scsi/scsi_lib.c                |  14 +++
+ include/linux/blk-mq.h                 |   5 +-
+ include/scsi/libsas.h                  |   4 +-
+ include/scsi/scsi_cmnd.h               |   4 +
+ 14 files changed, 298 insertions(+), 150 deletions(-)
+
+-- 
+2.26.2
 
