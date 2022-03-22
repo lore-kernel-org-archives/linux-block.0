@@ -2,66 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C23C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 19:49:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 139C1C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 19:49:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232025AbiCVTvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 15:51:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60510 "EHLO
+        id S231959AbiCVTvH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 15:51:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231959AbiCVTvD (ORCPT
+        with ESMTP id S231986AbiCVTvG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 15:51:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5485550469
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:35 -0700 (PDT)
+        Tue, 22 Mar 2022 15:51:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9602850B3D
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647978574;
+        s=mimecast20190719; t=1647978577;
         h=from:from:sender:sender:reply-to:subject:subject:date:date:
          message-id:message-id:to:to:cc:cc:in-reply-to:in-reply-to:
-         references:references; bh=1NTHYZkzBmaMh1ItKjSkJntcIn8iIb3p4X2tzJvZIko=;
-        b=VZzS77FxDjqEVD9cckUmdpzJm6zgdOIkiiQZbJyIhr4ylM0TpFQ9cZIFmcScvy7JKIGxNe
-        Hm9ehvj66X3iI56xWu3b7AATJg7Xal+QVLevBNTi/u1Y4mDQUGJRprw1adVAxY0u9pThvc
-        5jlw9NUmoUE+bknawkL7y82UuI8kK9o=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+         references:references; bh=CUK36jS7t3ES+pLUUL+mUYA6t3/aGv0zfagQFWZKaXc=;
+        b=VbYu36Op4MRg+gN6mblyonlisZID25cBGOLaDOSc4PqttroMWktliZiFOHX3M9i+OAcMUx
+        kyATOr5uupCph87/ObiKHyGp2zIQEE8+qNc8s07+6b4lafO2/x/8YwiAkbEUfzB1FnA8hp
+        SQTmGyOJHRZucpXVtU/AHYGwzwszeW8=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-lDnC8VkEP16kkEQTd803uQ-1; Tue, 22 Mar 2022 15:49:31 -0400
-X-MC-Unique: lDnC8VkEP16kkEQTd803uQ-1
-Received: by mail-qt1-f198.google.com with SMTP id p6-20020a05622a00c600b002e1cb9508e8so12336253qtw.20
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:31 -0700 (PDT)
+ us-mta-623-wtEUbN5LNIK7SQYa8VH-7w-1; Tue, 22 Mar 2022 15:49:34 -0400
+X-MC-Unique: wtEUbN5LNIK7SQYa8VH-7w-1
+Received: by mail-qk1-f200.google.com with SMTP id 195-20020a3707cc000000b0067b0c849285so12510431qkh.5
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
          :in-reply-to:references;
-        bh=1NTHYZkzBmaMh1ItKjSkJntcIn8iIb3p4X2tzJvZIko=;
-        b=BqbupsSBPqPWP/rmLuTRwY0JKN+SxFmcGqxLq6cNGAEdJz550UJJxZAeNfwwmeHBlQ
-         BJPr1MFQm4lwWCtEQ9jMGEkDtVv9luws0UWWKgb/Wig/075QQ5zdcht8BC41/u7A40t3
-         rCGyZY1TaL4R4EngKh/a5hyt0L/PKk7MkrdtG+AQdV+21MMmTGd6FyYwKaXvtSwBEUFk
-         Oq2J6P1TuV3rezx56GL5rFqJsFHMCnyWKRFwFyEi507ltI61kawNvbqJxGdd6xSrf8BS
-         7zgUhHuHmq5lg48IOSw1LOxjd/SAz8Lm4fyAQd6WTXdR2Hxqo/Og6FjOhzwbSs9ImbZU
-         Obzg==
-X-Gm-Message-State: AOAM530h+RSGK7z+MgTVpkWe8QXsjfc+nvQe4iiHaWc58280xme+R6GG
-        +IeEaq7dTxdzKPzPL06XGeowf0j5pcW6tadxOn1QntN6kRse5/EwTUFMUX86CBA7c5jRyn7r8zV
-        ClkZlXlejjhFlYZbkznt0fw==
-X-Received: by 2002:a37:a842:0:b0:67b:305c:6c8a with SMTP id r63-20020a37a842000000b0067b305c6c8amr16313062qke.225.1647978570440;
-        Tue, 22 Mar 2022 12:49:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzvYHkXfWn6Fvg9HfMKpOQHdAfRhM9jz9XzPB3xppVu7owmXOq3fC0UGbNmng59cIfiD90P1A==
-X-Received: by 2002:a37:a842:0:b0:67b:305c:6c8a with SMTP id r63-20020a37a842000000b0067b305c6c8amr16313048qke.225.1647978570122;
-        Tue, 22 Mar 2022 12:49:30 -0700 (PDT)
+        bh=CUK36jS7t3ES+pLUUL+mUYA6t3/aGv0zfagQFWZKaXc=;
+        b=Y6WwQZeXAmd1QJTHtXkcFe+kxxGIHGk0YmFG3HmiMz04NvouB01xOgbyDB5sr6DwHb
+         VaTTDa+XganJHyu0H3cLJSORa1LV2rrhUEt9qmKqf41+d2BSi4SmUJhVfS7/0LEOWBs1
+         AJpfo+AheEYplsw9I4lyZDbrxlBxxrFG8Kf7q9ZCkT4/M7OAKvsuBzVWrTrpEyPFJfFU
+         +YS+UNRQRsiVS2RRLoF7zbJOSbhWZBT+sgZGTT+kOOOmk3wurCNo45N5NYAmqNT8V8jY
+         b4nxfDI/O9o2nEFa7FV/ueeHyhxQUnhw3IsAa4c1hJPLdk/QRfklIscFcZ2W9t9kFYBr
+         fUZg==
+X-Gm-Message-State: AOAM530J6Jpm5JtKAZgRiEgllv38jaVnEP6vlM3TJyOIapdcxRVvnUhx
+        gz/AFdVfmrXKnhlpcvTE2nVHJv4VME2+mfhqU6U4O+9Rba2ynWlBuaaear444Dj8MpSr6PtnX8D
+        3VszAHK7ZU2VXlxRcvyax9w==
+X-Received: by 2002:a37:7cd:0:b0:67b:e91:6b01 with SMTP id 196-20020a3707cd000000b0067b0e916b01mr16641569qkh.652.1647978573393;
+        Tue, 22 Mar 2022 12:49:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzhGeJC8fKIOscwpW7RkXLopawiBL7yLMjD6LNS9u1yPv2DAClh1WWgit2m17Y/Funlddnw8A==
+X-Received: by 2002:a37:7cd:0:b0:67b:e91:6b01 with SMTP id 196-20020a3707cd000000b0067b0e916b01mr16641560qkh.652.1647978573149;
+        Tue, 22 Mar 2022 12:49:33 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id q8-20020a05622a030800b002e1c9304db8sm14480140qtw.38.2022.03.22.12.49.29
+        by smtp.gmail.com with ESMTPSA id m23-20020a05620a221700b00649555cd27bsm9635821qkh.79.2022.03.22.12.49.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 12:49:29 -0700 (PDT)
+        Tue, 22 Mar 2022 12:49:32 -0700 (PDT)
 Sender: Mike Snitzer <msnitzer@redhat.com>
 From:   Mike Snitzer <snitzer@redhat.com>
 X-Google-Original-From: Mike Snitzer <snitzer@kernel.org>
 To:     axboe@kernel.dk
 Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
         linux-block@vger.kernel.org
-Subject: [PATCH 1/3] block: allow BIOSET_PERCPU_CACHE use from bio_alloc_clone
-Date:   Tue, 22 Mar 2022 15:49:25 -0400
-Message-Id: <20220322194927.42778-2-snitzer@kernel.org>
+Subject: [PATCH 3/3] dm: conditionally enable BIOSET_PERCPU_CACHE for bio-based dm_io bioset
+Date:   Tue, 22 Mar 2022 15:49:27 -0400
+Message-Id: <20220322194927.42778-4-snitzer@kernel.org>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20220322194927.42778-1-snitzer@kernel.org>
 References: <20220322194927.42778-1-snitzer@kernel.org>
@@ -69,157 +69,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-These changes allow DM core to make full use of BIOSET_PERCPU_CACHE:
-
-Factor out bio_alloc_percpu_cache() from bio_alloc_kiocb() to allow
-use by bio_alloc_clone() too.
-
-Update bioset_init_from_src() to set BIOSET_PERCPU_CACHE if
-bio_src->cache is not NULL.
-
-Move bio_clear_polled() to include/linux/bio.h to allow users outside
-of block core.
+There is no point establishing the bioset percpu cache if request_queue
+won't have QUEUE_FLAG_POLL.
 
 Signed-off-by: Mike Snitzer <snitzer@kernel.org>
 ---
- block/bio.c         | 56 +++++++++++++++++++++++++++++++++--------------------
- block/blk.h         |  7 -------
- include/linux/bio.h |  7 +++++++
- 3 files changed, 42 insertions(+), 28 deletions(-)
+ drivers/md/dm-table.c | 11 ++++++++---
+ drivers/md/dm.c       |  6 +++---
+ drivers/md/dm.h       |  4 ++--
+ 3 files changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/block/bio.c b/block/bio.c
-index b15f5466ce08..2c3a1f678461 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -728,6 +728,33 @@ void bio_put(struct bio *bio)
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index c0be4f60b427..7ebc70e3eb2f 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -1002,6 +1002,8 @@ bool dm_table_request_based(struct dm_table *t)
+ 	return __table_type_request_based(dm_table_get_type(t));
  }
- EXPORT_SYMBOL(bio_put);
  
-+static struct bio *bio_alloc_percpu_cache(struct block_device *bdev,
-+		unsigned short nr_vecs, unsigned int opf, gfp_t gfp,
-+		struct bio_set *bs)
-+{
-+	struct bio_alloc_cache *cache;
-+	struct bio *bio;
++static int dm_table_supports_poll(struct dm_table *t);
 +
-+	cache = per_cpu_ptr(bs->cache, get_cpu());
-+	if (cache->free_list) {
-+		bio = cache->free_list;
-+		cache->free_list = bio->bi_next;
-+		cache->nr--;
-+		put_cpu();
-+		bio_init(bio, bdev, nr_vecs ? bio->bi_inline_vecs : NULL,
-+			 nr_vecs, opf);
-+		bio->bi_pool = bs;
-+		bio_set_flag(bio, BIO_PERCPU_CACHE);
-+		return bio;
+ static int dm_table_alloc_md_mempools(struct dm_table *t, struct mapped_device *md)
+ {
+ 	enum dm_queue_mode type = dm_table_get_type(t);
+@@ -1009,21 +1011,24 @@ static int dm_table_alloc_md_mempools(struct dm_table *t, struct mapped_device *
+ 	unsigned min_pool_size = 0;
+ 	struct dm_target *ti;
+ 	unsigned i;
++	bool poll_supported = false;
+ 
+ 	if (unlikely(type == DM_TYPE_NONE)) {
+ 		DMWARN("no table type is set, can't allocate mempools");
+ 		return -EINVAL;
+ 	}
+ 
+-	if (__table_type_bio_based(type))
++	if (__table_type_bio_based(type)) {
+ 		for (i = 0; i < t->num_targets; i++) {
+ 			ti = t->targets + i;
+ 			per_io_data_size = max(per_io_data_size, ti->per_io_data_size);
+ 			min_pool_size = max(min_pool_size, ti->num_flush_bios);
+ 		}
++		poll_supported = !!dm_table_supports_poll(t);
 +	}
-+	put_cpu();
-+	bio = bio_alloc_bioset(bdev, nr_vecs, opf, gfp, bs);
-+	if (!bio)
-+		return NULL;
-+	bio_set_flag(bio, BIO_PERCPU_CACHE);
-+	return bio;
-+}
-+
- static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+ 
+-	t->mempools = dm_alloc_md_mempools(md, type, t->integrity_supported,
+-					   per_io_data_size, min_pool_size);
++	t->mempools = dm_alloc_md_mempools(md, type, per_io_data_size, min_pool_size,
++					   t->integrity_supported, poll_supported);
+ 	if (!t->mempools)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 06f3720a190b..071e7615f153 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -2997,8 +2997,8 @@ int dm_noflush_suspending(struct dm_target *ti)
+ EXPORT_SYMBOL_GPL(dm_noflush_suspending);
+ 
+ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_queue_mode type,
+-					    unsigned integrity, unsigned per_io_data_size,
+-					    unsigned min_pool_size)
++					    unsigned per_io_data_size, unsigned min_pool_size,
++					    bool integrity, bool poll)
  {
- 	bio_set_flag(bio, BIO_CLONED);
-@@ -768,7 +795,10 @@ struct bio *bio_alloc_clone(struct block_device *bdev, struct bio *bio_src,
- {
- 	struct bio *bio;
- 
--	bio = bio_alloc_bioset(bdev, 0, bio_src->bi_opf, gfp, bs);
-+	if (bs->cache && bio_src->bi_opf & REQ_POLLED)
-+		bio = bio_alloc_percpu_cache(bdev, 0, bio_src->bi_opf, gfp, bs);
-+	else
-+		bio = bio_alloc_bioset(bdev, 0, bio_src->bi_opf, gfp, bs);
- 	if (!bio)
- 		return NULL;
- 
-@@ -1736,6 +1766,8 @@ int bioset_init_from_src(struct bio_set *bs, struct bio_set *src)
- 		flags |= BIOSET_NEED_BVECS;
- 	if (src->rescue_workqueue)
- 		flags |= BIOSET_NEED_RESCUER;
-+	if (src->cache)
-+		flags |= BIOSET_PERCPU_CACHE;
- 
- 	return bioset_init(bs, src->bio_pool.min_nr, src->front_pad, flags);
- }
-@@ -1753,35 +1785,17 @@ EXPORT_SYMBOL(bioset_init_from_src);
-  *    Like @bio_alloc_bioset, but pass in the kiocb. The kiocb is only
-  *    used to check if we should dip into the per-cpu bio_set allocation
-  *    cache. The allocation uses GFP_KERNEL internally. On return, the
-- *    bio is marked BIO_PERCPU_CACHEABLE, and the final put of the bio
-+ *    bio is marked BIO_PERCPU_CACHE, and the final put of the bio
-  *    MUST be done from process context, not hard/soft IRQ.
-  *
+ 	struct dm_md_mempools *pools = kzalloc_node(sizeof(*pools), GFP_KERNEL, md->numa_node_id);
+ 	unsigned int pool_size = 0;
+@@ -3014,7 +3014,7 @@ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_qu
+ 		pool_size = max(dm_get_reserved_bio_based_ios(), min_pool_size);
+ 		front_pad = roundup(per_io_data_size, __alignof__(struct dm_target_io)) + DM_TARGET_IO_BIO_OFFSET;
+ 		io_front_pad = roundup(per_io_data_size,  __alignof__(struct dm_io)) + DM_IO_BIO_OFFSET;
+-		ret = bioset_init(&pools->io_bs, pool_size, io_front_pad, BIOSET_PERCPU_CACHE);
++		ret = bioset_init(&pools->io_bs, pool_size, io_front_pad, poll ? BIOSET_PERCPU_CACHE : 0);
+ 		if (ret)
+ 			goto out;
+ 		if (integrity && bioset_integrity_create(&pools->io_bs, pool_size))
+diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+index 9013dc1a7b00..3f89664fea01 100644
+--- a/drivers/md/dm.h
++++ b/drivers/md/dm.h
+@@ -221,8 +221,8 @@ void dm_kcopyd_exit(void);
+  * Mempool operations
   */
- struct bio *bio_alloc_kiocb(struct kiocb *kiocb, struct block_device *bdev,
- 		unsigned short nr_vecs, unsigned int opf, struct bio_set *bs)
- {
--	struct bio_alloc_cache *cache;
--	struct bio *bio;
--
- 	if (!(kiocb->ki_flags & IOCB_ALLOC_CACHE) || nr_vecs > BIO_INLINE_VECS)
- 		return bio_alloc_bioset(bdev, nr_vecs, opf, GFP_KERNEL, bs);
+ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_queue_mode type,
+-					    unsigned integrity, unsigned per_bio_data_size,
+-					    unsigned min_pool_size);
++					    unsigned per_io_data_size, unsigned min_pool_size,
++					    bool integrity, bool poll);
+ void dm_free_md_mempools(struct dm_md_mempools *pools);
  
--	cache = per_cpu_ptr(bs->cache, get_cpu());
--	if (cache->free_list) {
--		bio = cache->free_list;
--		cache->free_list = bio->bi_next;
--		cache->nr--;
--		put_cpu();
--		bio_init(bio, bdev, nr_vecs ? bio->bi_inline_vecs : NULL,
--			 nr_vecs, opf);
--		bio->bi_pool = bs;
--		bio_set_flag(bio, BIO_PERCPU_CACHE);
--		return bio;
--	}
--	put_cpu();
--	bio = bio_alloc_bioset(bdev, nr_vecs, opf, GFP_KERNEL, bs);
--	bio_set_flag(bio, BIO_PERCPU_CACHE);
--	return bio;
-+	return bio_alloc_percpu_cache(bdev, nr_vecs, opf, GFP_KERNEL, bs);
- }
- EXPORT_SYMBOL_GPL(bio_alloc_kiocb);
- 
-diff --git a/block/blk.h b/block/blk.h
-index ebaa59ca46ca..8e338e76d303 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -451,13 +451,6 @@ extern struct device_attribute dev_attr_events;
- extern struct device_attribute dev_attr_events_async;
- extern struct device_attribute dev_attr_events_poll_msecs;
- 
--static inline void bio_clear_polled(struct bio *bio)
--{
--	/* can't support alloc cache if we turn off polling */
--	bio_clear_flag(bio, BIO_PERCPU_CACHE);
--	bio->bi_opf &= ~REQ_POLLED;
--}
--
- long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
- long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
- 
-diff --git a/include/linux/bio.h b/include/linux/bio.h
-index 7523aba4ddf7..709663ae757a 100644
---- a/include/linux/bio.h
-+++ b/include/linux/bio.h
-@@ -787,6 +787,13 @@ static inline void bio_set_polled(struct bio *bio, struct kiocb *kiocb)
- 		bio->bi_opf |= REQ_NOWAIT;
- }
- 
-+static inline void bio_clear_polled(struct bio *bio)
-+{
-+	/* can't support alloc cache if we turn off polling */
-+	bio_clear_flag(bio, BIO_PERCPU_CACHE);
-+	bio->bi_opf &= ~REQ_POLLED;
-+}
-+
- struct bio *blk_next_bio(struct bio *bio, struct block_device *bdev,
- 		unsigned int nr_pages, unsigned int opf, gfp_t gfp);
- 
+ /*
 -- 
 2.15.0
 
