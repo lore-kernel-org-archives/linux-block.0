@@ -2,99 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CC92C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 19:49:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C2A5C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 19:49:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231954AbiCVTvA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 15:51:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60252 "EHLO
+        id S229742AbiCVTvD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 15:51:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229742AbiCVTvA (ORCPT
+        with ESMTP id S231989AbiCVTvC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 15:51:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7240C4F9CC
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:31 -0700 (PDT)
+        Tue, 22 Mar 2022 15:51:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7F3854F9C5
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647978570;
+        s=mimecast20190719; t=1647978573;
         h=from:from:sender:sender:reply-to:subject:subject:date:date:
-         message-id:message-id:to:to:cc:cc;
-        bh=Ra70WqR4k9WaEnGzMfMHq7N8Yl2YrFMOg3wm/QlzybE=;
-        b=jPEXh70C4cyOWt9+F4QaGWkIFRRRZhw4Clz77JMfAmU1zna9WVl8je8+LtrqWB3uYAE1Dz
-        3Ld04RLMU5QPuzUA6QkJCYjOJCs0btTeLHX2JyJB1LS8I8rckk+PUO//kTOcoa3bdUXYnN
-        VzAIGZHqwJAIae5/43RZgcNqIyKWRHc=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+         message-id:message-id:to:to:cc:cc:in-reply-to:in-reply-to:
+         references:references; bh=3cVB5xGp5SZscTV0JpNErHCNRhdsu/xqDSO16/65Gk4=;
+        b=Ui9vavLsiCeKYQBUF3I1/rKDoky5GoRyjJUDOEvxbzp697T3kM18ibL9Fp+eVDCbdt9T3R
+        7gh/GLAuRY/OBj7VgXqxZvoYjcrPieNEWYx6y3OSVP76XxGw4w0Q4tJzNTkERuMSY7Fci4
+        PPZjzKwj2nIkhRzwIu+gJiOeUFhTkkw=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-176-oQqMY_5GP1CosSTIyqvxcw-1; Tue, 22 Mar 2022 15:49:29 -0400
-X-MC-Unique: oQqMY_5GP1CosSTIyqvxcw-1
-Received: by mail-qv1-f71.google.com with SMTP id z1-20020ad44781000000b00440ded04b09so13210264qvy.22
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:29 -0700 (PDT)
+ us-mta-173-NVOl6Og2PN2j1OtDa_7NuQ-1; Tue, 22 Mar 2022 15:49:32 -0400
+X-MC-Unique: NVOl6Og2PN2j1OtDa_7NuQ-1
+Received: by mail-qt1-f198.google.com with SMTP id h11-20020a05622a170b00b002e0769b9018so12373065qtk.14
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 12:49:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
-        bh=Ra70WqR4k9WaEnGzMfMHq7N8Yl2YrFMOg3wm/QlzybE=;
-        b=y5Ar9uGhvDjIpgJVEyZ/DffsnIax0ZwRFck1epWbtwqTHEPdL3P7rmw5hmKIOaAD+Z
-         zHAnezHonnCh9DtYCmb6Dzif5W4BZnKh87JtBSZ8sLav7WtvhSWlaB4GCVogb5egAYz4
-         o8TQJ/EB3cUmZGISBOgw/UFXOBGOhpK8kYgrmihu8+Xp+PdiF9XUql/9kdwjrPTLIrcv
-         4Z9FE6d5l5W77DFzEsvsp/Dxl09BdYD5Ql/YtuaPxug/J6HTBcjzXFvJSUrO84Ph0KKQ
-         hcnoB12JJE5nvzekDwYSXtLfXGLZNzDFALhBOUYgGEAGOSp7Scaf4lkJEWMyiap+sRin
-         DQdw==
-X-Gm-Message-State: AOAM531EPA/Zj6/BvnBQfPoL5nlW9AC9F3KoNFV167dGA6lsknHTmGzj
-        nIFuM3SDcAp1YTOA926GpRqnzy/Gn8thx+o3mC1zhJ2MY+tCOL1oMq6RQu128dBzxG8UdK8j75W
-        ko9C0hcEWsnwgHIVc2KUaGA==
-X-Received: by 2002:ac8:5c45:0:b0:2e1:9144:2849 with SMTP id j5-20020ac85c45000000b002e191442849mr21355797qtj.510.1647978568659;
-        Tue, 22 Mar 2022 12:49:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwuAUFri4nvEvVZF2RbL13ATvmIkasPUTw6SWWeNMQNB5h7Rc+g8WP6K964HYpvWyTYncWNsg==
-X-Received: by 2002:ac8:5c45:0:b0:2e1:9144:2849 with SMTP id j5-20020ac85c45000000b002e191442849mr21355785qtj.510.1647978568427;
-        Tue, 22 Mar 2022 12:49:28 -0700 (PDT)
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+         :in-reply-to:references;
+        bh=3cVB5xGp5SZscTV0JpNErHCNRhdsu/xqDSO16/65Gk4=;
+        b=2nzp6c7Q0eJOUio0xiTaUBVbnBrOrN3fNWNXIEWn8fZIIytirEwh14hASjx7H/LEXR
+         gEwU5+8YhWV2TJHOqa1mmORenk731SPGYnamAsUWDt4gxu/LuY3rJn26KpuQ8mzpHszF
+         1oAYM4ItUYSCICtbJXCQ+sl17RvZAWslniKHeprySnRrRy8lzutVhAJoK3DbEorA04fx
+         ljkIqNxe/00bLPz8etdOkeVxIatklt1OcB57hWAUG4jgujSCJ68GzucgjmJURmLN0Z63
+         AtpscZa7iCRfT+x0MqQeQfmKrLqo5TdYSM7vW8FNOH6zKxNTF3zoOZmt/txEjJot7Ulb
+         LJ4g==
+X-Gm-Message-State: AOAM530YjUItsuH6596Oi8WCnyPOTCFijw9j30i5iu2EU8gKjoehWRv8
+        3B4u4dFsZfsm6wzF7suEMOihUjaQHj5NrARLwKMDsbrqbB7yaaBzFy1SyEkyxMlwluUu61zLwON
+        4fhgJ6bYU1CTBlDBCXb3nfA==
+X-Received: by 2002:a05:622a:134d:b0:2e2:2802:15ff with SMTP id w13-20020a05622a134d00b002e2280215ffmr2455239qtk.413.1647978571823;
+        Tue, 22 Mar 2022 12:49:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwC2IsFjp8HuwBZ0PkPpIAKSGVFZvigvzaUsqvzvIqB26eoTOji40/Opg7gasAyW4DiZ743TQ==
+X-Received: by 2002:a05:622a:134d:b0:2e2:2802:15ff with SMTP id w13-20020a05622a134d00b002e2280215ffmr2455228qtk.413.1647978571575;
+        Tue, 22 Mar 2022 12:49:31 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id x20-20020ac85f14000000b002e1ee1c56c3sm13518520qta.76.2022.03.22.12.49.27
+        by smtp.gmail.com with ESMTPSA id w1-20020ac857c1000000b002e1e899badesm14497446qta.72.2022.03.22.12.49.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 12:49:28 -0700 (PDT)
+        Tue, 22 Mar 2022 12:49:31 -0700 (PDT)
 Sender: Mike Snitzer <msnitzer@redhat.com>
 From:   Mike Snitzer <snitzer@redhat.com>
 X-Google-Original-From: Mike Snitzer <snitzer@kernel.org>
 To:     axboe@kernel.dk
 Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
         linux-block@vger.kernel.org
-Subject: [PATCH 0/3] block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_clone
-Date:   Tue, 22 Mar 2022 15:49:24 -0400
-Message-Id: <20220322194927.42778-1-snitzer@kernel.org>
+Subject: [PATCH 2/3] dm: enable BIOSET_PERCPU_CACHE for dm_io bioset
+Date:   Tue, 22 Mar 2022 15:49:26 -0400
+Message-Id: <20220322194927.42778-3-snitzer@kernel.org>
 X-Mailer: git-send-email 2.15.0
+In-Reply-To: <20220322194927.42778-1-snitzer@kernel.org>
+References: <20220322194927.42778-1-snitzer@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Also change dm_io_complete() to use bio_clear_polled() so that it
+clears both REQ_POLLED and BIO_PERCPU_CACHE if the bio is requeued due
+to BLK_STS_DM_REQUEUE.
 
-I ran with your suggestion and DM now sees a ~7% improvement in hipri
-bio polling with io_uring (using dm-linear on null_blk, IOPS went from
-900K to 966K).
+Only io_uring benefits from using BIOSET_PERCPU_CACHE, it is only safe
+to use in non-interrupt context but io_uring's completions are all in
+process context.
 
-I'd appreciate it if you could pick up the first patch for 5.19.
-I'll rebase dm's 5.19 branch on block once it lands.
+This change improves DM's hipri bio polling performance by ~7%.
 
-(FYI, this series builds on linux-dm.git's "dm-5.18" branch, and the
-commits in this series are available in linux-dm.git's "dm-5.19"
-branch).
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+---
+ drivers/md/dm.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-Thanks,
-Mike
-
-Mike Snitzer (3):
-  block: allow BIOSET_PERCPU_CACHE use from bio_alloc_clone
-  dm: enable BIOSET_PERCPU_CACHE for dm_io bioset
-  dm: conditionally enable BIOSET_PERCPU_CACHE for bio-based dm_io bioset
-
- block/bio.c           | 56 ++++++++++++++++++++++++++++++++-------------------
- block/blk.h           |  7 -------
- drivers/md/dm-table.c | 11 +++++++---
- drivers/md/dm.c       | 10 ++++-----
- drivers/md/dm.h       |  4 ++--
- include/linux/bio.h   |  7 +++++++
- 6 files changed, 57 insertions(+), 38 deletions(-)
-
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index a2e80c376827..06f3720a190b 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -899,9 +899,9 @@ static void dm_io_complete(struct dm_io *io)
+ 		/*
+ 		 * Upper layer won't help us poll split bio, io->orig_bio
+ 		 * may only reflect a subset of the pre-split original,
+-		 * so clear REQ_POLLED in case of requeue
++		 * so clear REQ_POLLED and BIO_PERCPU_CACHE on requeue.
+ 		 */
+-		bio->bi_opf &= ~REQ_POLLED;
++		bio_clear_polled(bio);
+ 		return;
+ 	}
+ 
+@@ -3014,7 +3014,7 @@ struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_qu
+ 		pool_size = max(dm_get_reserved_bio_based_ios(), min_pool_size);
+ 		front_pad = roundup(per_io_data_size, __alignof__(struct dm_target_io)) + DM_TARGET_IO_BIO_OFFSET;
+ 		io_front_pad = roundup(per_io_data_size,  __alignof__(struct dm_io)) + DM_IO_BIO_OFFSET;
+-		ret = bioset_init(&pools->io_bs, pool_size, io_front_pad, 0);
++		ret = bioset_init(&pools->io_bs, pool_size, io_front_pad, BIOSET_PERCPU_CACHE);
+ 		if (ret)
+ 			goto out;
+ 		if (integrity && bioset_integrity_create(&pools->io_bs, pool_size))
 -- 
 2.15.0
 
