@@ -2,89 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD6D6C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 15:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03255C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 15:18:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238355AbiCVPS5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 11:18:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60054 "EHLO
+        id S238378AbiCVPTf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 11:19:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238338AbiCVPS5 (ORCPT
+        with ESMTP id S237034AbiCVPTd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 11:18:57 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4174F8878B;
-        Tue, 22 Mar 2022 08:17:29 -0700 (PDT)
-Received: from fraeml709-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KNFRj3Vrfz67Ncp;
-        Tue, 22 Mar 2022 23:15:45 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml709-chm.china.huawei.com (10.206.15.37) with Microsoft SMTP Server
+        Tue, 22 Mar 2022 11:19:33 -0400
+Received: from SJSMAIL01.us.kioxia.com (usmailhost21.kioxia.com [12.0.68.226])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABF0862CA;
+        Tue, 22 Mar 2022 08:18:04 -0700 (PDT)
+Received: from SJSMAIL01.us.kioxia.com (10.90.133.90) by
+ SJSMAIL01.us.kioxia.com (10.90.133.90) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 22 Mar 2022 16:17:26 +0100
-Received: from [10.47.85.68] (10.47.85.68) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 22 Mar
- 2022 15:17:25 +0000
-Message-ID: <0f7b9765-8835-25b5-4cdb-bc78edddad37@huawei.com>
-Date:   Tue, 22 Mar 2022 15:17:24 +0000
+ 15.1.2176.14; Tue, 22 Mar 2022 08:18:03 -0700
+Received: from SJSMAIL01.us.kioxia.com ([fe80::b962:3005:acea:aa09]) by
+ SJSMAIL01.us.kioxia.com ([fe80::b962:3005:acea:aa09%5]) with mapi id
+ 15.01.2176.014; Tue, 22 Mar 2022 08:18:03 -0700
+From:   Clay Mayers <Clay.Mayers@kioxia.com>
+To:     Kanchan Joshi <joshi.k@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "kbusch@kernel.org" <kbusch@kernel.org>,
+        "asml.silence@gmail.com" <asml.silence@gmail.com>
+CC:     "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "sbates@raithlin.com" <sbates@raithlin.com>,
+        "logang@deltatee.com" <logang@deltatee.com>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "javier@javigon.com" <javier@javigon.com>,
+        "mcgrof@kernel.org" <mcgrof@kernel.org>,
+        "a.manzanares@samsung.com" <a.manzanares@samsung.com>,
+        "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
+        "anuj20.g@samsung.com" <anuj20.g@samsung.com>
+Subject: RE: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Thread-Topic: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Thread-Index: AQHYMwaP8WKeHTnbdEm2AUHWA0dFWKzLlXmw
+Date:   Tue, 22 Mar 2022 15:18:03 +0000
+Message-ID: <d66a6bb2d0974171b44777dd07889473@kioxia.com>
+References: <20220308152105.309618-1-joshi.k@samsung.com>
+ <CGME20220308152702epcas5p1eb1880e024ac8b9531c85a82f31a4e78@epcas5p1.samsung.com>
+ <20220308152105.309618-6-joshi.k@samsung.com>
+In-Reply-To: <20220308152105.309618-6-joshi.k@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.90.53.183]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 01/11] blk-mq: Add blk_mq_init_queue_ops()
-To:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>
-CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
-        <bvanassche@acm.org>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
-        <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <dm-devel@redhat.com>,
-        <beanhuo@micron.com>
-References: <1647945585-197349-1-git-send-email-john.garry@huawei.com>
- <1647945585-197349-2-git-send-email-john.garry@huawei.com>
- <20220322111848.GA29270@lst.de>
- <cacc3f7b-c8be-0f72-1c52-562c15b468a4@huawei.com>
- <b5df2ef1-2d6d-340e-e4b4-09132dc0516b@suse.de>
- <a5e42012-c1fc-082e-e636-594abc07dd70@huawei.com>
- <306df4cf-0ee0-2b1e-044c-aed6c70122f9@suse.de>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <306df4cf-0ee0-2b1e-044c-aed6c70122f9@suse.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.85.68]
-X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 22/03/2022 14:03, Hannes Reinecke wrote:
->>
->> As mentioned in the cover letter response, it just seems best to keep 
->> the normal scsi_cmnd payload but have other means to add on the 
->> internal command data, like using host_scribble or scsi_cmnd priv data.
->>
-> Well; I found that most drivers I had been looking at the scsi command 
-> payload isn't used at all; the drivers primarily cared about the 
-> (driver-provided) payload, and were completely ignoring the scsi command 
-> payload.
-> 
-> Similar for ATA/libsas: you basically never issue real scsi commands, 
-> but either 'raw' ATA requests or SCSI TMFs. None of which are scsi 
-> commands, so providing them is a bit of a waste.
-> 
-> (And causes irritations, too, as a scsi command requires associated 
-> pointers like ->device etc to be set up. Which makes it tricky to use 
-> for the initial device setup.)
-
-A problem I see is that in scsi_mq_init_request() we allocate memories 
-like sense_buffer and prot_sdb and store the pointers in the scsi_cmnd 
-payload. If we then reuse a scsi_cmnd payload as an "internal" command 
-payload then this data may be lost.
-
-It might be possible to reuse the scsi cmnd payload for the "internal", 
-but I would rather not get hung up on it now if possible.
-
-Thanks,
-John
+PiBGcm9tOiBLYW5jaGFuIEpvc2hpDQo+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDgsIDIwMjIgNzoy
+MSBBTQ0KPiBUbzogYXhib2VAa2VybmVsLmRrOyBoY2hAbHN0LmRlOyBrYnVzY2hAa2VybmVsLm9y
+ZzsNCj4gYXNtbC5zaWxlbmNlQGdtYWlsLmNvbQ0KPiBDYzogaW8tdXJpbmdAdmdlci5rZXJuZWwu
+b3JnOyBsaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LQ0KPiBibG9ja0B2Z2Vy
+Lmtlcm5lbC5vcmc7IHNiYXRlc0ByYWl0aGxpbi5jb207IGxvZ2FuZ0BkZWx0YXRlZS5jb207DQo+
+IHBhbmt5ZGV2OEBnbWFpbC5jb207IGphdmllckBqYXZpZ29uLmNvbTsgbWNncm9mQGtlcm5lbC5v
+cmc7DQo+IGEubWFuemFuYXJlc0BzYW1zdW5nLmNvbTsgam9zaGlpaXRyQGdtYWlsLmNvbTsgYW51
+ajIwLmdAc2Ftc3VuZy5jb20NCj4gU3ViamVjdDogW1BBVENIIDA1LzE3XSBudm1lOiB3aXJlLXVw
+IHN1cHBvcnQgZm9yIGFzeW5jLXBhc3N0aHJ1IG9uIGNoYXItDQo+IGRldmljZS4NCj4gDQoNCg0K
+PHNuaXA+DQo+ICtzdGF0aWMgdm9pZCBudm1lX3B0X3Rhc2tfY2Ioc3RydWN0IGlvX3VyaW5nX2Nt
+ZCAqaW91Y21kKQ0KPiArew0KPiArCXN0cnVjdCBudm1lX3VyaW5nX2NtZF9wZHUgKnBkdSA9IG52
+bWVfdXJpbmdfY21kX3BkdShpb3VjbWQpOw0KPiArCXN0cnVjdCByZXF1ZXN0ICpyZXEgPSBwZHUt
+PnJlcTsNCj4gKwlpbnQgc3RhdHVzOw0KPiArCXN0cnVjdCBiaW8gKmJpbyA9IHJlcS0+YmlvOw0K
+PiArDQo+ICsJaWYgKG52bWVfcmVxKHJlcSktPmZsYWdzICYgTlZNRV9SRVFfQ0FOQ0VMTEVEKQ0K
+PiArCQlzdGF0dXMgPSAtRUlOVFI7DQo+ICsJZWxzZQ0KPiArCQlzdGF0dXMgPSBudm1lX3JlcShy
+ZXEpLT5zdGF0dXM7DQo+ICsNCj4gKwkvKiB3ZSBjYW4gZnJlZSByZXF1ZXN0ICovDQo+ICsJYmxr
+X21xX2ZyZWVfcmVxdWVzdChyZXEpOw0KPiArCWJsa19ycV91bm1hcF91c2VyKGJpbyk7DQo+ICsN
+Cj4gKwlpZiAoIXN0YXR1cyAmJiBwZHUtPm1ldGFfYnVmZmVyKSB7DQo+ICsJCWlmIChjb3B5X3Rv
+X3VzZXIocGR1LT5tZXRhX2J1ZmZlciwgcGR1LT5tZXRhLCBwZHUtDQo+ID5tZXRhX2xlbikpDQoN
+ClRoaXMgY29weSBpcyBpbmNvcnJlY3RseSBjYWxsZWQgZm9yIHdyaXRlcy4NCg0KPiArCQkJc3Rh
+dHVzID0gLUVGQVVMVDsNCj4gKwl9DQo+ICsJa2ZyZWUocGR1LT5tZXRhKTsNCj4gKw0KPiArCWlv
+X3VyaW5nX2NtZF9kb25lKGlvdWNtZCwgc3RhdHVzKTsNCj4gK30NCjwvc25pcD4NCg==
