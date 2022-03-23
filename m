@@ -2,87 +2,115 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44DCBC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 09:01:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F4AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 09:29:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243003AbiCWJDK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 05:03:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42188 "EHLO
+        id S243274AbiCWJbF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 05:31:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234009AbiCWJDK (ORCPT
+        with ESMTP id S238098AbiCWJbF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 05:03:10 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 326116EB0D;
-        Wed, 23 Mar 2022 02:01:40 -0700 (PDT)
-Received: from fraeml743-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KNj3b1ngBz67PtB;
-        Wed, 23 Mar 2022 16:59:55 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml743-chm.china.huawei.com (10.206.15.224) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 23 Mar 2022 10:01:37 +0100
-Received: from [10.47.85.68] (10.47.85.68) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Wed, 23 Mar
- 2022 09:01:36 +0000
-Message-ID: <378065de-3cb8-b44f-66e9-747960bcd990@huawei.com>
-Date:   Wed, 23 Mar 2022 09:01:33 +0000
+        Wed, 23 Mar 2022 05:31:05 -0400
+Received: from mail-yw1-x1131.google.com (mail-yw1-x1131.google.com [IPv6:2607:f8b0:4864:20::1131])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD316213E;
+        Wed, 23 Mar 2022 02:29:35 -0700 (PDT)
+Received: by mail-yw1-x1131.google.com with SMTP id 00721157ae682-2e64a6b20eeso10108077b3.3;
+        Wed, 23 Mar 2022 02:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=RTdntLwWP7UcoqdxIbtO2gBEwkCYFZ/lgUjrNqmrzxY=;
+        b=T61hvAd7cJiSJIGmZk3tv26qPToF8HN5U/lQ/m08EAvWa2SmtE6To2nDTNf374lnhT
+         GPKcxTCuuPtJXa5gmEw+gX2f1CnhO+VLeiTWr2XmuaL6dVuTtvBLqYJtSXHPPzFlHs5d
+         Ri/6Ne7YUODQm8T3VMLlOYE4KOjFASZnLeZ8IqhaE9iuhu7q9KNKFvXczv/h7Sgwfpuk
+         P+Ovst/9RkkokTnzdrENQ2gJQlJX7TsW9sSFizNo9ppyZqVHj+5ghhwpu4GTzkQKNuQt
+         kjsxCrJT+nOf4qUF+msiy+R5Tj/zMWQPy3RSPf7HIGYLtyZhwIakdPpQAIpFcLhlFiZB
+         DguA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=RTdntLwWP7UcoqdxIbtO2gBEwkCYFZ/lgUjrNqmrzxY=;
+        b=qypTNF9dh1L6sa75Cer/YX4VSQGLoJCifVbTmABDtyD7UZ+C67wYVHM6sta0TLaqqX
+         PMj2+lPfRJ9L0lyCD9ff9Q5vL2L6UzzJglkIUHzFqp9faI0GLtjRr6I6G+hUBPn/wLxc
+         Tqgjk/NTjwUrsQEHLHAjl1nzcmzBITCV6BoG6Rt4u9KS7o9w+n/uGS3uG3QYalyhfETb
+         IY4ke6sTxRJmMHNpMrRmu/4Evhp1PuZrp6/zBohF7dqAZ+WrDzieHzuGGx72AFn/ArKS
+         spvgjmZYjX0OHYo9UBWDVtiVO8laK3Mv2KqhoJhRZIkVvm3ucb73d7ZM7O/axBETbXMt
+         5qgQ==
+X-Gm-Message-State: AOAM530JFmh5NORM5ZVh+pt7+5AD8TJasIIE64vXJ/Hwj3FJAFxe4CEz
+        0nLrxAFHvH95BbXpeYyiNQx7KCsBoXQ7n+EN9FA=
+X-Google-Smtp-Source: ABdhPJxsStnlEm2/XrSzPGOBMOTw5PlnKDFjWTj/c9kKouVbhUo8itraPrOCZBSFmdgor+QYZSqQ1SYIOcVDz/aGNlE=
+X-Received: by 2002:a0d:c284:0:b0:2dc:37ec:f02c with SMTP id
+ e126-20020a0dc284000000b002dc37ecf02cmr33701891ywd.503.1648027774854; Wed, 23
+ Mar 2022 02:29:34 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 01/11] blk-mq: Add blk_mq_init_queue_ops()
-To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <hch@lst.de>, <ming.lei@redhat.com>,
-        <hare@suse.de>
-CC:     <chenxiang66@hisilicon.com>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <dm-devel@redhat.com>,
-        <beanhuo@micron.com>
-References: <1647945585-197349-1-git-send-email-john.garry@huawei.com>
- <1647945585-197349-2-git-send-email-john.garry@huawei.com>
- <e74776f0-505b-8b4f-effd-519bce9bdc79@acm.org>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <e74776f0-505b-8b4f-effd-519bce9bdc79@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.85.68]
-X-ClientProxiedBy: lhreml730-chm.china.huawei.com (10.201.108.81) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+References: <20220124091107.642561-1-hch@lst.de> <20220124091107.642561-2-hch@lst.de>
+ <20220322211915.GA2413063@roeck-us.net> <CAKFNMonRd5QQMzLoH3T=M=C=2Q_j9d86EYzZeY4DU2HQAE3E8w@mail.gmail.com>
+ <20220323064248.GA24874@lst.de>
+In-Reply-To: <20220323064248.GA24874@lst.de>
+From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Date:   Wed, 23 Mar 2022 18:29:23 +0900
+Message-ID: <CAKFNMonANUN7_99oVBOq=iCJpt6jQs3qhu1ez5SwMm2g7sZUyw@mail.gmail.com>
+Subject: Re: [dm-devel] [PATCH 01/19] fs: remove mpage_alloc
+To:     Christoph Hellwig <hch@lst.de>, Guenter Roeck <linux@roeck-us.net>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nfs@vger.kernel.org,
+        linux-nilfs <linux-nilfs@vger.kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.co>,
+        device-mapper development <dm-devel@redhat.com>,
+        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-fsdevel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        ntfs3@lists.linux.dev, Jack Wang <jinpu.wang@ionos.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        drbd-dev@lists.linbit.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 23/03/2022 02:57, Bart Van Assche wrote:
-> On 3/22/22 03:39, John Garry wrote:
->> Add an API to allocate a request queue which accepts a custom set of
->> blk_mq_ops for that request queue.
->>
->> The reason which we may want custom ops is for queuing requests which we
->> don't want to go through the normal queuing path.
-> 
+On Wed, Mar 23, 2022 at 3:42 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Wed, Mar 23, 2022 at 06:38:22AM +0900, Ryusuke Konishi wrote:
+> > This looks because the mask of GFP_KERNEL is removed along with
+> > the removal of mpage_alloc().
+> >
+>
+> > The default value of the gfp flag is set to GFP_HIGHUSER_MOVABLE by
+> > inode_init_always().
+> > So, __GFP_HIGHMEM hits the gfp warning at bio_alloc() that
+> > do_mpage_readpage() calls.
+>
+> Yeah.  Let's try this to match the iomap code:
+>
+> diff --git a/fs/mpage.c b/fs/mpage.c
+> index 9ed1e58e8d70b..d465883edf719 100644
+> --- a/fs/mpage.c
+> +++ b/fs/mpage.c
+> @@ -148,13 +148,11 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+>         int op = REQ_OP_READ;
+>         unsigned nblocks;
+>         unsigned relative_block;
+> -       gfp_t gfp;
+> +       gfp_t gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
+>
+>         if (args->is_readahead) {
+>                 op |= REQ_RAHEAD;
+> -               gfp = readahead_gfp_mask(page->mapping);
+> -       } else {
+> -               gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
+> +               gfp |= __GFP_NORETRY | __GFP_NOWARN;
+>         }
+>
+>         if (page_has_buffers(page))
 
-Hi Bart,
+I did not test for iomap, but this patch has fixed the same regression on the
+latest mainline at least for ext2, exfat, vfat and nilfs2.  Thanks!
 
- > Custom ops shouldn't be required for this. See e.g. how tmf_queue
- > is used in the UFS driver for an example of a queue implementation
- > with custom operations and that does not require changes of the block
- > layer core.
-
-The UFS code uses a private tagset (in ufs_hba.tmf_tag_set) for only 
-management of TMF tags/memories. This tagset does not really have any 
-custom operations. All it has is a stub of .queue_rq CB in 
-ufshcd_queue_tmf() and that is because this CB is compulsory.
-
-As for the idea of having multiple tagsets per shost with real custom 
-operations, this idea was mentioned before, but I think managing 
-multiple tagsets could be trouble. For a start, it would mean that we 
-need a distinct allocation of reserved and regular tags, and sometimes 
-we don't want this - as Hannes mentioned earlier, many HBAs have low 
-queue depth and cannot afford to permanently carve out a bunch of 
-reserved tags.
-
-Thanks,
-John
+Ryusuke Konishi
