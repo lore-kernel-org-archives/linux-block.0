@@ -2,125 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A02C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 16:03:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3754CC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 16:37:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238342AbiCWQF0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 12:05:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32956 "EHLO
+        id S237268AbiCWQjV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 12:39:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39344 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237375AbiCWQFY (ORCPT
+        with ESMTP id S231493AbiCWQjV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 12:05:24 -0400
-X-Greylist: delayed 1229 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 23 Mar 2022 09:03:53 PDT
-Received: from gateway22.websitewelcome.com (gateway22.websitewelcome.com [192.185.47.125])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77C2614094
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 09:03:53 -0700 (PDT)
-Received: from cm12.websitewelcome.com (cm12.websitewelcome.com [100.42.49.8])
-        by gateway22.websitewelcome.com (Postfix) with ESMTP id 2392E366C
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 10:43:22 -0500 (CDT)
-Received: from 162-215-252-75.unifiedlayer.com ([208.91.199.152])
-        by cmsmtp with SMTP
-        id X38rnpZ2w9AGSX38snkJlN; Wed, 23 Mar 2022 10:43:22 -0500
-X-Authority-Reason: nr=8
+        Wed, 23 Mar 2022 12:39:21 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5768B7A98C
+        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 09:37:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=roeck-us.net; s=default; h=Content-Type:MIME-Version:Message-ID:Subject:Cc:
-        To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-        :Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-        List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=lagRXHohghy8kR3woCuBBmkrcJ/jzmeeFU/A5c+1noo=; b=SKVgFgGANbObFf6amjfV24eu+h
-        n0xWMkM27kPmvFAgvKcqFv+hfIHThLfoWcRnd1X8xFUcQP3HR13LA4VzmRqW+O6FeAgRVxjx27KSe
-        hl2iN+faBt50LA0zMJAn8QRAKthN0v2Vcku3E5ajko0c30LSgmQO+U3vw8gVUULYf32KGgJo+PCIE
-        flVfEntmD6Pxj237DGMtNbwdJvCMhuo0fSfOesmqg5BySHh87KeT7TljcegAXg6iNDlRbUWxBpB1P
-        33QYer1vvhIIEQ4VhMb6a9eCkP1nCGe/5sBMPEQF8lCzmBRQ54ViRtb5zi3O8POeIPCXsSH7hXR8d
-        33EJ51dQ==;
-Received: from 108-223-40-66.lightspeed.sntcca.sbcglobal.net ([108.223.40.66]:57638 helo=localhost)
-        by bh-25.webhostbox.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-        (Exim 4.94.2)
-        (envelope-from <linux@roeck-us.net>)
-        id 1nX38q-0034li-Mc; Wed, 23 Mar 2022 15:43:20 +0000
-Date:   Wed, 23 Mar 2022 08:43:19 -0700
-From:   Guenter Roeck <linux@roeck-us.net>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nfs@vger.kernel.org,
-        linux-nilfs <linux-nilfs@vger.kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.co>,
-        device-mapper development <dm-devel@redhat.com>,
-        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        linux-fsdevel@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        ntfs3@lists.linux.dev, Jack Wang <jinpu.wang@ionos.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        drbd-dev@lists.linbit.com
-Subject: Re: [dm-devel] [PATCH 01/19] fs: remove mpage_alloc
-Message-ID: <20220323154319.GA2268247@roeck-us.net>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=F6ZxHPxQkAvi8SSVUYKhrpEuw9qJyFA484+C2OJlw/A=; b=NITVaSDWGrV/1DrTteZHrxloTL
+        nROFEyiFJC0i67n8MQ4JcxQAC1rDz4GeGMLUtgJRof94ONvriQHlAPRFju1N//27fmHsgjk/BFW/c
+        D0zv7Yz+PF4oPirZnA+eFO+qZ1PAuQ3IPqVCmwF2f8WEyctyJHSnK67odJ0COp3Slv6dWOmmI9A+V
+        hYyt7pf4rOcj77vA1hpZWjOBNJsjQNSpqqcIu+yq+9MflLKiPjYyRv3wUGeMiiz05jvKSYQ9nMAFa
+        X1AGR6GVmnjLR9RuMYnixB3DrrmeZbRpC1l++2m0sS2qa3nmzkMP8CZzrlaY0RAsLNh4GWy09GKEW
+        bWfRP7HA==;
+Received: from [2001:4bb8:19a:b822:f080:d126:bfe4:c36c] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nX3za-00EHG0-JT; Wed, 23 Mar 2022 16:37:51 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 01/14] block: don't print I/O error warning for dead disks
+Date:   Wed, 23 Mar 2022 17:37:35 +0100
+Message-Id: <20220323163748.1526919-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - bh-25.webhostbox.net
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - roeck-us.net
-X-BWhitelist: no
-X-Source-IP: 108.223.40.66
-X-Source-L: No
-X-Exim-ID: 1nX38q-0034li-Mc
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 108-223-40-66.lightspeed.sntcca.sbcglobal.net (localhost) [108.223.40.66]:57638
-X-Source-Auth: guenter@roeck-us.net
-X-Email-Count: 29
-X-Source-Cap: cm9lY2s7YWN0aXZzdG07YmgtMjUud2ViaG9zdGJveC5uZXQ=
-X-Local-Domain: yes
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 07:42:48AM +0100, Christoph Hellwig wrote:
-> On Wed, Mar 23, 2022 at 06:38:22AM +0900, Ryusuke Konishi wrote:
-> > This looks because the mask of GFP_KERNEL is removed along with
-> > the removal of mpage_alloc().
-> > 
-> 
-> > The default value of the gfp flag is set to GFP_HIGHUSER_MOVABLE by
-> > inode_init_always().
-> > So, __GFP_HIGHMEM hits the gfp warning at bio_alloc() that
-> > do_mpage_readpage() calls.
-> 
-> Yeah.  Let's try this to match the iomap code:
-> 
-> diff --git a/fs/mpage.c b/fs/mpage.c
-> index 9ed1e58e8d70b..d465883edf719 100644
-> --- a/fs/mpage.c
-> +++ b/fs/mpage.c
-> @@ -148,13 +148,11 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
->  	int op = REQ_OP_READ;
->  	unsigned nblocks;
->  	unsigned relative_block;
-> -	gfp_t gfp;
-> +	gfp_t gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
->  
->  	if (args->is_readahead) {
->  		op |= REQ_RAHEAD;
-> -		gfp = readahead_gfp_mask(page->mapping);
-> -	} else {
-> -		gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
-> +		gfp |= __GFP_NORETRY | __GFP_NOWARN;
->  	}
->  
->  	if (page_has_buffers(page))
+When a disk has been marked dead, don't print warnings for I/O errors
+as they are very much expected.
 
-That fixes the problem for me.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-mq.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 8e659dc5fcf37..5b6a7c9d0d992 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -794,7 +794,8 @@ bool blk_update_request(struct request *req, blk_status_t error,
+ #endif
+ 
+ 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
+-		     !(req->rq_flags & RQF_QUIET))) {
++		     !(req->rq_flags & RQF_QUIET)) &&
++		     !test_bit(GD_DEAD, &req->q->disk->state)) {
+ 		blk_print_req_error(req, error);
+ 		trace_block_rq_error(req, error, nr_bytes);
+ 	}
+-- 
+2.30.2
 
-Guenter
