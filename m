@@ -2,78 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7256C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 02:57:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F13C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:11:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241404AbiCWC7A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 22:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40022 "EHLO
+        id S241914AbiCWGMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 02:12:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231958AbiCWC7A (ORCPT
+        with ESMTP id S231919AbiCWGMg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 22:59:00 -0400
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E390A70864;
-        Tue, 22 Mar 2022 19:57:31 -0700 (PDT)
-Received: by mail-pl1-f169.google.com with SMTP id c23so353617plo.0;
-        Tue, 22 Mar 2022 19:57:31 -0700 (PDT)
+        Wed, 23 Mar 2022 02:12:36 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0076E8F0;
+        Tue, 22 Mar 2022 23:11:03 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id kc20so534669qvb.3;
+        Tue, 22 Mar 2022 23:11:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:from:to:cc:subject:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ifWjR9jEFmFX8aRx9xc4ahzyvlT1JxK8sH59+zbMgcM=;
+        b=d8yqVfswjLKnW065K+y9jlbglxjxi533dEaaajB2Hr5kQEVFHk2pIMnd0cKiv2Y5QK
+         3zj6eHcsJdEnbNGBhm7UHtSffl9a8EpWvRgpB0SoC9Nexg0tsr4nhsswekoQM/3fbDvG
+         y6iOwb+TNOEMoKJF6mM5yjLFxZHBlW/Pudhfnftit78UhaFAC9k36rDZgCZunoGDss9H
+         xTnVjv9J0LRCPBpIxq14i8JUOVoJx9a+cnHay7bfSal0huT9hL2haYbYdA26AiBNMUo3
+         ULwEOgzAC6/zeSHW1R/z/fAJPmPpL8mzbTM63WDgElWHRZspna3zcn8/R31hyJ3Cvpm/
+         vdgA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=XdtGK4rmRWu9kbcb/j+mRwJrjPioe83qUnPzzHWXTQM=;
-        b=hOTbXYQ+hdgB6CHQrx27rKZi6dqG0qOP0SsKjCnlviwBYqkzVtwjHrJUI8lEY9jbPy
-         hiHz85/m6mCcqJXMueUCky/komPNQpbogMpVzIOVCcphzVu7DArn7dyKZwc9SW3q7qJ5
-         KnNS7gV52dpXSku0zR37maTuWsXDb63A7zBP1KYTK0LfOSIiIqMHu9OAzNTLLw71LIjn
-         3JmWjv/jB3DccaslWTEBWAcrNJ9FpIec+O4Kzw7Mzcgqk5KBWGtNqRsVEq0Q0KA1jW/f
-         OMkly43Ym+NFMrsH6fsUeG38CqdaP+ttwFvKc5C88a/0WzTYGzx9RTypLwPtaOLDI3y3
-         tMFg==
-X-Gm-Message-State: AOAM532lUsqSufaMXc72MMCAiNhG1d3DfohV4ClaM71tISFXr474mnNA
-        8t8K4W29fLHUgM/wLYO1lVWAgQWiVJQ=
-X-Google-Smtp-Source: ABdhPJwSFEIHiVSTOmzTD2GpstiC4F+wLHyntg8/TEzIPpoV27kY2teF1rJv/n+nM+gczQuBLAtydA==
-X-Received: by 2002:a17:902:8605:b0:151:b6a2:8a1 with SMTP id f5-20020a170902860500b00151b6a208a1mr21517901plo.64.1648004251166;
-        Tue, 22 Mar 2022 19:57:31 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id 16-20020a17090a005000b001c7511dc31esm4019995pjb.41.2022.03.22.19.57.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 22 Mar 2022 19:57:30 -0700 (PDT)
-Message-ID: <e74776f0-505b-8b4f-effd-519bce9bdc79@acm.org>
-Date:   Tue, 22 Mar 2022 19:57:27 -0700
+        h=x-gm-message-state:message-id:date:from:to:cc:subject:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ifWjR9jEFmFX8aRx9xc4ahzyvlT1JxK8sH59+zbMgcM=;
+        b=ij2XD7tDgngXdhFh6GS0fRj47OocRSKRIwnXGFpOf2Faf0IUxKRjeWR3jigYRF+78G
+         s0kJi3cHEujr6lC/jPGm+9KFBAfH2uuWHZFL0+wFRCfd9TeMb4pmF13M1PX+c8DGB4Ao
+         nZttAa3yxPNFsoZNDJ8vyyDHQQXHIrjvyQcWB+T89W0EiLP4fWa0EP/5OwpG8DxDPYSA
+         rVC7s2WnAn+v7IqXsqBZSwf5DCGBaZS+LYxrH4KwKz9g0K1gTBsigMF/jal1zyrr7Ydb
+         jNUUi0IlmmUpyRfXNRgdw3Iy7NuhMYWGfTtXT3QX+1uBbQW9KB9rnHNU3NIfXq6Sp9jS
+         ueTA==
+X-Gm-Message-State: AOAM5330Ji0y1No5bfF34yLbzviIRa4lu4UWhivK5xoraZJ7OjvEQdXN
+        iHllHzK3a5i/HqRajk1ioqg=
+X-Google-Smtp-Source: ABdhPJxgu4dweeqTZjUIM6RLqCD9cWzQSftS10ONwtj2woCx83xyIagtnBycyLjFBoH22jxt1oI4KA==
+X-Received: by 2002:a05:6214:20e6:b0:440:f6d0:fe55 with SMTP id 6-20020a05621420e600b00440f6d0fe55mr20307116qvk.57.1648015862723;
+        Tue, 22 Mar 2022 23:11:02 -0700 (PDT)
+Received: from localhost ([193.203.214.57])
+        by smtp.gmail.com with ESMTPSA id b126-20020a376784000000b0067d21404704sm9845296qkc.131.2022.03.22.23.11.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 22 Mar 2022 23:11:01 -0700 (PDT)
+Message-ID: <623ab9f5.1c69fb81.66f4.5e68@mx.google.com>
+X-Google-Original-Message-ID: <20220323061058.GA2343452@cgel.zte@gmail.com>
+Date:   Wed, 23 Mar 2022 06:10:58 +0000
+From:   CGEL <cgel.zte@gmail.com>
+To:     Johannes Weiner <hannes@cmpxchg.org>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
+        Yang Yang <yang.yang29@zte.com.cn>,
+        Ran Xiaokai <ran.xiaokai@zte.com.cn>
+Subject: Re: [PATCH] block/psi: make PSI annotations of submit_bio only work
+ for file pages
+References: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
+ <YjiMsGoXoDU+FwsS@cmpxchg.org>
+ <623938d1.1c69fb81.52716.030f@mx.google.com>
+ <YjnO3p6vvAjeMCFC@cmpxchg.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 01/11] blk-mq: Add blk_mq_init_queue_ops()
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hch@lst.de, ming.lei@redhat.com,
-        hare@suse.de
-Cc:     chenxiang66@hisilicon.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com, beanhuo@micron.com
-References: <1647945585-197349-1-git-send-email-john.garry@huawei.com>
- <1647945585-197349-2-git-send-email-john.garry@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <1647945585-197349-2-git-send-email-john.garry@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YjnO3p6vvAjeMCFC@cmpxchg.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/22/22 03:39, John Garry wrote:
-> Add an API to allocate a request queue which accepts a custom set of
-> blk_mq_ops for that request queue.
+On Tue, Mar 22, 2022 at 09:27:58AM -0400, Johannes Weiner wrote:
+> On Tue, Mar 22, 2022 at 02:47:42AM +0000, CGEL wrote:
+> > On Mon, Mar 21, 2022 at 10:33:20AM -0400, Johannes Weiner wrote:
+> > > On Wed, Mar 16, 2022 at 06:39:28AM +0000, cgel.zte@gmail.com wrote:
+> > > > From: Yang Yang <yang.yang29@zte.com.cn>
+> > > > 
+> > > > psi tracks the time spent on submitting the IO of refaulting file pages
+> > > > and anonymous pages[1]. But after we tracks refaulting anonymous pages
+> > > > in swap_readpage[2][3], there is no need to track refaulting anonymous
+> > > > pages in submit_bio.
+> > > > 
+> > > > So this patch can reduce redundant calling of psi_memstall_enter. And
+> > > > make it easier to track refaulting file pages and anonymous pages
+> > > > separately.
+> > > 
+> > > I don't think this is an improvement.
+> > > 
+> > > psi_memstall_enter() will check current->in_memstall once, detect the
+> > > nested call, and bail. Your patch checks PageSwapBacked for every page
+> > > being added. It's more branches for less robust code.
+> > 
+> > We are also working for a new patch to classify different reasons cause
+> > psi_memstall_enter(): reclaim, thrashing, compact, etc. This will help
+> > user to tuning sysctl, for example, if user see high compact delay, he
+> > may try do adjust THP sysctl to reduce the compact delay.
+> > 
+> > To support that, we should distinguish what's the reason cause psi in
+> > submit_io(), this patch does the job.
 > 
-> The reason which we may want custom ops is for queuing requests which we
-> don't want to go through the normal queuing path.
+> Please submit these patches together then. On its own, this patch
+> isn't desirable.
+I think this patch has it's independent value, I try to make a better
+explain.
 
-Custom ops shouldn't be required for this. See e.g. how tmf_queue
-is used in the UFS driver for an example of a queue implementation
-with custom operations and that does not require changes of the block
-layer core.
+1) This patch doesn't work it worse or even better
+After this patch, swap workingset handle is simpler, file workingset
+handle just has one more check, as below.
+Before this patch handling swap workingset:
+	a) in swap_readpage() call psi_memstall_enter() ->
+	b) in __bio_add_page() test if should call bio_set_flag(), true ->
+	c) in __bio_add_page() call bio_set_flag()
+	d) in submit_bio() test if should call psi_memstall_enter(), true ->
+	e) call psi_memstall_enter, detect the nested call, and bail.
+	f) call bio_clear_flag if needed.
+Before this patch handling file page workingset:
+	a) in __bio_add_page() test if should call bio_set_flag(), true ->
+	...
+	b) call bio_clear_flag if needed.
+After this patch handling swap workingset:
+	a) in swap_readpage() call psi_memstall_enter() ->
+	b) in __bio_add_page() test if should call bio_set_flag(), one more check, false and return.
+	c) in submit_bio() test if should call psi_memstall_enter(), false and return.
+After this patch handling file pages workingset:
+	a) in __bio_add_page() test if should call bio_set_flag(), one more check, true ->
+	...
+	b) call bio_clear_flag if needed.
 
-Thanks,
+2) This patch help tools like kprobe to trace different workingset
+After this patch we know workingset in submit_io() is only cause by file pages.
 
-Bart.
+3) This patch will help code evolution
+Such as psi classify, getdelays supports counting file pages workingset submit.
