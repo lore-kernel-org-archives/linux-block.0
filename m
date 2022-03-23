@@ -2,120 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7A1C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 00:09:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94777C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 00:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240890AbiCWALV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 20:11:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60222 "EHLO
+        id S240894AbiCWAQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 20:16:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbiCWALU (ORCPT
+        with ESMTP id S230174AbiCWAQG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 20:11:20 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C078652E2;
-        Tue, 22 Mar 2022 17:09:52 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id q19so13754131pgm.6;
-        Tue, 22 Mar 2022 17:09:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=jgdleOfLqvIueyHSwi4fWJ4tDGfe4r9oabmW/ltVQfA=;
-        b=avwhU6x1JfpTO8sJQ119s5PQOrOOWDFIVC6x29zlmMo5HnxbUrJ4/ayTBrAWKMI+0m
-         8jqBbu6a/6+CxQ+UjRQOtNIn7szxxAoBA6p+h6f7cL6S1kdMC0FqiUqMDXr/j1oXr8VW
-         sEwD+OjHyel6B3SwO03v9K+0050odi4b4seilPOFvCnfvUVLK7azgA86ZeddkeMR16ME
-         1xa1Dy2+m0QkwroZQ3Yv7ud3XGHhae1Pl96/eUIOrpGG4TWEnT6lW/F6YJ8jFK9zHd1k
-         icW47ZawSs7KPeR7jJs0nMQFCn+/IhM0mCdusruM29ObL+r6fSIyTzcmyMgTcNykKTuX
-         lW3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=jgdleOfLqvIueyHSwi4fWJ4tDGfe4r9oabmW/ltVQfA=;
-        b=MAdaEXuAVnA/8Ky3cdFNzDU5GwGAi7l5r6ST8hAm+6j3si+YzPxJDQqVq4Gzo5QsF1
-         RqApKNU7umRhUxU/y0PQJ6GitJQfaXGJX/xlXW5oPeGgJAfZ1WaOPdeTMRprqztn0rXE
-         damaTxWHR/gDfChn4h8al/Q5vzRh4H/W8tMkv3Niih8IcrvilTS0SpqvXJVNFSt02Ooe
-         zBixgpQ3hx8jsmjw+FHW6789FFHUIJ7t5YNfWqUqcuucQ+o3eOmhjsKxjP6y+Fqkk+02
-         /27hRwVxoC63vBg426WZIpVdPlOH9VZqla/WpKaKGwYRx3WWYW9Gk/rdQVSLP7kO4mrz
-         cTHw==
-X-Gm-Message-State: AOAM53171Veuj/KCoy4JXipnx+4AtZ7UH0OC7qcDmURDNsGb8tosmRSO
-        ZG2/J5VL4iuy1QvWbk+l8CY=
-X-Google-Smtp-Source: ABdhPJzjsD/JD2TnBKP/Y+UoUX4WheNMH0jDX1ojdZ1WPXEEXBmoepezJyf7z9NLaFvZkaPh1bmyhg==
-X-Received: by 2002:a05:6a00:8d4:b0:4f6:6da0:f380 with SMTP id s20-20020a056a0008d400b004f66da0f380mr31516605pfu.34.1647994191702;
-        Tue, 22 Mar 2022 17:09:51 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-e24f-43ff-fee6-449f.res6.spectrum.com. [2603:800c:1a02:1bae:e24f:43ff:fee6:449f])
-        by smtp.gmail.com with ESMTPSA id t26-20020a056a00139a00b004faa13ba384sm9348071pfg.162.2022.03.22.17.09.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 17:09:51 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 22 Mar 2022 14:09:49 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Dave Chinner <david@fromorbit.com>
-Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
-Message-ID: <YjplTfleQUMjFV8C@slm.duckdns.org>
-References: <YjkEjYVjLuo8imtn@slm.duckdns.org>
- <1c455861-3b42-c530-a99e-cce13e932f53@I-love.SAKURA.ne.jp>
- <YjkJ3S/1c8PxiA2Q@slm.duckdns.org>
- <2ce1e26c-9050-9a4d-03b1-fb6ad57a5ccf@I-love.SAKURA.ne.jp>
- <Yjn+vpHZzvxiAUaK@slm.duckdns.org>
- <20220322220007.GQ1544202@dread.disaster.area>
- <YjpHjRoq+WtOAmut@slm.duckdns.org>
- <342c3dee-2acc-3983-ab38-7afe6c5ea677@I-love.SAKURA.ne.jp>
- <YjpLfK+glfSPe09Q@slm.duckdns.org>
- <20220322225914.GR1544202@dread.disaster.area>
+        Tue, 22 Mar 2022 20:16:06 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCF46E378
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 17:14:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1647994478; x=1679530478;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=GdbhgEPHZMj7WIxYHBgfeYmYBcS8yHQZhp9NkEy1/AU=;
+  b=KUGzZrodVbp4v9VE/ztxAzL+37Xp1dyUW/0g9MBpdS5Hj5Ca4EK/hMKs
+   RuarDPsBSP95cYfzOjZehTNqav7b9D+5Y8ufCp7dnGMPnKNIoIPPU8iGQ
+   mMry9wwMIV2LJpiLrzI3JZrhLo0B+Z1N+19B/kK45dlNgX4nso//m3t/4
+   rCaeWO6COvNi5A8tTQvJNwanQwccgNYIAGEfDNVMcbCMY4VEOv0qxaF0L
+   1lJyf1ko4UUhtIFCQrmz6vMvMWaaQK/mjWCWXA7JPQBUVFqrp7n4SLfHy
+   DIxW4Jw6ChSu6H07p0T5pCv4tFTMizHYvIyI9BwvZsa9hYvRLIp8bT/5F
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10294"; a="238591415"
+X-IronPort-AV: E=Sophos;i="5.90,203,1643702400"; 
+   d="scan'208";a="238591415"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2022 17:14:38 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,203,1643702400"; 
+   d="scan'208";a="500807058"
+Received: from lkp-server02.sh.intel.com (HELO 89b41b6ae01c) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 22 Mar 2022 17:14:36 -0700
+Received: from kbuild by 89b41b6ae01c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1nWoe3-000JRj-Fu; Wed, 23 Mar 2022 00:14:35 +0000
+Date:   Wed, 23 Mar 2022 08:13:46 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Tejun Heo <tj@kernel.org>, Christoph Hellwig <hch@lst.de>
+Subject: Re: [PATCH] block: avoid to call blkg_free() in atomic context
+Message-ID: <202203230833.LMKQ6DdX-lkp@intel.com>
+References: <20220322161238.2006448-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220322225914.GR1544202@dread.disaster.area>
+In-Reply-To: <20220322161238.2006448-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Hi Ming,
 
-On Wed, Mar 23, 2022 at 09:59:14AM +1100, Dave Chinner wrote:
-> The filesystem buffered write IO path isn't part of memory reclaim -
-> it's a user IO path and I think most filesystems will treat it that
-> way.
+Thank you for the patch! Perhaps something to improve:
 
-We can argue the semantics but anything in fs / io path which sit on write
-path should be marked MEM_RECLAIM because they can be depended upon while
-cleaning dirty pages. This isn't a layering problem or anything. It's just
-what that flag is for.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on v5.17 next-20220322]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-> If the loop device IO mechanism means that every ->write_iter path
-> needs to be considered as directly in the memory reclaim path, then
-> that means a huge amount of the kernel needs to be considered as "in
-> memory reclaim". i.e. it's not just this one XFS workqueue that is
-> going have this problem - it's any workqueue that can be waited on
-> by the incoming IO path.
-> 
-> For example, network filesystem might put the network stack directly
-> in the IO path. Which means if we then put loop on top of that
-> filesystems, various workqueues in the network stack may now need to
-> be considered as running under the memory reclaim path because of
-> the loop block device.
-> 
-> I don't know what the solution is, but if the fix is "xfs needs to
-> mark a workqueue that has nothing to do with memory reclaim as
-> WQ_MEM_RECLAIM because of the loop device" then we're talking about
-> playing workqueue whack-a-mole across the entire kernel forever
-> more....
+url:    https://github.com/0day-ci/linux/commits/Ming-Lei/block-avoid-to-call-blkg_free-in-atomic-context/20220323-001434
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-randconfig-a005-20220321 (https://download.01.org/0day-ci/archive/20220323/202203230833.LMKQ6DdX-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 902f4708fe1d03b0de7e5315ef875006a6adc319)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/c40ac630dd1d94497e427b4933efad4dbfaa0b5b
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Ming-Lei/block-avoid-to-call-blkg_free-in-atomic-context/20220323-001434
+        git checkout c40ac630dd1d94497e427b4933efad4dbfaa0b5b
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
 
-Yeah, all those workqueues must be and most of them are already tagged with
-MEM_RECLAIM. The network drivers are kinda painful and we *can* make them
-conditional (on it sitting in the io path) if that ever becomes necessary
-but the number hasn't been problematic till now.
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
 
-Thanks.
+All warnings (new ones prefixed by >>):
+
+   block/blk-cgroup.c:75: warning: Function parameter or member 'work' not described in 'blkg_free_workfn'
+>> block/blk-cgroup.c:75: warning: expecting prototype for blkg_free(). Prototype was for blkg_free_workfn() instead
+
+
+vim +75 block/blk-cgroup.c
+
+a2b1693bac45ea Tejun Heo 2012-04-13  67  
+0381411e4b1a52 Tejun Heo 2012-03-05  68  /**
+0381411e4b1a52 Tejun Heo 2012-03-05  69   * blkg_free - free a blkg
+0381411e4b1a52 Tejun Heo 2012-03-05  70   * @blkg: blkg to free
+0381411e4b1a52 Tejun Heo 2012-03-05  71   *
+0381411e4b1a52 Tejun Heo 2012-03-05  72   * Free @blkg which may be partially allocated.
+0381411e4b1a52 Tejun Heo 2012-03-05  73   */
+c40ac630dd1d94 Ming Lei  2022-03-23  74  static void blkg_free_workfn(struct work_struct *work)
+0381411e4b1a52 Tejun Heo 2012-03-05 @75  {
+c40ac630dd1d94 Ming Lei  2022-03-23  76  	struct blkcg_gq *blkg = container_of(work, struct blkcg_gq,
+c40ac630dd1d94 Ming Lei  2022-03-23  77  					     free_work);
+e8989fae38d983 Tejun Heo 2012-03-05  78  	int i;
+549d3aa872cd1a Tejun Heo 2012-03-05  79  
+549d3aa872cd1a Tejun Heo 2012-03-05  80  	if (!blkg)
+549d3aa872cd1a Tejun Heo 2012-03-05  81  		return;
+549d3aa872cd1a Tejun Heo 2012-03-05  82  
+db61367038dcd2 Tejun Heo 2013-05-14  83  	for (i = 0; i < BLKCG_MAX_POLS; i++)
+001bea73e70efd Tejun Heo 2015-08-18  84  		if (blkg->pd[i])
+001bea73e70efd Tejun Heo 2015-08-18  85  			blkcg_policy[i]->pd_free_fn(blkg->pd[i]);
+e8989fae38d983 Tejun Heo 2012-03-05  86  
+0a9a25ca78437b Ming Lei  2022-03-18  87  	if (blkg->q)
+0a9a25ca78437b Ming Lei  2022-03-18  88  		blk_put_queue(blkg->q);
+f73316482977ac Tejun Heo 2019-11-07  89  	free_percpu(blkg->iostat_cpu);
+ef069b97feec11 Tejun Heo 2019-06-13  90  	percpu_ref_exit(&blkg->refcnt);
+549d3aa872cd1a Tejun Heo 2012-03-05  91  	kfree(blkg);
+0381411e4b1a52 Tejun Heo 2012-03-05  92  }
+0381411e4b1a52 Tejun Heo 2012-03-05  93  
 
 -- 
-tejun
+0-DAY CI Kernel Test Service
+https://01.org/lkp
