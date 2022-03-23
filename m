@@ -2,111 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D90F8C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 01:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BAC4C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 01:58:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231530AbiCWBzD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 21:55:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55120 "EHLO
+        id S239042AbiCWB76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 21:59:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240590AbiCWBzC (ORCPT
+        with ESMTP id S240879AbiCWB75 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 21:55:02 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 810765BE5D
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 18:53:34 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id t5so328358pfg.4
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 18:53:34 -0700 (PDT)
+        Tue, 22 Mar 2022 21:59:57 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B14C756428
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 18:58:28 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id o3-20020a17090a3d4300b001c6bc749227so375029pjf.1
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 18:58:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=sCOm76y/sh5DspROS7K4wB/idPXNKcfl397QVrN3UP0=;
-        b=4kqTY5UEKA1B/GRl4lDGJyRIW4MtRtBEj0uKQhURAA0qbUqH79qnMnMkJcPotZ93An
-         L/nV/mxDUsv82hBte87aF9/IVKxhxtq7X3p8yXFnmUfE/b8eXnHzi79l4UYiid6komYf
-         MOOS5IJ0uW69H1yxpKkozDpfCtSWdhHwOvfNRC5WbHQZ7jfS5lzWCoRqxqzKRbX4rZyW
-         iwRLeEKSWncvd7dm+IXZsAVx/gFKFAx6bGrftXDIAihk1riE84qijcMkPTXLmuH8ydBS
-         47sUNKHv3OeiplOvP3Y4IspGa8gCnoQzzt2qXDk90qJ61VYjOZnKRfuUaMtk0BicvG4p
-         dAqA==
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=9WUJvJb+3FVfie2XgWOKgUsJUKjqCaUKC6dD4Q84ceM=;
+        b=lYFWtQ+pAgnGgUlDOeVxj3+Yg0co3zUv0nBKpaLeh9d31qT/w6jqFpYzFuql2DSM0k
+         v0/VtVUp+Rc5Y0j6XGKkRiZLe+xTKIeNJQuvIfG7bAAdFoRvaw6ozxrVYAexNXf4dcjp
+         at3rOo26TM2vc5gU/pOWabL/BUp+zuRdLFWKy9NAnOyZ14PGWFPw6o/0Qug4CQxdGdSV
+         J02tFzuvhB/x8+gOYnYgiRxy0D45Y2dcukrjc6NTJclXr7JmvtqAazbw0+cqmV89VCwt
+         rbZYEUC2xdHsl8dcu5NN4ZPW7x77iiJLznGvl+Lyu/lRNm4OTDSs/XPeSLVQk/IBfqEq
+         SCSA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=sCOm76y/sh5DspROS7K4wB/idPXNKcfl397QVrN3UP0=;
-        b=OZnWH8l0CB9G9EPnKcaXhCNThqiNYFLfjEa6p+uLGnaS16ZELw0hVIcbqZZe1pb7O9
-         5bsaNcTtmi/CnDjZKcjin2Utke0F/qbrthXucZf/i/9CD1sHzd7HYyi2XHRmrCMxZn2k
-         jFVRsMbpEC8SsMt5vMfXSDFOwsVJB+P280C4CuQxHyRLHlClvnTZ/EkvDZdR+hSgoXwp
-         +UjaTRGWACwwnW5mNIjgmKiVL5Jy0NWz0q7n/08tFdUwYawAYjWiHB5mWiFOvMKNMXom
-         QI4y7FngWugtgaCkBtpqbIxRF2+2Ai6JVYvzkX7OeEcU/hhUpgczTVXf9sb/9+ak07CG
-         Pi+g==
-X-Gm-Message-State: AOAM533x4NNHgGVuzDM7fftLnlWcWZ7cfhhj058NCSb+dg2c+ReMa/Am
-        vhyRAORUBGHOTMNSYLoeuwLyBA==
-X-Google-Smtp-Source: ABdhPJyfJZpN0/NtXoVnZWBeGTDPopXiCW6lJLYlIvbXSKJYUfQTSOe1iA+eiM//RcFU2NTvpMzPoA==
-X-Received: by 2002:a05:6a00:18aa:b0:4fa:ac2e:a969 with SMTP id x42-20020a056a0018aa00b004faac2ea969mr10126678pfh.27.1648000413867;
-        Tue, 22 Mar 2022 18:53:33 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u14-20020a056a00124e00b004fab8f3245fsm4278505pfi.149.2022.03.22.18.53.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 18:53:33 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20220323011308.2010380-1-ming.lei@redhat.com>
-References: <20220323011308.2010380-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2] block: avoid to call blkg_free() in atomic context
-Message-Id: <164800041278.696497.7442688779865145159.b4-ty@kernel.dk>
-Date:   Tue, 22 Mar 2022 19:53:32 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=9WUJvJb+3FVfie2XgWOKgUsJUKjqCaUKC6dD4Q84ceM=;
+        b=n00tCccMEu+t4uvAV9hxmN7lm8n2Beb4G6KbLY9wuLxcfgk4hGv4Il3AeQ7aCQE7NL
+         DQGGXTFc0aj9El1JzVDaszuCxgGBIJDvfkCzUw8zitZoa90qThYJAh3x8+e8mVctwnfX
+         7GzfYJjeWJUqJ0NvkaN6BhqMOYdiEdx+vA2FfuCl8s2P2U5IOmGvkjTDfIz2Ervh6xeQ
+         Bax7athbcfIPWRsfEEKt1Ir5q69MRiMl47bhHsAAUXbjNdUgGY58/H3cHRrMhEXxUEFJ
+         CATd2wKYUYWxHyVKTtFhPV1XsjPQ2ZzZ2kSTwXSDpIi6+aEzXPYXZgep0qM4Gqih/PJS
+         Fc1w==
+X-Gm-Message-State: AOAM531E3LKzsxAFD/XSWm3y5RmZHqJq/N1Wd6YiXhtOXripWPEqXCg4
+        5ZlhrSiwkpVjr8TNaFTZO0TlxQ==
+X-Google-Smtp-Source: ABdhPJywrahHnEK8IuzwOkAHcI26Q0uMh9Rkhe0HSiSKYX/CuWQet6iduiZxFq4TfrnKRIlzFCfdWg==
+X-Received: by 2002:a17:902:c949:b0:154:5215:1db1 with SMTP id i9-20020a170902c94900b0015452151db1mr14117251pla.163.1648000708134;
+        Tue, 22 Mar 2022 18:58:28 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id a38-20020a056a001d2600b004f70d5e92basm24545979pfx.34.2022.03.22.18.58.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 22 Mar 2022 18:58:27 -0700 (PDT)
+Message-ID: <a1693c16-151e-60f0-ed8d-25e98dce57d4@kernel.dk>
+Date:   Tue, 22 Mar 2022 19:58:25 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 10/17] block: wire-up support for plugging
+Content-Language: en-US
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Ming Lei <ming.lei@redhat.com>, Kanchan Joshi <joshi.k@samsung.com>
+Cc:     Kanchan Joshi <joshiiitr@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+References: <20220308152105.309618-1-joshi.k@samsung.com>
+ <CGME20220308152714epcas5p4c5a0d16512fd7054c9a713ee28ede492@epcas5p4.samsung.com>
+ <20220308152105.309618-11-joshi.k@samsung.com>
+ <20220310083400.GD26614@lst.de>
+ <CA+1E3rJMSc33tkpXUdnftSuxE5yZ8kXpAi+czSNhM74gQgk_Ag@mail.gmail.com>
+ <Yi9T9UBIz/Qfciok@T590> <20220321070208.GA5107@test-zns>
+ <Yjp3dMxs764WEz6N@T590> <c7ce0850-0286-ec6b-2d68-20226e7bae16@kernel.dk>
+In-Reply-To: <c7ce0850-0286-ec6b-2d68-20226e7bae16@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 23 Mar 2022 09:13:08 +0800, Ming Lei wrote:
-> blkg_free() may be called in atomic context, either spin lock is held,
-> or run in rcu callback. Meantime either request queue's release handler
-> or ->pd_free_fn can sleep.
+On 3/22/22 7:41 PM, Jens Axboe wrote:
+> On 3/22/22 7:27 PM, Ming Lei wrote:
+>> On Mon, Mar 21, 2022 at 12:32:08PM +0530, Kanchan Joshi wrote:
+>>> On Mon, Mar 14, 2022 at 10:40:53PM +0800, Ming Lei wrote:
+>>>> On Thu, Mar 10, 2022 at 06:10:08PM +0530, Kanchan Joshi wrote:
+>>>>> On Thu, Mar 10, 2022 at 2:04 PM Christoph Hellwig <hch@lst.de> wrote:
+>>>>>>
+>>>>>> On Tue, Mar 08, 2022 at 08:50:58PM +0530, Kanchan Joshi wrote:
+>>>>>>> From: Jens Axboe <axboe@kernel.dk>
+>>>>>>>
+>>>>>>> Add support to use plugging if it is enabled, else use default path.
+>>>>>>
+>>>>>> The subject and this comment don't really explain what is done, and
+>>>>>> also don't mention at all why it is done.
+>>>>>
+>>>>> Missed out, will fix up. But plugging gave a very good hike to IOPS.
+>>>>
+>>>> But how does plugging improve IOPS here for passthrough request? Not
+>>>> see plug->nr_ios is wired to data.nr_tags in blk_mq_alloc_request(),
+>>>> which is called by nvme_submit_user_cmd().
+>>>
+>>> Yes, one tag at a time for each request, but none of the request gets
+>>> dispatched and instead added to the plug. And when io_uring ends the
+>>> plug, the whole batch gets dispatched via ->queue_rqs (otherwise it used
+>>> to be via ->queue_rq, one request at a time).
+>>>
+>>> Only .plug impact looks like this on passthru-randread:
+>>>
+>>> KIOPS(depth_batch)  1_1    8_2    64_16    128_32
+>>> Without plug        159    496     784      785
+>>> With plug           159    525     991     1044
+>>>
+>>> Hope it does clarify.
+>>
+>> OK, thanks for your confirmation, then the improvement should be from
+>> batch submission only.
+>>
+>> If cached request is enabled, I guess the number could be better.
 > 
-> Fix the issue by scheduling work function for freeing blkcg_gq instance.
-> 
-> [  148.553894] BUG: sleeping function called from invalid context at block/blk-sysfs.c:767
-> [  148.557381] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/13
-> [  148.560741] preempt_count: 101, expected: 0
-> [  148.562577] RCU nest depth: 0, expected: 0
-> [  148.564379] 1 lock held by swapper/13/0:
-> [  148.566127]  #0: ffffffff82615f80 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire+0x0/0x1b
-> [  148.569640] Preemption disabled at:
-> [  148.569642] [<ffffffff8123f9c3>] ___slab_alloc+0x554/0x661
-> [  148.573559] CPU: 13 PID: 0 Comm: swapper/13 Kdump: loaded Not tainted 5.17.0_up+ #110
-> [  148.576834] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-1.fc33 04/01/2014
-> [  148.579768] Call Trace:
-> [  148.580567]  <IRQ>
-> [  148.581262]  dump_stack_lvl+0x56/0x7c
-> [  148.582367]  ? ___slab_alloc+0x554/0x661
-> [  148.583526]  __might_resched+0x1af/0x1c8
-> [  148.584678]  blk_release_queue+0x24/0x109
-> [  148.585861]  kobject_cleanup+0xc9/0xfe
-> [  148.586979]  blkg_free+0x46/0x63
-> [  148.587962]  rcu_do_batch+0x1c5/0x3db
-> [  148.589057]  rcu_core+0x14a/0x184
-> [  148.590065]  __do_softirq+0x14d/0x2c7
-> [  148.591167]  __irq_exit_rcu+0x7a/0xd4
-> [  148.592264]  sysvec_apic_timer_interrupt+0x82/0xa5
-> [  148.593649]  </IRQ>
-> [  148.594354]  <TASK>
-> [  148.595058]  asm_sysvec_apic_timer_interrupt+0x12/0x20
-> 
-> [...]
+> Yes, my original test patch pre-dates being able to set a submit count,
+> it would definitely help improve this case too. The current win is
+> indeed just from being able to use ->queue_rqs() rather than single
+> submit.
 
-Applied, thanks!
+Actually that is already there through io_uring, nothing extra is
+needed.
 
-[1/1] block: avoid to call blkg_free() in atomic context
-      commit: d578c770c85233af592e54537f93f3831bde7e9a
-
-Best regards,
 -- 
 Jens Axboe
-
 
