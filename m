@@ -2,68 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EDAC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 16:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BE33C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 16:45:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236146AbiCWQjt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 12:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40212 "EHLO
+        id S242751AbiCWQrR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 12:47:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231493AbiCWQjr (ORCPT
+        with ESMTP id S245542AbiCWQrE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 12:39:47 -0400
+        Wed, 23 Mar 2022 12:47:04 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5E76541
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 09:38:17 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747DB5FF29;
+        Wed, 23 Mar 2022 09:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=F6ZxHPxQkAvi8SSVUYKhrpEuw9qJyFA484+C2OJlw/A=; b=gSxPQMAHoePp42mReEuwhyK6xq
-        LG5lY0iTOljWnJo7bbVqFb7ZBRBwll3LWZgQWrKh1jNlym4KM2YaPJF+rzEjB7d9Ixz4zXJH/Scvp
-        H5DjLY73faEI4ag/w5EztxqXKzmYZprSthBsnc0sHxmyqAVnTucZLnJ/JvKscySboc6p0fWs+54zJ
-        +glmbPVznZg5m+9XS5AZyCdeo8wcW54aKo1v27dVmqD3S70QAsezies6R7cYypBf8kloOnKJyvgwm
-        J2TQLPb1jES1XVSllGCyrDUw2/B/s9QbH96f0KiihSQ+RKqE1nE7gy4YrN8jB8aDdJZo4xzIitOSe
-        S5IbZV+w==;
-Received: from [2001:4bb8:19a:b822:f080:d126:bfe4:c36c] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nX400-00EHJp-Vs; Wed, 23 Mar 2022 16:38:17 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH] block: don't print I/O error warning for dead disks
-Date:   Wed, 23 Mar 2022 17:38:15 +0100
-Message-Id: <20220323163815.1526998-1-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=O6SFKONUTvLIQdQzfaDKFf4xslPRUYzgRdkwBAJy9AU=; b=F4bY1Ko8RtdLoTqRAtzKuUTF04
+        J4sfCqUaTCB7QFLrhyYUi+pV3sT6yV2XcC5i/mNuLOwkC4NVgmaoLyMcPUM4r7IEKCSqzjJNm5Aw3
+        u//0QeuZ+BGuAeSupgDQqjpHLdXUeRrwv9F2kltz0ql8mkB/mGE0PIstMn9r16vkswUHcIWHNUVvH
+        n8tsBPOhe3SMRp/xEv4JhF5F5o9Yr5dBpBe7/cnTe6W5G0Bq8PXPga5CTE7syNTrLyk/J8GSAvGWA
+        tt8ulAOL6+KZX3F1NnP9TpqbUe+Ibqk/7l/536dwpW4/1FnzY3TlRWjh1016z4o517klXtc0e2ObQ
+        oqJTMGqQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nX46v-00EHrK-6J; Wed, 23 Mar 2022 16:45:25 +0000
+Date:   Wed, 23 Mar 2022 09:45:25 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Cc:     linux-mm@kvack.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        xuyu@linux.alibaba.com, bostroesser@gmail.com
+Subject: Re: [RFC 1/3] mm/memory.c: introduce vm_insert_page(s)_mkspecial
+Message-ID: <YjtOpf1bf0qH87HD@infradead.org>
+References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
+ <20220318095531.15479-2-xiaoguang.wang@linux.alibaba.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220318095531.15479-2-xiaoguang.wang@linux.alibaba.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a disk has been marked dead, don't print warnings for I/O errors
-as they are very much expected.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 8e659dc5fcf37..5b6a7c9d0d992 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -794,7 +794,8 @@ bool blk_update_request(struct request *req, blk_status_t error,
- #endif
- 
- 	if (unlikely(error && !blk_rq_is_passthrough(req) &&
--		     !(req->rq_flags & RQF_QUIET))) {
-+		     !(req->rq_flags & RQF_QUIET)) &&
-+		     !test_bit(GD_DEAD, &req->q->disk->state)) {
- 		blk_print_req_error(req, error);
- 		trace_block_rq_error(req, error, nr_bytes);
- 	}
--- 
-2.30.2
-
+I relaly don't think we should add this amount of overhead to the
+core VM for a (relatively) irrelevant driver.
