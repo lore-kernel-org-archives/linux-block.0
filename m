@@ -2,84 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B64A8C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:15:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6786FC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:42:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231980AbiCWGQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 02:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
+        id S237424AbiCWGoW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 02:44:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbiCWGQa (ORCPT
+        with ESMTP id S231617AbiCWGoV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 02:16:30 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC125A17B
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 23:15:01 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id A51AE81;
-        Tue, 22 Mar 2022 23:14:58 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id HM-s5RCIFE8f; Tue, 22 Mar 2022 23:14:58 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id CA19840;
-        Tue, 22 Mar 2022 23:14:57 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net CA19840
-Date:   Tue, 22 Mar 2022 23:14:56 -0700 (PDT)
-From:   Eric Wheeler <linux-block@lists.ewheeler.net>
-To:     Ming Lei <ming.lei@redhat.com>
-cc:     linux-block@vger.kernel.org
-Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
- completion.
-In-Reply-To: <YjfFHvTCENCC29WS@T590>
-Message-ID: <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net>
-References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net> <YjfFHvTCENCC29WS@T590>
+        Wed, 23 Mar 2022 02:44:21 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3DA370044;
+        Tue, 22 Mar 2022 23:42:52 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8DA2C68AFE; Wed, 23 Mar 2022 07:42:48 +0100 (CET)
+Date:   Wed, 23 Mar 2022 07:42:48 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Guenter Roeck <linux@roeck-us.net>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-nfs@vger.kernel.org,
+        linux-nilfs <linux-nilfs@vger.kernel.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.co>,
+        device-mapper development <dm-devel@redhat.com>,
+        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        linux-fsdevel@vger.kernel.org, xen-devel@lists.xenproject.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        ntfs3@lists.linux.dev, Jack Wang <jinpu.wang@ionos.com>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        drbd-dev@lists.linbit.com
+Subject: Re: [dm-devel] [PATCH 01/19] fs: remove mpage_alloc
+Message-ID: <20220323064248.GA24874@lst.de>
+References: <20220124091107.642561-1-hch@lst.de> <20220124091107.642561-2-hch@lst.de> <20220322211915.GA2413063@roeck-us.net> <CAKFNMonRd5QQMzLoH3T=M=C=2Q_j9d86EYzZeY4DU2HQAE3E8w@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKFNMonRd5QQMzLoH3T=M=C=2Q_j9d86EYzZeY4DU2HQAE3E8w@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 21 Mar 2022, Ming Lei wrote:
-> On Sat, Mar 19, 2022 at 10:14:29AM -0700, Eric Wheeler wrote:
-> > Hello all,
-> > 
-> > In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
-> > it does not appear that lo_req_flush() does anything to make sure 
-> > ki_complete has been called for pending work, it just calls vfs_fsync().
-> > 
-> > Is this a consistency problem?
+On Wed, Mar 23, 2022 at 06:38:22AM +0900, Ryusuke Konishi wrote:
+> This looks because the mask of GFP_KERNEL is removed along with
+> the removal of mpage_alloc().
 > 
-> No. What FLUSH command provides is just flushing cache in device side to
-> storage medium, so it is nothing to do with pending request.
 
-If a flush follows a series of writes, would it be best if the flush 
-happened _after_ those writes complete?  Then then the storage medium will 
-be sure to flush what was intended to be written.
+> The default value of the gfp flag is set to GFP_HIGHUSER_MOVABLE by
+> inode_init_always().
+> So, __GFP_HIGHMEM hits the gfp warning at bio_alloc() that
+> do_mpage_readpage() calls.
 
-It seems that this series of events could lead to inconsistent data:
-	loop		->	filesystem
-	write a
-	write b
-	flush
-				write a
-				flush
-				write b
-				crash, b is lost
+Yeah.  Let's try this to match the iomap code:
 
-If write+flush ordering is _not_ important, then can you help me 
-understand why?
-
--Eric
-
-
-
-> 
-> 
-> Thanks, 
-> Ming
-> 
-> 
+diff --git a/fs/mpage.c b/fs/mpage.c
+index 9ed1e58e8d70b..d465883edf719 100644
+--- a/fs/mpage.c
++++ b/fs/mpage.c
+@@ -148,13 +148,11 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
+ 	int op = REQ_OP_READ;
+ 	unsigned nblocks;
+ 	unsigned relative_block;
+-	gfp_t gfp;
++	gfp_t gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
+ 
+ 	if (args->is_readahead) {
+ 		op |= REQ_RAHEAD;
+-		gfp = readahead_gfp_mask(page->mapping);
+-	} else {
+-		gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
++		gfp |= __GFP_NORETRY | __GFP_NOWARN;
+ 	}
+ 
+ 	if (page_has_buffers(page))
