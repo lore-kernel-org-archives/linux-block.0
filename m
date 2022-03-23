@@ -2,135 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F13C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:11:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B64A8C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241914AbiCWGMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 02:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58248 "EHLO
+        id S231980AbiCWGQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 02:16:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231919AbiCWGMg (ORCPT
+        with ESMTP id S229624AbiCWGQa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 02:12:36 -0400
-Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D0076E8F0;
-        Tue, 22 Mar 2022 23:11:03 -0700 (PDT)
-Received: by mail-qv1-xf2a.google.com with SMTP id kc20so534669qvb.3;
-        Tue, 22 Mar 2022 23:11:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:from:to:cc:subject:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ifWjR9jEFmFX8aRx9xc4ahzyvlT1JxK8sH59+zbMgcM=;
-        b=d8yqVfswjLKnW065K+y9jlbglxjxi533dEaaajB2Hr5kQEVFHk2pIMnd0cKiv2Y5QK
-         3zj6eHcsJdEnbNGBhm7UHtSffl9a8EpWvRgpB0SoC9Nexg0tsr4nhsswekoQM/3fbDvG
-         y6iOwb+TNOEMoKJF6mM5yjLFxZHBlW/Pudhfnftit78UhaFAC9k36rDZgCZunoGDss9H
-         xTnVjv9J0LRCPBpIxq14i8JUOVoJx9a+cnHay7bfSal0huT9hL2haYbYdA26AiBNMUo3
-         ULwEOgzAC6/zeSHW1R/z/fAJPmPpL8mzbTM63WDgElWHRZspna3zcn8/R31hyJ3Cvpm/
-         vdgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:from:to:cc:subject:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ifWjR9jEFmFX8aRx9xc4ahzyvlT1JxK8sH59+zbMgcM=;
-        b=ij2XD7tDgngXdhFh6GS0fRj47OocRSKRIwnXGFpOf2Faf0IUxKRjeWR3jigYRF+78G
-         s0kJi3cHEujr6lC/jPGm+9KFBAfH2uuWHZFL0+wFRCfd9TeMb4pmF13M1PX+c8DGB4Ao
-         nZttAa3yxPNFsoZNDJ8vyyDHQQXHIrjvyQcWB+T89W0EiLP4fWa0EP/5OwpG8DxDPYSA
-         rVC7s2WnAn+v7IqXsqBZSwf5DCGBaZS+LYxrH4KwKz9g0K1gTBsigMF/jal1zyrr7Ydb
-         jNUUi0IlmmUpyRfXNRgdw3Iy7NuhMYWGfTtXT3QX+1uBbQW9KB9rnHNU3NIfXq6Sp9jS
-         ueTA==
-X-Gm-Message-State: AOAM5330Ji0y1No5bfF34yLbzviIRa4lu4UWhivK5xoraZJ7OjvEQdXN
-        iHllHzK3a5i/HqRajk1ioqg=
-X-Google-Smtp-Source: ABdhPJxgu4dweeqTZjUIM6RLqCD9cWzQSftS10ONwtj2woCx83xyIagtnBycyLjFBoH22jxt1oI4KA==
-X-Received: by 2002:a05:6214:20e6:b0:440:f6d0:fe55 with SMTP id 6-20020a05621420e600b00440f6d0fe55mr20307116qvk.57.1648015862723;
-        Tue, 22 Mar 2022 23:11:02 -0700 (PDT)
-Received: from localhost ([193.203.214.57])
-        by smtp.gmail.com with ESMTPSA id b126-20020a376784000000b0067d21404704sm9845296qkc.131.2022.03.22.23.11.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 22 Mar 2022 23:11:01 -0700 (PDT)
-Message-ID: <623ab9f5.1c69fb81.66f4.5e68@mx.google.com>
-X-Google-Original-Message-ID: <20220323061058.GA2343452@cgel.zte@gmail.com>
-Date:   Wed, 23 Mar 2022 06:10:58 +0000
-From:   CGEL <cgel.zte@gmail.com>
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, akpm@linux-foundation.org,
-        Yang Yang <yang.yang29@zte.com.cn>,
-        Ran Xiaokai <ran.xiaokai@zte.com.cn>
-Subject: Re: [PATCH] block/psi: make PSI annotations of submit_bio only work
- for file pages
-References: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
- <YjiMsGoXoDU+FwsS@cmpxchg.org>
- <623938d1.1c69fb81.52716.030f@mx.google.com>
- <YjnO3p6vvAjeMCFC@cmpxchg.org>
+        Wed, 23 Mar 2022 02:16:30 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BC125A17B
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 23:15:01 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id A51AE81;
+        Tue, 22 Mar 2022 23:14:58 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id HM-s5RCIFE8f; Tue, 22 Mar 2022 23:14:58 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id CA19840;
+        Tue, 22 Mar 2022 23:14:57 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net CA19840
+Date:   Tue, 22 Mar 2022 23:14:56 -0700 (PDT)
+From:   Eric Wheeler <linux-block@lists.ewheeler.net>
+To:     Ming Lei <ming.lei@redhat.com>
+cc:     linux-block@vger.kernel.org
+Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
+ completion.
+In-Reply-To: <YjfFHvTCENCC29WS@T590>
+Message-ID: <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net>
+References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net> <YjfFHvTCENCC29WS@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YjnO3p6vvAjeMCFC@cmpxchg.org>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 09:27:58AM -0400, Johannes Weiner wrote:
-> On Tue, Mar 22, 2022 at 02:47:42AM +0000, CGEL wrote:
-> > On Mon, Mar 21, 2022 at 10:33:20AM -0400, Johannes Weiner wrote:
-> > > On Wed, Mar 16, 2022 at 06:39:28AM +0000, cgel.zte@gmail.com wrote:
-> > > > From: Yang Yang <yang.yang29@zte.com.cn>
-> > > > 
-> > > > psi tracks the time spent on submitting the IO of refaulting file pages
-> > > > and anonymous pages[1]. But after we tracks refaulting anonymous pages
-> > > > in swap_readpage[2][3], there is no need to track refaulting anonymous
-> > > > pages in submit_bio.
-> > > > 
-> > > > So this patch can reduce redundant calling of psi_memstall_enter. And
-> > > > make it easier to track refaulting file pages and anonymous pages
-> > > > separately.
-> > > 
-> > > I don't think this is an improvement.
-> > > 
-> > > psi_memstall_enter() will check current->in_memstall once, detect the
-> > > nested call, and bail. Your patch checks PageSwapBacked for every page
-> > > being added. It's more branches for less robust code.
+On Mon, 21 Mar 2022, Ming Lei wrote:
+> On Sat, Mar 19, 2022 at 10:14:29AM -0700, Eric Wheeler wrote:
+> > Hello all,
 > > 
-> > We are also working for a new patch to classify different reasons cause
-> > psi_memstall_enter(): reclaim, thrashing, compact, etc. This will help
-> > user to tuning sysctl, for example, if user see high compact delay, he
-> > may try do adjust THP sysctl to reduce the compact delay.
+> > In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
+> > it does not appear that lo_req_flush() does anything to make sure 
+> > ki_complete has been called for pending work, it just calls vfs_fsync().
 > > 
-> > To support that, we should distinguish what's the reason cause psi in
-> > submit_io(), this patch does the job.
+> > Is this a consistency problem?
 > 
-> Please submit these patches together then. On its own, this patch
-> isn't desirable.
-I think this patch has it's independent value, I try to make a better
-explain.
+> No. What FLUSH command provides is just flushing cache in device side to
+> storage medium, so it is nothing to do with pending request.
 
-1) This patch doesn't work it worse or even better
-After this patch, swap workingset handle is simpler, file workingset
-handle just has one more check, as below.
-Before this patch handling swap workingset:
-	a) in swap_readpage() call psi_memstall_enter() ->
-	b) in __bio_add_page() test if should call bio_set_flag(), true ->
-	c) in __bio_add_page() call bio_set_flag()
-	d) in submit_bio() test if should call psi_memstall_enter(), true ->
-	e) call psi_memstall_enter, detect the nested call, and bail.
-	f) call bio_clear_flag if needed.
-Before this patch handling file page workingset:
-	a) in __bio_add_page() test if should call bio_set_flag(), true ->
-	...
-	b) call bio_clear_flag if needed.
-After this patch handling swap workingset:
-	a) in swap_readpage() call psi_memstall_enter() ->
-	b) in __bio_add_page() test if should call bio_set_flag(), one more check, false and return.
-	c) in submit_bio() test if should call psi_memstall_enter(), false and return.
-After this patch handling file pages workingset:
-	a) in __bio_add_page() test if should call bio_set_flag(), one more check, true ->
-	...
-	b) call bio_clear_flag if needed.
+If a flush follows a series of writes, would it be best if the flush 
+happened _after_ those writes complete?  Then then the storage medium will 
+be sure to flush what was intended to be written.
 
-2) This patch help tools like kprobe to trace different workingset
-After this patch we know workingset in submit_io() is only cause by file pages.
+It seems that this series of events could lead to inconsistent data:
+	loop		->	filesystem
+	write a
+	write b
+	flush
+				write a
+				flush
+				write b
+				crash, b is lost
 
-3) This patch will help code evolution
-Such as psi classify, getdelays supports counting file pages workingset submit.
+If write+flush ordering is _not_ important, then can you help me 
+understand why?
+
+-Eric
+
+
+
+> 
+> 
+> Thanks, 
+> Ming
+> 
+> 
