@@ -2,94 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0381FC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 22 Mar 2022 23:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6F30C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 00:06:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230205AbiCVXwE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 19:52:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47446 "EHLO
+        id S240847AbiCWAHw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 20:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52108 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230177AbiCVXwD (ORCPT
+        with ESMTP id S229470AbiCWAHv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 19:52:03 -0400
-Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89E426EB2D;
-        Tue, 22 Mar 2022 16:50:35 -0700 (PDT)
-Received: from dread.disaster.area (pa49-186-150-27.pa.vic.optusnet.com.au [49.186.150.27])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id 08A0B533B09;
-        Wed, 23 Mar 2022 10:50:33 +1100 (AEDT)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1nWoGm-008hY6-KY; Wed, 23 Mar 2022 10:50:32 +1100
-Date:   Wed, 23 Mar 2022 10:50:32 +1100
-From:   Dave Chinner <david@fromorbit.com>
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Tejun Heo <tj@kernel.org>,
-        Dan Schatzberg <schatzberg.dan@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Jan Kara <jack@suse.cz>, Christoph Hellwig <hch@lst.de>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-xfs <linux-xfs@vger.kernel.org>
-Subject: Re: [PATCH] loop: add WQ_MEM_RECLAIM flag to per device workqueue
-Message-ID: <20220322235032.GS1544202@dread.disaster.area>
-References: <1c455861-3b42-c530-a99e-cce13e932f53@I-love.SAKURA.ne.jp>
- <YjkJ3S/1c8PxiA2Q@slm.duckdns.org>
- <2ce1e26c-9050-9a4d-03b1-fb6ad57a5ccf@I-love.SAKURA.ne.jp>
- <Yjn+vpHZzvxiAUaK@slm.duckdns.org>
- <20220322220007.GQ1544202@dread.disaster.area>
- <YjpHjRoq+WtOAmut@slm.duckdns.org>
- <342c3dee-2acc-3983-ab38-7afe6c5ea677@I-love.SAKURA.ne.jp>
- <YjpLfK+glfSPe09Q@slm.duckdns.org>
- <20220322225914.GR1544202@dread.disaster.area>
- <fd10ea3c-fb18-2bb0-d630-4d3cb1f48394@I-love.SAKURA.ne.jp>
+        Tue, 22 Mar 2022 20:07:51 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5E75E143
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 17:06:23 -0700 (PDT)
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22N065RR036473;
+        Wed, 23 Mar 2022 09:06:05 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Wed, 23 Mar 2022 09:06:05 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22N064DF036470
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 23 Mar 2022 09:06:04 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <e0d5bde3-16cc-9576-7fc6-c3d82e6854e7@I-love.SAKURA.ne.jp>
+Date:   Wed, 23 Mar 2022 09:06:05 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fd10ea3c-fb18-2bb0-d630-4d3cb1f48394@I-love.SAKURA.ne.jp>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.4 cv=VuxAv86n c=1 sm=1 tr=0 ts=623a60ca
-        a=sPqof0Mm7fxWrhYUF33ZaQ==:117 a=sPqof0Mm7fxWrhYUF33ZaQ==:17
-        a=kj9zAlcOel0A:10 a=o8Y5sQTvuykA:10 a=7-415B0cAAAA:8
-        a=XEOLygNWQvZj-UsTpHEA:9 a=CjuIK1q_8ugA:10 a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 8/8] loop: don't destroy lo->workqueue in __loop_clr_fd
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com
+References: <20220316084519.2850118-1-hch@lst.de>
+ <20220316084519.2850118-9-hch@lst.de>
+ <20220316112522.7fvzz7hgnyogbkxj@quack3.lan>
+ <dd4e3821-24cf-8b65-4851-f90b395a4557@I-love.SAKURA.ne.jp>
+ <20220322111017.GB28931@lst.de>
+ <3af48f01-eaca-f17a-a18b-5279c7a4a691@I-love.SAKURA.ne.jp>
+In-Reply-To: <3af48f01-eaca-f17a-a18b-5279c7a4a691@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 08:32:49AM +0900, Tetsuo Handa wrote:
-> On 2022/03/23 7:59, Dave Chinner wrote:
-> > I don't know what the solution is, but if the fix is "xfs needs to
-> > mark a workqueue that has nothing to do with memory reclaim as
-> > WQ_MEM_RECLAIM because of the loop device" then we're talking about
-> > playing workqueue whack-a-mole across the entire kernel forever
-> > more....
-....
-> And if WQs used by filesystem side do not want to use WQ_MEM_RECLAIM flag, the loop
-> module would have to abuse __WQ_LEGACY flag in order to suppress this warning.
+On 2022/03/22 21:42, Tetsuo Handa wrote:
+> On 2022/03/22 20:10, Christoph Hellwig wrote:
+>> On Wed, Mar 16, 2022 at 10:24:20PM +0900, Tetsuo Handa wrote:
+>>> Since this WQ is invoked when flushing data to disk, this WQ had better use
+>>> WQ_MEM_RECLAIM flag when creating. A WQ created with WQ_MEM_RECLAIM flag has
+>>> at least one "struct task_struct" in order to guarantee forward progress, but
+>>> results in consuming more kernel resources. Therefore, it is preferable to
+>>> destroy the WQ when clearing unbinding a loop device from a backing file.
+>>
+>> Whіch then gets us into lock dependency problems.  A previously used
+>> but lingering around device will use some resources, so what?  If you
+>> care about the least used resources the only way to get there is to
+>> destroy the device.
+> 
+> There is no dependency problems and there is no resource wasting if we choose
+> task_work approach, for that approach runs in lockless context and allows
+> destroying "struct task_struct" as soon as device is unbound.
 
-I'm not talking about whether filesysetms want to use WQ_MEM_RECLAIM
-or not, I'm commenting on the implicit depedency that the loop
-device creates that forces the use of WQ_MEM_RECLAIM in all
-downstream workqueues. That's what I'm asking about here - how far
-does this implicit, undocumented dependency actually reach and how
-do we communicate to all developers so that they know about this in
-the future when creating new workqueues that might end up under the
-loop device?
-
-That's the problem here - unless the developer explicitly considers
-and/or remembers this loopback dependency when adding a new
-workqueue to a filesystem (or even as far down as network stacks)
-then this problem is going to keep happening and we'll just have to
-keep driving WQ_MEM_RECLAIM deeper into the stack.
-
-Tejun stated that just marking all workqueues as WQ_MEM_RECLAIM as
-being problematic in some situations, and I'm concerned that
-resolving implicit dependencies are going to end up in that
-situation anyway.
-
-Cheers,
-
-Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+This lockdep problem is reaching to whether the loop module should continue using WQ.
+There must be a reason to convert kernel threads into WQ again, but use of WQ_MEM_RECLAIM flag
+is causing troubles. https://lkml.kernel.org/r/20220322235032.GS1544202@dread.disaster.area
