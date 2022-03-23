@@ -2,95 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89896C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 19:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7132C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 19:45:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241663AbiCWTnj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 15:43:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42594 "EHLO
+        id S1344362AbiCWTrB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 15:47:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344323AbiCWTnj (ORCPT
+        with ESMTP id S241263AbiCWTrA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 15:43:39 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9860C8B6F5
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 12:42:09 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id DDF751F44C3A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1648064528;
-        bh=jaSlGEWNNc5/heOq1AHMdWQOmAzG5eDPGZkTrS0x1Wg=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=Ldj8DuSqrt6OXxElXNi9MAKJvo0e9gBtZLdVjSE2ae5C2z17URQ67w8ik0+/cEQf1
-         /zXSQFUNWj9co/eSJ+b5vP84eh6VSk0R6X45xbqDecHKDuT1J+SgnDkGyXiCn/c6Ln
-         14M+j/3pS5DcdskX0GqXttw0xsqnaarQQ3Eq+1JxTqxnEO6dYYXdu6pKotVLMBP0cc
-         Ei7wn2nH8kBWq0t9ymo6vT+wq4GdXsQ17WpdOeMQQ8sU1hDM3f50p3aeIlyy6J3cl3
-         r4zZSMPK9LnDgWnTrXgouqajFZ6pdFmPJwBfSTpT80pi+L9b35TuxRWrzhRu//FUQv
-         R2arglUru/y0A==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Sagi Grimberg <sagi@grimberg.me>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Hannes Reinecke <hare@suse.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-Organization: Collabora
-References: <87tucsf0sr.fsf@collabora.com>
-        <986caf55-65d1-0755-383b-73834ec04967@suse.de>
-        <b6bb4435-d83c-b129-c761-00a74e7e0739@grimberg.me>
-        <87bkyyg4jc.fsf@collabora.com>
-        <e0a6ca51-8202-0b61-dd50-349e6f27761b@grimberg.me>
-        <45caea9d-53d0-6f06-bb98-9174a08972d4@oracle.com>
-        <6d831f69-06f4-fafe-ce17-13596e6f3f6d@grimberg.me>
-        <0b85385b-e8cf-2ab3-ce22-c63d4346cc16@acm.org>
-        <c618c809-4ec0-69f9-0cab-87149ad6b45a@suse.de>
-        <d2950977-9930-1e80-a46d-8311935e8da4@grimberg.me>
-        <YjBKaoBYtofJXrgw@infradead.org>
-        <1cec32d1-511e-1a78-b157-9ecaebc72c66@grimberg.me>
-Date:   Wed, 23 Mar 2022 15:42:04 -0400
-In-Reply-To: <1cec32d1-511e-1a78-b157-9ecaebc72c66@grimberg.me> (Sagi
-        Grimberg's message of "Tue, 15 Mar 2022 10:38:24 +0200")
-Message-ID: <87bkxwqwvn.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
+        Wed, 23 Mar 2022 15:47:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CA9EF8B6FD
+        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 12:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648064730;
+        h=from:from:sender:sender:reply-to:subject:subject:date:date:
+         message-id:message-id:to:to:cc:cc;
+        bh=lSw1myUul/JfBJxzMKk7S5towi4LjKVp/1Za72ezB54=;
+        b=LySLnh5D8ldF2An8lMEdM511ztji2IndrSg3bMjgzJrZ20yOdFoU4JcGu+5d09GTPsKUaZ
+        Ym8It4T9o7hJ8TDmoW0pr9X5a+kgDNeXXhg+iKqqOJrPJfpLUCzR2kkgZP9amU8ksb5g+P
+        J3NV9BSAlye41K19E24todAgpdanfxY=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-524-gJeEuQpKNT-1tyN8BJeC6A-1; Wed, 23 Mar 2022 15:45:26 -0400
+X-MC-Unique: gJeEuQpKNT-1tyN8BJeC6A-1
+Received: by mail-qt1-f200.google.com with SMTP id h11-20020a05622a170b00b002e0769b9018so1995803qtk.14
+        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 12:45:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id;
+        bh=lSw1myUul/JfBJxzMKk7S5towi4LjKVp/1Za72ezB54=;
+        b=7hy98tfkIgdKJiBSr9gKKGEViqcHwIdJF9EOB+WpnS08FpkNPhqxTlypp3cvfCXKv6
+         UnlNJF+5fR7QB5k/SuOVvFXUajDutfe3SNfz3wp6J6Q+ZpdGQKPuW3I6bDQlhPl2yi5H
+         /SYO3JuKJcGH/NZ4TDh6SjMT4UtlgoplCGtRi+upyUFh1/xNsUdbWBm8egen8D6y9RyT
+         nzhH4MkkIDLlpcrgzDK/+vGAZznbe77+rBm/4TUkSghP4lp39tQ9v2qEfcEGci2QihDo
+         dzdE0wSA7Hd6gDEKC5UZKHYm973LEEV3VmEy8nwZF2rM7fuhlz+ngxdR8iUGZEC0DuZt
+         Zozw==
+X-Gm-Message-State: AOAM533+Zb8FlYvP5JBxvVt71k2oA2Y/7n3WKw1AvenwgqMYznVVqilk
+        k6lnhM/i99+xroD+0rhaGCofbkNtWuL+HUlRtE+l8mQe1IePYbPwvrBxkbQIItoYnNW8ceXzEoE
+        5jxYQNM0hhAQKda2WRStzog==
+X-Received: by 2002:a05:620a:4442:b0:67d:b94a:8c6a with SMTP id w2-20020a05620a444200b0067db94a8c6amr1061909qkp.569.1648064725985;
+        Wed, 23 Mar 2022 12:45:25 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJx47UcAziqxaHCmQSZ1SIf9p3IFNqdEceNYCt1DNIo6G+Q2WNX/DpF1yfSQSseo4kE6sbUbPQ==
+X-Received: by 2002:a05:620a:4442:b0:67d:b94a:8c6a with SMTP id w2-20020a05620a444200b0067db94a8c6amr1061900qkp.569.1648064725765;
+        Wed, 23 Mar 2022 12:45:25 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id r11-20020ae9d60b000000b0067e5308d664sm545584qkk.92.2022.03.23.12.45.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Mar 2022 12:45:25 -0700 (PDT)
+Sender: Mike Snitzer <msnitzer@redhat.com>
+From:   Mike Snitzer <snitzer@redhat.com>
+X-Google-Original-From: Mike Snitzer <snitzer@kernel.org>
+To:     axboe@kernel.dk
+Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH v2 0/4] block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_bioset
+Date:   Wed, 23 Mar 2022 15:45:20 -0400
+Message-Id: <20220323194524.5900-1-snitzer@kernel.org>
+X-Mailer: git-send-email 2.15.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sagi Grimberg <sagi@grimberg.me> writes:
+Hi Jens,
 
->> FYI, I have absolutely no interest in supporting any userspace hooks
->> in nvmet.
->
-> Don't think we are discussing adding anything specific to nvmet, a
-> userspace backend will most likely sit behind a block device exported
-> via nvmet (at least from my perspective). Although I do see issues
-> with using the passthru interface...
->
->> If you want a userspace nvme implementation please use SPDK.
->
-> The original use-case did not include nvmet, I may have stirred
-> the pot saying that we have nvmet loopback instead of a new kind
-> of device with a new set of tools.
->
-> I don't think that spdk meets even the original android use-case.
->
-> Not touching nvmet is fine, it just eliminates some of the possible
-> use-cases. Although personally I don't see a huge issue with adding
-> yet another backend to nvmet...
+I ran with your suggestion and DM now sees a ~7% improvement in hipri
+bio polling with io_uring (using dm-linear on null_blk, IOPS went from
+900K to 966K).
 
-After discussing with google for the r/w/flush use-case (cloud, not
-android), they are interested in avoiding the source of complexity that
-arises from implementing the NVMe protocol in the interface.  Even if it
-is hidden behind a userspace library, it means converting block
-rq->nvme->block rq, which might have a performance impact?
+Christoph,
 
-From your previous message, I think we can move forward with dissociating
-the original use case from nvme passthrough, and have the userspace hook
-as a block driver?
+I tried to address your review of the previous set. Patch 1 and 2 can
+obviously be folded but I left them split out for review purposes.
+Feel free to see if these changes are meaningful for nvme's use.
+Happy for either you to take on iterating on these block changes
+further or you letting me know what changes you'd like made.
+
+Thanks,
+Mike
+
+v2: add REQ_ALLOC_CACHE and move use of bio_alloc_percpu_cache to
+    bio_alloc_bioset
+
+Mike Snitzer (4):
+  block: allow BIOSET_PERCPU_CACHE use from bio_alloc_clone
+  block: allow BIOSET_PERCPU_CACHE use from bio_alloc_bioset
+  dm: enable BIOSET_PERCPU_CACHE for dm_io bioset
+  dm: conditionally enable BIOSET_PERCPU_CACHE for bio-based dm_io bioset
+
+ block/bio.c               | 67 +++++++++++++++++++++++++++++++----------------
+ block/blk.h               |  7 -----
+ drivers/md/dm-table.c     | 11 +++++---
+ drivers/md/dm.c           | 10 +++----
+ drivers/md/dm.h           |  4 +--
+ include/linux/bio.h       |  9 +++++++
+ include/linux/blk_types.h |  4 ++-
+ 7 files changed, 71 insertions(+), 41 deletions(-)
 
 -- 
-Gabriel Krisman Bertazi
+2.15.0
+
