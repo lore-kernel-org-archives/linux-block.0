@@ -2,81 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6786FC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A27C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 06:47:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237424AbiCWGoW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 02:44:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49518 "EHLO
+        id S231617AbiCWGs2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 23 Mar 2022 02:48:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231617AbiCWGoV (ORCPT
+        with ESMTP id S230377AbiCWGs1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 02:44:21 -0400
+        Wed, 23 Mar 2022 02:48:27 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3DA370044;
-        Tue, 22 Mar 2022 23:42:52 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD4370CF0
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 23:46:58 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8DA2C68AFE; Wed, 23 Mar 2022 07:42:48 +0100 (CET)
-Date:   Wed, 23 Mar 2022 07:42:48 +0100
+        id 043A868B05; Wed, 23 Mar 2022 07:46:55 +0100 (CET)
+Date:   Wed, 23 Mar 2022 07:46:54 +0100
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Guenter Roeck <linux@roeck-us.net>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-nfs@vger.kernel.org,
-        linux-nilfs <linux-nilfs@vger.kernel.org>,
-        Mike Snitzer <snitzer@redhat.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-        Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.co>,
-        device-mapper development <dm-devel@redhat.com>,
-        "Md . Haris Iqbal" <haris.iqbal@ionos.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        linux-fsdevel@vger.kernel.org, xen-devel@lists.xenproject.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        ntfs3@lists.linux.dev, Jack Wang <jinpu.wang@ionos.com>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        drbd-dev@lists.linbit.com
-Subject: Re: [dm-devel] [PATCH 01/19] fs: remove mpage_alloc
-Message-ID: <20220323064248.GA24874@lst.de>
-References: <20220124091107.642561-1-hch@lst.de> <20220124091107.642561-2-hch@lst.de> <20220322211915.GA2413063@roeck-us.net> <CAKFNMonRd5QQMzLoH3T=M=C=2Q_j9d86EYzZeY4DU2HQAE3E8w@mail.gmail.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, axboe@kernel.dk,
+        ming.lei@redhat.com, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/3] block: allow BIOSET_PERCPU_CACHE use from
+ bio_alloc_clone
+Message-ID: <20220323064654.GB24874@lst.de>
+References: <20220322194927.42778-1-snitzer@kernel.org> <20220322194927.42778-2-snitzer@kernel.org> <20220322195414.GA8650@lst.de> <Yjouh9C7MaVrTnLh@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAKFNMonRd5QQMzLoH3T=M=C=2Q_j9d86EYzZeY4DU2HQAE3E8w@mail.gmail.com>
+In-Reply-To: <Yjouh9C7MaVrTnLh@redhat.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 23, 2022 at 06:38:22AM +0900, Ryusuke Konishi wrote:
-> This looks because the mask of GFP_KERNEL is removed along with
-> the removal of mpage_alloc().
+On Tue, Mar 22, 2022 at 04:16:07PM -0400, Mike Snitzer wrote:
+> I did initially think it worthwhile to push the use of
+> bio_alloc_percpu_cache() down to bio_alloc_bioset() rather than
+> bio_alloc_clone() -- but I started slower with more targetted change
+> for DM's needs.
+
+Note that the nvme io_uring passthrough patches also want a non-kiocb
+cached alloc version.  That code isn't quite ready yet but shows we'll
+need something there as well.
+
+> And yeah, since there isn't a REQ_ flag equivalent for IOCB_ALLOC_CACHE
+> (other than just allowing all REQ_POLLED access) there isn't a
+> meaningful way to limit access to the bioset's percpu cache.
 > 
+> Curious: how do bio_alloc_kiocb() callers know when it appropriate to
+> set IOCB_ALLOC_CACHE or not?  Seems io_uring is only one and it
+> unilaterally does:
+> kiocb->ki_flags |= IOCB_HIPRI | IOCB_ALLOC_CACHE;
 
-> The default value of the gfp flag is set to GFP_HIGHUSER_MOVABLE by
-> inode_init_always().
-> So, __GFP_HIGHMEM hits the gfp warning at bio_alloc() that
-> do_mpage_readpage() calls.
+Yes, an uring deals with making sure they are freed in the same place.
 
-Yeah.  Let's try this to match the iomap code:
+> So like IOCB_HIPRI maps to REQ_POLL, should IOCB_ALLOC_CACHE map to
+> REQ_ALLOC_CACHE? Or better name?
 
-diff --git a/fs/mpage.c b/fs/mpage.c
-index 9ed1e58e8d70b..d465883edf719 100644
---- a/fs/mpage.c
-+++ b/fs/mpage.c
-@@ -148,13 +148,11 @@ static struct bio *do_mpage_readpage(struct mpage_readpage_args *args)
- 	int op = REQ_OP_READ;
- 	unsigned nblocks;
- 	unsigned relative_block;
--	gfp_t gfp;
-+	gfp_t gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
- 
- 	if (args->is_readahead) {
- 		op |= REQ_RAHEAD;
--		gfp = readahead_gfp_mask(page->mapping);
--	} else {
--		gfp = mapping_gfp_constraint(page->mapping, GFP_KERNEL);
-+		gfp |= __GFP_NORETRY | __GFP_NOWARN;
- 	}
- 
- 	if (page_has_buffers(page))
+The name sounds good fine, and I just it would be best done by
+lifting BIO_PERCPU_CACHE to the REQ_ namespace and ensure it is
+cleared by the bio allocator if the percpu cache isn't actually
+used.
