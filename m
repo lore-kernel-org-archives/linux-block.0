@@ -2,76 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C36E7C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 00:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73337C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 23 Mar 2022 00:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229614AbiCWAel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 22 Mar 2022 20:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
+        id S240935AbiCWAij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 22 Mar 2022 20:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230174AbiCWAek (ORCPT
+        with ESMTP id S239295AbiCWAii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 22 Mar 2022 20:34:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8D301EAF6
-        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 17:33:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1647995589;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=2M0LiFyVNVzuALo6Yr1XgbsnYE0HiRYpBPRPrdOU24Q=;
-        b=D3tERQc5Sb+10sr+rjKK8utI1Lmd1rwB9ZNQyJJfW8xbibta9OQPtoXgDTK4zjtM5z0uYM
-        HZgBLvJuJwYCbVPcnt/E56Wjo2JdhYrLoFjsICIjQmVqMDzhg4e4NuaH5W+qIbR1YqD8x/
-        fjoJyqC49FXz/dPEZhdjfA7X3XVYb+0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-68-mAX6EYdjOTiBEuJDhMetxQ-1; Tue, 22 Mar 2022 20:33:07 -0400
-X-MC-Unique: mAX6EYdjOTiBEuJDhMetxQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C26E8038E3;
-        Wed, 23 Mar 2022 00:33:07 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C10EC26E9A;
-        Wed, 23 Mar 2022 00:33:01 +0000 (UTC)
-Date:   Wed, 23 Mar 2022 08:32:56 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Yu Kuai <yukuai3@huawei.com>
-Subject: Re: [PATCH 2/3] block: let blkcg_gq grab request queue's refcnt
-Message-ID: <YjpquAY3l9qdOzmE@T590>
-References: <20220318130144.1066064-1-ming.lei@redhat.com>
- <20220318130144.1066064-3-ming.lei@redhat.com>
- <20220322093322.GA27283@lst.de>
- <YjmjplwpQpkOlimQ@T590>
- <Yjn9JBT02ZbSdRbb@slm.duckdns.org>
+        Tue, 22 Mar 2022 20:38:38 -0400
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CFF2532C1
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 17:37:10 -0700 (PDT)
+Received: by mail-io1-f72.google.com with SMTP id u10-20020a5ec00a000000b00648e5804d5bso13511951iol.12
+        for <linux-block@vger.kernel.org>; Tue, 22 Mar 2022 17:37:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=94hmLNLc4Qa65xhXJkCqKMKovw/2rdLlaroN12E6w9I=;
+        b=XLWVdjKItfhPLmgGbbdsG5iHcgRcYdgX7sQxJwuQi9NlP5VcrpbrrRctBvx5cgcKXd
+         CwjQuRqsxvRKpTwUvoWxMs8YpA4GnrGPL1+XpB+akM//YUbzhAkVv+Vq5hMDrXgbBjN0
+         McoRU/jct35GRxIKszNrtYNqZ9Px9BHp/IZOaVrKY1Cqol/VEdVn9GHiNu1yB+baODY1
+         g37UlHN223igkHNtdP7clVuzKjs43c1DTEf+cLt8p+hOYSBHXQbbNKR6xSKAvYV7uNNZ
+         lIR+B/j+OjYCRfrZF/d1ZOfiZtPtvvjq85Lef3BuH4PLmvxMJL8aGTFyBim6I7y8qB0C
+         2/0w==
+X-Gm-Message-State: AOAM530yUjJzx2Wks+3P/cH+4Hw/ND5dAkbGKUSb92eqX5d+zcpmAv96
+        IuneNlmd1lE5pzNo7PqsQm76Cy+web43b2bk5dP6GkCosEEA
+X-Google-Smtp-Source: ABdhPJxgGzn9M+W85C5QQyqaGER567i8Ni0Wh0pm/fQ8jNr/jrNrGVKqaTeS0VR6UsigXFb6xbZUilrXBgVl1VfFlwPUIINOPwZx
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yjn9JBT02ZbSdRbb@slm.duckdns.org>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Received: by 2002:a6b:b806:0:b0:646:1c7b:bb01 with SMTP id
+ i6-20020a6bb806000000b006461c7bbb01mr13365275iof.105.1647995829453; Tue, 22
+ Mar 2022 17:37:09 -0700 (PDT)
+Date:   Tue, 22 Mar 2022 17:37:09 -0700
+In-Reply-To: <20220323000702.3445-1-hdanton@sina.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000018dde05dad7ee2e@google.com>
+Subject: Re: [syzbot] BUG: sleeping function called from invalid context in blk_release_queue
+From:   syzbot <syzbot+bbea00057d3d55c4889b@syzkaller.appspotmail.com>
+To:     hdanton@sina.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 22, 2022 at 06:45:24AM -1000, Tejun Heo wrote:
-> On Tue, Mar 22, 2022 at 06:23:34PM +0800, Ming Lei wrote:
-> > One solution is to delay 'blk_put_queue(blkg->q)' and 'kfree(blkg)'
-> > into one work function by reusing blkg->async_bio_work as release_work.
-> > 
-> > I will prepare one patch for addressing the issue.
-> 
-> Ah, so, this is the report. Can you please include the backtrace and
-> reference to the patch you posted?
+Hello,
 
-OK.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Also I guess it has answered your question in another thread.
+Reported-and-tested-by: syzbot+bbea00057d3d55c4889b@syzkaller.appspotmail.com
 
-Thanks,
-Ming
+Tested on:
 
+commit:         f9006d92 Add linux-next specific files for 20220321
+git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/
+kernel config:  https://syzkaller.appspot.com/x/.config?x=949ef165e81e8114
+dashboard link: https://syzkaller.appspot.com/bug?extid=bbea00057d3d55c4889b
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=13d673db700000
+
+Note: testing is done by a robot and is best-effort only.
