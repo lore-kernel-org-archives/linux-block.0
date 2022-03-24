@@ -2,125 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA5BAC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:21:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0725DC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:27:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242365AbiCXHWq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 03:22:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56796 "EHLO
+        id S1348537AbiCXH2p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 03:28:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242373AbiCXHWo (ORCPT
+        with ESMTP id S232088AbiCXH2o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 03:22:44 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ADAD986F9;
-        Thu, 24 Mar 2022 00:21:13 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id r13so7309255ejd.5;
-        Thu, 24 Mar 2022 00:21:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=L8t/rxY8yvEceEcSHYnXjymDX7m07BTfnPsMbsacLCE=;
-        b=Td6lnLH/iruIZ4mx+aAqQafW+QnS0cKUyBO9/9JyZRZK0RKswmoPiW+EHpBnzYMBll
-         jgqss9CUEHP+ky5KHFkHEkoh1/JBQD1+I6PxPbp1vGK90mriH7Y3dsR7wgo+y59C93hQ
-         s9xi3SjjPw9Si53jEekr8kdc2jKrl5rkTg31PN65vsWSlNZZMElgVNWVJcDdh8r8Jyak
-         vvlRWRKgTSQF7YSACyI2zgQxpqxiAqr9CXA9ek8kqCEahUBnqEhjj92Ddd2wF25Pqn2M
-         tQ/N8jFGOqAaerJ4zgoQDg2D5iI4BxFmjfoAMp1QT0nHTBJ6YTKpPMYRF5zt/T2fAIa3
-         rg8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=L8t/rxY8yvEceEcSHYnXjymDX7m07BTfnPsMbsacLCE=;
-        b=UDcLumBCgnc2lmc5bsOc/ZtXfE4aT0nW+d2qlKxVWIbo8orjc643xpdjJa72YWkKpX
-         nIqNplXMYGdqJHFE99oHu9V3bic2WfkuTi6w9NUBzhnj2lwk/WlMbeafXvOA2JbirpPB
-         6a5ZSaMlNPQzWcicIWvu0RpMyyMG9CQUrvRC7msHt3sXjixBfyhwuWS9teyKGy6K6o5v
-         S9nhwN9wIGF6REbtIwh3LIUk18nOlnecUtZb45rZoCujI+2AlJdQpniBjxPu9ns2xB/U
-         3A4eX9iJ/Yqn+A3OPtFKqX8lVN5j9aNdmHs9QRjMOcyAxg8mShQERMRZLY4SoBueCOeH
-         gG0w==
-X-Gm-Message-State: AOAM530owdbqazicQJiBm82OeNRWoz2CmALcQGDqb16Xzy73lm5ZiUim
-        2l3fUGPmma3wR7yCOyifNxE=
-X-Google-Smtp-Source: ABdhPJx6LGoPkFEFkoaZyd3WBwpMSKmhSaujWAgVjTGkfEJZBG+4bfYn+4vbts3FB+vBfIrYJ+UHfw==
-X-Received: by 2002:a17:906:3ad1:b0:6ce:a880:7745 with SMTP id z17-20020a1709063ad100b006cea8807745mr4221888ejd.46.1648106472018;
-        Thu, 24 Mar 2022 00:21:12 -0700 (PDT)
-Received: from localhost.localdomain (i130160.upc-i.chello.nl. [62.195.130.160])
-        by smtp.googlemail.com with ESMTPSA id m4-20020a17090672c400b006e0035654b0sm780758ejl.84.2022.03.24.00.21.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 00:21:11 -0700 (PDT)
-From:   Jakob Koschel <jakobkoschel@gmail.com>
-To:     Ilya Dryomov <idryomov@gmail.com>
-Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
-        Jens Axboe <axboe@kernel.dk>, ceph-devel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Mike Rapoport <rppt@kernel.org>,
-        "Brian Johannesmeyer" <bjohannesmeyer@gmail.com>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>, Jakob Koschel <jakobkoschel@gmail.com>
-Subject: [PATCH] rbd: replace usage of found with dedicated list iterator variable
-Date:   Thu, 24 Mar 2022 08:20:50 +0100
-Message-Id: <20220324072050.62242-1-jakobkoschel@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Thu, 24 Mar 2022 03:28:44 -0400
+Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6986998F63;
+        Thu, 24 Mar 2022 00:27:12 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0V83t.bs_1648106829;
+Received: from 30.225.28.175(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0V83t.bs_1648106829)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Thu, 24 Mar 2022 15:27:10 +0800
+Message-ID: <c26b28c1-b9d8-7570-b631-8cdda0f9de73@linux.alibaba.com>
+Date:   Thu, 24 Mar 2022 15:27:08 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [RFC 1/3] mm/memory.c: introduce vm_insert_page(s)_mkspecial
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     linux-mm@kvack.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        xuyu@linux.alibaba.com, bostroesser@gmail.com
+References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
+ <20220318095531.15479-2-xiaoguang.wang@linux.alibaba.com>
+ <YjtOpf1bf0qH87HD@infradead.org>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <YjtOpf1bf0qH87HD@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To move the list iterator variable into the list_for_each_entry_*()
-macro in the future it should be avoided to use the list iterator
-variable after the loop body.
+hi,
 
-To *never* use the list iterator variable after the loop it was
-concluded to use a separate iterator variable instead of a
-found boolean [1].
+> I relaly don't think we should add this amount of overhead to the
+> core VM for a (relatively) irrelevant driver.
+OK, but as what I have described in cover letter, both vm_insert_pages and
+remap_pfn_range have performance or usage limits. Do you know any better
+method to map block device io request's sgl pages to user space? I think 
+block
+device backend implemented in use space will benefit from this feature, 
+thanks.
 
-This removes the need to use a found variable and simply checking if
-the variable was set, can determine if the break/goto was hit.
-
-Link: https://lore.kernel.org/all/CAHk-=wgRr_D8CB-D9Kg-c=EHreAsk5SqXPwr9Y7k9sA6cWXJ6w@mail.gmail.com/
-Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
----
- drivers/block/rbd.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index b844432bad20..e5f891d058e8 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -756,24 +756,23 @@ static struct rbd_client *__rbd_get_client(struct rbd_client *rbdc)
-  */
- static struct rbd_client *rbd_client_find(struct ceph_options *ceph_opts)
- {
--	struct rbd_client *client_node;
--	bool found = false;
-+	struct rbd_client *client_node = NULL, *iter;
- 
- 	if (ceph_opts->flags & CEPH_OPT_NOSHARE)
- 		return NULL;
- 
- 	spin_lock(&rbd_client_list_lock);
--	list_for_each_entry(client_node, &rbd_client_list, node) {
--		if (!ceph_compare_options(ceph_opts, client_node->client)) {
--			__rbd_get_client(client_node);
-+	list_for_each_entry(iter, &rbd_client_list, node) {
-+		if (!ceph_compare_options(ceph_opts, iter->client)) {
-+			__rbd_get_client(iter);
- 
--			found = true;
-+			client_node = iter;
- 			break;
- 		}
- 	}
- 	spin_unlock(&rbd_client_list_lock);
- 
--	return found ? client_node : NULL;
-+	return client_node;
- }
- 
- /*
-
-base-commit: f443e374ae131c168a065ea1748feac6b2e76613
--- 
-2.25.1
-
+Regards,
+Xiaoguang Wang
