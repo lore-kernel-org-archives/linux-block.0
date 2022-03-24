@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99C3EC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86947C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348636AbiCXHxX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 03:53:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
+        id S1346081AbiCXHx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 03:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242403AbiCXHxW (ORCPT
+        with ESMTP id S1348694AbiCXHxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 03:53:22 -0400
+        Thu, 24 Mar 2022 03:53:25 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68ACB99686
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0301A996A4
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=WVzkkbrxtQ7e/ZumjaGTdVP8sQaRQ+9gjayHQfTr2lE=; b=GlOWFf7KKR+j6StPylKHqpEMsU
-        5X+HbqcAuKwk6+bS6/qoe34uLCWSDi5pdXKh8sdxK3YPXjK32NkGeeTDFNRP8TLly9nupeqtYL091
-        wlTUwz1874MDEM1IdfY9JLQffz/W7AxRDBgfNQLVr0Jiayi/wcMGYmAciIuuDVLXn0x+qHARAVruB
-        ZCs5vxZVbz5e4jYEOCgDETAwloulx/A4SDTErqZi8UcUafe125DXulbGCGEn7QdD4mfV1eCSOlqN1
-        qN9BUACl2XNLPZWUy8XEtahhtV5DXvN5FA8vWGUFbyTQ7PzGyhiYWQcOuZpymErU/wD2aIeIVpS2t
-        ziJlUYAQ==;
+        bh=MuFp2PEYVgAJNpwoksEBN8g5TKJG7AFoiRM8TdlFZDA=; b=wn0nFXfxEJQXn91TH7UoINL82M
+        CKyi8kH/ZephzR2VWVgJBFNm36ebs5Z/WLss5PtA1lrS2zfTQSU0gTihl37o40pF1kMs4odo/UpO/
+        2OcPdc1i4fR6Rr0aegdUfA7XEqa8D43pQ4rj5tIWELI/BU3gBavck31UBKbVQ+9xmtUCh7aMcg4I+
+        Es7dslp/xxt3cFCqj/lBwI2sOh7oMWvaokQ3WOeoGKO1LuHUCmhi3KF/OI4KhZR/BoFOMOf6ptk09
+        jTI2ZxEl2z9i00s13aNMbOJabqTkbaF+bW4GTCleyPbmDL9Pp3g6n6Nc4V0GYisSRd2PfX0TR9ArR
+        eMZQQD/Q==;
 Received: from [2001:4bb8:19a:b822:f71:16c0:5841:924e] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXIG2-00FzaJ-KX; Thu, 24 Mar 2022 07:51:47 +0000
+        id 1nXIG5-00FzbR-6h; Thu, 24 Mar 2022 07:51:49 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         Minchan Kim <minchan@kernel.org>,
@@ -37,9 +37,9 @@ Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         "Darrick J . Wong" <djwong@kernel.org>,
         Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
         nbd@other.debian.org
-Subject: [PATCH 10/13] loop: only freeze the queue in __loop_clr_fd when needed
-Date:   Thu, 24 Mar 2022 08:51:16 +0100
-Message-Id: <20220324075119.1556334-11-hch@lst.de>
+Subject: [PATCH 11/13] loop: implement ->free_disk
+Date:   Thu, 24 Mar 2022 08:51:17 +0100
+Message-Id: <20220324075119.1556334-12-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220324075119.1556334-1-hch@lst.de>
 References: <20220324075119.1556334-1-hch@lst.de>
@@ -50,46 +50,64 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-->release is only called after all outstanding I/O has completed, so only
-freeze the queue when clearing the backing file of a live loop device.
+Ensure that the lo_device which is stored in the gendisk private
+data is valid until the gendisk is freed.  Currently the loop driver
+uses a lot of effort to make sure a device is not freed when it is
+still in use, but to to fix a potential deadlock this will be relaxed
+a bit soon.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Jan Kara <jack@suse.cz>
-Tested-by: Darrick J. Wong <djwong@kernel.org>
 ---
- drivers/block/loop.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ drivers/block/loop.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c57acbcf9be6a..a5dd259958ee2 100644
+index a5dd259958ee2..b3170e8cdbe95 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -1144,8 +1144,13 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
- 		blk_queue_write_cache(lo->lo_queue, false, false);
+@@ -1765,6 +1765,14 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+ 	mutex_unlock(&lo->lo_mutex);
+ }
  
--	/* freeze request queue during the transition */
--	blk_mq_freeze_queue(lo->lo_queue);
-+	/*
-+	 * Freeze the request queue when unbinding on a live file descriptor and
-+	 * thus an open device.  When called from ->release we are guaranteed
-+	 * that there is no I/O in progress already.
-+	 */
-+	if (!release)
-+		blk_mq_freeze_queue(lo->lo_queue);
++static void lo_free_disk(struct gendisk *disk)
++{
++	struct loop_device *lo = disk->private_data;
++
++	mutex_destroy(&lo->lo_mutex);
++	kfree(lo);
++}
++
+ static const struct block_device_operations lo_fops = {
+ 	.owner =	THIS_MODULE,
+ 	.open =		lo_open,
+@@ -1773,6 +1781,7 @@ static const struct block_device_operations lo_fops = {
+ #ifdef CONFIG_COMPAT
+ 	.compat_ioctl =	lo_compat_ioctl,
+ #endif
++	.free_disk =	lo_free_disk,
+ };
  
- 	destroy_workqueue(lo->workqueue);
- 	loop_free_idle_workers(lo, true);
-@@ -1170,7 +1175,8 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	mapping_set_gfp_mask(filp->f_mapping, gfp);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
--	blk_mq_unfreeze_queue(lo->lo_queue);
-+	if (!release)
-+		blk_mq_unfreeze_queue(lo->lo_queue);
+ /*
+@@ -2064,15 +2073,14 @@ static void loop_remove(struct loop_device *lo)
+ {
+ 	/* Make this loop device unreachable from pathname. */
+ 	del_gendisk(lo->lo_disk);
+-	blk_cleanup_disk(lo->lo_disk);
++	blk_cleanup_queue(lo->lo_disk->queue);
+ 	blk_mq_free_tag_set(&lo->tag_set);
  
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+ 	mutex_lock(&loop_ctl_mutex);
+ 	idr_remove(&loop_index_idr, lo->lo_number);
+ 	mutex_unlock(&loop_ctl_mutex);
+-	/* There is no route which can find this loop device. */
+-	mutex_destroy(&lo->lo_mutex);
+-	kfree(lo);
++
++	put_disk(lo->lo_disk);
+ }
  
+ static void loop_probe(dev_t dev)
 -- 
 2.30.2
 
