@@ -2,101 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FC1FC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 17:45:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72347C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 17:47:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352246AbiCXRrU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 13:47:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40922 "EHLO
+        id S243676AbiCXRso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 13:48:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243676AbiCXRrU (ORCPT
+        with ESMTP id S1352402AbiCXRsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 13:47:20 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B7CB2473;
-        Thu, 24 Mar 2022 10:45:47 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id bn33so7191023ljb.6;
-        Thu, 24 Mar 2022 10:45:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=XjdOGRorC0nLuKT+vnf4KghH4qK564bOF026m1uq2LM=;
-        b=qn5ODB5qgGzbNY6LyHQ1PpJ+e8WZnGb3VIdgWKJ4RWs7GjUS5wjCq7s+T4SpWzyyRz
-         X5Kv8cFbzPU1ALMGYa5T8WOKpm0YB33F4W56+qyixcVsxniuEIBj//m/DJEJnq38UrXs
-         Eza/doKWtG2viDJxbE93l6gb1wq/dqhYes8nQfFolowATEmhocCTqet3SrVAaIdCgFVH
-         ET9VDmte4nWETFRNYj9+ixpoXev6v5YAd2bMDMRF8A28SoDBtTRjFTNaR+7uOkgyQ58r
-         1JGivxE8gPTnFFm7NcbScjnOreo9c7fXFQrtZpcYtCUtAjcjyHiZpx6ghM0sQ8Nfvvx0
-         iMHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XjdOGRorC0nLuKT+vnf4KghH4qK564bOF026m1uq2LM=;
-        b=RCCHIx6CvWna5WLhhuYwj+cbgQf2byARXA2bJVXPNb/KupEDYU0TPuvY5reQNm5Wrm
-         dOusxIJ2IlwAQqPFQ7+uiMipndGogzzxwfvqOwM22EDQHwBhlpzGH34a5ujIEw1RIeA3
-         8+/wImD9c8kNkp1QZfCUkc9QdDIV7R5kO1rm8UwhPW/3RdPp3iq/7RTdPboMegkm+/iq
-         mR5WKYUoFrikvgJoyAhqWCiq9ASOZzd0TTurJZutA8rGXGDTriKckwWJ9TmLc6zDqGGZ
-         fyZ6udvfcSL/BL2vu0lh4GgwA3VKENemWh7WyeT+cBqysdTuAdmMCWOT8yvewG4R5Fj3
-         lOiA==
-X-Gm-Message-State: AOAM531B49aXZ3YBDK2KG0yYhql4mCKtddViUG+RLjLEmN9e4HuZGgs6
-        WOGpig55QJPITda0l5vJwrEcWtilVj+18SUv64c=
-X-Google-Smtp-Source: ABdhPJz0+kF30iUk1IKjKuHkn6OMlOdoGxgUwTrEvzpunKZL2D1zUDJ7ekei/or9tWttmHRiMEUXp+orM938M0EQA9Q=
-X-Received: by 2002:a2e:90d6:0:b0:246:e44:bcf6 with SMTP id
- o22-20020a2e90d6000000b002460e44bcf6mr4820564ljg.501.1648143946143; Thu, 24
- Mar 2022 10:45:46 -0700 (PDT)
+        Thu, 24 Mar 2022 13:48:43 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA1AB53C4
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 10:47:11 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 1986768B05; Thu, 24 Mar 2022 18:47:02 +0100 (CET)
+Date:   Thu, 24 Mar 2022 18:47:01 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
+ ->open / ->release
+Message-ID: <20220324174701.GA28583@lst.de>
+References: <20220324075119.1556334-1-hch@lst.de> <20220324075119.1556334-13-hch@lst.de> <20220324141321.pqesnshaswwk3svk@quack3.lan> <20220324171518.GC28007@lst.de>
 MIME-Version: 1.0
-References: <20220308152105.309618-1-joshi.k@samsung.com> <CGME20220308152716epcas5p3d38d2372c184259f1a10c969f7e4396f@epcas5p3.samsung.com>
- <20220308152105.309618-12-joshi.k@samsung.com> <20220310083503.GE26614@lst.de>
- <CA+1E3rLF7D4jThUPZYbxpXs9LLdQ7Ek=Qy+rXZE=xgwBcLoaWQ@mail.gmail.com> <20220324063011.GA12660@lst.de>
-In-Reply-To: <20220324063011.GA12660@lst.de>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Thu, 24 Mar 2022 23:15:20 +0530
-Message-ID: <CA+1E3rJAK9fPuS6g_po_vpvde_LpOjkuoU=E5h=v9rnHhc3+mw@mail.gmail.com>
-Subject: Re: [PATCH 11/17] block: factor out helper for bio allocation from cache
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220324171518.GC28007@lst.de>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 12:00 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> On Thu, Mar 10, 2022 at 05:55:02PM +0530, Kanchan Joshi wrote:
-> > On Thu, Mar 10, 2022 at 2:05 PM Christoph Hellwig <hch@lst.de> wrote:
-> > >
-> > > On Tue, Mar 08, 2022 at 08:50:59PM +0530, Kanchan Joshi wrote:
-> > > > +struct bio *bio_alloc_kiocb(struct kiocb *kiocb, unsigned short nr_vecs,
-> > > > +                         struct bio_set *bs)
-> > > > +{
-> > > > +     if (!(kiocb->ki_flags & IOCB_ALLOC_CACHE))
-> > > > +             return bio_alloc_bioset(GFP_KERNEL, nr_vecs, bs);
-> > > > +
-> > > > +     return bio_from_cache(nr_vecs, bs);
-> > > > +}
-> > > >  EXPORT_SYMBOL_GPL(bio_alloc_kiocb);
-> > >
-> > > If we go down this route we might want to just kill the bio_alloc_kiocb
-> > > wrapper.
-> >
-> > Fine, will kill that in v2.
->
-> As a headsup,  Mike Snitzer has been doing something similar in the
->
-> "block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_bioset"
->
-> series.
+On Thu, Mar 24, 2022 at 06:15:18PM +0100, Christoph Hellwig wrote:
+> On Thu, Mar 24, 2022 at 03:13:21PM +0100, Jan Kara wrote:
+> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> > 
+> > Looks good but I still think we need something like attached preparatory
+> > patch to not regress e.g. filesystem probing triggered by udev events. What
+> > do you think?
+> 
+> Yes, I think it makes sense to add that.
 
-Thanks, that can be reused here too. But to enable this feature - we
-need to move to a bioset from bio_kmalloc in nvme, and you did not
-seem fine with that.
+Actually, looking at it in a little more detail: this misses the
+explicit kobject_uevent calls for the capacity changes.  I think the
+best idea might be something like this:
+
+---
+From db5ab8ab0fbcf07af769023a894fafc22b662cd9 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Thu, 24 Mar 2022 18:41:28 +0100
+Subject: loop: suppress uevents while reconfiguring the device
+
+Currently, udev change event is generated for a loop device before the
+device is ready for IO. Due to serialization on lo->lo_mutex in
+lo_open() this does not matter because anybody is able to open the
+device and do IO only after the configuration is finished. However this
+synchronization in lo_open() is going away so make sure userspace
+reacting to the change event will see the new device state by generating
+the event only when the device is setup.
+
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/block/loop.c | 25 +++++++++++++++++++++----
+ 1 file changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index b3170e8cdbe95..bfd21af7aa38b 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -572,6 +572,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 
+ 	if (!file)
+ 		return -EBADF;
++
++	/* suppress uevents while reconfiguring the device */
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
++
+ 	is_loop = is_loop_device(file);
+ 	error = loop_global_lock_killable(lo, is_loop);
+ 	if (error)
+@@ -626,13 +630,18 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	fput(old_file);
+ 	if (partscan)
+ 		loop_reread_partitions(lo);
+-	return 0;
++
++	error = 0;
++done:
++	/* enable and uncork uevent now that we are done */
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
++	return error;
+ 
+ out_err:
+ 	loop_global_unlock(lo, is_loop);
+ out_putf:
+ 	fput(file);
+-	return error;
++	goto done;
+ }
+ 
+ /* loop sysfs attributes */
+@@ -999,6 +1008,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	/* This is safe, since we have a reference from open(). */
+ 	__module_get(THIS_MODULE);
+ 
++	/* suppress uevents while reconfiguring the device */
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
++
+ 	/*
+ 	 * If we don't hold exclusive handle for the device, upgrade to it
+ 	 * here to avoid changing device under exclusive owner.
+@@ -1101,7 +1113,12 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		loop_reread_partitions(lo);
+ 	if (!(mode & FMODE_EXCL))
+ 		bd_abort_claiming(bdev, loop_configure);
+-	return 0;
++
++	error = 0;
++done:
++	/* enable and uncork uevent now that we are done */
++	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
++	return error;
+ 
+ out_unlock:
+ 	loop_global_unlock(lo, is_loop);
+@@ -1112,7 +1129,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	fput(file);
+ 	/* This is safe: open() is still holding a reference. */
+ 	module_put(THIS_MODULE);
+-	return error;
++	goto done;
+ }
+ 
+ static void __loop_clr_fd(struct loop_device *lo, bool release)
+-- 
+2.30.2
+
