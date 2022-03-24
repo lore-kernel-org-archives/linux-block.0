@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0BAC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95766C4332F
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239839AbiCXHxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 03:53:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32850 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229616AbiCXHxE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
+        id S236790AbiCXHxE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Thu, 24 Mar 2022 03:53:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32842 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1348730AbiCXHxD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Thu, 24 Mar 2022 03:53:03 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EB5899686
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:33 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB8399682
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=68Vr9ZZvn7QlZeObLr2LIfxyN5gniOKZYA3d9ipjL3Q=; b=pVOkQxsAa/GqbX+WMYuWpXUN60
-        Nql2UDvVBt1ON2mTFf5YrKzammMYyJ1LTA0pCu3rztFT5S/9zbcSYO3/H+pls1s95HRLxaowSQdKX
-        aVvDP/gxlIzLYAqLbHw8jdjNmDj3nwEMRXD7CRIQjk+frmLPKsbkpFUPBcdPZQB1Bhvut0VwmmfiB
-        wCRuRnMw1Zlp3qm4W7/qEt15tuqrESOfENDdLtKzkQrw77iwLE6O5mG6xU6WLyf+0BDyulq2DlKYl
-        pMcR0dYk4LwCk0Il76E97ijVRTGVX6BWkl3VIjpMXCdp1y4Tod+CJ02wL1bUfXxmXZcv+fTcRVv4l
-        ZwvpMMYw==;
+        bh=A2Q06m/LYxunrDsvF/NawvPuXR8LHtFwXlMKubqZCD8=; b=E1PoEhrblmHGtnsD1hoHW5N4Ts
+        uiUzSN8qWVHazv8sKZQ9FmxD+OnNgMMJMJiFSy/d+7Jkx5wCk3CLvNAcjXbjMOJxGNQyq1JHTGd0C
+        QEpqnAFxt+WdxyPjx1VsvK0uoZq4MIoDXYZ6ciR3pORdpZ94UpTYfByTtLfSyRRarJNkj30DBVZVC
+        OUAYuxc+IXrF52Vlw3o2sKMZtFiMiM/wG01eG3A+zRcsTyW814qukpwYXPnAmPatFKUmOqwLYI64a
+        VhNktVUU2AQk1FbgJ0r7y8d5PsXuG0zt6KLpBbYDio1Lc38nDeauFX+dQ80Amm87vmob26ygpEhSp
+        EVuEHy7Q==;
 Received: from [2001:4bb8:19a:b822:f71:16c0:5841:924e] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXIFk-00FzUG-LB; Thu, 24 Mar 2022 07:51:29 +0000
+        id 1nXIFf-00FzTR-Hz; Thu, 24 Mar 2022 07:51:23 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         Minchan Kim <minchan@kernel.org>,
@@ -37,9 +37,9 @@ Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         "Darrick J . Wong" <djwong@kernel.org>,
         Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
         nbd@other.debian.org
-Subject: [PATCH 03/13] zram: cleanup zram_remove
-Date:   Thu, 24 Mar 2022 08:51:09 +0100
-Message-Id: <20220324075119.1556334-4-hch@lst.de>
+Subject: [PATCH 01/13] nbd: use the correct block_device in nbd_ioctl
+Date:   Thu, 24 Mar 2022 08:51:07 +0100
+Message-Id: <20220324075119.1556334-2-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220324075119.1556334-1-hch@lst.de>
 References: <20220324075119.1556334-1-hch@lst.de>
@@ -50,51 +50,88 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Remove the bdev variable and just use the gendisk pointed to by the
-zram_device directly.
+The bdev parameter to ->ioctl contains the block device that the ioctl
+is called on, which can be the partition.  But the code in nbd_ioctl
+that uses it really wants the whole device for things like the bd_openers
+check.  Switch to not pass the bdev along and always use nbd->disk->part0
+instead.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/zram/zram_drv.c | 11 +++++------
- 1 file changed, 5 insertions(+), 6 deletions(-)
+ drivers/block/nbd.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index fd83fad59beb1..863606f1722b1 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1987,19 +1987,18 @@ static int zram_add(void)
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 5a1f98494dddf..795f65a5c9661 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1217,11 +1217,11 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+ 	return -ENOSPC;
+ }
  
- static int zram_remove(struct zram *zram)
+-static void nbd_bdev_reset(struct block_device *bdev)
++static void nbd_bdev_reset(struct nbd_device *nbd)
  {
--	struct block_device *bdev = zram->disk->part0;
- 	bool claimed;
+-	if (bdev->bd_openers > 1)
++	if (nbd->disk->part0->bd_openers > 1)
+ 		return;
+-	set_capacity(bdev->bd_disk, 0);
++	set_capacity(nbd->disk, 0);
+ }
  
--	mutex_lock(&bdev->bd_disk->open_mutex);
--	if (bdev->bd_openers) {
--		mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_lock(&zram->disk->open_mutex);
-+	if (zram->disk->part0->bd_openers) {
-+		mutex_unlock(&zram->disk->open_mutex);
- 		return -EBUSY;
- 	}
+ static void nbd_parse_flags(struct nbd_device *nbd)
+@@ -1389,7 +1389,7 @@ static int nbd_start_device(struct nbd_device *nbd)
+ 	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
+ }
  
- 	claimed = zram->claim;
- 	if (!claimed)
- 		zram->claim = true;
--	mutex_unlock(&bdev->bd_disk->open_mutex);
-+	mutex_unlock(&zram->disk->open_mutex);
+-static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
++static int nbd_start_device_ioctl(struct nbd_device *nbd)
+ {
+ 	struct nbd_config *config = nbd->config;
+ 	int ret;
+@@ -1408,7 +1408,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ 	flush_workqueue(nbd->recv_workq);
  
- 	zram_debugfs_unregister(zram);
+ 	mutex_lock(&nbd->config_lock);
+-	nbd_bdev_reset(bdev);
++	nbd_bdev_reset(nbd);
+ 	/* user requested, ignore socket errors */
+ 	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
+ 		ret = 0;
+@@ -1417,12 +1417,11 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+ 	return ret;
+ }
  
-@@ -2011,7 +2010,7 @@ static int zram_remove(struct zram *zram)
- 		;
- 	} else {
- 		/* Make sure all the pending I/O are finished */
--		sync_blockdev(bdev);
-+		sync_blockdev(zram->disk->part0);
- 		zram_reset_device(zram);
- 	}
- 
+-static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+-				 struct block_device *bdev)
++static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
+ {
+ 	sock_shutdown(nbd);
+-	__invalidate_device(bdev, true);
+-	nbd_bdev_reset(bdev);
++	__invalidate_device(nbd->disk->part0, true);
++	nbd_bdev_reset(nbd);
+ 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
+ 			       &nbd->config->runtime_flags))
+ 		nbd_config_put(nbd);
+@@ -1448,7 +1447,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 	case NBD_DISCONNECT:
+ 		return nbd_disconnect(nbd);
+ 	case NBD_CLEAR_SOCK:
+-		nbd_clear_sock_ioctl(nbd, bdev);
++		nbd_clear_sock_ioctl(nbd);
+ 		return 0;
+ 	case NBD_SET_SOCK:
+ 		return nbd_add_socket(nbd, arg, false);
+@@ -1468,7 +1467,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+ 		config->flags = arg;
+ 		return 0;
+ 	case NBD_DO_IT:
+-		return nbd_start_device_ioctl(nbd, bdev);
++		return nbd_start_device_ioctl(nbd);
+ 	case NBD_CLEAR_QUE:
+ 		/*
+ 		 * This is for compatibility only.  The queue is always cleared
 -- 
 2.30.2
 
