@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95766C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF26DC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236790AbiCXHxE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 03:53:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32842 "EHLO
+        id S242414AbiCXHxJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 03:53:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32878 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348730AbiCXHxD (ORCPT
+        with ESMTP id S229616AbiCXHxH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 03:53:03 -0400
+        Thu, 24 Mar 2022 03:53:07 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CB8399682
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6EBD99686
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:51:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=A2Q06m/LYxunrDsvF/NawvPuXR8LHtFwXlMKubqZCD8=; b=E1PoEhrblmHGtnsD1hoHW5N4Ts
-        uiUzSN8qWVHazv8sKZQ9FmxD+OnNgMMJMJiFSy/d+7Jkx5wCk3CLvNAcjXbjMOJxGNQyq1JHTGd0C
-        QEpqnAFxt+WdxyPjx1VsvK0uoZq4MIoDXYZ6ciR3pORdpZ94UpTYfByTtLfSyRRarJNkj30DBVZVC
-        OUAYuxc+IXrF52Vlw3o2sKMZtFiMiM/wG01eG3A+zRcsTyW814qukpwYXPnAmPatFKUmOqwLYI64a
-        VhNktVUU2AQk1FbgJ0r7y8d5PsXuG0zt6KLpBbYDio1Lc38nDeauFX+dQ80Amm87vmob26ygpEhSp
-        EVuEHy7Q==;
+        bh=zKb7x856P4h6kt9BXusF+6U9PtY1Xc+RwUb+qnCSWeY=; b=0Jg1g53lzsNoDWsU9DYIpZ514W
+        Dmz8fKXAMGeFyfblDQrwDuRyD8SsNf8RRHVTujd7Fb135Zi/isoZnAhdAgYhlzdBSFYhv/Kuk2NXw
+        sy+A+obs0HEVAcprlpNM2KWxKWV5TSujPBzS0Dk7lc08o8xMsSQZTSvHIXg7XcmGADXJ5VYOI0qNo
+        YBj3/td/K2+Ub6Hq4ffXY2IK+XcDJi6T32Ku9yOKBS1NlxsAJ4vPhvcKzdj0N7ux/GU+4m/3lEee2
+        pFPGL34+eV+V7FKETzFEa1mZglIOj3FfoH4VNWqObo8eCYGLoDb6cAl/wYY7Ls8esT/MC1XkCPgZJ
+        MKZGMTrg==;
 Received: from [2001:4bb8:19a:b822:f71:16c0:5841:924e] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXIFf-00FzTR-Hz; Thu, 24 Mar 2022 07:51:23 +0000
+        id 1nXIFn-00FzUe-71; Thu, 24 Mar 2022 07:51:31 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
         Minchan Kim <minchan@kernel.org>,
@@ -37,9 +37,9 @@ Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
         "Darrick J . Wong" <djwong@kernel.org>,
         Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
         nbd@other.debian.org
-Subject: [PATCH 01/13] nbd: use the correct block_device in nbd_ioctl
-Date:   Thu, 24 Mar 2022 08:51:07 +0100
-Message-Id: <20220324075119.1556334-2-hch@lst.de>
+Subject: [PATCH 04/13] block: add a disk_openers helper
+Date:   Thu, 24 Mar 2022 08:51:10 +0100
+Message-Id: <20220324075119.1556334-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220324075119.1556334-1-hch@lst.de>
 References: <20220324075119.1556334-1-hch@lst.de>
@@ -50,88 +50,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The bdev parameter to ->ioctl contains the block device that the ioctl
-is called on, which can be the partition.  But the code in nbd_ioctl
-that uses it really wants the whole device for things like the bd_openers
-check.  Switch to not pass the bdev along and always use nbd->disk->part0
-instead.
+Add a helper that returns the openers for a given gendisk to avoid having
+drivers poke into disk->part0 to get at this information in a somewhat
+cumbersome way.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/block/nbd.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ drivers/block/nbd.c           |  4 ++--
+ drivers/block/zram/zram_drv.c |  4 ++--
+ include/linux/blkdev.h        | 15 +++++++++++++++
+ 3 files changed, 19 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 5a1f98494dddf..795f65a5c9661 100644
+index 795f65a5c9661..93af7587d5ed6 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -1217,11 +1217,11 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
- 	return -ENOSPC;
- }
+@@ -1219,7 +1219,7 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
  
--static void nbd_bdev_reset(struct block_device *bdev)
-+static void nbd_bdev_reset(struct nbd_device *nbd)
+ static void nbd_bdev_reset(struct nbd_device *nbd)
  {
--	if (bdev->bd_openers > 1)
-+	if (nbd->disk->part0->bd_openers > 1)
+-	if (nbd->disk->part0->bd_openers > 1)
++	if (disk_openers(nbd->disk) > 1)
  		return;
--	set_capacity(bdev->bd_disk, 0);
-+	set_capacity(nbd->disk, 0);
+ 	set_capacity(nbd->disk, 0);
+ }
+@@ -1578,7 +1578,7 @@ static void nbd_release(struct gendisk *disk, fmode_t mode)
+ 	struct nbd_device *nbd = disk->private_data;
+ 
+ 	if (test_bit(NBD_RT_DISCONNECT_ON_CLOSE, &nbd->config->runtime_flags) &&
+-			disk->part0->bd_openers == 0)
++			disk_openers(disk) == 0)
+ 		nbd_disconnect_and_put(nbd);
+ 
+ 	nbd_config_put(nbd);
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index 863606f1722b1..2362385f782a9 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1800,7 +1800,7 @@ static ssize_t reset_store(struct device *dev,
+ 
+ 	mutex_lock(&disk->open_mutex);
+ 	/* Do not reset an active device or claimed device */
+-	if (disk->part0->bd_openers || zram->claim) {
++	if (disk_openers(disk) || zram->claim) {
+ 		mutex_unlock(&disk->open_mutex);
+ 		return -EBUSY;
+ 	}
+@@ -1990,7 +1990,7 @@ static int zram_remove(struct zram *zram)
+ 	bool claimed;
+ 
+ 	mutex_lock(&zram->disk->open_mutex);
+-	if (zram->disk->part0->bd_openers) {
++	if (disk_openers(zram->disk)) {
+ 		mutex_unlock(&zram->disk->open_mutex);
+ 		return -EBUSY;
+ 	}
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index eb27312a1b8f3..9824ebc9b4d31 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -176,6 +176,21 @@ static inline bool disk_live(struct gendisk *disk)
+ 	return !inode_unhashed(disk->part0->bd_inode);
  }
  
- static void nbd_parse_flags(struct nbd_device *nbd)
-@@ -1389,7 +1389,7 @@ static int nbd_start_device(struct nbd_device *nbd)
- 	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
- }
- 
--static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
-+static int nbd_start_device_ioctl(struct nbd_device *nbd)
- {
- 	struct nbd_config *config = nbd->config;
- 	int ret;
-@@ -1408,7 +1408,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 	flush_workqueue(nbd->recv_workq);
- 
- 	mutex_lock(&nbd->config_lock);
--	nbd_bdev_reset(bdev);
-+	nbd_bdev_reset(nbd);
- 	/* user requested, ignore socket errors */
- 	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
- 		ret = 0;
-@@ -1417,12 +1417,11 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
- 	return ret;
- }
- 
--static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
--				 struct block_device *bdev)
-+static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
- {
- 	sock_shutdown(nbd);
--	__invalidate_device(bdev, true);
--	nbd_bdev_reset(bdev);
-+	__invalidate_device(nbd->disk->part0, true);
-+	nbd_bdev_reset(nbd);
- 	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
- 			       &nbd->config->runtime_flags))
- 		nbd_config_put(nbd);
-@@ -1448,7 +1447,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 	case NBD_DISCONNECT:
- 		return nbd_disconnect(nbd);
- 	case NBD_CLEAR_SOCK:
--		nbd_clear_sock_ioctl(nbd, bdev);
-+		nbd_clear_sock_ioctl(nbd);
- 		return 0;
- 	case NBD_SET_SOCK:
- 		return nbd_add_socket(nbd, arg, false);
-@@ -1468,7 +1467,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
- 		config->flags = arg;
- 		return 0;
- 	case NBD_DO_IT:
--		return nbd_start_device_ioctl(nbd, bdev);
-+		return nbd_start_device_ioctl(nbd);
- 	case NBD_CLEAR_QUE:
- 		/*
- 		 * This is for compatibility only.  The queue is always cleared
++/**
++ * disk_openers - returns how many openers are there for a disk
++ * @disk: disk to check
++ *
++ * This returns the number of openers for a disk.  Note that this value is only
++ * stable if disk->open_mutex is held.
++ *
++ * Note: Due to a quirk in the block layer open code, each open partition is
++ * only counted once even if there are multiple openers.
++ */
++static inline unsigned int disk_openers(struct gendisk *disk)
++{
++	return disk->part0->bd_openers;
++}
++
+ /*
+  * The gendisk is refcounted by the part0 block_device, and the bd_device
+  * therein is also used for device model presentation in sysfs.
 -- 
 2.30.2
 
