@@ -2,237 +2,267 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57669C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 14:05:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C684C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 14:13:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350736AbiCXOHZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 10:07:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55902 "EHLO
+        id S1350756AbiCXOO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 10:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350735AbiCXOHU (ORCPT
+        with ESMTP id S1345387AbiCXOO4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 10:07:20 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474E5AC04C
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 07:05:48 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id o8so3912208pgf.9
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 07:05:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=IBmAfRHWXsoFTijrtM1oV+vmwLucmnlLDXAqQecddn0=;
-        b=O1O5EI7JckwyfBDV3JsSkek9PmaLW/qCXQ70bXFuBJNUPL642P/yuz0aSgjx/wvIsQ
-         Pi8hsvFcnWE2hw25wCNQrb6yFqr06JACIWLx+zVpIX0ezH2ZpvtpDZF6i66KLUaNJ9+/
-         woBToDsk5XT0S0AtXT5hF6Onkx+Nv8TBa8eo5iOAE/71NhwhvlGxS4rdRUCo4GTnLAk2
-         KhjGlfcJH3qGh3BJ8B9kf2IvNuqDTuVKVuQlIIxesgKQ/fCPV4IEGJPUrcs5SIzThZ0T
-         +f/xZDqCuSL3g80hprCbh7iKCW+D2Ap/YhWXMC5yW6F8eOzT3SBOiGjDwJFIot5G8Elf
-         t41w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=IBmAfRHWXsoFTijrtM1oV+vmwLucmnlLDXAqQecddn0=;
-        b=SCDimEVfSytwAwUWuB74S1F6DnEobkrxOGpuizO0JdteBUA7VvCOMILpKhIIixV2eB
-         Usu/fofWvzXjZvs7ll6A8do9nHgd9FxvG/B6rWzvUjxaGxI/dvRXN7/4hXY0cFo4OGWt
-         CSTmW0OJxIrGp+ghW5wTBhXEJ93liEOa0v5rXbHeV+a6gf/fEfwNDWoKqBkaz+vlYxeS
-         Vit8DhdEyc0NyoNhn7risudS5EP0jnMVsia/Gtkrt6ekF9A9WGk273iXabPM+6c6/XmP
-         DTHKbmZbylbOpLrkIgasWdFCOp9jWC1pxIXxgv/GziuCCme88imZs2BQyE2rYYu6K0/e
-         7P5A==
-X-Gm-Message-State: AOAM533kl1Q8zckdb1rhE1aYb6sN/P4UxXR7SuAf0OCwMLeyy7tl5jXp
-        PaQ8drBdGu72SXJ5+qGGjF4=
-X-Google-Smtp-Source: ABdhPJy0BkYTP2vEIrYxPSKN2AjlEihlNeOc0pTewu01SslZ0tYErhQAf4rWZpmyeoQR23kFwBUi+w==
-X-Received: by 2002:a65:4c82:0:b0:380:3aee:6948 with SMTP id m2-20020a654c82000000b003803aee6948mr4140324pgt.527.1648130747707;
-        Thu, 24 Mar 2022 07:05:47 -0700 (PDT)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id u12-20020a17090a890c00b001b8efcf8e48sm9441845pjn.14.2022.03.24.07.05.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Mar 2022 07:05:46 -0700 (PDT)
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, mgurtovoy@nvidia.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: [PATCH v3 2/2] virtio-blk: support mq_ops->queue_rqs()
-Date:   Thu, 24 Mar 2022 23:04:50 +0900
-Message-Id: <20220324140450.33148-3-suwan.kim027@gmail.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20220324140450.33148-1-suwan.kim027@gmail.com>
-References: <20220324140450.33148-1-suwan.kim027@gmail.com>
+        Thu, 24 Mar 2022 10:14:56 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5C01E3E6
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 07:13:23 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 641B321100;
+        Thu, 24 Mar 2022 14:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1648131202; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i7rkE/+nY7ru0dtCC89r13OI5pvbT9r9MW6yL1fexYQ=;
+        b=aMr3TNnedd+Zv2KfBUyvxwif/twUM+SsOkIpJm8ckm6dFpKcydId1GwavNOyiiOgzVv/ax
+        3rKVs02rxFqzsk8qynqLZwL/ndL37A7P1Gn876Z9n/TBMgAnBmJb51wKkKrsWbgG/cqaap
+        UEsKAulAeti0oJf2mohKPEYe8FELRgg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1648131202;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i7rkE/+nY7ru0dtCC89r13OI5pvbT9r9MW6yL1fexYQ=;
+        b=Nj5lniwDpHRb/bWld6GgZASe90s328FgoSbEtkxDkPqbDlCr1WlqEZ+oHrsz4f2Xu0UIw6
+        pOZ98ROalT1V5OCg==
+Received: from quack3.suse.cz (unknown [10.100.200.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 29BB1A3B93;
+        Thu, 24 Mar 2022 14:13:22 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 76641A0610; Thu, 24 Mar 2022 15:13:21 +0100 (CET)
+Date:   Thu, 24 Mar 2022 15:13:21 +0100
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
+ ->open / ->release
+Message-ID: <20220324141321.pqesnshaswwk3svk@quack3.lan>
+References: <20220324075119.1556334-1-hch@lst.de>
+ <20220324075119.1556334-13-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/mixed; boundary="umwtnzhqcn5ic4i7"
+Content-Disposition: inline
+In-Reply-To: <20220324075119.1556334-13-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch supports mq_ops->queue_rqs() hook. It has an advantage of
-batch submission to virtio-blk driver. It also helps polling I/O because
-polling uses batched completion of block layer. Batch submission in
-queue_rqs() can boost polling performance.
 
-In queue_rqs(), it iterates plug->mq_list, collects requests that
-belong to same HW queue and adds requests into virtqueue until it
-encounters a request from other HW queue or sees the end of the list.
-Then, virtio-blk kicks virtqueue to submit requests.
+--umwtnzhqcn5ic4i7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-If there is an error, it inserts error request to requeue_list and
-passes it to ordinary block layer path.
+On Thu 24-03-22 08:51:18, Christoph Hellwig wrote:
+> lo_refcount counts how many openers a loop device has, but that count
+> is already provided by the block layer in the bd_openers field of the
+> whole-disk block_device.  Remove lo_refcount and allow opens to
+> succeed even on devices beeing deleted - now that ->free_disk is
+> implemented we can handle that race gracefull and all I/O on it will
+> just fail. Similarly there is a small race window now where
+> loop_control_remove does not synchronize the delete vs the remove
+> due do bd_openers not being under lo_mutex protection, but we can
+> handle that just as gracefully.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-For verification, I did fio test.
-(io_uring, randread, direct=1, bs=4K, iodepth=64 numjobs=N)
-I set 4 vcpu and 2 virtio-blk queues for VM and run fio test 5 times.
-It shows about 1-4% improvement.
+Looks good but I still think we need something like attached preparatory
+patch to not regress e.g. filesystem probing triggered by udev events. What
+do you think?
 
-                                 |   numjobs=2   |    numjobs=4
-      -----------------------------------------------------------
-        fio without queue_rqs()  |   282K IOPS   |    245K IOPS
-      -----------------------------------------------------------
-        fio with queue_rqs()     |   294K IOPS   |    249K IOPS
+Otherwise feel free to add:
 
-For polling I/O performance, I also did fio test as below.
-(io_uring, hipri, randread, direct=1, bs=512, iodepth=64 numjobs=4)
-I set 4 vcpu and 2 poll queues for VM.
-It shows upto 7% improvement in polling I/O.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-                                      |   IOPS   |  avg latency
-      -----------------------------------------------------------
-        fio poll without queue_rqs()  |   413K   |   619.72 usec
-      -----------------------------------------------------------
-        fio poll with queue_rqs()     |   445K   |   581.2  usec
+								Honza
 
-Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
----
- drivers/block/virtio_blk.c | 93 ++++++++++++++++++++++++++++++++++----
- 1 file changed, 84 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 3d16f8b753e7..4a0a3b2d9caf 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -311,6 +311,28 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
- 		virtqueue_notify(vq->vq);
- }
- 
-+static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
-+					struct virtio_blk *vblk,
-+					struct request *req,
-+					struct virtblk_req *vbr, int *num)
-+{
-+	blk_status_t status;
-+
-+	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
-+	if (unlikely(status))
-+		return status;
-+
-+	blk_mq_start_request(req);
-+
-+	*num = virtblk_map_data(hctx, req, vbr);
-+	if (unlikely(*num < 0)) {
-+		virtblk_cleanup_cmd(req);
-+		return BLK_STS_RESOURCE;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
- static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			   const struct blk_mq_queue_data *bd)
- {
-@@ -324,18 +346,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	blk_status_t status;
- 	int err;
- 
--	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
-+	status = virtblk_prep_rq(hctx, vblk, req, vbr, &num);
- 	if (unlikely(status))
- 		return status;
- 
--	blk_mq_start_request(req);
--
--	num = virtblk_map_data(hctx, req, vbr);
--	if (unlikely(num < 0)) {
--		virtblk_cleanup_cmd(req);
--		return BLK_STS_RESOURCE;
--	}
--
- 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
- 	err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
- 	if (err) {
-@@ -367,6 +381,66 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+static bool virtblk_prep_rq_batch(struct virtio_blk_vq *vq, struct request *req)
-+{
-+	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
-+	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+	unsigned long flags;
-+	int num, err;
-+
-+	req->mq_hctx->tags->rqs[req->tag] = req;
-+
-+	if (virtblk_prep_rq(req->mq_hctx, vblk, req, vbr, &num) != BLK_STS_OK)
-+		return false;
-+
-+	spin_lock_irqsave(&vq->lock, flags);
-+	err = virtblk_add_req(vq->vq, vbr, vbr->sg_table.sgl, num);
-+	if (err) {
-+		spin_unlock_irqrestore(&vq->lock, flags);
-+		virtblk_unmap_data(req, vbr);
-+		virtblk_cleanup_cmd(req);
-+		return false;
-+	}
-+	spin_unlock_irqrestore(&vq->lock, flags);
-+
-+	return true;
-+}
-+
-+static void virtio_queue_rqs(struct request **rqlist)
-+{
-+	struct request *req, *next, *prev = NULL;
-+	struct request *requeue_list = NULL;
-+
-+	rq_list_for_each_safe(rqlist, req, next) {
-+		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
-+		unsigned long flags;
-+		bool kick;
-+
-+		if (!virtblk_prep_rq_batch(vq, req)) {
-+			rq_list_move(rqlist, &requeue_list, req, prev);
-+			req = prev;
-+
-+			if (!req)
-+				continue;
-+		}
-+
-+		if (!next || req->mq_hctx != next->mq_hctx) {
-+			spin_lock_irqsave(&vq->lock, flags);
-+			kick = virtqueue_kick_prepare(vq->vq);
-+			spin_unlock_irqrestore(&vq->lock, flags);
-+			if (kick)
-+				virtqueue_notify(vq->vq);
-+
-+			req->rq_next = NULL;
-+			*rqlist = next;
-+			prev = NULL;
-+		} else
-+			prev = req;
-+	}
-+
-+	*rqlist = requeue_list;
-+}
-+
- /* return id (s/n) string for *disk to *id_str
-  */
- static int virtblk_get_id(struct gendisk *disk, char *id_str)
-@@ -823,6 +897,7 @@ static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 
- static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
-+	.queue_rqs	= virtio_queue_rqs,
- 	.commit_rqs	= virtio_commit_rqs,
- 	.init_hctx	= virtblk_init_hctx,
- 	.complete	= virtblk_request_done,
+> ---
+>  drivers/block/loop.c | 37 +++++++------------------------------
+>  drivers/block/loop.h |  1 -
+>  2 files changed, 7 insertions(+), 31 deletions(-)
+> 
+> diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+> index b3170e8cdbe95..e1eb925d3f855 100644
+> --- a/drivers/block/loop.c
+> +++ b/drivers/block/loop.c
+> @@ -1244,7 +1244,7 @@ static int loop_clr_fd(struct loop_device *lo)
+>  	 * <dev>/do something like mkfs/losetup -d <dev> causing the losetup -d
+>  	 * command to fail with EBUSY.
+>  	 */
+> -	if (atomic_read(&lo->lo_refcnt) > 1) {
+> +	if (disk_openers(lo->lo_disk) > 1) {
+>  		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
+>  		mutex_unlock(&lo->lo_mutex);
+>  		return 0;
+> @@ -1724,33 +1724,15 @@ static int lo_compat_ioctl(struct block_device *bdev, fmode_t mode,
+>  }
+>  #endif
+>  
+> -static int lo_open(struct block_device *bdev, fmode_t mode)
+> -{
+> -	struct loop_device *lo = bdev->bd_disk->private_data;
+> -	int err;
+> -
+> -	err = mutex_lock_killable(&lo->lo_mutex);
+> -	if (err)
+> -		return err;
+> -	if (lo->lo_state == Lo_deleting)
+> -		err = -ENXIO;
+> -	else
+> -		atomic_inc(&lo->lo_refcnt);
+> -	mutex_unlock(&lo->lo_mutex);
+> -	return err;
+> -}
+> -
+>  static void lo_release(struct gendisk *disk, fmode_t mode)
+>  {
+>  	struct loop_device *lo = disk->private_data;
+>  
+> -	mutex_lock(&lo->lo_mutex);
+> -	if (atomic_dec_return(&lo->lo_refcnt))
+> -		goto out_unlock;
+> +	if (disk_openers(disk) > 0)
+> +		return;
+>  
+> -	if (lo->lo_flags & LO_FLAGS_AUTOCLEAR) {
+> -		if (lo->lo_state != Lo_bound)
+> -			goto out_unlock;
+> +	mutex_lock(&lo->lo_mutex);
+> +	if (lo->lo_state == Lo_bound && (lo->lo_flags & LO_FLAGS_AUTOCLEAR)) {
+>  		lo->lo_state = Lo_rundown;
+>  		mutex_unlock(&lo->lo_mutex);
+>  		/*
+> @@ -1760,8 +1742,6 @@ static void lo_release(struct gendisk *disk, fmode_t mode)
+>  		__loop_clr_fd(lo, true);
+>  		return;
+>  	}
+> -
+> -out_unlock:
+>  	mutex_unlock(&lo->lo_mutex);
+>  }
+>  
+> @@ -1775,7 +1755,6 @@ static void lo_free_disk(struct gendisk *disk)
+>  
+>  static const struct block_device_operations lo_fops = {
+>  	.owner =	THIS_MODULE,
+> -	.open =		lo_open,
+>  	.release =	lo_release,
+>  	.ioctl =	lo_ioctl,
+>  #ifdef CONFIG_COMPAT
+> @@ -2029,7 +2008,6 @@ static int loop_add(int i)
+>  	 */
+>  	if (!part_shift)
+>  		disk->flags |= GENHD_FL_NO_PART;
+> -	atomic_set(&lo->lo_refcnt, 0);
+>  	mutex_init(&lo->lo_mutex);
+>  	lo->lo_number		= i;
+>  	spin_lock_init(&lo->lo_lock);
+> @@ -2119,13 +2097,12 @@ static int loop_control_remove(int idx)
+>  	ret = mutex_lock_killable(&lo->lo_mutex);
+>  	if (ret)
+>  		goto mark_visible;
+> -	if (lo->lo_state != Lo_unbound ||
+> -	    atomic_read(&lo->lo_refcnt) > 0) {
+> +	if (lo->lo_state != Lo_unbound || disk_openers(lo->lo_disk) > 0) {
+>  		mutex_unlock(&lo->lo_mutex);
+>  		ret = -EBUSY;
+>  		goto mark_visible;
+>  	}
+> -	/* Mark this loop device no longer open()-able. */
+> +	/* Mark this loop device as no more bound, but not quite unbound yet */
+>  	lo->lo_state = Lo_deleting;
+>  	mutex_unlock(&lo->lo_mutex);
+>  
+> diff --git a/drivers/block/loop.h b/drivers/block/loop.h
+> index 082d4b6bfc6a6..449d562738c52 100644
+> --- a/drivers/block/loop.h
+> +++ b/drivers/block/loop.h
+> @@ -28,7 +28,6 @@ struct loop_func_table;
+>  
+>  struct loop_device {
+>  	int		lo_number;
+> -	atomic_t	lo_refcnt;
+>  	loff_t		lo_offset;
+>  	loff_t		lo_sizelimit;
+>  	int		lo_flags;
+> -- 
+> 2.30.2
+> 
 -- 
-2.26.3
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
+--umwtnzhqcn5ic4i7
+Content-Type: text/x-patch; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-loop-Send-udev-change-event-after-device-is-ready-fo.patch"
+
+From 663c2a1d0781a5fa34665a3e8544c5543f5aa70f Mon Sep 17 00:00:00 2001
+From: Jan Kara <jack@suse.cz>
+Date: Thu, 24 Mar 2022 14:58:05 +0100
+Subject: [PATCH] loop: Send udev change event after device is ready for IO
+
+Currently, udev change event is generated for a loop device before the
+device is ready for IO. Due to serialization on lo->lo_mutex in
+lo_open() this does not matter because anybody is able to open the
+device and do IO only after the configuration is finished. However this
+synchronization in lo_open() is going away so make sure userspace
+reacting to the change event will see the new device state by generating
+the event only when the device is setup.
+
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ drivers/block/loop.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 3e636a75c83a..e401afc3e6dc 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -608,6 +608,8 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
+ 	loop_update_dio(lo);
+ 	blk_mq_unfreeze_queue(lo->lo_queue);
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
++	/* Notify userspace about device change when it is ready for IO */
++	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+ 	loop_global_unlock(lo, is_loop);
+ 
+ 	/*
+@@ -1020,7 +1022,6 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		goto out_unlock;
+ 	}
+ 
+-	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+ 	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
+ 
+ 	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
+@@ -1068,6 +1069,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 	if (partscan)
+ 		lo->lo_disk->flags &= ~GENHD_FL_NO_PART;
+ 
++	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
+ 	loop_global_unlock(lo, is_loop);
+ 	if (partscan)
+ 		loop_reread_partitions(lo);
+-- 
+2.34.1
+
+
+--umwtnzhqcn5ic4i7--
