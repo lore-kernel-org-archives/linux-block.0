@@ -2,91 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0110DC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 00:25:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A49ECC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 06:21:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241602AbiCXA0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 23 Mar 2022 20:26:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59404 "EHLO
+        id S238334AbiCXGW3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 02:22:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241068AbiCXA0j (ORCPT
+        with ESMTP id S233563AbiCXGW3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 23 Mar 2022 20:26:39 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14FB97C791
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 17:25:08 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id t13so1282872pgn.8
-        for <linux-block@vger.kernel.org>; Wed, 23 Mar 2022 17:25:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=DLXwEQVoWDDsKhgb9WrIVEN4Frk4SugcJXU3mLlQoa8=;
-        b=MEF6krUU5iNpWW5KDt12I/WImTmZC81tdTGXK1zQY2QVo7Ju2vbhLSU1NOz7Syw5Ye
-         VWMJ6FEaTRHA+TrrBaGsKHwVCASruOWIU0BtaO2I6OyUHFp43fNH2gwlWq1zEA65djOi
-         /uo/TDF47f8P7p9O5XfjMUAcBTXDQTbzrdiM7nBcBaqqzpGMDolZNZTbD6gAXNnR6y+i
-         gcULbmlJa7tVVCOnPj14sfbWeHqNY5CuOzfbAJxIc0+bJnZERgsI0+9m6Fa29TkDkNl4
-         TkPR+V1ovjlNtnHyEGKtSFH/jG4RA4UE6aHgQ7jg+as1Fazj2zTx5aQdhBS2m4ZyOloh
-         +6GQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DLXwEQVoWDDsKhgb9WrIVEN4Frk4SugcJXU3mLlQoa8=;
-        b=Gm9whMxOmGe6pfsvKvLFRvc59U4fD5kHeljQkAmwXPp/YU0gw5XrFBDTMKsFNy7FlK
-         MpZyDrWwG1jZPJj5CoEJQ1cc3KDYWbegYJbyTMyf54Psrw1HDAtXVKRomoAP4/wSm/9u
-         P+ctxuiU87H+tuc4xbWZgz53QU/knlWoMnV663ScT7xBgGQsRCJ+GJ9h7eePuCSu6E4V
-         rxmKsSY0AuTON0D+pPcTc5AtEoHsa/j4o/u4vthVarL8xd+w9FXBt7DWmoGIJwRC6G80
-         KqaTIWn6a2tONNy8DhZJbXltaYScPIR2Y4XVHzE2ue4G8+uqBB1cr4VZch59p6jL6m/1
-         gKRQ==
-X-Gm-Message-State: AOAM532O9DzUjnCtQHZ73XodCz/WJ7HagLmSQ3XnDr9cTMK1sQBd+zEy
-        afczTxN3S1fPVFt8A58GWc0AUg==
-X-Google-Smtp-Source: ABdhPJxpUJvas/aHL0BqsaaE+UmpRki4f4WUW7prIIy8r1Nmg/onImt86e4hrZ6A4wbAnPuHrWxKyw==
-X-Received: by 2002:a63:4e26:0:b0:386:1839:3bde with SMTP id c38-20020a634e26000000b0038618393bdemr1928819pgb.603.1648081507485;
-        Wed, 23 Mar 2022 17:25:07 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ep2-20020a17090ae64200b001c6a7c22aedsm730331pjb.37.2022.03.23.17.25.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 23 Mar 2022 17:25:07 -0700 (PDT)
-Message-ID: <30acea65-293a-7049-2dad-9e81e025ce61@kernel.dk>
-Date:   Wed, 23 Mar 2022 18:25:06 -0600
+        Thu, 24 Mar 2022 02:22:29 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F138E388B;
+        Wed, 23 Mar 2022 23:20:57 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E22FC68C4E; Thu, 24 Mar 2022 07:20:53 +0100 (CET)
+Date:   Thu, 24 Mar 2022 07:20:53 +0100
+From:   Christoph Hellwig <hch@lst.de>
+To:     Sagi Grimberg <sagi@grimberg.me>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshiiitr@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Message-ID: <20220324062053.GA12519@lst.de>
+References: <20220308152105.309618-6-joshi.k@samsung.com> <7a123895-1102-4b36-2d6e-1e00e978d03d@grimberg.me> <CA+1E3rK8wnABptQLQrEo8XRdsbua9t_88e3ZP-Ass3CnxHv+oA@mail.gmail.com> <8f45a761-5ecb-5911-1064-9625a285c93d@grimberg.me> <20220316092153.GA4885@test-zns> <11f9e933-cfc8-2e3b-c815-c49a4b7db4ec@grimberg.me> <CA+1E3r+_DEw5ABPbLzSp9Gvg6L8XU-2HBoLK7kuXucLjr=+Ezw@mail.gmail.com> <3ed01280-5487-7206-a326-0cd110118b65@grimberg.me> <666deb0e-fa10-8a39-c1aa-cf3908b3795c@kernel.dk> <28b53100-9930-92d4-ba3b-f9c5e8773808@grimberg.me>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2 0/4] block/dm: use BIOSET_PERCPU_CACHE from
- bio_alloc_bioset
-Content-Language: en-US
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-References: <20220323194524.5900-1-snitzer@kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220323194524.5900-1-snitzer@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <28b53100-9930-92d4-ba3b-f9c5e8773808@grimberg.me>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/23/22 1:45 PM, Mike Snitzer wrote:
-> Hi Jens,
-> 
-> I ran with your suggestion and DM now sees a ~7% improvement in hipri
-> bio polling with io_uring (using dm-linear on null_blk, IOPS went from
-> 900K to 966K).
-> 
-> Christoph,
-> 
-> I tried to address your review of the previous set. Patch 1 and 2 can
-> obviously be folded but I left them split out for review purposes.
-> Feel free to see if these changes are meaningful for nvme's use.
-> Happy for either you to take on iterating on these block changes
-> further or you letting me know what changes you'd like made.
+On Wed, Mar 16, 2022 at 04:50:53PM +0200, Sagi Grimberg wrote:
+>>> I know, and that was my original question, no one cares that this
+>>> interface completely lacks this capability? Maybe it is fine, but
+>>> it is not a trivial assumption given that this is designed to be more
+>>> than an interface to send admin/vs commands to the controller...
+>>
+>> Most people don't really care about or use multipath, so it's not a
+>> primary goal.
+>
+> This statement is generally correct. However what application would be 
+> interested in speaking raw nvme to a device and gaining performance that
+> is even higher than the block layer (which is great to begin with)?
 
-Ran the usual peak testing, and it's good for about a 20% improvement
-for me. 5.6M -> 6.6M IOPS on a single core, dm-linear.
+If passthrough is faster than the block I/O path we're doing someting
+wrong.  At best it should be the same performance.
 
--- 
-Jens Axboe
-
+That being said multipathing is an integral part of the nvme driver
+architecture, and the /dev/ngX devices.  If we want to support uring
+async commands on /dev/ngX it will have to support multipath.
