@@ -2,32 +2,65 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70548C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 21:09:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE63FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 23:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347040AbiCXVK4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 17:10:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57936 "EHLO
+        id S234132AbiCXXjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 19:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353945AbiCXVKx (ORCPT
+        with ESMTP id S1356977AbiCXXiX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 17:10:53 -0400
-Received: from SJSMAIL01.us.kioxia.com (usmailhost21.kioxia.com [12.0.68.226])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62A0076281;
-        Thu, 24 Mar 2022 14:09:20 -0700 (PDT)
-Received: from SJSMAIL01.us.kioxia.com (10.90.133.90) by
- SJSMAIL01.us.kioxia.com (10.90.133.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.14; Thu, 24 Mar 2022 14:09:18 -0700
-Received: from SJSMAIL01.us.kioxia.com ([fe80::b962:3005:acea:aa09]) by
- SJSMAIL01.us.kioxia.com ([fe80::b962:3005:acea:aa09%5]) with mapi id
- 15.01.2176.014; Thu, 24 Mar 2022 14:09:18 -0700
-From:   Clay Mayers <Clay.Mayers@kioxia.com>
-To:     Kanchan Joshi <joshi.k@samsung.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        Thu, 24 Mar 2022 19:38:23 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72A08B6D3C
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 16:36:50 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id w4so6344766ply.13
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 16:36:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=GebMZe55xHN1I+0YXbeTh7daUrmbTo6OsaivpOl4mhM=;
+        b=ZTsDnLd6GGJ/CDNND38btHDAVkn3zbXuN/5tHhxkl/olLbx9B/SxKx7u3z/q25MPmm
+         6qCZwQ1+j7YORPvJZ9GBwsqPD1TGedIrtEMcCUlPYEu0Jwn+egh8rAG4RZyYYqFt83Ya
+         BmP837YpxGYX8Gi76uQZIT0sue2hPve4uK1ufIGT9LY665Jbi2T0P4MNc37dEhf/VdMe
+         z7c3t1lMbTUX+yAsG4sOCRETXzAWCu/ylwvScmtYLgvftncFBspdMgh/rZJSnrrugRti
+         l8DKyTe5OT6sdGIWlIA+1GeI6CjaTvHAfuVLE7dymwW1MYsyr6VQX0XaDPUSM0Qb1nmQ
+         2fIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GebMZe55xHN1I+0YXbeTh7daUrmbTo6OsaivpOl4mhM=;
+        b=1MenWrHUTaHraJAfg9Qh5llW1XJJFf2HptRlpX2QppCK5bDaJParJa/ccxxEL2QnqD
+         P6+qkF5hfAukBr2dBZsCuqrZhhyCd1bZBmv0BeJNMmF7OnKeYhrp2GeMnn88TX/OY819
+         AF8yWEkANRsI7huVFIqarEnAI4guLxNNy5Ao7ivtRLCy7kAbAcqnTMnvUgb9XmM/EQ98
+         1/ulP942WH0CTt2NaW3veVevSkrcLg5LPQg4kQ1nYRIJy5Dky98uOQEYpzcYdkcoc8Ml
+         IKGqdeLUba2CpEcsVPD7P3zpgmSzbhP9t0wbaOTZjsEwcDbfqoCqFK4tANLRtAIhLFSp
+         swqg==
+X-Gm-Message-State: AOAM532MeU/PMbKmZq3M3BzXre68sglrnw7DSQVsZX/PyMKxYjSxMA63
+        +FxwhybsMnJkhiT11Cfo0BFNOA==
+X-Google-Smtp-Source: ABdhPJzqMNc0ahbFfodPumpJQOiINRzZGitX9G+hqCRFpKVPql6rpnnDAM2cR9akyaGDaLiOylrvLQ==
+X-Received: by 2002:a17:90b:4f86:b0:1c6:b3eb:99a3 with SMTP id qe6-20020a17090b4f8600b001c6b3eb99a3mr9261128pjb.66.1648165009872;
+        Thu, 24 Mar 2022 16:36:49 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id y9-20020a056a00180900b004faa45a2230sm4754641pfa.210.2022.03.24.16.36.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Mar 2022 16:36:49 -0700 (PDT)
+Message-ID: <2e4e5faa-ca1e-75b1-b864-646270b708ed@kernel.dk>
+Date:   Thu, 24 Mar 2022 17:36:46 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
+Content-Language: en-US
+To:     Clay Mayers <Clay.Mayers@kioxia.com>,
+        Kanchan Joshi <joshi.k@samsung.com>, "hch@lst.de" <hch@lst.de>,
         "kbusch@kernel.org" <kbusch@kernel.org>,
         "asml.silence@gmail.com" <asml.silence@gmail.com>
-CC:     "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
+Cc:     "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
         "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         "sbates@raithlin.com" <sbates@raithlin.com>,
@@ -38,94 +71,74 @@ CC:     "io-uring@vger.kernel.org" <io-uring@vger.kernel.org>,
         "a.manzanares@samsung.com" <a.manzanares@samsung.com>,
         "joshiiitr@gmail.com" <joshiiitr@gmail.com>,
         "anuj20.g@samsung.com" <anuj20.g@samsung.com>
-Subject: RE: [PATCH 17/17] nvme: enable non-inline passthru commands
-Thread-Topic: [PATCH 17/17] nvme: enable non-inline passthru commands
-Thread-Index: AQHYMwoHCN0mZHqKz0OTQ9/5LjtdfKzOvDUg
-Date:   Thu, 24 Mar 2022 21:09:18 +0000
-Message-ID: <6a1cf782310d481aa5ef2fc172f55826@kioxia.com>
 References: <20220308152105.309618-1-joshi.k@samsung.com>
  <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
  <20220308152105.309618-18-joshi.k@samsung.com>
-In-Reply-To: <20220308152105.309618-18-joshi.k@samsung.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.93.77.13]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-MIME-Version: 1.0
+ <6a1cf782310d481aa5ef2fc172f55826@kioxia.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <6a1cf782310d481aa5ef2fc172f55826@kioxia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiBGcm9tOiBLYW5jaGFuIEpvc2hpDQo+IFNlbnQ6IFR1ZXNkYXksIE1hcmNoIDgsIDIwMjIgNzoy
-MSBBTQ0KPiBUbzogYXhib2VAa2VybmVsLmRrOyBoY2hAbHN0LmRlOyBrYnVzY2hAa2VybmVsLm9y
-ZzsNCj4gYXNtbC5zaWxlbmNlQGdtYWlsLmNvbQ0KPiBDYzogaW8tdXJpbmdAdmdlci5rZXJuZWwu
-b3JnOyBsaW51eC1udm1lQGxpc3RzLmluZnJhZGVhZC5vcmc7IGxpbnV4LQ0KPiBibG9ja0B2Z2Vy
-Lmtlcm5lbC5vcmc7IHNiYXRlc0ByYWl0aGxpbi5jb207IGxvZ2FuZ0BkZWx0YXRlZS5jb207DQo+
-IHBhbmt5ZGV2OEBnbWFpbC5jb207IGphdmllckBqYXZpZ29uLmNvbTsgbWNncm9mQGtlcm5lbC5v
-cmc7DQo+IGEubWFuemFuYXJlc0BzYW1zdW5nLmNvbTsgam9zaGlpaXRyQGdtYWlsLmNvbTsgYW51
-ajIwLmdAc2Ftc3VuZy5jb20NCj4gU3ViamVjdDogW1BBVENIIDE3LzE3XSBudm1lOiBlbmFibGUg
-bm9uLWlubGluZSBwYXNzdGhydSBjb21tYW5kcw0KPiANCj4gRnJvbTogQW51aiBHdXB0YSA8YW51
-ajIwLmdAc2Ftc3VuZy5jb20+DQo+IA0KPiBPbiBzdWJtaXNzaW9uLGp1c3QgZmV0Y2ggdGhlIGNv
-bW1tYW5kIGZyb20gdXNlcnNwYWNlIHBvaW50ZXIgYW5kIHJldXNlDQo+IGV2ZXJ5dGhpbmcgZWxz
-ZS4gT24gY29tcGxldGlvbiwgdXBkYXRlIHRoZSByZXN1bHQgZmllbGQgaW5zaWRlIHRoZSBwYXNz
-dGhydQ0KPiBjb21tYW5kLg0KPiANCj4gU2lnbmVkLW9mZi1ieTogQW51aiBHdXB0YSA8YW51ajIw
-LmdAc2Ftc3VuZy5jb20+DQo+IFNpZ25lZC1vZmYtYnk6IEthbmNoYW4gSm9zaGkgPGpvc2hpLmtA
-c2Ftc3VuZy5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9udm1lL2hvc3QvaW9jdGwuYyB8IDI5ICsr
-KysrKysrKysrKysrKysrKysrKysrKystLS0tDQo+ICAxIGZpbGUgY2hhbmdlZCwgMjUgaW5zZXJ0
-aW9ucygrKSwgNCBkZWxldGlvbnMoLSkNCj4gDQo+IGRpZmYgLS1naXQgYS9kcml2ZXJzL252bWUv
-aG9zdC9pb2N0bC5jIGIvZHJpdmVycy9udm1lL2hvc3QvaW9jdGwuYyBpbmRleA0KPiA3MDFmZWFl
-Y2FiYmUuLmRkYjdlNTg2NGJlNiAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9udm1lL2hvc3QvaW9j
-dGwuYw0KPiArKysgYi9kcml2ZXJzL252bWUvaG9zdC9pb2N0bC5jDQo+IEBAIC02NSw2ICs2NSwx
-NCBAQCBzdGF0aWMgdm9pZCBudm1lX3B0X3Rhc2tfY2Ioc3RydWN0IGlvX3VyaW5nX2NtZA0KPiAq
-aW91Y21kKQ0KPiAgCX0NCj4gIAlrZnJlZShwZHUtPm1ldGEpOw0KPiANCj4gKwlpZiAoaW91Y21k
-LT5mbGFncyAmIElPX1VSSU5HX0ZfVUNNRF9JTkRJUkVDVCkgew0KPiArCQlzdHJ1Y3QgbnZtZV9w
-YXNzdGhydV9jbWQ2NCBfX3VzZXIgKnB0Y21kNjQgPSBpb3VjbWQtDQo+ID5jbWQ7DQo+ICsJCXU2
-NCByZXN1bHQgPSBsZTY0X3RvX2NwdShudm1lX3JlcShyZXEpLT5yZXN1bHQudTY0KTsNCj4gKw0K
-PiArCQlpZiAocHV0X3VzZXIocmVzdWx0LCAmcHRjbWQ2NC0+cmVzdWx0KSkNCj4gKwkJCXN0YXR1
-cyA9IC1FRkFVTFQ7DQoNCldoZW4gdGhlIHRocmVhZCB0aGF0IHN1Ym1pdHRlZCB0aGUgaW9fdXJp
-bmdfY21kIGhhcyBleGl0ZWQsIHRoZSBDQiBpcw0KY2FsbGVkIGJ5IGEgc3lzdGVtIHdvcmtlciBp
-bnN0ZWFkIHNvIHB1dF91c2VyKCkgZmFpbHMuICBUaGUgY3FlIGlzIHN0aWxsDQpjb21wbGV0ZWQg
-YW5kIHRoZSBwcm9jZXNzIHNlZXMgYSBmYWlsZWQgaS9vIHN0YXR1cywgYnV0IHRoZSBpL28gZGlk
-IG5vdA0KZmFpbC4gIFRoZSBzYW1lIGlzIHRydWUgZm9yIG1ldGEgZGF0YSBiZWluZyByZXR1cm5l
-ZCBpbiBwYXRjaCA1Lg0KDQpJIGNhbid0IHNheSBpZiBpdCdzIGEgcmVxdWlyZW1lbnQgdG8gc3Vw
-cG9ydCB0aGlzIGNhc2UuICBJdCBkb2VzIGJyZWFrIG91cg0KY3VycmVudCBwcm90by10eXBlIGJ1
-dCB3ZSBjYW4gYWRqdXN0Lg0KDQo+ICsJfQ0KPiArDQo+ICAJaW9fdXJpbmdfY21kX2RvbmUoaW91
-Y21kLCBzdGF0dXMpOw0KPiAgfQ0KPiANCj4gQEAgLTE0Myw2ICsxNTEsMTMgQEAgc3RhdGljIGlu
-bGluZSBib29sIG52bWVfaXNfZml4ZWRiX3Bhc3N0aHJ1KHN0cnVjdA0KPiBpb191cmluZ19jbWQg
-KmlvdWNtZCkNCj4gIAlyZXR1cm4gKChpb3VjbWQpICYmIChpb3VjbWQtPmZsYWdzICYNCj4gSU9f
-VVJJTkdfRl9VQ01EX0ZJWEVEQlVGUykpOyAgfQ0KPiANCj4gK3N0YXRpYyBpbmxpbmUgYm9vbCBp
-c19pbmxpbmVfcncoc3RydWN0IGlvX3VyaW5nX2NtZCAqaW91Y21kLCBzdHJ1Y3QNCj4gK252bWVf
-Y29tbWFuZCAqY21kKSB7DQo+ICsJcmV0dXJuICgoaW91Y21kLT5mbGFncyAmIElPX1VSSU5HX0Zf
-VUNNRF9JTkRJUkVDVCkgfHwNCj4gKwkJCShjbWQtPmNvbW1vbi5vcGNvZGUgPT0gbnZtZV9jbWRf
-d3JpdGUgfHwNCj4gKwkJCSBjbWQtPmNvbW1vbi5vcGNvZGUgPT0gbnZtZV9jbWRfcmVhZCkpOyB9
-DQo+ICsNCj4gIHN0YXRpYyBpbnQgbnZtZV9zdWJtaXRfdXNlcl9jbWQoc3RydWN0IHJlcXVlc3Rf
-cXVldWUgKnEsDQo+ICAJCXN0cnVjdCBudm1lX2NvbW1hbmQgKmNtZCwgdTY0IHVidWZmZXIsDQo+
-ICAJCXVuc2lnbmVkIGJ1ZmZsZW4sIHZvaWQgX191c2VyICptZXRhX2J1ZmZlciwgdW5zaWduZWQN
-Cj4gbWV0YV9sZW4sIEBAIC0xOTMsOCArMjA4LDcgQEAgc3RhdGljIGludCBudm1lX3N1Ym1pdF91
-c2VyX2NtZChzdHJ1Y3QNCj4gcmVxdWVzdF9xdWV1ZSAqcSwNCj4gIAkJfQ0KPiAgCX0NCj4gIAlp
-ZiAoaW91Y21kKSB7IC8qIGFzeW5jIGRpc3BhdGNoICovDQo+IC0JCWlmIChjbWQtPmNvbW1vbi5v
-cGNvZGUgPT0gbnZtZV9jbWRfd3JpdGUgfHwNCj4gLQkJCQljbWQtPmNvbW1vbi5vcGNvZGUgPT0g
-bnZtZV9jbWRfcmVhZCkgew0KPiArCQlpZiAoaXNfaW5saW5lX3J3KGlvdWNtZCwgY21kKSkgew0K
-PiAgCQkJaWYgKGJpbyAmJiBpc19wb2xsaW5nX2VuYWJsZWQoaW91Y21kLCByZXEpKSB7DQo+ICAJ
-CQkJaW91Y21kLT5iaW8gPSBiaW87DQo+ICAJCQkJYmlvLT5iaV9vcGYgfD0gUkVRX1BPTExFRDsN
-Cj4gQEAgLTIwNCw3ICsyMTgsNyBAQCBzdGF0aWMgaW50IG52bWVfc3VibWl0X3VzZXJfY21kKHN0
-cnVjdA0KPiByZXF1ZXN0X3F1ZXVlICpxLA0KPiAgCQkJYmxrX2V4ZWN1dGVfcnFfbm93YWl0KHJl
-cSwgMCwgbnZtZV9lbmRfYXN5bmNfcHQpOw0KPiAgCQkJcmV0dXJuIDA7DQo+ICAJCX0gZWxzZSB7
-DQo+IC0JCQkvKiBzdXBwb3J0IG9ubHkgcmVhZCBhbmQgd3JpdGUgZm9yIG5vdy4gKi8NCj4gKwkJ
-CS8qIHN1cHBvcnQgb25seSByZWFkIGFuZCB3cml0ZSBmb3IgaW5saW5lICovDQo+ICAJCQlyZXQg
-PSAtRUlOVkFMOw0KPiAgCQkJZ290byBvdXRfbWV0YTsNCj4gIAkJfQ0KPiBAQCAtMzcyLDcgKzM4
-NiwxNCBAQCBzdGF0aWMgaW50IG52bWVfdXNlcl9jbWQ2NChzdHJ1Y3QgbnZtZV9jdHJsICpjdHJs
-LA0KPiBzdHJ1Y3QgbnZtZV9ucyAqbnMsDQo+ICAJfSBlbHNlIHsNCj4gIAkJaWYgKGlvdWNtZC0+
-Y21kX2xlbiAhPSBzaXplb2Yoc3RydWN0IG52bWVfcGFzc3RocnVfY21kNjQpKQ0KPiAgCQkJcmV0
-dXJuIC1FSU5WQUw7DQo+IC0JCWNwdHIgPSAoc3RydWN0IG52bWVfcGFzc3RocnVfY21kNjQgKilp
-b3VjbWQtPmNtZDsNCj4gKwkJaWYgKGlvdWNtZC0+ZmxhZ3MgJiBJT19VUklOR19GX1VDTURfSU5E
-SVJFQ1QpIHsNCj4gKwkJCXVjbWQgPSAoc3RydWN0IG52bWVfcGFzc3RocnVfY21kNjQgX191c2Vy
-DQo+ICopaW91Y21kLT5jbWQ7DQo+ICsJCQlpZiAoY29weV9mcm9tX3VzZXIoJmNtZCwgdWNtZCwg
-c2l6ZW9mKGNtZCkpKQ0KPiArCQkJCXJldHVybiAtRUZBVUxUOw0KPiArCQkJY3B0ciA9ICZjbWQ7
-DQo+ICsJCX0gZWxzZSB7DQo+ICsJCQljcHRyID0gKHN0cnVjdCBudm1lX3Bhc3N0aHJ1X2NtZDY0
-ICopaW91Y21kLT5jbWQ7DQo+ICsJCX0NCj4gIAl9DQo+ICAJaWYgKGNwdHItPmZsYWdzICYgTlZN
-RV9ISVBSSSkNCj4gIAkJcnFfZmxhZ3MgfD0gUkVRX1BPTExFRDsNCj4gLS0NCj4gMi4yNS4xDQoN
-Cg==
+On 3/24/22 3:09 PM, Clay Mayers wrote:
+>> From: Kanchan Joshi
+>> Sent: Tuesday, March 8, 2022 7:21 AM
+>> To: axboe@kernel.dk; hch@lst.de; kbusch@kernel.org;
+>> asml.silence@gmail.com
+>> Cc: io-uring@vger.kernel.org; linux-nvme@lists.infradead.org; linux-
+>> block@vger.kernel.org; sbates@raithlin.com; logang@deltatee.com;
+>> pankydev8@gmail.com; javier@javigon.com; mcgrof@kernel.org;
+>> a.manzanares@samsung.com; joshiiitr@gmail.com; anuj20.g@samsung.com
+>> Subject: [PATCH 17/17] nvme: enable non-inline passthru commands
+>>
+>> From: Anuj Gupta <anuj20.g@samsung.com>
+>>
+>> On submission,just fetch the commmand from userspace pointer and reuse
+>> everything else. On completion, update the result field inside the passthru
+>> command.
+>>
+>> Signed-off-by: Anuj Gupta <anuj20.g@samsung.com>
+>> Signed-off-by: Kanchan Joshi <joshi.k@samsung.com>
+>> ---
+>>  drivers/nvme/host/ioctl.c | 29 +++++++++++++++++++++++++----
+>>  1 file changed, 25 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/nvme/host/ioctl.c b/drivers/nvme/host/ioctl.c index
+>> 701feaecabbe..ddb7e5864be6 100644
+>> --- a/drivers/nvme/host/ioctl.c
+>> +++ b/drivers/nvme/host/ioctl.c
+>> @@ -65,6 +65,14 @@ static void nvme_pt_task_cb(struct io_uring_cmd
+>> *ioucmd)
+>>  	}
+>>  	kfree(pdu->meta);
+>>
+>> +	if (ioucmd->flags & IO_URING_F_UCMD_INDIRECT) {
+>> +		struct nvme_passthru_cmd64 __user *ptcmd64 = ioucmd-
+>>> cmd;
+>> +		u64 result = le64_to_cpu(nvme_req(req)->result.u64);
+>> +
+>> +		if (put_user(result, &ptcmd64->result))
+>> +			status = -EFAULT;
+> 
+> When the thread that submitted the io_uring_cmd has exited, the CB is
+> called by a system worker instead so put_user() fails.  The cqe is
+> still completed and the process sees a failed i/o status, but the i/o
+> did not fail.  The same is true for meta data being returned in patch
+> 5.
+> 
+> I can't say if it's a requirement to support this case.  It does break
+> our current proto-type but we can adjust.
+
+Just don't do that then - it's all very much task based. If the task
+goes away and completions haven't been reaped, don't count on anything
+sane happening in terms of them completing successfully or not.
+
+The common case for this happening is offloading submit to a submit
+thread, which is utterly pointless with io_uring anyway.
+
+-- 
+Jens Axboe
+
