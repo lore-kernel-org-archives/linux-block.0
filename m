@@ -2,101 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28096C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 10:42:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F7C1C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 12:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349561AbiCXKoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 06:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34546 "EHLO
+        id S1349452AbiCXMWU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 08:22:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349559AbiCXKoT (ORCPT
+        with ESMTP id S1350094AbiCXMWS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 06:44:19 -0400
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5243AA146F;
-        Thu, 24 Mar 2022 03:42:47 -0700 (PDT)
-Received: by mail-ej1-f42.google.com with SMTP id yy13so8302394ejb.2;
-        Thu, 24 Mar 2022 03:42:47 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Z+tOhomyyHuPVoCuADsMsVAjnchfBPFbDYj/vr6ULFk=;
-        b=mV3bfzolQVC2jlxhUiJy06qFMco1LBQp2MWBzh+H/gm+zVPNYDjkalyOwMXvJsihuS
-         jMxwuMYBOfnekr1dNnNI2wvEeNurRqnZK5qTLWA0KMSuvw5P12ny5N4uOc+7NzgmwCac
-         SBiN+we2cwKiEZzzb1U5GBqAQGHu7M213R58uZgqJyuTNqRsn7G6f61We5J5KYm74iI8
-         ROipGr7beoUR0p0mS+qR1OkO+b2vbikVVGAKQFveLxA2TgvI9F/DbZ0/NSi5/W6rX7zP
-         IzC1XfRgKWhFHTKHQcUoPdWd/Z4g8VDDhtkO6skGQEWyVU0vBUA69d7AsGKNu8Rp/JK2
-         SXDg==
-X-Gm-Message-State: AOAM531F7N0rHnNzF6dEQCNP3WI7gXJiO1/SnD6W7r2Xqr/ZuWWr2O5O
-        BqXIyCd/MEA0m8RPQQ6+5AM=
-X-Google-Smtp-Source: ABdhPJwIdokZm/Y/j1GkNTRNcR1YxV/an65AItscWscYJKvj1/Qq6h7xM55DmHKiD8wf1owr5GZbZg==
-X-Received: by 2002:a17:906:6547:b0:6bd:e2ad:8c82 with SMTP id u7-20020a170906654700b006bde2ad8c82mr4794402ejn.693.1648118565765;
-        Thu, 24 Mar 2022 03:42:45 -0700 (PDT)
-Received: from [10.100.102.14] (85.65.206.129.dynamic.barak-online.net. [85.65.206.129])
-        by smtp.gmail.com with ESMTPSA id l2-20020a1709060cc200b006d3d91e88c7sm959117ejh.214.2022.03.24.03.42.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 24 Mar 2022 03:42:44 -0700 (PDT)
-Message-ID: <88827a86-1304-e699-ec11-2718e280f9ad@grimberg.me>
-Date:   Thu, 24 Mar 2022 12:42:42 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.5.0
-Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
- char-device.
-Content-Language: en-US
+        Thu, 24 Mar 2022 08:22:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE9CC652C7
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 05:20:46 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id A36461F745;
+        Thu, 24 Mar 2022 12:20:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1648124445; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ru7twObJmkEeqX5kufO5l0DfRgeiRYwOwFdgSaymrM4=;
+        b=YKfOAqryvTvf2cb0T6bddOnaL8IuSAiRiuq4uLh7fByzw4TfD8ZnOlQXK1ai2vCBJTQnl5
+        9cWyBf5V81iIR4PCFupA6RtnH86UPGcIVNhhiIth1TSKVDQw8w1lDfSkJjhzX1kp039FBG
+        f5NiJrd/7u4+MhFo3kv8EXgQ6rszUR0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1648124445;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ru7twObJmkEeqX5kufO5l0DfRgeiRYwOwFdgSaymrM4=;
+        b=/7iwgfzxeB+5RF0lBjBDfbJ05jzoKJs7CCsAPVis2qoFRDYYpC6BOFOuUp3E3MmSfkteo3
+        HvPEJ/UHsGzSvGCg==
+Received: from quack3.suse.cz (unknown [10.100.200.198])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 827FDA3B87;
+        Thu, 24 Mar 2022 12:20:45 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 35498A0610; Thu, 24 Mar 2022 13:20:41 +0100 (CET)
+Date:   Thu, 24 Mar 2022 13:20:41 +0100
+From:   Jan Kara <jack@suse.cz>
 To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshiiitr@gmail.com>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <20220308152105.309618-6-joshi.k@samsung.com>
- <7a123895-1102-4b36-2d6e-1e00e978d03d@grimberg.me>
- <CA+1E3rK8wnABptQLQrEo8XRdsbua9t_88e3ZP-Ass3CnxHv+oA@mail.gmail.com>
- <8f45a761-5ecb-5911-1064-9625a285c93d@grimberg.me>
- <20220316092153.GA4885@test-zns>
- <11f9e933-cfc8-2e3b-c815-c49a4b7db4ec@grimberg.me>
- <CA+1E3r+_DEw5ABPbLzSp9Gvg6L8XU-2HBoLK7kuXucLjr=+Ezw@mail.gmail.com>
- <3ed01280-5487-7206-a326-0cd110118b65@grimberg.me>
- <666deb0e-fa10-8a39-c1aa-cf3908b3795c@kernel.dk>
- <28b53100-9930-92d4-ba3b-f9c5e8773808@grimberg.me>
- <20220324062053.GA12519@lst.de>
-From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20220324062053.GA12519@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        Jan Kara <jack@suse.cz>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH 01/13] nbd: use the correct block_device in nbd_ioctl
+Message-ID: <20220324122041.itc55zladc5sax5p@quack3.lan>
+References: <20220324075119.1556334-1-hch@lst.de>
+ <20220324075119.1556334-2-hch@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220324075119.1556334-2-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
->>>> I know, and that was my original question, no one cares that this
->>>> interface completely lacks this capability? Maybe it is fine, but
->>>> it is not a trivial assumption given that this is designed to be more
->>>> than an interface to send admin/vs commands to the controller...
->>>
->>> Most people don't really care about or use multipath, so it's not a
->>> primary goal.
->>
->> This statement is generally correct. However what application would be
->> interested in speaking raw nvme to a device and gaining performance that
->> is even higher than the block layer (which is great to begin with)?
+On Thu 24-03-22 08:51:07, Christoph Hellwig wrote:
+> The bdev parameter to ->ioctl contains the block device that the ioctl
+> is called on, which can be the partition.  But the code in nbd_ioctl
+> that uses it really wants the whole device for things like the bd_openers
+> check.  Switch to not pass the bdev along and always use nbd->disk->part0
+> instead.
 > 
-> If passthrough is faster than the block I/O path we're doing someting
-> wrong.  At best it should be the same performance.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-That is not what the changelog says.
+Looks good. Feel free to add:
 
-> That being said multipathing is an integral part of the nvme driver
-> architecture, and the /dev/ngX devices.  If we want to support uring
-> async commands on /dev/ngX it will have to support multipath.
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-Couldn't agree more...
+								Honza
+
+> ---
+>  drivers/block/nbd.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5a1f98494dddf..795f65a5c9661 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1217,11 +1217,11 @@ static int nbd_reconnect_socket(struct nbd_device *nbd, unsigned long arg)
+>  	return -ENOSPC;
+>  }
+>  
+> -static void nbd_bdev_reset(struct block_device *bdev)
+> +static void nbd_bdev_reset(struct nbd_device *nbd)
+>  {
+> -	if (bdev->bd_openers > 1)
+> +	if (nbd->disk->part0->bd_openers > 1)
+>  		return;
+> -	set_capacity(bdev->bd_disk, 0);
+> +	set_capacity(nbd->disk, 0);
+>  }
+>  
+>  static void nbd_parse_flags(struct nbd_device *nbd)
+> @@ -1389,7 +1389,7 @@ static int nbd_start_device(struct nbd_device *nbd)
+>  	return nbd_set_size(nbd, config->bytesize, nbd_blksize(config));
+>  }
+>  
+> -static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *bdev)
+> +static int nbd_start_device_ioctl(struct nbd_device *nbd)
+>  {
+>  	struct nbd_config *config = nbd->config;
+>  	int ret;
+> @@ -1408,7 +1408,7 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+>  	flush_workqueue(nbd->recv_workq);
+>  
+>  	mutex_lock(&nbd->config_lock);
+> -	nbd_bdev_reset(bdev);
+> +	nbd_bdev_reset(nbd);
+>  	/* user requested, ignore socket errors */
+>  	if (test_bit(NBD_RT_DISCONNECT_REQUESTED, &config->runtime_flags))
+>  		ret = 0;
+> @@ -1417,12 +1417,11 @@ static int nbd_start_device_ioctl(struct nbd_device *nbd, struct block_device *b
+>  	return ret;
+>  }
+>  
+> -static void nbd_clear_sock_ioctl(struct nbd_device *nbd,
+> -				 struct block_device *bdev)
+> +static void nbd_clear_sock_ioctl(struct nbd_device *nbd)
+>  {
+>  	sock_shutdown(nbd);
+> -	__invalidate_device(bdev, true);
+> -	nbd_bdev_reset(bdev);
+> +	__invalidate_device(nbd->disk->part0, true);
+> +	nbd_bdev_reset(nbd);
+>  	if (test_and_clear_bit(NBD_RT_HAS_CONFIG_REF,
+>  			       &nbd->config->runtime_flags))
+>  		nbd_config_put(nbd);
+> @@ -1448,7 +1447,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+>  	case NBD_DISCONNECT:
+>  		return nbd_disconnect(nbd);
+>  	case NBD_CLEAR_SOCK:
+> -		nbd_clear_sock_ioctl(nbd, bdev);
+> +		nbd_clear_sock_ioctl(nbd);
+>  		return 0;
+>  	case NBD_SET_SOCK:
+>  		return nbd_add_socket(nbd, arg, false);
+> @@ -1468,7 +1467,7 @@ static int __nbd_ioctl(struct block_device *bdev, struct nbd_device *nbd,
+>  		config->flags = arg;
+>  		return 0;
+>  	case NBD_DO_IT:
+> -		return nbd_start_device_ioctl(nbd, bdev);
+> +		return nbd_start_device_ioctl(nbd);
+>  	case NBD_CLEAR_QUE:
+>  		/*
+>  		 * This is for compatibility only.  The queue is always cleared
+> -- 
+> 2.30.2
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
