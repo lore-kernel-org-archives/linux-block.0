@@ -2,127 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A74C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 18:03:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E92E9C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 20:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351059AbiCXSFS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 14:05:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55906 "EHLO
+        id S244145AbiCXUhE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 16:37:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236126AbiCXSFR (ORCPT
+        with ESMTP id S1344269AbiCXUhD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 14:05:17 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 39247B6D1C;
-        Thu, 24 Mar 2022 11:03:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 8CE82CE25B1;
-        Thu, 24 Mar 2022 18:03:43 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CA14C340F0;
-        Thu, 24 Mar 2022 18:03:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648145021;
-        bh=t4qj3yzjpmPxrk9bbLyU8usx0IFZLTWW+/9wIEcE8T0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=RyuBJrVfvGAO3I+jdGpD3wWjzHZ5BPFyIqWkxNU+ZGEMVRx7okKrAVg0PHdIgXy4E
-         j4cvG8KokWZHeHXK0v8HaHHhcoisqdch4CPoA+WYVrKKai6xags4j49GUPqZZ6xnEB
-         vX/rIS8hBuibENDX1LmjivHy2I6Qh8ZIvogvzXRALHN4kltJcr6V23dr2ZqJgOU6mP
-         TD93ffV9fwme715cdPhGHRTErYTO3HZf9IkAexYWpInnigQvrxwRqgDcZRUpt8BBf8
-         0zasG5ShtBezkzkb66iOesP0vxz0bNxkuOcwbWqujbYehvDg4uxsOffNUk+FMD/dgV
-         IsMlJ1z61ezEw==
-Date:   Thu, 24 Mar 2022 20:03:37 +0200
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     linux-kernel@vger.kernel.org,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
-        Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Eli Cohen <eli@mellanox.com>,
-        Saeed Mahameed <saeedm@nvidia.com>,
-        Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        Florian Westphal <fw@strlen.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Felipe Balbi <felipe.balbi@linux.intel.com>,
-        =?utf-8?B?TWljaGHFgiBNaXJvc8WCYXc=?= <mirq-linux@rere.qmqm.pl>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Krzysztof Opasiak <k.opasiak@samsung.com>,
-        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
-        Valentina Manea <valentina.manea.m@gmail.com>,
-        Shuah Khan <shuah@kernel.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
-        Joachim Fritschi <jfritschi@freenet.de>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Ingo Molnar <mingo@kernel.org>,
-        Karol Herbst <karolherbst@gmail.com>,
-        Pekka Paalanen <ppaalanen@gmail.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Andy Lutomirski <luto@kernel.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Borislav Petkov <bp@alien8.de>,
-        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
-        coreteam@netfilter.org, netdev@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
-        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
-        virtualization@lists.linux-foundation.org, x86@kernel.org
-Subject: Re: [PATCH 3/9] net: mlx5: eliminate anonymous module_init &
- module_exit
-Message-ID: <YjyyeUEAo+1Kob5v@unreal>
-References: <20220316192010.19001-1-rdunlap@infradead.org>
- <20220316192010.19001-4-rdunlap@infradead.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220316192010.19001-4-rdunlap@infradead.org>
+        Thu, 24 Mar 2022 16:37:03 -0400
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C4482A8EDE
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 13:35:28 -0700 (PDT)
+Received: by mail-qv1-f53.google.com with SMTP id jo24so4685275qvb.5
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 13:35:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=/DA2QpPVPr3enZ27mGPd7ho97R+A7tobG2oweYbaoNA=;
+        b=ybl30GJaSunAZfDwmu/B66FccoUJ9/OgTc6L70wpj3HnhZsHTa3Vu+ZQt+bTEUWtlL
+         zs++BszOpf2aQomYZ9AGTnWbv/QTa0s9UfXW0Ah+qBSpessbTAiodGrejjXN6RnNNamv
+         Ma2Q77fPPyymVzl7/yWvMz9NCKSwR6ZsCfjhUyyMEBtqON4U7tfxUNi/oZpQGt69amUC
+         oCw5psdlpI6ImloFCG3n1LOm7NqGtAOanY0PPunSCnxRgyuPZeBzd7oHfs+aK8O1But7
+         HuUHHAxQMHStRV357IkBs4Aae2g12ScJGyaFeDzqcFVNTnHV/C5HBk1xah9FrxJ3u5/V
+         fkjA==
+X-Gm-Message-State: AOAM530iXGNXEUqc+Q+N7HpExTytrUxVLpAoHrfQIQ9gD3EWaNlLzvuh
+        e30gDT2xHHPw29kw8ac+4e5NSzt4Mb8s
+X-Google-Smtp-Source: ABdhPJyGBdmnolpgAFuBdwe78chN1I2/ElrtcKyGcbdJw04vnJanHfFxqWQMoGpNfYfYLSKcO7xQdw==
+X-Received: by 2002:ad4:5f4b:0:b0:441:4d40:f8d2 with SMTP id p11-20020ad45f4b000000b004414d40f8d2mr6070094qvg.33.1648154127897;
+        Thu, 24 Mar 2022 13:35:27 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id o21-20020ac85a55000000b002e16389b501sm3174633qta.96.2022.03.24.13.35.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 13:35:26 -0700 (PDT)
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     axboe@kernel.dk
+Cc:     ming.lei@redhat.com, hch@lst.de, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH v3 0/3] block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_bioset
+Date:   Thu, 24 Mar 2022 16:35:23 -0400
+Message-Id: <20220324203526.62306-1-snitzer@kernel.org>
+X-Mailer: git-send-email 2.15.0
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 16, 2022 at 12:20:04PM -0700, Randy Dunlap wrote:
-> Eliminate anonymous module_init() and module_exit(), which can lead to
-> confusion or ambiguity when reading System.map, crashes/oops/bugs,
-> or an initcall_debug log.
-> 
-> Give each of these init and exit functions unique driver-specific
-> names to eliminate the anonymous names.
-> 
-> Example 1: (System.map)
->  ffffffff832fc78c t init
->  ffffffff832fc79e t init
->  ffffffff832fc8f8 t init
-> 
-> Example 2: (initcall_debug log)
->  calling  init+0x0/0x12 @ 1
->  initcall init+0x0/0x12 returned 0 after 15 usecs
->  calling  init+0x0/0x60 @ 1
->  initcall init+0x0/0x60 returned 0 after 2 usecs
->  calling  init+0x0/0x9a @ 1
->  initcall init+0x0/0x9a returned 0 after 74 usecs
-> 
-> Fixes: e126ba97dba9 ("mlx5: Add driver for Mellanox Connect-IB adapters")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Eli Cohen <eli@mellanox.com>
-> Cc: Saeed Mahameed <saeedm@nvidia.com>
-> Cc: netdev@vger.kernel.org
-> Cc: Leon Romanovsky <leon@kernel.org>
-> Cc: linux-rdma@vger.kernel.org
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/main.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
+Hi Jens,
+
+This v3 is a rebase of the previous v2 series ontop of the revised v2
+patch that Christoph provided.
+
+Linus hasn't pulled the for-5.18/dm-changes branch yet, so the 3rd DM
+patch cannot be applied yet.  But feel free to pickup the first 2
+block patches for 5.19 and I'll rebase dm-5.19 on block accordingly.
 
 Thanks,
-Reviewed-by: Leon Romanovsky <leonro@nvidia.com>
+Mike
+
+v3: tweaked some code comments, refined patch headers and folded DM
+    patches so only one DM patch now.
+v2: add REQ_ALLOC_CACHE and move use of bio_alloc_percpu_cache to
+    bio_alloc_bioset
+
+Mike Snitzer (3):
+  block: allow using the per-cpu bio cache from bio_alloc_bioset
+  block: allow use of per-cpu bio alloc cache by block drivers
+  dm: conditionally enable BIOSET_PERCPU_CACHE for dm_io bioset
+
+ block/bio.c               | 88 +++++++++++++++++++++++------------------------
+ block/blk.h               |  7 ----
+ block/fops.c              | 11 ++++--
+ drivers/md/dm-table.c     | 11 ++++--
+ drivers/md/dm.c           |  8 ++---
+ drivers/md/dm.h           |  4 +--
+ include/linux/bio.h       |  8 +++--
+ include/linux/blk_types.h |  3 +-
+ 8 files changed, 73 insertions(+), 67 deletions(-)
+
+-- 
+2.15.0
+
