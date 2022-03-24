@@ -2,230 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94028C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 08:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FDBC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 09:16:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238071AbiCXIgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 04:36:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51016 "EHLO
+        id S1349153AbiCXJSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 05:18:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348946AbiCXIgK (ORCPT
+        with ESMTP id S1348801AbiCXJSX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 04:36:10 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B437A9BBA1
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:34:38 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id y142so7150945ybe.11
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:34:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=H9C4iWK8tDBUB2K5MoYQ8IdbBv0hhGC6J226BwafzxE=;
-        b=H7odm9u2iOSLi/nihkTQfBQorXUM+ZN70jCp94YAZ3j+ckOqi0H4n6jyrQiYWl2Egr
-         IAsZaCKqNrLx46C464qulxmTb1o5WcBGqhKTlFmK+azFulF0rBFzfj/o5p5bSp1uNrgE
-         IoUMcTLRd7Cpdsl5GsoKQxZXbwnGAcG4a86yTv4x6CMOALKPhuzCGVADuB8uEcMBfs4I
-         V/M+efs8nV+tZ3p3EAbOM2SedtGBpqSB+5uZihZIy0tkmFFpv8BzN0Eubaqvv7hp4zv7
-         sd6839XCDs1tMm9XtakWMAjl4QSQbmcHpvBVcgU83FJgtvriKQx2wanW4agjgTg2GyE8
-         QfjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=H9C4iWK8tDBUB2K5MoYQ8IdbBv0hhGC6J226BwafzxE=;
-        b=LrSXj0op2htLSLFQUI/SYYZ87JzhOG57mWGDRkb1WvbtJHFV6UVRYKaCBLg/qvYrl0
-         M3ygujXwxzg1GbTFYCqMZQEv3wwsvramNwizpM547y5WMZxFQA5F7/gRc7ZV0YqZHAxE
-         1DoTyVs2bUhFih7wbZocW96LxWshckiK6xIhlnLWZIUDSpFxRO2XN091fafJye1rgOKK
-         e8TljeF30GUrCsC0J67s3zHZvnE842ftXyYOBhGTK9ZIiHV2vFscbweMu6+ENWBR3Mo8
-         GmQ7jBQvU4XfMrWogwTV8w5iYmZAeBLtCNcO3dfuivBMM4AsSFQla51tfb1DbZbwDBGz
-         J68Q==
-X-Gm-Message-State: AOAM531IkGUmETk8sCuTF39hWkgFgYk+qJw1+pw9xzeEpnsgGBof/j/G
-        o1N4scPaawy+Url1Pz89dJLP2IGgwOmvTiZXuxnJSLLL8z0BUggl
-X-Google-Smtp-Source: ABdhPJzrkUM3IpVhOLboqwyW3cmXm7ecsw+EVoB/yCuf6ABxuBjLQrPhojDDbzjBImQU5zArt++DZ0Fmw9ZG3R0Oahc=
-X-Received: by 2002:a25:548:0:b0:633:81bd:e319 with SMTP id
- 69-20020a250548000000b0063381bde319mr3600207ybf.603.1648110877037; Thu, 24
- Mar 2022 01:34:37 -0700 (PDT)
+        Thu, 24 Mar 2022 05:18:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 73A049D4FA
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 02:16:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648113411;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=kxIA+CLFwcc8TqwMm37/uOtvk1/QQRU8QzWc86/Fkpw=;
+        b=Pkga9J0yl/+d5KxZyuDfSSUfzF9R1sJJyvXBuQMkKDNFRw7YKj8nqdB3UgmAOFikk3wtYR
+        QPg0OV3HFX2nOSxN1WmEqeEVv7/zOkqE1s8rFbciChBU16kwskpFiExj8Ol/C/Wb/QyMxJ
+        NhyZ3bwCYU/gxhAjlcfl7v9FAuZRJAk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-286-LUQhrbZgOFe5H5F8ssxHOg-1; Thu, 24 Mar 2022 05:16:50 -0400
+X-MC-Unique: LUQhrbZgOFe5H5F8ssxHOg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4B79805A30;
+        Thu, 24 Mar 2022 09:16:49 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 384BA112132C;
+        Thu, 24 Mar 2022 09:16:41 +0000 (UTC)
+Date:   Thu, 24 Mar 2022 17:16:36 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Cc:     linux-mm@kvack.org, target-devel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
+        xuyu@linux.alibaba.com, bostroesser@gmail.com
+Subject: Re: [RFC 2/3] mm: export zap_page_range()
+Message-ID: <Yjw29HcA2JL41aA6@T590>
+References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
+ <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
 MIME-Version: 1.0
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Thu, 24 Mar 2022 14:04:23 +0530
-Message-ID: <CA+G9fYtZpazsDTQo9N-4U=T5QvEKTu_xDi=W+1_7ng51306LYg@mail.gmail.com>
-Subject: next: BUG: sleeping function called from invalid context at block/blk-sysfs.c:766
-To:     linux-block <linux-block@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Linux-Next Mailing List <linux-next@vger.kernel.org>,
-        lkft-triage@lists.linaro.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Stephen Rothwell <sfr@canb.auug.org.au>,
-        Ming Lei <ming.lei@redhat.com>,
-        Eric Biggers <ebiggers@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-While running kselftest zram test cases on Linux next-20220324 the kernel BUG
-reported on arm64 Qcom db845 development board.
+On Fri, Mar 18, 2022 at 05:55:30PM +0800, Xiaoguang Wang wrote:
+> Module target_core_user will use it to implement zero copy feature.
+> 
+> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+> ---
+>  mm/memory.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/mm/memory.c b/mm/memory.c
+> index 1f745e4d11c2..9974d0406dad 100644
+> --- a/mm/memory.c
+> +++ b/mm/memory.c
+> @@ -1664,6 +1664,7 @@ void zap_page_range(struct vm_area_struct *vma, unsigned long start,
+>  	mmu_notifier_invalidate_range_end(&range);
+>  	tlb_finish_mmu(&tlb);
+>  }
+> +EXPORT_SYMBOL_GPL(zap_page_range);
 
-metadata:
-  git_ref: master
-  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
-  git_sha: b61581ae229d8eb9f21f8753be3f4011f7692384
-  git_describe: next-20220323
-  kernel_version: 5.17.0
-  kernel-config: https://builds.tuxbuild.com/26mKdspULB326eo6s22cXZzYhmt/config
+BTW, what is the counter part api of remap_pfn_range() for serving the
+unmap? Or does it really need to unmap the vm space for this zero-copy
+case?
 
-Log:
-[    0.000000] Linux version 5.17.0-next-20220323 (tuxmake@tuxmake)
-(aarch64-linux-gnu-gcc (Debian 11.2.0-18) 11.2.0, GNU ld (GNU Binutils
-for Debian) 2.38) #1 SMP PREEMPT @1648023452
-[    0.000000] Machine model: Thundercomm Dragonboard 845c
-
-# running zram tests
-# --------------------
-# create '1' zram device(s)
-# zram load module successful
-# set max_comp_streams to zram device(s)
-# FAIL can't set max_streams '2', get
-# /sys/block/zram0/max_comp_streams = '8' (1/1)
-# z[  626.759707] zram0: detected capacity change from 0 to 4096
-ram max streams: OK
-# test that we can set compression algorithm
-# supported algs: lzo [lzo-rle] lz4 lz4hc 842
-# /sys/block/zram0/comp_algorithm = 'lzo' (1/1)
-# zram set compression algorithm: OK
-# set disk size to zram device(s)
-# /sys/block/zram0/disksize = '2097152' (1/1)
-# zram set disksizes: OK
-# set memory limit to zram device(s)
-# /sys/block/zram0/mem_limit = '2M' (1/1)
-# zram set memory limit: OK
-# make ext4 filesystem on /dev/zram0
-# zram mkfs.ext4: OK
-# mount /dev/zram0
-[  626.812708] EXT4-fs (zram0): mounted filesystem without journal.
-Quota mode: none.
-[  626.820412] ext4 filesystem being mounted at
-/opt/kselftests/default-in-kernel/zram/zram0 supports timestamps until
-2038 (0x7fffffff)
-# zram mount of zram device(s): OK
-# fill zram0...
-# zram0 can be filled with '1932' KB
-# zram used 12M, zram disk sizes 2097152M
-# zram compression ratio: 174762.66:1: OK
-# zram cleanup
-[  636.589363] zram0: detected capacity change from 4096 to 0
-# zram rmmod zram
-[  636.607315] zram: Removed device: zram0
-[  636.682510] BUG: sleeping function called from invalid context at
-block/blk-sysfs.c:766
-[  636.690716] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
-0, name: swapper/0
-[  636.698836] preempt_count: 101, expected: 0
-[  636.703169] RCU nest depth: 0, expected: 0
-[  636.707410] INFO: lockdep is turned off.
-[  636.711471] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.17.0-next-20220323 #1
-[  636.718729] Hardware name: Thundercomm Dragonboard 845c (DT)
-[  636.724485] Call trace:
-[  636.726988]  dump_backtrace+0xc0/0x134
-[  636.730823]  show_stack+0x24/0x7c
-[  636.734210]  dump_stack_lvl+0x8c/0xb8
-[  636.737949]  dump_stack+0x18/0x34
-[  636.741333]  __might_resched+0x1c8/0x240
-[  636.745334]  __might_sleep+0x5c/0x94
-[  636.748981]  blk_release_queue+0x38/0x100
-[  636.753070]  kobject_put+0xa4/0x210
-[  636.756631]  blk_put_queue+0x20/0x30
-[  636.760278]  blkg_free.part.0+0x68/0xa0
-[  636.764191]  __blkg_release+0x50/0x74
-[  636.767926]  rcu_core+0x410/0xb90
-[  636.771316]  rcu_core_si+0x1c/0x2c
-[  636.774789]  __do_softirq+0x14c/0x654
-[  636.778522]  __irq_exit_rcu+0x17c/0x1b0
-[  636.782436]  irq_exit_rcu+0x1c/0x44
-[  636.785998]  el1_interrupt+0x38/0x64
-[  636.789645]  el1h_64_irq_handler+0x18/0x24
-[  636.793813]  el1h_64_irq+0x64/0x68
-[  636.797284]  cpuidle_enter_state+0xe4/0x380
-[  636.801544]  cpuidle_enter+0x44/0x5c
-[  636.805191]  do_idle+0x240/0x2d0
-[  636.808484]  cpu_startup_entry+0x34/0x3c
-[  636.812479]  rest_init+0x1c8/0x2d0
-[  636.815951]  arch_call_rest_init+0x1c/0x28
-[  636.820126]  start_kernel+0x73c/0x77c
-[  636.823861]  __primary_switched+0xc0/0xc8
-# zram01 : [PASS]
-#
-# create '1' zram device(s)
-[  636.859790] zram: Added device: zram0
-# zram load module successful
-# set max_comp_streams to zram device(s)
-# FAIL can't set max_streams '2', get
-# /sys/block/zram0/max_comp_streams = '[  637.901396] zram0: detected
-capacity change from 0 to 2048
-8' (1/1)
-# zram max streams: OK
-# set disk size to zram device(s)
-# /sys/block/zram0/disksize = '1048576' (1/1)
-# zram set disksizes: OK
-# set memory limit to zram device(s)
-# /sys/block/zram0/mem_limit = '1M' (1/1)
-# zram set memory limit: OK
-# make swap with zram device(s)
-[  637.935258] Adding 1020k swap on /dev/zram0.  Priority:-2 extents:1
-across:1020k SS
-# done with /dev/zram0
-# zram making zram mkswap and swapon: OK
-# zram swapoff: OK
-# zram cleanup
-[  637.995603] zram0: detected capacity change from 2048 to 0
-# zram rmmod zram
-[  638.012764] zram: Removed device: zram0
-[  638.110836] BUG: sleeping function called from invalid context at
-block/blk-sysfs.c:766
-[  638.118965] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
-0, name: swapper/7
-[  638.126928] preempt_count: 101, expected: 0
-[  638.131179] RCU nest depth: 0, expected: 0
-[  638.135349] INFO: lockdep is turned off.
-[  638.139350] CPU: 7 PID: 0 Comm: swapper/7 Tainted: G        W
-  5.17.0-next-20220323 #1
-[  638.147964] Hardware name: Thundercomm Dragonboard 845c (DT)
-[  638.153687] Call trace:
-[  638.156170]  dump_backtrace+0xc0/0x134
-[  638.159977]  show_stack+0x24/0x7c
-[  638.163332]  dump_stack_lvl+0x8c/0xb8
-[  638.167049]  dump_stack+0x18/0x34
-[  638.170408]  __might_resched+0x1c8/0x240
-[  638.174387]  __might_sleep+0x5c/0x94
-[  638.178004]  blk_release_queue+0x38/0x100
-[  638.182071]  kobject_put+0xa4/0x210
-[  638.185599]  blk_put_queue+0x20/0x30
-[  638.189216]  blkg_free.part.0+0x68/0xa0
-[  638.193106]  __blkg_release+0x50/0x74
-[  638.196811]  rcu_core+0x410/0xb90
-[  638.200168]  rcu_core_si+0x1c/0x2c
-[  638.203612]  __do_softirq+0x14c/0x654
-[  638.207314]  __irq_exit_rcu+0x17c/0x1b0
-[  638.211196]  irq_exit_rcu+0x1c/0x44
-[  638.214727]  el1_interrupt+0x38/0x64
-[  638.218346]  el1h_64_irq_handler+0x18/0x24
-[  638.222493]  el1h_64_irq+0x64/0x68
-[  638.225934]  cpuidle_enter_state+0xe4/0x380
-[  638.230170]  cpuidle_enter+0x44/0x5c
-[  638.233787]  do_idle+0x240/0x2d0
-[  638.237060]  cpu_startup_entry+0x34/0x3c
-[  638.241034]  secondary_start_kernel+0x148/0x170
-[  638.245616]  __secondary_switched+0xa0/0xa4
-# zram02 : [PASS]
-
-steps to produce:
-   # cd  /opt/kselftests/default-in-kernel/zram/
-   # ./zram.sh
-
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+If it isn't necessary to unmap, maybe remap_pfn_range() is faster than
+vm_insert_page(s)_mkspecial + zap_page_range() since zap_page_range()
+looks a bit heavy.
 
 
---
-Linaro LKFT
-https://lkft.linaro.org
+Thanks,
+Ming
 
-[1] https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20220323/testrun/8654494/suite/linux-log-parser/test/check-kernel-bug-4772266/log
-[2] https://lkft.validation.linaro.org/scheduler/job/4772266#L5186
