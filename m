@@ -2,141 +2,230 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DB0C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 08:05:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94028C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 08:34:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345871AbiCXIHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 04:07:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
+        id S238071AbiCXIgL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 04:36:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51016 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245300AbiCXIHC (ORCPT
+        with ESMTP id S1348946AbiCXIgK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 04:07:02 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D42147ADE
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:05:30 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id f11-20020a056602070b00b00645d08010fcso2634811iox.15
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:05:30 -0700 (PDT)
+        Thu, 24 Mar 2022 04:36:10 -0400
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B437A9BBA1
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:34:38 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id y142so7150945ybe.11
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:34:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:from:date:message-id:subject:to:cc;
+        bh=H9C4iWK8tDBUB2K5MoYQ8IdbBv0hhGC6J226BwafzxE=;
+        b=H7odm9u2iOSLi/nihkTQfBQorXUM+ZN70jCp94YAZ3j+ckOqi0H4n6jyrQiYWl2Egr
+         IAsZaCKqNrLx46C464qulxmTb1o5WcBGqhKTlFmK+azFulF0rBFzfj/o5p5bSp1uNrgE
+         IoUMcTLRd7Cpdsl5GsoKQxZXbwnGAcG4a86yTv4x6CMOALKPhuzCGVADuB8uEcMBfs4I
+         V/M+efs8nV+tZ3p3EAbOM2SedtGBpqSB+5uZihZIy0tkmFFpv8BzN0Eubaqvv7hp4zv7
+         sd6839XCDs1tMm9XtakWMAjl4QSQbmcHpvBVcgU83FJgtvriKQx2wanW4agjgTg2GyE8
+         QfjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=lyJrSW4wDcuNfJrpcCLjJJ/Nl57jnLSCYWnrohs0+bE=;
-        b=J69IufofEybgazqYTBBGnQKvWt38RmmfyvKwaVjuaBLdQHV4XaQcstSB+xOx3CZe9k
-         pz3l26T4MlKZxTLQ+zE+4dTjTL8cWv70Xc+pFJ/NtvuRlBCW5M0+84PrfEU8tAX6AsTd
-         yC2EvKNb8s7iDcvSrp2k0ZkJcrQSwZzD7ewZMS3pOEYdrgXbgDjc1VDpjNY7Aq9wCmNs
-         mseR8BZcwratpN3kaEaiK1TTHySC8anEQMkUxhyeSG5p7JdlDr4Dzo+Pf4Sm4qc5bXWB
-         jYQvuuC4qUtQu4vcnG/BpXcUrGiN2+RK9CwakjPx8Ig/MKDo7DfYwhLOajN3T3/XcY6K
-         37Yg==
-X-Gm-Message-State: AOAM531rUcBEygVWazK0SqiT1/jSpAyWH9QDPNlSEPEs3O6O7jhsHDj3
-        0gLDOUPl7jkucX2uA9CsiFwk66Di6LJGlWL0XJoXL1TgpgMh
-X-Google-Smtp-Source: ABdhPJznQTZc0SUPRekIeKv/BvXmumJJNy6ZG1sLE03YPeaTySKbteBgI62ZjuExhSV9kujpfOv+zUFAYnSmJxfFGxjUjRyGzX6n
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=H9C4iWK8tDBUB2K5MoYQ8IdbBv0hhGC6J226BwafzxE=;
+        b=LrSXj0op2htLSLFQUI/SYYZ87JzhOG57mWGDRkb1WvbtJHFV6UVRYKaCBLg/qvYrl0
+         M3ygujXwxzg1GbTFYCqMZQEv3wwsvramNwizpM547y5WMZxFQA5F7/gRc7ZV0YqZHAxE
+         1DoTyVs2bUhFih7wbZocW96LxWshckiK6xIhlnLWZIUDSpFxRO2XN091fafJye1rgOKK
+         e8TljeF30GUrCsC0J67s3zHZvnE842ftXyYOBhGTK9ZIiHV2vFscbweMu6+ENWBR3Mo8
+         GmQ7jBQvU4XfMrWogwTV8w5iYmZAeBLtCNcO3dfuivBMM4AsSFQla51tfb1DbZbwDBGz
+         J68Q==
+X-Gm-Message-State: AOAM531IkGUmETk8sCuTF39hWkgFgYk+qJw1+pw9xzeEpnsgGBof/j/G
+        o1N4scPaawy+Url1Pz89dJLP2IGgwOmvTiZXuxnJSLLL8z0BUggl
+X-Google-Smtp-Source: ABdhPJzrkUM3IpVhOLboqwyW3cmXm7ecsw+EVoB/yCuf6ABxuBjLQrPhojDDbzjBImQU5zArt++DZ0Fmw9ZG3R0Oahc=
+X-Received: by 2002:a25:548:0:b0:633:81bd:e319 with SMTP id
+ 69-20020a250548000000b0063381bde319mr3600207ybf.603.1648110877037; Thu, 24
+ Mar 2022 01:34:37 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:14c2:b0:319:d84d:e878 with SMTP id
- l2-20020a05663814c200b00319d84de878mr2118389jak.314.1648109129411; Thu, 24
- Mar 2022 01:05:29 -0700 (PDT)
-Date:   Thu, 24 Mar 2022 01:05:29 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000035adf105daf24fba@google.com>
-Subject: [syzbot] upstream boot error: WARNING in blk_release_queue
-From:   syzbot <syzbot+8e08dfd9ad607062fa1b@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
-        syzkaller-bugs@googlegroups.com
+From:   Naresh Kamboju <naresh.kamboju@linaro.org>
+Date:   Thu, 24 Mar 2022 14:04:23 +0530
+Message-ID: <CA+G9fYtZpazsDTQo9N-4U=T5QvEKTu_xDi=W+1_7ng51306LYg@mail.gmail.com>
+Subject: next: BUG: sleeping function called from invalid context at block/blk-sysfs.c:766
+To:     linux-block <linux-block@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Linux-Next Mailing List <linux-next@vger.kernel.org>,
+        lkft-triage@lists.linaro.org
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        Stephen Rothwell <sfr@canb.auug.org.au>,
+        Ming Lei <ming.lei@redhat.com>,
+        Eric Biggers <ebiggers@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+While running kselftest zram test cases on Linux next-20220324 the kernel BUG
+reported on arm64 Qcom db845 development board.
 
-syzbot found the following issue on:
+metadata:
+  git_ref: master
+  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+  git_sha: b61581ae229d8eb9f21f8753be3f4011f7692384
+  git_describe: next-20220323
+  kernel_version: 5.17.0
+  kernel-config: https://builds.tuxbuild.com/26mKdspULB326eo6s22cXZzYhmt/config
 
-HEAD commit:    1bc191051dca Merge tag 'trace-v5.18' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b7c1f9700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=70f8915481c02c4
-dashboard link: https://syzkaller.appspot.com/bug?extid=8e08dfd9ad607062fa1b
-compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+Log:
+[    0.000000] Linux version 5.17.0-next-20220323 (tuxmake@tuxmake)
+(aarch64-linux-gnu-gcc (Debian 11.2.0-18) 11.2.0, GNU ld (GNU Binutils
+for Debian) 2.38) #1 SMP PREEMPT @1648023452
+[    0.000000] Machine model: Thundercomm Dragonboard 845c
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8e08dfd9ad607062fa1b@syzkaller.appspotmail.com
+# running zram tests
+# --------------------
+# create '1' zram device(s)
+# zram load module successful
+# set max_comp_streams to zram device(s)
+# FAIL can't set max_streams '2', get
+# /sys/block/zram0/max_comp_streams = '8' (1/1)
+# z[  626.759707] zram0: detected capacity change from 0 to 4096
+ram max streams: OK
+# test that we can set compression algorithm
+# supported algs: lzo [lzo-rle] lz4 lz4hc 842
+# /sys/block/zram0/comp_algorithm = 'lzo' (1/1)
+# zram set compression algorithm: OK
+# set disk size to zram device(s)
+# /sys/block/zram0/disksize = '2097152' (1/1)
+# zram set disksizes: OK
+# set memory limit to zram device(s)
+# /sys/block/zram0/mem_limit = '2M' (1/1)
+# zram set memory limit: OK
+# make ext4 filesystem on /dev/zram0
+# zram mkfs.ext4: OK
+# mount /dev/zram0
+[  626.812708] EXT4-fs (zram0): mounted filesystem without journal.
+Quota mode: none.
+[  626.820412] ext4 filesystem being mounted at
+/opt/kselftests/default-in-kernel/zram/zram0 supports timestamps until
+2038 (0x7fffffff)
+# zram mount of zram device(s): OK
+# fill zram0...
+# zram0 can be filled with '1932' KB
+# zram used 12M, zram disk sizes 2097152M
+# zram compression ratio: 174762.66:1: OK
+# zram cleanup
+[  636.589363] zram0: detected capacity change from 4096 to 0
+# zram rmmod zram
+[  636.607315] zram: Removed device: zram0
+[  636.682510] BUG: sleeping function called from invalid context at
+block/blk-sysfs.c:766
+[  636.690716] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
+0, name: swapper/0
+[  636.698836] preempt_count: 101, expected: 0
+[  636.703169] RCU nest depth: 0, expected: 0
+[  636.707410] INFO: lockdep is turned off.
+[  636.711471] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.17.0-next-20220323 #1
+[  636.718729] Hardware name: Thundercomm Dragonboard 845c (DT)
+[  636.724485] Call trace:
+[  636.726988]  dump_backtrace+0xc0/0x134
+[  636.730823]  show_stack+0x24/0x7c
+[  636.734210]  dump_stack_lvl+0x8c/0xb8
+[  636.737949]  dump_stack+0x18/0x34
+[  636.741333]  __might_resched+0x1c8/0x240
+[  636.745334]  __might_sleep+0x5c/0x94
+[  636.748981]  blk_release_queue+0x38/0x100
+[  636.753070]  kobject_put+0xa4/0x210
+[  636.756631]  blk_put_queue+0x20/0x30
+[  636.760278]  blkg_free.part.0+0x68/0xa0
+[  636.764191]  __blkg_release+0x50/0x74
+[  636.767926]  rcu_core+0x410/0xb90
+[  636.771316]  rcu_core_si+0x1c/0x2c
+[  636.774789]  __do_softirq+0x14c/0x654
+[  636.778522]  __irq_exit_rcu+0x17c/0x1b0
+[  636.782436]  irq_exit_rcu+0x1c/0x44
+[  636.785998]  el1_interrupt+0x38/0x64
+[  636.789645]  el1h_64_irq_handler+0x18/0x24
+[  636.793813]  el1h_64_irq+0x64/0x68
+[  636.797284]  cpuidle_enter_state+0xe4/0x380
+[  636.801544]  cpuidle_enter+0x44/0x5c
+[  636.805191]  do_idle+0x240/0x2d0
+[  636.808484]  cpu_startup_entry+0x34/0x3c
+[  636.812479]  rest_init+0x1c8/0x2d0
+[  636.815951]  arch_call_rest_init+0x1c/0x28
+[  636.820126]  start_kernel+0x73c/0x77c
+[  636.823861]  __primary_switched+0xc0/0xc8
+# zram01 : [PASS]
+#
+# create '1' zram device(s)
+[  636.859790] zram: Added device: zram0
+# zram load module successful
+# set max_comp_streams to zram device(s)
+# FAIL can't set max_streams '2', get
+# /sys/block/zram0/max_comp_streams = '[  637.901396] zram0: detected
+capacity change from 0 to 2048
+8' (1/1)
+# zram max streams: OK
+# set disk size to zram device(s)
+# /sys/block/zram0/disksize = '1048576' (1/1)
+# zram set disksizes: OK
+# set memory limit to zram device(s)
+# /sys/block/zram0/mem_limit = '1M' (1/1)
+# zram set memory limit: OK
+# make swap with zram device(s)
+[  637.935258] Adding 1020k swap on /dev/zram0.  Priority:-2 extents:1
+across:1020k SS
+# done with /dev/zram0
+# zram making zram mkswap and swapon: OK
+# zram swapoff: OK
+# zram cleanup
+[  637.995603] zram0: detected capacity change from 2048 to 0
+# zram rmmod zram
+[  638.012764] zram: Removed device: zram0
+[  638.110836] BUG: sleeping function called from invalid context at
+block/blk-sysfs.c:766
+[  638.118965] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid:
+0, name: swapper/7
+[  638.126928] preempt_count: 101, expected: 0
+[  638.131179] RCU nest depth: 0, expected: 0
+[  638.135349] INFO: lockdep is turned off.
+[  638.139350] CPU: 7 PID: 0 Comm: swapper/7 Tainted: G        W
+  5.17.0-next-20220323 #1
+[  638.147964] Hardware name: Thundercomm Dragonboard 845c (DT)
+[  638.153687] Call trace:
+[  638.156170]  dump_backtrace+0xc0/0x134
+[  638.159977]  show_stack+0x24/0x7c
+[  638.163332]  dump_stack_lvl+0x8c/0xb8
+[  638.167049]  dump_stack+0x18/0x34
+[  638.170408]  __might_resched+0x1c8/0x240
+[  638.174387]  __might_sleep+0x5c/0x94
+[  638.178004]  blk_release_queue+0x38/0x100
+[  638.182071]  kobject_put+0xa4/0x210
+[  638.185599]  blk_put_queue+0x20/0x30
+[  638.189216]  blkg_free.part.0+0x68/0xa0
+[  638.193106]  __blkg_release+0x50/0x74
+[  638.196811]  rcu_core+0x410/0xb90
+[  638.200168]  rcu_core_si+0x1c/0x2c
+[  638.203612]  __do_softirq+0x14c/0x654
+[  638.207314]  __irq_exit_rcu+0x17c/0x1b0
+[  638.211196]  irq_exit_rcu+0x1c/0x44
+[  638.214727]  el1_interrupt+0x38/0x64
+[  638.218346]  el1h_64_irq_handler+0x18/0x24
+[  638.222493]  el1h_64_irq+0x64/0x68
+[  638.225934]  cpuidle_enter_state+0xe4/0x380
+[  638.230170]  cpuidle_enter+0x44/0x5c
+[  638.233787]  do_idle+0x240/0x2d0
+[  638.237060]  cpu_startup_entry+0x34/0x3c
+[  638.241034]  secondary_start_kernel+0x148/0x170
+[  638.245616]  __secondary_switched+0xa0/0xa4
+# zram02 : [PASS]
 
-------------[ cut here ]------------
-do not call blocking ops when !TASK_RUNNING; state=402 set at [<ffffffff81583637>] worker_thread+0xf57/0x1300 kernel/workqueue.c:2472
-WARNING: CPU: 1 PID: 10 at kernel/sched/core.c:9660 __might_sleep+0xb0/0xe0 kernel/sched/core.c:9656
-Modules linked in:
-CPU: 1 PID: 10 Comm: kworker/u4:1 Not tainted 5.17.0-syzkaller-02237-g1bc191051dca #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue:  0x0 (events_unbound)
-RIP: 0010:__might_sleep+0xb0/0xe0 kernel/sched/core.c:9656
-Code: af 0c 01 42 80 3c 23 00 74 08 48 89 ef e8 78 17 7a 00 48 8b 4d 00 48 c7 c7 60 c8 8e 8a 44 89 ee 48 89 ca 31 c0 e8 f0 90 f2 ff <0f> 0b eb b7 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 72 ff ff ff 48 89
-RSP: 0000:ffffc90000dd0b38 EFLAGS: 00010246
-RAX: e1fd253f302a1e00 RBX: 1ffff1100248367e RCX: ffff888012419d00
-RDX: 0000000080000101 RSI: 0000000080000101 RDI: 0000000000000000
-RBP: ffff88801241b3f0 R08: ffffffff816b7962 R09: fffffbfff1c40ac6
-R10: fffffbfff1c40ac6 R11: 0000000000000000 R12: dffffc0000000000
-R13: 0000000000000402 R14: 00000000000002ff R15: ffffffff8c6a6052
-FS:  0000000000000000(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 000000000ca8e000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- blk_release_queue+0x2e/0x2a0 block/blk-sysfs.c:767
- kobject_cleanup+0x1c0/0x280 lib/kobject.c:705
- blkg_free+0x2d0/0x320 block/blk-cgroup.c:86
- rcu_do_batch kernel/rcu/tree.c:2535 [inline]
- rcu_core+0xa85/0x1700 kernel/rcu/tree.c:2786
- __do_softirq+0x392/0x7a3 kernel/softirq.c:558
- __irq_exit_rcu+0xec/0x170 kernel/softirq.c:637
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
- sysvec_apic_timer_interrupt+0x91/0xb0 arch/x86/kernel/apic/apic.c:1097
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x12/0x20
-RIP: 0010:__raw_spin_unlock_irq include/linux/spinlock_api_smp.h:160 [inline]
-RIP: 0010:_raw_spin_unlock_irq+0x25/0x40 kernel/locking/spinlock.c:202
-Code: 71 40 fd ff 90 53 48 89 fb 48 83 c7 18 48 8b 74 24 08 e8 be c8 41 f7 48 89 df e8 46 7a 43 f7 e8 31 2f 67 f7 fb bf 01 00 00 00 <e8> 46 dd 35 f7 65 8b 05 67 b7 dc 75 85 c0 74 02 5b c3 e8 7c a0 da
-RSP: 0000:ffffc90000cf7dd8 EFLAGS: 00000286
-RAX: e1fd253f302a1e00 RBX: ffff888011869800 RCX: ffffffff90e09903
-RDX: dffffc0000000000 RSI: 0000000000000001 RDI: 0000000000000001
-RBP: 0000000000000080 R08: ffffffff818ce770 R09: ffffed100230d301
-R10: ffffed100230d301 R11: 0000000000000000 R12: ffff8880119b3c00
-R13: ffff888011869858 R14: ffff888011869860 R15: dffffc0000000000
- worker_thread+0xfba/0x1300 kernel/workqueue.c:2474
- kthread+0x2a3/0x2d0 kernel/kthread.c:377
- ret_from_fork+0x1f/0x30
- </TASK>
-----------------
-Code disassembly (best guess):
-   0:	71 40                	jno    0x42
-   2:	fd                   	std
-   3:	ff 90 53 48 89 fb    	callq  *-0x476b7ad(%rax)
-   9:	48 83 c7 18          	add    $0x18,%rdi
-   d:	48 8b 74 24 08       	mov    0x8(%rsp),%rsi
-  12:	e8 be c8 41 f7       	callq  0xf741c8d5
-  17:	48 89 df             	mov    %rbx,%rdi
-  1a:	e8 46 7a 43 f7       	callq  0xf7437a65
-  1f:	e8 31 2f 67 f7       	callq  0xf7672f55
-  24:	fb                   	sti
-  25:	bf 01 00 00 00       	mov    $0x1,%edi
-* 2a:	e8 46 dd 35 f7       	callq  0xf735dd75 <-- trapping instruction
-  2f:	65 8b 05 67 b7 dc 75 	mov    %gs:0x75dcb767(%rip),%eax        # 0x75dcb79d
-  36:	85 c0                	test   %eax,%eax
-  38:	74 02                	je     0x3c
-  3a:	5b                   	pop    %rbx
-  3b:	c3                   	retq
-  3c:	e8                   	.byte 0xe8
-  3d:	7c a0                	jl     0xffffffdf
-  3f:	da                   	.byte 0xda
+steps to produce:
+   # cd  /opt/kselftests/default-in-kernel/zram/
+   # ./zram.sh
+
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+--
+Linaro LKFT
+https://lkft.linaro.org
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+[1] https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20220323/testrun/8654494/suite/linux-log-parser/test/check-kernel-bug-4772266/log
+[2] https://lkft.validation.linaro.org/scheduler/job/4772266#L5186
