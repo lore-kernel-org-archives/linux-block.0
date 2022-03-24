@@ -2,139 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99675C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 07:52:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56DB0C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 08:05:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348757AbiCXHxl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 03:53:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33326 "EHLO
+        id S1345871AbiCXIHD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 04:07:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348747AbiCXHxb (ORCPT
+        with ESMTP id S245300AbiCXIHC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 03:53:31 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB1F399682
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 00:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oyyCwh90cGXNXwAPCoxdzjzz3NJgcKmcraEfIe/JKo0=; b=VYwSdCSI1iDAV3N53cUMm5tUFj
-        4v0XP2IxDpo6H0wFUnKYnuLIIRNDEp4qReHmKIKG7wQKDDwjpEiv0KaLACcQ82ytXHRcuFUrYd85C
-        +pOooOTRd8EIUtAjIVUB5RrtWoDc2IPDUnajidML5yHVRB5Lidr8ia98gOm1JRt2GjuslOCRPOFuv
-        sOAr4tf3knvxOrGvL0BPNSZs3gYej0cU8wtzjFbkfeBGYVds6Ckghc6YCD84ayEDwLWdusFelPLco
-        EYZmL7W0UUXJhXc5fUYskYFv0AzWMqWCxsmIMqOAZwyq9rORBkbAeOuZ6xcBLgz0tuGooTAZRI0Ed
-        krEIOeZA==;
-Received: from [2001:4bb8:19a:b822:f71:16c0:5841:924e] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nXIGA-00FzdJ-AF; Thu, 24 Mar 2022 07:51:54 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>
-Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        Jan Kara <jack@suse.cz>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org,
-        syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com
-Subject: [PATCH 13/13] loop: don't destroy lo->workqueue in __loop_clr_fd
-Date:   Thu, 24 Mar 2022 08:51:19 +0100
-Message-Id: <20220324075119.1556334-14-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220324075119.1556334-1-hch@lst.de>
-References: <20220324075119.1556334-1-hch@lst.de>
+        Thu, 24 Mar 2022 04:07:02 -0400
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D42147ADE
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:05:30 -0700 (PDT)
+Received: by mail-io1-f71.google.com with SMTP id f11-20020a056602070b00b00645d08010fcso2634811iox.15
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 01:05:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=lyJrSW4wDcuNfJrpcCLjJJ/Nl57jnLSCYWnrohs0+bE=;
+        b=J69IufofEybgazqYTBBGnQKvWt38RmmfyvKwaVjuaBLdQHV4XaQcstSB+xOx3CZe9k
+         pz3l26T4MlKZxTLQ+zE+4dTjTL8cWv70Xc+pFJ/NtvuRlBCW5M0+84PrfEU8tAX6AsTd
+         yC2EvKNb8s7iDcvSrp2k0ZkJcrQSwZzD7ewZMS3pOEYdrgXbgDjc1VDpjNY7Aq9wCmNs
+         mseR8BZcwratpN3kaEaiK1TTHySC8anEQMkUxhyeSG5p7JdlDr4Dzo+Pf4Sm4qc5bXWB
+         jYQvuuC4qUtQu4vcnG/BpXcUrGiN2+RK9CwakjPx8Ig/MKDo7DfYwhLOajN3T3/XcY6K
+         37Yg==
+X-Gm-Message-State: AOAM531rUcBEygVWazK0SqiT1/jSpAyWH9QDPNlSEPEs3O6O7jhsHDj3
+        0gLDOUPl7jkucX2uA9CsiFwk66Di6LJGlWL0XJoXL1TgpgMh
+X-Google-Smtp-Source: ABdhPJznQTZc0SUPRekIeKv/BvXmumJJNy6ZG1sLE03YPeaTySKbteBgI62ZjuExhSV9kujpfOv+zUFAYnSmJxfFGxjUjRyGzX6n
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Received: by 2002:a05:6638:14c2:b0:319:d84d:e878 with SMTP id
+ l2-20020a05663814c200b00319d84de878mr2118389jak.314.1648109129411; Thu, 24
+ Mar 2022 01:05:29 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 01:05:29 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000035adf105daf24fba@google.com>
+Subject: [syzbot] upstream boot error: WARNING in blk_release_queue
+From:   syzbot <syzbot+8e08dfd9ad607062fa1b@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, llvm@lists.linux.dev,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-There is no need to destroy the workqueue when clearing unbinding
-a loop device from a backing file.  Not doing so on the other hand
-avoid creating a complex lock dependency chain involving the global
-system_transition_mutex.
+Hello,
 
-Based on a patch from Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>.
+syzbot found the following issue on:
 
-Reported-by: syzbot+6479585dfd4dedd3f7e1@syzkaller.appspotmail.com
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+HEAD commit:    1bc191051dca Merge tag 'trace-v5.18' of git://git.kernel.o..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=12b7c1f9700000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=70f8915481c02c4
+dashboard link: https://syzkaller.appspot.com/bug?extid=8e08dfd9ad607062fa1b
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.2
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8e08dfd9ad607062fa1b@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+do not call blocking ops when !TASK_RUNNING; state=402 set at [<ffffffff81583637>] worker_thread+0xf57/0x1300 kernel/workqueue.c:2472
+WARNING: CPU: 1 PID: 10 at kernel/sched/core.c:9660 __might_sleep+0xb0/0xe0 kernel/sched/core.c:9656
+Modules linked in:
+CPU: 1 PID: 10 Comm: kworker/u4:1 Not tainted 5.17.0-syzkaller-02237-g1bc191051dca #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue:  0x0 (events_unbound)
+RIP: 0010:__might_sleep+0xb0/0xe0 kernel/sched/core.c:9656
+Code: af 0c 01 42 80 3c 23 00 74 08 48 89 ef e8 78 17 7a 00 48 8b 4d 00 48 c7 c7 60 c8 8e 8a 44 89 ee 48 89 ca 31 c0 e8 f0 90 f2 ff <0f> 0b eb b7 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c 72 ff ff ff 48 89
+RSP: 0000:ffffc90000dd0b38 EFLAGS: 00010246
+RAX: e1fd253f302a1e00 RBX: 1ffff1100248367e RCX: ffff888012419d00
+RDX: 0000000080000101 RSI: 0000000080000101 RDI: 0000000000000000
+RBP: ffff88801241b3f0 R08: ffffffff816b7962 R09: fffffbfff1c40ac6
+R10: fffffbfff1c40ac6 R11: 0000000000000000 R12: dffffc0000000000
+R13: 0000000000000402 R14: 00000000000002ff R15: ffffffff8c6a6052
+FS:  0000000000000000(0000) GS:ffff8880b9b00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000ca8e000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ blk_release_queue+0x2e/0x2a0 block/blk-sysfs.c:767
+ kobject_cleanup+0x1c0/0x280 lib/kobject.c:705
+ blkg_free+0x2d0/0x320 block/blk-cgroup.c:86
+ rcu_do_batch kernel/rcu/tree.c:2535 [inline]
+ rcu_core+0xa85/0x1700 kernel/rcu/tree.c:2786
+ __do_softirq+0x392/0x7a3 kernel/softirq.c:558
+ __irq_exit_rcu+0xec/0x170 kernel/softirq.c:637
+ irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
+ sysvec_apic_timer_interrupt+0x91/0xb0 arch/x86/kernel/apic/apic.c:1097
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x12/0x20
+RIP: 0010:__raw_spin_unlock_irq include/linux/spinlock_api_smp.h:160 [inline]
+RIP: 0010:_raw_spin_unlock_irq+0x25/0x40 kernel/locking/spinlock.c:202
+Code: 71 40 fd ff 90 53 48 89 fb 48 83 c7 18 48 8b 74 24 08 e8 be c8 41 f7 48 89 df e8 46 7a 43 f7 e8 31 2f 67 f7 fb bf 01 00 00 00 <e8> 46 dd 35 f7 65 8b 05 67 b7 dc 75 85 c0 74 02 5b c3 e8 7c a0 da
+RSP: 0000:ffffc90000cf7dd8 EFLAGS: 00000286
+RAX: e1fd253f302a1e00 RBX: ffff888011869800 RCX: ffffffff90e09903
+RDX: dffffc0000000000 RSI: 0000000000000001 RDI: 0000000000000001
+RBP: 0000000000000080 R08: ffffffff818ce770 R09: ffffed100230d301
+R10: ffffed100230d301 R11: 0000000000000000 R12: ffff8880119b3c00
+R13: ffff888011869858 R14: ffff888011869860 R15: dffffc0000000000
+ worker_thread+0xfba/0x1300 kernel/workqueue.c:2474
+ kthread+0x2a3/0x2d0 kernel/kthread.c:377
+ ret_from_fork+0x1f/0x30
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	71 40                	jno    0x42
+   2:	fd                   	std
+   3:	ff 90 53 48 89 fb    	callq  *-0x476b7ad(%rax)
+   9:	48 83 c7 18          	add    $0x18,%rdi
+   d:	48 8b 74 24 08       	mov    0x8(%rsp),%rsi
+  12:	e8 be c8 41 f7       	callq  0xf741c8d5
+  17:	48 89 df             	mov    %rbx,%rdi
+  1a:	e8 46 7a 43 f7       	callq  0xf7437a65
+  1f:	e8 31 2f 67 f7       	callq  0xf7672f55
+  24:	fb                   	sti
+  25:	bf 01 00 00 00       	mov    $0x1,%edi
+* 2a:	e8 46 dd 35 f7       	callq  0xf735dd75 <-- trapping instruction
+  2f:	65 8b 05 67 b7 dc 75 	mov    %gs:0x75dcb767(%rip),%eax        # 0x75dcb79d
+  36:	85 c0                	test   %eax,%eax
+  38:	74 02                	je     0x3c
+  3a:	5b                   	pop    %rbx
+  3b:	c3                   	retq
+  3c:	e8                   	.byte 0xe8
+  3d:	7c a0                	jl     0xffffffdf
+  3f:	da                   	.byte 0xda
+
+
 ---
- drivers/block/loop.c | 26 +++++++++++++-------------
- 1 file changed, 13 insertions(+), 13 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index e1eb925d3f855..84613eb2fdd57 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -808,7 +808,6 @@ struct loop_worker {
- };
- 
- static void loop_workfn(struct work_struct *work);
--static void loop_rootcg_workfn(struct work_struct *work);
- 
- #ifdef CONFIG_BLK_CGROUP
- static inline int queue_on_root_worker(struct cgroup_subsys_state *css)
-@@ -1043,20 +1042,19 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	    !file->f_op->write_iter)
- 		lo->lo_flags |= LO_FLAGS_READ_ONLY;
- 
--	lo->workqueue = alloc_workqueue("loop%d",
--					WQ_UNBOUND | WQ_FREEZABLE,
--					0,
--					lo->lo_number);
- 	if (!lo->workqueue) {
--		error = -ENOMEM;
--		goto out_unlock;
-+		lo->workqueue = alloc_workqueue("loop%d",
-+						WQ_UNBOUND | WQ_FREEZABLE,
-+						0, lo->lo_number);
-+		if (!lo->workqueue) {
-+			error = -ENOMEM;
-+			goto out_unlock;
-+		}
- 	}
- 
- 	disk_force_media_change(lo->lo_disk, DISK_EVENT_MEDIA_CHANGE);
- 	set_disk_ro(lo->lo_disk, (lo->lo_flags & LO_FLAGS_READ_ONLY) != 0);
- 
--	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
--	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
- 	lo->use_dio = lo->lo_flags & LO_FLAGS_DIRECT_IO;
- 	lo->lo_device = bdev;
- 	lo->lo_backing_file = file;
-@@ -1152,10 +1150,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	if (!release)
- 		blk_mq_freeze_queue(lo->lo_queue);
- 
--	destroy_workqueue(lo->workqueue);
--	loop_free_idle_workers(lo, true);
--	del_timer_sync(&lo->timer);
--
- 	spin_lock_irq(&lo->lo_lock);
- 	filp = lo->lo_backing_file;
- 	lo->lo_backing_file = NULL;
-@@ -1749,6 +1743,10 @@ static void lo_free_disk(struct gendisk *disk)
- {
- 	struct loop_device *lo = disk->private_data;
- 
-+	if (lo->workqueue)
-+		destroy_workqueue(lo->workqueue);
-+	loop_free_idle_workers(lo, true);
-+	del_timer_sync(&lo->timer);
- 	mutex_destroy(&lo->lo_mutex);
- 	kfree(lo);
- }
-@@ -2012,6 +2010,8 @@ static int loop_add(int i)
- 	lo->lo_number		= i;
- 	spin_lock_init(&lo->lo_lock);
- 	spin_lock_init(&lo->lo_work_lock);
-+	INIT_WORK(&lo->rootcg_work, loop_rootcg_workfn);
-+	INIT_LIST_HEAD(&lo->rootcg_cmd_list);
- 	disk->major		= LOOP_MAJOR;
- 	disk->first_minor	= i << part_shift;
- 	disk->minors		= 1 << part_shift;
--- 
-2.30.2
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
