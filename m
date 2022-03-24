@@ -2,147 +2,170 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72347C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 17:47:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1561C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 17:56:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243676AbiCXRso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 13:48:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42698 "EHLO
+        id S1352425AbiCXR6C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 13:58:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352402AbiCXRsn (ORCPT
+        with ESMTP id S231939AbiCXR57 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 13:48:43 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EA1AB53C4
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 10:47:11 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 1986768B05; Thu, 24 Mar 2022 18:47:02 +0100 (CET)
-Date:   Thu, 24 Mar 2022 18:47:01 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
- ->open / ->release
-Message-ID: <20220324174701.GA28583@lst.de>
-References: <20220324075119.1556334-1-hch@lst.de> <20220324075119.1556334-13-hch@lst.de> <20220324141321.pqesnshaswwk3svk@quack3.lan> <20220324171518.GC28007@lst.de>
+        Thu, 24 Mar 2022 13:57:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EF170B6D0F
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 10:56:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648144585;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=K1rRuvdeVE+p43mVKCo+9JbhVwz1CF9F7SMs1X4zTSk=;
+        b=NBabdruepU6hlHQLhhvQQCbrLpXl30HUKIvkGJ8d4bxWc6IkP786mO2PWW7JT0JkH4AcgW
+        rdgSgDltNWi0oY/4n4VttIY1/Gq5gEkLCrbvkCRpsWtH2HVYfeKthhNjomPY8F6TNIIcDB
+        yhEK1zoCMk+6jBVFeuhG07/ewARtPYU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-209-VLvkIFA6O06yTKVIqQUvKQ-1; Thu, 24 Mar 2022 13:56:24 -0400
+X-MC-Unique: VLvkIFA6O06yTKVIqQUvKQ-1
+Received: by mail-wm1-f69.google.com with SMTP id q6-20020a1cf306000000b0038c5726365aso1852022wmq.3
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 10:56:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=K1rRuvdeVE+p43mVKCo+9JbhVwz1CF9F7SMs1X4zTSk=;
+        b=mO1EKFm9qIY/D7O47jKI8byvn/SR9eGwuNMB7cCWIduiG/B8D/kYnUWMo2ZZerBQie
+         8g7S2Rj2J5GDGIz8f8y7Fab6atqUFBJxLe4j2QHHS7/yR3eG/BJrXZEa8iKZAKd8kELx
+         wZ89CHO4kCWF0Zc/RhkkLpgkdl3JlyGw+Vr2CajrgPHs9hJ3PF9zBrYrOF46jN/2y4QH
+         qwC92fRcbxEwDvAOXRWevSHCig5ozuN+P3+DKhZgrQKmR5c+e1fbCbmeYluHQ+/BMkrf
+         zIa73P+hvtntQesnle6stastSWfHgYFXSwdDj0KGYoMVEuEKa7iQ4NDq9k9EBYlp2FZz
+         WUYg==
+X-Gm-Message-State: AOAM53239Go8DZdhrGub0xSTm5KdOUv2b5daVRQw6MNfmZL1yQHE4UAL
+        h46moHuzkX31ILMnuvYNYr4859RQwl2TnOmAD636GDgpu+qtkJHxTkJ1SZ+tedk4AIvMiPMcWhg
+        UHNNJPTtlhVOWJwJ8twOveMY=
+X-Received: by 2002:a05:6000:10ce:b0:204:203:9c87 with SMTP id b14-20020a05600010ce00b0020402039c87mr5368420wrx.181.1648144583000;
+        Thu, 24 Mar 2022 10:56:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwiMTRzqgSTdtdRgb33oi/EZn8C/VD+y9bPjT79yWQxteeWRRsF3keydqYNyxNTNtpqmyRJvA==
+X-Received: by 2002:a05:6000:10ce:b0:204:203:9c87 with SMTP id b14-20020a05600010ce00b0020402039c87mr5368399wrx.181.1648144582776;
+        Thu, 24 Mar 2022 10:56:22 -0700 (PDT)
+Received: from redhat.com ([2.55.151.118])
+        by smtp.gmail.com with ESMTPSA id a12-20020a5d53cc000000b00205a0ee9c74sm281412wrw.89.2022.03.24.10.56.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 24 Mar 2022 10:56:22 -0700 (PDT)
+Date:   Thu, 24 Mar 2022 13:56:18 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     jasowang@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+        mgurtovoy@nvidia.com, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, kernel test robot <lkp@intel.com>
+Subject: Re: [PATCH v3 1/2] virtio-blk: support polling I/O
+Message-ID: <20220324135556-mutt-send-email-mst@kernel.org>
+References: <20220324140450.33148-1-suwan.kim027@gmail.com>
+ <20220324140450.33148-2-suwan.kim027@gmail.com>
+ <20220324103056-mutt-send-email-mst@kernel.org>
+ <YjyEKuKhmhML6NN3@localhost.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220324171518.GC28007@lst.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <YjyEKuKhmhML6NN3@localhost.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 24, 2022 at 06:15:18PM +0100, Christoph Hellwig wrote:
-> On Thu, Mar 24, 2022 at 03:13:21PM +0100, Jan Kara wrote:
-> > > Signed-off-by: Christoph Hellwig <hch@lst.de>
+On Thu, Mar 24, 2022 at 11:46:02PM +0900, Suwan Kim wrote:
+> On Thu, Mar 24, 2022 at 10:32:02AM -0400, Michael S. Tsirkin wrote:
+> > On Thu, Mar 24, 2022 at 11:04:49PM +0900, Suwan Kim wrote:
+> > > This patch supports polling I/O via virtio-blk driver. Polling
+> > > feature is enabled by module parameter "num_poll_queues" and it
+> > > sets dedicated polling queues for virtio-blk. This patch improves
+> > > the polling I/O throughput and latency.
+> > > 
+> > > The virtio-blk driver doesn't not have a poll function and a poll
+> > > queue and it has been operating in interrupt driven method even if
+> > > the polling function is called in the upper layer.
+> > > 
+> > > virtio-blk polling is implemented upon 'batched completion' of block
+> > > layer. virtblk_poll() queues completed request to io_comp_batch->req_list
+> > > and later, virtblk_complete_batch() calls unmap function and ends
+> > > the requests in batch.
+> > > 
+> > > virtio-blk reads the number of poll queues from module parameter
+> > > "num_poll_queues". If VM sets queue parameter as below,
+> > > ("num-queues=N" [QEMU property], "num_poll_queues=M" [module parameter])
+> > > It allocates N virtqueues to virtio_blk->vqs[N] and it uses [0..(N-M-1)]
+> > > as default queues and [(N-M)..(N-1)] as poll queues. Unlike the default
+> > > queues, the poll queues have no callback function.
+> > > 
+> > > Regarding HW-SW queue mapping, the default queue mapping uses the
+> > > existing method that condsiders MSI irq vector. But the poll queue
+> > > doesn't have an irq, so it uses the regular blk-mq cpu mapping.
+> > > 
+> > > For verifying the improvement, I did Fio polling I/O performance test
+> > > with io_uring engine with the options below.
+> > > (io_uring, hipri, randread, direct=1, bs=512, iodepth=64 numjobs=N)
+> > > I set 4 vcpu and 4 virtio-blk queues - 2 default queues and 2 poll
+> > > queues for VM.
+> > > 
+> > > As a result, IOPS and average latency improved about 10%.
+> > > 
+> > > Test result:
+> > > 
+> > > - Fio io_uring poll without virtio-blk poll support
+> > > 	-- numjobs=1 : IOPS = 339K, avg latency = 188.33us
+> > > 	-- numjobs=2 : IOPS = 367K, avg latency = 347.33us
+> > > 	-- numjobs=4 : IOPS = 383K, avg latency = 682.06us
+> > > 
+> > > - Fio io_uring poll with virtio-blk poll support
+> > > 	-- numjobs=1 : IOPS = 380K, avg latency = 167.87us
+> > > 	-- numjobs=2 : IOPS = 409K, avg latency = 312.6us
+> > > 	-- numjobs=4 : IOPS = 413K, avg latency = 619.72us
+> > > 
+> > > Reported-by: kernel test robot <lkp@intel.com>
+> > > Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
+> > > ---
+> > >  drivers/block/virtio_blk.c | 101 +++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 97 insertions(+), 4 deletions(-)
+> > > 
+> > > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > > index 8c415be86732..3d16f8b753e7 100644
+> > > --- a/drivers/block/virtio_blk.c
+> > > +++ b/drivers/block/virtio_blk.c
+> > > @@ -37,6 +37,10 @@ MODULE_PARM_DESC(num_request_queues,
+> > >  		 "0 for no limit. "
+> > >  		 "Values > nr_cpu_ids truncated to nr_cpu_ids.");
+> > >  
+> > > +static unsigned int num_poll_queues;
+> > > +module_param(num_poll_queues, uint, 0644);
+> > > +MODULE_PARM_DESC(num_poll_queues, "The number of dedicated virtqueues for polling I/O");
+> > > +
+> > >  static int major;
+> > >  static DEFINE_IDA(vd_index_ida);
+> > >
 > > 
-> > Looks good but I still think we need something like attached preparatory
-> > patch to not regress e.g. filesystem probing triggered by udev events. What
-> > do you think?
+> > Is there some way to make it work reasonably without need to set
+> > module parameters? I don't see any other devices with a num_poll_queues
+> > parameter - how do they handle this?
 > 
-> Yes, I think it makes sense to add that.
+> Hi Michael,
+> 
+> NVMe driver uses module parameter.
+> 
+> Please refer to this.
+> -----
+> drivers/nvme/host/pci.c
+> 
+> static unsigned int poll_queues;
+> module_param_cb(poll_queues, &io_queue_count_ops, &poll_queues, 0644);
+> MODULE_PARM_DESC(poll_queues, "Number of queues to use for polled IO.");
+> -----
+> 
+> Regards,
+> Suwan Kim
 
-Actually, looking at it in a little more detail: this misses the
-explicit kobject_uevent calls for the capacity changes.  I think the
-best idea might be something like this:
+OK then. Let's maybe be consistent wrt parameter naming?
 
----
-From db5ab8ab0fbcf07af769023a894fafc22b662cd9 Mon Sep 17 00:00:00 2001
-From: Christoph Hellwig <hch@lst.de>
-Date: Thu, 24 Mar 2022 18:41:28 +0100
-Subject: loop: suppress uevents while reconfiguring the device
-
-Currently, udev change event is generated for a loop device before the
-device is ready for IO. Due to serialization on lo->lo_mutex in
-lo_open() this does not matter because anybody is able to open the
-device and do IO only after the configuration is finished. However this
-synchronization in lo_open() is going away so make sure userspace
-reacting to the change event will see the new device state by generating
-the event only when the device is setup.
-
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/loop.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index b3170e8cdbe95..bfd21af7aa38b 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -572,6 +572,10 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 
- 	if (!file)
- 		return -EBADF;
-+
-+	/* suppress uevents while reconfiguring the device */
-+	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
-+
- 	is_loop = is_loop_device(file);
- 	error = loop_global_lock_killable(lo, is_loop);
- 	if (error)
-@@ -626,13 +630,18 @@ static int loop_change_fd(struct loop_device *lo, struct block_device *bdev,
- 	fput(old_file);
- 	if (partscan)
- 		loop_reread_partitions(lo);
--	return 0;
-+
-+	error = 0;
-+done:
-+	/* enable and uncork uevent now that we are done */
-+	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
-+	return error;
- 
- out_err:
- 	loop_global_unlock(lo, is_loop);
- out_putf:
- 	fput(file);
--	return error;
-+	goto done;
- }
- 
- /* loop sysfs attributes */
-@@ -999,6 +1008,9 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	/* This is safe, since we have a reference from open(). */
- 	__module_get(THIS_MODULE);
- 
-+	/* suppress uevents while reconfiguring the device */
-+	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 1);
-+
- 	/*
- 	 * If we don't hold exclusive handle for the device, upgrade to it
- 	 * here to avoid changing device under exclusive owner.
-@@ -1101,7 +1113,12 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 		loop_reread_partitions(lo);
- 	if (!(mode & FMODE_EXCL))
- 		bd_abort_claiming(bdev, loop_configure);
--	return 0;
-+
-+	error = 0;
-+done:
-+	/* enable and uncork uevent now that we are done */
-+	dev_set_uevent_suppress(disk_to_dev(lo->lo_disk), 0);
-+	return error;
- 
- out_unlock:
- 	loop_global_unlock(lo, is_loop);
-@@ -1112,7 +1129,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
- 	fput(file);
- 	/* This is safe: open() is still holding a reference. */
- 	module_put(THIS_MODULE);
--	return error;
-+	goto done;
- }
- 
- static void __loop_clr_fd(struct loop_device *lo, bool release)
 -- 
-2.30.2
+MST
 
