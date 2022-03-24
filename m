@@ -2,87 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7FDBC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 09:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28096C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 24 Mar 2022 10:42:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349153AbiCXJSY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 05:18:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49644 "EHLO
+        id S1349561AbiCXKoV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 06:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348801AbiCXJSX (ORCPT
+        with ESMTP id S1349559AbiCXKoT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 05:18:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 73A049D4FA
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 02:16:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648113411;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kxIA+CLFwcc8TqwMm37/uOtvk1/QQRU8QzWc86/Fkpw=;
-        b=Pkga9J0yl/+d5KxZyuDfSSUfzF9R1sJJyvXBuQMkKDNFRw7YKj8nqdB3UgmAOFikk3wtYR
-        QPg0OV3HFX2nOSxN1WmEqeEVv7/zOkqE1s8rFbciChBU16kwskpFiExj8Ol/C/Wb/QyMxJ
-        NhyZ3bwCYU/gxhAjlcfl7v9FAuZRJAk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-286-LUQhrbZgOFe5H5F8ssxHOg-1; Thu, 24 Mar 2022 05:16:50 -0400
-X-MC-Unique: LUQhrbZgOFe5H5F8ssxHOg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4B79805A30;
-        Thu, 24 Mar 2022 09:16:49 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 384BA112132C;
-        Thu, 24 Mar 2022 09:16:41 +0000 (UTC)
-Date:   Thu, 24 Mar 2022 17:16:36 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Cc:     linux-mm@kvack.org, target-devel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-block@vger.kernel.org,
-        xuyu@linux.alibaba.com, bostroesser@gmail.com
-Subject: Re: [RFC 2/3] mm: export zap_page_range()
-Message-ID: <Yjw29HcA2JL41aA6@T590>
-References: <20220318095531.15479-1-xiaoguang.wang@linux.alibaba.com>
- <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
+        Thu, 24 Mar 2022 06:44:19 -0400
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5243AA146F;
+        Thu, 24 Mar 2022 03:42:47 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id yy13so8302394ejb.2;
+        Thu, 24 Mar 2022 03:42:47 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Z+tOhomyyHuPVoCuADsMsVAjnchfBPFbDYj/vr6ULFk=;
+        b=mV3bfzolQVC2jlxhUiJy06qFMco1LBQp2MWBzh+H/gm+zVPNYDjkalyOwMXvJsihuS
+         jMxwuMYBOfnekr1dNnNI2wvEeNurRqnZK5qTLWA0KMSuvw5P12ny5N4uOc+7NzgmwCac
+         SBiN+we2cwKiEZzzb1U5GBqAQGHu7M213R58uZgqJyuTNqRsn7G6f61We5J5KYm74iI8
+         ROipGr7beoUR0p0mS+qR1OkO+b2vbikVVGAKQFveLxA2TgvI9F/DbZ0/NSi5/W6rX7zP
+         IzC1XfRgKWhFHTKHQcUoPdWd/Z4g8VDDhtkO6skGQEWyVU0vBUA69d7AsGKNu8Rp/JK2
+         SXDg==
+X-Gm-Message-State: AOAM531F7N0rHnNzF6dEQCNP3WI7gXJiO1/SnD6W7r2Xqr/ZuWWr2O5O
+        BqXIyCd/MEA0m8RPQQ6+5AM=
+X-Google-Smtp-Source: ABdhPJwIdokZm/Y/j1GkNTRNcR1YxV/an65AItscWscYJKvj1/Qq6h7xM55DmHKiD8wf1owr5GZbZg==
+X-Received: by 2002:a17:906:6547:b0:6bd:e2ad:8c82 with SMTP id u7-20020a170906654700b006bde2ad8c82mr4794402ejn.693.1648118565765;
+        Thu, 24 Mar 2022 03:42:45 -0700 (PDT)
+Received: from [10.100.102.14] (85.65.206.129.dynamic.barak-online.net. [85.65.206.129])
+        by smtp.gmail.com with ESMTPSA id l2-20020a1709060cc200b006d3d91e88c7sm959117ejh.214.2022.03.24.03.42.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 24 Mar 2022 03:42:44 -0700 (PDT)
+Message-ID: <88827a86-1304-e699-ec11-2718e280f9ad@grimberg.me>
+Date:   Thu, 24 Mar 2022 12:42:42 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220318095531.15479-3-xiaoguang.wang@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 05/17] nvme: wire-up support for async-passthru on
+ char-device.
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Kanchan Joshi <joshiiitr@gmail.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+References: <20220308152105.309618-6-joshi.k@samsung.com>
+ <7a123895-1102-4b36-2d6e-1e00e978d03d@grimberg.me>
+ <CA+1E3rK8wnABptQLQrEo8XRdsbua9t_88e3ZP-Ass3CnxHv+oA@mail.gmail.com>
+ <8f45a761-5ecb-5911-1064-9625a285c93d@grimberg.me>
+ <20220316092153.GA4885@test-zns>
+ <11f9e933-cfc8-2e3b-c815-c49a4b7db4ec@grimberg.me>
+ <CA+1E3r+_DEw5ABPbLzSp9Gvg6L8XU-2HBoLK7kuXucLjr=+Ezw@mail.gmail.com>
+ <3ed01280-5487-7206-a326-0cd110118b65@grimberg.me>
+ <666deb0e-fa10-8a39-c1aa-cf3908b3795c@kernel.dk>
+ <28b53100-9930-92d4-ba3b-f9c5e8773808@grimberg.me>
+ <20220324062053.GA12519@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220324062053.GA12519@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 05:55:30PM +0800, Xiaoguang Wang wrote:
-> Module target_core_user will use it to implement zero copy feature.
+
+>>>> I know, and that was my original question, no one cares that this
+>>>> interface completely lacks this capability? Maybe it is fine, but
+>>>> it is not a trivial assumption given that this is designed to be more
+>>>> than an interface to send admin/vs commands to the controller...
+>>>
+>>> Most people don't really care about or use multipath, so it's not a
+>>> primary goal.
+>>
+>> This statement is generally correct. However what application would be
+>> interested in speaking raw nvme to a device and gaining performance that
+>> is even higher than the block layer (which is great to begin with)?
 > 
-> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-> ---
->  mm/memory.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/mm/memory.c b/mm/memory.c
-> index 1f745e4d11c2..9974d0406dad 100644
-> --- a/mm/memory.c
-> +++ b/mm/memory.c
-> @@ -1664,6 +1664,7 @@ void zap_page_range(struct vm_area_struct *vma, unsigned long start,
->  	mmu_notifier_invalidate_range_end(&range);
->  	tlb_finish_mmu(&tlb);
->  }
-> +EXPORT_SYMBOL_GPL(zap_page_range);
+> If passthrough is faster than the block I/O path we're doing someting
+> wrong.  At best it should be the same performance.
 
-BTW, what is the counter part api of remap_pfn_range() for serving the
-unmap? Or does it really need to unmap the vm space for this zero-copy
-case?
+That is not what the changelog says.
 
-If it isn't necessary to unmap, maybe remap_pfn_range() is faster than
-vm_insert_page(s)_mkspecial + zap_page_range() since zap_page_range()
-looks a bit heavy.
+> That being said multipathing is an integral part of the nvme driver
+> architecture, and the /dev/ngX devices.  If we want to support uring
+> async commands on /dev/ngX it will have to support multipath.
 
-
-Thanks,
-Ming
-
+Couldn't agree more...
