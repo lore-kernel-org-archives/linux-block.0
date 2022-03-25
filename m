@@ -2,109 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2860C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 02:10:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59E35C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 02:47:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353106AbiCYCM0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 24 Mar 2022 22:12:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57928 "EHLO
+        id S1357945AbiCYCso (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 24 Mar 2022 22:48:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1357693AbiCYCMO (ORCPT
+        with ESMTP id S1358144AbiCYCsn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 24 Mar 2022 22:12:14 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A488EA1470
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 19:10:25 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id d134so823031ybc.13
-        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 19:10:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IKwNBEs3tASJWL7vN74tIrUm9dV+sBlNlNaJ5KwKgTs=;
-        b=cbc3BGe5+zL07UFEV9pbFjATQyTFfHkL8NRVARYGOxWmh0lxE1dNlskSSeW2JkMs2k
-         sFZgeI9XI06R2An17rGJRCrVBd+4KlMmefFE0nM82JlLERTRrgyL+1O3jRbO/hSqr9ZS
-         Pvf+cXGQaP182cb0VU8dTVUGy9z7Ic0Nmx+vQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IKwNBEs3tASJWL7vN74tIrUm9dV+sBlNlNaJ5KwKgTs=;
-        b=R7HsVOxye6z/kuCsVnPWELNCG/R6z9J3drhknYBUXxZ+Hsa5tpl+Z+lNyA+zyo7sCI
-         ZP6QnAtp6zBgidrrWzON+pFlxiqWp8y3vAEo6S0gSC0Nj55x7W8wKp2hXSTdqo4MH88F
-         2OCKjskKLWhSsSm/d3hLi70ZVJwc8Qx5sBlScOw1iQZu+C1MNT4Z2F3AsCxui0ssJVJt
-         W3izJ77kv094+lQJ3+kNnnSddCyEz3Pn/x74AS1qINts7VsETSH11NsLpatpmSZCVhK+
-         CdYe7pKu0/5uMxD1B7C6LIwl5cHSj3sn0ZDvMy/e1CYjZ8n8P5aoVKNNqmC1iOAD3VeD
-         jLQA==
-X-Gm-Message-State: AOAM533bIgKtoQGwbT74XuChJwG4wm80CYAL1J2kBrZRmWRm9rDs0DA6
-        u2Rze2ilApzBryMKIY31eN0tLa1fnSs8oknn64oMAg==
-X-Google-Smtp-Source: ABdhPJz3y4TlNL1JF4KJF+1yuPmc8LbezhlJz2o/4Jb79VASFUj+QoEgLFnQxvm0LwiSP+zSpCA553HDqMC/wZi0OFI=
-X-Received: by 2002:a25:3f43:0:b0:633:bdd8:4ae6 with SMTP id
- m64-20020a253f43000000b00633bdd84ae6mr7423462yba.134.1648174224922; Thu, 24
- Mar 2022 19:10:24 -0700 (PDT)
-MIME-Version: 1.0
-References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
- <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
- <YjA439FwajtHsahr@google.com> <YjEOiZCLBMgbw8oc@google.com>
- <CABWYdi0jd_pG_qqAnnGK6otNNXeNoiAWtmC14Jv+tiSadJPw0w@mail.gmail.com>
- <CABWYdi2gOzAK60gLYKx9gSoSfJRZaAjyAWm+55gLgcSKrDrP9Q@mail.gmail.com>
- <YjTCF37cUNz9FwGi@google.com> <YjTVVxIAsnKAXjTd@google.com>
-In-Reply-To: <YjTVVxIAsnKAXjTd@google.com>
-From:   Ivan Babrou <ivan@cloudflare.com>
-Date:   Thu, 24 Mar 2022 19:10:14 -0700
-Message-ID: <CABWYdi0tgau=trCiGWULY88Wu1-=13ck8NikV0KxfDQHFCCiMA@mail.gmail.com>
-Subject: Re: zram corruption due to uninitialized do_swap_page fault
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        Linux MM <linux-mm@kvack.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        kernel-team <kernel-team@cloudflare.com>
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 24 Mar 2022 22:48:43 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48783BD7FB
+        for <linux-block@vger.kernel.org>; Thu, 24 Mar 2022 19:47:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id D8D01616A7
+        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 02:47:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4CF1DC340EC;
+        Fri, 25 Mar 2022 02:47:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648176430;
+        bh=LRRhD/zUQUEEwXLdZD9CtW6cxeVnRQ/dYeb1tHKJPB8=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=cxZAWHBXrLRP/BpyWXSseDpcGE7gSDm7al1cywNw/IZsF7SyKnzyRBC5FnUIOWr4c
+         C6sAZ5gp4UT09wNN/lr3Pe/h0Xsw/N62ihO9aVgKaOI3xUAXE++XL+kNGBriQzbBLo
+         iDnyuQoJ5+OwmgSujTFPSzdpNO/wbfW27BqeU43fra9xaXs0s3YlUlu9Hqn2BCyoJc
+         a/W2tVz9k9lk7sCwsHSk5V822PHbBk4uQr/sGXuSdjbz8QBeDzi7jXT2c4A7URogr1
+         xDkPIk/UkEbIq3D9+X4QUgKFwh+dZYBvJe0f9kNvt1NhaDfrge48rdi2uPn74B3rP3
+         1FdwF/LKeRs5g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3A303E6D44B;
+        Fri, 25 Mar 2022 02:47:10 +0000 (UTC)
+Subject: Re: [dm-devel] [git pull] device mapper changes for 5.18
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <YjuFWbp0vdh/7c5A@redhat.com>
+References: <YjuFWbp0vdh/7c5A@redhat.com>
+X-PR-Tracked-List-Id: device-mapper development <dm-devel.redhat.com>
+X-PR-Tracked-Message-Id: <YjuFWbp0vdh/7c5A@redhat.com>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.18/dm-changes
+X-PR-Tracked-Commit-Id: 4d7bca13dd9a5033174b0735056c5658cb893e76
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: b1f8ccdaae0310332d16f65bf0f622f9d4ae2391
+Message-Id: <164817643023.17034.838620470975420781.pr-tracker-bot@kernel.org>
+Date:   Fri, 25 Mar 2022 02:47:10 +0000
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Aashish Sharma <shraash@google.com>,
+        Wang Qing <wangqing@vivo.com>,
+        Zhiqiang Liu <liuzhiqiang26@huawei.com>,
+        Jordy Zomer <jordy@jordyzomer.github.io>,
+        Tom Rix <trix@redhat.com>, Barry Song <21cnbao@gmail.com>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, Kirill Tkhai <ktkhai@virtuozzo.com>,
+        Colin Ian King <colin.i.king@gmail.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Thore Sommer <public@thson.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 18, 2022 at 11:54 AM Minchan Kim <minchan@kernel.org> wrote:
->
-> On Fri, Mar 18, 2022 at 10:32:07AM -0700, Minchan Kim wrote:
-> > On Fri, Mar 18, 2022 at 09:30:09AM -0700, Ivan Babrou wrote:
-> > > On Wed, Mar 16, 2022 at 11:26 AM Ivan Babrou <ivan@cloudflare.com> wrote:
-> > > > I'm making an internal build and will push it to some location to see
-> > > > how it behaves, but it might take a few days to get any sort of
-> > > > confidence in the results (unless it breaks immediately).
-> > > >
-> > > > I've also pushed my patch that disables SWP_SYNCHRONOUS_IO to a few
-> > > > locations yesterday to see how it fares.
-> > >
-> > > I have some updates before the weekend. There are two experimental groups:
-> > >
-> > > * My patch that removes the SWP_SYNCHRONOUS_IO flag. There are 704
-> > > machines in this group across 5 datacenters with cumulative uptime of
-> > > 916 days.
-> > > * Minchan's patch to remove swap_slot_free_notify. There are 376
-> > > machines in this group across 3 datacenters with cumulative uptime of
-> > > 240 days.
-> > >
-> > > Our machines take a couple of hours to start swapping anything after
-> > > boot, and I discounted these two hours from the cumulative uptime.
-> > >
-> > > Neither of these two groups experienced unexpected coredumps or
-> > > rocksdb corruptions.
-> > >
-> > > I think at this point it's reasonable to proceed with Minchan's patch
-> > > (including a backport).
-> >
-> > Let me cook the patch and then will post it.
-> >
-> > Thanks for the testing as well as reporting, Ivan!
->
-> From 1ede54d46f0b1958bfc624f17fe709637ef8f12a Mon Sep 17 00:00:00 2001
-> From: Minchan Kim <minchan@kernel.org>
-> Date: Tue, 15 Mar 2022 14:14:23 -0700
-> Subject: [PATCH] mm: fix unexpected zeroed page mapping with zram swap
+The pull request you sent on Wed, 23 Mar 2022 16:38:49 -0400:
 
-Is there any action needed from me to make sure that this lands into
-the mm tree and eventually into stable releases?
+> git://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git tags/for-5.18/dm-changes
+
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/b1f8ccdaae0310332d16f65bf0f622f9d4ae2391
+
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
