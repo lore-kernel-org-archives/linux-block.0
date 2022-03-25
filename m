@@ -2,165 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C87F5C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 07:30:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 265DEC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 08:34:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350300AbiCYHcF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Mar 2022 03:32:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55832 "EHLO
+        id S235243AbiCYIfh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Mar 2022 04:35:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350106AbiCYHcE (ORCPT
+        with ESMTP id S1347783AbiCYIfg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Mar 2022 03:32:04 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E612C4E16;
-        Fri, 25 Mar 2022 00:30:30 -0700 (PDT)
-Received: from kwepemi100023.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KPtwz5wNqzCrlb;
-        Fri, 25 Mar 2022 15:28:19 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100023.china.huawei.com (7.221.188.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 25 Mar 2022 15:30:28 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 25 Mar 2022 15:30:27 +0800
-Subject: Re: [PATCH -next 00/11] support concurrent sync io for bfq on a
- specail occasion
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
-        <jack@suse.cz>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220305091205.4188398-1-yukuai3@huawei.com>
- <e299180e-cdbd-0837-8478-5e397ac8166b@huawei.com>
- <11fda851-a552-97ea-d083-d0288c17ba53@huawei.com>
-Message-ID: <e78fc7c5-cf08-9fc7-3f81-7ff8aaf37673@huawei.com>
-Date:   Fri, 25 Mar 2022 15:30:26 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 25 Mar 2022 04:35:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 766733AA51
+        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 01:34:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648197241;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=saAk925KE4YTcVBlOMWQBhUVk1WAYvAJga7iRSwNkWA=;
+        b=HNXwiBS/2E7nYEWwYHxWiZi/Jw62McuqEjXuQtZQJLJ1WWeJXzgORx5oJMibIn+4gk+Sin
+        4CH20me2HRfIQCVtx9MBW7IX3KuvIHvOgMkOz2Ps+VyDPhDLGecatg6D97J9Oy/JSN+mLF
+        MCnzygiFlrRmdHSJ0qMhe0b14PzSaww=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-657-1eM15YjuPQ2lJIQK-Suu6w-1; Fri, 25 Mar 2022 04:34:00 -0400
+X-MC-Unique: 1eM15YjuPQ2lJIQK-Suu6w-1
+Received: by mail-wr1-f70.google.com with SMTP id z1-20020adfec81000000b001f1f7e7ec99so2480356wrn.17
+        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 01:33:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=saAk925KE4YTcVBlOMWQBhUVk1WAYvAJga7iRSwNkWA=;
+        b=z90Ikiwmz31QrEc3MZOh1bVgDJCTzj5989gTUQtPLWf+dm8j/8gIsAA97sci5x9da0
+         Ik4LNBVZHgTxNmsTEHb9VM5zI30clfKT1zNhW39GBo+SqBCchvdYq05z6CTaU+t06QDu
+         ebNGrLlDlNbJgacihLTlSk4QOzW57jpqKUw1j8WiFaZRP4FvRI7a0RPSSUGvUU2fB32j
+         uMZq0n9HmdzwkLkTe9N+wnTjIkjv+TA1cb/tO69Cb+zT5z14YOUnXeJDtqA3gYLlKJ84
+         RNotRPmHxt9Xk86989GBtanbRRVNLPMZtwO8fyQsEnDrTvJcvBtWyEbF7rLYoDmvlBsn
+         v6EA==
+X-Gm-Message-State: AOAM532bJflubevuFW+4I174B96xJOxIJ2Cym65hNwVrPEdRFBrGeWzh
+        lCexrsWG2UyD/FQoG1TkHkHrb5pPBr5393GDfHIa0dvMH5zxxHwr53paH2iAOwgDqcXScCsJp5n
+        PRcYfjSha+KAkmio+CT7yi9Y=
+X-Received: by 2002:adf:ebc1:0:b0:1e6:1109:5a1c with SMTP id v1-20020adfebc1000000b001e611095a1cmr7979825wrn.228.1648197239011;
+        Fri, 25 Mar 2022 01:33:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz8GsEnvVVsBe7K8bvT5MIDoTV+RToKncLKw5H8I6Ep8Yar8zelHy4/ERbBduTX23N6Bxn9Ig==
+X-Received: by 2002:adf:ebc1:0:b0:1e6:1109:5a1c with SMTP id v1-20020adfebc1000000b001e611095a1cmr7979796wrn.228.1648197238720;
+        Fri, 25 Mar 2022 01:33:58 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c705:4200:6374:a71a:a88:a4b? (p200300cbc70542006374a71a0a880a4b.dip0.t-ipconnect.de. [2003:cb:c705:4200:6374:a71a:a88:a4b])
+        by smtp.gmail.com with ESMTPSA id g10-20020adfe40a000000b00203eb3551f0sm6341460wrm.117.2022.03.25.01.33.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 25 Mar 2022 01:33:58 -0700 (PDT)
+Message-ID: <86947c1a-090d-e101-d536-69818e2e8f5d@redhat.com>
+Date:   Fri, 25 Mar 2022 09:33:57 +0100
 MIME-Version: 1.0
-In-Reply-To: <11fda851-a552-97ea-d083-d0288c17ba53@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: zram corruption due to uninitialized do_swap_page fault
+Content-Language: en-US
+To:     Ivan Babrou <ivan@cloudflare.com>, Minchan Kim <minchan@kernel.org>
+Cc:     Andrew Morton <akpm@linux-foundation.org>,
+        Linux MM <linux-mm@kvack.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        kernel-team <kernel-team@cloudflare.com>
+References: <CABWYdi2a=Tc3dRfQ+037PG0GHKvZd5SEXJxBBbNspsrHK1zNpQ@mail.gmail.com>
+ <CABWYdi1PeNbgnM4qE001+_BzHJxQcaaY9sLOK=Y7gjqfXZO0=g@mail.gmail.com>
+ <YjA439FwajtHsahr@google.com> <YjEOiZCLBMgbw8oc@google.com>
+ <CABWYdi0jd_pG_qqAnnGK6otNNXeNoiAWtmC14Jv+tiSadJPw0w@mail.gmail.com>
+ <CABWYdi2gOzAK60gLYKx9gSoSfJRZaAjyAWm+55gLgcSKrDrP9Q@mail.gmail.com>
+ <YjTCF37cUNz9FwGi@google.com> <YjTVVxIAsnKAXjTd@google.com>
+ <CABWYdi0tgau=trCiGWULY88Wu1-=13ck8NikV0KxfDQHFCCiMA@mail.gmail.com>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <CABWYdi0tgau=trCiGWULY88Wu1-=13ck8NikV0KxfDQHFCCiMA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
-
-在 2022/03/17 9:49, yukuai (C) 写道:
-> friendly ping ...
-> 
-> 在 2022/03/11 14:31, yukuai (C) 写道:
->> friendly ping ...
+On 25.03.22 03:10, Ivan Babrou wrote:
+> On Fri, Mar 18, 2022 at 11:54 AM Minchan Kim <minchan@kernel.org> wrote:
 >>
->> 在 2022/03/05 17:11, Yu Kuai 写道:
->>> Currently, bfq can't handle sync io concurrently as long as they
->>> are not issued from root group. This is because
->>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>> bfq_asymmetric_scenario().
+>> On Fri, Mar 18, 2022 at 10:32:07AM -0700, Minchan Kim wrote:
+>>> On Fri, Mar 18, 2022 at 09:30:09AM -0700, Ivan Babrou wrote:
+>>>> On Wed, Mar 16, 2022 at 11:26 AM Ivan Babrou <ivan@cloudflare.com> wrote:
+>>>>> I'm making an internal build and will push it to some location to see
+>>>>> how it behaves, but it might take a few days to get any sort of
+>>>>> confidence in the results (unless it breaks immediately).
+>>>>>
+>>>>> I've also pushed my patch that disables SWP_SYNCHRONOUS_IO to a few
+>>>>> locations yesterday to see how it fares.
+>>>>
+>>>> I have some updates before the weekend. There are two experimental groups:
+>>>>
+>>>> * My patch that removes the SWP_SYNCHRONOUS_IO flag. There are 704
+>>>> machines in this group across 5 datacenters with cumulative uptime of
+>>>> 916 days.
+>>>> * Minchan's patch to remove swap_slot_free_notify. There are 376
+>>>> machines in this group across 3 datacenters with cumulative uptime of
+>>>> 240 days.
+>>>>
+>>>> Our machines take a couple of hours to start swapping anything after
+>>>> boot, and I discounted these two hours from the cumulative uptime.
+>>>>
+>>>> Neither of these two groups experienced unexpected coredumps or
+>>>> rocksdb corruptions.
+>>>>
+>>>> I think at this point it's reasonable to proceed with Minchan's patch
+>>>> (including a backport).
 >>>
->>> This patchset tries to support concurrent sync io if all the sync ios
->>> are issued from the same cgroup:
+>>> Let me cook the patch and then will post it.
 >>>
->>> 1) Count root_group into 'num_groups_with_pending_reqs', patch 1-5;
->>>
->>> 2) Don't idle if 'num_groups_with_pending_reqs' is 1, patch 6;
->>>
->>> 3) Don't count the group if the group doesn't have pending requests,
->>> while it's child groups may have pending requests, patch 7;
->>>
->>> This is because, for example:
->>> if sync ios are issued from cgroup /root/c1/c2, root, c1 and c2
->>> will all be counted into 'num_groups_with_pending_reqs',
->>> which makes it impossible to handle sync ios concurrently.
->>>
->>> 4) Decrease 'num_groups_with_pending_reqs' when the last queue completes
->>> all the requests, while child groups may still have pending
->>> requests, patch 8-10;
->>>
->>> This is because, for example:
->>> t1 issue sync io on root group, t2 and t3 issue sync io on the same
->>> child group. num_groups_with_pending_reqs is 2 now.
->>> After t1 stopped, num_groups_with_pending_reqs is still 2. sync io from
->>> t2 and t3 still can't be handled concurrently.
->>>
->>> fio test script: startdelay is used to avoid queue merging
->>> [global]
->>> filename=/dev/nvme0n1
->>> allow_mounted_write=0
->>> ioengine=psync
->>> direct=1
->>> ioscheduler=bfq
->>> offset_increment=10g
->>> group_reporting
->>> rw=randwrite
->>> bs=4k
->>>
->>> [test1]
->>> numjobs=1
->>>
->>> [test2]
->>> startdelay=1
->>> numjobs=1
->>>
->>> [test3]
->>> startdelay=2
->>> numjobs=1
->>>
->>> [test4]
->>> startdelay=3
->>> numjobs=1
->>>
->>> [test5]
->>> startdelay=4
->>> numjobs=1
->>>
->>> [test6]
->>> startdelay=5
->>> numjobs=1
->>>
->>> [test7]
->>> startdelay=6
->>> numjobs=1
->>>
->>> [test8]
->>> startdelay=7
->>> numjobs=1
->>>
->>> test result:
->>> running fio on root cgroup
->>> v5.17-rc6:       550 Mib/s
->>> v5.17-rc6-patched: 550 Mib/s
->>>
->>> running fio on non-root cgroup
->>> v5.17-rc6:       349 Mib/s
->>> v5.17-rc6-patched: 550 Mib/s
->>>
->>> Yu Kuai (11):
->>>    block, bfq: add new apis to iterate bfq entities
->>>    block, bfq: apply news apis where root group is not expected
->>>    block, bfq: cleanup for __bfq_activate_requeue_entity()
->>>    block, bfq: move the increasement of 
->>> 'num_groups_with_pending_reqs' to
->>>      it's caller
->>>    block, bfq: count root group into 'num_groups_with_pending_reqs'
->>>    block, bfq: do not idle if only one cgroup is activated
->>>    block, bfq: only count parent bfqg when bfqq is activated
->>>    block, bfq: record how many queues have pending requests in bfq_group
->>>    block, bfq: move forward __bfq_weights_tree_remove()
->>>    block, bfq: decrease 'num_groups_with_pending_reqs' earlier
->>>    block, bfq: cleanup bfqq_group()
->>>
->>>   block/bfq-cgroup.c  | 13 +++----
->>>   block/bfq-iosched.c | 87 +++++++++++++++++++++++----------------------
->>>   block/bfq-iosched.h | 41 +++++++++++++--------
->>>   block/bfq-wf2q.c    | 56 +++++++++++++++--------------
->>>   4 files changed, 106 insertions(+), 91 deletions(-)
->>>
+>>> Thanks for the testing as well as reporting, Ivan!
+>>
+>> From 1ede54d46f0b1958bfc624f17fe709637ef8f12a Mon Sep 17 00:00:00 2001
+>> From: Minchan Kim <minchan@kernel.org>
+>> Date: Tue, 15 Mar 2022 14:14:23 -0700
+>> Subject: [PATCH] mm: fix unexpected zeroed page mapping with zram swap
+> 
+> Is there any action needed from me to make sure that this lands into
+> the mm tree and eventually into stable releases?
+> 
+
+Sending it as a proper patch with a proper subject, not buried deep down
+in a conversation might help ;)
+
+-- 
+Thanks,
+
+David / dhildenb
+
