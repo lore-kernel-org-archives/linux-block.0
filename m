@@ -2,52 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80D1FC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 16:23:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56A2FC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 16:56:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359069AbiCYQZM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Mar 2022 12:25:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53348 "EHLO
+        id S1345629AbiCYQ6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Mar 2022 12:58:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356998AbiCYQZM (ORCPT
+        with ESMTP id S1377376AbiCYQ6F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Mar 2022 12:25:12 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC3C231925
-        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 09:23:35 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id D4FC868B05; Fri, 25 Mar 2022 17:23:31 +0100 (CET)
-Date:   Fri, 25 Mar 2022 17:23:31 +0100
-From:   Christoph Hellwig <hch@lst.de>
-To:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc:     Christoph Hellwig <hch@lst.de>, Dave Chinner <david@fromorbit.com>,
-        Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
- ->open / ->release
-Message-ID: <20220325162331.GA16355@lst.de>
-References: <20220324075119.1556334-1-hch@lst.de> <20220324075119.1556334-13-hch@lst.de> <20220324141321.pqesnshaswwk3svk@quack3.lan> <96a4e2e7-e16e-7e89-255d-8aa29ffca68b@I-love.SAKURA.ne.jp> <20220324172335.GA28299@lst.de> <0b47dbee-ce17-7502-6bf3-fad939f89bb7@I-love.SAKURA.ne.jp>
+        Fri, 25 Mar 2022 12:58:05 -0400
+Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B17343ED2E;
+        Fri, 25 Mar 2022 09:56:25 -0700 (PDT)
+Received: by mail-vk1-xa29.google.com with SMTP id m84so4542584vke.1;
+        Fri, 25 Mar 2022 09:56:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7fjXSK3Yvyz7mSD5V7xuckH+eT1koYaMuBSGDuDa7Jg=;
+        b=j9Vj4vJzsRg1iLTzat+VUMVIwbpF2OjBrUJLXaU2urPVF2IpHN9mumemI7oSEUSpSS
+         7b27OFfmiVkavRZQ7+T4Q1zse7cIQKk/dYGGNTo9SrMz8fOCyq/JmKX4GTMerWB35KFf
+         DZtxQyYrMlfsaNO9YV0o6tPtGigmFt539hcKgmhOx7qZfRX8G0Uu6FjXT5YOTvuxqP5o
+         DewQyiRA1EqU2ewDRLp8mSVZVSb4aNU1u+nYCJf+LVzB66KI/LZ7SsPokBlKnSCQ6CNq
+         6e0RMzOE+5KTnscXPIv+79D+tlmCuujJIzGWg6Vg6wkXVrnApZgHQ76uQkOexFE+Z6Fl
+         0tsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7fjXSK3Yvyz7mSD5V7xuckH+eT1koYaMuBSGDuDa7Jg=;
+        b=Ih3gVSI4oQXNJrCSBkhFD6/O7zlvJrBSh8q3DerRuDBAG2BRJMF0gRTlW0Fg50jLVp
+         4Tz6TgeXrSuMmXPcrInF+DcyhOH9oBc5IS5ngdq6xOyKIoAqEcSIwL2cRrepFL0sqP/Q
+         g/Q7yNIpDUDJZwQmbClAVa1wo2rCtb1VSJVDAf8+aXPElSJM8TXoLRmi1U82Mw3LeG7Z
+         jtwrz9EVP1fSGSOi02k5/W+SHMfktdyEdD8mO26MOBdphNZKIxPX9/ebLw3MfvgxAgV9
+         fOZieGsRUBuEq0bE3q+NBFJkLihekUcYRu4ZzJ7ZXhuEJD+hiTR9k3gvzZIhcne77jUz
+         L6ug==
+X-Gm-Message-State: AOAM531f8TepZ9hCYT+oMeMJKqo6ESht3JM5brtewmTPWo6fzklEjPxv
+        fkEPyAxnWFFl96RtEjq2BrZxOHsGXC8uO8z1d30=
+X-Google-Smtp-Source: ABdhPJz/8XFnjnwx1Noi+N4DU0S2Tn47QZWN0T95fxmHkeNqxDKorClg2d7HT1mn/rlebzglvDLzHWV0j0okgNNJiW4=
+X-Received: by 2002:a05:6122:8c8:b0:32a:7010:c581 with SMTP id
+ 8-20020a05612208c800b0032a7010c581mr5548291vkg.32.1648227384124; Fri, 25 Mar
+ 2022 09:56:24 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b47dbee-ce17-7502-6bf3-fad939f89bb7@I-love.SAKURA.ne.jp>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+References: <20220324072050.62242-1-jakobkoschel@gmail.com>
+In-Reply-To: <20220324072050.62242-1-jakobkoschel@gmail.com>
+From:   Ilya Dryomov <idryomov@gmail.com>
+Date:   Fri, 25 Mar 2022 17:56:58 +0100
+Message-ID: <CAOi1vP-kHch7eF--yuH=y+V2DyY0v09qTA826=Tqr_YnQDfMBQ@mail.gmail.com>
+Subject: Re: [PATCH] rbd: replace usage of found with dedicated list iterator variable
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     Dongsheng Yang <dongsheng.yang@easystack.cn>,
+        Jens Axboe <axboe@kernel.dk>,
+        Ceph Development <ceph-devel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Mar 25, 2022 at 07:54:15PM +0900, Tetsuo Handa wrote:
-> > But for now I'd really prefer to stop moving the goalpost further and
-> > further.
-> 
-> Then, why not kill this code?
+On Thu, Mar 24, 2022 at 8:21 AM Jakob Koschel <jakobkoschel@gmail.com> wrote:
+>
+> To move the list iterator variable into the list_for_each_entry_*()
+> macro in the future it should be avoided to use the list iterator
+> variable after the loop body.
+>
+> To *never* use the list iterator variable after the loop it was
+> concluded to use a separate iterator variable instead of a
+> found boolean [1].
+>
+> This removes the need to use a found variable and simply checking if
+> the variable was set, can determine if the break/goto was hit.
+>
+> Link: https://lore.kernel.org/all/CAHk-=wgRr_D8CB-D9Kg-c=EHreAsk5SqXPwr9Y7k9sA6cWXJ6w@mail.gmail.com/
+> Signed-off-by: Jakob Koschel <jakobkoschel@gmail.com>
+> ---
+>  drivers/block/rbd.c | 13 ++++++-------
+>  1 file changed, 6 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
+> index b844432bad20..e5f891d058e8 100644
+> --- a/drivers/block/rbd.c
+> +++ b/drivers/block/rbd.c
+> @@ -756,24 +756,23 @@ static struct rbd_client *__rbd_get_client(struct rbd_client *rbdc)
+>   */
+>  static struct rbd_client *rbd_client_find(struct ceph_options *ceph_opts)
+>  {
+> -       struct rbd_client *client_node;
+> -       bool found = false;
+> +       struct rbd_client *client_node = NULL, *iter;
+>
+>         if (ceph_opts->flags & CEPH_OPT_NOSHARE)
+>                 return NULL;
+>
+>         spin_lock(&rbd_client_list_lock);
+> -       list_for_each_entry(client_node, &rbd_client_list, node) {
+> -               if (!ceph_compare_options(ceph_opts, client_node->client)) {
+> -                       __rbd_get_client(client_node);
+> +       list_for_each_entry(iter, &rbd_client_list, node) {
+> +               if (!ceph_compare_options(ceph_opts, iter->client)) {
+> +                       __rbd_get_client(iter);
+>
+> -                       found = true;
+> +                       client_node = iter;
+>                         break;
+>                 }
+>         }
+>         spin_unlock(&rbd_client_list_lock);
+>
+> -       return found ? client_node : NULL;
+> +       return client_node;
+>  }
+>
+>  /*
+>
+> base-commit: f443e374ae131c168a065ea1748feac6b2e76613
+> --
+> 2.25.1
+>
 
-I think we should eventually do that, and I've indeed tested a patch
-that is only cosmetically different.  I wasn't really convinced we
-should do it in this series, but if there is consensus that we should
-do it now I can respin the series with a patch like this included.
+Applied.
+
+Thanks,
+
+                Ilya
