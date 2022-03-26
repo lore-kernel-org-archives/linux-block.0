@@ -2,100 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF83CC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 25 Mar 2022 23:32:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2242FC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 26 Mar 2022 01:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234226AbiCYXdx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Mar 2022 19:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42178 "EHLO
+        id S229883AbiCZBNP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 25 Mar 2022 21:13:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234217AbiCYXdw (ORCPT
+        with ESMTP id S229446AbiCZBNP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Mar 2022 19:33:52 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A17AB5EDE1
-        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 16:32:17 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id jx9so8889997pjb.5
-        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 16:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
-         :subject:content-transfer-encoding;
-        bh=oixGAxtc9S1yvFWVFxAuZyUsgbSJfEBC4tEWOkoMM3k=;
-        b=H/N+De6eHRQZbLGn8dMJwiTfu8BZZjusF2dCxJEbvKbyTi536PFtt91SuRc9v/oPJy
-         qPWM71oct1PbHsdfqnI7o2nTd7hcZ9+ZB3+NukhNC1Cimftk4ZIscZwB7wdoSq2S2Cb8
-         hGRXR8QlG3w9gwyEjAlnvRG3pV//mVuZArcWk0zRDyeH//3cV/t3dHtXG51hPAe9nnSh
-         /Nakfby14UvXhlpH1cVRREYGzYCoQ2uA3DdMYHevTFqEpIjE1ymIWxZlbze1ZzPhKTef
-         jUSAsbszSBVJ6j5yYxUxtTFVixS3QUyXLYG6ZcBU6igvmRk7AAzNuGbnXGb61i2KNA1N
-         J3OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=oixGAxtc9S1yvFWVFxAuZyUsgbSJfEBC4tEWOkoMM3k=;
-        b=t2c8sIZSVfflLdB55H3hsOBa/vDRSwWgBqJX5YTaqCUbGSQFDNOVwR2Bau9h13EbDj
-         6COcKUeghX15VwR/Kw5Adh0kJLXYItLD8zP4R5Owr0L2BaUV03XAVra5+m3oU36JYtvy
-         RaAepdDt0/6P5RCTRkhOqtyS49QdE/qbIFDt/LqYwwZUEFjZsQmDqGLN73N66VkoW9om
-         XOzGnILhRvR6QvK2hcq9IoE8rCMhbUsaqfHXQFqmdUl6DnHL2y49BoEkiWfs6EGaq1ZO
-         1dRNFX0bhu4aYUe6pi45jaw206BqyYI1Ca0854h3HwyHlmH3fH37zNfIzsVNK3f2wPVH
-         M7EA==
-X-Gm-Message-State: AOAM5300RK87yTVfUrZgrLXbWJJHomgs9TgvNarowXGOrRtjtpb1B00W
-        OBv/T0jbIGOOeMxEYJsy/PzwFeVlkD2BYt3h
-X-Google-Smtp-Source: ABdhPJzPvgPO5sXFfsew84C5dcHPsJ1GM8L1iyTzcAV5tXQol0Nw/NBu+i+N1Ec4wYC4PvkdVsV4jA==
-X-Received: by 2002:a17:902:9345:b0:153:4d7a:53d9 with SMTP id g5-20020a170902934500b001534d7a53d9mr14481336plp.116.1648251137067;
-        Fri, 25 Mar 2022 16:32:17 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id n14-20020a17090a394e00b001c670d67b8esm7053893pjf.32.2022.03.25.16.32.16
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 25 Mar 2022 16:32:16 -0700 (PDT)
-Message-ID: <a3c160b2-1e7d-06cd-4644-b2edf136726a@kernel.dk>
-Date:   Fri, 25 Mar 2022 17:32:15 -0600
+        Fri, 25 Mar 2022 21:13:15 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B03FC170D97;
+        Fri, 25 Mar 2022 18:11:39 -0700 (PDT)
+Received: from kwepemi100025.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KQLTN49pKzCrC1;
+        Sat, 26 Mar 2022 09:09:28 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100025.china.huawei.com (7.221.188.158) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 26 Mar 2022 09:11:37 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 26 Mar 2022 09:11:37 +0800
+Subject: Re: [PATCH 2/3] block: factor out common code for part_stat_show()
+ and diskstats_show()
+To:     Christoph Hellwig <hch@infradead.org>
+CC:     <axboe@kernel.dk>, <mpatocka@redhat.com>, <snitzer@redhat.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220317112653.1019490-1-yukuai3@huawei.com>
+ <20220317112653.1019490-3-yukuai3@huawei.com>
+ <Yj2BTUIEooYX/IaA@infradead.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <c6a80995-7af9-3daa-9d5b-ba73f75788be@huawei.com>
+Date:   Sat, 26 Mar 2022 09:11:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Follow up bio allocation fixup
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <Yj2BTUIEooYX/IaA@infradead.org>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+ÔÚ 2022/03/25 16:46, Christoph Hellwig Ð´µÀ:
+> On Thu, Mar 17, 2022 at 07:26:52PM +0800, Yu Kuai wrote:
+>> part_stat_show() and diskstats_show() are very similar, just factor out
+>> common code.
+> 
+> Well, it doesn't really "factor" much, but creates a big and pretty
+> unmaintainble macro.  I don't really see the benefit here.
 
-We got some reports of users seeing:
+Hi,
 
-Unexpected gfp: 0x2 (__GFP_HIGHMEM). Fixing up to gfp: 0x1192888
+Thanks for your advice, I'll remove this patch.
 
-which is a regression caused by the bio allocation cleanups. Please pull
-this followup fix, thanks!
+BTW, do you have any suggestion about patch 3 ?
 
-
-The following changes since commit 64bf0eef0171912f7c2f3ea30ee6ad7a2ad0a511:
-
-  f2fs: pass the bio operation to bio_alloc_bioset (2022-03-08 17:59:03 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/for-5.18/alloc-cleanups-2022-03-25
-
-for you to fetch changes up to 61285ff72ae59e1603f908b13363e99883d67e09:
-
-  fs: do not pass __GFP_HIGHMEM to bio_alloc in do_mpage_readpage (2022-03-23 09:42:15 -0600)
-
-----------------------------------------------------------------
-for-5.18/alloc-cleanups-2022-03-25
-
-----------------------------------------------------------------
-Christoph Hellwig (1):
-      fs: do not pass __GFP_HIGHMEM to bio_alloc in do_mpage_readpage
-
- fs/mpage.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
--- 
-Jens Axboe
-
+Thanks,
+Kuai
+> .
+> 
