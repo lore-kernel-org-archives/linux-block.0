@@ -2,222 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A197C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 26 Mar 2022 03:19:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDBC4C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 26 Mar 2022 08:58:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230440AbiCZDVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 25 Mar 2022 23:21:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43218 "EHLO
+        id S232166AbiCZI7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 26 Mar 2022 04:59:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230415AbiCZDVE (ORCPT
+        with ESMTP id S231671AbiCZI7g (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 25 Mar 2022 23:21:04 -0400
-Received: from mailout1.samsung.com (mailout1.samsung.com [203.254.224.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA1B2506E5
-        for <linux-block@vger.kernel.org>; Fri, 25 Mar 2022 20:19:23 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20220326031919epoutp01a75eb0bc0f061379ed610330fb81c145~f0BDkjPFd1704617046epoutp01G
-        for <linux-block@vger.kernel.org>; Sat, 26 Mar 2022 03:19:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20220326031919epoutp01a75eb0bc0f061379ed610330fb81c145~f0BDkjPFd1704617046epoutp01G
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1648264759;
-        bh=F0N8qMeD0azlIV/3buov8aYHcihb5aLD/QeHO9g9Lfw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=bvryxoTBXggI8k7QxPQ2UJ8zHY1t14BISLyKOaEnh0GIUbgBvhAV/aWl9cxuBSg2U
-         AneFoP8+6TekYc5uYPV7B1ghx7EQQD2tHz3AM98jLP+mjhXrOkX1iE61k++PbPkNxk
-         eYlKuLAsuYYfUGOrZW6WHDk4PNL27n7wRewDeGyE=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20220326031919epcas5p3b798f432c72e2951210a076642884495~f0BDIZ28S0726907269epcas5p3i;
-        Sat, 26 Mar 2022 03:19:19 +0000 (GMT)
-Received: from epsmges5p2new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4KQPM74QK7z4x9Q0; Sat, 26 Mar
-        2022 03:19:15 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        A1.C2.12523.3368E326; Sat, 26 Mar 2022 12:19:15 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
-        20220325134426epcas5p41f9bb3a823879981550237281458ad6e~fo5kC5pcs2339723397epcas5p4I;
-        Fri, 25 Mar 2022 13:44:26 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220325134426epsmtrp130df0ddebfed92e2b430677f028d3d4a~fo5kB8I9I0574005740epsmtrp1Z;
-        Fri, 25 Mar 2022 13:44:26 +0000 (GMT)
-X-AuditID: b6c32a4a-5a1ff700000030eb-34-623e86334397
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        65.1A.29871.A37CD326; Fri, 25 Mar 2022 22:44:26 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220325134423epsmtip24e5d06ec63fbe8b4f0e3c4aceca7a4e8~fo5h7EN3q0616106161epsmtip2a;
-        Fri, 25 Mar 2022 13:44:23 +0000 (GMT)
-Date:   Fri, 25 Mar 2022 19:09:21 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshiiitr@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        Javier =?utf-8?B?R29uesOhbGV6?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
-Message-ID: <20220325133921.GA13818@test-zns>
+        Sat, 26 Mar 2022 04:59:36 -0400
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 638872963F2
+        for <linux-block@vger.kernel.org>; Sat, 26 Mar 2022 01:58:00 -0700 (PDT)
+Received: from ptx.hi.pengutronix.de ([2001:67c:670:100:1d::c0])
+        by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+        (Exim 4.92)
+        (envelope-from <ore@pengutronix.de>)
+        id 1nY2FB-0002cj-KB; Sat, 26 Mar 2022 09:57:57 +0100
+Received: from ore by ptx.hi.pengutronix.de with local (Exim 4.92)
+        (envelope-from <ore@pengutronix.de>)
+        id 1nY2F9-0001JP-Jh; Sat, 26 Mar 2022 09:57:55 +0100
+Date:   Sat, 26 Mar 2022 09:57:55 +0100
+From:   Oleksij Rempel <o.rempel@pengutronix.de>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v2 4/4] block/mq-deadline: Prioritize high-priority
+ requests
+Message-ID: <20220326085755.GB27264@pengutronix.de>
+References: <20210927220328.1410161-1-bvanassche@acm.org>
+ <20210927220328.1410161-5-bvanassche@acm.org>
+ <Yj22kLrsw+z7sj7R@pengutronix.de>
+ <180dc22b-4fee-93c2-9813-1b4f109b5dc7@acm.org>
 MIME-Version: 1.0
-In-Reply-To: <20220324063218.GC12660@lst.de>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrKJsWRmVeSWpSXmKPExsWy7bCmpq5xm12SwaPrihbTDytaNE34y2wx
-        Z9U2RovVd/vZLFauPspk8a71HItF5+kLTBbn3x5msph06Bqjxd5b2hbzlz1lt1jSepzN4saE
-        p4wWa24+ZbH4fGYeqwO/x7Orzxg9ds66y+7RvOAOi8fls6Uem1Z1snlsXlLvsftmA5vHtsUv
-        WT36tqxi9Pi8SS6AKyrbJiM1MSW1SCE1Lzk/JTMv3VbJOzjeOd7UzMBQ19DSwlxJIS8xN9VW
-        ycUnQNctMwfoByWFssScUqBQQGJxsZK+nU1RfmlJqkJGfnGJrVJqQUpOgUmBXnFibnFpXrpe
-        XmqJlaGBgZEpUGFCdkZ7/3SWgqOyFee2NzI2MN4S62Lk5JAQMJE4eP4BSxcjF4eQwG5GiX9/
-        J0E5nxglJi/ewQ5SJSTwjVHiyMRsmI6rP/vYIIr2MkrseniCHcJ5xiix/tMjRpAqFgFVia6f
-        74BGcXCwCWhKXJhcChIWEVCSePrqLCNIPbPAG2aJtb/3soIkhAVcJDb2XmMDqecV0JX4sqgI
-        JMwrIChxcuYTsDGcAjoSz/+7g4RFBZQlDmw7zgQyRkLgDofEmo7tzCA1EkBjei7qQdwpLPHq
-        +BZ2CFtK4mV/G5SdLNG6/TI7RHmJxJIF6hBhe4mLe/4ygdjMAukSjw80Q5XLSkw9tQ4qzifR
-        +/sJE0ScV2LHPBhbUeLepKesELa4xMMZS6BsD4njja8YIaEzk0Vi271OlgmM8rOQfDYLyT4I
-        20qi80MT6yyg85gFpCWW/+OAMDUl1u/SX8DIuopRMrWgODc9tdi0wCgvtRwe28n5uZsYwelb
-        y2sH48MHH/QOMTJxMB5ilOBgVhLhvX/ZOkmINyWxsiq1KD++qDQntfgQoykwoiYyS4km5wMz
-        SF5JvKGJpYGJmZmZiaWxmaGSOO/p9A2JQgLpiSWp2ampBalFMH1MHJxSDUy+LXtKzzEckhV2
-        KHN97bP5+YtTgi89Qiv0/C/J2DkGKTVXRyQ4emdeUL1o25w7dfHarW/mrLh/yNpfwNb08fRd
-        zj6Biu//HnfXlZZwuS2WlP/Buf+UZ6slc9ziwODyT/Ou3Tj/QL+UK7XqBeOUY8dupyzZsujf
-        yUlzCzZNnLzp8xZBzddsX14uUJqtc+rgjUtT8tafu6G2v1R7XVWWvtSq7rkyX36sjV73WOla
-        9mQ9i9tzHnaECufkes2Zt+xc8aE+zRO96YczTrwsZ0v+4Rm+vr5yv5D/lhy//p+7fK6L6+oZ
-        ihcJ+ZbWnog8uXDj7CO3Z1qs9fOwibXXvTnpyIQXTLd3N67iXja1fLbskr0SSizFGYmGWsxF
-        xYkAc8KG9mgEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprJIsWRmVeSWpSXmKPExsWy7bCSvK7Vcdskg83XWS2mH1a0aJrwl9li
-        zqptjBar7/azWaxcfZTJ4l3rORaLztMXmCzOvz3MZDHp0DVGi723tC3mL3vKbrGk9TibxY0J
-        Txkt1tx8ymLx+cw8Vgd+j2dXnzF67Jx1l92jecEdFo/LZ0s9Nq3qZPPYvKTeY/fNBjaPbYtf
-        snr0bVnF6PF5k1wAVxSXTUpqTmZZapG+XQJXxobJ+xgLfklVHH3Vz9TAuFKki5GTQ0LAROLq
-        zz62LkYuDiGB3YwSn/dcYoFIiEs0X/vBDmELS6z895wdougJo8Sd3gtsIAkWAVWJrp/vgBo4
-        ONgENCUuTC4FCYsIKEk8fXWWEaSeWeATs8Tm14vA6oUFXCQ29l5jA6nnFdCV+LKoCGLmTBaJ
-        yzOPMYLU8AoISpyc+QTsCGYBM4l5mx8yg9QzC0hLLP/HAWJyCuhIPP/vDlIhKqAscWDbcaYJ
-        jIKzkDTPQtI8C6F5ASPzKkbJ1ILi3PTcYsMCw7zUcr3ixNzi0rx0veT83E2M4NjT0tzBuH3V
-        B71DjEwcjIcYJTiYlUR471+2ThLiTUmsrEotyo8vKs1JLT7EKM3BoiTOe6HrZLyQQHpiSWp2
-        ampBahFMlomDU6qBicd2/ZVty9bYFl1PyuTcv/CvSo5aFldmp2pQVWNlps45zXebtCetzOXs
-        mXRo/VcP6V6Fd/MV/r86xaBk8r9j4YcPT+TF8maYM7fLrm6cZ9R8Lp417LPjEbOpRmlCu+qm
-        n+F4zGSvM/v1BZUreiaPWFbrVsu+b/C2WXY5duGHHXX7vqo/kG998XeCiq6USOGmJXq6d8Sn
-        HjxQ1WN0IstremmfzS6pBo0Ckb3OtscCdRjy924qLU1a5c/tvO2YrVAXJ+8LfpUbpTF9u0ME
-        zHc9ObWlMPD8R/ENP/Ub9zsn1m0I6pxjr7rWOEmqKIl/0t/VHktKRLgfftyzsOjb1W1318V1
-        XpQv/xggyGSsfMhQiaU4I9FQi7moOBEA1ygI6iwDAAA=
-X-CMS-MailID: 20220325134426epcas5p41f9bb3a823879981550237281458ad6e
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----48ALem4cADf3xwa-0Uc1Gf-iSzVqekzis73It7X2K98eFieH=_67a8_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3
-References: <20220308152105.309618-1-joshi.k@samsung.com>
-        <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
-        <20220308152105.309618-18-joshi.k@samsung.com>
-        <20220310083652.GF26614@lst.de>
-        <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
-        <20220310141945.GA890@lst.de>
-        <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
-        <20220311062710.GA17232@lst.de>
-        <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
-        <20220324063218.GC12660@lst.de>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <180dc22b-4fee-93c2-9813-1b4f109b5dc7@acm.org>
+X-Sent-From: Pengutronix Hildesheim
+X-URL:  http://www.pengutronix.de/
+X-IRC:  #ptxdist @freenode
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-Uptime: 09:50:39 up 105 days, 17:36, 57 users,  load average: 0.10, 0.07,
+ 0.07
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-SA-Exim-Connect-IP: 2001:67c:670:100:1d::c0
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: linux-block@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------48ALem4cADf3xwa-0Uc1Gf-iSzVqekzis73It7X2K98eFieH=_67a8_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+On Fri, Mar 25, 2022 at 10:05:43AM -0700, Bart Van Assche wrote:
+> On 3/25/22 05:33, Oleksij Rempel wrote:
+> > I have regression on iMX6 + USB storage device with this patch.
+> > After plugging USB Flash driver (in my case USB3 Intenso 32GB) and
+> > running mount /dev/sda1 /mnt, the command will never exit.
+> > 
+> > Reverting this patchs (322cff70d46) on top of v5.17 solves it for me.
+> > 
+> > How can I help you to debug this issue?
+> 
+> That is unexpected. Is there perhaps something special about the USB
+> stick for which the hang occurs, e.g. the queue depth it supports is
+> low? Can you please share the output of the following commands after
+> having inserted the USB stick that triggers the hang?
+> 
+> (cd /sys/class && grep -aH . scsi_host/*/can_queue scsi_device/*/device/{blacklist,inquiry,model,queue*,vendor}) | sort
 
-On Thu, Mar 24, 2022 at 07:32:18AM +0100, Christoph Hellwig wrote:
->On Tue, Mar 22, 2022 at 10:40:27PM +0530, Kanchan Joshi wrote:
->> On Fri, Mar 11, 2022 at 11:57 AM Christoph Hellwig <hch@lst.de> wrote:
->> > > And that's because this ioctl requires additional "__u64 result;" to
->> > > be updated within "struct nvme_passthru_cmd64".
->> > > To update that during completion, we need, at the least, the result
->> > > field to be a pointer "__u64 result_ptr" inside the struct
->> > > nvme_passthru_cmd64.
->> > > Do you see that is possible without adding a new passthru ioctl in nvme?
->> >
->> > We don't need a new passthrough ioctl in nvme.
->> Right. Maybe it is easier for applications if they get to use the same
->> ioctl opcode/structure that they know well already.
->
->I disagree.  Reusing the same opcode and/or structure for something
->fundamentally different creates major confusion.  Don't do it.
+Here it is:
+root@test:/sys/class cat scsi_host/*/can_queue
+1
+root@test:/sys/class cat scsi_device/*/device/blacklist
+root@test:/sys/class cat scsi_device/*/device/inquiry
+Intenso Speed Line      1.00
+root@test:/sys/class cat scsi_device/*/device/model
+Speed Line      
+root@test:/sys/class cat scsi_device/*/device/queue*
+1
+none
+root@test:/sys/class cat scsi_device/*/device/vendor
+Intenso 
 
-Ok. If you are open to take new opcode/struct route, that is all we
-require to pair with big-sqe and have this sorted. How about this -
+I do not know, if there is something special about it. If needed, i can
+take it apart to see what controller is used.
 
-+/* same as nvme_passthru_cmd64 but expecting result field to be pointer */
-+struct nvme_passthru_cmd64_ind {
-+       __u8    opcode;
-+       __u8    flags;
-+       __u16   rsvd1;
-+       __u32   nsid;
-+       __u32   cdw2;
-+       __u32   cdw3;
-+       __u64   metadata;
-+       __u64   addr;
-+       __u32   metadata_len;
-+       union {
-+               __u32   data_len; /* for non-vectored io */
-+               __u32   vec_cnt; /* for vectored io */
-+       };
-+       __u32   cdw10;
-+       __u32   cdw11;
-+       __u32   cdw12;
-+       __u32   cdw13;
-+       __u32   cdw14;
-+       __u32   cdw15;
-+       __u32   timeout_ms;
-+       __u32   rsvd2;
-+       __u64   presult; /* pointer to result */
-+};
-+
- #define nvme_admin_cmd nvme_passthru_cmd
-
-+#define NVME_IOCTL_IO64_CMD_IND        _IOWR('N', 0x50, struct nvme_passthru_cmd64_ind)
-
-Not heavy on code-volume too, because only one statement (updating
-result) changes and we reuse everything else.
-
->> >From all that we discussed, maybe the path forward could be this:
->> - inline-cmd/big-sqe is useful if paired with big-cqe. Drop big-sqe
->> for now if we cannot go the big-cqe route.
->> - use only indirect-cmd as this requires nothing special, just regular
->> sqe and cqe. We can support all passthru commands with a lot less
->> code. No new ioctl in nvme, so same semantics. For common commands
->> (i.e. read/write) we can still avoid updating the result (put_user
->> cost will go).
->>
->> Please suggest if we should approach this any differently in v2.
->
->Personally I think larger SQEs and CQEs are the only sensible interface
->here.  Everything else just fails like a horrible hack I would not want
->to support in NVMe.
-
-So far we have gathered three choices: 
-
-(a) big-sqe + new opcode/struct in nvme
-(b) big-sqe + big-cqe
-(c) regular-sqe + regular-cqe
-
-I can post a RFC on big-cqe work if that is what it takes to evaluate
-clearly what path to take. But really, the code is much more compared
-to choice (a) and (c). Differentiating one CQE with another does not
-seem very maintenance-friendly, particularly in liburing.
-
-For (c), I did not get what part feels like horrible hack.
-It is same as how we do sync passthru - read passthru command from
-user-space memory, and update result into that on completion.
-But yes, (a) seems like the best option to me.
-
-------48ALem4cADf3xwa-0Uc1Gf-iSzVqekzis73It7X2K98eFieH=_67a8_
-Content-Type: text/plain; charset="utf-8"
-
-
-------48ALem4cADf3xwa-0Uc1Gf-iSzVqekzis73It7X2K98eFieH=_67a8_--
+Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
