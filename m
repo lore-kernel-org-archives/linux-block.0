@@ -2,68 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F614C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 26 Mar 2022 20:18:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC9E5C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 27 Mar 2022 07:09:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235530AbiCZUUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 26 Mar 2022 16:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53060 "EHLO
+        id S235586AbiC0HLJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Mar 2022 03:11:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235491AbiCZUTx (ORCPT
+        with ESMTP id S231994AbiC0HLD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 26 Mar 2022 16:19:53 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2AC9606D9
-        for <linux-block@vger.kernel.org>; Sat, 26 Mar 2022 13:18:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 172FACE0BBC
-        for <linux-block@vger.kernel.org>; Sat, 26 Mar 2022 20:18:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 881B8C36AE2;
-        Sat, 26 Mar 2022 20:18:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648325890;
-        bh=Cn7QpZS1h0EgUPz7JHfAIM6uIrl0UGR4MkMzOL0npew=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=omiEJ+tVY/HQgnfnAYmXGFwM33i5mXSmWQz7CAdDXamKU571bW38r/jQYJb3MLprX
-         GaovUc/pEOtO70LT+QwIQBbUbKb63eE4RtDWusem/CZHc4lsA9E+nu2zA3GQgkBVN5
-         bViTHXt9RtJdyu9CGv0NwyAVzTEfVMXZBSDyWd+FCAjsN8hMS2uWd4AgL2aHMuuwwd
-         VM55fcmZHM7u0FW12Kkosfyj/Hfl6fkYmK5L1mDofi2fYzc7t98Aj7R4Z1HfBqlL2x
-         VcxtQUKDonEuIcdzraDN8vpEL4FZ5PT5p5PsIXR8YQd0APaFLfUpBz+FoQeX5De240
-         ulh8oqvTmsg1A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 77403E6D402;
-        Sat, 26 Mar 2022 20:18:10 +0000 (UTC)
-Subject: Re: [GIT PULL] Support for 64-bit data integrity
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <37e3c459-0de0-3d23-11d2-7d7d39e5e941@kernel.dk>
-References: <37e3c459-0de0-3d23-11d2-7d7d39e5e941@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <37e3c459-0de0-3d23-11d2-7d7d39e5e941@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.18/64bit-pi-2022-03-25
-X-PR-Tracked-Commit-Id: 1e21270685ae4c14361dd501da62cdc4be867d4e
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3f7282139fe1594be464b90141d56738e7a0ea8a
-Message-Id: <164832589048.7233.14910005659096987314.pr-tracker-bot@kernel.org>
-Date:   Sat, 26 Mar 2022 20:18:10 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        Sun, 27 Mar 2022 03:11:03 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C7AD1D31F;
+        Sun, 27 Mar 2022 00:09:26 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id w7so7229063pfu.11;
+        Sun, 27 Mar 2022 00:09:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id;
+        bh=Dswsk0jetBijYktZ7SH96xaSPfRhbnA9l3ZIGPdBlrI=;
+        b=i6+b2XSkalNg6DOhuZPtEKFGG0z1vvDdmoEcVQ4ypDwvzICeXJOv4LFhwpx2x18QS+
+         AhlWIC4s2MpT+zM5Ora+fCociP/CzNaaxGO+mJO+Z7nuQbZL7hQ1oRJlNk+n19Hq4lgb
+         7A4rHk02cWxNisZq8XWes7odzO7hdXfD5DMzQIuPQjiRbP1yr1N0cCB7cM7R8ohpRLPx
+         YINtCTy1tB07UxDqqu34cU/PVkwNZBOMFK0p8ZA/Dr3q9nYRJ8HLG8q214dSGaW1ETG9
+         QrK6+hgJlceQmK7rDuk2ew0kSGyBPUZ1iORntFv13yzMoDOr4mqV6wloQ1dkju8jS0pY
+         qzMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=Dswsk0jetBijYktZ7SH96xaSPfRhbnA9l3ZIGPdBlrI=;
+        b=NcSGL6uQpOQSa0RiOjLuqWars9ssyBuYTw7Dya365IVU0YJOZ4t9AH0T5p0kbYSI6x
+         1RHT3eBwdfZ9xFn9sSg0U+jJNX5OPppH6/XJQSMtG7hWaM2XoKv+gPcGhxK7GYpOauG9
+         I3buVK+nZJMDqW2cDq2IyjRx5LdtK2rAct9BJhXlzwi0Wa6zIodJucDsOvUUzmnJ+FJs
+         PMW5KdCFp1CIhV7t/nj/0JowlEW3f8o5gZlaDJRMu+zo8/dNIOe5oBcLo72i91c/ykFQ
+         H64XxmZ8WCVpGHHe0jQnT0ver5Lktdxyb9RYcXSrrPcCd0N91tFKR8WBzNN7ybJ6i788
+         DlIw==
+X-Gm-Message-State: AOAM531sXJcYJtlL5ZlyUXH3QIszTPcgeYrZ0w/OVahIJLoGgv55WaYT
+        dTAgtJKNxWtlMZaAwX4ITpw=
+X-Google-Smtp-Source: ABdhPJymh6IMTtnDyhTTmlhAfbLgWrj5zjZfypZgJnag3MlTplfc8wEo9bq0GVF9wmHFKQk5NpcMMg==
+X-Received: by 2002:a63:de0c:0:b0:378:9365:c3c6 with SMTP id f12-20020a63de0c000000b003789365c3c6mr5894337pgg.301.1648364965504;
+        Sun, 27 Mar 2022 00:09:25 -0700 (PDT)
+Received: from localhost ([115.220.243.108])
+        by smtp.gmail.com with ESMTPSA id k14-20020aa7820e000000b004f7134a70cdsm11349504pfi.61.2022.03.27.00.09.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+        Sun, 27 Mar 2022 00:09:24 -0700 (PDT)
+From:   Xiaomeng Tong <xiam0nd.tong@gmail.com>
+To:     philipp.reisner@linbit.com
+Cc:     lars.ellenberg@linbit.com, axboe@kernel.dk, agruen@linbit.com,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Xiaomeng Tong <xiam0nd.tong@gmail.com>, stable@vger.kernel.org
+Subject: [PATCH] drbd: fix an invalid memory access caused by incorrect use of list iterator
+Date:   Sun, 27 Mar 2022 15:09:18 +0800
+Message-Id: <20220327070918.8465-1-xiam0nd.tong@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 25 Mar 2022 09:18:35 -0600:
+The bug is here:
+	idr_remove(&connection->peer_devices, vnr);
 
-> git://git.kernel.dk/linux-block.git tags/for-5.18/64bit-pi-2022-03-25
+If the previous for_each_connection() don't exit early (no goto hit
+inside the loop), the iterator 'connection' after the loop will be a
+bogus pointer to an invalid structure object containing the HEAD
+(&resource->connections). As a result, the use of 'connection' above
+will lead to a invalid memory access (including a possible invalid free
+as idr_remove could call free_layer).
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3f7282139fe1594be464b90141d56738e7a0ea8a
+The original intention should have been to remove all peer_devices,
+but the following lines have already done the work. So just remove
+this line and the unneeded label, to fix this bug.
 
-Thank you!
+Cc: stable@vger.kernel.org
+Fixes: c06ece6ba6f1b ("drbd: Turn connection->volumes into connection->peer_devices")
+Signed-off-by: Xiaomeng Tong <xiam0nd.tong@gmail.com>
+---
+ drivers/block/drbd/drbd_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 6f450816c4fa..5d5beeba3ed4 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -2793,12 +2793,12 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 
+ 	if (init_submitter(device)) {
+ 		err = ERR_NOMEM;
+-		goto out_idr_remove_vol;
++		goto out_idr_remove_from_resource;
+ 	}
+ 
+ 	err = add_disk(disk);
+ 	if (err)
+-		goto out_idr_remove_vol;
++		goto out_idr_remove_from_resource;
+ 
+ 	/* inherit the connection state */
+ 	device->state.conn = first_connection(resource)->cstate;
+@@ -2812,8 +2812,6 @@ enum drbd_ret_code drbd_create_device(struct drbd_config_context *adm_ctx, unsig
+ 	drbd_debugfs_device_add(device);
+ 	return NO_ERROR;
+ 
+-out_idr_remove_vol:
+-	idr_remove(&connection->peer_devices, vnr);
+ out_idr_remove_from_resource:
+ 	for_each_connection(connection, resource) {
+ 		peer_device = idr_remove(&connection->peer_devices, vnr);
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.17.1
+
