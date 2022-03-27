@@ -2,144 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6737C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 27 Mar 2022 15:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4059CC433F5
+	for <linux-block@archiver.kernel.org>; Sun, 27 Mar 2022 16:35:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235907AbiC0P4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 27 Mar 2022 11:56:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51686 "EHLO
+        id S236026AbiC0Qh3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 27 Mar 2022 12:37:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230219AbiC0P4b (ORCPT
+        with ESMTP id S231373AbiC0Qh2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 27 Mar 2022 11:56:31 -0400
-Received: from IND01-MA1-obe.outbound.protection.outlook.com (mail-ma1ind01olkn0182.outbound.protection.outlook.com [104.47.100.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60BE0120A9;
-        Sun, 27 Mar 2022 08:54:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BVmSPLlj4K8t8xGIofp2WNNzHU4TMaCGDumxmud8Bo077IFKb0fmgWUGyink+rMr1PE9fa5RaSdVyoEf+JPIoIw7zOgb1bf9t8jesox+yTa/6O+ZwrajiNHeLhdWN8i3qmNWQpGKeN83JM+vSPtUOiIitKHD9GVJJmJN5K77YuAi15JCX4ryHPGr0xVacoM3o8g1cruzpx8oxaNnRu3xompkFdAXMxtE5go+MsncuPbcGJC1gGBVsDRJwY95VHtsHnc10tzL+0IcUaUtMWyZagW7dHxbvbBq0IZJ+kznyvdBir34HA3XU/ZPrbSayNmY/08up5ZJUcCaa3cbu8T+CQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=332RzeANlZkgMlVT7KnX9t8T8LJu2FySmHdFdviKUw4=;
- b=nfJ5Vi2Kmkwcon44cmzmDrnGp6qLoG4phhM64iSIThTWCwmA2rXk5cDZAN4722sc4UEEZgbjDY8zDRxEEeuF84xY9cCcrjkGET3C77rx9ca9AwZvhzRv7vVRmgDU979iTGW2D/ugL29mX+oKNJk3FyV9l73aLH+lqObBVqiRsZq8DdkSY5Jmkg7MHApnpnQxXK0wXqnhnnB7bvweFoSmPERuAmOy/58E6MjswiV+8GEryhytO2sPeGYwfMneRvTA8GqG5TgIYcahPhgilUMdu/1FcL5/vbdowCsVEnba05V9Vr01ud8Kq4xEkkY1mrIiT1VfcFdGCnRCwboPrb8I+w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=332RzeANlZkgMlVT7KnX9t8T8LJu2FySmHdFdviKUw4=;
- b=qxVvlx3L0hnASB8oJ8ARUnQ/tAZ7jjtqQwhsH3H1TJNeY+U7Dab5T/R7EKB3W1HyVzTa2X6Fmgpvoq+g8I9lhvLEADxCaKD/tB0LeB0S2rDcLMxOS3W+y0Zf+kTnMvBC8/t8n3de55MiN+n0ERxsv6vXn5iylKQSQasny9Ljlu9a6EGkZyE117/Zu952PLXyD3FcvKdE7wSbzBLUXULCQEBjs/uoPRObQZeA3x1HWzcPm0e9Icz2jxUiy4iyIjznHOxzLWGTwZERTWXFGED+EkWFbwD6RXw4eD7PyJlpcqJKeXCtvTDhFkMutnLtWqyg9/MpwnUeA/wSyTvW3x5VlA==
-Received: from MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a01:5c::7)
- by MAXPR01MB4166.INDPRD01.PROD.OUTLOOK.COM (2603:1096:a01:5::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.17; Sun, 27 Mar
- 2022 15:54:48 +0000
-Received: from MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::1983:1d86:32f7:4c2]) by MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::1983:1d86:32f7:4c2%7]) with mapi id 15.20.5102.019; Sun, 27 Mar 2022
- 15:54:48 +0000
-Message-ID: <MA0PR01MB7443B82F782378825531D702B41C9@MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM>
-Subject: [PATCH] Removing the unused TODO
-From:   Dipankar Das <dipsonu10@hotmail.com>
-To:     dave@stgolabs.net, axboe@kernel.dk
-Cc:     linux-efi@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, dipsonu10@hotmail.com
-Date:   Sun, 27 Mar 2022 21:24:40 +0530
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5-0ubuntu1 
-Content-Transfer-Encoding: 7bit
-X-TMN:  [DxIGcH3BlopwL89DYLTa5mnZNmdv/uCD]
-X-ClientProxiedBy: BM1PR0101CA0041.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:b00:1a::27) To MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:5c::7)
-X-Microsoft-Original-Message-ID: <f585897e03b85d4ff13c96223893264c2a3de801.camel@hotmail.com>
+        Sun, 27 Mar 2022 12:37:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 61B8413E3D
+        for <linux-block@vger.kernel.org>; Sun, 27 Mar 2022 09:35:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648398948;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=+lQQjfFsQ51Od5mIf4Q3nNReRLr9i5dQC+GPcw/OCa4=;
+        b=fI/FhGqEpChHbQTtsburPiD596gFbgYfTvPNltCLgpQKW8Dtav76JTy5sOpeAyAM45tKP2
+        tnR3ZLTgAad6rAU8KNFfRrDA2y8DjR670MK6dvrWPkwRmXkkaDfaxe9jXNXYBHn/m2cKCJ
+        eyE/BcuujhIIHrzyKE32U5xByn44/6g=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-541-CwFRt_a3N6WRHIYUPi4CxQ-1; Sun, 27 Mar 2022 12:35:44 -0400
+X-MC-Unique: CwFRt_a3N6WRHIYUPi4CxQ-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 52AFE3C02181;
+        Sun, 27 Mar 2022 16:35:44 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 41F6A401E7E;
+        Sun, 27 Mar 2022 16:35:38 +0000 (UTC)
+Date:   Mon, 28 Mar 2022 00:35:33 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-mm@kvack.org
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Message-ID: <YkCSVSk1SwvtABIW@T590>
+References: <87tucsf0sr.fsf@collabora.com>
+ <986caf55-65d1-0755-383b-73834ec04967@suse.de>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5fba3e7b-da11-44b2-218d-08da100a1d5d
-X-MS-Exchange-SLBlob-MailProps: 79Jo46q8hhAGd6HLJWKohVWz45gMXq9RzesEPAiP3hgmNAbZ46ZztfdXa2kOfTeCx2tsufgphnerouSYEmzCPVglKSvzFrZysjTYNwL1k/KUG/otKMm5DbDxpBZSffaJ8cyO6osh1cb3ww0rdY2ibzDoKElcbNpC8TQgb5RYlOcCRZJETH2cEIvVXrSE6Z17JEdSYlWYxp7jlRLA6X7cejFbFdGJkFoJNXB9smpxSIkyKDJ743U9yydPELdZCg4YKpXkd/Skb7imCkvA5yeyeMtjJvFcwqqy+PJS6a/x223N3ETLDEoWQKoU5vJjKu3GFfux/lRvtd+aYYxZpMZ5E+4/pSqchRWAlZoGx9FObn1CIs6j3I2Z5vmohqNJPLNkMVPyHnRcZqWeuDL2kXWyta6yHcSGrByPD7+i0Z9NhE/pGgOu1fmXi8TYh8Rjnl82wITwMh0Y50g2zVrC1MxdRULcN7PQmvvcKHwmW60dpqcHX5SGFt7x3cvWqrPntUZPrIWhKlXL1W4gPpIebDeVSOCmLIWTEYaLVwvOw931lL4TeYl1R/l+krYDaZQLywAlPD0Zu6edxqT4pyzS5BP8QtQYjhgsC/etfI/aLb8D6ygNjk6PrZdh8bbbF5bHhBBQJ79Y32FmuQuGdUjAu8lAzYSWJr1A0n+d2upqiP83vuw99hiwn+Zb6SiVu+PZ2COo
-X-MS-TrafficTypeDiagnostic: MAXPR01MB4166:EE_
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IQXVrXtcrs3TE5/Mj+H7p1SBpz/DEVQoFIUMTJ/yJC+eMLTdeVz+PiutERaLBKB0zejpAjTf3n0gJd9IcOr0bgcatUJycdudwbfKLjJ4Ebldjve3ULfb/Q+xSzwyk4w3CEsnNoXJouni2zDxOwu89JYek2WYxH//lBMUtAygS4AbdoBKKgLTiEA6gJRB8zkmARXfP06k/osyKdWG2jSV7hjnTn8r5RAV/dosl6BtC30hR9RaEkmUMsPL8ivpBUNNxOXpzIp++TUe3zg9yYcvAYHn0dI8e7NMbYh39o6SLFWqQYnSuavnIiCocYDLhjZYyOB78HRAYQT8/w6DPcWhVTpC6KCxx9rGhK+i5fraxNwX0mE4KR4yaZHr+7V7PncYB12gOBknFmB3BtTRxnzmja0zstkYRi+UygRr+PBJ8sfQJlLcXPsuGpcXM1x/On/DYR3jrBjRs8qkDjAh10u2tf8tx6HnJzdXtdGG+R85JpTeq2isJD22SQjkDRc0NDoeIaXPXlqHaHja2whN0mVfRf9IpM1nFd84nvTbgpwC7EeRKIzVT4jPBeW9jFekQ+l/HmuR+flmM+0H5cN8HGJGxg==
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Q3NtSzVaWjV0azE1L3JUdXN5OFAvZCtTZG5pZFZrVkV3SjZEYWZkS3htV0pQ?=
- =?utf-8?B?aVl2TDNHVXRpUHdBeVBORVU1RG1ocys5dUp4V3NVV0lIZzRLSU15ZzU5SDN5?=
- =?utf-8?B?TlhtNys1bjN5K3pydXZyYVM0c0Rvd3pNTC9zMjJiWWNRZDFjbVFuNjA5ZHps?=
- =?utf-8?B?TjdKTzZuaU1pdjliV1NIa0VoWHBkQjVMcWh1WGY1R2VmaGtNdWlhVEMwL2Jp?=
- =?utf-8?B?WGF3elE1SjMvaXREYnE1UTlrY0lzdzFxT2lJaENHQ01EYzJiRS84b3VyTFIr?=
- =?utf-8?B?SjVteVFZYjRBNndETHJDb0pyUGxIRkU3MkNnejNZaW8wQWlZK2RobkpFYk1P?=
- =?utf-8?B?dU9aRG04eVQ4a3ZFNENtdEtwcmQwUlovNXpuYW5KYTNQTlB6SmluWDRJcVdX?=
- =?utf-8?B?bGFPeENUbDlWWk5zZlM1SWdzdmx0UTJubm43Q2FYQVArL1dPTTZmbTBrMnRJ?=
- =?utf-8?B?SjhDNUxTd2RtWVhGY0ZjZDFaL2tGNGVMMnR5allGR2JIclkwM1MyNGhkaHFW?=
- =?utf-8?B?WWJRV0J2cnpUZnd2ZEtCQVZFTTJpaEYvazhQQ09PNDFBK0RPUVdvbnAzT1Br?=
- =?utf-8?B?MG1qdTAzMDcremNENTR6RDZOU0VIbkdybERCZy9GanZhMlJXK0ZXZVNtSlpV?=
- =?utf-8?B?M3M4Y0hYaWd0blAvU1d5aEdIQzYzUzl5aXJ2TzBJOTkyNHZLc29odk4wblda?=
- =?utf-8?B?K0wydUEzNm01Q21QNmhkMFRTYWNZeVFFQk1OY2RocTJTSXJDVytnN0hXaEpu?=
- =?utf-8?B?eXZHWDhIYXpCSjlzSnIzMnV6TmZwWHh1aUprUmR0VDVmMUluSzJvNElFWFQw?=
- =?utf-8?B?NlZzUGdJT0hQeTNsSGk0T1ZIUkFtcmhibVh5SnlFQ0pGRFU4a1BHNXc0Y2U1?=
- =?utf-8?B?bzRWcHYzWU11NVZJK1lXQlRia3UyeW9KbEdLaEpCcGg3ejhGZytncy9RdGRo?=
- =?utf-8?B?SnF2ZVJyYk1jalVEYUEreExORHp5aElhMjJybE9iai8wOE8wWlhUeXZQblZR?=
- =?utf-8?B?NmxmTksyMVNmN2Vxb05pL3VyOHZWdG9WcHo0UkdwWjBOaHdLdjlIS3haTVlv?=
- =?utf-8?B?UVNTcUo3aHlmSHFjRVBuTlR3V0VJalQxR2hYZFRoMzFldW4yQkp4Q3pEWWJX?=
- =?utf-8?B?bVF4R2lWaTh2OENuUkdrbmF5MWIrV3E1ZVVSRjFpQ0VYODNsTktRVkl5dGlK?=
- =?utf-8?B?NUtmVDIzTkhGVzhWYTI3bld5SWxEcWp6OEVuUnhIRzZveFNvNXNLT0R0bXFU?=
- =?utf-8?B?TVZzOXRYSUx4WkVQK0VUS3BVQmRrZzdueFRlbnBTbVJ5RW1STE1NejJDdWpV?=
- =?utf-8?B?S1JhREQ4Ty9MdUdlU3RPU3Bhb3VLbXNJNkFVQzRkbHQxRGVXNjN6aG9ORmJG?=
- =?utf-8?B?UDIwTTF5M3dSMlc4a1V4eU1Hd1FsSDNVZzAzK21FNWtnZVNEV2hETEp3bjJE?=
- =?utf-8?B?WWg3VnVJOXJQeXpkaThoNDN1dzQ5dnhwUVdmSyt4YVlidjRQZmdWWVRRMkdj?=
- =?utf-8?B?Z2U2S2dzeU1VSzc5OVpaVGNXZjdOajJsamc3QjdqNTdTVHNaaXFRVVZTbkl1?=
- =?utf-8?B?VzVlRXpIdUdoYlp4T2tUNXdhSUkzMGh1RSszUFdJa2ZYY0p5SlZPdkFxM01Y?=
- =?utf-8?B?N3NDVUFSYjhuYjQrMTlTVkV3NHZCOEJ6V1dtOXNRdlV4MVoraEtRb3Z0czhQ?=
- =?utf-8?B?bUVNRFhGSjZxUkMzVHRvWnNUcXRhb3FWV0N2QXpXcUppSnVlOFJ0dVBxbUZC?=
- =?utf-8?B?NHlLbE9lZ2dVcXdENncvS0ZibTg3aUtMTFpOUDRGWXFtc3IvWGFycDZjaStt?=
- =?utf-8?B?bEI1bWJobmRVZ0o5Z0lOQ2p5OGZONk4vZFlsVnJuWkU2VWk0RkFSR2kzUDBK?=
- =?utf-8?B?OEpwaW1UODl1N25FK2R1dzVKb1UvSjhTWVY2bkV6SVcvcFI3ekxVTlQxQzdN?=
- =?utf-8?Q?og1usL92vbs=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-42ed3.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5fba3e7b-da11-44b2-218d-08da100a1d5d
-X-MS-Exchange-CrossTenant-AuthSource: MA0PR01MB7443.INDPRD01.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Mar 2022 15:54:48.0020
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MAXPR01MB4166
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <986caf55-65d1-0755-383b-73834ec04967@suse.de>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From 429f8f717c7a2b36ef75b7f747e05971c53ed932 Mon Sep 17 00:00:00 2001
-From: Dipankar Das <dipsonu10@hotmail.com>
-Date: Sun, 27 Mar 2022 20:06:40 +0530
-Subject: [PATCH] Removing the unused TODO
-As the TODO didn't had a message and nothing related to it
+On Tue, Feb 22, 2022 at 07:57:27AM +0100, Hannes Reinecke wrote:
+> On 2/21/22 20:59, Gabriel Krisman Bertazi wrote:
+> > I'd like to discuss an interface to implement user space block devices,
+> > while avoiding local network NBD solutions.  There has been reiterated
+> > interest in the topic, both from researchers [1] and from the community,
+> > including a proposed session in LSFMM2018 [2] (though I don't think it
+> > happened).
+> > 
+> > I've been working on top of the Google iblock implementation to find
+> > something upstreamable and would like to present my design and gather
+> > feedback on some points, in particular zero-copy and overall user space
+> > interface.
+> > 
+> > The design I'm pending towards uses special fds opened by the driver to
+> > transfer data to/from the block driver, preferably through direct
+> > splicing as much as possible, to keep data only in kernel space.  This
+> > is because, in my use case, the driver usually only manipulates
+> > metadata, while data is forwarded directly through the network, or
+> > similar. It would be neat if we can leverage the existing
+> > splice/copy_file_range syscalls such that we don't ever need to bring
+> > disk data to user space, if we can avoid it.  I've also experimented
+> > with regular pipes, But I found no way around keeping a lot of pipes
+> > opened, one for each possible command 'slot'.
+> > 
+> > [1] https://dl.acm.org/doi/10.1145/3456727.3463768
+> > [2] https://www.spinics.net/lists/linux-fsdevel/msg120674.html
+> > 
+> Actually, I'd rather have something like an 'inverse io_uring', where an
+> application creates a memory region separated into several 'ring' for
+> submission and completion.
+> Then the kernel could write/map the incoming data onto the rings, and
+> application can read from there.
+> Maybe it'll be worthwhile to look at virtio here.
 
-To: dave@stgolabs.net,
-    axboe@kernel.dk
-Cc: linux-efi@vger.kernel.org,
-    linux-block@vger.kernel.org,
-    linux-kernel@vger.kernel.org
+IMO it needn't 'inverse io_uring', the normal io_uring SQE/CQE model
+does cover this case, the userspace part can submit SQEs beforehand
+for getting notification of each incoming io request from kernel driver,
+then after one io request is queued to the driver, the driver can
+queue a CQE for the previous submitted SQE. Recent posted patch of
+IORING_OP_URING_CMD[1] is perfect for such purpose.
 
-Signed-off-by: Dipankar Das <dipsonu10@hotmail.com>
----
- block/partitions/efi.c | 2 --
- 1 file changed, 2 deletions(-)
+I have written one such userspace block driver recently, and [2] is the
+kernel part blk-mq driver(ubd driver), the userspace part is ubdsrv[3].
+Both the two parts look quite simple, but still in very early stage, so
+far only ubd-loop and ubd-null targets are implemented in [3]. Not only
+the io command communication channel is done via IORING_OP_URING_CMD, but
+also IO handling for ubd-loop is implemented via plain io_uring too.
 
-diff --git a/block/partitions/efi.c b/block/partitions/efi.c
-index 5e9be13a56a8..87d4788fe274 100644
---- a/block/partitions/efi.c
-+++ b/block/partitions/efi.c
-@@ -8,8 +8,6 @@
-  * efi.[ch] by Matt Domsch <Matt_Domsch@dell.com>
-  *   Copyright 2000,2001,2002,2004 Dell Inc.
-  *
-- * TODO:
-- *
-  * Changelog:
-  * Mon August 5th, 2013 Davidlohr Bueso <davidlohr@hp.com>
-  * - detect hybrid MBRs, tighter pMBR checking & cleanups.
--- 
-2.25.1
+It is basically working, for ubd-loop, not see regression in 'xfstests -g auto'
+on the ubd block device compared with same xfstests on underlying disk, and
+my simple performance test on VM shows the result isn't worse than kernel loop
+driver with dio, or even much better on some test situations.
 
+Wrt. this userspace block driver things, I am more interested in the following
+sub-topics:
+
+1) zero copy
+- the ubd driver[2] needs one data copy: for WRITE request, copy pages
+  in io request to userspace buffer before handling the WRITE IO by ubdsrv;
+  for READ request, the reverse copy is done after READ request is
+  handled by ubdsrv
+
+- I tried to apply zero copy via remap_pfn_range() for avoiding this
+  data copy, but looks it can't work for ubd driver, since pages in the
+  remapped vm area can't be retrieved by get_user_pages_*() which is called in
+  direct io code path
+
+- recently Xiaoguang Wang posted one RFC patch[4] for support zero copy on
+  tcmu, and vm_insert_page(s)_mkspecial() is added for such purpose, but
+  it has same limit of remap_pfn_range; Also Xiaoguang mentioned that
+  vm_insert_pages may work, but anonymous pages can not be remapped by
+  vm_insert_pages.
+
+- here the requirement is to remap either anonymous pages or page cache
+  pages into userspace vm, and the mapping/unmapping can be done for
+  each IO runtime. Is this requirement reasonable? If yes, is there any
+  easy way to implement it in kernel?
+
+2) batching queueing io_uring CQEs
+
+- for ubd driver, batching is very sensitive to performance per my
+  observation, if we can run batch queueing IORING_OP_URING_CMD CQEs,
+  ubd_queue_rqs() can be wirted to the batching CQEs, then the whole batch
+  only takes one io_uring_enter().
+
+- not digging into io_uring code for this interface yet, but looks not
+  see such interface
+
+3) requirement on userspace block driver
+- exact requirements from user viewpoint
+
+4) apply eBPF in userspace block driver
+- it is one open topic, still not have specific or exact idea yet,
+
+- is there chance to apply ebpf for mapping ubd io into its target handling
+for avoiding data copy and remapping cost for zero copy?
+
+I am happy to join the virtual discussion on lsf/mm if there is and it
+is possible.
+
+[1] https://lore.kernel.org/linux-block/20220308152105.309618-1-joshi.k@samsung.com/#r
+[2] https://github.com/ming1/linux/tree/v5.17-ubd-dev
+[3] https://github.com/ming1/ubdsrv
+[4] https://lore.kernel.org/linux-block/abbe51c4-873f-e96e-d421-85906689a55a@gmail.com/#r
+
+Thanks,
+Ming
 
