@@ -2,187 +2,225 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95818C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 05:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B53C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 07:21:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236913AbiC1F5B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 01:57:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60660 "EHLO
+        id S232836AbiC1HXb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 03:23:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232968AbiC1F47 (ORCPT
+        with ESMTP id S231468AbiC1HXa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 01:56:59 -0400
-Received: from mailout3.samsung.com (mailout3.samsung.com [203.254.224.33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DBCCFD3E
-        for <linux-block@vger.kernel.org>; Sun, 27 Mar 2022 22:55:16 -0700 (PDT)
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20220328055510epoutp0349335a53cace097fba1bc42884fae111~gdbsvadGk2106921069epoutp03e
-        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 05:55:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20220328055510epoutp0349335a53cace097fba1bc42884fae111~gdbsvadGk2106921069epoutp03e
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1648446910;
-        bh=T6whiRjWfdN1vlsHlKJrbgN1KF63tkFQ6NOjc/voY84=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=FUch3g/mfXZh/ZxCAje6vs5UdbaPZHrY8JXrSB1Gvq5ibIpPKUeLak/6gEInwK/qr
-         aWBBTvhT+Dg+YkAQTCUiVdH0Nb76jj4AkKFoZXE+WsAb7poHaHfrR7tb3U9z4GZGI6
-         o6VeDg4cE+Ju+205Nrf6foI4Cue2dDeVZy/cCop0=
-Received: from epsnrtp3.localdomain (unknown [182.195.42.164]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220328055509epcas5p4b6a5da7339afb101f2278d0e08019708~gdbsTcC3H1059210592epcas5p4G;
-        Mon, 28 Mar 2022 05:55:09 +0000 (GMT)
-Received: from epsmges5p3new.samsung.com (unknown [182.195.38.178]) by
-        epsnrtp3.localdomain (Postfix) with ESMTP id 4KRhjz6CfCz4x9QK; Mon, 28 Mar
-        2022 05:55:03 +0000 (GMT)
-Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
-        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        4D.90.05590.6BD41426; Mon, 28 Mar 2022 14:55:02 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220328055221epcas5p2b89350b832172fd7f030de4740902000~gdZPsJx_V0935809358epcas5p2Y;
-        Mon, 28 Mar 2022 05:52:21 +0000 (GMT)
-Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220328055221epsmtrp18314df2398e43e021bd1e0b7de026d0f~gdZPrU4Bb2830328303epsmtrp1T;
-        Mon, 28 Mar 2022 05:52:21 +0000 (GMT)
-X-AuditID: b6c32a4b-739ff700000015d6-24-62414db6fd75
-Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        AC.88.03370.51D41426; Mon, 28 Mar 2022 14:52:21 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip1.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220328055220epsmtip191ee9a4a7f3726f8455e5a17a3dfe1a8~gdZOUA_571711217112epsmtip1Z;
-        Mon, 28 Mar 2022 05:52:20 +0000 (GMT)
-Date:   Mon, 28 Mar 2022 11:17:17 +0530
-From:   Kanchan Joshi <joshi.k@samsung.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-mm@kvack.org
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-Message-ID: <20220328054717.GA16252@test-zns>
+        Mon, 28 Mar 2022 03:23:30 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22CBF1706A;
+        Mon, 28 Mar 2022 00:21:50 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id g22so4698112edz.2;
+        Mon, 28 Mar 2022 00:21:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=v9u93oacVo0WHHkBTfuXklapfqlel1OBBUvggiuQ4ZE=;
+        b=TGOTnXKUAHCIU+stD2wybSqfdtfoxvgH3A2+xJNSodC0jc+8BvRxwtj5M9TwCuSfFD
+         h7Gxsh+qK4FuccKgFkv7RWxygNtbFB3uc+JtkkbbfkEDkBHbLQYcJ1cmVQYpf0ukDtM9
+         ykbYu8ztxRjnG+3kus2DH+R/trvdJvbkrxwjTmHiZZP0PEL7Ps17OCIojazwAZ/I2muQ
+         XYLmXu2Vvetq3BTgc7Tu+zCJXqFwbfZHD0hqzrCIdQOwc6tb9M5YFVVZTpgRr/xykg+X
+         zVslnUaM6ujpCVDEor4QgazueP+anJGjRvo3rcAIQn/PuvMnGUNlj7jaVldAhCn+f+oQ
+         P9UQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=v9u93oacVo0WHHkBTfuXklapfqlel1OBBUvggiuQ4ZE=;
+        b=rYb41kVWvJs9NkSbkFVisnu7yxHfvWOhNyXcpa5/5MjVUXGdzl7uQ5MknynSgZM+z9
+         JDwq+yeL2WbCfBi3xOGGlXbXlwzsL92McERu1hbomDs7nilbuYvFqF3kkm9f5aUF8ILC
+         IkL9VQ3xoHNFMwaj7DEjfFo701HWVUNgwbFmQfnlhKp3sBr2LYaXDOw52HL/EHjKliz2
+         rjupnYvesqE4NjOcjML8i/D/sj5NdnNJBGYhvMXHN7UyPSy0WQt1qNv+xtSjHgt7z1NC
+         svbxkz2dCpHvTrPOC/eJLehNmQksm/qzW/H8V4OMYHlqbjBvuIQLfqHf8vlvPrKMTnKQ
+         rmsQ==
+X-Gm-Message-State: AOAM533Fz8QfyQBb2UI+Ebe61Y/64sxVN6CEW17WpCtXGY9fWrfZJXje
+        4FGGj/En0osvNUl3s2WQzD8=
+X-Google-Smtp-Source: ABdhPJwp0NDJizEMGzCurWCE3EkvJVdpD/qGorSycoQ524nmUamymlU4x2gOmtdnw2N6IIC4XLpTSQ==
+X-Received: by 2002:a05:6402:84b:b0:419:105:f516 with SMTP id b11-20020a056402084b00b004190105f516mr14735753edz.3.1648452108484;
+        Mon, 28 Mar 2022 00:21:48 -0700 (PDT)
+Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id gn33-20020a1709070d2100b006dfcce8be86sm5595208ejc.225.2022.03.28.00.21.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Mar 2022 00:21:46 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Cc:     syzbot <syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] memory leak in blk_mq_init_tags
+Date:   Mon, 28 Mar 2022 09:21:38 +0200
+Message-ID: <12985729.uLZWGnKmhe@leap>
+In-Reply-To: <000000000000c341cc05db38c1b0@google.com>
+References: <000000000000c341cc05db38c1b0@google.com>
 MIME-Version: 1.0
-In-Reply-To: <YkCSVSk1SwvtABIW@T590>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrEJsWRmVeSWpSXmKPExsWy7bCmpu42X8ckg7n3zSz2LJrEZLHo6HUW
-        i723tC3urfnParHv9V5mi0OTm5ksNv09yeTA7rHj7hJGj02fJrF77Hxo6TH5xnJGj/f7rrJ5
-        bD5d7fF5k1wAe1S2TUZqYkpqkUJqXnJ+SmZeuq2Sd3C8c7ypmYGhrqGlhbmSQl5ibqqtkotP
-        gK5bZg7QNUoKZYk5pUChgMTiYiV9O5ui/NKSVIWM/OISW6XUgpScApMCveLE3OLSvHS9vNQS
-        K0MDAyNToMKE7Iy/M/8xF2yRq3g0s529gXGNZBcjJ4eEgIlEY8Ny9i5GLg4hgd2MEtt3LWUF
-        SQgJfGKU2HhEECLxmVHixt6pLDAdf05PYIZI7GKUWDh3GyuE84xRYuKsc+wgVSwCqhI/r09l
-        6mLk4GAT0JS4MLkUJCwioCRx9+5qsHXMAg8YJXbsmwS2TljAWuLPpC9gNq+ArsT+hv9MELag
-        xMmZT8A2cwqoSBw5MIkNxBYVUJY4sO04E8ggCYFeDompZ58yQpznInHiQjuULSzx6vgWdghb
-        SuJlfxuUnSzRuv0yO8hxEgIlEksWqEOE7SUu7vkLtpdZIENi0YwXzBBxWYmpp9ZBxfkken8/
-        YYKI80rsmAdjK0rcm/SUFcIWl3g4YwmU7SExddEHaPieZJT4dnMhywRG+VlIfpuFZB+EbSXR
-        +aGJdRbQecwC0hLL/3FAmJoS63fpL2BkXcUomVpQnJueWmxaYJyXWg6P8OT83E2M4MSq5b2D
-        8dGDD3qHGJk4GA8xSnAwK4nwyp61TxLiTUmsrEotyo8vKs1JLT7EaAqMq4nMUqLJ+cDUnlcS
-        b2hiaWBiZmZmYmlsZqgkznsqfUOikEB6YklqdmpqQWoRTB8TB6dUA1P5rO6OgnsMl1w4N8lN
-        Tr0kL3dUp+3g1zSe20suyitOqne+4xiRKMjrpH/BU/J0VU/l6hK2i/Gf9l484Gq+SkRYpl6g
-        QkC0quK7ktDthJWhWY6OHj81s217D11cqygX/tvw2+Lwr+rRuw82bXHSmrjxxE7u2m+hOl6x
-        j5jdvPxvSrWFfr2kGX7njNq088JuU7rEV6zUOc3xx7xJr/o317byV8aM6+5ZzX7btqCXc93n
-        OKW0oAPN15/uNRS8vqPy3He977v8ni/79kn64BkGmZAHzlLfLQ2VPq7+aaDkEZVv0KVR4Mvw
-        Rdju/16mxJO2y6UmiFy5vHRz/2tBrgy9pde/Xb8TPuNUZNbKDyFBL5RYijMSDbWYi4oTAeiP
-        hAA1BAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrKLMWRmVeSWpSXmKPExsWy7bCSnK6or2OSQc9+LYs9iyYxWSw6ep3F
-        Yu8tbYt7a/6zWux7vZfZ4tDkZiaLTX9PMjmwe+y4u4TRY9OnSeweOx9aeky+sZzR4/2+q2we
-        m09Xe3zeJBfAHsVlk5Kak1mWWqRvl8CVsWviFraCZ9IV2y5tZGlg/CHWxcjJISFgIvHn9ATm
-        LkYuDiGBHYwS+7s6WCES4hLN136wQ9jCEiv/PWeHKHrCKLHx8gVmkASLgKrEz+tTmboYOTjY
-        BDQlLkwuBQmLCChJ3L27GqyeWeARo8TZN4uYQBLCAtYSfyZ9AVvAK6Arsb/hPxPE0JOMEitP
-        72SGSAhKnJz5hAXEZhYwk5i3+SEzyAJmAWmJ5f84QMKcAioSRw5MYgOxRQWUJQ5sO840gVFw
-        FpLuWUi6ZyF0L2BkXsUomVpQnJueW2xYYJSXWq5XnJhbXJqXrpecn7uJERwTWlo7GPes+qB3
-        iJGJg/EQowQHs5IIr+xZ+yQh3pTEyqrUovz4otKc1OJDjNIcLErivBe6TsYLCaQnlqRmp6YW
-        pBbBZJk4OKUamErj8r62He46rNOTzFfQkJ7x/e/OzgkTfbruuTzXPnT26GpmpccNDz0XmCVG
-        B0WeDjsSf+7QvwLXr+X/HK8d3Lhp+p78e5ybOPZuLzu7N/BN64ZJ8+9urVyZd527x+u02W3T
-        ndNKBXftfGLiGXpJUtnSuaetnPHM95JLdw4udPqtvGbpcq72A16R9gbTw+P8pr9NLN1zzDj+
-        Zd65X6Jah+3leiQTjhUb+dmm//hz6dDhTxJ7M4z778pz6k3YOm2KpW147lLObqO9P3meCXz0
-        yZy8r8Jr5UIp3U/t51If/XsU0zBxfQFbU3n71c7LczaZmUfPTr2ZmHW7fHtm8EcttpbeFonF
-        kpmZJsU1EtM7NZVYijMSDbWYi4oTASNRkZz4AgAA
-X-CMS-MailID: 20220328055221epcas5p2b89350b832172fd7f030de4740902000
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----9xePhvBs7L.CmQYP2EuM5i8QaKGj7GHgcW4toGXxqW8MJ5yL=_10a20_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220327163555epcas5p430d58efe9dd4e5bb2db31da74b15182b
-References: <87tucsf0sr.fsf@collabora.com>
-        <986caf55-65d1-0755-383b-73834ec04967@suse.de>
-        <CGME20220327163555epcas5p430d58efe9dd4e5bb2db31da74b15182b@epcas5p4.samsung.com>
-        <YkCSVSk1SwvtABIW@T590>
+Content-Type: multipart/mixed; boundary="nextPart2823658.e9J7NaK4W3"
+Content-Transfer-Encoding: 7Bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------9xePhvBs7L.CmQYP2EuM5i8QaKGj7GHgcW4toGXxqW8MJ5yL=_10a20_
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+This is a multi-part message in MIME format.
 
-On Mon, Mar 28, 2022 at 12:35:33AM +0800, Ming Lei wrote:
->On Tue, Feb 22, 2022 at 07:57:27AM +0100, Hannes Reinecke wrote:
->> On 2/21/22 20:59, Gabriel Krisman Bertazi wrote:
->> > I'd like to discuss an interface to implement user space block devices,
->> > while avoiding local network NBD solutions.  There has been reiterated
->> > interest in the topic, both from researchers [1] and from the community,
->> > including a proposed session in LSFMM2018 [2] (though I don't think it
->> > happened).
->> >
->> > I've been working on top of the Google iblock implementation to find
->> > something upstreamable and would like to present my design and gather
->> > feedback on some points, in particular zero-copy and overall user space
->> > interface.
->> >
->> > The design I'm pending towards uses special fds opened by the driver to
->> > transfer data to/from the block driver, preferably through direct
->> > splicing as much as possible, to keep data only in kernel space.  This
->> > is because, in my use case, the driver usually only manipulates
->> > metadata, while data is forwarded directly through the network, or
->> > similar. It would be neat if we can leverage the existing
->> > splice/copy_file_range syscalls such that we don't ever need to bring
->> > disk data to user space, if we can avoid it.  I've also experimented
->> > with regular pipes, But I found no way around keeping a lot of pipes
->> > opened, one for each possible command 'slot'.
->> >
->> > [1] https://protect2.fireeye.com/v1/url?k=894d9ec4-e83076bc-894c158b-74fe485fffb1-3de06c94a9e9abfa&q=1&e=40f886a9-b53a-42b0-8e68-c94bc3813a9c&u=https%3A%2F%2Fdl.acm.org%2Fdoi%2F10.1145%2F3456727.3463768
->> > [2] https://www.spinics.net/lists/linux-fsdevel/msg120674.html
->> >
->> Actually, I'd rather have something like an 'inverse io_uring', where an
->> application creates a memory region separated into several 'ring' for
->> submission and completion.
->> Then the kernel could write/map the incoming data onto the rings, and
->> application can read from there.
->> Maybe it'll be worthwhile to look at virtio here.
->
->IMO it needn't 'inverse io_uring', the normal io_uring SQE/CQE model
->does cover this case, the userspace part can submit SQEs beforehand
->for getting notification of each incoming io request from kernel driver,
->then after one io request is queued to the driver, the driver can
->queue a CQE for the previous submitted SQE. Recent posted patch of
->IORING_OP_URING_CMD[1] is perfect for such purpose.
-I had added that as one of the potential usecases to discuss for
-uring-cmd:
-https://lore.kernel.org/linux-block/20220228092511.458285-1-joshi.k@samsung.com/
-And your email is already bringing lot of clarity on this.
+--nextPart2823658.e9J7NaK4W3
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
 
->I have written one such userspace block driver recently, and [2] is the
->kernel part blk-mq driver(ubd driver), the userspace part is ubdsrv[3].
->Both the two parts look quite simple, but still in very early stage, so
->far only ubd-loop and ubd-null targets are implemented in [3]. Not only
->the io command communication channel is done via IORING_OP_URING_CMD, but
->also IO handling for ubd-loop is implemented via plain io_uring too.
->
->It is basically working, for ubd-loop, not see regression in 'xfstests -g auto'
->on the ubd block device compared with same xfstests on underlying disk, and
->my simple performance test on VM shows the result isn't worse than kernel loop
->driver with dio, or even much better on some test situations.
-Added this in my to-be-read list. Thanks for sharing.
+On domenica 27 marzo 2022 22:08:18 CEST syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    6b1f86f8e9c7 Merge tag 'folio-5.18b' of git://git.infradea..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=13b41dcb700000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=c6e80763d853259b
+> dashboard link: https://syzkaller.appspot.com/bug?extid=f08c77040fa163a75a46
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1564ecb3700000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888118503c00 (size 192):
+>   comm "kworker/u4:2", pid 52, jiffies 4294961137 (age 11.420s)
+>   hex dump (first 32 bytes):
+>     02 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     02 00 00 00 06 00 00 00 01 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff822c042b>] kmalloc_node include/linux/slab.h:602 [inline]
+>     [<ffffffff822c042b>] kzalloc_node include/linux/slab.h:728 [inline]
+>     [<ffffffff822c042b>] blk_mq_init_tags+0x4b/0xc0 block/blk-mq-tag.c:578
+>     [<ffffffff822b6caa>] blk_mq_alloc_rq_map+0xea/0x1a0 block/blk-mq.c:3169
+>     [<ffffffff822bbb86>] blk_mq_alloc_map_and_rqs+0x26/0xb0 block/blk-mq.c:3620
+>     [<ffffffff822c3437>] blk_mq_sched_alloc_map_and_rqs block/blk-mq-sched.c:507 [inline]
+>     [<ffffffff822c3437>] blk_mq_init_sched+0x127/0x2e0 block/blk-mq-sched.c:587
+>     [<ffffffff8229e6f9>] elevator_init_mq+0x1f9/0x240 block/elevator.c:709
+>     [<ffffffff822c7085>] device_add_disk+0x25/0x510 block/genhd.c:421
+>     [<ffffffff82846437>] sd_probe+0x457/0x670 drivers/scsi/sd.c:3551
+>     [<ffffffff8270c477>] call_driver_probe drivers/base/dd.c:517 [inline]
+>     [<ffffffff8270c477>] really_probe.part.0+0xe7/0x380 drivers/base/dd.c:596
+>     [<ffffffff8270c81c>] really_probe drivers/base/dd.c:558 [inline]
+>     [<ffffffff8270c81c>] __driver_probe_device+0x10c/0x1e0 drivers/base/dd.c:755
+>     [<ffffffff8270c91a>] driver_probe_device+0x2a/0x120 drivers/base/dd.c:785
+>     [<ffffffff8270d186>] __device_attach_driver+0xf6/0x140 drivers/base/dd.c:902
+>     [<ffffffff827093e7>] bus_for_each_drv+0xb7/0x100 drivers/base/bus.c:427
+>     [<ffffffff8270b9ef>] __device_attach_async_helper+0xcf/0x110 drivers/base/dd.c:931
+>     [<ffffffff8127cf94>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+>     [<ffffffff8126b3ef>] process_one_work+0x2bf/0x600 kernel/workqueue.c:2307
+>     [<ffffffff8126bd19>] worker_thread+0x59/0x5b0 kernel/workqueue.c:2454
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888117fee680 (size 128):
+>   comm "kworker/u4:2", pid 52, jiffies 4294961137 (age 11.420s)
+>   hex dump (first 32 bytes):
+>     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>   backtrace:
+>     [<ffffffff8240b6be>] kmalloc_array_node include/linux/slab.h:679 [inline]
+>     [<ffffffff8240b6be>] kcalloc_node include/linux/slab.h:684 [inline]
+>     [<ffffffff8240b6be>] sbitmap_init_node+0xde/0x2d0 lib/sbitmap.c:113
+>     [<ffffffff8240b8ec>] sbitmap_queue_init_node+0x3c/0x1f0 lib/sbitmap.c:428
+>     [<ffffffff822c0347>] bt_alloc block/blk-mq-tag.c:543 [inline]
+>     [<ffffffff822c0347>] blk_mq_init_bitmaps+0x57/0xf0 block/blk-mq-tag.c:555
+>     [<ffffffff822c0468>] blk_mq_init_tags+0x88/0xc0 block/blk-mq-tag.c:586
+>     [<ffffffff822b6caa>] blk_mq_alloc_rq_map+0xea/0x1a0 block/blk-mq.c:3169
+>     [<ffffffff822bbb86>] blk_mq_alloc_map_and_rqs+0x26/0xb0 block/blk-mq.c:3620
+>     [<ffffffff822c3437>] blk_mq_sched_alloc_map_and_rqs block/blk-mq-sched.c:507 [inline]
+>     [<ffffffff822c3437>] blk_mq_init_sched+0x127/0x2e0 block/blk-mq-sched.c:587
+>     [<ffffffff8229e6f9>] elevator_init_mq+0x1f9/0x240 block/elevator.c:709
+>     [<ffffffff822c7085>] device_add_disk+0x25/0x510 block/genhd.c:421
+>     [<ffffffff82846437>] sd_probe+0x457/0x670 drivers/scsi/sd.c:3551
+>     [<ffffffff8270c477>] call_driver_probe drivers/base/dd.c:517 [inline]
+>     [<ffffffff8270c477>] really_probe.part.0+0xe7/0x380 drivers/base/dd.c:596
+>     [<ffffffff8270c81c>] really_probe drivers/base/dd.c:558 [inline]
+>     [<ffffffff8270c81c>] __driver_probe_device+0x10c/0x1e0 drivers/base/dd.c:755
+>     [<ffffffff8270c91a>] driver_probe_device+0x2a/0x120 drivers/base/dd.c:785
+>     [<ffffffff8270d186>] __device_attach_driver+0xf6/0x140 drivers/base/dd.c:902
+>     [<ffffffff827093e7>] bus_for_each_drv+0xb7/0x100 drivers/base/bus.c:427
+>     [<ffffffff8270b9ef>] __device_attach_async_helper+0xcf/0x110 drivers/base/dd.c:931
+> 
+> BUG: memory leak
+> unreferenced object 0xffff888116df4c00 (size 512):
+>   comm "kworker/u4:2", pid 52, jiffies 4294961137 (age 11.420s)
+>   hex dump (first 32 bytes):
+>     01 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+>     10 4c df 16 81 88 ff ff 10 4c df 16 81 88 ff ff  .L.......L......
+>   backtrace:
+>     [<ffffffff8240b9b8>] kmalloc_node include/linux/slab.h:602 [inline]
+>     [<ffffffff8240b9b8>] kzalloc_node include/linux/slab.h:728 [inline]
+>     [<ffffffff8240b9b8>] sbitmap_queue_init_node+0x108/0x1f0 lib/sbitmap.c:438
+>     [<ffffffff822c0377>] bt_alloc block/blk-mq-tag.c:543 [inline]
+>     [<ffffffff822c0377>] blk_mq_init_bitmaps+0x87/0xf0 block/blk-mq-tag.c:557
+>     [<ffffffff822c0468>] blk_mq_init_tags+0x88/0xc0 block/blk-mq-tag.c:586
+>     [<ffffffff822b6caa>] blk_mq_alloc_rq_map+0xea/0x1a0 block/blk-mq.c:3169
+>     [<ffffffff822bbb86>] blk_mq_alloc_map_and_rqs+0x26/0xb0 block/blk-mq.c:3620
+>     [<ffffffff822c3437>] blk_mq_sched_alloc_map_and_rqs block/blk-mq-sched.c:507 [inline]
+>     [<ffffffff822c3437>] blk_mq_init_sched+0x127/0x2e0 block/blk-mq-sched.c:587
+>     [<ffffffff8229e6f9>] elevator_init_mq+0x1f9/0x240 block/elevator.c:709
+>     [<ffffffff822c7085>] device_add_disk+0x25/0x510 block/genhd.c:421
+>     [<ffffffff82846437>] sd_probe+0x457/0x670 drivers/scsi/sd.c:3551
+>     [<ffffffff8270c477>] call_driver_probe drivers/base/dd.c:517 [inline]
+>     [<ffffffff8270c477>] really_probe.part.0+0xe7/0x380 drivers/base/dd.c:596
+>     [<ffffffff8270c81c>] really_probe drivers/base/dd.c:558 [inline]
+>     [<ffffffff8270c81c>] __driver_probe_device+0x10c/0x1e0 drivers/base/dd.c:755
+>     [<ffffffff8270c91a>] driver_probe_device+0x2a/0x120 drivers/base/dd.c:785
+>     [<ffffffff8270d186>] __device_attach_driver+0xf6/0x140 drivers/base/dd.c:902
+>     [<ffffffff827093e7>] bus_for_each_drv+0xb7/0x100 drivers/base/bus.c:427
+>     [<ffffffff8270b9ef>] __device_attach_async_helper+0xcf/0x110 drivers/base/dd.c:931
+>     [<ffffffff8127cf94>] async_run_entry_fn+0x24/0xf0 kernel/async.c:127
+> 
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> syzbot can test patches for this issue, for details see:
+> https://goo.gl/tpsmEJ#testing-patches
+> 
+> -- 
+> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/000000000000c341cc05db38c1b0%40google.com.
+> 
+I think that, if device_add_disk() fails, the code should jump to the 
+"out_free_index" label. 
+
+Let's try if my argument is correct...
+
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+
+Fabio
+
+--nextPart2823658.e9J7NaK4W3
+Content-Disposition: attachment; filename="diff"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/x-patch; charset="UTF-8"; name="diff"
+
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index a390679cf458..cd310eb406bb 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3434,7 +3434,7 @@ static int sd_probe(struct device *dev)
+ 	error = device_add(&sdkp->disk_dev);
+ 	if (error) {
+ 		put_device(&sdkp->disk_dev);
+-		goto out;
++		goto out_free_index;
+ 	}
+ 
+ 	dev_set_drvdata(dev, sdkp);
+
+--nextPart2823658.e9J7NaK4W3--
 
 
 
-
-------9xePhvBs7L.CmQYP2EuM5i8QaKGj7GHgcW4toGXxqW8MJ5yL=_10a20_
-Content-Type: text/plain; charset="utf-8"
-
-
-------9xePhvBs7L.CmQYP2EuM5i8QaKGj7GHgcW4toGXxqW8MJ5yL=_10a20_--
