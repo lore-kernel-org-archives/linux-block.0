@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72545C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:24:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDFB4C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:24:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240993AbiC1L0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        id S240847AbiC1LYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:24:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241122AbiC1LZT (ORCPT
+        with ESMTP id S241749AbiC1LYK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:25:19 -0400
+        Mon, 28 Mar 2022 07:24:10 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EEDBC54;
-        Mon, 28 Mar 2022 04:23:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F27A955759;
+        Mon, 28 Mar 2022 04:22:19 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 110AC6115A;
-        Mon, 28 Mar 2022 11:23:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91011C34112;
-        Mon, 28 Mar 2022 11:23:23 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8EB076115A;
+        Mon, 28 Mar 2022 11:22:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFB45C34100;
+        Mon, 28 Mar 2022 11:22:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466604;
-        bh=QFe6QMfeqMy4yd7gMOsZYHy56sJcir2qQB3c5AmyZzQ=;
+        s=k20201202; t=1648466539;
+        bh=F81kisKEqi/pBnYxv7fdozfHy3YTomyXenOPF/ZqZeM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=DZfs84SraGhwEChv6FR52t1t2bLJd2yE3nFCDPjZWyZwv5cMRuhRDEew2J09OGIcS
-         JEBoY7FKQjrkjZ40bmhc4nxL9zOqGR3pSkxFAGOH9LqBenr6uMPn1NyO7jsR8lXNE0
-         wu7nH4xLBTnoUXuh5iVHuW7mi+4NudcndoMyN3IUZfwi8t5j7FEhz6T/vOHZCNOSP2
-         WJOb8BcfbTXjBEpybkF9ZnlCkr/I39mSklCjqpXb0Dlm4qz2xgXRW34brgP8HKoWlO
-         x4t2v/5L/4MxhyV6CsYk9bdZxEaVjFiN6fE4cYGvDwTvl6LbZuFMkNoSnwhzYzA3w4
-         uRNOv+erx6PHw==
+        b=YHzpEjp60A5DleGa7SXyWHkI6feoxiWn9leqsX1E09t62hAFAUnIV88CpwLx1Lqyy
+         cVlnWcVDXCELE9h1m0qEzV6c2K0kl6N/zG6uuQ49aa6/MLO4JrgMrP/fPYqYXlY5KH
+         lv3OfzB9DMoLSOPZN3KOb5xazllSAtcPZY6tXt5Mvb8rl1VYM59pCq6rZxPzmEY9nk
+         BrtoawsLCSywjVl4BMUf09gHv7dANfxiXFZNg9D0wNYSG9mvq8Bk+UVg/WEps3Mun3
+         vrODlaN82CM8L/aIBy1LwEH1qF5Y/9DZiVjCAPfGflrNRGJ7JB/I1kfQSVGYNQXd5s
+         9IwBAOmU+eG+w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Zhang Wensheng <zhangwensheng5@huawei.com>,
         Hulk Robot <hulkci@huawei.com>, Jens Axboe <axboe@kernel.dk>,
         Sasha Levin <sashal@kernel.org>, paolo.valente@linaro.org,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 13/21] bfq: fix use-after-free in bfq_dispatch_request
-Date:   Mon, 28 Mar 2022 07:22:46 -0400
-Message-Id: <20220328112254.1556286-13-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 20/29] bfq: fix use-after-free in bfq_dispatch_request
+Date:   Mon, 28 Mar 2022 07:21:22 -0400
+Message-Id: <20220328112132.1555683-20-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328112254.1556286-1-sashal@kernel.org>
-References: <20220328112254.1556286-1-sashal@kernel.org>
+In-Reply-To: <20220328112132.1555683-1-sashal@kernel.org>
+References: <20220328112132.1555683-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -193,10 +193,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 8d95bf7765b1..138541996dd5 100644
+index e66970bf27db..9843085cc2c3 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -4799,7 +4799,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+@@ -5061,7 +5061,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
  	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
  	struct request *rq;
  	struct bfq_queue *in_serv_queue;
@@ -205,7 +205,7 @@ index 8d95bf7765b1..138541996dd5 100644
  
  	spin_lock_irq(&bfqd->lock);
  
-@@ -4807,14 +4807,15 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+@@ -5069,14 +5069,15 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
  	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
  
  	rq = __bfq_dispatch_request(hctx);
