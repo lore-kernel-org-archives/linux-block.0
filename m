@@ -2,67 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B34BC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 07:29:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B107C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 07:55:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238807AbiC1Ha4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 03:30:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56770 "EHLO
+        id S238985AbiC1H5L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 03:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236389AbiC1Haz (ORCPT
+        with ESMTP id S236049AbiC1H5F (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 03:30:55 -0400
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DABB3427C5
-        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 00:29:12 -0700 (PDT)
-Received: by mail-il1-f197.google.com with SMTP id m4-20020a924b04000000b002c851e73720so7278921ilg.23
-        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 00:29:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=KF6RRSv0UEz8tSzbeuXx0815Teuk0m5QkpVJdIXOy1A=;
-        b=BCYX7XHByiOgf7EfWGdPuUTV7wqtTtQPxloH7VB7tA2PTMSM9IidNR67bNUXWmTtVv
-         ZjbZZqcqK0+5X53giVuMONj0QfvkJntfn9S8hHKei7TquT8iGpXIXMAGgmlAXi+SWh6g
-         dsVjTpGp2Eiq/LRcmMHCgDoLsHXIS+hCDmDjGtjp0pacu5haSXXPO6rFqouShPK5AKdX
-         YQ5GU4h7TohwGOl3U0hV6aJ3w3y4nsN2NoAzbDsg4R2p3hxw+OItYDikSDv7m0J6D0tE
-         IAqYq8i0dDh9XWRwiCE45HoJKFCufyMXNg2cN/zsyKwIZGcO70jn+/YN4aZ76Xk5mKuN
-         RlQw==
-X-Gm-Message-State: AOAM531E1WvGDaJPEsYH7SKdEGrFqxJ6XVHgPjeh9Eex83XXIWfQPHi2
-        lfNBMC09lqCthYkFwKhDFT/BjEkQzBwai6txokrdm0AytXsV
-X-Google-Smtp-Source: ABdhPJylgre9J6aJ68nKejMHlxOmxK4+mEFWQQBbyeS+ASnoUYOMmCmdSz/22WytKSqAWnOGc3TqFAKHkQbHRRqzDsr0ElUtrNTs
+        Mon, 28 Mar 2022 03:57:05 -0400
+X-Greylist: delayed 478 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 28 Mar 2022 00:55:25 PDT
+Received: from mail.ourpartnership.pl (mail.ourpartnership.pl [80.211.82.238])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BA4DF92
+        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 00:55:24 -0700 (PDT)
+Received: by mail.ourpartnership.pl (Postfix, from userid 1001)
+        id 48BB361EC4; Mon, 28 Mar 2022 08:46:33 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ourpartnership.pl;
+        s=mail; t=1648453644;
+        bh=M1ZVeu3q6Upppe+FUx/3rgI7MKJXh389NZDbgCK1SX4=;
+        h=Date:From:To:Subject:From;
+        b=ORKJ1iRwrT8Tk0ZqVeGta/8IecnNDrt3rEff3LBDPxUxTYN0BxYlTfUicG6I45lAd
+         mVhsi8NUYkB5mLwN2qK+1PdS6XIEMtWgwuJFy91F2aCZmnARPeWtcXwdUlPSgR+V9t
+         XRr71bJAyQt5nuBL7b4KGqGnYvSKWdrsMhpBjPu00ceqAcThF32gAnA2L8PdJllUoT
+         mzBx67kPmwSNOhZGZuAuCToXNT4rnEDgGrZrERDJZewiGYVc4LROGx+5GzKbbxFMuk
+         /Vz3pcWCz3cmgV4e1KBEzfJl8EpM4xjs7zuGVF9r23xV8eUVwIsBuaohLOceYNH+iN
+         0pOkkur6pDdBQ==
+Received: by mail.ourpartnership.pl for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 07:46:04 GMT
+Message-ID: <20220328074501-0.1.9.2aib.0.oxgo1bq1fg@ourpartnership.pl>
+Date:   Mon, 28 Mar 2022 07:46:04 GMT
+From:   =?UTF-8?Q? "Arkadiusz_Soko=C5=82owski" ?= 
+        <arkadiusz.sokolowski@ourpartnership.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Koszty instalacji fotowoltaicznej
+X-Mailer: mail.ourpartnership.pl
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:4089:b0:319:b60c:3c3d with SMTP id
- m9-20020a056638408900b00319b60c3c3dmr12553389jam.120.1648452551957; Mon, 28
- Mar 2022 00:29:11 -0700 (PDT)
-Date:   Mon, 28 Mar 2022 00:29:11 -0700
-In-Reply-To: <12985729.uLZWGnKmhe@leap>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c9dfe005db4244a9@google.com>
-Subject: Re: [syzbot] memory leak in blk_mq_init_tags
-From:   syzbot <syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, fmdefrancesco@gmail.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Dzie=C5=84 dobry,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+stworzyli=C5=9Bmy specjaln=C4=85 ofert=C4=99 dla firm, na kompleksow=C4=85=
+ obs=C5=82ug=C4=99 inwestycji w fotowoltaik=C4=99. =20
 
-Reported-and-tested-by: syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
+Specjalizujemy si=C4=99 w zakresie doboru, monta=C5=BCu i serwisie instal=
+acji fotowoltaicznych, dysponujemy najnowocze=C5=9Bniejszymi rozwi=C4=85z=
+ania, kt=C3=B3re zapewni=C4=85 Pa=C5=84stwu oczekiwane rezultaty.
 
-Tested on:
+Mo=C5=BCemy przygotowa=C4=87 dla Pa=C5=84stwa wst=C4=99pn=C4=85 kalkulacj=
+=C4=99 i przeanalizowa=C4=87 efekty mo=C5=BCliwe do osi=C4=85gni=C4=99cia=
+=2E
 
-commit:         ae085d7f mm: kfence: fix missing objcg housekeeping fo..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6583b67d32c256f1
-dashboard link: https://syzkaller.appspot.com/bug?extid=f08c77040fa163a75a46
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1461d105700000
+Czy s=C4=85 Pa=C5=84stwo otwarci na wst=C4=99pn=C4=85 rozmow=C4=99 w tym =
+temacie?
 
-Note: testing is done by a robot and is best-effort only.
+
+Pozdrawiam
+Arkadiusz Soko=C5=82owski
