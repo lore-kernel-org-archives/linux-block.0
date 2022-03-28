@@ -2,169 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87740C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 13:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E86B4C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 13:57:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243290AbiC1NSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 09:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55616 "EHLO
+        id S243553AbiC1N7e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 09:59:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243071AbiC1NR7 (ORCPT
+        with ESMTP id S243547AbiC1N7d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 09:17:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE3F62714F
-        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 06:16:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648473377;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=80jZIITs+99nIoEveepu0l/LxeyCPVpi03G8CUsNTF0=;
-        b=YIKvqf2pCHdLw7UyRK/nm6xE9cp77UEsScqVB7syeHIgBcp0f4p0zhk1jpYn+imduqA6z4
-        9PO5HJf5RmchuO5VGZD5eCPItcRfrQc/TdV75JbzIQ4T2HB6h0Ac+yY8T+vIfoyjQHDlml
-        fYFJV0oQxzD9PiSwGrJSQwSo36ENNHg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-500-WQeC-oFANLeuMdV0xtN-Yg-1; Mon, 28 Mar 2022 09:16:15 -0400
-X-MC-Unique: WQeC-oFANLeuMdV0xtN-Yg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 95A011C01E84;
-        Mon, 28 Mar 2022 13:16:14 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.150])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 425C7401E4E;
-        Mon, 28 Mar 2022 13:16:14 +0000 (UTC)
-Date:   Mon, 28 Mar 2022 14:16:13 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Suwan Kim <suwan.kim027@gmail.com>
-Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
-        mgurtovoy@nvidia.com, virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] virtio-blk: support mq_ops->queue_rqs()
-Message-ID: <YkG1HeQ8qu11KFnF@stefanha-x1.localdomain>
-References: <20220324140450.33148-1-suwan.kim027@gmail.com>
- <20220324140450.33148-3-suwan.kim027@gmail.com>
+        Mon, 28 Mar 2022 09:59:33 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73C8E5D678
+        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 06:57:51 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id j15so28824104eje.9
+        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 06:57:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=n9XsGPVM3OBI1o2wqhHoOEJxIfzU6g7lXxBVU0mjG/Y=;
+        b=Ez6cMtRVxjy3WSMB1qzvx3cy4spCXTGzgPZr10+KtI8BzuENmAwZYO3QRxO8apwhdk
+         Gx/OwzAq56twYuJHbSNRr/ynrf8UZv8nZabgjguaaYtLEw14dRILVPlAIb3NWcfCIEFz
+         R0vs6suuVg8txAujwrRo9eCsP66vuNCyg3q/7Hl5rhtiFGcLBnBlVW0XK6WRDQXGQpo9
+         P98aIYsAcPHmRmHhZT5GEmhehUmAo5sskD4IVNthqt4MCA4hYgDq5DFudsoiPiOVmqz3
+         ObFCsBjvY+rUifYfspBCrmsYiRbQMQJGHN3WmpiWJ6enDYObilCHWxEJh02YvmEBZDCV
+         1jzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=n9XsGPVM3OBI1o2wqhHoOEJxIfzU6g7lXxBVU0mjG/Y=;
+        b=CLcpr2oInvWo745Vn0/HpzMCCa4VDda93Vm/2NJLKIcYtyAtda+F5T0JnLJNf82UVg
+         2qS9LBKj/0ZIYmSsi7DuhT0XpsqKZJ4gzdjp2WG4CBF7t0AoYVNC3h25RzzFsnCJJBVG
+         2+pLSgERfZmU9A+sfVhBcGYo2pW3vgQRwRIlLqi9XQnhyMYkbGit9h1BX5ZusOcQHVJw
+         cZnpMFucvAMNY3gIoWdIOSs5VnscaJ0efbRtRdG8iSlgEU7P3879iaEyDY3/+xwtx1NB
+         FKAPgjeisnunEafxo0spZsl8KxdghQfX2EWYiJSnmPzDuzXBH9NBhd2KdHmUjzFvZF27
+         bfLw==
+X-Gm-Message-State: AOAM531NcmNK578nXplxQByTHl7rIYgaLy4PsnAIl/MJACTiYp8cJsYR
+        W9ncD7COKvInGmK51ToCkLPsxeLnOV+3wuZCqL12kA==
+X-Google-Smtp-Source: ABdhPJx8IAzAnugQilvYszPqbwu/kHCCuyCQG5aZa/oDfoRHr1M15AxQcxiJNiHW7Pkc4FoojrnBeCiC5WtixX+3oUs=
+X-Received: by 2002:a17:907:3da9:b0:6db:f3f:33c2 with SMTP id
+ he41-20020a1709073da900b006db0f3f33c2mr27321704ejc.735.1648475869953; Mon, 28
+ Mar 2022 06:57:49 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="aukWC0QEceelRlMd"
-Content-Disposition: inline
-In-Reply-To: <20220324140450.33148-3-suwan.kim027@gmail.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+References: <42165d3f9dfc7abb54542d34a4e33ea8e83b101c.1648379172.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <42165d3f9dfc7abb54542d34a4e33ea8e83b101c.1648379172.git.christophe.jaillet@wanadoo.fr>
+From:   Jinpu Wang <jinpu.wang@ionos.com>
+Date:   Mon, 28 Mar 2022 15:57:39 +0200
+Message-ID: <CAMGffEkVEWTcpK9ntx15xmvdiXtm+uwyz8Wr-AhAjwCcFLVOqg@mail.gmail.com>
+Subject: Re: [PATCH] block/rnbd: Fix the maximum clt_device_id value in init_dev()
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Danil Kipnis <danil.kipnis@ionos.com>,
+        linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+        Jack Wang <jinpu.wang@ionos.com>, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
---aukWC0QEceelRlMd
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 24, 2022 at 11:04:50PM +0900, Suwan Kim wrote:
-> @@ -367,6 +381,66 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw=
-_ctx *hctx,
->  	return BLK_STS_OK;
->  }
-> =20
-> +static bool virtblk_prep_rq_batch(struct virtio_blk_vq *vq, struct reque=
-st *req)
-> +{
-> +	struct virtio_blk *vblk =3D req->mq_hctx->queue->queuedata;
-> +	struct virtblk_req *vbr =3D blk_mq_rq_to_pdu(req);
-> +	unsigned long flags;
-> +	int num, err;
-> +
-> +	req->mq_hctx->tags->rqs[req->tag] =3D req;
-> +
-> +	if (virtblk_prep_rq(req->mq_hctx, vblk, req, vbr, &num) !=3D BLK_STS_OK)
-> +		return false;
-> +
-> +	spin_lock_irqsave(&vq->lock, flags);
-> +	err =3D virtblk_add_req(vq->vq, vbr, vbr->sg_table.sgl, num);
-> +	if (err) {
-> +		spin_unlock_irqrestore(&vq->lock, flags);
-> +		virtblk_unmap_data(req, vbr);
-> +		virtblk_cleanup_cmd(req);
-> +		return false;
-> +	}
-> +	spin_unlock_irqrestore(&vq->lock, flags);
-
-Simplification:
-
-  spin_lock_irqsave(&vq->lock, flags);
-  err =3D virtblk_add_req(vq->vq, vbr, vbr->sg_table.sgl, num);
-  spin_unlock_irqrestore(&vq->lock, flags);
-  if (err) {
-      virtblk_unmap_data(req, vbr);
-      virtblk_cleanup_cmd(req);
-      return false;
-  }
-
-> +
-> +	return true;
-> +}
-> +
-> +static void virtio_queue_rqs(struct request **rqlist)
-> +{
-> +	struct request *req, *next, *prev =3D NULL;
-> +	struct request *requeue_list =3D NULL;
-> +
-> +	rq_list_for_each_safe(rqlist, req, next) {
-> +		struct virtio_blk_vq *vq =3D req->mq_hctx->driver_data;
-> +		unsigned long flags;
-> +		bool kick;
-> +
-> +		if (!virtblk_prep_rq_batch(vq, req)) {
-> +			rq_list_move(rqlist, &requeue_list, req, prev);
-> +			req =3D prev;
-> +
-> +			if (!req)
-> +				continue;
-> +		}
-> +
-> +		if (!next || req->mq_hctx !=3D next->mq_hctx) {
-> +			spin_lock_irqsave(&vq->lock, flags);
-
-Did you try calling virtblk_add_req() here to avoid acquiring and
-releasing the lock multiple times? In other words, do virtblk_prep_rq()
-but wait until we get here to do virtblk_add_req().
-
-I don't know if it has any measurable effect on performance or maybe the
-code would become too complex, but I noticed that we're not fully
-exploiting batching.
-
-> +			kick =3D virtqueue_kick_prepare(vq->vq);
-> +			spin_unlock_irqrestore(&vq->lock, flags);
-> +			if (kick)
-> +				virtqueue_notify(vq->vq);
-> +
-> +			req->rq_next =3D NULL;
-> +			*rqlist =3D next;
-> +			prev =3D NULL;
-> +		} else
-> +			prev =3D req;
-
-What guarantees that req is still alive after we called
-virtblk_add_req()? The device may have seen it and completed it already
-by the time we get here.
-
---aukWC0QEceelRlMd
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmJBtR0ACgkQnKSrs4Gr
-c8iSGgf7BNTuMPGJKEJL5YvuaSkP9tkxRu0Ox0PHhKsi+lLc4MBCXoZOlKP1tN0W
-8kxLoGTXs973GnjvVeOGSesENUrAmNDp/T0yoGpqR+ViuerbqVHA+vJgQ1/CNqKz
-/cNbrskA1tmIe8X0Y6Mbdw15mAgIFlWu9Ngcw40Gkn/n2plb5xqUNfkPB7osOGr1
-sHhWE1PybsAFc82p4rzHEWukkRXFPQz7BPjgpKHorScjzSOPlkeVXDB+UHFgp3d1
-zGE1aUHq9EN23Lefb8nCOEVE8HVZ5GEX3bdKpDO/tGdzMHXgcIi+sxCjFtb7dalV
-jNcujLPscSGe1HDWTbeiwuKuvUbaag==
-=sF01
------END PGP SIGNATURE-----
-
---aukWC0QEceelRlMd--
-
+On Sun, Mar 27, 2022 at 1:06 PM Christophe JAILLET
+<christophe.jaillet@wanadoo.fr> wrote:
+>
+> ida_alloc_range(..., min, max, ...) returns values from min to max,
+> inclusive.
+>
+> So, '1 << (MINORBITS - RNBD_PART_BITS)' is a valid value for ret, which is
+> then saved in 'dev->clt_device_id'.
+>
+> This value is used in rnbd_client_setup_device() and passed to
+> rnbd_clt_setup_gen_disk().
+> There we have:
+>     dev->gd->first_minor        = idx << RNBD_PART_BITS
+>
+> So a possible value for 'gd->first_minor' is '1 << MINORBITS'
+>
+> This is an issue because:
+>     rnbd_clt_setup_gen_disk()
+>     --> add_disk(dev->gd)
+>       --> device_add_disk(NULL, disk, NULL)
+>
+> And there we have:
+>    ddev->devt = MKDEV(disk->major, disk->first_minor);
+>
+> So, should 'gd->first_minor' be '1 << MINORBITS', MKDEV() would overflow.
+>
+> Fixes: f7a7a5c228d4 ("block/rnbd: client: main functionality")
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> ---
+> #define MKDEV(ma,mi)    (((ma) << MINORBITS) | (mi))
+>
+> This patch is completely speculative.
+>
+> I think that:
+>         if (disk->first_minor + disk->minors > MINORMASK + 1)
+>                 return -EINVAL;
+> in device_add_disk() handles this corner case.
+> Anyway, if I'm correct, handling the error earlier can't hurt (at least I
+> guess so :)).
+>
+> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+looks good to me, thx!
+Acked-by: Jack Wang <jinpu.wang@ionos.com>
+> ---
+>  drivers/block/rnbd/rnbd-clt.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index b66e8840b94b..db900c3786a3 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1454,7 +1454,7 @@ static struct rnbd_clt_dev *init_dev(struct rnbd_clt_session *sess,
+>                 goto out_alloc;
+>         }
+>
+> -       ret = ida_alloc_max(&index_ida, 1 << (MINORBITS - RNBD_PART_BITS),
+> +       ret = ida_alloc_max(&index_ida, (1 << (MINORBITS - RNBD_PART_BITS)) - 1,
+>                             GFP_KERNEL);
+>         if (ret < 0) {
+>                 pr_err("Failed to initialize device '%s' from session %s, allocating idr failed, err: %d\n",
+> --
+> 2.32.0
+>
