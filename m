@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3083C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DAD6C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:24:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241019AbiC1LZm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:25:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45404 "EHLO
+        id S240750AbiC1LZz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:25:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57276 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241140AbiC1LZO (ORCPT
+        with ESMTP id S241716AbiC1LYJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:25:14 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D879B38F;
-        Mon, 28 Mar 2022 04:23:20 -0700 (PDT)
+        Mon, 28 Mar 2022 07:24:09 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCDF356212;
+        Mon, 28 Mar 2022 04:21:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 025ABB81055;
-        Mon, 28 Mar 2022 11:23:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DFE34C36AE9;
-        Mon, 28 Mar 2022 11:23:16 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 9D80961126;
+        Mon, 28 Mar 2022 11:21:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F9BDC36AE5;
+        Mon, 28 Mar 2022 11:21:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466597;
-        bh=pNGC9iaIzki56+oLL+F2pcsDvere2XFtbUd5KkGa3fg=;
+        s=k20201202; t=1648466505;
+        bh=p7xJ9qpWfezlsKnmcqhlhATGgUbph48s1/5K73DMHN0=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fc3XWfAX3qlYoznzA3saKdq2exFy9DLLByFwPb2vRxa3IDLLyfDq0ZAsriyKAsMRD
-         KLnFf8TO8vkGpJcTT9LcYTGrZLM4AF2arQFyihelTCIHLSJIyCqImVld+Ne8nX5ZUe
-         SVWq7wg+W8NzDbPM62k0jW3Bv7NjODDE44GftcGAfLBbsVB7unB8xDL095r+GH/yB5
-         uU7SOvEfRp034nlvbQUL2ZopZio1J9EgDDg5NCFJ8qHLSUcL1sxISk8y6YUZrrud3R
-         HZ/PFuMKUNBEZ6V7afgQkgzF5U49W+SVjxBvETdTaaTA086krV9nEcZKwzfv2sUP0a
-         GVWn2v6Xwsxhg==
+        b=CP/oZgRIqKbUfX0YKgoftcYgZW6AdFVHZREwqrHCTMfHmv6WDs7hgB3wK0p770XsR
+         /xQfvP52JH/dBIAWOruGI14mP+S/bTiSITZFg3tME82RCZtilRV53hKW8M7xNDnF4H
+         K9S59F6oty2weRnWMkm5zIgUgUDJkNz0dnVEUY/OJybkuxKkhuXfgW/ZyZQGYEINt5
+         /pKbRGa1ZkK3tuz6ge4FYE3mKOpiVLO31gUEzvQ0k3/e4Fnac+A3ythm1UFrC8t5RU
+         P0QMMxKx8WQO2nFSq7H+0Y6+H3HdJCwG6wMemCfqoq8g+B5IvtuLRpGvYHujwvfumA
+         upUvcjmgj486w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
-        Himanshu Madhani <himanshu.madhani@oracle.com>,
+Cc:     Yahu Gao <gaoyahu19@gmail.com>,
+        Paolo Valente <paolo.valente@linaro.org>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 08/21] loop: use sysfs_emit() in the sysfs xxx show()
-Date:   Mon, 28 Mar 2022 07:22:41 -0400
-Message-Id: <20220328112254.1556286-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 07/29] block/bfq_wf2q: correct weight to ioprio
+Date:   Mon, 28 Mar 2022 07:21:09 -0400
+Message-Id: <20220328112132.1555683-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328112254.1556286-1-sashal@kernel.org>
-References: <20220328112254.1556286-1-sashal@kernel.org>
+In-Reply-To: <20220328112132.1555683-1-sashal@kernel.org>
+References: <20220328112132.1555683-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,71 +52,36 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Chaitanya Kulkarni <kch@nvidia.com>
+From: Yahu Gao <gaoyahu19@gmail.com>
 
-[ Upstream commit b27824d31f09ea7b4a6ba2c1b18bd328df3e8bed ]
+[ Upstream commit bcd2be763252f3a4d5fc4d6008d4d96c601ee74b ]
 
-sprintf does not know the PAGE_SIZE maximum of the temporary buffer
-used for outputting sysfs content and it's possible to overrun the
-PAGE_SIZE buffer length.
+The return value is ioprio * BFQ_WEIGHT_CONVERSION_COEFF or 0.
+What we want is ioprio or 0.
+Correct this by changing the calculation.
 
-Use a generic sysfs_emit function that knows the size of the
-temporary buffer and ensures that no overrun is done for offset
-attribute in
-loop_attr_[offset|sizelimit|autoclear|partscan|dio]_show() callbacks.
-
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
-Reviewed-by: Himanshu Madhani <himanshu.madhani@oracle.com>
-Link: https://lore.kernel.org/r/20220215213310.7264-2-kch@nvidia.com
+Signed-off-by: Yahu Gao <gaoyahu19@gmail.com>
+Acked-by: Paolo Valente <paolo.valente@linaro.org>
+Link: https://lore.kernel.org/r/20220107065859.25689-1-gaoyahu19@gmail.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/loop.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ block/bfq-wf2q.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index ee537a9f1d1a..e4517d483bdc 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -797,33 +797,33 @@ static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
- 
- static ssize_t loop_attr_offset_show(struct loop_device *lo, char *buf)
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index b74cc0da118e..709b901de3ca 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -519,7 +519,7 @@ unsigned short bfq_ioprio_to_weight(int ioprio)
+ static unsigned short bfq_weight_to_ioprio(int weight)
  {
--	return sprintf(buf, "%llu\n", (unsigned long long)lo->lo_offset);
-+	return sysfs_emit(buf, "%llu\n", (unsigned long long)lo->lo_offset);
+ 	return max_t(int, 0,
+-		     IOPRIO_NR_LEVELS * BFQ_WEIGHT_CONVERSION_COEFF - weight);
++		     IOPRIO_NR_LEVELS - weight / BFQ_WEIGHT_CONVERSION_COEFF);
  }
  
- static ssize_t loop_attr_sizelimit_show(struct loop_device *lo, char *buf)
- {
--	return sprintf(buf, "%llu\n", (unsigned long long)lo->lo_sizelimit);
-+	return sysfs_emit(buf, "%llu\n", (unsigned long long)lo->lo_sizelimit);
- }
- 
- static ssize_t loop_attr_autoclear_show(struct loop_device *lo, char *buf)
- {
- 	int autoclear = (lo->lo_flags & LO_FLAGS_AUTOCLEAR);
- 
--	return sprintf(buf, "%s\n", autoclear ? "1" : "0");
-+	return sysfs_emit(buf, "%s\n", autoclear ? "1" : "0");
- }
- 
- static ssize_t loop_attr_partscan_show(struct loop_device *lo, char *buf)
- {
- 	int partscan = (lo->lo_flags & LO_FLAGS_PARTSCAN);
- 
--	return sprintf(buf, "%s\n", partscan ? "1" : "0");
-+	return sysfs_emit(buf, "%s\n", partscan ? "1" : "0");
- }
- 
- static ssize_t loop_attr_dio_show(struct loop_device *lo, char *buf)
- {
- 	int dio = (lo->lo_flags & LO_FLAGS_DIRECT_IO);
- 
--	return sprintf(buf, "%s\n", dio ? "1" : "0");
-+	return sysfs_emit(buf, "%s\n", dio ? "1" : "0");
- }
- 
- LOOP_ATTR_RO(backing_file);
+ static void bfq_get_entity(struct bfq_entity *entity)
 -- 
 2.34.1
 
