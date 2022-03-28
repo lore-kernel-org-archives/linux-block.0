@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7FE6C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:38:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2DDFC43217
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:38:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236650AbiC1LkR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:40:17 -0400
+        id S240019AbiC1LkV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:40:21 -0400
 Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241663AbiC1LdR (ORCPT
+        with ESMTP id S241901AbiC1Ld4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:33:17 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5F07583A7;
-        Mon, 28 Mar 2022 04:24:47 -0700 (PDT)
+        Mon, 28 Mar 2022 07:33:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88E2583A1;
+        Mon, 28 Mar 2022 04:25:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 938F6B8105C;
-        Mon, 28 Mar 2022 11:24:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C844C34111;
-        Mon, 28 Mar 2022 11:24:43 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A301D611D0;
+        Mon, 28 Mar 2022 11:25:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49990C36AE2;
+        Mon, 28 Mar 2022 11:24:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466684;
-        bh=arOqiv7s1sG8hM57x5heqLv9MAqGzAu1E9HVg0Oq938=;
+        s=k20201202; t=1648466700;
+        bh=f33bEnVh+8N/Rz8/d6j1iSz6hPzJh5PCzK3Nlal1e2c=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Rb7zUUn2KQfsCKsxUaAIbcKh9L5W9WVsOHEJzcbmSiRDiRDcxbOydlqG7bgqKxjkd
-         9PlddUkiur8hB0rCEWmQOien6WvfG35PE25VTRJwZxuJ4MhEHO0SAfu2JbT/xHXXM6
-         Gxi7yEXO946pMmhDuLhYM0+E0vcDmOz4s7Q0BMji505ahZIH1mIjTVIZPtSUkjoUoh
-         u8lO5e0UEtG4L4/z4ooxRvI8eMXtsOqC75y+a+ZZQhj5cMXa5d3eNNQ48w4zT/wITL
-         bkBV+bIfvxAkTC5847eNvzxmbChVI2pDQuvLd/P6AIWctmGKedD5VphYv9Xu0oTqeZ
-         zMwu9yPDwQYmg==
+        b=ZtiJjyZEsljlRt+muuuM4p/RVxGsjuxVVQ404jQdgClrpMdZyf781a7BJNnZqydzV
+         58lJk8PD10GsUr/LIUw6eiuu0YGavbj3XvlwTiZyvxemWjBQykBXSwi5rb+R8Upeae
+         olHKmoU9v+u1s5ur5IBS12b1rzMcQBqLKa78M1P24WKiR51MoZA0+s+ZP+1uKJMZyh
+         y4noPzxN/GA781qPtzQglpStHzFr+kswqPi77eGQ0QhH4bzLoERMGWk4j7Aqyg8m1t
+         27/9HB/pywgWkTxS4cnJGlX9fy1eCmGWhowA2lhuuaKNPhXA/nSNa6N/cy85BPXieK
+         kh0wKDUCXGjLQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Chaitanya Kulkarni <kch@nvidia.com>,
         Himanshu Madhani <himanshu.madhani@oracle.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 2/8] loop: use sysfs_emit() in the sysfs xxx show()
-Date:   Mon, 28 Mar 2022 07:24:33 -0400
-Message-Id: <20220328112440.1557113-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 2/8] loop: use sysfs_emit() in the sysfs xxx show()
+Date:   Mon, 28 Mar 2022 07:24:50 -0400
+Message-Id: <20220328112456.1557226-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328112440.1557113-1-sashal@kernel.org>
-References: <20220328112440.1557113-1-sashal@kernel.org>
+In-Reply-To: <20220328112456.1557226-1-sashal@kernel.org>
+References: <20220328112456.1557226-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -75,10 +75,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index c6157ccb9498..4c115c1e9209 100644
+index f236b7984b94..2ff17b397cd2 100644
 --- a/drivers/block/loop.c
 +++ b/drivers/block/loop.c
-@@ -765,33 +765,33 @@ static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
+@@ -773,33 +773,33 @@ static ssize_t loop_attr_backing_file_show(struct loop_device *lo, char *buf)
  
  static ssize_t loop_attr_offset_show(struct loop_device *lo, char *buf)
  {
