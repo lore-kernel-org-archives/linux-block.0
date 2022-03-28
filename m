@@ -2,95 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 404C3C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 08:30:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B90DAC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 08:45:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236720AbiC1Ic2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 04:32:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32954 "EHLO
+        id S235751AbiC1Iqj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 04:46:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239386AbiC1Ic1 (ORCPT
+        with ESMTP id S239493AbiC1Iqi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 04:32:27 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5837B13D32
-        for <linux-block@vger.kernel.org>; Mon, 28 Mar 2022 01:30:47 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 0FDC71F385;
-        Mon, 28 Mar 2022 08:30:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1648456246; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zTwNET6NFHGhSKFNWoO4/wxCz/Ohx5B7SlCtUBVlQec=;
-        b=LN9Jptd9hAjIgEC4ZJmFQX/Z9N5TuwM0oNuHpyuekuzMosDdN1+zZQiQlk9wDeSDjvd2w6
-        ZxFgWJEf/CWf2/8tIhQnBn/W8HtC/uyzq3SlpMwYxmRZpCMMYusgMHB6sxcdWXEiHHej60
-        Cxrr6S6oSUaYbCkw3obQzRimu/FAwEQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1648456246;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=zTwNET6NFHGhSKFNWoO4/wxCz/Ohx5B7SlCtUBVlQec=;
-        b=seQ2j4KoWErxklMTXjF+mwYwb3/OrpqVESFpdXgFmwVUZOxc+X1TKBuIpVHUt68YYxe2YJ
-        q2O2KFm4JeBQ1vBw==
-Received: from quack3.suse.cz (unknown [10.163.43.118])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 8993BA3B87;
-        Mon, 28 Mar 2022 08:30:45 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 3BB61A0610; Mon, 28 Mar 2022 10:30:45 +0200 (CEST)
-Date:   Mon, 28 Mar 2022 10:30:45 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-        Dave Chinner <david@fromorbit.com>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        nbd@other.debian.org
-Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
- ->open / ->release
-Message-ID: <20220328083045.ryoh7rbhauxgezgn@quack3.lan>
-References: <20220324075119.1556334-1-hch@lst.de>
- <20220324075119.1556334-13-hch@lst.de>
- <20220324141321.pqesnshaswwk3svk@quack3.lan>
- <96a4e2e7-e16e-7e89-255d-8aa29ffca68b@I-love.SAKURA.ne.jp>
- <20220324172335.GA28299@lst.de>
- <0b47dbee-ce17-7502-6bf3-fad939f89bb7@I-love.SAKURA.ne.jp>
- <20220325162331.GA16355@lst.de>
+        Mon, 28 Mar 2022 04:46:38 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997D453B41;
+        Mon, 28 Mar 2022 01:44:58 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id p26-20020a05600c1d9a00b0038ccbff1951so5149753wms.1;
+        Mon, 28 Mar 2022 01:44:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Pqdm+mBE6rvDwcUiUDsdVFIdx5r1E/ZYwzEqYDEj1e0=;
+        b=NB+PmO5b3jTtCuBHri6okNxSStdSscYcd7scQMYe+jFgLN/IzFE+S/k+w+siMZXP8U
+         0eJno86W9uXoIMvzol/M2MNDwdibNcN2b4FFn2m9YcSbLuppA5h7atjI47yhBw/DuZn5
+         rDwCyiY1dEnrzdCJJdBCtEVfFIwKQRSyjLJ6nmENR5/abqGmZiemDaSBz5RAkPZDQbAC
+         YDdkIlBUpLasyQpvi9gqdWoN7ozOg8JQzoxag7TtvScki1DQr45K6/SYQTTX9fere8Md
+         r1IRNilqQifjqHfyJQi13KfuAqNodpxNLeN4wA+2chspQnDeMZsBvgj6BJ5o21Z7eAhK
+         iARg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Pqdm+mBE6rvDwcUiUDsdVFIdx5r1E/ZYwzEqYDEj1e0=;
+        b=0lYQvyWPisiq8pLQ91bgW4qBWOzAB+baoOY921rrwR3FQv7OopYdIbTzz1ka4HFyON
+         U4r/rRXavbEVEeEgJ7pIqr1h6Ve8Gl1Xyv0BJ5RvbyIcEfBWUCwF/6wafR5LAktRmhJk
+         VvIaAa8D9JNkEDnMNusHxt3p3EcZKChnInuHj9qaspVkcWRstjQeR57yH1WGtDXVCGuv
+         1hq9urwb02AFoskHa3lZY1LcfdbZS8IqXKEdXyXb/cX4RSrTYUwyX0dTZ2VZTKlEfynP
+         QIy8lnaMcPXTJwDoawCW74UNv77d5uniW0s+iqFiepe1nrJp7aKL+qM3lFGrx6ppHTRW
+         ljUg==
+X-Gm-Message-State: AOAM530RLzG+TiaZmRnhaLM9k2zy9oi6/a5rqLScwgx5nh7rUFOiwhxJ
+        378GfHkowyVOIQvChKaQscU=
+X-Google-Smtp-Source: ABdhPJxtdTBusI80FVUAuQFJXM8pHhDgNrv9BKoyKHkaGwamAo3bAaxMSp13WOHJlEJWWqn1wdZbjg==
+X-Received: by 2002:a7b:c186:0:b0:38c:75ea:4903 with SMTP id y6-20020a7bc186000000b0038c75ea4903mr24461122wmi.176.1648457097197;
+        Mon, 28 Mar 2022 01:44:57 -0700 (PDT)
+Received: from localhost.localdomain (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id o5-20020a5d4a85000000b00205a8bb9c0dsm10493303wrq.90.2022.03.28.01.44.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Mar 2022 01:44:56 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-scsi@vger.kernel.org
+Cc:     "Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
+        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
+Subject: [PATCH] scsi: sd: Jump to out_free_index if device_add{,_disk}() fail
+Date:   Mon, 28 Mar 2022 10:44:52 +0200
+Message-Id: <20220328084452.11479-1-fmdefrancesco@gmail.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220325162331.GA16355@lst.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri 25-03-22 17:23:31, Christoph Hellwig wrote:
-> On Fri, Mar 25, 2022 at 07:54:15PM +0900, Tetsuo Handa wrote:
-> > > But for now I'd really prefer to stop moving the goalpost further and
-> > > further.
-> > 
-> > Then, why not kill this code?
-> 
-> I think we should eventually do that, and I've indeed tested a patch
-> that is only cosmetically different.  I wasn't really convinced we
-> should do it in this series, but if there is consensus that we should
-> do it now I can respin the series with a patch like this included.
+Currently, if device_add() or device_add_disk() fail, the code jumps to
+the "out" label. Doing so we get a memory leak as Syzbot reports.[1]
 
-I'd defer it to a separate patchset. Because as much as the change to
-disallow LOOP_CLR_FD ioctl for used loop device makes sense, I'm not sure
-there isn't some framework using loop devices somewhere which relies on
-this just getting magically translated to setting LO_AUTOCLEAR flag. So IMO
-this has a big potential of userspace visible regression and as such I'd
-prefer doing it separately from the bugfixes.
+Fix this bug by jumping to the "out_free_index" label.
 
-								Honza
+[1] https://groups.google.com/g/syzkaller-bugs/c/BvuqG6YGb6I
+
+Reported-and-tested-by: syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
+Fixes: 2a7a891f4c40 ("scsi: sd: Add error handling support for add_disk()")
+Fixes: 265dfe8ebbab ("scsi: sd: Free scsi_disk device via put_device()")
+Signed-off-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
+---
+ drivers/scsi/sd.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index a390679cf458..61fcf653ef5a 100644
+--- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3434,7 +3434,7 @@ static int sd_probe(struct device *dev)
+ 	error = device_add(&sdkp->disk_dev);
+ 	if (error) {
+ 		put_device(&sdkp->disk_dev);
+-		goto out;
++		goto out_free_index;
+ 	}
+ 
+ 	dev_set_drvdata(dev, sdkp);
+@@ -3475,7 +3475,7 @@ static int sd_probe(struct device *dev)
+ 	error = device_add_disk(dev, gd, NULL);
+ 	if (error) {
+ 		put_device(&sdkp->disk_dev);
+-		goto out;
++		goto out_free_index;
+ 	}
+ 
+ 	if (sdkp->capacity)
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.34.1
+
