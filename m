@@ -2,50 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A16FC3527C
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74AF3C35280
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 11:22:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240835AbiC1LYc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 07:24:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54414 "EHLO
+        id S240867AbiC1LYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 07:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241576AbiC1LX7 (ORCPT
+        with ESMTP id S240799AbiC1LWa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 07:23:59 -0400
+        Mon, 28 Mar 2022 07:22:30 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CADF56774;
-        Mon, 28 Mar 2022 04:21:12 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC7D856C38;
+        Mon, 28 Mar 2022 04:19:34 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id C4404B80D13;
-        Mon, 28 Mar 2022 11:21:11 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2FA8C340EC;
-        Mon, 28 Mar 2022 11:21:09 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 55755B81055;
+        Mon, 28 Mar 2022 11:19:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A41EC34110;
+        Mon, 28 Mar 2022 11:19:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648466470;
-        bh=HmgySWAgI7lbWNhdt5YYN+F4pSLogygYEPz8K+p7vu8=;
+        s=k20201202; t=1648466373;
+        bh=DGiPymTuM+QJAu0OpzM/6EVWBNsoZgX5XuX4zN7L4Uc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=czyx8spc/jCrgljP5JH5XmuzNL2H0Can1CYrfHzLVx+e11ipfZhLw25y3pTkZSTl2
-         rhp9ZE5prOa746Omchvd3buM5ynwMNYPCYbFjeuxz/1loG1wH7QGfEm9UkTGhEIg2c
-         E/uybDN0lOn7++xxZhUtQ7tNsInF0o16Elab4oYU81y4By//Hb5xZF5StHApXbxYBb
-         9Z9GATxeMGa64HD7brujsZIcVH3bG2IWc6VlrxA+fNkskD89nnxgWZ2uPApA8e86F+
-         9JGyTpulbwInIWoHR30WFsWvYSQeibUSHY2+sMFcvkHoEl0BYB/p4wxtoyluyq4Wg6
-         MtTEl6+MPQaIg==
+        b=Sl5aPVNhM9r7JgS8aLtPt/Y9HqxWPbHa01GK2cOkOC998iKXT+3lWdnNm3VJSzQWt
+         xva0dCBL8+do64Fi//EkUhq2Lnkt/29f39qjGeCSpefQPDGaMi/kvaHdGrSGe5mxtm
+         ul0gy7L7oLua27nR3oW8mDbLLo5TlsczfEfXkMKr1MhUSvsUom4jJhhw1n53mqc8Ip
+         22+PLciPDKHVXHBjE/ZxxbSDi8hKw7hPSJuklsDLvK7QhHhF8ZkNuHS79Iu46XoW2m
+         VTGDZ5iwDCzPo72KNp+n6xg6imWg+o/Qv09ZoSYsZS7lqMliL8GCqYOFZHoEX/XwFu
+         6Z6AmwO6zr8Ww==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Paolo Valente <paolo.valente@linaro.org>,
-        =?UTF-8?q?Holger=20Hoffst=C3=A4tte?= 
-        <holger@applied-asynchrony.com>, Jens Axboe <axboe@kernel.dk>,
-        Sasha Levin <sashal@kernel.org>, linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.16 27/35] Revert "Revert "block, bfq: honor already-setup queue merges""
-Date:   Mon, 28 Mar 2022 07:20:03 -0400
-Message-Id: <20220328112011.1555169-27-sashal@kernel.org>
+Cc:     Zhang Wensheng <zhangwensheng5@huawei.com>,
+        Hulk Robot <hulkci@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Sasha Levin <sashal@kernel.org>, paolo.valente@linaro.org,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.17 30/43] bfq: fix use-after-free in bfq_dispatch_request
+Date:   Mon, 28 Mar 2022 07:18:14 -0400
+Message-Id: <20220328111828.1554086-30-sashal@kernel.org>
 X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220328112011.1555169-1-sashal@kernel.org>
-References: <20220328112011.1555169-1-sashal@kernel.org>
+In-Reply-To: <20220328111828.1554086-1-sashal@kernel.org>
+References: <20220328111828.1554086-1-sashal@kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
@@ -53,73 +52,181 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Paolo Valente <paolo.valente@linaro.org>
+From: Zhang Wensheng <zhangwensheng5@huawei.com>
 
-[ Upstream commit 15729ff8143f8135b03988a100a19e66d7cb7ecd ]
+[ Upstream commit ab552fcb17cc9e4afe0e4ac4df95fc7b30e8490a ]
 
-A crash [1] happened to be triggered in conjunction with commit
-2d52c58b9c9b ("block, bfq: honor already-setup queue merges"). The
-latter was then reverted by commit ebc69e897e17 ("Revert "block, bfq:
-honor already-setup queue merges""). Yet, the reverted commit was not
-the one introducing the bug. In fact, it actually triggered a UAF
-introduced by a different commit, and now fixed by commit d29bd41428cf
-("block, bfq: reset last_bfqq_created on group change").
+KASAN reports a use-after-free report when doing normal scsi-mq test
 
-So, there is no point in keeping commit 2d52c58b9c9b ("block, bfq:
-honor already-setup queue merges") out. This commit restores it.
+[69832.239032] ==================================================================
+[69832.241810] BUG: KASAN: use-after-free in bfq_dispatch_request+0x1045/0x44b0
+[69832.243267] Read of size 8 at addr ffff88802622ba88 by task kworker/3:1H/155
+[69832.244656]
+[69832.245007] CPU: 3 PID: 155 Comm: kworker/3:1H Not tainted 5.10.0-10295-g576c6382529e #8
+[69832.246626] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+[69832.249069] Workqueue: kblockd blk_mq_run_work_fn
+[69832.250022] Call Trace:
+[69832.250541]  dump_stack+0x9b/0xce
+[69832.251232]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.252243]  print_address_description.constprop.6+0x3e/0x60
+[69832.253381]  ? __cpuidle_text_end+0x5/0x5
+[69832.254211]  ? vprintk_func+0x6b/0x120
+[69832.254994]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.255952]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.256914]  kasan_report.cold.9+0x22/0x3a
+[69832.257753]  ? bfq_dispatch_request+0x1045/0x44b0
+[69832.258755]  check_memory_region+0x1c1/0x1e0
+[69832.260248]  bfq_dispatch_request+0x1045/0x44b0
+[69832.261181]  ? bfq_bfqq_expire+0x2440/0x2440
+[69832.262032]  ? blk_mq_delay_run_hw_queues+0xf9/0x170
+[69832.263022]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.264011]  ? blk_mq_sched_request_inserted+0x100/0x100
+[69832.265101]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.266206]  ? blk_mq_do_dispatch_ctx+0x570/0x570
+[69832.267147]  ? __switch_to+0x5f4/0xee0
+[69832.267898]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.268946]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.269840]  blk_mq_run_work_fn+0x51/0x60
+[69832.278170]  process_one_work+0x6d4/0xfe0
+[69832.278984]  worker_thread+0x91/0xc80
+[69832.279726]  ? __kthread_parkme+0xb0/0x110
+[69832.280554]  ? process_one_work+0xfe0/0xfe0
+[69832.281414]  kthread+0x32d/0x3f0
+[69832.282082]  ? kthread_park+0x170/0x170
+[69832.282849]  ret_from_fork+0x1f/0x30
+[69832.283573]
+[69832.283886] Allocated by task 7725:
+[69832.284599]  kasan_save_stack+0x19/0x40
+[69832.285385]  __kasan_kmalloc.constprop.2+0xc1/0xd0
+[69832.286350]  kmem_cache_alloc_node+0x13f/0x460
+[69832.287237]  bfq_get_queue+0x3d4/0x1140
+[69832.287993]  bfq_get_bfqq_handle_split+0x103/0x510
+[69832.289015]  bfq_init_rq+0x337/0x2d50
+[69832.289749]  bfq_insert_requests+0x304/0x4e10
+[69832.290634]  blk_mq_sched_insert_requests+0x13e/0x390
+[69832.291629]  blk_mq_flush_plug_list+0x4b4/0x760
+[69832.292538]  blk_flush_plug_list+0x2c5/0x480
+[69832.293392]  io_schedule_prepare+0xb2/0xd0
+[69832.294209]  io_schedule_timeout+0x13/0x80
+[69832.295014]  wait_for_common_io.constprop.1+0x13c/0x270
+[69832.296137]  submit_bio_wait+0x103/0x1a0
+[69832.296932]  blkdev_issue_discard+0xe6/0x160
+[69832.297794]  blk_ioctl_discard+0x219/0x290
+[69832.298614]  blkdev_common_ioctl+0x50a/0x1750
+[69832.304715]  blkdev_ioctl+0x470/0x600
+[69832.305474]  block_ioctl+0xde/0x120
+[69832.306232]  vfs_ioctl+0x6c/0xc0
+[69832.306877]  __se_sys_ioctl+0x90/0xa0
+[69832.307629]  do_syscall_64+0x2d/0x40
+[69832.308362]  entry_SYSCALL_64_after_hwframe+0x44/0xa9
+[69832.309382]
+[69832.309701] Freed by task 155:
+[69832.310328]  kasan_save_stack+0x19/0x40
+[69832.311121]  kasan_set_track+0x1c/0x30
+[69832.311868]  kasan_set_free_info+0x1b/0x30
+[69832.312699]  __kasan_slab_free+0x111/0x160
+[69832.313524]  kmem_cache_free+0x94/0x460
+[69832.314367]  bfq_put_queue+0x582/0x940
+[69832.315112]  __bfq_bfqd_reset_in_service+0x166/0x1d0
+[69832.317275]  bfq_bfqq_expire+0xb27/0x2440
+[69832.318084]  bfq_dispatch_request+0x697/0x44b0
+[69832.318991]  __blk_mq_do_dispatch_sched+0x52f/0x830
+[69832.319984]  __blk_mq_sched_dispatch_requests+0x398/0x4f0
+[69832.321087]  blk_mq_sched_dispatch_requests+0xdf/0x140
+[69832.322225]  __blk_mq_run_hw_queue+0xc0/0x270
+[69832.323114]  blk_mq_run_work_fn+0x51/0x60
+[69832.323942]  process_one_work+0x6d4/0xfe0
+[69832.324772]  worker_thread+0x91/0xc80
+[69832.325518]  kthread+0x32d/0x3f0
+[69832.326205]  ret_from_fork+0x1f/0x30
+[69832.326932]
+[69832.338297] The buggy address belongs to the object at ffff88802622b968
+[69832.338297]  which belongs to the cache bfq_queue of size 512
+[69832.340766] The buggy address is located 288 bytes inside of
+[69832.340766]  512-byte region [ffff88802622b968, ffff88802622bb68)
+[69832.343091] The buggy address belongs to the page:
+[69832.344097] page:ffffea0000988a00 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88802622a528 pfn:0x26228
+[69832.346214] head:ffffea0000988a00 order:2 compound_mapcount:0 compound_pincount:0
+[69832.347719] flags: 0x1fffff80010200(slab|head)
+[69832.348625] raw: 001fffff80010200 ffffea0000dbac08 ffff888017a57650 ffff8880179fe840
+[69832.354972] raw: ffff88802622a528 0000000000120008 00000001ffffffff 0000000000000000
+[69832.356547] page dumped because: kasan: bad access detected
+[69832.357652]
+[69832.357970] Memory state around the buggy address:
+[69832.358926]  ffff88802622b980: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.360358]  ffff88802622ba00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.361810] >ffff88802622ba80: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[69832.363273]                       ^
+[69832.363975]  ffff88802622bb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fc fc fc
+[69832.375960]  ffff88802622bb80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[69832.377405] ==================================================================
 
-[1] https://bugzilla.kernel.org/show_bug.cgi?id=214503
+In bfq_dispatch_requestfunction, it may have function call:
 
-Reported-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Link: https://lore.kernel.org/r/20211125181510.15004-1-paolo.valente@linaro.org
+bfq_dispatch_request
+	__bfq_dispatch_request
+		bfq_select_queue
+			bfq_bfqq_expire
+				__bfq_bfqd_reset_in_service
+					bfq_put_queue
+						kmem_cache_free
+In this function call, in_serv_queue has beed expired and meet the
+conditions to free. In the function bfq_dispatch_request, the address
+of in_serv_queue pointing to has been released. For getting the value
+of idle_timer_disabled, it will get flags value from the address which
+in_serv_queue pointing to, then the problem of use-after-free happens;
+
+Fix the problem by check in_serv_queue == bfqd->in_service_queue, to
+get the value of idle_timer_disabled if in_serve_queue is equel to
+bfqd->in_service_queue. If the space of in_serv_queue pointing has
+been released, this judge will aviod use-after-free problem.
+And if in_serv_queue may be expired or finished, the idle_timer_disabled
+will be false which would not give effects to bfq_update_dispatch_stats.
+
+Reported-by: Hulk Robot <hulkci@huawei.com>
+Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+Link: https://lore.kernel.org/r/20220303070334.3020168-1-zhangwensheng5@huawei.com
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- block/bfq-iosched.c | 16 +++++++++++++---
- 1 file changed, 13 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 15 ++++++++-------
+ 1 file changed, 8 insertions(+), 7 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 7eecd3200d83..342e927f213b 100644
+index 36a66e97e3c2..8735f075230f 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2662,6 +2662,15 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	 * are likely to increase the throughput.
- 	 */
- 	bfqq->new_bfqq = new_bfqq;
-+	/*
-+	 * The above assignment schedules the following redirections:
-+	 * each time some I/O for bfqq arrives, the process that
-+	 * generated that I/O is disassociated from bfqq and
-+	 * associated with new_bfqq. Here we increases new_bfqq->ref
-+	 * in advance, adding the number of processes that are
-+	 * expected to be associated with new_bfqq as they happen to
-+	 * issue I/O.
-+	 */
- 	new_bfqq->ref += process_refs;
- 	return new_bfqq;
- }
-@@ -2724,6 +2733,10 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- {
- 	struct bfq_queue *in_service_bfqq, *new_bfqq;
+@@ -5181,7 +5181,7 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+ 	struct request *rq;
+ 	struct bfq_queue *in_serv_queue;
+-	bool waiting_rq, idle_timer_disabled;
++	bool waiting_rq, idle_timer_disabled = false;
  
-+	/* if a merge has already been setup, then proceed with that first */
-+	if (bfqq->new_bfqq)
-+		return bfqq->new_bfqq;
-+
- 	/*
- 	 * Check delayed stable merge for rotational or non-queueing
- 	 * devs. For this branch to be executed, bfqq must not be
-@@ -2825,9 +2838,6 @@ bfq_setup_cooperator(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 	if (bfq_too_late_for_merging(bfqq))
- 		return NULL;
+ 	spin_lock_irq(&bfqd->lock);
  
--	if (bfqq->new_bfqq)
--		return bfqq->new_bfqq;
+@@ -5189,14 +5189,15 @@ static struct request *bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+ 	waiting_rq = in_serv_queue && bfq_bfqq_wait_request(in_serv_queue);
+ 
+ 	rq = __bfq_dispatch_request(hctx);
 -
- 	if (!io_struct || unlikely(bfqq == &bfqd->oom_bfqq))
- 		return NULL;
+-	idle_timer_disabled =
+-		waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
++	if (in_serv_queue == bfqd->in_service_queue) {
++		idle_timer_disabled =
++			waiting_rq && !bfq_bfqq_wait_request(in_serv_queue);
++	}
  
+ 	spin_unlock_irq(&bfqd->lock);
+-
+-	bfq_update_dispatch_stats(hctx->queue, rq, in_serv_queue,
+-				  idle_timer_disabled);
++	bfq_update_dispatch_stats(hctx->queue, rq,
++			idle_timer_disabled ? in_serv_queue : NULL,
++				idle_timer_disabled);
+ 
+ 	return rq;
+ }
 -- 
 2.34.1
 
