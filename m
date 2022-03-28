@@ -2,107 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B90DAC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 08:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B081C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 28 Mar 2022 08:59:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235751AbiC1Iqj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 28 Mar 2022 04:46:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42894 "EHLO
+        id S239594AbiC1JBP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 28 Mar 2022 05:01:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239493AbiC1Iqi (ORCPT
+        with ESMTP id S239595AbiC1JBO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 28 Mar 2022 04:46:38 -0400
-Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997D453B41;
-        Mon, 28 Mar 2022 01:44:58 -0700 (PDT)
-Received: by mail-wm1-x332.google.com with SMTP id p26-20020a05600c1d9a00b0038ccbff1951so5149753wms.1;
-        Mon, 28 Mar 2022 01:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Pqdm+mBE6rvDwcUiUDsdVFIdx5r1E/ZYwzEqYDEj1e0=;
-        b=NB+PmO5b3jTtCuBHri6okNxSStdSscYcd7scQMYe+jFgLN/IzFE+S/k+w+siMZXP8U
-         0eJno86W9uXoIMvzol/M2MNDwdibNcN2b4FFn2m9YcSbLuppA5h7atjI47yhBw/DuZn5
-         rDwCyiY1dEnrzdCJJdBCtEVfFIwKQRSyjLJ6nmENR5/abqGmZiemDaSBz5RAkPZDQbAC
-         YDdkIlBUpLasyQpvi9gqdWoN7ozOg8JQzoxag7TtvScki1DQr45K6/SYQTTX9fere8Md
-         r1IRNilqQifjqHfyJQi13KfuAqNodpxNLeN4wA+2chspQnDeMZsBvgj6BJ5o21Z7eAhK
-         iARg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Pqdm+mBE6rvDwcUiUDsdVFIdx5r1E/ZYwzEqYDEj1e0=;
-        b=0lYQvyWPisiq8pLQ91bgW4qBWOzAB+baoOY921rrwR3FQv7OopYdIbTzz1ka4HFyON
-         U4r/rRXavbEVEeEgJ7pIqr1h6Ve8Gl1Xyv0BJ5RvbyIcEfBWUCwF/6wafR5LAktRmhJk
-         VvIaAa8D9JNkEDnMNusHxt3p3EcZKChnInuHj9qaspVkcWRstjQeR57yH1WGtDXVCGuv
-         1hq9urwb02AFoskHa3lZY1LcfdbZS8IqXKEdXyXb/cX4RSrTYUwyX0dTZ2VZTKlEfynP
-         QIy8lnaMcPXTJwDoawCW74UNv77d5uniW0s+iqFiepe1nrJp7aKL+qM3lFGrx6ppHTRW
-         ljUg==
-X-Gm-Message-State: AOAM530RLzG+TiaZmRnhaLM9k2zy9oi6/a5rqLScwgx5nh7rUFOiwhxJ
-        378GfHkowyVOIQvChKaQscU=
-X-Google-Smtp-Source: ABdhPJxtdTBusI80FVUAuQFJXM8pHhDgNrv9BKoyKHkaGwamAo3bAaxMSp13WOHJlEJWWqn1wdZbjg==
-X-Received: by 2002:a7b:c186:0:b0:38c:75ea:4903 with SMTP id y6-20020a7bc186000000b0038c75ea4903mr24461122wmi.176.1648457097197;
-        Mon, 28 Mar 2022 01:44:57 -0700 (PDT)
-Received: from localhost.localdomain (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
-        by smtp.gmail.com with ESMTPSA id o5-20020a5d4a85000000b00205a8bb9c0dsm10493303wrq.90.2022.03.28.01.44.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Mar 2022 01:44:56 -0700 (PDT)
-From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org
-Cc:     "Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
-Subject: [PATCH] scsi: sd: Jump to out_free_index if device_add{,_disk}() fail
-Date:   Mon, 28 Mar 2022 10:44:52 +0200
-Message-Id: <20220328084452.11479-1-fmdefrancesco@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 28 Mar 2022 05:01:14 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B1A52E1D;
+        Mon, 28 Mar 2022 01:59:33 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id CB3DA210E0;
+        Mon, 28 Mar 2022 08:59:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1648457971; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=JjTRUXEsWdiWo+pOfUOR0gpFvCCT2Q/VJ9kcvZZ1do4=;
+        b=v4KIQz8oemUWPSiJN3H0UU9h5NBsKSFxHv7qEG5vYoHOAhlJ77aAh7gcF6AgCa3WPu3UmK
+        b036F/TWvFOPtPCKR4jhwGnDkzx3jo5gWY6EQx+IVZ2i6jXWDZB1y+vGQngPxTgoRObE4T
+        yLtlCFzyk+KIfF13D3H7paa8VjGRrmc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1648457971;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=JjTRUXEsWdiWo+pOfUOR0gpFvCCT2Q/VJ9kcvZZ1do4=;
+        b=7d60lZ8o0VMPUJfpRRhFdGNkspj1ivHV1JZ/Q4NSYuZ0Xsd33NtPT/hT/uKDMgWB+mji+G
+        g8Dyo6gTwoeOAXCw==
+Received: from localhost.localdomain (unknown [10.100.201.122])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 97F4FA3B88;
+        Mon, 28 Mar 2022 08:59:31 +0000 (UTC)
+From:   Jiri Slaby <jslaby@suse.cz>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiri Slaby <jslaby@suse.cz>, Christoph Hellwig <hch@lst.de>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH] block: restore the old set_task_ioprio() behaviour wrt PF_EXITING
+Date:   Mon, 28 Mar 2022 10:59:28 +0200
+Message-Id: <20220328085928.7899-1-jslaby@suse.cz>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, if device_add() or device_add_disk() fail, the code jumps to
-the "out" label. Doing so we get a memory leak as Syzbot reports.[1]
+PF_EXITING tasks were silently ignored before the below commits.
+Continue doing so. Otherwise python-psutil tests fail:
+  ERROR: psutil.tests.test_process.TestProcess.test_zombie_process
+  ----------------------------------------------------------------------
+  Traceback (most recent call last):
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/build/lib.linux-x86_64-3.9/psutil/_pslinux.py", line 1661, in wrapper
+      return fun(self, *args, **kwargs)
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/build/lib.linux-x86_64-3.9/psutil/_pslinux.py", line 2133, in ionice_set
+      return cext.proc_ioprio_set(self.pid, ioclass, value)
+  ProcessLookupError: [Errno 3] No such process
 
-Fix this bug by jumping to the "out_free_index" label.
+  During handling of the above exception, another exception occurred:
 
-[1] https://groups.google.com/g/syzkaller-bugs/c/BvuqG6YGb6I
+  Traceback (most recent call last):
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/psutil/tests/test_process.py", line 1313, in test_zombie_process
+      succeed_or_zombie_p_exc(fun)
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/psutil/tests/test_process.py", line 1288, in succeed_or_zombie_p_exc
+      return fun()
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/build/lib.linux-x86_64-3.9/psutil/__init__.py", line 792, in ionice
+      return self._proc.ionice_set(ioclass, value)
+    File "/home/abuild/rpmbuild/BUILD/psutil-5.9.0/build/lib.linux-x86_64-3.9/psutil/_pslinux.py", line 1665, in wrapper
+      raise NoSuchProcess(self.pid, self._name)
+  psutil.NoSuchProcess: process no longer exists (pid=2057)
 
-Reported-and-tested-by: syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
-Fixes: 2a7a891f4c40 ("scsi: sd: Add error handling support for add_disk()")
-Fixes: 265dfe8ebbab ("scsi: sd: Free scsi_disk device via put_device()")
-Signed-off-by: Fabio M. De Francesco <fmdefrancesco@gmail.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Jan Kara <jack@suse.cz>
+Cc: Jens Axboe <axboe@kernel.dk>
+Fixes: 5fc11eebb4 (block: open code create_task_io_context in set_task_ioprio)
+Fixes: a957b61254 (block: fix error in handling dead task for ioprio setting)
+Signed-off-by: Jiri Slaby <jslaby@suse.cz>
 ---
- drivers/scsi/sd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ block/blk-ioc.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index a390679cf458..61fcf653ef5a 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3434,7 +3434,7 @@ static int sd_probe(struct device *dev)
- 	error = device_add(&sdkp->disk_dev);
- 	if (error) {
- 		put_device(&sdkp->disk_dev);
--		goto out;
-+		goto out_free_index;
- 	}
+diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+index 11f49f78db32..df9cfe4ca532 100644
+--- a/block/blk-ioc.c
++++ b/block/blk-ioc.c
+@@ -280,7 +280,6 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
  
- 	dev_set_drvdata(dev, sdkp);
-@@ -3475,7 +3475,7 @@ static int sd_probe(struct device *dev)
- 	error = device_add_disk(dev, gd, NULL);
- 	if (error) {
- 		put_device(&sdkp->disk_dev);
--		goto out;
-+		goto out_free_index;
- 	}
+ 		task_lock(task);
+ 		if (task->flags & PF_EXITING) {
+-			err = -ESRCH;
+ 			kmem_cache_free(iocontext_cachep, ioc);
+ 			goto out;
+ 		}
+@@ -292,7 +291,7 @@ int set_task_ioprio(struct task_struct *task, int ioprio)
+ 	task->io_context->ioprio = ioprio;
+ out:
+ 	task_unlock(task);
+-	return err;
++	return 0;
+ }
+ EXPORT_SYMBOL_GPL(set_task_ioprio);
  
- 	if (sdkp->capacity)
 -- 
-2.34.1
+2.35.1
 
