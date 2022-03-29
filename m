@@ -2,105 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CF00C4332F
-	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 09:26:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64084C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 09:42:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234694AbiC2J2e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 05:28:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32992 "EHLO
+        id S234742AbiC2Jnu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 05:43:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40042 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234684AbiC2J1o (ORCPT
+        with ESMTP id S234527AbiC2Jnt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 05:27:44 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12112986EA;
-        Tue, 29 Mar 2022 02:26:01 -0700 (PDT)
-Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KSPK1431gzfYyL;
-        Tue, 29 Mar 2022 17:24:21 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Tue, 29 Mar 2022 17:25:59 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Tue, 29 Mar
- 2022 17:25:58 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <andriy.shevchenko@linux.intel.com>,
-        <john.garry@huawei.com>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next RFC 4/6] sbitmap: wake up the number of threads based on required tags
-Date:   Tue, 29 Mar 2022 17:40:46 +0800
-Message-ID: <20220329094048.2107094-5-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220329094048.2107094-1-yukuai3@huawei.com>
-References: <20220329094048.2107094-1-yukuai3@huawei.com>
+        Tue, 29 Mar 2022 05:43:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 839C64B422
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 02:42:06 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 372B621614;
+        Tue, 29 Mar 2022 09:42:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1648546925; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bd2RgASabPUF53MD8kPW9HA/VZftYdPTsYUe1/q/32M=;
+        b=zzqKCPqtz7T1GfQriG2fM3yXZMBd/gXxCNgK4ZIOWkMXlQZ7d7X7r8vB7uyy0zI+GCoMTg
+        ZjKgSFeDGo6PAMdg1/1snQBCsTBEI0Cj6PcKTvy2753aV6KChevkwLmEx6r+HbucFtZgHo
+        G5ymRKH7/CtQun3KJuA6ORFVYZh5PlA=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1648546925;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Bd2RgASabPUF53MD8kPW9HA/VZftYdPTsYUe1/q/32M=;
+        b=p5kSxPjVdRzBVHnBFXsEuWz0LnccB8S37/6MRGOib1DjMduyr8bHReq6MAREBN1s4EiSLp
+        jomTPmUMXGs2mhDg==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 89300A3B82;
+        Tue, 29 Mar 2022 09:42:04 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 98AB2A0610; Tue, 29 Mar 2022 11:42:03 +0200 (CEST)
+Date:   Tue, 29 Mar 2022 11:42:03 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jan Kara <jack@suse.cz>,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Dave Chinner <david@fromorbit.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        "Darrick J . Wong" <djwong@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
+        nbd@other.debian.org
+Subject: Re: [PATCH 12/13] loop: remove lo_refcount and avoid lo_mutex in
+ ->open / ->release
+Message-ID: <20220329094203.zkgkqtumix7nygs2@quack3.lan>
+References: <20220324075119.1556334-1-hch@lst.de>
+ <20220324075119.1556334-13-hch@lst.de>
+ <20220324141321.pqesnshaswwk3svk@quack3.lan>
+ <96a4e2e7-e16e-7e89-255d-8aa29ffca68b@I-love.SAKURA.ne.jp>
+ <20220324172335.GA28299@lst.de>
+ <0b47dbee-ce17-7502-6bf3-fad939f89bb7@I-love.SAKURA.ne.jp>
+ <20220325162331.GA16355@lst.de>
+ <20220328083045.ryoh7rbhauxgezgn@quack3.lan>
+ <20220329063921.GA19778@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220329063921.GA19778@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, __sbq_wake_up() will wake up 'wake_batch' threads
-unconditionally, for split io this will intensify competition and split
-io won't be issued sequentially.
+On Tue 29-03-22 08:39:21, Christoph Hellwig wrote:
+> On Mon, Mar 28, 2022 at 10:30:45AM +0200, Jan Kara wrote:
+> > On Fri 25-03-22 17:23:31, Christoph Hellwig wrote:
+> > > On Fri, Mar 25, 2022 at 07:54:15PM +0900, Tetsuo Handa wrote:
+> > > > > But for now I'd really prefer to stop moving the goalpost further and
+> > > > > further.
+> > > > 
+> > > > Then, why not kill this code?
+> > > 
+> > > I think we should eventually do that, and I've indeed tested a patch
+> > > that is only cosmetically different.  I wasn't really convinced we
+> > > should do it in this series, but if there is consensus that we should
+> > > do it now I can respin the series with a patch like this included.
+> > 
+> > I'd defer it to a separate patchset. Because as much as the change to
+> > disallow LOOP_CLR_FD ioctl for used loop device makes sense, I'm not sure
+> > there isn't some framework using loop devices somewhere which relies on
+> > this just getting magically translated to setting LO_AUTOCLEAR flag. So IMO
+> > this has a big potential of userspace visible regression and as such I'd
+> > prefer doing it separately from the bugfixes.
+> 
+> At least my idea would not be to disallow LOOP_CLR_FD on a used block
+> devices as that would go back to the udev problems before Dave turned
+> it into a magic LO_AUTOCLEAR.  But to remove the lo_refcnt check
+> entirely, as loop_clr_fd now is safe against concurrent users - it
+> has to anyway as there can be other users even without an open.
 
-This modification can optimize the ratio of sequentially for split
-big io, however, in order to gain optimal result, tag preemption still
-need to be disabled, which will be done in later patches.
+Ah, OK, so you'd always set LO_AUTOCLEAR and leave cleanup to happen
+from lo_release()? That makes sense to me.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- lib/sbitmap.c | 22 +++++++++++++++++++++-
- 1 file changed, 21 insertions(+), 1 deletion(-)
-
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index ae4fd4de9ebe..9d04c0ecc8f7 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -597,6 +597,26 @@ static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
- 	return NULL;
- }
- 
-+static unsigned int get_wake_nr(struct sbq_wait_state *ws, unsigned int nr_tags)
-+{
-+	struct sbq_wait *wait;
-+	struct wait_queue_entry *entry;
-+	unsigned int nr = 1;
-+
-+	spin_lock_irq(&ws->wait.lock);
-+	list_for_each_entry(entry, &ws->wait.head, entry) {
-+		wait = container_of(entry, struct sbq_wait, wait);
-+		if (nr_tags <= wait->nr_tags)
-+			break;
-+
-+		nr++;
-+		nr_tags -= wait->nr_tags;
-+	}
-+	spin_unlock_irq(&ws->wait.lock);
-+
-+	return nr;
-+}
-+
- static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- {
- 	struct sbq_wait_state *ws;
-@@ -628,7 +648,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
- 		if (ret == wait_cnt) {
- 			sbq_index_atomic_inc(&sbq->wake_index);
--			wake_up_nr(&ws->wait, wake_batch);
-+			wake_up_nr(&ws->wait, get_wake_nr(ws, wake_batch));
- 			return false;
- 		}
- 
+								Honza
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
