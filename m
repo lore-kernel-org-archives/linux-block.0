@@ -2,110 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7972C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 08:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0F6C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 08:45:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232411AbiC2IaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 04:30:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34410 "EHLO
+        id S233683AbiC2IrR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 04:47:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233915AbiC2IaN (ORCPT
+        with ESMTP id S234084AbiC2IrQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 04:30:13 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C644BC2E;
-        Tue, 29 Mar 2022 01:28:29 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id bq8so19558172ejb.10;
-        Tue, 29 Mar 2022 01:28:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=X0CBK7H5KAD0lnlnKP0frM2mtSUqhfuGB3eg/LBvMJg=;
-        b=J5JKsxvCrCpujexBruGCPLspO7CMQXYu49WX4i9M9rtV6h0HSNzHjxyZfd1qZyisAf
-         tEAlGuoLsdqF4dD+BPLX7LY+EZo5TmpbaabjWUS0fSBPJfbdEI2iGeyOCtThHAFeTy4E
-         TExxV4nvxn7zrkJ+jQLke/vkAFtnBmd/87zOZba1VA6CfRTnE+FBPW4oNmuM8HO8fW8r
-         KVZP+jDE74+wiUE96Ziprd1AgQv9B4dpDFVxcpF1tOydUO/H65mFN9ThADaRPTe8WwEb
-         M7dRamwqK/Vucskuxmcvg6jDGoRfN14bYDVrGH9BMew2lvYB22Ma1/8ZHVxQkw1OjGGF
-         04iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=X0CBK7H5KAD0lnlnKP0frM2mtSUqhfuGB3eg/LBvMJg=;
-        b=0x5J0LbEWorFvXZdMg4MukqbHHxtOT4wUG1sFi/V4nKyucOXWjmPDeUL2ImJVvPyRN
-         2Ti11dVF4ZRudfIDMeQ7yhlmu5U17LnPOXHPkUU1lrSwJB2+RxNktEzPsgPvmBfMV5UO
-         0iEME/UWaX/85dPKG85a8XGLl0FZTclNk1ZiVsxJd9Y3W3MsVhQ8Ii+oZGzb2x3NxYHz
-         PLslW5YGnOG7tVOvG6TtJ0KBx+hsGi6/oxqJujQdcpE5peneoyAc3I5rpA01osqW1a49
-         mSTt00mDlfsK2JBGHhiEMSMUboXUgARNfZhmkbIYoyM+RPBstHoUxx3flI2PIkmN7PGg
-         4k1A==
-X-Gm-Message-State: AOAM530h+Z5bXux9EtoUnDA/ITkpIuCwRTSL/hXhpuSEwi05xR44Tul8
-        kJzObjh3uG6gNAOaPdjbvd4=
-X-Google-Smtp-Source: ABdhPJwbGRcP1Tkz9eusm9vJyR+e5qdqMqvo2Ts6vHPTU+xbbckzgWIj9FTgVDAhVvz6nKPnMT5RdQ==
-X-Received: by 2002:a17:906:9b85:b0:6db:ab80:7924 with SMTP id dd5-20020a1709069b8500b006dbab807924mr32941857ejc.160.1648542507580;
-        Tue, 29 Mar 2022 01:28:27 -0700 (PDT)
-Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
-        by smtp.gmail.com with ESMTPSA id hb6-20020a170907160600b006dff6a979fdsm6912468ejc.51.2022.03.29.01.28.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Mar 2022 01:28:26 -0700 (PDT)
-From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-scsi@vger.kernel.org,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com
-Subject: Re: [PATCH] scsi: sd: Jump to out_free_index if device_add{,_disk}() fail
-Date:   Tue, 29 Mar 2022 10:28:24 +0200
-Message-ID: <824276213.0ifERbkFSE@leap>
-In-Reply-To: <20220329075752.GS12805@kadam>
-References: <20220328084452.11479-1-fmdefrancesco@gmail.com> <20220329074744.GR12805@kadam> <20220329075752.GS12805@kadam>
+        Tue, 29 Mar 2022 04:47:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 88F2536B48
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 01:45:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648543533;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=uMgkTYZf/g0woPe8B780plgukc+vz+yUuXXC8TqXCcA=;
+        b=GeNcty1KmKyy9DowQft5B9ABkVPFPihE5FisH54+sYsbQbjlz3GtWTOtbft8F9Dp7lKT54
+        haSEdofARI5NTR4/wJdkGekBIHUHhjuwgT/sH5A5tnCX+mYf8mcbscv9HHAcvoSLhnxGh2
+        iradbaEBA7+1XaJOZPPoSRIUd8iYDZo=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-556-4oflrWbVOaKBM0S8CQKSBQ-1; Tue, 29 Mar 2022 04:45:31 -0400
+X-MC-Unique: 4oflrWbVOaKBM0S8CQKSBQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B7F571C168E4;
+        Tue, 29 Mar 2022 08:45:30 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.109])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6AE0D46A3AF;
+        Tue, 29 Mar 2022 08:45:30 +0000 (UTC)
+Date:   Tue, 29 Mar 2022 09:45:29 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Suwan Kim <suwan.kim027@gmail.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        mgurtovoy@nvidia.com, virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] virtio-blk: support mq_ops->queue_rqs()
+Message-ID: <YkLHKXukyZd27ADE@stefanha-x1.localdomain>
+References: <20220324140450.33148-1-suwan.kim027@gmail.com>
+ <20220324140450.33148-3-suwan.kim027@gmail.com>
+ <YkG1HeQ8qu11KFnF@stefanha-x1.localdomain>
+ <YkHZSV+USBSRPuTv@localhost.localdomain>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="mO5OVVo6Gt3wRhJH"
+Content-Disposition: inline
+In-Reply-To: <YkHZSV+USBSRPuTv@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On marted? 29 marzo 2022 09:57:53 CEST Dan Carpenter wrote:
-> On Tue, Mar 29, 2022 at 10:47:45AM +0300, Dan Carpenter wrote:
-> > No, this patch is wrong.  That is supposed to be freed in scsi_disk_release()
-> > but apparently that's not getting called.  Is the ref counting off?
-> > 
-> 
-> Yeah.  The device_add() needs a matching device_del().
-> 
-> regards,
-> dan carpenter
-> 
-Thanks, Dan.
 
-I've just just checked other similar code and saw the following pattern 
-whenever we have an error:
+--mO5OVVo6Gt3wRhJH
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-device_del(dev);
-put_device(dev);
+On Tue, Mar 29, 2022 at 12:50:33AM +0900, Suwan Kim wrote:
+> On Mon, Mar 28, 2022 at 02:16:13PM +0100, Stefan Hajnoczi wrote:
+> > On Thu, Mar 24, 2022 at 11:04:50PM +0900, Suwan Kim wrote:
+> > > +static void virtio_queue_rqs(struct request **rqlist)
+> > > +{
+> > > +	struct request *req, *next, *prev =3D NULL;
+> > > +	struct request *requeue_list =3D NULL;
+> > > +
+> > > +	rq_list_for_each_safe(rqlist, req, next) {
+> > > +		struct virtio_blk_vq *vq =3D req->mq_hctx->driver_data;
+> > > +		unsigned long flags;
+> > > +		bool kick;
+> > > +
+> > > +		if (!virtblk_prep_rq_batch(vq, req)) {
+> > > +			rq_list_move(rqlist, &requeue_list, req, prev);
+> > > +			req =3D prev;
+> > > +
+> > > +			if (!req)
+> > > +				continue;
+> > > +		}
+> > > +
+> > > +		if (!next || req->mq_hctx !=3D next->mq_hctx) {
+> > > +			spin_lock_irqsave(&vq->lock, flags);
+> >=20
+> > Did you try calling virtblk_add_req() here to avoid acquiring and
+> > releasing the lock multiple times? In other words, do virtblk_prep_rq()
+> > but wait until we get here to do virtblk_add_req().
+> >=20
+> > I don't know if it has any measurable effect on performance or maybe the
+> > code would become too complex, but I noticed that we're not fully
+> > exploiting batching.
+>=20
+> I tried as you said. I called virtlblk_add_req() and added requests
+> of rqlist to virtqueue in this if statement with holding the lock
+> only once.
+>=20
+> I attach the code at the end of this mail.
+> Please refer the code.
+>=20
+> But I didn't see improvement. It showed slightly worse performance
+> than the current patch.
 
-Therefore, I suppose that you are suggesting the following simple change:
+Okay, thanks for trying it!
 
-diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-index a390679cf458..13d96d0f9dde 100644
---- a/drivers/scsi/sd.c
-+++ b/drivers/scsi/sd.c
-@@ -3474,6 +3474,7 @@ static int sd_probe(struct device *dev)
- 
-        error = device_add_disk(dev, gd, NULL);
-        if (error) {
-+               device_del(&sdkp->disk_dev);
-                put_device(&sdkp->disk_dev);
-                goto out;
-        }
+> > > +			kick =3D virtqueue_kick_prepare(vq->vq);
+> > > +			spin_unlock_irqrestore(&vq->lock, flags);
+> > > +			if (kick)
+> > > +				virtqueue_notify(vq->vq);
+> > > +
+> > > +			req->rq_next =3D NULL;
+>=20
+> Did you ask this part?
+>=20
+> > > +			*rqlist =3D next;
+> > > +			prev =3D NULL;
+> > > +		} else
+> > > +			prev =3D req;
+> >=20
+> > What guarantees that req is still alive after we called
+> > virtblk_add_req()? The device may have seen it and completed it already
+> > by the time we get here.
+>=20
+> Isn't request completed after the kick?
+>=20
+> If you asked about "req->rq_next =3D NULL",
+> I think it should be placed before
+> "kick =3D virtqueue_kick_prepare(vq->vq);"
+>=20
+> -----------
+> 	req->rq_next =3D NULL;
+> 	kick =3D virtqueue_kick_prepare(vq->vq);
+> 	spin_unlock_irqrestore(&vq->lock, flags);
+> 	if (kick)
+> 		virtqueue_notify(vq->vq);
+> -----------
 
-Did I get it?
+No, virtqueue_add_sgs() exposes vring descriptors to the device. The
+device may process immediately. In other words, VIRTIO devices may poll
+the vring instead of waiting for virtqueue_notify(). There is no
+guarantee that the request is alive until virtqueue_notify() is called.
 
-Regards,
+The code has to handle the case where the request is completed during
+virtqueue_add_sgs().
 
-Fabio
+Stefan
 
+--mO5OVVo6Gt3wRhJH
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmJCxykACgkQnKSrs4Gr
+c8i6RggAyb2FEHMODJp1S34MXObUfuNkzJdnNuX2cn1Eh4CjmvTyHSPK/vSwqBF2
+cLcDqG1Mdf8qzvtO2WQdrkvDzhyYZAM0C51cQu7m1UzZ7HMmSVZc6XNdKplKS7uZ
+sWkGppbl43ng0Ts31FhSCE7tt5RbfQ1qZqdoCkDLl6oD4xAAP2/tJJy7iXaFdOoT
+PYI2OWs3S2u2kCxJdJbHVlxMy4I+SIn9q/ZOzzgz4PI4xAQ316YlL99ciyIqIBaX
+toE6eMSrkvyveT/O80M8OwwaVNkZR/EPZGNAWGwz6ZpmMIL33T+mRU3DOdC5ikLy
+aqaIom1JtCx+gekwkhhfw4XHhlJPqQ==
+=a5gB
+-----END PGP SIGNATURE-----
+
+--mO5OVVo6Gt3wRhJH--
 
