@@ -2,302 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 542DCC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 21:42:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0C07C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 22:30:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234497AbiC2VoY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 17:44:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36940 "EHLO
+        id S233931AbiC2WcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 18:32:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234302AbiC2VoY (ORCPT
+        with ESMTP id S237471AbiC2WcD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 17:44:24 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2190533A20
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 14:42:40 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id z23-20020a6b0a17000000b00649f13ea3a7so11417576ioi.23
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 14:42:40 -0700 (PDT)
+        Tue, 29 Mar 2022 18:32:03 -0400
+Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F44081197
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 15:30:18 -0700 (PDT)
+Received: by mail-lf1-x132.google.com with SMTP id m3so32709085lfj.11
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 15:30:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvz-org.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language
+         :from:to:cc:references:in-reply-to:content-transfer-encoding;
+        bh=pVfFf2LUiJ+lsVTn/1q73IQZHWiUdzX5dxpnEtrh5/M=;
+        b=Jrjr0c4GoXhREc6Y0AuBp/HQXw7DCz11gV9pvXQC2uHO/Lx+rb0jidySb0jUtdMDjI
+         3DuH9EqKXs0rVWa8iBLD6aFZjOeBWOQDnC6sOP1EzlxLCrsLBZQC6OiDfwZf5MeOcCD+
+         9+brZg2Ra5mOgBJrkdC4VJUTwfgpSN4R2FUOBWpGID2cA76JzRyNDWDZAFPBAhfmXGXr
+         9vsXT3zp4tYzYpMabRRa2K6THyetJCe0KpvV+RzTMc1A5SzCG+axrcLPnE2dtec0u4x7
+         dZxzaT9jB/LYFsDSDsd9kS4o4p7QfijPX2RhruEONplfcG0vvh6+dzPHsIcajGsJ14j1
+         4mKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=M2PV7/NvNeQv/6cvN2UQyzaC5uPl4rNbDHWaa31+KxE=;
-        b=mP83UNgX60vl/CpLLoQQZNZ8/bDz/YAWSnxawI+JFEgHaJNTC6pdiO6xDK1RHBk6md
-         zUOi/xLGs+a3Vs2RMu70a36mWxmEURB/BNFB386NEJuCcg4Kq8VMB2XyR7KwVuLbArDh
-         mbY1Bjf/HWsNLWj5xZx4EJP7X3zNDe24xoAs1gpb5qrllcwwJDQLO9f7leYiPTzkY4ra
-         zSBmYKTlM2+5asYc133J1PnS4uIXt24kI1MVCx9jTE4d2yxDDO32hdgonBV0VCWqgQ6V
-         17FPPijdnTYCUiBSyD2M/FcAVhtK1XQkj0oqzc/mi+4uckRQE32HQekQm/nWFDNc83OH
-         6vYg==
-X-Gm-Message-State: AOAM530rcIlvoGSSbpmDsYE6ioM9wViaHv7oe3tprBlCF3XWmYiZTK1j
-        XnVsXt1GYXviKF+PSDJACbEJUY2EObNF66tNYnq58Wt6Cpj0
-X-Google-Smtp-Source: ABdhPJzlFbC5teMav8cqcSVfBNO8N0KCR+vf6Sab3F44wx5SDqdQyWZQcE2TEyZ3uEujh9CZHy+YhzYejuUKkiy82AzPtCj6CO6/
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:from:to:cc:references:in-reply-to
+         :content-transfer-encoding;
+        bh=pVfFf2LUiJ+lsVTn/1q73IQZHWiUdzX5dxpnEtrh5/M=;
+        b=vXF8JHiEG/4jgu7lWng2EyRnDwX0jRqrSYLbvUjjzznwQy6LCAjq0WJXCN9FtMA8RV
+         UB40Kqj5B+kXFRd1DbpxJKs3kw8H/EoVHLTBToDmz24evmc9Eir/AlYiBH9MSortuAxO
+         OxqFLquzK9FRDDWFcpV8JU+jmaklVUX270HVkhj02nKmNER0Cmt3i3qcNJZDNbWRG4fg
+         91E50Ozdx7jxSXTQYMDUpDDC+r7Or6B6HIgDbIVAR9DqbJu4toyxrpwC5OBdZG0L/FcI
+         nNwG7tVOUM3ymysRzgM5mzaIc+Cn3UzGEcgypL6x5fPgIF/cB7dIxr7rBVc6ZlB0zSUN
+         20qQ==
+X-Gm-Message-State: AOAM533Vdotr7vXXH7eUpDkiDxCWbpSk3ku0AYQeQt4Psr2X/BelSt6c
+        5zEm0+xlc8gzGaP6BaGq74sYQQ==
+X-Google-Smtp-Source: ABdhPJwjPyIRXEqSaJ3aXsai40mgW0ySP5DWFmKQLoiwZAkLzP+t506D6D+qytxazIQad66XZ7nyZQ==
+X-Received: by 2002:a05:6512:1398:b0:445:bcef:e4fd with SMTP id p24-20020a056512139800b00445bcefe4fdmr4506411lfa.398.1648593016505;
+        Tue, 29 Mar 2022 15:30:16 -0700 (PDT)
+Received: from [192.168.0.120] ([2.92.192.13])
+        by smtp.gmail.com with ESMTPSA id h22-20020a0565123c9600b0044a3b2549c1sm2129416lfv.165.2022.03.29.15.30.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Mar 2022 15:30:16 -0700 (PDT)
+Message-ID: <7e7c19f3-ec6a-9a82-5b6f-04edbdc7040d@openvz.org>
+Date:   Wed, 30 Mar 2022 01:30:15 +0300
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:34a9:b0:323:600c:e42c with SMTP id
- t41-20020a05663834a900b00323600ce42cmr8991938jal.75.1648590159465; Tue, 29
- Mar 2022 14:42:39 -0700 (PDT)
-Date:   Tue, 29 Mar 2022 14:42:39 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d5cfe505db624e84@google.com>
-Subject: [syzbot] BUG: sleeping function called from invalid context in xa_destroy
-From:   syzbot <syzbot+ef9c11f60b926d1682a5@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [dm-devel] [PATCH 3/4] dm-qcow2: Introduce driver to create block
+ devices over QCOW2 files
+Content-Language: en-US
+From:   Kirill Tkhai <kirill.tkhai@openvz.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     agk@redhat.com, snitzer@redhat.com, dm-devel@redhat.com,
+        song@kernel.org, linux-kernel@vger.kernel.org,
+        khorenko@virtuozzo.com, axboe@kernel.dk,
+        linux-block@vger.kernel.org
+References: <164846619932.251310.3668540533992131988.stgit@pro>
+ <164846631540.251310.2398727490395218229.stgit@pro>
+ <YkMK1cmWyEJGoMB+@infradead.org>
+ <241b972d-5f78-6282-4f67-131a2566d479@openvz.org>
+In-Reply-To: <241b972d-5f78-6282-4f67-131a2566d479@openvz.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On 29.03.2022 18:24, Kirill Tkhai wrote:
+> On 29.03.2022 16:34, Christoph Hellwig wrote:
+>> On Mon, Mar 28, 2022 at 02:18:35PM +0300, Kirill Tkhai wrote:
+>>> The driver is request based, since this allows to use blk-mq
+>>> merging of request. Driver splits requests itself, and every
+>>> request (i.e., qio) after splitting fits a single cluster.
+>>> (In some cases it is worth to create bigger splits, and this
+>>> is a subject of further optimizations).
+>>
+>> Nak, please don't do that.  If you want finer grained processing use
+>> a bio based driver, not a request based one.  This is just getting us
+>> into tons of problems.
+> 
+> Could you explain what you mean? Why shouldn't I use generic bio merging
+> code, but implementing my own merging? Which problems you point?
+> 
+> Generic blk-mq is well tested and lots of people work on its performance.
+> It's not obvious reason I should better implement own realization.
 
-syzbot found the following issue on:
+In addition to this message. Possible, I confused you with patch description. Let I explain on example.
 
-HEAD commit:    1930a6e739c4 Merge tag 'ptrace-cleanups-for-v5.18' of git:..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=133bd72b700000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=39f9ae4aa54206fb
-dashboard link: https://syzkaller.appspot.com/bug?extid=ef9c11f60b926d1682a5
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
+There are a lot cases, when block device receives sequential bios, which
+consist of one page. The driver wants to have these bios are merged together because of
+it's not a good idea to call call_write_iter() for each of such 1-page bios.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+The same time, in QCOW2 format two sequential clusters may be placed inconsequently.
+For instance, let we have 1Mb cluster size and mapping:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ef9c11f60b926d1682a5@syzkaller.appspotmail.com
+virtual device range      range inside QCOW2 file
+[0Mb, 1Mb]            ->  [20Mb, 21Mb]
+[1Mb, 2Mb]            ->  [30Mb, 31Mb].
 
-BUG: sleeping function called from invalid context at block/blk-sysfs.c:766
-in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 0, name: swapper/1
-preempt_count: 101, expected: 0
-RCU nest depth: 0, expected: 0
-1 lock held by swapper/1/0:
- #0: ffffffff8bd81e40 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2524 [inline]
- #0: ffffffff8bd81e40 (rcu_callback){....}-{0:0}, at: rcu_core+0x73d/0x1880 kernel/rcu/tree.c:2786
-Preemption disabled at:
-[<0000000000000000>] 0x0
-CPU: 1 PID: 0 Comm: swapper/1 Not tainted 5.17.0-syzkaller-12882-g1930a6e739c4 #0
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- blkg_free.part.0+0x112/0x1f0 block/blk-cgroup.c:86
- blkg_free block/blk-cgroup.c:78 [inline]
- __blkg_release+0x105/0x160 block/blk-cgroup.c:102
- rcu_do_batch kernel/rcu/tree.c:2535 [inline]
- rcu_core+0x7b1/0x1880 kernel/rcu/tree.c:2786
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
- </IRQ>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:645
-Code: ff ff ff 48 89 df e8 c4 8c 63 f8 e9 55 ff ff ff 4c 89 e7 e8 b7 8c 63 f8 eb 96 0f 1f 44 00 00 eb 07 0f 00 2d 57 d4 65 00 fb f4 <c3> cc cc cc cc 41 55 41 54 55 48 89 fd 53 e8 92 e4 17 f8 e8 7d 21
-RSP: 0018:ffffc9000045fdf8 EFLAGS: 00000202
-RAX: 000000000036c1fd RBX: ffff88801149d700 RCX: ffffffff895dcc51
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000001 R08: 0000000000000001 R09: ffff88802cb3af93
-R10: ffffed10059675f2 R11: 0000000000000000 R12: ffffed1002293ae0
-R13: 0000000000000001 R14: ffffffff8db640d0 R15: 0000000000000000
- default_idle_call+0x87/0xd0 kernel/sched/idle.c:109
- secondary_startup_64_no_verify+0xc3/0xcb
- </TASK>
+This may happen because of cluster #1 were allocated later than cluster #0.
+In case of a request going to [512K, 1.5Mb], it intersects cluster boundary
+and we want to split it into two. Otherwise it impossible to call call_write_iter().
 
-================================
-WARNING: inconsistent lock state
-5.17.0-syzkaller-12882-g1930a6e739c4 #0 Tainted: G        W        
---------------------------------
-inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} usage.
-swapper/1/0 [HC0[0]:SC1[1]:HE0:SE0] takes:
-ffff888042c5ba30 (&xa->xa_lock#8){+.?.}-{2:2}, at: xa_destroy+0xb3/0x360 lib/xarray.c:2207
-{SOFTIRQ-ON-W} state was registered at:
-  lock_acquire kernel/locking/lockdep.c:5641 [inline]
-  lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5606
-  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-  _raw_spin_lock+0x2a/0x40 kernel/locking/spinlock.c:154
-  spin_lock include/linux/spinlock.h:349 [inline]
-  xa_insert include/linux/xarray.h:772 [inline]
-  blk_mq_init_hctx block/blk-mq.c:3501 [inline]
-  blk_mq_alloc_and_init_hctx+0x52d/0x1190 block/blk-mq.c:3962
-  blk_mq_realloc_hw_ctxs+0x43d/0x590 block/blk-mq.c:3991
-  blk_mq_init_allocated_queue+0x457/0x13d0 block/blk-mq.c:4053
-  blk_mq_init_queue_data block/blk-mq.c:3906 [inline]
-  __blk_mq_alloc_disk+0xd1/0x1c0 block/blk-mq.c:3926
-  floppy_alloc_disk+0x3d/0x390 drivers/block/floppy.c:4495
-  do_floppy_init drivers/block/floppy.c:4576 [inline]
-  floppy_async_init+0x316/0x21ca drivers/block/floppy.c:4746
-  async_run_entry_fn+0x9d/0x550 kernel/async.c:127
-  process_one_work+0x996/0x1610 kernel/workqueue.c:2289
-  worker_thread+0x665/0x1080 kernel/workqueue.c:2436
-  kthread+0x2e9/0x3a0 kernel/kthread.c:376
-  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:298
-irq event stamp: 3588931
-hardirqs last  enabled at (3588930): [<ffffffff81c44ea5>] kasan_quarantine_put+0xf5/0x210 mm/kasan/quarantine.c:231
-hardirqs last disabled at (3588931): [<ffffffff8960c0fe>] __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:108 [inline]
-hardirqs last disabled at (3588931): [<ffffffff8960c0fe>] _raw_spin_lock_irqsave+0x4e/0x50 kernel/locking/spinlock.c:162
-softirqs last  enabled at (3588522): [<ffffffff81479a93>] invoke_softirq kernel/softirq.c:432 [inline]
-softirqs last  enabled at (3588522): [<ffffffff81479a93>] __irq_exit_rcu+0x123/0x180 kernel/softirq.c:637
-softirqs last disabled at (3588607): [<ffffffff81479a93>] invoke_softirq kernel/softirq.c:432 [inline]
-softirqs last disabled at (3588607): [<ffffffff81479a93>] __irq_exit_rcu+0x123/0x180 kernel/softirq.c:637
+Solving the problem with 1-page bios, an implementing own elevator for only driver
+does not look a good idea. Making an elevator with performance comparable with
+generic block layer's is not a trivial task. At least it will require the same
+amount of code that block layer has. This is not a solution for a single driver.
 
-other info that might help us debug this:
- Possible unsafe locking scenario:
+From the driver side, it tells block layer about optimal IO size, so the number
+of splits should gravitate to zero.
 
-       CPU0
-       ----
-  lock(&xa->xa_lock#8);
-  <Interrupt>
-    lock(&xa->xa_lock#8);
+Looking at another drivers like loop and nbd, they both are request based.
+Necessity to split a request to fit a filesystem extent is not a reason to stop
+merging loop requests, isn't it?! Also, nbd merges bios despite they are splitted
+by qemu-nbd in userspace level to fit 1 cluster boundary just like my driver does.
+Because, this is the only way. I've already tried another way, when I started
+writing this driver as bio-based. But then found that this is not a good solution,
+and converted it in request-based.
 
- *** DEADLOCK ***
-
-1 lock held by swapper/1/0:
- #0: ffffffff8bd81e40 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2524 [inline]
- #0: ffffffff8bd81e40 (rcu_callback){....}-{0:0}, at: rcu_core+0x73d/0x1880 kernel/rcu/tree.c:2786
-
-stack backtrace:
-CPU: 1 PID: 0 Comm: swapper/1 Tainted: G        W         5.17.0-syzkaller-12882-g1930a6e739c4 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- print_usage_bug kernel/locking/lockdep.c:3935 [inline]
- valid_state kernel/locking/lockdep.c:3947 [inline]
- mark_lock_irq kernel/locking/lockdep.c:4150 [inline]
- mark_lock.part.0.cold+0x18/0xd8 kernel/locking/lockdep.c:4607
- mark_lock kernel/locking/lockdep.c:4571 [inline]
- mark_usage kernel/locking/lockdep.c:4502 [inline]
- __lock_acquire+0x11e7/0x56c0 kernel/locking/lockdep.c:4983
- lock_acquire kernel/locking/lockdep.c:5641 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5606
- __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
- _raw_spin_lock_irqsave+0x39/0x50 kernel/locking/spinlock.c:162
- xa_destroy+0xb3/0x360 lib/xarray.c:2207
- blk_mq_release+0x2b1/0x3e0 block/blk-mq.c:3887
- blk_release_queue+0x15b/0x320 block/blk-sysfs.c:780
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- blkg_free.part.0+0x112/0x1f0 block/blk-cgroup.c:86
- blkg_free block/blk-cgroup.c:78 [inline]
- __blkg_release+0x105/0x160 block/blk-cgroup.c:102
- rcu_do_batch kernel/rcu/tree.c:2535 [inline]
- rcu_core+0x7b1/0x1880 kernel/rcu/tree.c:2786
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- invoke_softirq kernel/softirq.c:432 [inline]
- __irq_exit_rcu+0x123/0x180 kernel/softirq.c:637
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1097
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:645
-RIP: 0010:default_idle+0xb/0x10 arch/x86/kernel/process.c:734
-Code: ff ff ff 48 89 df e8 c4 8c 63 f8 e9 55 ff ff ff 4c 89 e7 e8 b7 8c 63 f8 eb 96 0f 1f 44 00 00 eb 07 0f 00 2d 57 d4 65 00 fb f4 <c3> cc cc cc cc 41 55 41 54 55 48 89 fd 53 e8 92 e4 17 f8 e8 7d 21
-RSP: 0018:ffffc9000045fdf8 EFLAGS: 00000202
-RAX: 000000000036c1fd RBX: ffff88801149d700 RCX: ffffffff895dcc51
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000001 R08: 0000000000000001 R09: ffff88802cb3af93
-R10: ffffed10059675f2 R11: 0000000000000000 R12: ffffed1002293ae0
-R13: 0000000000000001 R14: ffffffff8db640d0 R15: 0000000000000000
- default_idle_call+0x87/0xd0 kernel/sched/idle.c:109
- cpuidle_idle_call kernel/sched/idle.c:191 [inline]
- do_idle+0x401/0x590 kernel/sched/idle.c:303
- cpu_startup_entry+0x14/0x20 kernel/sched/idle.c:400
- start_secondary+0x265/0x340 arch/x86/kernel/smpboot.c:266
- secondary_startup_64_no_verify+0xc3/0xcb
- </TASK>
-ODEBUG: object ffffc90000528af0 is NOT on stack ffffc90000458000, but annotated.
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 0 at lib/debugobjects.c:548 debug_object_is_on_stack lib/debugobjects.c:545 [inline]
-WARNING: CPU: 1 PID: 0 at lib/debugobjects.c:548 __debug_object_init.cold+0x252/0x2e5 lib/debugobjects.c:607
-Modules linked in:
-
-CPU: 1 PID: 0 Comm: swapper/1 Tainted: G        W         5.17.0-syzkaller-12882-g1930a6e739c4 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:debug_object_is_on_stack lib/debugobjects.c:548 [inline]
-RIP: 0010:__debug_object_init.cold+0x252/0x2e5 lib/debugobjects.c:607
-Code: 00 48 8d 7b 20 48 89 fa 48 c1 ea 03 80 3c 02 00 74 05 e8 b4 74 9b f8 48 8b 53 20 4c 89 e6 48 c7 c7 80 88 26 8a e8 a1 4c f1 ff <0f> 0b e9 d3 7f c7 fa 48 b8 00 01 00 00 00 00 ad de 48 89 ef 48 89
-RSP: 0018:ffffc90000528920 EFLAGS: 00010286
-RAX: 0000000000000050 RBX: ffff88801149d700 RCX: 0000000000000000
-RDX: ffff88801149d700 RSI: ffffffff815fcd18 RDI: fffff520000a5116
-RBP: ffff88801149d700 R08: 0000000000000050 R09: 0000000000000001
-R10: ffffffff815f76ee R11: 0000000000000000 R12: ffffc90000528af0
-R13: 1ffff920000a5133 R14: ffffffff90713c70 R15: ffffffff90713c68
-FS:  0000000000000000(0000) GS:ffff88802cb00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000056b66efc CR3: 000000006d58f000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <IRQ>
- __init_work+0x2d/0x50 kernel/workqueue.c:521
- synchronize_rcu_expedited+0x392/0x620 kernel/rcu/tree_exp.h:851
- synchronize_rcu+0x132/0x190 kernel/rcu/tree.c:3789
- blk_trace_cleanup kernel/trace/blktrace.c:350 [inline]
- __blk_trace_remove+0xcb/0x1c0 kernel/trace/blktrace.c:365
- blk_trace_shutdown+0x85/0x100 kernel/trace/blktrace.c:777
- blk_release_queue+0x16f/0x320 block/blk-sysfs.c:782
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- blkg_free.part.0+0x112/0x1f0 block/blk-cgroup.c:86
- blkg_free block/blk-cgroup.c:78 [inline]
- __blkg_release+0x105/0x160 block/blk-cgroup.c:102
- rcu_do_batch kernel/rcu/tree.c:2535 [inline]
- rcu_core+0x7b1/0x1880 kernel/rcu/tree.c:2786
- __do_softirq+0x29b/0x9c2 kernel/softirq.c:558
- invoke_softirq kernel/softirq.c:432 [inline]
- __irq_exit_rcu+0x123/0x180 kernel/softirq.c:637
- irq_exit_rcu+0x5/0x20 kernel/softirq.c:649
- sysvec_apic_timer_interrupt+0x93/0xc0 arch/x86/kernel/apic/apic.c:1097
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x12/0x20 arch/x86/include/asm/idtentry.h:645
-RIP: 0010:default_idle+0xb/0x10 arch/x86/kernel/process.c:734
-Code: ff ff ff 48 89 df e8 c4 8c 63 f8 e9 55 ff ff ff 4c 89 e7 e8 b7 8c 63 f8 eb 96 0f 1f 44 00 00 eb 07 0f 00 2d 57 d4 65 00 fb f4 <c3> cc cc cc cc 41 55 41 54 55 48 89 fd 53 e8 92 e4 17 f8 e8 7d 21
-RSP: 0018:ffffc9000045fdf8 EFLAGS: 00000202
-RAX: 000000000036c1fd RBX: ffff88801149d700 RCX: ffffffff895dcc51
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 0000000000000001 R08: 0000000000000001 R09: ffff88802cb3af93
-R10: ffffed10059675f2 R11: 0000000000000000 R12: ffffed1002293ae0
-R13: 0000000000000001 R14: ffffffff8db640d0 R15: 0000000000000000
- default_idle_call+0x87/0xd0 kernel/sched/idle.c:109
- cpuidle_idle_call kernel/sched/idle.c:191 [inline]
- do_idle+0x401/0x590 kernel/sched/idle.c:303
- cpu_startup_entry+0x14/0x20 kernel/sched/idle.c:400
- start_secondary+0x265/0x340 arch/x86/kernel/smpboot.c:266
- secondary_startup_64_no_verify+0xc3/0xcb
- </TASK>
-----------------
-Code disassembly (best guess), 3 bytes skipped:
-   0:	48 89 df             	mov    %rbx,%rdi
-   3:	e8 c4 8c 63 f8       	callq  0xf8638ccc
-   8:	e9 55 ff ff ff       	jmpq   0xffffff62
-   d:	4c 89 e7             	mov    %r12,%rdi
-  10:	e8 b7 8c 63 f8       	callq  0xf8638ccc
-  15:	eb 96                	jmp    0xffffffad
-  17:	0f 1f 44 00 00       	nopl   0x0(%rax,%rax,1)
-  1c:	eb 07                	jmp    0x25
-  1e:	0f 00 2d 57 d4 65 00 	verw   0x65d457(%rip)        # 0x65d47c
-  25:	fb                   	sti
-  26:	f4                   	hlt
-* 27:	c3                   	retq <-- trapping instruction
-  28:	cc                   	int3
-  29:	cc                   	int3
-  2a:	cc                   	int3
-  2b:	cc                   	int3
-  2c:	41 55                	push   %r13
-  2e:	41 54                	push   %r12
-  30:	55                   	push   %rbp
-  31:	48 89 fd             	mov    %rdi,%rbp
-  34:	53                   	push   %rbx
-  35:	e8 92 e4 17 f8       	callq  0xf817e4cc
-  3a:	e8                   	.byte 0xe8
-  3b:	7d 21                	jge    0x5e
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Kirill
