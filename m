@@ -2,91 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BEABC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 17:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4035FC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 20:07:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236464AbiC2RWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 13:22:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45528 "EHLO
+        id S229498AbiC2UJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 16:09:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233105AbiC2RWt (ORCPT
+        with ESMTP id S229472AbiC2UJC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 13:22:49 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3818417B0E2
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 10:21:04 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id 273861F43829
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1648574462;
-        bh=MKEFh39BbVWWkFq3HEcuavmMNzOKW96accRddIjlml0=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=HOBxHKk1TrEFQCjB9ARCB9ak6RO7J4j6jzvIoI3f5oo4PnxH0fCcJxOqI6bO9lK3k
-         A5UmKzQaTLlglOk+kKNyNYSuXwnAQ7bWLj+SGhVxr3Yie8rUBLLj/exU4ZuMJtq9Ub
-         nYjoocAREzu9PeQXudeKZiTr+PRkUg4IgG0G44v+Ld+pnAtk0C6CiyJQGiTM9qeYcp
-         zBOsbfGn0XUWgSSXOETC+u9b5U8Et1NFSK3tVAUBo45PWcShUxNee0PFMHZE+++XqR
-         Z4RkUMIWZDRWGdWQzcsJMb3prkriXziLViRKQY6cnjhBr3gnvljAtk1232nZxNtrP3
-         bAgon0hOGcmbA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
-        linux-block@vger.kernel.org,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-mm@kvack.org
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-Organization: Collabora
-References: <87tucsf0sr.fsf@collabora.com>
-        <986caf55-65d1-0755-383b-73834ec04967@suse.de> <YkCSVSk1SwvtABIW@T590>
-        <87o81prfrg.fsf@collabora.com> <YkJTQW7aAjDGKL9p@T590>
-Date:   Tue, 29 Mar 2022 13:20:57 -0400
-In-Reply-To: <YkJTQW7aAjDGKL9p@T590> (Ming Lei's message of "Tue, 29 Mar 2022
-        08:30:57 +0800")
-Message-ID: <87bkxor7ye.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Tue, 29 Mar 2022 16:09:02 -0400
+X-Greylist: delayed 371 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 29 Mar 2022 13:07:18 PDT
+Received: from email.studentenwerk.mhn.de (dresden.studentenwerk.mhn.de [141.84.225.229])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18A842013FF;
+        Tue, 29 Mar 2022 13:07:17 -0700 (PDT)
+Received: from mailhub.studentenwerk.mhn.de (mailhub.studentenwerk.mhn.de [127.0.0.1])
+        by email.studentenwerk.mhn.de (Postfix) with ESMTPS id 4KSgRg1YJXzRhSp;
+        Tue, 29 Mar 2022 22:01:03 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stwm.de; s=stwm-20170627;
+        t=1648584063;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=pJC4NSVW4gwhBSN+CvduaIYW64z7cizjcVpdotN7+JE=;
+        b=THIpnCV+y28ayxUrv+11JJqMnliscPyGxRKyzgpbPVCDBb/utAkyPtxlIo+OUMQzvd4UCn
+        C6phrnBP9ytO23TwrdT/COf13trWKEKpBiMCwO4u4qqNPpM1Gv18eyfH6JwvHObcq/KaCL
+        TMQx14d9qrn6TqjSCGphbxD7BxRqYZyUlmZmgk8CDL0h71q/inRKzlutsPTs8K3HmPO1XU
+        ot902kmJthbbRWXJH4qio2HV831Zpd4480ew/1yhsLP8Bk/kbPluZub6/SxNsI+6zimLX2
+        grL/qqLI1bq7cOU8ujGmwZvwUgJCI2cvW85L7FVSdrFX9Jiba8D1QK7DaN35ww==
 MIME-Version: 1.0
-Content-Type: text/plain
+Date:   Tue, 29 Mar 2022 22:01:15 +0200
+From:   Wolfgang Walter <linux@stwm.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com
+Subject: Re: [Drbd-dev] state of drbd in mainline
+In-Reply-To: <20220329073254.GA20691@lst.de>
+References: <20220329070618.GA20396@lst.de>
+ <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
+ <20220329073254.GA20691@lst.de>
+Message-ID: <ff5bc3eb8fa27845cefa2f96e5241972@stwm.de>
+X-Sender: linux@stwm.de
+Organization: =?UTF-8?Q?Studentenwerk_M=C3=BCnchen?=
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
+Am 2022-03-29 09:32, schrieb Christoph Hellwig:
+> On Tue, Mar 29, 2022 at 09:22:26AM +0200, Philipp Reisner wrote:
+>> Hi Christoph,
+>> 
+>> what do you expect for the DRBD changes? Usually, they fall into the
+>> category: yes, obviously. When you are changing the block layer in 
+>> this
+>> way, then that is necessary for the in-tree DRBD code.
+>> 
+>> Regarding users: Yes, there are users of the in-tree DRBD code. Very 
+>> big
+>> corporations. And, yes, we see pressure building up that we get our 
+>> act
+>> together and re-sync the in-tree DRBD with the out-of tree DRBD.
+> 
+> The complete lack of bug reports and maintainer interaction usually
+> suggests low to no use and heavy bitrot.  If that is not the case
+> here that's fine, just asking..
+> 
+> _______________________________________________
+> drbd-dev mailing list
+> drbd-dev@lists.linbit.com
+> https://lists.linbit.com/mailman/listinfo/drbd-dev
 
->> I was thinking of something like this, or having a way for the server to
->> only operate on the fds and do splice/sendfile.  But, I don't know if it
->> would be useful for many use cases.  We also want to be able to send the
->> data to userspace, for instance, for userspace networking.
->
-> I understand the big point is that how to pass the io data to ubd driver's
-> request/bio pages. But splice/sendfile just transfers data between two FDs,
-> then how can the block request/bio's pages get filled with expected data?
-> Can you explain a bit in detail?
+We use the in-tree DRBD with LTS (actually 5.15.32 and 5.4.188) and 
+depend on it. It just works. We never had any issues in the last 5 
+years.
 
-Hi Ming,
-
-My idea was to split the control and dataplanes in different file
-descriptors.
-
-A queue has a fd that is mapped to a shared memory area where the
-request descriptors are.  Submission/completion are done by read/writing
-the index of the request on the shared memory area.
-
-For the data plane, each request descriptor in the queue has an
-associated file descriptor to be used for data transfer, which is
-preallocated at queue creation time.  I'm mapping the bio linearly, from
-offset 0, on these descriptors on .queue_rq().  Userspace operates on
-these data file descriptors with regular RW syscalls, direct splice to
-another fd or pipe, or mmap it to move data around. The data is
-available on that fd until IO is completed through the queue fd.  After
-an operation is completed, the fds are reused for the next IO on that
-queue position.
-
-Hannes has pointed out the issues with fd limits. :)
-
-> If block layer is bypassed, it won't be exposed as block disk to userspace.
-
-I implemented it as a block-mq driver, but it still only supports one
-queue.
-
+Regards
 -- 
-Gabriel Krisman Bertazi
+Wolfgang Walter
+Studentenwerk München
+Anstalt des öffentlichen Rechts
