@@ -2,181 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26071C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 15:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E0A4C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 29 Mar 2022 15:44:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238055AbiC2Pi4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 11:38:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36886 "EHLO
+        id S238944AbiC2PqB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 11:46:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36174 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239238AbiC2Pii (ORCPT
+        with ESMTP id S238938AbiC2PqA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 11:38:38 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B82D1B0857
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 08:36:54 -0700 (PDT)
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 22TFaqnS020483;
-        Wed, 30 Mar 2022 00:36:52 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Wed, 30 Mar 2022 00:36:52 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 22TFapE4020480
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 30 Mar 2022 00:36:52 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <fda9e2b7-d1db-e00c-98aa-e8ff555b88eb@I-love.SAKURA.ne.jp>
-Date:   Wed, 30 Mar 2022 00:36:49 +0900
+        Tue, 29 Mar 2022 11:46:00 -0400
+Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B47EE13CD3
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 08:44:15 -0700 (PDT)
+Received: by mail-vk1-xa31.google.com with SMTP id q85so9984518vkq.4
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 08:44:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=cFXlp32xQw7/OjMn3uGU844211qFMDFeLujMZW6rFtE=;
+        b=JqKDQ8MKvspOvGXGqMIk6wdMVNm2l+b4NyGw6XjLHvS4btBEqsAfnlyweRKHI4yMJG
+         ghyNvZ3eYnf2Zor1uhlE1bG1HzDFRUTP7PMo7n3K63z+CtY6PMp+ACAjJZfIbgzqFp90
+         dgEixgbPzK/xbL2DhnDrF0A+GFWKW9kK5u5AiazLqE+YSJHzqmcTH/kU2+j0gmpSo/K+
+         tzBUrvWpmsdBIMHKH+y1Y7W42wYDLHBvBmnbvUvRxmd7Lr7PrD3kr+k+USKm9anB8Kbh
+         icgrwgZdiP1VOnpV3IhtWS9kmwb6OgSbkglXY/R7vfdcXfv2gdQA86buPDgejlP+0TIA
+         jNbw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=cFXlp32xQw7/OjMn3uGU844211qFMDFeLujMZW6rFtE=;
+        b=LOZVZW82yqA4RzmqORnKfWvIKF9bQLoDTD/oDr9Gaf/g4/eSxQk5TxGABgTkQBkyAa
+         QxyTgkzOjXqVkZeaZ8NtuxJL171wR/J59nNS06P4D31gytotae9dJoFcT1YGArD73tnZ
+         FAAyuUD1vsDyJ7nQ7Fov+cejtSOTjzpl1ks6qYvooneTYzU4g8CG3CenuZuGwGEBEZMt
+         ScjD+SgdlZJAkO3PHiCIkaVAaznIp3CCVCiYiid0DUjc6OQXxbigqLhlus4r+XrotGkH
+         lMAYn86QgKF+hiNkzND+cq8DpWndOdL6VsmmviocGxbgOnK/2zxJ8UddN9OGemzUy/AV
+         GGpA==
+X-Gm-Message-State: AOAM533/9Ix3s8Wb9vboNeK+jktM4H3taeJNgJaQls/yURd5UB0YwHfW
+        pMf80rv7WA7f31rk09QcNvEKuRb6elqGc45C3ToDww==
+X-Google-Smtp-Source: ABdhPJyW12LjVa8kn/B0znyep6GosCNAp/KjjP9BVBaJg4O8d/25oaPhxtDrGS8yhBe02srwIag4mfxCnCj/FF/ECuM=
+X-Received: by 2002:a1f:6a82:0:b0:33f:7eeb:5989 with SMTP id
+ f124-20020a1f6a82000000b0033f7eeb5989mr17894292vkc.29.1648568654813; Tue, 29
+ Mar 2022 08:44:14 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: [PATCH 15/14] loop: avoid loop_validate_mutex/lo_mutex in ->release
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Cc:     "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matteo Croce <mcroce@microsoft.com>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>
-References: <20220325063929.1773899-1-hch@lst.de>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220325063929.1773899-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220329070618.GA20396@lst.de> <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
+ <20220329073254.GA20691@lst.de> <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
+ <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
+In-Reply-To: <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
+From:   Philipp Reisner <philipp.reisner@linbit.com>
+Date:   Tue, 29 Mar 2022 17:44:03 +0200
+Message-ID: <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
+Subject: Re: state of drbd in mainline
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since ->release is called with disk->open_mutex held, and __loop_clr_fd()
- from lo_release() is called via ->release when disk_openers() == 0, we are
-guaranteed that "struct file" which will be passed to loop_validate_file()
-via fget() cannot be the loop device __loop_clr_fd(lo, true) will clear.
-Thus, there is no need to hold loop_validate_mutex from __loop_clr_fd()
-if release == true.
+Jens, my intention is to keep it in-tree, and at some point update it.
+Regarding your questions:
 
-When I made commit 3ce6e1f662a91097 ("loop: reintroduce global lock for
-safe loop_validate_file() traversal"), I wrote "It is acceptable for
-loop_validate_file() to succeed, for actual clear operation has not started
-yet.". But now I came to feel why it is acceptable to succeed.
+[...]
 
-It seems that the loop driver was added in Linux 1.3.68, and
+> - Why aren't the drbd maintainers responding to posted patches? They seem
+>   to simply be ignored, and I'm left to pickup the trivial ones that look
+>   fine to me. In-kernel drbd appears largely unmaintained, and has been for
+>   years.
 
-  if (lo->lo_refcnt > 1)
-    return -EBUSY;
+The team here has grown, we are busy. Since you started to pick up the
+trivial patches yourself, I thought it is not necessary that I collect them and
+send a pull request in merge-window time.
 
-check in loop_clr_fd() was there from the beginning. The intent of this
-check was unclear. But now I think that current
+> - Even if out-of-band communication is used for in-kernel users of drbd,
+>   that doesn't result in any patches or fixes that should go upstream?
 
-  disk_openers(lo->lo_disk) > 1
+This one:
+https://patchwork.kernel.org/project/linux-block/patch/20210426163032.3454129-1-christoph.boehmwalder@linbit.com/
+(relevant to users that have DRBD on top of md raid)
 
-form is there for three reasons.
+> - If there's zero activity for in-kernel drbd, all users are using the
+>   out-of-tree version?
 
-(1) Avoid I/O errors when some process which opens and reads from this
-    loop device in response to uevent notification (e.g. systemd-udevd),
-    as described in commit a1ecac3b0656a682 ("loop: Make explicit loop
-    device destruction lazy"). This opener is short-lived because it is
-    likely that the file descriptor used by that process is closed soon.
+There are users of the in-tree version, some with huge fleets.
+Some do not need the newer out-of-tree DRBD, and the in-tree version is a
+lot easier to compile. You need coccinelle for the out-of-tree version,
+and that can already be a hindering barrier for some.
 
-(2) Avoid I/O errors caused by underlying layer of stacked loop devices
-    (i.e. ioctl(some_loop_fd, LOOP_SET_FD, other_loop_fd)) being suddenly
-    disappeared. This opener is long-lived because this reference is
-    associated with not a file descriptor but lo->lo_backing_file.
+> As far as I can tell, drbd upstream is stone cold dead, and has been for
+> years. Why shouldn't it just get removed?
 
-(3) Avoid I/O errors caused by underlying layer of mounted loop device
-    (i.e. mount(some_loop_device, some_mount_point)) being suddenly
-    disappeared. This opener is long-lived because this reference is
-    associated with not a file descriptor but mount.
+Because there are users.
 
-While race in (1) might be acceptable, (2) and (3) should be checked
-racelessly. That is, make sure that __loop_clr_fd() will not run if
-loop_validate_file() succeeds, by doing refcount check with global lock
-held when explicit loop device destruction is requested.
+> Is it just bait to get people to use an out-of-tree version?
 
-As a result of no longer waiting for lo->lo_mutex after setting Lo_rundown,
-we can remove pointless BUG_ON(lo->lo_state != Lo_rundown) check.
+No.
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- drivers/block/loop.c | 38 +++++++++++++-------------------------
- 1 file changed, 13 insertions(+), 25 deletions(-)
-
-diff --git a/drivers/block/loop.c b/drivers/block/loop.c
-index 2506193a4fd1..6b813c592159 100644
---- a/drivers/block/loop.c
-+++ b/drivers/block/loop.c
-@@ -1135,27 +1135,6 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
- 	struct file *filp;
- 	gfp_t gfp = lo->old_gfp_mask;
- 
--	/*
--	 * Flush loop_configure() and loop_change_fd(). It is acceptable for
--	 * loop_validate_file() to succeed, for actual clear operation has not
--	 * started yet.
--	 */
--	mutex_lock(&loop_validate_mutex);
--	mutex_unlock(&loop_validate_mutex);
--	/*
--	 * loop_validate_file() now fails because l->lo_state != Lo_bound
--	 * became visible.
--	 */
--
--	/*
--	 * Since this function is called upon "ioctl(LOOP_CLR_FD)" xor "close()
--	 * after ioctl(LOOP_CLR_FD)", it is a sign of something going wrong if
--	 * lo->lo_state has changed while waiting for lo->lo_mutex.
--	 */
--	mutex_lock(&lo->lo_mutex);
--	BUG_ON(lo->lo_state != Lo_rundown);
--	mutex_unlock(&lo->lo_mutex);
--
- 	if (test_bit(QUEUE_FLAG_WC, &lo->lo_queue->queue_flags))
- 		blk_queue_write_cache(lo->lo_queue, false, false);
- 
-@@ -1238,11 +1217,20 @@ static int loop_clr_fd(struct loop_device *lo)
- {
- 	int err;
- 
--	err = mutex_lock_killable(&lo->lo_mutex);
-+	/*
-+	 * Since lo_ioctl() is called without locks held, it is possible that
-+	 * loop_configure()/loop_change_fd() and loop_clr_fd() run in parallel.
-+	 *
-+	 * Therefore, use global lock when setting Lo_rundown state in order to
-+	 * make sure that loop_validate_file() will fail if the "struct file"
-+	 * which loop_configure()/loop_change_fd() found via fget() was this
-+	 * loop device.
-+	 */
-+	err = loop_global_lock_killable(lo, true);
- 	if (err)
- 		return err;
- 	if (lo->lo_state != Lo_bound) {
--		mutex_unlock(&lo->lo_mutex);
-+		loop_global_unlock(lo, true);
- 		return -ENXIO;
- 	}
- 	/*
-@@ -1257,11 +1245,11 @@ static int loop_clr_fd(struct loop_device *lo)
- 	 */
- 	if (disk_openers(lo->lo_disk) > 1) {
- 		lo->lo_flags |= LO_FLAGS_AUTOCLEAR;
--		mutex_unlock(&lo->lo_mutex);
-+		loop_global_unlock(lo, true);
- 		return 0;
- 	}
- 	lo->lo_state = Lo_rundown;
--	mutex_unlock(&lo->lo_mutex);
-+	loop_global_unlock(lo, true);
- 
- 	__loop_clr_fd(lo, false);
- 	return 0;
--- 
-2.32.0
-
-
+> --
+> Jens Axboe
