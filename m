@@ -2,324 +2,196 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 423D9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 03:08:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7871FC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 03:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232750AbiC3DK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 23:10:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41976 "EHLO
+        id S242428AbiC3D40 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 23:56:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242229AbiC3DKZ (ORCPT
+        with ESMTP id S234735AbiC3D4Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 23:10:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C405103C
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 20:08:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648609717;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=P+I+Rd6WWoY/JtxV+Dr+XPyfn8kZ0GPQrOttvIbs1E0=;
-        b=VfvJEDfPNikMDV6jda6Tygl0k9Z5XxXT9FgnZB0r1by9FtQI6iXfSgHNlAIE+o6s6jZ3AB
-        5DY3sOljaBG/5E++/9iWMA5L62Tc4ZAS1ZxutcWaE4cHwOHphrkW/2d63NEJeF2yg0hKg7
-        34PB1kMGRQg9etHRabxirrh111w9N8g=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-199-B0G2m-R_OHqoJBbMzVxszQ-1; Tue, 29 Mar 2022 23:08:35 -0400
-X-MC-Unique: B0G2m-R_OHqoJBbMzVxszQ-1
-Received: by mail-pg1-f197.google.com with SMTP id z132-20020a63338a000000b003844e317066so9583516pgz.19
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 20:08:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=P+I+Rd6WWoY/JtxV+Dr+XPyfn8kZ0GPQrOttvIbs1E0=;
-        b=L0oMuqo5ynO/OBtBH4V4zS/EvI6XujJg7ND18M+eaHOxIxEJgJ3vYfUKRAyikABQhC
-         0lCSWX3++zA09U4nKN9FuEC1BCIM4bVc0JKy+uXdsV8lkrmZQJIwPXGC4QGb3nRCKyHi
-         VccJwPHEfEsdjyMUVnjTvimLlU+F/GkXT6UpFtigfpSRYsYYCwINgXvTZBzJBuPs1lHw
-         58X1NUPhcaqmOgOo3Du+INn2ILkwvYJMMKmJFz2845SAo8R2HOfmemQxHu+dj0Owki0K
-         e2nfNuQbwofvp3uTkm6GJJnqs55stb9dddydl33031bACtmpgHLGWhTm76WXFr7UQ89t
-         3j2A==
-X-Gm-Message-State: AOAM530eNXTuUwbMI/mD75BEpH4d8lZgvrmM9AIQDSZgbaLtnnqHJnJ7
-        A9W0ly2FDQrY38Z7wJ586QwlhyWOLUd0kX2OrPmh2/OccOslcNCQBZR1J/F3ODR8SHQevG4DNRT
-        XT2dAhT8yNoVDOD906AbfgDKJnzWI9HZKiyaQF4U=
-X-Received: by 2002:a05:6a00:1d27:b0:4fb:66bd:f3b6 with SMTP id a39-20020a056a001d2700b004fb66bdf3b6mr11124224pfx.40.1648609714462;
-        Tue, 29 Mar 2022 20:08:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIPAprb4eDkgCBFRQuDsUvk0bWu36cDWQaD1sGqKLB2fJK+oA3x0RsPMDdL75G5Xb6AYOHf5uxBQf4sNn+upM=
-X-Received: by 2002:a05:6a00:1d27:b0:4fb:66bd:f3b6 with SMTP id
- a39-20020a056a001d2700b004fb66bdf3b6mr11124196pfx.40.1648609713966; Tue, 29
- Mar 2022 20:08:33 -0700 (PDT)
+        Tue, 29 Mar 2022 23:56:25 -0400
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 050425AEF5;
+        Tue, 29 Mar 2022 20:54:37 -0700 (PDT)
+Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22U3Avcj011972;
+        Wed, 30 Mar 2022 03:51:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2021-07-09;
+ bh=MTAz/AZSivMduMxR16LfoZmOoRCY6iaWZcf+qgW2veU=;
+ b=yTpwjuV5XJJenXGLOtJ5APN89BpjH44AssGabqf/HygQwOebr2m4RHYT4Q1MzyH16BnY
+ GnyZKvQVaCZLd98vNGy2WsjvcqrDpa8Ec4fM1/LY1E4hztStu38u4Jkvje7b5HyJ7+bh
+ cw6FohmU/fasg4XAwefa32vxq1blUcaaJ+uxiTVBrWktt7HYaRFOFL6wJFuGhMFWq1f3
+ 2z6WYFDDa7n8Exepk7rmE1Q8Oo/SQv2q+lW99AKK5kFxSwZlO3vM8wxRYBTv++kR7TAM
+ Ao/vx89J+88h+Wsz9cjJ2uhXywCEL6NAB2I3Rwq/ijIr0nDmQIysnjkRxSYO2y9uA4Cl vw== 
+Received: from aserp3030.oracle.com ([141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3f1sm2gb1e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Mar 2022 03:51:33 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 22U3ohVf156677;
+        Wed, 30 Mar 2022 03:51:32 GMT
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2175.outbound.protection.outlook.com [104.47.59.175])
+        by aserp3030.oracle.com with ESMTP id 3f1rv8e93f-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 30 Mar 2022 03:51:32 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=WsJDH6e55m6fMwohhPNYcmQRIrEvhDM2k2HjvuVF+z/9iVJ3ZsDioCAihqcehce8Hy3R63fU0BbWUe5/LGBLKDYDY5QcSU+qd9I1RAN2wNhE0N59EkmZusC/UzwWGS3/H1ys/MUGsPpbaLi+nVf65rJPtK22Egcrq/imGIuBN+ymSeSiuT4EB4b+p295d5zsHC5Jo8ZwQK/LV/ZSpsI1KmiFdZNrspCPQTKQG1/RG984MCGzi7BVy/jJHavdZZ5neoiZvydJf6LQrejcZlZuue+KPfXMf4uQSoeQ2CT7ABcM3HcbVkDRhQH9LYmPePhKdIVHer/shqIXvFU5+vDDZQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MTAz/AZSivMduMxR16LfoZmOoRCY6iaWZcf+qgW2veU=;
+ b=PbQA+hAIyGQ4PeDMPggqKePXD++iXwaSd1MWuNo5T+x+RgvCEoYywO8iTtbSTaH3bZf/drQwHaDF2ri2ISaVAJbIHmGmdfXhwA89jUVjajXvUEZWfPJCYE3ZBIv810xGIimWsLrHFlkyYqJNjyiFxCUlJXCv8xlbBRmh+08ZDViXltrrJJsQrJG2dtz50KEp5PLLo5ySWnNnQPG5KlAI8Zj9iQ0E6AyftWIBBsHaOionU3Md4KSxroCjPpFQijRdZKQk39J8pZ2ycv+ny9Uofep7rstzpXbLO3V45v4gCcU+xvHqS0SttRYrTUPo+aByOdEzbcYMtOAzApC1GefUcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MTAz/AZSivMduMxR16LfoZmOoRCY6iaWZcf+qgW2veU=;
+ b=x9YEY0C9uo937d1SOBCJcYlAQFFtKI5NgsnWuF7P51+RtvrhrPdgw6sidLrs0+gDe57kVAyZVSeDFChVzDziyki6SoIJRjPg/AiFPRVpNyvq4OLiiES6uSAp7kQE3JVV0TbGhUSxZKn7gOQFUFp8tXAIfL1UBT9IEc6o2QrI+TQ=
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by MN2PR10MB4173.namprd10.prod.outlook.com (2603:10b6:208:1d1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5102.18; Wed, 30 Mar
+ 2022 03:51:30 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::48e3:d153:6df4:fbed]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::48e3:d153:6df4:fbed%4]) with mapi id 15.20.5102.023; Wed, 30 Mar 2022
+ 03:51:30 +0000
+To:     Randy Dunlap <rdunlap@infradead.org>
+Cc:     linux-kernel@vger.kernel.org,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>, Amit Shah <amit@kernel.org>,
+        Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Eli Cohen <eli@mellanox.com>,
+        Saeed Mahameed <saeedm@nvidia.com>,
+        Leon Romanovsky <leon@kernel.org>,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Felipe Balbi <felipe.balbi@linux.intel.com>,
+        =?utf-8?Q?Micha=C5=82_Miros=C5=82aw?= <mirq-linux@rere.qmqm.pl>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Krzysztof Opasiak <k.opasiak@samsung.com>,
+        Igor Kotrasinski <i.kotrasinsk@samsung.com>,
+        Valentina Manea <valentina.manea.m@gmail.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Jussi Kivilinna <jussi.kivilinna@mbnet.fi>,
+        Joachim Fritschi <jfritschi@freenet.de>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        Ingo Molnar <mingo@kernel.org>,
+        Karol Herbst <karolherbst@gmail.com>,
+        Pekka Paalanen <ppaalanen@gmail.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Andy Lutomirski <luto@kernel.org>,
+        Peter Zijlstra <peterz@infradead.org>,
+        Borislav Petkov <bp@alien8.de>,
+        "H. Peter Anvin" <hpa@zytor.com>, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, netdev@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, nouveau@lists.freedesktop.org,
+        virtualization@lists.linux-foundation.org, x86@kernel.org
+Subject: Re: [PATCH 5/9] virtio-scsi: eliminate anonymous module_init &
+ module_exit
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq1y20st7ww.fsf@ca-mkp.ca.oracle.com>
+References: <20220316192010.19001-1-rdunlap@infradead.org>
+        <20220316192010.19001-6-rdunlap@infradead.org>
+Date:   Tue, 29 Mar 2022 23:51:27 -0400
+In-Reply-To: <20220316192010.19001-6-rdunlap@infradead.org> (Randy Dunlap's
+        message of "Wed, 16 Mar 2022 12:20:06 -0700")
+Content-Type: text/plain
+X-ClientProxiedBy: DM6PR02CA0042.namprd02.prod.outlook.com
+ (2603:10b6:5:177::19) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-References: <CAHj4cs8TSNdAW-Tkz6YNGOczn9CTachw6X_zSxCrTGzzaxroJQ@mail.gmail.com>
-In-Reply-To: <CAHj4cs8TSNdAW-Tkz6YNGOczn9CTachw6X_zSxCrTGzzaxroJQ@mail.gmail.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Wed, 30 Mar 2022 11:08:22 +0800
-Message-ID: <CAHj4cs9Sm6zoULV9HL-HuhBXW8dBMbdeO5MMgOa6BrkDw8HDpA@mail.gmail.com>
-Subject: Re: [bug report] kernel BUG at lib/list_debug.c:26! observed during
- blktests srp/002 on latest linux tree
-To:     linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 609889fb-058c-4bdb-5695-08da12009300
+X-MS-TrafficTypeDiagnostic: MN2PR10MB4173:EE_
+X-Microsoft-Antispam-PRVS: <MN2PR10MB4173D0036F739BDDC7753C888E1F9@MN2PR10MB4173.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: un6f//6iu39uhfJNawpCiF2FMLLldzDMSXxNSS8zBCMV13ExzfYEjDtFTwTgjWWM558X85eREvri4Y+lciAQodprT9CfTyHFh3pKxn2SYZcw2ii8GZL1b2MREo3ctfCgozkX7uXt4H0SFaKzRMW3GzaspFYrxNLVVCfvlEKqn4JY0C6GpUhCa7oyVPKTYe1o78Z0AN+jyHTjVFQXAk7JtfcMaS6RkDIN5Fkh2fT3wQD4Bymr86V7LaBWpKl4K9UfPXw8tbh86SEe9RgtNOT9oY+o587CX+k/V5XFB3bgdGMkFDZeV1MWMHWlu8Cysq7U7ELege/BfmtFvS50QlounZYAEO1wf9OoNw4nC2U7F7Aik8XddeYBpY3IR8diGgVdsieiybiVNpu2fBDZbL4G3P5h4iPMPGGfLfsHsWOTY/JO02HCce0KVbC548eyJFBWbGqIN1auEIRrQdk1ynesnOxzMloZSi9yvcFCLxY7N3RpJAuxUgCjaN7nXQbARTZB3c1zrdElYWF0wMS6dyeia/n3XlD1zh1bbZOsymlwcTKK1yvWxyyF/35Nx0tf5q9i1Ge/uwcsKMmQshIGxS2ckItIV2M3DPFmUAmfSfF20Yigyx3qfTm5ozR1ohCJw7ikhZ86uf4y/v98K2ndxSDo/T7Gwffu+niK/+wv1MImEbUl0VoxCFBEWjHxydMd+EJqchuOX51IKj3ZMbzzDGpa0A==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(316002)(6486002)(4326008)(7366002)(8676002)(54906003)(7416002)(36916002)(2906002)(66556008)(6512007)(6666004)(6916009)(66476007)(7406005)(5660300002)(86362001)(52116002)(66946007)(558084003)(38100700002)(38350700002)(26005)(6506007)(508600001)(8936002)(186003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Vxpgna/MvdxlJqlYd+4dFReKfRiyjM9rdLnc/OFC6HX/OQgo7Y7DcKA6CDD7?=
+ =?us-ascii?Q?EgT+vkeh3ThSpqf18xVol9ikVRAx8S4e3R29pEohzXqwgq9TPf25ZPHxOq2X?=
+ =?us-ascii?Q?Y303ft/jsd1h3FXPN7Uyp5qRadYwZS7bA6gZkgBgypdVv0bQ8g7ecmXBalvB?=
+ =?us-ascii?Q?jvqUpgObUcLyZLc/pyvMqrAYPkrTt4uOAwa18AlV/S1uupXtK5PWMUk0OCk2?=
+ =?us-ascii?Q?YwOmTXIvVURrvwcQX/cdk/CYGJWZQa/UZDnBZI5Ea4A8wBcWclMeWZpfOV0r?=
+ =?us-ascii?Q?IdbRffXM5s1zhNocpjUtqRO6ODJBh0F3J9oZZ7XDLvw5BNKHxKdOqXmvrGsy?=
+ =?us-ascii?Q?M+sdn9GkNL47FiVDfhkADMt15Il9iGYPGL0vCsLxv3952mcGK5mv/J7jJypq?=
+ =?us-ascii?Q?uHBG7piUL/R6u502DY5gu8XFcy/Fh9Zrxp7x8dmtZ7eS+RmKLQAxC6tZ6Tvg?=
+ =?us-ascii?Q?FzEQAMiKdoiGz0F5IdYLPl3uMmC5f43ODBSTMxoUoZomRRMd5SWR6uRxBdOz?=
+ =?us-ascii?Q?OXhJF3CitpEtt+l0kpzqMu+iFqN6OviCuB9m+uSVOX6wmqbkGzwuvkTnk8h8?=
+ =?us-ascii?Q?3y+nuukANnCwK3A/yDgEFE9Gn9wd1z9I+ksULstacbvePDjDmPpGNkeHMp4N?=
+ =?us-ascii?Q?42/5/Ejyf6CdKsNnPSASiV6ws7pg2hTrtDidCe0UuLgoEyn4DuccIaluetWk?=
+ =?us-ascii?Q?HAveApqmuCFndhUEcnJOUkOynuLooW6XwJTM8bExDJd+if/j91btSSE7mj28?=
+ =?us-ascii?Q?UW60RIvNXL2KrB/YrjniWak53zsdyezUivhX+1A9fn2ffQx16UN4eWnB5aPS?=
+ =?us-ascii?Q?JD0lROY9/YSR519lUcMI8WonHlnz02sCSPCPhF/Pklhh8vOfOICFgIbmFoLQ?=
+ =?us-ascii?Q?9idSTBft+PIrVGwFB7BTrlXO8MtY3sZq5rqxosTo24H+LCXOhtr4YX+Ky/TY?=
+ =?us-ascii?Q?5ZfksXfzXAX5s4KxhuDZBJHGyrpXCAxLTksbJ3cut7k2GgQOuF7adi4pDdwT?=
+ =?us-ascii?Q?T0R7695z5RDiEgEV1/b7MQOf8UN7MqBgJ0UIE/AzIsK1eWf+xTKibXK2vkFE?=
+ =?us-ascii?Q?KuV0EwU9P7Ilfun5FOPoLmhfsntWB5pnEJKsmEqKEzo6CGVECD2Sw0cGmfAg?=
+ =?us-ascii?Q?IPAQ551LEyXAW8T70zAls9ReqBDv0d+G/f2Dx5DG/1CbNwXbWPv+OIbNXT0o?=
+ =?us-ascii?Q?mLaa1Bn9HBJ2JhVYBrmxElo+U7r408sI/a4xh3fgY2KtDop6P4CxywxsaxqV?=
+ =?us-ascii?Q?VTvw9X87kZk9pXw1xODOSBIMb6R1MQoJJVxpW8bdldwqAVwap8wMZE1ApIGN?=
+ =?us-ascii?Q?UP37WhAxED5nJKcYTDGD4hfQKswtr4gCwayjeA+ZCHIwfw8lwdB8hKoUGD+u?=
+ =?us-ascii?Q?K6EMzAtgcuAr7xh7pGYKMHWegegOa9Dvg6Qj2swuZ2Ml4bqOnijK5i0CYvCm?=
+ =?us-ascii?Q?gLa1WgGSNY0vLshRhZFP+Rg2RaH1FN6z9z42vfYLwRHOM4HZKl3AVIaT1z94?=
+ =?us-ascii?Q?d5WUv5Yt/cm8iNWQP3UyKOGrRcmzyt26yHt7IIXvGhwYHPwuqz+TVK9DPA+1?=
+ =?us-ascii?Q?LABK2/ATjBM1oBN4rejj+UnIn5SqilLKYPnTd6FvUr7Ydy7pRi9wxwEdqXze?=
+ =?us-ascii?Q?VvQMLe5Vq2jO92qBr1nDZkIgCmGe98P09ytI3JGzX+drHCkIofZzV2rRUZKu?=
+ =?us-ascii?Q?kyCMel8BZIMLOZzdf5w5wGVZcSmdvGM8WDrncLMPILlMxDVQ2PStAW/awZoQ?=
+ =?us-ascii?Q?cQL+1NUbGiKknlAarVNKOe92qf9gV/s=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 609889fb-058c-4bdb-5695-08da12009300
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Mar 2022 03:51:30.4418
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: x71bOGbVgGxrMdmSRIqZvsq7l5SWhdaI4jtwFsMcqPQDBb3QZ+Uxw2lm2IWWC5fX2yOaCAuYCcMvAEMGz6Z+tsGhfk+VxDvKjr1vBsq0PKo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR10MB4173
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10301 signatures=695566
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=806 spamscore=0
+ adultscore=0 mlxscore=0 phishscore=0 bulkscore=0 suspectscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2203300017
+X-Proofpoint-ORIG-GUID: NlyRnsT44OwC8SWLKEdZBVwQEiUY1Qxq
+X-Proofpoint-GUID: NlyRnsT44OwC8SWLKEdZBVwQEiUY1Qxq
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Confirmed it has been fixed on the latest linux-block/for-next,
-pls ignore this report, sorry for the noise.
 
-On Wed, Mar 30, 2022 at 10:36 AM Yi Zhang <yi.zhang@redhat.com> wrote:
->
-> Hello
-> Below issue was triggered during blktests srp/002 on the latest linux
-> tree, pls help check it, thanks.
->
-> [  361.390453] scsi host23: ib_srp: Already connected to target port
-> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=fe80:0000:0000:0000:0207:43ff:fe4a:9388
-> [  361.417657] sd 21:0:0:2: [sdf] Attached SCSI disk
-> [  361.424672] sd 21:0:0:0: [sde] Attached SCSI disk
-> [  361.453074] scsi host23: ib_srp: Already connected to target port
-> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=172.16.0.82
-> [  361.453747] sd 21:0:0:1: [sdg] Attached SCSI disk
-> [  361.496671] scsi host23: ib_srp: Already connected to target port
-> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=fe80:0000:0000:0000:0207:43ff:fe4a:9380
-> [  362.510524] scsi 22:0:0:2: alua: Detached
-> [  362.543857] scsi 22:0:0:0: alua: Detached
-> [  362.556512] scsi 22:0:0:1: alua: Detached
-> [  362.583589] debugfs: Directory 'dm-1' with parent 'block' already present!
-> [  362.689488] BUG: scheduling while atomic: multipathd/2684/0x00000102
-> [  362.689493] Modules linked in: ib_srp scsi_transport_srp
-> target_core_user uio target_core_pscsi target_core_file ib_srpt
-> target_core_iblock target_core_mod rdma_cm iw_cm ib_cm scsi_debug
-> rdma_rxe ib_uverbs ip6_udp_tunnel udp_tunnel null_blk ib_umad ib_core
-> rfkill sunrpc vfat fat dm_service_time dm_multipath scsi_dh_rdac
-> scsi_dh_emc scsi_dh_alua intel_rapl_msr intel_rapl_common amd64_edac
-> edac_mce_amd ipmi_ssif kvm_amd kvm irqbypass acpi_ipmi igb rapl pcspkr
-> joydev ipmi_si k10temp i2c_piix4 dca ipmi_devintf ipmi_msghandler
-> acpi_cpufreq fuse zram xfs csiostor ast i2c_algo_bit drm_vram_helper
-> drm_kms_helper drm_ttm_helper ttm cxgb4 crct10dif_pclmul crc32_pclmul
-> drm crc32c_intel nvme ghash_clmulni_intel nvme_core tls ccp
-> scsi_transport_fc sp5100_tco [last unloaded: null_blk]
-> [  362.689541] Preemption disabled at:
-> [  362.689541] [<ffffffffb6154944>] vprintk_emit+0x114/0x280
-> [  362.689549] CPU: 1 PID: 2684 Comm: multipathd Not tainted 5.17.0+ #1
-> [  362.689552] Hardware name: Supermicro Super Server/H11SSL-i, BIOS
-> 1.3 06/25/2019
-> [  362.689554] Call Trace:
-> [  362.689557]  <IRQ>
-> [  362.689560]  dump_stack_lvl+0x44/0x58
-> [  362.689564]  ? vprintk_emit+0x114/0x280
-> [  362.689567]  __schedule_bug.cold+0x81/0x8e
-> [  362.689571]  __schedule+0xe37/0x1190
-> [  362.689575]  schedule+0x4e/0xb0
-> [  362.689578]  rwsem_down_write_slowpath+0x1e4/0x5a0
-> [  362.689582]  simple_recursive_removal+0x17b/0x2a0
-> [  362.689586]  ? start_creating.part.0+0x110/0x110
-> [  362.689590]  debugfs_remove+0x40/0x60
-> [  362.689592]  blk_release_queue+0x95/0x100
-> [  362.689595]  kobject_put+0x7e/0x1b0
-> [  362.689599]  blkg_free.part.0+0x41/0x60
-> [  362.689602]  rcu_do_batch+0x18a/0x4c0
-> [  362.689605]  rcu_core+0x1bb/0x4d0
-> [  362.689608]  __do_softirq+0xfb/0x30b
-> [  362.689611]  __irq_exit_rcu+0xbd/0x140
-> [  362.689614]  sysvec_apic_timer_interrupt+0x9e/0xc0
-> [  362.689618]  </IRQ>
-> [  362.689619]  <TASK>
-> [  362.689619]  asm_sysvec_apic_timer_interrupt+0x12/0x20
-> [  362.689622] RIP: 0010:console_unlock+0x371/0x530
-> [  362.689625] Code: 00 65 ff 0d 41 c4 ec 49 0f 85 54 fe ff ff 0f 1f
-> 44 00 00 e9 4a fe ff ff e8 7c 18 00 00 4d 85 e4 74 10 31 d2 fb 0f 1f
-> 44 00 00 <85> d2 0f 85 05 ff ff ff 8b 05 61 be cf 01 83 f8 ff 0f 85 bc
-> 00 00
-> [  362.689627] RSP: 0018:ffffb62785167a68 EFLAGS: 00000246
-> [  362.689629] RAX: 0000000080000001 RBX: 0000000000000000 RCX: 0000000000000000
-> [  362.689631] RDX: 0000000000000000 RSI: 0000000000000046 RDI: 00000000ffffffff
-> [  362.689632] RBP: 0000000000000000 R08: ffffffffb682c4a0 R09: 6d64272079726f74
-> [  362.689633] R10: 6f74636572694420 R11: 3a73666775626564 R12: 0000000000000200
-> [  362.689634] R13: 0000000000000000 R14: ffff9e2ec22bd100 R15: 0000000000000000
-> [  362.689636]  ? univ8250_console_exit+0x20/0x20
-> [  362.689641]  ? console_unlock+0x364/0x530
-> [  362.689644]  vprintk_emit+0x140/0x280
-> [  362.689647]  _printk+0x48/0x4a
-> [  362.689649]  ? lookup_dcache+0x17/0x60
-> [  362.689653]  start_creating.part.0.cold+0x59/0x5b
-> [  362.689656]  debugfs_create_dir+0x2b/0x170
-> [  362.689658]  blk_register_queue+0xc8/0x230
-> [  362.689661]  ? bd_register_pending_holders+0xd7/0x100
-> [  362.689664]  device_add_disk+0x203/0x340
-> [  362.689667]  dm_setup_md_queue+0x9b/0xe0
-> [  362.689672]  table_load+0x293/0x2c0
-> [  362.689674]  ? __find_device_hash_cell+0x140/0x140
-> [  362.689676]  ctl_ioctl+0x1f9/0x4e0
-> [  362.689682]  dm_ctl_ioctl+0xa/0x10
-> [  362.689684]  __x64_sys_ioctl+0x8c/0xc0
-> [  362.689686]  do_syscall_64+0x3a/0x80
-> [  362.689689]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> [  362.689691] RIP: 0033:0x7fadbb70b29f
-> [  362.689703] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24
-> 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00
-> 00 0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28
-> 00 00
-> [  362.689704] RSP: 002b:00007fadba3132f0 EFLAGS: 00000246 ORIG_RAX:
-> 0000000000000010
-> [  362.689706] RAX: ffffffffffffffda RBX: 00007fada801d860 RCX: 00007fadbb70b29f
-> [  362.689707] RDX: 00007fada803cf80 RSI: 00000000c138fd09 RDI: 0000000000000005
-> [  362.689709] RBP: 0000000000000003 R08: 00007fadba3110a0 R09: 00007fadbbb99040
-> [  362.689709] R10: 00007fadba310ea7 R11: 0000000000000246 R12: 00007fadbbb886b6
-> [  362.689710] R13: 00007fadbbb8838c R14: 00007fada803cfb0 R15: 00007fadbbb8878c
-> [  362.689713]  </TASK>
-> [  362.918525] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-56:
-> queued zerolength write
-> [  362.918539] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-54:
-> queued zerolength write
-> [  362.918547] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-52:
-> queued zerolength write
-> [  362.918555] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-50:
-> queued zerolength write
-> [  362.918561] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-48:
-> queued zerolength write
-> [  362.918566] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-46:
-> queued zerolength write
-> [  362.918571] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-44:
-> queued zerolength write
-> [  362.918577] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-42:
-> queued zerolength write
-> [  362.918583] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-40:
-> queued zerolength write
-> [  362.918588] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-38:
-> queued zerolength write
-> [  362.918676] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-56 wc->status 5
-> [  362.918682] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-54 wc->status 5
-> [  362.918686] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-52 wc->status 5
-> [  362.918689] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-50 wc->status 5
-> [  362.918693] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-48 wc->status 5
-> [  362.918696] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-46 wc->status 5
-> [  362.918699] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-44 wc->status 5
-> [  362.918701] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-42 wc->status 5
-> [  362.918704] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-40 wc->status 5
-> [  362.918707] ib_srpt:srpt_zerolength_write_done: ib_srpt
-> 172.16.0.82-38 wc->status 5
-> [  362.918724] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-56
-> [  362.918731] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-54
-> [  362.918737] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-52
-> [  362.918743] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-50
-> [  362.918750] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-48
-> [  362.918757] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-46
-> [  362.918763] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-44
-> [  362.918769] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-42
-> [  362.918775] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-40
-> [  362.918781] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-38
-> [  366.541704] device-mapper: multipath: 253:2: Failing path 8:16.
-> [  366.575468] scsi 21:0:0:0: alua: Detached
-> [  366.576646] sd 20:0:0:2: [sdc] Synchronizing SCSI cache
-> [  366.587879] list_add corruption. prev->next should be next
-> (ffff9e31e2008838), but was 0000000000000000. (prev=ffffb62782284db0).
-> [  366.587895] ------------[ cut here ]------------
-> [  366.587895] kernel BUG at lib/list_debug.c:26!
-> [  366.587903] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-> [  366.587906] CPU: 6 PID: 0 Comm: swapper/6 Tainted: G        W
->   5.17.0+ #1
-> [  366.587909] Hardware name: Supermicro Super Server/H11SSL-i, BIOS
-> 1.3 06/25/2019
-> [  366.587911] RIP: 0010:__list_add_valid.cold+0x3d/0x3f
-> [  366.587918] Code: f2 48 89 c1 48 89 fe 48 c7 c7 a8 b6 65 b7 e8 b4
-> e6 fd ff 0f 0b 48 89 d1 48 89 c6 4c 89 c2 48 c7 c7 50 b6 65 b7 e8 9d
-> e6 fd ff <0f> 0b 48 89 fe 48 c7 c7 e0 b6 65 b7 e8 8c e6 fd ff 0f 0b 48
-> 89 d1
-> [  366.587920] RSP: 0018:ffffb62782370d78 EFLAGS: 00010086
-> [  366.587923] RAX: 0000000000000075 RBX: ffff9e31e2008820 RCX: 0000000000000000
-> [  366.587924] RDX: 0000000000000103 RSI: ffffffffb764577c RDI: 00000000ffffffff
-> [  366.587926] RBP: ffffb62782370e10 R08: ffffffffb7e65380 R09: 3238373236626666
-> [  366.587927] R10: 3438323238373236 R11: 62666666663d7665 R12: ffffb62782284db0
-> [  366.587928] R13: ffff9e31e2008834 R14: ffffb62782370db0 R15: ffff9e31e2008838
-> [  366.587929] FS:  0000000000000000(0000) GS:ffff9e35cea00000(0000)
-> knlGS:0000000000000000
-> [  366.587931] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  366.587932] CR2: 00007f18579e44e0 CR3: 00000001cce10000 CR4: 00000000003506e0
-> [  366.587934] Call Trace:
-> [  366.587936]  <IRQ>
-> [  366.587938]  rwsem_down_write_slowpath+0xd7/0x5a0
-> [  366.587945]  simple_recursive_removal+0x17b/0x2a0
-> [  366.587950]  ? start_creating.part.0+0x110/0x110
-> [  366.587955]  debugfs_remove+0x40/0x60
-> [  366.587958]  blk_release_queue+0x95/0x100
-> [  366.587962]  kobject_put+0x7e/0x1b0
-> [  366.587966]  blkg_free.part.0+0x41/0x60
-> [  366.587969]  rcu_do_batch+0x18a/0x4c0
-> [  366.587975]  rcu_core+0x1bb/0x4d0
-> [  366.587978]  __do_softirq+0xfb/0x30b
-> [  366.587981]  __irq_exit_rcu+0xbd/0x140
-> [  366.587985]  sysvec_apic_timer_interrupt+0x9e/0xc0
-> [  366.587989]  </IRQ>
-> [  366.587990]  <TASK>
-> [  366.587991]  asm_sysvec_apic_timer_interrupt+0x12/0x20
-> [  366.587994] RIP: 0010:cpuidle_enter_state+0xd8/0x380
-> [  366.587998] Code: 00 00 31 ff e8 39 0a 73 ff 45 84 ff 74 16 9c 58
-> 0f 1f 40 00 f6 c4 02 0f 85 8e 02 00 00 31 ff e8 4e b7 78 ff fb 0f 1f
-> 44 00 00 <45> 85 f6 0f 88 21 01 00 00 49 63 ce 48 8d 04 49 48 8d 04 81
-> 49 8d
-> [  366.587999] RSP: 0018:ffffb62782207eb0 EFLAGS: 00000246
-> [  366.588001] RAX: ffff9e35cea00000 RBX: 0000000000000001 RCX: 0000000000000000
-> [  366.588002] RDX: 000000555a50727e RSI: ffffffffb764577c RDI: ffffffffb76074d6
-> [  366.588003] RBP: ffff9e2ec204bc00 R08: 0000000000000002 R09: 000000003cf3d124
-> [  366.588004] R10: 0000000000000008 R11: 00000000000003e4 R12: ffffffffb8077b80
-> [  366.588005] R13: 000000555a50727e R14: 0000000000000001 R15: 0000000000000000
-> [  366.588008]  cpuidle_enter+0x29/0x40
-> [  366.588010]  do_idle+0x1b2/0x220
-> [  366.588014]  cpu_startup_entry+0x19/0x20
-> [  366.588016]  secondary_startup_64_no_verify+0xd5/0xdb
-> [  366.588022]  </TASK>
-> [  366.588022] Modules linked in: ib_srp scsi_transport_srp
-> target_core_user uio target_core_pscsi target_core_file ib_srpt
-> target_core_iblock target_core_mod rdma_cm iw_cm ib_cm scsi_debug
-> rdma_rxe ib_uverbs ip6_udp_tunnel udp_tunnel null_blk ib_umad ib_core
-> rfkill sunrpc vfat fat dm_service_time dm_multipath scsi_dh_rdac
-> scsi_dh_emc scsi_dh_alua intel_rapl_msr intel_rapl_common amd64_edac
-> edac_mce_amd ipmi_ssif kvm_amd kvm irqbypass acpi_ipmi igb rapl pcspkr
-> joydev ipmi_si k10temp i2c_piix4 dca ipmi_devintf ipmi_msghandler
-> acpi_cpufreq fuse zram xfs csiostor ast i2c_algo_bit drm_vram_helper
-> drm_kms_helper drm_ttm_helper ttm cxgb4 crct10dif_pclmul crc32_pclmul
-> drm crc32c_intel nvme ghash_clmulni_intel nvme_core tls ccp
-> scsi_transport_fc sp5100_tco [last unloaded: null_blk]
-> [  366.588072] ---[ end trace 0000000000000000 ]---
-> [  366.680305] RIP: 0010:__list_add_valid.cold+0x3d/0x3f
-> [  366.680310] Code: f2 48 89 c1 48 89 fe 48 c7 c7 a8 b6 65 b7 e8 b4
-> e6 fd ff 0f 0b 48 89 d1 48 89 c6 4c 89 c2 48 c7 c7 50 b6 65 b7 e8 9d
-> e6 fd ff <0f> 0b 48 89 fe 48 c7 c7 e0 b6 65 b7 e8 8c e6 fd ff 0f 0b 48
-> 89 d1
-> [  366.680311] RSP: 0018:ffffb62782370d78 EFLAGS: 00010086
-> [  366.680314] RAX: 0000000000000075 RBX: ffff9e31e2008820 RCX: 0000000000000000
-> [  366.680315] RDX: 0000000000000103 RSI: ffffffffb764577c RDI: 00000000ffffffff
-> [  366.680316] RBP: ffffb62782370e10 R08: ffffffffb7e65380 R09: 3238373236626666
-> [  366.680317] R10: 3438323238373236 R11: 62666666663d7665 R12: ffffb62782284db0
-> [  366.680318] R13: ffff9e31e2008834 R14: ffffb62782370db0 R15: ffff9e31e2008838
-> [  366.680319] FS:  0000000000000000(0000) GS:ffff9e35cea00000(0000)
-> knlGS:0000000000000000
-> [  366.680321] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [  366.680322] CR2: 00007f18579e44e0 CR3: 00000001cce10000 CR4: 00000000003506e0
-> [  366.680324] Kernel panic - not syncing: Fatal exception in interrupt
-> [  366.680543] Kernel Offset: 0x35000000 from 0xffffffff81000000
-> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [  368.507945] ---[ end Kernel panic - not syncing: Fatal exception in
-> interrupt ]---
->
-> --
-> Best Regards,
->   Yi Zhang
+Randy,
 
+> Eliminate anonymous module_init() and module_exit(), which can lead to
+> confusion or ambiguity when reading System.map, crashes/oops/bugs, or
+> an initcall_debug log.
 
+Applied to 5.18/scsi-staging, thanks!
 
 -- 
-Best Regards,
-  Yi Zhang
-
+Martin K. Petersen	Oracle Linux Engineering
