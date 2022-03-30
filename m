@@ -2,89 +2,324 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CD2C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 03:02:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 423D9C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 03:08:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234295AbiC3DDw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 29 Mar 2022 23:03:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47400 "EHLO
+        id S232750AbiC3DK0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 29 Mar 2022 23:10:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242191AbiC3DDu (ORCPT
+        with ESMTP id S242229AbiC3DKZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 29 Mar 2022 23:03:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2CF63B716F
-        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 20:02:06 -0700 (PDT)
+        Tue, 29 Mar 2022 23:10:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C405103C
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 20:08:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648609325;
+        s=mimecast20190719; t=1648609717;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=xxzvoUYwD8SSYfs6qQXKCiAwI4oUDxgTEMP9uTO4mCk=;
-        b=UIOYWg6+zRDpv4BAtKC+2yw5ck9gch3swMJ8yjCLZOLrO6DVXRf3MiYHuybLH7a1fVhlmu
-        JC7DbJOS0VRJAZOSFxd4VxRcpH2j+CGGYZStq6SylhkiZ4BC1NWUGcksKejdJVHP24C4lo
-        5geOcw8tBpIOYy53fmNLDg77hl+HmSI=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=P+I+Rd6WWoY/JtxV+Dr+XPyfn8kZ0GPQrOttvIbs1E0=;
+        b=VfvJEDfPNikMDV6jda6Tygl0k9Z5XxXT9FgnZB0r1by9FtQI6iXfSgHNlAIE+o6s6jZ3AB
+        5DY3sOljaBG/5E++/9iWMA5L62Tc4ZAS1ZxutcWaE4cHwOHphrkW/2d63NEJeF2yg0hKg7
+        34PB1kMGRQg9etHRabxirrh111w9N8g=
+Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
+ [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-32-OWISo9TON5mPeQ0u3-hOeQ-1; Tue, 29 Mar 2022 23:01:59 -0400
-X-MC-Unique: OWISo9TON5mPeQ0u3-hOeQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6541029DD991;
-        Wed, 30 Mar 2022 03:01:59 +0000 (UTC)
-Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 69D652166B3F;
-        Wed, 30 Mar 2022 03:01:45 +0000 (UTC)
-Date:   Wed, 30 Mar 2022 11:01:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     syzbot <syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tj@kernel.org
-Subject: Re: [syzbot] possible deadlock in throtl_pending_timer_fn
-Message-ID: <YkPIFKn0osBGOgma@T590>
-References: <CAFj5m9+Gc-t6vD17yWBNos-fk9vmhUTLsXYGrSx4Bdzn7R67JQ@mail.gmail.com>
- <0000000000009518f205db66a47a@google.com>
+ us-mta-199-B0G2m-R_OHqoJBbMzVxszQ-1; Tue, 29 Mar 2022 23:08:35 -0400
+X-MC-Unique: B0G2m-R_OHqoJBbMzVxszQ-1
+Received: by mail-pg1-f197.google.com with SMTP id z132-20020a63338a000000b003844e317066so9583516pgz.19
+        for <linux-block@vger.kernel.org>; Tue, 29 Mar 2022 20:08:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=P+I+Rd6WWoY/JtxV+Dr+XPyfn8kZ0GPQrOttvIbs1E0=;
+        b=L0oMuqo5ynO/OBtBH4V4zS/EvI6XujJg7ND18M+eaHOxIxEJgJ3vYfUKRAyikABQhC
+         0lCSWX3++zA09U4nKN9FuEC1BCIM4bVc0JKy+uXdsV8lkrmZQJIwPXGC4QGb3nRCKyHi
+         VccJwPHEfEsdjyMUVnjTvimLlU+F/GkXT6UpFtigfpSRYsYYCwINgXvTZBzJBuPs1lHw
+         58X1NUPhcaqmOgOo3Du+INn2ILkwvYJMMKmJFz2845SAo8R2HOfmemQxHu+dj0Owki0K
+         e2nfNuQbwofvp3uTkm6GJJnqs55stb9dddydl33031bACtmpgHLGWhTm76WXFr7UQ89t
+         3j2A==
+X-Gm-Message-State: AOAM530eNXTuUwbMI/mD75BEpH4d8lZgvrmM9AIQDSZgbaLtnnqHJnJ7
+        A9W0ly2FDQrY38Z7wJ586QwlhyWOLUd0kX2OrPmh2/OccOslcNCQBZR1J/F3ODR8SHQevG4DNRT
+        XT2dAhT8yNoVDOD906AbfgDKJnzWI9HZKiyaQF4U=
+X-Received: by 2002:a05:6a00:1d27:b0:4fb:66bd:f3b6 with SMTP id a39-20020a056a001d2700b004fb66bdf3b6mr11124224pfx.40.1648609714462;
+        Tue, 29 Mar 2022 20:08:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyIPAprb4eDkgCBFRQuDsUvk0bWu36cDWQaD1sGqKLB2fJK+oA3x0RsPMDdL75G5Xb6AYOHf5uxBQf4sNn+upM=
+X-Received: by 2002:a05:6a00:1d27:b0:4fb:66bd:f3b6 with SMTP id
+ a39-20020a056a001d2700b004fb66bdf3b6mr11124196pfx.40.1648609713966; Tue, 29
+ Mar 2022 20:08:33 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000009518f205db66a47a@google.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+References: <CAHj4cs8TSNdAW-Tkz6YNGOczn9CTachw6X_zSxCrTGzzaxroJQ@mail.gmail.com>
+In-Reply-To: <CAHj4cs8TSNdAW-Tkz6YNGOczn9CTachw6X_zSxCrTGzzaxroJQ@mail.gmail.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Wed, 30 Mar 2022 11:08:22 +0800
+Message-ID: <CAHj4cs9Sm6zoULV9HL-HuhBXW8dBMbdeO5MMgOa6BrkDw8HDpA@mail.gmail.com>
+Subject: Re: [bug report] kernel BUG at lib/list_debug.c:26! observed during
+ blktests srp/002 on latest linux tree
+To:     linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Mar 29, 2022 at 07:52:57PM -0700, syzbot wrote:
-> > On Wed, Mar 30, 2022 at 5:23 AM syzbot
-> > <syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com> wrote:
-> >>
-> >> Hello,
-> >>
-> >> syzbot found the following issue on:
-> >>
-> >> HEAD commit:    cb7cbaae7fd9 Merge tag 'drm-next-2022-03-25' of git://anon..
-> >> git tree:       upstream
-> >> console output: https://syzkaller.appspot.com/x/log.txt?x=17ef8b43700000
-> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=7094767cefc58fb9
-> >> dashboard link: https://syzkaller.appspot.com/bug?extid=934ebb67352c8a490bf3
-> >> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> >>
-> >> Unfortunately, I don't have any reproducer for this issue yet.
-> >>
-> >> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> >> Reported-by: syzbot+934ebb67352c8a490bf3@syzkaller.appspotmail.com
-> >
-> > #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git
-> 
-> This crash does not have a reproducer. I cannot test it.
+Confirmed it has been fixed on the latest linux-block/for-next,
+pls ignore this report, sorry for the noise.
 
-This one is triggered in case of memory allocation failure, especially blkg_free()
-is called from blkg_alloc() directly. That is why it is hard to reproduce, and it
-is one old issue.
+On Wed, Mar 30, 2022 at 10:36 AM Yi Zhang <yi.zhang@redhat.com> wrote:
+>
+> Hello
+> Below issue was triggered during blktests srp/002 on the latest linux
+> tree, pls help check it, thanks.
+>
+> [  361.390453] scsi host23: ib_srp: Already connected to target port
+> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=fe80:0000:0000:0000:0207:43ff:fe4a:9388
+> [  361.417657] sd 21:0:0:2: [sdf] Attached SCSI disk
+> [  361.424672] sd 21:0:0:0: [sde] Attached SCSI disk
+> [  361.453074] scsi host23: ib_srp: Already connected to target port
+> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=172.16.0.82
+> [  361.453747] sd 21:0:0:1: [sdg] Attached SCSI disk
+> [  361.496671] scsi host23: ib_srp: Already connected to target port
+> with id_ext=0ec47afffee6bada;ioc_guid=0ec47afffee6bada;dest=fe80:0000:0000:0000:0207:43ff:fe4a:9380
+> [  362.510524] scsi 22:0:0:2: alua: Detached
+> [  362.543857] scsi 22:0:0:0: alua: Detached
+> [  362.556512] scsi 22:0:0:1: alua: Detached
+> [  362.583589] debugfs: Directory 'dm-1' with parent 'block' already present!
+> [  362.689488] BUG: scheduling while atomic: multipathd/2684/0x00000102
+> [  362.689493] Modules linked in: ib_srp scsi_transport_srp
+> target_core_user uio target_core_pscsi target_core_file ib_srpt
+> target_core_iblock target_core_mod rdma_cm iw_cm ib_cm scsi_debug
+> rdma_rxe ib_uverbs ip6_udp_tunnel udp_tunnel null_blk ib_umad ib_core
+> rfkill sunrpc vfat fat dm_service_time dm_multipath scsi_dh_rdac
+> scsi_dh_emc scsi_dh_alua intel_rapl_msr intel_rapl_common amd64_edac
+> edac_mce_amd ipmi_ssif kvm_amd kvm irqbypass acpi_ipmi igb rapl pcspkr
+> joydev ipmi_si k10temp i2c_piix4 dca ipmi_devintf ipmi_msghandler
+> acpi_cpufreq fuse zram xfs csiostor ast i2c_algo_bit drm_vram_helper
+> drm_kms_helper drm_ttm_helper ttm cxgb4 crct10dif_pclmul crc32_pclmul
+> drm crc32c_intel nvme ghash_clmulni_intel nvme_core tls ccp
+> scsi_transport_fc sp5100_tco [last unloaded: null_blk]
+> [  362.689541] Preemption disabled at:
+> [  362.689541] [<ffffffffb6154944>] vprintk_emit+0x114/0x280
+> [  362.689549] CPU: 1 PID: 2684 Comm: multipathd Not tainted 5.17.0+ #1
+> [  362.689552] Hardware name: Supermicro Super Server/H11SSL-i, BIOS
+> 1.3 06/25/2019
+> [  362.689554] Call Trace:
+> [  362.689557]  <IRQ>
+> [  362.689560]  dump_stack_lvl+0x44/0x58
+> [  362.689564]  ? vprintk_emit+0x114/0x280
+> [  362.689567]  __schedule_bug.cold+0x81/0x8e
+> [  362.689571]  __schedule+0xe37/0x1190
+> [  362.689575]  schedule+0x4e/0xb0
+> [  362.689578]  rwsem_down_write_slowpath+0x1e4/0x5a0
+> [  362.689582]  simple_recursive_removal+0x17b/0x2a0
+> [  362.689586]  ? start_creating.part.0+0x110/0x110
+> [  362.689590]  debugfs_remove+0x40/0x60
+> [  362.689592]  blk_release_queue+0x95/0x100
+> [  362.689595]  kobject_put+0x7e/0x1b0
+> [  362.689599]  blkg_free.part.0+0x41/0x60
+> [  362.689602]  rcu_do_batch+0x18a/0x4c0
+> [  362.689605]  rcu_core+0x1bb/0x4d0
+> [  362.689608]  __do_softirq+0xfb/0x30b
+> [  362.689611]  __irq_exit_rcu+0xbd/0x140
+> [  362.689614]  sysvec_apic_timer_interrupt+0x9e/0xc0
+> [  362.689618]  </IRQ>
+> [  362.689619]  <TASK>
+> [  362.689619]  asm_sysvec_apic_timer_interrupt+0x12/0x20
+> [  362.689622] RIP: 0010:console_unlock+0x371/0x530
+> [  362.689625] Code: 00 65 ff 0d 41 c4 ec 49 0f 85 54 fe ff ff 0f 1f
+> 44 00 00 e9 4a fe ff ff e8 7c 18 00 00 4d 85 e4 74 10 31 d2 fb 0f 1f
+> 44 00 00 <85> d2 0f 85 05 ff ff ff 8b 05 61 be cf 01 83 f8 ff 0f 85 bc
+> 00 00
+> [  362.689627] RSP: 0018:ffffb62785167a68 EFLAGS: 00000246
+> [  362.689629] RAX: 0000000080000001 RBX: 0000000000000000 RCX: 0000000000000000
+> [  362.689631] RDX: 0000000000000000 RSI: 0000000000000046 RDI: 00000000ffffffff
+> [  362.689632] RBP: 0000000000000000 R08: ffffffffb682c4a0 R09: 6d64272079726f74
+> [  362.689633] R10: 6f74636572694420 R11: 3a73666775626564 R12: 0000000000000200
+> [  362.689634] R13: 0000000000000000 R14: ffff9e2ec22bd100 R15: 0000000000000000
+> [  362.689636]  ? univ8250_console_exit+0x20/0x20
+> [  362.689641]  ? console_unlock+0x364/0x530
+> [  362.689644]  vprintk_emit+0x140/0x280
+> [  362.689647]  _printk+0x48/0x4a
+> [  362.689649]  ? lookup_dcache+0x17/0x60
+> [  362.689653]  start_creating.part.0.cold+0x59/0x5b
+> [  362.689656]  debugfs_create_dir+0x2b/0x170
+> [  362.689658]  blk_register_queue+0xc8/0x230
+> [  362.689661]  ? bd_register_pending_holders+0xd7/0x100
+> [  362.689664]  device_add_disk+0x203/0x340
+> [  362.689667]  dm_setup_md_queue+0x9b/0xe0
+> [  362.689672]  table_load+0x293/0x2c0
+> [  362.689674]  ? __find_device_hash_cell+0x140/0x140
+> [  362.689676]  ctl_ioctl+0x1f9/0x4e0
+> [  362.689682]  dm_ctl_ioctl+0xa/0x10
+> [  362.689684]  __x64_sys_ioctl+0x8c/0xc0
+> [  362.689686]  do_syscall_64+0x3a/0x80
+> [  362.689689]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> [  362.689691] RIP: 0033:0x7fadbb70b29f
+> [  362.689703] Code: 00 48 89 44 24 18 31 c0 48 8d 44 24 60 c7 04 24
+> 10 00 00 00 48 89 44 24 08 48 8d 44 24 20 48 89 44 24 10 b8 10 00 00
+> 00 0f 05 <89> c2 3d 00 f0 ff ff 77 18 48 8b 44 24 18 64 48 2b 04 25 28
+> 00 00
+> [  362.689704] RSP: 002b:00007fadba3132f0 EFLAGS: 00000246 ORIG_RAX:
+> 0000000000000010
+> [  362.689706] RAX: ffffffffffffffda RBX: 00007fada801d860 RCX: 00007fadbb70b29f
+> [  362.689707] RDX: 00007fada803cf80 RSI: 00000000c138fd09 RDI: 0000000000000005
+> [  362.689709] RBP: 0000000000000003 R08: 00007fadba3110a0 R09: 00007fadbbb99040
+> [  362.689709] R10: 00007fadba310ea7 R11: 0000000000000246 R12: 00007fadbbb886b6
+> [  362.689710] R13: 00007fadbbb8838c R14: 00007fada803cfb0 R15: 00007fadbbb8878c
+> [  362.689713]  </TASK>
+> [  362.918525] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-56:
+> queued zerolength write
+> [  362.918539] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-54:
+> queued zerolength write
+> [  362.918547] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-52:
+> queued zerolength write
+> [  362.918555] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-50:
+> queued zerolength write
+> [  362.918561] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-48:
+> queued zerolength write
+> [  362.918566] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-46:
+> queued zerolength write
+> [  362.918571] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-44:
+> queued zerolength write
+> [  362.918577] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-42:
+> queued zerolength write
+> [  362.918583] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-40:
+> queued zerolength write
+> [  362.918588] ib_srpt:srpt_zerolength_write: ib_srpt 172.16.0.82-38:
+> queued zerolength write
+> [  362.918676] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-56 wc->status 5
+> [  362.918682] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-54 wc->status 5
+> [  362.918686] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-52 wc->status 5
+> [  362.918689] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-50 wc->status 5
+> [  362.918693] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-48 wc->status 5
+> [  362.918696] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-46 wc->status 5
+> [  362.918699] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-44 wc->status 5
+> [  362.918701] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-42 wc->status 5
+> [  362.918704] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-40 wc->status 5
+> [  362.918707] ib_srpt:srpt_zerolength_write_done: ib_srpt
+> 172.16.0.82-38 wc->status 5
+> [  362.918724] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-56
+> [  362.918731] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-54
+> [  362.918737] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-52
+> [  362.918743] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-50
+> [  362.918750] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-48
+> [  362.918757] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-46
+> [  362.918763] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-44
+> [  362.918769] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-42
+> [  362.918775] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-40
+> [  362.918781] ib_srpt:srpt_release_channel_work: ib_srpt 172.16.0.82-38
+> [  366.541704] device-mapper: multipath: 253:2: Failing path 8:16.
+> [  366.575468] scsi 21:0:0:0: alua: Detached
+> [  366.576646] sd 20:0:0:2: [sdc] Synchronizing SCSI cache
+> [  366.587879] list_add corruption. prev->next should be next
+> (ffff9e31e2008838), but was 0000000000000000. (prev=ffffb62782284db0).
+> [  366.587895] ------------[ cut here ]------------
+> [  366.587895] kernel BUG at lib/list_debug.c:26!
+> [  366.587903] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+> [  366.587906] CPU: 6 PID: 0 Comm: swapper/6 Tainted: G        W
+>   5.17.0+ #1
+> [  366.587909] Hardware name: Supermicro Super Server/H11SSL-i, BIOS
+> 1.3 06/25/2019
+> [  366.587911] RIP: 0010:__list_add_valid.cold+0x3d/0x3f
+> [  366.587918] Code: f2 48 89 c1 48 89 fe 48 c7 c7 a8 b6 65 b7 e8 b4
+> e6 fd ff 0f 0b 48 89 d1 48 89 c6 4c 89 c2 48 c7 c7 50 b6 65 b7 e8 9d
+> e6 fd ff <0f> 0b 48 89 fe 48 c7 c7 e0 b6 65 b7 e8 8c e6 fd ff 0f 0b 48
+> 89 d1
+> [  366.587920] RSP: 0018:ffffb62782370d78 EFLAGS: 00010086
+> [  366.587923] RAX: 0000000000000075 RBX: ffff9e31e2008820 RCX: 0000000000000000
+> [  366.587924] RDX: 0000000000000103 RSI: ffffffffb764577c RDI: 00000000ffffffff
+> [  366.587926] RBP: ffffb62782370e10 R08: ffffffffb7e65380 R09: 3238373236626666
+> [  366.587927] R10: 3438323238373236 R11: 62666666663d7665 R12: ffffb62782284db0
+> [  366.587928] R13: ffff9e31e2008834 R14: ffffb62782370db0 R15: ffff9e31e2008838
+> [  366.587929] FS:  0000000000000000(0000) GS:ffff9e35cea00000(0000)
+> knlGS:0000000000000000
+> [  366.587931] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  366.587932] CR2: 00007f18579e44e0 CR3: 00000001cce10000 CR4: 00000000003506e0
+> [  366.587934] Call Trace:
+> [  366.587936]  <IRQ>
+> [  366.587938]  rwsem_down_write_slowpath+0xd7/0x5a0
+> [  366.587945]  simple_recursive_removal+0x17b/0x2a0
+> [  366.587950]  ? start_creating.part.0+0x110/0x110
+> [  366.587955]  debugfs_remove+0x40/0x60
+> [  366.587958]  blk_release_queue+0x95/0x100
+> [  366.587962]  kobject_put+0x7e/0x1b0
+> [  366.587966]  blkg_free.part.0+0x41/0x60
+> [  366.587969]  rcu_do_batch+0x18a/0x4c0
+> [  366.587975]  rcu_core+0x1bb/0x4d0
+> [  366.587978]  __do_softirq+0xfb/0x30b
+> [  366.587981]  __irq_exit_rcu+0xbd/0x140
+> [  366.587985]  sysvec_apic_timer_interrupt+0x9e/0xc0
+> [  366.587989]  </IRQ>
+> [  366.587990]  <TASK>
+> [  366.587991]  asm_sysvec_apic_timer_interrupt+0x12/0x20
+> [  366.587994] RIP: 0010:cpuidle_enter_state+0xd8/0x380
+> [  366.587998] Code: 00 00 31 ff e8 39 0a 73 ff 45 84 ff 74 16 9c 58
+> 0f 1f 40 00 f6 c4 02 0f 85 8e 02 00 00 31 ff e8 4e b7 78 ff fb 0f 1f
+> 44 00 00 <45> 85 f6 0f 88 21 01 00 00 49 63 ce 48 8d 04 49 48 8d 04 81
+> 49 8d
+> [  366.587999] RSP: 0018:ffffb62782207eb0 EFLAGS: 00000246
+> [  366.588001] RAX: ffff9e35cea00000 RBX: 0000000000000001 RCX: 0000000000000000
+> [  366.588002] RDX: 000000555a50727e RSI: ffffffffb764577c RDI: ffffffffb76074d6
+> [  366.588003] RBP: ffff9e2ec204bc00 R08: 0000000000000002 R09: 000000003cf3d124
+> [  366.588004] R10: 0000000000000008 R11: 00000000000003e4 R12: ffffffffb8077b80
+> [  366.588005] R13: 000000555a50727e R14: 0000000000000001 R15: 0000000000000000
+> [  366.588008]  cpuidle_enter+0x29/0x40
+> [  366.588010]  do_idle+0x1b2/0x220
+> [  366.588014]  cpu_startup_entry+0x19/0x20
+> [  366.588016]  secondary_startup_64_no_verify+0xd5/0xdb
+> [  366.588022]  </TASK>
+> [  366.588022] Modules linked in: ib_srp scsi_transport_srp
+> target_core_user uio target_core_pscsi target_core_file ib_srpt
+> target_core_iblock target_core_mod rdma_cm iw_cm ib_cm scsi_debug
+> rdma_rxe ib_uverbs ip6_udp_tunnel udp_tunnel null_blk ib_umad ib_core
+> rfkill sunrpc vfat fat dm_service_time dm_multipath scsi_dh_rdac
+> scsi_dh_emc scsi_dh_alua intel_rapl_msr intel_rapl_common amd64_edac
+> edac_mce_amd ipmi_ssif kvm_amd kvm irqbypass acpi_ipmi igb rapl pcspkr
+> joydev ipmi_si k10temp i2c_piix4 dca ipmi_devintf ipmi_msghandler
+> acpi_cpufreq fuse zram xfs csiostor ast i2c_algo_bit drm_vram_helper
+> drm_kms_helper drm_ttm_helper ttm cxgb4 crct10dif_pclmul crc32_pclmul
+> drm crc32c_intel nvme ghash_clmulni_intel nvme_core tls ccp
+> scsi_transport_fc sp5100_tco [last unloaded: null_blk]
+> [  366.588072] ---[ end trace 0000000000000000 ]---
+> [  366.680305] RIP: 0010:__list_add_valid.cold+0x3d/0x3f
+> [  366.680310] Code: f2 48 89 c1 48 89 fe 48 c7 c7 a8 b6 65 b7 e8 b4
+> e6 fd ff 0f 0b 48 89 d1 48 89 c6 4c 89 c2 48 c7 c7 50 b6 65 b7 e8 9d
+> e6 fd ff <0f> 0b 48 89 fe 48 c7 c7 e0 b6 65 b7 e8 8c e6 fd ff 0f 0b 48
+> 89 d1
+> [  366.680311] RSP: 0018:ffffb62782370d78 EFLAGS: 00010086
+> [  366.680314] RAX: 0000000000000075 RBX: ffff9e31e2008820 RCX: 0000000000000000
+> [  366.680315] RDX: 0000000000000103 RSI: ffffffffb764577c RDI: 00000000ffffffff
+> [  366.680316] RBP: ffffb62782370e10 R08: ffffffffb7e65380 R09: 3238373236626666
+> [  366.680317] R10: 3438323238373236 R11: 62666666663d7665 R12: ffffb62782284db0
+> [  366.680318] R13: ffff9e31e2008834 R14: ffffb62782370db0 R15: ffff9e31e2008838
+> [  366.680319] FS:  0000000000000000(0000) GS:ffff9e35cea00000(0000)
+> knlGS:0000000000000000
+> [  366.680321] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [  366.680322] CR2: 00007f18579e44e0 CR3: 00000001cce10000 CR4: 00000000003506e0
+> [  366.680324] Kernel panic - not syncing: Fatal exception in interrupt
+> [  366.680543] Kernel Offset: 0x35000000 from 0xffffffff81000000
+> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [  368.507945] ---[ end Kernel panic - not syncing: Fatal exception in
+> interrupt ]---
+>
+> --
+> Best Regards,
+>   Yi Zhang
 
 
-Thanks,
-Ming
+
+-- 
+Best Regards,
+  Yi Zhang
 
