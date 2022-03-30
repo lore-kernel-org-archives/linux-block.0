@@ -2,67 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 112B4C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 13:04:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD04C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 13:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232267AbiC3NF7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 09:05:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56726 "EHLO
+        id S239044AbiC3NQY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 09:16:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345618AbiC3NF6 (ORCPT
+        with ESMTP id S233195AbiC3NQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 09:05:58 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AB7E2BC;
-        Wed, 30 Mar 2022 06:04:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=uMLqGfWuqWdrPS+5GCzVB17d8FYui969zyu6SJ6c6Tc=; b=kSYREJcmSh+sctnbfm38Lr17hn
-        xkvX/5nDs0uyM7t1OwM3KRSMhMGLZCsypuyTSccqbWRrI1ZXVrzGCqeoRHqWX6QobbLLrLRtPlb3e
-        pOprx5IHn8HH7YeT+0YS6ldLu4xbYlDrr1q6kS/ywGE7Yzqtcj4NJsWE6SJRDGnhwtmxNwHXXsyFf
-        LMdlE3xLONbBV7qaphD7JGgrO+sn/Cw3gMqjsDNmXxJnEefKbLKJJYq26OIfv5o6LWy2qRmD6HPQb
-        iX2VZssSGtb5SotNyx5MzDiY1Rn0qd95cfQXM/of+U25oKeSWPZ73Qkstb3iCRlR6Q4RDGov7QVhp
-        G6zDEwnw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nZXzc-00FxoT-Lk; Wed, 30 Mar 2022 13:04:08 +0000
-Date:   Wed, 30 Mar 2022 06:04:08 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Johannes Weiner <hannes@cmpxchg.org>
-Cc:     CGEL <cgel.zte@gmail.com>, axboe@kernel.dk,
-        viro@zeniv.linux.org.uk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        akpm@linux-foundation.org, Yang Yang <yang.yang29@zte.com.cn>,
-        Ran Xiaokai <ran.xiaokai@zte.com.cn>,
-        Christoph Hellwig <hch@infradead.org>
-Subject: Re: [PATCH] block/psi: make PSI annotations of submit_bio only work
- for file pages
-Message-ID: <YkRVSIG6QKfDK/ES@infradead.org>
-References: <20220316063927.2128383-1-yang.yang29@zte.com.cn>
- <YjiMsGoXoDU+FwsS@cmpxchg.org>
- <623938d1.1c69fb81.52716.030f@mx.google.com>
- <YjnO3p6vvAjeMCFC@cmpxchg.org>
- <20220323061058.GA2343452@cgel.zte@gmail.com>
- <62441603.1c69fb81.4b06b.5a29@mx.google.com>
- <YkRUfuT3jGcqSw1Q@cmpxchg.org>
+        Wed, 30 Mar 2022 09:16:24 -0400
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B25220EC;
+        Wed, 30 Mar 2022 06:14:39 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-df0940c4eeso8545532fac.8;
+        Wed, 30 Mar 2022 06:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=1nMim+eDxDf/5PKoFQWnd0bc2gDZtzpNJd3Is7aeZY4=;
+        b=OO5qym66qk0XlxKttsyfA46hGzSbNVjvrT/LxJlPEiiqAz4AOlcErzm1ffT2k8o7B8
+         307OYsfFOYzDkF/kiz6EcRTBnGTWAgeCDdfnAU/EdCSMlrhOaZqmo6eOAVojefshckW8
+         ndlDVekcZ9riKZweXxxyTUmP2zQFfc8uFG+7aLJm5Td3z4ZLEH/S5PTpGFT4BuI3fWNa
+         SV86A1+K0q2lgb4oxXG3dEzPkkarlR+K8+VudDymSYFvjfBUr25FQufpE4iv+Z5O7/LG
+         DtKFfqdbLu/ZcIyJjMSWXwa8jnYTwmhMf97Be1YIgeptlIyx9apeyjB7LpmQEMt0jsa8
+         9Fnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=1nMim+eDxDf/5PKoFQWnd0bc2gDZtzpNJd3Is7aeZY4=;
+        b=UyiOG3TzgRSOngPCMjb4jPqJatL6hlJOpvYAOLvapn/Rh2Abt96Ew3gHyieXhZvnQJ
+         3UbC3vpmzwTDPcsXi1gN8tVUaE5Cvj452znVH8W1PwpVQ0J5y0K9+8l3vU8wZ24jstK0
+         ZVRVdFRrPe2iVVvF98ga+b5vAjm5S6ErXJg59p0xQTv0y6htp0W2s7xinWKzgtalsOP3
+         X/IWknKwEZBSKX4X59SiJhhkd5P2vwrVc3x7t5M7FT2fX4iziTButtjm+Aw/vjXKHDe6
+         +++444/1KA+xrKRdzbE1K20OaxbrCsRa7mp3b3LyHgZp6sN6MeBAcBOc7NVJualN444e
+         gDeg==
+X-Gm-Message-State: AOAM531//gIrKkJ5QBhVHXq8L4sinvfLGw7Da6V4WlZfJEV8uy9lxfTD
+        8Q3ZG96zJZGoJWjr+bVAzuB09EDTSrGigjBUNA0=
+X-Google-Smtp-Source: ABdhPJxjFqw1iL+mE7nQo5TNi+cZ3oFVY7P5u/Ty0k4rd+2f0SFlkNu4vS/GbISpH8YqSLOOLjyeWPP6F1006rYG4GI=
+X-Received: by 2002:a05:6870:c154:b0:dd:986c:afa9 with SMTP id
+ g20-20020a056870c15400b000dd986cafa9mr2052493oad.160.1648646078446; Wed, 30
+ Mar 2022 06:14:38 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkRUfuT3jGcqSw1Q@cmpxchg.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
+ <20220308152105.309618-18-joshi.k@samsung.com> <20220310083652.GF26614@lst.de>
+ <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
+ <20220310141945.GA890@lst.de> <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
+ <20220311062710.GA17232@lst.de> <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
+ <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns> <20220330130219.GB1938@lst.de>
+In-Reply-To: <20220330130219.GB1938@lst.de>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Wed, 30 Mar 2022 18:44:12 +0530
+Message-ID: <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
+Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Kanchan Joshi <joshi.k@samsung.com>, Jens Axboe <axboe@kernel.dk>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 30, 2022 at 09:00:46AM -0400, Johannes Weiner wrote:
-> If you want type distinction, we should move it all into MM code, like
-> Christoph is saying. Were swap code handles anon refaults and the page
-> cache code handles file refaults. This would be my preferred layering,
-> and my original patch did that: https://lkml.org/lkml/2019/7/22/1070.
+On Wed, Mar 30, 2022 at 6:32 PM Christoph Hellwig <hch@lst.de> wrote:
+>
+> On Fri, Mar 25, 2022 at 07:09:21PM +0530, Kanchan Joshi wrote:
+> > Ok. If you are open to take new opcode/struct route, that is all we
+> > require to pair with big-sqe and have this sorted. How about this -
+>
+> I would much, much, much prefer to support a bigger CQE.  Having
+> a pointer in there just creates a fair amount of overhead and
+> really does not fit into the model nvme and io_uring use.
 
-FYI, I started redoing that version and I think with all the cleanups
-to filemap.c and the readahead code this can be done fairly nicely now:
+Sure, will post the code with bigger-cqe first.
 
-http://git.infradead.org/users/hch/block.git/commitdiff/666abb29c6db870d3941acc5ac19e83fbc72cfd4
-
+> But yes, if we did not go down that route that would be the structure
+> that is needed.
+Got it. Thanks for confirming.
