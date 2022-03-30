@@ -2,87 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99918C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72061C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:56:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350212AbiC3SxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 14:53:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50366 "EHLO
+        id S1345378AbiC3S5o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 14:57:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350815AbiC3SxS (ORCPT
+        with ESMTP id S1350285AbiC3S5m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 14:53:18 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4F53B553
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:51:33 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id 9so22727916iou.5
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:51:33 -0700 (PDT)
+        Wed, 30 Mar 2022 14:57:42 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95BA16AA63
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:55:56 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id bg10so43382775ejb.4
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:55:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=y92bvKVGil+XZIjxQXyncjq3AMwQmOj/Se4/L6WvBo8=;
-        b=3gCw8s3HHskcb+LSDXXaVbHpv9SbKZTlAR4hi2sgsDZPkhmmD3MP+bFWyNS9vzUEqN
-         vBvc0mVIqmaQaAhypqdgmXbjEszkwApa8aFt5fidnXgUCeM/kc9nl6Zb0aqEjM9VaOug
-         yyYB6T369Gdp264crOjKNwsWa1cm48eqBCXI66ZjvPE1mfmN7ZGKGwOcNLqHq9IP1zT3
-         r5IAp+/gSW8FEkrYJE2BH6pg5InDhNWpm5Q70GJoi8P/MDyl5zcrNKKlkj8bS6JpDlea
-         vYfHoIRmwqlua69ryfDxyLkXCp1d0eQna4jVUw4V4CJ+xBaqGhZ+rDtNR4qjdN97MumR
-         Ul9g==
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fS8vexv5y5IlDW6jDa/CJnkMG23qfhzjDUs+WGYeVjg=;
+        b=uE53q3re8iwnjr6tBa9zKY2osZp3Jp7t2TKEQ3SXNl1//qBGvJExj/tsz6E1PgZ3e/
+         LkmwFOYHMXSgAU9TJywuh/3mnW/vMQ9usbvvqFAMx1fQd8lYOWLLVXhbeuUQve3sXZXf
+         Fq5P2qkDbGUh0zMm4KJHlrdljEz+Ehg0sYvMkHQ52hNhhcRfJ+Hcgkw8bLQIV+4lCT35
+         VzaTaenvPApoHdpE75vTR57mqE52fMwU0uKIf/5Km74RZ7c7aJw81Xwvkc12VZoCOT0e
+         7ARVYYfD3GMdixo06qi0wm53i2TqGld6y+YnhLB6+sXfLvzX9Z+/7m5kbKulshiKjXdT
+         4LZg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=y92bvKVGil+XZIjxQXyncjq3AMwQmOj/Se4/L6WvBo8=;
-        b=EgGeZ8kyOGkki8kcwkD795fP7t6HK13Z399QMLcyulsncV/RGWL6pQU2WmpWKpTO9R
-         khqhmWqSvDs4/QGkzLpO4U1Ism8pySZ2ikw8cqbxF5BMcKfK8LdFeaNSx9FdsFZujQyW
-         JTPg8czDZKfOAaqNsVDPFE8Yy5SCX2E8OL1CQv2HdAoBtsJDl4Qedrz1NBVG+Tm3ZLWg
-         R6kK8pJb1rRbx/YJUTbPt5ITTzAEl+s3phFCs26gVO92Iw6UvzXbLEuCok9/DXbaN6R0
-         3zoRJ3drdChwQyS4vCBlRTsdFEsq3/lY96S+83aSZqRAd6oKb/lNX6o6rOdNPXFdhdFt
-         AvjA==
-X-Gm-Message-State: AOAM53333LSHLW4tibsRZ0X5ruPUP9t5f2bDDjNUZpL2P8JMy5ir5Zte
-        yl4UB0EpRaU4OZ3FnG4Pw1zE3YedwtiO/A/A
-X-Google-Smtp-Source: ABdhPJxFa1K1f4C5BONxN28/ytYaG07W6F2EgJyQSyUkT/eiqQ9cyCL99l6RfDPPlj/FGN6oO03b9g==
-X-Received: by 2002:a02:7050:0:b0:321:440c:5e11 with SMTP id f77-20020a027050000000b00321440c5e11mr680586jac.35.1648666292621;
-        Wed, 30 Mar 2022 11:51:32 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id z17-20020a92da11000000b002c83987c2ffsm10383622ilm.76.2022.03.30.11.51.32
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=fS8vexv5y5IlDW6jDa/CJnkMG23qfhzjDUs+WGYeVjg=;
+        b=hmeqcdWd5Xig2SRqasPqsqJPGylNGzP5bFZFqcgPq0AN6WviQqAQu29fsfnzBy6aCU
+         JHPqftcQKGWJUiR4ZsYS600FB7m7BUQCOOEqY0NCZK22iSf/xL+MxXi9AFwHO2nMM4eP
+         5ZtffvvSWUIaR5HDJ1H1J3A456Uw0Xabw9WuNUR5SA3VEiAfLuED1ZESnZGW+/v/R4Pk
+         wLBsJRAD4ELSO4lzEkpBrPiWINsMPfkeyI/JF5CwFTQcb/R6hAVGHGHXchLzRWhZDKzR
+         5kuztnLsy0TMApn3SemOMJ7RKpqhKd6KdgC4G0iYWZJ5kL/mRvL/5ozzQZnS6KSY0jrz
+         vqAg==
+X-Gm-Message-State: AOAM533rFkiVvAo7hPa029++rtLBN4vxRgsW8w8dHGpmdXCac5XBOMfV
+        WJ7mD8DdzSSlM4fRrDJaI4hvDA==
+X-Google-Smtp-Source: ABdhPJz+Vt1B8Iq4kvuEZ5n0irgjFoH7JQGrTUQ0hBXINZJsc5RSI/lf6XLpN5R8JUo3VnVHtmsipg==
+X-Received: by 2002:a17:907:16ac:b0:6e0:1646:9121 with SMTP id hc44-20020a17090716ac00b006e016469121mr1136241ejc.194.1648666555117;
+        Wed, 30 Mar 2022 11:55:55 -0700 (PDT)
+Received: from gintonic.linbit (62-99-137-214.static.upcbusiness.at. [62.99.137.214])
+        by smtp.gmail.com with ESMTPSA id nc13-20020a1709071c0d00b006dfa376ee55sm8554639ejc.131.2022.03.30.11.55.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 11:51:32 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     hch@lst.de, linux-block@vger.kernel.org, dm-devel@redhat.com,
-        ming.lei@redhat.com
-In-Reply-To: <20220324203526.62306-1-snitzer@kernel.org>
-References: <20220324203526.62306-1-snitzer@kernel.org>
-Subject: Re: (subset) [PATCH v3 0/3] block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_bioset
-Message-Id: <164866629201.257072.14870349731518355925.b4-ty@kernel.dk>
-Date:   Wed, 30 Mar 2022 12:51:32 -0600
+        Wed, 30 Mar 2022 11:55:54 -0700 (PDT)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <abxoe@kernel.dk>
+Cc:     Philipp Reisner <philipp.reisner@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, stable@vger.kernel.org
+Subject: [RESEND PATCH] drbd: fix potential silent data corruption
+Date:   Wed, 30 Mar 2022 20:55:51 +0200
+Message-Id: <20220330185551.3553196-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 24 Mar 2022 16:35:23 -0400, Mike Snitzer wrote:
-> This v3 is a rebase of the previous v2 series ontop of the revised v2
-> patch that Christoph provided.
-> 
-> Linus hasn't pulled the for-5.18/dm-changes branch yet, so the 3rd DM
-> patch cannot be applied yet.  But feel free to pickup the first 2
-> block patches for 5.19 and I'll rebase dm-5.19 on block accordingly.
-> 
-> [...]
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-Applied, thanks!
+Scenario:
+---------
 
-[1/3] block: allow using the per-cpu bio cache from bio_alloc_bioset
-      commit: a147e4805855e34f8e1027b88baf59a7f7c8b8d3
-[2/3] block: allow use of per-cpu bio alloc cache by block drivers
-      commit: e866e4dbad251b4dd1e134c295afd862333864bc
+bio chain generated by blk_queue_split().
+Some split bio fails and propagates its error status to the "parent" bio.
+But then the (last part of the) parent bio itself completes without error.
 
-Best regards,
+We would clobber the already recorded error status with BLK_STS_OK,
+causing silent data corruption.
+
+Reproducer:
+-----------
+
+How to trigger this in the real world within seconds:
+
+DRBD on top of degraded parity raid,
+small stripe_cache_size, large read_ahead setting.
+Drop page cache (sysctl vm.drop_caches=1, fadvise "DONTNEED",
+umount and mount again, "reboot").
+
+Cause significant read ahead.
+
+Large read ahead request is split by blk_queue_split().
+Parts of the read ahead that are already in the stripe cache,
+or find an available stripe cache to use, can be serviced.
+Parts of the read ahead that would need "too much work",
+would need to wait for a "stripe_head" to become available,
+are rejected immediately.
+
+For larger read ahead requests that are split in many pieces, it is very
+likely that some "splits" will be serviced, but then the stripe cache is
+exhausted/busy, and the remaining ones will be rejected.
+
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Cc: <stable@vger.kernel.org> # 4.13.x
+---
+ drivers/block/drbd/drbd_req.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+index c04394518b07..e1e58e91ee58 100644
+--- a/drivers/block/drbd/drbd_req.c
++++ b/drivers/block/drbd/drbd_req.c
+@@ -180,7 +180,8 @@ void start_new_tl_epoch(struct drbd_connection *connection)
+ void complete_master_bio(struct drbd_device *device,
+ 		struct bio_and_error *m)
+ {
+-	m->bio->bi_status = errno_to_blk_status(m->error);
++	if (unlikely(m->error))
++		m->bio->bi_status = errno_to_blk_status(m->error);
+ 	bio_endio(m->bio);
+ 	dec_ap_bio(device);
+ }
 -- 
-Jens Axboe
-
+2.32.0
 
