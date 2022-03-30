@@ -2,87 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D26EBC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 14:55:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F155C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 15:02:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347572AbiC3O5E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 10:57:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42334 "EHLO
+        id S1347703AbiC3PER (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 11:04:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245243AbiC3O45 (ORCPT
+        with ESMTP id S1344524AbiC3PEQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 10:56:57 -0400
-Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EB7B49CBC
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 07:55:10 -0700 (PDT)
-Received: by mail-io1-xd2a.google.com with SMTP id k25so25010499iok.8
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 07:55:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=R/QA3qwuvc+FZQ+dv5ME79tUgBYzzyKos1+TF13+4yQ=;
-        b=beGWf5RZrPnpIIOChN9iUKTh3sfzxfPCjZ2JKiQR+vhrtTmfVYrJe0tkng2GZnstMC
-         KADRrLbuu5wPJEPpFqNfW0F0u3eEMSJszujRTf3I+7wa2RlYGONVH5KrzXP9E1odfute
-         JRkkPR8lV4Efrsf8+D7wIP5Hb1xMf1K3Z9SK2P3S08WKyUoBNIVM4/taAaPTmn7mnyx7
-         NebS4jRL7C3ErmStAR6cntI6m1Waae+ZCBjF4reLMj8qy5u/wfr//fADwKtS1kqIGWeG
-         Sb1LFDbkiqUs39uWKHXAlSKgPr3PCQ7mnrLrfr/Ht5R6TSKr6qIgFEMT6d2y57XftrzM
-         5LjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=R/QA3qwuvc+FZQ+dv5ME79tUgBYzzyKos1+TF13+4yQ=;
-        b=bo4oUVTsDoTsaEucPfMqnJ+keIz6EPfeXvJlCUb+28gsk4RJRcNIELeEJyZSF0z+EL
-         zXkZ1OMrkc2UAvmsm7KPGh8W53EBtzTngnx3Od6c74bmLFScyDSHSJro+Hz217uT50le
-         nSQLgMiuBhqmwdzoQg7DMN9w1KmfxXdLv/LiXVDASTb2jZ3LynhoWQ8NSmZleSrRwxMA
-         wiorWv4Gtx5sNB/Gb/+gtrhnoMHiIAkIYipCTyAiPLCNAm9WOyUA0J4HhgsnQnkMAVuF
-         pvckeDdcHnNTA7GEtYd43wzNOejMaMGGISUSt9SMxREGh1UyXZpYyHzyHu/yNZPxZ/VH
-         4jvA==
-X-Gm-Message-State: AOAM533WiASop4a98HHCmf+eWnwMP8wR+Iot7K5OCnlJf0IDwPS0hRf3
-        /zVBXbZdWpRLbp8ARPvZFienmXkLqmQ9f/tA
-X-Google-Smtp-Source: ABdhPJz3ogEsUt77/dKerlk0+F1wbN/aqIEn3YfWAm1SNqiQ5Px+22BxvDghI7kN/xbnyk/nI0XREA==
-X-Received: by 2002:a6b:14a:0:b0:649:a974:9042 with SMTP id 71-20020a6b014a000000b00649a9749042mr11501105iob.81.1648652109714;
-        Wed, 30 Mar 2022 07:55:09 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id q197-20020a6b8ece000000b00648d615e80csm11473586iod.41.2022.03.30.07.55.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 07:55:09 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Carlos Llamas <cmllamas@google.com>, linux-block@vger.kernel.org
-Cc:     Christoph Hellwig <hch@lst.de>, kernel-team@android.com,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20220329201815.1347500-1-cmllamas@google.com>
-References: <20220329201815.1347500-1-cmllamas@google.com>
-Subject: Re: [PATCH] loop: fix ioctl calls using compat_loop_info
-Message-Id: <164865210886.39485.16982992188546747372.b4-ty@kernel.dk>
-Date:   Wed, 30 Mar 2022 08:55:08 -0600
+        Wed, 30 Mar 2022 11:04:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E00504DF5D
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 08:02:31 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id A04531F37B;
+        Wed, 30 Mar 2022 15:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1648652550; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hSvx/jwnDEMpOpOcIUnC5TadP/nNxMZQ+fITqf7JB+s=;
+        b=hAREkiaXFkP+E2UlHxKgvvrJ1aFM5upJjTbX2UvAL82643ACtcy+jvp/Jf6yr/y3V6z/y/
+        nhZ2OkdGt2fAQ+Q4yQ+kcFsyO7HPvcf/tHxHJMtrsAjpKjeI5UqUfgMxM7BiB7Isdz80zS
+        ahAoLw/NsQyVBkh+4SY8j8zasM/hY1M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1648652550;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=hSvx/jwnDEMpOpOcIUnC5TadP/nNxMZQ+fITqf7JB+s=;
+        b=RIKKW3hoxJHvf0/mN+zDC2TZnoBJjL7Yi6JnSZLICp+sg2aAxKYfYkIE0PccrID6YdcKHt
+        B4T7J7t8r4qG8vCQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 8FF6BA3B83;
+        Wed, 30 Mar 2022 15:02:30 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 0A63DA0610; Wed, 30 Mar 2022 17:02:30 +0200 (CEST)
+Date:   Wed, 30 Mar 2022 17:02:30 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jan Kara <jack@suse.cz>, linux-block@vger.kernel.org,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>
+Subject: Re: [PATCH 8/9] bfq: Get rid of __bio_blkcg() usage
+Message-ID: <20220330150230.dzdlbu5w6cdshl5s@quack3.lan>
+References: <20220330123438.32719-1-jack@suse.cz>
+ <20220330124255.24581-8-jack@suse.cz>
+ <YkRlasF4GzJ+iHo/@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YkRlasF4GzJ+iHo/@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 29 Mar 2022 20:18:15 +0000, Carlos Llamas wrote:
-> Support for cryptoloop was deleted in commit 47e9624616c8 ("block:
-> remove support for cryptoloop and the xor transfer"), making the usage
-> of loop_info->lo_encrypt_type obsolete. However, this member was also
-> removed from the compat_loop_info definition and this breaks userspace
-> ioctl calls for 32-bit binaries and CONFIG_COMPAT=y.
+On Wed 30-03-22 07:12:58, Christoph Hellwig wrote:
+> On Wed, Mar 30, 2022 at 02:42:51PM +0200, Jan Kara wrote:
+> > Convert BFQ to the new situation where bio->bi_blkg is initialized in
+> > bio_set_dev() and thus practically always valid. This allows us to save
+> > blkcg_gq lookup and noticeably simplify the code.
 > 
-> This patch restores the compat_loop_info->lo_encrypt_type member and
-> marks it obsolete as well as in the uapi header definitions.
-> 
-> [...]
+> Is there any case at all where it is not valid these days?
+> I can't think of any even if we have plenty of boilerplate code trying
+> to handle that case.
 
-Applied, thanks!
+So I didn't find any as well but I was not 100% sure since
+blkg_tryget_closest() seems like it *could* return NULL in some rare error
+cases. If we either modify blkg_tryget_closest() or handle that case in
+bio_associate_blkg_from_css() by using root_blkg, we can remove all the
+boilerplate code I assume.
 
-[1/1] loop: fix ioctl calls using compat_loop_info
-      commit: f941c51eeac7ebe0f8ec30943bf78e7f60aad039
+								Honza
 
-Best regards,
 -- 
-Jens Axboe
-
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
