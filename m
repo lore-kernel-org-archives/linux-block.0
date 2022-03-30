@@ -2,114 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08230C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90959C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350111AbiC3SZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 14:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59952 "EHLO
+        id S1350334AbiC3S3J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 14:29:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351384AbiC3SYx (ORCPT
+        with ESMTP id S1351087AbiC3S2Z (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 14:24:53 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F7B4B419
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:22:25 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id 5FDC81F45F1F
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1648664543;
-        bh=sYm9jFXdrgdVFCDucYlpXP1Kp/s8ldkKOJ7mfqFc47g=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=aIZcFo5g1HqWaoOkPGUjVdIx3TE8m0Li0nQHSAI+ebjOiNJ4Bttags1vgirq7SeEz
-         rOFHGLfBfkeKZaS6uGONwAjzX9p/MrcACJlMlxxcBceoZK2oMf1oq+aiXBlGBQKeUv
-         Zp+GzlarvnxVmLOlYnDgIcZL2B5CD1RyCZtV9V+Wtq1kyPBVxoGJHO6jiY3Sg81KI5
-         /tomjYsrjzmSzs95G7/aE0Fr2FDB8uq0zShFL5LqHpIDZHJfaD37O8kzh0pGei9sad
-         ZFIcBbu76ONDUE3nQ5JmjBI81oUWjOVaSa/QNBd21I5b4sZlBUUIsUUmVSAlNzhOBd
-         YyHBv/J9UBZhA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
-        linux-block@vger.kernel.org,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-mm@kvack.org
-Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
-Organization: Collabora
-References: <87tucsf0sr.fsf@collabora.com>
-        <986caf55-65d1-0755-383b-73834ec04967@suse.de> <YkCSVSk1SwvtABIW@T590>
-        <87o81prfrg.fsf@collabora.com> <YkJTQW7aAjDGKL9p@T590>
-        <87bkxor7ye.fsf@collabora.com> <YkO4rFBHCdjCJndV@T590>
-Date:   Wed, 30 Mar 2022 14:22:20 -0400
-In-Reply-To: <YkO4rFBHCdjCJndV@T590> (Ming Lei's message of "Wed, 30 Mar 2022
-        09:55:56 +0800")
-Message-ID: <87tubfpag3.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        Wed, 30 Mar 2022 14:28:25 -0400
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E375747075
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
+Received: by mail-il1-x135.google.com with SMTP id j15so15077944ila.13
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=JFFSehnkNeo1K8L02V2cW9CThdS75MCRvOKla3KLkAw=;
+        b=BFTCzD4aFvt9JrLiEz1bvzh6geIg6IptVTdj6IDiPuICAE203wQz9TEb+4sd+GuDm8
+         7hfsvwiWBq0a8G/L8JH1EJb4H5BgYFm066eNM++IJprdbaiP/K/RQcVNoIdok+4Buz0n
+         VPAQxsddsYW6lxBAvrCd3pw/AsU0VWg+XQ9+f+uSiaJkninfGHo8tQFy0F2WQL/CkiPX
+         978UdPWCEqFU5zNcqpfpYI+hbpzYnlekkvQ4l365jJLsdpHWW1qs4vwF10T/u8GEeEZH
+         VfPeDuk7IqzhfjQL+dK96hTc4fToK+0EsQR50pC8XTuJ0494LDj5KpiHUMlEIVaBIuzm
+         wOwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=JFFSehnkNeo1K8L02V2cW9CThdS75MCRvOKla3KLkAw=;
+        b=7FKN4Ld0EmX4HodqlmsIIoMiRYEg26DRouAL7Dl5Oh3CKwrxoiECHDjoic5Te73A2l
+         8PaflDzs9hdZVjoeAOzh+fk6OL1A3thHrqP+lLgiEBn2ZF1foomW77DIKK8dmx0vz92S
+         RM0juQFp96zOXFf2wzqUS/L5fGPbrwrdZkYf2EAfpXrBVoNuxr1awMV/lG7m31OIjtKQ
+         EavhLs0LNlAA1omtHW29k0ePARgV+V3pLc9OC3Hj2w+9YMYI4wDs7mKi2JEyn0mBTwJl
+         HmZpPwq1heLODiZz+rI0ZtCvb+lF+T/qMdKCViIofh7scB1qIDsCvVTdqfTucM8GummQ
+         KRnw==
+X-Gm-Message-State: AOAM533DoeqdRVgmqBK51Bnoq+uX8OHcXVgezEKZNIVY23Xt5fpwi1co
+        Qj3521oG5yLjVWnEYhKcEr4yVo+w7rpmq0pg
+X-Google-Smtp-Source: ABdhPJwUvZiBYV6AGjovRlQg5dfR2IK8vL/m8lnPjq8KMhvUK1WpCP4kEeYA48hTsQvWDg7IrHos5Q==
+X-Received: by 2002:a92:cbc3:0:b0:2c6:78fa:41e9 with SMTP id s3-20020a92cbc3000000b002c678fa41e9mr11278289ilq.112.1648664688212;
+        Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id i81-20020a6bb854000000b00649c1b67a6csm11564038iof.28.2022.03.30.11.24.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Mar 2022 11:24:47 -0700 (PDT)
+Message-ID: <0dc208a9-22f2-6758-e776-752ff81e2b19@kernel.dk>
+Date:   Wed, 30 Mar 2022 12:24:46 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: state of drbd in mainline
+Content-Language: en-US
+To:     Philipp Reisner <philipp.reisner@linbit.com>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220329070618.GA20396@lst.de>
+ <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
+ <20220329073254.GA20691@lst.de>
+ <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
+ <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
+ <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
+ <3c42b1ed-7c03-64e6-409e-e92247288cac@kernel.dk>
+ <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ming Lei <ming.lei@redhat.com> writes:
+On 3/30/22 9:23 AM, Philipp Reisner wrote:
+>>> Jens, my intention is to keep it in-tree, and at some point update it.
+>>> Regarding your questions:
+>>
+>> That'd be great, but it's been years since there was any significant
+>> updates to the in-kernel drbd... I would strongly suggest that the
+>> in-kernel be brought closer to what people are mostly running, as it
+>> stands it's basically unmaintained.
+> 
+> The changes we worked on over many Years in the more recent drbd-9.x
+> branches are just too fundamental to do them in small chunks, we could
+> upstream bit by bit.  We need to get that reviewed in a big series.  If I
 
-> On Tue, Mar 29, 2022 at 01:20:57PM -0400, Gabriel Krisman Bertazi wrote:
->> Ming Lei <ming.lei@redhat.com> writes:
->> 
->> >> I was thinking of something like this, or having a way for the server to
->> >> only operate on the fds and do splice/sendfile.  But, I don't know if it
->> >> would be useful for many use cases.  We also want to be able to send the
->> >> data to userspace, for instance, for userspace networking.
->> >
->> > I understand the big point is that how to pass the io data to ubd driver's
->> > request/bio pages. But splice/sendfile just transfers data between two FDs,
->> > then how can the block request/bio's pages get filled with expected data?
->> > Can you explain a bit in detail?
->> 
->> Hi Ming,
->> 
->> My idea was to split the control and dataplanes in different file
->> descriptors.
->> 
->> A queue has a fd that is mapped to a shared memory area where the
->> request descriptors are.  Submission/completion are done by read/writing
->> the index of the request on the shared memory area.
->> 
->> For the data plane, each request descriptor in the queue has an
->> associated file descriptor to be used for data transfer, which is
->> preallocated at queue creation time.  I'm mapping the bio linearly, from
->> offset 0, on these descriptors on .queue_rq().  Userspace operates on
->> these data file descriptors with regular RW syscalls, direct splice to
->> another fd or pipe, or mmap it to move data around. The data is
->> available on that fd until IO is completed through the queue fd.  After
->> an operation is completed, the fds are reused for the next IO on that
->> queue position.
->> 
->> Hannes has pointed out the issues with fd limits. :)
->
-> OK, thanks for the detailed explanation!
->
-> Also you may switch to map each request queue/disk into a FD, and every
-> request is mapped to one fixed extent of the 'file' via rq->tag since we
-> have max sectors limit for each request, then fd limits can be avoided.
->
-> But I am wondering if this way is friendly to userspace side implementation,
-> since there isn't buffer, only FDs visible to userspace.
+Your development model is fundamentally broken. You've allowed your 9.x
+branch to totally drift from mainline, which just helps underline my
+earlier point on that in-kernel drbd is effectively abandoned and
+unmaintained.
 
-The advantages would be not mapping the request data in userspace if we
-could avoid it, since it would be possible to just forward the data
-inside the kernel.  But my latest understanding is that most use cases
-will want to directly manipulate the data anyway, maybe to checksum, or
-even for sending through userspace networking.  It is not clear to me
-anymore that we'd benefit from not always mapping the requests to
-userspace.
+> started to dump them on linux-block right away, nobody would look at it
+> seriously, since it would be too much.  I intend to get people from red
+> hat/suse assigned to do such a review. Then we will do that on linux-block,
+> so that everyone who cares sees what happens.
 
-I've been looking at your implementation and I really like how simple it
-is. I think it's the most promising approach for this feature I've
-reviewed so far.  I'd like to send you a few patches for bugs I found
-when testing it and keep working on making it upstreamable.  How can I
-send you those patches?  Is it fine to just email you or should I also
-cc linux-block, even though this is yet out-of-tree code?
+You're just doing it totally wrong. Upstream kernel should match your
+9.x branch, and it should have been developed in sync. What you appear
+to have done is to ignore mainline, while it would've been correct and
+much easier in the long run to ensure that development is regularly
+synced to the mainline kernel. You know, like EVERY other driver that is
+maintained does.
+
+Now you've got a giant pile of patches, which probably don't adhere to
+how we would've done the mainline commits in the first place, and it'll
+cause a huge pain for not just you but upstream reviewers. I don't care
+about the former, but I do care a lot about the latter. That's a giant
+waste of the time of the folks involved on the block side, and
+definitely not what a responsible kernel maintainer would do.
+
+From your reply here and earlier ones, seems to me that you don't grasp
+the gravity of the situation, which is also worrying.
+
+>> The main discrepancy here is that there are apparently huge numbers of
+>> in-tree users, yet no fixes or patches at all making it to mainline.
+>> Either drbd is bug free and doesn't require any fixes at all, which I
+>> very much would doubt, or fixes aren't being sent upstream.
+> 
+> It is the broad consent among the users of the drbd-8.4 branch (that is what
+> is in-tree), is that it works for its purpose. It is for sure not bug-free,
+> but people are not running into bugs anymore. So, call it free of relevant
+> bugs, if you want.  No new features go into that branch, on purpose. To keep
+> it that way.
+> 
+> Have a look at that one real bug-fix that was identified in the last Year.
+> https://patchwork.kernel.org/project/linux-block/patch/20210426163032.3454129-1-christoph.boehmwalder@linbit.com/
+> 
+> When do you want to have that reposted to you?
+> right now? Just before the next merge window opens?
+
+That can go in anytime, so please do submit it.
 
 -- 
-Gabriel Krisman Bertazi
+Jens Axboe
+
