@@ -2,111 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D97A8C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:06:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08230C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:23:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238591AbiC3SIb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 14:08:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53722 "EHLO
+        id S1350111AbiC3SZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 14:25:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349748AbiC3SI0 (ORCPT
+        with ESMTP id S1351384AbiC3SYx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 14:08:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4CC023DA4B
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:06:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1648663590;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uWSt8FFFTI4rhck3dPnwbJuLsSit8PUXxQiArFyosm8=;
-        b=WEK//vBvxC37iXc3DA9hZctU8Z54IiLfgECTawzCJcEpeKzVTrMOBl8wyyw7l92iUMM3EN
-        HmJMTVHs/045r/tyVIVehFYEtwULNvJ382IAKK1HyDPyOq8SO0DC5+JxiABkBPvPlbcxBf
-        kBnEmrWPMpC7eNUynP0K5V8URs9oDRk=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-31-lRM0IlUsPv-MC-E-ViBk5g-1; Wed, 30 Mar 2022 14:06:29 -0400
-X-MC-Unique: lRM0IlUsPv-MC-E-ViBk5g-1
-Received: by mail-qv1-f69.google.com with SMTP id h18-20020a05621402f200b00440cedaa9a2so16635205qvu.17
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:06:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uWSt8FFFTI4rhck3dPnwbJuLsSit8PUXxQiArFyosm8=;
-        b=i1DBgWmnVlk+U1pBBov53SP8jjEj0dFUh14Dr5/jW43xiFuwrUDFHvd6SEUolhFsUT
-         KhoD3RyvRCgk2LVRALC7Xh/mEAWPP3vFYTgStcf4Pp1o01zQcSPLMDleS6XtHx3NcwQF
-         Uh3Paiy2H1QAn84LvRns4e0Q0BKw1Q87/7wg3vFTyOxk4tZez1f39qMLtXshWVAo9Qes
-         cXj0pTPFG+zB/LaxdgvuSu+0vvvMBJ7GGWiCETS8OIoW9Hx5I7dGc9zA+/m91Mx+4ifd
-         BL/nGjme685jWIPcMVOn+i7Z2/HZ2yPV8Xu1F0v5z4qRjf9NKUtuo/bXgv/HeiVYD1fB
-         UAkQ==
-X-Gm-Message-State: AOAM533t8/ic3XNQH4gFyhgLFE5kTU3Gtc/Nk7Iy1OhfthWpe1gfFb6B
-        UcJ/9gpJNeyvE1+fi8S8YQfmoYRXucQQbUO/D3+XjYsm/nVJ/xIHOU6rNn+Kkp8G73F5ixca9AM
-        0Iut0rDpeCy/YgFdKPZW+Aw==
-X-Received: by 2002:ad4:5be3:0:b0:441:7bd1:29bd with SMTP id k3-20020ad45be3000000b004417bd129bdmr733374qvc.14.1648663586921;
-        Wed, 30 Mar 2022 11:06:26 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzkima55vXfIXB4/YhL8vxRAGITI8NXaa0gII7X9gZDBJaWlIZfDnbZH36cgG+Ixq8NEncA6A==
-X-Received: by 2002:ad4:5be3:0:b0:441:7bd1:29bd with SMTP id k3-20020ad45be3000000b004417bd129bdmr733356qvc.14.1648663586730;
-        Wed, 30 Mar 2022 11:06:26 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id u20-20020a05620a455400b0067ec0628661sm12639056qkp.110.2022.03.30.11.06.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 11:06:26 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 14:06:25 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Philipp Reisner <philipp.reisner@linbit.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: state of drbd in mainline
-Message-ID: <YkScIas+/Ev0trcZ@redhat.com>
-References: <20220329070618.GA20396@lst.de>
- <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
- <20220329073254.GA20691@lst.de>
- <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
- <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
- <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
- <3c42b1ed-7c03-64e6-409e-e92247288cac@kernel.dk>
- <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+        Wed, 30 Mar 2022 14:24:53 -0400
+Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F7B4B419
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:22:25 -0700 (PDT)
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+        (Authenticated sender: krisman)
+        with ESMTPSA id 5FDC81F45F1F
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1648664543;
+        bh=sYm9jFXdrgdVFCDucYlpXP1Kp/s8ldkKOJ7mfqFc47g=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=aIZcFo5g1HqWaoOkPGUjVdIx3TE8m0Li0nQHSAI+ebjOiNJ4Bttags1vgirq7SeEz
+         rOFHGLfBfkeKZaS6uGONwAjzX9p/MrcACJlMlxxcBceoZK2oMf1oq+aiXBlGBQKeUv
+         Zp+GzlarvnxVmLOlYnDgIcZL2B5CD1RyCZtV9V+Wtq1kyPBVxoGJHO6jiY3Sg81KI5
+         /tomjYsrjzmSzs95G7/aE0Fr2FDB8uq0zShFL5LqHpIDZHJfaD37O8kzh0pGei9sad
+         ZFIcBbu76ONDUE3nQ5JmjBI81oUWjOVaSa/QNBd21I5b4sZlBUUIsUUmVSAlNzhOBd
+         YyHBv/J9UBZhA==
+From:   Gabriel Krisman Bertazi <krisman@collabora.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Hannes Reinecke <hare@suse.de>, lsf-pc@lists.linux-foundation.org,
+        linux-block@vger.kernel.org,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-mm@kvack.org
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Organization: Collabora
+References: <87tucsf0sr.fsf@collabora.com>
+        <986caf55-65d1-0755-383b-73834ec04967@suse.de> <YkCSVSk1SwvtABIW@T590>
+        <87o81prfrg.fsf@collabora.com> <YkJTQW7aAjDGKL9p@T590>
+        <87bkxor7ye.fsf@collabora.com> <YkO4rFBHCdjCJndV@T590>
+Date:   Wed, 30 Mar 2022 14:22:20 -0400
+In-Reply-To: <YkO4rFBHCdjCJndV@T590> (Ming Lei's message of "Wed, 30 Mar 2022
+        09:55:56 +0800")
+Message-ID: <87tubfpag3.fsf@collabora.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Mar 30 2022 at 11:23P -0400,
-Philipp Reisner <philipp.reisner@linbit.com> wrote:
+Ming Lei <ming.lei@redhat.com> writes:
 
-> > > Jens, my intention is to keep it in-tree, and at some point update it.
-> > > Regarding your questions:
-> >
-> > That'd be great, but it's been years since there was any significant
-> > updates to the in-kernel drbd... I would strongly suggest that the
-> > in-kernel be brought closer to what people are mostly running, as it
-> > stands it's basically unmaintained.
-> 
-> The changes we worked on over many Years in the more recent drbd-9.x
-> branches are just too fundamental to do them in small chunks, we could
-> upstream bit by bit.  We need to get that reviewed in a big series.  If I
-> started to dump them on linux-block right away, nobody would look at it
-> seriously, since it would be too much.  I intend to get people from red
-> hat/suse assigned to do such a review. Then we will do that on linux-block,
-> so that everyone who cares sees what happens.
+> On Tue, Mar 29, 2022 at 01:20:57PM -0400, Gabriel Krisman Bertazi wrote:
+>> Ming Lei <ming.lei@redhat.com> writes:
+>> 
+>> >> I was thinking of something like this, or having a way for the server to
+>> >> only operate on the fds and do splice/sendfile.  But, I don't know if it
+>> >> would be useful for many use cases.  We also want to be able to send the
+>> >> data to userspace, for instance, for userspace networking.
+>> >
+>> > I understand the big point is that how to pass the io data to ubd driver's
+>> > request/bio pages. But splice/sendfile just transfers data between two FDs,
+>> > then how can the block request/bio's pages get filled with expected data?
+>> > Can you explain a bit in detail?
+>> 
+>> Hi Ming,
+>> 
+>> My idea was to split the control and dataplanes in different file
+>> descriptors.
+>> 
+>> A queue has a fd that is mapped to a shared memory area where the
+>> request descriptors are.  Submission/completion are done by read/writing
+>> the index of the request on the shared memory area.
+>> 
+>> For the data plane, each request descriptor in the queue has an
+>> associated file descriptor to be used for data transfer, which is
+>> preallocated at queue creation time.  I'm mapping the bio linearly, from
+>> offset 0, on these descriptors on .queue_rq().  Userspace operates on
+>> these data file descriptors with regular RW syscalls, direct splice to
+>> another fd or pipe, or mmap it to move data around. The data is
+>> available on that fd until IO is completed through the queue fd.  After
+>> an operation is completed, the fds are reused for the next IO on that
+>> queue position.
+>> 
+>> Hannes has pointed out the issues with fd limits. :)
+>
+> OK, thanks for the detailed explanation!
+>
+> Also you may switch to map each request queue/disk into a FD, and every
+> request is mapped to one fixed extent of the 'file' via rq->tag since we
+> have max sectors limit for each request, then fd limits can be avoided.
+>
+> But I am wondering if this way is friendly to userspace side implementation,
+> since there isn't buffer, only FDs visible to userspace.
 
-Why do you think Red Hat, SUSE or any other distro vendor's engineers
-should be made to review what amounts to be a massive dump of changes
-you developed over years?
+The advantages would be not mapping the request data in userspace if we
+could avoid it, since it would be possible to just forward the data
+inside the kernel.  But my latest understanding is that most use cases
+will want to directly manipulate the data anyway, maybe to checksum, or
+even for sending through userspace networking.  It is not clear to me
+anymore that we'd benefit from not always mapping the requests to
+userspace.
 
-Presummably you have heard of "upstream first"!?  Why do you think it
-doesn't apply to drbd?
+I've been looking at your implementation and I really like how simple it
+is. I think it's the most promising approach for this feature I've
+reviewed so far.  I'd like to send you a few patches for bugs I found
+when testing it and keep working on making it upstreamable.  How can I
+send you those patches?  Is it fine to just email you or should I also
+cc linux-block, even though this is yet out-of-tree code?
 
-It'd be one thing if drbd never went upstream but _it did_.  As is
-your development model is completely wrong.
-
-Mike
-
+-- 
+Gabriel Krisman Bertazi
