@@ -2,137 +2,138 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6B4C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 19:23:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E5AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 19:31:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350620AbiC3TZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 15:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52466 "EHLO
+        id S1350746AbiC3Tda (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 15:33:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241000AbiC3TZE (ORCPT
+        with ESMTP id S236846AbiC3Tda (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 15:25:04 -0400
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D021237
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 12:23:16 -0700 (PDT)
-Received: by mail-pf1-f171.google.com with SMTP id x31so13123768pfh.9
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 12:23:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=ZHtyaTDCFwT16k5cdDfPF/P2EA5gPFqUR2PCvm4ECgI=;
-        b=YQfob1wgJ8QhpYSvS1CfnB2Df1MJFbEXTXCNza5VUvu8+wThcuvOvK08J/zTZ4Qbdm
-         1GxBpCLPfS2ilJhgRSeOPcSLxVsNQkIttpUi8oqmd2oUbLxFeIvZxUpMrXZCWE3v/PCo
-         sUzMJPWZK6HKPXpgBTsIJGH4ejQoATg7infOmEj8NG9uxgXORVkwCxBRi67/xp1JyfHL
-         ZmdChelr/5IM3NTkn+5Nw5vOf5Z1g31imRSUT4HqISREpyLAqqz0JRfYA89x66y8mKxc
-         mlvlcwYq6cLW51vYS+ekfpOmIhFppu3Mg5LZU8UUsZ9tZyaZ1MobS8fFifGBCsp3xcAD
-         73SA==
-X-Gm-Message-State: AOAM533ytZfYvrRc4tV4AL7ljBEiT2nZ3m524yBHhc2TuWLcYUVLWs2F
-        TIqi+rcREOyNfxn9oNnUeAd0WkrcyMM=
-X-Google-Smtp-Source: ABdhPJzwW5Uj3tPdbpOaNG5QzaofCKC1qF7aDIo6ArraeWowHZ4NFFbLL3rxw31k/agc3F4ivB+E5w==
-X-Received: by 2002:a05:6a00:ad0:b0:4f7:a357:6899 with SMTP id c16-20020a056a000ad000b004f7a3576899mr34729945pfl.80.1648668195778;
-        Wed, 30 Mar 2022 12:23:15 -0700 (PDT)
-Received: from fedora (136-24-99-118.cab.webpass.net. [136.24.99.118])
-        by smtp.gmail.com with ESMTPSA id h6-20020a056a00218600b004f65315bb37sm26083117pfi.13.2022.03.30.12.23.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 12:23:15 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 08:28:28 -0400
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
-Message-ID: <YkRM7Iyp8m6A1BCl@fedora>
-References: <YkSK6mU1fja2OykG@redhat.com>
+        Wed, 30 Mar 2022 15:33:30 -0400
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CD31929A;
+        Wed, 30 Mar 2022 12:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1648668702; x=1680204702;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=/wUg19F4bho3UrdXcKxpKP+dFuU7a5qpHTH21Holqd8=;
+  b=HJIBWfczqoXH3kLS84PAATiHnMg4vxbyl1AydR9VVGzaYZrMvwPPXN5B
+   jmHJb37cCkQhxUdKOFxiiMHdofmt3Hr0zBRsQ9/qR+U7G5j910zPkr/Jz
+   Oh7190LpM+FQXGw3Z7k3NnsOdGv95CI5l6Edd36hSv0rTg1Mobahm4vkw
+   U=;
+X-IronPort-AV: E=Sophos;i="5.90,223,1643673600"; 
+   d="scan'208";a="189068137"
+Subject: Re: [Drbd-dev] state of drbd in mainline
+Thread-Topic: [Drbd-dev] state of drbd in mainline
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP; 30 Mar 2022 19:31:41 +0000
+Received: from EX13MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+        by email-inbound-relay-iad-1d-7a21ed79.us-east-1.amazon.com (Postfix) with ESMTPS id 98E43220F87;
+        Wed, 30 Mar 2022 19:31:40 +0000 (UTC)
+Received: from EX13D21UWA002.ant.amazon.com (10.43.160.246) by
+ EX13MTAUWB001.ant.amazon.com (10.43.161.207) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Wed, 30 Mar 2022 19:31:32 +0000
+Received: from EX13D23UWA003.ant.amazon.com (10.43.160.194) by
+ EX13D21UWA002.ant.amazon.com (10.43.160.246) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.32; Wed, 30 Mar 2022 19:31:32 +0000
+Received: from EX13D23UWA003.ant.amazon.com ([10.43.160.194]) by
+ EX13D23UWA003.ant.amazon.com ([10.43.160.194]) with mapi id 15.00.1497.033;
+ Wed, 30 Mar 2022 19:31:32 +0000
+From:   "Kiselev, Oleg" <okiselev@amazon.com>
+To:     Philipp Reisner <philipp.reisner@linbit.com>,
+        Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Christoph Hellwig <hch@lst.de>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "Herrenschmidt, Benjamin" <benh@amazon.com>,
+        "Smith, Stewart" <trawets@amazon.com>
+Thread-Index: AQHYREo/hxsLFmWyRUaMnu9akgwu46zX25aA
+Date:   Wed, 30 Mar 2022 19:31:32 +0000
+Message-ID: <7AD2D6DC-0609-42F9-A481-B6E5C0F58180@amazon.com>
+References: <20220329070618.GA20396@lst.de>
+ <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
+ <20220329073254.GA20691@lst.de>
+ <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
+ <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
+ <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
+ <3c42b1ed-7c03-64e6-409e-e92247288cac@kernel.dk>
+ <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+In-Reply-To: <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.43.160.98]
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <BBE82A3345660541908687EF8C2DC1D0@amazon.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkSK6mU1fja2OykG@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Mike,
-
-On Wed, Mar 30, 2022 at 12:52:58PM -0400, Mike Snitzer wrote:
-> Hey Tejun and Dennis,
-> 
-> I recently found that due to bio_set_dev()'s call to
-> bio_associate_blkg(), bio_set_dev() needs much more cpu than ideal;
-> especially when doing 4K IOs via io_uring's HIPRI bio-polling.
-> 
-> I'm very naive about blk-cgroups.. so I'm hopeful you or others can
-> help me cut through this to understand what the ideal outcome should
-> be for DM's bio clone + remap heavy use-case as it relates to
-> bio_associate_blkg.
-> 
-> If I hack dm-linear with a local __bio_set_dev that simply removes
-> the call to bio_associate_blkg() my IOPS go from ~980K to 995K.
-> 
-> Looking at what is happening a bit, relative to this DM bio cloning
-> usecase, it seems __bio_clone() calls bio_clone_blkg_association() to
-> clone the blkg from DM device, then dm-linear.c:linear_map's call
-> to bio_set_dev() will cause bio_associate_blkg(bio) to reuse the css
-> but then it triggers an update because the bdev is being remapped in
-> the bio (due to linear_map sending the IO to the real underlying
-> device). End result _seems_ like collective wasteful effort to get the
-> blk-cgroup resources setup properly in the face of a simple remap.
-> 
-> Seems the current DM pattern is causing repeat blkg work for _every_
-> remapped bio?  Do you see a way to speed up repeat calls to
-> bio_associate_blkg()?
-> 
-
-I must admit I wrote this with limited knowledge of bio cloning at the
-time. I can fill in the thought process here.
-
-The idea was every bio should have a blkg associated with it for io
-accounting and things like blk-iolatency and blk-iocost. The device
-abstraction I believe means we can set limits here as well on submission
-rate to the md device.
-
-I think cloning is a special case that I might have gotten wrong. If
-there is a bio_set_dev() call after each clone(), then the
-bio_clone_blkg_association() is excess work. We'd need to audit how
-bio_alloc_clone() is being used to be safe. Alternatively, we could opt
-for a bio_alloc_clone_noblkg(), but that's a little bit uglier.
-
-1. bio_set_dev() above md <- needed so we can do throttling on the md.
-2. bio_alloc_clone() <- doesn't need to clone the blkg() info.
-3. bio_set_dev() in md <- sets the right underlying device association.
-
-Thanks,
-Dennis
-
-> Test kernel is my latest dm-5.19 branch (though latest Linus 5.18-rc0
-> kernel should be fine too):
-> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.19
-> 
-> I'm using dm-linear ontop on a 16G blk-mq null_blk device:
-> 
-> modprobe null_blk queue_mode=2 poll_queues=2 bs=4096 gb=16
-> SIZE=`blockdev --getsz /dev/nullb0`
-> echo "0 $SIZE linear /dev/nullb0 0" | dmsetup create linear
-> 
-> And running the workload with fio using this wrapper script:
-> io_uring.sh 20 1 /dev/mapper/linear 4096
-> 
-> #!/bin/bash
-> 
-> RTIME=$1
-> JOBS=$2
-> DEV=$3
-> BS=$4
-> 
-> QD=64
-> BATCH=16
-> HI=1
-> 
-> fio --bs=$BS --ioengine=io_uring --fixedbufs --registerfiles --hipri=$HI \
->         --iodepth=$QD \
->         --iodepth_batch_submit=$BATCH \
->         --iodepth_batch_complete_min=$BATCH \
->         --filename=$DEV \
->         --direct=1 --runtime=$RTIME --numjobs=$JOBS --rw=randread \
->         --name=test --group_reporting
+QVdTIFJEUyBpcyBhIG1ham9yIHVzZXIgb2YgZHJiZC4gIFdlIGFyZSBwcm9iYWJseSByZXNwb25z
+aWJsZSBmb3IgdGhlIHN1YnN0YW50aWFsIHBlcmNlbnRhZ2Ugb2YgZHJiZCB1c2VycyBpbiB0aGUg
+d29ybGQuICBXZSBhcmUgY3VycmVudGx5IG9uIGRyYmQtOC40LiAgV2Ugd2lsbCBldmVudHVhbGx5
+IG1pZ3JhdGUgdG8gZHJiZC05LCBidXQgYXQgb3VyIHNjYWxlIHRoaXMgaXNuJ3QgZ29pbmcgdG8g
+aGFwcGVuIHZlcnkgc29vbi4gIA0KDQpUaGUgbGFzdCB0aW1lIHdlIG5lZWRlZCB0byBwYXRjaCBk
+cmJkIHdhcyBiYWNrIGluIDIwMTguICBXZSd2ZSBub3QgZGlhZ25vc2VkIGFueSByZXBvcnRhYmxl
+IGlzc3VlcyB3aXRoIGRyYmQtOC40IGluIHRoZSBwYXN0IH40IHllYXJzLiAgIEl0J3MgYSBzdGFi
+bGUsIG1hdHVyZSBkcml2ZXIuICAgV2Ugd291bGQgcHJlZmVyIGZvciBkcmJkLTggdG8gY29udGlu
+dWUgYmVpbmcgYXZhaWxhYmxlIGluIHRoZSB1cHN0cmVhbSB0cmVlLiAgV2UnZCBhbHNvIHdlbGNv
+bWUgZHJiZC05IGJlaW5nIGF2YWlsYWJsZSBpbi10cmVlIGFzIHNvb24gYXMgcG9zc2libGU6IGl0
+IHdpbGwgbWFrZSBsaWZlIG11Y2ggZWFzaWVyIGZvciBvdGhlciBBV1MgdGVhbXMgdGhhdCBhcmUg
+Y3VycmVudGx5IHdvcmtpbmcgb24gRFJCRCBkZXBsb3ltZW50Lg0KDQrvu79PbiAzLzMwLzIyLCA4
+OjI0IEFNLCAiZHJiZC1kZXYtYm91bmNlc0BsaXN0cy5saW5iaXQuY29tIG9uIGJlaGFsZiBvZiBQ
+aGlsaXBwIFJlaXNuZXIiIDxkcmJkLWRldi1ib3VuY2VzQGxpc3RzLmxpbmJpdC5jb20gb24gYmVo
+YWxmIG9mIHBoaWxpcHAucmVpc25lckBsaW5iaXQuY29tPiB3cm90ZToNCg0KICAgIENBVVRJT046
+IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUgb2YgdGhlIG9yZ2FuaXphdGlvbi4g
+RG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0YWNobWVudHMgdW5sZXNzIHlvdSBjYW4gY29u
+ZmlybSB0aGUgc2VuZGVyIGFuZCBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUuDQoNCg0KDQogICAg
+PiA+IEplbnMsIG15IGludGVudGlvbiBpcyB0byBrZWVwIGl0IGluLXRyZWUsIGFuZCBhdCBzb21l
+IHBvaW50IHVwZGF0ZSBpdC4NCiAgICA+ID4gUmVnYXJkaW5nIHlvdXIgcXVlc3Rpb25zOg0KICAg
+ID4NCiAgICA+IFRoYXQnZCBiZSBncmVhdCwgYnV0IGl0J3MgYmVlbiB5ZWFycyBzaW5jZSB0aGVy
+ZSB3YXMgYW55IHNpZ25pZmljYW50DQogICAgPiB1cGRhdGVzIHRvIHRoZSBpbi1rZXJuZWwgZHJi
+ZC4uLiBJIHdvdWxkIHN0cm9uZ2x5IHN1Z2dlc3QgdGhhdCB0aGUNCiAgICA+IGluLWtlcm5lbCBi
+ZSBicm91Z2h0IGNsb3NlciB0byB3aGF0IHBlb3BsZSBhcmUgbW9zdGx5IHJ1bm5pbmcsIGFzIGl0
+DQogICAgPiBzdGFuZHMgaXQncyBiYXNpY2FsbHkgdW5tYWludGFpbmVkLg0KDQogICAgVGhlIGNo
+YW5nZXMgd2Ugd29ya2VkIG9uIG92ZXIgbWFueSBZZWFycyBpbiB0aGUgbW9yZSByZWNlbnQgZHJi
+ZC05LngNCiAgICBicmFuY2hlcyBhcmUganVzdCB0b28gZnVuZGFtZW50YWwgdG8gZG8gdGhlbSBp
+biBzbWFsbCBjaHVua3MsIHdlIGNvdWxkDQogICAgdXBzdHJlYW0gYml0IGJ5IGJpdC4gIFdlIG5l
+ZWQgdG8gZ2V0IHRoYXQgcmV2aWV3ZWQgaW4gYSBiaWcgc2VyaWVzLiAgSWYgSQ0KICAgIHN0YXJ0
+ZWQgdG8gZHVtcCB0aGVtIG9uIGxpbnV4LWJsb2NrIHJpZ2h0IGF3YXksIG5vYm9keSB3b3VsZCBs
+b29rIGF0IGl0DQogICAgc2VyaW91c2x5LCBzaW5jZSBpdCB3b3VsZCBiZSB0b28gbXVjaC4gIEkg
+aW50ZW5kIHRvIGdldCBwZW9wbGUgZnJvbSByZWQNCiAgICBoYXQvc3VzZSBhc3NpZ25lZCB0byBk
+byBzdWNoIGEgcmV2aWV3LiBUaGVuIHdlIHdpbGwgZG8gdGhhdCBvbiBsaW51eC1ibG9jaywNCiAg
+ICBzbyB0aGF0IGV2ZXJ5b25lIHdobyBjYXJlcyBzZWVzIHdoYXQgaGFwcGVucy4NCg0KICAgIFsu
+Li5dDQogICAgPiBUaGUgbWFpbiBkaXNjcmVwYW5jeSBoZXJlIGlzIHRoYXQgdGhlcmUgYXJlIGFw
+cGFyZW50bHkgaHVnZSBudW1iZXJzIG9mDQogICAgPiBpbi10cmVlIHVzZXJzLCB5ZXQgbm8gZml4
+ZXMgb3IgcGF0Y2hlcyBhdCBhbGwgbWFraW5nIGl0IHRvIG1haW5saW5lLg0KICAgID4gRWl0aGVy
+IGRyYmQgaXMgYnVnIGZyZWUgYW5kIGRvZXNuJ3QgcmVxdWlyZSBhbnkgZml4ZXMgYXQgYWxsLCB3
+aGljaCBJDQogICAgPiB2ZXJ5IG11Y2ggd291bGQgZG91YnQsIG9yIGZpeGVzIGFyZW4ndCBiZWlu
+ZyBzZW50IHVwc3RyZWFtLg0KDQogICAgSXQgaXMgdGhlIGJyb2FkIGNvbnNlbnQgYW1vbmcgdGhl
+IHVzZXJzIG9mIHRoZSBkcmJkLTguNCBicmFuY2ggKHRoYXQgaXMgd2hhdA0KICAgIGlzIGluLXRy
+ZWUpLCBpcyB0aGF0IGl0IHdvcmtzIGZvciBpdHMgcHVycG9zZS4gSXQgaXMgZm9yIHN1cmUgbm90
+IGJ1Zy1mcmVlLA0KICAgIGJ1dCBwZW9wbGUgYXJlIG5vdCBydW5uaW5nIGludG8gYnVncyBhbnlt
+b3JlLiBTbywgY2FsbCBpdCBmcmVlIG9mIHJlbGV2YW50DQogICAgYnVncywgaWYgeW91IHdhbnQu
+ICBObyBuZXcgZmVhdHVyZXMgZ28gaW50byB0aGF0IGJyYW5jaCwgb24gcHVycG9zZS4gVG8ga2Vl
+cA0KICAgIGl0IHRoYXQgd2F5Lg0KDQogICAgSGF2ZSBhIGxvb2sgYXQgdGhhdCBvbmUgcmVhbCBi
+dWctZml4IHRoYXQgd2FzIGlkZW50aWZpZWQgaW4gdGhlIGxhc3QgWWVhci4NCiAgICAyMDIxMDQy
+NjE2MzAzMi4zNDU0MTI5LTEtY2hyaXN0b3BoLmJvZWhtd2FsZGVyQGxpbmJpdC5jb20gPGh0dHBz
+Oi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcvcHJvamVjdC9saW51eC1ibG9jay9wYXRjaC88YSBocmVm
+PT4vIj5odHRwczovL3BhdGNod29yay5rZXJuZWwub3JnL3Byb2plY3QvbGludXgtYmxvY2svcGF0
+Y2gvMjAyMTA0MjYxNjMwMzIuMzQ1NDEyOS0xLWNocmlzdG9waC5ib2VobXdhbGRlckBsaW5iaXQu
+Y29tLw0KDQogICAgV2hlbiBkbyB5b3Ugd2FudCB0byBoYXZlIHRoYXQgcmVwb3N0ZWQgdG8geW91
+Pw0KICAgIHJpZ2h0IG5vdz8gSnVzdCBiZWZvcmUgdGhlIG5leHQgbWVyZ2Ugd2luZG93IG9wZW5z
+Pw0KICAgIF9fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fDQog
+ICAgZHJiZC1kZXYgbWFpbGluZyBsaXN0DQogICAgZHJiZC1kZXZAbGlzdHMubGluYml0LmNvbQ0K
+ICAgIGh0dHBzOi8vbGlzdHMubGluYml0LmNvbS9tYWlsbWFuL2xpc3RpbmZvL2RyYmQtZGV2DQoN
+Cg==
