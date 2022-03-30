@@ -2,140 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90959C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99918C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 18:51:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350334AbiC3S3J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 14:29:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43610 "EHLO
+        id S1350212AbiC3SxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 14:53:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351087AbiC3S2Z (ORCPT
+        with ESMTP id S1350815AbiC3SxS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 14:28:25 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E375747075
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id j15so15077944ila.13
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
+        Wed, 30 Mar 2022 14:53:18 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E4F53B553
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:51:33 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id 9so22727916iou.5
+        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 11:51:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=JFFSehnkNeo1K8L02V2cW9CThdS75MCRvOKla3KLkAw=;
-        b=BFTCzD4aFvt9JrLiEz1bvzh6geIg6IptVTdj6IDiPuICAE203wQz9TEb+4sd+GuDm8
-         7hfsvwiWBq0a8G/L8JH1EJb4H5BgYFm066eNM++IJprdbaiP/K/RQcVNoIdok+4Buz0n
-         VPAQxsddsYW6lxBAvrCd3pw/AsU0VWg+XQ9+f+uSiaJkninfGHo8tQFy0F2WQL/CkiPX
-         978UdPWCEqFU5zNcqpfpYI+hbpzYnlekkvQ4l365jJLsdpHWW1qs4vwF10T/u8GEeEZH
-         VfPeDuk7IqzhfjQL+dK96hTc4fToK+0EsQR50pC8XTuJ0494LDj5KpiHUMlEIVaBIuzm
-         wOwg==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=y92bvKVGil+XZIjxQXyncjq3AMwQmOj/Se4/L6WvBo8=;
+        b=3gCw8s3HHskcb+LSDXXaVbHpv9SbKZTlAR4hi2sgsDZPkhmmD3MP+bFWyNS9vzUEqN
+         vBvc0mVIqmaQaAhypqdgmXbjEszkwApa8aFt5fidnXgUCeM/kc9nl6Zb0aqEjM9VaOug
+         yyYB6T369Gdp264crOjKNwsWa1cm48eqBCXI66ZjvPE1mfmN7ZGKGwOcNLqHq9IP1zT3
+         r5IAp+/gSW8FEkrYJE2BH6pg5InDhNWpm5Q70GJoi8P/MDyl5zcrNKKlkj8bS6JpDlea
+         vYfHoIRmwqlua69ryfDxyLkXCp1d0eQna4jVUw4V4CJ+xBaqGhZ+rDtNR4qjdN97MumR
+         Ul9g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=JFFSehnkNeo1K8L02V2cW9CThdS75MCRvOKla3KLkAw=;
-        b=7FKN4Ld0EmX4HodqlmsIIoMiRYEg26DRouAL7Dl5Oh3CKwrxoiECHDjoic5Te73A2l
-         8PaflDzs9hdZVjoeAOzh+fk6OL1A3thHrqP+lLgiEBn2ZF1foomW77DIKK8dmx0vz92S
-         RM0juQFp96zOXFf2wzqUS/L5fGPbrwrdZkYf2EAfpXrBVoNuxr1awMV/lG7m31OIjtKQ
-         EavhLs0LNlAA1omtHW29k0ePARgV+V3pLc9OC3Hj2w+9YMYI4wDs7mKi2JEyn0mBTwJl
-         HmZpPwq1heLODiZz+rI0ZtCvb+lF+T/qMdKCViIofh7scB1qIDsCvVTdqfTucM8GummQ
-         KRnw==
-X-Gm-Message-State: AOAM533DoeqdRVgmqBK51Bnoq+uX8OHcXVgezEKZNIVY23Xt5fpwi1co
-        Qj3521oG5yLjVWnEYhKcEr4yVo+w7rpmq0pg
-X-Google-Smtp-Source: ABdhPJwUvZiBYV6AGjovRlQg5dfR2IK8vL/m8lnPjq8KMhvUK1WpCP4kEeYA48hTsQvWDg7IrHos5Q==
-X-Received: by 2002:a92:cbc3:0:b0:2c6:78fa:41e9 with SMTP id s3-20020a92cbc3000000b002c678fa41e9mr11278289ilq.112.1648664688212;
-        Wed, 30 Mar 2022 11:24:48 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id i81-20020a6bb854000000b00649c1b67a6csm11564038iof.28.2022.03.30.11.24.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Mar 2022 11:24:47 -0700 (PDT)
-Message-ID: <0dc208a9-22f2-6758-e776-752ff81e2b19@kernel.dk>
-Date:   Wed, 30 Mar 2022 12:24:46 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: state of drbd in mainline
-Content-Language: en-US
-To:     Philipp Reisner <philipp.reisner@linbit.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220329070618.GA20396@lst.de>
- <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
- <20220329073254.GA20691@lst.de>
- <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
- <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
- <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
- <3c42b1ed-7c03-64e6-409e-e92247288cac@kernel.dk>
- <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=y92bvKVGil+XZIjxQXyncjq3AMwQmOj/Se4/L6WvBo8=;
+        b=EgGeZ8kyOGkki8kcwkD795fP7t6HK13Z399QMLcyulsncV/RGWL6pQU2WmpWKpTO9R
+         khqhmWqSvDs4/QGkzLpO4U1Ism8pySZ2ikw8cqbxF5BMcKfK8LdFeaNSx9FdsFZujQyW
+         JTPg8czDZKfOAaqNsVDPFE8Yy5SCX2E8OL1CQv2HdAoBtsJDl4Qedrz1NBVG+Tm3ZLWg
+         R6kK8pJb1rRbx/YJUTbPt5ITTzAEl+s3phFCs26gVO92Iw6UvzXbLEuCok9/DXbaN6R0
+         3zoRJ3drdChwQyS4vCBlRTsdFEsq3/lY96S+83aSZqRAd6oKb/lNX6o6rOdNPXFdhdFt
+         AvjA==
+X-Gm-Message-State: AOAM53333LSHLW4tibsRZ0X5ruPUP9t5f2bDDjNUZpL2P8JMy5ir5Zte
+        yl4UB0EpRaU4OZ3FnG4Pw1zE3YedwtiO/A/A
+X-Google-Smtp-Source: ABdhPJxFa1K1f4C5BONxN28/ytYaG07W6F2EgJyQSyUkT/eiqQ9cyCL99l6RfDPPlj/FGN6oO03b9g==
+X-Received: by 2002:a02:7050:0:b0:321:440c:5e11 with SMTP id f77-20020a027050000000b00321440c5e11mr680586jac.35.1648666292621;
+        Wed, 30 Mar 2022 11:51:32 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id z17-20020a92da11000000b002c83987c2ffsm10383622ilm.76.2022.03.30.11.51.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Mar 2022 11:51:32 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     hch@lst.de, linux-block@vger.kernel.org, dm-devel@redhat.com,
+        ming.lei@redhat.com
+In-Reply-To: <20220324203526.62306-1-snitzer@kernel.org>
+References: <20220324203526.62306-1-snitzer@kernel.org>
+Subject: Re: (subset) [PATCH v3 0/3] block/dm: use BIOSET_PERCPU_CACHE from bio_alloc_bioset
+Message-Id: <164866629201.257072.14870349731518355925.b4-ty@kernel.dk>
+Date:   Wed, 30 Mar 2022 12:51:32 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/30/22 9:23 AM, Philipp Reisner wrote:
->>> Jens, my intention is to keep it in-tree, and at some point update it.
->>> Regarding your questions:
->>
->> That'd be great, but it's been years since there was any significant
->> updates to the in-kernel drbd... I would strongly suggest that the
->> in-kernel be brought closer to what people are mostly running, as it
->> stands it's basically unmaintained.
+On Thu, 24 Mar 2022 16:35:23 -0400, Mike Snitzer wrote:
+> This v3 is a rebase of the previous v2 series ontop of the revised v2
+> patch that Christoph provided.
 > 
-> The changes we worked on over many Years in the more recent drbd-9.x
-> branches are just too fundamental to do them in small chunks, we could
-> upstream bit by bit.  We need to get that reviewed in a big series.  If I
-
-Your development model is fundamentally broken. You've allowed your 9.x
-branch to totally drift from mainline, which just helps underline my
-earlier point on that in-kernel drbd is effectively abandoned and
-unmaintained.
-
-> started to dump them on linux-block right away, nobody would look at it
-> seriously, since it would be too much.  I intend to get people from red
-> hat/suse assigned to do such a review. Then we will do that on linux-block,
-> so that everyone who cares sees what happens.
-
-You're just doing it totally wrong. Upstream kernel should match your
-9.x branch, and it should have been developed in sync. What you appear
-to have done is to ignore mainline, while it would've been correct and
-much easier in the long run to ensure that development is regularly
-synced to the mainline kernel. You know, like EVERY other driver that is
-maintained does.
-
-Now you've got a giant pile of patches, which probably don't adhere to
-how we would've done the mainline commits in the first place, and it'll
-cause a huge pain for not just you but upstream reviewers. I don't care
-about the former, but I do care a lot about the latter. That's a giant
-waste of the time of the folks involved on the block side, and
-definitely not what a responsible kernel maintainer would do.
-
-From your reply here and earlier ones, seems to me that you don't grasp
-the gravity of the situation, which is also worrying.
-
->> The main discrepancy here is that there are apparently huge numbers of
->> in-tree users, yet no fixes or patches at all making it to mainline.
->> Either drbd is bug free and doesn't require any fixes at all, which I
->> very much would doubt, or fixes aren't being sent upstream.
+> Linus hasn't pulled the for-5.18/dm-changes branch yet, so the 3rd DM
+> patch cannot be applied yet.  But feel free to pickup the first 2
+> block patches for 5.19 and I'll rebase dm-5.19 on block accordingly.
 > 
-> It is the broad consent among the users of the drbd-8.4 branch (that is what
-> is in-tree), is that it works for its purpose. It is for sure not bug-free,
-> but people are not running into bugs anymore. So, call it free of relevant
-> bugs, if you want.  No new features go into that branch, on purpose. To keep
-> it that way.
-> 
-> Have a look at that one real bug-fix that was identified in the last Year.
-> https://patchwork.kernel.org/project/linux-block/patch/20210426163032.3454129-1-christoph.boehmwalder@linbit.com/
-> 
-> When do you want to have that reposted to you?
-> right now? Just before the next merge window opens?
+> [...]
 
-That can go in anytime, so please do submit it.
+Applied, thanks!
 
+[1/3] block: allow using the per-cpu bio cache from bio_alloc_bioset
+      commit: a147e4805855e34f8e1027b88baf59a7f7c8b8d3
+[2/3] block: allow use of per-cpu bio alloc cache by block drivers
+      commit: e866e4dbad251b4dd1e134c295afd862333864bc
+
+Best regards,
 -- 
 Jens Axboe
+
 
