@@ -2,128 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 382F6C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 17:21:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FE58C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 18:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229867AbiCaRXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 13:23:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
+        id S237503AbiCaS5E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 14:57:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57156 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229823AbiCaRXG (ORCPT
+        with ESMTP id S237374AbiCaS5A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 13:23:06 -0400
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D361F0824;
-        Thu, 31 Mar 2022 10:21:18 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id k124-20020a1ca182000000b0038c9cf6e2a6so81035wme.0;
-        Thu, 31 Mar 2022 10:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=+UVRHxpu5eAfZsEs5HfhLN004uIPJF3dGsymXwYvqE0=;
-        b=LNUVKXrv51q/DMVQ860JVj9trLzFV/zwqf6kbU1eIcKzFyN42aHz1+BBprVSkJ9n4D
-         wDJDO/+r6UGXeIFsZx4I5xkVuCUEqYEM4wKnq9llbQX8dQpznyhHf50XTEMZdWcK23RZ
-         iBWy/hiiaNOKW188/GaypOGFunHUm5wB3VAzu9KajZ8d4HsSdis+TQ/DkIW0Z9ooMnWG
-         Jb/XiCsZg4rNYn7bPe5mm+fizG7LJGW4LoLMiuENFUpE6DP6SSSo8CM5twNT/nI7cSt4
-         b2944laRAYHdWIm9fmq1JFdIQabTy2/8PpKig1IcLTw4Pgob6wUwIvtWP4H8Kurwnfo/
-         28TQ==
+        Thu, 31 Mar 2022 14:57:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3339F192357
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 11:55:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648752911;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=k0Z1jeCIKmFnHUAVH1qnoY3Db0lyY6IzDGCak9lVPA4=;
+        b=I6UfAKID5dXbjC+sUAyB5JoKR2tGzk0f+uFsZM+qflorfhQiq3m4bQzpc1cq2dgZgyfyeT
+        Iw4h7FRpbJNYPThb81WrhYmLccyequalx4M1I9VGUA+f7BRhQGzBZXfnuyZ9jMhznT62ny
+        ZlGFHMrixWBMhBLQvm34U/l1EcWoSFw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-610-efqZm7nAOVaeOKlcNfxMHw-1; Thu, 31 Mar 2022 14:55:08 -0400
+X-MC-Unique: efqZm7nAOVaeOKlcNfxMHw-1
+Received: by mail-qt1-f199.google.com with SMTP id k1-20020ac85fc1000000b002e1c5930386so267898qta.3
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 11:55:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=+UVRHxpu5eAfZsEs5HfhLN004uIPJF3dGsymXwYvqE0=;
-        b=QxIykZVGCuhYKCvABblfgrC71eV1uF2tYhTiYr768dYAl8ylKk8rOJeGXPZVn5FxIq
-         So2m8BmesogrPE1/IMKz+Eqp2llUaHTjTe1DvMpM/NHsbKeTluy+mBB6AcSZt0JuEzeF
-         Ip1jlPGPrxrXEuNU8Bf1QYnHS9TZNViT2fdvSWw71diCJ6vj1Jf+WKv9k9EAnjooWdKN
-         tzUwWE9eUBTSERAyWeXd52b1/ID1ZWYl0dQGKu76UJCzfqIXe54uXoZNoTqLU6SewBM/
-         mzyQ+qOzP1Cp2OKLnrmcVgbYaQS59rCdXzW41epISB7UzrpNq3aCtJnz1MnW+Bg0IzYn
-         nI5w==
-X-Gm-Message-State: AOAM533hMoGoSmp+FV0qU/bUkqhJbWhhaRxGZqHFHO9N5gHCq6BeRpVT
-        Wm9c0WSnxAJeMYZ+AW0wmSQ=
-X-Google-Smtp-Source: ABdhPJzq3nr8QvRZ+mF96/wzGEaUKNuBxFHKqbGBuOjhVXW3zpe6yfAWUncBSibI3awJmqeY6frabA==
-X-Received: by 2002:a05:600c:35d4:b0:38c:9933:41c0 with SMTP id r20-20020a05600c35d400b0038c993341c0mr5593964wmq.149.1648747276628;
-        Thu, 31 Mar 2022 10:21:16 -0700 (PDT)
-Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
-        by smtp.gmail.com with ESMTPSA id u7-20020a05600c19c700b0038cc9aac1a3sm8571435wmq.23.2022.03.31.10.21.14
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=k0Z1jeCIKmFnHUAVH1qnoY3Db0lyY6IzDGCak9lVPA4=;
+        b=k1WuOAwKcrHjgnoQYgwMlQlZGGMovDtalvnJWUXuVvGX4ctdscZAGZHe28ajEsMkoj
+         lkPnjNFHxL0jaCFbEf0cipyCDVkbknFOcw8P/1M7CLYYiBrBVJO/eYiMsCs7c7FuWyHL
+         IqOsXL2ZUXfaK/ZtOYAlJJD2+lcmx1uqZhq5mT0zub59rxm/X3qJaLkKd9dtqM9bPRMq
+         qzCCba4HTDEm3y7h6+qQ46i8HICTZJbGVgHfstnQpgpWj17OnvFlGqNAwMu4H0Ft3ZWK
+         VSVVAP+LHacyJJ6qr7o3o9j5hIYj3SyKKTsY34mcPA5yycNgFwjjPPbBA1GrAwx8YZsO
+         98eg==
+X-Gm-Message-State: AOAM532UtW8AuchKRhxrwBUKq/ywvBX/9L3oEFgkEr22EdFx5ozjJj6J
+        zh/KeYUyuYC2rOCST+zccyDJyzRj+RO/pFfJO3Kqnj4kfl2McFgMleb1iTNI+q5qFTkimp+6n2/
+        534KU4LPn6/PdztGyry8MZZM=
+X-Received: by 2002:a05:622a:30c:b0:2eb:871f:be08 with SMTP id q12-20020a05622a030c00b002eb871fbe08mr5653193qtw.128.1648752908001;
+        Thu, 31 Mar 2022 11:55:08 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwOfSfgjRpynVUGU6NUsEVov2wHm6Z2q5VA2LwjDD2FsuUZ0dBiyT2QVfsvS200T/64ZPCA0g==
+X-Received: by 2002:a05:622a:30c:b0:2eb:871f:be08 with SMTP id q12-20020a05622a030c00b002eb871fbe08mr5653182qtw.128.1648752907803;
+        Thu, 31 Mar 2022 11:55:07 -0700 (PDT)
+Received: from localhost.localdomain.com (024-205-208-113.res.spectrum.com. [24.205.208.113])
+        by smtp.gmail.com with ESMTPSA id bk15-20020a05620a1a0f00b0067e5bd7a9ccsm68289qkb.50.2022.03.31.11.55.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 10:21:15 -0700 (PDT)
-From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     Wenchao Hao <haowenchao@huawei.com>,
-        syzkaller-bugs@googlegroups.com, axboe@kernel.dk,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
-        linfeilong@huawei.com
-Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
-Date:   Thu, 31 Mar 2022 19:21:13 +0200
-Message-ID: <3427592.iIbC2pHGDl@leap>
-In-Reply-To: <20220331162416.GI12805@kadam>
-References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <1787706.atdPhlSkOF@leap> <20220331162416.GI12805@kadam>
+        Thu, 31 Mar 2022 11:55:07 -0700 (PDT)
+From:   trix@redhat.com
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Tom Rix <trix@redhat.com>
+Subject: [PATCH] blk-wbt: remove wbt_track stub
+Date:   Thu, 31 Mar 2022 11:54:58 -0700
+Message-Id: <20220331185458.3427454-1-trix@redhat.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On gioved? 31 marzo 2022 18:24:16 CEST Dan Carpenter wrote:
-> On Thu, Mar 31, 2022 at 06:14:27PM +0200, Fabio M. De Francesco wrote:
-> > On gioved? 31 marzo 2022 15:42:10 CEST Dan Carpenter wrote:
-> > > Wenchao Hao, what you're saying makes a lot of sense but it raises a lot
-> > > of questions in turn.
-> > > 
-> > > Fabio, did you test your patch?
-> > 
-> > Yes, I did, Dan. I tested it the usual way with the "#syz test:" command.
-> > Obviously I have not the hardware to test code on it.
-> > 
-> 
-> Yeah.  What a nightmare.  You posted a link to the first test.  It said
-> passed but definitely introduced some use after frees but how was anyone
-> supposed to know?
+From: Tom Rix <trix@redhat.com>
 
-Maybe that a "spare-time Linux developer" like me should leave these 
-kinds of bug fixes to more experienced people. But we should also note 
-that I tried two or three different patches and _all_ of them passed
-the tests. 
+cppcheck returns this warning
+[block/blk-wbt.h:104] -> [block/blk-wbt.c:592]:
+  (warning) Function 'wbt_track' argument order different:
+  declaration 'rq, flags, ' definition 'rqos, rq, bio'
 
-> 
-> No way we would have figured this out.
+In commit c1c80384c8f4 ("block: remove external dependency on wbt_flags")
+wbt_track was removed for the real declaration, its stub should
+have been as well.
 
-I think that something should change about the way Syzbot tests patches 
-and about how it provides the results. The other four or five bugs that 
-I have fixed were based mainly to the fact that they passed the Syzbot 
-tests. 
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ block/blk-wbt.h | 3 ---
+ 1 file changed, 3 deletions(-)
 
-Perhaps I've been lucky but my patches were good and they were merged. 
-
-However, I began to trust Syzbot too much. This is not how I should 
-approach and try to solve bugs.
-
-> I'm working to make Smatch
-> understand device_put() better but this one is way difficult.
-> 
-> Sorry that you went through this.
-
-Please don't be sorry :)
-
-Believe me when I say that I cannot explain how many things I have 
-learned during these days while working on this issue. I see no 
-problems at all but only opportunities for learning.
-
-Thank you very much!
-
-Fabio M. De Francesco
-
-> 
-> regards,
-> dan carpenter
-> 
-> 
-
-
-
+diff --git a/block/blk-wbt.h b/block/blk-wbt.h
+index 2eb01becde8c..7e44eccc676d 100644
+--- a/block/blk-wbt.h
++++ b/block/blk-wbt.h
+@@ -101,9 +101,6 @@ u64 wbt_default_latency_nsec(struct request_queue *);
+ 
+ #else
+ 
+-static inline void wbt_track(struct request *rq, enum wbt_flags flags)
+-{
+-}
+ static inline int wbt_init(struct request_queue *q)
+ {
+ 	return -EINVAL;
+-- 
+2.26.3
 
