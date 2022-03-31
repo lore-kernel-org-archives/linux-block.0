@@ -2,86 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62718C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 13:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C96EC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 14:07:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236996AbiCaNt7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 09:49:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46914 "EHLO
+        id S237306AbiCaOJ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 10:09:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236991AbiCaNt7 (ORCPT
+        with ESMTP id S236716AbiCaOJ0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 09:49:59 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A18510CF0F
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 06:48:12 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id z16so22085569pfh.3
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 06:48:12 -0700 (PDT)
+        Thu, 31 Mar 2022 10:09:26 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7E0E2128C8
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 07:07:38 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id c4so21465830qtx.1
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 07:07:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=WIjS4hHkncWnADQSguPcZ9yDRhMIIgfXbDG/5koXL+M=;
-        b=8JdtJA3KoB9+DGVHgZEvfjxJgMQB8AJ3+FSa/hLLh59tuXtTzMTYqls626HhE0Xx60
-         M8oCxHsUeiyFnCM6zqv7RaiC1o3cURHKKd8TiUDajJIKwDH91uIAhjAWsRucpfdjRjaL
-         MNyNzgTZVBriuzx0dA4ay60uAVu43DYTvPKr2G0XVXQ8KissoueE1rxxZFNyFbs4ES5/
-         j4bv8lJfqwpnH0vwKGlzFRvcN1mAMxs4MPKKIb6qB3gRrEdaWRmCGB31IUaoOfyPhuIW
-         RShLIX/p6TZP2ZhVRV6PkG5Qw+d9y/FGgpiUFEywgccI3/V+ah8sVNYNy6QbTu0k9Ed1
-         DeDw==
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=RUo5kwiJz1bXcAqbqhS7EP1tVYXGo0oDgLG0Vt1y+Yw=;
+        b=piasVfJJs0bqvNJ4PSZRAVyjHcXIX+f20OEUWIVbZrN66k1VJSR4dx7gqLu3aayp7Q
+         270fgEB5o1cj86OnfA4+P3m/Lfik2iBL74oA9pmDfPB358bkLsO6KS1/yi5MrnrxLpqP
+         2/PmwBHugQKp8Jg+9/HpgKLnulHPVq56TNbJAUJz66lV6aXiI8v31Ors3hXoU1tLa7Vr
+         +vvKGo31JwJiNS8dfwtiBJbipCXMugjSYuBMb3blJcywsgXzbvPlmuO1/KMFZoshZgzN
+         o43bkTuDeIplUupMKNaxvm2swmnVZJnb/pd27kwSPyjYbWW4hlXTR5xvlW+lRYXKQEJn
+         /9dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=WIjS4hHkncWnADQSguPcZ9yDRhMIIgfXbDG/5koXL+M=;
-        b=AyMi+vy6gHnYVxjYwQphxrxQ78b7uVbXggamEIMEphrbMCoFilzrf5AjhTkQMhVDbj
-         tFQZXRs2JxPC3PnZVLL9o1rEYvH/og3ndhFRreVbIt1Qu9iVdMmOx1JZdhYU0EaIuRh4
-         EyLEDw+c179+3u2iiZFifFCKMaHiJ6uuHMHnOD0NctMamv7UFKk5O8Xm/BQBdrsq7PyM
-         xtkyLmMPjzBL5Riy+ovWYEAAJfCa5Y74B9itcFM6G+b+i8iTNy1uhNcc79T/AMosaO8/
-         IDF+daroVwxDGMAyLKMANdCIL8SyCB/WH+HmIG5yG3YL9tcX98HzEBQl7RxdsQIRT7Xe
-         fFGg==
-X-Gm-Message-State: AOAM531JfgyLRtemhmxvMohAFcE368CWMi/RosXQDOM3E4IXaeUHf2eH
-        R9rBupk4GLEtyoyld6rWyajVrw==
-X-Google-Smtp-Source: ABdhPJx1JWwl3z3vLqKxPFPwBAUbmruyet8e5XAqvGozXt0cKP0NQz5DfjALnTIZvovc9OIbpJ01HQ==
-X-Received: by 2002:a05:6a02:283:b0:342:703e:1434 with SMTP id bk3-20020a056a02028300b00342703e1434mr10853784pgb.74.1648734492091;
-        Thu, 31 Mar 2022 06:48:12 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id lw4-20020a17090b180400b001c7327d09c3sm10037155pjb.53.2022.03.31.06.48.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 06:48:11 -0700 (PDT)
-Message-ID: <8dbb5fc7-7170-d190-ba24-2ef13dc73623@kernel.dk>
-Date:   Thu, 31 Mar 2022 07:48:10 -0600
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=RUo5kwiJz1bXcAqbqhS7EP1tVYXGo0oDgLG0Vt1y+Yw=;
+        b=u1PJR6YfCunE1h+7NX/V0qZGwlvQfw82We2zsWGsKTfXv4V8Gn7hbWYCemseRRN3iI
+         wJ6JEAby6LsYnXyLxByPIVB0tXAFBAcUpVIB1vQ6I3TyGOpl/0cJTgVG3eC1UlkGnBYd
+         GfLURfNYFpx3hYNL3nxVvCDZ9lLR4vu8nEtZ8t4iXokzKcYvvWgasUtu3xAfx1KLTotD
+         8B0aGkUFhEZLIIJS+FTB2G3rGo3eILBR3xXsQG4E3m54e0VSw2ZVIY9w9tZro7wxtvtq
+         sfiIVv4W5ffsdkbW3G9DLhN/oMU+OK/WtB3AypWGvMIT9rC8GcTmC+5Gd6T070PMsrlA
+         0kGw==
+X-Gm-Message-State: AOAM532Ks+nRw5DapSZ7wbs6Fwy6AOUqlB/OSOAz4HK7GWOkuPTHHbGQ
+        Pw9OybXt5YjCi4rWSle6M2yGSQ==
+X-Google-Smtp-Source: ABdhPJy7PzQlsoFAhL/5nP5uePzyN9D+3lTBYWt8xfk4DVXO5W6tcsmGikWZnPr0rN62xnxYhv+yfQ==
+X-Received: by 2002:ac8:5fd2:0:b0:2e1:b346:7505 with SMTP id k18-20020ac85fd2000000b002e1b3467505mr4464103qta.94.1648735657640;
+        Thu, 31 Mar 2022 07:07:37 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id 8-20020ac85948000000b002e1cd3fa142sm20349064qtz.92.2022.03.31.07.07.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 07:07:36 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 10:07:35 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     Zhang Wensheng <zhangwensheng5@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, nbd@other.debian.org,
+        yukuai3@huawei.com
+Subject: Re: [PATCH -next] nbd: fix possible overflow on 'first_minor' in
+ nbd_dev_add()
+Message-ID: <YkW1p4oP9mmcuwK9@localhost.localdomain>
+References: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] MAINTAINERS: add drbd co-maintainer
-Content-Language: en-US
-To:     =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        linux-block@vger.kernel.org
-References: <20220331134236.776524-1-christoph.boehmwalder@linbit.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220331134236.776524-1-christoph.boehmwalder@linbit.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 7:42 AM, Christoph Böhmwalder wrote:
-> In light of the recent controversy surrounding the (lack of)
-> maintenance of the in-tree DRBD driver, we have decided to add myself
-> as co-maintainer. This allows us to better distribute the workload and
-> reduce the chance of patches getting lost.
+On Thu, Mar 10, 2022 at 05:32:24PM +0800, Zhang Wensheng wrote:
+> When 'index' is a big numbers, it may become negative which forced
+> to 'int'. then 'index << part_shift' might overflow to a positive
+> value that is not greater than '0xfffff', then sysfs might complains
+> about duplicate creation. Because of this, move the 'index' judgment
+> to the front will fix it and be better.
 > 
-> I will be keeping an eye on the mailing list in order to ensure that all
-> patches get the attention they need.
+> Fixes: b0d9111a2d53 ("nbd: use an idr to keep track of nbd devices")
+> Fixes: 940c264984fd ("nbd: fix possible overflow for 'first_minor' in nbd_dev_add()")
+> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
 
-Can you go over the ones I already listed? That'd be a good start.
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
 
--- 
-Jens Axboe
+Thanks,
 
+Josef
