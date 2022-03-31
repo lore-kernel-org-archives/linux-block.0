@@ -2,129 +2,434 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D28C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 30 Mar 2022 20:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59FEDC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 00:11:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232177AbiC3UXY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 30 Mar 2022 16:23:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57644 "EHLO
+        id S1343702AbiCaANH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 30 Mar 2022 20:13:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232001AbiC3UXY (ORCPT
+        with ESMTP id S1352077AbiCaAM5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 30 Mar 2022 16:23:24 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70A6B3BA5F
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 13:21:38 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id r2so26125484iod.9
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 13:21:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=4qH3sjnyZ0sZu4IU936XgcnySyKMmLOeeiMCINTicno=;
-        b=ZJ+jUXzm23avbF4K9SMxVMSicBNjPYuCYIOA/vgGY7WcSGsJmLUM1ErMcEtaeIqcv2
-         5PmOQQlBL8qzz8DbV5/asR0cLg/3usp6ksXP577st28dW3h7SBsNIq+vGM4/nYGH8it0
-         zL1k7aFl+eIzbY3dTkkPFhg5YzRjNGvcKUoI5M7oMzowN22RQU+WhikR92H9JGIEn70t
-         B7w4iP61DZeYtxEg1oHF3lT6Iir4HpuolHxffRhYmYEbDRG1kl6fI2ONcslYOiXS451N
-         YRiIVOjligELpykhgcE05vEvBVNbwEM6j4d50Kx9I2z9kYSlVqU7b0pOma+LAgGVvEqf
-         o7/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=4qH3sjnyZ0sZu4IU936XgcnySyKMmLOeeiMCINTicno=;
-        b=m2qu/X2QkPvsm3yebuO23wkDGeGyXBXrk9ZU4j6r3OUBedKU+MyuDZ3s3/LM/qf83p
-         krFkgSJSz6NAUyQqbJWDEuvVAOh9OF9zQY7XdaJ9r+El3cG5NAj1QAGGFS/NrM3SJp89
-         YbA9nT6yl/9CwwJ11heNBnTkk9TxROntL2TJtverC3W8X2TLigu/z8VynNn1TcAlFwXN
-         wLlotAGv4iJiAljoN3rsujMvCEj8xD4IAa/bIZxhUKmA8rQBsB7JwO+rADf7KivGO7yu
-         WFPql7pM0bqPTPNMr9ow6bQeubghy2+nYfklsx0MPkx7Oi6HlCLI7RwHYmg7WWfiJ4+/
-         P4bw==
-X-Gm-Message-State: AOAM533mgaZ9F4OWvNfYnn7ybwKx8qY3pJ/TDM2Ebz1laMchAg1pP3tB
-        o4e0UcvF9tqZkrjncCOyj38tpw==
-X-Google-Smtp-Source: ABdhPJxiHd4wWA49qUn6yTSxex2CITvWAs8MaDikj6dKgx6kY3gZ6gIFiWxA3BuSpcV+jcVERuHs8w==
-X-Received: by 2002:a05:6638:25c4:b0:323:a5ba:e1a2 with SMTP id u4-20020a05663825c400b00323a5bae1a2mr324273jat.135.1648671697776;
-        Wed, 30 Mar 2022 13:21:37 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id b12-20020a6be70c000000b00648f61d9652sm11510617ioh.52.2022.03.30.13.21.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Mar 2022 13:21:37 -0700 (PDT)
-Message-ID: <a5fbb7f3-8b0a-eef9-6479-dedc9fc6a425@kernel.dk>
-Date:   Wed, 30 Mar 2022 14:21:35 -0600
+        Wed, 30 Mar 2022 20:12:57 -0400
+Received: from mail-4323.proton.ch (mail-4323.proton.ch [185.70.43.23])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E585ADF97;
+        Wed, 30 Mar 2022 17:11:10 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 00:11:03 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=michaelmarod.com;
+        s=protonmail; t=1648685468;
+        bh=aQAHdEh9CFGeN0ix9xdk6IHB3uKzVIyJqjomh+kjACg=;
+        h=Date:To:From:Reply-To:Subject:Message-ID:In-Reply-To:References:
+         From:To:Cc:Date:Subject:Reply-To:Feedback-ID:Message-ID;
+        b=JN14ZdGay9soqOysc3GBRYTvrNMKaPUh+rI1CxOJydExeHe5HVQFIxnnN14bd7gPo
+         s2n9wMvZgN6998AgzwvwDNlIx9dss189mezS6x17Pwugwbf8CfM0l4f7lrGGz2kuub
+         NUyL7wYW3BCvSWpyKXN8mbIF4b5Ov7gkONm58wQg=
+To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+From:   Michael Marod <michael@michaelmarod.com>
+Reply-To: Michael Marod <michael@michaelmarod.com>
+Subject: Re: NVME performance regression in Linux 5.x due to lack of block level IO queueing
+Message-ID: <C06B8EF0-BF3B-4F14-994F-F80B5102D538@michaelmarod.com>
+In-Reply-To: <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com>
+References: <51E3A396-F68B-496D-AE36-B0457A3B0968@michaelmarod.com> <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [Drbd-dev] state of drbd in mainline
-Content-Language: en-US
-To:     "Kiselev, Oleg" <okiselev@amazon.com>,
-        Philipp Reisner <philipp.reisner@linbit.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Christoph Hellwig <hch@lst.de>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "Herrenschmidt, Benjamin" <benh@amazon.com>,
-        "Smith, Stewart" <trawets@amazon.com>
-References: <20220329070618.GA20396@lst.de>
- <CADGDV=UgjZAbmAN-2bO1nyDvA=XCC9Lf2dxWHZ0BwxF12nnztQ@mail.gmail.com>
- <20220329073254.GA20691@lst.de>
- <CADGDV=U5jwe0CZ12174cMahfD_h-GsBswWaA1VOJbHaC1nsrUw@mail.gmail.com>
- <f9d89282-3a67-ad97-149f-52325e23607c@kernel.dk>
- <CADGDV=WN2TFR6dO7ZdiQ2ijPjs+7HSsvk0ZCHsHj6ZG5t-oEdA@mail.gmail.com>
- <3c42b1ed-7c03-64e6-409e-e92247288cac@kernel.dk>
- <CADGDV=WcTSSC70yG61dazo-WyoLOzp3r+nOk-Eg2x_Ncx=3nRg@mail.gmail.com>
- <7AD2D6DC-0609-42F9-A481-B6E5C0F58180@amazon.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <7AD2D6DC-0609-42F9-A481-B6E5C0F58180@amazon.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/30/22 1:31 PM, Kiselev, Oleg wrote:
-> AWS RDS is a major user of drbd.  We are probably responsible for the
-> substantial percentage of drbd users in the world.  We are currently
-> on drbd-8.4.  We will eventually migrate to drbd-9, but at our scale
-> this isn't going to happen very soon.  
-> 
-> The last time we needed to patch drbd was back in 2018.  We've not
-> diagnosed any reportable issues with drbd-8.4 in the past ~4 years.
-> It's a stable, mature driver.   We would prefer for drbd-8 to continue
-> being available in the upstream tree.  We'd also welcome drbd-9 being
-> available in-tree as soon as possible: it will make life much easier
-> for other AWS teams that are currently working on DRBD deployment.
+Cross-posting from linux-kernel to linux-block as it relates to linux-block=
+ primarily.
 
-Thanks for the info, that's useful and good to know. My objection was as
-much about ignoring patches that are sent for drbd, I don't recall
-seeing any replies to those kinds of emails in the last 3-4 years. Part
-of maintaining an in-tree driver is also dealing with those in a
-reasonable amount of time, and ensuring that they make it upstream. And
-the one bug fix that does look important was just sent upstream only
-because of this discussion, and that's been lingering for a year it
-seems.
+Also realized that "Fix" is the wrong thing to say in my previous email -- =
+"Edit" would have made more sense. The issue still remains, I just meant to=
+ correct my first email.
 
-Roughly ordered by date:
+Finally wanted to point out that on both systems, the scheduler is set to "=
+none".
 
-https://lore.kernel.org/all/20220327070918.8465-1-xiam0nd.tong@gmail.com/
-https://lore.kernel.org/all/1648436049-4335-1-git-send-email-baihaowen@meizu.com/
-https://lore.kernel.org/all/YbpERiPKO4ufe1hf@pc638.lan/
-https://lore.kernel.org/all/20211213223331.135412-11-keescook@chromium.org/
-[PATCH 0/2] drbd: Make use of PFN_UP helper macro (only on drbd list)
-https://lore.kernel.org/all/20210525065925.3978-1-lyl2019@mail.ustc.edu.cn/
-https://lore.kernel.org/all/1619774456-116567-1-git-send-email-jiapeng.chong@linux.alibaba.com/
-https://lore.kernel.org/all/20210426163032.3454129-1-christoph.boehmwalder@linbit.com/ (the referenced patch)
-https://lore.kernel.org/all/20210402070713.4069-1-lyl2019@mail.ustc.edu.cn/ (use after free, security issue?)
-https://lore.kernel.org/all/20201026215043.3893318-1-arnd@kernel.org/
+Thanks,
+Michael
 
-This is just going back a bit, by no means an exhaustive list. Looking back
-to 2016-2017 and I see zero replies in emails like the above, not one.
-Everybody misses patches here and there, that's common. What isn't common
-is blatantly ignoring everything for, what, 5 years?
+> On Mar 30, 2022, at 10:49 AM, Michael Marod <michael@michaelmarod.com> wr=
+ote:
+>
+> Fix: There were 0 "IO unplugs" and 5 "Timer unplugs" on the Linux 4.4.0 i=
+nstance and 5 "IO unplugs" and 0 "Timer unplugs" on the Linux 5.4.0 one.
+>
+>> On Mar 30, 2022, at 10:31 AM, Michael Marod <michael@michaelmarod.com> w=
+rote:
+>>
+>> It has been noticed in an AWS Cloud environment that the IO performance =
+on an Ubuntu Bionic 18.04 i3 instance with Linux 5.4.0 is significantly wor=
+se than that of an Ubuntu Xenial 16.04 i3 instance with Linux 4.4.0. I've b=
+een digging into the issue and it seems like block level queueing is not wo=
+rking as well (if at all?) on the Linux 5 instance. When I've run performan=
+ce tests using fio, iostat reports 0.00 average queue size for the Linux 5.=
+4.0 instance but goes up to 0.5 or higher on the 4.4.0 one.
+>>
+>> In my setup, I have 2 NVMe devices (/dev/nvme0n1 and /dev/nvme1n1) confi=
+gured in a raid0 on /dev/md127 which is mounted on /opt. I've tested device=
+s directly and through the RAID controller and it does not seem to make a d=
+ifference. In the output below I am writing through /opt which exercises th=
+e file system and RAID controller. Also, fio was compiled from source with =
+latest version on both instances.
+>>
+>> # fio -name=3Drandrw -filename=3D/opt/testfile -direct=3D1 -thread -rw=
+=3Drandrw -ioengine=3Dpsync -bs=3D4k -size=3D10G -numjobs=3D1 -group_report=
+ing=3D1 -runtime=3D120
+>>
+>> Note: these are different versions of iostat which is why the output is =
+different
+>>
+>> # Linux 4.4.0-1137-aws:
+>> Device:         rrqm/s   wrqm/s     r/s     w/s    rkB/s    wkB/s avgrq-=
+sz avgqu-sz   await r_await w_await  svctm  %util
+>> nvme1n1           0.00     0.00 3248.00 3173.00 12992.00 12692.00     8.=
+00     0.44    0.07    0.10    0.03   0.07  44.00
+>> nvme0n1           0.00     0.00 3229.00 3292.00 12916.00 13168.00     8.=
+00     0.47    0.07    0.10    0.04   0.07  46.80
+>>
+>> # Linux 5.4.0-1068-aws:
+>> Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rr=
+qm  %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+>> nvme0n1       2842.57 2789.11  11370.30  11156.44     0.00     0.00   0.=
+00   0.00    0.10    0.04   0.00     4.00     4.00   0.18  99.01
+>> nvme1n1       2849.50 2748.51  11398.02  10994.06     0.00     0.00   0.=
+00   0.00    0.10    0.04   0.00     4.00     4.00   0.18  99.01
+>>
+>> For another (possibly simpler) demonstration -- I ran blktrace/blkparse =
+on both Linux 4.4.0 and 5.5.0 instances with the same hardware (i3.4xlarge)=
+. Then I used fio to do a simple stress test that sends 5 write requests.
+>>
+>> # fio -name=3Dwrite -filename=3D/opt/testfile -direct=3D1 -thread -rw=3D=
+write, -ioengine=3Dpsync -bs=3D4k -size=3D4k -numjobs=3D5 -group_reporting=
+=3D1 -runtime=3D5
+>>
+>> The blkparse output shows that the Linux 4.4.0 instance had 5 "Writes Qu=
+eued" while the Linux 5.4.0 one had 0. Additionally, there were 0 "IO unplu=
+gs" and 5 "Timer unplugs" on the Linux 4.4.0 instance and 5 "Timer unplugs"=
+ and 0 "IO unplugs" on the Linux 5.4.0 one.
+>>
+>> // On the Bionic machine with Linux 5.4.0-1068-aws #72~18.04.1-Ubuntu SM=
+P Thu Mar 3 08:49:49 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux:
+>> # blktrace -d /dev/nvme0n1 -d /dev/nvme1n1 -o - | blkparse -i -
+>> 259,0   12        1     0.000000000 114067  A  WS 401408 + 8 <- (9,127) =
+274432
+>> 259,0   12        2     0.000003433 114067  G  WS 401408 + 8 [fio]
+>> 259,0   12        3     0.000004078 114067  P   N [fio]
+>> 259,0   12        4     0.000004548 114067  U   N [fio] 1
+>> 259,0   12        5     0.000005654 114067  D  WS 401408 + 8 [fio]
+>> 259,0    4        1     0.000045379     0  C  WS 401408 + 8 [0]
+>> 259,0   14        1     0.000210927     0  C  WS 401408 + 8 [0]
+>> 259,0   14        2     0.000254591 114065  A  WS 401408 + 8 <- (9,127) =
+274432
+>> 259,0   14        3     0.000257373 114065  G  WS 401408 + 8 [fio]
+>> 259,0   14        4     0.000257853 114065  P   N [fio]
+>> 259,0   14        5     0.000258340 114065  U   N [fio] 1
+>> 259,0   14        6     0.000259293 114065  D  WS 401408 + 8 [fio]
+>> 259,0    8        2     0.000290583     0  C  WS 401408 + 8 [0]
+>> 259,0   13        1     0.000080964 114068  A  WS 401408 + 8 <- (9,127) =
+274432
+>> 259,0   13        2     0.000083702 114068  G  WS 401408 + 8 [fio]
+>> 259,0   13        3     0.000084247 114068  P   N [fio]
+>> 259,0   13        4     0.000084654 114068  U   N [fio] 1
+>> 259,0   13        5     0.000085801 114068  D  WS 401408 + 8 [fio]
+>> 259,0    3        1 1266874889.709450585 114066  A  WS 401408 + 8 <- (9,=
+127) 274432
+>> 259,0    3        2 1266874889.709455280 114066  G  WS 401408 + 8 [fio]
+>> 259,0    3        3 1266874889.709456267 114066  P   N [fio]
+>> 259,0    3        4 1266874889.709456843 114066  U   N [fio] 1
+>> 259,0    3        5 1266874889.709458888 114066  D  WS 401408 + 8 [fio]
+>> 259,0   15        1     0.000164738 114069  A  WS 401408 + 8 <- (9,127) =
+274432
+>> 259,0   15        2     0.000168016 114069  G  WS 401408 + 8 [fio]
+>> 259,0   15        3     0.000168571 114069  P   N [fio]
+>> 259,0   15        4     0.000169037 114069  U   N [fio] 1
+>> 259,0   15        5     0.000169993 114069  D  WS 401408 + 8 [fio]
+>> 259,0   10        1     0.000128797     0  C  WS 401408 + 8 [0]
+>> ^C259,0    8        1 1266874889.709500996     0  C  WS 401408 + 8 [0]
+>> CPU3 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             1        =09 Timer unplugs:           0
+>> CPU4 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU8 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        2,   =
+     8KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU10 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU12 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             1        =09 Timer unplugs:           0
+>> CPU13 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             1        =09 Timer unplugs:           0
+>> CPU14 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             1        =09 Timer unplugs:           0
+>> CPU15 (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             3
+>> IO unplugs:             1        =09 Timer unplugs:           0
+>>
+>> Total (259,0):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        5,   =
+    20KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        5,   =
+    20KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> IO unplugs:             5        =09 Timer unplugs:           0
+>>
+>> Throughput (R/W): 0KiB/s / 0KiB/s
+>> Events (259,0): 30 entries
+>> Skips: 0 forward (0 -   0.0%)
+>>
+>> // On the Xenial machine with 4.4.0-1137-aws #151-Ubuntu SMP Tue Mar 1 0=
+9:47:43 UTC 2022 x86_64 x86_64 x86_64 GNU/Linux
+>> # blktrace -d /dev/nvme0n1 -d /dev/nvme1n1 -o - | blkparse -i -
+>> 259,1    1        1     0.000000000 82519  Q  WS 399368 + 8 [fio]
+>> 259,1    1        2     0.000000980 82519  G  WS 399368 + 8 [fio]
+>> 259,1    1        3     0.000003468 82519 UT   N [fio] 1
+>> 259,1    1        4     0.000003867 82519  I  WS 399368 + 8 [fio]
+>> 259,1    1        5     0.000011785  1393  D  WS 399368 + 8 [kworker/1:1=
+H]
+>> 259,1    2        1 1266874889.709465021 82517  Q  WS 399368 + 8 [fio]
+>> 259,1    2        2 1266874889.709467133 82517  G  WS 399368 + 8 [fio]
+>> 259,1    2        3 1266874889.709471568 82517 UT   N [fio] 1
+>> 259,1    2        4 1266874889.709471568 82517  I  WS 399368 + 8 [fio]
+>> 259,1    2        5 1266874889.709476205   980  D  WS 399368 + 8 [kworke=
+r/2:1H]
+>> 259,1   15        1     0.000051309     0  C  WS 399368 + 8 [0]
+>> 259,1    3        1     0.000079179 82520  Q  WS 399368 + 8 [fio]
+>> 259,1    3        2     0.000080079 82520  G  WS 399368 + 8 [fio]
+>> 259,1    3        3     0.000082140 82520 UT   N [fio] 1
+>> 259,1    3        4     0.000082391 82520  I  WS 399368 + 8 [fio]
+>> 259,1    3        5     0.000087819   975  D  WS 399368 + 8 [kworker/3:1=
+H]
+>> 259,1   12        1     0.000125455     0  C  WS 399368 + 8 [0]
+>> 259,1    5        1     0.000152778 82521  Q  WS 399368 + 8 [fio]
+>> 259,1    5        2     0.000153811 82521  G  WS 399368 + 8 [fio]
+>> 259,1    5        3     0.000155811 82521 UT   N [fio] 1
+>> 259,1    5        4     0.000156314 82521  I  WS 399368 + 8 [fio]
+>> 259,1    5        5     0.000168577  1552  D  WS 399368 + 8 [kworker/5:1=
+H]
+>> 259,1    7        1     0.000206251     0  C  WS 399368 + 8 [0]
+>> 259,1    9        1     0.000234725 82518  Q  WS 399368 + 8 [fio]
+>> 259,1    9        2     0.000235496 82518  G  WS 399368 + 8 [fio]
+>> 259,1    9        3     0.000237147 82518 UT   N [fio] 1
+>> 259,1    9        4     0.000237382 82518  I  WS 399368 + 8 [fio]
+>> 259,1    9        5     0.000242425  2001  D  WS 399368 + 8 [kworker/9:1=
+H]
+>> 259,1   15        2     0.000290161     0  C  WS 399368 + 8 [0]
+>> 259,1   13        1 1266874889.709520875     0  C  WS 399368 + 8 [0]
+>> ^CCPU1 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           1,   =
+     4KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           1
+>> CPU2 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           1,   =
+     4KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           1
+>> CPU3 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           1,   =
+     4KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           1
+>> CPU5 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           1,   =
+     4KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           1
+>> CPU7 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU9 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           1,   =
+     4KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        1,   =
+     4KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        0,   =
+     0KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           1
+>> CPU12 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU13 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        1,   =
+     4KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>> CPU15 (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           0,   =
+     0KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        0,   =
+     0KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        2,   =
+     8KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> Read depth:             0        =09 Write depth:             2
+>> IO unplugs:             0        =09 Timer unplugs:           0
+>>
+>> Total (259,1):
+>> Reads Queued:           0,        0KiB=09 Writes Queued:           5,   =
+    20KiB
+>> Read Dispatches:        0,        0KiB=09 Write Dispatches:        5,   =
+    20KiB
+>> Reads Requeued:         0=09=09 Writes Requeued:         0
+>> Reads Completed:        0,        0KiB=09 Writes Completed:        5,   =
+    20KiB
+>> Read Merges:            0,        0KiB=09 Write Merges:            0,   =
+     0KiB
+>> IO unplugs:             0        =09 Timer unplugs:           5
+>>
+>> Throughput (R/W): 0KiB/s / 0KiB/s
+>> Events (259,1): 30 entries
+>> Skips: 0 forward (0 -   0.0%)
+>>
+>> Please CC me directly as I am not subscribed to LKML.
+>>
+>> Thanks,
+>>
+>> -- Michael Marod (michael@michaelmarod.com)
+>
 
-I'm not here to babysit unmaintained drivers. linbit need to get their
-act together and maintain the driver, or it will get removed.
-
--- 
-Jens Axboe
 
