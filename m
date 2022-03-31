@@ -2,93 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBDCC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 10:13:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 749B9C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 12:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234534AbiCaKO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 06:14:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44112 "EHLO
+        id S232373AbiCaMDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 08:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234528AbiCaKOy (ORCPT
+        with ESMTP id S235506AbiCaMCh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 06:14:54 -0400
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6E81EECC;
-        Thu, 31 Mar 2022 03:13:07 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id p12-20020a05600c430c00b0038cbdf52227so1700011wme.2;
-        Thu, 31 Mar 2022 03:13:07 -0700 (PDT)
+        Thu, 31 Mar 2022 08:02:37 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8671F2F03A
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 04:59:36 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id y6so20648840plg.2
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 04:59:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=dKkMeptSr36K5MwCeZt80OcWRzRb8UQj5WuimYmARbo=;
-        b=c10QXVAA0Dxut1I4GVKnE6PpwlNm0nURglIWMhhy1wcvOUIEJmH6LQPMS4+/m9NsM+
-         O+8PZ2Py09DfMoTm4qXKMZ/tjQhrkBlfiF/ErHDRMUPPnlmZ/eSzuTG1V6v8BG/VyEhd
-         z57tNNUuecaGNY88UTnbsv1gh3F/ZntaLP47gacjslesFqdl6wIwkC5usWzpYrWJAPI8
-         my1EDtJOn5iNc2D3YdzLjXzjGZxKnOCPrzRIDGC92xb/LA8g+Kuz0zIOvN588l7AlEUD
-         V99MVKVsr3zjmDomQt3p2uMAIN+pXCkggSQPjX/1JXBwj/CUVbHRB44ztrJptjto2MxY
-         HroA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=KCzd1cYmD81YFpA7sO7MsSj7P6a5wWaVyEmyHM8Jq4Y=;
+        b=OoI6T+guOwttwBls41pWyMV89jUSiZu+HkclfzaLZyCBwB1ptiYCLbBrOftTK5AEFV
+         G91f6U0S/k+5Tq4c3tdWWf6kSa6WESuEOUEIbAomploca2YgEAOyYwQmq4q3J68Nb2J8
+         NSiBvYsHlQ6ECiUIkvFvYhkjVPu1OLsVcZoBMXT/FOqPMvPbQkskNBxhvBLcx0yfbvPw
+         xqjBXxixF9KCprW8EeGyazYZy3jquoD/ofsrXVTWdrYIZCxsyDMAOk27GkKrF9dd9jej
+         +o+zMaPmR2JQyYip8Ve7Cz0wfEFt6TSrj/St0ueukRTVEf8Ya8YXvwelzveFdoJNvPu/
+         qZLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=dKkMeptSr36K5MwCeZt80OcWRzRb8UQj5WuimYmARbo=;
-        b=ckX1hQeMnVfQX6qGf3AHpRyLLh+Ef3O/dP+FuclM2W1Ube60CDMJqWcqwwAQHMFIcQ
-         fBWJmyijpQdOwlEYgBaxXpJViwGd7aRoFJPiPy/Hsn8Iau+PFovgdRHXgBl/bRvwoB3E
-         SjlFfTE+B3/wRxBgyn5bL2q1bLEV4bQbpGpabnITf0f40yuRKybfJlotM/jh4j4FhWA+
-         1n9VgEIbIf2s+wNBG9oYYuekfQya8r/axS6iysvgUJUK5qcLH9vvP0kpTBV4sVr0lx3X
-         Bd5pb2F4I5Xg6xL1SzVOM+jd5mOpuMpEmRh8MVkRB++qJzog/znJaFLCiboOKI+9fig7
-         x2qA==
-X-Gm-Message-State: AOAM530KrNp0/RzIq5QQojWAgfEMHDhbhF7X47iobqs3hb6uozl8foIt
-        KHEWyILcg6ltFGmQR2EVDo7c2xbyOtE=
-X-Google-Smtp-Source: ABdhPJw65pMOd/a/TkP+RPpEPUTYbErdPZV0+1TQOfGoel/Y4yrLicjLv1Mqe6jtdNx2Z1YhYacByA==
-X-Received: by 2002:a05:600c:6001:b0:38c:6c43:4427 with SMTP id az1-20020a05600c600100b0038c6c434427mr4036846wmb.186.1648721585268;
-        Thu, 31 Mar 2022 03:13:05 -0700 (PDT)
-Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
-        by smtp.gmail.com with ESMTPSA id t9-20020a05600c198900b0038cb8b38f9fsm7163875wmq.21.2022.03.31.03.13.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 03:13:03 -0700 (PDT)
-From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Wenchao Hao <haowenchao@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, linfeilong@huawei.com
-Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
-Date:   Thu, 31 Mar 2022 12:13:01 +0200
-Message-ID: <1722561.VLH7GnMWUR@leap>
-In-Reply-To: <YkVwt4s+K0haRpbr@infradead.org>
-References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <10056508.nUPlyArG6x@leap> <YkVwt4s+K0haRpbr@infradead.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=KCzd1cYmD81YFpA7sO7MsSj7P6a5wWaVyEmyHM8Jq4Y=;
+        b=4rTVBZLPRCqBVSpF68yDXYpqNpcgatDlkqVvbq5E6vYc4ih9pW3r4G/9GAzE52gEXZ
+         ZnGZJue1GrOIFMIZDLxhcs4ZznrzwFygopWyGbKwNkwjCZv46nX3EoNPCNH4QEUWagEh
+         KKMyIi/owT5VxsNSl7JyECMOkdzpMTv9vsfq6zLi0iarS6uD5Xnq98QPUjOWiIRiZ6LT
+         n1na1BJxll+BFp58OA5eQqvpSpz1umkT/khNTCqU8qIUoFMNQHfnj0XK2wbAc3A0BBGb
+         wRxny6cNn0ySKwZZ6y7ftYaNxIDC0RhcObOi3zqyJqMgGmW6711uDT0GHfa4Me3koQwr
+         ZhQg==
+X-Gm-Message-State: AOAM532z4Nb/sT9NcJdKxlq6IOUOei+IDiNjMuoyeMp3/oP+uSJLfWgQ
+        Tei0y2OL/aqvj6gkX79/nYR1Jg==
+X-Google-Smtp-Source: ABdhPJzBYMxAps8GRFmVQoDt80yzI/kS5BlUW/Gbsw8dPIcwbpoEc3gPEZZ8sGb11FRejcmmhmmP6g==
+X-Received: by 2002:a17:90b:4f41:b0:1c7:928d:196e with SMTP id pj1-20020a17090b4f4100b001c7928d196emr5707713pjb.47.1648727975265;
+        Thu, 31 Mar 2022 04:59:35 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id l18-20020a056a00141200b004f75395b2cesm27528667pfu.150.2022.03.31.04.59.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Mar 2022 04:59:34 -0700 (PDT)
+Message-ID: <a7b2fe8d-9967-2046-67a5-62d10e95a861@kernel.dk>
+Date:   Thu, 31 Mar 2022 05:59:33 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v2] block: use dedicated list iterator variable
+Content-Language: en-US
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Bart Van Assche <bvanassche@acm.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>
+References: <20220331091218.641532-1-jakobkoschel@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220331091218.641532-1-jakobkoschel@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On gioved? 31 marzo 2022 11:13:27 CEST Christoph Hellwig wrote:
+On 3/31/22 3:12 AM, Jakob Koschel wrote:
+> To move the list iterator variable into the list_for_each_entry_*()
+> macro in the future it should be avoided to use the list iterator
+> variable after the loop body.
 > 
-> .. and then the cleanup patch would need the same logic.  But thinking
-> about it I don't think we actually can do that due to the split
-> unregistration.  So I take my suggestion back.
-> 
+> To *never* use the list iterator variable after the loop it was
+> concluded to use a separate iterator variable instead of a
+> found boolean [1].
 
-If I understand correctly, after thinking about it some more, you decided 
-to withdraw your own suggestion.
+Not a huge fan of doing a helper for this single use, but I guess it
+does make the main function easier to code. So I guess that's fine. But
+can you move the call down where the result is checked?
 
-Dan had already approved this patch.
+qe = blk_lookup_qe_pair(head, q);
+if (!qe)
+	return;
 
-Therefore, I'll leave the patch as it is now and wait for someone to place
-a "Reviewed-by" tag and Maintainers to merge (if, in the meantime, nobody 
-else require further changes).
+I prefer no distance between call and check, makes it easier to read. I
+can make the edit locally and note it in the commit message so you don't
+have to re-send it. Let me know, or just resend a v3.
 
-Thanks,
-
-Fabio 
-
-
+-- 
+Jens Axboe
 
