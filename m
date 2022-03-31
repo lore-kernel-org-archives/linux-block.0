@@ -2,89 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C190C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 12:06:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2325C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 12:07:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235808AbiCaMIG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 08:08:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53122 "EHLO
+        id S235701AbiCaMIt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 08:08:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235701AbiCaMH4 (ORCPT
+        with ESMTP id S235714AbiCaMIr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 08:07:56 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2ECE4C7BD
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:05 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id m18so18321153plx.3
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:05 -0700 (PDT)
+        Thu, 31 Mar 2022 08:08:47 -0400
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9931B1D1921
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:55 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id o13so19799022pgc.12
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=JFDL+YbHXOZXfT1eYe4XgKv9dr6pUyV1bxUS3LMlVKs=;
-        b=BVkhl/wnZn20LFoc5PiYLZq2Ii7PW5AYyao3RUkUuSJu6nLDJtGtbjInoCbG7UlKn4
-         YOY9//OqoITxoW1EG99CV6YEll7X0H9PlR1kgndTt3cypgTga4bTr+KTFyOJn4DmRZIE
-         sItqN0ySg6F1XvCWYv5ByNQ2HTgQCDOuWQghBKo0px80GsDjx+770m6mv2H+oQzTJMJL
-         s/mSXJrLyiViVYnadVgH96k0U8vsVmHHvCx1xe9+ivT9hPzv5g7wSdyzDyYhmkMiLo2C
-         0eUt9s5MYlNcRli/fSmplOfiy1+PGjK0skXPhH0E6ZJ65pBvwFv0reSg+ESLn91H5Su2
-         E6Bw==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=ajAH84Era5KkgIhOHwE81m3fGO3ciHDG++KPPLyfwho=;
+        b=o6Kca80XlDby8UicvWJFnGD/S4zB+msvdJGsi3MWk6P8D7MCMe/EVF8PVgu+Hh9BP6
+         VYjvaeZlC5nAXvTlmmpUyLad3VA53z/q28HdJkOoz4P5j04U/0UeLgtpIHSB1eOR+3P6
+         8xpcAGqThykG9tcWtss60SdU033mPxyX00eaDGphvQq250l7bVeIuuT4kdEb8vS+LUfl
+         WLOR3uFmUlpLzhYHt0vyOi9whtFfYWJRYN+JKtNqzvvD+T2L5YOS6i4tij2gSA+Fj0zQ
+         8w3RB9EBR4vb9+10Sue/pOi9p6ESnQwY7gx7FrEHCtWsSZCsQ00f7r/nvNi6YY34LQN1
+         0jxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=JFDL+YbHXOZXfT1eYe4XgKv9dr6pUyV1bxUS3LMlVKs=;
-        b=E1NDqZstXLsu0B12OQImGyA94yyi1cv1hadUTazQyRDD+TnoN3VQOWHu/5KyJ8x3Ku
-         cxrDQyPFH0z5HdYDeVTCwMWBwVffTA8gDVCqmA9ixLU1cqs0e7hpIsbPYrFLbxPGUyqG
-         zynMtGlDOf2tZvv7A3ozawtGH6Cv824Q/5iWu5Q/YfsqbQlj4yRomjZ3sxlDj+5PGQ7w
-         WK0UIb3clAXL7sENaKS/6q/O69dTvdqsUm7xZ4fWunwg/hsB49RMVgkvuXEFRWyvDcqu
-         JmfJe97fxMelt1j/frASsJWH/nVq3VJhGyG7uS31xsNwUiwlTrGvN5aFlQxB7gmBq1pN
-         Y7Lg==
-X-Gm-Message-State: AOAM532eQLm0/FU1aopDGSbN/WLohor99+TfK9iQ47ljkv4se565EdzK
-        W8JMINBV1zVRN7NUMFg6KRti1g==
-X-Google-Smtp-Source: ABdhPJzm4oBw1lo9Ze3zlT8Vr0B1J2Ro5YuyME4y3100hRXLcOv6/SLMJKFXM+QhPEeQ9Sso5MSINg==
-X-Received: by 2002:a17:902:7fc2:b0:153:3c90:17b9 with SMTP id t2-20020a1709027fc200b001533c9017b9mr4757024plb.61.1648728365170;
-        Thu, 31 Mar 2022 05:06:05 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id k23-20020a17090a591700b001ca00b46cf9sm4844963pji.18.2022.03.31.05.06.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Mar 2022 05:06:04 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     "Bos, H.J." <h.j.bos@vu.nl>, linux-kernel@vger.kernel.org,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Mike Rapoport <rppt@kernel.org>, linux-block@vger.kernel.org,
-        Bart Van Assche <bvanassche@acm.org>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>
-In-Reply-To: <20220331091218.641532-1-jakobkoschel@gmail.com>
-References: <20220331091218.641532-1-jakobkoschel@gmail.com>
-Subject: Re: [PATCH v2] block: use dedicated list iterator variable
-Message-Id: <164872836394.7852.9344079162179392052.b4-ty@kernel.dk>
-Date:   Thu, 31 Mar 2022 06:06:03 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ajAH84Era5KkgIhOHwE81m3fGO3ciHDG++KPPLyfwho=;
+        b=uKTm+7ysmLsrcXLfSdwKBFqHvo7oKYSgv30RZptiubLPJ4AYPGAHOt22JTOmlHHTW2
+         dysslJoVRe1yWhMqfsakgFQfXZWvis75fLHtRSujX8jpGOxejIaL6UOBx7VDCGTc1mU5
+         fE0utvHSCOKnjhwtyve7PiZVdIEwwiZ83BvEZ1fo8GYUWQXGZHJ8uOrx6yocuF6J7Y3F
+         OQ6Upbw4s97bEIiqql02hC/uy6EwdVbu5dNxc5k+GIAxJlRqJouxWqaZSsuhh1qhU2Ja
+         iSmP9wRHKoh9brGX/glTwSWvdjttp1AMVdO6OzCbuNV0oPPjlZRBTgd7pNavRgHpDxj3
+         nD+A==
+X-Gm-Message-State: AOAM532j+sdsLlLWIKJEKkNFPzxH2jDXvG+Qk/G+v0wVR+8N04mumYbz
+        GnD7KosBhVV2uA1DCdPi+N09rg==
+X-Google-Smtp-Source: ABdhPJy4SLFWxEDZrMqlRYkOz4IFfm2BOt53Gvuy3QwVn6X+4z2A7ZWiREjZQ6MZt5vs5Pwq6hQvQQ==
+X-Received: by 2002:a63:354f:0:b0:398:4ead:866e with SMTP id c76-20020a63354f000000b003984ead866emr10789475pga.322.1648728414613;
+        Thu, 31 Mar 2022 05:06:54 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 73-20020a62194c000000b004fab3b767ccsm29425052pfz.216.2022.03.31.05.06.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Mar 2022 05:06:54 -0700 (PDT)
+Message-ID: <51522714-1194-57cf-b5c2-af497671fa09@kernel.dk>
+Date:   Thu, 31 Mar 2022 06:06:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v2] block: use dedicated list iterator variable
+Content-Language: en-US
+To:     Jakob Koschel <jakobkoschel@gmail.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Mike Rapoport <rppt@kernel.org>,
+        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
+        Cristiano Giuffrida <c.giuffrida@vu.nl>,
+        "Bos, H.J." <h.j.bos@vu.nl>
+References: <20220331091218.641532-1-jakobkoschel@gmail.com>
+ <a7b2fe8d-9967-2046-67a5-62d10e95a861@kernel.dk>
+ <E262CAA9-1B49-4035-9181-28C6FFDBE21F@gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <E262CAA9-1B49-4035-9181-28C6FFDBE21F@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 31 Mar 2022 11:12:18 +0200, Jakob Koschel wrote:
-> To move the list iterator variable into the list_for_each_entry_*()
-> macro in the future it should be avoided to use the list iterator
-> variable after the loop body.
+On 3/31/22 6:00 AM, Jakob Koschel wrote:
 > 
-> To *never* use the list iterator variable after the loop it was
-> concluded to use a separate iterator variable instead of a
-> found boolean [1].
 > 
-> [...]
+>> On 31. Mar 2022, at 13:59, Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> On 3/31/22 3:12 AM, Jakob Koschel wrote:
+>>> To move the list iterator variable into the list_for_each_entry_*()
+>>> macro in the future it should be avoided to use the list iterator
+>>> variable after the loop body.
+>>>
+>>> To *never* use the list iterator variable after the loop it was
+>>> concluded to use a separate iterator variable instead of a
+>>> found boolean [1].
+>>
+>> Not a huge fan of doing a helper for this single use, but I guess it
+>> does make the main function easier to code. So I guess that's fine. But
+>> can you move the call down where the result is checked?
+>>
+>> qe = blk_lookup_qe_pair(head, q);
+>> if (!qe)
+>> 	return;
+>>
+>> I prefer no distance between call and check, makes it easier to read. I
+>> can make the edit locally and note it in the commit message so you don't
+>> have to re-send it. Let me know, or just resend a v3.
+> 
+> I'm fine with you doing the change locally, thanks!
 
-Applied, thanks!
+OK, I did that, it's in. Thanks!
 
-[1/1] block: use dedicated list iterator variable
-      commit: 4a3b666e0ea977dd40adb56c37a91370f76fa19e
-
-Best regards,
 -- 
 Jens Axboe
-
 
