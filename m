@@ -2,108 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2325C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 12:07:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB510C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 12:14:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235701AbiCaMIt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 08:08:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57912 "EHLO
+        id S235916AbiCaMQm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 08:16:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36452 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235714AbiCaMIr (ORCPT
+        with ESMTP id S234316AbiCaMQl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 08:08:47 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9931B1D1921
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:55 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id o13so19799022pgc.12
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 05:06:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=ajAH84Era5KkgIhOHwE81m3fGO3ciHDG++KPPLyfwho=;
-        b=o6Kca80XlDby8UicvWJFnGD/S4zB+msvdJGsi3MWk6P8D7MCMe/EVF8PVgu+Hh9BP6
-         VYjvaeZlC5nAXvTlmmpUyLad3VA53z/q28HdJkOoz4P5j04U/0UeLgtpIHSB1eOR+3P6
-         8xpcAGqThykG9tcWtss60SdU033mPxyX00eaDGphvQq250l7bVeIuuT4kdEb8vS+LUfl
-         WLOR3uFmUlpLzhYHt0vyOi9whtFfYWJRYN+JKtNqzvvD+T2L5YOS6i4tij2gSA+Fj0zQ
-         8w3RB9EBR4vb9+10Sue/pOi9p6ESnQwY7gx7FrEHCtWsSZCsQ00f7r/nvNi6YY34LQN1
-         0jxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ajAH84Era5KkgIhOHwE81m3fGO3ciHDG++KPPLyfwho=;
-        b=uKTm+7ysmLsrcXLfSdwKBFqHvo7oKYSgv30RZptiubLPJ4AYPGAHOt22JTOmlHHTW2
-         dysslJoVRe1yWhMqfsakgFQfXZWvis75fLHtRSujX8jpGOxejIaL6UOBx7VDCGTc1mU5
-         fE0utvHSCOKnjhwtyve7PiZVdIEwwiZ83BvEZ1fo8GYUWQXGZHJ8uOrx6yocuF6J7Y3F
-         OQ6Upbw4s97bEIiqql02hC/uy6EwdVbu5dNxc5k+GIAxJlRqJouxWqaZSsuhh1qhU2Ja
-         iSmP9wRHKoh9brGX/glTwSWvdjttp1AMVdO6OzCbuNV0oPPjlZRBTgd7pNavRgHpDxj3
-         nD+A==
-X-Gm-Message-State: AOAM532j+sdsLlLWIKJEKkNFPzxH2jDXvG+Qk/G+v0wVR+8N04mumYbz
-        GnD7KosBhVV2uA1DCdPi+N09rg==
-X-Google-Smtp-Source: ABdhPJy4SLFWxEDZrMqlRYkOz4IFfm2BOt53Gvuy3QwVn6X+4z2A7ZWiREjZQ6MZt5vs5Pwq6hQvQQ==
-X-Received: by 2002:a63:354f:0:b0:398:4ead:866e with SMTP id c76-20020a63354f000000b003984ead866emr10789475pga.322.1648728414613;
-        Thu, 31 Mar 2022 05:06:54 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 73-20020a62194c000000b004fab3b767ccsm29425052pfz.216.2022.03.31.05.06.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 05:06:54 -0700 (PDT)
-Message-ID: <51522714-1194-57cf-b5c2-af497671fa09@kernel.dk>
-Date:   Thu, 31 Mar 2022 06:06:52 -0600
+        Thu, 31 Mar 2022 08:16:41 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8751A41629;
+        Thu, 31 Mar 2022 05:14:54 -0700 (PDT)
+Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KThyG6nltzCr6F;
+        Thu, 31 Mar 2022 20:12:38 +0800 (CST)
+Received: from dggpemm500017.china.huawei.com (7.185.36.178) by
+ dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 31 Mar 2022 20:14:52 +0800
+Received: from [10.174.178.220] (10.174.178.220) by
+ dggpemm500017.china.huawei.com (7.185.36.178) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Thu, 31 Mar 2022 20:14:52 +0800
+Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+CC:     <fmdefrancesco@gmail.com>, <axboe@kernel.dk>, <jejb@linux.ibm.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-scsi@vger.kernel.org>, <martin.petersen@oracle.com>,
+        <syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com>,
+        <syzkaller-bugs@googlegroups.com>, <linfeilong@huawei.com>
+References: <20220329154948.10350-1-fmdefrancesco@gmail.com>
+ <20220331152622.616534-1-haowenchao@huawei.com> <20220331054156.GI3293@kadam>
+From:   Wenchao Hao <haowenchao@huawei.com>
+Message-ID: <fdebdbd3-575b-b30e-d37f-dcc6d53a4f53@huawei.com>
+Date:   Thu, 31 Mar 2022 20:14:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.9.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2] block: use dedicated list iterator variable
+In-Reply-To: <20220331054156.GI3293@kadam>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To:     Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Mike Rapoport <rppt@kernel.org>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        "Bos, H.J." <h.j.bos@vu.nl>
-References: <20220331091218.641532-1-jakobkoschel@gmail.com>
- <a7b2fe8d-9967-2046-67a5-62d10e95a861@kernel.dk>
- <E262CAA9-1B49-4035-9181-28C6FFDBE21F@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <E262CAA9-1B49-4035-9181-28C6FFDBE21F@gmail.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.220]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500017.china.huawei.com (7.185.36.178)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 6:00 AM, Jakob Koschel wrote:
+On 2022/3/31 13:41, Dan Carpenter wrote:
+> On Thu, Mar 31, 2022 at 11:26:22AM -0400, 'Wenchao Hao' via syzkaller-bugs wrote:
+>> I do not think it's necessary to call device_del() on this path. If the device
+>> has been added, put_device() would delete it from sysfs. So the origin error
+>> handle is ok with me.
+>>
 > 
+> No.  The original is buggy and it was detected at runtime by syzbot.
+> It's not static analysis, it is an actual bug found in testing.
 > 
->> On 31. Mar 2022, at 13:59, Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 3/31/22 3:12 AM, Jakob Koschel wrote:
->>> To move the list iterator variable into the list_for_each_entry_*()
->>> macro in the future it should be avoided to use the list iterator
->>> variable after the loop body.
->>>
->>> To *never* use the list iterator variable after the loop it was
->>> concluded to use a separate iterator variable instead of a
->>> found boolean [1].
->>
->> Not a huge fan of doing a helper for this single use, but I guess it
->> does make the main function easier to code. So I guess that's fine. But
->> can you move the call down where the result is checked?
->>
->> qe = blk_lookup_qe_pair(head, q);
->> if (!qe)
->> 	return;
->>
->> I prefer no distance between call and check, makes it easier to read. I
->> can make the edit locally and note it in the commit message so you don't
->> have to re-send it. Let me know, or just resend a v3.
+Yes, it's a bug, but the root reason is not we forget to call 
+device_del(sdkp->disk_dev). It's because we did not cleanup gendisk.
+The leak memory is allocated in elevator_init_mq(), we should clean
+this memory via blk_cleanup_queue().
+
+I summit a patch which would fix this memory leak:
+
+https://lore.kernel.org/linux-scsi/20220401011018.1026553-1-haowenchao@huawei.com/T/#u
+
+> The device_put() unwinds device_initialize().  The device_del() unwinds
+> device_add().  Take a look at the comments to device_add() or take a
+> look at how device_register/unregister() work.
 > 
-> I'm fine with you doing the change locally, thanks!
 
-OK, I did that, it's in. Thanks!
-
--- 
-Jens Axboe
-
+You may read the implement of put_device(), it is based on kobj_xxx.
+If the kobj is still in sysfs, a cleanup would be performed.
+And device_del() seems would not decrease the reference count of kobj,
+the main aim is to make it invisibleto sysfs.
