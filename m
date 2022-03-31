@@ -2,89 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07A1AC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 09:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76579C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 09:15:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233685AbiCaJPf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 05:15:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40188 "EHLO
+        id S233696AbiCaJRM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 05:17:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48826 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233672AbiCaJPX (ORCPT
+        with ESMTP id S233231AbiCaJRM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 05:15:23 -0400
+        Thu, 31 Mar 2022 05:17:12 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04FEB4A;
-        Thu, 31 Mar 2022 02:13:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A901B10781A
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 02:15:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=WV4zzGwlX5tfhXTvGhAbB3PhzrHBBTp7BcxlK6NdwK8=; b=P/bxrCTI4drj48NjuxThG29VxH
-        ebHq/Gm9DUghweh+goB7YczQXWSsi1Gz6QnHhDS97L5Q+7HYS0yHR4EqQ+nYgReUmcnPOowqeZQmO
-        iqM+qrBpYMI7pSXI1iGiGYJ05m5h7AlHaU9thnZ3QykVYYQrri+ON9biDdtmdsnvieN0+n3SXbauk
-        zsnNQFx7DqNw+VCwny2yYxz6IhQihDCKXvTvCg3nrJ9BjrdNf0BKkJfrZHwrsqnTjVmiVOqVkZTxh
-        0PNhWQYqVtg3UYqSjzK/Lge+PRWnq+2fj9CKvesuu28DFvt3ni3Iu9+eRGbFxmsjY9E0/EUR8+3XD
-        OU6cOWUA==;
+        bh=NmduW1iwmBwQuxt8u8E9I4xdRNInpTYlPZnwFbf13L8=; b=0YqOVjVHUA/pWE6flu0hEhJgNR
+        c6NDxH/8dHAlQvnDfD5MqguDJ77zoOmYDT4CfEhozthfCGQpaZLtPvel4WkmsELC0NrJFRIFvecrX
+        8n4oO0g7MBMmv3k2/n8e1TdRMvtG16J6b5kGsEzWwptmYmHYSOA9RN+yj/d03gfnZIRq+KKfKd0Z/
+        DTdLRWwksfvKyrQoO1qFWfhJWls/XOUkZnd02XvDqZDn9wbZF4/9KYcCkfSmqNMKf5NE+YtSxfHX3
+        GfNQPmnbljnHlxSF/9s3I90RgnHsS+iUxGVXHNUaUFfYU9mROhgy2GcalIhDOZoRQgLIish2tNuF1
+        Gbd6loEg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nZqrv-001R3U-17; Thu, 31 Mar 2022 09:13:27 +0000
-Date:   Thu, 31 Mar 2022 02:13:27 -0700
+        id 1nZqto-001ROG-Gh; Thu, 31 Mar 2022 09:15:24 +0000
+Date:   Thu, 31 Mar 2022 02:15:24 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        Wenchao Hao <haowenchao@huawei.com>, axboe@kernel.dk,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
-        syzkaller-bugs@googlegroups.com, linfeilong@huawei.com
-Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
-Message-ID: <YkVwt4s+K0haRpbr@infradead.org>
-References: <20220329154948.10350-1-fmdefrancesco@gmail.com>
- <20220331054156.GI3293@kadam>
- <YkU/6KB+0fPU5Hie@infradead.org>
- <10056508.nUPlyArG6x@leap>
+To:     Dennis Zhou <dennis@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@kernel.org>, tj@kernel.org,
+        axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
+Message-ID: <YkVxLN9p0t6DI5ie@infradead.org>
+References: <YkSK6mU1fja2OykG@redhat.com>
+ <YkRM7Iyp8m6A1BCl@fedora>
+ <YkUwmyrIqnRGIOHm@infradead.org>
+ <YkVBjUy9GeSMbh5Q@fedora>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <10056508.nUPlyArG6x@leap>
+In-Reply-To: <YkVBjUy9GeSMbh5Q@fedora>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 11:07:45AM +0200, Fabio M. De Francesco wrote:
-> If I don't misunderstand what you wrote, I think you mean something like
-> the following changes:
-> 
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index a390679cf458..7a000a9a9dbe 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -3431,7 +3431,7 @@ static int sd_probe(struct device *dev)
->         sdkp->disk_dev.class = &sd_disk_class;
->         dev_set_name(&sdkp->disk_dev, "%s", dev_name(dev));
->  
-> -       error = device_add(&sdkp->disk_dev);
-> +       error = device_register(&sdkp->disk_dev);
+On Wed, Mar 30, 2022 at 10:52:13PM -0700, Dennis Zhou wrote:
+> I took a quick look. It seems with the new interface,
+> bio_clone_blkg_association() is unnecessary given the correct
+> association should be derived from the bio_alloc*() calls with the
+> passed in bdev. Also, blkcg_bio_issue_init() in clone seems wrong.
 
-The device_initialize call about also need to go.
+Yes, I think you are right.
 
->         if (error) {
->                 put_device(&sdkp->disk_dev);
+> Maybe the right thing to do here for md-linear and btrfs (what I've
+> looked at) is to delay cloning until the map occurs and the right device
+> is already in hand?
 
-.. and this put_device
-
->                 goto out;
-> @@ -3474,7 +3474,7 @@ static int sd_probe(struct device *dev)
->  
->         error = device_add_disk(dev, gd, NULL);
->         if (error) {
-> -               put_device(&sdkp->disk_dev);
-> +               device_unregister(&sdkp->disk_dev);
->                 goto out;
->         }
-
-.. and then the cleanup patch would need the same logic.  But thinking
-about it I don't think we actually can do that due to the split
-unregistration.  So I take my suggestion back.
+That would in general be the preferred option where possible.
