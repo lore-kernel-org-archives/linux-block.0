@@ -2,108 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1508EC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 23:09:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24AC3C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 23:22:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242801AbiCaXLm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 19:11:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33320 "EHLO
+        id S242877AbiCaXYH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 19:24:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241856AbiCaXLl (ORCPT
+        with ESMTP id S231898AbiCaXYE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 19:11:41 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA32665162
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 16:09:53 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id f3so1005680pfe.2
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 16:09:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=cz3GyvYVzV3EdDN6sB+1FTc+c9hwF2tdZTNimFcZLNE=;
-        b=H+ydDUAE3ArEgOwqdy5OxWseMKcHyBBJkrf6rlBsJ08wAxF9Cfxer5aaRBdgBo+lBD
-         7Tr10y0n0emtB4xE73WkxCkt40MOlRQBb6a3WGikOLrM+Cho5mM51lIxbW4CLargfshe
-         B45zfCaSVIKHhhRW/+TdaeCB+we/UQZMTIC4MfIpodgd2jcW2O3V3rBOy7DMLx8/7FQQ
-         cUoJWnYDQtTkx8IxrPIcqLPUg1uRBPf8v8PH+tKE0CM80Il166tAXfLdoV9Plju11dCo
-         WAwF170/GBBWVDX2RmCp+IAFgBIG06mIP9pmIznSuBaxb/RkhFvHvz5v3Dk/8zXfggW2
-         R4HA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=cz3GyvYVzV3EdDN6sB+1FTc+c9hwF2tdZTNimFcZLNE=;
-        b=GAYSrSrmhxav/Vb4Jiq/qMRJ7zY24Ye/wTbRhXDHLuacMI41RcLKRLZhV+fU6qjGxK
-         uWZ/FuYXjZRCsKmsZd4QUPVYQn63pyqsdwoYkg56sOgvF8oq+Icw01YIyV3BKpI87auo
-         2Qf1NUQOUAFeIjnLHwKZ2dsWIKC71pWhLdbZVQzgxVO1QsGnzxaL5ht8GLHpgSIlhXxv
-         Hs/ZwE+TXvHMTgRKZjxrB18g32ttiWT+fHZ5uEZF2H0wfQAcpLnrB5F1Z07qUluGn7Zj
-         lna1j4lYyhvI9FFCA+TQOZ2sNUXcE/hQbh9YlnCFsJxlOTmcTOXR6WUkVxDe98uERjpV
-         mZSg==
-X-Gm-Message-State: AOAM531xCj3kTgR8Y7kDDS5tGD/OsuePeRiVJMMTscQW4iBR7L4b1NfR
-        QmJmapwlnYXMtoPki6Om2EuEiw==
-X-Google-Smtp-Source: ABdhPJytWJ8U0yLRH8Kl35OBWcKwI3vz+SnWKsJfk0otE+SEsTGPONodJMMiXqpN14jZTP8fDBsXYw==
-X-Received: by 2002:a63:d149:0:b0:384:b288:8704 with SMTP id c9-20020a63d149000000b00384b2888704mr12390321pgj.112.1648768193276;
-        Thu, 31 Mar 2022 16:09:53 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id b16-20020a056a00115000b004f6ff260c9esm516225pfm.207.2022.03.31.16.09.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 16:09:52 -0700 (PDT)
-Message-ID: <078e8084-8fea-5b69-89a6-9488a28163cf@kernel.dk>
-Date:   Thu, 31 Mar 2022 17:09:51 -0600
+        Thu, 31 Mar 2022 19:24:04 -0400
+Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4885D192
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 16:22:16 -0700 (PDT)
+Date:   Thu, 31 Mar 2022 23:22:03 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=michaelmarod.com;
+        s=protonmail; t=1648768931;
+        bh=H/HIIOtE6ezWt3oBMOEbUNvqPRvMS/qhwtcdJgLLn40=;
+        h=Date:To:From:Cc:Reply-To:Subject:Message-ID:In-Reply-To:
+         References:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+         Message-ID;
+        b=QFUpB8Mf5Yo249YgcpZ2mBq/kbYlExC4LlzZC9jN5oobhUwMNnV3yPX5RgUtdCQV9
+         stnloZ02HxUnlbbDG8BgBswAfG4aNxP0QPBTKspeZSh5CwVkzzoPq1wY2p8tuo/Jxf
+         FPUqDsTIhOGhqZwXivTEpSjnx3bJKQpAm64p14zk=
+To:     Christoph Hellwig <hch@infradead.org>
+From:   Michael Marod <michael@michaelmarod.com>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Reply-To: Michael Marod <michael@michaelmarod.com>
+Subject: Re: NVME performance regression in Linux 5.x due to lack of block level IO queueing
+Message-ID: <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
+In-Reply-To: <YkUvgu6VxNORv8M6@infradead.org>
+References: <51E3A396-F68B-496D-AE36-B0457A3B0968@michaelmarod.com> <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com> <C06B8EF0-BF3B-4F14-994F-F80B5102D538@michaelmarod.com> <YkUvgu6VxNORv8M6@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [Drbd-dev] [PATCH 2/2] drbd: remove check of list iterator
- against head past the loop body
-Content-Language: en-US
-To:     =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Jakob Koschel <jakobkoschel@gmail.com>
-Cc:     linux-kernel@vger.kernel.org, "Bos, H.J." <h.j.bos@vu.nl>,
-        Brian Johannesmeyer <bjohannesmeyer@gmail.com>,
-        linux-block@vger.kernel.org,
-        Cristiano Giuffrida <c.giuffrida@vu.nl>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Mike Rapoport <rppt@kernel.org>, drbd-dev@lists.linbit.com,
-        Philipp Reisner <philipp.reisner@linbit.com>
-References: <20220331220349.885126-1-jakobkoschel@gmail.com>
- <20220331220349.885126-2-jakobkoschel@gmail.com>
- <4dcedb78-355f-ed1a-9af1-27e9e63b5643@linbit.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <4dcedb78-355f-ed1a-9af1-27e9e63b5643@linbit.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 4:28 PM, Christoph B?hmwalder wrote:
-> Am 01.04.22 um 00:03 schrieb Jakob Koschel:
->> When list_for_each_entry() completes the iteration over the whole list
->> without breaking the loop, the iterator value will be a bogus pointer
->> computed based on the head element.
->>
->> While it is safe to use the pointer to determine if it was computed
->> based on the head element, either with list_entry_is_head() or
->> &pos->member == head, using the iterator variable after the loop should
->> be avoided.
->>
->> In preparation to limit the scope of a list iterator to the list
->> traversal loop, use a dedicated pointer to point to the found element [1].
->>
-> 
-> Hi Jakob,
-> 
-> Both of these look good to me, thanks.
-> 
-> Reviewed-by: Christoph B?hmwalder <christoph.boehmwalder@linbit.com>
+Good call -- Turns out that that cache issue is resolved in 5.17. I tried a=
+ number of kernels and narrowed it down to a problem that started after 4.9=
+ and before 4.15, and ended some time after 5.13. Namely, 4.9 is good, 4.15=
+ is bad, 5.13 is bad, and 5.17 is good. I did not bisect it all the way dow=
+n to the specific versions where the behaviors changed.
 
-Applied both, but shortened title of this commit. Jakob, please keep it
-within the usual 74 chars. In general, it's great to use a cover letter
-for anything that's more than one patch. Just some pointers if you're
-doing more of these.
+Device            r/s     w/s     rkB/s     wkB/s   rrqm/s   wrqm/s  %rrqm =
+ %wrqm r_await w_await aqu-sz rareq-sz wareq-sz  svctm  %util
+nvme1n1       2758.00 2783.00  11032.00  11132.00     0.00     0.00   0.00 =
+  0.00    0.10    0.03   0.36     4.00     4.00   0.18 100.00
+nvme0n1       2830.00 2875.00  11320.00  11500.00     0.00     0.00   0.00 =
+  0.00    0.10    0.03   0.39     4.00     4.00   0.18 100.00
 
--- 
-Jens Axboe
+With regards to the performance between 4.4.0 and 5.17, for a single thread=
+, 4.4.0 still had better performance over 5.17. However, the 5.17 kernel wa=
+s significantly better at multiple threads. In fact, it is so much better I=
+ don't believe the results (10x improvement!). Is this to be expected that =
+a single thread would be slower in 5.17, but recent improvements make it po=
+ssible to run many of them in parallel more efficiently?
 
+# /usr/local/bin/fio -name=3Drandrw -filename=3D/opt/foo -direct=3D1 -iodep=
+th=3D1 -thread -rw=3Drandrw -ioengine=3Dpsync -bs=3D4k -size=3D10G -numjobs=
+=3D16 -group_reporting=3D1 -runtime=3D120
+
+// Ubuntu 16.04 / Linux 4.4.0:
+Run status group 0 (all jobs):
+   READ: bw=3D54.5MiB/s (57.1MB/s), 54.5MiB/s-54.5MiB/s (57.1MB/s-57.1MB/s)=
+, io=3D6537MiB (6854MB), run=3D120002-120002msec
+  WRITE: bw=3D54.5MiB/s (57.2MB/s), 54.5MiB/s-54.5MiB/s (57.2MB/s-57.2MB/s)=
+, io=3D6544MiB (6862MB), run=3D120002-120002msec
+
+// Ubuntu 18.04 / Linux 5.4.0:
+Run status group 0 (all jobs):
+   READ: bw=3D23.5MiB/s (24.7MB/s), 23.5MiB/s-23.5MiB/s (24.7MB/s-24.7MB/s)=
+, io=3D2821MiB (2959MB), run=3D120002-120002msec
+  WRITE: bw=3D23.5MiB/s (24.6MB/s), 23.5MiB/s-23.5MiB/s (24.6MB/s-24.6MB/s)=
+, io=3D2819MiB (2955MB), run=3D120002-120002msec
+
+// Ubuntu 18.04 / Linux 5.17:
+Run status group 0 (all jobs):
+   READ: bw=3D244MiB/s (255MB/s), 244MiB/s-244MiB/s (255MB/s-255MB/s), io=
+=3D28.6GiB (30.7GB), run=3D120001-120001msec
+  WRITE: bw=3D244MiB/s (256MB/s), 244MiB/s-244MiB/s (256MB/s-256MB/s), io=
+=3D28.6GiB (30.7GB), run=3D120001-120001msec
+
+Thanks,
+Michael
