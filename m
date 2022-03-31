@@ -2,72 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94045C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:09:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 733E8C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:14:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239662AbiCaQL3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 12:11:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56832 "EHLO
+        id S236112AbiCaQQU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 12:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239622AbiCaQL2 (ORCPT
+        with ESMTP id S239681AbiCaQQT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:11:28 -0400
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 708081275B6
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:09:40 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id l7-20020a05600c1d0700b0038c99618859so1989470wms.2
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:09:40 -0700 (PDT)
+        Thu, 31 Mar 2022 12:16:19 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BFC055201;
+        Thu, 31 Mar 2022 09:14:32 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id bg10so385530ejb.4;
+        Thu, 31 Mar 2022 09:14:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject
-         :content-transfer-encoding;
-        bh=gDhoX2vp0X4fbn9hhWYTzWQWTzyqRleqCJPPleiUnqg=;
-        b=JgbCBKAqSiC8qCBt90VbvpL4ZRLaOSezEa0WJUg36jDzsZjQaye10l0Ru09XhFoa2i
-         ttj5T91TR/oerfAId9B6KEZB5ABKwkWavhbPtHG5ZvMiTplSavBaGA0oATjXwO8fvzIr
-         7mZCt2DGN04n734ZKWTF3U7IovtIPqEwFrwgHY9BBvLChS32DLTglD4GpsXV6O84EKuw
-         D9pa/KC4l83exBuE31iH7yHDfc8VNseU5se9WcmLAR0dWN0KvdRUPRIB9KQ59/tZTaM/
-         hJCA30GYNbNv30gBOWis6CwheV+wgua/6m1pd5nx91FO++jEA5yeQVg+gdvNSZQRDBIP
-         Tc+A==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=FcCfLyzsYqQGsFb8akFbb6JZWG/9vXgcMF8J+x5RgTo=;
+        b=KNVfSswHBmhK2iu1F1kOKQ3KNCpbNu/Ugef2TxvfwjloYZ3/DTFQMw5K8b91+zBaa1
+         +NR35BCwAd3B617BAuEReAFzyos00j7whUnx+kmcFquxjPPOkgegGrM2mv3Q3p0EI0Ty
+         pxYBhJgkZf0KT4UWuq/eRZiq/PVUFzA9dR+kL87L3Sb2XgrrcDd4jMev/C6i+RJagtEc
+         2aYeIyufTPHaQ9rKJuNSMcPbgXW0MfbutlnzYCoiGiutzWqkEO63R8Bf7RCSd/B3Q8Ui
+         QeQw82JngZa9PnCbfpElTirQ8d4W3uilTrQ6w1ajLcitEs9HT8CZiMOt87Vnv2p76g/s
+         wJvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :content-transfer-encoding;
-        bh=gDhoX2vp0X4fbn9hhWYTzWQWTzyqRleqCJPPleiUnqg=;
-        b=KMz7rN5w65xRKpF8ZGLodChXWHlT6kHmkabk3AKZgUTzrR+v69Gl1tz2gHnPlX2et2
-         KYAd9pHPLpj9weXBiIBGJm7w2XcBNqSA7LOnGTP8yOiTHFhNSqa6lgpgv5mjV5YyMe6g
-         v/ScAxEUDnFgwAAmpmmN3VgaiXTxlz8ytulqL3OjPfkr5U9IOvo8J/HKmMYLuIVv0WuQ
-         +vF+1Rh/ixl/0Vx3T8v+MdIDlGt4vjhnYF44HIdBoQTEWn31a2Vr7YzHEfnbtcRaEV31
-         QMhg2+Jkr4ROwnMW4Kk1dOz/44Rxz3rebjynuRKsk5D+2kZOVqo5nRxhrsdYruo4TBgY
-         ONLQ==
-X-Gm-Message-State: AOAM533GDyIMItSe9y9AVepaZk7RRPUxOYLc3iypJCogSy4SAKVnpPjw
-        Nn3/rfL0OGzzgFMPZ55AuI+aG4ONkKE=
-X-Google-Smtp-Source: ABdhPJwMxLoaMcHBgIo+a7QEIePD7pPUqSyOagjFz8F6CJsPyhyQJyGN4VwwqK4CigmpaImryZMXeg==
-X-Received: by 2002:a1c:f604:0:b0:38c:8ffd:dbb6 with SMTP id w4-20020a1cf604000000b0038c8ffddbb6mr5409657wmc.43.1648742978691;
-        Thu, 31 Mar 2022 09:09:38 -0700 (PDT)
-Received: from DESKTOP-R5VBAL5 ([39.53.224.185])
-        by smtp.gmail.com with ESMTPSA id n2-20020adfb742000000b00205eda3b3c1sm1421929wre.34.2022.03.31.09.09.37
-        for <linux-block@vger.kernel.org>
-        (version=TLS1 cipher=ECDHE-ECDSA-AES128-SHA bits=128/128);
-        Thu, 31 Mar 2022 09:09:38 -0700 (PDT)
-Message-ID: <6245d242.1c69fb81.db242.683c@mx.google.com>
-Date:   Thu, 31 Mar 2022 09:09:38 -0700 (PDT)
-X-Google-Original-Date: 31 Mar 2022 12:09:37 -0400
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FcCfLyzsYqQGsFb8akFbb6JZWG/9vXgcMF8J+x5RgTo=;
+        b=UE1ibcJusrLW1ikjmCCTGEN3izduWvjf+VE6RcsH4fO5uL1z3CXFSDgr619/zc9kDE
+         qIXVy/FUU0/Bqr6zFXUSSvbQWNZbTM8F7xeKgbhmqPcvtZNJ8uJmxijlZvo/3Go3EsSf
+         Wts/+TjFXqBErax9R6wZWE3/UdaIR3j6ETcSZGypATcWwbSc9E+W6glGZVB1aNbLZMPK
+         aQ8lp/pw6Eswi0pJi7oW5jQMZpVnKso9JziDNF2BiO5C2pzPHa8ouVxFEQAgJYu1azG2
+         gFCG2m/970MU9024iZXwtXcSjIr/SyYKbxtyOykuot2bzu1IBZ7HskfxwfZVbdNDXO2f
+         FVzQ==
+X-Gm-Message-State: AOAM5332xj2qgR4Rju9XFI0xQo6Jxj8FvKTKgs51ovIbKwnvUm8lwXcy
+        GbqQY2CMmnksDT1NFNo2I2w=
+X-Google-Smtp-Source: ABdhPJxrFeCrlrgYsId4lWZdjzNbs1gNXB+bHQsamw/8iBBZbKjMSEzvaieenk1/1kbxHBO64XBPnQ==
+X-Received: by 2002:a17:906:58d3:b0:6da:bdb2:2727 with SMTP id e19-20020a17090658d300b006dabdb22727mr5604700ejs.549.1648743270654;
+        Thu, 31 Mar 2022 09:14:30 -0700 (PDT)
+Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id hp12-20020a1709073e0c00b006e02924bf20sm9606044ejc.117.2022.03.31.09.14.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 09:14:29 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     Wenchao Hao <haowenchao@huawei.com>,
+        syzkaller-bugs@googlegroups.com,
+        Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     axboe@kernel.dk, jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com,
+        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com, linfeilong@huawei.com
+Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
+Date:   Thu, 31 Mar 2022 18:14:27 +0200
+Message-ID: <1787706.atdPhlSkOF@leap>
+In-Reply-To: <20220331134210.GF12805@kadam>
+References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <fdebdbd3-575b-b30e-d37f-dcc6d53a4f53@huawei.com> <20220331134210.GF12805@kadam>
 MIME-Version: 1.0
-From:   armanddreamlandestimation@gmail.com
-To:     linux-block@vger.kernel.org
-Subject: Estimating Services
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,=0D=0A=0D=0AWe provide estimation & quantities takeoff service=
-s. We are providing 98-100 accuracy in our estimates and take-off=
-s. Please tell us if you need any estimating services regarding y=
-our projects.=0D=0A=0D=0ASend over the plans and mention the exac=
-t scope of work and shortly we will get back with a proposal on w=
-hich our charges and turnaround time will be mentioned=0D=0A=0D=0A=
-You may ask for sample estimates and take-offs. Thanks.=0D=0A=0D=0A=
-Kind Regards=0D=0AArmand Southern=0D=0ADreamland Estimation, LLC
+On gioved? 31 marzo 2022 15:42:10 CEST Dan Carpenter wrote:
+> Wenchao Hao, what you're saying makes a lot of sense but it raises a lot
+> of questions in turn.
+> 
+> Fabio, did you test your patch?
+
+Yes, I did, Dan. I tested it the usual way with the "#syz test:" command.
+Obviously I have not the hardware to test code on it.
+
+Therefore, the messages that say "Syzbot tested the patch and it didn't
+trigger any issue" is all that I can know about the code being good or not.
+This is the criterion I've always used before sending patches for Syzbot's
+reports.
+
+However, my knowledge of these subsystems and the API that are related to 
+this bug were very little, but now I can say that during the last couple of 
+days it has improved to the point where I can affirm that Wenchao's patch
+seems to me to be the only correct solution.
+
+Thanks for all the help you and the the other developers provided. It was
+invaluable for a better understanding of this matter.
+
+Regards,
+
+Fabio M. De Francesco
+
 
