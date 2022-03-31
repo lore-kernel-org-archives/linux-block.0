@@ -2,73 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70076C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 10:01:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBDCC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 10:13:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234220AbiCaKDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 06:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40682 "EHLO
+        id S234534AbiCaKO4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 06:14:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233682AbiCaKDL (ORCPT
+        with ESMTP id S234528AbiCaKOy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 06:03:11 -0400
-Received: from iris.vrvis.at (iris.vrvis.at [92.60.8.8])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2867964BF5;
-        Thu, 31 Mar 2022 03:01:22 -0700 (PDT)
-Received: from [10.43.0.42]
-        by iris.vrvis.at with esmtpsa (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <valentin@vrvis.at>)
-        id 1nZrcG-0006PH-P5; Thu, 31 Mar 2022 12:01:21 +0200
-Message-ID: <774968b2-5d34-0f36-5ec6-284aaabb4585@vrvis.at>
-Date:   Thu, 31 Mar 2022 12:01:20 +0200
+        Thu, 31 Mar 2022 06:14:54 -0400
+Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6E81EECC;
+        Thu, 31 Mar 2022 03:13:07 -0700 (PDT)
+Received: by mail-wm1-x329.google.com with SMTP id p12-20020a05600c430c00b0038cbdf52227so1700011wme.2;
+        Thu, 31 Mar 2022 03:13:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=dKkMeptSr36K5MwCeZt80OcWRzRb8UQj5WuimYmARbo=;
+        b=c10QXVAA0Dxut1I4GVKnE6PpwlNm0nURglIWMhhy1wcvOUIEJmH6LQPMS4+/m9NsM+
+         O+8PZ2Py09DfMoTm4qXKMZ/tjQhrkBlfiF/ErHDRMUPPnlmZ/eSzuTG1V6v8BG/VyEhd
+         z57tNNUuecaGNY88UTnbsv1gh3F/ZntaLP47gacjslesFqdl6wIwkC5usWzpYrWJAPI8
+         my1EDtJOn5iNc2D3YdzLjXzjGZxKnOCPrzRIDGC92xb/LA8g+Kuz0zIOvN588l7AlEUD
+         V99MVKVsr3zjmDomQt3p2uMAIN+pXCkggSQPjX/1JXBwj/CUVbHRB44ztrJptjto2MxY
+         HroA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=dKkMeptSr36K5MwCeZt80OcWRzRb8UQj5WuimYmARbo=;
+        b=ckX1hQeMnVfQX6qGf3AHpRyLLh+Ef3O/dP+FuclM2W1Ube60CDMJqWcqwwAQHMFIcQ
+         fBWJmyijpQdOwlEYgBaxXpJViwGd7aRoFJPiPy/Hsn8Iau+PFovgdRHXgBl/bRvwoB3E
+         SjlFfTE+B3/wRxBgyn5bL2q1bLEV4bQbpGpabnITf0f40yuRKybfJlotM/jh4j4FhWA+
+         1n9VgEIbIf2s+wNBG9oYYuekfQya8r/axS6iysvgUJUK5qcLH9vvP0kpTBV4sVr0lx3X
+         Bd5pb2F4I5Xg6xL1SzVOM+jd5mOpuMpEmRh8MVkRB++qJzog/znJaFLCiboOKI+9fig7
+         x2qA==
+X-Gm-Message-State: AOAM530KrNp0/RzIq5QQojWAgfEMHDhbhF7X47iobqs3hb6uozl8foIt
+        KHEWyILcg6ltFGmQR2EVDo7c2xbyOtE=
+X-Google-Smtp-Source: ABdhPJw65pMOd/a/TkP+RPpEPUTYbErdPZV0+1TQOfGoel/Y4yrLicjLv1Mqe6jtdNx2Z1YhYacByA==
+X-Received: by 2002:a05:600c:6001:b0:38c:6c43:4427 with SMTP id az1-20020a05600c600100b0038c6c434427mr4036846wmb.186.1648721585268;
+        Thu, 31 Mar 2022 03:13:05 -0700 (PDT)
+Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id t9-20020a05600c198900b0038cb8b38f9fsm7163875wmq.21.2022.03.31.03.13.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 03:13:03 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        Wenchao Hao <haowenchao@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com,
+        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com, linfeilong@huawei.com
+Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
+Date:   Thu, 31 Mar 2022 12:13:01 +0200
+Message-ID: <1722561.VLH7GnMWUR@leap>
+In-Reply-To: <YkVwt4s+K0haRpbr@infradead.org>
+References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <10056508.nUPlyArG6x@leap> <YkVwt4s+K0haRpbr@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org
-Content-Language: en-US
-From:   Valentin Kleibel <valentin@vrvis.at>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-References: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
- <YinpIKY0HVlJ+TLR@kroah.com> <50ddedf1-5ac3-91c3-0b50-645ceb541071@vrvis.at>
- <YinufgnQtSeTA18w@kroah.com> <9dd4a25a-7deb-fcdf-0c05-d37d4c894d86@vrvis.at>
- <Yi8jO3Q+xbPx0JwF@kroah.com> <b19953f8-2097-6962-eceb-5d41f4639ce4@vrvis.at>
-In-Reply-To: <b19953f8-2097-6962-eceb-5d41f4639ce4@vrvis.at>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Subject: [PATCH v2 2/2] aoe: use blk_mq_alloc_disk and blk_cleanup_disk
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use blk_mq_alloc_disk and blk_cleanup_disk to simplify the gendisk and
-request_queue allocation.
+On gioved? 31 marzo 2022 11:13:27 CEST Christoph Hellwig wrote:
+> 
+> .. and then the cleanup patch would need the same logic.  But thinking
+> about it I don't think we actually can do that due to the split
+> unregistration.  So I take my suggestion back.
+> 
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
-Link: https://lore.kernel.org/r/20210602065345.355274-17-hch@lst.de
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-(cherry picked from commit 6560ec961a080944f8d5e1fef17b771bfaf189cb)
-Fixes: 3582dd291788 (aoe: convert aoeblk to blk-mq)
-Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=215647
-Signed-off-by: Valentin Kleibel <valentin@vrvis.at>
----
-  drivers/block/aoe/aoedev.c | 3 +--
-  1 file changed, 1 insertion(+), 2 deletions(-)
+If I understand correctly, after thinking about it some more, you decided 
+to withdraw your own suggestion.
 
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index e2ea2356da06..c5753c6bfe80 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -277,9 +277,8 @@ freedev(struct aoedev *d)
-         if (d->gd) {
-                 aoedisk_rm_debugfs(d);
-                 del_gendisk(d->gd);
--               put_disk(d->gd);
-+               blk_cleanup_disk(d->gd);
-                 blk_mq_free_tag_set(&d->tag_set);
--               blk_cleanup_queue(d->blkq);
-         }
-         t = d->targets;
-         e = t + d->ntargets;
+Dan had already approved this patch.
+
+Therefore, I'll leave the patch as it is now and wait for someone to place
+a "Reviewed-by" tag and Maintainers to merge (if, in the meantime, nobody 
+else require further changes).
+
+Thanks,
+
+Fabio 
+
+
+
