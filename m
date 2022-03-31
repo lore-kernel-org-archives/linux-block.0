@@ -2,124 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B98DEC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 05:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C1CC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 09:07:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbiCaFyK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 01:54:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34320 "EHLO
+        id S233601AbiCaJJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 05:09:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230096AbiCaFyE (ORCPT
+        with ESMTP id S233597AbiCaJJh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 01:54:04 -0400
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 831A92DAB9
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 22:52:17 -0700 (PDT)
-Received: by mail-pl1-f175.google.com with SMTP id w8so22463176pll.10
-        for <linux-block@vger.kernel.org>; Wed, 30 Mar 2022 22:52:17 -0700 (PDT)
+        Thu, 31 Mar 2022 05:09:37 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56EEB1342CE;
+        Thu, 31 Mar 2022 02:07:50 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id bi12so46780416ejb.3;
+        Thu, 31 Mar 2022 02:07:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=yleowqqhp3Wp931KZ3m/sv7GFXxGTcDyzcmGmDmbgHI=;
+        b=MJcEYra4ISYsaTLHyz/zPckZ1W+v582WNIP7BA/z+gbbFk5Vd+l3XOWFknL2FUEnU4
+         6quPQfaj6miMmi4bBFTBdLTZvVrZKEMmncK/XLththqOXXC6DwavVea4vIkz4aHTKX6Q
+         Q9/Z5de9JLHYtPFKm5SWHuHwEIAehIzKmBfYLxK3xo2OI0NzaudHe0mz/aUVtTL7xTBA
+         FXVxMNpqRPLLCB8oAMmeNnv4WwrC6OXcpxovSiXeJWLwzOdswy2nNV9z6Obxf5OZe6v1
+         y0OElE7NNd/j6JZd9/AbO7tlSFhyHlucVCVEvO56kgOa9DvoMUxOw/XwUiTyq7FicAT7
+         kOQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1zTaM71SVPE6S3OdGd9sJCQOVirmJSKeBEVVvpHLP9M=;
-        b=AGNRcFSXwdrKLTwN3QJtYqX34qhPbPTM7N8BE6TK/6pEh4BavF1OQALps9r5n3Y5xV
-         9163kf+O+yggeMP+XAtId51saT7R6lSjwanwv07yzmngq/C0Ww7Kq3hzed672ufk5Z9b
-         z44JCfPK5CEk1Ol/9CGZ+qEFEU1++JDEGjCWOqYeZbcDPg9ex9cMD5tLBGwGJMmxDj2u
-         7SmEnuUx7EM73WUdluHFPVxHZxc/RMUowJ8HAEDZU1cX6R3qgpxo0HNJdGPwE6IV6rk7
-         T/5Np4A4eNWtafeSOb8JaTyLBkxaK3CfRsLHSoMJyT0m3yJow2SOiCAsB6XA+lqteiCb
-         uUTw==
-X-Gm-Message-State: AOAM5309POk4eNCo6H1p+wctJA39xwAb1MlSqaOyzzVOnnPSovONVae4
-        jR6bGtA6DOmeLL7DMpICuyJQB7+SEGc=
-X-Google-Smtp-Source: ABdhPJwOVwiZOY/QFsDtfI9b4cYAc4VtjeuKnSwxfInHXclMB0xLovIV+ITp1QjLG9anTmxDT1jafQ==
-X-Received: by 2002:a17:903:1249:b0:154:c472:de76 with SMTP id u9-20020a170903124900b00154c472de76mr38213570plh.81.1648705936249;
-        Wed, 30 Mar 2022 22:52:16 -0700 (PDT)
-Received: from fedora (136-24-99-118.cab.webpass.net. [136.24.99.118])
-        by smtp.gmail.com with ESMTPSA id pc13-20020a17090b3b8d00b001c775679f58sm8649714pjb.37.2022.03.30.22.52.14
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=yleowqqhp3Wp931KZ3m/sv7GFXxGTcDyzcmGmDmbgHI=;
+        b=zozXaBTHrhgYS9JnqlFeZiCKjNhr5MYij4e4uOnLMush5N0q9JiE6h+1/6FcTQFvFK
+         svpPCCdA0NyaYpcmH2po1kmzObesAgazR3fpqrvyinh+BcqZ08OhP+41iNN7rWQzpMko
+         uRbuTONkx32eoONA974YaFJUUIDm4W2MU3Kjvw2yFH25t+SZfFw6xQXRgn4UHQHtNshw
+         3bSCIFPgZnRvF+0KLaiK2b7D8jhqAat7dkuRjNkc4KQH6oiow3BR7QMU/7XYzkJRiPXY
+         hur2uFKJx/iQpyFDmCXEFF51zjaewTZMr4GEbGSVojikAmr2c946QixCMpdbO6hQqZ8e
+         20FA==
+X-Gm-Message-State: AOAM530AmpZ1lUqer4XQzptlPFg8YaX/OBO0bcQPKlhGQ75H718uLati
+        ly9Ag3Mjr6NgFlHb7cAp0IQ=
+X-Google-Smtp-Source: ABdhPJzYfpoUpfLnNo0BLs69thKYJ/H88xRMD5X1RrfWy000YdIwjqGUGStyPVbbIAHQzOjB5SAADQ==
+X-Received: by 2002:a17:907:7e8c:b0:6dc:b357:2f4 with SMTP id qb12-20020a1709077e8c00b006dcb35702f4mr4048945ejc.434.1648717668745;
+        Thu, 31 Mar 2022 02:07:48 -0700 (PDT)
+Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id jg39-20020a170907972700b006e047c810dbsm9198644ejc.56.2022.03.31.02.07.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Mar 2022 22:52:15 -0700 (PDT)
-Date:   Wed, 30 Mar 2022 22:52:13 -0700
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>, tj@kernel.org, axboe@kernel.dk,
-        linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
-Message-ID: <YkVBjUy9GeSMbh5Q@fedora>
-References: <YkSK6mU1fja2OykG@redhat.com>
- <YkRM7Iyp8m6A1BCl@fedora>
- <YkUwmyrIqnRGIOHm@infradead.org>
+        Thu, 31 Mar 2022 02:07:47 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>,
+        Christoph Hellwig <hch@infradead.org>
+Cc:     Wenchao Hao <haowenchao@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com,
+        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
+        syzkaller-bugs@googlegroups.com, linfeilong@huawei.com
+Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
+Date:   Thu, 31 Mar 2022 11:07:45 +0200
+Message-ID: <10056508.nUPlyArG6x@leap>
+In-Reply-To: <YkU/6KB+0fPU5Hie@infradead.org>
+References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <20220331054156.GI3293@kadam> <YkU/6KB+0fPU5Hie@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkUwmyrIqnRGIOHm@infradead.org>
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On gioved=C3=AC? 31 marzo 2022 07:45:12 CEST Christoph Hellwig wrote:
+> > The temptation was to call device_unregister() which is a combined
+> > device_del(); device_put(); but when the device_initialize() and
+> > device_add() are called separately, then I think it is more readable to
+> > call del and put separately as well.
+>=20
+> I think we should also consolidate the initialization side.  Using
+> device_register and device_unregister would have prevented this bug
+> and I should have switched to that before refactoring the code.
+>=20
+If I don't misunderstand what you wrote, I think you mean something like
+the following changes:
 
-On Wed, Mar 30, 2022 at 09:39:55PM -0700, Christoph Hellwig wrote:
-> On Wed, Mar 30, 2022 at 08:28:28AM -0400, Dennis Zhou wrote:
-> > I think cloning is a special case that I might have gotten wrong. If
-> > there is a bio_set_dev() call after each clone(), then the
-> > bio_clone_blkg_association() is excess work. We'd need to audit how
-> > bio_alloc_clone() is being used to be safe. Alternatively, we could opt
-> > for a bio_alloc_clone_noblkg(), but that's a little bit uglier.
-> 
-> As of Linux 5.18, the cloning interfaces have changed and take
-> a block devie that the clone is intended to be used for, and bio_set_dev
-> is mostly (there is a few more sports to be cleaned up in
-> dm/md/bcache/btrfs) only used for remapping to a new device.
-> 
+diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
+index a390679cf458..7a000a9a9dbe 100644
+=2D-- a/drivers/scsi/sd.c
++++ b/drivers/scsi/sd.c
+@@ -3431,7 +3431,7 @@ static int sd_probe(struct device *dev)
+        sdkp->disk_dev.class =3D &sd_disk_class;
+        dev_set_name(&sdkp->disk_dev, "%s", dev_name(dev));
+=20
+=2D       error =3D device_add(&sdkp->disk_dev);
++       error =3D device_register(&sdkp->disk_dev);
+        if (error) {
+                put_device(&sdkp->disk_dev);
+                goto out;
+@@ -3474,7 +3474,7 @@ static int sd_probe(struct device *dev)
+=20
+        error =3D device_add_disk(dev, gd, NULL);
+        if (error) {
+=2D               put_device(&sdkp->disk_dev);
++               device_unregister(&sdkp->disk_dev);
+                goto out;
+        }
 
-I took a quick look. It seems with the new interface,
-bio_clone_blkg_association() is unnecessary given the correct
-association should be derived from the bio_alloc*() calls with the
-passed in bdev. Also, blkcg_bio_issue_init() in clone seems wrong.
-
-Maybe the right thing to do here for md-linear and btrfs (what I've
-looked at) is to delay cloning until the map occurs and the right device
-is already in hand?
-
-> That being said I've eyed the code in bio_associate_blkg a bit and
-> I've been wondering about some of how it is implemented as well.
-> 
-
-I'm sure stuff has evolved since I've last been involved, but here is a
-brief explanation of the initial story. I suspect most of it holds true.
-Apologies if this isn't helpful.
-
-For others, a blkcg is a block cgroup. A blkcg_gq, blkg for short, is
-the marrying of a blkcg and a request_queue. It takes a reference on
-both so IO associated with the cgroup is tracked to the appropriate
-cgroup and prevents the request_queue from going away. Punted IOs go
-here and writeback is managed here as well. On the hot path, this is the
-tagging that blk-rq-qos stuff might depend on.
-
-The lookup itself is handled by blkg_lookup() which is a radix tree
-lookup of the request_queue. There is also a last hint which helps.
-blkg's are percpu-refcounted.
-
-In terms of lifetimes and pinning. child_blkcg pins parent_blkcgs in a
-tree hierarchy up to the root_blkcg. blkgs pin the blkcg it's associated
-to, the request_queue, and the blkg_parent (parent_blkcg and
-request_queue). They die in hierarchical order, alive until all children
-have passed.
-
-If there's anything else I can try to help answer please let me know.
-
-> Is recursive throttling really a thing?  i.e. we can have cgroup
-> policies on the upper (e.g. dm) device and then again on the lower
-> (e.g. nvme device)?  I think the code currently supports that, and
-> if we want to keep that I don't really see much of a way to avoid
-> the lookup, but maybe we cn make it faster.
-
-I'm not sure. I've primarily dealt with physical devices. However, I'm
-sure there are more complex setups that use it. Is it a good idea is
-probably debatable.
-
-Backing up though, I feel like the abstraction naturally alludes to this
-multiple association because you don't necessarily know when you hit
-physical devices until you finally submit through.
+@Dan, @Christoph: what do you think of the changes that I've copy-pasted ab=
+ove?
 
 Thanks,
-Dennis
+
+=46abio M. De Francesco
+
+
+
