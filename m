@@ -2,172 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EBB1C4332F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:25:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C46C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239882AbiCaQ04 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 12:26:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43608 "EHLO
+        id S240026AbiCaQgw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 12:36:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239934AbiCaQ0z (ORCPT
+        with ESMTP id S240022AbiCaQgv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:26:55 -0400
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B93A62A1C;
-        Thu, 31 Mar 2022 09:25:00 -0700 (PDT)
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VEx5gv007047;
-        Thu, 31 Mar 2022 16:24:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2021-07-09;
- bh=Yq8+2qRMKeLRoqN/aZe1kpvfpI6vhl22zU0q135oV90=;
- b=BLOuylkPkEHSaE/A2/pC7h6HifchkYOe/IvcGMDRvLpnQ3cvrNKNX8hY4xsCJy/FK2yu
- vrnhdcV4qUF67bGxQVIXyHJ3T71FnAxVe7nsaZJ7LmlfDNzn9IWXl4Hq1daZA6SXv9V7
- x2V2OjYFVn7y2KbCEFM3yDRTP28GHQZorXZqptuFM4FfFlqk3D446JbMAthoLSRHjM0J
- MqwYm8l6CJ/dq1iCQGf2mGmZm0bjHNhbhHdHCkdgfxJjPmZ6k3TK6tWMoS/m7QQRLWj8
- 06/sHI5sEruyNImVwVSTFEdqk7fe1/TCFvfxENyR6zZQJAW2HyFYS1Cg5PT0YAT0T66/ Mg== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3f1tes4tgp-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Mar 2022 16:24:46 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 22VGHKcd010056;
-        Thu, 31 Mar 2022 16:24:45 GMT
-Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2100.outbound.protection.outlook.com [104.47.55.100])
-        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3f1s951pc1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Mar 2022 16:24:45 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SkwqXA03soDgxnQbkLU40gv9WePXWAxuV7uZQDXpAzNPEPTbokCwW5j0Ttf2YlPj9j2KO2n1bBPO27QRfDHw2vtC9J/L90/MFWgRMAwMLd3Z/z+pkPQ0OGRkVT09o76+px49EPLjb6NIDG6T8QnD2+ILMewigh5Pp2sh24OtmDdzdfcLfTs2V1LhNcyWBsgNhm/Y3/EKOSQZeAJV9Ov0+0nCsXIardKvpYRGQaO3Umv1I1jG0sL5Ree2qBUmNxCR1+k5rRbsq+Pm0iEXwvNQuzK7eGSvwvvimkmK1M5TLL37UGP7f+BldORlCQ0S8lSwn06SDmMnxd0PyzvXRe8gLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Yq8+2qRMKeLRoqN/aZe1kpvfpI6vhl22zU0q135oV90=;
- b=fpeGNmyyspsKl1vR5c5RJ5NJkG4HMP9NiiXckWvQSUQiFidMZAEKvbz6hACpiQQf9HRl8Cb7VdkBtQq21UhtOyZJSX5djYcQwiKNjTox2QF2bqEeFIKFsYg7MEDDCfuY9kEdgytR9Wm1DOTpXW/TJ1dnnI8YwF0BaZr1tMrPgFXkNtrDVhZUBZtbk/7IuRHwTWUnrWLgofq/mGBWor/z04KYbLoZ7COOmj+EDbZquxfuRI+E5rHGrJYSGTgH7XQUIcMjUO+8ui9sYxVBLF7c1/AVoiKa7kuJpup7azL83reICxJbzpQU6Gme+8Ry/BYHinA4dogfxz6rSohjP6kuDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+        Thu, 31 Mar 2022 12:36:51 -0400
+Received: from alexa-out.qualcomm.com (alexa-out.qualcomm.com [129.46.98.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 850411BBF62;
+        Thu, 31 Mar 2022 09:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Yq8+2qRMKeLRoqN/aZe1kpvfpI6vhl22zU0q135oV90=;
- b=EWQlIZvTJukdE1uoAt3hES52m2ExIdXdcB/+ITD6/MJ6GEbFaJlC6ak6HZWclNfRk1Ls6tCw8O2/T6su2PwwIVweydyvPJaO+Hnc8vmDfMzr173KlKCoYwIktoDvQji0aYGV0mzpzrZU9GA2MFuiGWGpj4XL2HwYHn4lmow5l1E=
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- (2603:10b6:301:2d::28) by PH0PR10MB5870.namprd10.prod.outlook.com
- (2603:10b6:510:146::12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.21; Thu, 31 Mar
- 2022 16:24:43 +0000
-Received: from MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::d4e7:ee60:f060:e20c]) by MWHPR1001MB2365.namprd10.prod.outlook.com
- ([fe80::d4e7:ee60:f060:e20c%7]) with mapi id 15.20.5081.025; Thu, 31 Mar 2022
- 16:24:43 +0000
-Date:   Thu, 31 Mar 2022 19:24:16 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
-Cc:     Wenchao Hao <haowenchao@huawei.com>,
-        syzkaller-bugs@googlegroups.com, axboe@kernel.dk,
-        jejb@linux.ibm.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        martin.petersen@oracle.com,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
-        linfeilong@huawei.com
-Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
-Message-ID: <20220331162416.GI12805@kadam>
-References: <20220329154948.10350-1-fmdefrancesco@gmail.com>
- <fdebdbd3-575b-b30e-d37f-dcc6d53a4f53@huawei.com>
- <20220331134210.GF12805@kadam>
- <1787706.atdPhlSkOF@leap>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1787706.atdPhlSkOF@leap>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-ClientProxiedBy: JNAP275CA0023.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4d::16)
- To MWHPR1001MB2365.namprd10.prod.outlook.com (2603:10b6:301:2d::28)
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1648744503; x=1680280503;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=vcu31rMS0yn2EqzHi27wb6PxKwLH34tTd/+ys8ECp/A=;
+  b=ADDuc88FzNWZGKBrIk06zzzX+k6YSxqk27uWQNihSUCGuZ1GtMpxcMlV
+   xTEWa75dpfcsFQw+mC064HKR7W4MWXLYRVTC8926TBwzR2AQWBCbndTjo
+   VEkv7SFykl4Py4aMRGoIAena380+aMTSMqaNCRjn7CsXqgUcJlMFOvVOW
+   g=;
+Received: from ironmsg07-lv.qualcomm.com ([10.47.202.151])
+  by alexa-out.qualcomm.com with ESMTP; 31 Mar 2022 09:35:03 -0700
+X-QCInternal: smtphost
+Received: from nasanex01c.na.qualcomm.com ([10.47.97.222])
+  by ironmsg07-lv.qualcomm.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Mar 2022 09:35:02 -0700
+Received: from nalasex01a.na.qualcomm.com (10.47.209.196) by
+ nasanex01c.na.qualcomm.com (10.47.97.222) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.22; Thu, 31 Mar 2022 09:35:02 -0700
+Received: from qian (10.80.80.8) by nalasex01a.na.qualcomm.com (10.47.209.196)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.22; Thu, 31 Mar
+ 2022 09:34:58 -0700
+Date:   Thu, 31 Mar 2022 12:34:56 -0400
+From:   Qian Cai <quic_qiancai@quicinc.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
+        Mike Snitzer <snitzer@redhat.com>, Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "David Sterba" <dsterba@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        <linux-block@vger.kernel.org>, <dm-devel@redhat.com>,
+        <linux-kernel@vger.kernel.org>, <linux-bcache@vger.kernel.org>,
+        <linux-raid@vger.kernel.org>, <target-devel@vger.kernel.org>,
+        <linux-btrfs@vger.kernel.org>
+Subject: Re: cleanup bio_kmalloc v2
+Message-ID: <YkXYMGGbk/ZTbGaA@qian>
+References: <20220308061551.737853-1-hch@lst.de>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 6ac9266e-f168-4390-ad3c-08da1332f614
-X-MS-TrafficTypeDiagnostic: PH0PR10MB5870:EE_
-X-Microsoft-Antispam-PRVS: <PH0PR10MB5870AB050225AF32B56441178EE19@PH0PR10MB5870.namprd10.prod.outlook.com>
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: BiUNm0o/5zDXNANA5rxTbo9yJjGbqF75BprVe7IZSjiDmfqxAV6mS1Ugw0KC7IKwKooye2uGk0cO4cdAyhOj5W+JLPUetQIsNiTVVMQu0yDRWS2woBaLUVoPqWIWD8EwiGNBnUv0N9IkMPJesIAeuO4jcpgTtAEvicKru+S7Lk0niIVrEg96nWXvYY/pv2apvztZ9rVZ9rNfsYmSZllwEHfMIeOhcMIuSAz+biyDWhux88wUxuQOcmxAPOfuWlfSCBT60GrwsFJIoNmVzX9a+SeGpil3KqiUsHOak1jfq+zcwFLnMnGa9uSdF69BTBvTrkh93TddNAMMHdB3pmyQbatTt4IRrV+7G22oSf00NFHpKcKM4gywOv/GvbctfSzTG6oAd876lCwdmn+U08CoCL/kG3onwWhYapw1Gt/cK529Zxv3/V7x9gIbUm49ihiT93nKtvijPgYsOHhUUR6Kw3bZjN7g1oAPh+sGba2N2dgLI+AOqtRMBGJjIUaG6luC9KzIF5vz7Q8QligB4IsioM3kdKT+Y0OreZdw3We7U27J512Sc+20xn4O3l7zCkK9I9G3cRGarn/F1KMu/xVgG+tjAcAQmdydI0vsl+BqAubaFDjSH3nI1J+NVRYU/bK8YLI7lhvKKAkixDlXAgCSbOLXG1dYFk3KU0zIJM1lks62Mj5Pm75o+wnI6bgNshTuNCPpx1f+hZcWIXMO5UNc3w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1001MB2365.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(366004)(508600001)(38350700002)(38100700002)(7416002)(33716001)(6512007)(86362001)(33656002)(2906002)(6486002)(9686003)(6506007)(52116002)(316002)(6666004)(4744005)(5660300002)(8676002)(44832011)(4326008)(26005)(1076003)(66476007)(66556008)(186003)(8936002)(6916009)(66946007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iM2eOEd2BZ2UeUDvbJFYY86sstJ/sNEVN5dfU6tU+E+obINabc7d9bV1IIzY?=
- =?us-ascii?Q?v6fuzSc0x+LZlK+XZkWx7lvaV8FOk6eJLDCQEDe78cQvndwrp3FEdpDiaDgN?=
- =?us-ascii?Q?zQsB6JCh7nXwNKw7CYTnqaH+Xl1irUXqxTJ7r/POzDrBtmKzj1WKy03srAj/?=
- =?us-ascii?Q?d5pgqUssdZjSWnUcS1lcybqdwKV2TIUSF0Cio1kVq3PZVSGp2N0RrjXU2GUy?=
- =?us-ascii?Q?mKskQIB+Pp5S6Mz/ASdGP4KAsAVWijBpLNkq3HLhM/NjXHsfVYeUNhuKNKOv?=
- =?us-ascii?Q?jS2b5AQDMLTDqN1vN8LO3JxuAb9Gs1Y7Ll/lkg9X0KBjGL7UgtvzEqJ0OhMM?=
- =?us-ascii?Q?Dywg30Di/TXQ49w/joolLVZDHR4FjOX1zsyeMvHXArdP6tDv47kitrPWDaOF?=
- =?us-ascii?Q?/xb+f6DNGcKf73jgN8q1pfxfQVrsIb4UBURXp0iMYHlzDgIRfnMtDdR9iEt6?=
- =?us-ascii?Q?ecafZ1BnNvqFFy1rvkSlB7hSywoN22mrBjJu4ZEDZlRzk77M5BcrA6CfYbc+?=
- =?us-ascii?Q?SQIaWQ/eeMgbTifowmg5n7Y7Mcm6CjdQ7iAWQ1jqvV1pEjaWkTxUkl4ix69W?=
- =?us-ascii?Q?LbLl3LBpHbcW6z/67YPQCkQ9sWIXgXVR+i7ATlhsKbCudfHF+H5v9+Lecjco?=
- =?us-ascii?Q?L+GS/TDCIDHILt8k7LTV9ZZnjC4Z4tTvXVR1Y0TP3uIwQ4x+fgHZ4zhLaUR+?=
- =?us-ascii?Q?7Y2iGRIsPwxpHfMJwXmaXHg9URQCBg7csIxHAE0appISEpmVrkMYza0bcYAC?=
- =?us-ascii?Q?PgEnCCqRxv4bjockm7VU5Pzl+1/srdZu2FqoIosP/lrPFHtaLH3Fjv6C0qQv?=
- =?us-ascii?Q?8/LjyIqNUut3Et5EIoYnU2B1ZrsnVxEorRK8G6RbD46tAmRoM8m4s27MOr6L?=
- =?us-ascii?Q?rOcJf0e3qekXlvaIbsvpXZKKZSO90S0UHKwH/f3ineWRysvVCu6UuyPMhP1v?=
- =?us-ascii?Q?7OxSfr2CUBQIG3flPS4ZWk6D+LG7T6xqRwFhLH73e6TvbBkcisPIINQZ2lQp?=
- =?us-ascii?Q?fnzwcovpMcQyBLziMEIZKwpItCw3K6S978aUEGHfM8zHZ5oSoyGfctn19TJ9?=
- =?us-ascii?Q?DQhX76TlOnoYXoQFOdj+htJs04RvMBB3J1dp+9yJalw9aLJTWjZB4yJgUbjf?=
- =?us-ascii?Q?/BN6KJHlpkt8pMXdNFUD0PcjuaTJuRWIDN9i/ymy71hSZfAIUC7k+e0c2eIa?=
- =?us-ascii?Q?1kPZtxibZi5FxcZVDnGt/72c12+Gh/w86URg63Yzft4SXoOYGiCyeS+I6MIP?=
- =?us-ascii?Q?mYHw4jnF1vJtSdwsS/00QFwTBhp/ERnRnTnfRuiTPiCJoddeafxoa8+s5rDT?=
- =?us-ascii?Q?lGsyDcXRzDHS0Gg2+yS8YiTKYWnGMNqUu8xqJY42UjmWl65ulisftZoCYM0l?=
- =?us-ascii?Q?AeTqvi6QU3TgSQCsd7yqzERJKDEbG7GhzCnY5WCOh6BF5VGhOW5j7NnUfP1O?=
- =?us-ascii?Q?Fmmyz5u6dnp1ArWn9/NUKtIoBJm3DfgNQY5fkA+xBty/YBxnPA3+UUQll74j?=
- =?us-ascii?Q?4crRFqqwHWxnbQvC9Q4itQAFw0vRIRC2OtYCvDcAqyJwOgw2LxC/6d+Hz8Kc?=
- =?us-ascii?Q?zR9Q+R87UPPVAY0YCta1Wqr8Xpq4FdB85ccm/RV2h04NQADozWFsGwRZ4CQQ?=
- =?us-ascii?Q?8wjZlpeXfbX69s/+28tpvjuu0NmkSz4gZC5j3WjA9kysYNYgSS2XI6QW0/M6?=
- =?us-ascii?Q?9NmLBFbZxD9VDyccz2oj8qn+AzwWV992LDYvVHCBv16Vb+7Y0hVS96IttzEG?=
- =?us-ascii?Q?eJZ9IE/dT/kvXvPdkCN944njYIInMXM=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6ac9266e-f168-4390-ad3c-08da1332f614
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1001MB2365.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Mar 2022 16:24:42.9657
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c9VWKN9ggo+HbWnGZp2zUazhcc36W2YNBPk35Fk6Ax8R0Np0KXh3EJ4GjiLWFO95q9yO3Zd4OwUrU7hVyOWTOPPxAi6H4uVWMzwwBTuuKrE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR10MB5870
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.425,18.0.850
- definitions=2022-03-31_05:2022-03-30,2022-03-31 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxlogscore=999
- phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203310090
-X-Proofpoint-GUID: EP6NiaObFWaMerlAqXFDaT492otoLsy4
-X-Proofpoint-ORIG-GUID: EP6NiaObFWaMerlAqXFDaT492otoLsy4
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20220308061551.737853-1-hch@lst.de>
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 06:14:27PM +0200, Fabio M. De Francesco wrote:
-> On gioved? 31 marzo 2022 15:42:10 CEST Dan Carpenter wrote:
-> > Wenchao Hao, what you're saying makes a lot of sense but it raises a lot
-> > of questions in turn.
-> > 
-> > Fabio, did you test your patch?
+On Tue, Mar 08, 2022 at 07:15:46AM +0100, Christoph Hellwig wrote:
+> Hi Jens,
 > 
-> Yes, I did, Dan. I tested it the usual way with the "#syz test:" command.
-> Obviously I have not the hardware to test code on it.
+> this series finishes off the bio allocation interface cleanups by dealing
+> with the weirdest member of the famility.  bio_kmalloc combines a kmalloc
+> for the bio and bio_vecs with a hidden bio_init call and magic cleanup
+> semantics.
 > 
+> This series moves a few callers away from bio_kmalloc and then turns
+> bio_kmalloc into a simple wrapper for a slab allocation of a bio and the
+> inline biovecs.  The callers need to manually call bio_init instead with
+> all that entails and the magic that turns bio_put into a kfree goes away
+> as well, allowing for a proper debug check in bio_put that catches
+> accidental use on a bio_init()ed bio.
 
-Yeah.  What a nightmare.  You posted a link to the first test.  It said
-passed but definitely introduced some use after frees but how was anyone
-supposed to know?
+Reverting this series fixed boot crashes.
 
-No way we would have figured this out.  I'm working to make Smatch
-understand device_put() better but this one is way difficult.
-
-Sorry that you went through this.
-
-regards,
-dan carpenter
-
+ WARNING: CPU: 1 PID: 2622 at block/bio.c:229 bio_free
+ Modules linked in: cdc_ether usbnet ipmi_devintf ipmi_msghandler cppc_cpufreq fuse ip_tables x_tables ipv6 btrfs blake2b_generic libcrc32c xor xor_neon raid6_pq zstd_compress dm_mod nouveau crct10dif_ce drm_ttm_helper mlx5_core ttm drm_dp_helper drm_kms_helper nvme mpt3sas xhci_pci nvme_core raid_class drm xhci_pci_renesas
+ CPU: 1 PID: 2622 Comm: mount Not tainted 5.17.0-next-20220331 #50
+ pstate: 10400009 (nzcV daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+ pc : bio_free
+ lr : bio_put
+ sp : ffff8000371b7760
+ x29: ffff8000371b7760 x28: 0000000000000000 x27: dfff800000000000
+ x26: ffff08028f93a600 x25: 0000000000000000 x24: ffff08028f92f600
+ x23: 1ffff00006e36f10 x22: ffff08028fa18510 x21: 1fffe10051f430a2
+ x20: 0000000000000000 x19: ffff08028fa18500 x18: ffffde03db3e7d2c
+ x17: ffffde03d55f8bc4 x16: 1fffe10051e75129 x15: 1fffe106cfcfbb46
+ x14: 1fffe10051e7511c x13: 0000000000000004 x12: ffff700006e36eab
+ x11: 1ffff00006e36eaa x10: ffff700006e36eaa x9 : ffffde03d5cb9fec
+ x8 : ffff8000371b7557 x7 : 0000000000000001 x6 : ffff700006e36eaa
+ x5 : 1ffff00006e36ea9 x4 : 1ffff00006e36ebe x3 : 1fffe10051f430a2
+ x2 : 1fffe10051f430ae x1 : 0000000000000000 x0 : ffff08028fa18570
+ Call trace:
+  bio_free
+  bio_put
+  squashfs_read_data
+  squashfs_read_table
+  squashfs_fill_super
+  get_tree_bdev
+  squashfs_get_tree
+  vfs_get_tree
+  do_new_mount
+  path_mount
+  __arm64_sys_mount
+  invoke_syscall
+  el0_svc_common.constprop.0
+  do_el0_svc
+  el0_svc
+  el0t_64_sync_handler
+  el0t_64_sync
+ irq event stamp: 33146
+ hardirqs last  enabled at (33145):  free_unref_page
+ hardirqs last disabled at (33146):  el1_dbg
+ softirqs last  enabled at (33122):  __do_softirq
+ softirqs last disabled at (33111):  __irq_exit_rcu
+ ---[ end trace 0000000000000000 ]---
+ Unable to handle kernel paging request at virtual address dfff800000000001
+ KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+ Mem abort info:
+   ESR = 0x96000004
+   EC = 0x25: DABT (current EL), IL = 32 bits
+   SET = 0, FnV = 0
+   EA = 0, S1PTW = 0
+   FSC = 0x04: level 0 translation fault
+ Data abort info:
+   ISV = 0, ISS = 0x00000004
+   CM = 0, WnR = 0
+ [dfff800000000001] address between user and kernel address ranges
+ Internal error: Oops: 96000004 [#1] PREEMPT SMP
+ Modules linked in: cdc_ether usbnet ipmi_devintf ipmi_msghandler cppc_cpufreq fuse ip_tables x_tables ipv6 btrfs blake2b_generic libcrc32c xor xor_neon raid6_pq zstd_compress dm_mod nouveau crct10dif_ce
+drm_ttm_helper mlx5_core ttm drm_dp_helper drm_kms_helper nvme mpt3sas xhci_pci nvme_core raid_class drm xhci_pci_renesas
+ CPU: 1 PID: 2622 Comm: mount Tainted: G        W         5.17.0-next-20220331 #50
+ pc : bio_free
+ lr : bio_free
+ sp : ffff8000371b7760
+ x29: ffff8000371b7760 x28: 0000000000000000 x27: dfff800000000000
+ x26: ffff08028f93a600 x25: 0000000000000000 x24: ffff08028f92f600
+ x23: 1ffff00006e36f10 x22: ffff08028fa18548 x21: 00000000000000d0
+ x20: 0000000000000000 x19: ffff08028fa18500 x18: ffffde03db3e7d2c
+ x17: ffffde03d55f8bc4 x16: 1fffe10051e75129 x15: 1fffe106cfcfbb46
+ x14: 1fffe10051e7511c x13: 0000000000000004 x12: ffff700006e36eab
+ x11: 1ffff00006e36eaa x10: ffff700006e36eaa x9 : ffffde03d5cb9c78
+ x8 : ffff8000371b7557 x7 : 0000000000000001 x6 : ffff700006e36eaa
+ x5 : 1ffff00006e36ea9 x4 : 1fffe10051f430ac x3 : 0000000000000001
+ x2 : 0000000000000003 x1 : dfff800000000000 x0 : 0000000000000008
+ Call trace:
+  bio_free
+  bio_put
+  squashfs_read_data
+  squashfs_read_table
+  squashfs_fill_super
+  get_tree_bdev
+  squashfs_get_tree
+  vfs_get_tree
+  do_new_mount
+  path_mount
+  __arm64_sys_mount
+  invoke_syscall
+  el0_svc_common.constprop.0
+  do_el0_svc
+  el0_svc
+  el0t_64_sync_handler
+  el0t_64_sync
+ Code: d2d00001 f2fbffe1 52800062 d343fc03 (38e16861)
+ ---[ end trace 0000000000000000 ]---
+ SMP: stopping secondary CPUs
+ Kernel Offset: 0x5e03ccd70000 from 0xffff800008000000
+ PHYS_OFFSET: 0x80000000
+ CPU features: 0x000,00085c0d,19801c82
+ Memory Limit: none
+ ---[ end Kernel panic - not syncing: Oops: Fatal exception ]---
+> 
+> Changes since v1:
+>  - update a pre-existing comment per maintainer suggestion
+> 
+> Diffstat:
+>  block/bio.c                        |   47 ++++++++++++++-----------------------
+>  block/blk-crypto-fallback.c        |   14 ++++++-----
+>  block/blk-map.c                    |   42 +++++++++++++++++++++------------
+>  drivers/block/pktcdvd.c            |   34 +++++++++++---------------
+>  drivers/md/bcache/debug.c          |   10 ++++---
+>  drivers/md/dm-bufio.c              |    9 +++----
+>  drivers/md/raid1.c                 |   12 ++++++---
+>  drivers/md/raid10.c                |   21 +++++++++++-----
+>  drivers/target/target_core_pscsi.c |   36 ++++------------------------
+>  fs/btrfs/disk-io.c                 |    8 +++---
+>  fs/btrfs/volumes.c                 |   11 --------
+>  fs/btrfs/volumes.h                 |    2 -
+>  fs/squashfs/block.c                |   14 +++--------
+>  include/linux/bio.h                |    2 -
+>  14 files changed, 116 insertions(+), 146 deletions(-)
