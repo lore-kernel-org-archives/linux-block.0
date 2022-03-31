@@ -2,67 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B849CC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 382F6C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 17:21:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240282AbiCaQ4D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 12:56:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59194 "EHLO
+        id S229867AbiCaRXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 13:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240280AbiCaQ4C (ORCPT
+        with ESMTP id S229823AbiCaRXG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:56:02 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A6B9DE909
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:54:15 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id a9-20020a5d89c9000000b0064cb68a9ba6so77882iot.11
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:54:15 -0700 (PDT)
+        Thu, 31 Mar 2022 13:23:06 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D361F0824;
+        Thu, 31 Mar 2022 10:21:18 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id k124-20020a1ca182000000b0038c9cf6e2a6so81035wme.0;
+        Thu, 31 Mar 2022 10:21:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=+UVRHxpu5eAfZsEs5HfhLN004uIPJF3dGsymXwYvqE0=;
+        b=LNUVKXrv51q/DMVQ860JVj9trLzFV/zwqf6kbU1eIcKzFyN42aHz1+BBprVSkJ9n4D
+         wDJDO/+r6UGXeIFsZx4I5xkVuCUEqYEM4wKnq9llbQX8dQpznyhHf50XTEMZdWcK23RZ
+         iBWy/hiiaNOKW188/GaypOGFunHUm5wB3VAzu9KajZ8d4HsSdis+TQ/DkIW0Z9ooMnWG
+         Jb/XiCsZg4rNYn7bPe5mm+fizG7LJGW4LoLMiuENFUpE6DP6SSSo8CM5twNT/nI7cSt4
+         b2944laRAYHdWIm9fmq1JFdIQabTy2/8PpKig1IcLTw4Pgob6wUwIvtWP4H8Kurwnfo/
+         28TQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=lAU3Wth5raowPe6hr9BcwEouOu/KFzD0omZlx82ZzhQ=;
-        b=T6b/MsW+V9sQ8/ng7Xn1v02x2spng4J9ZGVop65t22tTZacW1qfzlFScwQ6joYZISk
-         ez4BjEETeIqKjKNVikXSLB7OWF5hf/yuI7JZu4fRIEYe//3XaJe5wfdLJ/G/FtjQ4w/S
-         PA7OosILIYEp73UWPQToK/SoJcFfZNIe/hpYPMQ9hXlojx7tK17TbEsFesaNQquOeEMw
-         eWJ/E+DpgoP7AmGH3n/Go3hwpHBTYYNY22KZEuvYfc2e62UjLSaGOZlxadUmy60UiDE8
-         hCklZvxhoDQR3m+NzH74W3JIuTq2ZuP7SBTozTPlhfCoOhkxFgWgBQn83U4ULV0xmX+5
-         SeBQ==
-X-Gm-Message-State: AOAM531DQNVjuj4hXy71mIPgEe68++OQPPT11AK+lFJXxt8Rm6lRUU0g
-        SjhORTWCdEWY+hfqbU52/yTAUvZg2c13QIJofqCWn/NA7j8A
-X-Google-Smtp-Source: ABdhPJwmJ9AzvPYeGAfkPFM7NlFTob2+QRp3K6k3IYckOOrGwTagSa4rhrpDwa3c7WBsNsTiOqz5dCc3PpdqYZs8p+YNEMVAidFz
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=+UVRHxpu5eAfZsEs5HfhLN004uIPJF3dGsymXwYvqE0=;
+        b=QxIykZVGCuhYKCvABblfgrC71eV1uF2tYhTiYr768dYAl8ylKk8rOJeGXPZVn5FxIq
+         So2m8BmesogrPE1/IMKz+Eqp2llUaHTjTe1DvMpM/NHsbKeTluy+mBB6AcSZt0JuEzeF
+         Ip1jlPGPrxrXEuNU8Bf1QYnHS9TZNViT2fdvSWw71diCJ6vj1Jf+WKv9k9EAnjooWdKN
+         tzUwWE9eUBTSERAyWeXd52b1/ID1ZWYl0dQGKu76UJCzfqIXe54uXoZNoTqLU6SewBM/
+         mzyQ+qOzP1Cp2OKLnrmcVgbYaQS59rCdXzW41epISB7UzrpNq3aCtJnz1MnW+Bg0IzYn
+         nI5w==
+X-Gm-Message-State: AOAM533hMoGoSmp+FV0qU/bUkqhJbWhhaRxGZqHFHO9N5gHCq6BeRpVT
+        Wm9c0WSnxAJeMYZ+AW0wmSQ=
+X-Google-Smtp-Source: ABdhPJzq3nr8QvRZ+mF96/wzGEaUKNuBxFHKqbGBuOjhVXW3zpe6yfAWUncBSibI3awJmqeY6frabA==
+X-Received: by 2002:a05:600c:35d4:b0:38c:9933:41c0 with SMTP id r20-20020a05600c35d400b0038c993341c0mr5593964wmq.149.1648747276628;
+        Thu, 31 Mar 2022 10:21:16 -0700 (PDT)
+Received: from leap.localnet (host-95-249-145-232.retail.telecomitalia.it. [95.249.145.232])
+        by smtp.gmail.com with ESMTPSA id u7-20020a05600c19c700b0038cc9aac1a3sm8571435wmq.23.2022.03.31.10.21.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 10:21:15 -0700 (PDT)
+From:   "Fabio M. De Francesco" <fmdefrancesco@gmail.com>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Wenchao Hao <haowenchao@huawei.com>,
+        syzkaller-bugs@googlegroups.com, axboe@kernel.dk,
+        jejb@linux.ibm.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        martin.petersen@oracle.com,
+        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
+        linfeilong@huawei.com
+Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
+Date:   Thu, 31 Mar 2022 19:21:13 +0200
+Message-ID: <3427592.iIbC2pHGDl@leap>
+In-Reply-To: <20220331162416.GI12805@kadam>
+References: <20220329154948.10350-1-fmdefrancesco@gmail.com> <1787706.atdPhlSkOF@leap> <20220331162416.GI12805@kadam>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d81:b0:2ca:47:4364 with SMTP id
- h1-20020a056e021d8100b002ca00474364mr1503158ila.80.1648745654584; Thu, 31 Mar
- 2022 09:54:14 -0700 (PDT)
-Date:   Thu, 31 Mar 2022 09:54:14 -0700
-In-Reply-To: <20220331164358.GA30565@lst.de>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000110d5805db868373@google.com>
-Subject: Re: [syzbot] WARNING in bio_free
-From:   syzbot <syzbot+e08de3db8be67b2a01b0@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On gioved? 31 marzo 2022 18:24:16 CEST Dan Carpenter wrote:
+> On Thu, Mar 31, 2022 at 06:14:27PM +0200, Fabio M. De Francesco wrote:
+> > On gioved? 31 marzo 2022 15:42:10 CEST Dan Carpenter wrote:
+> > > Wenchao Hao, what you're saying makes a lot of sense but it raises a lot
+> > > of questions in turn.
+> > > 
+> > > Fabio, did you test your patch?
+> > 
+> > Yes, I did, Dan. I tested it the usual way with the "#syz test:" command.
+> > Obviously I have not the hardware to test code on it.
+> > 
+> 
+> Yeah.  What a nightmare.  You posted a link to the first test.  It said
+> passed but definitely introduced some use after frees but how was anyone
+> supposed to know?
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Maybe that a "spare-time Linux developer" like me should leave these 
+kinds of bug fixes to more experienced people. But we should also note 
+that I tried two or three different patches and _all_ of them passed
+the tests. 
 
-Reported-and-tested-by: syzbot+e08de3db8be67b2a01b0@syzkaller.appspotmail.com
+> 
+> No way we would have figured this out.
 
-Tested on:
+I think that something should change about the way Syzbot tests patches 
+and about how it provides the results. The other four or five bugs that 
+I have fixed were based mainly to the fact that they passed the Syzbot 
+tests. 
 
-commit:         ea32d892 squashfs: free bios allocated using bio_kmall..
-git tree:       git://git.infradead.org/users/hch/misc.git squashfs-fix
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6a82c1abd4cbb9ee
-dashboard link: https://syzkaller.appspot.com/bug?extid=e08de3db8be67b2a01b0
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+Perhaps I've been lucky but my patches were good and they were merged. 
 
-Note: no patches were applied.
-Note: testing is done by a robot and is best-effort only.
+However, I began to trust Syzbot too much. This is not how I should 
+approach and try to solve bugs.
+
+> I'm working to make Smatch
+> understand device_put() better but this one is way difficult.
+> 
+> Sorry that you went through this.
+
+Please don't be sorry :)
+
+Believe me when I say that I cannot explain how many things I have 
+learned during these days while working on this issue. I see no 
+problems at all but only opportunities for learning.
+
+Thank you very much!
+
+Fabio M. De Francesco
+
+> 
+> regards,
+> dan carpenter
+> 
+> 
+
+
+
+
