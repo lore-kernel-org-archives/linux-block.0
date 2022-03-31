@@ -2,103 +2,72 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA5CC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 21:22:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A23DEC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 21:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241840AbiCaVYH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 17:24:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39926 "EHLO
+        id S241956AbiCaVsA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 17:48:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237321AbiCaVYG (ORCPT
+        with ESMTP id S237702AbiCaVr7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 17:24:06 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EAA423D748
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 14:22:18 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id o8so765331pgf.9
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 14:22:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=x3SePf6cYyzJ/sV6xHzMCnP/4ErKQDoUNlfoUc3FU/o=;
-        b=pbUrFWcZ2skLn6FAZKUppr3B/0KcKYvs7TVqCpR/V/wpljp0wGqVFJrj7vRAyJlZaG
-         N0rqPpfA6Eyg0swWL6TZQ2Ao2/Gs7zjCBpYKtGgeftbX9wZo5RutaAIdeBlBMTpypBzx
-         TGel8IyxgFZbX40O+FfItMq6FYmWpwXK95ZvQAB+ZeW7GfasepxJTsDFJwiOIPDzRraq
-         2L0hLd+MVFTJd98uB0m2smroBZU8rq8LJ+t/lj+n8QZvP6ZooUOk2UUyhrV3IJrm+6tP
-         Zl+ZU+WwG6a53qFjsvhKcgbDV5Sb6n1XbUYHqQhzrdurBPG4yfswzxy4qsxPu50Vppzu
-         xLQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=x3SePf6cYyzJ/sV6xHzMCnP/4ErKQDoUNlfoUc3FU/o=;
-        b=GnQ15zoMDEVV68PxchHEYGEh6HNdlDEng4d0xmnUDh6EoOtnnYbzVzUnVp3JIDUBOE
-         ne9PQO2DpKfnxR+Bi3IPorca780B/54PuPCWoLQ+kI1nTb6QK2PzmwafTs6KUPUsJ/5Q
-         BrrRK5WqEJTK5Nto8MgA6j43HFd4lVjQSAQVE8ttJR+WpbDfFt4szC7uiCmE2OvSTKRH
-         zQk8BE3yG+wNKIND9S999OcYoNnkrglHZz+w7Ssmcurd3Gaq5nk2NGAQOrBJhlxsP20z
-         5k8aSuMgS6UOl4uZl2DD3gDCuStd2hRRizFDUntOBXOsZ6cMCeGvJFVjHRAzFuWq0SsS
-         vGLQ==
-X-Gm-Message-State: AOAM533Modwh1BVU4Nf6YhBLdcstMGkyul3hlUIGIH7EB366xX+NvfMj
-        e1zjbvP7ncY4SvHnfmDUrsR8gQ==
-X-Google-Smtp-Source: ABdhPJwYnU9r41ORdf19G02EFb5yhsyLJV8xzLTtxC7Sx8NiXMpF/1DkwJ2vuON7bztWgA+FZZylpQ==
-X-Received: by 2002:a05:6a00:328f:b0:4fa:95b5:e1ff with SMTP id ck15-20020a056a00328f00b004fa95b5e1ffmr7412958pfb.60.1648761737704;
-        Thu, 31 Mar 2022 14:22:17 -0700 (PDT)
-Received: from ?IPV6:2600:380:772e:9a93:98d9:fd90:ab06:5943? ([2600:380:772e:9a93:98d9:fd90:ab06:5943])
-        by smtp.gmail.com with ESMTPSA id j7-20020a056a00130700b004b9f7cd94a4sm410220pfu.56.2022.03.31.14.22.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 14:22:17 -0700 (PDT)
-Message-ID: <1eb268c5-3420-0263-3f0c-7d3982f8f512@kernel.dk>
-Date:   Thu, 31 Mar 2022 15:22:14 -0600
+        Thu, 31 Mar 2022 17:47:59 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 149371D915A
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 14:46:10 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VKVP6J032352;
+        Thu, 31 Mar 2022 21:45:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2021-07-09; bh=dwiDsf+zvdH7oRjbZrvdnL3TUrOGM2biKjLq4Z3n0to=;
+ b=BTr75ZVpMNUo8Wvs2EsiTCTZf86INcUFhHvgjte+JtRd/khY6pYvVHpEBVLH3XdNbr8y
+ TN+9tHjPTJSzYq67924uT1L9USiipsuYOEy+gBT5efdl8XmdDyfxCp5KjiuTXfoEgN1+
+ 5Dy13bXsqC7GaJo3C969yhZKrAcNuvQrciAg4BDUbXd+B/NOExVMKQtKHJfoX/Avi/VB
+ 7gZB1Vp4OXnpp1hXGY3Rskz/Fo2EDRjd2LrOg230gI/ZSNKwj8BemF5P70p3d8SuiZZN
+ VrudY7Uo3mbRFNO5HGSqRsfPzEovuYhSGykfex/uqBx+otssHNbIfd8SACMCpdKoQSUH Aw== 
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3f1uctwtsx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 21:45:58 +0000
+Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 22VLfLtG013724;
+        Thu, 31 Mar 2022 21:45:58 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3f1s95cux9-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Thu, 31 Mar 2022 21:45:58 +0000
+Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 22VLjvTi025801;
+        Thu, 31 Mar 2022 21:45:57 GMT
+Received: from dhcp-10-65-129-122.vpn.oracle.com (dhcp-10-65-129-122.vpn.oracle.com [10.65.129.122])
+        by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3f1s95cuwy-1;
+        Thu, 31 Mar 2022 21:45:57 +0000
+From:   Alan Adamson <alan.adamson@oracle.com>
+To:     linux-block@vger.kernel.org
+Cc:     alan.adamson@oracle.com, linux-nvme@lists.infradead.org,
+        osandov@fb.com
+Subject: Issues running nvme-tcp/rdma passthru blktests
+Date:   Thu, 31 Mar 2022 14:45:25 -0700
+Message-Id: <20220331214526.95529-1-alan.adamson@oracle.com>
+X-Mailer: git-send-email 2.24.3 (Apple Git-128)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 4/5] block: turn bio_kmalloc into a simple kmalloc wrapper
-Content-Language: en-US
-To:     Marek Szyprowski <m.szyprowski@samsung.com>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-References: <20220308061551.737853-1-hch@lst.de>
- <20220308061551.737853-5-hch@lst.de>
- <CGME20220331211804eucas1p28da21f2dfd57aa490abffb8f87417f42@eucas1p2.samsung.com>
- <6696cc6a-3e3f-035e-5b8c-05ea361383f3@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <6696cc6a-3e3f-035e-5b8c-05ea361383f3@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: OY9R3DFYrKbNPG64zwoMNfwPmmh_fpkK
+X-Proofpoint-GUID: OY9R3DFYrKbNPG64zwoMNfwPmmh_fpkK
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 3:18 PM, Marek Szyprowski wrote:
-> Hi Christoph,
-> 
-> On 08.03.2022 07:15, Christoph Hellwig wrote:
->> Remove the magic autofree semantics and require the callers to explicitly
->> call bio_init to initialize the bio.
->>
->> This allows bio_free to catch accidental bio_put calls on bio_init()ed
->> bios as well.
->>
->> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> 
-> This patch, which landed in today's next-20220331 as commit 57c47b42f454 
-> ("block: turn bio_kmalloc into a simple kmalloc wrapper"), breaks badly 
-> all my test systems, which use squashfs initrd:
+When executing blktest nvme tests with tcp and rdma, and with 
+CONFIG_NVME_TARGET_PASSTHRU enabled, tests nvme/034-037 did not
+complete.
 
-The series has been reverted on the block side, so next linux-next should
-be fine again. We'll try again for 5.19.
+This was because the nvme/rc helper for setting up passthru targets
+hardcoded trtype to "loop" which resulted in the nvme connect to
+fail.
 
--- 
-Jens Axboe
+The following patch resolves this.
+
+Alan
 
