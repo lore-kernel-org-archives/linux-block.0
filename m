@@ -2,126 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5048C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:44:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2AB2C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 16:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240189AbiCaQpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 12:45:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52884 "EHLO
+        id S240251AbiCaQun (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 12:50:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240192AbiCaQpt (ORCPT
+        with ESMTP id S240240AbiCaQum (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 12:45:49 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D4C4209A67;
-        Thu, 31 Mar 2022 09:44:02 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 9437C68AFE; Thu, 31 Mar 2022 18:43:58 +0200 (CEST)
-Date:   Thu, 31 Mar 2022 18:43:58 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     syzbot <syzbot+e08de3db8be67b2a01b0@syzkaller.appspotmail.com>
-Cc:     axboe@kernel.dk, hch@lst.de, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, martin.petersen@oracle.com,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] WARNING in bio_free
-Message-ID: <20220331164358.GA30565@lst.de>
-References: <0000000000006cc9ec05db8658be@google.com>
+        Thu, 31 Mar 2022 12:50:42 -0400
+Received: from mail-io1-xd36.google.com (mail-io1-xd36.google.com [IPv6:2607:f8b0:4864:20::d36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5F195883B
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:48:53 -0700 (PDT)
+Received: by mail-io1-xd36.google.com with SMTP id q11so157990iod.6
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 09:48:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=GVS+7ByfaDfRQ3cP7Su5v65xswUHpTm7s1D0XKCLUIc=;
+        b=5UHAlnNn6pmh13gHK2pkVOqqU+NLxHAIm10n7hxY69fkf4etI7xGcoRjiBvGoyxJNr
+         kabCkIf1xxwY5lv3Fz+S1YPx7xckQPP2QGAxBmU/6XuRjvC3V9So7gmo5sdkO4isG+7U
+         NYY0uWHbGE6Q/h3sInup3pNJi9R9t2lf1mAnVfMWjXyxKmAnrTRpm6i8FD+xdnRD9+kO
+         TZ43pQfEjcjGk7vvTk+toj73TV/PjBpXagt13go4gLwi84xpTxTtB2xWYo91klXaZtPT
+         YIuOfPzysEz9Z8i6engCc1D604prelmrGVhbWJ968cwBOEX4MnOYuo44vJBZyXv5Y/b+
+         Wf/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=GVS+7ByfaDfRQ3cP7Su5v65xswUHpTm7s1D0XKCLUIc=;
+        b=Hn8NI8B1F1a6IxIy6bf3NEXoX4n//gRPcR8tVb4lDsdsvYSHi/5Wl9raiVsr9RonKE
+         77gUCFplPWcM8pq4zBgIpZeRK0R/Ks3jy7bqGzqMIZx+kG6NW0KljXDazhi2msFhZUih
+         XcgHXfkbOskN0UzpeGYzDSQmAYzCQjc9xQmbQtlhgYpaFZRM64tvYYqxDfwMPwA/JKEI
+         aG3WzUwp/AngwGjYBKW3M/MKx7kgOKrNPa41BPnHL6HXAhfMwHHsL947NSFBg01kQDnK
+         EHJ8hTd+tk9RFsjrBhurfT1uAMYoWFVNFQDGq3es/UvttQ8BNUjdQuZhE6FhW2xCD9AE
+         WDrQ==
+X-Gm-Message-State: AOAM533KmqxdcmPJgTIkYxEVAPCdFVzfcq89hcVqrrM5J5YGx4ARRUpv
+        eYO2wve4UKUXFMXO4JCl68NM8Q==
+X-Google-Smtp-Source: ABdhPJxO6cxAuydd+MYxjFrmEZWnATNnBLDhK+n22mh4Hzt3rKwlZEwEzWA3wPZWmZM8hKaYOdK5ag==
+X-Received: by 2002:a02:c017:0:b0:323:6b24:5bde with SMTP id y23-20020a02c017000000b003236b245bdemr3323956jai.185.1648745331810;
+        Thu, 31 Mar 2022 09:48:51 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id j4-20020a056e02218400b002c82f195e80sm12730706ila.83.2022.03.31.09.48.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Mar 2022 09:48:51 -0700 (PDT)
+Message-ID: <572bf891-8b2b-b32e-af64-d80fb7f5963f@kernel.dk>
+Date:   Thu, 31 Mar 2022 10:48:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0000000000006cc9ec05db8658be@google.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: cleanup bio_kmalloc v2
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Qian Cai <quic_qiancai@quicinc.com>
+Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+References: <20220308061551.737853-1-hch@lst.de> <YkXYMGGbk/ZTbGaA@qian>
+ <20220331164024.GA30404@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220331164024.GA30404@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-#syz test git://git.infradead.org/users/hch/misc.git squashfs-fix
+On 3/31/22 10:40 AM, Christoph Hellwig wrote:
+> This should fix it:
 
-On Thu, Mar 31, 2022 at 09:42:19AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    fdcbcd1348f4 Add linux-next specific files for 20220331
-> git tree:       linux-next
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16c815bb700000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=366ab475940a4177
-> dashboard link: https://syzkaller.appspot.com/bug?extid=e08de3db8be67b2a01b0
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=131015d7700000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14807cf7700000
-> 
-> The issue was bisected to:
-> 
-> commit 57c47b42f4545b5f8fa288f190c0d68f96bc477f
-> Author: Christoph Hellwig <hch@lst.de>
-> Date:   Tue Mar 8 06:15:50 2022 +0000
-> 
->     block: turn bio_kmalloc into a simple kmalloc wrapper
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1567f79b700000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=1767f79b700000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1367f79b700000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+e08de3db8be67b2a01b0@syzkaller.appspotmail.com
-> Fixes: 57c47b42f454 ("block: turn bio_kmalloc into a simple kmalloc wrapper")
-> 
-> loop0: detected capacity change from 0 to 8
-> ------------[ cut here ]------------
-> WARNING: CPU: 1 PID: 3587 at block/bio.c:229 bio_free+0xe8/0x120 block/bio.c:229
-> Modules linked in:
-> CPU: 1 PID: 3587 Comm: syz-executor393 Not tainted 5.17.0-next-20220331-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-> RIP: 0010:bio_free+0xe8/0x120 block/bio.c:229
-> Code: fa 48 c1 ea 03 0f b6 04 02 84 c0 74 04 3c 03 7e 20 8b 45 08 48 83 c4 08 48 29 c3 48 89 df 5b 5d e9 fd be cb fd e8 a8 af a3 fd <0f> 0b e9 51 ff ff ff 48 89 34 24 e8 e8 57 ef fd 48 8b 34 24 eb d1
-> RSP: 0018:ffffc900038efac0 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffff8880241c7f00 RCX: 0000000000000000
-> RDX: ffff888019410000 RSI: ffffffff83d57848 RDI: ffff8880241c7f80
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: ffffffff83d57915 R11: 0000000000000000 R12: 0000000000000060
-> R13: 0000000000000060 R14: 0000000000001000 R15: 0000000000000060
-> FS:  0000555556045300(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007ffc4e7ecd20 CR3: 000000007554f000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  bio_put+0x20e/0x3b0 block/bio.c:754
->  squashfs_read_data+0x2ce/0xed0 fs/squashfs/block.c:221
->  squashfs_read_table+0x184/0x1f0 fs/squashfs/cache.c:432
->  squashfs_fill_super+0x337/0x2690 fs/squashfs/super.c:184
->  get_tree_bdev+0x440/0x760 fs/super.c:1292
->  vfs_get_tree+0x89/0x2f0 fs/super.c:1497
->  do_new_mount fs/namespace.c:3040 [inline]
->  path_mount+0x1320/0x1fa0 fs/namespace.c:3370
->  do_mount fs/namespace.c:3383 [inline]
->  __do_sys_mount fs/namespace.c:3591 [inline]
->  __se_sys_mount fs/namespace.c:3568 [inline]
->  __x64_sys_mount+0x27f/0x300 fs/namespace.c:3568
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x35/0x80 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> RIP: 0033:0x7f5ae6a070da
-> Code: 83 c4 08 5b 5d c3 66 2e 0f 1f 84 00 00 00 00 00 c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 49 89 ca b8 a5 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffe7a847f68 EFLAGS: 00000282 ORIG_RAX: 00000000000000a5
-> RAX: ffffffffffffffda RBX: 00007ffe7a847fc0 RCX: 00007f5ae6a070da
-> RDX: 0000000020000000 RSI: 0000000020000100 RDI: 00007ffe7a847f80
-> RBP: 00007ffe7a847f80 R08: 00007ffe7a847fc0 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000282 R12: 0000000020000218
-> R13: 0000000000000003 R14: 0000000000000004 R15: 0000000000000001
->  </TASK>
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> syzbot can test patches for this issue, for details see:
-> https://goo.gl/tpsmEJ#testing-patches
----end quoted text---
+Let's drop this one for 5.18, it's also causing a few conflicts and
+would probably be more suited for 5.19 at this point.
+
+-- 
+Jens Axboe
+
