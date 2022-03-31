@@ -2,110 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36A2CC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 14:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33801C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 31 Mar 2022 14:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233273AbiCaOWK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 10:22:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45348 "EHLO
+        id S237564AbiCaOce (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 10:32:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237461AbiCaOWJ (ORCPT
+        with ESMTP id S237561AbiCaOcd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 10:22:09 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5706A1BFDF7;
-        Thu, 31 Mar 2022 07:20:20 -0700 (PDT)
-Received: from pps.filterd (m0098404.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 22VDP8Ip010210;
-        Thu, 31 Mar 2022 14:20:03 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : reply-to : to : cc : date : in-reply-to : references : content-type
- : mime-version : content-transfer-encoding; s=pp1;
- bh=kRBcowtAIg+U1BYIxVvx2TwDQmBLa27VX92AbZvvO4I=;
- b=WgiKreRg6xVX1G7roLx5WLkwcIvedfV5EQ5WbLgZW8tvtGFvlAvjj2ctlWp5/sEfIQ0s
- vg5HXC/7R0LXUNJPEx4lg5qGGPCx4ZUFlQbKTRBk7ojKyV5PKNo/jj31JZlhDi3aZYLG
- 7PKsBqhA8p4gtItYzGsUl6SV8xQS1ELgLsfU6tBrBjcoIAT4cSLa0cBWktIX/DSPyCG8
- C/rW2BJY/HfVwnFhGXivvIZcqOhBkq3ZLp1TNi6TsH5E1/1RZlcVAyRxOrXJdPQYgdCn
- Hr/tyBflBcIL6uXMmk9ZoIynMEMgVZqigzYhy/YCKc1UYYNMSfVBFoCvSZz3jiXN9bSW Jw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f58a401cs-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 14:20:03 +0000
-Received: from m0098404.ppops.net (m0098404.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 22VEK20k024987;
-        Thu, 31 Mar 2022 14:20:02 GMT
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-        by mx0a-001b2d01.pphosted.com with ESMTP id 3f58a401c7-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 14:20:02 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-        by ppma01dal.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 22VEDZ8E001147;
-        Thu, 31 Mar 2022 14:20:01 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
-        by ppma01dal.us.ibm.com with ESMTP id 3f1tfae6nv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 31 Mar 2022 14:20:01 +0000
-Received: from b03ledav004.gho.boulder.ibm.com (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
-        by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 22VEK0GZ14156216
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 31 Mar 2022 14:20:00 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 2BAA27806B;
-        Thu, 31 Mar 2022 14:20:00 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id C0C8C78063;
-        Thu, 31 Mar 2022 14:19:58 +0000 (GMT)
-Received: from [IPv6:2601:5c4:4300:c551::c14] (unknown [9.163.9.79])
-        by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
-        Thu, 31 Mar 2022 14:19:58 +0000 (GMT)
-Message-ID: <574d33978be5eb4732cd3bf61727e6b509a7e484.camel@linux.ibm.com>
-Subject: Re: [PATCH] scsi: sd: call device_del() if device_add_disk() fails
-From:   James Bottomley <jejb@linux.ibm.com>
-Reply-To: jejb@linux.ibm.com
-To:     Dan Carpenter <dan.carpenter@oracle.com>,
-        Wenchao Hao <haowenchao@huawei.com>,
-        syzkaller-bugs@googlegroups.com
-Cc:     fmdefrancesco@gmail.com, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, martin.petersen@oracle.com,
-        syzbot+f08c77040fa163a75a46@syzkaller.appspotmail.com,
-        linfeilong@huawei.com
-Date:   Thu, 31 Mar 2022 10:19:57 -0400
-In-Reply-To: <20220331134210.GF12805@kadam>
-References: <20220329154948.10350-1-fmdefrancesco@gmail.com>
-         <20220331152622.616534-1-haowenchao@huawei.com>
-         <20220331054156.GI3293@kadam>
-         <fdebdbd3-575b-b30e-d37f-dcc6d53a4f53@huawei.com>
-         <20220331134210.GF12805@kadam>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        Thu, 31 Mar 2022 10:32:33 -0400
+Received: from mail-il1-x12c.google.com (mail-il1-x12c.google.com [IPv6:2607:f8b0:4864:20::12c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E851D67DA
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 07:30:46 -0700 (PDT)
+Received: by mail-il1-x12c.google.com with SMTP id 8so16869465ilq.4
+        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 07:30:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=l8CekeoQZXHX4U3TiS2vpp4O2YuTCmdU/BDSBQosw7Q=;
+        b=2t3SM0cZXUR72lsXD7aWv01f4VUP1+TsCWH1VXhR9gW8eeqvvAYm8IPed6tPPC/+bT
+         /wf9r2P3V48ygYra/UM1VT50ENC51HGaz5CRa65IhBEmNu5LJEGBB7CqL0dNZJ++bP5l
+         ZuFHQmFFFJgh/P90XI1k0WCdnaV/65iQKBTWubWDoonZK3zxaSLZQXZus5lAGOBhywkZ
+         TrV5h5uml6+9t1iFBJ5FnSDBddgz0muYcbWXUBl6LXRAAfpdksB4eK30BIE/mJJM1ZHC
+         rmY/8/X0BmT2ei/CA6CADJPhXxCAdFQCskc1lcm8c4RtAGPxzECZY8oM8CNOmAkuRemv
+         /OtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=l8CekeoQZXHX4U3TiS2vpp4O2YuTCmdU/BDSBQosw7Q=;
+        b=aY653s7DWdZPIjyt/f0LIrEvUW/QpdFFnzEA5ksFy0ahTEpX/OP8mm2GPUUeeVoMUt
+         oF7UA6sdv0s5fzoQisWUXWD57zt8h4I7e7Ti2Qk386bGYofIFim+Qxcr2EpQ6ceKRfOG
+         UVPF2X2qLN1BzylejusRdt+NdIUmgmDG5JR76PFasXYdC5t8AzY0Ai7gaeeXG1Udd6uR
+         8dloQl207pkh5r5l10/QNxqaa4deEmj6iTPeOsvUZgSjk6XDX3zwn+9XdMMSsZ1A1KcE
+         N/UtroYJ6z/oae6LWs65z9IRcgU/ksJJqu+bW5/phe/K/CNnKsaw1eKIaXhPcDcGAuZN
+         mAMA==
+X-Gm-Message-State: AOAM532A27XhRvyLRhP3Kel4Rz5hDxByy/rxbXV727KGoqbX8bjHL/h/
+        I0V/vahlhQN1qN2rPf+GzpR1lA==
+X-Google-Smtp-Source: ABdhPJz25adczaNwDR175aQhqMn4WdHp4yEMllsYZBu8VTCksFw0OQj+38m10GkF9u9YGSPT+0qfJg==
+X-Received: by 2002:a05:6e02:1c0a:b0:2c7:75de:d84 with SMTP id l10-20020a056e021c0a00b002c775de0d84mr13381733ilh.186.1648737045567;
+        Thu, 31 Mar 2022 07:30:45 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id i3-20020a056602134300b0064620a85b6dsm13883109iov.12.2022.03.31.07.30.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Mar 2022 07:30:44 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     josef@toxicpanda.com, Zhang Wensheng <zhangwensheng5@huawei.com>
+Cc:     linux-block@vger.kernel.org, nbd@other.debian.org,
+        linux-kernel@vger.kernel.org, yukuai3@huawei.com
+In-Reply-To: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
+References: <20220310093224.4002895-1-zhangwensheng5@huawei.com>
+Subject: Re: [PATCH -next] nbd: fix possible overflow on 'first_minor' in nbd_dev_add()
+Message-Id: <164873704446.46490.778795283218997371.b4-ty@kernel.dk>
+Date:   Thu, 31 Mar 2022 08:30:44 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zKmGDzLpzzB_S1JDhPOk3DeX7A3LagNa
-X-Proofpoint-GUID: e9DkUTvMMIgF-uLZnCkqQYobHaGnPue4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-03-31_05,2022-03-31_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- suspectscore=0 bulkscore=0 priorityscore=1501 mlxlogscore=580
- clxscore=1011 spamscore=0 mlxscore=0 lowpriorityscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2203310079
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 2022-03-31 at 16:42 +0300, Dan Carpenter wrote:
-[...]
-> Also, I don't really understand why we don't have to call
-> put_device(&sdkp->disk_dev) at the end of sd_remove().
+On Thu, 10 Mar 2022 17:32:24 +0800, Zhang Wensheng wrote:
+> When 'index' is a big numbers, it may become negative which forced
+> to 'int'. then 'index << part_shift' might overflow to a positive
+> value that is not greater than '0xfffff', then sysfs might complains
+> about duplicate creation. Because of this, move the 'index' judgment
+> to the front will fix it and be better.
+> 
+> 
+> [...]
 
-That's because the final put is done by the gendisk ->free_disk()
-function which is scsi_disk_free_disk().  Most of the gendisk functions
-we provide convert a gendisk to a scsi_disk (via the gendisk
-private_data), so the sdkp has to live as long as the gendisk.
+Applied, thanks!
 
-James
+[1/1] nbd: fix possible overflow on 'first_minor' in nbd_dev_add()
+      commit: 6d35d04a9e18990040e87d2bbf72689252669d54
+
+Best regards,
+-- 
+Jens Axboe
 
 
