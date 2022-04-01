@@ -2,80 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2C9C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 02:27:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B821C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 02:34:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244017AbiDAC3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 22:29:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59748 "EHLO
+        id S244116AbiDACgD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 22:36:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244068AbiDAC27 (ORCPT
+        with ESMTP id S240300AbiDACgC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 22:28:59 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD2A255A8E;
-        Thu, 31 Mar 2022 19:27:11 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2063BB82201;
-        Fri,  1 Apr 2022 02:27:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E048C340ED;
-        Fri,  1 Apr 2022 02:27:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1648780028;
-        bh=nBYzy51cnyAKW9oy9okRIcSO8R9iuWITzppuXcOQxGQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=I7QTln4hskTdPSmj1zc5lLhHekbXWXFcpO7fOwmPhs+yxFWS8XCIUXMA2YupyhDML
-         L19oT9c9jq78Ho+/sbzgIyP1sCYO/O1bZR/3TbdeiM/q3mLEK3SZco/rtUESPD3BEM
-         BHkf7opbKhzfuMWvpWJKNIzmFXKl6W+icZfRAI0n0tDMp38sjF0eDaSyQ86UsqLJUg
-         +MfCQqWBv2sMxjfD+lsBhel2i/knrAcvjGmoACfj7OJPW8a21Bi0XulFyO0T6sAeWU
-         hLkzZFxiGSM4/mrHwUmC2lcXyWRvuVlmQsMNzaw+bHRS228uSIouTmbRy3rlBuHa8t
-         hWXNVDppvaJjw==
-Date:   Thu, 31 Mar 2022 20:27:05 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Michael Marod <michael@michaelmarod.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: NVME performance regression in Linux 5.x due to lack of block
- level IO queueing
-Message-ID: <YkZi+co1HchfRafa@kbusch-mbp.dhcp.thefacebook.com>
-References: <51E3A396-F68B-496D-AE36-B0457A3B0968@michaelmarod.com>
- <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com>
- <C06B8EF0-BF3B-4F14-994F-F80B5102D538@michaelmarod.com>
- <YkUvgu6VxNORv8M6@infradead.org>
- <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
+        Thu, 31 Mar 2022 22:36:02 -0400
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6F866CB5;
+        Thu, 31 Mar 2022 19:34:14 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id z8so1503172oix.3;
+        Thu, 31 Mar 2022 19:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=pK4tyBfA3bEbxgtyBUBSotAlH+ifeflAX1W+Ob8TM00=;
+        b=Mt2brRA4775fLEWdpYfxvpvKDDTgy4aNuuCzFnVcSU29F/RTNr6T8WnNggdqbYVogB
+         cZcU1nL6X5d7XiYXtnQKr/oAjFLTAgWMAOrj0kUn1yaySiebC5jHuMK5MySQMApOEUqQ
+         ar9J+C2MBoGeOmkNN9h5guTko7HZ7wbCt8EA3e0YRENcmvtg29WRcNiqqqRYNmZveCvk
+         2MHEF/HcRhtUTGsWM0Ze6RdUT5qkiGbV9aLrZyBNBfIjMZPww5um1ff7NFjJoiMLiTF6
+         T08kgYskINDQgvYjetCSqLQka5YFnbnpBI29F3v/lMdZfgQ5U4/yZB5j+z4DrNHvLC0I
+         k5kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=pK4tyBfA3bEbxgtyBUBSotAlH+ifeflAX1W+Ob8TM00=;
+        b=EseCDigFrSgzMjOtJuIMzTmGXkpme+Xal9v2zuMDlLXA1gOai5MO8VrU5gbjtN8ztV
+         Xfd7UxUhWX5aZFZWkq9+bN2VGzGaN8V961lAiF6hk3TCVTiVw32Yy4PXb+WIpsi41WEy
+         E2TG8Uw4JlZsvtjMHhd+hPbp0Mks1UchqUT0Hkv912+K8NvdDzUJAoxVhhX0Iy6NV+p4
+         VwhhvYYK01iIpfCmMHn/lSw6sqC7ff7A/IVf2+1QpHtP08Jr1RHjjtYAa+51q9S5f/Rv
+         b1xNNJaaoup2Skln3khmV05k1SuGd0F6qiv8anvVibbieLeFSRkRZMFrsGK0NFLne9Q7
+         KHoQ==
+X-Gm-Message-State: AOAM531Y4UTRHaWyqF5dpMQ72sO/fY5OK/pfKS0k4nMFMVFJvX/2un3N
+        vcAqIWpuT2XrWvhpXFiQWUZBFthX8mn90JWJ7aPA0feBSKQ=
+X-Google-Smtp-Source: ABdhPJwsuMrJeRG2Xq2Tal7zrithBAIkM9ciuFki8krG7+387XaljgePmf0vfC77RoDc9pO2azGIW8dpokfkuPMuaiA=
+X-Received: by 2002:aca:2407:0:b0:2ef:5c86:5a09 with SMTP id
+ n7-20020aca2407000000b002ef5c865a09mr3880084oic.160.1648780453322; Thu, 31
+ Mar 2022 19:34:13 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
+References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
+ <20220308152105.309618-18-joshi.k@samsung.com> <20220310083652.GF26614@lst.de>
+ <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
+ <20220310141945.GA890@lst.de> <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
+ <20220311062710.GA17232@lst.de> <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
+ <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
+ <20220330130219.GB1938@lst.de> <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
+ <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk>
+In-Reply-To: <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk>
+From:   Kanchan Joshi <joshiiitr@gmail.com>
+Date:   Fri, 1 Apr 2022 08:03:48 +0530
+Message-ID: <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
+Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Pavel Begunkov <asml.silence@gmail.com>,
+        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, sbates@raithlin.com,
+        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
+        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>,
+        Anuj Gupta <anuj20.g@samsung.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 11:22:03PM +0000, Michael Marod wrote:
-> # /usr/local/bin/fio -name=randrw -filename=/opt/foo -direct=1 -iodepth=1 -thread -rw=randrw -ioengine=psync -bs=4k -size=10G -numjobs=16 -group_reporting=1 -runtime=120
-> 
-> // Ubuntu 16.04 / Linux 4.4.0:
-> Run status group 0 (all jobs):
->    READ: bw=54.5MiB/s (57.1MB/s), 54.5MiB/s-54.5MiB/s (57.1MB/s-57.1MB/s), io=6537MiB (6854MB), run=120002-120002msec
->   WRITE: bw=54.5MiB/s (57.2MB/s), 54.5MiB/s-54.5MiB/s (57.2MB/s-57.2MB/s), io=6544MiB (6862MB), run=120002-120002msec
-> 
-> // Ubuntu 18.04 / Linux 5.4.0:
-> Run status group 0 (all jobs):
->    READ: bw=23.5MiB/s (24.7MB/s), 23.5MiB/s-23.5MiB/s (24.7MB/s-24.7MB/s), io=2821MiB (2959MB), run=120002-120002msec
->   WRITE: bw=23.5MiB/s (24.6MB/s), 23.5MiB/s-23.5MiB/s (24.6MB/s-24.6MB/s), io=2819MiB (2955MB), run=120002-120002msec
-> 
-> // Ubuntu 18.04 / Linux 5.17:
-> Run status group 0 (all jobs):
->    READ: bw=244MiB/s (255MB/s), 244MiB/s-244MiB/s (255MB/s-255MB/s), io=28.6GiB (30.7GB), run=120001-120001msec
->   WRITE: bw=244MiB/s (256MB/s), 244MiB/s-244MiB/s (256MB/s-256MB/s), io=28.6GiB (30.7GB), run=120001-120001msec
+On Fri, Apr 1, 2022 at 6:55 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> On 3/30/22 7:14 AM, Kanchan Joshi wrote:
+> > On Wed, Mar 30, 2022 at 6:32 PM Christoph Hellwig <hch@lst.de> wrote:
+> >>
+> >> On Fri, Mar 25, 2022 at 07:09:21PM +0530, Kanchan Joshi wrote:
+> >>> Ok. If you are open to take new opcode/struct route, that is all we
+> >>> require to pair with big-sqe and have this sorted. How about this -
+> >>
+> >> I would much, much, much prefer to support a bigger CQE.  Having
+> >> a pointer in there just creates a fair amount of overhead and
+> >> really does not fit into the model nvme and io_uring use.
+> >
+> > Sure, will post the code with bigger-cqe first.
+>
+> I can add the support, should be pretty trivial. And do the liburing
+> side as well, so we have a sane base.
 
-Thanks for the info. I don't know of anything block or nvme specific that might
-explain an order of magnitude perf difference.
+ I will post the big-cqe based work today. It works with fio.
+ It does not deal with liburing (which seems tricky), but hopefully it
+can help us move forward anyway .
 
-Could you try the same test without the filesytems? You mentioned using mdraid,
-so try '--filename=/dev/mdX'. If that also shows similiar performance
-difference, try using one of your nvme member drives directly, like
-'--filename=/dev/nvme1n1'. That should isolate which subsystem is contributing
-to the difference.
+> Then I'd suggest to collapse a few of the patches in the series,
+> the ones that simply modify or fix gaps in previous ones. Order
+> the series so we build the support and then add nvme support
+> nicely on top of that.
+
+I think we already did away with patches which were fixing only the
+gaps. But yes, patches still add infra for features incrementally.
+Do you mean having all io_uring infra (async, plug, poll) squashed
+into a single io_uring patch?
+On a related note, I was thinking of deferring fixed-buffer and
+bio-cache support for now.
