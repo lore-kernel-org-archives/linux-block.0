@@ -2,114 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B96EEC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 03:43:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23048C4332F
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 04:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244731AbiDADpW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 23:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46724 "EHLO
+        id S244914AbiDAE7I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Apr 2022 00:59:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244734AbiDADpR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 23:45:17 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC8DCB08;
-        Thu, 31 Mar 2022 20:43:26 -0700 (PDT)
-Received: from kwepemi100008.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KV5br3s6nz1HBK0;
-        Fri,  1 Apr 2022 11:43:04 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100008.china.huawei.com (7.221.188.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 1 Apr 2022 11:43:24 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 1 Apr 2022 11:43:23 +0800
-Subject: Re: [PATCH RFC -next 0/3] improve fairness for sbitmap waitqueues
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
-        <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220318082505.3025427-1-yukuai3@huawei.com>
- <d91e88e0-cd40-1670-2542-390dd4fb5ddf@huawei.com>
-Message-ID: <c4d4b335-90b9-0211-acb4-b80f3bb5de5e@huawei.com>
-Date:   Fri, 1 Apr 2022 11:43:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S244906AbiDAE7H (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 00:59:07 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51A63AF1E5;
+        Thu, 31 Mar 2022 21:57:18 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id D5FF268AFE; Fri,  1 Apr 2022 06:57:13 +0200 (CEST)
+Date:   Fri, 1 Apr 2022 06:57:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Marek Szyprowski <m.szyprowski@samsung.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
+        Song Liu <song@kernel.org>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        David Sterba <dsterba@suse.com>,
+        Phillip Lougher <phillip@squashfs.org.uk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org
+Subject: Re: [PATCH 4/5] block: turn bio_kmalloc into a simple kmalloc
+ wrapper
+Message-ID: <20220401045713.GA9057@lst.de>
+References: <20220308061551.737853-1-hch@lst.de> <20220308061551.737853-5-hch@lst.de> <CGME20220331211804eucas1p28da21f2dfd57aa490abffb8f87417f42@eucas1p2.samsung.com> <6696cc6a-3e3f-035e-5b8c-05ea361383f3@samsung.com>
 MIME-Version: 1.0
-In-Reply-To: <d91e88e0-cd40-1670-2542-390dd4fb5ddf@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6696cc6a-3e3f-035e-5b8c-05ea361383f3@samsung.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
-
-在 2022/03/25 15:30, yukuai (C) 写道:
-> friendly ping ...
+On Thu, Mar 31, 2022 at 11:18:03PM +0200, Marek Szyprowski wrote:
+> Hi Christoph,
 > 
-> 在 2022/03/18 16:25, Yu Kuai 写道:
->> During some io test, I found that waitqueues can be extremly unbalanced,
->> especially when tags are little.
->>
->> For example:
->> test cmd: nr_requests is set to 64, and queue_depth is set to 32
->> [global]
->> filename=/dev/sdh
->> ioengine=libaio
->> direct=1
->> allow_mounted_write=0
->> group_reporting
->>
->> [test]
->> rw=randwrite
->> bs=4k
->> numjobs=512
->> iodepth=2
->>
->> With patch 1 applied, I observe the following status:
->> ws_active=484
->> ws={
->>          {.wait_cnt=8, .waiters_cnt=117},
->>          {.wait_cnt=8, .waiters_cnt=59},
->>          {.wait_cnt=8, .waiters_cnt=76},
->>          {.wait_cnt=8, .waiters_cnt=0},
->>          {.wait_cnt=5, .waiters_cnt=24},
->>          {.wait_cnt=8, .waiters_cnt=12},
->>          {.wait_cnt=8, .waiters_cnt=21},
->>          {.wait_cnt=8, .waiters_cnt=175},
->> }
->>
->> 'waiters_cnt' means how many threads are waitng for tags in the 'ws',
->> and such extremely unbalanced status is very frequent. After reading the
->> sbitmap code, I found there are two situations that might cause the
->> problem:
->>
->> 1) blk_mq_get_tag() can call 'bt_wait_ptr()' while the threads might get
->> tag successfully before going to wait. - patch 2
->>
->> 2) After a 'ws' is woken up, following blk_mq_put_tag() might wake up
->> the same 'ws' again instead of the next one. - patch 3
->>
->> I'm not sure if the unbalanced status is really a *problem* and need to
->> be fixed, this patchset is just to improve fairness and not a thorough
->> fix. Any comments and suggestions are welcome.
->>
->> Yu Kuai (3):
->>    sbitmap: record the number of waiters for each waitqueue
->>    blk-mq: call 'bt_wait_ptr()' later in blk_mq_get_tag()
->>    sbitmap: improve the fairness of waitqueues' wake up
->>
->>   block/blk-mq-tag.c      |  6 ++---
->>   include/linux/sbitmap.h |  5 ++++
->>   lib/sbitmap.c           | 57 ++++++++++++++++++++++-------------------
->>   3 files changed, 39 insertions(+), 29 deletions(-)
->>
+> On 08.03.2022 07:15, Christoph Hellwig wrote:
+> > Remove the magic autofree semantics and require the callers to explicitly
+> > call bio_init to initialize the bio.
+> >
+> > This allows bio_free to catch accidental bio_put calls on bio_init()ed
+> > bios as well.
+> >
+> > Signed-off-by: Christoph Hellwig <hch@lst.de>
+> 
+> This patch, which landed in today's next-20220331 as commit 57c47b42f454 
+> ("block: turn bio_kmalloc into a simple kmalloc wrapper"), breaks badly 
+> all my test systems, which use squashfs initrd:
+
+In addition to the revert, this is the patch I had already queued up:
+
+diff --git a/fs/squashfs/block.c b/fs/squashfs/block.c
+index 930eb530fa622..fed99bb3df3be 100644
+--- a/fs/squashfs/block.c
++++ b/fs/squashfs/block.c
+@@ -72,6 +72,13 @@ static int copy_bio_to_actor(struct bio *bio,
+ 	return copied_bytes;
+ }
+ 
++static void squashfs_bio_free(struct bio *bio)
++{
++	bio_free_pages(bio);
++	bio_uninit(bio);
++	kfree(bio);
++}
++
+ static int squashfs_bio_read(struct super_block *sb, u64 index, int length,
+ 			     struct bio **biop, int *block_offset)
+ {
+@@ -118,9 +125,7 @@ static int squashfs_bio_read(struct super_block *sb, u64 index, int length,
+ 	return 0;
+ 
+ out_free_bio:
+-	bio_free_pages(bio);
+-	bio_uninit(bio);
+-	kfree(bio);
++	squashfs_bio_free(bio);
+ 	return error;
+ }
+ 
+@@ -183,8 +188,7 @@ int squashfs_read_data(struct super_block *sb, u64 index, int length,
+ 			data = bvec_virt(bvec);
+ 			length |= data[0] << 8;
+ 		}
+-		bio_free_pages(bio);
+-		bio_put(bio);
++		squashfs_bio_free(bio);
+ 
+ 		compressed = SQUASHFS_COMPRESSED(length);
+ 		length = SQUASHFS_COMPRESSED_SIZE(length);
+@@ -217,8 +221,7 @@ int squashfs_read_data(struct super_block *sb, u64 index, int length,
+ 	}
+ 
+ out_free_bio:
+-	bio_free_pages(bio);
+-	bio_put(bio);
++	squashfs_bio_free(bio);
+ out:
+ 	if (res < 0) {
+ 		ERROR("Failed to read block 0x%llx: %d\n", index, res);
+
