@@ -2,255 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82166C433FE
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9ADCC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 12:31:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343517AbiDAK34 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Apr 2022 06:29:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38670 "EHLO
+        id S243390AbiDAMdW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Apr 2022 08:33:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245676AbiDAK3r (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 06:29:47 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A23426E57B;
-        Fri,  1 Apr 2022 03:27:56 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id BC6811FD05;
-        Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1648808874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p8HInWOn0JhCGNwoQJmTzRAGa2b1vZ1mm3a6v3TxOEk=;
-        b=NHawarvg96YwPJfe8jGHAS35dQ6mnS1pIvyMP3ws8ulU8byrNgeqcz4irLxZXEuGcGRHbk
-        gV670bS6uiOFTgUL88hZpe4+GfD2dSdqT57sVIuhrB9AidgJTyEn754T4CvRYrPsNUs2TN
-        XAH/132sDS/rRNdxzXkWRwAGdLBgei4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1648808874;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=p8HInWOn0JhCGNwoQJmTzRAGa2b1vZ1mm3a6v3TxOEk=;
-        b=ZQouYWe8OkYwRJ/NLDM5n15237uB4542jZO3foQVEvnhiNRvZoR5ZS6R8LgrksJSr9MQwj
-        EBfX193++MOc75DA==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 84B74A3B95;
-        Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id A09E1A061E; Fri,  1 Apr 2022 12:27:52 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH 8/9] bfq: Get rid of __bio_blkcg() usage
-Date:   Fri,  1 Apr 2022 12:27:49 +0200
-Message-Id: <20220401102752.8599-8-jack@suse.cz>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20220401102325.17617-1-jack@suse.cz>
-References: <20220401102325.17617-1-jack@suse.cz>
+        with ESMTP id S231284AbiDAMdW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 08:33:22 -0400
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EFDC5F278
+        for <linux-block@vger.kernel.org>; Fri,  1 Apr 2022 05:31:31 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id n35so1581925wms.5
+        for <linux-block@vger.kernel.org>; Fri, 01 Apr 2022 05:31:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DjHen8SjurGesv2/euau4gflSw1KQFpZxY2bQ80GWWc=;
+        b=4nmMhJBetoYm1lZlMCb31TT7Q/YqTMXFw/vdDDCiqMQui8pdlrPAgDSr4iLNLk81lt
+         P4L7OZEbahfo6oNPilxT3fAnrGwcQemIOCzIyvg/Jlh9luW+74eaHIsWgXQ+gSacnCtb
+         quzW+wSAWHt89ynaCi6u/Sj4hKMIoRbGzKbW6CNEkgHiqiVKMDz4hm6MKC1FT8vqXI9w
+         nMfOLDSgBfsbypS1MRrXzUKuBFkal+Mbdyu2Qhh1tSMRWO6k0YAvAst4gto2/HjQG8rs
+         a98p7sGLSQxmKh6G2U/AXLdknnV7dKcKKbiCZtcPkkj6GoAfqV0ctTLKiSYTQ7kvjnFk
+         lyew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DjHen8SjurGesv2/euau4gflSw1KQFpZxY2bQ80GWWc=;
+        b=ZBa5TAbdJ9cM8hE9v1rIPubA3GgNEzWSX00mkSPeNpvuTZBCcYHZ4teG/04ZLgdE4V
+         h40pu6mxx8FCPLMH/qRnCgHqQFIrqISbna+Kl8H2RS6aPzHW1m4C4EqP4KcZegcwtoHl
+         sywkN2cf6O6vhHjjSzuO9osKzWTPPZEbUC7ygvGlGLvCd1YsMjWbZJCBHT3OKirbQFoR
+         LfDOf3TbwLPZzyKdnOug4nK+aaUlS29RNKCRdEOjrT61gaqf0nv65RKR8Wr3SS5Yj22P
+         kBbgg37Cfe/44PI64a/bzVy4W1O1KqFZYykazsEFNiYZX/uhUQ8TiTR2l0uYwNl2Oo4J
+         pxGA==
+X-Gm-Message-State: AOAM530tSPQeVAa/jUazvGiYqWUfXCVfUnuw9HPGACqnuxMxCK6TUdqW
+        jbGCJ1vbQOOn+5v8XjBis3HOpQZGLQQPWfCJ4wSMeQ==
+X-Google-Smtp-Source: ABdhPJz4Cw8Lc3YzkpvNHzTnf1J5O+dJbnkNlNzONropveVyQes/R3govCZ1BmuhcVKV3tOg49L9fnv0+pqgJWj6/OM=
+X-Received: by 2002:a05:600c:3009:b0:381:194a:8cb5 with SMTP id
+ j9-20020a05600c300900b00381194a8cb5mr8871178wmh.43.1648816289933; Fri, 01 Apr
+ 2022 05:31:29 -0700 (PDT)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=6636; h=from:subject; bh=hmCQcGPDWk91gsH0Ff6dqf205Vr5YwBuVPp7vIJKXHA=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiRtOlRcq5SUVFcwdhJubzpp07pilAw1qLVVFvCC3T +GEjsv6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYkbTpQAKCRCcnaoHP2RA2Uf6B/ 9NAj5dovT41inrRQ8Y2MKon+z3fJhzZEmJbYlQ8jJ0P4zuZo8FKMyQyz3XkdrJm9/9xKpLKlU/BJKz psMMCmdjOQbKHYY0xj00TkVHmZz+HTAbqQ/6V+ismZsh2I8rX7uvHk+Js03A7+xkMh33gr4jpLwwrb zSjYHKsfXfTb45CecRxO+iTjdbn6TY2BOmmbA7B+TCqOe2wqf0OvD2rr55cOYNpTt2C3QWjJqGnEJl XOfCn0D9EdG55dzTIFxY/w/6phN+YudB7XgiDH8mrKOW628kkYmHRLzpn0VZaD0AwsMqryqAoH0pf0 JFejz0ZV9632cZ50HZ+V6LtyB55rOa
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+References: <20220401083637.2407766-1-lv.ruyi@zte.com.cn>
+In-Reply-To: <20220401083637.2407766-1-lv.ruyi@zte.com.cn>
+From:   Philipp Reisner <philipp.reisner@linbit.com>
+Date:   Fri, 1 Apr 2022 14:31:18 +0200
+Message-ID: <CADGDV=Wf9MpS7_3C6=RNTBO5rqxjtWOz170=7K215R9X38yc5w@mail.gmail.com>
+Subject: Re: [PATCH] block: fix potential dereference null pointer
+To:     cgel.zte@gmail.com
+Cc:     Lars Ellenberg <lars.ellenberg@linbit.com>,
+        =?UTF-8?Q?Christoph_B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>, Jens Axboe <axboe@kernel.dk>,
+        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Lv Ruyi <lv.ruyi@zte.com.cn>,
+        Zeal Robot <zealci@zte.com.cn>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-BFQ usage of __bio_blkcg() is a relict from the past. Furthermore if bio
-would not be associated with any blkcg, the usage of __bio_blkcg() in
-BFQ is prone to races with the task being migrated between cgroups as
-__bio_blkcg() calls at different places could return different blkcgs.
+Hi Lv Ruyi,
 
-Convert BFQ to the new situation where bio->bi_blkg is initialized in
-bio_set_dev() and thus practically always valid. This allows us to save
-blkcg_gq lookup and noticeably simplify the code.
+This patch does not make sense to me. A request can only get "TO_BE_SENT"
+when the connection is established with the corresponding
+cstate. Establishing a connection can only work if net_conf is set. net_conf
+can be exchanged to a new one, but never become NULL.
 
-CC: stable@vger.kernel.org
-Fixes: 0fe061b9f03c ("blkcg: fix ref count issue with bio_blkcg() using task_css")
-Tested-by: "yukuai (C)" <yukuai3@huawei.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/bfq-cgroup.c  | 63 +++++++++++++++++----------------------------
- block/bfq-iosched.c | 11 +-------
- block/bfq-iosched.h |  3 +--
- 3 files changed, 25 insertions(+), 52 deletions(-)
+Please share more details why you think this NULL check is necessary here?
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 879380c2bc7e..32d2c2a47480 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -586,27 +586,11 @@ static void bfq_group_set_parent(struct bfq_group *bfqg,
- 	entity->sched_data = &parent->sched_data;
- }
- 
--static struct bfq_group *bfq_lookup_bfqg(struct bfq_data *bfqd,
--					 struct blkcg *blkcg)
-+static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
- {
--	struct blkcg_gq *blkg;
--
--	blkg = blkg_lookup(blkcg, bfqd->queue);
--	if (likely(blkg))
--		return blkg_to_bfqg(blkg);
--	return NULL;
--}
--
--struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
--				     struct blkcg *blkcg)
--{
--	struct bfq_group *bfqg, *parent;
-+	struct bfq_group *parent;
- 	struct bfq_entity *entity;
- 
--	bfqg = bfq_lookup_bfqg(bfqd, blkcg);
--	if (unlikely(!bfqg))
--		return NULL;
--
- 	/*
- 	 * Update chain of bfq_groups as we might be handling a leaf group
- 	 * which, along with some of its relatives, has not been hooked yet
-@@ -623,8 +607,15 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
- 			bfq_group_set_parent(curr_bfqg, parent);
- 		}
- 	}
-+}
- 
--	return bfqg;
-+struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
-+{
-+	struct blkcg_gq *blkg = bio->bi_blkg;
-+
-+	if (!blkg)
-+		return bfqd->root_group;
-+	return blkg_to_bfqg(blkg);
- }
- 
- /**
-@@ -714,25 +705,15 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-  * Move bic to blkcg, assuming that bfqd->lock is held; which makes
-  * sure that the reference to cgroup is valid across the call (see
-  * comments in bfq_bic_update_cgroup on this issue)
-- *
-- * NOTE: an alternative approach might have been to store the current
-- * cgroup in bfqq and getting a reference to it, reducing the lookup
-- * time here, at the price of slightly more complex code.
-  */
--static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
--						struct bfq_io_cq *bic,
--						struct blkcg *blkcg)
-+static void *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
-+				     struct bfq_io_cq *bic,
-+				     struct bfq_group *bfqg)
- {
- 	struct bfq_queue *async_bfqq = bic_to_bfqq(bic, 0);
- 	struct bfq_queue *sync_bfqq = bic_to_bfqq(bic, 1);
--	struct bfq_group *bfqg;
- 	struct bfq_entity *entity;
- 
--	bfqg = bfq_find_set_group(bfqd, blkcg);
--
--	if (unlikely(!bfqg))
--		bfqg = bfqd->root_group;
--
- 	if (async_bfqq) {
- 		entity = &async_bfqq->entity;
- 
-@@ -784,20 +765,24 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
- void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
- {
- 	struct bfq_data *bfqd = bic_to_bfqd(bic);
--	struct bfq_group *bfqg = NULL;
-+	struct bfq_group *bfqg = bfq_bio_bfqg(bfqd, bio);
- 	uint64_t serial_nr;
- 
--	rcu_read_lock();
--	serial_nr = __bio_blkcg(bio)->css.serial_nr;
-+	serial_nr = bfqg_to_blkg(bfqg)->blkcg->css.serial_nr;
- 
- 	/*
- 	 * Check whether blkcg has changed.  The condition may trigger
- 	 * spuriously on a newly created cic but there's no harm.
- 	 */
- 	if (unlikely(!bfqd) || likely(bic->blkcg_serial_nr == serial_nr))
--		goto out;
-+		return;
- 
--	bfqg = __bfq_bic_change_cgroup(bfqd, bic, __bio_blkcg(bio));
-+	/*
-+	 * New cgroup for this process. Make sure it is linked to bfq internal
-+	 * cgroup hierarchy.
-+	 */
-+	bfq_link_bfqg(bfqd, bfqg);
-+	__bfq_bic_change_cgroup(bfqd, bic, bfqg);
- 	/*
- 	 * Update blkg_path for bfq_log_* functions. We cache this
- 	 * path, and update it here, for the following
-@@ -850,8 +835,6 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
- 	 */
- 	blkg_path(bfqg_to_blkg(bfqg), bfqg->blkg_path, sizeof(bfqg->blkg_path));
- 	bic->blkcg_serial_nr = serial_nr;
--out:
--	rcu_read_unlock();
- }
- 
- /**
-@@ -1469,7 +1452,7 @@ void bfq_end_wr_async(struct bfq_data *bfqd)
- 	bfq_end_wr_async_queues(bfqd, bfqd->root_group);
- }
- 
--struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd, struct blkcg *blkcg)
-+struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
- {
- 	return bfqd->root_group;
- }
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d7cf930b47bb..e47c75f1fa0f 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -5726,14 +5726,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 	struct bfq_queue *bfqq;
- 	struct bfq_group *bfqg;
- 
--	rcu_read_lock();
--
--	bfqg = bfq_find_set_group(bfqd, __bio_blkcg(bio));
--	if (!bfqg) {
--		bfqq = &bfqd->oom_bfqq;
--		goto out;
--	}
--
-+	bfqg = bfq_bio_bfqg(bfqd, bio);
- 	if (!is_sync) {
- 		async_bfqq = bfq_async_queue_prio(bfqd, bfqg, ioprio_class,
- 						  ioprio);
-@@ -5779,8 +5772,6 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
- 
- 	if (bfqq != &bfqd->oom_bfqq && is_sync && !respawn)
- 		bfqq = bfq_do_or_sched_stable_merge(bfqd, bfqq, bic);
--
--	rcu_read_unlock();
- 	return bfqq;
- }
- 
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 4664e2f3e828..978ef5d6fe6a 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -1009,8 +1009,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg);
- void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio);
- void bfq_end_wr_async(struct bfq_data *bfqd);
--struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
--				     struct blkcg *blkcg);
-+struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio);
- struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
- struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
--- 
-2.34.1
 
+
+On Fri, Apr 1, 2022 at 10:36 AM <cgel.zte@gmail.com> wrote:
+>
+> From: Lv Ruyi <lv.ruyi@zte.com.cn>
+>
+> rcu_dereference may return NULL, so check the returned pointer.
+>
+> Reported-by: Zeal Robot <zealci@zte.com.cn>
+> Signed-off-by: Lv Ruyi <lv.ruyi@zte.com.cn>
+> ---
+>  drivers/block/drbd/drbd_req.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>
+> diff --git a/drivers/block/drbd/drbd_req.c b/drivers/block/drbd/drbd_req.c
+> index e1e58e91ee58..8ab6da155e2f 100644
+> --- a/drivers/block/drbd/drbd_req.c
+> +++ b/drivers/block/drbd/drbd_req.c
+> @@ -577,6 +577,10 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
+>                 D_ASSERT(device, !(req->rq_state & RQ_NET_MASK));
+>                 rcu_read_lock();
+>                 nc = rcu_dereference(connection->net_conf);
+> +               if (!nc) {
+> +                       rcu_read_unlock();
+> +                       break;
+> +               }
+>                 p = nc->wire_protocol;
+>                 rcu_read_unlock();
+>                 req->rq_state |=
+> @@ -690,6 +694,10 @@ int __req_mod(struct drbd_request *req, enum drbd_req_event what,
+>                 /* close the epoch, in case it outgrew the limit */
+>                 rcu_read_lock();
+>                 nc = rcu_dereference(connection->net_conf);
+> +               if (!nc) {
+> +                       rcu_read_unlock();
+> +                       break;
+> +               }
+>                 p = nc->max_epoch_size;
+>                 rcu_read_unlock();
+>                 if (connection->current_tle_writes >= p)
+> --
+> 2.25.1
+>
