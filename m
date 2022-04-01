@@ -2,115 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6FDC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 01:25:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A2C9C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 02:27:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243720AbiDAB1D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 21:27:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37046 "EHLO
+        id S244017AbiDAC3D (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 22:29:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59748 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230402AbiDAB1C (ORCPT
+        with ESMTP id S244068AbiDAC27 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 21:27:02 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 473B117ABF
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 18:25:14 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id o68-20020a17090a0a4a00b001c686a48263so4001903pjo.1
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 18:25:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=R1dhsfiSnHarafc+SmeCxyhyUIwSltgVfiy2Auaw7XY=;
-        b=fQMNa0zR50WmR1S4nBEbfURpZV/PZqj5G/FooiuFfLFx/oSbL6TAO1RmchiopvRUYc
-         lRutC+dyKymrdUYXiFz6oX5FW2enISjhKnXTxnce9fBUgsU2EzJ2JAxcy94OjJZyD7sn
-         OnK9u+Vn1G6BrK1XubK95JXY7dYXcCOVZn8tDWtT9bGxFbjiE7ajdEO8gV9DYlXdhxnI
-         8amhNJFaBdkbukTk88vIooQWmT1w9MMPtDeNAyTG05/fQvSMr3mErWuw4Msdxd6KU2ZO
-         3TXMrtiJukjn6feeJpgztxBaTZtHEokjO3ECTzfJLk03IuiGfrbVqMmOuFvfxae+Wy06
-         foBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=R1dhsfiSnHarafc+SmeCxyhyUIwSltgVfiy2Auaw7XY=;
-        b=a4PmZTOeoe8kETwBbI4qwjgABLBzkx2MKlB5rKVtX8RNC0PQ1a7GqjWuzkfMi7aDwr
-         /Mq+ZtxpC90pFYXQGO9IdWzWWULZ3CUKn9j+mLxCuoPWAQNn+xHLAyTeLPQU/YIA8tnP
-         k3Bg4QHNJYkKHrfsB8bOosQB5eqbPyVAzF9HjfmvbbMA/ohIj5chXMOuJGOI0AuEJ/Bh
-         fZ2RVEo5Iw3xO2SolEWqq49cPey3okmKSK56xh6Nk2VpqOt5IwwFiQCyql2e3qdUbq40
-         k1Wxe+hYsdH9fGsqdwPobB5ZrjmPu2KG/bo9KZj5VW6uaYXTMtIHE/u4tNGcwFWuWc9j
-         QI6A==
-X-Gm-Message-State: AOAM531B+PjYDzslZckU2yJoRn9Pip6ka99d+9gk6oNY4HdApTV+tWdt
-        F9ltJyWD4aWU3/ZZ7sMU9U5oVw==
-X-Google-Smtp-Source: ABdhPJy8855lS5pun2goImSU2Yk45LqwFkuwCtNplt7chwm3MS44jEbh+GGvioT7BUI4sTCb+BnA2Q==
-X-Received: by 2002:a17:902:f551:b0:153:b179:291a with SMTP id h17-20020a170902f55100b00153b179291amr43675464plf.13.1648776313690;
-        Thu, 31 Mar 2022 18:25:13 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d16-20020a056a00245000b004f771b48736sm700240pfj.194.2022.03.31.18.25.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 18:25:13 -0700 (PDT)
-Message-ID: <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk>
-Date:   Thu, 31 Mar 2022 19:25:11 -0600
+        Thu, 31 Mar 2022 22:28:59 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FD2A255A8E;
+        Thu, 31 Mar 2022 19:27:11 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 2063BB82201;
+        Fri,  1 Apr 2022 02:27:10 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E048C340ED;
+        Fri,  1 Apr 2022 02:27:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1648780028;
+        bh=nBYzy51cnyAKW9oy9okRIcSO8R9iuWITzppuXcOQxGQ=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=I7QTln4hskTdPSmj1zc5lLhHekbXWXFcpO7fOwmPhs+yxFWS8XCIUXMA2YupyhDML
+         L19oT9c9jq78Ho+/sbzgIyP1sCYO/O1bZR/3TbdeiM/q3mLEK3SZco/rtUESPD3BEM
+         BHkf7opbKhzfuMWvpWJKNIzmFXKl6W+icZfRAI0n0tDMp38sjF0eDaSyQ86UsqLJUg
+         +MfCQqWBv2sMxjfD+lsBhel2i/knrAcvjGmoACfj7OJPW8a21Bi0XulFyO0T6sAeWU
+         hLkzZFxiGSM4/mrHwUmC2lcXyWRvuVlmQsMNzaw+bHRS228uSIouTmbRy3rlBuHa8t
+         hWXNVDppvaJjw==
+Date:   Thu, 31 Mar 2022 20:27:05 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Michael Marod <michael@michaelmarod.com>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: NVME performance regression in Linux 5.x due to lack of block
+ level IO queueing
+Message-ID: <YkZi+co1HchfRafa@kbusch-mbp.dhcp.thefacebook.com>
+References: <51E3A396-F68B-496D-AE36-B0457A3B0968@michaelmarod.com>
+ <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com>
+ <C06B8EF0-BF3B-4F14-994F-F80B5102D538@michaelmarod.com>
+ <YkUvgu6VxNORv8M6@infradead.org>
+ <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
-Content-Language: en-US
-To:     Kanchan Joshi <joshiiitr@gmail.com>, Christoph Hellwig <hch@lst.de>
-Cc:     Kanchan Joshi <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
- <20220308152105.309618-18-joshi.k@samsung.com>
- <20220310083652.GF26614@lst.de>
- <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
- <20220310141945.GA890@lst.de>
- <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
- <20220311062710.GA17232@lst.de>
- <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
- <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
- <20220330130219.GB1938@lst.de>
- <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/30/22 7:14 AM, Kanchan Joshi wrote:
-> On Wed, Mar 30, 2022 at 6:32 PM Christoph Hellwig <hch@lst.de> wrote:
->>
->> On Fri, Mar 25, 2022 at 07:09:21PM +0530, Kanchan Joshi wrote:
->>> Ok. If you are open to take new opcode/struct route, that is all we
->>> require to pair with big-sqe and have this sorted. How about this -
->>
->> I would much, much, much prefer to support a bigger CQE.  Having
->> a pointer in there just creates a fair amount of overhead and
->> really does not fit into the model nvme and io_uring use.
+On Thu, Mar 31, 2022 at 11:22:03PM +0000, Michael Marod wrote:
+> # /usr/local/bin/fio -name=randrw -filename=/opt/foo -direct=1 -iodepth=1 -thread -rw=randrw -ioengine=psync -bs=4k -size=10G -numjobs=16 -group_reporting=1 -runtime=120
 > 
-> Sure, will post the code with bigger-cqe first.
+> // Ubuntu 16.04 / Linux 4.4.0:
+> Run status group 0 (all jobs):
+>    READ: bw=54.5MiB/s (57.1MB/s), 54.5MiB/s-54.5MiB/s (57.1MB/s-57.1MB/s), io=6537MiB (6854MB), run=120002-120002msec
+>   WRITE: bw=54.5MiB/s (57.2MB/s), 54.5MiB/s-54.5MiB/s (57.2MB/s-57.2MB/s), io=6544MiB (6862MB), run=120002-120002msec
+> 
+> // Ubuntu 18.04 / Linux 5.4.0:
+> Run status group 0 (all jobs):
+>    READ: bw=23.5MiB/s (24.7MB/s), 23.5MiB/s-23.5MiB/s (24.7MB/s-24.7MB/s), io=2821MiB (2959MB), run=120002-120002msec
+>   WRITE: bw=23.5MiB/s (24.6MB/s), 23.5MiB/s-23.5MiB/s (24.6MB/s-24.6MB/s), io=2819MiB (2955MB), run=120002-120002msec
+> 
+> // Ubuntu 18.04 / Linux 5.17:
+> Run status group 0 (all jobs):
+>    READ: bw=244MiB/s (255MB/s), 244MiB/s-244MiB/s (255MB/s-255MB/s), io=28.6GiB (30.7GB), run=120001-120001msec
+>   WRITE: bw=244MiB/s (256MB/s), 244MiB/s-244MiB/s (256MB/s-256MB/s), io=28.6GiB (30.7GB), run=120001-120001msec
 
-I can add the support, should be pretty trivial. And do the liburing
-side as well, so we have a sane base.
+Thanks for the info. I don't know of anything block or nvme specific that might
+explain an order of magnitude perf difference.
 
-Then I'd suggest to collapse a few of the patches in the series,
-the ones that simply modify or fix gaps in previous ones. Order
-the series so we build the support and then add nvme support
-nicely on top of that.
-
-I'll send out a message on a rebase big sqe/cqe branch, will do
-that once 5.18-rc1 is released so we can get it updated to a
-current tree as well.
-
--- 
-Jens Axboe
-
+Could you try the same test without the filesytems? You mentioned using mdraid,
+so try '--filename=/dev/mdX'. If that also shows similiar performance
+difference, try using one of your nvme member drives directly, like
+'--filename=/dev/nvme1n1'. That should isolate which subsystem is contributing
+to the difference.
