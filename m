@@ -2,157 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD71CC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 02:44:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3B87C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 02:59:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244268AbiDACqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 22:46:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34902 "EHLO
+        id S240582AbiDADAx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 23:00:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50342 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240616AbiDACqM (ORCPT
+        with ESMTP id S233528AbiDADAx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 22:46:12 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B631575A6
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 19:44:06 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id jx9so1179969pjb.5
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 19:44:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=HWtyih8igr9N3NwexuJxuDSMFSnT6hvHzlu33VdYUJk=;
-        b=CrRSqUR2tTuhZv2izdc3Hwy1yVmoJale25fz+zC/RZ/47NWGIH0+nPvfkWE+2d8q8Q
-         RNtrm4qNKYkIHBJpoj9TNbHjtECePEn2l09fu683uFurKZvIloqxiewaQEykEctwvOzU
-         hlNKZiD5e0OhKMauNuSbUOlw2D0wWLTAtJkCn8fLH4dpoxKoqvk1+L77VL73gCxhKjX4
-         1rBIIFaMufDL3LIsz/YRl1AxZCywLohlBW0dUNMgPjUXJGRs7m+Pb7eqybOi/FmNKui2
-         tabf/Ll4ewQqDGYo8LXBtZ3UXJWgtAJE+X/538GpyNSAt8uJBdgB0Po0EzmESHFsnaeG
-         KLiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=HWtyih8igr9N3NwexuJxuDSMFSnT6hvHzlu33VdYUJk=;
-        b=gyzAS7qGmdqc+2gFFLJMMcWEk/6YCIstumZrPcGaMmnSyxaJAVwwn1N1b1DDXpjoh3
-         zBbm4rVirZBd0UHPLObllvohX//ETCvJBo2wM2WSy7jcwSL1ZQiTCrCQ8pJWQMR2wwxg
-         nvkXtUpOnKD5PIJpnCAxXBMt69x8eY4cct1IUp/yoR6pq/lrgIA8ThM3l/1yIG8QZLQ9
-         D41E9syBBz+dSS8ORctbQJ7PWepOKkt+yfwQIvzR7PvuN4ubRHUvECiSLHwfYqRnW4ig
-         sgZNbK743vjGzS1S+upZAdPJpynXMVrHKYAtJUilyTqNO9TKr7//9y3mY+Nu/VewS3lT
-         joVw==
-X-Gm-Message-State: AOAM530YTnmTfCWPynQNW7wYpBw7jto1T/X50xcBQ2ngAwzLLR0CVK5v
-        lfx+HnKUgG9hfxzq8Hr7VCmgPg==
-X-Google-Smtp-Source: ABdhPJw6EzVnlWTDGXWHyAme/hHYmcfZjrGv8JJhxPhRcvIW5tOYienAotqz9breF+R4C2Grr37duA==
-X-Received: by 2002:a17:90a:8d08:b0:1c6:5ada:9920 with SMTP id c8-20020a17090a8d0800b001c65ada9920mr9482799pjo.126.1648781045575;
-        Thu, 31 Mar 2022 19:44:05 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f15-20020a056a0022cf00b004fb32b9e000sm852809pfj.1.2022.03.31.19.44.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 19:44:04 -0700 (PDT)
-Message-ID: <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk>
-Date:   Thu, 31 Mar 2022 20:44:02 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
+        Thu, 31 Mar 2022 23:00:53 -0400
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2050.outbound.protection.outlook.com [40.107.244.50])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180E513E430;
+        Thu, 31 Mar 2022 19:59:04 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gh+8r5cynXHPNq9tYYRdmO1/G557a+dkA8Fx2Ay/lN0PCdmxKLD9N3WV5Ng8WtfLrww2pgSsiRVnIa1HLknTp2TPwrV0hpGLV7YfNyLvMdcYlCH1kk+owZhualgPsDXPhHZKdKQL7MvsnYp6u0DmGPV5t8jS4R2OITxNNgMwiOeXt+lLJyyQBoj3Qc+iU/yAf5Xx26HvtnEghyVny44CFk0x7Kb7WfknzZnsWyl1fE/tmYtyT8QAyBjgQvaKQ9qhwMrpvS1g3ZTbET4PgMvM9PS+xRJ/ofOGASVK6+W9U8aufJPlRlDg9XdcTV+ztmID1EoY/3uITGxVDKwpNVtFBw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JH87abgXgaKhHeaoRMgBOm7FfUU9jV0vzaUx3C7Ub1k=;
+ b=bJoi8bA5YoL/+T4smWZdcJCIDzxFBIkLAL7i7G5WASIDTycrxz16caIgS9NDSTNjjmZ5pSVA3e2dCHD2MXlhXE+Z8s45zKrRWLG6Fwelv/3js/ax+8FGwkdGClA4KSE0Eiau8R26H3SfaSk8fqs2o6Ee/J2Azl4d3Yec9KajxtYKUSYL3W041VCNk18p6Njz3kQgy2IbGXW1Sr5BrTfaRkD6a+nO29PGkhDVmsqU6oBAjVvWwo7QDpZVur5CHkjeFaXcNxZ8CPNBj39OuzfHs+BFjfp0WsYnxh0YFqhPBXpQ/ztJ0wM7oXP8wVIUqV++z76xH1XOFSLB4hlcPM4+Xg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JH87abgXgaKhHeaoRMgBOm7FfUU9jV0vzaUx3C7Ub1k=;
+ b=JJXmDh1oo2iOmspsiKCspcQItFE0nIdJKdAeRrj4nMi6fipcKp9+GhIUxigWZg6eZLespOep5QOlT+r4tKJtzfH4fYFXPnDFOw9Uwrl+UtBsaPWBlOtEGKMAup45fCU3CG821SyUdQSavd/DqoY38vc3B5NSDeZOylJz8A09WY6S/kP+aZbrORwxe+Z5Ms/2MPjB6nlBkXD9PWFzAB/IoggZN6sQF/FT379PKywko1X76Ntdbr0Vx/by5XhdLK39w4qsV/GyJLAbh9T2d1arC+Zi3QEgITUOLdD49PqKVFS5ETmy2Az1PRm8KG/XM1AbCgeJLlHa5SoClgdAPEcRkQ==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by MN2PR12MB3759.namprd12.prod.outlook.com (2603:10b6:208:163::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5123.19; Fri, 1 Apr
+ 2022 02:59:01 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::3dbb:6c2c:eecf:a279]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::3dbb:6c2c:eecf:a279%6]) with mapi id 15.20.5123.019; Fri, 1 Apr 2022
+ 02:59:00 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Michael Marod <michael@michaelmarod.com>
+CC:     Keith Busch <kbusch@kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: NVME performance regression in Linux 5.x due to lack of block
+ level IO queueing
+Thread-Topic: NVME performance regression in Linux 5.x due to lack of block
+ level IO queueing
+Thread-Index: AQHYRJPdEASHqlgOOkeQA9+5bxa47KzY6EUAgAE61YCAADOygIAACOsA
+Date:   Fri, 1 Apr 2022 02:59:00 +0000
+Message-ID: <a00e3a0d-8dff-c845-ed3b-9dc435187ecd@nvidia.com>
+References: <51E3A396-F68B-496D-AE36-B0457A3B0968@michaelmarod.com>
+ <847D3821-1D92-468C-88C3-34284BA7922E@michaelmarod.com>
+ <C06B8EF0-BF3B-4F14-994F-F80B5102D538@michaelmarod.com>
+ <YkUvgu6VxNORv8M6@infradead.org>
+ <4034AD9F-2A6A-4AE6-B5FC-58FC2BC238F5@michaelmarod.com>
+ <YkZi+co1HchfRafa@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <YkZi+co1HchfRafa@kbusch-mbp.dhcp.thefacebook.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
- <20220308152105.309618-18-joshi.k@samsung.com>
- <20220310083652.GF26614@lst.de>
- <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
- <20220310141945.GA890@lst.de>
- <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
- <20220311062710.GA17232@lst.de>
- <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
- <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
- <20220330130219.GB1938@lst.de>
- <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
- <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk>
- <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a9dc105d-cb90-48ef-8417-08da138b92be
+x-ms-traffictypediagnostic: MN2PR12MB3759:EE_
+x-microsoft-antispam-prvs: <MN2PR12MB37598020C179062E17E04A94A3E09@MN2PR12MB3759.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: iyzX/iZGXsD11/sF7oyQf9soCKjM1d54QclsJZ+FlrAyF77q45yDlsaDwgybMgG7uXMPVRffDPAfiKczktlDQQfQ3pr3aH89SjF6c85TcMW3QKUGoVi0ZxI2RzENsmO/nSOsCEul40dYr1mJhPvdGxjFG4OOK3Ka+JSk8K9fJhL8W+oUyFKebo10JuQKDUTT9rBeGKlcWCVZ2d5gXujrDVpp2jj5c2GchJ8CQgu7a50wjQz3K7UYTp7DXRhrtqlB9rq3JV785mHsinL8NWIpb7D1uly6ikh6uz+dVWxSVhhlVwpY8NrXaJapp+q9iIeT+9gRRD/qZn4xMpOvycj+jq6pZ/tIzWqqsKAGvM0628DwAD10JaUOLaR38Jt7fnCuhi3CDOaolBOaDuBojwOMhkX/ipMzkBU/zBiz1+ogygMa6WaCing4O3cKFv9dcCEvEjds+iTUMxIxNPyqBRekrNcVZuO6D3RWCdetkWtqo2hoOOS0FSvZ/hH3zXvPmvD7ZiQndEcrKRz79sTBgiglR8jRSHxC/7wxW5nU/Y5mRKi57IpnZeqhihE0Mj5RG81Ydl3eZXuFkD9UA78jPdB/LVOn8byMIaOusHqqo59Ilh4yaOSiP7E9N4/DM13bFXMx2A7FTOxtQrS9yg0+Sr/UjyTKdBMpP5lN99D2vsWm9xUB018JCQkQg1mRnK993e4OGRafCE44co9MxyHBszW5SXHe5PWxgHMatPIIGOwqfJqOP3EI/d4PbxcHB7tE+EFa7umaqyA0jRzcC3zJBxE2ZA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(31686004)(76116006)(36756003)(8676002)(91956017)(66446008)(66476007)(6916009)(316002)(31696002)(54906003)(86362001)(4326008)(122000001)(66556008)(38100700002)(64756008)(6512007)(8936002)(83380400001)(6506007)(38070700005)(4744005)(5660300002)(508600001)(2616005)(66946007)(2906002)(71200400001)(186003)(6486002)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?NkdOcnd1dWFYM1pTcG9uaVdRSUxVYXZVQXk3WmhQbDBYd2VJdm9jSXF0UFVr?=
+ =?utf-8?B?QlBYaDBFN2JjRGFrektkeUdpbFVVNld5SWV3OHlCUmFHQ3h3aUM1SEhVY0Z6?=
+ =?utf-8?B?TjZyMjVvTmJEcXIvUFY1QVp2VGRwQXdISmdSRGMzSnliVUNMUzNFUmxvK1c2?=
+ =?utf-8?B?RTNzZkNBTkZhMXFaSjFwZ0ZGMVUxbTBvQzRwOExsUHQ4MnQwVUw1a0hLaE9k?=
+ =?utf-8?B?VGZHUlFLMzNkTGg1SUFKZ3liNzEvR2RUU1BaU2JCSnY0UVRUbFpFMUI3a2VT?=
+ =?utf-8?B?WEkwb3E5UEgvSnlRL0xBVEpsbktjbjR5QlJ0a3pOVmMya2x2ZGZaeXNiNjV3?=
+ =?utf-8?B?OFZodXhNVG1id3JoVjd0U0JlTFRyU0NuWDNLMXdNMVdTNXoyVk51TjBhSzdF?=
+ =?utf-8?B?K3gxS2V5VUZWNVJ4SllFcFY1aFl6KzdyWjU4c2tMTmdEbnhUSHdRYU95VzMz?=
+ =?utf-8?B?YTVKQnducGxqMDZYam1NTW1HZkxMcHNZSHBRd04rVnk1UVVDa0pUNURFeENK?=
+ =?utf-8?B?M1dDVXFFVFFURFBUcDNkdmREQ2JUZERuaGxkSkt4NG9rYThXeDdaSUx5cmlh?=
+ =?utf-8?B?Ny8rZjlITHFSNzVBWnRucnVjYVg3U2JSbTVCaGJnR2FNUlFXMzNDZDU4d05q?=
+ =?utf-8?B?TkVSdVltL0tSNlRjZVpwVjBwTk9yRWp6UytKZm5sV2pNbFpZK0dSeHJCallu?=
+ =?utf-8?B?NHpFTlZXaloxY1cvOWc2TlJLVG1WbFJCbDhpMDNPKzlzeEZsQmd5Ui9HbzNG?=
+ =?utf-8?B?aEJLeWlCb3RxazhVWU81bjJnb2ZRNUhQczNEWFlIcGZSSmRqdE9yUE0rMmZH?=
+ =?utf-8?B?NzRDRVlXdjF4aHovTXRqRXltbmRyZ2hVTXZFZXZiMC9GUm8yOFNQU0JxYmI4?=
+ =?utf-8?B?N3owc0U5R1F3OEhmTWp3NmRLWGFLcUZ5U2FnSEI1djJRZ0RoMkhlVmdldkxl?=
+ =?utf-8?B?eTA3aXVHMU9lUHdDUEMyYzFLR2dBbllDOGlUQU9tWE1vRWtaOXdKWVZsWUw4?=
+ =?utf-8?B?bVY0K2JZOFNTUHBOQ25pclk5amxiNldJeEErbndJUGxrVDgvRUJ0YVNXZlhF?=
+ =?utf-8?B?TC94UjQ2Zzd3RVdTc2FyaTZvbi8yaHNCZWRQYkNiS01TWjRaMHlJSTBZY2dO?=
+ =?utf-8?B?TnZSNEtHWG1wQXM1bnVnL044QStUbk1xLzB3TEpPQVRUanQrcEhUZDA0SzFm?=
+ =?utf-8?B?bmpkK1BnOUlXSm5xT3dlVHVMT1p5ai8wTEdDM2xxUlFIbm52eklacFd0ZG9U?=
+ =?utf-8?B?ek9RUUo0dzBGYWQxc1FoRDJRT0VDa1Z5cEx5MjBmM1Z1bG8xTk9hTkp1MUhY?=
+ =?utf-8?B?SGhuZXBlVHFMN1ZjT0NOdmMwemdPckFiaFIzMTNNNWY5MG9NbFd3RnJ3VGEv?=
+ =?utf-8?B?OVF6d1ZFTXdmd1pLSFVlbmh2ckZZWXNCSjRXTzVKTjlLZ1VkSXppcGsvdDEr?=
+ =?utf-8?B?dVkzSG1XN2R0MU1DL1FBbGxZTlN0MHBtakg2SDMraXRXWGdPUEI2RngyRXl4?=
+ =?utf-8?B?WjExWjUvOWpjYXNxNFMrTU0vblo2RjhvQStHT0lydmowTEJ2czJRQXhLQ004?=
+ =?utf-8?B?b2NsRmdMZGtPdmllbWw4VUUxTXI4OWgyQ1VqSkRqcHA3enlqOGhTYzc4Zm5t?=
+ =?utf-8?B?d0w4OHltMkF4T2NNSDlpZ3VJTll4czZGandRZ2dGcEFEUlFMbVRnYVBnWDE5?=
+ =?utf-8?B?YVhtWmFZWHpmL3Z0UUhqYXJxWnk3bVRoY3RtS09HKzBhYWlYSFllSzc1Tm9v?=
+ =?utf-8?B?M2tFaHYzSEgyTU03MFFxYnBoNnJsN2t6RUhNY0plTkx6S2pjOVZWVnZRVTBx?=
+ =?utf-8?B?SGRVRmJoNlQwSkdGZ090TjdKdXZ6Rnp3ZXRJcTZLZVZETTVyRzhqMVZhbnVv?=
+ =?utf-8?B?OVFOa0VrZHJqM0VzL0U1OHM1REduRC94Q2NSYnpTcUpvN3dJMXJnTEpIbzN3?=
+ =?utf-8?B?OEdZN09MQ1oyUG91TERaT3d5WUY1ZlQzWHpFVjE3ZGJwMGl5enBqRFM0dmV2?=
+ =?utf-8?B?aVRrS3FsM3BRTmdTQW1ZMlI3c2RZNytZYUVkSmVleUlSblhsbVE3S0JiUTFu?=
+ =?utf-8?B?UzBFR0haRGlOcExjQm5paFFReG9XZ0puelF2Qzg3QzV4UzgyUG9jZlBHeGxF?=
+ =?utf-8?B?a1ExM1hRc29vS1IvLzlaK2ZrR01lcTNUeTg1d2hEVFlJMGw0NkRKRVIyd00r?=
+ =?utf-8?B?YVp0ZHFMZ3Rnd3dFU0ozWGZhMm1nNFBBU250V1R6eXB5SE1saXp0QkVnVW9h?=
+ =?utf-8?B?eS84MjAwaDVvVWVEcmpiajRMQXJ6NG9JNWd5U0VCakJBbytobGJscTMzWTdH?=
+ =?utf-8?B?Qk41enpBYnZnVCt2bjRzY1c5QVZIaXpmK3FqbkZYZzNhc3phdjlvdz09?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <15BE18793FA91245B52938A38ED65B84@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a9dc105d-cb90-48ef-8417-08da138b92be
+X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Apr 2022 02:59:00.8750
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: PaYuMZ3lXx+ICgYckHbIfcswr0bx/BfeqIoVpR78OXSxFtIDQ9r58qubV5GTPU1XEEHCJexktYxyFe+oCgoZQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR12MB3759
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 8:33 PM, Kanchan Joshi wrote:
-> On Fri, Apr 1, 2022 at 6:55 AM Jens Axboe <axboe@kernel.dk> wrote:
->>
->> On 3/30/22 7:14 AM, Kanchan Joshi wrote:
->>> On Wed, Mar 30, 2022 at 6:32 PM Christoph Hellwig <hch@lst.de> wrote:
->>>>
->>>> On Fri, Mar 25, 2022 at 07:09:21PM +0530, Kanchan Joshi wrote:
->>>>> Ok. If you are open to take new opcode/struct route, that is all we
->>>>> require to pair with big-sqe and have this sorted. How about this -
->>>>
->>>> I would much, much, much prefer to support a bigger CQE.  Having
->>>> a pointer in there just creates a fair amount of overhead and
->>>> really does not fit into the model nvme and io_uring use.
->>>
->>> Sure, will post the code with bigger-cqe first.
->>
->> I can add the support, should be pretty trivial. And do the liburing
->> side as well, so we have a sane base.
-> 
->  I will post the big-cqe based work today. It works with fio.
->  It does not deal with liburing (which seems tricky), but hopefully it
-> can help us move forward anyway .
-
-Let's compare then, since I just did the support too :-)
-
-Some limitations in what I pushed:
-
-1) Doesn't support the inline completion path. Undecided if this is
-super important or not, the priority here for me was to not pollute the
-general completion path.
-
-2) Doesn't support overflow. That can certainly be done, only
-complication here is that we need 2x64bit in the io_kiocb for that.
-Perhaps something can get reused for that, not impossible. But figured
-it wasn't important enough for a first run.
-
-I also did the liburing support, but haven't pushed it yet. That's
-another case where some care has to be taken to avoid makig the general
-path slower.
-
-Oh, it's here, usual branch:
-
-https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-big-sqe
-
-and based on top of the pending 5.18 bits and the current 5.19 bits.
-
->> Then I'd suggest to collapse a few of the patches in the series,
->> the ones that simply modify or fix gaps in previous ones. Order
->> the series so we build the support and then add nvme support
->> nicely on top of that.
-> 
-> I think we already did away with patches which were fixing only the
-> gaps. But yes, patches still add infra for features incrementally.
-> Do you mean having all io_uring infra (async, plug, poll) squashed
-> into a single io_uring patch?
-
-At least async and plug, I'll double check on the poll bit.
-
-> On a related note, I was thinking of deferring fixed-buffer and
-> bio-cache support for now.
-
-Yes, I think that can be done as a round 2. Keep the current one
-simpler.
-
--- 
-Jens Axboe
-
+DQo+IFRoYW5rcyBmb3IgdGhlIGluZm8uIEkgZG9uJ3Qga25vdyBvZiBhbnl0aGluZyBibG9jayBv
+ciBudm1lIHNwZWNpZmljIHRoYXQgbWlnaHQNCj4gZXhwbGFpbiBhbiBvcmRlciBvZiBtYWduaXR1
+ZGUgcGVyZiBkaWZmZXJlbmNlLg0KPiANCj4gQ291bGQgeW91IHRyeSB0aGUgc2FtZSB0ZXN0IHdp
+dGhvdXQgdGhlIGZpbGVzeXRlbXM/IFlvdSBtZW50aW9uZWQgdXNpbmcgbWRyYWlkLA0KPiBzbyB0
+cnkgJy0tZmlsZW5hbWU9L2Rldi9tZFgnLiBJZiB0aGF0IGFsc28gc2hvd3Mgc2ltaWxpYXIgcGVy
+Zm9ybWFuY2UNCj4gZGlmZmVyZW5jZSwgdHJ5IHVzaW5nIG9uZSBvZiB5b3VyIG52bWUgbWVtYmVy
+IGRyaXZlcyBkaXJlY3RseSwgbGlrZQ0KPiAnLS1maWxlbmFtZT0vZGV2L252bWUxbjEnLiBUaGF0
+IHNob3VsZCBpc29sYXRlIHdoaWNoIHN1YnN5c3RlbSBpcyBjb250cmlidXRpbmcNCj4gdG8gdGhl
+IGRpZmZlcmVuY2UuDQo+IA0KDQpXaXRoIEtlaXRoJ3Mgc3VnZ2VzdGlvbnMgeW91IGNhbiBhbHdh
+eXMgdGFrZSB0aGUgcGVyZiBudW1iZXJzIGFuZA0KY29tcGFyZSBiZWZvcmUgYW5kIGFmdGVyIG1h
+aW5seSBmb3IgbnZtZV9xdWV1ZV9ycSgpIGFuZCBudm1lX2lycSgpLg0KDQotY2sNCg0KDQo=
