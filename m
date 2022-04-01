@@ -2,97 +2,108 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ACEAC433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B716FC433EF
 	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245593AbiDAK3v (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Apr 2022 06:29:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38648 "EHLO
+        id S245687AbiDAK3w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Apr 2022 06:29:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245574AbiDAK3p (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 06:29:45 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E98326E558
-        for <linux-block@vger.kernel.org>; Fri,  1 Apr 2022 03:27:55 -0700 (PDT)
+        with ESMTP id S245635AbiDAK3r (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 06:29:47 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7EF26E56E;
+        Fri,  1 Apr 2022 03:27:55 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id CCFA521A99;
-        Fri,  1 Apr 2022 10:27:53 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id A15131FD03;
+        Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1648808873; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Qy+aItlDnKh+kf9kMWucumFijaWwv/sCrv5oXIjwE9g=;
-        b=EsU7WJWJeLTs0QB+7//u4cT9HN9Cr7pVvlXYjwbm2ztNRhoMiKz031S0B+MfvrB8FF+w8k
-        HIlwCX4aiZwfX6z5taXUhWJk1vR/j6nZOyK/mfrdv70i91ry7Ef32FoKRa7ulFByp0AfTb
-        zKQ9Y5NGj5cRBDh8yy935utkduyBP2k=
+        t=1648808874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tA0rKXsxf77nc7Y9wimslw6o3kvPAaCI532S6Fi8Ku8=;
+        b=JTpL/yQ35Uo0cdyHthSMpwo+YYr9z9gbqEVfbnlwtm21i1pPikC5BwnHiJFfwEH4wMQOa/
+        d4smprMTtGFMDt99t6UwNOX+824oE5uZdUy/814GNlYDYcRh2AZYCbA9OIqJHKBsVMQxHe
+        BNA6ivLPACoKsUlieD372btioLxvB0E=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1648808873;
+        s=susede2_ed25519; t=1648808874;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=Qy+aItlDnKh+kf9kMWucumFijaWwv/sCrv5oXIjwE9g=;
-        b=A6Drk6x03lvY20Zo+e7yMym1jqwo+mVO5jGDA3S2nN74qRlhN1hT5+Qn5XzzRcouvos1RU
-        tV6m1gL/sRXCMBDg==
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tA0rKXsxf77nc7Y9wimslw6o3kvPAaCI532S6Fi8Ku8=;
+        b=JweEsUcElcwq2AE3MqnVDYuqWGUXa7Ic1doIZQzk+ycT4MEhnss9WChRssxOgY3o6sF41o
+        e28Eb49SIPkFKtDg==
 Received: from quack3.suse.cz (unknown [10.163.28.18])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id AD955A3B93;
-        Fri,  1 Apr 2022 10:27:53 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTPS id 821DFA3B88;
+        Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 6F5ABA0610; Fri,  1 Apr 2022 12:27:52 +0200 (CEST)
+        id A709CA061F; Fri,  1 Apr 2022 12:27:52 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH 0/9 v7] bfq: Avoid use-after-free when moving processes between cgroups
-Date:   Fri,  1 Apr 2022 12:27:41 +0200
-Message-Id: <20220401102325.17617-1-jack@suse.cz>
+        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
+        stable@vger.kernel.org
+Subject: [PATCH 9/9] bfq: Make sure bfqg for which we are queueing requests is online
+Date:   Fri,  1 Apr 2022 12:27:50 +0200
+Message-Id: <20220401102752.8599-9-jack@suse.cz>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20220401102325.17617-1-jack@suse.cz>
+References: <20220401102325.17617-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1742; h=from:subject:message-id; bh=Woq18d3GqSq325hnHrVbkiYazH+zBVj4PzXclk8lnX8=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiRtOZPoyAYLn6sr1sP6B6BeA1DVts6sMV+W8utkyk 6yUr5COJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYkbTmQAKCRCcnaoHP2RA2f9ZCA CJvM5GqNh1tkRBF7ZMfvem9eJyrsBfcCdjLIQUr0x161VHmVWW0olOHmpVvIMzDU22Cej93QjJny4W 7L3GZ3Oyn28x2qRdQ4igdN36nToUKfET6ePIKtsiNcyIMH5PDx3e0S8A9tJZG4MSX1OxIsLkfX+P4D 5O8a0F5zyhj6LsjtDno80fzX+I1NbVG49uOmLfy091Zy/iHabL5czlKsZ/VaoZwl7KNkPN3+ly4grB 4/QeYjus+cKEEeH2GmgcIK4I74RGbEenIC8XUcQj4+FHMLTzdtDQaPMW+wEyc4ayc+b7lDSN0CrRzL YFhTPCWswM93VFKNs7YOszcYj9nQP1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1568; h=from:subject; bh=sgAPcAQrJvyNTY55SSAru4QatmfaUnmjg+zxK4TmvNM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiRtOlKklLhNNV3RGbf7D1KUJYUgBsxgg8XSM1TWU0 HAuk0saJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYkbTpQAKCRCcnaoHP2RA2WUuB/ 45d/A4FWTboIVYdZ+QTKDERa161jYw4o75MeQV0qFUxjSiBn1+H1MSA5bPrLHZUGJhfAsD+RMefQIg oxOjs4FUnRMk2utm8NFp39DvIwTryxvAhI85kRUFLpXS5TOQrk6j6WQAeybv4ucYN/opBfH7ikQBEe iDW+Okuhm4+wzbxoEBOitpzukCfF6eK3aky2OeiHz78HU672Df1Gx22XTmXF3mstLzoFP35yonrra6 HZMnZIZCAvtjxOsozE5Dv0E5WnuPq4q0M9r95UaHad4mUF9kltwKmYuluyi9CvyS6QjKruRzVf3l1Z kYLXABUvmFhNAIiYt4qTATjJmfQsi6
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+Bios queued into BFQ IO scheduler can be associated with a cgroup that
+was already offlined. This may then cause insertion of this bfq_group
+into a service tree. But this bfq_group will get freed as soon as last
+bio associated with it is completed leading to use after free issues for
+service tree users. Fix the problem by making sure we always operate on
+online bfq_group. If the bfq_group associated with the bio is not
+online, we pick the first online parent.
 
-here is the seventh version of my patches to fix use-after-free issues in BFQ
-when processes with merged queues get moved to different cgroups. Kuai has
-confirmed that patches now fix all the issues his reproducer was able to
-trigger so I've just added some tags, codewise this is the same as v6. Paolo,
-can you please check whether the patches look good to you so that Jens can
-merge them? Thanks!
+CC: stable@vger.kernel.org
+Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
+Tested-by: "yukuai (C)" <yukuai3@huawei.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/bfq-cgroup.c | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
-Changes since v6:
-* Added some Tested-by, Fixes, and CC tags
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 32d2c2a47480..09574af83566 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -612,10 +612,19 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+ {
+ 	struct blkcg_gq *blkg = bio->bi_blkg;
++	struct bfq_group *bfqg;
+ 
+-	if (!blkg)
+-		return bfqd->root_group;
+-	return blkg_to_bfqg(blkg);
++	while (blkg) {
++		bfqg = blkg_to_bfqg(blkg);
++		if (bfqg->online) {
++			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
++			return bfqg;
++		}
++		blkg = blkg->parent;
++	}
++	bio_associate_blkg_from_css(bio,
++				&bfqg_to_blkg(bfqd->root_group)->blkcg->css);
++	return bfqd->root_group;
+ }
+ 
+ /**
+-- 
+2.34.1
 
-Changes since v5:
-* Added handling of situation when bio is submitted for a cgroup that has
-  already went through bfq_pd_offline()
-* Convert bfq to avoid using deprecated __bio_blkcg() and thus fix possible
-  races when returned cgroup can change while bfq is working with a request
-
-Changes since v4:
-* Even more aggressive splitting of merged bfq queues to avoid problems with
-  long merge chains.
-
-Changes since v3:
-* Changed handling of bfq group move to handle the case when target of the
-  merge has moved.
-
-Changes since v2:
-* Improved handling of bfq queue splitting on move between cgroups
-* Removed broken change to bfq_put_cooperator()
-
-Changes since v1:
-* Added fix for bfq_put_cooperator()
-* Added fix to handle move between cgroups in bfq_merge_bio()
-
-								Honza
-Previous versions:
-Link: http://lore.kernel.org/r/20211223171425.3551-1-jack@suse.cz # v1
-Link: http://lore.kernel.org/r/20220105143037.20542-1-jack@suse.cz # v2
-Link: http://lore.kernel.org/r/20220112113529.6355-1-jack@suse.cz # v3
-Link: http://lore.kernel.org/r/20220114164215.28972-1-jack@suse.cz # v4
-Link: http://lore.kernel.org/r/20220121105503.14069-1-jack@suse.cz # v5
-Link: http://lore.kernel.org/r/20220330123438.32719-1-jack@suse.cz # v6
