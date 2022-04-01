@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E32E7C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 19:34:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B664C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 19:38:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346921AbiDATgi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Apr 2022 15:36:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33716 "EHLO
+        id S245438AbiDATkW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Apr 2022 15:40:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38376 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245438AbiDATgh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 15:36:37 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EC84190E81
-        for <linux-block@vger.kernel.org>; Fri,  1 Apr 2022 12:34:47 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id p21so4389372ioj.4
-        for <linux-block@vger.kernel.org>; Fri, 01 Apr 2022 12:34:47 -0700 (PDT)
+        with ESMTP id S236441AbiDATkV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 15:40:21 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85BE31AC70D
+        for <linux-block@vger.kernel.org>; Fri,  1 Apr 2022 12:38:31 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id x4so4373077iop.7
+        for <linux-block@vger.kernel.org>; Fri, 01 Apr 2022 12:38:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:content-language:to:cc:from
          :subject:content-transfer-encoding;
-        bh=1h7Y7J0rb7JBxLiuKUh5toLCo/YmE8yiwrotHzLNM2c=;
-        b=g/AHpzt0O20TNczxLRwpbG/bvB0XWTXlp123r8XcUO/HNeLGN41xHU4jEzdK+0CqzZ
-         ZGCoVuVneNNwW7Lx/6P4TG4PBi9xRfh+FerVaRbgGWloM4gY986WKaLlIakg6IIpvlkW
-         sYcxL3Aszxy5y2H424Sw6JNYF91OGXT26H4b/6V84k2B1PydHBhbOOXUuX9uJPUFS0Uh
-         a9o2E4S0Zg8g1PJukju+Ul59GOspFtASmkpXP8W5fJi29xut0H2lX1RN0DmVbXgmzhv8
-         7hKcF5/fTpFTfUSxXzprcWZR5UAILUre+WQgT89RMZKrnJ5BD7x13AuHlLefgQswvsfT
-         iVnA==
+        bh=QtLDD+hpm0/9TCUiDXd6oieaWudsMn6CYkvzN9fAUDk=;
+        b=TipgiB7gx6HnWAgqXYM75y0heOpMGl0dLFGOhnaPeAJjbpRFou+wLW1IxOXky/9bJt
+         XpzVBXThhvNOgxI5FKgvZypR2WmqdvNydpiSul4YdMjrXbQrVQ9cJTXre2xKSOOD3eNR
+         p71eCDm9ciNeYliJLmpB5nt9XdtOJvFaHT55vCV8Ejat+CVkNfx0u4tr477i4iMd6KmI
+         zOuc2aCiCHxYc3jQhgOXVbgbwSYJzpi0uNmeq7AIxH9P9quaBDxBczLNxVFTGrv7F0jo
+         IT7ibUNrftEV6fFiIC4kEB+tHrCXCUKy+mgGadc14VvXlx4Sg6sJ6y9irE2YWJzRNcvp
+         UBhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent
          :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=1h7Y7J0rb7JBxLiuKUh5toLCo/YmE8yiwrotHzLNM2c=;
-        b=PG0x+TBRg4p56FwRP0yep06FP16V4mGg184idD1/da4xXW72GRY0uH/eS0Urpa8OOf
-         C0a9xnfo39fD8/5yF/hxQo1nkjN0R2V6uLsMd2f4+4IMwd/g7219f39FxL2tGu8skGVa
-         m1GDA87cl+zJN20rquUCQnF7SnvqRbbVlgud9MIAbZWaaARoMct7m1ZssJod4n8z9u2c
-         5XD9vaxyUIjv2o//6LzaGgjbt6J7M5uRsMaYRBnfdpe5QIBtMKRP79InUgk289nWf4+3
-         ibv/pErD4oGVjd2aKui4nPFs+zU6kIZ6F4wNPJbRg3d52R9zRR1QICDYBJnGc+1LNjke
-         s1hQ==
-X-Gm-Message-State: AOAM530rHAbzDIMYE1AnOy66RHo3qZYwKH7GTKrPAvhY1SUldmY+h50u
-        1PpMleTHgMXGNE+bonJ+1XJ9XS0LtKkuaXI6
-X-Google-Smtp-Source: ABdhPJxBCx6CQMnb3VAKL5upd8/7876RskYfWBuD7yvOeqNP45VJXtJ14aCltJHGs0d6ugvwAHg5hQ==
-X-Received: by 2002:a5d:950e:0:b0:64c:adf3:7bd with SMTP id d14-20020a5d950e000000b0064cadf307bdmr575908iom.48.1648841686539;
-        Fri, 01 Apr 2022 12:34:46 -0700 (PDT)
+        bh=QtLDD+hpm0/9TCUiDXd6oieaWudsMn6CYkvzN9fAUDk=;
+        b=JA8EKl4/wgjuOZrLGzS5SWzGSy4vswy68bz1aLStneXauhGWPe54dvCvPbFTdA67h7
+         FLUKQdRtk8OImiKYNPV6WTVg2REBy+dP51R+NOrW+omQ3GfIm3EL/vT+T3LnHamhDzhn
+         ABglS00pfV5623tJS0YWv3IybqGwEN9pWV5d6QkseHJE6baLs6F7zg8WkCVTUYUdTSz2
+         68hx6+juDdDl3Qn8HiBpGfgdpxg0txaBvjsOO976AvGWPBk72jpOvwdzwT3+RekPpRRF
+         FX5UH0hPmB2+/cE+QSr/bRFWJEavl2nvK5eLLKWYHSMjjMdio5gE9p/bBeusssVexo0A
+         14YQ==
+X-Gm-Message-State: AOAM532Ghb/G5/gDOmup71kBdhZhBVuBSLdXjnIgS814VM4MyYKkcVFB
+        PS8ji48j6rxh5pxNHrzVZdhIkBZ7qooix9K9
+X-Google-Smtp-Source: ABdhPJzntKyjmroB9Nlp7Lkb5D5qV5bfcnBGEIFBmW15bpmIUBUeNF5oUcZzo24ojeL1jKvp8zohtw==
+X-Received: by 2002:a05:6638:1194:b0:323:6cfd:9014 with SMTP id f20-20020a056638119400b003236cfd9014mr6439480jas.34.1648841910837;
+        Fri, 01 Apr 2022 12:38:30 -0700 (PDT)
 Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id k3-20020a0566022a4300b0064ca623b65esm2010495iov.4.2022.04.01.12.34.46
+        by smtp.gmail.com with ESMTPSA id f2-20020a056e020c6200b002c9cb3afc79sm1719743ilj.30.2022.04.01.12.38.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Apr 2022 12:34:46 -0700 (PDT)
-Message-ID: <b7d7893a-971b-9ac6-b4b9-e39a81038254@kernel.dk>
-Date:   Fri, 1 Apr 2022 13:34:45 -0600
+        Fri, 01 Apr 2022 12:38:30 -0700 (PDT)
+Message-ID: <d5869c35-c548-a84a-6355-8dfa0bf6eced@kernel.dk>
+Date:   Fri, 1 Apr 2022 13:38:30 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
@@ -56,74 +56,137 @@ Content-Language: en-US
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.18-rc1
+Subject: [GIT PULL] Block driver fixes for 5.18-rc1
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-Either fixes or a few additions that got missed in the initial merge
-window pull. In detail:
+Followup block driver updates and fixes for the 5.18-rc1 merge window.
+In detail:
 
-- List iterator fix to avoid leaking value post loop (Jakob)
+- NVMe pull request
+	- Fix multipath hang when disk goes live over reconnect
+	  (Anton Eidelman)
+	- fix RCU hole that allowed for endless looping in multipath round
+	  robin (Chris Leech)
+	- remove redundant assignment after left shift (Colin Ian King)
+	- add quirks for Samsung X5 SSDs (Monish Kumar R)
+	- fix the read-only state for zoned namespaces with unsupposed
+	  features (Pankaj Raghav)
+	- use a private workqueue instead of the system workqueue in nvmet
+	  (Sagi Grimberg)
+	- allow duplicate NSIDs for private namespaces (Sungup Moon)
+	- expose use_threaded_interrupts read-only in sysfs (Xin Hao)"
 
-- One-off fix in minor count (Christophe)
+- nbd minor allocation fix (Zhang)
 
-- Fix for a regression in how io priority setting works for an exiting
-  task (Jiri)
+- drbd fixes and maintainer addition (Lars, Jakob, Christoph)
 
-- Fix a regression in this merge window with blkg_free() being called in
-  an inappropriate context (Ming)
+- n64cart build fix (Jackie)
 
-- Misc fixes (Ming, Tom)
+- loop compat ioctl fix (Carlos)
+
+- Misc fixes (Colin, Dongli)
 
 Please pull!
 
 
-The following changes since commit 8f9e7b65f833cb9a4b2e2f54a049d74df394d906:
+The following changes since commit ae53aea611b7a532a52ba966281a8b7a8cfd008a:
 
-  block: cancel all throttled bios in del_gendisk() (2022-03-18 09:57:56 -0600)
+  Merge tag 'nvme-5.18-2022-03-17' of git://git.infradead.org/nvme into for-5.18/drivers (2022-03-17 20:46:22 -0600)
 
 are available in the Git repository at:
 
-  git://git.kernel.dk/linux-block.git tags/for-5.18/block-2022-04-01
+  git://git.kernel.dk/linux-block.git tags/for-5.18/drivers-2022-04-01
 
-for you to fetch changes up to 8d7829ebc1e48208b3c02c2a10c5f8856246033c:
+for you to fetch changes up to 2651ee5ae43241831ca63d7158bb2b151a6a0e1f:
 
-  blk-wbt: remove wbt_track stub (2022-03-31 12:58:38 -0600)
-
-----------------------------------------------------------------
-for-5.18/block-2022-04-01
+  drbd: remove check of list iterator against head past the loop body (2022-03-31 17:08:15 -0600)
 
 ----------------------------------------------------------------
-Christophe JAILLET (1):
-      block: Fix the maximum minor value is blk_alloc_ext_minor()
+for-5.18/drivers-2022-04-01
 
-Jakob Koschel (1):
-      block: use dedicated list iterator variable
+----------------------------------------------------------------
+Anton Eidelman (1):
+      nvme-multipath: fix hang when disk goes live over reconnect
 
-Jiri Slaby (1):
-      block: restore the old set_task_ioprio() behaviour wrt PF_EXITING
+Carlos Llamas (1):
+      loop: fix ioctl calls using compat_loop_info
 
-Ming Lei (2):
-      lib/sbitmap: allocate sb->map via kvzalloc_node
-      block: avoid calling blkg_free() in atomic context
+Chris Leech (1):
+      nvme: fix RCU hole that allowed for endless looping in multipath round robin
 
-Tom Rix (1):
-      blk-wbt: remove wbt_track stub
+Christoph Böhmwalder (1):
+      MAINTAINERS: add drbd co-maintainer
 
- block/blk-cgroup.c         | 32 ++++++++++++++++++++++----------
- block/blk-ioc.c            |  3 +--
- block/blk-mq.c             | 25 ++++++++++++++++---------
- block/blk-wbt.h            |  3 ---
- block/genhd.c              |  2 +-
- include/linux/blk-cgroup.h |  5 ++++-
- include/linux/sbitmap.h    |  2 +-
- lib/sbitmap.c              |  2 +-
- 8 files changed, 46 insertions(+), 28 deletions(-)
+Colin Ian King (2):
+      xen-blkback: remove redundant assignment to variable i
+      nvmet: remove redundant assignment after left shift
+
+Dongli Zhang (1):
+      xen/blkfront: fix comment for need_copy
+
+Jackie Liu (1):
+      n64cart: convert bi_disk to bi_bdev->bd_disk fix build
+
+Jakob Koschel (2):
+      drbd: remove usage of list iterator variable after loop
+      drbd: remove check of list iterator against head past the loop body
+
+Jens Axboe (1):
+      Merge tag 'nvme-5.18-2022-03-29' of git://git.infradead.org/nvme into for-5.18/drivers
+
+Lars Ellenberg (1):
+      drbd: fix potential silent data corruption
+
+Monish Kumar R (1):
+      nvme-pci: add quirks for Samsung X5 SSDs
+
+Pankaj Raghav (1):
+      nvme: fix the read-only state for zoned namespaces with unsupposed features
+
+Sagi Grimberg (1):
+      nvmet: use a private workqueue instead of the system workqueue
+
+Sungup Moon (1):
+      nvme: allow duplicate NSIDs for private namespaces
+
+Xin Hao (1):
+      nvme-pci: expose use_threaded_interrupts read-only in sysfs
+
+Zhang Wensheng (1):
+      nbd: fix possible overflow on 'first_minor' in nbd_dev_add()
+
+ MAINTAINERS                         |  1 +
+ drivers/block/drbd/drbd_main.c      |  7 ++++--
+ drivers/block/drbd/drbd_req.c       | 45 ++++++++++++++++++++++++-------------
+ drivers/block/loop.c                |  1 +
+ drivers/block/n64cart.c             |  2 +-
+ drivers/block/nbd.c                 | 24 ++++++++++----------
+ drivers/block/xen-blkback/blkback.c |  2 +-
+ drivers/block/xen-blkfront.c        |  2 +-
+ drivers/nvme/host/core.c            | 38 +++++++++++++++++++++----------
+ drivers/nvme/host/multipath.c       | 32 +++++++++++++++++++++-----
+ drivers/nvme/host/nvme.h            | 23 +++++++++++++++++++
+ drivers/nvme/host/pci.c             |  7 ++++--
+ drivers/nvme/target/admin-cmd.c     |  2 +-
+ drivers/nvme/target/configfs.c      |  2 +-
+ drivers/nvme/target/core.c          | 26 +++++++++++++++------
+ drivers/nvme/target/fc.c            |  8 +++----
+ drivers/nvme/target/fcloop.c        | 16 ++++++-------
+ drivers/nvme/target/io-cmd-file.c   |  6 ++---
+ drivers/nvme/target/loop.c          |  4 ++--
+ drivers/nvme/target/nvmet.h         |  1 +
+ drivers/nvme/target/passthru.c      |  2 +-
+ drivers/nvme/target/rdma.c          | 12 +++++-----
+ drivers/nvme/target/tcp.c           | 10 ++++-----
+ include/linux/nvme.h                |  1 +
+ include/uapi/linux/loop.h           |  4 ++--
+ 25 files changed, 186 insertions(+), 92 deletions(-)
 
 -- 
 Jens Axboe
