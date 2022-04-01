@@ -2,154 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4772DC433F5
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 03:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16B3BC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 03:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244350AbiDADHF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 31 Mar 2022 23:07:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46598 "EHLO
+        id S240264AbiDADip (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 31 Mar 2022 23:38:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54008 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234555AbiDADHE (ORCPT
+        with ESMTP id S244625AbiDADim (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 31 Mar 2022 23:07:04 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D6E193B6A
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 20:05:15 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id y10so1385027pfa.7
-        for <linux-block@vger.kernel.org>; Thu, 31 Mar 2022 20:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:in-reply-to:content-transfer-encoding;
-        bh=r7khBnonEiFThq13FqiG7LKVSQ+MeKxonEXk60vTiZk=;
-        b=TAg1e9zBJTGmVQlIFL6G6CAqhYDbb5339K7GUDokxjlYMqdwqoz8hphzJUz6vFyzZp
-         cBgh7/mOFVp2zT5x90Jr3DZ8JCaY90NURmqmn0Hzl1k9C934soglkbvMvJufqGHACvFs
-         JYLLrnAunOVL6MNaKUdtNyh9xbWUVIELUeL62O3Si8bzhS05OWGwUiFQQAvOSI6QtNHx
-         cFq/PJrXJzZTa0cwKj5Lx9JM8qfUAOG8uyPzjf/H9eeICIbDnWy8aBvV+OLCxX0cjt/t
-         9qH4BGFylh1FGR1l6hX8FIAxJ6i7wfgWG9jalSIiOTKsA+Z5BV0bW4qOUtPSA7Y3m57t
-         FJsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=r7khBnonEiFThq13FqiG7LKVSQ+MeKxonEXk60vTiZk=;
-        b=FC9h/OhVrKA06TDeZXsOhLle2koLA+8r1fVz8hYis+m0CzClFxcl4EIHC7oOfP9A1w
-         LwjrlES5ut/EKUJPBcmefy2hrgH4vjyhvjtOk3qpmtcBJoUJliBICM0SXgK6r4eM7cuF
-         lObcIU8d2BRx+bzCcnEJ5UTjKYnpnQ7r9M/w7GnbJnI1TmcEvUbcIDGsroF6AN3Poe93
-         CWBhXicLTxM++/wHHfUKgOqeehrobrPdAPS5srpaDA32F8EKdUqOuJjhnoKUtaiUGU9C
-         TqsIpyyaSOkksNu3OaZ0O44lqp/YeH4Whtbjhk3MXskxiuKLIbHp+LuPUrZhAJu6O15c
-         KNyw==
-X-Gm-Message-State: AOAM531nu39Yggd/oRAgvBgSjoQuuwPSahj8lfnnCiHwi84dJukzBVbM
-        hZg3vmZOdkQuGvTzXciQjoyWCQ==
-X-Google-Smtp-Source: ABdhPJwf62CCz6zDtBAJs+C2QiuuIuYi30RJGbEXPrLs61j0DQUYOxVD0TojYqnwKOjPNvTYR/PrGQ==
-X-Received: by 2002:a05:6a00:ad0:b0:4e1:2d96:2ab0 with SMTP id c16-20020a056a000ad000b004e12d962ab0mr8542870pfl.3.1648782315250;
-        Thu, 31 Mar 2022 20:05:15 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ds15-20020a17090b08cf00b001c6a4974b45sm11003304pjb.40.2022.03.31.20.05.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Mar 2022 20:05:14 -0700 (PDT)
-Message-ID: <f082f9e9-5ebb-48df-cfca-01cd1770c886@kernel.dk>
-Date:   Thu, 31 Mar 2022 21:05:12 -0600
+        Thu, 31 Mar 2022 23:38:42 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D016718A7BE;
+        Thu, 31 Mar 2022 20:36:52 -0700 (PDT)
+Received: from kwepemi500019.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KV5Qk43hwzgYGg;
+        Fri,  1 Apr 2022 11:35:10 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500019.china.huawei.com (7.221.188.117) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 1 Apr 2022 11:36:50 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 1 Apr
+ 2022 11:36:49 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.co>
+Subject: [PATCH] blk-mq: fix possible creation failure for 'debugfs_dir'
+Date:   Fri, 1 Apr 2022 11:51:39 +0800
+Message-ID: <20220401035139.272897-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
-Content-Language: en-US
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Kanchan Joshi <joshiiitr@gmail.com>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
- <20220308152105.309618-18-joshi.k@samsung.com>
- <20220310083652.GF26614@lst.de>
- <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
- <20220310141945.GA890@lst.de>
- <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
- <20220311062710.GA17232@lst.de>
- <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
- <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
- <20220330130219.GB1938@lst.de>
- <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
- <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk>
- <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
- <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk>
-In-Reply-To: <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 3/31/22 8:44 PM, Jens Axboe wrote:
-> On 3/31/22 8:33 PM, Kanchan Joshi wrote:
->> On Fri, Apr 1, 2022 at 6:55 AM Jens Axboe <axboe@kernel.dk> wrote:
->>>
->>> On 3/30/22 7:14 AM, Kanchan Joshi wrote:
->>>> On Wed, Mar 30, 2022 at 6:32 PM Christoph Hellwig <hch@lst.de> wrote:
->>>>>
->>>>> On Fri, Mar 25, 2022 at 07:09:21PM +0530, Kanchan Joshi wrote:
->>>>>> Ok. If you are open to take new opcode/struct route, that is all we
->>>>>> require to pair with big-sqe and have this sorted. How about this -
->>>>>
->>>>> I would much, much, much prefer to support a bigger CQE.  Having
->>>>> a pointer in there just creates a fair amount of overhead and
->>>>> really does not fit into the model nvme and io_uring use.
->>>>
->>>> Sure, will post the code with bigger-cqe first.
->>>
->>> I can add the support, should be pretty trivial. And do the liburing
->>> side as well, so we have a sane base.
->>
->>  I will post the big-cqe based work today. It works with fio.
->>  It does not deal with liburing (which seems tricky), but hopefully it
->> can help us move forward anyway .
-> 
-> Let's compare then, since I just did the support too :-)
-> 
-> Some limitations in what I pushed:
-> 
-> 1) Doesn't support the inline completion path. Undecided if this is
-> super important or not, the priority here for me was to not pollute the
-> general completion path.
-> 
-> 2) Doesn't support overflow. That can certainly be done, only
-> complication here is that we need 2x64bit in the io_kiocb for that.
-> Perhaps something can get reused for that, not impossible. But figured
-> it wasn't important enough for a first run.
-> 
-> I also did the liburing support, but haven't pushed it yet. That's
-> another case where some care has to be taken to avoid makig the general
-> path slower.
-> 
-> Oh, it's here, usual branch:
-> 
-> https://git.kernel.dk/cgit/linux-block/log/?h=io_uring-big-sqe
-> 
-> and based on top of the pending 5.18 bits and the current 5.19 bits.
+'q->debugfs_dir' is created in blk_register_queue(), however, it's not
+removed in blk_unregister_queue() and is delayed to blk_release_queue().
+Thus it's possible that del_gendisk() is done and the old 'debugfs_dir'
+is not removed yet, and in the mean time blk_register_queue() is called
+for the new device with the same name. In this case, kernel will
+compalin about creation failure for 'debugfs_dir' like following:
 
-Do post your version too, would be interesting to compare. I just wired
-mine up to NOP, hasn't seen any testing beyond just verifying that we do
-pass back the extra data.
+debugfs: Directory 'nullb1' with parent 'block' already present!
 
-Added inline completion as well. Kind of interesting in that performance
-actually seems to be _better_ with CQE32 for my initial testing, just
-using NOP. More testing surely needed, will run it on actual hardware
-too as I have a good idea what performance should look like there.
+Fix the problem by moving forward the removal of 'debgfs_dir' to
+blk_unregister_queue().
 
-I also think it's currently broken for request deferral and timeouts,
-but those are just minor tweaks that need to be made to account for the
-cq head being doubly incremented on bigger CQEs.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-sysfs.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 88bd41d4cb59..15fc3f0786e3 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -779,11 +779,6 @@ static void blk_release_queue(struct kobject *kobj)
+ 	if (queue_is_mq(q))
+ 		blk_mq_release(q);
+ 
+-	blk_trace_shutdown(q);
+-	mutex_lock(&q->debugfs_mutex);
+-	debugfs_remove_recursive(q->debugfs_dir);
+-	mutex_unlock(&q->debugfs_mutex);
+-
+ 	if (queue_is_mq(q))
+ 		blk_mq_debugfs_unregister(q);
+ 
+@@ -951,5 +946,11 @@ void blk_unregister_queue(struct gendisk *disk)
+ 
+ 	mutex_unlock(&q->sysfs_dir_lock);
+ 
++	blk_trace_shutdown(q);
++	mutex_lock(&q->debugfs_mutex);
++	blk_mq_debugfs_unregister_hctxs(q);
++	debugfs_remove_recursive(q->debugfs_dir);
++	mutex_unlock(&q->debugfs_mutex);
++
+ 	kobject_put(&disk_to_dev(disk)->kobj);
+ }
 -- 
-Jens Axboe
+2.31.1
 
