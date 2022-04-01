@@ -2,108 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B716FC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF8E5C4321E
+	for <linux-block@archiver.kernel.org>; Fri,  1 Apr 2022 10:28:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245687AbiDAK3w (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 1 Apr 2022 06:29:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38664 "EHLO
+        id S245635AbiDAK3x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 1 Apr 2022 06:29:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38668 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245635AbiDAK3r (ORCPT
+        with ESMTP id S245615AbiDAK3r (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Fri, 1 Apr 2022 06:29:47 -0400
 Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED7EF26E56E;
-        Fri,  1 Apr 2022 03:27:55 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2167526E570;
+        Fri,  1 Apr 2022 03:27:56 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id A15131FD03;
+        by smtp-out2.suse.de (Postfix) with ESMTP id A77A81FD04;
         Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1648808874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tA0rKXsxf77nc7Y9wimslw6o3kvPAaCI532S6Fi8Ku8=;
-        b=JTpL/yQ35Uo0cdyHthSMpwo+YYr9z9gbqEVfbnlwtm21i1pPikC5BwnHiJFfwEH4wMQOa/
-        d4smprMTtGFMDt99t6UwNOX+824oE5uZdUy/814GNlYDYcRh2AZYCbA9OIqJHKBsVMQxHe
-        BNA6ivLPACoKsUlieD372btioLxvB0E=
+        bh=qOuiYb1lKXflzrbNlr4ffbWrXf/9yvnmykox32bxZwU=;
+        b=ep7ydXvlBedTPae2aigPOIZ7tu2Ft92V7kSszeE6Kxtl+yWuLZSVcdDszCkTAvMu5JlWCa
+        Wj8NlKMS2h879TYNNkKnocd8Lse+pWD5ZLNgO8Gbos44ihumvwoILbW512U8C07eVuBXSV
+        iOqdujo0kQhDgY1q5iIJWhQYgfkvJqE=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1648808874;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=tA0rKXsxf77nc7Y9wimslw6o3kvPAaCI532S6Fi8Ku8=;
-        b=JweEsUcElcwq2AE3MqnVDYuqWGUXa7Ic1doIZQzk+ycT4MEhnss9WChRssxOgY3o6sF41o
-        e28Eb49SIPkFKtDg==
+        bh=qOuiYb1lKXflzrbNlr4ffbWrXf/9yvnmykox32bxZwU=;
+        b=UEZuT2o0A5mvF2zOFujCYL+I5oC+cH9jRcbxP5+q1yYIFElLVzcglFU5KMQ1lwu4DWilIU
+        BzOr99OONa3PkaDA==
 Received: from quack3.suse.cz (unknown [10.163.28.18])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 821DFA3B88;
+        by relay2.suse.de (Postfix) with ESMTPS id 82246A3B92;
         Fri,  1 Apr 2022 10:27:54 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id A709CA061F; Fri,  1 Apr 2022 12:27:52 +0200 (CEST)
+        id 8D79BA061B; Fri,  1 Apr 2022 12:27:52 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Paolo Valente <paolo.valente@linaro.org>
 Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
         "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
         stable@vger.kernel.org
-Subject: [PATCH 9/9] bfq: Make sure bfqg for which we are queueing requests is online
-Date:   Fri,  1 Apr 2022 12:27:50 +0200
-Message-Id: <20220401102752.8599-9-jack@suse.cz>
+Subject: [PATCH 5/9] bfq: Drop pointless unlock-lock pair
+Date:   Fri,  1 Apr 2022 12:27:46 +0200
+Message-Id: <20220401102752.8599-5-jack@suse.cz>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220401102325.17617-1-jack@suse.cz>
 References: <20220401102325.17617-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1568; h=from:subject; bh=sgAPcAQrJvyNTY55SSAru4QatmfaUnmjg+zxK4TmvNM=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiRtOlKklLhNNV3RGbf7D1KUJYUgBsxgg8XSM1TWU0 HAuk0saJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYkbTpQAKCRCcnaoHP2RA2WUuB/ 45d/A4FWTboIVYdZ+QTKDERa161jYw4o75MeQV0qFUxjSiBn1+H1MSA5bPrLHZUGJhfAsD+RMefQIg oxOjs4FUnRMk2utm8NFp39DvIwTryxvAhI85kRUFLpXS5TOQrk6j6WQAeybv4ucYN/opBfH7ikQBEe iDW+Okuhm4+wzbxoEBOitpzukCfF6eK3aky2OeiHz78HU672Df1Gx22XTmXF3mstLzoFP35yonrra6 HZMnZIZCAvtjxOsozE5Dv0E5WnuPq4q0M9r95UaHad4mUF9kltwKmYuluyi9CvyS6QjKruRzVf3l1Z kYLXABUvmFhNAIiYt4qTATjJmfQsi6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=908; h=from:subject; bh=f6a//ztGhPlB2z2XpIrLMQ0/PyT+BqDb2fM6yWfWv9E=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiRtOiyQ3U5Y+mlC8NHplioNGOhgYJ9xWmqnglRyDH +MzguKeJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYkbTogAKCRCcnaoHP2RA2UdHCA CEUQLtCsQKDFr2Em7i2k2huuA1KKXygTe7pFnzk6qUmZy3lu0H5aQptIyMq3a5c4x8xSZexhnnT2Iw E+zDpozVXoi4z2YXee+zborRL9MCRRxx8wOnUI40Fhl+BJRKT6eURHiqc34h0MGnQ4NCVUUVo/4K7t Jmdq0VGTwqYM/9HkqYSNkZ4Jki3HXxj1mQt834quxDMdRKthlk6U4htltt1nm+b6tZ7hZPc0mRF7Ja sfTd20Hp21QKZny5HF4LXpG6+b9YWfvRlxaMRflyV8lmoD8l23pNX/jwR/i/FzfzTl3k+YY/XUjMMy oBG0VS9y5y4OEhDIaRFb0GwiKggNDb
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Bios queued into BFQ IO scheduler can be associated with a cgroup that
-was already offlined. This may then cause insertion of this bfq_group
-into a service tree. But this bfq_group will get freed as soon as last
-bio associated with it is completed leading to use after free issues for
-service tree users. Fix the problem by making sure we always operate on
-online bfq_group. If the bfq_group associated with the bio is not
-online, we pick the first online parent.
+In bfq_insert_request() we unlock bfqd->lock only to call
+trace_block_rq_insert() and then lock bfqd->lock again. This is really
+pointless since tracing is disabled if we really care about performance
+and even if the tracepoint is enabled, it is a quick call.
 
 CC: stable@vger.kernel.org
-Fixes: e21b7a0b9887 ("block, bfq: add full hierarchical scheduling and cgroups support")
 Tested-by: "yukuai (C)" <yukuai3@huawei.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-cgroup.c | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+ block/bfq-iosched.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 32d2c2a47480..09574af83566 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -612,10 +612,19 @@ static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
- struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
- {
- 	struct blkcg_gq *blkg = bio->bi_blkg;
-+	struct bfq_group *bfqg;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 1fc4d4628fba..19082e14f3c1 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6150,11 +6150,8 @@ static void bfq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 		return;
+ 	}
  
--	if (!blkg)
--		return bfqd->root_group;
--	return blkg_to_bfqg(blkg);
-+	while (blkg) {
-+		bfqg = blkg_to_bfqg(blkg);
-+		if (bfqg->online) {
-+			bio_associate_blkg_from_css(bio, &blkg->blkcg->css);
-+			return bfqg;
-+		}
-+		blkg = blkg->parent;
-+	}
-+	bio_associate_blkg_from_css(bio,
-+				&bfqg_to_blkg(bfqd->root_group)->blkcg->css);
-+	return bfqd->root_group;
- }
+-	spin_unlock_irq(&bfqd->lock);
+-
+ 	trace_block_rq_insert(rq);
  
- /**
+-	spin_lock_irq(&bfqd->lock);
+ 	bfqq = bfq_init_rq(rq);
+ 	if (!bfqq || at_head) {
+ 		if (at_head)
 -- 
 2.34.1
 
