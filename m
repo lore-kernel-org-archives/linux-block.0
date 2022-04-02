@@ -2,152 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D003BC433EF
-	for <linux-block@archiver.kernel.org>; Sat,  2 Apr 2022 06:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FF7FC433EF
+	for <linux-block@archiver.kernel.org>; Sat,  2 Apr 2022 07:06:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234946AbiDBGlf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 2 Apr 2022 02:41:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41136 "EHLO
+        id S235069AbiDBHIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 2 Apr 2022 03:08:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbiDBGle (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Apr 2022 02:41:34 -0400
-Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FFC838BDF
-        for <linux-block@vger.kernel.org>; Fri,  1 Apr 2022 23:39:42 -0700 (PDT)
-Received: by mail-lj1-x236.google.com with SMTP id q14so6429125ljc.12
-        for <linux-block@vger.kernel.org>; Fri, 01 Apr 2022 23:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=SVpU5A7CQ8uaAahl0pz4fiwTHdku0V6uZ8ivISvYKHA=;
-        b=D1aJavNFparvr9Z62slxy9bMsvh0R1tcoHJKxzXnT4/7/fD6rgSyGMpnbrniL8po9Z
-         Ey/l/TBmZgs798VCHfwmGVQNCpLYKoilTmRSQ5eoknYELM2URyjkJXp/1BMl3Uor44I/
-         bXXsK2XJqCA2b/wmLgQBvVY2zO7JRwZwD8+lPJ4a+Ol8yiF4XjAUFmRxKabKbf2exZOx
-         +wHah8MM41SKusZPhz1bonN591BlPyeHXeTxHhW07yAe/lxS96YtvF4HN/3MH0No1pxj
-         5ZM92k/GSsnfJ7t3Ag1QBXvbRX9d+731vOlU/DfC9p3DmYE0iROfgsDBFINjL6NEGgZw
-         eWYg==
+        with ESMTP id S229714AbiDBHIk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 2 Apr 2022 03:08:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76E30102422
+        for <linux-block@vger.kernel.org>; Sat,  2 Apr 2022 00:06:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1648883208;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=HyMSiJlOQvjIy8EGlx27j+iS4lIlX1GOMrjnd5IUUSk=;
+        b=IF3v1ffIKPK646r1vPGrHQ5GPej+kjFxTQI8sZKyIACpUXQuLY5PE3O9yMa0ynndxItGHr
+        robHTjM3vqfEm13vgQtzApNaNl316IEUp2C4S7M+VfN55jcn6bANEIgh/EW1PL7LJNKav2
+        bNOv1Jb3g9OY5hk/kX+goJMh8O660g4=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-671-Fo2QaCCSMc610F5dsOQJdg-1; Sat, 02 Apr 2022 03:06:47 -0400
+X-MC-Unique: Fo2QaCCSMc610F5dsOQJdg-1
+Received: by mail-pg1-f199.google.com with SMTP id z132-20020a63338a000000b003844e317066so2672139pgz.19
+        for <linux-block@vger.kernel.org>; Sat, 02 Apr 2022 00:06:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=SVpU5A7CQ8uaAahl0pz4fiwTHdku0V6uZ8ivISvYKHA=;
-        b=i2GbQ5Gj05i8j3w6sWJ6839hR4WLJaC9P8fHjgDZcUIm9H+Xy81JKCKiVoq9QdoRe9
-         xQlVr92o6ttPyd1SoPxnS6R81jVTQqFZWr/vE1jCMles7FG+bRtRfMOBggoWXh6Gj8ud
-         cd705zc8pFlvw3YL6jdAPovW8KcAPF/IHgnMV6g8xDUbi986P44f1vjulH3+t1Pu4AZo
-         ShB7FQf88HJ3dS5QbLn8Y6GrUgXguDIpL5lmvo+RjzaN2GQO4pEPKUZH5zDNw9AZOpNo
-         d5iqb+HboUpec+IpJfaG1zPbR2mbnduC077RUlrsfCSZ17rSKP131Xre3o8n+pitQyU7
-         D3ag==
-X-Gm-Message-State: AOAM533OpTG9EPeeuZFpvDLa38sVxoKMXcV4ssDDDsJ6x1vpfqWPtspu
-        VXqMn5RSTjdvgqVMoufoUsnO7mw6r3ycxgagWSN+DiajSmnOyFB7
-X-Google-Smtp-Source: ABdhPJzj1i1VMhPATBqvlosrYLvwxeExS8IFAQGMkNnEKmVN6pW9f4teOqEW8r7ink4FDFqgSNdwS4FCM6d53KaRz/o=
-X-Received: by 2002:a2e:b791:0:b0:24a:c272:d721 with SMTP id
- n17-20020a2eb791000000b0024ac272d721mr15532505ljo.357.1648881580385; Fri, 01
- Apr 2022 23:39:40 -0700 (PDT)
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
+        bh=HyMSiJlOQvjIy8EGlx27j+iS4lIlX1GOMrjnd5IUUSk=;
+        b=8CHCtnMY3SrLNwxdLooQPwDOawOs7aikhKC4Jeiv4L3vUR68ucFr0byzBgkm5OXue3
+         UzXn2TskRlB9pL6MjRAdR1nPgGz23BvYsBnxlAnKWTqsG9WcrdagKTwOfWZUB2zLfBt8
+         Bct3CiZALP40di2jK1ouBeulrEIh3lFgawawbCoFR7Wt8mfhSmGq9Nqr5bHSOAF/UMx8
+         2PqU2x/AownJl1AgBZv9aMelHaD9p6Wiwc9xbypu4tSicQfDynrsZPP27TDjh9+cfiXn
+         ti2ry+BC0s2QVspibnFbGv2nLtmS6fHQVcWtTdD081xfT3V3JrrfvN8J5RlSVJI0vO1Z
+         /oRw==
+X-Gm-Message-State: AOAM533LmWGXS2vLhTSMfdtvSoBK5PtY+JAWxxRQqnNr82Z/cwHckwQJ
+        qqv9cs6P1HeHkdZsKivOOQbUO5FO3bJKRWGjsgcILi//Bz0AxJEtkimtoX7TqaiV+0LC3qW0j3s
+        0IpVvYjG8mkLXmcO98tZnj+4MtzuK7Fqr6pst8UU=
+X-Received: by 2002:a17:902:ce8f:b0:154:6031:b53e with SMTP id f15-20020a170902ce8f00b001546031b53emr13551113plg.159.1648883206216;
+        Sat, 02 Apr 2022 00:06:46 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwyZf4Lobqcgjo9zG6mfY2sEsOCsigZvVE7GNj0PFthgZr9CyVzKyvMFUQmY8B8MBMZ7a6nW2jFTGZm5x3/8C8=
+X-Received: by 2002:a17:902:ce8f:b0:154:6031:b53e with SMTP id
+ f15-20020a170902ce8f00b001546031b53emr13551096plg.159.1648883205929; Sat, 02
+ Apr 2022 00:06:45 -0700 (PDT)
 MIME-Version: 1.0
-From:   Chris Murphy <lists@colorremedies.com>
-Date:   Sat, 2 Apr 2022 00:39:24 -0600
-Message-ID: <CAJCQCtTw_2C7ZSz7as5Gvq=OmnDiio=HRkQekqWpKot84sQhFA@mail.gmail.com>
-Subject: 5.17, WARNING: at block/bfq-iosched.c:602 bfqq_request_over_limit+0x122/0x3a0
-To:     linux-block@vger.kernel.org
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Sat, 2 Apr 2022 15:06:34 +0800
+Message-ID: <CAHj4cs8F51f_Br7kBPYN0yDo4FqFFbodHAUN6_c=Rd4Bd+Y1sw@mail.gmail.com>
+Subject: [bug report][bisected] modprob -r scsi-debug take more than 3mins
+ during blktests srp/ tests
+To:     linux-scsi <linux-scsi@vger.kernel.org>
+Cc:     dgilbert@interlog.com, Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks like a regression of some sort in BFQ, but I'm not immediately
-aware of a manifestation in user space. I've also found four other
-downstream BFQ related call traces with xfs and btrfs joining in. I'll
-list those before the trace...
+Hello
+I found the scsi-debug module removing [1] takes more than 3mins
+during blktests srp/ tests, and bisecting shows it was introduced from
+[2],
+Pls help check it, let me know if you need more info for it, thanks.
 
-[   45.263999] kernel: ------------[ cut here ]------------
-[   45.264006] kernel: WARNING: CPU: 4 PID: 73 at
-block/bfq-iosched.c:602 bfqq_request_over_limit+0x122/0x3a0
-[   45.264014] kernel: Modules linked in: uinput rfcomm snd_seq_dummy
-snd_hrtimer nft_objref nf_conntrack_netbios_ns nf_conntrack_broadcast
-nft_fib_inet nft_fib_ipv4 nft_fib_ipv6 nft_fib nft_reject_inet
-nf_reject_ipv4 nf_reject_ipv6 nft_reject nft_ct nft_chain_nat nf_nat
-nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 ip_set nf_tables nfnetlink
-qrtr bnep b43 snd_hda_codec_cirrus snd_hda_codec_generic btusb
-uvcvideo cordic btrtl ledtrig_audio mac80211 btbcm videobuf2_vmalloc
-snd_hda_intel btintel videobuf2_memops snd_intel_dspcfg videobuf2_v4l2
-btmtk snd_intel_sdw_acpi libarc4 videobuf2_common snd_hda_codec
-cfg80211 bluetooth intel_rapl_msr videodev intel_rapl_common
-snd_hda_core ssb mc x86_pkg_temp_thermal intel_powerclamp coretemp
-ecdh_generic snd_hwdep rfkill kvm_intel snd_seq bcm5974
-apple_mfi_fastcharge snd_seq_device i915 joydev snd_pcm kvm snd_timer
-irqbypass snd mei_pxp iTCO_wdt mei_hdcp intel_pmc_bxt bcma applesmc
-at24 soundcore iTCO_vendor_support mei_me rapl i2c_i801 acpi_als
-intel_cstate ttm
-[   45.264066] kernel:  mei intel_uncore industrialio_triggered_buffer
-i2c_smbus lpc_ich sbs kfifo_buf apple_gmux sbshc industrialio apple_bl
-pcspkr zram isofs squashfs crct10dif_pclmul crc32_pclmul crc32c_intel
-sdhci_pci cqhci ghash_clmulni_intel hid_appleir firewire_ohci sdhci
-tg3 thunderbolt firewire_core mmc_core crc_itu_t hid_apple video uas
-usb_storage sunrpc be2iscsi bnx2i cnic uio cxgb4i cxgb4 tls cxgb3i
-cxgb3 mdio libcxgbi libcxgb qla4xxx iscsi_boot_sysfs iscsi_tcp
-libiscsi_tcp libiscsi scsi_transport_iscsi loop ip6_tables ip_tables
-ipmi_devintf ipmi_msghandler fuse
-[   45.264101] kernel: CPU: 4 PID: 73 Comm: kworker/u16:2 Not tainted
-5.17.1-300.fc36.x86_64 #1
-[   45.264104] kernel: Hardware name: Apple Inc.
-MacBookPro8,2/Mac-94245A3940C91C80, BIOS
-MBP81.88Z.0050.B00.1804101331 04/10/18
-[   45.264106] kernel: Workqueue: loop0 loop_workfn [loop]
-[   45.264112] kernel: RIP: 0010:bfqq_request_over_limit+0x122/0x3a0
-[   45.264115] kernel: Code: 1e 48 8b 5b 60 8d 78 01 48 83 c6 08 48 85
-db 0f 84 0e 02 00 00 89 f8 44 0f b6 63 18 45 84 e4 0f 84 f4 01 00 00
-44 39 e8 7c d4 <0f> 0b 8d 58 ff 44 39 e8 0f 85 24 02 00 00 83 fb ff 0f
-84 d8 01 00
-[   45.264118] kernel: RSP: 0018:ffffa8e34034f7b8 EFLAGS: 00010046
-[   45.264120] kernel: RAX: 0000000000000005 RBX: ffff92914c004098
-RCX: 0000000000000000
-[   45.264122] kernel: RDX: 0000000000000000 RSI: ffffa8e34034f800
-RDI: 0000000000000005
-[   45.264123] kernel: RBP: ffff9291435c5680 R08: 0000000000000800
-R09: 0000000000008000
-[   45.264125] kernel: R10: 0000000000000000 R11: ffffa8e34034f8e0
-R12: 0000000000000001
-[   45.264126] kernel: R13: 0000000000000005 R14: 0000000000000004
-R15: 0000000000000002
-[   45.264128] kernel: FS:  0000000000000000(0000)
-GS:ffff9293a3b00000(0000) knlGS:0000000000000000
-[   45.264130] kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   45.264131] kernel: CR2: 00007fa7a5755000 CR3: 000000010a9ec002
-CR4: 00000000000606e0
-[   45.264133] kernel: Call Trace:
-[   45.264136] kernel:  <TASK>
-[   45.264140] kernel:  ? mempool_alloc+0x4f/0x170
-[   45.264145] kernel:  ? bvec_alloc+0x62/0xb0
-[   45.264148] kernel:  ? kmem_cache_alloc+0x162/0x2c0
-[   45.264152] kernel:  bfq_limit_depth+0xc3/0x220
-[   45.264155] kernel:  __blk_mq_alloc_requests+0x237/0x2a0
-[   45.264160] kernel:  blk_mq_submit_bio+0x3d3/0x620
-[   45.264163] kernel:  submit_bio_noacct+0x1f3/0x2a0
-[   45.264165] kernel:  mpage_readahead+0x133/0x180
-[   45.264171] kernel:  ? isofs_get_blocks+0x210/0x210 [isofs]
-[   45.264175] kernel:  read_pages+0x61/0x2a0
-[   45.264178] kernel:  page_cache_ra_unbounded+0x1a8/0x200
-[   45.264182] kernel:  filemap_get_pages+0x4ab/0x620
-[   45.264185] kernel:  ? copy_page_to_iter+0x2bd/0x410
-[   45.264189] kernel:  filemap_read+0xa8/0x2e0
-[   45.264192] kernel:  ? avc_has_perm+0x7a/0x170
-[   45.264196] kernel:  ? check_preempt_wakeup+0x125/0x2a0
-[   45.264202] kernel:  do_iter_readv_writev+0x149/0x180
-[   45.264206] kernel:  do_iter_read+0xde/0x1d0
-[   45.264209] kernel:  loop_process_work+0x68f/0x8f0 [loop]
-[   45.264214] kernel:  process_one_work+0x1c4/0x380
-[   45.264218] kernel:  worker_thread+0x4d/0x380
-[   45.264221] kernel:  ? process_one_work+0x380/0x380
-[   45.264223] kernel:  kthread+0xe6/0x110
-[   45.264225] kernel:  ? kthread_complete_and_exit+0x20/0x20
-[   45.264227] kernel:  ret_from_fork+0x1f/0x30
-[   45.264233] kernel:  </TASK>
-[   45.264234] kernel: ---[ end trace 0000000000000000 ]---
+[1]
+# time ./check srp/001
+srp/001 (Create and remove LUNs)                             [passed]
+    runtime    ...  3.194s
+real 3m12.119s
+user 0m0.859s
+sys 0m2.227s
 
+# ps aux | grep modprobe
+root      250153  0.0  0.0  10600  2264 pts/0    D+   01:34   0:00
+modprobe -r scsi_debug
 
-https://bugzilla.redhat.com/show_bug.cgi?id=2068723
-https://bugzilla.redhat.com/show_bug.cgi?id=2049004
-https://bugzilla.redhat.com/show_bug.cgi?id=2066214
-https://bugzilla.redhat.com/show_bug.cgi?id=2064732
+# cat /proc/250153/stack
+[<0>] blk_execute_rq+0x95/0xb0
+[<0>] __scsi_execute+0xe2/0x250
+[<0>] sd_sync_cache+0xac/0x190
+[<0>] sd_shutdown+0x67/0xf0
+[<0>] sd_remove+0x39/0x80
+[<0>] __device_release_driver+0x234/0x240
+[<0>] device_release_driver+0x23/0x30
+[<0>] bus_remove_device+0xd8/0x140
+[<0>] device_del+0x18b/0x3f0
+[<0>] __scsi_remove_device+0x102/0x140
+[<0>] scsi_forget_host+0x55/0x60
+[<0>] scsi_remove_host+0x72/0x110
+[<0>] sdebug_driver_remove+0x22/0xa0 [scsi_debug]
+[<0>] __device_release_driver+0x181/0x240
+[<0>] device_release_driver+0x23/0x30
+[<0>] bus_remove_device+0xd8/0x140
+[<0>] device_del+0x18b/0x3f0
+[<0>] device_unregister+0x13/0x60
+[<0>] sdebug_do_remove_host+0xd1/0xf0 [scsi_debug]
+[<0>] scsi_debug_exit+0x58/0xe1e [scsi_debug]
+[<0>] __do_sys_delete_module.constprop.0+0x170/0x260
+[<0>] do_syscall_64+0x3a/0x80
+[<0>] entry_SYSCALL_64_after_hwframe+0x44/0xae
 
--- 
-Chris Murphy
+# dmesg | tail -10
+[  345.863755] ib_srpt:srpt_release_channel_work: ib_srpt 10.16.221.74-32
+[  345.863855] ib_srpt:srpt_release_channel_work: ib_srpt 10.16.221.74-34
+[  345.863953] ib_srpt:srpt_release_channel_work: ib_srpt 10.16.221.74-36
+[  346.373371] sd 15:0:0:0: [sdb] Synchronizing SCSI cache
+[  532.864536] sd 15:0:0:0: [sdb] Synchronize Cache(10) failed:
+Result: hostbyte=DID_TIME_OUT driverbyte=DRIVER_OK
+------> seems most of the time were taken here
+[  532.929626] eno1np0 speed is unknown, defaulting to 1000
+[  532.938524] eno2np1 speed is unknown, defaulting to 1000
+[  532.943957] eno4 speed is unknown, defaulting to 1000
+[  532.998059] rdma_rxe: rxe-ah pool destroyed with unfree'd elem
+[  533.011781] rdma_rxe: unloaded
+
+[2]
+commit 2aad3cd8537033cd34f70294a23f54623ffe9c1b (refs/bisect/bad)
+Author: Douglas Gilbert <dgilbert@interlog.com>
+Date:   Sat Jan 8 20:28:45 2022 -0500
+
+    scsi: scsi_debug: Address races following module load
+
