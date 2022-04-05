@@ -2,67 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B98E7C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  5 Apr 2022 06:38:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97E90C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Apr 2022 06:45:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230046AbiDEGkt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Apr 2022 02:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35148 "EHLO
+        id S229998AbiDEGrJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Apr 2022 02:47:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230075AbiDEGkt (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Apr 2022 02:40:49 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78A0F1FCD2
-        for <linux-block@vger.kernel.org>; Mon,  4 Apr 2022 23:38:45 -0700 (PDT)
-Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 2356chwA054393;
-        Tue, 5 Apr 2022 15:38:43 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
- Tue, 05 Apr 2022 15:38:43 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 2356cgFx054383
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 5 Apr 2022 15:38:42 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <2e052daf-214d-6921-1765-3b4974cea7cc@I-love.SAKURA.ne.jp>
-Date:   Tue, 5 Apr 2022 15:38:41 +0900
+        with ESMTP id S230434AbiDEGqY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Apr 2022 02:46:24 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D44BEDE94;
+        Mon,  4 Apr 2022 23:44:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=aa6EnR0OODni9NkMlW60o+EQDHL2WUhXl/q4Tb5C0WA=; b=F4LcFfuZLWAu9MYQ1IC5TROCFf
+        4kSSfdcZQZRcHRWwrmPTMkTLMoGOdmP87tvso2dlbXAGh2KNp1IyI1OKuM5COVBeLftnoTDZwlCWK
+        IIHXkxdnE0QyAAti4rFCLRYndQWHSQ1XFRwsEYXlIjoK8TlG8kum0u1pljqalf+yc98EGUJzrBuKj
+        y1plqwEmzXxbgvyy7KCdvK5/LtJY13nGSQKh4QAxJkJ6fB1E+GCazq2xWp7aIMGzDg2NboNQhjfFi
+        zHCLk2pVlt4AfWN5Y0e+mmBPgb/b0HZnWDbEyKEVLF3m7hNPB8NEeWDsMZ1BVdsVl+HWByHhP+jS7
+        ofuxnI1A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nbcvO-00HM1T-5d; Tue, 05 Apr 2022 06:44:22 +0000
+Date:   Mon, 4 Apr 2022 23:44:22 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        syzbot <syzbot+4f1a237abaf14719db49@syzkaller.appspotmail.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com,
+        Jan Kara <jack@suse.cz>
+Subject: Re: [syzbot] INFO: task can't die in blkdev_common_ioctl
+Message-ID: <YkvlRnO3Ho/mrk0V@infradead.org>
+References: <0000000000007a4a2d05dba6baa6@google.com>
+ <d3213c1a-f82a-02f6-b5b2-0d3242e0242a@I-love.SAKURA.ne.jp>
+ <Ykp63pk7aSj/bNRT@infradead.org>
+ <67179a84-8be7-4c93-e355-2ca50666f960@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: yet another approach to fix the loop lock order inversions v6
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, Josef Bacik <josef@toxicpanda.com>,
-        Minchan Kim <minchan@kernel.org>,
-        Nitin Gupta <ngupta@vflare.org>,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Ming Lei <ming.lei@redhat.com>,
-        Matteo Croce <mcroce@microsoft.com>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-References: <20220330052917.2566582-1-hch@lst.de>
- <20220404074235.GA1046@lst.de>
- <499de381-c81e-4bd0-b5f7-1ee6be45821d@I-love.SAKURA.ne.jp>
- <20220405062838.GA24373@lst.de>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20220405062838.GA24373@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <67179a84-8be7-4c93-e355-2ca50666f960@I-love.SAKURA.ne.jp>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/04/05 15:28, Christoph Hellwig wrote:
-> On Mon, Apr 04, 2022 at 06:39:31PM +0900, Tetsuo Handa wrote:
->> Two bugs which Jan has found in /bin/mount might not be yet fixed in
->> versions developers/users are using. Thus, let's wait for a while
->> before committing to linux.git.
+On Mon, Apr 04, 2022 at 02:12:14PM +0900, Tetsuo Handa wrote:
+> On 2022/04/04 13:58, Christoph Hellwig wrote:
+> > all, as it does not come through blkdev_fallocate.
 > 
-> Jan, which loop bugs might be relevant here?
+> My patch proposes filemap_invalidate_lock_killable() and converts only
+> blkdev_fallocate() case as a starting point. Nothing prevents us from
+> converting e.g. blk_ioctl_zeroout() case as well. The "not come through
+> blkdev_fallocate" is bogus.
 
-Since async __loop_clr_fd() was reverted, these bugs should
-no longer be relevant. But different bugs might be found with
-this series. Thus, let's stay careful for a while...
+Sure, we could try to convert most of the > 50 instances of
+filemap_invalidate_lock to be killable.  But that:
+
+  a) isn't what your patch actuall did
+  b) doesn't solve the underlying issue that is wasn't designed to to be
+     held over very extremely long running operations
+
+Or to get back to what I said before - I don't think we can just hold
+the lock over manually zeroing potentially gigabytes of blocks.
+
+In other words:  we'll need to chunk the zeroing up if we want
+to hold the invalidate lock, I see no ther way to properly fix this.
