@@ -2,282 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76754C433FE
-	for <linux-block@archiver.kernel.org>; Tue,  5 Apr 2022 19:56:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC402C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  5 Apr 2022 19:57:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232222AbiDET61 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 5 Apr 2022 15:58:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35708 "EHLO
+        id S233906AbiDET63 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 5 Apr 2022 15:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1455099AbiDEP7h (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Apr 2022 11:59:37 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3C221EC60F
-        for <linux-block@vger.kernel.org>; Tue,  5 Apr 2022 08:09:59 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id q19so11251778pgm.6
-        for <linux-block@vger.kernel.org>; Tue, 05 Apr 2022 08:09:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=OsQBgV6RiDL/nIj8RCzA65E63c+7TZ8ZOHwvD/MmE7E=;
-        b=Ix1UePss6t0Um+MzbqPiPQpVI1kkwW7Nvw0JuEmUfmWcYtWe3gj7c5hq+VYo0fnZ1G
-         qN+sNyOMgAfCygz7QTi6KaJCXPOoszTccS4RFbDSjwklKys8VGITjH+qN9mXX6kHobVr
-         70ylOzmuRk6vluH1C0+jrwm7nUZZWhoO0Cdl6Mt/Ogq/+IFrHKOE39ftVcYl8ayA2tiM
-         d/k5m9+V7+60RvR7uQ2ZZYpEGTG1TQYGjUf8sKEvjBqKiwUUmzjSuug3GDsm/fLfl1zr
-         O83wntj1nOeqP3fNUY3GX9ZcvjBZT6TPd0qL4OmSVNl3/NKdk1I87wx9hS+usum7rzyJ
-         UHTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OsQBgV6RiDL/nIj8RCzA65E63c+7TZ8ZOHwvD/MmE7E=;
-        b=KwUsP9zIQM0Ac2uBS0E6vpfAQSQ/eWYN6GZvEzOrdlzECw75vlfeD0nxDT7HVr7qQh
-         hfipkfjqcV8BpRpikSV0fYwgjYRqnQY9yVyLLaGXgDV5Ax7kDC2G2KVuAwNQ2bSouMPn
-         oGVBCs2bx7N9/g6OAePy8uIhsXGxHuDwslaZvYOxTK+6n2J+FYyaAdmw0yOJC5MXfBy0
-         hu4NVsmQ0jaMpDgyBQ8SkJCkKVQrFdDsfrlXj+cm3OPoFTo2CBGcUDf2/vcj/QHz5RjB
-         SIB0ZbPiSn/dp2C4uLOu3qQ+38BmWV0f/NWodrOk4vpW+fWp057pL7x2I9fMS8tXHkP1
-         +qzA==
-X-Gm-Message-State: AOAM5304+dJ9zZa9GklzNIC+HhzgrAEfjz2+NALLJAXApqC4w+j9lKnP
-        D4sdtbmMHwbUWLTOdYTmS5g=
-X-Google-Smtp-Source: ABdhPJzEkkahnalvcQKATWLmiliTl8ZWKl7MAsmNKnk33fG7QbsAWC2XgSA0IWNz6TVRsK4VLeNpKQ==
-X-Received: by 2002:a63:1e52:0:b0:380:ae84:256e with SMTP id p18-20020a631e52000000b00380ae84256emr3322335pgm.84.1649171399484;
-        Tue, 05 Apr 2022 08:09:59 -0700 (PDT)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id y2-20020a056a00190200b004fa865d1fd3sm16071772pfi.86.2022.04.05.08.09.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Apr 2022 08:09:58 -0700 (PDT)
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
-        pbonzini@redhat.com, mgurtovoy@nvidia.com, dongli.zhang@oracle.com,
-        hch@infradead.org
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>
-Subject: [PATCH v5 2/2] virtio-blk: support mq_ops->queue_rqs()
-Date:   Wed,  6 Apr 2022 00:09:24 +0900
-Message-Id: <20220405150924.147021-3-suwan.kim027@gmail.com>
-X-Mailer: git-send-email 2.26.3
-In-Reply-To: <20220405150924.147021-1-suwan.kim027@gmail.com>
-References: <20220405150924.147021-1-suwan.kim027@gmail.com>
+        with ESMTP id S1457530AbiDEQFw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 5 Apr 2022 12:05:52 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E06C0310;
+        Tue,  5 Apr 2022 09:03:51 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e01424;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0V9HeY9c_1649174628;
+Received: from 30.32.95.104(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0V9HeY9c_1649174628)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Wed, 06 Apr 2022 00:03:48 +0800
+Message-ID: <e5923923-375f-c696-0c87-ca5def984d84@linux.alibaba.com>
+Date:   Wed, 6 Apr 2022 00:03:47 +0800
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH v2 2/3] scsi: target: tcmu: Fix possible data corruption
+Content-Language: en-US
+To:     Bodo Stroesser <bostroesser@gmail.com>, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20220323134940.31463-1-xiaoguang.wang@linux.alibaba.com>
+ <20220323134940.31463-3-xiaoguang.wang@linux.alibaba.com>
+ <b6280955-d3f5-f11b-5f62-07ab83cff4ac@gmail.com>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <b6280955-d3f5-f11b-5f62-07ab83cff4ac@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch supports mq_ops->queue_rqs() hook. It has an advantage of
-batch submission to virtio-blk driver. It also helps polling I/O because
-polling uses batched completion of block layer. Batch submission in
-queue_rqs() can boost polling performance.
+hi,
 
-In queue_rqs(), it iterates plug->mq_list, collects requests that
-belong to same HW queue until it encounters a request from other
-HW queue or sees the end of the list.
-Then, virtio-blk adds requests into virtqueue and kicks virtqueue
-to submit requests.
+> On 23.03.22 14:49, Xiaoguang Wang wrote:
+>> When tcmu_vma_fault() gets one page successfully, before the current
+>> context completes page fault procedure, find_free_blocks() may run in
+>> and call unmap_mapping_range() to unmap this page. Assume when
+>> find_free_blocks() completes its job firstly, previous page fault
+>> procedure starts to run again and completes, then one truncated page has
+>> beed mapped to use space, but note that tcmu_vma_fault() has gotten one
+>> refcount for this page, so any other subsystem won't use this page,
+>> unless later the use space addr is unmapped.
+>>
+>> If another command runs in later and needs to extends dbi_thresh, it may
+>> reuse the corresponding slot to previous page in data_bitmap, then thouth
+>> we'll allocate new page for this slot in data_area, but no page fault will
+>> happen again, because we have a valid map, real request's data will lose.
+>
+> I don't think, this is a safe fix. It is possible that not only
+> find_free_blocks runs before page fault procedure completes, but also
+> allocation for next cmd happens. In that case the new call to
+> unmap_mapping_range would also happen before page fault completes ->
+> data corruption.
+>
+> AFAIK, no one ever has seen this this bug in real life, as
+Yeah, I know, just find this maybe an issue by reading codes :)
 
-If there is an error, it inserts error request to requeue_list and
-passes it to ordinary block layer path.
+> find_free_blocks only runs seldomly and userspace would have to access
+> a data page the very first time while the cmd that owned this page
+> already has been completed by userspace. Therefore I think we should
+> apply a perfect fix only.
+>
+> I'm wondering whether there really is such a race. If so, couldn't the
+> same race happen in other drivers or even when truncating mapped files?
+Indeed, I have described how filesystem implementations avoid this issue
+in patch's commit message:
 
-For verification, I did fio test.
-(io_uring, randread, direct=1, bs=4K, iodepth=64 numjobs=N)
-I set 4 vcpu and 2 virtio-blk queues for VM and run fio test 5 times.
-It shows about 2% improvement.
+  Filesystem implementations will also run into this issue, but they
+  usually lock page when vm_operations_struct->fault gets one page, and
+  unlock page after finish_fault() completes. In truncate sides, they
+  lock pages in truncate_inode_pages() to protect race with page fault.
+  We can also have similar codes like filesystem to fix this issue.
 
-                                 |   numjobs=2   |   numjobs=4
-      -----------------------------------------------------------
-        fio without queue_rqs()  |   291K IOPS   |   238K IOPS
-      -----------------------------------------------------------
-        fio with queue_rqs()     |   295K IOPS   |   243K IOPS
 
-For polling I/O performance, I also did fio test as below.
-(io_uring, hipri, randread, direct=1, bs=512, iodepth=64 numjobs=4)
-I set 4 vcpu and 2 poll queues for VM.
-It shows about 2% improvement in polling I/O.
+Take ext4 as example, a file in ext4 is mapped to user space, if then a truncate
+operation occurs, ext4 calls truncate_pagecache():
+void truncate_pagecache(struct inode *inode, loff_t newsize)
+{
+        struct address_space *mapping = inode->i_mapping;
+        loff_t holebegin = round_up(newsize, PAGE_SIZE);
 
-                                      |   IOPS   |  avg latency
-      -----------------------------------------------------------
-        fio poll without queue_rqs()  |   424K   |   613.05 usec
-      -----------------------------------------------------------
-        fio poll with queue_rqs()     |   435K   |   601.01 usec
+        /*
+         * unmap_mapping_range is called twice, first simply for
+         * efficiency so that truncate_inode_pages does fewer
+         * single-page unmaps.  However after this first call, and
+         * before truncate_inode_pages finishes, it is possible for
+         * private pages to be COWed, which remain after
+         * truncate_inode_pages finishes, hence the second
+         * unmap_mapping_range call must be made for correctness.
+         */
+        unmap_mapping_range(mapping, holebegin, 0, 1);
+        truncate_inode_pages(mapping, newsize);
+        unmap_mapping_range(mapping, holebegin, 0, 1);
+}
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
----
- drivers/block/virtio_blk.c | 114 +++++++++++++++++++++++++++++++------
- 1 file changed, 98 insertions(+), 16 deletions(-)
+In truncate_inode_pages(), it'll lock page and set page->mapping
+to be NULL, and in ext4's filemap_fault(), it'll lock page and check whether
+page->mapping has been changed, if it's true, it'll just fail the page
+fault procedure.
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 51eea2a49e11..9260522eaaa6 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -108,8 +108,7 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
- 	}
- }
- 
--static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
--		struct scatterlist *data_sg, bool have_data)
-+static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- {
- 	struct scatterlist hdr, status, *sgs[3];
- 	unsigned int num_out = 0, num_in = 0;
-@@ -117,11 +116,11 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
- 	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
- 	sgs[num_out++] = &hdr;
- 
--	if (have_data) {
-+	if (vbr->sg_table.nents) {
- 		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
--			sgs[num_out++] = data_sg;
-+			sgs[num_out++] = vbr->sg_table.sgl;
- 		else
--			sgs[num_out + num_in++] = data_sg;
-+			sgs[num_out + num_in++] = vbr->sg_table.sgl;
- 	}
- 
- 	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
-@@ -311,6 +310,28 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
- 		virtqueue_notify(vq->vq);
- }
- 
-+static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
-+					struct virtio_blk *vblk,
-+					struct request *req,
-+					struct virtblk_req *vbr)
-+{
-+	blk_status_t status;
-+
-+	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
-+	if (unlikely(status))
-+		return status;
-+
-+	blk_mq_start_request(req);
-+
-+	vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
-+	if (unlikely(vbr->sg_table.nents < 0)) {
-+		virtblk_cleanup_cmd(req);
-+		return BLK_STS_RESOURCE;
-+	}
-+
-+	return BLK_STS_OK;
-+}
-+
- static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			   const struct blk_mq_queue_data *bd)
- {
-@@ -318,26 +339,17 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	struct request *req = bd->rq;
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
- 	unsigned long flags;
--	int num;
- 	int qid = hctx->queue_num;
- 	bool notify = false;
- 	blk_status_t status;
- 	int err;
- 
--	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
-+	status = virtblk_prep_rq(hctx, vblk, req, vbr);
- 	if (unlikely(status))
- 		return status;
- 
--	blk_mq_start_request(req);
--
--	num = virtblk_map_data(hctx, req, vbr);
--	if (unlikely(num < 0)) {
--		virtblk_cleanup_cmd(req);
--		return BLK_STS_RESOURCE;
--	}
--
- 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
--	err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
-+	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
- 	if (err) {
- 		virtqueue_kick(vblk->vqs[qid].vq);
- 		/* Don't stop the queue if -ENOMEM: we may have failed to
-@@ -367,6 +379,75 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	return BLK_STS_OK;
- }
- 
-+static bool virtblk_prep_rq_batch(struct request *req)
-+{
-+	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
-+	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+
-+	req->mq_hctx->tags->rqs[req->tag] = req;
-+
-+	return virtblk_prep_rq(req->mq_hctx, vblk, req, vbr) == BLK_STS_OK;
-+}
-+
-+static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
-+					struct request **rqlist,
-+					struct request **requeue_list)
-+{
-+	unsigned long flags;
-+	int err;
-+	bool kick;
-+
-+	spin_lock_irqsave(&vq->lock, flags);
-+
-+	while (!rq_list_empty(*rqlist)) {
-+		struct request *req = rq_list_pop(rqlist);
-+		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
-+
-+		err = virtblk_add_req(vq->vq, vbr);
-+		if (err) {
-+			virtblk_unmap_data(req, vbr);
-+			virtblk_cleanup_cmd(req);
-+			rq_list_add(requeue_list, req);
-+		}
-+	}
-+
-+	kick = virtqueue_kick_prepare(vq->vq);
-+	spin_unlock_irqrestore(&vq->lock, flags);
-+
-+	return kick;
-+}
-+
-+static void virtio_queue_rqs(struct request **rqlist)
-+{
-+	struct request *req, *next, *prev = NULL;
-+	struct request *requeue_list = NULL;
-+
-+	rq_list_for_each_safe(rqlist, req, next) {
-+		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
-+		bool kick;
-+
-+		if (!virtblk_prep_rq_batch(req)) {
-+			rq_list_move(rqlist, &requeue_list, req, prev);
-+			req = prev;
-+			if (!req)
-+				continue;
-+		}
-+
-+		if (!next || req->mq_hctx != next->mq_hctx) {
-+			req->rq_next = NULL;
-+			kick = virtblk_add_req_batch(vq, rqlist, &requeue_list);
-+			if (kick)
-+				virtqueue_notify(vq->vq);
-+
-+			*rqlist = next;
-+			prev = NULL;
-+		} else
-+			prev = req;
-+	}
-+
-+	*rqlist = requeue_list;
-+}
-+
- /* return id (s/n) string for *disk to *id_str
-  */
- static int virtblk_get_id(struct gendisk *disk, char *id_str)
-@@ -831,6 +912,7 @@ static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
- 
- static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rq	= virtio_queue_rq,
-+	.queue_rqs	= virtio_queue_rqs,
- 	.commit_rqs	= virtio_commit_rqs,
- 	.init_hctx	= virtblk_init_hctx,
- 	.complete	= virtblk_request_done,
--- 
-2.26.3
+For tcmu, though the data area's pages don't have a valid mapping,
+but we can apply similar method.
+In tcmu_vma_fault(), we lock the page and set VM_FAULT_LOCKED
+flag, in find_free_blocks(), we firstly try to lock pages which are going
+to be released, if lock_page() returns, we can ensure that there are
+not inflight running page fault procedure, and following unmap_mapping_range()
+will also ensure that all user maps will be cleared.
+Seems that it'll resolve this possible issue, please have a check, thanks.
+
+
+Regards,
+Xiaoguang Wang
+
+
+>
+>
+>>
+>> To fix this issue, when extending dbi_thresh, we'll need to call
+>> unmap_mapping_range() to unmap use space data area which may exist,
+>> which I think it's a simple method.
+>>
+>> Filesystem implementations will also run into this issue, but they
+>> ususally lock page when vm_operations_struct->fault gets one page, and
+>> unlock page after finish_fault() completes. In truncate sides, they
+>> lock pages in truncate_inode_pages() to protect race with page fault.
+>> We can also have similar codes like filesystem to fix this issue.
+>>
+>> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+>> ---
+>>   drivers/target/target_core_user.c | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
+>> index 06a5c4086551..9196188504ec 100644
+>> --- a/drivers/target/target_core_user.c
+>> +++ b/drivers/target/target_core_user.c
+>> @@ -862,6 +862,7 @@ static int tcmu_alloc_data_space(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
+>>       if (space < cmd->dbi_cnt) {
+>>           unsigned long blocks_left =
+>>                   (udev->max_blocks - udev->dbi_thresh) + space;
+>> +        loff_t off, len;
+>>             if (blocks_left < cmd->dbi_cnt) {
+>>               pr_debug("no data space: only %lu available, but ask for %u\n",
+>> @@ -870,6 +871,10 @@ static int tcmu_alloc_data_space(struct tcmu_dev *udev, struct tcmu_cmd *cmd,
+>>               return -1;
+>>           }
+>>   +        off = udev->data_off + (loff_t)udev->dbi_thresh * udev->data_blk_size;
+>> +        len = cmd->dbi_cnt * udev->data_blk_size;
+>> +        unmap_mapping_range(udev->inode->i_mapping, off, len, 1);
+>> +
+>>           udev->dbi_thresh += cmd->dbi_cnt;
+>>           if (udev->dbi_thresh > udev->max_blocks)
+>>               udev->dbi_thresh = udev->max_blocks;
 
