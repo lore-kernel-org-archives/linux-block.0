@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0F52C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 09:11:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09704C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 09:11:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232762AbiDFJNp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 05:13:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52852 "EHLO
+        id S235562AbiDFJNr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 05:13:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356441AbiDFJDI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 05:03:08 -0400
+        with ESMTP id S1349404AbiDFJCq (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 05:02:46 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE0F148F717;
-        Tue,  5 Apr 2022 23:06:14 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64CAF48F70C;
+        Tue,  5 Apr 2022 23:05:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=h9nRIyL4wrpJ3ypc009/z3A2dTvKLKo4vnaU7ryfwvk=; b=a9oCdCdHg2UWHjdBX3bxPs2eKR
-        5hve9tuJweiHtNscXmQk+Ivzu2Q7V3Mhv54LpOAbMMyQCJFe1pzLSFTspFhvQH5RSd3zutfvDVBle
-        gc7aQWZ1G4DVpBQSlfEnNf2ldCbJPt3gAAT/HH2ojp1/M3c6g9Su6hdyodjAivFbD+KIhySRZQL+J
-        uMGgYqy0Bvib+9naGiIp1U//m5d564u8ZAFKPpmnTrgGDKoliPoyKaR90tTLnVja4b5oVEZAers0q
-        p77NmZVl/ZfqKctngEgkCmQ/GGwXLM4DulJii5cEYj/W60uypGBwfA+RHY+qWe7ISyRLJtvjwNf2V
-        jwMR1eTA==;
+        bh=qk698qFB+7DuJ4AJ2sY5VQ7AD5pdtTim73QQqZ92loQ=; b=vV1BbnA55cPPAZB3254BK506im
+        Old6T+yuUYVQppmY4OvzxURFILotMc/oCVviEkRv2abUE0J0i0GHlFCQmQE6zN4zzMN0LyyGdxCxm
+        a3zAC2ibzPxxmh2esPJ31vQhU4t1hgSd4oolbLVJ30XUyZxO92DdwG6hQFMXNMNhWN7rcep7w4tlS
+        VBiExL3j/1rs3vSKxNFaeesN2dWuawOYgyTbMBu//+gVZzz/ekohyJi6Ui5YQzYrI1BTFh69BMJ40
+        8U0V0qb3pKlFpPgDI+reF/WlPNRxgS+0CgrkGxB17h8Jk2cVEx0UzjeLM8HRoV8yqMFF4OEOqQS3q
+        gljNqowQ==;
 Received: from 213-225-3-188.nat.highway.a1.net ([213.225.3.188] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nbyny-003vFI-1v; Wed, 06 Apr 2022 06:06:10 +0000
+        id 1nbynH-003umG-Rn; Wed, 06 Apr 2022 06:05:28 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
         cluster-devel@redhat.com, jfs-discussion@lists.sourceforge.net,
         linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
         ocfs2-devel@oss.oracle.com, linux-mm@kvack.org
-Subject: [PATCH 13/27] block: add a bdev_stable_writes helper
-Date:   Wed,  6 Apr 2022 08:05:02 +0200
-Message-Id: <20220406060516.409838-14-hch@lst.de>
+Subject: [PATCH 02/27] target: pass a block_device to target_configure_unmap_from_queue
+Date:   Wed,  6 Apr 2022 08:04:51 +0200
+Message-Id: <20220406060516.409838-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220406060516.409838-1-hch@lst.de>
 References: <20220406060516.409838-1-hch@lst.de>
@@ -56,75 +56,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a helper to check the stable writes flag based on the block_device
-instead of having to poke into the block layer internal request_queue.
+The target code is a consumer of the block layer and should generally
+work on struct block_device.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- drivers/md/dm-table.c  | 4 +---
- fs/super.c             | 2 +-
- include/linux/blkdev.h | 6 ++++++
- mm/swapfile.c          | 2 +-
- 4 files changed, 9 insertions(+), 5 deletions(-)
+ drivers/target/target_core_device.c  | 5 +++--
+ drivers/target/target_core_file.c    | 7 ++++---
+ drivers/target/target_core_iblock.c  | 2 +-
+ include/target/target_core_backend.h | 4 ++--
+ 4 files changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 5e38d0dd009d5..d46839faa0ca5 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1950,9 +1950,7 @@ static int device_requires_stable_pages(struct dm_target *ti,
- 					struct dm_dev *dev, sector_t start,
- 					sector_t len, void *data)
+diff --git a/drivers/target/target_core_device.c b/drivers/target/target_core_device.c
+index fa866acef5bb2..3a1ec705cd80b 100644
+--- a/drivers/target/target_core_device.c
++++ b/drivers/target/target_core_device.c
+@@ -834,9 +834,10 @@ struct se_device *target_alloc_device(struct se_hba *hba, const char *name)
+  * in ATA and we need to set TPE=1
+  */
+ bool target_configure_unmap_from_queue(struct se_dev_attrib *attrib,
+-				       struct request_queue *q)
++				       struct block_device *bdev)
  {
--	struct request_queue *q = bdev_get_queue(dev->bdev);
--
--	return blk_queue_stable_writes(q);
-+	return bdev_stable_writes(dev->bdev);
- }
+-	int block_size = queue_logical_block_size(q);
++	struct request_queue *q = bdev_get_queue(bdev);
++	int block_size = bdev_logical_block_size(bdev);
  
- int dm_table_set_restrictions(struct dm_table *t, struct request_queue *q,
-diff --git a/fs/super.c b/fs/super.c
-index f1d4a193602d6..60f57c7bc0a69 100644
---- a/fs/super.c
-+++ b/fs/super.c
-@@ -1204,7 +1204,7 @@ static int set_bdev_super(struct super_block *s, void *data)
- 	s->s_dev = s->s_bdev->bd_dev;
- 	s->s_bdi = bdi_get(s->s_bdev->bd_disk->bdi);
+ 	if (!blk_queue_discard(q))
+ 		return false;
+diff --git a/drivers/target/target_core_file.c b/drivers/target/target_core_file.c
+index 8190b840065f3..8d191fdc33217 100644
+--- a/drivers/target/target_core_file.c
++++ b/drivers/target/target_core_file.c
+@@ -134,10 +134,11 @@ static int fd_configure_device(struct se_device *dev)
+ 	 */
+ 	inode = file->f_mapping->host;
+ 	if (S_ISBLK(inode->i_mode)) {
+-		struct request_queue *q = bdev_get_queue(I_BDEV(inode));
++		struct block_device *bdev = I_BDEV(inode);
++		struct request_queue *q = bdev_get_queue(bdev);
+ 		unsigned long long dev_size;
  
--	if (blk_queue_stable_writes(s->s_bdev->bd_disk->queue))
-+	if (bdev_stable_writes(s->s_bdev))
- 		s->s_iflags |= SB_I_STABLE_WRITES;
- 	return 0;
- }
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 075b16d4560e7..a433798c3343e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1330,6 +1330,12 @@ static inline bool bdev_nonrot(struct block_device *bdev)
- 	return blk_queue_nonrot(bdev_get_queue(bdev));
- }
+-		fd_dev->fd_block_size = bdev_logical_block_size(I_BDEV(inode));
++		fd_dev->fd_block_size = bdev_logical_block_size(bdev);
+ 		/*
+ 		 * Determine the number of bytes from i_size_read() minus
+ 		 * one (1) logical sector from underlying struct block_device
+@@ -150,7 +151,7 @@ static int fd_configure_device(struct se_device *dev)
+ 			dev_size, div_u64(dev_size, fd_dev->fd_block_size),
+ 			fd_dev->fd_block_size);
  
-+static inline bool bdev_stable_writes(struct block_device *bdev)
-+{
-+	return test_bit(QUEUE_FLAG_STABLE_WRITES,
-+			&bdev_get_queue(bdev)->queue_flags);
-+}
-+
- static inline bool bdev_write_cache(struct block_device *bdev)
+-		if (target_configure_unmap_from_queue(&dev->dev_attrib, q))
++		if (target_configure_unmap_from_queue(&dev->dev_attrib, bdev))
+ 			pr_debug("IFILE: BLOCK Discard support available,"
+ 				 " disabled by default\n");
+ 		/*
+diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
+index 87ede165ddba4..b886ce1770bfd 100644
+--- a/drivers/target/target_core_iblock.c
++++ b/drivers/target/target_core_iblock.c
+@@ -119,7 +119,7 @@ static int iblock_configure_device(struct se_device *dev)
+ 	dev->dev_attrib.hw_max_sectors = queue_max_hw_sectors(q);
+ 	dev->dev_attrib.hw_queue_depth = q->nr_requests;
+ 
+-	if (target_configure_unmap_from_queue(&dev->dev_attrib, q))
++	if (target_configure_unmap_from_queue(&dev->dev_attrib, bd))
+ 		pr_debug("IBLOCK: BLOCK Discard support available,"
+ 			 " disabled by default\n");
+ 
+diff --git a/include/target/target_core_backend.h b/include/target/target_core_backend.h
+index 675f3a1fe6139..773963a1e0b53 100644
+--- a/include/target/target_core_backend.h
++++ b/include/target/target_core_backend.h
+@@ -14,7 +14,7 @@
+ #define TRANSPORT_FLAG_PASSTHROUGH_ALUA		0x2
+ #define TRANSPORT_FLAG_PASSTHROUGH_PGR          0x4
+ 
+-struct request_queue;
++struct block_device;
+ struct scatterlist;
+ 
+ struct target_backend_ops {
+@@ -117,7 +117,7 @@ sense_reason_t passthrough_parse_cdb(struct se_cmd *cmd,
+ bool target_sense_desc_format(struct se_device *dev);
+ sector_t target_to_linux_sector(struct se_device *dev, sector_t lb);
+ bool target_configure_unmap_from_queue(struct se_dev_attrib *attrib,
+-				       struct request_queue *q);
++				       struct block_device *bdev);
+ 
+ static inline bool target_dev_configured(struct se_device *se_dev)
  {
- 	return test_bit(QUEUE_FLAG_WC, &bdev_get_queue(bdev)->queue_flags);
-diff --git a/mm/swapfile.c b/mm/swapfile.c
-index d5ab7ec4d92ca..4069f17a82c8e 100644
---- a/mm/swapfile.c
-+++ b/mm/swapfile.c
-@@ -3065,7 +3065,7 @@ SYSCALL_DEFINE2(swapon, const char __user *, specialfile, int, swap_flags)
- 		goto bad_swap_unlock_inode;
- 	}
- 
--	if (p->bdev && blk_queue_stable_writes(p->bdev->bd_disk->queue))
-+	if (p->bdev && bdev_stable_writes(p->bdev))
- 		p->flags |= SWP_STABLE_WRITES;
- 
- 	if (p->bdev && p->bdev->bd_disk->fops->rw_page)
 -- 
 2.30.2
 
