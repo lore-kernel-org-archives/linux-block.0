@@ -2,151 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F853C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 09:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C67C8C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 10:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349527AbiDFJbI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 05:31:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57710 "EHLO
+        id S242874AbiDFKlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 06:41:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1579549AbiDFJUa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 05:20:30 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8747B493CEC;
-        Tue,  5 Apr 2022 23:12:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=oBOOfc3iQHyh4s/28CPoA+VriGqSgcKurZz21BM76xw=; b=pJCGiZx3jyaVpZeZ0r9wUwDapM
-        vnq8sVI2OmDjjjAlFeiXpQpXHd3qLUTQmrO2SbOe0V6Khalibg7qRuv2CX/PmXjL37DUcmx7RyXUD
-        uqV0VALE0g88DIoHQ8FOht85xvAYgQtSSQkYwAbHZrJs1DJK9oJoVWzqXmfVBMdHkAXiYPHbSqsOm
-        JRH353S+zCB5cxULSv0TJdyD4SZcedhDbR4o7iLNacPeClM4cp0ji0qL5BFynmSG+uTd35rxhyItY
-        UxPsxFWrFNYMOUR5XuvZyJCMiOjiUFIHRMbQ3DBI8Pg1KPplQ7VNfvN9RWt3m4kjFOi/RjGHDlxuI
-        e40KmP4g==;
-Received: from 213-225-3-188.nat.highway.a1.net ([213.225.3.188] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nbyuA-003zHx-LZ; Wed, 06 Apr 2022 06:12:35 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Coly Li <colyli@suse.de>, Mike Snitzer <snitzer@redhat.com>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: [PATCH 1/5] btrfs: simplify ->flush_bio handling
-Date:   Wed,  6 Apr 2022 08:12:24 +0200
-Message-Id: <20220406061228.410163-2-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220406061228.410163-1-hch@lst.de>
-References: <20220406061228.410163-1-hch@lst.de>
+        with ESMTP id S239971AbiDFKkB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 06:40:01 -0400
+Received: from mail1.bemta34.messagelabs.com (mail1.bemta34.messagelabs.com [195.245.231.4])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBC04F994D;
+        Wed,  6 Apr 2022 00:05:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fujitsu.com;
+        s=170520fj; t=1649228714; i=@fujitsu.com;
+        bh=05cGtA6yxrBEXr8TsKfNblRw+Bdby9YhP92PsT290U4=;
+        h=Date:To:Cc:Subject:Message-ID:Reply-To:References:MIME-Version:
+         Content-Type:In-Reply-To:From;
+        b=BJDFFQHg7gw8WYACPIsS5IO7QZ2Et0/snRy0O1P7sPcx3klPBjnAcFB0x5vQmkc7B
+         wdj7sgZsarcq07EkkN9Uk7cWaXRM4BHIkDNaIuDnoDW/xdWPN+yfeRQ0VLd0GPd0XX
+         YqbordNSTrdttI2gAjHO+G0BfdXM58RE64W8BbUe7mviFWROX5XjUVwj2GTsNCRtCK
+         2WJ4V8hKwe8nmUuYA+n39zIapfnu0J3NGApl7UCEEBLyvU7tS2BrmjwMlFpa9b2hDX
+         gUaY7GvBudukN14SBUkBadO1YF+sMHYk2wGdlkRTCLILZZ+pMjV2no6kK1JlP7i/NG
+         hrGSl+X1ARJQg==
+X-Brightmail-Tracker: H4sIAAAAAAAAA1WSf1CTdRzH+T4bzx5hDz38iq9L8ljCH3ibDDW
+  +ilh6lk8nFJfJJVfZgyy2GsjteThnXAdKKIcRKiTHVFDHrwFhB6OIOQ60BDwhGM6BFxWyGU4R
+  kwqMX+1p54/+e3/u9fq8P/98CEFAPS4hlDpOqc1gNFLcR7h5E8HI6mITUqJcB19GDaPFOHowc
+  gJDvQ3jOLLcP+WNxmx1QmRs+BFDg3/kY+jKtzcwZLm5GlnH60SovOJnHFnPb0cXLb1C9Evjkj
+  f6YakYIPOhGhGaL1uHKmucInSksh2gY+fyBOiovQ1HRfXxqH2+TYTmnF9jyDjeiqH2e/0ilF8
+  9iaHavgoczZhKsFdD6aG+LLr54QkR3VKVQ3/+22GcLhmuBfRESzmgzWenMfryg+tC2jySi9MD
+  Nfdw2vZ3noCe6rDh9HTzi4lksrc6I2Wf7kNv1dRoF5Y56KNrt1zGc8E8UQiWEQGUCcBbV94sB
+  D7ubASwqMMkKASEe8iChp/EvCOkVkFLpRnwOYiSQqerD/C+gGoiYZfTIeL9QCoZLt6O5x2Sio
+  Z/3jJgnv6X4BnbAs77JDVLwuq2CW8PyIZHf50Uehb8YW+5478soCLh8OIdjO8UUC/A2kWCj8u
+  oJJh/XMobkFoB54wzOJ+D3fVNhl7AKzi1BrqKGI8SAW39zYJjIFD/TL/+mX790/6zQFAPNqZo
+  1WkqLp1Ra2SKqCiZQrFetjZGptggZz6VMXJllmy/kuVk0XJmPytXsqycPZC+V5Mqz1ByzcD9Q
+  qlseGAbKDA+kl8CywlMGkz6KhJSAvxS9qUeUDGsao82S6NkL4EVBCGFZBxyM3+tMk2p+0itcT
+  /iYwwJsTSIrNroxiSbyaSz6jQPugrCJCHkyAY3oHigysp4svb4ha0gVBJIAi8vrwBxplKbrub
+  +z10ghADSQHIHXy9WZ3BP2l3uw5j78P1rb/CHOeYpkuRiOVWl7x8SfveXV2mR5OTzV3PqoheN
+  8ht3LNyuk9zUZwMLSQn2nG7ZBY2j9fXj4/Xh6J+Y0PeSaktax4Y6d4cFOZ7z//LgrtqvDm/2t
+  W9dWnvb3L/tiNrwdkfbzTDCd94gjg5/95FjbO+gZtI+y5ozcZk43XrBOln9+2vFBZvW567Z9r
+  1f6qzuA8KkHzrTOXG3xfXJW3si49dl55zK18VVrPzm9FJB8kxZ07XEPMeA3frKF82dFysL5hq
+  Dd6++a1ie0POwZ2DnaGwMN709Qp+4yh63My4WdkU4sod7ulc6TeLr3X51WxpLqKCwyK0maam1
+  qj6pbOGdEGdhiVl3Pu3jc0Nb9JxUyKoYRaRAyzL/Akr/LJA9BAAA
+X-Env-Sender: Alan.Robinson@fujitsu.com
+X-Msg-Ref: server-8.tower-548.messagelabs.com!1649228712!85085!1
+X-Originating-IP: [62.60.8.97]
+X-SYMC-ESS-Client-Auth: outbound-route-from=pass
+X-StarScan-Received: 
+X-StarScan-Version: 9.85.5; banners=-,-,-
+X-VirusChecked: Checked
+Received: (qmail 31866 invoked from network); 6 Apr 2022 07:05:12 -0000
+Received: from unknown (HELO n03ukasimr01.n03.fujitsu.local) (62.60.8.97)
+  by server-8.tower-548.messagelabs.com with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP; 6 Apr 2022 07:05:12 -0000
+Received: from n03ukasimr01.n03.fujitsu.local (localhost [127.0.0.1])
+        by n03ukasimr01.n03.fujitsu.local (Postfix) with ESMTP id 3681F100190;
+        Wed,  6 Apr 2022 08:05:12 +0100 (BST)
+Received: from nera.osd.abg.fsc.net (unknown [172.17.20.8])
+        by n03ukasimr01.n03.fujitsu.local (Postfix) with SMTP id 07836100181;
+        Wed,  6 Apr 2022 08:05:10 +0100 (BST)
+Received: by nera.osd.abg.fsc.net (Postfix, from userid 5004)
+        id B86E417478B; Wed,  6 Apr 2022 09:04:46 +0200 (CEST)
+Date:   Wed, 6 Apr 2022 09:04:46 +0200
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "jfs-discussion@lists.sourceforge.net" 
+        <jfs-discussion@lists.sourceforge.net>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" 
+        <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+Subject: Re: [PATCH 15/27] block: use bdev_alignment_offset in
+ part_alignment_offset_show
+Message-ID: <20220406070446.GA1722@ts.fujitsu.com>
+Reply-To: Alan.Robinson@fujitsu.com
+Mail-Followup-To: Alan.Robinson@fujitsu.com, Christoph Hellwig <hch@lst.de>,
+        Jens Axboe <axboe@kernel.dk>,
+        "jfs-discussion@lists.sourceforge.net" <jfs-discussion@lists.sourceforge.net>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+        "linux-mm@kvack.org" <linux-mm@kvack.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
+        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
+        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
+        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
+        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
+        "linux-f2fs-devel@lists.sourceforge.net" <linux-f2fs-devel@lists.sourceforge.net>,
+        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
+        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+References: <20220406060516.409838-1-hch@lst.de>
+ <0b7ae3df301c4fdd8d37f773d8d1eb93@FR3P281MB0843.DEUP281.PROD.OUTLOOK.COM>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b7ae3df301c4fdd8d37f773d8d1eb93@FR3P281MB0843.DEUP281.PROD.OUTLOOK.COM>
+X-sent-by-me: robin@sanpedro
+User-Agent: Mutt/1.9.3 (2018-01-21)
+From:   Alan.Robinson@fujitsu.com (Alan Robinson)
+X-Virus-Scanned: ClamAV using ClamSMTP
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use and embedded bios that is initialized when used instead of
-bio_kmalloc plus bio_reset.
+Hi Christoph,
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: David Sterba <dsterba@suse.com>
----
- fs/btrfs/disk-io.c |  8 +++++---
- fs/btrfs/volumes.c | 11 -----------
- fs/btrfs/volumes.h |  4 ++--
- 3 files changed, 7 insertions(+), 16 deletions(-)
+On Wed, Apr 06, 2022 at 06:05:04AM +0000, Christoph Hellwig wrote:
+> From: Christoph Hellwig <hch@lst.de>
+> Subject: [PATCH 15/27] block: use bdev_alignment_offset in
+>  part_alignment_offset_show
+> 
+> Replace the open coded offset calculation with the proper helper.
+> This is an ABI change in that the -1 for a misaligned partition is
+> properly propagated, which can be considered a bug fix and maches
 
-diff --git a/fs/btrfs/disk-io.c b/fs/btrfs/disk-io.c
-index b30309f187cf0..51f4cdf6bcaea 100644
---- a/fs/btrfs/disk-io.c
-+++ b/fs/btrfs/disk-io.c
-@@ -4225,6 +4225,7 @@ static int wait_dev_supers(struct btrfs_device *device, int max_mirrors)
-  */
- static void btrfs_end_empty_barrier(struct bio *bio)
- {
-+	bio_uninit(bio);
- 	complete(bio->bi_private);
- }
- 
-@@ -4234,7 +4235,7 @@ static void btrfs_end_empty_barrier(struct bio *bio)
-  */
- static void write_dev_flush(struct btrfs_device *device)
- {
--	struct bio *bio = device->flush_bio;
-+	struct bio *bio = &device->flush_bio;
- 
- #ifndef CONFIG_BTRFS_FS_CHECK_INTEGRITY
- 	/*
-@@ -4252,7 +4253,8 @@ static void write_dev_flush(struct btrfs_device *device)
- 		return;
- #endif
- 
--	bio_reset(bio, device->bdev, REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH);
-+	bio_init(bio, device->bdev, NULL, 0,
-+		 REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH);
- 	bio->bi_end_io = btrfs_end_empty_barrier;
- 	init_completion(&device->flush_wait);
- 	bio->bi_private = &device->flush_wait;
-@@ -4266,7 +4268,7 @@ static void write_dev_flush(struct btrfs_device *device)
-  */
- static blk_status_t wait_dev_flush(struct btrfs_device *device)
- {
--	struct bio *bio = device->flush_bio;
-+	struct bio *bio = &device->flush_bio;
- 
- 	if (!test_bit(BTRFS_DEV_STATE_FLUSH_SENT, &device->dev_state))
- 		return BLK_STS_OK;
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index 1be7cb2f955fc..00517239b5c01 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -405,7 +405,6 @@ void btrfs_free_device(struct btrfs_device *device)
- 	WARN_ON(!list_empty(&device->post_commit_list));
- 	rcu_string_free(device->name);
- 	extent_io_tree_release(&device->alloc_state);
--	bio_put(device->flush_bio);
- 	btrfs_destroy_dev_zone_info(device);
- 	kfree(device);
- }
-@@ -6956,16 +6955,6 @@ struct btrfs_device *btrfs_alloc_device(struct btrfs_fs_info *fs_info,
- 	if (!dev)
- 		return ERR_PTR(-ENOMEM);
- 
--	/*
--	 * Preallocate a bio that's always going to be used for flushing device
--	 * barriers and matches the device lifespan
--	 */
--	dev->flush_bio = bio_kmalloc(GFP_KERNEL, 0);
--	if (!dev->flush_bio) {
--		kfree(dev);
--		return ERR_PTR(-ENOMEM);
--	}
--
- 	INIT_LIST_HEAD(&dev->dev_list);
- 	INIT_LIST_HEAD(&dev->dev_alloc_list);
- 	INIT_LIST_HEAD(&dev->post_commit_list);
-diff --git a/fs/btrfs/volumes.h b/fs/btrfs/volumes.h
-index bd297f23d19e7..628c9af894749 100644
---- a/fs/btrfs/volumes.h
-+++ b/fs/btrfs/volumes.h
-@@ -121,8 +121,8 @@ struct btrfs_device {
- 	/* bytes used on the current transaction */
- 	u64 commit_bytes_used;
- 
--	/* for sending down flush barriers */
--	struct bio *flush_bio;
-+	/* Bio used for flushing device barriers */
-+	struct bio flush_bio;
- 	struct completion flush_wait;
- 
- 	/* per-device scrub information */
--- 
-2.30.2
+s/maches/matches/
+
+> what is done on the whole device.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/partitions/core.c | 6 +-----
+>  1 file changed, 1 insertion(+), 5 deletions(-)
+> 
+> diff --git a/block/partitions/core.c b/block/partitions/core.c
+> index 2ef8dfa1e5c85..240b3fff521e4 100644
+> --- a/block/partitions/core.c
+> +++ b/block/partitions/core.c
+> @@ -200,11 +200,7 @@ static ssize_t part_ro_show(struct device *dev,
+>  static ssize_t part_alignment_offset_show(struct device *dev,
+>  					  struct device_attribute *attr, char *buf)
+>  {
+> -	struct block_device *bdev = dev_to_bdev(dev);
+> -
+> -	return sprintf(buf, "%u\n",
+> -		queue_limit_alignment_offset(&bdev_get_queue(bdev)->limits,
+> -				bdev->bd_start_sect));
+> +	return sprintf(buf, "%u\n", bdev_alignment_offset(dev_to_bdev(dev)));
+
+Should this now be %d instead of %u, there are one or two examples of
+both in the rest of the patch series.
+
+Alan
 
