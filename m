@@ -2,111 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D29AAC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 12:21:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C23AC4332F
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 12:46:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232540AbiDFMXs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 08:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40730 "EHLO
+        id S230232AbiDFMsu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 08:48:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233488AbiDFMWv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 08:22:51 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBA655552F9
-        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 01:06:59 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id l26so2633108ejx.1
-        for <linux-block@vger.kernel.org>; Wed, 06 Apr 2022 01:06:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
-         :subject:content-transfer-encoding;
-        bh=es6GCrlF2nUa0y5ZqhJAmYS3RmLKzWhj9CrxAydvPkQ=;
-        b=WLs5Y7dQQ1ojQDKonVW6tlspo1zGSLIdb34V1BJRbZ8++lv5g3uyv8sDyc+aeAiwi+
-         XcJw2lAErX6inKAEwv1iR9I9O4OHIlWTk4rMQW0yx3MsopAyhZ+ohuE5rT8oR6NKGIB+
-         B2UW7eg7uhPisss+fZ3XIu7aaVgQsioBwNWykuYRMTFdLMdsIMM/v5zn4xkT501erVBv
-         J7YSTnIlpqIo7WbU2m0Z8/S4YAWjF9A00yWknK4Ewp2Ikw7KQokUMgEuVTxUbPjFa8G9
-         dD9dRWZUtfbPL2WQwXktQsQJnsdIl/46vrlj+vrE8MT339Exya2p8uFxtb2fqBjMKM/C
-         5J2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=es6GCrlF2nUa0y5ZqhJAmYS3RmLKzWhj9CrxAydvPkQ=;
-        b=2Jo9dGKaTnt5lyXPstmUcG2tZ6F0lsbhzDRDIC9IK2k+vm74fEtEVJxc1c9rq2N9id
-         xO6Z/Lcu+H94NmY1T7x15ZdX3ovepdBxZtT/l5UmctukO4vLjIQtANbXhg4X0Pw8Daoe
-         mgQFjolXhQaBK+1LuJQqdtAspO8qis+5JHBr63WNxsoBJoQtvgKVQ1Z6W2vbl8VAO6lL
-         7Q6V3cgJuYku9vAI3oc1SoXyXa/YRIpWRTE6PwwQSy1F8Zpxp7xb0Xl+f5Aw6fF+TGoi
-         BUI0Vi5Lf8gHbOEv+VpFKa069ZTPa34lw0Vdsrfer41XSaiK0hJrSsQTZKNT75eeFnfE
-         Tq1w==
-X-Gm-Message-State: AOAM533IkPyMe/avFsZIzKaG3ri8a/mVaznXlzKvfO/0NUU5plba+Wyu
-        qE8FTWMokOR9BGF2o9p/z3cBPX7O/j9sMO1R
-X-Google-Smtp-Source: ABdhPJy0++LnaoradYkv1E6KheIHyeqVReiZzhg85Ym/lpm0gMzniiWG8JrkI90H2/KDZlnujE8+/A==
-X-Received: by 2002:a17:907:3f86:b0:6df:ad43:583 with SMTP id hr6-20020a1709073f8600b006dfad430583mr7144090ejc.535.1649232418531;
-        Wed, 06 Apr 2022 01:06:58 -0700 (PDT)
-Received: from [192.168.178.55] (85-127-190-169.dsl.dynamic.surfer.at. [85.127.190.169])
-        by smtp.gmail.com with ESMTPSA id gk16-20020a17090790d000b006e802f814b2sm1996037ejb.193.2022.04.06.01.06.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Apr 2022 01:06:57 -0700 (PDT)
-Message-ID: <60bf3e8f-9cfb-00d1-5fea-71a72ba93258@linbit.com>
-Date:   Wed, 6 Apr 2022 10:06:56 +0200
+        with ESMTP id S230104AbiDFMsZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 08:48:25 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8144AF789
+        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 01:52:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1649235162; x=1680771162;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=LFM3dJ4XtmmQmpjm/ADKwYliPf/iPacGMSt9/3x5IFU=;
+  b=ojFY4yb27o4X5BsYo4VL4HCfneARBHq+b6TIZETdYkCzRsEqssK9/WD/
+   MJfK+Jgnd4//m2XKAGHJMmws3J0HVieespFs0vF5KQT0uKEJfVSiA+7G+
+   xS/LcA2sDGikEJxaf+gsHKkW/bMmBA/MNB/DUDIYeswaDTEMGQlvgPAsZ
+   4zTxzwAXOLHLu16kK4pueo41CFA6TBoo8hLmjTGdxSPo9bvbZteaD9y45
+   e6hwMys4s3tV3siihop/FczFDPJlrXHpBydiXfYnbE9PsgifmiXCzekTN
+   Yc9dzMmThJNIXbBxkUW7+ScrznlhKojWVKsjCmdbrOLgBDtgNtPV7QCk+
+   A==;
+X-IronPort-AV: E=Sophos;i="5.90,239,1643644800"; 
+   d="scan'208";a="197223420"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 06 Apr 2022 16:52:42 +0800
+IronPort-SDR: J5CD/EytoUYY6ArcK2/+bnOObJ+Alf52vzsco5jdYtzL4r9cl0dEvBu0C6MHlleNe3OtHDXvWq
+ 23OyR6CAE5eKPULn08rPYsTDd9nsU7QqIEFrg4JSbsjoVxbxQ/bjFnw/NEzdR8zsKjtvOGapTo
+ BWeREmvxlSpguyn/vosk445x66Gn598+z+kc5gpzuaJmeTdj1xYZrUF4AocMC/eGb5aPNUAEr9
+ hHKD+IUFVPHlF8td72xtkuKHTfa1/pFk7fHH53Xv5egsZn8RZZMjVhANiLVg536pnYWBxMLMS9
+ X7haFOYv+6TF3iLql/izNTXl
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Apr 2022 01:24:14 -0700
+IronPort-SDR: EXeY5bcDquG90I2SoQN814k3hzdAPCnwQFj2R8UmTjLNvYCLXQn09S7AAHShkekXzU+wlIXnub
+ SXIsgVysoOaBcULZ3ZPCIXw5ABLTeFh0JBcFzxstJ+ZzbwFJ997v3Oej26+tB+Htdt4MWdmpS5
+ 30mNvXoU3MYF8A/vVK1Ezjd+7cT/80xoSaT7GS9AnP4xwf++hOFfBY+YOc9pVf5k46cudXpcdp
+ RIsqwz5vc6L4p3kSWP8JaGDNyFG26L5Ne8SUUwsMZYFH43ES/Rb+EBMOOYiGdQSOpQEtXO4pc4
+ /cg=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Apr 2022 01:52:43 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KYJDn0gkrz1SVp4
+        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 01:52:41 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1649235160; x=1651827161; bh=LFM3dJ4XtmmQmpjm/ADKwYliPf/iPacGMSt
+        9/3x5IFU=; b=FzUociJ5h7WAQTsg6/of1WcVO/OsM8WZr8TGwq4XsiCjPsWYnIG
+        8/w+gKZQabfM5/6lPmJQreKk5Ou6wFCFKuKzU34LNEBfiEEQgQdKgaFRiQjCbS+v
+        bXmYOK12GNp/Ja0XBlu9I1309M6iplipC0iSH4zUASq/4DY1Z1ntJWZZ2gnz7v04
+        gr+tHwiyI12IKqfvshI8zep4+bgj/F03PH6lDam0sCy+54uxyIAUOpes7fa1mbqW
+        oKbTS+GZl8C4hDtpg8QtlcOVicbeOAAs2w8xnnXnZGy/42U80yMH8z7K4uMfNY4W
+        C4OWYxx5B6+JAZVIxV0TMfw3Lljnnr2SA9w==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id g5tnqVdw2gN4 for <linux-block@vger.kernel.org>;
+        Wed,  6 Apr 2022 01:52:40 -0700 (PDT)
+Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KYJDg4WyPz1Rvlx;
+        Wed,  6 Apr 2022 01:52:35 -0700 (PDT)
+Message-ID: <ea3d14cb-00ea-8d7b-4615-9347fdd7aa27@opensource.wdc.com>
+Date:   Wed, 6 Apr 2022 17:52:34 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
+Subject: Re: [PATCH 14/27] block: add a bdev_max_zone_append_sectors helper
 Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-Subject: [GIT PULL] DRBD fixes for Linux 5.18
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        nbd@other.debian.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, jfs-discussion@lists.sourceforge.net,
+        linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
+        ocfs2-devel@oss.oracle.com, linux-mm@kvack.org
+References: <20220406060516.409838-1-hch@lst.de>
+ <20220406060516.409838-15-hch@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220406060516.409838-15-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+On 4/6/22 15:05, Christoph Hellwig wrote:
+> Add a helper to check the max supported sectors for zone append based on
+> the block_device instead of having to poke into the block layer internal
+> request_queue.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>   drivers/nvme/target/zns.c | 3 +--
+>   fs/zonefs/super.c         | 3 +--
+>   include/linux/blkdev.h    | 6 ++++++
+>   3 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+> index e34718b095504..82b61acf7a72b 100644
+> --- a/drivers/nvme/target/zns.c
+> +++ b/drivers/nvme/target/zns.c
+> @@ -34,8 +34,7 @@ static int validate_conv_zones_cb(struct blk_zone *z,
+>   
+>   bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
+>   {
+> -	struct request_queue *q = ns->bdev->bd_disk->queue;
+> -	u8 zasl = nvmet_zasl(queue_max_zone_append_sectors(q));
+> +	u8 zasl = nvmet_zasl(bdev_max_zone_append_sectors(ns->bdev));
+>   	struct gendisk *bd_disk = ns->bdev->bd_disk;
+>   	int ret;
+>   
+> diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+> index 3614c7834007d..7a63807b736c4 100644
+> --- a/fs/zonefs/super.c
+> +++ b/fs/zonefs/super.c
+> @@ -678,13 +678,12 @@ static ssize_t zonefs_file_dio_append(struct kiocb *iocb, struct iov_iter *from)
+>   	struct inode *inode = file_inode(iocb->ki_filp);
+>   	struct zonefs_inode_info *zi = ZONEFS_I(inode);
+>   	struct block_device *bdev = inode->i_sb->s_bdev;
+> -	unsigned int max;
+> +	unsigned int max = bdev_max_zone_append_sectors(bdev);
+>   	struct bio *bio;
+>   	ssize_t size;
+>   	int nr_pages;
+>   	ssize_t ret;
+>   
+> -	max = queue_max_zone_append_sectors(bdev_get_queue(bdev));
+>   	max = ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize);
+>   	iov_iter_truncate(from, max);
+>   
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index a433798c3343e..f8c50b77543eb 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -1188,6 +1188,12 @@ static inline unsigned int queue_max_zone_append_sectors(const struct request_qu
+>   	return min(l->max_zone_append_sectors, l->max_sectors);
+>   }
+>   
+> +static inline unsigned int
+> +bdev_max_zone_append_sectors(struct block_device *bdev)
+> +{
+> +	return queue_max_zone_append_sectors(bdev_get_queue(bdev));
+> +}
+> +
+>   static inline unsigned queue_logical_block_size(const struct request_queue *q)
+>   {
+>   	int retval = 512;
 
-this is the first batch of DRBD updates, catching up from the last few years.
-These fixes are a bit more substantial, so it would be great if they could still
-go into 5.18.
+Looks good.
 
-Please pull.
+Acked-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-
-The following changes since commit ff0f3f83175274daf2eb4fd4db6430ab71c66e80:
-
-  Merge branch 'for-5.19/io_uring-xattr' into for-next (2022-04-04 17:59:51 -0600)
-
-are available in the Git repository at:
-
-  https://github.com/LINBIT/linux-drbd.git tags/drbd-fixes-5.18-2022-04-06
-
-for you to fetch changes up to 0ab5e2117763190f684fdedb6f171abd4b939f1b:
-
-  drbd: set QUEUE_FLAG_STABLE_WRITES (2022-04-06 09:16:13 +0200)
-
-----------------------------------------------------------------
-DRBD fixes for Linux 5.18
-
-- enable stable writes for DRBD (Christoph Böhmwalder)
-- fix a potential invalid memory access (Xiaomeng Tong)
-- fix a use-after-free bug (Lv Yunlong)
-
-----------------------------------------------------------------
-Christoph Böhmwalder (1):
-      drbd: set QUEUE_FLAG_STABLE_WRITES
-
-Lv Yunlong (1):
-      drbd: Fix five use after free bugs in get_initial_state
-
-Xiaomeng Tong (1):
-      drbd: fix an invalid memory access caused by incorrect use of list iterator
-
- drivers/block/drbd/drbd_int.h          |  8 ++++----
- drivers/block/drbd/drbd_main.c         |  7 +++----
- drivers/block/drbd/drbd_nl.c           | 41 +++++++++++++++++++++++++----------------
- drivers/block/drbd/drbd_state.c        | 18 +++++++++---------
- drivers/block/drbd/drbd_state_change.h |  8 ++++----
- 5 files changed, 45 insertions(+), 37 deletions(-)
+-- 
+Damien Le Moal
+Western Digital Research
