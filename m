@@ -2,31 +2,31 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CA1C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 09:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E6B5C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 09:12:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243814AbiDFJOu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 05:14:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53082 "EHLO
+        id S1346311AbiDFJOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 05:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359501AbiDFJDX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 05:03:23 -0400
+        with ESMTP id S1358083AbiDFJDR (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 05:03:17 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA943478A54;
-        Tue,  5 Apr 2022 23:06:28 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 114384793B9;
+        Tue,  5 Apr 2022 23:06:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=65vdZDv/Oyhj9d7BIFQpxpieHFePRtIOo5rSsdbnvJY=; b=fnclFxf748Yk+HJEP8iaRVW3WB
-        aWWIhphvzxhVY6FZKXEjV9bmsgZxn1Kj0ojlUoEizIay0h/EV1KlYq6LYsLwUZoiL+Fz08VFbrmWJ
-        BYNbJJT671L+8hPCaASzQ9hicWQta9jTVuyI55rgNvXk3KOf4lbIG1gDSvXVJwm3aMnDnl4JurT3R
-        S8cYXnLnqA9S0vlUcqmBeds07qoRbn35ezQfJ8pyS1RE387ITcgzq6PHUXXwRZqcO/Sk1L5arJMLy
-        E+9ofKyWiYPnidQ8zD5I0ZyEozinv4MmGtOr/LudVUr7xp27guzf7u4zI6ERWqMoK3aOeUdBrl0mu
-        xcCu0PRw==;
+        bh=P8BTzfbZzMhTwk+O/5Q9S2IjdA/Er5Nl5Yd1FdZzPNs=; b=jmLLAFsmpP/kGZ+yrDJsbaGT90
+        3PwfbbG3wYKmDjHmMy+UJOFVGL4TGDhECV3MOyV3UV8eSqcB0oTUed5n8oqNZktxd33ScowUP7QGh
+        zbHFLMbrLKGeYKPMV8S63E/RRGEzhJrhrEAo36bmKxr9IL3fiqhq4h4HV/PV2BMnFoSisR8vXTGSe
+        pm93ugKsrwSXqQ5J/PUF18cWu1plS4ueu1I2pDS3596vDa7E3hJWQLYJIHPBT5CXRTFQ5Q3FfKMQJ
+        gbNfl56sQdKYZDUFA7Rmbrh+TTmjlhI2tnHxRO3P8MOrLI7+hAjFr/PXAnmPHqK5dQh0zlvNaSpaR
+        rj8Pm/Qw==;
 Received: from 213-225-3-188.nat.highway.a1.net ([213.225.3.188] helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nbyoD-003vVW-6V; Wed, 06 Apr 2022 06:06:25 +0000
+        id 1nbyo2-003vK1-1x; Wed, 06 Apr 2022 06:06:14 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
@@ -43,9 +43,9 @@ Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
         cluster-devel@redhat.com, jfs-discussion@lists.sourceforge.net,
         linux-nilfs@vger.kernel.org, ntfs3@lists.linux.dev,
         ocfs2-devel@oss.oracle.com, linux-mm@kvack.org
-Subject: [PATCH 17/27] block: use bdev_alignment_offset in disk_alignment_offset_show
-Date:   Wed,  6 Apr 2022 08:05:06 +0200
-Message-Id: <20220406060516.409838-18-hch@lst.de>
+Subject: [PATCH 14/27] block: add a bdev_max_zone_append_sectors helper
+Date:   Wed,  6 Apr 2022 08:05:03 +0200
+Message-Id: <20220406060516.409838-15-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220406060516.409838-1-hch@lst.de>
 References: <20220406060516.409838-1-hch@lst.de>
@@ -56,47 +56,67 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This does the same as the open coded variant except for an extra branch,
-and allows to remove queue_alignment_offset entirely.
+Add a helper to check the max supported sectors for zone append based on
+the block_device instead of having to poke into the block layer internal
+request_queue.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/genhd.c          | 2 +-
- include/linux/blkdev.h | 8 --------
- 2 files changed, 1 insertion(+), 9 deletions(-)
+ drivers/nvme/target/zns.c | 3 +--
+ fs/zonefs/super.c         | 3 +--
+ include/linux/blkdev.h    | 6 ++++++
+ 3 files changed, 8 insertions(+), 4 deletions(-)
 
-diff --git a/block/genhd.c b/block/genhd.c
-index b8b6759d670f0..712031ce19070 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1010,7 +1010,7 @@ static ssize_t disk_alignment_offset_show(struct device *dev,
+diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
+index e34718b095504..82b61acf7a72b 100644
+--- a/drivers/nvme/target/zns.c
++++ b/drivers/nvme/target/zns.c
+@@ -34,8 +34,7 @@ static int validate_conv_zones_cb(struct blk_zone *z,
+ 
+ bool nvmet_bdev_zns_enable(struct nvmet_ns *ns)
  {
- 	struct gendisk *disk = dev_to_disk(dev);
+-	struct request_queue *q = ns->bdev->bd_disk->queue;
+-	u8 zasl = nvmet_zasl(queue_max_zone_append_sectors(q));
++	u8 zasl = nvmet_zasl(bdev_max_zone_append_sectors(ns->bdev));
+ 	struct gendisk *bd_disk = ns->bdev->bd_disk;
+ 	int ret;
  
--	return sprintf(buf, "%d\n", queue_alignment_offset(disk->queue));
-+	return sprintf(buf, "%d\n", bdev_alignment_offset(disk->part0));
- }
+diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+index 3614c7834007d..7a63807b736c4 100644
+--- a/fs/zonefs/super.c
++++ b/fs/zonefs/super.c
+@@ -678,13 +678,12 @@ static ssize_t zonefs_file_dio_append(struct kiocb *iocb, struct iov_iter *from)
+ 	struct inode *inode = file_inode(iocb->ki_filp);
+ 	struct zonefs_inode_info *zi = ZONEFS_I(inode);
+ 	struct block_device *bdev = inode->i_sb->s_bdev;
+-	unsigned int max;
++	unsigned int max = bdev_max_zone_append_sectors(bdev);
+ 	struct bio *bio;
+ 	ssize_t size;
+ 	int nr_pages;
+ 	ssize_t ret;
  
- static ssize_t disk_discard_alignment_show(struct device *dev,
+-	max = queue_max_zone_append_sectors(bdev_get_queue(bdev));
+ 	max = ALIGN_DOWN(max << SECTOR_SHIFT, inode->i_sb->s_blocksize);
+ 	iov_iter_truncate(from, max);
+ 
 diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index f8c50b77543eb..d5346e72e3645 100644
+index a433798c3343e..f8c50b77543eb 100644
 --- a/include/linux/blkdev.h
 +++ b/include/linux/blkdev.h
-@@ -1251,14 +1251,6 @@ bdev_zone_write_granularity(struct block_device *bdev)
- 	return queue_zone_write_granularity(bdev_get_queue(bdev));
+@@ -1188,6 +1188,12 @@ static inline unsigned int queue_max_zone_append_sectors(const struct request_qu
+ 	return min(l->max_zone_append_sectors, l->max_sectors);
  }
  
--static inline int queue_alignment_offset(const struct request_queue *q)
--{
--	if (q->limits.misaligned)
--		return -1;
--
--	return q->limits.alignment_offset;
--}
--
- static inline int queue_limit_alignment_offset(struct queue_limits *lim, sector_t sector)
++static inline unsigned int
++bdev_max_zone_append_sectors(struct block_device *bdev)
++{
++	return queue_max_zone_append_sectors(bdev_get_queue(bdev));
++}
++
+ static inline unsigned queue_logical_block_size(const struct request_queue *q)
  {
- 	unsigned int granularity = max(lim->physical_block_size, lim->io_min);
+ 	int retval = 512;
 -- 
 2.30.2
 
