@@ -2,183 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C67C8C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 10:39:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D19AC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 12:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242874AbiDFKlJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 06:41:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50886 "EHLO
+        id S232533AbiDFMXr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 08:23:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239971AbiDFKkB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 06:40:01 -0400
-Received: from mail1.bemta34.messagelabs.com (mail1.bemta34.messagelabs.com [195.245.231.4])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBC04F994D;
-        Wed,  6 Apr 2022 00:05:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fujitsu.com;
-        s=170520fj; t=1649228714; i=@fujitsu.com;
-        bh=05cGtA6yxrBEXr8TsKfNblRw+Bdby9YhP92PsT290U4=;
-        h=Date:To:Cc:Subject:Message-ID:Reply-To:References:MIME-Version:
-         Content-Type:In-Reply-To:From;
-        b=BJDFFQHg7gw8WYACPIsS5IO7QZ2Et0/snRy0O1P7sPcx3klPBjnAcFB0x5vQmkc7B
-         wdj7sgZsarcq07EkkN9Uk7cWaXRM4BHIkDNaIuDnoDW/xdWPN+yfeRQ0VLd0GPd0XX
-         YqbordNSTrdttI2gAjHO+G0BfdXM58RE64W8BbUe7mviFWROX5XjUVwj2GTsNCRtCK
-         2WJ4V8hKwe8nmUuYA+n39zIapfnu0J3NGApl7UCEEBLyvU7tS2BrmjwMlFpa9b2hDX
-         gUaY7GvBudukN14SBUkBadO1YF+sMHYk2wGdlkRTCLILZZ+pMjV2no6kK1JlP7i/NG
-         hrGSl+X1ARJQg==
-X-Brightmail-Tracker: H4sIAAAAAAAAA1WSf1CTdRzH+T4bzx5hDz38iq9L8ljCH3ibDDW
-  +ilh6lk8nFJfJJVfZgyy2GsjteThnXAdKKIcRKiTHVFDHrwFhB6OIOQ60BDwhGM6BFxWyGU4R
-  kwqMX+1p54/+e3/u9fq8P/98CEFAPS4hlDpOqc1gNFLcR7h5E8HI6mITUqJcB19GDaPFOHowc
-  gJDvQ3jOLLcP+WNxmx1QmRs+BFDg3/kY+jKtzcwZLm5GlnH60SovOJnHFnPb0cXLb1C9Evjkj
-  f6YakYIPOhGhGaL1uHKmucInSksh2gY+fyBOiovQ1HRfXxqH2+TYTmnF9jyDjeiqH2e/0ilF8
-  9iaHavgoczZhKsFdD6aG+LLr54QkR3VKVQ3/+22GcLhmuBfRESzmgzWenMfryg+tC2jySi9MD
-  Nfdw2vZ3noCe6rDh9HTzi4lksrc6I2Wf7kNv1dRoF5Y56KNrt1zGc8E8UQiWEQGUCcBbV94sB
-  D7ubASwqMMkKASEe8iChp/EvCOkVkFLpRnwOYiSQqerD/C+gGoiYZfTIeL9QCoZLt6O5x2Sio
-  Z/3jJgnv6X4BnbAs77JDVLwuq2CW8PyIZHf50Uehb8YW+5478soCLh8OIdjO8UUC/A2kWCj8u
-  oJJh/XMobkFoB54wzOJ+D3fVNhl7AKzi1BrqKGI8SAW39zYJjIFD/TL/+mX790/6zQFAPNqZo
-  1WkqLp1Ra2SKqCiZQrFetjZGptggZz6VMXJllmy/kuVk0XJmPytXsqycPZC+V5Mqz1ByzcD9Q
-  qlseGAbKDA+kl8CywlMGkz6KhJSAvxS9qUeUDGsao82S6NkL4EVBCGFZBxyM3+tMk2p+0itcT
-  /iYwwJsTSIrNroxiSbyaSz6jQPugrCJCHkyAY3oHigysp4svb4ha0gVBJIAi8vrwBxplKbrub
-  +z10ghADSQHIHXy9WZ3BP2l3uw5j78P1rb/CHOeYpkuRiOVWl7x8SfveXV2mR5OTzV3PqoheN
-  8ht3LNyuk9zUZwMLSQn2nG7ZBY2j9fXj4/Xh6J+Y0PeSaktax4Y6d4cFOZ7z//LgrtqvDm/2t
-  W9dWnvb3L/tiNrwdkfbzTDCd94gjg5/95FjbO+gZtI+y5ozcZk43XrBOln9+2vFBZvW567Z9r
-  1f6qzuA8KkHzrTOXG3xfXJW3si49dl55zK18VVrPzm9FJB8kxZ07XEPMeA3frKF82dFysL5hq
-  Dd6++a1ie0POwZ2DnaGwMN709Qp+4yh63My4WdkU4sod7ulc6TeLr3X51WxpLqKCwyK0maam1
-  qj6pbOGdEGdhiVl3Pu3jc0Nb9JxUyKoYRaRAyzL/Akr/LJA9BAAA
-X-Env-Sender: Alan.Robinson@fujitsu.com
-X-Msg-Ref: server-8.tower-548.messagelabs.com!1649228712!85085!1
-X-Originating-IP: [62.60.8.97]
-X-SYMC-ESS-Client-Auth: outbound-route-from=pass
-X-StarScan-Received: 
-X-StarScan-Version: 9.85.5; banners=-,-,-
-X-VirusChecked: Checked
-Received: (qmail 31866 invoked from network); 6 Apr 2022 07:05:12 -0000
-Received: from unknown (HELO n03ukasimr01.n03.fujitsu.local) (62.60.8.97)
-  by server-8.tower-548.messagelabs.com with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP; 6 Apr 2022 07:05:12 -0000
-Received: from n03ukasimr01.n03.fujitsu.local (localhost [127.0.0.1])
-        by n03ukasimr01.n03.fujitsu.local (Postfix) with ESMTP id 3681F100190;
-        Wed,  6 Apr 2022 08:05:12 +0100 (BST)
-Received: from nera.osd.abg.fsc.net (unknown [172.17.20.8])
-        by n03ukasimr01.n03.fujitsu.local (Postfix) with SMTP id 07836100181;
-        Wed,  6 Apr 2022 08:05:10 +0100 (BST)
-Received: by nera.osd.abg.fsc.net (Postfix, from userid 5004)
-        id B86E417478B; Wed,  6 Apr 2022 09:04:46 +0200 (CEST)
-Date:   Wed, 6 Apr 2022 09:04:46 +0200
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        "jfs-discussion@lists.sourceforge.net" 
-        <jfs-discussion@lists.sourceforge.net>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
-        "nbd@other.debian.org" <nbd@other.debian.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
-Subject: Re: [PATCH 15/27] block: use bdev_alignment_offset in
- part_alignment_offset_show
-Message-ID: <20220406070446.GA1722@ts.fujitsu.com>
-Reply-To: Alan.Robinson@fujitsu.com
-Mail-Followup-To: Alan.Robinson@fujitsu.com, Christoph Hellwig <hch@lst.de>,
-        Jens Axboe <axboe@kernel.dk>,
-        "jfs-discussion@lists.sourceforge.net" <jfs-discussion@lists.sourceforge.net>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
-        "linux-mm@kvack.org" <linux-mm@kvack.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "target-devel@vger.kernel.org" <target-devel@vger.kernel.org>,
-        "linux-mtd@lists.infradead.org" <linux-mtd@lists.infradead.org>,
-        "drbd-dev@lists.linbit.com" <drbd-dev@lists.linbit.com>,
-        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-        "linux-nilfs@vger.kernel.org" <linux-nilfs@vger.kernel.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "cluster-devel@redhat.com" <cluster-devel@redhat.com>,
-        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
-        "nbd@other.debian.org" <nbd@other.debian.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-bcache@vger.kernel.org" <linux-bcache@vger.kernel.org>,
-        "ceph-devel@vger.kernel.org" <ceph-devel@vger.kernel.org>,
-        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
-        "linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" <linux-f2fs-devel@lists.sourceforge.net>,
-        "linux-xfs@vger.kernel.org" <linux-xfs@vger.kernel.org>,
-        "ocfs2-devel@oss.oracle.com" <ocfs2-devel@oss.oracle.com>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "ntfs3@lists.linux.dev" <ntfs3@lists.linux.dev>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
-References: <20220406060516.409838-1-hch@lst.de>
- <0b7ae3df301c4fdd8d37f773d8d1eb93@FR3P281MB0843.DEUP281.PROD.OUTLOOK.COM>
+        with ESMTP id S233702AbiDFMW5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 08:22:57 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C21A4AFB16
+        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 01:07:17 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id ot30so2520960ejb.12
+        for <linux-block@vger.kernel.org>; Wed, 06 Apr 2022 01:07:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=BK4uqR4DBxUcrOhSL0+7lH+xVrswMnPHtjVKXsOOpG4=;
+        b=BsP+slwiGpMkPf/dgipgLte79LcScL1Bzneuo/X2T+L007SVcLKYhH4WnFDdQ4Hh11
+         WUEoJUDeg/oK0y0FBgvqq+apORk9ZUEaRWyk9/4SI0EjyCBMgtW/pj+No3We4coZO1d9
+         qHb5/czAauAt+P9dJDEiclfZ9AWovvrhH4HsCMoeQTOE3YQplNukr+bpn/hznfo+MABb
+         WcTwf/H0bGyy35GYN/Oky7AuU86mtCuqrJhCF4scvj00IZBUvT//nrIQlwarhyq6aBdL
+         CY68PBMn2TV5I34+ibPnOioCwy+udy6ngNkMrk2+Ss4xPpk4Y5FHoLmiuvBQvRXLXEfh
+         06Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=BK4uqR4DBxUcrOhSL0+7lH+xVrswMnPHtjVKXsOOpG4=;
+        b=kB46q6Q3J7wbdgkFA3kAMhkNeMx5kle4fUK2jSeX9UoWeNGC83bDLzvv+sIql1LUOe
+         1OUWiuaby7aF/CA6W1mqFLhiTYL+VWGEVat0TI4Wi67jxERR6HbgZMlxnCbCkaZ3C5jA
+         y0oeVSOvzCmCXXWDd4JsrOofXT/a3ddUFVVjUJ+LJl4B9sWLvQ5DiTNJ26mUnWIWNEE8
+         EkUl0cuv7QYBClbOLTtlmJ2y9epK1wLy96RvUFc1pu1UL+IzfTa4Tq4f39wnLbZXMwuO
+         N5Wpmue2zfeYt/twsN7R457aLgLcuxCN9llJXlhd7DoZOCgslqQGarptsap0juI++JpW
+         7VXw==
+X-Gm-Message-State: AOAM530ALFIBQVBoRtrS+5vgD/7n2JybzvCGtDgAIiwvFxZv8LH8X1eI
+        43hYpsOUcHuzqr3JTm9eWC6t+g==
+X-Google-Smtp-Source: ABdhPJwJX6r3yfeEYEn95I6lOIn41Oq/clijjnflZWOXHkxNbce8Drfed0p6O52HauE7LjeAPl0L2Q==
+X-Received: by 2002:a17:906:6a11:b0:6e4:976b:e94 with SMTP id qw17-20020a1709066a1100b006e4976b0e94mr7316685ejc.142.1649232436324;
+        Wed, 06 Apr 2022 01:07:16 -0700 (PDT)
+Received: from [192.168.178.55] (85-127-190-169.dsl.dynamic.surfer.at. [85.127.190.169])
+        by smtp.gmail.com with ESMTPSA id do8-20020a170906c10800b006dfe4d1edc6sm6246817ejc.61.2022.04.06.01.07.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Apr 2022 01:07:15 -0700 (PDT)
+Message-ID: <bca64395-2c73-25f9-dbca-76479ef5d280@linbit.com>
+Date:   Wed, 6 Apr 2022 10:07:14 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0b7ae3df301c4fdd8d37f773d8d1eb93@FR3P281MB0843.DEUP281.PROD.OUTLOOK.COM>
-X-sent-by-me: robin@sanpedro
-User-Agent: Mutt/1.9.3 (2018-01-21)
-From:   Alan.Robinson@fujitsu.com (Alan Robinson)
-X-Virus-Scanned: ClamAV using ClamSMTP
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        Lars Ellenberg <lars.ellenberg@linbit.com>
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [GIT PULL] DRBD updates for Linux 5.19
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Christoph,
+Hi Jens,
 
-On Wed, Apr 06, 2022 at 06:05:04AM +0000, Christoph Hellwig wrote:
-> From: Christoph Hellwig <hch@lst.de>
-> Subject: [PATCH 15/27] block: use bdev_alignment_offset in
->  part_alignment_offset_show
-> 
-> Replace the open coded offset calculation with the proper helper.
-> This is an ABI change in that the -1 for a misaligned partition is
-> properly propagated, which can be considered a bug fix and maches
+these updates are mostly cosmetic; also stuff we missed over the years.
 
-s/maches/matches/
+Please pull for 5.19.
 
-> what is done on the whole device.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  block/partitions/core.c | 6 +-----
->  1 file changed, 1 insertion(+), 5 deletions(-)
-> 
-> diff --git a/block/partitions/core.c b/block/partitions/core.c
-> index 2ef8dfa1e5c85..240b3fff521e4 100644
-> --- a/block/partitions/core.c
-> +++ b/block/partitions/core.c
-> @@ -200,11 +200,7 @@ static ssize_t part_ro_show(struct device *dev,
->  static ssize_t part_alignment_offset_show(struct device *dev,
->  					  struct device_attribute *attr, char *buf)
->  {
-> -	struct block_device *bdev = dev_to_bdev(dev);
-> -
-> -	return sprintf(buf, "%u\n",
-> -		queue_limit_alignment_offset(&bdev_get_queue(bdev)->limits,
-> -				bdev->bd_start_sect));
-> +	return sprintf(buf, "%u\n", bdev_alignment_offset(dev_to_bdev(dev)));
 
-Should this now be %d instead of %u, there are one or two examples of
-both in the rest of the patch series.
+The following changes since commit ff0f3f83175274daf2eb4fd4db6430ab71c66e80:
 
-Alan
+  Merge branch 'for-5.19/io_uring-xattr' into for-next (2022-04-04 17:59:51 -0600)
 
+are available in the Git repository at:
+
+  https://github.com/LINBIT/linux-drbd.git tags/drbd-5.19-2022-04-06
+
+for you to fetch changes up to 7e4d200ceb13f404ab4f9332c81abb2c260eeff9:
+
+  drbd: Return true/false (not 1/0) from bool functions (2022-04-06 09:06:27 +0200)
+
+----------------------------------------------------------------
+Miscellaneous DRBD updates for Linux 5.19
+
+- return true/false instead of 1/0 from bool functions (Haowen Bai)
+- use kvfree_rcu instead of synchronize_rcu() followed by kvfree()
+  (Haowen Bai)
+- prefer "unsigned int" over "unsigned" (Cai Huoqing)
+- use the PFN_UP helper macro (Cai Huoqing)
+- remove a redundant assignment (Jiapeng Chong)
+- fix type mismatches for netlink return codes (Arnd Bergmann)
+- fix array initializers for cmdnames (Arnd Bergmann)
+
+----------------------------------------------------------------
+Arnd Bergmann (2):
+      drbd: fix duplicate array initializer
+      drbd: address enum mismatch warnings
+
+Cai Huoqing (2):
+      drbd: Make use of PFN_UP helper macro
+      drbd: Replace "unsigned" with "unsigned int"
+
+Haowen Bai (1):
+      drbd: Return true/false (not 1/0) from bool functions
+
+Jiapeng Chong (1):
+      block: drbd: drbd_receiver: Remove redundant assignment to err
+
+Uladzislau Rezki (Sony) (1):
+      drdb: Switch to kvfree_rcu() API
+
+ drivers/block/drbd/drbd_bitmap.c   |  2 +-
+ drivers/block/drbd/drbd_main.c     | 11 ++++++-----
+ drivers/block/drbd/drbd_nl.c       | 33 ++++++++++++++++-----------------
+ drivers/block/drbd/drbd_receiver.c | 15 ++++++---------
+ drivers/block/drbd/drbd_req.c      |  2 +-
+ drivers/block/drbd/drbd_state.c    |  3 +--
+ drivers/block/drbd/drbd_worker.c   |  2 +-
+ 7 files changed, 32 insertions(+), 36 deletions(-)
