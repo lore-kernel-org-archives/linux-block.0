@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57035C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 17:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B09B5C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  6 Apr 2022 17:28:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239243AbiDFRaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 13:30:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37476 "EHLO
+        id S239079AbiDFRaO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 13:30:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239177AbiDFR37 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 13:29:59 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDCBB6377
-        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 08:32:59 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id s8so2746564pfk.12
-        for <linux-block@vger.kernel.org>; Wed, 06 Apr 2022 08:32:59 -0700 (PDT)
+        with ESMTP id S239095AbiDFRaF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 13:30:05 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5194A1B2C46
+        for <linux-block@vger.kernel.org>; Wed,  6 Apr 2022 08:33:05 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id f3so2794305pfe.2
+        for <linux-block@vger.kernel.org>; Wed, 06 Apr 2022 08:33:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=QUWEtqdcs6FvknA2cur3eZm3P9mBxM8axKf5gzGdnMg=;
-        b=LUeQ9OYBL0Z2v3DhtaxJaz4oaaf4bdyZcBECl0nfDraADBw3KtJeGPRDCl0OwzOkN3
-         G2Y9rBB1eyQ2GKCjpS0U6ew5Wzq4xOtmxjXdBmp8YNzdPFS5YGVcnlUjS6ompLkzvmV0
-         gQhSupzZyB4zfu8StdkBFCM4rSk8p/yLmPL9tm6m2ganYTFHDL7rZ4PFBDsVbIvzxK1A
-         lX6ksQqICCzb5FJYHvgxufQPthuheCiU7anydOiMYpSpuaeHojDhy8splNLSNgY0JDhr
-         hmbXJdmOR22C+aBrUhA/dIyDcVzUtJZssMWqFaNXHLXKi22yfAs+XZpuDmTpRuKRolum
-         YjOg==
+        bh=SUZaMqlIZslqTIAvp50tjNzPRTlwW0v6s6z7ljz2x04=;
+        b=SyK4W1aNuYA/zPaey9m6E0e/QHjNc9/UVcQCe2OBeb21losYNrtfYrq6T8Pr36dJAx
+         ENn5Oee2uy8flEagL+mCAtb4g6wiO0xI9ctCePDLrcAnDkwfGOik/aPpan96ZtJcaoO8
+         buTmHDwWImTNJIYLdvOaX7S4SQr/9DurJ/ZthGar96ffWDQeUx4GFfiQKCdpFEJezv3b
+         mvfaclSNkKquwKfFfMlUtxrw6u2eOfpp7NUdhEE7FxyTH34qdevkz3OauLiSEcw45JhB
+         rbK7Nn6WgKnnY3k3b17vQFmMy2+qssAArQccnNHzXdugFA80HVH0KtueutGbBtwYaR7u
+         bMZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=QUWEtqdcs6FvknA2cur3eZm3P9mBxM8axKf5gzGdnMg=;
-        b=djGzzyeuvb2E396d633rdOQk+jviRzhTTQJc/y1aajR4x89UApPT3yosWIVrHSX3Ld
-         gNdTHjRuSd83qlCzlerIfU2AWdBmFhde8EuCGfu8rxR91KlbnZzRmC2gQphAkcGQ7Qh5
-         a7ddZJag8E6eV0Tum77NhkogedWOpIczxLO7if6DhZXj09hdsOCHzDKvyvD2XrDtXveW
-         E5UYAz+J/me0wpclTcbVgQqMVFr2ctVuoB1EfG4ZorA98mH3XvX1/L+Lj8QLY2gNRTMv
-         ETZCpdUVx//tSkFoJrX8VpVBlJTIZF6fOG/LqVas05auer4PutD7Y6PVJrXbH33wk9iB
-         0ZAQ==
-X-Gm-Message-State: AOAM533mQ/2/Hetp4GxFWQcsH0ZmHXL8Vgf8VHZPlKG9beu/ElhNAKUO
-        10aFLGQkGcK+pmYkyZRgBEg=
-X-Google-Smtp-Source: ABdhPJywoNHApXu0f+gXiyPKYqHCxiJrSe2lvaLbTGseuTPrQ/J7vZlwUP3sFtQ5VZt1OOnfZZu7vQ==
-X-Received: by 2002:a05:6a00:22d2:b0:4fa:9d26:bc5d with SMTP id f18-20020a056a0022d200b004fa9d26bc5dmr9464501pfj.79.1649259179418;
-        Wed, 06 Apr 2022 08:32:59 -0700 (PDT)
+        bh=SUZaMqlIZslqTIAvp50tjNzPRTlwW0v6s6z7ljz2x04=;
+        b=fqU0+gg7WzTIGTng84tU0NHddVxP8iMNdvMcVLnslYbksHexx0N8HQTWhpZDezk8GN
+         qBta/RtGVGsZqcU4S0E0DuFNuzoDJ3wdAGhSHiONRPpBQnwPHMMu6wD/ZIx0QfIwUoqt
+         Hc57VG/7oh1t5hMVhq9ooKXdMbxuS0znNERyI1LZHEK9/UTFtj7mc9KouXprzQs3EDQE
+         KD5m8XtBFzyjgD+SMlbKvY/J+rxno4xMkl6Sntb6NoHt/q3YB4kdjZ82G7cCVbo57OAy
+         vTphmJj2Ez7ZKH7JU6LZcqm3b6WD/Fww6yiXEYJJcClosnlg03sYRXKEAtDfUPiYvOyS
+         2/aQ==
+X-Gm-Message-State: AOAM530aHPoaU5B4yZ0IxuN73HaeAR0ENHuf1qhV3BFCdYA0Uehcdw5D
+        Anqfu2FqgocqqHB17cOqI1w=
+X-Google-Smtp-Source: ABdhPJzuhccBeWETUUETOeLWJw5Aqz2446WFQYJIKw7lFhVZQP4Jwldbynm8zkTaFq7dhEz3gB/IHw==
+X-Received: by 2002:a63:5051:0:b0:374:5fd0:f131 with SMTP id q17-20020a635051000000b003745fd0f131mr7659331pgl.431.1649259184697;
+        Wed, 06 Apr 2022 08:33:04 -0700 (PDT)
 Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.googlemail.com with ESMTPSA id f31-20020a17090a702200b001ca996866b5sm6024037pjk.12.2022.04.06.08.32.55
+        by smtp.googlemail.com with ESMTPSA id f31-20020a17090a702200b001ca996866b5sm6024037pjk.12.2022.04.06.08.33.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Apr 2022 08:32:58 -0700 (PDT)
+        Wed, 06 Apr 2022 08:33:03 -0700 (PDT)
 From:   Suwan Kim <suwan.kim027@gmail.com>
 To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
         pbonzini@redhat.com, mgurtovoy@nvidia.com, dongli.zhang@oracle.com,
@@ -54,9 +54,9 @@ To:     mst@redhat.com, jasowang@redhat.com, stefanha@redhat.com,
 Cc:     virtualization@lists.linux-foundation.org,
         linux-block@vger.kernel.org, Suwan Kim <suwan.kim027@gmail.com>,
         Christoph Hellwig <hch@lst.de>
-Subject: [PATCH v6 1/2] virtio-blk: support polling I/O
-Date:   Thu,  7 Apr 2022 00:32:06 +0900
-Message-Id: <20220406153207.163134-2-suwan.kim027@gmail.com>
+Subject: [PATCH v6 2/2] virtio-blk: support mq_ops->queue_rqs()
+Date:   Thu,  7 Apr 2022 00:32:07 +0900
+Message-Id: <20220406153207.163134-3-suwan.kim027@gmail.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20220406153207.163134-1-suwan.kim027@gmail.com>
 References: <20220406153207.163134-1-suwan.kim027@gmail.com>
@@ -66,238 +66,220 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch supports polling I/O via virtio-blk driver. Polling
-feature is enabled by module parameter "poll_queues" and it sets
-dedicated polling queues for virtio-blk. This patch improves the
-polling I/O throughput and latency.
+This patch supports mq_ops->queue_rqs() hook. It has an advantage of
+batch submission to virtio-blk driver. It also helps polling I/O because
+polling uses batched completion of block layer. Batch submission in
+queue_rqs() can boost polling performance.
 
-The virtio-blk driver doesn't not have a poll function and a poll
-queue and it has been operating in interrupt driven method even if
-the polling function is called in the upper layer.
+In queue_rqs(), it iterates plug->mq_list, collects requests that
+belong to same HW queue until it encounters a request from other
+HW queue or sees the end of the list.
+Then, virtio-blk adds requests into virtqueue and kicks virtqueue
+to submit requests.
 
-virtio-blk polling is implemented upon 'batched completion' of block
-layer. virtblk_poll() queues completed request to io_comp_batch->req_list
-and later, virtblk_complete_batch() calls unmap function and ends
-the requests in batch.
+If there is an error, it inserts error request to requeue_list and
+passes it to ordinary block layer path.
 
-virtio-blk reads the number of poll queues from module parameter
-"poll_queues". If VM sets queue parameter as below,
-("num-queues=N" [QEMU property], "poll_queues=M" [module parameter])
-It allocates N virtqueues to virtio_blk->vqs[N] and it uses [0..(N-M-1)]
-as default queues and [(N-M)..(N-1)] as poll queues. Unlike the default
-queues, the poll queues have no callback function.
+For verification, I did fio test.
+(io_uring, randread, direct=1, bs=4K, iodepth=64 numjobs=N)
+I set 4 vcpu and 2 virtio-blk queues for VM and run fio test 5 times.
+It shows about 2% improvement.
 
-Regarding HW-SW queue mapping, the default queue mapping uses the
-existing method that condsiders MSI irq vector. But the poll queue
-doesn't have an irq, so it uses the regular blk-mq cpu mapping.
+                                 |   numjobs=2   |   numjobs=4
+      -----------------------------------------------------------
+        fio without queue_rqs()  |   291K IOPS   |   238K IOPS
+      -----------------------------------------------------------
+        fio with queue_rqs()     |   295K IOPS   |   243K IOPS
 
-For verifying the improvement, I did Fio polling I/O performance test
-with io_uring engine with the options below.
-(io_uring, hipri, randread, direct=1, bs=512, iodepth=64 numjobs=N)
-I set 4 vcpu and 4 virtio-blk queues - 2 default queues and 2 poll
-queues for VM.
+For polling I/O performance, I also did fio test as below.
+(io_uring, hipri, randread, direct=1, bs=512, iodepth=64 numjobs=4)
+I set 4 vcpu and 2 poll queues for VM.
+It shows about 2% improvement in polling I/O.
 
-As a result, IOPS and average latency improved about 10%.
-
-Test result:
-
-- Fio io_uring poll without virtio-blk poll support
-	-- numjobs=1 : IOPS = 339K, avg latency = 188.33us
-	-- numjobs=2 : IOPS = 367K, avg latency = 347.33us
-	-- numjobs=4 : IOPS = 383K, avg latency = 682.06us
-
-- Fio io_uring poll with virtio-blk poll support
-	-- numjobs=1 : IOPS = 385K, avg latency = 165.94us
-	-- numjobs=2 : IOPS = 408K, avg latency = 313.28us
-	-- numjobs=4 : IOPS = 424K, avg latency = 613.05us
+                                      |   IOPS   |  avg latency
+      -----------------------------------------------------------
+        fio poll without queue_rqs()  |   424K   |   613.05 usec
+      -----------------------------------------------------------
+        fio poll with queue_rqs()     |   435K   |   601.01 usec
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
 Signed-off-by: Suwan Kim <suwan.kim027@gmail.com>
 ---
- drivers/block/virtio_blk.c | 106 +++++++++++++++++++++++++++++++++++--
- 1 file changed, 103 insertions(+), 3 deletions(-)
+ drivers/block/virtio_blk.c | 114 +++++++++++++++++++++++++++++++------
+ 1 file changed, 98 insertions(+), 16 deletions(-)
 
 diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index a8bcf3f664af..957e15b87651 100644
+index 957e15b87651..924a1cd6cdca 100644
 --- a/drivers/block/virtio_blk.c
 +++ b/drivers/block/virtio_blk.c
-@@ -37,6 +37,10 @@ MODULE_PARM_DESC(num_request_queues,
- 		 "0 for no limit. "
- 		 "Values > nr_cpu_ids truncated to nr_cpu_ids.");
- 
-+static unsigned int poll_queues;
-+module_param(poll_queues, uint, 0644);
-+MODULE_PARM_DESC(poll_queues, "The number of dedicated virtqueues for polling I/O");
-+
- static int major;
- static DEFINE_IDA(vd_index_ida);
- 
-@@ -74,6 +78,7 @@ struct virtio_blk {
- 
- 	/* num of vqs */
- 	int num_vqs;
-+	int io_queues[HCTX_MAX_TYPES];
- 	struct virtio_blk_vq *vqs;
- };
- 
-@@ -512,6 +517,7 @@ static int init_vq(struct virtio_blk *vblk)
- 	const char **names;
- 	struct virtqueue **vqs;
- 	unsigned short num_vqs;
-+	unsigned int num_poll_vqs;
- 	struct virtio_device *vdev = vblk->vdev;
- 	struct irq_affinity desc = { 0, };
- 
-@@ -520,6 +526,7 @@ static int init_vq(struct virtio_blk *vblk)
- 				   &num_vqs);
- 	if (err)
- 		num_vqs = 1;
-+
- 	if (!err && !num_vqs) {
- 		dev_err(&vdev->dev, "MQ advertised but zero queues reported\n");
- 		return -EINVAL;
-@@ -529,6 +536,17 @@ static int init_vq(struct virtio_blk *vblk)
- 			min_not_zero(num_request_queues, nr_cpu_ids),
- 			num_vqs);
- 
-+	num_poll_vqs = min_t(unsigned int, poll_queues, num_vqs - 1);
-+
-+	vblk->io_queues[HCTX_TYPE_DEFAULT] = num_vqs - num_poll_vqs;
-+	vblk->io_queues[HCTX_TYPE_READ] = 0;
-+	vblk->io_queues[HCTX_TYPE_POLL] = num_poll_vqs;
-+
-+	dev_info(&vdev->dev, "%d/%d/%d default/read/poll queues\n",
-+				vblk->io_queues[HCTX_TYPE_DEFAULT],
-+				vblk->io_queues[HCTX_TYPE_READ],
-+				vblk->io_queues[HCTX_TYPE_POLL]);
-+
- 	vblk->vqs = kmalloc_array(num_vqs, sizeof(*vblk->vqs), GFP_KERNEL);
- 	if (!vblk->vqs)
- 		return -ENOMEM;
-@@ -541,12 +559,18 @@ static int init_vq(struct virtio_blk *vblk)
- 		goto out;
+@@ -101,8 +101,7 @@ static inline blk_status_t virtblk_result(struct virtblk_req *vbr)
  	}
+ }
  
--	for (i = 0; i < num_vqs; i++) {
-+	for (i = 0; i < num_vqs - num_poll_vqs; i++) {
- 		callbacks[i] = virtblk_done;
- 		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req.%d", i);
- 		names[i] = vblk->vqs[i].name;
- 	}
- 
-+	for (; i < num_vqs; i++) {
-+		callbacks[i] = NULL;
-+		snprintf(vblk->vqs[i].name, VQ_NAME_LEN, "req_poll.%d", i);
-+		names[i] = vblk->vqs[i].name;
-+	}
-+
- 	/* Discover virtqueues and write information to configuration.  */
- 	err = virtio_find_vqs(vdev, num_vqs, vqs, callbacks, names, &desc);
- 	if (err)
-@@ -692,16 +716,89 @@ static const struct attribute_group *virtblk_attr_groups[] = {
- static int virtblk_map_queues(struct blk_mq_tag_set *set)
+-static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+-		struct scatterlist *data_sg, bool have_data)
++static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
  {
- 	struct virtio_blk *vblk = set->driver_data;
-+	int i, qoff;
-+
-+	for (i = 0, qoff = 0; i < set->nr_maps; i++) {
-+		struct blk_mq_queue_map *map = &set->map[i];
-+
-+		map->nr_queues = vblk->io_queues[i];
-+		map->queue_offset = qoff;
-+		qoff += map->nr_queues;
-+
-+		if (map->nr_queues == 0)
-+			continue;
-+
-+		/*
-+		 * Regular queues have interrupts and hence CPU affinity is
-+		 * defined by the core virtio code, but polling queues have
-+		 * no interrupts so we let the block layer assign CPU affinity.
-+		 */
-+		if (i == HCTX_TYPE_POLL)
-+			blk_mq_map_queues(&set->map[i]);
-+		else
-+			blk_mq_virtio_map_queues(&set->map[i], vblk->vdev, 0);
-+	}
-+
-+	return 0;
-+}
-+
-+static void virtblk_complete_batch(struct io_comp_batch *iob)
-+{
-+	struct request *req;
+ 	struct scatterlist hdr, status, *sgs[3];
+ 	unsigned int num_out = 0, num_in = 0;
+@@ -110,11 +109,11 @@ static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr,
+ 	sg_init_one(&hdr, &vbr->out_hdr, sizeof(vbr->out_hdr));
+ 	sgs[num_out++] = &hdr;
  
--	return blk_mq_virtio_map_queues(&set->map[HCTX_TYPE_DEFAULT],
--					vblk->vdev, 0);
-+	rq_list_for_each(&iob->req_list, req) {
-+		virtblk_unmap_data(req, blk_mq_rq_to_pdu(req));
+-	if (have_data) {
++	if (vbr->sg_table.nents) {
+ 		if (vbr->out_hdr.type & cpu_to_virtio32(vq->vdev, VIRTIO_BLK_T_OUT))
+-			sgs[num_out++] = data_sg;
++			sgs[num_out++] = vbr->sg_table.sgl;
+ 		else
+-			sgs[num_out + num_in++] = data_sg;
++			sgs[num_out + num_in++] = vbr->sg_table.sgl;
+ 	}
+ 
+ 	sg_init_one(&status, &vbr->status, sizeof(vbr->status));
+@@ -304,6 +303,28 @@ static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
+ 		virtqueue_notify(vq->vq);
+ }
+ 
++static blk_status_t virtblk_prep_rq(struct blk_mq_hw_ctx *hctx,
++					struct virtio_blk *vblk,
++					struct request *req,
++					struct virtblk_req *vbr)
++{
++	blk_status_t status;
++
++	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
++	if (unlikely(status))
++		return status;
++
++	blk_mq_start_request(req);
++
++	vbr->sg_table.nents = virtblk_map_data(hctx, req, vbr);
++	if (unlikely(vbr->sg_table.nents < 0)) {
 +		virtblk_cleanup_cmd(req);
++		return BLK_STS_RESOURCE;
 +	}
-+	blk_mq_end_request_batch(iob);
++
++	return BLK_STS_OK;
 +}
 +
-+static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
+ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 			   const struct blk_mq_queue_data *bd)
+ {
+@@ -311,26 +332,17 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	struct request *req = bd->rq;
+ 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
+ 	unsigned long flags;
+-	int num;
+ 	int qid = hctx->queue_num;
+ 	bool notify = false;
+ 	blk_status_t status;
+ 	int err;
+ 
+-	status = virtblk_setup_cmd(vblk->vdev, req, vbr);
++	status = virtblk_prep_rq(hctx, vblk, req, vbr);
+ 	if (unlikely(status))
+ 		return status;
+ 
+-	blk_mq_start_request(req);
+-
+-	num = virtblk_map_data(hctx, req, vbr);
+-	if (unlikely(num < 0)) {
+-		virtblk_cleanup_cmd(req);
+-		return BLK_STS_RESOURCE;
+-	}
+-
+ 	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
+-	err = virtblk_add_req(vblk->vqs[qid].vq, vbr, vbr->sg_table.sgl, num);
++	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
+ 	if (err) {
+ 		virtqueue_kick(vblk->vqs[qid].vq);
+ 		/* Don't stop the queue if -ENOMEM: we may have failed to
+@@ -360,6 +372,75 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
+ 	return BLK_STS_OK;
+ }
+ 
++static bool virtblk_prep_rq_batch(struct request *req)
 +{
-+	struct virtio_blk *vblk = hctx->queue->queuedata;
-+	struct virtio_blk_vq *vq = hctx->driver_data;
-+	struct virtblk_req *vbr;
++	struct virtio_blk *vblk = req->mq_hctx->queue->queuedata;
++	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
++
++	req->mq_hctx->tags->rqs[req->tag] = req;
++
++	return virtblk_prep_rq(req->mq_hctx, vblk, req, vbr) == BLK_STS_OK;
++}
++
++static bool virtblk_add_req_batch(struct virtio_blk_vq *vq,
++					struct request **rqlist,
++					struct request **requeue_list)
++{
 +	unsigned long flags;
-+	unsigned int len;
-+	int found = 0;
++	int err;
++	bool kick;
 +
 +	spin_lock_irqsave(&vq->lock, flags);
 +
-+	while ((vbr = virtqueue_get_buf(vq->vq, &len)) != NULL) {
-+		struct request *req = blk_mq_rq_from_pdu(vbr);
++	while (!rq_list_empty(*rqlist)) {
++		struct request *req = rq_list_pop(rqlist);
++		struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
 +
-+		found++;
-+		if (!blk_mq_add_to_batch(req, iob, vbr->status,
-+						virtblk_complete_batch))
-+			blk_mq_complete_request(req);
++		err = virtblk_add_req(vq->vq, vbr);
++		if (err) {
++			virtblk_unmap_data(req, vbr);
++			virtblk_cleanup_cmd(req);
++			rq_list_add(requeue_list, req);
++		}
 +	}
 +
-+	if (found)
-+		blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
-+
++	kick = virtqueue_kick_prepare(vq->vq);
 +	spin_unlock_irqrestore(&vq->lock, flags);
 +
-+	return found;
++	return kick;
 +}
 +
-+static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-+			  unsigned int hctx_idx)
++static void virtio_queue_rqs(struct request **rqlist)
 +{
-+	struct virtio_blk *vblk = data;
-+	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
++	struct request *req, *next, *prev = NULL;
++	struct request *requeue_list = NULL;
 +
-+	WARN_ON(vblk->tag_set.tags[hctx_idx] != hctx->tags);
-+	hctx->driver_data = vq;
-+	return 0;
- }
++	rq_list_for_each_safe(rqlist, req, next) {
++		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
++		bool kick;
++
++		if (!virtblk_prep_rq_batch(req)) {
++			rq_list_move(rqlist, &requeue_list, req, prev);
++			req = prev;
++			if (!req)
++				continue;
++		}
++
++		if (!next || req->mq_hctx != next->mq_hctx) {
++			req->rq_next = NULL;
++			kick = virtblk_add_req_batch(vq, rqlist, &requeue_list);
++			if (kick)
++				virtqueue_notify(vq->vq);
++
++			*rqlist = next;
++			prev = NULL;
++		} else
++			prev = req;
++	}
++
++	*rqlist = requeue_list;
++}
++
+ /* return id (s/n) string for *disk to *id_str
+  */
+ static int virtblk_get_id(struct gendisk *disk, char *id_str)
+@@ -794,6 +875,7 @@ static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
  
  static const struct blk_mq_ops virtio_mq_ops = {
  	.queue_rq	= virtio_queue_rq,
++	.queue_rqs	= virtio_queue_rqs,
  	.commit_rqs	= virtio_commit_rqs,
-+	.init_hctx	= virtblk_init_hctx,
+ 	.init_hctx	= virtblk_init_hctx,
  	.complete	= virtblk_request_done,
- 	.map_queues	= virtblk_map_queues,
-+	.poll		= virtblk_poll,
- };
- 
- static unsigned int virtblk_queue_depth;
-@@ -778,6 +875,9 @@ static int virtblk_probe(struct virtio_device *vdev)
- 		sizeof(struct scatterlist) * VIRTIO_BLK_INLINE_SG_CNT;
- 	vblk->tag_set.driver_data = vblk;
- 	vblk->tag_set.nr_hw_queues = vblk->num_vqs;
-+	vblk->tag_set.nr_maps = 1;
-+	if (vblk->io_queues[HCTX_TYPE_POLL])
-+		vblk->tag_set.nr_maps = 3;
- 
- 	err = blk_mq_alloc_tag_set(&vblk->tag_set);
- 	if (err)
 -- 
 2.26.3
 
