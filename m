@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2E19C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 01:19:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88792C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 01:19:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238807AbiDGBVq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 6 Apr 2022 21:21:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
+        id S238496AbiDGBVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 6 Apr 2022 21:21:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240524AbiDGBUD (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 21:20:03 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A17215B85B;
-        Wed,  6 Apr 2022 18:18:02 -0700 (PDT)
+        with ESMTP id S240498AbiDGBUC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 6 Apr 2022 21:20:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0992FAAB5A;
+        Wed,  6 Apr 2022 18:17:39 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8B04A61DA8;
-        Thu,  7 Apr 2022 01:18:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1CA1C385A7;
-        Thu,  7 Apr 2022 01:18:00 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id B0F8DB8268C;
+        Thu,  7 Apr 2022 01:17:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69954C385A1;
+        Thu,  7 Apr 2022 01:17:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1649294282;
-        bh=6jNmCwqW0fu4CPFR3J5FzbGjeFGMlP2sKf6skwD6jqA=;
+        s=k20201202; t=1649294256;
+        bh=UQmEn963an1N+8324q6nVW42Vd6cGd++y0TYi1GY9Vo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Asu9K+l3LEMeieAYMciFHQsAM9+JPSmRYaxUDeQlu8FsQGi0gM2/7xxvsK8ZUaQXP
-         EN1SPPT6kewY4zmjmlAPV9PBQF27mf2izegOPGU2l5rbzGOxfQyRj7JKZq7GY4tMW/
-         m6rdAhBWeqLA1B/1gz9ZuMCqimK2NtqixsgWcxhmjTBGo3JjvijXKaNMlQGXxhckJc
-         7PJIfz1ajHHFxROrUAHlYK6R6vNLe8BN8/hbjLFsmcBBzjQ5rbzj5qm6FaNr1pygJ7
-         Vz8pwVf7gLsYi2hs+cTJHClf8rSz0QG5TXUL8VMvLSVHk2wXMu87Thz340MkP4nyP8
-         FALCU8RKzWsFg==
+        b=V2nn+8AWgMU/UvMnl5M73iHmAu/4OdJj3K5v3AyVLS/4iisjss0EQesqn9Mt6Yo4J
+         O5TV1CNa6B57SBrwbAUJmN7l750dTONz7Ws+2QACkBrGtfdEH3II2HMrGG9J0cgtw+
+         80GJQARPsP70dPvmWnnTipJMbP0gh1j+KXzTPJvpAV5OvJMldHSz3o2xM7HbuyHw8s
+         +mqJum3JSsoODVpmBDdrkv4wJqRNOLdJc5xPp2AOkke8z97zIY5qAmhELRzbsMKDO7
+         NNtWxiMxMmp7bjItBoUchwA0au+yWwwsetDmJ4eBwnjGHYOxh1864LheA57H8S2XI7
+         TXX5TaCTfaaFA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
@@ -38,12 +38,12 @@ Cc:     Jakob Koschel <jakobkoschel@gmail.com>,
         philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
         christoph.boehmwalder@linbit.com, drbd-dev@lists.linbit.com,
         linux-block@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 6/7] drbd: remove usage of list iterator variable after loop
-Date:   Wed,  6 Apr 2022 21:17:39 -0400
-Message-Id: <20220407011740.115717-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 7/8] drbd: remove usage of list iterator variable after loop
+Date:   Wed,  6 Apr 2022 21:16:44 -0400
+Message-Id: <20220407011645.115412-7-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220407011740.115717-1-sashal@kernel.org>
-References: <20220407011740.115717-1-sashal@kernel.org>
+In-Reply-To: <20220407011645.115412-1-sashal@kernel.org>
+References: <20220407011645.115412-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -76,10 +76,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-index daa9cef96ec6..f4537a5eef02 100644
+index b998e3abca7a..1e02cb60b65b 100644
 --- a/drivers/block/drbd/drbd_main.c
 +++ b/drivers/block/drbd/drbd_main.c
-@@ -193,7 +193,7 @@ void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
+@@ -195,7 +195,7 @@ void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
  		unsigned int set_size)
  {
  	struct drbd_request *r;
@@ -88,7 +88,7 @@ index daa9cef96ec6..f4537a5eef02 100644
  	int expect_epoch = 0;
  	int expect_size = 0;
  
-@@ -247,8 +247,11 @@ void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
+@@ -249,8 +249,11 @@ void tl_release(struct drbd_connection *connection, unsigned int barrier_nr,
  	 * to catch requests being barrier-acked "unexpectedly".
  	 * It usually should find the same req again, or some READ preceding it. */
  	list_for_each_entry(req, &connection->transfer_log, tl_requests)
