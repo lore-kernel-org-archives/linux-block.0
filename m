@@ -2,114 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC61C433F5
-	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 14:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F760C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 14:32:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242088AbiDGOTc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Apr 2022 10:19:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55660 "EHLO
+        id S1344010AbiDGOeX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Apr 2022 10:34:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231286AbiDGOTa (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 10:19:30 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C9D182AC1;
-        Thu,  7 Apr 2022 07:17:31 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 61C2D1F85F;
-        Thu,  7 Apr 2022 14:07:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1649340469; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=ZeyhWDWe3VQJDbVFe6ALa/xuqG9ur0lFXdtYBiNjvF4=;
-        b=rNJj0vahzMBzkVeyWABeOvfPZ+gwVL8jFq73tfory1t83lvPjPrMYYUj9+ERa0LDE5U2Hl
-        CMj29hnmoIcBKkCmv+XiJxJEJIwkRSYbbYUGK7l0bDhsjEiooqQrXU/ZRZAD/TQnIcDFNA
-        qCVaN1J+377XNAW4LHylAlY+NVrQlAY=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1649340469;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-        bh=ZeyhWDWe3VQJDbVFe6ALa/xuqG9ur0lFXdtYBiNjvF4=;
-        b=6Umfv4ZjAG6g9cUpr3+QcujVZ0SXQLjgqSR9cnSlZ8OyjGkgoFVwmgYjSKaVVwe2ZqiuRP
-        NzzsfptJqx1yy+DQ==
-Received: from quack3.suse.cz (unknown [10.163.43.118])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 3C54DA3B87;
-        Thu,  7 Apr 2022 14:07:49 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id C5863A061A; Thu,  7 Apr 2022 16:07:48 +0200 (CEST)
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Chris Murphy <lists@colorremedies.com>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH] bfq: Fix warning in bfqq_request_over_limit()
-Date:   Thu,  7 Apr 2022 16:07:38 +0200
-Message-Id: <20220407140738.9723-1-jack@suse.cz>
-X-Mailer: git-send-email 2.34.1
+        with ESMTP id S1344006AbiDGOeW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 10:34:22 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9688D198526;
+        Thu,  7 Apr 2022 07:32:12 -0700 (PDT)
+Received: from fraeml707-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KZ3gw30svz681Z4;
+        Thu,  7 Apr 2022 22:30:20 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml707-chm.china.huawei.com (10.206.15.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 7 Apr 2022 16:32:10 +0200
+Received: from [10.47.80.129] (10.47.80.129) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 7 Apr
+ 2022 15:32:09 +0100
+Message-ID: <3e1914a8-5f6b-8fcf-7fb3-2d1edb9766e1@huawei.com>
+Date:   Thu, 7 Apr 2022 15:32:07 +0100
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2227; h=from:subject; bh=RGBELGd9kRiiBqyO8iLOf/EMYrWHMTI9dTyXfqVDzHw=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBiTvAj+ioUFsElYUHwAQ0Gjj0yDsHmUM8Nv8iHKzOT Y/4aL8qJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYk7wIwAKCRCcnaoHP2RA2VXgCA CJh7DB3gmlXPCQBvwW5OXLtIiPwN4fui2KYgLJM2UktZcajLfOq+kq888HYbqClId2sv/ztqgTfNlK aF6NwMq61KVoOQYz6fNRCcO2HObts2jNvJ3fvYdkGAtSDqI8jqgJz8d4eBTyskblpnWet6tOhDUMwe Lm8mf4LIIvPYfaJ1mICkKHZB+j4IhWnb/kFJtyq/j/Hn8A9iNkCcMI+un3Wo4APd9jGBQyKFJLrqCx zFbBjvr0b9bGHf5OupDNEmSCNGEMXCp2PwQ5NW7nqLJuqAreiVcd6/QlyNcqfYxnMT8Lrwr8LlCD7z dzjvOFEMdd5IJLYNh0gQoHmXa14veV
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH 03/11] libata: Send internal commands through the block
+ layer
+To:     Christoph Hellwig <hch@lst.de>
+CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
+        <bvanassche@acm.org>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <ming.lei@redhat.com>,
+        <hare@suse.de>, <chenxiang66@hisilicon.com>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-ide@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <dm-devel@redhat.com>, <beanhuo@micron.com>
+References: <1647945585-197349-1-git-send-email-john.garry@huawei.com>
+ <1647945585-197349-4-git-send-email-john.garry@huawei.com>
+ <20220322112057.GC29270@lst.de>
+In-Reply-To: <20220322112057.GC29270@lst.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.80.129]
+X-ClientProxiedBy: lhreml728-chm.china.huawei.com (10.201.108.79) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-People are occasionally reporting a warning bfqq_request_over_limit()
-triggering reporting that BFQ's idea of cgroup hierarchy (and its depth)
-does not match what generic blkcg code thinks. This can actually happen
-when bfqq gets moved between BFQ groups while bfqq_request_over_limit()
-is running. Make sure the code is safe against BFQ queue being moved to
-a different BFQ group.
+On 22/03/2022 11:20, Christoph Hellwig wrote:
+> On Tue, Mar 22, 2022 at 06:39:37PM +0800, John Garry wrote:
+>> When SCSI HBA device drivers are required to process an ATA internal
+>> command they still need a tag for the IO. This often requires the driver
+>> to set aside a set of tags for these sorts of IOs and manage the tags
+>> themselves.
+>>
+>> If we associate a SCSI command (and request) with an ATA internal command
+>> then the tag is already provided, so introduce the change to send ATA
+>> internal commands through the block layer with a set of custom blk-mq ops.
+>>
+>> note: I think that the timeout handling needs to be fixed up.
 
-Fixes: 76f1df88bbc2 ("bfq: Limit number of requests consumed by each cgroup")
-CC: stable@vger.kernel.org
-Link: https://lore.kernel.org/all/CAJCQCtTw_2C7ZSz7as5Gvq=OmnDiio=HRkQekqWpKot84sQhFA@mail.gmail.com/
-Reported-by: Chris Murphy <lists@colorremedies.com>
-Reported-by: "yukuai (C)" <yukuai3@huawei.com>
-Signed-off-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+Hi Christoph,
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index e47c75f1fa0f..272d48d8f326 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -569,7 +569,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
- 	struct bfq_entity *entity = &bfqq->entity;
- 	struct bfq_entity *inline_entities[BFQ_LIMIT_INLINE_DEPTH];
- 	struct bfq_entity **entities = inline_entities;
--	int depth, level;
-+	int depth, level, alloc_depth = BFQ_LIMIT_INLINE_DEPTH;
- 	int class_idx = bfqq->ioprio_class - 1;
- 	struct bfq_sched_data *sched_data;
- 	unsigned long wsum;
-@@ -578,15 +578,21 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
- 	if (!entity->on_st_or_in_serv)
- 		return false;
- 
-+retry:
-+	spin_lock_irq(&bfqd->lock);
- 	/* +1 for bfqq entity, root cgroup not included */
- 	depth = bfqg_to_blkg(bfqq_group(bfqq))->blkcg->css.cgroup->level + 1;
--	if (depth > BFQ_LIMIT_INLINE_DEPTH) {
-+	if (depth > alloc_depth) {
-+		spin_unlock_irq(&bfqd->lock);
-+		if (entities != inline_entities)
-+			kfree(entities);
- 		entities = kmalloc_array(depth, sizeof(*entities), GFP_NOIO);
- 		if (!entities)
- 			return false;
-+		alloc_depth = depth;
-+		goto retry;
- 	}
- 
--	spin_lock_irq(&bfqd->lock);
- 	sched_data = entity->sched_data;
- 	/* Gather our ancestors as we need to traverse them in reverse order */
- 	level = 0;
--- 
-2.34.1
+> Any reason to not just send them through an ATA_16 passthrough CDB and
+> just use all the normal SCSI command handling?
 
+I had a go at implementing this but I have come up against a few issues:
+
+- ATA_16 handling translates the passthrough CDB to a ATA TF. However 
+ata_exec_internal_sg() is passed a TF already. So what to do? Change the 
+callers to generate a ATA_16 CDB? I guess not. Otherwise we could put 
+the already-generated TF in the SCSI cmd CDB somehow and use directly.
+
+- We may have no SCSI device (yet) for the target when issuing an 
+internal command, but only the ATA port+dev. So need a method to pass 
+these pointers to ATA_16 handling
+
+- we would need to change ata_scsi_translate(), ata_scsi_pass_thru() and 
+other friends to deal with ATA_TAG_INTERNAL and its peculiarities - 
+today it just deals with regular qc's.
+
+It still does seem a reasonable idea to use ATA_16, but it looks like 
+significant modifications would be required....
+
+Thanks,
+John
