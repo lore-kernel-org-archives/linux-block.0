@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BD75C43217
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8F6C43219
 	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 17:28:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346303AbiDGRaE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Apr 2022 13:30:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47272 "EHLO
+        id S1346316AbiDGRaF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Apr 2022 13:30:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51896 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346527AbiDGR1k (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 13:27:40 -0400
+        with ESMTP id S1346494AbiDGR1e (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 13:27:34 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574D2104A7D;
-        Thu,  7 Apr 2022 10:23:51 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCD2AD43;
+        Thu,  7 Apr 2022 10:23:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=NVweqEcjCecZ0bg5dlWjMJWWbRBpQR845+naXv01S1E=; b=h2VvbNMMeOyfd9uAusM38USxqP
-        BFBKHX85h+K9Iouhc5J025ZGSoGwKIXCO7ojH7XY7YyHtqY+FxOrMiXktfFPC7gZLVbBq6QA4Qrqv
-        PwwUyHVKqeCbkzTZVPu2r1p/mePJAyTIMmfWusxrJqTms3K+wv/Mo3p/YBnQtsZcnxrkfsf90KZUZ
-        Xg1LT6yc0J5GbUL+iqWxGKdJq7/8uvyiNuLx7fcBLUIz5E8rLwHtHv/EBxJImTmU6jMWSTAQAZ2Sk
-        jcbEXGAMH4iMByypCuG9AOAn5Wdl8PTU5kKxepYadTEARhyeUEkfv3RDRU6GmNTMuzQ8V4aGuRy3/
-        YqtIYkZQ==;
+        bh=Ro5Q2HMUd1HfFndmJ8UruOv1XXFC1TCh+hCWqq4F5HI=; b=lNdxkLiyyrn3aS3xg/neZkhWSy
+        EQ/x8P103d73dG+E1L8gyXZXQahh/qSrQJ5E2iEr3HGbbjjb7dzGf6dxaWlJYS6KdU/r4qMDwRcfG
+        ys+2isPwYgL3Fssvb/g1EA2pA67VavH7fvDXrUi4r5tTa0HGXqDq5EbfzfsxhboyCOB/4brGpq4SS
+        isYKr1pYJiIdDpA/HKBV2mOII+PGWeDJQ7nBCw04HlT2YFgNF+I/TozmncDF0ycCTMS/+TZqwAC8a
+        hYZegZqwnM8JL4gP/ZvJCOgohvEMhqdXQxMe0MR9yRetlpxLKXYpyTIeqcY8Hg0tdilHMMEHWFXQL
+        fTM4xbZA==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1ncUMK-002BBg-28; Thu, 07 Apr 2022 09:47:44 -0600
+        id 1ncUML-002BBg-70; Thu, 07 Apr 2022 09:47:46 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1ncUME-000226-6k; Thu, 07 Apr 2022 09:47:38 -0600
+        id 1ncUMD-00021m-1Y; Thu, 07 Apr 2022 09:47:37 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -55,134 +55,222 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
-        Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu,  7 Apr 2022 09:47:11 -0600
-Message-Id: <20220407154717.7695-16-logang@deltatee.com>
+        Logan Gunthorpe <logang@deltatee.com>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+Date:   Thu,  7 Apr 2022 09:47:06 -0600
+Message-Id: <20220407154717.7695-11-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220407154717.7695-1-logang@deltatee.com>
 References: <20220407154717.7695-1-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
-X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, logang@deltatee.com, jhubbard@nvidia.com, rcampbell@nvidia.com, mgurtovoy@nvidia.com, kch@nvidia.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 15/21] iov_iter: introduce iov_iter_get_pages_[alloc_]flags()
+Subject: [PATCH v6 10/21] nvme-pci: convert to using dma_map_sgtable()
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add iov_iter_get_pages_flags() and iov_iter_get_pages_alloc_flags()
-which take a flags argument that is passed to get_user_pages_fast().
+The dma_map operations now support P2PDMA pages directly. So remove
+the calls to pci_p2pdma_[un]map_sg_attrs() and replace them with calls
+to dma_map_sgtable().
 
-This is so that FOLL_PCI_P2PDMA can be passed when appropriate.
+dma_map_sgtable() returns more complete error codes than dma_map_sg()
+and allows differentiating EREMOTEIO errors in case an unsupported
+P2PDMA transfer is requested. When this happens, return BLK_STS_TARGET
+so the request isn't retried.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+Reviewed-by: Max Gurtovoy <mgurtovoy@nvidia.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- include/linux/uio.h |  6 ++++++
- lib/iov_iter.c      | 25 +++++++++++++++++++------
- 2 files changed, 25 insertions(+), 6 deletions(-)
+ drivers/nvme/host/pci.c | 69 +++++++++++++++++------------------------
+ 1 file changed, 29 insertions(+), 40 deletions(-)
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 739285fe5a2f..ddf9e4cf4a59 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -232,8 +232,14 @@ void iov_iter_pipe(struct iov_iter *i, unsigned int direction, struct pipe_inode
- void iov_iter_discard(struct iov_iter *i, unsigned int direction, size_t count);
- void iov_iter_xarray(struct iov_iter *i, unsigned int direction, struct xarray *xarray,
- 		     loff_t start, size_t count);
-+ssize_t iov_iter_get_pages_flags(struct iov_iter *i, struct page **pages,
-+		size_t maxsize, unsigned maxpages, size_t *start,
-+		unsigned int gup_flags);
- ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
- 			size_t maxsize, unsigned maxpages, size_t *start);
-+ssize_t iov_iter_get_pages_alloc_flags(struct iov_iter *i,
-+		struct page ***pages, size_t maxsize, size_t *start,
-+		unsigned int gup_flags);
- ssize_t iov_iter_get_pages_alloc(struct iov_iter *i, struct page ***pages,
- 			size_t maxsize, size_t *start);
- int iov_iter_npages(const struct iov_iter *i, int maxpages);
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 6dd5330f7a99..9bf6e3af5120 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1515,9 +1515,9 @@ static struct page *first_bvec_segment(const struct iov_iter *i,
- 	return page;
- }
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index fec4c7191310..07412116d4d1 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -230,11 +230,10 @@ struct nvme_iod {
+ 	bool use_sgl;
+ 	int aborted;
+ 	int npages;		/* In the PRP list. 0 means small pool in use */
+-	int nents;		/* Used in scatterlist */
+ 	dma_addr_t first_dma;
+ 	unsigned int dma_len;	/* length of single DMA segment mapping */
+ 	dma_addr_t meta_dma;
+-	struct scatterlist *sg;
++	struct sg_table sgt;
+ };
  
--ssize_t iov_iter_get_pages(struct iov_iter *i,
-+ssize_t iov_iter_get_pages_flags(struct iov_iter *i,
- 		   struct page **pages, size_t maxsize, unsigned maxpages,
--		   size_t *start)
-+		   size_t *start, unsigned int gup_flags)
+ static inline unsigned int nvme_dbbuf_size(struct nvme_dev *dev)
+@@ -524,7 +523,7 @@ static void nvme_commit_rqs(struct blk_mq_hw_ctx *hctx)
+ static void **nvme_pci_iod_list(struct request *req)
  {
- 	size_t len;
- 	int n, res;
-@@ -1528,7 +1528,6 @@ ssize_t iov_iter_get_pages(struct iov_iter *i,
- 		return 0;
- 
- 	if (likely(iter_is_iovec(i))) {
--		unsigned int gup_flags = 0;
- 		unsigned long addr;
- 
- 		if (iov_iter_rw(i) != WRITE)
-@@ -1558,6 +1557,13 @@ ssize_t iov_iter_get_pages(struct iov_iter *i,
- 		return iter_xarray_get_pages(i, pages, maxsize, maxpages, start);
- 	return -EFAULT;
- }
-+EXPORT_SYMBOL_GPL(iov_iter_get_pages_flags);
-+
-+ssize_t iov_iter_get_pages(struct iov_iter *i, struct page **pages,
-+			   size_t maxsize, unsigned maxpages, size_t *start)
-+{
-+	return iov_iter_get_pages_flags(i, pages, maxsize, maxpages, start, 0);
-+}
- EXPORT_SYMBOL(iov_iter_get_pages);
- 
- static struct page **get_pages_array(size_t n)
-@@ -1640,9 +1646,9 @@ static ssize_t iter_xarray_get_pages_alloc(struct iov_iter *i,
- 	return actual;
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+-	return (void **)(iod->sg + blk_rq_nr_phys_segments(req));
++	return (void **)(iod->sgt.sgl + blk_rq_nr_phys_segments(req));
  }
  
--ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
-+ssize_t iov_iter_get_pages_alloc_flags(struct iov_iter *i,
- 		   struct page ***pages, size_t maxsize,
--		   size_t *start)
-+		   size_t *start, unsigned int gup_flags)
+ static inline bool nvme_pci_use_sgls(struct nvme_dev *dev, struct request *req)
+@@ -576,17 +575,6 @@ static void nvme_free_sgls(struct nvme_dev *dev, struct request *req)
+ 	}
+ }
+ 
+-static void nvme_unmap_sg(struct nvme_dev *dev, struct request *req)
+-{
+-	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+-
+-	if (is_pci_p2pdma_page(sg_page(iod->sg)))
+-		pci_p2pdma_unmap_sg(dev->dev, iod->sg, iod->nents,
+-				    rq_dma_dir(req));
+-	else
+-		dma_unmap_sg(dev->dev, iod->sg, iod->nents, rq_dma_dir(req));
+-}
+-
+ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
  {
- 	struct page **p;
- 	size_t len;
-@@ -1654,7 +1660,6 @@ ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
- 		return 0;
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+@@ -597,9 +585,10 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 		return;
+ 	}
  
- 	if (likely(iter_is_iovec(i))) {
--		unsigned int gup_flags = 0;
- 		unsigned long addr;
- 
- 		if (iov_iter_rw(i) != WRITE)
-@@ -1667,6 +1672,7 @@ ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
- 		p = get_pages_array(n);
- 		if (!p)
- 			return -ENOMEM;
+-	WARN_ON_ONCE(!iod->nents);
++	WARN_ON_ONCE(!iod->sgt.nents);
 +
- 		res = get_user_pages_fast(addr, n, gup_flags, p);
- 		if (unlikely(res <= 0)) {
- 			kvfree(p);
-@@ -1694,6 +1700,13 @@ ssize_t iov_iter_get_pages_alloc(struct iov_iter *i,
- 		return iter_xarray_get_pages_alloc(i, pages, maxsize, start);
- 	return -EFAULT;
++	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
+ 
+-	nvme_unmap_sg(dev, req);
+ 	if (iod->npages == 0)
+ 		dma_pool_free(dev->prp_small_pool, nvme_pci_iod_list(req)[0],
+ 			      iod->first_dma);
+@@ -607,7 +596,7 @@ static void nvme_unmap_data(struct nvme_dev *dev, struct request *req)
+ 		nvme_free_sgls(dev, req);
+ 	else
+ 		nvme_free_prps(dev, req);
+-	mempool_free(iod->sg, dev->iod_mempool);
++	mempool_free(iod->sgt.sgl, dev->iod_mempool);
  }
-+EXPORT_SYMBOL_GPL(iov_iter_get_pages_alloc_flags);
-+
-+ssize_t iov_iter_get_pages_alloc(struct iov_iter *i, struct page ***pages,
-+				 size_t maxsize, size_t *start)
-+{
-+	return iov_iter_get_pages_alloc_flags(i, pages, maxsize, start, 0);
-+}
- EXPORT_SYMBOL(iov_iter_get_pages_alloc);
  
- size_t csum_and_copy_from_iter(void *addr, size_t bytes, __wsum *csum,
+ static void nvme_print_sgl(struct scatterlist *sgl, int nents)
+@@ -630,7 +619,7 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct dma_pool *pool;
+ 	int length = blk_rq_payload_bytes(req);
+-	struct scatterlist *sg = iod->sg;
++	struct scatterlist *sg = iod->sgt.sgl;
+ 	int dma_len = sg_dma_len(sg);
+ 	u64 dma_addr = sg_dma_address(sg);
+ 	int offset = dma_addr & (NVME_CTRL_PAGE_SIZE - 1);
+@@ -703,16 +692,16 @@ static blk_status_t nvme_pci_setup_prps(struct nvme_dev *dev,
+ 		dma_len = sg_dma_len(sg);
+ 	}
+ done:
+-	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sg));
++	cmnd->dptr.prp1 = cpu_to_le64(sg_dma_address(iod->sgt.sgl));
+ 	cmnd->dptr.prp2 = cpu_to_le64(iod->first_dma);
+ 	return BLK_STS_OK;
+ free_prps:
+ 	nvme_free_prps(dev, req);
+ 	return BLK_STS_RESOURCE;
+ bad_sgl:
+-	WARN(DO_ONCE(nvme_print_sgl, iod->sg, iod->nents),
++	WARN(DO_ONCE(nvme_print_sgl, iod->sgt.sgl, iod->sgt.nents),
+ 			"Invalid SGL for payload:%d nents:%d\n",
+-			blk_rq_payload_bytes(req), iod->nents);
++			blk_rq_payload_bytes(req), iod->sgt.nents);
+ 	return BLK_STS_IOERR;
+ }
+ 
+@@ -738,12 +727,13 @@ static void nvme_pci_sgl_set_seg(struct nvme_sgl_desc *sge,
+ }
+ 
+ static blk_status_t nvme_pci_setup_sgls(struct nvme_dev *dev,
+-		struct request *req, struct nvme_rw_command *cmd, int entries)
++		struct request *req, struct nvme_rw_command *cmd)
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	struct dma_pool *pool;
+ 	struct nvme_sgl_desc *sg_list;
+-	struct scatterlist *sg = iod->sg;
++	struct scatterlist *sg = iod->sgt.sgl;
++	unsigned int entries = iod->sgt.nents;
+ 	dma_addr_t sgl_dma;
+ 	int i = 0;
+ 
+@@ -841,7 +831,7 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ {
+ 	struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
+ 	blk_status_t ret = BLK_STS_RESOURCE;
+-	int nr_mapped;
++	int rc;
+ 
+ 	if (blk_rq_nr_phys_segments(req) == 1) {
+ 		struct bio_vec bv = req_bvec(req);
+@@ -859,26 +849,25 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	}
+ 
+ 	iod->dma_len = 0;
+-	iod->sg = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
+-	if (!iod->sg)
++	iod->sgt.sgl = mempool_alloc(dev->iod_mempool, GFP_ATOMIC);
++	if (!iod->sgt.sgl)
+ 		return BLK_STS_RESOURCE;
+-	sg_init_table(iod->sg, blk_rq_nr_phys_segments(req));
+-	iod->nents = blk_rq_map_sg(req->q, req, iod->sg);
+-	if (!iod->nents)
++	sg_init_table(iod->sgt.sgl, blk_rq_nr_phys_segments(req));
++	iod->sgt.orig_nents = blk_rq_map_sg(req->q, req, iod->sgt.sgl);
++	if (!iod->sgt.orig_nents)
+ 		goto out_free_sg;
+ 
+-	if (is_pci_p2pdma_page(sg_page(iod->sg)))
+-		nr_mapped = pci_p2pdma_map_sg_attrs(dev->dev, iod->sg,
+-				iod->nents, rq_dma_dir(req), DMA_ATTR_NO_WARN);
+-	else
+-		nr_mapped = dma_map_sg_attrs(dev->dev, iod->sg, iod->nents,
+-					     rq_dma_dir(req), DMA_ATTR_NO_WARN);
+-	if (!nr_mapped)
++	rc = dma_map_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req),
++			     DMA_ATTR_NO_WARN);
++	if (rc) {
++		if (rc == -EREMOTEIO)
++			ret = BLK_STS_TARGET;
+ 		goto out_free_sg;
++	}
+ 
+ 	iod->use_sgl = nvme_pci_use_sgls(dev, req);
+ 	if (iod->use_sgl)
+-		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw, nr_mapped);
++		ret = nvme_pci_setup_sgls(dev, req, &cmnd->rw);
+ 	else
+ 		ret = nvme_pci_setup_prps(dev, req, &cmnd->rw);
+ 	if (ret != BLK_STS_OK)
+@@ -886,9 +875,9 @@ static blk_status_t nvme_map_data(struct nvme_dev *dev, struct request *req,
+ 	return BLK_STS_OK;
+ 
+ out_unmap_sg:
+-	nvme_unmap_sg(dev, req);
++	dma_unmap_sgtable(dev->dev, &iod->sgt, rq_dma_dir(req), 0);
+ out_free_sg:
+-	mempool_free(iod->sg, dev->iod_mempool);
++	mempool_free(iod->sgt.sgl, dev->iod_mempool);
+ 	return ret;
+ }
+ 
+@@ -912,7 +901,7 @@ static blk_status_t nvme_prep_rq(struct nvme_dev *dev, struct request *req)
+ 
+ 	iod->aborted = 0;
+ 	iod->npages = -1;
+-	iod->nents = 0;
++	iod->sgt.nents = 0;
+ 
+ 	ret = nvme_setup_cmd(req->q->queuedata, req);
+ 	if (ret)
 -- 
 2.30.2
 
