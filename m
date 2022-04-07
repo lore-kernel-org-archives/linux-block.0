@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4684FC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 17:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD80CC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 17:25:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346324AbiDGR05 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Apr 2022 13:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46738 "EHLO
+        id S1346172AbiDGR1H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Apr 2022 13:27:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346341AbiDGR0j (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 13:26:39 -0400
+        with ESMTP id S1346326AbiDGR06 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 13:26:58 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EFD1DC6;
-        Thu,  7 Apr 2022 10:22:39 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B8CBF325;
+        Thu,  7 Apr 2022 10:22:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=rMmDd7FK89WBPMzhI41Yh5OWeVuvzuwCzfQzO0Mz/AU=; b=iG+EidunEVskeYVIo6imRxDh47
-        8oq55Yf7ytuhttopUD3lvf6ThM95I2SsX20Tz5UXUkIHMvEUwkiyLww1Y7lHLgPLamVgzzrDt9fYq
-        fpg8LyY+HXCPuc+m5seNIMP6THmXjEpPrwBk+domuzL5vo/nJyqtYtFUTbuonua5YFS70T17/tsyO
-        Pgfwb6Z8/wqY9TNBk0i3thENlVQAP5CwlZXcgv5Mc/wTHtjxESXLnXBUgGBRbumCU/gpb5+oRv96h
-        HcTc43gYK3lYYuIjoveMt+N0WHXfbSbT3dVPExe0nM5REk4BP4aZAir/OaylNhLOLqVjDfa7vIHRS
-        cLi8EOWQ==;
+        bh=NhYwwPYUOPNVkjQIdyegnu/TVIl/nr3VeJZ7F4Q1rQY=; b=kW115vO/lD5rTsxYR5wDs4inqe
+        b62XLPVR1SKPBKhjIMGvH8/MnKPRwidsE+zcAlS8tHsYa6gYUO/lWQKAiq0fskHTB4DfCzP9KwEt2
+        awuANPVzBGDxwiLlGKvFZcVBO0iijF1vKPmrj95MhayJpJlrS46NDTFfC+t7KI8DNk4ry1m5/8d1J
+        +7oK34SQ8cIiJnBx3+JJHIyr3dMLRP4mSXQh6eF23EX5U4e3yvWW2GUbw6AGAk7S7lbdREAiI4Faf
+        /F4ASkipN0tLk9wxIMmSs5rh/01GZKqdFrmMo+fMt2J66f3X0zQZYZqeS8UlYt9kYOkl7xUEiidL6
+        7kOVCESQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1ncUMI-002BBf-HJ; Thu, 07 Apr 2022 09:47:43 -0600
+        id 1ncUMJ-002BBi-Mr; Thu, 07 Apr 2022 09:47:44 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1ncUMF-00022U-JJ; Thu, 07 Apr 2022 09:47:39 -0600
+        id 1ncUME-00022A-Fc; Thu, 07 Apr 2022 09:47:38 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,8 +56,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Thu,  7 Apr 2022 09:47:17 -0600
-Message-Id: <20220407154717.7695-22-logang@deltatee.com>
+Date:   Thu,  7 Apr 2022 09:47:12 -0600
+Message-Id: <20220407154717.7695-17-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220407154717.7695-1-logang@deltatee.com>
 References: <20220407154717.7695-1-logang@deltatee.com>
@@ -66,119 +66,83 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v6 21/21] nvme-pci: allow mmaping the CMB in userspace
+Subject: [PATCH v6 16/21] block: add check when merging zone device pages
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Allow userspace to obtain CMB memory by mmaping the controller's
-char device. The mmap call allocates and returns a hunk of CMB memory,
-(the offset is ignored) so userspace does not have control over the
-address within the CMB.
+Consecutive zone device pages should not be merged into the same sgl
+or bvec segment with other types of pages or if they belong to different
+pgmaps. Otherwise getting the pgmap of a given segment is not possible
+without scanning the entire segment. This helper returns true either if
+both pages are not zone device pages or both pages are zone device
+pages with the same pgmap.
 
-A VMA allocated in this way will only be usable by drivers that set
-FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
-checked the first time the pages are mapped for DMA.
-
-Currently this is only supported by O_DIRECT to an PCI NVMe device
-or through the NVMe passthrough IOCTL.
+Add a helper to determine if zone device pages are mergeable and use
+this helper in page_is_mergeable().
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- drivers/nvme/host/core.c | 15 +++++++++++++++
- drivers/nvme/host/nvme.h |  2 ++
- drivers/nvme/host/pci.c  | 17 +++++++++++++++++
- 3 files changed, 34 insertions(+)
+ block/bio.c        |  2 ++
+ include/linux/mm.h | 23 +++++++++++++++++++++++
+ 2 files changed, 25 insertions(+)
 
-diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
-index bbc276dda49f..1fd3372c2c18 100644
---- a/drivers/nvme/host/core.c
-+++ b/drivers/nvme/host/core.c
-@@ -3114,6 +3114,10 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
- 	}
+diff --git a/block/bio.c b/block/bio.c
+index cdd7b2915c53..3406c0450db3 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -834,6 +834,8 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
+ 		return false;
+ 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
+ 		return false;
++	if (!zone_device_pages_have_same_pgmap(bv->bv_page, page))
++		return false;
  
- 	file->private_data = ctrl;
-+
-+	if (ctrl->ops->cdev_file_open)
-+		ctrl->ops->cdev_file_open(ctrl, file);
-+
- 	return 0;
+ 	*same_page = ((vec_end_addr & PAGE_MASK) == page_addr);
+ 	if (*same_page)
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 14ef41af8b77..fb2264a17e4a 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -1108,6 +1108,24 @@ static inline bool is_zone_device_page(const struct page *page)
+ {
+ 	return page_zonenum(page) == ZONE_DEVICE;
  }
- 
-@@ -3127,12 +3131,23 @@ static int nvme_dev_release(struct inode *inode, struct file *file)
- 	return 0;
++
++/*
++ * Consecutive zone device pages should not be merged into the same sgl
++ * or bvec segment with other types of pages or if they belong to different
++ * pgmaps. Otherwise getting the pgmap of a given segment is not possible
++ * without scanning the entire segment. This helper returns true either if
++ * both pages are not zone device pages or both pages are zone device pages
++ * with the same pgmap.
++ */
++static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
++						     const struct page *b)
++{
++	if (is_zone_device_page(a) != is_zone_device_page(b))
++		return false;
++	if (!is_zone_device_page(a))
++		return true;
++	return a->pgmap == b->pgmap;
++}
+ extern void memmap_init_zone_device(struct zone *, unsigned long,
+ 				    unsigned long, struct dev_pagemap *);
+ #else
+@@ -1115,6 +1133,11 @@ static inline bool is_zone_device_page(const struct page *page)
+ {
+ 	return false;
  }
- 
-+static int nvme_dev_mmap(struct file *file, struct vm_area_struct *vma)
++static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
++						     const struct page *b)
 +{
-+	struct nvme_ctrl *ctrl = file->private_data;
-+
-+	if (!ctrl->ops->mmap_cmb)
-+		return -ENODEV;
-+
-+	return ctrl->ops->mmap_cmb(ctrl, vma);
++	return true;
 +}
-+
- static const struct file_operations nvme_dev_fops = {
- 	.owner		= THIS_MODULE,
- 	.open		= nvme_dev_open,
- 	.release	= nvme_dev_release,
- 	.unlocked_ioctl	= nvme_dev_ioctl,
- 	.compat_ioctl	= compat_ptr_ioctl,
-+	.mmap		= nvme_dev_mmap,
- };
+ #endif
  
- static ssize_t nvme_sysfs_reset(struct device *dev,
-diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
-index 7d97bfb2a9e2..24fbcd274c64 100644
---- a/drivers/nvme/host/nvme.h
-+++ b/drivers/nvme/host/nvme.h
-@@ -497,6 +497,8 @@ struct nvme_ctrl_ops {
- 	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
- 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
- 	bool (*supports_pci_p2pdma)(struct nvme_ctrl *ctrl);
-+	void (*cdev_file_open)(struct nvme_ctrl *ctrl, struct file *file);
-+	int (*mmap_cmb)(struct nvme_ctrl *ctrl, struct vm_area_struct *vma);
- };
- 
- /*
-diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-index 07412116d4d1..5946244e0295 100644
---- a/drivers/nvme/host/pci.c
-+++ b/drivers/nvme/host/pci.c
-@@ -2965,6 +2965,21 @@ static bool nvme_pci_supports_pci_p2pdma(struct nvme_ctrl *ctrl)
- 	return dma_pci_p2pdma_supported(dev->dev);
- }
- 
-+static void nvme_pci_cdev_file_open(struct nvme_ctrl *ctrl, struct file *file)
-+{
-+	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
-+
-+	pci_p2pdma_file_open(pdev, file);
-+}
-+
-+static int nvme_pci_mmap_cmb(struct nvme_ctrl *ctrl,
-+			     struct vm_area_struct *vma)
-+{
-+	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
-+
-+	return pci_mmap_p2pmem(pdev, vma);
-+}
-+
- static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.name			= "pcie",
- 	.module			= THIS_MODULE,
-@@ -2976,6 +2991,8 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
- 	.submit_async_event	= nvme_pci_submit_async_event,
- 	.get_address		= nvme_pci_get_address,
- 	.supports_pci_p2pdma	= nvme_pci_supports_pci_p2pdma,
-+	.cdev_file_open		= nvme_pci_cdev_file_open,
-+	.mmap_cmb		= nvme_pci_mmap_cmb,
- };
- 
- static int nvme_dev_map(struct nvme_dev *dev)
+ static inline bool folio_is_zone_device(const struct folio *folio)
 -- 
 2.30.2
 
