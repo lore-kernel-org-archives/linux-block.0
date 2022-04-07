@@ -2,208 +2,209 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D6BEC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 04:49:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC8A7C433F5
+	for <linux-block@archiver.kernel.org>; Thu,  7 Apr 2022 05:16:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240830AbiDGEvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 7 Apr 2022 00:51:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48810 "EHLO
+        id S234584AbiDGFSX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 7 Apr 2022 01:18:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51790 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240682AbiDGEvy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 00:51:54 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 952F910FAF9;
-        Wed,  6 Apr 2022 21:49:55 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 23720UMS022588;
-        Thu, 7 Apr 2022 04:49:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
- mime-version : subject : from : in-reply-to : date : cc :
- content-transfer-encoding : message-id : references : to; s=pp1;
- bh=jIemPP/faeMhx0l03xLYN8S16cDR16EsIdNEN9P8j6w=;
- b=O1EXUF9lSV+DHny7HHD2q3+t6neT7MEMo+IlLP67V8MRxYKusuFc2oloadizltsPHRtJ
- Dn0BPchmwcVsyaKeM3WgZwYpGUe3cmbMYh4PyLemI3acuKzbYqcPe+AhO4w248w7DzpM
- +pYnlkpZifrE0vuUnqODDr8zuzZVlziO0i54jM+mQoLKgYSfk97muggsjXnvJn2twPkX
- PE5W1CS8S2cvzOJeFpkCRLurwbebFxA+feD2ufI1xoR+T5fcuvfKmBRDECVS5VI9r6An
- fV9RUHlxfltuxEOvJ21EYohAphhk517UzP5RlnGVhQ4fNy+2CGoK/fVgf7DzB8gleS3Q EQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f96s86g8h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 04:49:51 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.16.0.43/8.16.0.43) with SMTP id 2374d9Cf028423;
-        Thu, 7 Apr 2022 04:49:50 GMT
-Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
-        by mx0b-001b2d01.pphosted.com with ESMTP id 3f96s86g84-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 04:49:50 +0000
-Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
-        by ppma05fra.de.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 2374lNxI026895;
-        Thu, 7 Apr 2022 04:49:48 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
-        by ppma05fra.de.ibm.com with ESMTP id 3f6e48qecw-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Thu, 07 Apr 2022 04:49:48 +0000
-Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
-        by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 2374nkks38535482
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Thu, 7 Apr 2022 04:49:46 GMT
-Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 420C052051;
-        Thu,  7 Apr 2022 04:49:46 +0000 (GMT)
-Received: from smtpclient.apple (unknown [9.199.196.207])
-        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 33DCC52057;
-        Thu,  7 Apr 2022 04:49:45 +0000 (GMT)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.60.0.1.1\))
-Subject: Re: [powerpc]Kernel crash while running xfstests (generic/250)
- [next-20220404]
-From:   Sachin Sant <sachinp@linux.ibm.com>
-In-Reply-To: <A3B628C9-A20B-4621-BC8C-C79B270297E1@linux.ibm.com>
-Date:   Thu, 7 Apr 2022 10:19:44 +0530
-Cc:     dm-devel@redhat.com, riteshh@linux.ibm.com,
-        linuxppc-dev@lists.ozlabs.org,
-        open list <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B34CE5E9-8635-4DF0-AC0D-FB887462DFD6@linux.ibm.com>
-References: <A3B628C9-A20B-4621-BC8C-C79B270297E1@linux.ibm.com>
-To:     linux-block@vger.kernel.org, snitzer@redhat.com
-X-Mailer: Apple Mail (2.3693.60.0.1.1)
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 7_3nnGPA5-UcH6E1DDBObTXLmA2SBSB5
-X-Proofpoint-ORIG-GUID: VwbGyXRN72Dbn9xdqr4cc4ROmiZNOcVd
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.850,Hydra:6.0.425,FMLib:17.11.64.514
- definitions=2022-04-06_13,2022-04-06_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
- priorityscore=1501 bulkscore=0 impostorscore=0 mlxscore=0 phishscore=0
- adultscore=0 mlxlogscore=999 spamscore=0 lowpriorityscore=0 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204070023
+        with ESMTP id S233492AbiDGFSV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 7 Apr 2022 01:18:21 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F8111166;
+        Wed,  6 Apr 2022 22:16:22 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id B76E021122;
+        Thu,  7 Apr 2022 05:16:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1649308580; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3mSljOe/NcqR0nJ5LYJS1IexMd+XWdNrUUnY7u8p4ss=;
+        b=S8u6tT4MOmjtYxCqeb3qmZNn/bHZfqArgo8fnUTx30csmaC8EzqkNzsFCobTftsYYuUnLo
+        j2CEECTylf45En922p7zGMdDliHlOB0W/p8IrTqMAAnrwN0MZYWeSbIR9ZZAecmXn6aNZm
+        pYWtnVOXe4neFTwM3RVsKoYuaP4pLxY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1649308580;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=3mSljOe/NcqR0nJ5LYJS1IexMd+XWdNrUUnY7u8p4ss=;
+        b=8wVCLmcmG2fqohkxPiOTT+zNzsZDHS4xqLNwNHKElc9o7Ynzusas5Vi1t3zyX0xdAJFT8y
+        NypPr2uWld7TnxBQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 81FE713A66;
+        Thu,  7 Apr 2022 05:16:14 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 0FojFJ5zTmLoQAAAMHmgww
+        (envelope-from <colyli@suse.de>); Thu, 07 Apr 2022 05:16:14 +0000
+Message-ID: <2aee78dd-d5b6-5444-da28-34ab2631b264@suse.de>
+Date:   Thu, 7 Apr 2022 13:16:12 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: [PATCH 23/27] block: add a bdev_max_discard_sectors helper
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        nbd@other.debian.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-bcache@vger.kernel.org,
+        linux-raid@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-nvme@lists.infradead.org,
+        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Jens Axboe <axboe@kernel.dk>, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ntfs3@lists.linux.dev, ocfs2-devel@oss.oracle.com,
+        linux-mm@kvack.org
+References: <20220406060516.409838-1-hch@lst.de>
+ <20220406060516.409838-24-hch@lst.de>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <20220406060516.409838-24-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 4/6/22 2:05 PM, Christoph Hellwig wrote:
+> Add a helper to query the number of sectors support per each discard bio
+> based on the block device and use this helper to stop various places from
+> poking into the request_queue to see if discard is supported and if so how
+> much.  This mirrors what is done e.g. for write zeroes as well.
+>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-> On 04-Apr-2022, at 5:04 PM, Sachin Sant <sachinp@linux.ibm.com> wrote:
->=20
-> While running xfstests(ext4 or XFS as fs) on a Power10 LPAR booted =
-with today=E2=80=99s
-> next (5.18.0-rc1-next-20220404) following crash is seen.=20
->=20
-> This problem was possibly introduced with 5.17.0-next-20220330.=20
-> Git bisect leads me to following patch
-> commit 1d158814db8e7b3cbca0f2c8d9242fbec4fbc57e
->    dm: conditionally enable BIOSET_PERCPU_CACHE for dm_io bioset
->=20
 
-Continue to see this problem with latest next.=20
+For the bcache part,
 
-[ 2388.091152] EXT4-fs (dm-0): mounted filesystem with ordered data =
-mode. Quota mode: none.
-[ 2388.091173] ext4 filesystem being mounted at /mnt/scratch supports =
-timestamps until 2038 (0x7fffffff)
-[ 2388.287138] BUG: Unable to handle kernel data access at =
-0x5deadbeef0000122
-[ 2388.287154] Faulting instruction address: 0xc000000000154a6c
-[ 2388.287160] Oops: Kernel access of bad area, sig: 11 [#1]
-[ 2388.287164] LE PAGE_SIZE=3D64K MMU=3DHash SMP NR_CPUS=3D2048 NUMA =
-pSeries
-[ 2388.287172] Modules linked in: xfs dm_flakey dm_snapshot dm_bufio =
-dm_zero loop dm_mod ip_set bonding rfkill nf_tables libcrc32c nfnetlink =
-sunrpc pseries_rng xts vmx_crypto uio_pdrv_genirq uio sch_fq_codel ext4 =
-mbcache jbd2 lpfc nvmet_fc nvmet sr_mod sd_mod cdrom nvme_fc sg nvme =
-nvme_fabrics tg3 nvme_core ptp ibmvscsi t10_pi crc64_rocksoft ibmveth =
-scsi_transport_srp scsi_transport_fc pps_core crc64 ipmi_devintf =
-ipmi_msghandler fuse [last unloaded: scsi_debug]
-[ 2388.287236] CPU: 16 PID: 1043652 Comm: dmsetup Not tainted =
-5.18.0-rc1-next-20220406 #1
-[ 2388.287244] NIP:  c000000000154a6c LR: c000000000154998 CTR: =
-c000000000674690
-[ 2388.287249] REGS: c000000145fb3610 TRAP: 0380   Not tainted  =
-(5.18.0-rc1-next-20220406)
-[ 2388.287255] MSR:  800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  =
-CR: 28024824  XER: 00000000
-[ 2388.287271] CFAR: c0000000001549a0 IRQMASK: 0=20
-[ 2388.287271] GPR00: c000000000154998 c000000145fb38b0 c000000002a1f400 =
-0000000000000000=20
-[ 2388.287271] GPR04: c00000004aa2c378 0000000000000000 c000000048fdf060 =
-c00000015387b600=20
-[ 2388.287271] GPR08: c00000015387b600 5deadbeef0000100 5deadbeef0000122 =
-c00800000988a4e8=20
-[ 2388.287271] GPR12: c000000000674690 c00000001ec28a80 0000010014bf0b40 =
-00007fff9f1b9da8=20
-[ 2388.287271] GPR16: 00007fff9f1b9da8 00007fff9f1b9da8 00007fff9f1f3670 =
-0000000000000000=20
-[ 2388.287271] GPR20: 00007fff9f1c3388 00007fff9f1f2040 0000010014bf0b70 =
-0000000000000131=20
-[ 2388.287271] GPR24: c00000000254d768 ffffffffffff0000 c00000000254d730 =
-c0000000f5103a00=20
-[ 2388.287271] GPR28: c0000000029b0570 c00000004aa2c378 0000000000000017 =
-0000000000000000=20
-[ 2388.287332] NIP [c000000000154a6c] =
-__cpuhp_state_remove_instance+0x19c/0x2c0
-[ 2388.287344] LR [c000000000154998] =
-__cpuhp_state_remove_instance+0xc8/0x2c0
-[ 2388.287351] Call Trace:
-[ 2388.287353] [c000000145fb38b0] [c000000000154998] =
-__cpuhp_state_remove_instance+0xc8/0x2c0 (unreliable)
-[ 2388.287362] [c000000145fb3920] [c0000000006746ec] =
-bioset_exit+0x5c/0x280
-[ 2388.287369] [c000000145fb39c0] [c0080000098733f4] =
-cleanup_mapped_device+0x4c/0x1a0 [dm_mod]
-[ 2388.287385] [c000000145fb3a00] [c0080000098736f0] =
-__dm_destroy+0x1a8/0x360 [dm_mod]
-[ 2388.287397] [c000000145fb3aa0] [c008000009880e90] =
-dev_remove+0x1a8/0x280 [dm_mod]
-[ 2388.287409] [c000000145fb3b30] [c00800000988115c] =
-ctl_ioctl+0x1f4/0x7c0 [dm_mod]
-[ 2388.287422] [c000000145fb3d40] [c008000009881748] =
-dm_ctl_ioctl+0x20/0x40 [dm_mod]
-[ 2388.287434] [c000000145fb3d60] [c0000000004b2c08] =
-sys_ioctl+0xf8/0x150
-[ 2388.287441] [c000000145fb3db0] [c0000000000324e8] =
-system_call_exception+0x178/0x380
-[ 2388.287449] [c000000145fb3e10] [c00000000000c64c] =
-system_call_common+0xec/0x250
-[ 2388.287457] --- interrupt: c00 at 0x7fff9ec991a0
-[ 2388.287461] NIP:  00007fff9ec991a0 LR: 00007fff9f1b6824 CTR: =
-0000000000000000
-[ 2388.287466] REGS: c000000145fb3e80 TRAP: 0c00   Not tainted  =
-(5.18.0-rc1-next-20220406)
-[ 2388.287471] MSR:  800000000280f033 =
-<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 28004484  XER: 00000000
-[ 2388.287486] IRQMASK: 0=20
-[ 2388.287486] GPR00: 0000000000000036 00007fffe5635be0 00007fff9ed77300 =
-0000000000000003=20
-[ 2388.287486] GPR04: 00000000c138fd04 0000010014bf0b40 0000000000000004 =
-00007fff9f1c3f98=20
-[ 2388.287486] GPR08: 0000000000000003 0000000000000000 0000000000000000 =
-0000000000000000=20
-[ 2388.287486] GPR12: 0000000000000000 00007fff9f29fa00 0000010014bf0b40 =
-00007fff9f1b9da8=20
-[ 2388.287486] GPR16: 00007fff9f1b9da8 00007fff9f1b9da8 00007fff9f1f3670 =
-0000000000000000=20
-[ 2388.287486] GPR20: 00007fff9f1c3388 00007fff9f1f2040 0000010014bf0b70 =
-0000010014bf0940=20
-[ 2388.287486] GPR24: 00007fff9f1b9da8 00007fff9f1b9da8 00007fff9f1b9da8 =
-00007fff9f1b9da8=20
-[ 2388.287486] GPR28: 0000000000000001 00007fff9f1b9da8 0000000000000000 =
-00007fff9f1b9da8=20
-[ 2388.287543] NIP [00007fff9ec991a0] 0x7fff9ec991a0
-[ 2388.287547] LR [00007fff9f1b6824] 0x7fff9f1b6824
-[ 2388.287551] --- interrupt: c00
-[ 2388.287554] Instruction dump:
-[ 2388.287558] 60000000 7f69db78 7f83e040 7c7f07b4 7bea1f24 419cffb4 =
-eae10028 eb210038=20
-[ 2388.287569] eb610048 e93d0000 e95d0008 2fa90000 <f92a0000> 419e0008 =
-f9490008 3d405dea=20
-[ 2388.287581] ---[ end trace 0000000000000000 ]---
-[ 2388.403785]=20
-[ 2389.403791] Kernel panic - not syncing: Fatal exception
+Acked-by: Coly Li <colyli@suse.de>
 
-Let me know if any additional information is required.
 
--Sachin
+Thanks.
+
+
+Coly Li
+
+
+
+> ---
+>   block/blk-core.c                    |  2 +-
+>   block/blk-lib.c                     |  2 +-
+>   block/ioctl.c                       |  3 +--
+>   drivers/block/drbd/drbd_main.c      |  2 +-
+>   drivers/block/drbd/drbd_nl.c        | 12 +++++++-----
+>   drivers/block/drbd/drbd_receiver.c  |  5 ++---
+>   drivers/block/loop.c                |  9 +++------
+>   drivers/block/rnbd/rnbd-srv-dev.h   |  6 +-----
+>   drivers/block/xen-blkback/xenbus.c  |  2 +-
+>   drivers/md/bcache/request.c         |  4 ++--
+>   drivers/md/bcache/super.c           |  2 +-
+>   drivers/md/bcache/sysfs.c           |  2 +-
+>   drivers/md/dm-cache-target.c        |  9 +--------
+>   drivers/md/dm-clone-target.c        |  9 +--------
+>   drivers/md/dm-io.c                  |  2 +-
+>   drivers/md/dm-log-writes.c          |  3 +--
+>   drivers/md/dm-raid.c                |  9 ++-------
+>   drivers/md/dm-table.c               |  4 +---
+>   drivers/md/dm-thin.c                |  9 +--------
+>   drivers/md/dm.c                     |  2 +-
+>   drivers/md/md-linear.c              |  4 ++--
+>   drivers/md/raid0.c                  |  2 +-
+>   drivers/md/raid1.c                  |  6 +++---
+>   drivers/md/raid10.c                 |  8 ++++----
+>   drivers/md/raid5-cache.c            |  2 +-
+>   drivers/target/target_core_device.c |  8 +++-----
+>   fs/btrfs/extent-tree.c              |  4 ++--
+>   fs/btrfs/ioctl.c                    |  2 +-
+>   fs/exfat/file.c                     |  2 +-
+>   fs/exfat/super.c                    | 10 +++-------
+>   fs/ext4/ioctl.c                     | 10 +++-------
+>   fs/ext4/super.c                     | 10 +++-------
+>   fs/f2fs/f2fs.h                      |  3 +--
+>   fs/f2fs/segment.c                   |  6 ++----
+>   fs/fat/file.c                       |  2 +-
+>   fs/fat/inode.c                      | 10 +++-------
+>   fs/gfs2/rgrp.c                      |  2 +-
+>   fs/jbd2/journal.c                   |  7 ++-----
+>   fs/jfs/ioctl.c                      |  2 +-
+>   fs/jfs/super.c                      |  8 ++------
+>   fs/nilfs2/ioctl.c                   |  2 +-
+>   fs/ntfs3/file.c                     |  2 +-
+>   fs/ntfs3/super.c                    |  2 +-
+>   fs/ocfs2/ioctl.c                    |  2 +-
+>   fs/xfs/xfs_discard.c                |  2 +-
+>   fs/xfs/xfs_super.c                  | 12 ++++--------
+>   include/linux/blkdev.h              |  5 +++++
+>   mm/swapfile.c                       | 17 ++---------------
+>   48 files changed, 87 insertions(+), 163 deletions(-)
+
+[snipped]
+
+
+> diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
+> index fdd0194f84dd0..e27f67f06a428 100644
+> --- a/drivers/md/bcache/request.c
+> +++ b/drivers/md/bcache/request.c
+> @@ -1005,7 +1005,7 @@ static void cached_dev_write(struct cached_dev *dc, struct search *s)
+>   		bio_get(s->iop.bio);
+>   
+>   		if (bio_op(bio) == REQ_OP_DISCARD &&
+> -		    !blk_queue_discard(bdev_get_queue(dc->bdev)))
+> +		    !bdev_max_discard_sectors(dc->bdev))
+>   			goto insert_data;
+>   
+>   		/* I/O request sent to backing device */
+> @@ -1115,7 +1115,7 @@ static void detached_dev_do_request(struct bcache_device *d, struct bio *bio,
+>   	bio->bi_private = ddip;
+>   
+>   	if ((bio_op(bio) == REQ_OP_DISCARD) &&
+> -	    !blk_queue_discard(bdev_get_queue(dc->bdev)))
+> +	    !bdev_max_discard_sectors(dc->bdev))
+>   		bio->bi_end_io(bio);
+>   	else
+>   		submit_bio_noacct(bio);
+> diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
+> index bf3de149d3c9f..296f200b2e208 100644
+> --- a/drivers/md/bcache/super.c
+> +++ b/drivers/md/bcache/super.c
+> @@ -2350,7 +2350,7 @@ static int register_cache(struct cache_sb *sb, struct cache_sb_disk *sb_disk,
+>   	ca->bdev->bd_holder = ca;
+>   	ca->sb_disk = sb_disk;
+>   
+> -	if (blk_queue_discard(bdev_get_queue(bdev)))
+> +	if (bdev_max_discard_sectors((bdev)))
+>   		ca->discard = CACHE_DISCARD(&ca->sb);
+>   
+>   	ret = cache_alloc(ca);
+> diff --git a/drivers/md/bcache/sysfs.c b/drivers/md/bcache/sysfs.c
+> index d1029d71ff3bc..c6f677059214d 100644
+> --- a/drivers/md/bcache/sysfs.c
+> +++ b/drivers/md/bcache/sysfs.c
+> @@ -1151,7 +1151,7 @@ STORE(__bch_cache)
+>   	if (attr == &sysfs_discard) {
+>   		bool v = strtoul_or_return(buf);
+>   
+> -		if (blk_queue_discard(bdev_get_queue(ca->bdev)))
+> +		if (bdev_max_discard_sectors(ca->bdev))
+>   			ca->discard = v;
+>   
+>   		if (v != CACHE_DISCARD(&ca->sb)) {
+
+
+[snipped]
 
