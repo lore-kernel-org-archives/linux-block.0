@@ -2,100 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 050A1C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 04:42:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E89CC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 05:51:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234287AbiDHEop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 00:44:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41202 "EHLO
+        id S235007AbiDHFxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 01:53:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233655AbiDHEoo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 00:44:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CACC83891
-        for <linux-block@vger.kernel.org>; Thu,  7 Apr 2022 21:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649392960;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XMoooqF53GZ23xCsKlQFvK1zXgNehgoBhcLdBNRgTXI=;
-        b=WhxJSXweSfXxBhxMeCuECiigJj8krkseAO2o6T3+QcUWa/9dgYtRiqsK8MrWaG/ptbe33b
-        D5CGkVal8xELfbARuUhlgblyZlm33ZCiVxEpXez1GLq+hm8Gp3xiW8DEAk1ivq2isMF9vx
-        aemVVpbzu54EEtEOB9eeA7s9mE5zct8=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-549-otWZoUpOM8ahzjK2bR0cBQ-1; Fri, 08 Apr 2022 00:42:39 -0400
-X-MC-Unique: otWZoUpOM8ahzjK2bR0cBQ-1
-Received: by mail-pj1-f69.google.com with SMTP id c11-20020a17090a4d0b00b001cab6569b8cso4086645pjg.5
-        for <linux-block@vger.kernel.org>; Thu, 07 Apr 2022 21:42:39 -0700 (PDT)
+        with ESMTP id S233501AbiDHFx3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 01:53:29 -0400
+Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4201C2296D1
+        for <linux-block@vger.kernel.org>; Thu,  7 Apr 2022 22:51:27 -0700 (PDT)
+Received: by mail-lf1-x12d.google.com with SMTP id h14so8129337lfl.2
+        for <linux-block@vger.kernel.org>; Thu, 07 Apr 2022 22:51:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=QMVVRJGSL83qZp/D399to2LDBBeobEw6FStjIYATZ/Y=;
+        b=0YiRAWzvm1vgAPRBpqShBhJzPF6IeAHhJxoonPSnyl+HeapfBuqBKQCYebg6GIkrv9
+         lSJj4vxwr5M89BFYzC4xZSqEELjc7WzOUexpm9x3uKYSnrmw6jy/tHU6PHtW0wvxtuqt
+         z28rXPcsP5k7B8OTAFBB1Y+WGPN/m0XxgPx52dk+s5hZgUJ2YgkbHsH4kBchwzvJ+tfD
+         1A4cCfA5RMoyhXM0Tqd6KRQYk1xfN8xQI2wRHYdkDgFV430cBSLTxglcmlO4yM8L0fse
+         awJ3BB3sOXtwpKTDxYoach8joggACHPRPjA5gLy+lq90d0TBo8THUnJV6IH9s77ZzoEk
+         rEXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=XMoooqF53GZ23xCsKlQFvK1zXgNehgoBhcLdBNRgTXI=;
-        b=a0P+4brUFv3TKTDOs0wRTQaWyjU8Qw5DyJoQZ39B2p55p9i8z/2mj6hMaTIMEI9SQr
-         LcTZSkflz3T9VgESHXYHiWDaY6JYmU9DVXFTquDMaUkfO+rRB9Z/FcfAHpr9j89+Vd3l
-         vV5oNp71bU5vlx9IG9TH3CdYCYBDEo0DsbHIt0yMgakKFEp3Fqd3bsU3FwZHIp/UcdCV
-         rU/DHIM5hV3Eevb/2/ime0iwCtuc4cQvvJZ1hG39UClu+U50UC6EEVWN2BER5bYGm4G5
-         DzLDUKtwAO80OpY7ly2EwIdv/wn8cLPS5+5f4d+gDATJX4OkbNdzwkeQ+lbpUyQfc6V1
-         icQg==
-X-Gm-Message-State: AOAM532b9kjYYxuBiEkoT/yodbX7WVxtgExy4p5b0+kx8/cHhbsTjqYT
-        OdUeQfCgF1qao/XfY9gSzLHvNUusYRHbk/NdENLYY0NvShzjji8TnYNpNgl4kSd2dAMlxuL3A0S
-        EjWje4R46kzx/844YB8k5KFFvShumb/F6D9TjfpM=
-X-Received: by 2002:a17:902:da86:b0:154:522b:342d with SMTP id j6-20020a170902da8600b00154522b342dmr17425665plx.46.1649392958054;
-        Thu, 07 Apr 2022 21:42:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy68BbPh/Xv3keTRCrOzhla6M/q1AAvzBllIKCdQXvf3xbmXklNY7ShbxXO9F8Zy8Y+rzxyt9BS/gEZ0vzwUlk=
-X-Received: by 2002:a17:902:da86:b0:154:522b:342d with SMTP id
- j6-20020a170902da8600b00154522b342dmr17425650plx.46.1649392957758; Thu, 07
- Apr 2022 21:42:37 -0700 (PDT)
+         :message-id:subject:to;
+        bh=QMVVRJGSL83qZp/D399to2LDBBeobEw6FStjIYATZ/Y=;
+        b=4/xekmnNL92n520rR85D215P+6Of0j/3PK+GitfeHzRk9BB5rxz3PE7xBXKpedFpeP
+         QcdgCyaHFKNWsWGLTo95nDuXOo3PT2OWj0dSuxs+snzb+7GBY2J4D7RMjNbh+lpCa5+n
+         dJKs2ejsnpQ1wGYx2sjoEhVTECJtIPNIqp0QzQs3G8i4JE4KzVXBILiArt32+5C2MKXy
+         Y2inK/enStVWKGOyJtykaiBD6iIgceUoFdBttMdDFK1TIBpTdutpOSNeT14Bdx2iVCaT
+         VrwvXY0i1FFdCoeTy3kX5qzsQZ7P8ngNsfvUvOJGlYy9wIocy8JJMOnSE466WI4tKw6j
+         NyXw==
+X-Gm-Message-State: AOAM531AjIuCmieVz7DCZQxxejHXKZDLBbkn+LKou0VkvdsfIw265YeA
+        YE2Hl3p2MkwD2M/sgUT372LbRX5x1LFmGbW4QYVsrg==
+X-Google-Smtp-Source: ABdhPJzjAOb88R3T8f0sBYpRPzkVucnZ8sw6tR7Q1e3wb3WhXl14J4PvwZOLRdJ9aVqEXjrcnlvXppRqb6ku2CgYizg=
+X-Received: by 2002:a05:6512:1594:b0:44a:2d71:f14d with SMTP id
+ bp20-20020a056512159400b0044a2d71f14dmr12204895lfb.446.1649397085177; Thu, 07
+ Apr 2022 22:51:25 -0700 (PDT)
 MIME-Version: 1.0
 References: <CAJCQCtQkDFs7bt5T=jHO0iZ0zUgvaPpYPf_n4s+URtQXqF2Mew@mail.gmail.com>
-In-Reply-To: <CAJCQCtQkDFs7bt5T=jHO0iZ0zUgvaPpYPf_n4s+URtQXqF2Mew@mail.gmail.com>
-From:   Yi Zhang <yi.zhang@redhat.com>
-Date:   Fri, 8 Apr 2022 12:42:25 +0800
-Message-ID: <CAHj4cs8Mtv66ikMDTJYQ48spEvF8QYyoD0SrZPDKfgXarpp=dg@mail.gmail.com>
+ <CAHj4cs8Mtv66ikMDTJYQ48spEvF8QYyoD0SrZPDKfgXarpp=dg@mail.gmail.com>
+In-Reply-To: <CAHj4cs8Mtv66ikMDTJYQ48spEvF8QYyoD0SrZPDKfgXarpp=dg@mail.gmail.com>
+From:   Chris Murphy <lists@colorremedies.com>
+Date:   Thu, 7 Apr 2022 23:51:09 -0600
+Message-ID: <CAJCQCtS=1W23HZ71jw1AxJ=SXihDgjWfgxVC+vjjNpd9=87zrw@mail.gmail.com>
 Subject: Re: 5.18-rc1 nvme0: Admin Cmd(0x6), I/O Error (sct 0x0 / sc 0x2) DNR
-To:     Chris Murphy <lists@colorremedies.com>
-Cc:     linux-block <linux-block@vger.kernel.org>
+To:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Chris
+On Thu, Apr 7, 2022 at 10:42 PM Yi Zhang <yi.zhang@redhat.com> wrote:
+>
+> Hi Chris
+>
+> This issue has been reported and you can find more info here.
+> https://lore.kernel.org/linux-nvme/F2ACCD82-052F-473F-9882-1703147FA662@oracle.com/T/#t
 
-This issue has been reported and you can find more info here.
-https://lore.kernel.org/linux-nvme/F2ACCD82-052F-473F-9882-1703147FA662@oracle.com/T/#t
+Thank you, I didn't realize there is an nvme specific list. Noted.
 
-On Fri, Apr 8, 2022 at 11:41 AM Chris Murphy <lists@colorremedies.com> wrote:
->
-> Hi,
->
-> I'm seeing this never before seen message in the journal, all in red
-> text. This is kernel-5.18.0-0.rc1.20220406git3e732ebf7316ac8.19.fc37.x86_64
->
-> Apr 07 21:26:30 fovo.local kernel: nvme nvme0: pci function 0000:03:00.0
-> Apr 07 21:26:30 fovo.local kernel: nvme0: Admin Cmd(0x6), I/O Error
-> (sct 0x0 / sc 0x2) DNR
-> Apr 07 21:26:30 fovo.local kernel: nvme nvme0: 8/0/0 default/read/poll queues
-> Apr 07 21:26:30 fovo.local kernel:  nvme0n1: p1 p2 p3 p4 p5
->
-> 03:00.0 Non-Volatile memory controller [0108]: Toshiba Corporation XG6
-> NVMe SSD Controller [1179:011a] (prog-if 02 [NVM Express])
->     Subsystem: Toshiba Corporation Device [1179:0001]
->
-> This happens with every boot of this 5.18.0-rc1 kernel, no such
-> message for any 5.17.x series kernel.
->
->
-> --
-> Chris Murphy
->
-
+I filed a rhbz referencing the nvme list thread in case anyone else
+stumbles into this.
+https://bugzilla.redhat.com/show_bug.cgi?id=2073270
 
 -- 
-Best Regards,
-  Yi Zhang
-
+Chris Murphy
