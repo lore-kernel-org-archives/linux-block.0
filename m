@@ -2,123 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2546DC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 14:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77ABDC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 15:02:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236915AbiDHOdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 10:33:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49426 "EHLO
+        id S234694AbiDHPEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 11:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236931AbiDHOdJ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 10:33:09 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6AD38236A;
-        Fri,  8 Apr 2022 07:31:05 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id u14so8841244pjj.0;
-        Fri, 08 Apr 2022 07:31:05 -0700 (PDT)
+        with ESMTP id S233704AbiDHPEf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 11:04:35 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B09B2359F4
+        for <linux-block@vger.kernel.org>; Fri,  8 Apr 2022 08:02:32 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g12-20020a17090a640c00b001cb59d7a57cso252410pjj.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Apr 2022 08:02:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=dw6sluGZPNAiiEgCFWBZyzySwlZyM82T1lEG/zKHTFQ=;
+        b=CsjFd/mRmdhrJXMfXIBZxWQ+CQyEK279nunIU2odsRosVfg+S45jNz9qb4lDRz6a/l
+         g8rb5V2DzqDIMOPoFwS6D2xRt33ASiGV4CHtJx2SN95qau1/DQvUAnR6hj+YI2yb+Egr
+         D7Dczf4mBrXWZwkKKtWSf5hUK1eOr/lo4NkD+If6EQw0nJ/gts0JS5Qpm5yBuk3uSFoa
+         u+tAdua+l67RGq/TQKrGJM/d4IXPZxmWc64w+Ku4otl5vLXlQgZYdllPj4qqdunwInvU
+         JMFb03HtZFblSzZaP4Pifp01lRJ1yNQd670a8GQ2t4Nv20vtTvfe+zTxZK2ztjMQ029z
+         93CA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=K4RegTFlAS1vHtPsS6VQv2PGN8uUwFV5fmBAjh3ZjH8=;
-        b=d+5p9MT5q19AAEpcwGB+UfzRygrFUbzH1pVC9pwTrmRrhhWcukdxwSO3Y1cBlkXqhc
-         MkNegcMphJ6bcvuyDMSdd9qDYE4ZXxJpLLXljXZN6VewPZ3WvyDbhTEBKeDQ1QLxVvLj
-         XK5rdQMaBttXaur5aVBbz4WlsxB9gp05c24WWR1Cy9r77mnDG3bq3dC7ma6fM5Btn7Qj
-         n95OsfZBkxUH4ZVlfS0mhuJghtqrDs62EXNQklBdT8OMRkekkVBnAJI8jZJDRpyc8dt0
-         AKQLB0PxMAieR3ecXGcKkkfOEwN02oSVENjZMJ5IH9fb5kXfg8i9u/Hna2Oeq2BAwt4d
-         Y8PA==
-X-Gm-Message-State: AOAM531q1fN5bEachA6scfke66PMnE5ffHM6D8o7l+nhrTJYW4DKgRjU
-        WY3MAnt/WavhAhd0T/VFljI=
-X-Google-Smtp-Source: ABdhPJzlFbVJCnytetIFsB8me3aL3szEJqcJz5yfU5STCm6cLL3hyv0A3UsC/wKsxjAvK80W74t9Qg==
-X-Received: by 2002:a17:902:ec90:b0:154:5c1c:bbf with SMTP id x16-20020a170902ec9000b001545c1c0bbfmr20278440plg.56.1649428264730;
-        Fri, 08 Apr 2022 07:31:04 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id e10-20020a17090a630a00b001c685cfd9d1sm12043002pjj.20.2022.04.08.07.31.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Apr 2022 07:31:04 -0700 (PDT)
-Message-ID: <5d84c02f-62c6-6418-6629-cebd42dc2ca5@acm.org>
-Date:   Fri, 8 Apr 2022 07:31:02 -0700
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=dw6sluGZPNAiiEgCFWBZyzySwlZyM82T1lEG/zKHTFQ=;
+        b=c3kAlvFEvIeo4uvPTVLkmgBa/N/Dlj56ifEYc8OxxwXPTrAce6FBL/gxxsneJwF+1F
+         7TCfrhlpkvsoOGbWleTTx3gu8kginIy8QHjUEf10o+drgOI3X+9oGc/MX7ocxtQiu2SG
+         fkM3s3oy1nPELFIgWnhr4IXjSare93DDcHGpaFsTqNMMBvby4xL1T4BS3kAc+G7DdGmr
+         VpvDWgqRx/GENI9dz3DxE/Hk9iBn75NL112pliuiMSTTLBf16I0Nnd6x02lAe+VCfZaG
+         79so/S3etf7EOxxZokihbNokvlcI08/hs3CD2FSxq5zO0Z0YXj9IJsfU7hrEKqorcofh
+         9T8w==
+X-Gm-Message-State: AOAM532kl0deJ8FYDVNTgIhTIPwieHcVYaCTmD8RQFEcsfN14M956IXM
+        qg8iVV9SCoXBgMceeZALYC4=
+X-Google-Smtp-Source: ABdhPJxgxsY8mgixTrjkYtArhXGsz7n8CcYtvAacpHZJYUbSur4JqSiGCQoobE9a8pbLiJiKce5l8Q==
+X-Received: by 2002:a17:90a:550a:b0:1cb:5799:30b4 with SMTP id b10-20020a17090a550a00b001cb579930b4mr1600266pji.9.1649430151971;
+        Fri, 08 Apr 2022 08:02:31 -0700 (PDT)
+Received: from localhost.localdomain ([114.200.4.15])
+        by smtp.gmail.com with ESMTPSA id f31-20020a17090a702200b001ca996866b5sm12268263pjk.12.2022.04.08.08.02.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Apr 2022 08:02:31 -0700 (PDT)
+Date:   Sat, 9 Apr 2022 00:02:24 +0900
+From:   Suwan Kim <suwan.kim027@gmail.com>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "mst@redhat.com" <mst@redhat.com>,
+        "jasowang@redhat.com" <jasowang@redhat.com>,
+        "stefanha@redhat.com" <stefanha@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "pbonzini@redhat.com" <pbonzini@redhat.com>,
+        "elliott@hpe.com" <elliott@hpe.com>,
+        "dongli.zhang@oracle.com" <dongli.zhang@oracle.com>,
+        "hch@infradead.org" <hch@infradead.org>,
+        Max Gurtovoy <mgurtovoy@nvidia.com>
+Subject: Re: [PATCH v6 0/2] virtio-blk: support polling I/O and
+ mq_ops->queue_rqs()
+Message-ID: <YlBOgKV/y/9bCWD4@localhost.localdomain>
+References: <20220406153207.163134-1-suwan.kim027@gmail.com>
+ <3b36802a-94ca-776b-bc15-51f60fbbcf51@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
- based on required tags
-Content-Language: en-US
-To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk,
-        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
-        ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220408073916.1428590-1-yukuai3@huawei.com>
- <20220408073916.1428590-9-yukuai3@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220408073916.1428590-9-yukuai3@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3b36802a-94ca-776b-bc15-51f60fbbcf51@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/8/22 00:39, Yu Kuai wrote:
-> Always wake up 'wake_batch' threads will intensify competition and
-> split io won't be issued continuously. Now that how many tags is required
-> is recorded for huge io, it's safe to wake up baed on required tags.
+On Thu, Apr 07, 2022 at 07:36:00PM +0000, Chaitanya Kulkarni wrote:
+> On 4/6/22 08:32, Suwan Kim wrote:
+> > This patch serise adds support for polling I/O and mq_ops->queue_rqs()
+> > to virtio-blk driver.
+> > 
 > 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   lib/sbitmap.c | 22 +++++++++++++++++++++-
->   1 file changed, 21 insertions(+), 1 deletion(-)
+> Thanks for doing this work, can you please add a blktests [1]
+> for this so it will get tested by different ppl under different
+> environment by various backend for each release ?
 > 
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index 8d01e02ea4b1..eac9fa5c2b4d 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -614,6 +614,26 @@ static inline void sbq_update_preemption(struct sbitmap_queue *sbq,
->   	WRITE_ONCE(sbq->force_tag_preemption, force);
->   }
->   
-> +static unsigned int get_wake_nr(struct sbq_wait_state *ws, unsigned int nr_tags)
+> Please CC me and Omar for blktests I'll be happy to review.
+> 
+> -ck
+> 
+> [1] https://github.com/osandov/blktests.git
+> 
+> 
 
-Consider renaming "get_wake_nr()" into "nr_to_wake_up()".
+Hi Chaitanya,
 
-> +{
-> +	struct sbq_wait *wait;
-> +	struct wait_queue_entry *entry;
-> +	unsigned int nr = 1;
-> +
-> +	spin_lock_irq(&ws->wait.lock);
-> +	list_for_each_entry(entry, &ws->wait.head, entry) {
-> +		wait = container_of(entry, struct sbq_wait, wait);
-> +		if (nr_tags <= wait->nr_tags)
-> +			break;
-> +
-> +		nr++;
-> +		nr_tags -= wait->nr_tags;
-> +	}
-> +	spin_unlock_irq(&ws->wait.lock);
-> +
-> +	return nr;
-> +}
-> +
->   static bool __sbq_wake_up(struct sbitmap_queue *sbq)
->   {
->   	struct sbq_wait_state *ws;
-> @@ -648,7 +668,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
->   	smp_mb__before_atomic();
->   	atomic_set(&ws->wait_cnt, wake_batch);
->   	sbq_update_preemption(sbq, wake_batch);
-> -	wake_up_nr(&ws->wait, wake_batch);
-> +	wake_up_nr(&ws->wait, get_wake_nr(ws, wake_batch));
->   
->   	return true;
->   }
+Sure. I will do.
+Do I need to add a new test script about vdN device IO polling
+to blktests/tests/block/?
 
-ws->wait.lock is unlocked after the number of threads to wake up has 
-been computed and is locked again by wake_up_nr(). The ws->wait.head 
-list may be modified after get_wake_nr() returns and before wake_up_nr() 
-is called. Isn't that a race condition?
-
-Thanks,
-
-Bart.
+Regards,
+Suwan Kim
