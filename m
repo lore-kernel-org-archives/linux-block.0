@@ -2,73 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E89CC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 05:51:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 057A6C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 06:52:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235007AbiDHFxa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 01:53:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49888 "EHLO
+        id S229446AbiDHGx7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 02:53:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233501AbiDHFx3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 01:53:29 -0400
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4201C2296D1
-        for <linux-block@vger.kernel.org>; Thu,  7 Apr 2022 22:51:27 -0700 (PDT)
-Received: by mail-lf1-x12d.google.com with SMTP id h14so8129337lfl.2
-        for <linux-block@vger.kernel.org>; Thu, 07 Apr 2022 22:51:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=colorremedies-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=QMVVRJGSL83qZp/D399to2LDBBeobEw6FStjIYATZ/Y=;
-        b=0YiRAWzvm1vgAPRBpqShBhJzPF6IeAHhJxoonPSnyl+HeapfBuqBKQCYebg6GIkrv9
-         lSJj4vxwr5M89BFYzC4xZSqEELjc7WzOUexpm9x3uKYSnrmw6jy/tHU6PHtW0wvxtuqt
-         z28rXPcsP5k7B8OTAFBB1Y+WGPN/m0XxgPx52dk+s5hZgUJ2YgkbHsH4kBchwzvJ+tfD
-         1A4cCfA5RMoyhXM0Tqd6KRQYk1xfN8xQI2wRHYdkDgFV430cBSLTxglcmlO4yM8L0fse
-         awJ3BB3sOXtwpKTDxYoach8joggACHPRPjA5gLy+lq90d0TBo8THUnJV6IH9s77ZzoEk
-         rEXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=QMVVRJGSL83qZp/D399to2LDBBeobEw6FStjIYATZ/Y=;
-        b=4/xekmnNL92n520rR85D215P+6Of0j/3PK+GitfeHzRk9BB5rxz3PE7xBXKpedFpeP
-         QcdgCyaHFKNWsWGLTo95nDuXOo3PT2OWj0dSuxs+snzb+7GBY2J4D7RMjNbh+lpCa5+n
-         dJKs2ejsnpQ1wGYx2sjoEhVTECJtIPNIqp0QzQs3G8i4JE4KzVXBILiArt32+5C2MKXy
-         Y2inK/enStVWKGOyJtykaiBD6iIgceUoFdBttMdDFK1TIBpTdutpOSNeT14Bdx2iVCaT
-         VrwvXY0i1FFdCoeTy3kX5qzsQZ7P8ngNsfvUvOJGlYy9wIocy8JJMOnSE466WI4tKw6j
-         NyXw==
-X-Gm-Message-State: AOAM531AjIuCmieVz7DCZQxxejHXKZDLBbkn+LKou0VkvdsfIw265YeA
-        YE2Hl3p2MkwD2M/sgUT372LbRX5x1LFmGbW4QYVsrg==
-X-Google-Smtp-Source: ABdhPJzjAOb88R3T8f0sBYpRPzkVucnZ8sw6tR7Q1e3wb3WhXl14J4PvwZOLRdJ9aVqEXjrcnlvXppRqb6ku2CgYizg=
-X-Received: by 2002:a05:6512:1594:b0:44a:2d71:f14d with SMTP id
- bp20-20020a056512159400b0044a2d71f14dmr12204895lfb.446.1649397085177; Thu, 07
- Apr 2022 22:51:25 -0700 (PDT)
+        with ESMTP id S229453AbiDHGxu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 02:53:50 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6F4676E34;
+        Thu,  7 Apr 2022 23:50:51 -0700 (PDT)
+Received: from kwepemi500001.china.huawei.com (unknown [172.30.72.57])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4KZTLN5NYTzBrWj;
+        Fri,  8 Apr 2022 14:46:36 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500001.china.huawei.com (7.221.188.114) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 8 Apr 2022 14:50:49 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Fri, 8 Apr 2022 14:50:48 +0800
+Subject: Re: [PATCH -next 00/11] support concurrent sync io for bfq on a
+ specail occasion
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <jack@suse.cz>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220305091205.4188398-1-yukuai3@huawei.com>
+ <e299180e-cdbd-0837-8478-5e397ac8166b@huawei.com>
+ <11fda851-a552-97ea-d083-d0288c17ba53@huawei.com>
+ <e78fc7c5-cf08-9fc7-3f81-7ff8aaf37673@huawei.com>
+ <81cfac80-83f6-7381-d4ad-560dfcdd9a9d@huawei.com>
+Message-ID: <b5ee609d-e104-bc91-f0d4-21e27d411ab8@huawei.com>
+Date:   Fri, 8 Apr 2022 14:50:47 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <CAJCQCtQkDFs7bt5T=jHO0iZ0zUgvaPpYPf_n4s+URtQXqF2Mew@mail.gmail.com>
- <CAHj4cs8Mtv66ikMDTJYQ48spEvF8QYyoD0SrZPDKfgXarpp=dg@mail.gmail.com>
-In-Reply-To: <CAHj4cs8Mtv66ikMDTJYQ48spEvF8QYyoD0SrZPDKfgXarpp=dg@mail.gmail.com>
-From:   Chris Murphy <lists@colorremedies.com>
-Date:   Thu, 7 Apr 2022 23:51:09 -0600
-Message-ID: <CAJCQCtS=1W23HZ71jw1AxJ=SXihDgjWfgxVC+vjjNpd9=87zrw@mail.gmail.com>
-Subject: Re: 5.18-rc1 nvme0: Admin Cmd(0x6), I/O Error (sct 0x0 / sc 0x2) DNR
-To:     Yi Zhang <yi.zhang@redhat.com>, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <81cfac80-83f6-7381-d4ad-560dfcdd9a9d@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 7, 2022 at 10:42 PM Yi Zhang <yi.zhang@redhat.com> wrote:
->
-> Hi Chris
->
-> This issue has been reported and you can find more info here.
-> https://lore.kernel.org/linux-nvme/F2ACCD82-052F-473F-9882-1703147FA662@oracle.com/T/#t
+friendly ping ...
 
-Thank you, I didn't realize there is an nvme specific list. Noted.
-
-I filed a rhbz referencing the nvme list thread in case anyone else
-stumbles into this.
-https://bugzilla.redhat.com/show_bug.cgi?id=2073270
-
--- 
-Chris Murphy
+在 2022/04/01 11:43, yukuai (C) 写道:
+> friendly ping ...
+> 
+> 在 2022/03/25 15:30, yukuai (C) 写道:
+>> friendly ping ...
+>>
+>> 在 2022/03/17 9:49, yukuai (C) 写道:
+>>> friendly ping ...
+>>>
+>>> 在 2022/03/11 14:31, yukuai (C) 写道:
+>>>> friendly ping ...
+>>>>
+>>>> 在 2022/03/05 17:11, Yu Kuai 写道:
+>>>>> Currently, bfq can't handle sync io concurrently as long as they
+>>>>> are not issued from root group. This is because
+>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>>>>> bfq_asymmetric_scenario().
+>>>>>
+>>>>> This patchset tries to support concurrent sync io if all the sync ios
+>>>>> are issued from the same cgroup:
+>>>>>
+>>>>> 1) Count root_group into 'num_groups_with_pending_reqs', patch 1-5;
+>>>>>
+>>>>> 2) Don't idle if 'num_groups_with_pending_reqs' is 1, patch 6;
+>>>>>
+>>>>> 3) Don't count the group if the group doesn't have pending requests,
+>>>>> while it's child groups may have pending requests, patch 7;
+>>>>>
+>>>>> This is because, for example:
+>>>>> if sync ios are issued from cgroup /root/c1/c2, root, c1 and c2
+>>>>> will all be counted into 'num_groups_with_pending_reqs',
+>>>>> which makes it impossible to handle sync ios concurrently.
+>>>>>
+>>>>> 4) Decrease 'num_groups_with_pending_reqs' when the last queue 
+>>>>> completes
+>>>>> all the requests, while child groups may still have pending
+>>>>> requests, patch 8-10;
+>>>>>
+>>>>> This is because, for example:
+>>>>> t1 issue sync io on root group, t2 and t3 issue sync io on the same
+>>>>> child group. num_groups_with_pending_reqs is 2 now.
+>>>>> After t1 stopped, num_groups_with_pending_reqs is still 2. sync io 
+>>>>> from
+>>>>> t2 and t3 still can't be handled concurrently.
+>>>>>
+>>>>> fio test script: startdelay is used to avoid queue merging
+>>>>> [global]
+>>>>> filename=/dev/nvme0n1
+>>>>> allow_mounted_write=0
+>>>>> ioengine=psync
+>>>>> direct=1
+>>>>> ioscheduler=bfq
+>>>>> offset_increment=10g
+>>>>> group_reporting
+>>>>> rw=randwrite
+>>>>> bs=4k
+>>>>>
+>>>>> [test1]
+>>>>> numjobs=1
+>>>>>
+>>>>> [test2]
+>>>>> startdelay=1
+>>>>> numjobs=1
+>>>>>
+>>>>> [test3]
+>>>>> startdelay=2
+>>>>> numjobs=1
+>>>>>
+>>>>> [test4]
+>>>>> startdelay=3
+>>>>> numjobs=1
+>>>>>
+>>>>> [test5]
+>>>>> startdelay=4
+>>>>> numjobs=1
+>>>>>
+>>>>> [test6]
+>>>>> startdelay=5
+>>>>> numjobs=1
+>>>>>
+>>>>> [test7]
+>>>>> startdelay=6
+>>>>> numjobs=1
+>>>>>
+>>>>> [test8]
+>>>>> startdelay=7
+>>>>> numjobs=1
+>>>>>
+>>>>> test result:
+>>>>> running fio on root cgroup
+>>>>> v5.17-rc6:       550 Mib/s
+>>>>> v5.17-rc6-patched: 550 Mib/s
+>>>>>
+>>>>> running fio on non-root cgroup
+>>>>> v5.17-rc6:       349 Mib/s
+>>>>> v5.17-rc6-patched: 550 Mib/s
+>>>>>
+>>>>> Yu Kuai (11):
+>>>>>    block, bfq: add new apis to iterate bfq entities
+>>>>>    block, bfq: apply news apis where root group is not expected
+>>>>>    block, bfq: cleanup for __bfq_activate_requeue_entity()
+>>>>>    block, bfq: move the increasement of 
+>>>>> 'num_groups_with_pending_reqs' to
+>>>>>      it's caller
+>>>>>    block, bfq: count root group into 'num_groups_with_pending_reqs'
+>>>>>    block, bfq: do not idle if only one cgroup is activated
+>>>>>    block, bfq: only count parent bfqg when bfqq is activated
+>>>>>    block, bfq: record how many queues have pending requests in 
+>>>>> bfq_group
+>>>>>    block, bfq: move forward __bfq_weights_tree_remove()
+>>>>>    block, bfq: decrease 'num_groups_with_pending_reqs' earlier
+>>>>>    block, bfq: cleanup bfqq_group()
+>>>>>
+>>>>>   block/bfq-cgroup.c  | 13 +++----
+>>>>>   block/bfq-iosched.c | 87 
+>>>>> +++++++++++++++++++++++----------------------
+>>>>>   block/bfq-iosched.h | 41 +++++++++++++--------
+>>>>>   block/bfq-wf2q.c    | 56 +++++++++++++++--------------
+>>>>>   4 files changed, 106 insertions(+), 91 deletions(-)
+>>>>>
