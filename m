@@ -2,148 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3189C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 06:54:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3125C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 07:24:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229527AbiDHG4e (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 02:56:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53048 "EHLO
+        id S229461AbiDHH0n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 03:26:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229453AbiDHG4d (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 02:56:33 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBE8432C213;
-        Thu,  7 Apr 2022 23:54:27 -0700 (PDT)
-Received: from kwepemi100004.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KZTVr4DLrz1HBfw;
-        Fri,  8 Apr 2022 14:53:56 +0800 (CST)
+        with ESMTP id S229469AbiDHH0m (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 03:26:42 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BBCA36939A;
+        Fri,  8 Apr 2022 00:24:39 -0700 (PDT)
+Received: from kwepemi100010.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KZV8C6FLFzgYXl;
+        Fri,  8 Apr 2022 15:22:51 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100004.china.huawei.com (7.221.188.70) with Microsoft SMTP Server
+ kwepemi100010.china.huawei.com (7.221.188.54) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 8 Apr 2022 14:54:25 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Fri, 8 Apr 2022 14:54:24 +0800
-Subject: Re: [PATCH] blk-mq: add debugfs to print information for
- blk_mq_tag_set
-To:     <axboe@kernel.dk>
+ 15.1.2375.24; Fri, 8 Apr 2022 15:24:37 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2308.21; Fri, 8 Apr
+ 2022 15:24:36 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <yukuai3@huawei.com>,
+        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
+        <ming.lei@redhat.com>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <yi.zhang@huawei.com>
-References: <20220401035319.274260-1-yukuai3@huawei.com>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <a7d35fc4-2ec5-7b64-4990-8a3a5bffa358@huawei.com>
-Date:   Fri, 8 Apr 2022 14:54:24 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Subject: [PATCH -next RFC v2 0/8] improve tag allocation under heavy load
+Date:   Fri, 8 Apr 2022 15:39:08 +0800
+Message-ID: <20220408073916.1428590-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20220401035319.274260-1-yukuai3@huawei.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping ...
+Changes in v2:
+ - use a new title
+ - add patches to fix waitqueues' unfairness - path 1-3
+ - delete patch to add queue flag
+ - delete patch to split big io thoroughly
 
-ÔÚ 2022/04/01 11:53, Yu Kuai Ð´µÀ:
-> This should be helpful to solve some problems.
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
->   block/blk-mq-debugfs.c | 54 ++++++++++++++++++++++++++++++++++++++----
->   1 file changed, 50 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
-> index aa0349e9f083..3c6260df7a95 100644
-> --- a/block/blk-mq-debugfs.c
-> +++ b/block/blk-mq-debugfs.c
-> @@ -183,12 +183,52 @@ static ssize_t queue_state_write(void *data, const char __user *buf,
->   	return count;
->   }
->   
-> +static void __flags_show(unsigned long flags, struct seq_file *m);
-> +
-> +static int queue_tag_set_show(void *data, struct seq_file *m)
-> +{
-> +	struct request_queue *q = data;
-> +	struct blk_mq_tag_set *set = q->tag_set;
-> +	int i, j;
-> +
-> +	seq_puts(m, "map:\n");
-> +	for (i = 0; i < set->nr_maps; ++i) {
-> +		struct blk_mq_queue_map *map = &set->map[i];
-> +
-> +		if (!map) {
-> +			seq_puts(m, "    NULL\n");
-> +			continue;
-> +		}
-> +
-> +		seq_printf(m, "    nr_queues %u offset %u map:", map->nr_queues,
-> +			   map->queue_offset);
-> +		if (!map->mq_map) {
-> +			seq_puts(m, " NULL\n");
-> +			continue;
-> +		}
-> +		for (j = 0; j < nr_cpu_ids; ++j)
-> +			seq_printf(m, " %u", map->mq_map[j]);
-> +		seq_puts(m, "\n");
-> +	}
-> +
-> +	seq_printf(m, "nr_hw_queues: %u\n", set->nr_hw_queues);
-> +	seq_printf(m, "queue_depth: %u\n", set->queue_depth);
-> +	seq_printf(m, "reserved_tags: %u\n", set->reserved_tags);
-> +	seq_printf(m, "cmd_size: %u\n", set->cmd_size);
-> +	seq_printf(m, "numa_node: %d\n", set->numa_node);
-> +	seq_printf(m, "timeout: %u\n", set->timeout);
-> +	__flags_show(set->flags, m);
-> +
-> +	return 0;
-> +}
-> +
->   static const struct blk_mq_debugfs_attr blk_mq_debugfs_queue_attrs[] = {
->   	{ "poll_stat", 0400, queue_poll_stat_show },
->   	{ "requeue_list", 0400, .seq_ops = &queue_requeue_list_seq_ops },
->   	{ "pm_only", 0600, queue_pm_only_show, NULL },
->   	{ "state", 0600, queue_state_show, queue_state_write },
->   	{ "zone_wlock", 0400, queue_zone_wlock_show, NULL },
-> +	{ "tag_set", 0400, queue_tag_set_show, NULL },
->   	{ },
->   };
->   
-> @@ -229,10 +269,9 @@ static const char *const hctx_flag_name[] = {
->   };
->   #undef HCTX_FLAG_NAME
->   
-> -static int hctx_flags_show(void *data, struct seq_file *m)
-> +static void __flags_show(unsigned long flags, struct seq_file *m)
->   {
-> -	struct blk_mq_hw_ctx *hctx = data;
-> -	const int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(hctx->flags);
-> +	const int alloc_policy = BLK_MQ_FLAG_TO_ALLOC_POLICY(flags);
->   
->   	seq_puts(m, "alloc_policy=");
->   	if (alloc_policy < ARRAY_SIZE(alloc_policy_name) &&
-> @@ -242,9 +281,16 @@ static int hctx_flags_show(void *data, struct seq_file *m)
->   		seq_printf(m, "%d", alloc_policy);
->   	seq_puts(m, " ");
->   	blk_flags_show(m,
-> -		       hctx->flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
-> +		       flags ^ BLK_ALLOC_POLICY_TO_MQ_FLAG(alloc_policy),
->   		       hctx_flag_name, ARRAY_SIZE(hctx_flag_name));
->   	seq_puts(m, "\n");
-> +}
-> +
-> +static int hctx_flags_show(void *data, struct seq_file *m)
-> +{
-> +	struct blk_mq_hw_ctx *hctx = data;
-> +
-> +	__flags_show(hctx->flags, m);
->   	return 0;
->   }
->   
-> 
+There is a defect for blk-mq compare to blk-sq, specifically split io
+will end up discontinuous if the device is under high io pressure, while
+split io will still be continuous in sq, this is because:
+
+1) new io can preempt tag even if there are lots of threads waiting.
+2) split bio is issued one by one, if one bio can't get tag, it will go
+to wail.
+3) each time 8(or wake batch) requests is done, 8 waiters will be woken up.
+Thus if a thread is woken up, it will unlikey to get multiple tags.
+
+The problem was first found by upgrading kernel from v3.10 to v4.18,
+test device is HDD with 256 'max_sectors_kb', and test case is issuing 1m
+ios with high concurrency.
+
+Noted that there is a precondition for such performance problem:
+There is a certain gap between bandwith for single io with
+bs=max_sectors_kb and disk upper limit.
+
+During the test, I found that waitqueues can be extremly unbalanced on
+heavy load. This is because 'wake_index' is not set properly in
+__sbq_wake_up(), see details in patch 3.
+
+In this patchset:
+ - patch 1-3 fix waitqueues' unfairness.
+ - patch 4,5 disable tag preemption on heavy load.
+ - patch 6 forces tag preemption for split bios.
+ - patch 7,8 improve large random io for HDD. As I mentioned above, we
+ do meet the problem and I'm trying to fix it at very low cost. However,
+ if anyone still thinks this is not a common case and not worth to
+ optimize, I'll drop them.
+
+Test environment:
+arm64, 96 core with 200 BogoMIPS, test device is HDD. The default
+'max_sectors_kb' is 1280(Sorry that I was unable to test on the machine
+where 'max_sectors_kb' is 256).
+
+The single io performance(randwrite):
+
+| bs       | 128k | 256k | 512k | 1m   | 1280k | 2m   | 4m   |
+| -------- | ---- | ---- | ---- | ---- | ----- | ---- | ---- |
+| bw MiB/s | 20.1 | 33.4 | 51.8 | 67.1 | 74.7  | 82.9 | 82.9 |
+
+It can be seen that 1280k io is already close to upper limit, and it'll
+be hard to see differences with the default value, thus I set
+'max_sectors_kb' to 128 in the following test.
+
+Test cmd:
+        fio \
+        -filename=/dev/$dev \
+        -name=test \
+        -ioengine=psync \
+        -allow_mounted_write=0 \
+        -group_reporting \
+        -direct=1 \
+        -offset_increment=1g \
+        -rw=randwrite \
+        -bs=1024k \
+        -numjobs={1,2,4,8,16,32,64,128,256,512} \
+        -runtime=110 \
+        -ramp_time=10
+
+Test result: MiB/s
+
+| numjobs | v5.18-rc1 | v5.18-rc1-patched |
+| ------- | --------- | ----------------- |
+| 1       | 67.7      | 67.7              |
+| 2       | 67.7      | 67.7              |
+| 4       | 67.7      | 67.7              |
+| 8       | 67.7      | 67.7              |
+| 16      | 64.8      | 65.2              |
+| 32      | 59.8      | 62.8              |
+| 64      | 54.9      | 58.6              |
+| 128     | 49        | 55.8              |
+| 256     | 37.7      | 52.3              |
+| 512     | 31.8      | 51.4              |
+
+Yu Kuai (8):
+  sbitmap: record the number of waiters for each waitqueue
+  blk-mq: call 'bt_wait_ptr()' later in blk_mq_get_tag()
+  sbitmap: make sure waitqueues are balanced
+  blk-mq: don't preempt tag on heavy load
+  sbitmap: force tag preemption if free tags are sufficient
+  blk-mq: force tag preemption for split bios
+  blk-mq: record how many tags are needed for splited bio
+  sbitmap: wake up the number of threads based on required tags
+
+ block/blk-merge.c         |   9 ++-
+ block/blk-mq-tag.c        |  42 +++++++++-----
+ block/blk-mq.c            |  25 +++++++-
+ block/blk-mq.h            |   2 +
+ include/linux/blk_types.h |   4 ++
+ include/linux/sbitmap.h   |   9 +++
+ lib/sbitmap.c             | 117 +++++++++++++++++++++++++-------------
+ 7 files changed, 150 insertions(+), 58 deletions(-)
+
+-- 
+2.31.1
+
