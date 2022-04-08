@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39788C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 14:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2546DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 14:31:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232123AbiDHO0z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 10:26:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55022 "EHLO
+        id S236915AbiDHOdK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 10:33:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232946AbiDHO0y (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 10:26:54 -0400
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1749352E43;
-        Fri,  8 Apr 2022 07:24:50 -0700 (PDT)
-Received: by mail-pg1-f177.google.com with SMTP id q19so7907578pgm.6;
-        Fri, 08 Apr 2022 07:24:50 -0700 (PDT)
+        with ESMTP id S236931AbiDHOdJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 10:33:09 -0400
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E6AD38236A;
+        Fri,  8 Apr 2022 07:31:05 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id u14so8841244pjj.0;
+        Fri, 08 Apr 2022 07:31:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=6ODb0Vvt7yJSXTfd7/roxI6ds9SrXkY3UoyCBz1N6yg=;
-        b=Yp0BemXTzFsiq0rCtVlZa3+FNCorzAkZmwvgY7xwS209zMwuAs/SGYeT9VHh/LMEc2
-         3lSLTbGOuvF70Oly7/ZlyPEhfwIHpdbs1V1ZIO3AL6J9gcrvdWsxFrIkE6Z6htEuQdBY
-         3UtP8UxYU3FjNyyOcvQjAkhix/1GCq5/R97X1Z84Y0R/uWp58VwCU3+ypOM/hoxV5aP4
-         TqrKAgAcvBXRdHYS2E2X9woLtOe0aRFOyT15Emj58cN0YaNBty+NRjhsLQj/nI6ppwE+
-         1HwJQxpvS7g0qUZ9yZX2vGSZPrJJI4KSdBp2XAUt6MejZdlMzc0VqiMRMugxhw9KaaAF
-         zVhg==
-X-Gm-Message-State: AOAM532I0P1jWzoZWqMRwnvOvGD/HmkrZjOI0Y2DHxo6xN4bsYGXqojx
-        j74Yxah8JBOyCLhUizqBL1M=
-X-Google-Smtp-Source: ABdhPJxTs6S4CtJPYyP8s02ZrwKd9mFCt4lTRL8yGczwwgM1zjya290zt205U2JZ6gZJJTcnRHO9vA==
-X-Received: by 2002:a65:6a16:0:b0:39d:4f3:67e6 with SMTP id m22-20020a656a16000000b0039d04f367e6mr1835982pgu.84.1649427890298;
-        Fri, 08 Apr 2022 07:24:50 -0700 (PDT)
+        bh=K4RegTFlAS1vHtPsS6VQv2PGN8uUwFV5fmBAjh3ZjH8=;
+        b=d+5p9MT5q19AAEpcwGB+UfzRygrFUbzH1pVC9pwTrmRrhhWcukdxwSO3Y1cBlkXqhc
+         MkNegcMphJ6bcvuyDMSdd9qDYE4ZXxJpLLXljXZN6VewPZ3WvyDbhTEBKeDQ1QLxVvLj
+         XK5rdQMaBttXaur5aVBbz4WlsxB9gp05c24WWR1Cy9r77mnDG3bq3dC7ma6fM5Btn7Qj
+         n95OsfZBkxUH4ZVlfS0mhuJghtqrDs62EXNQklBdT8OMRkekkVBnAJI8jZJDRpyc8dt0
+         AKQLB0PxMAieR3ecXGcKkkfOEwN02oSVENjZMJ5IH9fb5kXfg8i9u/Hna2Oeq2BAwt4d
+         Y8PA==
+X-Gm-Message-State: AOAM531q1fN5bEachA6scfke66PMnE5ffHM6D8o7l+nhrTJYW4DKgRjU
+        WY3MAnt/WavhAhd0T/VFljI=
+X-Google-Smtp-Source: ABdhPJzlFbVJCnytetIFsB8me3aL3szEJqcJz5yfU5STCm6cLL3hyv0A3UsC/wKsxjAvK80W74t9Qg==
+X-Received: by 2002:a17:902:ec90:b0:154:5c1c:bbf with SMTP id x16-20020a170902ec9000b001545c1c0bbfmr20278440plg.56.1649428264730;
+        Fri, 08 Apr 2022 07:31:04 -0700 (PDT)
 Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id j24-20020aa78d18000000b0050564584660sm6223983pfe.32.2022.04.08.07.24.48
+        by smtp.gmail.com with ESMTPSA id e10-20020a17090a630a00b001c685cfd9d1sm12043002pjj.20.2022.04.08.07.31.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Apr 2022 07:24:49 -0700 (PDT)
-Message-ID: <0dab5bd2-4f19-0b04-fa8c-6ed68b70c20e@acm.org>
-Date:   Fri, 8 Apr 2022 07:24:47 -0700
+        Fri, 08 Apr 2022 07:31:04 -0700 (PDT)
+Message-ID: <5d84c02f-62c6-6418-6629-cebd42dc2ca5@acm.org>
+Date:   Fri, 8 Apr 2022 07:31:02 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH -next RFC v2 4/8] blk-mq: don't preempt tag under heavy
- load
+Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
+ based on required tags
 Content-Language: en-US
 To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk,
         andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
@@ -51,9 +51,9 @@ To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk,
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         yi.zhang@huawei.com
 References: <20220408073916.1428590-1-yukuai3@huawei.com>
- <20220408073916.1428590-5-yukuai3@huawei.com>
+ <20220408073916.1428590-9-yukuai3@huawei.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220408073916.1428590-5-yukuai3@huawei.com>
+In-Reply-To: <20220408073916.1428590-9-yukuai3@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -61,38 +61,64 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 4/8/22 00:39, Yu Kuai wrote:
-> The idle way to disable tag preemption is to track how many tags are
-
-idle -> ideal?
-
-> available, and wait directly in blk_mq_get_tag() if free tags are
-> very little. However, this is out of reality because fast path is
-> affected.
+> Always wake up 'wake_batch' threads will intensify competition and
+> split io won't be issued continuously. Now that how many tags is required
+> is recorded for huge io, it's safe to wake up baed on required tags.
 > 
-> As 'ws_active' is only updated in slow path, this patch disable tag
-> preemption if 'ws_active' is greater than 8, which means there are many
-> threads waiting for tags already.
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>   lib/sbitmap.c | 22 +++++++++++++++++++++-
+>   1 file changed, 21 insertions(+), 1 deletion(-)
 > 
-> Once tag preemption is disabled, there is a situation that can cause
-> performance degration(or io hung in extreme scenarios): the waitqueue
-
-degration -> degradation?
-
-> diff --git a/block/blk-mq.h b/block/blk-mq.h
-> index 2615bd58bad3..b49b20e11350 100644
-> --- a/block/blk-mq.h
-> +++ b/block/blk-mq.h
-> @@ -156,6 +156,7 @@ struct blk_mq_alloc_data {
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 8d01e02ea4b1..eac9fa5c2b4d 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -614,6 +614,26 @@ static inline void sbq_update_preemption(struct sbitmap_queue *sbq,
+>   	WRITE_ONCE(sbq->force_tag_preemption, force);
+>   }
 >   
->   	/* allocate multiple requests/tags in one go */
->   	unsigned int nr_tags;
-> +	bool preemption;
->   	struct request **cached_rq;
->   
+> +static unsigned int get_wake_nr(struct sbq_wait_state *ws, unsigned int nr_tags)
 
-Please change "preemption" into "preempt".
+Consider renaming "get_wake_nr()" into "nr_to_wake_up()".
+
+> +{
+> +	struct sbq_wait *wait;
+> +	struct wait_queue_entry *entry;
+> +	unsigned int nr = 1;
+> +
+> +	spin_lock_irq(&ws->wait.lock);
+> +	list_for_each_entry(entry, &ws->wait.head, entry) {
+> +		wait = container_of(entry, struct sbq_wait, wait);
+> +		if (nr_tags <= wait->nr_tags)
+> +			break;
+> +
+> +		nr++;
+> +		nr_tags -= wait->nr_tags;
+> +	}
+> +	spin_unlock_irq(&ws->wait.lock);
+> +
+> +	return nr;
+> +}
+> +
+>   static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   {
+>   	struct sbq_wait_state *ws;
+> @@ -648,7 +668,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>   	smp_mb__before_atomic();
+>   	atomic_set(&ws->wait_cnt, wake_batch);
+>   	sbq_update_preemption(sbq, wake_batch);
+> -	wake_up_nr(&ws->wait, wake_batch);
+> +	wake_up_nr(&ws->wait, get_wake_nr(ws, wake_batch));
+>   
+>   	return true;
+>   }
+
+ws->wait.lock is unlocked after the number of threads to wake up has 
+been computed and is locked again by wake_up_nr(). The ws->wait.head 
+list may be modified after get_wake_nr() returns and before wake_up_nr() 
+is called. Isn't that a race condition?
 
 Thanks,
 
 Bart.
-
