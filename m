@@ -2,108 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D14AC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 15:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8FFCC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  8 Apr 2022 19:10:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237735AbiDHPpM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 11:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34384 "EHLO
+        id S231663AbiDHTMY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 8 Apr 2022 15:12:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237732AbiDHPpK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 11:45:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6414D8F98D
-        for <linux-block@vger.kernel.org>; Fri,  8 Apr 2022 08:43:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649432582;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=uh9C/0cIrjIkPvPWnpHllBVIfwXhKDgyixfW2DYR0Ew=;
-        b=KNPN9jVc5Uy4gbevGVXI2icBTz8dy7IZzs2R7i4LxB1yx2xc3SgRQGE+0ZA1kEWl7XJl8b
-        9MvO3AVhMnOci/fOK1Yl58yr9URuzz9YaDWTj+GpTWYX9pM5zhM+PV4lrzNQxwqDAMv2mE
-        i8BxibgR2RtmXcLAAv0RXqrrrU+gySg=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-624-D0TwLVhyOmCwTyMBj4omQg-1; Fri, 08 Apr 2022 11:42:54 -0400
-X-MC-Unique: D0TwLVhyOmCwTyMBj4omQg-1
-Received: by mail-qt1-f198.google.com with SMTP id e5-20020ac85985000000b002e217abd72fso8018272qte.9
-        for <linux-block@vger.kernel.org>; Fri, 08 Apr 2022 08:42:54 -0700 (PDT)
+        with ESMTP id S230398AbiDHTMX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 15:12:23 -0400
+Received: from mail-il1-x134.google.com (mail-il1-x134.google.com [IPv6:2607:f8b0:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB9BAFA238
+        for <linux-block@vger.kernel.org>; Fri,  8 Apr 2022 12:10:15 -0700 (PDT)
+Received: by mail-il1-x134.google.com with SMTP id r11so7131781ila.1
+        for <linux-block@vger.kernel.org>; Fri, 08 Apr 2022 12:10:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=uaceRjBB2mDTyHzrgasDxaH0Scftp6QF398Ljtd1+os=;
+        b=s1MqjSL/CHfTdm31fAKGu57ADqPRJl+amfCgBH7Ug7pvLE5BUNP6bJxV+JLuIU+A/D
+         Obhb85OpQr1/oK/tKt0m7X+fdEIS+659SBs+aLa9wa80aebBdjvGaq6Y95dEzaZq0co+
+         GsilxsbjDp8i6cPlvMcHtMpdoMSR1cJ6m1dalinxWPJH+NnWKs/hGMyynI0luGSLcWKZ
+         AByQkS1VlThw2+MtLwM/PWk/nbfZn/ZdFtbxPtcgWrHIPTyQ5FYNWWw+sbM7pUlg+1mO
+         NDM+Heq+qsLNNuiaqpkYR28zWIPkBPs3CWLhgaZ73LLu4766+u83eVRkWU5CCHOcs7Yd
+         0dxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=uh9C/0cIrjIkPvPWnpHllBVIfwXhKDgyixfW2DYR0Ew=;
-        b=fdUt44TkJZEV/m6von103EvZ4lVXbeatRKxMHCDibYYykpfi5X11XhUIJ26CjNkPom
-         IJQNNHDS0Md0hgvLUahYG2x/SprrmcOX2T3fMKR/2DscA1MMilg2FJFQ6cZgncImh0JO
-         +jyd3m/NlXT4gFndMlsU830pNDLCMpg5aeWvwNyXG+HNgNAurKqLg0MgmAZgnm/gic3r
-         9Ma/kfhGxK9qZkZusgGRctEsCvir+5CoFaL3FKLnlujsp1C9mT524RmQyMTwGf+HguTB
-         S2On2Z09FYULtH7BUcTj8JyVAkDMe7ZXHbbn9siAadRHVg6aiq7jteM5ycehAuF8g4oy
-         ZwBg==
-X-Gm-Message-State: AOAM533nrO6ftW5fEPbzvpVezC7hGPk48yfBuFQOfiX5vDG93S2VmhHq
-        QkXtfn9IqrjiPrhBwi/1efAAXsUkNiDMFkJSG8yU89Tgmr1PQ4r6x0W/zPsU98roX+lzWaq5JHK
-        tGTVkZxql5cKuo/Jo+Sisaw==
-X-Received: by 2002:ac8:5b86:0:b0:2e2:72c:9e06 with SMTP id a6-20020ac85b86000000b002e2072c9e06mr16437924qta.113.1649432573616;
-        Fri, 08 Apr 2022 08:42:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzUfLlWE2Smd+oFO5ffih62dgSw8HBW5GxPWKP/2qDKZQAiBqeEt3sbfXtDD+mcuNQwhgeoNw==
-X-Received: by 2002:ac8:5b86:0:b0:2e2:72c:9e06 with SMTP id a6-20020ac85b86000000b002e2072c9e06mr16437906qta.113.1649432573399;
-        Fri, 08 Apr 2022 08:42:53 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id a21-20020a376615000000b0069a110a481dsm2597335qkc.41.2022.04.08.08.42.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Apr 2022 08:42:52 -0700 (PDT)
-Date:   Fri, 8 Apr 2022 11:42:51 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Dennis Zhou <dennis@kernel.org>, Mike Snitzer <snitzer@kernel.org>,
-        tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
-Message-ID: <YlBX+ytxxeSj2neQ@redhat.com>
-References: <YkSK6mU1fja2OykG@redhat.com>
- <YkRM7Iyp8m6A1BCl@fedora>
- <YkUwmyrIqnRGIOHm@infradead.org>
- <YkVBjUy9GeSMbh5Q@fedora>
- <YkVxLN9p0t6DI5ie@infradead.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=uaceRjBB2mDTyHzrgasDxaH0Scftp6QF398Ljtd1+os=;
+        b=xiJ5QZEOcCnPu0BjVUitpY0eqrux97Y+VO/fblnYzGwfbSHnie9Q8lKJVJ74cPbuUN
+         ngS3kiU+/7+dYC30cdD7JNoTE1zSrxw9dPI5kIJE+23M9KCfF70Qu6ZkNEjRjBvNOSEa
+         UlHHdAQhr1X5/C3xSkdxTSploIi79kf3E5srUB0hCKgCMc3smCyYAYXRKOKYibClp4xm
+         KES2FqggqpPZwHtObxuz+Lw7woMFLTCIsrOWVzAo4/1gbeQKylZ/aCUovhpjsARRRdkl
+         9QcscLKiHMzxHCTyTy2LCJBYDVMaofd+6112L82wsfgoHnhQs3XS7vmLaa0ibc6MUTGx
+         L0fA==
+X-Gm-Message-State: AOAM531jsLJp578ypulXi3oVP4az4akcxlASdM9OexSYfgzN4UD5suaQ
+        cMHiMEHpruVhpht7Xf5RI/RJESQx8fecHQ==
+X-Google-Smtp-Source: ABdhPJxtcYltX1BnEPzh0LFo0to385E6nrfK7qi+Y+TAJR6n34lh/R0BX7OkkS0En6Ghcbwvmqedyw==
+X-Received: by 2002:a05:6e02:1b83:b0:2c8:c95:a4b3 with SMTP id h3-20020a056e021b8300b002c80c95a4b3mr9256011ili.293.1649445015192;
+        Fri, 08 Apr 2022 12:10:15 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id o3-20020a0566022e0300b0064ca88c0893sm16478414iow.10.2022.04.08.12.10.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Apr 2022 12:10:14 -0700 (PDT)
+Message-ID: <d50a0ee1-c7e2-1b99-8d3f-ce2edeea92cd@kernel.dk>
+Date:   Fri, 8 Apr 2022 13:10:13 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YkVxLN9p0t6DI5ie@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH -next RFC v2 0/8] improve tag allocation under heavy load
+Content-Language: en-US
+To:     Yu Kuai <yukuai3@huawei.com>, andriy.shevchenko@linux.intel.com,
+        john.garry@huawei.com, ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220408073916.1428590-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 31 2022 at  5:15P -0400,
-Christoph Hellwig <hch@infradead.org> wrote:
+For this one, and other patches you send, they send up in spam because
+the sender can't be verified. I would encourage you to figure out what
+is going wrong here, because a lot of your patches end up getting
+dropped or missed because of it.
 
-> On Wed, Mar 30, 2022 at 10:52:13PM -0700, Dennis Zhou wrote:
-> > I took a quick look. It seems with the new interface,
-> > bio_clone_blkg_association() is unnecessary given the correct
-> > association should be derived from the bio_alloc*() calls with the
-> > passed in bdev. Also, blkcg_bio_issue_init() in clone seems wrong.
-> 
-> Yes, I think you are right.
-> 
-> > Maybe the right thing to do here for md-linear and btrfs (what I've
-> > looked at) is to delay cloning until the map occurs and the right device
-> > is already in hand?
-> 
-> That would in general be the preferred option where possible.
-
-Delaying cloning until remap is a problem for DM given the target_type
-->map interface for all DM targets assumes the passed bio is already a
-clone that needs to be remapped accordingly.
-
-I think we can achieve the goal of efficient cloning/remapping for
-both usecases simply by splitting out the bio_set_dev() and leaving it
-to the caller to pick which interface to use (e.g. clone vs
-clone_and_remap).
-
-Christoph is this something you're open to doing as continuation of
-your bio alloc/clone related audit/changes?  Or would you prefer
-someone else deal with it?  I could take a closer look next week if
-needed.
-
-Mike
+-- 
+Jens Axboe
 
