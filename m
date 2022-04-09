@@ -2,312 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F09C433FE
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 14:52:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF522C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 16:03:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239552AbiDIOyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 10:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38232 "EHLO
+        id S242551AbiDIQFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 12:05:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233301AbiDIOyI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 10:54:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D901C2B
-        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 07:51:59 -0700 (PDT)
+        with ESMTP id S242550AbiDIQFy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 12:05:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E6B185BC9
+        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 09:03:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649515918;
+        s=mimecast20190719; t=1649520225;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=t/bg9kn7ROahCSJyzfOEtwvtDCZszZoWTbNGij2GrjE=;
-        b=WIn2RwJ+6s6g0PgtqNJIaGlqmHd/zV8vIuqysfyp3wN8v4yqTnhbYNl4rxyxsexHjj4rNi
-        ySzlTOcL5FngQ9aRexdNRkDJKcuhIZtcAMyYSMgal9804Ui99LfQeDelaoreM22JsdY4SW
-        EqjbNtmV5HABmQUnNAqtHjLTmKEqvTs=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=qtkyBcEIcgGitzE6/jMR0BHvrVCs5FpvV9wdXJQk7lw=;
+        b=ZMW9WlxGWd4k7ey9jSAoBlvshyUGNQvSRCLhalxJdXUcuSwdZoh9zXyyjJCIvF/o2oZ1NA
+        rwmcicg/LoG+EXit133fpNFIbkc7I5c6ZP6FFWt87VIXrj30dHtX3NJvuvwKt9pnQsNsNy
+        f2CpLQAsjREqOujo/jgEQSx1fyff1VE=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-48-of_xt2dBNCm_QR4bi8xcTA-1; Sat, 09 Apr 2022 10:51:57 -0400
-X-MC-Unique: of_xt2dBNCm_QR4bi8xcTA-1
-Received: by mail-qt1-f200.google.com with SMTP id f7-20020a05622a1a0700b002e06d6279d5so9878729qtb.7
-        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 07:51:57 -0700 (PDT)
+ us-mta-453-uOqGqz4lOtGgqoXz7W7glA-1; Sat, 09 Apr 2022 12:03:44 -0400
+X-MC-Unique: uOqGqz4lOtGgqoXz7W7glA-1
+Received: by mail-qv1-f72.google.com with SMTP id gh5-20020a05621429c500b004443be8db85so242446qvb.11
+        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 09:03:44 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=t/bg9kn7ROahCSJyzfOEtwvtDCZszZoWTbNGij2GrjE=;
-        b=bOd1e+UwPUrQuFhaJpHlTbUVhR6kc7S/rb7hN7MgEWEdyYgQozlPw4LQWs/SYyQTg1
-         t9+C8zRpDxIFRgldDPLDqfTwNaqV3xWDQ0Lv4e+5h4yw0Oy4Nwa4ED1S43mngKDDOBZQ
-         s0lrsQTI/KyHuRht/Vg6b1jFt7rGXQbw5l2/fg28PPtMTyPfuzwUAJk+bI6+JhbrsGT0
-         s367MXk/1hSCKYAkXPJDSHuN7FT372oX4FmJl2Tsm2mDEWSsXWxyb0gBaO8vwPJiXq9n
-         SVx0EoekweJR6qlZizKSrtgYXZXzAIyXf9lMQAY0qbIXnoBSUnNHeoKvsg/0D1F3Qxz8
-         LXtw==
-X-Gm-Message-State: AOAM532I649b2XqloNV0RoPW55GAh3vRJz97eJGm4gIPRNdzRg9oOW/s
-        QHW8cVJ81vf46/DkamSdMYvCVeajuPNEGvnTq/G6KFMKdJWwYPnJKXJ80GMxdglFGVGDmf9DreA
-        eKNPZfeMDrNEFmpXNzccaatQ=
-X-Received: by 2002:a05:620a:2544:b0:680:a53b:ec1a with SMTP id s4-20020a05620a254400b00680a53bec1amr16685997qko.544.1649515916290;
-        Sat, 09 Apr 2022 07:51:56 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwGn6fJ9jRuJMb+wl3Tw8IkHfFNGvG+cEzqACp3UVw8jPRAuuFK+9VOOBkb8ed4Kksz+lzgVw==
-X-Received: by 2002:a05:620a:2544:b0:680:a53b:ec1a with SMTP id s4-20020a05620a254400b00680a53bec1amr16685978qko.544.1649515916047;
-        Sat, 09 Apr 2022 07:51:56 -0700 (PDT)
-Received: from dell-per740-01.7a2m.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
-        by smtp.gmail.com with ESMTPSA id a23-20020a05620a16d700b0067e98304705sm14845602qkn.89.2022.04.09.07.51.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Apr 2022 07:51:55 -0700 (PDT)
-From:   Tom Rix <trix@redhat.com>
-To:     tim@cyberelk.net, axboe@kernel.dk, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, nathan@kernel.org,
-        ndesaulniers@google.com
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=qtkyBcEIcgGitzE6/jMR0BHvrVCs5FpvV9wdXJQk7lw=;
+        b=jDU6WhJsyCVL1ZnPpb22smzpXTGFQb6ECzGQTW0sXY7r7Pe/Y5c/tybmxTJR87Fo6r
+         JZDirLrWSn9Pf+3Lk2KDUEgDgLRV2DntcPYNnNobr4CxcN6XewTlWBGhcdzryWFKF2aB
+         v2v5cfOv3XO9OvZT6liDxw0XZKdc8k3gvuZEJtJwa29cqEZDXTItcBeiIPUhxPiJCuyN
+         iKN43LhzqTVOC8KxeoomD/hmNWG5IOs0L6Z85mmHKNVRi+4rNxK7QAfpJu1tNSFkWaVV
+         OuGpxAM4w4ov44tMUCBYtxwB5GWZ7zNNpbFXY2ulY27EuNePjr19l8aLp4Cv8U1vAqU1
+         hK1A==
+X-Gm-Message-State: AOAM5300Q97LcEdRQk1iyQ2UBC2VDBzAbCNJ0h+2ICxF2cWhPy1ZRkou
+        CuYd7ZrX+YZybT+M6l9k+OQkB2XttwsMgxgAIldXAwAhlwvS0OiGmbQb5cmGBH992MzzTnK6wIw
+        dUlXJeCvBtQWlSoWK8qDuBNE=
+X-Received: by 2002:a05:620a:4694:b0:67e:ca07:4d46 with SMTP id bq20-20020a05620a469400b0067eca074d46mr16310326qkb.624.1649520223780;
+        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9gLy9N+EtbprXxWppsB8/pZMfaSy4i+GT0eKsrmpJpPW6wWHSwAV/TaLkqZlqoRiGySXFDw==
+X-Received: by 2002:a05:620a:4694:b0:67e:ca07:4d46 with SMTP id bq20-20020a05620a469400b0067eca074d46mr16310304qkb.624.1649520223470;
+        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
+Received: from localhost.localdomain (024-205-208-113.res.spectrum.com. [24.205.208.113])
+        by smtp.gmail.com with ESMTPSA id o6-20020a05620a22c600b0067d247816eesm15150840qki.85.2022.04.09.09.03.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
+Subject: Re: [PATCH] block: Remove redundant assignments
+To:     Michal Orzel <michalorzel.eng@gmail.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, llvm@lists.linux.dev,
-        Tom Rix <trix@redhat.com>
-Subject: [PATCH] security: do not leak information in ioctl
-Date:   Sat,  9 Apr 2022 10:51:37 -0400
-Message-Id: <20220409145137.67592-1-trix@redhat.com>
-X-Mailer: git-send-email 2.27.0
+        linux-ntfs-dev@lists.sourceforge.net, llvm@lists.linux.dev
+References: <20220409101933.207157-1-michalorzel.eng@gmail.com>
+ <20220409101933.207157-2-michalorzel.eng@gmail.com>
+ <a56d1184-d399-d5f8-765f-5a4f35dacd5e@redhat.com>
+ <446a3e88-4c14-300d-862a-1279274c3760@gmail.com>
+From:   Tom Rix <trix@redhat.com>
+Message-ID: <c2c40f00-777c-f19a-eb5f-6e978ddd6bcf@redhat.com>
+Date:   Sat, 9 Apr 2022 09:03:40 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
+In-Reply-To: <446a3e88-4c14-300d-862a-1279274c3760@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-clang static analysis reports this representative issue
-pcd.c:832:22: warning: Assigned value is garbage
-  or undefined
-  tochdr->cdth_trk0 = buffer[2];
-                    ^ ~~~~~~~~~
 
-If the call to pcd_atapi fails, buffer is an unknown
-state.  Passing an unknown buffer back to the user
-can leak information and is a security risk.
+On 4/9/22 6:20 AM, Michal Orzel wrote:
+> Hi Tom,
+>
+>> On 4/9/22 3:19 AM, Michal Orzel wrote:
+>>> Get rid of redundant assignments which end up in values not being
+>>> read either because they are overwritten or the function ends.
+>> This log is the same as your last patch.
+>>
+>> Instead of a general statement on deadstores, a more specific
+>>
+>> analysis of the setting being removed would be helpful.
+>>
+>> This will mean splitting the patch to match the analysis.
+>>
+>> Tom
+>>
+> I think that this explanation in a commit is enough for such a trivial patch.
+> It informs that we are fixing clang-tidy findings related to deadstores
+> in a block subsystem. What analysis would you want to see?
+> Something like "Remove deadstore assignment ret = -EINVAL  in a function bio_map_user_iov" ?
+> I think that it will create too much of not needed overhead.
 
-Check before returning this buffer to the user.
+The compiler should remove these already.  All of the static analyzers 
+produce false positives, if you do not provide analysis the reviewer has 
+to assume you have not done any and has to do the false positive 
+analysis themselves. This burdens the reviewer for something of small 
+value that can be dismissed as churn.
 
-The per-case variables cmd and buffer are common.
-Change their scope to function level.
-Change colliding parameter name cmd to request.
+Tom
 
-Cleanup whitespace
-
-pcd.c comment
-/* the audio_ioctl stuff is adapted from sr_ioctl.c */
-
-Shows there is a similar problem in sr_ioctl.c
-sr_ioctl.c uses this pattern
-
-  result = sr_do_ioctl(cd, &cgc);
-  to-user = buffer[];
-  kfree(buffer);
-  return result;
-
-Check result and jump over the use of buffer
-if there is an error.
-
-  result = sr_do_ioctl(cd, &cgc);
-  if (result)
-    goto err;
-  to-user = buffer[];
-err:
-  kfree(buffer);
-  return result;
-
-Additionally initialize the buffer to zero.
-
-This problem can be seen in the 2.4.0 kernel
-However this scm only goes back as far as 2.6.12
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Tom Rix <trix@redhat.com>
----
- drivers/block/paride/pcd.c | 87 +++++++++++++++++---------------------
- drivers/scsi/sr_ioctl.c    | 15 +++++--
- 2 files changed, 50 insertions(+), 52 deletions(-)
-
-diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
-index f462ad67931a..2315918e3647 100644
---- a/drivers/block/paride/pcd.c
-+++ b/drivers/block/paride/pcd.c
-@@ -810,67 +810,56 @@ static void do_pcd_read_drq(void)
- 
- /* the audio_ioctl stuff is adapted from sr_ioctl.c */
- 
--static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void *arg)
-+static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int request, void *arg)
- {
- 	struct pcd_unit *cd = cdi->handle;
-+	char cmd[12] = { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0 };
-+	char buffer[32] = {};
- 
--	switch (cmd) {
--
-+	switch (request) {
- 	case CDROMREADTOCHDR:
-+	{
-+		struct cdrom_tochdr *tochdr =
-+			(struct cdrom_tochdr *) arg;
- 
--		{
--			char cmd[12] =
--			    { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12,
--			 0, 0, 0 };
--			struct cdrom_tochdr *tochdr =
--			    (struct cdrom_tochdr *) arg;
--			char buffer[32];
--			int r;
--
--			r = pcd_atapi(cd, cmd, 12, buffer, "read toc header");
-+		if (pcd_atapi(cd, cmd, 12, buffer, "read toc header"))
-+			return -EIO;
- 
--			tochdr->cdth_trk0 = buffer[2];
--			tochdr->cdth_trk1 = buffer[3];
-+		tochdr->cdth_trk0 = buffer[2];
-+		tochdr->cdth_trk1 = buffer[3];
- 
--			return r ? -EIO : 0;
--		}
-+		return 0;
-+	}
- 
- 	case CDROMREADTOCENTRY:
--
--		{
--			char cmd[12] =
--			    { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12,
--			 0, 0, 0 };
--
--			struct cdrom_tocentry *tocentry =
--			    (struct cdrom_tocentry *) arg;
--			unsigned char buffer[32];
--			int r;
--
--			cmd[1] =
--			    (tocentry->cdte_format == CDROM_MSF ? 0x02 : 0);
--			cmd[6] = tocentry->cdte_track;
--
--			r = pcd_atapi(cd, cmd, 12, buffer, "read toc entry");
--
--			tocentry->cdte_ctrl = buffer[5] & 0xf;
--			tocentry->cdte_adr = buffer[5] >> 4;
--			tocentry->cdte_datamode =
--			    (tocentry->cdte_ctrl & 0x04) ? 1 : 0;
--			if (tocentry->cdte_format == CDROM_MSF) {
--				tocentry->cdte_addr.msf.minute = buffer[9];
--				tocentry->cdte_addr.msf.second = buffer[10];
--				tocentry->cdte_addr.msf.frame = buffer[11];
--			} else
--				tocentry->cdte_addr.lba =
--				    (((((buffer[8] << 8) + buffer[9]) << 8)
--				      + buffer[10]) << 8) + buffer[11];
--
--			return r ? -EIO : 0;
-+	{
-+		struct cdrom_tocentry *tocentry =
-+			(struct cdrom_tocentry *) arg;
-+
-+		cmd[1] = (tocentry->cdte_format == CDROM_MSF ? 0x02 : 0);
-+		cmd[6] = tocentry->cdte_track;
-+
-+		if (pcd_atapi(cd, cmd, 12, buffer, "read toc entry"))
-+			return -EIO;
-+
-+		tocentry->cdte_ctrl = buffer[5] & 0xf;
-+		tocentry->cdte_adr = buffer[5] >> 4;
-+		tocentry->cdte_datamode =
-+			(tocentry->cdte_ctrl & 0x04) ? 1 : 0;
-+		if (tocentry->cdte_format == CDROM_MSF) {
-+			tocentry->cdte_addr.msf.minute = buffer[9];
-+			tocentry->cdte_addr.msf.second = buffer[10];
-+			tocentry->cdte_addr.msf.frame = buffer[11];
-+		} else {
-+			tocentry->cdte_addr.lba =
-+				(((((buffer[8] << 8) + buffer[9]) << 8)
-+				  + buffer[10]) << 8) + buffer[11];
- 		}
- 
--	default:
-+		return 0;
-+	}
- 
-+	default:
- 		return -ENOSYS;
- 	}
- }
-diff --git a/drivers/scsi/sr_ioctl.c b/drivers/scsi/sr_ioctl.c
-index ddd00efc4882..fbdb5124d7f7 100644
---- a/drivers/scsi/sr_ioctl.c
-+++ b/drivers/scsi/sr_ioctl.c
-@@ -41,7 +41,7 @@ static int sr_read_tochdr(struct cdrom_device_info *cdi,
- 	int result;
- 	unsigned char *buffer;
- 
--	buffer = kmalloc(32, GFP_KERNEL);
-+	buffer = kzalloc(32, GFP_KERNEL);
- 	if (!buffer)
- 		return -ENOMEM;
- 
-@@ -55,10 +55,13 @@ static int sr_read_tochdr(struct cdrom_device_info *cdi,
- 	cgc.data_direction = DMA_FROM_DEVICE;
- 
- 	result = sr_do_ioctl(cd, &cgc);
-+	if (result)
-+		goto err;
- 
- 	tochdr->cdth_trk0 = buffer[2];
- 	tochdr->cdth_trk1 = buffer[3];
- 
-+err:
- 	kfree(buffer);
- 	return result;
- }
-@@ -71,7 +74,7 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
- 	int result;
- 	unsigned char *buffer;
- 
--	buffer = kmalloc(32, GFP_KERNEL);
-+	buffer = kzalloc(32, GFP_KERNEL);
- 	if (!buffer)
- 		return -ENOMEM;
- 
-@@ -86,6 +89,8 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
- 	cgc.data_direction = DMA_FROM_DEVICE;
- 
- 	result = sr_do_ioctl(cd, &cgc);
-+	if (result)
-+		goto err;
- 
- 	tocentry->cdte_ctrl = buffer[5] & 0xf;
- 	tocentry->cdte_adr = buffer[5] >> 4;
-@@ -98,6 +103,7 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
- 		tocentry->cdte_addr.lba = (((((buffer[8] << 8) + buffer[9]) << 8)
- 			+ buffer[10]) << 8) + buffer[11];
- 
-+err:
- 	kfree(buffer);
- 	return result;
- }
-@@ -384,7 +390,7 @@ int sr_get_mcn(struct cdrom_device_info *cdi, struct cdrom_mcn *mcn)
- {
- 	Scsi_CD *cd = cdi->handle;
- 	struct packet_command cgc;
--	char *buffer = kmalloc(32, GFP_KERNEL);
-+	char *buffer = kzalloc(32, GFP_KERNEL);
- 	int result;
- 
- 	if (!buffer)
-@@ -400,10 +406,13 @@ int sr_get_mcn(struct cdrom_device_info *cdi, struct cdrom_mcn *mcn)
- 	cgc.data_direction = DMA_FROM_DEVICE;
- 	cgc.timeout = IOCTL_TIMEOUT;
- 	result = sr_do_ioctl(cd, &cgc);
-+	if (result)
-+		goto err;
- 
- 	memcpy(mcn->medium_catalog_number, buffer + 9, 13);
- 	mcn->medium_catalog_number[13] = 0;
- 
-+err:
- 	kfree(buffer);
- 	return result;
- }
--- 
-2.27.0
+>
+> Cheers,
+> Michal
+>
 
