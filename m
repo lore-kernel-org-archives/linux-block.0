@@ -2,166 +2,190 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08428C433FE
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 08:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF5EC433EF
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 09:10:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240623AbiDIITS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 04:19:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53986 "EHLO
+        id S238129AbiDIJMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 05:12:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240720AbiDIITN (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 04:19:13 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29E442545A8
-        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 01:17:03 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id m30so16082908wrb.1
-        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 01:17:03 -0700 (PDT)
+        with ESMTP id S232278AbiDIJMe (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 05:12:34 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2455CE8B
+        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 02:10:26 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id c7so16237659wrd.0
+        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 02:10:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Ga61vN/TMGQoWv5pdVva9yHEVEk7JvDu8SvkqTkiHOU=;
-        b=16VWXfTcecI6vKD89hlxEi4M1sM+lDWraPFKcdJek4zYvKgcUI+UTTfswq4WTG3pUA
-         DwGdvejVPHmGbB6WxyxpG5RxCDgxrI8ELqeSKx9xnWZSuDqFsfTR7C0q23UBJ4NTUUke
-         9rs/lGq9PScZMcSAS9SHkk+s8lIoFrVgzxTJ9NRLUES2XsBvbZXGJskPHSy0jdzHruaB
-         iGqoe9YksSt5XleGcAhaVmv2OHki/8AO1/zdgDuyMqAmL6dyveVZDyPGB/rY+7+4UaaK
-         b7o7nIN/SrEk1fy76OtZuySau99YX+Sryl6fYO8t+jUUvribl7KiF9nqytVWelfdH+Mk
-         O4fQ==
+        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=zKNmula4M8WaEFCuyQt+X+sg6b+J30wEG4NDVdlEmfw=;
+        b=uTECW+az/g/69POVttkd/BW9dZ9GLVDt4ldrah8nFo6RrLiPvPcCM5QvSgmVqmV3po
+         ZdFk3B3zYlgCZ1/8bKoHZJqmKvTDapWg/IRd8dfJLa3taZuCmi8WbPlWxozi/yEwSxD3
+         dSoD+7GcPMgxwxGRmvd1GPYIaizbbf0xa7H6H0QSSG0LtwawRpUvaxCJOUH/0o7Ahwnh
+         l4BsTc+9jBr9dHvhLgyT4s3QGLQZBHsaha28QkPMY27Nx36RecJHqtGaN51/JYMf2z+r
+         dYHdCEqphYoG7apkvMyyK5z88EjEBj+cvBm6gsZtfSsIzvxbvdNNmGRnLwRxqs5SN2D6
+         mlCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Ga61vN/TMGQoWv5pdVva9yHEVEk7JvDu8SvkqTkiHOU=;
-        b=3VIq6BZGBgQgBG7du6PRx9lWj5ohadSaXYD/Oo0u/Y6PxAnH504njiTyr5lJMQnzZB
-         7MPRfMlQVVRHUn1VyDiqiBhwh4AnBmmt/bY2sJwHHVpL2x3j3M1YBm/EhPB/4BwKvclE
-         A8zMcUO0QJq2oh92Q4HxVobcW9RNLLaARGx8/GXzWXpT5FhO49Plngo0O5FMR0Cdp6Mt
-         yTNGLaaXVSDZ6lw2Dwfq3FpzcxoTvmYkFZhjHQ2wNIUY/1qI2FFohfa7OD/rIrgbQrlz
-         GCkrADk6/nOZY33dr6JTsfK/HyZF35vyLF0Y9Dc/KxjcDSJH1GZUwRuZ3EGJY6+i3S3w
-         vSFg==
-X-Gm-Message-State: AOAM533dF10HOvB21gE4zBUJ5K+oGn2ZqD2GAcIBspgVVeqWVxCmwhPh
-        esTcI9Cl7kT/mqW4F9qmEmjxlw==
-X-Google-Smtp-Source: ABdhPJyMl7hUdRWB67QUv24ZWK8mJRwBaxhnGq09ejE28bU5zjvkHivlidIC/JIf/EdWqVvIZNI6nA==
-X-Received: by 2002:adf:9581:0:b0:1ed:c341:4ed1 with SMTP id p1-20020adf9581000000b001edc3414ed1mr16998132wrp.299.1649492221449;
-        Sat, 09 Apr 2022 01:17:01 -0700 (PDT)
-Received: from [192.168.169.127] (178.115.52.210.wireless.dyn.drei.com. [178.115.52.210])
-        by smtp.gmail.com with ESMTPSA id r14-20020a05600c35ce00b0038c9f469979sm12169802wmq.40.2022.04.09.01.16.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Apr 2022 01:17:01 -0700 (PDT)
-Message-ID: <5a26cdb1-b63b-8d35-640b-bc0e0f78a181@linbit.com>
-Date:   Sat, 9 Apr 2022 10:16:58 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=zKNmula4M8WaEFCuyQt+X+sg6b+J30wEG4NDVdlEmfw=;
+        b=ItUwFp7f1J+NJNvOZZk+iU086pLk/8a8hlGIMw7Xis81cELVNoUyxK0ulqTUEDufcZ
+         tye+s9aOb0v0u0vhfyM71kYYOqUbSSyxQCNdUiImdVfPapv0MkhmEq4xuKDZ90ovHDnB
+         ZLbHs8DD2uNywY3DnDLfoqQ2Hw7EGMTna3dEwUivS6EG4iTct/01dcpuOoY+Vc18B9Dw
+         YxnTtDFHlNTfpH9ljAz4VyEAQTnY1tj0AqziWFfKLTdUeM3HOGYe8QcVgsRxQOQDPITa
+         JLFXEISQbsJTF24FqPaaHIq0KmT1Ow4/P4gneEMYslbT/i29ooMHO5ZFKy6yO1gUhYF7
+         TT7w==
+X-Gm-Message-State: AOAM530atbGEwsBVnvzwJ4wV50syHKF5d0mgY239LIWv0i1CjcGUf2H0
+        1vAnele1f5hGQXG3lINNlUklDA==
+X-Google-Smtp-Source: ABdhPJz55r9BpQIYYv9HG1fxE+9koNbEJjQ6f7PEd6EV9RU8GRbV1Ar6RTczJOdQ0ua98aRuvHQV2A==
+X-Received: by 2002:adf:f1d1:0:b0:206:1303:ee49 with SMTP id z17-20020adff1d1000000b002061303ee49mr17386609wro.533.1649495424629;
+        Sat, 09 Apr 2022 02:10:24 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id az19-20020a05600c601300b0038cadf3aa69sm17751194wmb.36.2022.04.09.02.10.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Apr 2022 02:10:23 -0700 (PDT)
+Date:   Sat, 9 Apr 2022 10:10:21 +0100
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     Enze Li <lienze@kylinos.cn>
+Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH] cdrom: make EXPORT_SYMBOL follow exported function
+Message-ID: <YlFNfb3IB0KLdnf6@equinox>
+References: <20220406090337.1116708-1-lienze@kylinos.cn>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.2
-Subject: Re: [Drbd-dev] [PATCH 04/27] drbd: remove assign_p_sizes_qlim
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     jfs-discussion@lists.sourceforge.net,
-        linux-nvme@lists.infradead.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        dm-devel@redhat.com, target-devel@vger.kernel.org,
-        linux-mtd@lists.infradead.org, drbd-dev@lists.linbit.com,
-        linux-s390@vger.kernel.org, linux-nilfs@vger.kernel.org,
-        linux-scsi@vger.kernel.org, cluster-devel@redhat.com,
-        xen-devel@lists.xenproject.org, linux-ext4@vger.kernel.org,
-        linux-um@lists.infradead.org, nbd@other.debian.org,
-        linux-block@vger.kernel.org, linux-bcache@vger.kernel.org,
-        ceph-devel@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        linux-xfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-fsdevel@vger.kernel.org, ntfs3@lists.linux.dev,
-        linux-btrfs@vger.kernel.org, Jens Axboe <axboe@kernel.dk>
-References: <20220409045043.23593-1-hch@lst.de>
- <20220409045043.23593-5-hch@lst.de>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20220409045043.23593-5-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220406090337.1116708-1-lienze@kylinos.cn>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09.04.22 06:50, Christoph Hellwig wrote:
-> Fold each branch into its only caller.
+On Wed, Apr 06, 2022 at 05:03:37PM +0800, Enze Li wrote:
+> Currently, some EXPORT_SYMBOL declarations do not follow the exported
+> function, which affects the readability of the code.  To maintain
+> consistency, move these EXPORT_SYMBOL declarations to the correct
+> position to improve the readability of the code.
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Signed-off-by: Enze Li <lienze@kylinos.cn>
 > ---
->   drivers/block/drbd/drbd_main.c | 47 +++++++++++++++-------------------
->   1 file changed, 20 insertions(+), 27 deletions(-)
+>  drivers/cdrom/cdrom.c | 21 ++++++++++-----------
+>  1 file changed, 10 insertions(+), 11 deletions(-)
 > 
-> diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
-> index 9676a1d214bc5..1262fe1c33618 100644
-> --- a/drivers/block/drbd/drbd_main.c
-> +++ b/drivers/block/drbd/drbd_main.c
-> @@ -903,31 +903,6 @@ void drbd_gen_and_send_sync_uuid(struct drbd_peer_device *peer_device)
->   	}
->   }
->   
-> -/* communicated if (agreed_features & DRBD_FF_WSAME) */
-> -static void
-> -assign_p_sizes_qlim(struct drbd_device *device, struct p_sizes *p,
-> -					struct request_queue *q)
-> -{
-> -	if (q) {
-> -		p->qlim->physical_block_size = cpu_to_be32(queue_physical_block_size(q));
-> -		p->qlim->logical_block_size = cpu_to_be32(queue_logical_block_size(q));
-> -		p->qlim->alignment_offset = cpu_to_be32(queue_alignment_offset(q));
-> -		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
-> -		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
-> -		p->qlim->discard_enabled = blk_queue_discard(q);
-> -		p->qlim->write_same_capable = 0;
-> -	} else {
-> -		q = device->rq_queue;
-> -		p->qlim->physical_block_size = cpu_to_be32(queue_physical_block_size(q));
-> -		p->qlim->logical_block_size = cpu_to_be32(queue_logical_block_size(q));
-> -		p->qlim->alignment_offset = 0;
-> -		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
-> -		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
-> -		p->qlim->discard_enabled = 0;
-> -		p->qlim->write_same_capable = 0;
-> -	}
-> -}
+> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
+> index 7bd10d63ddbe..2d9dce967c90 100644
+> --- a/drivers/cdrom/cdrom.c
+> +++ b/drivers/cdrom/cdrom.c
+> @@ -648,6 +648,7 @@ int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi)
+>  	mutex_unlock(&cdrom_mutex);
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(register_cdrom);
+>  #undef ENSURE
+>  
+>  void unregister_cdrom(struct cdrom_device_info *cdi)
+> @@ -663,6 +664,7 @@ void unregister_cdrom(struct cdrom_device_info *cdi)
+>  
+>  	cd_dbg(CD_REG_UNREG, "drive \"/dev/%s\" unregistered\n", cdi->name);
+>  }
+> +EXPORT_SYMBOL(unregister_cdrom);
+>  
+>  int cdrom_get_media_event(struct cdrom_device_info *cdi,
+>  			  struct media_event_desc *med)
+> @@ -690,6 +692,7 @@ int cdrom_get_media_event(struct cdrom_device_info *cdi,
+>  	memcpy(med, &buffer[sizeof(*eh)], sizeof(*med));
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(cdrom_get_media_event);
+>  
+>  static int cdrom_get_random_writable(struct cdrom_device_info *cdi,
+>  			      struct rwrt_feature_desc *rfd)
+> @@ -1206,6 +1209,7 @@ int cdrom_open(struct cdrom_device_info *cdi, struct block_device *bdev,
+>  	cdi->use_count--;
+>  	return ret;
+>  }
+> +EXPORT_SYMBOL(cdrom_open);
+>  
+>  /* This code is similar to that in open_for_data. The routine is called
+>     whenever an audio play operation is requested.
+> @@ -1301,6 +1305,7 @@ void cdrom_release(struct cdrom_device_info *cdi, fmode_t mode)
+>  			cdo->tray_move(cdi, 1);
+>  	}
+>  }
+> +EXPORT_SYMBOL(cdrom_release);
+>  
+>  static int cdrom_read_mech_status(struct cdrom_device_info *cdi, 
+>  				  struct cdrom_changer_info *buf)
+> @@ -1383,6 +1388,7 @@ int cdrom_number_of_slots(struct cdrom_device_info *cdi)
+>  	kfree(info);
+>  	return nslots;
+>  }
+> +EXPORT_SYMBOL(cdrom_number_of_slots);
+>  
+>  
+>  /* If SLOT < 0, unload the current slot.  Otherwise, try to load SLOT. */
+> @@ -1582,6 +1588,7 @@ void init_cdrom_command(struct packet_command *cgc, void *buf, int len,
+>  	cgc->data_direction = type;
+>  	cgc->timeout = CDROM_DEF_TIMEOUT;
+>  }
+> +EXPORT_SYMBOL(init_cdrom_command);
+>  
+>  /* DVD handling */
+>  
+> @@ -2000,6 +2007,7 @@ int cdrom_mode_sense(struct cdrom_device_info *cdi,
+>  	cgc->data_direction = CGC_DATA_READ;
+>  	return cdo->generic_packet(cdi, cgc);
+>  }
+> +EXPORT_SYMBOL(cdrom_mode_sense);
+>  
+>  int cdrom_mode_select(struct cdrom_device_info *cdi,
+>  		      struct packet_command *cgc)
+> @@ -2015,6 +2023,7 @@ int cdrom_mode_select(struct cdrom_device_info *cdi,
+>  	cgc->data_direction = CGC_DATA_WRITE;
+>  	return cdo->generic_packet(cdi, cgc);
+>  }
+> +EXPORT_SYMBOL(cdrom_mode_select);
+>  
+>  static int cdrom_read_subchannel(struct cdrom_device_info *cdi,
+>  				 struct cdrom_subchnl *subchnl, int mcn)
+> @@ -2893,6 +2902,7 @@ int cdrom_get_last_written(struct cdrom_device_info *cdi, long *last_written)
+>  	*last_written = toc.cdte_addr.lba;
+>  	return 0;
+>  }
+> +EXPORT_SYMBOL(cdrom_get_last_written);
+>  
+>  /* return the next writable block. also for udf file system. */
+>  static int cdrom_get_next_writable(struct cdrom_device_info *cdi,
+> @@ -3430,18 +3440,7 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
+>  
+>  	return -ENOSYS;
+>  }
 > -
->   int drbd_send_sizes(struct drbd_peer_device *peer_device, int trigger_reply, enum dds_flags flags)
->   {
->   	struct drbd_device *device = peer_device->device;
-> @@ -957,14 +932,32 @@ int drbd_send_sizes(struct drbd_peer_device *peer_device, int trigger_reply, enu
->   		q_order_type = drbd_queue_order_type(device);
->   		max_bio_size = queue_max_hw_sectors(q) << 9;
->   		max_bio_size = min(max_bio_size, DRBD_MAX_BIO_SIZE);
-> -		assign_p_sizes_qlim(device, p, q);
-> +		p->qlim->physical_block_size =
-> +			cpu_to_be32(queue_physical_block_size(q));
-> +		p->qlim->logical_block_size =
-> +			cpu_to_be32(queue_logical_block_size(q));
-> +		p->qlim->alignment_offset =
-> +			cpu_to_be32(queue_alignment_offset(q));
-> +		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
-> +		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
-> +		p->qlim->discard_enabled = blk_queue_discard(q);
->   		put_ldev(device);
->   	} else {
-> +		struct request_queue *q = device->rq_queue;
-> +
-> +		p->qlim->physical_block_size =
-> +			cpu_to_be32(queue_physical_block_size(q));
-> +		p->qlim->logical_block_size =
-> +			cpu_to_be32(queue_logical_block_size(q));
-> +		p->qlim->alignment_offset = 0;
-> +		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
-> +		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
-> +		p->qlim->discard_enabled = 0;
-> +
->   		d_size = 0;
->   		u_size = 0;
->   		q_order_type = QUEUE_ORDERED_NONE;
->   		max_bio_size = DRBD_MAX_BIO_SIZE; /* ... multiple BIOs per peer_request */
-> -		assign_p_sizes_qlim(device, p, NULL);
->   	}
->   
->   	if (peer_device->connection->agreed_pro_version <= 94)
+> -EXPORT_SYMBOL(cdrom_get_last_written);
+> -EXPORT_SYMBOL(register_cdrom);
+> -EXPORT_SYMBOL(unregister_cdrom);
+> -EXPORT_SYMBOL(cdrom_open);
+> -EXPORT_SYMBOL(cdrom_release);
+>  EXPORT_SYMBOL(cdrom_ioctl);
+> -EXPORT_SYMBOL(cdrom_number_of_slots);
+> -EXPORT_SYMBOL(cdrom_mode_select);
+> -EXPORT_SYMBOL(cdrom_mode_sense);
+> -EXPORT_SYMBOL(init_cdrom_command);
+> -EXPORT_SYMBOL(cdrom_get_media_event);
+>  
+>  #ifdef CONFIG_SYSCTL
+>  
+> -- 
+> 2.25.1
+> 
 
-LGTM now, thanks.
+Seems like a sensible change to me, and builds OK. Many thanks for the
+patch. As we're now outside the merge window, I will send onto Jens at
+the appropriate time.
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
+
+Regards,
+Phil
