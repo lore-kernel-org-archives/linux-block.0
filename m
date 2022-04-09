@@ -2,118 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF522C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 16:03:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D87A7C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 21:31:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242551AbiDIQFz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 12:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43404 "EHLO
+        id S232163AbiDIVdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 17:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242550AbiDIQFy (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 12:05:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4E6B185BC9
-        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 09:03:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649520225;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=qtkyBcEIcgGitzE6/jMR0BHvrVCs5FpvV9wdXJQk7lw=;
-        b=ZMW9WlxGWd4k7ey9jSAoBlvshyUGNQvSRCLhalxJdXUcuSwdZoh9zXyyjJCIvF/o2oZ1NA
-        rwmcicg/LoG+EXit133fpNFIbkc7I5c6ZP6FFWt87VIXrj30dHtX3NJvuvwKt9pnQsNsNy
-        f2CpLQAsjREqOujo/jgEQSx1fyff1VE=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-uOqGqz4lOtGgqoXz7W7glA-1; Sat, 09 Apr 2022 12:03:44 -0400
-X-MC-Unique: uOqGqz4lOtGgqoXz7W7glA-1
-Received: by mail-qv1-f72.google.com with SMTP id gh5-20020a05621429c500b004443be8db85so242446qvb.11
-        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 09:03:44 -0700 (PDT)
+        with ESMTP id S231915AbiDIVdV (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 17:33:21 -0400
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B7E1033;
+        Sat,  9 Apr 2022 14:31:12 -0700 (PDT)
+Received: by mail-pl1-f173.google.com with SMTP id n9so10852724plc.4;
+        Sat, 09 Apr 2022 14:31:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=qtkyBcEIcgGitzE6/jMR0BHvrVCs5FpvV9wdXJQk7lw=;
-        b=jDU6WhJsyCVL1ZnPpb22smzpXTGFQb6ECzGQTW0sXY7r7Pe/Y5c/tybmxTJR87Fo6r
-         JZDirLrWSn9Pf+3Lk2KDUEgDgLRV2DntcPYNnNobr4CxcN6XewTlWBGhcdzryWFKF2aB
-         v2v5cfOv3XO9OvZT6liDxw0XZKdc8k3gvuZEJtJwa29cqEZDXTItcBeiIPUhxPiJCuyN
-         iKN43LhzqTVOC8KxeoomD/hmNWG5IOs0L6Z85mmHKNVRi+4rNxK7QAfpJu1tNSFkWaVV
-         OuGpxAM4w4ov44tMUCBYtxwB5GWZ7zNNpbFXY2ulY27EuNePjr19l8aLp4Cv8U1vAqU1
-         hK1A==
-X-Gm-Message-State: AOAM5300Q97LcEdRQk1iyQ2UBC2VDBzAbCNJ0h+2ICxF2cWhPy1ZRkou
-        CuYd7ZrX+YZybT+M6l9k+OQkB2XttwsMgxgAIldXAwAhlwvS0OiGmbQb5cmGBH992MzzTnK6wIw
-        dUlXJeCvBtQWlSoWK8qDuBNE=
-X-Received: by 2002:a05:620a:4694:b0:67e:ca07:4d46 with SMTP id bq20-20020a05620a469400b0067eca074d46mr16310326qkb.624.1649520223780;
-        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy9gLy9N+EtbprXxWppsB8/pZMfaSy4i+GT0eKsrmpJpPW6wWHSwAV/TaLkqZlqoRiGySXFDw==
-X-Received: by 2002:a05:620a:4694:b0:67e:ca07:4d46 with SMTP id bq20-20020a05620a469400b0067eca074d46mr16310304qkb.624.1649520223470;
-        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
-Received: from localhost.localdomain (024-205-208-113.res.spectrum.com. [24.205.208.113])
-        by smtp.gmail.com with ESMTPSA id o6-20020a05620a22c600b0067d247816eesm15150840qki.85.2022.04.09.09.03.41
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=bXHLCa3dfzOIhVpo6ukpcQv28YFp7azGl7372EerRWE=;
+        b=MW0T7rAGnneZdsW/GewBji04ECXWXw5jdFtHtuxEqvQokJavApef+EeyEAI1Ym45iY
+         bpLW3vtiKZjz7KMujAB/aMDbY1J576TpiGzYbL13UfuXV7y8YFLrnBe9iWAroDlPa9KM
+         M2OWZQiyVe5BnUulZtb7QCQ6yqX6/gNrlPLJQbmqaOghB98EeqgTRLtxFvSWSoM19GZo
+         jlzG8sIJHaET0DAnUGpBG1gwMQGX/hUp4gRYZEerlXOetWTQW9CrZNrJwu3sWUUWCnHM
+         Lov0x9FNO6wuCBDYidT3nD/D/aZ5uQC95h/nK6SQ7VB9nV87fjbcVMX2BzjepYufx+bi
+         bj3A==
+X-Gm-Message-State: AOAM533dU2RD3mSA44+Y0cuuyXwOoTehJ2pR5q868266DSKU4X1tFNTh
+        jOHP6T3QebEjC1tD/HKGank=
+X-Google-Smtp-Source: ABdhPJwiPGUKhP2E6gW5QpL4MVOIoeilAzAEraJsHe/m5MbOTFLPTdAH4Z2mmESVNoclbygW2iyhcQ==
+X-Received: by 2002:a17:903:2284:b0:157:110f:1b27 with SMTP id b4-20020a170903228400b00157110f1b27mr13411872plh.108.1649539871960;
+        Sat, 09 Apr 2022 14:31:11 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id z16-20020a056a00241000b004f3a647ae89sm31503976pfh.174.2022.04.09.14.31.10
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Apr 2022 09:03:43 -0700 (PDT)
-Subject: Re: [PATCH] block: Remove redundant assignments
-To:     Michal Orzel <michalorzel.eng@gmail.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, llvm@lists.linux.dev
-References: <20220409101933.207157-1-michalorzel.eng@gmail.com>
- <20220409101933.207157-2-michalorzel.eng@gmail.com>
- <a56d1184-d399-d5f8-765f-5a4f35dacd5e@redhat.com>
- <446a3e88-4c14-300d-862a-1279274c3760@gmail.com>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <c2c40f00-777c-f19a-eb5f-6e978ddd6bcf@redhat.com>
-Date:   Sat, 9 Apr 2022 09:03:40 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Sat, 09 Apr 2022 14:31:11 -0700 (PDT)
+Message-ID: <924169bb-4a94-e9b1-1aeb-86c99e8637e7@acm.org>
+Date:   Sat, 9 Apr 2022 14:31:09 -0700
 MIME-Version: 1.0
-In-Reply-To: <446a3e88-4c14-300d-862a-1279274c3760@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH -next RFC v2 0/8] improve tag allocation under heavy load
 Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>, "yukuai (C)" <yukuai3@huawei.com>,
+        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+ <d50a0ee1-c7e2-1b99-8d3f-ce2edeea92cd@kernel.dk>
+ <d02f416f-a1de-f7d9-881e-a88c1bdd25c1@huawei.com>
+ <98d3b9b9-1786-837c-d316-cc991305c8aa@kernel.dk>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <98d3b9b9-1786-837c-d316-cc991305c8aa@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 4/8/22 19:28, Jens Axboe wrote:
+> The easiest is probably to try and send patches to a gmail account. If
+> you don't have one, just create one. That will help you see the issue
+> and verify whatever the fix might be. It might be a company email
+> server issue, hower.
 
-On 4/9/22 6:20 AM, Michal Orzel wrote:
-> Hi Tom,
->
->> On 4/9/22 3:19 AM, Michal Orzel wrote:
->>> Get rid of redundant assignments which end up in values not being
->>> read either because they are overwritten or the function ends.
->> This log is the same as your last patch.
->>
->> Instead of a general statement on deadstores, a more specific
->>
->> analysis of the setting being removed would be helpful.
->>
->> This will mean splitting the patch to match the analysis.
->>
->> Tom
->>
-> I think that this explanation in a commit is enough for such a trivial patch.
-> It informs that we are fixing clang-tidy findings related to deadstores
-> in a block subsystem. What analysis would you want to see?
-> Something like "Remove deadstore assignment ret = -EINVAL  in a function bio_map_user_iov" ?
-> I think that it will create too much of not needed overhead.
+Hi Jens and Yu,
 
-The compiler should remove these already.  All of the static analyzers 
-produce false positives, if you do not provide analysis the reviewer has 
-to assume you have not done any and has to do the false positive 
-analysis themselves. This burdens the reviewer for something of small 
-value that can be dismissed as churn.
+I think it's a company email issue. Many servers that receive email rely 
+on the SPF, DKIM & DMARC standards to determine whether or not to 
+classify email as spam. I had to add the following rule to my inbox 
+receive Huawei.com emails:
 
-Tom
+Matches: from:(huawei.com)
+Do this: Never send it to Spam
 
->
-> Cheers,
-> Michal
->
+Thanks,
+
+Bart.
+
 
