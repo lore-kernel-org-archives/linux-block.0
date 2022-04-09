@@ -2,60 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FE22C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 05:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B646DC433EF
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 07:01:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229701AbiDIFRw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 01:17:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37956 "EHLO
+        id S235231AbiDIHDn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 03:03:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232130AbiDIFRv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 01:17:51 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 691C826129
-        for <linux-block@vger.kernel.org>; Fri,  8 Apr 2022 22:15:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=v5AUaXmXbfF5lrBdpvkZcFbAxCun5fHL446CBq+qPn4=; b=3yzv0B+b5AiWTVUvxQOp6I5XfM
-        7te3Z0QZ9NjotZL9XDb9lV/pQObdOzPM/gU5a4EkihalsNWIwO091pEBsRO1LmbQEkhYatEmv8qcc
-        uDIPhnp0Hc98F0lXlT4j4MUtqqqMEOrXNIalVA9lydLwXsUL3KmmXg/9DvJlth1Q2D7NYqUHPI1FU
-        F66XDI/AFfUFtiofXf0861VcJt379gJMkuGLOCyhDnurMzR+86P1b6z0qj6gVZIk4xq6gHkoHKQNU
-        iRHQCxoQ+HzDEDcAkFRj88nHpLzBjjp/wBMfuv0Pid7m5W0CdXDmJpecq56i7RqOPwaz/A7ZB9gEq
-        /rFHiIpA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nd3Rl-002DAU-Bg; Sat, 09 Apr 2022 05:15:41 +0000
-Date:   Fri, 8 Apr 2022 22:15:41 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dennis Zhou <dennis@kernel.org>,
-        Mike Snitzer <snitzer@kernel.org>, tj@kernel.org,
-        axboe@kernel.dk, linux-block@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
-Message-ID: <YlEWfc39+H+esrQm@infradead.org>
-References: <YkSK6mU1fja2OykG@redhat.com>
- <YkRM7Iyp8m6A1BCl@fedora>
- <YkUwmyrIqnRGIOHm@infradead.org>
- <YkVBjUy9GeSMbh5Q@fedora>
- <YkVxLN9p0t6DI5ie@infradead.org>
- <YlBX+ytxxeSj2neQ@redhat.com>
+        with ESMTP id S234163AbiDIHDm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 03:03:42 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 314B91D97E8;
+        Sat,  9 Apr 2022 00:01:30 -0700 (PDT)
+Received: from kwepemi100024.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Kb5b03CpLzgYTj;
+        Sat,  9 Apr 2022 14:59:40 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100024.china.huawei.com (7.221.188.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 9 Apr 2022 15:01:26 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.21; Sat, 9 Apr 2022 15:01:26 +0800
+Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
+ based on required tags
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
+        <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+ <20220408073916.1428590-9-yukuai3@huawei.com>
+ <6470d923-8fa5-cda1-e519-6f890cdcb00a@acm.org>
+ <4c322eee-3ad9-812f-a341-aa5e91573912@huawei.com>
+ <fc82d24f-51d8-5f8c-1a44-6c95da722f54@acm.org>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <51aa71af-4c05-2991-5698-12014a4943d5@huawei.com>
+Date:   Sat, 9 Apr 2022 15:01:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlBX+ytxxeSj2neQ@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <fc82d24f-51d8-5f8c-1a44-6c95da722f54@acm.org>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 08, 2022 at 11:42:51AM -0400, Mike Snitzer wrote:
-> I think we can achieve the goal of efficient cloning/remapping for
-> both usecases simply by splitting out the bio_set_dev() and leaving it
-> to the caller to pick which interface to use (e.g. clone vs
-> clone_and_remap).
+在 2022/04/09 12:16, Bart Van Assche 写道:
+> On 4/8/22 19:17, yukuai (C) wrote:
+>> I think the reason to wake up 'wake_batch' waiters is to make sure
+>> wakers will use up 'wake_batch' tags that is just freed, because each
+>> wakers should aquire at least one tag. Thus I think if we can make sure
+>> wakers will use up 'wake_batch' tags, it's ok to wake up less waiters.
+> 
+> Hmm ... I think it's up to you to (a) explain this behavior change in 
+> detail in the commit message and (b) to prove that this behavior change 
+> won't cause trouble (I guess this change will cause trouble).
 
-You can just pass a NULL bdev to bio_alloc_clone/bio_init_clone.
-I've been hoping to get rid of that, but if we have a clear use case
-it will have to stay.
+Hi, Bart
+
+Sorry that the commit message doesn't explain clearly.
+
+There are only two situations that wakers will be less than 'wake_batch'
+after this patch:
+
+(a) some wakers will acquire multipul tags, as I mentioned above, this
+is ok because wakers will use up 'wake_batch' tags.
+
+(b) the total number of waiters is less than 'wake_batch', this is
+problematic if tag preemption is disabled, because io concurrency will
+be declined.(patch 5 should fix the problem)
+
+For the race that new threads are waited after get_wake_nr() and before
+wake_up_nr() in situation (b), I can't figure out how this can be
+problematic, however, this can be optimized by triggering additional
+wake up:
+
+@@ -623,15 +623,17 @@ static unsigned int get_wake_nr(struct 
+sbq_wait_state *ws, unsigned int nr_tags)
+         spin_lock_irq(&ws->wait.lock);
+         list_for_each_entry(entry, &ws->wait.head, entry) {
+                 wait = container_of(entry, struct sbq_wait, wait);
+-               if (nr_tags <= wait->nr_tags)
++               if (nr_tags <= wait->nr_tags) {
++                       nr_tags = 0;
+                         break;
++               }
+
+                 nr++;
+                 nr_tags -= wait->nr_tags;
+         }
+         spin_unlock_irq(&ws->wait.lock);
+
+-       return nr;
++       return nr + nr_tags;
+  }
+
+What do you think?
+
+Thanks,
+Kuai
+
+> 
+> Thanks,
+> 
+> Bart.
+> .
+> 
