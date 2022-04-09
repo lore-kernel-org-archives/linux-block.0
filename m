@@ -2,84 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D5FC433F5
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 07:14:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36722C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 08:15:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237188AbiDIHQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 03:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38114 "EHLO
+        id S241084AbiDIIRq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 04:17:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbiDIHQM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 03:16:12 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CD95B860;
-        Sat,  9 Apr 2022 00:14:06 -0700 (PDT)
-Received: from kwepemi100015.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Kb5sY0c6pzgYWT;
-        Sat,  9 Apr 2022 15:12:17 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100015.china.huawei.com (7.221.188.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 9 Apr 2022 15:14:03 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.21; Sat, 9 Apr 2022 15:14:02 +0800
-Subject: Re: [PATCH -next RFC v2 0/8] improve tag allocation under heavy load
-To:     Jens Axboe <axboe@kernel.dk>, <andriy.shevchenko@linux.intel.com>,
-        <john.garry@huawei.com>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220408073916.1428590-1-yukuai3@huawei.com>
- <d50a0ee1-c7e2-1b99-8d3f-ce2edeea92cd@kernel.dk>
- <d02f416f-a1de-f7d9-881e-a88c1bdd25c1@huawei.com>
- <98d3b9b9-1786-837c-d316-cc991305c8aa@kernel.dk>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <1c9b79e2-f44b-8e08-ee39-aa8eda3afc50@huawei.com>
-Date:   Sat, 9 Apr 2022 15:14:02 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230349AbiDIIRp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 04:17:45 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1F382DCC83
+        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 01:15:38 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id v2so2350307wrv.6
+        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 01:15:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=sw+fQbvS6SFTnotjqrxbhqCVHIPsenv7yxMzOYGId1I=;
+        b=swx5mkkbJNix1TPl46oJjK+Fw0+J2z/XHhCyUPh+dcKkTNBekj88xkgZeDCIEgfzZd
+         +FA0t7ckuNM4K4OwCilxgo/M+WNIfDm8hTC88nPXmxm39Wp7Y3PlmqfYEyysUU8hQUUf
+         QcFmQYaxbOUrhMO1omCXZ8F/Rog5zixS+JPWEUQR0KkNkX4orlWG0JIiavrTh9qI4888
+         PfuJYdextltFDNT3Q+47ZPQuPkokUbAa0jhifptu2z1GSQMaUF7eHMsw0ukFDymbedqA
+         fJT7coHgReWy+GC/y+kW2UJS/DziuPPZTxFTP9KzlhdtF9p6DIhUJyZVoMiIdhtFkJM+
+         cESQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sw+fQbvS6SFTnotjqrxbhqCVHIPsenv7yxMzOYGId1I=;
+        b=lChPiWPh/tEXnmLP+w4jfNaTCzd84g8duUeeGS/6kd9oGhyVaN2bWyB7336Fxv/FuV
+         53+G2pXRnASZfQ4U630EfKRTlHPBaBLUNnwcFoXWsF9Fm+jgQfB+G6vamoJzmyh5/m8i
+         E+jTF7dSfkTVJPE/LRYejafZgwRUx429TdAJJZKyfGSxz2ynzQx2hlr84CxCcSijc0lo
+         5jd8Q9+QPJlINfUVwnSFthQ7PzDuLulcyFupyJjZIq2GWALGFb6ePXM6e3PDzuAhxV+M
+         z/iWyZBI0XwOLltwzua/P56GXHrwxP6WqNsVdE9XBo/LM0RF7eoSUWVCdbaAxnz9zMg9
+         gCmA==
+X-Gm-Message-State: AOAM532xVT8YRdfGWzYeMg7Sw2417IMqakwngTuFs+vbVfzE4mmQk9cC
+        2s/PL1Kq/WQqK7OONKLLkR1g9w==
+X-Google-Smtp-Source: ABdhPJzQQyyFsXyXf3Tt03078VjcrkSv2k98fwj9oToPATRHlAVDyH773lIm4bEik17KjObuot5lIg==
+X-Received: by 2002:a5d:6c6b:0:b0:1ea:77ea:dde8 with SMTP id r11-20020a5d6c6b000000b001ea77eadde8mr17920640wrz.690.1649492137216;
+        Sat, 09 Apr 2022 01:15:37 -0700 (PDT)
+Received: from [192.168.169.127] (178.115.52.210.wireless.dyn.drei.com. [178.115.52.210])
+        by smtp.gmail.com with ESMTPSA id m20-20020a05600c4f5400b0038b5162260csm16809052wmq.23.2022.04.09.01.15.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Apr 2022 01:15:36 -0700 (PDT)
+Message-ID: <72e9bd34-3380-e305-65f0-a17306f5bd08@linbit.com>
+Date:   Sat, 9 Apr 2022 10:15:33 +0200
 MIME-Version: 1.0
-In-Reply-To: <98d3b9b9-1786-837c-d316-cc991305c8aa@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.2
+Subject: Re: [PATCH 24/27] block: remove QUEUE_FLAG_DISCARD
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-um@lists.infradead.org,
+        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
+        nbd@other.debian.org, ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, Jens Axboe <axboe@kernel.dk>,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ntfs3@lists.linux.dev, ocfs2-devel@oss.oracle.com,
+        linux-mm@kvack.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Coly Li <colyli@suse.de>
+References: <20220409045043.23593-1-hch@lst.de>
+ <20220409045043.23593-25-hch@lst.de>
+From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+In-Reply-To: <20220409045043.23593-25-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/04/09 10:28, Jens Axboe 写道:
-> On 4/8/22 8:26 PM, yukuai (C) wrote:
->> 在 2022/04/09 3:10, Jens Axboe 写道:
->>> For this one, and other patches you send, they send up in spam because
->>> the sender can't be verified. I would encourage you to figure out what
->>> is going wrong here, because a lot of your patches end up getting
->>> dropped or missed because of it.
->>>
->>
->> Hi,
->>
->> Thanks for your notice, however, I have no clue what is going on right
->> now. I'll look for some help and hopefully that can be fixed.
+On 09.04.22 06:50, Christoph Hellwig wrote:
+> Just use a non-zero max_discard_sectors as an indicator for discard
+> support, similar to what is done for write zeroes.
 > 
-> The easiest is probably to try and send patches to a gmail account. If
-> you don't have one, just create one. That will help you see the issue
-> and verify whatever the fix might be. It might be a company email
-> server issue, hower.
+> The only places where needs special attention is the RAID5 driver,
+> which must clear discard support for security reasons by default,
+> even if the default stacking rules would allow for it.
 > 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+> Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com> [btrfs]
 
-I tried to send a patch to gmail, however, no issues are found. I am
-contacting our IT support and hope they can figure out what is going on.
+I think you may have a typo there: my ACK was for drbd, not btrfs.
 
-By the way, I didn't see anything unusual for my patches in linux-block
-patchwork:
-
-https://patchwork.kernel.org/project/linux-block/list/?series=&submitter=187999&state=&q=&archive=both&delegate=
-
-Is there a seperate place to track patches?
-
-Thanks,
-Kuai
+> Acked-by: Coly Li <colyli@suse.de> [bcache]
+> ---
+>   arch/um/drivers/ubd_kern.c          |  2 --
+>   block/blk-core.c                    |  2 +-
