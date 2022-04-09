@@ -2,116 +2,312 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74F95C433FE
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 14:33:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F09C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 14:52:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234074AbiDIOfQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 10:35:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56930 "EHLO
+        id S239552AbiDIOyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 10:54:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229567AbiDIOfP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 10:35:15 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2512A35879;
-        Sat,  9 Apr 2022 07:33:07 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 207A11F864;
-        Sat,  9 Apr 2022 14:33:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1649514786; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BmOfl4NqddautzOtQrZ0dLuhiQSp1fB0SDxF8v7gYBA=;
-        b=SJlQufjnXjTQtqgkhM6MsOUPDPwOMZ6xGLQ76UNS6RR1cEGIg2CW/GZ7A0Nq9xE2LKzjCQ
-        zm4gbJFRwGS5ZR58/OOlzltxzH57NlfDQ1MS9kgXiNk7elM8N3NSClk0AEwvrheO6NCJzw
-        l51uuNG8cURr+Q1l6/il4XbIWcEO2Fg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1649514786;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=BmOfl4NqddautzOtQrZ0dLuhiQSp1fB0SDxF8v7gYBA=;
-        b=yiH+qx8I6hbeCP31rtrhbZE5qxMo8OqYiXG+UWOpJ9wghAOQqadl62X34RS7V0fnDyonaX
-        HzX10h1d2uotqQBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3F41913AA1;
-        Sat,  9 Apr 2022 14:32:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id m2GpARiZUWLHIgAAMHmgww
-        (envelope-from <colyli@suse.de>); Sat, 09 Apr 2022 14:32:56 +0000
-Message-ID: <f01ac878-9b0d-972b-70dc-6f3f61b9947b@suse.de>
-Date:   Sat, 9 Apr 2022 22:32:52 +0800
+        with ESMTP id S233301AbiDIOyI (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 10:54:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D901C2B
+        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 07:51:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649515918;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=t/bg9kn7ROahCSJyzfOEtwvtDCZszZoWTbNGij2GrjE=;
+        b=WIn2RwJ+6s6g0PgtqNJIaGlqmHd/zV8vIuqysfyp3wN8v4yqTnhbYNl4rxyxsexHjj4rNi
+        ySzlTOcL5FngQ9aRexdNRkDJKcuhIZtcAMyYSMgal9804Ui99LfQeDelaoreM22JsdY4SW
+        EqjbNtmV5HABmQUnNAqtHjLTmKEqvTs=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-48-of_xt2dBNCm_QR4bi8xcTA-1; Sat, 09 Apr 2022 10:51:57 -0400
+X-MC-Unique: of_xt2dBNCm_QR4bi8xcTA-1
+Received: by mail-qt1-f200.google.com with SMTP id f7-20020a05622a1a0700b002e06d6279d5so9878729qtb.7
+        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 07:51:57 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t/bg9kn7ROahCSJyzfOEtwvtDCZszZoWTbNGij2GrjE=;
+        b=bOd1e+UwPUrQuFhaJpHlTbUVhR6kc7S/rb7hN7MgEWEdyYgQozlPw4LQWs/SYyQTg1
+         t9+C8zRpDxIFRgldDPLDqfTwNaqV3xWDQ0Lv4e+5h4yw0Oy4Nwa4ED1S43mngKDDOBZQ
+         s0lrsQTI/KyHuRht/Vg6b1jFt7rGXQbw5l2/fg28PPtMTyPfuzwUAJk+bI6+JhbrsGT0
+         s367MXk/1hSCKYAkXPJDSHuN7FT372oX4FmJl2Tsm2mDEWSsXWxyb0gBaO8vwPJiXq9n
+         SVx0EoekweJR6qlZizKSrtgYXZXzAIyXf9lMQAY0qbIXnoBSUnNHeoKvsg/0D1F3Qxz8
+         LXtw==
+X-Gm-Message-State: AOAM532I649b2XqloNV0RoPW55GAh3vRJz97eJGm4gIPRNdzRg9oOW/s
+        QHW8cVJ81vf46/DkamSdMYvCVeajuPNEGvnTq/G6KFMKdJWwYPnJKXJ80GMxdglFGVGDmf9DreA
+        eKNPZfeMDrNEFmpXNzccaatQ=
+X-Received: by 2002:a05:620a:2544:b0:680:a53b:ec1a with SMTP id s4-20020a05620a254400b00680a53bec1amr16685997qko.544.1649515916290;
+        Sat, 09 Apr 2022 07:51:56 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwGn6fJ9jRuJMb+wl3Tw8IkHfFNGvG+cEzqACp3UVw8jPRAuuFK+9VOOBkb8ed4Kksz+lzgVw==
+X-Received: by 2002:a05:620a:2544:b0:680:a53b:ec1a with SMTP id s4-20020a05620a254400b00680a53bec1amr16685978qko.544.1649515916047;
+        Sat, 09 Apr 2022 07:51:56 -0700 (PDT)
+Received: from dell-per740-01.7a2m.lab.eng.bos.redhat.com (nat-pool-bos-t.redhat.com. [66.187.233.206])
+        by smtp.gmail.com with ESMTPSA id a23-20020a05620a16d700b0067e98304705sm14845602qkn.89.2022.04.09.07.51.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Apr 2022 07:51:55 -0700 (PDT)
+From:   Tom Rix <trix@redhat.com>
+To:     tim@cyberelk.net, axboe@kernel.dk, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, nathan@kernel.org,
+        ndesaulniers@google.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, llvm@lists.linux.dev,
+        Tom Rix <trix@redhat.com>
+Subject: [PATCH] security: do not leak information in ioctl
+Date:   Sat,  9 Apr 2022 10:51:37 -0400
+Message-Id: <20220409145137.67592-1-trix@redhat.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH 26/27] block: decouple REQ_OP_SECURE_ERASE from
- REQ_OP_DISCARD
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-um@lists.infradead.org,
-        linux-block@vger.kernel.org, drbd-dev@lists.linbit.com,
-        nbd@other.debian.org, ceph-devel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org, Jens Axboe <axboe@kernel.dk>,
-        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
-        ntfs3@lists.linux.dev, ocfs2-devel@oss.oracle.com,
-        linux-mm@kvack.org,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>,
-        Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-        David Sterba <dsterba@suse.com>
-References: <20220409045043.23593-1-hch@lst.de>
- <20220409045043.23593-27-hch@lst.de>
-From:   Coly Li <colyli@suse.de>
-In-Reply-To: <20220409045043.23593-27-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/22 12:50 PM, Christoph Hellwig wrote:
-> Secure erase is a very different operation from discard in that it is
-> a data integrity operation vs hint.  Fully split the limits and helper
-> infrastructure to make the separation more clear.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
-> Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com> [drbd]
-> Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com> [nifs2]
-> Acked-by: Coly Li <colyli@suse.de> [drbd]
+clang static analysis reports this representative issue
+pcd.c:832:22: warning: Assigned value is garbage
+  or undefined
+  tochdr->cdth_trk0 = buffer[2];
+                    ^ ~~~~~~~~~
 
-Hi Christoph,
+If the call to pcd_atapi fails, buffer is an unknown
+state.  Passing an unknown buffer back to the user
+can leak information and is a security risk.
 
-My ACK is for bcache, not drbd here.
+Check before returning this buffer to the user.
 
-Thanks.
+The per-case variables cmd and buffer are common.
+Change their scope to function level.
+Change colliding parameter name cmd to request.
 
+Cleanup whitespace
 
-Coly Li
+pcd.c comment
+/* the audio_ioctl stuff is adapted from sr_ioctl.c */
 
+Shows there is a similar problem in sr_ioctl.c
+sr_ioctl.c uses this pattern
 
+  result = sr_do_ioctl(cd, &cgc);
+  to-user = buffer[];
+  kfree(buffer);
+  return result;
 
-> Acked-by: David Sterba <dsterba@suse.com> [btrfs]
+Check result and jump over the use of buffer
+if there is an error.
 
+  result = sr_do_ioctl(cd, &cgc);
+  if (result)
+    goto err;
+  to-user = buffer[];
+err:
+  kfree(buffer);
+  return result;
 
+Additionally initialize the buffer to zero.
 
+This problem can be seen in the 2.4.0 kernel
+However this scm only goes back as far as 2.6.12
 
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Tom Rix <trix@redhat.com>
+---
+ drivers/block/paride/pcd.c | 87 +++++++++++++++++---------------------
+ drivers/scsi/sr_ioctl.c    | 15 +++++--
+ 2 files changed, 50 insertions(+), 52 deletions(-)
+
+diff --git a/drivers/block/paride/pcd.c b/drivers/block/paride/pcd.c
+index f462ad67931a..2315918e3647 100644
+--- a/drivers/block/paride/pcd.c
++++ b/drivers/block/paride/pcd.c
+@@ -810,67 +810,56 @@ static void do_pcd_read_drq(void)
+ 
+ /* the audio_ioctl stuff is adapted from sr_ioctl.c */
+ 
+-static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int cmd, void *arg)
++static int pcd_audio_ioctl(struct cdrom_device_info *cdi, unsigned int request, void *arg)
+ {
+ 	struct pcd_unit *cd = cdi->handle;
++	char cmd[12] = { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0 };
++	char buffer[32] = {};
+ 
+-	switch (cmd) {
+-
++	switch (request) {
+ 	case CDROMREADTOCHDR:
++	{
++		struct cdrom_tochdr *tochdr =
++			(struct cdrom_tochdr *) arg;
+ 
+-		{
+-			char cmd[12] =
+-			    { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12,
+-			 0, 0, 0 };
+-			struct cdrom_tochdr *tochdr =
+-			    (struct cdrom_tochdr *) arg;
+-			char buffer[32];
+-			int r;
+-
+-			r = pcd_atapi(cd, cmd, 12, buffer, "read toc header");
++		if (pcd_atapi(cd, cmd, 12, buffer, "read toc header"))
++			return -EIO;
+ 
+-			tochdr->cdth_trk0 = buffer[2];
+-			tochdr->cdth_trk1 = buffer[3];
++		tochdr->cdth_trk0 = buffer[2];
++		tochdr->cdth_trk1 = buffer[3];
+ 
+-			return r ? -EIO : 0;
+-		}
++		return 0;
++	}
+ 
+ 	case CDROMREADTOCENTRY:
+-
+-		{
+-			char cmd[12] =
+-			    { GPCMD_READ_TOC_PMA_ATIP, 0, 0, 0, 0, 0, 0, 0, 12,
+-			 0, 0, 0 };
+-
+-			struct cdrom_tocentry *tocentry =
+-			    (struct cdrom_tocentry *) arg;
+-			unsigned char buffer[32];
+-			int r;
+-
+-			cmd[1] =
+-			    (tocentry->cdte_format == CDROM_MSF ? 0x02 : 0);
+-			cmd[6] = tocentry->cdte_track;
+-
+-			r = pcd_atapi(cd, cmd, 12, buffer, "read toc entry");
+-
+-			tocentry->cdte_ctrl = buffer[5] & 0xf;
+-			tocentry->cdte_adr = buffer[5] >> 4;
+-			tocentry->cdte_datamode =
+-			    (tocentry->cdte_ctrl & 0x04) ? 1 : 0;
+-			if (tocentry->cdte_format == CDROM_MSF) {
+-				tocentry->cdte_addr.msf.minute = buffer[9];
+-				tocentry->cdte_addr.msf.second = buffer[10];
+-				tocentry->cdte_addr.msf.frame = buffer[11];
+-			} else
+-				tocentry->cdte_addr.lba =
+-				    (((((buffer[8] << 8) + buffer[9]) << 8)
+-				      + buffer[10]) << 8) + buffer[11];
+-
+-			return r ? -EIO : 0;
++	{
++		struct cdrom_tocentry *tocentry =
++			(struct cdrom_tocentry *) arg;
++
++		cmd[1] = (tocentry->cdte_format == CDROM_MSF ? 0x02 : 0);
++		cmd[6] = tocentry->cdte_track;
++
++		if (pcd_atapi(cd, cmd, 12, buffer, "read toc entry"))
++			return -EIO;
++
++		tocentry->cdte_ctrl = buffer[5] & 0xf;
++		tocentry->cdte_adr = buffer[5] >> 4;
++		tocentry->cdte_datamode =
++			(tocentry->cdte_ctrl & 0x04) ? 1 : 0;
++		if (tocentry->cdte_format == CDROM_MSF) {
++			tocentry->cdte_addr.msf.minute = buffer[9];
++			tocentry->cdte_addr.msf.second = buffer[10];
++			tocentry->cdte_addr.msf.frame = buffer[11];
++		} else {
++			tocentry->cdte_addr.lba =
++				(((((buffer[8] << 8) + buffer[9]) << 8)
++				  + buffer[10]) << 8) + buffer[11];
+ 		}
+ 
+-	default:
++		return 0;
++	}
+ 
++	default:
+ 		return -ENOSYS;
+ 	}
+ }
+diff --git a/drivers/scsi/sr_ioctl.c b/drivers/scsi/sr_ioctl.c
+index ddd00efc4882..fbdb5124d7f7 100644
+--- a/drivers/scsi/sr_ioctl.c
++++ b/drivers/scsi/sr_ioctl.c
+@@ -41,7 +41,7 @@ static int sr_read_tochdr(struct cdrom_device_info *cdi,
+ 	int result;
+ 	unsigned char *buffer;
+ 
+-	buffer = kmalloc(32, GFP_KERNEL);
++	buffer = kzalloc(32, GFP_KERNEL);
+ 	if (!buffer)
+ 		return -ENOMEM;
+ 
+@@ -55,10 +55,13 @@ static int sr_read_tochdr(struct cdrom_device_info *cdi,
+ 	cgc.data_direction = DMA_FROM_DEVICE;
+ 
+ 	result = sr_do_ioctl(cd, &cgc);
++	if (result)
++		goto err;
+ 
+ 	tochdr->cdth_trk0 = buffer[2];
+ 	tochdr->cdth_trk1 = buffer[3];
+ 
++err:
+ 	kfree(buffer);
+ 	return result;
+ }
+@@ -71,7 +74,7 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
+ 	int result;
+ 	unsigned char *buffer;
+ 
+-	buffer = kmalloc(32, GFP_KERNEL);
++	buffer = kzalloc(32, GFP_KERNEL);
+ 	if (!buffer)
+ 		return -ENOMEM;
+ 
+@@ -86,6 +89,8 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
+ 	cgc.data_direction = DMA_FROM_DEVICE;
+ 
+ 	result = sr_do_ioctl(cd, &cgc);
++	if (result)
++		goto err;
+ 
+ 	tocentry->cdte_ctrl = buffer[5] & 0xf;
+ 	tocentry->cdte_adr = buffer[5] >> 4;
+@@ -98,6 +103,7 @@ static int sr_read_tocentry(struct cdrom_device_info *cdi,
+ 		tocentry->cdte_addr.lba = (((((buffer[8] << 8) + buffer[9]) << 8)
+ 			+ buffer[10]) << 8) + buffer[11];
+ 
++err:
+ 	kfree(buffer);
+ 	return result;
+ }
+@@ -384,7 +390,7 @@ int sr_get_mcn(struct cdrom_device_info *cdi, struct cdrom_mcn *mcn)
+ {
+ 	Scsi_CD *cd = cdi->handle;
+ 	struct packet_command cgc;
+-	char *buffer = kmalloc(32, GFP_KERNEL);
++	char *buffer = kzalloc(32, GFP_KERNEL);
+ 	int result;
+ 
+ 	if (!buffer)
+@@ -400,10 +406,13 @@ int sr_get_mcn(struct cdrom_device_info *cdi, struct cdrom_mcn *mcn)
+ 	cgc.data_direction = DMA_FROM_DEVICE;
+ 	cgc.timeout = IOCTL_TIMEOUT;
+ 	result = sr_do_ioctl(cd, &cgc);
++	if (result)
++		goto err;
+ 
+ 	memcpy(mcn->medium_catalog_number, buffer + 9, 13);
+ 	mcn->medium_catalog_number[13] = 0;
+ 
++err:
+ 	kfree(buffer);
+ 	return result;
+ }
+-- 
+2.27.0
 
