@@ -2,190 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAF5EC433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 09:10:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB20AC433F5
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 10:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238129AbiDIJMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 05:12:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47484 "EHLO
+        id S239461AbiDIKWt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 06:22:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232278AbiDIJMe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 05:12:34 -0400
-Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2455CE8B
-        for <linux-block@vger.kernel.org>; Sat,  9 Apr 2022 02:10:26 -0700 (PDT)
-Received: by mail-wr1-x436.google.com with SMTP id c7so16237659wrd.0
-        for <linux-block@vger.kernel.org>; Sat, 09 Apr 2022 02:10:26 -0700 (PDT)
+        with ESMTP id S241404AbiDIKWs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 06:22:48 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4ED3AAB43;
+        Sat,  9 Apr 2022 03:20:40 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id o16so8445435ljp.3;
+        Sat, 09 Apr 2022 03:20:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=zKNmula4M8WaEFCuyQt+X+sg6b+J30wEG4NDVdlEmfw=;
-        b=uTECW+az/g/69POVttkd/BW9dZ9GLVDt4ldrah8nFo6RrLiPvPcCM5QvSgmVqmV3po
-         ZdFk3B3zYlgCZ1/8bKoHZJqmKvTDapWg/IRd8dfJLa3taZuCmi8WbPlWxozi/yEwSxD3
-         dSoD+7GcPMgxwxGRmvd1GPYIaizbbf0xa7H6H0QSSG0LtwawRpUvaxCJOUH/0o7Ahwnh
-         l4BsTc+9jBr9dHvhLgyT4s3QGLQZBHsaha28QkPMY27Nx36RecJHqtGaN51/JYMf2z+r
-         dYHdCEqphYoG7apkvMyyK5z88EjEBj+cvBm6gsZtfSsIzvxbvdNNmGRnLwRxqs5SN2D6
-         mlCw==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=5QftsX1dgd5OMiDjNSHKc4sKfhDSWXlBSyJWmhsDORE=;
+        b=lIcaIvVgQWhf4bm21WVG4xpWBPraOWyb1f6F59KYYAkMggzis7CkSLVbW6960O74u/
+         el2jRgkdd2sXdTu7zCFrzGxuBYpP+pZ04sjx3fM5FvQHaXGdkKa8TSoJ/06Exx7rw43j
+         bjAiH1puHxtVOPfC2t4JJo+1x8RS/QYeC9ZSxseviBh1fBzDdm2bg6wqAJ7RVxvFi5a4
+         xsSHw8HDPTgNA3x8N+NzfCFOkgoJkByY/dzalIvn2bEvBX6iHWb7f9tAZm1yerigeM4x
+         b6N3Ylh+F+y4pZuePJaBdZ/mad+RgxS2mwY7urf0ELWob8NzCy+2yhpoz6JXKw6vxfDR
+         XZWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=zKNmula4M8WaEFCuyQt+X+sg6b+J30wEG4NDVdlEmfw=;
-        b=ItUwFp7f1J+NJNvOZZk+iU086pLk/8a8hlGIMw7Xis81cELVNoUyxK0ulqTUEDufcZ
-         tye+s9aOb0v0u0vhfyM71kYYOqUbSSyxQCNdUiImdVfPapv0MkhmEq4xuKDZ90ovHDnB
-         ZLbHs8DD2uNywY3DnDLfoqQ2Hw7EGMTna3dEwUivS6EG4iTct/01dcpuOoY+Vc18B9Dw
-         YxnTtDFHlNTfpH9ljAz4VyEAQTnY1tj0AqziWFfKLTdUeM3HOGYe8QcVgsRxQOQDPITa
-         JLFXEISQbsJTF24FqPaaHIq0KmT1Ow4/P4gneEMYslbT/i29ooMHO5ZFKy6yO1gUhYF7
-         TT7w==
-X-Gm-Message-State: AOAM530atbGEwsBVnvzwJ4wV50syHKF5d0mgY239LIWv0i1CjcGUf2H0
-        1vAnele1f5hGQXG3lINNlUklDA==
-X-Google-Smtp-Source: ABdhPJz55r9BpQIYYv9HG1fxE+9koNbEJjQ6f7PEd6EV9RU8GRbV1Ar6RTczJOdQ0ua98aRuvHQV2A==
-X-Received: by 2002:adf:f1d1:0:b0:206:1303:ee49 with SMTP id z17-20020adff1d1000000b002061303ee49mr17386609wro.533.1649495424629;
-        Sat, 09 Apr 2022 02:10:24 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id az19-20020a05600c601300b0038cadf3aa69sm17751194wmb.36.2022.04.09.02.10.23
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=5QftsX1dgd5OMiDjNSHKc4sKfhDSWXlBSyJWmhsDORE=;
+        b=DpP7pD6+g3oQYilDkXZtkoclT84VVGn/gpBbQ/K0+Uv4qT+AYVqvb/PLpJg8Nknf4J
+         v7OuABtX0wX4MfMQ3o3DGDNNk/628qUXCLiKXdtPHPHbSS3n/WNFl4ustjRQsdgH7+4D
+         sXSpg6l1byonNJN/RJS19tupm+C1Eez4RZC6mr2fSSQELe4N8nMlVKJEE9b/9P8U9ieP
+         OU08p2YvZ0vdLklysac5+53NNSr8jS7wuOksgWUFzRBvM2B+PdkPip2rdWZUxsm8IbKP
+         enhKErl0SnDTf8I/+M/oAJAJHzXiKDyGkj7mm2AXqopWIOvhd2OU9h0V2mtjw1qx2MyX
+         r0sg==
+X-Gm-Message-State: AOAM5332aJj7i7OIQHcQdCa8BdRpV2OuU44e4sRPVdXD+nbegH10Govz
+        qmx6tMwhxwZ1Gd2SzuNiPP4=
+X-Google-Smtp-Source: ABdhPJwdqdeQNfPRzFlZMVy9U++8XAvooRz27TV4IDt40ZVMkyp9aNtRrPu1iD9L5v9gpgq2Z4XXOg==
+X-Received: by 2002:a2e:700c:0:b0:24b:56ab:1ab8 with SMTP id l12-20020a2e700c000000b0024b56ab1ab8mr2089677ljc.357.1649499638896;
+        Sat, 09 Apr 2022 03:20:38 -0700 (PDT)
+Received: from morzel-asus.lan (static-91-225-135-18.devs.futuro.pl. [91.225.135.18])
+        by smtp.gmail.com with ESMTPSA id h8-20020ac24da8000000b0046b8a03301bsm363680lfe.137.2022.04.09.03.20.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Apr 2022 02:10:23 -0700 (PDT)
-Date:   Sat, 9 Apr 2022 10:10:21 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     Enze Li <lienze@kylinos.cn>
-Cc:     axboe@kernel.dk, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH] cdrom: make EXPORT_SYMBOL follow exported function
-Message-ID: <YlFNfb3IB0KLdnf6@equinox>
-References: <20220406090337.1116708-1-lienze@kylinos.cn>
+        Sat, 09 Apr 2022 03:20:38 -0700 (PDT)
+From:   Michal Orzel <michalorzel.eng@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        "Richard Russon (FlatCap)" <ldm@flatcap.org>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Cc:     Michal Orzel <michalorzel.eng@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, llvm@lists.linux.dev
+Subject: [PATCH] block: Remove redundant assignments
+Date:   Sat,  9 Apr 2022 12:19:32 +0200
+Message-Id: <20220409101933.207157-2-michalorzel.eng@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220409101933.207157-1-michalorzel.eng@gmail.com>
+References: <20220409101933.207157-1-michalorzel.eng@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220406090337.1116708-1-lienze@kylinos.cn>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 06, 2022 at 05:03:37PM +0800, Enze Li wrote:
-> Currently, some EXPORT_SYMBOL declarations do not follow the exported
-> function, which affects the readability of the code.  To maintain
-> consistency, move these EXPORT_SYMBOL declarations to the correct
-> position to improve the readability of the code.
-> 
-> Signed-off-by: Enze Li <lienze@kylinos.cn>
-> ---
->  drivers/cdrom/cdrom.c | 21 ++++++++++-----------
->  1 file changed, 10 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/cdrom/cdrom.c b/drivers/cdrom/cdrom.c
-> index 7bd10d63ddbe..2d9dce967c90 100644
-> --- a/drivers/cdrom/cdrom.c
-> +++ b/drivers/cdrom/cdrom.c
-> @@ -648,6 +648,7 @@ int register_cdrom(struct gendisk *disk, struct cdrom_device_info *cdi)
->  	mutex_unlock(&cdrom_mutex);
->  	return 0;
->  }
-> +EXPORT_SYMBOL(register_cdrom);
->  #undef ENSURE
->  
->  void unregister_cdrom(struct cdrom_device_info *cdi)
-> @@ -663,6 +664,7 @@ void unregister_cdrom(struct cdrom_device_info *cdi)
->  
->  	cd_dbg(CD_REG_UNREG, "drive \"/dev/%s\" unregistered\n", cdi->name);
->  }
-> +EXPORT_SYMBOL(unregister_cdrom);
->  
->  int cdrom_get_media_event(struct cdrom_device_info *cdi,
->  			  struct media_event_desc *med)
-> @@ -690,6 +692,7 @@ int cdrom_get_media_event(struct cdrom_device_info *cdi,
->  	memcpy(med, &buffer[sizeof(*eh)], sizeof(*med));
->  	return 0;
->  }
-> +EXPORT_SYMBOL(cdrom_get_media_event);
->  
->  static int cdrom_get_random_writable(struct cdrom_device_info *cdi,
->  			      struct rwrt_feature_desc *rfd)
-> @@ -1206,6 +1209,7 @@ int cdrom_open(struct cdrom_device_info *cdi, struct block_device *bdev,
->  	cdi->use_count--;
->  	return ret;
->  }
-> +EXPORT_SYMBOL(cdrom_open);
->  
->  /* This code is similar to that in open_for_data. The routine is called
->     whenever an audio play operation is requested.
-> @@ -1301,6 +1305,7 @@ void cdrom_release(struct cdrom_device_info *cdi, fmode_t mode)
->  			cdo->tray_move(cdi, 1);
->  	}
->  }
-> +EXPORT_SYMBOL(cdrom_release);
->  
->  static int cdrom_read_mech_status(struct cdrom_device_info *cdi, 
->  				  struct cdrom_changer_info *buf)
-> @@ -1383,6 +1388,7 @@ int cdrom_number_of_slots(struct cdrom_device_info *cdi)
->  	kfree(info);
->  	return nslots;
->  }
-> +EXPORT_SYMBOL(cdrom_number_of_slots);
->  
->  
->  /* If SLOT < 0, unload the current slot.  Otherwise, try to load SLOT. */
-> @@ -1582,6 +1588,7 @@ void init_cdrom_command(struct packet_command *cgc, void *buf, int len,
->  	cgc->data_direction = type;
->  	cgc->timeout = CDROM_DEF_TIMEOUT;
->  }
-> +EXPORT_SYMBOL(init_cdrom_command);
->  
->  /* DVD handling */
->  
-> @@ -2000,6 +2007,7 @@ int cdrom_mode_sense(struct cdrom_device_info *cdi,
->  	cgc->data_direction = CGC_DATA_READ;
->  	return cdo->generic_packet(cdi, cgc);
->  }
-> +EXPORT_SYMBOL(cdrom_mode_sense);
->  
->  int cdrom_mode_select(struct cdrom_device_info *cdi,
->  		      struct packet_command *cgc)
-> @@ -2015,6 +2023,7 @@ int cdrom_mode_select(struct cdrom_device_info *cdi,
->  	cgc->data_direction = CGC_DATA_WRITE;
->  	return cdo->generic_packet(cdi, cgc);
->  }
-> +EXPORT_SYMBOL(cdrom_mode_select);
->  
->  static int cdrom_read_subchannel(struct cdrom_device_info *cdi,
->  				 struct cdrom_subchnl *subchnl, int mcn)
-> @@ -2893,6 +2902,7 @@ int cdrom_get_last_written(struct cdrom_device_info *cdi, long *last_written)
->  	*last_written = toc.cdte_addr.lba;
->  	return 0;
->  }
-> +EXPORT_SYMBOL(cdrom_get_last_written);
->  
->  /* return the next writable block. also for udf file system. */
->  static int cdrom_get_next_writable(struct cdrom_device_info *cdi,
-> @@ -3430,18 +3440,7 @@ int cdrom_ioctl(struct cdrom_device_info *cdi, struct block_device *bdev,
->  
->  	return -ENOSYS;
->  }
-> -
-> -EXPORT_SYMBOL(cdrom_get_last_written);
-> -EXPORT_SYMBOL(register_cdrom);
-> -EXPORT_SYMBOL(unregister_cdrom);
-> -EXPORT_SYMBOL(cdrom_open);
-> -EXPORT_SYMBOL(cdrom_release);
->  EXPORT_SYMBOL(cdrom_ioctl);
-> -EXPORT_SYMBOL(cdrom_number_of_slots);
-> -EXPORT_SYMBOL(cdrom_mode_select);
-> -EXPORT_SYMBOL(cdrom_mode_sense);
-> -EXPORT_SYMBOL(init_cdrom_command);
-> -EXPORT_SYMBOL(cdrom_get_media_event);
->  
->  #ifdef CONFIG_SYSCTL
->  
-> -- 
-> 2.25.1
-> 
+Get rid of redundant assignments which end up in values not being
+read either because they are overwritten or the function ends.
 
-Seems like a sensible change to me, and builds OK. Many thanks for the
-patch. As we're now outside the merge window, I will send onto Jens at
-the appropriate time.
+Reported by clang-tidy [deadcode.DeadStores]
 
-Signed-off-by: Phillip Potter <phil@philpotter.co.uk>
+Signed-off-by: Michal Orzel <michalorzel.eng@gmail.com>
+---
+ block/badblocks.c        |  2 --
+ block/blk-map.c          |  5 ++---
+ block/partitions/acorn.c |  4 ++--
+ block/partitions/atari.c |  1 -
+ block/partitions/ldm.c   | 15 +++------------
+ 5 files changed, 7 insertions(+), 20 deletions(-)
 
-Regards,
-Phil
+diff --git a/block/badblocks.c b/block/badblocks.c
+index d39056630d9c..3afb550c0f7b 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -65,7 +65,6 @@ int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 		s >>= bb->shift;
+ 		target += (1<<bb->shift) - 1;
+ 		target >>= bb->shift;
+-		sectors = target - s;
+ 	}
+ 	/* 'target' is now the first block after the bad range */
+ 
+@@ -345,7 +344,6 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+ 		s += (1<<bb->shift) - 1;
+ 		s >>= bb->shift;
+ 		target >>= bb->shift;
+-		sectors = target - s;
+ 	}
+ 
+ 	write_seqlock_irq(&bb->lock);
+diff --git a/block/blk-map.c b/block/blk-map.c
+index c7f71d83eff1..fa72e63e18c2 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -260,10 +260,9 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 
+ 		npages = DIV_ROUND_UP(offs + bytes, PAGE_SIZE);
+ 
+-		if (unlikely(offs & queue_dma_alignment(rq->q))) {
+-			ret = -EINVAL;
++		if (unlikely(offs & queue_dma_alignment(rq->q)))
+ 			j = 0;
+-		} else {
++		else {
+ 			for (j = 0; j < npages; j++) {
+ 				struct page *page = pages[j];
+ 				unsigned int n = PAGE_SIZE - offs;
+diff --git a/block/partitions/acorn.c b/block/partitions/acorn.c
+index 2c381c694c57..d2fc122d7426 100644
+--- a/block/partitions/acorn.c
++++ b/block/partitions/acorn.c
+@@ -282,13 +282,13 @@ int adfspart_check_ADFS(struct parsed_partitions *state)
+ #ifdef CONFIG_ACORN_PARTITION_RISCIX
+ 		case PARTITION_RISCIX_SCSI:
+ 		case PARTITION_RISCIX_MFM:
+-			slot = riscix_partition(state, start_sect, slot,
++			riscix_partition(state, start_sect, slot,
+ 						nr_sects);
+ 			break;
+ #endif
+ 
+ 		case PARTITION_LINUX:
+-			slot = linux_partition(state, start_sect, slot,
++			linux_partition(state, start_sect, slot,
+ 					       nr_sects);
+ 			break;
+ 		}
+diff --git a/block/partitions/atari.c b/block/partitions/atari.c
+index da5994175416..9655c728262a 100644
+--- a/block/partitions/atari.c
++++ b/block/partitions/atari.c
+@@ -140,7 +140,6 @@ int atari_partition(struct parsed_partitions *state)
+ 				/* accept only GEM,BGM,RAW,LNX,SWP partitions */
+ 				if (!((pi->flg & 1) && OK_id(pi->id)))
+ 					continue;
+-				part_fmt = 2;
+ 				put_partition (state, slot,
+ 						be32_to_cpu(pi->st),
+ 						be32_to_cpu(pi->siz));
+diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
+index 27f6c7d9c776..38e58960ae03 100644
+--- a/block/partitions/ldm.c
++++ b/block/partitions/ldm.c
+@@ -736,7 +736,6 @@ static bool ldm_parse_cmp3 (const u8 *buffer, int buflen, struct vblk *vb)
+ 		len = r_cols;
+ 	} else {
+ 		r_stripe = 0;
+-		r_cols   = 0;
+ 		len = r_parent;
+ 	}
+ 	if (len < 0)
+@@ -783,11 +782,8 @@ static int ldm_parse_dgr3 (const u8 *buffer, int buflen, struct vblk *vb)
+ 		r_id1 = ldm_relative (buffer, buflen, 0x24, r_diskid);
+ 		r_id2 = ldm_relative (buffer, buflen, 0x24, r_id1);
+ 		len = r_id2;
+-	} else {
+-		r_id1 = 0;
+-		r_id2 = 0;
++	} else
+ 		len = r_diskid;
+-	}
+ 	if (len < 0)
+ 		return false;
+ 
+@@ -826,11 +822,8 @@ static bool ldm_parse_dgr4 (const u8 *buffer, int buflen, struct vblk *vb)
+ 		r_id1 = ldm_relative (buffer, buflen, 0x44, r_name);
+ 		r_id2 = ldm_relative (buffer, buflen, 0x44, r_id1);
+ 		len = r_id2;
+-	} else {
+-		r_id1 = 0;
+-		r_id2 = 0;
++	} else
+ 		len = r_name;
+-	}
+ 	if (len < 0)
+ 		return false;
+ 
+@@ -963,10 +956,8 @@ static bool ldm_parse_prt3(const u8 *buffer, int buflen, struct vblk *vb)
+ 			return false;
+ 		}
+ 		len = r_index;
+-	} else {
+-		r_index = 0;
++	} else
+ 		len = r_diskid;
+-	}
+ 	if (len < 0) {
+ 		ldm_error("len %d < 0", len);
+ 		return false;
+-- 
+2.25.1
+
