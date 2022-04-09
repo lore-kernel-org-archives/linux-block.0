@@ -2,104 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C9AFC43219
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 03:39:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E812C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 04:16:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238687AbiDIDl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 8 Apr 2022 23:41:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49008 "EHLO
+        id S236785AbiDIESo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 9 Apr 2022 00:18:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238554AbiDIDlz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 8 Apr 2022 23:41:55 -0400
-Received: from loongson.cn (mail.loongson.cn [114.242.206.163])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C7C18AC928;
-        Fri,  8 Apr 2022 20:39:48 -0700 (PDT)
-Received: from linux.localdomain (unknown [113.200.148.30])
-        by mail.loongson.cn (Coremail) with SMTP id AQAAf9Dx3xP9_1BiOesbAA--.5440S3;
-        Sat, 09 Apr 2022 11:39:44 +0800 (CST)
-From:   Tiezhu Yang <yangtiezhu@loongson.cn>
-To:     Jens Axboe <axboe@kernel.dk>, Jonathan Corbet <corbet@lwn.net>
-Cc:     linux-block@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH 1/3] init: print some info about UUID and LABEL in name_to_dev_t()
-Date:   Sat,  9 Apr 2022 11:39:39 +0800
-Message-Id: <1649475581-12139-2-git-send-email-yangtiezhu@loongson.cn>
-X-Mailer: git-send-email 2.1.0
-In-Reply-To: <1649475581-12139-1-git-send-email-yangtiezhu@loongson.cn>
-References: <1649475581-12139-1-git-send-email-yangtiezhu@loongson.cn>
-X-CM-TRANSID: AQAAf9Dx3xP9_1BiOesbAA--.5440S3
-X-Coremail-Antispam: 1UD129KBjvJXoW7ZryxGF43uFy5Aw1kZw45GFg_yoW8uw4kpw
-        47K345Kr92qr4DA3WUAF1rXry5Ja1Y93WFqFWFvws7uwsIgF9rX3W0yF1jy34UJw1rA3W2
-        qa15Jr93CF4YyaDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-        9KBjDU0xBIdaVrnRJUUUBFb7Iv0xC_tr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
-        0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI
-        8067AKxVWUGwA2048vs2IY020Ec7CjxVAFwI0_Jrv_JF4l8cAvFVAK0II2c7xJM28CjxkF
-        64kEwVA0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcV
-        CY1x0267AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv
-        6xkF7I0E14v26r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4
-        CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvj
-        eVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwCY02Avz4vE14v_Gr4l42xK82IYc2
-        Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s02
-        6x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0x
-        vE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE
-        42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6x
-        kF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jw2-5UUUUU=
-X-CM-SenderInfo: p1dqw3xlh2x3gn0dqz5rrqw2lrqou0/
+        with ESMTP id S240684AbiDIESn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 00:18:43 -0400
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22A9B381B7;
+        Fri,  8 Apr 2022 21:16:38 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id k13so4355861plk.12;
+        Fri, 08 Apr 2022 21:16:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=n9MXD0mYMH8RzHOiznday//9xBEvvSDwnsbWVqnewdc=;
+        b=Jnm+DKRV+5JKiEaWNaxXLXTBqSV7XJM8YmXOssklQ9WCeDgNkkPRA6YS47LhUO9GNq
+         lk3lpzpbxBYqCATX3I7crB0sXvlZz8VZZxTVSqC++Oi3kVj9BLxZRq11Zl3DfnQyb4xh
+         iYU4RDSUJyjPX/Z0U61UG4EmxuPMSmFGGShLhrtSBN1+wB0+rVfrQ/2ehm/e6QnTnPFQ
+         /MjOBXuSjNbXFHclwlkRB+Z7dP9XIRIgF3CWMNDDEYME/ZoMxAD7gN2GOKBquWcN8oki
+         s/ZeJbO0eYD73Ea2RACpaqAivQlTcC1cpdwRTUWBOVD6qjxYahSCDjFYzob1o/scsRRK
+         XfPQ==
+X-Gm-Message-State: AOAM532SzvViTB/FRBXGy9c5PXfRabzGjoxriIzS9ac6eiwA6BNnFhoD
+        DGykMMQ0ej+zOIKir9boTas=
+X-Google-Smtp-Source: ABdhPJwEclMAWyS7JoOw6kDj/M0wjApflh8rMtjacMRv/ldCt9XQkv3BEO0T7UQCpAIWSxLnOJEBkA==
+X-Received: by 2002:a17:90b:4b10:b0:1c7:5b66:28df with SMTP id lx16-20020a17090b4b1000b001c75b6628dfmr25269315pjb.33.1649477796968;
+        Fri, 08 Apr 2022 21:16:36 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id y15-20020a17090a1f4f00b001c7ecaf9e13sm13618880pjy.35.2022.04.08.21.16.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Apr 2022 21:16:36 -0700 (PDT)
+Message-ID: <fc82d24f-51d8-5f8c-1a44-6c95da722f54@acm.org>
+Date:   Fri, 8 Apr 2022 21:16:34 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
+ based on required tags
+Content-Language: en-US
+To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
+        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+ <20220408073916.1428590-9-yukuai3@huawei.com>
+ <6470d923-8fa5-cda1-e519-6f890cdcb00a@acm.org>
+ <4c322eee-3ad9-812f-a341-aa5e91573912@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <4c322eee-3ad9-812f-a341-aa5e91573912@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If there is no valid initrd, but root=UUID or root=LABEL is used
-in the command line, boot hangs like this:
+On 4/8/22 19:17, yukuai (C) wrote:
+> I think the reason to wake up 'wake_batch' waiters is to make sure
+> wakers will use up 'wake_batch' tags that is just freed, because each
+> wakers should aquire at least one tag. Thus I think if we can make sure
+> wakers will use up 'wake_batch' tags, it's ok to wake up less waiters.
 
-[    5.739815] VFS: Cannot open root device "UUID=19957230-2e15-494c-8dfa-84aab3591961" or unknown-block(0,0): error -6
-[    5.750280] Please append a correct "root=" boot option; here are the available partitions:
-[    5.856059] 0800       125034840 sda
-[    5.856061]  driver: sd
-[    5.862124]   0801          307200 sda1 d5077411-3d87-4f85-b312-8cc309ef9073
-[    5.862128]
-[    5.870603]   0802         1048576 sda2 aae0dd30-e5f5-44e1-994e-d47bf5ce2e52
-[    5.870606]
-[    5.879080]   0803        52428800 sda3 759079ee-85fa-4636-9de7-1ac0643ab87e
-[    5.879083]
-[    5.887558]   0804         8388608 sda4 439c4b0a-7b4f-4434-82f1-f9d380b55fb9
-[    5.887560]
-[    5.896035]   0805        62860288 sda5 ee52e951-1315-4fab-a3e5-45c6eeae6ce6
-[    5.910575] Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0)
-[    5.918796] ---[ end Kernel panic - not syncing: VFS: Unable to mount root fs on unknown-block(0,0) ]---
+Hmm ... I think it's up to you to (a) explain this behavior change in 
+detail in the commit message and (b) to prove that this behavior change 
+won't cause trouble (I guess this change will cause trouble).
 
-The above log is very useful, but some users still need time
-to analysis the cause [1, 2]. It is better to print some info
-to explicitly tell the users root=UUID or root=LABEL is not
-supported without initrd.
+Thanks,
 
-[1] https://unix.stackexchange.com/questions/93767/why-cant-i-specify-my-root-fs-with-a-uuid
-[2] https://unix.stackexchange.com/questions/302795/how-to-identify-root-partition-via-uuid-without-initramfs-initrd
-
-Signed-off-by: Tiezhu Yang <yangtiezhu@loongson.cn>
----
- init/do_mounts.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
-
-diff --git a/init/do_mounts.c b/init/do_mounts.c
-index 7058e14..2c1c492 100644
---- a/init/do_mounts.c
-+++ b/init/do_mounts.c
-@@ -290,6 +290,14 @@ dev_t name_to_dev_t(const char *name)
- 	if (strncmp(name, "/dev/", 5) == 0)
- 		return devt_from_devname(name + 5);
- #endif
-+	if (strncmp(name, "UUID=", 5) == 0) {
-+		pr_info("root=UUID is not supported without initrd\n");
-+		return 0;
-+	}
-+	if (strncmp(name, "LABEL=", 6) == 0) {
-+		pr_info("root=LABEL is not supported without initrd\n");
-+		return 0;
-+	}
- 	return devt_from_devnum(name);
- }
- EXPORT_SYMBOL_GPL(name_to_dev_t);
--- 
-2.1.0
-
+Bart.
