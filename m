@@ -2,88 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79BDFC433EF
-	for <linux-block@archiver.kernel.org>; Sat,  9 Apr 2022 21:33:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE16DC43217
+	for <linux-block@archiver.kernel.org>; Sun, 10 Apr 2022 06:26:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232291AbiDIVf5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 9 Apr 2022 17:35:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54484 "EHLO
+        id S232813AbiDJG2i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 10 Apr 2022 02:28:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231915AbiDIVf4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 9 Apr 2022 17:35:56 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98B2CEB8;
-        Sat,  9 Apr 2022 14:33:48 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id h23-20020a17090a051700b001c9c1dd3acbso12970806pjh.3;
-        Sat, 09 Apr 2022 14:33:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=xj9rNlmvCUpgWDGEsXJxpVSrmFrkxrjjtQuyonvd5qc=;
-        b=pxgwE7gdypqSf3Nl/KgOQens2ziEPmCPehhJrsikvcaPi541pnOkMOyjrYKMM7OmsG
-         JAHBYYZRYMbQ1LtytJAez/zROFN3iYUo7dMoJr/l261ZQ86ZBxrMrTvUCc0HP0hzUL2E
-         yDqvj1ShFDj7qRyGo8YiEH80hbZsJe1Ipu9ukCND3xinMfZ9UMpNODbffIKutEim+xQO
-         tzbHnwATY5/FNop1iBW5uINgsp0SVaERj4+QvJp1WDB3RAEEK4E9NX4OTW8VrCgf1nt3
-         wH02r1pDd7viFS+5AN+uXXk3XIneK9oC0y3GLDSmb1QUqHRx6m06Kh+F30TBEiUqwFTG
-         c3tA==
-X-Gm-Message-State: AOAM530UHsDWJIHvmh3Rm/pw1WG5EhJ/JXeTC6tAN4ZTiWSoJbr+QHma
-        sZoR9ARUkYNMIkkXwQaT+c/rICKaGlo=
-X-Google-Smtp-Source: ABdhPJzt4uYVmAOOfTFXUaThJIE6it/aZqeUjTF7jZ4zOK6HeRYQXtZ//XCBsFR/8ewFWu2RG6nRAg==
-X-Received: by 2002:a17:902:e791:b0:151:dbbd:aeae with SMTP id cp17-20020a170902e79100b00151dbbdaeaemr25732522plb.171.1649540027613;
-        Sat, 09 Apr 2022 14:33:47 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id pf2-20020a17090b1d8200b001c6f65ca66fsm15952799pjb.47.2022.04.09.14.33.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 09 Apr 2022 14:33:46 -0700 (PDT)
-Message-ID: <d41e3238-d7d9-16f8-38bd-2608844d7831@acm.org>
-Date:   Sat, 9 Apr 2022 14:33:45 -0700
+        with ESMTP id S232295AbiDJG2g (ORCPT
+        <rfc822;linux-block@vger.kernel.org>);
+        Sun, 10 Apr 2022 02:28:36 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 039BD5A08F;
+        Sat,  9 Apr 2022 23:26:25 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id E057168AFE; Sun, 10 Apr 2022 08:26:20 +0200 (CEST)
+Date:   Sun, 10 Apr 2022 08:26:20 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Christoph =?iso-8859-1?Q?B=F6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Cc:     Christoph Hellwig <hch@lst.de>, dm-devel@redhat.com,
+        linux-xfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
+        drbd-dev@lists.linbit.com, nbd@other.debian.org,
+        ceph-devel@vger.kernel.org,
+        virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, Jens Axboe <axboe@kernel.dk>,
+        linux-bcache@vger.kernel.org, linux-raid@vger.kernel.org,
+        linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        jfs-discussion@lists.sourceforge.net, linux-nilfs@vger.kernel.org,
+        ntfs3@lists.linux.dev, ocfs2-devel@oss.oracle.com,
+        linux-mm@kvack.org,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Coly Li <colyli@suse.de>
+Subject: Re: [PATCH 24/27] block: remove QUEUE_FLAG_DISCARD
+Message-ID: <20220410062620.GA16234@lst.de>
+References: <20220409045043.23593-1-hch@lst.de> <20220409045043.23593-25-hch@lst.de> <72e9bd34-3380-e305-65f0-a17306f5bd08@linbit.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] block/compat_ioctl: fix range check in BLKGETSIZE
-Content-Language: en-US
-To:     Khazhismel Kumykov <khazhy@google.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220408234707.2562835-1-khazhy@google.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220408234707.2562835-1-khazhy@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <72e9bd34-3380-e305-65f0-a17306f5bd08@linbit.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/8/22 16:47, Khazhismel Kumykov wrote:
-> kernel ulong and compat_ulong_t may not be same width. Use type directly
-> to eliminate mismatches.
-> 
-> This would result in truncation rather than EFBIG for 32bit mode for
-> large disks.
-> 
-> Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
-> ---
->   block/ioctl.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> Noticed this one was sitting in my "not landed yet" pile, third time's
-> the charm? :)
-> 
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 4a86340133e4..959e93a90b29 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -629,7 +629,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
->   		return compat_put_long(argp,
->   			(bdev->bd_disk->bdi->ra_pages * PAGE_SIZE) / 512);
->   	case BLKGETSIZE:
-> -		if (bdev_nr_sectors(bdev) > ~0UL)
-> +		if (bdev_nr_sectors(bdev) > ~((compat_ulong_t)0UL))
->   			return -EFBIG;
->   		return compat_put_ulong(argp, bdev_nr_sectors(bdev));
+On Sat, Apr 09, 2022 at 10:15:33AM +0200, Christoph Böhmwalder wrote:
+> On 09.04.22 06:50, Christoph Hellwig wrote:
+>> Just use a non-zero max_discard_sectors as an indicator for discard
+>> support, similar to what is done for write zeroes.
+>>
+>> The only places where needs special attention is the RAID5 driver,
+>> which must clear discard support for security reasons by default,
+>> even if the default stacking rules would allow for it.
+>>
+>> Signed-off-by: Christoph Hellwig <hch@lst.de>
+>> Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
+>> Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com> [btrfs]
+>
+> I think you may have a typo there: my ACK was for drbd, not btrfs.
 
-A nit: the "UL" and two parentheses can be left out. Anyway:
-
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Indeed, sorry.
