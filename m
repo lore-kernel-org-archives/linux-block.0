@@ -2,146 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A89CEC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 16:51:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A71C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 16:58:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348702AbiDKQxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Apr 2022 12:53:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
+        id S241589AbiDKRAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Apr 2022 13:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348700AbiDKQxs (ORCPT
+        with ESMTP id S238268AbiDKRAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Apr 2022 12:53:48 -0400
-Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AC336B45
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:51:32 -0700 (PDT)
-Received: by mail-io1-xd32.google.com with SMTP id q11so19409129iod.6
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:51:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=eiAYIK4eB9YpKVQY7uodlLNbKuIMZrkg3r+tUafoF+8=;
-        b=KZiBB6oG1FD1CE/9BBJANOo58MujeM4G+RO7m0j+T/VCQTn2cFaXrCMbVSBax+yoN7
-         zKDoOVZlUkLaZ3ztKLjDMlm48/fezbrjDjd8FinhGjO/FLRdb2WT+p4RV7ZQF1GSlEoM
-         zg/KHadgywEe+78idGiO1rJO41wOAmyIQaqmGm7D0TJo4fBqK0V5vxf7W2kNRvfSqWe/
-         n2dc0BeZUdc7FFx0l3CrIv4eLePLZWBHlARH5xY0AFfmWa0edY3kh4EDCa7ynSehK1oI
-         zgYYXZ46rdiFi8fAR7Y+nIkHgoyOShglax8UmPcZR49QbLOjlDvBow6HyZjIhs09/T8U
-         fh4w==
+        Mon, 11 Apr 2022 13:00:35 -0400
+Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EE102A7
+        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:58:21 -0700 (PDT)
+Received: by mail-qk1-f177.google.com with SMTP id 75so8321402qkk.8
+        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:58:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=eiAYIK4eB9YpKVQY7uodlLNbKuIMZrkg3r+tUafoF+8=;
-        b=jvYeMXee4zmprOBzYsMgVtOJbNWjQF9JLAH265/vSzCJsTTAYPgLnI9usktEABdOzk
-         qMypp0ScxQEtP9GOmm6/2DWSUy+tjzuBvPpnV7rzn2yO2RNRLF9YAwJZg1FxAyAkXOQC
-         zktorQS727c3kLAFnC0QH/dYdG8/eLkB0+O9uZkoqDto7H0LGqcn9K7lMGLpijgE35lg
-         JSfkb+csdBncllJY36Pjx6PphjVDjAay8fBfdwkbsDEyd/XjaF7M2VwMrgisaKYcoEjK
-         6KhNRO0pnId68TwOy4vHA1VyrDoFw2dOlLHhAzh+2Rz9PV4fGeQUDigc/zm6GWnY0zsc
-         4A+w==
-X-Gm-Message-State: AOAM530WMZARLqAvacz8/JFJWxbIE89cNArXOhw2EnMU7V/ls13giYRF
-        02R6aIm6UrGCgVrjpHRFTXdP5Uous4P/wg==
-X-Google-Smtp-Source: ABdhPJyrBJiJPWff548IHrGfcWxyvtBO+exqiqx6SfQ/bhIkV++JhY6PT88XFxSZLp9IJ3vkLBwX/Q==
-X-Received: by 2002:a05:6638:4984:b0:326:11b5:74fb with SMTP id cv4-20020a056638498400b0032611b574fbmr4965472jab.153.1649695891345;
-        Mon, 11 Apr 2022 09:51:31 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id s13-20020a6bdc0d000000b006408888551dsm20145509ioc.8.2022.04.11.09.51.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Apr 2022 09:51:30 -0700 (PDT)
-Message-ID: <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
-Date:   Mon, 11 Apr 2022 10:51:28 -0600
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=Q9NaM/bqnDmwmZW9IjiKDhdbhCbXASVz0XNirNdhkOw=;
+        b=sZEBTmva1j2hHU2Gdmw3s7cNKvtIRhIxaZBluEc7kq5g7s/r0hoXCWr4Ekd+9K5F7C
+         9nIRppF2rBcBkBRbh2FTfMpVgeye0jypPWwOFI8Nsgs0b/TUCGfC8awMEgTDJcvffXGT
+         xY6Q7AX/WcZzr0MfurcmQY7gVeqEuyRkurq00ngZ5FLEROu18g8Wx68brlc7DgaZHIgA
+         WRhaExLgEAUM1IHGYkDC/U3Io5C4HSkSqTSTlF+bQVTjt31zToyEk6vrQHQmOdAA2HfC
+         8XZSAUK1VTAwqDSxe6THkembFlwformXGcjBwWyqqThdfUhTvmmYKiFS6S0cH6uqmnRC
+         rmnQ==
+X-Gm-Message-State: AOAM532FArRysBsnddT786b9GEV9Ae4C/GmDMeyCutCeUbl1pf7Ctwa/
+        nh85rwsZH3ukLs2cl0Bk4Ts5
+X-Google-Smtp-Source: ABdhPJzneUy68CPhWIxGkvWUcDlTbElnOZi5WfODKQ97gn0Po+Vl0ctS1z0DBoq/zxAjz93pxGyBcQ==
+X-Received: by 2002:a05:620a:404f:b0:69a:5ca1:32fc with SMTP id i15-20020a05620a404f00b0069a5ca132fcmr230560qko.676.1649696300198;
+        Mon, 11 Apr 2022 09:58:20 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id h186-20020a376cc3000000b00699c789a757sm14602815qkc.132.2022.04.11.09.58.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Apr 2022 09:58:19 -0700 (PDT)
+Date:   Mon, 11 Apr 2022 12:58:18 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dennis Zhou <dennis@kernel.org>, tj@kernel.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, dm-devel@redhat.com
+Subject: Re: can we reduce bio_set_dev overhead due to bio_associate_blkg?
+Message-ID: <YlReKjjWhvTZjfg/@redhat.com>
+References: <YkSK6mU1fja2OykG@redhat.com>
+ <YkRM7Iyp8m6A1BCl@fedora>
+ <YkUwmyrIqnRGIOHm@infradead.org>
+ <YkVBjUy9GeSMbh5Q@fedora>
+ <YkVxLN9p0t6DI5ie@infradead.org>
+ <YlBX+ytxxeSj2neQ@redhat.com>
+ <YlEWfc39+H+esrQm@infradead.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH] cdrom: do not print info list when there is no cdrom
- device
-Content-Language: en-US
-To:     Enze Li <lienze@kylinos.cn>, Phillip Potter <phil@philpotter.co.uk>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220408084221.1681592-1-lienze@kylinos.cn>
- <25390602-cfa0-dba3-bfbc-a35ed6b44bcf@kernel.dk>
- <20220409122530.60353fcd@asus> <YlFA7USiCtqsFvVD@equinox>
- <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YlEWfc39+H+esrQm@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/11/22 2:41 AM, Enze Li wrote:
-> 
-> On 4/9/22 16:16, Phillip Potter wrote:
->> On Sat, Apr 09, 2022 at 12:25:30PM +0800, Enze Li wrote:
-> 
-> <snip>
-> 
->>> On Fri, 8 Apr 2022 06:34:04 -0600
->>> Jens Axboe <axboe@kernel.dk> wrote:
->>>> Will this potentially break applications that parse it?
->>>>
->>> I dunno, is there any way to confirm this thing?  And if this is really
->>> a possibility, does it mean that we cannot make changes?
->>>
->> Sorry, anything that can be parsed from userspace has the potential to
->> break userspace applications. For that reason, I would have to say I
->> don't think this patch is suitable. Sure there are times it's
->> appropriate to change userspace interfaces, but I'd rather err on the
->> side of caution here. Thanks for the patch though.
->>
->> Nacked-by: Phillip Potter <phil@philpotter.co.uk>
->>
->> Regards,
->> Phil
-> 
-> Hi Phil,
-> 
-> Thanks for your review.  I got what you said. ?
-> 
-> In addition, I noticed that in the source file[1], there is a Todo List there.  I'm quite
-> interested in it.  It says:
-> ================================================
->   17 To Do List:
->   18 ----------------------------------
->   19
->   20  -- Modify sysctl/proc interface. I plan on having one directory per                 
->   21  drive, with entries for outputing general drive information, and sysctl             
->   22  based tunable parameters such as whether the tray should auto-close for             
->   23  that drive. Suggestions (or patches) for this welcome!
-> ================================================
-> I'd like to know if the relevant patches are still welcome?
-> 
-> IIUC, the TODO List says that we need to implement a modification of the
-> following form:
-> ----------------------------------------------------------------------------------------------------------
-> $ tree /proc/sys/dev/cdrom
-> /proc/sys/dev/cdrom
-> |--sr0--autoclose
-> |       |-autoeject
-> |       |-check_media
-> |       |-debug
-> |       |-info
-> |       |-lock
-> |
-> |--sr1--autoclose
-> |       |-autoeject
-> |       |-check_media
-> |       |-debug
-> |       |-info
-> |       |-lock
-> |
-> |--sr2 ...
-> .
-> .
-> .
-> ----------------------------------------------------------------------------------------------------------
-> I would appreciate it if you could give me some advice.
+On Sat, Apr 09 2022 at  1:15P -0400,
+Christoph Hellwig <hch@infradead.org> wrote:
 
-Let's not do that, this advice is perhaps 20 years old. /proc isn't to
-be used for anything like that these days.
+> On Fri, Apr 08, 2022 at 11:42:51AM -0400, Mike Snitzer wrote:
+> > I think we can achieve the goal of efficient cloning/remapping for
+> > both usecases simply by splitting out the bio_set_dev() and leaving it
+> > to the caller to pick which interface to use (e.g. clone vs
+> > clone_and_remap).
+> 
+> You can just pass a NULL bdev to bio_alloc_clone/bio_init_clone.
+> I've been hoping to get rid of that, but if we have a clear use case
+> it will have to stay.
 
--- 
-Jens Axboe
+DM core is just using bio_alloc_clone. And bio_alloc_bioset() allows
+bdev to be NULL -- so you're likely referring to that (which will skip
+bio_init's bio_associate_blkg).
 
+Circling back to earlier in this thread, Dennis and you agreed that it
+doesn't make sense to have __bio_clone() do blkcg work if the clone
+bio will be remapped (via bio_set_dev).  Given that, and the fact that
+bio_clone_blkg_association() assumes both bios are from same bdev,
+this change makes sense:
+
+diff --git a/block/bio.c b/block/bio.c
+index 7892f1108ca6..0340acc283a0 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -772,14 +772,16 @@ static int __bio_clone(struct bio *bio, struct bio *bio_src, gfp_t gfp)
+	bio_set_flag(bio, BIO_CLONED);
+	if (bio_flagged(bio_src, BIO_THROTTLED))
+		bio_set_flag(bio, BIO_THROTTLED);
+-	if (bio->bi_bdev == bio_src->bi_bdev &&
+-	    bio_flagged(bio_src, BIO_REMAPPED))
+-		bio_set_flag(bio, BIO_REMAPPED);
+	bio->bi_ioprio = bio_src->bi_ioprio;
+	bio->bi_iter = bio_src->bi_iter;
+
+-	bio_clone_blkg_association(bio, bio_src);
+-	blkcg_bio_issue_init(bio);
++	if (bio->bi_bdev == bio_src->bi_bdev) {
++		if (bio_flagged(bio_src, BIO_REMAPPED))
++			bio_set_flag(bio, BIO_REMAPPED);
++
++		bio_clone_blkg_association(bio, bio_src);
++		blkcg_bio_issue_init(bio);
++	}
+
+	if (bio_crypt_clone(bio, bio_src, gfp) < 0)
+		return -ENOMEM;
+
+Think this will fix some of the performance penalty of redundant blkcg
+initialization that I reported (though like was also discussed: more
+work likely needed to further optimize bio_associate_blkg).
+
+I'll audit DM targets and test to verify my changes and will post
+proper patch(es) once done.
+
+Mike
