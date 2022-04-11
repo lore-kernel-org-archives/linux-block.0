@@ -2,122 +2,58 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FADAC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 14:44:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69BC0C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 15:07:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230368AbiDKOqO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Apr 2022 10:46:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35012 "EHLO
+        id S1347210AbiDKPKE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Apr 2022 11:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344434AbiDKOqM (ORCPT
+        with ESMTP id S234367AbiDKPKC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Apr 2022 10:46:12 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3299613CC8;
-        Mon, 11 Apr 2022 07:43:58 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id BD42FB81643;
-        Mon, 11 Apr 2022 14:43:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2F802C385A4;
-        Mon, 11 Apr 2022 14:43:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1649688235;
-        bh=Y3EfVQNNBs/0MytQNTHPYHrnCnnhOOTpdF06Qx+ClDs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=faIHQj3pWM2LzvbpuXQNvIWWFousJEmGccimQP3wvJDnViaZpU8gaABucJE5IOd10
-         lyj+GTG4jX+avK4cSmQNRBgrfC6RE2tG2Cnw9IR+kAN8rUPdPqhEFP+QDsIgKq9u1q
-         sFnyo4j+QdblCzuPSmMZ5i7B0Wvr/zuMAAiTtHew=
-Date:   Mon, 11 Apr 2022 16:43:53 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Valentin Kleibel <valentin@vrvis.at>
-Cc:     stable@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Justin Sanders <justin@coraid.com>, linux-block@vger.kernel.org
-Subject: Re: [PATCH v2 1/2] block: add blk_alloc_disk and blk_cleanup_disk
- APIs
-Message-ID: <YlQ+qUjLjg5p33II@kroah.com>
-References: <c274db07-9c7d-d857-33ad-4a762819bcdd@vrvis.at>
- <YinpIKY0HVlJ+TLR@kroah.com>
- <50ddedf1-5ac3-91c3-0b50-645ceb541071@vrvis.at>
- <YinufgnQtSeTA18w@kroah.com>
- <9dd4a25a-7deb-fcdf-0c05-d37d4c894d86@vrvis.at>
- <Yi8jO3Q+xbPx0JwF@kroah.com>
- <b19953f8-2097-6962-eceb-5d41f4639ce4@vrvis.at>
- <ab7167b6-8ea5-fd4a-66ea-b8aa93f68ee2@vrvis.at>
+        Mon, 11 Apr 2022 11:10:02 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32A2ADEE8;
+        Mon, 11 Apr 2022 08:07:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=kaOYbB7BPRuQaA6MSo+ry7RpxuhRfvVv8fz/JnNUxz8=; b=fjLiTm+vkn8ToPkhqxJ9r/2JHE
+        6PU6Us8m6sMsugih5LHYR/OmBND3Ay1ajeJE260aTCfKQvwHxemQNuMnvqQxCkCWKArY4fn5FA2hR
+        yWtB7EpN10msubpx9aFTZByz6VTehNutR3ZeLzOMHvsSgZVAC/qmbgYR3wNq6pwFS3TMTzSCbyQZL
+        AS98yxFPTUj6ehFKyE6VXPo2J1KacTIokYLZ/kTpsG3pD9SSU5MSHao55JfuLhiotMh6s52wcvFhC
+        oTisq+Mly46j02oPIv01FBg+El5Nee+170jKpTzvIO0huA/7xzC/jKNZMvjMFzGJVQ7f67NdnpV4S
+        qjqfMrFQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ndvdR-009UOP-4a; Mon, 11 Apr 2022 15:07:21 +0000
+Date:   Mon, 11 Apr 2022 08:07:21 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tom Rix <trix@redhat.com>
+Cc:     tim@cyberelk.net, axboe@kernel.dk, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, nathan@kernel.org,
+        ndesaulniers@google.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: Re: [PATCH] security: do not leak information in ioctl
+Message-ID: <YlREKRb/xgAFsi97@infradead.org>
+References: <20220409145137.67592-1-trix@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ab7167b6-8ea5-fd4a-66ea-b8aa93f68ee2@vrvis.at>
+In-Reply-To: <20220409145137.67592-1-trix@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Mar 31, 2022 at 12:00:08PM +0200, Valentin Kleibel wrote:
-> Add two new APIs to allocate and free a gendisk including the
-> request_queue for use with BIO based drivers.  This is to avoid
-> boilerplate code in drivers.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Ulf Hansson <ulf.hansson@linaro.org>
-> Link: https://lore.kernel.org/r/20210521055116.1053587-6-hch@lst.de
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> (cherry picked from commit f525464a8000f092c20b00eead3eaa9d849c599e)
-> Fixes: 3582dd291788 (aoe: convert aoeblk to blk-mq)
-> Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=215647
-> Signed-off-by: Valentin Kleibel <valentin@vrvis.at>
-> ---
->  block/genhd.c         | 15 +++++++++++++++
->  include/linux/genhd.h |  1 +
->  2 files changed, 16 insertions(+)
-> 
-> diff --git a/block/genhd.c b/block/genhd.c
-> index 796baf761202..421cad085502 100644
-> --- a/block/genhd.c
-> +++ b/block/genhd.c
-> @@ -1836,6 +1836,21 @@ void put_disk_and_module(struct gendisk *disk)
->         }
->  }
->  EXPORT_SYMBOL(put_disk_and_module);
-> +/**
-> + * blk_cleanup_disk - shutdown a gendisk allocated by blk_alloc_disk
-> + * @disk: gendisk to shutdown
-> + *
-> + * Mark the queue hanging off @disk DYING, drain all pending requests, then
-> mark
-> + * the queue DEAD, destroy and put it and the gendisk structure.
-> + *
-> + * Context: can sleep
-> + */
-> +void blk_cleanup_disk(struct gendisk *disk)
-> +{
-> +       blk_cleanup_queue(disk->queue);
-> +       put_disk(disk);
-> +}
-> +EXPORT_SYMBOL(blk_cleanup_disk);
-> 
->  static void set_disk_ro_uevent(struct gendisk *gd, int ro)
->  {
-> diff --git a/include/linux/genhd.h b/include/linux/genhd.h
-> index 03da3f603d30..b7b180d3734a 100644
-> --- a/include/linux/genhd.h
-> +++ b/include/linux/genhd.h
-> @@ -369,6 +369,7 @@ extern void blk_unregister_region(dev_t devt, unsigned
-> long range);
->  #define alloc_disk(minors) alloc_disk_node(minors, NUMA_NO_NODE)
-> 
->  int register_blkdev(unsigned int major, const char *name);
-> +void blk_cleanup_disk(struct gendisk *disk);
->  void unregister_blkdev(unsigned int major, const char *name);
-> 
->  void revalidate_disk_size(struct gendisk *disk, bool verbose);
+Wrong subject prefix, and this really should be split into one patch for
+pcd and one for sr.
 
-This backport looks to be incomplete, and is also totally whitespace
-damaged and can not be applied at all :(
+The sr prt looks sensible to me.  But for pcd why can't you just
+initialize buffer using
 
-Please fix both up and resend.
+	char buffer[32] = { };
 
-thanks,
+and be done with it?
 
-greg k-h
