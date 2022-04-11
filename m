@@ -2,103 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F300DC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 16:31:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A89CEC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 11 Apr 2022 16:51:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348632AbiDKQdo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Apr 2022 12:33:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43362 "EHLO
+        id S1348702AbiDKQxw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Apr 2022 12:53:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59850 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348656AbiDKQdn (ORCPT
+        with ESMTP id S1348700AbiDKQxs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Apr 2022 12:33:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1317F31363
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:31:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649694686;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=9npo1nqXaxbPxEQzLk6Betnt1M5YLmZj/dlQsw0KH3E=;
-        b=YiHrMYvHInwGeCN3bYuEPlIoiDiJVFb9MVt+VeLTcktAdCuNMwbMiegis3p6SVGNsPwCAv
-        5vUEJREkqLSwoCOFuH/+OayrBJT7163N7tjN4yxJhv6w9fmlvXj/vgIEMDDKAHYsFcwWgA
-        4IPkTADn56RN2w6+eOU8j+gb1lcUbXA=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-675-izmQ2saFO4SUqcqw9FIdrg-1; Mon, 11 Apr 2022 12:31:24 -0400
-X-MC-Unique: izmQ2saFO4SUqcqw9FIdrg-1
-Received: by mail-qv1-f72.google.com with SMTP id gh5-20020a05621429c500b004443be8db85so4415866qvb.11
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:31:24 -0700 (PDT)
+        Mon, 11 Apr 2022 12:53:48 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19AC336B45
+        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:51:32 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id q11so19409129iod.6
+        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 09:51:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=eiAYIK4eB9YpKVQY7uodlLNbKuIMZrkg3r+tUafoF+8=;
+        b=KZiBB6oG1FD1CE/9BBJANOo58MujeM4G+RO7m0j+T/VCQTn2cFaXrCMbVSBax+yoN7
+         zKDoOVZlUkLaZ3ztKLjDMlm48/fezbrjDjd8FinhGjO/FLRdb2WT+p4RV7ZQF1GSlEoM
+         zg/KHadgywEe+78idGiO1rJO41wOAmyIQaqmGm7D0TJo4fBqK0V5vxf7W2kNRvfSqWe/
+         n2dc0BeZUdc7FFx0l3CrIv4eLePLZWBHlARH5xY0AFfmWa0edY3kh4EDCa7ynSehK1oI
+         zgYYXZ46rdiFi8fAR7Y+nIkHgoyOShglax8UmPcZR49QbLOjlDvBow6HyZjIhs09/T8U
+         fh4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=9npo1nqXaxbPxEQzLk6Betnt1M5YLmZj/dlQsw0KH3E=;
-        b=6tBZC8R31A7mUrVKd8xmDcqM2RqzQ29fUrs+VqJOS54meD+IQa4C1omTylv3shRVfc
-         6Uunhzu/48HtVXbYw0k7IcNMR0lvHH/5y0A6Uy4C4cYAqj8tIhTjz2YLL/PG/WkbbOUe
-         uGxvq/d9MJ+iAtyJbKkuZ+IsBYAiSmH9gwHup61UmUTdfTQD0nqKwcHP9upijLKk4GGf
-         TsoOKS0hNN3NfaCoStCB8IGBx4pnTZlV/C2EN8Lp2MLBlbw2nsGqyKcC1SNEOq3c7tUb
-         DGIbbx2RCRuS5XETeyDAatyOipc0H0o5L/FYom/l8nRPP/EV40CAkIy7/MBfKiIeTTc0
-         o6zQ==
-X-Gm-Message-State: AOAM533R3V88F6342TuScAx/e3SZR0v+Kp1GfFY2+1nArCdCIJ8YtZa1
-        WYGnnpkDubS9l/8eDdC/R6vB3DpA3CAl+S1Kn0mlsgsqBmEE0gLAgWyu6wn95K0enqey5FANZIt
-        Z/MIfvjHq5O+z4Lpm3i+Zno4=
-X-Received: by 2002:a05:620a:1024:b0:69c:2e0f:d020 with SMTP id a4-20020a05620a102400b0069c2e0fd020mr160239qkk.108.1649694684320;
-        Mon, 11 Apr 2022 09:31:24 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyIBbuzUKRKdpRu1szbFKkqYCYu3AmHHhLAg8TDSWf8+WPdx1Tx8DzyFwTfgzm1rUwE2RhpZg==
-X-Received: by 2002:a05:620a:1024:b0:69c:2e0f:d020 with SMTP id a4-20020a05620a102400b0069c2e0fd020mr160226qkk.108.1649694684121;
-        Mon, 11 Apr 2022 09:31:24 -0700 (PDT)
-Received: from localhost.localdomain (024-205-208-113.res.spectrum.com. [24.205.208.113])
-        by smtp.gmail.com with ESMTPSA id s31-20020a05622a1a9f00b002e1df010316sm26851091qtc.80.2022.04.11.09.31.22
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=eiAYIK4eB9YpKVQY7uodlLNbKuIMZrkg3r+tUafoF+8=;
+        b=jvYeMXee4zmprOBzYsMgVtOJbNWjQF9JLAH265/vSzCJsTTAYPgLnI9usktEABdOzk
+         qMypp0ScxQEtP9GOmm6/2DWSUy+tjzuBvPpnV7rzn2yO2RNRLF9YAwJZg1FxAyAkXOQC
+         zktorQS727c3kLAFnC0QH/dYdG8/eLkB0+O9uZkoqDto7H0LGqcn9K7lMGLpijgE35lg
+         JSfkb+csdBncllJY36Pjx6PphjVDjAay8fBfdwkbsDEyd/XjaF7M2VwMrgisaKYcoEjK
+         6KhNRO0pnId68TwOy4vHA1VyrDoFw2dOlLHhAzh+2Rz9PV4fGeQUDigc/zm6GWnY0zsc
+         4A+w==
+X-Gm-Message-State: AOAM530WMZARLqAvacz8/JFJWxbIE89cNArXOhw2EnMU7V/ls13giYRF
+        02R6aIm6UrGCgVrjpHRFTXdP5Uous4P/wg==
+X-Google-Smtp-Source: ABdhPJyrBJiJPWff548IHrGfcWxyvtBO+exqiqx6SfQ/bhIkV++JhY6PT88XFxSZLp9IJ3vkLBwX/Q==
+X-Received: by 2002:a05:6638:4984:b0:326:11b5:74fb with SMTP id cv4-20020a056638498400b0032611b574fbmr4965472jab.153.1649695891345;
+        Mon, 11 Apr 2022 09:51:31 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id s13-20020a6bdc0d000000b006408888551dsm20145509ioc.8.2022.04.11.09.51.29
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Apr 2022 09:31:23 -0700 (PDT)
-Subject: Re: [PATCH] security: do not leak information in ioctl
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     tim@cyberelk.net, axboe@kernel.dk, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, nathan@kernel.org,
-        ndesaulniers@google.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        llvm@lists.linux.dev
-References: <20220409145137.67592-1-trix@redhat.com>
- <YlREKRb/xgAFsi97@infradead.org>
-From:   Tom Rix <trix@redhat.com>
-Message-ID: <eec2efee-1153-8d8e-77c2-96156733a0c6@redhat.com>
-Date:   Mon, 11 Apr 2022 09:31:20 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        Mon, 11 Apr 2022 09:51:30 -0700 (PDT)
+Message-ID: <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
+Date:   Mon, 11 Apr 2022 10:51:28 -0600
 MIME-Version: 1.0
-In-Reply-To: <YlREKRb/xgAFsi97@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] cdrom: do not print info list when there is no cdrom
+ device
 Content-Language: en-US
+To:     Enze Li <lienze@kylinos.cn>, Phillip Potter <phil@philpotter.co.uk>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+References: <20220408084221.1681592-1-lienze@kylinos.cn>
+ <25390602-cfa0-dba3-bfbc-a35ed6b44bcf@kernel.dk>
+ <20220409122530.60353fcd@asus> <YlFA7USiCtqsFvVD@equinox>
+ <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 4/11/22 2:41 AM, Enze Li wrote:
+> 
+> On 4/9/22 16:16, Phillip Potter wrote:
+>> On Sat, Apr 09, 2022 at 12:25:30PM +0800, Enze Li wrote:
+> 
+> <snip>
+> 
+>>> On Fri, 8 Apr 2022 06:34:04 -0600
+>>> Jens Axboe <axboe@kernel.dk> wrote:
+>>>> Will this potentially break applications that parse it?
+>>>>
+>>> I dunno, is there any way to confirm this thing?  And if this is really
+>>> a possibility, does it mean that we cannot make changes?
+>>>
+>> Sorry, anything that can be parsed from userspace has the potential to
+>> break userspace applications. For that reason, I would have to say I
+>> don't think this patch is suitable. Sure there are times it's
+>> appropriate to change userspace interfaces, but I'd rather err on the
+>> side of caution here. Thanks for the patch though.
+>>
+>> Nacked-by: Phillip Potter <phil@philpotter.co.uk>
+>>
+>> Regards,
+>> Phil
+> 
+> Hi Phil,
+> 
+> Thanks for your review.  I got what you said. ?
+> 
+> In addition, I noticed that in the source file[1], there is a Todo List there.  I'm quite
+> interested in it.  It says:
+> ================================================
+>   17 To Do List:
+>   18 ----------------------------------
+>   19
+>   20  -- Modify sysctl/proc interface. I plan on having one directory per                 
+>   21  drive, with entries for outputing general drive information, and sysctl             
+>   22  based tunable parameters such as whether the tray should auto-close for             
+>   23  that drive. Suggestions (or patches) for this welcome!
+> ================================================
+> I'd like to know if the relevant patches are still welcome?
+> 
+> IIUC, the TODO List says that we need to implement a modification of the
+> following form:
+> ----------------------------------------------------------------------------------------------------------
+> $ tree /proc/sys/dev/cdrom
+> /proc/sys/dev/cdrom
+> |--sr0--autoclose
+> |       |-autoeject
+> |       |-check_media
+> |       |-debug
+> |       |-info
+> |       |-lock
+> |
+> |--sr1--autoclose
+> |       |-autoeject
+> |       |-check_media
+> |       |-debug
+> |       |-info
+> |       |-lock
+> |
+> |--sr2 ...
+> .
+> .
+> .
+> ----------------------------------------------------------------------------------------------------------
+> I would appreciate it if you could give me some advice.
 
-On 4/11/22 8:07 AM, Christoph Hellwig wrote:
-> Wrong subject prefix, and this really should be split into one patch for
-> pcd and one for sr.
-ok i will split
-> The sr prt looks sensible to me.  But for pcd why can't you just
-> initialize buffer using
->
-> 	char buffer[32] = { };
->
-> and be done with it?
+Let's not do that, this advice is perhaps 20 years old. /proc isn't to
+be used for anything like that these days.
 
-The failure can happen in the transfer loop, so some of the data will 
-not be zero.
-
-And checking status should be done.
-
-zero-ing is because i am paranoid.
-
-Tom
-
->
+-- 
+Jens Axboe
 
