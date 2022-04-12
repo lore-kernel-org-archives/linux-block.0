@@ -2,83 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA4FEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 01:18:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9E6C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 03:20:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236110AbiDLBU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Apr 2022 21:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36562 "EHLO
+        id S231476AbiDLDWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 11 Apr 2022 23:22:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235998AbiDLBU5 (ORCPT
+        with ESMTP id S1344515AbiDLDWv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Apr 2022 21:20:57 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CB463F2
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 18:18:42 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id md4so8572382pjb.4
-        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 18:18:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=7zb6q1clRNVhF0nkskjbfPH7YAOizM8520PoPHZpcOw=;
-        b=O7uwwzHGxTRiODkFwH9ivMlDft0Tl2AIFEZwulB/Qoqhzakw0M5Pr0WHUsU3KXP9H2
-         wkj8Cq7lBfEbdiOG6WxF87/wazWOkLDju5SMx6jl26dv/Hy1OiBgTEXG6898eZcz2pt0
-         CDDXM9PghdlqBkxgzmVCnm3aDVy8WdgIw/kJUUCFJbk7FayxWN4dml8+NPL6ld8CSm+T
-         P5xin+G5p8WyYwl0rdBels5U9Z+K6uGBDN5fq1EaGY+h+Tv2p2jBK/KDlCm9it6QMjuH
-         gJ3zXyH+wbuC2pGUxRVy9dCaT5Gm1pw50gbt8IIYVRAFTSN3TdBgj94PlFG0vPLV5hQa
-         vBgg==
+        Mon, 11 Apr 2022 23:22:51 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7531929C;
+        Mon, 11 Apr 2022 20:20:35 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id c12so290709plr.6;
+        Mon, 11 Apr 2022 20:20:35 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=7zb6q1clRNVhF0nkskjbfPH7YAOizM8520PoPHZpcOw=;
-        b=dTEv0QuLl/OEx1nAsv6Xfqq2N9CYdhLpRD6a+2TUGNnJp27TQYAn5sIR7E8gXeWWAn
-         /ZycTp638C2dI1Q6R96jTmpwqcYE0TraGHX6vtO0IWEuyOZPD8gPziaIx6qszc80UPg4
-         32MQWdO0PV073BeoLFm7/8JKkQOcnZG5gBv2yxr7RURl1z7NcoMZZhgsEgXiU0ewraCM
-         jByo62abCTs/tI0H40U5A2Up1kWPJyKnxdIeNlnAwwV1Tg5H8vjyQDRF/+mYSp+aeBlt
-         E9dgKAOnhz+seIsIDWgbyPUo4MYxtO4LSOFdpzGqkJ7u/D61nqMm2o0anaR568kfxrM0
-         ZrYA==
-X-Gm-Message-State: AOAM531gR4jvpshVrHBDulpgnn6oMGvKZgrgnN1do6emF/x/861k79gD
-        kDyCU8AcI9VC71Qx/Ym3b6E7SwmRSzgTkw==
-X-Google-Smtp-Source: ABdhPJyELxhsPSt5QpmyGIAa7Xr9IhqeHkFbLogqUSu+AT9i/cLN1dmFY8AdTxDbHLR7TpH4yEZPpA==
-X-Received: by 2002:a17:903:183:b0:158:7083:4ae9 with SMTP id z3-20020a170903018300b0015870834ae9mr5753119plg.75.1649726321769;
-        Mon, 11 Apr 2022 18:18:41 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id g5-20020a056a0023c500b004fae15ab86dsm36262964pfc.52.2022.04.11.18.18.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Apr 2022 18:18:41 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     kbusch@kernel.org, linux-block@vger.kernel.org,
-        torvalds@linux-foundation.org
-Cc:     linux-kernel@vger.kernel.org
-In-Reply-To: <20220327173316.315-1-kbusch@kernel.org>
-References: <20220327173316.315-1-kbusch@kernel.org>
-Subject: Re: [PATCH] block: move lower_48_bits() to block
-Message-Id: <164972632075.287454.14684936901752798558.b4-ty@kernel.dk>
-Date:   Mon, 11 Apr 2022 19:18:40 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=7VT6OS2Zq3xIyfsj15Xb2jo5DCcrYgYdtW2QTDTUZ9g=;
+        b=u8//jNtFowOhZUdEvLXp/EzMoDROrCLLgTc9P/uCD5/XajBtypiisidHZFaTWCyobb
+         DDrDW8iymcRAiLEl6B74BUaQfdnFmKWejn7+syBvtHwpNW4JmL9gx68eWGGQ9uvwyIPk
+         saHVko4KJ7zzZtfERVmLgWiMQsVWLrrJC6TCvvPjs1vVekZaHc0Fpp57/Dep4kU/97HF
+         vV33yihku7kzpcW0XhziiHrEibAhrLfJc5wrPlM+pQlEEBFHmC/DaWlv9SLrOOVqy2uf
+         2ZdWpqymu06RpBlPNZjPzz1iErlw8j/O9Z9GeeLugccPz6NBjoGDAMXnV6Wl5CP35jMp
+         Umsg==
+X-Gm-Message-State: AOAM531HHr+Khs4SKQGNWNyOp/TeQlYtrh4P6ULGeotOWTbRLUBvH9my
+        IP0DmknsJjUoZScYQuWpJoM=
+X-Google-Smtp-Source: ABdhPJyX/yiluHvle7DFv3GYJFH8NJTwI9X6az29p1cn+XJQa4p+ob6jdQd4bAm14tyMXMOuWZQQwg==
+X-Received: by 2002:a17:903:110c:b0:14d:8859:5c8 with SMTP id n12-20020a170903110c00b0014d885905c8mr35109121plh.156.1649733634935;
+        Mon, 11 Apr 2022 20:20:34 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id f20-20020a056a00229400b004fb16860af6sm37358440pfe.195.2022.04.11.20.20.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Apr 2022 20:20:34 -0700 (PDT)
+Message-ID: <7095eedb-91a7-e8d6-f30b-91aa65de3533@acm.org>
+Date:   Mon, 11 Apr 2022 20:20:32 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
+ based on required tags
+Content-Language: en-US
+To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
+        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
+        ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+ <20220408073916.1428590-9-yukuai3@huawei.com>
+ <6470d923-8fa5-cda1-e519-6f890cdcb00a@acm.org>
+ <4c322eee-3ad9-812f-a341-aa5e91573912@huawei.com>
+ <fc82d24f-51d8-5f8c-1a44-6c95da722f54@acm.org>
+ <51aa71af-4c05-2991-5698-12014a4943d5@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <51aa71af-4c05-2991-5698-12014a4943d5@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 27 Mar 2022 11:33:16 -0600, kbusch@kernel.org wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The function is not generally applicable enough to be included in the core
-> kernel header. Move it to block since it's the only subsystem using it.
-> 
-> 
+On 4/9/22 00:01, yukuai (C) wrote:
+> For the race that new threads are waited after get_wake_nr() and before
+> wake_up_nr() in situation (b), I can't figure out how this can be
+> problematic [ ... ]
 
-Applied, thanks!
+If the atomic_dec_return() statement in __sbq_wake_up() returns a value 
+that is less than or equal to zero, wake_batch waiters should be woken 
+up or I/O will hang until sbitmap_queue_wake_all() is called. That last 
+function should not be called unless there is no alternative.
 
-[1/1] block: move lower_48_bits() to block
-      commit: 868e6139c5212e7d9de8332806aacfeafb349320
+Thanks,
 
-Best regards,
--- 
-Jens Axboe
-
-
+Bart.
