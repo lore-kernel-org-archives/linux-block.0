@@ -2,98 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 867EBC47082
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC2D1C388F3
 	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 10:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244605AbiDLKLy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 06:11:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46770 "EHLO
+        id S244557AbiDLKL4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 06:11:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380842AbiDLIWn (ORCPT
+        with ESMTP id S1352950AbiDLJyZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 04:22:43 -0400
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13554F9C4
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 00:52:16 -0700 (PDT)
-Received: by mail-pj1-f53.google.com with SMTP id a16-20020a17090a6d9000b001c7d6c1bb13so2020188pjk.4
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 00:52:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PdNJO9jKeiU6aIag2xubkGaXQwXjChJyaN34FakShGY=;
-        b=VrgVy42r9B8rnlG+sgfQT+fQ3/G8oe1qHTrzX+hKiU1Tbd4bw68NxvBfOlBA0VorU3
-         MWduohK5uNM53RSDrF/Hhhsbxd/ZylnA8PQPOsOqk2d9+nqokQcwZNj8U2QaUWK9Ul66
-         fxC6uWgGeiuSSPBjaZWoUADu+pQMZrCksUeDGD/vY+L7kzgcCBUeKD+cq0Ewna0IVBzR
-         ggEv0lU47EvzUaSMbyJp9uVWxa8/D92ybayu69bWlzNFeOOqEuguq1YOWyb67vxSOHnP
-         t8/lf4Dy2SXChQY9SXdWA+5DnKVdMLWnpFQ1IEc/Wcjui59zvN5reiuCnVfhabIjwOTH
-         KlWg==
-X-Gm-Message-State: AOAM532PrtY2BopEsU3NgIYvMs631o6zJ5y7WjJlT9w8FEDoZeNzP/n2
-        OjxmgNdIRHJT1f0K8PpSX/T8d5hVe5xayg==
-X-Google-Smtp-Source: ABdhPJw3kPhCuAbQ5kwytznaF5rAWDrtwt4O2z2AZ5FETVqH+AjSQrIjZkQ9M2KwrcrdOTXs8Khxlw==
-X-Received: by 2002:a17:902:7247:b0:156:9d3d:756d with SMTP id c7-20020a170902724700b001569d3d756dmr36508813pll.6.1649749935972;
-        Tue, 12 Apr 2022 00:52:15 -0700 (PDT)
-Received: from fedora (136-24-99-118.cab.webpass.net. [136.24.99.118])
-        by smtp.gmail.com with ESMTPSA id k187-20020a636fc4000000b003983a01b896sm1881676pgc.90.2022.04.12.00.52.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 00:52:15 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 00:52:13 -0700
-From:   Dennis Zhou <dennis@kernel.org>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Mike Snitzer <snitzer@kernel.org>, linux-block@vger.kernel.org,
-        tj@kernel.org, axboe@kernel.dk, dm-devel@redhat.com
-Subject: Re: [PATCH] block: remove redundant blk-cgroup init from __bio_clone
-Message-ID: <YlUvrXX2M3VqsgCQ@fedora>
-References: <YkRM7Iyp8m6A1BCl@fedora>
- <YkUwmyrIqnRGIOHm@infradead.org>
- <YkVBjUy9GeSMbh5Q@fedora>
- <YkVxLN9p0t6DI5ie@infradead.org>
- <YlBX+ytxxeSj2neQ@redhat.com>
- <YlEWfc39+H+esrQm@infradead.org>
- <YlReKjjWhvTZjfg/@redhat.com>
- <YlRiUVFK+a0DwQhu@redhat.com>
- <YlRmhlL8TtQow0W0@redhat.com>
- <YlUN2pVsIn1dbzHg@infradead.org>
+        Tue, 12 Apr 2022 05:54:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE2B96948E
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 01:57:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649753836;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6Kgra35BNLPF+KPHNAv0PXTEPcsn2mHMlil0KXV/udI=;
+        b=Wc8rfbWE6PjEToTidaueaBB11ah1MrxWlgiIcDwqM6qMRg3OxCHhYrS7XHMI11ucVZrkDW
+        17JpjaL9ORPjZkwUxyDoboHSGIX7KaGitKalhRxIkUJ5bRXZ6S2+ngsuYlJVpXmwEsAsn2
+        BkpwAXPDwj3gxkSVHd0NN6TJ3umO+YI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-474-Gs6SbN-mPzq4VtohAcpO4g-1; Tue, 12 Apr 2022 04:57:10 -0400
+X-MC-Unique: Gs6SbN-mPzq4VtohAcpO4g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 80DFC18812C7;
+        Tue, 12 Apr 2022 08:57:10 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 83520C44B1D;
+        Tue, 12 Apr 2022 08:57:09 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 4/8] dm: switch to bdev based io accounting interface
+Date:   Tue, 12 Apr 2022 16:56:12 +0800
+Message-Id: <20220412085616.1409626-5-ming.lei@redhat.com>
+In-Reply-To: <20220412085616.1409626-1-ming.lei@redhat.com>
+References: <20220412085616.1409626-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlUN2pVsIn1dbzHg@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 10:27:54PM -0700, Christoph Hellwig wrote:
-> On Mon, Apr 11, 2022 at 01:33:58PM -0400, Mike Snitzer wrote:
-> > When bio_{alloc,init}_clone are passed a bdev, bio_init() will call
-> > bio_associate_blkg() so the __bio_clone() work to initialize blkcg
-> > isn't needed.
-> 
-> No, unfortunately it isn't as simple as that.  There are bios that do
-> not use the default cgroup and thus blkg, e.g. those that come from
-> cgroup writeback.
+DM won't account sectors in flush IO, also we can retrieve sectors
+from 'dm_io' for avoiding to allocate & update new original bio, which
+will be done in the following patch.
 
-Yeah I wasn't quite right earlier. But, the new api isn't in line with
-the original semantics. Cloning the blkg preserves the original bios
-request_queue which likely differs from the bdev passed into clone. This
-means an IO might be charged to the wrong device.
+So switch to bdev based io accounting interface.
 
-So, the blkg combines the who, blkcg, and the where, the corresponding
-request_queue. Before bios were inited in 2 phases:
-    bio_alloc();
-    bio_set_dev();
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ drivers/md/dm.c | 21 ++++++++-------------
+ 1 file changed, 8 insertions(+), 13 deletions(-)
 
-This meant at clone time, we didn't have the where, but the who was
-encased in the blkg. So, after bio_clone_blkg_association() expected a
-bio_set_dev() call which called bio_associate_blkg(). When the bio
-already has a blkg, it attempts to reuse the blkcg while using the new
-bdev to find the correct blkg.
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index ed85cd1165a4..31eacc0e93ed 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -504,29 +504,24 @@ static void dm_io_acct(struct dm_io *io, bool end)
+ 	unsigned long start_time = io->start_time;
+ 	struct mapped_device *md = io->md;
+ 	struct bio *bio = io->orig_bio;
+-	bool is_flush_with_data;
+-	unsigned int bi_size;
++	unsigned int sectors;
+ 
+ 	/* If REQ_PREFLUSH set save any payload but do not account it */
+-	is_flush_with_data = bio_is_flush_with_data(bio);
+-	if (is_flush_with_data) {
+-		bi_size = bio->bi_iter.bi_size;
+-		bio->bi_iter.bi_size = 0;
+-	}
++	if (bio_is_flush_with_data(bio))
++		sectors = 0;
++	else
++		sectors = bio_sectors(bio);
+ 
+ 	if (!end)
+-		bio_start_io_acct_time(bio, start_time);
++		bdev_start_io_acct(bio->bi_bdev, sectors, bio_op(bio),
++				start_time);
+ 	else
+-		bio_end_io_acct(bio, start_time);
++		bdev_end_io_acct(bio->bi_bdev, bio_op(bio), start_time);
+ 
+ 	if (unlikely(dm_stats_used(&md->stats)))
+ 		dm_stats_account_io(&md->stats, bio_data_dir(bio),
+ 				    bio->bi_iter.bi_sector, bio_sectors(bio),
+ 				    end, start_time, stats_aux);
+-
+-	/* Restore bio's payload so it does get accounted upon requeue */
+-	if (is_flush_with_data)
+-		bio->bi_iter.bi_size = bi_size;
+ }
+ 
+ static void __dm_start_io_acct(struct dm_io *io)
+-- 
+2.31.1
 
-The tricky part seems to be how to seamlessly expose the appropriate
-blkcg without being intrusive to bio_alloc*() apis.
-
-Regarding the NULL bdev, I think that works as long as we keep the
-bio_clone_blkg_association() call to carry the correct blkcg to the
-bio_set_dev() call.
-
-Thanks,
-Dennis
