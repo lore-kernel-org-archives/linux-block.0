@@ -2,91 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAC8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 23:27:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5592C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 23:36:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230290AbiDLX3g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 19:29:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38894 "EHLO
+        id S230264AbiDLXiX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 19:38:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33752 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231451AbiDLX2Y (ORCPT
+        with ESMTP id S230422AbiDLXcH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 19:28:24 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C1D85979
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 15:32:01 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id h5so17573873pgc.7
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 15:32:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=UTSp/G8zwV18QcS++FuQzWULt0VtGmmOqsMfzG5ErkA=;
-        b=2u8RZR5Z/ycl0/rlZlTpBfbAQMR7bXJ9y/kQiA4x/saJN2+hoVZnRddqJRcYY7lb2v
-         Bjodb+LUw3QTYFHpteR0dVcP6+jjnQlsCS2yVTUPgAvAxhQH75k3PFMoYpY6TcXVJXKy
-         JudGJnkgu6CrhOQLuBs8YxpJVIjKnGliYLhm3kWUrWEIfz+27mq+rL0MLrS8sbQXWZrI
-         TM3hM45jKo3JLLTbPZWOzw4mttlmyYdOIXO71hIow4aJYgK5BDO+uhK9qlDEA1o4UzPc
-         MC44eMEGnQEArcYYjgJJcZcNJr56zFC6KsUykNSU1QOvOTGRE6FBdf8bZjZO/OGZ7EQ4
-         tqnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=UTSp/G8zwV18QcS++FuQzWULt0VtGmmOqsMfzG5ErkA=;
-        b=Du+nlOw5FWTnSHje5pq87K3oJ3p2TPP5u/K3+zUlmaoBCQ0hwcgWa5r588MGk8UbUH
-         32ccUVZiLtix17V91Cv8t7TPtwJP2RhHo93EPz0VAhP7u3Sb3oSEAVzwPlghVMRw22YU
-         fmQAmeKTH251bkTc3J6GYp/A+Qq5uq2FpCOCewNhjR1BnZpbiONBZ50pASFYV2Bwkj6q
-         0+30akOpeLPI9dLv/MiOfdvWKwjOLVL6eDiTkT/oYr2n5Ew8WY0qocIXp55NcaeaBGTc
-         MCO75bZUSwvdgHEqP79ro+r4V3UJJvEtnMjKqDq/PgE/OfuQkiYBQhf6q6xEoc78ZXAR
-         GXgg==
-X-Gm-Message-State: AOAM531UfAKvWn0yxRDMXaTjRBsMiPmCp2xUbcBPyOFKriZnTnHht+le
-        cIEC9DUAZBAZfOg26DZyuLH2ZA==
-X-Google-Smtp-Source: ABdhPJxfJJwMFnMw12ISX69ykkGJykL+olL9K1M/959vnjtHTUaLHqNf2JTnUA5fym5wfUqCsaxWhQ==
-X-Received: by 2002:a65:6a07:0:b0:39d:8c35:426b with SMTP id m7-20020a656a07000000b0039d8c35426bmr5415538pgu.171.1649802720473;
-        Tue, 12 Apr 2022 15:32:00 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x6-20020a17090aa38600b001ca2f87d271sm535902pjp.15.2022.04.12.15.31.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 15:31:59 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     alobakin@pm.me, linux-crypto@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org
-Cc:     bvanassche@acm.org, linux-kernel@vger.kernel.org, kch@nvidia.com,
-        kbusch@kernel.org, Christoph Hellwig <hch@lst.de>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        linux-arch@vger.kernel.org, martin.petersen@oracle.com,
-        Arnd Bergmann <arnd@arndb.de>
-In-Reply-To: <20220412215220.75677-1-alobakin@pm.me>
-References: <20220412215220.75677-1-alobakin@pm.me>
-Subject: Re: [PATCH RESEND] asm-generic: fix __get_unaligned_be48() on 32 bit platforms
-Message-Id: <164980271890.301666.4533609890818235558.b4-ty@kernel.dk>
-Date:   Tue, 12 Apr 2022 16:31:58 -0600
+        Tue, 12 Apr 2022 19:32:07 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7099492843
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 15:18:45 -0700 (PDT)
+Received: from fsav114.sakura.ne.jp (fsav114.sakura.ne.jp [27.133.134.241])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23CMIbrh028703;
+        Wed, 13 Apr 2022 07:18:37 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav114.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp);
+ Wed, 13 Apr 2022 07:18:37 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23CMIaVq028699
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 13 Apr 2022 07:18:37 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <55006f3b-9571-9167-eaf0-6a2caec747ad@I-love.SAKURA.ne.jp>
+Date:   Wed, 13 Apr 2022 07:18:33 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH] block/rnbd: client: avoid flush_workqueue(system_long_wq)
+ usage
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+References: <becb2389-e249-0aa2-7701-2c02155aedf2@I-love.SAKURA.ne.jp>
+In-Reply-To: <becb2389-e249-0aa2-7701-2c02155aedf2@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 12 Apr 2022 21:59:16 +0000, Alexander Lobakin wrote:
-> While testing the new macros for working with 48 bit containers,
-> I faced a weird problem:
+On 2022/04/12 22:46, Tetsuo Handa wrote:
+> Flushing system-wide workqueues is dangerous and will be forbidden.
 > 
-> 32 + 16: 0x2ef6e8da 0x79e60000
-> 48: 0xffffe8da + 0x79e60000
+> Since system_long_wq is used only inside rnbd_destroy_sessions(),
+> let's use list_head than creating a local workqueue for tracking
+> work_struct to flush.
 > 
-> All the bits starting from the 32nd were getting 1d in 9/10 cases.
-> The debug showed:
+> Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
 > 
-> [...]
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> ---
+> Notice: This patch is only compile tested. Please test before applying.
+> 
+>  drivers/block/rnbd/rnbd-clt.c | 5 ++++-
+>  drivers/block/rnbd/rnbd-clt.h | 1 +
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+> index b66e8840b94b..b14e7c15133e 100644
+> --- a/drivers/block/rnbd/rnbd-clt.c
+> +++ b/drivers/block/rnbd/rnbd-clt.c
+> @@ -1730,6 +1730,7 @@ static void rnbd_destroy_sessions(void)
+>  {
+>  	struct rnbd_clt_session *sess, *sn;
+>  	struct rnbd_clt_dev *dev, *tn;
+> +	LIST_HEAD(list);
+>  
+>  	/* Firstly forbid access through sysfs interface */
+>  	rnbd_clt_destroy_sysfs_files();
+> @@ -1762,11 +1763,13 @@ static void rnbd_destroy_sessions(void)
+>  			 */
+>  			INIT_WORK(&dev->unmap_on_rmmod_work, unmap_device_work);
+>  			queue_work(system_long_wq, &dev->unmap_on_rmmod_work);
+> +			list_add_tail(&dev->unmap_on_rmmod_list, &list);
+>  		}
+>  		rnbd_clt_put_sess(sess);
+>  	}
+>  	/* Wait for all scheduled unmap works */
+> -	flush_workqueue(system_long_wq);
+> +	list_for_each_entry(dev, &list, unmap_on_rmmod_list)
+> +		flush_work(&dev->unmap_on_rmmod_work);
 
-Applied, thanks!
+Since kfree(dev) might be called from unmap_device_work(), this seems unsafe.
+We need rnbd_clt_get_dev() before queue_work() and rnbd_clt_put_dev() after flush_work()
+in order to make dev->unmap_on_rmmod_list traversal safe...
 
-[1/1] asm-generic: fix __get_unaligned_be48() on 32 bit platforms
-      commit: b97687527be85a55e12804c98745c5619eadcc32
-
-Best regards,
--- 
-Jens Axboe
-
+>  	WARN_ON(!list_empty(&sess_list));
+>  }
+>  
+> diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
+> index 2e2e8c4a85c1..a6d704abda61 100644
+> --- a/drivers/block/rnbd/rnbd-clt.h
+> +++ b/drivers/block/rnbd/rnbd-clt.h
+> @@ -136,6 +136,7 @@ struct rnbd_clt_dev {
+>  	char			*blk_symlink_name;
+>  	refcount_t		refcount;
+>  	struct work_struct	unmap_on_rmmod_work;
+> +	struct list_head	unmap_on_rmmod_list;
+>  };
+>  
+>  /* rnbd-clt.c */
 
