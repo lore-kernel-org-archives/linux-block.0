@@ -2,62 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E35AC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 05:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FB92C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 05:27:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229593AbiDLF2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 01:28:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
+        id S240858AbiDLFaN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 01:30:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346902AbiDLF2J (ORCPT
+        with ESMTP id S240383AbiDLFaL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 01:28:09 -0400
+        Tue, 12 Apr 2022 01:30:11 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AAE34B81;
-        Mon, 11 Apr 2022 22:25:53 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EFF234B81
+        for <linux-block@vger.kernel.org>; Mon, 11 Apr 2022 22:27:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
         :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=qKT+rKxJxRTHwUX6zSPidvw6TsQOrmd//JseePK15uA=; b=hafi3HcZO8eclGRtpUfrnE7sz+
-        GnBAtjQIZNL0tYtwdHuTZcGGXIpJdnbezVWLvAEmIgpr/gr+rzKToHd/w0XwyrBFB5p/FWfb5+Ej6
-        JapzhsrEoapweCNZ5h4r3Dj3E+4PlafjaTJX0J0B+Tbx8yOAREaPPKadIanLPk+Ffiv3116nxwEt5
-        g+pFhD6zKyBrqNfguDK1LNiQuOIgAk0e9zJwd547O7NmObUXW1eYNLsngge5e/VM0SQfM/KA3cLq7
-        Jp4gRfd3Lkbi13GGMT3PSYNozHQoB5nUKtOJyn194Qmr9eP8ztXnRQEiGYg/O1GNm4aQXxnGUS5vZ
-        uODATKMA==;
+        bh=32XuRnLyycr6E1ydFLiKQS7WOYQdiFoBJCL0skZrtUY=; b=osDQtdSRYYyuty4FeErIdlzrtG
+        H5xNmpSBSBjl956pugv3bQoyW1M3Ap6xLvmrd8Bs1hIGVKeN1QBKt5ZIndAAWqPQxvrP/RbqTgJoR
+        aKle0U8Trw5qWuH8GdLK5IRytnu4qvErMfBrhN/RMjaerleaxgMt28CZdnorc5wdLOgBVDHNVJoKv
+        0FdFqRhVszyXIZaoR57UfA5RLe0+O2Xop5KwBfijMcj3GrDSWOPMn/PI/i+QOavx5maTOhNiKQq2C
+        N55SpQps6cAYoxY2DOx33qNGcqaKs/q6OKMbLMnoO49U9goiW0LuncLwGnHGNQrjeYje6NI/Plod6
+        pivGo/Jg==;
 Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ne922-00BmCM-4j; Tue, 12 Apr 2022 05:25:38 +0000
-Date:   Mon, 11 Apr 2022 22:25:38 -0700
+        id 1ne94F-00BmLK-0M; Tue, 12 Apr 2022 05:27:55 +0000
+Date:   Mon, 11 Apr 2022 22:27:54 -0700
 From:   Christoph Hellwig <hch@infradead.org>
-To:     Tom Rix <trix@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>, tim@cyberelk.net,
-        axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
-        nathan@kernel.org, ndesaulniers@google.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-scsi@vger.kernel.org, llvm@lists.linux.dev
-Subject: Re: [PATCH] security: do not leak information in ioctl
-Message-ID: <YlUNUgTfej6VpkWS@infradead.org>
-References: <20220409145137.67592-1-trix@redhat.com>
- <YlREKRb/xgAFsi97@infradead.org>
- <eec2efee-1153-8d8e-77c2-96156733a0c6@redhat.com>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
+        Dennis Zhou <dennis@kernel.org>, tj@kernel.org,
+        axboe@kernel.dk, dm-devel@redhat.com
+Subject: Re: [PATCH] block: remove redundant blk-cgroup init from __bio_clone
+Message-ID: <YlUN2pVsIn1dbzHg@infradead.org>
+References: <YkSK6mU1fja2OykG@redhat.com>
+ <YkRM7Iyp8m6A1BCl@fedora>
+ <YkUwmyrIqnRGIOHm@infradead.org>
+ <YkVBjUy9GeSMbh5Q@fedora>
+ <YkVxLN9p0t6DI5ie@infradead.org>
+ <YlBX+ytxxeSj2neQ@redhat.com>
+ <YlEWfc39+H+esrQm@infradead.org>
+ <YlReKjjWhvTZjfg/@redhat.com>
+ <YlRiUVFK+a0DwQhu@redhat.com>
+ <YlRmhlL8TtQow0W0@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <eec2efee-1153-8d8e-77c2-96156733a0c6@redhat.com>
+In-Reply-To: <YlRmhlL8TtQow0W0@redhat.com>
 X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 09:31:20AM -0700, Tom Rix wrote:
-> The failure can happen in the transfer loop, so some of the data will not be
-> zero.
-> 
-> And checking status should be done.
-> 
-> zero-ing is because i am paranoid.
+On Mon, Apr 11, 2022 at 01:33:58PM -0400, Mike Snitzer wrote:
+> When bio_{alloc,init}_clone are passed a bdev, bio_init() will call
+> bio_associate_blkg() so the __bio_clone() work to initialize blkcg
+> isn't needed.
 
-Maybe I'm just lost because of all the reformating.  Please do a first
-patch that split the CDROMREADTOCHDR and CDROMREADTOCENTRY into one
-helper each and the just do the minimal fix on top so that it is
-reviewable.
+No, unfortunately it isn't as simple as that.  There are bios that do
+not use the default cgroup and thus blkg, e.g. those that come from
+cgroup writeback.
