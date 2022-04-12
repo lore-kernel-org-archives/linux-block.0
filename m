@@ -2,140 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0561EC43219
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 17:17:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F828C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 19:00:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358040AbiDLRTm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 13:19:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42764 "EHLO
+        id S230089AbiDLTDO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 15:03:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41024 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358036AbiDLRTk (ORCPT
+        with ESMTP id S1358993AbiDLTDG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:19:40 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1719517EE;
-        Tue, 12 Apr 2022 10:17:21 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id o16so19038490ljp.3;
-        Tue, 12 Apr 2022 10:17:21 -0700 (PDT)
+        Tue, 12 Apr 2022 15:03:06 -0400
+X-Greylist: delayed 539 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 12 Apr 2022 12:00:46 PDT
+Received: from vm01.musikschule-froehlich.de (vm01.musikschule-froehlich.de [62.26.11.82])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F01C520E
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 12:00:46 -0700 (PDT)
+Received: from srv01.ms-frl.com (srv01.ms-frl.com [212.227.140.228])
+        (Authenticated sender: exchange@musikschule-froehlich.de)
+        by vm01.musikschule-froehlich.de (Postfix) with ESMTPSA id 94D06763114
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 18:51:45 +0000 (UTC)
+Received: from srv01.ms-frl.com (localhost.localdomain [127.0.0.1])
+        by srv01.ms-frl.com (Postfix) with ESMTP id 5EC982E8330F
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 20:51:45 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=5xKeCB3U7apfcgfSY+vdVOqKVo2uGRt41JWYEZNVaok=;
-        b=ICm9HArNM3EaOT0Oy+Hp4+JHSlkM9BUfiQxOw29OrKcAogUAZos5svailFbnu+zweO
-         Axva43yl+erT/kWI85bljmW2MMzuGQSSWPRguz8PneqTZjybaO/2CPuSoS/DXiusBR0i
-         D3LawH5Q0au8ap25HEm1iYZA6/eUJ+ToouDaB0EPJgid8aYyyW5JdVUJCCsLhv55iNcd
-         jRxnG4gFNYuW7ut0wGdI761mxoZ3Q6CuX2YKF5hRjqvjdYDR13DQZw6ME5AYd/SBB34E
-         D21t/iOgPI+CF9dfTfz9nONQUosEpZG7dUVnoAtfppHO5JmqgDMXM1g0az2R98J93JvY
-         ddYg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=5xKeCB3U7apfcgfSY+vdVOqKVo2uGRt41JWYEZNVaok=;
-        b=4usWXYEUw4EchnrhZSmx+gkL9x1ElWRzRdhVGUhVLFYRa9J+rAjBnP6IaiWrvHLoSm
-         SZ1/6/080znf+sTipv4UaOt1qTror5uLaOsMF2T0KHuu724ZaKFVGrYvdHcbjQ8Ogwvw
-         1aD6+QeBDtAGR4KVAQ1jJadF3zfQj+TDSc20ovyU7d70pE/8CniqAuGinjqXz90KBo6x
-         gmLcxCXCODWMtbj61rTguA4NINWyx+bm8XXTpkKHCjhcFbvYPTvszRi55H7JNPryaK05
-         mydW93hLdu8F5Csq3BTWaYsPXCTLkWmAIsYzUJ6u33Za2sdX12/4sRayZ6BI86kiCxsp
-         JFDg==
-X-Gm-Message-State: AOAM531m4kqsWx9ess7S7e7LB3IUzx4aQL0H29nQd+ElBBFtP2Fpb7aI
-        CnzpdRkpUsxXycAFm5yQOr4=
-X-Google-Smtp-Source: ABdhPJwzGv0nlFwbb55xRO4/KxhQwo/cOSvqirc1RdTO64DIM0LyoWHyRNiW9KEdEBRXKJBoH+d4eg==
-X-Received: by 2002:a2e:8912:0:b0:24b:57e7:284c with SMTP id d18-20020a2e8912000000b0024b57e7284cmr11258357lji.147.1649783840258;
-        Tue, 12 Apr 2022 10:17:20 -0700 (PDT)
-Received: from morzel-asus.lan (static-91-225-135-18.devs.futuro.pl. [91.225.135.18])
-        by smtp.gmail.com with ESMTPSA id m2-20020a05651202e200b0046ba665cd6dsm723928lfq.141.2022.04.12.10.17.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 10:17:19 -0700 (PDT)
-From:   Michal Orzel <michalorzel.eng@gmail.com>
-To:     "Richard Russon (FlatCap)" <ldm@flatcap.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Nick Desaulniers <ndesaulniers@google.com>,
-        Tom Rix <trix@redhat.com>
-Cc:     Michal Orzel <michalorzel.eng@gmail.com>,
-        linux-ntfs-dev@lists.sourceforge.net, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, llvm@lists.linux.dev
-Subject: [PATCH v2 5/5] block/partitions/ldm: Remove redundant assignments
-Date:   Tue, 12 Apr 2022 19:16:51 +0200
-Message-Id: <20220412171651.19812-5-michalorzel.eng@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220412171651.19812-1-michalorzel.eng@gmail.com>
-References: <20220412171651.19812-1-michalorzel.eng@gmail.com>
+        d=kinder-musikunterricht.de; s=default; t=1649789505;
+        bh=jyFFm776Ihbw524zx8kgYnyPEGkkdHpaAuKErwq4TwU=;
+        h=Received:Received:To:Subject:From;
+        b=D8Ugj8etJQnT/uD7tMkFqU+4++AY4/Erp+Hrm2/xs3S/0w0X20RZCQAP1Ay+hFLKd
+         3mIE/8nocwTLmUs6c+QUzBp9PtYM/usDIwkdz7aTgC2ky0AxPR7TFAO5bqEOVzhJOm
+         9HFauTNW0ua/0w828Lq661CIIflwSYWoloZKQSy4=
+Received-SPF: pass (srv01.ms-frl.com: localhost is always allowed.) client-ip=127.0.0.1; envelope-from=info@kinder-musikunterricht.de; helo=srv01.ms-frl.com;
+Received: from srv01.ms-frl.com ([212.227.140.228])
+        by srv01.ms-frl.com (srv01.ms-frl.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 9E3BRkk1RTOP for <linux-block@vger.kernel.org>;
+        Tue, 12 Apr 2022 20:51:45 +0200 (CEST)
+Received: by srv01.ms-frl.com (Postfix, from userid 10001)
+        id 3CFDF2E83313; Tue, 12 Apr 2022 20:51:45 +0200 (CEST)
+To:     linux-block@vger.kernel.org
+Subject: =?UTF-8?Q?Ihre_Anfrage_f=C3=BCr_Online-Unterricht_an_Musiksc?=
+ =?UTF-8?Q?hule_Fr=C3=B6hlich?=
+Date:   Tue, 12 Apr 2022 18:51:45 +0000
+From:   =?UTF-8?Q?Musikschule_Fr=C3=B6hlich?= 
+        <info@kinder-musikunterricht.de>
+Reply-To: info@kinder-musikunterricht.de
+Message-ID: <lXS4YUHgHh05wAunPKtg8MfEFbLalBYAMfQQ5Res@www.kinder-musikunterricht.de>
+X-Mailer: PHPMailer 6.5.3 (https://github.com/PHPMailer/PHPMailer)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-PPP-Message-ID: <164978950522.3637478.11581182793502708857@srv01.ms-frl.com>
+X-PPP-Vhost: aktive.ms-frl.com
+Authentication-Results: vm01.musikschule-froehlich.de;
+        auth=pass smtp.auth=exchange@musikschule-froehlich.de smtp.mailfrom=info@kinder-musikunterricht.de
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Get rid of the following redundant assignments:
-- to a variable r_cols from function ldm_parse_cmp3
-- to variables r_id1 and r_id2 from functions ldm_parse_dgr3 and ldm_parse_dgr4
-- to a variable r_index from function ldm_parse_prt3
-that end up in values not being read until the end of function.
+Liebe/r 🖤 Janis is interested in your profile! Click here: http://inx.lv/FQgA?iq 🖤,
 
-Reported by clang-tidy [deadcode.DeadStores]
+vielen Dank für Ihr Interesse an einer kostenlosen *Online*-Schnupperstunde.
 
-Signed-off-by: Michal Orzel <michalorzel.eng@gmail.com>
----
-Changes since v1:
--move the change into a separate patch
--add analysis
----
- block/partitions/ldm.c | 15 +++------------
- 1 file changed, 3 insertions(+), 12 deletions(-)
+Anbei zeigen wir Ihnen, welche Daten Sie an uns übergeben haben:
+E-Mail: 🖤 Janis is interested in your profile! Click here: http://inx.lv/FQgA?iq 🖤 <linux-block@vger.kernel.org>
+PLZ: tauabxy
+Telefon: 036837577276
+Aktions-Code: 
+Zustimmung zum Datenschutz: Zugestimmt: Ja, ich stimme zu. *
 
-diff --git a/block/partitions/ldm.c b/block/partitions/ldm.c
-index 27f6c7d9c776..38e58960ae03 100644
---- a/block/partitions/ldm.c
-+++ b/block/partitions/ldm.c
-@@ -736,7 +736,6 @@ static bool ldm_parse_cmp3 (const u8 *buffer, int buflen, struct vblk *vb)
- 		len = r_cols;
- 	} else {
- 		r_stripe = 0;
--		r_cols   = 0;
- 		len = r_parent;
- 	}
- 	if (len < 0)
-@@ -783,11 +782,8 @@ static int ldm_parse_dgr3 (const u8 *buffer, int buflen, struct vblk *vb)
- 		r_id1 = ldm_relative (buffer, buflen, 0x24, r_diskid);
- 		r_id2 = ldm_relative (buffer, buflen, 0x24, r_id1);
- 		len = r_id2;
--	} else {
--		r_id1 = 0;
--		r_id2 = 0;
-+	} else
- 		len = r_diskid;
--	}
- 	if (len < 0)
- 		return false;
+Wir freuen uns, dass Sie sich für unsere Live-Unterricht online Schnupperstunde interessieren.
+Zur genauen Terminabsprache werden wir uns schnellstmöglich bei Ihnen melden.
  
-@@ -826,11 +822,8 @@ static bool ldm_parse_dgr4 (const u8 *buffer, int buflen, struct vblk *vb)
- 		r_id1 = ldm_relative (buffer, buflen, 0x44, r_name);
- 		r_id2 = ldm_relative (buffer, buflen, 0x44, r_id1);
- 		len = r_id2;
--	} else {
--		r_id1 = 0;
--		r_id2 = 0;
-+	} else
- 		len = r_name;
--	}
- 	if (len < 0)
- 		return false;
+Sollte sich in der Zwischenzeit etwas geändert, oder sich weitere Fragen ergeben haben, melden Sie sich gerne bei uns.
  
-@@ -963,10 +956,8 @@ static bool ldm_parse_prt3(const u8 *buffer, int buflen, struct vblk *vb)
- 			return false;
- 		}
- 		len = r_index;
--	} else {
--		r_index = 0;
-+	} else
- 		len = r_diskid;
--	}
- 	if (len < 0) {
- 		ldm_error("len %d < 0", len);
- 		return false;
+
+Fröhliche Grüße
+Ihr Team von Musikschule Fröhlich
+
 -- 
-2.25.1
+Diese E-Mail wurde von einem Kontaktformular von Musikschule Fröhlich (https://www.kinder-musikunterricht.de) gesendet
+
+Musikschule Fröhlich Stiftungs-Gesellschaft mbH
+Am Forsthaus 1, 35713 Eschenburg
+Vertretungsberechtigter Geschäftsführer: Dr. h.c. Dieter Fröhlich und Rüdiger Dönges
+Tel: 02774 / 92 77 30 | Fax: 02774 / 92 77 33 | stiftung@musikschule-froehlich.com
+Registergericht: Amtsgericht Wetzlar | Registernummer: HRB 6633
 
