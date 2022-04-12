@@ -2,79 +2,62 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B9E6C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 03:20:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E35AC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 05:25:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231476AbiDLDWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 11 Apr 2022 23:22:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34212 "EHLO
+        id S229593AbiDLF2K (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 01:28:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344515AbiDLDWv (ORCPT
+        with ESMTP id S1346902AbiDLF2J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 11 Apr 2022 23:22:51 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E7531929C;
-        Mon, 11 Apr 2022 20:20:35 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id c12so290709plr.6;
-        Mon, 11 Apr 2022 20:20:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7VT6OS2Zq3xIyfsj15Xb2jo5DCcrYgYdtW2QTDTUZ9g=;
-        b=u8//jNtFowOhZUdEvLXp/EzMoDROrCLLgTc9P/uCD5/XajBtypiisidHZFaTWCyobb
-         DDrDW8iymcRAiLEl6B74BUaQfdnFmKWejn7+syBvtHwpNW4JmL9gx68eWGGQ9uvwyIPk
-         saHVko4KJ7zzZtfERVmLgWiMQsVWLrrJC6TCvvPjs1vVekZaHc0Fpp57/Dep4kU/97HF
-         vV33yihku7kzpcW0XhziiHrEibAhrLfJc5wrPlM+pQlEEBFHmC/DaWlv9SLrOOVqy2uf
-         2ZdWpqymu06RpBlPNZjPzz1iErlw8j/O9Z9GeeLugccPz6NBjoGDAMXnV6Wl5CP35jMp
-         Umsg==
-X-Gm-Message-State: AOAM531HHr+Khs4SKQGNWNyOp/TeQlYtrh4P6ULGeotOWTbRLUBvH9my
-        IP0DmknsJjUoZScYQuWpJoM=
-X-Google-Smtp-Source: ABdhPJyX/yiluHvle7DFv3GYJFH8NJTwI9X6az29p1cn+XJQa4p+ob6jdQd4bAm14tyMXMOuWZQQwg==
-X-Received: by 2002:a17:903:110c:b0:14d:8859:5c8 with SMTP id n12-20020a170903110c00b0014d885905c8mr35109121plh.156.1649733634935;
-        Mon, 11 Apr 2022 20:20:34 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id f20-20020a056a00229400b004fb16860af6sm37358440pfe.195.2022.04.11.20.20.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Apr 2022 20:20:34 -0700 (PDT)
-Message-ID: <7095eedb-91a7-e8d6-f30b-91aa65de3533@acm.org>
-Date:   Mon, 11 Apr 2022 20:20:32 -0700
+        Tue, 12 Apr 2022 01:28:09 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76AAE34B81;
+        Mon, 11 Apr 2022 22:25:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=qKT+rKxJxRTHwUX6zSPidvw6TsQOrmd//JseePK15uA=; b=hafi3HcZO8eclGRtpUfrnE7sz+
+        GnBAtjQIZNL0tYtwdHuTZcGGXIpJdnbezVWLvAEmIgpr/gr+rzKToHd/w0XwyrBFB5p/FWfb5+Ej6
+        JapzhsrEoapweCNZ5h4r3Dj3E+4PlafjaTJX0J0B+Tbx8yOAREaPPKadIanLPk+Ffiv3116nxwEt5
+        g+pFhD6zKyBrqNfguDK1LNiQuOIgAk0e9zJwd547O7NmObUXW1eYNLsngge5e/VM0SQfM/KA3cLq7
+        Jp4gRfd3Lkbi13GGMT3PSYNozHQoB5nUKtOJyn194Qmr9eP8ztXnRQEiGYg/O1GNm4aQXxnGUS5vZ
+        uODATKMA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ne922-00BmCM-4j; Tue, 12 Apr 2022 05:25:38 +0000
+Date:   Mon, 11 Apr 2022 22:25:38 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tom Rix <trix@redhat.com>
+Cc:     Christoph Hellwig <hch@infradead.org>, tim@cyberelk.net,
+        axboe@kernel.dk, jejb@linux.ibm.com, martin.petersen@oracle.com,
+        nathan@kernel.org, ndesaulniers@google.com,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-scsi@vger.kernel.org, llvm@lists.linux.dev
+Subject: Re: [PATCH] security: do not leak information in ioctl
+Message-ID: <YlUNUgTfej6VpkWS@infradead.org>
+References: <20220409145137.67592-1-trix@redhat.com>
+ <YlREKRb/xgAFsi97@infradead.org>
+ <eec2efee-1153-8d8e-77c2-96156733a0c6@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH -next RFC v2 8/8] sbitmap: wake up the number of threads
- based on required tags
-Content-Language: en-US
-To:     "yukuai (C)" <yukuai3@huawei.com>, axboe@kernel.dk,
-        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
-        ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220408073916.1428590-1-yukuai3@huawei.com>
- <20220408073916.1428590-9-yukuai3@huawei.com>
- <6470d923-8fa5-cda1-e519-6f890cdcb00a@acm.org>
- <4c322eee-3ad9-812f-a341-aa5e91573912@huawei.com>
- <fc82d24f-51d8-5f8c-1a44-6c95da722f54@acm.org>
- <51aa71af-4c05-2991-5698-12014a4943d5@huawei.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <51aa71af-4c05-2991-5698-12014a4943d5@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <eec2efee-1153-8d8e-77c2-96156733a0c6@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/9/22 00:01, yukuai (C) wrote:
-> For the race that new threads are waited after get_wake_nr() and before
-> wake_up_nr() in situation (b), I can't figure out how this can be
-> problematic [ ... ]
+On Mon, Apr 11, 2022 at 09:31:20AM -0700, Tom Rix wrote:
+> The failure can happen in the transfer loop, so some of the data will not be
+> zero.
+> 
+> And checking status should be done.
+> 
+> zero-ing is because i am paranoid.
 
-If the atomic_dec_return() statement in __sbq_wake_up() returns a value 
-that is less than or equal to zero, wake_batch waiters should be woken 
-up or I/O will hang until sbitmap_queue_wake_all() is called. That last 
-function should not be called unless there is no alternative.
-
-Thanks,
-
-Bart.
+Maybe I'm just lost because of all the reformating.  Please do a first
+patch that split the CDROMREADTOCHDR and CDROMREADTOCENTRY into one
+helper each and the just do the minimal fix on top so that it is
+reviewable.
