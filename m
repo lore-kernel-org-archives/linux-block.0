@@ -2,112 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5341BC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 17:15:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 650D5C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 17:17:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbiDLRRy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 13:17:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39860 "EHLO
+        id S239695AbiDLRTj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 13:19:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358054AbiDLRRi (ORCPT
+        with ESMTP id S1350218AbiDLRTh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 13:17:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 634A33B556
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 10:15:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649783719;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=RQSg+fcGgsIovBMSED5kWUrqeIxltHs9zhn3+V43E5w=;
-        b=dQP2uZCzY1PHHfrVmblWr8wgpCGavDEoYKaPww9NTRV97uBJHzH7Xf2I02ijLeTIMYGj//
-        ZBqW9+/5J9e1TYscRWSgOz1D8RvyM0JU0InJQXy7nL0jDom4L61VvFDraEG2QjIBjYL5i0
-        RVxxCquIc4c7sidWe+4XSBQeuwK3lrQ=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-518-DLYIMxcMMiKNua67Smfm7Q-1; Tue, 12 Apr 2022 13:15:17 -0400
-X-MC-Unique: DLYIMxcMMiKNua67Smfm7Q-1
-Received: by mail-qk1-f199.google.com with SMTP id v14-20020a05620a0f0e00b00699f4ea852cso10064118qkl.9
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 10:15:17 -0700 (PDT)
+        Tue, 12 Apr 2022 13:19:37 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C175D517FC;
+        Tue, 12 Apr 2022 10:17:10 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id t25so33331111lfg.7;
+        Tue, 12 Apr 2022 10:17:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=URuYojkxV6WW5KduaZwbvyQpA/mj+9RW5XKOSq85tII=;
+        b=QYt1UC5IFgQjZ6sZdp7YECBm2g6b2CPrjGdVmz2lkTrU0xl+cv2UsXHIc8lKFFLGYw
+         HC3krv4I4D5hfLgh31O11/Twa1I0DudLbkuwGieLgQqy6Nxd2QUu5rf0IYT7jFQFI/Lr
+         zcSSIYsp5S5ugQ+NBSFDYs8MSvBiWTrjlNc8SqLTX8Mkt3jl6Ng/YNoD8s/IwpNynQvZ
+         FNWjwHR1dMq9TB5qXfhqZUdH3dKjiAgTyU5aMeEevKKJdO7mKA4Uh+cYeZjX3jdy5rc6
+         gg1vlpQ4+dnjx+tQRnf2UAtUiN+VFowZ64IlZknWiBDsRmBJndnf24Zjr5PCgVjJIWp/
+         7TbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=RQSg+fcGgsIovBMSED5kWUrqeIxltHs9zhn3+V43E5w=;
-        b=7y5Yuzuj7mSf7LXjdNIwE1jdN7Kxc1ceHugZZoXU2cp3h5qvBRZdqSE/gQURbHubwz
-         1cOq3SIZBTLa+HGh7QsVOEPqDtW0PbvHIVFgqvsOjTi57B7ETmiLoTqAvp63hZ1Kkg3W
-         2RjFUZjW2LA6zb6nicP5wdUuObpFW/nh8kshS/BhQE4hm0dW7BD3hffKPKgSzq787bBy
-         BYCCQMm1BpIZej2N6Uc/He71Wl52ea2O501wamhT2NwGWovY7HtQzPGYyJvcf38+RwK/
-         jyuUxsFSDR93zGZ0MBNsTj3lzWVEMGQTTthGNWyrqgnk2QlGLvzrIm8C+df4wWCjbL04
-         LvYA==
-X-Gm-Message-State: AOAM532q3w8tyKu3CpTJv5V2YFCki6CRdBqBtsWyqEm62YCZRbjjd4Zg
-        7cUVZQrMy5fcFO6I5xEl1+bMmuVC6CidRyjjz9DnMht9pGfUgaoLFQVQV7qWhJpAnhD5mUI7BIb
-        e4HrsZyKD8leVTVJFRNT84w==
-X-Received: by 2002:a05:6214:1d23:b0:444:4d2d:e377 with SMTP id f3-20020a0562141d2300b004444d2de377mr7107837qvd.116.1649783716799;
-        Tue, 12 Apr 2022 10:15:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzbgL0jHo2bPMSrSx0VpwBt3GfTFFXXN6q9xlEpCtbK4KzVbZUTCV64ELttOITi2TjcTROl4w==
-X-Received: by 2002:a05:6214:1d23:b0:444:4d2d:e377 with SMTP id f3-20020a0562141d2300b004444d2de377mr7107810qvd.116.1649783716520;
-        Tue, 12 Apr 2022 10:15:16 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id x5-20020a05620a01e500b0069c42d12378sm901453qkn.18.2022.04.12.10.15.15
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=URuYojkxV6WW5KduaZwbvyQpA/mj+9RW5XKOSq85tII=;
+        b=3D1fWZnUinLaB+sdEmFKbRWoo7uO6arpVHlsI2qcPs2n80az7aL8x//ZexB4to7Dcb
+         M1zGOWWFF09SSBlHVXEXaNzKWbXs26B+i1e1HBISRiNy+YsJKzNSG4CNP2zXIsNaMx5a
+         Oi7PyEFUvVYu6XfWUrRT1V1VnqQn9PUXGJwoHAQjxErmtn5k3qI+S7x/6HEYnQkQzcAZ
+         D3WKuTVqo8d+FpDs1oMhXUuENJ5HzxgyUwQt4paMDmJ7hr+DZ3lZclFF2aAdd8QyjB9e
+         EwEjtZydV+Ingsv9qbQ96dZRzJuL+wrms5EuF6vCTwgjhOpMxxAnk7+zllCPTxBfli6o
+         ikpQ==
+X-Gm-Message-State: AOAM5316wtQmVQLTq2VoqPH2bqXqnCefPZ5eBymSoctuN0k0xEamCIql
+        v8V9NX26Alb8eqi6VDbbKAo=
+X-Google-Smtp-Source: ABdhPJwh5oXNeEM8ojAPGe+8gV/lp2WDXe5fQBude/NLBc3HOVhukRH79ibF7/MEJpGMZ5ajzRsqrw==
+X-Received: by 2002:a05:6512:2214:b0:44a:348a:d6d with SMTP id h20-20020a056512221400b0044a348a0d6dmr25654107lfu.506.1649783829102;
+        Tue, 12 Apr 2022 10:17:09 -0700 (PDT)
+Received: from morzel-asus.lan (static-91-225-135-18.devs.futuro.pl. [91.225.135.18])
+        by smtp.gmail.com with ESMTPSA id m2-20020a05651202e200b0046ba665cd6dsm723928lfq.141.2022.04.12.10.17.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Apr 2022 10:15:15 -0700 (PDT)
-Date:   Tue, 12 Apr 2022 13:15:14 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 0/8] dm: io accounting & polling improvement
-Message-ID: <YlWzoj+M1ykUubH+@redhat.com>
-References: <20220412085616.1409626-1-ming.lei@redhat.com>
+        Tue, 12 Apr 2022 10:17:08 -0700 (PDT)
+From:   Michal Orzel <michalorzel.eng@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Cc:     Michal Orzel <michalorzel.eng@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: [PATCH v2 2/5] block/blk-map: Remove redundant assignment
+Date:   Tue, 12 Apr 2022 19:16:48 +0200
+Message-Id: <20220412171651.19812-2-michalorzel.eng@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220412171651.19812-1-michalorzel.eng@gmail.com>
+References: <20220412171651.19812-1-michalorzel.eng@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220412085616.1409626-1-ming.lei@redhat.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 12 2022 at  4:56P -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+Get rid of redundant assignment to a variable ret from function
+bio_map_user_iov as it is being assigned a value that is never read.
+It is being re-assigned in the first instruction after the while loop
 
-> Hello Guys,
-> 
-> The 1st patch adds bdev based io accounting interface.
-> 
-> The 2nd ~ 5th patches improves dm's io accounting & split, meantime
-> fixes kernel panic on dm-zone.
-> 
-> The other patches improves io polling & dm io reference handling.
-> 
-> 
-> Ming Lei (8):
->   block: replace disk based account with bdev's
->   dm: don't pass bio to __dm_start_io_acct and dm_end_io_acct
->   dm: pass 'dm_io' instance to dm_io_acct directly
->   dm: switch to bdev based io accounting interface
->   dm: always setup ->orig_bio in alloc_io
->   dm: don't grab target io reference in dm_zone_map_bio
->   dm: improve target io referencing
->   dm: put all polled io into one single list
-> 
->  block/blk-core.c              |  15 +--
->  drivers/block/zram/zram_drv.c |   5 +-
->  drivers/md/dm-core.h          |  17 ++-
->  drivers/md/dm-zone.c          |  10 --
->  drivers/md/dm.c               | 190 +++++++++++++++++++---------------
->  include/linux/blkdev.h        |   7 +-
->  6 files changed, 131 insertions(+), 113 deletions(-)
-> 
-> -- 
-> 2.31.1
-> 
+Reported by clang-tidy [deadcode.DeadStores]
 
-I'll review this closely but, a couple weeks ago, I queued up quite a
-lot of conflicting changes for 5.19 here:
+Signed-off-by: Michal Orzel <michalorzel.eng@gmail.com>
+---
+Changes since v1:
+-move the change into a separate patch
+-add analysis
+---
+ block/blk-map.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.19
+diff --git a/block/blk-map.c b/block/blk-map.c
+index c7f71d83eff1..fa72e63e18c2 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -260,10 +260,9 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 
+ 		npages = DIV_ROUND_UP(offs + bytes, PAGE_SIZE);
+ 
+-		if (unlikely(offs & queue_dma_alignment(rq->q))) {
+-			ret = -EINVAL;
++		if (unlikely(offs & queue_dma_alignment(rq->q)))
+ 			j = 0;
+-		} else {
++		else {
+ 			for (j = 0; j < npages; j++) {
+ 				struct page *page = pages[j];
+ 				unsigned int n = PAGE_SIZE - offs;
+-- 
+2.25.1
 
