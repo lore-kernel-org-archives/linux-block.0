@@ -2,92 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92B65C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 11:40:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B55EEC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 12:13:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235299AbiDMLnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Apr 2022 07:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40100 "EHLO
+        id S230320AbiDMMPj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Apr 2022 08:15:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232617AbiDMLnF (ORCPT
+        with ESMTP id S230219AbiDMMPj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Apr 2022 07:43:05 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7CE35C35C;
-        Wed, 13 Apr 2022 04:40:36 -0700 (PDT)
-Received: from kwepemi500021.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kdgb90vMXzgYmQ;
-        Wed, 13 Apr 2022 19:38:45 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500021.china.huawei.com (7.221.188.245) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 13 Apr 2022 19:40:34 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 13 Apr 2022 19:40:33 +0800
-Subject: Re: [PATCH -next 10/11] block, bfq: decrease
- 'num_groups_with_pending_reqs' earlier
-To:     Jan Kara <jack@suse.cz>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220305091205.4188398-1-yukuai3@huawei.com>
- <20220305091205.4188398-11-yukuai3@huawei.com>
- <20220413112816.fwobg4cp6ttpnpk6@quack3.lan>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <f3ed507a-7c85-cd69-3ad5-3e9c0e75c372@huawei.com>
-Date:   Wed, 13 Apr 2022 19:40:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 13 Apr 2022 08:15:39 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A3B05D644
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 05:13:18 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id v15so2077154edb.12
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 05:13:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ionos.com; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=euyt40KhhUsQOe6kvPhCTuxL2KFbhG8Znq1qtDTg1Fk=;
+        b=YsvDdLFJypbjPO2wtWoUQIyX9PXTrLQN1l2SBkG0res/Ogqs8H6Z0JcVcuxzQDhHvV
+         /QwVQJ8mV/BJ5O+NdACNBLnvJyHDYZMDqs2cZHM6mA1/GVgUxRcFhY+lmf9BprCBIDwL
+         S3EybliV26Cr88p/7w31zLFs1f4OOiD3C378QjkxEZlmluNjVODxaOgsTXbr+vOARp5A
+         XPFZEsM07dh7fnxINlT+i9b7IgKnMeJbHK2or3Ddh976922ymdWTwHA2hSpgs6hFr4TS
+         yRNm5w3hCKkgt4BCCegwyupaxI2YFO369FQ3TN1sEdTxgNWyJ9ECEUduC2UnxTN3+w36
+         UeKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=euyt40KhhUsQOe6kvPhCTuxL2KFbhG8Znq1qtDTg1Fk=;
+        b=CRMW7TSYoEhmwYYrabnC9SKnZMwQjE3rD64HMXxxByr2neC48xW6AUzcEVDeqeZvG1
+         bJITcJJRgnp0LrWdzrgxvFf1Bm/EZJOaV2me3ncwXWLPUjVYYlK4y4nDReLeO4yXWraN
+         D/M5/uQ1f7t9di/8Dh42vIi43pI1bkd5ThMsZwD0cjFxfT7GdiRlZUK8tJd9JWXf7rC+
+         b42n7NnxjGRfLloYkDdgAhuhcX+nSmnOdZB2mXTMecs/QVB5Fbqrt+xg0KWgjbJWt+h3
+         n0/7OoZwms7K/npbxH5DDjyXdJ/AdNISzTDDfbitxtMI2qPCLmS2pQW1m6v7E8bJzkqr
+         Y30w==
+X-Gm-Message-State: AOAM530y0MaoFW0jtswDhHufVjh/QODBF1TKY34NfPlV1Ko+KE+H0C58
+        wHXJFBVj9rH2EErAwmasm7H9FZ11u24D8A==
+X-Google-Smtp-Source: ABdhPJxMlXvv7HIpl8e2f0+OeHmYJ70cNzI5OOQmC2BfYsk66Gj46a5rJD4BEUsYuplv9j/KCF5M6g==
+X-Received: by 2002:aa7:c40b:0:b0:41d:9886:90a0 with SMTP id j11-20020aa7c40b000000b0041d988690a0mr5828427edq.275.1649851996727;
+        Wed, 13 Apr 2022 05:13:16 -0700 (PDT)
+Received: from jwang-Latitude-5491.fkb.profitbricks.net (200116b8451b58006033032d82fea3ec.dip.versatel-1u1.de. [2001:16b8:451b:5800:6033:32d:82fe:a3ec])
+        by smtp.gmail.com with ESMTPSA id 10-20020a170906310a00b006e834953b55sm7167358ejx.27.2022.04.13.05.13.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Apr 2022 05:13:16 -0700 (PDT)
+From:   Jack Wang <jinpu.wang@ionos.com>
+To:     linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, hch@infradead.org, sagi@grimberg.me,
+        bvanassche@acm.org, haris.iqbal@ionos.com, jinpu.wang@ionos.com,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        Santosh Kumar Pradhan <santosh.pradhan@ionos.com>
+Subject: [PATCH] block/rnbd-clt: Avoid flush_workqueue(system_long_wq) usage
+Date:   Wed, 13 Apr 2022 14:13:15 +0200
+Message-Id: <20220413121315.63684-1-jinpu.wang@ionos.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <20220413112816.fwobg4cp6ttpnpk6@quack3.lan>
-Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/04/13 19:28, Jan Kara Ð´µÀ:
-> On Sat 05-03-22 17:12:04, Yu Kuai wrote:
->> Currently 'num_groups_with_pending_reqs' won't be decreased when
->> the group doesn't have any pending requests, while some child group
->> still have pending requests. The decrement is delayed to when all the
->> child groups doesn't have any pending requests.
->>
->> For example:
->> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
->> child group. num_groups_with_pending_reqs is 2 now.
->> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
->> t3 still can't be handled concurrently.
->>
->> Fix the problem by decreasing 'num_groups_with_pending_reqs'
->> immediately upon the weights_tree removal of last bfqq of the group.
->>
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> 
-> So I'd find the logic easier to follow if you completely removed
-> entity->in_groups_with_pending_reqs and did updates of
-> bfqd->num_groups_with_pending_reqs like:
-> 
-> 	if (!bfqg->num_entities_with_pending_reqs++)
-> 		bfqd->num_groups_with_pending_reqs++;
-> 
-Hi,
+Flushing system-wide workqueues is dangerous and will be forbidden.
 
-Indeed, this is an excellent idle, and much better than the way I did.
+Replace system_long_wq with local rnbd_clt_wq.
 
-Thanks,
-Kuai
+Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
 
-> and similarly on the remove side. And there would we literally two places
-> (addition & removal from weight tree) that would need to touch these
-> counters. Pretty obvious and all can be done in patch 9.
-> 
-> 								Honza
-> 
+Cc: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Signed-off-by: Jack Wang <jinpu.wang@ionos.com>
+Reviewed-by: Santosh Kumar Pradhan <santosh.pradhan@ionos.com>
+---
+ drivers/block/rnbd/rnbd-clt.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index b66e8840b94b..1cb34649a875 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -25,6 +25,7 @@ static int rnbd_client_major;
+ static DEFINE_IDA(index_ida);
+ static DEFINE_MUTEX(sess_lock);
+ static LIST_HEAD(sess_list);
++static struct workqueue_struct *rnbd_clt_wq;
+ 
+ /*
+  * Maximum number of partitions an instance can have.
+@@ -1761,12 +1762,12 @@ static void rnbd_destroy_sessions(void)
+ 			 * procedure takes minutes.
+ 			 */
+ 			INIT_WORK(&dev->unmap_on_rmmod_work, unmap_device_work);
+-			queue_work(system_long_wq, &dev->unmap_on_rmmod_work);
++			queue_work(rnbd_clt_wq, &dev->unmap_on_rmmod_work);
+ 		}
+ 		rnbd_clt_put_sess(sess);
+ 	}
+ 	/* Wait for all scheduled unmap works */
+-	flush_workqueue(system_long_wq);
++	flush_workqueue(rnbd_clt_wq);
+ 	WARN_ON(!list_empty(&sess_list));
+ }
+ 
+@@ -1792,6 +1793,13 @@ static int __init rnbd_client_init(void)
+ 		       err);
+ 		unregister_blkdev(rnbd_client_major, "rnbd");
+ 	}
++	rnbd_clt_wq = alloc_workqueue("rnbd_clt_wq", 0, 0);
++	if (!rnbd_clt_wq) {
++		pr_err("Failed to load module, alloc_workqueue failed.\n");
++		rnbd_clt_destroy_sysfs_files();
++		unregister_blkdev(rnbd_client_major, "rnbd");
++		err = -ENOMEM;
++	}
+ 
+ 	return err;
+ }
+@@ -1801,6 +1809,7 @@ static void __exit rnbd_client_exit(void)
+ 	rnbd_destroy_sessions();
+ 	unregister_blkdev(rnbd_client_major, "rnbd");
+ 	ida_destroy(&index_ida);
++	destroy_workqueue(rnbd_clt_wq);
+ }
+ 
+ module_init(rnbd_client_init);
+-- 
+2.25.1
 
