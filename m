@@ -2,79 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 394A8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 12 Apr 2022 23:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64F62C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 00:00:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231365AbiDLXpe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 12 Apr 2022 19:45:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43106 "EHLO
+        id S229752AbiDMACx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 12 Apr 2022 20:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230426AbiDLXpY (ORCPT
+        with ESMTP id S229710AbiDMACw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 12 Apr 2022 19:45:24 -0400
+        Tue, 12 Apr 2022 20:02:52 -0400
 Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8701711177
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 16:31:49 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F10A2611B
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 17:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1649806309; x=1681342309;
+  t=1649808033; x=1681344033;
   h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to;
-  bh=/OZapqEAwvC33AYXsoDR6Phx2aqKTlYIMskcR01mxQM=;
-  b=k23419BlwJfP6tcoRjz1faOTNqZw4WG4pVGNO3bgkSrhlyq5YVfLWmX0
-   Zequ3Y3cPwiISoADcKHQ1MrMeJhbXg35UFFWX00af3RRCjcD8acFjZNRR
-   L/3Wjub0etd+MCFiY73zqjg7Svw+/P72IhSuIH91jue4716fsWurbChTn
-   tY/XE1eMCRn//o9evnHlvRe50nuDHDs8xDLYxa4MSzda/USfDRHIObMQW
-   NddLA3EA8/QHJhRfqKnf6FghLZAO24NsDi3sTWDOl/n/wkMUInaZUpwwQ
-   E0UUlpli+Eu2so1WyLIWthurlU6nPUEBdZztrYxk1uS7aThpJp4KTPpPk
-   Q==;
+   from:in-reply-to:content-transfer-encoding;
+  bh=v0UR0B46HKwKKmbfy/6oiTxJwibqFJYnvE7l/c4jKWw=;
+  b=fAwFhbRENUWrwH4Txzj7To5AiGkWDCf8KHaXMEsEh+8RDkQwnEq+t1DS
+   PHyddrFrmfjvwWlsjfRf5vqI1ChWfW5w89z/pyxlqnzsCs9FBH3rf5bcL
+   NUvZlA1Y3Ud0DkGCCyrdZZrP2dE1O0XcYxZCk4hye+Gr2l2khFccDF0Hc
+   DYDmes2VwIS2sA9rEvq1qzNnAv9/j7Fvt0j+yJfgTj5asJq0v5dyTegXX
+   43xttvIhW2eCSi15T0ztCG6m7X8wf9Mg6IrPRoVlzAB6rHscvxTTi+NaY
+   deTN20nr5InK3/Z/78Jwfgg7X2MgHx5pE0UuFyAHsyShtAFBFT0PsxJS4
+   g==;
 X-IronPort-AV: E=Sophos;i="5.90,254,1643644800"; 
-   d="sh'?scan'208";a="196638048"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Apr 2022 07:31:48 +0800
-IronPort-SDR: 1f2XVrEbhGh1ZWpxwFu2Hd4eheUhyeQrhDNF/Ag1Et92pElZiS3ZI5uJLRvs6OCVuGS8MtOXcz
- 2hAnwV0+XWHw8OegYoB5b1oq6hm218DelLI/5yos/Yeg5X3dJHqShKCnGWyRjOASZSahAQ3Xxh
- qBDtEIaP+7Ma963IzhuMdzO5IpycGFuI1KlFJfA+ItDTXD1VejZTBBfmHnkEZtIGBdXjyWEf5R
- jhxipSAcbUYcINNNUD6TL3WUizi3p8lrozu4IxB/hajLmsEbpzKdvS7D5J6oKPsPePrTImuOzI
- dMKxCE0S4ZzJq6BWVIqjVHnZ
+   d="scan'208";a="196639591"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Apr 2022 08:00:30 +0800
+IronPort-SDR: eYTMn2/0qoFyiWdsIS/YNlJkbriAFEMMh5VRgU7KRBhx5IKFrStq5JAvJ8GQqQW8WsJpFnArgz
+ 4WNosALJZd0BySbg3AUbJU60Xs4XJ7nZ6OOjDxSxK4rN1g6DIykiybI5NC0qWjQuZ5/BMTD/nl
+ 0x3de82n1VSWgsbk1uxMWht70MvtRwDTpHU+D53L1RC8z7BzGaI9xUZVMAcLeaCUo0H1+Mdbii
+ YQeY6wBZo9p3ApYApo07nGWmTI2zHv39rpDuwIc+T++BYLGtEMJnJTXHw8XBvLlkqiog4bgrhk
+ yX114cXwhhaHcX9xfrFSQO4i
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Apr 2022 16:02:16 -0700
-IronPort-SDR: i8MBCefsSVNjkKmDMfzIoCYIillCx1qCH5sF940oP7OTLR/AtoOXI/xvnasc1RZGso/GjdQsQP
- rFRHpvL6PlVZYYS/APcG86dGLyHZwi1kn805zrdiWxtGw/L/NVNRRTSsb2eGmXJLBZQ0MyGpKL
- zYA1vOnkeWhiNOpBav2l7tpFsPUQPHBMkCWak8SG0dhBvspka4yGKk8O5eKqp0a2QbXTlXK9UG
- vR/ka709lHBll7UM1bIbTE9fVq9d0ezhNaoPUo6cE4IH1jKqN8kaOGFLsr4ZBsLoOVszFPOZUL
- pX8=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Apr 2022 16:31:45 -0700
+IronPort-SDR: ZcioxZILCavX2wx70HTJuhq9Fp1SEUfm+WiejwIZ+CSjIt1dXN0AnPUGeUw4qSIXZ/SNYpDPHt
+ SCuh3D+XjrtRe6P8B5c/Y2IshuLIIFjdEWK9LcZDFEIy1d4hlm1KnSliK4Mb3ycV0sA/APwB7t
+ W9r+icMdEEdfSI2C+ezUO90eszSEJiCwWzau6BoILIcSgxLe9P/SAL+0Jv9nfVgpyOzX1o/2m5
+ kOvPu5f/RwoNVVCgLZwpuu0kBCEHfC1BcTz3IbJi6AgCu6dS7JFRx01c0KjgVgYho09t6nblZq
+ cOk=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Apr 2022 16:31:48 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Apr 2022 17:00:31 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KdMSN1QRSz1SVny
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 16:31:48 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KdN5T4n0rz1Rwrw
+        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 17:00:29 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=in-reply-to:organization:from:references
-        :to:content-language:subject:user-agent:mime-version:date
-        :message-id:content-type; s=dkim; t=1649806307; x=1652398308;
-         bh=/OZapqEAwvC33AYXsoDR6Phx2aqKTlYIMskcR01mxQM=; b=Om1fEBXazDcc
-        Bh2R/ePGTPg2xld01Entfig3BN6ffcd6CrISDOCQaJUJm8ptGM5PNd5SIxTqd5KY
-        6dDsofDspzGNCC0MdlU3g9XgZupwtp/XME+y/dZ0J4O2UxV+eLcUKjXWr39HMbLJ
-        CPh6pGCpVz68lGih+nyFndrD3Xx8ThbwjEkf68Uo1LN9+C0MvdVFYiGxJX2LAePg
-        5eZpyBkmBaoNAYiwzEfsPLcz6D+f9jWCNwo4uuiX1LS+6iXkn2sEu3IIh70a7Ty4
-        Uo36qXttrXktlPFkLYZH0nhMfk1uisa6YANqPzb5z1c62KR+FoE0KDlwZIClX4Y3
-        Bgp/QpMj9Q==
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1649808028; x=1652400029; bh=v0UR0B46HKwKKmbfy/6oiTxJwibqFJYnvE7
+        l/c4jKWw=; b=FfZg6FlX5nClatit8k3YDZS8OZN2iMA6hEoQlZlTe16VpZUod0M
+        caLOzt7JeQAwjgzdvWusWR9GUDB0H7opb1xxtbJzGOQooKvZjZAF8q/s+rE+5tJ9
+        AfkCk7POV7/doG7LfcBEOD9CS7cbBlKN+vOn1zqYG7WdoWuuWyScr69JivUxqXJ0
+        PoOPlRO/tIMorwdKzeQKUnz5AIVOOSptxJDkhya8UxhqLz7L+jdHV9o/0Qz5ECJW
+        EqlXylty99hDgEOCOYKbLOw3rH7879P7nrIeiTjIoXE5hjpTP6LB+Y++K244LaMy
+        B5VwDZ/I8tA3a2v+Jlx/KzLIdYmhTXAudyQ==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id cGyN215Kz_gL for <linux-block@vger.kernel.org>;
-        Tue, 12 Apr 2022 16:31:47 -0700 (PDT)
+        with ESMTP id bvQbjshtjpoG for <linux-block@vger.kernel.org>;
+        Tue, 12 Apr 2022 17:00:28 -0700 (PDT)
 Received: from [10.225.163.9] (unknown [10.225.163.9])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KdMSL1G1mz1Rvlx;
-        Tue, 12 Apr 2022 16:31:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="------------egsgRdPfyYMP0pfbru57ULgc"
-Message-ID: <44a6c5cd-d9ca-e238-4574-73d9140a0d8d@opensource.wdc.com>
-Date:   Wed, 13 Apr 2022 08:31:44 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KdN5R53wzz1Rvlx;
+        Tue, 12 Apr 2022 17:00:27 -0700 (PDT)
+Message-ID: <34597cd1-cb19-c5de-8c44-b8c5a0a07cf7@opensource.wdc.com>
+Date:   Wed, 13 Apr 2022 09:00:26 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
@@ -90,14 +89,11 @@ References: <20220412085616.1409626-1-ming.lei@redhat.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
 In-Reply-To: <YlYEq0XC2XL6bv2b@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
-
-This is a multi-part message in MIME format.
---------------egsgRdPfyYMP0pfbru57ULgc
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
 On 4/13/22 08:00, Mike Snitzer wrote:
 > On Tue, Apr 12 2022 at  6:38P -0400,
@@ -141,26 +137,15 @@ On 4/13/22 08:00, Mike Snitzer wrote:
 > 
 > Can you please try the following patch?
 
-OK. Will do right away.
+This works. I tested with a zoned nullblk + dm-crypt, forcing the zone
+append emulation code to be used. I ran zonefs tests on top of that with
+no issues. I will run btrfs tests too later today to exercise things a
+little more.
 
 > 
 > Really sorry for breaking dm-zone.c; please teach this man how to test
 > the basics of all things dm-zoned (is there a testsuite in the tools
 > or something?).
-
-We have an internal test suite to check all things related to zone. We run
-that weekly on all RC releases. We did not catch the problem earlier as we
-do not run against for-next trees in previous cycles. We could add such
-runs :)
-
-We would be happy to contribute stuff for testing. Ideally, integrating
-that into blktest, with a new DM group, would be nice. That was discussed
-in past LSF. Maybe a topic again for this year ? Beside zone stuff, I am
-sure we can add more DM tests (I am sure you do also have a test suite ?).
-
-For quick tests, I generally use a zoned nullblk device. I am attaching 2
-scripts which allow creating and deleting nullblk devices easily.
-
 > 
 > Thanks,
 > Mike
@@ -335,88 +320,3 @@ scripts which allow creating and deleting nullblk devices easily.
 -- 
 Damien Le Moal
 Western Digital Research
---------------egsgRdPfyYMP0pfbru57ULgc
-Content-Type: application/x-shellscript; name="nullblk-create.sh"
-Content-Disposition: attachment; filename="nullblk-create.sh"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Jhc2gKCnNjcmlwdGRpcj0iJChjZCAiJChkaXJuYW1lICIkMCIpIiAmJiBwd2Qp
-IgoKZnVuY3Rpb24gdXNhZ2UoKQp7CgllY2hvICJVc2FnZTogJChiYXNlbmFtZSAkMCkgW29w
-dGlvbnNdIgoJZWNobyAiT3B0aW9uczoiCgllY2hvICIgICAgLWggfCAtLWhlbHAgICAgICA6
-IERpc3BsYXkgdGhpcyBoZWxwIG1lc3NhZ2UgYW5kIGV4aXQiCgllY2hvICIgICAgLXYgICAg
-ICAgICAgICAgICA6IEJlIHZlcmJvc2UgKGRpc3BsYXkgZmluYWwgY29uZmlnKSIKCWVjaG8g
-IiAgICAtY2FwIDxzaXplIChHQik+IDogc2V0IGRldmljZSBjYXBhY2l0eSAoZGVmYXVsdDog
-OCkiCgllY2hvICIgICAgICAgICAgICAgICAgICAgICAgIEZvciB6b25lZCBkZXZpY2VzLCBj
-YXBhY2l0eSBpcyBkZXRlcm1pbmVkIgoJZWNobyAiICAgICAgICAgICAgICAgICAgICAgICB3
-aXRoIHpvbmUgc2l6ZSBhbmQgdG90YWwgbnVtYmVyIG9mIHpvbmVzIgoJZWNobyAiICAgIC1i
-cyA8c2l6ZSAoQik+ICAgOiBzZXQgc2VjdG9yIHNpemUgKGRlZmF1bHQ6IDUxMikiCgllY2hv
-ICIgICAgLW0gICAgICAgICAgICAgICA6IGVuYWJsZSBtZW1vcnkgYmFja2luZyAoZGVmYXVs
-dDogZmFsc2UpIgoJZWNobyAiICAgIC16ICAgICAgICAgICAgICAgOiBjcmVhdGUgYSB6b25l
-ZCBkZXZpY2UgKGRlZmF1bHQ6IGZhbHNlKSIKCWVjaG8gIiAgICAtcW0gPG1vZGU+ICAgICAg
-IDogc2V0IHF1ZXVlIG1vZGUgKGRlZmF1bHQ6IDIpIgoJZWNobyAiICAgICAgICAgICAgICAg
-ICAgICAgICAwPWJpbywgMT1ycSwgMj1tdWx0aXF1ZXVlIgoJZWNobyAiICAgIC1zcSA8bnVt
-PiAgICAgICAgOiBzZXQgbnVtYmVyIG9mIHN1Ym1pc3Npb24gcXVldWVzIgoJZWNobyAiICAg
-ICAgICAgICAgICAgICAgICAgICAoZGVmYXVsdDogbnByb2MpIgoJZWNobyAiICAgIC1xZCA8
-ZGVwdGg+ICAgICAgOiBzZXQgcXVldWUgZGVwdGggKGRlZmF1bHQ6IDY0KSIKCWVjaG8gIiAg
-ICAtaW0gPG1vZGU+ICAgICAgIDogc2V0IElSUSBtb2RlIChkZWZhdWx0OiAwKSIKCWVjaG8g
-IiAgICAgICAgICAgICAgICAgICAgICAgMD1ub25lLCAxPXNvZnRpcnEsIDI9dGltZXIiCgll
-Y2hvICIgICAgLWMgPG5zZWNzPiAgICAgICA6IHNldCBjb21wbGV0aW9uIHRpbWUgZm9yIHRp
-bWVyIGNvbXBsZXRpb24iCgllY2hvICIgICAgICAgICAgICAgICAgICAgICAgIChkZWZhdWx0
-OiAxMDAwMCBucykiCgllY2hvICJPcHRpb25zIGZvciB6b25lZCBkZXZpY2VzOiIKCWVjaG8g
-IiAgICAtenMgPHNpemUgKE1CKT4gIDogc2V0IHpvbmUgc2l6ZSAoZGVmYXVsdDogOCBNQiki
-CgllY2hvICIgICAgLXpjIDxzaXplIChNQik+ICA6IHNldCB6b25lIGNhcGFjaXR5IChkZWZh
-dWx0OiB6b25lIHNpemUpIgoJZWNobyAiICAgIC16bmMgPG51bT4gICAgICAgOiBzZXQgbnVt
-YmVyIG9mIGNvbnYgem9uZXMgKGRlZmF1bHQ6IDApIgoJZWNobyAiICAgIC16bnMgPG51bT4g
-ICAgICAgOiBzZXQgbnVtYmVyIG9mIHN3ciB6b25lcyAoZGVmYXVsdDogOCkiCgllY2hvICIg
-ICAgLXpyICAgICAgICAgICAgICA6IGFkZCBhIHNtYWxsZXIgcnVudCBzd3Igem9uZSAoZGVm
-YXVsdDogbm9uZSkiCgllY2hvICIgICAgLXptbyA8bnVtPiAgICAgICA6IHNldCBtYXggb3Bl
-biB6b25lcyAoZGVmYXVsdDogbm8gbGltaXQpIgoJZWNobyAiICAgIC16bWEgPG51bT4gICAg
-ICAgOiBzZXQgbWF4IGFjdGl2ZSB6b25lcyAoZGVmYXVsdDogbm8gbGltaXQpIgoKCWV4aXQg
-MAp9CgpmdW5jdGlvbiBnZXRfbnVsbGJfaWQoKQp7Cglsb2NhbCBuaWQ9MAoKCXdoaWxlIFsg
-MSBdOyBkbwoJCWlmIFsgISAtYiAiL2Rldi9udWxsYiR7bmlkfSIgXTsgdGhlbgoJCQlicmVh
-awoJCWZpCgkJbmlkPSQoKCBuaWQgKyAxICkpCglkb25lCgoJZWNobyAiJG5pZCIKfQoKIyBT
-ZXQgY29uZmlnIGRlZmF1bHRzCmNhcD04CmJzPTUxMgptPTAKcW09MgpzcT0kKG5wcm9jKQpx
-ZD02NAppbT0wCmM9MTAwMDAKCno9MAp6cz04CnpjPTAKem5jPTAKem5zPTgKenI9MAp6bW89
-MAp6bWE9MAoKdj0wCgojIFBhcnNlIGNvbW1hbmQgbGluZQp3aGlsZSBbWyAkIyAtZ3QgMCBd
-XTsgZG8KCWNhc2UgIiQxIiBpbgoJIi1oIiB8ICItLWhlbHAiKQoJCXVzYWdlICIkMCIgOzsK
-CSItdiIpCgkJdj0xIDs7CgkiLWNhcCIpCgkJc2hpZnQ7IGNhcD0kMSA7OwoJIi1icyIpCgkJ
-c2hpZnQ7IGJzPSQxIDs7CgkiLW0iKQoJCW09MSA7OwoJIi1xbSIpCgkJc2hpZnQ7IHFtPSQx
-IDs7CgkiLXNxIikKCQlzaGlmdDsgc3E9JDEgOzsKCSItcWQiKQoJCXNoaWZ0OyBxZD0kMSA7
-OwoJIi1pbSIpCgkJc2hpZnQ7IGltPSQxIDs7CgkiLWMiKQoJCXNoaWZ0OyBjPSQxIDs7Cgki
-LXoiKQoJCXo9MSA7OwoJIi16cyIpCgkJc2hpZnQ7IHpzPSQxIDs7CgkiLXpjIikKCQlzaGlm
-dDsgemM9JDEgOzsKCSItem5jIikKCQlzaGlmdDsgem5jPSQxIDs7CgkiLXpucyIpCgkJc2hp
-ZnQ7IHpucz0kMSA7OwoJIi16ciIpCgkJenI9MSA7OwoJIi16bW8iKQoJCXNoaWZ0OyB6bW89
-JDEgOzsKCSItem1hIikKCQlzaGlmdDsgem1hPSQxIDs7CgkqKQoJCWVjaG8gIkludmFsaWQg
-b3B0aW9uIFwiJDFcIiAodXNlIC1oIG9wdGlvbiBmb3IgaGVscCkiCgkJZXhpdCAxIDs7Cgll
-c2FjCgoJc2hpZnQKZG9uZQoKIyBDYWxjdWxhdGUgem9uZWQgZGV2aWNlIGNhcGFjaXR5Cmlm
-IFsgJHogPT0gMSBdOyB0aGVuCgljYXA9JCgoIHpzICogKHpuYyArIHpucykgKSkKCWlmIFsg
-JHpyID09IDEgXTsgdGhlbgoJCWNhcD0kKCggZ2IgKyB6bnMgLSAxICkpCglmaQplbHNlCglj
-YXA9JCgoIGNhcCAqIDEwMjQgKSkKZmkKCiMgQ3JlYXRlIGRldmljZSBjb25maWcKbW9kcHJv
-YmUgbnVsbF9ibGsgbnJfZGV2aWNlcz0wIHx8IHJldHVybiAkPwpuaWQ9JChnZXRfbnVsbGJf
-aWQpCmRldj0iL3N5cy9rZXJuZWwvY29uZmlnL251bGxiL251bGxiJHtuaWR9Igpta2RpciAi
-JHtkZXZ9IgoKZWNobyAkY2FwID4gIiR7ZGV2fSIvc2l6ZQplY2hvICRicyA+ICIke2Rldn0i
-L2Jsb2Nrc2l6ZQplY2hvICRtID4gIiR7ZGV2fSIvbWVtb3J5X2JhY2tlZAplY2hvICRxbSA+
-ICIke2Rldn0iL3F1ZXVlX21vZGUKZWNobyAkc3EgPiAiJHtkZXZ9Ii9zdWJtaXRfcXVldWVz
-CmVjaG8gJHFkID4gIiR7ZGV2fSIvaHdfcXVldWVfZGVwdGgKZWNobyAkaW0gPiAiJHtkZXZ9
-Ii9pcnFtb2RlCmlmIFsgJGltID09IDIgXTsgdGhlbgoJZWNobyAkYyA+ICIke2Rldn0iL2Nv
-bXBsZXRpb25fbnNlYwpmaQoKZWNobyAkeiA+ICIke2Rldn0iL3pvbmVkCmlmIFsgJHogPT0g
-MSBdOyB0aGVuCgllY2hvICR6cyA+ICIke2Rldn0iL3pvbmVfc2l6ZQoJZWNobyAkemMgPiAi
-JHtkZXZ9Ii96b25lX2NhcGFjaXR5CgllY2hvICR6bmMgPiAiJHtkZXZ9Ii96b25lX25yX2Nv
-bnYKCWVjaG8gJHptbyA+ICIke2Rldn0iL3pvbmVfbWF4X29wZW4KCWVjaG8gJHptYSA+ICIk
-e2Rldn0iL3pvbmVfbWF4X2FjdGl2ZQpmaQoKIyBFbmFibGUgZGV2aWNlCmVjaG8gMSA+ICIk
-e2Rldn0iL3Bvd2VyCmVjaG8gIkNyZWF0ZWQgL2Rldi9udWxsYiR7bmlkfSIKCmlmIFsgJHYg
-PT0gMSBdOyB0aGVuCgllY2hvICJEZXZpY2UgY29uZmlndXJhdGlvbjoiCglncmVwIC1yIC4g
-JHtkZXZ9CmZpCg==
---------------egsgRdPfyYMP0pfbru57ULgc
-Content-Type: application/x-shellscript; name="nullblk-destroy.sh"
-Content-Disposition: attachment; filename="nullblk-destroy.sh"
-Content-Transfer-Encoding: base64
-
-IyEvYmluL2Jhc2gKCmlmIFsgJCMgIT0gMSBdOyB0aGVuCgllY2hvICJVc2FnZTogJChiYXNl
-bmFtZSAkMCkgPG51bGxiIElEPiIKCWV4aXQgMQpmaQoKbmlkPSQxCgppZiBbICEgLWIgIi9k
-ZXYvbnVsbGIkbmlkIiBdOyB0aGVuCgllY2hvICIvZGV2L251bGxiJG5pZDogTm8gc3VjaCBk
-ZXZpY2UiCglleGl0IDEKZmkKCmVjaG8gMCA+IC9zeXMva2VybmVsL2NvbmZpZy9udWxsYi9u
-dWxsYiRuaWQvcG93ZXIKcm1kaXIgL3N5cy9rZXJuZWwvY29uZmlnL251bGxiL251bGxiJG5p
-ZAoKZWNobyAiRGVzdHJveWVkIC9kZXYvbnVsbGIkbmlkIgoK
-
---------------egsgRdPfyYMP0pfbru57ULgc--
