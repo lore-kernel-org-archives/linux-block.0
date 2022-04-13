@@ -2,73 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5154EC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 06:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50548C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 08:48:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232850AbiDMGnN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Apr 2022 02:43:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33388 "EHLO
+        id S233984AbiDMIuf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Apr 2022 04:50:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233059AbiDMGnL (ORCPT
+        with ESMTP id S233932AbiDMIue (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Apr 2022 02:43:11 -0400
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A6FE2C117
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 23:40:51 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id bh17so1892569ejb.8
-        for <linux-block@vger.kernel.org>; Tue, 12 Apr 2022 23:40:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fUtafTS5bbm7w+XJYVemBkOAYh5lBscMoQ8qcKKpMqg=;
-        b=Mm1kMoh9RG4tEhG/2qjy8o2a5FtsLSAtW0ABT98X8gL3SheMnNLIcTaRCsln/9v/Ud
-         z/02UiilPONzE2ThI/8FoN2sdVa3mPawKwK5T7Kk5YTnq33cC3Xq4IVa47+4RCnN7jDN
-         MvQ3voFc9TyoMC9naC9hAdzMwrVETCS5B2+JMx2PYBHtMMFGeDzjTNRwfyYhxZ0Ti0hh
-         WYVmjW3pDvNGS3Wpx4kdmOo3UV6FwdY1hMddiIxNQlWH2ld6e4PhgsU9lxBKKk4n/n9n
-         8EC3Xms015f16+gXMKAOO8JwaRBw1sBr/vHTGh4CeBO4B3Z3aYoroqZQLZh+budlhxJd
-         1gxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fUtafTS5bbm7w+XJYVemBkOAYh5lBscMoQ8qcKKpMqg=;
-        b=FiE2FeZZMsDLA9sIqPLfKgU/U+GDaHAWO5OD6yprWwMLl5P2DKKMzT7DIV5TY7ULhd
-         LsRuqBfI6jAqkyJ48F9KMTu5EQGfrWPUk+roOg0hDdQxrUFCKkGXbW8JCXoxcxmcIZm2
-         w2UiRKV6ZEIczLhPleo5X85irrlXS6RQlIU5GCxxMev3A3zjpmm5fnHCJ4Q83LAgbV9a
-         9fP+n+CTUqs+mnugIYbK2zYikcS8+zioec4nIghKZmBOdIxpgD5//YkuxYhU8v4/GqVd
-         +BQ/hpjfJcLNmUVjJY+kMw33NbOe9X5mXMyOTkqDOC86mXelO8VURSU4Q2KD72IzAvlY
-         VpDQ==
-X-Gm-Message-State: AOAM531iM1tx3JSP0K7ceLjdg8kJwr8UKSlgEiv3BDDGRlXN1lie04Jq
-        yNWvjhezxITbHD1U3w/uOeEy4quESPU92s7jaYHa7/lI7DiBew==
-X-Google-Smtp-Source: ABdhPJyU071dNJ1fwpnZw46980R8xTuu/uen5K9WIAioMoRh5GKRC6IpaXpCf/YBrXwaSvMwI2RNZ5Izhp65Vm7jzKE=
-X-Received: by 2002:a17:907:7e82:b0:6e8:92eb:2858 with SMTP id
- qb2-20020a1709077e8200b006e892eb2858mr12065463ejc.443.1649832050185; Tue, 12
- Apr 2022 23:40:50 -0700 (PDT)
+        Wed, 13 Apr 2022 04:50:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6D8F84D633
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 01:48:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649839693;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=TONeNBOzlLsHGQgbGOgTiLe6tBJABMu6in/bEcDq0d0=;
+        b=RGX3kre/tMl416SrewFZ4hpPdCBQMc0FqnwX5wQ+clTYBdsL1GAgvkvNt+UKCst5L53/ym
+        udC07b7nGYHbF8JZneORYGILhsKLC5wydl1ir6iQe81GGAZY2NVstHCtz5W1EGD/dkss/T
+        +qdwjZ7vY2h+UlVrdAMx3QsBzzqRKYE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-461-xAbrCXFaMuSmH2ncmZNP-w-1; Wed, 13 Apr 2022 04:48:12 -0400
+X-MC-Unique: xAbrCXFaMuSmH2ncmZNP-w-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 23ED4899ED0;
+        Wed, 13 Apr 2022 08:48:12 +0000 (UTC)
+Received: from localhost (ovpn-8-24.pek2.redhat.com [10.72.8.24])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 585C454AC93;
+        Wed, 13 Apr 2022 08:48:09 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH] block: avoid io timeout in case of sync polled dio
+Date:   Wed, 13 Apr 2022 16:48:05 +0800
+Message-Id: <20220413084805.1571884-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-References: <becb2389-e249-0aa2-7701-2c02155aedf2@I-love.SAKURA.ne.jp>
- <55006f3b-9571-9167-eaf0-6a2caec747ad@I-love.SAKURA.ne.jp>
- <CAMGffEnXi8AiC2rqZaHER1rrcsCPR0UNocKyxr9H6hXRwjj4MQ@mail.gmail.com> <7adb8272-6836-77f6-70c8-6fbd180c0e2e@I-love.SAKURA.ne.jp>
-In-Reply-To: <7adb8272-6836-77f6-70c8-6fbd180c0e2e@I-love.SAKURA.ne.jp>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 13 Apr 2022 08:40:38 +0200
-Message-ID: <CAMGffEnJm13zBa0o=v3Qtk1Cab3sLdYr9ER3FL6wHeiHe9205w@mail.gmail.com>
-Subject: Re: [PATCH] block/rnbd: client: avoid flush_workqueue(system_long_wq) usage
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 7:31 AM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> On 2022/04/13 14:21, Jinpu Wang wrote:
-> > I feel the simple approach is to replace the global system_long_wq
-> > with a local workqueue for rnbd_client.
->
-> OK. Please post a patch.
-Will do, thanks!
+If the bio is marked as POLLED after submission, bio_poll() should be
+called for reaping io since there isn't irq for completing the request,
+so we can't call into blk_io_schedule() in case that bio_poll() returns
+zero.
+
+Also for calling bio_poll(), current->plug has to be flushed out,
+otherwise bio may not be issued to driver, and ->bi_cookie won't
+be set.
+
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/fops.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index 9f2ecec406b0..17798aa31bf6 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -101,11 +101,16 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+ 		bio_set_polled(&bio, iocb);
+ 
+ 	submit_bio(&bio);
++	/* flush plug list to make sure that bio is issued */
++	if (bio.bi_opf & REQ_POLLED)
++		blk_flush_plug(current->plug, false);
+ 	for (;;) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+ 		if (!READ_ONCE(bio.bi_private))
+ 			break;
+-		if (!(iocb->ki_flags & IOCB_HIPRI) || !bio_poll(&bio, NULL, 0))
++		if (bio.bi_opf & REQ_POLLED)
++			bio_poll(&bio, NULL, 0);
++		else
+ 			blk_io_schedule();
+ 	}
+ 	__set_current_state(TASK_RUNNING);
+-- 
+2.31.1
+
