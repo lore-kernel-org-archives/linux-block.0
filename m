@@ -2,75 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 417A8C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 17:04:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D97C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 13 Apr 2022 17:38:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237173AbiDMRGv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Apr 2022 13:06:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46400 "EHLO
+        id S232862AbiDMRko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Apr 2022 13:40:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231812AbiDMRGu (ORCPT
+        with ESMTP id S231937AbiDMRkl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Apr 2022 13:06:50 -0400
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4507B2F008
-        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 10:04:28 -0700 (PDT)
-Received: by mail-qt1-f176.google.com with SMTP id o18so1815944qtk.7
-        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 10:04:28 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=1gkKYNxAVgG9gQQX5FWE9T2WbQK+aJhhHh5HXzZzRl0=;
-        b=lE4sQ7o0qLqhvxRMsUR9meIipmoFdQ7y7e6BMd5Qy1wQfzax2S9eVGz754hyvydRkB
-         yOH51K311IXh40FsAmLMPeSFan2MSppsLfjRVY95569rmCLIb5yWtIWHGV1vGtaPQKr/
-         6a2mvuxu+GxsstWDegurLMs0w09Moz1fqFpiSE1OlEZuqyv1tmGj3pHlTVH6WXJcgPl/
-         mEqDrVFwom8rfDt+N0aXGEdQIrPClCc+QwtAIaYVOR78XAjsLRILSvC0CRBxdKk1v6hX
-         armOQ7CZNGnXWEpIzhHyR4yWqtWscNh+TuefC12WXbtNaKgy7KGk9lzPgh1e5ZS93Da7
-         GWyw==
-X-Gm-Message-State: AOAM530s/Stlzjr/arXpq7I4sRm1RKLbc/fG2Htn8rJ5CeBSKiBrDj06
-        KeLA/deyL8z7kXaDvn+InAWX
-X-Google-Smtp-Source: ABdhPJzk8Hsy6b4fFdojSz0Z/fwMjicI2vghSEfVW7+AE/QcDDdQw502GSidyJJNTGoVWuUmwvp37w==
-X-Received: by 2002:ac8:5e4e:0:b0:2e2:2bad:47b1 with SMTP id i14-20020ac85e4e000000b002e22bad47b1mr7781053qtx.493.1649869467355;
-        Wed, 13 Apr 2022 10:04:27 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id a23-20020a05620a103700b00699d49c511dsm16089900qkk.104.2022.04.13.10.04.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Apr 2022 10:04:26 -0700 (PDT)
-Date:   Wed, 13 Apr 2022 13:04:25 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Coly Li <colyli@suse.de>,
-        Song Liu <song@kernel.org>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        David Sterba <dsterba@suse.com>,
-        Phillip Lougher <phillip@squashfs.org.uk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        linux-kernel@vger.kernel.org, linux-bcache@vger.kernel.org,
-        linux-raid@vger.kernel.org, target-devel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH 4/5] block: turn bio_kmalloc into a simple kmalloc wrapper
-Message-ID: <YlcCmW0CLAFXB8UQ@redhat.com>
-References: <20220406061228.410163-1-hch@lst.de>
- <20220406061228.410163-5-hch@lst.de>
+        Wed, 13 Apr 2022 13:40:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DEC36C973
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 10:38:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=AZJsY66c5TcYQ4vjMN6WkMeM3ErEPd6p9C0SMGe9KOE=; b=KkjaVr2Uo+R1NoPCbH/avT5gcP
+        SVVDo4MHnIWwgcR4FMu0CHLjXfIIvC6GPFeUhkUxk0RgkYwXsJrtYCb/s9VjpE3A5X03FbWP1Fe/e
+        gtH+68XIp2nH6GFLulVnrxCQc8vpLLOXJIwsJ3hjY1/GwwmDmtLkf/L/6Hp6HqT6Gwo3l1tZNoCzE
+        vIDMgdNXS4n6PPqhdA9lM37pTpN3UaWpD93xaOEf68X8YR0HaG1BmsettcWWBRe7ll6QdUYZSaA7W
+        qMf3oWp6xehqMv0anOF2QKnySEdXcR2nVZO7zqhxs8yPfPYwS1DbYME2dEw+DJPyPmNxnlX8DUWuN
+        eqs5MK/g==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1negwX-001xw6-KM; Wed, 13 Apr 2022 17:38:13 +0000
+Date:   Wed, 13 Apr 2022 10:38:13 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Yi Zhang <yi.zhang@redhat.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+Subject: Re: can't run nvme-mp blktests
+Message-ID: <YlcKheNsvNSKZ3CE@bombadil.infradead.org>
+References: <YlYYJC/WUEsnI9Im@bombadil.infradead.org>
+ <CAHj4cs-HD_uQ_=SQKyFcUJvxFmiJMZSxX5uaqCAkN3h2Zw93ZQ@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220406061228.410163-5-hch@lst.de>
+In-Reply-To: <CAHj4cs-HD_uQ_=SQKyFcUJvxFmiJMZSxX5uaqCAkN3h2Zw93ZQ@mail.gmail.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 06 2022 at  2:12P -0400,
-Christoph Hellwig <hch@lst.de> wrote:
-
-> Remove the magic autofree semantics and require the callers to explicitly
-> call bio_init to initialize the bio.
+On Wed, Apr 13, 2022 at 11:02:47AM +0800, Yi Zhang wrote:
+> On Wed, Apr 13, 2022 at 8:24 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > I do have CONFIG_NVME_MULTIPATH=y but I also have:
+> >
+> > cat /etc/modprobe.d/nvme.conf
+> > options nvme_core multipath=N
+> >
+> > And yet I always end up booting with:
+> >
+> > cat /sys/module/nvme_core/parameters/multipath
+> > Y
+> >
+> > So trying to run:
+> >
+> > nvme_trtype=rdma ./check nvmeof-mp
+> >
+> > I end up with the warning:
+> >
+> > nvmeof-mp/***                                                [not run]
+> >     CONFIG_NVME_MULTIPATH has been set in .config and multipathing has been enabled in the nvme_core kernel module
+> >
+> > Are there times where one cannot disable multipath? I'm not using
+> > any nvme drive at boot, but I do use one for a random data parition.
 > 
-> This allows bio_free to catch accidental bio_put calls on bio_init()ed
-> bios as well.
-> 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> So the multipath is not updated with N, pls try manually removing the
+> nvme_core module and retest.
 
-Acked-by: Mike Snitzer <snitzer@kernel.org>
+I can't remove the module as a filesystem is mounted on one of the nvme
+drives used at boot. It is not an OS partition, ie, it is just /data/.
+The blktests is intended for some other nvme drives.
+
+> Or just reboot can also help update the parameter.
+
+Reboot does not help, that is my point.
+
+> BTW, to run blktests nvmeof-mp, the correct way is:
+> # ./check nvmeof-mp
+> # use_siw=1 ./check nvmeof-mp
+
+That does not let me do anything different as CONFIG_NVME_MULTIPATH is
+still found to be set and the module parameter for nvme_core for
+multipath is still "Y".
+
+  Luis
