@@ -2,208 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C358C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 00:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D528C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 00:50:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232641AbiDNAjx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Apr 2022 20:39:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
+        id S238826AbiDNAxF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 13 Apr 2022 20:53:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59586 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231578AbiDNAjx (ORCPT
+        with ESMTP id S238451AbiDNAxE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Apr 2022 20:39:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DEBB81C909
-        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 17:37:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649896647;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=580Y10xMSDQ+qiRiFLQWIHQfC+j7d35SlLZAW+MMhZM=;
-        b=ZhA3nLQ8E9ZegQYhHM1qGkgF4RCh/ZWpeNQmjCDjkEtAQNfki/A9tUIqMaBWsCiUOzrkyB
-        uymW8AieJRf7/sg7Tw8XwDkmuIxUvTMjd4GJg3wfGIFaRFC/9rDAaWK/7fHYKPlalo7az9
-        yeIaM8cae7Fb2iNg+riDZUztkOXJS8s=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-332-E1crAhWlMUmOOPcJPucE8w-1; Wed, 13 Apr 2022 20:37:26 -0400
-X-MC-Unique: E1crAhWlMUmOOPcJPucE8w-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F57D1C05AA0;
-        Thu, 14 Apr 2022 00:37:26 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B656111D3C8;
-        Thu, 14 Apr 2022 00:37:03 +0000 (UTC)
-Date:   Thu, 14 Apr 2022 08:36:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 5/8] dm: always setup ->orig_bio in alloc_io
-Message-ID: <Yldsqh2YsclXYl3s@T590>
-References: <20220412085616.1409626-1-ming.lei@redhat.com>
- <20220412085616.1409626-6-ming.lei@redhat.com>
- <YlXmmB6IO7usz2c1@redhat.com>
- <YlYt2rzM0NBPARVp@T590>
- <YlZp3+VrP930VjIQ@redhat.com>
- <YlbBf0mJa/BPHSSq@T590>
- <YlcPXslr6Y7cHOSU@redhat.com>
+        Wed, 13 Apr 2022 20:53:04 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA5C17073
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 17:50:41 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id bd13so2754352pfb.7
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 17:50:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=1F+QMmgmqNsz0P/+D1DEIlkzPJIhGt55nqdOHiLZhaY=;
+        b=0Jd+BpS16HN7SmPDWJ5g5VFDbdsB9YHCHOBU1dZOTgbW4TM3ftqH/jaVvE+VFAK0KN
+         oRANUrNkmzHZjRirA4AM+Ij4Pq72fn/Lrr1lfpsKxsdmijf7DiEuYBiyWvBpsQUK72De
+         GCvk0jWbKyfMh+3dORSXyjhwb8hKqAAU57bM58nKRcFUvM5CShg8fGu4KReZH9Uf8D/J
+         VUIJ+kYtauI0G84ObmE7NcyhokLmeRAKi0Ogb1EXZ6Wc2c2GrSYN9gtvy8dl+sGweSY7
+         JVEtZnu39dNAGLGR16YJq2eBBlMzSd70XtLYjPiQ61XcHFjSpedeYBvCDtMFLbejM7+C
+         dioQ==
+X-Gm-Message-State: AOAM533PIToXX/xr5BgJQ3PpXL16F1mm1s0VOoPxlAypcVfMAcEUiRSJ
+        +i/OkbwBwt08f2QrRAF9sI94+hdvZ5c=
+X-Google-Smtp-Source: ABdhPJwZxO7RkLH2KxAHOIERISnN9gERyFMXO46JGCPbIYDx/1WVe0QawlNtybOzsQdI9Hh2lMX7yg==
+X-Received: by 2002:a63:5115:0:b0:39c:d48d:1b87 with SMTP id f21-20020a635115000000b0039cd48d1b87mr216417pgb.107.1649897441065;
+        Wed, 13 Apr 2022 17:50:41 -0700 (PDT)
+Received: from [192.168.51.110] (c-73-241-217-19.hsd1.ca.comcast.net. [73.241.217.19])
+        by smtp.gmail.com with ESMTPSA id n12-20020a17090a670c00b001cbb7fdb9e4sm4123870pjj.53.2022.04.13.17.50.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Apr 2022 17:50:40 -0700 (PDT)
+Message-ID: <8db9ded3-ae12-3c56-5ac6-35ee9b9117bc@acm.org>
+Date:   Wed, 13 Apr 2022 17:50:38 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlcPXslr6Y7cHOSU@redhat.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: blktests srp failures with a guest with kdevops on v5.17-rc7
+ removal
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     linux-block@vger.kernel.org
+References: <YldoSh6o5sbifsJf@bombadil.infradead.org>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <YldoSh6o5sbifsJf@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 13, 2022 at 01:58:54PM -0400, Mike Snitzer wrote:
-> On Wed, Apr 13 2022 at  8:26P -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Wed, Apr 13, 2022 at 02:12:47AM -0400, Mike Snitzer wrote:
-> > > On Tue, Apr 12 2022 at  9:56P -0400,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > On Tue, Apr 12, 2022 at 04:52:40PM -0400, Mike Snitzer wrote:
-> > > > > On Tue, Apr 12 2022 at  4:56P -0400,
-> > > > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > > > 
-> > > > > > The current DM codes setup ->orig_bio after __map_bio() returns,
-> > > > > > and not only cause kernel panic for dm zone, but also a bit ugly
-> > > > > > and tricky, especially the waiting until ->orig_bio is set in
-> > > > > > dm_submit_bio_remap().
-> > > > > > 
-> > > > > > The reason is that one new bio is cloned from original FS bio to
-> > > > > > represent the mapped part, which just serves io accounting.
-> > > > > > 
-> > > > > > Now we have switched to bdev based io accounting interface, and we
-> > > > > > can retrieve sectors/bio_op from both the real original bio and the
-> > > > > > added fields of .sector_offset & .sectors easily, so the new cloned
-> > > > > > bio isn't necessary any more.
-> > > > > > 
-> > > > > > Not only fixes dm-zone's kernel panic, but also cleans up dm io
-> > > > > > accounting & split a bit.
-> > > > > 
-> > > > > You're conflating quite a few things here.  DM zone really has no
-> > > > > business accessing io->orig_bio (dm-zone.c can just as easily inspect
-> > > > > the tio->clone, because it hasn't been remapped yet it reflects the
-> > > > > io->origin_bio, so there is no need to look at io->orig_bio) -- but
-> > > > > yes I clearly broke things during the 5.18 merge and it needs fixing
-> > > > > ASAP.
-> > > > 
-> > > > You can just consider the cleanup part of this patches, :-)
-> > > 
-> > > I will.  But your following list doesn't reflect any "cleanup" that I
-> > > saw in your patchset.  Pretty fundamental changes that are similar,
-> > > but different, to the dm-5.19 changes I've staged.
-> > > 
-> > > > 1) no late assignment of ->orig_bio, and always set it in alloc_io()
-> > > >
-> > > > 2) no waiting on on ->origi_bio, especially the waiting is done in
-> > > > fast path of dm_submit_bio_remap().
-> > > 
-> > > For 5.18 waiting on io->orig_bio just enables a signal that the IO was
-> > > split and can be accounted.
-> > > 
-> > > For 5.19 I also plan on using late io->orig_bio assignment as an
-> > > alternative to the full-blown refcounting currently done with
-> > > io->io_count.  I've yet to quantify the gains with focused testing but
-> > > in theory this approach should scale better on large systems with many
-> > > concurrent IO threads to the same device (RCU is primary constraint
-> > > now).
-> > > 
-> > > I'll try to write a bpfrace script to measure how frequently "waiting on
-> > > io->orig_bio" occurs for dm_submit_bio_remap() heavy usage (like
-> > > dm-crypt). But I think we'll find it is very rarely, if ever, waited
-> > > on in the fast path.
-> > 
-> > The waiting depends on CPU and device's speed, if device is quicker than
-> > CPU, the wait should be longer. Testing in one environment is usually
-> > not enough.
-> > 
-> > > 
-> > > > 3) no split for io accounting
-> > > 
-> > > DM's more recent approach to splitting has never been done for benefit
-> > > or use of IO accounting, see this commit for its origin:
-> > > 18a25da84354c6b ("dm: ensure bio submission follows a depth-first tree walk")
-> > > 
-> > > Not sure why you keep poking fun at DM only doing a single split when:
-> > > that is the actual design.  DM splits off orig_bio then recurses to
-> > > handle the remainder of the bio that wasn't issued.  Storing it in
-> > > io->orig_bio (previously io->bio) was always a means of reflecting
-> > > things properly. And yes IO accounting is one use, the other is IO
-> > > completion. But unfortunately DM's IO accounting has always been a
-> > > mess ever since the above commit. Changes in 5.18 fixed that.
-> > > 
-> > > But again, DM's splitting has _nothing_ to do with IO accounting.
-> > > Splitting only happens when needed for IO submission given constraints
-> > > of DM target(s) or underlying layers.
-> > 
-> > What I meant is that the bio returned from bio_split() is only for
-> > io accounting. Yeah, the comment said it can be for io completion too,
-> > but that is easily done without the splitted bio.
-> >
-> > > All said, I will look closer at your entire set and see if it better
-> > > to go with your approach.  This patch in particular is interesting
-> > > (avoids cloning and other complexity of bio_split + bio_chain):
-> > > https://patchwork.kernel.org/project/dm-devel/patch/20220412085616.1409626-6-ming.lei@redhat.com/
-> > 
-> > That patch shows we can avoid the extra split, also shows that the
-> > splitted bio from bio_split() is for io accounting only.
-> 
-> Yes I see that now.  But it also served to preserve the original bio
-> for use in completion.  Not a big deal, but it did track the head of
-> the bio_chain.
-> 
-> The bigger issue with this patch is that you've caused
-> dm_submit_bio_remap() to go back to accounting the entire original bio
-> before any split occurs.  That is a problem because you'll end up
-> accounting that bio for every split, so in split heavy workloads the
-> IO accounting won't reflect when the IO is actually issued and we'll
-> regress back to having very inaccurate and incorrect IO accounting for
-> dm_submit_bio_remap() heavy targets (e.g. dm-crypt).
+On 4/13/22 17:18, Luis Chamberlain wrote:
+> I've started to work on expanding coverage of testing with blktests
+> on kdevops [0] to other test groups. srp was one of them. But the amount
+> of failures I'm seeing seems to tell me I'm probably doing something
+> really stupid, so please help me review the setup. The baseline for
+> srp is listed below, each of these is a failure. I've used v5.17-rc7
+> as a starting point.
 
-Good catch, but we know the length of mapped part in original bio before
-calling __map_bio(), so io->sectors/io->offset_sector can be setup here,
-something like the following delta change should address it:
+Do the SRP tests pass when using the Soft-iWARP driver instead of 
+rdma_rxe? I'm asking this because there are known issues with the 
+rdma_rxe driver in kernel versions v5.17 and also in v5.18-rc1. An 
+example of how to select the Soft-iWARP driver:
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index db23efd6bbf6..06b554f3104b 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1558,6 +1558,13 @@ static int __split_and_process_bio(struct clone_info *ci)
- 
- 	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
- 	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-+
-+	if (ci->sector_count > len) {
-+		/* setup the mapped part for accounting */
-+		dm_io_set_flag(ci->io, DM_IO_SPLITTED);
-+		ci->io->sectors = len;
-+		ci->io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
-+	}
- 	__map_bio(clone);
- 
- 	ci->sector += len;
-@@ -1603,11 +1610,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
- 	if (error || !ci.sector_count)
- 		goto out;
- 
--	/* setup the mapped part for accounting */
--	dm_io_set_flag(ci.io, DM_IO_SPLITTED);
--	ci.io->sectors = bio_sectors(bio) - ci.sector_count;
--	ci.io->sector_offset = bio_end_sector(bio) - bio->bi_iter.bi_sector;
--
- 	bio_trim(bio, ci.io->sectors, ci.sector_count);
- 	trace_block_split(bio, bio->bi_iter.bi_sector);
- 	bio_inc_remaining(bio);
+cd blktests && use_siw=1 ./check -q srp/001
 
--- 
-Ming
-
+Bart.
