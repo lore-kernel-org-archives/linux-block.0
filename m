@@ -2,131 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CED1C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 03:08:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0AEC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 03:58:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236888AbiDNDK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 13 Apr 2022 23:10:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51404 "EHLO
+        id S239790AbiDNEAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 00:00:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbiDNDK5 (ORCPT
+        with ESMTP id S229485AbiDNEAp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 13 Apr 2022 23:10:57 -0400
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1652B329A7;
-        Wed, 13 Apr 2022 20:08:32 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0VA0LT0e_1649905709;
-Received: from 30.225.28.188(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VA0LT0e_1649905709)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 14 Apr 2022 11:08:30 +0800
-Message-ID: <54f14cda-8eed-e486-b41d-5eefc56da526@linux.alibaba.com>
-Date:   Thu, 14 Apr 2022 11:08:29 +0800
+        Thu, 14 Apr 2022 00:00:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0199B1EAD6
+        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 20:58:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649908700;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Jg1rZH24EckI+v9QyBfJtar9AT8HpG0UvbbpNpJYo60=;
+        b=GoBQSCV0Ku11/PJBCU0varaVXazJTIfWzORxbUkCWmTvOXLzOe4atYxLGK1M/nF8mYdFUN
+        eNEBdZ2xh1LelBNpI9TYKnjrHgXRyq8NirFXz8bq3Fs7MY/+A5osUANWYAkd6eSqZhUlzc
+        dEOvTRMssnymPeOhLE9u5FRN1x3k/OM=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-482-9Nb3WGG7PACLD9L03PSN1Q-1; Wed, 13 Apr 2022 23:58:16 -0400
+X-MC-Unique: 9Nb3WGG7PACLD9L03PSN1Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 687293806706;
+        Thu, 14 Apr 2022 03:58:16 +0000 (UTC)
+Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id E8E912166B4F;
+        Thu, 14 Apr 2022 03:57:59 +0000 (UTC)
+Date:   Thu, 14 Apr 2022 11:57:54 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        dm-devel@redhat.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH 5/8] dm: always setup ->orig_bio in alloc_io
+Message-ID: <YlebwjTKH2MU9tCD@T590>
+References: <20220412085616.1409626-1-ming.lei@redhat.com>
+ <20220412085616.1409626-6-ming.lei@redhat.com>
+ <YlXmmB6IO7usz2c1@redhat.com>
+ <YlYt2rzM0NBPARVp@T590>
+ <YlZp3+VrP930VjIQ@redhat.com>
+ <YlbBf0mJa/BPHSSq@T590>
+ <YlcPXslr6Y7cHOSU@redhat.com>
+ <Yldsqh2YsclXYl3s@T590>
+ <YleGKbZiHeBIJidI@redhat.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: [PATCH v2] scsi: target: tcmu: Fix possible data corruption
-Content-Language: en-US
-To:     kernel test robot <lkp@intel.com>, linux-scsi@vger.kernel.org,
-        target-devel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, linux-block@vger.kernel.org,
-        bostroesser@gmail.com
-References: <20220411135958.21385-1-xiaoguang.wang@linux.alibaba.com>
- <202204121450.qYzuKGXT-lkp@intel.com>
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-In-Reply-To: <202204121450.qYzuKGXT-lkp@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YleGKbZiHeBIJidI@redhat.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-hi,
+On Wed, Apr 13, 2022 at 10:25:45PM -0400, Mike Snitzer wrote:
+> On Wed, Apr 13 2022 at  8:36P -0400,
+> Ming Lei <ming.lei@redhat.com> wrote:
+> 
+> > On Wed, Apr 13, 2022 at 01:58:54PM -0400, Mike Snitzer wrote:
+> > > 
+> > > The bigger issue with this patch is that you've caused
+> > > dm_submit_bio_remap() to go back to accounting the entire original bio
+> > > before any split occurs.  That is a problem because you'll end up
+> > > accounting that bio for every split, so in split heavy workloads the
+> > > IO accounting won't reflect when the IO is actually issued and we'll
+> > > regress back to having very inaccurate and incorrect IO accounting for
+> > > dm_submit_bio_remap() heavy targets (e.g. dm-crypt).
+> > 
+> > Good catch, but we know the length of mapped part in original bio before
+> > calling __map_bio(), so io->sectors/io->offset_sector can be setup here,
+> > something like the following delta change should address it:
+> > 
+> > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+> > index db23efd6bbf6..06b554f3104b 100644
+> > --- a/drivers/md/dm.c
+> > +++ b/drivers/md/dm.c
+> > @@ -1558,6 +1558,13 @@ static int __split_and_process_bio(struct clone_info *ci)
+> >  
+> >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
+> >  	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
+> > +
+> > +	if (ci->sector_count > len) {
+> > +		/* setup the mapped part for accounting */
+> > +		dm_io_set_flag(ci->io, DM_IO_SPLITTED);
+> > +		ci->io->sectors = len;
+> > +		ci->io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
+> > +	}
+> >  	__map_bio(clone);
+> >  
+> >  	ci->sector += len;
+> > @@ -1603,11 +1610,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
+> >  	if (error || !ci.sector_count)
+> >  		goto out;
+> >  
+> > -	/* setup the mapped part for accounting */
+> > -	dm_io_set_flag(ci.io, DM_IO_SPLITTED);
+> > -	ci.io->sectors = bio_sectors(bio) - ci.sector_count;
+> > -	ci.io->sector_offset = bio_end_sector(bio) - bio->bi_iter.bi_sector;
+> > -
+> >  	bio_trim(bio, ci.io->sectors, ci.sector_count);
+> >  	trace_block_split(bio, bio->bi_iter.bi_sector);
+> >  	bio_inc_remaining(bio);
+> > 
+> > -- 
+> > Ming
+> > 
+> 
+> Unfortunately we do need splitting after __map_bio() because a dm
+> target's ->map can use dm_accept_partial_bio() to further reduce a
+> bio's mapped part.
+> 
+> But I think dm_accept_partial_bio() could be trained to update
+> tio->io->sectors?
 
-Thanks for this report, I'll add the Reported-by in V3 patch.
-But before sending V3, I'd like to wait tcmu maintainer to have a brief review.
+->orig_bio is just for serving io accounting, but ->orig_bio isn't
+passed to dm_accept_partial_bio(), and not gets updated after
+dm_accept_partial_bio() is called.
 
-Regards,
-Xiaoguang Wang
+If that is one issue, it must be one existed issue in dm io accounting
+since ->orig_bio isn't updated when dm_accept_partial_bio() is called.
 
-> Hi Xiaoguang,
->
-> Thank you for the patch! Perhaps something to improve:
->
-> [auto build test WARNING on jejb-scsi/for-next]
-> [also build test WARNING on v5.18-rc2 next-20220411]
-> [cannot apply to mkp-scsi/for-next]
-> [If your patch is applied to the wrong git tree, kindly drop us a note.
-> And when submitting patch, we suggest to use '--base' as documented in
-> https://git-scm.com/docs/git-format-patch]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Xiaoguang-Wang/scsi-target-tcmu-Fix-possible-data-corruption/20220411-220214
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/jejb/scsi.git for-next
-> config: x86_64-rhel-8.3-kselftests (https://download.01.org/0day-ci/archive/20220412/202204121450.qYzuKGXT-lkp@intel.com/config)
-> compiler: gcc-11 (Debian 11.2.0-19) 11.2.0
-> reproduce:
->         # apt-get install sparse
->         # sparse version: v0.6.4-dirty
->         # https://github.com/intel-lab-lkp/linux/commit/2bceb529129db286e111bc3bae0b52b62b1fba07
->         git remote add linux-review https://github.com/intel-lab-lkp/linux
->         git fetch --no-tags linux-review Xiaoguang-Wang/scsi-target-tcmu-Fix-possible-data-corruption/20220411-220214
->         git checkout 2bceb529129db286e111bc3bae0b52b62b1fba07
->         # save the config file to linux build tree
->         mkdir build_dir
->         make W=1 C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/target/
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
->
->
-> sparse warnings: (new ones prefixed by >>)
->>> drivers/target/target_core_user.c:1907:21: sparse: sparse: incorrect type in assignment (different base types) @@     expected int ret @@     got restricted vm_fault_t @@
->    drivers/target/target_core_user.c:1907:21: sparse:     expected int ret
->    drivers/target/target_core_user.c:1907:21: sparse:     got restricted vm_fault_t
->>> drivers/target/target_core_user.c:1911:16: sparse: sparse: incorrect type in return expression (different base types) @@     expected restricted vm_fault_t @@     got int ret @@
->    drivers/target/target_core_user.c:1911:16: sparse:     expected restricted vm_fault_t
->    drivers/target/target_core_user.c:1911:16: sparse:     got int ret
->
-> vim +1907 drivers/target/target_core_user.c
->
->   1874	
->   1875	static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
->   1876	{
->   1877		struct tcmu_dev *udev = vmf->vma->vm_private_data;
->   1878		struct uio_info *info = &udev->uio_info;
->   1879		struct page *page;
->   1880		unsigned long offset;
->   1881		void *addr;
->   1882		int ret = 0;
->   1883	
->   1884		int mi = tcmu_find_mem_index(vmf->vma);
->   1885		if (mi < 0)
->   1886			return VM_FAULT_SIGBUS;
->   1887	
->   1888		/*
->   1889		 * We need to subtract mi because userspace uses offset = N*PAGE_SIZE
->   1890		 * to use mem[N].
->   1891		 */
->   1892		offset = (vmf->pgoff - mi) << PAGE_SHIFT;
->   1893	
->   1894		if (offset < udev->data_off) {
->   1895			/* For the vmalloc()ed cmd area pages */
->   1896			addr = (void *)(unsigned long)info->mem[mi].addr + offset;
->   1897			page = vmalloc_to_page(addr);
->   1898			get_page(page);
->   1899		} else {
->   1900			uint32_t dpi;
->   1901	
->   1902			/* For the dynamically growing data area pages */
->   1903			dpi = (offset - udev->data_off) / PAGE_SIZE;
->   1904			page = tcmu_try_get_data_page(udev, dpi);
->   1905			if (!page)
->   1906				return VM_FAULT_SIGBUS;
->> 1907			ret = VM_FAULT_LOCKED;
->   1908		}
->   1909	
->   1910		vmf->page = page;
->> 1911		return ret;
->   1912	}
->   1913	
->
+So do we have to update it?
+
+> 
+> dm_accept_partial_bio() has been around for a long time, it keeps
+> growing BUG_ONs that are actually helpful to narrow its use to "normal
+> IO", so it should be OK.
+> 
+> Running 'make check' in a built cryptsetup source tree should be a
+> good test for DM target interface functionality.
+
+Care to share the test tree?
+
+> 
+> But there aren't automated tests for IO accounting correctness yet.
+
+I did verify io accounting by running dm-thin with blk-throttle, and the
+observed throughput is same with expected setting. Running both small bs
+and large bs, so non-split and split code path are covered.
+
+Maybe you can add this kind of test into dm io accounting automated test.
+
+
+Thanks,
+Ming
 
