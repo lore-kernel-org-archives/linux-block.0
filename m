@@ -2,193 +2,156 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12754C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 17:45:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EACC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 20:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233574AbiDNRsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 13:48:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41976 "EHLO
+        id S242193AbiDNUwP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 16:52:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344070AbiDNRsE (ORCPT
+        with ESMTP id S234573AbiDNUwM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 13:48:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 25E38EA343
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 10:45:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649958337;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=usx95EEwfrYdBbdBHcf5uEzhLX1K5ppp1W762nvmhf0=;
-        b=dXzl0PFYPE/mxeStexcdzgPqhLhcaPblbxh3tDbQjvgprkJlHlgQhyDTXkj/AxmBtza1D9
-        JN/uMXcVpWkhHapv5EISt0BpTG8dq5UD9Up0JSvm5NtunvfQQhPuWUzpPWwSz8wzTtajFq
-        dsQewp2UnmtZcN+KAIT8PduhpHJytRY=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-536-PebimWDyOpS7vGpCCl8pbw-1; Thu, 14 Apr 2022 13:45:36 -0400
-X-MC-Unique: PebimWDyOpS7vGpCCl8pbw-1
-Received: by mail-qk1-f198.google.com with SMTP id bi19-20020a05620a319300b0069c16295aabso3770178qkb.1
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 10:45:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=usx95EEwfrYdBbdBHcf5uEzhLX1K5ppp1W762nvmhf0=;
-        b=IWWhyP9bzIfrkDpqfUVccci2wKZXJdkCqHGnVS4GL7Z1ImCO7WxyT49GqQOUH5KVtY
-         KoAUQ1XpQND27wbuh2AxyrTQCzxTUX/YyMo0L9772BGUlNF8kqQbPWM4DQNuL2k/UPP2
-         9AtGJLpKMLg/59WjBllHmlzZIoLDp3jzGCSpBIMCxFBudS6gAe1kGxh4b7e1mkhR6dHM
-         DVlpX8V5BvIWZ2bilgO2QfCqXNfrcO8lSkC7vD9+yd0j1Hb214XoiVYKPlilnI81nAp/
-         8KxbZMDimZ3vJSH4pCHWNvOVWpC0SgR74r8WoknDpLFd1vLK/je9UwK6u8D3IAjDV57a
-         7okg==
-X-Gm-Message-State: AOAM530UUXuZ2Oq3uwrZzhTlM5EO9B8gzP1JSHLPbW9ozMpBfwhTzWbv
-        Cd00jfn3NJeC/8JZX10MVj4fuqK4bmcPsyU3ZaDEJWPsEVrMpzjDpFJHzXiz0OJ7T3EhM5QSMWa
-        KXCt+61mih5C6NUB9jmBPtg==
-X-Received: by 2002:a05:6214:1194:b0:444:45d6:d79d with SMTP id t20-20020a056214119400b0044445d6d79dmr4402764qvv.36.1649958335398;
-        Thu, 14 Apr 2022 10:45:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxUpya9rdf13D61nFewCk4EkHcslczh8V8fddHYZSzprOrc5xsK/HVlJwVz8wlvQvvDIaifCw==
-X-Received: by 2002:a05:6214:1194:b0:444:45d6:d79d with SMTP id t20-20020a056214119400b0044445d6d79dmr4402751qvv.36.1649958335179;
-        Thu, 14 Apr 2022 10:45:35 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id e126-20020a376984000000b0069c86b28524sm440264qkc.19.2022.04.14.10.45.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Apr 2022 10:45:34 -0700 (PDT)
-Date:   Thu, 14 Apr 2022 13:45:33 -0400
-From:   Mike Snitzer <snitzer@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 5/8] dm: always setup ->orig_bio in alloc_io
-Message-ID: <Ylhdvac5SY85r+1R@redhat.com>
-References: <20220412085616.1409626-1-ming.lei@redhat.com>
- <20220412085616.1409626-6-ming.lei@redhat.com>
- <YlXmmB6IO7usz2c1@redhat.com>
- <YlYt2rzM0NBPARVp@T590>
- <YlZp3+VrP930VjIQ@redhat.com>
- <YlbBf0mJa/BPHSSq@T590>
- <YlcPXslr6Y7cHOSU@redhat.com>
- <Yldsqh2YsclXYl3s@T590>
- <YleGKbZiHeBIJidI@redhat.com>
- <YlebwjTKH2MU9tCD@T590>
+        Thu, 14 Apr 2022 16:52:12 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A84B1286E1
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 13:49:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:
+        Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+        Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description;
+        bh=wbN6lyz0cg103/KWlQpucikbWmcexEtQWqY1CoPqHck=; b=2xT+mXPj1c6jHID3pt7aAnZRKS
+        pCoV59yogfaxa/0d4n3pGcxSjOLLU9t/fBmLARLlVG+4zNJxCOnXbZmuu7FG7jWpklh79avJfthkI
+        C1kg5mT99sWowl8rV79yZaP5l0keE+CRQgTcfIWfQ4aSdkMut2+CW75nP7PtMCdPbsWXMVMgBOdaf
+        bG3NlKynYl7bkOBfo4QFWOybjv/u2fvORIGuJUCAESQK898mMthNAbt3l9Ev2vWNxWDCieO+CKfur
+        xMvK8SgSqd1TBVN6x/22pFYKHwlBMCno8ccWXODepECAN6Sm7ecHXv4B1PuNBl0H9k0jmGpNIgoOA
+        5cdycy2A==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nf6PQ-007G6U-Qm; Thu, 14 Apr 2022 20:49:44 +0000
+Date:   Thu, 14 Apr 2022 13:49:44 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, mcgrof@kernel.org
+Subject: Re: blktests srp failures with a guest with kdevops on v5.17-rc7
+ removal
+Message-ID: <YliI6FPQsdr8jJDu@bombadil.infradead.org>
+References: <YldoSh6o5sbifsJf@bombadil.infradead.org>
+ <8db9ded3-ae12-3c56-5ac6-35ee9b9117bc@acm.org>
+ <Yldyy3ZSEbaTxwSj@bombadil.infradead.org>
+ <Yld0t1DeZdNBzMR+@bombadil.infradead.org>
+ <09020b99-fa20-fd6c-abbc-ba294049a025@acm.org>
+ <Yld5vMf8UUztgFjm@bombadil.infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YlebwjTKH2MU9tCD@T590>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <Yld5vMf8UUztgFjm@bombadil.infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 13 2022 at 11:57P -0400,
-Ming Lei <ming.lei@redhat.com> wrote:
+On Wed, Apr 13, 2022 at 06:32:44PM -0700, Luis Chamberlain wrote:
+> On Wed, Apr 13, 2022 at 06:22:05PM -0700, Bart Van Assche wrote:
+> > On 4/13/22 18:11, Luis Chamberlain wrote:
+> > > My exclusion list one-liner is getting longer, but hey, no crashes ye=
+t.
+> > >=20
+> > > i=3D0; while true; do use_siw=3D1 ./check -q srp -x srp/001 -x srp/00=
+5 -x srp/006 -x srp/011 -x srp/012 -x srp/013 ; if [[ $? -ne 0 ]]; then ech=
+o "BAD at $i"; break; else echo GOOOD $i ; fi; let i=3D$i+1; done;
+> >=20
+> > An exclusion list? Why? The SRP tests are stable. I think that all test
+> > failures indicate a kernel bug.
+>=20
+> Oh boy. OK. Well I get a failure on all tests unfortunately. I've only
+> gotten a kernel splat for the other test I mentioned and test 002 for
+> which I attach the respective dmesg. The other ones just eventually fail
+> if run in a loop.
 
-> On Wed, Apr 13, 2022 at 10:25:45PM -0400, Mike Snitzer wrote:
-> > On Wed, Apr 13 2022 at  8:36P -0400,
-> > Ming Lei <ming.lei@redhat.com> wrote:
-> > 
-> > > On Wed, Apr 13, 2022 at 01:58:54PM -0400, Mike Snitzer wrote:
-> > > > 
-> > > > The bigger issue with this patch is that you've caused
-> > > > dm_submit_bio_remap() to go back to accounting the entire original bio
-> > > > before any split occurs.  That is a problem because you'll end up
-> > > > accounting that bio for every split, so in split heavy workloads the
-> > > > IO accounting won't reflect when the IO is actually issued and we'll
-> > > > regress back to having very inaccurate and incorrect IO accounting for
-> > > > dm_submit_bio_remap() heavy targets (e.g. dm-crypt).
-> > > 
-> > > Good catch, but we know the length of mapped part in original bio before
-> > > calling __map_bio(), so io->sectors/io->offset_sector can be setup here,
-> > > something like the following delta change should address it:
-> > > 
-> > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > index db23efd6bbf6..06b554f3104b 100644
-> > > --- a/drivers/md/dm.c
-> > > +++ b/drivers/md/dm.c
-> > > @@ -1558,6 +1558,13 @@ static int __split_and_process_bio(struct clone_info *ci)
-> > >  
-> > >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
-> > >  	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> > > +
-> > > +	if (ci->sector_count > len) {
-> > > +		/* setup the mapped part for accounting */
-> > > +		dm_io_set_flag(ci->io, DM_IO_SPLITTED);
-> > > +		ci->io->sectors = len;
-> > > +		ci->io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
-> > > +	}
-> > >  	__map_bio(clone);
-> > >  
-> > >  	ci->sector += len;
-> > > @@ -1603,11 +1610,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
-> > >  	if (error || !ci.sector_count)
-> > >  		goto out;
-> > >  
-> > > -	/* setup the mapped part for accounting */
-> > > -	dm_io_set_flag(ci.io, DM_IO_SPLITTED);
-> > > -	ci.io->sectors = bio_sectors(bio) - ci.sector_count;
-> > > -	ci.io->sector_offset = bio_end_sector(bio) - bio->bi_iter.bi_sector;
-> > > -
-> > >  	bio_trim(bio, ci.io->sectors, ci.sector_count);
-> > >  	trace_block_split(bio, bio->bi_iter.bi_sector);
-> > >  	bio_inc_remaining(bio);
-> > > 
-> > > -- 
-> > > Ming
-> > > 
-> > 
-> > Unfortunately we do need splitting after __map_bio() because a dm
-> > target's ->map can use dm_accept_partial_bio() to further reduce a
-> > bio's mapped part.
-> > 
-> > But I think dm_accept_partial_bio() could be trained to update
-> > tio->io->sectors?
-> 
-> ->orig_bio is just for serving io accounting, but ->orig_bio isn't
-> passed to dm_accept_partial_bio(), and not gets updated after
-> dm_accept_partial_bio() is called.
-> 
-> If that is one issue, it must be one existed issue in dm io accounting
-> since ->orig_bio isn't updated when dm_accept_partial_bio() is called.
+The prior email didn't mail it to the list so I'm trimming the kernel
+log below to only the kernel warning so it at least gets archived and
+others get it.
 
-Recall that ->orig_bio is updated after the bio_split() at the bottom of
-dm_split_and_process_bio().
+[  171.959312] run blktests srp/002 at 2022-04-14 01:29:08
+[  172.177267] null_blk: module loaded
+[  172.257984] SoftiWARP attached
 
-That bio_split() is based on ci->sector_count, which is reduced as a
-side-effect of dm_accept_partial_bio() reducing tio->len_ptr.  It is
-pretty circuitous so I can absolutely understand why you didn't
-immediately appreciate the interface.  The block comment above
-dm_accept_partial_bio() does a pretty comprehensive job of explaining.
+<-- snip -->
+[  195.215244] ib_srp:srp_max_it_iu_len: ib_srp: max_iu_len =3D 8260
+[  195.218424] sd 3:0:0:2: [sdc] Attached SCSI disk
+[  195.218783] ------------[ cut here ]------------
+[  195.221242] WARNING: CPU: 7 PID: 201 at drivers/infiniband/sw/siw/siw_cm=
+=2Ec:255 siw_cep_put+0x125/0x130 [siw]
+[  195.222838] Modules linked in: ib_srp(E) scsi_transport_srp(E) target_co=
+re_pscsi(E) target_core_file(E) ib_srpt(E) target_core_iblock(E) target_cor=
+e_mod(E) rdma_cm(E) iw_cm(E) ib_cm(E) scsi_debug(E) siw(E) null_blk(E) ib_u=
+mad(E) ib_uverbs(E) sd_mod(E) sg(E) dm_service_time(E) scsi_dh_rdac(E) scsi=
+_dh_emc(E) scsi_dh_alua(E) dm_multipath(E) ib_core(E) dm_mod(E) nvme_fabric=
+s(E) kvm_intel(E) kvm(E) irqbypass(E) crct10dif_pclmul(E) ghash_clmulni_int=
+el(E) aesni_intel(E) crypto_simd(E) cryptd(E) joydev(E) evdev(E) serio_raw(=
+E) cirrus(E) drm_shmem_helper(E) drm_kms_helper(E) virtio_balloon(E) cec(E)=
+ i6300esb(E) button(E) drm(E) configfs(E) ip_tables(E) x_tables(E) autofs4(=
+E) ext4(E) crc16(E) mbcache(E) jbd2(E) btrfs(E) blake2b_generic(E) xor(E) r=
+aid6_pq(E) zstd_compress(E) libcrc32c(E) crc32c_generic(E) virtio_net(E) ne=
+t_failover(E) failover(E) virtio_blk(E) ata_generic(E) uhci_hcd(E) ehci_hcd=
+(E) crc32_pclmul(E) crc32c_intel(E) ata_piix(E) psmouse(E) nvme(E) libata(E=
+) virtio_pci(E)
+[  195.222986]  virtio_pci_legacy_dev(E) virtio_pci_modern_dev(E) usbcore(E=
+) virtio(E) usb_common(E) scsi_mod(E) nvme_core(E) i2c_piix4(E) virtio_ring=
+(E) t10_pi(E) scsi_common(E) [last unloaded: null_blk]
+[  195.241036] sd 3:0:0:1: [sdd] Attached SCSI disk
+[  195.241188] CPU: 2 PID: 201 Comm: kworker/u16:22 Kdump: loaded Tainted: =
+G            E     5.17.0-rc7 #1
+[  195.246053] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
+1.15.0-1 04/01/2014
+[  195.249123] Workqueue: iw_cm_wq cm_work_handler [iw_cm]
+[  195.251274] RIP: 0010:siw_cep_put+0x125/0x130 [siw]
+[  195.253548] Code: bb c0 e8 ae 74 0f d7 48 89 ef 5d 41 5c 41 5d e9 b1 d6 =
+ef d6 5d be 03 00 00 00 41 5c 41 5d e9 22 b7 0c d7 0f 0b e9 f3 fe ff ff <0f=
+> 0b e9 1c ff ff ff 0f 1f 40 00 0f 1f 44 00 00 55 48 8d 6f 20 53
+[  195.258982] RSP: 0018:ffffbc53404ebc98 EFLAGS: 00010286
+[  195.261018] RAX: 0000000000000001 RBX: 0000000000000000 RCX: 00000000000=
+00000
+[  195.263569] RDX: 0000000000000001 RSI: 0000000000000246 RDI: ffffa03d110=
+2a924
+[  195.266151] RBP: ffffa03d1102a900 R08: ffffa03d1102a920 R09: ffffbc53404=
+ebc50
+[  195.269150] R10: ffffffff98a060e0 R11: 0000000000000000 R12: ffffa03cc42=
+97000
+[  195.272744] R13: ffffa03d2a48aea0 R14: ffffa03d2a48ae78 R15: ffffa03cc42=
+7ad58
+[  195.275575] FS:  0000000000000000(0000) GS:ffffa03df7c80000(0000) knlGS:=
+0000000000000000
+[  195.278932] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  195.280963] CR2: 00005590bc2e4fe8 CR3: 000000008500a004 CR4: 00000000007=
+70ee0
+[  195.282803] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 00000000000=
+00000
+[  195.284650] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 00000000000=
+00400
+[  195.286522] PKRU: 55555554
+[  195.287998] Call Trace:
+[  195.289210]  <TASK>
+[  195.290969]  siw_reject+0xac/0x180 [siw]
+[  195.292679]  iw_cm_reject+0x68/0xc0 [iw_cm]
+[  195.294136]  cm_work_handler+0x59d/0xe20 [iw_cm]
+[  195.295588]  process_one_work+0x1e2/0x3b0
+[  195.298338]  worker_thread+0x50/0x3a0
+[  195.300330]  ? rescuer_thread+0x390/0x390
+[  195.302269]  kthread+0xe5/0x110
+[  195.304062]  ? kthread_complete_and_exit+0x20/0x20
+[  195.307612]  ret_from_fork+0x1f/0x30
+[  195.309585]  </TASK>
+[  195.310674] ---[ end trace 0000000000000000 ]---
+[  195.313290] scsi host4: ib_srp: REJ received
+[  195.313293] scsi host4:   REJ reason 0xffffff98
+[  195.315433] scsi host4: ib_srp: Connection 0/8 to 172.17.8.113 failed
+[  195.472718] ib_srp:srp_parse_in: ib_srp: 172.17.8.113 -> 172.17.8.113:0
+[  195.472739] ib_srp:srp_parse_in: ib_srp: 172.17.8.113:5555 -> 172.17.8.1=
+13:5555
+[  195.472807] ib_srp:srp_parse_in: ib_srp: [fe80::5054:ff:fe5b:90dc%3] -> =
+[fe80::5054:ff:fe5b:90dc]:0/202442865%3
 
-But basically dm_accept_partial_bio() provides DM targets access to
-control DM core's splitting if they find that they cannot accommodate
-the entirety of the clone bio that is sent to their ->map.
-dm_accept_partial_bio() may only ever be called from a target's ->map
+<-- snip -->
 
-> So do we have to update it?
-> 
-> > 
-> > dm_accept_partial_bio() has been around for a long time, it keeps
-> > growing BUG_ONs that are actually helpful to narrow its use to "normal
-> > IO", so it should be OK.
-> > 
-> > Running 'make check' in a built cryptsetup source tree should be a
-> > good test for DM target interface functionality.
-> 
-> Care to share the test tree?
-
-https://gitlab.com/cryptsetup/cryptsetup.git
-
-> 
-> > 
-> > But there aren't automated tests for IO accounting correctness yet.
-> 
-> I did verify io accounting by running dm-thin with blk-throttle, and the
-> observed throughput is same with expected setting. Running both small bs
-> and large bs, so non-split and split code path are covered.
-> 
-> Maybe you can add this kind of test into dm io accounting automated test.
-
-Yeah, something like that would be good.
-
-Mike
-
+  Luis
