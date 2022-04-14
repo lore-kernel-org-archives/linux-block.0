@@ -2,170 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50121C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 22:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B33CC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 22:41:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346954AbiDNWJC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 18:09:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56718 "EHLO
+        id S1347078AbiDNWoG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 18:44:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238969AbiDNWIv (ORCPT
+        with ESMTP id S1347077AbiDNWoF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 18:08:51 -0400
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E5EB53FA
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 15:06:04 -0700 (PDT)
-Received: by mail-pg1-f177.google.com with SMTP id 125so5920888pgc.11
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 15:06:03 -0700 (PDT)
+        Thu, 14 Apr 2022 18:44:05 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D843513D60
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 15:41:39 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id h16-20020a056902009000b00628a70584b2so5445454ybs.6
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 15:41:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=rAQUyFFCAm9hAIpMthk09aJ6bzB1j1wIgJVRYFh3f58=;
+        b=E3GbblU9eh7nB1JiPymsjFnwzoT6TbQMf8ldul6KS4xO2fQSx1uK7JVhfC4can/CSz
+         7V3LtWsBoV+qeu9UUPZaLqIeOXV5EyYsNzOkhQTey1XvrEyokJJ9QU5U+uLqMhdgZtbp
+         p9yBKq2F+QtfzHyUFMsCjoo6rUMGGkcTpV3of2gXzgwOnyDUXdpqlzV03XFTgetPnHte
+         hPHGZIlI+HqWxTTk19bBAEzEPP6x9R92M6n5jSuGU3sHRHY69QwA0MTCGQKiMFRPpuG2
+         Y8ARNaB2Czz6794TSC/U4ORN2ewJpmEP0d03K7ypNDwXgC455icI9HQupJDXoB9fThr6
+         9v7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=eevggjw2OxTmUqOECOpSHGkAhYOGJApD2ziGElXblPA=;
-        b=MsGKC/hVtJW7DBvqgM4MfzzTpYWBoUyV651hzB1+Jo46QOXKxdCVhdyn1hX4X76AAs
-         at/SMHa+mObDB6Xju3aLuGVmVvYU9lAQNEj/9uXph/ahvEz5pjz2NiTniNvL/G4gq6Ha
-         zu6LUn2SATFhPjA12ixuu4UWILmQBF7Ewu0MGAO4QU6tNg0B6EvZtnpWwn4d7YkiHQFU
-         s7yNk8IRAmwMP9gbS/zPVuOoaBdk59vyvdsCE+2/bpNp8PB+CKp5xatqR0pK1v7eSnCw
-         NMkEC6gqwrKrQvUo5aSa12MAHNgAU0lop8Q7ig+fhvt9IwlXXwcP7NJIKT7uBd9+KEkH
-         w+OQ==
-X-Gm-Message-State: AOAM533oEwaGVKY27/JRY4AM85/ph5ZoiCyJuuh2uCCfOEq6nPqxpeNw
-        QfnOn5Ac5SW3eVpD3ZmvSigUMqrRYwC2qA==
-X-Google-Smtp-Source: ABdhPJxIysStK9fqGY+0gKP8GE1nUg9XBp2TYXRtBwpnOllxTLne9EumNQqsnIr/EWaCLoPfExuuog==
-X-Received: by 2002:a65:4185:0:b0:399:4c59:e3b1 with SMTP id a5-20020a654185000000b003994c59e3b1mr3894256pgq.154.1649973963101;
-        Thu, 14 Apr 2022 15:06:03 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:b0b3:691d:9b49:7717? ([2620:15c:211:201:b0b3:691d:9b49:7717])
-        by smtp.gmail.com with ESMTPSA id p13-20020a056a000b4d00b004faecee6e89sm765284pfo.208.2022.04.14.15.06.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Apr 2022 15:06:02 -0700 (PDT)
-Message-ID: <ae78751b-ff42-ab37-1eeb-06c4cdecfc40@acm.org>
-Date:   Thu, 14 Apr 2022 15:06:00 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: blktests srp failures with a guest with kdevops on v5.17-rc7
- removal
-Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-block@vger.kernel.org
-References: <YldoSh6o5sbifsJf@bombadil.infradead.org>
- <8db9ded3-ae12-3c56-5ac6-35ee9b9117bc@acm.org>
- <Yldyy3ZSEbaTxwSj@bombadil.infradead.org>
- <Yld0t1DeZdNBzMR+@bombadil.infradead.org>
- <09020b99-fa20-fd6c-abbc-ba294049a025@acm.org>
- <Yld5vMf8UUztgFjm@bombadil.infradead.org>
- <YliI6FPQsdr8jJDu@bombadil.infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <YliI6FPQsdr8jJDu@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=rAQUyFFCAm9hAIpMthk09aJ6bzB1j1wIgJVRYFh3f58=;
+        b=stsTckGzxO721neNpK5mnZ6y0JFYkTWWBhKpkVil5bI+HzlFgJMQX4DtPn3AdCfNH2
+         zHjuNnDrl0gcT7Kq3e82Lr1kl9gmpLumEysM4n2wh8b/e/BMkd1HBXgUCDSz2k89HgZ2
+         j4z/fQ+chKJ1kGMFNfEy2/2UoXwU17aQxVcGFww1d6IT5E6CwSzO6LVy1x4gTMAscJ1T
+         NtJfzsgy7fn3C9hfTHDCCy/wwkuxvxfkssC/uMlsJSa8ZIjPDStsv2pIS7n+E/zii2i1
+         19RqB8524an2e+xUBxBXQyJokSzimd7+p8gz1HxTLww4UTV2AMJbOwgwAM5poibe8dUR
+         ma/A==
+X-Gm-Message-State: AOAM533ZqH8mlI+PVm/ZFCXhh6U1qVUq99xY5/qjLVy6Rk02om5CiVj1
+        ZJqZFCow8cY+J0cHEJhYrwWoASL8lw8=
+X-Google-Smtp-Source: ABdhPJyPRB6aS2hvABaRs4E8OHt+HsAC7x01q5HuMRBlfWdcx4tIhTOoY3h76+73rpRKld3Mv/x1LMEEXx8=
+X-Received: from khazhy-linux.svl.corp.google.com ([2620:15c:2cd:202:a4e5:c402:edee:ce9e])
+ (user=khazhy job=sendgmr) by 2002:a81:9ca:0:b0:2eb:f567:217f with SMTP id
+ 193-20020a8109ca000000b002ebf567217fmr3782016ywj.322.1649976099028; Thu, 14
+ Apr 2022 15:41:39 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 15:40:56 -0700
+In-Reply-To: <20220408234707.2562835-1-khazhy@google.com>
+Message-Id: <20220414224056.2875681-1-khazhy@google.com>
+Mime-Version: 1.0
+References: <20220408234707.2562835-1-khazhy@google.com>
+X-Mailer: git-send-email 2.36.0.rc0.470.gd361397f0d-goog
+Subject: [PATCH v2] block/compat_ioctl: fix range check in BLKGETSIZE
+From:   Khazhismel Kumykov <khazhy@google.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Khazhismel Kumykov <khazhy@google.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNC8xNC8yMiAxMzo0OSwgTHVpcyBDaGFtYmVybGFpbiB3cm90ZToNCj4gT24gV2VkLCBB
-cHIgMTMsIDIwMjIgYXQgMDY6MzI6NDRQTSAtMDcwMCwgTHVpcyBDaGFtYmVybGFpbiB3cm90
-ZToNCj4+IE9uIFdlZCwgQXByIDEzLCAyMDIyIGF0IDA2OjIyOjA1UE0gLTA3MDAsIEJhcnQg
-VmFuIEFzc2NoZSB3cm90ZToNCj4+PiBPbiA0LzEzLzIyIDE4OjExLCBMdWlzIENoYW1iZXJs
-YWluIHdyb3RlOg0KPj4+PiBNeSBleGNsdXNpb24gbGlzdCBvbmUtbGluZXIgaXMgZ2V0dGlu
-ZyBsb25nZXIsIGJ1dCBoZXksIG5vIGNyYXNoZXMgeWV0Lg0KPj4+Pg0KPj4+PiBpPTA7IHdo
-aWxlIHRydWU7IGRvIHVzZV9zaXc9MSAuL2NoZWNrIC1xIHNycCAteCBzcnAvMDAxIC14IHNy
-cC8wMDUgLXggc3JwLzAwNiAteCBzcnAvMDExIC14IHNycC8wMTIgLXggc3JwLzAxMyA7IGlm
-IFtbICQ/IC1uZSAwIF1dOyB0aGVuIGVjaG8gIkJBRCBhdCAkaSI7IGJyZWFrOyBlbHNlIGVj
-aG8gR09PT0QgJGkgOyBmaTsgbGV0IGk9JGkrMTsgZG9uZTsNCj4+Pg0KPj4+IEFuIGV4Y2x1
-c2lvbiBsaXN0PyBXaHk/IFRoZSBTUlAgdGVzdHMgYXJlIHN0YWJsZS4gSSB0aGluayB0aGF0
-IGFsbCB0ZXN0DQo+Pj4gZmFpbHVyZXMgaW5kaWNhdGUgYSBrZXJuZWwgYnVnLg0KPj4NCj4+
-IE9oIGJveS4gT0suIFdlbGwgSSBnZXQgYSBmYWlsdXJlIG9uIGFsbCB0ZXN0cyB1bmZvcnR1
-bmF0ZWx5LiBJJ3ZlIG9ubHkNCj4+IGdvdHRlbiBhIGtlcm5lbCBzcGxhdCBmb3IgdGhlIG90
-aGVyIHRlc3QgSSBtZW50aW9uZWQgYW5kIHRlc3QgMDAyIGZvcg0KPj4gd2hpY2ggSSBhdHRh
-Y2ggdGhlIHJlc3BlY3RpdmUgZG1lc2cuIFRoZSBvdGhlciBvbmVzIGp1c3QgZXZlbnR1YWxs
-eSBmYWlsDQo+PiBpZiBydW4gaW4gYSBsb29wLg0KPiANCj4gVGhlIHByaW9yIGVtYWlsIGRp
-ZG4ndCBtYWlsIGl0IHRvIHRoZSBsaXN0IHNvIEknbSB0cmltbWluZyB0aGUga2VybmVsDQo+
-IGxvZyBiZWxvdyB0byBvbmx5IHRoZSBrZXJuZWwgd2FybmluZyBzbyBpdCBhdCBsZWFzdCBn
-ZXRzIGFyY2hpdmVkIGFuZA0KPiBvdGhlcnMgZ2V0IGl0Lg0KPiANCj4gWyAgMTcxLjk1OTMx
-Ml0gcnVuIGJsa3Rlc3RzIHNycC8wMDIgYXQgMjAyMi0wNC0xNCAwMToyOTowOA0KPiBbICAx
-NzIuMTc3MjY3XSBudWxsX2JsazogbW9kdWxlIGxvYWRlZA0KPiBbICAxNzIuMjU3OTg0XSBT
-b2Z0aVdBUlAgYXR0YWNoZWQNCj4gDQo+IDwtLSBzbmlwIC0tPg0KPiBbICAxOTUuMjE1MjQ0
-XSBpYl9zcnA6c3JwX21heF9pdF9pdV9sZW46IGliX3NycDogbWF4X2l1X2xlbiA9IDgyNjAN
-Cj4gWyAgMTk1LjIxODQyNF0gc2QgMzowOjA6MjogW3NkY10gQXR0YWNoZWQgU0NTSSBkaXNr
-DQo+IFsgIDE5NS4yMTg3ODNdIC0tLS0tLS0tLS0tLVsgY3V0IGhlcmUgXS0tLS0tLS0tLS0t
-LQ0KPiBbICAxOTUuMjIxMjQyXSBXQVJOSU5HOiBDUFU6IDcgUElEOiAyMDEgYXQgZHJpdmVy
-cy9pbmZpbmliYW5kL3N3L3Npdy9zaXdfY20uYzoyNTUgc2l3X2NlcF9wdXQrMHgxMjUvMHgx
-MzAgW3Npd10NCj4gWyAgMTk1LjIyMjgzOF0gTW9kdWxlcyBsaW5rZWQgaW46IGliX3NycChF
-KSBzY3NpX3RyYW5zcG9ydF9zcnAoRSkgdGFyZ2V0X2NvcmVfcHNjc2koRSkgdGFyZ2V0X2Nv
-cmVfZmlsZShFKSBpYl9zcnB0KEUpIHRhcmdldF9jb3JlX2libG9jayhFKSB0YXJnZXRfY29y
-ZV9tb2QoRSkgcmRtYV9jbShFKSBpd19jbShFKSBpYl9jbShFKSBzY3NpX2RlYnVnKEUpIHNp
-dyhFKSBudWxsX2JsayhFKSBpYl91bWFkKEUpIGliX3V2ZXJicyhFKSBzZF9tb2QoRSkgc2co
-RSkgZG1fc2VydmljZV90aW1lKEUpIHNjc2lfZGhfcmRhYyhFKSBzY3NpX2RoX2VtYyhFKSBz
-Y3NpX2RoX2FsdWEoRSkgZG1fbXVsdGlwYXRoKEUpIGliX2NvcmUoRSkgZG1fbW9kKEUpIG52
-bWVfZmFicmljcyhFKSBrdm1faW50ZWwoRSkga3ZtKEUpIGlycWJ5cGFzcyhFKSBjcmN0MTBk
-aWZfcGNsbXVsKEUpIGdoYXNoX2NsbXVsbmlfaW50ZWwoRSkgYWVzbmlfaW50ZWwoRSkgY3J5
-cHRvX3NpbWQoRSkgY3J5cHRkKEUpIGpveWRldihFKSBldmRldihFKSBzZXJpb19yYXcoRSkg
-Y2lycnVzKEUpIGRybV9zaG1lbV9oZWxwZXIoRSkgZHJtX2ttc19oZWxwZXIoRSkgdmlydGlv
-X2JhbGxvb24oRSkgY2VjKEUpIGk2MzAwZXNiKEUpIGJ1dHRvbihFKSBkcm0oRSkgY29uZmln
-ZnMoRSkgaXBfdGFibGVzKEUpIHhfdGFibGVzKEUpIGF1dG9mczQoRSkgZXh0NChFKSBjcmMx
-NihFKSBtYmNhY2hlKEUpIGpiZDIoRSkgYnRyZnMoRSkgYmxha2UyYl9nZW5lcmljKEUpIHhv
-cihFKSByYWlkNl9wcShFKSB6c3RkX2NvbXByZXNzKEUpIGxpYmNyYzMyYyhFKSBjcmMzMmNf
-Z2VuZXJpYyhFKSB2aXJ0aW9fbmV0KEUpIG5ldF9mYWlsb3ZlcihFKSBmYWlsb3ZlcihFKSB2
-aXJ0aW9fYmxrKEUpIGF0YV9nZW5lcmljKEUpIHVoY2lfaGNkKEUpIGVoY2lfaGNkKEUpIGNy
-YzMyX3BjbG11bChFKSBjcmMzMmNfaW50ZWwoRSkgYXRhX3BpaXgoRSkgcHNtb3VzZShFKSBu
-dm1lKEUpIGxpYmF0YShFKSB2aXJ0aW9fcGNpKEUpDQo+IFsgIDE5NS4yMjI5ODZdICB2aXJ0
-aW9fcGNpX2xlZ2FjeV9kZXYoRSkgdmlydGlvX3BjaV9tb2Rlcm5fZGV2KEUpIHVzYmNvcmUo
-RSkgdmlydGlvKEUpIHVzYl9jb21tb24oRSkgc2NzaV9tb2QoRSkgbnZtZV9jb3JlKEUpIGky
-Y19waWl4NChFKSB2aXJ0aW9fcmluZyhFKSB0MTBfcGkoRSkgc2NzaV9jb21tb24oRSkgW2xh
-c3QgdW5sb2FkZWQ6IG51bGxfYmxrXQ0KPiBbICAxOTUuMjQxMDM2XSBzZCAzOjA6MDoxOiBb
-c2RkXSBBdHRhY2hlZCBTQ1NJIGRpc2sNCj4gWyAgMTk1LjI0MTE4OF0gQ1BVOiAyIFBJRDog
-MjAxIENvbW06IGt3b3JrZXIvdTE2OjIyIEtkdW1wOiBsb2FkZWQgVGFpbnRlZDogRyAgICAg
-ICAgICAgIEUgICAgIDUuMTcuMC1yYzcgIzENCj4gWyAgMTk1LjI0NjA1M10gSGFyZHdhcmUg
-bmFtZTogUUVNVSBTdGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwgMTk5NiksIEJJT1MgMS4x
-NS4wLTEgMDQvMDEvMjAxNA0KPiBbICAxOTUuMjQ5MTIzXSBXb3JrcXVldWU6IGl3X2NtX3dx
-IGNtX3dvcmtfaGFuZGxlciBbaXdfY21dDQo+IFsgIDE5NS4yNTEyNzRdIFJJUDogMDAxMDpz
-aXdfY2VwX3B1dCsweDEyNS8weDEzMCBbc2l3XQ0KPiBbICAxOTUuMjUzNTQ4XSBDb2RlOiBi
-YiBjMCBlOCBhZSA3NCAwZiBkNyA0OCA4OSBlZiA1ZCA0MSA1YyA0MSA1ZCBlOSBiMSBkNiBl
-ZiBkNiA1ZCBiZSAwMyAwMCAwMCAwMCA0MSA1YyA0MSA1ZCBlOSAyMiBiNyAwYyBkNyAwZiAw
-YiBlOSBmMyBmZSBmZiBmZiA8MGY+IDBiIGU5IDFjIGZmIGZmIGZmIDBmIDFmIDQwIDAwIDBm
-IDFmIDQ0IDAwIDAwIDU1IDQ4IDhkIDZmIDIwIDUzDQo+IFsgIDE5NS4yNTg5ODJdIFJTUDog
-MDAxODpmZmZmYmM1MzQwNGViYzk4IEVGTEFHUzogMDAwMTAyODYNCj4gWyAgMTk1LjI2MTAx
-OF0gUkFYOiAwMDAwMDAwMDAwMDAwMDAxIFJCWDogMDAwMDAwMDAwMDAwMDAwMCBSQ1g6IDAw
-MDAwMDAwMDAwMDAwMDANCj4gWyAgMTk1LjI2MzU2OV0gUkRYOiAwMDAwMDAwMDAwMDAwMDAx
-IFJTSTogMDAwMDAwMDAwMDAwMDI0NiBSREk6IGZmZmZhMDNkMTEwMmE5MjQNCj4gWyAgMTk1
-LjI2NjE1MV0gUkJQOiBmZmZmYTAzZDExMDJhOTAwIFIwODogZmZmZmEwM2QxMTAyYTkyMCBS
-MDk6IGZmZmZiYzUzNDA0ZWJjNTANCj4gWyAgMTk1LjI2OTE1MF0gUjEwOiBmZmZmZmZmZjk4
-YTA2MGUwIFIxMTogMDAwMDAwMDAwMDAwMDAwMCBSMTI6IGZmZmZhMDNjYzQyOTcwMDANCj4g
-WyAgMTk1LjI3Mjc0NF0gUjEzOiBmZmZmYTAzZDJhNDhhZWEwIFIxNDogZmZmZmEwM2QyYTQ4
-YWU3OCBSMTU6IGZmZmZhMDNjYzQyN2FkNTgNCj4gWyAgMTk1LjI3NTU3NV0gRlM6ICAwMDAw
-MDAwMDAwMDAwMDAwKDAwMDApIEdTOmZmZmZhMDNkZjdjODAwMDAoMDAwMCkga25sR1M6MDAw
-MDAwMDAwMDAwMDAwMA0KPiBbICAxOTUuMjc4OTMyXSBDUzogIDAwMTAgRFM6IDAwMDAgRVM6
-IDAwMDAgQ1IwOiAwMDAwMDAwMDgwMDUwMDMzDQo+IFsgIDE5NS4yODA5NjNdIENSMjogMDAw
-MDU1OTBiYzJlNGZlOCBDUjM6IDAwMDAwMDAwODUwMGEwMDQgQ1I0OiAwMDAwMDAwMDAwNzcw
-ZWUwDQo+IFsgIDE5NS4yODI4MDNdIERSMDogMDAwMDAwMDAwMDAwMDAwMCBEUjE6IDAwMDAw
-MDAwMDAwMDAwMDAgRFIyOiAwMDAwMDAwMDAwMDAwMDAwDQo+IFsgIDE5NS4yODQ2NTBdIERS
-MzogMDAwMDAwMDAwMDAwMDAwMCBEUjY6IDAwMDAwMDAwZmZmZTBmZjAgRFI3OiAwMDAwMDAw
-MDAwMDAwNDAwDQo+IFsgIDE5NS4yODY1MjJdIFBLUlU6IDU1NTU1NTU0DQo+IFsgIDE5NS4y
-ODc5OThdIENhbGwgVHJhY2U6DQo+IFsgIDE5NS4yODkyMTBdICA8VEFTSz4NCj4gWyAgMTk1
-LjI5MDk2OV0gIHNpd19yZWplY3QrMHhhYy8weDE4MCBbc2l3XQ0KPiBbICAxOTUuMjkyNjc5
-XSAgaXdfY21fcmVqZWN0KzB4NjgvMHhjMCBbaXdfY21dDQo+IFsgIDE5NS4yOTQxMzZdICBj
-bV93b3JrX2hhbmRsZXIrMHg1OWQvMHhlMjAgW2l3X2NtXQ0KPiBbICAxOTUuMjk1NTg4XSAg
-cHJvY2Vzc19vbmVfd29yaysweDFlMi8weDNiMA0KPiBbICAxOTUuMjk4MzM4XSAgd29ya2Vy
-X3RocmVhZCsweDUwLzB4M2EwDQo+IFsgIDE5NS4zMDAzMzBdICA/IHJlc2N1ZXJfdGhyZWFk
-KzB4MzkwLzB4MzkwDQo+IFsgIDE5NS4zMDIyNjldICBrdGhyZWFkKzB4ZTUvMHgxMTANCj4g
-WyAgMTk1LjMwNDA2Ml0gID8ga3RocmVhZF9jb21wbGV0ZV9hbmRfZXhpdCsweDIwLzB4MjAN
-Cj4gWyAgMTk1LjMwNzYxMl0gIHJldF9mcm9tX2ZvcmsrMHgxZi8weDMwDQo+IFsgIDE5NS4z
-MDk1ODVdICA8L1RBU0s+DQo+IFsgIDE5NS4zMTA2NzRdIC0tLVsgZW5kIHRyYWNlIDAwMDAw
-MDAwMDAwMDAwMDAgXS0tLQ0KPiBbICAxOTUuMzEzMjkwXSBzY3NpIGhvc3Q0OiBpYl9zcnA6
-IFJFSiByZWNlaXZlZA0KPiBbICAxOTUuMzEzMjkzXSBzY3NpIGhvc3Q0OiAgIFJFSiByZWFz
-b24gMHhmZmZmZmY5OA0KPiBbICAxOTUuMzE1NDMzXSBzY3NpIGhvc3Q0OiBpYl9zcnA6IENv
-bm5lY3Rpb24gMC84IHRvIDE3Mi4xNy44LjExMyBmYWlsZWQNCj4gWyAgMTk1LjQ3MjcxOF0g
-aWJfc3JwOnNycF9wYXJzZV9pbjogaWJfc3JwOiAxNzIuMTcuOC4xMTMgLT4gMTcyLjE3Ljgu
-MTEzOjANCj4gWyAgMTk1LjQ3MjczOV0gaWJfc3JwOnNycF9wYXJzZV9pbjogaWJfc3JwOiAx
-NzIuMTcuOC4xMTM6NTU1NSAtPiAxNzIuMTcuOC4xMTM6NTU1NQ0KPiBbICAxOTUuNDcyODA3
-XSBpYl9zcnA6c3JwX3BhcnNlX2luOiBpYl9zcnA6IFtmZTgwOjo1MDU0OmZmOmZlNWI6OTBk
-YyUzXSAtPiBbZmU4MDo6NTA1NDpmZjpmZTViOjkwZGNdOjAvMjAyNDQyODY1JTMNCg0KVGhp
-cyBpcyB1bmV4cGVjdGVkIC0gSSBoYWQgbm90IHlldCBzZWVuIHRoZSBhYm92ZSBtZXNzYWdl
-IHdoaWxlIHJ1bm5pbmcgDQp0aGUgU1JQIHRlc3RzLiBIb3cgYWJvdXQgcG9zdGluZyB0aGUg
-YWJvdmUgcmVwb3J0IG9uIHRoZSBsaW51eC1yZG1hIA0KbWFpbGluZyBsaXN0IGFuZCBDYy1p
-bmcgdGhlIFNvZnQtaVdBUlAgbWFpbnRhaW5lcj8NCg0KUFM6IGEgZml4IGZvciB0aGUgdjUu
-MTgtcmMxIHJkbWFfcnhlIGRyaXZlciBpcyB1bmRlciBkZXZlbG9wbWVudC4gU2VlIA0KYWxz
-byANCmh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LXJkbWEvMjAyMjA0MTQxNjE4NDYu
-R002NDcwNkB6aWVwZS5jYS9ULyNtYjc2NWM4NzA4NDM3ZDZlMzEzNzY2YTg5ZDZjNmU5YjEw
-M2I4ZDU0Ng0KDQpUaGFua3MsDQoNCkJhcnQuDQo=
+kernel ulong and compat_ulong_t may not be same width. Use type directly
+to eliminate mismatches.
+
+This would result in truncation rather than EFBIG for 32bit mode for
+large disks.
+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+---
+ block/ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+v2: addressed bart's comment
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4a86340133e4..f8703db99c73 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -629,7 +629,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		return compat_put_long(argp,
+ 			(bdev->bd_disk->bdi->ra_pages * PAGE_SIZE) / 512);
+ 	case BLKGETSIZE:
+-		if (bdev_nr_sectors(bdev) > ~0UL)
++		if (bdev_nr_sectors(bdev) > ~(compat_ulong_t)0)
+ 			return -EFBIG;
+ 		return compat_put_ulong(argp, bdev_nr_sectors(bdev));
+ 
+-- 
+2.36.0.rc0.470.gd361397f0d-goog
+
