@@ -2,99 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38512C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 06:37:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADF1C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 14 Apr 2022 08:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229989AbiDNGjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 02:39:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34624 "EHLO
+        id S231520AbiDNIrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 04:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234478AbiDNGjV (ORCPT
+        with ESMTP id S241086AbiDNIrS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 02:39:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 242F450B1B
-        for <linux-block@vger.kernel.org>; Wed, 13 Apr 2022 23:36:57 -0700 (PDT)
+        Thu, 14 Apr 2022 04:47:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A99D763535
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 01:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649918216;
+        s=mimecast20190719; t=1649925893;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding;
-        bh=YsKS+gtQCw9gSuuCeDFIBxhgvPXSvy6sfDZyth/Ynrk=;
-        b=II+xnOpKWAonAr8bprM6k04b/EWvVp6D3A1ISWCHsFfwEY2B76kXoyzNRuTP4JoyrKqFcA
-        6hiSQ3F9SIUJ2ssixBoKYsw9yPfAr98ZMw+/tlJYGWhsZHH0vq+w2O74luNjWtQByc/8/h
-        MC0G6M1lc/b8DBU1YuuHhO6iMqUHpuU=
+        bh=f3UmWTwLzb0GS2SVV2SavmD1XZ3p7xpzqKW1TUrCWCA=;
+        b=gV5vvekKaWQujeC1iHtqhxCz2M3L3akG3KIotaJyCLLaD8O+taPySazfNXqCNBsV3Q1O89
+        7tnOAQkdpYtXGqTX4yh5qVGo5ZbHleresC0iD93SEYlbBzBqySLu31NN+Hmd+on1iC7nEX
+        p/x1HuqNLg6aZp9CTD3Mw+XYaAm1i/Q=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-453-LYPfr49cM2SHlGrdLrsG2g-1; Thu, 14 Apr 2022 02:36:53 -0400
-X-MC-Unique: LYPfr49cM2SHlGrdLrsG2g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-438-ofDJOp9nPmSw-edY3pO7Zg-1; Thu, 14 Apr 2022 04:44:50 -0400
+X-MC-Unique: ofDJOp9nPmSw-edY3pO7Zg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3B0480352D;
-        Thu, 14 Apr 2022 06:36:52 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.72])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8BC1840885A6;
-        Thu, 14 Apr 2022 06:36:52 +0000 (UTC)
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     linux-block@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Paymon MARANDI <darwinskernel@gmail.com>
-Subject: [PATCH] Revert "make: let src/Makefile set *dir vars properly"
-Date:   Thu, 14 Apr 2022 07:36:51 +0100
-Message-Id: <20220414063651.81341-1-stefanha@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 331891014A61;
+        Thu, 14 Apr 2022 08:44:50 +0000 (UTC)
+Received: from localhost (ovpn-8-26.pek2.redhat.com [10.72.8.26])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 2600942B935;
+        Thu, 14 Apr 2022 08:44:48 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>,
+        Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Subject: [PATCH] block: fix offset/size check in bio_trim()
+Date:   Thu, 14 Apr 2022 16:44:43 +0800
+Message-Id: <20220414084443.1736850-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 9236f53a8ffe96cc2430f7131bbcba5756b97bc2.
+Unit of bio->bi_iter.bi_size is bytes, but unit of offset/size
+is sector.
 
-"make install DESTDIR=..." specifies a root directory where files are
-installed. For example, includedir=/usr/include DESTDIR=/a should
-install header files into /a/usr/include.
+Fix the above issue in checking offset/size in bio_trim().
 
-Commit 9236f53a8ffe removed the includedir=, etc arguments on the make
-command-line in ./Makefile, leaving only prefix=$(DESTDIR)$(prefix). It
-claimed "prefix suffice for setting *dir variables in src/Makefile" but
-this is incorrect. "make install DESTDIR=..." now has no effect and
-files are not installed with a DESTDIR prefix.
-
-The GNU make manual 9.5 Overriding Variables says:
-
-  all ordinary assignments of the same variable in the makefile are
-  ignored; we say they have been overridden by the command line
-  argument.
-
-This explains why it was necessary to set includedir=, etc on the make
-command-line in ./Makefile. We need to override these variables with
-DESTDIR from the command-line so they are not clobbered in src/Makefile
-when config-host.mak is included.
-
-Cc: Paymon MARANDI <darwinskernel@gmail.com>
-Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Fixes: e83502ca5f1e ("block: fix argument type of bio_trim()")
+Cc: Chaitanya Kulkarni <chaitanya.kulkarni@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- Makefile | 3 +++
- 1 file changed, 3 insertions(+)
+V2:
+	- use bio_sectors() as suggested by Christoph
 
-diff --git a/Makefile b/Makefile
-index d6f8520..28c0fd8 100644
---- a/Makefile
-+++ b/Makefile
-@@ -45,6 +45,9 @@ endif
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index cdd7b2915c53..4259125e16ab 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1598,7 +1598,7 @@ EXPORT_SYMBOL(bio_split);
+ void bio_trim(struct bio *bio, sector_t offset, sector_t size)
+ {
+ 	if (WARN_ON_ONCE(offset > BIO_MAX_SECTORS || size > BIO_MAX_SECTORS ||
+-			 offset + size > bio->bi_iter.bi_size))
++			 offset + size > bio_sectors(bio)))
+ 		return;
  
- install: $(NAME).pc
- 	@$(MAKE) -C src install prefix=$(DESTDIR)$(prefix) \
-+		includedir=$(DESTDIR)$(includedir) \
-+		libdir=$(DESTDIR)$(libdir) \
-+		libdevdir=$(DESTDIR)$(libdevdir) \
- 		relativelibdir=$(relativelibdir)
- 	$(INSTALL) -D -m 644 $(NAME).pc $(DESTDIR)$(libdevdir)/pkgconfig/$(NAME).pc
- 	$(INSTALL) -m 755 -d $(DESTDIR)$(mandir)/man2
+ 	size <<= 9;
 -- 
-2.35.1
+2.31.1
 
