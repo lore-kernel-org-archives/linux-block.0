@@ -2,105 +2,249 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D488CC433FE
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 01:10:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 777D4C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 02:10:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348363AbiDOBMp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 21:12:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
+        id S1348566AbiDOCMk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 22:12:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348410AbiDOBMh (ORCPT
+        with ESMTP id S1348604AbiDOCMf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 21:12:37 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E58D73AA7B;
-        Thu, 14 Apr 2022 18:10:10 -0700 (PDT)
-Received: from kwepemi500003.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4KfdRw2QDQzCr0W;
-        Fri, 15 Apr 2022 09:05:48 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500003.china.huawei.com (7.221.188.51) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 15 Apr 2022 09:10:07 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 15 Apr 2022 09:10:07 +0800
-Subject: Re: [PATCH -next 10/11] block, bfq: decrease
- 'num_groups_with_pending_reqs' earlier
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     Jan Kara <jack@suse.cz>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220305091205.4188398-1-yukuai3@huawei.com>
- <20220305091205.4188398-11-yukuai3@huawei.com>
- <20220413112816.fwobg4cp6ttpnpk6@quack3.lan>
- <f3ed507a-7c85-cd69-3ad5-3e9c0e75c372@huawei.com>
-Message-ID: <ef7bad8c-b8dd-f625-330c-9a22e303844b@huawei.com>
-Date:   Fri, 15 Apr 2022 09:10:06 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 14 Apr 2022 22:12:35 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CE91A393
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 19:10:07 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id 5438639;
+        Thu, 14 Apr 2022 19:10:07 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id rDU9nMGboJI0; Thu, 14 Apr 2022 19:10:05 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id AB1CD46;
+        Thu, 14 Apr 2022 19:10:05 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net AB1CD46
+Date:   Thu, 14 Apr 2022 19:10:04 -0700 (PDT)
+From:   Eric Wheeler <linux-block@lists.ewheeler.net>
+To:     Ming Lei <ming.lei@redhat.com>
+cc:     linux-block@vger.kernel.org
+Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
+ completion.
+In-Reply-To: <YldqnL79xH5NJGKW@T590>
+Message-ID: <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
+References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net> <YjfFHvTCENCC29WS@T590> <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net> <bd5f9817-c65e-7915-18b-9c68bb34488e@ewheeler.net> <YldqnL79xH5NJGKW@T590>
 MIME-Version: 1.0
-In-Reply-To: <f3ed507a-7c85-cd69-3ad5-3e9c0e75c372@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/04/13 19:40, yukuai (C) 写道:
-> 在 2022/04/13 19:28, Jan Kara 写道:
->> On Sat 05-03-22 17:12:04, Yu Kuai wrote:
->>> Currently 'num_groups_with_pending_reqs' won't be decreased when
->>> the group doesn't have any pending requests, while some child group
->>> still have pending requests. The decrement is delayed to when all the
->>> child groups doesn't have any pending requests.
->>>
->>> For example:
->>> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
->>> child group. num_groups_with_pending_reqs is 2 now.
->>> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
->>> t3 still can't be handled concurrently.
->>>
->>> Fix the problem by decreasing 'num_groups_with_pending_reqs'
->>> immediately upon the weights_tree removal of last bfqq of the group.
->>>
->>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>
->> So I'd find the logic easier to follow if you completely removed
->> entity->in_groups_with_pending_reqs and did updates of
->> bfqd->num_groups_with_pending_reqs like:
->>
->>     if (!bfqg->num_entities_with_pending_reqs++)
->>         bfqd->num_groups_with_pending_reqs++;
->>
-> Hi,
+On Thu, 14 Apr 2022, Ming Lei wrote:
+> On Wed, Apr 13, 2022 at 03:49:07PM -0700, Eric Wheeler wrote:
+> > On Tue, 22 Mar 2022, Eric Wheeler wrote:
+> > > On Mon, 21 Mar 2022, Ming Lei wrote:
+> > > > On Sat, Mar 19, 2022 at 10:14:29AM -0700, Eric Wheeler wrote:
+> > > > > Hello all,
+> > > > > 
+> > > > > In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
+> > > > > it does not appear that lo_req_flush() does anything to make sure 
+> > > > > ki_complete has been called for pending work, it just calls vfs_fsync().
+> > > > > 
+> > > > > Is this a consistency problem?
+> > > > 
+> > > > No. What FLUSH command provides is just flushing cache in device side to
+> > > > storage medium, so it is nothing to do with pending request.
+> > > 
+> > > If a flush follows a series of writes, would it be best if the flush 
+> > > happened _after_ those writes complete?  Then then the storage medium will 
+> > > be sure to flush what was intended to be written.
+> > > 
+> > > It seems that this series of events could lead to inconsistent data:
+> > > 	loop		->	filesystem
+> > > 	write a
+> > > 	write b
+> > > 	flush
+> > > 				write a
+> > > 				flush
+> > > 				write b
+> > > 				crash, b is lost
+> > > 
+> > > If write+flush ordering is _not_ important, then can you help me 
+> > > understand why?
+> > > 
+> > 
+> > Hi Ming, just checking in: did you see the message above?
+> > 
+> > Do you really mean to say that reordering writes around a flush is safe 
+> > in the presence of a crash?
 > 
-> Indeed, this is an excellent idle, and much better than the way I did.
+> Sorry, replied too quick.
+
+Thats ok, thanks for considering the issue!
+ 
+> BTW, what is the actual crash? Any dmesg log? From the above description, b is
+> just not flushed to storage when running flush, and sooner or later it will
+> land, so what is the real issue?
+
+In this case "crash" is actually a filesystem snapshot using most any 
+snapshot technology such as: dm-thin, btrfs, bcachefs, zfs.  From the 
+filesystem inside the loop file's point of view, a snapshot is the same as 
+a hardware crash.
+
+Some background:
+
+  We've already seen journal commit re-ordering caused by dm-crypt in 
+  dm-thin snapshots:
+	dm-thin -> dm-crypt -> [kvm with a disk using ext4]
+
+  This is the original email about dm-crypt ordering:
+	https://listman.redhat.com/archives/dm-devel/2016-September/msg00035.html 
+
+  We "fixed" the dm-crypt issue by disabling parallel dm-crypt threads 
+  with dm-crypt flags same_cpu_crypt+submit_from_crypt_cpus and haven't 
+  seen the issue since. (Its noticably slower, but I'll take consistency 
+  over performance any day! Not sure if that old dm-crypt ordering has 
+  been fixed.)
+
+So back to considering loop devs:
+
+Having seen the dm-crypt issue I would like to verify that loop isn't 
+susceptable to the same issue in the presence of lower-level 
+snapshots---but it looks like it could be since flushes don't enforce 
+ordering.  Here is why:
+
+In ext4/super.c:ext4_sync_fs(), the ext4 code calls 
+blkdev_issue_flush(sb->s_bdev) when barriers are enabled (which is 
+default).  blkdev_issue_flush() sets REQ_PREFLUSH and according to 
+blk_types.h this is a "request for cache flush"; you could think of 
+in-flight IO's on the way through loop.ko and into the hypervisor 
+filesystem where the loop's backing file lives as being in a "cache" of 
+sorts---especially for non-DIO loopdevs hitting the pagecache.
+
+Thus, ext4 critically expects that all IOs preceding a flush will hit 
+persistent storage before all future IOs.  Failing that, journal replay 
+cannot return the filesystem to a consistent state without a `fsck`.  
+
+(Note that ext4 is just an example, really any journaled filesystem is at 
+risk.)
+
+Lets say a virtual machine uses a loopback file for a disk and the VM 
+issues the following to delete some file called "/b":
+
+  unlink("/b"):
+	write: journal commit: unlink /b
+	flush: blkdev_issue_flush()
+	write: update fs datastructures (remove /b from a dentry)
+	<hypervisor snapshot>
+
+If the flush happens out of order then an operation like unlink("/b")  
+could look like this where the guest VM's filesystem is on the left and 
+the hypervisor's loop filesystem operations are on the right:
+
+  VM ext4 filesystem            |  Hypervisor loop dev ordering
+--------------------------------+--------------------------------
+write: journal commit: unlink /b
+flush: blkdev_issue_flush()
+write: update fs dentry's
+                                queued to loop: [journal commit: unlink /b]
+                                queued to loop: [update fs dentry's]
+                                flush: vfs_fsync() - out of order
+                                queued to ext4: [journal commit: unlink /b]
+                                queued to ext4: [update fs dentry's]
+                                write lands: [update fs dentry's]
+                                <snapshot!>
+                                write lands: [journal commit: unlink /b]
+				
+Notice that the last two "write lands" are out of order because the 
+vfs_fsync() does not separate them as expected by the VM's ext4 
+implementation.
+
+Presently, loop.c will never re-order actual WRITE's: they will be 
+submitted to loopdev's `file*` handle in-submit-order because the 
+workqueue will keep them ordered.  This is good[*].
+
+But, REQ_FLUSH is not a write:
+
+The vfs_fsync() in lo_req_flush() is _not_ ordered by the writequeue, and 
+there exists no mechanism in loop.c to enforce completion of IOs submitted 
+to the loopdev's `file*` handle prior to completing the vfs_fsync(), nor 
+are subsequent IOs thereby required to complete after the flush.
+
+Thus, the hypervisor's snapshot-capable filesystem can re-order the last 
+two writes because the flush happened early.
+
+In the re-ordered case on the hypervisor side:
+
+  If a snapshot happens after the dentry removal but _before_ the journal 
+  commit, then a journal replay of the resulting snapshot will be 
+  inconsistent.
+
+Flush re-ordering creates an inconsistency in two possible cases:
+
+   a. In the snapshot after dentry removal but before journal commit.
+   b. Crash after dentry removal but before journal comit.
+
+Really a snapshot looks like a crash to the filesystem, so (a) and (b) are 
+equivalent but (a) is easier to reason about. In either case, mounting the 
+out-of-order filesystem (snapshot if (a), origin if (b)) will present 
+kernel errors in the VM when the dentry is read:
+
+	kernel: EXT4-fs error (device dm-2): ext4_lookup:1441: inode 
+	 #1196093: comm rsync: deleted inode referenced: 1188710
+	[ https://listman.redhat.com/archives/dm-devel/2016-September/028121.html ]
+
+
+Fixing flush ordering provides for two possible improvements:
+  ([*] from above about write ordering)
+
+1. Consistency, as above.
+
+2. Performance.  Right now loopdev IOs are serialized by a single write 
+   queue per loopdev.  Parallel work queues could be used to submit IOs in 
+   parallel to the filesystem serving the loopdev's `file*` handle since 
+   VMs may submit IOs from different CPU cores.  Special care would need 
+   to be taken for the following cases:
+
+     a. Ordering of dependent IOs (ie, reads or writes of preceding 
+        writes).
+     b. Flushes need to wait for all workqueues to quiesce.
+
+   W.r.t choosing the number of WQ's: Certainly not 1:1 CPU to workqueue 
+   mapping because of the old WQ issue running out of pid's with lots of 
+   CPUs, but here are some possibilities:
+
+     a. 1:1 per socket
+     b. User configurable as a module parameter
+     c. Dedicated pool of workqueues for all loop devs that dispatch 
+        queued IOs to the correct `file*` handle.  RCU might be useful.
+
+
+What next?
+
+Ok, so assuming consistency is an issue, #1 is the priority and #2 is 
+nice-to-have.  This might be the right time for to consider these since 
+there is so much discussion about loop.c on the list right now.
+
+According to my understanding of the research above this appears to be an 
+issue and there are other kernel developers who know this code better than I.  
+
+I want to know if this is correct:
+
+Should others be CC'ed on this topic?  If so, who?
+
+
+--
+Eric Wheeler
+
+
+
+> 
 > 
 > Thanks,
-> Kuai
+> Ming
 > 
->> and similarly on the remove side. And there would we literally two places
->> (addition & removal from weight tree) that would need to touch these
->> counters. Pretty obvious and all can be done in patch 9.
->>
->>                                 Honza
-Hi, Jan
-
-I think with this change, we can count root_group while activating bfqqs
-that are under root_group, thus there is no need to modify
-for_each_entity(or fake bfq_sched_data) any more.
-
-The special case is that weight racing bfqqs are not inserted into
-weights tree, and I think this can be handled by adding a fake
-bfq_weight_counter for such bfqqs.
-
-What do you think ?
-
-Kuai
+> 
