@@ -2,94 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13F32C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 03:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C0BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 03:47:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349119AbiDODoH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 23:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47422 "EHLO
+        id S1348395AbiDODtr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 23:49:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349127AbiDODoG (ORCPT
+        with ESMTP id S1349149AbiDODto (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 23:44:06 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260502CC9F;
-        Thu, 14 Apr 2022 20:41:39 -0700 (PDT)
-Received: from kwepemi100025.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kfhtz1knSzfYnm;
-        Fri, 15 Apr 2022 11:40:59 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100025.china.huawei.com (7.221.188.158) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 15 Apr 2022 11:41:37 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 15 Apr
- 2022 11:41:36 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH RESEND] blk-mq: fix possible creation failure for 'debugfs_dir'
-Date:   Fri, 15 Apr 2022 11:56:07 +0800
-Message-ID: <20220415035607.1836495-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Thu, 14 Apr 2022 23:49:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C017C5AA64
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 20:47:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1649994436;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=OmFzF4P+0ykVdRezfaRk2XA/8c8gib3FIWkPQg2gCgk=;
+        b=GJePG8NEmYxRm3kdf9dJXF4cW/ez/IVbFSFFNGZZufAPZb8xwuznphSg7dUQ1/E7jl8ovH
+        xltrk1ekNQBm5ULyAudK+7ZwN+kpmekDYDWwF4W/4YzZMaIslIy09yDfDGs1VbVS7Q89qJ
+        CSO1bjCUeEnYw3QKL+KHKugZUimrQw4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-296-179hF6s6PbSjO_5l_uwFEw-1; Thu, 14 Apr 2022 23:47:11 -0400
+X-MC-Unique: 179hF6s6PbSjO_5l_uwFEw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D7F7A1C04B41;
+        Fri, 15 Apr 2022 03:47:10 +0000 (UTC)
+Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id E6FA840EC010;
+        Fri, 15 Apr 2022 03:47:09 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+Subject: [PATCH V2] block: avoid io timeout in case of sync polled dio
+Date:   Fri, 15 Apr 2022 11:47:03 +0800
+Message-Id: <20220415034703.2081695-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-'q->debugfs_dir' is created in blk_register_queue(), however, it's not
-removed in blk_unregister_queue() and is delayed to blk_release_queue().
-Thus it's possible that del_gendisk() is done and blk_release_queue()
-is not called yet, and in the mean time blk_register_queue() is called
-for the new device with the same name. In this case, kernel will
-compalin about creation failure for 'debugfs_dir' like following:
+For POLLED bio, bio_poll() should be called for reaping io since
+there isn't irq for completing the request, so we can't call into
+blk_io_schedule() in case that bio_poll() returns zero, otherwise
+io timeout is easily triggered.
 
-debugfs: Directory 'nullb1' with parent 'block' already present!
+Also before calling bio_poll(), current->plug should be flushed out,
+otherwise the bio may not be issued to driver, and ->bi_cookie won't
+be set.
 
-Fix the problem by moving forward the removal of 'debgfs_dir' to
-blk_unregister_queue().
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+CC: linux-mm@kvack.org
+Cc: linux-xfs@vger.kernel.org
+Reported-by: Changhui Zhong <czhong@redhat.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-sysfs.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+V2:
+	- as pointed out by Christoph, iomap & mm code should be covered
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 88bd41d4cb59..15fc3f0786e3 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -779,11 +779,6 @@ static void blk_release_queue(struct kobject *kobj)
- 	if (queue_is_mq(q))
- 		blk_mq_release(q);
+ block/fops.c         | 7 ++++++-
+ fs/iomap/direct-io.c | 7 +++++--
+ mm/page_io.c         | 8 +++++++-
+ 3 files changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index 9f2ecec406b0..c9bac700e072 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -101,11 +101,16 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+ 		bio_set_polled(&bio, iocb);
  
--	blk_trace_shutdown(q);
--	mutex_lock(&q->debugfs_mutex);
--	debugfs_remove_recursive(q->debugfs_dir);
--	mutex_unlock(&q->debugfs_mutex);
--
- 	if (queue_is_mq(q))
- 		blk_mq_debugfs_unregister(q);
+ 	submit_bio(&bio);
++	/* make sure the bio is issued before polling */
++	if (bio.bi_opf & REQ_POLLED)
++		blk_flush_plug(current->plug, false);
+ 	for (;;) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+ 		if (!READ_ONCE(bio.bi_private))
+ 			break;
+-		if (!(iocb->ki_flags & IOCB_HIPRI) || !bio_poll(&bio, NULL, 0))
++		if (bio.bi_opf & REQ_POLLED)
++			bio_poll(&bio, NULL, 0);
++		else
+ 			blk_io_schedule();
+ 	}
+ 	__set_current_state(TASK_RUNNING);
+diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+index b08f5dc31780..e67d2f63a163 100644
+--- a/fs/iomap/direct-io.c
++++ b/fs/iomap/direct-io.c
+@@ -654,8 +654,11 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
+ 			if (!READ_ONCE(dio->submit.waiter))
+ 				break;
  
-@@ -951,5 +946,11 @@ void blk_unregister_queue(struct gendisk *disk)
- 
- 	mutex_unlock(&q->sysfs_dir_lock);
- 
-+	blk_trace_shutdown(q);
-+	mutex_lock(&q->debugfs_mutex);
-+	blk_mq_debugfs_unregister_hctxs(q);
-+	debugfs_remove_recursive(q->debugfs_dir);
-+	mutex_unlock(&q->debugfs_mutex);
+-			if (!dio->submit.poll_bio ||
+-			    !bio_poll(dio->submit.poll_bio, NULL, 0))
++			if (dio->submit.poll_bio &&
++					(dio->submit.poll_bio->bi_opf &
++						REQ_POLLED))
++				bio_poll(dio->submit.poll_bio, NULL, 0);
++			else
+ 				blk_io_schedule();
+ 		}
+ 		__set_current_state(TASK_RUNNING);
+diff --git a/mm/page_io.c b/mm/page_io.c
+index b417f000b49e..16f2a63e2524 100644
+--- a/mm/page_io.c
++++ b/mm/page_io.c
+@@ -421,12 +421,18 @@ int swap_readpage(struct page *page, bool synchronous)
+ 	count_vm_event(PSWPIN);
+ 	bio_get(bio);
+ 	submit_bio(bio);
 +
- 	kobject_put(&disk_to_dev(disk)->kobj);
- }
++	/* make sure the bio is issued before polling */
++	if (bio->bi_opf & REQ_POLLED)
++		blk_flush_plug(current->plug, false);
+ 	while (synchronous) {
+ 		set_current_state(TASK_UNINTERRUPTIBLE);
+ 		if (!READ_ONCE(bio->bi_private))
+ 			break;
+ 
+-		if (!bio_poll(bio, NULL, 0))
++		if (bio->bi_opf & REQ_POLLED)
++			bio_poll(bio, NULL, 0);
++		else
+ 			blk_io_schedule();
+ 	}
+ 	__set_current_state(TASK_RUNNING);
 -- 
 2.31.1
 
