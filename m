@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D1FDC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 09:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6A4C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 09:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351938AbiDOJ7E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 05:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60608 "EHLO
+        id S1351962AbiDOJ7G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 05:59:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60582 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351946AbiDOJ67 (ORCPT
+        with ESMTP id S1351948AbiDOJ7A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 05:58:59 -0400
+        Fri, 15 Apr 2022 05:59:00 -0400
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 165BBBA316;
-        Fri, 15 Apr 2022 02:56:30 -0700 (PDT)
-Received: from kwepemi100004.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KfsB50Yq4zhXZF;
-        Fri, 15 Apr 2022 17:54:37 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCE01BA32E;
+        Fri, 15 Apr 2022 02:56:31 -0700 (PDT)
+Received: from kwepemi100005.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KfsB64NWrzhXZ3;
+        Fri, 15 Apr 2022 17:54:38 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100004.china.huawei.com (7.221.188.70) with Microsoft SMTP Server
+ kwepemi100005.china.huawei.com (7.221.188.155) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 15 Apr 2022 17:56:28 +0800
+ 15.1.2375.24; Fri, 15 Apr 2022 17:56:29 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 15 Apr
- 2022 17:56:27 +0800
+ 2022 17:56:29 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <axboe@kernel.dk>, <bvanassche@acm.org>,
         <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
         <ming.lei@redhat.com>, <qiulaibin@huawei.com>
 CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next RFC v3 5/8] sbitmap: force tag preemption if free tags are sufficient
-Date:   Fri, 15 Apr 2022 18:10:50 +0800
-Message-ID: <20220415101053.554495-6-yukuai3@huawei.com>
+Subject: [PATCH -next RFC v3 7/8] blk-mq: record how many tags are needed for splited bio
+Date:   Fri, 15 Apr 2022 18:10:52 +0800
+Message-ID: <20220415101053.554495-8-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220415101053.554495-1-yukuai3@huawei.com>
 References: <20220415101053.554495-1-yukuai3@huawei.com>
@@ -49,104 +49,135 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that tag preemption is disabled under heavy load, if wakers doesn't
-use up 'wake_batch' tags while preemption is still disabled, io
-concurrency will be declined.
+Currently, each time 8(or wake batch) requests is done, 8 waiters will
+be woken up, this is not necessary because we only need to make sure
+wakers will use up 8 tags. For example, if we know in advance that a
+thread need 8 tags, then wake up one thread is enough, and this can also
+avoid unnecessary context switch.
 
-To fix the problem, add a detection before wake up, and force tag
-preemption is free tags are sufficient, so that the extra tags can be
-used by new io. And tag preemption will be disabled again if the extra
-tags are used up.
+On the other hand, sequential io is much faster than random io, thus
+it's better to issue split io continuously.
+
+This patch tries to provide such information that how many tags will
+be needed for huge io, and it will be used in next patch.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-mq-tag.c      |  3 ++-
+ block/blk-mq-tag.c      |  1 +
+ block/blk-mq.c          | 24 +++++++++++++++++++++---
+ block/blk-mq.h          |  2 ++
  include/linux/sbitmap.h |  2 ++
- lib/sbitmap.c           | 30 ++++++++++++++++++++++++++++++
- 3 files changed, 34 insertions(+), 1 deletion(-)
+ 4 files changed, 26 insertions(+), 3 deletions(-)
 
 diff --git a/block/blk-mq-tag.c b/block/blk-mq-tag.c
-index a6c5ec846a5e..d02710cf3355 100644
+index d02710cf3355..70ce98a5c32b 100644
 --- a/block/blk-mq-tag.c
 +++ b/block/blk-mq-tag.c
-@@ -131,7 +131,8 @@ static inline bool preempt_tag(struct blk_mq_alloc_data *data,
- 			       struct sbitmap_queue *bt)
+@@ -165,6 +165,7 @@ unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
+ 			return BLK_MQ_NO_TAG;
+ 	}
+ 
++	wait.nr_tags += data->nr_split;
+ 	do {
+ 		struct sbitmap_queue *bt_prev;
+ 
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index a889f01d2cdf..ac614a379a6d 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2760,12 +2760,14 @@ static bool blk_mq_attempt_bio_merge(struct request_queue *q,
+ static struct request *blk_mq_get_new_requests(struct request_queue *q,
+ 					       struct blk_plug *plug,
+ 					       struct bio *bio,
+-					       unsigned int nsegs)
++					       unsigned int nsegs,
++					       unsigned int nr_split)
  {
- 	return data->preempt ||
--	       atomic_read(&bt->ws_active) <= SBQ_WAIT_QUEUES;
-+	       atomic_read(&bt->ws_active) <= SBQ_WAIT_QUEUES ||
-+	       bt->force_tag_preemption;
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+ 		.nr_tags	= 1,
+ 		.cmd_flags	= bio->bi_opf,
++		.nr_split	= nr_split,
+ 		.preempt	= (bio->bi_opf & REQ_PREEMPT),
+ 	};
+ 	struct request *rq;
+@@ -2824,6 +2826,19 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	return rq;
  }
  
- unsigned int blk_mq_get_tag(struct blk_mq_alloc_data *data)
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 8a64271d0696..ca00ccb6af48 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -143,6 +143,8 @@ struct sbitmap_queue {
- 	 * sbitmap_queue_get_shallow()
- 	 */
- 	unsigned int min_shallow_depth;
-+
-+	bool force_tag_preemption;
- };
- 
- /**
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 7527527bbc86..315e5619b384 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -434,6 +434,7 @@ int sbitmap_queue_init_node(struct sbitmap_queue *sbq, unsigned int depth,
- 	sbq->wake_batch = sbq_calc_wake_batch(sbq, depth);
- 	atomic_set(&sbq->wake_index, 0);
- 	atomic_set(&sbq->ws_active, 0);
-+	sbq->force_tag_preemption = true;
- 
- 	sbq->ws = kzalloc_node(SBQ_WAIT_QUEUES * sizeof(*sbq->ws), flags, node);
- 	if (!sbq->ws) {
-@@ -604,6 +605,34 @@ static void sbq_update_wake_index(struct sbitmap_queue *sbq,
- 		atomic_cmpxchg(&sbq->wake_index, old_wake_index, index);
- }
- 
-+static inline void sbq_update_preemption(struct sbitmap_queue *sbq,
-+					 unsigned int wake_batch)
++static inline unsigned int caculate_sectors_split(struct bio *bio)
 +{
-+	unsigned int free;
-+
-+	if (wake_batch == 1) {
-+		/*
-+		 * Waiters will be woken up one by one, no risk of declining
-+		 * io concurrency.
-+		 */
-+		sbq->force_tag_preemption = false;
-+		return;
++	switch (bio_op(bio)) {
++	case REQ_OP_DISCARD:
++	case REQ_OP_SECURE_ERASE:
++	case REQ_OP_WRITE_ZEROES:
++		return 0;
++	default:
++		return (bio_sectors(bio) - 1) /
++			queue_max_sectors(bio->bi_bdev->bd_queue);
 +	}
-+
-+	free = sbq->sb.depth - sbitmap_weight(&sbq->sb);
-+	if (sbq->force_tag_preemption) {
-+		if (free <= wake_batch)
-+			sbq->force_tag_preemption = false;
-+	} else {
-+		if (free > wake_batch << 1)
-+			sbq->force_tag_preemption = true;
-+
-+	}
-+	sbq->force_tag_preemption =
-+		(sbq->sb.depth - sbitmap_weight(&sbq->sb)) >= wake_batch << 1 ?
-+		true : false;
 +}
 +
- static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- {
- 	struct sbq_wait_state *ws;
-@@ -642,6 +671,7 @@ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
- 	 */
- 	smp_mb__before_atomic();
- 	atomic_set(&ws->wait_cnt, wake_batch);
-+	sbq_update_preemption(sbq, wake_batch);
- 	wake_up_nr(&ws->wait, wake_batch);
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2844,11 +2859,14 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	const int is_sync = op_is_sync(bio->bi_opf);
+ 	struct request *rq;
+ 	unsigned int nr_segs = 1;
++	unsigned int nr_split = 0;
+ 	blk_status_t ret;
  
- 	return false;
+ 	blk_queue_bounce(q, &bio);
+-	if (blk_may_split(q, bio))
++	if (blk_may_split(q, bio)) {
++		nr_split = caculate_sectors_split(bio);
+ 		__blk_queue_split(q, &bio, &nr_segs);
++	}
+ 
+ 	if (!bio_integrity_prep(bio))
+ 		return;
+@@ -2857,7 +2875,7 @@ void blk_mq_submit_bio(struct bio *bio)
+ 	if (!rq) {
+ 		if (!bio)
+ 			return;
+-		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs);
++		rq = blk_mq_get_new_requests(q, plug, bio, nr_segs, nr_split);
+ 		if (unlikely(!rq))
+ 			return;
+ 	}
+diff --git a/block/blk-mq.h b/block/blk-mq.h
+index 1a85bd1045d8..9bad3057c1f3 100644
+--- a/block/blk-mq.h
++++ b/block/blk-mq.h
+@@ -156,6 +156,8 @@ struct blk_mq_alloc_data {
+ 
+ 	/* allocate multiple requests/tags in one go */
+ 	unsigned int nr_tags;
++	/* number of ios left after this io is handled */
++	unsigned int nr_split;
+ 	/* true if blk_mq_get_tag() will try to preempt tag */
+ 	bool preempt;
+ 	struct request **cached_rq;
+diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
+index ca00ccb6af48..1abd8ed5d406 100644
+--- a/include/linux/sbitmap.h
++++ b/include/linux/sbitmap.h
+@@ -596,12 +596,14 @@ void sbitmap_queue_wake_up(struct sbitmap_queue *sbq);
+ void sbitmap_queue_show(struct sbitmap_queue *sbq, struct seq_file *m);
+ 
+ struct sbq_wait {
++	unsigned int nr_tags;
+ 	struct sbitmap_queue *sbq;	/* if set, sbq_wait is accounted */
+ 	struct wait_queue_entry wait;
+ };
+ 
+ #define DEFINE_SBQ_WAIT(name)							\
+ 	struct sbq_wait name = {						\
++		.nr_tags = 1,							\
+ 		.sbq = NULL,							\
+ 		.wait = {							\
+ 			.private	= current,				\
 -- 
 2.31.1
 
