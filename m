@@ -2,146 +2,381 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 651AFC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 05:58:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90202C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 06:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345539AbiDOGAs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 02:00:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47660 "EHLO
+        id S239309AbiDOGdt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 02:33:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53080 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242775AbiDOGAr (ORCPT
+        with ESMTP id S236512AbiDOGdr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 02:00:47 -0400
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2050.outbound.protection.outlook.com [40.107.220.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FF00689B5
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 22:58:19 -0700 (PDT)
+        Fri, 15 Apr 2022 02:33:47 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6595AEC1;
+        Thu, 14 Apr 2022 23:31:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650004280; x=1681540280;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=rysp2VpWbNPLU3xX6SkFEk6QJuv8TD0rys6Zo3G8eUM=;
+  b=m6BRy1eYWlCFC8S1OLAHmjSCjJaQXmUBdygl1Y8LSbjU1NAD2Ytmf2Ya
+   6fDMg+hv3P3ctsW4Dz+fOhmoJzQsLfhwK6WyDHn28KYl/UmTlTC8iJTr8
+   LfCefUcCRBJgZeEowNOW/GfxGWp1bV6Oj+6VTRqEFLQzRv5E6jHStT6xV
+   l6pLHi5md0eEhu/DKDIIN43i956kdRGHrHNmiDfNvrfN0NIOHaTS9ogzK
+   Fk3uxJuJWYEFuf7WYlDl/xDSCOOMp8ZawCU0szkCu9xatwLRZArUmgp4d
+   umg4cqnK7703JPFJWItwfmed6p/tHQEcm2XUs8TrqabXrKLrLFkoPLOUX
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10317"; a="250403090"
+X-IronPort-AV: E=Sophos;i="5.90,261,1643702400"; 
+   d="scan'208";a="250403090"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2022 23:31:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,261,1643702400"; 
+   d="scan'208";a="661670101"
+Received: from orsmsx604.amr.corp.intel.com ([10.22.229.17])
+  by orsmga004.jf.intel.com with ESMTP; 14 Apr 2022 23:31:19 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX604.amr.corp.intel.com (10.22.229.17) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Thu, 14 Apr 2022 23:31:18 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Thu, 14 Apr 2022 23:31:18 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Thu, 14 Apr 2022 23:31:18 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=T3YkjfNTWRdm1GfWKNgpAf8qSXCjMLVTpkrg+3gO1SWwf14b4I9ndWRqAlCzR4ajyWuEAVovCHXMI1yJamuUPrS1i/rfJ+pDH5oFDtUpHKxbYAfkqLjwh0Z+EEUWqOKmLfdjcDL/a3sVypKYXhBsR2hq11xXNXpEG1IMD1GmVI7ajal5jP3aGK5pb2eXs5xGKJjj+5K+FVkhXqYSZH1TG/wz7yr0rVIiUCNXc819YcnOjB6hfPOTzY7jHQj0AiuHDzs1Amy+Sjw9HYHUscQS4xqUnvn8Hco/rkRbxSBcLDrdXpC36onZhIQS4bnmzqIGU1QaO9qjgGZAuBKXLE+AuQ==
+ b=LU5e0r47Rl0sRHUqessA5YQ+pUSYCqISFmjK5mOPqC0Q2MiVh6ZW2O0yKCWa1mgcTZ8EPxKGAJNcSCMguYboUrjL/YIaj4Ty7L/CtTj7/S6Z1IgC9/fwZwt1sOUObFlg3rI6G88gjGyNrLg55WaE1LyEQERNAjqNFlfogQD9Af9redqsXRKuxde7FlyJ/yOnlixQdbCQxK7E3mWlY54aZ3ZWQa5FeOq0REqHXSA82uY2fI5GGuXY35FK+xF2MuQArLYdgNgLdzpCGwj9v062E64MlNmqB7z2+CAJNocHFD8BStAh8Ri/VFVp0xeOVQHuuH4BFLT1i5EIDFjvTHiMAw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Iz5Wp+3v9LrYuxHi4agFqP0fu511cz1lRwqz9E+6cb4=;
- b=DCY4G0rRfCpbU6r2Dn7Ir2mWSKsrXnGX4x7VafRV9jpR5xQiVleYKYUt9uOOBbV00Lc4BoQCSaEc1rZldSAE9nGrr4/PGY1wnXjkP/+QZ2zjYYHfE8dGIxt5uv9DIcLMqPRc05kueUWX80iLk3NrqY1s0RU8/TxY9MzuBeWsde47tOFEHqZQR+AVd8Er6ekx41Dvu8wo6S5vR9cVcewNdkREwGCXwN/DYXfIfSUse9EhFQX+PufcESo9QwCn6KrVlD7WMlPkO6hAEiRUoxOr0SeziUW4cQClmONPAY10gjelYhKA9cq3k9pFrPuEYve4a530wSa6K8c/kMQhyPFByA==
+ bh=w5lvWrBD/IckZk3dU9ntsrmajwX9omUYrKtYBcuKxQU=;
+ b=f6rcMZ6lUm+5VYPbhV67QA3S3MTI9cgkOgL1fUnx/0bB5dkinu8+P9PjJr0AAPwHLwTKISRllkcSa7/L8JKThnHEAa26fG/jrzh291ABT1bzZSI4KQDnSaexdQbYyyIX0NCzcWn3ukGPoOJq2Tx7Rqmu6n8zqezyxeIIHr3kr2+LUwqq5odW62vAs19JSlJBh5FUNbdOGAyo2IUI88PGGceq3kIkHIxx8MDGmtxnIyrSvILNeIA802VO1pcfEVkN8ZZfbSz4wBJdc1xWGnC+zntczWhlyB+wVj35PTTxn2oIQ1SeEoyaaTUDh0dYfPrh6DnmHZVwRCDZVQtXHGky7Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Iz5Wp+3v9LrYuxHi4agFqP0fu511cz1lRwqz9E+6cb4=;
- b=ci5VL8hptygWD/b3qpbBCRtBGd0ixcGeq02wC0sjp2lztfXT8eYvssEgQ8MIXyTYSIVBQiLj0CeHdwxjZ70VtIpDCRYbNQNGFw31SzgoXWaBlPtazWmiiFeX5bLe/jHkvBhSqaZvZ1MeKQt2SmxAPDiTbELDntbuLOLe1VUapnbSA4Zx3EuF81FWGK2qVkDF2W/wTRRrM/+Q4nJ0R79eQUSsgdftLOjSymzULJPUsMgX/otpDN3tXLIalSRn0rjJZ5kbjBjgP5OZlxp0BRIMAcVhxjwJ03FpTCJXmofihgaZTbXQF0QaHnIz865ZZUerHSaS8eXezZ+S8WDGvjpL/Q==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by DM5PR12MB1513.namprd12.prod.outlook.com (2603:10b6:4:d::16) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5164.20; Fri, 15 Apr 2022 05:58:17 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::a90b:9df2:370c:e76b]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::a90b:9df2:370c:e76b%3]) with mapi id 15.20.5144.030; Fri, 15 Apr 2022
- 05:58:16 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Christoph Hellwig <hch@infradead.org>,
-        Bart Van Assche <bvanassche@acm.org>
-CC:     Luis Chamberlain <mcgrof@kernel.org>,
-        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
-        "sagi@grimberg.me" <sagi@grimberg.me>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-Subject: Re: can't run nvme-mp blktests
-Thread-Topic: can't run nvme-mp blktests
-Thread-Index: AQHYTszV+3u4N1FyaEK26iQxNB3DuaztRycAgADV6wCAAACpAIAAVTwAgAIAbwCAAAqZAA==
-Date:   Fri, 15 Apr 2022 05:58:16 +0000
-Message-ID: <587c14e7-2b7e-74ac-377b-6faafcb829e4@nvidia.com>
-References: <YlYYJC/WUEsnI9Im@bombadil.infradead.org>
- <YlZXOC4VgmDrUGIP@infradead.org> <YlcKqu3roZQSxZe8@bombadil.infradead.org>
- <YlcLOM49JsdlBqTW@infradead.org>
- <af030072-d932-5e38-64d6-bfd28152862b@acm.org>
- <YlkAlHe6LloUAzzN@infradead.org>
-In-Reply-To: <YlkAlHe6LloUAzzN@infradead.org>
-Accept-Language: en-US
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BN6PR11MB3956.namprd11.prod.outlook.com (2603:10b6:405:77::10)
+ by PH0PR11MB4853.namprd11.prod.outlook.com (2603:10b6:510:40::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.18; Fri, 15 Apr
+ 2022 06:31:16 +0000
+Received: from BN6PR11MB3956.namprd11.prod.outlook.com
+ ([fe80::34ba:1704:3bf3:6d94]) by BN6PR11MB3956.namprd11.prod.outlook.com
+ ([fe80::34ba:1704:3bf3:6d94%4]) with mapi id 15.20.5164.018; Fri, 15 Apr 2022
+ 06:31:16 +0000
+Message-ID: <b9f12710-25f4-3dff-4f9b-cfe0bc3097e2@intel.com>
+Date:   Fri, 15 Apr 2022 14:31:06 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH -next RFC v2 3/8] sbitmap: make sure waitqueues are
+ balanced
 Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ababe9fc-79ce-491d-e3c5-08da1ea4ef77
-x-ms-traffictypediagnostic: DM5PR12MB1513:EE_
-x-microsoft-antispam-prvs: <DM5PR12MB1513305AC17E6D2ED8644BA4A3EE9@DM5PR12MB1513.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 3fos1XTQqYoa++MMHPMfDev3OBEuvRrgJXdRd95lM3sPg+DYp5G6nmr4gAT1/PB4l9k7wl0+atoVQOY52+0F5OH7ZcIIN/BvyDoGtTw2RK7sO8FCptM7VcxqXyPo5JCrQ6WMnQ34JP0stQz7ZPGIl/yCDJiWqXe55J18NgM73V0zJTJD1F2CdsiNPoY9Kd9N/GPeZ+fvT0B2ekDrBkdJfZYeeZc2Px8rO1yGjaaNRFCkmFOwfp74bd0XwiuAGSHTDyKlj6/k90EFzJBBhCOvzqhl1oplcwHcKxX2wAdNpuF3MikIhX2UeJ5DrcJxe9SH/4uvF720Tiqc8mgXF4mqwgTqUe6ruZhWwCvE5qw+wDVdhhVcbrsb3VT/+s3KZBnXoh+GhkSKkcZQuyQFpj+87ChQUwUjscQAe+JbvRoxMsh4+VV86gD6E0AH85h7HBX+ApJaLerwubu/aXryPg8yMrheXoF06MiKFdsrYGg1VfG3PaZUr/b1k7SmEEmD0T5T0q7EbYCn3YcM8eLnaeqV7slWYmgdNKTb9FFCrZVfKNapzgi0++4CMuQRzGpq49OmJ9POoiP47sM1e3uryhFTmvqE0ik1bs5jjdT3U96iKCRDLBhRZCisGyHNHuJCI2ntCAOt3EpQ2wexcE65RPfBqtK35DbJGPY8muiqodt3dKSfxB44WTQ0TwQrlLK7/stqGvBu+1Elb7nChCgO3W5ztlCvwRwoZL7h5hALYq3wzU2OHtRexD2iGXjoVkXCX9+shMNeQBkQPNgTYHoyvC1hOQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(6506007)(31686004)(6512007)(6486002)(316002)(5660300002)(71200400001)(54906003)(110136005)(2616005)(91956017)(83380400001)(186003)(66446008)(64756008)(66476007)(66556008)(66946007)(4326008)(8676002)(31696002)(508600001)(76116006)(86362001)(38100700002)(38070700005)(2906002)(36756003)(53546011)(4744005)(122000001)(8936002)(3480700007)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?L0JTeXNrbE9OQVg3N0M1SEtBRlF1Rk82ZEF6S21rZk55Q1JuNEVjNGtqdG4r?=
- =?utf-8?B?S21ObHNEcmtKM1dkU0p2TzI4YkZnanQrdnR1VlQwUlVsMDdrZlB2WjdvSUpq?=
- =?utf-8?B?RkZYR3IycjByZllHMEFKYnQ0d3kzcFFRNkJtNytsS2xobEovNDdYd01wWUw5?=
- =?utf-8?B?Tld5djJLUlVpNkpkcGl2V1dDc2xRUUhlYWVYM0xoOW9laThKQVJsOHpyUE9q?=
- =?utf-8?B?SlkxM2VaSG1WUVRxa0N6RFo2b2ZKZStLSTVZMWo3ZjRFbjFiRFp2dHVCOWZw?=
- =?utf-8?B?WFRYWlI0emJ6Zm9HN21MTmNWS0loVmNUZ3ZyWmFTNjUyKzc2Rjc1ZUFBSi9r?=
- =?utf-8?B?RFdVOFVEYmtzbGJnUTNPeFh0Vnhza0R0SXkzN09WNEFTb1R0UTVSVjRMSFo4?=
- =?utf-8?B?T3M0d3gxVDRWSlFyMDNvL3NUbm9hT2Fpb0JIUitCSEFDR2IreFp5TEFINi9R?=
- =?utf-8?B?TFU4eE85NkF6SjdGVzNxcGx4M2syWHpUcC91M0ZKVXlrVW5PMTR3R2x5M0lU?=
- =?utf-8?B?Sy9lbloxeXJuR2l0WmwwSlpZaXJ3SGdPUHlrTWlXUm0wb1M5S2QxUGw2a2Zo?=
- =?utf-8?B?TGhwTklvdksvRUtOMU9KejZ6MHJ1M3F5SCszYS9GVk92UU5YMGpQbzRVOU50?=
- =?utf-8?B?eEFtWDZObjJrWm5CVTFUVEZDdVllOTk3VHJLU0YxaHVJcE5aK1pIOG14WGov?=
- =?utf-8?B?cllvbUorS0JHRzF4K0ZEbXpJbU1zcWt6N2MveTNoVWxLU3NaU0xRL3hma1gz?=
- =?utf-8?B?WjN1azVOdmh5SG5XZ3UwNHZJK2JLWTFiNzd5U3NLYngzK21UUTluQXQ4eGhs?=
- =?utf-8?B?U25aS1NtVEFWM1cxaTVlTHRLbFJrQU1LMGNTZ1A0ZTVVKzhiYkhwRm9OYk1t?=
- =?utf-8?B?QVNRMkFGWjNPNWdzVWVUYnEyTFhtOXRpNTMvZjJ4QiswaVQrKzVlTmdQZk51?=
- =?utf-8?B?ek1MTkllMWVCbWN1SVJFZEtTd1pPQjIyZEw1dXlkdndwUFVzTHRJYW9tQkRI?=
- =?utf-8?B?dGpVYjEzaVpLQ1BkQUdXb25HOGlkM2N0eHl3TXdwRXdVUGJTMFVBRkcrRTZV?=
- =?utf-8?B?MkVTSDdSMVpaNXpQU1c1T2h3ZjJ5MFBlZzByTE9NMlJiVWRhQzlXYWlnSnYy?=
- =?utf-8?B?OFRMOXBwRUJFRXQweENRZVdraU85LzkrZjNWdCs5djZPL0xvYzdkR3dmM2tl?=
- =?utf-8?B?Y0FyUFRVU1dpajNmbGcwWWNvbHpyVlhjMDVENFVJNkFEVGh1NFJHZVluMzJw?=
- =?utf-8?B?Y3F1MmtTOFk3V2YxdTQ4ZkFvRUg2OE4wOVlVNUxmb1J1QjE4WDlxTW5pd2Jq?=
- =?utf-8?B?MkM2ZE5LdXoxTGhvRjdWazA5aXZsVmcyUjV3MjBLM21FV0xnUjVGbnV3WWZn?=
- =?utf-8?B?YVpPQm9iVi92YnlGcVdidUw4eWN5dkV3WnZUZ1hMWFMyMG13OW9tZU51YzVM?=
- =?utf-8?B?ckY5c21uNUhYTTZjemgrMWhKcGpCQ0R1L2tMS0RHSU56eENxRUxJWG5UMVdy?=
- =?utf-8?B?K2NQU3ZwdVlQV29LUU1zK2FrUkNYYk9kZ3FUWkVPVzdnS3gyUlBPcVR4N2tl?=
- =?utf-8?B?d2JWSlpHYjlWWUlpY1ppU0VEdGZCcy8vUHFHS1pUMXpjaW5rOEZ0dWdOeml2?=
- =?utf-8?B?WTNUOVRmeVc0eEFqVXpTWEMvMTN6bldQN1VHZVFKTnJCRDYydGg3UkNkWHZy?=
- =?utf-8?B?YjQvZ29MWHQrUnNkUkZ5K3F3cCtEK29BU3QxNGlWWjZsN01iZVIvWmZ6a3ky?=
- =?utf-8?B?UjZwTisyVFY4VjVJWEtDWXlBUnFycElMMmtCRnc3V1ZLUmVobWVHQ1g1QUJ5?=
- =?utf-8?B?am5rZWxqcmpRZTFnQ1R2RzJpQnp6bG1hUVFISytrSkFKS2V4MUVoVWJJSHhz?=
- =?utf-8?B?eHFnRVRPUVlWbllNZk01dG9ZYkNiWGJkem5jeCsxYVZ2RVk5Zy9paFlnSmFQ?=
- =?utf-8?B?M1M1YS8vbFlmZnJZS2lhQ3BJa1ZKMUlUTXRSN3BBendkSk5VZERKd0l3Rk9m?=
- =?utf-8?B?OXRHUU5QTU1XYnhJdDIraXV5aE84ekZZMjVySHlnZ2h2SlZEbXBLOUExaGUv?=
- =?utf-8?B?VUloQjNOaG4yL1l5N2Y1N20yTTJhaWQrbkl1REtOTjdienY4Z2dCUkxoeGJE?=
- =?utf-8?B?V2VVL1pkaVh3Mm9Yb1I1UE9uZVlmWFZUSFMrRHRwY2J3dEdJVGE1cUVOMHhW?=
- =?utf-8?B?M241TVFWaDJTMEQ4VjZVZ1R1RjZkNEJmK0VoVG9mOHJwMU5YT2ZOZGxoZk0r?=
- =?utf-8?B?UEdzdUhwSFZVQnExUGdLL2YyeGdDL1lBbTJNM3NUREtXc1lra1dlUWx2dzY4?=
- =?utf-8?B?RlpQNk80d0ZGdEhveGxONzRyYWJRMWc5NXlzQjBmaHc3MndWVTQyNFhFOGVo?=
- =?utf-8?Q?p1ttOvU3gTcEnZdk=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <9F65BEE46775CC4597CDBD95A0A38CF6@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+To:     Yu Kuai <yukuai3@huawei.com>, <axboe@kernel.dk>,
+        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
+        <ming.lei@redhat.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220408073916.1428590-1-yukuai3@huawei.com>
+ <20220408073916.1428590-4-yukuai3@huawei.com>
+From:   "Li, Ming" <ming4.li@intel.com>
+Organization: Intel
+In-Reply-To: <20220408073916.1428590-4-yukuai3@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: HK2P15301CA0024.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:202:1::34) To BN6PR11MB3956.namprd11.prod.outlook.com
+ (2603:10b6:405:77::10)
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 2d3bcb1b-84ed-4c25-226c-08da1ea98b3b
+X-MS-TrafficTypeDiagnostic: PH0PR11MB4853:EE_
+X-Microsoft-Antispam-PRVS: <PH0PR11MB485382FE141817BE74D315A3DDEE9@PH0PR11MB4853.namprd11.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LF94XxOqdFZglpjKCsbDMMzAsHtMYhfBot3AJuxdwsLGzhrCpjcbLXgKPCc6756EU7klbswwxLHMn9mKhj4u8Pv8TRQDQ47KBC0ZEflYbtMA3UD8QwM+9m/oS3ycnJavDcPHSHgIk4fMXstl5BcpYL0NFxokMTwV7qLVrHvyMvsJV7kMJwl/runFtAnM7P0vpkh5FCdaKDOC3RvcHBuAxqI9A3nZIXeiTQ9kqOMzTWZISJgxPA3+UfAQPCar7Hp6U8nivOMk7c0IOXXPRGB42X0LPgdJKkRob4HVP2s7QRnoQpdzghku8ltVSxKeMa6TSbbA5eVbK4X7lpYc3lrPSP6hlgvBXvy+K50baVFggdjuUjcY3DsJbJeickBNUvC4giaRtrhcFTA0Avbv/OUADAugj9OcLYB1IGg89DSOxby8kQIDMoaYb3X3GnkhWpbyJHDazvuQSVXDKkSv2xipvzMrttzKDCUoNER6Tn+U1pCSvFbdOMeeH2GvYOYkbbBvb15bbxCiki+vEi4Pfqn9U7nRJqlKvuVHaE5OjaPGC1rhymQQqZjQExzo8LxNlJF0Z4/T/hE460rOLdtE9UJULAm0Oadfmwkcp+tIpXHvUzvDSfnZhDCyHpzr4fCflO9C+TRj+zq/GdXQcriLHOExfTS3bBR3XzsJnxZrhchp+w5mnBhDpnt8MjjKzH2CJ3228VCU2/YAx2s0NJRSMFsfOcY7kcwnHLriS6DOR9skkuo=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN6PR11MB3956.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(38100700002)(36916002)(8676002)(66476007)(4326008)(66556008)(6512007)(86362001)(26005)(186003)(83380400001)(82960400001)(6506007)(2906002)(8936002)(2616005)(36756003)(316002)(6666004)(31686004)(66946007)(53546011)(6486002)(31696002)(508600001)(5660300002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dk9KbXR4WVNRMTh0MmxDOUlVTjRhZGxSOHRoaUY4RXRHSjRZR0JnZXFuLzhv?=
+ =?utf-8?B?VzQwNjBCeG03d2NuRFUvT0NuUWNZUnhIYmJMZXFTSmVkZDliZHVmVkxpekRF?=
+ =?utf-8?B?dlRVb3NDbE5udUMxOGdOcUpadXV1SUVDQkR4UXcvSGdvZGFubW40ODQ3TUFy?=
+ =?utf-8?B?TkdsYnNyVm93MHhEbmUzMUlGV1pHZVVtZ1d3KzR4NmNVSWZJa01VSjduV0cy?=
+ =?utf-8?B?YUpIU0JmRWlDM3JlNU1FQytZZ2FUNnlUZWxTdHB0bWFXcW9hTzZncWtOZWsy?=
+ =?utf-8?B?emRMWjgybGdMYitrY1lzNktaUVhCbldWaFllcXNOOU5vYituSWhSMk5ZOVcw?=
+ =?utf-8?B?U2dOQm9vZS9mdjU3c0pZa2FaY3JoNnZCaUUxZ2FHM2cydmVrQitFQnYyUVBh?=
+ =?utf-8?B?dFMxMmExbkluK1E5VHhldGRHTFdSbzhydFBmcnpMSnRuNzRsUU5pakM3OWpJ?=
+ =?utf-8?B?cnNKMjZkdzZRaWRPd0VXM0FpOHpTNnRIZVYveUVuNStrVGxKdEc3RDcvMGpC?=
+ =?utf-8?B?Skcwc0d5US9qUjFnRU5NaitzVlpaTUVCOUVRV25NTU45U2FMc0hZSEhvTWpF?=
+ =?utf-8?B?L1RsMDZOeEc0QWE4amdhVzA0N1ZJUStSaVJzTE9LUG1Yckx3QUtnRmdTbmxj?=
+ =?utf-8?B?VVRrKzV2TnJqUzI3UWl4ZXFvV014Y1psdFBDd0paNWxYZ2RQbzNDTkhVVW5G?=
+ =?utf-8?B?T1VmeG5Hamg4RFpCUzJ0aGdoU243S28vdnhUQ2grOHROMVJWdDhkMERPMXFp?=
+ =?utf-8?B?YVRkZ08xbUFEb1FqRW1hcWVXSVdsSWI3VldvcWcxMnV5dmFlNXN4Vk4vRUlw?=
+ =?utf-8?B?V2w2UnNkcFNUWG90cGtWL0FiTm9sak1nR21tVk4zWHpIaEJTbXFjaWMzWkNH?=
+ =?utf-8?B?cWl2ZWxDZ2R6WGxVMlQrV2o3S3ZjRVVDbGVsQms3alRVZ3dpY01iV3YvK3pk?=
+ =?utf-8?B?d1Y4TWpxa1FHcnVIU1lBd2NiNGs0dUl5V0Q4OTBxaGlEbW1kRkpNZjhIcHcr?=
+ =?utf-8?B?czdabGJhSndlQk1LTzFiMDNVREEveGJGbzNFZnVVV0hXR1RqWWVnT2I1Z0VU?=
+ =?utf-8?B?K1VLR0U4cmsxMmdOY3UvZnYydUkxREU5RXFUN0o2ZEJxd2Npa2Uwc1hZMXho?=
+ =?utf-8?B?dUdNT3JYQ2RjSWZ0azY3bkF3SjE1dUdNcHR6SGhJSjc4dEpIMEdLMzZ0NEpY?=
+ =?utf-8?B?TEVaRWhURFFpT2p5NDNXQ3ZzZTU0MkRWSlZtZXZoSWNmWDY3VnZWVFBINlZt?=
+ =?utf-8?B?eDIreTh5QzJCVDBid3RRTENPV3NKWS9wTnVXT3VnSHc4azdoMmNvZXlHRXQw?=
+ =?utf-8?B?S1BnNjZ3NXN4dmtNK2NjUEV4eUxBNXk3aWtVZGJOQ2pwZmticWVOU3lCM2Mr?=
+ =?utf-8?B?b216S3pJZjBabGRlTytveG9vM3VOdXIvK281NEJrUnVqOGs0bkFhbTRTWldZ?=
+ =?utf-8?B?T1R0bWVTemtwREFMQWtXVFEyYW9waDI1RXc0azFwbWtSQmVjQnBCMDVBWTBO?=
+ =?utf-8?B?c3diWXIzenZXQnNaY2Q4enVTb1cyRUs4MjdHeUx6aUFMakdmRzBSamh0cEdP?=
+ =?utf-8?B?cnNySjRsVkRSNXVGdzFmRG5EaXh2YkxOOGxIeWMyUWRtOVFRQjFQdHU3S3Rq?=
+ =?utf-8?B?dmVKbGZpaWlrUHFiaFhRTm5sQW5EM2hqZmc1c1dReEhMUE9Kd1JiaFF4ZjJt?=
+ =?utf-8?B?NzdnMVcyRDYraHdFNUxBVktDNjZrOVNlc1RZOXVwYXUzVTEzclVhSms4b1NJ?=
+ =?utf-8?B?TGt3bW93QlIvNkxxSUhVWXpOM002dnd3YTI3aktvREhGSHEzZVlSQnBINmRj?=
+ =?utf-8?B?U1VudEt5NXlxK3lVSVdkU0graWdkdUU5M1JldSt6elptNmlKWUNIWUJvNUJi?=
+ =?utf-8?B?SjZsMGZOejZCZ1VlMmNzYlJrczNPN0czWG1TZFNxa0hmcldYdzJlM0crVk53?=
+ =?utf-8?B?c2xZalVkaHR5ZDkvNDdkVWwxbUZhRFl4ZWwzZzc4czgrWDh3NHY2M1VpMDky?=
+ =?utf-8?B?WnkzN1h5MmcxdEliOFB4akZ0WkhzR1pXWnVxTzJ5K2VzSDQramkrRS9Ea2RE?=
+ =?utf-8?B?SUhVYS8yR1JadUFoSDlXd01iVUNBdm9OaFB4MGcwR3ZIeWhQYVM0RzZudlR2?=
+ =?utf-8?B?S3dQMEVKbUVJQitwLzI4YkNkbFNvZW1KbUFiMjhOWkVQeEI2MWZld2JGRGd6?=
+ =?utf-8?B?VDFuMVBvR0VnMys1UnN3c0hRQkNFTzFRU2pnWnp3NGZuZWYramw3RHJiMFls?=
+ =?utf-8?B?Mlc5U0NwV1Z6UFpSeDJtQU1SUEY1RmMwL3lhOG8rWFJyMm4xTW92M2N6ZmZu?=
+ =?utf-8?B?Tm5LRWZ5QnNOSG5HM3ZiM0RJbUxTM0xLbDVUS2R1TllyNTU4WnRqUT09?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d3bcb1b-84ed-4c25-226c-08da1ea98b3b
+X-MS-Exchange-CrossTenant-AuthSource: BN6PR11MB3956.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ababe9fc-79ce-491d-e3c5-08da1ea4ef77
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Apr 2022 05:58:16.6646
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Apr 2022 06:31:16.3686
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qBxYJPDTNFtw4mgyFPF/EgBoaETEAhkQBgzRSICCCA8wILC6F92uZgji9eDYw/IpIpvvYN013A9tGg6vtiImVQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1513
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: johW4ybBewEuFXNpJSiSwjb9DVrXgVQqDNROFJk05ySPoCwYpLm5uC0nKGRywZDTC+23bNVO7NqZPhWFt6UZ6g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4853
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNC8xNC8yMiAyMjoyMCwgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IE9uIFdlZCwgQXBy
-IDEzLCAyMDIyIGF0IDAzOjQ2OjE2UE0gLTA3MDAsIEJhcnQgVmFuIEFzc2NoZSB3cm90ZToNCj4+
-IEknbSBub3Qgc3VyZSB3aGV0aGVyIHRoZSBudm1lLW1wIHRlc3RzIHRlc3QgYW55IGNvZGUgdGhh
-dCBpcyBub3QgeWV0IHRlc3RlZCBieQ0KPj4gYW55IG52bWUgb3Igc3JwIHRlc3QuIEhvdyBhYm91
-dCByZW1vdmluZyB0aGVzZSB0ZXN0cyBzaW5jZSB0aGVzZSB0ZXN0cyBtYWtlDQo+PiBpdCBoYXJk
-ZXIgdGhhbiBuZWNlc3NhcnkgdG8gcnVuIGJsa3Rlc3RzPw0KPiANCj4gSSBoYXZlbid0IGxvb2tl
-ZCBhdCB0aGUgZGV0YWlscyByZWNlbnRseSwgYnV0IGlmIHRoZXNlIHRlc3RzIHN0aWxsIGFyZQ0K
-PiBiYXNpY2FsbHkgYSBjb3B5IGFuZCBwYXN0ZSBvZiB0aGUgc3JwIG1wYXRoIHRlc3RzIEknbSBh
-bGwgZm9yIHJlbW92aW5nDQo+IHRoZW0hDQoNCklmIGl0IGRvZXNuJ3QgYWRkIGEgbmV3IHRlc3Qg
-Y292ZXJhZ2UgaW4gdGhlIGJsa3Rlc3QgZnJhbWV3b3JrDQp0aGVuIHBsZWFzZSByZW1vdmUuDQoN
-Ci1jaw0KDQo=
+
+
+On 4/8/2022 3:39 PM, Yu Kuai wrote:
+> Currently, same waitqueue might be woken up continuously:
+> 
+> __sbq_wake_up		__sbq_wake_up
+>  sbq_wake_ptr -> assume	0
+> 			 sbq_wake_ptr -> 0
+>  atomic_dec_return
+> 			atomic_dec_return
+>  atomic_cmpxchg -> succeed
+> 			 atomic_cmpxchg -> failed
+> 			  return true
+> 
+> 			__sbq_wake_up
+> 			 sbq_wake_ptr
+> 			  atomic_read(&sbq->wake_index) -> still 0
+>  sbq_index_atomic_inc -> inc to 1
+> 			  if (waitqueue_active(&ws->wait))
+> 			   if (wake_index != atomic_read(&sbq->wake_index))
+> 			    atomic_set -> reset from 1 to 0
+>  wake_up_nr -> wake up first waitqueue
+> 			    // continue to wake up in first waitqueue
+> 
+> What's worse, io hung is possible in theory because wake up might be
+> missed. For example, 2 * wake_batch tags are put, while only wake_batch
+> threads are worken:
+> 
+> __sbq_wake_up
+>  atomic_cmpxchg -> reset wait_cnt
+> 			__sbq_wake_up -> decrease wait_cnt
+> 			...
+> 			__sbq_wake_up -> wait_cnt is decreased to 0 again
+> 			 atomic_cmpxchg
+> 			 sbq_index_atomic_inc -> increase wake_index
+> 			 wake_up_nr -> wake up and waitqueue might be empty
+>  sbq_index_atomic_inc -> increase again, one waitqueue is skipped
+>  wake_up_nr -> invalid wake up because old wakequeue might be empty
+> 
+> To fix the problem, refactor to make sure waitqueues will be woken up
+> one by one, and also choose the next waitqueue by the number of threads
+> that are waiting to keep waitqueues balanced.
+Hi, do you think that updating wake_index before atomic_cmpxchg(ws->wait_cnt) also can solve these two problems?
+like this:
+__sbq_wake_up()
+{
+	....
+	if (wait_cnt <= 0) {
+		ret = atomic_cmpxchg(sbq->wake_index, old_wake_index, next_wake_index);
+		if (ret == old_wake_index) {
+			ret = atomic_cmpxchg(ws->wait_cnt, wait_cnt, wake_batch);
+			if (ret == wait_cnt)
+				wake_up_nr(ws->wait, wake_batch);
+		}
+	}
+}
+
+Your solution is picking the waitqueue with the largest waiters_cnt as the next one to be waked up, I think that waitqueue is possible to starve.
+if lots of threads in a same waitqueue stop waiting before sbq wakes them up, it will cause the waiters_cnt of waitqueue is much less than others, looks like sbq_update_wake_index() would never pick this waitqueue. What do you think? is it possible?
+
+
+> 
+> Test cmd: nr_requests is 64, and queue_depth is 32
+> [global]
+> filename=/dev/sda
+> ioengine=libaio
+> direct=1
+> allow_mounted_write=0
+> group_reporting
+> 
+> [test]
+> rw=randwrite
+> bs=4k
+> numjobs=512
+> iodepth=2
+> 
+> Before this patch, waitqueues can be extremly unbalanced, for example:
+> ws_active=484
+> ws={
+>         {.wait_cnt=8, .waiters_cnt=117},
+>         {.wait_cnt=8, .waiters_cnt=59},
+>         {.wait_cnt=8, .waiters_cnt=76},
+>         {.wait_cnt=8, .waiters_cnt=0},
+>         {.wait_cnt=5, .waiters_cnt=24},
+>         {.wait_cnt=8, .waiters_cnt=12},
+>         {.wait_cnt=8, .waiters_cnt=21},
+>         {.wait_cnt=8, .waiters_cnt=175},
+> }
+> 
+> With this patch, waitqueues is always balanced, for example:
+> ws_active=477
+> ws={
+>         {.wait_cnt=8, .waiters_cnt=59},
+>         {.wait_cnt=6, .waiters_cnt=62},
+>         {.wait_cnt=8, .waiters_cnt=61},
+>         {.wait_cnt=8, .waiters_cnt=60},
+>         {.wait_cnt=8, .waiters_cnt=63},
+>         {.wait_cnt=8, .waiters_cnt=56},
+>         {.wait_cnt=8, .waiters_cnt=59},
+>         {.wait_cnt=8, .waiters_cnt=57},
+> }
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  lib/sbitmap.c | 81 ++++++++++++++++++++++++++-------------------------
+>  1 file changed, 42 insertions(+), 39 deletions(-)
+> 
+> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+> index 393f2b71647a..176fba0252d7 100644
+> --- a/lib/sbitmap.c
+> +++ b/lib/sbitmap.c
+> @@ -575,68 +575,71 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
+>  }
+>  EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
+>  
+> -static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
+> +/* always choose the 'ws' with the max waiters */
+> +static void sbq_update_wake_index(struct sbitmap_queue *sbq,
+> +				  int old_wake_index)
+>  {
+> -	int i, wake_index;
+> +	int index, wake_index;
+> +	int max_waiters = 0;
+>  
+> -	if (!atomic_read(&sbq->ws_active))
+> -		return NULL;
+> +	if (old_wake_index != atomic_read(&sbq->wake_index))
+> +		return;
+>  
+> -	wake_index = atomic_read(&sbq->wake_index);
+> -	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+> -		struct sbq_wait_state *ws = &sbq->ws[wake_index];
+> +	for (wake_index = 0; wake_index < SBQ_WAIT_QUEUES; wake_index++) {
+> +		struct sbq_wait_state *ws;
+> +		int waiters;
+>  
+> -		if (waitqueue_active(&ws->wait)) {
+> -			if (wake_index != atomic_read(&sbq->wake_index))
+> -				atomic_set(&sbq->wake_index, wake_index);
+> -			return ws;
+> -		}
+> +		if (wake_index == old_wake_index)
+> +			continue;
+>  
+> -		wake_index = sbq_index_inc(wake_index);
+> +		ws = &sbq->ws[wake_index];
+> +		waiters = atomic_read(&ws->waiters_cnt);
+> +		if (waiters > max_waiters) {
+> +			max_waiters = waiters;
+> +			index = wake_index;
+> +		}
+>  	}
+>  
+> -	return NULL;
+> +	if (max_waiters)
+> +		atomic_cmpxchg(&sbq->wake_index, old_wake_index, index);
+>  }
+>  
+>  static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+>  {
+>  	struct sbq_wait_state *ws;
+>  	unsigned int wake_batch;
+> -	int wait_cnt;
+> +	int wait_cnt, wake_index;
+>  
+> -	ws = sbq_wake_ptr(sbq);
+> -	if (!ws)
+> +	if (!atomic_read(&sbq->ws_active))
+>  		return false;
+>  
+> +	wake_index = atomic_read(&sbq->wake_index);
+> +	ws = &sbq->ws[wake_index];
+>  	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+> -	if (wait_cnt <= 0) {
+> -		int ret;
+> -
+> -		wake_batch = READ_ONCE(sbq->wake_batch);
+> -
+> -		/*
+> -		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> -		 * ensure that we see the batch size update before the wait
+> -		 * count is reset.
+> -		 */
+> -		smp_mb__before_atomic();
+> -
+> +	if (wait_cnt > 0) {
+> +		return false;
+> +	} else if (wait_cnt < 0) {
+>  		/*
+> -		 * For concurrent callers of this, the one that failed the
+> -		 * atomic_cmpxhcg() race should call this function again
+> +		 * Concurrent callers should call this function again
+>  		 * to wakeup a new batch on a different 'ws'.
+>  		 */
+> -		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+> -		if (ret == wait_cnt) {
+> -			sbq_index_atomic_inc(&sbq->wake_index);
+> -			wake_up_nr(&ws->wait, wake_batch);
+> -			return false;
+> -		}
+> -
+> +		sbq_update_wake_index(sbq, wake_index);
+>  		return true;
+>  	}
+>  
+> -	return false;
+> +	sbq_update_wake_index(sbq, wake_index);
+> +	wake_batch = READ_ONCE(sbq->wake_batch);
+> +
+> +	/*
+> +	 * Pairs with the memory barrier in sbitmap_queue_resize() to
+> +	 * ensure that we see the batch size update before the wait
+> +	 * count is reset.
+> +	 */
+> +	smp_mb__before_atomic();
+> +	atomic_set(&ws->wait_cnt, wake_batch);
+> +	wake_up_nr(&ws->wait, wake_batch);
+> +
+> +	return true;
+>  }
+>  
+>  void sbitmap_queue_wake_up(struct sbitmap_queue *sbq)
