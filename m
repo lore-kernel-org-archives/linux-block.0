@@ -2,145 +2,298 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73D01C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 13:24:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E1B0C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 14:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344371AbiDON1Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 09:27:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37612 "EHLO
+        id S1354463AbiDOOc0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 10:32:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229982AbiDON1P (ORCPT
+        with ESMTP id S1354461AbiDOOcZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 09:27:15 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A7522F01B
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 06:24:48 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id z6-20020a17090a398600b001cb9fca3210so8362769pjb.1
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 06:24:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:from:subject:to:cc
-         :content-language:content-transfer-encoding;
-        bh=PDaYToyZJy928mS0mZ04ICiqHISbtfenGJA8KikCA2M=;
-        b=MZcsLnwhhcCWxiXi8ivMH0gLsOG6+XoKweneCNgVmxi5ibs0XGgCcOOJc8hKlojH5F
-         +bBkXwUfWqzNGvez+oxeMH2yu7F8KTFjgBjODe8GWflaDutJ/h2lYE+g2TAk1Be/uchZ
-         MN/3uje65CJSW0iKPjqiS9h5DOTKLlprSWezFtYIRJtlOE98vciVkXSWquQNhgYMhT8R
-         o1uRy6FA3i0R8N4sIJH5d6k3kXpZxCmjcMDXCJljgWJqAdwkaQrODNH14y9re7JdVgTb
-         Na+MjOB0s8buFk95QNfi6c9kJsBoIdUtaARDVOQnrscA9+2U4uXlEkJ3w6doOLy5JoA6
-         784g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
-         :subject:to:cc:content-language:content-transfer-encoding;
-        bh=PDaYToyZJy928mS0mZ04ICiqHISbtfenGJA8KikCA2M=;
-        b=veIvF5yTXBaSFsLm27L2q8gBohE4fUZgfUl/f5vhQpunJdaABwPBVM3CP7mQj5WqXx
-         6K8+sxdFtZ/2cnCA/2c5qex+MgMmxC/pcAqs5x/vB827u7FZ5SZXxVjdumhDOdPAYgmU
-         +0jgfsBqxk2RKAMg+Ic+Ars7RzcutTTi1Wph23w0cknp40ghW4wy5lcXYv+8msxr61zc
-         MlcLZQpxFA6Hv/unYhBnfUeeWkRbLO9A6iIFU0eyQMP6G+RImlyXjK17v9zHuDuKD8J3
-         5ovHaPWKZso/80uSmx0ZYodK6YFQJkIsOt/qBsJyOQfwc4BJWcPRLn6YwxqX1PEWBViz
-         yemw==
-X-Gm-Message-State: AOAM532i1ha/phD2ZroYUpGbQIZOvc0bAYN39EGHJF8KxJz4xPk/iebA
-        TMnc6SnOaaT5FCwglauNJ6ClRCtjk950IA==
-X-Google-Smtp-Source: ABdhPJzMbdvnanptc9MfUlskXyL5wcSUBR3q6MC6mEqipGEyVxSkWwJMgnGq9MXjX77Q1GC9ikgXpQ==
-X-Received: by 2002:a17:902:edd1:b0:158:8318:b51e with SMTP id q17-20020a170902edd100b001588318b51emr19331261plk.89.1650029087487;
-        Fri, 15 Apr 2022 06:24:47 -0700 (PDT)
-Received: from [192.168.4.166] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
-        by smtp.gmail.com with ESMTPSA id m2-20020a17090a4d8200b001cb41f25148sm4993167pjh.17.2022.04.15.06.24.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Apr 2022 06:24:46 -0700 (PDT)
-Message-ID: <3a9f60a9-01f7-64fc-cd84-b76d162b528f@kernel.dk>
-Date:   Fri, 15 Apr 2022 07:24:46 -0600
+        Fri, 15 Apr 2022 10:32:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6B30EA76F2
+        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 07:29:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650032995;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=iakfPzHPI4Gff47VnXv0STpJeaaR1gdsdPOwiDuiR9U=;
+        b=jVOTswdISzuU/ta84/RbXyf6E8CFHB1A0zVFatOqmOGmkLTAFkgZN9QYgR6OHAX6nGN2fi
+        eHHm7k08ugwY0CiuChsdrEGWQdF9vEWh9RThPEIWYqQwKynDAGcNh0DOMrCq7r2Q7uqZ2B
+        2sslkM1dvx90Y8/QZhsM3NKanQAxWwg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-388-JF23Ih2COQK_FM_H7mWOOQ-1; Fri, 15 Apr 2022 10:29:52 -0400
+X-MC-Unique: JF23Ih2COQK_FM_H7mWOOQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id ECC90801E95;
+        Fri, 15 Apr 2022 14:29:51 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AF0DB9E6C;
+        Fri, 15 Apr 2022 14:29:45 +0000 (UTC)
+Date:   Fri, 15 Apr 2022 22:29:34 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Eric Wheeler <linux-block@lists.ewheeler.net>
+Cc:     linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
+ completion.
+Message-ID: <YlmBTtGdTH2xW1qT@T590>
+References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
+ <YjfFHvTCENCC29WS@T590>
+ <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net>
+ <bd5f9817-c65e-7915-18b-9c68bb34488e@ewheeler.net>
+ <YldqnL79xH5NJGKW@T590>
+ <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.18-rc3
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On Thu, Apr 14, 2022 at 07:10:04PM -0700, Eric Wheeler wrote:
+> On Thu, 14 Apr 2022, Ming Lei wrote:
+> > On Wed, Apr 13, 2022 at 03:49:07PM -0700, Eric Wheeler wrote:
+> > > On Tue, 22 Mar 2022, Eric Wheeler wrote:
+> > > > On Mon, 21 Mar 2022, Ming Lei wrote:
+> > > > > On Sat, Mar 19, 2022 at 10:14:29AM -0700, Eric Wheeler wrote:
+> > > > > > Hello all,
+> > > > > > 
+> > > > > > In loop.c do_req_filebacked() for REQ_OP_FLUSH, lo_req_flush() is called: 
+> > > > > > it does not appear that lo_req_flush() does anything to make sure 
+> > > > > > ki_complete has been called for pending work, it just calls vfs_fsync().
+> > > > > > 
+> > > > > > Is this a consistency problem?
+> > > > > 
+> > > > > No. What FLUSH command provides is just flushing cache in device side to
+> > > > > storage medium, so it is nothing to do with pending request.
+> > > > 
+> > > > If a flush follows a series of writes, would it be best if the flush 
+> > > > happened _after_ those writes complete?  Then then the storage medium will 
+> > > > be sure to flush what was intended to be written.
+> > > > 
+> > > > It seems that this series of events could lead to inconsistent data:
+> > > > 	loop		->	filesystem
+> > > > 	write a
+> > > > 	write b
+> > > > 	flush
+> > > > 				write a
+> > > > 				flush
+> > > > 				write b
+> > > > 				crash, b is lost
+> > > > 
+> > > > If write+flush ordering is _not_ important, then can you help me 
+> > > > understand why?
+> > > > 
+> > > 
+> > > Hi Ming, just checking in: did you see the message above?
+> > > 
+> > > Do you really mean to say that reordering writes around a flush is safe 
+> > > in the presence of a crash?
+> > 
+> > Sorry, replied too quick.
+> 
+> Thats ok, thanks for considering the issue!
+>  
+> > BTW, what is the actual crash? Any dmesg log? From the above description, b is
+> > just not flushed to storage when running flush, and sooner or later it will
+> > land, so what is the real issue?
+> 
+> In this case "crash" is actually a filesystem snapshot using most any 
+> snapshot technology such as: dm-thin, btrfs, bcachefs, zfs.  From the 
+> filesystem inside the loop file's point of view, a snapshot is the same as 
+> a hardware crash.
+> 
+> Some background:
+> 
+>   We've already seen journal commit re-ordering caused by dm-crypt in 
+>   dm-thin snapshots:
+> 	dm-thin -> dm-crypt -> [kvm with a disk using ext4]
+> 
+>   This is the original email about dm-crypt ordering:
+> 	https://listman.redhat.com/archives/dm-devel/2016-September/msg00035.html 
+> 
+>   We "fixed" the dm-crypt issue by disabling parallel dm-crypt threads 
+>   with dm-crypt flags same_cpu_crypt+submit_from_crypt_cpus and haven't 
+>   seen the issue since. (Its noticably slower, but I'll take consistency 
+>   over performance any day! Not sure if that old dm-crypt ordering has 
+>   been fixed.)
+> 
+> So back to considering loop devs:
+> 
+> Having seen the dm-crypt issue I would like to verify that loop isn't 
+> susceptable to the same issue in the presence of lower-level 
+> snapshots---but it looks like it could be since flushes don't enforce 
+> ordering.  Here is why:
+> 
+> In ext4/super.c:ext4_sync_fs(), the ext4 code calls 
+> blkdev_issue_flush(sb->s_bdev) when barriers are enabled (which is 
+> default).  blkdev_issue_flush() sets REQ_PREFLUSH and according to 
+> blk_types.h this is a "request for cache flush"; you could think of 
+> in-flight IO's on the way through loop.ko and into the hypervisor 
+> filesystem where the loop's backing file lives as being in a "cache" of 
+> sorts---especially for non-DIO loopdevs hitting the pagecache.
+> 
+> Thus, ext4 critically expects that all IOs preceding a flush will hit 
+> persistent storage before all future IOs.  Failing that, journal replay 
+> cannot return the filesystem to a consistent state without a `fsck`.  
 
-Nothing major here:
+If ext4 expects the following order, it is ext4's responsibility to
+maintain the order, and block layer may re-order all these IOs at will,
+so do not expect IOs are issued to device in submission order
 
-- Moving of lower_48_bits() to the block layer and a fix for the
-  unaligned_be48 added with that originally (Alexander, Keith)
+1) IOs preceding flush in 2)
 
-- Fix a bad WARN_ON() for trim size checking (Ming)
+2) flush
 
-- A polled IO timeout fix for null_blk (Ming)
+3) IOs after the flush
 
-- Silence IO error printing for dead disks (Christoph)
+Even the device drive may re-order these IOs, such as AHCI/NCQ.
 
-- Compat mode range fix (Khazhismel)
+> 
+> (Note that ext4 is just an example, really any journaled filesystem is at 
+> risk.)
+> 
+> Lets say a virtual machine uses a loopback file for a disk and the VM 
+> issues the following to delete some file called "/b":
+> 
+>   unlink("/b"):
+> 	write: journal commit: unlink /b
+> 	flush: blkdev_issue_flush()
+> 	write: update fs datastructures (remove /b from a dentry)
+> 	<hypervisor snapshot>
+> 
+> If the flush happens out of order then an operation like unlink("/b")  
+> could look like this where the guest VM's filesystem is on the left and 
+> the hypervisor's loop filesystem operations are on the right:
+> 
+>   VM ext4 filesystem            |  Hypervisor loop dev ordering
+> --------------------------------+--------------------------------
+> write: journal commit: unlink /b
+> flush: blkdev_issue_flush()
+> write: update fs dentry's
+>                                 queued to loop: [journal commit: unlink /b]
+>                                 queued to loop: [update fs dentry's]
+>                                 flush: vfs_fsync() - out of order
+>                                 queued to ext4: [journal commit: unlink /b]
+>                                 queued to ext4: [update fs dentry's]
+>                                 write lands: [update fs dentry's]
+>                                 <snapshot!>
+>                                 write lands: [journal commit: unlink /b]
 
-- NVMe pull request via Christoph:
-	- Tone down the error logging added this merge window a bit
-	  (Chaitanya Kulkarni)
-	- Quirk devices with non-unique unique identifiers (Christoph)
+If VM ext4 requires the above order, ext4 FS code has to start flush until
+write(unlink /b) is done or do write(unlink /b) and flush in one single
+command, and start write(update fs dentry's) after the flush is done.
+
+Once ext4 submits IOs in this way, you will see the issue shouldn't be
+related with hypervisor.
+
+One issue I saw is in case of snapshot in block layer & loop/buffered
+io. When loop write is done, the data is just in FS page cache, which
+may be invisible to block snapshot(dm-snap), even page writeback may be
+re-order. But if flush is used correctly, this way still works fine.
+
+> 				
+> Notice that the last two "write lands" are out of order because the 
+> vfs_fsync() does not separate them as expected by the VM's ext4 
+> implementation.
+> 
+> Presently, loop.c will never re-order actual WRITE's: they will be 
+> submitted to loopdev's `file*` handle in-submit-order because the 
+> workqueue will keep them ordered.  This is good[*].
+
+Again do not expect block layer to maintain IO order.
+
+> 
+> But, REQ_FLUSH is not a write:
+> 
+> The vfs_fsync() in lo_req_flush() is _not_ ordered by the writequeue, and 
+> there exists no mechanism in loop.c to enforce completion of IOs submitted 
+> to the loopdev's `file*` handle prior to completing the vfs_fsync(), nor 
+> are subsequent IOs thereby required to complete after the flush.
+
+Yes, but flush is just to flush device cache to medium, and block
+layer doesn't maintain io order, that is responsibility of block layer's
+user(FS) to maintain io order.
+
+> 
+> Thus, the hypervisor's snapshot-capable filesystem can re-order the last 
+> two writes because the flush happened early.
+> 
+> In the re-ordered case on the hypervisor side:
+> 
+>   If a snapshot happens after the dentry removal but _before_ the journal 
+>   commit, then a journal replay of the resulting snapshot will be 
+>   inconsistent.
+> 
+> Flush re-ordering creates an inconsistency in two possible cases:
+> 
+>    a. In the snapshot after dentry removal but before journal commit.
+>    b. Crash after dentry removal but before journal comit.
+> 
+> Really a snapshot looks like a crash to the filesystem, so (a) and (b) are 
+> equivalent but (a) is easier to reason about. In either case, mounting the 
+> out-of-order filesystem (snapshot if (a), origin if (b)) will present 
+> kernel errors in the VM when the dentry is read:
+> 
+> 	kernel: EXT4-fs error (device dm-2): ext4_lookup:1441: inode 
+> 	 #1196093: comm rsync: deleted inode referenced: 1188710
+> 	[ https://listman.redhat.com/archives/dm-devel/2016-September/028121.html ]
+> 
+> 
+> Fixing flush ordering provides for two possible improvements:
+
+No, what you should fix is to enhance the IO order in FS or journal
+code, instead of block layer.
+
+>   ([*] from above about write ordering)
+> 
+> 1. Consistency, as above.
+> 
+> 2. Performance.  Right now loopdev IOs are serialized by a single write 
+>    queue per loopdev.  Parallel work queues could be used to submit IOs in 
+>    parallel to the filesystem serving the loopdev's `file*` handle since 
+>    VMs may submit IOs from different CPU cores.  Special care would need 
+>    to be taken for the following cases:
+> 
+>      a. Ordering of dependent IOs (ie, reads or writes of preceding 
+>         writes).
+>      b. Flushes need to wait for all workqueues to quiesce.
+> 
+>    W.r.t choosing the number of WQ's: Certainly not 1:1 CPU to workqueue 
+>    mapping because of the old WQ issue running out of pid's with lots of 
+>    CPUs, but here are some possibilities:
+> 
+>      a. 1:1 per socket
+>      b. User configurable as a module parameter
+>      c. Dedicated pool of workqueues for all loop devs that dispatch 
+>         queued IOs to the correct `file*` handle.  RCU might be useful.
+> 
+> 
+> What next?
+> 
+> Ok, so assuming consistency is an issue, #1 is the priority and #2 is 
+> nice-to-have.  This might be the right time for to consider these since 
+> there is so much discussion about loop.c on the list right now.
+> 
+> According to my understanding of the research above this appears to be an 
+> issue and there are other kernel developers who know this code better than I.  
+> 
+> I want to know if this is correct:
+> 
+> Should others be CC'ed on this topic?  If so, who?
+
+ext4 or fsdevel guys.
 
 
-Please pull!
-
-
-The following changes since commit 286901941fd18a52b2138fddbbf589ad3639eb00:
-
-  drbd: set QUEUE_FLAG_STABLE_WRITES (2022-04-06 13:07:53 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-15
-
-for you to fetch changes up to 89a2ee91edd9c555c59e4d38dc54b99141632cc2:
-
-  Merge tag 'nvme-5.18-2022-04-15' of git://git.infradead.org/nvme into block-5.18 (2022-04-15 06:33:49 -0600)
-
-----------------------------------------------------------------
-block-5.18-2022-04-15
-
-----------------------------------------------------------------
-Alexander Lobakin (1):
-      asm-generic: fix __get_unaligned_be48() on 32 bit platforms
-
-Chaitanya Kulkarni (1):
-      nvme: don't print verbose errors for internal passthrough requests
-
-Christoph Hellwig (4):
-      nvme: add a quirk to disable namespace identifiers
-      nvme-pci: disable namespace identifiers for the MAXIO MAP1002/1202
-      nvme-pci: disable namespace identifiers for Qemu controllers
-      block: don't print I/O error warning for dead disks
-
-Jens Axboe (1):
-      Merge tag 'nvme-5.18-2022-04-15' of git://git.infradead.org/nvme into block-5.18
-
-Keith Busch (1):
-      block: move lower_48_bits() to block
-
-Khazhismel Kumykov (1):
-      block/compat_ioctl: fix range check in BLKGETSIZE
-
-Ming Lei (2):
-      block: fix offset/size check in bio_trim()
-      block: null_blk: end timed out poll request
-
- block/bio.c                     |  2 +-
- block/blk-mq.c                  |  3 ++-
- block/ioctl.c                   |  2 +-
- drivers/block/null_blk/main.c   |  2 +-
- drivers/nvme/host/core.c        | 27 ++++++++++++++++++++-------
- drivers/nvme/host/nvme.h        |  5 +++++
- drivers/nvme/host/pci.c         |  9 ++++++++-
- include/asm-generic/unaligned.h |  2 +-
- include/linux/kernel.h          |  9 ---------
- include/linux/t10-pi.h          |  9 +++++++++
- 10 files changed, 48 insertions(+), 22 deletions(-)
-
--- 
-Jens Axboe
+Thanks,
+Ming
 
