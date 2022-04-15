@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D15C38A2D
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 04:53:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 011EBC4321E
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 04:53:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349718AbiDOE4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 00:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47578 "EHLO
+        id S1349664AbiDOE4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 00:56:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349624AbiDOE4D (ORCPT
+        with ESMTP id S1349526AbiDOEzz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 00:56:03 -0400
+        Fri, 15 Apr 2022 00:55:55 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF6D70904;
-        Thu, 14 Apr 2022 21:53:35 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 371986A406;
+        Thu, 14 Apr 2022 21:53:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         Content-Type:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:
         To:From:Sender:Reply-To:Content-ID:Content-Description;
-        bh=9tUaZULhEmteAuYmNe/S5K85i8mY+zpV/R7NWj8li0M=; b=AjCBuPx/UHSGTakXv8HXmgNw4N
-        Iyofq9wNNzfgjbG93scprq/gUs5OOhFUGL0tKjcj2IWWkpHNBkXqusk5CV5Uj/P/70TymjB6Unzdu
-        VnxSzUtQb3ldimIkXALq/IfCXSo1TL1NzeISVmz+Ea7q6xFf02zHvxp+FndxH2zbBXHBFRTOnXe4c
-        nAXrXpjx27cFTMs0mjOzvEq3gOjLOY6hKIcglkznMntAYg+vXORRN23xzGalvjS8R6ccxTXJWj8QW
-        sdXJMYerLCI2QfFcDPA/f8tI4pucu7JSpv7rjXlKJh5WSo2NBa1UXNlyVf9emnFeALezPoiPRp2d8
-        jaVM4Jaw==;
+        bh=XZGhvwW8WnEXnqFpyMAZS4hEeSHoeSYBiqC69zbelFo=; b=Gxz7Y5uJ+XKe3DFB5F+glNf4Qd
+        +ilmHliKeg1fmYV7/5LLANJc72+LNxw8j97CHk5ziFCgc1uz7kS3J7fxsGIO6cnBRc/aEIND8YKio
+        0SkKbU86rwF6U+vXBBwyr3GFqwWasgE9TCw8n+hO0zPxSPP5I4ZPpiX7PrV0Nkluz9OYVJwj4Hmwy
+        oKidnHT0/AqxHbe4vf+J+1VyQBy8myzVvzFwGzWB5MOWnMsTyORGtxjAzgY+jPvDzJzijUERBo3GF
+        IuBPqJCO6mtg8vZGmw86bOvzf7HW3Tdf+1Wt8evubUZivpuvFh33FBjqoHj3OCwfnGHVCD1k5Crl7
+        crl4uuXw==;
 Received: from [2a02:1205:504b:4280:f5dd:42a4:896c:d877] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nfDxb-008OvZ-Ly; Fri, 15 Apr 2022 04:53:32 +0000
+        id 1nfDxW-008OrQ-LX; Fri, 15 Apr 2022 04:53:27 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
@@ -46,9 +46,9 @@ Cc:     dm-devel@redhat.com, linux-xfs@vger.kernel.org,
         ocfs2-devel@oss.oracle.com, linux-mm@kvack.org,
         =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
         <christoph.boehmwalder@linbit.com>
-Subject: [PATCH 07/27] drbd: cleanup decide_on_discard_support
-Date:   Fri, 15 Apr 2022 06:52:38 +0200
-Message-Id: <20220415045258.199825-8-hch@lst.de>
+Subject: [PATCH 05/27] drbd: use bdev based limit helpers in drbd_send_sizes
+Date:   Fri, 15 Apr 2022 06:52:36 +0200
+Message-Id: <20220415045258.199825-6-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220415045258.199825-1-hch@lst.de>
 References: <20220415045258.199825-1-hch@lst.de>
@@ -60,117 +60,47 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Sanitize the calling conventions and use a goto label to cleanup the
-code flow.
+Use the bdev based limits helpers where they exist.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
 ---
- drivers/block/drbd/drbd_nl.c | 68 +++++++++++++++++++-----------------
- 1 file changed, 35 insertions(+), 33 deletions(-)
+ drivers/block/drbd/drbd_main.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/block/drbd/drbd_nl.c b/drivers/block/drbd/drbd_nl.c
-index b7216c186ba4d..4d00986d6f588 100644
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -1204,38 +1204,42 @@ static unsigned int drbd_max_discard_sectors(struct drbd_connection *connection)
- }
+diff --git a/drivers/block/drbd/drbd_main.c b/drivers/block/drbd/drbd_main.c
+index 367715205c860..c39b04bda261f 100644
+--- a/drivers/block/drbd/drbd_main.c
++++ b/drivers/block/drbd/drbd_main.c
+@@ -924,7 +924,9 @@ int drbd_send_sizes(struct drbd_peer_device *peer_device, int trigger_reply, enu
  
- static void decide_on_discard_support(struct drbd_device *device,
--			struct request_queue *q,
--			struct request_queue *b,
--			bool discard_zeroes_if_aligned)
-+		struct drbd_backing_dev *bdev)
- {
--	/* q = drbd device queue (device->rq_queue)
--	 * b = backing device queue (device->ldev->backing_bdev->bd_disk->queue),
--	 *     or NULL if diskless
--	 */
--	struct drbd_connection *connection = first_peer_device(device)->connection;
--	bool can_do = b ? blk_queue_discard(b) : true;
--
--	if (can_do && connection->cstate >= C_CONNECTED && !(connection->agreed_features & DRBD_FF_TRIM)) {
--		can_do = false;
--		drbd_info(connection, "peer DRBD too old, does not support TRIM: disabling discards\n");
--	}
--	if (can_do) {
--		/* We don't care for the granularity, really.
--		 * Stacking limits below should fix it for the local
--		 * device.  Whether or not it is a suitable granularity
--		 * on the remote device is not our problem, really. If
--		 * you care, you need to use devices with similar
--		 * topology on all peers. */
--		blk_queue_discard_granularity(q, 512);
--		q->limits.max_discard_sectors = drbd_max_discard_sectors(connection);
--		blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
--		q->limits.max_write_zeroes_sectors = drbd_max_discard_sectors(connection);
--	} else {
--		blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
--		blk_queue_discard_granularity(q, 0);
--		q->limits.max_discard_sectors = 0;
--		q->limits.max_write_zeroes_sectors = 0;
-+	struct drbd_connection *connection =
-+		first_peer_device(device)->connection;
-+	struct request_queue *q = device->rq_queue;
+ 	memset(p, 0, packet_size);
+ 	if (get_ldev_if_state(device, D_NEGOTIATING)) {
+-		struct request_queue *q = bdev_get_queue(device->ldev->backing_bdev);
++		struct block_device *bdev = device->ldev->backing_bdev;
++		struct request_queue *q = bdev_get_queue(bdev);
 +
-+	if (bdev && !blk_queue_discard(bdev->backing_bdev->bd_disk->queue))
-+		goto not_supported;
-+
-+	if (connection->cstate >= C_CONNECTED &&
-+	    !(connection->agreed_features & DRBD_FF_TRIM)) {
-+		drbd_info(connection,
-+			"peer DRBD too old, does not support TRIM: disabling discards\n");
-+		goto not_supported;
- 	}
-+
-+	/*
-+	 * We don't care for the granularity, really.
-+	 *
-+	 * Stacking limits below should fix it for the local device.  Whether or
-+	 * not it is a suitable granularity on the remote device is not our
-+	 * problem, really. If you care, you need to use devices with similar
-+	 * topology on all peers.
-+	 */
-+	blk_queue_discard_granularity(q, 512);
-+	q->limits.max_discard_sectors = drbd_max_discard_sectors(connection);
-+	blk_queue_flag_set(QUEUE_FLAG_DISCARD, q);
-+	q->limits.max_write_zeroes_sectors =
-+		drbd_max_discard_sectors(connection);
-+	return;
-+
-+not_supported:
-+	blk_queue_flag_clear(QUEUE_FLAG_DISCARD, q);
-+	blk_queue_discard_granularity(q, 0);
-+	q->limits.max_discard_sectors = 0;
-+	q->limits.max_write_zeroes_sectors = 0;
- }
- 
- static void fixup_discard_if_not_supported(struct request_queue *q)
-@@ -1273,7 +1277,6 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
- 	unsigned int max_segments = 0;
- 	struct request_queue *b = NULL;
- 	struct disk_conf *dc;
--	bool discard_zeroes_if_aligned = true;
- 
- 	if (bdev) {
- 		b = bdev->backing_bdev->bd_disk->queue;
-@@ -1282,7 +1285,6 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
+ 		d_size = drbd_get_max_capacity(device->ldev);
  		rcu_read_lock();
- 		dc = rcu_dereference(device->ldev->disk_conf);
- 		max_segments = dc->max_bio_bvecs;
--		discard_zeroes_if_aligned = dc->discard_zeroes_if_aligned;
- 		rcu_read_unlock();
- 
- 		blk_set_stacking_limits(&q->limits);
-@@ -1292,7 +1294,7 @@ static void drbd_setup_queue_param(struct drbd_device *device, struct drbd_backi
- 	/* This is the workaround for "bio would need to, but cannot, be split" */
- 	blk_queue_max_segments(q, max_segments ? max_segments : BLK_MAX_SEGMENTS);
- 	blk_queue_segment_boundary(q, PAGE_SIZE-1);
--	decide_on_discard_support(device, q, b, discard_zeroes_if_aligned);
-+	decide_on_discard_support(device, bdev);
- 
- 	if (b) {
- 		blk_stack_limits(&q->limits, &b->limits, 0);
+ 		u_size = rcu_dereference(device->ldev->disk_conf)->disk_size;
+@@ -933,13 +935,13 @@ int drbd_send_sizes(struct drbd_peer_device *peer_device, int trigger_reply, enu
+ 		max_bio_size = queue_max_hw_sectors(q) << 9;
+ 		max_bio_size = min(max_bio_size, DRBD_MAX_BIO_SIZE);
+ 		p->qlim->physical_block_size =
+-			cpu_to_be32(queue_physical_block_size(q));
++			cpu_to_be32(bdev_physical_block_size(bdev));
+ 		p->qlim->logical_block_size =
+-			cpu_to_be32(queue_logical_block_size(q));
++			cpu_to_be32(bdev_logical_block_size(bdev));
+ 		p->qlim->alignment_offset =
+ 			cpu_to_be32(queue_alignment_offset(q));
+-		p->qlim->io_min = cpu_to_be32(queue_io_min(q));
+-		p->qlim->io_opt = cpu_to_be32(queue_io_opt(q));
++		p->qlim->io_min = cpu_to_be32(bdev_io_min(bdev));
++		p->qlim->io_opt = cpu_to_be32(bdev_io_opt(bdev));
+ 		p->qlim->discard_enabled = blk_queue_discard(q);
+ 		put_ldev(device);
+ 	} else {
 -- 
 2.30.2
 
