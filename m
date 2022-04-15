@@ -2,154 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3256C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 00:15:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9120DC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 01:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241534AbiDOARf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 20:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48696 "EHLO
+        id S230168AbiDOBMT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 21:12:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55784 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241452AbiDOARf (ORCPT
+        with ESMTP id S1348362AbiDOBMR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 20:17:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9CDA25EBE0
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 17:15:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649981707;
+        Thu, 14 Apr 2022 21:12:17 -0400
+Received: from beige.elm.relay.mailchannels.net (beige.elm.relay.mailchannels.net [23.83.212.16])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2747D3B550
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 18:09:50 -0700 (PDT)
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+        by relay.mailchannels.net (Postfix) with ESMTP id 3F01A6C1504;
+        Fri, 15 Apr 2022 01:09:50 +0000 (UTC)
+Received: from pdx1-sub0-mail-a254.dreamhost.com (unknown [127.0.0.6])
+        (Authenticated sender: dreamhost)
+        by relay.mailchannels.net (Postfix) with ESMTPA id 8EFCE6C0C02;
+        Fri, 15 Apr 2022 01:09:49 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1649984989; a=rsa-sha256;
+        cv=none;
+        b=luGsKPMKMzwoZaCehgAtQDKXHtLwI/Bb+IQrwoEOtbCCWFGlsSC384//89DMk1Di1w/ktl
+        6pnoE9ni4QJ64CYEUY7LU1ceAbnw/awe9dQksZuFBENWPbIRjl/gIuNKuA0dv8qf4awMvE
+        phXc2+tVdtKhMFyXyR/Zj13rPRrCKMoazfYEc0oPJgsWPT1rAlsBUK24xBKtX3ecUpOmT3
+        BImaupRDqDL1CriNK3SNhF5jcF7CrL+Y9p7hrhrK+LsM7RvnHPDyStnDoUk0cwN06JBFLc
+        6aJ306dq0SGD/f7L4qW79KVY3gtob3b5Mw5vLB5GIsnHMyA68PjXAa2kYp4MjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+        s=arc-2022; t=1649984989;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=CGA0sZQuZMtep/DXV9pp9QKiPU6kPEr+26lp8dvp17w=;
-        b=WV4Shgpg9RN0cmZBaBdMCJahsBXSpKTaqg5BiXzRC64rtLjBbOs0uKN/a7oAN9zGHtYNwh
-        YAazoBZZ175uwv6cj1WKFLypzTNZqh3Sb1C6sPhZ+lc0QvpGgkA6dBoXhcDT1wHjBa0gUM
-        Jn/G3hN/LsI3q7tZjzj81MNgClr4eS0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-477-DIlnEp-7OBaXE6IBa1lq7g-1; Thu, 14 Apr 2022 20:15:04 -0400
-X-MC-Unique: DIlnEp-7OBaXE6IBa1lq7g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+         in-reply-to:in-reply-to:references:references:dkim-signature;
+        bh=1qz53KrRMkB/ZM+kzLvy6ZodR3AQ4fKs9G5gZAUuH0A=;
+        b=idifjoJJrkNK8WVHYyeM9AEMuH9nMPtNjaZmYUzyeeorrBqzc28QuXoJLvjhd2ILJNkG9C
+        mg6MHl6kSm2Gn3f8s5BqXG66C1+st9OqCwRYvT+1ipgUkRo/YbbGS+PG2y3V2qmkySyv6F
+        zv/iL5kMZ6zq5QBDt/fCSdh6KIQ1D9tJtSh9iHDCHGegKitiiIDcGkSNS+079bxi6X4yoI
+        ANPlY3HPuEsEMwINshXtKo+PEI0WpGImy4kVuNCft/gb0q0TMmZpZlXcv47uRibJYA/a+v
+        n25faLsXTxbNbBkGG/WjZPDTIUgYcSULsls16vYyllrMcbcdVnIb21Oo4C0VdA==
+ARC-Authentication-Results: i=1;
+        rspamd-5f678fb567-kjczk;
+        auth=pass smtp.auth=dreamhost smtp.mailfrom=dave@stgolabs.net
+X-Sender-Id: dreamhost|x-authsender|dave@stgolabs.net
+Received: from pdx1-sub0-mail-a254.dreamhost.com (pop.dreamhost.com
+ [64.90.62.162])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+        by 100.121.210.130 (trex/6.7.1);
+        Fri, 15 Apr 2022 01:09:50 +0000
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: dreamhost|x-authsender|dave@stgolabs.net
+X-MailChannels-Auth-Id: dreamhost
+X-Oafish-Share: 01e8484824ac3d66_1649984989900_3690627288
+X-MC-Loop-Signature: 1649984989900:2156853323
+X-MC-Ingress-Time: 1649984989899
+Received: from offworld (unknown [104.36.29.107])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 93E41811E7A;
-        Fri, 15 Apr 2022 00:15:03 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F0502111D3D2;
-        Fri, 15 Apr 2022 00:14:44 +0000 (UTC)
-Date:   Fri, 15 Apr 2022 08:14:40 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 5/8] dm: always setup ->orig_bio in alloc_io
-Message-ID: <Yli48LmLi7dEngLn@T590>
-References: <20220412085616.1409626-6-ming.lei@redhat.com>
- <YlXmmB6IO7usz2c1@redhat.com>
- <YlYt2rzM0NBPARVp@T590>
- <YlZp3+VrP930VjIQ@redhat.com>
- <YlbBf0mJa/BPHSSq@T590>
- <YlcPXslr6Y7cHOSU@redhat.com>
- <Yldsqh2YsclXYl3s@T590>
- <YleGKbZiHeBIJidI@redhat.com>
- <YlebwjTKH2MU9tCD@T590>
- <Ylhdvac5SY85r+1R@redhat.com>
+        (Authenticated sender: dave@stgolabs.net)
+        by pdx1-sub0-mail-a254.dreamhost.com (Postfix) with ESMTPSA id 4KfdXX5lD1z1Mx;
+        Thu, 14 Apr 2022 18:09:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=stgolabs.net;
+        s=dreamhost; t=1649984989;
+        bh=1qz53KrRMkB/ZM+kzLvy6ZodR3AQ4fKs9G5gZAUuH0A=;
+        h=Date:From:To:Cc:Subject:Content-Type;
+        b=O0+czJqmRR1GmwHVbk8DOZuXFi/0/9x4iIDnaiGBcrCRK3+rC3Z7EnknuZhHhnzxH
+         8crK0Mn/X6XbbA7wlTnHy2XF0HZtKDBQboX8epE2Stqh74LtHpsp0wZjzifSwp5eGT
+         stXF8eYZDzirf8+URNQwsprcw35oXm8rYXdhojQugAF5NaoZrVl3D5PmajL0Cs73uc
+         NGMqSlZ4HH/JVPF+TkGCGyFLsF8l9FJ3Rb7Gf8SEmzLFafY6jAYEIcXAF57F4IDI0E
+         LjuIemgJ50C7mKzwhTPah/RrpdPLe+iz8JxpkoJz9TMgdUzEBfm929NKJro0XEqLL2
+         xGBFocPyId6kg==
+Date:   Thu, 14 Apr 2022 18:09:45 -0700
+From:   Davidlohr Bueso <dave@stgolabs.net>
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     shinichiro.kawasaki@wdc.com, Klaus Jensen <its@irrelevant.dk>,
+        "Paul E. McKenney" <paulmck@kernel.org>,
+        linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Subject: Re: blktests with zbd/006 ZNS triggers a possible false positive RCU
+ stall
+Message-ID: <20220415010945.wvyztmss7rfqnlog@offworld>
+References: <YliZ9M6QWISXvhAJ@bombadil.infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <Ylhdvac5SY85r+1R@redhat.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+In-Reply-To: <YliZ9M6QWISXvhAJ@bombadil.infradead.org>
+User-Agent: NeoMutt/20201120
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 14, 2022 at 01:45:33PM -0400, Mike Snitzer wrote:
-> On Wed, Apr 13 2022 at 11:57P -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Wed, Apr 13, 2022 at 10:25:45PM -0400, Mike Snitzer wrote:
-> > > On Wed, Apr 13 2022 at  8:36P -0400,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > On Wed, Apr 13, 2022 at 01:58:54PM -0400, Mike Snitzer wrote:
-> > > > > 
-> > > > > The bigger issue with this patch is that you've caused
-> > > > > dm_submit_bio_remap() to go back to accounting the entire original bio
-> > > > > before any split occurs.  That is a problem because you'll end up
-> > > > > accounting that bio for every split, so in split heavy workloads the
-> > > > > IO accounting won't reflect when the IO is actually issued and we'll
-> > > > > regress back to having very inaccurate and incorrect IO accounting for
-> > > > > dm_submit_bio_remap() heavy targets (e.g. dm-crypt).
-> > > > 
-> > > > Good catch, but we know the length of mapped part in original bio before
-> > > > calling __map_bio(), so io->sectors/io->offset_sector can be setup here,
-> > > > something like the following delta change should address it:
-> > > > 
-> > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > > index db23efd6bbf6..06b554f3104b 100644
-> > > > --- a/drivers/md/dm.c
-> > > > +++ b/drivers/md/dm.c
-> > > > @@ -1558,6 +1558,13 @@ static int __split_and_process_bio(struct clone_info *ci)
-> > > >  
-> > > >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
-> > > >  	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> > > > +
-> > > > +	if (ci->sector_count > len) {
-> > > > +		/* setup the mapped part for accounting */
-> > > > +		dm_io_set_flag(ci->io, DM_IO_SPLITTED);
-> > > > +		ci->io->sectors = len;
-> > > > +		ci->io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
-> > > > +	}
-> > > >  	__map_bio(clone);
-> > > >  
-> > > >  	ci->sector += len;
-> > > > @@ -1603,11 +1610,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
-> > > >  	if (error || !ci.sector_count)
-> > > >  		goto out;
-> > > >  
-> > > > -	/* setup the mapped part for accounting */
-> > > > -	dm_io_set_flag(ci.io, DM_IO_SPLITTED);
-> > > > -	ci.io->sectors = bio_sectors(bio) - ci.sector_count;
-> > > > -	ci.io->sector_offset = bio_end_sector(bio) - bio->bi_iter.bi_sector;
-> > > > -
-> > > >  	bio_trim(bio, ci.io->sectors, ci.sector_count);
-> > > >  	trace_block_split(bio, bio->bi_iter.bi_sector);
-> > > >  	bio_inc_remaining(bio);
-> > > > 
-> > > > -- 
-> > > > Ming
-> > > > 
-> > > 
-> > > Unfortunately we do need splitting after __map_bio() because a dm
-> > > target's ->map can use dm_accept_partial_bio() to further reduce a
-> > > bio's mapped part.
-> > > 
-> > > But I think dm_accept_partial_bio() could be trained to update
-> > > tio->io->sectors?
-> > 
-> > ->orig_bio is just for serving io accounting, but ->orig_bio isn't
-> > passed to dm_accept_partial_bio(), and not gets updated after
-> > dm_accept_partial_bio() is called.
-> > 
-> > If that is one issue, it must be one existed issue in dm io accounting
-> > since ->orig_bio isn't updated when dm_accept_partial_bio() is called.
-> 
-> Recall that ->orig_bio is updated after the bio_split() at the bottom of
-> dm_split_and_process_bio().
-> 
-> That bio_split() is based on ci->sector_count, which is reduced as a
-> side-effect of dm_accept_partial_bio() reducing tio->len_ptr.  It is
-> pretty circuitous so I can absolutely understand why you didn't
-> immediately appreciate the interface.  The block comment above
-> dm_accept_partial_bio() does a pretty comprehensive job of explaining.
+On Thu, 14 Apr 2022, Luis Chamberlain wrote:
 
-Go it now, thanks for the explanation.
+>Hey folks,
+>
+>While enhancing kdevops [0] to embrace automation of testing with
+>blktests for ZNS I ended up spotting a possible false positive RCU stall
+>when running zbd/006 after zbd/005. The curious thing though is that
+>this possible RCU stall is only possible when using the qemu
+>ZNS drive, not when using nbd. In so far as kdevops is concerned
+>it creates ZNS drives for you when you enable the config option
+>CONFIG_QEMU_ENABLE_NVME_ZNS=y. So picking any of the ZNS drives
+>suffices. When configuring blktests you can just enable the zbd
+>guest, so only a pair of guests are reated the zbd guest and the
+>respective development guest, zbd-dev guest. When using
+>CONFIG_KDEVOPS_HOSTS_PREFIX="linux517" this means you end up with
+>just two guests:
+>
+>  * linux517-blktests-zbd
+>  * linux517-blktests-zbd-dev
+>
+>The RCU stall can be triggered easily as follows:
+>
+>make menuconfig # make sure to enable CONFIG_QEMU_ENABLE_NVME_ZNS=y and blktests
+>make
+>make bringup # bring up guests
+>make linux # build and boot into v5.17-rc7
+>make blktests # build and install blktests
+>
+>Now let's ssh to the guest while leaving a console attached
+>with `sudo virsh vagrant_linux517-blktests-zbd` in a window:
+>
+>ssh linux517-blktests-zbd
+>sudo su -
+>cd /usr/local/blktests
+>export TEST_DEVS=/dev/nvme9n1
+>i=0; while true; do ./check zbd/005 zbd/006; if [[ $? -ne 0 ]]; then echo "BAD at $i"; break; else echo GOOOD $i ; fi; let i=$i+1; done;
+>
+>The above should never fail, but you should eventually see an RCU
+>stall candidate on the console. The full details can be observed on the
+>gist [1] but for completeness I list some of it below. It may be a false
+>positive at this point, not sure.
+>
+>[493272.711271] run blktests zbd/005 at 2022-04-14 20:03:22
+>[493305.769531] run blktests zbd/006 at 2022-04-14 20:03:55
+>[493336.979482] nvme nvme9: I/O 192 QID 5 timeout, aborting
+>[493336.981666] nvme nvme9: Abort status: 0x0
+>[493367.699440] nvme nvme9: I/O 192 QID 5 timeout, reset controller
+>[493388.819341] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+>[493425.817272] rcu:    4-....: (0 ticks this GP) idle=c48/0/0x0 softirq=11316030/11316030 fqs=939  (false positive?)
+>[493425.819275]         (detected by 7, t=14522 jiffies, g=31237493, q=6271)
 
-As you mentioned, it can be addressed in dm_accept_partial_bio()
-by updating ti->io->sectors.
+Ok so CPU-7 detected stalls on CPU-4, which is in dyntick-idle mode,
+which is an extended quiescent state (EQS) to overcome the limitations of
+not having a tick (NO_HZ). So the false positive looks correct here in
+that idle threads in this state are not in fact blocking the grace period
+kthread.
 
+No idea, however, why this would happen when using qemu as opposed to
+nbd.
 
 Thanks,
-Ming
-
+Davidlohr
