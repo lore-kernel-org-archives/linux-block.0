@@ -2,158 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDDDC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 15:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 320BFC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 17:33:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355732AbiDOPji (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 11:39:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56160 "EHLO
+        id S235083AbiDORff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 13:35:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42876 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355831AbiDOPhs (ORCPT
+        with ESMTP id S234977AbiDORfe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 11:37:48 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D82E21B790;
-        Fri, 15 Apr 2022 08:34:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04407;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VA7riuI_1650036890;
-Received: from localhost(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VA7riuI_1650036890)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Fri, 15 Apr 2022 23:34:51 +0800
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-To:     linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, bostroesser@gmail.com
-Subject: [PATCH v3] scsi: target: tcmu: Fix possible data corruption
-Date:   Fri, 15 Apr 2022 23:34:50 +0800
-Message-Id: <20220415153450.15184-1-xiaoguang.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.14.4.44.g2045bb6
+        Fri, 15 Apr 2022 13:35:34 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCF9F59A7B
+        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 10:33:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=8gU2lm0j+eGzSDNtIV/caHzrW072udW9pBWRUBEKfjM=; b=Bl58gB2lsYoRMXH4kM3gKpc4To
+        CPrXYHdo6NYpmVJpQTQhb7Kg4s1fCwYV6SAfLaAB7/UO+QKt6WIz8Djvi0HkYBeYfJ76RlCIReFsQ
+        hPJRRVPrX2QaCATHIs3EZ4h7DEzjqDMC21rf9caxgYXwobOD4WewIFlxHetpW1gzYgKMgEBJJgdpS
+        282+B415bRyOtTiHkkDrUfAF4m8Y9MG3SA2qmKDBnHAq7qehpbtOIexh/jXVbVYO6oX7pee4ueh4N
+        +isEhZaCdTUw3Jemd98p7hXQSM4VyBAK2R1I90XNuyTMFzMjzKS6YjMBvvnqUrysU1Cc1dIQpWMT4
+        aaHT1ERg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nfPoa-00B0mU-M3; Fri, 15 Apr 2022 17:33:00 +0000
+Date:   Fri, 15 Apr 2022 10:33:00 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Davidlohr Bueso <dave@stgolabs.net>,
+        Klaus Jensen <its@irrelevant.dk>,
+        "Paul E. McKenney" <paulmck@kernel.org>
+Cc:     shinichiro.kawasaki@wdc.com, Klaus Jensen <its@irrelevant.dk>,
+        linux-block@vger.kernel.org, Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Subject: Re: blktests with zbd/006 ZNS triggers a possible false positive RCU
+ stall
+Message-ID: <YlmsTCBLg6hB2eNn@bombadil.infradead.org>
+References: <YliZ9M6QWISXvhAJ@bombadil.infradead.org>
+ <20220415010945.wvyztmss7rfqnlog@offworld>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220415010945.wvyztmss7rfqnlog@offworld>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When tcmu_vma_fault() gets one page successfully, before the current
-context completes page fault procedure, find_free_blocks() may run in
-and call unmap_mapping_range() to unmap this page. Assume when
-find_free_blocks() completes its job firstly, previous page fault
-procedure starts to run again and completes, then one truncated page has
-beed mapped to use space, but note that tcmu_vma_fault() has gotten one
-refcount for this page, so any other subsystem won't use this page,
-unless later the use space addr is unmapped.
+On Thu, Apr 14, 2022 at 06:09:45PM -0700, Davidlohr Bueso wrote:
+> No idea, however, why this would happen when using qemu as opposed to
+> nbd.
 
-If another command runs in later and needs to extends dbi_thresh, it may
-reuse the corresponding slot to previous page in data_bitmap, then though
-we'll allocate new page for this slot in data_area, but no page fault will
-happen again, because we have a valid map, real request's data will lose.
+Sorry I keep saying nbd often when I mean null_blk, but yeah, same concept,
+in that I meant an nvme controller is involved *with* the RCU splat.
 
-Filesystem implementations will also run into this issue, but they
-usually lock page when vm_operations_struct->fault gets one page, and
-unlock page after finish_fault() completes. In truncate sides, they
-lock pages in truncate_inode_pages() to protect race with page fault.
-We can also have similar codes like filesystem to fix this issue.
+The qemu nvme driver and qemu controller would be one code run time surface
+to conside here, the two consecutive nvme controller IO timeouts seem
+to be telling of a backlog of some sort:
 
-To fix this possible data corruption, we can apply similar method like
-filesystem. For pages that are to be freed, find_free_blocks() locks
-and unlocks these pages, and make tcmu_vma_fault() also lock found page
-under cmdr_lock. With this action, for above race, find_free_blocks()
-will wait all page faults to be completed before calling
-unmap_mapping_range(), and later if unmap_mapping_range() is called,
-it will ensure stale mappings to be removed cleanly.
+[493305.769531] run blktests zbd/006 at 2022-04-14 20:03:55
+[493336.979482] nvme nvme9: I/O 192 QID 5 timeout, aborting
+[493336.981666] nvme nvme9: Abort status: 0x0
+[493367.699440] nvme nvme9: I/O 192 QID 5 timeout, reset controller
+<-- rcu possible stall and NMIs-->
+[493426.706021] nvme nvme9: 8/0/0 default/read/poll queues
 
-Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
----
-V3:
- Just lock/unlock_page in tcmu_blocks_release(), and call
-tcmu_blocks_release() before unmap_mapping_range().
+So that seems to be pattern here. First puzzle is *why* we end up with
+the IO timeout on the qemu nvme controller. And for this reason I CC'd
+Klaus, in case he might have any ideas.
 
-V2:
-  Wait all possible inflight page faults to be completed in
-find_free_blocks() to fix possible stale map.
----
- drivers/target/target_core_user.c | 30 +++++++++++++++++++++++++++---
- 1 file changed, 27 insertions(+), 3 deletions(-)
+The first "timeout, aborting" happens when we have a first timeout of
+a request for IO tag 192 sent to the controller and it just times out.
+This seems to happen about 30 seconds after the test zbd/006 starts.
 
-diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
-index fd7267baa707..ff4a575a14d2 100644
---- a/drivers/target/target_core_user.c
-+++ b/drivers/target/target_core_user.c
-@@ -20,6 +20,7 @@
- #include <linux/configfs.h>
- #include <linux/mutex.h>
- #include <linux/workqueue.h>
-+#include <linux/pagemap.h>
- #include <net/genetlink.h>
- #include <scsi/scsi_common.h>
- #include <scsi/scsi_proto.h>
-@@ -1667,6 +1668,25 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
- 	xas_lock(&xas);
- 	xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
- 		xas_store(&xas, NULL);
-+		/*
-+		 * While reaching here, there maybe page faults occurring on
-+		 * these to be released pages, and there maybe one race that
-+		 * unmap_mapping_range() is called before page fault on these
-+		 * pages are finished, then valid but stale map is created.
-+		 *
-+		 * If another command runs in later and needs to extends
-+		 * dbi_thresh, it may reuse the corresponding slot to previous
-+		 * page in data_bitmap, then though we'll allocate new page for
-+		 * this slot in data_area, but no page fault will happen again,
-+		 * because we have a valid map, command's data will lose.
-+		 *
-+		 * So here we lock and unlock pages that are to be released to
-+		 * ensure all page faults to be completed, then following
-+		 * unmap_mapping_range() can ensure stale maps to be removed
-+		 * cleanly.
-+		 */
-+		lock_page(page);
-+		unlock_page(page);
- 		__free_page(page);
- 		pages_freed++;
- 	}
-@@ -1822,6 +1842,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
- 	page = xa_load(&udev->data_pages, dpi);
- 	if (likely(page)) {
- 		get_page(page);
-+		lock_page(page);
- 		mutex_unlock(&udev->cmdr_lock);
- 		return page;
- 	}
-@@ -1863,6 +1884,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
- 	struct page *page;
- 	unsigned long offset;
- 	void *addr;
-+	vm_fault_t ret = 0;
- 
- 	int mi = tcmu_find_mem_index(vmf->vma);
- 	if (mi < 0)
-@@ -1887,10 +1909,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
- 		page = tcmu_try_get_data_page(udev, dpi);
- 		if (!page)
- 			return VM_FAULT_SIGBUS;
-+		ret = VM_FAULT_LOCKED;
- 	}
- 
- 	vmf->page = page;
--	return 0;
-+	return ret;
- }
- 
- static const struct vm_operations_struct tcmu_vm_ops = {
-@@ -3205,12 +3228,13 @@ static void find_free_blocks(void)
- 			udev->dbi_max = block;
- 		}
- 
-+		/* Release the block pages */
-+		pages_freed = tcmu_blocks_release(udev, start, end - 1);
-+
- 		/* Here will truncate the data area from off */
- 		off = udev->data_off + (loff_t)start * udev->data_blk_size;
- 		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
- 
--		/* Release the block pages */
--		pages_freed = tcmu_blocks_release(udev, start, end - 1);
- 		mutex_unlock(&udev->cmdr_lock);
- 
- 		total_pages_freed += pages_freed;
--- 
-2.14.4.44.g2045bb6
+The "reset controller" will happen if we already issued the IO command
+with tag 192 before and had already timed out before and hadn't been returned
+to the driver. Resetting the controller is the stop gap measure.
 
+The nvme_timeout() is just shared blk_mq_ops between nvme_mq_admin_ops
+and nvme_mq_ops.
+
+Inspecting the logs of running test zbd/005 and zbd/006 in a loop I can
+see that not all nvme resets of the controller end up in the RCU stall splat
+though.
+
+The timeout of an IO happens about after 30 seconds the test starts, then
+the reset 30 seconds after that first timeout, then the RCU stall about
+30 seconds after. For instance follow these now mapped times:
+
+Apr 13 23:02:33 linux517-blktests-zbd unknown: run blktests zbd/006 at 2022-04-13 23:02:33
+30 seconds go by ...
+Apr 13 23:03:05 linux517-blktests-zbd kernel: nvme nvme9: I/O 651 QID 3 timeout, aborting
+Apr 13 23:03:05 linux517-blktests-zbd kernel: nvme nvme9: Abort status: 0x0
+30 seconds go by ...
+Apr 13 23:03:36 linux517-blktests-zbd kernel: nvme nvme9: I/O 651 QID 3 timeout, reset controller
+30 seconds go by ...
+Apr 13 23:04:04 linux517-blktests-zbd kernel: rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+
+So the reset happens and yet we stay put. The reset work for the PCI
+nvme controller is on nvme_reset_work() drivers/nvme/host/pci.c and
+I don't see that issue'ing stuff back up the admin queue, however,
+the first IO timeout did send an admin abort, on the same file:
+
+drivers/nvme/host/pci.c
+static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
+{
+	...
+	dev_warn(nvmeq->dev->ctrl.device,                                       
+                "I/O %d QID %d timeout, aborting\n",                            
+                 req->tag, nvmeq->qid);                                         
+                                                                                
+        abort_req = blk_mq_alloc_request(dev->ctrl.admin_q, nvme_req_op(&cmd),  
+                                         BLK_MQ_REQ_NOWAIT);                    
+        if (IS_ERR(abort_req)) {                                                
+                atomic_inc(&dev->ctrl.abort_limit);                             
+                return BLK_EH_RESET_TIMER;                                      
+        }                                                                       
+        nvme_init_request(abort_req, &cmd);                                     
+                                                                                
+        abort_req->end_io_data = NULL;                                          
+        blk_execute_rq_nowait(abort_req, false, abort_endio);  
+	...
+}
+
+So this is all seems by design. What's puzzling is why it takes
+about 30 seconds to get to the possible RCU stall splat *after* we
+reset the nvme controller. It make me wonder if we left something
+lingering in a black hole somewhere after our first reset. Is it
+right to gather from the RCU splat that whatever it was, it was stuck
+in a long spin lock?
+
+  Luis
