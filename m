@@ -2,147 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AB13C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 11:01:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E070BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 11:30:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352563AbiDOLDu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 15 Apr 2022 07:03:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34866 "EHLO
+        id S1345000AbiDOLdV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 15 Apr 2022 07:33:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352663AbiDOLD3 (ORCPT
+        with ESMTP id S240835AbiDOLdU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 15 Apr 2022 07:03:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EFD46BF52F
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 04:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650020450;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=swJmJjsyEir1ptFGEkx0uxAo7c+eDE2H3xRn7VWYphQ=;
-        b=IyYak90jj0HnWuOqkylXROFzabUoWUlkUVMnfOXlfdlLFBAQbXK96WbRV5P/rZzQmHQ5uV
-        6Bu+tN7iywngoTfqO42rK/lM/oB5Mc8xiV5Cd9DEGERBWPN8DI1iosIBysTVFt07Ec5Hhh
-        w4Wa4JfqaaQr3ndH6YO3KzKD07p+9To=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-85-AyWIkw6wMn-zgAe2jDt2yg-1; Fri, 15 Apr 2022 07:00:47 -0400
-X-MC-Unique: AyWIkw6wMn-zgAe2jDt2yg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DDEA638041DB;
-        Fri, 15 Apr 2022 11:00:46 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id D388C40EC01C;
-        Fri, 15 Apr 2022 11:00:42 +0000 (UTC)
-Date:   Fri, 15 Apr 2022 19:00:37 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <YllQVT6n472eUB7+@T590>
-References: <20220415034703.2081695-1-ming.lei@redhat.com>
- <20220415051844.GA22762@lst.de>
+        Fri, 15 Apr 2022 07:33:20 -0400
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF56813D10;
+        Fri, 15 Apr 2022 04:30:52 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id bh17so14915878ejb.8;
+        Fri, 15 Apr 2022 04:30:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=NuMDg4fRhVyWhAZksl85UPhTSm7yzkXOLLW7/T+oU88=;
+        b=MKRUp8vjgZui77tLGwshuC3NWpStzpUB4J8Y9Zsw90Hp2SvnLSIbRgobWeqLvboBAy
+         dsmY5Tg3hucjiEYnI3qoi3naAjfeqFmKWmqbYwstsUT/A4qR5gMEoJtOGFfL0UBRxFWr
+         uDjxwvN+QeWNEGDAC5umIukQtY5eYoIICdN5WgY93NNPHfwXFL/XS21ZauYOnGu6IK+i
+         qGLPDPFmMh4bueXqwL+4iHkYsVWjrcPk5XEY9fGuDcDVcrPqNEPWLtP94l94bBgTyKoz
+         B0JHOAViwZrs+vtZjdXIOLHWb6AeHeJnICaNT2+uByItUcZkaCvxvsERdRoD0gXbwVU+
+         oLWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=NuMDg4fRhVyWhAZksl85UPhTSm7yzkXOLLW7/T+oU88=;
+        b=JvPgNoeDCg+Wts4Ac+5LB+pyvtPweo1mrcnA/lKxjsmzHYcJOS2LtcgqiJGmRz+svX
+         6hVezLibPSSF4RuU7D0TtFhkaZ3zkUVeiJkeJt24t9f3YKyIYsg5Az9j2wk1fBqYKgF7
+         R/RxPO78vDdXak2FosGD/GFWnF3uHB7mcqnyPB4JkjWxu8/ZKdH0i3sxhujgkqupdw7q
+         x6Pe8mBhtUGrgGJ1aIdF20/+36ksES04Xo01XJgZIBHRMYUrcTYOzCTYO7Q6xIYOUCO2
+         7YLcTh/QoQIeKuVinzzSIFFDMQn2CeCpaVRBkb+TkkddDYQ82/RioL/RfTIjZlCbQrmL
+         OMaw==
+X-Gm-Message-State: AOAM532DmRF9lm2R9rBJLaQ8R4JuD+xKXCD/IMqsG3Us2wV1FXWrlop5
+        66yr/UXC6gyAMLfo3o5VNqzElTrKois=
+X-Google-Smtp-Source: ABdhPJy9duN7S1DD+los3T/PtKdJsAsrebIer+Y+d1C2GhqYt2PHI2c21HL/V5FH49v1A0RuLX78Ew==
+X-Received: by 2002:a17:906:9b8f:b0:6db:ab62:4713 with SMTP id dd15-20020a1709069b8f00b006dbab624713mr6004025ejc.738.1650022251218;
+        Fri, 15 Apr 2022 04:30:51 -0700 (PDT)
+Received: from [192.168.178.40] (ipbcc1cfad.dynamic.kabel-deutschland.de. [188.193.207.173])
+        by smtp.gmail.com with ESMTPSA id z22-20020a1709063ad600b006e8867caa5dsm1593790ejd.72.2022.04.15.04.30.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Apr 2022 04:30:50 -0700 (PDT)
+Message-ID: <cb3a64c6-eeee-213f-ad71-d343e9c0e13c@gmail.com>
+Date:   Fri, 15 Apr 2022 13:30:49 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220415051844.GA22762@lst.de>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v2] scsi: target: tcmu: Fix possible data corruption
+Content-Language: en-US
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20220411135958.21385-1-xiaoguang.wang@linux.alibaba.com>
+From:   Bodo Stroesser <bostroesser@gmail.com>
+In-Reply-To: <20220411135958.21385-1-xiaoguang.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 07:18:44AM +0200, Christoph Hellwig wrote:
-> On Fri, Apr 15, 2022 at 11:47:03AM +0800, Ming Lei wrote:
-> > +	/* make sure the bio is issued before polling */
-> > +	if (bio.bi_opf & REQ_POLLED)
-> > +		blk_flush_plug(current->plug, false);
-> 
-> I still think the core code should handle this.  Without that we'd need
-> to export the blk_flush_plug for anything that would want to poll bios
-> from modules, in addition to it generally being a mess.  See a proposed
+Hi,
 
-So far there isn't such usage yet. dm calls bio_poll() in ->iopoll(),
-and its caller(io_uring) will finish the plug.
+Thank you for the patch.
 
-> patch for that below.  I'd also split the flush aspect from the poll
-> aspect into two patches.
-> 
-> > +		if (bio.bi_opf & REQ_POLLED)
-> > +			bio_poll(&bio, NULL, 0);
-> > +		else
-> >  			blk_io_schedule();
-> 
-> Instead of this duplicate logic everywhere I'd just make bio_boll
-> call blk_io_schedule for the !REQ_POLLED case and simplify all the
-> callers.
+I'm wondering whether we need the new function
+tcmu_wait_inflight_page_fault? Your previous patch just fixed
+tcmu_vma_fault and tcmu_try_get_data_page to call get_page() while
+holding cmdr_lock. So, I think we are safe to first call
+tcmu_blocks_release and then do unmap_mapping_range.
+If so, we could simply add lock_page() and unlock_page() to
+tcmu_blocks_release avoiding the need for a second walk through the
+xarray.
 
-bio_poll() may be called with rcu read lock held, so I'd suggest to
-not mix the two together.
+Bodo
 
+On 11.04.22 15:59, Xiaoguang Wang wrote:
+> When tcmu_vma_fault() gets one page successfully, before the current
+> context completes page fault procedure, find_free_blocks() may run in
+> and call unmap_mapping_range() to unmap this page. Assume when
+> find_free_blocks() completes its job firstly, previous page fault
+> procedure starts to run again and completes, then one truncated page has
+> beed mapped to use space, but note that tcmu_vma_fault() has gotten one
+> refcount for this page, so any other subsystem won't use this page,
+> unless later the use space addr is unmapped.
 > 
-> > +			if (dio->submit.poll_bio &&
-> > +					(dio->submit.poll_bio->bi_opf &
-> > +						REQ_POLLED))
+> If another command runs in later and needs to extends dbi_thresh, it may
+> reuse the corresponding slot to previous page in data_bitmap, then though
+> we'll allocate new page for this slot in data_area, but no page fault will
+> happen again, because we have a valid map, real request's data will lose.
 > 
-> This indentation looks awfull,normal would be:
+> Filesystem implementations will also run into this issue, but they
+> usually lock page when vm_operations_struct->fault gets one page, and
+> unlock page after finish_fault() completes. In truncate sides, they
+> lock pages in truncate_inode_pages() to protect race with page fault.
+> We can also have similar codes like filesystem to fix this issue.
 > 
-> 			if (dio->submit.poll_bio &&
-> 			    (dio->submit.poll_bio->bi_opf & REQ_POLLED))
-
-That follows the indentation style of fs/iomap/direct-io.c for break in
-'if'.
-
+> To fix this possible data corruption, we can apply similar method like
+> filesystem. For pages that are to be freed, find_free_blocks() locks
+> and unlocks these pages, and make tcmu_vma_fault() also lock found page
+> under cmdr_lock. With this action, for above race, find_free_blocks()
+> will wait all page faults to be completed before calling
+> unmap_mapping_range(), and later if unmap_mapping_range() is called,
+> it will ensure stale mappings to be removed cleanly.
+> 
+> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
 > 
 > ---
-> From 08ff61b0142eb708fc384cf867c72175561d974a Mon Sep 17 00:00:00 2001
-> From: Christoph Hellwig <hch@lst.de>
-> Date: Fri, 15 Apr 2022 07:15:42 +0200
-> Subject: blk-mq: don't plug for synchronously polled requests
-> 
-> For synchronous polling to work, the bio must be issued to the driver from
-> the submit_bio call, otherwise ->bi_cookie won't be set.
-> 
-> Based on a patch from Ming Lei.
-> 
-> Reported-by: Changhui Zhong <czhong@redhat.com>
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> V2:
+>    Wait all possible inflight page faults to be completed in
+> find_free_blocks() to fix possible stale map.
 > ---
->  block/blk-mq.c | 8 +++++++-
->  1 file changed, 7 insertions(+), 1 deletion(-)
+>   drivers/target/target_core_user.c | 39 ++++++++++++++++++++++++++++++++++++++-
+>   1 file changed, 38 insertions(+), 1 deletion(-)
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ed3ed86f7dd24..bcc7e3d11296c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2851,7 +2851,13 @@ void blk_mq_submit_bio(struct bio *bio)
->  		return;
->  	}
->  
-> -	if (plug)
-> +	/*
-> +	 * We can't plug for synchronously polled submissions, otherwise
-> +	 * bio->bi_cookie won't be set directly after submission, which is the
-> +	 * indicator used by the submitter to check if a bio needs polling.
-> +	 */
-> +	if (plug &&
-> +	    (rq->bio->bi_opf & (REQ_POLLED | REQ_NOWAIT)) != REQ_POLLED)
->  		blk_add_rq_to_plug(plug, rq);
->  	else if ((rq->rq_flags & RQF_ELV) ||
->  		 (rq->mq_hctx->dispatch_busy &&
-
-It is nothing to do with REQ_NOWAIT. sync polled dio can be marked as
-REQ_NOWAIT by userspace too. If '--nowait=1' is added in the fio
-reproducer, io timeout is triggered too.
-
-
-
-Thanks,
-Ming
-
+> diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
+> index fd7267baa707..ed026f5bdb14 100644
+> --- a/drivers/target/target_core_user.c
+> +++ b/drivers/target/target_core_user.c
+> @@ -20,6 +20,7 @@
+>   #include <linux/configfs.h>
+>   #include <linux/mutex.h>
+>   #include <linux/workqueue.h>
+> +#include <linux/pagemap.h>
+>   #include <net/genetlink.h>
+>   #include <scsi/scsi_common.h>
+>   #include <scsi/scsi_proto.h>
+> @@ -1657,6 +1658,20 @@ static int tcmu_check_and_free_pending_cmd(struct tcmu_cmd *cmd)
+>   	return -EINVAL;
+>   }
+>   
+> +static void tcmu_wait_inflight_page_fault(struct tcmu_dev *udev,
+> +			unsigned long first, unsigned long last)
+> +{
+> +	XA_STATE(xas, &udev->data_pages, first * udev->data_pages_per_blk);
+> +	struct page *page;
+> +
+> +	xas_lock(&xas);
+> +	xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
+> +		lock_page(page);
+> +		unlock_page(page);
+> +	}
+> +	xas_unlock(&xas);
+> +}
+> +
+>   static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
+>   				unsigned long last)
+>   {
+> @@ -1822,6 +1837,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
+>   	page = xa_load(&udev->data_pages, dpi);
+>   	if (likely(page)) {
+>   		get_page(page);
+> +		lock_page(page);
+>   		mutex_unlock(&udev->cmdr_lock);
+>   		return page;
+>   	}
+> @@ -1863,6 +1879,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>   	struct page *page;
+>   	unsigned long offset;
+>   	void *addr;
+> +	int ret = 0;
+>   
+>   	int mi = tcmu_find_mem_index(vmf->vma);
+>   	if (mi < 0)
+> @@ -1887,10 +1904,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>   		page = tcmu_try_get_data_page(udev, dpi);
+>   		if (!page)
+>   			return VM_FAULT_SIGBUS;
+> +		ret = VM_FAULT_LOCKED;
+>   	}
+>   
+>   	vmf->page = page;
+> -	return 0;
+> +	return ret;
+>   }
+>   
+>   static const struct vm_operations_struct tcmu_vm_ops = {
+> @@ -3205,6 +3223,25 @@ static void find_free_blocks(void)
+>   			udev->dbi_max = block;
+>   		}
+>   
+> +		/*
+> +		 * While reaching here, there maybe page faults occurring on
+> +		 * these to be released pages, and there maybe one race that
+> +		 * unmap_mapping_range() is called before page fault on these
+> +		 * pages are finished, then valid but stale map is created.
+> +		 *
+> +		 * If another command runs in later and needs to extends
+> +		 * dbi_thresh, it may reuse the corresponding slot to previous
+> +		 * page in data_bitmap, then though we'll allocate new page for
+> +		 * this slot in data_area, but no page fault will happen again,
+> +		 * because we have a valid map, command's data will lose.
+> +		 *
+> +		 * So here we lock and unlock pages that are to be released to
+> +		 * ensure all page faults to be completed, then following
+> +		 * unmap_mapping_range() can ensure stale maps to be removed
+> +		 * cleanly.
+> +		 */
+> +		tcmu_wait_inflight_page_fault(udev, start, end - 1);
+> +
+>   		/* Here will truncate the data area from off */
+>   		off = udev->data_off + (loff_t)start * udev->data_blk_size;
+>   		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
