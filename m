@@ -2,142 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C0BC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 03:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9330C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 15 Apr 2022 03:54:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348395AbiDODtr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 14 Apr 2022 23:49:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58928 "EHLO
+        id S237785AbiDOD5N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 14 Apr 2022 23:57:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47134 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349149AbiDODto (ORCPT
+        with ESMTP id S235889AbiDOD5M (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 14 Apr 2022 23:49:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C017C5AA64
-        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 20:47:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1649994436;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=OmFzF4P+0ykVdRezfaRk2XA/8c8gib3FIWkPQg2gCgk=;
-        b=GJePG8NEmYxRm3kdf9dJXF4cW/ez/IVbFSFFNGZZufAPZb8xwuznphSg7dUQ1/E7jl8ovH
-        xltrk1ekNQBm5ULyAudK+7ZwN+kpmekDYDWwF4W/4YzZMaIslIy09yDfDGs1VbVS7Q89qJ
-        CSO1bjCUeEnYw3QKL+KHKugZUimrQw4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-296-179hF6s6PbSjO_5l_uwFEw-1; Thu, 14 Apr 2022 23:47:11 -0400
-X-MC-Unique: 179hF6s6PbSjO_5l_uwFEw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 14 Apr 2022 23:57:12 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FFF73190D
+        for <linux-block@vger.kernel.org>; Thu, 14 Apr 2022 20:54:42 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D7F7A1C04B41;
-        Fri, 15 Apr 2022 03:47:10 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id E6FA840EC010;
-        Fri, 15 Apr 2022 03:47:09 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Date:   Fri, 15 Apr 2022 11:47:03 +0800
-Message-Id: <20220415034703.2081695-1-ming.lei@redhat.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id C64C1B82817
+        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 03:54:40 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65918C385A6;
+        Fri, 15 Apr 2022 03:54:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1649994879;
+        bh=6Ih4djtR6MruO9Talc/bN4c9e3mFp3udvrXO33dS3Tw=;
+        h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+        b=WSIbgbVDaTSfr8X1DNe4q+IE4+shBZeWdTGpgFG+V2DT0gCadsT46WrBj+sPQO4op
+         idkps+UZXaQ8eOpvkDx65Z04IclhiscMhs68N8oeNyaY4sNzZ8S3JVZXyzamO7/cjy
+         e4O0riPVGyLhjhjE+YX/DV2/SEwAlG1sYq7wLg5S5ROBYZCy+T/TQJudsF/NJAU2eg
+         gPqPd0xVmRxNaRpNzGo69AHTG9lbwkOU7qfHi+6JACEv8X9LH2C4n62SqyBQWHl+eQ
+         zO5vLfkurSm8AOHAz7rI6HPpjQYM8c3RQu5vvbkxwiF/dMP5NGlSncCA2E0qP6Lt7m
+         ahbTLMfhI18RQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+        id D9A045C0564; Thu, 14 Apr 2022 20:54:38 -0700 (PDT)
+Date:   Thu, 14 Apr 2022 20:54:38 -0700
+From:   "Paul E. McKenney" <paulmck@kernel.org>
+To:     Davidlohr Bueso <dave@stgolabs.net>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, shinichiro.kawasaki@wdc.com,
+        Klaus Jensen <its@irrelevant.dk>, linux-block@vger.kernel.org,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Adam Manzanares <a.manzanares@samsung.com>
+Subject: Re: blktests with zbd/006 ZNS triggers a possible false positive RCU
+ stall
+Message-ID: <20220415035438.GE4285@paulmck-ThinkPad-P17-Gen-1>
+Reply-To: paulmck@kernel.org
+References: <YliZ9M6QWISXvhAJ@bombadil.infradead.org>
+ <20220415010945.wvyztmss7rfqnlog@offworld>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220415010945.wvyztmss7rfqnlog@offworld>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For POLLED bio, bio_poll() should be called for reaping io since
-there isn't irq for completing the request, so we can't call into
-blk_io_schedule() in case that bio_poll() returns zero, otherwise
-io timeout is easily triggered.
+On Thu, Apr 14, 2022 at 06:09:45PM -0700, Davidlohr Bueso wrote:
+> On Thu, 14 Apr 2022, Luis Chamberlain wrote:
+> 
+> > Hey folks,
+> > 
+> > While enhancing kdevops [0] to embrace automation of testing with
+> > blktests for ZNS I ended up spotting a possible false positive RCU stall
+> > when running zbd/006 after zbd/005. The curious thing though is that
+> > this possible RCU stall is only possible when using the qemu
+> > ZNS drive, not when using nbd. In so far as kdevops is concerned
+> > it creates ZNS drives for you when you enable the config option
+> > CONFIG_QEMU_ENABLE_NVME_ZNS=y. So picking any of the ZNS drives
+> > suffices. When configuring blktests you can just enable the zbd
+> > guest, so only a pair of guests are reated the zbd guest and the
+> > respective development guest, zbd-dev guest. When using
+> > CONFIG_KDEVOPS_HOSTS_PREFIX="linux517" this means you end up with
+> > just two guests:
+> > 
+> >  * linux517-blktests-zbd
+> >  * linux517-blktests-zbd-dev
+> > 
+> > The RCU stall can be triggered easily as follows:
+> > 
+> > make menuconfig # make sure to enable CONFIG_QEMU_ENABLE_NVME_ZNS=y and blktests
+> > make
+> > make bringup # bring up guests
+> > make linux # build and boot into v5.17-rc7
+> > make blktests # build and install blktests
+> > 
+> > Now let's ssh to the guest while leaving a console attached
+> > with `sudo virsh vagrant_linux517-blktests-zbd` in a window:
+> > 
+> > ssh linux517-blktests-zbd
+> > sudo su -
+> > cd /usr/local/blktests
+> > export TEST_DEVS=/dev/nvme9n1
+> > i=0; while true; do ./check zbd/005 zbd/006; if [[ $? -ne 0 ]]; then echo "BAD at $i"; break; else echo GOOOD $i ; fi; let i=$i+1; done;
+> > 
+> > The above should never fail, but you should eventually see an RCU
+> > stall candidate on the console. The full details can be observed on the
+> > gist [1] but for completeness I list some of it below. It may be a false
+> > positive at this point, not sure.
+> > 
+> > [493272.711271] run blktests zbd/005 at 2022-04-14 20:03:22
+> > [493305.769531] run blktests zbd/006 at 2022-04-14 20:03:55
+> > [493336.979482] nvme nvme9: I/O 192 QID 5 timeout, aborting
+> > [493336.981666] nvme nvme9: Abort status: 0x0
+> > [493367.699440] nvme nvme9: I/O 192 QID 5 timeout, reset controller
+> > [493388.819341] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+> > [493425.817272] rcu:    4-....: (0 ticks this GP) idle=c48/0/0x0 softirq=11316030/11316030 fqs=939  (false positive?)
+> > [493425.819275]         (detected by 7, t=14522 jiffies, g=31237493, q=6271)
+> 
+> Ok so CPU-7 detected stalls on CPU-4, which is in dyntick-idle mode,
+> which is an extended quiescent state (EQS) to overcome the limitations of
+> not having a tick (NO_HZ). So the false positive looks correct here in
+> that idle threads in this state are not in fact blocking the grace period
+> kthread.
+> 
+> No idea, however, why this would happen when using qemu as opposed to
+> nbd.
 
-Also before calling bio_poll(), current->plug should be flushed out,
-otherwise the bio may not be issued to driver, and ->bi_cookie won't
-be set.
+This one is a bit strange, no two ways about it.
 
-CC: linux-mm@kvack.org
-Cc: linux-xfs@vger.kernel.org
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- as pointed out by Christoph, iomap & mm code should be covered
+In theory, vCPU preemption is a possibility.  In practice, if the
+RCU grace-period kthread's vCPU was preempted for so long, I would
+have expected the RCU CPU stall warning to complain about starvation.
+But it still might be worth tracing context switches on the underlying
+hypervisor.
 
- block/fops.c         | 7 ++++++-
- fs/iomap/direct-io.c | 7 +++++--
- mm/page_io.c         | 8 +++++++-
- 3 files changed, 18 insertions(+), 4 deletions(-)
+Another possibility is that the activity of the RCU CPU stall warning
+kicked CPU 4 into action so that by the time the message was printed, it
+had exited its RCU read-side critical section and transitioned to idle.
+(This sort of behavior is rare, but it does sometimes happen.)
 
-diff --git a/block/fops.c b/block/fops.c
-index 9f2ecec406b0..c9bac700e072 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -101,11 +101,16 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
- 		bio_set_polled(&bio, iocb);
- 
- 	submit_bio(&bio);
-+	/* make sure the bio is issued before polling */
-+	if (bio.bi_opf & REQ_POLLED)
-+		blk_flush_plug(current->plug, false);
- 	for (;;) {
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		if (!READ_ONCE(bio.bi_private))
- 			break;
--		if (!(iocb->ki_flags & IOCB_HIPRI) || !bio_poll(&bio, NULL, 0))
-+		if (bio.bi_opf & REQ_POLLED)
-+			bio_poll(&bio, NULL, 0);
-+		else
- 			blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index b08f5dc31780..e67d2f63a163 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -654,8 +654,11 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			if (!READ_ONCE(dio->submit.waiter))
- 				break;
- 
--			if (!dio->submit.poll_bio ||
--			    !bio_poll(dio->submit.poll_bio, NULL, 0))
-+			if (dio->submit.poll_bio &&
-+					(dio->submit.poll_bio->bi_opf &
-+						REQ_POLLED))
-+				bio_poll(dio->submit.poll_bio, NULL, 0);
-+			else
- 				blk_io_schedule();
- 		}
- 		__set_current_state(TASK_RUNNING);
-diff --git a/mm/page_io.c b/mm/page_io.c
-index b417f000b49e..16f2a63e2524 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -421,12 +421,18 @@ int swap_readpage(struct page *page, bool synchronous)
- 	count_vm_event(PSWPIN);
- 	bio_get(bio);
- 	submit_bio(bio);
-+
-+	/* make sure the bio is issued before polling */
-+	if (bio->bi_opf & REQ_POLLED)
-+		blk_flush_plug(current->plug, false);
- 	while (synchronous) {
- 		set_current_state(TASK_UNINTERRUPTIBLE);
- 		if (!READ_ONCE(bio->bi_private))
- 			break;
- 
--		if (!bio_poll(bio, NULL, 0))
-+		if (bio->bi_opf & REQ_POLLED)
-+			bio_poll(bio, NULL, 0);
-+		else
- 			blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
--- 
-2.31.1
+Would it be possible to ftrace __rcu_read_lock() and __rcu_read_unlock()?
+That would be one really big trace, though.  Another possibility is to
+instrument these two functions so that __rcu_read_unlock() complains
+if the RCU read-side critical section has lasted for more than (say)
+10 seconds.
 
+Other thoughts?
+
+							Thanx, Paul
