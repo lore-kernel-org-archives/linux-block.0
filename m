@@ -2,103 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C369C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:49:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DAB4C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:57:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229471AbiDPFvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 01:51:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
+        id S229458AbiDPGAJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 02:00:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbiDPFvr (ORCPT
+        with ESMTP id S229379AbiDPGAI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 01:51:47 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D702980B;
-        Fri, 15 Apr 2022 22:49:17 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8C5F768AFE; Sat, 16 Apr 2022 07:49:13 +0200 (CEST)
-Date:   Sat, 16 Apr 2022 07:49:13 +0200
-From:   Christoph Hellwig <hch@lst.de>
+        Sat, 16 Apr 2022 02:00:08 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B93093EF0E
+        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 22:57:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=bR66EBE3nvCiMrI28fR9pGb0v8PbBJaFXXBv3CUcvU8=; b=CzRXPb9Vz+8mI5+ha+oJUC2qPz
+        rvKojrGdHqol+X2tx+AzM29hg1msFang98XOZF9inkk5cCH6n0pbL86kDlyF/K6Hw0580+yKQgvLw
+        VPv2eHoyxUoa1101v6FMkY9oKayufhs5HhS111Gg5+ruHULPN5bNQYON1cuR0EiBlHwZlzjdK8Yr8
+        lUMrZUUp9xuvenUSuUlkoVJeGKU/5UwkYqm86jCbj12MW+lwNMrxkRzpfSOmz8ap7CafGYRKcUMQv
+        A80shUA4aK/mK8ug6zJsvEX01prB3gBNY8mdeG7rpdt9/YRGhbWsDnF9jKV368rV7sgAYjm+jV/5t
+        JQVf8F3w==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nfbR9-00CJbD-Vt; Sat, 16 Apr 2022 05:57:36 +0000
+Date:   Fri, 15 Apr 2022 22:57:35 -0700
+From:   Christoph Hellwig <hch@infradead.org>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <20220416054913.GA7405@lst.de>
-References: <20220415034703.2081695-1-ming.lei@redhat.com> <20220415051844.GA22762@lst.de> <YllQVT6n472eUB7+@T590>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH 1/8] block: replace disk based account with bdev's
+Message-ID: <Ylpaz2LpRcbPI5Lp@infradead.org>
+References: <20220412085616.1409626-1-ming.lei@redhat.com>
+ <20220412085616.1409626-2-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YllQVT6n472eUB7+@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <20220412085616.1409626-2-ming.lei@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 07:00:37PM +0800, Ming Lei wrote:
-> On Fri, Apr 15, 2022 at 07:18:44AM +0200, Christoph Hellwig wrote:
-> > On Fri, Apr 15, 2022 at 11:47:03AM +0800, Ming Lei wrote:
-> > > +	/* make sure the bio is issued before polling */
-> > > +	if (bio.bi_opf & REQ_POLLED)
-> > > +		blk_flush_plug(current->plug, false);
-> > 
-> > I still think the core code should handle this.  Without that we'd need
-> > to export the blk_flush_plug for anything that would want to poll bios
-> > from modules, in addition to it generally being a mess.  See a proposed
-> 
-> So far there isn't such usage yet. dm calls bio_poll() in ->iopoll(),
-> and its caller(io_uring) will finish the plug.
+On Tue, Apr 12, 2022 at 04:56:09PM +0800, Ming Lei wrote:
+> 'block device' is generic type for interface, and gendisk becomes more
+> one block layer internal type, so replace disk based account interface
+> with bdec's.
 
-Yes.  But not doing this automatically also means you keep easily
-forgetting callsites.  For example iomap still does not flush the plug
-in your patch.
+I can't parse this sentence.
 
-> > patch for that below.  I'd also split the flush aspect from the poll
-> > aspect into two patches.
-> > 
-> > > +		if (bio.bi_opf & REQ_POLLED)
-> > > +			bio_poll(&bio, NULL, 0);
-> > > +		else
-> > >  			blk_io_schedule();
-> > 
-> > Instead of this duplicate logic everywhere I'd just make bio_boll
-> > call blk_io_schedule for the !REQ_POLLED case and simplify all the
-> > callers.
-> 
-> bio_poll() may be called with rcu read lock held, so I'd suggest to
-> not mix the two together.
+> +unsigned long bdev_start_io_acct(struct block_device *bdev,
+> +				 unsigned int sectors, unsigned int op,
+> +				 unsigned long start_time)
+>  {
+> -	return __part_start_io_acct(disk->part0, sectors, op, jiffies);
+> +	return __part_start_io_acct(bdev, sectors, op, start_time);
+>  }
+> -EXPORT_SYMBOL(disk_start_io_acct);
+> +EXPORT_SYMBOL(bdev_start_io_acct);
 
-Ok, makes sense.
+Just rename __part_start_io_acct to bdev_start_io_acct instead.
 
-> > 
-> > > +			if (dio->submit.poll_bio &&
-> > > +					(dio->submit.poll_bio->bi_opf &
-> > > +						REQ_POLLED))
-> > 
-> > This indentation looks awfull,normal would be:
-> > 
-> > 			if (dio->submit.poll_bio &&
-> > 			    (dio->submit.poll_bio->bi_opf & REQ_POLLED))
-> 
-> That follows the indentation style of fs/iomap/direct-io.c for break in
-> 'if'.
+> -void disk_end_io_acct(struct gendisk *disk, unsigned int op,
+> +void bdev_end_io_acct(struct block_device *bdev, unsigned int op,
+>  		      unsigned long start_time)
+>  {
+> -	__part_end_io_acct(disk->part0, op, start_time);
+> +	__part_end_io_acct(bdev, op, start_time);
+>  }
+> -EXPORT_SYMBOL(disk_end_io_acct);
+> +EXPORT_SYMBOL(bdev_end_io_acct);
 
-It doesn't.  Just look at the conditional you replaced for example :)
+Same here.
 
-> > +	/*
-> > +	 * We can't plug for synchronously polled submissions, otherwise
-> > +	 * bio->bi_cookie won't be set directly after submission, which is the
-> > +	 * indicator used by the submitter to check if a bio needs polling.
-> > +	 */
-> > +	if (plug &&
-> > +	    (rq->bio->bi_opf & (REQ_POLLED | REQ_NOWAIT)) != REQ_POLLED)
-> >  		blk_add_rq_to_plug(plug, rq);
-> >  	else if ((rq->rq_flags & RQF_ELV) ||
-> >  		 (rq->mq_hctx->dispatch_busy &&
-> 
-> It is nothing to do with REQ_NOWAIT. sync polled dio can be marked as
-> REQ_NOWAIT by userspace too. If '--nowait=1' is added in the fio
-> reproducer, io timeout is triggered too.
-
-True.  So I guess we'll need a new flag to distinguish the cases.
