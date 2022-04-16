@@ -2,71 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5E0C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:18:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C369C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:49:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229716AbiDPFVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 01:21:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35756 "EHLO
+        id S229471AbiDPFvs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 01:51:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbiDPFVL (ORCPT
+        with ESMTP id S229379AbiDPFvr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 01:21:11 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26A6EB089;
-        Fri, 15 Apr 2022 22:18:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=g+ujJVVDoFg2B4P01ECtm57Vr62I/0DX7wK8TNkFwYU=; b=EKriTvTdng77iAKQoyYG6B5/VV
-        5OVUPDyFrE6pmPGmccjCI5RnxYElNCQzLnaOMjV1+aazGiETaUlqPpnoE4cupYU/skXt1620cyZxr
-        Q3csBuph9OxtbU1UA4xK0S1pCOd/jE5Sg+f5RR8p9Y6DRiZcXma5uBVVaEz9HrC/Riy4fSh2pzHp4
-        4JrNXR2FCjceXhTJF1oObVnIBVl3OQH9hrO13WcPRT39+BSsBeD881zufHquRmsvHKrHjqG3ZTtT2
-        62qJYsZ2RxvQ6XO4iWJtROJgGsfO4E7TET5bxE2MkxjBxBF1IEAQQrLfmU2S8KXzK7fF0gg2kVxmw
-        z+z7FeMA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nfapQ-00CGcz-82; Sat, 16 Apr 2022 05:18:36 +0000
-Date:   Fri, 15 Apr 2022 22:18:36 -0700
-From:   Christoph Hellwig <hch@infradead.org>
+        Sat, 16 Apr 2022 01:51:47 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D702980B;
+        Fri, 15 Apr 2022 22:49:17 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 8C5F768AFE; Sat, 16 Apr 2022 07:49:13 +0200 (CEST)
+Date:   Sat, 16 Apr 2022 07:49:13 +0200
+From:   Christoph Hellwig <hch@lst.de>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Eric Wheeler <linux-block@lists.ewheeler.net>,
-        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
-Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
- completion.
-Message-ID: <YlpRrLmwe/TJucjz@infradead.org>
-References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
- <YjfFHvTCENCC29WS@T590>
- <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net>
- <bd5f9817-c65e-7915-18b-9c68bb34488e@ewheeler.net>
- <YldqnL79xH5NJGKW@T590>
- <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
- <YlmBTtGdTH2xW1qT@T590>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
+Message-ID: <20220416054913.GA7405@lst.de>
+References: <20220415034703.2081695-1-ming.lei@redhat.com> <20220415051844.GA22762@lst.de> <YllQVT6n472eUB7+@T590>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <YlmBTtGdTH2xW1qT@T590>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YllQVT6n472eUB7+@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 10:29:34PM +0800, Ming Lei wrote:
-> If ext4 expects the following order, it is ext4's responsibility to
-> maintain the order, and block layer may re-order all these IOs at will,
-> so do not expect IOs are issued to device in submission order
+On Fri, Apr 15, 2022 at 07:00:37PM +0800, Ming Lei wrote:
+> On Fri, Apr 15, 2022 at 07:18:44AM +0200, Christoph Hellwig wrote:
+> > On Fri, Apr 15, 2022 at 11:47:03AM +0800, Ming Lei wrote:
+> > > +	/* make sure the bio is issued before polling */
+> > > +	if (bio.bi_opf & REQ_POLLED)
+> > > +		blk_flush_plug(current->plug, false);
+> > 
+> > I still think the core code should handle this.  Without that we'd need
+> > to export the blk_flush_plug for anything that would want to poll bios
+> > from modules, in addition to it generally being a mess.  See a proposed
+> 
+> So far there isn't such usage yet. dm calls bio_poll() in ->iopoll(),
+> and its caller(io_uring) will finish the plug.
 
-Yes, and it has been so since REQ_FLUSH (which later became
-REQ_OP_FLUSH) replaced REQ_BARRIER 12 years ago:
+Yes.  But not doing this automatically also means you keep easily
+forgetting callsites.  For example iomap still does not flush the plug
+in your patch.
 
-commit 28e7d1845216538303bb95d679d8fd4de50e2f1a
-Author: Tejun Heo <tj@kernel.org>
-Date:   Fri Sep 3 11:56:16 2010 +0200
+> > patch for that below.  I'd also split the flush aspect from the poll
+> > aspect into two patches.
+> > 
+> > > +		if (bio.bi_opf & REQ_POLLED)
+> > > +			bio_poll(&bio, NULL, 0);
+> > > +		else
+> > >  			blk_io_schedule();
+> > 
+> > Instead of this duplicate logic everywhere I'd just make bio_boll
+> > call blk_io_schedule for the !REQ_POLLED case and simplify all the
+> > callers.
+> 
+> bio_poll() may be called with rcu read lock held, so I'd suggest to
+> not mix the two together.
 
-block: drop barrier ordering by queue draining
-    
-    Filesystems will take all the responsibilities for ordering requests
-    around commit writes and will only indicate how the commit writes
-    themselves should be handled by block layers.  This patch drops
-    barrier ordering by queue draining from block layer.
+Ok, makes sense.
 
+> > 
+> > > +			if (dio->submit.poll_bio &&
+> > > +					(dio->submit.poll_bio->bi_opf &
+> > > +						REQ_POLLED))
+> > 
+> > This indentation looks awfull,normal would be:
+> > 
+> > 			if (dio->submit.poll_bio &&
+> > 			    (dio->submit.poll_bio->bi_opf & REQ_POLLED))
+> 
+> That follows the indentation style of fs/iomap/direct-io.c for break in
+> 'if'.
+
+It doesn't.  Just look at the conditional you replaced for example :)
+
+> > +	/*
+> > +	 * We can't plug for synchronously polled submissions, otherwise
+> > +	 * bio->bi_cookie won't be set directly after submission, which is the
+> > +	 * indicator used by the submitter to check if a bio needs polling.
+> > +	 */
+> > +	if (plug &&
+> > +	    (rq->bio->bi_opf & (REQ_POLLED | REQ_NOWAIT)) != REQ_POLLED)
+> >  		blk_add_rq_to_plug(plug, rq);
+> >  	else if ((rq->rq_flags & RQF_ELV) ||
+> >  		 (rq->mq_hctx->dispatch_busy &&
+> 
+> It is nothing to do with REQ_NOWAIT. sync polled dio can be marked as
+> REQ_NOWAIT by userspace too. If '--nowait=1' is added in the fio
+> reproducer, io timeout is triggered too.
+
+True.  So I guess we'll need a new flag to distinguish the cases.
