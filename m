@@ -2,146 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91151C43217
-	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 09:03:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F996C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 09:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229792AbiDPJGX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 05:06:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51784 "EHLO
+        id S230179AbiDPJZ7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 05:25:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45140 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229975AbiDPJGW (ORCPT
+        with ESMTP id S229507AbiDPJZ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 05:06:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE5C51066EA
-        for <linux-block@vger.kernel.org>; Sat, 16 Apr 2022 02:03:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650099830;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+F3IclGpN6LG2HX4GRtWaYgRDtghcyGDVhwRl4OE650=;
-        b=iVjjArRFHk56mN2v8I1fHOpLAi0GHSzPwPD3GOS8Dp7/XEaI8i8XQ7pZgQtf6UqfoFnLhp
-        bIvDcROI33s79fmER4KpLE9HxhwK37u0/tSQ7mriCt5PCe8eyn/8vCSN8X/qZOL7DLKpus
-        zLVuwBivZCJi5roTWH1OAnYQNOpn5O0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-421-nSxqUU0bPB-XJ4TIJrd2Sg-1; Sat, 16 Apr 2022 05:03:46 -0400
-X-MC-Unique: nSxqUU0bPB-XJ4TIJrd2Sg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 10F80185A79C;
-        Sat, 16 Apr 2022 09:03:46 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 77813145D392;
-        Sat, 16 Apr 2022 09:03:40 +0000 (UTC)
-Date:   Sat, 16 Apr 2022 17:03:35 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <YlqGZ7W9rg0eNt9A@T590>
-References: <20220415034703.2081695-1-ming.lei@redhat.com>
- <20220415051844.GA22762@lst.de>
- <YllQVT6n472eUB7+@T590>
- <20220416054913.GA7405@lst.de>
+        Sat, 16 Apr 2022 05:25:58 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87BB11031;
+        Sat, 16 Apr 2022 02:23:27 -0700 (PDT)
+Received: from kwepemi100024.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KgSNp34w6zFpcL;
+        Sat, 16 Apr 2022 17:20:58 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100024.china.huawei.com (7.221.188.87) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 16 Apr 2022 17:23:25 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 16 Apr
+ 2022 17:23:24 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <jack@suse.cz>, <paolo.valente@linaro.org>, <axboe@kernel.dk>,
+        <tj@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v2 0/5] support concurrent sync io for bfq on a specail occasion
+Date:   Sat, 16 Apr 2022 17:37:48 +0800
+Message-ID: <20220416093753.3054696-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220416054913.GA7405@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 16, 2022 at 07:49:13AM +0200, Christoph Hellwig wrote:
-> On Fri, Apr 15, 2022 at 07:00:37PM +0800, Ming Lei wrote:
-> > On Fri, Apr 15, 2022 at 07:18:44AM +0200, Christoph Hellwig wrote:
-> > > On Fri, Apr 15, 2022 at 11:47:03AM +0800, Ming Lei wrote:
-> > > > +	/* make sure the bio is issued before polling */
-> > > > +	if (bio.bi_opf & REQ_POLLED)
-> > > > +		blk_flush_plug(current->plug, false);
-> > > 
-> > > I still think the core code should handle this.  Without that we'd need
-> > > to export the blk_flush_plug for anything that would want to poll bios
-> > > from modules, in addition to it generally being a mess.  See a proposed
-> > 
-> > So far there isn't such usage yet. dm calls bio_poll() in ->iopoll(),
-> > and its caller(io_uring) will finish the plug.
-> 
-> Yes.  But not doing this automatically also means you keep easily
-> forgetting callsites.  For example iomap still does not flush the plug
-> in your patch.
+Changes in v2:
+ - Use a different aporch to count root group, which is much simple.
 
-It is reasonable for flush user(usually submission) to be responsible
-for finishing/flushing plug.
+Currently, bfq can't handle sync io concurrently as long as they
+are not issued from root group. This is because
+'bfqd->num_groups_with_pending_reqs > 0' is always true in
+bfq_asymmetric_scenario().
 
-iomap is one good example to show this point, since it does flush the plug
-before call bio_poll(), see __iomap_dio_rw().
+The way that bfqg is counted to 'num_groups_with_pending_reqs':
 
-> 
-> > > patch for that below.  I'd also split the flush aspect from the poll
-> > > aspect into two patches.
-> > > 
-> > > > +		if (bio.bi_opf & REQ_POLLED)
-> > > > +			bio_poll(&bio, NULL, 0);
-> > > > +		else
-> > > >  			blk_io_schedule();
-> > > 
-> > > Instead of this duplicate logic everywhere I'd just make bio_boll
-> > > call blk_io_schedule for the !REQ_POLLED case and simplify all the
-> > > callers.
-> > 
-> > bio_poll() may be called with rcu read lock held, so I'd suggest to
-> > not mix the two together.
-> 
-> Ok, makes sense.
-> 
-> > > 
-> > > > +			if (dio->submit.poll_bio &&
-> > > > +					(dio->submit.poll_bio->bi_opf &
-> > > > +						REQ_POLLED))
-> > > 
-> > > This indentation looks awfull,normal would be:
-> > > 
-> > > 			if (dio->submit.poll_bio &&
-> > > 			    (dio->submit.poll_bio->bi_opf & REQ_POLLED))
-> > 
-> > That follows the indentation style of fs/iomap/direct-io.c for break in
-> > 'if'.
-> 
-> It doesn't.  Just look at the conditional you replaced for example :)
+Before this patchset:
+ 1) root group will never be counted.
+ 2) Count if bfqg or it's child bfqgs have pending requests.
+ 3) Don't count if bfqg and it's child bfqgs complete all the requests.
 
-OK, I will change to your style.
+After this patchset:
+ 1) root group is counted.
+ 2) Count if bfqg have pending requests.
+This is because, for example:
+if sync ios are issued from cgroup /root/c1/c2, root, c1 and c2 will all
+be counted into 'num_groups_with_pending_reqs', which makes it impossible
+to handle sync ios concurrently.
 
-> 
-> > > +	/*
-> > > +	 * We can't plug for synchronously polled submissions, otherwise
-> > > +	 * bio->bi_cookie won't be set directly after submission, which is the
-> > > +	 * indicator used by the submitter to check if a bio needs polling.
-> > > +	 */
-> > > +	if (plug &&
-> > > +	    (rq->bio->bi_opf & (REQ_POLLED | REQ_NOWAIT)) != REQ_POLLED)
-> > >  		blk_add_rq_to_plug(plug, rq);
-> > >  	else if ((rq->rq_flags & RQF_ELV) ||
-> > >  		 (rq->mq_hctx->dispatch_busy &&
-> > 
-> > It is nothing to do with REQ_NOWAIT. sync polled dio can be marked as
-> > REQ_NOWAIT by userspace too. If '--nowait=1' is added in the fio
-> > reproducer, io timeout is triggered too.
-> 
-> True.  So I guess we'll need a new flag to distinguish the cases.
+ 3) Don't count if bfqg complete all the requests.
+This is because, for example:
+t1 issue sync io on root group, t2 and t3 issue sync io on the same child
+group. num_groups_with_pending_reqs is 2 now. After t1 stopped,
+num_groups_with_pending_reqs is still 2. sync io from t2 and t3 still can't
+be handled concurrently.
 
-If there will be more such kind of poll usage in kernel, I think it is fine
-to add the flag, but so far all the three aren't used very often.
+fio test script: startdelay is used to avoid queue merging
+[global]
+filename=/dev/nvme0n1
+allow_mounted_write=0
+ioengine=psync
+direct=1
+ioscheduler=bfq
+offset_increment=10g
+group_reporting
+rw=randwrite
+bs=4k
 
+[test1]
+numjobs=1
 
-Thanks,
-Ming
+[test2]
+startdelay=1
+numjobs=1
+
+[test3]
+startdelay=2
+numjobs=1
+
+[test4]
+startdelay=3
+numjobs=1
+
+[test5]
+startdelay=4
+numjobs=1
+
+[test6]
+startdelay=5
+numjobs=1
+
+[test7]
+startdelay=6
+numjobs=1
+
+[test8]
+startdelay=7
+numjobs=1
+
+test result:
+running fio on root cgroup
+v5.18-rc1:	   550 Mib/s
+v5.18-rc1-patched: 550 Mib/s
+
+running fio on non-root cgroup
+v5.18-rc1:	   349 Mib/s
+v5.18-rc1-patched: 550 Mib/s
+
+Yu Kuai (5):
+  block, bfq: cleanup bfq_weights_tree add/remove apis
+  block, bfq: add fake weight_counter for weight-raised queue
+  bfq, block: record how many queues have pending requests in bfq_group
+  block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+  block, bfq: do not idle if only one cgroup is activated
+
+ block/bfq-cgroup.c  |  1 +
+ block/bfq-iosched.c | 90 +++++++++++++++++++--------------------------
+ block/bfq-iosched.h | 26 ++++++-------
+ block/bfq-wf2q.c    | 30 +++------------
+ 4 files changed, 56 insertions(+), 91 deletions(-)
+
+-- 
+2.31.1
 
