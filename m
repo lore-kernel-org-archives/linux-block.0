@@ -2,54 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB966C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:58:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8773C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 06:09:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229506AbiDPGBV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 02:01:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45106 "EHLO
+        id S229574AbiDPGLq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 02:11:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50536 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbiDPGBV (ORCPT
+        with ESMTP id S229379AbiDPGLp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 02:01:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E65FA6213C
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 22:58:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=gU0yYpKruvAcYODaycpgnNMrkQfFOoDNcDnBic7CSRQ=; b=l9oYKltFADqlqKwobKYqiDmGMf
-        g+KhQc5Yebii4Djqsgkm5cTMbV+FLJjvd/wBMcGIxNuRUFckp1w7aDfn6bUdt7ZJcALPUWAOLL4zg
-        kzBZdUC9tNN6hB99rBvGaZQAB/TQ5DVkD2yagRaunN1CzOQBT8smsVSUUJGmK8eV2pKwd8U2O10jw
-        noItra32AkIi2UcOoS3UUGGDmZaNW5BfmJYHIIu5/7Hqp8GUxPQAnVbrhfVYdNEajLLlqKMc1osB4
-        tWSPHQR1NLk4WkgmScnVRqnb99JKyoBl4jLw7B8eXCANclYGKzNoAg0F6R0k+ZvVusSsWqiWxXCBC
-        kTQqRYUA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nfbSL-00CJdS-UQ; Sat, 16 Apr 2022 05:58:49 +0000
-Date:   Fri, 15 Apr 2022 22:58:49 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 0/8] dm: io accounting & polling improvement
-Message-ID: <YlpbGbtc5NwD64KH@infradead.org>
-References: <20220412085616.1409626-1-ming.lei@redhat.com>
- <YlWzoj+M1ykUubH+@redhat.com>
+        Sat, 16 Apr 2022 02:11:45 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E90665404;
+        Fri, 15 Apr 2022 23:09:14 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KgN6l1hywzfYmy;
+        Sat, 16 Apr 2022 14:08:31 +0800 (CST)
+Received: from [10.174.176.103] (10.174.176.103) by
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 16 Apr 2022 14:09:10 +0800
+Message-ID: <da58534e-aa43-b163-4c05-190e1e20c0ab@huawei.com>
+Date:   Sat, 16 Apr 2022 14:09:09 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlWzoj+M1ykUubH+@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH -next v2] nbd: fix possible overflow on 'first_minor' in
+ nbd_dev_add()
+From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
+To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <nbd@other.debian.org>
+References: <20220407032505.3797948-1-zhangwensheng5@huawei.com>
+In-Reply-To: <20220407032505.3797948-1-zhangwensheng5@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.103]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemi500016.china.huawei.com (7.221.188.220)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Apr 12, 2022 at 01:15:14PM -0400, Mike Snitzer wrote:
-> I'll review this closely but, a couple weeks ago, I queued up quite a
-> lot of conflicting changes for 5.19 here:
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.19
+friendly ping...
 
-Can you please end them out to the device mapper list for review?
+在 2022/4/7 11:25, Zhang Wensheng 写道:
+> When 'index' is a big numbers, it may become negative which forced
+> to 'int'. then 'index << part_shift' might overflow to a positive
+> value that is not greater than '0xfffff', then sysfs might complains
+> about duplicate creation. Because of this, move the 'index' judgment
+> to the front will fix it and be better.
+>
+> Fixes: b0d9111a2d53 ("nbd: use an idr to keep track of nbd devices")
+> Fixes: 940c264984fd ("nbd: fix possible overflow for 'first_minor' in nbd_dev_add()")
+> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
+> ---
+> v1->v2:
+> - add the line "disk->first_minor = index << part_shift;" which has
+> been deleted by mistake in v1.
+>
+>   drivers/block/nbd.c | 23 ++++++++++++-----------
+>   1 file changed, 12 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> index 5a1f98494ddd..9448aacbcf0f 100644
+> --- a/drivers/block/nbd.c
+> +++ b/drivers/block/nbd.c
+> @@ -1800,17 +1800,7 @@ static struct nbd_device *nbd_dev_add(int index, unsigned int refs)
+>   	refcount_set(&nbd->refs, 0);
+>   	INIT_LIST_HEAD(&nbd->list);
+>   	disk->major = NBD_MAJOR;
+> -
+> -	/* Too big first_minor can cause duplicate creation of
+> -	 * sysfs files/links, since index << part_shift might overflow, or
+> -	 * MKDEV() expect that the max bits of first_minor is 20.
+> -	 */
+>   	disk->first_minor = index << part_shift;
+> -	if (disk->first_minor < index || disk->first_minor > MINORMASK) {
+> -		err = -EINVAL;
+> -		goto out_free_work;
+> -	}
+> -
+>   	disk->minors = 1 << part_shift;
+>   	disk->fops = &nbd_fops;
+>   	disk->private_data = nbd;
+> @@ -1915,8 +1905,19 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+>   	if (!netlink_capable(skb, CAP_SYS_ADMIN))
+>   		return -EPERM;
+>   
+> -	if (info->attrs[NBD_ATTR_INDEX])
+> +	if (info->attrs[NBD_ATTR_INDEX]) {
+>   		index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
+> +
+> +		/*
+> +		 * Too big first_minor can cause duplicate creation of
+> +		 * sysfs files/links, since index << part_shift might overflow, or
+> +		 * MKDEV() expect that the max bits of first_minor is 20.
+> +		 */
+> +		if (index < 0 || index > MINORMASK >> part_shift) {
+> +			printk(KERN_ERR "nbd: illegal input index %d\n", index);
+> +			return -EINVAL;
+> +		}
+> +	}
+>   	if (!info->attrs[NBD_ATTR_SOCKETS]) {
+>   		printk(KERN_ERR "nbd: must specify at least one socket\n");
+>   		return -EINVAL;
