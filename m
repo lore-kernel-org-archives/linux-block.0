@@ -2,145 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28ECC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 04:01:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC5E0C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 16 Apr 2022 05:18:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229862AbiDPEDj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 00:03:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48538 "EHLO
+        id S229716AbiDPFVL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 01:21:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35756 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229826AbiDPEDi (ORCPT
+        with ESMTP id S229548AbiDPFVL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 00:03:38 -0400
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACFED6EB2E
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 21:01:06 -0700 (PDT)
-Received: by mail-pj1-f52.google.com with SMTP id ll10so8926607pjb.5
-        for <linux-block@vger.kernel.org>; Fri, 15 Apr 2022 21:01:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=Y49V9VHQz/nF4aVhY2YnAmSiohT5VAchK0Uuz6JK1v8=;
-        b=r7M+60bfJ0NmVELR1UCX/0Pwh4ff1V2sV32FryhOpyAS+t8N3svSFPfa6tsoAXeRI9
-         7X+83iYBUUXOJtYN+P8ohU08RkfU+isy8KVypgrRmVbn7t5SubFOkQPVkRX43xDehS8t
-         gSzBNwNddfjgYsgNP3k+0sjpL4xtJnFC7ejT64hg/Ir+WdVdSeIAE0hHc4USpgVFE6Ha
-         AyE4wFbYLRUuAFjVDpmIjXDPxLnARGlUb8m72pMck98aPVgKjZo30UQ8jRw8Vs6uAHXb
-         Co+CORe7wPIBsQm1F7+IAJ2K7h8na2pgbJfVJcRPbDWSluA1cVvCiJ1/rLdMq7kqRa9K
-         t6kw==
-X-Gm-Message-State: AOAM5310x/v8dD6wEALM6DIlgQ1pcmtH0a9/4AHY8uB6v8qP11ulcSTz
-        jFhHr6Zs5F0TupgAe8grWn8JCQ08fIY=
-X-Google-Smtp-Source: ABdhPJy9oABTCxVrEvqaaOsITBGHgbPB5SULkO94ZAGV1U0kN4C8AOZbrjnXoRsGsniXv/B6/D20iA==
-X-Received: by 2002:a17:902:d511:b0:158:e2ff:8e4b with SMTP id b17-20020a170902d51100b00158e2ff8e4bmr1796600plg.77.1650081665868;
-        Fri, 15 Apr 2022 21:01:05 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id z14-20020a17090a170e00b001cb7e69ee5csm10025804pjd.54.2022.04.15.21.01.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Apr 2022 21:01:04 -0700 (PDT)
-Message-ID: <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
-Date:   Fri, 15 Apr 2022 21:01:03 -0700
+        Sat, 16 Apr 2022 01:21:11 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C26A6EB089;
+        Fri, 15 Apr 2022 22:18:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=g+ujJVVDoFg2B4P01ECtm57Vr62I/0DX7wK8TNkFwYU=; b=EKriTvTdng77iAKQoyYG6B5/VV
+        5OVUPDyFrE6pmPGmccjCI5RnxYElNCQzLnaOMjV1+aazGiETaUlqPpnoE4cupYU/skXt1620cyZxr
+        Q3csBuph9OxtbU1UA4xK0S1pCOd/jE5Sg+f5RR8p9Y6DRiZcXma5uBVVaEz9HrC/Riy4fSh2pzHp4
+        4JrNXR2FCjceXhTJF1oObVnIBVl3OQH9hrO13WcPRT39+BSsBeD881zufHquRmsvHKrHjqG3ZTtT2
+        62qJYsZ2RxvQ6XO4iWJtROJgGsfO4E7TET5bxE2MkxjBxBF1IEAQQrLfmU2S8KXzK7fF0gg2kVxmw
+        z+z7FeMA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nfapQ-00CGcz-82; Sat, 16 Apr 2022 05:18:36 +0000
+Date:   Fri, 15 Apr 2022 22:18:36 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Eric Wheeler <linux-block@lists.ewheeler.net>,
+        linux-block@vger.kernel.org, linux-ext4@vger.kernel.org
+Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
+ completion.
+Message-ID: <YlpRrLmwe/TJucjz@infradead.org>
+References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net>
+ <YjfFHvTCENCC29WS@T590>
+ <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net>
+ <bd5f9817-c65e-7915-18b-9c68bb34488e@ewheeler.net>
+ <YldqnL79xH5NJGKW@T590>
+ <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
+ <YlmBTtGdTH2xW1qT@T590>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v2] blktests: replace module removal with patient module
- removal
-Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>, osandov@fb.com
-Cc:     linux-block@vger.kernel.org
-References: <YlogluONIoc1VTCI@bombadil.infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <YlogluONIoc1VTCI@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YlmBTtGdTH2xW1qT@T590>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/15/22 18:49, Luis Chamberlain wrote:
-> -	if ! modprobe -r null_blk || ! modprobe null_blk "$@" "${zoned}" ; then
-> -		return 1
-> -	fi
-> +	_patient_rmmod null_blk || return 1
-> +	modprobe null_blk "$@" "${zoned}" || 1
+On Fri, Apr 15, 2022 at 10:29:34PM +0800, Ming Lei wrote:
+> If ext4 expects the following order, it is ext4's responsibility to
+> maintain the order, and block layer may re-order all these IOs at will,
+> so do not expect IOs are issued to device in submission order
 
-"1" is not a valid command. Should "|| 1" perhaps be changed into "|| 
-return 1"?
+Yes, and it has been so since REQ_FLUSH (which later became
+REQ_OP_FLUSH) replaced REQ_BARRIER 12 years ago:
 
-> +_has_modprobe_patient()
-> +{
-> +	modprobe --help >& /dev/null || return 1
-> +	modprobe --help | grep -q -1 "remove-patiently" || return 1
-> +	return 0
-> +}
+commit 28e7d1845216538303bb95d679d8fd4de50e2f1a
+Author: Tejun Heo <tj@kernel.org>
+Date:   Fri Sep 3 11:56:16 2010 +0200
 
-I can't find the meaning of "-1" in the grep man page. Did I perhaps 
-overlook something?
+block: drop barrier ordering by queue draining
+    
+    Filesystems will take all the responsibilities for ordering requests
+    around commit writes and will only indicate how the commit writes
+    themselves should be handled by block layers.  This patch drops
+    barrier ordering by queue draining from block layer.
 
-> +# checks the refcount and returns 0 if we can safely remove the module. rmmod
-> +# does this check for us, but we can use this to also iterate checking for this
-> +# refcount before we even try to remove the module. This is useful when using
-> +# debug test modules which take a while to quiesce.
-> +_patient_rmmod_check_refcnt()
-> +{
-> +	local module=$1
-> +	local refcnt=0
-> +
-> +	if [[ -f "/sys/module/$module/refcnt" ]]; then
-> +		refcnt=$(cat "/sys/module/$module/refcnt" 2>/dev/null)
-> +		if [[ $? -ne 0 || $refcnt -eq 0 ]]; then
-> +			return 0
-> +		fi
-> +		return 1
-> +	fi
-> +	return 0
-> +}
-
-Hmm ... why is the check for existence of the refcnt separate from 
-reading the refcnt? I think that just reading the refcnt should be 
-sufficient. Additionally, that will avoid the race where the module is 
-unloaded after the check and before the refcnt is read.
-
-> -	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
-> -	if [[ "${nvme_trtype}" != "loop" ]]; then
-> -		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
-> -	fi
-> -	modprobe -r nvmet 2>/dev/null
-> +	if [[ "${nvme_trtype}" == "loop" ]]; then
-> +		_patient_rmmod nvme_"${nvme_trtype}"
-> +        else
-> +                _patient_rmmod nvme-"${nvme_trtype}"
-> +                _patient_rmmod nvmet-"${nvme_trtype}"
-> +        fi
-> +	_patient_rmmod nvmet 2>/dev/null
-
-The statement _patient_rmmod nvme-"${nvme_trtype}" occurs twice in the 
-above code. How about preserving the structure of the existing code such 
-that that statement only occurs once?
-
->   # Unload the SRP initiator driver.
->   stop_srp_ini() {
-> -	local i
-> -
->   	log_out
-> -	for ((i=40;i>=0;i--)); do
-> -		remove_mpath_devs || return $?
-> -		unload_module ib_srp >/dev/null 2>&1 && break
-> -		sleep 1
-> -	done
-> -	if [ -e /sys/module/ib_srp ]; then
-> -		echo "Error: unloading kernel module ib_srp failed"
-> -		return 1
-> -	fi
-> -	unload_module scsi_transport_srp || return $?
-> +	remove_mpath_devs || return $?
-> +	_patient_rmmod ib_srp || return 1
-> +	_patient_rmmod scsi_transport_srp || return $?
->   }
-
-Removing the loop from around remove_mpath_devs is wrong. It is 
-important that that loop is preserved.
-
-Thanks,
-
-Bart.
