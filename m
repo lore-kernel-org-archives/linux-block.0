@@ -2,172 +2,181 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D380C4332F
-	for <linux-block@archiver.kernel.org>; Sun, 17 Apr 2022 02:22:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F75C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 17 Apr 2022 02:41:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233280AbiDQCZ2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 16 Apr 2022 22:25:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47718 "EHLO
+        id S233322AbiDQCnr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 16 Apr 2022 22:43:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230493AbiDQCZ1 (ORCPT
+        with ESMTP id S230493AbiDQCnr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 16 Apr 2022 22:25:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E0DA73F890
-        for <linux-block@vger.kernel.org>; Sat, 16 Apr 2022 19:22:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650162173;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ByDiCpg32DJyEi8mcLFX5wGAkwDCrwjwCgGSWXhxCqw=;
-        b=LqJ3Mqwtsh9FzcnKLGrewiIZSrTKMWpNhbc0XAx3iI7m/Sw4ACL/H5kdOixF9gTjvwdgSd
-        P7QAfHuDFgTpPtSkFU8QlNPy1LgbON2jQ8lbhhR33+GYSC9xg3x8kLZDaCoLohsI5Me/HL
-        ZcIWk/UfUZcnaukX/JDPUmiD1T5BIDk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-321-1yazkfxuOmW75nm4vWDDcg-1; Sat, 16 Apr 2022 22:22:51 -0400
-X-MC-Unique: 1yazkfxuOmW75nm4vWDDcg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6C666101AA44;
-        Sun, 17 Apr 2022 02:22:51 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id E86A6111DD0D;
-        Sun, 17 Apr 2022 02:22:33 +0000 (UTC)
-Date:   Sun, 17 Apr 2022 10:22:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Subject: Re: [PATCH 5/8] dm: always setup ->orig_bio in alloc_io
-Message-ID: <Ylt55PHHu6XShdfA@T590>
-References: <YlYt2rzM0NBPARVp@T590>
- <YlZp3+VrP930VjIQ@redhat.com>
- <YlbBf0mJa/BPHSSq@T590>
- <YlcPXslr6Y7cHOSU@redhat.com>
- <Yldsqh2YsclXYl3s@T590>
- <YleGKbZiHeBIJidI@redhat.com>
- <YlebwjTKH2MU9tCD@T590>
- <Ylhdvac5SY85r+1R@redhat.com>
- <Yli48LmLi7dEngLn@T590>
- <Ylneb0NWsCab0HqI@redhat.com>
+        Sat, 16 Apr 2022 22:43:47 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD479275D5;
+        Sat, 16 Apr 2022 19:41:11 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VADANgH_1650163268;
+Received: from 30.39.112.65(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VADANgH_1650163268)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Sun, 17 Apr 2022 10:41:09 +0800
+Message-ID: <fd548b40-0125-cead-f5ef-8d85d1834f9d@linux.alibaba.com>
+Date:   Sun, 17 Apr 2022 10:41:08 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ylneb0NWsCab0HqI@redhat.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.0
+Subject: Re: [PATCH v3] scsi: target: tcmu: Fix possible data corruption
+Content-Language: en-US
+To:     Bodo Stroesser <bostroesser@gmail.com>, linux-scsi@vger.kernel.org,
+        target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20220415153450.15184-1-xiaoguang.wang@linux.alibaba.com>
+ <b3df81ad-c0a8-4758-2d24-103ed39acfeb@gmail.com>
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+In-Reply-To: <b3df81ad-c0a8-4758-2d24-103ed39acfeb@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 15, 2022 at 05:06:55PM -0400, Mike Snitzer wrote:
-> On Thu, Apr 14 2022 at  8:14P -0400,
-> Ming Lei <ming.lei@redhat.com> wrote:
-> 
-> > On Thu, Apr 14, 2022 at 01:45:33PM -0400, Mike Snitzer wrote:
-> > > On Wed, Apr 13 2022 at 11:57P -0400,
-> > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > 
-> > > > On Wed, Apr 13, 2022 at 10:25:45PM -0400, Mike Snitzer wrote:
-> > > > > On Wed, Apr 13 2022 at  8:36P -0400,
-> > > > > Ming Lei <ming.lei@redhat.com> wrote:
-> > > > > 
-> > > > > > On Wed, Apr 13, 2022 at 01:58:54PM -0400, Mike Snitzer wrote:
-> > > > > > > 
-> > > > > > > The bigger issue with this patch is that you've caused
-> > > > > > > dm_submit_bio_remap() to go back to accounting the entire original bio
-> > > > > > > before any split occurs.  That is a problem because you'll end up
-> > > > > > > accounting that bio for every split, so in split heavy workloads the
-> > > > > > > IO accounting won't reflect when the IO is actually issued and we'll
-> > > > > > > regress back to having very inaccurate and incorrect IO accounting for
-> > > > > > > dm_submit_bio_remap() heavy targets (e.g. dm-crypt).
-> > > > > > 
-> > > > > > Good catch, but we know the length of mapped part in original bio before
-> > > > > > calling __map_bio(), so io->sectors/io->offset_sector can be setup here,
-> > > > > > something like the following delta change should address it:
-> > > > > > 
-> > > > > > diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-> > > > > > index db23efd6bbf6..06b554f3104b 100644
-> > > > > > --- a/drivers/md/dm.c
-> > > > > > +++ b/drivers/md/dm.c
-> > > > > > @@ -1558,6 +1558,13 @@ static int __split_and_process_bio(struct clone_info *ci)
-> > > > > >  
-> > > > > >  	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
-> > > > > >  	clone = alloc_tio(ci, ti, 0, &len, GFP_NOIO);
-> > > > > > +
-> > > > > > +	if (ci->sector_count > len) {
-> > > > > > +		/* setup the mapped part for accounting */
-> > > > > > +		dm_io_set_flag(ci->io, DM_IO_SPLITTED);
-> > > > > > +		ci->io->sectors = len;
-> > > > > > +		ci->io->sector_offset = bio_end_sector(ci->bio) - ci->sector;
-> > > > > > +	}
-> > > > > >  	__map_bio(clone);
-> > > > > >  
-> > > > > >  	ci->sector += len;
-> > > > > > @@ -1603,11 +1610,6 @@ static void dm_split_and_process_bio(struct mapped_device *md,
-> > > > > >  	if (error || !ci.sector_count)
-> > > > > >  		goto out;
-> > > > > >  
-> > > > > > -	/* setup the mapped part for accounting */
-> > > > > > -	dm_io_set_flag(ci.io, DM_IO_SPLITTED);
-> > > > > > -	ci.io->sectors = bio_sectors(bio) - ci.sector_count;
-> > > > > > -	ci.io->sector_offset = bio_end_sector(bio) - bio->bi_iter.bi_sector;
-> > > > > > -
-> > > > > >  	bio_trim(bio, ci.io->sectors, ci.sector_count);
-> > > > > >  	trace_block_split(bio, bio->bi_iter.bi_sector);
-> > > > > >  	bio_inc_remaining(bio);
-> > > > > > 
-> > > > > > -- 
-> > > > > > Ming
-> > > > > > 
-> > > > > 
-> > > > > Unfortunately we do need splitting after __map_bio() because a dm
-> > > > > target's ->map can use dm_accept_partial_bio() to further reduce a
-> > > > > bio's mapped part.
-> > > > > 
-> > > > > But I think dm_accept_partial_bio() could be trained to update
-> > > > > tio->io->sectors?
-> > > > 
-> > > > ->orig_bio is just for serving io accounting, but ->orig_bio isn't
-> > > > passed to dm_accept_partial_bio(), and not gets updated after
-> > > > dm_accept_partial_bio() is called.
-> > > > 
-> > > > If that is one issue, it must be one existed issue in dm io accounting
-> > > > since ->orig_bio isn't updated when dm_accept_partial_bio() is called.
-> > > 
-> > > Recall that ->orig_bio is updated after the bio_split() at the bottom of
-> > > dm_split_and_process_bio().
-> > > 
-> > > That bio_split() is based on ci->sector_count, which is reduced as a
-> > > side-effect of dm_accept_partial_bio() reducing tio->len_ptr.  It is
-> > > pretty circuitous so I can absolutely understand why you didn't
-> > > immediately appreciate the interface.  The block comment above
-> > > dm_accept_partial_bio() does a pretty comprehensive job of explaining.
-> > 
-> > Go it now, thanks for the explanation.
-> > 
-> > As you mentioned, it can be addressed in dm_accept_partial_bio()
-> > by updating ti->io->sectors.
-> 
-> Yes, I rebased your patchset ontop of dm-5.19 and fixed up your
-> splitting like we discussed.  I'll be rebasing ontop of v5.18-rc3 once
-> it is released but please have a look at this 'dm-5.19-v2' branch:
-> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.19-v2
-> 
-> And this commit in particular:
-> https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/commit/?h=dm-5.19-v2&id=fe5a99da8b0d0518342f5cdb522a06b0f123ca09
-> 
-> Once I've verified with you that it looks OK I'll fold it into your
-> commit (at the same time I rebase on v5.18-rc3 early next week).
+hi,
 
-Hi Mike,
+> Hi,
+>
+> Thank you again for the patch!
+>
+> You might call me a nitpicker, but ...
+>
+> Wouldn't it be good to add a comment in find_free_blocks explaining
+> why it is safe to first call tcmu_blocks_release and then
+> unmap_mapping_range?
+Never mind.
+I think better comments will help developers understand codes better.
 
-Your delta change looks good, thanks for fixing it!
+Regards,
+Xiaoguang Wang
 
-Thanks,
-Ming
+>
+> Regards,
+> Bodo
+>
+> On 15.04.22 17:34, Xiaoguang Wang wrote:
+>> When tcmu_vma_fault() gets one page successfully, before the current
+>> context completes page fault procedure, find_free_blocks() may run in
+>> and call unmap_mapping_range() to unmap this page. Assume when
+>> find_free_blocks() completes its job firstly, previous page fault
+>> procedure starts to run again and completes, then one truncated page has
+>> beed mapped to use space, but note that tcmu_vma_fault() has gotten one
+>> refcount for this page, so any other subsystem won't use this page,
+>> unless later the use space addr is unmapped.
+>>
+>> If another command runs in later and needs to extends dbi_thresh, it may
+>> reuse the corresponding slot to previous page in data_bitmap, then though
+>> we'll allocate new page for this slot in data_area, but no page fault will
+>> happen again, because we have a valid map, real request's data will lose.
+>>
+>> Filesystem implementations will also run into this issue, but they
+>> usually lock page when vm_operations_struct->fault gets one page, and
+>> unlock page after finish_fault() completes. In truncate sides, they
+>> lock pages in truncate_inode_pages() to protect race with page fault.
+>> We can also have similar codes like filesystem to fix this issue.
+>>
+>> To fix this possible data corruption, we can apply similar method like
+>> filesystem. For pages that are to be freed, find_free_blocks() locks
+>> and unlocks these pages, and make tcmu_vma_fault() also lock found page
+>> under cmdr_lock. With this action, for above race, find_free_blocks()
+>> will wait all page faults to be completed before calling
+>> unmap_mapping_range(), and later if unmap_mapping_range() is called,
+>> it will ensure stale mappings to be removed cleanly.
+>>
+>> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+>> ---
+>> V3:
+>>   Just lock/unlock_page in tcmu_blocks_release(), and call
+>> tcmu_blocks_release() before unmap_mapping_range().
+>>
+>> V2:
+>>    Wait all possible inflight page faults to be completed in
+>> find_free_blocks() to fix possible stale map.
+>> ---
+>>   drivers/target/target_core_user.c | 30 +++++++++++++++++++++++++++---
+>>   1 file changed, 27 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
+>> index fd7267baa707..ff4a575a14d2 100644
+>> --- a/drivers/target/target_core_user.c
+>> +++ b/drivers/target/target_core_user.c
+>> @@ -20,6 +20,7 @@
+>>   #include <linux/configfs.h>
+>>   #include <linux/mutex.h>
+>>   #include <linux/workqueue.h>
+>> +#include <linux/pagemap.h>
+>>   #include <net/genetlink.h>
+>>   #include <scsi/scsi_common.h>
+>>   #include <scsi/scsi_proto.h>
+>> @@ -1667,6 +1668,25 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
+>>       xas_lock(&xas);
+>>       xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
+>>           xas_store(&xas, NULL);
+>> +        /*
+>> +         * While reaching here, there maybe page faults occurring on
+>> +         * these to be released pages, and there maybe one race that
+>> +         * unmap_mapping_range() is called before page fault on these
+>> +         * pages are finished, then valid but stale map is created.
+>> +         *
+>> +         * If another command runs in later and needs to extends
+>> +         * dbi_thresh, it may reuse the corresponding slot to previous
+>> +         * page in data_bitmap, then though we'll allocate new page for
+>> +         * this slot in data_area, but no page fault will happen again,
+>> +         * because we have a valid map, command's data will lose.
+>> +         *
+>> +         * So here we lock and unlock pages that are to be released to
+>> +         * ensure all page faults to be completed, then following
+>> +         * unmap_mapping_range() can ensure stale maps to be removed
+>> +         * cleanly.
+>> +         */
+>> +        lock_page(page);
+>> +        unlock_page(page);
+>>           __free_page(page);
+>>           pages_freed++;
+>>       }
+>> @@ -1822,6 +1842,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
+>>       page = xa_load(&udev->data_pages, dpi);
+>>       if (likely(page)) {
+>>           get_page(page);
+>> +        lock_page(page);
+>>           mutex_unlock(&udev->cmdr_lock);
+>>           return page;
+>>       }
+>> @@ -1863,6 +1884,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>>       struct page *page;
+>>       unsigned long offset;
+>>       void *addr;
+>> +    vm_fault_t ret = 0;
+>>         int mi = tcmu_find_mem_index(vmf->vma);
+>>       if (mi < 0)
+>> @@ -1887,10 +1909,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>>           page = tcmu_try_get_data_page(udev, dpi);
+>>           if (!page)
+>>               return VM_FAULT_SIGBUS;
+>> +        ret = VM_FAULT_LOCKED;
+>>       }
+>>         vmf->page = page;
+>> -    return 0;
+>> +    return ret;
+>>   }
+>>     static const struct vm_operations_struct tcmu_vm_ops = {
+>> @@ -3205,12 +3228,13 @@ static void find_free_blocks(void)
+>>               udev->dbi_max = block;
+>>           }
+>>   +        /* Release the block pages */
+>> +        pages_freed = tcmu_blocks_release(udev, start, end - 1);
+>> +
+>>           /* Here will truncate the data area from off */
+>>           off = udev->data_off + (loff_t)start * udev->data_blk_size;
+>>           unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
+>>   -        /* Release the block pages */
+>> -        pages_freed = tcmu_blocks_release(udev, start, end - 1);
+>>           mutex_unlock(&udev->cmdr_lock);
+>>             total_pages_freed += pages_freed;
 
