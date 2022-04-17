@@ -2,173 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D32C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 17 Apr 2022 05:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC1A7C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 17 Apr 2022 07:46:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233436AbiDQF2o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Apr 2022 01:28:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50088 "EHLO
+        id S233565AbiDQHst (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Apr 2022 03:48:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233425AbiDQF2o (ORCPT
+        with ESMTP id S233563AbiDQHsr (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Apr 2022 01:28:44 -0400
-Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87F113E12;
-        Sat, 16 Apr 2022 22:26:07 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R751e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VADb8oq_1650173164;
-Received: from localhost(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VADb8oq_1650173164)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sun, 17 Apr 2022 13:26:05 +0800
-From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-To:     linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org, bostroesser@gmail.com
-Subject: [PATCH v4] scsi: target: tcmu: Fix possible data corruption
-Date:   Sun, 17 Apr 2022 13:26:04 +0800
-Message-Id: <20220417052604.120942-1-xiaoguang.wang@linux.alibaba.com>
-X-Mailer: git-send-email 2.14.4.44.g2045bb6
+        Sun, 17 Apr 2022 03:48:47 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF5C72B8;
+        Sun, 17 Apr 2022 00:46:12 -0700 (PDT)
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23H7k87b062178;
+        Sun, 17 Apr 2022 16:46:08 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Sun, 17 Apr 2022 16:46:08 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23H7k7Yh062171
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 17 Apr 2022 16:46:08 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <ff8f59e5-7699-0ccd-4da3-a34aa934a16b@I-love.SAKURA.ne.jp>
+Date:   Sun, 17 Apr 2022 16:46:08 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Content-Language: en-US
+To:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH v2] block: add filemap_invalidate_lock_killable()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When tcmu_vma_fault() gets one page successfully, before the current
-context completes page fault procedure, find_free_blocks() may run in
-and call unmap_mapping_range() to unmap this page. Assume when
-find_free_blocks() completes its job firstly, previous page fault
-procedure starts to run again and completes, then one truncated page has
-beed mapped to use space, but note that tcmu_vma_fault() has gotten one
-refcount for this page, so any other subsystem won't use this page,
-unless later the use space addr is unmapped.
+syzbot is reporting hung task at blkdev_fallocate() [1], for it can take
+minutes with mapping->invalidate_lock held. Since fallocate() has to accept
+64bits size, we can't predict how long it will take. Thus, mitigate this
+problem by using killable wait where possible.
 
-If another command runs in later and needs to extends dbi_thresh, it may
-reuse the corresponding slot to previous page in data_bitmap, then though
-we'll allocate new page for this slot in data_area, but no page fault will
-happen again, because we have a valid map, real request's data will lose.
+  ----------
+  #define _GNU_SOURCE
+  #include <sys/types.h>
+  #include <sys/stat.h>
+  #include <fcntl.h>
+  #include <unistd.h>
 
-Filesystem implementations will also run into this issue, but they
-usually lock page when vm_operations_struct->fault gets one page, and
-unlock page after finish_fault() completes. In truncate sides, they
-lock pages in truncate_inode_pages() to protect race with page fault.
-We can also have similar codes like filesystem to fix this issue.
+  int main(int argc, char *argv[])
+  {
+    fork();
+    fallocate(open("/dev/nullb0", O_RDWR), 0x11, 0, ~0UL >> 1);
+    return 0;
+  }
+  ----------
 
-To fix this possible data corruption, we can apply similar method like
-filesystem. For pages that are to be freed, tcmu_blocks_release() locks
-and unlocks these pages, and make tcmu_vma_fault() also lock found page
-under cmdr_lock. At the same time, since tcmu_vma_fault() gets one extra
-page refcount, tcmu_blocks_release() won't free pages if pages are in
-page fault procedure, which means it's safe to call tcmu_blocks_release()
-before unmap_mapping_range().
+Note that, even after this patch, e.g. "cat /dev/nullb0" can be reported
+as hung task at filemap_invalidate_lock_shared() when this reproducer is
+running. We will need to also make fault-acceptable reads killable.
 
-With above action, for above race, tcmu_blocks_release()
-will wait all page faults to be completed before calling
-unmap_mapping_range(), and later if unmap_mapping_range() is called,
-it will ensure stale mappings to be removed cleanly.
+  __schedule+0x9a0/0xb20
+  schedule+0xc1/0x120
+  rwsem_down_read_slowpath+0x3b5/0x670
+  __down_read_common+0x56/0x1f0
+  page_cache_ra_unbounded+0x12d/0x400
+  filemap_read+0x4bb/0x1280
+  blkdev_read_iter+0x1d5/0x260
+  vfs_read+0x5f8/0x690
+  ksys_read+0xee/0x190
+  do_syscall_64+0x3d/0x90
+  entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Link: https://syzkaller.appspot.com/bug?extid=39b75c02b8be0a061bfc [1]
+Reported-by: syzbot <syzbot+39b75c02b8be0a061bfc@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
-V4:
- Add comments to explain why it's safe to call tcmu_blocks_release()
-before unmap_mapping_range().
+Changes in v2:
+  Converted all users in block/ directory and fs/open.c file.
+  I didn't convert remaining users because remaining users should be
+  carefully converted by each filesystem's developers.
 
-V3:
- Just lock/unlock_page in tcmu_blocks_release(), and call
-tcmu_blocks_release() before unmap_mapping_range().
+ block/blk-zoned.c  | 3 ++-
+ block/fops.c       | 3 ++-
+ block/ioctl.c      | 6 ++++--
+ fs/open.c          | 3 ++-
+ include/linux/fs.h | 5 +++++
+ 5 files changed, 15 insertions(+), 5 deletions(-)
 
-V2:
-  Wait all possible inflight page faults to be completed in
-find_free_blocks() to fix possible stale map.
----
- drivers/target/target_core_user.c | 36 +++++++++++++++++++++++++++++++++---
- 1 file changed, 33 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
-index fd7267baa707..f286b5294862 100644
---- a/drivers/target/target_core_user.c
-+++ b/drivers/target/target_core_user.c
-@@ -20,6 +20,7 @@
- #include <linux/configfs.h>
- #include <linux/mutex.h>
- #include <linux/workqueue.h>
-+#include <linux/pagemap.h>
- #include <net/genetlink.h>
- #include <scsi/scsi_common.h>
- #include <scsi/scsi_proto.h>
-@@ -1667,6 +1668,25 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
- 	xas_lock(&xas);
- 	xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
- 		xas_store(&xas, NULL);
-+		/*
-+		 * While reaching here, there maybe page faults occurring on
-+		 * these to be released pages, and there maybe one race that
-+		 * unmap_mapping_range() is called before page fault on these
-+		 * pages are finished, then valid but stale map is created.
-+		 *
-+		 * If another command runs in later and needs to extends
-+		 * dbi_thresh, it may reuse the corresponding slot to previous
-+		 * page in data_bitmap, then though we'll allocate new page for
-+		 * this slot in data_area, but no page fault will happen again,
-+		 * because we have a valid map, command's data will lose.
-+		 *
-+		 * So here we lock and unlock pages that are to be released to
-+		 * ensure all page faults to be completed, then following
-+		 * unmap_mapping_range() can ensure stale maps to be removed
-+		 * cleanly.
-+		 */
-+		lock_page(page);
-+		unlock_page(page);
- 		__free_page(page);
- 		pages_freed++;
- 	}
-@@ -1822,6 +1842,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
- 	page = xa_load(&udev->data_pages, dpi);
- 	if (likely(page)) {
- 		get_page(page);
-+		lock_page(page);
- 		mutex_unlock(&udev->cmdr_lock);
- 		return page;
- 	}
-@@ -1863,6 +1884,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
- 	struct page *page;
- 	unsigned long offset;
- 	void *addr;
-+	vm_fault_t ret = 0;
+diff --git a/block/blk-zoned.c b/block/blk-zoned.c
+index 38cd840d8838..07a8841f4724 100644
+--- a/block/blk-zoned.c
++++ b/block/blk-zoned.c
+@@ -422,7 +422,8 @@ int blkdev_zone_mgmt_ioctl(struct block_device *bdev, fmode_t mode,
+ 		op = REQ_OP_ZONE_RESET;
  
- 	int mi = tcmu_find_mem_index(vmf->vma);
- 	if (mi < 0)
-@@ -1887,10 +1909,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
- 		page = tcmu_try_get_data_page(udev, dpi);
- 		if (!page)
- 			return VM_FAULT_SIGBUS;
-+		ret = VM_FAULT_LOCKED;
- 	}
+ 		/* Invalidate the page cache, including dirty pages. */
+-		filemap_invalidate_lock(bdev->bd_inode->i_mapping);
++		if (filemap_invalidate_lock_killable(bdev->bd_inode->i_mapping))
++			return -EINTR;
+ 		ret = blkdev_truncate_zone_range(bdev, mode, &zrange);
+ 		if (ret)
+ 			goto fail;
+diff --git a/block/fops.c b/block/fops.c
+index ba5e7d5ff9a5..418fb1d789ff 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -656,7 +656,8 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
+ 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
+ 		return -EINVAL;
  
- 	vmf->page = page;
--	return 0;
-+	return ret;
+-	filemap_invalidate_lock(inode->i_mapping);
++	if (filemap_invalidate_lock_killable(inode->i_mapping))
++		return -EINTR;
+ 
+ 	/* Invalidate the page cache, including dirty pages. */
+ 	error = truncate_bdev_range(bdev, file->f_mode, start, end);
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4a86340133e4..13f863f79f68 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -111,7 +111,8 @@ static int blk_ioctl_discard(struct block_device *bdev, fmode_t mode,
+ 	if (start + len > bdev_nr_bytes(bdev))
+ 		return -EINVAL;
+ 
+-	filemap_invalidate_lock(inode->i_mapping);
++	if (filemap_invalidate_lock_killable(inode->i_mapping))
++		return -EINTR;
+ 	err = truncate_bdev_range(bdev, mode, start, start + len - 1);
+ 	if (err)
+ 		goto fail;
+@@ -152,7 +153,8 @@ static int blk_ioctl_zeroout(struct block_device *bdev, fmode_t mode,
+ 		return -EINVAL;
+ 
+ 	/* Invalidate the page cache, including dirty pages */
+-	filemap_invalidate_lock(inode->i_mapping);
++	if (filemap_invalidate_lock_killable(inode->i_mapping))
++		return -EINTR;
+ 	err = truncate_bdev_range(bdev, mode, start, end);
+ 	if (err)
+ 		goto fail;
+diff --git a/fs/open.c b/fs/open.c
+index 7b50d7a2f51d..adf62e1c186b 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -859,7 +859,8 @@ static int do_dentry_open(struct file *f,
+ 		if (filemap_nr_thps(inode->i_mapping)) {
+ 			struct address_space *mapping = inode->i_mapping;
+ 
+-			filemap_invalidate_lock(inode->i_mapping);
++			if (filemap_invalidate_lock_killable(inode->i_mapping))
++				return -EINTR;
+ 			/*
+ 			 * unmap_mapping_range just need to be called once
+ 			 * here, because the private pages is not need to be
+diff --git a/include/linux/fs.h b/include/linux/fs.h
+index 03f8d95bd4ef..e0134c372b6d 100644
+--- a/include/linux/fs.h
++++ b/include/linux/fs.h
+@@ -797,6 +797,11 @@ static inline void filemap_invalidate_lock(struct address_space *mapping)
+ 	down_write(&mapping->invalidate_lock);
  }
  
- static const struct vm_operations_struct tcmu_vm_ops = {
-@@ -3205,12 +3228,19 @@ static void find_free_blocks(void)
- 			udev->dbi_max = block;
- 		}
- 
-+		/*
-+		 * Release the block pages.
-+		 * Also note that since tcmu_vma_fault() gets one extra page
-+		 * refcount, tcmu_blocks_release() won't free pages if pages
-+		 * are in page fault procedure, which means it's safe to
-+		 * call tcmu_blocks_release() before unmap_mapping_range().
-+		 */
-+		pages_freed = tcmu_blocks_release(udev, start, end - 1);
++static inline int filemap_invalidate_lock_killable(struct address_space *mapping)
++{
++	return down_write_killable(&mapping->invalidate_lock);
++}
 +
- 		/* Here will truncate the data area from off */
- 		off = udev->data_off + (loff_t)start * udev->data_blk_size;
- 		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
- 
--		/* Release the block pages */
--		pages_freed = tcmu_blocks_release(udev, start, end - 1);
- 		mutex_unlock(&udev->cmdr_lock);
- 
- 		total_pages_freed += pages_freed;
+ static inline void filemap_invalidate_unlock(struct address_space *mapping)
+ {
+ 	up_write(&mapping->invalidate_lock);
 -- 
-2.14.4.44.g2045bb6
-
+2.32.0
