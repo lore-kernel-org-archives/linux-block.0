@@ -2,73 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE9AC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 13:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B085C43219
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 13:28:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241633AbiDRNZv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 09:25:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55984 "EHLO
+        id S241392AbiDRNb3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 09:31:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241659AbiDRNY6 (ORCPT
+        with ESMTP id S244450AbiDRNaa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 09:24:58 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8B1B3DA4B
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 05:52:52 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id md20-20020a17090b23d400b001cb70ef790dso17169913pjb.5
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 05:52:52 -0700 (PDT)
+        Mon, 18 Apr 2022 09:30:30 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95F1C12636
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 05:54:34 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id s17so1432096plg.9
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 05:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=F9FMycteyYrs8wEiBExwTDtAcc/2JBQ5GQqodkswvTM=;
-        b=zqMJx9kEO/syGgh/jfUujcMdgZO1Zk4th79yyPJcsdnvdIDI8Xk864jrHuyarDgv8c
-         gBt2ez+Ym/+EaLgC6MfWMHx5OVcgB54eOfckx7Cmdvf3bmGVDc/T0aLwM9rpN+nKDwcO
-         dWklV+ARMeZbUO1+GrFCqFc/xZjiULaGiN1ll1DVCyoNwgzG1P+0Y9ZhUcwBpI/7WQx/
-         gN/pYZdJuI935bVWCVcjkTqu2k20R+5oG6mGhil2uYi4X3QtR1zxXemtHM8NZ8XUvixz
-         3tQXFtvzqXbRCXIajCtyaq1nqo4kcpEpLyzsTyB3FvSvWQd/rTixV4XGHzsBwq9Bu/vV
-         stDA==
+        bh=ibYDSZCFNyFY0E0xngH81UyJF82hqCghGqnVPLy+gv8=;
+        b=vC9VRENF/75LZHQO0Jmt6CUkAae3UjBfTPuDF0tWoqRTCDRZmo8HfD5ThHskhG+ttd
+         Pb4E+Bm8QkdesdnIeSUdCK0uTkYqY4EnO/E1XMMjnuAqCu8yWkQwiUuJ9iY7ud95Qnx2
+         f4SAdRo1cPQ2v3F2of3hIt+cb3rwD0EvWYnpV4vtuTAOdzLWk1UhZp7MoSZKC/MTbU54
+         H7bg8uAIF3bvuEK9uekwY4wA2SP3L/0PtDSMZgN9cSVOjSc+1aVt3UCnot+lS/TQ7xf6
+         viy8udDRKQitduBgLgFLGKJW/11xcZ6Ynd9P13N6I8H5rWnZ4vXdqSck8zAfPM7m3Rys
+         vxNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=F9FMycteyYrs8wEiBExwTDtAcc/2JBQ5GQqodkswvTM=;
-        b=xCe6NGT4bxZ6+DBdZVDHwjng/13q5dz+u7fXu1paFKwSsCO00bmswHMofX6MV1+HzB
-         siNuTSKTHOFMO6pC+iADwc9EAAcBIcvX5jNbatXRL8/VCypFXlu8LgtcJmM3ysAyX3zz
-         H1SjuOIliyIgvz1C3nAlWL2MFH9coMnR5I6geNXbWFWDbAUOsj2kBrfmWYsMwPt5umSj
-         PJRkORbXnmZbbPcIip7XinMPpj8UoVGWUa/YnqeSLGTVzhTKp2pCDUjVvj3p+s1UiuXH
-         V05dm2Zr3UET6gSbndsDQGxDHmSfjFg6xTSlrEJ3kTpW82O816WrHRk31DPh9VMBMdiU
-         Xgnw==
-X-Gm-Message-State: AOAM530KILy62VlQEoKnFRTZ4blUz0kZTxx3oUR3BdKsxJR78SATGHja
-        XsoZ8zjcCuLYwgLjcVqCZ2HBaA==
-X-Google-Smtp-Source: ABdhPJyPDIaLEewZhdBb/81ulQRxH4lnSCW72QYENTWzgjKzLqW/EIFRVhnHg8tc4oCKtNOZ6kDuRg==
-X-Received: by 2002:a17:902:6b44:b0:154:4bee:c434 with SMTP id g4-20020a1709026b4400b001544beec434mr10858040plt.43.1650286372060;
-        Mon, 18 Apr 2022 05:52:52 -0700 (PDT)
+        bh=ibYDSZCFNyFY0E0xngH81UyJF82hqCghGqnVPLy+gv8=;
+        b=CKPkDVIXM8XJtSw5ABQEATm3irFuvBgPQu27CxPbQy/w+W3FbTtQIaA/TVSSnfQrWh
+         D3XnGU2+j2WnDhMkx+2efZEhgiiTiD/Pa6EBkhW6jKM0duDrVHpjH5ajZo9E5dF5HO4a
+         LjugA97sRqTAVDmx9X7t8CFTgIdHDExDvqmEITeOxMfrLrAtPDuJntztAe5VBAztWmyb
+         +4K3nIsoioQi+f8Gys4yS16XaObEwL6BRQGt4ELmYZ9PScDe/2knNaLMdyTc1n3icpFc
+         1jbC6j2ct71gVc270calXZlhtIgcBp8K2SxEYhwcbWDp6ArITIhYuJ9bH6cILAnspmGH
+         EqkQ==
+X-Gm-Message-State: AOAM533GJm5oPnRjhgw/qAvNQZz1U+P1S+0ztR0YJr71QNDvVIGBW/ec
+        c6Fj6MPkyJ4gRM8+n6+kk1i0eg==
+X-Google-Smtp-Source: ABdhPJz27Q2KH3dc6+wcyn8Fer81Q/YsmmGcpXrAJWb3QGquOeH4hUXGRnhuHPecX23uf799lbv9Aw==
+X-Received: by 2002:a17:90a:6c64:b0:1cb:a150:52d with SMTP id x91-20020a17090a6c6400b001cba150052dmr12926639pjj.111.1650286472739;
+        Mon, 18 Apr 2022 05:54:32 -0700 (PDT)
 Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id s24-20020a17090a441800b001ca9b5724a6sm12663301pjg.36.2022.04.18.05.52.49
+        by smtp.gmail.com with ESMTPSA id k7-20020aa788c7000000b0050a553bcf80sm8667087pff.18.2022.04.18.05.54.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Apr 2022 05:52:51 -0700 (PDT)
+        Mon, 18 Apr 2022 05:54:32 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-f2fs-devel@lists.sourceforge.net,
-        jfs-discussion@lists.sourceforge.net, linux-raid@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, drbd-dev@lists.linbit.com,
-        xen-devel@lists.xenproject.org, nbd@other.debian.org,
-        linux-nvme@lists.infradead.org, linux-mmc@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-block@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, linux-mm@kvack.org,
-        linux-ext4@vger.kernel.org, dm-devel@redhat.com,
-        linux-nilfs@vger.kernel.org, ocfs2-devel@oss.oracle.com,
-        linux-scsi@vger.kernel.org, linux-xfs@vger.kernel.org,
-        cluster-devel@redhat.com, linux-mtd@lists.infradead.org,
-        linux-btrfs@vger.kernel.org, linux-bcache@vger.kernel.org,
-        ceph-devel@vger.kernel.org, ntfs3@lists.linux.dev,
-        linux-um@lists.infradead.org, target-devel@vger.kernel.org
-In-Reply-To: <20220415045258.199825-1-hch@lst.de>
-References: <20220415045258.199825-1-hch@lst.de>
-Subject: Re: use block_device based APIs in block layer consumers v3
-Message-Id: <165028636949.14872.7589996414521818725.b4-ty@kernel.dk>
-Date:   Mon, 18 Apr 2022 06:52:49 -0600
+To:     minchan@kernel.org, josef@toxicpanda.com, ngupta@vflare.org,
+        Christoph Hellwig <hch@lst.de>
+Cc:     mcroce@microsoft.com, linux-block@vger.kernel.org,
+        penguin-kernel@i-love.sakura.ne.jp, nbd@other.debian.org,
+        jack@suse.cz, djwong@kernel.org, ming.lei@redhat.com
+In-Reply-To: <20220330052917.2566582-2-hch@lst.de>
+References: <20220330052917.2566582-1-hch@lst.de> <20220330052917.2566582-2-hch@lst.de>
+Subject: Re: [PATCH 01/15] nbd: use the correct block_device in nbd_bdev_reset
+Message-Id: <165028647141.16008.13343182404375254679.b4-ty@kernel.dk>
+Date:   Mon, 18 Apr 2022 06:54:31 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -76,73 +66,46 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 15 Apr 2022 06:52:31 +0200, Christoph Hellwig wrote:
-> this series cleanups up the block layer API so that APIs consumed
-> by file systems are (almost) only struct block_devic based, so that
-> file systems don't have to poke into block layer internals like the
-> request_queue.
+On Wed, 30 Mar 2022 07:29:03 +0200, Christoph Hellwig wrote:
+> The bdev parameter to ->ioctl contains the block device that the ioctl
+> is called on, which can be the partition.  But the openers check in
+> nbd_bdev_reset really needs to check use the whole device, so switch to
+> using that.
 > 
-> I also found a bunch of existing bugs related to partition offsets
-> and discard so these are fixed while going along.
 > 
-> [...]
 
 Applied, thanks!
 
-[01/27] target: remove an incorrect unmap zeroes data deduction
-        commit: 179d8609d8424529e95021df939ed7b0b82b37f1
-[02/27] target: pass a block_device to target_configure_unmap_from_queue
-        commit: 817e8b51eb3d927ce6d56ecf9f48bc3c5b26168b
-[03/27] target: fix discard alignment on partitions
-        commit: 968786b9ef56e75e0109158a4936ffffea962c1e
-[04/27] drbd: remove assign_p_sizes_qlim
-        commit: 40349d0e16cedd0de561f59752c3249780fb749b
-[05/27] drbd: use bdev based limit helpers in drbd_send_sizes
-        commit: 7a38acce229685968b770d1d9e64e01396b93643
-[06/27] drbd: use bdev_alignment_offset instead of queue_alignment_offset
-        commit: c6f23b1a05441a26f765e59dd95e8ba7354f9388
-[07/27] drbd: cleanup decide_on_discard_support
-        commit: 998e9cbcd615e5e6a7baa69e673ee845f812744e
-[08/27] btrfs: use bdev_max_active_zones instead of open coding it
-        commit: c1e7b24416400ef13ff92a1c60c336c9a2834d7b
-[09/27] ntfs3: use bdev_logical_block_size instead of open coding it
-        commit: f09dac9afb8e3ce4b6485dbc091a9b9c742db023
-[10/27] mm: use bdev_is_zoned in claim_swapfile
-        commit: 9964e674559b02619fee2012a56839624143d02e
-[11/27] block: add a bdev_nonrot helper
-        commit: 10f0d2a517796b8f6dc04fb0cc3e49003ae6b0bc
-[12/27] block: add a bdev_write_cache helper
-        commit: 08e688fdb8f7e862092ae64cee20bc8b463d1046
-[13/27] block: add a bdev_fua helper
-        commit: a557e82e5a01826f902bd94fc925c03f253cb712
-[14/27] block: add a bdev_stable_writes helper
-        commit: 36d254893aa6a6e204075c3cce94bb572ac32c04
-[15/27] block: add a bdev_max_zone_append_sectors helper
-        commit: 2aba0d19f4d8c8929b4b3b94a9cfde2aa20e6ee2
-[16/27] block: use bdev_alignment_offset in part_alignment_offset_show
-        commit: 64dcc7c2717395b7c83ffb10f040d3be795d03c1
-[17/27] block: use bdev_alignment_offset in disk_alignment_offset_show
-        commit: 640f2a23911b8388989547f89d055afbb910b88e
-[18/27] block: move bdev_alignment_offset and queue_limit_alignment_offset out of line
-        commit: 89098b075cb74a80083bc4ed6b71d0ee18b6898f
-[19/27] block: remove queue_discard_alignment
-        commit: 4e1462ffe8998749884d61f91be251a7a8719677
-[20/27] block: use bdev_discard_alignment in part_discard_alignment_show
-        commit: f0f975a4dde890bfe25ce17bf07a6495453988a4
-[21/27] block: move {bdev,queue_limit}_discard_alignment out of line
-        commit: 5c4b4a5c6f11c869a57c6bd977143430bc9dc43d
-[22/27] block: refactor discard bio size limiting
-        commit: e3cc28ea28b5f8794db2aed24f8a0282ad2e85a2
-[23/27] block: add a bdev_max_discard_sectors helper
-        commit: cf0fbf894bb543f472f682c486be48298eccf199
-[24/27] block: remove QUEUE_FLAG_DISCARD
-        commit: 70200574cc229f6ba038259e8142af2aa09e6976
-[25/27] block: add a bdev_discard_granularity helper
-        commit: 7b47ef52d0a2025fd1408a8a0990933b8e1e510f
-[26/27] block: decouple REQ_OP_SECURE_ERASE from REQ_OP_DISCARD
-        commit: 44abff2c0b970ae3d310b97617525dc01f248d7c
-[27/27] direct-io: remove random prefetches
-        commit: c22198e78d523c8fa079bbb70b2523bb6aa51849
+[01/15] nbd: use the correct block_device in nbd_bdev_reset
+        commit: 2a852a693f8839bb877fc731ffbc9ece3a9c16d7
+[02/15] zram: cleanup reset_store
+        commit: d666e20e2e7983d03bbf5e208b8485541ae616a1
+[03/15] zram: cleanup zram_remove
+        commit: 7a86d6dc1493326feb0d3ce5af2f34401dd3defa
+[04/15] block: add a disk_openers helper
+        commit: dbdc1be32591af023db2812706f01e6cd2f42bfc
+[05/15] block: turn bdev->bd_openers into an atomic_t
+        commit: 9acf381f3e8f715175c29f4b6d722f6b6797d139
+[06/15] loop: de-duplicate the idle worker freeing code
+        commit: 2cf429b53c1041a0e90943e1d2a5a7a7f89accb0
+[07/15] loop: initialize the worker tracking fields once
+        commit: b15ed54694fbba714931dd81790f86797cf8bed2
+[08/15] loop: remove the racy bd_inode->i_mapping->nrpages asserts
+        commit: 98ded54a33839e7b8f8bed772e01a544f48e33a7
+[09/15] loop: don't freeze the queue in lo_release
+        commit: 46dc967445bde5300eee7e567a67796de2217586
+[10/15] loop: only freeze the queue in __loop_clr_fd when needed
+        commit: 1fe0b1acb14dd3113b7dc975a118cd7f08af8316
+[11/15] loop: implement ->free_disk
+        commit: d2c7f56f8b5256d57f9e3fc7794c31361d43bdd9
+[12/15] loop: suppress uevents while reconfiguring the device
+        commit: 498ef5c777d9c89693b70cc453b40c392120ea1b
+[13/15] loop: avoid loop_validate_mutex/lo_mutex in ->release
+        commit: 158eaeba4b8edf9940f64daa83cbd1ac7db7593c
+[14/15] loop: remove lo_refcount and avoid lo_mutex in ->open / ->release
+        commit: a0e286b6a5b61d4da01bdf865071c4da417046d6
+[15/15] loop: don't destroy lo->workqueue in __loop_clr_fd
+        commit: d292dc80686aeafc418d809b4f9598578a7f294f
 
 Best regards,
 -- 
