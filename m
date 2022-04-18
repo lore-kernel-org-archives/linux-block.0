@@ -2,155 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 684C7C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 08:29:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76CEFC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 09:39:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229449AbiDRIcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 04:32:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55052 "EHLO
+        id S233152AbiDRJmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 05:42:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229817AbiDRIcC (ORCPT
+        with ESMTP id S229752AbiDRJmJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 04:32:02 -0400
-Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC08A193F0;
-        Mon, 18 Apr 2022 01:29:23 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=chengyou@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VAM.vKD_1650270559;
-Received: from 30.43.105.155(mailfrom:chengyou@linux.alibaba.com fp:SMTPD_---0VAM.vKD_1650270559)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Mon, 18 Apr 2022 16:29:21 +0800
-Message-ID: <07be0869-13d9-6893-28b4-924c840a7804@linux.alibaba.com>
-Date:   Mon, 18 Apr 2022 16:29:19 +0800
+        Mon, 18 Apr 2022 05:42:09 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB9AC1658F
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 02:39:29 -0700 (PDT)
+Received: from fsav120.sakura.ne.jp (fsav120.sakura.ne.jp [27.133.134.247])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23I9dReG045714;
+        Mon, 18 Apr 2022 18:39:27 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav120.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp);
+ Mon, 18 Apr 2022 18:39:27 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav120.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23I9dRbP045710
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 18 Apr 2022 18:39:27 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <1a792f29-e698-6468-cc8c-b2f0fcea3d9b@I-love.SAKURA.ne.jp>
+Date:   Mon, 18 Apr 2022 18:39:22 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: siw_cm.c:255 siw_cep_put+0x125/0x130 kernel warning while testing
- blktests srp/002 v5.17-rc7
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: yet another approach to fix the loop lock order inversions v6
 Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Bernard Metzler <bmt@zurich.ibm.com>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-References: <Yliu2ROIh0nLk5l0@bombadil.infradead.org>
-From:   Cheng Xu <chengyou@linux.alibaba.com>
-In-Reply-To: <Yliu2ROIh0nLk5l0@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>
+Cc:     Jan Kara <jack@suse.cz>, "Darrick J . Wong" <djwong@kernel.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        Matteo Croce <mcroce@microsoft.com>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+References: <20220330052917.2566582-1-hch@lst.de>
+ <20220404074235.GA1046@lst.de>
+ <499de381-c81e-4bd0-b5f7-1ee6be45821d@I-love.SAKURA.ne.jp>
+In-Reply-To: <499de381-c81e-4bd0-b5f7-1ee6be45821d@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-DQoNCk9uIDQvMTUvMjIgNzozMSBBTSwgTHVpcyBDaGFtYmVybGFpbiB3cm90ZToNCg0KPC4u
-Lj4NCg0KPiBbICAxOTUuMjE4NzgzXSAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0t
-LS0tLS0NCj4gWyAgMTk1LjIyMTI0Ml0gV0FSTklORzogQ1BVOiA3IFBJRDogMjAxIGF0IGRy
-aXZlcnMvaW5maW5pYmFuZC9zdy9zaXcvc2l3X2NtLmM6MjU1IHNpd19jZXBfcHV0KzB4MTI1
-LzB4MTMwIFtzaXddDQo+IFsgIDE5NS4yMjI4MzhdIE1vZHVsZXMgbGlua2VkIGluOiBpYl9z
-cnAoRSkgc2NzaV90cmFuc3BvcnRfc3JwKEUpIHRhcmdldF9jb3JlX3BzY3NpKEUpIHRhcmdl
-dF9jb3JlX2ZpbGUoRSkgaWJfc3JwdChFKSB0YXJnZXRfY29yZV9pYmxvY2soRSkgdGFyZ2V0
-X2NvcmVfbW9kKEUpIHJkbWFfY20oRSkgaXdfY20oRSkgaWJfY20oRSkgc2NzaV9kZWJ1ZyhF
-KSBzaXcoRSkgbnVsbF9ibGsoRSkgaWJfdW1hZChFKSBpYl91dmVyYnMoRSkgc2RfbW9kKEUp
-IHNnKEUpIGRtX3NlcnZpY2VfdGltZShFKSBzY3NpX2RoX3JkYWMoRSkgc2NzaV9kaF9lbWMo
-RSkgc2NzaV9kaF9hbHVhKEUpIGRtX211bHRpcGF0aChFKSBpYl9jb3JlKEUpIGRtX21vZChF
-KSBudm1lX2ZhYnJpY3MoRSkga3ZtX2ludGVsKEUpIGt2bShFKSBpcnFieXBhc3MoRSkgY3Jj
-dDEwZGlmX3BjbG11bChFKSBnaGFzaF9jbG11bG5pX2ludGVsKEUpIGFlc25pX2ludGVsKEUp
-IGNyeXB0b19zaW1kKEUpIGNyeXB0ZChFKSBqb3lkZXYoRSkgZXZkZXYoRSkgc2VyaW9fcmF3
-KEUpIGNpcnJ1cyhFKSBkcm1fc2htZW1faGVscGVyKEUpIGRybV9rbXNfaGVscGVyKEUpIHZp
-cnRpb19iYWxsb29uKEUpIGNlYyhFKSBpNjMwMGVzYihFKSBidXR0b24oRSkgZHJtKEUpIGNv
-bmZpZ2ZzKEUpIGlwX3RhYmxlcyhFKSB4X3RhYmxlcyhFKSBhdXRvZnM0KEUpIGV4dDQoRSkg
-Y3JjMTYoRSkgbWJjYWNoZShFKSBqYmQyKEUpIGJ0cmZzKEUpIGJsYWtlMmJfZ2VuZXJpYyhF
-KSB4b3IoRSkgcmFpZDZfcHEoRSkgenN0ZF9jb21wcmVzcyhFKSBsaWJjcmMzMmMoRSkgY3Jj
-MzJjX2dlbmVyaWMoRSkgdmlydGlvX25ldChFKSBuZXRfZmFpbG92ZXIoRSkgZmFpbG92ZXIo
-RSkgdmlydGlvX2JsayhFKSBhdGFfZ2VuZXJpYyhFKSB1aGNpX2hjZChFKSBlaGNpX2hjZChF
-KSBjcmMzMl9wY2xtdWwoRSkgY3JjMzJjX2ludGVsKEUpIGF0YV9waWl4KEUpIHBzbW91c2Uo
-RSkgbnZtZShFKSBsaWJhdGEoRSkgdmlydGlvX3BjaShFKQ0KPiBbICAxOTUuMjIyOTg2XSAg
-dmlydGlvX3BjaV9sZWdhY3lfZGV2KEUpIHZpcnRpb19wY2lfbW9kZXJuX2RldihFKSB1c2Jj
-b3JlKEUpIHZpcnRpbyhFKSB1c2JfY29tbW9uKEUpIHNjc2lfbW9kKEUpIG52bWVfY29yZShF
-KSBpMmNfcGlpeDQoRSkgdmlydGlvX3JpbmcoRSkgdDEwX3BpKEUpIHNjc2lfY29tbW9uKEUp
-IFtsYXN0IHVubG9hZGVkOiBudWxsX2Jsa10NCj4gWyAgMTk1LjI0MTAzNl0gc2QgMzowOjA6
-MTogW3NkZF0gQXR0YWNoZWQgU0NTSSBkaXNuDQo+IFsgIDE5NS4yNDExODhdIENQVTogMiBQ
-SUQ6IDIwMSBDb21tOiBrd29ya2VyL3UxNjoyMiBLZHVtcDogbG9hZGVkIFRhaW50ZWQ6IEcg
-ICAgICAgICAgICBFICAgICA1LjE3LjAtcmM3ICMxDQo+IFsgIDE5NS4yNDYwNTNdIEhhcmR3
-YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9T
-IDEuMTUuMC0xIDA0LzAxLzIwMTQNCj4gWyAgMTk1LjI0OTEyM10gV29ya3F1ZXVlOiBpd19j
-bV93cSBjbV93b3JrX2hhbmRsZXIgW2l3X2NtXQ0KPiBbICAxOTUuMjUxMjc0XSBSSVA6IDAw
-MTA6c2l3X2NlcF9wdXQrMHgxMjUvMHgxMzAgW3Npd10NCj4gWyAgMTk1LjI1MzU0OF0gQ29k
-ZTogYmIgYzAgZTggYWUgNzQgMGYgZDcgNDggODkgZWYgNWQgNDEgNWMgNDEgNWQgZTkgYjEg
-ZDYgZWYgZDYgNWQgYmUgMDMgMDAgMDAgMDAgNDEgNWMgNDEgNWQgZTkgMjIgYjcgMGMgZDcg
-MGYgMGIgZTkgZjMgZmUgZmYgZmYgPDBmPiAwYiBlOSAxYyBmZiBmZiBmZiAwZiAxZiA0MCAw
-MCAwZiAxZiA0NCAwMCAwMCA1NSA0OCA4ZCA2ZiAyMCA1Mw0KPiBbICAxOTUuMjU4OTgyXSBS
-U1A6IDAwMTg6ZmZmZmJjNTM0MDRlYmM5OCBFRkxBR1M6IDAwMDEwMjg2DQo+IFsgIDE5NS4y
-NjEwMThdIFJBWDogMDAwMDAwMDAwMDAwMDAwMSBSQlg6IDAwMDAwMDAwMDAwMDAwMDAgUkNY
-OiAwMDAwMDAwMDAwMDAwMDAwDQo+IFsgIDE5NS4yNjM1NjldIFJEWDogMDAwMDAwMDAwMDAw
-MDAwMSBSU0k6IDAwMDAwMDAwMDAwMDAyNDYgUkRJOiBmZmZmYTAzZDExMDJhOTI0DQo+IFsg
-IDE5NS4yNjYxNTFdIFJCUDogZmZmZmEwM2QxMTAyYTkwMCBSMDg6IGZmZmZhMDNkMTEwMmE5
-MjAgUjA5OiBmZmZmYmM1MzQwNGViYzUwDQo+IFsgIDE5NS4yNjkxNTBdIFIxMDogZmZmZmZm
-ZmY5OGEwNjBlMCBSMTE6IDAwMDAwMDAwMDAwMDAwMDAgUjEyOiBmZmZmYTAzY2M0Mjk3MDAw
-DQo+IFsgIDE5NS4yNzI3NDRdIFIxMzogZmZmZmEwM2QyYTQ4YWVhMCBSMTQ6IGZmZmZhMDNk
-MmE0OGFlNzggUjE1OiBmZmZmYTAzY2M0MjdhZDU4DQo+IFsgIDE5NS4yNzU1NzVdIEZTOiAg
-MDAwMDAwMDAwMDAwMDAwMCgwMDAwKSBHUzpmZmZmYTAzZGY3YzgwMDAwKDAwMDApIGtubEdT
-OjAwMDAwMDAwMDAwMDAwMDANCj4gWyAgMTk1LjI3ODkzMl0gQ1M6ICAwMDEwIERTOiAwMDAw
-IEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiBbICAxOTUuMjgwOTYzXSBDUjI6
-IDAwMDA1NTkwYmMyZTRmZTggQ1IzOiAwMDAwMDAwMDg1MDBhMDA0IENSNDogMDAwMDAwMDAw
-MDc3MGVlMA0KPiBbICAxOTUuMjgyODAzXSBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAw
-MDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KPiBbICAxOTUuMjg0NjUw
-XSBEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2OiAwMDAwMDAwMGZmZmUwZmYwIERSNzogMDAw
-MDAwMDAwMDAwMDQwMA0KPiBbICAxOTUuMjg2NTIyXSBQS1JVOiA1NTU1NTU1NA0KPiBbICAx
-OTUuMjg3OTk4XSBDYWxsIFRyYWNlOg0KPiBbICAxOTUuMjg5MjEwXSAgPFRBU0s+DQo+IFsg
-IDE5NS4yOTA5NjldICBzaXdfcmVqZWN0KzB4YWMvMHgxODAgW3Npd10NCj4gWyAgMTk1LjI5
-MjY3OV0gIGl3X2NtX3JlamVjdCsweDY4LzB4YzAgW2l3X2NtXQ0KPiBbICAxOTUuMjk0MTM2
-XSAgY21fd29ya19oYW5kbGVyKzB4NTlkLzB4ZTIwIFtpd19jbV0NCj4gWyAgMTk1LjI5NTU4
-OF0gIHByb2Nlc3Nfb25lX3dvcmsrMHgxZTIvMHgzYjANCj4gWyAgMTk1LjI5ODMzOF0gIHdv
-cmtlcl90aHJlYWQrMHg1MC8weDNhMA0KPiBbICAxOTUuMzAwMzMwXSAgPyByZXNjdWVyX3Ro
-cmVhZCsweDM5MC8weDM5MA0KPiBbICAxOTUuMzAyMjY5XSAga3RocmVhZCsweGU1LzB4MTEw
-DQo+IFsgIDE5NS4zMDQwNjJdICA/IGt0aHJlYWRfY29tcGxldGVfYW5kX2V4aXQrMHgyMC8w
-eDIwDQo+IFsgIDE5NS4zMDc2MTJdICByZXRfZnJvbV9mb3JrKzB4MWYvMHgzMA0KPiBbICAx
-OTUuMzA5NTg1XSAgPC9UQVNLPg0KPiBbICAxOTUuMzEwNjc0XSAtLS1bIGVuZCB0cmFjZSAw
-MDAwMDAwMDAwMDAwMDAwIF0tLS0NCj4gWyAgMTk1LjMxMzI5MF0gc2NzaSBob3N0NDogaWJf
-c3JwOiBSRUogcmVjZWl2ZWQNCj4gWyAgMTk1LjMxMzI5M10gc2NzaSBob3N0NDogICBSRUog
-cmVhc29uIDB4ZmZmZmZmOTgNCj4gWyAgMTk1LjMxNTQzM10gc2NzaSBob3N0NDogaWJfc3Jw
-OiBDb25uZWN0aW9uIDAvOCB0byAxNzIuMTcuOC4xMTMgZmFpbGVkDQo+IFsgIDE5NS40NzI3
-MThdIGliX3NycDpzcnBfcGFyc2VfaW46IGliX3NycDogMTcyLjE3LjguMTEzIC0+IDE3Mi4x
-Ny44LjExMzowDQo+IFsgIDE5NS40NzI3MzldIGliX3NycDpzcnBfcGFyc2VfaW46IGliX3Ny
-cDogMTcyLjE3LjguMTEzOjU1NTUgLT4gMTcyLjE3LjguMTEzOjU1NTUNCj4gWyAgMTk1LjQ3
-MjgwN10gaWJfc3JwOnNycF9wYXJzZV9pbjogaWJfc3JwOiBbZmU4MDo6NTA1NDpmZjpmZTVi
-OjkwZGMlM10gLT4gW2ZlODA6OjUwNTQ6ZmY6ZmU1Yjo5MGRjXTowLzIwMjQ0Mjg2NSUzDQo+
-ID4gWzBdIGh0dHBzOi8vZ2l0aHViLmNvbS9tY2dyb2Yva2Rldm9wcw0KPiAgPiAgICBMdWlz
-DQoNCkhpLCBCZXJuYXJkDQoNCkkgcmVwcm9kdWNlZCB0aGlzIGlzc3VlLCBhbmQgaXQgbG9v
-a3MgbGlrZSBhIGNvbmRpdGlvbiByYWNlIGJldHdlZW4NCidjbV93b3JrX2hhbmRsZXInIGFu
-ZCAnc2l3X2NtX3dvcmtfaGFuZGxlcicuDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiAgVGhyZWFkMDogICAg
-ICAgICAgICAgICAgICAgICAgICAgVGhyZWFkMToNCiAgc2l3X2NtX3dvcmtfaGFuZGxlciAg
-ICAgICAgICAgICAgY21fd29ya19oYW5kbGVyDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpzdGVwMDoNCnNpd19j
-bV91cGNhbGwgd2l0aA0KSVdfQ01fRVZFTlRfQ09OTkVDVF9SRVFVRVNUDQoNCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgPT09PiBjbV9jb25uX3JlcV9oYW5kbGVyDQogICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4NCiAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgY21faWQtPmNtX2hhbmRsZXIgKGZhaWxlZCkNCiAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaXdfY21fcmVqZWN0DQogICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2l3X3JlamVjdA0KDQoqc3RlcDEq
-Og0KZGV0YWNoIGNlcCB3aXRoIGxpc3Rlbl9jZXANCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
-LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KV2hlbiBzaXdf
-cmVqZWN0IGlzIGNhbGxlZCBpbiBjbV93b3JrX2hhbmRsZXIsIHRoZSByZWxhdGVkIGNlcCBt
-YXkgaGF2ZQ0Kbm90IGJlZW4gZGV0YWNoZWQgd2l0aCBpdHMgbGlzdGVuX2NlcCwgdGhyb3Vn
-aCB0aGUgdHdvIHN0ZXBzIGFyZSB2ZXJ5DQpjbG9zZS4NCg0KSSB0aGluayBvbmUgc2ltcGxl
-IHdheSB0byBmaXggdGhpcyBpc3N1ZSBpcyBrZWVwIHN0ZXAxIHVuZGVyDQpzaXdfY2VwX3Nl
-dF9pbnVzZSdzIHByb3RlY3Rpb24sIGFuZCB0aGlzIHdpbGwgbWFrZSBzaXdfcmVqZWN0IHdp
-bGwgYmUNCnBlbmRpbmcgdXRpbCBzaXdfY21fd29ya19oYW5kbGVyIHJlbGVhc2UgdGhlIGxv
-Y2s6DQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2luZmluaWJhbmQvc3cvc2l3L3Npd19jbS5j
-IA0KYi9kcml2ZXJzL2luZmluaWJhbmQvc3cvc2l3L3Npd19jbS5jDQppbmRleCA3YWNkZDNj
-M2E1OTkuLmYwMzNiNmRhMWU5ZiAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvaW5maW5pYmFuZC9z
-dy9zaXcvc2l3X2NtLmMNCisrKyBiL2RyaXZlcnMvaW5maW5pYmFuZC9zdy9zaXcvc2l3X2Nt
-LmMNCkBAIC05NjgsMTMgKzk2OCwxNSBAQCBzdGF0aWMgdm9pZCBzaXdfYWNjZXB0X25ld2Nv
-bm4oc3RydWN0IHNpd19jZXAgKmNlcCkNCg0KICAgICAgICAgICAgICAgICBzaXdfY2VwX3Nl
-dF9pbnVzZShuZXdfY2VwKTsNCiAgICAgICAgICAgICAgICAgcnYgPSBzaXdfcHJvY19tcGFy
-ZXEobmV3X2NlcCk7DQotICAgICAgICAgICAgICAgc2l3X2NlcF9zZXRfZnJlZShuZXdfY2Vw
-KTsNCg0KICAgICAgICAgICAgICAgICBpZiAocnYgIT0gLUVBR0FJTikgew0KICAgICAgICAg
-ICAgICAgICAgICAgICAgIHNpd19jZXBfcHV0KGNlcCk7DQogICAgICAgICAgICAgICAgICAg
-ICAgICAgbmV3X2NlcC0+bGlzdGVuX2NlcCA9IE5VTEw7DQorICAgICAgICAgICAgICAgICAg
-ICAgICBzaXdfY2VwX3NldF9mcmVlKG5ld19jZXApOw0KICAgICAgICAgICAgICAgICAgICAg
-ICAgIGlmIChydikNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZXJy
-b3I7DQorICAgICAgICAgICAgICAgfSBlbHNlIHsNCisgICAgICAgICAgICAgICAgICAgICAg
-IHNpd19jZXBfc2V0X2ZyZWUobmV3X2NlcCk7DQogICAgICAgICAgICAgICAgIH0NCiAgICAg
-ICAgIH0NCiAgICAgICAgIHJldHVybjsNCg0KVGhhbmtzLA0KQ2hlbmcgWHUNCg==
+On 2022/04/04 18:39, Tetsuo Handa wrote:
+> On 2022/04/04 16:42, Christoph Hellwig wrote:
+>> Any more comments?  It would be good to settle this saga for 5.18.
+> 
+> 5 hours ago I added this series to my tree so that we can immediately
+> send to linux.git via linux-block.git#5.18 if nothing wrong happens.
+> 
+> https://osdn.net/projects/tomoyo/scm/git/tomoyo-test1/commits/99499a2b0ff01d8a5c0a06132ab33aaed4433b89
+
+This series was tested for 2 weeks using linux-next.git and got no problem report.
+
+I think we can send this series to 5.18.
