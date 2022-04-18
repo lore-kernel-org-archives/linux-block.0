@@ -2,120 +2,154 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BEEC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 21:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC06C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 21:21:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347909AbiDRVHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 17:07:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45782 "EHLO
+        id S233148AbiDRVY1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 17:24:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347893AbiDRVHE (ORCPT
+        with ESMTP id S230107AbiDRVY0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 17:07:04 -0400
-Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5786E2A700
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 14:04:23 -0700 (PDT)
-Received: by mail-wr1-x42b.google.com with SMTP id x18so12064740wrc.0
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 14:04:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=2xC56SbahR+A86XAZ1Xr5CheL4zTUR2Yl2PX5kgsh60=;
-        b=jVefXpeaUqA2UhMsfdWRxwA6dVOS/OubaUhUbzQiNiw6Sh3TSAJzNrupAImg7ews6u
-         ouky8CJKsd6yjdaomtrNrSxPMKZP+c97cnIiq7aCvfyOB3Zo2igqk7ZzmDrKYxU+tRSO
-         KQDZwYpTzB/quuQMmvwf+tJfSs56zyhk/X1TmvSqzjrNzoiyiPuOgilveEhPfr6UrDik
-         LMDrw2bn4aNZwLp0nSoYHc3bU6cNSlhsY/a960ueZeONiv4HRR+50dS6yF1nnlKXtx+h
-         4Ahw7F5i6QXCSQxeJ7S+OQuPdWULZcgWYcHIbC+AL6xSQF993ov+8VTg+Ti7DdcevQrz
-         WlVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=2xC56SbahR+A86XAZ1Xr5CheL4zTUR2Yl2PX5kgsh60=;
-        b=zict+xg2uCwS5U/nov0V6pWgcUAQBhUnfPR4Zhri4MSHAxBs9+JCNsuxQa85d4vJgE
-         Ji/eB6E9rB/LFkfOrPunCuh6TtSMMoAu1uPMQe4FZE67Cs1+xfP3FywE9hPAsnwAy/lk
-         o2ZBFsgCdCFChbAuP/J3FLRV0Fc+7GUK5uj7VKt825ut3bbNELyRYCEFmjp6zw0lwF0C
-         wmzH0vrfGexb1AdNBv4VI3n/v36mN5Tybna2mFgUX9QXuag6ixyiFvtCImd+R3f9aSeW
-         yuAnSPv8DuZ9nfDxWsv2IRCNcwhKi8nMnOCYLRmDo4woivxV5OcGk0+LuKF7Umi3DDZ+
-         2jAA==
-X-Gm-Message-State: AOAM532iqwTZ81IWC4JHXbJScpi00aCEJV3ngXI4LbnOrvJM23vowbE0
-        Fq3XGfFjrGCrD/x9XjsAUqAjYKBY+1nIaw==
-X-Google-Smtp-Source: ABdhPJyEZlaRcGyCo1uMJOZOgoyGccFvv75S9XwuahzLFfjLlKLpcoWdx5eV5TRokdsECQsOSl9nyA==
-X-Received: by 2002:a5d:47aa:0:b0:20a:8b96:5b2c with SMTP id 10-20020a5d47aa000000b0020a8b965b2cmr8152221wrb.621.1650315861737;
-        Mon, 18 Apr 2022 14:04:21 -0700 (PDT)
-Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
-        by smtp.gmail.com with ESMTPSA id n5-20020adf8b05000000b00207a4fd0185sm11234964wra.7.2022.04.18.14.04.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Apr 2022 14:04:21 -0700 (PDT)
-Date:   Mon, 18 Apr 2022 22:04:18 +0100
-From:   Phillip Potter <phil@philpotter.co.uk>
-To:     Jens Axboe <axboe@kernel.dk>, Enze Li <lienze@kylinos.cn>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] cdrom: do not print info list when there is no cdrom
- device
-Message-ID: <Yl3SUr9+qzoRlQt8@equinox>
-References: <20220408084221.1681592-1-lienze@kylinos.cn>
- <25390602-cfa0-dba3-bfbc-a35ed6b44bcf@kernel.dk>
- <20220409122530.60353fcd@asus>
- <YlFA7USiCtqsFvVD@equinox>
- <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
- <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
+        Mon, 18 Apr 2022 17:24:26 -0400
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2062.outbound.protection.outlook.com [40.107.236.62])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF3B22CCB9;
+        Mon, 18 Apr 2022 14:21:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cBprRuHTAqjyrdZLgXpxN/jbKb4hf93g0yBGpvMRX64f1U0ECDUBe3wx0loJyLBBBlpOghO4/sW9lj3TpZc3teLjLCeNbUlt8kEKOxH3g3Y9lw+myjikITpmFCZHcTbGTcgpfgq+NvlV1IJsmyIteahFKuMkCnhfFw9QnbmDB+Pkj2dQpu0trz8AGiMEIEZHS5MlwejXn/MWd/V85kzr0hnJhv7/iubLz/KUgOQLnBneogSrzfOkGhW8yF4/NNmfG3XrKvwi3V9l0CeBPMW5v1iK2/JE8jcaHbitsczbmp8C12H6C34YJzswPQJ+HoTl+jylxPVHISMrBs+aRmiXMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SN+jaZlItyVekpsnL569YkoOgGJzVlcO1URdevBm70E=;
+ b=hGU44lA9Ofv4clDlJ5I70vAUjnri5bZR86K3cCyV+h7pV98MTZ3HBygl7th/lxWYbzxpvTL2NI/4biUyVDPXmaqzGvSVaf8dZGpJK28fcgtAB/47rx6/mowE1DWgLvqiL1AcZCZK457o9Jro/yJPZUf0FqGAqGUCQJUKykDO6n4YcdUSPFh7wZOfTmWT1sv80+RZjRglYhPWbQv3YXGEaSR1ksygUaI45cLmcarqK9s1VynX1UU4+80yVy6vd6rC+7tZ+PW2ZAeOPTbC5Fdam/8hYwIesM4kpr/OKc+afc5J+CO4pAEW8le/ZUN/cP64XntfjTH9HhiyTP0AMJ5sWQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SN+jaZlItyVekpsnL569YkoOgGJzVlcO1URdevBm70E=;
+ b=scWDnKzXDPtOpqYqxi3SWbaPYejy8UIXqSPZunbjaMaM/VkrPRjQ/lzDGbHwub3nN+5snni5oRsFu74qokJ2VyF0k72CKsGQlAEvilW0LPTbxkPD8nMCtS/PepH4feOVJURogNFLWj2Q1wN5b84T7tSHG40nN5yfF0fhq4kmybHyG5kl1vW0FhX2LmIHxWWuw6pJz834z+E8DnlMa8HcllohH3IMfCqOq+X4F6fCXblq3wyQqLcNIUuvxszQRhGbhFdSC16WW090jwncJM3krX0N6ZzlYPcjXKrXNTtNeJLJbANYOIVPTrPV0OnD37ywMoTkmtZIr3nVQTkhscH4AQ==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by DM4PR12MB5101.namprd12.prod.outlook.com (2603:10b6:5:390::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Mon, 18 Apr
+ 2022 21:21:45 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::a90b:9df2:370c:e76b]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::a90b:9df2:370c:e76b%3]) with mapi id 15.20.5164.025; Mon, 18 Apr 2022
+ 21:21:44 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+CC:     Richard Weinberger <richard@nod.at>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        =?utf-8?B?Um9nZXIgUGF1IE1vbm7DqQ==?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@kernel.org>, Song Liu <song@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        "linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "nbd@other.debian.org" <nbd@other.debian.org>,
+        "virtualization@lists.linux-foundation.org" 
+        <virtualization@lists.linux-foundation.org>,
+        "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>,
+        "linux-raid@vger.kernel.org" <linux-raid@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+Subject: Re: [PATCH 08/11] loop: remove a spurious clear of discard_alignment
+Thread-Topic: [PATCH 08/11] loop: remove a spurious clear of discard_alignment
+Thread-Index: AQHYUuBa8QWBZz9aDUOa5Tmj7psG5qz2LtoA
+Date:   Mon, 18 Apr 2022 21:21:44 +0000
+Message-ID: <a60f5fc2-fad3-3e82-00b2-46126c7844ed@nvidia.com>
+References: <20220418045314.360785-1-hch@lst.de>
+ <20220418045314.360785-9-hch@lst.de>
+In-Reply-To: <20220418045314.360785-9-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 29c292e8-3de4-4b82-65bd-08da21817097
+x-ms-traffictypediagnostic: DM4PR12MB5101:EE_
+x-microsoft-antispam-prvs: <DM4PR12MB5101905494492F3B3B1789BBA3F39@DM4PR12MB5101.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VTdOHMLOgj5nGlVqc9NJF8HcI54YZvuZgAg95udf3adOomd+wnZvnFAnda6i9vsfcSdwvXzHOCeeqxWt9aMlrMjRWF7Xv9ySzuXME4VPhTN6b7ns2yrqA075agaZdGinqKpCILKu86+pqIbpUNB7ihfkTGMgUI44TM4j8mL5K+wRdRnDOux1aCIyo85Wi24KeN8TisGUyr2oIbkV7/Lg+6ZyC/+btl7c36JMnsxIoHus4s5Yj3TIe51AJhZxWcFEv5Wj+I7IkVe2aWIIFQ6gssIKIt46n0J0ldMlDfh6Y+MFdRUEZ8tppl2ALPOjxZvB99il+VWZ5X4bLWTWl6JwR0Gty6B5Bfm/6c2/uDwv7PD3USn3AXdA2X8HK5mb5ibCpFELSYp1vTg5bBr8XnpgAClHXDU66lJrPlW1e84y4+nf0j3eHfsO3i7DYZT7tulSMSyiTJSBPkV9mCKI2W93bwqfY5s7gNZ2RdO2/4Qg7mNhPkiqdJdFo7Yeotx1Yz7emda/qftdc6e8vNGM5VUFW43ZFvdL3NsiG6P8Uwra5wmEkVFYZz4Bc6PRf568LaAMP3B23aCWHIB7AxBI2Nmm90JPG3Pv94gJxiMzjH+o+oECMD0A/cdho5FbbDmKZz1VGs1WIQuwUCqcIk1syuc8uQj9uZ0XiZoXSS7IH3MsjfaGsnWX4U/Njp053kRrHzoG7aKMPQ9OClMuvLfpWMh0gLOw9Z04aQgHxVy9ekz0n+4gnIxtkwrlMl0Xl7Ap0YqtO9luyWBM5+K1Ke+FJuKVBA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(38070700005)(122000001)(38100700002)(5660300002)(4326008)(6486002)(186003)(2616005)(54906003)(110136005)(508600001)(6512007)(71200400001)(6506007)(7416002)(66556008)(66476007)(64756008)(8676002)(76116006)(8936002)(66446008)(53546011)(66946007)(316002)(91956017)(31686004)(558084003)(86362001)(2906002)(36756003)(31696002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?UE45SDBjVlIraVRQaFkxSXBFV3dQaGFhdzNpYXhoeFp5Q2QyZzBTR2dEUm5E?=
+ =?utf-8?B?WEs4NXVhT1orNTZheFBQcytBanZXTjN4ZS9Tdk5oNERRbnNXQlNuV1BjSHNU?=
+ =?utf-8?B?NC9jTmZKalpaRVRMN0MreC9qVFRLY0JCMytKTzNhVzRoeVRGMjF1c1Q5VTVJ?=
+ =?utf-8?B?UURCZWZMQ1Y2eXc4WGJPczFLRW1zWHlGdlU5WU1UK1pwdzcwMjQrOENTM1E2?=
+ =?utf-8?B?bU11TnVVakFOc0pvRHBqQ2JTb3FBK1B6Q2FWaGVIRlkwVmRKNGIwY1V1N2ph?=
+ =?utf-8?B?RXFjR2N6YW9UbUdYTkNSNm5tYVBwdWR6MWNPWlBDVVdPQ3UvdmdsSVFHOXl5?=
+ =?utf-8?B?TGl3VktDNFdWRG9SU2xUKzV2Rm9KWUFBdzdZbldDOGlncFhzbnRYdWNJQmow?=
+ =?utf-8?B?aFdFTGQ1cjhvUS92NmN1RmlDSE1kdWV0YktBZ2dkS2J5U1dteW5GTW9PSzNO?=
+ =?utf-8?B?UW5JZlFqSjVPREtQTWdScHZKaytXckxnejFHNUYxOXozUWdqNW9ibkFBUS9u?=
+ =?utf-8?B?TXFORU1kUDkyVWpZNElQUnoxSi9XTEFQNnJEellVSXcybnNCT2FWWVNMeHJU?=
+ =?utf-8?B?MXcvZXlTT0krUmlhVVFkQ2Q4OGVrYjk4cjhsVm9Ibm1xTjdMdGdoVWcwbTJE?=
+ =?utf-8?B?bHFtYXVXeHp0cW41eWI2VTVBQkFjcmJWZGJQbGZKeDdQRnNyRjVaVlB2NWk2?=
+ =?utf-8?B?MnVFSm03V1dnUXNsTm5ubWEvUjRnb0F2cDhXemFkaEtnYzJibHh0d3RFSHV1?=
+ =?utf-8?B?RmlqdnRRWWpFVEVBNUZNWjFmODFLNkVmWE01akFmUklpTzNhMjBIWXVIZDF1?=
+ =?utf-8?B?Q2pGTjlibERiNkpkeTNQYW14RVVGaWJISU5CdUNWTW5icXU0cG0xQVJ3TkN1?=
+ =?utf-8?B?cGQ5VWhzTnNZSmtIblFyVVJuaEp5cGRpeXlTNU5oMmRRdVNBdVQrVlFWNEdY?=
+ =?utf-8?B?ZlF2ZUtYTUVwRjRuN3RPVkxCY0ZIUURkdlJGRUkzdnByMGJoRDcveGcxbUFL?=
+ =?utf-8?B?T05ZY3M4bktoNXlIdGkxZXk5VVM1STJrZHMyTDF4VnQ1UXE1bVc2V1Z6djcr?=
+ =?utf-8?B?VFp6cW94RmhFZzRUdXNGdDkyVWlRRUhPR1JZUnNJSEdndHpHSk1lZ2ErVHl1?=
+ =?utf-8?B?SS9LbzRjVlJCQm9IMk4rWXZkbFIzUnlZVUVWdXFHUFdLekUxeHg3aUVJcE5p?=
+ =?utf-8?B?ejJKdDhVOTU3S20rNy9FOG14N2pCc3FDNDQvVk5YamhkMmt3RkYxMlJQaWRL?=
+ =?utf-8?B?NWJnRHJKYStzam1OTTBxUFErdjdyTkl2QjF3Nk1sL3FFVFJRS2RVeGVLL1hy?=
+ =?utf-8?B?NWtMcEVPUURwMk5aeHJCZ0d1U0xOQWFxRWYzL1VDZ0p1enAraGwyeG9LOUo3?=
+ =?utf-8?B?Vm5senFER2FTUmttTGdXOEhqL2pwK0RvTS90UVpOK09xMzFGcHhtODhHYUtz?=
+ =?utf-8?B?aEhCcXBqVUxMWmZmNEcrYzI0emJLN1hjbmlyL2pDOUtBSldyMDFWNVh2elpi?=
+ =?utf-8?B?NHJqTE5vRmYzVmswQVYvNFI2QkxyRUw3V3ZzN2Z0QjRHRkZnSGJ4UG45SlpB?=
+ =?utf-8?B?TmNiNnpYVVkzczlQWGE4bkF0UzNnZHFtMFkzTjg3d1grVWdBb1pweHZ1TWpl?=
+ =?utf-8?B?WEljWGlNUHFFZ2paUmR0WFY2RVRFKzZOTTRkblltL04xNVZ5b1R4NmVMN2t5?=
+ =?utf-8?B?ZDJQYk9iQ0tGOHFnUXdNWXNxTlRZTEtzOVN0MktwUTBUd01oREFlSURkQWVK?=
+ =?utf-8?B?R3h1SUYvNmN6U2tadGU0U1dKRiszczhLYnhhSXNXcXFHL29HcVRpRGVBczNH?=
+ =?utf-8?B?Rko5aVBIblhEdlB4TGJRay9PbkkwWVNXNi9vdnYzWkkwY0lKQWk2bjd6N0JO?=
+ =?utf-8?B?VGR0NkxSUjJHeHo0ZU5lRkt2N0dHVVdocXgwaytlVlo0Qmp4dlB4Ym0waGhL?=
+ =?utf-8?B?MWtVQTlyWDd5SkUyR0E1c0d4QnIxMWxYbUUvOUVFWjk4Sy9hTlJIbkJ5a3FC?=
+ =?utf-8?B?N3hvYzRUMlJ5M2oyRzRnYVcvTzc2a0dqRnhKUXVTY2FDL3NMcnZ6Q1BkWlpU?=
+ =?utf-8?B?VEE0OGpEdDlBN3RKMEFWR3JiUFJQMnAySTMvbHBSbFBRcXU3aTVXdXlleHhI?=
+ =?utf-8?B?Vm80bmE2RGsyN0d1WnZ3VThXRlVoVG9vS0lLbWJjK08vRE1JUHhvbklUcU1C?=
+ =?utf-8?B?TnlBMXJBSzlBeGtoTjdwUnVmaXlQMFZIMDIvR2ZzN3ZXRVhIT0hpZkk3L21n?=
+ =?utf-8?B?bnZzZWlTUUtvVVFTSUg2d1BYTjVXM0s5R3JkQXMrcDA5bllLS3FpdWlYdmNX?=
+ =?utf-8?B?cFFLRmdGSkxHd0ZRY2tPdHdKdk1aVEs4TDE5S2x3L25EMzZrUnFKOGR6ZTRi?=
+ =?utf-8?Q?PQoUgCYR9P1+D+Oo=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <41D9387E299FEA4DBE85A4EDA24D0FFB@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29c292e8-3de4-4b82-65bd-08da21817097
+X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Apr 2022 21:21:44.8408
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: XFN+DIrHwXW4dMMfM+xmFlg+tyVkcF7I1h6/S9n/Q2biCyaj6At7SnFy02ZzrCvM3Xc6fVux9dDTKsDMn+vhYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5101
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 11, 2022 at 10:51:28AM -0600, Jens Axboe wrote:
-> >   20  -- Modify sysctl/proc interface. I plan on having one directory per                 
-> >   21  drive, with entries for outputing general drive information, and sysctl             
-> >   22  based tunable parameters such as whether the tray should auto-close for             
-> >   23  that drive. Suggestions (or patches) for this welcome!
-> > ================================================
-> > I'd like to know if the relevant patches are still welcome?
-> > 
-> > IIUC, the TODO List says that we need to implement a modification of the
-> > following form:
-> > ----------------------------------------------------------------------------------------------------------
-> > $ tree /proc/sys/dev/cdrom
-> > /proc/sys/dev/cdrom
-> > |--sr0--autoclose
-> > |       |-autoeject
-> > |       |-check_media
-> > |       |-debug
-> > |       |-info
-> > |       |-lock
-> > |
-> > |--sr1--autoclose
-> > |       |-autoeject
-> > |       |-check_media
-> > |       |-debug
-> > |       |-info
-> > |       |-lock
-> > |
-> > |--sr2 ...
-> > .
-> > .
-> > .
-> > ----------------------------------------------------------------------------------------------------------
-> > I would appreciate it if you could give me some advice.
-> 
-> Let's not do that, this advice is perhaps 20 years old. /proc isn't to
-> be used for anything like that these days.
-> 
-> -- 
-> Jens Axboe
->
-
-Hi Both,
-
-I will send a patch alongside others during the next merge window to
-remove this TODO section for now. It was part of the initial mainline
-git commit (17 years and two days ago), so it (as Jens says) is almost
-certainly even older than this.
-
-Regards,
-Phil
+T24gNC8xNy8yMiAyMTo1MywgQ2hyaXN0b3BoIEhlbGx3aWcgd3JvdGU6DQo+IFRoZSBsb29wIGRy
+aXZlciBuZXZlciBzZXRzIGEgZGlzY2FyZF9hbGlnbm1lbnQsIHNvIGl0IGFsc28gZG9lbnMndCBu
+ZWVkDQoNCnMvZG9lbnMndC9kb2Vzbid0Lw0KDQo+IHRvIGNsZWFyIGl0IHRvIHplcm8uDQo+IA0K
+PiBTaWduZWQtb2ZmLWJ5OiBDaHJpc3RvcGggSGVsbHdpZyA8aGNoQGxzdC5kZT4NCg0KUmV2aWV3
+ZWQtYnk6IENoYWl0YW55YSBLdWxrYXJuaSA8a2NoQG52aWRpYS5jb20+DQoNCi1jaw0KDQoNCg==
