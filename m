@@ -2,96 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59DF4C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 04:54:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F29ECC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 05:12:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236613AbiDRE46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 00:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56402 "EHLO
+        id S236609AbiDRFPP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 01:15:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236577AbiDRE4x (ORCPT
+        with ESMTP id S233191AbiDRFPP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 00:56:53 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9E7917E23;
-        Sun, 17 Apr 2022 21:54:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=FtH/TzYq8qAlMP8iMYBlGWDgAyvZ+dC0QKeXw0CO9iY=; b=BUsTo3zH0HXFlc2PINU8GKGh7x
-        xOheprcMV4SR/Bv+uFwxwEEXQNbDYNV0dXmpOloJvszTTFIFrVWaZxvzBY3RFcl0N0jCpn4vw3nb4
-        mTGNcSlargn2+/9oPzLzWJrWP+vix6g0SW/61Ow0uZFQlb8WOgevrVuktiq9QO8aHLzYorKaOwQBQ
-        CfxG3eR2YUokj3T01RV5d+uhBYCjSMPbPfvUkXoiOxJvCqf7RvI027xldIPQkqonm5kkPHmkKj1CY
-        TNHlrnSp6mhzujyAzSdQ8dHMYyS7hxSExdUVN15TaHiISjHO2rUQKK97SneL+jfBatao0hyUgCdvx
-        1/5nIEmg==;
-Received: from [2a02:1205:504b:4280:f5dd:42a4:896c:d877] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ngJOW-00FYuM-S5; Mon, 18 Apr 2022 04:53:49 +0000
+        Mon, 18 Apr 2022 01:15:15 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFB0DF06;
+        Sun, 17 Apr 2022 22:12:37 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 4B7A468AA6; Mon, 18 Apr 2022 07:12:34 +0200 (CEST)
+Date:   Mon, 18 Apr 2022 07:12:34 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@kernel.org>, Song Liu <song@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org, linux-raid@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        dm-devel@redhat.com
-Subject: [PATCH 11/11] xen-blkback: use bdev_discard_alignment
-Date:   Mon, 18 Apr 2022 06:53:14 +0200
-Message-Id: <20220418045314.360785-12-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220418045314.360785-1-hch@lst.de>
-References: <20220418045314.360785-1-hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
+Message-ID: <20220418051234.GA3559@lst.de>
+References: <20220415034703.2081695-1-ming.lei@redhat.com> <20220415051844.GA22762@lst.de> <YllQVT6n472eUB7+@T590> <20220416054913.GA7405@lst.de> <YlqGZ7W9rg0eNt9A@T590>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YlqGZ7W9rg0eNt9A@T590>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use bdev_discard_alignment to calculate the correct discard alignment
-offset even for partitions instead of just looking at the queue limit.
+On Sat, Apr 16, 2022 at 05:03:35PM +0800, Ming Lei wrote:
+> > Yes.  But not doing this automatically also means you keep easily
+> > forgetting callsites.  For example iomap still does not flush the plug
+> > in your patch.
+> 
+> It is reasonable for flush user(usually submission) to be responsible
+> for finishing/flushing plug.
 
-Also switch to use bdev_discard_granularity to get rid of the last direct
-queue reference in xen_blkbk_discard.
+Well, I very much disagree here.  blk_flush_plug is not a publіc,
+exported API, and that is for a reason.  A bio submission interface
+that requires flushing the plug to be useful is rather broken.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- drivers/block/xen-blkback/xenbus.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> iomap is one good example to show this point, since it does flush the plug
+> before call bio_poll(), see __iomap_dio_rw().
 
-diff --git a/drivers/block/xen-blkback/xenbus.c b/drivers/block/xen-blkback/xenbus.c
-index b21bffc9c50bc..04c90cb8955f6 100644
---- a/drivers/block/xen-blkback/xenbus.c
-+++ b/drivers/block/xen-blkback/xenbus.c
-@@ -583,14 +583,14 @@ static void xen_blkbk_discard(struct xenbus_transaction xbt, struct backend_info
- 	if (bdev_max_discard_sectors(bdev)) {
- 		err = xenbus_printf(xbt, dev->nodename,
- 			"discard-granularity", "%u",
--			q->limits.discard_granularity);
-+			bdev_discard_granularity(bdev));
- 		if (err) {
- 			dev_warn(&dev->dev, "writing discard-granularity (%d)", err);
- 			return;
- 		}
- 		err = xenbus_printf(xbt, dev->nodename,
- 			"discard-alignment", "%u",
--			q->limits.discard_alignment);
-+			bdev_discard_alignment(bdev));
- 		if (err) {
- 			dev_warn(&dev->dev, "writing discard-alignment (%d)", err);
- 			return;
--- 
-2.30.2
+iomap does not do a manual plug flush anywhere.
 
+iomap does finish the plug before polling, which makes sense.
+
+Now of course __blkdev_direct_IO_simple doesn't even use a plug
+to start with, so I'm wondering what plug this patch even tries
+to flush?
