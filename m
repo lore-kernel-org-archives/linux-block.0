@@ -2,96 +2,175 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3A6CC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 15:50:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC07BC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 15:57:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345654AbiDRPxZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 11:53:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44078 "EHLO
+        id S1345919AbiDRQAN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 12:00:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346001AbiDRPwe (ORCPT
+        with ESMTP id S1345886AbiDRQAF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 11:52:34 -0400
-Received: from mail-io1-xd34.google.com (mail-io1-xd34.google.com [IPv6:2607:f8b0:4864:20::d34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC085AE49
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 08:33:05 -0700 (PDT)
-Received: by mail-io1-xd34.google.com with SMTP id y85so4999712iof.3
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 08:33:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :references:from:in-reply-to:content-transfer-encoding;
-        bh=LXj6l1SIzMiGd0F8WnSspnVhDnfpp7z0rMQUAc/4akE=;
-        b=YmfY0AvXT0xwonY1k18wME4X5j+utcTyjbM5kTSIJ2Sfdq2WcOlhZD/9Qsjy9ADhVT
-         25JBwrts+1gp4A3s9bZv+vkDcPJRkViees3ich1TGM8GeQzKdA971ED2sk8ayu/Z6vBq
-         g/rR8h6l6VGP2xY0UpEZJkw/Uo0MpSaPG+X6wDh4ZwfPSzKfpUxnMDdgWDgtQupeSmZ9
-         wRVSQVbFmLhMrPr8QmT+AZQPm7ENFdqolRqVsCZIV92zgR272s5yKY5Gg/p9X40ZCwSt
-         GuBTZakoblzwZ6LVBkzi+cyu6o+KbIEYbDqOK0Bh8Oe6rFAXGbOuYhYZA6a4YLPMxFFg
-         IslA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LXj6l1SIzMiGd0F8WnSspnVhDnfpp7z0rMQUAc/4akE=;
-        b=0MjqBXzugjTxGCJCNYr4XCXRCM076CWV6dBAXHRAGfWPSJI3JrT4b9bzY/nEhzfj1i
-         ShdBICOe4zWHIDkYhBEz/Oy+nGDX5H1533LGte+xvW58kbOcCf7rPKQQHgyx84FikNIq
-         6WX8GwOITetfNMhPEe6HOPIErZ2ExZQxSiTh2eEYNTFNZUWDC1ZxtPWlT7mXkJMOmaKa
-         VdMSb2cvho4BWyPSzgZ+rcbVku/d+H4xGvbxjr3dtfJn8OKbyQJPrArlFYgvAOQoTnS+
-         gOHshUUNGqrbH1pj33DFd0u+X3evm5PW3lUo9eblkjLeajL7uXC1ZGgosv9z0OITBKdV
-         QJsg==
-X-Gm-Message-State: AOAM530qDro0SKKf2hW6ew8wgnPDcucN3nhTVVYxkBZLAtsRYx79PClK
-        oNVGeCUutkBaCGlpj81PIwHL4Q==
-X-Google-Smtp-Source: ABdhPJwGF3gvlBEhBonFyPnwG51X6A+BdfyzEgPCalkbk2CbbMhFeGOyDOH0K+kIxrComukz8fm0Cw==
-X-Received: by 2002:a05:6602:c3:b0:64f:d28f:a62c with SMTP id z3-20020a05660200c300b0064fd28fa62cmr4771325ioe.212.1650295985255;
-        Mon, 18 Apr 2022 08:33:05 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id o11-20020a92a80b000000b002c1ec0ca545sm7316890ilh.18.2022.04.18.08.33.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Apr 2022 08:33:04 -0700 (PDT)
-Message-ID: <2e7aa3f5-7fad-5188-f7f6-3ba8f75d4b6f@kernel.dk>
-Date:   Mon, 18 Apr 2022 09:33:03 -0600
+        Mon, 18 Apr 2022 12:00:05 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45FCFF2B
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 08:57:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Z1nNE2psavlCFIarcihZEIqCOPB3Sdq4D2KRmDjAReA=; b=euSrmbCPpT5wvZPlXNns8X+bpC
+        OWz9ZUhQGu9761eltKEwthgbYVkPU+O0n1qq9yOJwmIVksp7fMzry8DyEFKbMeQgMinZxi/Qa+yH8
+        SNwCmG09zyAjEA47cdfddyM5uscQejkDcrI67c65vrEwsdTV0rDR+GJTLUWzRru6S3sOQZtEvVDJP
+        rcORkVcD+jHH6XkQfk2F8PDNkEqwhWqNzWlyRkHCD2cbwZs4fyLlzeRGo3f8kgSzICQstaxbwo5zu
+        yAtOqE+qyhRxw/ZQwqKe7YXYMlM3MI+FKfgkDhhljOcQ4yeFu/DcWgiDDEezSn8bnyB5oOChkmZNj
+        OYqNQujw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ngTkR-00HZ6H-VM; Mon, 18 Apr 2022 15:57:08 +0000
+Date:   Mon, 18 Apr 2022 08:57:07 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] blktests: replace module removal with patient module
+ removal
+Message-ID: <Yl2KU6vLxawrIXi/@bombadil.infradead.org>
+References: <YlogluONIoc1VTCI@bombadil.infradead.org>
+ <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [Question] Accessing read data in bio request
-Content-Language: en-US
-To:     Jasper Surmont <surmontjasper@gmail.com>,
-        linux-block@vger.kernel.org
-References: <CAH4tiUtGuZP6QnO6L9EEDFL08O-UusHihO6CbvEf-QwJM3QPCg@mail.gmail.com>
- <eab14c0a-dd66-555c-8830-d23a5068273c@kernel.dk>
- <b975d3aa-e5b1-c16d-1820-4de5d84576cc@gmail.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <b975d3aa-e5b1-c16d-1820-4de5d84576cc@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Please don't top post
+On Fri, Apr 15, 2022 at 09:01:03PM -0700, Bart Van Assche wrote:
+> On 4/15/22 18:49, Luis Chamberlain wrote:
+> > -	if ! modprobe -r null_blk || ! modprobe null_blk "$@" "${zoned}" ; then
+> > -		return 1
+> > -	fi
+> > +	_patient_rmmod null_blk || return 1
+> > +	modprobe null_blk "$@" "${zoned}" || 1
+> 
+> "1" is not a valid command. Should "|| 1" perhaps be changed into "|| return
+> 1"?
 
-On 4/18/22 7:06 AM, Jasper Surmont wrote:
-> On 18/04/2022 04:59, Jens Axboe wrote:
->> On 4/14/22 8:15 AM, Jasper Surmont wrote:
->>> I'm writing a device mapper target, and on a bio (read) request I want
->>> to access (for example just logging) the data that was just read (by
->>> providing a callback to bio->bio_end_io).
->>>
->>> I've figured out I could read the data by using bvec_kmap_local() on
->>> each bio_vec to get a pointer to the data. However, if my
->>> understanding is correct this seems like an unefficient way: if the
->>> bio just finished a read then shouldn't the data already be mapped
->>> somewhere? If so, where?
->>
->> Not necessarily - if you're doing passthrough or O_DIRECT IO, then
->> no mapping necessarily exists for any part of the IO.
->
-> Okay thanks! So does this mean that you would suggest doing it with
-> bvec_kmap_local()? Or are there other, maybe better, methods?
+That was a typo, fixed.
 
-That's the way, yes.
+> > +_has_modprobe_patient()
+> > +{
+> > +	modprobe --help >& /dev/null || return 1
+> > +	modprobe --help | grep -q -1 "remove-patiently" || return 1
+> > +	return 0
+> > +}
+> 
+> I can't find the meaning of "-1" in the grep man page. Did I perhaps
+> overlook something?
 
--- 
-Jens Axboe
+That's shorthand for -C 1, but we can remove it as it is not needed.
 
+> > +# checks the refcount and returns 0 if we can safely remove the module. rmmod
+> > +# does this check for us, but we can use this to also iterate checking for this
+> > +# refcount before we even try to remove the module. This is useful when using
+> > +# debug test modules which take a while to quiesce.
+> > +_patient_rmmod_check_refcnt()
+> > +{
+> > +	local module=$1
+> > +	local refcnt=0
+> > +
+> > +	if [[ -f "/sys/module/$module/refcnt" ]]; then
+> > +		refcnt=$(cat "/sys/module/$module/refcnt" 2>/dev/null)
+> > +		if [[ $? -ne 0 || $refcnt -eq 0 ]]; then
+> > +			return 0
+> > +		fi
+> > +		return 1
+> > +	fi
+> > +	return 0
+> > +}
+> 
+> Hmm ... why is the check for existence of the refcnt separate from reading
+> the refcnt? I think that just reading the refcnt should be sufficient.
+> Additionally, that will avoid the race where the module is unloaded after
+> the check and before the refcnt is read.
+
+We can certainly simplify it as follows:
+
+_patient_rmmod_check_refcnt()
+{
+	local module=$1
+	local refcnt=0
+
+	refcnt=$(cat "/sys/module/$module/refcnt" 2>/dev/null)
+	if [[ $? -ne 0 || $refcnt -eq 0 ]]; then
+		return 0
+	fi
+	return 1
+}
+
+> > -	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
+> > -	if [[ "${nvme_trtype}" != "loop" ]]; then
+> > -		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
+> > -	fi
+> > -	modprobe -r nvmet 2>/dev/null
+> > +	if [[ "${nvme_trtype}" == "loop" ]]; then
+> > +		_patient_rmmod nvme_"${nvme_trtype}"
+> > +        else
+> > +                _patient_rmmod nvme-"${nvme_trtype}"
+> > +                _patient_rmmod nvmet-"${nvme_trtype}"
+> > +        fi
+> > +	_patient_rmmod nvmet 2>/dev/null
+> 
+> The statement _patient_rmmod nvme-"${nvme_trtype}" occurs twice in the above
+> code. How about preserving the structure of the existing code such that that
+> statement only occurs once?
+
+There is one call for nvme-"${nvme_trtype}", the other is for the
+underscore version, so there are no two calls.
+
+Did I miss something?
+
+> >   # Unload the SRP initiator driver.
+> >   stop_srp_ini() {
+> > -	local i
+> > -
+> >   	log_out
+> > -	for ((i=40;i>=0;i--)); do
+> > -		remove_mpath_devs || return $?
+> > -		unload_module ib_srp >/dev/null 2>&1 && break
+> > -		sleep 1
+> > -	done
+> > -	if [ -e /sys/module/ib_srp ]; then
+> > -		echo "Error: unloading kernel module ib_srp failed"
+> > -		return 1
+> > -	fi
+> > -	unload_module scsi_transport_srp || return $?
+> > +	remove_mpath_devs || return $?
+> > +	_patient_rmmod ib_srp || return 1
+> > +	_patient_rmmod scsi_transport_srp || return $?
+> >   }
+> 
+> Removing the loop from around remove_mpath_devs is wrong. It is important
+> that that loop is preserved.
+
+Why ? Can you test and verify?
+
+I can explain why I'm removing it. Code which typically used to try to
+insist on a module removal were just running into situations where the
+refcnt got bumped but they could not explain why, and the reason is
+that module refcnt's are finicky. *Anything* in userspace can easily
+trigger this, and this is module specific. While doing a module removal,
+if you are running into this, the only thing you can do is to patiently
+wait until userspace is done with whatever it may try to do. The old
+re-try attempts are buggy because of this.
+
+A future mechansim for kmod will be to allow userspace to try to remove
+first the modules which hold a refcnt, but that does not do anything for
+whatever userspace might do. These entry points from userspace are
+completely module specific and cannot be generalized (nor do I think we
+want to add semantics to the kernelf or it).
+
+So the only thing one can sensibly do, specially in test frameworks, is
+to wait and use a timeout for it.
+
+  Luis
