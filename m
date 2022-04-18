@@ -2,59 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F29ECC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 05:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09292C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 05:15:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236609AbiDRFPP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 01:15:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41972 "EHLO
+        id S233191AbiDRFRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 01:17:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233191AbiDRFPP (ORCPT
+        with ESMTP id S232046AbiDRFRl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 01:15:15 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DFB0DF06;
-        Sun, 17 Apr 2022 22:12:37 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4B7A468AA6; Mon, 18 Apr 2022 07:12:34 +0200 (CEST)
-Date:   Mon, 18 Apr 2022 07:12:34 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <20220418051234.GA3559@lst.de>
-References: <20220415034703.2081695-1-ming.lei@redhat.com> <20220415051844.GA22762@lst.de> <YllQVT6n472eUB7+@T590> <20220416054913.GA7405@lst.de> <YlqGZ7W9rg0eNt9A@T590>
+        Mon, 18 Apr 2022 01:17:41 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1B8438AB;
+        Sun, 17 Apr 2022 22:15:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=05bZopyuY2vKFmqnP3FA43TKOlvN0o/huqGPlzbxCOA=; b=1WAbili0haVJfedFeVXuHME/Yx
+        JAzOOShmc9CNBO+MVWYoIkJCSGQIEitVTTTQEKSJV6MDMEpgSdytDkq592jPAFG5Y+zNgld6Fu318
+        Yq/YCGGokVE+yD41LhzWuMSKPHR/zrYIkHd7PoqjrQ/QxU6Cg8XJzkYb9N5mUrizyaTC6fWP+sPAn
+        xbo8V4u9ZTndhm4BXL2FVwQqk4tMCJJn+/zJCD+yi/nM7rBqqdfnJufA/vUAtX8vIMlSLtsRI0h5V
+        YPwLOBEtq6Uj9h4z+GyEz7DjCkGrq/OT+DOytfjFnJGQXUzAFIY+KHMK1kCk0CBgjZ2pHtqH9LuBM
+        NwdRO5MA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ngJiz-00Fdw6-SN; Mon, 18 Apr 2022 05:14:57 +0000
+Date:   Sun, 17 Apr 2022 22:14:57 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Alexander Viro <viro@zeniv.linux.org.uk>,
+        Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>,
+        linux-block@vger.kernel.org,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH v2] block: add filemap_invalidate_lock_killable()
+Message-ID: <Ylzz0bbN1y3OFABI@infradead.org>
+References: <ff8f59e5-7699-0ccd-4da3-a34aa934a16b@I-love.SAKURA.ne.jp>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YlqGZ7W9rg0eNt9A@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <ff8f59e5-7699-0ccd-4da3-a34aa934a16b@I-love.SAKURA.ne.jp>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 16, 2022 at 05:03:35PM +0800, Ming Lei wrote:
-> > Yes.  But not doing this automatically also means you keep easily
-> > forgetting callsites.  For example iomap still does not flush the plug
-> > in your patch.
-> 
-> It is reasonable for flush user(usually submission) to be responsible
-> for finishing/flushing plug.
+I'm starting to sound like a broken record as I'm stating it the third
+time now, but: 
 
-Well, I very much disagree here.  blk_flush_plug is not a publіc,
-exported API, and that is for a reason.  A bio submission interface
-that requires flushing the plug to be useful is rather broken.
+no, this does not in any way fix the problem of holding the invalidate
+lock over long running I/O.  It just does ease the symptoms in the least
+important but apparently visible to you caller.
 
-> iomap is one good example to show this point, since it does flush the plug
-> before call bio_poll(), see __iomap_dio_rw().
-
-iomap does not do a manual plug flush anywhere.
-
-iomap does finish the plug before polling, which makes sense.
-
-Now of course __blkdev_direct_IO_simple doesn't even use a plug
-to start with, so I'm wondering what plug this patch even tries
-to flush?
+What we need to do is to get the zeroing I/O out from under the
+invalidate lock, just like how we don't do direct I/O under it.
