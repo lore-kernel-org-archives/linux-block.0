@@ -2,159 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CCA2C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 15:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E8B3C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 15:46:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237264AbiDRPL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 11:11:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47874 "EHLO
+        id S1345652AbiDRPte (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 11:49:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40788 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244505AbiDRPLV (ORCPT
+        with ESMTP id S1345756AbiDRPt3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 11:11:21 -0400
-Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DAD985B1
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 07:03:53 -0700 (PDT)
-Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23IE3jol036151;
-        Mon, 18 Apr 2022 23:03:45 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
- Mon, 18 Apr 2022 23:03:45 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23IE3jCp036148
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 18 Apr 2022 23:03:45 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <9d1759e0-2f93-d49f-48b3-12b8d47e95cd@I-love.SAKURA.ne.jp>
-Date:   Mon, 18 Apr 2022 23:03:40 +0900
+        Mon, 18 Apr 2022 11:49:29 -0400
+Received: from mail-io1-xd2b.google.com (mail-io1-xd2b.google.com [IPv6:2607:f8b0:4864:20::d2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AAB735DEC
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 08:25:22 -0700 (PDT)
+Received: by mail-io1-xd2b.google.com with SMTP id r12so8793357iod.6
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 08:25:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=J/SdugHxNre+EwLFr61Vazy6vhBUOD+w6dfnA2gFP8c=;
+        b=axBRFhMi3+2zB9bjQ+sHCDe04tJTnhhkstg7Fzwpvdnuu1z3gdbcjQv0xCgj0DDiPn
+         8Dpu249gV07Nnt4TnBYVFSVOodY3QFTA14jCjOcWi0m+sU45syTGy6B1nVS+2WZxqUFr
+         aLbYs2lZoI92qXQHI7s1s5Tlj0L17O0FxGARmEO8qlFvtyHDwsVcp+BKM330Nlox1WfG
+         HtIiPQn5i/Z4+OCqZc0eOML8LeOEYjn7YfWjjUbQRXZMTLdDyTQpjZ/kNsDbTWx3jwuA
+         WmI5zV340dj13tXGUCH193Efu6lEXipikraPF15+ejvZOHBdiTrN+bG2CMgIzo1VS+tN
+         SUTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=J/SdugHxNre+EwLFr61Vazy6vhBUOD+w6dfnA2gFP8c=;
+        b=vWwNIUqPowLBExdwAWD02KaUEjaGmWdTWU8kwKau/IAP7nWb7Sv1OTb+mbuW9IpIfu
+         wfyg5Go+LcTX/+GE+uzP8hRtBi1Bve57G/XYEBxl6Zvdo3Cpmz+2dtT+fLbOe/h0WkxW
+         Ummfv9KBs4aTxMLrBbepwdyiVZeTZ0KzIv4yzT+NtSHzr8FRYOEqRp5KwiaOQX0bQ5Ow
+         BInTQM8Go8XlMMUEfu8j3NraqQP7293jy766GbOSWTN6hNIUfWe9EXWxddnL2mAYq0PN
+         LEzii9pddHVt01gzNVl4zXyFlK8rglCfOjg0LZYO2QXcSJobT1BNNMKIecBA83DDSi9m
+         mLGQ==
+X-Gm-Message-State: AOAM532e5g6rXJCByjC7vLiGEsU7fZbVrjVb9vorrmdtD3VMI26u9UwD
+        PQsKPcscjhqWSBP7DzzGkWWcow==
+X-Google-Smtp-Source: ABdhPJxXgafkLWqHQvzNiStOc1rfCouXOBQMnp8Do04Twt7fltmyCtfpiKkbOOeX417xSBXPCCscsA==
+X-Received: by 2002:a05:6638:25ce:b0:329:91ac:782 with SMTP id u14-20020a05663825ce00b0032991ac0782mr408177jat.22.1650295521416;
+        Mon, 18 Apr 2022 08:25:21 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id o2-20020a92c042000000b002cc1f9e8dd8sm2711288ilf.44.2022.04.18.08.25.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Apr 2022 08:25:20 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     jinpu.wang@ionos.com, linux-block@vger.kernel.org
+Cc:     hch@infradead.org, bvanassche@acm.org, sagi@grimberg.me,
+        haris.iqbal@ionos.com, santosh.pradhan@ionos.com,
+        penguin-kernel@I-love.SAKURA.ne.jp
+In-Reply-To: <20220413123420.66470-1-jinpu.wang@ionos.com>
+References: <20220413123420.66470-1-jinpu.wang@ionos.com>
+Subject: Re: [PATCH] block/rnbd-clt: Avoid flush_workqueue(system_long_wq) usage
+Message-Id: <165029552063.51804.8437792369057437632.b4-ty@kernel.dk>
+Date:   Mon, 18 Apr 2022 09:25:20 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-To:     Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block <linux-block@vger.kernel.org>
-Subject: [PATCH] aoe: Avoid flush_scheduled_work() usage
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Flushing system-wide workqueues is dangerous and will be forbidden.
-Replace system_wq with local aoe_wq.
+On Wed, 13 Apr 2022 14:34:20 +0200, Jack Wang wrote:
+> Flushing system-wide workqueues is dangerous and will be forbidden.
+> 
+> Replace system_long_wq with local rnbd_clt_wq.
+> 
+> Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
+> 
+> 
+> [...]
 
-Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-Note: This patch is only compile tested.
+Applied, thanks!
 
- drivers/block/aoe/aoe.h     | 2 ++
- drivers/block/aoe/aoeblk.c  | 2 +-
- drivers/block/aoe/aoecmd.c  | 2 +-
- drivers/block/aoe/aoedev.c  | 4 ++--
- drivers/block/aoe/aoemain.c | 9 ++++++++-
- 5 files changed, 14 insertions(+), 5 deletions(-)
+[1/1] block/rnbd-clt: Avoid flush_workqueue(system_long_wq) usage
+      commit: 5ea7c1339e3ed094dd4df48d598f9018a2587283
 
-diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
-index 84d0fcebd6af..749ae1246f4c 100644
---- a/drivers/block/aoe/aoe.h
-+++ b/drivers/block/aoe/aoe.h
-@@ -244,3 +244,5 @@ void aoenet_exit(void);
- void aoenet_xmit(struct sk_buff_head *);
- int is_aoe_netif(struct net_device *ifp);
- int set_aoe_iflist(const char __user *str, size_t size);
-+
-+extern struct workqueue_struct *aoe_wq;
-diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
-index 8a91fcac6f82..348adf335217 100644
---- a/drivers/block/aoe/aoeblk.c
-+++ b/drivers/block/aoe/aoeblk.c
-@@ -435,7 +435,7 @@ aoeblk_gdalloc(void *vp)
- err:
- 	spin_lock_irqsave(&d->lock, flags);
- 	d->flags &= ~DEVFL_GD_NOW;
--	schedule_work(&d->work);
-+	queue_work(aoe_wq, &d->work);
- 	spin_unlock_irqrestore(&d->lock, flags);
- }
- 
-diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
-index 384073ef2323..d7317425be51 100644
---- a/drivers/block/aoe/aoecmd.c
-+++ b/drivers/block/aoe/aoecmd.c
-@@ -968,7 +968,7 @@ ataid_complete(struct aoedev *d, struct aoetgt *t, unsigned char *id)
- 		d->flags |= DEVFL_NEWSIZE;
- 	else
- 		d->flags |= DEVFL_GDALLOC;
--	schedule_work(&d->work);
-+	queue_work(aoe_wq, &d->work);
- }
- 
- static void
-diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
-index c5753c6bfe80..b381d1c3ef32 100644
---- a/drivers/block/aoe/aoedev.c
-+++ b/drivers/block/aoe/aoedev.c
-@@ -321,7 +321,7 @@ flush(const char __user *str, size_t cnt, int exiting)
- 			specified = 1;
- 	}
- 
--	flush_scheduled_work();
-+	flush_workqueue(aoe_wq);
- 	/* pass one: do aoedev_downdev, which might sleep */
- restart1:
- 	spin_lock_irqsave(&devlist_lock, flags);
-@@ -520,7 +520,7 @@ freetgt(struct aoedev *d, struct aoetgt *t)
- void
- aoedev_exit(void)
- {
--	flush_scheduled_work();
-+	flush_workqueue(aoe_wq);
- 	flush(NULL, 0, EXITING);
- }
- 
-diff --git a/drivers/block/aoe/aoemain.c b/drivers/block/aoe/aoemain.c
-index 1e4e2971171c..892d627a2379 100644
---- a/drivers/block/aoe/aoemain.c
-+++ b/drivers/block/aoe/aoemain.c
-@@ -35,6 +35,7 @@ aoe_exit(void)
- 	aoechr_exit();
- 	aoedev_exit();
- 	aoeblk_exit();		/* free cache after de-allocating bufs */
-+	destroy_workqueue(aoe_wq);
- }
- 
- static int __init
-@@ -42,9 +43,13 @@ aoe_init(void)
- {
- 	int ret;
- 
-+	aoe_wq = alloc_workqueue("aoe_wq", 0, 0);
-+	if (!aoe_wq)
-+		return -ENOMEM;
-+
- 	ret = aoedev_init();
- 	if (ret)
--		return ret;
-+		goto dev_fail;
- 	ret = aoechr_init();
- 	if (ret)
- 		goto chr_fail;
-@@ -77,6 +82,8 @@ aoe_init(void)
- 	aoechr_exit();
-  chr_fail:
- 	aoedev_exit();
-+ dev_fail:
-+	destroy_workqueue(aoe_wq);
- 
- 	printk(KERN_INFO "aoe: initialisation failure.\n");
- 	return ret;
+Best regards,
 -- 
-2.32.0
+Jens Axboe
 
 
