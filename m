@@ -2,88 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA23EC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 13:56:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CCA2C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 15:08:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238861AbiDRN7V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 09:59:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
+        id S237264AbiDRPL2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 11:11:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244641AbiDRN5J (ORCPT
+        with ESMTP id S244505AbiDRPLV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 09:57:09 -0400
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C3722AC78
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 06:06:55 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id h11so16737384ljb.2
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 06:06:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:to:references:from
-         :in-reply-to:content-transfer-encoding;
-        bh=ir6p9qR6i3Lf2PnQ+lXVT9cyaA0B4G3OxK1MKpNTHKI=;
-        b=GbZCV4Jy3veDwuv5swETs0LY36CQTAjPT9A9mfgofncNEQfTODzrb8UF5iQbMu3Cfd
-         djpXL044CCjuJBzcMNFn21kP2zaSjJdcOomHsAkZVzeMRO0GHSEf+M0mBoEjXsF+oh4H
-         8eKBKUos1s5e5+BcbkGAA+g1eqevvhou5Oya3RJ/Bzfmgp1bkCKGpGF5UhYrPaHV80Av
-         JsRa9IiiuaKm1w4M1PSA4viRSgysIkjjCLzHKcGlED8/MjuGebMHLDjEXdQc7dYmz9h5
-         oOUVjDD5hVZqTuUKgLG2yfZNBVUQ/dr20TuYSceFS/GfF4jp7QAhNmdij5ZnL1GX4bJ3
-         PkSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :to:references:from:in-reply-to:content-transfer-encoding;
-        bh=ir6p9qR6i3Lf2PnQ+lXVT9cyaA0B4G3OxK1MKpNTHKI=;
-        b=3hK3ooZLX1qNfGYQHVJtF9xXQ7uqCSCLpNuQgkt5F0PYE80JNyamiOF053Jv/c+SkT
-         RzBP/+PQOfRD/aHvB4H5jJOgl+k8Y+nkX1rg4uPC5dIUoCJ9ojdJVuNnwSwlcF3gE/rI
-         v/SCsb9XuUNRpfUfhb0SUIx6Fb8Nn61ILuckWFBDupQa8nv7te3J4IrDA5JDkaCDWnhr
-         VrV8491hVb6v5TZXtfsAiY1DQJHn8Cee0Lb8ZXsUeHl1rDNJNleYaXhesPkViUx5drWw
-         afxTSAJ742j//t/nEo9sv/81WYkGPDy/iQiEZcBcsm1xs/fgYOwqKcfxSAW46wdaoClr
-         mICg==
-X-Gm-Message-State: AOAM532ZHC8pUD2guRX9lbLMFau1o0WjOvMjC+qESw6FdqxEVgTrFolg
-        A4t1ttNIJHEYWvWdDR7Ram70P/V4AFs6yQ==
-X-Google-Smtp-Source: ABdhPJzm3HSLEnjcYa9iv6di0SjGbytLsUqwpX2B24OLlLrgWDd585ZYRjyYdDvUpE+2zbaVhEBRog==
-X-Received: by 2002:a2e:88c8:0:b0:24d:b907:d71e with SMTP id a8-20020a2e88c8000000b0024db907d71emr4174962ljk.431.1650287213249;
-        Mon, 18 Apr 2022 06:06:53 -0700 (PDT)
-Received: from ?IPV6:2001:14ba:a302:88ff::1? (dzpbkv-4yyyyyyyyyyyyt-3.rev.dnainternet.fi. [2001:14ba:a302:88ff::1])
-        by smtp.gmail.com with ESMTPSA id p11-20020a19604b000000b0046fb725b88fsm929812lfk.224.2022.04.18.06.06.52
-        for <linux-block@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Apr 2022 06:06:52 -0700 (PDT)
-Message-ID: <b975d3aa-e5b1-c16d-1820-4de5d84576cc@gmail.com>
-Date:   Mon, 18 Apr 2022 16:06:52 +0300
+        Mon, 18 Apr 2022 11:11:21 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DAD985B1
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 07:03:53 -0700 (PDT)
+Received: from fsav313.sakura.ne.jp (fsav313.sakura.ne.jp [153.120.85.144])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 23IE3jol036151;
+        Mon, 18 Apr 2022 23:03:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav313.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp);
+ Mon, 18 Apr 2022 23:03:45 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav313.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 23IE3jCp036148
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Mon, 18 Apr 2022 23:03:45 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <9d1759e0-2f93-d49f-48b3-12b8d47e95cd@I-love.SAKURA.ne.jp>
+Date:   Mon, 18 Apr 2022 23:03:40 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [Question] Accessing read data in bio request
-To:     linux-block@vger.kernel.org
-References: <CAH4tiUtGuZP6QnO6L9EEDFL08O-UusHihO6CbvEf-QwJM3QPCg@mail.gmail.com>
- <eab14c0a-dd66-555c-8830-d23a5068273c@kernel.dk>
-From:   Jasper Surmont <surmontjasper@gmail.com>
-In-Reply-To: <eab14c0a-dd66-555c-8830-d23a5068273c@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>
+Subject: [PATCH] aoe: Avoid flush_scheduled_work() usage
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Okay thanks! So does this mean that you would suggest doing it with 
-bvec_kmap_local()?
-Or are there other, maybe better, methods?
+Flushing system-wide workqueues is dangerous and will be forbidden.
+Replace system_wq with local aoe_wq.
 
-Thanks!
+Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+Note: This patch is only compile tested.
 
-On 18/04/2022 04:59, Jens Axboe wrote:
-> On 4/14/22 8:15 AM, Jasper Surmont wrote:
->> I'm writing a device mapper target, and on a bio (read) request I want
->> to access (for example just logging) the data that was just read (by
->> providing a callback to bio->bio_end_io).
->>
->> I've figured out I could read the data by using bvec_kmap_local() on
->> each bio_vec to get a pointer to the data. However, if my
->> understanding is correct this seems like an unefficient way: if the
->> bio just finished a read then shouldn't the data already be mapped
->> somewhere? If so, where?
-> Not necessarily - if you're doing passthrough or O_DIRECT IO, then
-> no mapping necessarily exists for any part of the IO.
->
->
+ drivers/block/aoe/aoe.h     | 2 ++
+ drivers/block/aoe/aoeblk.c  | 2 +-
+ drivers/block/aoe/aoecmd.c  | 2 +-
+ drivers/block/aoe/aoedev.c  | 4 ++--
+ drivers/block/aoe/aoemain.c | 9 ++++++++-
+ 5 files changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/block/aoe/aoe.h b/drivers/block/aoe/aoe.h
+index 84d0fcebd6af..749ae1246f4c 100644
+--- a/drivers/block/aoe/aoe.h
++++ b/drivers/block/aoe/aoe.h
+@@ -244,3 +244,5 @@ void aoenet_exit(void);
+ void aoenet_xmit(struct sk_buff_head *);
+ int is_aoe_netif(struct net_device *ifp);
+ int set_aoe_iflist(const char __user *str, size_t size);
++
++extern struct workqueue_struct *aoe_wq;
+diff --git a/drivers/block/aoe/aoeblk.c b/drivers/block/aoe/aoeblk.c
+index 8a91fcac6f82..348adf335217 100644
+--- a/drivers/block/aoe/aoeblk.c
++++ b/drivers/block/aoe/aoeblk.c
+@@ -435,7 +435,7 @@ aoeblk_gdalloc(void *vp)
+ err:
+ 	spin_lock_irqsave(&d->lock, flags);
+ 	d->flags &= ~DEVFL_GD_NOW;
+-	schedule_work(&d->work);
++	queue_work(aoe_wq, &d->work);
+ 	spin_unlock_irqrestore(&d->lock, flags);
+ }
+ 
+diff --git a/drivers/block/aoe/aoecmd.c b/drivers/block/aoe/aoecmd.c
+index 384073ef2323..d7317425be51 100644
+--- a/drivers/block/aoe/aoecmd.c
++++ b/drivers/block/aoe/aoecmd.c
+@@ -968,7 +968,7 @@ ataid_complete(struct aoedev *d, struct aoetgt *t, unsigned char *id)
+ 		d->flags |= DEVFL_NEWSIZE;
+ 	else
+ 		d->flags |= DEVFL_GDALLOC;
+-	schedule_work(&d->work);
++	queue_work(aoe_wq, &d->work);
+ }
+ 
+ static void
+diff --git a/drivers/block/aoe/aoedev.c b/drivers/block/aoe/aoedev.c
+index c5753c6bfe80..b381d1c3ef32 100644
+--- a/drivers/block/aoe/aoedev.c
++++ b/drivers/block/aoe/aoedev.c
+@@ -321,7 +321,7 @@ flush(const char __user *str, size_t cnt, int exiting)
+ 			specified = 1;
+ 	}
+ 
+-	flush_scheduled_work();
++	flush_workqueue(aoe_wq);
+ 	/* pass one: do aoedev_downdev, which might sleep */
+ restart1:
+ 	spin_lock_irqsave(&devlist_lock, flags);
+@@ -520,7 +520,7 @@ freetgt(struct aoedev *d, struct aoetgt *t)
+ void
+ aoedev_exit(void)
+ {
+-	flush_scheduled_work();
++	flush_workqueue(aoe_wq);
+ 	flush(NULL, 0, EXITING);
+ }
+ 
+diff --git a/drivers/block/aoe/aoemain.c b/drivers/block/aoe/aoemain.c
+index 1e4e2971171c..892d627a2379 100644
+--- a/drivers/block/aoe/aoemain.c
++++ b/drivers/block/aoe/aoemain.c
+@@ -35,6 +35,7 @@ aoe_exit(void)
+ 	aoechr_exit();
+ 	aoedev_exit();
+ 	aoeblk_exit();		/* free cache after de-allocating bufs */
++	destroy_workqueue(aoe_wq);
+ }
+ 
+ static int __init
+@@ -42,9 +43,13 @@ aoe_init(void)
+ {
+ 	int ret;
+ 
++	aoe_wq = alloc_workqueue("aoe_wq", 0, 0);
++	if (!aoe_wq)
++		return -ENOMEM;
++
+ 	ret = aoedev_init();
+ 	if (ret)
+-		return ret;
++		goto dev_fail;
+ 	ret = aoechr_init();
+ 	if (ret)
+ 		goto chr_fail;
+@@ -77,6 +82,8 @@ aoe_init(void)
+ 	aoechr_exit();
+  chr_fail:
+ 	aoedev_exit();
++ dev_fail:
++	destroy_workqueue(aoe_wq);
+ 
+ 	printk(KERN_INFO "aoe: initialisation failure.\n");
+ 	return ret;
+-- 
+2.32.0
+
+
