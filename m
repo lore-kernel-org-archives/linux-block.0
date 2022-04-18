@@ -2,111 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DCDC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 18:40:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5BEEC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 21:04:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347416AbiDRSm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 14:42:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
+        id S1347909AbiDRVHE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 17:07:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229900AbiDRSm5 (ORCPT
+        with ESMTP id S1347893AbiDRVHE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 14:42:57 -0400
-Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825E7165A9;
-        Mon, 18 Apr 2022 11:40:17 -0700 (PDT)
-Received: by mail-ej1-x62e.google.com with SMTP id lc2so28346311ejb.12;
-        Mon, 18 Apr 2022 11:40:17 -0700 (PDT)
+        Mon, 18 Apr 2022 17:07:04 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5786E2A700
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 14:04:23 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id x18so12064740wrc.0
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 14:04:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=vSMD5tZaQY3VxVrqnvWTg6ERREdi/3N3yoNkf/fiGwk=;
-        b=AuVu10OK2iVJMn+A5X128j7vyLDMUbtjEgBXYjqXi84QJi6aOhLr2xa8diVl2AWRNx
-         O/alJT5lPH6NS1nGBNQ8eLnGRlLjwZXiuuuVLJsbNj8XV1VBW3btSEoue9QMDzz4qkov
-         wQyAYWB7D/Mlh1KlXJq3VbTMQmHOWtp/d1DGOE1GHRg8Po9GMTgPLU8L6GcGOJd0iN/h
-         LXwlvsqX0z9bVbyZYxCDnP2qIDJdiS7Jd9IdcpSAUrpZikuLJNn2FQFbzX+nYt2bVg8N
-         E8x43kp5ALuJNdV4JD2Z/gk2F1Xl3OITZuOcRb+npPWWgNOZgz3PF9WwrTEF8W006Vns
-         g+aA==
+        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=2xC56SbahR+A86XAZ1Xr5CheL4zTUR2Yl2PX5kgsh60=;
+        b=jVefXpeaUqA2UhMsfdWRxwA6dVOS/OubaUhUbzQiNiw6Sh3TSAJzNrupAImg7ews6u
+         ouky8CJKsd6yjdaomtrNrSxPMKZP+c97cnIiq7aCvfyOB3Zo2igqk7ZzmDrKYxU+tRSO
+         KQDZwYpTzB/quuQMmvwf+tJfSs56zyhk/X1TmvSqzjrNzoiyiPuOgilveEhPfr6UrDik
+         LMDrw2bn4aNZwLp0nSoYHc3bU6cNSlhsY/a960ueZeONiv4HRR+50dS6yF1nnlKXtx+h
+         4Ahw7F5i6QXCSQxeJ7S+OQuPdWULZcgWYcHIbC+AL6xSQF993ov+8VTg+Ti7DdcevQrz
+         WlVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vSMD5tZaQY3VxVrqnvWTg6ERREdi/3N3yoNkf/fiGwk=;
-        b=dFFjcABN+KvvUciDf1AiQaMb2hz0h8ckT9Ij7Za3bU4I0iBPGu8HlzleZpW7Q5Drs8
-         dO1wS7MYqsKlQLVoOO69AA1pkOtbRO3gFYchRTe1B7XVbDqizLC4q1du+JbZA55NJwsY
-         cl827fY7xFp80CWXIA3VPn5JzQj27qpMwedHEFfZVlzNW3IMk0ECsQ0F8oavSB45mJCR
-         buJbc2l69lew7lVOOjRmlePoWv5uM74GtmHJb613PCRvwClDFKv/X6j8ddsrzJ11lEDO
-         AL4uxKHPnovZlgVgbcDrMiwF5/bjn2+sMPNOY4rSPkEO3XrCogXsz7B0W1XhAKNXGspW
-         JN1Q==
-X-Gm-Message-State: AOAM532yAf8qrQK3MQ0/BQKOcvXvPFti4rEbQ2okVMP/wOSXXvRb8Fje
-        R9PkWsSf7k1ILO0CU87pExfq9k+Oxxg=
-X-Google-Smtp-Source: ABdhPJxzxb7vPsOwaDOgJoXth65vpTEOaoQRsQ/xMLYNQ/FXIeP7VKMyzVaN3l+uQ4WHMGZJcAFVjQ==
-X-Received: by 2002:a17:907:980a:b0:6db:799c:cb44 with SMTP id ji10-20020a170907980a00b006db799ccb44mr10063369ejc.485.1650307216042;
-        Mon, 18 Apr 2022 11:40:16 -0700 (PDT)
-Received: from [192.168.178.40] (ipbcc1cfad.dynamic.kabel-deutschland.de. [188.193.207.173])
-        by smtp.gmail.com with ESMTPSA id dm11-20020a170907948b00b006cf488e72e3sm4835316ejc.25.2022.04.18.11.40.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Apr 2022 11:40:15 -0700 (PDT)
-Message-ID: <5015edcc-0b62-4c1f-d4f4-ec0d7a1470d7@gmail.com>
-Date:   Mon, 18 Apr 2022 20:40:14 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=2xC56SbahR+A86XAZ1Xr5CheL4zTUR2Yl2PX5kgsh60=;
+        b=zict+xg2uCwS5U/nov0V6pWgcUAQBhUnfPR4Zhri4MSHAxBs9+JCNsuxQa85d4vJgE
+         Ji/eB6E9rB/LFkfOrPunCuh6TtSMMoAu1uPMQe4FZE67Cs1+xfP3FywE9hPAsnwAy/lk
+         o2ZBFsgCdCFChbAuP/J3FLRV0Fc+7GUK5uj7VKt825ut3bbNELyRYCEFmjp6zw0lwF0C
+         wmzH0vrfGexb1AdNBv4VI3n/v36mN5Tybna2mFgUX9QXuag6ixyiFvtCImd+R3f9aSeW
+         yuAnSPv8DuZ9nfDxWsv2IRCNcwhKi8nMnOCYLRmDo4woivxV5OcGk0+LuKF7Umi3DDZ+
+         2jAA==
+X-Gm-Message-State: AOAM532iqwTZ81IWC4JHXbJScpi00aCEJV3ngXI4LbnOrvJM23vowbE0
+        Fq3XGfFjrGCrD/x9XjsAUqAjYKBY+1nIaw==
+X-Google-Smtp-Source: ABdhPJyEZlaRcGyCo1uMJOZOgoyGccFvv75S9XwuahzLFfjLlKLpcoWdx5eV5TRokdsECQsOSl9nyA==
+X-Received: by 2002:a5d:47aa:0:b0:20a:8b96:5b2c with SMTP id 10-20020a5d47aa000000b0020a8b965b2cmr8152221wrb.621.1650315861737;
+        Mon, 18 Apr 2022 14:04:21 -0700 (PDT)
+Received: from equinox (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id n5-20020adf8b05000000b00207a4fd0185sm11234964wra.7.2022.04.18.14.04.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Apr 2022 14:04:21 -0700 (PDT)
+Date:   Mon, 18 Apr 2022 22:04:18 +0100
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     Jens Axboe <axboe@kernel.dk>, Enze Li <lienze@kylinos.cn>
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] cdrom: do not print info list when there is no cdrom
+ device
+Message-ID: <Yl3SUr9+qzoRlQt8@equinox>
+References: <20220408084221.1681592-1-lienze@kylinos.cn>
+ <25390602-cfa0-dba3-bfbc-a35ed6b44bcf@kernel.dk>
+ <20220409122530.60353fcd@asus>
+ <YlFA7USiCtqsFvVD@equinox>
+ <f74b6933-5357-6b2c-3127-7a3465dadbdf@kylinos.cn>
+ <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v4] scsi: target: tcmu: Fix possible data corruption
-Content-Language: en-US
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Cc:     linux-block@vger.kernel.org
-References: <20220417052604.120942-1-xiaoguang.wang@linux.alibaba.com>
-From:   Bodo Stroesser <bostroesser@gmail.com>
-In-Reply-To: <20220417052604.120942-1-xiaoguang.wang@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <226c4072-a3ca-a5a4-1b7f-f7104b43af03@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Mon, Apr 11, 2022 at 10:51:28AM -0600, Jens Axboe wrote:
+> >   20  -- Modify sysctl/proc interface. I plan on having one directory per                 
+> >   21  drive, with entries for outputing general drive information, and sysctl             
+> >   22  based tunable parameters such as whether the tray should auto-close for             
+> >   23  that drive. Suggestions (or patches) for this welcome!
+> > ================================================
+> > I'd like to know if the relevant patches are still welcome?
+> > 
+> > IIUC, the TODO List says that we need to implement a modification of the
+> > following form:
+> > ----------------------------------------------------------------------------------------------------------
+> > $ tree /proc/sys/dev/cdrom
+> > /proc/sys/dev/cdrom
+> > |--sr0--autoclose
+> > |       |-autoeject
+> > |       |-check_media
+> > |       |-debug
+> > |       |-info
+> > |       |-lock
+> > |
+> > |--sr1--autoclose
+> > |       |-autoeject
+> > |       |-check_media
+> > |       |-debug
+> > |       |-info
+> > |       |-lock
+> > |
+> > |--sr2 ...
+> > .
+> > .
+> > .
+> > ----------------------------------------------------------------------------------------------------------
+> > I would appreciate it if you could give me some advice.
+> 
+> Let's not do that, this advice is perhaps 20 years old. /proc isn't to
+> be used for anything like that these days.
+> 
+> -- 
+> Jens Axboe
+>
 
-just some remarks regarding the new comment.
+Hi Both,
 
-Bodo
+I will send a patch alongside others during the next merge window to
+remove this TODO section for now. It was part of the initial mainline
+git commit (17 years and two days ago), so it (as Jens says) is almost
+certainly even older than this.
 
-On 17.04.22 07:26, Xiaoguang Wang wrote:
-
-... snip ...
-
->   static const struct vm_operations_struct tcmu_vm_ops = {
-> @@ -3205,12 +3228,19 @@ static void find_free_blocks(void)
->   			udev->dbi_max = block;
->   		}
->   
-> +		/*
-> +		 * Release the block pages.
-> +		 * Also note that since tcmu_vma_fault() gets one extra page
-> +		 * refcount, tcmu_blocks_release() won't free pages if pages
-> +		 * are in page fault procedure, which means it's safe to
-
-s/in page fault procedure/mapped/
-
-> +		 * call tcmu_blocks_release() before unmap_mapping_range().
-
-"... before unmap_mapping_range(), which drops the refcount of pages it
-unmaps and thus releases those pages."
-
-Please feel free to find an even better wording.
-
-> +		 */
-> +		pages_freed = tcmu_blocks_release(udev, start, end - 1);
-> +
->   		/* Here will truncate the data area from off */
->   		off = udev->data_off + (loff_t)start * udev->data_blk_size;
->   		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
->   
-> -		/* Release the block pages */
-> -		pages_freed = tcmu_blocks_release(udev, start, end - 1);
->   		mutex_unlock(&udev->cmdr_lock);
->   
->   		total_pages_freed += pages_freed;
+Regards,
+Phil
