@@ -2,106 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70036C433FE
-	for <linux-block@archiver.kernel.org>; Sun, 17 Apr 2022 16:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 601D6C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 01:33:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234402AbiDQQeq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 17 Apr 2022 12:34:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42798 "EHLO
+        id S235615AbiDRBgP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 17 Apr 2022 21:36:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234401AbiDQQep (ORCPT
+        with ESMTP id S235618AbiDRBfv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 17 Apr 2022 12:34:45 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3312B3054C;
-        Sun, 17 Apr 2022 09:32:10 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 96F3F85;
-        Sun, 17 Apr 2022 09:32:09 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id KUKJeRbwtXv8; Sun, 17 Apr 2022 09:32:08 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id 9E07F48;
-        Sun, 17 Apr 2022 09:32:08 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 9E07F48
-Date:   Sun, 17 Apr 2022 09:32:07 -0700 (PDT)
-From:   Eric Wheeler <linux-block@lists.ewheeler.net>
-To:     Jens Axboe <axboe@kernel.dk>
-cc:     Christoph Hellwig <hch@infradead.org>,
-        Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org,
-        linux-ext4@vger.kernel.org
-Subject: Re: loop: it looks like REQ_OP_FLUSH could return before IO
- completion.
-In-Reply-To: <7ae1f26a-cd09-85ff-2f4c-9e80af41ce66@kernel.dk>
-Message-ID: <d867fce8-e252-a621-cadb-c658dd2906a@ewheeler.net>
-References: <af3e552a-6c77-b295-19e1-d7a1e39b31f3@ewheeler.net> <YjfFHvTCENCC29WS@T590> <c03de7ac-63e9-2680-ca5b-8be62e4e177f@ewheeler.net> <bd5f9817-c65e-7915-18b-9c68bb34488e@ewheeler.net> <YldqnL79xH5NJGKW@T590> <5b3cb173-484e-db3-8224-911a324de7dd@ewheeler.net>
- <YlmBTtGdTH2xW1qT@T590> <YlpRrLmwe/TJucjz@infradead.org> <2815ce9-85f-7b56-be3f-7835eb9bb2c6@ewheeler.net> <7ae1f26a-cd09-85ff-2f4c-9e80af41ce66@kernel.dk>
+        Sun, 17 Apr 2022 21:35:51 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61EA41835F
+        for <linux-block@vger.kernel.org>; Sun, 17 Apr 2022 18:32:49 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id j8-20020a17090a060800b001cd4fb60dccso12788950pjj.2
+        for <linux-block@vger.kernel.org>; Sun, 17 Apr 2022 18:32:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=KJfLbwgngO3OiGtIZhQTnGZUpV/6KTf4a6VxaVn0jHA=;
+        b=fUiWEs30cpVdTgnRTDuIunTyD3sFwyNXIMjD2xrDFFhby9PvozDytSBEVj5TLA3enQ
+         WJg5PUCFZhavWnDTUSjcqiWdtbmRSnwGPVoJqfidCHXMsRiC/8miYakfaAZVFsJvX3bS
+         5rW4pfgKMUPRH4xvCV8Ayqx16fXXcBpmLJ8ouv1MDWzBzzeX6sTvregS6+W7imKu2o9s
+         JkpStrFdIm2UGzcq7WrYJf9XXlMNLf1O1L3ohQXq8EaSjdqThCTtF7dsfLFbH0M279GX
+         9j/pkX//BLTGvZs/WRmTotqH1MNj+h8ET2s+rsNWcTHLVYqXbzx2Z0wD2+tsX+cqIWVh
+         IhOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=KJfLbwgngO3OiGtIZhQTnGZUpV/6KTf4a6VxaVn0jHA=;
+        b=tuTVaMYCb5mvIHSFQyjChsNy4o4qlsv8GzwcVYYSVnfzvgSTr0qTm4JbxcVhK6F+4e
+         RBDRmaQneWlTxyOTfynW9vIDKK8be8aZfxEZ+5G46oXXwP7+bXWMJHO8IOOSY0Z0fIZT
+         bBtU5nqkc+UeZGPuhoeXcf80SnY0M832HavYHJ77TC6q9DufhUFjhJChGrn/hSewQcUL
+         lZTMn7xGJWl60BpxkfbU5vvEtxrDuTAimmaTpMyCByHc1K74bVwW1qXZNtDyzF3J/yIE
+         Ab/vxt9E7B7GN2ZyVavs8A9Pp+WEzHpXkvyhNDbilZBzQxkEqaecJlq3WgpZECaepwp1
+         A9NQ==
+X-Gm-Message-State: AOAM530cp9nMhABDy4Y3krA8ey+MpRmIdjfBte/Mntcd1Bdj3VVhlzi4
+        FqzSQIlmcfYlczRfV+hC2FLn7kEEOETD9pnG
+X-Google-Smtp-Source: ABdhPJxH3Tcv8urG8TWDL99aaKBrMqsxLK1RCMCg75RZRVpxh7Td568gOGSDadX3DzyNp9aRqA2iCg==
+X-Received: by 2002:a17:903:2406:b0:158:f6f0:6c44 with SMTP id e6-20020a170903240600b00158f6f06c44mr4676524plo.88.1650245568439;
+        Sun, 17 Apr 2022 18:32:48 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id g15-20020a63be4f000000b0039934531e95sm10726611pgo.18.2022.04.17.18.32.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 17 Apr 2022 18:32:47 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     linux-block@vger.kernel.org, phillip@squashfs.org.uk,
+        target-devel@vger.kernel.org, colyli@suse.de,
+        linux-btrfs@vger.kernel.org, martin.petersen@oracle.com,
+        linux-raid@vger.kernel.org, dsterba@suse.com, josef@toxicpanda.com,
+        song@kernel.org, dm-devel@redhat.com, snitzer@redhat.com,
+        linux-bcache@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20220406061228.410163-1-hch@lst.de>
+References: <20220406061228.410163-1-hch@lst.de>
+Subject: Re: cleanup bio_kmalloc v3
+Message-Id: <165024556441.258485.6980891929042026868.b4-ty@kernel.dk>
+Date:   Sun, 17 Apr 2022 19:32:44 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 16 Apr 2022, Jens Axboe wrote:
-> On 4/16/22 2:05 PM, Eric Wheeler wrote:
-> > On Fri, 15 Apr 2022, Christoph Hellwig wrote:
-> >> On Fri, Apr 15, 2022 at 10:29:34PM +0800, Ming Lei wrote:
-> >>> If ext4 expects the following order, it is ext4's responsibility to
-> >>> maintain the order, and block layer may re-order all these IOs at will,
-> >>> so do not expect IOs are issued to device in submission order
-> >>
-> >> Yes, and it has been so since REQ_FLUSH (which later became
-> >> REQ_OP_FLUSH) replaced REQ_BARRIER 12 years ago:
-> >>
-> >> commit 28e7d1845216538303bb95d679d8fd4de50e2f1a
-> >> Author: Tejun Heo <tj@kernel.org>
-> >> Date:   Fri Sep 3 11:56:16 2010 +0200
-> >>
-> >> block: drop barrier ordering by queue draining
-> >>     
-> >>     Filesystems will take all the responsibilities for ordering requests
-> >>     around commit writes and will only indicate how the commit writes
-> >>     themselves should be handled by block layers.  This patch drops
-> >>     barrier ordering by queue draining from block layer.
-> > 
-> > Thanks Christoph. I think this answers my original question, too.
-> > 
-> > You may have already answered this implicitly above.  If you would be so 
-> > kind as to confirm my or correct my understanding with a few more 
-> > questions:
-> > 
-> > 1. Is the only way for a filesystem to know if one IO completed before a 
-> >    second IO to track the first IO's completion and submit the second IO 
-> >    when the first IO's completes (eg a journal commit followed by the 
-> >    subsequent metadata update)?  If not, then what block-layer mechanism 
-> >    should be used?
+On Wed, 6 Apr 2022 08:12:23 +0200, Christoph Hellwig wrote:
+> this series finishes off the bio allocation interface cleanups by dealing
+> with the weirdest member of the famility.  bio_kmalloc combines a kmalloc
+> for the bio and bio_vecs with a hidden bio_init call and magic cleanup
+> semantics.
 > 
-> You either need to have a callback or wait on the IO, there's no other
-> way.
+> This series moves a few callers away from bio_kmalloc and then turns
+> bio_kmalloc into a simple wrapper for a slab allocation of a bio and the
+> inline biovecs.  The callers need to manually call bio_init instead with
+> all that entails and the magic that turns bio_put into a kfree goes away
+> as well, allowing for a proper debug check in bio_put that catches
+> accidental use on a bio_init()ed bio.
 > 
-> > 2. Are there any IO ordering flags or mechanisms in the block layer at 
-> >    this point---or---is it simply that all IOs entering the block layer 
-> >    can always be re-ordered before reaching the media?
-> 
-> No, no ordering flags are provided for this kind of use case. Any IO can
-> be reordered, hence the only reliable solution is to ensure the previous
-> have completed.
+> [...]
 
-Perfect, thanks Jens!
+Applied, thanks!
 
-> 
-> -- 
-> Jens Axboe
-> 
-> 
+[1/5] btrfs: simplify ->flush_bio handling
+      commit: f9e69aa9ccd7e51c47b147e45e03987ea0ef9aa3
+[2/5] squashfs: always use bio_kmalloc in squashfs_bio_read
+      commit: 46a2d4ccc49903923506685a8368ca88312bbdc9
+[3/5] target/pscsi: remove pscsi_get_bio
+      commit: 7655db80932d95f501a0811544d9520ec720e38d
+[4/5] block: turn bio_kmalloc into a simple kmalloc wrapper
+      commit: 066ff571011d8416e903d3d4f1f41e0b5eb91e1d
+[5/5] pktcdvd: stop using bio_reset
+      commit: 852ad96cb03621f7995764b4b31cbff9801d8bcd
 
-
-
---
-Eric Wheeler
+Best regards,
+-- 
+Jens Axboe
 
 
