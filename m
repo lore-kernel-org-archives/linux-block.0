@@ -2,123 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0970C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 16:39:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2DCDC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 18:40:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237467AbiDRQly (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 12:41:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42466 "EHLO
+        id S1347416AbiDRSm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 14:42:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34530 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343585AbiDRQlt (ORCPT
+        with ESMTP id S229900AbiDRSm5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 12:41:49 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E369A32075
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 09:39:09 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id s17so1931046plg.9
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 09:39:09 -0700 (PDT)
+        Mon, 18 Apr 2022 14:42:57 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825E7165A9;
+        Mon, 18 Apr 2022 11:40:17 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id lc2so28346311ejb.12;
+        Mon, 18 Apr 2022 11:40:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=vSMD5tZaQY3VxVrqnvWTg6ERREdi/3N3yoNkf/fiGwk=;
+        b=AuVu10OK2iVJMn+A5X128j7vyLDMUbtjEgBXYjqXi84QJi6aOhLr2xa8diVl2AWRNx
+         O/alJT5lPH6NS1nGBNQ8eLnGRlLjwZXiuuuVLJsbNj8XV1VBW3btSEoue9QMDzz4qkov
+         wQyAYWB7D/Mlh1KlXJq3VbTMQmHOWtp/d1DGOE1GHRg8Po9GMTgPLU8L6GcGOJd0iN/h
+         LXwlvsqX0z9bVbyZYxCDnP2qIDJdiS7Jd9IdcpSAUrpZikuLJNn2FQFbzX+nYt2bVg8N
+         E8x43kp5ALuJNdV4JD2Z/gk2F1Xl3OITZuOcRb+npPWWgNOZgz3PF9WwrTEF8W006Vns
+         g+aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=pGo9sy2WfBMcvwYS15AcY4wsEQghRrO+9A8algaK7ss=;
-        b=wfanEBkF9CGf1TWIG1uHXACfH4kEdmJuaY8ksKQ3i43xRGXwG0AWMBvBLqC5G1surP
-         vXh3RGvVZQXGB3QD49d3h80p16JY5L2rXn3vXjAvd4SHsiHNrQgYqGho3XGSUUh7dO+s
-         FNgbW2j+qi0+zhMDarMTlhkhr2MG0qbWa0VTSBhTXHikoY8ujxs8YJQLsuDXcEsmCQ4D
-         eHKfiv698mDw5NpbwqB6fYFvqT3o/8v4kOY281i7cFa+hqDr4scepeNsp3wyTWZ8diB9
-         AODhJjWKiLp7YU40H5zmMIBIFd1JVDQ82YzlHxfhCUhvaKEPBWS67vyZNbVKoAPRwFUJ
-         NVwQ==
-X-Gm-Message-State: AOAM533cYekqluSH/v+JhdAG1b36N50/NMTx8mjPHDXOZE+qrJFJi6XY
-        HqhBF79z6C4zssvmhKDzu8g=
-X-Google-Smtp-Source: ABdhPJwlIZY73JCEJ1JxS6dl3uWAHAwMpGs1Ol5ypl2yq2ifrpxsOiitVVsQsxli/+haGqAhykW8Ow==
-X-Received: by 2002:a17:902:9881:b0:158:f258:c3c3 with SMTP id s1-20020a170902988100b00158f258c3c3mr9084182plp.7.1650299949186;
-        Mon, 18 Apr 2022 09:39:09 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:713b:40eb:c240:d568? ([2620:15c:211:201:713b:40eb:c240:d568])
-        by smtp.gmail.com with ESMTPSA id x6-20020a17090a294600b001cba3274bd0sm17065502pjf.28.2022.04.18.09.39.07
+        bh=vSMD5tZaQY3VxVrqnvWTg6ERREdi/3N3yoNkf/fiGwk=;
+        b=dFFjcABN+KvvUciDf1AiQaMb2hz0h8ckT9Ij7Za3bU4I0iBPGu8HlzleZpW7Q5Drs8
+         dO1wS7MYqsKlQLVoOO69AA1pkOtbRO3gFYchRTe1B7XVbDqizLC4q1du+JbZA55NJwsY
+         cl827fY7xFp80CWXIA3VPn5JzQj27qpMwedHEFfZVlzNW3IMk0ECsQ0F8oavSB45mJCR
+         buJbc2l69lew7lVOOjRmlePoWv5uM74GtmHJb613PCRvwClDFKv/X6j8ddsrzJ11lEDO
+         AL4uxKHPnovZlgVgbcDrMiwF5/bjn2+sMPNOY4rSPkEO3XrCogXsz7B0W1XhAKNXGspW
+         JN1Q==
+X-Gm-Message-State: AOAM532yAf8qrQK3MQ0/BQKOcvXvPFti4rEbQ2okVMP/wOSXXvRb8Fje
+        R9PkWsSf7k1ILO0CU87pExfq9k+Oxxg=
+X-Google-Smtp-Source: ABdhPJxzxb7vPsOwaDOgJoXth65vpTEOaoQRsQ/xMLYNQ/FXIeP7VKMyzVaN3l+uQ4WHMGZJcAFVjQ==
+X-Received: by 2002:a17:907:980a:b0:6db:799c:cb44 with SMTP id ji10-20020a170907980a00b006db799ccb44mr10063369ejc.485.1650307216042;
+        Mon, 18 Apr 2022 11:40:16 -0700 (PDT)
+Received: from [192.168.178.40] (ipbcc1cfad.dynamic.kabel-deutschland.de. [188.193.207.173])
+        by smtp.gmail.com with ESMTPSA id dm11-20020a170907948b00b006cf488e72e3sm4835316ejc.25.2022.04.18.11.40.15
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Apr 2022 09:39:08 -0700 (PDT)
-Message-ID: <1293a7e7-71d0-117e-1a4f-8ccfc609bc43@acm.org>
-Date:   Mon, 18 Apr 2022 09:39:06 -0700
+        Mon, 18 Apr 2022 11:40:15 -0700 (PDT)
+Message-ID: <5015edcc-0b62-4c1f-d4f4-ec0d7a1470d7@gmail.com>
+Date:   Mon, 18 Apr 2022 20:40:14 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.7.0
-Subject: Re: [PATCH v2] blktests: replace module removal with patient module
- removal
+Subject: Re: [PATCH v4] scsi: target: tcmu: Fix possible data corruption
 Content-Language: en-US
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     osandov@fb.com, linux-block@vger.kernel.org
-References: <YlogluONIoc1VTCI@bombadil.infradead.org>
- <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
- <Yl2KU6vLxawrIXi/@bombadil.infradead.org>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <Yl2KU6vLxawrIXi/@bombadil.infradead.org>
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org
+References: <20220417052604.120942-1-xiaoguang.wang@linux.alibaba.com>
+From:   Bodo Stroesser <bostroesser@gmail.com>
+In-Reply-To: <20220417052604.120942-1-xiaoguang.wang@linux.alibaba.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/18/22 08:57, Luis Chamberlain wrote:
-> On Fri, Apr 15, 2022 at 09:01:03PM -0700, Bart Van Assche wrote:
->> On 4/15/22 18:49, Luis Chamberlain wrote:
->>> -	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
->>> -	if [[ "${nvme_trtype}" != "loop" ]]; then
->>> -		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
->>> -	fi
->>> -	modprobe -r nvmet 2>/dev/null
->>> +	if [[ "${nvme_trtype}" == "loop" ]]; then
->>> +		_patient_rmmod nvme_"${nvme_trtype}"
->>> +        else
->>> +                _patient_rmmod nvme-"${nvme_trtype}"
->>> +                _patient_rmmod nvmet-"${nvme_trtype}"
->>> +        fi
->>> +	_patient_rmmod nvmet 2>/dev/null
->>
->> The statement _patient_rmmod nvme-"${nvme_trtype}" occurs twice in the above
->> code. How about preserving the structure of the existing code such that that
->> statement only occurs once?
-> 
-> There is one call for nvme-"${nvme_trtype}", the other is for the
-> underscore version, so there are no two calls.
-> 
-> Did I miss something?
+Hi,
 
-It's only now that I see the underscore/hyphen difference in the if and else
-branches. It is not clear to me why this behavior change has been introduced?
-The following command produces no output on my test setup:
+just some remarks regarding the new comment.
 
-find /lib/modules -name 'nvme_*'
+Bodo
 
->>>    # Unload the SRP initiator driver.
->>>    stop_srp_ini() {
->>> -	local i
->>> -
->>>    	log_out
->>> -	for ((i=40;i>=0;i--)); do
->>> -		remove_mpath_devs || return $?
->>> -		unload_module ib_srp >/dev/null 2>&1 && break
->>> -		sleep 1
->>> -	done
->>> -	if [ -e /sys/module/ib_srp ]; then
->>> -		echo "Error: unloading kernel module ib_srp failed"
->>> -		return 1
->>> -	fi
->>> -	unload_module scsi_transport_srp || return $?
->>> +	remove_mpath_devs || return $?
->>> +	_patient_rmmod ib_srp || return 1
->>> +	_patient_rmmod scsi_transport_srp || return $?
->>>    }
->>
->> Removing the loop from around remove_mpath_devs is wrong. It is important
->> that that loop is preserved.
-> 
-> Why ? Can you test and verify?
+On 17.04.22 07:26, Xiaoguang Wang wrote:
 
-If I remember correctly I put remove_mpath_devs call inside the loop because
-multipathd keeps running while the loop is ongoing and hence can modify paths
-while the loop is running.
+... snip ...
 
-Thanks,
+>   static const struct vm_operations_struct tcmu_vm_ops = {
+> @@ -3205,12 +3228,19 @@ static void find_free_blocks(void)
+>   			udev->dbi_max = block;
+>   		}
+>   
+> +		/*
+> +		 * Release the block pages.
+> +		 * Also note that since tcmu_vma_fault() gets one extra page
+> +		 * refcount, tcmu_blocks_release() won't free pages if pages
+> +		 * are in page fault procedure, which means it's safe to
 
-Bart.
+s/in page fault procedure/mapped/
+
+> +		 * call tcmu_blocks_release() before unmap_mapping_range().
+
+"... before unmap_mapping_range(), which drops the refcount of pages it
+unmaps and thus releases those pages."
+
+Please feel free to find an even better wording.
+
+> +		 */
+> +		pages_freed = tcmu_blocks_release(udev, start, end - 1);
+> +
+>   		/* Here will truncate the data area from off */
+>   		off = udev->data_off + (loff_t)start * udev->data_blk_size;
+>   		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
+>   
+> -		/* Release the block pages */
+> -		pages_freed = tcmu_blocks_release(udev, start, end - 1);
+>   		mutex_unlock(&udev->cmdr_lock);
+>   
+>   		total_pages_freed += pages_freed;
