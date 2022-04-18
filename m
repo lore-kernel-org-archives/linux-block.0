@@ -2,107 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D31BAC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 08:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 684C7C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 18 Apr 2022 08:29:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237198AbiDRIWX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 04:22:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47886 "EHLO
+        id S229449AbiDRIcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 18 Apr 2022 04:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbiDRIWW (ORCPT
+        with ESMTP id S229817AbiDRIcC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 04:22:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 59047167D8
-        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 01:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650269983;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=CbSlwIMBsmUQ2btaZklk9txorHfyUp9hbUvmVQpF0EI=;
-        b=cPE95vutq5L92fdFKc8oMxoMiDKp/b3bOWnwuQzLEV7GmD5vlFf1Z0kQggaqQG+HspdxgN
-        60bdV4FGtEmN9hQWVcuqQSJNK2CBXkv6d0wl8VOBeTFgl1F9oF0JarHGmF5r4pbmc6plof
-        8Q7IX4gX8VgoOUlEXPM6LRzaOxJaA5Y=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-447-UmfjE_gIMMiENiNezl8JNw-1; Mon, 18 Apr 2022 04:19:27 -0400
-X-MC-Unique: UmfjE_gIMMiENiNezl8JNw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C1B8C1C05AA6;
-        Mon, 18 Apr 2022 08:19:26 +0000 (UTC)
-Received: from T590 (ovpn-8-28.pek2.redhat.com [10.72.8.28])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FC417C28;
-        Mon, 18 Apr 2022 08:19:14 +0000 (UTC)
-Date:   Mon, 18 Apr 2022 16:19:09 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <Yl0e/YBPGydwVAE7@T590>
-References: <20220415034703.2081695-1-ming.lei@redhat.com>
- <20220415051844.GA22762@lst.de>
- <YllQVT6n472eUB7+@T590>
- <20220416054913.GA7405@lst.de>
- <YlqGZ7W9rg0eNt9A@T590>
- <20220418051234.GA3559@lst.de>
+        Mon, 18 Apr 2022 04:32:02 -0400
+Received: from out30-54.freemail.mail.aliyun.com (out30-54.freemail.mail.aliyun.com [115.124.30.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC08A193F0;
+        Mon, 18 Apr 2022 01:29:23 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=chengyou@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VAM.vKD_1650270559;
+Received: from 30.43.105.155(mailfrom:chengyou@linux.alibaba.com fp:SMTPD_---0VAM.vKD_1650270559)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 18 Apr 2022 16:29:21 +0800
+Message-ID: <07be0869-13d9-6893-28b4-924c840a7804@linux.alibaba.com>
+Date:   Mon, 18 Apr 2022 16:29:19 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220418051234.GA3559@lst.de>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.7.0
+Subject: Re: siw_cm.c:255 siw_cep_put+0x125/0x130 kernel warning while testing
+ blktests srp/002 v5.17-rc7
+Content-Language: en-US
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Bernard Metzler <bmt@zurich.ibm.com>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, linux-rdma@vger.kernel.org,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+References: <Yliu2ROIh0nLk5l0@bombadil.infradead.org>
+From:   Cheng Xu <chengyou@linux.alibaba.com>
+In-Reply-To: <Yliu2ROIh0nLk5l0@bombadil.infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 18, 2022 at 07:12:34AM +0200, Christoph Hellwig wrote:
-> On Sat, Apr 16, 2022 at 05:03:35PM +0800, Ming Lei wrote:
-> > > Yes.  But not doing this automatically also means you keep easily
-> > > forgetting callsites.  For example iomap still does not flush the plug
-> > > in your patch.
-> > 
-> > It is reasonable for flush user(usually submission) to be responsible
-> > for finishing/flushing plug.
-> 
-> Well, I very much disagree here.  blk_flush_plug is not a publіc,
-> exported API, and that is for a reason.  A bio submission interface
-> that requires flushing the plug to be useful is rather broken.
-
-But there isn't any such users from module now. Maybe never, since sync
-polled dio becomes legacy after io_uring is invented.
-
-Do we have such potential use case in which explicit flush plug is
-needed except for polled io in __blkdev_direct_IO_simple() and swap_readpage()?
-
-If there is, I am happy to add one flag for bypassing plug in blk core
-code.
-
-> 
-> > iomap is one good example to show this point, since it does flush the plug
-> > before call bio_poll(), see __iomap_dio_rw().
-> 
-> iomap does not do a manual plug flush anywhere.
-> 
-> iomap does finish the plug before polling, which makes sense.
-> 
-> Now of course __blkdev_direct_IO_simple doesn't even use a plug
-> to start with, so I'm wondering what plug this patch even tries
-> to flush?
- 
-At least blkdev_write_iter(), and __swap_writepage() might call
-into ->direct_IO with one plug too.
-
-Not mention loop driver can call into ->direct_IO directly, and we
-should have applied plug for batching submission in loop_process_work().
-
-
-Thanks,
-Ming
-
+DQoNCk9uIDQvMTUvMjIgNzozMSBBTSwgTHVpcyBDaGFtYmVybGFpbiB3cm90ZToNCg0KPC4u
+Lj4NCg0KPiBbICAxOTUuMjE4NzgzXSAtLS0tLS0tLS0tLS1bIGN1dCBoZXJlIF0tLS0tLS0t
+LS0tLS0NCj4gWyAgMTk1LjIyMTI0Ml0gV0FSTklORzogQ1BVOiA3IFBJRDogMjAxIGF0IGRy
+aXZlcnMvaW5maW5pYmFuZC9zdy9zaXcvc2l3X2NtLmM6MjU1IHNpd19jZXBfcHV0KzB4MTI1
+LzB4MTMwIFtzaXddDQo+IFsgIDE5NS4yMjI4MzhdIE1vZHVsZXMgbGlua2VkIGluOiBpYl9z
+cnAoRSkgc2NzaV90cmFuc3BvcnRfc3JwKEUpIHRhcmdldF9jb3JlX3BzY3NpKEUpIHRhcmdl
+dF9jb3JlX2ZpbGUoRSkgaWJfc3JwdChFKSB0YXJnZXRfY29yZV9pYmxvY2soRSkgdGFyZ2V0
+X2NvcmVfbW9kKEUpIHJkbWFfY20oRSkgaXdfY20oRSkgaWJfY20oRSkgc2NzaV9kZWJ1ZyhF
+KSBzaXcoRSkgbnVsbF9ibGsoRSkgaWJfdW1hZChFKSBpYl91dmVyYnMoRSkgc2RfbW9kKEUp
+IHNnKEUpIGRtX3NlcnZpY2VfdGltZShFKSBzY3NpX2RoX3JkYWMoRSkgc2NzaV9kaF9lbWMo
+RSkgc2NzaV9kaF9hbHVhKEUpIGRtX211bHRpcGF0aChFKSBpYl9jb3JlKEUpIGRtX21vZChF
+KSBudm1lX2ZhYnJpY3MoRSkga3ZtX2ludGVsKEUpIGt2bShFKSBpcnFieXBhc3MoRSkgY3Jj
+dDEwZGlmX3BjbG11bChFKSBnaGFzaF9jbG11bG5pX2ludGVsKEUpIGFlc25pX2ludGVsKEUp
+IGNyeXB0b19zaW1kKEUpIGNyeXB0ZChFKSBqb3lkZXYoRSkgZXZkZXYoRSkgc2VyaW9fcmF3
+KEUpIGNpcnJ1cyhFKSBkcm1fc2htZW1faGVscGVyKEUpIGRybV9rbXNfaGVscGVyKEUpIHZp
+cnRpb19iYWxsb29uKEUpIGNlYyhFKSBpNjMwMGVzYihFKSBidXR0b24oRSkgZHJtKEUpIGNv
+bmZpZ2ZzKEUpIGlwX3RhYmxlcyhFKSB4X3RhYmxlcyhFKSBhdXRvZnM0KEUpIGV4dDQoRSkg
+Y3JjMTYoRSkgbWJjYWNoZShFKSBqYmQyKEUpIGJ0cmZzKEUpIGJsYWtlMmJfZ2VuZXJpYyhF
+KSB4b3IoRSkgcmFpZDZfcHEoRSkgenN0ZF9jb21wcmVzcyhFKSBsaWJjcmMzMmMoRSkgY3Jj
+MzJjX2dlbmVyaWMoRSkgdmlydGlvX25ldChFKSBuZXRfZmFpbG92ZXIoRSkgZmFpbG92ZXIo
+RSkgdmlydGlvX2JsayhFKSBhdGFfZ2VuZXJpYyhFKSB1aGNpX2hjZChFKSBlaGNpX2hjZChF
+KSBjcmMzMl9wY2xtdWwoRSkgY3JjMzJjX2ludGVsKEUpIGF0YV9waWl4KEUpIHBzbW91c2Uo
+RSkgbnZtZShFKSBsaWJhdGEoRSkgdmlydGlvX3BjaShFKQ0KPiBbICAxOTUuMjIyOTg2XSAg
+dmlydGlvX3BjaV9sZWdhY3lfZGV2KEUpIHZpcnRpb19wY2lfbW9kZXJuX2RldihFKSB1c2Jj
+b3JlKEUpIHZpcnRpbyhFKSB1c2JfY29tbW9uKEUpIHNjc2lfbW9kKEUpIG52bWVfY29yZShF
+KSBpMmNfcGlpeDQoRSkgdmlydGlvX3JpbmcoRSkgdDEwX3BpKEUpIHNjc2lfY29tbW9uKEUp
+IFtsYXN0IHVubG9hZGVkOiBudWxsX2Jsa10NCj4gWyAgMTk1LjI0MTAzNl0gc2QgMzowOjA6
+MTogW3NkZF0gQXR0YWNoZWQgU0NTSSBkaXNuDQo+IFsgIDE5NS4yNDExODhdIENQVTogMiBQ
+SUQ6IDIwMSBDb21tOiBrd29ya2VyL3UxNjoyMiBLZHVtcDogbG9hZGVkIFRhaW50ZWQ6IEcg
+ICAgICAgICAgICBFICAgICA1LjE3LjAtcmM3ICMxDQo+IFsgIDE5NS4yNDYwNTNdIEhhcmR3
+YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9T
+IDEuMTUuMC0xIDA0LzAxLzIwMTQNCj4gWyAgMTk1LjI0OTEyM10gV29ya3F1ZXVlOiBpd19j
+bV93cSBjbV93b3JrX2hhbmRsZXIgW2l3X2NtXQ0KPiBbICAxOTUuMjUxMjc0XSBSSVA6IDAw
+MTA6c2l3X2NlcF9wdXQrMHgxMjUvMHgxMzAgW3Npd10NCj4gWyAgMTk1LjI1MzU0OF0gQ29k
+ZTogYmIgYzAgZTggYWUgNzQgMGYgZDcgNDggODkgZWYgNWQgNDEgNWMgNDEgNWQgZTkgYjEg
+ZDYgZWYgZDYgNWQgYmUgMDMgMDAgMDAgMDAgNDEgNWMgNDEgNWQgZTkgMjIgYjcgMGMgZDcg
+MGYgMGIgZTkgZjMgZmUgZmYgZmYgPDBmPiAwYiBlOSAxYyBmZiBmZiBmZiAwZiAxZiA0MCAw
+MCAwZiAxZiA0NCAwMCAwMCA1NSA0OCA4ZCA2ZiAyMCA1Mw0KPiBbICAxOTUuMjU4OTgyXSBS
+U1A6IDAwMTg6ZmZmZmJjNTM0MDRlYmM5OCBFRkxBR1M6IDAwMDEwMjg2DQo+IFsgIDE5NS4y
+NjEwMThdIFJBWDogMDAwMDAwMDAwMDAwMDAwMSBSQlg6IDAwMDAwMDAwMDAwMDAwMDAgUkNY
+OiAwMDAwMDAwMDAwMDAwMDAwDQo+IFsgIDE5NS4yNjM1NjldIFJEWDogMDAwMDAwMDAwMDAw
+MDAwMSBSU0k6IDAwMDAwMDAwMDAwMDAyNDYgUkRJOiBmZmZmYTAzZDExMDJhOTI0DQo+IFsg
+IDE5NS4yNjYxNTFdIFJCUDogZmZmZmEwM2QxMTAyYTkwMCBSMDg6IGZmZmZhMDNkMTEwMmE5
+MjAgUjA5OiBmZmZmYmM1MzQwNGViYzUwDQo+IFsgIDE5NS4yNjkxNTBdIFIxMDogZmZmZmZm
+ZmY5OGEwNjBlMCBSMTE6IDAwMDAwMDAwMDAwMDAwMDAgUjEyOiBmZmZmYTAzY2M0Mjk3MDAw
+DQo+IFsgIDE5NS4yNzI3NDRdIFIxMzogZmZmZmEwM2QyYTQ4YWVhMCBSMTQ6IGZmZmZhMDNk
+MmE0OGFlNzggUjE1OiBmZmZmYTAzY2M0MjdhZDU4DQo+IFsgIDE5NS4yNzU1NzVdIEZTOiAg
+MDAwMDAwMDAwMDAwMDAwMCgwMDAwKSBHUzpmZmZmYTAzZGY3YzgwMDAwKDAwMDApIGtubEdT
+OjAwMDAwMDAwMDAwMDAwMDANCj4gWyAgMTk1LjI3ODkzMl0gQ1M6ICAwMDEwIERTOiAwMDAw
+IEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMw0KPiBbICAxOTUuMjgwOTYzXSBDUjI6
+IDAwMDA1NTkwYmMyZTRmZTggQ1IzOiAwMDAwMDAwMDg1MDBhMDA0IENSNDogMDAwMDAwMDAw
+MDc3MGVlMA0KPiBbICAxOTUuMjgyODAzXSBEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAw
+MDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAwMDAwMDAwMDAwMA0KPiBbICAxOTUuMjg0NjUw
+XSBEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2OiAwMDAwMDAwMGZmZmUwZmYwIERSNzogMDAw
+MDAwMDAwMDAwMDQwMA0KPiBbICAxOTUuMjg2NTIyXSBQS1JVOiA1NTU1NTU1NA0KPiBbICAx
+OTUuMjg3OTk4XSBDYWxsIFRyYWNlOg0KPiBbICAxOTUuMjg5MjEwXSAgPFRBU0s+DQo+IFsg
+IDE5NS4yOTA5NjldICBzaXdfcmVqZWN0KzB4YWMvMHgxODAgW3Npd10NCj4gWyAgMTk1LjI5
+MjY3OV0gIGl3X2NtX3JlamVjdCsweDY4LzB4YzAgW2l3X2NtXQ0KPiBbICAxOTUuMjk0MTM2
+XSAgY21fd29ya19oYW5kbGVyKzB4NTlkLzB4ZTIwIFtpd19jbV0NCj4gWyAgMTk1LjI5NTU4
+OF0gIHByb2Nlc3Nfb25lX3dvcmsrMHgxZTIvMHgzYjANCj4gWyAgMTk1LjI5ODMzOF0gIHdv
+cmtlcl90aHJlYWQrMHg1MC8weDNhMA0KPiBbICAxOTUuMzAwMzMwXSAgPyByZXNjdWVyX3Ro
+cmVhZCsweDM5MC8weDM5MA0KPiBbICAxOTUuMzAyMjY5XSAga3RocmVhZCsweGU1LzB4MTEw
+DQo+IFsgIDE5NS4zMDQwNjJdICA/IGt0aHJlYWRfY29tcGxldGVfYW5kX2V4aXQrMHgyMC8w
+eDIwDQo+IFsgIDE5NS4zMDc2MTJdICByZXRfZnJvbV9mb3JrKzB4MWYvMHgzMA0KPiBbICAx
+OTUuMzA5NTg1XSAgPC9UQVNLPg0KPiBbICAxOTUuMzEwNjc0XSAtLS1bIGVuZCB0cmFjZSAw
+MDAwMDAwMDAwMDAwMDAwIF0tLS0NCj4gWyAgMTk1LjMxMzI5MF0gc2NzaSBob3N0NDogaWJf
+c3JwOiBSRUogcmVjZWl2ZWQNCj4gWyAgMTk1LjMxMzI5M10gc2NzaSBob3N0NDogICBSRUog
+cmVhc29uIDB4ZmZmZmZmOTgNCj4gWyAgMTk1LjMxNTQzM10gc2NzaSBob3N0NDogaWJfc3Jw
+OiBDb25uZWN0aW9uIDAvOCB0byAxNzIuMTcuOC4xMTMgZmFpbGVkDQo+IFsgIDE5NS40NzI3
+MThdIGliX3NycDpzcnBfcGFyc2VfaW46IGliX3NycDogMTcyLjE3LjguMTEzIC0+IDE3Mi4x
+Ny44LjExMzowDQo+IFsgIDE5NS40NzI3MzldIGliX3NycDpzcnBfcGFyc2VfaW46IGliX3Ny
+cDogMTcyLjE3LjguMTEzOjU1NTUgLT4gMTcyLjE3LjguMTEzOjU1NTUNCj4gWyAgMTk1LjQ3
+MjgwN10gaWJfc3JwOnNycF9wYXJzZV9pbjogaWJfc3JwOiBbZmU4MDo6NTA1NDpmZjpmZTVi
+OjkwZGMlM10gLT4gW2ZlODA6OjUwNTQ6ZmY6ZmU1Yjo5MGRjXTowLzIwMjQ0Mjg2NSUzDQo+
+ID4gWzBdIGh0dHBzOi8vZ2l0aHViLmNvbS9tY2dyb2Yva2Rldm9wcw0KPiAgPiAgICBMdWlz
+DQoNCkhpLCBCZXJuYXJkDQoNCkkgcmVwcm9kdWNlZCB0aGlzIGlzc3VlLCBhbmQgaXQgbG9v
+a3MgbGlrZSBhIGNvbmRpdGlvbiByYWNlIGJldHdlZW4NCidjbV93b3JrX2hhbmRsZXInIGFu
+ZCAnc2l3X2NtX3dvcmtfaGFuZGxlcicuDQoNCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCiAgVGhyZWFkMDogICAg
+ICAgICAgICAgICAgICAgICAgICAgVGhyZWFkMToNCiAgc2l3X2NtX3dvcmtfaGFuZGxlciAg
+ICAgICAgICAgICAgY21fd29ya19oYW5kbGVyDQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQpzdGVwMDoNCnNpd19j
+bV91cGNhbGwgd2l0aA0KSVdfQ01fRVZFTlRfQ09OTkVDVF9SRVFVRVNUDQoNCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgPT09PiBjbV9jb25uX3JlcV9oYW5kbGVyDQogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAuLi4NCiAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgY21faWQtPmNtX2hhbmRsZXIgKGZhaWxlZCkNCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaXdfY21fcmVqZWN0DQogICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgc2l3X3JlamVjdA0KDQoqc3RlcDEq
+Og0KZGV0YWNoIGNlcCB3aXRoIGxpc3Rlbl9jZXANCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCg0KV2hlbiBzaXdf
+cmVqZWN0IGlzIGNhbGxlZCBpbiBjbV93b3JrX2hhbmRsZXIsIHRoZSByZWxhdGVkIGNlcCBt
+YXkgaGF2ZQ0Kbm90IGJlZW4gZGV0YWNoZWQgd2l0aCBpdHMgbGlzdGVuX2NlcCwgdGhyb3Vn
+aCB0aGUgdHdvIHN0ZXBzIGFyZSB2ZXJ5DQpjbG9zZS4NCg0KSSB0aGluayBvbmUgc2ltcGxl
+IHdheSB0byBmaXggdGhpcyBpc3N1ZSBpcyBrZWVwIHN0ZXAxIHVuZGVyDQpzaXdfY2VwX3Nl
+dF9pbnVzZSdzIHByb3RlY3Rpb24sIGFuZCB0aGlzIHdpbGwgbWFrZSBzaXdfcmVqZWN0IHdp
+bGwgYmUNCnBlbmRpbmcgdXRpbCBzaXdfY21fd29ya19oYW5kbGVyIHJlbGVhc2UgdGhlIGxv
+Y2s6DQoNCmRpZmYgLS1naXQgYS9kcml2ZXJzL2luZmluaWJhbmQvc3cvc2l3L3Npd19jbS5j
+IA0KYi9kcml2ZXJzL2luZmluaWJhbmQvc3cvc2l3L3Npd19jbS5jDQppbmRleCA3YWNkZDNj
+M2E1OTkuLmYwMzNiNmRhMWU5ZiAxMDA2NDQNCi0tLSBhL2RyaXZlcnMvaW5maW5pYmFuZC9z
+dy9zaXcvc2l3X2NtLmMNCisrKyBiL2RyaXZlcnMvaW5maW5pYmFuZC9zdy9zaXcvc2l3X2Nt
+LmMNCkBAIC05NjgsMTMgKzk2OCwxNSBAQCBzdGF0aWMgdm9pZCBzaXdfYWNjZXB0X25ld2Nv
+bm4oc3RydWN0IHNpd19jZXAgKmNlcCkNCg0KICAgICAgICAgICAgICAgICBzaXdfY2VwX3Nl
+dF9pbnVzZShuZXdfY2VwKTsNCiAgICAgICAgICAgICAgICAgcnYgPSBzaXdfcHJvY19tcGFy
+ZXEobmV3X2NlcCk7DQotICAgICAgICAgICAgICAgc2l3X2NlcF9zZXRfZnJlZShuZXdfY2Vw
+KTsNCg0KICAgICAgICAgICAgICAgICBpZiAocnYgIT0gLUVBR0FJTikgew0KICAgICAgICAg
+ICAgICAgICAgICAgICAgIHNpd19jZXBfcHV0KGNlcCk7DQogICAgICAgICAgICAgICAgICAg
+ICAgICAgbmV3X2NlcC0+bGlzdGVuX2NlcCA9IE5VTEw7DQorICAgICAgICAgICAgICAgICAg
+ICAgICBzaXdfY2VwX3NldF9mcmVlKG5ld19jZXApOw0KICAgICAgICAgICAgICAgICAgICAg
+ICAgIGlmIChydikNCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGdvdG8gZXJy
+b3I7DQorICAgICAgICAgICAgICAgfSBlbHNlIHsNCisgICAgICAgICAgICAgICAgICAgICAg
+IHNpd19jZXBfc2V0X2ZyZWUobmV3X2NlcCk7DQogICAgICAgICAgICAgICAgIH0NCiAgICAg
+ICAgIH0NCiAgICAgICAgIHJldHVybjsNCg0KVGhhbmtzLA0KQ2hlbmcgWHUNCg==
