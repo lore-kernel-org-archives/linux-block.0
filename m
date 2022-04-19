@@ -2,104 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6CCAC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 17:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3774C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 18:14:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350964AbiDSRe5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Apr 2022 13:34:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41476 "EHLO
+        id S1356347AbiDSSRU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Apr 2022 14:17:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353804AbiDSRew (ORCPT
+        with ESMTP id S1356531AbiDSSQY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Apr 2022 13:34:52 -0400
-Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4155A38DBD;
-        Tue, 19 Apr 2022 10:32:09 -0700 (PDT)
-Received: by mail-oi1-x231.google.com with SMTP id e4so18889590oif.2;
-        Tue, 19 Apr 2022 10:32:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9TRLt0umpK42xe/joZUuCtcbZ6R6cAmp1bJxdUcgm8M=;
-        b=XJpQjzjjctWjfGZZgTtSKyIT83IHM45dieg4WsW3ak2hpJ3kPz5fBe7UBbK0wNxoIJ
-         ivMYTJzH5nSfURv5rAgqT6W3/nbjOJr+K2C8yMDpYzRAKNtea0GU2KQn1qWFcL5BXG+i
-         j3O4+GnfOhQgA4GdyKvqKANlfxsFsCSfIG/uYL+yg/zvZNcUEokQO28bOaFAJcgOSn25
-         aMaunSVG5GwIkyUnZCC/xZ/W0HCTmgipivwurrrbRbvCsYM3KAmnuJTz1Po7XK7xT3aW
-         WQF5eQ83vqBHR4woYK1i2LaQtI6OjFRYQuFmL3uxFhbr73u1aqNW6CJgmR3PWdWScj2a
-         t1vA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9TRLt0umpK42xe/joZUuCtcbZ6R6cAmp1bJxdUcgm8M=;
-        b=pooYgMkI1s4tz8vGBRCvay0HGQbLTnnfMe90nY3d0OjfyIDYPXsQ6lu/wLDpZWf5B/
-         qN1sRiOC16v0/BtXqg59sKOCkztBX4eLRDbSHuMS+oQ8HsSDNNZ51Ti8wZ2QZTxguTaB
-         WWNexk0RRzukPBXCA01sbjz4jBeWQvxorwtJLVCFWRr3jrsBrpbzO+rqAvRLh+IL8AaH
-         OKLiyQB3uAqu+1O29PlWel7v0M+5EqF0OdUREmydGuiiV9TEPh8hRO0pscbl2Casb+iX
-         zojtzWyb3rQ/On/AUu/tLeKexBbtW+gvXDFPVXZDqUPfKxxrsK5J/TUiNThTYlIaROQq
-         Kyow==
-X-Gm-Message-State: AOAM532n2JaJ3KPqamoC7dn2rnwhDh4Vp/0ZiA2N3Sb+oBQ9CjeLKKRa
-        YdHM7M3O5PA/0TNw3mJaw7P/vLTqjvdoXujFdE8=
-X-Google-Smtp-Source: ABdhPJzjvbZzKw9AmTVeqJqXQyrX4Xm2mQCN5iTfSaun8qvgGqsIrB7jYyjuk+QaIV2MI5zrGwOmpJwfcJbb0uNqSDw=
-X-Received: by 2002:a05:6808:f8f:b0:322:b4ce:a10e with SMTP id
- o15-20020a0568080f8f00b00322b4cea10emr2758955oiw.160.1650389528530; Tue, 19
- Apr 2022 10:32:08 -0700 (PDT)
+        Tue, 19 Apr 2022 14:16:24 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B05763EBA0;
+        Tue, 19 Apr 2022 11:12:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 629F2B81982;
+        Tue, 19 Apr 2022 18:12:39 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C489C385A9;
+        Tue, 19 Apr 2022 18:12:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650391958;
+        bh=MK0OE6TjYTtxohqk28sr/Dd7rzK97V5i8xMRJVD6TPE=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=SF4PrCXLyzxyYaFNiTpbcNpaOt1BOLXb7LQ9iSbrLGUPsWBqkQW1aXy6DNqknTaMc
+         /eLRPkxZUt6PR8VmwMlN3VYHHY/7fFTfOTYeK3ekg9EYlU48VytfcNJDALR7JHJg4+
+         7YgxkxYOcOHih7RdtDrBuDJD4cGWDqywbe1uCMO6WprfDMpwBsUJJ8FigfKCNG/STi
+         p4Ci+qkZJct2pU+ef9WbTlEIcZ6e99FTR6JgN+p4vmDo6WkWM2M85HGyx44hXwwwOO
+         roCHq95KI2q6SUFphlUgnLGUythIKDWCPZXowl79y9578erU5+FttRAfrnkce4TlUK
+         JoFlbnZZGH3Ig==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Khazhismel Kumykov <khazhy@google.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.17 33/34] block/compat_ioctl: fix range check in BLKGETSIZE
+Date:   Tue, 19 Apr 2022 14:11:00 -0400
+Message-Id: <20220419181104.484667-33-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220419181104.484667-1-sashal@kernel.org>
+References: <20220419181104.484667-1-sashal@kernel.org>
 MIME-Version: 1.0
-References: <CGME20220308152729epcas5p17e82d59c68076eb46b5ef658619d65e3@epcas5p1.samsung.com>
- <20220308152105.309618-18-joshi.k@samsung.com> <20220310083652.GF26614@lst.de>
- <CA+1E3rLaQstG8LWUyJrbK5Qz+AnNpOnAyoK-7H5foFm67BJeFA@mail.gmail.com>
- <20220310141945.GA890@lst.de> <CA+1E3rL3Q2noHW-cD20SZyo9EqbzjF54F6TgZoUMMuZGkhkqnw@mail.gmail.com>
- <20220311062710.GA17232@lst.de> <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
- <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
- <20220330130219.GB1938@lst.de> <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
- <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk> <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
- <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk>
-In-Reply-To: <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Tue, 19 Apr 2022 23:01:43 +0530
-Message-ID: <CA+1E3rJHgEan2yiVS882XouHgKNP4Rn6G2LrXyFu-0kgyu27=Q@mail.gmail.com>
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Kanchan Joshi <joshi.k@samsung.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
-Few thoughts below toward the next version -
+From: Khazhismel Kumykov <khazhy@google.com>
 
-On Fri, Apr 1, 2022 at 8:14 AM Jens Axboe <axboe@kernel.dk> wrote:
-[snip]
-> >>> Sure, will post the code with bigger-cqe first.
-> >>
-> >> I can add the support, should be pretty trivial. And do the liburing
-> >> side as well, so we have a sane base.
-> >
-> >  I will post the big-cqe based work today. It works with fio.
-> >  It does not deal with liburing (which seems tricky), but hopefully it
-> > can help us move forward anyway .
->
-> Let's compare then, since I just did the support too :-)
+[ Upstream commit ccf16413e520164eb718cf8b22a30438da80ff23 ]
 
-Major difference is generic support (rather than uring-cmd only) and
-not touching the regular completion path. So plan is to use your patch
-for the next version with some bits added (e.g. overflow-handling and
-avoiding extra CQE tail increment). Hope that sounds fine.
+kernel ulong and compat_ulong_t may not be same width. Use type directly
+to eliminate mismatches.
 
-We have things working on top of your current branch
-"io_uring-big-sqe". Since SQE now has 8 bytes of free space (post
-xattr merge) and CQE infra is different (post cqe-caching in ctx) -
-things needed to be done a bit differently. But all this is now tested
-better with liburing support/util (plan is to post that too).
+This would result in truncation rather than EFBIG for 32bit mode for
+large disks.
+
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Link: https://lore.kernel.org/r/20220414224056.2875681-1-khazhy@google.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ block/ioctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/ioctl.c b/block/ioctl.c
+index 4a86340133e4..f8703db99c73 100644
+--- a/block/ioctl.c
++++ b/block/ioctl.c
+@@ -629,7 +629,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg)
+ 		return compat_put_long(argp,
+ 			(bdev->bd_disk->bdi->ra_pages * PAGE_SIZE) / 512);
+ 	case BLKGETSIZE:
+-		if (bdev_nr_sectors(bdev) > ~0UL)
++		if (bdev_nr_sectors(bdev) > ~(compat_ulong_t)0)
+ 			return -EFBIG;
+ 		return compat_put_ulong(argp, bdev_nr_sectors(bdev));
+ 
+-- 
+2.35.1
+
