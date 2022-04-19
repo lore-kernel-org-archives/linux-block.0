@@ -2,194 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7058CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 11:00:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A83D9C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 11:41:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242912AbiDSLD2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Apr 2022 07:03:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35920 "EHLO
+        id S241362AbiDSLo3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Apr 2022 07:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46394 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350821AbiDSLD1 (ORCPT
+        with ESMTP id S1351841AbiDSLmM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Apr 2022 07:03:27 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AADC1FA4E
-        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 04:00:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1650366043; x=1681902043;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=AO7XZBEhi1By4NanAu/ixvqdG8OOolfgUjOvr2Ll2gE=;
-  b=pD/E0n4ZnnVigxRHACbV48Pa5fpu6m29lqQAivI6gXpaShDmNx3ZQtwK
-   EuBOEbQus7gDrooCJmaLDje1/Piq+QYuBzMKjLBF/xU2YTJhEDb0mdUT8
-   ytdROIROFOZBwvdFn+06dXR2vBCsGy83ZWmRlop19gJrZ0AUV+59qAhRl
-   RjaruaeC9nyt8oP049WASc/+DZaABGx0/6k6+eDEHv94QdmczqqPReq23
-   56m+LNqPIlWkKGB+HeLRR79P0ODmoxHx6J1jDFD8ybT+qapPLTZg1tgHi
-   /MZWVxZpxoj1ieO/tX3fyBaTcLXRlkEZoECVuNU39tWZTFnZVkS+cBJTn
-   g==;
-X-IronPort-AV: E=Sophos;i="5.90,272,1643644800"; 
-   d="scan'208";a="198252961"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 19 Apr 2022 19:00:43 +0800
-IronPort-SDR: lii3IllGKbnl4DEr7GN7QKcUZTnvzlZWKxczOs1ctoUdU3r+t1onX5wrRDf1oJGZHGwu0QZG9m
- FcqqKyZZpogymRPaIS+/u5T60NKOtt9PXkNI/2baQ15Ij4oGjju7zsz4J2xbqwsmoPtFOpAAk5
- amgB8uEh1UH4ehO9UMiqOvtv1T97vBmYM+MGvQRhRe3jRsOuiBxKqos0mxbaeIuFo+LimGXSik
- l4B2czLVsLcN3fVnjhSxs/rJeSzyW/3tuvqL0LtKYd7sn2wvo4I5IyvyAGsMNiLSbD1Jqpj7c0
- BHK7m+75EsbprLxcn5c2yTok
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Apr 2022 03:31:50 -0700
-IronPort-SDR: sHAFCa4Z2VXgltVU3RcrkPtY1lzI4m1MWT4lY3bUBjnBhYmi5JVp/yoGn3xoRl0PFMU+0Qtfer
- aJN7rf7zkU4MTb2yzhw+2tuD/QX1wSCjpdvkuzH5e9Lc4McRN4Sq9F4U2I1qHCE51cvi7SB/kV
- S/Yx4q6CDCFe6Mdx9NcxRDcR/hMKZYyCduDGiT3gsrBlwZyQdCsnacVqQNdji8CJq6YkQPV2M6
- RO1lG/YAi22UWOuTQkcKkTUJ6p7TbZpYZh5Nefz/x/NB7X67iJshuoWCLPKkfVeuBeCIQguVqO
- DJ0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Apr 2022 04:00:45 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KjLSX3tT7z1Rwrw
-        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 04:00:44 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:mime-version
-        :references:in-reply-to:x-mailer:message-id:date:subject:to
-        :from; s=dkim; t=1650366044; x=1652958045; bh=AO7XZBEhi1By4NanAu
-        /ixvqdG8OOolfgUjOvr2Ll2gE=; b=BfDhITdlCIK/EQoRlrpSo2oPfQfxIU2w8q
-        KcWKLuTSzszt9Cw2hk3Kx1Y59QHAf0BIvEXRBtmD3jUlIl6cZRXXesmjbApPLVdt
-        rd+BEpcy9c1udY/yNB/VQd8ztNckzxhScBBr4CHTlqQgbJyGsfwPI8xPL+fHABfL
-        Xc+crn6hS5/hh5p9TzesPEHcXB/0HlhR+ZpMoBpwX2dOiKE4h682H48sr7R5Y/ZK
-        NpoJHWsWP+4Ziy303/9YWS18N60icHFqD1WuXzm8397lF/rlJ3xhbTPn68sYJNu+
-        1R/8qkFU3AjMPKvzqviAYLgE4NZvyNkVMmjZrHKTI1WS0nhdCi4g==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 6XVBuiwTdvll for <linux-block@vger.kernel.org>;
-        Tue, 19 Apr 2022 04:00:44 -0700 (PDT)
-Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KjLSW42n1z1Rvlx;
-        Tue, 19 Apr 2022 04:00:43 -0700 (PDT)
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Cc:     Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH 4/4] block: null_blk: Improve device creation with configfs
-Date:   Tue, 19 Apr 2022 20:00:38 +0900
-Message-Id: <20220419110038.3728406-5-damien.lemoal@opensource.wdc.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220419110038.3728406-1-damien.lemoal@opensource.wdc.com>
-References: <20220419110038.3728406-1-damien.lemoal@opensource.wdc.com>
+        Tue, 19 Apr 2022 07:42:12 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0931D37BE7;
+        Tue, 19 Apr 2022 04:37:20 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KjMCl1XB7zFqT6;
+        Tue, 19 Apr 2022 19:34:43 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 19 Apr 2022 19:37:13 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 19 Apr 2022 19:37:12 +0800
+Subject: Re: [PATCH -next 10/11] block, bfq: decrease
+ 'num_groups_with_pending_reqs' earlier
+To:     Jan Kara <jack@suse.cz>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220305091205.4188398-1-yukuai3@huawei.com>
+ <20220305091205.4188398-11-yukuai3@huawei.com>
+ <20220413112816.fwobg4cp6ttpnpk6@quack3.lan>
+ <f3ed507a-7c85-cd69-3ad5-3e9c0e75c372@huawei.com>
+ <ef7bad8c-b8dd-f625-330c-9a22e303844b@huawei.com>
+ <20220419094955.ucjxadnhdyonfjdo@quack3.lan>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <d088c184-b67f-1afb-5f1c-0e166c665c50@huawei.com>
+Date:   Tue, 19 Apr 2022 19:37:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20220419094955.ucjxadnhdyonfjdo@quack3.lan>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently, the directory name used to create a nullb device through
-sysfs is not used as the device name, potentially causing headaches for
-users if devices are already created through the modprobe operation
-withe the nr_device module parameter not set to 0. E.g. a user can do
-"mkdir /sys/kernel/config/nullb/nullb0" to create a nullb device while
-/dev/nullb0 wasalready created from modprobe. In this case, the configfs
-nullb device will be named nullb1, causing confusion for the user.
+在 2022/04/19 17:49, Jan Kara 写道:
+> On Fri 15-04-22 09:10:06, yukuai (C) wrote:
+>> 在 2022/04/13 19:40, yukuai (C) 写道:
+>>> 在 2022/04/13 19:28, Jan Kara 写道:
+>>>> On Sat 05-03-22 17:12:04, Yu Kuai wrote:
+>>>>> Currently 'num_groups_with_pending_reqs' won't be decreased when
+>>>>> the group doesn't have any pending requests, while some child group
+>>>>> still have pending requests. The decrement is delayed to when all the
+>>>>> child groups doesn't have any pending requests.
+>>>>>
+>>>>> For example:
+>>>>> 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
+>>>>> child group. num_groups_with_pending_reqs is 2 now.
+>>>>> 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
+>>>>> t3 still can't be handled concurrently.
+>>>>>
+>>>>> Fix the problem by decreasing 'num_groups_with_pending_reqs'
+>>>>> immediately upon the weights_tree removal of last bfqq of the group.
+>>>>>
+>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>>
+>>>> So I'd find the logic easier to follow if you completely removed
+>>>> entity->in_groups_with_pending_reqs and did updates of
+>>>> bfqd->num_groups_with_pending_reqs like:
+>>>>
+>>>>      if (!bfqg->num_entities_with_pending_reqs++)
+>>>>          bfqd->num_groups_with_pending_reqs++;
+>>>>
+>>> Hi,
+>>>
+>>> Indeed, this is an excellent idle, and much better than the way I did.
+>>>
+>>> Thanks,
+>>> Kuai
+>>>
+>>>> and similarly on the remove side. And there would we literally two places
+>>>> (addition & removal from weight tree) that would need to touch these
+>>>> counters. Pretty obvious and all can be done in patch 9.
+>>
+>> I think with this change, we can count root_group while activating bfqqs
+>> that are under root_group, thus there is no need to modify
+>> for_each_entity(or fake bfq_sched_data) any more.
+> 
+> Sure, if you can make this work, it would be easier :)
+> 
+>> The special case is that weight racing bfqqs are not inserted into
+>> weights tree, and I think this can be handled by adding a fake
+>> bfq_weight_counter for such bfqqs.
+> 
+> Do you mean "weight raised bfqqs"? Yes, you are right they would need
+> special treatment - maybe bfq_weights_tree_add() is not the best function
+> to use for this and we should rather use insertion / removal from the
+> service tree for maintaining num_entities_with_pending_reqs counter?
+> I can even see we already have bfqg->active_entities so maybe we could just
+> somehow tweak that accounting and use it for our purposes?
 
-Simplify this by using the configfs directory name as the nullb device
-name, always, unless another nullb device is already using the same
-name. E.g. if modprobe created nullb0, then:
+The problem to use 'active_entities' is that bfqq can be deactivated
+while it still has pending requests.
 
-$ mkdir /sys/kernel/config/nullb/nullb0
-mkdir: cannot create directory '/sys/kernel/config/nullb/nullb0': File
-exists
+Anyway, I posted a new version aready, which still use weights_tree
+insertion / removal to count pending bfqqs. I'll be great if you can
+take a look:
 
-will be reported to th user.
+https://patchwork.kernel.org/project/linux-block/cover/20220416093753.3054696-1-yukuai3@huawei.com/
 
-To implement this, the function null_find_dev_by_name() is added to
-check for the existence of a nullb device with the name used for a new
-configfs device directory. nullb_group_make_item() uses this new
-function to check if the directory name can be used as the disk name.
-Finally, null_add_dev() is modified to use the device config item name
-as the disk name for new nullb device, for devices created using
-configfs. The naming of devices created though modprobe remains
-unchanged.
+BTW, I was worried that you can't receive the emails because I got
+warnings that mails can't deliver to you:
 
-Of note is that it is possible for a user to create through configfs a
-nullb device with the same name as an existing device. E.g.
+Your message could not be delivered for more than 6 hour(s).
+It will be retried until it is 1 day(s) old.
 
-$ mkdir /sys/kernel/config/nullb/null will successfully create the nullb
-device "null" but this device will however not appear under /dev/ since
-/dev/null already exists.
+For further assistance, please send mail to postmaster.
 
-Suggested-by: Joseph Bacik <josef@toxicpanda.com>
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
----
- drivers/block/null_blk/main.c | 28 +++++++++++++++++++++++++++-
- 1 file changed, 27 insertions(+), 1 deletion(-)
+If you do so, please include this problem report. You can
+delete your own text from the attached returned message.
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.=
-c
-index 96b6eb4ca60a..49d89ae013de 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -232,6 +232,7 @@ static struct nullb_device *null_alloc_dev(void);
- static void null_free_dev(struct nullb_device *dev);
- static void null_del_dev(struct nullb *nullb);
- static int null_add_dev(struct nullb_device *dev);
-+static struct nullb *null_find_dev_by_name(const char *name);
- static void null_free_device_storage(struct nullb_device *dev, bool is_c=
-ache);
-=20
- static inline struct nullb_device *to_nullb_device(struct config_item *i=
-tem)
-@@ -560,6 +561,9 @@ config_item *nullb_group_make_item(struct config_grou=
-p *group, const char *name)
- {
- 	struct nullb_device *dev;
-=20
-+	if (null_find_dev_by_name(name))
-+		return ERR_PTR(-EEXIST);
-+
- 	dev =3D null_alloc_dev();
- 	if (!dev)
- 		return ERR_PTR(-ENOMEM);
-@@ -2061,7 +2065,13 @@ static int null_add_dev(struct nullb_device *dev)
-=20
- 	null_config_discard(nullb);
-=20
--	sprintf(nullb->disk_name, "nullb%d", nullb->index);
-+	if (config_item_name(&dev->item)) {
-+		/* Use configfs dir name as the device name */
-+		snprintf(nullb->disk_name, sizeof(nullb->disk_name),
-+			 "%s", config_item_name(&dev->item));
-+	} else {
-+		sprintf(nullb->disk_name, "nullb%d", nullb->index);
-+	}
-=20
- 	rv =3D null_gendisk_register(nullb);
- 	if (rv)
-@@ -2090,6 +2100,22 @@ static int null_add_dev(struct nullb_device *dev)
- 	return rv;
- }
-=20
-+static struct nullb *null_find_dev_by_name(const char *name)
-+{
-+	struct nullb *nullb =3D NULL, *nb;
-+
-+	mutex_lock(&lock);
-+	list_for_each_entry(nb, &nullb_list, list) {
-+		if (strcmp(nb->disk_name, name) =3D=3D 0) {
-+			nullb =3D nb;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&lock);
-+
-+	return nullb;
-+}
-+
- static int null_create_dev(void)
- {
- 	struct nullb_device *dev;
---=20
-2.35.1
+                    The mail system
 
+<jack@imap.suse.de> (expanded from <jack@suse.cz>): host
+     mail2.suse.de[149.44.160.157] said: 452 4.3.1 Insufficient system 
+storage
+
+Thanks,
+Kuai
+> 
+> 								Honza
+> 
