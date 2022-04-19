@@ -2,51 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41236C3526F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6B59C433EF
 	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 16:05:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354341AbiDSQHo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1354299AbiDSQHo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Tue, 19 Apr 2022 12:07:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39950 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354411AbiDSQHk (ORCPT
+        with ESMTP id S1354393AbiDSQHg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Apr 2022 12:07:40 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1D8BC0A;
-        Tue, 19 Apr 2022 09:04:57 -0700 (PDT)
+        Tue, 19 Apr 2022 12:07:36 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF695BC2B;
+        Tue, 19 Apr 2022 09:04:53 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id C15A421601;
-        Tue, 19 Apr 2022 16:04:55 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id 65D721F752;
+        Tue, 19 Apr 2022 16:04:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1650384295; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1650384292; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z+3aAU9uNbVvLuEPmFtNeMNDyKnto7iqzKw2El8pJGI=;
-        b=mmpajxKhkU1mnkmh056J11rsisif1Eat6AwlPyRLFPrb7mrHzwv4lHpiZeThKG6UZU95V3
-        wDMDiQty0li4zSR3p1KaPqXH6neJbMD8LbycfAauuTF7K4za2xIu3tsVRQPxb1XasXN0LG
-        qvdlZ1VwAy7Sosrhv7Kx8s0TPn/yukE=
+        bh=suTXyimM3RuxwOZfem+9Jfn70HGUAVc4SO+4D+kIats=;
+        b=J/LX8G/qDy/5h3cXNDfs9Gschcz2BnO1TsLtkROYh4Mg7VohBkbSeEhNOKTr1duOWtHWSY
+        UXQYcTingvUUXBVL0+97Jc7AKfjXPNvsczfpq2blekW6kakTZNwCnp4+RKPinQu9I5qR1X
+        YtfjK//iUZehkHWKlK+QK7Sl1ijIHks=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1650384295;
+        s=susede2_ed25519; t=1650384292;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=z+3aAU9uNbVvLuEPmFtNeMNDyKnto7iqzKw2El8pJGI=;
-        b=y6L7axMSD8Kaa/ZGqcyY9exPvfiQ7wh8I1ICosqiKryY5B4GqQ6yJICZuJw0Pt4PJ3mr66
-        cpVXEBL+by8moKBQ==
+        bh=suTXyimM3RuxwOZfem+9Jfn70HGUAVc4SO+4D+kIats=;
+        b=WWJN2bUMzSjIcxgKXWhoR0fjcaNTw2m2/axUgL81gtM4TjM30HRjsJzt+7vWOyvjzosm+N
+        6vvWQRbvWmjMpBDQ==
 Received: from localhost.localdomain (unknown [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id 0717F2C146;
-        Tue, 19 Apr 2022 16:04:52 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTP id 8BC6A2C142;
+        Tue, 19 Apr 2022 16:04:43 +0000 (UTC)
 From:   Coly Li <colyli@suse.de>
 To:     axboe@kernel.dk
 Cc:     hch@lst.de, kch@nvidia.com, snitzer@redhat.com,
         linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
         Coly Li <colyli@suse.de>
-Subject: [PATCH 2/2] bcache: fix wrong bdev parameter when calling bio_alloc_clone() in do_bio_hook()
-Date:   Wed, 20 Apr 2022 00:04:25 +0800
-Message-Id: <20220419160425.4148-3-colyli@suse.de>
+Subject: [PATCH 1/2] bcache: put bch_bio_map() back to correct location in journal_write_unlocked()
+Date:   Wed, 20 Apr 2022 00:04:24 +0800
+Message-Id: <20220419160425.4148-2-colyli@suse.de>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220419160425.4148-1-colyli@suse.de>
 References: <20220419160425.4148-1-colyli@suse.de>
@@ -56,37 +56,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit abfc426d1b2f ("block: pass a block_device to bio_clone_fast")
-calls the modified bio_alloc_clone() in bcache code as:
-	bio_init_clone(bio->bi_bdev, bio, orig_bio, GFP_NOIO);
+Commit a7c50c940477 ("block: pass a block_device and opf to bio_reset")
+moves bch_bio_map() inside journal_write_unlocked() next to the location
+where the modified bio_reset() was called.
 
-But the first parameter is wrong, where bio->bi_bdev should be
-orig_bio->bi_bdev. The wrong bi_bdev panics the kernel when submitting
-cache bio.
+This change is wrong because calling bch_bio_map() immediately after
+bio_reset(), a BUG_ON(!bio->bi_iter.bi_size) inside bch_bio_map() will
+be triggered and panic the kernel.
 
-This patch fixes the wrong bdev parameter usage and avoid the panic.
+This patch puts bch_bio_map() back to its original correct location in
+journal_write_unlocked() and avoid the BUG_ON().
 
-Fixes: abfc426d1b2f ("block: pass a block_device to bio_clone_fast")
+Fixes: a7c50c940477 ("block: pass a block_device and opf to bio_reset")
 Signed-off-by: Coly Li <colyli@suse.de>
 Cc: Christoph Hellwig <hch@lst.de>
-Cc: Mike Snitzer <snitzer@redhat.com>
+Cc: Chaitanya Kulkarni <kch@nvidia.com>
 ---
- drivers/md/bcache/request.c | 2 +-
+ drivers/md/bcache/journal.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/md/bcache/request.c b/drivers/md/bcache/request.c
-index fdd0194f84dd..320fcdfef48e 100644
---- a/drivers/md/bcache/request.c
-+++ b/drivers/md/bcache/request.c
-@@ -685,7 +685,7 @@ static void do_bio_hook(struct search *s,
- {
- 	struct bio *bio = &s->bio.bio;
+diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
+index 7c2ca52ca3e4..df5347ea450b 100644
+--- a/drivers/md/bcache/journal.c
++++ b/drivers/md/bcache/journal.c
+@@ -771,12 +771,12 @@ static void journal_write_unlocked(struct closure *cl)
  
--	bio_init_clone(bio->bi_bdev, bio, orig_bio, GFP_NOIO);
-+	bio_init_clone(orig_bio->bi_bdev, bio, orig_bio, GFP_NOIO);
- 	/*
- 	 * bi_end_io can be set separately somewhere else, e.g. the
- 	 * variants in,
+ 		bio_reset(bio, ca->bdev, REQ_OP_WRITE | 
+ 			  REQ_SYNC | REQ_META | REQ_PREFLUSH | REQ_FUA);
+-		bch_bio_map(bio, w->data);
+ 		bio->bi_iter.bi_sector	= PTR_OFFSET(k, i);
+ 		bio->bi_iter.bi_size = sectors << 9;
+ 
+ 		bio->bi_end_io	= journal_write_endio;
+ 		bio->bi_private = w;
++		bch_bio_map(bio, w->data);
+ 
+ 		trace_bcache_journal_write(bio, w->data->keys);
+ 		bio_list_add(&list, bio);
 -- 
 2.34.1
 
