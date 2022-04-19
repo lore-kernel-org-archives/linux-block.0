@@ -2,155 +2,359 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F49C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 03:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E84E7C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 04:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346379AbiDSDZR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 18 Apr 2022 23:25:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47502 "EHLO
+        id S237490AbiDSE0J (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Apr 2022 00:26:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232721AbiDSDZQ (ORCPT
+        with ESMTP id S229483AbiDSE0J (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 18 Apr 2022 23:25:16 -0400
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2108.outbound.protection.outlook.com [40.107.117.108])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15DDF24974;
-        Mon, 18 Apr 2022 20:22:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EVTJ0OSNSGHBGIgTTT0FJvCGLG1HkpoMmEnxvfVSpqzHHEye2lQMFeXjzBEztDqg4veEhi2nDzNbzGnxkXrDZQlnStIvGLu3d6ecBdzCLjlFstPmSLJy4kLhwu0zwZhDleIMX6bd2TdQwJ9EXWHDFjq5J3qm26Pm49Qao3UMXycuogHt90ndInNtCHO1NjHKYPfe06cHfmsdhiNSc+//3VnWn057uNGGzFcQ6S3UTdXmPAkJKNcmPmh64tp2octBkg9+euU6SNcQ8GDrR1vpS/42KWcwZi7zcimXWPU0++z5MtophxwecEjjP/cpQGOkYJnH3/vN/x8dZQ+F+apLLw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vPufU/3c3D4WIa2W8KmD6j5ogA94uvlga5imJyah4wM=;
- b=Vj2kOxfuM7Dols/PUh72IVE8/bhikYHfO9p2HK0fAu/jcgwXiEKQusgU0rygfgcdC1t4UrYL6/vKjsnJXoybj853xoJao7p3zUM9ZRJ6f9haEz0qxWOZ8QrUwiw2+7gOXrSk4gJcikejNy+0F8tA6kI/KvK/rSdVXIN8lkl97HfT5ljfeVKVLL4PYWPtga4PtvW+wLY7cvE8qTEouGzuJxNbq2SvpFuG4v4MYTlbaWbd1HY7600efr+Yw4k5yeYnsazLoow3/PhS6Q3i2O68V2cC7pOzeZIffXw87EECWEdgq8pDfkDgFaEwPLe50fA3I0wDbyHKmtDgGkn/JLsd3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo0.onmicrosoft.com;
- s=selector2-vivo0-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vPufU/3c3D4WIa2W8KmD6j5ogA94uvlga5imJyah4wM=;
- b=pENgm9P+TV+IF6enQJvAus4tmFULuSQOHnHUBg+umxHNFVPjJsStz2+RfFLz+F+FVlZBGg3JDbH5FxQ5kzjGZusRmvVPPbzn+W30e+xei39BCpdHfbgf617Yh8oNb/hkKH/w39xASL+frwQvd1V83oRLpIPYgUle9IX+bDtokL4=
-Received: from KL1PR0601MB4003.apcprd06.prod.outlook.com (2603:1096:820:26::6)
- by SEYPR06MB5254.apcprd06.prod.outlook.com (2603:1096:101:86::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.19; Tue, 19 Apr
- 2022 03:22:32 +0000
-Received: from KL1PR0601MB4003.apcprd06.prod.outlook.com
- ([fe80::f0c7:9081:8b5a:7e7e]) by KL1PR0601MB4003.apcprd06.prod.outlook.com
- ([fe80::f0c7:9081:8b5a:7e7e%8]) with mapi id 15.20.5164.026; Tue, 19 Apr 2022
- 03:22:31 +0000
-From:   =?utf-8?B?5bi45Yek5qWg?= <changfengnan@vivo.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-CC:     "jaegeuk@kernel.org" <jaegeuk@kernel.org>,
-        "chao@kernel.org" <chao@kernel.org>,
-        "tytso@mit.edu" <tytso@mit.edu>,
-        "adilger.kernel@dilger.ca" <adilger.kernel@dilger.ca>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-ext4@vger.kernel.org" <linux-ext4@vger.kernel.org>,
-        "linux-f2fs-devel@lists.sourceforge.net" 
-        <linux-f2fs-devel@lists.sourceforge.net>
-Subject: RE: [PATCH 2/3] f2fs: notify when device not supprt inlinecrypt
-Thread-Topic: [PATCH 2/3] f2fs: notify when device not supprt inlinecrypt
-Thread-Index: AQHYUu45GoDAOd0+BUSILnKkLO2jc6z1RCGAgAABOZCAAPuzAIAATRAwgAAEZwCAAACpwA==
-Date:   Tue, 19 Apr 2022 03:22:31 +0000
-Message-ID: <KL1PR0601MB4003E83BD65B8381C030FAC3BBF29@KL1PR0601MB4003.apcprd06.prod.outlook.com>
-References: <20220418063312.63181-1-changfengnan@vivo.com>
- <20220418063312.63181-2-changfengnan@vivo.com>
- <Yl0RmUoZypbVmayj@sol.localdomain>
- <KL1PR0601MB400369725474F2A2DE647057BBF39@KL1PR0601MB4003.apcprd06.prod.outlook.com>
- <Yl3lxMnZ5teL+bkU@sol.localdomain>
- <KL1PR0601MB4003A659B51814320E156C35BBF29@KL1PR0601MB4003.apcprd06.prod.outlook.com>
- <Yl4qGkrfMT7FqbJj@sol.localdomain>
-In-Reply-To: <Yl4qGkrfMT7FqbJj@sol.localdomain>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5deaf085-5f65-455c-ee19-08da21b3d71d
-x-ms-traffictypediagnostic: SEYPR06MB5254:EE_
-x-microsoft-antispam-prvs: <SEYPR06MB5254633CF5A38C2BF12C1919BBF29@SEYPR06MB5254.apcprd06.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: IC5XtlboOySQlnDAtfEUo2wXqpwOechquHDWaz23vvkgkgazAbUGITJXnSCUdWAfsnQu/ps2v624PZf+NU6YiD/twwpgB0JQUhLT2RcJ2Cd1LOO7w3yh2tqKv996fH8SrLZnSNea2z6rS9Ttp5U+rFcONWLSuPMxNQl2uswgMO5EUrrDP06El6bDK8IHULUEqPOSKobaESXviMuDOeZ6SXxddtO2G9FWa8Yl74NI/weFitIbsGj9OzYkzregT6HKlpE1biAFlG6At3cUJO9D5Qcu2GMjjTW28CD9rBQq0eQ/1OONuzAlGcbugQfDekWr/EelDcas9nKwiWGL0q8PP+NBghxptC19JyXv6nadKFN6fwlmSgN1HL4sO2NUQM8C1hujUoQ/nyew6pK5bRpGSX2kY66NvJEL0pMp1vYR9J99eiD8sZkPJOcxZ9uq44Y7+H1YOlZOghcsCWN8zKqgwX0mVQIMnQdmN3Bkejo0cupOnHGYnkSyczSCbKA//W13BiRfqvM+IKJpp/kdbs5/spklvA00rK9ZzV4jPuRLny2Ky8C/mSzQMXjcRxd/Iezr0L/LdMc41VBcHMnYsJwE65ajjdJjqc/WgwQLWvuPGxWfLByPwK+fcUNIgNE7Hzw/qlmwIJeVYfT0bRaOG73r+40vYBxByTzx/I81NHW8AoEz63YqXB08FWTfI+A3xP7Ded5mDzynH0/XLPK/LJjMMHq3Kbly1RRWRlMCblaXaI1bZvFMc4vQgJjNLYiT5W4OrefWQjTK2QmJDaZ4HjTrdgAJLLejPofpFsSoAGuzXgM=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1PR0601MB4003.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(66556008)(66446008)(966005)(52536014)(33656002)(64756008)(38070700005)(8936002)(66476007)(4326008)(26005)(186003)(55016003)(53546011)(86362001)(8676002)(71200400001)(6916009)(2906002)(508600001)(9686003)(4744005)(66946007)(85182001)(122000001)(76116006)(316002)(54906003)(83380400001)(38100700002)(5660300002)(6506007)(7696005);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Vm8xUUlEVmo2T2FXSlJieTBqelBOZGVRWElPUmpIdm5TdnhFWVh0NTdJN0VP?=
- =?utf-8?B?N2x1RnVMK0EvRU1lbkxOZDNNMFdqTFRVQVF6dEpCN3JncjQzZ3AyQmIzbzV5?=
- =?utf-8?B?OEZPWkZxdXBvQkw0blR1Q3VuUCsrQW9odkRkRXl1cEVuR25NWEZLeWcrY2pB?=
- =?utf-8?B?VUxrb0VsaG94YTZac2w2SXlOMzNURkdWOFd5MXgwRGxYSlhlRVlpckNTNmR1?=
- =?utf-8?B?S2Q1emVhd1ZQODN5L2ZiMy84TDh6KzJGQnNvdHQwZk1CK1FDbUp3d21oMHJs?=
- =?utf-8?B?amJ0Mnc1V3pibm1DZTJsQ1JuUmJZSlZROVpoWFNwdVRwUDRTVlNUK3dLU2ho?=
- =?utf-8?B?eDM3eGxNSWFDYnZWKzJLOVVISW1HSHErQkhRby9DN2ZZNEdSRHQ1WGVzeGxC?=
- =?utf-8?B?MzRUU3lYWXdCWFdKa0YzYllrbmdYUFJBaDNOb0czemV4WHRKaXNrSEVGOEdF?=
- =?utf-8?B?bXJ3YjcrK0VJZW1RQUZZVzE3V3JwOTVCZ0VFR1BOZEY3N0Q0SkJVTmRiTW9k?=
- =?utf-8?B?M0hhZ3JwcDhMLzB3bFovZzFtMEdQZm01bEtDb3c5bXhFcDVtUk9JcFdiaE16?=
- =?utf-8?B?VVhiQ1NHY1cxTlJ5SWNFU0I4VktzR3ZIQTdqckJuYXQzVXhXMHZ0cElSQXZB?=
- =?utf-8?B?TFdHV2dNdXJpV2Z0LzBIekU2TEo5bHkyemRBWDJqN3lXRkx1RThDaDdST0g3?=
- =?utf-8?B?RG9WbStFZVBHTDJEV3ZQRkNOdURldnRuMzJZVnBZUS95RkNSYmN4UHB0QlRm?=
- =?utf-8?B?b0NRa00xVE9hcnh3RTJZblMwTGpWVWVhOGw4cFd4anljcWNIMHgvUk1tazEz?=
- =?utf-8?B?ckhqZXlCY29yUE5vcVZNaElpdDF5aEVjd3o1VW5VaE9Gc0hYZW9NK1R5TXZN?=
- =?utf-8?B?SnNTK1o5UGt1WGlaeHZiMUVNUTNiS3hvSk1UZVhBeFJubE9icFV0NzRqQXY4?=
- =?utf-8?B?ZGIrN0FvV0JqeDVEWVE4MFNNRGQvdW5KdW1LSzNpbEpDOTNBTlZ2MVFzUEdh?=
- =?utf-8?B?MXlDWEs2eEtUWUMvL1QvZ2dZRVdKdXpDUko5anpBNmJOdmxITXV5cWVDa0dM?=
- =?utf-8?B?OVlyeFdqTXhESDFicVovUTlYbUJWRHBXZ0xSOE9QM2xWeFRuRHRacFFqMSti?=
- =?utf-8?B?SkhqUXJhK2dEVkpKbjROVkg1bHFYU1JJeVNMeThxazdJRXNRUU51RlYwZnk5?=
- =?utf-8?B?UWhRRGo4b1RuWkI0Mk1CMDczZ1M2QlZHUnRCWGtZR04rb01QcHpBdGV6QVQ1?=
- =?utf-8?B?TEVpWFdxc050cHdzZ0YxbTBGZVJvUWt0c2JoSEdqcys1aXltT1I0NW5FTWNm?=
- =?utf-8?B?WlVDMkRMb0JsZEdTdE1sRGxFQ3FjV21Dek1LY2ZLcDV5MUtNL1VLWjRic1lk?=
- =?utf-8?B?ZFlidms2N3UwVUFBK1dOODd0dmcyOXZGa0lzUDR3amY3K0xVUDRvdTBzUFpi?=
- =?utf-8?B?eE9UN0lSTGwvU3doQ0Q2NVY5WjZ6OUMwbndkV1BQTDNSSnE4NUhGWmtiUnJx?=
- =?utf-8?B?TENBTEJYYW9IcUhVNzNFS1JwamtyRnBkOEZqdWhYOFh5MGYxZ1F3NnpnaUYv?=
- =?utf-8?B?ZzdMTmdjMW1EWHVpMTZoaTdxVjd4aUU1am5hUHZtMlZWY2tqd2pBUTlmWldZ?=
- =?utf-8?B?VU9nV3F0b1VEY0YwRk1BQXV3UkZ5T0M1NmRSUmYzMmdMclJvZlNOditjN0RC?=
- =?utf-8?B?dWVVN1FDTEV0U21FMG1VUmdLcjNxWEdsL1A4WndsU3NkRGdXbVBJZ3B1ei9x?=
- =?utf-8?B?dkVuTWFPNVdkSUZOM1k2cWlvSmxOQnpTTVV1MlBSSitSOHN5Z2lqSUI1K0JR?=
- =?utf-8?B?aEoxUVdvL29nbGQvKyt6bHRaV3BubXFKVlpNbEpCb05JSHhQRW90UG55NUJW?=
- =?utf-8?B?UTkzREZ2YUR6UUFjaVpuSmIzemlsZWt0QUFQclFWM3NRUDRlQWs5VWxLd3Jj?=
- =?utf-8?B?ZitrT2tjb0lnQWRlRmc3QmdpY1dSMVZjLzBtRk52RGZEYmJodUNsOWtreHJP?=
- =?utf-8?B?VnZWSFFKTDhidHdJcVdPL3BBenNYbUl1blZkdEdjMFJDYW16YUlNQ1RMOFQ5?=
- =?utf-8?B?ekI1WkFZdHZ2cWhiZ1ArWllnZGh3eVdJUnczdEJZQzNLTHlhWU5QaUREaDQr?=
- =?utf-8?B?dGZjT2NJMklJZFloY1RiZGRyZEhiV0NyWjNLUlRwVDBaT2Q0YnJNSFFJRFlo?=
- =?utf-8?B?b1AzQXorUnhPRzl3aDJOS0NEU0YrOXNLSTF5Y3hjRVJRQjNTelQwS0I2dWlK?=
- =?utf-8?B?WFc0TFI5U1ducERkbjJwUkZ0b2xZZXRsRmxLeTZ0SndsQjZXRnJ1VG85VXFh?=
- =?utf-8?B?TTFkUTFXNk5yUUlmdG1TRWlUbEliN1BSakcwV3Fsd1dVMkNjRXJPdz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+        Tue, 19 Apr 2022 00:26:09 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319F020F61
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 21:23:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1650342206; x=1681878206;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=h2sKctrxRnb5Wul/X1SYvQAAuX2xq2d93wu8H86cs4w=;
+  b=E6ufseDCrm1tiD6B7K5K3TkIgwdYCYge/EOE5xvQ0+H+u8R2QfW21TCs
+   kKh2s1w7+Gyw4Bg/qvLMQN+9c58StX3R+ncY/OHHkpqldsBwPe1i8e5m0
+   5ziuAYkwtmfgIzdsrk4n3E7CuNG6mKLgzHv9SyHyHIyUhSYjkZwYFW19B
+   mx6o/DQeIQo3J7J9Myfbskw4dCBOzrUtYU9ONQ3mB8ecdNhwrUcroMHaE
+   CBmMZRAanA/0p2gVCzbOofAy0Cz9RaiNT6H2OqQ3ulUII/1x0dIUNHH9E
+   7/IMvT2mLra/ngc0Nfb+hhIOdaWrwH0YCjdtu64IRWNqZl01zGd9JpZrw
+   w==;
+X-IronPort-AV: E=Sophos;i="5.90,271,1643644800"; 
+   d="scan'208";a="197087163"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 Apr 2022 12:23:25 +0800
+IronPort-SDR: izdcClDewhXYz3kC1/Ae9d/074KPaX3JtFrkik60717buEysQumu9r8RMUbcT1t/X7J6T41SPu
+ lFWCRPJLzdLK0ySNwQ01GinyIXhVD33hx8oc19Wp6+OUeqZAD1muAaIwGIoL4c4tUIVTo+QHYU
+ 8QCTWYl9LJGK/IH0Mz61VsFPiO42IDSnbXF09guGv8Zi4n80YKTkeAL6eWZyu15Z0khRGrVqKx
+ GhmMa54i6B8i0EaUBpWZT44vPuBdn3KZuDQrBx5ORRDobHiLqenCPHmIiD7kjJi2xo7ZJtdEuC
+ QHdUOx7hsC98OOYMc3sdNlge
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Apr 2022 20:54:31 -0700
+IronPort-SDR: StfS2+hgwHLTSaZi5zPvQ0sPYFWyEf3lt5TdHGuUOKrUp5xVgpSu/I4mi1BN/us1TMEjm9BhGi
+ cZTPfNBxR9t6hutoB17LUu5/1M7YKwwa4DtX1wX3xkbiFlrRNiIMTxPpSi+T5q27H8TxLfeCAj
+ sor1AyHKK5LNWxiD4P3XmDUy4GtRZ1X07RZ/IqIR7tUlGV/a00QCn6WKA4vH2GSYokIZZbLnW5
+ V+spC4+wSatToyA++L679KOyKA14cyAClkFVVzca5czwn1GuTr6yga7WSbnb0IwccoB3pyjE78
+ X64=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Apr 2022 21:23:25 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Kj9f50ctLz1Rwrw
+        for <linux-block@vger.kernel.org>; Mon, 18 Apr 2022 21:23:25 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1650342204; x=1652934205; bh=h2sKctrxRnb5Wul/X1SYvQAAuX2xq2d93wu
+        8H86cs4w=; b=HGeJ7hkp+9mEZk+J33cwAeSCjp6mkJ2GT8hnrn8mtISM9ySHz0V
+        GSn/pwYF43jQAnswEFlyOaCsT5WPh4LKCRN37mB5pRorTRWt3WA+T3PCYaX8yftP
+        fVm28ZnsIqrlVVFvCvd74xmYH39CmJH6Ikc4p8d27mCM8v08THcgt4yzzF8d/wz6
+        bWongLwq+vylCReAnBb7djNAhWw3cFVezoOShI034tYiRb35v3f0zQHvia9AAmb2
+        Rg1Xb+9IqN5GhQYnLblEUbTJDGO/tyewUxvk1yiGIOAm+gyukX6wBYOIRcIWUXLO
+        BNsYpd8gSp3rAsFXTH5pm+eULHK7LV4ighg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id g2Q9Ste6tMGB for <linux-block@vger.kernel.org>;
+        Mon, 18 Apr 2022 21:23:24 -0700 (PDT)
+Received: from [10.225.163.14] (unknown [10.225.163.14])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kj9f32szlz1Rvlx;
+        Mon, 18 Apr 2022 21:23:23 -0700 (PDT)
+Message-ID: <c5418ac1-460f-348f-d7a3-d7c3a1aaad71@opensource.wdc.com>
+Date:   Tue, 19 Apr 2022 13:23:22 +0900
 MIME-Version: 1.0
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: KL1PR0601MB4003.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5deaf085-5f65-455c-ee19-08da21b3d71d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Apr 2022 03:22:31.2503
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: bJNdVwB7GmKRpLtPqdvhMDJD+O5SUgzUreaHyZAYcR4K1K1EWtog+xVrkBmcQFpWWZfTyb0zz5w7SODIrvINVg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEYPR06MB5254
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: Nullblk configfs oddities
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>
+References: <Yl3aQQtPQvkskXcP@localhost.localdomain>
+ <c7f02531-8637-89a2-d8b7-1da03240db73@nvidia.com>
+ <b1fcc3dc-71a5-4a07-8f18-75f5e6cd7153@kernel.dk>
+ <827699fb-e21b-2cad-6a6d-0a21c49f444e@nvidia.com>
+ <bc93d84b-3c10-07ed-5203-9eba485fb108@kernel.dk>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <bc93d84b-3c10-07ed-5203-9eba485fb108@kernel.dk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBFcmljIEJpZ2dlcnMgPGViaWdn
-ZXJzQGtlcm5lbC5vcmc+DQo+IFNlbnQ6IFR1ZXNkYXksIEFwcmlsIDE5LCAyMDIyIDExOjE5IEFN
-DQo+IFRvOiDluLjlh6TmpaAgPGNoYW5nZmVuZ25hbkB2aXZvLmNvbT4NCj4gQ2M6IGphZWdldWtA
-a2VybmVsLm9yZzsgY2hhb0BrZXJuZWwub3JnOyB0eXRzb0BtaXQuZWR1Ow0KPiBhZGlsZ2VyLmtl
-cm5lbEBkaWxnZXIuY2E7IGF4Ym9lQGtlcm5lbC5kazsgbGludXgtYmxvY2tAdmdlci5rZXJuZWwu
-b3JnOw0KPiBsaW51eC1leHQ0QHZnZXIua2VybmVsLm9yZzsgbGludXgtZjJmcy1kZXZlbEBsaXN0
-cy5zb3VyY2Vmb3JnZS5uZXQNCj4gU3ViamVjdDogUmU6IFtQQVRDSCAyLzNdIGYyZnM6IG5vdGlm
-eSB3aGVuIGRldmljZSBub3Qgc3VwcHJ0IGlubGluZWNyeXB0DQo+IA0KPiBPbiBUdWUsIEFwciAx
-OSwgMjAyMiBhdCAwMzoxNDo1MUFNICswMDAwLCDluLjlh6TmpaAgd3JvdGU6DQo+ID4NCj4gPiBU
-aGFua3MgZm9yIHlvdXIgZXhwbGFuYXRpb24sIHRoaXMgcGF0Y2hzZXQgaGFzIHRvbyBtYW55IGNh
-c2UgdG8gZm9yZ2V0IHRvDQo+IGhhbmRsZS4uLg0KPiA+IEJhY2sgdG8gbXkgZmlyc3QgdGhvdWdo
-dCwgbWF5YmUgdGhlcmUgc2hvdWxkIGhhdmUgb25lIHN5c2ZzIG5vZGUgdG8NCj4gPiBpbmRpY2F0
-ZSB0aGUgZGV2aWNlIHN1cHBvcnQgaW5saW5lY3J5cHQgb3Igbm90ID8gU28gdXNlciBjYW4ga25v
-dyBpdCdzDQo+ID4gZGV2aWNlIG5vdCBzdXBwb3J0IGlubGluZWNyeXB0IGFuZCBub3QgZm9yIG90
-aGVyIHJlYXNvbnMuDQo+ID4NCj4gDQo+IExpbnV4IHY1LjE4IGhhcyB0aGF0LiAgU2VlIGh0dHBz
-Oi8vZ2l0Lmtlcm5lbC5vcmcvbGludXMvMjBmMDFmMTYzMjAzNjY2MA0KPiAoImJsay1jcnlwdG86
-IHNob3cgY3J5cHRvIGNhcGFiaWxpdGllcyBpbiBzeXNmcyIpLg0KT2gsIEkgc2VlLCB0aGFua3Mg
-YSBsb3QuIA0KDQo+IA0KPiAtIEVyaWMNCg==
+On 4/19/22 07:24, Jens Axboe wrote:
+> On 4/18/22 4:21 PM, Chaitanya Kulkarni wrote:
+>> On 4/18/22 15:14, Jens Axboe wrote:
+>>> On 4/18/22 3:54 PM, Chaitanya Kulkarni wrote:
+>>>> On 4/18/22 14:38, Josef Bacik wrote:
+>>>>> Hello,
+>>>>>
+>>>>> I'm trying to add a test to fsperf and it requires the use of nullblk.  I'm
+>>>>> trying to use the configfs thing, and it's doing some odd things.  My basic
+>>>>> reproducer is
+>>>>>
+>>>>> modprobe null_blk
+>>>>> mkdir /sys/kernel/config/nullb/nullb0
+>>>>> echo some shit into the config
+>>>>> echo 1 > /sys/kernel/config/nullb/nullb0/power
+>>>>>
+>>>>> Now null_blk apparently defaults to nr_devices == 1, so it creates nullb0 on
+>>>>> modprobe.  But this doesn't show up in the configfs directory.  There's no way
+>>>>> to find this out until when I try to mkfs my nullb0 and it doesn't work.  The
+>>>>> above steps gets my device created at /dev/nullb1, but there's no actual way to
+>>>>> figure out that's what happened.  If I do something like
+>>>>> /sys/kernel/config/nullb/nullbfsperf I still just get nullb<number>, I don't get
+>>>>> my fancy name.
+>>>>>
+>>>>
+>>>> when you load module with default module parameter it will create a
+>>>> default device with no memory backed mode, that will not be visible in
+>>>> the configfs.
+>>>
+>>> Right, the problem is really that pre-configured devices (via nr_devices
+>>> being bigger than 0, which is the default) don't show up in configfs.
+>>> That, to me, is the real issue here, because it means you need to know
+>>> which ones are already setup before doing mkdir for a new one.
+>>>
+>>> On top of that, it's also odd that they don't show up there to begin
+>>> with.
+>>>
+>>
+>> it is indeed confusing, maybe we need to find a way to populate the
+>> configfs when loading the module? but I'm not sure if that is
+>> the right approach since configs ideally should be populated by
+>> user.
+>>
+>> OTOH we can make the memory_backed module param [1] so user can
+>> tentatively not use configfs and only rely on default configuration ?
+> 
+> Arguably configfs should just be disabled if loading with nr_devices
+> larger than 0, as it's a mess of an API as it stands. But probably too
+> late for that. The fact that we also have an option that's specific to
+> configfs just makes it even worse.
+> 
+> I don't know much about configfs, but pre-populating with the configured
+> devices and options would be ideal and completely solve this. I think
+> that would be the best solution given the current situation. Not that
+> it's THAT important, null_blk is a developer tool and as such can have
+> some sharper and rouger edges. Still would be nice to make it saner,
+> though.
+> 
+
+I came up with this. It does prepopulate configfs nullb directory with the
+devices created on modprobe. But... doing an rmmod now always gives a
+"rmmod: ERROR: Module null_blk is in use" because configfs takes a ref on
+nullblk module for each entry. So the user now must do an rmdir of all
+prepopulated devices before doing rmmod. Not ideal. And messing up with
+the module references is probably not a good idea...
+
+
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 1aa4897685f6..98933555b59f 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -9,6 +9,7 @@
+ #include <linux/sched.h>
+ #include <linux/fs.h>
+ #include <linux/init.h>
++#include <linux/namei.h>
+ #include "null_blk.h"
+
+ #define FREE_BATCH		16
+@@ -667,6 +668,7 @@ static void null_free_dev(struct nullb_device *dev)
+
+ 	null_free_zoned_dev(dev);
+ 	badblocks_exit(&dev->badblocks);
++	kfree(dev->config_path);
+ 	kfree(dev);
+ }
+
+@@ -2088,12 +2090,121 @@ static int null_add_dev(struct nullb_device *dev)
+ 	return rv;
+ }
+
++#ifdef CONFIG_CONFIGFS_FS
++
++static int nullb_create_dev(int idx)
++{
++	char disk_name[DISK_NAME_LEN];
++	struct nullb_device *dev;
++	struct config_item *item;
++	struct dentry *dentry;
++	struct path parent;
++	const char *path;
++	int ret;
++
++	/* Use configfs to allocate the device */
++	sprintf(disk_name, "nullb%d", idx);
++	path = kasprintf(GFP_KERNEL, "/sys/kernel/config/nullb/%s", disk_name);
++	if (!path)
++		return -ENOMEM;
++
++	dentry = kern_path_create(AT_FDCWD, path, &parent, LOOKUP_DIRECTORY);
++	if (IS_ERR(dentry)) {
++		ret = PTR_ERR(dentry);
++		goto free;
++	}
++
++	ret = vfs_mkdir(mnt_user_ns(parent.mnt), d_inode(parent.dentry),
++			dentry, 0755);
++	if (ret)
++		goto done;
++
++	/* Start the device */
++	item = config_group_find_item(&nullb_subsys.su_group, disk_name);
++	if (!item) {
++		pr_err("Device %s not powered up\n", disk_name);
++		goto done;
++	}
++
++	dev = to_nullb_device(item);
++	set_bit(NULLB_DEV_FL_UP, &dev->flags);
++	ret = null_add_dev(dev);
++	if (ret) {
++		clear_bit(NULLB_DEV_FL_UP, &dev->flags);
++		goto put;
++	}
++
++	set_bit(NULLB_DEV_FL_CONFIGURED, &dev->flags);
++	dev->power = true;
++	dev->config_path = path;
++	path = NULL;
++
++put:
++	config_item_put(item);
++done:
++	done_path_create(&parent, dentry);
++free:
++	kfree(path);
++
++	return ret;
++}
++
++static void nullb_destroy_dev(struct nullb *nullb)
++{
++	struct nullb_device *dev = nullb->dev;
++	struct dentry *dentry;
++	struct path parent;
++
++	dentry = kern_path_create(AT_FDCWD, dev->config_path, &parent,
+LOOKUP_DIRECTORY);
++	if (IS_ERR(dentry)) {
++		pr_err("Lookup %s failed %ld\n",
++		       dev->config_path, PTR_ERR(dentry));
++		return;
++	}
++
++	if (d_really_is_positive(dentry)) {
++		vfs_rmdir(mnt_user_ns(parent.mnt), d_inode(parent.dentry),
++			  dentry);
++		dput(dentry);
++	}
++
++	done_path_create(&parent, dentry);
++}
++
++#else
++
++static int nullb_create_dev(int idx)
++{
++	struct nullb_device *dev;
++
++	dev = null_alloc_dev();
++	if (!dev)
++		return -ENOMEM;
++
++	ret = null_add_dev(dev);
++	if (ret) {
++		null_free_dev(dev);
++		return ret;
++	}
++
++	return 0;
++}
++
++static int nullb_destroy_dev(struct nullb *nullb)
++{
++	struct nullb_device *dev = nullb->dev;
++
++	null_del_dev(nullb);
++	null_free_dev(dev);
++}
++
++#endif
++
+ static int __init null_init(void)
+ {
+ 	int ret = 0;
+ 	unsigned int i;
+ 	struct nullb *nullb;
+-	struct nullb_device *dev;
+
+ 	if (g_bs > PAGE_SIZE) {
+ 		pr_warn("invalid block size\n");
+@@ -2151,16 +2262,9 @@ static int __init null_init(void)
+ 	}
+
+ 	for (i = 0; i < nr_devices; i++) {
+-		dev = null_alloc_dev();
+-		if (!dev) {
+-			ret = -ENOMEM;
+-			goto err_dev;
+-		}
+-		ret = null_add_dev(dev);
+-		if (ret) {
+-			null_free_dev(dev);
++		ret = nullb_create_dev(i);
++		if (ret)
+ 			goto err_dev;
+-		}
+ 	}
+
+ 	pr_info("module loaded\n");
+@@ -2169,9 +2273,7 @@ static int __init null_init(void)
+ err_dev:
+ 	while (!list_empty(&nullb_list)) {
+ 		nullb = list_entry(nullb_list.next, struct nullb, list);
+-		dev = nullb->dev;
+-		null_del_dev(nullb);
+-		null_free_dev(dev);
++		nullb_destroy_dev(nullb);
+ 	}
+ 	unregister_blkdev(null_major, "nullb");
+ err_conf:
+diff --git a/drivers/block/null_blk/null_blk.h
+b/drivers/block/null_blk/null_blk.h
+index 78eb56b0ca55..ecdc22e74d35 100644
+--- a/drivers/block/null_blk/null_blk.h
++++ b/drivers/block/null_blk/null_blk.h
+@@ -61,6 +61,7 @@ struct nullb_zone {
+ struct nullb_device {
+ 	struct nullb *nullb;
+ 	struct config_item item;
++	const char *config_path;
+ 	struct radix_tree_root data; /* data stored in the disk */
+ 	struct radix_tree_root cache; /* disk cache data */
+ 	unsigned long flags; /* device flags */
+
+
+
+-- 
+Damien Le Moal
+Western Digital Research
