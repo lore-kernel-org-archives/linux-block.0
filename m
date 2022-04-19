@@ -2,80 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE4EDC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 05:39:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F93AC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 19 Apr 2022 06:33:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232577AbiDSFmK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Apr 2022 01:42:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55642 "EHLO
+        id S1348854AbiDSGft (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Apr 2022 02:35:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbiDSFmJ (ORCPT
+        with ESMTP id S237280AbiDSGfs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Apr 2022 01:42:09 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B322527FF0;
-        Mon, 18 Apr 2022 22:39:27 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 4D68068AFE; Tue, 19 Apr 2022 07:39:24 +0200 (CEST)
-Date:   Tue, 19 Apr 2022 07:39:24 +0200
+        Tue, 19 Apr 2022 02:35:48 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50B712611F;
+        Mon, 18 Apr 2022 23:33:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=mEA1zORyqfjRljCelmq6ahOxZI2mvs8e/1u/HcZHz7U=; b=U7ChaIlKYTEonM+tjnN7rHqR5p
+        5xPHaPXk2u8Fw9c5yuZttueYYbSPKQ5xjohcy/myxDrutZ+xpeDQEHaHtR4ToW111+ApMh2yI7Odi
+        CSONfAWo6Ww2cSv+rZlZRTYnILU3ELOsr5XBrV1h6KS4Gt5e2d3p9T6aZOXJYTbbW80zGeRHWLSjG
+        pIJqyvsprBIW8fx7ydV0cssYfQuounv4ze021cHhie6PYbJlc3yyOOLA7/Sui7lq+Ba4D95h0lwCp
+        xph1m/1QRa8x6kCPZ3RTBLOUWrD8duQr1t+ADEZnRAM54PWMzbiZTt1HT63S1PLngfYrMIBRkKh/c
+        p+3q0EMg==;
+Received: from [2001:4bb8:191:364b:8ef6:df8:5a60:ae5d] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nghQ9-001hyv-9l; Tue, 19 Apr 2022 06:33:05 +0000
 From:   Christoph Hellwig <hch@lst.de>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: avoid io timeout in case of sync polled dio
-Message-ID: <20220419053924.GA31720@lst.de>
-References: <20220415034703.2081695-1-ming.lei@redhat.com> <20220415051844.GA22762@lst.de> <YllQVT6n472eUB7+@T590> <20220416054913.GA7405@lst.de> <YlqGZ7W9rg0eNt9A@T590> <20220418051234.GA3559@lst.de> <Yl0e/YBPGydwVAE7@T590>
+To:     Jens Axboe <axboe@kernel.dk>, "Theodore Ts'o" <tytso@mit.edu>
+Cc:     linux-block@vger.kernel.org, linux-spdx@vger.kernel.org
+Subject: SPDX tag and top of file comment cleanups for the loop driver
+Date:   Tue, 19 Apr 2022 08:32:59 +0200
+Message-Id: <20220419063303.583106-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yl0e/YBPGydwVAE7@T590>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 18, 2022 at 04:19:09PM +0800, Ming Lei wrote:
-> But there isn't any such users from module now. Maybe never, since sync
-> polled dio becomes legacy after io_uring is invented.
+Hi Jens, hi Ted,
 
-I thought about that a bit, but if we decided synchronous polled I/O
-is not in major user anymore (which I think) and we think it is enough
-of a burden to support (which I'm not sure of, but this patch points to)
-then it might be time to remove it.
+the loop driver still had no SPDX tag, so this series cleans up some
+lose ends and fixes that up.
 
-> Do we have such potential use case in which explicit flush plug is
-> needed except for polled io in __blkdev_direct_IO_simple() and swap_readpage()?
-> 
-> If there is, I am happy to add one flag for bypassing plug in blk core
-> code.
-
-I think the point is that we need to offer sensible APIs for I/O
-methods we want to support.
-
-> > 
-> > > iomap is one good example to show this point, since it does flush the plug
-> > > before call bio_poll(), see __iomap_dio_rw().
-> > 
-> > iomap does not do a manual plug flush anywhere.
-> > 
-> > iomap does finish the plug before polling, which makes sense.
-> > 
-> > Now of course __blkdev_direct_IO_simple doesn't even use a plug
-> > to start with, so I'm wondering what plug this patch even tries
-> > to flush?
->  
-> At least blkdev_write_iter(), and __swap_writepage() might call
-> into ->direct_IO with one plug too.
-> 
-> Not mention loop driver can call into ->direct_IO directly, and we
-> should have applied plug for batching submission in loop_process_work().
-
-The loop driver still calls through the read/write iter method, and
-the swap code ->direct_IO path is not used for block devices (and
-completley broken right now, see the patch series from Neil).
-
-But the loop driver is a good point, even for the iomap case as the
-blk_finish_plug would only flush the plug that is on-stack in
-__iomap_dio_rw, it would not help you with any plug holder by caller
-higher in the stack.
+Ted, does the SPDX tag match your original licensing decision back then,
+or do we need to correct it?  Does the auto-converted tag on the loop.h
+SPDX header (GPL1.0 or later with syscall exception) make sense, or
+should that have been GPL2 only with syscall exception?
