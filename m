@@ -2,181 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F40BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 14:31:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60131C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 14:54:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379468AbiDTOeY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 10:34:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35750 "EHLO
+        id S1379755AbiDTO5L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 10:57:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348369AbiDTOeX (ORCPT
+        with ESMTP id S236824AbiDTO5L (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 10:34:23 -0400
+        Wed, 20 Apr 2022 10:57:11 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B065733A00
-        for <linux-block@vger.kernel.org>; Wed, 20 Apr 2022 07:31:36 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 189C11EEC9
+        for <linux-block@vger.kernel.org>; Wed, 20 Apr 2022 07:54:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650465095;
+        s=mimecast20190719; t=1650466464;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=I7T6uNrxtdMv6Jk9B2TNgRBUsej61OwrtET1tcadZAw=;
-        b=d17WWx1vnrXShPxIzd4PlfVK3K8tNJtM0XpFFc1Lj8C9hJwrcawWR8JKuNfI8B0cnMsV18
-        APPkbcLHh7qndvVnJtmrDYK8tcXEya6U/N3toEbnYVTnnHktjqcC1iM1Y+YKSIkz8DiZAb
-        C0w+Rg4PLRpxaEafQy6Z0B0daYLYZm0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=mZjsCa5DWmSw7wQX/1kGElLyptDOSI/bENhlaa110to=;
+        b=bfv1++wG5mF0KJQqD003LQDPmydHTvkSEEudhdLlM6rb0MGTcMXhxR9dLEZ8y/1HCPWI+/
+        4iZOEETjvj/jH2KZZXEfrT8Rp8GIfXuXs/B8crztE1QeGmuTg1ix7i53CSfaWGbG/t/dJM
+        HyaBp/fytr1tSmY5J5hdZ02AdhJ+jAE=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-634-sopYKkH1O7a55SH0zeFU0Q-1; Wed, 20 Apr 2022 10:31:34 -0400
-X-MC-Unique: sopYKkH1O7a55SH0zeFU0Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+ us-mta-104-3W6PvLbqNz-KpSL3KWsmMg-1; Wed, 20 Apr 2022 10:54:22 -0400
+X-MC-Unique: 3W6PvLbqNz-KpSL3KWsmMg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2DB0B8517E7;
-        Wed, 20 Apr 2022 14:31:18 +0000 (UTC)
-Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 464B854CE2F;
-        Wed, 20 Apr 2022 14:31:16 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
-Date:   Wed, 20 Apr 2022 22:31:10 +0800
-Message-Id: <20220420143110.2679002-1-ming.lei@redhat.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CE3C029AA3BD;
+        Wed, 20 Apr 2022 14:54:21 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.99])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id B4D7C2166B44;
+        Wed, 20 Apr 2022 14:54:13 +0000 (UTC)
+Date:   Wed, 20 Apr 2022 16:54:11 +0200
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Chaitanya Kulkarni <kch@nvidia.com>
+Cc:     mst@redhat.com, jasowang@redhat.com, pbonzini@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org
+Subject: Re: [PATCH 1/4] virtio-blk: remove additional check in fast path
+Message-ID: <YmAekwHPRy8sfaEs@stefanha-x1.localdomain>
+References: <20220420041053.7927-1-kch@nvidia.com>
+ <20220420041053.7927-2-kch@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="WNcOvVsFLKxLTK9e"
+Content-Disposition: inline
+In-Reply-To: <20220420041053.7927-2-kch@nvidia.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So far bio is marked as REQ_POLLED if RWF_HIPRI/IOCB_HIPRI is passed
-from userspace sync io interface, then block layer tries to poll until
-the bio is completed. But the current implementation calls
-blk_io_schedule() if bio_poll() returns 0, and this way causes io hang or
-timeout easily.
 
-But looks no one reports this kind of issue, which should have been
-triggered in normal io poll sanity test or blktests block/007 as
-observed by Changhui, that means it is very likely that no one uses it
-or no one cares it.
+--WNcOvVsFLKxLTK9e
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Also after io_uring is invented, io poll for sync dio becomes legacy
-interface.
+On Tue, Apr 19, 2022 at 09:10:50PM -0700, Chaitanya Kulkarni wrote:
+> The function virtblk_setup_cmd() calls
+> virtblk_setup_discard_write_zeroes() once we process the block layer
+> request operation setup in the switch. Even though it saves duplicate
+> call for REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES it adds additional check
+> in the fast path that is redundent since we already have a switch case
+> for both REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES.
+>=20
+> Move the call virtblk_setup_discard_write_zeroes() into switch case
+> label of REQ_OP_DISCARD and REQ_OP_WRITE_ZEROES and avoid duplicate
+> branch in the fast path.
+>=20
+> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+> ---
+>  drivers/block/virtio_blk.c | 9 ++++-----
+>  1 file changed, 4 insertions(+), 5 deletions(-)
 
-So ignore RWF_HIPRI hint for sync dio.
+Is there data that shows the performance effect of moving the code out
+of the fast path?
 
-CC: linux-mm@kvack.org
-Cc: linux-xfs@vger.kernel.org
-Reported-by: Changhui Zhong <czhong@redhat.com>
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
-V2:
-	- avoid to break io_uring async polling as pointed by Chritoph
+> diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> index 6ccf15253dee..b77711e73422 100644
+> --- a/drivers/block/virtio_blk.c
+> +++ b/drivers/block/virtio_blk.c
+> @@ -223,10 +223,14 @@ static blk_status_t virtblk_setup_cmd(struct virtio=
+_device *vdev,
+>  		break;
+>  	case REQ_OP_DISCARD:
+>  		type =3D VIRTIO_BLK_T_DISCARD;
+> +		if (virtblk_setup_discard_write_zeroes(req, unmap))
 
- block/fops.c         | 22 +---------------------
- fs/iomap/direct-io.c |  7 +++----
- mm/page_io.c         |  4 +---
- 3 files changed, 5 insertions(+), 28 deletions(-)
+unmap is never true here. The variable obscures what is going on:
 
-diff --git a/block/fops.c b/block/fops.c
-index e3643362c244..b9b83030e0df 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -44,14 +44,6 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
- 
- #define DIO_INLINE_BIO_VECS 4
- 
--static void blkdev_bio_end_io_simple(struct bio *bio)
--{
--	struct task_struct *waiter = bio->bi_private;
--
--	WRITE_ONCE(bio->bi_private, NULL);
--	blk_wake_io_task(waiter);
--}
--
- static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
- 		struct iov_iter *iter, unsigned int nr_pages)
- {
-@@ -83,8 +75,6 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
- 		bio_init(&bio, bdev, vecs, nr_pages, dio_bio_write_op(iocb));
- 	}
- 	bio.bi_iter.bi_sector = pos >> SECTOR_SHIFT;
--	bio.bi_private = current;
--	bio.bi_end_io = blkdev_bio_end_io_simple;
- 	bio.bi_ioprio = iocb->ki_ioprio;
- 
- 	ret = bio_iov_iter_get_pages(&bio, iter);
-@@ -97,18 +87,8 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
- 
- 	if (iocb->ki_flags & IOCB_NOWAIT)
- 		bio.bi_opf |= REQ_NOWAIT;
--	if (iocb->ki_flags & IOCB_HIPRI)
--		bio_set_polled(&bio, iocb);
- 
--	submit_bio(&bio);
--	for (;;) {
--		set_current_state(TASK_UNINTERRUPTIBLE);
--		if (!READ_ONCE(bio.bi_private))
--			break;
--		if (!(iocb->ki_flags & IOCB_HIPRI) || !bio_poll(&bio, NULL, 0))
--			blk_io_schedule();
--	}
--	__set_current_state(TASK_RUNNING);
-+	submit_bio_wait(&bio);
- 
- 	bio_release_pages(&bio, should_dirty);
- 	if (unlikely(bio.bi_status))
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 62da020d02a1..80f9b047aa1b 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -56,7 +56,8 @@ static void iomap_dio_submit_bio(const struct iomap_iter *iter,
- {
- 	atomic_inc(&dio->ref);
- 
--	if (dio->iocb->ki_flags & IOCB_HIPRI) {
-+	/* Sync dio can't be polled reliably */
-+	if ((dio->iocb->ki_flags & IOCB_HIPRI) && !is_sync_kiocb(dio->iocb)) {
- 		bio_set_polled(bio, dio->iocb);
- 		dio->submit.poll_bio = bio;
- 	}
-@@ -653,9 +654,7 @@ __iomap_dio_rw(struct kiocb *iocb, struct iov_iter *iter,
- 			if (!READ_ONCE(dio->submit.waiter))
- 				break;
- 
--			if (!dio->submit.poll_bio ||
--			    !bio_poll(dio->submit.poll_bio, NULL, 0))
--				blk_io_schedule();
-+			blk_io_schedule();
- 		}
- 		__set_current_state(TASK_RUNNING);
- 	}
-diff --git a/mm/page_io.c b/mm/page_io.c
-index 89fbf3cae30f..3fbdab6a940e 100644
---- a/mm/page_io.c
-+++ b/mm/page_io.c
-@@ -360,7 +360,6 @@ int swap_readpage(struct page *page, bool synchronous)
- 	 * attempt to access it in the page fault retry time check.
- 	 */
- 	if (synchronous) {
--		bio->bi_opf |= REQ_POLLED;
- 		get_task_struct(current);
- 		bio->bi_private = current;
- 	}
-@@ -372,8 +371,7 @@ int swap_readpage(struct page *page, bool synchronous)
- 		if (!READ_ONCE(bio->bi_private))
- 			break;
- 
--		if (!bio_poll(bio, NULL, 0))
--			blk_io_schedule();
-+		blk_io_schedule();
- 	}
- 	__set_current_state(TASK_RUNNING);
- 	bio_put(bio);
--- 
-2.31.1
+s/unmap/false/
+
+--WNcOvVsFLKxLTK9e
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmJgHpMACgkQnKSrs4Gr
+c8hIkAgAk7J4MkB5WFrMUnpKJVCj0ms73q3tUwebLmjKe+twZuJSJdotXWrMDgUO
+NGL64GlQUB351DkeCl5A7Djgt//qcuM4ygdP91/BEywwAFY7iFT7oedxyvxYMOt4
+4Qz/7+OCUjTt3ZbbGDKr3Oo151IwsLxQ3Q3Zvwmh9vGkKOCUJdpF0GjQh4EDY0+b
+sgSw1YIgNPq+tfzHuxPKccw+n20PoVhBNIcVriHquSGwiFq3hjtYqkwPUhoF3VdC
+1unhI9dyDAvZl1h8ZLDo85hhsNctRgSb7cXRqPpV3tUs5b3N7emzTNKJj+iwrQ6h
+wJy1wBTCL2YAwhSDWbu6fdyqX5GEUQ==
+=gl2/
+-----END PGP SIGNATURE-----
+
+--WNcOvVsFLKxLTK9e--
 
