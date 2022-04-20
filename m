@@ -2,172 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 516C9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 15:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B4DC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 15:10:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236213AbiDTPIz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 11:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40472 "EHLO
+        id S1354794AbiDTPNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 11:13:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236171AbiDTPIy (ORCPT
+        with ESMTP id S1380077AbiDTPMp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:08:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A4CE937AB7
-        for <linux-block@vger.kernel.org>; Wed, 20 Apr 2022 08:06:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650467166;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=6DKh4o2jS010YVUvBT4jr1LtaBa+8/+wEj/lEYqROuM=;
-        b=JSXQ29b4IEewbMrW85QAUN9UxymmUjCEAPICp5w9dC+j71dyod0yZIxOw+0yd492JS4py8
-        8VGo4Mx1SLptNcvblZqJ4wDnvX897idKLdzenz2+euKOqAbxc/ObebXDYiBi7GsQ2AT24B
-        zg6+sJGZucXGKfgJ+SIvjnIFpkTuYB8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-671-OS1SCCbiNWqoSE-FbH9wgA-1; Wed, 20 Apr 2022 11:06:03 -0400
-X-MC-Unique: OS1SCCbiNWqoSE-FbH9wgA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 20 Apr 2022 11:12:45 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1E081BEB8;
+        Wed, 20 Apr 2022 08:09:59 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D080129AA3B9;
-        Wed, 20 Apr 2022 15:06:02 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 639A4112131B;
-        Wed, 20 Apr 2022 15:05:47 +0000 (UTC)
-Date:   Wed, 20 Apr 2022 23:05:42 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@osandov.com>,
-        Omar Sandoval <osandov@fb.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-Subject: Re: [PATCH blktests] block/002: delay debugfs directory check
-Message-ID: <YmAhRtOnezJ2EwBl@T590>
-References: <20220420045911.914393-1-shinichiro.kawasaki@wdc.com>
- <Yl/TjWYle8mOOwlO@T590>
- <20220420124213.5wc4umnjrlvu6zbi@shindev>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5B4A1210E4;
+        Wed, 20 Apr 2022 15:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1650467398; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=E9Za1fy7SJZVuU3gsJHYcUnfUQspR3rknfU8bXQql9Y=;
+        b=s7o4aJsXllglxjEicM+le/pE5Q4+nZsQh1+qkc+l1wMXB8I5KM8EXHpK9vVJQBopp4olwE
+        /0eL2tvJFzr8/5F+QMy5ysfmCp4A5ramqeRsMJKSZCtFDWgeFHKh6l0oEFDWWCNJk0EhzP
+        yXIHNy0QuiJkmeTPgRibcNpvjDS2yuo=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 96AE513AD5;
+        Wed, 20 Apr 2022 15:09:57 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id QAKAI0UiYGJILQAAMHmgww
+        (envelope-from <jgross@suse.com>); Wed, 20 Apr 2022 15:09:57 +0000
+From:   Juergen Gross <jgross@suse.com>
+To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-usb@vger.kernel.org,
+        dri-devel@lists.freedesktop.org, linux-integrity@vger.kernel.org,
+        linux-pci@vger.kernel.org
+Cc:     Juergen Gross <jgross@suse.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, alsa-devel@alsa-project.org,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: [PATCH 00/18] xen: simplify frontend side ring setup
+Date:   Wed, 20 Apr 2022 17:09:24 +0200
+Message-Id: <20220420150942.31235-1-jgross@suse.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220420124213.5wc4umnjrlvu6zbi@shindev>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 20, 2022 at 12:42:14PM +0000, Shinichiro Kawasaki wrote:
-> On Apr 20, 2022 / 17:34, Ming Lei wrote:
-> > On Wed, Apr 20, 2022 at 01:59:11PM +0900, Shin'ichiro Kawasaki wrote:
-> > > The test case block/002 checks that device removal during blktrace run
-> > > does not leak debugfs directory. The Linux kernel commit 0a9a25ca7843
-> > > ("block: let blkcg_gq grab request queue's refcnt") triggered failure of
-> > > the test case. The commit delayed queue release and debugfs directory
-> > > removal then the test case checks directory existence too early. To
-> > > avoid this false-positive failure, delay the directory existence check.
-> > > 
-> > > Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > > ---
-> > >  tests/block/002 | 1 +
-> > >  1 file changed, 1 insertion(+)
-> > > 
-> > > diff --git a/tests/block/002 b/tests/block/002
-> > > index 9b183e7..8061c91 100755
-> > > --- a/tests/block/002
-> > > +++ b/tests/block/002
-> > > @@ -29,6 +29,7 @@ test() {
-> > >  		echo "debugfs directory deleted with blktrace active"
-> > >  	fi
-> > >  	{ kill $!; wait; } >/dev/null 2>/dev/null
-> > > +	sleep 0.5
-> > >  	if [[ -d /sys/kernel/debug/block/${SCSI_DEBUG_DEVICES[0]} ]]; then
-> > >  		echo "debugfs directory leaked"
-> > >  	fi
-> > 
-> > Hello,
-> > 
-> > Jens has merged Yu Kuai's fix[1], so I think it won't be triggered now.
-> > 
-> > 
-> > [1] https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git/commit/?h=block-5.18&id=a87c29e1a85e64b28445bb1e80505230bf2e3b4b
-> 
-> Hi Ming, I applied the patch above on top of v5.18-rc3 and ran block/002.
-> Unfortunately, it failed with a new symptom with KASAN use-after-free [2]. I
-> ran block/002 with linux-block/block-5.18 branch tip with git hash a87c29e1a85e
-> and got the same KASAN uaf. Reverting the patch from the linux-block/block-5.18
-> branch, the KASAN uaf disappears (Still block/002 fails). Regarding block/002,
-> it looks the patch made the failure symptom worse.
+Many Xen PV frontends share similar code for setting up a ring page
+(allocating and granting access for the backend) and for tearing it
+down.
 
-Hi Shinichiro,
+Create new service functions doing all needed steps in one go.
 
-Looks Yu Kuai's patch has other problem, can you drop that patch and
-apply & test the attached patch?
+This requires all frontends to use a common value for an invalid
+grant reference in order to make the functions idempotent.
 
-Jens, looks the patch of "blk-mq: fix possible creation failure for 'debugfs_dir'"
-isn't ready to go, can you drop it first from block-5.18?
+Juergen Gross (18):
+  xen/blkfront: switch blkfront to use INVALID_GRANT_REF
+  xen/netfront: switch netfront to use INVALID_GRANT_REF
+  xen/scsifront: remove unused GRANT_INVALID_REF definition
+  xen/usb: switch xen-hcd to use INVALID_GRANT_REF
+  xen/drm: switch xen_drm_front to use INVALID_GRANT_REF
+  xen/sound: switch xen_snd_front to use INVALID_GRANT_REF
+  xen/dmabuf: switch gntdev-dmabuf to use INVALID_GRANT_REF
+  xen/shbuf: switch xen-front-pgdir-shbuf to use INVALID_GRANT_REF
+  xen/xenbus: add xenbus_setup_ring() service function
+  xen/blkfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/netfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/tpmfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/drmfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/pcifront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/scsifront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/usbfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/sndfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+  xen/xenbus: eliminate xenbus_grant_ring()
 
-diff --git a/block/blk-core.c b/block/blk-core.c
-index f305cb66c72a..c41c415849d9 100644
---- a/block/blk-core.c
-+++ b/block/blk-core.c
-@@ -438,6 +438,7 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
- {
- 	struct request_queue *q;
- 	int ret;
-+	char q_name[32];
- 
- 	q = kmem_cache_alloc_node(blk_get_queue_kmem_cache(alloc_srcu),
- 			GFP_KERNEL | __GFP_ZERO, node_id);
-@@ -495,6 +496,9 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
- 	blk_set_default_limits(&q->limits);
- 	q->nr_requests = BLKDEV_DEFAULT_RQ;
- 
-+	snprintf(q_name, 32, "%d", q->id);
-+	q->debugfs_dir = debugfs_create_dir(q_name, blk_debugfs_root);
-+
- 	return q;
- 
- fail_stats:
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 88bd41d4cb59..651ec10a5a87 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -837,8 +837,8 @@ int blk_register_queue(struct gendisk *disk)
- 	}
- 
- 	mutex_lock(&q->debugfs_mutex);
--	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
--					    blk_debugfs_root);
-+	q->debugfs_dir = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
-+			blk_debugfs_root, kobject_name(q->kobj.parent));
- 	mutex_unlock(&q->debugfs_mutex);
- 
- 	if (queue_is_mq(q)) {
-@@ -913,6 +913,7 @@ int blk_register_queue(struct gendisk *disk)
- void blk_unregister_queue(struct gendisk *disk)
- {
- 	struct request_queue *q = disk->queue;
-+	char q_name[32];
- 
- 	if (WARN_ON(!q))
- 		return;
-@@ -951,5 +952,11 @@ void blk_unregister_queue(struct gendisk *disk)
- 
- 	mutex_unlock(&q->sysfs_dir_lock);
- 
-+	mutex_lock(&q->debugfs_mutex);
-+	snprintf(q_name, 32, "%d", q->id);
-+	q->debugfs_dir = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
-+			blk_debugfs_root, q_name);
-+	mutex_unlock(&q->debugfs_mutex);
-+
- 	kobject_put(&disk_to_dev(disk)->kobj);
- }
+ drivers/block/xen-blkfront.c                | 54 ++++----------
+ drivers/char/tpm/xen-tpmfront.c             | 18 +----
+ drivers/gpu/drm/xen/xen_drm_front.h         |  9 ---
+ drivers/gpu/drm/xen/xen_drm_front_evtchnl.c | 40 +++-------
+ drivers/net/xen-netfront.c                  | 77 ++++++--------------
+ drivers/pci/xen-pcifront.c                  | 19 +----
+ drivers/scsi/xen-scsifront.c                | 30 ++------
+ drivers/usb/host/xen-hcd.c                  | 59 ++++-----------
+ drivers/xen/gntdev-dmabuf.c                 | 13 +---
+ drivers/xen/xen-front-pgdir-shbuf.c         | 17 +----
+ drivers/xen/xenbus/xenbus_client.c          | 81 ++++++++++++++++-----
+ include/xen/xenbus.h                        |  4 +-
+ sound/xen/xen_snd_front_evtchnl.c           | 41 +++--------
+ sound/xen/xen_snd_front_evtchnl.h           |  9 ---
+ 14 files changed, 156 insertions(+), 315 deletions(-)
 
-Thanks,
-Ming
+-- 
+2.34.1
 
