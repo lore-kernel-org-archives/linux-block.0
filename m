@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD9CDC43217
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 15:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4B5EC4167B
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 15:10:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379894AbiDTPNQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 11:13:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43326 "EHLO
+        id S1380007AbiDTPNR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 11:13:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380082AbiDTPMq (ORCPT
+        with ESMTP id S1380091AbiDTPMs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:12:46 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FBD93E5C4;
-        Wed, 20 Apr 2022 08:10:00 -0700 (PDT)
+        Wed, 20 Apr 2022 11:12:48 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF0FC3EA8F;
+        Wed, 20 Apr 2022 08:10:01 -0700 (PDT)
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 9C16421115;
-        Wed, 20 Apr 2022 15:09:58 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id AEDA81F74F;
+        Wed, 20 Apr 2022 15:10:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1650467398; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        t=1650467400; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=8T6Z7jV+2E1LG0Lx6kFTGECOTx+ZZjBB+fMJq4VZyPo=;
-        b=WF4b9n87A3M7HYOr+N4ZjOY+Cgid8wI0c6irsUK8+pQROZTqJnInO/MAVODMUxLWX9V4V0
-        Z+LcPet04JF89QS0wEomkfON2JmmAd36vHuHA/rqkTO0zUey1+1KZplpI+cvYdc6r6WSe9
-        cji3xX1G6SjGEefquTF4b8p4MGSO6uo=
+        bh=jX7srMhp6ubGUE560TW855B1p8XgeYqviaHs7bo1HEQ=;
+        b=kK+HoGASU9zFbNjXEDo2LjceMqvAQGce4bPew3hcIKRD6+xa3dfSQNUY3SkQUPf+rnjJIq
+        Y0nCIHUplnWY8chzVzP3MDTZFhGpeqmjYivp4zntVFFokHKSMNmI5bZgJjfrtepBO97rOd
+        DI4vcrcbfvyYU+fGRcUV/5+gt5T/RHo=
 Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6227213AE0;
-        Wed, 20 Apr 2022 15:09:58 +0000 (UTC)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 75BB713AD5;
+        Wed, 20 Apr 2022 15:10:00 +0000 (UTC)
 Received: from dovecot-director2.suse.de ([192.168.254.65])
         by imap2.suse-dmz.suse.de with ESMTPSA
-        id aMK0FkYiYGJILQAAMHmgww
-        (envelope-from <jgross@suse.com>); Wed, 20 Apr 2022 15:09:58 +0000
+        id sHx2G0giYGJILQAAMHmgww
+        (envelope-from <jgross@suse.com>); Wed, 20 Apr 2022 15:10:00 +0000
 From:   Juergen Gross <jgross@suse.com>
 To:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
 Cc:     Juergen Gross <jgross@suse.com>,
+        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
         Boris Ostrovsky <boris.ostrovsky@oracle.com>,
         Stefano Stabellini <sstabellini@kernel.org>,
-        =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
         Jens Axboe <axboe@kernel.dk>
-Subject: [PATCH 01/18] xen/blkfront: switch blkfront to use INVALID_GRANT_REF
-Date:   Wed, 20 Apr 2022 17:09:25 +0200
-Message-Id: <20220420150942.31235-2-jgross@suse.com>
+Subject: [PATCH 10/18] xen/blkfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+Date:   Wed, 20 Apr 2022 17:09:34 +0200
+Message-Id: <20220420150942.31235-11-jgross@suse.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20220420150942.31235-1-jgross@suse.com>
 References: <20220420150942.31235-1-jgross@suse.com>
@@ -60,127 +60,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of using a private macro for an invalid grant reference use
-the common one.
+Simplify blkfront's ring creation and removal via xenbus_setup_ring()
+and xenbus_teardown_ring().
 
 Signed-off-by: Juergen Gross <jgross@suse.com>
 ---
- drivers/block/xen-blkfront.c | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ drivers/block/xen-blkfront.c | 34 +++++++---------------------------
+ 1 file changed, 7 insertions(+), 27 deletions(-)
 
 diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 003056d4f7f5..7f35e30e626a 100644
+index 7f35e30e626a..367df4d9cd59 100644
 --- a/drivers/block/xen-blkfront.c
 +++ b/drivers/block/xen-blkfront.c
-@@ -229,8 +229,6 @@ static unsigned int nr_minors;
- static unsigned long *minors;
- static DEFINE_SPINLOCK(minor_lock);
- 
--#define GRANT_INVALID_REF	0
--
- #define PARTS_PER_DISK		16
- #define PARTS_PER_EXT_DISK      256
- 
-@@ -321,7 +319,7 @@ static int fill_grant_buffer(struct blkfront_ring_info *rinfo, int num)
- 			gnt_list_entry->page = granted_page;
- 		}
- 
--		gnt_list_entry->gref = GRANT_INVALID_REF;
-+		gnt_list_entry->gref = INVALID_GRANT_REF;
- 		list_add(&gnt_list_entry->node, &rinfo->grants);
- 		i++;
- 	}
-@@ -350,7 +348,7 @@ static struct grant *get_free_grant(struct blkfront_ring_info *rinfo)
- 					  node);
- 	list_del(&gnt_list_entry->node);
- 
--	if (gnt_list_entry->gref != GRANT_INVALID_REF)
-+	if (gnt_list_entry->gref != INVALID_GRANT_REF)
- 		rinfo->persistent_gnts_c--;
- 
- 	return gnt_list_entry;
-@@ -372,7 +370,7 @@ static struct grant *get_grant(grant_ref_t *gref_head,
- 	struct grant *gnt_list_entry = get_free_grant(rinfo);
- 	struct blkfront_info *info = rinfo->dev_info;
- 
--	if (gnt_list_entry->gref != GRANT_INVALID_REF)
-+	if (gnt_list_entry->gref != INVALID_GRANT_REF)
- 		return gnt_list_entry;
- 
- 	/* Assign a gref to this page */
-@@ -396,7 +394,7 @@ static struct grant *get_indirect_grant(grant_ref_t *gref_head,
- 	struct grant *gnt_list_entry = get_free_grant(rinfo);
- 	struct blkfront_info *info = rinfo->dev_info;
- 
--	if (gnt_list_entry->gref != GRANT_INVALID_REF)
-+	if (gnt_list_entry->gref != INVALID_GRANT_REF)
- 		return gnt_list_entry;
- 
- 	/* Assign a gref to this page */
-@@ -1221,7 +1219,7 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
- 		list_for_each_entry_safe(persistent_gnt, n,
- 					 &rinfo->grants, node) {
- 			list_del(&persistent_gnt->node);
--			if (persistent_gnt->gref != GRANT_INVALID_REF) {
-+			if (persistent_gnt->gref != INVALID_GRANT_REF) {
- 				gnttab_end_foreign_access(persistent_gnt->gref,
- 							  0UL);
- 				rinfo->persistent_gnts_c--;
-@@ -1283,9 +1281,9 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
+@@ -1280,15 +1280,8 @@ static void blkif_free_ring(struct blkfront_ring_info *rinfo)
+ 	flush_work(&rinfo->work);
  
  	/* Free resources associated with old device channel. */
- 	for (i = 0; i < info->nr_ring_pages; i++) {
--		if (rinfo->ring_ref[i] != GRANT_INVALID_REF) {
-+		if (rinfo->ring_ref[i] != INVALID_GRANT_REF) {
- 			gnttab_end_foreign_access(rinfo->ring_ref[i], 0);
--			rinfo->ring_ref[i] = GRANT_INVALID_REF;
-+			rinfo->ring_ref[i] = INVALID_GRANT_REF;
- 		}
- 	}
- 	free_pages_exact(rinfo->ring.sring,
-@@ -1475,7 +1473,7 @@ static int blkif_completion(unsigned long *id,
- 			 * to the tail of the list, so it will not be picked
- 			 * again unless we run out of persistent grants.
- 			 */
--			s->grants_used[i]->gref = GRANT_INVALID_REF;
-+			s->grants_used[i]->gref = INVALID_GRANT_REF;
- 			list_add_tail(&s->grants_used[i]->node, &rinfo->grants);
- 		}
- 	}
-@@ -1500,7 +1498,7 @@ static int blkif_completion(unsigned long *id,
- 					indirect_page = s->indirect_grants[i]->page;
- 					list_add(&indirect_page->lru, &rinfo->indirect_pages);
- 				}
--				s->indirect_grants[i]->gref = GRANT_INVALID_REF;
-+				s->indirect_grants[i]->gref = INVALID_GRANT_REF;
- 				list_add_tail(&s->indirect_grants[i]->node, &rinfo->grants);
- 			}
- 		}
-@@ -1687,7 +1685,7 @@ static int setup_blkring(struct xenbus_device *dev,
- 	grant_ref_t gref[XENBUS_MAX_RING_GRANTS];
+-	for (i = 0; i < info->nr_ring_pages; i++) {
+-		if (rinfo->ring_ref[i] != INVALID_GRANT_REF) {
+-			gnttab_end_foreign_access(rinfo->ring_ref[i], 0);
+-			rinfo->ring_ref[i] = INVALID_GRANT_REF;
+-		}
+-	}
+-	free_pages_exact(rinfo->ring.sring,
+-			 info->nr_ring_pages * XEN_PAGE_SIZE);
+-	rinfo->ring.sring = NULL;
++	xenbus_teardown_ring((void **)&rinfo->ring.sring, info->nr_ring_pages,
++			     rinfo->ring_ref);
  
- 	for (i = 0; i < info->nr_ring_pages; i++)
--		rinfo->ring_ref[i] = GRANT_INVALID_REF;
-+		rinfo->ring_ref[i] = INVALID_GRANT_REF;
+ 	if (rinfo->irq)
+ 		unbind_from_irqhandler(rinfo->irq, rinfo);
+@@ -1679,31 +1672,18 @@ static int setup_blkring(struct xenbus_device *dev,
+ 			 struct blkfront_ring_info *rinfo)
+ {
+ 	struct blkif_sring *sring;
+-	int err, i;
++	int err;
+ 	struct blkfront_info *info = rinfo->dev_info;
+ 	unsigned long ring_size = info->nr_ring_pages * XEN_PAGE_SIZE;
+-	grant_ref_t gref[XENBUS_MAX_RING_GRANTS];
  
- 	sring = alloc_pages_exact(ring_size, GFP_NOIO);
- 	if (!sring) {
-@@ -2544,13 +2542,13 @@ static void purge_persistent_grants(struct blkfront_info *info)
+-	for (i = 0; i < info->nr_ring_pages; i++)
+-		rinfo->ring_ref[i] = INVALID_GRANT_REF;
++	err = xenbus_setup_ring(dev, GFP_NOIO, (void **)&sring,
++				info->nr_ring_pages, rinfo->ring_ref);
++	if (err)
++		goto fail;
  
- 		list_for_each_entry_safe(gnt_list_entry, tmp, &rinfo->grants,
- 					 node) {
--			if (gnt_list_entry->gref == GRANT_INVALID_REF ||
-+			if (gnt_list_entry->gref == INVALID_GRANT_REF ||
- 			    !gnttab_try_end_foreign_access(gnt_list_entry->gref))
- 				continue;
+-	sring = alloc_pages_exact(ring_size, GFP_NOIO);
+-	if (!sring) {
+-		xenbus_dev_fatal(dev, -ENOMEM, "allocating shared ring");
+-		return -ENOMEM;
+-	}
+ 	SHARED_RING_INIT(sring);
+ 	FRONT_RING_INIT(&rinfo->ring, sring, ring_size);
  
- 			list_del(&gnt_list_entry->node);
- 			rinfo->persistent_gnts_c--;
--			gnt_list_entry->gref = GRANT_INVALID_REF;
-+			gnt_list_entry->gref = INVALID_GRANT_REF;
- 			list_add_tail(&gnt_list_entry->node, &grants);
- 		}
- 
+-	err = xenbus_grant_ring(dev, rinfo->ring.sring, info->nr_ring_pages, gref);
+-	if (err < 0) {
+-		free_pages_exact(sring, ring_size);
+-		rinfo->ring.sring = NULL;
+-		goto fail;
+-	}
+-	for (i = 0; i < info->nr_ring_pages; i++)
+-		rinfo->ring_ref[i] = gref[i];
+-
+ 	err = xenbus_alloc_evtchn(dev, &rinfo->evtchn);
+ 	if (err)
+ 		goto fail;
 -- 
 2.34.1
 
