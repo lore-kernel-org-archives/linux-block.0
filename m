@@ -2,89 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C1D4C4332F
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 15:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7628C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 19:42:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354937AbiDTPcM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 11:32:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33140 "EHLO
+        id S1351468AbiDTTo4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 15:44:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234586AbiDTPcL (ORCPT
+        with ESMTP id S1347556AbiDTTo4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 11:32:11 -0400
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A96A45AD3;
-        Wed, 20 Apr 2022 08:29:25 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-e604f712ecso2282984fac.9;
-        Wed, 20 Apr 2022 08:29:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=61FWMBiIp/oHQjo9zys3+M0sljyptQ7R0Qf5Z5MBknc=;
-        b=qfNMbgXhys2URznuKviywGFhiZ668686N57iwamEyUpsg6K+8Akv9WmUP8JSXHvMeq
-         yR2RgAVUH7lz2laj04BwucqPLvDlwoozfqrU+X65v0XJDcqHLYN1CbhKEqmchJSECnf+
-         bsc+AUzGz3Izx86rlagi0hkmDCCf1rc9h666nI3ifRO8yPETkeaa/AvqYkODLvVPtJMB
-         fhoDHF7Ptx5FQxTxBOasz4txQWj2g8CwXR95cjqxFrpKPAQVQalmKEu3LEumbvWZcQ3E
-         XUtN5b+KljnfaLAJJ4mbWA+msrFfSGYMoSlAicfOMN6CmLxdSOWNyRnYD+D92OiftegJ
-         ilMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=61FWMBiIp/oHQjo9zys3+M0sljyptQ7R0Qf5Z5MBknc=;
-        b=yiVbvRe0c5Pxyvdomzoa7m7IZwmdvFdWBElXN224pTVXijYzDbxXM51nYCfKAD9ky/
-         sUhV/FBTRux0JhCVepL+INrq9in9+RAWvgZRNUL0lU7b9raI7kZ/7QBLbVKMx+3yWPux
-         SGVRkZpczk1J5StIoa4hjqVvJYVymbQ6Sk4QnAMdTT74v9ACP4TGP/iDzE33R2n/ueKp
-         Cj2qDgcTDpD+0tow1+bM/XAqxjc+0AieOb0dDH4N679THwPO7+sH0yjruDld7UfZ3Jhn
-         7Yj0+9CV6M59wbtfS2gZRf4v3FHoTneEBajZq2B459eCzNT5Hnh0T/pXpRWLzA0iG6l+
-         fl6Q==
-X-Gm-Message-State: AOAM531BXMGgRzWX3fHZQwR2jidJpQBE06nGaYMR8VngU8zkU3361r9M
-        kRdSvLrjee0PJUKwkXY2j34HlrFVoAPV48Cb3QI=
-X-Google-Smtp-Source: ABdhPJyJir+zz5lALNTrCHI37Thw0c7JMdw6PttB1W2T0kT7Nu7IbPDTjNIPoeyBZNpGwUGQL9JrhoOXBbLRAf86Kvw=
-X-Received: by 2002:a05:6870:2190:b0:e6:26d2:abe0 with SMTP id
- l16-20020a056870219000b000e626d2abe0mr1750858oae.15.1650468564716; Wed, 20
- Apr 2022 08:29:24 -0700 (PDT)
+        Wed, 20 Apr 2022 15:44:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 084D813FB1;
+        Wed, 20 Apr 2022 12:42:08 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8A1E861617;
+        Wed, 20 Apr 2022 19:42:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C871C385A0;
+        Wed, 20 Apr 2022 19:42:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650483727;
+        bh=VkstLNUnX452bwgxVbRIkkIiLOBzV/cxnUGwTZse+38=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Pz9skgakdcihR9csrUcjZT44NnjtWbJ8iPQVCsk8Bt4o9WuCBhLXYSzur/HQUFBJD
+         ManinBuSF5ltDZDb/nyBtQIuyjkh+fRifJgvhSXi5SgqQj4AImO46y4MvzC4E59WuI
+         FAFMZo673HxfxypD1JRbsuV1EBBa2ua1OJPwzH/LTk2kc5qg1xbCvFNkfINkCoiL1B
+         xrUoAT7Qw2jqPxpewcc2bSSWpGQhZuuN5WkZwt672JiuEIoucKhHrV1XR2MQ6CTyFE
+         L+RQ+mnNwLHOW14E9sUwSIxu9EDBMbiaOVdMng5v882yuCetMkbHOpSYe1RZVYYuX8
+         FYf1lk3HXT1ag==
+Date:   Wed, 20 Apr 2022 12:41:53 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Ritesh Harjani <riteshh@codeaurora.org>,
+        Asutosh Das <asutoshd@codeaurora.org>,
+        Alim Akhtar <alim.akhtar@samsung.com>,
+        Avri Altman <avri.altman@wdc.com>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 2/2] blk-crypto: fix the blk_crypto_profile liftime
+Message-ID: <YmBiAQ/IZbFhRc6o@sol.localdomain>
+References: <20220420064745.1119823-1-hch@lst.de>
+ <20220420064745.1119823-3-hch@lst.de>
 MIME-Version: 1.0
-References: <CA+1E3rLGwHFbdbSTJBfWrw6RLErwcT2zPxGmmWbcLUj2y=16Qg@mail.gmail.com>
- <20220324063218.GC12660@lst.de> <20220325133921.GA13818@test-zns>
- <20220330130219.GB1938@lst.de> <CA+1E3r+Z9UyiNjmb-DzOpNrcbCO_nNFYUD5L5xJJCisx_D=wPQ@mail.gmail.com>
- <a44e38d6-54b4-0d17-c274-b7d46f60a0cf@kernel.dk> <CA+1E3r+CSC6jaDBXpxQUDnk8G=RuQaa=DPJ=tt9O9qydH5B9SQ@mail.gmail.com>
- <f3923d64-4f84-143b-cce2-fcf8366da0e6@kernel.dk> <CA+1E3rJHgEan2yiVS882XouHgKNP4Rn6G2LrXyFu-0kgyu27=Q@mail.gmail.com>
- <CGME20220420152003epcas5p3991e6941773690bcb425fd9d817105c3@epcas5p3.samsung.com>
- <586ec702-fcaa-f12c-1752-bf262242a751@kernel.dk> <20220420151454.GA30119@test-zns>
-In-Reply-To: <20220420151454.GA30119@test-zns>
-From:   Kanchan Joshi <joshiiitr@gmail.com>
-Date:   Wed, 20 Apr 2022 20:58:57 +0530
-Message-ID: <CA+1E3rKYapc2_un9F4MNB5Zf7KfRr9=ATqonGnvcuvThLFX2vg@mail.gmail.com>
-Subject: Re: [PATCH 17/17] nvme: enable non-inline passthru commands
-To:     Kanchan Joshi <joshi.k@samsung.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
-        Keith Busch <kbusch@kernel.org>,
-        Pavel Begunkov <asml.silence@gmail.com>,
-        io-uring@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, sbates@raithlin.com,
-        logang@deltatee.com, Pankaj Raghav <pankydev8@gmail.com>,
-        =?UTF-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Adam Manzanares <a.manzanares@samsung.com>,
-        Anuj Gupta <anuj20.g@samsung.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220420064745.1119823-3-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> >Just still grab the 16 bytes, we don't care about addr3 for passthrough.
-> >Should be no changes required there.
-> I was thinking of uring-cmd in general, but then also it does not seem
-> to collide with xattr. Got your point.
-> Measure was removing 8b "result" field from passthru-cmd, since 32b CQE
-> makes that part useless, and we are adding new opcode in nvme
-> anyway. Maybe we should still reduce passthu-cmd to 64b (rather than 72),
-> not very sure.
-Correction above: reduce passthru-cmd to 72b (rather than 80b).
+On Wed, Apr 20, 2022 at 08:47:45AM +0200, Christoph Hellwig wrote:
+> Once the blk_crypto_profile is exposed in sysfs it needs to stay alive
+> as long as sysfs accesses are possibly pending.  Ensure that by removing
+> the blk_crypto_kobj wrapper and just embedding the kobject into the
+> actual blk_crypto_profile.  This requires the blk_crypto_profile
+> structure to be dynamically allocated, which in turn requires a private
+> data pointer for driver use.
+> 
+> Fixes: 20f01f163203 ("blk-crypto: show crypto capabilities in sysfs")
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
+Can you elaborate on what you think the actual problem is here?  The lifetime of
+the blk_crypto_profile matches that of the host controller kobject, and I
+thought that it is not destroyed until after higher-level objects such as
+gendisks and request_queues are destroyed.  Similar assumptions are made by the
+queue kobject, which assumes it is safe to access the gendisk, and by the
+independent_access_ranges kobject which assumes it is safe to access the queue.
 
+I suppose this wouldn't have worked with the original sysfs design where opening
+a file in sysfs actually got a refcount to the kobject.  But that's long gone,
+having been changed in Linux v2.6.23 (https://lwn.net/Articles/229774).
 
--- 
-Joshi
+Note that commit 20f01f163203 which added this code got an "all looks good" from
+Greg KH (https://lore.kernel.org/r/YaH1CmHClx5WvDWD@kroah.com).  I'd have hoped
+that he would've noticed if there was a major problem with how kobjects are used
+here!  Greg, would you mind taking a look at this part again?
+
+>  int blk_crypto_sysfs_register(struct request_queue *q)
+>  {
+> -	struct blk_crypto_kobj *obj;
+>  	int err;
+>  
+>  	if (!q->crypto_profile)
+>  		return 0;
+>  
+> -	obj = kzalloc(sizeof(*obj), GFP_KERNEL);
+> -	if (!obj)
+> -		return -ENOMEM;
+> -	obj->profile = q->crypto_profile;
+> -
+> -	err = kobject_init_and_add(&obj->kobj, &blk_crypto_ktype, &q->kobj,
+> -				   "crypto");
+> -	if (err) {
+> -		kobject_put(&obj->kobj);
+> -		return err;
+> -	}
+> -	q->crypto_kobject = &obj->kobj;
+> -	return 0;
+> +	err = kobject_add(&q->crypto_profile->kobj, &q->kobj, "crypto");
+> +	if (err)
+> +		kobject_put(&q->crypto_profile->kobj);
+> +	return err;
+>  }
+
+In any case, this proposal is not correct since it is assuming that each
+blk_crypto_profile is referenced by only one request_queue, which is not
+necessarily the case since a host controller can have multiple disks.
+The same kobject can't be added to multiple places in the hierarchy.
+
+If we did need to do something differently here, I think we'd either need to put
+the blk_crypto_profile kobject under the host controller one and link to it from
+the queue directories (which I mentioned in commit 20f01f163203 as an
+alternative considered), or duplicate the crypto capabilities in each
+request_queue and only share the actual keyslot management data structures.
+
+- Eric
