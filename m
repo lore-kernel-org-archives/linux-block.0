@@ -2,91 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A85C6C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 04:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82858C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 05:05:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359363AbiDTFCA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 01:02:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33012 "EHLO
+        id S1357124AbiDTFIj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 01:08:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359362AbiDTFB7 (ORCPT
+        with ESMTP id S1359377AbiDTFIh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 01:01:59 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D45DC1FA7F
-        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 21:59:13 -0700 (PDT)
+        Wed, 20 Apr 2022 01:08:37 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 186C727147
+        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 22:05:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1650430752; x=1681966752;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KYQyovQyksbNpHDMld625g6lj6DMhyFdjeMPfDpgCng=;
-  b=TaReLXktFglt0v4tWlxo95pEcgIm3xLv8iBw9ZClGKLBw2HkOycxBq+p
-   OGkPJzM2SXec4MesK/zwk+ZKEbIFp7SFhkK2okNiQSkwnt1FkRYzoSqal
-   doY8nTA5j3A+M5PYYtozz71T/T+vLpGpbdp3Yz8NIQtAScJ/C8bxoF3lH
-   GMM2yQ44TRueT4UGxufaOosCIoO7qHW4WaAIxyzP0W8UrnJrSpT2AhVvC
-   3ogUF3DH2Ca8BDYeWY7gdYJ2j8ENDY29gCwWlMizGpoFRwyByUndl7JR+
-   xbRM6MtP8oo2c8oFL22qKJKnDTMcu+At1aIj9k1KCZyyXVP41HJ3vvq2A
-   Q==;
+  t=1650431150; x=1681967150;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=o8q20WkD5Ikqc8y1E534ZjoNOqKW8XEoRrj9gEj3rTM=;
+  b=YGRns/XlfXMG/8TD8aF6gtlIddqZ2VV6rK3QIxUlSfrhDgfq54uOpk3x
+   RGr/0rWTFFpe3iaVjFeIZJJuxL+D338sVOwArVCaKVd79v2L+tTo7RNCC
+   dKocyKPwChOd2Hnka1Nq9OSnqlXlnegex3VePZa0DlOg35jbHZE2yvktf
+   yeEXIenHp78U1snKp7g6zUMnIA6z3JwahvZu60r462HTekI5I2GNylMrK
+   dL0yCD6yLhAu1egkBvR+l1bA5qzBZ+NMVAW8cWQGfbYY0AxQhlbjTERKE
+   YFMUL4dZQ3mPnggrpWCBGIe/NCcu7/V7ZleqxwqnBtrI8cn6JWmfYB9RV
+   A==;
 X-IronPort-AV: E=Sophos;i="5.90,274,1643644800"; 
-   d="scan'208";a="198327693"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 20 Apr 2022 12:59:11 +0800
-IronPort-SDR: +5LWOv2ftWEYW82ZnPOMGENQXN8rTRn9C4OTIkYqwXRAzZ7J7r7/Dxnq6vtXt3gJvv6JwWsWIr
- a5l8QHu+egEpy/KOuXl+I3+TAyT8nVctPUnk23KybJO+V8pjzufCteHBR7B/jNeuvMuSFBy2mH
- nokkPbB+g0HR/KzRnD12buA9AefMkS14ZlXCHhsdj973is2YN1McyxHPmVV/eFsU1IYak8cJKZ
- xnqFf/DPXu1CtDKYT1EKfT3yB6yXaPk1V8CwY7EAZuOJ1CofPQMVb7mjpr4Ayt3J5SrkE17CsK
- pzgBf5uqd6JwAM1nTLepyJ+1
+   d="scan'208";a="199225793"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Apr 2022 13:05:49 +0800
+IronPort-SDR: oRTaWlpyRl3gujth8dzjnfKqy0wy6k3oD0e1PA7LQCCWJSV65bjutFch8MDeRDuQB3SF4YW3/v
+ rd5j+HIaWUaJ1ZBJb16qeS3eVHLYjA7zca4N2r3JVaMTR7nox44yA7mAWzUikudrujHOldH/Mj
+ 8vnNEAVTbvCD2GXD4Qt8+dza8zG0H3Ygy5e58v+MrWnmBIBuh59o2tCU/NZCmnbAsvmoNKaLgj
+ HpvpMbZyTyb2402CIUTC542PTQb4lO845WUV77zPV3SLKKZgECoxL//jcA0LPjvZPZThKcXy01
+ jxruaUFJZG3iL5YjbHmu4k/P
 Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Apr 2022 21:30:17 -0700
-IronPort-SDR: 9k9P/OcxxNkOIwwmnrOI0eOmC4todTYZl902WN2fa91PywDbruG4Z7jMm2HyY0Y2o4z3xpXM1A
- 4XXhelsW+lvzFwcdJ1vV4VJL+Rvfm9CZOzBipT6qkhKfoiX+mKl16HNH95C/gJO12bfFAR0HVz
- 3Dl1FAlvEdVKp3F2oryUHGOH4+SOgBWZ7QaoEvv7km6StoWlXpuUb3DSSaD6hQRuWI/qzzC+rk
- 8NjYdW/0hJEVjlVjg5OpcHhtcMeOnFr1O3stgDXvTxwF3jmXk3nuieKXAGH0XFk/lSomV0moQ8
- bvk=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Apr 2022 21:36:51 -0700
+IronPort-SDR: CrRZUL4Hh0qYUPy3hBwrlt1blYYBFwl/U7qSKW8orCMTk60982G4FJ7zykxG3afWI3oMeW8n5e
+ 6RMZfcNhHy4jnPoDEbrmbJvl2pK/rsuQAg1LXSkH0tiFk2i3Ew75ofErmklLsEa3QxV4iWyguX
+ eUHJZqxarlCYCXHUgIPVkAwSildAWRwfCjlqz9ZVKS5KCEiIQEft+O3rypx92Y3CrbF0uW1era
+ vvTwfizUuuLF2Z5dEglKYNXduovTua4qqGLAoEkAU+DW4bqTA5KrWhjfbsU781grN/uaUcG0qs
+ D6U=
 WDCIronportException: Internal
-Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.173])
-  by uls-op-cesaip01.wdc.com with ESMTP; 19 Apr 2022 21:59:11 -0700
-From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     linux-block@vger.kernel.org, Omar Sandoval <osandov@osandov.com>
-Cc:     Omar Sandoval <osandov@fb.com>, Ming Lei <ming.lei@redhat.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [PATCH blktests] block/002: delay debugfs directory check
-Date:   Wed, 20 Apr 2022 13:59:11 +0900
-Message-Id: <20220420045911.914393-1-shinichiro.kawasaki@wdc.com>
-X-Mailer: git-send-email 2.35.1
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Apr 2022 22:05:48 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KjpXW5n0yz1SHwl
+        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 22:05:47 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1650431147; x=1653023148; bh=o8q20WkD5Ikqc8y1E534ZjoNOqKW8XEoRrj
+        9gEj3rTM=; b=MmU8cEHFcM5IQwPklrmJq9CcqLCfcNdmkE15qGnnyVn7884Th9h
+        M26eCxd/Hq3A0ybr4O3ALbYTN9a8Y1Df3498FxSnXcpH3jydiYjGM7u9of32ECD3
+        qWXzA7KBGYVHkFOpihzU5FQzufiTKypZwtW7GQdZqOpEWqR7V/Jpmu3sC6C3m4f1
+        mYKYhfq9RHXfAvtUhfCcNTjsWQ7mSH/AbeayITUnmfuRqP/6gRpJh3UIWLRV5AuF
+        eHekQ7VKC/FySlh/2GiyZH9+jbqoYBslIYNQQY69ESaFu/qg/TnU9D4kAe0xg9gp
+        EU8DcTVT1qEYZQbYEwyw5DXfmsLgDKg/tNg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id QpGDGgxgd58t for <linux-block@vger.kernel.org>;
+        Tue, 19 Apr 2022 22:05:47 -0700 (PDT)
+Received: from [10.225.163.14] (unknown [10.225.163.14])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KjpXV3n7Tz1Rvlx;
+        Tue, 19 Apr 2022 22:05:46 -0700 (PDT)
+Message-ID: <1e5b6fa5-2bfe-408b-209f-0d10ab1040fb@opensource.wdc.com>
+Date:   Wed, 20 Apr 2022 14:05:44 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v2 3/4] block: null_blk: Cleanup messages
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Cc:     Josef Bacik <josef@toxicpanda.com>
+References: <20220420005718.3780004-1-damien.lemoal@opensource.wdc.com>
+ <20220420005718.3780004-4-damien.lemoal@opensource.wdc.com>
+ <8413d847-fbdb-b209-1062-88439b24ccc4@nvidia.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <8413d847-fbdb-b209-1062-88439b24ccc4@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The test case block/002 checks that device removal during blktrace run
-does not leak debugfs directory. The Linux kernel commit 0a9a25ca7843
-("block: let blkcg_gq grab request queue's refcnt") triggered failure of
-the test case. The commit delayed queue release and debugfs directory
-removal then the test case checks directory existence too early. To
-avoid this false-positive failure, delay the directory existence check.
+On 4/20/22 12:57, Chaitanya Kulkarni wrote:
+> On 4/19/22 17:57, Damien Le Moal wrote:
+>> Use the pr_fmt() macro to prefix all null_blk pr_xxx() messages with
+>> "null_blk:" to clarify which module is printing the messages. Also add
+>> a pr_info() message in null_add_dev() to print the name of a newly
+>> created disk.
+>>
+>> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+>> ---
+> 
+> why not [1] to keep #define pr_fmt at one place in header file
+> instead of duplicating it in zoned.c main.c  ?
+> 
+> irrespective of that, looks good.
+> 
+> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+> 
+> -ck
+> 
+> 
+> [1]
+> 
+> diff --git a/drivers/block/null_blk/null_blk.h 
+> b/drivers/block/null_blk/null_blk.h
+> index 78eb56b0ca55..450849fb3038 100644
+> --- a/drivers/block/null_blk/null_blk.h
+> +++ b/drivers/block/null_blk/null_blk.h
+> @@ -167,4 +167,8 @@ static inline size_t null_zone_valid_read_len(struct 
+> nullb *nullb,
+>   }
+>   #define null_report_zones      NULL
+>   #endif /* CONFIG_BLK_DEV_ZONED */
+> +
+> +#undef pr_fmt
+> +#define pr_fmt(fmt)    "null_blk: " fmt
+> +
+>   #endif /* __NULL_BLK_H */
 
-Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
----
- tests/block/002 | 1 +
- 1 file changed, 1 insertion(+)
+Right, could do that. Jens ? Do you want an update for this ?
 
-diff --git a/tests/block/002 b/tests/block/002
-index 9b183e7..8061c91 100755
---- a/tests/block/002
-+++ b/tests/block/002
-@@ -29,6 +29,7 @@ test() {
- 		echo "debugfs directory deleted with blktrace active"
- 	fi
- 	{ kill $!; wait; } >/dev/null 2>/dev/null
-+	sleep 0.5
- 	if [[ -d /sys/kernel/debug/block/${SCSI_DEBUG_DEVICES[0]} ]]; then
- 		echo "debugfs directory leaked"
- 	fi
 -- 
-2.35.1
-
+Damien Le Moal
+Western Digital Research
