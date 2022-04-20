@@ -2,115 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DB5AC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 02:21:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A55AC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 20 Apr 2022 03:40:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358915AbiDTCXs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 19 Apr 2022 22:23:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51708 "EHLO
+        id S1359290AbiDTDmw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 19 Apr 2022 23:42:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229791AbiDTCXs (ORCPT
+        with ESMTP id S1349095AbiDTDmv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 19 Apr 2022 22:23:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BB0F12AC60
-        for <linux-block@vger.kernel.org>; Tue, 19 Apr 2022 19:21:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650421262;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=7nmJqhMRmg/yjGaYYM+pE/QMOABTkth3WNm+buaQly8=;
-        b=P46sCEpWzcDg5BuYu/+tPL7HYyOWHtWE/g3rHn6ACIN+JqW3s9bKBLJMeUXXnFdOUNehFX
-        L9bcDS7G22A0wVAJ6FPA/uqrfEQEfEltXDfxyD5UnfVqG1nmTmBXaAr2sUeavrAFY0w8y+
-        oxxFET5RTG1uoB0uRZZklOAaa4G2eFc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-269-Tl8OV1EGNB6-Ye5-oLo-nA-1; Tue, 19 Apr 2022 22:20:59 -0400
-X-MC-Unique: Tl8OV1EGNB6-Ye5-oLo-nA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DE9CF80C8FB;
-        Wed, 20 Apr 2022 02:20:58 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FD7D2166BA3;
-        Wed, 20 Apr 2022 02:20:49 +0000 (UTC)
-Date:   Wed, 20 Apr 2022 10:20:44 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     "Williams, Dan J" <dan.j.williams@intel.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH 2/3] block: let blkcg_gq grab request queue's refcnt
-Message-ID: <Yl9t/Dy7C53DFEh0@T590>
-References: <20220318130144.1066064-1-ming.lei@redhat.com>
- <20220318130144.1066064-3-ming.lei@redhat.com>
- <eac2af72d9e73f79bbdbe8253f7562d9f17046b3.camel@intel.com>
- <292908e4-8721-20a0-2720-e60641a1fbe4@huawei.com>
+        Tue, 19 Apr 2022 23:42:51 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2682F111E;
+        Tue, 19 Apr 2022 20:40:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650426006; x=1681962006;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=NsJ9PYv8qIHidqFAvFUveajyWeLCRc11CN8BaXUlmiw=;
+  b=JgUZWhOQ8Qg15daBTDiP2gXcT0dozyQ5IuXLy2QHVfa57RxBQoadIg3G
+   gLJBEjx6pRv/UDIeInj61eAg3xDIVhTSzui6W9IC4Ds8D/R7NlM/CQQM4
+   ZvEPtMG9oskSifR2Scjgm22JWgjuPOHPIZfBwNMeqhWRF+Z7u9rLcYs3z
+   +3+7HuEpZPCz5ahz2jbu5P4RlUOTNidewlFJljBUF6kbETKnRXvvOq1g2
+   zEaUGK17Yhpb+rh04mbyXLJ6ip+KBxUj1YFVt+ijJpRF93/r62UMDSYn2
+   +3JEcXOPmxtki42vRRyCsirv0qjwDkTjVs73cidNfYVvlDQgQQRGIkCUT
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10322"; a="245823096"
+X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
+   d="scan'208";a="245823096"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Apr 2022 20:40:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,274,1643702400"; 
+   d="scan'208";a="531178539"
+Received: from orsmsx605.amr.corp.intel.com ([10.22.229.18])
+  by orsmga002.jf.intel.com with ESMTP; 19 Apr 2022 20:40:05 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX605.amr.corp.intel.com (10.22.229.18) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27; Tue, 19 Apr 2022 20:40:05 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.27 via Frontend Transport; Tue, 19 Apr 2022 20:40:05 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.171)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2308.27; Tue, 19 Apr 2022 20:40:05 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ngHPXiwg+8OJycEh/zZ7BKK3E2k8hyx/ddllZjVC4iDdLOvjvpAHNe8R2/i9WX5Y8n8mmcNG7boHVXXWnOv4GEhIjekFBR/sFw7n9o3ToTZmZYONXfkgHxyC+NfxGoZ3Ff7Jt/a6L7RF0Jrs6Kp2WluRINf5o7WzP1maMKrciU71P/JbS62jlaSwUG38qQS3WgRlpd+AVM+qaBCIVV4tm/rjgrypawyo1N2BTj+0B9me5CmwaU4QP/d/auXZpIL0SspnSLh2RQN6T9e64VNxdavG/FDC5GLqT9XqIBevOMJaA5a0+eaPn1ovhFgOVfE+V4AqmGNxnepyfLnPoZKyeg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NsJ9PYv8qIHidqFAvFUveajyWeLCRc11CN8BaXUlmiw=;
+ b=K6XzOzMhlUEHrXe5csm3ai237YE99we7qoQWVDp/qBuVBDVWwakVzLbiDvgJnEcizvgQLVvyk/taNEPDjrXfIqp3JMFm/yYuiedoQNEk7oFwi4B8WtjHxhPUeGkoyn2sog8pG6piCGF3EjOvIAocuIRWJcrfge7oFhu5i5HEbeJinsFdjona2nTCf/Pvx9IvQfZo2YpAZF3g5YjlU1e82ozv7gekD/qiDMZY9Ndq6yGZlCy6+zWWCs407Mu33Xtjj7a8XCQu1wlU+TweJIEe8gzH7mGvfvmY3x/zuMu0I87bhBIFjQJRwF2Cye9x825DqAx7436S+qrrQAlwxERMFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from MWHPR1101MB2126.namprd11.prod.outlook.com
+ (2603:10b6:301:50::20) by SA0PR11MB4622.namprd11.prod.outlook.com
+ (2603:10b6:806:9c::7) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5164.20; Wed, 20 Apr
+ 2022 03:40:03 +0000
+Received: from MWHPR1101MB2126.namprd11.prod.outlook.com
+ ([fe80::645c:646:87b0:7be5]) by MWHPR1101MB2126.namprd11.prod.outlook.com
+ ([fe80::645c:646:87b0:7be5%6]) with mapi id 15.20.5164.026; Wed, 20 Apr 2022
+ 03:40:03 +0000
+From:   "Williams, Dan J" <dan.j.williams@intel.com>
+To:     "yukuai3@huawei.com" <yukuai3@huawei.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>
+CC:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "yi.zhang@huawei.com" <yi.zhang@huawei.com>
+Subject: Re: [PATCH RESEND] blk-mq: fix possible creation failure for
+ 'debugfs_dir'
+Thread-Topic: [PATCH RESEND] blk-mq: fix possible creation failure for
+ 'debugfs_dir'
+Thread-Index: AQHYVGhRDRXwVlyXjEuH8PI6ymwRjQ==
+Date:   Wed, 20 Apr 2022 03:40:02 +0000
+Message-ID: <97c78b6cbb95c2e63e2ef70a8901360f4ed23dc3.camel@intel.com>
+References: <20220415035607.1836495-1-yukuai3@huawei.com>
+In-Reply-To: <20220415035607.1836495-1-yukuai3@huawei.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Evolution 3.40.4 (3.40.4-3.fc34) 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: b3f1dc55-11db-411e-1931-08da227f742f
+x-ms-traffictypediagnostic: SA0PR11MB4622:EE_
+x-microsoft-antispam-prvs: <SA0PR11MB4622FCB93736122B47EB1A33C6F59@SA0PR11MB4622.namprd11.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: uUAbe3RIwJ1HnhKXEdTGP1qHPHhm4qSKABYHD+0JwimQW1tMkQDhq6gFKgwqdE0yBJTihSYekXmzUEz7M9zI62cHPiooNe/MB/F6rApHHP0ACygWEJc8MVUd2ZFBHAffe1rMDJBt4fyfVRPqZhdh65y7E2DzJzeLaVQ3JogqCgNTwquBJJONDBUzA79k9VqcUyeJ94Mv6HPQHjMnwe76nTIHkvoA4ieKDTrduyTNKQLz1wgCMVER/o9doW2IxAbIwR7/09NHjLPR4Ro8IgEdfwTsNqZPuxeN2Tvh+2viw90k66v674fRJm8fROaFAMB5XxgSyVDPXQPpJkirzknGFZMUXe88NVAN55eegNdkNNi/OA3ous47ele7T2uyLuRWRNswl2hFWXAecvjrrLTG2ZGYjwMvxGw9ErCnHW8F+B4NJU8UMeNpu1sjNUrGS8jJDCEbCaSA3TfY65HBEpgEN5m96LMcNJ/BvEIF6FelWkB2sLb6oJ+oMLRiPdjinxEusbEV3iSY4krcQHROoZ9AbJyaj0Ssxwp4Ivy6eFX2+0N3/FSQjbBWBxK9DG/MyhFpV1NjXxkEhmrINQHjT2I+sNdeYTAqSF790agVLIu1rBwDlIrmpvLL1jw7rHodNijPO6wsyyPoTY2s1KHEa4wo8eZ0yiZnVC6KbZbDQk1AFvhG+WgCM4i56vFNHHD8ylheRVleyvQEvJu3/5CgUSEzAQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1101MB2126.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(366004)(91956017)(4744005)(86362001)(64756008)(6512007)(26005)(8676002)(66476007)(122000001)(2906002)(2616005)(66446008)(38100700002)(6506007)(8936002)(71200400001)(6486002)(38070700005)(110136005)(54906003)(508600001)(66556008)(36756003)(76116006)(66946007)(186003)(82960400001)(83380400001)(316002)(4326008)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VTdyNmV0MnVjcExNUVRWQnJESVZLU2ZLeUQrQnZJcEtERnU5SmlJdGxIYUZh?=
+ =?utf-8?B?Wk1LTlpVY0s0eG5mclhGT3pCcTd6UkU2SEU4M3dMRjFPd015UFFucFh2Z1c3?=
+ =?utf-8?B?N3RKNlo2RUNCOEdIdFNNRVJ6dEJoeW13RHJlZ20wNzFES09ZdVUvWHdQRUly?=
+ =?utf-8?B?bXlmY2R3cW44c1dYRE16MXd3Yk9XSWo1NlRhcmxJZzhNVWx0QklMdm9KK2o1?=
+ =?utf-8?B?U3FRMFQ1TCtkU1FQRkV2SDlBbTlVWEYrK25JOEx0bzFPWkkvK21mWEtUdHdq?=
+ =?utf-8?B?bXQ1aENIbTlsUWdiTlFvcmw3clRWdFdSV25JbjhFZ053aGxxM0JUWGlZVXpG?=
+ =?utf-8?B?TjRtbW1TWUMrZHRWUU9pMDdkbitHWVVwWEdMVmszUElaNW5BamM3M0tIWTZr?=
+ =?utf-8?B?Yitzb1BwbHVMSGc1NmdhdnF0NVVNaXVpdmxwTjlrb2VkcFBRTytTWHA0emsv?=
+ =?utf-8?B?ZzB3dTdUNEFRQ2R0QmdleVNHTjV0TWxLeVBPem1GaFc4K3VNQmhybjR4NDBI?=
+ =?utf-8?B?WDZyS3NJTlJCWGZGZVA3d0EwUjByS1ZtWVhoMW8xdSt5RHE3WWVQOHM1d0J4?=
+ =?utf-8?B?Wlc3cWtjUGg2SUZ6aHBGQ1d5OFgrQzd1S0hqVkhDVmJKYVdiRzJsWWhXWDls?=
+ =?utf-8?B?dkNmWFp3NWNQVHJrbUxSdW5IUG96YlB3SWhWSC9BT2ZwbE9ZS1lXbmRjMU84?=
+ =?utf-8?B?ZTgzNlhLZUhEN3QzeVZKUHhzdlJick9LQWlpTVJ6OTZvd2U3YmJucThibWxS?=
+ =?utf-8?B?MWJnMmR5TnIzckxDc0xOakNEOHlncWZBSjA4RDRwMlJYemk3dFZQclFiaEpD?=
+ =?utf-8?B?L1dBZG01N201eFF2Z1lGQkpYTUcweUN2c2hETEtrY3JiQUNtUFdaNWFtenA1?=
+ =?utf-8?B?VUt4cXVYWXFvOFArVkhabkhiQ0RYVjVZOUxRUW50R0hqSmNkVzhZRnV2eFl0?=
+ =?utf-8?B?Ukd2MHlPZDZQVHlhditwUHJ0am9rODRLcGVpeWVQL09IQi9XZG9HSmpGZUd0?=
+ =?utf-8?B?aFcxdDZhOEtJamZjVDZWRGdnVHRCaU13K2l1Y1VLdjZwQ0hnY0xIQVRUZ0h3?=
+ =?utf-8?B?L3lGeXJtSUtUVnpiNS9RMXRuRUNIZE9rTHFVNDE2eGZJeTF2R291aDhpRjZO?=
+ =?utf-8?B?S0pIMEs4ZWhueDdiYWc1L3BVNTVUS0Z1b3hleGw3VW81cDBrY242ejU5UnBs?=
+ =?utf-8?B?UlFGbjNoekowTFRRdXY2amx5TDdETDFHaHJycWVlYzg3SEcxakV2RXNSRWVV?=
+ =?utf-8?B?ZTNVamlpUnkvWitQeGY5eGFIMzQ1d29aTUJONGF5OVI4RWxBMXNJL2k5SmFE?=
+ =?utf-8?B?Yk9GVzNQZ2xjSFdYMXFHY1l0aWtnaVpMYW00ak1mQ294Z01DNnF2SzVGcDFW?=
+ =?utf-8?B?UExUcnZHcXVPa2NkcHBwc1hLZWNJclNHdWp1a3hvVDI0SXlQbXV1U1NBUlVL?=
+ =?utf-8?B?bDNnUXN0V3VRaDhsNlVJZzhqNGFlbGJLam0ySDA0NjZVSzR4WC9pN085UkxT?=
+ =?utf-8?B?NzByVU1ybnlTQTNoaGZxZ3poOGhrSk43U1FmaFA0enllS3M1bCtBdnJubSs5?=
+ =?utf-8?B?STdVdzdCTVZod1M4cVpQUXBTMjd4MFRxaXYvVEVjcHlCT2V6QTNtdW9lUW4w?=
+ =?utf-8?B?VlVsUm5lSDR1ZjFUY2k0cmoydmxOTTR4eEdZdWhXbTFxeFhFK0JGQzU5WFRo?=
+ =?utf-8?B?RFhkZHJId1NBc3JVbjJIL0tSdDhnMHdDTU50cEYzMWZNMmNWdER1b0dFZjBa?=
+ =?utf-8?B?R01YcndCL3hiLzE5V2VBVGFqa3N5NkxDMTVNelJwMkV3VC9hQnVNaWcyUE9q?=
+ =?utf-8?B?YzljaWttcjdkZ054WXNrLzdPOG10SzZ3SFBVZDNwRnI2WTVVYWt3aG05WHAx?=
+ =?utf-8?B?R1Ftbm1hSmdabzBhU2F1WXBHdGtVVUovUTNBMW5MQXU3WUplL2tSN1lSYlFY?=
+ =?utf-8?B?Q1JyT2c4eHlCaFpuRlpGcVJENldHUE1zcnNITXBJdGtnVE85VUtlaTJBTnVQ?=
+ =?utf-8?B?U01UMDJDZ1UzSTBwWnN1TlJYY0IzdllLZmo5UlplN0xZYTRlWk1IRVMwVTBD?=
+ =?utf-8?B?UnhpY0RwME5GdE82OUloZkpFN0VmR2EweXpDa0Ruc1ZDUTZxUEhWL1pneEpM?=
+ =?utf-8?B?S3ZwcFFrTkZnYzhqYmJKbWdaRFFIcTNNcTczdTdpckpONVVQL0ptdmV3c24z?=
+ =?utf-8?B?RW9ZMzhjMWFuYlhGN09vQmJLbXJwUjNaZStJU1kvU1Z6WFZTVVpFUm8reUNp?=
+ =?utf-8?B?TVlyaGJsTWg1QllPM1h1b08wREJCRmU3dElTajc5QnZFYUloUzdxajMzZWY5?=
+ =?utf-8?B?MkFrV29ZM0JrMThzSllTQ2ZObWZJckVIWldzblQ3d3JPbmlwZy9CdmZ5NGpI?=
+ =?utf-8?Q?HS+aUSP6jpvqQruDoA4YvDZDuHrqCDmgHlMU/?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <69235B828C40F54FA3235356541055F4@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <292908e4-8721-20a0-2720-e60641a1fbe4@huawei.com>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MWHPR1101MB2126.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b3f1dc55-11db-411e-1931-08da227f742f
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Apr 2022 03:40:03.0375
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: EVuJmzWJHE4jsZnGxHxZbnO7sJ7II9wr7HcsTCtFKaddZgfCy8S25dxvjXyibgat6JexigX2I5qmkDtv6OK3vTF9qRvixKGSJRne10qd2wI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR11MB4622
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 20, 2022 at 10:01:36AM +0800, yukuai (C) wrote:
-> 在 2022/04/20 9:46, Williams, Dan J 写道:
-> > On Fri, 2022-03-18 at 21:01 +0800, Ming Lei wrote:
-> > > In the whole lifetime of blkcg_gq instance, ->q will be referred, such
-> > > as, ->pd_free_fn() is called in blkg_free, and throtl_pd_free() still
-> > > may touch the request queue via &tg->service_queue.pending_timer which
-> > > is handled by throtl_pending_timer_fn(), so it is reasonable to grab
-> > > request queue's refcnt by blkcg_gq instance.
-> > > 
-> > > Previously blkcg_exit_queue() is called from blk_release_queue, and it
-> > > is hard to avoid the use-after-free. But recently commit 1059699f87eb ("block:
-> > > move blkcg initialization/destroy into disk allocation/release handler")
-> > > is merged to for-5.18/block, it becomes simple to fix the issue by simply
-> > > grabbing request queue's refcnt.
-> > 
-> > This patch, upstream as commit 0a9a25ca7843 ("block: let blkcg_gq grab
-> > request queue's refcnt") causes the nvdimm unit tests to spam messages
-> > like:
-> > 
-> > [   51.439133] debugfs: Directory 'pmem2' with parent 'block' already present!
-> > [   52.095679] debugfs: Directory 'pmem3' with parent 'block' already present!
-> > [   52.505613] block device autoloading is deprecated and will be removed.
-> > [   52.791693] debugfs: Directory 'pmem2' with parent 'block' already present!
-> > [   53.240314] debugfs: Directory 'pmem3' with parent 'block' already present!
-> > [   53.373472] debugfs: Directory 'pmem3' with parent 'block' already present!
-> > [   53.688876] nd_pmem btt2.0: No existing arenas
-> > [   53.773097] debugfs: Directory 'pmem2s' with parent 'block' already present!
-> > [   53.884493] debugfs: Directory 'pmem2s' with parent 'block' already present!
-> > [   54.042946] debugfs: Directory 'pmem2s' with parent 'block' already present!
-> > [   54.195954] debugfs: Directory 'pmem2s' with parent 'block' already present!
-> > [   54.383989] debugfs: Directory 'pmem2' with parent 'block' already present!
-> > [   54.577206] nd_pmem btt3.0: No existing arenas
-> > 
-> Hi,
-> 
-> I saw the same warning in our test, and I posted a patch to fix the
-> problem:
-> 
-> https://patchwork.kernel.org/project/linux-block/patch/20220415035607.1836495-1-yukuai3@huawei.com/
-> 
-> The root cause is not relate to the above commit, see details in
-> the commit message.
-
-Yeah, I am pretty sure the issue of 'debugfs: Directory 'XXXXX' with parent 'block' already
-present!' is one block layer long-term issue.
-
-Commit 0a9a25ca7843 ("block: let blkcg_gq grab request queue's refcnt") justs causes queue
-released a bit late, then the issue becomes easier to trigger.
-
-
-Thanks,
-Ming
-
+T24gRnJpLCAyMDIyLTA0LTE1IGF0IDExOjU2ICswODAwLCBZdSBLdWFpIHdyb3RlOg0KPiAncS0+
+ZGVidWdmc19kaXInIGlzIGNyZWF0ZWQgaW4gYmxrX3JlZ2lzdGVyX3F1ZXVlKCksIGhvd2V2ZXIs
+IGl0J3Mgbm90DQo+IHJlbW92ZWQgaW4gYmxrX3VucmVnaXN0ZXJfcXVldWUoKSBhbmQgaXMgZGVs
+YXllZCB0byBibGtfcmVsZWFzZV9xdWV1ZSgpLg0KPiBUaHVzIGl0J3MgcG9zc2libGUgdGhhdCBk
+ZWxfZ2VuZGlzaygpIGlzIGRvbmUgYW5kIGJsa19yZWxlYXNlX3F1ZXVlKCkNCj4gaXMgbm90IGNh
+bGxlZCB5ZXQsIGFuZCBpbiB0aGUgbWVhbiB0aW1lIGJsa19yZWdpc3Rlcl9xdWV1ZSgpIGlzIGNh
+bGxlZA0KPiBmb3IgdGhlIG5ldyBkZXZpY2Ugd2l0aCB0aGUgc2FtZSBuYW1lLiBJbiB0aGlzIGNh
+c2UsIGtlcm5lbCB3aWxsDQo+IGNvbXBhbGluIGFib3V0IGNyZWF0aW9uIGZhaWx1cmUgZm9yICdk
+ZWJ1Z2ZzX2RpcicgbGlrZSBmb2xsb3dpbmc6DQo+IA0KPiBkZWJ1Z2ZzOiBEaXJlY3RvcnkgJ251
+bGxiMScgd2l0aCBwYXJlbnQgJ2Jsb2NrJyBhbHJlYWR5IHByZXNlbnQhDQo+IA0KPiBGaXggdGhl
+IHByb2JsZW0gYnkgbW92aW5nIGZvcndhcmQgdGhlIHJlbW92YWwgb2YgJ2RlYmdmc19kaXInIHRv
+DQo+IGJsa191bnJlZ2lzdGVyX3F1ZXVlKCkuDQo+IA0KPiBTaWduZWQtb2ZmLWJ5OiBZdSBLdWFp
+IDx5dWt1YWkzQGh1YXdlaS5jb20+DQoNCkxvb2tzIGxpa2UgSSdtIGxhdGUgdG8gdGhlIHBhcnR5
+LCBidXQgZm9yIHdoYXQgaXRzIHdvcnRoOg0KDQpUZXN0ZWQtYnk6IERhbiBXaWxsaWFtcyA8ZGFu
+Lmoud2lsbGlhbXNAaW50ZWwuY29tPg0KDQpUaGFua3MhDQoNCg==
