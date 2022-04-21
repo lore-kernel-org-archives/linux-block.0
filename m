@@ -2,149 +2,70 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E09DC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 17:53:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD066C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 17:56:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348173AbiDUR4Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Apr 2022 13:56:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52126 "EHLO
+        id S1391000AbiDUR7j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Apr 2022 13:59:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236549AbiDUR4X (ORCPT
+        with ESMTP id S232674AbiDUR7i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Apr 2022 13:56:23 -0400
+        Thu, 21 Apr 2022 13:59:38 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5262F4A926;
-        Thu, 21 Apr 2022 10:53:32 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E449C46165
+        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 10:56:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=OzMBFt4cX9sZG3+xKaNjpIrCYXW+IugofzGvsiKoa1c=; b=r+8wwH27HmVqrnNXROGmLzk+8Z
-        9BQdWmRbDA5sRoSKKRvgHo5MzzgfhN5j0Omy9hJXca1lszYylN6C6VhVBRerKkOqR3O3xnPvQx/0k
-        cjFj+cO1nW6yYtWNecbGNXyOmd0a1BKLaez4I8cGDSH7bF0Qjy733QIvq74FIcyVyeaqQLJnoAyGd
-        PpdS/8QRn5mLrCNg7LP4bWPEAmlsGn9sMfxBAPKo856bGPyOmrZJe2OLHRgVugg0+EtA41Os2EHp5
-        JXtRD2c/UC/Yopn1biddSqI6/4c9rgw4hbPDEc8hy+f7H10LkQPzaeoOhsXbpJNOIXRx+lEndjkM7
-        oBbuzUrw==;
+        bh=f7qsl0wuzlN+We+YckfR1ZlSyXconLmQzfiazp6GcNQ=; b=H7dDgrOezWvMiFG1vqjjOVPbUi
+        3cWfanle3D1y5ExnRcQ8OOI1w1DHQ7FN+p/a1bwSCCcfImZC+GPiBCr99AME4LLCA0UrRM8Ak5IGF
+        hbDmzF4uS3jmxWgsSKGx3nvKVTb5scPWuvbqZqTPx2IJ+Qi5au2kY7qNKyXvTKi8GvC12QEzzSOeF
+        4Q0HpdMTVptQbsvLlvZO2JxwH2vXS59Og3ishxOoZ7syMJMgPrd+ajRMwqfNbhoARHaB98bVkek8m
+        yo66IbXa31zSVpXukYeUw8BYKLJQ1Hw4NpH9j0VcaYG51qz+rf6NojnOijhwgqeze+bJQ8h8QFs6g
+        kRFHJCRQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nhazi-00EWI6-QM; Thu, 21 Apr 2022 17:53:30 +0000
-Date:   Thu, 21 Apr 2022 10:53:30 -0700
+        id 1nhb2p-00EWPR-Du; Thu, 21 Apr 2022 17:56:43 +0000
+Date:   Thu, 21 Apr 2022 10:56:43 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Douglas Gilbert <dgilbert@interlog.com>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-modules@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Pankaj Malhotra <pankaj1.m@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-Subject: scsi_debug in fstests and blktests (Was: Re: Fwd: [bug
- report][bisected] modprob -r scsi-debug take more than 3mins during blktests
- srp/ tests)
-Message-ID: <YmGaGoz2+Kdqu05l@bombadil.infradead.org>
-References: <CAHj4cs9OTm9sb_5fmzgz+W9OSLeVPKix3Yri856kqQVccwd_Mw@mail.gmail.com>
- <fba69540-b623-9602-a0e2-00de3348dbd6@interlog.com>
- <YlW7gY8nr9LnBEF+@bombadil.infradead.org>
- <00ebace8-b513-53c0-f13b-d3320757695d@interlog.com>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        Christoph Hellwig <hch@infradead.org>,
+        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
+        "sagi@grimberg.me" <sagi@grimberg.me>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: can't run nvme-mp blktests
+Message-ID: <YmGa2yzufsI1TLiC@bombadil.infradead.org>
+References: <YlYYJC/WUEsnI9Im@bombadil.infradead.org>
+ <YlZXOC4VgmDrUGIP@infradead.org>
+ <YlcKqu3roZQSxZe8@bombadil.infradead.org>
+ <YlcLOM49JsdlBqTW@infradead.org>
+ <af030072-d932-5e38-64d6-bfd28152862b@acm.org>
+ <YlkAlHe6LloUAzzN@infradead.org>
+ <587c14e7-2b7e-74ac-377b-6faafcb829e4@nvidia.com>
+ <YlmyiXBHyqtDQ+g9@bombadil.infradead.org>
+ <0d49f3d3-b0ca-8bc9-1be3-c68d0571c98b@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <00ebace8-b513-53c0-f13b-d3320757695d@interlog.com>
+In-Reply-To: <0d49f3d3-b0ca-8bc9-1be3-c68d0571c98b@acm.org>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Moving this discussion to the lists as we need to really think
-about how testing on fstests and blktests uses scsi_debug for
-a high confidence in baseline without false positives on failures
-due to the inability to the remove scsi_debug module.
-
-This should also apply to other test debug modules like null_blk,
-nvme target loop drivers, etc, it's all the same long term. But yeah
-scsi surely make this... painful today. In any case hopefully folks
-with other test debug drivesr are running tests to ensure you can
-always rmmod these modules regardless of what is happening.
-
-On Tue, Apr 12, 2022 at 06:03:40PM -0400, Douglas Gilbert wrote:
-> On 2022-04-12 13:48, Luis Chamberlain wrote:
-> > On Thu, Apr 07, 2022 at 10:09:54PM -0400, Douglas Gilbert wrote:
-> > > Hi,
-> > > Is it time to revert this patch?
-> > 
-> > Upstream kmod will indeed get patched soon witha  --patient-remove
-> > option. So the issue is that. However, it doesn't mean driver's
-> > can't / should strive to avoid these issues if they can. That is a
-> > thing left to driver's to implement / resolve if they want.
-> > 
-> > In the meantime userspace should change to user the patient removal,
-> > and if the upstream kmod doesn't have yet have it (note, the code is
-> > not yet merged) then tools doing module removal should open code the
-> > module removal. I modified fstests to do open coding of the patient
-> > module removal in case kmod does not support it.  I have a similar patch
-> > for blktests but that still requires regression testing on my part. I
-> > hope to finish that soon though.
-> > 
-> > So the answer to your question: it depends on how well you want to deal
-> > with these issues for users, or punt the problems to patient removal
-> > usage.
+On Fri, Apr 15, 2022 at 11:09:33AM -0700, Bart Van Assche wrote:
+> On 4/15/22 10:59, Luis Chamberlain wrote:
+> > That's about 3 block folks not being sure whether or not it helps. And
+> > the complexities of it, to test it, requiring a different kernel seems
+> > just stupid. So I'm going to drop the tests from kdevops and not bother
+> > with them.
 > 
-> Hi,
-> There is a significant amount of work bringing down a driver like scsi_debug.
-> Apart from potentially consuming most of the ram on a box, it also has the
-> issue of SCSI commands that are "in flight" when rmmod is called.
-> 
-> So I think it is approaching impossible to make rmmod scsi_debug the equivalent
-> of an atomic operation. There are just too many moving parts, potentially
-> moving asynchronously to one another. This is an extremely good test for the
-> SCSI/block system, roughly equivalent to losing a HBA that has a lot of disks
-> behind it. Will the system stabilize and how long will that take?
+> How about modifying the nvmeof-mp tests such that these use NVMe
+> multipathing instead of the dm-multipath driver?
 
-I understand. But I really cannot buy "impossible". Impossible I think should
-mean a design flaw somewhere.
-
-At least for now I think we should narrow our objectives so that
-this is *possible* within the context of fstests and blktests because
-otherwise *we really should not be using scsi_debug* for high fidelity
-in testing. One of the reasons is that we want to be able to run
-fstests or blktests in a loop with confidence so that failures are
-real. A failure due to the inability to not remove a debug module
-makes gaining confidence in a baseline a bit difficult and you'd have
-to implement hacks around it.
-
-mcgrof@fulton ~/devel/blktests (git::master)$ git grep _have_scsi_debug tests | wc -l
-10
-
-mcgrof@fulton ~/devel/xfstests-dev (git::master)$ git grep _require_scsi_debug tests| wc -l
-5
-
-Not insane, but enough for us to care, but I think if we *narrow* our
-scope to ensure scsi_debug *can* be removed *at least* with the patient
-module remover we're good.
-
-Do you think this is viable goal for scsi_debug?
-
-> Setting up races between modprobe and rmmod on scsi_debug was certainly not
-> top of mind for me.
-
-Oh I get it. But the community has already embraced it for years on
-fstests and blktests. So at this point I think we have no other option.
-
-I think one thing we *can* do is *not* use scsi_debug for tests which
-*really don't need scsi*.
-
-> Storage systems such as SCSI are a lot better defined
-> (and ordered) in the power-up scenario. Even with asynchronous scanning
-> (discovery) of devices (even SSDs) it can take 10 plus seconds to bring up
-> devices with a lot more handshaking between controller and the storage
-> device. And even with SSDs, there is increased power draw during power-up
-> (hard disks obviously need to accelerate the medium up to the rated speed).
-> That leads to big storage arrays staggering when they apply power to
-> different banks of SSDs/disks.
-
-Sure..
-
-> I wonder if anyone has tested building scsi_mod (the SCSI mid-level) as a
-> module and tried rmmod on it while, say, a USB key is being read :-)
-
-:)
+Patches welcomed, I'm just going to ignore nvme-mp for now.
 
   Luis
