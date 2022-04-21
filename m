@@ -2,144 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20405C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 21:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0281CC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 23:07:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347325AbiDUV7V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Apr 2022 17:59:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46162 "EHLO
+        id S1384584AbiDUXJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Apr 2022 19:09:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54598 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229637AbiDUV7U (ORCPT
+        with ESMTP id S229917AbiDUXJu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Apr 2022 17:59:20 -0400
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2085.outbound.protection.outlook.com [40.107.244.85])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53F6B4D27D
-        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 14:56:29 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XXnRFgIQ1L/p0VuPmuMB3IAfLFpE17tY4lQwSejdgFm6U1cY18LfJrDWzEoV0ecrys03j5aoufezVFUnxUoKUSgNm8hYTOxGBT8djymwRMFLMylz+Z5JZEMhDeOEmSFes0BLCkPVEGlBL871K90wrr1sGLrkHp++ngbSPNefxRQJrfd9odmziMhtYv9jf2PjL9lYj+x5dN/4kD794bkqwDg99cAOyFQoYdoVWdq6Bssl9w7O+lZOCEdWpOiNq4ttr9m4HVr6wzAoy5uNBzoaWueZBzaUsmDQpPTRZgmw+35GINGF8U3Z4BL4UsL/e7MsAHiGzp33ld07Z5XshsELxg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OxMQ3Fma46v0uudrsRJQ3Chnxr8Udcp6S4YmQ3KJq9A=;
- b=R2KFTFBBjHPnOzcf5myvbdZl2SqaqaRQDV+RZosMvkLw8kYm/4WQTd/Ou1M4tMH8WDY6yLRlYnuYwDJ7sZmRoknPDaqm4ZR5E3zTDm7YuFRQwGWisXK/CyLKRNOjciBYsPw2R+WuuTG8arpvv3lwEVe8+43CHAAWNofQBnpWim2kOiwhfyp7PgEwE8wmInm1nlpbWHIffiOtIE3mA+2iUJg4CPDZZj8OOmPHvhNyw8VsbsG8udqSeljQPRmmgtGccS0UBCXG8fKRsLAhM0dREestPZXPcBgRhNdpMr/HjnMZ2TuSpg8Dn4pDAhD268280uiTTfcGozq/GbZ+gXZ37w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OxMQ3Fma46v0uudrsRJQ3Chnxr8Udcp6S4YmQ3KJq9A=;
- b=KrVPaIx5+J/rQe6AuSfrd3k8jSvsksXeHjNLKXXWlzFMSb3hO2gjNQ7VWrbTT6qXEqLvo5lkQq4YSv/RZtB9otiffWlt8uEKfUUIhcS6bkZOxVWNSf11e0LXGq7ly3Bcwc+p7XH4WFpV/6H+4dmQtJ9enEewVNba9YcfwiPHynnGCMc0EO1NPnJQMM//w8vGCBXUfY8vXPlPxF/jdwlSET/iXBtnnM+MNP9GFfr28oefEEiN21wdnO6ZOiegzwsSsHaef2ULaqBTE1lFb4HUGYiKfuYVBxEyk5BJGFqH5ZEq0XaJEFofHPBl2kCNGz7ry2pS1Ojdv9ptz4V9rx3D5w==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by MWHPR12MB1280.namprd12.prod.outlook.com (2603:10b6:300:12::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.14; Thu, 21 Apr
- 2022 21:56:28 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::a90b:9df2:370c:e76b]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::a90b:9df2:370c:e76b%3]) with mapi id 15.20.5164.026; Thu, 21 Apr 2022
- 21:56:28 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     "stefanha@redhat.com" <stefanha@redhat.com>
-CC:     "mst@redhat.com" <mst@redhat.com>,
-        "virtualization@lists.linux-foundation.org" 
-        <virtualization@lists.linux-foundation.org>,
-        "pbonzini@redhat.com" <pbonzini@redhat.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "jasowang@redhat.com" <jasowang@redhat.com>
-Subject: Re: [PATCH 0/4] virtio-blk: small cleanup
-Thread-Topic: [PATCH 0/4] virtio-blk: small cleanup
-Thread-Index: AQHYVGyptnVZeDje0Ee2zKGOBbl9aaz67HOA
-Date:   Thu, 21 Apr 2022 21:56:28 +0000
-Message-ID: <6c21dd2d-830a-8842-428e-6fc60966b73e@nvidia.com>
-References: <20220420041053.7927-1-kch@nvidia.com>
-In-Reply-To: <20220420041053.7927-1-kch@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: aed7e947-f1d0-4553-62e1-08da23e1c978
-x-ms-traffictypediagnostic: MWHPR12MB1280:EE_
-x-microsoft-antispam-prvs: <MWHPR12MB12807F950B9958A970F862E3A3F49@MWHPR12MB1280.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 0BqsRfPnaEjZPS1vpL0NMk/ITPS5tsPSuLRSsmr+BkKb+/m2JpmnP4TcpAoyHM3sbH2yzM5A4tO5VQgusEG3gGWppKViLqH/jWiXcVCMnC5qKpikGAc3InL58XW4o3TmZBbXjzfcUrSdldWm1zHXBS7vP3M0fSiVSjArYS2aYTbDZjgii3EctWYh9cn2jNfftFg8dmyJwoZJ1rlEjAJrmGNSvujru2SPbo8iGL6h3x2SoAGsoJgE2o73MsANSyQSEsgzykpC8CjV7YCuBGZ0tx7Z7WsKtfRXis4Yykhj/EX4wTUzXbNPraDXFr8q/D+AZpoluHPgs6+s8T1ekwvGHpq+Dp3b3WU1qT2LMg6bj4QI2EuTeaK7qKuufl6ehbJg/FImcvLBBTrC1+94O28oEtgIR1SJCaMOG3as2rr06MFFBW/zBDffRV3e6dcK4FdBajBn7JnE1rzyqvrnrbtJRLPiGjEONFUIy6GVEqju1HdYwlJo6qWFxbjzbj3Y6QVZ8352QPg6tEMnkB+7g30ar+GxUnFWDEcJP3uU/P0JNfW6gEimnkj3DagqIqefrHN73S92UlhEmmZwuLya0XRVFb0ZRI7On2tcCn/EL62CNU1hvUpa8VzvRa66JrwnnmpkYiKR1tOZ4SStUAu2WXzmfVl1reMFAMr+BU9uwYTELqnRSkKtpcWtIWrfzluqi9+jdGwovAiFId9GBuB3oJ2g84RjmyqXkKdhS5Y35K/JdvzFuzyEjX8pxQ/HRsaHxPEZMRLLth3LmgR5BOEvQLeZRci1X99Vd0dLvTWybr+4rUk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(186003)(2616005)(508600001)(6512007)(6486002)(71200400001)(26005)(4326008)(53546011)(2906002)(6506007)(83380400001)(122000001)(38070700005)(38100700002)(76116006)(66556008)(64756008)(66476007)(31686004)(66946007)(66446008)(8676002)(91956017)(86362001)(54906003)(4744005)(5660300002)(31696002)(316002)(36756003)(8936002)(6916009)(21314003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?K1NQWmpzMHE0Z1daWUlGZ3Jqckg0MTVrbmdFenpkTk52OU5ZK1dQWldZcjNv?=
- =?utf-8?B?cG9aTUZoYXRINVI4UkRqZmt4VEtLcjZlUDJVcXlQRXlKS1NFTVR2RURjMmVZ?=
- =?utf-8?B?OHg5RXJsaDUyTlA1QWhDcHZTTE13NWtBcXByM29WdFNQd09HRm5TektrdUNO?=
- =?utf-8?B?aXUxN3BiSzR4emNublp5QkdSYzVGSS9DOEE0aVVpY3Q0aFhDTmtpa0tVMm1m?=
- =?utf-8?B?ZTBJL0xQMXNNa3ZyZldNY2JSS1JOK3ZDcStwaGp0NlNrWCtVN3ljZ1NJU1Qx?=
- =?utf-8?B?ZWplNFZ4R2NVVWJhcTJqL3ZoNXgxNmlHdEhjcG0rVmxtREpBZWNQL2FuNGNG?=
- =?utf-8?B?L1R4Y2J1THNDMFYwbTMraTNyVTVUT2M3Y0JtSkFZWEg0RTV4U3dUQlZTbCsx?=
- =?utf-8?B?MFM4Qk51UVpUREh0UFcrK0drV2tkTXdxUHFyV2Nqekt5NlFTMm9WU0wxNEtN?=
- =?utf-8?B?U2FheVNxdDRWUjgyVlVpR3pza1BVN200WFNZTFZMRDRQWEx3MG44S2lrbkVa?=
- =?utf-8?B?MkhLeGJxSTJlMFRPOGkwOTF2Wm5BMUlIekxURGUwSC96VWt6K0ZCSTNXd3l2?=
- =?utf-8?B?eDVXLzNyQUdleGtIakRmYmFkV1VXZXB4U1UzY2YwSHJWUFQwS0dmZEZNRGV1?=
- =?utf-8?B?cm5xYktGaUg5U2lLeEtDdXlOaGFwRjljTGFXcW9SS2xxV2I2WmZtak5TOE5y?=
- =?utf-8?B?ZjBZS1dWU1d5dXBhSFAzMUN6aTZwWGI2MlZPUEdpWTd4ZUp6QVB5ZlU2RjVv?=
- =?utf-8?B?VlZWakNvZXRTeXdZWksrRkUvcUlCWlpsTWlUSVJ5Y1lIZnlkMCtxeUNBMGEv?=
- =?utf-8?B?Qmp3UXJMV1VEV2thK2VVbW1oSWFPU01kUG9CYWtod2JtUlduQmt0cFNqS28r?=
- =?utf-8?B?WkEveXREZktZQURXQjJiMTFJbzhObEs0eUoyd0NtS2p6UmVJR2ZGWG04YThp?=
- =?utf-8?B?dlF3NGZ6ZVorWHl0cnJSdXo5U2lHS0N5MlN1SnBsdVYzdFBqQkdDZmN6STVp?=
- =?utf-8?B?bkJWQzdsVWV3MUZac3pBMmNVVTZHRHhHKytoV3M0WjlwNFdZMS94SlIxMHZN?=
- =?utf-8?B?UmN4Tm0wWVduQk5qV2cxK0RDSlFoMmdvckRhR3pVTXhxc2swZGsxWFRwTHNM?=
- =?utf-8?B?L2QxRFd2NXk1MDZ6UzBjb1NHNUtNSytGRVYwcm9TOWZlSnpjeGVqN01oanMx?=
- =?utf-8?B?UkRYNGc5UW9jRnVkT2MzNU52Ulh2R2Y0VWxqdkFUQ3ZEWjdOTDJ1U0lRVlRK?=
- =?utf-8?B?TzFDaDlPVFdOY0JJUG1sL1NJbXNHeGc0R1htUmdlZzN4V282TklrT3pWcUcv?=
- =?utf-8?B?Sm92aktabWxWYUZsakRReEk4Rm9EZjUwSW5Qa0dFbW9jbVNpUUlMTk1nMEs2?=
- =?utf-8?B?Zi9TN3hydVJLMmJGWlRhZ2lNVkZJTTVQeDZkZVNHdWFMOGJqa3Z1a0Uxd2lO?=
- =?utf-8?B?T0lReUdTMVQzMHhGT2J0VGJDelRVaVcxelhSZ0xwN0tpTS9WaUR1cHZXRkla?=
- =?utf-8?B?WDFqQjYyYVBQQVFUZWMyRE1Da2VmREdrSmRFMk9YWG5GUS9lMktOY0l1ckxw?=
- =?utf-8?B?QkJ5bkswUXNqWi9RN2cwc29CVTM0VDB1RzZQL3gvcDljNVdsalJuTFhGOVFk?=
- =?utf-8?B?WjBnamhrY043UEIyOFdTNUtEZllYaXo5UmV5OFRDZlVvdEpGZW1PVWxpZS9a?=
- =?utf-8?B?NWhJMVQzTmIwRk8xbUh3MlJlZCtva2oya0twL1R1QTdHWkh3Tkl5MTRidXN5?=
- =?utf-8?B?eGVxWktDMTgwZlEwa1l3c1krL3ZPVzFiS3Zpei9EdzBUbDFleTE2VEhnMUpN?=
- =?utf-8?B?cjArcVc4UVlJaWZ6RE1BV1FxVDZoOWgreXJabUpOcmdacEtUWlR3SGY5OFNy?=
- =?utf-8?B?RG0xL1hZVnE1c1B5Rm00b3lwM0wxVEVyazMvRDNtWStKcm1uV2VTdUdzMmk4?=
- =?utf-8?B?L05kV09paDBGWnJYamhMdmNBemJodVFONjVLZi9WZXhLNEtua0pZWVlBbDZv?=
- =?utf-8?B?dktxeXZ4M3dNc1RzOEZaQjM5WCs3eWYyR1BvTWRkbkNwckhOUWxEM25OTmRX?=
- =?utf-8?B?RFRTMlBtaHo3NDluMjFTSXplWDkxQzlrYmVGWEZIOTN0MHdqamV3R01McFZX?=
- =?utf-8?B?SkVVQXRUeU9QTGVjY3MwR0R6enc0QWt4Wjd4TGxGb2hTL2EvNkdEVUdkY3lk?=
- =?utf-8?B?cFdKcjcwTy9vN0s4bDF0cUZScGV1YVFzU1VoNnMxTG5BZG8zejV2UkhIM3NC?=
- =?utf-8?B?RVBoODJlakgrRFNSNFZ2b1NHb0IrbERPNEszNFJtMENzdlNSSWdrcnF0R2Jk?=
- =?utf-8?B?R3dZeWkxQlA3NWtQWlVkdmxTVExsanlLNlhyeENKVGxvN2hRcHZzZz09?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <0B26BC06AC45BE4693F047165E82F64D@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Thu, 21 Apr 2022 19:09:50 -0400
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6663643395
+        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 16:06:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650582419; x=1682118419;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pQT9aEysMXXsjvzcG5V3WWcbMoPa0tWlFbbMxcv7ek4=;
+  b=JvaYFOhW8Elj6X1/afq0Wi2N9+AsiZKuopoCVaw3DChEfagnruN0UznE
+   2frTdcKtX6M4lYIAn/4LMo9SQmPXwWHPkaDDcdNpiVRB+MYRnP0HkMbTL
+   EOZ6E4/NBUQoN4Q27VAXq2pbqc5oCLddCA+XyyBGxGw0TzydKcjcv/klO
+   W5Y9kpY37ENSbAIkq6xXnI7G9imcgL5U4vurB4pRqUxlVpzYB+49OJXvB
+   RUnRIQdLISfAXjq3n2/ejxkc2BbPHxu3D+mx9lgm4bdN3JTOBjrhcPvDK
+   w0yM/RmQBRaF+/vg7H2sj85mn5vpXlqmDHciTFyTlBI9TJByVr6Mk++gQ
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="289623736"
+X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
+   d="scan'208";a="289623736"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 16:06:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,280,1643702400"; 
+   d="scan'208";a="615137201"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 21 Apr 2022 16:06:57 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nhft2-0008s4-Eq;
+        Thu, 21 Apr 2022 23:06:56 +0000
+Date:   Fri, 22 Apr 2022 07:06:35 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        yukuai <yukuai3@huawei.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH] block: fix "Directory XXXXX with parent 'block' already
+ present!"
+Message-ID: <202204220614.mF9U5ks7-lkp@intel.com>
+References: <20220421083431.2917311-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aed7e947-f1d0-4553-62e1-08da23e1c978
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Apr 2022 21:56:28.0445
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: dUx+EjTsojcNQIGUO9RKxk2y25Fnb4s/OQR5BaKrPIeXjj66mYPHvaWlP2tCngoC1pvrQsyeuxBwmpA0tL2YOg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR12MB1280
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220421083431.2917311-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNC8xOS8yMiAyMToxMCwgQ2hhaXRhbnlhIEt1bGthcm5pIHdyb3RlOg0KPiBIaSwNCj4gDQo+
-IFRoaXMgaGFzIHNvbWUgbml0IGZpeGVzIGFuZCBjb2RlIGNsZWFudXBzIGFsb25nIHdpdGggcmVt
-b3ZpbmcNCj4gZGVwcmVjYXRlZCBBUEkgZmlyIGlkYV9zaW1wbGVfWFhYKCkuDQo+IA0KPiAtY2sN
-Cj4gDQo+IENoYWl0YW55YSBLdWxrYXJuaSAoNCk6DQo+ICAgIHZpcnRpby1ibGs6IHJlbW92ZSBh
-ZGRpdGlvbmFsIGNoZWNrIGluIGZhc3QgcGF0aA0KPiAgICB2aXJ0aW8tYmxrOiBkb24ndCBhZGQg
-YSBuZXcgbGluZQ0KPiAgICB2aXJ0aW8tYmxrOiBhdm9pZCBmdW5jdGlvbiBjYWxsIGluIHRoZSBm
-YXN0IHBhdGgNCj4gICAgdmlydGlvLWJsazogcmVtb3ZlIGRlcHJlY2F0ZWQgaWRhX3NpbXBsZV9Y
-WFgoKQ0KPiANCj4gICBkcml2ZXJzL2Jsb2NrL3ZpcnRpb19ibGsuYyB8IDM4ICsrKysrKysrKysr
-KysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ICAgMSBmaWxlIGNoYW5nZWQsIDE3IGluc2Vy
-dGlvbnMoKyksIDIxIGRlbGV0aW9ucygtKQ0KPiANCg0KVGhhbmtzIGZvciB0aGUgcmV2aWV3LCBJ
-J2xsIHNlbmQgb3V0IGEgVjIgYW5kIGRyb3AgcGF0Y2hlcyB0aGF0DQpsYWNrcyB0aGUgcXVhbnRp
-dGF0aXZlIGRhdGEuLg0KDQotY2sNCg0KDQo=
+Hi Ming,
+
+Thank you for the patch! Yet something to improve:
+
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on v5.18-rc3 next-20220421]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-fix-Directory-XXXXX-with-parent-block-already-present/20220421-163556
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: arm64-randconfig-r034-20220421 (https://download.01.org/0day-ci/archive/20220422/202204220614.mF9U5ks7-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 5bd87350a5ae429baf8f373cb226a57b62f87280)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # install arm64 cross compiling tool for clang build
+        # apt-get install binutils-aarch64-linux-gnu
+        # https://github.com/intel-lab-lkp/linux/commit/746684a4668ee70b284126159a10f98ff7ebb319
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ming-Lei/block-fix-Directory-XXXXX-with-parent-block-already-present/20220421-163556
+        git checkout 746684a4668ee70b284126159a10f98ff7ebb319
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=arm64 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> block/blk-sysfs.c:841:22: error: passing 'const char *' to parameter of type 'char *' discards qualifiers [-Werror,-Wincompatible-pointer-types-discards-qualifiers]
+                           blk_debugfs_root, kobject_name(q->kobj.parent));
+                                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/debugfs.h:252:47: note: passing argument to parameter 'new_name' here
+                   struct dentry *new_dir, char *new_name)
+                                                 ^
+   1 error generated.
+
+
+vim +841 block/blk-sysfs.c
+
+   808	
+   809	/**
+   810	 * blk_register_queue - register a block layer queue with sysfs
+   811	 * @disk: Disk of which the request queue should be registered with sysfs.
+   812	 */
+   813	int blk_register_queue(struct gendisk *disk)
+   814	{
+   815		int ret;
+   816		struct device *dev = disk_to_dev(disk);
+   817		struct request_queue *q = disk->queue;
+   818	
+   819		ret = blk_trace_init_sysfs(dev);
+   820		if (ret)
+   821			return ret;
+   822	
+   823		mutex_lock(&q->sysfs_dir_lock);
+   824	
+   825		ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
+   826		if (ret < 0) {
+   827			blk_trace_remove_sysfs(dev);
+   828			goto unlock;
+   829		}
+   830	
+   831		ret = sysfs_create_group(&q->kobj, &queue_attr_group);
+   832		if (ret) {
+   833			blk_trace_remove_sysfs(dev);
+   834			kobject_del(&q->kobj);
+   835			kobject_put(&dev->kobj);
+   836			goto unlock;
+   837		}
+   838	
+   839		mutex_lock(&q->debugfs_mutex);
+   840		q->debugfs_dir = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
+ > 841				blk_debugfs_root, kobject_name(q->kobj.parent));
+   842		mutex_unlock(&q->debugfs_mutex);
+   843	
+   844		if (queue_is_mq(q)) {
+   845			__blk_mq_register_dev(dev, q);
+   846			blk_mq_debugfs_register(q);
+   847		}
+   848	
+   849		mutex_lock(&q->sysfs_lock);
+   850	
+   851		ret = disk_register_independent_access_ranges(disk, NULL);
+   852		if (ret)
+   853			goto put_dev;
+   854	
+   855		if (q->elevator) {
+   856			ret = elv_register_queue(q, false);
+   857			if (ret)
+   858				goto put_dev;
+   859		}
+   860	
+   861		ret = blk_crypto_sysfs_register(q);
+   862		if (ret)
+   863			goto put_dev;
+   864	
+   865		blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+   866		wbt_enable_default(q);
+   867		blk_throtl_register_queue(q);
+   868	
+   869		/* Now everything is ready and send out KOBJ_ADD uevent */
+   870		kobject_uevent(&q->kobj, KOBJ_ADD);
+   871		if (q->elevator)
+   872			kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+   873		mutex_unlock(&q->sysfs_lock);
+   874	
+   875	unlock:
+   876		mutex_unlock(&q->sysfs_dir_lock);
+   877	
+   878		/*
+   879		 * SCSI probing may synchronously create and destroy a lot of
+   880		 * request_queues for non-existent devices.  Shutting down a fully
+   881		 * functional queue takes measureable wallclock time as RCU grace
+   882		 * periods are involved.  To avoid excessive latency in these
+   883		 * cases, a request_queue starts out in a degraded mode which is
+   884		 * faster to shut down and is made fully functional here as
+   885		 * request_queues for non-existent devices never get registered.
+   886		 */
+   887		if (!blk_queue_init_done(q)) {
+   888			blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
+   889			percpu_ref_switch_to_percpu(&q->q_usage_counter);
+   890		}
+   891	
+   892		return ret;
+   893	
+   894	put_dev:
+   895		elv_unregister_queue(q);
+   896		disk_unregister_independent_access_ranges(disk);
+   897		mutex_unlock(&q->sysfs_lock);
+   898		mutex_unlock(&q->sysfs_dir_lock);
+   899		kobject_del(&q->kobj);
+   900		blk_trace_remove_sysfs(dev);
+   901		kobject_put(&dev->kobj);
+   902	
+   903		return ret;
+   904	}
+   905	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
