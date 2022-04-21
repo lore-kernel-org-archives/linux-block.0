@@ -2,152 +2,149 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0567C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 08:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC438C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 08:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386585AbiDUIUm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Apr 2022 04:20:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37168 "EHLO
+        id S1386697AbiDUIhk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Apr 2022 04:37:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376778AbiDUIUl (ORCPT
+        with ESMTP id S1386731AbiDUIhh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Apr 2022 04:20:41 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87DA5580;
-        Thu, 21 Apr 2022 01:17:52 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id A5A361F753;
-        Thu, 21 Apr 2022 08:17:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1650529071; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FO+Td3IAeL8JPxWWmq97kK/arJnOgJYeJmIEQZmu6Q4=;
-        b=hsjSjO8BCiowP68+EIpgBhbAya2WSVngXOQPhO1j1SUW+AOZhtRqkJpjzWvJwDk6Xh7RQg
-        Rtud5TyCdIiO8QdFi8StxsrJacpjMUAU/VH3XI/N/Fr14AaSI4XK4pfn8Ow4gSK6hyy4Ay
-        P3/EUL52z2+Sj7yxLcGjRsHZatrgAW4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1650529071;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FO+Td3IAeL8JPxWWmq97kK/arJnOgJYeJmIEQZmu6Q4=;
-        b=0cten+z1XG/t7JbbZAIWsy0BxmYxLg4cm1EodIyPjAK61enAlTYITs/d6DTbgQYTyaJlBo
-        xmFyPoDEHXs214Cg==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 21 Apr 2022 04:37:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E2C281EC68
+        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 01:34:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650530086;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xGZv9P4S9fhBdH6JIW7sdFGzYHSOLiHRjd4lI4R/2pw=;
+        b=ToPaZI3sipGtYTa0vypwolQvqv8dMsbaIYPuFHRpnXjPXvSSkAEVT8hfWnOWaEijgVa+Gb
+        Dm+qCLnnAOIu53I/7CaF4b9kar+fWcfvwXuFQLx7Nu9LqoFwHplnlPiQGkoNmmJWry283e
+        /UfQeW/y/PpO0/e6cMqDqovdeOteFgc=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-54-LiNgnq3cNXefG_dh0iyagQ-1; Thu, 21 Apr 2022 04:34:43 -0400
+X-MC-Unique: LiNgnq3cNXefG_dh0iyagQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 9512F2C14B;
-        Thu, 21 Apr 2022 08:17:51 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 25329A0620; Thu, 21 Apr 2022 10:17:51 +0200 (CEST)
-Date:   Thu, 21 Apr 2022 10:17:51 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Jan Kara <jack@suse.cz>, tj@kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next 10/11] block, bfq: decrease
- 'num_groups_with_pending_reqs' earlier
-Message-ID: <20220421081751.yn565xfvkwkldboi@quack3.lan>
-References: <20220305091205.4188398-1-yukuai3@huawei.com>
- <20220305091205.4188398-11-yukuai3@huawei.com>
- <20220413112816.fwobg4cp6ttpnpk6@quack3.lan>
- <f3ed507a-7c85-cd69-3ad5-3e9c0e75c372@huawei.com>
- <ef7bad8c-b8dd-f625-330c-9a22e303844b@huawei.com>
- <20220419094955.ucjxadnhdyonfjdo@quack3.lan>
- <d088c184-b67f-1afb-5f1c-0e166c665c50@huawei.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7093C381D8AC;
+        Thu, 21 Apr 2022 08:34:42 +0000 (UTC)
+Received: from localhost (ovpn-8-28.pek2.redhat.com [10.72.8.28])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 4B2EC111E3EC;
+        Thu, 21 Apr 2022 08:34:36 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        yukuai <yukuai3@huawei.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH] block: fix "Directory XXXXX with parent 'block' already present!"
+Date:   Thu, 21 Apr 2022 16:34:31 +0800
+Message-Id: <20220421083431.2917311-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <d088c184-b67f-1afb-5f1c-0e166c665c50@huawei.com>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 19-04-22 19:37:11, yukuai (C) wrote:
-> 在 2022/04/19 17:49, Jan Kara 写道:
-> > On Fri 15-04-22 09:10:06, yukuai (C) wrote:
-> > > 在 2022/04/13 19:40, yukuai (C) 写道:
-> > > > 在 2022/04/13 19:28, Jan Kara 写道:
-> > > > > On Sat 05-03-22 17:12:04, Yu Kuai wrote:
-> > > > > > Currently 'num_groups_with_pending_reqs' won't be decreased when
-> > > > > > the group doesn't have any pending requests, while some child group
-> > > > > > still have pending requests. The decrement is delayed to when all the
-> > > > > > child groups doesn't have any pending requests.
-> > > > > > 
-> > > > > > For example:
-> > > > > > 1) t1 issue sync io on root group, t2 and t3 issue sync io on the same
-> > > > > > child group. num_groups_with_pending_reqs is 2 now.
-> > > > > > 2) t1 stopped, num_groups_with_pending_reqs is still 2. io from t2 and
-> > > > > > t3 still can't be handled concurrently.
-> > > > > > 
-> > > > > > Fix the problem by decreasing 'num_groups_with_pending_reqs'
-> > > > > > immediately upon the weights_tree removal of last bfqq of the group.
-> > > > > > 
-> > > > > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> > > > > 
-> > > > > So I'd find the logic easier to follow if you completely removed
-> > > > > entity->in_groups_with_pending_reqs and did updates of
-> > > > > bfqd->num_groups_with_pending_reqs like:
-> > > > > 
-> > > > >      if (!bfqg->num_entities_with_pending_reqs++)
-> > > > >          bfqd->num_groups_with_pending_reqs++;
-> > > > > 
-> > > > Hi,
-> > > > 
-> > > > Indeed, this is an excellent idle, and much better than the way I did.
-> > > > 
-> > > > Thanks,
-> > > > Kuai
-> > > > 
-> > > > > and similarly on the remove side. And there would we literally two places
-> > > > > (addition & removal from weight tree) that would need to touch these
-> > > > > counters. Pretty obvious and all can be done in patch 9.
-> > > 
-> > > I think with this change, we can count root_group while activating bfqqs
-> > > that are under root_group, thus there is no need to modify
-> > > for_each_entity(or fake bfq_sched_data) any more.
-> > 
-> > Sure, if you can make this work, it would be easier :)
-> > 
-> > > The special case is that weight racing bfqqs are not inserted into
-> > > weights tree, and I think this can be handled by adding a fake
-> > > bfq_weight_counter for such bfqqs.
-> > 
-> > Do you mean "weight raised bfqqs"? Yes, you are right they would need
-> > special treatment - maybe bfq_weights_tree_add() is not the best function
-> > to use for this and we should rather use insertion / removal from the
-> > service tree for maintaining num_entities_with_pending_reqs counter?
-> > I can even see we already have bfqg->active_entities so maybe we could just
-> > somehow tweak that accounting and use it for our purposes?
-> 
-> The problem to use 'active_entities' is that bfqq can be deactivated
-> while it still has pending requests.
-> 
-> Anyway, I posted a new version aready, which still use weights_tree
-> insertion / removal to count pending bfqqs. I'll be great if you can
-> take a look:
-> 
-> https://patchwork.kernel.org/project/linux-block/cover/20220416093753.3054696-1-yukuai3@huawei.com/
+q->debugfs_dir is used by blk-mq debugfs and blktrace. The dentry is
+created when adding disk, and removed when releasing request queue.
 
-Thanks, I'll have a look.
+There is small window between releasing disk and releasing request
+queue, and during the period, one disk with same name may be created
+and added, so debugfs_create_dir() may complain with "Directory XXXXX
+with parent 'block' already present!"
 
-> BTW, I was worried that you can't receive the emails because I got
-> warnings that mails can't deliver to you:
-> 
-> Your message could not be delivered for more than 6 hour(s).
-> It will be retried until it is 1 day(s) old.
+Fixes the issue by moving debugfs_create_dir() into blk_alloc_queue(),
+and the dir name is named with q->id from beginning, and switched to
+disk name when adding disk, and finally changed to q->id in disk_release().
 
-Yes, I didn't get those emails because our mail system ran out of disk
-space and it took a few days to resolve so emails got bounced...
+Reported-by: Dan Williams <dan.j.williams@intel.com>
+Cc: yukuai (C) <yukuai3@huawei.com>
+Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-core.c  | 4 ++++
+ block/blk-sysfs.c | 4 ++--
+ block/genhd.c     | 8 ++++++++
+ 3 files changed, 14 insertions(+), 2 deletions(-)
 
-								Honza
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index f305cb66c72a..245ec664753d 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -438,6 +438,7 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
+ {
+ 	struct request_queue *q;
+ 	int ret;
++	char q_name[16];
+ 
+ 	q = kmem_cache_alloc_node(blk_get_queue_kmem_cache(alloc_srcu),
+ 			GFP_KERNEL | __GFP_ZERO, node_id);
+@@ -495,6 +496,9 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
+ 	blk_set_default_limits(&q->limits);
+ 	q->nr_requests = BLKDEV_DEFAULT_RQ;
+ 
++	sprintf(q_name, "%d", q->id);
++	q->debugfs_dir = debugfs_create_dir(q_name, blk_debugfs_root);
++
+ 	return q;
+ 
+ fail_stats:
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 88bd41d4cb59..1f986c20a07b 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -837,8 +837,8 @@ int blk_register_queue(struct gendisk *disk)
+ 	}
+ 
+ 	mutex_lock(&q->debugfs_mutex);
+-	q->debugfs_dir = debugfs_create_dir(kobject_name(q->kobj.parent),
+-					    blk_debugfs_root);
++	q->debugfs_dir = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
++			blk_debugfs_root, kobject_name(q->kobj.parent));
+ 	mutex_unlock(&q->debugfs_mutex);
+ 
+ 	if (queue_is_mq(q)) {
+diff --git a/block/genhd.c b/block/genhd.c
+index 36532b931841..08895f9f7087 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -25,6 +25,7 @@
+ #include <linux/pm_runtime.h>
+ #include <linux/badblocks.h>
+ #include <linux/part_stat.h>
++#include <linux/debugfs.h>
+ #include "blk-throttle.h"
+ 
+ #include "blk.h"
+@@ -1160,6 +1161,7 @@ static void disk_release_mq(struct request_queue *q)
+ static void disk_release(struct device *dev)
+ {
+ 	struct gendisk *disk = dev_to_disk(dev);
++	char q_name[16];
+ 
+ 	might_sleep();
+ 	WARN_ON_ONCE(disk_live(disk));
+@@ -1173,6 +1175,12 @@ static void disk_release(struct device *dev)
+ 	kfree(disk->random);
+ 	xa_destroy(&disk->part_tbl);
+ 
++	mutex_lock(&disk->queue->debugfs_mutex);
++	sprintf(q_name, "%d", disk->queue->id);
++	disk->queue->debugfs_dir = debugfs_rename(blk_debugfs_root,
++			disk->queue->debugfs_dir, blk_debugfs_root, q_name);
++	mutex_unlock(&disk->queue->debugfs_mutex);
++
+ 	disk->queue->disk = NULL;
+ 	blk_put_queue(disk->queue);
+ 
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.31.1
+
