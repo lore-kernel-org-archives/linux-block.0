@@ -2,219 +2,178 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 761B8C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 02:02:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE9BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 02:37:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383773AbiDUCFn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 20 Apr 2022 22:05:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43840 "EHLO
+        id S1379207AbiDUCk2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 20 Apr 2022 22:40:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243566AbiDUCFm (ORCPT
+        with ESMTP id S229462AbiDUCk1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 20 Apr 2022 22:05:42 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B3EDEC0;
-        Wed, 20 Apr 2022 19:02:53 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R251e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=chengyou@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VAc6Az8_1650506569;
-Received: from 30.43.96.87(mailfrom:chengyou@linux.alibaba.com fp:SMTPD_---0VAc6Az8_1650506569)
+        Wed, 20 Apr 2022 22:40:27 -0400
+Received: from out30-43.freemail.mail.aliyun.com (out30-43.freemail.mail.aliyun.com [115.124.30.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A15F72C4;
+        Wed, 20 Apr 2022 19:37:38 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04395;MF=xiaoguang.wang@linux.alibaba.com;NM=1;PH=DS;RN=4;SR=0;TI=SMTPD_---0VAcaTs5_1650508655;
+Received: from localhost(mailfrom:xiaoguang.wang@linux.alibaba.com fp:SMTPD_---0VAcaTs5_1650508655)
           by smtp.aliyun-inc.com(127.0.0.1);
-          Thu, 21 Apr 2022 10:02:50 +0800
-Message-ID: <1ec3f1d2-887d-f66c-6221-6319afc4a3e9@linux.alibaba.com>
-Date:   Thu, 21 Apr 2022 10:02:47 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.7.0
-Subject: Re: siw_cm.c:255 siw_cep_put+0x125/0x130 kernel warning while testing
- blktests srp/002 v5.17-rc7
-Content-Language: en-US
-To:     Bernard Metzler <BMT@zurich.ibm.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Pankaj Raghav <p.raghav@samsung.com>
-References: <BYAPR15MB2631988B13EE2E336FD2ED4E99F29@BYAPR15MB2631.namprd15.prod.outlook.com>
-From:   Cheng Xu <chengyou@linux.alibaba.com>
-In-Reply-To: <BYAPR15MB2631988B13EE2E336FD2ED4E99F29@BYAPR15MB2631.namprd15.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+          Thu, 21 Apr 2022 10:37:36 +0800
+From:   Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+To:     linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, bostroesser@gmail.com
+Subject: [PATCH v5] scsi: target: tcmu: Fix possible data corruption
+Date:   Thu, 21 Apr 2022 10:37:35 +0800
+Message-Id: <20220421023735.9018-1-xiaoguang.wang@linux.alibaba.com>
+X-Mailer: git-send-email 2.14.4.44.g2045bb6
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+When tcmu_vma_fault() gets one page successfully, before the current
+context completes page fault procedure, find_free_blocks() may run in
+and call unmap_mapping_range() to unmap this page. Assume when
+find_free_blocks() completes its job firstly, previous page fault
+procedure starts to run again and completes, then one truncated page has
+beed mapped to use space, but note that tcmu_vma_fault() has gotten one
+refcount for this page, so any other subsystem won't use this page,
+unless later the use space addr is unmapped.
 
+If another command runs in later and needs to extends dbi_thresh, it may
+reuse the corresponding slot to previous page in data_bitmap, then though
+we'll allocate new page for this slot in data_area, but no page fault will
+happen again, because we have a valid map, real request's data will lose.
 
-On 4/19/22 11:53 PM, Bernard Metzler wrote:
->> -----Original Message-----
->> From: Cheng Xu <chengyou@linux.alibaba.com>
->> Sent: Monday, 18 April 2022 10:29
->> To: Luis Chamberlain <mcgrof@kernel.org>; Bernard Metzler
->> <BMT@zurich.ibm.com>; Bart Van Assche <bvanassche@acm.org>
->> Cc: linux-block@vger.kernel.org; linux-rdma@vger.kernel.org; Pankaj Raghav
->> <pankydev8@gmail.com>; Pankaj Raghav <p.raghav@samsung.com>
->> Subject: [EXTERNAL] Re: siw_cm.c:255 siw_cep_put+0x125/0x130 kernel
->> warning while testing blktests srp/002 v5.17-rc7
->>
->>
->>
->> On 4/15/22 7:31 AM, Luis Chamberlain wrote:
->>
->> <...>
->>
->>> [  195.218783] ------------[ cut here ]------------
->>> [  195.221242] WARNING: CPU: 7 PID: 201 at
->> drivers/infiniband/sw/siw/siw_cm.c:255 siw_cep_put+0x125/0x130 [siw]
->>> [  195.222838] Modules linked in: ib_srp(E) scsi_transport_srp(E)
->> target_core_pscsi(E) target_core_file(E) ib_srpt(E) target_core_iblock(E)
->> target_core_mod(E) rdma_cm(E) iw_cm(E) ib_cm(E) scsi_debug(E) siw(E)
->> null_blk(E) ib_umad(E) ib_uverbs(E) sd_mod(E) sg(E) dm_service_time(E)
->> scsi_dh_rdac(E) scsi_dh_emc(E) scsi_dh_alua(E) dm_multipath(E) ib_core(E)
->> dm_mod(E) nvme_fabrics(E) kvm_intel(E) kvm(E) irqbypass(E)
->> crct10dif_pclmul(E) ghash_clmulni_intel(E) aesni_intel(E) crypto_simd(E)
->> cryptd(E) joydev(E) evdev(E) serio_raw(E) cirrus(E) drm_shmem_helper(E)
->> drm_kms_helper(E) virtio_balloon(E) cec(E) i6300esb(E) button(E) drm(E)
->> configfs(E) ip_tables(E) x_tables(E) autofs4(E) ext4(E) crc16(E) mbcache(E)
->> jbd2(E) btrfs(E) blake2b_generic(E) xor(E) raid6_pq(E) zstd_compress(E)
->> libcrc32c(E) crc32c_generic(E) virtio_net(E) net_failover(E) failover(E)
->> virtio_blk(E) ata_generic(E) uhci_hcd(E) ehci_hcd(E) crc32_pclmul(E)
->> crc32c_intel(E) ata_piix(E) psmouse(E) nvme(E) libata(E) virtio_pci(E)
->>> [  195.222986]  virtio_pci_legacy_dev(E) virtio_pci_modern_dev(E)
->> usbcore(E) virtio(E) usb_common(E) scsi_mod(E) nvme_core(E) i2c_piix4(E)
->> virtio_ring(E) t10_pi(E) scsi_common(E) [last unloaded: null_blk]
->>> [  195.241036] sd 3:0:0:1: [sdd] Attached SCSI disn
->>> [  195.241188] CPU: 2 PID: 201 Comm: kworker/u16:22 Kdump: loaded
->> Tainted: G            E     5.17.0-rc7 #1
->>> [  195.246053] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
->> BIOS 1.15.0-1 04/01/2014
->>> [  195.249123] Workqueue: iw_cm_wq cm_work_handler [iw_cm]
->>> [  195.251274] RIP: 0010:siw_cep_put+0x125/0x130 [siw]
->>> [  195.253548] Code: bb c0 e8 ae 74 0f d7 48 89 ef 5d 41 5c 41 5d e9 b1 d6 ef
->> d6 5d be 03 00 00 00 41 5c 41 5d e9 22 b7 0c d7 0f 0b e9 f3 fe ff ff <0f> 0b e9 1c
->> ff ff ff 0f 1f 40 00 0f 1f 44 00 00 55 48 8d 6f 20 53
->>> [  195.258982] RSP: 0018:ffffbc53404ebc98 EFLAGS: 00010286
->>> [  195.261018] RAX: 0000000000000001 RBX: 0000000000000000 RCX:
->> 0000000000000000
->>> [  195.263569] RDX: 0000000000000001 RSI: 0000000000000246 RDI:
->> ffffa03d1102a924
->>> [  195.266151] RBP: ffffa03d1102a900 R08: ffffa03d1102a920 R09:
->> ffffbc53404ebc50
->>> [  195.269150] R10: ffffffff98a060e0 R11: 0000000000000000 R12:
->> ffffa03cc4297000
->>> [  195.272744] R13: ffffa03d2a48aea0 R14: ffffa03d2a48ae78 R15:
->> ffffa03cc427ad58
->>> [  195.275575] FS:  0000000000000000(0000) GS:ffffa03df7c80000(0000)
->> knlGS:0000000000000000
->>> [  195.278932] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>> [  195.280963] CR2: 00005590bc2e4fe8 CR3: 000000008500a004 CR4:
->> 0000000000770ee0
->>> [  195.282803] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
->> 0000000000000000
->>> [  195.284650] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
->> 0000000000000400
->>> [  195.286522] PKRU: 55555554
->>> [  195.287998] Call Trace:
->>> [  195.289210]  <TASK>
->>> [  195.290969]  siw_reject+0xac/0x180 [siw]
->>> [  195.292679]  iw_cm_reject+0x68/0xc0 [iw_cm]
->>> [  195.294136]  cm_work_handler+0x59d/0xe20 [iw_cm]
->>> [  195.295588]  process_one_work+0x1e2/0x3b0
->>> [  195.298338]  worker_thread+0x50/0x3a0
->>> [  195.300330]  ? rescuer_thread+0x390/0x390
->>> [  195.302269]  kthread+0xe5/0x110
->>> [  195.304062]  ? kthread_complete_and_exit+0x20/0x20
->>> [  195.307612]  ret_from_fork+0x1f/0x30
->>> [  195.309585]  </TASK>
->>> [  195.310674] ---[ end trace 0000000000000000 ]---
->>> [  195.313290] scsi host4: ib_srp: REJ received
->>> [  195.313293] scsi host4:   REJ reason 0xffffff98
->>> [  195.315433] scsi host4: ib_srp: Connection 0/8 to 172.17.8.113 failed
->>> [  195.472718] ib_srp:srp_parse_in: ib_srp: 172.17.8.113 -> 172.17.8.113:0
->>> [  195.472739] ib_srp:srp_parse_in: ib_srp: 172.17.8.113:5555 ->
->> 172.17.8.113:5555
->>> [  195.472807] ib_srp:srp_parse_in: ib_srp: [fe80::5054:ff:fe5b:90dc%3] ->
->> [fe80::5054:ff:fe5b:90dc]:0/202442865%3
->>>> [0] INVALID URI REMOVED
->> 3A__github.com_mcgrof_kdevops&d=DwIGaQ&c=jf_iaSHvJObTbx-
->> siA1ZOg&r=2TaYXQ0T-
->> r8ZO1PP1alNwU_QJcRRLfmYTAgd3QCvqSc&m=7dWDVPFaNFXoRqokXmPFFy
->> XkVL2yItLNzYUDfM4ULTg&s=1ezv_qa-
->> ujLTftm7OxJ5xNZuoKrc70DJPBDccqZokbY&e=
->>>   >    Luis
->>
->> Hi, Bernard
->>
->> I reproduced this issue, and it looks like a condition race between
->> 'cm_work_handler' and 'siw_cm_work_handler'.
->>
->> ----------------------------------------------------------------
->>    Thread0:                         Thread1:
->>    siw_cm_work_handler              cm_work_handler
->> ----------------------------------------------------------------
->> step0:
->> siw_cm_upcall with
->> IW_CM_EVENT_CONNECT_REQUEST
->>
->>                               ===> cm_conn_req_handler
->>                                      ...
->>                                        cm_id->cm_handler (failed)
->>                                        iw_cm_reject
->>                                             siw_reject
->>
->> *step1*:
->> detach cep with listen_cep
->> ----------------------------------------------------------------
->>
->> When siw_reject is called in cm_work_handler, the related cep may have
->> not been detached with its listen_cep, through the two steps are very
->> close.
->>
->> I think one simple way to fix this issue is keep step1 under
->> siw_cep_set_inuse's protection, and this will make siw_reject will be
->> pending util siw_cm_work_handler release the lock:
->>
->> diff --git a/drivers/infiniband/sw/siw/siw_cm.c
->> b/drivers/infiniband/sw/siw/siw_cm.c
->> index 7acdd3c3a599..f033b6da1e9f 100644
->> --- a/drivers/infiniband/sw/siw/siw_cm.c
->> +++ b/drivers/infiniband/sw/siw/siw_cm.c
->> @@ -968,13 +968,15 @@ static void siw_accept_newconn(struct siw_cep
->> *cep)
->>
->>                   siw_cep_set_inuse(new_cep);
->>                   rv = siw_proc_mpareq(new_cep);
->> -               siw_cep_set_free(new_cep);
->>
->>                   if (rv != -EAGAIN) {
->>                           siw_cep_put(cep);
->>                           new_cep->listen_cep = NULL;
->> +                       siw_cep_set_free(new_cep);
->>                           if (rv)
->>                                   goto error;
->> +               } else {
->> +                       siw_cep_set_free(new_cep);
->>                   }
->>           }
->>           return;
->>
->> Thanks,
->> Cheng Xu
-> 
-> Hi Cheng, many thanks for looking into it! Unfortunately
-> I am out next 12 days until May. I will immediately look into
-> it when back. Your explanation sounds reasonable, but I'd
-> like to fully understand. 
-I'd like to send a patch to fix this. When you back, you can review this
-issue and the patch.
+Filesystem implementations will also run into this issue, but they
+usually lock page when vm_operations_struct->fault gets one page, and
+unlock page after finish_fault() completes. In truncate sides, they
+lock pages in truncate_inode_pages() to protect race with page fault.
+We can also have similar codes like filesystem to fix this issue.
 
-Was it fixing the issue for you?
+To fix this possible data corruption, we can apply similar method like
+filesystem. For pages that are to be freed, tcmu_blocks_release() locks
+and unlocks these pages, and make tcmu_vma_fault() also lock found page
+under cmdr_lock. At the same time, since tcmu_vma_fault() gets one extra
+page refcount, tcmu_blocks_release() won't free pages if pages are in
+page fault procedure, which means it's safe to call tcmu_blocks_release()
+before unmap_mapping_range().
 
-Sure, With this change, the WARN in dmesg does not appear any more in
-my tests.
+With above action, for above race, tcmu_blocks_release()
+will wait all page faults to be completed before calling
+unmap_mapping_range(), and later if unmap_mapping_range() is called,
+it will ensure stale mappings to be removed cleanly.
 
-Thanks,
-Cheng Xu
+Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+---
+V5:
+ Improve code comments.
 
-> 
-> Thanks, Bernard.
-> 
+V4:
+ Add comments to explain why it's safe to call tcmu_blocks_release()
+before unmap_mapping_range().
+
+V3:
+ Just lock/unlock_page in tcmu_blocks_release(), and call
+tcmu_blocks_release() before unmap_mapping_range().
+
+V2:
+  Wait all possible inflight page faults to be completed in
+find_free_blocks() to fix possible stale map.
+---
+ drivers/target/target_core_user.c | 38 +++++++++++++++++++++++++++++++++++---
+ 1 file changed, 35 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
+index fd7267baa707..f0d4cc693e9e 100644
+--- a/drivers/target/target_core_user.c
++++ b/drivers/target/target_core_user.c
+@@ -20,6 +20,7 @@
+ #include <linux/configfs.h>
+ #include <linux/mutex.h>
+ #include <linux/workqueue.h>
++#include <linux/pagemap.h>
+ #include <net/genetlink.h>
+ #include <scsi/scsi_common.h>
+ #include <scsi/scsi_proto.h>
+@@ -1667,6 +1668,25 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
+ 	xas_lock(&xas);
+ 	xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
+ 		xas_store(&xas, NULL);
++		/*
++		 * While reaching here, there maybe page faults occurring on
++		 * these to be released pages, and there maybe one race that
++		 * unmap_mapping_range() is called before page fault on these
++		 * pages are finished, then valid but stale map is created.
++		 *
++		 * If another command runs in later and needs to extends
++		 * dbi_thresh, it may reuse the corresponding slot to previous
++		 * page in data_bitmap, then though we'll allocate new page for
++		 * this slot in data_area, but no page fault will happen again,
++		 * because we have a valid map, command's data will lose.
++		 *
++		 * So here we lock and unlock pages that are to be released to
++		 * ensure all page faults to be completed, then following
++		 * unmap_mapping_range() can ensure stale maps to be removed
++		 * cleanly.
++		 */
++		lock_page(page);
++		unlock_page(page);
+ 		__free_page(page);
+ 		pages_freed++;
+ 	}
+@@ -1822,6 +1842,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
+ 	page = xa_load(&udev->data_pages, dpi);
+ 	if (likely(page)) {
+ 		get_page(page);
++		lock_page(page);
+ 		mutex_unlock(&udev->cmdr_lock);
+ 		return page;
+ 	}
+@@ -1863,6 +1884,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+ 	struct page *page;
+ 	unsigned long offset;
+ 	void *addr;
++	vm_fault_t ret = 0;
+ 
+ 	int mi = tcmu_find_mem_index(vmf->vma);
+ 	if (mi < 0)
+@@ -1887,10 +1909,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+ 		page = tcmu_try_get_data_page(udev, dpi);
+ 		if (!page)
+ 			return VM_FAULT_SIGBUS;
++		ret = VM_FAULT_LOCKED;
+ 	}
+ 
+ 	vmf->page = page;
+-	return 0;
++	return ret;
+ }
+ 
+ static const struct vm_operations_struct tcmu_vm_ops = {
+@@ -3205,12 +3228,21 @@ static void find_free_blocks(void)
+ 			udev->dbi_max = block;
+ 		}
+ 
++		/*
++		 * Release the block pages.
++		 * Also note that since tcmu_vma_fault() gets one extra page
++		 * refcount, tcmu_blocks_release() won't free pages if pages
++		 * are in mapped, that means it's safe to call
++		 * tcmu_blocks_release() before unmap_mapping_range(), which
++		 * drops the refcount of pages it unmaps and thus releases
++		 * those pages.
++		 */
++		pages_freed = tcmu_blocks_release(udev, start, end - 1);
++
+ 		/* Here will truncate the data area from off */
+ 		off = udev->data_off + (loff_t)start * udev->data_blk_size;
+ 		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
+ 
+-		/* Release the block pages */
+-		pages_freed = tcmu_blocks_release(udev, start, end - 1);
+ 		mutex_unlock(&udev->cmdr_lock);
+ 
+ 		total_pages_freed += pages_freed;
+-- 
+2.14.4.44.g2045bb6
+
