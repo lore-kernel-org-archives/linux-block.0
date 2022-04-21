@@ -2,122 +2,207 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F18C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 18:00:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8303AC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 21 Apr 2022 20:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229511AbiDUSC7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 21 Apr 2022 14:02:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58708 "EHLO
+        id S1392609AbiDUU5j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 21 Apr 2022 16:57:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1391238AbiDUSC5 (ORCPT
+        with ESMTP id S1392612AbiDUU5j (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 21 Apr 2022 14:02:57 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3607BBE29
-        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 11:00:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=h71PPsUCftSbNIx2YEYpL34UYfyDKKfxZOR30wmfF0Y=; b=XLV0UIIo3xfHXTbvscQzupyjHa
-        ev8SaqVqC4NJ7/Pv0QRdQt/JyLc/JSBJCPmIh0rRr4Rbw1KiXZKQv7eqyYqXs8687o5KNfIKJtXx+
-        4/j8o+mN9jQ9kMGDekQjaxhgK4PVqrxz+uMWXL9SzaywNYzF1pFGl8e6NsBi4/CGbBvXMrluv/q+m
-        bqWsUVW5GzSfdD/tWQo4Jr68zS3RVmgX3ss513ybOsgiERUkCbfLl16937uEzqHmlefAoMEr3rxzL
-        pUgrqtpnOZhHru3wE7DESVHsKpHyHXqDPYxdr1kMuNDoxnCUpOJBhKwltwXohE5jkXEEMqognQZd3
-        k0fLfoyQ==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nhb63-00EXaZ-9e; Thu, 21 Apr 2022 18:00:03 +0000
-Date:   Thu, 21 Apr 2022 11:00:03 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Klaus Jensen <its@irrelevant.dk>,
-        "Paul E. McKenney" <paulmck@kernel.org>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Pankaj Raghav <pankydev8@gmail.com>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Adam Manzanares <a.manzanares@samsung.com>
-Subject: Re: blktests with zbd/006 ZNS triggers a possible false positive RCU
- stall
-Message-ID: <YmGbo5Pvv9bOMqmt@bombadil.infradead.org>
-References: <YliZ9M6QWISXvhAJ@bombadil.infradead.org>
- <20220420055429.t5ni7yah4p4yxgsq@shindev>
+        Thu, 21 Apr 2022 16:57:39 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A5C04EA29
+        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 13:54:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1650574488; x=1682110488;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=sc+XCwLCTGokbGmO7cIsT8byYFNPcCk0Y5S6uGaHrFI=;
+  b=VtuvwIaBDfobKG8nGFI3Sz5AzutOPSLZi4meSsNMH98QFed6T63nzAzk
+   qlEi/3xqEQydQyJqgb1jCsq6+dxgHDWXFiaW3qKcC8i8I9Gem1nIvgdue
+   +EpagE6V6yPATz3Pqgy+I+LDqg+M2CWivhUA/YnL1GakejZZgqfjWouZ0
+   6iblxfMkoB+r7NTFym6FHLBrfyJDlQs2rsxY07Gdpo/W2TdAGeaFPzuDF
+   PV1otlC4HDCTdboe5hXMkp4qyN7yYeCzLxOEjZ71hkiRUDTcAgp1THtmj
+   LCnkRgmHcYftUqHPP3k3GRFg+tSOpkPF4njJQkuopoOuXZSnnV2tTQEwM
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10324"; a="264252208"
+X-IronPort-AV: E=Sophos;i="5.90,279,1643702400"; 
+   d="scan'208";a="264252208"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Apr 2022 13:54:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.90,279,1643702400"; 
+   d="scan'208";a="593838090"
+Received: from lkp-server01.sh.intel.com (HELO 3abc53900bec) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 21 Apr 2022 13:54:45 -0700
+Received: from kbuild by 3abc53900bec with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nhdp7-0008mk-5X;
+        Thu, 21 Apr 2022 20:54:45 +0000
+Date:   Fri, 22 Apr 2022 04:54:24 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     kbuild-all@lists.01.org, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        yukuai <yukuai3@huawei.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH] block: fix "Directory XXXXX with parent 'block' already
+ present!"
+Message-ID: <202204220422.9SM0r5ue-lkp@intel.com>
+References: <20220421083431.2917311-1-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220420055429.t5ni7yah4p4yxgsq@shindev>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20220421083431.2917311-1-ming.lei@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Apr 20, 2022 at 05:54:29AM +0000, Shinichiro Kawasaki wrote:
-> On Apr 14, 2022 / 15:02, Luis Chamberlain wrote:
-> > Hey folks,
-> > 
-> > While enhancing kdevops [0] to embrace automation of testing with
-> > blktests for ZNS I ended up spotting a possible false positive RCU stall
-> > when running zbd/006 after zbd/005. The curious thing though is that
-> > this possible RCU stall is only possible when using the qemu
-> > ZNS drive, not when using nbd. In so far as kdevops is concerned
-> > it creates ZNS drives for you when you enable the config option
-> > CONFIG_QEMU_ENABLE_NVME_ZNS=y. So picking any of the ZNS drives
-> > suffices. When configuring blktests you can just enable the zbd
-> > guest, so only a pair of guests are reated the zbd guest and the
-> > respective development guest, zbd-dev guest. When using
-> > CONFIG_KDEVOPS_HOSTS_PREFIX="linux517" this means you end up with
-> > just two guests:
-> > 
-> >   * linux517-blktests-zbd
-> >   * linux517-blktests-zbd-dev
-> > 
-> > The RCU stall can be triggered easily as follows:
-> > 
-> > make menuconfig # make sure to enable CONFIG_QEMU_ENABLE_NVME_ZNS=y and blktests
-> > make
-> > make bringup # bring up guests
-> > make linux # build and boot into v5.17-rc7
-> > make blktests # build and install blktests
-> > 
-> > Now let's ssh to the guest while leaving a console attached
-> > with `sudo virsh vagrant_linux517-blktests-zbd` in a window:
-> > 
-> > ssh linux517-blktests-zbd
-> > sudo su -
-> > cd /usr/local/blktests
-> > export TEST_DEVS=/dev/nvme9n1
-> > i=0; while true; do ./check zbd/005 zbd/006; if [[ $? -ne 0 ]]; then echo "BAD at $i"; break; else echo GOOOD $i ; fi; let i=$i+1; done;
-> > 
-> > The above should never fail, but you should eventually see an RCU
-> > stall candidate on the console. The full details can be observed on the
-> > gist [1] but for completeness I list some of it below. It may be a false
-> > positive at this point, not sure.
-> > 
-> > [493272.711271] run blktests zbd/005 at 2022-04-14 20:03:22
-> > [493305.769531] run blktests zbd/006 at 2022-04-14 20:03:55
-> > [493336.979482] nvme nvme9: I/O 192 QID 5 timeout, aborting
-> > [493336.981666] nvme nvme9: Abort status: 0x0
-> > [493367.699440] nvme nvme9: I/O 192 QID 5 timeout, reset controller
-> > [493388.819341] rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
-> 
-> Hello Luis,
-> 
-> I run blktests zbd group on several QEMU ZNS emulation devices for every rcX
-> kernel releases. But, I have not ever observed the symptom above. Now I'm
-> repeating zbd/005 and zbd/006 using v5.18-rc3 and a QEMU ZNS device, and do
-> not observe the symptom so far, after 400 times repeat.
+Hi Ming,
 
-Did you try v5.17-rc7 ?
+Thank you for the patch! Perhaps something to improve:
 
-> I would like to run the test using same ZNS set up as yours. Can you share how
-> your ZNS device is set up? I would like to know device size and QEMU -device
-> options, such as zoned.zone_size or zoned.max_active.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on v5.18-rc3 next-20220421]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-It is as easy as the above make commands, and follow up login commands.
-I'll be bumping the kernel to test for fstesta and blktests on kdevops
-soon but the baseline is sadly not yet done for all filesystems and
-blktests yet. Once the baseline is completed though it should be easy to
-bump kernel and confirm if old failures are not failing anymore / find
-new issues.
+url:    https://github.com/intel-lab-lkp/linux/commits/Ming-Lei/block-fix-Directory-XXXXX-with-parent-block-already-present/20220421-163556
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: csky-randconfig-r036-20220421 (https://download.01.org/0day-ci/archive/20220422/202204220422.9SM0r5ue-lkp@intel.com/config)
+compiler: csky-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/746684a4668ee70b284126159a10f98ff7ebb319
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Ming-Lei/block-fix-Directory-XXXXX-with-parent-block-already-present/20220421-163556
+        git checkout 746684a4668ee70b284126159a10f98ff7ebb319
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross W=1 O=build_dir ARCH=csky SHELL=/bin/bash
 
-  Luis
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All warnings (new ones prefixed by >>):
+
+   block/blk-sysfs.c: In function 'blk_register_queue':
+>> block/blk-sysfs.c:841:43: warning: passing argument 4 of 'debugfs_rename' discards 'const' qualifier from pointer target type [-Wdiscarded-qualifiers]
+     841 |                         blk_debugfs_root, kobject_name(q->kobj.parent));
+         |                                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from block/blk-sysfs.c:13:
+   include/linux/debugfs.h:252:47: note: expected 'char *' but argument is of type 'const char *'
+     252 |                 struct dentry *new_dir, char *new_name)
+         |                                         ~~~~~~^~~~~~~~
+
+
+vim +841 block/blk-sysfs.c
+
+   808	
+   809	/**
+   810	 * blk_register_queue - register a block layer queue with sysfs
+   811	 * @disk: Disk of which the request queue should be registered with sysfs.
+   812	 */
+   813	int blk_register_queue(struct gendisk *disk)
+   814	{
+   815		int ret;
+   816		struct device *dev = disk_to_dev(disk);
+   817		struct request_queue *q = disk->queue;
+   818	
+   819		ret = blk_trace_init_sysfs(dev);
+   820		if (ret)
+   821			return ret;
+   822	
+   823		mutex_lock(&q->sysfs_dir_lock);
+   824	
+   825		ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
+   826		if (ret < 0) {
+   827			blk_trace_remove_sysfs(dev);
+   828			goto unlock;
+   829		}
+   830	
+   831		ret = sysfs_create_group(&q->kobj, &queue_attr_group);
+   832		if (ret) {
+   833			blk_trace_remove_sysfs(dev);
+   834			kobject_del(&q->kobj);
+   835			kobject_put(&dev->kobj);
+   836			goto unlock;
+   837		}
+   838	
+   839		mutex_lock(&q->debugfs_mutex);
+   840		q->debugfs_dir = debugfs_rename(blk_debugfs_root, q->debugfs_dir,
+ > 841				blk_debugfs_root, kobject_name(q->kobj.parent));
+   842		mutex_unlock(&q->debugfs_mutex);
+   843	
+   844		if (queue_is_mq(q)) {
+   845			__blk_mq_register_dev(dev, q);
+   846			blk_mq_debugfs_register(q);
+   847		}
+   848	
+   849		mutex_lock(&q->sysfs_lock);
+   850	
+   851		ret = disk_register_independent_access_ranges(disk, NULL);
+   852		if (ret)
+   853			goto put_dev;
+   854	
+   855		if (q->elevator) {
+   856			ret = elv_register_queue(q, false);
+   857			if (ret)
+   858				goto put_dev;
+   859		}
+   860	
+   861		ret = blk_crypto_sysfs_register(q);
+   862		if (ret)
+   863			goto put_dev;
+   864	
+   865		blk_queue_flag_set(QUEUE_FLAG_REGISTERED, q);
+   866		wbt_enable_default(q);
+   867		blk_throtl_register_queue(q);
+   868	
+   869		/* Now everything is ready and send out KOBJ_ADD uevent */
+   870		kobject_uevent(&q->kobj, KOBJ_ADD);
+   871		if (q->elevator)
+   872			kobject_uevent(&q->elevator->kobj, KOBJ_ADD);
+   873		mutex_unlock(&q->sysfs_lock);
+   874	
+   875	unlock:
+   876		mutex_unlock(&q->sysfs_dir_lock);
+   877	
+   878		/*
+   879		 * SCSI probing may synchronously create and destroy a lot of
+   880		 * request_queues for non-existent devices.  Shutting down a fully
+   881		 * functional queue takes measureable wallclock time as RCU grace
+   882		 * periods are involved.  To avoid excessive latency in these
+   883		 * cases, a request_queue starts out in a degraded mode which is
+   884		 * faster to shut down and is made fully functional here as
+   885		 * request_queues for non-existent devices never get registered.
+   886		 */
+   887		if (!blk_queue_init_done(q)) {
+   888			blk_queue_flag_set(QUEUE_FLAG_INIT_DONE, q);
+   889			percpu_ref_switch_to_percpu(&q->q_usage_counter);
+   890		}
+   891	
+   892		return ret;
+   893	
+   894	put_dev:
+   895		elv_unregister_queue(q);
+   896		disk_unregister_independent_access_ranges(disk);
+   897		mutex_unlock(&q->sysfs_lock);
+   898		mutex_unlock(&q->sysfs_dir_lock);
+   899		kobject_del(&q->kobj);
+   900		blk_trace_remove_sysfs(dev);
+   901		kobject_put(&dev->kobj);
+   902	
+   903		return ret;
+   904	}
+   905	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
