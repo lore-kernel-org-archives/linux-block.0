@@ -2,97 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 151DFC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 06:43:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 050F5C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 07:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379429AbiDVGq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 02:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48042 "EHLO
+        id S1378105AbiDVH6T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Apr 2022 03:58:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444379AbiDVGq2 (ORCPT
+        with ESMTP id S232604AbiDVH6R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 02:46:28 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E7F9D50E0C
-        for <linux-block@vger.kernel.org>; Thu, 21 Apr 2022 23:43:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650609814;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4/DxhYoCHdp20VSErL/dpjfGLHO1zuzg+O4MIWra3xE=;
-        b=EyjdIVA/n1iFZEhSWY6JT6FlLzNeQa9yyEf3XnNm49OxfQThyPeSwSQIMvZx1L3CTnHbWR
-        387TA21zHp4ofwbPuIuUMyCgfDf7XKaCcWXKzpJbiAVY5Rv62KMnff96Ll1i3Oun1BAMEC
-        VWGPbPH4zecvDzsANBRbJfOiWZNz2jU=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-518-j7rRCXoXN16KIhvLSLJ-eQ-1; Fri, 22 Apr 2022 02:43:31 -0400
-X-MC-Unique: j7rRCXoXN16KIhvLSLJ-eQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B64386B8A6;
-        Fri, 22 Apr 2022 06:43:31 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 50D5EC2811D;
-        Fri, 22 Apr 2022 06:43:25 +0000 (UTC)
-Date:   Fri, 22 Apr 2022 14:43:20 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Dan Williams <dan.j.williams@intel.com>,
-        yukuai <yukuai3@huawei.com>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: Re: [PATCH] block: fix "Directory XXXXX with parent 'block' already
- present!"
-Message-ID: <YmJOiCifWa7CDy/e@T590>
-References: <20220421083431.2917311-1-ming.lei@redhat.com>
- <YmGBnbYByitxF3UW@infradead.org>
- <YmIalwWdv30FgmKE@T590>
- <YmJFmUyBczk42j15@infradead.org>
+        Fri, 22 Apr 2022 03:58:17 -0400
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9929734641
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 00:55:24 -0700 (PDT)
+Received: by mail-il1-f200.google.com with SMTP id q9-20020a056e02106900b002cbc8d479eeso3996850ilj.1
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 00:55:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=/vtUWpnugYZvI17/PxIskjzNw1gYIuijhJ19Q0tFHHE=;
+        b=ZsyYlq/SyKQeD5F0bDuEqy58r6B8U1Fh9rCn3FO3U6s5nxwaDxJVFW3FIsb4g5kV3y
+         6EwPcgyY4L5aYvb0bNEYCSJ4q2y4Gq5RvgM/T64t13sL42w8yCGFZ8IbeHOJtZns7Rig
+         agdo4dzbJTjO4D02wdOx2CDNPvTl3X6j98Cg+kBIzoORYxHgEtbQKov13mkm/AfN4v8/
+         wfZmBN5NZ6TJgzP0Q3h7kJQJmJHNY5un5VincT+Qr7mDmcXZEmVxgfoxI3NN5S5am2t3
+         zKrkH2f/QasopFmT/4h74SOtQV5wsLo4//ierO7E3aAK//yWifVHucADlHCNefs/HF6I
+         D8ZA==
+X-Gm-Message-State: AOAM533oO4RtpgKFvPLJZTiMkBzXIkOao0f10EgiDySbLaQEb+tvrlLO
+        L3Oc3wwVkCpAofs601XVyaDoVvCH343vVafeUkUTZ3hyX5h8
+X-Google-Smtp-Source: ABdhPJweuOucVY7qIlWIZ0LJXuyQZzQ1OM0E9pWKoqV1SaityRuZjD/S4y68Or9hUabKFNRg/Iq8vpFpikOvh5qXsHWBPHn+N/r5
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YmJFmUyBczk42j15@infradead.org>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Received: by 2002:a05:6638:1647:b0:328:81e9:1975 with SMTP id
+ a7-20020a056638164700b0032881e91975mr1518400jat.143.1650614124001; Fri, 22
+ Apr 2022 00:55:24 -0700 (PDT)
+Date:   Fri, 22 Apr 2022 00:55:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000085bef105dd398c3d@google.com>
+Subject: [syzbot] WARNING in __floppy_read_block_0
+From:   syzbot <syzbot+bac6723617710898abd3@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 21, 2022 at 11:05:13PM -0700, Christoph Hellwig wrote:
-> On Fri, Apr 22, 2022 at 11:01:43AM +0800, Ming Lei wrote:
-> > Please see the following reasons:
-> > 
-> > 1) disk_release_mq() calls elevator_exit()/rq_qos_exit(), and the two
-> > may trigger UAF if q->debugfs_dir is removed in blk_unregister_queue().
-> 
-> Well.  The debugfs_remove_recursive already removes all underlying
-> entries, so the extra debugfs_remove_recursive calls there can just
-> go away.
-> > 
-> > 2) after deleting disk, blktrace still should/can work for tracing
-> > passthrough request.
-> > 
-> > 3) "debugfs directory deleted with blktrace active" in block/002 could
-> > be triggered
-> 
-> Well, 3 just tests 2, so these are really one.
-> 
-> But how is blktrace supposed to work after the disk is torn down
-> anyway? Pretty much all actual block trace traces reference the
-> gendisk and/or block device which are getting freed at that point.
-> So doing any blktrace action after the gendisk is released will
-> lead to memory corruption.  For everyting but SCSI the race windows
-> are probably small enough to not be seen by accident, but if you
-> unbind the SSI ULP this should be fairly reproducible.
+Hello,
 
-blktrace opens the bdev, so it is safe to trace until blktrace closes
-the bdev. And del_gendisk() does happen before releasing disk, that
-is why I don't think it is good to remove q->debugfs_dir inside
-del_gendisk().
+syzbot found the following issue on:
+
+HEAD commit:    b2d229d4ddb1 Linux 5.18-rc3
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10b813f0f00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=dd7c9a79dfcfa205
+dashboard link: https://syzkaller.appspot.com/bug?extid=bac6723617710898abd3
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bac6723617710898abd3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 2 PID: 22697 at drivers/block/floppy.c:1000 schedule_bh drivers/block/floppy.c:1000 [inline]
+WARNING: CPU: 2 PID: 22697 at drivers/block/floppy.c:1000 process_fd_request drivers/block/floppy.c:2849 [inline]
+WARNING: CPU: 2 PID: 22697 at drivers/block/floppy.c:1000 __floppy_read_block_0.isra.0+0x292/0x330 drivers/block/floppy.c:4141
+Modules linked in:
+CPU: 2 PID: 22697 Comm: syz-executor.3 Not tainted 5.18.0-rc3-syzkaller #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:1000 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2849 [inline]
+RIP: 0010:__floppy_read_block_0.isra.0+0x292/0x330 drivers/block/floppy.c:4141
+Code: 84 24 b8 01 00 00 65 48 2b 04 25 28 00 00 00 0f 85 a0 00 00 00 48 81 c4 c0 01 00 00 5b 5d 41 5c 41 5d 41 5e c3 e8 1e 1e f0 fc <0f> 0b e9 5a ff ff ff e8 e2 12 3b fd e9 7c fe ff ff e8 08 1e f0 fc
+RSP: 0018:ffffc90021f2f6c0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 1ffff920043e5ed8 RCX: 0000000000000000
+RDX: ffff888019a48080 RSI: ffffffff84882ff2 RDI: 0000000000000003
+RBP: ffffea0001593300 R08: 0000000000000000 R09: ffffffff8c8b3f27
+R10: ffffffff84882f4a R11: 0000000000000000 R12: 0000000000000001
+R13: 0000000000000001 R14: dffffc0000000000 R15: 0000000000000001
+FS:  00007fce8416d700(0000) GS:ffff88802cc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5e5a11efc0 CR3: 000000006ad68000 CR4: 0000000000150ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_revalidate.isra.0+0x801/0xae0 drivers/block/floppy.c:4187
+ floppy_open+0xac5/0xd70 drivers/block/floppy.c:4039
+ blkdev_get_whole+0x99/0x2d0 block/bdev.c:666
+ blkdev_get_by_dev.part.0+0x5d2/0xc80 block/bdev.c:816
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:850
+ blkdev_open+0x13c/0x2c0 block/fops.c:498
+ do_dentry_open+0x4a1/0x11e0 fs/open.c:824
+ do_open fs/namei.c:3476 [inline]
+ path_openat+0x1c71/0x2910 fs/namei.c:3609
+ do_filp_open+0x1aa/0x400 fs/namei.c:3636
+ do_sys_openat2+0x16d/0x4c0 fs/open.c:1213
+ do_sys_open fs/open.c:1229 [inline]
+ __do_sys_openat fs/open.c:1245 [inline]
+ __se_sys_openat fs/open.c:1240 [inline]
+ __x64_sys_openat+0x13f/0x1f0 fs/open.c:1240
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fce8303c004
+Code: 84 00 00 00 00 00 44 89 54 24 0c e8 96 f9 ff ff 44 8b 54 24 0c 44 89 e2 48 89 ee 41 89 c0 bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 34 44 89 c7 89 44 24 0c e8 c8 f9 ff ff 8b 44
+RSP: 002b:00007fce8416cca0 EFLAGS: 00000293 ORIG_RAX: 0000000000000101
+RAX: ffffffffffffffda RBX: 6666666666666667 RCX: 00007fce8303c004
+RDX: 0000000000000000 RSI: 00007fce8416cd40 RDI: 00000000ffffff9c
+RBP: 00007fce8416cd40 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000000
+R13: 00007ffe79dbf38f R14: 00007fce8416d300 R15: 0000000000022000
+ </TASK>
 
 
-thanks,
-Ming
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
