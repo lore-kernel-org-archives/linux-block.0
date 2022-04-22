@@ -2,94 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21BE5C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 15:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A484C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 15:43:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449410AbiDVP1F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 11:27:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
+        id S1449573AbiDVPqA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Apr 2022 11:46:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49838 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1449406AbiDVP1E (ORCPT
+        with ESMTP id S1449506AbiDVPpa (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 11:27:04 -0400
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D795A0B1
-        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 08:24:10 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id b5so5270735ile.0
-        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 08:24:10 -0700 (PDT)
+        Fri, 22 Apr 2022 11:45:30 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE6EA5B3C2;
+        Fri, 22 Apr 2022 08:42:34 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id s14so11651907plk.8;
+        Fri, 22 Apr 2022 08:42:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Wxv1VHcdMAWKawTEifnINmazC29umb2i5gHiDAZVeBk=;
-        b=335nWJbBDhabHr89gG5tFiLbFOQLvASDcW1EglELgq0uhxBp97C2KaIqEwRKVbYsmx
-         GpS+ja0gF1YRQsUZmFTz2Nl2pDXP+Xg6v+vWDRNYMU8cLM1cbEfDWjFhC1kiLwXMHCqc
-         eUNTTMg/IucTx/f6rGjggjmKpM7YImY+ja+IfNi+FzeDGPOhrYxJqIu19gGYohfQaFGV
-         0SRajNzdFfpfR5CbaoKsMJp5T0wjU80hAdAdMAGsWbQc6pgeR7DyeISxjBih7RRxtKeA
-         yyb7xs1AH/m8scE0u5RTvPAz4HOf8cex/5nDUlehQfn/pXUbFnP8ggIcugUC7gLXuD4C
-         AWYw==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/2bXBH57zZDvmeIOYDk/m7NyaBAKN+vWWjfrVhEZ7T4=;
+        b=XYZOLh+Jv2kL2sx884zx4C5eFWyZUuKY38ML9XvAYhNcR9BREu4ndvKecAC8kiH8Wl
+         2v8yd4kPP2gu4bBvSJJYHpMRWaZdWMCPawASUwvIYLt/36hDOsoQF6/PRGnoA/fP3+Iy
+         OdYf/Am/17PxHTlnZSv3KbSRM9TsczBeb1wQS6jyeQwBOuRzRhaolF58FR4l9A1SPpSs
+         HkM3GxADfbMO/Zvs8ImLLAeCMjyTOUQSJdFg27FdWbQ+EuDUKbiREIqdpGpAdH81y42c
+         dVVAZmsCS7qchIwgGY0c3HnDxcg2FfvolA13AyZ8voskHxh/DdCWa9uIdpnjrvxytLup
+         fQpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Wxv1VHcdMAWKawTEifnINmazC29umb2i5gHiDAZVeBk=;
-        b=lxs5rt7W2k+xL0m0/ErWtYBDw22eZZPJn2Fhlyby6APhzboTgpVen1X1xt2+ZTbP13
-         MwCy3nY4Ih4OfGjV/qL5bUFLIXwFJch12sXqnKYrbCCkaudg5hwwUcRGN2Bqe/bqXEWU
-         ZHG/67UvbVNj2TaEcmfBIt0+H6pgZKjWPa0GZdx3/ZTJ3mKp7x5Q2u+kO8jTM4l/31pI
-         LpFdLAzAxKE9kJ9zbnvx7PwDaO+4tGEsUASdD7zuSpr6AbC1xQ+rpEgYfBQOapB0ASyV
-         vwoLXYgvCY9y2dI9GjjNYLQrN/YbMBfe81LRAtW+rtrsp0Pbi9NNzKgqfai0fjdu6sAZ
-         AAYQ==
-X-Gm-Message-State: AOAM532qkDctIhb3NEZobAy0/itlBsCJm3I+KNfM/aEDggfYAzVLBqrk
-        vENRmhnSEzt2hl++olcLIMedAYnAZ9w55plONDZZW6D2wRJGmQ==
-X-Google-Smtp-Source: ABdhPJynI2j2o9aSn9G09xaJSPgHCkDd+G+caW0XT60z6/oGe+SAEg8uILSJZITvWsJcMG2BcnPuKkJSdTWGHxW7IyE=
-X-Received: by 2002:a92:d2ca:0:b0:2ca:ca3a:de89 with SMTP id
- w10-20020a92d2ca000000b002caca3ade89mr2225426ilg.127.1650641049737; Fri, 22
- Apr 2022 08:24:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
-In-Reply-To: <20220422054224.19527-1-matthew.ruffell@canonical.com>
-From:   Josef Bacik <josef@toxicpanda.com>
-Date:   Fri, 22 Apr 2022 11:23:58 -0400
-Message-ID: <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
-Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
- inotify emit udev uevent changes
-To:     Matthew Ruffell <matthew.ruffell@canonical.com>
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=/2bXBH57zZDvmeIOYDk/m7NyaBAKN+vWWjfrVhEZ7T4=;
+        b=wsZc+GM2UzLy55ReM0h1QJOD4WO38nkrn4j7DyMVTYJMtFMTmfab+lJGNrXEUB1Us2
+         AsF0bTmWBXv0ol/wpYmI2kikZvjavVDtp/NrOmVKmT2uJgq2XTPL/ZMYzCU3qZG8CR9H
+         nfMz5vhVyHooVvBqk6v3EWOZZpxG4Qe3fD2FJ+2VSOmxX4xntrEaOWbuqAZ5CM0vt60L
+         WGauzYn2Gac9BYcViOzW3gt+NNUP2OZMdp4CiQepR6MkJT1QE+OlILtCzk1zWMpAXjV9
+         bqqMoxdzZM2MLjexRpk2kB6ynjuxSOg19OwpQrLJv0rXgegz0zrXtOCLU1Omfq0s7NLK
+         efoQ==
+X-Gm-Message-State: AOAM531HRe4YVRJUTMEB8Rjj8ncsaQKsrDdNaHQ/IK6ANkvyZphpkf3k
+        UlnxzlN3+rtvklwD9hDpD9Y=
+X-Google-Smtp-Source: ABdhPJxxn+CbIFWzfwls+DC0iuC84aNWB0fSRIoYKEF+syIzU+vM8K0HoUfp8xLLZbd6xF64bDs7kQ==
+X-Received: by 2002:a17:90b:4c45:b0:1d2:acdc:71d4 with SMTP id np5-20020a17090b4c4500b001d2acdc71d4mr16900643pjb.39.1650642153919;
+        Fri, 22 Apr 2022 08:42:33 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:b5ae])
+        by smtp.gmail.com with ESMTPSA id y68-20020a623247000000b0050acc1def3csm3032102pfy.203.2022.04.22.08.42.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Apr 2022 08:42:33 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 22 Apr 2022 05:42:31 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
 Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        nbd <nbd@other.debian.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+        Paolo Valente <paolo.valente@linaro.org>,
+        James Smart <james.smart@broadcom.com>,
+        Dick Kennedy <dick.kennedy@broadcom.com>,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-mm@kvack.org
+Subject: Re: make the blkcg and blkcg structures private
+Message-ID: <YmLM5/1+VH5mdQ/o@slm.duckdns.org>
+References: <20220420042723.1010598-1-hch@lst.de>
+ <YmHQS1pyIglK+gfS@slm.duckdns.org>
+ <20220422042318.GA9977@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220422042318.GA9977@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 1:42 AM Matthew Ruffell
-<matthew.ruffell@canonical.com> wrote:
->
-> Dear maintainers of the nbd subsystem,
->
-> A user has come across an issue which causes the nbd module to hang after a
-> disconnect where a write has been made to a qemu qcow image file, with qemu-nbd
-> being the server.
->
+Hello,
 
-Ok there's two problems here, but I want to make sure I have the right
-fix for the hang first.  Can you apply this patch
+On Fri, Apr 22, 2022 at 06:23:18AM +0200, Christoph Hellwig wrote:
+> On Thu, Apr 21, 2022 at 11:44:43AM -1000, Tejun Heo wrote:
+> > The patches look all good to me and I'm not against making things more
+> > private but can you elaborate on the rationale a bit more? By and large, we
+> > have never been shy about putting things in the headers if there's *any*
+> > (perceived) gain to be made from doing so, or even just as a way to pick the
+> > locations for different things - type defs go on header and so on. Most of
+> > the inlines and [un]likely's that we have are rather silly with modern
+> > compilers with global optimizations, so it does make sense to get tidier,
+> > but if that's the rationale, mentioning that in the commit message, even
+> > briefly, would be great - ie. it should explain the benefits of adding these
+> > few accessors to keep the definition private.
+> 
+> Mostly to help me understand the code :)  between all the moving to
+> and from the css struture it is a bit of a mess, and limiting the scope
+> that deals with the structures greatly helps with that.
 
-https://paste.centos.org/view/b1a2d01a
+Hahaha, yeah, fair enough. I don't see a reason to not apply the patchset
+given that the code is better organized and easier to follow afterewards.
+For the series,
 
-and make sure the hang goes away?  Once that part is fixed I'll fix
-the IO errors, this is just us racing with systemd while we teardown
-the device and then we're triggering a partition read while the device
-is going down and it's complaining loudly.  Before we would
-set_capacity to 0 whenever we disconnected, but that causes problems
-with file systems that may still have the device open.  However now we
-only do this if the server does the CLEAR_SOCK ioctl, which clearly
-can race with systemd poking the device, so I need to make it
-set_capacity(0) when the last opener closes the device to prevent this
-style of race.
+ Acked-by: Tejun Heo <tj@kernel.org>
 
-Let me know if that patch fixes the hang, and then I'll work up
-something for the capacity problem.  Thanks,
+Thanks.
 
-Josef
+-- 
+tejun
