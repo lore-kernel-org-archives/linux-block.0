@@ -2,69 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D8AC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 15:20:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21BE5C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 15:24:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1449535AbiDVPXQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 11:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36258 "EHLO
+        id S1449410AbiDVP1F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Apr 2022 11:27:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1449405AbiDVPWj (ORCPT
+        with ESMTP id S1449406AbiDVP1E (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 11:22:39 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B488E093;
-        Fri, 22 Apr 2022 08:19:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=nIt0HvtWAi7tSIj0kbqPEjdjwfm2aCcxWjAjplI4Eqk=; b=gh7qIgCmO2h1kzss7bU+3HG1QO
-        ewzcJdVhPdEpSRkdim/oqKPWN0jiJkSN4vMxD4To+9+cmt02DkAczVcEnk98NMCK/AA1XbTG/WAGI
-        lhFawYPQYB6hOlzKDTU9zIKm5nIV66VergAeali0TvR6dISxua/ivaYgLGJPc9JLbnu4BYBiJi/KR
-        HDKjSObLSRDdk+FjPB9gARKjqFyA0mR1jpkzsui7ewdldZTFJ4l4DhEH7Kld1EOmiHfGIowKCpnL2
-        eT0cOlUoWV9rIWvmLxb6V0zQZJPR6QRs2a8qXhtxFsQGg+SgEo57K3HPx6cMHWjjP5/2TToe3EFOr
-        SJDunzCQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nhv4M-0014P5-DU; Fri, 22 Apr 2022 15:19:38 +0000
-Date:   Fri, 22 Apr 2022 08:19:38 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Douglas Gilbert <dgilbert@interlog.com>,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-modules@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Pankaj Malhotra <pankaj1.m@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-Subject: Re: scsi_debug in fstests and blktests (Was: Re: Fwd: [bug
- report][bisected] modprob -r scsi-debug take more than 3mins during blktests
- srp/ tests)
-Message-ID: <YmLHin571pO+umo+@infradead.org>
-References: <CAHj4cs9OTm9sb_5fmzgz+W9OSLeVPKix3Yri856kqQVccwd_Mw@mail.gmail.com>
- <fba69540-b623-9602-a0e2-00de3348dbd6@interlog.com>
- <YlW7gY8nr9LnBEF+@bombadil.infradead.org>
- <00ebace8-b513-53c0-f13b-d3320757695d@interlog.com>
- <YmGaGoz2+Kdqu05l@bombadil.infradead.org>
- <YmJDqceT1AiePyxj@infradead.org>
- <YmKgxGFc4SMi7MnB@mit.edu>
+        Fri, 22 Apr 2022 11:27:04 -0400
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75D795A0B1
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 08:24:10 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id b5so5270735ile.0
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 08:24:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Wxv1VHcdMAWKawTEifnINmazC29umb2i5gHiDAZVeBk=;
+        b=335nWJbBDhabHr89gG5tFiLbFOQLvASDcW1EglELgq0uhxBp97C2KaIqEwRKVbYsmx
+         GpS+ja0gF1YRQsUZmFTz2Nl2pDXP+Xg6v+vWDRNYMU8cLM1cbEfDWjFhC1kiLwXMHCqc
+         eUNTTMg/IucTx/f6rGjggjmKpM7YImY+ja+IfNi+FzeDGPOhrYxJqIu19gGYohfQaFGV
+         0SRajNzdFfpfR5CbaoKsMJp5T0wjU80hAdAdMAGsWbQc6pgeR7DyeISxjBih7RRxtKeA
+         yyb7xs1AH/m8scE0u5RTvPAz4HOf8cex/5nDUlehQfn/pXUbFnP8ggIcugUC7gLXuD4C
+         AWYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Wxv1VHcdMAWKawTEifnINmazC29umb2i5gHiDAZVeBk=;
+        b=lxs5rt7W2k+xL0m0/ErWtYBDw22eZZPJn2Fhlyby6APhzboTgpVen1X1xt2+ZTbP13
+         MwCy3nY4Ih4OfGjV/qL5bUFLIXwFJch12sXqnKYrbCCkaudg5hwwUcRGN2Bqe/bqXEWU
+         ZHG/67UvbVNj2TaEcmfBIt0+H6pgZKjWPa0GZdx3/ZTJ3mKp7x5Q2u+kO8jTM4l/31pI
+         LpFdLAzAxKE9kJ9zbnvx7PwDaO+4tGEsUASdD7zuSpr6AbC1xQ+rpEgYfBQOapB0ASyV
+         vwoLXYgvCY9y2dI9GjjNYLQrN/YbMBfe81LRAtW+rtrsp0Pbi9NNzKgqfai0fjdu6sAZ
+         AAYQ==
+X-Gm-Message-State: AOAM532qkDctIhb3NEZobAy0/itlBsCJm3I+KNfM/aEDggfYAzVLBqrk
+        vENRmhnSEzt2hl++olcLIMedAYnAZ9w55plONDZZW6D2wRJGmQ==
+X-Google-Smtp-Source: ABdhPJynI2j2o9aSn9G09xaJSPgHCkDd+G+caW0XT60z6/oGe+SAEg8uILSJZITvWsJcMG2BcnPuKkJSdTWGHxW7IyE=
+X-Received: by 2002:a92:d2ca:0:b0:2ca:ca3a:de89 with SMTP id
+ w10-20020a92d2ca000000b002caca3ade89mr2225426ilg.127.1650641049737; Fri, 22
+ Apr 2022 08:24:09 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YmKgxGFc4SMi7MnB@mit.edu>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
+In-Reply-To: <20220422054224.19527-1-matthew.ruffell@canonical.com>
+From:   Josef Bacik <josef@toxicpanda.com>
+Date:   Fri, 22 Apr 2022 11:23:58 -0400
+Message-ID: <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
+ inotify emit udev uevent changes
+To:     Matthew Ruffell <matthew.ruffell@canonical.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 08:34:12AM -0400, Theodore Ts'o wrote:
-> I would love it if blktests didn't require modules, period.  That's
-> because it's super-convenient to be able to pluck a kernel out from
-> the build tree without having to install it first.  If all of the
-> necessary devices could be built-into the kernel, this would allow
-> this to work:
+On Fri, Apr 22, 2022 at 1:42 AM Matthew Ruffell
+<matthew.ruffell@canonical.com> wrote:
+>
+> Dear maintainers of the nbd subsystem,
+>
+> A user has come across an issue which causes the nbd module to hang after a
+> disconnect where a write has been made to a qemu qcow image file, with qemu-nbd
+> being the server.
+>
 
-Yes, all my testing runs that way normally.  And running blktests
-does not fit that workflow at all.
+Ok there's two problems here, but I want to make sure I have the right
+fix for the hang first.  Can you apply this patch
+
+https://paste.centos.org/view/b1a2d01a
+
+and make sure the hang goes away?  Once that part is fixed I'll fix
+the IO errors, this is just us racing with systemd while we teardown
+the device and then we're triggering a partition read while the device
+is going down and it's complaining loudly.  Before we would
+set_capacity to 0 whenever we disconnected, but that causes problems
+with file systems that may still have the device open.  However now we
+only do this if the server does the CLEAR_SOCK ioctl, which clearly
+can race with systemd poking the device, so I need to make it
+set_capacity(0) when the last opener closes the device to prevent this
+style of race.
+
+Let me know if that patch fixes the hang, and then I'll work up
+something for the capacity problem.  Thanks,
+
+Josef
