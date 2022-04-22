@@ -2,85 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C30C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 11:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CD62C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 12:08:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1445769AbiDVLqH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 07:46:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49238 "EHLO
+        id S1447256AbiDVMK6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Apr 2022 08:10:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229960AbiDVLqG (ORCPT
+        with ESMTP id S1384839AbiDVMK6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 07:46:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 533D152B24
-        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 04:43:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1650627792;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0Ka4pkaIl0n0C8wRiVJB+Tf0N4jkuRhOTDXzmulvrko=;
-        b=XhBDTmz4Fftj18V7P+11mzZnscjSRVYq5EeDb859/tlVl8D5jlEDEMw3HIUaN+K+Cnyzkl
-        nwJeETz1wdno+clUO8h06lW+YKYMxpV9jks7JYU9xO6MSQDavUw/F+X9lNfe9G3auWrYaH
-        V5YckDWvdt49c3noLbcsCphy/AP6ZvA=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-43-2aQCrlSrPfuy5v4vWNiTYg-1; Fri, 22 Apr 2022 07:43:10 -0400
-X-MC-Unique: 2aQCrlSrPfuy5v4vWNiTYg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id AFC621C05AB6;
-        Fri, 22 Apr 2022 11:43:09 +0000 (UTC)
-Received: from [172.16.176.1] (ovpn-64-2.rdu2.redhat.com [10.10.64.2])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 567B3C33AE8;
-        Fri, 22 Apr 2022 11:43:09 +0000 (UTC)
-From:   "Benjamin Coddington" <bcodding@redhat.com>
-To:     "Matthew Wilcox" <willy@infradead.org>
-Cc:     lsf-pc@lists.linuxfoundation.org, linux-fsdevel@vger.kernel.org,
-        linux-mm@kvack.org, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-nvme@lists.infradead.org,
-        bpf@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: LSF/MM/BPF 2022: Running BOF
-Date:   Fri, 22 Apr 2022 07:43:08 -0400
-Message-ID: <15847F8A-5246-4634-ABBE-9C05AA3CBF34@redhat.com>
-In-Reply-To: <Yl7TUDtLcrhXcp1g@casper.infradead.org>
-References: <Yl7TUDtLcrhXcp1g@casper.infradead.org>
+        Fri, 22 Apr 2022 08:10:58 -0400
+X-Greylist: delayed 467 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 22 Apr 2022 05:08:03 PDT
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A0C56435;
+        Fri, 22 Apr 2022 05:08:03 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 36B415FD02;
+        Fri, 22 Apr 2022 15:00:13 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1650628813;
+        bh=WGcfw8+jkSEDAp7PzGBXGL+KYgoLrJlmcpYGAiTjh9c=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=mWKkDqU9zd+6jMn6LF34ds5F5QWus3BbqYxRfe++y7ule4ejyYTRNq1Zsq3rIguMn
+         uum8aHOz75sbkv2eU1+w7t8IIFScyB3urtkSkeaxpKhYSvG5jumJHtGhdgJOujBF0z
+         zvufrnkAmB1A9qxtFzjL7QyQtdeJ2h7mY/JU2+QIWrDD+W6c+xyL+XGoaCdSh57nRw
+         Sw6EcfbCtAUD7cm0uu8o0wy/W0ep607QASvT3HtndHd5Rw8WEB6jPIemFOua/Dy76t
+         iA6mGyepFswjQhpJBlF1Wa/xwufbfzEAEuehOu8bwAKYInvr3nnMBKHGiiqtwPVwad
+         x7eadFKcsfqqg==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Fri, 22 Apr 2022 15:00:12 +0300 (MSK)
+From:   Alexey Romanov <avromanov@sberdevices.ru>
+To:     <minchan@kernel.org>, <ngupta@vflare.org>,
+        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>
+CC:     <axboe@chromium.org>, <kernel@sberdevices.ru>,
+        <linux-kernel@vger.kernel.org>, <mnitenko@gmail.com>,
+        Alexey Romanov <avromanov@sberdevices.ru>,
+        Dmitry Rokosov <ddrokosov@sberdevices.ru>
+Subject: [PATCH v1] zram: don't retry compress incompressible page
+Date:   Fri, 22 Apr 2022 14:59:59 +0300
+Message-ID: <20220422115959.3313-1-avromanov@sberdevices.ru>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH01.sberdevices.ru (172.16.1.4) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/04/22 06:12:00 #19330442
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 19 Apr 2022, at 11:20, Matthew Wilcox wrote:
+It doesn't make sense for us to retry to compress an uncompressible
+page (comp_len == PAGE_SIZE) in zsmalloc slowpath, because we will
+be storing it uncompressed anyway. We can avoid wasting time on
+another compression attempt. It is enough to take lock
+(zcomp_stream_get) and execute the code below.
 
-> As in the past few years, let's hold a running BOF.
->
-> I propose meeting in the lobby of the Margaritaville hotel at 6:15 for
-> a 6:30 departure for an hour-long run on Monday, Tuesday and Wednesday
-> mornings.  I'm assuming breakfast will be 8-9am and sessions start at 9am.
-> Pace will be determined by whoever shows up.
->
-> We're only a mile from the North Lykken north Trailhead.
-> Other trails are a little more distant.  I've been reading
-> http://www.hiking-in-ps.com/the-north-lykken-trail/ (note this map is
-> for the south trailhead of the North Lykken trail).  I haven't been
-> to this area in 30 years and I have no idea what the trails are like,
-> so if somebody has local information, that would be great.
->
-> I note that the room rate includes complimentary bicycle rentals.  If
-> we want to, we could cycle to various other local trails.
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
+---
+ drivers/block/zram/zram_drv.c | 15 +++++++++++++--
+ 1 file changed, 13 insertions(+), 2 deletions(-)
 
-I'm in unless I'm trying to run in the PM.  I've got a tentative run/explore
-of one of the slot canyons about an hour away if I can swing it (painted
-canyon, ladder canyon, I may have to borrow a car from someone), and would
-be nice to try to get up into Mt San Jacinto park as well.
-
-I'm interested in getting some trail and elevation, but I've not run out
-there yet and will need to scope out what's possible when I get there.
-
-Ben
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index cb253d80d72b..bb9dd8b64176 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1413,9 +1413,20 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 		handle = zs_malloc(zram->mem_pool, comp_len,
+ 				GFP_NOIO | __GFP_HIGHMEM |
+ 				__GFP_MOVABLE);
+-		if (handle)
++		if (!handle)
++			return -ENOMEM;
++
++		if (comp_len != PAGE_SIZE)
+ 			goto compress_again;
+-		return -ENOMEM;
++
++		/*
++		 * If the page is not compressible, you need to acquire the lock and
++		 * execute the code below. The zcomp_stream_get() call is needed to
++		 * disable the cpu hotplug and grab the zstrm buffer back.
++		 * It is necessary that the dereferencing of the zstrm variable below
++		 * occurs correctly.
++		 */
++		zstrm = zcomp_stream_get(zram->comp);
+ 	}
+ 
+ 	alloced_pages = zs_get_total_pages(zram->mem_pool);
+-- 
+2.30.1
 
