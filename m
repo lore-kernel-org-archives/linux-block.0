@@ -2,94 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 737A1C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 13:15:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB228C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 14:40:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235689AbiDWNSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Apr 2022 09:18:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
+        id S230397AbiDWOnT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Apr 2022 10:43:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235717AbiDWNSn (ORCPT
+        with ESMTP id S229543AbiDWOnM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Apr 2022 09:18:43 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B7EE1F310F
-        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 06:15:46 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id a15so10526720pfv.11
-        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 06:15:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=DkpznYvxl1/xMx0A04k/2Fl0ZC/HbF/iN3ydwHQpN/4=;
-        b=4uaKF5hlFr8mNsqJ8TWB7F13SlhEEPo6NAAmtKTt7hIpuOSLzZWSskb28us+DcoQai
-         09KbaV2Jk+l5ZnE7rzVymd9zCGCRy8hf4ZQquJgFVgtYVhmnJTTi9egqygeeC6Eau+0I
-         k2CdEmIWlEgDev5uEE2Qlex6Z0WJIf2G0lkFBf3uql+/uYQ27+tlRpNSxJzb3FsIx0kR
-         lKVexeAUZv+LP6mLjN3G/Hc1to0dpN6PfwdsZ+w/dkw6VE8StSH8H+kgWrMPLs8MvIFe
-         O2soPkbclypAAE5smTL11bCHL13QTHaCSvsIKTgQh4ocExW52yAe45JL6xrsvJSjbrkY
-         LtWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=DkpznYvxl1/xMx0A04k/2Fl0ZC/HbF/iN3ydwHQpN/4=;
-        b=WaquN+SGusPljUbg4grUxOjjxAG798UYqp6tDnpquQPRIXlQaPH2N9e4DVoIj+Z3XE
-         s3WpaqJiHXB4yGSBkt42RuwZY833VFz1sK5W6D3odXJPnZRAXK0I/G2GuY7d0odGTyQ7
-         AiYc2VFrygRKWOp7n/Xs4iPDnIcuFqh1izVxMFy7pxQYroYfsfH+ZCAMH3BoNS9rWGsA
-         sJb7G0oO+TPZ92f71RQmhu7CJVfRITjN6A44AbyE1hgZGdhlHYwsAOr9tgnaConjLS7W
-         0643TKRUfOwSZ1kkbNW53FZcgbSRPINQOSvhEkhD+bM1XvXRRh8hFzY8gNcr+Grwrhqg
-         OyVg==
-X-Gm-Message-State: AOAM531J6uxyS1Tpbt5NxzloWFlclmKZ3gvm/oUmtSMOjmGZUp4+IgUF
-        Kkrr0M81SeIaxI9/36gxsnEcZw==
-X-Google-Smtp-Source: ABdhPJzi//fAeVhht0V7uQhZj5Kv/AcBUYnzTjirTu0TP+mQl1OLLisyNtf8gYG/7eAbKd4x7ErVrQ==
-X-Received: by 2002:a05:6a00:b52:b0:508:31e1:7d35 with SMTP id p18-20020a056a000b5200b0050831e17d35mr10083737pfo.33.1650719745503;
-        Sat, 23 Apr 2022 06:15:45 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id t66-20020a628145000000b0050ca37e60eesm5935627pfd.57.2022.04.23.06.15.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Apr 2022 06:15:45 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ndesaulniers@google.com, michalorzel.eng@gmail.com,
-        trix@redhat.com, nathan@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        llvm@lists.linux.dev
-In-Reply-To: <20220423113811.13335-1-michalorzel.eng@gmail.com>
-References: <20220423113811.13335-1-michalorzel.eng@gmail.com>
-Subject: Re: [PATCH RESEND v2 1/5] block/badblocks: Remove redundant assignments
-Message-Id: <165071974452.502130.12676791188164630002.b4-ty@kernel.dk>
-Date:   Sat, 23 Apr 2022 07:15:44 -0600
+        Sat, 23 Apr 2022 10:43:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id ACC6FDFAE
+        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 07:40:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1650724811;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Hi7lL+uHEvjGcmxe1RXhBh46Ye9HEjaAkiU/ZDSXGds=;
+        b=KjhrtuVZrOZ7vERz9IaMqOLW6Ys3McsCxLYPY7cBihuYeMZ2wRFq6kQ/1QN4L5PpPMZ/93
+        YvDZt3rKZDOM8bhV/xiS4jqVT/n51xNS30v2KBqZAt6To2bEt9SOkhXOtCmlT/RUOXKynH
+        TN7utt1CviHRtwXKHrzh8XB0sX6DlGs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-562-tlSETiZ_NMOvrAhFHoBnHw-1; Sat, 23 Apr 2022 10:40:10 -0400
+X-MC-Unique: tlSETiZ_NMOvrAhFHoBnHw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B59ED101AA42;
+        Sat, 23 Apr 2022 14:40:09 +0000 (UTC)
+Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C413841636C;
+        Sat, 23 Apr 2022 14:40:08 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ming Lei <ming.lei@redhat.com>,
+        kernel test robot <lkp@intel.com>
+Subject: [PATCH V2 1/2] debugfs: fix declaration of debugfs_rename
+Date:   Sat, 23 Apr 2022 22:39:51 +0800
+Message-Id: <20220423143952.3162999-2-ming.lei@redhat.com>
+In-Reply-To: <20220423143952.3162999-1-ming.lei@redhat.com>
+References: <20220423143952.3162999-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 23 Apr 2022 13:38:07 +0200, Michal Orzel wrote:
-> Get rid of redundant assignments to a variable sectors from functions
-> badblocks_check and badblocks_clear. This variable, that is a function
-> parameter, is being assigned a value that is never read until the end of
-> function.
-> 
-> Reported by clang-tidy [deadcode.DeadStores]
-> 
-> [...]
+debugfs_rename() declaration isn't same between CONFIG_DEBUG_FS
+and !CONFIG_DEBUG_FS, which causes the following warning in case
+of !CONFIG_DEBUG_FS:
 
-Applied, thanks!
+   include/linux/debugfs.h:252:47: note: expected 'char *' but argument is of type 'const char *'
+     252 |                 struct dentry *new_dir, char *new_name)
+         |                                         ~~~~~~^~~~~~~~
 
-[1/5] block/badblocks: Remove redundant assignments
-      commit: 3de2e5f28cb133f1d9c1b2403079722d0e7b671e
-[2/5] block/blk-map: Remove redundant assignment
-      commit: 7ab89db979017255c2163880de5c63d8c9726aef
-[3/5] block/partitions/acorn: Remove redundant assignments
-      commit: 834726828b47c08e84df02f975e30c5c65bf316b
-[4/5] block/partitions/atari: Remove redundant assignment
-      commit: 87420fa94f6cdd2ae8aa3e1d8602bfa549794fac
-[5/5] block/partitions/ldm: Remove redundant assignments
-      commit: e233fe1aa02815f38588a5a965a197bbcabfb125
+So fix declaration of debugfs_rename().
 
-Best regards,
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Reported-by: kernel test robot <lkp@intel.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ include/linux/debugfs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/linux/debugfs.h b/include/linux/debugfs.h
+index c869f1e73d75..bba0f514d97e 100644
+--- a/include/linux/debugfs.h
++++ b/include/linux/debugfs.h
+@@ -249,7 +249,7 @@ static inline ssize_t debugfs_attr_write(struct file *file,
+ }
+ 
+ static inline struct dentry *debugfs_rename(struct dentry *old_dir, struct dentry *old_dentry,
+-                struct dentry *new_dir, char *new_name)
++                struct dentry *new_dir, const char *new_name)
+ {
+ 	return ERR_PTR(-ENODEV);
+ }
 -- 
-Jens Axboe
-
+2.31.1
 
