@@ -2,63 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E509C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 16:55:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB5C7C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 17:11:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234693AbiDWQ6b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 23 Apr 2022 12:58:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55090 "EHLO
+        id S236534AbiDWROg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Apr 2022 13:14:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58086 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233532AbiDWQ6a (ORCPT
+        with ESMTP id S236520AbiDWROf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 23 Apr 2022 12:58:30 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D4262180C
-        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 09:55:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=c8pzfkie7KZBcsbeHOes2SAs+NZkafum8oz9xP2IPQg=; b=MH6rmQ5xUCJ13bOuqnPTADYF2B
-        G1quwiUdf0BbjSTVFFg/S4kctGD8BIKc/K/VEm4M+Tmzv71HIZusEsEitcG90Ad5gq5jtHouVxBic
-        AG0CFma7Yvc4nN5rEX5ogtmnR3i1ZgqQ5jQfUlLResxq3ufGcQWtDj0Op7MEWHItEPl/5XEOdLeTU
-        7XgJLH/QJlbtDNW/a0ZtsC98131WWovHPgZ6mypAoP7MbCE+q7gnFEIC8Cg1WyRS7sx8wRYLyT4Pm
-        SHQ9kKzsqcxDnwveSycCK6U6q6/GjUaCkrokjmiLJrFRvyId2UtDpCBbJ8WstlCzgOJaVrrP585dL
-        Akz352fg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1niJ2f-004gEs-Hx; Sat, 23 Apr 2022 16:55:29 +0000
-Date:   Sat, 23 Apr 2022 09:55:29 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@kernel.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@infradead.org>,
-        Dennis Zhou <dennis@kernel.org>, tj@kernel.org,
-        axboe@kernel.dk, dm-devel@redhat.com
-Subject: Re: [PATCH] block: remove redundant blk-cgroup init from __bio_clone
-Message-ID: <YmQvgdqHlsQVpxR+@infradead.org>
-References: <YkSK6mU1fja2OykG@redhat.com>
- <YkRM7Iyp8m6A1BCl@fedora>
- <YkUwmyrIqnRGIOHm@infradead.org>
- <YkVBjUy9GeSMbh5Q@fedora>
- <YkVxLN9p0t6DI5ie@infradead.org>
- <YlBX+ytxxeSj2neQ@redhat.com>
- <YlEWfc39+H+esrQm@infradead.org>
- <YlReKjjWhvTZjfg/@redhat.com>
- <YlRiUVFK+a0DwQhu@redhat.com>
- <YlRmhlL8TtQow0W0@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YlRmhlL8TtQow0W0@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Sat, 23 Apr 2022 13:14:35 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D9B81AF3E
+        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 10:11:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 292CA60F45
+        for <linux-block@vger.kernel.org>; Sat, 23 Apr 2022 17:11:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CDC8C385A5;
+        Sat, 23 Apr 2022 17:11:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1650733896;
+        bh=007ct6jwXTbJQS7rs9kmkWmfcVXNUfdGwk4stLkhz/g=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=XANd/YC6ZQt9amkNXdXzOixa6VXPFHNxMaXasuXGaq9kBSpkzGXrOhdtCS10dMzAv
+         eYzytjtc2IOZGALFDm9Ndu6Cds0mMYiJoszq3WCDLRAYeDjutctj2kDE3XYLJCEsuI
+         jnPpXFfdKnutqPZ9kqLuU0IpiMhSfqgejsxhD70Qsbakab2l4zSq/X2Z2ruqs4DW2x
+         BR0nHUys0GPwDCeNp6vf93LuAP9CZM519m8zv+1DAtRPh7kj3uasTDYOox9bXzT9y2
+         +DsIUW0IHPXJHgzH2kRPRJrM8oDZpH5NgWHv51/qglhz2DPs4jAR++5am6aNhjws12
+         VZuRUcLYESR6w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79B13E8DBD4;
+        Sat, 23 Apr 2022 17:11:36 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 5.18-rc4
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <1dbe8c29-19a6-d03f-e693-502080707680@kernel.dk>
+References: <1dbe8c29-19a6-d03f-e693-502080707680@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <1dbe8c29-19a6-d03f-e693-502080707680@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-22
+X-PR-Tracked-Commit-Id: 9dca4168a37c9cfe182f077f0d2289292e9e3656
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8467f9e34955c6923e0ed63b1c2dbbf1df70b908
+Message-Id: <165073389649.30714.5350357575760719388.pr-tracker-bot@kernel.org>
+Date:   Sat, 23 Apr 2022 17:11:36 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-So while I'm still diving into the somewhat invasive changes to
-optimize some of the cloning all we might relaly need for your
-use case should be this:
+The pull request you sent on Fri, 22 Apr 2022 20:18:08 -0600:
 
-http://git.infradead.org/users/hch/block.git/shortlog/refs/heads/blk-clone-no-bdev
+> git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-22
 
-Can you check if this helps you?
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8467f9e34955c6923e0ed63b1c2dbbf1df70b908
 
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
