@@ -2,133 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08840C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 22 Apr 2022 22:10:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B93CC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 02:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231998AbiDVWNb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 18:13:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53220 "EHLO
+        id S231272AbiDWCVG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 22 Apr 2022 22:21:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232983AbiDVWNL (ORCPT
+        with ESMTP id S229455AbiDWCVF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 18:13:11 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2735122C3C3;
-        Fri, 22 Apr 2022 14:00:57 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id j6so6741681pfe.13;
-        Fri, 22 Apr 2022 14:00:57 -0700 (PDT)
+        Fri, 22 Apr 2022 22:21:05 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D096DF87
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 19:18:10 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id c23so14667718plo.0
+        for <linux-block@vger.kernel.org>; Fri, 22 Apr 2022 19:18:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=iv87v9Yca5TZDg/ZQ/iYjZjkzk7tiOH6BRDDm7Dxt0Y=;
-        b=fu0F1CAVqlD9Irw8VYYm8YmF+EPHITJrPwLkshaOAGcPbpAgnfpdLx0vAZX9gI6xZf
-         SJ3CNdXK9Y4YbnjX5RygQu9E9ZFtDXEPrebfQd3u5POyYIP/Ain4NphhDZtQxZw1qEWm
-         GVHPujZWudp0ogm9MVDdUGMOua6INR1GlA/VTNT+51PUfdHdyWZRxrtZ4UfkIohsoRDZ
-         x6Xb3GJShmjXlrTYFvslFdVuPnj0OIshb7baSnSrKa2AJRzLHtXs4Rigv6SB6J+zEdzD
-         mNcD6DsEGguEyrnS2cSNZ9R4XGpR4i6+Fd8vol5CLckzjVcNBKjroiIYIfPetGqY+Os+
-         5New==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to:cc
+         :content-language:content-transfer-encoding;
+        bh=PYOSS5/DJvDqR+/P87jn0dmO+rmmGkHzFGUlm0Aw058=;
+        b=CrTXwNpHOgVqTotWKVo4GFRnRCw8E1J/ruLoaylygrhew1bAXAjn1g3Lz25/JmFJvS
+         heeb+enrElQGMMC5EPFr4YZLhBW9BMmdzHorjUQNnaCxyVjxujcMwV9kXg/vW9VMqEr7
+         Nq0+mnTfd3aLkJlmm8DJn04RpophguVqBAuMKuNm9St8Qy2XVXGNHUpxO/QPveIkSacd
+         gi6TuvrfHCwHcpwiUt6a50VrGTEKj9lIfQzA0f1M+PjeiLD7q11J8nlKqbl5qvk3I4Oo
+         ZX7xZHOAvoP9sZSsPdf+VddFxTY8bFXjZk1L8xq0RipT+zgQp521JJsPbdA6LojZIxIn
+         6qXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=iv87v9Yca5TZDg/ZQ/iYjZjkzk7tiOH6BRDDm7Dxt0Y=;
-        b=inZsCiCj/gBRuTSaEpp+5cKCK8GA1Pzh8OVgON/XzqBpiZtp9x/ElLyrnxhxDLuRgX
-         q1Z848viyvTt9c9sCcf0HijTOgHAIvUmv/yC7KNiAmKWyozX6Ntka9gS7vqRmls2pTvF
-         LMfMTNHB8KN2zRIpN0D0Pc/Ya26JC+rQXQliC1jmFcA75D7TD6FPY3SGJibe0C/5WPGt
-         Mort2IEILJHtghBgeLu6GvTXwc1MdAYDddzeA3pTWpg2SzM4BiBBt2czutyEm/2XO52D
-         D4U1K88Il7LIWtsr+kRY1QeIIWC37BFK1kTWWnhY53RrW5rr/+iLwSgHOb16jhlOGvBv
-         yacQ==
-X-Gm-Message-State: AOAM533vbirifgrU71c1BSQXugmjL7DwcqcpL8r3d24xNAHsQ+N7zTQe
-        XV2OgaI0ps27uhnVB/e4MjkO5n7JHuE=
-X-Google-Smtp-Source: ABdhPJzDgamSPgly3WQ+00xbiuqkgQliUhJZzRcFR4QOhP8ELajgX3fvATKicZLowHshGlszxbesiQ==
-X-Received: by 2002:a17:903:2352:b0:159:3fa:261 with SMTP id c18-20020a170903235200b0015903fa0261mr6183552plh.21.1650659239352;
-        Fri, 22 Apr 2022 13:27:19 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:2194:db4:85a8:b0df])
-        by smtp.gmail.com with ESMTPSA id u9-20020a17090a4bc900b001d26f134e43sm7206404pjl.51.2022.04.22.13.27.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Apr 2022 13:27:19 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Fri, 22 Apr 2022 13:27:17 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Alexey Romanov <avromanov@sberdevices.ru>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     ngupta@vflare.org, senozhatsky@chromium.org,
-        linux-block@vger.kernel.org, axboe@chromium.org,
-        kernel@sberdevices.ru, linux-kernel@vger.kernel.org,
-        mnitenko@gmail.com, Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: Re: [PATCH v1] zram: don't retry compress incompressible page
-Message-ID: <YmMPpaseLn4i6MYk@google.com>
-References: <20220422115959.3313-1-avromanov@sberdevices.ru>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:content-language:content-transfer-encoding;
+        bh=PYOSS5/DJvDqR+/P87jn0dmO+rmmGkHzFGUlm0Aw058=;
+        b=Dj08bNVzc/rYerpFJFFOS6uTk5tzjmyWNEsUeLagLBMKLOLlTVWZ0xSZsyezxrjCVq
+         E9WBcVT3JryKb5BkrmCrVaDJPexdJ21g2P5qCLj5bULLwxyI8nSCJrpihuaQPyBZ2Ftx
+         lpR6iao7wjY6BUD5ucOp5f6CrA0TuJiPE69+B4jlcl3T4gXmxOJVYBoUrrcNwg7dT2qx
+         DJ5BOu+YRDACZgVLj5knytfI6wBTiL5pTbCbWThzzmWTtfSoRn11OYB632RamZTuM8Xz
+         fEeEXoCV8z6ypjBTsGc22PXctHV9lYy3xcWj1Q9U+hckx9yrJ/fvvO4JlAPqejL5EdBJ
+         T+MA==
+X-Gm-Message-State: AOAM532x/aG9JHKQvQZyxPInUmvU/QtdhDuKaPcUH/GgyFE/YDscU2Sy
+        3CnU+CuJXA/eVB+pT+5kS3hoFH9n+kIiXzej
+X-Google-Smtp-Source: ABdhPJwzkTRDHzZVXIkFQEoZ6vonPOmzYH5Fpo3CP7bs/d6/owiJWynnm/rIyDAXyN0a81upE5do3g==
+X-Received: by 2002:a17:902:8ec2:b0:156:9d2c:9ec5 with SMTP id x2-20020a1709028ec200b001569d2c9ec5mr7301839plo.170.1650680289622;
+        Fri, 22 Apr 2022 19:18:09 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id d21-20020a056a0010d500b004fd9ee64134sm3833598pfu.74.2022.04.22.19.18.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Apr 2022 19:18:09 -0700 (PDT)
+Message-ID: <1dbe8c29-19a6-d03f-e693-502080707680@kernel.dk>
+Date:   Fri, 22 Apr 2022 20:18:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220422115959.3313-1-avromanov@sberdevices.ru>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.18-rc4
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Apr 22, 2022 at 02:59:59PM +0300, Alexey Romanov wrote:
-> It doesn't make sense for us to retry to compress an uncompressible
-> page (comp_len == PAGE_SIZE) in zsmalloc slowpath, because we will
-> be storing it uncompressed anyway. We can avoid wasting time on
-> another compression attempt. It is enough to take lock
-> (zcomp_stream_get) and execute the code below.
+Hi Linus,
 
-Totally make sense. However, I'd like to discuss removing the double
-compression logic entirely.
+Just two small regression fixes for bcache. Please pull!
 
-Ccing Sergey to get some opinion.
 
-[da9556a2367c, zram: user per-cpu compression streams]
+The following changes since commit 89a2ee91edd9c555c59e4d38dc54b99141632cc2:
 
-The 2nd trial allocation under per-cpu pressmption has been used to
-prevent regression of allocation failure. However, it makes trouble
-for maintenance without significant benefit.
-(I gathered some of data from my device and writestall was just 38 for
-10 days even though swap was very heap - pswpout 164831211).
+  Merge tag 'nvme-5.18-2022-04-15' of git://git.infradead.org/nvme into block-5.18 (2022-04-15 06:33:49 -0600)
 
-Even, such 38 attempts don't guarantee 2nd trial allocation was
-successful because it's timing dependent and __GFP_DIRECT_RECLAIM is
-never helpful in reclaim context.
+are available in the Git repository at:
 
-I'd like to remove the double compression logic and make it simple.
-What do you think?
+  git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-22
 
-> 
-> Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-> Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
-> ---
->  drivers/block/zram/zram_drv.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index cb253d80d72b..bb9dd8b64176 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1413,9 +1413,20 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
->  		handle = zs_malloc(zram->mem_pool, comp_len,
->  				GFP_NOIO | __GFP_HIGHMEM |
->  				__GFP_MOVABLE);
-> -		if (handle)
-> +		if (!handle)
-> +			return -ENOMEM;
-> +
-> +		if (comp_len != PAGE_SIZE)
->  			goto compress_again;
-> -		return -ENOMEM;
-> +
-> +		/*
-> +		 * If the page is not compressible, you need to acquire the lock and
-> +		 * execute the code below. The zcomp_stream_get() call is needed to
-> +		 * disable the cpu hotplug and grab the zstrm buffer back.
-> +		 * It is necessary that the dereferencing of the zstrm variable below
-> +		 * occurs correctly.
-> +		 */
-> +		zstrm = zcomp_stream_get(zram->comp);
->  	}
->  
->  	alloced_pages = zs_get_total_pages(zram->mem_pool);
-> -- 
-> 2.30.1
-> 
+for you to fetch changes up to 9dca4168a37c9cfe182f077f0d2289292e9e3656:
+
+  bcache: fix wrong bdev parameter when calling bio_alloc_clone() in do_bio_hook() (2022-04-19 11:28:17 -0600)
+
+----------------------------------------------------------------
+block-5.18-2022-04-22
+
+----------------------------------------------------------------
+Coly Li (2):
+      bcache: put bch_bio_map() back to correct location in journal_write_unlocked()
+      bcache: fix wrong bdev parameter when calling bio_alloc_clone() in do_bio_hook()
+
+ drivers/md/bcache/journal.c | 2 +-
+ drivers/md/bcache/request.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+-- 
+Jens Axboe
+
