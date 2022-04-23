@@ -2,117 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39D9C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 02:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFFFC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 23 Apr 2022 11:38:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232238AbiDWC4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 22 Apr 2022 22:56:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49994 "EHLO
+        id S233604AbiDWLla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 23 Apr 2022 07:41:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231970AbiDWC4V (ORCPT
+        with ESMTP id S232036AbiDWLl3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 22 Apr 2022 22:56:21 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D63E464714;
-        Fri, 22 Apr 2022 19:53:25 -0700 (PDT)
-Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KlbS71Q0czhYFk;
-        Sat, 23 Apr 2022 10:53:11 +0800 (CST)
-Received: from [10.174.176.103] (10.174.176.103) by
- kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 23 Apr 2022 10:53:22 +0800
-Message-ID: <f2fb47c9-edbb-65ce-5d6a-1363a814662f@huawei.com>
-Date:   Sat, 23 Apr 2022 10:53:22 +0800
+        Sat, 23 Apr 2022 07:41:29 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01AB91A04F;
+        Sat, 23 Apr 2022 04:38:33 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id n17so12475340ljc.11;
+        Sat, 23 Apr 2022 04:38:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nSOBiYrJmNaRQKYvQ7ACT7tJByUwQn0t0NjQZI493e4=;
+        b=pqQDbw4RNWGcL08nmRqyvsk7VcZjZULEDn/DTHgGlSFCPd6rXe5laDjJpufm96j0Ns
+         DLjKk4lBqxrzba7tl0m8WAB/iH7q0ypWZaqja4O6LXnx4GOuJaxWiyoKM4LQ/4pbOYJp
+         V0toXlRCeB00f6oQ9J/OsbDeNSWYRmMfAaFySoA28A+B5PKmykTLMf+Q4vvrFJcxov0L
+         veyLID366e70c/5NFbkkR6oHwTQ5F4gqmvWLOOQQ5NnzGLHWuMPu5qdi6AOiecpPvaxn
+         eju9iPoH3jpmYxXiIlitaLqLCg3JU/pQNw9xHmwKFQOFJatB8MM8EPDxbydFSxkQZkY7
+         nlEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=nSOBiYrJmNaRQKYvQ7ACT7tJByUwQn0t0NjQZI493e4=;
+        b=EkWVVgJ4etUZ6kuUMGAyUFfSdC9uax5xCRMsiotp+5ChrxXKzhpL63ZMYPnQATbd4O
+         bxmm7QmdHTj0DayMq9soh9Ac8NSV72UgKAZV94TzPYlzzU+WDOW0KSac+wxDCNfpgtCE
+         /czW/BTDJfBodqRKiul5Q3XiCSkeKeANVuZfGaoJQ1q65z9KZ1T0a0TwN120Gtv1Ea/h
+         iuk38SNxoZqy4lSSzRGcBRK2YXZodvzbgKmJjuLD5V6S8tQyPLp5SfRkuWBciSZBrMa3
+         UdR+eBBLmQuEkg3oE3gqc7BGNq4eu1EGJs8P/l4illmWw0s12NVqLv4109zSIBRyIT7/
+         1H8w==
+X-Gm-Message-State: AOAM533WAxCTkpAElHaCLPLQxDVTrII0Z7i8BDS7G+u0qiNmPVoEhSzo
+        9lW4HhkMdbWdV08/ulCbO0U=
+X-Google-Smtp-Source: ABdhPJyd/PgxrOLjdrlaAYRz7cdirlOXUSeWNoFiBhHafKI7Ef6ntic9mpwNXmVl9XDmNjkGeMfFzg==
+X-Received: by 2002:a2e:a40b:0:b0:24d:c4d4:5796 with SMTP id p11-20020a2ea40b000000b0024dc4d45796mr5370110ljn.202.1650713911189;
+        Sat, 23 Apr 2022 04:38:31 -0700 (PDT)
+Received: from morzel-asus.lan (static-91-225-135-18.devs.futuro.pl. [91.225.135.18])
+        by smtp.gmail.com with ESMTPSA id g17-20020a2e9cd1000000b0024db538c2absm526411ljj.7.2022.04.23.04.38.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Apr 2022 04:38:30 -0700 (PDT)
+From:   Michal Orzel <michalorzel.eng@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Nick Desaulniers <ndesaulniers@google.com>,
+        Tom Rix <trix@redhat.com>
+Cc:     Michal Orzel <michalorzel.eng@gmail.com>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        llvm@lists.linux.dev
+Subject: [PATCH RESEND v2 1/5] block/badblocks: Remove redundant assignments
+Date:   Sat, 23 Apr 2022 13:38:07 +0200
+Message-Id: <20220423113811.13335-1-michalorzel.eng@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH -next v2] nbd: fix possible overflow on 'first_minor' in
- nbd_dev_add()
-From:   "zhangwensheng (E)" <zhangwensheng5@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>
-References: <20220407032505.3797948-1-zhangwensheng5@huawei.com>
- <da58534e-aa43-b163-4c05-190e1e20c0ab@huawei.com>
-In-Reply-To: <da58534e-aa43-b163-4c05-190e1e20c0ab@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.103]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemi500016.china.huawei.com (7.221.188.220)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-friendly ping...
+Get rid of redundant assignments to a variable sectors from functions
+badblocks_check and badblocks_clear. This variable, that is a function
+parameter, is being assigned a value that is never read until the end of
+function.
 
-在 2022/4/16 14:09, zhangwensheng (E) 写道:
-> friendly ping...
->
-> 在 2022/4/7 11:25, Zhang Wensheng 写道:
->> When 'index' is a big numbers, it may become negative which forced
->> to 'int'. then 'index << part_shift' might overflow to a positive
->> value that is not greater than '0xfffff', then sysfs might complains
->> about duplicate creation. Because of this, move the 'index' judgment
->> to the front will fix it and be better.
->>
->> Fixes: b0d9111a2d53 ("nbd: use an idr to keep track of nbd devices")
->> Fixes: 940c264984fd ("nbd: fix possible overflow for 'first_minor' in 
->> nbd_dev_add()")
->> Signed-off-by: Zhang Wensheng <zhangwensheng5@huawei.com>
->> ---
->> v1->v2:
->> - add the line "disk->first_minor = index << part_shift;" which has
->> been deleted by mistake in v1.
->>
->>   drivers/block/nbd.c | 23 ++++++++++++-----------
->>   1 file changed, 12 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
->> index 5a1f98494ddd..9448aacbcf0f 100644
->> --- a/drivers/block/nbd.c
->> +++ b/drivers/block/nbd.c
->> @@ -1800,17 +1800,7 @@ static struct nbd_device *nbd_dev_add(int 
->> index, unsigned int refs)
->>       refcount_set(&nbd->refs, 0);
->>       INIT_LIST_HEAD(&nbd->list);
->>       disk->major = NBD_MAJOR;
->> -
->> -    /* Too big first_minor can cause duplicate creation of
->> -     * sysfs files/links, since index << part_shift might overflow, or
->> -     * MKDEV() expect that the max bits of first_minor is 20.
->> -     */
->>       disk->first_minor = index << part_shift;
->> -    if (disk->first_minor < index || disk->first_minor > MINORMASK) {
->> -        err = -EINVAL;
->> -        goto out_free_work;
->> -    }
->> -
->>       disk->minors = 1 << part_shift;
->>       disk->fops = &nbd_fops;
->>       disk->private_data = nbd;
->> @@ -1915,8 +1905,19 @@ static int nbd_genl_connect(struct sk_buff 
->> *skb, struct genl_info *info)
->>       if (!netlink_capable(skb, CAP_SYS_ADMIN))
->>           return -EPERM;
->>   -    if (info->attrs[NBD_ATTR_INDEX])
->> +    if (info->attrs[NBD_ATTR_INDEX]) {
->>           index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
->> +
->> +        /*
->> +         * Too big first_minor can cause duplicate creation of
->> +         * sysfs files/links, since index << part_shift might 
->> overflow, or
->> +         * MKDEV() expect that the max bits of first_minor is 20.
->> +         */
->> +        if (index < 0 || index > MINORMASK >> part_shift) {
->> +            printk(KERN_ERR "nbd: illegal input index %d\n", index);
->> +            return -EINVAL;
->> +        }
->> +    }
->>       if (!info->attrs[NBD_ATTR_SOCKETS]) {
->>           printk(KERN_ERR "nbd: must specify at least one socket\n");
->>           return -EINVAL;
-> .
+Reported by clang-tidy [deadcode.DeadStores]
+
+Signed-off-by: Michal Orzel <michalorzel.eng@gmail.com>
+---
+ block/badblocks.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/block/badblocks.c b/block/badblocks.c
+index d39056630d9c..3afb550c0f7b 100644
+--- a/block/badblocks.c
++++ b/block/badblocks.c
+@@ -65,7 +65,6 @@ int badblocks_check(struct badblocks *bb, sector_t s, int sectors,
+ 		s >>= bb->shift;
+ 		target += (1<<bb->shift) - 1;
+ 		target >>= bb->shift;
+-		sectors = target - s;
+ 	}
+ 	/* 'target' is now the first block after the bad range */
+ 
+@@ -345,7 +344,6 @@ int badblocks_clear(struct badblocks *bb, sector_t s, int sectors)
+ 		s += (1<<bb->shift) - 1;
+ 		s >>= bb->shift;
+ 		target >>= bb->shift;
+-		sectors = target - s;
+ 	}
+ 
+ 	write_seqlock_irq(&bb->lock);
+-- 
+2.25.1
+
