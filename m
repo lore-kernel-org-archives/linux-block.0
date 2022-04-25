@@ -2,72 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1ADC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 01:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F9BC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 03:09:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240241AbiDYBwB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 24 Apr 2022 21:52:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52038 "EHLO
+        id S240542AbiDYDMI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 24 Apr 2022 23:12:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240236AbiDYBv4 (ORCPT
+        with ESMTP id S240474AbiDYDMH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 24 Apr 2022 21:51:56 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE1DC3AA5B
-        for <linux-block@vger.kernel.org>; Sun, 24 Apr 2022 18:48:51 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id k27so1558100edk.4
-        for <linux-block@vger.kernel.org>; Sun, 24 Apr 2022 18:48:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AMq90c3EMg7Fo2DoesguV3visvIyItzGt8+NgqwW1jA=;
-        b=N0lnR+lEWZ2JpvJDFYtPnAWSABeP6Qu+dzIw6plNSyp/DjwEjP3Of8osZGCMWR0Qiz
-         AO3jGmjwm4/zb81Wz6+VsPB0OJbLdcLE2htsbPovDbzBiMlSwTFviIODAPboLtqR9mGz
-         5LEGQJFhe0HioZkY/xSlKmgtx1+QZFIMdfibA=
+        Sun, 24 Apr 2022 23:12:07 -0400
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B4C64E385;
+        Sun, 24 Apr 2022 20:09:04 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id i24so13579084pfa.7;
+        Sun, 24 Apr 2022 20:09:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AMq90c3EMg7Fo2DoesguV3visvIyItzGt8+NgqwW1jA=;
-        b=hUcdTXoZrXjdsSreHYg24iHsgK7ZDr79HTG5PngGB34qqB+f/9iPObdyPPXd90PCih
-         9rLOibAkQqFTepDIOTGITbxmkqRkBmz/CDG6aLeiIccrsxcNoKWvm8eDnXll6fOh9T2V
-         J7ywK8K4u27w/nS2ZhicHXv+XRzVuzSU/Q2S1zGfkxYQup+jncC4YTWB/h7lmPA1MLqW
-         rPwvS5dh0xpxDRyInIDRooloQu3Ix6sAUu+XIgWAK/9mdpkKm6P4GN92/CveDAc8dAVX
-         1YucbhasX3bScOwD+5AOicEosWpqkwq+T5ti8eqEqd2rdWjQMnPckcWjYF70orgM6vBw
-         yZBQ==
-X-Gm-Message-State: AOAM530CWAxTRx2FiyeJJ2KPbfW+F3glgqMGusfXGWIlTZ2kHG7WQ+pe
-        4EC33qNCnlA7zyq7V17QNku7D/8gu71oIRxifQ19zw==
-X-Google-Smtp-Source: ABdhPJwZOqrqMruNYx6fZ+JTZUfCJwGibdcad+m1P70jVJs4UKuBc6rZxzI1DBU1HjF8rnWSebMP2c1jAWoVl21Lovk=
-X-Received: by 2002:a05:6402:f1c:b0:41d:8bc7:cd26 with SMTP id
- i28-20020a0564020f1c00b0041d8bc7cd26mr16460882eda.47.1650851330313; Sun, 24
- Apr 2022 18:48:50 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=tsGZFIEixUEnJNolXV8dfGKJqfTCfEpZ3B2cSrfx1vM=;
+        b=eWbthMyR5pl1rFlPdMKr3HSLFSx73sk+wZ1uL96OKuPPahT/UJrpXsIkRtJRNAuCPN
+         SZxKyWI70mcH+164+Um+v1onym4X4h+w11oNv0UkFLZvD10Gc/gidP138PHMOlE066iA
+         Qs7Y2SWaimJBdX2sa6G7tZ6NDzzEv810ic0NC/KxYmZlphJ1ijHTLT7Q5ZmbEcRbC48f
+         Pa6aBeDNFJ5hOpXcOqG0QDLUSTtDap6VAnSEWgf7/j04nJMpqcK5LSUuP3PJAGBcKSzY
+         XugPnCCRPHSpHKZ0GLup7sgjpM5+1PY5L5d7S1PWxgMsaN0vyo8w9XBCu728UsefeJ8b
+         qbeg==
+X-Gm-Message-State: AOAM532k9noiUdzKMgIkVI2hTf86GQdehfXvov2VyY5HY/AKD7f39DBX
+        OqdSuLVZnlO2DxeAuuEyusgRhrcCfyc=
+X-Google-Smtp-Source: ABdhPJzOQj9ikbTemWkl0X4L6g7+gJVC6zzs6svuR4Q/oiKun077BKe3V8PtBTFA63SVbSHmMXRfuw==
+X-Received: by 2002:a05:6a00:2d0:b0:4f4:1f34:e39d with SMTP id b16-20020a056a0002d000b004f41f34e39dmr16617024pft.14.1650856143804;
+        Sun, 24 Apr 2022 20:09:03 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id t2-20020a17090a448200b001cd4989ff40sm9147432pjg.7.2022.04.24.20.09.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 24 Apr 2022 20:09:02 -0700 (PDT)
+Message-ID: <450b5ab6-fb82-06dc-2a11-e0b464901c74@acm.org>
+Date:   Sun, 24 Apr 2022 20:09:01 -0700
 MIME-Version: 1.0
-References: <20220422115959.3313-1-avromanov@sberdevices.ru> <YmMPpaseLn4i6MYk@google.com>
-In-Reply-To: <YmMPpaseLn4i6MYk@google.com>
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-Date:   Mon, 25 Apr 2022 10:48:39 +0900
-Message-ID: <CA+_sPao6mN5hwFEanGuAM6YeM+RYiKbortwNech3-cLfMsGuDw@mail.gmail.com>
-Subject: Re: [PATCH v1] zram: don't retry compress incompressible page
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Alexey Romanov <avromanov@sberdevices.ru>, ngupta@vflare.org,
-        linux-block@vger.kernel.org, axboe@chromium.org,
-        kernel@sberdevices.ru, linux-kernel@vger.kernel.org,
-        mnitenko@gmail.com, Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH -next RFC v3 0/8] improve tag allocation under heavy load
+Content-Language: en-US
+To:     Yu Kuai <yukuai3@huawei.com>, axboe@kernel.dk,
+        andriy.shevchenko@linux.intel.com, john.garry@huawei.com,
+        ming.lei@redhat.com, qiulaibin@huawei.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220415101053.554495-1-yukuai3@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220415101053.554495-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Apr 23, 2022 at 5:27 AM Minchan Kim <minchan@kernel.org> wrote:
-[..]
-> The 2nd trial allocation under per-cpu pressmption has been used to
-> prevent regression of allocation failure. However, it makes trouble
-> for maintenance without significant benefit.
+On 4/15/22 03:10, Yu Kuai wrote:
+> The single io performance(randwrite):
+> 
+> | bs       | 128k | 256k | 512k | 1m   | 1280k | 2m   | 4m   |
+> | -------- | ---- | ---- | ---- | ---- | ----- | ---- | ---- |
+> | bw MiB/s | 20.1 | 33.4 | 51.8 | 67.1 | 74.7  | 82.9 | 82.9 |
 
-Agreed.
+Although the above data is interesting, it is not sufficient. The above 
+data comes from a setup with a single hard disk. There are many other 
+configurations that are relevant (hard disk array, high speed NVMe, QD=1 
+USB stick, ...) but for which no conclusions can be drawn from the above 
+data.
 
-> I'd like to remove the double compression logic and make it simple.
-> What do you think?
+Another question is whether the approach of this patch series is the 
+right approach? I would expect that round-robin wakeup of waiters would 
+be ideal from a fairness point of view. However, there are patches in 
+this patch series that guarantee that wakeup of tag waiters won't happen 
+in a round robin fashion.
 
-I'm all for it.
+Thanks,
+
+Bart.
