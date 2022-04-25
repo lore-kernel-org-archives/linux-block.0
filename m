@@ -2,103 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED4FC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 21:08:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59B3C41535
+	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 22:22:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245683AbiDYVLj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Apr 2022 17:11:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54340 "EHLO
+        id S237872AbiDYWZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Apr 2022 18:25:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245685AbiDYVLh (ORCPT
+        with ESMTP id S1343627AbiDYVul (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Apr 2022 17:11:37 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BE276D943;
-        Mon, 25 Apr 2022 14:08:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 25 Apr 2022 17:50:41 -0400
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92423AA54
+        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 14:47:35 -0700 (PDT)
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 286D96137F;
-        Mon, 25 Apr 2022 21:08:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 918D6C385BC;
-        Mon, 25 Apr 2022 21:08:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1650920910;
-        bh=yN2FFsgqiwWmpQIWXC94b82E2wpYjQTq/CU/u3g3cjE=;
-        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-        b=pdKHj+9jtFEKRxbFIKbp6BN5W0SKHdhPUGdQDXd7Xqx9vi4EpkMV1Y4FokX/IkPYa
-         fcHGk/4On2XWYf3uADhfEsr+7LxnZ49Mj82N7KMHrZLd/dwLJ08US+RaehkUasA6/k
-         ULzEmN8W11D5KZ+Cm4S93JoYXPgu2ne6zBKyDbG+PP7TNy6nKJUI/Prlkq4aTHvM+N
-         eDTgN5VZZLATieGxC8vMqcHVTHdQIL63mmQQGdiCPeBj+cARAR4cnGnqJ35UI9ZFbn
-         uSL8Ys/PCGOp1a6uCJDJdZhN6mhZ0J51T+/xZ6Bj+aFJUo7nkxoRQiwNXWKGnT6ByK
-         ZiFdXEcFhWfZg==
-Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-2f7d7e3b5bfso49218707b3.5;
-        Mon, 25 Apr 2022 14:08:30 -0700 (PDT)
-X-Gm-Message-State: AOAM531k5AywOy2rlPyo61lLzMDJNpMwdIaNzA6gQfrAhnfZeXQrV3FJ
-        wD5Xl7ifXOHzHfkIL5muoYW0N9nlGQYXiMiuqoQ=
-X-Google-Smtp-Source: ABdhPJxgUnh58spmwdi5KGXzmrzAEx/WM60nf6Oi6YSWPgwfZEJsfaGjWIDBRUKlPyettQyT9R0PC00gVw9kzJ9ffYQ=
-X-Received: by 2002:a0d:e343:0:b0:2f7:cefb:577b with SMTP id
- m64-20020a0de343000000b002f7cefb577bmr9909411ywe.472.1650920909604; Mon, 25
- Apr 2022 14:08:29 -0700 (PDT)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 816363F1D3
+        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 21:47:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1650923253;
+        bh=UO4wzxZajFtH3qcfy3dLF1bQAk44v43NDT+rmdRn5Yo=;
+        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+         To:Cc:Content-Type;
+        b=J5+97Ol7GprYEW2ZEzNG4XzYVNsOUW0hZWdsQzVB/duFtm7QztNyWaCuwFifRdVLS
+         UK1L5wsfM9Ng4KwhlUOM6ddLDISodBfm93unZoI892dJsJUI9OK76qgKASLecXZrIl
+         5xct1CynTk3pCa0/saQfmfmTeEuPUvvFJ39omJCB6zUfdh317D7D8oJL8sg2+gTRu5
+         zvxU6CqFHPfTPxzVPL7Yr8qVvVYIjp27l5LhfKkcRFx92VoQAZoiGANueJM+j7uut6
+         Z01+xXCiWe/4/Eu4Z42UtYTMKKty4G3LW01MvFO8wM3jPXKC2pKF4sYWBi/9RfCYM+
+         4vhJAozziJTUg==
+Received: by mail-pf1-f197.google.com with SMTP id i19-20020aa79093000000b0050d44b83506so2050728pfa.22
+        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 14:47:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UO4wzxZajFtH3qcfy3dLF1bQAk44v43NDT+rmdRn5Yo=;
+        b=DqQw3psiqaNthDXejCFoCnc5hbZ0857i0Ttl7gytzcy+vGfRywTGbkNJdujkcUwigJ
+         w+4FbT6ZqcBa9+rfsEZWgz0ubAlnHhk6z6VDJ585W25+PWDwZoiBEUPMftQI9Nvsv29V
+         IpNhaxvR8kkqOzh8qOLLlisVj/V5mm0CUOhjMugVIOsM2HptSHJ8FlE8QS7+eXUIxHpB
+         SUyW2iwk0kSoYJ3irIzjitFjt/SeVQSSjmH8XMpRk8AKOC0oDDuTcyPwUL9rLjrja4h+
+         ZxhhcZxaUdldAOX4K9LLR5N1YxfqXA2s/JuxJdJpXph+ck/nHKYS1728v3Qd9Pa9PRiT
+         hnUQ==
+X-Gm-Message-State: AOAM533CJSF/ihBk76PPVxdoPVzRjO4vW26cUFEbux3qKLk8msf3y7w8
+        Mq8etZBniLKttQOb8X3MDe5jLqwd5ZgtlBsZ23M8XAQWwgD/5gDx+OM2Yd798N/vwnhTtsCBFEA
+        /jnkO1iyycAhNQXc5HzLOpDy9eWN5MS8kaUByrQpDJruhpc45NqTYVCA+
+X-Received: by 2002:a17:90b:886:b0:1d9:3a05:3f2a with SMTP id bj6-20020a17090b088600b001d93a053f2amr14051816pjb.53.1650923251836;
+        Mon, 25 Apr 2022 14:47:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw2rdYzYOX06hsXRuD35oezdKlAmuDxmoRYv+cEWg5RH4h591X/jJQypqGczm4ZFvbqbJKbrTN/oPcN6sjDAD4=
+X-Received: by 2002:a17:90b:886:b0:1d9:3a05:3f2a with SMTP id
+ bj6-20020a17090b088600b001d93a053f2amr14051798pjb.53.1650923251590; Mon, 25
+ Apr 2022 14:47:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220418045314.360785-1-hch@lst.de> <20220418045314.360785-7-hch@lst.de>
-In-Reply-To: <20220418045314.360785-7-hch@lst.de>
-From:   Song Liu <song@kernel.org>
-Date:   Mon, 25 Apr 2022 14:08:18 -0700
-X-Gmail-Original-Message-ID: <CAPhsuW7fpiAqAf+U491dTH4mWORZQCxfyT6zWQwN=4r5WJ429Q@mail.gmail.com>
-Message-ID: <CAPhsuW7fpiAqAf+U491dTH4mWORZQCxfyT6zWQwN=4r5WJ429Q@mail.gmail.com>
-Subject: Re: [PATCH 06/11] raid5: don't set the discard_alignment queue limit
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, Richard Weinberger <richard@nod.at>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        Jan Hoeppner <hoeppner@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org,
-        linux-raid <linux-raid@vger.kernel.org>,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        dm-devel@redhat.com
+References: <20220422054224.19527-1-matthew.ruffell@canonical.com> <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+In-Reply-To: <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+From:   Matthew Ruffell <matthew.ruffell@canonical.com>
+Date:   Tue, 26 Apr 2022 09:47:20 +1200
+Message-ID: <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
+Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
+ inotify emit udev uevent changes
+To:     Josef Bacik <josef@toxicpanda.com>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Apr 17, 2022 at 9:53 PM Christoph Hellwig <hch@lst.de> wrote:
->
-> The discard_alignment queue limit is named a bit misleading means the
-> offset into the block device at which the discard granularity starts.
-> Setting it to the discard granularity as done by raid5 is mostly
-> harmless but also useless.
->
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
+Hi Josef,
 
-Acked-by: Song Liu <song@kernel.org>
+The pastebin has expired the link, and I can't access your patch.
+Seems to default to 1 day deletion.
 
-> ---
->  drivers/md/raid5.c | 1 -
->  1 file changed, 1 deletion(-)
+Could you please create a new paste or send the patch inline in this
+email thread?
+
+I am more than happy to try the patch out.
+
+Thank you for your analysis.
+Matthew
+
+On Sat, Apr 23, 2022 at 3:24 AM Josef Bacik <josef@toxicpanda.com> wrote:
 >
-> diff --git a/drivers/md/raid5.c b/drivers/md/raid5.c
-> index 59f91e392a2ae..39b0afdf40d0a 100644
-> --- a/drivers/md/raid5.c
-> +++ b/drivers/md/raid5.c
-> @@ -7749,7 +7749,6 @@ static int raid5_run(struct mddev *mddev)
->                  */
->                 stripe = stripe * PAGE_SIZE;
->                 stripe = roundup_pow_of_two(stripe);
-> -               mddev->queue->limits.discard_alignment = stripe;
->                 mddev->queue->limits.discard_granularity = stripe;
+> On Fri, Apr 22, 2022 at 1:42 AM Matthew Ruffell
+> <matthew.ruffell@canonical.com> wrote:
+> >
+> > Dear maintainers of the nbd subsystem,
+> >
+> > A user has come across an issue which causes the nbd module to hang after a
+> > disconnect where a write has been made to a qemu qcow image file, with qemu-nbd
+> > being the server.
+> >
 >
->                 blk_queue_max_write_zeroes_sectors(mddev->queue, 0);
-> --
-> 2.30.2
+> Ok there's two problems here, but I want to make sure I have the right
+> fix for the hang first.  Can you apply this patch
 >
+> https://paste.centos.org/view/b1a2d01a
+>
+> and make sure the hang goes away?  Once that part is fixed I'll fix
+> the IO errors, this is just us racing with systemd while we teardown
+> the device and then we're triggering a partition read while the device
+> is going down and it's complaining loudly.  Before we would
+> set_capacity to 0 whenever we disconnected, but that causes problems
+> with file systems that may still have the device open.  However now we
+> only do this if the server does the CLEAR_SOCK ioctl, which clearly
+> can race with systemd poking the device, so I need to make it
+> set_capacity(0) when the last opener closes the device to prevent this
+> style of race.
+>
+> Let me know if that patch fixes the hang, and then I'll work up
+> something for the capacity problem.  Thanks,
+>
+> Josef
