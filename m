@@ -2,130 +2,195 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B75C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 05:11:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E858CC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 06:14:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235200AbiDYFOA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Apr 2022 01:14:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
+        id S231880AbiDYGRb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Apr 2022 02:17:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240462AbiDYFNz (ORCPT
+        with ESMTP id S232051AbiDYGRb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Apr 2022 01:13:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2FCB5
-        for <linux-block@vger.kernel.org>; Sun, 24 Apr 2022 22:10:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 33C3161050
-        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 05:10:52 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47CB8C385A4;
-        Mon, 25 Apr 2022 05:10:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1650863451;
-        bh=ijx+1KXU+XKQgivlvclWhCkj86kRCgZkwoD21xMOhME=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=JX7nvyjoGESVhJB8MNjdtYkoRrBqE/4/4LY+xRmC0OS2eFSbqXB+dAm+xZpIogNT9
-         nD/bpVroHL1s4fiLEdvyV4jJ+tLjaIPH38tloxqO+D25YL1r7DSOD8QPSiZ33XGTRB
-         5gK6Vbt8joPmQYiViJgsp4dJBN21ZrAzJ/jrnqho=
-Date:   Mon, 25 Apr 2022 07:10:46 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        yukuai <yukuai3@huawei.com>
-Subject: Re: [PATCH V2 2/2] block: fix "Directory XXXXX with parent 'block'
- already present!"
-Message-ID: <YmYtVnC3QzfukbSu@kroah.com>
-References: <20220423143952.3162999-1-ming.lei@redhat.com>
- <20220423143952.3162999-3-ming.lei@redhat.com>
- <68e17ba8-24ec-5b60-d52e-18d41f91892c@suse.de>
- <YmUX/Q9o08rOSTaQ@T590>
- <682a215d-de50-40f1-b6f8-48801617bcad@suse.de>
- <YmU86/YZ18CtbLgb@T590>
- <YmVUl8m0Kak4JeKa@kroah.com>
- <YmX5O0dzHs09aFbh@T590>
+        Mon, 25 Apr 2022 02:17:31 -0400
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB3C11169;
+        Sun, 24 Apr 2022 23:14:26 -0700 (PDT)
+Received: from kwepemi100004.china.huawei.com (unknown [172.30.72.57])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KmvpP4YWkz1JBZC;
+        Mon, 25 Apr 2022 14:13:33 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100004.china.huawei.com (7.221.188.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 25 Apr 2022 14:14:24 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 25 Apr 2022 14:14:23 +0800
+Subject: Re: [PATCH -next RFC v3 0/8] improve tag allocation under heavy load
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        <axboe@kernel.dk>, <bvanassche@acm.org>,
+        <andriy.shevchenko@linux.intel.com>, <john.garry@huawei.com>,
+        <ming.lei@redhat.com>, <qiulaibin@huawei.com>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220415101053.554495-1-yukuai3@huawei.com>
+ <dc800086-43c6-1ff2-659e-258cb75649dd@huawei.com>
+ <3fbadd9f-11dd-9043-11cf-f0839dcf30e1@opensource.wdc.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <63e84f2a-2487-a0c3-cab2-7d2011bc2db4@huawei.com>
+Date:   Mon, 25 Apr 2022 14:14:23 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YmX5O0dzHs09aFbh@T590>
+In-Reply-To: <3fbadd9f-11dd-9043-11cf-f0839dcf30e1@opensource.wdc.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 09:28:27AM +0800, Ming Lei wrote:
-> On Sun, Apr 24, 2022 at 03:45:59PM +0200, Greg Kroah-Hartman wrote:
-> > On Sun, Apr 24, 2022 at 08:04:59PM +0800, Ming Lei wrote:
-> > > On Sun, Apr 24, 2022 at 01:51:45PM +0200, Hannes Reinecke wrote:
-> > > > On 4/24/22 11:28, Ming Lei wrote:
-> > > > > On Sun, Apr 24, 2022 at 10:53:29AM +0200, Hannes Reinecke wrote:
-> > > > > > On 4/23/22 16:39, Ming Lei wrote:
-> > > > > > > q->debugfs_dir is used by blk-mq debugfs and blktrace. The dentry is
-> > > > > > > created when adding disk, and removed when releasing request queue.
-> > > > > > > 
-> > > > > > > There is small window between releasing disk and releasing request
-> > > > > > > queue, and during the period, one disk with same name may be created
-> > > > > > > and added, so debugfs_create_dir() may complain with "Directory XXXXX
-> > > > > > > with parent 'block' already present!"
-> > > > > > > 
-> > > > > > > Fixes the issue by moving debugfs_create_dir() into blk_alloc_queue(),
-> > > > > > > and the dir name is named with q->id from beginning, and switched to
-> > > > > > > disk name when adding disk, and finally changed to q->id in disk_release().
-> > > > > > > 
-> > > > > > > Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > > > > > > Reported-by: Dan Williams <dan.j.williams@intel.com>
-> > > > > > > Cc: yukuai (C) <yukuai3@huawei.com>
-> > > > > > > Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-> > > > > > > Signed-off-by: Ming Lei <ming.lei@redhat.com>
-> > > > > > > ---
-> > > > > > >    block/blk-core.c  | 4 ++++
-> > > > > > >    block/blk-sysfs.c | 4 ++--
-> > > > > > >    block/genhd.c     | 8 ++++++++
-> > > > > > >    3 files changed, 14 insertions(+), 2 deletions(-)
-> > > > > > > 
-> > > > > > Errm.
-> > > > > > 
-> > > > > > Isn't this superfluous now that Jens merged Yu Kuais patch?
-> > > > > 
-> > > > > Jens has dropped Yu Kuai's patch which caused kernel panic.
-> > > > > 
-> > > > Right.
-> > > > But still, this patch looks really odd.
-> > > > How is userspace supposed to use the directories prior to the renaming?
-> > > 
-> > > That doesn't make any difference for current uses, but we may extend it
-> > > to support debugfs for non-blk request queue in future by exporting q->id
-> > > somewhere. Even though now the interested q->id can be figured out
-> > > easily by very simple ebpf trace prog.
-> > > 
-> > > > 
-> > > > And as you already have identified the places where we can safely create
-> > > > (and remove) the debugfs directories, why can't we move the call to create
-> > > > and remove the debugfs directories to those locations and do away with the
-> > > > renaming?
-> > > 
-> > > First it needs more change to fix the kernel panic.
-> > > 
-> > > Second removing debugfs dir in del_gendisk will break blktests block/002.
-> > 
-> > Then fix the test?  debugfs interactions that cause kernel bugs should
-> > be ok to change the functionality of.  Remember, this is for
-> > debugging...
+在 2022/04/25 11:24, Damien Le Moal 写道:
+> On 4/24/22 11:43, yukuai (C) wrote:
+>> friendly ping ...
+>>
+>> 在 2022/04/15 18:10, Yu Kuai 写道:
+>>> Changes in v3:
+>>>    - update 'waiters_cnt' before 'ws_active' in sbitmap_prepare_to_wait()
+>>>    in patch 1, in case __sbq_wake_up() see 'ws_active > 0' while
+>>>    'waiters_cnt' are all 0, which will cause deap loop.
+>>>    - don't add 'wait_index' during each loop in patch 2
+>>>    - fix that 'wake_index' might mismatch in the first wake up in patch 3,
+>>>    also improving coding for the patch.
+>>>    - add a detection in patch 4 in case io hung is triggered in corner
+>>>    cases.
+>>>    - make the detection, free tags are sufficient, more flexible.
+>>>    - fix a race in patch 8.
+>>>    - fix some words and add some comments.
+>>>
+>>> Changes in v2:
+>>>    - use a new title
+>>>    - add patches to fix waitqueues' unfairness - path 1-3
+>>>    - delete patch to add queue flag
+>>>    - delete patch to split big io thoroughly
+>>>
+>>> In this patchset:
+>>>    - patch 1-3 fix waitqueues' unfairness.
+>>>    - patch 4,5 disable tag preemption on heavy load.
+>>>    - patch 6 forces tag preemption for split bios.
+>>>    - patch 7,8 improve large random io for HDD. We do meet the problem and
+>>>    I'm trying to fix it at very low cost. However, if anyone still thinks
+>>>    this is not a common case and not worth to optimize, I'll drop them.
+>>>
+>>> There is a defect for blk-mq compare to blk-sq, specifically split io
+>>> will end up discontinuous if the device is under high io pressure, while
+>>> split io will still be continuous in sq, this is because:
+>>>
+>>> 1) new io can preempt tag even if there are lots of threads waiting.
+>>> 2) split bio is issued one by one, if one bio can't get tag, it will go
+>>> to wail.
+>>> 3) each time 8(or wake batch) requests is done, 8 waiters will be woken up.
+>>> Thus if a thread is woken up, it will unlikey to get multiple tags.
+>>>
+>>> The problem was first found by upgrading kernel from v3.10 to v4.18,
+>>> test device is HDD with 256 'max_sectors_kb', and test case is issuing 1m
+>>> ios with high concurrency.
+>>>
+>>> Noted that there is a precondition for such performance problem:
+>>> There is a certain gap between bandwidth for single io with
+>>> bs=max_sectors_kb and disk upper limit.
+>>>
+>>> During the test, I found that waitqueues can be extremly unbalanced on
+>>> heavy load. This is because 'wake_index' is not set properly in
+>>> __sbq_wake_up(), see details in patch 3.
+>>>
+>>> Test environment:
+>>> arm64, 96 core with 200 BogoMIPS, test device is HDD. The default
+>>> 'max_sectors_kb' is 1280(Sorry that I was unable to test on the machine
+>>> where 'max_sectors_kb' is 256).>>
+>>> The single io performance(randwrite):
+>>>
+>>> | bs       | 128k | 256k | 512k | 1m   | 1280k | 2m   | 4m   |
+>>> | -------- | ---- | ---- | ---- | ---- | ----- | ---- | ---- |
+>>> | bw MiB/s | 20.1 | 33.4 | 51.8 | 67.1 | 74.7  | 82.9 | 82.9 |
 > 
-> But what is wrong with the test? Isn't it reasonable to keep debugfs dir
-> when blktrace is collecting log?
+> These results are extremely strange, unless you are running with the
+> device write cache disabled ? If you have the device write cache enabled,
+> the problem you mention above would be most likely completely invisible,
+> which I guess is why nobody really noticed any issue until now.
+> 
+> Similarly, with reads, the device side read-ahead may hide the problem,
+> albeit that depends on how "intelligent" the drive is at identifying
+> sequential accesses.
+> 
+>>>
+>>> It can be seen that 1280k io is already close to upper limit, and it'll
+>>> be hard to see differences with the default value, thus I set
+>>> 'max_sectors_kb' to 128 in the following test.
+>>>
+>>> Test cmd:
+>>>           fio \
+>>>           -filename=/dev/$dev \
+>>>           -name=test \
+>>>           -ioengine=psync \
+>>>           -allow_mounted_write=0 \
+>>>           -group_reporting \
+>>>           -direct=1 \
+>>>           -offset_increment=1g \
+>>>           -rw=randwrite \
+>>>           -bs=1024k \
+>>>           -numjobs={1,2,4,8,16,32,64,128,256,512} \
+>>>           -runtime=110 \
+>>>           -ramp_time=10
+>>>
+>>> Test result: MiB/s
+>>>
+>>> | numjobs | v5.18-rc1 | v5.18-rc1-patched |
+>>> | ------- | --------- | ----------------- |
+>>> | 1       | 67.7      | 67.7              |
+>>> | 2       | 67.7      | 67.7              |
+>>> | 4       | 67.7      | 67.7              |
+>>> | 8       | 67.7      | 67.7              |
+>>> | 16      | 64.8      | 65.6              |
+>>> | 32      | 59.8      | 63.8              |
+>>> | 64      | 54.9      | 59.4              |
+>>> | 128     | 49        | 56.9              |
+>>> | 256     | 37.7      | 58.3              |
+>>> | 512     | 31.8      | 57.9              |
+> 
+> Device write cache disabled ?
+> 
+> Also, what is the max QD of this disk ?
+> 
+> E.g., if it is SATA, it is 32, so you will only get at most 64 scheduler
+> tags. So for any of your tests with more than 64 threads, many of the
+> threads will be waiting for a scheduler tag for the BIO before the
+> bio_split problem you explain triggers. Given that the numbers you show
+> are the same for before-after patch with a number of threads <= 64, I am
+> tempted to think that the problem is not really BIO splitting...
+> 
+> What about random read workloads ? What kind of results do you see ?
 
-How can you collect something from a device that is gone?
+Hi,
 
-> After debugfs dir is removed, blktrace may not collect intact log, and
-> people may complain it is one kernel regression.
+Sorry about the misleading of this test case.
 
-What exactly breaks?  The device is removed, why should a trace continue
-to give you data?
+This testcase is high concurrency huge randwrite, it's just for the
+problem that split bios won't be issued continuously, which is the
+root cause of the performance degradation as the numjobs increases.
 
-thanks,
+queue_depth is 32, and numjobs is 64, thus when numjobs is not greater
+than 8, performance is fine, because the ratio of sequential io should
+be 7/8. However, as numjobs increases, performance is worse because
+the ratio is lower. For example, when numjobs is 512, the ratio of
+sequential io is about 20%.
 
-greg k-h
+patch 6-8 will let split bios still be issued continuously under high
+pressure.
+
+Thanks,
+Kuai
+
