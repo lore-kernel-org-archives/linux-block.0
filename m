@@ -2,174 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D4DDC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 09:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41534C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 09:39:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232516AbiDYJjZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Apr 2022 05:39:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36224 "EHLO
+        id S238515AbiDYJmA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Apr 2022 05:42:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241528AbiDYJiI (ORCPT
+        with ESMTP id S240617AbiDYJlY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Apr 2022 05:38:08 -0400
+        Mon, 25 Apr 2022 05:41:24 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58FE727FC1
-        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 02:32:17 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 1664F210EC;
-        Mon, 25 Apr 2022 09:32:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1650879136; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0BD017051;
+        Mon, 25 Apr 2022 02:37:20 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id BCF1D210E5;
+        Mon, 25 Apr 2022 09:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1650879438; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ch4wkDrCRtpYceCYwZ1TRWD3mA8uwpmXHf0EkEGXbwg=;
-        b=C9P7mqItDKWzOQ08ZOXow/U3izhXG+/eaCQtlDXEQIZCT/upiFY7VF/RacIRt7typ2PdDd
-        pLlPWfN0W1Q1bQ44cGriWKFJNbD1J1XXeseYnNgx3oqdIzdcyhoKivVcHRhjX9HnBUZJV+
-        b+OAqgPaLIIQMNqvDzDAkapvnT1hT34=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1650879136;
+        bh=XKzPZSZjl/CuIwENsnn/SueNKmgq+oSUkjLiGdxjrMA=;
+        b=RjxNMVpIYiZeOVcck2OTzhAgsn/etT3h6srkKhwtsjKo6HtUVxvjbuDwIT/0mg/Ua7fJhw
+        pwGeeIon9y/cWp9fs9hZEVH0l18cIBdAxdS8K9797rxvkDQQ2isqTAxrS2x0hpNK/UFOUP
+        RGgmMyPduVR6UIsFmKaxYgqsTkQgI9g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1650879438;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Ch4wkDrCRtpYceCYwZ1TRWD3mA8uwpmXHf0EkEGXbwg=;
-        b=qfozWM9NYVmlMtWpHRNm2JT4wJ+7yw/sslReXqxc/3k4YwG0nBnFYNasXWI5yXFCaulGxc
-        6ceRNYtfCEMvUpDw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=XKzPZSZjl/CuIwENsnn/SueNKmgq+oSUkjLiGdxjrMA=;
+        b=BhZGwetAzIrrfnZsS/+C5b2Y8bNuVhmDcP2dSQuLjyce8OsHoOrcFx6hWf9hmrOcKEF5Is
+        bxCyxSbQic/PapAA==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F005213AE1;
-        Mon, 25 Apr 2022 09:32:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id M4AlOp9qZmJ1GwAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 25 Apr 2022 09:32:15 +0000
-Message-ID: <186f4002-0359-95e7-889f-af065210cd74@suse.de>
-Date:   Mon, 25 Apr 2022 11:32:15 +0200
+        by relay2.suse.de (Postfix) with ESMTPS id 9AC792C142;
+        Mon, 25 Apr 2022 09:37:18 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 35574A0620; Mon, 25 Apr 2022 11:37:15 +0200 (CEST)
+Date:   Mon, 25 Apr 2022 11:37:15 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk,
+        tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 1/5] block, bfq: cleanup bfq_weights_tree
+ add/remove apis
+Message-ID: <20220425093715.5ufwrgqrtyoqzjp3@quack3.lan>
+References: <20220416093753.3054696-1-yukuai3@huawei.com>
+ <20220416093753.3054696-2-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Dan Williams <dan.j.williams@intel.com>,
-        yukuai <yukuai3@huawei.com>
-References: <20220423143952.3162999-1-ming.lei@redhat.com>
- <20220423143952.3162999-3-ming.lei@redhat.com>
- <68e17ba8-24ec-5b60-d52e-18d41f91892c@suse.de> <YmUX/Q9o08rOSTaQ@T590>
- <682a215d-de50-40f1-b6f8-48801617bcad@suse.de> <YmU86/YZ18CtbLgb@T590>
- <YmVUl8m0Kak4JeKa@kroah.com> <YmX5O0dzHs09aFbh@T590>
- <YmYtVnC3QzfukbSu@kroah.com> <YmZk2GN1/Z8a0v7O@T590>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH V2 2/2] block: fix "Directory XXXXX with parent 'block'
- already present!"
-In-Reply-To: <YmZk2GN1/Z8a0v7O@T590>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220416093753.3054696-2-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/25/22 11:07, Ming Lei wrote:
-> On Mon, Apr 25, 2022 at 07:10:46AM +0200, Greg Kroah-Hartman wrote:
->> On Mon, Apr 25, 2022 at 09:28:27AM +0800, Ming Lei wrote:
->>> On Sun, Apr 24, 2022 at 03:45:59PM +0200, Greg Kroah-Hartman wrote:
->>>> On Sun, Apr 24, 2022 at 08:04:59PM +0800, Ming Lei wrote:
->>>>> On Sun, Apr 24, 2022 at 01:51:45PM +0200, Hannes Reinecke wrote:
->>>>>> On 4/24/22 11:28, Ming Lei wrote:
->>>>>>> On Sun, Apr 24, 2022 at 10:53:29AM +0200, Hannes Reinecke wrote:
->>>>>>>> On 4/23/22 16:39, Ming Lei wrote:
->>>>>>>>> q->debugfs_dir is used by blk-mq debugfs and blktrace. The dentry is
->>>>>>>>> created when adding disk, and removed when releasing request queue.
->>>>>>>>>
->>>>>>>>> There is small window between releasing disk and releasing request
->>>>>>>>> queue, and during the period, one disk with same name may be created
->>>>>>>>> and added, so debugfs_create_dir() may complain with "Directory XXXXX
->>>>>>>>> with parent 'block' already present!"
->>>>>>>>>
->>>>>>>>> Fixes the issue by moving debugfs_create_dir() into blk_alloc_queue(),
->>>>>>>>> and the dir name is named with q->id from beginning, and switched to
->>>>>>>>> disk name when adding disk, and finally changed to q->id in disk_release().
->>>>>>>>>
->>>>>>>>> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>>>>>> Reported-by: Dan Williams <dan.j.williams@intel.com>
->>>>>>>>> Cc: yukuai (C) <yukuai3@huawei.com>
->>>>>>>>> Cc: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
->>>>>>>>> Signed-off-by: Ming Lei <ming.lei@redhat.com>
->>>>>>>>> ---
->>>>>>>>>     block/blk-core.c  | 4 ++++
->>>>>>>>>     block/blk-sysfs.c | 4 ++--
->>>>>>>>>     block/genhd.c     | 8 ++++++++
->>>>>>>>>     3 files changed, 14 insertions(+), 2 deletions(-)
->>>>>>>>>
->>>>>>>> Errm.
->>>>>>>>
->>>>>>>> Isn't this superfluous now that Jens merged Yu Kuais patch?
->>>>>>>
->>>>>>> Jens has dropped Yu Kuai's patch which caused kernel panic.
->>>>>>>
->>>>>> Right.
->>>>>> But still, this patch looks really odd.
->>>>>> How is userspace supposed to use the directories prior to the renaming?
->>>>>
->>>>> That doesn't make any difference for current uses, but we may extend it
->>>>> to support debugfs for non-blk request queue in future by exporting q->id
->>>>> somewhere. Even though now the interested q->id can be figured out
->>>>> easily by very simple ebpf trace prog.
->>>>>
->>>>>>
->>>>>> And as you already have identified the places where we can safely create
->>>>>> (and remove) the debugfs directories, why can't we move the call to create
->>>>>> and remove the debugfs directories to those locations and do away with the
->>>>>> renaming?
->>>>>
->>>>> First it needs more change to fix the kernel panic.
->>>>>
->>>>> Second removing debugfs dir in del_gendisk will break blktests block/002.
->>>>
->>>> Then fix the test?  debugfs interactions that cause kernel bugs should
->>>> be ok to change the functionality of.  Remember, this is for
->>>> debugging...
->>>
->>> But what is wrong with the test? Isn't it reasonable to keep debugfs dir
->>> when blktrace is collecting log?
->>
->> How can you collect something from a device that is gone?
+On Sat 16-04-22 17:37:49, Yu Kuai wrote:
+> They already pass 'bfqd' as the first parameter, there is no need to
+> pass 'bfqd->queue_weights_tree' as another parameter.
 > 
-> Here the 'gone' may be just in logical/soft viewpoint, such as, one disk
-> is removed by sysfs, and the driver still may send sync cache command
-> to make sure the cache inside drive is flushed, such as scsi's
-> SYNCHRONIZE_CACHE.
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+Nice cleanup. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c | 14 +++++++-------
+>  block/bfq-iosched.h |  7 ++-----
+>  block/bfq-wf2q.c    | 16 +++++-----------
+>  3 files changed, 14 insertions(+), 23 deletions(-)
 > 
-And that is my argument: what does this buy us?
-Is is relevant (for blktrace) to have the SYNCHRONIZE_CACHE to be 
-present in the logs?
- From my POV, blktrace is there to analyze I/O flow; device shutdown is 
-not really relevant for that as the results of that operation depend on 
-other factors which won't show up in blktrace at all.
-
-So we're not losing much by (maybe) missing shutdown commands in 
-blktrace; if needs be device shutdown can be traced by other means.
-
-I'd rather keep the code simple, and not having an operation in the core 
-block layer which requires quite some explanation.
-_And_ relies on the current ordering; if things change here it'll be 
-really hard to figure out if that workaround is still required or might 
-be obsoleted by the change.
-
-Cheers,
-
-Hannes
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 2e0dd68a3cbe..2deea2d07a1f 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -862,9 +862,9 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
+>   * In most scenarios, the rate at which nodes are created/destroyed
+>   * should be low too.
+>   */
+> -void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+> -			  struct rb_root_cached *root)
+> +void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  {
+> +	struct rb_root_cached *root = &bfqd->queue_weights_tree;
+>  	struct bfq_entity *entity = &bfqq->entity;
+>  	struct rb_node **new = &(root->rb_root.rb_node), *parent = NULL;
+>  	bool leftmost = true;
+> @@ -936,13 +936,14 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>   * See the comments to the function bfq_weights_tree_add() for considerations
+>   * about overhead.
+>   */
+> -void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+> -			       struct bfq_queue *bfqq,
+> -			       struct rb_root_cached *root)
+> +void __bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  {
+> +	struct rb_root_cached *root;
+> +
+>  	if (!bfqq->weight_counter)
+>  		return;
+>  
+> +	root = &bfqd->queue_weights_tree;
+>  	bfqq->weight_counter->num_active--;
+>  	if (bfqq->weight_counter->num_active > 0)
+>  		goto reset_entity_pointer;
+> @@ -1004,8 +1005,7 @@ void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>  	 * has no dispatched request. DO NOT use bfqq after the next
+>  	 * function invocation.
+>  	 */
+> -	__bfq_weights_tree_remove(bfqd, bfqq,
+> -				  &bfqd->queue_weights_tree);
+> +	__bfq_weights_tree_remove(bfqd, bfqq);
+>  }
+>  
+>  /*
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 3b83e3d1c2e5..072099b0c11a 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -969,11 +969,8 @@ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync);
+>  void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync);
+>  struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
+>  void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+> -void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+> -			  struct rb_root_cached *root);
+> -void __bfq_weights_tree_remove(struct bfq_data *bfqd,
+> -			       struct bfq_queue *bfqq,
+> -			       struct rb_root_cached *root);
+> +void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+> +void __bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+>  void bfq_weights_tree_remove(struct bfq_data *bfqd,
+>  			     struct bfq_queue *bfqq);
+>  void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index f8eb340381cf..a1296058c1ec 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -707,7 +707,6 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+>  		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+>  		unsigned int prev_weight, new_weight;
+>  		struct bfq_data *bfqd = NULL;
+> -		struct rb_root_cached *root;
+>  #ifdef CONFIG_BFQ_GROUP_IOSCHED
+>  		struct bfq_sched_data *sd;
+>  		struct bfq_group *bfqg;
+> @@ -770,19 +769,15 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
+>  		 * queue, remove the entity from its old weight counter (if
+>  		 * there is a counter associated with the entity).
+>  		 */
+> -		if (prev_weight != new_weight && bfqq) {
+> -			root = &bfqd->queue_weights_tree;
+> -			__bfq_weights_tree_remove(bfqd, bfqq, root);
+> -		}
+> +		if (prev_weight != new_weight && bfqq)
+> +			__bfq_weights_tree_remove(bfqd, bfqq);
+>  		entity->weight = new_weight;
+>  		/*
+>  		 * Add the entity, if it is not a weight-raised queue,
+>  		 * to the counter associated with its new weight.
+>  		 */
+> -		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1) {
+> -			/* If we get here, root has been initialized. */
+> -			bfq_weights_tree_add(bfqd, bfqq, root);
+> -		}
+> +		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1)
+> +			bfq_weights_tree_add(bfqd, bfqq);
+>  
+>  		new_st->wsum += entity->weight;
+>  
+> @@ -1686,8 +1681,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  
+>  	if (!bfqq->dispatched)
+>  		if (bfqq->wr_coeff == 1)
+> -			bfq_weights_tree_add(bfqd, bfqq,
+> -					     &bfqd->queue_weights_tree);
+> +			bfq_weights_tree_add(bfqd, bfqq);
+>  
+>  	if (bfqq->wr_coeff > 1)
+>  		bfqd->wr_busy_queues++;
+> -- 
+> 2.31.1
+> 
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
