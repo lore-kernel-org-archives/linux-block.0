@@ -2,124 +2,207 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3417C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 19:27:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAFB5C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 19:35:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244894AbiDYTa7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Apr 2022 15:30:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40092 "EHLO
+        id S244967AbiDYTit (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Apr 2022 15:38:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40522 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230214AbiDYTa6 (ORCPT
+        with ESMTP id S237034AbiDYTis (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Apr 2022 15:30:58 -0400
-X-Greylist: delayed 313 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 25 Apr 2022 12:27:51 PDT
-Received: from mp-relay-01.fibernetics.ca (mp-relay-01.fibernetics.ca [208.85.217.136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FC31110978;
-        Mon, 25 Apr 2022 12:27:51 -0700 (PDT)
-Received: from mailpool-fe-02.fibernetics.ca (mailpool-fe-02.fibernetics.ca [208.85.217.145])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mp-relay-01.fibernetics.ca (Postfix) with ESMTPS id D0F9FE0F7E;
-        Mon, 25 Apr 2022 19:22:36 +0000 (UTC)
-Received: from localhost (mailpool-mx-02.fibernetics.ca [208.85.217.141])
-        by mailpool-fe-02.fibernetics.ca (Postfix) with ESMTP id B304460284;
-        Mon, 25 Apr 2022 19:22:36 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at 
-Received: from mailpool-fe-02.fibernetics.ca ([208.85.217.145])
-        by localhost (mail-mx-02.fibernetics.ca [208.85.217.141]) (amavisd-new, port 10024)
-        with ESMTP id PaBD9BfcMjTl; Mon, 25 Apr 2022 19:22:36 +0000 (UTC)
-Received: from [192.168.48.23] (host-45-78-195-155.dyn.295.ca [45.78.195.155])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: dgilbert@interlog.com)
-        by mail.ca.inter.net (Postfix) with ESMTPSA id 535B860958;
-        Mon, 25 Apr 2022 19:22:35 +0000 (UTC)
-Message-ID: <bc0b2c10-10e6-a1d9-4139-ac93ad3512b2@interlog.com>
-Date:   Mon, 25 Apr 2022 15:22:34 -0400
+        Mon, 25 Apr 2022 15:38:48 -0400
+Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [IPv6:2620:100:9001:583::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBFC9111153
+        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 12:35:43 -0700 (PDT)
+Received: from pps.filterd (m0050095.ppops.net [127.0.0.1])
+        by m0050095.ppops.net-00190b01. (8.17.1.5/8.17.1.5) with ESMTP id 23PH8MAw021232;
+        Mon, 25 Apr 2022 20:35:40 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=jan2016.eng;
+ bh=TIzVC+MUUmP99qiHXsSdlBUIjEg4h1tzn/qxjzLVKIc=;
+ b=eAOzjSlZg9rb8bhn56IhL7MMz2Bra1Lt5fAcTNaldZ1M70MRRCMHYe/nttJHt40JnyBO
+ OCtYVJrcl1wrdj/AUqixzH0Kis4xmHX6tzfKQPjtD2gHs8BfSqHxW9Xf8ljLuOcGM+l0
+ D0UkARi898h1HaS0keYZoXEALLzEQQJd2srtnMDbdyTaUkCpXGYHJjBSjqqHc+bVd1aD
+ AEBbBf4kgNO6MOMNNVfFn9KiQEbIAFlS5CRYDgcSdp0aKP0Sxd29G1E3xxsAd9qDVwGC
+ excOWrX71YbkLOZyc55P0Ybl0iFwhXYVvqCNsFIrzGwQ5t1rXDqV0n2+Bs6/uHBDHTac vA== 
+Received: from prod-mail-ppoint6 (prod-mail-ppoint6.akamai.com [184.51.33.61] (may be forged))
+        by m0050095.ppops.net-00190b01. (PPS) with ESMTPS id 3fm908x4up-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 20:35:40 +0100
+Received: from pps.filterd (prod-mail-ppoint6.akamai.com [127.0.0.1])
+        by prod-mail-ppoint6.akamai.com (8.16.1.2/8.16.1.2) with SMTP id 23PJZ6Zf008621;
+        Mon, 25 Apr 2022 15:35:39 -0400
+Received: from email.msg.corp.akamai.com ([172.27.123.33])
+        by prod-mail-ppoint6.akamai.com with ESMTP id 3fmct0bw6j-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+        Mon, 25 Apr 2022 15:35:38 -0400
+Received: from USTX2EX-DAG3MB1.msg.corp.akamai.com (172.27.165.125) by
+ usma1ex-dag4mb1.msg.corp.akamai.com (172.27.91.20) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.986.22; Mon, 25 Apr 2022 15:35:38 -0400
+Received: from USTX2EX-DAG3MB4.msg.corp.akamai.com (172.27.165.128) by
+ USTX2EX-DAG3MB1.msg.corp.akamai.com (172.27.165.125) with Microsoft SMTP
+ Server (TLS) id 15.0.1497.32; Mon, 25 Apr 2022 14:35:37 -0500
+Received: from USTX2EX-DAG3MB4.msg.corp.akamai.com ([172.27.165.128]) by
+ USTX2EX-DAG3MB4.msg.corp.akamai.com ([172.27.165.128]) with mapi id
+ 15.00.1497.033; Mon, 25 Apr 2022 14:35:37 -0500
+From:   "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "snitzer@redhat.com" <snitzer@redhat.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+CC:     "Hunt, Joshua" <johunt@akamai.com>
+Subject: Re: Precise disk statistics 
+Thread-Topic: Precise disk statistics 
+Thread-Index: AQHYVouZqvQv+uCO7UOGBZRe2qwZNq0BCWyA
+Date:   Mon, 25 Apr 2022 19:35:37 +0000
+Message-ID: <1650915337169.63486@akamai.com>
+References: <1650661324247.40468@akamai.com>
+In-Reply-To: <1650661324247.40468@akamai.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [172.27.97.87]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Reply-To: dgilbert@interlog.com
-Subject: Re: scsi_debug in fstests and blktests (Was: Re: Fwd: [bug
- report][bisected] modprob -r scsi-debug take more than 3mins during blktests
- srp/ tests)
-Content-Language: en-CA
-To:     Luis Chamberlain <mcgrof@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-modules@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Pankaj Malhotra <pankaj1.m@samsung.com>,
-        Vincent Fu <vincent.fu@samsung.com>
-References: <CAHj4cs9OTm9sb_5fmzgz+W9OSLeVPKix3Yri856kqQVccwd_Mw@mail.gmail.com>
- <fba69540-b623-9602-a0e2-00de3348dbd6@interlog.com>
- <YlW7gY8nr9LnBEF+@bombadil.infradead.org>
- <00ebace8-b513-53c0-f13b-d3320757695d@interlog.com>
- <YmGaGoz2+Kdqu05l@bombadil.infradead.org> <YmJDqceT1AiePyxj@infradead.org>
- <YmLEeUhTImWKIshO@bombadil.infradead.org>
-From:   Douglas Gilbert <dgilbert@interlog.com>
-In-Reply-To: <YmLEeUhTImWKIshO@bombadil.infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.486,18.0.858
+ definitions=2022-04-25_08:2022-04-25,2022-04-25 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
+ mlxlogscore=999 bulkscore=0 spamscore=0 suspectscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2204250087
+X-Proofpoint-ORIG-GUID: 5dYL6fndmt3NXhOksDYh8vAxR6ZyE7AW
+X-Proofpoint-GUID: 5dYL6fndmt3NXhOksDYh8vAxR6ZyE7AW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-04-25_10,2022-04-25_03,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 adultscore=0 mlxlogscore=999
+ suspectscore=0 impostorscore=0 bulkscore=0 spamscore=0 malwarescore=0
+ clxscore=1015 priorityscore=1501 lowpriorityscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
+ definitions=main-2204250087
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-04-22 11:06, Luis Chamberlain wrote:
-> On Thu, Apr 21, 2022 at 10:56:57PM -0700, Christoph Hellwig wrote:
->> On Thu, Apr 21, 2022 at 10:53:30AM -0700, Luis Chamberlain wrote:
->>> Moving this discussion to the lists as we need to really think
->>> about how testing on fstests and blktests uses scsi_debug for
->>> a high confidence in baseline without false positives on failures
->>> due to the inability to the remove scsi_debug module.
->>>
->>> This should also apply to other test debug modules like null_blk,
->>> nvme target loop drivers, etc, it's all the same long term. But yeah
->>> scsi surely make this... painful today. In any case hopefully folks
->>> with other test debug drivesr are running tests to ensure you can
->>> always rmmod these modules regardless of what is happening.
->>
->> Maybe fix blktests to not rely on module removal  I have such a hard
->> time actually using blktests because it is suck a f^^Y% broken piece
->> of crap that assumes everything is modular.  Stop making that whole
->> assumption and work fine with built-in driver as a first step.  Then
->> start worrying about module removal.
-> 
-> It begs the question if the same wish should apply to fstests.
-> 
-> If we want to *not* rely on module removal then the right thing to do I
-> think would be to replace module removal on these debug modules
-> (scsi_debug) with an API as null_blk has which uses configfs to *add* /
-> *remove* devices.
-
-The scsi_debug driver has been around for a while, I started maintaining it
-around 1998. It was always assumed that it would be used as a module while
-testing, then removed. You might wonder why the number of SCSI hosts simulated
-by scsi_debug is called "add_hosts"? That is because it is also a sysfs
-read-write parameter that can take a positive or negative integer to add or
-remove that number of SCSI hosts at runtime, without removing the module.
-See /sys/bus/pseudo/drivers/scsi_debug where about 2/3 of the parameters
-are writable. Perhaps configfs capability could be added to scsi_debug,
-patches welcome ...
-
-If you want a cheap ram disk to back file system tests then null_blk is the
-way to go.
-
-The scsi_debug driver is a SCSI low level driver (LLD) controlling a
-simulated HBA (on the "pseudo" bus) that has zero or more SCSI devices
-(e.g. disks) attached to it. It is designed to back sd, st, ses Linux
-devices (e.g. /dev/sdb). And it can simulate various types of storage
-that are found in the real world, for example storage with associated
-protection information and more recently with zoned storage. It can also
-simulate errors and/or a _lot_ of devices (say 10,000) by sharing the
-backing ram behind each device.
-
-So the fact that the scsi_debug driver can support blktests could be seen
-as a bit of an accident, that is not its primary purpose.
-
-Doug Gilbert
-
-
+________________________________________=0A=
+From: Jayaramappa, Srilakshmi=0A=
+Sent: Friday, April 22, 2022 5:02 PM=0A=
+To: axboe@kernel.dk; snitzer@redhat.com; linux-block@vger.kernel.org=0A=
+Cc: Hunt, Joshua=0A=
+Subject: Precise disk statistics=0A=
+=0A=
+Hi,=0A=
+=0A=
+We install LTS kernel on our machines. While moving from 4.19.x to 5.4.x we=
+ noticed a performance drop in one of our applications.=0A=
+We tracked down the root cause to the commit series for removing the pendin=
+g IO accounting (80a787ba3809 to 6f75723190d8)=0A=
+which includes 5b18b5a73760 block: delete part_round_stats and switch to le=
+ss precise counting.=0A=
+=0A=
+The application (which runs on non-dm machines) tracks disk utilization to =
+estimate the load it can further take on. After the commits in question,=0A=
+we see an over reporting of disk utilization [1] compared to the older meth=
+od of reporting based on inflight counter [2] for the same load.=0A=
+The over-reporting is observed in v5.4.190 and in v5.15.35 as well. I've at=
+tached the config file used to build the kernel.=0A=
+=0A=
+We understand that the disk util% does not provide a true picture of how mu=
+ch more work the device is capable of doing in flash based=0A=
+devices and we are planning to use a different model to observe the perform=
+ance potential.=0A=
+In the interim we are having to revert the above commit series to bring bac=
+k the original reporting method.=0A=
+=0A=
+In the hopes of getting back our application's performance with a new chang=
+e on top of the 5.4.x reporting (as opposed to reverting commits),=0A=
+I tried checking if the request queue is busy before updating io_ticks [3].=
+ With this change the applications's throughput is closer to=0A=
+what we observe with the commits reverted, but still behind by ~ 6 %. Thoug=
+h, I am not sure that this change is safe overall.=0A=
+=0A=
+I'd appreciate your expert opinion on this matter. Could you please let us =
+know if there is some other idea we could explore to report precise disk st=
+ats=0A=
+that we can build on top of existing reporting in the kernel and submit a p=
+atch, or if going back to using the inflight counters is indeed our best be=
+t.=0A=
+=0A=
+Thank you=0A=
+-Sri=0A=
+=0A=
+[1]=0A=
+root@xxx:~# DISK=3Dnvme3n1; dd if=3D/dev/$DISK of=3D/dev/null bs=3D1048576 =
+iflag=3Ddirect count=3D2048 & iostat -yxm /dev/$DISK 1 1 ; wait=0A=
+...=0A=
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 0.721532 s, 3.0 GB/s=0A=
+=0A=
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle=0A=
+           0.13    0.00    0.28    1.53    0.00   98.07=0A=
+=0A=
+Device            r/s     rMB/s   rrqm/s  %rrqm r_await rareq-sz     w/s   =
+  wMB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dMB/s   drqm/s  %drqm =
+d_await dareq-sz  aqu-sz  %util=0A=
+nvme3n1       16383.00   2047.88     0.00   0.00    0.21   128.00    0.00  =
+    0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00=
+    0.00     0.00    0.00  72.20=0A=
+=0A=
+[2]=0A=
+=0A=
+root@xxx:~# DISK=3Dnvme3n1; dd if=3D/dev/$DISK of=3D/dev/null bs=3D1048576 =
+iflag=3Ddirect count=3D2048 & iostat -yxm /dev/$DISK 1 1 ; wait=0A=
+...=0A=
+2147483648 bytes (2.1 GB, 2.0 GiB) copied, 0.702101 s, 3.1 GB/s=0A=
+=0A=
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle=0A=
+           0.03    0.00    0.18    1.57    0.00   98.22=0A=
+=0A=
+Device            r/s     rMB/s   rrqm/s  %rrqm r_await rareq-sz     w/s   =
+  wMB/s   wrqm/s  %wrqm w_await wareq-sz     d/s     dMB/s   drqm/s  %drqm =
+d_await dareq-sz  aqu-sz  %util=0A=
+nvme3n1       16380.00   2047.50     0.00   0.00    0.20   128.00    0.00  =
+    0.00     0.00   0.00    0.00     0.00    0.00      0.00     0.00   0.00=
+    0.00     0.00    0.00  64.20=0A=
+=0A=
+=0A=
+[3]=0A=
+diff --git a/block/bio.c b/block/bio.c=0A=
+index cb38d6f3acce..8275b10a1c9a 100644=0A=
+--- a/block/bio.c=0A=
++++ b/block/bio.c=0A=
+@@ -1754,14 +1754,17 @@ void bio_check_pages_dirty(struct bio *bio)=0A=
+        schedule_work(&bio_dirty_work);=0A=
+ }=0A=
+=0A=
+-void update_io_ticks(struct hd_struct *part, unsigned long now, bool end)=
+=0A=
++void update_io_ticks(struct request_queue *q, struct hd_struct *part, unsi=
+gned long now, bool end)=0A=
+ {=0A=
+        unsigned long stamp;=0A=
+ again:=0A=
+        stamp =3D READ_ONCE(part->stamp);=0A=
+        if (unlikely(stamp !=3D now)) {=0A=
+                if (likely(cmpxchg(&part->stamp, stamp, now) =3D=3D stamp))=
+ {=0A=
++                      if (blk_mq_queue_inflight(q)) {=0A=
+                                __part_stat_add(part, io_ticks, end ? now -=
+ stamp : 1);=0A=
++            }=0A=
+                }=0A=
+        }=0A=
+        if (part->partno) {=0A=
+=0A=
+=0A=
+=0A=
+Sorry, resending without the config attachment since my original email boun=
+ced from linux-block.=0A=
+=0A=
+=0A=
+Thanks=0A=
+-Sri=
