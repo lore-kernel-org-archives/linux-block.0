@@ -2,76 +2,206 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D682C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 13:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BE94AC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 14:04:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235411AbiDZNzx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Apr 2022 09:55:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40572 "EHLO
+        id S1350974AbiDZOH4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Apr 2022 10:07:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229840AbiDZNzw (ORCPT
+        with ESMTP id S1351420AbiDZOHw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Apr 2022 09:55:52 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91FE12EB78;
-        Tue, 26 Apr 2022 06:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=irD5TP5dvYOrrDctV6NZa3iVQyIsJ9/GKsDYgTCLneg=; b=GphFVrNB6afv2AYo22a/nMAAJY
-        m8+WnybGo7Wr5Dql3SNlVIYf4LwEpiSVbiZqM36tRxQrB7A4iO5cgzbTG2HZMbBNdoWwHCr8es3f6
-        fWLqL5IDYVkyvs5G9vpO+Q1ZQ41+Jrax07Fxju54ejsKuMo3CgoW2R6Qj3izCMjvdiJxc0h61ijAx
-        EfPl+WBbV2jY4q2HoQQEf+kl9iiuHlvtpzAmfRp6QR8oZ2jbSNmbnBFzg5R63RM3g/CzjnrbqRTog
-        HGYcSDvt8E74qPhlGWvsje5aOjuJhzmuTfEWVXTpNZcY37pk4eZBcz02YmqGGlDlwQM4PWuPIdDRL
-        2n05+acQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1njLcQ-00ElLb-N2; Tue, 26 Apr 2022 13:52:42 +0000
-Date:   Tue, 26 Apr 2022 06:52:42 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Miquel Raynal <miquel.raynal@bootlin.com>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: Re: [RFC PATCH 4/5] mtd_blkdevs: scan partitions on mtdblock if
- FIT_PARTITION is set
-Message-ID: <Ymf5KpEAGybW8W17@infradead.org>
-References: <Yma3ck/hygQ0badz@makrotopia.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Yma3ck/hygQ0badz@makrotopia.org>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Tue, 26 Apr 2022 10:07:52 -0400
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83C52197D66
+        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 07:04:44 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id l18so9670803ejc.7
+        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 07:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=KtEIWr2kc5GEVWgugzC6y2i1UxqHjSA/KzvAMY+u73s=;
+        b=SHrdp9T5rVKvqeGI18n+FNWzsD6B04fSIfbGdjDqzpy2tRqZBRGE8aOx7G7p3qQT/F
+         EYUB7aY5ddMpvv6FRvek/n6ATVNM5YNIM3GW9JMOxEji3PX2BfmIvzoeApJhegaDsTq+
+         ZflfYtdG8IKua69IEJDqXfbM7xW3ghoGKgp758YfEZ5UIm1vhM80KVFtrDn/oC7qXN0u
+         lwhSjguvJRK9KAbktBVMsfVdH2GAjA/w3UUJ0zp8eawUuMIFKXLTo49WZughcfH4daxx
+         aAWNyPOwZJsVxvONPHS2gSawPqD7DfI02xRkVpmQJwaavdGCZCC9471nDkBD755RKe3S
+         4lIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=KtEIWr2kc5GEVWgugzC6y2i1UxqHjSA/KzvAMY+u73s=;
+        b=d16N4UMykeTydteydtVb+nmba3bbs23ULiQlggGPqLh9hVyevzL8N+QMteI9YB7dq8
+         Jlh1sSj8/ccQ5w5UN1C1rT+U+0xNfPtBI6CalSZgfSKv3xDvoJ3KCBw1YGxKP6Zi0IZO
+         nR5sSYV4eLdmzaMW/iTXAOc/Xrn0xftmMnWEjGOsRcEcUm5dsNIPfwRM9yzUAQsddrDH
+         zir7AlmS6jK1AfQCywP9d3Jj2yLi4a9NJMv10WNs6DacxMOLAPmOGtpTtAoznTDtKUCS
+         O+qHx1h4Hkw+ePjO1ke2k+dXsj/CmGPPey+HXNBN8mI5tcNi299RcvbA2mmUNLIzMPXF
+         aMjg==
+X-Gm-Message-State: AOAM5320gexqPhc0PIENQwssi9aA2S8AKJyqcKNA/PYLmP5p57URo8Wy
+        +cFTpTUaPwv4DFhB/cTVGb8Xtg==
+X-Google-Smtp-Source: ABdhPJwDU5trBFEPTcjdhG4LeCkBncp8DcariF123JXTjaUzrqvovNIIeT/vCfhhoBjdW23PClUkiw==
+X-Received: by 2002:a17:907:6d0d:b0:6f3:61e1:e33b with SMTP id sa13-20020a1709076d0d00b006f361e1e33bmr19353124ejc.320.1650981882816;
+        Tue, 26 Apr 2022 07:04:42 -0700 (PDT)
+Received: from [192.168.0.13] ([83.216.184.132])
+        by smtp.gmail.com with ESMTPSA id f1-20020a056402194100b00416b174987asm6512881edz.35.2022.04.26.07.04.38
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 26 Apr 2022 07:04:39 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH -next v2 2/5] block, bfq: add fake weight_counter for
+ weight-raised queue
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20220426091556.qzryd552gzo6dikf@quack3.lan>
+Date:   Tue, 26 Apr 2022 16:04:37 +0200
+Cc:     "yukuai (C)" <yukuai3@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <C73DAAB4-7919-4449-86E2-449BD068E57A@linaro.org>
+References: <20220416093753.3054696-1-yukuai3@huawei.com>
+ <20220416093753.3054696-3-yukuai3@huawei.com>
+ <20220425094856.qgkhba2klguduxot@quack3.lan>
+ <a27b8c79-867f-9253-84db-1d39c964b3ed@huawei.com>
+ <20220425161650.xzyijgkb5yzviea3@quack3.lan>
+ <4591d02d-1f14-c928-1c50-6e434dfbb7b2@huawei.com>
+ <20220426074023.5y4gwvjsjzem3vgp@quack3.lan>
+ <77b4c06c-f813-bcac-ea26-107e52f46d0a@huawei.com>
+ <20220426091556.qzryd552gzo6dikf@quack3.lan>
+To:     Jan Kara <jack@suse.cz>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Apr 25, 2022 at 04:00:02PM +0100, Daniel Golle wrote:
-> Enable partition parsers on plain mtdblock devices in case of
-> CONFIG_FIT_PARTITION being selected.
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/mtd/mtd_blkdevs.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-> index f7317211146550..e9759c4182f8d5 100644
-> --- a/drivers/mtd/mtd_blkdevs.c
-> +++ b/drivers/mtd/mtd_blkdevs.c
-> @@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
->  	} else {
->  		snprintf(gd->disk_name, sizeof(gd->disk_name),
->  			 "%s%d", tr->name, new->devnum);
-> +#ifndef CONFIG_FIT_PARTITION
->  		gd->flags |= GENHD_FL_NO_PART;
-> +#endif
 
-This will just recreate the fixed regression, just with the extra
-twist of needіng a completely unrelted config option to trigger it.
+
+> Il giorno 26 apr 2022, alle ore 11:15, Jan Kara <jack@suse.cz> ha =
+scritto:
+>=20
+> On Tue 26-04-22 16:27:46, yukuai (C) wrote:
+>> =E5=9C=A8 2022/04/26 15:40, Jan Kara =E5=86=99=E9=81=93:
+>>> On Tue 26-04-22 09:49:04, yukuai (C) wrote:
+>>>> =E5=9C=A8 2022/04/26 0:16, Jan Kara =E5=86=99=E9=81=93:
+>>>>> Hello!
+>>>>>=20
+>>>>> On Mon 25-04-22 21:34:16, yukuai (C) wrote:
+>>>>>> =E5=9C=A8 2022/04/25 17:48, Jan Kara =E5=86=99=E9=81=93:
+>>>>>>> On Sat 16-04-22 17:37:50, Yu Kuai wrote:
+>>>>>>>> Weight-raised queue is not inserted to weights_tree, which =
+makes it
+>>>>>>>> impossible to track how many queues have pending requests =
+through
+>>>>>>>> weights_tree insertion and removel. This patch add fake =
+weight_counter
+>>>>>>>> for weight-raised queue to do that.
+>>>>>>>>=20
+>>>>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>>>>>=20
+>>>>>>> This is a bit hacky. I was looking into a better place where to =
+hook to
+>>>>>>> count entities in a bfq_group with requests and I think =
+bfq_add_bfqq_busy()
+>>>>>>> and bfq_del_bfqq_busy() are ideal for this. It also makes better =
+sense
+>>>>>>> conceptually than hooking into weights tree handling.
+>>>>>>=20
+>>>>>> bfq_del_bfqq_busy() will be called when all the reqs in the bfqq =
+are
+>>>>>> dispatched, however there might still some reqs are't completed =
+yet.
+>>>>>>=20
+>>>>>> Here what we want to track is how many bfqqs have pending reqs,
+>>>>>> specifically if the bfqq have reqs are't complted.
+>>>>>>=20
+>>>>>> Thus I think bfq_del_bfqq_busy() is not the right place to do =
+that.
+>>>>>=20
+>>>>> Yes, I'm aware there will be a difference. But note that bfqq can =
+stay busy
+>>>>> with only dispatched requests because the logic in =
+__bfq_bfqq_expire() will
+>>>>> not call bfq_del_bfqq_busy() if idling is needed for service =
+guarantees. So
+>>>>> I think using bfq_add/del_bfqq_busy() would work OK.
+>>>> Hi,
+>>>>=20
+>>>> I didn't think of that before. If bfqq stay busy after dispathing =
+all
+>>>> the requests, there are two other places that bfqq can clear busy:
+>>>>=20
+>>>> 1) bfq_remove_request(), bfqq has to insert a new req while it's =
+not in
+>>>> service.
+>>>=20
+>>> Yes and the request then would have to be dispatched or merged. =
+Which
+>>> generally means another bfqq from the same bfqg is currently active =
+and
+>>> thus this should have no impact on service guarantees we are =
+interested in.
+>>>=20
+>>>> 2) bfq_release_process_ref(), user thread is gone / moved, or old =
+bfqq
+>>>> is gone due to merge / ioprio change.
+>>>=20
+>>> Yes, here there's no new IO for the bfqq so no point in maintaining =
+any
+>>> service guarantees to it.
+>>>=20
+>>>> I wonder, will bfq_del_bfqq_busy() be called immediately when =
+requests
+>>>> are completed? (It seems not to me...). For example, a user thread
+>>>> issue a sync io just once, and it keep running without issuing new =
+io,
+>>>> then when does the bfqq clears the busy state?
+>>>=20
+>>> No, when bfqq is kept busy, it will get scheduled as in-service =
+queue in
+>>> the future. Then what happens depends on whether it will get more =
+requests
+>>> or not. But generally its busy state will get cleared once it is =
+expired
+>>> for other reason than preemption.
+>>=20
+>> Thanks for your explanation.
+>>=20
+>> I think in normal case using bfq_add/del_bfqq_busy() if fine.
+>>=20
+>> There is one last situation that I'm worried: If some disk are very
+>> slow that the dispatched reqs are not completed when the bfqq is
+>> rescheduled as in-service queue, and thus busy state can be cleared
+>> while reqs are not completed.
+>>=20
+>> Using bfq_del_bfqq_busy() will change behaviour in this specail case,
+>> do you think service guarantees will be broken?
+>=20
+> Well, I don't think so. Because slow disks don't tend to do a lot of
+> internal scheduling (or have deep IO queues for that matter). Also =
+note
+> that generally bfq_select_queue() will not even expire a queue =
+(despite it
+> not having any requests to dispatch) when we should not dispatch other
+> requests to maintain service guarantees. So I think service guarantees =
+will
+> be generally preserved. Obviously I could be wrong, we we will not =
+know
+> until we try it :).
+>=20
+
+I have nothing to add ... You guys are getting better than me about BFQ =
+:)
+
+Thanks,
+Paolo
+
+> 								Honza
+>=20
+> --=20
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+
