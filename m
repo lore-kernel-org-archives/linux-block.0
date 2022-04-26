@@ -2,106 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B8C8C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 14:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63ED1C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 14:25:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237422AbiDZO2H (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Apr 2022 10:28:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56190 "EHLO
+        id S1351604AbiDZO22 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Apr 2022 10:28:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57552 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244894AbiDZO2G (ORCPT
+        with ESMTP id S1348555AbiDZO21 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Apr 2022 10:28:06 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B99685A084
-        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 07:24:56 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id i27so36406687ejd.9
-        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 07:24:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=vGi2xWo0glztPoHlb3pGflxD9oTprLjQ3hPK/vMNf9g=;
-        b=hQ7W0BWcpUkQc/T8HXofDKebFeuGCBNPA5SZVDUfqR/Wgw7Qois8SYRnyk9WOoAHeu
-         F/9jI9kUIifVKMlpQKopUdI/JZsUhYq/vQcqeQK4/nxr9MspWekGKFdgaWjZZsQVqxhu
-         tmS+2B+y3iD7cVRg0aBWsQnviwtyJcRl60tsNuO09pmmr2LGiuSl+b9edYTc8nrargte
-         ufPok664AcZ7cV+an88gvuWIEVSJMo3IR31ozD8FfRbz1dZEA5V21oxe1GZ9V7jSg/cU
-         hgKUeLqYaG8JBRTtZFaqg06j5HFctbBkAB4mjjXcEmG4ci7ClXQz0YfqeQxhVk0uUDy0
-         5fKQ==
+        Tue, 26 Apr 2022 10:28:27 -0400
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75B411BEB4;
+        Tue, 26 Apr 2022 07:25:18 -0700 (PDT)
+Received: by mail-wr1-f51.google.com with SMTP id t6so22288428wra.4;
+        Tue, 26 Apr 2022 07:25:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=vGi2xWo0glztPoHlb3pGflxD9oTprLjQ3hPK/vMNf9g=;
-        b=HuKVA7juoTvm8nX/rfjrhiDwIxucfUBC5eBGRPyEcchcm93WzwiOU0F9px83gBH+6i
-         nyZsDSiYoIEJ9jIaJWoEgFfauplo1B2nCoOmPb4DYZk7ZsmXHCuBa5B+c02QvMHTK9WR
-         XDq75DXhM0S9KvUn7eDK1bDUtnQjlKmCyvvW8Yk2UiEdpGS8Zz55h5ByJq8pM6IULc6n
-         VvVq++NIr19zNuBtP/xdxODzJvLHlaejI8qArq5X8PZ3plGw28Y87nR1VZAIwcaG1Vd2
-         tr+1ZEfPBWXYow600/YGwFptog1RCAyXYg3Em2v+ysN8S8zR3K6uRKaoAhg6WkAR807T
-         d6Jw==
-X-Gm-Message-State: AOAM532uzukIu0K0UyBVyj7hhuKh3l9AiNImuEr7NvYGGtn++Bnq7FmZ
-        1/yoY8mxcuKnnd2UVkmsfqhzTg==
-X-Google-Smtp-Source: ABdhPJwqgfbj1kmKNaRApziMfN3y1y0mgZBxvHxiI0QR5TzVpevciWSnaiC3oLvOhLwmBH4Io+45bQ==
-X-Received: by 2002:a17:907:86ab:b0:6e8:d60e:d6c3 with SMTP id qa43-20020a17090786ab00b006e8d60ed6c3mr21366841ejc.346.1650983095263;
-        Tue, 26 Apr 2022 07:24:55 -0700 (PDT)
-Received: from [192.168.0.13] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id l20-20020a1709062a9400b006ce71a88bf5sm4976128eje.183.2022.04.26.07.24.52
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 26 Apr 2022 07:24:54 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH -next 00/11] support concurrent sync io for bfq on a
- specail occasion
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20220413111216.npgrdzaubsvjsmy3@quack3.lan>
-Date:   Tue, 26 Apr 2022 16:24:51 +0200
-Cc:     Yu Kuai <yukuai3@huawei.com>, Tejun Heo <tj@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=nWpDQmZNg8zKVk12QskQ7NNS05C4fI/JmZBKLdKyu8Q=;
+        b=N3rGspRTI08F0a6/PTNqrr9OkLopYK/vTV7LBZQ6ul7Qtw1M1ZjWuU4WBBN97fKbxi
+         2WP1+uMyHQlPFpVx+CN1fETiMi/nvjqsrT32ACuOA5CNtGaUlIG8dtrPhl2I9XeR9Tgt
+         sDblG/q9hb8uLlgWspF41wtpYjByPnVymUWTXdh26cHamCM+kgwcetw6syJ8W9HVSZfT
+         m2v9y8xT8V5CUCMNP8MalYoxz1XrcTL/poxEGKjnFuzBIzIOUQZcG60WTDfErsm1j6lR
+         XOUuVWioOdn6sjAYX0087d94RcBq3KjFumDdY4Lk90ONiqMJRXEyJn8uLitBtag6g+aV
+         VQYQ==
+X-Gm-Message-State: AOAM530ha+LLppiKCyV0ZYCMELB5w1UsJqxHiLTjOnfRxNRIbzSraSHA
+        3kSX9Vs2wg9DpqU6p5sam9E=
+X-Google-Smtp-Source: ABdhPJx+tGjrozc2v+hkDAQGkKaaKd6tvj25GGtU09S+2P3NV6/kZmjHHHaKsKLq0MduUfwGvhoEcw==
+X-Received: by 2002:a05:6000:1a8d:b0:20a:ab7c:efb1 with SMTP id f13-20020a0560001a8d00b0020aab7cefb1mr18901071wry.716.1650983116938;
+        Tue, 26 Apr 2022 07:25:16 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id j39-20020a05600c1c2700b00393ee3deaf1sm5525786wms.9.2022.04.26.07.25.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Apr 2022 07:25:16 -0700 (PDT)
+Message-ID: <c658f5cc-7b9a-84ee-ac22-cefc03e3dbf2@grimberg.me>
+Date:   Tue, 26 Apr 2022 17:25:12 +0300
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH 09/11] nvme: remove a spurious clear of discard_alignment
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@kernel.org>, Song Liu <song@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        Jan Hoeppner <hoeppner@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
+        nbd@other.debian.org, virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        dm-devel@redhat.com
+References: <20220418045314.360785-1-hch@lst.de>
+ <20220418045314.360785-10-hch@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220418045314.360785-10-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <7C91FB1F-0690-4D1C-A631-98236F6DC55F@linaro.org>
-References: <20220305091205.4188398-1-yukuai3@huawei.com>
- <20220413111216.npgrdzaubsvjsmy3@quack3.lan>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-> Il giorno 13 apr 2022, alle ore 13:12, Jan Kara <jack@suse.cz> ha scritto:
-> 
-> On Sat 05-03-22 17:11:54, Yu Kuai wrote:
->> Currently, bfq can't handle sync io concurrently as long as they
->> are not issued from root group. This is because
->> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->> bfq_asymmetric_scenario().
->> 
->> This patchset tries to support concurrent sync io if all the sync ios
->> are issued from the same cgroup:
->> 
->> 1) Count root_group into 'num_groups_with_pending_reqs', patch 1-5;
-> 
-> Seeing the complications and special casing for root_group I wonder: Won't
-> we be better off to create fake bfq_sched_data in bfq_data and point
-> root_group->sched_data there? AFAICS it would simplify the code
-> considerably as root_group would be just another bfq_group, no need to
-> special case it in various places, no games with bfqg->my_entity, etc.
-> Paolo, do you see any problem with that?
-> 
-
-I do see the benefits.  My only concern is that then we also need to
-check/change the places that rely on the assumption that we would
-change.
-
-Thanks,
-Paolo
-
-> 								Honza
-> -- 
-> Jan Kara <jack@suse.com>
-> SUSE Labs, CR
-
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
