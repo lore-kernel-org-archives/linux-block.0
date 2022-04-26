@@ -2,118 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D59B3C41535
-	for <linux-block@archiver.kernel.org>; Mon, 25 Apr 2022 22:22:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CA9C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 01:49:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237872AbiDYWZK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 25 Apr 2022 18:25:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49630 "EHLO
+        id S238072AbiDZBwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 25 Apr 2022 21:52:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343627AbiDYVul (ORCPT
+        with ESMTP id S241577AbiDZBwQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 25 Apr 2022 17:50:41 -0400
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E92423AA54
-        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 14:47:35 -0700 (PDT)
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 816363F1D3
-        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 21:47:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1650923253;
-        bh=UO4wzxZajFtH3qcfy3dLF1bQAk44v43NDT+rmdRn5Yo=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=J5+97Ol7GprYEW2ZEzNG4XzYVNsOUW0hZWdsQzVB/duFtm7QztNyWaCuwFifRdVLS
-         UK1L5wsfM9Ng4KwhlUOM6ddLDISodBfm93unZoI892dJsJUI9OK76qgKASLecXZrIl
-         5xct1CynTk3pCa0/saQfmfmTeEuPUvvFJ39omJCB6zUfdh317D7D8oJL8sg2+gTRu5
-         zvxU6CqFHPfTPxzVPL7Yr8qVvVYIjp27l5LhfKkcRFx92VoQAZoiGANueJM+j7uut6
-         Z01+xXCiWe/4/Eu4Z42UtYTMKKty4G3LW01MvFO8wM3jPXKC2pKF4sYWBi/9RfCYM+
-         4vhJAozziJTUg==
-Received: by mail-pf1-f197.google.com with SMTP id i19-20020aa79093000000b0050d44b83506so2050728pfa.22
-        for <linux-block@vger.kernel.org>; Mon, 25 Apr 2022 14:47:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UO4wzxZajFtH3qcfy3dLF1bQAk44v43NDT+rmdRn5Yo=;
-        b=DqQw3psiqaNthDXejCFoCnc5hbZ0857i0Ttl7gytzcy+vGfRywTGbkNJdujkcUwigJ
-         w+4FbT6ZqcBa9+rfsEZWgz0ubAlnHhk6z6VDJ585W25+PWDwZoiBEUPMftQI9Nvsv29V
-         IpNhaxvR8kkqOzh8qOLLlisVj/V5mm0CUOhjMugVIOsM2HptSHJ8FlE8QS7+eXUIxHpB
-         SUyW2iwk0kSoYJ3irIzjitFjt/SeVQSSjmH8XMpRk8AKOC0oDDuTcyPwUL9rLjrja4h+
-         ZxhhcZxaUdldAOX4K9LLR5N1YxfqXA2s/JuxJdJpXph+ck/nHKYS1728v3Qd9Pa9PRiT
-         hnUQ==
-X-Gm-Message-State: AOAM533CJSF/ihBk76PPVxdoPVzRjO4vW26cUFEbux3qKLk8msf3y7w8
-        Mq8etZBniLKttQOb8X3MDe5jLqwd5ZgtlBsZ23M8XAQWwgD/5gDx+OM2Yd798N/vwnhTtsCBFEA
-        /jnkO1iyycAhNQXc5HzLOpDy9eWN5MS8kaUByrQpDJruhpc45NqTYVCA+
-X-Received: by 2002:a17:90b:886:b0:1d9:3a05:3f2a with SMTP id bj6-20020a17090b088600b001d93a053f2amr14051816pjb.53.1650923251836;
-        Mon, 25 Apr 2022 14:47:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw2rdYzYOX06hsXRuD35oezdKlAmuDxmoRYv+cEWg5RH4h591X/jJQypqGczm4ZFvbqbJKbrTN/oPcN6sjDAD4=
-X-Received: by 2002:a17:90b:886:b0:1d9:3a05:3f2a with SMTP id
- bj6-20020a17090b088600b001d93a053f2amr14051798pjb.53.1650923251590; Mon, 25
- Apr 2022 14:47:31 -0700 (PDT)
+        Mon, 25 Apr 2022 21:52:16 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB09124DAA;
+        Mon, 25 Apr 2022 18:49:07 -0700 (PDT)
+Received: from kwepemi100023.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4KnPqp26QDzGpS3;
+        Tue, 26 Apr 2022 09:46:30 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100023.china.huawei.com (7.221.188.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Apr 2022 09:49:05 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 26 Apr 2022 09:49:05 +0800
+Subject: Re: [PATCH -next v2 2/5] block, bfq: add fake weight_counter for
+ weight-raised queue
+To:     Jan Kara <jack@suse.cz>
+CC:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>,
+        <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220416093753.3054696-1-yukuai3@huawei.com>
+ <20220416093753.3054696-3-yukuai3@huawei.com>
+ <20220425094856.qgkhba2klguduxot@quack3.lan>
+ <a27b8c79-867f-9253-84db-1d39c964b3ed@huawei.com>
+ <20220425161650.xzyijgkb5yzviea3@quack3.lan>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <4591d02d-1f14-c928-1c50-6e434dfbb7b2@huawei.com>
+Date:   Tue, 26 Apr 2022 09:49:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-References: <20220422054224.19527-1-matthew.ruffell@canonical.com> <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
-In-Reply-To: <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
-From:   Matthew Ruffell <matthew.ruffell@canonical.com>
-Date:   Tue, 26 Apr 2022 09:47:20 +1200
-Message-ID: <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
-Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
- inotify emit udev uevent changes
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        nbd <nbd@other.debian.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20220425161650.xzyijgkb5yzviea3@quack3.lan>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Josef,
+在 2022/04/26 0:16, Jan Kara 写道:
+> Hello!
+> 
+> On Mon 25-04-22 21:34:16, yukuai (C) wrote:
+>> 在 2022/04/25 17:48, Jan Kara 写道:
+>>> On Sat 16-04-22 17:37:50, Yu Kuai wrote:
+>>>> Weight-raised queue is not inserted to weights_tree, which makes it
+>>>> impossible to track how many queues have pending requests through
+>>>> weights_tree insertion and removel. This patch add fake weight_counter
+>>>> for weight-raised queue to do that.
+>>>>
+>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>
+>>> This is a bit hacky. I was looking into a better place where to hook to
+>>> count entities in a bfq_group with requests and I think bfq_add_bfqq_busy()
+>>> and bfq_del_bfqq_busy() are ideal for this. It also makes better sense
+>>> conceptually than hooking into weights tree handling.
+>>
+>> bfq_del_bfqq_busy() will be called when all the reqs in the bfqq are
+>> dispatched, however there might still some reqs are't completed yet.
+>>
+>> Here what we want to track is how many bfqqs have pending reqs,
+>> specifically if the bfqq have reqs are't complted.
+>>
+>> Thus I think bfq_del_bfqq_busy() is not the right place to do that.
+> 
+> Yes, I'm aware there will be a difference. But note that bfqq can stay busy
+> with only dispatched requests because the logic in __bfq_bfqq_expire() will
+> not call bfq_del_bfqq_busy() if idling is needed for service guarantees. So
+> I think using bfq_add/del_bfqq_busy() would work OK.
+Hi,
 
-The pastebin has expired the link, and I can't access your patch.
-Seems to default to 1 day deletion.
+I didn't think of that before. If bfqq stay busy after dispathing all
+the requests, there are two other places that bfqq can clear busy:
 
-Could you please create a new paste or send the patch inline in this
-email thread?
+1) bfq_remove_request(), bfqq has to insert a new req while it's not in
+service.
 
-I am more than happy to try the patch out.
+2) bfq_release_process_ref(), user thread is gone / moved, or old bfqq
+is gone due to merge / ioprio change.
 
-Thank you for your analysis.
-Matthew
+I wonder, will bfq_del_bfqq_busy() be called immediately when requests
+are completed? (It seems not to me...). For example, a user thread
+issue a sync io just once, and it keep running without issuing new io,
+then when does the bfqq clears the busy state?
 
-On Sat, Apr 23, 2022 at 3:24 AM Josef Bacik <josef@toxicpanda.com> wrote:
->
-> On Fri, Apr 22, 2022 at 1:42 AM Matthew Ruffell
-> <matthew.ruffell@canonical.com> wrote:
-> >
-> > Dear maintainers of the nbd subsystem,
-> >
-> > A user has come across an issue which causes the nbd module to hang after a
-> > disconnect where a write has been made to a qemu qcow image file, with qemu-nbd
-> > being the server.
-> >
->
-> Ok there's two problems here, but I want to make sure I have the right
-> fix for the hang first.  Can you apply this patch
->
-> https://paste.centos.org/view/b1a2d01a
->
-> and make sure the hang goes away?  Once that part is fixed I'll fix
-> the IO errors, this is just us racing with systemd while we teardown
-> the device and then we're triggering a partition read while the device
-> is going down and it's complaining loudly.  Before we would
-> set_capacity to 0 whenever we disconnected, but that causes problems
-> with file systems that may still have the device open.  However now we
-> only do this if the server does the CLEAR_SOCK ioctl, which clearly
-> can race with systemd poking the device, so I need to make it
-> set_capacity(0) when the last opener closes the device to prevent this
-> style of race.
->
-> Let me know if that patch fixes the hang, and then I'll work up
-> something for the capacity problem.  Thanks,
->
-> Josef
+Thanks,
+Kuai
+> 
+> 								Honza
+> 
