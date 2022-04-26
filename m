@@ -2,218 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C67DC43217
-	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 12:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D682C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 13:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350306AbiDZM5u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Apr 2022 08:57:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57162 "EHLO
+        id S235411AbiDZNzx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Apr 2022 09:55:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350266AbiDZM4q (ORCPT
+        with ESMTP id S229840AbiDZNzw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Apr 2022 08:56:46 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7023117D48D;
-        Tue, 26 Apr 2022 05:53:38 -0700 (PDT)
-Received: from kwepemi100023.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KnhdJ1r9yzhYmK;
-        Tue, 26 Apr 2022 20:53:24 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100023.china.huawei.com (7.221.188.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 26 Apr 2022 20:53:36 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 26 Apr
- 2022 20:53:35 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH -next 6/6] nbd: use pr_err to output error message
-Date:   Tue, 26 Apr 2022 21:07:46 +0800
-Message-ID: <20220426130746.885140-7-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220426130746.885140-1-yukuai3@huawei.com>
-References: <20220426130746.885140-1-yukuai3@huawei.com>
+        Tue, 26 Apr 2022 09:55:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91FE12EB78;
+        Tue, 26 Apr 2022 06:52:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
+        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
+        Sender:Reply-To:Content-ID:Content-Description;
+        bh=irD5TP5dvYOrrDctV6NZa3iVQyIsJ9/GKsDYgTCLneg=; b=GphFVrNB6afv2AYo22a/nMAAJY
+        m8+WnybGo7Wr5Dql3SNlVIYf4LwEpiSVbiZqM36tRxQrB7A4iO5cgzbTG2HZMbBNdoWwHCr8es3f6
+        fWLqL5IDYVkyvs5G9vpO+Q1ZQ41+Jrax07Fxju54ejsKuMo3CgoW2R6Qj3izCMjvdiJxc0h61ijAx
+        EfPl+WBbV2jY4q2HoQQEf+kl9iiuHlvtpzAmfRp6QR8oZ2jbSNmbnBFzg5R63RM3g/CzjnrbqRTog
+        HGYcSDvt8E74qPhlGWvsje5aOjuJhzmuTfEWVXTpNZcY37pk4eZBcz02YmqGGlDlwQM4PWuPIdDRL
+        2n05+acQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1njLcQ-00ElLb-N2; Tue, 26 Apr 2022 13:52:42 +0000
+Date:   Tue, 26 Apr 2022 06:52:42 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Daniel Golle <daniel@makrotopia.org>
+Cc:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [RFC PATCH 4/5] mtd_blkdevs: scan partitions on mtdblock if
+ FIT_PARTITION is set
+Message-ID: <Ymf5KpEAGybW8W17@infradead.org>
+References: <Yma3ck/hygQ0badz@makrotopia.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Yma3ck/hygQ0badz@makrotopia.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Instead of using the long printk(KERN_ERR "nbd: ...") to
-output error message, defining pr_fmt and using
-the short pr_err("") to do that. The replacemen is done
-by using the following command:
+On Mon, Apr 25, 2022 at 04:00:02PM +0100, Daniel Golle wrote:
+> Enable partition parsers on plain mtdblock devices in case of
+> CONFIG_FIT_PARTITION being selected.
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  drivers/mtd/mtd_blkdevs.c | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+> index f7317211146550..e9759c4182f8d5 100644
+> --- a/drivers/mtd/mtd_blkdevs.c
+> +++ b/drivers/mtd/mtd_blkdevs.c
+> @@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+>  	} else {
+>  		snprintf(gd->disk_name, sizeof(gd->disk_name),
+>  			 "%s%d", tr->name, new->devnum);
+> +#ifndef CONFIG_FIT_PARTITION
+>  		gd->flags |= GENHD_FL_NO_PART;
+> +#endif
 
-  sed -i 's/printk(KERN_ERR "nbd: /pr_err("/g' \
-		  drivers/block/nbd.c
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 36 ++++++++++++++++++------------------
- 1 file changed, 18 insertions(+), 18 deletions(-)
-
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 566aabcaff51..8d15a9d929c7 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1930,16 +1930,16 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 		 * MKDEV() expect that the max bits of first_minor is 20.
- 		 */
- 		if (index < 0 || index > MINORMASK >> part_shift) {
--			printk(KERN_ERR "nbd: illegal input index %d\n", index);
-+			pr_err("illegal input index %d\n", index);
- 			return -EINVAL;
- 		}
- 	}
- 	if (!info->attrs[NBD_ATTR_SOCKETS]) {
--		printk(KERN_ERR "nbd: must specify at least one socket\n");
-+		pr_err("must specify at least one socket\n");
- 		return -EINVAL;
- 	}
- 	if (!info->attrs[NBD_ATTR_SIZE_BYTES]) {
--		printk(KERN_ERR "nbd: must specify a size in bytes for the device\n");
-+		pr_err("must specify a size in bytes for the device\n");
- 		return -EINVAL;
- 	}
- again:
-@@ -1975,7 +1975,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 		nbd_put(nbd);
- 		if (index == -1)
- 			goto again;
--		printk(KERN_ERR "nbd: nbd%d already in use\n", index);
-+		pr_err("nbd%d already in use\n", index);
- 		return -EBUSY;
- 	}
- 	if (WARN_ON(nbd->config)) {
-@@ -1987,7 +1987,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 	if (IS_ERR(config)) {
- 		mutex_unlock(&nbd->config_lock);
- 		nbd_put(nbd);
--		printk(KERN_ERR "nbd: couldn't allocate config\n");
-+		pr_err("couldn't allocate config\n");
- 		return PTR_ERR(config);
- 	}
- 	nbd->config = config;
-@@ -2043,7 +2043,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 			struct nlattr *socks[NBD_SOCK_MAX+1];
- 
- 			if (nla_type(attr) != NBD_SOCK_ITEM) {
--				printk(KERN_ERR "nbd: socks must be embedded in a SOCK_ITEM attr\n");
-+				pr_err("socks must be embedded in a SOCK_ITEM attr\n");
- 				ret = -EINVAL;
- 				goto out;
- 			}
-@@ -2052,7 +2052,7 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 							  nbd_sock_policy,
- 							  info->extack);
- 			if (ret != 0) {
--				printk(KERN_ERR "nbd: error processing sock list\n");
-+				pr_err("error processing sock list\n");
- 				ret = -EINVAL;
- 				goto out;
- 			}
-@@ -2123,7 +2123,7 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- 		return -EPERM;
- 
- 	if (!info->attrs[NBD_ATTR_INDEX]) {
--		printk(KERN_ERR "nbd: must specify an index to disconnect\n");
-+		pr_err("must specify an index to disconnect\n");
- 		return -EINVAL;
- 	}
- 	index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
-@@ -2131,13 +2131,13 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
- 	nbd = idr_find(&nbd_index_idr, index);
- 	if (!nbd) {
- 		mutex_unlock(&nbd_index_mutex);
--		printk(KERN_ERR "nbd: couldn't find device at index %d\n",
-+		pr_err("couldn't find device at index %d\n",
- 		       index);
- 		return -EINVAL;
- 	}
- 	if (!refcount_inc_not_zero(&nbd->refs)) {
- 		mutex_unlock(&nbd_index_mutex);
--		printk(KERN_ERR "nbd: device at index %d is going down\n",
-+		pr_err("device at index %d is going down\n",
- 		       index);
- 		return -EINVAL;
- 	}
-@@ -2163,7 +2163,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 		return -EPERM;
- 
- 	if (!info->attrs[NBD_ATTR_INDEX]) {
--		printk(KERN_ERR "nbd: must specify a device to reconfigure\n");
-+		pr_err("must specify a device to reconfigure\n");
- 		return -EINVAL;
- 	}
- 	index = nla_get_u32(info->attrs[NBD_ATTR_INDEX]);
-@@ -2171,7 +2171,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	nbd = idr_find(&nbd_index_idr, index);
- 	if (!nbd) {
- 		mutex_unlock(&nbd_index_mutex);
--		printk(KERN_ERR "nbd: couldn't find a device at index %d\n",
-+		pr_err("couldn't find a device at index %d\n",
- 		       index);
- 		return -EINVAL;
- 	}
-@@ -2193,7 +2193,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 	}
- 	if (!refcount_inc_not_zero(&nbd->refs)) {
- 		mutex_unlock(&nbd_index_mutex);
--		printk(KERN_ERR "nbd: device at index %d is going down\n",
-+		pr_err("device at index %d is going down\n",
- 		       index);
- 		return -EINVAL;
- 	}
-@@ -2258,7 +2258,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 			struct nlattr *socks[NBD_SOCK_MAX+1];
- 
- 			if (nla_type(attr) != NBD_SOCK_ITEM) {
--				printk(KERN_ERR "nbd: socks must be embedded in a SOCK_ITEM attr\n");
-+				pr_err("socks must be embedded in a SOCK_ITEM attr\n");
- 				ret = -EINVAL;
- 				goto out;
- 			}
-@@ -2267,7 +2267,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
- 							  nbd_sock_policy,
- 							  info->extack);
- 			if (ret != 0) {
--				printk(KERN_ERR "nbd: error processing sock list\n");
-+				pr_err("error processing sock list\n");
- 				ret = -EINVAL;
- 				goto out;
- 			}
-@@ -2484,7 +2484,7 @@ static int __init nbd_init(void)
- 	BUILD_BUG_ON(sizeof(struct nbd_request) != 28);
- 
- 	if (max_part < 0) {
--		printk(KERN_ERR "nbd: max_part must be >= 0\n");
-+		pr_err("max_part must be >= 0\n");
- 		return -EINVAL;
- 	}
- 
-@@ -2563,10 +2563,10 @@ static void __exit nbd_cleanup(void)
- 		nbd = list_first_entry(&del_list, struct nbd_device, list);
- 		list_del_init(&nbd->list);
- 		if (refcount_read(&nbd->config_refs))
--			printk(KERN_ERR "nbd: possibly leaking nbd_config (ref %d)\n",
-+			pr_err("possibly leaking nbd_config (ref %d)\n",
- 					refcount_read(&nbd->config_refs));
- 		if (refcount_read(&nbd->refs) != 1)
--			printk(KERN_ERR "nbd: possibly leaking a device\n");
-+			pr_err("possibly leaking a device\n");
- 		nbd_put(nbd);
- 	}
- 
--- 
-2.31.1
-
+This will just recreate the fixed regression, just with the extra
+twist of needіng a completely unrelted config option to trigger it.
