@@ -2,90 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2640CC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 07:37:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA36C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 26 Apr 2022 07:40:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344099AbiDZHko (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Apr 2022 03:40:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53584 "EHLO
+        id S1344085AbiDZHnh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 26 Apr 2022 03:43:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344130AbiDZHkc (ORCPT
+        with ESMTP id S1344273AbiDZHnc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Apr 2022 03:40:32 -0400
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED641331BB;
-        Tue, 26 Apr 2022 00:37:23 -0700 (PDT)
-Received: from relay1-d.mail.gandi.net (unknown [217.70.183.193])
-        by mslow1.mail.gandi.net (Postfix) with ESMTP id 87A8DC7D66;
-        Tue, 26 Apr 2022 07:37:22 +0000 (UTC)
-Received: (Authenticated sender: miquel.raynal@bootlin.com)
-        by mail.gandi.net (Postfix) with ESMTPSA id A2B15240005;
-        Tue, 26 Apr 2022 07:37:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-        t=1650958633;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Tue, 26 Apr 2022 03:43:32 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96948198;
+        Tue, 26 Apr 2022 00:40:25 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 4D09D210EB;
+        Tue, 26 Apr 2022 07:40:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1650958824; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=U0qBOgNyh8voQ1Cq8xvcGs0VWNzEpgJVmBmlg1kmNXM=;
-        b=fjWUZ6VGHzQIycm0+2Q6HwF2JSXWP2MnpyxPKkWCQmNAmDmms8EDOMQYKLD+o3j8hB+qj3
-        viy24v8Q49I3/yOkYS5VvP5VTy3Zi/t1eJNc2hCqJWjpyCTHoaqfBz7iYl4MHF2M/HBUIx
-        bnyTs3j8GKcW/fLYnvWvNl35tkTnIH/+xF+D3AXL3QQl/4oW1V65Zs+gvlpGn9uraLQ+OQ
-        UDaMqAYchPF3NQfK//ot9KlwVvS2mYsJmCF364GYC7bSta7ctfaY9KK3yZ8HJbHNPOEEJs
-        ZVUuOc+vaTnfXgkcQ238FhAExM09m3aJAPJm20t2D+ofJrVUpeVIMBPUtA/HCg==
-Date:   Tue, 26 Apr 2022 09:37:10 +0200
-From:   Miquel Raynal <miquel.raynal@bootlin.com>
-To:     Daniel Golle <daniel@makrotopia.org>
-Cc:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
-        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org,
-        Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Richard Weinberger <richard@nod.at>,
-        Vignesh Raghavendra <vigneshr@ti.com>,
-        Masahiro Yamada <masahiroy@kernel.org>
-Subject: Re: [RFC PATCH 4/5] mtd_blkdevs: scan partitions on mtdblock if
- FIT_PARTITION is set
-Message-ID: <20220426093710.6ec48b5e@xps13>
-In-Reply-To: <Yma3ck/hygQ0badz@makrotopia.org>
-References: <Yma3ck/hygQ0badz@makrotopia.org>
-Organization: Bootlin
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+        bh=TzIWVJ6EAqjRbZdTdcHexxp67XQ0RbOshNKrsYIiSGw=;
+        b=HEKQn3ZNZDXr5N9BnyZVgEfdr/N/FPYgznPqSkR3gh+MssKWIATSMZQ9KQir0TwYryIgeM
+        vPoVMchQ76WSLK7rnM/QEMx/dLo91F7OQwRtxhtIQZ9E/rqMEUAyIlN9JXf7ZOWJ/UqScS
+        kM8uEOZOlqVJ30Rl9VGN5x8PzIVV0HE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1650958824;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=TzIWVJ6EAqjRbZdTdcHexxp67XQ0RbOshNKrsYIiSGw=;
+        b=p5T6zNi4/s2xl8tShY9ElhnTBewZdrvUmQifOHQhh37BeTdsOAYD6X2REHk4nclxYXrlK8
+        UPx9RNBM+1j+WnBQ==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 37FD12C142;
+        Tue, 26 Apr 2022 07:40:24 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id DF0CEA0620; Tue, 26 Apr 2022 09:40:23 +0200 (CEST)
+Date:   Tue, 26 Apr 2022 09:40:23 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, axboe@kernel.dk,
+        tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 2/5] block, bfq: add fake weight_counter for
+ weight-raised queue
+Message-ID: <20220426074023.5y4gwvjsjzem3vgp@quack3.lan>
+References: <20220416093753.3054696-1-yukuai3@huawei.com>
+ <20220416093753.3054696-3-yukuai3@huawei.com>
+ <20220425094856.qgkhba2klguduxot@quack3.lan>
+ <a27b8c79-867f-9253-84db-1d39c964b3ed@huawei.com>
+ <20220425161650.xzyijgkb5yzviea3@quack3.lan>
+ <4591d02d-1f14-c928-1c50-6e434dfbb7b2@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <4591d02d-1f14-c928-1c50-6e434dfbb7b2@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Daniel,
+On Tue 26-04-22 09:49:04, yukuai (C) wrote:
+> 在 2022/04/26 0:16, Jan Kara 写道:
+> > Hello!
+> > 
+> > On Mon 25-04-22 21:34:16, yukuai (C) wrote:
+> > > 在 2022/04/25 17:48, Jan Kara 写道:
+> > > > On Sat 16-04-22 17:37:50, Yu Kuai wrote:
+> > > > > Weight-raised queue is not inserted to weights_tree, which makes it
+> > > > > impossible to track how many queues have pending requests through
+> > > > > weights_tree insertion and removel. This patch add fake weight_counter
+> > > > > for weight-raised queue to do that.
+> > > > > 
+> > > > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > > > 
+> > > > This is a bit hacky. I was looking into a better place where to hook to
+> > > > count entities in a bfq_group with requests and I think bfq_add_bfqq_busy()
+> > > > and bfq_del_bfqq_busy() are ideal for this. It also makes better sense
+> > > > conceptually than hooking into weights tree handling.
+> > > 
+> > > bfq_del_bfqq_busy() will be called when all the reqs in the bfqq are
+> > > dispatched, however there might still some reqs are't completed yet.
+> > > 
+> > > Here what we want to track is how many bfqqs have pending reqs,
+> > > specifically if the bfqq have reqs are't complted.
+> > > 
+> > > Thus I think bfq_del_bfqq_busy() is not the right place to do that.
+> > 
+> > Yes, I'm aware there will be a difference. But note that bfqq can stay busy
+> > with only dispatched requests because the logic in __bfq_bfqq_expire() will
+> > not call bfq_del_bfqq_busy() if idling is needed for service guarantees. So
+> > I think using bfq_add/del_bfqq_busy() would work OK.
+> Hi,
+> 
+> I didn't think of that before. If bfqq stay busy after dispathing all
+> the requests, there are two other places that bfqq can clear busy:
+> 
+> 1) bfq_remove_request(), bfqq has to insert a new req while it's not in
+> service.
 
-daniel@makrotopia.org wrote on Mon, 25 Apr 2022 16:00:02 +0100:
+Yes and the request then would have to be dispatched or merged. Which
+generally means another bfqq from the same bfqg is currently active and
+thus this should have no impact on service guarantees we are interested in.
 
-> Enable partition parsers on plain mtdblock devices in case of
-> CONFIG_FIT_PARTITION being selected.
->=20
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  drivers/mtd/mtd_blkdevs.c | 2 ++
->  1 file changed, 2 insertions(+)
->=20
-> diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
-> index f7317211146550..e9759c4182f8d5 100644
-> --- a/drivers/mtd/mtd_blkdevs.c
-> +++ b/drivers/mtd/mtd_blkdevs.c
-> @@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
->  	} else {
->  		snprintf(gd->disk_name, sizeof(gd->disk_name),
->  			 "%s%d", tr->name, new->devnum);
-> +#ifndef CONFIG_FIT_PARTITION
+> 2) bfq_release_process_ref(), user thread is gone / moved, or old bfqq
+> is gone due to merge / ioprio change.
 
-Can we use a regular 'if' here?
+Yes, here there's no new IO for the bfqq so no point in maintaining any
+service guarantees to it.
 
->  		gd->flags |=3D GENHD_FL_NO_PART;
-> +#endif
->  	}
-> =20
->  	set_capacity(gd, ((u64)new->size * tr->blksize) >> 9);
+> I wonder, will bfq_del_bfqq_busy() be called immediately when requests
+> are completed? (It seems not to me...). For example, a user thread
+> issue a sync io just once, and it keep running without issuing new io,
+> then when does the bfqq clears the busy state?
 
-Thanks,
-Miqu=C3=A8l
+No, when bfqq is kept busy, it will get scheduled as in-service queue in
+the future. Then what happens depends on whether it will get more requests
+or not. But generally its busy state will get cleared once it is expired
+for other reason than preemption.
+
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
