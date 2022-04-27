@@ -2,153 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C5B1C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 10:57:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBA9C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 11:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231565AbiD0LAK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 07:00:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35170 "EHLO
+        id S232346AbiD0LDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 07:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231684AbiD0K72 (ORCPT
+        with ESMTP id S232265AbiD0LC6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 06:59:28 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7036D22C3C1;
-        Wed, 27 Apr 2022 03:37:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id DE5591F747;
-        Wed, 27 Apr 2022 10:37:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1651055827; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EwRuU3lN9KI8hyzt5BRGcUdxQu2aFhndVDrcib1zzbI=;
-        b=feYJC2od1AKLT8mJSoDbAoyzHedIgJQwZvNS3KNVkgnc7RzT6txrdyC7qHmbKtqm0eHZ1C
-        nwtyIUFNi9tG48N+Y74qTSYSX6kwlgGkYQd3TgrHBB36BxazEEJwyWSiqJG/CA/Henk0as
-        Q442kgxgzolK1QTcIhmgJfFSnVSSaYE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1651055827;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=EwRuU3lN9KI8hyzt5BRGcUdxQu2aFhndVDrcib1zzbI=;
-        b=Z5DGjHUwr8LqYy6Y4hmCD5vvVYHZlNaZpZ9cOR3X70LSGdN3HKPIIQ+uUPD5pElrFfGesW
-        b/jCF0GqeLUhBNBg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 942411323E;
-        Wed, 27 Apr 2022 10:37:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id VQRnI9McaWJTBQAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 27 Apr 2022 10:37:07 +0000
-Message-ID: <a885def5-7373-28d9-6ed6-bc836864c67c@suse.de>
-Date:   Wed, 27 Apr 2022 12:37:07 +0200
+        Wed, 27 Apr 2022 07:02:58 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F94E3FFE55;
+        Wed, 27 Apr 2022 03:45:00 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 0154A5FD14;
+        Wed, 27 Apr 2022 13:03:58 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1651053838;
+        bh=xDaCZThPN1hiRJLuo77xGJjD3YT8oMl+cH5JOqy6XdM=;
+        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+        b=hUXihnSfgpZaOTLVqBNsn+GqjMS/ZBmcNCl2C+HSuMNp3hLMHp4tk4UMK9Y+UqwfP
+         fUglnqUJtzdRFkpwUoxAPfbrfFWAEyK378LLJyorkp0T/13zFbNlEStIlromddme33
+         M/7BORyYibDNBlD77Pih5ENzFTJO1Hbe5WLtBHxWy3SpctWup2sVTt9UJ/9txONHcd
+         u09Z5BaEQeHVGWFXZKSNLnjD+oFaSrHtQZW/k20zVQvzM+Z3xMqJ1y0kP9vVMAiJh5
+         aN+E9CqTPKIbbHF8xtPTNzvXeUF9Rmq2yPVm96xARCu3gw1s36U7iBCCsk3pcm4xce
+         piXWKvcft4Yig==
+Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Wed, 27 Apr 2022 13:03:57 +0300 (MSK)
+From:   Alexey Romanov <avromanov@sberdevices.ru>
+To:     <minchan@kernel.org>, <ngupta@vflare.org>,
+        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>
+CC:     <axboe@chromium.org>, <kernel@sberdevices.ru>,
+        <linux-kernel@vger.kernel.org>, <mnitenko@gmail.com>,
+        Alexey Romanov <avromanov@sberdevices.ru>,
+        Dmitry Rokosov <ddrokosov@sberdevices.ru>
+Subject: [PATCH v2] zram: remove double compression logic
+Date:   Wed, 27 Apr 2022 13:03:45 +0300
+Message-ID: <20220427100345.29461-1-avromanov@sberdevices.ru>
+X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, msnitzer@redhat.com, bvanassche@acm.org,
-        martin.petersen@oracle.com, kbusch@kernel.org, hch@lst.de,
-        Frederick.Knight@netapp.com, osandov@fb.com,
-        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
-        jack@suse.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        Arnav Dawn <arnav.dawn@samsung.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org
-References: <20220426101241.30100-1-nj.shetty@samsung.com>
- <CGME20220426101938epcas5p291690dd1f0e931cd9f8139daaf3f9296@epcas5p2.samsung.com>
- <20220426101241.30100-4-nj.shetty@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v4 03/10] block: Introduce a new ioctl for copy
-In-Reply-To: <20220426101241.30100-4-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.16.1.6]
+X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
+ S-MS-EXCH01.sberdevices.ru (172.16.1.4)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/04/27 08:28:00 #19366970
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/26/22 12:12, Nitesh Shetty wrote:
-> Add new BLKCOPY ioctl that offloads copying of one or more sources ranges
-> to one or more destination in a device. COPY ioctl accepts a 'copy_range'
-> structure that contains no of range, a reserved field , followed by an
-> array of ranges. Each source range is represented by 'range_entry' that
-> contains source start offset, destination start offset and length of
-> source ranges (in bytes)
-> 
-> MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
-> MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
-> 
-> Example code, to issue BLKCOPY:
-> /* Sample example to copy three entries with [dest,src,len],
-> * [32768, 0, 4096] [36864, 4096, 4096] [40960,8192,4096] on same device */
-> 
-> int main(void)
-> {
-> 	int i, ret, fd;
-> 	unsigned long src = 0, dst = 32768, len = 4096;
-> 	struct copy_range *cr;
-> 	cr = (struct copy_range *)malloc(sizeof(*cr)+
-> 					(sizeof(struct range_entry)*3));
-> 	cr->nr_range = 3;
-> 	cr->reserved = 0;
-> 	for (i = 0; i< cr->nr_range; i++, src += len, dst += len) {
-> 		cr->range_list[i].dst = dst;
-> 		cr->range_list[i].src = src;
-> 		cr->range_list[i].len = len;
-> 		cr->range_list[i].comp_len = 0;
-> 	}
-> 	fd = open("/dev/nvme0n1", O_RDWR);
-> 	if (fd < 0) return 1;
-> 	ret = ioctl(fd, BLKCOPY, cr);
-> 	if (ret != 0)
-> 	       printf("copy failed, ret= %d\n", ret);
-> 	for (i=0; i< cr->nr_range; i++)
-> 		if (cr->range_list[i].len != cr->range_list[i].comp_len)
-> 			printf("Partial copy for entry %d: requested %llu, completed %llu\n",
-> 								i, cr->range_list[i].len,
-> 								cr->range_list[i].comp_len);
-> 	close(fd);
-> 	free(cr);
-> 	return ret;
-> }
-> 
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Javier González <javier.gonz@samsung.com>
-> Signed-off-by: Arnav Dawn <arnav.dawn@samsung.com>
-> ---
->   block/ioctl.c           | 32 ++++++++++++++++++++++++++++++++
->   include/uapi/linux/fs.h |  9 +++++++++
->   2 files changed, 41 insertions(+)
-> 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+The 2nd trial allocation under per-cpu presumption has been
+used to prevent regression of allocation failure. However, it
+makes trouble for maintenance without significant benefit.
+The slowpath branch is executed extremely rarely: getting
+there is problematic. Therefore, we delete this branch.
 
-Cheers,
+Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
+Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
+---
+ drivers/block/zram/zram_drv.c | 38 +++++++++--------------------------
+ drivers/block/zram/zram_drv.h |  1 -
+ 2 files changed, 9 insertions(+), 30 deletions(-)
 
-Hannes
+diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+index cb253d80d72b..4be6caf43b1d 100644
+--- a/drivers/block/zram/zram_drv.c
++++ b/drivers/block/zram/zram_drv.c
+@@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
+ 
+ 	down_read(&zram->init_lock);
+ 	ret = scnprintf(buf, PAGE_SIZE,
+-			"version: %d\n%8llu %8llu\n",
++			"version: %d\n%8llu\n",
+ 			version,
+-			(u64)atomic64_read(&zram->stats.writestall),
+ 			(u64)atomic64_read(&zram->stats.miss_free));
+ 	up_read(&zram->init_lock);
+ 
+@@ -1373,7 +1372,6 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 	}
+ 	kunmap_atomic(mem);
+ 
+-compress_again:
+ 	zstrm = zcomp_stream_get(zram->comp);
+ 	src = kmap_atomic(page);
+ 	ret = zcomp_compress(zstrm, src, &comp_len);
+@@ -1388,33 +1386,15 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
+ 
+ 	if (comp_len >= huge_class_size)
+ 		comp_len = PAGE_SIZE;
+-	/*
+-	 * handle allocation has 2 paths:
+-	 * a) fast path is executed with preemption disabled (for
+-	 *  per-cpu streams) and has __GFP_DIRECT_RECLAIM bit clear,
+-	 *  since we can't sleep;
+-	 * b) slow path enables preemption and attempts to allocate
+-	 *  the page with __GFP_DIRECT_RECLAIM bit set. we have to
+-	 *  put per-cpu compression stream and, thus, to re-do
+-	 *  the compression once handle is allocated.
+-	 *
+-	 * if we have a 'non-null' handle here then we are coming
+-	 * from the slow path and handle has already been allocated.
+-	 */
+-	if (!handle)
+-		handle = zs_malloc(zram->mem_pool, comp_len,
+-				__GFP_KSWAPD_RECLAIM |
+-				__GFP_NOWARN |
+-				__GFP_HIGHMEM |
+-				__GFP_MOVABLE);
+-	if (!handle) {
++
++	handle = zs_malloc(zram->mem_pool, comp_len,
++			__GFP_KSWAPD_RECLAIM |
++			__GFP_NOWARN |
++			__GFP_HIGHMEM |
++			__GFP_MOVABLE);
++
++	if (unlikely(!handle)) {
+ 		zcomp_stream_put(zram->comp);
+-		atomic64_inc(&zram->stats.writestall);
+-		handle = zs_malloc(zram->mem_pool, comp_len,
+-				GFP_NOIO | __GFP_HIGHMEM |
+-				__GFP_MOVABLE);
+-		if (handle)
+-			goto compress_again;
+ 		return -ENOMEM;
+ 	}
+ 
+diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
+index 80c3b43b4828..158c91e54850 100644
+--- a/drivers/block/zram/zram_drv.h
++++ b/drivers/block/zram/zram_drv.h
+@@ -81,7 +81,6 @@ struct zram_stats {
+ 	atomic64_t huge_pages_since;	/* no. of huge pages since zram set up */
+ 	atomic64_t pages_stored;	/* no. of pages currently stored */
+ 	atomic_long_t max_used_pages;	/* no. of maximum pages stored */
+-	atomic64_t writestall;		/* no. of write slow paths */
+ 	atomic64_t miss_free;		/* no. of missed free */
+ #ifdef	CONFIG_ZRAM_WRITEBACK
+ 	atomic64_t bd_count;		/* no. of pages in backing device */
 -- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+2.30.1
+
