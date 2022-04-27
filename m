@@ -2,153 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DBA9C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 11:00:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9F9C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 11:30:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232346AbiD0LDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 07:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38266 "EHLO
+        id S232649AbiD0Lde (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 07:33:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37932 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232265AbiD0LC6 (ORCPT
+        with ESMTP id S232590AbiD0Ldd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 07:02:58 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F94E3FFE55;
-        Wed, 27 Apr 2022 03:45:00 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 0154A5FD14;
-        Wed, 27 Apr 2022 13:03:58 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1651053838;
-        bh=xDaCZThPN1hiRJLuo77xGJjD3YT8oMl+cH5JOqy6XdM=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=hUXihnSfgpZaOTLVqBNsn+GqjMS/ZBmcNCl2C+HSuMNp3hLMHp4tk4UMK9Y+UqwfP
-         fUglnqUJtzdRFkpwUoxAPfbrfFWAEyK378LLJyorkp0T/13zFbNlEStIlromddme33
-         M/7BORyYibDNBlD77Pih5ENzFTJO1Hbe5WLtBHxWy3SpctWup2sVTt9UJ/9txONHcd
-         u09Z5BaEQeHVGWFXZKSNLnjD+oFaSrHtQZW/k20zVQvzM+Z3xMqJ1y0kP9vVMAiJh5
-         aN+E9CqTPKIbbHF8xtPTNzvXeUF9Rmq2yPVm96xARCu3gw1s36U7iBCCsk3pcm4xce
-         piXWKvcft4Yig==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Wed, 27 Apr 2022 13:03:57 +0300 (MSK)
-From:   Alexey Romanov <avromanov@sberdevices.ru>
-To:     <minchan@kernel.org>, <ngupta@vflare.org>,
-        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>
-CC:     <axboe@chromium.org>, <kernel@sberdevices.ru>,
-        <linux-kernel@vger.kernel.org>, <mnitenko@gmail.com>,
-        Alexey Romanov <avromanov@sberdevices.ru>,
-        Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: [PATCH v2] zram: remove double compression logic
-Date:   Wed, 27 Apr 2022 13:03:45 +0300
-Message-ID: <20220427100345.29461-1-avromanov@sberdevices.ru>
-X-Mailer: git-send-email 2.33.0
+        Wed, 27 Apr 2022 07:33:33 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC3438191
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id h12so1267905plf.12
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=VWsO9zYE+6z8Bu+J+RVWchJHdOi/jTER00tosQL2T9k=;
+        b=fBiMUHL+/89DWKYwG6EjwyvTpwpWmS2S7Tq9KPIVm3Z1+65DIF65PsvxA6GBg6lX5E
+         7RqX1vmosklEYI8VFjNF3/0b1d/zOlXrobjGn6xntCUrbhi3bpISDovDrxsTNVsPnogN
+         2t5yfG+UyyZROV8h3L/dReZNbNN7kRmw32Q+A=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=VWsO9zYE+6z8Bu+J+RVWchJHdOi/jTER00tosQL2T9k=;
+        b=B0tXJ1mIzrLdXVLJPxA0u8tyXj0jjKAZGrabWdMNzAXUUV1PsAIYLs2dd3McUdXhw1
+         9M+nzwNxB1T2O0vt5nSrxXinjQw1WiP6PMj4natfmPgBBF7/lhGvq9FB09xQ+RznLLrl
+         3BvOAMykoU/03RCJyjOBeHZyxLd93ZOnSRfO04G6tUm180VMxhBB7R32Y/sclfqgwGAV
+         ZAEnMmH/j0gF2NXV1Bw6jgKTIC0FbTJQPoMj0Ey7l0qRrPGTz+6ZYzcMcTIMz1oE/glm
+         mxzbCI/Oz7Z0Zp+2p/QChYm8knGXPE622i8JMdE7GCP0y86wLXwdtijy+O+oZ4FXpgL2
+         0u/Q==
+X-Gm-Message-State: AOAM531fJJXSjINMobXncdteSQ6oD+qQl8Rzmo2z4otu+DglCFJIFZ1d
+        YOPyldWsejXXg5Dcn2hI4yECGA==
+X-Google-Smtp-Source: ABdhPJxgII3YJrlgmRBlb+I6g1YyWPWr0arhPXRxwA6t0ftRB36wF6qpxWbiq+09MhjzTFZc/4cGUA==
+X-Received: by 2002:a17:903:32d2:b0:15d:57c7:9eef with SMTP id i18-20020a17090332d200b0015d57c79eefmr1916051plr.2.1651059022158;
+        Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:8e2d:263:26e7:c039])
+        by smtp.gmail.com with ESMTPSA id d14-20020a62f80e000000b0050d2671b11bsm14355030pfh.53.2022.04.27.04.30.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 04:30:21 -0700 (PDT)
+Date:   Wed, 27 Apr 2022 20:30:16 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Alexey Romanov <avromanov@sberdevices.ru>
+Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
+        linux-block@vger.kernel.org, axboe@chromium.org,
+        kernel@sberdevices.ru, linux-kernel@vger.kernel.org,
+        mnitenko@gmail.com, Dmitry Rokosov <ddrokosov@sberdevices.ru>
+Subject: Re: [PATCH v2] zram: remove double compression logic
+Message-ID: <YmkpSC/gJf7Cg2Ym@google.com>
+References: <20220427100345.29461-1-avromanov@sberdevices.ru>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/04/27 08:28:00 #19366970
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220427100345.29461-1-avromanov@sberdevices.ru>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 2nd trial allocation under per-cpu presumption has been
-used to prevent regression of allocation failure. However, it
-makes trouble for maintenance without significant benefit.
-The slowpath branch is executed extremely rarely: getting
-there is problematic. Therefore, we delete this branch.
+On (22/04/27 13:03), Alexey Romanov wrote:
+> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> index cb253d80d72b..4be6caf43b1d 100644
+> --- a/drivers/block/zram/zram_drv.c
+> +++ b/drivers/block/zram/zram_drv.c
+> @@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
+>  
+>  	down_read(&zram->init_lock);
+>  	ret = scnprintf(buf, PAGE_SIZE,
+> -			"version: %d\n%8llu %8llu\n",
+> +			"version: %d\n%8llu\n",
+>  			version,
+> -			(u64)atomic64_read(&zram->stats.writestall),
+>  			(u64)atomic64_read(&zram->stats.miss_free));
+>  	up_read(&zram->init_lock);
 
-Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
----
- drivers/block/zram/zram_drv.c | 38 +++++++++--------------------------
- drivers/block/zram/zram_drv.h |  1 -
- 2 files changed, 9 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index cb253d80d72b..4be6caf43b1d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
- 
- 	down_read(&zram->init_lock);
- 	ret = scnprintf(buf, PAGE_SIZE,
--			"version: %d\n%8llu %8llu\n",
-+			"version: %d\n%8llu\n",
- 			version,
--			(u64)atomic64_read(&zram->stats.writestall),
- 			(u64)atomic64_read(&zram->stats.miss_free));
- 	up_read(&zram->init_lock);
- 
-@@ -1373,7 +1372,6 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 	}
- 	kunmap_atomic(mem);
- 
--compress_again:
- 	zstrm = zcomp_stream_get(zram->comp);
- 	src = kmap_atomic(page);
- 	ret = zcomp_compress(zstrm, src, &comp_len);
-@@ -1388,33 +1386,15 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 
- 	if (comp_len >= huge_class_size)
- 		comp_len = PAGE_SIZE;
--	/*
--	 * handle allocation has 2 paths:
--	 * a) fast path is executed with preemption disabled (for
--	 *  per-cpu streams) and has __GFP_DIRECT_RECLAIM bit clear,
--	 *  since we can't sleep;
--	 * b) slow path enables preemption and attempts to allocate
--	 *  the page with __GFP_DIRECT_RECLAIM bit set. we have to
--	 *  put per-cpu compression stream and, thus, to re-do
--	 *  the compression once handle is allocated.
--	 *
--	 * if we have a 'non-null' handle here then we are coming
--	 * from the slow path and handle has already been allocated.
--	 */
--	if (!handle)
--		handle = zs_malloc(zram->mem_pool, comp_len,
--				__GFP_KSWAPD_RECLAIM |
--				__GFP_NOWARN |
--				__GFP_HIGHMEM |
--				__GFP_MOVABLE);
--	if (!handle) {
-+
-+	handle = zs_malloc(zram->mem_pool, comp_len,
-+			__GFP_KSWAPD_RECLAIM |
-+			__GFP_NOWARN |
-+			__GFP_HIGHMEM |
-+			__GFP_MOVABLE);
-+
-+	if (unlikely(!handle)) {
- 		zcomp_stream_put(zram->comp);
--		atomic64_inc(&zram->stats.writestall);
--		handle = zs_malloc(zram->mem_pool, comp_len,
--				GFP_NOIO | __GFP_HIGHMEM |
--				__GFP_MOVABLE);
--		if (handle)
--			goto compress_again;
- 		return -ENOMEM;
- 	}
- 
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 80c3b43b4828..158c91e54850 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -81,7 +81,6 @@ struct zram_stats {
- 	atomic64_t huge_pages_since;	/* no. of huge pages since zram set up */
- 	atomic64_t pages_stored;	/* no. of pages currently stored */
- 	atomic_long_t max_used_pages;	/* no. of maximum pages stored */
--	atomic64_t writestall;		/* no. of write slow paths */
- 	atomic64_t miss_free;		/* no. of missed free */
- #ifdef	CONFIG_ZRAM_WRITEBACK
- 	atomic64_t bd_count;		/* no. of pages in backing device */
--- 
-2.30.1
-
+I think this also has to bump `version` to 2, since format of the
+file has changed.
