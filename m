@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61430C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 16:04:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D153C4321E
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 16:04:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241897AbiD0QHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 12:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49232 "EHLO
+        id S241710AbiD0QHh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 12:07:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241690AbiD0QG4 (ORCPT
+        with ESMTP id S241691AbiD0QG4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 27 Apr 2022 12:06:56 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8264A3D1255
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 09:03:13 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220427160310euoutp0113c30f3c95f49be1760df85d6732b48e~pzFHNA3Tx0745007450euoutp01k
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 16:03:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220427160310euoutp0113c30f3c95f49be1760df85d6732b48e~pzFHNA3Tx0745007450euoutp01k
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4583D1BF4
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 09:03:14 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220427160306euoutp0265d02cdcaa48af3849e3abe896320e42~pzFEK95Nl1441914419euoutp023
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 16:03:06 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220427160306euoutp0265d02cdcaa48af3849e3abe896320e42~pzFEK95Nl1441914419euoutp023
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1651075390;
-        bh=Z59AramoBMIFuOXUYYH05DZBLjfbCNMGUst3i9j3Z7Q=;
+        s=mail20170921; t=1651075386;
+        bh=6yQzfClVhDZ6n4jKfgnEonLdHdedN/dO+ui2CUTxKaw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=W7RCwmZtNSpvqE8y4evit2Zuyld27ntnSWb6JvmMVBxMaxqsV2CNMLB1BGalJnTQP
-         YU0C/GItlU594cRcvi1Dbxne/WVtaDdWMEvWlL9JbbHa5tK/3iAwedjLyWAn8J47KM
-         uIoIWOO+pVS0kGYKL9LDlUfRYQeyBV2VT2nUvGbg=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        b=cKE+vL/OPgHNA5HyEuoppvKdFOS+gwWs/XPu9wKdHeQVDpM9bVGUGuGH4Cz1Ot2nV
+         mwZW75NlBDHpbmp3EMaq6ci6eCl8znZzFGLCjeqC8bf+AzrosLVKEJGzyhJO56tHro
+         xWC6wXNFsIlB0LEPDkuJgM7n+T08AdvuEPooYFV8=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220427160308eucas1p29e66b3685c84483f3fdd5a90299d93e1~pzFFvrXVn2333623336eucas1p2p;
-        Wed, 27 Apr 2022 16:03:08 +0000 (GMT)
+        20220427160305eucas1p23f1ca6b3cc5d07b7197b62455d839133~pzFCtQUuI1589415894eucas1p2K;
+        Wed, 27 Apr 2022 16:03:05 +0000 (GMT)
 Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 8C.0A.10260.C3969626; Wed, 27
-        Apr 2022 17:03:08 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220427160307eucas1p229f9ebae38fcca9974909799e5e63ccf~pzFFKDoBX2335623356eucas1p2h;
-        Wed, 27 Apr 2022 16:03:07 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220427160307eusmtrp194cac78e29ca037961137d3a49caf9ec~pzFFDipZN2142221422eusmtrp1D;
-        Wed, 27 Apr 2022 16:03:07 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-96-6269693c7e10
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 85.A7.09404.B3969626; Wed, 27
-        Apr 2022 17:03:07 +0100 (BST)
-Received: from localhost (unknown [106.210.248.162]) by eusmtip1.samsung.com
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 7B.D7.10009.93969626; Wed, 27
+        Apr 2022 17:03:05 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220427160304eucas1p1a0080df82f76c39882c4298c3c3d99fd~pzFCRIwGd2685626856eucas1p1p;
+        Wed, 27 Apr 2022 16:03:04 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220427160304eusmtrp21dbea116401f4753609014b6527a5210~pzFCQGpO42598325983eusmtrp2o;
+        Wed, 27 Apr 2022 16:03:04 +0000 (GMT)
+X-AuditID: cbfec7f2-e7fff70000002719-7f-626969390a70
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id C6.81.09522.83969626; Wed, 27
+        Apr 2022 17:03:04 +0100 (BST)
+Received: from localhost (unknown [106.210.248.162]) by eusmtip2.samsung.com
         (KnoxPortal) with ESMTPA id
-        20220427160307eusmtip1fe2208eed35a4c2cc164aecccf9c648a~pzFEt7JbD1109611096eusmtip1x;
-        Wed, 27 Apr 2022 16:03:07 +0000 (GMT)
+        20220427160304eusmtip21ef5128fdd0e92e860a902eb43177b8d~pzFB5d6OL3126231262eusmtip26;
+        Wed, 27 Apr 2022 16:03:04 +0000 (GMT)
 From:   Pankaj Raghav <p.raghav@samsung.com>
 To:     jaegeuk@kernel.org, axboe@kernel.dk, snitzer@kernel.org,
         hch@lst.de, mcgrof@kernel.org, naohiro.aota@wdc.com,
@@ -62,105 +62,126 @@ Cc:     linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
         dm-devel@redhat.com, bvanassche@acm.org, jiangbo.365@bytedance.com,
         linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
         linux-block@vger.kernel.org, Pankaj Raghav <p.raghav@samsung.com>
-Subject: [PATCH 11/16] btrfs: zoned: relax the alignment constraint for
- zoned devices
-Date:   Wed, 27 Apr 2022 18:02:50 +0200
-Message-Id: <20220427160255.300418-12-p.raghav@samsung.com>
+Subject: [PATCH 08/16] btrfs: zoned: add generic btrfs helpers for zoned
+ devices
+Date:   Wed, 27 Apr 2022 18:02:47 +0200
+Message-Id: <20220427160255.300418-9-p.raghav@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220427160255.300418-1-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xTZxzNd+/t7S2z7lpd+CLdiFWmuPAQMPvG2MIWs924p7pMMNmwwOWR
-        8XAt4BAX64oOOnlVUB5uQh2TAqGUh1lBSIMCMoa6YkeBDOKEqSCt8kjpEFjLrZn/nXN+5/zO
-        70s+ChfpyM1UYkoaK0uRJklID+JKj+OmX1hiYnTgco8Y6X7rwVHdXwUkOvfYgaP+kgEMqQtK
-        +Whp4BaOOqwVPHR78SSGho0GDGnrujE0oSvH0RnjYwItq8acWvZdHD29uwupu/4EaNJcjqGO
-        kdeQ6V4NH5k076OrHX0EGmy7QKKLv0zyUeHpBRxZCicBKupt5qG56mw+api2EejGiFf4y8zg
-        nQ+YlRv1JFOktPKZW2N6ghkcSGeaanNJpkpRgjPNP59g2ivnMKZ9WEEyeUoryRhOjfMYW6eZ
-        ZPJbagGjazETTGGznvep6JBHWCyblJjBygLePuyRYCrOx44o1n2z0mTnK8CiQAUEFKRDoL7K
-        gauAByWiawA8t7xKcmQeQIW2wk3mALxe14E9i1y71OqOXAawbLERcOQhgPfGTM4JRZH0Tngy
-        l+/SN9EWAIsaGzEXwekpHN5uGVpbtZE+CPWLVuDCBO0D8+by1rCQfhPa74zyuTpvWGay811L
-        BU69cDaCs2yAfWUThAvjTouytWLtIkhrPeC4qRhw2T2wumUC5/BGONXb4t4phv1nzxAczoKT
-        liV3OBvAAoOOdJVBZ1n+70kuiNO+UNcWwNnfgdctBh7nWA8tMxu4E9ZD9ZXzOCcLYc5pEeeW
-        QINjwl0K4eB3FwjOwkDD0t5CsKX8ubeUP/eW8v9rKwFeCzzZdHlyPCsPTmGP+sulyfL0lHj/
-        mNTkJuD80/0rvQu/gpqpJ/5dAKNAF4AULtkknG9PiBYJY6WZx1hZapQsPYmVdwEvipB4CmMS
-        G6UiOl6axn7FskdY2bMpRgk2KzCv+jJhZEZw67qg6QXpt5KPM7UfhVrT7seZc5JrreNBr74e
-        fvT+zIcvafy2WEvtQ/b34vzSA//VBBmK2zQp+n1ZMDNb3aAmJjSVA7v3BeERxqhHxu/HRsOE
-        OT7nfecv7pU0PEwVp379hWm1x3dZXLzDR6na+lnuZcGxEDgjLXG88GPp8LveMUPH/zn1R3DA
-        tC33wbYn9It/q2pWFw490n651bPEM8RBNYyHrUZHHoyIN1bVd0YFbCsw6iWx1uN9/vu1scod
-        b72SaQsIDzzw9CfJgZVr3bPb94d2x3lGPnjDODLsvWeWarQczhAPh3p1niB++Byxtu2726tH
-        L+mzrn5iKr1plhDyBOmunbhMLv0P+DRJV0IEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsVy+t/xu7rWmZlJBlem61isP3WM2WL13X42
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Se0xbZRzNd+/t7aWx7K7F8A3Ehep04AZDTfzcpvEx3I37Y4sYNS4qZbtA
+        I3TYgrAxBYSx8dha0DFaqi0vRRgWRiHreDhZgAF2LDxGYWM8Rp3WrO0oOAjIpNwu7r9zft85
+        v3N+yUfhIiMZQMnkyaxCLk2QkAKipXvp2vZXZbKYHdYyChn7unFUN6EiUYlrCUf9Zy0YKlaV
+        8tGyZQBH7Y4yHrq+mIWhsctmDP1c14WhWaMWR4WXXQT6N//22ixnGkcr0xGouPMGQLYRLYba
+        x19Ag3dq+GiwYi9qa+8l0NAlHYn0P9r4SJ27gCOr2gZQUU8TD7mrc/jol7+dBLo6HvhGEDM0
+        vI9ZvXqeZIqyHXxm4HYjwQxZUpgLtXkkU555FmeaqjKYVoMbY1rHMknmdLaDZMwnJnmMs2OE
+        ZM6YagFjNI0QjLqpkXdA9LFg92E2QfYlqwh/PVoQX5Bv4CWZNqSNn2jiZQL7E/nAh4L0y7Cq
+        cZbIBwJKRNcAuNTmwDkyD2CPapXPETeAV+p+IB9ZuusrvZafACzLXcQ48heA+pu2NQtFkXQo
+        zMpbd/vRVgCLGhrWRThtx+F10yjmWSWm34OTE2PAYyDoLVDX9pFnLKR3wqy7TpxL2ww1gw/W
+        d/rQu6B6zivZCHs1nt4+ays3w+zmsvXakK4WwKK+YW/TPbD0j28JDouhvcfE5/BT8KFZj3E4
+        Hdqsy15zDoAqs5H0hMG1sDO/J3ggTodA46VwTv4mrNQXAE7hC633NnIVfGFxyzmcGwvhqVwR
+        p5ZA89KsNxTCoW903jIMLLbOAzUI1j52jPaxY7T/5xoAXgv82RRlYhyrjJCzqWFKaaIyRR4X
+        duhI4gWw9qf7V3vmLoLv7ffDOgFGgU4AKVziJ5xvjY8RCQ9Ljx5jFUc+U6QksMpOEEgREn/h
+        IVmDVETHSZPZz1k2iVU8esUon4BM7JS48mv01UJFfd9BccVc6zWNZk+Qz0zH7NsLB90nFU/7
+        jx7f71gEYuVrhegT4jlyy9FnBjLuB0X6js5pot4NiS8djq7fMBBmz/jQyvTz/omtLh+1jIHT
+        +yMr7jiadz5b7zIV3x3ZWvWFurXr/aTaiKkdLvd557YbQ1EvDdtUK8mv6N85FrL1txeXHyhT
+        B7ZTneYPQvMyxu5NH8dmfp28We5y1tLiysDUk5NTt9LzR9NmaqymzL3mmNilgpje6mW/wk2W
+        ksipqJYr6QErzc8bHnbpahKEBkOaLmX61p+NF5NMu0qC8e/8ztErruBN4W99KpFvC5JF6/Mq
+        Yyc0SbuNgic7SiSEMl4aEYorlNL/AHjkNBtCBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprHKsWRmVeSWpSXmKPExsVy+t/xe7oWmZlJBleeaFmsP3WM2WL13X42
         i2kffjJbnJ56lsliUv8MdovfZ88zW+x9N5vV4sKPRiaLmwd2MlmsXH2UyeLJ+lnMFj0HPrBY
         /O26BxRrechs8eehocWkQ9cYLZ5encVksfeWtsWlxyvYLS4tcrfYs/cki8XlXXPYLOYve8pu
         MaHtK7PFjQlPGS0mHt/MavF5aQu7xbrX71ksTtySdpD1uHzF2+PfiTVsHhOb37F7nL+3kcXj
         8tlSj02rOtk8FjZMZfbYvKTeY/eCz0weu282sHn0Nr9j89jZep/V4/2+q2wefVtWMXqs33KV
         xWPC5o2sAUJRejZF+aUlqQoZ+cUltkrRhhZGeoaWFnpGJpZ6hsbmsVZGpkr6djYpqTmZZalF
-        +nYJehmXpvQxFTTwVPzb9J29gfEHZxcjJ4eEgInE4cVbmbsYuTiEBJYySvQ/WcAKkZCQuL2w
-        iRHCFpb4c62LDcQWEnjOKDHhtGQXIwcHm4CWRGMnO0iviMATRon7Px+zgDjMAg0sErcm7mIC
-        aRAWCJWY1NLMDmKzCKhK9H7uBRvKK2At8f3KbXaIBfISMy99ZwcZygkUn/ApAmKXlUT3olus
-        EOWCEidnPmEBsZmBypu3zmaewCgwC0lqFpLUAkamVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmb
-        GIEJZduxn1t2MK589VHvECMTB+MhRgkOZiUR3i+7M5KEeFMSK6tSi/Lji0pzUosPMZoCnT2R
-        WUo0OR+Y0vJK4g3NDEwNTcwsDUwtzYyVxHk9CzoShQTSE0tSs1NTC1KLYPqYODilGpjmrbjk
-        9E73Oa/J+if9fbyVPcrR819umO4l9WfiedHM9K3yc/6Gbyg62Tsx7MYf/zfPimqaavWu+PZK
-        MFqoGGlO1k35krMgp0nx9Pnrk9v+V+5Oj9WaYmo1f90kBvnlXxa+kvf/lb3Zf/fVXQn9s8vy
-        mlri9jQ9lBUtLUw71Ht/Pu/8Sx8y+xa/z3qlkhm3PE9bSebp4+RTjpGcG7Rv817UnFhZHV72
-        4sg0++ZHk1j8eddUrNkx64SjxfM/27/d+Mxw52zurrkCx825z/sceibeyelzr+vJC48DMxy0
-        3zutXD6Fa2E1z7w1r6a1PD37+/TBpn/VXgebj/CvDIt2udqfe01MzXFXetXfVRx1z3r8lViK
-        MxINtZiLihMBMHgdG7EDAAA=
-X-CMS-MailID: 20220427160307eucas1p229f9ebae38fcca9974909799e5e63ccf
+        +nYJehndXQtYC7bwV9xq3czawPiKp4uRk0NCwETi2NrFLF2MXBxCAksZJd6dbGWDSEhI3F7Y
+        xAhhC0v8udbFBlH0nFHiyf01QA4HB5uAlkRjJztIXETgCaPE/Z+PwSYxCzSwSNyauIsJpFtY
+        IEBiZUsXK0gDi4CqxJw9ESBhXgEricbn75khFshLzLz0nR2khFPAWmLCJ7ASIaCS7kW3WCHK
+        BSVOznzCAmIzA5U3b53NPIFRYBaS1CwkqQWMTKsYRVJLi3PTc4sN9YoTc4tL89L1kvNzNzEC
+        E8q2Yz8372Cc9+qj3iFGJg7GQ4wSHMxKIrxfdmckCfGmJFZWpRblxxeV5qQWH2I0Bbp6IrOU
+        aHI+MKXllcQbmhmYGpqYWRqYWpoZK4nzehZ0JAoJpCeWpGanphakFsH0MXFwSjUwbXh0sFYx
+        ffez0B6x6u98avHVshcbxYx9PuuKqC2oyAzgu+CwtoUpebr1lrPqWgqLljxszKicc6BGQ13I
+        6evUJ+ebNSwcVrf4uN4X2H9p0b79p9z1jxvH3u/mepvZFyL1epHRTbW0Za4/4t5/vhSaYfbe
+        Nv/OIaHcQy/5yxZ8X/bHpEG2/YBd47UCT6FTu35+ccguYrMy7AvSi0xYfvGwTtrMxss3rzr+
+        fb/IzDvo9PeqkBVWQo8tRKNua6l/rP7w3DF31qFTMVd5171Zv+Y374rm8BKVtJ2Xjq9u9Yj8
+        yrfkL4+Dq8uUw98/2STONzv8qsZ57wfTRxHFkjMF416p3f6VVTG7S19jdfC2JWpySizFGYmG
+        WsxFxYkABPmx3bEDAAA=
+X-CMS-MailID: 20220427160304eucas1p1a0080df82f76c39882c4298c3c3d99fd
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220427160307eucas1p229f9ebae38fcca9974909799e5e63ccf
+X-RootMTR: 20220427160304eucas1p1a0080df82f76c39882c4298c3c3d99fd
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20220427160307eucas1p229f9ebae38fcca9974909799e5e63ccf
+X-CMS-RootMailID: 20220427160304eucas1p1a0080df82f76c39882c4298c3c3d99fd
 References: <20220427160255.300418-1-p.raghav@samsung.com>
-        <CGME20220427160307eucas1p229f9ebae38fcca9974909799e5e63ccf@eucas1p2.samsung.com>
+        <CGME20220427160304eucas1p1a0080df82f76c39882c4298c3c3d99fd@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Checks were in place to return error when a non power-of-2 zoned devices
-is detected. Remove those checks as non power-of-2 zoned devices are
-now supported.
+Add helpers to calculate alignment, round up and round down
+for zoned devices. These helpers encapsulates the necessary handling for
+power_of_2 and non-power_of_2 zone sizes. Optimized calculations are
+performed for zone sizes that are power_of_2 with log and shifts.
 
-Relax the zone size constraint to align with the BTRFS_STRIPE_LEN(64k)
-so that block groups are aligned to the BTRFS_STRIPE_LEN.
+btrfs_zoned_is_aligned() is added instead of reusing bdev_zone_aligned()
+helper is due to some use cases in btrfs where zone alignment is checked
+before having access to the underlying block device such as in this
+function: btrfs_load_block_group_zone_info().
 
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 ---
- fs/btrfs/zoned.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ fs/btrfs/zoned.h | 28 ++++++++++++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 8f3f542e174c..3ed085762f14 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -395,8 +395,7 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
- 		zone_sectors = bdev_zone_sectors(bdev);
- 	}
+diff --git a/fs/btrfs/zoned.h b/fs/btrfs/zoned.h
+index 49317524e9a6..b9c435961361 100644
+--- a/fs/btrfs/zoned.h
++++ b/fs/btrfs/zoned.h
+@@ -9,6 +9,7 @@
+ #include "disk-io.h"
+ #include "block-group.h"
+ #include "btrfs_inode.h"
++#include "misc.h"
  
--	/* Check if it's power of 2 (see is_power_of_2) */
--	ASSERT(zone_sectors != 0 && (zone_sectors & (zone_sectors - 1)) == 0);
-+	ASSERT(zone_sectors != 0 && IS_ALIGNED(zone_sectors, BTRFS_STRIPE_LEN));
- 	zone_info->zone_size = zone_sectors << SECTOR_SHIFT;
+ /*
+  * Block groups with more than this value (percents) of unusable space will be
+@@ -34,6 +35,33 @@ struct btrfs_zoned_device_info {
+ 	u32 sb_zone_location[BTRFS_SUPER_MIRROR_MAX];
+ };
  
- 	/* We reject devices with a zone size larger than 8GB */
-@@ -835,9 +834,11 @@ int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
- 
- 	ASSERT(rw == READ || rw == WRITE);
- 
--	if (!is_power_of_2(bdev_zone_sectors(bdev)))
--		return -EINVAL;
- 	nr_sectors = bdev_nr_sectors(bdev);
++static inline bool btrfs_zoned_is_aligned(u64 pos, u64 zone_size)
++{
++	u64 remainder = 0;
 +
-+	if (!IS_ALIGNED(nr_sectors, BTRFS_STRIPE_LEN))
-+		return -EINVAL;
++	if (is_power_of_two_u64(zone_size))
++		return IS_ALIGNED(pos, zone_size);
 +
- 	nr_zones = bdev_zone_no(bdev, nr_sectors);
- 
- 	sb_zone = sb_zone_number(bdev, mirror);
++	div64_u64_rem(pos, zone_size, &remainder);
++	return remainder == 0;
++}
++
++static inline u64 btrfs_zoned_roundup(u64 pos, u64 zone_size)
++{
++	if (is_power_of_two_u64(zone_size))
++		return ALIGN(pos, zone_size);
++
++	return roundup(pos, zone_size);
++}
++
++static inline u64 btrfs_zoned_rounddown(u64 pos, u64 zone_size)
++{
++	if (is_power_of_two_u64(zone_size))
++		return round_down(pos, zone_size);
++
++	return rounddown(pos, zone_size);
++}
++
+ #ifdef CONFIG_BLK_DEV_ZONED
+ int btrfs_get_dev_zone(struct btrfs_device *device, u64 pos,
+ 		       struct blk_zone *zone);
 -- 
 2.25.1
 
