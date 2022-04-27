@@ -2,90 +2,282 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CA44C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 10:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02AA0C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 10:42:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbiD0Kl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 06:41:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39466 "EHLO
+        id S229845AbiD0Kpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 06:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51314 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229441AbiD0Kl6 (ORCPT
+        with ESMTP id S229805AbiD0Kpu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 06:41:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0469136EE13
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 03:21:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651054801;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=OpIunjeIYPh5Rz1kLsEA2FMELtrbur+qP4oN0kQVy8o=;
-        b=Wb6na531/Xto0pwyqFuDm1g9tntaiuksKLJnl224TpJCAASzvX3hjnXx8h6Py3My+CDOS1
-        1pyuaszxZ3vy9t9vK83DkUg5tgJoITvL0rvGHGx8drGzb5tB62Vbfw1Cp6heJmf4mwmu32
-        44yPKhJF9gJzRMyp6Kl8zTcA5Z94zmw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-54-vpCXn147NkCXlJjdA95btQ-1; Wed, 27 Apr 2022 05:57:30 -0400
-X-MC-Unique: vpCXn147NkCXlJjdA95btQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Wed, 27 Apr 2022 06:45:50 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A499284D47;
+        Wed, 27 Apr 2022 03:29:18 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id EB63B38035A0;
-        Wed, 27 Apr 2022 09:57:29 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (file01.intranet.prod.int.rdu2.redhat.com [10.11.5.7])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 8D51FC2812C;
-        Wed, 27 Apr 2022 09:57:29 +0000 (UTC)
-Received: from file01.intranet.prod.int.rdu2.redhat.com (localhost [127.0.0.1])
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4) with ESMTP id 23R9vTpg010661;
-        Wed, 27 Apr 2022 05:57:29 -0400
-Received: from localhost (mpatocka@localhost)
-        by file01.intranet.prod.int.rdu2.redhat.com (8.14.4/8.14.4/Submit) with ESMTP id 23R9vTw8010657;
-        Wed, 27 Apr 2022 05:57:29 -0400
-X-Authentication-Warning: file01.intranet.prod.int.rdu2.redhat.com: mpatocka owned process doing -bs
-Date:   Wed, 27 Apr 2022 05:57:29 -0400 (EDT)
-From:   Mikulas Patocka <mpatocka@redhat.com>
-X-X-Sender: mpatocka@file01.intranet.prod.int.rdu2.redhat.com
-To:     "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
-cc:     "yukuai (C)" <yukuai3@huawei.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Hunt, Joshua" <johunt@akamai.com>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-Subject: Re: Precise disk statistics
-In-Reply-To: <1651017390610.22782@akamai.com>
-Message-ID: <alpine.LRH.2.02.2204270549490.10147@file01.intranet.prod.int.rdu2.redhat.com>
-References: <1650661324247.40468@akamai.com> <1650915337169.63486@akamai.com>,<87031651-ba75-2b6f-8a5e-b0b4ef41c65f@huawei.com> <1651017390610.22782@akamai.com>
-User-Agent: Alpine 2.02 (LRH 1266 2009-07-14)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 63E961F388;
+        Wed, 27 Apr 2022 10:29:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1651055356; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rJ68u8jd1pGMMpvwjEOkdhZXSNG8xLLCdO1Cn+Xq+gA=;
+        b=gDV+xrS2GbcllQPvhcHYRsIZ5JmMF2CTqkJH2hZzzFtDP0TXmtJZrpUuuojh3t96ebXcco
+        MAc0BQ67VewzXUn+zMa2QyCdDcBvaXF2/Fq9ddaIFETQCt9fte7B7E4o+krYi72nEXZLYM
+        2ZEuZ2TIjVXu6V9ocZWj7LvaM3Bftfc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1651055356;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=rJ68u8jd1pGMMpvwjEOkdhZXSNG8xLLCdO1Cn+Xq+gA=;
+        b=EkM4US2Ur6JYETOSv0kVXMTGm4wfX9NWB6vWzYaHSmzhLafSzMfv1PShz4hn4/DwHAF+XD
+        EYzGw+r4D0s0dBCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 193711323E;
+        Wed, 27 Apr 2022 10:29:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 24OHBfwaaWJ/AQAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 27 Apr 2022 10:29:16 +0000
+Message-ID: <2082148f-890f-e5f4-c304-b99212aa377e@suse.de>
+Date:   Wed, 27 Apr 2022 12:29:15 +0200
 MIME-Version: 1.0
-Content-Type: TEXT/PLAIN; charset=US-ASCII
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Content-Language: en-US
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org,
+        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
+        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
+        axboe@kernel.dk, msnitzer@redhat.com, bvanassche@acm.org,
+        martin.petersen@oracle.com, kbusch@kernel.org, hch@lst.de,
+        Frederick.Knight@netapp.com, osandov@fb.com,
+        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
+        jack@suse.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Arnav Dawn <arnav.dawn@samsung.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        James Smart <james.smart@broadcom.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Alexander Viro <viro@zeniv.linux.org.uk>,
+        linux-kernel@vger.kernel.org
+References: <20220426101241.30100-1-nj.shetty@samsung.com>
+ <CGME20220426101921epcas5p341707619b5e836490284a42c92762083@epcas5p3.samsung.com>
+ <20220426101241.30100-3-nj.shetty@samsung.com>
+From:   Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v4 02/10] block: Add copy offload support infrastructure
+In-Reply-To: <20220426101241.30100-3-nj.shetty@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-> [+ Mikulas and Ming]
+On 4/26/22 12:12, Nitesh Shetty wrote:
+> Introduce blkdev_issue_copy which supports source and destination bdevs,
+> and an array of (source, destination and copy length) tuples.
+> Introduce REQ_COPY copy offload operation flag. Create a read-write
+> bio pair with a token as payload and submitted to the device in order.
+> Read request populates token with source specific information which
+> is then passed with write request.
+> This design is courtesy Mikulas Patocka's token based copy
 > 
-> I see. Thank you for the response, Kuai, appreciate it.
+> Larger copy will be divided, based on max_copy_sectors,
+> max_copy_range_sector limits.
 > 
-> The conversation here https://lkml.org/lkml/2020/3/24/1870 hints at 
-> potential improvements to io_ticks tracking.
+> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
+> Signed-off-by: Arnav Dawn <arnav.dawn@samsung.com>
+> ---
+>   block/blk-lib.c           | 232 ++++++++++++++++++++++++++++++++++++++
+>   block/blk.h               |   2 +
+>   include/linux/blk_types.h |  21 ++++
+>   include/linux/blkdev.h    |   2 +
+>   include/uapi/linux/fs.h   |  14 +++
+>   5 files changed, 271 insertions(+)
 > 
-> @Mikulas, Mike, please let us know if you have plans for more accurate 
-> accounting or if there is some idea we can work on and submit a patch.
+> diff --git a/block/blk-lib.c b/block/blk-lib.c
+> index 09b7e1200c0f..ba9da2d2f429 100644
+> --- a/block/blk-lib.c
+> +++ b/block/blk-lib.c
+> @@ -117,6 +117,238 @@ int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
+>   }
+>   EXPORT_SYMBOL(blkdev_issue_discard);
+>   
+> +/*
+> + * Wait on and process all in-flight BIOs.  This must only be called once
+> + * all bios have been issued so that the refcount can only decrease.
+> + * This just waits for all bios to make it through bio_copy_end_io. IO
+> + * errors are propagated through cio->io_error.
+> + */
+> +static int cio_await_completion(struct cio *cio)
+> +{
+> +	int ret = 0;
+> +	unsigned long flags;
+> +
+> +	spin_lock_irqsave(&cio->lock, flags);
+> +	if (cio->refcount) {
+> +		cio->waiter = current;
+> +		__set_current_state(TASK_UNINTERRUPTIBLE);
+> +		spin_unlock_irqrestore(&cio->lock, flags);
+> +		blk_io_schedule();
+> +		/* wake up sets us TASK_RUNNING */
+> +		spin_lock_irqsave(&cio->lock, flags);
+> +		cio->waiter = NULL;
+> +		ret = cio->io_err;
+> +	}
+> +	spin_unlock_irqrestore(&cio->lock, flags);
+> +	kvfree(cio);
+> +
+> +	return ret;
+> +}
+> +
+> +static void bio_copy_end_io(struct bio *bio)
+> +{
+> +	struct copy_ctx *ctx = bio->bi_private;
+> +	struct cio *cio = ctx->cio;
+> +	sector_t clen;
+> +	int ri = ctx->range_idx;
+> +	unsigned long flags;
+> +	bool wake = false;
+> +
+> +	if (bio->bi_status) {
+> +		cio->io_err = bio->bi_status;
+> +		clen = (bio->bi_iter.bi_sector << SECTOR_SHIFT) - ctx->start_sec;
+> +		cio->rlist[ri].comp_len = min_t(sector_t, clen, cio->rlist[ri].comp_len);
+> +	}
+> +	__free_page(bio->bi_io_vec[0].bv_page);
+> +	kfree(ctx);
+> +	bio_put(bio);
+> +
+> +	spin_lock_irqsave(&cio->lock, flags);
+> +	if (((--cio->refcount) <= 0) && cio->waiter)
+> +		wake = true;
+> +	spin_unlock_irqrestore(&cio->lock, flags);
+> +	if (wake)
+> +		wake_up_process(cio->waiter);
+> +}
+> +
+> +/*
+> + * blk_copy_offload	- Use device's native copy offload feature
+> + * Go through user provide payload, prepare new payload based on device's copy offload limits.
+> + */
+> +int blk_copy_offload(struct block_device *src_bdev, int nr_srcs,
+> +		struct range_entry *rlist, struct block_device *dst_bdev, gfp_t gfp_mask)
+> +{
+> +	struct request_queue *sq = bdev_get_queue(src_bdev);
+> +	struct request_queue *dq = bdev_get_queue(dst_bdev);
+> +	struct bio *read_bio, *write_bio;
+> +	struct copy_ctx *ctx;
+> +	struct cio *cio;
+> +	struct page *token;
+> +	sector_t src_blk, copy_len, dst_blk;
+> +	sector_t remaining, max_copy_len = LONG_MAX;
+> +	unsigned long flags;
+> +	int ri = 0, ret = 0;
+> +
+> +	cio = kzalloc(sizeof(struct cio), GFP_KERNEL);
+> +	if (!cio)
+> +		return -ENOMEM;
+> +	cio->rlist = rlist;
+> +	spin_lock_init(&cio->lock);
+> +
+> +	max_copy_len = min_t(sector_t, sq->limits.max_copy_sectors, dq->limits.max_copy_sectors);
+> +	max_copy_len = min3(max_copy_len, (sector_t)sq->limits.max_copy_range_sectors,
+> +			(sector_t)dq->limits.max_copy_range_sectors) << SECTOR_SHIFT;
+> +
+> +	for (ri = 0; ri < nr_srcs; ri++) {
+> +		cio->rlist[ri].comp_len = rlist[ri].len;
+> +		src_blk = rlist[ri].src;
+> +		dst_blk = rlist[ri].dst;
+> +		for (remaining = rlist[ri].len; remaining > 0; remaining -= copy_len) {
+> +			copy_len = min(remaining, max_copy_len);
+> +
+> +			token = alloc_page(gfp_mask);
+> +			if (unlikely(!token)) {
+> +				ret = -ENOMEM;
+> +				goto err_token;
+> +			}
+> +
+> +			ctx = kzalloc(sizeof(struct copy_ctx), gfp_mask);
+> +			if (!ctx) {
+> +				ret = -ENOMEM;
+> +				goto err_ctx;
+> +			}
+> +			ctx->cio = cio;
+> +			ctx->range_idx = ri;
+> +			ctx->start_sec = dst_blk;
+> +
+> +			read_bio = bio_alloc(src_bdev, 1, REQ_OP_READ | REQ_COPY | REQ_NOMERGE,
+> +					gfp_mask);
+> +			if (!read_bio) {
+> +				ret = -ENOMEM;
+> +				goto err_read_bio;
+> +			}
+> +			read_bio->bi_iter.bi_sector = src_blk >> SECTOR_SHIFT;
+> +			__bio_add_page(read_bio, token, PAGE_SIZE, 0);
+> +			/*__bio_add_page increases bi_size by len, so overwrite it with copy len*/
+> +			read_bio->bi_iter.bi_size = copy_len;
+> +			ret = submit_bio_wait(read_bio);
+> +			bio_put(read_bio);
+> +			if (ret)
+> +				goto err_read_bio;
+> +
+> +			write_bio = bio_alloc(dst_bdev, 1, REQ_OP_WRITE | REQ_COPY | REQ_NOMERGE,
+> +					gfp_mask);
+> +			if (!write_bio) {
+> +				ret = -ENOMEM;
+> +				goto err_read_bio;
+> +			}
+> +			write_bio->bi_iter.bi_sector = dst_blk >> SECTOR_SHIFT;
+> +			__bio_add_page(write_bio, token, PAGE_SIZE, 0);
+> +			/*__bio_add_page increases bi_size by len, so overwrite it with copy len*/
+> +			write_bio->bi_iter.bi_size = copy_len;
+> +			write_bio->bi_end_io = bio_copy_end_io;
+> +			write_bio->bi_private = ctx;
+> +
+> +			spin_lock_irqsave(&cio->lock, flags);
+> +			++cio->refcount;
+> +			spin_unlock_irqrestore(&cio->lock, flags);
+> +
+> +			submit_bio(write_bio);
+> +			src_blk += copy_len;
+> +			dst_blk += copy_len;
+> +		}
+> +	}
+> +
 
-I know that the accounting is not accurate, but more accurate accounting 
-needed a shared atomic variable and it caused performance degradation. So, 
-we don't plan to improve the accounting.
+Hmm. I'm not sure if I like the copy loop.
+What I definitely would do is to allocate the write bio before reading 
+data; after all, if we can't allocate the write bio reading is pretty 
+much pointless.
 
-Mikulas
+But the real issue I have with this is that it's doing synchronous 
+reads, thereby limiting the performance.
 
-> 
-> Thanks
-> -Sri
-> 
-> 
-> 
+Can't you submit the write bio from the end_io function of the read bio?
+That would disentangle things, and we should be getting a better 
+performance.
 
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
