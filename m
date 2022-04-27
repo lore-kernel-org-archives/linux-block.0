@@ -2,219 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E87D9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 21:34:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA04C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 21:56:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237463AbiD0VhQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 17:37:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40958 "EHLO
+        id S236348AbiD0V71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 17:59:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239562AbiD0Vfa (ORCPT
+        with ESMTP id S235023AbiD0V70 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 17:35:30 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A060D2716C
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 14:32:18 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id g8so212710pfh.5
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 14:32:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=NGtD7pTj2B4cUHsyyQ/puOKcndrpml9ymFj4xPybbpI=;
-        b=P1WKJthTsp1W+j06dbtGA7NqfDgaaNNthVzqZk8f3KGq25k5x/OcwZxiwsWJAclOzd
-         DJKmcYXSvNZ40KnXCdi4g7p0XoSoq8gcIfo6mfrSeHWa1LG9In2srSB+z0sMUkWmSywD
-         q5W93FWHP4jLLUgEkFBvhpIh20D9lM1FPZXr0Q7a24/19VmohOKowdtCmozXcwqv5khu
-         XSaWwFkmXnG5N6VOJrGowqcPnmpxix8I3NI0oURlIDYmuZIHUr+OvsCJt8SPTYW/MyS7
-         Kr51q7o2iC3E27BbZjaEw3KblPADjpEoawJ5i3USfu2A7kh9sRnNgBZKK6LQytl0rWDO
-         Am9A==
-X-Gm-Message-State: AOAM530Pfbj2LTF2GSsg/jHWLLzsRYaaKv0+WCdaMGkBIOSE2yFJfCDN
-        SO1Q0gYNqsJvMw6+3fpz+14=
-X-Google-Smtp-Source: ABdhPJysQE1X3VUu848w22emoIC9+vFjvYCvE5B/Oh6jDbYgCjUUQOorOtIrM8Km3RjsL0neIDIiQw==
-X-Received: by 2002:a63:ad0c:0:b0:374:50b4:c955 with SMTP id g12-20020a63ad0c000000b0037450b4c955mr25065883pgf.530.1651095138077;
-        Wed, 27 Apr 2022 14:32:18 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:6cbb:d78e:9b3:bb62])
-        by smtp.gmail.com with ESMTPSA id nm6-20020a17090b19c600b001cd4989fedbsm7700112pjb.39.2022.04.27.14.32.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Apr 2022 14:32:17 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Omar Sandoval <osandov@fb.com>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH blktests 3/3] tests/scsi: Add tests for SCSI devices with gap zones
-Date:   Wed, 27 Apr 2022 14:31:43 -0700
-Message-Id: <20220427213143.2490653-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.36.0.464.gb9c8b46e94-goog
-In-Reply-To: <20220427213143.2490653-1-bvanassche@acm.org>
-References: <20220427213143.2490653-1-bvanassche@acm.org>
+        Wed, 27 Apr 2022 17:59:26 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9484114E
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 14:56:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1651096574; x=1682632574;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ndxlCJcsWNsxefRwlgceKJ0VvE3NnTsnasUGPtb8I/A=;
+  b=INasHToD2EVFoYTuKi+ly8Tlt24ri+0O8Gq+4/UgY3Qfy0Bw1I81As71
+   Oe6spaq7T8rm1FQFau0kn3NSn+2/IX+Yp5ZFgPPxdDz9+vbAv6SgiztU3
+   xi+t7PT9T9HkHUulApHRPclsauUnffMIRe6C41ioDitaCbWfW1U7PBcHI
+   C9rAkqFR6f59N0VhMoiG67pkWk/whAWnmUhIz9FxnYDEjOTQcKoU908yA
+   xpsdzD+Rf2qUnigiOmkyBK3rX+RHgrKR0m3aFY1XBQNHwTVdNKFrj1vMm
+   C5yzfsIzQP0LATCE4Nm4C7rwNQe0xjS/VXuE9uuVpcwud0qxqISb1Troj
+   A==;
+X-IronPort-AV: E=Sophos;i="5.90,294,1643644800"; 
+   d="scan'208";a="197838684"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2022 05:56:11 +0800
+IronPort-SDR: 27SAauzrUJML8v6OzAuN6elLpu0JPVU7yE6VKK5QjreTn7UdW/4KFwg8cgXps6+OIdZiey6yLb
+ TP+6Se7dpHC7GsnUHR/LB9n5QEfH0J0mJkLSO/JYUBnYtII2TIqybGtwFXqS6DGhqk+HQhIFJV
+ lBBlyDISnT4auzhPSTbuecEXT4gWqve4+rA9sSmDXWi+viU0r9R3vncv0tu/QLNqSEc/mDDjE2
+ RBJ9plVs7R22SDYdp4pd4L5ehORJ14aLkZyEUtXGWDO0TrTmzQCYpRfCuxaUHJyChHpLBOVifw
+ eBuFPx1fqag/7gZV8rF11Jxh
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Apr 2022 14:27:03 -0700
+IronPort-SDR: CRZo2V4itjpHagBSlS8P9hqUB1MQyRSmyJ+znJ3g+QCTOg1xv38DR6VDKNzCQwH6kHSq9oU+Rf
+ 72wIvj2IpcKk1ROE5H138b/NiJvILJMSKu0C5prmlNVuZqjpGvYHrH6ykC8kXLqOeGvRZoho23
+ 09hyRedlVmwlZhWqVFWNpg7IWXjlKZkqojP7wXWOVckEvxuvZt8zZX8dZNqfA2gQcXGl5a67iA
+ N+d0lqH199Wdu6idmaj1n6qWh3RusH4MZ5ax9gErzLGnS3QWSozjYGqng3Z7UATCjYy7ARC0ka
+ oQo=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Apr 2022 14:56:12 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KpXd65LkZz1SHwl
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 14:56:10 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1651096569; x=1653688570; bh=ndxlCJcsWNsxefRwlgceKJ0VvE3NnTsnasU
+        GPtb8I/A=; b=e3SQWIC7isONhMVABcQXbRoKsYP01AGBbkTTjAVX/tATNA9akqV
+        o0SzlNWttcnvWNegaIDqsgtVaRN7EVxQ3KYkcm+l9jYgyZmBuBYBE4JaxLs2gHlp
+        W1W8Mvuy7yp4sC9d1mSOqpu2vkVNAa4MzcfMRY1QziIs9+dyJcsECcIpZDlx7FnA
+        sLmbmraKN3ndEuoI8banOkqH+BI0AIeOKJ0Jrr31eP4b5BaP469/vPWfa5e+E+C4
+        3D/ZgYZzzLxhG1LuI1msi7Jn0cK1sHIIimzpgNd8UB6ilKxM3M2xEHUkmkK7FsyN
+        iTtpZ7+j79y0W+8DaWFHsJGQlJCaD693HFw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id w8a8kW-XZlL5 for <linux-block@vger.kernel.org>;
+        Wed, 27 Apr 2022 14:56:09 -0700 (PDT)
+Received: from [10.225.163.27] (unknown [10.225.163.27])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4KpXd44RlGz1Rvlc;
+        Wed, 27 Apr 2022 14:56:08 -0700 (PDT)
+Message-ID: <3f80a126-e52a-955b-aca4-14218d26faf5@opensource.wdc.com>
+Date:   Thu, 28 Apr 2022 06:56:07 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH v4 00/10] Add Copy offload support
+Content-Language: en-US
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, nitheshshetty@gmail.com,
+        linux-kernel@vger.kernel.org
+References: <CGME20220426101804epcas5p4a0a325d3ce89e868e4924bbdeeba6d15@epcas5p4.samsung.com>
+ <20220426101241.30100-1-nj.shetty@samsung.com>
+ <c02f67e1-2f76-7e52-8478-78e28b96b6a1@opensource.wdc.com>
+ <20220427153826.GE9558@test-zns>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220427153826.GE9558@test-zns>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- tests/scsi/009     | 56 +++++++++++++++++++++++++++++++++++++
- tests/scsi/009.out |  2 ++
- tests/scsi/010     | 70 ++++++++++++++++++++++++++++++++++++++++++++++
- tests/scsi/010.out |  2 ++
- 4 files changed, 130 insertions(+)
- create mode 100755 tests/scsi/009
- create mode 100644 tests/scsi/009.out
- create mode 100644 tests/scsi/010
- create mode 100644 tests/scsi/010.out
+On 4/28/22 00:38, Nitesh Shetty wrote:
+> On Wed, Apr 27, 2022 at 10:46:32AM +0900, Damien Le Moal wrote:
+>> On 4/26/22 19:12, Nitesh Shetty wrote:
+>>> The patch series covers the points discussed in November 2021 virtual=
+ call
+>>> [LSF/MM/BFP TOPIC] Storage: Copy Offload[0].
+>>> We have covered the Initial agreed requirements in this patchset.
+>>> Patchset borrows Mikulas's token based approach for 2 bdev
+>>> implementation.
+>>>
+>>> Overall series supports =E2=80=93
+>>>
+>>> 1. Driver
+>>> - NVMe Copy command (single NS), including support in nvme-target (fo=
+r
+>>>     block and file backend)
+>>>
+>>> 2. Block layer
+>>> - Block-generic copy (REQ_COPY flag), with interface accommodating
+>>>     two block-devs, and multi-source/destination interface
+>>> - Emulation, when offload is natively absent
+>>> - dm-linear support (for cases not requiring split)
+>>>
+>>> 3. User-interface
+>>> - new ioctl
+>>> - copy_file_range for zonefs
+>>>
+>>> 4. In-kernel user
+>>> - dm-kcopyd
+>>> - copy_file_range in zonefs
+>>>
+>>> For zonefs copy_file_range - Seems we cannot levearge fstest here. Li=
+mited
+>>> testing is done at this point using a custom application for unit tes=
+ting.
+>>
+>> https://protect2.fireeye.com/v1/url?k=3Db14bf8e1-d0361099-b14a73ae-74f=
+e485fffb1-9bd9bbb269af18f9&q=3D1&e=3Db9714c29-ea22-4fa5-8a2a-eeb42ca4bdc1=
+&u=3Dhttps%3A%2F%2Fgithub.com%2Fwesterndigitalcorporation%2Fzonefs-tools
+>>
+>> ./configure --with-tests
+>> make
+>> sudo make install
+>>
+>> Then run tests/zonefs-tests.sh
+>>
+>> Adding test case is simple. Just add script files under tests/scripts
+>>
+>> I just realized that the README file of this project is not documentin=
+g
+>> this. I will update it.
+>>
+>=20
+> Thank you. We will try to use this.
+> Any plans to integrate this testsuite with fstests(xfstest) ?
 
-diff --git a/tests/scsi/009 b/tests/scsi/009
-new file mode 100755
-index 000000000000..38f771f14e02
---- /dev/null
-+++ b/tests/scsi/009
-@@ -0,0 +1,56 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2022 Google LLC
-+
-+. tests/scsi/rc
-+. common/scsi_debug
-+
-+DESCRIPTION="test gap zone support with BTRFS"
-+QUICK=1
-+
-+requires() {
-+	_have_fio &&
-+	_have_module_param scsi_debug zone_cap_mb &&
-+	_have_program mkfs.btrfs
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local params=(
-+		delay=0
-+		dev_size_mb=1024
-+		sector_size=4096
-+		zbc=host-managed
-+		zone_cap_mb=3
-+		zone_nr_conv=16
-+		zone_size_mb=4
-+	)
-+	_init_scsi_debug "${params[@]}" || return 1
-+
-+	local dev="/dev/${SCSI_DEBUG_DEVICES[0]}" fail
-+
-+	mkfs.btrfs "${dev}" >>"${FULL}" 2>&1 &&
-+	local mount_dir="$TMPDIR/mnt" &&
-+	mkdir -p "${mount_dir}" &&
-+	mount -t btrfs "${dev}" "${mount_dir}" &&
-+	local fio_args=(
-+		--size=1M
-+		--directory="${mount_dir}"
-+		--time_based
-+		--runtime=10
-+	) &&
-+	_run_fio_verify_io "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-+	fail=true
-+
-+	umount "${mount_dir}" >>"${FULL}" 2>&1
-+
-+	_exit_scsi_debug
-+
-+	if [ -z "$fail" ]; then
-+		echo "Test complete"
-+	else
-+		echo "Test failed"
-+		return 1
-+	fi
-+}
-diff --git a/tests/scsi/009.out b/tests/scsi/009.out
-new file mode 100644
-index 000000000000..f6db2a371d9e
---- /dev/null
-+++ b/tests/scsi/009.out
-@@ -0,0 +1,2 @@
-+Running scsi/009
-+Test complete
-diff --git a/tests/scsi/010 b/tests/scsi/010
-new file mode 100644
-index 000000000000..4fdc6f82e732
---- /dev/null
-+++ b/tests/scsi/010
-@@ -0,0 +1,70 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+# Copyright (C) 2022 Google LLC
-+
-+. tests/scsi/rc
-+. common/null_blk
-+. common/scsi_debug
-+
-+DESCRIPTION="test gap zone support with F2FS"
-+QUICK=1
-+
-+requires() {
-+	_have_fio &&
-+	_have_modules null_blk &&
-+	_have_module_param scsi_debug zone_cap_mb &&
-+	_have_program mkfs.f2fs
-+}
-+
-+test() {
-+	echo "Running ${TEST_NAME}"
-+
-+	local mount_dir="$TMPDIR/mnt"
-+
-+	local null_blk_params=(
-+		blocksize=4096
-+		completion_nsec=0
-+		memory_backed=1
-+		size=1024 # MB
-+		submit_queues=1
-+		power=1
-+	)
-+	_init_null_blk nr_devices=0 queue_mode=2 &&
-+	_configure_null_blk nullb0 "${null_blk_params[@]}" || return $?
-+	local cdev=/dev/nullb0
-+
-+	local scsi_debug_params=(
-+		delay=0
-+		dev_size_mb=1024
-+		sector_size=4096
-+		zbc=host-managed
-+		zone_cap_mb=3
-+		zone_nr_conv=0
-+		zone_size_mb=4
-+	)
-+	_init_scsi_debug "${scsi_debug_params[@]}" &&
-+	local zdev="/dev/${SCSI_DEBUG_DEVICES[0]}" fail &&
-+	ls -ld "${cdev}" "${zdev}" >>"${FULL}" &&
-+	mkfs.f2fs -m "${cdev}" -c "${zdev}" >>"${FULL}" 2>&1 &&
-+	mkdir -p "${mount_dir}" &&
-+	mount -t f2fs "${cdev}" "${mount_dir}" &&
-+	local fio_args=(
-+		--size=1M
-+		--directory="${mount_dir}"
-+		--time_based
-+		--runtime=10
-+	) &&
-+	_run_fio_verify_io "${fio_args[@]}" >>"${FULL}" 2>&1 ||
-+	fail=true
-+
-+	umount "${mount_dir}" >>"${FULL}" 2>&1
-+	_exit_scsi_debug
-+	_exit_null_blk
-+
-+	if [ -z "$fail" ]; then
-+		echo "Test complete"
-+	else
-+		echo "Test failed"
-+		return 1
-+	fi
-+}
-diff --git a/tests/scsi/010.out b/tests/scsi/010.out
-new file mode 100644
-index 000000000000..6581d5eb2c5a
---- /dev/null
-+++ b/tests/scsi/010.out
-@@ -0,0 +1,2 @@
-+Running scsi/010
-+Test complete
+No. It is not a good fit since zonefs cannot pass most of the generic tes=
+t
+cases.
+
+>=20
+> --
+> Nitesh Shetty
+>=20
+>=20
+
+
+--=20
+Damien Le Moal
+Western Digital Research
