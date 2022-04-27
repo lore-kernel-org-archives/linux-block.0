@@ -2,100 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B29E5C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 12:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C529AC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 13:29:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234854AbiD0M4F (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 08:56:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59416 "EHLO
+        id S235985AbiD0Ncd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 09:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234805AbiD0M4E (ORCPT
+        with ESMTP id S235846AbiD0Ncc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 08:56:04 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 749893BA5F;
-        Wed, 27 Apr 2022 05:52:53 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 30C3C210F4;
-        Wed, 27 Apr 2022 12:52:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1651063972; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yhhsQZ/apy3ajEmL5BMkQH4udIsKMO/zX6YXUvskbjo=;
-        b=HKwz9nxCbcYcqN9QwfH1r/OK8igSL7ddbDwQPY0FTJ9uWwqeDCyym37BrWo7AuYPgFyIfr
-        ZZUi0JysOo5F8s8wa3Efo0O62vpkwufpcdX5yjShpE8Nb6w+Qo8LJrQ/J/IQwp1cmsbITY
-        30oslwuMsB2FRM+EppyUlA2FiA7c9DM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1651063972;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=yhhsQZ/apy3ajEmL5BMkQH4udIsKMO/zX6YXUvskbjo=;
-        b=HMVy/XOhIcTAl6OpMei3jxWEDWxT8+4SiZ5FoEVgdmSiCFbi8a8tlLNJLhHJTzd2g71rRw
-        2X9PmFajXjj4N0Cw==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 27 Apr 2022 09:32:32 -0400
+Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CE343F896;
+        Wed, 27 Apr 2022 06:29:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1651066159;
+        bh=svw2QKLySLeBa5NNG/2lDGa1cC2jheHbjip4Kiq8SFo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=QLwApHFr3nCbCYTm5CWgFeivIHf2YkzTif89S0W47Cy9Y2o2vuu66MxF4aeS4ilfg
+         GXAzMul1I56L0CYwOM5XA8WQ1isTAWoNasqrgdNrGpiaU3oRh+5odJiuCa127KQlIS
+         3vfSlWiDzLbLMEwrOYGlP41vjdLtYhAtOBlIZGhk=
+Received: from localhost (localhost [127.0.0.1])
+        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 852711288C2B;
+        Wed, 27 Apr 2022 09:29:19 -0400 (EDT)
+Received: from bedivere.hansenpartnership.com ([127.0.0.1])
+        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id 66aQ9DCPgOss; Wed, 27 Apr 2022 09:29:19 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+        d=hansenpartnership.com; s=20151216; t=1651066158;
+        bh=svw2QKLySLeBa5NNG/2lDGa1cC2jheHbjip4Kiq8SFo=;
+        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
+        b=OB4HmMNFTRjCCWJIUeVZMKQsCcrkIEiWCs7jRmR5UbxTOyyWe3grkEMqiwmm3UkTl
+         oCz2+xF1VurT45hfyL0kOmice0jPJcJTVwPoweLGHWNqN8HyQejxi6R/Ytvh3NIcue
+         15gce1pryuw4ME8biooP3KzK9NTzL0RuN2t6B8VI=
+Received: from lingrow.int.hansenpartnership.com (unknown [IPv6:2601:5c4:4300:c551::c14])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 1FD2B2C141;
-        Wed, 27 Apr 2022 12:52:51 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 718DBA0620; Wed, 27 Apr 2022 14:52:51 +0200 (CEST)
-Date:   Wed, 27 Apr 2022 14:52:51 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     jack@suse.cz, tj@kernel.org, axboe@kernel.dk,
-        paolo.valente@linaro.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next v3 1/3] block, bfq: record how many queues are busy
- in bfq_group
-Message-ID: <20220427125251.yl7ff4ti33w6ktrf@quack3.lan>
-References: <20220427124722.48465-1-yukuai3@huawei.com>
- <20220427124722.48465-2-yukuai3@huawei.com>
+        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 5AA8C1288C2F;
+        Wed, 27 Apr 2022 09:29:15 -0400 (EDT)
+Message-ID: <d134571f381868e1cec74aca905012d8aec9fec8.camel@HansenPartnership.com>
+Subject: Re: Race-free block device opening
+From:   James Bottomley <James.Bottomley@HansenPartnership.com>
+To:     Demi Marie Obenour <demi@invisiblethingslab.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Block Mailing List <linux-block@vger.kernel.org>,
+        Linux Filesystem Mailing List <linux-fsdevel@vger.kernel.org>
+Date:   Wed, 27 Apr 2022 09:29:12 -0400
+In-Reply-To: <Ymg2HIc8NGraPNbM@itl-email>
+References: <Ymg2HIc8NGraPNbM@itl-email>
+Content-Type: multipart/signed; micalg="pgp-sha256";
+        protocol="application/pgp-signature"; boundary="=-m2/yxg2jUsj/Q2J7p/Oh"
+User-Agent: Evolution 3.34.4 
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220427124722.48465-2-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 27-04-22 20:47:20, Yu Kuai wrote:
-> Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
-> 
-> Add a counter 'busy_queues' in bfq_group, and update it in
-> bfq_add/del_bfqq_busy().
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-...
+--=-m2/yxg2jUsj/Q2J7p/Oh
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index f8eb340381cf..53826797430f 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -218,6 +218,14 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
->  	return false;
->  }
->  
-> +static void bfq_update_busy_queues(struct bfq_queue *bfqq, bool is_add)
-> +{
-> +	if (is_add)
-> +		bfqq_group(bfqq)->busy_queues++;
-> +	else
-> +		bfqq_group(bfqq)->busy_queues--;
-> +}
-> +
->  #else /* CONFIG_BFQ_GROUP_IOSCHED */
+On Tue, 2022-04-26 at 14:12 -0400, Demi Marie Obenour wrote:
+> Right now, opening block devices in a race-free way is incredibly
+> hard.
 
-I think the bool argument here unnecessarily hurts readability (it's
-difficult to see what the argument means without looking into the
-implementation). I'd rather create two functions bfq_{inc,dec}_busy_queues()
-or if you really insist on a single function, we can have
-bfq_add_busy_queues() and have 'int' argument that will be +1 or -1.
+Could you be more specific about what the race you're having problems
+with is?  What is racing.
 
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> The only reasonable approach I know of is sd_device_new_from_path() +
+> sd_device_open(), and is only available in systemd git main.  It also
+> requires waiting on systemd-udev to have processed udev rules, which
+> can be a bottleneck.
+
+This doesn't actually seem to be in my copy of systemd.
+
+>   There are better approaches in various special cases, such as using
+> device-mapper ioctls to check that the device one has opened still
+> has the name and/or UUID one expects.  However, none of them works
+> for a plain call to open(2).
+
+Just so we're clear: if you call open on, say /dev/sdb1 and something
+happens to hot unplug and then replug a different device under that
+node, the file descriptor you got at open does *not* point to the new
+node.  It points to a dead device responder that errors everything.
+
+The point being once you open() something, the file descriptor is
+guaranteed to point to the same device (or error).
+
+> A much better approach would be for udev to point its symlinks at
+> "/dev/disk/by-diskseq/$DISKSEQ" for non-partition disk devices, or at
+> "/dev/disk/by-diskseq/${DISKSEQ}p${PARTITION}" for partitions.  A
+> filesystem would then be mounted at "/dev/disk/by-diskseq" that
+> provides for race-free opening of these paths.  This could be
+> implemented in userspace using FUSE, either with difficulty using the
+> current kernel API, or easily and efficiently using a new kernel API
+> for opening a block device by diskseq + partition.  However, I think
+> this should be handled by the Linux kernel itself.
+>=20
+> What would be necessary to get this into the kernel?  I would like to
+> implement this, but I don=E2=80=99t have the time to do so anytime soon. =
+ Is
+> anyone else interested in taking this on?  I suspect the kernel code
+> needed to implement this would be quite a bit smaller than the FUSE
+> implementation.
+
+So it sounds like the problem is you want to be sure that the device
+doesn't change after you've called libblkid to identify it but before
+you call open?  If that's so, the way you do this in userspace is to
+call libblkid again after the open.  If the before and after id match,
+you're as sure as you can be the open was of the right device.
+
+James
+
+
+--=-m2/yxg2jUsj/Q2J7p/Oh
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+Content-Transfer-Encoding: 7bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABMIAB0WIQTnYEDbdso9F2cI+arnQslM7pishQUCYmlFKAAKCRDnQslM7pis
+hUPRAP9pjLs7yDBOO2c5Li9a7Pn7ceWfSbT5gPoE+EHnc411EAD+ILidPuqJQpgK
+dqmy5RX/RG/fj7Tt6j8VKRMWYrsXFbk=
+=fhrO
+-----END PGP SIGNATURE-----
+
+--=-m2/yxg2jUsj/Q2J7p/Oh--
+
