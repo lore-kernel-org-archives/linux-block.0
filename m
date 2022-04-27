@@ -2,177 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49602C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 14:32:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C71E2C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 14:41:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237995AbiD0Oel (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 10:34:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58978 "EHLO
+        id S238365AbiD0Oon (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 10:44:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238047AbiD0Oec (ORCPT
+        with ESMTP id S238416AbiD0Ook (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 10:34:32 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAED31A3B0
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 07:31:12 -0700 (PDT)
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220427143110epoutp0246b856e1431b83896b1d9b08fc634b72~px0y9xzSO1245312453epoutp025
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 14:31:10 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220427143110epoutp0246b856e1431b83896b1d9b08fc634b72~px0y9xzSO1245312453epoutp025
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1651069870;
-        bh=crH6lA8CKSr3raD35a8WNJj9gNhvnxzuqz4w8DLYYGk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GBUm2WD6F3Z5HwMcUyBQaYPtjxARISGL4mfMaC3csS9bnpOWsACa0RlTfaPQLtcUd
-         wryIIjjjsiqT27fY9c4cx+pfYLbriKHi6ksL7g46ARz2QpskEneEtLg3mQ86CClAhO
-         eUl329tZKqMCkDRd64ixsq8/+cfcTW1kLjuotojQ=
-Received: from epsnrtp2.localdomain (unknown [182.195.42.163]) by
-        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
-        20220427143110epcas5p40c88d0aed948bf707494648074071e87~px0yta3Zx2356823568epcas5p4v;
-        Wed, 27 Apr 2022 14:31:10 +0000 (GMT)
-Received: from epsmges5p1new.samsung.com (unknown [182.195.38.183]) by
-        epsnrtp2.localdomain (Postfix) with ESMTP id 4KpLlZ5wJ5z4x9Pt; Wed, 27 Apr
-        2022 14:31:06 +0000 (GMT)
-Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        05.DD.10063.9A359626; Wed, 27 Apr 2022 23:31:05 +0900 (KST)
-Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20220427130824epcas5p38594effe1d648be050ff00284e115014~pwshxFhMl2087820878epcas5p35;
-        Wed, 27 Apr 2022 13:08:24 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220427130824epsmtrp14e26381493d2df92a583d1f425e97e0c~pwshwRhe_3201832018epsmtrp1G;
-        Wed, 27 Apr 2022 13:08:24 +0000 (GMT)
-X-AuditID: b6c32a49-4b5ff7000000274f-c5-626953a9862a
-Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        D8.A4.08853.84049626; Wed, 27 Apr 2022 22:08:24 +0900 (KST)
-Received: from test-zns (unknown [107.110.206.5]) by epsmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220427130823epsmtip2faace445336901ad6bad32c4c8c06a3d~pwsghFvIJ1516015160epsmtip2s;
-        Wed, 27 Apr 2022 13:08:23 +0000 (GMT)
-Date:   Wed, 27 Apr 2022 18:33:15 +0530
-From:   Nitesh Shetty <nj.shetty@samsung.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
-        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, nitheshshetty@gmail.com,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 03/10] block: Introduce a new ioctl for copy
-Message-ID: <20220427130315.GB9558@test-zns>
+        Wed, 27 Apr 2022 10:44:40 -0400
+Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0B6534B86
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 07:41:28 -0700 (PDT)
+Received: by mail-io1-xd30.google.com with SMTP id e15so3489442iob.3
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 07:41:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=aKqOi2YxxgVMYrT/iMU227sAyZ3FZV58U8M3nF1WuNE=;
+        b=tiIRUA3tr38eZE/JFWO/cio3PgqEpC8xi0+AWAjkClai38fMT7rtoSAEezo0nAULjw
+         Hr72iHq2mpHjVU2IUm0aHnNGGN4DOGD6RdqxnVFniNhh3zZkCFR2jq9JYl+jPjqFS7no
+         GZNtzlD/INFWl4IaiMyiQzLuxg2cfRzyn/e/XnPRw6pDAXE5J/ZgBf1E4TYm8kbo5AfC
+         9mpEy3eWhLcO2eyOpcFReatZ3EI02FxESpD1Wh3SQzjDI17jtH7jW5Mjyj+OcKk0zGBK
+         RRdXw/mU4ow40cJ1nFFTg9ojGColhLHGX5NcsZKlov/knSQ9Dd/egGtD7VCAq1xqgOKj
+         UZ0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=aKqOi2YxxgVMYrT/iMU227sAyZ3FZV58U8M3nF1WuNE=;
+        b=iDJyKv53a13Bh9uQkP5EWXsok4XEIDoGbkKJSP29O4DvvEBNpUzF8tJIIpdogcqml0
+         GKM9y7T8YIxM6tgFGbOF+uuSU30W2y4/IejYtcBomq6zMq0zpB7V/Iwc7DIf7fQYgHfW
+         aSLgii8delAZb/mZH6MnuAKbmNl3u9B37amDL2pTemqVTccxwADj8AThLihEAnd7wnrD
+         reKWCketYRIUKyM2MxssnEEz2aD10xjgbjHHDZg3yd65T7i3dyOMqpTbW8f7Sv3TFXNP
+         970P5sdkjD34/kNktHylkRTBVAgcRGMn71J0GdXzRtc4cjhGMBz4LJGbG4qH2Dp5IupY
+         +Zlw==
+X-Gm-Message-State: AOAM531uyJvCYDfVLtQUT1sDlA2/vq8GwKiZD28yFPGmJ1H0TZCxZedn
+        TmHNjwt+7ykI3kxORazIO242rjwTy8rLgw==
+X-Google-Smtp-Source: ABdhPJygX6DgElavYTVsAEod2epfkSAshtz+9yF4fNKo8e5vFnaACFmGEszqzVQV5wz/x6koPY+vnQ==
+X-Received: by 2002:a5d:94c2:0:b0:60b:bd34:bb6f with SMTP id y2-20020a5d94c2000000b0060bbd34bb6fmr11639151ior.32.1651070487499;
+        Wed, 27 Apr 2022 07:41:27 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id 123-20020a6b1581000000b00657b48baeb8sm1182576iov.41.2022.04.27.07.41.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 07:41:27 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org
+Cc:     riel@surriel.com, linux-kernel@vger.kernel.org, kernel-team@fb.com,
+        linux-block@vger.kernel.org
+In-Reply-To: <YmjODd4aif9BzFuO@slm.duckdns.org>
+References: <YmjODd4aif9BzFuO@slm.duckdns.org>
+Subject: Re: [PATCH block-5.18] iocost: don't reset the inuse weight of under-weighted debtors
+Message-Id: <165107048684.42574.6493116001052820883.b4-ty@kernel.dk>
+Date:   Wed, 27 Apr 2022 08:41:26 -0600
 MIME-Version: 1.0
-In-Reply-To: <513edc25-1c73-6c85-9a50-0e267a106ec0@opensource.wdc.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrAJsWRmVeSWpSXmKPExsWy7bCmlu7K4Mwkg83dbBa/z55nttj7bjar
-        xd5b2hZ79p5ksbi8aw6bxfxlT9ktuq/vYLPY8aSR0YHDY+esu+wem5fUe+xsvc/q8X7fVTaP
-        z5vkAlijsm0yUhNTUosUUvOS81My89JtlbyD453jTc0MDHUNLS3MlRTyEnNTbZVcfAJ03TJz
-        gC5RUihLzCkFCgUkFhcr6dvZFOWXlqQqZOQXl9gqpRak5BSYFOgVJ+YWl+al6+WlllgZGhgY
-        mQIVJmRnbOndwFrwUrBiw71fjA2MLXxdjJwcEgImEkv3zWDtYuTiEBLYzSjRvXYulPOJUeLs
-        wd9sEM43RomWxYcYYVpWX5sKVbWXUaK1+zhU1TNGieM7vrGDVLEIqEr0LF8AlODgYBPQljj9
-        nwMkLCJgKvG2p5UFpJ5Z4AyjRPv7XWD1wgLOEv0XbzOD2LwCOhJ7D2xlg7AFJU7OfMICYnMK
-        uElMPbaRCcQWFVCWOLDtOBPIIAmBVg6J91P2sUOc5yKx/Np3NghbWOLV8S1QcSmJl/1tUHa5
-        xPa2BVDNLYwSXadOsUAk7CUu7vkLtoFZIEPiZP8TqEGyElNPrYOK80n0/n7CBBHnldgxD8ZW
-        llizfgFUvaTEte+NULaHxJ9fkLATEvjNKHFuecQERvlZSJ6bhWQdhK0jsWD3JyCbA8iWllj+
-        jwPC1JRYv0t/ASPrKkbJ1ILi3PTUYtMCw7zUcniUJ+fnbmIEJ1Utzx2Mdx980DvEyMTBeIhR
-        goNZSYT3y+6MJCHelMTKqtSi/Pii0pzU4kOMpsDImsgsJZqcD0zreSXxhiaWBiZmZmYmlsZm
-        hkrivKfTNyQKCaQnlqRmp6YWpBbB9DFxcEo1MDHuZMtnCveS5dyplbLtQ6yT1cyrqp+jNV78
-        td50UtihS2znQbNss6ct9y5WSj7h4r/YvvP4l4mq586arxDgNPK0nbt2++XpMSyzTzCcP7bl
-        5Ga9AMnSCYdmflilkdHO6ZLZYi2mdeBXw/qNYccOMUeXMonf3vhNMHH187VXs/esU5gVdm+R
-        QH7+vZSl3Et/rs9sdvogqivX0XT8L7/GDZcT0a5aIZtfbT5d3nVm9QtZWSuWxw7PjrLxsXB6
-        ZAepV1oo5Jr3P3lwnr2ghq1ZxsBld7Y03/5b/IwP31969ER6+s043U+n6j5ylorx68Wd7luj
-        tu5F4JUE58n38kyZ060niWXO15t/W6h4z12VDCWW4oxEQy3mouJEAIGbFNYzBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrALMWRmVeSWpSXmKPExsWy7bCSvK6HQ2aSwaIl0ha/z55nttj7bjar
-        xd5b2hZ79p5ksbi8aw6bxfxlT9ktuq/vYLPY8aSR0YHDY+esu+wem5fUe+xsvc/q8X7fVTaP
-        z5vkAlijuGxSUnMyy1KL9O0SuDKaL3IXrOSv2LThL2MD413uLkZODgkBE4nV16aydjFycQgJ
-        7GaUeHP7DSNEQlJi2d8jzBC2sMTKf8/ZIYqeMEo03poDlmARUJXoWb6ArYuRg4NNQFvi9H8O
-        kLCIgKnE255WFpB6ZoEzjBLt73exgySEBZwl+i/eBuvlFdCR2HtgKxvE0N+MEkveTmaFSAhK
-        nJz5hAXEZhbQkrjx7yUTyAJmAWmJ5f/AFnAKuElMPbaRCcQWFVCWOLDtONMERsFZSLpnIeme
-        hdC9gJF5FaNkakFxbnpusWGBYV5quV5xYm5xaV66XnJ+7iZGcCRoae5g3L7qg94hRiYOxkOM
-        EhzMSiK8X3ZnJAnxpiRWVqUW5ccXleakFh9ilOZgURLnvdB1Ml5IID2xJDU7NbUgtQgmy8TB
-        KdXAdHDXNQfr76ea8g6xxHUXtj65+s76sFXCrNy02EbZflWt4s8m8WmWhQxPPdznWvr0qJo5
-        Zdl8rf1zY1c1R/y1JZ82m/OuXpJrPi9hS23woU4/0/Lo1nXzLrLdWXPw+pSD+Rk7bu3XYXDP
-        P6ZzU9qc1UTn5oMFWsuZp9vy5K7NW5w8V/286MKagv+9svKreO4v+lszVWWhb+8WvuP+G3Ym
-        nG8q/h5b8l38wV/NvALj/cZTT3quXejR71hYe6g79UiOzdrSezVVklPsvNUmu2qEVNfYPZ/y
-        ovWVfEzu76ojTfskD5v4KDZznLvU9rdpsWa19anSOSXHvrBI9QcbR2+MCWdc7zc5J/o8m5/l
-        pjQlluKMREMt5qLiRACj4ob+8wIAAA==
-X-CMS-MailID: 20220427130824epcas5p38594effe1d648be050ff00284e115014
-X-Msg-Generator: CA
-Content-Type: multipart/mixed;
-        boundary="----s9reHD3dvq.Swzu4OgS99nNlXP7CLa0djtt04wdzZepsPVyA=_17950_"
-X-Sendblock-Type: REQ_APPROVE
-CMS-TYPE: 105P
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220426101938epcas5p291690dd1f0e931cd9f8139daaf3f9296
-References: <20220426101241.30100-1-nj.shetty@samsung.com>
-        <CGME20220426101938epcas5p291690dd1f0e931cd9f8139daaf3f9296@epcas5p2.samsung.com>
-        <20220426101241.30100-4-nj.shetty@samsung.com>
-        <513edc25-1c73-6c85-9a50-0e267a106ec0@opensource.wdc.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-------s9reHD3dvq.Swzu4OgS99nNlXP7CLa0djtt04wdzZepsPVyA=_17950_
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-
-O Wed, Apr 27, 2022 at 11:48:57AM +0900, Damien Le Moal wrote:
-> On 4/26/22 19:12, Nitesh Shetty wrote:
-> > Add new BLKCOPY ioctl that offloads copying of one or more sources ranges
-> > to one or more destination in a device. COPY ioctl accepts a 'copy_range'
-> > structure that contains no of range, a reserved field , followed by an
-> > array of ranges. Each source range is represented by 'range_entry' that
-> > contains source start offset, destination start offset and length of
-> > source ranges (in bytes)
-> > 
-> > MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
-> > MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
-> > 
-> > Example code, to issue BLKCOPY:
-> > /* Sample example to copy three entries with [dest,src,len],
-> > * [32768, 0, 4096] [36864, 4096, 4096] [40960,8192,4096] on same device */
-> > 
-> > int main(void)
-> > {
-> > 	int i, ret, fd;
-> > 	unsigned long src = 0, dst = 32768, len = 4096;
-> > 	struct copy_range *cr;
-> > 	cr = (struct copy_range *)malloc(sizeof(*cr)+
-> > 					(sizeof(struct range_entry)*3));
-> > 	cr->nr_range = 3;
-> > 	cr->reserved = 0;
-> > 	for (i = 0; i< cr->nr_range; i++, src += len, dst += len) {
-> > 		cr->range_list[i].dst = dst;
-> > 		cr->range_list[i].src = src;
-> > 		cr->range_list[i].len = len;
-> > 		cr->range_list[i].comp_len = 0;
-> > 	}
-> > 	fd = open("/dev/nvme0n1", O_RDWR);
-> > 	if (fd < 0) return 1;
-> > 	ret = ioctl(fd, BLKCOPY, cr);
-> > 	if (ret != 0)
-> > 	       printf("copy failed, ret= %d\n", ret);
-> > 	for (i=0; i< cr->nr_range; i++)
-> > 		if (cr->range_list[i].len != cr->range_list[i].comp_len)
-> > 			printf("Partial copy for entry %d: requested %llu, completed %llu\n",
-> > 								i, cr->range_list[i].len,
-> > 								cr->range_list[i].comp_len);
-> > 	close(fd);
-> > 	free(cr);
-> > 	return ret;
-> > }
+On Tue, 26 Apr 2022 19:01:01 -1000, Tejun Heo wrote:
+> When an iocg is in debt, its inuse weight is owned by debt handling and
+> should stay at 1. This invariant was broken when determining the amount of
+> surpluses at the beginning of donation calculation - when an iocg's
+> hierarchical weight is too low, the iocg is excluded from donation
+> calculation and its inuse is reset to its active regardless of its
+> indebtedness, triggering warnings like the following:
 > 
-> Nice to have a code example. But please format it correctly.
->
+> [...]
 
-acked
+Applied, thanks!
 
---
-Nitesh Shetty
+[1/1] iocost: don't reset the inuse weight of under-weighted debtors
+      commit: 8c936f9ea11ec4e35e288810a7503b5c841a355f
 
-------s9reHD3dvq.Swzu4OgS99nNlXP7CLa0djtt04wdzZepsPVyA=_17950_
-Content-Type: text/plain; charset="utf-8"
+Best regards,
+-- 
+Jens Axboe
 
 
-------s9reHD3dvq.Swzu4OgS99nNlXP7CLa0djtt04wdzZepsPVyA=_17950_--
