@@ -2,262 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EEAAC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 02:49:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8048FC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 05:01:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1357268AbiD0CwS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 26 Apr 2022 22:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54556 "EHLO
+        id S1345295AbiD0FEQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 01:04:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53730 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231183AbiD0CwR (ORCPT
+        with ESMTP id S240085AbiD0FEP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 26 Apr 2022 22:52:17 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD304DA6E3
-        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 19:49:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1651027747; x=1682563747;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iWpU0HwIqdFrg2zx3TJihfa/upjaFNfHL6fd3w+flV4=;
-  b=f1ngMhf/DKfdVS/Tm9Qk3yHBVkqQI+VwA4fF9Cc4tM2BdAAMRtHv8vpp
-   0Fr3uP5gxGj1K0bzMRTfZAoM1gOEtPJatAzSznv5gb5++fNjfb7tqznuw
-   MuDqcqyG3pBoRMBPmtlcIkpQbE9iQUAG/2scYMxzmL0rl6qhgqU4edtJg
-   QW7cf47QmW11njs8YURWOFGpmd9hZktkRjV3nTFBu9yWEaBN8GbIMK2nL
-   oKMCwMWPQn21Jqm9706bzeMkheDVld40HW1JSXGwojVTm47TbkHOB0wja
-   6axB5rXFmub249avuL0pZqcSLuEd644PVhKW1CtoBvK4Z3V7SNC0LN8QS
-   g==;
-X-IronPort-AV: E=Sophos;i="5.90,292,1643644800"; 
-   d="scan'208";a="198912064"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2022 10:49:06 +0800
-IronPort-SDR: c2EZkLVCVDCKbYjsDbZDc4/GZ/19m2Zh4m4rm2oIvr8drma8Mhgsp0pFsg8QownOm4aUOs9xyz
- BjZZHzMN8FydVkhpN3QNKC56esYoScSyRJdgy8i7IDRH9OF5O8EjsWb8Skdf5vNR8oscpuD7K3
- bOXZ4PDckNWqCFQe5TPYiSosSt+bhDUp53Ppe8UNuKlrPNRo5t8//GN/AVWEQDu0ENbn0X88K6
- IMPz/8MJverZTa5+/eweIiytpvd6y1HHXoWbMcNbdPG3VM9REnLeofWnGUAODJ1oCxMD73hPg2
- MJaw97DPak9oHcPTNS1mL7nD
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2022 19:20:00 -0700
-IronPort-SDR: /OGoQhiY80CSx8mvc65BPjhpBIuJPgeVQdklqqKYQNapVoBY0urleBMqsuGLvDNf5BMgu/YKM6
- 0oFksQ4kzqrEc1jN2CHeSBSgRHu5y/TtfC5EgAXmyK2seUGVQHP13bWJMBFMOJrf8oS6JeyLjF
- pTLJGKf7D5xSr6JOGiJAEoQmLoLc1UlvownXdYIODRNgjtyInGqL9xcmRTr+qz5TedT78hFCKK
- nAKrxN1OaX9WvZ0Br51a5JlsKFOnFGs5nIIRDPaRzjPEFntYUVyJQrntQITS/RsYV1gfJdrOKB
- U30=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Apr 2022 19:49:07 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Kp39Z39Dkz1SVp0
-        for <linux-block@vger.kernel.org>; Tue, 26 Apr 2022 19:49:06 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1651027745; x=1653619746; bh=iWpU0HwIqdFrg2zx3TJihfa/upjaFNfHL6f
-        d3w+flV4=; b=hikYTurwappRrrZasDTrqUqmKOTuKu4rZvUNZjPAd1cl9dkwlq/
-        m2Sa9DPyXNi3xu6jhSuIOCnmz1HjekfSujLBC8Vzwj+VpHXxKwTa0kHl3cC6q4I/
-        vnebs5mXEBMfWil0VWD7Aliqzov5gJfUIOuG8BMSxpnxmXzqLSESCpAsTlPy26QP
-        XVwKEGJVnLpYvh1n7JAKbFMbo2+O962s9G7/+vWFGFYAQfeC+S5aTobuLNYzvtsm
-        0hjcJOJFy01d0didhwDTvIOJY4NO8/OUayXwuqJfYagWh55n9Tco6gfvUlI1N9d4
-        i1TD2XJ7QSFZG2GpfC0R35CGnj2voYJyncg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 08hzdCJD3yBh for <linux-block@vger.kernel.org>;
-        Tue, 26 Apr 2022 19:49:05 -0700 (PDT)
-Received: from [10.225.163.27] (unknown [10.225.163.27])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kp39Q3MMrz1Rvlc;
-        Tue, 26 Apr 2022 19:48:58 -0700 (PDT)
-Message-ID: <513edc25-1c73-6c85-9a50-0e267a106ec0@opensource.wdc.com>
-Date:   Wed, 27 Apr 2022 11:48:57 +0900
+        Wed, 27 Apr 2022 01:04:15 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 272633F307;
+        Tue, 26 Apr 2022 22:01:06 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id h1so611967pfv.12;
+        Tue, 26 Apr 2022 22:01:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=SFTg9MPpAQTp6TISgZC7JwgCd+VZygIltX3qHXtuEIY=;
+        b=M9T5s2utd20CnMnOeMpcBa4bYx7nj5rJZtAwndg5kj3H5PopvrFBSzHq02FziZkf0D
+         4sQ4y/7n/Xwj/nwxCJEoey3LR/SmgJl9zeHG37Di0cWLYg5F17aF3MA+a5D33z6BRvrA
+         WXTL/ZWvYyAztswWc+j345du08QD3O0c8Cq9ijTCDVCNkCFlfrSJ01m7+MMVbvyT3e4j
+         yZfoV07Cx0jUbPlbB8MRpJM3dL8ALM9hBG4K8q0UAt5AaRvZDGfGTvP4xw2cLuLbFbb9
+         HF/BWAz/0tVtyLITz/1CaeHiHhF6EF+ZTwITITJWF3ZegZMDDOGJPOAaLrvOP742Wtgh
+         Smyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=SFTg9MPpAQTp6TISgZC7JwgCd+VZygIltX3qHXtuEIY=;
+        b=JBhhvTgCdlXuBx5yQiZP9ps0UFIQZ5suT3W/T0Zg7KhoiA57Px8AB2GDvcO3LtphZP
+         ep1H1CCZmuqA+5zak549QWJaUExVAyZuEgIIuCm3AF01JOY9RuNZRSrc4rwvjRSzf/vi
+         7TcJ/yOyNfNZrTWAV8BMs45pq2HdOzY0akeTlbjcEnPmcuJCQ1pEjana0dw81C4Iqavm
+         rdai+JNd4Uq0rYGC1ioq+gthNNSX7hW7UJt5SBZrD/ASmmnNcLhsmwcXJa/WEHVJ1Ggo
+         4Wyou2DOP+t9SQpYjKj76K5B5JHzyaOtfLtGpP2CpNBkUISZvmU/0Vbf5GB5lD1tsrk2
+         CkrQ==
+X-Gm-Message-State: AOAM53241FGuDV0D16MVeLQd2dAtKSJd0L1FBtnVjQETZtdLUgpC1whY
+        HUmybtqefOMbmEZG0cVNsO4=
+X-Google-Smtp-Source: ABdhPJyMcdiaF/JnIL8yZrYft4WsH/fwDZRML7R1hbRK74iYsx6XgOIzGNwB0a/19H8GoJYefSCdHg==
+X-Received: by 2002:a05:6a02:182:b0:374:5a57:cbf9 with SMTP id bj2-20020a056a02018200b003745a57cbf9mr21979675pgb.616.1651035664985;
+        Tue, 26 Apr 2022 22:01:04 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:7a3e])
+        by smtp.gmail.com with ESMTPSA id t15-20020a62d14f000000b0050d3846c538sm10587628pfl.57.2022.04.26.22.01.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Apr 2022 22:01:04 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 26 Apr 2022 19:01:01 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, Rik van Riel <riel@surriel.com>
+Subject: [PATCH block-5.18] iocost: don't reset the inuse weight of
+ under-weighted debtors
+Message-ID: <YmjODd4aif9BzFuO@slm.duckdns.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH v4 03/10] block: Introduce a new ioctl for copy
-Content-Language: en-US
-To:     Nitesh Shetty <nj.shetty@samsung.com>
-Cc:     chaitanyak@nvidia.com, linux-block@vger.kernel.org,
-        linux-scsi@vger.kernel.org, dm-devel@redhat.com,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, msnitzer@redhat.com, bvanassche@acm.org,
-        martin.petersen@oracle.com, hare@suse.de, kbusch@kernel.org,
-        hch@lst.de, Frederick.Knight@netapp.com, osandov@fb.com,
-        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
-        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
-        jack@suse.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
-        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
-        Arnav Dawn <arnav.dawn@samsung.com>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        James Smart <james.smart@broadcom.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        linux-kernel@vger.kernel.org
-References: <20220426101241.30100-1-nj.shetty@samsung.com>
- <CGME20220426101938epcas5p291690dd1f0e931cd9f8139daaf3f9296@epcas5p2.samsung.com>
- <20220426101241.30100-4-nj.shetty@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220426101241.30100-4-nj.shetty@samsung.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/26/22 19:12, Nitesh Shetty wrote:
-> Add new BLKCOPY ioctl that offloads copying of one or more sources rang=
-es
-> to one or more destination in a device. COPY ioctl accepts a 'copy_rang=
-e'
-> structure that contains no of range, a reserved field , followed by an
-> array of ranges. Each source range is represented by 'range_entry' that
-> contains source start offset, destination start offset and length of
-> source ranges (in bytes)
->=20
-> MAX_COPY_NR_RANGE, limits the number of entries for the IOCTL and
-> MAX_COPY_TOTAL_LENGTH limits the total copy length, IOCTL can handle.
->=20
-> Example code, to issue BLKCOPY:
-> /* Sample example to copy three entries with [dest,src,len],
-> * [32768, 0, 4096] [36864, 4096, 4096] [40960,8192,4096] on same device=
- */
->=20
-> int main(void)
-> {
-> 	int i, ret, fd;
-> 	unsigned long src =3D 0, dst =3D 32768, len =3D 4096;
-> 	struct copy_range *cr;
-> 	cr =3D (struct copy_range *)malloc(sizeof(*cr)+
-> 					(sizeof(struct range_entry)*3));
-> 	cr->nr_range =3D 3;
-> 	cr->reserved =3D 0;
-> 	for (i =3D 0; i< cr->nr_range; i++, src +=3D len, dst +=3D len) {
-> 		cr->range_list[i].dst =3D dst;
-> 		cr->range_list[i].src =3D src;
-> 		cr->range_list[i].len =3D len;
-> 		cr->range_list[i].comp_len =3D 0;
-> 	}
-> 	fd =3D open("/dev/nvme0n1", O_RDWR);
-> 	if (fd < 0) return 1;
-> 	ret =3D ioctl(fd, BLKCOPY, cr);
-> 	if (ret !=3D 0)
-> 	       printf("copy failed, ret=3D %d\n", ret);
-> 	for (i=3D0; i< cr->nr_range; i++)
-> 		if (cr->range_list[i].len !=3D cr->range_list[i].comp_len)
-> 			printf("Partial copy for entry %d: requested %llu, completed %llu\n"=
-,
-> 								i, cr->range_list[i].len,
-> 								cr->range_list[i].comp_len);
-> 	close(fd);
-> 	free(cr);
-> 	return ret;
-> }
+When an iocg is in debt, its inuse weight is owned by debt handling and
+should stay at 1. This invariant was broken when determining the amount of
+surpluses at the beginning of donation calculation - when an iocg's
+hierarchical weight is too low, the iocg is excluded from donation
+calculation and its inuse is reset to its active regardless of its
+indebtedness, triggering warnings like the following:
 
-Nice to have a code example. But please format it correctly.
+ WARNING: CPU: 5 PID: 0 at block/blk-iocost.c:1416 iocg_kick_waitq+0x392/0x3a0
+ ...
+ RIP: 0010:iocg_kick_waitq+0x392/0x3a0
+ Code: 00 00 be ff ff ff ff 48 89 4d a8 e8 98 b2 70 00 48 8b 4d a8 85 c0 0f 85 4a fe ff ff 0f 0b e9 43 fe ff ff 0f 0b e9 4d fe ff ff <0f> 0b e9 50 fe ff ff e8 a2 ae 70 00 66 90 0f 1f 44 00 00 55 48 89
+ RSP: 0018:ffffc90000200d08 EFLAGS: 00010016
+ ...
+  <IRQ>
+  ioc_timer_fn+0x2e0/0x1470
+  call_timer_fn+0xa1/0x2c0
+ ...
 
->=20
-> Signed-off-by: Nitesh Shetty <nj.shetty@samsung.com>
-> Signed-off-by: Javier Gonz=C3=A1lez <javier.gonz@samsung.com>
-> Signed-off-by: Arnav Dawn <arnav.dawn@samsung.com>
-> ---
->  block/ioctl.c           | 32 ++++++++++++++++++++++++++++++++
->  include/uapi/linux/fs.h |  9 +++++++++
->  2 files changed, 41 insertions(+)
->=20
-> diff --git a/block/ioctl.c b/block/ioctl.c
-> index 46949f1b0dba..58d93c20ff30 100644
-> --- a/block/ioctl.c
-> +++ b/block/ioctl.c
-> @@ -120,6 +120,36 @@ static int blk_ioctl_discard(struct block_device *=
-bdev, fmode_t mode,
->  	return err;
->  }
-> =20
-> +static int blk_ioctl_copy(struct block_device *bdev, fmode_t mode,
-> +		unsigned long arg)
-> +{
-> +	struct copy_range crange, *ranges =3D NULL;
-> +	size_t payload_size =3D 0;
-> +	int ret;
-> +
-> +	if (!(mode & FMODE_WRITE))
-> +		return -EBADF;
-> +
-> +	if (copy_from_user(&crange, (void __user *)arg, sizeof(crange)))
-> +		return -EFAULT;
-> +
-> +	if (unlikely(!crange.nr_range || crange.reserved || crange.nr_range >=
-=3D MAX_COPY_NR_RANGE))
-> +		return -EINVAL;
-> +
-> +	payload_size =3D (crange.nr_range * sizeof(struct range_entry)) + siz=
-eof(crange);
-> +
-> +	ranges =3D memdup_user((void __user *)arg, payload_size);
-> +	if (IS_ERR(ranges))
-> +		return PTR_ERR(ranges);
-> +
-> +	ret =3D blkdev_issue_copy(bdev, ranges->nr_range, ranges->range_list,=
- bdev, GFP_KERNEL);
-> +	if (copy_to_user((void __user *)arg, ranges, payload_size))
-> +		ret =3D -EFAULT;
-> +
-> +	kfree(ranges);
-> +	return ret;
-> +}
-> +
->  static int blk_ioctl_secure_erase(struct block_device *bdev, fmode_t m=
-ode,
->  		void __user *argp)
->  {
-> @@ -481,6 +511,8 @@ static int blkdev_common_ioctl(struct block_device =
-*bdev, fmode_t mode,
->  		return blk_ioctl_discard(bdev, mode, arg);
->  	case BLKSECDISCARD:
->  		return blk_ioctl_secure_erase(bdev, mode, argp);
-> +	case BLKCOPY:
-> +		return blk_ioctl_copy(bdev, mode, arg);
->  	case BLKZEROOUT:
->  		return blk_ioctl_zeroout(bdev, mode, arg);
->  	case BLKGETDISKSEQ:
-> diff --git a/include/uapi/linux/fs.h b/include/uapi/linux/fs.h
-> index 822c28cebf3a..a3b13406ffb8 100644
-> --- a/include/uapi/linux/fs.h
-> +++ b/include/uapi/linux/fs.h
-> @@ -78,6 +78,14 @@ struct range_entry {
->  	__u64 comp_len;
->  };
-> =20
-> +struct copy_range {
-> +	__u64 nr_range;
-> +	__u64 reserved;
-> +
-> +	/* Range_list always must be at the end */
-> +	struct range_entry range_list[];
-> +};
-> +
->  /* extent-same (dedupe) ioctls; these MUST match the btrfs ioctl defin=
-itions */
->  #define FILE_DEDUPE_RANGE_SAME		0
->  #define FILE_DEDUPE_RANGE_DIFFERS	1
-> @@ -199,6 +207,7 @@ struct fsxattr {
->  #define BLKROTATIONAL _IO(0x12,126)
->  #define BLKZEROOUT _IO(0x12,127)
->  #define BLKGETDISKSEQ _IOR(0x12,128,__u64)
-> +#define BLKCOPY _IOWR(0x12, 129, struct copy_range)
->  /*
->   * A jump here: 130-136 are reserved for zoned block devices
->   * (see uapi/linux/blkzoned.h)
+As this happens only when an iocg's hierarchical weight is negligible, its
+impact likely is limited to triggering the warnings. Fix it by skipping
+resetting inuse of under-weighted debtors.
 
-
---=20
-Damien Le Moal
-Western Digital Research
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Reported-by: Rik van Riel <riel@surriel.com>
+Fixes: c421a3eb2e27 ("blk-iocost: revamp debt handling")
+Cc: stable@vger.kernel.org # v5.10+
+---
+ block/blk-iocost.c |   12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 70a0a3d680a35..9bd670999d0af 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2322,7 +2322,17 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 				iocg->hweight_donating = hwa;
+ 				iocg->hweight_after_donation = new_hwi;
+ 				list_add(&iocg->surplus_list, &surpluses);
+-			} else {
++			} else if (!iocg->abs_vdebt) {
++				/*
++				 * @iocg doesn't have enough to donate. Reset
++				 * its inuse to active.
++				 *
++				 * Don't reset debtors as their inuse's are
++				 * owned by debt handling. This shouldn't affect
++				 * donation calculuation in any meaningful way
++				 * as @iocg doesn't have a meaningful amount of
++				 * share anyway.
++				 */
+ 				TRACE_IOCG_PATH(inuse_shortage, iocg, &now,
+ 						iocg->inuse, iocg->active,
+ 						iocg->hweight_inuse, new_hwi);
