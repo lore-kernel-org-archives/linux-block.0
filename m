@@ -2,137 +2,221 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E602C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 13:47:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84867C4332F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 14:29:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236301AbiD0NuP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 09:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50782 "EHLO
+        id S237915AbiD0OcO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 10:32:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236362AbiD0NuO (ORCPT
+        with ESMTP id S237877AbiD0OcN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 09:50:14 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48407404AD1
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 06:47:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1651067223; x=1682603223;
-  h=from:to:cc:subject:date:message-id:references:
-   content-transfer-encoding:mime-version;
-  bh=0GmFkb40a/pecWM/jHAPUOHe95mFJ/Q1IRRp0qNZvA4=;
-  b=Q9nNvNBdlDTE0gIA/8xtQS+BvbG4/7pSNAdhkbbc7qWK24OfLL4rk8iA
-   U2Bv3PXJz8RVjuee9QdMHETUHDBT3twcqCLHXMSDeK2CofWi3R/H3TIRr
-   RGIzh+2uSA2e5caInrGw/VfoMh0AFCgQ3udg4zH3W3v64GCsScmoH2EFN
-   PIjQloARfj4fWJfP2M+/riYXRyLB3HOIKygMQSrzYgjkaZcbfzYqrtYQb
-   T8y+BhEvdHi+z9GYg0asio852VbwarWwA7Jaekx4lyhGl17S7ekBt298c
-   WUrEiUXZFXx6eGXN7i+52MXAluLpsw3UfUUhtp8DG8y/NBOQwOaa3Zoo/
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.90,293,1643644800"; 
-   d="scan'208";a="199852958"
-Received: from mail-mw2nam10lp2103.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.103])
-  by ob1.hgst.iphmx.com with ESMTP; 27 Apr 2022 21:47:00 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZitNVkelqSeGdI3Q2qex6G6yuUhDYhVJXUfn5QfTZyTTjODpqz4bYw73c9sasyXLtA88oiDdvhzTe7VNQEIfSHGhxSpuGadIU4a42pW4K4SCD2+nZJc02MHPKuSZ4gejRK6AzLVVtnt1KfTCacKym4ErhtxjG+KE9H2qJPpI0ADiEFq+Mk3KQjAvfI3r+8QeydMdVM/DclgznZIy0t53R8Q666V+7j0Itcyo6BcdyfwOhfXcQwBV439Yl4OHFzaTUpqHQtvAxlAdXbIKdmJmBO8h8feaDZo3f4kaoPgxWHp2yQ5d/WYFcgI+HnYnNlxyH0RdcI1ktFO3fPSsQlwUlw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0GmFkb40a/pecWM/jHAPUOHe95mFJ/Q1IRRp0qNZvA4=;
- b=im3q/hzsmYFIMdqdDT8d7iKgWAkjd5dlt+xolyyJd4SXwjh6wlbZhzzlBNITAgSokfln6VyuaHpHlRKSbhefWgsKTQQSA/m5IdAnORBTLykSbjI83t0t+7dLkfF3wilvdjC/dIflbkWnOesS3Ldj85UVpvf8Jq0iSS0i9VqSaUkrTxaURfz8riqbK+zwumFRjTnhu8zyOXldweNMx4VxC9I6nhVBEEwGPN/y/3psiQkG75Bxa5z2EPXqx3xYU1VmlKcq103oGFe6UL9tkhTjh02sm4IwtA13Kzp+GIF+KaWRjSD1A5BpU4klcCWtWymN8iVQLKgXqwBojON6T0oMOA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Wed, 27 Apr 2022 10:32:13 -0400
+Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F1CF15833;
+        Wed, 27 Apr 2022 07:29:01 -0700 (PDT)
+Received: by mail-ed1-x532.google.com with SMTP id d6so2151011ede.8;
+        Wed, 27 Apr 2022 07:29:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0GmFkb40a/pecWM/jHAPUOHe95mFJ/Q1IRRp0qNZvA4=;
- b=tDBisQ9DU2mztNEEvK7FzeIThR02CBB6m2+pbUS35pgLkcILkEo/S7FisWd96K061QcWSVH0Bo9SWPvJdw2tTfiwOEwV5L+HYRDKydcSXFjsbVfPgEKN0GXHXxkTeWD9sOO8cJ+oEhhxQD0Ksr0CTSfHt8ZexoISvQTiipxjw60=
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
- by CY4PR04MB0793.namprd04.prod.outlook.com (2603:10b6:903:e5::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5186.15; Wed, 27 Apr
- 2022 13:46:58 +0000
-Received: from PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::6cfd:b252:c66e:9e12]) by PH0PR04MB7416.namprd04.prod.outlook.com
- ([fe80::6cfd:b252:c66e:9e12%3]) with mapi id 15.20.5186.021; Wed, 27 Apr 2022
- 13:46:57 +0000
-From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Omar Sandoval <osandov@osandov.com>
-CC:     Omar Sandoval <osandov@fb.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>
-Subject: Re: [PATCH blktests 0/6] extend zoned mode coverage for scsi devices
-Thread-Topic: [PATCH blktests 0/6] extend zoned mode coverage for scsi devices
-Thread-Index: AQHYQ9X/np2PQw7bEU+9QFJnuSz41Q==
-Date:   Wed, 27 Apr 2022 13:46:57 +0000
-Message-ID: <PH0PR04MB74169B8CC438FAABF21475E79BFA9@PH0PR04MB7416.namprd04.prod.outlook.com>
-References: <20220330013215.463555-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 923ae307-3f8f-40ae-9f2d-08da285465c2
-x-ms-traffictypediagnostic: CY4PR04MB0793:EE_
-x-microsoft-antispam-prvs: <CY4PR04MB079321B61B86D01D17783BED9BFA9@CY4PR04MB0793.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 9cPEfaKZf9IygspmnvDAmuRQiFjhCVh1l9IaFNZG4ZOt8N8GPOkhWJdScoh0h9F/pJagnZW3cMlqDqH48ILMU4DhytYMYfCoItEw8NDbOSwyN/w5sguBWK8Oi3gzk+mnjV24PHG6EC1+ojuwSBBdZ+0ckWc74cCpaLl2x6nyRCjgqQSbyRUUc2ljnH+LEjTG5gXNhbUMb7k7SvWgOYUKAa3E6wbVtjpb0lgpsxvs/YSdxkG2AwkGBhwRpQ1ht8+usWsUt5gKWg9/XX8gcPAubo+pycBz/wPZAfUvOpx2swLuX4zcLzx7DWhMzxoUWbvmQ/IV6AGQSrhLtlekGPvGSgZYEhT5MEJXaTK5EDEu2nei05x5X+SdKyIleIEevFgyXQ9s8ZqhdxTzL/dRyOxa3DfHbbfw4QHDkmZaJqTpV0+RVIYyqOZNLeNCVGc+md+78bVOEiww8hiUuTHJUAKTqDn4KaoAYUxgeQytehSskxK6fmZie5bvq2FW1ODlyvvPWQuG4xieruOpBpDHkjkUyKP0B5Pxip/t2AyMeHDY/jYX7F/dTxvya4Ii5heAolsb/+jYeZ+WjLYJV//6RPtO+079+5hWizmkxq96rmpBmgxMjT6yJs+juGgVuH1d/DfOHpsgUKrKIah1p0v9dJ4nb2Xg5VzZXt6V1SgiN7uIOg3cRA7ZzjLXk+oQffNLXRTTRCGlr/hCcuEb1Bu1geklWA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(508600001)(316002)(33656002)(55016003)(110136005)(4326008)(66476007)(8676002)(66556008)(66446008)(76116006)(86362001)(82960400001)(64756008)(91956017)(52536014)(122000001)(54906003)(71200400001)(66946007)(38070700005)(38100700002)(6506007)(558084003)(5660300002)(2906002)(4270600006)(7696005)(26005)(9686003)(186003)(8936002)(19618925003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?GYnNlNKt0N7jx1zmiaHEprvDBCGi2BAgDm29WTu9bl0yS13vahu1mlpmSpdo?=
- =?us-ascii?Q?CQTn7GEiU+VnDImyWvfuvuU+fEUY+NTqwaEFtzQWFubs9Xsxx2LcL1BQhYv/?=
- =?us-ascii?Q?zZlC3CKKIF6dv5n7ksTAuiDdnIybzvIXX9DEzWZXfDoT5RquY06wKtrweSrj?=
- =?us-ascii?Q?SR8kfozEMb5hyl7rQ2iMlseVu05SXsoa3hAyzpYlWOEPgymEPKtE+lRC4tsY?=
- =?us-ascii?Q?p7b1dF6UTGVxMrykpNN64N8ddDG68yNID4cgxyLiPiUphhnLmBElNBXgxr1n?=
- =?us-ascii?Q?/rfvI7ZNLi2ytg7TIdAQjSQI600T8haCjzRxJsyXzYNXSJwF5Qt3/KDIZQ7c?=
- =?us-ascii?Q?M86sl/crN52721K/uhdmuLVtq2fTyRjuwm4PDkPEIkPPJEatXXEF7JKrMLkI?=
- =?us-ascii?Q?FKc1i73QEWFoEziNG3X1evsL6CP6snmN27lS6Egv4FzMp9cxWgMVTsTLiB98?=
- =?us-ascii?Q?qcgdSX25MTNfKG0KRvbNU4wnpBXDwlYartT+Xf8KwSGUuIzGULmXGY/2eMkn?=
- =?us-ascii?Q?SEG43tkEEj1PiyD/0FZICyOxnhGb9Pz7w9vLpp+3HMmcxxqO2V5Dp5wwTD95?=
- =?us-ascii?Q?fRs/0yhhJWNRzOtQVXTEEAMsdHtUYQAFeMpaU/xFd0AXiRiiobroG8Wxg/IL?=
- =?us-ascii?Q?j20YixNfYP9jme75RDH3KMHbnMpYyQG0UBLVvwVM5/r0jHkLFfdNUG3VVmES?=
- =?us-ascii?Q?M8+GhduDdbWr72ip37Iklnpjh+UMirkGKPRhFaPDuJw3AqpgRT2UfVtgDbd2?=
- =?us-ascii?Q?O3qXGfTao0D1/tAhAIfpWnq0xbMDdg2jNsdWTZxtkAu+59pd/8UhmTEQ6xq5?=
- =?us-ascii?Q?kVDexI5csZg0xHzATRHhpRnnBVMn+MmbYsGkANbYURceRoJXBnV6m49zV1mR?=
- =?us-ascii?Q?j2ErsJnKMWEG4zOuHdTBH65E+CodmHioVr6UI3R9FJkgPiWSbl1T7Ieoc/3e?=
- =?us-ascii?Q?Jx/a8jNH18sDmpIZmWIKR7VRJDrjP9RdFDgbEO7thGuo1po+j3jD17Tod0yC?=
- =?us-ascii?Q?qyMM82MUajm0ORN2fdO980z/ZvsUFBtY3nDCv29fv1aTNMG13gQ+7SQExQMp?=
- =?us-ascii?Q?UKnKf6aJNOXbHCoG/HPaKZvZhxaT9Gzi+o5Qapd1VHRxyP6uUzr7It6cSzEQ?=
- =?us-ascii?Q?UiGwfVVCb5pAVR5EHdVOIv0xIokycbR3qX+fftv1xWfTCEit60Hx3nH740CX?=
- =?us-ascii?Q?Sro/iyQymW7k2NhCqlll6SJeiYmiRH3gvPSjo6b0TCUD/LonoeQJTVeqC2Yj?=
- =?us-ascii?Q?PNnRldlit9sJp6RVGzgzjn0DX3SNrAxQSI0BxofkWUBJexPIUscjZnBGZ6BZ?=
- =?us-ascii?Q?5AjYPMtcLOVB2UtI6m544RALRIPCv+gLMQM/dkcEU6rHGoBufraIuI22CS1k?=
- =?us-ascii?Q?bAMb0NuPzTvAdAr8xJM9D2f63sS8p73v7W5JNh2o4kI4XC1GVAhIZho59k3x?=
- =?us-ascii?Q?2m/trNVfUb9n1fgtyZzIkA1GcVnyc3EAUn7HePAbpLJuy4Bf0Or4XGALufp6?=
- =?us-ascii?Q?Z0rspS7YSeFQ/9/lzs3Emgqyx05pxLBG4Cc5GQDDpZciK750w2wzkAOJNGxq?=
- =?us-ascii?Q?kSEZLb9AkHG0BHH0myo6HKjK2ukdgzvUhm9piF36D0lDiHXJgrTe9OIQWiF6?=
- =?us-ascii?Q?V1l7sKVls1qkundiqtufzCBMFkY5hbXMeg7uAh7dXipmkRgUfEHE09H6HiYP?=
- =?us-ascii?Q?CUJEBzrOXOSI67nCGUZb5PhcSBVBzENTxl5lZztkZt82IkZm9HVDg/FU7ORb?=
- =?us-ascii?Q?SQGKJWrmlhQOUzPmiIf0O3JkWY5p2/LXyLIesqjFkrmDFGG9HVdK?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=su+S40qJAZBfxSVeOdjWZtJfUAwd/TBUd34BOhXChlA=;
+        b=EgsSkp4KEkcR+2OCaAJw+XTmptgLB+M5SPxXRTyIj2cFFBX5AkRTwbnD7wwX202qZ6
+         TIOuFJu0D3+uviL4jTZMwYfeZPtPXyEL+kNF+G7x78MOH3GGvyzAKMnicdEvvK+dFGg7
+         dtkUgVyKSjElwsa3+LlRj7Otzk1iKIT7C12cQrs7b9CYOk3kdSVQrkpHinkKxEUalji1
+         uRyu17JzMOFAP72zGDjFv/OZdWn0DAQQQV/uWbgTE6dljZ6Zknqyf4sT32G38YQJWUwg
+         phia9v5nk4wOQcM9WqGM5y6zvpj3kDwxZwOkM4XEXfYqkRHrfs9onsicwL/sOtFzo0s8
+         yE2Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=su+S40qJAZBfxSVeOdjWZtJfUAwd/TBUd34BOhXChlA=;
+        b=yjDvSzJLxM9HTOnobFaF7BAMvvxhu+uE+iliV1aEXl9A7dDxkO5YDc3XYxov66Bzhe
+         5NB+aT2Frs6Bm0nGMU0jxxCxDKEbaPxRga20ImQKAtJ2HFYw7p1vV5wiazjFSaO4by2k
+         acqiicn+LEvjxAsgT9TTUiqrKm9CBfcWTUAZu6IRkwuEBY9TxDaSUsrilXapDN9nL87d
+         97wJkg1Dvq76+cGYz8Sh7i68Xxmx2BKl3sq1cRWsSxZ+W5wL/EjZFERT0JXrNUiFQlTM
+         gFssGhovn1lD0MNZuAIyKCSyorTOzMDFRj6+bOXh9I5u89klVYT2OKpQJx1aOhwNxLCc
+         0mAw==
+X-Gm-Message-State: AOAM530bj45nck6qVyj+TYYdUFEm31sp3h3lEBi2SlWxBhpRizwnLFgU
+        bgz5BAM5MbhjPPL+o2zaoK0=
+X-Google-Smtp-Source: ABdhPJyu74sKIRMGh4xs2yGGlcLJRYPP/1WkaIwXZjA2aDIG1D+FXmp5h+5d9js+TpSHOT0+LQgX1A==
+X-Received: by 2002:a05:6402:1a42:b0:424:20bb:3e37 with SMTP id bf2-20020a0564021a4200b0042420bb3e37mr30770788edb.29.1651069739636;
+        Wed, 27 Apr 2022 07:28:59 -0700 (PDT)
+Received: from [192.168.178.40] (ipbcc1cfad.dynamic.kabel-deutschland.de. [188.193.207.173])
+        by smtp.gmail.com with ESMTPSA id n14-20020a50934e000000b0042053e79386sm8545803eda.91.2022.04.27.07.28.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Apr 2022 07:28:58 -0700 (PDT)
+Message-ID: <1c5d7e25-474c-e5bb-bd07-5cba3f49fcfa@gmail.com>
+Date:   Wed, 27 Apr 2022 16:28:57 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 923ae307-3f8f-40ae-9f2d-08da285465c2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Apr 2022 13:46:57.5806
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LJGHV6QT/W/ciRjQK0Ep2iR76qx5KWTA3McbHT1vxsqq20sEaAOrxCWGFiYzb1ZHOgv2K3B0O2S7t9VPkIxG6qi7FSamZbYhPVSr+vvX6Rg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB0793
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH v5] scsi: target: tcmu: Fix possible data corruption
+Content-Language: en-US
+To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Cc:     linux-block@vger.kernel.org,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+References: <20220421023735.9018-1-xiaoguang.wang@linux.alibaba.com>
+From:   Bodo Stroesser <bostroesser@gmail.com>
+In-Reply-To: <20220421023735.9018-1-xiaoguang.wang@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For the series:=0A=
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
+Hi Wang,
+
+Thank you for fixing this!
+
+Reviewed-by: Bodo Stroesser <bostroesser@gmail.com>
+
+On 21.04.22 04:37, Xiaoguang Wang wrote:
+> When tcmu_vma_fault() gets one page successfully, before the current
+> context completes page fault procedure, find_free_blocks() may run in
+> and call unmap_mapping_range() to unmap this page. Assume when
+> find_free_blocks() completes its job firstly, previous page fault
+> procedure starts to run again and completes, then one truncated page has
+> beed mapped to use space, but note that tcmu_vma_fault() has gotten one
+> refcount for this page, so any other subsystem won't use this page,
+> unless later the use space addr is unmapped.
+> 
+> If another command runs in later and needs to extends dbi_thresh, it may
+> reuse the corresponding slot to previous page in data_bitmap, then though
+> we'll allocate new page for this slot in data_area, but no page fault will
+> happen again, because we have a valid map, real request's data will lose.
+> 
+> Filesystem implementations will also run into this issue, but they
+> usually lock page when vm_operations_struct->fault gets one page, and
+> unlock page after finish_fault() completes. In truncate sides, they
+> lock pages in truncate_inode_pages() to protect race with page fault.
+> We can also have similar codes like filesystem to fix this issue.
+> 
+> To fix this possible data corruption, we can apply similar method like
+> filesystem. For pages that are to be freed, tcmu_blocks_release() locks
+> and unlocks these pages, and make tcmu_vma_fault() also lock found page
+> under cmdr_lock. At the same time, since tcmu_vma_fault() gets one extra
+> page refcount, tcmu_blocks_release() won't free pages if pages are in
+> page fault procedure, which means it's safe to call tcmu_blocks_release()
+> before unmap_mapping_range().
+> 
+> With above action, for above race, tcmu_blocks_release()
+> will wait all page faults to be completed before calling
+> unmap_mapping_range(), and later if unmap_mapping_range() is called,
+> it will ensure stale mappings to be removed cleanly.
+> 
+> Signed-off-by: Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+> ---
+> V5:
+>   Improve code comments.
+> 
+> V4:
+>   Add comments to explain why it's safe to call tcmu_blocks_release()
+> before unmap_mapping_range().
+> 
+> V3:
+>   Just lock/unlock_page in tcmu_blocks_release(), and call
+> tcmu_blocks_release() before unmap_mapping_range().
+> 
+> V2:
+>    Wait all possible inflight page faults to be completed in
+> find_free_blocks() to fix possible stale map.
+> ---
+>   drivers/target/target_core_user.c | 38 +++++++++++++++++++++++++++++++++++---
+>   1 file changed, 35 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/target/target_core_user.c b/drivers/target/target_core_user.c
+> index fd7267baa707..f0d4cc693e9e 100644
+> --- a/drivers/target/target_core_user.c
+> +++ b/drivers/target/target_core_user.c
+> @@ -20,6 +20,7 @@
+>   #include <linux/configfs.h>
+>   #include <linux/mutex.h>
+>   #include <linux/workqueue.h>
+> +#include <linux/pagemap.h>
+>   #include <net/genetlink.h>
+>   #include <scsi/scsi_common.h>
+>   #include <scsi/scsi_proto.h>
+> @@ -1667,6 +1668,25 @@ static u32 tcmu_blocks_release(struct tcmu_dev *udev, unsigned long first,
+>   	xas_lock(&xas);
+>   	xas_for_each(&xas, page, (last + 1) * udev->data_pages_per_blk - 1) {
+>   		xas_store(&xas, NULL);
+> +		/*
+> +		 * While reaching here, there maybe page faults occurring on
+> +		 * these to be released pages, and there maybe one race that
+> +		 * unmap_mapping_range() is called before page fault on these
+> +		 * pages are finished, then valid but stale map is created.
+> +		 *
+> +		 * If another command runs in later and needs to extends
+> +		 * dbi_thresh, it may reuse the corresponding slot to previous
+> +		 * page in data_bitmap, then though we'll allocate new page for
+> +		 * this slot in data_area, but no page fault will happen again,
+> +		 * because we have a valid map, command's data will lose.
+> +		 *
+> +		 * So here we lock and unlock pages that are to be released to
+> +		 * ensure all page faults to be completed, then following
+> +		 * unmap_mapping_range() can ensure stale maps to be removed
+> +		 * cleanly.
+> +		 */
+> +		lock_page(page);
+> +		unlock_page(page);
+>   		__free_page(page);
+>   		pages_freed++;
+>   	}
+> @@ -1822,6 +1842,7 @@ static struct page *tcmu_try_get_data_page(struct tcmu_dev *udev, uint32_t dpi)
+>   	page = xa_load(&udev->data_pages, dpi);
+>   	if (likely(page)) {
+>   		get_page(page);
+> +		lock_page(page);
+>   		mutex_unlock(&udev->cmdr_lock);
+>   		return page;
+>   	}
+> @@ -1863,6 +1884,7 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>   	struct page *page;
+>   	unsigned long offset;
+>   	void *addr;
+> +	vm_fault_t ret = 0;
+>   
+>   	int mi = tcmu_find_mem_index(vmf->vma);
+>   	if (mi < 0)
+> @@ -1887,10 +1909,11 @@ static vm_fault_t tcmu_vma_fault(struct vm_fault *vmf)
+>   		page = tcmu_try_get_data_page(udev, dpi);
+>   		if (!page)
+>   			return VM_FAULT_SIGBUS;
+> +		ret = VM_FAULT_LOCKED;
+>   	}
+>   
+>   	vmf->page = page;
+> -	return 0;
+> +	return ret;
+>   }
+>   
+>   static const struct vm_operations_struct tcmu_vm_ops = {
+> @@ -3205,12 +3228,21 @@ static void find_free_blocks(void)
+>   			udev->dbi_max = block;
+>   		}
+>   
+> +		/*
+> +		 * Release the block pages.
+> +		 * Also note that since tcmu_vma_fault() gets one extra page
+> +		 * refcount, tcmu_blocks_release() won't free pages if pages
+> +		 * are in mapped, that means it's safe to call
+> +		 * tcmu_blocks_release() before unmap_mapping_range(), which
+> +		 * drops the refcount of pages it unmaps and thus releases
+> +		 * those pages.
+> +		 */
+> +		pages_freed = tcmu_blocks_release(udev, start, end - 1);
+> +
+>   		/* Here will truncate the data area from off */
+>   		off = udev->data_off + (loff_t)start * udev->data_blk_size;
+>   		unmap_mapping_range(udev->inode->i_mapping, off, 0, 1);
+>   
+> -		/* Release the block pages */
+> -		pages_freed = tcmu_blocks_release(udev, start, end - 1);
+>   		mutex_unlock(&udev->cmdr_lock);
+>   
+>   		total_pages_freed += pages_freed;
