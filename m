@@ -2,82 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9F9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 11:30:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51EA7C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 12:33:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232649AbiD0Lde (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 07:33:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37932 "EHLO
+        id S234169AbiD0MgY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 08:36:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232590AbiD0Ldd (ORCPT
+        with ESMTP id S234069AbiD0MgX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 07:33:33 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC3438191
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id h12so1267905plf.12
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VWsO9zYE+6z8Bu+J+RVWchJHdOi/jTER00tosQL2T9k=;
-        b=fBiMUHL+/89DWKYwG6EjwyvTpwpWmS2S7Tq9KPIVm3Z1+65DIF65PsvxA6GBg6lX5E
-         7RqX1vmosklEYI8VFjNF3/0b1d/zOlXrobjGn6xntCUrbhi3bpISDovDrxsTNVsPnogN
-         2t5yfG+UyyZROV8h3L/dReZNbNN7kRmw32Q+A=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VWsO9zYE+6z8Bu+J+RVWchJHdOi/jTER00tosQL2T9k=;
-        b=B0tXJ1mIzrLdXVLJPxA0u8tyXj0jjKAZGrabWdMNzAXUUV1PsAIYLs2dd3McUdXhw1
-         9M+nzwNxB1T2O0vt5nSrxXinjQw1WiP6PMj4natfmPgBBF7/lhGvq9FB09xQ+RznLLrl
-         3BvOAMykoU/03RCJyjOBeHZyxLd93ZOnSRfO04G6tUm180VMxhBB7R32Y/sclfqgwGAV
-         ZAEnMmH/j0gF2NXV1Bw6jgKTIC0FbTJQPoMj0Ey7l0qRrPGTz+6ZYzcMcTIMz1oE/glm
-         mxzbCI/Oz7Z0Zp+2p/QChYm8knGXPE622i8JMdE7GCP0y86wLXwdtijy+O+oZ4FXpgL2
-         0u/Q==
-X-Gm-Message-State: AOAM531fJJXSjINMobXncdteSQ6oD+qQl8Rzmo2z4otu+DglCFJIFZ1d
-        YOPyldWsejXXg5Dcn2hI4yECGA==
-X-Google-Smtp-Source: ABdhPJxgII3YJrlgmRBlb+I6g1YyWPWr0arhPXRxwA6t0ftRB36wF6qpxWbiq+09MhjzTFZc/4cGUA==
-X-Received: by 2002:a17:903:32d2:b0:15d:57c7:9eef with SMTP id i18-20020a17090332d200b0015d57c79eefmr1916051plr.2.1651059022158;
-        Wed, 27 Apr 2022 04:30:22 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:8e2d:263:26e7:c039])
-        by smtp.gmail.com with ESMTPSA id d14-20020a62f80e000000b0050d2671b11bsm14355030pfh.53.2022.04.27.04.30.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Apr 2022 04:30:21 -0700 (PDT)
-Date:   Wed, 27 Apr 2022 20:30:16 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Alexey Romanov <avromanov@sberdevices.ru>
-Cc:     minchan@kernel.org, ngupta@vflare.org, senozhatsky@chromium.org,
-        linux-block@vger.kernel.org, axboe@chromium.org,
-        kernel@sberdevices.ru, linux-kernel@vger.kernel.org,
-        mnitenko@gmail.com, Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: Re: [PATCH v2] zram: remove double compression logic
-Message-ID: <YmkpSC/gJf7Cg2Ym@google.com>
-References: <20220427100345.29461-1-avromanov@sberdevices.ru>
+        Wed, 27 Apr 2022 08:36:23 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73371FD31;
+        Wed, 27 Apr 2022 05:33:12 -0700 (PDT)
+Received: from kwepemi100003.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4KpJ6S1Wf3zfZrg;
+        Wed, 27 Apr 2022 20:32:16 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100003.china.huawei.com (7.221.188.122) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 27 Apr 2022 20:33:10 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 27 Apr
+ 2022 20:33:09 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
+        <paolo.valente@linaro.org>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v3 1/3] block, bfq: record how many queues are busy in bfq_group
+Date:   Wed, 27 Apr 2022 20:47:20 +0800
+Message-ID: <20220427124722.48465-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220427124722.48465-1-yukuai3@huawei.com>
+References: <20220427124722.48465-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220427100345.29461-1-avromanov@sberdevices.ru>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (22/04/27 13:03), Alexey Romanov wrote:
-> diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-> index cb253d80d72b..4be6caf43b1d 100644
-> --- a/drivers/block/zram/zram_drv.c
-> +++ b/drivers/block/zram/zram_drv.c
-> @@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
->  
->  	down_read(&zram->init_lock);
->  	ret = scnprintf(buf, PAGE_SIZE,
-> -			"version: %d\n%8llu %8llu\n",
-> +			"version: %d\n%8llu\n",
->  			version,
-> -			(u64)atomic64_read(&zram->stats.writestall),
->  			(u64)atomic64_read(&zram->stats.miss_free));
->  	up_read(&zram->init_lock);
+Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
 
-I think this also has to bump `version` to 2, since format of the
-file has changed.
+Add a counter 'busy_queues' in bfq_group, and update it in
+bfq_add/del_bfqq_busy().
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bfq-cgroup.c  |  1 +
+ block/bfq-iosched.h |  2 ++
+ block/bfq-wf2q.c    | 14 ++++++++++++++
+ 3 files changed, 17 insertions(+)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 09574af83566..4d516879d9fa 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+ 				   */
+ 	bfqg->bfqd = bfqd;
+ 	bfqg->active_entities = 0;
++	bfqg->busy_queues = 0;
+ 	bfqg->online = true;
+ 	bfqg->rq_pos_tree = RB_ROOT;
+ }
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 978ef5d6fe6a..3847f4ab77ac 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -906,6 +906,7 @@ struct bfq_group_data {
+  *                   are groups with more than one active @bfq_entity
+  *                   (see the comments to the function
+  *                   bfq_bfqq_may_idle()).
++ * @busy_queues: number of busy bfqqs.
+  * @rq_pos_tree: rbtree sorted by next_request position, used when
+  *               determining if two or more queues have interleaving
+  *               requests (see bfq_find_close_cooperator()).
+@@ -942,6 +943,7 @@ struct bfq_group {
+ 	struct bfq_entity *my_entity;
+ 
+ 	int active_entities;
++	int busy_queues;
+ 
+ 	struct rb_root rq_pos_tree;
+ 
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index f8eb340381cf..53826797430f 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -218,6 +218,14 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+ 	return false;
+ }
+ 
++static void bfq_update_busy_queues(struct bfq_queue *bfqq, bool is_add)
++{
++	if (is_add)
++		bfqq_group(bfqq)->busy_queues++;
++	else
++		bfqq_group(bfqq)->busy_queues--;
++}
++
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
+@@ -230,6 +238,10 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+ 	return true;
+ }
+ 
++static void bfq_update_busy_queues(struct bfq_queue *bfqq, bool is_add)
++{
++}
++
+ #endif /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+ /*
+@@ -1660,6 +1672,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	bfq_clear_bfqq_busy(bfqq);
+ 
+ 	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
++	bfq_update_busy_queues(bfqq, false);
+ 
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues--;
+@@ -1683,6 +1696,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
++	bfq_update_busy_queues(bfqq, true);
+ 
+ 	if (!bfqq->dispatched)
+ 		if (bfqq->wr_coeff == 1)
+-- 
+2.31.1
+
