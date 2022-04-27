@@ -2,107 +2,114 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D564C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 19:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 214D7C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 19:49:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230096AbiD0Ttt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 15:49:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41390 "EHLO
+        id S233454AbiD0Twc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 15:52:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35754 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235219AbiD0Tsx (ORCPT
+        with ESMTP id S233814AbiD0Tw2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 15:48:53 -0400
-X-Greylist: delayed 678 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 27 Apr 2022 12:43:56 PDT
-Received: from mx0a-00190b01.pphosted.com (mx0a-00190b01.pphosted.com [IPv6:2620:100:9001:583::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8A222D1F9
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 12:43:56 -0700 (PDT)
-Received: from pps.filterd (m0122333.ppops.net [127.0.0.1])
-        by mx0a-00190b01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 23RGnS90026015;
-        Wed, 27 Apr 2022 20:32:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=jan2016.eng;
- bh=En4aHoZK3NbhY+oA5W/g9EOIPnQRFnsBfonDIymvc9Y=;
- b=IWka3CnC55i6Q8EvMmC29w77OtNOB4bqnr16MsywCbhjLrK0UxNrzpqh9KHWcQE1XPG+
- j4V7Eunj2lv54Gc41I1i+4TjJokyTDCB8GJ/dwYMy10Tkrkt8vy70sEiJmJGxI7vCBYK
- PIfIiBFIBgq0jeL05KlEeh8gtDE3op1SoiykCO3MS9iYjtUmjvN/U6m+v1q1V63YMeQ8
- qkI90/JLnYjf5U7dqQ23ppDQ+1AtLFgjpFbdgg7dqRyC9Lgk153O3Y24Y0JaJlJWesnr
- aof/EHtfQUV6FDn3NF7j4FVoTBdmnYroyNMtnkJuw3cXkylsATdgDEDpnFuM4fp2ould SQ== 
-Received: from prod-mail-ppoint4 (a72-247-45-32.deploy.static.akamaitechnologies.com [72.247.45.32] (may be forged))
-        by mx0a-00190b01.pphosted.com (PPS) with ESMTPS id 3fpskm7jvv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 27 Apr 2022 20:32:28 +0100
-Received: from pps.filterd (prod-mail-ppoint4.akamai.com [127.0.0.1])
-        by prod-mail-ppoint4.akamai.com (8.16.1.2/8.16.1.2) with SMTP id 23RJIxm1029597;
-        Wed, 27 Apr 2022 15:32:27 -0400
-Received: from prod-mail-relay19.dfw02.corp.akamai.com ([172.27.165.173])
-        by prod-mail-ppoint4.akamai.com with ESMTP id 3fmct0ypav-1;
-        Wed, 27 Apr 2022 15:32:27 -0400
-Received: from [0.0.0.0] (prod-ssh-gw01.bos01.corp.akamai.com [172.27.119.138])
-        by prod-mail-relay19.dfw02.corp.akamai.com (Postfix) with ESMTP id 2685A6018D;
-        Wed, 27 Apr 2022 19:32:26 +0000 (GMT)
-Message-ID: <63116fb6-bc11-d551-6734-f5407c8f3af4@akamai.com>
-Date:   Wed, 27 Apr 2022 12:32:25 -0700
+        Wed, 27 Apr 2022 15:52:28 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C8F49C8B;
+        Wed, 27 Apr 2022 12:49:16 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id h12so2459041plf.12;
+        Wed, 27 Apr 2022 12:49:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:mime-version
+         :content-disposition;
+        bh=dHyaJhWWV2/0XVRasONV/Ot6Fn0AQBDrxMk4qZE1NjE=;
+        b=j2ccc9/tmPk1fdAf55kkSQPYg5qtpni4v4AYOGGuRC5Kc275Wz1QP0LZk6VSEAomca
+         LJ45O+/bKjIV8dVSZXzuyea5d1YHbou1nsPuHMfJVJXv7EGS4CyWTJyS52gkMqqntX5N
+         ybMZx6PAE1e2RF4VOQlALzstvb4Ja3mYTJiI3GFPU82iFnHIGEhOC1oH92roLwG0gu3v
+         E6Kc5bFKoAxaemNUCt3Yo5K/rPaqIXn5GqHaRVLjnwptdArBBUAbJeU2IivJVomYoxO2
+         nwbN+bg518RRO6yq4EKPISyZXVhnboeJh73dYApkF7Yf/Q3d+IuJwH2w3Nd3vl7YDhKj
+         fYTg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :mime-version:content-disposition;
+        bh=dHyaJhWWV2/0XVRasONV/Ot6Fn0AQBDrxMk4qZE1NjE=;
+        b=jqmSRHw8IiBJekRQ1GjfMfM9+LzzDAWyn682IBavQCF44DcuFwcGfpzC9A7F/NXZyG
+         uXrU7G3zj4ZxH6vF+KVCvBvkEnIwS7RirksGVBoWtxnr093G1Jr4ET9i+GWoToTXhxTp
+         iLxk/E1hntNro2mz+cjucGzpzP1piM5vNmCwzXTA1/wAY076l41A0NWJRm9q6ax0ZZL3
+         oI3qcpVveF7dZPU5SdNmxNXF3UTUS519gTo17uu7ugs0NOL4wfCY41n2qsSZ9Jr+1Qmz
+         9EVU189V2rmzRNKm6TyB+sADpvJ568GipjfKseOgC0rNdoG8RfFDrM+2OJ0M3TyHOujK
+         cn3w==
+X-Gm-Message-State: AOAM531DvMXzWmElVZDyXLsF2ZiDYJjPwz/DGzwxgJjAB5Zlyj7ukG9g
+        3INorDF3Sr/fDBj8fc1SPU4=
+X-Google-Smtp-Source: ABdhPJwzV7jGfLMkNkr7Nc4QrooBYL9PbbBZexVN3BcRMkRjddWyw7MQE+tpvgzPcSSWq11ciWNqZg==
+X-Received: by 2002:a17:902:f64d:b0:151:3895:46bf with SMTP id m13-20020a170902f64d00b00151389546bfmr30687221plg.31.1651088955577;
+        Wed, 27 Apr 2022 12:49:15 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:4f81])
+        by smtp.gmail.com with ESMTPSA id w11-20020a17090a4f4b00b001d8abe4bb17sm3569076pjl.32.2022.04.27.12.49.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 27 Apr 2022 12:49:14 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 27 Apr 2022 09:49:12 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        kernel-team@fb.com, Saravanan D <saravanand@fb.com>,
+        Christopher Obbard <chris.obbard@collabora.com>
+Subject: [PATCH block-5.18] Revert "block: inherit request start time from
+ bio for BLK_CGROUP"
+Message-ID: <YmmeOLfo5lzc+8yI@slm.duckdns.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: Precise disk statistics
-Content-Language: en-US
-To:     Mikulas Patocka <mpatocka@redhat.com>,
-        "Jayaramappa, Srilakshmi" <sjayaram@akamai.com>
-Cc:     "yukuai (C)" <yukuai3@huawei.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "snitzer@redhat.com" <snitzer@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "ming.lei@redhat.com" <ming.lei@redhat.com>
-References: <1650661324247.40468@akamai.com> <1650915337169.63486@akamai.com>
- <87031651-ba75-2b6f-8a5e-b0b4ef41c65f@huawei.com>
- <1651017390610.22782@akamai.com>
- <alpine.LRH.2.02.2204270549490.10147@file01.intranet.prod.int.rdu2.redhat.com>
-From:   Josh Hunt <johunt@akamai.com>
-In-Reply-To: <alpine.LRH.2.02.2204270549490.10147@file01.intranet.prod.int.rdu2.redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.486,18.0.858
- definitions=2022-04-27_04:2022-04-27,2022-04-27 signatures=0
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 mlxscore=0
- mlxlogscore=812 phishscore=0 adultscore=0 spamscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2204270120
-X-Proofpoint-GUID: nnwFYBv1rIHTXbYSSpRLT-bhx1wUjvYP
-X-Proofpoint-ORIG-GUID: nnwFYBv1rIHTXbYSSpRLT-bhx1wUjvYP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-04-27_04,2022-04-27_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 suspectscore=0
- mlxlogscore=807 lowpriorityscore=0 adultscore=0 mlxscore=0 spamscore=0
- bulkscore=0 impostorscore=0 clxscore=1011 phishscore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2202240000
- definitions=main-2204270120
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/27/22 02:57, Mikulas Patocka wrote:
->> [+ Mikulas and Ming]
->>
->> I see. Thank you for the response, Kuai, appreciate it.
->>
->> The conversation here https://urldefense.com/v3/__https://lkml.org/lkml/2020/3/24/1870__;!!GjvTz_vk!US3LozmCgynsWtz-1LkwhFPTXfY0XZNT7XKAw9GSNjZn0JkehqevMU7StsFKkjsS9b1hfGRsOCu0e1E$  hints at
->> potential improvements to io_ticks tracking.
->>
->> @Mikulas, Mike, please let us know if you have plans for more accurate
->> accounting or if there is some idea we can work on and submit a patch.
-> 
-> I know that the accounting is not accurate, but more accurate accounting
-> needed a shared atomic variable and it caused performance degradation. So,
-> we don't plan to improve the accounting.
+This reverts commit 0006707723233cb2a9a23ca19fc3d0864835704c. It has a
+couple problems:
 
-Thanks this is all very helpful.
+* bio_issue_time() is stored in bio->bi_issue truncated to 51 bits. This
+  overflows in slightly over 26 days. Setting rq->io_start_time_ns with it
+  means that io duration calculation would yield >26days after 26 days of
+  uptime. This, for example, confuses kyber making it cause high IO
+  latencies.
 
-If we know the accounting is not accurate then is there any reason to 
-keep it around? What value is it providing? Also, should we update tools 
-that use ioticks like iostat to report that disk utilization is 
-deprecated and should not be referred to going forward?
+* rq->io_start_time_ns should record the time that the IO is issued to the
+  device so that on-device latency can be measured. However,
+  bio_issue_time() is set before the bio goes through the rq-qos controllers
+  (wbt, iolatency, iocost), so when the bio gets throttled in any of the
+  mechanisms, the measured latencies make no sense - on-device latencies end
+  up higher than request-alloc-to-completion latencies.
 
-Josh
+We'll need a smarter way to avoid calling ktime_get_ns() repeatedly
+back-to-back. For now, let's revert the commit.
+
+Signed-off-by: Tejun Heo <tj@kernel.org>
+Cc: stable@vger.kernel.org # v5.16+
+---
+ block/blk-mq.c | 9 +--------
+ 1 file changed, 1 insertion(+), 8 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index c4370d2761706..84d749511f551 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1131,14 +1131,7 @@ void blk_mq_start_request(struct request *rq)
+ 	trace_block_rq_issue(rq);
+ 
+ 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
+-		u64 start_time;
+-#ifdef CONFIG_BLK_CGROUP
+-		if (rq->bio)
+-			start_time = bio_issue_time(&rq->bio->bi_issue);
+-		else
+-#endif
+-			start_time = ktime_get_ns();
+-		rq->io_start_time_ns = start_time;
++		rq->io_start_time_ns = ktime_get_ns();
+ 		rq->stats_sectors = blk_rq_sectors(rq);
+ 		rq->rq_flags |= RQF_STATS;
+ 		rq_qos_issue(q, rq);
+-- 
+2.36.0
+
