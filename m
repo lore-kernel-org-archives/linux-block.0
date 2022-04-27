@@ -2,158 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 333D7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 23:42:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6261BC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 23:53:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230102AbiD0XqE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 19:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53506 "EHLO
+        id S229898AbiD0X4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 19:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230125AbiD0XqD (ORCPT
+        with ESMTP id S229700AbiD0X4Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 19:46:03 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECB985EDCD
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 16:42:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1651102970; x=1682638970;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=b4PQ+YojFt/Da7JedNLqXswRcZ1DtIMcbUQc3b82khE=;
-  b=Nsp7zVuv4fbA4QVsRNDpuwmcqFsX2m4fWvWKczDuyy25l/ajgKvRYhSO
-   MR8LdwdJ90dxhOmPUgRnEOspQNhx8JDvxoIJNh+Lq24DEs8idlv1pjJsn
-   dGRlDh6NdSkfPTpB3v73uJSCkHslxV1sCL1anWhY3iEOe+XjRinwACZ7S
-   Exd1AsPeV1N5JjhPLpTu7aQFMiPVL6+Ro0XgdY7XUgMTdaFuouBljiXzp
-   z7OVQu/TP70inmVS7Cvq821dfUQcp0XMIksraZaxBhZq2CRlcYPJOK6iA
-   weBUGR1kIH0naHJP/mZHgwUP1X3ahqV7RyjU9caEw/U8wkNeUDeOkEuBl
-   g==;
-X-IronPort-AV: E=Sophos;i="5.90,294,1643644800"; 
-   d="scan'208";a="197844592"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 28 Apr 2022 07:42:49 +0800
-IronPort-SDR: xtvN47NNY+UU0Ek6MFhN+2R1idlVHWVuO1NM+0jUAlLveJKPX7lJoXdms2f9YxoW6pGDjAPWOJ
- QoHvYqhxMG7a01sykCMcIswHA65pSEqwGe5UCCUdfeTjoUWrQEj/s+vDdKcV1zBFc0tVUX3b0u
- ahMUhyeWbi3VTOx9CWU85yoFE0iiZmBzhuKGCmUrvU7Gn9grTE5dQ/wpuroqhWIGqsDAT15EVR
- p/XqNM9DRudrN1RoojLi2faLWO9O9a94eK1qeypdc+f5FCbnYdNl4AY/wsgZvEpWITQJhm+DZc
- FZmQux3V55oi19eXi4QoiHox
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Apr 2022 16:13:41 -0700
-IronPort-SDR: TjJVINq4UP/PnxQhLNk3X2CKG1+9HFZYCtBnhiVZ5mw4fCSa2muRGorW37lL1f8Yc3vfDyF6fc
- Fkxal2XE4lUFM/22LH+rX7xRkFYXvVebBQ6uWx/rPery30m5wpfySgcsOfxx4tRFc9PBVu59fU
- 3kRCke6/Z1ZNM0dYAjSl8jgm82Bq3NYp9RBNUsgq4v8fKciTctJvA4FNSMWMn/SFvPXUnzwllJ
- r9hg9hNtKzoE+UBgdALLNKncOgOmDlvK+7H0Zu0gisbE794sD6xq8jLQSasBf92shqbc6pMI+0
- o0Q=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Apr 2022 16:42:50 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Kpb090YMdz1SVny
-        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 16:42:49 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1651102968; x=1653694969; bh=b4PQ+YojFt/Da7JedNLqXswRcZ1DtIMcbUQ
-        c3b82khE=; b=aG9U+mpCYTqXLYVrB1nXg30+hvfUJ189J7XQSSmBmeZkvjsxkwu
-        zAaurumWJ7fm9SJv5J2FbjspgmG5JAqDow1JiX6iGFfC9Of0kykaaFX4ZDKBNjn7
-        c1vaCSsv8uCxbA0qKU1vQr7sjo2GKuQXZlvDLVoxWtDsD0Z1sjM+p8Nwc0CEll4E
-        D6XCio2WwJ24l1FBaPYbvh0rG1180xMBAGWn41A2ZxbXvt8f3tjQGcCajxa+bHT1
-        FmppUurtfeoO8TjI45cH5MPXNN7fFivo3PY5cobe5YbA6m03HnTor8+NQEiSRl8I
-        0/HpjutNT+lHDztsGZq4Q/AuoqjjlZcpVwA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 5WA4Ey5vor04 for <linux-block@vger.kernel.org>;
-        Wed, 27 Apr 2022 16:42:48 -0700 (PDT)
-Received: from [10.225.163.27] (unknown [10.225.163.27])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kpb025hPwz1Rvlc;
-        Wed, 27 Apr 2022 16:42:42 -0700 (PDT)
-Message-ID: <2ffc46c7-945f-ba26-90db-737fccd74fdf@opensource.wdc.com>
-Date:   Thu, 28 Apr 2022 08:42:41 +0900
+        Wed, 27 Apr 2022 19:56:16 -0400
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC1E310D;
+        Wed, 27 Apr 2022 16:53:03 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id a11so2856822pff.1;
+        Wed, 27 Apr 2022 16:53:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=79AFRdpemBVck+ntzsW/yKNt4PCLDqnjtmYL3oWIWPs=;
+        b=ERcJuxmAuVgbsIaump8T8yEPXPmGlPPG52HX+9B0YG5/lQFHIRQgdZL8cL00zhpld4
+         yNiFx7gcHa4YDjKwkCMxHpRCCkq23pphhzGNq7Hb201elKOqMDUPTFUmdPm/uaHGvI74
+         PDSrGLdR1coRP5bkv5jgEDVfW9HjUATh7PRbd7RjSr5jzAWdyAtjVxO03mHfrtdwplq+
+         j8OotbuRJSRX5MTpoRlQtTy/fojF7+qO1Foh6RWTErWYT/vlE0UnCqE5P8crMrXc7+eR
+         YaJIPvT9hJQjbL8sszTuJYTh0Sz2diXEqdB/ds6nL6Twg2GtR/zYudC4ggykQdcRdOvm
+         qdCQ==
+X-Gm-Message-State: AOAM532Y/cRWaBh6IB0xGlkBN6dArvyvn8q1+Fjya5pe3HzJ3ZxZk6AU
+        +1zOkBGdMmvb5RBxc0U81mQ=
+X-Google-Smtp-Source: ABdhPJwSGv1Za1U51Sy0XzpwyxC0M8/mR/bjHPIzXDoe+MDiEfgeZRKytqp5jH37HlZvkYhAFK/M7Q==
+X-Received: by 2002:a05:6a00:a94:b0:4fd:c14b:21cb with SMTP id b20-20020a056a000a9400b004fdc14b21cbmr32159218pfl.53.1651103583186;
+        Wed, 27 Apr 2022 16:53:03 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:6cbb:d78e:9b3:bb62? ([2620:15c:211:201:6cbb:d78e:9b3:bb62])
+        by smtp.gmail.com with ESMTPSA id w129-20020a628287000000b0050d4246fbedsm11710895pfd.187.2022.04.27.16.53.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Apr 2022 16:53:02 -0700 (PDT)
+Message-ID: <df8104aa-ca86-4053-5334-3bc4ff786c61@acm.org>
+Date:   Wed, 27 Apr 2022 16:52:59 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 16/16] dm-zoned: ensure only power of 2 zone sizes are
- allowed
+ Thunderbird/91.7.0
+Subject: Re: [PATCH 02/16] block: add blk_queue_zone_aligned and
+ bdev_zone_aligned helper
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, jaegeuk@kernel.org,
         axboe@kernel.dk, snitzer@kernel.org, hch@lst.de, mcgrof@kernel.org,
-        naohiro.aota@wdc.com, sagi@grimberg.me, dsterba@suse.com,
+        naohiro.aota@wdc.com, sagi@grimberg.me,
+        damien.lemoal@opensource.wdc.com, dsterba@suse.com,
         johannes.thumshirn@wdc.com
 Cc:     linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
         clm@fb.com, gost.dev@samsung.com, chao@kernel.org,
         linux-f2fs-devel@lists.sourceforge.net, josef@toxicpanda.com,
         jonathan.derrick@linux.dev, agk@redhat.com, kbusch@kernel.org,
         kch@nvidia.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, bvanassche@acm.org, jiangbo.365@bytedance.com,
+        dm-devel@redhat.com, jiangbo.365@bytedance.com,
         linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
         linux-block@vger.kernel.org
 References: <20220427160255.300418-1-p.raghav@samsung.com>
- <CGME20220427160313eucas1p1feecf74ec15c8c3d9250444710fd1676@eucas1p1.samsung.com>
- <20220427160255.300418-17-p.raghav@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220427160255.300418-17-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+ <CGME20220427160258eucas1p19548a7094f67b4c9f340add776f60082@eucas1p1.samsung.com>
+ <20220427160255.300418-3-p.raghav@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220427160255.300418-3-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/28/22 01:02, Pankaj Raghav wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
-> 
-> Today dm-zoned relies on the assumption that you have a zone size
-> with a power of 2. Even though the block layer today enforces this
-> requirement, these devices do exist and so provide a stop-gap measure
-> to ensure these devices cannot be used by mistake
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->  drivers/md/dm-zone.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 57daa86c19cf..221e0aa0f1a7 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->  	struct request_queue *q = md->queue;
->  	unsigned int noio_flag;
->  	int ret;
-> +	struct block_device *bdev = md->disk->part0;
-> +	sector_t zone_sectors;
-> +	char bname[BDEVNAME_SIZE];
+On 4/27/22 09:02, Pankaj Raghav wrote:
+> +static inline bool bdev_zone_aligned(struct block_device *bdev, sector_t sec)
+> +{
+> +	struct request_queue *q = bdev_get_queue(bdev);
 > +
-> +	zone_sectors = bdev_zone_sectors(bdev);
-> +
-> +	if (!is_power_of_2(zone_sectors)) {
-> +		DMWARN("%s: %s only power of two zone size supported\n",
-> +		       dm_device_name(md),
-> +		       bdevname(bdev, bname));
-> +		return 1;
-> +	}
+> +	if (q)
+> +		return blk_queue_zone_aligned(q, sec);
+> +	return false;
+> +}
 
-Why ?
+Which patch uses this function? I can't find any patch in this series 
+that introduces a call to this function.
 
-See my previous email about still allowing ZC < ZS for non power of 2 zone
-size drives. dm-zoned can easily support non power of 2 zone size as long
-as ZC == ZS for all zones.
+Thanks,
 
-The problem with dm-zoned is ZC < ZS *AND* potentially variable ZC per
-zone. That cannot be supported easily (still not impossible, but
-definitely a lot more complex).
-
->  
->  	/*
->  	 * Check if something changed. If yes, cleanup the current resources
+Bart.
 
 
--- 
-Damien Le Moal
-Western Digital Research
