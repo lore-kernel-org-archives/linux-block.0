@@ -2,114 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 214D7C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 19:49:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4771EC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 27 Apr 2022 19:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233454AbiD0Twc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 27 Apr 2022 15:52:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35754 "EHLO
+        id S234653AbiD0Ty6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 27 Apr 2022 15:54:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45106 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233814AbiD0Tw2 (ORCPT
+        with ESMTP id S234917AbiD0Tyy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 27 Apr 2022 15:52:28 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64C8F49C8B;
-        Wed, 27 Apr 2022 12:49:16 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id h12so2459041plf.12;
-        Wed, 27 Apr 2022 12:49:16 -0700 (PDT)
+        Wed, 27 Apr 2022 15:54:54 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBC160059
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 12:51:40 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id r17so659333iln.9
+        for <linux-block@vger.kernel.org>; Wed, 27 Apr 2022 12:51:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=dHyaJhWWV2/0XVRasONV/Ot6Fn0AQBDrxMk4qZE1NjE=;
-        b=j2ccc9/tmPk1fdAf55kkSQPYg5qtpni4v4AYOGGuRC5Kc275Wz1QP0LZk6VSEAomca
-         LJ45O+/bKjIV8dVSZXzuyea5d1YHbou1nsPuHMfJVJXv7EGS4CyWTJyS52gkMqqntX5N
-         ybMZx6PAE1e2RF4VOQlALzstvb4Ja3mYTJiI3GFPU82iFnHIGEhOC1oH92roLwG0gu3v
-         E6Kc5bFKoAxaemNUCt3Yo5K/rPaqIXn5GqHaRVLjnwptdArBBUAbJeU2IivJVomYoxO2
-         nwbN+bg518RRO6yq4EKPISyZXVhnboeJh73dYApkF7Yf/Q3d+IuJwH2w3Nd3vl7YDhKj
-         fYTg==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=A3SuMQQGPXuzThm/aM6O06njtTvaZhBmlWvPZYpCL2M=;
+        b=KP1HDZ4wptfcj0/cthgpkBLKrOPHem9S0qnn9gwCy5uZg1T6JFdVO34uWPhSQ2OGnh
+         QpMw5xtcg0dPsyhyQKDwfaQN/qd24/pZdx42411N3huZzwpDOahme9p+aZgS/4E6mUT+
+         w4nQYb7oAQ5jU9AcvPuyIwkf9FyzkkLAo1Rnt507+13b4tBI/vh59MHraZMa3tA2yGsp
+         gP9Ht7wG4mpm/DTJEfJgHMZd0LVlaw5VOJY4aspS6bddWpoRIxVUB/IqJF3fV4PRGRfm
+         A7s3XEBoGoKrK57M23wClox4n0QRE8rO7uekRsrIPU6Ep6TCVKE7+JVB76s8DueRp8+2
+         6ueQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :mime-version:content-disposition;
-        bh=dHyaJhWWV2/0XVRasONV/Ot6Fn0AQBDrxMk4qZE1NjE=;
-        b=jqmSRHw8IiBJekRQ1GjfMfM9+LzzDAWyn682IBavQCF44DcuFwcGfpzC9A7F/NXZyG
-         uXrU7G3zj4ZxH6vF+KVCvBvkEnIwS7RirksGVBoWtxnr093G1Jr4ET9i+GWoToTXhxTp
-         iLxk/E1hntNro2mz+cjucGzpzP1piM5vNmCwzXTA1/wAY076l41A0NWJRm9q6ax0ZZL3
-         oI3qcpVveF7dZPU5SdNmxNXF3UTUS519gTo17uu7ugs0NOL4wfCY41n2qsSZ9Jr+1Qmz
-         9EVU189V2rmzRNKm6TyB+sADpvJ568GipjfKseOgC0rNdoG8RfFDrM+2OJ0M3TyHOujK
-         cn3w==
-X-Gm-Message-State: AOAM531DvMXzWmElVZDyXLsF2ZiDYJjPwz/DGzwxgJjAB5Zlyj7ukG9g
-        3INorDF3Sr/fDBj8fc1SPU4=
-X-Google-Smtp-Source: ABdhPJwzV7jGfLMkNkr7Nc4QrooBYL9PbbBZexVN3BcRMkRjddWyw7MQE+tpvgzPcSSWq11ciWNqZg==
-X-Received: by 2002:a17:902:f64d:b0:151:3895:46bf with SMTP id m13-20020a170902f64d00b00151389546bfmr30687221plg.31.1651088955577;
-        Wed, 27 Apr 2022 12:49:15 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::5:4f81])
-        by smtp.gmail.com with ESMTPSA id w11-20020a17090a4f4b00b001d8abe4bb17sm3569076pjl.32.2022.04.27.12.49.14
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=A3SuMQQGPXuzThm/aM6O06njtTvaZhBmlWvPZYpCL2M=;
+        b=E4mLhi4NEHpo3sYVtxPY6XksT4BADRW6oSqx1RV5gruQyPe6P+A+5ywf+vBl3QHLae
+         tr3iWQLRUbSUVjseNHhmhfVr5+VGaysvaquV4F73IphK7iQl9AZ5qnzN/t+QVrp2mpuw
+         yu80g0iOClnk2Xc/IgBuGmiH7Sb6R2mvldVodL6gdRiouNhLIts18Npf46lKAJS8f2xz
+         x7DKAINt5crF+83/1u/QWsv+gI8Q87zvvsTiP2n0gQL8iVHDa7JjZpEMy7ESQu7VeiaA
+         buVrp2Dmd7xi2Wv4HDu4xkoQbv4sgIjW7V0LyfNpWOGpfMlqgfgKPjJ176C44o2x/gmy
+         pU7Q==
+X-Gm-Message-State: AOAM533+0xtVUfjR9pwE7HzlU3K6Au8qEQsWACz1YBIXnSVJA6MWXMu6
+        t+Eqlt8E4r+6gwI/yHnfaYy/3fgW8HxRUQ==
+X-Google-Smtp-Source: ABdhPJw/VADmvZzVCQb095A1Ngx6/rnHArBaR5Oj+OxIFthrh6JB7HWwRaKDnQ/+58IoRtEE9m9a4A==
+X-Received: by 2002:a05:6e02:1748:b0:2cd:a0ea:8ff4 with SMTP id y8-20020a056e02174800b002cda0ea8ff4mr6054458ill.269.1651089099496;
+        Wed, 27 Apr 2022 12:51:39 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id u4-20020a92d1c4000000b002cc14bf22ddsm10050294ilg.77.2022.04.27.12.51.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Apr 2022 12:49:14 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 27 Apr 2022 09:49:12 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        kernel-team@fb.com, Saravanan D <saravanand@fb.com>,
-        Christopher Obbard <chris.obbard@collabora.com>
-Subject: [PATCH block-5.18] Revert "block: inherit request start time from
- bio for BLK_CGROUP"
-Message-ID: <YmmeOLfo5lzc+8yI@slm.duckdns.org>
+        Wed, 27 Apr 2022 12:51:39 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org
+Cc:     linux-block@vger.kernel.org, saravanand@fb.com,
+        chris.obbard@collabora.com, kernel-team@fb.com,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <YmmeOLfo5lzc+8yI@slm.duckdns.org>
+References: <YmmeOLfo5lzc+8yI@slm.duckdns.org>
+Subject: Re: [PATCH block-5.18] Revert "block: inherit request start time from bio for BLK_CGROUP"
+Message-Id: <165108909873.140853.15966713411862913960.b4-ty@kernel.dk>
+Date:   Wed, 27 Apr 2022 13:51:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This reverts commit 0006707723233cb2a9a23ca19fc3d0864835704c. It has a
-couple problems:
+On Wed, 27 Apr 2022 09:49:12 -1000, Tejun Heo wrote:
+> This reverts commit 0006707723233cb2a9a23ca19fc3d0864835704c. It has a
+> couple problems:
+> 
+> * bio_issue_time() is stored in bio->bi_issue truncated to 51 bits. This
+>   overflows in slightly over 26 days. Setting rq->io_start_time_ns with it
+>   means that io duration calculation would yield >26days after 26 days of
+>   uptime. This, for example, confuses kyber making it cause high IO
+>   latencies.
+> 
+> [...]
 
-* bio_issue_time() is stored in bio->bi_issue truncated to 51 bits. This
-  overflows in slightly over 26 days. Setting rq->io_start_time_ns with it
-  means that io duration calculation would yield >26days after 26 days of
-  uptime. This, for example, confuses kyber making it cause high IO
-  latencies.
+Applied, thanks!
 
-* rq->io_start_time_ns should record the time that the IO is issued to the
-  device so that on-device latency can be measured. However,
-  bio_issue_time() is set before the bio goes through the rq-qos controllers
-  (wbt, iolatency, iocost), so when the bio gets throttled in any of the
-  mechanisms, the measured latencies make no sense - on-device latencies end
-  up higher than request-alloc-to-completion latencies.
+[1/1] Revert "block: inherit request start time from bio for BLK_CGROUP"
+      commit: 4cddeacad6d4b23493a108d0705e7d2ab89ba5a3
 
-We'll need a smarter way to avoid calling ktime_get_ns() repeatedly
-back-to-back. For now, let's revert the commit.
-
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: stable@vger.kernel.org # v5.16+
----
- block/blk-mq.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index c4370d2761706..84d749511f551 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1131,14 +1131,7 @@ void blk_mq_start_request(struct request *rq)
- 	trace_block_rq_issue(rq);
- 
- 	if (test_bit(QUEUE_FLAG_STATS, &q->queue_flags)) {
--		u64 start_time;
--#ifdef CONFIG_BLK_CGROUP
--		if (rq->bio)
--			start_time = bio_issue_time(&rq->bio->bi_issue);
--		else
--#endif
--			start_time = ktime_get_ns();
--		rq->io_start_time_ns = start_time;
-+		rq->io_start_time_ns = ktime_get_ns();
- 		rq->stats_sectors = blk_rq_sectors(rq);
- 		rq->rq_flags |= RQF_STATS;
- 		rq_qos_issue(q, rq);
+Best regards,
 -- 
-2.36.0
+Jens Axboe
+
 
