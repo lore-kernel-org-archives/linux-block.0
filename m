@@ -2,77 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1427EC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 19:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED816C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 20:01:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236895AbiD1T4c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Apr 2022 15:56:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46456 "EHLO
+        id S235821AbiD1UEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Apr 2022 16:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236574AbiD1T4b (ORCPT
+        with ESMTP id S231396AbiD1UEg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Apr 2022 15:56:31 -0400
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 107D9BF310
-        for <linux-block@vger.kernel.org>; Thu, 28 Apr 2022 12:53:16 -0700 (PDT)
-Received: by mail-pj1-f51.google.com with SMTP id cu23-20020a17090afa9700b001d98d8e53b7so6636237pjb.0
-        for <linux-block@vger.kernel.org>; Thu, 28 Apr 2022 12:53:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=lS0ufo28JApWWWITS5hlwhgT6n0g475gSGKPNtXDcoI=;
-        b=ceFnH2DHbYlSsG1CQd4A59YqwK7XGqTludgOTEp9j9MAWrX184sMKlOQ8lXlxGJNs+
-         QcqLFYZPZlA18Bdv3q/qRjLOToBJ05Vx69fqq1SmXgP/0KpA1hMEvaj9JAPUptBFKVgI
-         crWfw9dNL+DolCtXCBCCuNDeCzp1P3Ru0CNbt0d34BkPVV/656HQM9F7j50i7vO+ethA
-         0ZMdttnxDD0IJXIpcZsvWcaNqpJR2YlqyGlaJr9VumaAFv5vwgwF7UfGtxB5NATys4dG
-         761dfHHOdZdTs+9CAW8p+3I9Ald8kW3b3k44KWp4aKFnHAIJRTrJMPNsbQkIySyBaBSa
-         jpAQ==
-X-Gm-Message-State: AOAM530IxUaybNXXUWDO9ktIlVNz6pWVDN1xxI8xpgYulgHSx/E5pMdw
-        R3ejeOl1uQJI7NcQ5dNsAjc=
-X-Google-Smtp-Source: ABdhPJwStshcvnwF3sx/+PqobxK51UL/q/SB07RSdnvuwmgMWNlFg5FeA2R0LWdRkFoPfinS366t/g==
-X-Received: by 2002:a17:902:a3c9:b0:158:d83f:c436 with SMTP id q9-20020a170902a3c900b00158d83fc436mr35228868plb.162.1651175595449;
-        Thu, 28 Apr 2022 12:53:15 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:6f14:f527:3ca8:ecbf? ([2620:15c:211:201:6f14:f527:3ca8:ecbf])
-        by smtp.gmail.com with ESMTPSA id n14-20020a17090ac68e00b001d9e3b0e10fsm9328912pjt.16.2022.04.28.12.53.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 28 Apr 2022 12:53:14 -0700 (PDT)
-Message-ID: <106143d4-a3b5-4699-10f8-d4d048d3ec64@acm.org>
-Date:   Thu, 28 Apr 2022 12:53:13 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH blktests 1/3] Introduce the io_schedulers() function
+        Thu, 28 Apr 2022 16:04:36 -0400
+Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3973774868;
+        Thu, 28 Apr 2022 13:01:19 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+        by mail.sberdevices.ru (Postfix) with ESMTP id 65EF75FD03;
+        Thu, 28 Apr 2022 23:01:16 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+        s=mail; t=1651176076;
+        bh=Osnnz3SGQ3g/VbQYJdclIP+f6CEdAQIARqwCtbhZApE=;
+        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
+        b=oNpfdTYiFBwtPAF/VzIe5X6+HaR/Mw4kAZ1M/9iS0hjgbUSNuFcK0lAoHFrODtCuC
+         DHWuX/XEU89eNzO3cOTHMhE3GQGu9z6k8At5ELDc0k/VpZgHfaubEdYinkjaxxU0Bf
+         oQC1Q6Mmw7rqYfi4sx3UVrwEzrw2KgACEO+f7RROqfwPT1Oef3qmJfGm0HWuy3zgY/
+         RM3OuPBuujIc47wqa0dZmajNUbZWxOHuvEUFIfYOTfd+fish+23fodcDI6ZzY8UEVl
+         od3JTlXTQy4Mr9eGRUacBciLz498j71YQlu9jVdKChOD/1LLIYF2Wb3+GVhaxgHtd1
+         /DnM21t9+zlIg==
+Received: from S-MS-EXCH02.sberdevices.ru (S-MS-EXCH02.sberdevices.ru [172.16.1.5])
+        by mail.sberdevices.ru (Postfix) with ESMTP;
+        Thu, 28 Apr 2022 23:01:14 +0300 (MSK)
+From:   Aleksey Romanov <AVRomanov@sberdevices.ru>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        "minchan@kernel.org" <minchan@kernel.org>
+CC:     "minchan@kernel.org" <minchan@kernel.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "axboe@chromium.org" <axboe@chromium.org>,
+        kernel <kernel@sberdevices.ru>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mnitenko@gmail.com" <mnitenko@gmail.com>,
+        Dmitry Rokosov <DDRokosov@sberdevices.ru>
+Subject: Re: [PATCH v2] zram: remove double compression logic
+Thread-Topic: [PATCH v2] zram: remove double compression logic
+Thread-Index: AQHYWh39fkxoPWqFH028+oB3r+sQB60Dbc4AgAIhEIA=
+Date:   Thu, 28 Apr 2022 20:01:12 +0000
+Message-ID: <20220428200107.hz65qvxf2aoz27q2@cab-wsm-0029881>
+References: <20220427100345.29461-1-avromanov@sberdevices.ru>
+ <YmkpSC/gJf7Cg2Ym@google.com>
+In-Reply-To: <YmkpSC/gJf7Cg2Ym@google.com>
+Accept-Language: ru-RU, en-US
 Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Omar Sandoval <osandov@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <20220427213143.2490653-1-bvanassche@acm.org>
- <20220427213143.2490653-2-bvanassche@acm.org>
- <20220428035042.eqtokeaohmxerwu4@fedora>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220428035042.eqtokeaohmxerwu4@fedora>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.16.1.12]
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <93E992117724AD41B9856520CDF1E0BD@sberdevices.ru>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/04/28 14:34:00 #19338612
+X-KSMG-AntiVirus-Status: Clean, skipped
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/27/22 20:50, Shinichiro Kawasaki wrote:
-> On Apr 27, 2022 / 14:31, Bart Van Assche wrote:
->> -	local scheds
->>   	# shellcheck disable=SC2207
->> -	scheds=($(sed 's/[][]//g' "${TEST_DEV_SYSFS}/queue/scheduler"))
->> +	local scheds=($(io_schedulers "${TEST_DEV_SYSFS}"))
-> 
-> I ran block/005 with this patch and observed it fails without failure message.
-> To fix it, the line above should be:
->          local scheds=($(io_schedulers "$(basename "${TEST_DEV}")"))
-> 
+Thanks for the reply!
 
-This is something I should have noticed myself. I will fix this.
+On Wed, Apr 27, 2022 at 08:30:16PM +0900, Sergey Senozhatsky wrote:
+> On (22/04/27 13:03), Alexey Romanov wrote:
+> > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_dr=
+v.c
+> > index cb253d80d72b..4be6caf43b1d 100644
+> > --- a/drivers/block/zram/zram_drv.c
+> > +++ b/drivers/block/zram/zram_drv.c
+> > @@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev=
+,
+> > =20
+> >  	down_read(&zram->init_lock);
+> >  	ret =3D scnprintf(buf, PAGE_SIZE,
+> > -			"version: %d\n%8llu %8llu\n",
+> > +			"version: %d\n%8llu\n",
+> >  			version,
+> > -			(u64)atomic64_read(&zram->stats.writestall),
+> >  			(u64)atomic64_read(&zram->stats.miss_free));
+> >  	up_read(&zram->init_lock);
+>=20
+> I think this also has to bump `version` to 2, since format of the
+> file has changed.
 
-Thanks,
+Yes, I'll do that in the next patch.
 
-Bart.
+Minchan, do you have any suggestions on this patch?=20
+I want to fix Sergey suggestion and sumbit next patch.=
