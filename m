@@ -2,78 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C600BC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 11:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557E6C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 11:18:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345253AbiD1LIq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Apr 2022 07:08:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40538 "EHLO
+        id S1345488AbiD1LVS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Apr 2022 07:21:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344622AbiD1LIm (ORCPT
+        with ESMTP id S230231AbiD1LVS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Apr 2022 07:08:42 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6C563BA47;
-        Thu, 28 Apr 2022 04:05:23 -0700 (PDT)
-Received: from kwepemi100001.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Kpt6C0pfczfbDB;
-        Thu, 28 Apr 2022 19:04:03 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100001.china.huawei.com (7.221.188.215) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 28 Apr 2022 19:04:58 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 28 Apr
- 2022 19:04:57 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
-        <paolo.valente@linaro.org>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH -next v4 3/3] block, bfq: do not idle if only one group is activated
-Date:   Thu, 28 Apr 2022 19:19:07 +0800
-Message-ID: <20220428111907.3635820-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220428111907.3635820-1-yukuai3@huawei.com>
+        Thu, 28 Apr 2022 07:21:18 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD80A88A1;
+        Thu, 28 Apr 2022 04:18:03 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id A70091F37F;
+        Thu, 28 Apr 2022 11:18:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1651144682; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oTrnvMpAhjSGeg1gbv33jLZDolAkh8q0+zNQ815xKlQ=;
+        b=u/MaWQyAW2WWLjnSuO7VRXh2tbAm8BiWtFpc6daZUTVzIaWYKwFlx01h1w+nw4vs52VB8E
+        FiEZAmdelzrw+GfHEPtQdL5J5Fq02eMk7mYvyRoGQRjqM9whOKLIbb/W6YAU0pWbWTllJX
+        V+9rqJVoqyrkpjBK7QPyFBMp0SpODyU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1651144682;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=oTrnvMpAhjSGeg1gbv33jLZDolAkh8q0+zNQ815xKlQ=;
+        b=sQOtrYhIKz01UuNxtkiMhUrfGvIlrtZgRKSHw0Qr/9X8S0UTvFRvWkUKZ22FzRc6nV8GEW
+        JLpypogPB1UaJGDg==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 2F89D2C142;
+        Thu, 28 Apr 2022 11:18:02 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 7F55FA061A; Thu, 28 Apr 2022 13:18:00 +0200 (CEST)
+Date:   Thu, 28 Apr 2022 13:18:00 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     jack@suse.cz, tj@kernel.org, axboe@kernel.dk,
+        paolo.valente@linaro.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v4 1/3] block, bfq: record how many queues are busy
+ in bfq_group
+Message-ID: <20220428111800.aqfzwwii5dabx3ko@quack3.lan>
 References: <20220428111907.3635820-1-yukuai3@huawei.com>
+ <20220428111907.3635820-2-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220428111907.3635820-2-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that root group is counted into 'num_groups_with_busy_queues',
-'num_groups_with_busy_queues > 0' is always true in
-bfq_asymmetric_scenario(). Thus change the condition to '> 1'.
+On Thu 28-04-22 19:19:05, Yu Kuai wrote:
+> Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
+> 
+> Add a counter 'busy_queues' in bfq_group, and update it in
+> bfq_add/del_bfqq_busy().
+> 
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-On the other hand, this change can enable concurrent sync io if only
-one group is activated.
+Just two nits below:
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/bfq-iosched.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -218,6 +218,16 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+>  	return false;
+>  }
+>  
+> +static void bfq_add_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +	bfqq_group(bfqq)->busy_queues++;
+> +}
+> +
+> +static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +	bfqq_group(bfqq)->busy_queues--;
+> +}
+> +
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 609b4e894684..aeba9001da0b 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -844,7 +844,7 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
- 
- 	return varied_queue_weights || multiple_classes_busy
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
--	       || bfqd->num_groups_with_busy_queues > 0
-+	       || bfqd->num_groups_with_busy_queues > 1
- #endif
- 		;
- }
+An opposite from "decrement" is "increment", not "add". So
+bfq_add_busy_queues() should be bfq_inc_busy_queues().
+
+> @@ -230,6 +240,14 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+>  	return true;
+>  }
+>  
+> +static void bfq_add_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +}
+> +
+> +static void bfq_add_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +}
+> +
+
+You have two times the same function here and you miss the other one...
+
+								Honza
 -- 
-2.31.1
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
