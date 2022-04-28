@@ -2,172 +2,184 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB7DC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 12:45:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 817FFC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 28 Apr 2022 14:03:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343785AbiD1Msz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 28 Apr 2022 08:48:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
+        id S1348049AbiD1OG3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 28 Apr 2022 10:06:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346607AbiD1Msy (ORCPT
+        with ESMTP id S1348073AbiD1OGE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 28 Apr 2022 08:48:54 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A33286E7;
-        Thu, 28 Apr 2022 05:45:39 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 50799210F3;
-        Thu, 28 Apr 2022 12:45:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1651149938; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M1tER3DtXbQSLD/j7/Uc6zPjmyydRTQWyAvK011v6WQ=;
-        b=kyeLx/umgkcWp7Jye4+E/wli4Ow/64CCjDRg54IG697QSqk7Rw8tksQOhwQhuqMVZ0ZEBC
-        VSjoH4OYH80t/nZOGas/0XnPYKfxbWIlvUVfN8sUs8oEm9EB51wT2qX4byVfwrDcr5GF/C
-        XYXule2uzIGfdvJ7C1+bH4gQTI3B3/s=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1651149938;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=M1tER3DtXbQSLD/j7/Uc6zPjmyydRTQWyAvK011v6WQ=;
-        b=8uOH1k5ym649fa0VViH9DHTNG9RA9bhvgedB1TQqxU/6MEHo4XHi+B6v9gnBQ0bQWP9czQ
-        YCwB2rtjm8fOKfDA==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 3B2FF2C141;
-        Thu, 28 Apr 2022 12:45:38 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id DBDE8A061A; Thu, 28 Apr 2022 14:45:37 +0200 (CEST)
-Date:   Thu, 28 Apr 2022 14:45:37 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk,
-        tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next v5 1/3] block, bfq: record how many queues are busy
- in bfq_group
-Message-ID: <20220428124537.c5ve4vs2jk5uzthy@quack3.lan>
-References: <20220428120837.3737765-1-yukuai3@huawei.com>
- <20220428120837.3737765-2-yukuai3@huawei.com>
+        Thu, 28 Apr 2022 10:06:04 -0400
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE79FB6454;
+        Thu, 28 Apr 2022 07:02:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1651154570; x=1682690570;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=h4skWhp2zeIZpA2ClyYBwaM9S88S0lAXDPHsSUH0YyA=;
+  b=Fss3k9R8U39Qqn3SxHfPaAskIJoUcouFzazcg4D3LqNNRWtyJXZNxy1f
+   6uDUsK36VYQjxh6EqcIAhXpmVfWgmmEK1d01YQ3iaHnp0QTqgQfvXASdP
+   rNU4BYRlUFuIoYKx5cVh+/XTHrox0MCp7FcaeK6AhTzBgCCCAjZIXzYuF
+   K0UbVY/Azba8sNkQ5yqggsySiKQup4rIV/DQoazCkWkdZpAnxjUprmrsR
+   UMUmEZttRvdTayFLduee1AT5cMGeRGyOlYukhjWuo60Ls+8LQS2zc8Fhj
+   vdEEh3+/cys4mIO6DwcPYfa4SQg3YXGkfKVYoyFNgi+0J67Wtva+oDtoN
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10330"; a="246856336"
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="246856336"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2022 07:02:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,295,1647327600"; 
+   d="scan'208";a="541312589"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 28 Apr 2022 07:02:41 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nk4jA-0005Qa-9F;
+        Thu, 28 Apr 2022 14:02:40 +0000
+Date:   Thu, 28 Apr 2022 22:02:28 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Nitesh Shetty <nj.shetty@samsung.com>
+Cc:     kbuild-all@lists.01.org, chaitanyak@nvidia.com,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        dm-devel@redhat.com, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, axboe@kernel.dk,
+        msnitzer@redhat.com, bvanassche@acm.org,
+        martin.petersen@oracle.com, hare@suse.de, kbusch@kernel.org,
+        hch@lst.de, Frederick.Knight@netapp.com, osandov@fb.com,
+        lsf-pc@lists.linux-foundation.org, djwong@kernel.org,
+        josef@toxicpanda.com, clm@fb.com, dsterba@suse.com, tytso@mit.edu,
+        jack@suse.com, nitheshshetty@gmail.com, gost.dev@samsung.com,
+        Nitesh Shetty <nj.shetty@samsung.com>,
+        Kanchan Joshi <joshi.k@samsung.com>,
+        Javier =?iso-8859-1?Q?Gonz=E1lez?= <javier.gonz@samsung.com>,
+        Arnav Dawn <arnav.dawn@samsung.com>,
+        Alasdair Kergon <agk@redhat.com>,
+        Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH v4 05/10] nvme: add copy offload support
+Message-ID: <202204282136.kqIaq8aK-lkp@intel.com>
+References: <20220426101241.30100-6-nj.shetty@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220428120837.3737765-2-yukuai3@huawei.com>
+In-Reply-To: <20220426101241.30100-6-nj.shetty@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 28-04-22 20:08:35, Yu Kuai wrote:
-> Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
-> 
-> Add a counter 'busy_queues' in bfq_group, and update it in
-> bfq_add/del_bfqq_busy().
-> 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Hi Nitesh,
 
-Looks good. Feel free to add:
+Thank you for the patch! Perhaps something to improve:
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[auto build test WARNING on next-20220422]
+[cannot apply to axboe-block/for-next device-mapper-dm/for-next linus/master v5.18-rc4 v5.18-rc3 v5.18-rc2 v5.18-rc4]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-								Honza
+url:    https://github.com/intel-lab-lkp/linux/commits/Nitesh-Shetty/block-Introduce-queue-limits-for-copy-offload-support/20220426-201825
+base:    e7d6987e09a328d4a949701db40ef63fbb970670
+config: s390-randconfig-s032-20220427 (https://download.01.org/0day-ci/archive/20220428/202204282136.kqIaq8aK-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 11.3.0
+reproduce:
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # apt-get install sparse
+        # sparse version: v0.6.4-dirty
+        # https://github.com/intel-lab-lkp/linux/commit/e029014185aff1d7c8facf6e19447487c6ce2b93
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Nitesh-Shetty/block-Introduce-queue-limits-for-copy-offload-support/20220426-201825
+        git checkout e029014185aff1d7c8facf6e19447487c6ce2b93
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross C=1 CF='-fdiagnostic-prefix -D__CHECK_ENDIAN__' O=build_dir ARCH=s390 SHELL=/bin/bash drivers/md/ drivers/nvme/host/ drivers/nvme/target/
 
-> ---
->  block/bfq-cgroup.c  |  1 +
->  block/bfq-iosched.h |  2 ++
->  block/bfq-wf2q.c    | 20 ++++++++++++++++++++
->  3 files changed, 23 insertions(+)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 09574af83566..4d516879d9fa 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
->  				   */
->  	bfqg->bfqd = bfqd;
->  	bfqg->active_entities = 0;
-> +	bfqg->busy_queues = 0;
->  	bfqg->online = true;
->  	bfqg->rq_pos_tree = RB_ROOT;
->  }
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 978ef5d6fe6a..3847f4ab77ac 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -906,6 +906,7 @@ struct bfq_group_data {
->   *                   are groups with more than one active @bfq_entity
->   *                   (see the comments to the function
->   *                   bfq_bfqq_may_idle()).
-> + * @busy_queues: number of busy bfqqs.
->   * @rq_pos_tree: rbtree sorted by next_request position, used when
->   *               determining if two or more queues have interleaving
->   *               requests (see bfq_find_close_cooperator()).
-> @@ -942,6 +943,7 @@ struct bfq_group {
->  	struct bfq_entity *my_entity;
->  
->  	int active_entities;
-> +	int busy_queues;
->  
->  	struct rb_root rq_pos_tree;
->  
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index f8eb340381cf..d9ff33e0be38 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -218,6 +218,16 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
->  	return false;
->  }
->  
-> +static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
-> +{
-> +	bfqq_group(bfqq)->busy_queues++;
-> +}
-> +
-> +static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
-> +{
-> +	bfqq_group(bfqq)->busy_queues--;
-> +}
-> +
->  #else /* CONFIG_BFQ_GROUP_IOSCHED */
->  
->  static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
-> @@ -230,6 +240,14 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
->  	return true;
->  }
->  
-> +static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
-> +{
-> +}
-> +
-> +static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
-> +{
-> +}
-> +
->  #endif /* CONFIG_BFQ_GROUP_IOSCHED */
->  
->  /*
-> @@ -1660,6 +1678,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  	bfq_clear_bfqq_busy(bfqq);
->  
->  	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
-> +	bfq_inc_busy_queues(bfqq);
->  
->  	if (bfqq->wr_coeff > 1)
->  		bfqd->wr_busy_queues--;
-> @@ -1683,6 +1702,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
->  
->  	bfq_mark_bfqq_busy(bfqq);
->  	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
-> +	bfq_dec_busy_queues(bfqq);
->  
->  	if (!bfqq->dispatched)
->  		if (bfqq->wr_coeff == 1)
-> -- 
-> 2.31.1
-> 
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/nvme/host/core.c:803:26: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __le16 [usertype] dspec @@     got restricted __le32 [usertype] @@
+   drivers/nvme/host/core.c:803:26: sparse:     expected restricted __le16 [usertype] dspec
+   drivers/nvme/host/core.c:803:26: sparse:     got restricted __le32 [usertype]
+
+vim +803 drivers/nvme/host/core.c
+
+   739	
+   740	static inline blk_status_t nvme_setup_copy_write(struct nvme_ns *ns,
+   741		       struct request *req, struct nvme_command *cmnd)
+   742	{
+   743		struct nvme_ctrl *ctrl = ns->ctrl;
+   744		struct nvme_copy_range *range = NULL;
+   745		struct bio *bio = req->bio;
+   746		struct nvme_copy_token *token = bvec_kmap_local(&bio->bi_io_vec[0]);
+   747		sector_t src_sector, dst_sector, n_sectors;
+   748		u64 src_lba, dst_lba, n_lba;
+   749		unsigned short nr_range = 1;
+   750		u16 control = 0;
+   751		u32 dsmgmt = 0;
+   752	
+   753		if (unlikely(memcmp(token->subsys, "nvme", 4)))
+   754			return BLK_STS_NOTSUPP;
+   755		if (unlikely(token->ns != ns))
+   756			return BLK_STS_NOTSUPP;
+   757	
+   758		src_sector = token->src_sector;
+   759		dst_sector = bio->bi_iter.bi_sector;
+   760		n_sectors = token->sectors;
+   761		if (WARN_ON(n_sectors != bio->bi_iter.bi_size >> 9))
+   762			return BLK_STS_NOTSUPP;
+   763	
+   764		src_lba = nvme_sect_to_lba(ns, src_sector);
+   765		dst_lba = nvme_sect_to_lba(ns, dst_sector);
+   766		n_lba = nvme_sect_to_lba(ns, n_sectors);
+   767	
+   768		if (unlikely(nvme_lba_to_sect(ns, src_lba) != src_sector) ||
+   769				unlikely(nvme_lba_to_sect(ns, dst_lba) != dst_sector) ||
+   770				unlikely(nvme_lba_to_sect(ns, n_lba) != n_sectors))
+   771			return BLK_STS_NOTSUPP;
+   772	
+   773		if (WARN_ON(!n_lba))
+   774			return BLK_STS_NOTSUPP;
+   775	
+   776		if (req->cmd_flags & REQ_FUA)
+   777			control |= NVME_RW_FUA;
+   778	
+   779		if (req->cmd_flags & REQ_FAILFAST_DEV)
+   780			control |= NVME_RW_LR;
+   781	
+   782		memset(cmnd, 0, sizeof(*cmnd));
+   783		cmnd->copy.opcode = nvme_cmd_copy;
+   784		cmnd->copy.nsid = cpu_to_le32(ns->head->ns_id);
+   785		cmnd->copy.sdlba = cpu_to_le64(dst_lba);
+   786	
+   787		range = kmalloc_array(nr_range, sizeof(*range),
+   788				GFP_ATOMIC | __GFP_NOWARN);
+   789		if (!range)
+   790			return BLK_STS_RESOURCE;
+   791	
+   792		range[0].slba = cpu_to_le64(src_lba);
+   793		range[0].nlb = cpu_to_le16(n_lba - 1);
+   794	
+   795		cmnd->copy.nr_range = 0;
+   796	
+   797		req->special_vec.bv_page = virt_to_page(range);
+   798		req->special_vec.bv_offset = offset_in_page(range);
+   799		req->special_vec.bv_len = sizeof(*range) * nr_range;
+   800		req->rq_flags |= RQF_SPECIAL_PAYLOAD;
+   801	
+   802		cmnd->copy.control = cpu_to_le16(control);
+ > 803		cmnd->copy.dspec = cpu_to_le32(dsmgmt);
+   804	
+   805		return BLK_STS_OK;
+   806	}
+   807	
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+0-DAY CI Kernel Test Service
+https://01.org/lkp
