@@ -2,140 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2258AC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 05:59:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFF1C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 07:55:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354336AbiD2GCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Apr 2022 02:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42072 "EHLO
+        id S1355321AbiD2H6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Apr 2022 03:58:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354335AbiD2GCU (ORCPT
+        with ESMTP id S1355303AbiD2H6p (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Apr 2022 02:02:20 -0400
-Received: from mailout2.samsung.com (mailout2.samsung.com [203.254.224.25])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52174B18AA
-        for <linux-block@vger.kernel.org>; Thu, 28 Apr 2022 22:59:02 -0700 (PDT)
-Received: from epcas2p3.samsung.com (unknown [182.195.41.55])
-        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20220429055858epoutp0290984741fc6df83ee8a284de3cb881e2~qSIJwcmoG2818428184epoutp02J
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 05:58:58 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20220429055858epoutp0290984741fc6df83ee8a284de3cb881e2~qSIJwcmoG2818428184epoutp02J
+        Fri, 29 Apr 2022 03:58:45 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5B63916F
+        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 00:55:26 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220429075523euoutp024c88b8e93928f50b7f95f5a2c1c85dbf~qTtzVwgVn0456004560euoutp02K
+        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 07:55:23 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220429075523euoutp024c88b8e93928f50b7f95f5a2c1c85dbf~qTtzVwgVn0456004560euoutp02K
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1651211938;
-        bh=7VNqedSgdU0I1pkagRB5zQzJa9VgyyV3FEglDrDcLpU=;
-        h=Subject:Reply-To:From:To:CC:Date:References:From;
-        b=sBXN48SyXpYLCAWu3fAceiJvLeris7/SuwyDCU2LDidx9J1pmHjte1rqAXvCIrICf
-         h0G0Fgkvo1kxdiqle2nNXyuvzb8K92JaVScJx0swkoIUeYEi9FHuLgN9nYQNeE4stm
-         VZ3jOe+n5h5apxM7EzS13jbqgTRpxo9amUSpalqQ=
-Received: from epsnrtp1.localdomain (unknown [182.195.42.162]) by
-        epcas2p2.samsung.com (KnoxPortal) with ESMTP id
-        20220429055857epcas2p27b4e3b79a24ff7ae70863ef86dd8f8cc~qSIJHYWxF0125601256epcas2p2t;
-        Fri, 29 Apr 2022 05:58:57 +0000 (GMT)
-Received: from epsmges2p2.samsung.com (unknown [182.195.36.88]) by
-        epsnrtp1.localdomain (Postfix) with ESMTP id 4KqMHg2Vs5z4x9QV; Fri, 29 Apr
-        2022 05:58:55 +0000 (GMT)
-X-AuditID: b6c32a46-f8bff70000002624-7a-626b7e9f94b0
-Received: from epcas2p4.samsung.com ( [182.195.41.56]) by
-        epsmges2p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        7F.54.09764.F9E7B626; Fri, 29 Apr 2022 14:58:55 +0900 (KST)
-Mime-Version: 1.0
-Subject: [RESEND PATCH v2] block-map: added error handling for
- bio_copy_kern()
-Reply-To: j-young.choi@samsung.com
-Sender: Jinyoung CHOI <j-young.choi@samsung.com>
-From:   Jinyoung CHOI <j-young.choi@samsung.com>
-To:     "axboe@kernel.dk" <axboe@kernel.dk>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-CC:     "hch@infradead.org" <hch@infradead.org>
-X-Priority: 3
-X-Content-Kind-Code: NORMAL
-X-CPGS-Detection: blocking_info_exchange
-X-Drm-Type: N,general
-X-Msg-Generator: Mail
-X-Msg-Type: PERSONAL
-X-Reply-Demand: N
-Message-ID: <20220429055854epcms2p7e5045065a4732fb59b0fb1345c348a45@epcms2p7>
-Date:   Fri, 29 Apr 2022 14:58:54 +0900
-X-CMS-MailID: 20220429055854epcms2p7e5045065a4732fb59b0fb1345c348a45
+        s=mail20170921; t=1651218923;
+        bh=bI8Rkw8VYhP6ElpRPvYBxmnt/vOhfFyD8CJi294HeBw=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=HoryqjTOG82NnqnnNj+3vhs/FX2Q5GjZ+wHNNCBoBQ+IDE0GpweNh8zskco917Hmn
+         Ksh/uEnpMTVtmvTHZMzlxyoPAN/691uOnOrYYjYQRESFHzOdkYPrZM2dvhVeaQZKcb
+         nay2N5cHbEGgWKEd26uPSMz7PdD0Jmg5LOnT6sW4=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220429075523eucas1p256537cb0c8ef40f290f7fd4eaf86ac2c~qTtyzy38B2182821828eucas1p2D;
+        Fri, 29 Apr 2022 07:55:23 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id 58.9C.10260.BE99B626; Fri, 29
+        Apr 2022 08:55:23 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220429075522eucas1p23cf6e8071f09d7120c1e7f478d7affb7~qTtyWBlWB0294802948eucas1p2h;
+        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220429075522eusmtrp195fdb2491c8fe5ebf4b3338c61a748e2~qTtyUgZAB1327413274eusmtrp1p;
+        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
+X-AuditID: cbfec7f5-bddff70000002814-71-626b99eb914c
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 7B.66.09404.AE99B626; Fri, 29
+        Apr 2022 08:55:22 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220429075522eusmtip22810b8b6a3a13d12d5b555bfcd6aeb24~qTtyKSmCb0091400914eusmtip27;
+        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.170) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 29 Apr 2022 08:55:19 +0100
+Message-ID: <5927dc09-89ca-973a-2e24-99be696d4240@samsung.com>
+Date:   Fri, 29 Apr 2022 09:55:18 +0200
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.8.1
+Subject: Re: [PATCH 12/16] zonefs: allow non power of 2 zoned devices
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        <jaegeuk@kernel.org>, <axboe@kernel.dk>, <snitzer@kernel.org>,
+        <hch@lst.de>, <mcgrof@kernel.org>, <naohiro.aota@wdc.com>,
+        <sagi@grimberg.me>, <dsterba@suse.com>,
+        <johannes.thumshirn@wdc.com>
+CC:     <linux-kernel@vger.kernel.org>, <clm@fb.com>,
+        <gost.dev@samsung.com>, <chao@kernel.org>, <josef@toxicpanda.com>,
+        <jonathan.derrick@linux.dev>, <agk@redhat.com>,
+        <kbusch@kernel.org>, <kch@nvidia.com>,
+        <linux-nvme@lists.infradead.org>, <bvanassche@acm.org>,
+        <jiangbo.365@bytedance.com>, <linux-fsdevel@vger.kernel.org>,
+        <matias.bjorling@wdc.com>, <linux-block@vger.kernel.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <a68a2d40-dff4-bac6-bb05-57c5c88af66e@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset="utf-8"
-X-Sendblock-Type: AUTO_CONFIDENTIAL
-X-CPGSPASS: Y
-X-CPGSPASS: Y
-CMS-TYPE: 102P
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrPKsWRmVeSWpSXmKPExsWy7bCmhe78uuwkg+UvuSxW3+1ns3h5SNPi
-        RstjZotHt58xWpyesIjJord/K5vF3lvaFpd3zWFz4PDYvELL4/LZUo++LasYPT5vkgtgicq2
-        yUhNTEktUkjNS85PycxLt1XyDo53jjc1MzDUNbS0MFdSyEvMTbVVcvEJ0HXLzAE6QUmhLDGn
-        FCgUkFhcrKRvZ1OUX1qSqpCRX1xiq5RakJJTYF6gV5yYW1yal66Xl1piZWhgYGQKVJiQndF1
-        8jVbwV+eiv1/5rA0MB7i6mLk5JAQMJHYsPkoexcjF4eQwA5Gie7XX9i6GDk4eAUEJf7uEAap
-        ERYIkNg6ZzsLiC0koCRxbs0sRpASYQEDiVu95iBhNgE9iZ9LZrCBjBERWM4ocXj9TUaQBLOA
-        tsTvo49YIXbxSsxof8oCYUtLbF++lRHC1pD4sayXGcIWlbi5+i07jP3+2HyoGhGJ1ntnoWoE
-        JR783A0Vl5Q4dOgr2MkSAvkSGw4EQoRrJN4uPwBVoi9xrWMj2FpeAV+JtSungdksAqoSf74c
-        gqpxkejaCXOyvMT2t3OYQUYyC2hKrN+lDzFdWeLILRaYRxo2/mZHZzML8El0HP4LF98x7wkT
-        RKuaxKImI4iwjMTXw/PZJzAqzUKE8iwka2chrF3AyLyKUSy1oDg3PbXYqMAIHrHJ+bmbGMEp
-        UcttB+OUtx/0DjEycTAeYpTgYFYS4f2yOyNJiDclsbIqtSg/vqg0J7X4EKMp0MMTmaVEk/OB
-        STmvJN7QxNLAxMzM0NzI1MBcSZzXK2VDopBAemJJanZqakFqEUwfEwenVAPTVMOGnbatu8Rq
-        9lyN+5r1t5ThcyK/h8qTMAdNMZcjKd/sHVWLV66am/nE+LRL44OG3yH1jB8KKpZ1fN2yW3DC
-        87k8mkLb7sqx2y2MehiZInLr6lbNWG7ZEIkjuvmNTNusl1c/0baYteVddLTwb6fOPY0pv7XN
-        0mP4/bSfVbo8vvawZPb9g4JLL8z/f6Dxt5jsHKP9KRPDcy7c7dVftCz6LLvGp7iU2R48CzbP
-        WCQteEphff0SkaM1Vf7d74vDVqVnT5t5fz67wltXh+PVf+37qyNMC8RVNujsvO15+ZVP1Tbn
-        LIn1ia97VBYEZuT5K85tjD696OejnsdxJxu/6b1w3tAxWZ+Nj0d8hY/pOz4lluKMREMt5qLi
-        RADE6GqkEgQAAA==
-DLP-Filter: Pass
-X-CFilter-Loop: Reflected
-X-CMS-RootMailID: 20220429055854epcms2p7e5045065a4732fb59b0fb1345c348a45
-References: <CGME20220429055854epcms2p7e5045065a4732fb59b0fb1345c348a45@epcms2p7>
+X-Originating-IP: [106.210.248.170]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA01Sa0xTZxj2O+f0nEMX6gFc+MTpshqyzU0u0yVfhnEM0Jxk+7EsShhLplVO
+        gLW0pIV5gcUSioZ7gcmgmpRdMrAMOkDLWAfRLlzkbqEKBOhgrRAIoEKXsdZulFMX/j3v8z3P
+        +77Pm4/Gg+vJMDpdnsUp5RKZmBQSpp7N4cPLtdJzUT02Chn7e3DUOFNOouonmzgauD6Eocry
+        Ggq5h0ZwNPp3HoZuNXZjyGHU4ajk7hMCPS+a3eI0czjyzEWjSstDgJw2HYY6p95Cv3XeJ9DY
+        rzdJpP/RSSHtVReOJrROgCp62wSoeXmNQH1T+2IhOzb+Ievt+4lkK/JXKXZktoVgx4ay2VZD
+        Icl+q76Os20/XGHNk2qSLc1fJdmOAruAXeuykazxto1gtW0tAna99QB77W4x9jGTLDyWwsnS
+        v+SUkcfPCtN+H7JSmQbqYkv9IqkGc4IiEEBD5ih0LjRTRUBIBzMNAOpKrSRfbAA43WXD+WId
+        wPkRA/7C8kjznV9VD+BgdS3xv6r4zqK/mRnA5appymcJZI7DZzXdWyqaJphwuDT6OU8Hwfu1
+        DsKHX2aSYLVukPThEOYENDf9u83jTCiccugxX889jBvAseFVga/AGQ0O1x5bKV9TkjkE8wq3
+        ZwUwJ6FlwS7gzW/CgnY3xeNXYfvKTX+Eg7BqYhzj8VewqWdwe2nIdAvh9PCi/zQJUG2vJ3kc
+        Apd6b1M8fgUOVJUQPM6Bzgk3zps1AJZ3GEnfQpCJgWWDMl7zAXx6Te2nRXBiJYjfRwQrTd/g
+        WhCu23EL3Y7Muh0RdDsi1AHCAEK5bFVGKqc6IucuRKgkGapseWrEeUVGK9j6ywPeXtcvoGHp
+        aYQFYDSwAEjj4j2BG+a0c8GBKZJLlzml4owyW8apLGAfTYhDA8+n/ywJZlIlWZyU4zI55YtX
+        jA4IU2O5+sAkz+66tv2y+XB3abhl7WvPzNspFa8XBtzQwxx5rgMJmsZsKwew4ob+vTVzu06p
+        pJXNhs737OaFyBys7M5u9vRMFLvRGvPGOm7cDNKqZ2Pql4KTTgrdj2H8maxkhWRKp/9r0rQL
+        5D0znFosinP9mZwf2SDyvBMtFn0xlxfywPtZndZe1uey6aURVwIw01XFEW9YRlzsa573T3S9
+        NH4x5aPnDIjbW2I6LdxPK5QPNKuiS5sd6luPPhElHhPE3ku4kOCIP3jPelgqvuFtjO87Wrn2
+        abt2fsU1/s9MgdOqHLW7Eh8mSjKrrIvJ3xv7L2dNlv9hXD8bpyjZeDc3Skyo0iTRh3ClSvIf
+        T3lrRzoEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDKsWRmVeSWpSXmKPExsVy+t/xe7qvZmYnGUxtVrVYf+oYs8Xqu/1s
+        FtM+/GS2OD31LJPFpP4Z7Ba/z55ntrjwo5HJYuXqo0wWT9bPYrboOfCBxeJv1z2gWMtDZos/
+        Dw0tJh26xmjx9OosJou9t7Qt9uw9yWJxedccNov5y56yW0xo+8pscWPCU0aLicc3s1qse/2e
+        xeLELWkHCY/LV7w9/p1Yw+Yxsfkdu8f5extZPC6fLfXYtKqTzWNhw1Rmj81L6j1232xg8+ht
+        fsfmsbP1PqvH+31X2TzWb7nK4jFh80ZWj8+b5DzaD3QzBQhE6dkU5ZeWpCpk5BeX2CpFG1oY
+        6RlaWugZmVjqGRqbx1oZmSrp29mkpOZklqUW6dsl6GUcPnuJvWAVe8XG5S/YGhgfsnYxcnJI
+        CJhIXG9ZxNbFyMUhJLCUUWL7mZdQCRmJT1c+skPYwhJ/rnVBFX1klJj1bR8LhLObUeJV318m
+        kCpeATuJTzOOAiU4OFgEVCVeXYiDCAtKnJz5hAXEFhWIkHiw+yzYAmEBV4nda/+DxZkFxCVu
+        PZnPBDJTROA3o8Tlc+9YQRxmgRZmiffPLrFDbHvLJPHzaD8zyAY2AS2Jxk6w8zgF3CQOPb/P
+        CjFJU6J1+292CFteYvvbOcwQLyhLTL5xhQnCrpV4dX834wRG0VlIDpyF5JBZSEbNQjJqASPL
+        KkaR1NLi3PTcYiO94sTc4tK8dL3k/NxNjMBktu3Yzy07GFe++qh3iJGJg/EQowQHs5II75fd
+        GUlCvCmJlVWpRfnxRaU5qcWHGE2BgTSRWUo0OR+YTvNK4g3NDEwNTcwsDUwtzYyVxHk9CzoS
+        hQTSE0tSs1NTC1KLYPqYODilGpjqJDZZJUXe2X7Drj5mwR71qudZQQV9ieWPJNYlTelvy/vE
+        5ah3fqHe3O3hz72kI1Vsplp0XU/SzOTLSj7LP+ni/OdLW++a9lyz1s+a7/2Vv/CCfe0Ua8/o
+        wptTow783PMocZb4B8MwE+NDs2+IW3dP/D5nYpmXjYB089qQWr//LAZ8nO9u71TTvCw6/Rdb
+        VZzbNrtIF+Wvea9Ybh1R/3DnTB1n5VqXM05JomGv9zZmSih0O8qt6fgUycHiaHjmbeRaHp8e
+        vxNPGZauN78l0xa78equlZu6raSMtm7ZtveNC++qLP15mfOcNr918HtwJWzlvaC7C66vvlFt
+        bcHOtZ/nXzwfz3/G6NshvR53bJVYijMSDbWYi4oTARtV/pXvAwAA
+X-CMS-MailID: 20220429075522eucas1p23cf6e8071f09d7120c1e7f478d7affb7
+X-Msg-Generator: CA
+X-RootMTR: 20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44
+References: <20220427160255.300418-1-p.raghav@samsung.com>
+        <CGME20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44@eucas1p2.samsung.com>
+        <20220427160255.300418-13-p.raghav@samsung.com>
+        <bfc1ddc3-5db3-6879-b6ab-210a00b82c6b@opensource.wdc.com>
+        <c490bd45-deab-8c2b-151c-c8db9f97e10c@samsung.com>
+        <a68a2d40-dff4-bac6-bb05-57c5c88af66e@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When new pages are allocated to bio through alloc_page() in
-bio_copy_kern(), the pages must be freed in error handling after that.
+Hi Damien,
+On 2022-04-28 23:49, Damien Le Moal wrote:
+> This is still not convincing given the code I saw. Additional test cases
+> need to be added with data verification & concurrent regular writes also
+> sent while doing copy to verify locking.
+> 
+> Which also reminds me that I have not seen any change to mq-deadline zone
+> write locking for this series. What is the assumption ? That users should
+> not be issuing writes when a copy is on-going ? What a bout the reverse
+> case ? at the very least, it seems that blk_issue_copy() should be taking
+> the zone write lock.
+> 
+I think you posted this comment in this thread instead of posting it in
+the copy offload thread.
 
-There is little chance of an error occurring in blk_rq_append_bio(), but
-in the code flow, pages additionally allocated to bio must be released.
-
-V2:
-	- replace int with bool
-
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jinyoung Choi <j-young.choi@samsung.com>
----
- block/blk-map.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
-
-diff --git a/block/blk-map.c b/block/blk-map.c
-index df8b066cd548..613990fa87e1 100644
---- a/block/blk-map.c
-+++ b/block/blk-map.c
-@@ -637,6 +637,7 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
- 	int reading = rq_data_dir(rq) == READ;
- 	unsigned long addr = (unsigned long) kbuf;
- 	struct bio *bio;
-+	bool do_copy;
- 	int ret;
- 
- 	if (len > (queue_max_hw_sectors(q) << 9))
-@@ -644,8 +645,9 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
- 	if (!len || !kbuf)
- 		return -EINVAL;
- 
--	if (!blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf) ||
--	    blk_queue_may_bounce(q))
-+	do_copy = !blk_rq_aligned(q, addr, len) || object_is_on_stack(kbuf) ||
-+		blk_queue_may_bounce(q);
-+	if (do_copy)
- 		bio = bio_copy_kern(q, kbuf, len, gfp_mask, reading);
- 	else
- 		bio = bio_map_kern(q, kbuf, len, gfp_mask);
-@@ -658,6 +660,8 @@ int blk_rq_map_kern(struct request_queue *q, struct request *rq, void *kbuf,
- 
- 	ret = blk_rq_append_bio(rq, bio);
- 	if (unlikely(ret)) {
-+		if (do_copy)
-+			bio_free_pages(bio);
- 		bio_uninit(bio);
- 		kfree(bio);
- 	}
--- 
-2.25.1
+>> I will make sure to add my private tree for zonefs in my cover letter in
+>> the next rev. But even without that change, a typical emulated npo2
+>> device should work fine because the changes are applicable only for
+>> "runt" zones.
+> 
+> 
