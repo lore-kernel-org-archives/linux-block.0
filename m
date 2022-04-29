@@ -2,64 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5BFC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 12:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB56AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 12:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349145AbiD2MFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Apr 2022 08:05:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45856 "EHLO
+        id S1356212AbiD2MtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Apr 2022 08:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235150AbiD2MFQ (ORCPT
+        with ESMTP id S229671AbiD2MtJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Apr 2022 08:05:16 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8571483BF;
-        Fri, 29 Apr 2022 05:01:54 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 900311F891;
-        Fri, 29 Apr 2022 12:01:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1651233713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E4v0J7E7TIHLnhe4FA9TirvyYrl7Jt4fCW8B/8OF+Yg=;
-        b=YatVXBU0Ln0fYAWeEC4C+9MDbnW73SALU1/KHMg6VYTowiLWgr+2icn5jSy9L8CmpnvIP6
-        0SSrKsr9BkP+JtvAJmfZhx3JPtspLDdvi0v+jxWRQNnGN0JfGKJMZLEFL3k3M0k3J4tS7u
-        JlL+6Uom/HX98RRa768k7Fj4ohwBjoE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1651233713;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=E4v0J7E7TIHLnhe4FA9TirvyYrl7Jt4fCW8B/8OF+Yg=;
-        b=tDW/+ovYrQU5rvIe9X3ygr4epYrmg2WPyV+fj7EgsTH40ntyD53UTIAq7ApSNK3Nw4MJp9
-        o1NzFT1Spv3nnFAQ==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 315862C141;
-        Fri, 29 Apr 2022 12:01:53 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D8669A061D; Fri, 29 Apr 2022 14:01:52 +0200 (CEST)
-Date:   Fri, 29 Apr 2022 14:01:52 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Paolo Valente <paolo.valente@linaro.org>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Chris Murphy <lists@colorremedies.com>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH] bfq: Fix warning in bfqq_request_over_limit()
-Message-ID: <20220429120152.w6stp5nfedwoyzp3@quack3.lan>
-References: <20220407140738.9723-1-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Fri, 29 Apr 2022 08:49:09 -0400
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26F58BF0F
+        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id p8so6819589pfh.8
+        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=ocs0mbwWAgp+tAzV857SlK6UIswo55neeWcWC4SY3Dg=;
+        b=M75tT7fYDZfjp2tooPLlxMQYQCHtfgnPjxrcG9sjO42fIEVdkZaBnWBzOBXOEmYC9W
+         JabKq23L0OLWu8ahSAEd6NPC3Sfeq91RQmUzFmjWiz4Ws889UkTQi1Fk81nTagfrlfWu
+         K23tTRDPhdroVfIEBbspC8P+AglAXcN+MIvl8wK2OmLa5DHdQ/3VwU6N16EHIuBeYRKi
+         OPJGTUV5KkJ+9ELMNfwH+ihmvDC1E9uPkW9uTbSx2wp8H0o0P+TbBP3ECVmyi4BaHlRb
+         08sKokJAjEYkmy3pUBk8kB/Y18B8zN3n6WJqZ5QD1zgR+qTs1qncEBVKors9RsYHTRoN
+         aukg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=ocs0mbwWAgp+tAzV857SlK6UIswo55neeWcWC4SY3Dg=;
+        b=r0BGWF0Cij7FUYFGftPFdTA4fBrtUBNTBGlTJPPLth6xbQx7Hae5XuAc/Vvi2d+97z
+         3JO0wfzqDFQRz74hWzcebqw7XJZrYs6gy5m/LG5cSYzAElf/nZMglydDWfcEKWW/ROFB
+         0OXaQEIYJhS+W1UwQ0nFG9mlCMZDGlLIzdybaYk5ajJuoBgPBT14m9MyciElvn2VCDDv
+         F21pNdMYAKUrFbX1Q/HwLBld73t5+Cx6z37dfSxsys2jiMnNR1BkOXBOP3RwLNw/YFHf
+         yVHBUkQpzXqTqZCJh0vX1kEPilBIjCrGb5itU00/gSwDK+awAw8X9Ekl8mWtLmunWvoW
+         GWtw==
+X-Gm-Message-State: AOAM533+Acr5EbVaSHdzPnx81WwS+YHXtrUYPELUwAUM93F2v7543uMw
+        ITiD4FtviO4PzZkzSQBhm5lgsA==
+X-Google-Smtp-Source: ABdhPJwKlSzZpHDij9KxX7qhr19A8CctJ49N5nK9OCJnkYsL5jYSRcGt1HiFqXKIJmXzYMOH6YWc1Q==
+X-Received: by 2002:a05:6a00:1749:b0:50a:8eed:b824 with SMTP id j9-20020a056a00174900b0050a8eedb824mr39902311pfc.50.1651236351379;
+        Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x186-20020a6363c3000000b003c14af505f6sm6010824pgb.14.2022.04.29.05.45.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Apr 2022 05:45:50 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     jack@suse.cz, paolo.valente@linaro.org
+Cc:     yukuai3@huawei.com, stable@vger.kernel.org,
+        linux-block@vger.kernel.org, lists@colorremedies.com
 In-Reply-To: <20220407140738.9723-1-jack@suse.cz>
+References: <20220407140738.9723-1-jack@suse.cz>
+Subject: Re: [PATCH] bfq: Fix warning in bfqq_request_over_limit()
+Message-Id: <165123635009.46786.3093085989076098329.b4-ty@kernel.dk>
+Date:   Fri, 29 Apr 2022 06:45:50 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu 07-04-22 16:07:38, Jan Kara wrote:
+On Thu, 7 Apr 2022 16:07:38 +0200, Jan Kara wrote:
 > People are occasionally reporting a warning bfqq_request_over_limit()
 > triggering reporting that BFQ's idea of cgroup hierarchy (and its depth)
 > does not match what generic blkcg code thinks. This can actually happen
@@ -67,61 +72,15 @@ On Thu 07-04-22 16:07:38, Jan Kara wrote:
 > is running. Make sure the code is safe against BFQ queue being moved to
 > a different BFQ group.
 > 
-> Fixes: 76f1df88bbc2 ("bfq: Limit number of requests consumed by each cgroup")
-> CC: stable@vger.kernel.org
-> Link: https://lore.kernel.org/all/CAJCQCtTw_2C7ZSz7as5Gvq=OmnDiio=HRkQekqWpKot84sQhFA@mail.gmail.com/
-> Reported-by: Chris Murphy <lists@colorremedies.com>
-> Reported-by: "yukuai (C)" <yukuai3@huawei.com>
-> Signed-off-by: Jan Kara <jack@suse.cz>
+> [...]
 
-Ping guys? Can we get the fix in please? It is pretty trivial...
+Applied, thanks!
 
-								Honza
+[1/1] bfq: Fix warning in bfqq_request_over_limit()
+      commit: 09df6a75fffa68169c5ef9bef990cd7ba94f3eef
 
-> ---
->  block/bfq-iosched.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index e47c75f1fa0f..272d48d8f326 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -569,7 +569,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
->  	struct bfq_entity *entity = &bfqq->entity;
->  	struct bfq_entity *inline_entities[BFQ_LIMIT_INLINE_DEPTH];
->  	struct bfq_entity **entities = inline_entities;
-> -	int depth, level;
-> +	int depth, level, alloc_depth = BFQ_LIMIT_INLINE_DEPTH;
->  	int class_idx = bfqq->ioprio_class - 1;
->  	struct bfq_sched_data *sched_data;
->  	unsigned long wsum;
-> @@ -578,15 +578,21 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
->  	if (!entity->on_st_or_in_serv)
->  		return false;
->  
-> +retry:
-> +	spin_lock_irq(&bfqd->lock);
->  	/* +1 for bfqq entity, root cgroup not included */
->  	depth = bfqg_to_blkg(bfqq_group(bfqq))->blkcg->css.cgroup->level + 1;
-> -	if (depth > BFQ_LIMIT_INLINE_DEPTH) {
-> +	if (depth > alloc_depth) {
-> +		spin_unlock_irq(&bfqd->lock);
-> +		if (entities != inline_entities)
-> +			kfree(entities);
->  		entities = kmalloc_array(depth, sizeof(*entities), GFP_NOIO);
->  		if (!entities)
->  			return false;
-> +		alloc_depth = depth;
-> +		goto retry;
->  	}
->  
-> -	spin_lock_irq(&bfqd->lock);
->  	sched_data = entity->sched_data;
->  	/* Gather our ancestors as we need to traverse them in reverse order */
->  	level = 0;
-> -- 
-> 2.34.1
-> 
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
