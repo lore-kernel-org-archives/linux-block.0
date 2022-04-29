@@ -2,85 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB56AC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 12:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60139C4332F
+	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 15:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356212AbiD2MtL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Apr 2022 08:49:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37830 "EHLO
+        id S1377882AbiD2PZ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Apr 2022 11:25:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbiD2MtJ (ORCPT
+        with ESMTP id S241558AbiD2PZ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Apr 2022 08:49:09 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F26F58BF0F
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id p8so6819589pfh.8
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
+        Fri, 29 Apr 2022 11:25:28 -0400
+Received: from smtp2.axis.com (smtp2.axis.com [195.60.68.18])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6ABB5689A4;
+        Fri, 29 Apr 2022 08:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=ocs0mbwWAgp+tAzV857SlK6UIswo55neeWcWC4SY3Dg=;
-        b=M75tT7fYDZfjp2tooPLlxMQYQCHtfgnPjxrcG9sjO42fIEVdkZaBnWBzOBXOEmYC9W
-         JabKq23L0OLWu8ahSAEd6NPC3Sfeq91RQmUzFmjWiz4Ws889UkTQi1Fk81nTagfrlfWu
-         K23tTRDPhdroVfIEBbspC8P+AglAXcN+MIvl8wK2OmLa5DHdQ/3VwU6N16EHIuBeYRKi
-         OPJGTUV5KkJ+9ELMNfwH+ihmvDC1E9uPkW9uTbSx2wp8H0o0P+TbBP3ECVmyi4BaHlRb
-         08sKokJAjEYkmy3pUBk8kB/Y18B8zN3n6WJqZ5QD1zgR+qTs1qncEBVKors9RsYHTRoN
-         aukg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=ocs0mbwWAgp+tAzV857SlK6UIswo55neeWcWC4SY3Dg=;
-        b=r0BGWF0Cij7FUYFGftPFdTA4fBrtUBNTBGlTJPPLth6xbQx7Hae5XuAc/Vvi2d+97z
-         3JO0wfzqDFQRz74hWzcebqw7XJZrYs6gy5m/LG5cSYzAElf/nZMglydDWfcEKWW/ROFB
-         0OXaQEIYJhS+W1UwQ0nFG9mlCMZDGlLIzdybaYk5ajJuoBgPBT14m9MyciElvn2VCDDv
-         F21pNdMYAKUrFbX1Q/HwLBld73t5+Cx6z37dfSxsys2jiMnNR1BkOXBOP3RwLNw/YFHf
-         yVHBUkQpzXqTqZCJh0vX1kEPilBIjCrGb5itU00/gSwDK+awAw8X9Ekl8mWtLmunWvoW
-         GWtw==
-X-Gm-Message-State: AOAM533+Acr5EbVaSHdzPnx81WwS+YHXtrUYPELUwAUM93F2v7543uMw
-        ITiD4FtviO4PzZkzSQBhm5lgsA==
-X-Google-Smtp-Source: ABdhPJwKlSzZpHDij9KxX7qhr19A8CctJ49N5nK9OCJnkYsL5jYSRcGt1HiFqXKIJmXzYMOH6YWc1Q==
-X-Received: by 2002:a05:6a00:1749:b0:50a:8eed:b824 with SMTP id j9-20020a056a00174900b0050a8eedb824mr39902311pfc.50.1651236351379;
-        Fri, 29 Apr 2022 05:45:51 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x186-20020a6363c3000000b003c14af505f6sm6010824pgb.14.2022.04.29.05.45.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Apr 2022 05:45:50 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     jack@suse.cz, paolo.valente@linaro.org
-Cc:     yukuai3@huawei.com, stable@vger.kernel.org,
-        linux-block@vger.kernel.org, lists@colorremedies.com
-In-Reply-To: <20220407140738.9723-1-jack@suse.cz>
-References: <20220407140738.9723-1-jack@suse.cz>
-Subject: Re: [PATCH] bfq: Fix warning in bfqq_request_over_limit()
-Message-Id: <165123635009.46786.3093085989076098329.b4-ty@kernel.dk>
-Date:   Fri, 29 Apr 2022 06:45:50 -0600
+  d=axis.com; q=dns/txt; s=axis-central1; t=1651245727;
+  x=1682781727;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=xenmPUOXW+RZJN9qBuvo/3MkIoPU8IrRSy9rcS8hUiY=;
+  b=UeM6p+50yGpDPgGq8Xz9wtdT2t35h45DaXetIDo5DRLpncv3FHq3tOuC
+   CKrcDvKDOJztYFB4LgvmE7cqwmxEwsLXzR6Jc/ogGiElGounW7+BPPjX/
+   Ehz3EZiveGlf+R31BRHnaXwWtWVfJTFEpKJ2fV0ykUqDrkrpM2BiF6Cli
+   VTnsHMHzPYUccOOr075dPHfxLywFL1vSU2wVbtqrkiYoSRNwT1Hk1Xog0
+   V5XPBFqbWXBXs3xijrDaeKX9E6KyRwqK5AJE/87AOa3/LrXUHB1jqXJVf
+   BjYVGK+V5QtvN519jgUR0iGFxPV8Pk86e2WW24Ocrrwc5d5Bg7cHy54bP
+   w==;
+From:   Vincent Whitchurch <vincent.whitchurch@axis.com>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+CC:     <kernel@axis.com>, <linux-block@vger.kernel.org>, <tytso@mit.edu>,
+        Vincent Whitchurch <vincent.whitchurch@axis.com>,
+        <linux-mmc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] mmc: core: support zeroout using TRIM
+Date:   Fri, 29 Apr 2022 17:21:18 +0200
+Message-ID: <20220429152118.3617303-1-vincent.whitchurch@axis.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 7 Apr 2022 16:07:38 +0200, Jan Kara wrote:
-> People are occasionally reporting a warning bfqq_request_over_limit()
-> triggering reporting that BFQ's idea of cgroup hierarchy (and its depth)
-> does not match what generic blkcg code thinks. This can actually happen
-> when bfqq gets moved between BFQ groups while bfqq_request_over_limit()
-> is running. Make sure the code is safe against BFQ queue being moved to
-> a different BFQ group.
-> 
-> [...]
+If the device supports TRIM and indicates that it erases to zeros, we
+can use it to support hardware offloading of REQ_OP_WRITE_ZEROES.
 
-Applied, thanks!
+Signed-off-by: Vincent Whitchurch <vincent.whitchurch@axis.com>
+---
 
-[1/1] bfq: Fix warning in bfqq_request_over_limit()
-      commit: 09df6a75fffa68169c5ef9bef990cd7ba94f3eef
+Notes:
+    https://lore.kernel.org/lkml/20160303182146.GG9772@thunk.org/ seems to agree
+    that BLKZEROOUT can use TRIM on eMMC.
+    
+    BLKDISCARD uses DISCARD when available so it can't be used to send TRIM.
+    
+    If TRIM should not be used for BLKZEROOUT for some reason I guess the only way
+    is to use MMC_IOC_MULTI_CMD like in this commit in mmc-utils but that's a
+    rather low-level interface:
+    
+     https://git.kernel.org/pub/scm/utils/mmc/mmc-utils.git/commit/?id=43282e80e174cc73b09b81a4d17cb3a7b4dc5cfc
 
-Best regards,
+ drivers/mmc/core/block.c | 26 ++++++++++++++++++++++----
+ drivers/mmc/core/queue.c |  2 ++
+ 2 files changed, 24 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/mmc/core/block.c b/drivers/mmc/core/block.c
+index 506dc900f5c7..0398b205a285 100644
+--- a/drivers/mmc/core/block.c
++++ b/drivers/mmc/core/block.c
+@@ -126,6 +126,7 @@ struct mmc_blk_data {
+ #define MMC_BLK_DISCARD		BIT(2)
+ #define MMC_BLK_SECDISCARD	BIT(3)
+ #define MMC_BLK_CQE_RECOVERY	BIT(4)
++#define MMC_BLK_TRIM		BIT(5)
+ 
+ 	/*
+ 	 * Only set in main mmc_blk_data associated
+@@ -1090,12 +1091,13 @@ static void mmc_blk_issue_drv_op(struct mmc_queue *mq, struct request *req)
+ 	blk_mq_end_request(req, ret ? BLK_STS_IOERR : BLK_STS_OK);
+ }
+ 
+-static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
++static void mmc_blk_issue_erase_rq(struct mmc_queue *mq, struct request *req,
++				   int type, unsigned int erase_arg)
+ {
+ 	struct mmc_blk_data *md = mq->blkdata;
+ 	struct mmc_card *card = md->queue.card;
+ 	unsigned int from, nr;
+-	int err = 0, type = MMC_BLK_DISCARD;
++	int err = 0;
+ 	blk_status_t status = BLK_STS_OK;
+ 
+ 	if (!mmc_can_erase(card)) {
+@@ -1111,13 +1113,13 @@ static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
+ 		if (card->quirks & MMC_QUIRK_INAND_CMD38) {
+ 			err = mmc_switch(card, EXT_CSD_CMD_SET_NORMAL,
+ 					 INAND_CMD38_ARG_EXT_CSD,
+-					 card->erase_arg == MMC_TRIM_ARG ?
++					 erase_arg == MMC_TRIM_ARG ?
+ 					 INAND_CMD38_ARG_TRIM :
+ 					 INAND_CMD38_ARG_ERASE,
+ 					 card->ext_csd.generic_cmd6_time);
+ 		}
+ 		if (!err)
+-			err = mmc_erase(card, from, nr, card->erase_arg);
++			err = mmc_erase(card, from, nr, erase_arg);
+ 	} while (err == -EIO && !mmc_blk_reset(md, card->host, type));
+ 	if (err)
+ 		status = BLK_STS_IOERR;
+@@ -1127,6 +1129,19 @@ static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
+ 	blk_mq_end_request(req, status);
+ }
+ 
++static void mmc_blk_issue_trim_rq(struct mmc_queue *mq, struct request *req)
++{
++	mmc_blk_issue_erase_rq(mq, req, MMC_BLK_TRIM, MMC_TRIM_ARG);
++}
++
++static void mmc_blk_issue_discard_rq(struct mmc_queue *mq, struct request *req)
++{
++	struct mmc_blk_data *md = mq->blkdata;
++	struct mmc_card *card = md->queue.card;
++
++	mmc_blk_issue_erase_rq(mq, req, MMC_BLK_DISCARD, card->erase_arg);
++}
++
+ static void mmc_blk_issue_secdiscard_rq(struct mmc_queue *mq,
+ 				       struct request *req)
+ {
+@@ -2327,6 +2342,9 @@ enum mmc_issued mmc_blk_mq_issue_rq(struct mmc_queue *mq, struct request *req)
+ 		case REQ_OP_SECURE_ERASE:
+ 			mmc_blk_issue_secdiscard_rq(mq, req);
+ 			break;
++		case REQ_OP_WRITE_ZEROES:
++			mmc_blk_issue_trim_rq(mq, req);
++			break;
+ 		case REQ_OP_FLUSH:
+ 			mmc_blk_issue_flush(mq, req);
+ 			break;
+diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
+index c69b2d9df6f1..bbe2ea829ea7 100644
+--- a/drivers/mmc/core/queue.c
++++ b/drivers/mmc/core/queue.c
+@@ -191,6 +191,8 @@ static void mmc_queue_setup_discard(struct request_queue *q,
+ 		q->limits.discard_granularity = SECTOR_SIZE;
+ 	if (mmc_can_secure_erase_trim(card))
+ 		blk_queue_flag_set(QUEUE_FLAG_SECERASE, q);
++	if (mmc_can_trim(card) && card->erased_byte == 0)
++		blk_queue_max_write_zeroes_sectors(q, max_discard);
+ }
+ 
+ static unsigned short mmc_get_max_segments(struct mmc_host *host)
 -- 
-Jens Axboe
-
+2.34.1
 
