@@ -2,153 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABFF1C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 07:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D5BFC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 12:02:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355321AbiD2H6y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Apr 2022 03:58:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46852 "EHLO
+        id S1349145AbiD2MFQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 29 Apr 2022 08:05:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355303AbiD2H6p (ORCPT
+        with ESMTP id S235150AbiD2MFQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Apr 2022 03:58:45 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C5B63916F
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 00:55:26 -0700 (PDT)
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220429075523euoutp024c88b8e93928f50b7f95f5a2c1c85dbf~qTtzVwgVn0456004560euoutp02K
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 07:55:23 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220429075523euoutp024c88b8e93928f50b7f95f5a2c1c85dbf~qTtzVwgVn0456004560euoutp02K
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1651218923;
-        bh=bI8Rkw8VYhP6ElpRPvYBxmnt/vOhfFyD8CJi294HeBw=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=HoryqjTOG82NnqnnNj+3vhs/FX2Q5GjZ+wHNNCBoBQ+IDE0GpweNh8zskco917Hmn
-         Ksh/uEnpMTVtmvTHZMzlxyoPAN/691uOnOrYYjYQRESFHzOdkYPrZM2dvhVeaQZKcb
-         nay2N5cHbEGgWKEd26uPSMz7PdD0Jmg5LOnT6sW4=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220429075523eucas1p256537cb0c8ef40f290f7fd4eaf86ac2c~qTtyzy38B2182821828eucas1p2D;
-        Fri, 29 Apr 2022 07:55:23 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 58.9C.10260.BE99B626; Fri, 29
-        Apr 2022 08:55:23 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220429075522eucas1p23cf6e8071f09d7120c1e7f478d7affb7~qTtyWBlWB0294802948eucas1p2h;
-        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220429075522eusmtrp195fdb2491c8fe5ebf4b3338c61a748e2~qTtyUgZAB1327413274eusmtrp1p;
-        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-71-626b99eb914c
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 7B.66.09404.AE99B626; Fri, 29
-        Apr 2022 08:55:22 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220429075522eusmtip22810b8b6a3a13d12d5b555bfcd6aeb24~qTtyKSmCb0091400914eusmtip27;
-        Fri, 29 Apr 2022 07:55:22 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.170) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 29 Apr 2022 08:55:19 +0100
-Message-ID: <5927dc09-89ca-973a-2e24-99be696d4240@samsung.com>
-Date:   Fri, 29 Apr 2022 09:55:18 +0200
+        Fri, 29 Apr 2022 08:05:16 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8571483BF;
+        Fri, 29 Apr 2022 05:01:54 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 900311F891;
+        Fri, 29 Apr 2022 12:01:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1651233713; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=E4v0J7E7TIHLnhe4FA9TirvyYrl7Jt4fCW8B/8OF+Yg=;
+        b=YatVXBU0Ln0fYAWeEC4C+9MDbnW73SALU1/KHMg6VYTowiLWgr+2icn5jSy9L8CmpnvIP6
+        0SSrKsr9BkP+JtvAJmfZhx3JPtspLDdvi0v+jxWRQNnGN0JfGKJMZLEFL3k3M0k3J4tS7u
+        JlL+6Uom/HX98RRa768k7Fj4ohwBjoE=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1651233713;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=E4v0J7E7TIHLnhe4FA9TirvyYrl7Jt4fCW8B/8OF+Yg=;
+        b=tDW/+ovYrQU5rvIe9X3ygr4epYrmg2WPyV+fj7EgsTH40ntyD53UTIAq7ApSNK3Nw4MJp9
+        o1NzFT1Spv3nnFAQ==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 315862C141;
+        Fri, 29 Apr 2022 12:01:53 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D8669A061D; Fri, 29 Apr 2022 14:01:52 +0200 (CEST)
+Date:   Fri, 29 Apr 2022 14:01:52 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Chris Murphy <lists@colorremedies.com>,
+        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] bfq: Fix warning in bfqq_request_over_limit()
+Message-ID: <20220429120152.w6stp5nfedwoyzp3@quack3.lan>
+References: <20220407140738.9723-1-jack@suse.cz>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.8.1
-Subject: Re: [PATCH 12/16] zonefs: allow non power of 2 zoned devices
-Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        <jaegeuk@kernel.org>, <axboe@kernel.dk>, <snitzer@kernel.org>,
-        <hch@lst.de>, <mcgrof@kernel.org>, <naohiro.aota@wdc.com>,
-        <sagi@grimberg.me>, <dsterba@suse.com>,
-        <johannes.thumshirn@wdc.com>
-CC:     <linux-kernel@vger.kernel.org>, <clm@fb.com>,
-        <gost.dev@samsung.com>, <chao@kernel.org>, <josef@toxicpanda.com>,
-        <jonathan.derrick@linux.dev>, <agk@redhat.com>,
-        <kbusch@kernel.org>, <kch@nvidia.com>,
-        <linux-nvme@lists.infradead.org>, <bvanassche@acm.org>,
-        <jiangbo.365@bytedance.com>, <linux-fsdevel@vger.kernel.org>,
-        <matias.bjorling@wdc.com>, <linux-block@vger.kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <a68a2d40-dff4-bac6-bb05-57c5c88af66e@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.170]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA01Sa0xTZxj2O+f0nEMX6gFc+MTpshqyzU0u0yVfhnEM0Jxk+7EsShhLplVO
-        gLW0pIV5gcUSioZ7gcmgmpRdMrAMOkDLWAfRLlzkbqEKBOhgrRAIoEKXsdZulFMX/j3v8z3P
-        +77Pm4/Gg+vJMDpdnsUp5RKZmBQSpp7N4cPLtdJzUT02Chn7e3DUOFNOouonmzgauD6Eocry
-        Ggq5h0ZwNPp3HoZuNXZjyGHU4ajk7hMCPS+a3eI0czjyzEWjSstDgJw2HYY6p95Cv3XeJ9DY
-        rzdJpP/RSSHtVReOJrROgCp62wSoeXmNQH1T+2IhOzb+Ievt+4lkK/JXKXZktoVgx4ay2VZD
-        Icl+q76Os20/XGHNk2qSLc1fJdmOAruAXeuykazxto1gtW0tAna99QB77W4x9jGTLDyWwsnS
-        v+SUkcfPCtN+H7JSmQbqYkv9IqkGc4IiEEBD5ih0LjRTRUBIBzMNAOpKrSRfbAA43WXD+WId
-        wPkRA/7C8kjznV9VD+BgdS3xv6r4zqK/mRnA5appymcJZI7DZzXdWyqaJphwuDT6OU8Hwfu1
-        DsKHX2aSYLVukPThEOYENDf9u83jTCiccugxX889jBvAseFVga/AGQ0O1x5bKV9TkjkE8wq3
-        ZwUwJ6FlwS7gzW/CgnY3xeNXYfvKTX+Eg7BqYhzj8VewqWdwe2nIdAvh9PCi/zQJUG2vJ3kc
-        Apd6b1M8fgUOVJUQPM6Bzgk3zps1AJZ3GEnfQpCJgWWDMl7zAXx6Te2nRXBiJYjfRwQrTd/g
-        WhCu23EL3Y7Muh0RdDsi1AHCAEK5bFVGKqc6IucuRKgkGapseWrEeUVGK9j6ywPeXtcvoGHp
-        aYQFYDSwAEjj4j2BG+a0c8GBKZJLlzml4owyW8apLGAfTYhDA8+n/ywJZlIlWZyU4zI55YtX
-        jA4IU2O5+sAkz+66tv2y+XB3abhl7WvPzNspFa8XBtzQwxx5rgMJmsZsKwew4ob+vTVzu06p
-        pJXNhs737OaFyBys7M5u9vRMFLvRGvPGOm7cDNKqZ2Pql4KTTgrdj2H8maxkhWRKp/9r0rQL
-        5D0znFosinP9mZwf2SDyvBMtFn0xlxfywPtZndZe1uey6aURVwIw01XFEW9YRlzsa573T3S9
-        NH4x5aPnDIjbW2I6LdxPK5QPNKuiS5sd6luPPhElHhPE3ku4kOCIP3jPelgqvuFtjO87Wrn2
-        abt2fsU1/s9MgdOqHLW7Eh8mSjKrrIvJ3xv7L2dNlv9hXD8bpyjZeDc3Skyo0iTRh3ClSvIf
-        T3lrRzoEAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDKsWRmVeSWpSXmKPExsVy+t/xe7qvZmYnGUxtVrVYf+oYs8Xqu/1s
-        FtM+/GS2OD31LJPFpP4Z7Ba/z55ntrjwo5HJYuXqo0wWT9bPYrboOfCBxeJv1z2gWMtDZos/
-        Dw0tJh26xmjx9OosJou9t7Qt9uw9yWJxedccNov5y56yW0xo+8pscWPCU0aLicc3s1qse/2e
-        xeLELWkHCY/LV7w9/p1Yw+Yxsfkdu8f5extZPC6fLfXYtKqTzWNhw1Rmj81L6j1232xg8+ht
-        fsfmsbP1PqvH+31X2TzWb7nK4jFh80ZWj8+b5DzaD3QzBQhE6dkU5ZeWpCpk5BeX2CpFG1oY
-        6RlaWugZmVjqGRqbx1oZmSrp29mkpOZklqUW6dsl6GUcPnuJvWAVe8XG5S/YGhgfsnYxcnJI
-        CJhIXG9ZxNbFyMUhJLCUUWL7mZdQCRmJT1c+skPYwhJ/rnVBFX1klJj1bR8LhLObUeJV318m
-        kCpeATuJTzOOAiU4OFgEVCVeXYiDCAtKnJz5hAXEFhWIkHiw+yzYAmEBV4nda/+DxZkFxCVu
-        PZnPBDJTROA3o8Tlc+9YQRxmgRZmiffPLrFDbHvLJPHzaD8zyAY2AS2Jxk6w8zgF3CQOPb/P
-        CjFJU6J1+292CFteYvvbOcwQLyhLTL5xhQnCrpV4dX834wRG0VlIDpyF5JBZSEbNQjJqASPL
-        KkaR1NLi3PTcYiO94sTc4tK8dL3k/NxNjMBktu3Yzy07GFe++qh3iJGJg/EQowQHs5II75fd
-        GUlCvCmJlVWpRfnxRaU5qcWHGE2BgTSRWUo0OR+YTvNK4g3NDEwNTcwsDUwtzYyVxHk9CzoS
-        hQTSE0tSs1NTC1KLYPqYODilGpjqJDZZJUXe2X7Drj5mwR71qudZQQV9ieWPJNYlTelvy/vE
-        5ah3fqHe3O3hz72kI1Vsplp0XU/SzOTLSj7LP+ni/OdLW++a9lyz1s+a7/2Vv/CCfe0Ua8/o
-        wptTow783PMocZb4B8MwE+NDs2+IW3dP/D5nYpmXjYB089qQWr//LAZ8nO9u71TTvCw6/Rdb
-        VZzbNrtIF+Wvea9Ybh1R/3DnTB1n5VqXM05JomGv9zZmSih0O8qt6fgUycHiaHjmbeRaHp8e
-        vxNPGZauN78l0xa78equlZu6raSMtm7ZtveNC++qLP15mfOcNr918HtwJWzlvaC7C66vvlFt
-        bcHOtZ/nXzwfz3/G6NshvR53bJVYijMSDbWYi4oTARtV/pXvAwAA
-X-CMS-MailID: 20220429075522eucas1p23cf6e8071f09d7120c1e7f478d7affb7
-X-Msg-Generator: CA
-X-RootMTR: 20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44
-References: <20220427160255.300418-1-p.raghav@samsung.com>
-        <CGME20220427160309eucas1p2f677c8db581616f994473f17c4a5bd44@eucas1p2.samsung.com>
-        <20220427160255.300418-13-p.raghav@samsung.com>
-        <bfc1ddc3-5db3-6879-b6ab-210a00b82c6b@opensource.wdc.com>
-        <c490bd45-deab-8c2b-151c-c8db9f97e10c@samsung.com>
-        <a68a2d40-dff4-bac6-bb05-57c5c88af66e@opensource.wdc.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220407140738.9723-1-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Damien,
-On 2022-04-28 23:49, Damien Le Moal wrote:
-> This is still not convincing given the code I saw. Additional test cases
-> need to be added with data verification & concurrent regular writes also
-> sent while doing copy to verify locking.
+On Thu 07-04-22 16:07:38, Jan Kara wrote:
+> People are occasionally reporting a warning bfqq_request_over_limit()
+> triggering reporting that BFQ's idea of cgroup hierarchy (and its depth)
+> does not match what generic blkcg code thinks. This can actually happen
+> when bfqq gets moved between BFQ groups while bfqq_request_over_limit()
+> is running. Make sure the code is safe against BFQ queue being moved to
+> a different BFQ group.
 > 
-> Which also reminds me that I have not seen any change to mq-deadline zone
-> write locking for this series. What is the assumption ? That users should
-> not be issuing writes when a copy is on-going ? What a bout the reverse
-> case ? at the very least, it seems that blk_issue_copy() should be taking
-> the zone write lock.
-> 
-I think you posted this comment in this thread instead of posting it in
-the copy offload thread.
+> Fixes: 76f1df88bbc2 ("bfq: Limit number of requests consumed by each cgroup")
+> CC: stable@vger.kernel.org
+> Link: https://lore.kernel.org/all/CAJCQCtTw_2C7ZSz7as5Gvq=OmnDiio=HRkQekqWpKot84sQhFA@mail.gmail.com/
+> Reported-by: Chris Murphy <lists@colorremedies.com>
+> Reported-by: "yukuai (C)" <yukuai3@huawei.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 
->> I will make sure to add my private tree for zonefs in my cover letter in
->> the next rev. But even without that change, a typical emulated npo2
->> device should work fine because the changes are applicable only for
->> "runt" zones.
+Ping guys? Can we get the fix in please? It is pretty trivial...
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
 > 
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index e47c75f1fa0f..272d48d8f326 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -569,7 +569,7 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+>  	struct bfq_entity *entity = &bfqq->entity;
+>  	struct bfq_entity *inline_entities[BFQ_LIMIT_INLINE_DEPTH];
+>  	struct bfq_entity **entities = inline_entities;
+> -	int depth, level;
+> +	int depth, level, alloc_depth = BFQ_LIMIT_INLINE_DEPTH;
+>  	int class_idx = bfqq->ioprio_class - 1;
+>  	struct bfq_sched_data *sched_data;
+>  	unsigned long wsum;
+> @@ -578,15 +578,21 @@ static bool bfqq_request_over_limit(struct bfq_queue *bfqq, int limit)
+>  	if (!entity->on_st_or_in_serv)
+>  		return false;
+>  
+> +retry:
+> +	spin_lock_irq(&bfqd->lock);
+>  	/* +1 for bfqq entity, root cgroup not included */
+>  	depth = bfqg_to_blkg(bfqq_group(bfqq))->blkcg->css.cgroup->level + 1;
+> -	if (depth > BFQ_LIMIT_INLINE_DEPTH) {
+> +	if (depth > alloc_depth) {
+> +		spin_unlock_irq(&bfqd->lock);
+> +		if (entities != inline_entities)
+> +			kfree(entities);
+>  		entities = kmalloc_array(depth, sizeof(*entities), GFP_NOIO);
+>  		if (!entities)
+>  			return false;
+> +		alloc_depth = depth;
+> +		goto retry;
+>  	}
+>  
+> -	spin_lock_irq(&bfqd->lock);
+>  	sched_data = entity->sched_data;
+>  	/* Gather our ancestors as we need to traverse them in reverse order */
+>  	level = 0;
+> -- 
+> 2.34.1
 > 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
