@@ -2,68 +2,66 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DE7C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 29 Apr 2022 23:29:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51FE2C433F5
+	for <linux-block@archiver.kernel.org>; Sun,  1 May 2022 04:10:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381811AbiD2XdD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 29 Apr 2022 19:33:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51688 "EHLO
+        id S230513AbiEAEN3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 1 May 2022 00:13:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381807AbiD2XdC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>);
-        Fri, 29 Apr 2022 19:33:02 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153CACD655
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 16:29:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 9414D623C2
-        for <linux-block@vger.kernel.org>; Fri, 29 Apr 2022 23:29:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2B10C385A7;
-        Fri, 29 Apr 2022 23:29:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651274982;
-        bh=CuwlQkzzJxR7QabbZmeJ7i7SZClSbthXIPU3VbMa1/k=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=dWFPl5+wIdQCWMiGQRddf2crfnOASW64m438KUrS3NW87WDEzswalCU88T2sGeKQW
-         q3xsonoDp9JKeCfEWoZLatTa3CoyiPhUHAKH6Pe8DPfp2chJG6+GEqxGf+OlQ+oVnk
-         KtEtW6nb1KVqZLkygy/BKD1kGvzcIut6BxFlOQsYD1CMDRFLH7NgDeOwKlBx6HXd27
-         7x/pi4xG1Knc5IQ58l5w0Sgg6utLlr2CYRbTWlq5srBRSLVqorLkpiRaVnLl9oexLi
-         XfwwhRdSKmUjnOrWlHSSZCPt8FGYnBoB2ol0x4QvBH8lCU5jsEz21wdJO9Jtq/I7cc
-         zwMTO2a96869g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E11C0E8DBDA;
-        Fri, 29 Apr 2022 23:29:41 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fixes for 5.18-rc5
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <7b3769f3-34f4-db1c-8f53-85d47f2e72c3@kernel.dk>
-References: <7b3769f3-34f4-db1c-8f53-85d47f2e72c3@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <7b3769f3-34f4-db1c-8f53-85d47f2e72c3@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-29
-X-PR-Tracked-Commit-Id: 09df6a75fffa68169c5ef9bef990cd7ba94f3eef
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: bd3d3adea90e2d4b82efc29eb6f10ee4d9f55e6d
-Message-Id: <165127498191.20495.3667699348854625610.pr-tracker-bot@kernel.org>
-Date:   Fri, 29 Apr 2022 23:29:41 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        with ESMTP id S229488AbiEAEN2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 1 May 2022 00:13:28 -0400
+Received: from www262.sakura.ne.jp (www262.sakura.ne.jp [202.181.97.72])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EC7B5FF2F
+        for <linux-block@vger.kernel.org>; Sat, 30 Apr 2022 21:10:01 -0700 (PDT)
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 24149rwF027582;
+        Sun, 1 May 2022 13:09:53 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Sun, 01 May 2022 13:09:53 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 24149lf2027552
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 1 May 2022 13:09:53 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Message-ID: <050bd5a3-e2ef-0d67-7083-e34bc65f1f2d@I-love.SAKURA.ne.jp>
+Date:   Sun, 1 May 2022 13:09:50 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH v2] aoe: Avoid flush_scheduled_work() usage
+Content-Language: en-US
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Justin Sanders <justin@coraid.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block <linux-block@vger.kernel.org>
+References: <9d1759e0-2f93-d49f-48b3-12b8d47e95cd@I-love.SAKURA.ne.jp>
+ <abb37616-eec9-2794-e21e-7c623085d987@I-love.SAKURA.ne.jp>
+In-Reply-To: <abb37616-eec9-2794-e21e-7c623085d987@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Fri, 29 Apr 2022 12:40:45 -0600:
+Any questions?
 
-> git://git.kernel.dk/linux-block.git tags/block-5.18-2022-04-29
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/bd3d3adea90e2d4b82efc29eb6f10ee4d9f55e6d
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+On 2022/04/19 8:31, Tetsuo Handa wrote:
+> Flushing system-wide workqueues is dangerous and will be forbidden.
+> Replace system_wq with local aoe_wq.
+> 
+> Link: https://lkml.kernel.org/r/49925af7-78a8-a3dd-bce6-cfc02e1a9236@I-love.SAKURA.ne.jp
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> ---
+> Changes in v2:
+>   Fix link error, reported by kernel test robot <lkp@intel.com>
+> 
+>  drivers/block/aoe/aoe.h     |  2 ++
+>  drivers/block/aoe/aoeblk.c  |  2 +-
+>  drivers/block/aoe/aoecmd.c  |  2 +-
+>  drivers/block/aoe/aoedev.c  |  4 ++--
+>  drivers/block/aoe/aoemain.c | 10 +++++++++-
+>  5 files changed, 15 insertions(+), 5 deletions(-)
