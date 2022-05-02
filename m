@@ -2,67 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 902A1C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 17:46:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56D8EC433EF
+	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 18:11:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232031AbiEBRtk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 May 2022 13:49:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51558 "EHLO
+        id S1376413AbiEBSP0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 May 2022 14:15:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386753AbiEBRth (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 13:49:37 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [46.235.227.227])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B6C9FD1
-        for <linux-block@vger.kernel.org>; Mon,  2 May 2022 10:46:02 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: krisman)
-        with ESMTPSA id 541331F42E61
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1651513561;
-        bh=fSHWdWLfrNdMmU+qnTaxgSee/TwthYC5RsccC8c/o9o=;
-        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-        b=RKklCiOhLr9GOf0sAoUJU/SM3lVSR7+kSSb4jZiX2Zo5LYcY8Kt3vOPFNDI/tTvtx
-         5+Ehn56ASPO7aHGFEkBw6HNt/kjuvnfJYBeF1xRGxHOCb2XJh9S0O13zUHyMdK+MgH
-         6Fcy+P+6acIb6Yr8i6rQTtSgfXjaZ2RT/SQp9LG79EEi4E5W6uuLqU375IwFWOIk0L
-         rci78xSiZHPitWL/RbpoaecO7LMdXFAxYL7Apky1PREr9cfx1OzvzcPi/2XfxdnnaH
-         2cick2a/18ozLgSJ61IiQcY/Dc7rFkvMS+BruV3j9rAyOkx2z0QBjbF5kxB/HrOzt3
-         GjL6O2p88xgtA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Omar Sandoval <osandov@fb.com>,
+        with ESMTP id S241230AbiEBSPZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 14:15:25 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EC56DDC;
+        Mon,  2 May 2022 11:11:55 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id e24so13331455pjt.2;
+        Mon, 02 May 2022 11:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=km1RYLI1CobmrVkQO++1orn+WmYu8I6YnJXKOV3FSOQ=;
+        b=dB62/6N/AupbAvnvnbYkc9o1gznuQKe5diiYys5TCW2fVoV0Z/PzlNNr0Vd3GZMsUu
+         qv1m927BQ+WhuiRYLRPMXcUo+iGGzNcEUNBgvLpU196Uy2BKVJlhvhPSF5PqDMYX0fHG
+         fbZi/rZV1blQmJcCKvTxPKd4hhJ0Wvt2vc2qVaWxN70gr2CMYt5JL84AmxcEEVA4WTdB
+         PBZ9+NXWAl+ziAvI8YGOop1tGSAvqIi6anAsm6hsqCItEmUzNxCEXJk8IoON6l56iWhQ
+         NqNxKUbwAM5/sBrcKAMSprHgc5LoWBtkWjaOZBAbfR163HJxBwZ4K5sHHtinVZ91VxlY
+         SziA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=km1RYLI1CobmrVkQO++1orn+WmYu8I6YnJXKOV3FSOQ=;
+        b=2Bk5ijOIZ//P47QXau8fZTZ6G9oZ32lZfcKrWWBbOJue9Y4Zea8CWC2N4GjfDH/Ghi
+         kHj+4pqaocUCMS7UID8MFUaydmye6SiNjKSsxJUOkSS9aB3IR7sJ4fSzi3TEpiG61bX8
+         MinU+eWGuNJTqYCCO5GOYiCjgVwJlZiC/42ZNlqi2YaMkbtW3OYHmwBQbM1UonMa2ec4
+         XVYEG/7vvNMRltS1w9JKR6RDDfZhGvgFi6O7kRr3Wc4SDtlruNa7WymlFCLBwqEKDhXn
+         JDo9J7JOryi6+e8pWAsW+M2a4lz0rWXcvmqzsCB1OHUcXYSfeDe5VZ6WSodNvqv24LP6
+         wQSQ==
+X-Gm-Message-State: AOAM5327YXearednqChIwavcYovgkjkE931azChRAY7OXBWBbcNXy2JK
+        e/UfcOgryUh7cl38wWtvSP3RDpbOLg0=
+X-Google-Smtp-Source: ABdhPJzj3kGs5QP45BRIDGYHtsHAssbMOKq9HMUFTjzMJabeN+7kNncO7h3BuX770fKDhetwr1jI4Q==
+X-Received: by 2002:a17:90a:170c:b0:1dc:20c4:6354 with SMTP id z12-20020a17090a170c00b001dc20c46354mr409558pjd.113.1651515114454;
+        Mon, 02 May 2022 11:11:54 -0700 (PDT)
+Received: from google.com ([2620:15c:211:201:4d84:d37e:584f:bdbc])
+        by smtp.gmail.com with ESMTPSA id r10-20020a170902c7ca00b0015e8d4eb246sm4920428pla.144.2022.05.02.11.11.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 02 May 2022 11:11:53 -0700 (PDT)
+Sender: Minchan Kim <minchan.kim@gmail.com>
+Date:   Mon, 2 May 2022 11:11:51 -0700
+From:   Minchan Kim <minchan@kernel.org>
+To:     Aleksey Romanov <AVRomanov@sberdevices.ru>
+Cc:     Sergey Senozhatsky <senozhatsky@chromium.org>,
+        "ngupta@vflare.org" <ngupta@vflare.org>,
         "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "Khazhismel Kumykov" <khazhy@google.com>
-Subject: Re: [LSF/MM/BPF TOPIC] eBFP for block devices
-Organization: Collabora
-References: <5276e9fa-a253-6195-e697-60b4ff6e9bc4@suse.de>
-Date:   Mon, 02 May 2022 13:45:55 -0400
-In-Reply-To: <5276e9fa-a253-6195-e697-60b4ff6e9bc4@suse.de> (Hannes Reinecke's
-        message of "Mon, 2 May 2022 09:21:31 -0700")
-Message-ID: <87y1zjq14c.fsf@collabora.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+        "axboe@chromium.org" <axboe@chromium.org>,
+        kernel <kernel@sberdevices.ru>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "mnitenko@gmail.com" <mnitenko@gmail.com>,
+        Dmitry Rokosov <DDRokosov@sberdevices.ru>
+Subject: Re: [PATCH v2] zram: remove double compression logic
+Message-ID: <YnAe52Eg60tjeBNK@google.com>
+References: <20220427100345.29461-1-avromanov@sberdevices.ru>
+ <YmkpSC/gJf7Cg2Ym@google.com>
+ <20220428200107.hz65qvxf2aoz27q2@cab-wsm-0029881>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220428200107.hz65qvxf2aoz27q2@cab-wsm-0029881>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hannes Reinecke <hare@suse.de> writes:
+Hi Aleksey,
 
-> Hi Omar,
->
-> and another topic which came up during discussion yesterday:
->
-> eBPF for block devices
-> It would be useful to enable eBPF for block devices, such that we could
-> do things like filtering bios on bio type, do error injection by 
-> modifying the bio result etc.
-> This topic should be around how it could be implemented and what
-> additional use-cases could be supported.
+On Thu, Apr 28, 2022 at 08:01:12PM +0000, Aleksey Romanov wrote:
+> Thanks for the reply!
+> 
+> On Wed, Apr 27, 2022 at 08:30:16PM +0900, Sergey Senozhatsky wrote:
+> > On (22/04/27 13:03), Alexey Romanov wrote:
+> > > diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
+> > > index cb253d80d72b..4be6caf43b1d 100644
+> > > --- a/drivers/block/zram/zram_drv.c
+> > > +++ b/drivers/block/zram/zram_drv.c
+> > > @@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
+> > >  
+> > >  	down_read(&zram->init_lock);
+> > >  	ret = scnprintf(buf, PAGE_SIZE,
+> > > -			"version: %d\n%8llu %8llu\n",
+> > > +			"version: %d\n%8llu\n",
+> > >  			version,
+> > > -			(u64)atomic64_read(&zram->stats.writestall),
+> > >  			(u64)atomic64_read(&zram->stats.miss_free));
+> > >  	up_read(&zram->init_lock);
+> > 
+> > I think this also has to bump `version` to 2, since format of the
+> > file has changed.
+> 
+> Yes, I'll do that in the next patch.
+> 
+> Minchan, do you have any suggestions on this patch? 
+> I want to fix Sergey suggestion and sumbit next patch.
 
-Cc'ing Khazhy since Google might have some applications for this to
-filter IOs based on the blocks being accessed, in the context of
-safeguarding specific regions from accidental overwrites / application
-error.
+You need to remove zs_free in the path "Compression failed"
 
--- 
-Gabriel Krisman Bertazi
+Since we don't have double compression, we don't need QUEUE_FLAG_STABLE_WRITES
+so you could remove QUEUE_FLAG_STABLE_WRITES, too.
+
+Thanks.
