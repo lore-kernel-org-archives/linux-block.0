@@ -2,88 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25588C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:07:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C79C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:09:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241311AbiEBQLS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 May 2022 12:11:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52280 "EHLO
+        id S240435AbiEBQMj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 May 2022 12:12:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240854AbiEBQLR (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:11:17 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C349DEAF
-        for <linux-block@vger.kernel.org>; Mon,  2 May 2022 09:07:47 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id p8so12633340pfh.8
-        for <linux-block@vger.kernel.org>; Mon, 02 May 2022 09:07:47 -0700 (PDT)
+        with ESMTP id S240307AbiEBQMh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:12:37 -0400
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9453BDEEF
+        for <linux-block@vger.kernel.org>; Mon,  2 May 2022 09:09:08 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id c5-20020a9d75c5000000b00605ff3b9997so4818246otl.0
+        for <linux-block@vger.kernel.org>; Mon, 02 May 2022 09:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=vmp9CQIj1Zs/em4uo2GbHk0NnCqJbYnCBw5TO/vJ0eE=;
-        b=DkgHRwBeptOQUef7LWCd9qKGFhzSbT3Ijmd+WMgxscmZkJoRtExzgWwlapmqlIGmfI
-         mu+FjCmNhJRStsbeODKe5Negvi6KvW6ZBRGPlb5+16I4sOhH9x6y9noeRGSH8ZrOuKnk
-         lnEEBiToVM2DyhbQc53hR6aI53AIhWAPiWyzVYAu+daHb9UzbhIIOk7Vbj5IwoANmyVV
-         Bf/HTXoBhEnIKPYm3UTssLxE+VEM1H8AslebOd37GqDC6JsAZ9QFIcwkMO8ykJR+Vp15
-         0Xh3qyuHcff8GNtu2J2IGOwEGhwmhwo8o1ZMU8Sinwr1JUi0N4c2NLxgPLv2zZ8Q6bsJ
-         P9XQ==
+        d=osandov-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=B/uVoCQZXpNP+GXZdJL2KWam3nupYPtn4R/1jFNhGMk=;
+        b=lwblONIsZDB+Fy8xHPeMtApBA1FRlAmXviH0g8LwpG+s38JxuHTD5IUm6uZBCswOEK
+         Q7Pk+1rrl7j/by6mdXtrgm22xnEhy0JLHZnezngwZGtqgIThY+LKKd77RPe0MrG7fwlM
+         NeSmTA8cb1r2dnRPZiqjF0+3tTssR6UtLbWmIjKWb5cKsQOEr6NGhx6QQNM0QTevgOKC
+         yr+MVQ3g60Q82zjEE3BrY5DHdkXDFhtDGXIcBwgEbNlYQiWPB4dQm1zGM1024PdLxfMD
+         1dAUp3+GZOQ6Ecc2/S4qukzyI9u6M9bjKU6rK8zWVuI3Ubruy89ezrtuFuJ9BmA4KNpa
+         sOyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=vmp9CQIj1Zs/em4uo2GbHk0NnCqJbYnCBw5TO/vJ0eE=;
-        b=IAfPHkjNbUBRfnWN/3RRrR7AZW+5JNn7eVC5QkrlmLIruszOB+Uwq+Y2tBu8XryI3Z
-         pC1sfPnaj/Vw96HM3BpHA8nFgm/PTvDIkJ6NfGtuy/0lAXpCjy62U349yEvFwmOo6xUP
-         AI86k8qHKWLRvDPrGoa7Wuk0VPkZux8B54RoEtM3p/hj6c+8o/OMGtP1u6c9NtMY9avJ
-         2UqP4nnNoUnv04hsFWXyrrdGXSPuQS55QmPtYVy7g54pN6GDm5JKeluTsNvcyU3lC5K0
-         7UgqMUavpfWWUmKig3ld0guj1sFMkvV6xI7VfgT3AxvI2iD/x05OPROcHciyyfuZWUC/
-         BLKg==
-X-Gm-Message-State: AOAM533l6XRvCxRY/LoqNd4qqLokDIj5FB2mwcRXXl5dnea6E3lamgVi
-        5BBW406w19RTTVJwoNxLlt+MaHCWLhpMdInE
-X-Google-Smtp-Source: ABdhPJxN7SayQGlnlRlAnxrbhg/8PgwF1fcHSSb/MBaeXeimsNPqrIIR1crr/+zE4OKE6Nsu7mKRzA==
-X-Received: by 2002:a05:6a00:1515:b0:50d:bc1a:f7b3 with SMTP id q21-20020a056a00151500b0050dbc1af7b3mr12207502pfu.37.1651507666742;
-        Mon, 02 May 2022 09:07:46 -0700 (PDT)
-Received: from [127.0.1.1] ([8.34.116.185])
-        by smtp.gmail.com with ESMTPSA id g25-20020a62e319000000b0050dc7628168sm4883880pfh.66.2022.05.02.09.07.45
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=B/uVoCQZXpNP+GXZdJL2KWam3nupYPtn4R/1jFNhGMk=;
+        b=P1GEW5UocdEmb3ASrsUNhj0RQBqAq8AN4aeBL4kCQWOerMNrqe1QsTm2+zX8DRBz6n
+         VRGUPcMy+N9GG5uliNkFqPaG16F0U2gqb4JkwI+eaJGPxkvWlg1o+eoR27O3HgfZn4uk
+         kATq7SBN2qmK8OHzPynR+oslOCCo3XLBIp+mOMKmQ7hupBRQAC+pWJm6dyf8+CapszKx
+         c9xvmmYRkrT2ttp6wGCw07954YjCY58ZJfia7yoR1Jg0Y2n7Ny0VIJeIHHfCUlhJkZ1t
+         KXq71u9mvBkVAfN5NFGI9Mb+pCvWD4PFJi6lqDA5p/EYXpqnizJXUWyMgZesGc/1jjea
+         pTSA==
+X-Gm-Message-State: AOAM533bTBM4nymxo1Gow7HdGVxwNFYwJKkxzG1FC+G1Nle21hhsT/Wx
+        /CNf3uUecZG977bjT6DokEqz8w==
+X-Google-Smtp-Source: ABdhPJxBtgB8cf9G0gTqD6sxO7iVbiEZZVlT5BfOupTX6WPWjyQwJ/fHDClS9RQLbei4sOaU0rqslA==
+X-Received: by 2002:a9d:6d06:0:b0:606:133c:e7e8 with SMTP id o6-20020a9d6d06000000b00606133ce7e8mr2567540otp.83.1651507747821;
+        Mon, 02 May 2022 09:09:07 -0700 (PDT)
+Received: from relinquished.localdomain ([8.34.116.185])
+        by smtp.gmail.com with ESMTPSA id i1-20020a056870a68100b000e686d138a0sm5996008oam.58.2022.05.02.09.09.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 09:07:46 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        czhong@redhat.com, linux-mm@kvack.org, linux-xfs@vger.kernel.org
-In-Reply-To: <20220420143110.2679002-1-ming.lei@redhat.com>
-References: <20220420143110.2679002-1-ming.lei@redhat.com>
-Subject: Re: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
-Message-Id: <165150766572.3972.14278571508374814557.b4-ty@kernel.dk>
-Date:   Mon, 02 May 2022 10:07:45 -0600
+        Mon, 02 May 2022 09:09:07 -0700 (PDT)
+Date:   Mon, 2 May 2022 09:09:05 -0700
+From:   Omar Sandoval <osandov@osandov.com>
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Omar Sandoval <osandov@fb.com>,
+        Christian Brauner <christian.brauner@microsoft.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "lsf-pc@lists.linux-foundation.org" 
+        <lsf-pc@lists.linux-foundation.org>
+Subject: Re: [LSF TOPIC] block namespaces
+Message-ID: <YnACIcvUBH8/eKdC@relinquished.localdomain>
+References: <7dca874a-b8ef-59bf-a368-595d0ed2838f@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7dca874a-b8ef-59bf-a368-595d0ed2838f@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 20 Apr 2022 22:31:10 +0800, Ming Lei wrote:
-> So far bio is marked as REQ_POLLED if RWF_HIPRI/IOCB_HIPRI is passed
-> from userspace sync io interface, then block layer tries to poll until
-> the bio is completed. But the current implementation calls
-> blk_io_schedule() if bio_poll() returns 0, and this way causes io hang or
-> timeout easily.
+On Mon, May 02, 2022 at 01:14:48AM +0200, Hannes Reinecke wrote:
+> Hi Omar,
 > 
-> But looks no one reports this kind of issue, which should have been
-> triggered in normal io poll sanity test or blktests block/007 as
-> observed by Changhui, that means it is very likely that no one uses it
-> or no one cares it.
+> here's a late topic for the I/O Track: Block namespaces
 > 
-> [...]
+> We already proposed it for the (canceled) LSF last year, and now I found
+> that Christian Brauner is actually present here at LSF.
+> 
+> What this is about: Similarly to network namespaces we'd like to explore the
+> possibility of block namespaces.
+> Canonical use-case here is iscsi sessions within containers: if one
+> container starts up an iscsi session, why should this session be visible to
+> the other containers?
+> The discussion should be about general design and possible use-cases.
 
-Applied, thanks!
+Hey, Hannes,
 
-[1/1] block: ignore RWF_HIPRI hint for sync dio
-      commit: 9650b453a3d4b1b8ed4ea8bcb9b40109608d1faf
-
-Best regards,
--- 
-Jens Axboe
-
-
+How much does this overlap with Chris Leech's "network storage
+transports managed within a container" topic?
