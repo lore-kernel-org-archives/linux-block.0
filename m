@@ -2,104 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A16AC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:17:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA4AC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:18:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239521AbiEBQUk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 May 2022 12:20:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34496 "EHLO
+        id S1386291AbiEBQWM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 May 2022 12:22:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1386223AbiEBQUi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:20:38 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 558EDDFF8
-        for <linux-block@vger.kernel.org>; Mon,  2 May 2022 09:17:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 10A051F38D;
-        Mon,  2 May 2022 16:17:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1651508228; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cP4Qz0W91FrPGrCzRyvm/zakMJGQvmqBxram4FxnEjU=;
-        b=lDwxJihVLl/Bg65JyhDdIkOjyWJcob0/0sa94mEBA5Mzxnm2GkHnd130AeSRi60Xfd3p/I
-        B45EpbwOHSHMvvUoqli0DqXAdkIitGIsZY1G0oo9Bt7xkFI/bZmIRTcA+gmdlBmWzcMXI4
-        y2okroOSZtmPKdfMyfDJUPFcmMsMuRk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1651508228;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cP4Qz0W91FrPGrCzRyvm/zakMJGQvmqBxram4FxnEjU=;
-        b=SK/unQU8nRRXiD9lo4vF3mayP0rJF1gUqgAJ4KG6XlVv39Wxua3NNpsNyKXHYLOcre63aY
-        LNCTI2FsWuxL0+DQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 14E6B13491;
-        Mon,  2 May 2022 16:17:05 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id LOO4NAEEcGKaZAAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 02 May 2022 16:17:05 +0000
-Message-ID: <44814263-1546-a450-e799-5039aa991ca6@suse.de>
-Date:   Mon, 2 May 2022 09:17:04 -0700
+        with ESMTP id S1345155AbiEBQWK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:22:10 -0400
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3288E0BE;
+        Mon,  2 May 2022 09:18:40 -0700 (PDT)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1nlYkw-00088a-Sx; Mon, 02 May 2022 18:18:39 +0200
+Date:   Mon, 2 May 2022 17:18:33 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc:     Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 3/5] partitions/efi: add support for uImage.FIT sub-partitions
+Message-ID: <YnAEWcSCxO+1TXrn@makrotopia.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [LSF TOPIC] block namespaces
-Content-Language: en-US
-To:     Omar Sandoval <osandov@osandov.com>
-Cc:     Omar Sandoval <osandov@fb.com>,
-        Christian Brauner <christian.brauner@microsoft.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>
-References: <7dca874a-b8ef-59bf-a368-595d0ed2838f@suse.de>
- <YnACIcvUBH8/eKdC@relinquished.localdomain>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <YnACIcvUBH8/eKdC@relinquished.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/2/22 09:09, Omar Sandoval wrote:
-> On Mon, May 02, 2022 at 01:14:48AM +0200, Hannes Reinecke wrote:
->> Hi Omar,
->>
->> here's a late topic for the I/O Track: Block namespaces
->>
->> We already proposed it for the (canceled) LSF last year, and now I found
->> that Christian Brauner is actually present here at LSF.
->>
->> What this is about: Similarly to network namespaces we'd like to explore the
->> possibility of block namespaces.
->> Canonical use-case here is iscsi sessions within containers: if one
->> container starts up an iscsi session, why should this session be visible to
->> the other containers?
->> The discussion should be about general design and possible use-cases.
-> 
-> Hey, Hannes,
-> 
-> How much does this overlap with Chris Leech's "network storage
-> transports managed within a container" topic?
+Add new GUID allowing to parse uImage.FIT stored in a GPT partition
+and map filesystem sub-image as sub-partitions.
 
-Hmm. Good question; I don't really know. But yeah, I guess there is some.
-So we could lump both of them together I think.
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+---
+ block/partitions/efi.c | 6 ++++++
+ block/partitions/efi.h | 3 +++
+ 2 files changed, 9 insertions(+)
 
-Cheers,
-
-Hannes
+diff --git a/block/partitions/efi.c b/block/partitions/efi.c
+index 5e9be13a56a82a..b8a88601ff5780 100644
+--- a/block/partitions/efi.c
++++ b/block/partitions/efi.c
+@@ -716,6 +716,7 @@ int efi_partition(struct parsed_partitions *state)
+ 	gpt_entry *ptes = NULL;
+ 	u32 i;
+ 	unsigned ssz = queue_logical_block_size(state->disk->queue) / 512;
++	u32 extra_slot = 64;
+ 
+ 	if (!find_valid_gpt(state, &gpt, &ptes) || !gpt || !ptes) {
+ 		kfree(gpt);
+@@ -749,6 +750,11 @@ int efi_partition(struct parsed_partitions *state)
+ 				ARRAY_SIZE(ptes[i].partition_name));
+ 		utf16_le_to_7bit(ptes[i].partition_name, label_max, info->volname);
+ 		state->parts[i + 1].has_info = true;
++		/* If this is a U-Boot FIT volume it may have subpartitions */
++		if (IS_ENABLED(CONFIG_FIT_PARTITION) &&
++		    !efi_guidcmp(ptes[i].partition_type_guid, PARTITION_LINUX_FIT_GUID))
++			(void) parse_fit_partitions(state, start * ssz, size * ssz,
++						    &extra_slot, 127, 1);
+ 	}
+ 	kfree(ptes);
+ 	kfree(gpt);
+diff --git a/block/partitions/efi.h b/block/partitions/efi.h
+index 84b9f36b9e4797..06c11f6ae3989c 100644
+--- a/block/partitions/efi.h
++++ b/block/partitions/efi.h
+@@ -51,6 +51,9 @@
+ #define PARTITION_LINUX_LVM_GUID \
+     EFI_GUID( 0xe6d6d379, 0xf507, 0x44c2, \
+               0xa2, 0x3c, 0x23, 0x8f, 0x2a, 0x3d, 0xf9, 0x28)
++#define PARTITION_LINUX_FIT_GUID \
++    EFI_GUID( 0xcae9be83, 0xb15f, 0x49cc, \
++              0x86, 0x3f, 0x08, 0x1b, 0x74, 0x4a, 0x2d, 0x93)
+ 
+ typedef struct _gpt_header {
+ 	__le64 signature;
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+2.36.0
+
