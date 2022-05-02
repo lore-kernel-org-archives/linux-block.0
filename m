@@ -2,86 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8C79C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCA7FC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  2 May 2022 16:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240435AbiEBQMj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 2 May 2022 12:12:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        id S1386227AbiEBQSb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 2 May 2022 12:18:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240307AbiEBQMh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:12:37 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9453BDEEF
-        for <linux-block@vger.kernel.org>; Mon,  2 May 2022 09:09:08 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id c5-20020a9d75c5000000b00605ff3b9997so4818246otl.0
-        for <linux-block@vger.kernel.org>; Mon, 02 May 2022 09:09:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=B/uVoCQZXpNP+GXZdJL2KWam3nupYPtn4R/1jFNhGMk=;
-        b=lwblONIsZDB+Fy8xHPeMtApBA1FRlAmXviH0g8LwpG+s38JxuHTD5IUm6uZBCswOEK
-         Q7Pk+1rrl7j/by6mdXtrgm22xnEhy0JLHZnezngwZGtqgIThY+LKKd77RPe0MrG7fwlM
-         NeSmTA8cb1r2dnRPZiqjF0+3tTssR6UtLbWmIjKWb5cKsQOEr6NGhx6QQNM0QTevgOKC
-         yr+MVQ3g60Q82zjEE3BrY5DHdkXDFhtDGXIcBwgEbNlYQiWPB4dQm1zGM1024PdLxfMD
-         1dAUp3+GZOQ6Ecc2/S4qukzyI9u6M9bjKU6rK8zWVuI3Ubruy89ezrtuFuJ9BmA4KNpa
-         sOyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=B/uVoCQZXpNP+GXZdJL2KWam3nupYPtn4R/1jFNhGMk=;
-        b=P1GEW5UocdEmb3ASrsUNhj0RQBqAq8AN4aeBL4kCQWOerMNrqe1QsTm2+zX8DRBz6n
-         VRGUPcMy+N9GG5uliNkFqPaG16F0U2gqb4JkwI+eaJGPxkvWlg1o+eoR27O3HgfZn4uk
-         kATq7SBN2qmK8OHzPynR+oslOCCo3XLBIp+mOMKmQ7hupBRQAC+pWJm6dyf8+CapszKx
-         c9xvmmYRkrT2ttp6wGCw07954YjCY58ZJfia7yoR1Jg0Y2n7Ny0VIJeIHHfCUlhJkZ1t
-         KXq71u9mvBkVAfN5NFGI9Mb+pCvWD4PFJi6lqDA5p/EYXpqnizJXUWyMgZesGc/1jjea
-         pTSA==
-X-Gm-Message-State: AOAM533bTBM4nymxo1Gow7HdGVxwNFYwJKkxzG1FC+G1Nle21hhsT/Wx
-        /CNf3uUecZG977bjT6DokEqz8w==
-X-Google-Smtp-Source: ABdhPJxBtgB8cf9G0gTqD6sxO7iVbiEZZVlT5BfOupTX6WPWjyQwJ/fHDClS9RQLbei4sOaU0rqslA==
-X-Received: by 2002:a9d:6d06:0:b0:606:133c:e7e8 with SMTP id o6-20020a9d6d06000000b00606133ce7e8mr2567540otp.83.1651507747821;
-        Mon, 02 May 2022 09:09:07 -0700 (PDT)
-Received: from relinquished.localdomain ([8.34.116.185])
-        by smtp.gmail.com with ESMTPSA id i1-20020a056870a68100b000e686d138a0sm5996008oam.58.2022.05.02.09.09.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 02 May 2022 09:09:07 -0700 (PDT)
-Date:   Mon, 2 May 2022 09:09:05 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Omar Sandoval <osandov@fb.com>,
-        Christian Brauner <christian.brauner@microsoft.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "lsf-pc@lists.linux-foundation.org" 
-        <lsf-pc@lists.linux-foundation.org>
-Subject: Re: [LSF TOPIC] block namespaces
-Message-ID: <YnACIcvUBH8/eKdC@relinquished.localdomain>
-References: <7dca874a-b8ef-59bf-a368-595d0ed2838f@suse.de>
+        with ESMTP id S1357459AbiEBQSa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 2 May 2022 12:18:30 -0400
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1DABC93;
+        Mon,  2 May 2022 09:15:00 -0700 (PDT)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1nlYhM-00085n-QZ; Mon, 02 May 2022 18:14:57 +0200
+Date:   Mon, 2 May 2022 17:14:48 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org
+Cc:     Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: [PATCH 0/5] partition parser for U-Boot's uImage.FIT
+Message-ID: <YnADeJSWFYmP8ekM@makrotopia.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <7dca874a-b8ef-59bf-a368-595d0ed2838f@suse.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 02, 2022 at 01:14:48AM +0200, Hannes Reinecke wrote:
-> Hi Omar,
-> 
-> here's a late topic for the I/O Track: Block namespaces
-> 
-> We already proposed it for the (canceled) LSF last year, and now I found
-> that Christian Brauner is actually present here at LSF.
-> 
-> What this is about: Similarly to network namespaces we'd like to explore the
-> possibility of block namespaces.
-> Canonical use-case here is iscsi sessions within containers: if one
-> container starts up an iscsi session, why should this session be visible to
-> the other containers?
-> The discussion should be about general design and possible use-cases.
+Add uImage.FIT partition parser and wire it up to allow mounting
+filesystem sub-images from uImage.FIT in GPT partitions as well as
+mtdblock and ubiblock devices within Linux (e.g. as root filesystem).
 
-Hey, Hannes,
+Using uImage.FIT to store the root filesystem besides kernel and dtb has
+several obvious advantages which are hard to obtain in any other way:
+ * single image accross different storage types
+ * dynamically sized partitions for kernel and rootfs
+ * hash also for rootfs checked by U-Boot before launching kernel
+ * images may include additional filesystems e.g. for localization or
+   branding
 
-How much does this overlap with Chris Leech's "network storage
-transports managed within a container" topic?
+For this to work, the image has to be created with external data and
+sub-images aligned to the system's memory page boundaries, ie.
+ mkimage -E -B 0x1000 -p 0x1000 ...
+
+Booting such images has been supported by U-Boot since v2018.01.
+
+A previous version of this partition parser is in production use on
+some OpenWrt devices, eg. the BananaPi R64 where using the FIT parser
+allows booting the very same image from eMMC, SD Card or SPI-NAND/UBI
+and also using it as a firmware-upgrade image at the same time.
+The Ubiquiti UniFi 6 LR access served as a reference board with SPI-NOR
+flash and use of the partition parser on top of a mtdblock device.
+
+Most recently U-Boot now passes down the selected configuration
+node name via device tree to allow the partition parser (or userspace
+process via sysfs) to identify the image configuration.
+
+Device Tree schema for that:
+https://github.com/devicetree-org/dt-schema/commit/a24d97d43491e55d4def006213213a6c4045b646
+
+In most cases this partition parser can be used without relying on the
+bootloader to pass-down the configuration node name. The default
+configuration node is used then.
+
+Changes since RFC:
+ * fixed wrong variable used in error path
+ * introduced dedicated Kconfig options to enable partition
+   parsers on mtdblock and ubiblock
+ * drop #ifdef'ery, use IS_ENABLED(...) where needed
+
+Daniel Golle (5):
+  block: add new flag to add partitions read-only
+  block: add partition parser for U-Boot uImage.FIT
+  partitions/efi: add support for uImage.FIT sub-partitions
+  mtd_blkdevs: add option to enable scanning for partitions
+  mtd: ubi: block: add option to enable scanning for partitions
+
+ MAINTAINERS               |   6 +
+ block/blk.h               |   1 +
+ block/partitions/Kconfig  |  14 ++
+ block/partitions/Makefile |   1 +
+ block/partitions/check.h  |   5 +
+ block/partitions/core.c   |   6 +
+ block/partitions/efi.c    |   9 +
+ block/partitions/efi.h    |   3 +
+ block/partitions/fit.c    | 352 ++++++++++++++++++++++++++++++++++++++
+ drivers/mtd/Kconfig       |  11 ++
+ drivers/mtd/mtd_blkdevs.c |   4 +-
+ drivers/mtd/ubi/Kconfig   |  10 ++
+ drivers/mtd/ubi/block.c   |   5 +-
+ 13 files changed, 425 insertions(+), 2 deletions(-)
+ create mode 100644 block/partitions/fit.c
+
+-- 
+2.36.0
+
