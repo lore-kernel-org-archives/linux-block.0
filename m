@@ -2,91 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B88B6C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  3 May 2022 17:01:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B7CDC433EF
+	for <linux-block@archiver.kernel.org>; Tue,  3 May 2022 20:03:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239956AbiECRFX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 May 2022 13:05:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53670 "EHLO
+        id S235730AbiECUGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 May 2022 16:06:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233476AbiECRFW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 May 2022 13:05:22 -0400
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40B712628;
-        Tue,  3 May 2022 10:01:50 -0700 (PDT)
-Received: by mail-oi1-f179.google.com with SMTP id q8so18372494oif.13;
-        Tue, 03 May 2022 10:01:50 -0700 (PDT)
+        with ESMTP id S230514AbiECUGk (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 May 2022 16:06:40 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 271C1403C6
+        for <linux-block@vger.kernel.org>; Tue,  3 May 2022 13:03:07 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso3260392pjb.1
+        for <linux-block@vger.kernel.org>; Tue, 03 May 2022 13:03:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=Gyo7p1AtxXy3OgpPnsjbR9TlbxDuPZSB+of7dHJ2RMo=;
+        b=3pX2qCinYh2eo9o/rkSsVGt01ooT/iXFPmfOkwtsldcQvJz24MxqHnl/Hr8ltkxC3h
+         X/wRgfvMCJOnbRzuEhbVwp/pqK83sM+K4K8ftd4NwvrS5TaigDDGmHrrwm1VM7/SdiBs
+         6Z2sFKQm6h34JWOMOIxuNaoUWXigNiXhWrhooOAUAwUZhevhXhVLeJz3aDPCY06vPUJn
+         WPH5OrTg675AnBBNAH5MtUsjSPh850UCznU0JmhjhgXiYR2T/Os6CltUPRkbEh8KnKwO
+         Zcqwn7kjOrhCWqj0sLXbZc2wf4dGZon3NRS0fSMtFgfJ6LaS2xTr4XqUF/+wolRtkYuP
+         wNmQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=DRk7BATbee0He7UZ5VJP77cBX11TJXZ34BYAwZ+8AgM=;
-        b=xhLa9QqEPnziJXmsQV5gNVVce3r4YwzVcLNtv7st/OVFj/svHhnWqVllllhAoLtxiJ
-         w8cxZvVQh/RWTGE+pJqX6+IoUUdQQpk0IkT0RD85+RMG0tfFPFs0srokLEBWG8iFY93p
-         ANA5hDAIrqZAjcG/Cm3owfUXUJIqcC+u2ifdwdEOuMV1dImS1UGjSbjMcYyU70ACPW2d
-         ysPQVO+zv7WLk72XU3AJXX4nJIyLDurS2vGFEEEVkQhp/hwFQYzZ2/r34im4gpumeBNy
-         z9bNK0aJNAuI1pV7D0A5bA8eTUaAabqXPqYIvLLG08ydsNbiy+bnCOeQHxFvVR3WQ9w+
-         WtKw==
-X-Gm-Message-State: AOAM5336ea5EtQg0xXs9foz3ff+lIVipPp6z19JyqfTwbmmdKnopw6/k
-        XPdSVipkF7xdVGAok2wkcNk=
-X-Google-Smtp-Source: ABdhPJzQ7nN1tdLufKhuqG6pqOb+aTzQGH1sI9Wd1lN/gZWKJGxCZu7MZvXiQsv6VotmI9tLD36qJQ==
-X-Received: by 2002:a05:6808:1b10:b0:326:40f5:930c with SMTP id bx16-20020a0568081b1000b0032640f5930cmr840804oib.281.1651597309459;
-        Tue, 03 May 2022 10:01:49 -0700 (PDT)
-Received: from [10.10.69.251] ([8.34.116.185])
-        by smtp.gmail.com with ESMTPSA id a8-20020a4ad5c8000000b0035eb4e5a6c6sm5071917oot.28.2022.05.03.10.01.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 03 May 2022 10:01:48 -0700 (PDT)
-Message-ID: <1b7f3aac-0941-2554-d966-01a6bf76cc58@acm.org>
-Date:   Tue, 3 May 2022 10:01:45 -0700
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=Gyo7p1AtxXy3OgpPnsjbR9TlbxDuPZSB+of7dHJ2RMo=;
+        b=4ZtiQFaNwWOBkJ/qv6P6uLybcIbLZQIuHWw51ou+aY/Ktt+uT4Quid8PX5xIYV/Fl/
+         RtVQawRxzRyW5BhsiREaS+IA8ZO7Ww2w2F0/L259hAufMCcS1y18Dfe1xahF38DN4vuB
+         iZqKjMVH5/n1AEwHxYW5LvGIVVIQJ4XiQz0PBRyNvk971vovEIB+17H25AE8Jr8QSkCX
+         ztgi/YpNuSrRy1hgcqdIAhqD+ATdgKtQue/X2DcVyt26+US/NICbty6we41nLBJ3WQx7
+         xHzlqeHWhrM/IMamAF2MrnSlr3/7KNjS+JYfLz11hYk/XCnCzKZZ9Kf5uNDjinhBSZ8o
+         t/sQ==
+X-Gm-Message-State: AOAM533SR5N1x60tRv5ampM6c3gs1nCXuz/R2j933ldfmmrzs43R3JgQ
+        aJgdakdKpDCL54xwkmJ8mNydkpZkCHIXfw==
+X-Google-Smtp-Source: ABdhPJzhEnDltRxihueKjH6BGUMUATPCpDAcRxxF/TAOCMFUs+vBqrdjFNnGfhodyRqF7ET5EGFTng==
+X-Received: by 2002:a17:902:ea46:b0:15d:dbc:34f2 with SMTP id r6-20020a170902ea4600b0015d0dbc34f2mr17793422plg.60.1651608186591;
+        Tue, 03 May 2022 13:03:06 -0700 (PDT)
+Received: from [127.0.1.1] ([8.34.116.185])
+        by smtp.gmail.com with ESMTPSA id g20-20020aa78194000000b0050dc762818fsm6727619pfi.105.2022.05.03.13.03.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 May 2022 13:03:06 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     linux-block@vger.kernel.org, damien.lemoal@opensource.wdc.com
+Cc:     josef@toxicpanda.com
+In-Reply-To: <20220420005718.3780004-1-damien.lemoal@opensource.wdc.com>
+References: <20220420005718.3780004-1-damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH v2 0/4] null_blk cleanup and device naming improvements
+Message-Id: <165160818579.3632.8221777293051469775.b4-ty@kernel.dk>
+Date:   Tue, 03 May 2022 14:03:05 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH 13/16] null_blk: allow non power of 2 zoned devices
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, jaegeuk@kernel.org,
-        axboe@kernel.dk, snitzer@kernel.org, hch@lst.de, mcgrof@kernel.org,
-        naohiro.aota@wdc.com, sagi@grimberg.me,
-        damien.lemoal@opensource.wdc.com, dsterba@suse.com,
-        johannes.thumshirn@wdc.com
-Cc:     linux-kernel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        clm@fb.com, gost.dev@samsung.com, chao@kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, josef@toxicpanda.com,
-        jonathan.derrick@linux.dev, agk@redhat.com, kbusch@kernel.org,
-        kch@nvidia.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, jiangbo.365@bytedance.com,
-        linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
-        linux-block@vger.kernel.org
-References: <20220427160255.300418-1-p.raghav@samsung.com>
- <CGME20220427160310eucas1p28cd3c5ff4fb7a04bc77c4c0b9d96bb74@eucas1p2.samsung.com>
- <20220427160255.300418-14-p.raghav@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220427160255.300418-14-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/27/22 09:02, Pankaj Raghav wrote:
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index c441a4972064..82a62b543782 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1931,8 +1931,8 @@ static int null_validate_conf(struct nullb_device *dev)
->   		dev->mbps = 0;
->   
->   	if (dev->zoned &&
-> -	    (!dev->zone_size || !is_power_of_2(dev->zone_size))) {
-> -		pr_err("zone_size must be power-of-two\n");
-> +	    (!dev->zone_size)) {
-> +		pr_err("zone_size must not be zero\n");
->   		return -EINVAL;
->   	}
+On Wed, 20 Apr 2022 09:57:14 +0900, Damien Le Moal wrote:
+> The first 3 patches of this series are simple code cleanups.
+> 
+> The last patch changes the device naming scheme for devices created
+> through configfs: the configfs device directory name is used as the disk
+> name. This name is also checked against potentially exiting nullb
+> devices created during modprobe when the nr_device module option is not
+> 0.
+> 
+> [...]
 
-Please combine "if (dev->zoned &&" and "(!dev->zone_size)) {" into a 
-single line and leave out the parentheses that became superfluous.
+Applied, thanks!
 
-Thanks,
+[1/4] block: null_blk: Fix code style issues
+      commit: 8ea7b68edc5fd7b257759fa8588f7f8b57fedd51
+[2/4] block: null_blk: Cleanup device creation and deletion
+      commit: 2fdd541e4c7288f09077842654adc925b81ec620
+[3/4] block: null_blk: Cleanup messages
+      commit: 12e995654f2ef62dad1205629a3cd3c2d7cd405b
+[4/4] block: null_blk: Improve device creation with configfs
+      commit: 9986ac16c508d613b371a902a0c53b22bac195ee
 
-Bart.
+Best regards,
+-- 
+Jens Axboe
+
+
