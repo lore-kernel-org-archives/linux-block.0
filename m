@@ -2,95 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6793C433F5
-	for <linux-block@archiver.kernel.org>; Tue,  3 May 2022 20:05:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1E96C433F5
+	for <linux-block@archiver.kernel.org>; Tue,  3 May 2022 20:06:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236512AbiECUJP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 3 May 2022 16:09:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37756 "EHLO
+        id S234654AbiECUKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 3 May 2022 16:10:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236941AbiECUI5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 3 May 2022 16:08:57 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA032AE0;
-        Tue,  3 May 2022 13:05:22 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 40D856189A;
-        Tue,  3 May 2022 20:05:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0282C385A4;
-        Tue,  3 May 2022 20:05:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651608321;
-        bh=2OQ31S8saJK84+b60Nks/1nuGKuObPzODZf658f3HMo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Z3gmS/aw/5UbzdnldhQqOG3y2Htd54aWj3NdcFNjD/VuO6MUhIRAXm8gaqDMrbl7m
-         0Yd/IIwkIht0j2PXb+Na0iGFxmmXo69g/ybxOPgh9SC99E//dv42kQFiRnnJINmj0G
-         WQVouHUD07VcTCvD102p1MYo7k7OtdRH4nZKSxophQWU5wzuRrxx/mIrjlCvn7kjsq
-         yDReBNF0aClXwfI3zXeCWlW3e+RBMWhcbp6h1csAmjw9TRrSIgu4j5wxKNCdKT+oKm
-         M5ALQh3FJxRyG6IiOBdtF5JBS3VvY3anbsCRiV8IDHss/pgBG5U5QwG09lcuiCVlnW
-         Bdy2Z6nmvE8yA==
-Date:   Tue, 3 May 2022 13:05:19 -0700
-From:   Jaegeuk Kim <jaegeuk@kernel.org>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     axboe@kernel.dk, snitzer@kernel.org, hch@lst.de, mcgrof@kernel.org,
-        naohiro.aota@wdc.com, sagi@grimberg.me,
-        damien.lemoal@opensource.wdc.com, dsterba@suse.com,
-        johannes.thumshirn@wdc.com, linux-kernel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, clm@fb.com, gost.dev@samsung.com,
-        chao@kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        josef@toxicpanda.com, jonathan.derrick@linux.dev, agk@redhat.com,
-        kbusch@kernel.org, kch@nvidia.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, bvanassche@acm.org, jiangbo.365@bytedance.com,
-        linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 15/16] f2fs: ensure only power of 2 zone sizes are allowed
-Message-ID: <YnGK/8lu2GW4gEY0@google.com>
-References: <20220427160255.300418-1-p.raghav@samsung.com>
- <CGME20220427160312eucas1p279bcffd97ef83bd3617a38b80d979746@eucas1p2.samsung.com>
- <20220427160255.300418-16-p.raghav@samsung.com>
+        with ESMTP id S231220AbiECUKJ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 3 May 2022 16:10:09 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AC7521E0F;
+        Tue,  3 May 2022 13:06:36 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 243K6SNK021603
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 3 May 2022 16:06:28 -0400
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 38AF315C3EA1; Tue,  3 May 2022 16:06:28 -0400 (EDT)
+Date:   Tue, 3 May 2022 16:06:28 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-spdx@vger.kernel.org
+Subject: Re: SPDX tag and top of file comment cleanups for the loop driver
+Message-ID: <YnGLRAuS8QGaSADK@mit.edu>
+References: <20220419063303.583106-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220427160255.300418-16-p.raghav@samsung.com>
+In-Reply-To: <20220419063303.583106-1-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Applied to f2fs tree. Thanks,
+On Tue, Apr 19, 2022 at 08:32:59AM +0200, Christoph Hellwig wrote:
+> Hi Jens, hi Ted,
+> 
+> the loop driver still had no SPDX tag, so this series cleans up some
+> lose ends and fixes that up.
+> 
+> Ted, does the SPDX tag match your original licensing decision back then,
+> or do we need to correct it?  Does the auto-converted tag on the loop.h
+> SPDX header (GPL1.0 or later with syscall exception) make sense, or
+> should that have been GPL2 only with syscall exception?
 
-On 04/27, Pankaj Raghav wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
-> 
-> F2FS zoned support has power of 2 zone size assumption in many places
-> such as in __f2fs_issue_discard_zone, init_blkz_info. As the power of 2
-> requirement has been removed from the block layer, explicitly add a
-> condition in f2fs to allow only power of 2 zone size devices.
-> 
-> This condition will be relaxed once those calculation based on power of
-> 2 is made generic.
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->  fs/f2fs/super.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/fs/f2fs/super.c b/fs/f2fs/super.c
-> index f64761a15df7..db79abf30002 100644
-> --- a/fs/f2fs/super.c
-> +++ b/fs/f2fs/super.c
-> @@ -3685,6 +3685,10 @@ static int init_blkz_info(struct f2fs_sb_info *sbi, int devi)
->  		return 0;
->  
->  	zone_sectors = bdev_zone_sectors(bdev);
-> +	if (!is_power_of_2(zone_sectors)) {
-> +		f2fs_err(sbi, "F2FS does not support non power of 2 zone sizes\n");
-> +		return -EINVAL;
-> +	}
->  
->  	if (sbi->blocks_per_blkz && sbi->blocks_per_blkz !=
->  				SECTOR_TO_BLOCK(zone_sectors))
-> -- 
-> 2.25.1
+I think you've removed the loop.h in the patch series, so it shouldn't
+matter what the tag would be for loop.h, right?  In any case, GPLv2
+only was certainly the intent at the time.
+
+Cheers,
+
+						- Ted
