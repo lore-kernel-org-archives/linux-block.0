@@ -2,94 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39EFCC4332F
-	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 17:23:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA011C4332F
+	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 17:03:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237371AbiEFR1h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 May 2022 13:27:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56308 "EHLO
+        id S1355203AbiEDRGp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 May 2022 13:06:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1444167AbiEFR1f (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 13:27:35 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E5123BD2;
-        Fri,  6 May 2022 10:23:52 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S1355254AbiEDREN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 13:04:13 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D46C4DF76;
+        Wed,  4 May 2022 09:52:53 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C92A3620B2;
-        Fri,  6 May 2022 17:23:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6385C385A8;
-        Fri,  6 May 2022 17:23:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1651857831;
-        bh=nXZ3Q1jTbaZ/sK8x9V920nhEF4T7dJ3ktr0gnhCZATw=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:From;
-        b=OfYs4mRhp6lLGqo13sQacwVW9iittAZ7SAI7kb+r6hxxdi/apElxndNV2zhleIjOa
-         R19ikT+HJLadc/9Ye9/w48Cbh2j2zDiXP1448RufOjTjoKrwQLOpaYs7svQda8uNHl
-         1yp0T2hge2QaBesrUXtuFaOu7mz+e+agAvK9ixsfGkCLNaHFlC3+EC8Cd5CNeCOX3J
-         v498ZxqcSIobrgKGg/YVtjgFYXl3l/djT+e/iwLJwUmjgvQDs6QaZFv0sqApMzlbYU
-         uRHapzwdExq7H7WLMD+rjjwqt1kgyHR0gJHvZWb9+1I3CwwnqPnicF0+eHdFs1YRp5
-         atMpv+P/D1hUQ==
-Date:   Fri, 6 May 2022 12:23:48 -0500
-From:   Bjorn Helgaas <helgaas@kernel.org>
-To:     Peng Liu <liupeng256@huawei.com>
-Cc:     bhelgaas@google.com, tglx@linutronix.de, mingo@redhat.com,
-        bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-        hpa@zytor.com, lorenzo.pieralisi@arm.com, guohanjun@huawei.com,
-        sudeep.holla@arm.com, rafael@kernel.org, lenb@kernel.org,
-        akpm@linux-foundation.org, logang@deltatee.com,
-        martin.oliveira@eideticom.com, thunder.leizhen@huawei.com,
-        axboe@kernel.dk, kch@nvidia.com, ming.lei@redhat.com,
-        shinichiro.kawasaki@wdc.com, mcgrof@kernel.org,
-        jiangguoqing@kylinos.cn, jpittman@redhat.com, dave@stgolabs.net,
-        wangkefeng.wang@huawei.com, linux-block@vger.kernel.org,
-        linux-ia64@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-acpi@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, linux-mm@kvack.org
-Subject: Re: [PATCH 1/2] include/linux/nodemask.h: create node_available()
- helper
-Message-ID: <20220506172348.GA543299@bhelgaas>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id A85371F37F;
+        Wed,  4 May 2022 16:52:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1651683164; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zAXSq6bhqdolheY4p9cT7aP0Oy4T4nVBMUNySprQGJg=;
+        b=vE8sRwFmAdvIKQHGW+mHNYbQfMEMAdlaQcqhqiM2yfOAVy7gsn0V7HsTwt2w4B8L0AJRz6
+        YACrATxksuCgUwQY7a2toGbDwLHkNgFwY1Axbzv/svz5yo6k6d0wWChaM9KgkHwDzDQyNJ
+        HebomPomfBLU+oqZC0S2RJRZhW3Ge4w=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1651683164;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=zAXSq6bhqdolheY4p9cT7aP0Oy4T4nVBMUNySprQGJg=;
+        b=sCEh2RvidNwfAvfw21e903UN4kb+NKkiLtsl30cweyiBvUgCEZuzXUNUNyuzxIG3pvvgQZ
+        OGkJos+YlE3QW6AA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 49B43131BD;
+        Wed,  4 May 2022 16:52:39 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id QTNfB1evcmLrUwAAMHmgww
+        (envelope-from <hare@suse.de>); Wed, 04 May 2022 16:52:39 +0000
+Message-ID: <abe54d7b-47b7-fba1-2086-b601a68b63c8@suse.de>
+Date:   Wed, 4 May 2022 09:52:36 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506015801.757918-2-liupeng256@huawei.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH 01/16] block: make blkdev_nr_zones and blk_queue_zone_no
+ generic for npo2 zsze
+Content-Language: en-US
+References: <20220427160255.300418-1-p.raghav@samsung.com>
+ <CGME20220427160257eucas1p21fb58d0129376a135fdf0b9c2fe88895@eucas1p2.samsung.com>
+ <20220427160255.300418-2-p.raghav@samsung.com>
+From:   Hannes Reinecke <hare@suse.de>
+To:     undisclosed-recipients:;
+In-Reply-To: <20220427160255.300418-2-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Subject line convention looks like "numa: ..."
+On 4/27/22 09:02, Pankaj Raghav wrote:
+> Adapt blkdev_nr_zones and blk_queue_zone_no function so that it can
+> also work for non-power-of-2 zone sizes.
+> 
+> As the existing deployments of zoned devices had power-of-2
+> assumption, power-of-2 optimized calculation is kept for those devices.
+> 
+> There are no direct hot paths modified and the changes just
+> introduce one new branch per call.
+> 
+> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+>   block/blk-zoned.c      | 8 +++++++-
+>   include/linux/blkdev.h | 8 +++++++-
+>   2 files changed, 14 insertions(+), 2 deletions(-)
+> 
+Reviewed-by: Hannes Reinecke <hare@suse.de>
 
-On Fri, May 06, 2022 at 01:58:00AM +0000, Peng Liu wrote:
-> Lots of code dose
-               does
+Cheers,
 
-> 	node != NUMA_NO_NODE && !node_online(node)
-> or
-> 	node == NUMA_NO_NODE || node_online(node)
-> so create node_available to do this to simplify code.
-            node_available()
-
-I'm not really sure what meaning "node_available" conveys, though.
-Probably just because I don't understand NUMA.
-
-Should the test for NUMA_NO_NODE be folded into node_state() or
-node_online() directly instead of adding a new node_available()
-interface?
-
-NUMA_NO_NODE is -1.  It's not clear to me that node_state()/
-node_isset()/test_bit() would do the right thing given -1.  I doubt
-all node_online() callers ensure they don't pass NUMA_NO_NODE.
-
-> --- a/include/linux/nodemask.h
-> +++ b/include/linux/nodemask.h
-> @@ -70,6 +70,7 @@
->   *
->   * int node_online(node)		Is some node online?
->   * int node_possible(node)		Is some node possible?
-> + * int node_available(node)		Is some node available(online or NUMA_NO_NODE)?
-
-Existing file generally fits in 80 columns; follow that lead unless
-you have a really good reason.  E.g., maybe this?
-
-  + * int node_available(node)		Node online or NUMA_NO_NODE
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
