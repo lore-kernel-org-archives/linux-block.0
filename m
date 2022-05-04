@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8B40C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:52:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF54C4167E
+	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:52:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343661AbiEDI4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 May 2022 04:56:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52554 "EHLO
+        id S1343777AbiEDI4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 May 2022 04:56:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346724AbiEDIxY (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:24 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1183624F00
-        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:21 -0700 (PDT)
+        with ESMTP id S1346850AbiEDIxv (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:51 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8A2E25C79
+        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:28 -0700 (PDT)
 Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.51 with ESMTP; 4 May 2022 17:19:20 +0900
+        by 156.147.23.53 with ESMTP; 4 May 2022 17:19:22 +0900
 X-Original-SENDERIP: 156.147.1.125
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:20 +0900
+        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:22 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -46,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com
-Subject: [PATCH RFC v6 06/21] dept: Apply Dept to wait_for_completion()/complete()
-Date:   Wed,  4 May 2022 17:17:34 +0900
-Message-Id: <1651652269-15342-7-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v6 21/21] dept: Unstage wait when tagging a normal sleep wait
+Date:   Wed,  4 May 2022 17:17:49 +0900
+Message-Id: <1651652269-15342-22-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
 References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
@@ -56,139 +56,111 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Makes Dept able to track dependencies by
-wait_for_completion()/complete().
+Staging a wait and commit have been introduced to handle conditional
+sleeps that can be determined in __schedule() whether it actually goes
+to sleep or not. With this feature, actual wait tagging is delayed
+until __schedule().
+
+Unfortunately, an ambiguity arises when a normal sleep wait that doesn't
+require staging and commit, is involved in the middle of handling a
+conditional sleep e.g. between prepare_to_wait_*() and __schedule(),
+which is a very rare case tho.
+
+So let it give up handling the conditional sleep by unstaging it
+unconditionally when a normal sleep wait gets involved, to avoid the
+ambiguity.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/completion.h | 44 ++++++++++++++++++++++++++++++++++++++++++--
- kernel/sched/completion.c  | 12 ++++++++++--
- 2 files changed, 52 insertions(+), 4 deletions(-)
+ kernel/dependency/dept.c | 55 +++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 15 deletions(-)
 
-diff --git a/include/linux/completion.h b/include/linux/completion.h
-index 51d9ab0..358c656 100644
---- a/include/linux/completion.h
-+++ b/include/linux/completion.h
-@@ -26,14 +26,45 @@
- struct completion {
- 	unsigned int done;
- 	struct swait_queue_head wait;
-+	struct dept_map dmap;
- };
- 
-+#ifdef CONFIG_DEPT
-+#define dept_wfc_nocheck(m)			dept_map_nocheck(m)
-+#define dept_wfc_init(m, k, s, n)		dept_map_init(m, k, s, n)
-+#define dept_wfc_reinit(m)			dept_map_reinit(m)
-+#define dept_wfc_wait(m, ip)						\
-+do {									\
-+	dept_ask_event(m);						\
-+	dept_wait(m, 1UL, ip, __func__, 0);				\
-+} while (0)
-+#define dept_wfc_complete(m, ip)		dept_event(m, 1UL, ip, __func__)
-+#define dept_wfc_enter(m, ip)			dept_ecxt_enter(m, 1UL, ip, "completion_context_enter", "complete", 0)
-+#define dept_wfc_exit(m, ip)			dept_ecxt_exit(m, 1UL, ip)
-+#else
-+#define dept_wfc_nocheck(m)			do { } while (0)
-+#define dept_wfc_init(m, k, s, n)		do { (void)(n); (void)(k); } while (0)
-+#define dept_wfc_reinit(m)			do { } while (0)
-+#define dept_wfc_wait(m, ip)			do { } while (0)
-+#define dept_wfc_complete(m, ip)		do { } while (0)
-+#define dept_wfc_enter(m, ip)			do { } while (0)
-+#define dept_wfc_exit(m, ip)			do { } while (0)
-+#endif
-+
-+#define init_completion_nocheck(x) __init_completion(x, NULL, #x, false)
-+#define init_completion(x)					\
-+	do {							\
-+		static struct dept_key __dkey;			\
-+		__init_completion(x, &__dkey, #x, true);	\
-+	} while (0)
-+
- #define init_completion_map(x, m) init_completion(x)
- static inline void complete_acquire(struct completion *x) {}
- static inline void complete_release(struct completion *x) {}
- 
- #define COMPLETION_INITIALIZER(work) \
--	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait) }
-+	{ 0, __SWAIT_QUEUE_HEAD_INITIALIZER((work).wait), \
-+	  .dmap = DEPT_MAP_INITIALIZER(work) }
- 
- #define COMPLETION_INITIALIZER_ONSTACK_MAP(work, map) \
- 	(*({ init_completion_map(&(work), &(map)); &(work); }))
-@@ -81,9 +112,17 @@ static inline void complete_release(struct completion *x) {}
-  * This inline function will initialize a dynamically created completion
-  * structure.
-  */
--static inline void init_completion(struct completion *x)
-+static inline void __init_completion(struct completion *x,
-+				     struct dept_key *dkey,
-+				     const char *name, bool check)
- {
- 	x->done = 0;
-+
-+	if (check)
-+		dept_wfc_init(&x->dmap, dkey, 0, name);
-+	else
-+		dept_wfc_nocheck(&x->dmap);
-+
- 	init_swait_queue_head(&x->wait);
+diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+index 14dc33b..ce6d5b3 100644
+--- a/kernel/dependency/dept.c
++++ b/kernel/dependency/dept.c
+@@ -2166,6 +2166,21 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
+ 	}
  }
  
-@@ -97,6 +136,7 @@ static inline void init_completion(struct completion *x)
- static inline void reinit_completion(struct completion *x)
- {
- 	x->done = 0;
-+	dept_wfc_reinit(&x->dmap);
- }
- 
- extern void wait_for_completion(struct completion *);
-diff --git a/kernel/sched/completion.c b/kernel/sched/completion.c
-index 35f15c2..4cf0cfe 100644
---- a/kernel/sched/completion.c
-+++ b/kernel/sched/completion.c
-@@ -29,6 +29,7 @@ void complete(struct completion *x)
- {
- 	unsigned long flags;
- 
-+	dept_wfc_complete(&x->dmap, _RET_IP_);
- 	raw_spin_lock_irqsave(&x->wait.lock, flags);
- 
- 	if (x->done != UINT_MAX)
-@@ -58,6 +59,7 @@ void complete_all(struct completion *x)
- {
- 	unsigned long flags;
- 
-+	dept_wfc_complete(&x->dmap, _RET_IP_);
- 	lockdep_assert_RT_in_threaded_ctx();
- 
- 	raw_spin_lock_irqsave(&x->wait.lock, flags);
-@@ -112,17 +114,23 @@ void complete_all(struct completion *x)
- }
- 
- static long __sched
--wait_for_common(struct completion *x, long timeout, int state)
-+_wait_for_common(struct completion *x, long timeout, int state)
- {
- 	return __wait_for_common(x, schedule_timeout, timeout, state);
- }
- 
- static long __sched
--wait_for_common_io(struct completion *x, long timeout, int state)
-+_wait_for_common_io(struct completion *x, long timeout, int state)
- {
- 	return __wait_for_common(x, io_schedule_timeout, timeout, state);
- }
- 
-+#define wait_for_common(x, t, s)					\
-+({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common(x, t, s); })
++static inline void stage_map(struct dept_task *dt, struct dept_map *m)
++{
++	dt->stage_m = m;
++}
 +
-+#define wait_for_common_io(x, t, s)					\
-+({ dept_wfc_wait(&(x)->dmap, _RET_IP_); _wait_for_common_io(x, t, s); })
++static inline void unstage_map(struct dept_task *dt)
++{
++	dt->stage_m = NULL;
++}
 +
- /**
-  * wait_for_completion: - waits for completion of a task
-  * @x:  holds the state of this particular completion
++static inline struct dept_map *staged_map(struct dept_task *dt)
++{
++	return dt->stage_m;
++}
++
+ void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip,
+ 	       const char *w_fn, int ne, bool sleep)
+ {
+@@ -2183,27 +2198,24 @@ void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip,
+ 
+ 	flags = dept_enter();
+ 
++	/*
++	 * There's no way to distinguish between a staged wait and this
++	 * one, in the middle of handling a wait that requires staging
++	 * and commit in __schedule().
++	 *
++	 * The wait that has been tagged dept_wait() with sleep == true
++	 * should ignore the staged wait in __schedule() if it exists,
++	 * to avoid the ambiguity. It can be done by unstaging it.
++	 */
++	if (sleep)
++		unstage_map(dt);
++
+ 	__dept_wait(m, w_f, ip, w_fn, ne, sleep);
+ 
+ 	dept_exit(flags);
+ }
+ EXPORT_SYMBOL_GPL(dept_wait);
+ 
+-static inline void stage_map(struct dept_task *dt, struct dept_map *m)
+-{
+-	dt->stage_m = m;
+-}
+-
+-static inline void unstage_map(struct dept_task *dt)
+-{
+-	dt->stage_m = NULL;
+-}
+-
+-static inline struct dept_map *staged_map(struct dept_task *dt)
+-{
+-	return dt->stage_m;
+-}
+-
+ void dept_stage_wait(struct dept_map *m, unsigned long w_f,
+ 		     const char *w_fn, int ne)
+ {
+@@ -2565,6 +2577,19 @@ void dept_wait_split_map(struct dept_map_each *me,
+ 
+ 	flags = dept_enter();
+ 
++	/*
++	 * There's no way to distinguish between a staged wait and this
++	 * one, in the middle of handling a wait that requires staging
++	 * and commit in __schedule().
++	 *
++	 * The wait that has been tagged dept_wait_split_map() with
++	 * sleep == true should ignore the staged wait in __schedule()
++	 * if it exists, to avoid the ambiguity. It can be done by
++	 * unstaging it.
++	 */
++	if (sleep)
++		unstage_map(dt);
++
+ 	k = mc->keys ?: &mc->keys_local;
+ 	c = check_new_class(&mc->keys_local, k, 0, 0UL, mc->name);
+ 	if (c)
 -- 
 1.9.1
 
