@@ -2,24 +2,24 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FF54C4167E
-	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75493C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:52:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343777AbiEDI4O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 May 2022 04:56:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53398 "EHLO
+        id S1346640AbiEDI4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 May 2022 04:56:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51890 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346850AbiEDIxv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:51 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo13.lge.com [156.147.23.53])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B8A2E25C79
-        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:28 -0700 (PDT)
+        with ESMTP id S1346780AbiEDIxa (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:30 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 84C4625C46
+        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:22 -0700 (PDT)
 Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.53 with ESMTP; 4 May 2022 17:19:22 +0900
+        by 156.147.23.51 with ESMTP; 4 May 2022 17:19:21 +0900
 X-Original-SENDERIP: 156.147.1.125
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:22 +0900
+        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:21 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -46,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com
-Subject: [PATCH RFC v6 21/21] dept: Unstage wait when tagging a normal sleep wait
-Date:   Wed,  4 May 2022 17:17:49 +0900
-Message-Id: <1651652269-15342-22-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v6 16/21] dept: Distinguish each work from another
+Date:   Wed,  4 May 2022 17:17:44 +0900
+Message-Id: <1651652269-15342-17-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
 References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
@@ -56,111 +56,81 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Staging a wait and commit have been introduced to handle conditional
-sleeps that can be determined in __schedule() whether it actually goes
-to sleep or not. With this feature, actual wait tagging is delayed
-until __schedule().
+Workqueue already provides concurrency control. By that, any wait in a
+work doesn't prevents events in other works with the control enabled.
+Thus, each work would better be considered a different context.
 
-Unfortunately, an ambiguity arises when a normal sleep wait that doesn't
-require staging and commit, is involved in the middle of handling a
-conditional sleep e.g. between prepare_to_wait_*() and __schedule(),
-which is a very rare case tho.
-
-So let it give up handling the conditional sleep by unstaging it
-unconditionally when a normal sleep wait gets involved, to avoid the
-ambiguity.
+So let Dept assign a different context id to each work.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- kernel/dependency/dept.c | 55 +++++++++++++++++++++++++++++++++++-------------
- 1 file changed, 40 insertions(+), 15 deletions(-)
+ include/linux/dept.h     |  2 ++
+ kernel/dependency/dept.c | 10 ++++++++++
+ kernel/workqueue.c       |  3 +++
+ 3 files changed, 15 insertions(+)
 
+diff --git a/include/linux/dept.h b/include/linux/dept.h
+index c020b17..1a3858c 100644
+--- a/include/linux/dept.h
++++ b/include/linux/dept.h
+@@ -503,6 +503,7 @@ struct dept_task {
+ extern void dept_event_split_map(struct dept_map_each *me, struct dept_map_common *mc, unsigned long ip, const char *e_fn);
+ extern void dept_ask_event_split_map(struct dept_map_each *me, struct dept_map_common *mc);
+ extern void dept_kernel_enter(void);
++extern void dept_work_enter(void);
+ 
+ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ {
+@@ -556,6 +557,7 @@ static inline void dept_ecxt_enter_nokeep(struct dept_map *m)
+ #define dept_event_split_map(me, mc, ip, e_fn)		do { } while (0)
+ #define dept_ask_event_split_map(me, mc)		do { } while (0)
+ #define dept_kernel_enter()				do { } while (0)
++#define dept_work_enter()				do { } while (0)
+ #define dept_ecxt_enter_nokeep(m)			do { } while (0)
+ #define dept_key_init(k)				do { (void)(k); } while (0)
+ #define dept_key_destroy(k)				do { (void)(k); } while (0)
 diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
-index 14dc33b..ce6d5b3 100644
+index 18e5951..6707313 100644
 --- a/kernel/dependency/dept.c
 +++ b/kernel/dependency/dept.c
-@@ -2166,6 +2166,21 @@ static void __dept_wait(struct dept_map *m, unsigned long w_f,
- 	}
- }
- 
-+static inline void stage_map(struct dept_task *dt, struct dept_map *m)
-+{
-+	dt->stage_m = m;
-+}
-+
-+static inline void unstage_map(struct dept_task *dt)
-+{
-+	dt->stage_m = NULL;
-+}
-+
-+static inline struct dept_map *staged_map(struct dept_task *dt)
-+{
-+	return dt->stage_m;
-+}
-+
- void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip,
- 	       const char *w_fn, int ne, bool sleep)
- {
-@@ -2183,27 +2198,24 @@ void dept_wait(struct dept_map *m, unsigned long w_f, unsigned long ip,
- 
- 	flags = dept_enter();
- 
-+	/*
-+	 * There's no way to distinguish between a staged wait and this
-+	 * one, in the middle of handling a wait that requires staging
-+	 * and commit in __schedule().
-+	 *
-+	 * The wait that has been tagged dept_wait() with sleep == true
-+	 * should ignore the staged wait in __schedule() if it exists,
-+	 * to avoid the ambiguity. It can be done by unstaging it.
-+	 */
-+	if (sleep)
-+		unstage_map(dt);
-+
- 	__dept_wait(m, w_f, ip, w_fn, ne, sleep);
- 
+@@ -1844,6 +1844,16 @@ void dept_enirq_transition(unsigned long ip)
  	dept_exit(flags);
  }
- EXPORT_SYMBOL_GPL(dept_wait);
  
--static inline void stage_map(struct dept_task *dt, struct dept_map *m)
--{
--	dt->stage_m = m;
--}
--
--static inline void unstage_map(struct dept_task *dt)
--{
--	dt->stage_m = NULL;
--}
--
--static inline struct dept_map *staged_map(struct dept_task *dt)
--{
--	return dt->stage_m;
--}
--
- void dept_stage_wait(struct dept_map *m, unsigned long w_f,
- 		     const char *w_fn, int ne)
- {
-@@ -2565,6 +2577,19 @@ void dept_wait_split_map(struct dept_map_each *me,
- 
- 	flags = dept_enter();
- 
-+	/*
-+	 * There's no way to distinguish between a staged wait and this
-+	 * one, in the middle of handling a wait that requires staging
-+	 * and commit in __schedule().
-+	 *
-+	 * The wait that has been tagged dept_wait_split_map() with
-+	 * sleep == true should ignore the staged wait in __schedule()
-+	 * if it exists, to avoid the ambiguity. It can be done by
-+	 * unstaging it.
-+	 */
-+	if (sleep)
-+		unstage_map(dt);
++/*
++ * Assign a different context id to each work.
++ */
++void dept_work_enter(void)
++{
++	struct dept_task *dt = dept_task();
 +
- 	k = mc->keys ?: &mc->keys_local;
- 	c = check_new_class(&mc->keys_local, k, 0, 0UL, mc->name);
- 	if (c)
++	dt->cxt_id[DEPT_CXT_PROCESS] += (1UL << DEPT_CXTS_NR);
++}
++
+ void dept_kernel_enter(void)
+ {
+ 	struct dept_task *dt = dept_task();
+diff --git a/kernel/workqueue.c b/kernel/workqueue.c
+index 0d2514b..334654c 100644
+--- a/kernel/workqueue.c
++++ b/kernel/workqueue.c
+@@ -51,6 +51,7 @@
+ #include <linux/sched/isolation.h>
+ #include <linux/nmi.h>
+ #include <linux/kvm_para.h>
++#include <linux/dept.h>
+ 
+ #include "workqueue_internal.h"
+ 
+@@ -2199,6 +2200,8 @@ static void process_one_work(struct worker *worker, struct work_struct *work)
+ 
+ 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
+ #endif
++	dept_work_enter();
++
+ 	/* ensure we're on the correct CPU */
+ 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
+ 		     raw_smp_processor_id() != pool->cpu);
 -- 
 1.9.1
 
