@@ -2,25 +2,24 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87335C4167D
-	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BCDC43217
+	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 08:49:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346762AbiEDIx3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 May 2022 04:53:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52332 "EHLO
+        id S1346656AbiEDIx0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 May 2022 04:53:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346676AbiEDIxO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:14 -0400
-X-Greylist: delayed 1800 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 04 May 2022 01:49:22 PDT
-Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A88324F0C
-        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:21 -0700 (PDT)
+        with ESMTP id S1346654AbiEDIxD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 04:53:03 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id CE18624F28
+        for <linux-block@vger.kernel.org>; Wed,  4 May 2022 01:49:20 -0700 (PDT)
 Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.51 with ESMTP; 4 May 2022 17:19:19 +0900
+        by 156.147.23.52 with ESMTP; 4 May 2022 17:19:20 +0900
 X-Original-SENDERIP: 156.147.1.125
 X-Original-MAILFROM: byungchul.park@lge.com
 Received: from unknown (HELO localhost.localdomain) (10.177.244.38)
-        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:19 +0900
+        by 156.147.1.125 with ESMTP; 4 May 2022 17:19:20 +0900
 X-Original-SENDERIP: 10.177.244.38
 X-Original-MAILFROM: byungchul.park@lge.com
 From:   Byungchul Park <byungchul.park@lge.com>
@@ -47,9 +46,9 @@ Cc:     damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
         dri-devel@lists.freedesktop.org, airlied@linux.ie,
         rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
         hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com
-Subject: [PATCH RFC v6 01/21] llist: Move llist_{head,node} definition to types.h
-Date:   Wed,  4 May 2022 17:17:29 +0900
-Message-Id: <1651652269-15342-2-git-send-email-byungchul.park@lge.com>
+Subject: [PATCH RFC v6 07/21] dept: Apply Dept to seqlock
+Date:   Wed,  4 May 2022 17:17:35 +0900
+Message-Id: <1651652269-15342-8-git-send-email-byungchul.park@lge.com>
 X-Mailer: git-send-email 1.9.1
 In-Reply-To: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
 References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
@@ -57,54 +56,148 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-llist_head and llist_node can be used by very primitives. For example,
-Dept for tracking dependency uses llist things in its header. To avoid
-header dependency, move those to types.h.
+Makes Dept able to track dependencies by seqlock with adding wait
+annotation on read side of seqlock.
 
 Signed-off-by: Byungchul Park <byungchul.park@lge.com>
 ---
- include/linux/llist.h | 8 --------
- include/linux/types.h | 8 ++++++++
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ include/linux/seqlock.h | 60 +++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 58 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/llist.h b/include/linux/llist.h
-index 85bda2d..99cc3c3 100644
---- a/include/linux/llist.h
-+++ b/include/linux/llist.h
-@@ -53,14 +53,6 @@
- #include <linux/stddef.h>
- #include <linux/types.h>
+diff --git a/include/linux/seqlock.h b/include/linux/seqlock.h
+index 37ded6b..47c3379 100644
+--- a/include/linux/seqlock.h
++++ b/include/linux/seqlock.h
+@@ -23,6 +23,23 @@
  
--struct llist_head {
--	struct llist_node *first;
--};
--
--struct llist_node {
--	struct llist_node *next;
--};
--
- #define LLIST_HEAD_INIT(name)	{ NULL }
- #define LLIST_HEAD(name)	struct llist_head name = LLIST_HEAD_INIT(name)
+ #include <asm/processor.h>
  
-diff --git a/include/linux/types.h b/include/linux/types.h
-index ea8cf60a..b12a444 100644
---- a/include/linux/types.h
-+++ b/include/linux/types.h
-@@ -187,6 +187,14 @@ struct hlist_node {
- 	struct hlist_node *next, **pprev;
- };
- 
-+struct llist_head {
-+	struct llist_node *first;
-+};
++#ifdef CONFIG_DEPT
++#define DEPT_EVT_ALL		((1UL << DEPT_MAX_SUBCLASSES_EVT) - 1)
++#define dept_seq_wait(m, ip)	dept_wait(m, DEPT_EVT_ALL, ip, __func__, 0)
++#define dept_seq_writebegin(m, ip)				\
++do {								\
++	dept_ecxt_enter(m, 1UL, ip, __func__, "write_seqcount_end", 0);\
++} while (0)
++#define dept_seq_writeend(m, ip)				\
++do {								\
++	dept_ecxt_exit(m, 1UL, ip);				\
++} while (0)
++#else
++#define dept_seq_wait(m, ip)		do { } while (0)
++#define dept_seq_writebegin(m, ip)	do { } while (0)
++#define dept_seq_writeend(m, ip)	do { } while (0)
++#endif
 +
-+struct llist_node {
-+	struct llist_node *next;
-+};
+ /*
+  * The seqlock seqcount_t interface does not prescribe a precise sequence of
+  * read begin/retry/end. For readers, typically there is a call to
+@@ -82,7 +99,8 @@ static inline void __seqcount_init(seqcount_t *s, const char *name,
+ #ifdef CONFIG_DEBUG_LOCK_ALLOC
+ 
+ # define SEQCOUNT_DEP_MAP_INIT(lockname)				\
+-		.dep_map = { .name = #lockname }
++		.dep_map = { .name = #lockname, \
++			     .dmap = DEPT_MAP_INITIALIZER(lockname) }
+ 
+ /**
+  * seqcount_init() - runtime initializer for seqcount_t
+@@ -148,7 +166,7 @@ static inline void seqcount_lockdep_reader_access(const seqcount_t *s)
+  * This lock-unlock technique must be implemented for all of PREEMPT_RT
+  * sleeping locks.  See Documentation/locking/locktypes.rst
+  */
+-#if defined(CONFIG_LOCKDEP) || defined(CONFIG_PREEMPT_RT)
++#if defined(CONFIG_LOCKDEP) || defined(CONFIG_DEPT) || defined(CONFIG_PREEMPT_RT)
+ #define __SEQ_LOCK(expr)	expr
+ #else
+ #define __SEQ_LOCK(expr)
+@@ -203,6 +221,22 @@ static inline void seqcount_lockdep_reader_access(const seqcount_t *s)
+ 	__SEQ_LOCK(locktype	*lock);					\
+ } seqcount_##lockname##_t;						\
+ 									\
++static __always_inline void						\
++__seqprop_##lockname##_wait(const seqcount_##lockname##_t *s)		\
++{									\
++	__SEQ_LOCK(dept_seq_wait(&(lockmember)->dep_map.dmap, _RET_IP_));\
++}									\
++									\
++static __always_inline void						\
++__seqprop_##lockname##_writebegin(const seqcount_##lockname##_t *s)	\
++{									\
++}									\
++									\
++static __always_inline void						\
++__seqprop_##lockname##_writeend(const seqcount_##lockname##_t *s)	\
++{									\
++}									\
++									\
+ static __always_inline seqcount_t *					\
+ __seqprop_##lockname##_ptr(seqcount_##lockname##_t *s)			\
+ {									\
+@@ -271,6 +305,21 @@ static inline void __seqprop_assert(const seqcount_t *s)
+ 	lockdep_assert_preemption_disabled();
+ }
+ 
++static inline void __seqprop_wait(seqcount_t *s)
++{
++	dept_seq_wait(&s->dep_map.dmap, _RET_IP_);
++}
 +
- struct ustat {
- 	__kernel_daddr_t	f_tfree;
- #ifdef CONFIG_ARCH_32BIT_USTAT_F_TINODE
++static inline void __seqprop_writebegin(seqcount_t *s)
++{
++	dept_seq_writebegin(&s->dep_map.dmap, _RET_IP_);
++}
++
++static inline void __seqprop_writeend(seqcount_t *s)
++{
++	dept_seq_writeend(&s->dep_map.dmap, _RET_IP_);
++}
++
+ #define __SEQ_RT	IS_ENABLED(CONFIG_PREEMPT_RT)
+ 
+ SEQCOUNT_LOCKNAME(raw_spinlock, raw_spinlock_t,  false,    s->lock,        raw_spin, raw_spin_lock(s->lock))
+@@ -311,6 +360,9 @@ static inline void __seqprop_assert(const seqcount_t *s)
+ #define seqprop_sequence(s)		__seqprop(s, sequence)
+ #define seqprop_preemptible(s)		__seqprop(s, preemptible)
+ #define seqprop_assert(s)		__seqprop(s, assert)
++#define seqprop_dept_wait(s)		__seqprop(s, wait)
++#define seqprop_dept_writebegin(s)	__seqprop(s, writebegin)
++#define seqprop_dept_writeend(s)	__seqprop(s, writeend)
+ 
+ /**
+  * __read_seqcount_begin() - begin a seqcount_t read section w/o barrier
+@@ -360,6 +412,7 @@ static inline void __seqprop_assert(const seqcount_t *s)
+ #define read_seqcount_begin(s)						\
+ ({									\
+ 	seqcount_lockdep_reader_access(seqprop_ptr(s));			\
++	seqprop_dept_wait(s);						\
+ 	raw_read_seqcount_begin(s);					\
+ })
+ 
+@@ -512,6 +565,7 @@ static inline void do_raw_write_seqcount_end(seqcount_t *s)
+ 		preempt_disable();					\
+ 									\
+ 	do_write_seqcount_begin_nested(seqprop_ptr(s), subclass);	\
++	seqprop_dept_writebegin(s);					\
+ } while (0)
+ 
+ static inline void do_write_seqcount_begin_nested(seqcount_t *s, int subclass)
+@@ -538,6 +592,7 @@ static inline void do_write_seqcount_begin_nested(seqcount_t *s, int subclass)
+ 		preempt_disable();					\
+ 									\
+ 	do_write_seqcount_begin(seqprop_ptr(s));			\
++	seqprop_dept_writebegin(s);					\
+ } while (0)
+ 
+ static inline void do_write_seqcount_begin(seqcount_t *s)
+@@ -554,6 +609,7 @@ static inline void do_write_seqcount_begin(seqcount_t *s)
+  */
+ #define write_seqcount_end(s)						\
+ do {									\
++	seqprop_dept_writeend(s);					\
+ 	do_write_seqcount_end(seqprop_ptr(s));				\
+ 									\
+ 	if (seqprop_preemptible(s))					\
 -- 
 1.9.1
 
