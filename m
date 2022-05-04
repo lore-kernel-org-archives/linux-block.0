@@ -2,166 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03F2AC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 11:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B62BC433FE
+	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 11:23:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348500AbiEDLIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 May 2022 07:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41794 "EHLO
+        id S1348689AbiEDL1Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 4 May 2022 07:27:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37572 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348523AbiEDLIk (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 07:08:40 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FDDA245AF;
-        Wed,  4 May 2022 04:05:00 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 02CF75FD03;
-        Wed,  4 May 2022 14:04:56 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1651662296;
-        bh=hp4dZx7e7B5x52z+YxyWS6SnKYtRvgq3EAaeLq15SDs=;
-        h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
-        b=X/t9SQjjkOtxRknL2/11yTGGnCdaQdeC3Rgdc4Cfz2kZbMdv0Fhw3K1njpK77wv4W
-         2AQoNDg9pMVfi2xP6mPvTkexgH2spsvBfmkQXzGka+wc4emY56FlJZ8+5YnJo7c8zO
-         jAQsSjhVlapJDRWuRWb102Y7x40zEuZi8DjCmTFaY/c4QSc2KGBrdC0OlMRBo2l200
-         KQ0yRKfQh5fp1lhxCzwk910D9PTT/w5hJBBjhcOk/Q0CUVYaGubpb7r95CQYc/YhSQ
-         zzrsdZsr/OcT8QaYNLSbweXAFbJ0Ijj9ljdeDpBCpSgzaLpyy5BGsumsLYggPNtrIw
-         CfdSORLyHNHGw==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Wed,  4 May 2022 14:04:54 +0300 (MSK)
-From:   Alexey Romanov <avromanov@sberdevices.ru>
-To:     <minchan@kernel.org>, <ngupta@vflare.org>,
-        <senozhatsky@chromium.org>, <linux-block@vger.kernel.org>
-CC:     <axboe@chromium.org>, <kernel@sberdevices.ru>,
-        <linux-kernel@vger.kernel.org>, <mnitenko@gmail.com>,
-        Alexey Romanov <avromanov@sberdevices.ru>,
-        Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: [PATCH v3] zram: remove double compression logic
-Date:   Wed, 4 May 2022 14:04:42 +0300
-Message-ID: <20220504110442.59685-1-avromanov@sberdevices.ru>
-X-Mailer: git-send-email 2.33.0
+        with ESMTP id S234974AbiEDL1X (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 07:27:23 -0400
+Received: from mxout04.lancloud.ru (mxout04.lancloud.ru [45.84.86.114])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E63A5140BE;
+        Wed,  4 May 2022 04:23:44 -0700 (PDT)
+Received: from LanCloud
+DKIM-Filter: OpenDKIM Filter v2.11.0 mxout04.lancloud.ru 2E7B02130938
+Received: from LanCloud
+Received: from LanCloud
+Received: from LanCloud
+Subject: Re: [PATCH RFC v6 16/21] dept: Distinguish each work from another
+To:     Byungchul Park <byungchul.park@lge.com>,
+        <torvalds@linux-foundation.org>
+CC:     <damien.lemoal@opensource.wdc.com>, <linux-ide@vger.kernel.org>,
+        <adilger.kernel@dilger.ca>, <linux-ext4@vger.kernel.org>,
+        <mingo@redhat.com>, <linux-kernel@vger.kernel.org>,
+        <peterz@infradead.org>, <will@kernel.org>, <tglx@linutronix.de>,
+        <rostedt@goodmis.org>, <joel@joelfernandes.org>,
+        <sashal@kernel.org>, <daniel.vetter@ffwll.ch>,
+        <chris@chris-wilson.co.uk>, <duyuyang@gmail.com>,
+        <johannes.berg@intel.com>, <tj@kernel.org>, <tytso@mit.edu>,
+        <willy@infradead.org>, <david@fromorbit.com>, <amir73il@gmail.com>,
+        <bfields@fieldses.org>, <gregkh@linuxfoundation.org>,
+        <kernel-team@lge.com>, <linux-mm@kvack.org>,
+        <akpm@linux-foundation.org>, <mhocko@kernel.org>,
+        <minchan@kernel.org>, <hannes@cmpxchg.org>,
+        <vdavydov.dev@gmail.com>, <sj@kernel.org>, <jglisse@redhat.com>,
+        <dennis@kernel.org>, <cl@linux.com>, <penberg@kernel.org>,
+        <rientjes@google.com>, <vbabka@suse.cz>, <ngupta@vflare.org>,
+        <linux-block@vger.kernel.org>, <paolo.valente@linaro.org>,
+        <josef@toxicpanda.com>, <linux-fsdevel@vger.kernel.org>,
+        <viro@zeniv.linux.org.uk>, <jack@suse.cz>, <jack@suse.com>,
+        <jlayton@kernel.org>, <dan.j.williams@intel.com>,
+        <hch@infradead.org>, <djwong@kernel.org>,
+        <dri-devel@lists.freedesktop.org>, <airlied@linux.ie>,
+        <rodrigosiqueiramelo@gmail.com>, <melissa.srw@gmail.com>,
+        <hamohammed.sa@gmail.com>, <42.hyeyoo@gmail.com>
+References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
+ <1651652269-15342-17-git-send-email-byungchul.park@lge.com>
+From:   Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <24e4d6db-9dc9-f113-f655-9af3a51723d4@omp.ru>
+Date:   Wed, 4 May 2022 14:23:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [172.16.1.6]
-X-ClientProxiedBy: S-MS-EXCH02.sberdevices.ru (172.16.1.5) To
- S-MS-EXCH01.sberdevices.ru (172.16.1.4)
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/04 08:31:00 #19348425
-X-KSMG-AntiVirus-Status: Clean, skipped
+In-Reply-To: <1651652269-15342-17-git-send-email-byungchul.park@lge.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [192.168.11.198]
+X-ClientProxiedBy: LFEXT01.lancloud.ru (fd00:f066::141) To
+ LFEX1907.lancloud.ru (fd00:f066::207)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The 2nd trial allocation under per-cpu presumption has been
-used to prevent regression of allocation failure. However, it
-makes trouble for maintenance without significant benefit.
-The slowpath branch is executed extremely rarely: getting
-there is problematic. Therefore, we delete this branch.
+Hello!
 
-Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
----
- drivers/block/zram/zram_drv.c | 40 ++++++++---------------------------
- drivers/block/zram/zram_drv.h |  1 -
- 2 files changed, 9 insertions(+), 32 deletions(-)
+On 5/4/22 11:17 AM, Byungchul Park wrote:
 
-diff --git a/drivers/block/zram/zram_drv.c b/drivers/block/zram/zram_drv.c
-index cb253d80d72b..2eb614769d9d 100644
---- a/drivers/block/zram/zram_drv.c
-+++ b/drivers/block/zram/zram_drv.c
-@@ -1153,9 +1153,8 @@ static ssize_t debug_stat_show(struct device *dev,
- 
- 	down_read(&zram->init_lock);
- 	ret = scnprintf(buf, PAGE_SIZE,
--			"version: %d\n%8llu %8llu\n",
-+			"version: %d\n%8llu\n",
- 			version,
--			(u64)atomic64_read(&zram->stats.writestall),
- 			(u64)atomic64_read(&zram->stats.miss_free));
- 	up_read(&zram->init_lock);
- 
-@@ -1373,7 +1372,6 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 	}
- 	kunmap_atomic(mem);
- 
--compress_again:
- 	zstrm = zcomp_stream_get(zram->comp);
- 	src = kmap_atomic(page);
- 	ret = zcomp_compress(zstrm, src, &comp_len);
-@@ -1382,39 +1380,20 @@ static int __zram_bvec_write(struct zram *zram, struct bio_vec *bvec,
- 	if (unlikely(ret)) {
- 		zcomp_stream_put(zram->comp);
- 		pr_err("Compression failed! err=%d\n", ret);
--		zs_free(zram->mem_pool, handle);
- 		return ret;
- 	}
- 
- 	if (comp_len >= huge_class_size)
- 		comp_len = PAGE_SIZE;
--	/*
--	 * handle allocation has 2 paths:
--	 * a) fast path is executed with preemption disabled (for
--	 *  per-cpu streams) and has __GFP_DIRECT_RECLAIM bit clear,
--	 *  since we can't sleep;
--	 * b) slow path enables preemption and attempts to allocate
--	 *  the page with __GFP_DIRECT_RECLAIM bit set. we have to
--	 *  put per-cpu compression stream and, thus, to re-do
--	 *  the compression once handle is allocated.
--	 *
--	 * if we have a 'non-null' handle here then we are coming
--	 * from the slow path and handle has already been allocated.
--	 */
--	if (!handle)
--		handle = zs_malloc(zram->mem_pool, comp_len,
--				__GFP_KSWAPD_RECLAIM |
--				__GFP_NOWARN |
--				__GFP_HIGHMEM |
--				__GFP_MOVABLE);
--	if (!handle) {
-+
-+	handle = zs_malloc(zram->mem_pool, comp_len,
-+			__GFP_KSWAPD_RECLAIM |
-+			__GFP_NOWARN |
-+			__GFP_HIGHMEM |
-+			__GFP_MOVABLE);
-+
-+	if (unlikely(!handle)) {
- 		zcomp_stream_put(zram->comp);
--		atomic64_inc(&zram->stats.writestall);
--		handle = zs_malloc(zram->mem_pool, comp_len,
--				GFP_NOIO | __GFP_HIGHMEM |
--				__GFP_MOVABLE);
--		if (handle)
--			goto compress_again;
- 		return -ENOMEM;
- 	}
- 
-@@ -1975,7 +1954,6 @@ static int zram_add(void)
- 	if (ZRAM_LOGICAL_BLOCK_SIZE == PAGE_SIZE)
- 		blk_queue_max_write_zeroes_sectors(zram->disk->queue, UINT_MAX);
- 
--	blk_queue_flag_set(QUEUE_FLAG_STABLE_WRITES, zram->disk->queue);
- 	ret = device_add_disk(NULL, zram->disk, zram_disk_groups);
- 	if (ret)
- 		goto out_cleanup_disk;
-diff --git a/drivers/block/zram/zram_drv.h b/drivers/block/zram/zram_drv.h
-index 80c3b43b4828..158c91e54850 100644
---- a/drivers/block/zram/zram_drv.h
-+++ b/drivers/block/zram/zram_drv.h
-@@ -81,7 +81,6 @@ struct zram_stats {
- 	atomic64_t huge_pages_since;	/* no. of huge pages since zram set up */
- 	atomic64_t pages_stored;	/* no. of pages currently stored */
- 	atomic_long_t max_used_pages;	/* no. of maximum pages stored */
--	atomic64_t writestall;		/* no. of write slow paths */
- 	atomic64_t miss_free;		/* no. of missed free */
- #ifdef	CONFIG_ZRAM_WRITEBACK
- 	atomic64_t bd_count;		/* no. of pages in backing device */
--- 
-2.30.1
+> Workqueue already provides concurrency control. By that, any wait in a
+> work doesn't prevents events in other works with the control enabled.
+> Thus, each work would better be considered a different context.
+> 
+> So let Dept assign a different context id to each work.
+> 
+> Signed-off-by: Byungchul Park <byungchul.park@lge.com>
+[...]
+> diff --git a/kernel/dependency/dept.c b/kernel/dependency/dept.c
+> index 18e5951..6707313 100644
+> --- a/kernel/dependency/dept.c
+> +++ b/kernel/dependency/dept.c
+> @@ -1844,6 +1844,16 @@ void dept_enirq_transition(unsigned long ip)
+>  	dept_exit(flags);
+>  }
+>  
+> +/*
+> + * Assign a different context id to each work.
+> + */
+> +void dept_work_enter(void)
+> +{
+> +	struct dept_task *dt = dept_task();
+> +
+> +	dt->cxt_id[DEPT_CXT_PROCESS] += (1UL << DEPT_CXTS_NR);
 
+   Parens around << unnecessary...
+
+[...]
+
+MBR, Sergey
