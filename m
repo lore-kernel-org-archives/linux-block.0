@@ -2,84 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8CDC433F5
-	for <linux-block@archiver.kernel.org>; Thu,  5 May 2022 16:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F85EC433F5
+	for <linux-block@archiver.kernel.org>; Thu,  5 May 2022 17:21:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382255AbiEERBE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 May 2022 13:01:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48870 "EHLO
+        id S1351971AbiEERZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 May 2022 13:25:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354735AbiEERBC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 13:01:02 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88FBB5C84C;
-        Thu,  5 May 2022 09:57:04 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 202so4060920pgc.9;
-        Thu, 05 May 2022 09:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=gLSrukFuN1JT85xjZBxcJ9Q6yUhYQqPZheqHwdhEg7U=;
-        b=EKhBGUnGBYw2xmGFpRKZDvm+Gh13g3mCjpWQiTZSpTPei0JV5ZgCBH9Oxvyji5VBuU
-         PqYXCDhWkvHLFMxZ/Ni2Kkub8AuPe4eyJaqzw4RvqWU7r3BqkE1kAD6OMsTO9vdurJKK
-         WyVB4xrkHIrnfDp43sbRELj93B3KdGhyoxHZ/jvQbbMaT57d0BEhNiCly7IQUbLdXeWO
-         psSrNSQyfu6EmEIqqjyaMVI8aSciM/mz7sVYxATpQ8S1ujE2qIpMALTJqL70cYML2Yj7
-         +ivv0MOzSpe/EwSDFcbJOumobB0gM+MX8/GF+jMfkGx5UuO8t85s6l1fA+jkLUfex2g/
-         fJRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=gLSrukFuN1JT85xjZBxcJ9Q6yUhYQqPZheqHwdhEg7U=;
-        b=kiQWUAKBTG3JgWXOPKOHIg4Mke5aooRTNNrpr2yj1ZIB9cBHRZMl4Q47k12kv1auUT
-         XGHgqKOLwve2XduP8WMvnU2X1KlbtzQtqh43ljK3JT2AdJDsXhsH50O68eyAGXLQDrdY
-         c8XiPlAGBo3ehNmw5H47EgvOd2NqevTpnTuly6Ozv0A9a8fUvOlHQssmiUk1R0oq4BRF
-         gYwPhVwtAKEc1jn3V766NpbfFUxO43xXUW/MkWwl0E82tZu6P12xXtA61RMzp527SHtj
-         TEI7JvuNJRujjoYOKqmSAiApAYZPeHnXwPVWfbnG6aDzbVJI36S8dRV/8KWTvJteyYgC
-         SdHQ==
-X-Gm-Message-State: AOAM531qy/MkNP2j75ZYvdpeZgdkIwFcFjbCCXCizockQPHenh/jn5M6
-        afVjZpm+o6QsgXXrLEsTqiU=
-X-Google-Smtp-Source: ABdhPJy9XDrGdVUvOftS6Oi4+mMdvrkbx3+EWJx/3U1/ctK7WY72JKO4bqE965kTvk+ZECHhQ2ARuw==
-X-Received: by 2002:a05:6a00:26cf:b0:4f6:fc52:7b6a with SMTP id p15-20020a056a0026cf00b004f6fc527b6amr26567624pfw.39.1651769824001;
-        Thu, 05 May 2022 09:57:04 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:1c0c:8050:e4d3:12f5])
-        by smtp.gmail.com with ESMTPSA id z18-20020a170902ccd200b0015e8d4eb221sm1751056ple.107.2022.05.05.09.57.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 05 May 2022 09:57:03 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Thu, 5 May 2022 09:57:01 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Alexey Romanov <avromanov@sberdevices.ru>
-Cc:     akpm@linux-foundation.org, ngupta@vflare.org,
-        senozhatsky@chromium.org, linux-block@vger.kernel.org,
-        axboe@chromium.org, kernel@sberdevices.ru,
-        linux-kernel@vger.kernel.org, mnitenko@gmail.com,
-        Dmitry Rokosov <ddrokosov@sberdevices.ru>
-Subject: Re: [PATCH v5] zram: remove double compression logic
-Message-ID: <YnQB3X2wy7lEku+y@google.com>
-References: <20220505094443.11728-1-avromanov@sberdevices.ru>
+        with ESMTP id S243602AbiEERZb (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 13:25:31 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4A15C351
+        for <linux-block@vger.kernel.org>; Thu,  5 May 2022 10:21:51 -0700 (PDT)
+Date:   Thu, 5 May 2022 19:21:47 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1651771309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=R7qpjgbn1b6RR9QRF66vEq+Hu1c1iiO3RvPzNgXS5lk=;
+        b=bJ8xDazD5/S98EN/yZJS8MjD+Eb9NhUnwmLj+8i/3L4+K5qSNUpI808O7OFV9iRkyMKrbi
+        rkmedMyGHNcKyR2hRO/Joys8ioN3rrYFT8FGHenrg5pL7RUUhf3uIzMNI8dopSsy8KADPC
+        hsXr/H/KjurHDQ0BSJz9zamMx1NhgGW/xbxHbBHUPI468mrRv0N6/afN/tjplV4ibmCRd5
+        SPdjXOodSG/y9t2nAHyqPr0IxNmUALlNEijusZhlkkhOlHChBorn/lUq+ue161LkV8x8B6
+        eaqgBDL8U13vACg+f0oeyGHDbLfR/HzuqHpiMsPUMl+dyalvG7zTLxmaOlxYDg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1651771309;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+        bh=R7qpjgbn1b6RR9QRF66vEq+Hu1c1iiO3RvPzNgXS5lk=;
+        b=pYw+eE8JEITca8IwfL/ylnjw8OBJN7fl62uTvFvASXwxe6bm3jAH3psFGpqgsKR3a3C3Og
+        cDm+grPB1lIcxyAw==
+From:   Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To:     linux-block@vger.kernel.org
+Cc:     Jens Axboe <axboe@kernel.dk>, Thomas Gleixner <tglx@linutronix.de>
+Subject: [PATCH] blk-mq: Don't disable preemption around
+ __blk_mq_run_hw_queue().
+Message-ID: <YnQHqx/5+54jd+U+@linutronix.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20220505094443.11728-1-avromanov@sberdevices.ru>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 05, 2022 at 12:44:43PM +0300, Alexey Romanov wrote:
-> The 2nd trial allocation under per-cpu presumption has been used to
-> prevent regression of allocation failure. However, it makes trouble
-> for maintenance without significant benefit. The slowpath branch is
-> executed extremely rarely: getting there is problematic. Therefore,
-> we delete this branch.
-> 
-> Since b09ab054b69b, zram has used QUEUE_FLAG_STABLE_WRITES to prevent
-> buffer change between 1st and 2nd memory allocations. Since we remove
-> second trial memory allocation logic, we could remove the STABLE_WRITES
-> flag because there is no change buffer to be modified under us.
-> 
-> Signed-off-by: Alexey Romanov <avromanov@sberdevices.ru>
-> Signed-off-by: Dmitry Rokosov <ddrokosov@sberdevices.ru>
+__blk_mq_delay_run_hw_queue() disables preemption to get a stable
+current CPU number and then invokes __blk_mq_run_hw_queue() if the CPU
+number is part the mask.
 
-Acked-by: Minchan Kim <minchan@kernel.org>
+__blk_mq_run_hw_queue() acquires a spin_lock_t which is a sleeping lock
+on PREEMPT_RT and can't be acquired with disabled preemption.
+
+If it is important that the current CPU matches the requested CPU mask
+and that the context does not migrate to another CPU while
+__blk_mq_run_hw_queue() is invoked then it possible to achieve this by
+disabling migration and keeping the context preemptible.
+
+Disable only migration while testing the CPU mask and invoking
+__blk_mq_run_hw_queue().
+
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ block/blk-mq.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 84d749511f551..a28406ea043a8 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2046,14 +2046,14 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		return;
+ 
+ 	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
+-		int cpu = get_cpu();
+-		if (cpumask_test_cpu(cpu, hctx->cpumask)) {
++		migrate_disable();
++		if (cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
+ 			__blk_mq_run_hw_queue(hctx);
+-			put_cpu();
++			migrate_enable();
+ 			return;
+ 		}
+ 
+-		put_cpu();
++		migrate_enable();
+ 	}
+ 
+ 	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+-- 
+2.36.0
+
