@@ -2,85 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E7C6C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  5 May 2022 11:52:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F0AC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  5 May 2022 12:48:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358486AbiEEL4I (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 May 2022 07:56:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60334 "EHLO
+        id S1377715AbiEEMwG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 May 2022 08:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58332 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358561AbiEEL4E (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 07:56:04 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FCC554687;
-        Thu,  5 May 2022 04:52:25 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 242JuuCb019339;
-        Tue, 3 May 2022 00:52:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2021-07-09;
- bh=v3tgsvBwZrwBJL+dPJr1DWVn5Orb7oEWJBwYaqvh1z8=;
- b=G5mgt1cswu9ZpiknMhKqQ5ibIVH64/Zhg3Tp7IWPbpSJhDoI6Sz0AAguLqVpGB2YGRgV
- taCra3o/8TGMwqiug0swEjTitojwicA7m99PV9zkZU9q1eawTkd6uGPz2DtcuDBx9iBj
- rMGX9IFAWhlRQNT6NOSOdj1V2DpdZdnWc6JnJMTKnhY+Tc1teofj6PAzzeCJMtQF4jJD
- N/aiLA5c5pNN1AD+SS082nXPTI1VkZ59GJmledyXaadLB/+mMRRlWekoxPCBmvgJ6R3y
- MIOCSDbMTtsH1ULmLL904dvk2wu+/1GlGzKsU2SSq7P7mpfMg4a5YUjuBx9GR9dXziyo eQ== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3frwnt4kxb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 May 2022 00:52:09 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 2430oqLi008978;
-        Tue, 3 May 2022 00:52:07 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fruj83xct-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 03 May 2022 00:52:07 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 2430plk8010389;
-        Tue, 3 May 2022 00:52:07 GMT
-Received: from ca-mkp.mkp.ca.oracle.com (ca-mkp.ca.oracle.com [10.156.108.201])
-        by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com with ESMTP id 3fruj83x4g-36;
-        Tue, 03 May 2022 00:52:07 +0000
-From:   "Martin K. Petersen" <martin.petersen@oracle.com>
-To:     target-devel@vger.kernel.org,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        linux-scsi@vger.kernel.org
-Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
-        linux-block@vger.kernel.org, bostroesser@gmail.com
-Subject: Re: [PATCH v5] scsi: target: tcmu: Fix possible data corruption
-Date:   Mon,  2 May 2022 20:51:46 -0400
-Message-Id: <165153836364.24053.11408559773889328291.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.35.2
-In-Reply-To: <20220421023735.9018-1-xiaoguang.wang@linux.alibaba.com>
-References: <20220421023735.9018-1-xiaoguang.wang@linux.alibaba.com>
+        with ESMTP id S1377697AbiEEMwF (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 08:52:05 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C9CC55489;
+        Thu,  5 May 2022 05:48:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=9/4Kg9VoiU/sUPa2yiFYb5rxD+E8WeBJfA29l8Jo62M=; b=KKZXVuNHcAPhVObiZr8RLA10PM
+        x4pEB1jnO285NQgmoiRZfCCjMZooMWN7pzy9XibHRbax77gNKWWVzQCUJ8H33UiUS22SKIM115Qen
+        jRKYeeelpXFgf6r8ZkRUbctC1YSjiuegkgPWGm1qnNOIvQ/oHZn7DmRTXZ5LC2pHz42/0L5fGFL/C
+        GdnA2CktGfLOAyguPj6wGqnU8tVvNxJCKIms2TDHOrSxDs5zca+RNSbxmBbtLD5v2emdcsapk32Ar
+        QWd/BTvnuFzfCpKKoUzSBkZqM8e4HzXNBeWYhXFU1/UDQ5ZaaSA4PHm2Ycz36madYRNc4YwQbqlK+
+        r6nekriQ==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nmau4-00FsNQ-Se; Thu, 05 May 2022 12:48:20 +0000
+Date:   Thu, 5 May 2022 05:48:20 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bernard Metzler <BMT@zurich.ibm.com>
+Cc:     Cheng Xu <chengyou@linux.alibaba.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        Pankaj Raghav <pankydev8@gmail.com>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: siw_cm.c:255 siw_cep_put+0x125/0x130 kernel warning while
+ testing blktests srp/002 v5.17-rc7
+Message-ID: <YnPHlJWhlCbXdifi@bombadil.infradead.org>
+References: <BYAPR15MB2631988B13EE2E336FD2ED4E99F29@BYAPR15MB2631.namprd15.prod.outlook.com>
+ <1ec3f1d2-887d-f66c-6221-6319afc4a3e9@linux.alibaba.com>
+ <YnLkxglbU157KkNK@bombadil.infradead.org>
+ <b85c6425-6840-e01f-108b-c8ab03578731@linux.alibaba.com>
+ <BYAPR15MB2631A0A967BF02C93BF0E45C99C29@BYAPR15MB2631.namprd15.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: 5DUEGifWKu5CWy7uSv1o1GbzJuI2Zez9
-X-Proofpoint-GUID: 5DUEGifWKu5CWy7uSv1o1GbzJuI2Zez9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BYAPR15MB2631A0A967BF02C93BF0E45C99C29@BYAPR15MB2631.namprd15.prod.outlook.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 21 Apr 2022 10:37:35 +0800, Xiaoguang Wang wrote:
-
-> When tcmu_vma_fault() gets one page successfully, before the current
-> context completes page fault procedure, find_free_blocks() may run in
-> and call unmap_mapping_range() to unmap this page. Assume when
-> find_free_blocks() completes its job firstly, previous page fault
-> procedure starts to run again and completes, then one truncated page has
-> beed mapped to use space, but note that tcmu_vma_fault() has gotten one
-> refcount for this page, so any other subsystem won't use this page,
-> unless later the use space addr is unmapped.
+On Thu, May 05, 2022 at 11:42:55AM +0000, Bernard Metzler wrote:
 > 
-> [...]
+> > -----Original Message-----
+> > >
+> > > *poke*
+> > >
+> > > Would be good to get a fix merged. And if a patch is posted does this
+> > > need to go to stable?
+> > >
+> > >    Luis
+> > 
+> > The patch has been accepted and merged to for-rc, see:
+> > 
+> > INVALID URI REMOVED
+> > 3A__lore.kernel.org_all_d528d83466c44687f3872eadcb8c184528b2e2d4.1650526
+> > 554.git.chengyou-40linux.alibaba.com_T_&d=DwICaQ&c=jf_iaSHvJObTbx-
+> > siA1ZOg&r=2TaYXQ0T-r8ZO1PP1alNwU_QJcRRLfmYTAgd3QCvqSc&m=gj2AyKoOM_k9fYF-
+> > _XQ4HcYw_viOIwl6lDNPHqp7L1y2OiVRWvZkTFGFHSSZInor&s=P_HaXIXt9mBbCeBNBLsWe
+> > RTz5hvnUGUvObzs8lowzCM&e=
+> > 
+> > I think this patch need not be merged back to stable, because the issue
+> > is not a functional problem, but only produce a WARN in dmesg.
+> > 
+> > Thanks,
+> > Cheng Xu
+> 
+> I agree. It does not fix a memory leak or some such.
 
-Applied to 5.19/scsi-queue, thanks!
+If the warning triggers on older kernels it means testing using this
+driver will fail and those tests will be skipped. In this case the
+test srp/002 would be skipped unless this is fixed to not trigger
+a kernel warning.
 
-[1/1] scsi: target: tcmu: Fix possible data corruption
-      https://git.kernel.org/mkp/scsi/c/bb9b9eb0ae2e
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+  Luis
