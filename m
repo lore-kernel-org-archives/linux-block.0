@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 579A1C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 15:42:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55F1EC433F5
+	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 15:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1391134AbiEFPpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 May 2022 11:45:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42308 "EHLO
+        id S1443135AbiEFPuy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 May 2022 11:50:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49144 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344240AbiEFPpp (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 11:45:45 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023F9689A7
-        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:42:00 -0700 (PDT)
+        with ESMTP id S240885AbiEFPuy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 11:50:54 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77D016D4ED
+        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:47:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1651851720; x=1683387720;
+  t=1651852032; x=1683388032;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=CudXlomFZkQJESGju0/Iz+s8hFiIaxDM6HlQScgYRIU=;
-  b=JeI5NX8IpOB54YqPpSX/crPohncKa9sCSYu1sa1aBv5RzTsnFtUKlnPZ
-   ehK/+pnBZR7Cmi1U7OyaXthLz7huvnrAPmhZNEAN3NsrvdzEqXqwneNxL
-   Frfx1E37C1JWRiKG276S6bOFp66zgAZYM20hMDttqSBAA6vxTc3JhAfZR
-   1Ai5HyBKcZ8uWPSpEC2fXHNDJvWPggmnxnz+rqnbf3NoKe3acUr2DJ8Qc
-   sdVq3S1VElbuvAj6snCQ3vxgLOy1n5+3L4k1ImLzIwokkDWhv3lSg5yy7
-   lGCzwczjV91uUhXYWsk8Fqelzy4IXpzfk5mp/uRR5aR7GZcuuFMO7MO0E
-   A==;
+  bh=59Rf2fI9Uw9YDeWqGexMB7hcfRNyi4rusRKW1UzXakE=;
+  b=Z00Zar/1qxYaGxjV0E9gwi82NvmEgOtfi3f60OKELLpZzSmjManBKgut
+   e+JJXStybhd9iqU+znjgepf8kAkxyx7xFSuNSZS/JkIDYX7OqB3JoGgHn
+   iyDKRtAM6OmQJI7nFks2wOp1YMG1qABNU1zq3Vz6RMrP7GT/TFvNL2HZA
+   rdsCY72N7gG2mViP//z7rFeyCX+sPOjUqUqqVoPB+nKrMoUA5PS7TZtiX
+   qXuc7uNbMO/fHxwfacIPM25YFLwDFom7DWDAhM6Fehh/k3dFIpXxMNfNb
+   PANu77iGI3JWEufYZIzQIao2aJuGtbKX59Ju+2guCbLr0mqPaVwugPHHe
+   w==;
 X-IronPort-AV: E=Sophos;i="5.91,203,1647273600"; 
-   d="scan'208";a="199701354"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 06 May 2022 23:41:59 +0800
-IronPort-SDR: TqZwx98ovRdd0MIc39pSDAMpFvYOvUvu3HsChehH/xGOn/xsXs7o0o/yuH9imn3WvKSQ6dJOpt
- nT2CwUqcSWQM4St/JNu5gEU41SPCtMrf2HL97PR9ONB2zzDhWPdzps0Er+xxA9LuY5oFttKnAY
- xEgoUq+OCfuP5Q7/0Gt23KzIoTrGznAMLPNAu3AZNMtlziruFDH2hsGMZC+pS0vqvhbmbarBgE
- QWgYwbFzFkgRnLBmn0g56+kVhf+KUQusYZpPmUQyj88Pki6BkIhmlUnVBvvylMTLozQABEQfh0
- iRQCTbTYMdRgNnvQ/gqUxuW4
+   d="scan'208";a="200577968"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 06 May 2022 23:47:10 +0800
+IronPort-SDR: Pc1xNWpzxNydEIbW+YHF0kvFro0eiS7RqEnIS9itSAUAoVGVAirFK6mjD1VivkpphHJgMgMALX
+ nyckVjU1laXtud8hYxHE7Pgcft58WgZMDFaWnMNiDnZfmiQbUPfTsxN3vvSd/gb8MZKMmWC5ug
+ +Z2vc39jC2YEvaauQ1vY5zpVjU8BUVAeSK53ThsGyf2pEmTNCN/A7OnfSwPjKlh8qWmWjZquoL
+ 4PuE7pt5tlCZ3kYLYhTaRStWK/JrKShpu2slzr8s9VqCqgHVFAeiA7ASqjbHAW8OkHtOwNa22m
+ NfcIj9AasfOuyDEkHqu3nmMV
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:12:16 -0700
-IronPort-SDR: KqxjG8q+RZ7Chw7jsbgD4SLsKTUYm/omC6C19CeIWTDZ3f/QlHgT5R4VdyXAiR10vRBBbHUFyh
- thmGtB7crA2ULwhyX659tJiog5L5cZD8UCcl+WDBJiAmEZRKNZvXYkckvFotgPAQ/s5yhsAg3B
- wwJA/Nmf9bomonqqU/9rXoeBD+2aWfBPPrgs9XBbuV1IpMq71Hiq5TaAkSM4xNLXeYJhJ54fEg
- sz1SK04lFiOjNQIlLlyJSgSGJ/knX4a1RsmFkVJB99sPxSivW8YkJ7seQ3/Ks0LPjLwbSVSL0L
- iOw=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:17:24 -0700
+IronPort-SDR: +07TzYZfs/Rg992xlotPJ6l2FQ2uBuu/43XnQNNZawz4vLJg2nU8S5YR+50c+vHrJj+vOpF4Pc
+ m+XPyzzl0B5K1+j0B+hYy0J0j52B8JgFgfHuRAXtBovuCwt/pP8oWuRBJUJJFh/48kvyCw8x6k
+ 57QxdeVi9KuFVayAUxkzbLjDSOGsfXnFcuckTE6vm0Dc/aaGK9qfhX21CaZlOgKFlQQAySH/GW
+ bWHGz4+VonV7EueGdBDvPQuCJupuOAsuFn6mMFT01wFW5Qt/9SOt/87A59fd5DOjMqhIwkuzEK
+ ZvM=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:42:00 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:47:08 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KvvvC0zwmz1Rwrw
-        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:41:59 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4Kvw170w56z1SVp7
+        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:47:07 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -56,28 +56,27 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1651851718; x=1654443719; bh=CudXlomFZkQJESGju0/Iz+s8hFiIaxDM6Hl
-        QScgYRIU=; b=WbBRu0S7iR1SmhEVR9i30Kql+kUpme4JxK84Ex4n5H1AfUhQ0EA
-        s43ehh3Jxi03c/aa1PkPy9zpXcal9LS0jQoLHXDoQ8X64pfmVU8F+Y8nBgHjfgas
-        nkAL+jnWw5ThcR+Jq1BNnuhc0o/mhwqQ5IiqOdwPxU5eHhWBbzcI7rR1dUJwE2Fi
-        SMt7XqWc9/XGM7LK0GmzTFUNkZ+KteMkRDfpeOhq0if7HyNffaZrnfkJFK1T736p
-        S4EMQmEAWtxxz4M7PkJBG2UGqoKaNk93iakpAHvYx7Hk5wLPL3e1zc9RYTuzeG/j
-        dNxUKQCZnRC3KA89AxMPNpyTuxFnJGOFejw==
+        1651852025; x=1654444026; bh=59Rf2fI9Uw9YDeWqGexMB7hcfRNyi4rusRK
+        W1UzXakE=; b=mTplhvJ9iPYTZo2ETxz+yKlc1mnaUQr0R5H3QHk4V2k4gGZsRzM
+        o/KZpd6bKeLdy60e5fQOwxq2o5ZeQ38uthkPewcY+Bbs+40E4jHhAAoj80ZiJbFW
+        oEUffaZzsRFHVq8o4A7Ua9twV15gIU1ymvSOH3C/KUKnJ7OXCxpkjE/p8Bqno1NJ
+        sUCm04YhblVQ8EmCvYvbx7XuDcibwiDXYaAyYZcNTX3nn1muqmL1YLIl/Vp0nSMJ
+        nf0QsBf1gMPvUHys9YVCv1FWMpihhJCVeFZ+Cdqsom9G4h8D1ECSYKgdn+0ShXyU
+        EYvdzQVxSAYdAgkQVcaqXP5MkA2Ltqeaabw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id YVDSWZteFMgR for <linux-block@vger.kernel.org>;
-        Fri,  6 May 2022 08:41:58 -0700 (PDT)
+        with ESMTP id rvJEDUIao1Q2 for <linux-block@vger.kernel.org>;
+        Fri,  6 May 2022 08:47:05 -0700 (PDT)
 Received: from [10.225.103.215] (hn9j2j3.ad.shared [10.225.103.215])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kvvv75djhz1Rvlc;
-        Fri,  6 May 2022 08:41:55 -0700 (PDT)
-Message-ID: <7f1bd653-6f75-7c0d-9a82-e8992b1476e4@opensource.wdc.com>
-Date:   Sat, 7 May 2022 00:41:55 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kvw133RlTz1Rvlc;
+        Fri,  6 May 2022 08:47:03 -0700 (PDT)
+Message-ID: <39a80347-af70-8af0-024a-52f92e27a14a@opensource.wdc.com>
+Date:   Sat, 7 May 2022 00:47:02 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: [PATCH v3 11/11] dm-zoned: ensure only power of 2 zone sizes are
- allowed
+Subject: Re: [PATCH v3 10/11] null_blk: allow non power of 2 zoned devices
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, jaegeuk@kernel.org,
         hare@suse.de, dsterba@suse.com, axboe@kernel.dk, hch@lst.de,
@@ -95,11 +94,11 @@ Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
         Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org,
         Luis Chamberlain <mcgrof@kernel.org>
 References: <20220506081105.29134-1-p.raghav@samsung.com>
- <CGME20220506081118eucas1p17f3c29cc36d748c3b5a3246f069f434a@eucas1p1.samsung.com>
- <20220506081105.29134-12-p.raghav@samsung.com>
+ <CGME20220506081116eucas1p2cce67bbf30f4c9c4e6854965be41b098@eucas1p2.samsung.com>
+ <20220506081105.29134-11-p.raghav@samsung.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220506081105.29134-12-p.raghav@samsung.com>
+In-Reply-To: <20220506081105.29134-11-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -107,50 +106,141 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 2022/05/06 17:11, Pankaj Raghav wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
+> Convert the power of 2 based calculation with zone size to be generic in
+> null_zone_no with optimization for power of 2 based zone sizes.
 > 
-> Today dm-zoned relies on the assumption that you have a zone size
-> with a power of 2. Even though the block layer today enforces this
-> requirement, these devices do exist and so provide a stop-gap measure
-> to ensure these devices cannot be used by mistake
+> The nr_zones calculation in null_init_zoned_dev has been replaced with a
+> division without special handling for power of 2 based zone sizes as
+> this function is called only during the initialization and will not
+> invoked in the hot path.
 > 
+> Performance Measurement:
+> 
+> Device:
+> zone size = 128M, blocksize=4k
+> 
+> FIO cmd:
+> 
+> fio --name=zbc --filename=/dev/nullb0 --direct=1 --zonemode=zbd  --size=23G
+> --io_size=<iosize> --ioengine=io_uring --iodepth=<iod> --rw=<mode> --bs=4k
+> --loops=4
+> 
+> The following results are an average of 4 runs on AMD Ryzen 5 5600X with
+> 32GB of RAM:
+> 
+> Sequential Write:
+> 
+> x-----------------x---------------------------------x---------------------------------x
+> |     IOdepth     |            8                    |            16                   |
+> x-----------------x---------------------------------x---------------------------------x
+> |                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
+> x-----------------x---------------------------------x---------------------------------x
+> | Without patch   |  578     |  2257    |   12.80   |  576     |  2248    |   25.78   |
+> x-----------------x---------------------------------x---------------------------------x
+> |  With patch     |  581     |  2268    |   12.74   |  576     |  2248    |   25.85   |
+> x-----------------x---------------------------------x---------------------------------x
+> 
+> Sequential read:
+> 
+> x-----------------x---------------------------------x---------------------------------x
+> | IOdepth         |            8                    |            16                   |
+> x-----------------x---------------------------------x---------------------------------x
+> |                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
+> x-----------------x---------------------------------x---------------------------------x
+> | Without patch   |  667     |  2605    |   11.79   |  675     |  2637    |   23.49   |
+> x-----------------x---------------------------------x---------------------------------x
+> |  With patch     |  667     |  2605    |   11.79   |  675     |  2638    |   23.48   |
+> x-----------------x---------------------------------x---------------------------------x
+> 
+> Random read:
+> 
+> x-----------------x---------------------------------x---------------------------------x
+> | IOdepth         |            8                    |            16                   |
+> x-----------------x---------------------------------x---------------------------------x
+> |                 |  KIOPS   |BW(MiB/s) | Lat(usec) |  KIOPS   |BW(MiB/s) | Lat(usec) |
+> x-----------------x---------------------------------x---------------------------------x
+> | Without patch   |  522     |  2038    |   15.05   |  514     |  2006    |   30.87   |
+> x-----------------x---------------------------------x---------------------------------x
+> |  With patch     |  522     |  2039    |   15.04   |  523     |  2042    |   30.33   |
+> x-----------------x---------------------------------x---------------------------------x
+> 
+> Minor variations are noticed in Sequential write with io depth 8 and
+> in random read with io depth 16. But overall no noticeable differences
+> were noticed
+> 
+> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+> Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
 > Reviewed-by: Hannes Reinecke <hare@suse.de>
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 > Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 > ---
->  drivers/md/dm-zone.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>  drivers/block/null_blk/main.c  |  5 ++---
+>  drivers/block/null_blk/zoned.c | 14 +++++++-------
+>  2 files changed, 9 insertions(+), 10 deletions(-)
 > 
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 3e7b1fe15..27dc4ddf2 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->  	struct request_queue *q = md->queue;
->  	unsigned int noio_flag;
->  	int ret;
-> +	struct block_device *bdev = md->disk->part0;
-> +	sector_t zone_sectors;
-> +	char bname[BDEVNAME_SIZE];
-> +
-> +	zone_sectors = bdev_zone_sectors(bdev);
-> +
-> +	if (!is_power_of_2(zone_sectors)) {
-> +		DMWARN("%s: %s only power of two zone size supported\n",
-> +		       dm_device_name(md),
-> +		       bdevname(bdev, bname));
-> +		return 1;
-
-return -EINVAL;
-
-The error propagates to dm_table_set_restrictions() so a proper error code must
-be returned.
-
-
-> +	}
+> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+> index 5cb4c92cd..ed9a58201 100644
+> --- a/drivers/block/null_blk/main.c
+> +++ b/drivers/block/null_blk/main.c
+> @@ -1929,9 +1929,8 @@ static int null_validate_conf(struct nullb_device *dev)
+>  	if (dev->queue_mode == NULL_Q_BIO)
+>  		dev->mbps = 0;
 >  
->  	/*
->  	 * Check if something changed. If yes, cleanup the current resources
+> -	if (dev->zoned &&
+> -	    (!dev->zone_size || !is_power_of_2(dev->zone_size))) {
+> -		pr_err("zone_size must be power-of-two\n");
+> +	if (dev->zoned && !dev->zone_size) {
+> +		pr_err("zone_size must not be zero\n");
+
+May be a simpler phrasing would be better:
+
+pr_err("Invalid zero zone size\n");
+
+>  		return -EINVAL;
+>  	}
+>  
+> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
+> index dae54dd1a..00c34e65e 100644
+> --- a/drivers/block/null_blk/zoned.c
+> +++ b/drivers/block/null_blk/zoned.c
+> @@ -13,7 +13,10 @@ static inline sector_t mb_to_sects(unsigned long mb)
+>  
+>  static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
+>  {
+> -	return sect >> ilog2(dev->zone_size_sects);
+> +	if (is_power_of_2(dev->zone_size_sects))
+> +		return sect >> ilog2(dev->zone_size_sects);
+
+As a separate patch, I think we should really have ilog2(dev->zone_size_sects)
+as a dev field to avoid doing this ilog2 for every call..
+
+> +
+> +	return div64_u64(sect, dev->zone_size_sects);
+>  }
+>  
+>  static inline void null_lock_zone_res(struct nullb_device *dev)
+> @@ -62,10 +65,6 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+>  	sector_t sector = 0;
+>  	unsigned int i;
+>  
+> -	if (!is_power_of_2(dev->zone_size)) {
+> -		pr_err("zone_size must be power-of-two\n");
+> -		return -EINVAL;
+> -	}
+>  	if (dev->zone_size > dev->size) {
+>  		pr_err("Zone size larger than device capacity\n");
+>  		return -EINVAL;
+> @@ -83,8 +82,9 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
+>  	zone_capacity_sects = mb_to_sects(dev->zone_capacity);
+>  	dev_capacity_sects = mb_to_sects(dev->size);
+>  	dev->zone_size_sects = mb_to_sects(dev->zone_size);
+> -	dev->nr_zones = round_up(dev_capacity_sects, dev->zone_size_sects)
+> -		>> ilog2(dev->zone_size_sects);
+> +	dev->nr_zones =
+> +		div64_u64(roundup(dev_capacity_sects, dev->zone_size_sects),
+> +			  dev->zone_size_sects);
+>  
+>  	dev->zones = kvmalloc_array(dev->nr_zones, sizeof(struct nullb_zone),
+>  				    GFP_KERNEL | __GFP_ZERO);
 
 
 -- 
