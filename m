@@ -2,151 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25005C433F5
-	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 01:42:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F00C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 02:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1388143AbiEFBqJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 5 May 2022 21:46:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33700 "EHLO
+        id S1388288AbiEFCMZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 5 May 2022 22:12:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33430 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1388169AbiEFBps (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 21:45:48 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 250715E759;
-        Thu,  5 May 2022 18:41:39 -0700 (PDT)
-Received: from kwepemi100020.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4KvYDJ36N6z1JBs2;
-        Fri,  6 May 2022 09:40:32 +0800 (CST)
-Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- kwepemi100020.china.huawei.com (7.221.188.48) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 6 May 2022 09:41:37 +0800
-Received: from localhost.localdomain (10.175.112.125) by
- kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 6 May 2022 09:41:35 +0800
-From:   Peng Liu <liupeng256@huawei.com>
-To:     <bhelgaas@google.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        <hpa@zytor.com>, <lorenzo.pieralisi@arm.com>,
-        <guohanjun@huawei.com>, <sudeep.holla@arm.com>,
-        <rafael@kernel.org>, <lenb@kernel.org>,
-        <akpm@linux-foundation.org>, <logang@deltatee.com>,
-        <martin.oliveira@eideticom.com>, <thunder.leizhen@huawei.com>,
-        <axboe@kernel.dk>, <kch@nvidia.com>, <ming.lei@redhat.com>,
-        <shinichiro.kawasaki@wdc.com>, <mcgrof@kernel.org>,
-        <jiangguoqing@kylinos.cn>, <jpittman@redhat.com>,
-        <dave@stgolabs.net>, <liupeng256@huawei.com>,
-        <wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>,
-        <linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pci@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
-Subject: [PATCH 2/2] null_blk: fix wrong use of nr_online_nodes
-Date:   Fri, 6 May 2022 01:58:01 +0000
-Message-ID: <20220506015801.757918-3-liupeng256@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220506015801.757918-1-liupeng256@huawei.com>
-References: <20220506015801.757918-1-liupeng256@huawei.com>
+        with ESMTP id S1357014AbiEFCMY (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 5 May 2022 22:12:24 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F5F55EDF3
+        for <linux-block@vger.kernel.org>; Thu,  5 May 2022 19:08:43 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id g8so5109189pfh.5
+        for <linux-block@vger.kernel.org>; Thu, 05 May 2022 19:08:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=X21XiDb8yzYRhMfkoQesaQpAxwMWfr6V+3k+J4kSHT4=;
+        b=L4I8Ud8vSkZ2l3QiiFW2VOZxbVW2zlLG96lgULMUUNplPCS/RR7nR90OuzqWnbb/K6
+         jy3herpNsQgQchP5OIB6ElEOb0Jj5wTGl6ymmJ5vVqmiw7bl+Az0kfglXRZ/3hmr5CRL
+         ur8ZEn3o8EH6MXPynZWaPC5R90WF2nO9O/57LkzHxZ+c3RRot1ew3GnXWc7oC8Cxh7oK
+         ixqVPku4Yv9RJPXnyVi4aLDh0yKf6a7QqbEjbFUO41ptJw+oY3nLAR0OkjPimZDpKJ01
+         G4uwKgsl7QaEozKS5jCXMJ8FK79QcWFJnANCpUHb/oAxQ9VWIH+w+732hx7mUDrPJJkR
+         MCjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=X21XiDb8yzYRhMfkoQesaQpAxwMWfr6V+3k+J4kSHT4=;
+        b=yGTyXCLTPocrVv07sl7B82Vo0ovVhTPSD0RT6esz+UI9ZKi/yy1vvu6ii3dmLjq2Vh
+         eSqxbTSsR353HqDfNDsq7Z9J8r4aeLsvzs874BuSg9jtIILluXayIIsqTuLJbJNBxlzm
+         prluBij3t5V7B18Xph1z67Gd2WWfCyk4BIrcplHcKGDrLFxJmR/F8kSBm0212vgWkEH5
+         HNKnG/vGlvYUAmdZa5oG8YNgg3CRAa/2xUdHh8/JABeat6DZnIoVC2IQmDZCM9pmjm/9
+         etJLK0PcZMXXiDfRm3qmZALh3NxL0IICDA5QI0Z4Zhk1jjJy+NvThJ14NXxMQGnEcfZl
+         0QcA==
+X-Gm-Message-State: AOAM533G56V2P8Eve4ENkckOJ8v4Det2+2KIkKbaNk1/ctedTwhnAGN7
+        NtqxOFjvU23V5XKWsieJuQ3OVnAPsGJLhg==
+X-Google-Smtp-Source: ABdhPJxF8kuJo835tgVp4qFOw0UQVC02A2RpJhfbQusVB9d7Z0sDsTDaMxKZrlgHg+Q028s5VOouQw==
+X-Received: by 2002:a65:490d:0:b0:39e:58cb:b1eb with SMTP id p13-20020a65490d000000b0039e58cbb1ebmr928132pgs.390.1651802922385;
+        Thu, 05 May 2022 19:08:42 -0700 (PDT)
+Received: from [127.0.1.1] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id t8-20020a170902e84800b0015e8d4eb234sm313170plg.126.2022.05.05.19.08.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 05 May 2022 19:08:41 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     sth@linux.ibm.com
+Cc:     gor@linux.ibm.com, linux-block@vger.kernel.org,
+        hoeppner@linux.ibm.com,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        linux-s390@vger.kernel.org, hca@linux.ibm.com
+In-Reply-To: <20220505141733.1989450-1-sth@linux.ibm.com>
+References: <20220505141733.1989450-1-sth@linux.ibm.com>
+Subject: Re: [PATCH 0/5] s390/dasd: data corruption fixes for thin provisioning
+Message-Id: <165180292107.362372.5956159894859295300.b4-ty@kernel.dk>
+Date:   Thu, 05 May 2022 20:08:41 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.112.125]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600017.china.huawei.com (7.193.23.234)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Certain systems are designed to have sparse/discontiguous nodes,
-a valid node may be greater than nr_online_nodes. So, the use of
-"nid >= nr_online_nodes" to judge if a node is online is wrong.
+On Thu, 5 May 2022 16:17:28 +0200, Stefan Haberland wrote:
+> please apply the following patches. There are 4 patches to fix potential
+> data corruption on thin provisioned DASD devices and one cosmetic patch.
+> 
+> Haowen Bai (1):
+>   s390/dasd: Use kzalloc instead of kmalloc/memset
+> 
+> Jan Höppner (2):
+>   s390/dasd: Fix read for ESE with blksize < 4k
+>   s390/dasd: Fix read inconsistency for ESE DASD devices
+> 
+> [...]
 
-Node id is a basic parameter of the system, a user-configured node
-must be checked as early as possible. Otherwise, it may cause panic
-when calling some vulnerable functions such as node_online which
-will cause panic if a very big node is received.
+Applied, thanks!
 
-Check g_home_node once users config it, and use node_available to
-make node-checking compatible with sparse/discontiguous nodes.
+[1/5] s390/dasd: fix data corruption for ESE devices
+      commit: 5b53a405e4658580e1faf7c217db3f55a21ba849
+[2/5] s390/dasd: prevent double format of tracks for ESE devices
+      commit: 71f3871657370dbbaf942a1c758f64e49a36c70f
+[3/5] s390/dasd: Fix read for ESE with blksize < 4k
+      commit: cd68c48ea15c85f1577a442dc4c285e112ff1b37
+[4/5] s390/dasd: Fix read inconsistency for ESE DASD devices
+      commit: b9c10f68e23c13f56685559a0d6fdaca9f838324
+[5/5] s390/dasd: Use kzalloc instead of kmalloc/memset
+      commit: f1c8781ac9d87650ccf45a354c0bbfa3f9230371
 
-Fixes: 7ff684a683d7 ("null_blk: prevent crash from bad home_node value")
-Signed-off-by: Peng Liu <liupeng256@huawei.com>
-Suggested-by: Davidlohr Bueso <dave@stgolabs.net>
----
- drivers/block/null_blk/main.c | 45 ++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index 05b1120e6623..995348d6e7e7 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -97,7 +97,33 @@ module_param_named(poll_queues, g_poll_queues, int, 0444);
- MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
- 
- static int g_home_node = NUMA_NO_NODE;
--module_param_named(home_node, g_home_node, int, 0444);
-+
-+static int null_param_store_val(const char *str, int *val, int min, int max)
-+{
-+	int ret, new_val;
-+
-+	ret = kstrtoint(str, 10, &new_val);
-+	if (ret)
-+		return -EINVAL;
-+
-+	if (new_val < min || new_val > max)
-+		return -EINVAL;
-+
-+	*val = new_val;
-+	return 0;
-+}
-+
-+static int null_set_home_node(const char *str, const struct kernel_param *kp)
-+{
-+	return null_param_store_val(str, &g_home_node, 0, MAX_NUMNODES - 1);
-+}
-+
-+static const struct kernel_param_ops null_home_node_param_ops = {
-+	.set	= null_set_home_node,
-+	.get	= param_get_int,
-+};
-+
-+device_param_cb(home_node, &null_home_node_param_ops, &g_home_node, 0444);
- MODULE_PARM_DESC(home_node, "Home node for the device");
- 
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-@@ -120,21 +146,6 @@ MODULE_PARM_DESC(init_hctx, "Fault injection to fail hctx init. init_hctx=<inter
- 
- static int g_queue_mode = NULL_Q_MQ;
- 
--static int null_param_store_val(const char *str, int *val, int min, int max)
--{
--	int ret, new_val;
--
--	ret = kstrtoint(str, 10, &new_val);
--	if (ret)
--		return -EINVAL;
--
--	if (new_val < min || new_val > max)
--		return -EINVAL;
--
--	*val = new_val;
--	return 0;
--}
--
- static int null_set_queue_mode(const char *str, const struct kernel_param *kp)
- {
- 	return null_param_store_val(str, &g_queue_mode, NULL_Q_BIO, NULL_Q_MQ);
-@@ -2107,7 +2118,7 @@ static int __init null_init(void)
- 		g_max_sectors = BLK_DEF_MAX_SECTORS;
- 	}
- 
--	if (g_home_node != NUMA_NO_NODE && g_home_node >= nr_online_nodes) {
-+	if (!node_available(g_home_node)) {
- 		pr_err("invalid home_node value\n");
- 		g_home_node = NUMA_NO_NODE;
- 	}
+Best regards,
 -- 
-2.25.1
+Jens Axboe
+
 
