@@ -2,135 +2,157 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88576C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 12:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 579A1C433F5
+	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 15:42:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390441AbiEFNDD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 May 2022 09:03:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
+        id S1391134AbiEFPpq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 May 2022 11:45:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356442AbiEFNDC (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 09:03:02 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175EA6338E;
-        Fri,  6 May 2022 05:59:20 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 246Bhqsi032725;
-        Fri, 6 May 2022 12:57:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=evV7zW0Pkptdgxryp8q/nhaiY9RbM7s7Y7FBYLM1+3A=;
- b=Jpd/LqQ8qRyc1xkIsreNzVu3YNJxk4TaXrlRk5EXzrQXl5UeIjcnnMKpZQPsVJ0GWk+H
- 4OO+eKdI0ysFLbuy272CQquw7xLwkRQ1s5GUWbXY8kFuS71Ceev4HZ45AsEQ8oZBvzjh
- vj9ZT2cWF915zG+QEbX57A1GZjGTBqhBXVby9LhxAVMXfdHc8D2HNV+6fPiIWZDjoX8J
- xQc3nUSMfgk+A0yFcqxH7BuTTwMYt5urI5Cc5SR3b708MtZCLHe7iDRxY/w+5R6s+qyZ
- 89+99+cfayWa/722v5Fz4JyhE/P1cqJ/2euDxDC5GLt/zC7591d5SNeke9efRBlC4wae 9g== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw3279f16-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 May 2022 12:57:05 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 246C6GE1009740;
-        Fri, 6 May 2022 12:57:04 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw3279f0m-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 May 2022 12:57:04 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 246CrK4Z028206;
-        Fri, 6 May 2022 12:57:02 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
-        by ppma03ams.nl.ibm.com with ESMTP id 3ftp7fwgbx-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 06 May 2022 12:57:02 +0000
-Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
-        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 246Cv0dI39256422
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 6 May 2022 12:57:00 GMT
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F2900A4053;
-        Fri,  6 May 2022 12:56:59 +0000 (GMT)
-Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 1CD1EA4040;
-        Fri,  6 May 2022 12:56:59 +0000 (GMT)
-Received: from [9.145.54.141] (unknown [9.145.54.141])
-        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
-        Fri,  6 May 2022 12:56:59 +0000 (GMT)
-Message-ID: <1f26f6b4-4d33-6291-31c2-5cb68a5be829@linux.ibm.com>
-Date:   Fri, 6 May 2022 14:56:58 +0200
+        with ESMTP id S1344240AbiEFPpp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 11:45:45 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 023F9689A7
+        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:42:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1651851720; x=1683387720;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=CudXlomFZkQJESGju0/Iz+s8hFiIaxDM6HlQScgYRIU=;
+  b=JeI5NX8IpOB54YqPpSX/crPohncKa9sCSYu1sa1aBv5RzTsnFtUKlnPZ
+   ehK/+pnBZR7Cmi1U7OyaXthLz7huvnrAPmhZNEAN3NsrvdzEqXqwneNxL
+   Frfx1E37C1JWRiKG276S6bOFp66zgAZYM20hMDttqSBAA6vxTc3JhAfZR
+   1Ai5HyBKcZ8uWPSpEC2fXHNDJvWPggmnxnz+rqnbf3NoKe3acUr2DJ8Qc
+   sdVq3S1VElbuvAj6snCQ3vxgLOy1n5+3L4k1ImLzIwokkDWhv3lSg5yy7
+   lGCzwczjV91uUhXYWsk8Fqelzy4IXpzfk5mp/uRR5aR7GZcuuFMO7MO0E
+   A==;
+X-IronPort-AV: E=Sophos;i="5.91,203,1647273600"; 
+   d="scan'208";a="199701354"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 06 May 2022 23:41:59 +0800
+IronPort-SDR: TqZwx98ovRdd0MIc39pSDAMpFvYOvUvu3HsChehH/xGOn/xsXs7o0o/yuH9imn3WvKSQ6dJOpt
+ nT2CwUqcSWQM4St/JNu5gEU41SPCtMrf2HL97PR9ONB2zzDhWPdzps0Er+xxA9LuY5oFttKnAY
+ xEgoUq+OCfuP5Q7/0Gt23KzIoTrGznAMLPNAu3AZNMtlziruFDH2hsGMZC+pS0vqvhbmbarBgE
+ QWgYwbFzFkgRnLBmn0g56+kVhf+KUQusYZpPmUQyj88Pki6BkIhmlUnVBvvylMTLozQABEQfh0
+ iRQCTbTYMdRgNnvQ/gqUxuW4
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:12:16 -0700
+IronPort-SDR: KqxjG8q+RZ7Chw7jsbgD4SLsKTUYm/omC6C19CeIWTDZ3f/QlHgT5R4VdyXAiR10vRBBbHUFyh
+ thmGtB7crA2ULwhyX659tJiog5L5cZD8UCcl+WDBJiAmEZRKNZvXYkckvFotgPAQ/s5yhsAg3B
+ wwJA/Nmf9bomonqqU/9rXoeBD+2aWfBPPrgs9XBbuV1IpMq71Hiq5TaAkSM4xNLXeYJhJ54fEg
+ sz1SK04lFiOjNQIlLlyJSgSGJ/knX4a1RsmFkVJB99sPxSivW8YkJ7seQ3/Ks0LPjLwbSVSL0L
+ iOw=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 May 2022 08:42:00 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4KvvvC0zwmz1Rwrw
+        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 08:41:59 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1651851718; x=1654443719; bh=CudXlomFZkQJESGju0/Iz+s8hFiIaxDM6Hl
+        QScgYRIU=; b=WbBRu0S7iR1SmhEVR9i30Kql+kUpme4JxK84Ex4n5H1AfUhQ0EA
+        s43ehh3Jxi03c/aa1PkPy9zpXcal9LS0jQoLHXDoQ8X64pfmVU8F+Y8nBgHjfgas
+        nkAL+jnWw5ThcR+Jq1BNnuhc0o/mhwqQ5IiqOdwPxU5eHhWBbzcI7rR1dUJwE2Fi
+        SMt7XqWc9/XGM7LK0GmzTFUNkZ+KteMkRDfpeOhq0if7HyNffaZrnfkJFK1T736p
+        S4EMQmEAWtxxz4M7PkJBG2UGqoKaNk93iakpAHvYx7Hk5wLPL3e1zc9RYTuzeG/j
+        dNxUKQCZnRC3KA89AxMPNpyTuxFnJGOFejw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id YVDSWZteFMgR for <linux-block@vger.kernel.org>;
+        Fri,  6 May 2022 08:41:58 -0700 (PDT)
+Received: from [10.225.103.215] (hn9j2j3.ad.shared [10.225.103.215])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4Kvvv75djhz1Rvlc;
+        Fri,  6 May 2022 08:41:55 -0700 (PDT)
+Message-ID: <7f1bd653-6f75-7c0d-9a82-e8992b1476e4@opensource.wdc.com>
+Date:   Sat, 7 May 2022 00:41:55 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 07/11] dasd: don't set the discard_alignment queue limit
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.8.1
+Subject: Re: [PATCH v3 11/11] dm-zoned: ensure only power of 2 zone sizes are
+ allowed
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Richard Weinberger <richard@nod.at>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Josef Bacik <josef@toxicpanda.com>,
-        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
-        Jack Wang <jinpu.wang@ionos.com>,
-        "Michael S. Tsirkin" <mst@redhat.com>,
-        Jason Wang <jasowang@redhat.com>,
-        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
-        Mike Snitzer <snitzer@kernel.org>, Song Liu <song@kernel.org>,
-        Stefan Haberland <sth@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
-        nbd@other.debian.org, virtualization@lists.linux-foundation.org,
-        xen-devel@lists.xenproject.org, linux-raid@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        dm-devel@redhat.com
-References: <20220418045314.360785-1-hch@lst.de>
- <20220418045314.360785-8-hch@lst.de>
-From:   =?UTF-8?Q?Jan_H=c3=b6ppner?= <hoeppner@linux.ibm.com>
-In-Reply-To: <20220418045314.360785-8-hch@lst.de>
+To:     Pankaj Raghav <p.raghav@samsung.com>, jaegeuk@kernel.org,
+        hare@suse.de, dsterba@suse.com, axboe@kernel.dk, hch@lst.de,
+        snitzer@kernel.org
+Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
+        bvanassche@acm.org, linux-fsdevel@vger.kernel.org,
+        matias.bjorling@wdc.com, Jens Axboe <axboe@fb.com>,
+        gost.dev@samsung.com, jonathan.derrick@linux.dev,
+        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
+        dm-devel@redhat.com, Naohiro Aota <naohiro.aota@wdc.com>,
+        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
+        Sagi Grimberg <sagi@grimberg.me>,
+        Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
+References: <20220506081105.29134-1-p.raghav@samsung.com>
+ <CGME20220506081118eucas1p17f3c29cc36d748c3b5a3246f069f434a@eucas1p1.samsung.com>
+ <20220506081105.29134-12-p.raghav@samsung.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220506081105.29134-12-p.raghav@samsung.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8a7-K9CSYxb93olkIOkZv_aoAnTW7JGG
-X-Proofpoint-GUID: eBrk8yaxusH63MjrlJz40h5tJPgmJePg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-06_04,2022-05-06_01,2022-02-23_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
- malwarescore=0 phishscore=0 mlxlogscore=999 adultscore=0 clxscore=1011
- priorityscore=1501 spamscore=0 bulkscore=0 lowpriorityscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2202240000 definitions=main-2205060070
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 18/04/2022 06:53, Christoph Hellwig wrote:
-> The discard_alignment queue limit is named a bit misleading means the
-> offset into the block device at which the discard granularity starts.
-> Setting it to PAGE_SIZE while the discard granularity is the block size
-> that is smaller or the same as PAGE_SIZE as done by dasd is mostly
-> harmless but also useless.
+On 2022/05/06 17:11, Pankaj Raghav wrote:
+> From: Luis Chamberlain <mcgrof@kernel.org>
 > 
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-
-Acked-by: Jan Höppner <hoeppner@linux.ibm.com>
-
-Sorry for a rather late answer. I saw that Jens already applied
-the patches so it's fine when the Ack isn't added anymore.
-Wanted to send it anyway so that you know we're aware of it.
-
+> Today dm-zoned relies on the assumption that you have a zone size
+> with a power of 2. Even though the block layer today enforces this
+> requirement, these devices do exist and so provide a stop-gap measure
+> to ensure these devices cannot be used by mistake
+> 
+> Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 > ---
->  drivers/s390/block/dasd_fba.c | 1 -
->  1 file changed, 1 deletion(-)
+>  drivers/md/dm-zone.c | 12 ++++++++++++
+>  1 file changed, 12 insertions(+)
 > 
-> diff --git a/drivers/s390/block/dasd_fba.c b/drivers/s390/block/dasd_fba.c
-> index 8bd5665db9198..60be7f7bf2d16 100644
-> --- a/drivers/s390/block/dasd_fba.c
-> +++ b/drivers/s390/block/dasd_fba.c
-> @@ -782,7 +782,6 @@ static void dasd_fba_setup_blk_queue(struct dasd_block *block)
->  	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
->  
->  	q->limits.discard_granularity = logical_block_size;
-> -	q->limits.discard_alignment = PAGE_SIZE;
->  
->  	/* Calculate max_discard_sectors and make it PAGE aligned */
->  	max_bytes = USHRT_MAX * logical_block_size;
+> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
+> index 3e7b1fe15..27dc4ddf2 100644
+> --- a/drivers/md/dm-zone.c
+> +++ b/drivers/md/dm-zone.c
+> @@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
+>  	struct request_queue *q = md->queue;
+>  	unsigned int noio_flag;
+>  	int ret;
+> +	struct block_device *bdev = md->disk->part0;
+> +	sector_t zone_sectors;
+> +	char bname[BDEVNAME_SIZE];
+> +
+> +	zone_sectors = bdev_zone_sectors(bdev);
+> +
+> +	if (!is_power_of_2(zone_sectors)) {
+> +		DMWARN("%s: %s only power of two zone size supported\n",
+> +		       dm_device_name(md),
+> +		       bdevname(bdev, bname));
+> +		return 1;
 
+return -EINVAL;
+
+The error propagates to dm_table_set_restrictions() so a proper error code must
+be returned.
+
+
+> +	}
+>  
+>  	/*
+>  	 * Check if something changed. If yes, cleanup the current resources
+
+
+-- 
+Damien Le Moal
+Western Digital Research
