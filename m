@@ -2,135 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9A79C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 10:05:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88576C433EF
+	for <linux-block@archiver.kernel.org>; Fri,  6 May 2022 12:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1390801AbiEFKI6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 6 May 2022 06:08:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49398 "EHLO
+        id S1390441AbiEFNDD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 May 2022 09:03:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1390796AbiEFKIv (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 06:08:51 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F07C5BD22;
-        Fri,  6 May 2022 03:05:09 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 091F51F8BD;
-        Fri,  6 May 2022 10:05:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1651831508;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vOduMzov7LmnmWKc/9KVSmPz2a6N3lKrkrPH5TFQYIc=;
-        b=K4zZmj4v1fjdFM/RKx8Duu++qZaOr1W8AzpQcYAtGPMwOhjBprORx356zQus6XFWACBCQF
-        3q93GJMPIcNCGWf1Vqdj2ZqZfWSjk620OnmXjshIrIxUny7uRwTMBMu7qq+LU2Z1neP7Gi
-        IxTCtYC1flVRKGnh7NdXeIwsoAPvC6c=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1651831508;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vOduMzov7LmnmWKc/9KVSmPz2a6N3lKrkrPH5TFQYIc=;
-        b=emRyEKwz+9oRLLb8JPuF4fBjvsI2XyZaLLPkrB+CWkH8TWcBmagnWsk9b9EaOudwzxzjsW
-        uIsIGyYYtdhQ2ODA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 6321513A1B;
-        Fri,  6 May 2022 10:05:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id uw3nFtPydGJYbwAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Fri, 06 May 2022 10:05:07 +0000
-Date:   Fri, 6 May 2022 12:00:55 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     jaegeuk@kernel.org, hare@suse.de, dsterba@suse.com,
-        axboe@kernel.dk, hch@lst.de, damien.lemoal@opensource.wdc.com,
-        snitzer@kernel.org, Chris Mason <clm@fb.com>,
-        Josef Bacik <josef@toxicpanda.com>, bvanassche@acm.org,
-        linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
-        Jens Axboe <axboe@fb.com>, gost.dev@samsung.com,
-        jonathan.derrick@linux.dev, jiangbo.365@bytedance.com,
-        linux-nvme@lists.infradead.org, dm-devel@redhat.com,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org
-Subject: Re: [PATCH v3 00/11] support non power of 2 zoned devices
-Message-ID: <20220506100054.GZ18596@suse.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Pankaj Raghav <p.raghav@samsung.com>,
-        jaegeuk@kernel.org, hare@suse.de, dsterba@suse.com, axboe@kernel.dk,
-        hch@lst.de, damien.lemoal@opensource.wdc.com, snitzer@kernel.org,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        bvanassche@acm.org, linux-fsdevel@vger.kernel.org,
-        matias.bjorling@wdc.com, Jens Axboe <axboe@fb.com>,
-        gost.dev@samsung.com, jonathan.derrick@linux.dev,
-        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Alasdair Kergon <agk@redhat.com>,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org
-References: <CGME20220506081106eucas1p181e83ef352eb8bfb1752bee0cf84020f@eucas1p1.samsung.com>
- <20220506081105.29134-1-p.raghav@samsung.com>
+        with ESMTP id S1356442AbiEFNDC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 09:03:02 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 175EA6338E;
+        Fri,  6 May 2022 05:59:20 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 246Bhqsi032725;
+        Fri, 6 May 2022 12:57:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=evV7zW0Pkptdgxryp8q/nhaiY9RbM7s7Y7FBYLM1+3A=;
+ b=Jpd/LqQ8qRyc1xkIsreNzVu3YNJxk4TaXrlRk5EXzrQXl5UeIjcnnMKpZQPsVJ0GWk+H
+ 4OO+eKdI0ysFLbuy272CQquw7xLwkRQ1s5GUWbXY8kFuS71Ceev4HZ45AsEQ8oZBvzjh
+ vj9ZT2cWF915zG+QEbX57A1GZjGTBqhBXVby9LhxAVMXfdHc8D2HNV+6fPiIWZDjoX8J
+ xQc3nUSMfgk+A0yFcqxH7BuTTwMYt5urI5Cc5SR3b708MtZCLHe7iDRxY/w+5R6s+qyZ
+ 89+99+cfayWa/722v5Fz4JyhE/P1cqJ/2euDxDC5GLt/zC7591d5SNeke9efRBlC4wae 9g== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw3279f16-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 12:57:05 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 246C6GE1009740;
+        Fri, 6 May 2022 12:57:04 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3fw3279f0m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 12:57:04 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+        by ppma03ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 246CrK4Z028206;
+        Fri, 6 May 2022 12:57:02 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+        by ppma03ams.nl.ibm.com with ESMTP id 3ftp7fwgbx-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 06 May 2022 12:57:02 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com [9.149.105.59])
+        by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 246Cv0dI39256422
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 6 May 2022 12:57:00 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id F2900A4053;
+        Fri,  6 May 2022 12:56:59 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 1CD1EA4040;
+        Fri,  6 May 2022 12:56:59 +0000 (GMT)
+Received: from [9.145.54.141] (unknown [9.145.54.141])
+        by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+        Fri,  6 May 2022 12:56:59 +0000 (GMT)
+Message-ID: <1f26f6b4-4d33-6291-31c2-5cb68a5be829@linux.ibm.com>
+Date:   Fri, 6 May 2022 14:56:58 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220506081105.29134-1-p.raghav@samsung.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 07/11] dasd: don't set the discard_alignment queue limit
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Richard Weinberger <richard@nod.at>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Josef Bacik <josef@toxicpanda.com>,
+        "Md. Haris Iqbal" <haris.iqbal@ionos.com>,
+        Jack Wang <jinpu.wang@ionos.com>,
+        "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Mike Snitzer <snitzer@kernel.org>, Song Liu <song@kernel.org>,
+        Stefan Haberland <sth@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        linux-um@lists.infradead.org, linux-block@vger.kernel.org,
+        nbd@other.debian.org, virtualization@lists.linux-foundation.org,
+        xen-devel@lists.xenproject.org, linux-raid@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
+        dm-devel@redhat.com
+References: <20220418045314.360785-1-hch@lst.de>
+ <20220418045314.360785-8-hch@lst.de>
+From:   =?UTF-8?Q?Jan_H=c3=b6ppner?= <hoeppner@linux.ibm.com>
+In-Reply-To: <20220418045314.360785-8-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 8a7-K9CSYxb93olkIOkZv_aoAnTW7JGG
+X-Proofpoint-GUID: eBrk8yaxusH63MjrlJz40h5tJPgmJePg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-06_04,2022-05-06_01,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 suspectscore=0
+ malwarescore=0 phishscore=0 mlxlogscore=999 adultscore=0 clxscore=1011
+ priorityscore=1501 spamscore=0 bulkscore=0 lowpriorityscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205060070
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 06, 2022 at 10:10:54AM +0200, Pankaj Raghav wrote:
-> - Open issue:
-> * btrfs superblock location for zoned devices is expected to be in 0,
->   512GB(mirror) and 4TB(mirror) in the device. Zoned devices with po2
->   zone size will naturally align with these superblock location but non
->   po2 devices will not align with 512GB and 4TB offset.
+On 18/04/2022 06:53, Christoph Hellwig wrote:
+> The discard_alignment queue limit is named a bit misleading means the
+> offset into the block device at which the discard granularity starts.
+> Setting it to PAGE_SIZE while the discard granularity is the block size
+> that is smaller or the same as PAGE_SIZE as done by dasd is mostly
+> harmless but also useless.
 > 
->   The current approach for npo2 devices is to place the superblock mirror
->   zones near   512GB and 4TB that is **aligned to the zone size**.
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I don't like that, the offsets have been chosen so the values are fixed
-and also future proof in case the zone size increases significantly. The
-natural alignment of the pow2 zones makes it fairly trivial.
+Acked-by: Jan Höppner <hoeppner@linux.ibm.com>
 
-If I understand correctly what you suggest, it would mean that if zone
-is eg. 5G and starts at 510G then the superblock should start at 510G,
-right? And with another device that has 7G zone size the nearest
-multiple is 511G. And so on.
+Sorry for a rather late answer. I saw that Jens already applied
+the patches so it's fine when the Ack isn't added anymore.
+Wanted to send it anyway so that you know we're aware of it.
 
-That makes it all less predictable, depending on the physical device
-constraints that are affecting the logical data structures of the
-filesystem. We tried to avoid that with pow2, the only thing that
-depends on the device is that the range from the super block offsets is
-always 2 zones.
+> ---
+>  drivers/s390/block/dasd_fba.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/drivers/s390/block/dasd_fba.c b/drivers/s390/block/dasd_fba.c
+> index 8bd5665db9198..60be7f7bf2d16 100644
+> --- a/drivers/s390/block/dasd_fba.c
+> +++ b/drivers/s390/block/dasd_fba.c
+> @@ -782,7 +782,6 @@ static void dasd_fba_setup_blk_queue(struct dasd_block *block)
+>  	blk_queue_segment_boundary(q, PAGE_SIZE - 1);
+>  
+>  	q->limits.discard_granularity = logical_block_size;
+> -	q->limits.discard_alignment = PAGE_SIZE;
+>  
+>  	/* Calculate max_discard_sectors and make it PAGE aligned */
+>  	max_bytes = USHRT_MAX * logical_block_size;
 
-I really want to keep the offsets for all zoned devices the same and
-adapt the code that's handling the writes. This is possible with the
-non-pow2 too, the first write is set to the expected offset, leaving the
-beginning of the zone unused.
-
->   This
->   is of no issue for normal operation as we keep track where the superblock
->   mirror are placed but this can cause an issue with recovery tools for
->   zoned devices as they expect mirror superblock to be in 512GB and 4TB.
-
-Yeah the tools need to be updated, btrfs-progs and suite of blk* in
-util-linux.
-
->   Note that ATM, recovery tools such as `btrfs check` does not work for
->   image dumps for zoned devices even for po2 zone sizes.
-
-I thought this worked, but if you find something that does not please
-report that to Johannes or Naohiro.
