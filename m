@@ -2,174 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D9EC433EF
-	for <linux-block@archiver.kernel.org>; Sat,  7 May 2022 04:20:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D204C433EF
+	for <linux-block@archiver.kernel.org>; Sat,  7 May 2022 07:21:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355747AbiEGEYL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 May 2022 00:24:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44614 "EHLO
+        id S1446062AbiEGHZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 May 2022 03:25:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1445506AbiEGEYI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 May 2022 00:24:08 -0400
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903C7C5D
-        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 21:20:22 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04400;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VCUzE6g_1651897218;
-Received: from 30.30.104.151(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VCUzE6g_1651897218)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Sat, 07 May 2022 12:20:19 +0800
-Message-ID: <8a52ed85-3ffa-44a4-3e28-e13cdc793732@linux.alibaba.com>
-Date:   Sat, 7 May 2022 12:20:17 +0800
+        with ESMTP id S1446038AbiEGHY6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 May 2022 03:24:58 -0400
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F35F33883;
+        Sat,  7 May 2022 00:21:11 -0700 (PDT)
+Received: by mail-pg1-x534.google.com with SMTP id 202so7862914pgc.9;
+        Sat, 07 May 2022 00:21:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=rNQz935Rwo42XgI1l8Va40p/MEeV4p6HEVCQ52VDnf4=;
+        b=P42+8ex/HBpVSeUhi79CcZsiB1rEwx7SjPsWOzHKtYtuDRjT+7g81hnQb9Bg+3nrwT
+         De8dQlU9BcgwoEV9wdnbeE3D82XEoM9rdMizKhVMhmThyQPs7pG6yQdXOZHUILyVEB8B
+         MZOMaM5Nag+I9ca+mSFwEkbaCfc+mVQpZN8W0UFxaI3P1zlBAo3OLxIQcU7yZiXAhU1h
+         Jiaawf+dpE+KAoqOYTid6KwfvlqOs8L3T25b9+uILvT8+qC03iIX5R5P7pBVqRxRlV1/
+         2L77a/eKzFW5m+4Q8qaNXGrcogU5pQhNHMvwFRhhaVI7cMNifBapsGydQXtopBhbDEvv
+         tGKw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=rNQz935Rwo42XgI1l8Va40p/MEeV4p6HEVCQ52VDnf4=;
+        b=dbeW4iM7xzP1pedpoDFeZtPSpmc86HZmgQb1X3b5lrJZdzI+tplsVsUWaqsF8L1s8A
+         2U5tF6esDkokfGvo/YHHeEeec6aJgpFOSQsbfcC/MQkEGcSX5c6FVHf+p0IAokhhPB+q
+         l4FClkS0nKcw4/jXpPICClyeLZ89tcDKSfVADmhw1kbEBSWgGwHU2IfmpJuqLMTtJCrk
+         PNN3GDEiLwWAtr5iU9coSPpxe6mLDsAFWt5TUq8XBXVcrXTGHRmuddlv7L2GujvJklTK
+         nC7flNwS/oLwTTv+whKqvnsq60zWSNjk4GLU7zCTih+92OwvzA6oXuZtj6nRsBqwc11D
+         eWlA==
+X-Gm-Message-State: AOAM533mkWrE91d5Fv8TF+MsfcWOY5uSudTeBV1ZFoloI+2u15sES9gD
+        tRsM1an+HHlHXwUaVI9RE7Q=
+X-Google-Smtp-Source: ABdhPJy8wngBA9nCSkNphuykt/x5APcFu3ZWQNW14hKz2s7Rb0bLuKnbzsVQiG9xcQts5UZOdrCb6w==
+X-Received: by 2002:a65:6093:0:b0:373:9c75:19ec with SMTP id t19-20020a656093000000b003739c7519ecmr5972095pgu.539.1651908071104;
+        Sat, 07 May 2022 00:21:11 -0700 (PDT)
+Received: from hyeyoo ([114.29.24.243])
+        by smtp.gmail.com with ESMTPSA id 1-20020a170902c20100b0015ec44d25dasm2956759pll.235.2022.05.07.00.20.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 07 May 2022 00:21:10 -0700 (PDT)
+Date:   Sat, 7 May 2022 16:20:50 +0900
+From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
+Message-ID: <YnYd0hd+yTvVQxm5@hyeyoo>
+References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
+ <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: Follow up on UBD discussion
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
-References: <874k27rfwm.fsf@collabora.com> <YnDhorlKgOKiWkiz@T590>
-From:   ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Content-Language: en-US
-In-Reply-To: <YnDhorlKgOKiWkiz@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/5/3 16:02, Ming Lei wrote:
-> Hello Gabriel,
+On Fri, May 06, 2022 at 09:11:35AM +0900, Byungchul Park wrote:
+> Linus wrote:
+> >
+> > On Wed, May 4, 2022 at 1:19 AM Byungchul Park <byungchul.park@lge.com> wrote:
+> > >
+> > > Hi Linus and folks,
+> > >
+> > > I've been developing a tool for detecting deadlock possibilities by
+> > > tracking wait/event rather than lock(?) acquisition order to try to
+> > > cover all synchonization machanisms.
+> > 
+> > So what is the actual status of reports these days?
+> > 
+> > Last time I looked at some reports, it gave a lot of false positives
+> > due to mis-understanding prepare_to_sleep().
 > 
-> CC linux-block and hope you don't mind, :-)
+> Yes, it was. I handled the case in the following way:
 > 
-> On Mon, May 02, 2022 at 01:41:13PM -0400, Gabriel Krisman Bertazi wrote:
->>
->> Hi Ming,
->>
->> First of all, I hope I didn't put you on the spot too much during the
->> discussion.  My original proposal was to propose my design, but your
->> implementation quite solved the questions I had. :)
+> 1. Stage the wait at prepare_to_sleep(), which might be used at commit.
+>    Which has yet to be an actual wait that Dept considers.
+> 2. If the condition for sleep is true, the wait will be committed at
+>    __schedule(). The wait becomes an actual one that Dept considers.
+> 3. If the condition is false and the task gets back to TASK_RUNNING,
+>    clean(=reset) the staged wait.
 > 
-> I think that is open source, then we can put efforts together to make things
-> better.
+> That way, Dept only works with what actually hits to __schedule() for
+> the waits through sleep.
 > 
->>
->> I'd like to follow up to restart the communication and see
->> where I can help more with UBD.  As I said during the talk, I've
->> done some fio runs and I was able to saturate NBD much faster than UBD:
->>
->> https://people.collabora.com/~krisman/mingl-ubd/bw.png
+> > For this all to make sense, it would need to not have false positives
+> > (or at least a very small number of them together with a way to sanely
 > 
-> Yeah, that is true since NBD has extra socket communication cost which
-> can't be efficient as io_uring.
-> 
->>
->> I've also wrote some fixes to the initialization path, which I
->> planned to send to you as soon as you published your code, but I think
->> you might want to take a look already and see if you want to just squash
->> it into your code base.
->>
->> I pushed those fixes here:
->>
->>   https://gitlab.collabora.com/krisman/linux/-/tree/mingl-ubd
-> 
-> I have added the 1st fix and 3rd patch into my tree:
-> 
-> https://github.com/ming1/linux/commits/v5.17-ubd-dev
-> 
-> The added check in 2nd patch is done lockless, which may not be reliable
-> enough, so I didn't add it. Also adding device is in slow path, and no
-> necessary to improve in that code path.
-> 
-> I also cleaned up ubd driver a bit: debug code cleanup, remove zero copy
-> code, remove command of UBD_IO_GET_DATA and always make ubd driver
-> builtin.
-> 
-> ubdsrv part has been cleaned up too:
-> 
-> https://github.com/ming1/ubdsrv
-> 
->>
->> I'm looking into adding support for multiple driver queues next, and
->> should be able to share some patches on that shortly.
-> 
-> OK, please post them on linux-block so that more eyes can look at the
-> code, meantime the ubdsrv side needs to handle MQ too.
-> 
-> Sooner or later, the single ubdsrv task may be saturated by copying data and
-> io_uring command communication only, which can be shown by running io on
-> ubd-null target. In my lattop, the ubdsrv cpu utilization is close to
-> 90% when IOPS is > 500K. So MQ may help some fast backing cases.
-> 
-> 
-> Thanks,
-> Ming
+> Yes. I agree with you. I got rid of them that way I described above.
+>
 
-Hi Ming,
+IMHO DEPT should not report what lockdep allows (Not talking about
+wait events). I mean lockdep allows some kind of nested locks but
+DEPT reports them.
 
-Now I am learning your userspace block driver(UBD) [1][2] and we plan to
-replace TCMU by UBD as a new choice for implementing userspace bdev for
-its high performance and simplicity.
+When I was collecting reports from DEPT on varous configurations,
+Most of them was report of down_write_nested(), which is allowed in
+lockdep.
 
-First, we have conducted some tests by fio and perf to evaluate UBD.
+DEPT should not report at least what we know it's not a real deadlock.
+Otherwise there will be reports that is never fixed, which is quite
+unpleasant and reporters cannot examine all of them if it's real deadlock
+or not.
 
-1) UBD achieves higher throughput than TCMU. We think TCMU suffers from
-     the complicated SCSI layer and does not support multiqueue. However
-UBD is simply using io_uring passthrough and may support multiqueue in
-the future.(Note that even with a single queue now , UBD outperforms TCMU)
+> > get rid of them), and also have a track record of finding things that
+> > lockdep doesn't.
+> 
+> I have some reports that wait_for_completion or waitqueue is involved.
+> It's worth noting those are not tracked by Lockdep. I'm checking if
+> those are true positive or not. I will share those reports once I get
+> more convinced for that.
+> 
+> > Maybe such reports have been sent out with the current situation, and
+> > I haven't seen them.
+> 
+> Dept reports usually have been sent to me privately, not in LKML. As I
+> told you, I'm planning to share them.
+> 
+> 	Byungchul
+> 
+> > 
+> >                  Linus
+> > 
 
-2) Some functions in UBD result in high CPU utilization and we guess
-they also lower throughput. For example, ubdsrv_submit_fetch_commands()
-frequently iterates on the array of UBD IOs and wastes CPU when no IO is
-ready to be submitted. Besides,  ubd_copy_pages() asks CPU to copy data
-between bio vectors and UBD internal buffers while handling write and
-read requests and it could be eliminated by supporting zero-copy.
-
-Second, I'd like to share some ideas on UBD. I'm not sure if they are
-reasonable so please figure out my mistakes.
-
-1) UBD issues one sqe to commit last completed request and fetch a new
-one. Then, blk-mq's queue_rq() issues a new UBD IO request and completes
-one cqe for the fetch command. We have evaluated that io_submit_sqes()
-costs some CPU and steps of building a new sqe may lower throughput.
-Here I'd like to give a new solution: never submit sqe but trump up a
-cqe(with information of new UBD IO request) when calling queue_rq(). I
-am inspired by one io_uring flag: IORING_POLL_ADD_MULTI, with which a
-user issues only one sqe for polling an fd and repeatedly gets multiple
-cqes when new events occur. Dose this solution break the architecture of
-UBD?
-
-2) UBDSRV(the userspace part) should not allocate data buffers itself.
-When an application configs many queues with bigger iodepth, UBDSRV has
-to preallocate more buffers(size = 256KiB) and results in heavy memory
-overhead. I think data buffers should be allocated by applications
-themselves and passed to UBDSRV. In this way UBD offers more
-flexibility. However, while handling a write request, the control flow
-returns to the kernel part again to set buf addr and copy data from bio
-vectors. Is ioctl helpful by setting buf addr and copying write data to
-app buf?
-
-3) ubd_fetch_and_submit() frequently iterates on the array of ubd IOs
-and wastes CPU when no IO is ready to be submitted. I think it can be
-optimized by adding a new array storing UBD IOs that are ready to be
-commit back to the kernel part. Then we could batch these IOs and avoid
-unnecessary iterations on IOs which are not ready(fetching or handling
-by targets).
-
-4) Zero-copy support is important and we are trying to implement it now.
-
-5) Currently, UBD only support the loop target with io_uirng and all
-works(1.get one cqe 2.issue target io_uring IO 3.get target io_uring IO
-completion 4.prepare one sqe) are done in one thread. As far as I know,
- some applications such as SPDK, network fs and customized distribution
-systems do not support io_uring well.  I think we should separate target
-IO handling from the UBDSRV loop and allow applications handle target
-IOs themselves. Is this suggestion reasonable? (Or UBD should focus on
-io_uring-supported targets?)
-
-Regards,
-Zhang
-
-[1] https://github.com/ming1/ubdsrv
-[2]https://github.com/ming1/linux/commits/v5.17-ubd-dev
+-- 
+Thanks,
+Hyeonggon
