@@ -2,267 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA8F7C433EF
-	for <linux-block@archiver.kernel.org>; Sat,  7 May 2022 17:13:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE87C433F5
+	for <linux-block@archiver.kernel.org>; Sat,  7 May 2022 18:12:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1386415AbiEGRRH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 7 May 2022 13:17:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39112 "EHLO
+        id S1386806AbiEGSPr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 7 May 2022 14:15:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236727AbiEGRRG (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sat, 7 May 2022 13:17:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0A9771B7B0
-        for <linux-block@vger.kernel.org>; Sat,  7 May 2022 10:13:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1651943598;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fqG79diREP6rysmLssU/KqO/rf0L1EgrailA/A/Ojh4=;
-        b=FYCTOgbKHDIGmKyubmDzWEbC2n0HNVGhyShqYogShgO06qjWWRoekJYZcfCQLFzwzDynXL
-        mlDSItFzvfp5aZwgNwpojH2a2UnxII0HHaLGerHiezEV0pjIrfcB+EKjzXPoeWcZ9k6pt+
-        alNpeD8sionudwrlFZKu3I/WFXw0IXQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-443-rApCDvsAPBerB4Npvkc0NA-1; Sat, 07 May 2022 13:13:14 -0400
-X-MC-Unique: rApCDvsAPBerB4Npvkc0NA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        with ESMTP id S1446783AbiEGSPp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sat, 7 May 2022 14:15:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 568332ED6B
+        for <linux-block@vger.kernel.org>; Sat,  7 May 2022 11:11:58 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64414800B21;
-        Sat,  7 May 2022 17:13:14 +0000 (UTC)
-Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 69763400E89C;
-        Sat,  7 May 2022 17:13:07 +0000 (UTC)
-Date:   Sun, 8 May 2022 01:13:02 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
-Subject: Re: Follow up on UBD discussion
-Message-ID: <YnaonsoDjQjrutRb@T590>
-References: <874k27rfwm.fsf@collabora.com>
- <YnDhorlKgOKiWkiz@T590>
- <8a52ed85-3ffa-44a4-3e28-e13cdc793732@linux.alibaba.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <8a52ed85-3ffa-44a4-3e28-e13cdc793732@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+        by dfw.source.kernel.org (Postfix) with ESMTPS id E8535611A9
+        for <linux-block@vger.kernel.org>; Sat,  7 May 2022 18:11:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5DCDDC385A5;
+        Sat,  7 May 2022 18:11:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1651947117;
+        bh=ZlZadjjfMaZezjT1wNXhNY+bZUT/w3pL+m7wQWaKY/Q=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=lM5rxXhhWwk5BwYHk4wibKNrWjVyb2VYKFY5BbDveQZ9uFLxsBL3YEIF/xnc0oItY
+         rk2Vte9fsUsyyZolGwR9plPPAjmvHzzpKxrql0M87/cvl4CF4cxIGOo80mM5kbGY+p
+         MWFt6aU8Ns7LdULo4AWoufCPCvvvWnO09Miuq4Ru5djjPT8j9qCUtsfVxfBQupLh7x
+         lfxDLVBLnuhHfvIGGEHhNvy0mYZsp0WBw7IXWcvh+w7cAlAORM2O4YNDz+VGTgkyYT
+         3GUrbJcSAspWmnVW8ovzzWhmIGUrRw3Stx0zj4fEvO5tcAdzGl1DF+RAQZrqiujLlF
+         rDstBM1inVJEA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B27FE5D087;
+        Sat,  7 May 2022 18:11:57 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 5.18-rc6
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <c9ef8d83-8f8e-0b03-b197-bd6d6105059a@kernel.dk>
+References: <c9ef8d83-8f8e-0b03-b197-bd6d6105059a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <c9ef8d83-8f8e-0b03-b197-bd6d6105059a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-06
+X-PR-Tracked-Commit-Id: f1c8781ac9d87650ccf45a354c0bbfa3f9230371
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 8967605e7db37a46df69cecf42be2c68774f245c
+Message-Id: <165194711730.12019.15927030665958016945.pr-tracker-bot@kernel.org>
+Date:   Sat, 07 May 2022 18:11:57 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 07, 2022 at 12:20:17PM +0800, ZiyangZhang wrote:
-> On 2022/5/3 16:02, Ming Lei wrote:
-> > Hello Gabriel,
-> > 
-> > CC linux-block and hope you don't mind, :-)
-> > 
-> > On Mon, May 02, 2022 at 01:41:13PM -0400, Gabriel Krisman Bertazi wrote:
-> >>
-> >> Hi Ming,
-> >>
-> >> First of all, I hope I didn't put you on the spot too much during the
-> >> discussion.  My original proposal was to propose my design, but your
-> >> implementation quite solved the questions I had. :)
-> > 
-> > I think that is open source, then we can put efforts together to make things
-> > better.
-> > 
-> >>
-> >> I'd like to follow up to restart the communication and see
-> >> where I can help more with UBD.  As I said during the talk, I've
-> >> done some fio runs and I was able to saturate NBD much faster than UBD:
-> >>
-> >> https://people.collabora.com/~krisman/mingl-ubd/bw.png
-> > 
-> > Yeah, that is true since NBD has extra socket communication cost which
-> > can't be efficient as io_uring.
-> > 
-> >>
-> >> I've also wrote some fixes to the initialization path, which I
-> >> planned to send to you as soon as you published your code, but I think
-> >> you might want to take a look already and see if you want to just squash
-> >> it into your code base.
-> >>
-> >> I pushed those fixes here:
-> >>
-> >>   https://gitlab.collabora.com/krisman/linux/-/tree/mingl-ubd
-> > 
-> > I have added the 1st fix and 3rd patch into my tree:
-> > 
-> > https://github.com/ming1/linux/commits/v5.17-ubd-dev
-> > 
-> > The added check in 2nd patch is done lockless, which may not be reliable
-> > enough, so I didn't add it. Also adding device is in slow path, and no
-> > necessary to improve in that code path.
-> > 
-> > I also cleaned up ubd driver a bit: debug code cleanup, remove zero copy
-> > code, remove command of UBD_IO_GET_DATA and always make ubd driver
-> > builtin.
-> > 
-> > ubdsrv part has been cleaned up too:
-> > 
-> > https://github.com/ming1/ubdsrv
-> > 
-> >>
-> >> I'm looking into adding support for multiple driver queues next, and
-> >> should be able to share some patches on that shortly.
-> > 
-> > OK, please post them on linux-block so that more eyes can look at the
-> > code, meantime the ubdsrv side needs to handle MQ too.
-> > 
-> > Sooner or later, the single ubdsrv task may be saturated by copying data and
-> > io_uring command communication only, which can be shown by running io on
-> > ubd-null target. In my lattop, the ubdsrv cpu utilization is close to
-> > 90% when IOPS is > 500K. So MQ may help some fast backing cases.
-> > 
-> > 
-> > Thanks,
-> > Ming
-> 
-> Hi Ming,
-> 
-> Now I am learning your userspace block driver(UBD) [1][2] and we plan to
-> replace TCMU by UBD as a new choice for implementing userspace bdev for
-> its high performance and simplicity.
-> 
-> First, we have conducted some tests by fio and perf to evaluate UBD.
-> 
-> 1) UBD achieves higher throughput than TCMU. We think TCMU suffers from
->      the complicated SCSI layer and does not support multiqueue. However
-> UBD is simply using io_uring passthrough and may support multiqueue in
-> the future.(Note that even with a single queue now , UBD outperforms TCMU)
+The pull request you sent on Fri, 6 May 2022 20:10:57 -0600:
 
-MQ isn't hard to support, and it is basically workable now:
+> git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-06
 
-https://github.com/ming1/ubdsrv/commits/devel
-https://github.com/ming1/linux/commits/my_for-5.18-ubd-devel
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/8967605e7db37a46df69cecf42be2c68774f245c
 
-Just the affinity of pthread for each queue isn't setup yet.
+Thank you!
 
-> 
-> 2) Some functions in UBD result in high CPU utilization and we guess
-> they also lower throughput. For example, ubdsrv_submit_fetch_commands()
-> frequently iterates on the array of UBD IOs and wastes CPU when no IO is
-> ready to be submitted. Besides,  ubd_copy_pages() asks CPU to copy data
-> between bio vectors and UBD internal buffers while handling write and
-> read requests and it could be eliminated by supporting zero-copy.
-
-copy itself doesn't take much cpu, see the following trace:
-
--   34.36%     3.73%  ubd              [kernel.kallsyms]             [k] ubd_copy_pages.isra.0                               ▒
-   - 30.63% ubd_copy_pages.isra.0                                                                                            ▒
-      - 23.86% internal_get_user_pages_fast                                                                                  ▒
-         + 21.14% get_user_pages_unlocked                                                                                    ▒
-         + 2.62% lockless_pages_from_mm                                                                                      ▒
-        6.42% ubd_release_pages.constprop.0
-
-And we may provide option to allow to pin pages in the disk lifetime for avoiding
-the cost in _get_user_pages_fast().
-
-zero-copy has to touch page table, and its cost may be expensive too.
-The big problem is that MM doesn't provide mechanism to support generic
-remapping kernel pages to userspace.
-
-> 
-> Second, I'd like to share some ideas on UBD. I'm not sure if they are
-> reasonable so please figure out my mistakes.
-> 
-> 1) UBD issues one sqe to commit last completed request and fetch a new
-> one. Then, blk-mq's queue_rq() issues a new UBD IO request and completes
-> one cqe for the fetch command. We have evaluated that io_submit_sqes()
-> costs some CPU and steps of building a new sqe may lower throughput.
-> Here I'd like to give a new solution: never submit sqe but trump up a
-> cqe(with information of new UBD IO request) when calling queue_rq(). I
-> am inspired by one io_uring flag: IORING_POLL_ADD_MULTI, with which a
-> user issues only one sqe for polling an fd and repeatedly gets multiple
-> cqes when new events occur. Dose this solution break the architecture of
-> UBD?
-
-But each cqe has to be associated with one sqe, if I understand
-correctly.
-
-I will research IORING_POLL_ADD_MULTI a bit and see if it can help UBD.
-And yes, batching is really important for UBD's performance.
-
-> 
-> 2) UBDSRV(the userspace part) should not allocate data buffers itself.
-> When an application configs many queues with bigger iodepth, UBDSRV has
-> to preallocate more buffers(size = 256KiB) and results in heavy memory
-> overhead. I think data buffers should be allocated by applications
-
-That is just virtual memory, and pages can be reclaimed after IO is
-done.
-
-> themselves and passed to UBDSRV. In this way UBD offers more
-> flexibility. However, while handling a write request, the control flow
-> returns to the kernel part again to set buf addr and copy data from bio
-> vectors. Is ioctl helpful by setting buf addr and copying write data to
-> app buf?
-
-It is pretty easy to pass application buffer to UBD_IO_FETCH_REQ or
-UBD_IO_COMMIT_AND_FETCH_REQ, just by overriding ios[i].buf_addr which
-is sent to ubd driver via ubdsrv_io_cmd->addr.
-
-No need any ioctl, and io_uring command can handle everything.
-
-I think the idea is good, and we can provide one option for using
-pre-allocated buffer or application buffer.
-
-But the application buffer has to be in same process VM space with ubdsrv
-daemon, otherwise it becomes slower to pin these application
-buffers/pages.
-
-> 
-> 3) ubd_fetch_and_submit() frequently iterates on the array of ubd IOs
-> and wastes CPU when no IO is ready to be submitted. I think it can be
-> optimized by adding a new array storing UBD IOs that are ready to be
-> commit back to the kernel part. Then we could batch these IOs and avoid
-> unnecessary iterations on IOs which are not ready(fetching or handling
-> by targets).
-
-That should be easy to avoid the whole queue iteration, but my perf
-trace doesn't show ubd_fetch_and_submit() consumes too much CPU.
-
-> 
-> 4) Zero-copy support is important and we are trying to implement it now.
-
-I talked with Xiaoguang wrt. zero-copy support, and looks it isn't ready
-as one generic approach. If it is ready, it is easy to integrate to UBD.
-
-> 
-> 5) Currently, UBD only support the loop target with io_uirng and all
-> works(1.get one cqe 2.issue target io_uring IO 3.get target io_uring IO
-> completion 4.prepare one sqe) are done in one thread. As far as I know,
-
-loop is one example, and it provides similar function with kernel loop by
-< 200 lines of userspace code.
-
->  some applications such as SPDK, network fs and customized distribution
-> systems do not support io_uring well.  I think we should separate target
-> IO handling from the UBDSRV loop and allow applications handle target
-> IOs themselves. Is this suggestion reasonable? (Or UBD should focus on
-> io_uring-supported targets?)
-
-UBD provides one framework for implementing userspace block driver, you
-can do everything for handling the IO in userspace. The target code just
-needs to implement callbacks defined in ubdsrv_tgt_type, so it has been
-separated from ubd loop already. But UBD is still in early stage,
-and the interface will continue to improve or re-design. Or can you
-explain your ideas in a bit details? It could be very helpful if you
-can provide some application background.
-
-Reason why I suggested to use io_uring is that io_uring is very efficient, also
-async IO has been proved as very efficient approach for handling io.
-
-
-Thanks
-Ming
-
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
