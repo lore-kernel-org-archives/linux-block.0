@@ -2,117 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95817C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  4 May 2022 17:49:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB925C433FE
+	for <linux-block@archiver.kernel.org>; Sat,  7 May 2022 02:11:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359531AbiEDRw6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 4 May 2022 13:52:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42944 "EHLO
+        id S1348537AbiEGCOo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 6 May 2022 22:14:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359125AbiEDRvd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 4 May 2022 13:51:33 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15484C439;
-        Wed,  4 May 2022 10:11:30 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 8BD9B1F38D;
-        Wed,  4 May 2022 17:11:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1651684289; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N6EMoP13+uuDakjMHpvxy4PBHA2cakQS2VfsX4a/x94=;
-        b=DJBXlAYyuYbusnoUszCA+AfMUUtGYehcgNX/lQ0qb1pMGVJ8Y/wB2k+YBRDIZuhTeQqd7b
-        tHvLMy5QORZQYIpA9gIeZd+FIbx6yExh/jX0dTQhrTHcfqHSr/rMyA45YxKum1K9WKH687
-        TFFcsHo0sSle3EgUEzEdaFr8d2K/Tio=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1651684289;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=N6EMoP13+uuDakjMHpvxy4PBHA2cakQS2VfsX4a/x94=;
-        b=5hv3tExqNVDL20PvtwaVNk13uh5hLvjqypg4NlyuP/W5i/E/1fSmlov7z3Q727EOdt2Ymq
-        Cgfxb1jhrkiVgADw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 272C0131BD;
-        Wed,  4 May 2022 17:11:23 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id eGrpOruzcmIsWwAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 04 May 2022 17:11:23 +0000
-Message-ID: <2586cd78-cd54-97ed-86b0-8f78a444387a@suse.de>
-Date:   Wed, 4 May 2022 10:11:22 -0700
+        with ESMTP id S1356890AbiEGCOn (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 6 May 2022 22:14:43 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EBD85D5E5
+        for <linux-block@vger.kernel.org>; Fri,  6 May 2022 19:10:59 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id e5so7468935pgc.5
+        for <linux-block@vger.kernel.org>; Fri, 06 May 2022 19:10:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=4gOUiw5uQxUeOp2fX0fTYX1gJsz8NeIQ4cZ12I3BaOc=;
+        b=74K8/WcX21yZKre/WRJ6g72xA49qIaoNpuMo1klv6oQEGu2j3fB7XEQvKThEUfniN1
+         ubsUjpzUugwd9IBhJ+DDTtK43BMfS3CA0ymHDqTooM4GYb0GMiifC6SOt7+C2mZcSRsO
+         iC/jrGmz/IMKQheGClAHOrW5T/FW692bF0J84v8BuQPKNdURIuBjvo2t4L3CNGhOyJA1
+         XB9L0ouRkzQaZvLUFrYwO5gOnRr2SMG2COYUGI09830PagQfbgpIu0KCp76MS8VSWnrJ
+         QGvp1WjtQ9yxItxcOjsskyPqeFYqCmdEfXr4sF/y5Ocu3xYAa5df0RIQHCK4omfKx8uY
+         Xj9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=4gOUiw5uQxUeOp2fX0fTYX1gJsz8NeIQ4cZ12I3BaOc=;
+        b=1Z0ShZD3lVWf9GGnB3VDfln1MpjMVqKyNDiv8OSiz3du05QsyL7k4e2plEyg7YLTFa
+         +VzpyXFD6jtX+ylJrLNaQNN/nS04GbUsAUjgeS8r5OBYfCooyLs70JDZEbtd+n4Beks1
+         czmumz3SFhMLn2AdqfXOz5vj0gemr4xz4xmyakg1ayWC/+EveCQIkX3M4XtuxHnucskI
+         P1x1cfpv7aILs9w+B/xKiwzDM4xHz5V3lkL820r2XbZ5iz2J4ImcCLzfS6eJYVxubwAO
+         fpoMCHGzrYLP8LHLNA5OJeTFB2PG2ivZz542677YL0yyFAE8V1tvyfbjMoiJXeidLn2H
+         Qq6Q==
+X-Gm-Message-State: AOAM530UNAXpRdZ9+iOlVPr7N+iQ0FKE4/+yaYgkSSHCHFalaWB7aAZS
+        Mmt3XDgFcoRj7WHySIb1UEaDmbgPyEzR/Q==
+X-Google-Smtp-Source: ABdhPJwv5HWeC0MazIbUWT8tK7JpG4LStC/zh9JJ4OdY/zdBMKy9FUkYtrbUOU1J4S4XMncFDJNGdg==
+X-Received: by 2002:a63:e51:0:b0:3a4:9d22:1fd5 with SMTP id 17-20020a630e51000000b003a49d221fd5mr5181433pgo.586.1651889458760;
+        Fri, 06 May 2022 19:10:58 -0700 (PDT)
+Received: from [192.168.4.166] (cpe-72-132-29-68.dc.res.rr.com. [72.132.29.68])
+        by smtp.gmail.com with ESMTPSA id n23-20020a17090a929700b001d7f3bb11d7sm8008464pjo.53.2022.05.06.19.10.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 06 May 2022 19:10:58 -0700 (PDT)
+Message-ID: <c9ef8d83-8f8e-0b03-b197-bd6d6105059a@kernel.dk>
+Date:   Fri, 6 May 2022 20:10:57 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 16/16] dm-zoned: ensure only power of 2 zone sizes are
- allowed
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
 Content-Language: en-US
-References: <20220427160255.300418-1-p.raghav@samsung.com>
- <CGME20220427160313eucas1p1feecf74ec15c8c3d9250444710fd1676@eucas1p1.samsung.com>
- <20220427160255.300418-17-p.raghav@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-To:     undisclosed-recipients:;
-In-Reply-To: <20220427160255.300418-17-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fixes for 5.18-rc6
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 4/27/22 09:02, Pankaj Raghav wrote:
-> From: Luis Chamberlain <mcgrof@kernel.org>
-> 
-> Today dm-zoned relies on the assumption that you have a zone size
-> with a power of 2. Even though the block layer today enforces this
-> requirement, these devices do exist and so provide a stop-gap measure
-> to ensure these devices cannot be used by mistake
-> 
-> Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->   drivers/md/dm-zone.c | 12 ++++++++++++
->   1 file changed, 12 insertions(+)
-> 
-> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> index 57daa86c19cf..221e0aa0f1a7 100644
-> --- a/drivers/md/dm-zone.c
-> +++ b/drivers/md/dm-zone.c
-> @@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
->   	struct request_queue *q = md->queue;
->   	unsigned int noio_flag;
->   	int ret;
-> +	struct block_device *bdev = md->disk->part0;
-> +	sector_t zone_sectors;
-> +	char bname[BDEVNAME_SIZE];
-> +
-> +	zone_sectors = bdev_zone_sectors(bdev);
-> +
-> +	if (!is_power_of_2(zone_sectors)) {
-> +		DMWARN("%s: %s only power of two zone size supported\n",
-> +		       dm_device_name(md),
-> +		       bdevname(bdev, bname));
-> +		return 1;
-> +	}
->   
->   	/*
->   	 * Check if something changed. If yes, cleanup the current resources
+Hi Linus,
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+Single revert for a change that isn't needed in 5.18, and a small series
+for s390/dasd. Please pull!
 
-Cheers,
 
-Hannes
+The following changes since commit 09df6a75fffa68169c5ef9bef990cd7ba94f3eef:
+
+  bfq: Fix warning in bfqq_request_over_limit() (2022-04-29 06:45:37 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-06
+
+for you to fetch changes up to f1c8781ac9d87650ccf45a354c0bbfa3f9230371:
+
+  s390/dasd: Use kzalloc instead of kmalloc/memset (2022-05-05 20:08:27 -0600)
+
+----------------------------------------------------------------
+block-5.18-2022-05-06
+
+----------------------------------------------------------------
+Haowen Bai (1):
+      s390/dasd: Use kzalloc instead of kmalloc/memset
+
+Jan Höppner (2):
+      s390/dasd: Fix read for ESE with blksize < 4k
+      s390/dasd: Fix read inconsistency for ESE DASD devices
+
+Ming Lei (1):
+      Revert "block: release rq qos structures for queue without disk"
+
+Stefan Haberland (2):
+      s390/dasd: fix data corruption for ESE devices
+      s390/dasd: prevent double format of tracks for ESE devices
+
+ block/blk-core.c               |  4 ----
+ drivers/s390/block/dasd.c      | 18 +++++++++++++++---
+ drivers/s390/block/dasd_eckd.c | 33 ++++++++++++++++++++++-----------
+ drivers/s390/block/dasd_int.h  | 14 ++++++++++++++
+ 4 files changed, 51 insertions(+), 18 deletions(-)
+
 -- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Felix Imendörffer
+Jens Axboe
+
