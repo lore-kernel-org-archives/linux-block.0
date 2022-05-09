@@ -2,75 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 058C0C433F5
-	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 21:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C73D7C433F5
+	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 22:28:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230501AbiEIV6G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 May 2022 17:58:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42038 "EHLO
+        id S231508AbiEIWc0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 May 2022 18:32:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231983AbiEIV43 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 17:56:29 -0400
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF6B32D3F5B
-        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 14:50:10 -0700 (PDT)
-Received: by mail-io1-f69.google.com with SMTP id g16-20020a05660203d000b005f7b3b0642eso10708840iov.16
-        for <linux-block@vger.kernel.org>; Mon, 09 May 2022 14:50:10 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=s2rmpyNyFEujAf+EJYBoIEjX5MtLaffn8+X0o9N5fgE=;
-        b=lZ4ueEIoN7lzUWYapUKglBZh9XxZc9/E6txFeCg4u1UlDPnf8kjORt891eywSPIqRB
-         rh1e33UUwJf0jBqtwtqpQ4ysP8ril81V/MDJrOUwT+0B93VXVDxdox4Ot0GYMHWnVxUY
-         g/TYjAoOGCiNjpV2lFoZCVaolwHhVQUrPf7OMCRFLbUGiLKJxQqbcqq6xwnOvYxIy/99
-         SqY3PSLc/eiPsA06b7COaU7Jqyeoeti/ypY2pjxQuOuw+4fWUu7PhEden66unaQho6UP
-         vDXovtfHnzjcX6HV3JK4AXT7AnNNQPd17Nb9q1GwFzRHkUr44s0ksD5O07ioPAETcYBk
-         +aSQ==
-X-Gm-Message-State: AOAM531kNjtPkL00xomLRBFBfy+kbe+7LBIOdEMG/+jP40R2d381wvLf
-        9vAxn5PwXecuEvITKKdic4CghiKWNj9qO63ptYW8F2mRD5d3
-X-Google-Smtp-Source: ABdhPJwBVtl04Ej8XUy6iLjBCkDUNPExpqGoo3a5jGV8ypU3eIqqfYkoQPwIMtXgmETBrBFu7BHvBe/1eA2T9oXxg64g8WR0pnz3
+        with ESMTP id S229875AbiEIWcZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 18:32:25 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D4A218FF1;
+        Mon,  9 May 2022 15:28:29 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 249MSH8J011968
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 9 May 2022 18:28:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1652135302; bh=PomMNNmWyc5YBypwEkVpIDxcMt6S+On8bnwlKnLl0F0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=qTYb7bkM1f13CgzxxkHgcYUUpcdSEBUT/tf50JNLJU6fPsMDK8SQS+i92s1ti4Tyx
+         iGRFTPavJ8h99X4QcJ0MwhYWhsXkPhTDRlGmwzn8rsbAT6j0ocGR+0IBGf/l3GeS9p
+         LGPO99ypG2x1hYMGpqrIpEGraGGHFFaOH2O/u2mcZIe5Cthtyd8ZMw5zx+aBVHeUyS
+         q1m/CT4ksHBOdjSUNJMk5ZmO3eaaCHwKpIPr+dHOgp2v+EZ3T7b866dCtzUxZEdDmc
+         46n8znwTj37kjfLzCUBNC9Lu/FzPz5XH57jT/qwRwyVJwYbjXb4jLc48Dtq9Cx7vGI
+         OMQGEtAlJ47LQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id A4D2D15C3F0A; Mon,  9 May 2022 18:28:17 -0400 (EDT)
+Date:   Mon, 9 May 2022 18:28:17 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
+        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
+        linux-ext4@vger.kernel.org, mingo@redhat.com,
+        linux-kernel@vger.kernel.org, peterz@infradead.org,
+        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com
+Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
+Message-ID: <YnmVgVQ7usoXnJ1N@mit.edu>
+References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
+ <YnmCE2iwa0MSqocr@mit.edu>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:214b:b0:2cf:21fa:cce6 with SMTP id
- d11-20020a056e02214b00b002cf21facce6mr7280704ilv.160.1652133010262; Mon, 09
- May 2022 14:50:10 -0700 (PDT)
-Date:   Mon, 09 May 2022 14:50:10 -0700
-In-Reply-To: <00000000000029572505de968021@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000032d06e05de9b3136@google.com>
-Subject: Re: [syzbot] KASAN: use-after-free Read in bio_poll
-From:   syzbot <syzbot+99938118dfd9e1b0741a@syzkaller.appspotmail.com>
-To:     andrii@kernel.org, ast@kernel.org, axboe@kernel.dk,
-        bpf@vger.kernel.org, daniel@iogearbox.net, hch@lst.de,
-        john.fastabend@gmail.com, kafai@fb.com, kpsingh@kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        ming.lei@redhat.com, netdev@vger.kernel.org, songliubraving@fb.com,
-        syzkaller-bugs@googlegroups.com, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnmCE2iwa0MSqocr@mit.edu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has bisected this issue to:
+Oh, one other problem with DEPT --- it's SLOW --- the overhead is
+enormous.  Using kvm-xfstests[1] running "kvm-xfstests smoke", here
+are some sample times:
 
-commit 0f38d76646157357fcfa02f50575ea044830c494
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue Oct 12 10:40:45 2021 +0000
+			LOCKDEP		DEPT
+Time to first test	49 seconds	602 seconds
+ext4/001      		2 s		22 s
+ext4/003		2 s		8 s
+ext4/005		0 s		7 s
+ext4/020		1 s		8 s
+ext4/021		11 s		17 s
+ext4/023		0 s		83 s
+generic/001		4 s		76 s
+generic/002		0 s		11 s
+generic/003		10 s		19 s
 
-    blk-mq: cleanup blk_mq_submit_bio
+There are some large variations; in some cases, some xfstests take 10x
+as much time or more to run.  In fact, when I first started the
+kvm-xfstests run with DEPT, I thought something had hung and that
+tests would never start.  (In fact, with gce-xfstests the default
+watchdog "something has gone terribly wrong with the kexec" had fired,
+and I didn't get any test results using gce-xfstests at all.  If DEPT
+goes in without any optimizations, I'm going to have to adjust the
+watchdogs timers for gce-xfstests.)
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12506f7ef00000
-start commit:   c5eb0a61238d Linux 5.18-rc6
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11506f7ef00000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16506f7ef00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=78013caa620443d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=99938118dfd9e1b0741a
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1484cbc1f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10c7026cf00000
+The bottom line is that at the moment, between the false positives,
+and the significant overhead imposed by DEPT, I would suggest that if
+DEPT ever does go in, that it should be possible to disable DEPT and
+only use the existing CONFIG_PROVE_LOCKING version of LOCKDEP, just
+because DEPT is S - L - O - W.
 
-Reported-by: syzbot+99938118dfd9e1b0741a@syzkaller.appspotmail.com
-Fixes: 0f38d7664615 ("blk-mq: cleanup blk_mq_submit_bio")
+[1] https://github.com/tytso/xfstests-bld/blob/master/Documentation/kvm-quickstart.md
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+						- Ted
+
+P.S.  Darrick and I both have disabled using LOCKDEP by default
+because it slows down ext4 -g auto testing by a factor 2, and xfs -g
+auto testing by a factor of 3.  So the fact that DEPT is a factor of
+2x to 10x or more slower than LOCKDEP when running various xfstests
+tests should be a real concern.
+
