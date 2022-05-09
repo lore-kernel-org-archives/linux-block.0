@@ -2,314 +2,177 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2561C433FE
-	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 21:05:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD2BC433FE
+	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 21:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229964AbiEIVJ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 May 2022 17:09:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54620 "EHLO
+        id S229612AbiEIVeF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 May 2022 17:34:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229968AbiEIVJZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 17:09:25 -0400
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92E602685CF;
-        Mon,  9 May 2022 14:05:29 -0700 (PDT)
-Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
-        (authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 249L5N8M003386
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Mon, 9 May 2022 17:05:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-        t=1652130325; bh=BunAaHafxIwGSXvWzTaUU2Vd3jcLoKB1GDg8ARz5CFU=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=WflF31+UBdY5fjDeLiFNT5bQnKY4TgpY3BR4AOdq+HnsLuBTWBX+/XGRHz9TZ52nW
-         nnweuyzPiqhJ3fconWDoe7OsecwYseYvG2CQ7/hw4FX+JYouMT5aQXma8ckenKNjH/
-         TldH/HYjpodBwQNAE1SM7+8vMaXidCujL5/fcjx04tah2mEQoBsPfXdexDVQgcXvLc
-         y5jj/ni+Fc+GuP3jPrIa1yxkIZzhFBEqrho0AuSuKne8ffh5stu22AdRBVkKSLfMzo
-         j0wZD36YiNtlhQJkYYFlv9M0EjLCvQP2lgdfjGDQpyYKuDrMuo7cMy2VRrf79r0sL0
-         fl7tB2Zzihu3g==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-        id 83C1115C3F0A; Mon,  9 May 2022 17:05:23 -0400 (EDT)
-Date:   Mon, 9 May 2022 17:05:23 -0400
-From:   "Theodore Ts'o" <tytso@mit.edu>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com, bfields@fieldses.org,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com, 42.hyeyoo@gmail.com
-Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
-Message-ID: <YnmCE2iwa0MSqocr@mit.edu>
-References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
+        with ESMTP id S229500AbiEIVeD (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 17:34:03 -0400
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 029C52C13D2;
+        Mon,  9 May 2022 14:30:08 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 249Insbt008669;
+        Mon, 9 May 2022 14:29:46 -0700
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3fwp4q0qau-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:29:46 -0700
+Received: from m0045849.ppops.net (m0045849.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 249LOHIt005646;
+        Mon, 9 May 2022 14:29:46 -0700
+Received: from nam12-dm6-obe.outbound.protection.outlook.com (mail-dm6nam12lp2176.outbound.protection.outlook.com [104.47.59.176])
+        by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3fwp4q0qar-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Mon, 09 May 2022 14:29:46 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=N7efee5w1/9ponj7yiTHkj39EEIx+XZx1pw/EpRcLYmH2OvrCDIAzzt2+ElALm33uhd+3+HZ9vxU2cnI+3aZ0yIGQmjLs+stGbKt6paPWKHcrMRMlewmGJzo1wgio8BVIj6iY3ERNntM+0pZpK3GVxOowxmTJufVpac45gVV98u6+JzYcNDlb4H6uT3Je/2g6J0pJ1V+/9wInrUFedaHJJ5duoaBW8/KmvsX6bxaPWtIM52IZSz8kvQ6N+d1CC2Qiygna20AbFDOuQWf0UEsZ1/LRcVPwQwR2mDjT4gWzGbCCpaM9UKRO0wvx2+FlTW5cUVynycFclPeiEW/P8ltwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0EyyF1Jm83SFM5n6Rf3AjoOgglr6Tk/ArC4FU6TRhfY=;
+ b=ZENveuBfyW3IbwTJc4lhQGCr+z8DpCdG9GTjyHsyab+6hvuyX0neWoj7/4qLM1qEPpZg9uzsb5XEM6thZ4U+hDSHuvWhLGSpTugY8outvWFK80bRVE2ZMh+Z4b5H1W5IS4ufU2JKNXhV4x1Lu1GIgf3kGbOfmPFexHHAKOltZkglklMc5+nURIx3IbDqkhW5vqQ3c/nVnuOWdOqtt7ITMuvPye9BMzsvOcKz4Hrkv7n/PrU+uzUn+3yi+s3dJ2uRdXEs3m7wk4YU9BGCZA81SJDJt6C1UmA7Kc9F+537Gjy4HaTXyfN/D1hGove6TEyGPF2ueURDqZkmlXc+BzrrSA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0EyyF1Jm83SFM5n6Rf3AjoOgglr6Tk/ArC4FU6TRhfY=;
+ b=TdUcTv8IfCf15CKsB39fAZbtrgPl7KP/ibWfinXEBRWJ0JW2JmBnldlTlERjVYG033XYlZKUITACL6tXz77+LVTX4heu7HLft70kzIsuwf4OHhMqZV6LZGm0y3/TiamRq9O5spPcUCI2AVXY9u7I0PspJhZcIYNBEyMsiGjK7W4=
+Received: from BY3PR18MB4530.namprd18.prod.outlook.com (2603:10b6:a03:3b5::5)
+ by CY4PR1801MB1893.namprd18.prod.outlook.com (2603:10b6:910:75::34) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5227.23; Mon, 9 May
+ 2022 21:29:41 +0000
+Received: from BY3PR18MB4530.namprd18.prod.outlook.com
+ ([fe80::6d08:b515:317d:6ef7]) by BY3PR18MB4530.namprd18.prod.outlook.com
+ ([fe80::6d08:b515:317d:6ef7%9]) with mapi id 15.20.5227.023; Mon, 9 May 2022
+ 21:29:41 +0000
+From:   Xiaoming Zhou <xzhou@marvell.com>
+To:     Eric Biggers <ebiggers@kernel.org>
+CC:     "kbusch@kernel.org" <kbusch@kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "x86@kernel.org" <x86@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "axboe@kernel.dk" <axboe@kernel.dk>, "hch@lst.de" <hch@lst.de>,
+        "martin.petersen@oracle.com" <martin.petersen@oracle.com>,
+        "colyli@suse.de" <colyli@suse.de>
+Subject: RE: [EXT] Re: [PATCHv3 06/10]crypto: add rocksoft 64b crc framework
+Thread-Topic: [EXT] Re: [PATCHv3 06/10]crypto: add rocksoft 64b crc framework
+Thread-Index: AdhibcBRiq8Mz+RYTlqaQoqjC5ZFDgBds16AAAAd5eA=
+Date:   Mon, 9 May 2022 21:29:40 +0000
+Message-ID: <BY3PR18MB4530A713E7FB3CCD51F71A74A8C69@BY3PR18MB4530.namprd18.prod.outlook.com>
+References: <CO1PR18MB4538FAB1C3EC9DC4EF036C8BA8C79@CO1PR18MB4538.namprd18.prod.outlook.com>
+ <Ynl7dXm38FaX/2od@sol.localdomain>
+In-Reply-To: <Ynl7dXm38FaX/2od@sol.localdomain>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: f2a4987b-d706-44d7-3660-08da32030705
+x-ms-traffictypediagnostic: CY4PR1801MB1893:EE_
+x-microsoft-antispam-prvs: <CY4PR1801MB18938521EFFF6E77CF53A449A8C69@CY4PR1801MB1893.namprd18.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: NO2tgFzA79Bcfd/1JE4+N2ahMVn+LAnmm0UEG1ySFXFEltNRH0Bi9DUd0h9z/milEXfMU1KH/uKpvUuka0QmU2MYyg0Lyyww6/yBHk/W4lYFgr7PovZI2U9+4yVsTO7F1xdNuzwtwt82SEqruy8J/+9eU3CzJUq5PuNGwP1TF8LRC8PxGBwZmG5dYSBEmySLgyiKaaGjhVuggiY6evU0YEioLM5Eeakd4tFh7YxvZfn9SyZGpGMCf6EDUx5fhWVQZYY0vMiAEN3efesTLmJPnyk8o9TT3IIpbj+V7PXzWyEiYmotkQiMymyjPT8nQucJI3yW+AL0tYC/C0e1dl3WRB1MTp49EZRNpADEXk0nroEGMdib4LEM93MxVzGHZFSR1rouGkrhYDv4fynpTk1PaTaPc7meg3VFE/1CHYOF3mkg6uG4Jkzqg3HDQACbvnkGgmeZSDmNSTiQuJ7LrgmMZbNms+6cGZhdA55qW4SDxfns75A1Au9pHCrcFbVgPfVDfLReAQy0azTuHYx0nFD6dansYH/FC7JffzervjdYYOIs5KtXbvMPyFo8qWSmXoMHlGbbT12llSUTgUQ1rwLCysYaGT9riIdhYM3Ng9GkwrJg7VR2EXbDqdeb4AWUdL4rrsSaat1gJbhF3FTB0iiHH1zIe5srRzqc4BNjCyg+BfwlIuFHsh2IX44jqUBnYI4Jf47Nez/VK7L8GLzXGDGRJw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4530.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(52536014)(2906002)(122000001)(7416002)(8936002)(38070700005)(38100700002)(5660300002)(4326008)(186003)(83380400001)(508600001)(33656002)(76116006)(66556008)(8676002)(66946007)(64756008)(66476007)(66446008)(316002)(54906003)(6916009)(53546011)(7696005)(6506007)(26005)(9686003)(71200400001)(86362001)(55016003);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?9WJ1fWxBNbDrXpc7TgKn+NE1yuow3yOxQzpJR2F4lcmShR8EYNZazodkuoKM?=
+ =?us-ascii?Q?oCwSu4T9yle+koHacY7+Ux14d3bw9FHJBxsVfeAXuRZeDTXRV4dW0tU5rXl+?=
+ =?us-ascii?Q?eIv9JN44Ba1sw20to7jTm2TiK0E//N4AM84D7awzpeYgikm4e98aj9tum3uO?=
+ =?us-ascii?Q?yWBQPbmQYC7wAclN/GpaaSY98zGuNPIRipE+lXTLnyLjpoG7erR9CCkU/rzG?=
+ =?us-ascii?Q?uUuO5Pc3T045LjcaYxBV9A2v8AeU5n7DymOAdgYWSua4mlny1YJnS0bhSn9B?=
+ =?us-ascii?Q?1OMdsww2UdvrNjHkZ6bPKkcZJ1AkOyh8jr4VuRFWJTUT281m/1DVkju+ODPO?=
+ =?us-ascii?Q?FvGVeXkHp+wyj/C9eoVtSqbtd2t92x3q5rmuIgEEH0MN2R7A9R/SwJucQnch?=
+ =?us-ascii?Q?WI2hwVkDAL7sc7aVms6tUruF27+3q67rMasuKNA9U6xWZn7NGMsIQ6e8nDEc?=
+ =?us-ascii?Q?5qQWbk6tvR+n7GLGXSdPoc5EEHpmJkbbTh2OoAjdDCw6iOnnfrr/m6OMFIHH?=
+ =?us-ascii?Q?RLG6rwV83BhET/mzNyHAZdUHeQ9IimcKkV+2e5paoS/nQEC4VCSDreFGZJ6/?=
+ =?us-ascii?Q?7cap5am0QCGwghqD938ajZsPRVbct2A50F61E0BXfr2OU/8Ak1q5sgh8pBUu?=
+ =?us-ascii?Q?CfLCKOP3JWOVaqs5jQ0+XcNLd8Vh7wCh51Ucv/a0cXw+9jL9NUgNa9xmsRcc?=
+ =?us-ascii?Q?/C9a8h9gs8hyq4Iwy6Ecm8/cmjd9u20inAX0P0U/Se4mVjHn+9gYiJJ+Kqye?=
+ =?us-ascii?Q?o2HJW4X0hl9kAydkJ1LpaQOKO0VWQbdxE0Jy1xJS4B+MjDbxsx6jNpq3ucnn?=
+ =?us-ascii?Q?1JbmsAumh6TABu33LkJfAs1uKiomr9RDTfm66ncylOzHB0vpecFnpCnxv7bx?=
+ =?us-ascii?Q?Cula4dTr7p9WTNI9qvEAdbT5KYlTFhmy59ogfnZva4GzmUtW4c/57MtTCnmv?=
+ =?us-ascii?Q?RQ7VZfahHpDEiJGATb9TnbaJNVxJYu/benWtZ50VfnsbZW4zljZCE3Js3njV?=
+ =?us-ascii?Q?f85Sti5Bd/GxNRrrKbLkbDADVIackQltA3npf0jEROPgbl4SOCg5uhLxWKI3?=
+ =?us-ascii?Q?fYpinyaBsUTmvI1NIk1kAg/hAxN1f9r7IT+OQpu8ia0tjYi6pjjeIozjSZeW?=
+ =?us-ascii?Q?ATN/wqvywPwe2pdZqamQb04gCSk1lJeXqXa1L6F/hXSsjUvvYAev5CdzfVDJ?=
+ =?us-ascii?Q?BJ2YIOSmqb06SeMJPl3QKgLDMCu/W8jLyLT8fr39SOBDE0VztJlinm4KxH0B?=
+ =?us-ascii?Q?ehuLHyNdEHE6Pqv5epHRKYPS0jT9sEYK4D/hjKHAq4lGkmnvTG0AgcDZCBPI?=
+ =?us-ascii?Q?CV9aGXuFgvVvdU1Cl0KKk1jiKa0GRohtdypt//iORZKY4yv3ZPqhseLVfO04?=
+ =?us-ascii?Q?edbe3ExbnXZiJlHmJ7upISVz195CICBhvL6DyF7lLfFipD8ebRcXCrHI+CF1?=
+ =?us-ascii?Q?vpwILuUUjpuAl+sJ+vtw/R+4db1G75qo9M3TihwTzGH+g2YD8vzqeT4v1w4L?=
+ =?us-ascii?Q?Ud9XLnclatbWa1HCwe8sMRsSLmZCq0kk64sdoM4rPJnxmW+kNMlEGa7uwHdq?=
+ =?us-ascii?Q?aZPkwOl3qQLa7C2EJRGXIoNyMMSs8cI1aSQTc5HadTm7o/iBi2g7bTyvqcHX?=
+ =?us-ascii?Q?/W56lMSgXsMs72si8lc87UrF9HOAA0ury8OdpsM4DBnyH3FCRlyaOGjybGaM?=
+ =?us-ascii?Q?BRhClBkzi2HC4/baGwLUhwDjVWdCg8zuhVNa88/fJDEJRvtLFQHqaI15DzoH?=
+ =?us-ascii?Q?XT4p4Sh9xg=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4530.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f2a4987b-d706-44d7-3660-08da32030705
+X-MS-Exchange-CrossTenant-originalarrivaltime: 09 May 2022 21:29:41.0263
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3azeocFbJJrzUjpAv2w4E+y1IvCW/mO2uWJStbbBU7Y+u4hqFuq87reYg7BtQUlXKLlId6JqXUz/DwawFyRsqQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR1801MB1893
+X-Proofpoint-ORIG-GUID: 0Fj7mbNa5aTahNzsZZ7GjUsEvDbOqxmt
+X-Proofpoint-GUID: PQS4jgfCwLnIxJZ8ECwovUqYtfqgwJzC
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_05,2022-05-09_02,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I tried DEPT-v6 applied against 5.18-rc5, and it reported the
-following positive.
+Agree.  The "11199E50_6128D175h" of 64b CRC Check in the Spec also is the A=
+E8B1486_0A799888h with bits reversed.
 
-The reason why it's nonsense is that in context A's [W] wait:
+Regards,
+Xiaoming
 
-[ 1538.545054] [W] folio_wait_bit_common(pglocked:0):
-[ 1538.545370] [<ffffffff81259944>] __filemap_get_folio+0x3e4/0x420
-[ 1538.545763] stacktrace:
-[ 1538.545928]       folio_wait_bit_common+0x2fa/0x460
-[ 1538.546248]       __filemap_get_folio+0x3e4/0x420
-[ 1538.546558]       pagecache_get_page+0x11/0x40
-[ 1538.546852]       ext4_mb_init_group+0x80/0x2e0
-[ 1538.547152]       ext4_mb_good_group_nolock+0x2a3/0x2d0
+-----Original Message-----
+From: Eric Biggers <ebiggers@kernel.org>=20
+Sent: Monday, May 9, 2022 1:37 PM
+To: Xiaoming Zhou <xzhou@marvell.com>
+Cc: kbusch@kernel.org; linux-nvme@lists.infradead.org; linux-block@vger.ker=
+nel.org; linux-crypto@vger.kernel.org; x86@kernel.org; linux-kernel@vger.ke=
+rnel.org; axboe@kernel.dk; hch@lst.de; martin.petersen@oracle.com; colyli@s=
+use.de
+Subject: [EXT] Re: [PATCHv3 06/10]crypto: add rocksoft 64b crc framework
 
-... we're reading the block allocation bitmap into the page cache.
-This does not correspond to a real inode, and so we don't actually
-take ei->i_data_sem in this on the psuedo-inode used.
+External Email
 
-In contast, context's B's [W] and [E]'s stack traces, the
-folio_wait_bit is clearly associated with page which is mapped to a
-real inode:
+----------------------------------------------------------------------
+On Sun, May 08, 2022 at 12:01:21AM +0000, Xiaoming Zhou wrote:
+> Hi Keith,
+> For the polynomial you used in this path is 0x9A6C9329AC4BC9B5ULL, =20
+> why it is different than the 0xAD93D23594C93659ULL defined in NVMe=20
+> command set spec
+> 5.2.1.3.4 ? Though the crc66 implemented in this patch can pass with=20
+> test cases defined in Figure 121: 64b CRC Test Cases for 4KiB Logical=20
+> Block with no Metadata.  Could you explain the discrepancy between the sp=
+ec and the patch?
+>=20
 
-[ 1538.553656] [W] down_write(&ei->i_data_sem:0):
-[ 1538.553948] [<ffffffff8141c01b>] ext4_map_blocks+0x17b/0x680
-[ 1538.554320] stacktrace:
-[ 1538.554485]       ext4_map_blocks+0x17b/0x680
-[ 1538.554772]       mpage_map_and_submit_extent+0xef/0x530
-[ 1538.555122]       ext4_writepages+0x798/0x990
-[ 1538.555409]       do_writepages+0xcf/0x1c0
-[ 1538.555682]       __writeback_single_inode+0x58/0x3f0
-[ 1538.556014]       writeback_sb_inodes+0x210/0x540
-  		     ...
+0x9A6C9329AC4BC9B5 is 0xAD93D23594C93659 with its bits reversed.
 
-[ 1538.558621] [E] folio_wake_bit(pglocked:0):
-[ 1538.558896] [<ffffffff814418c0>] ext4_bio_write_page+0x400/0x560
-[ 1538.559290] stacktrace:
-[ 1538.559455]       ext4_bio_write_page+0x400/0x560
-[ 1538.559765]       mpage_submit_page+0x5c/0x80
-[ 1538.560051]       mpage_map_and_submit_buffers+0x15a/0x250
-[ 1538.560409]       mpage_map_and_submit_extent+0x134/0x530
-[ 1538.560764]       ext4_writepages+0x798/0x990
-[ 1538.561057]       do_writepages+0xcf/0x1c0
-[ 1538.561329]       __writeback_single_inode+0x58/0x3f0
-		...
+0xAD93D23594C93659 maps the polynomial coefficients to bits in the natural =
+way.
+However, writing the polynomial in this way isn't useful for this CRC varia=
+nt, as it is a bit-reversed CRC.
 
-
-In any case, this will ***never*** deadlock, and it's due to DEPT
-fundamentally not understanding that waiting on different pages may be
-due to inodes that come from completely different inodes, and so there
-is zero possible chance this would never deadlock.
-
-I suspect there will be similar false positives for tests (or
-userspace) that uses copy_file_range(2) or send_file(2) system calls.
-
-I've included the full DEPT log report below.
-
-						- Ted
-
-generic/011		[20:11:16][ 1533.411773] run fstests generic/011 at 2022-05-07 20:11:16
-[ 1533.509603] DEPT_INFO_ONCE: Need to expand the ring buffer.
-[ 1536.910044] DEPT_INFO_ONCE: Pool(wait) is empty.
-[ 1538.533315] ===================================================
-[ 1538.533793] DEPT: Circular dependency has been detected.
-[ 1538.534199] 5.18.0-rc5-xfstests-dept-00021-g8d3d751c9964 #571 Not tainted
-[ 1538.534645] ---------------------------------------------------
-[ 1538.535035] summary
-[ 1538.535177] ---------------------------------------------------
-[ 1538.535567] *** DEADLOCK ***
-[ 1538.535567] 
-[ 1538.535854] context A
-[ 1538.536008]     [S] down_write(&ei->i_data_sem:0)
-[ 1538.536323]     [W] folio_wait_bit_common(pglocked:0)
-[ 1538.536655]     [E] up_write(&ei->i_data_sem:0)
-[ 1538.536958] 
-[ 1538.537063] context B
-[ 1538.537216]     [S] (unknown)(pglocked:0)
-[ 1538.537480]     [W] down_write(&ei->i_data_sem:0)
-[ 1538.537789]     [E] folio_wake_bit(pglocked:0)
-[ 1538.538082] 
-[ 1538.538184] [S]: start of the event context
-[ 1538.538460] [W]: the wait blocked
-[ 1538.538680] [E]: the event not reachable
-[ 1538.538939] ---------------------------------------------------
-[ 1538.539327] context A's detail
-[ 1538.539530] ---------------------------------------------------
-[ 1538.539918] context A
-[ 1538.540072]     [S] down_write(&ei->i_data_sem:0)
-[ 1538.540382]     [W] folio_wait_bit_common(pglocked:0)
-[ 1538.540712]     [E] up_write(&ei->i_data_sem:0)
-[ 1538.541015] 
-[ 1538.541119] [S] down_write(&ei->i_data_sem:0):
-[ 1538.541410] [<ffffffff8141c01b>] ext4_map_blocks+0x17b/0x680
-[ 1538.541782] stacktrace:
-[ 1538.541946]       ext4_map_blocks+0x17b/0x680
-[ 1538.542234]       ext4_getblk+0x5f/0x1f0
-[ 1538.542493]       ext4_bread+0xc/0x70
-[ 1538.542736]       ext4_append+0x48/0xf0
-[ 1538.542991]       ext4_init_new_dir+0xc8/0x160
-[ 1538.543284]       ext4_mkdir+0x19a/0x320
-[ 1538.543542]       vfs_mkdir+0x83/0xe0
-[ 1538.543788]       do_mkdirat+0x8c/0x130
-[ 1538.544042]       __x64_sys_mkdir+0x29/0x30
-[ 1538.544319]       do_syscall_64+0x40/0x90
-[ 1538.544584]       entry_SYSCALL_64_after_hwframe+0x44/0xae
-[ 1538.544949] 
-[ 1538.545054] [W] folio_wait_bit_common(pglocked:0):
-[ 1538.545370] [<ffffffff81259944>] __filemap_get_folio+0x3e4/0x420
-[ 1538.545763] stacktrace:
-[ 1538.545928]       folio_wait_bit_common+0x2fa/0x460
-[ 1538.546248]       __filemap_get_folio+0x3e4/0x420
-[ 1538.546558]       pagecache_get_page+0x11/0x40
-[ 1538.546852]       ext4_mb_init_group+0x80/0x2e0
-[ 1538.547152]       ext4_mb_good_group_nolock+0x2a3/0x2d0
-[ 1538.547496]       ext4_mb_regular_allocator+0x391/0x780
-[ 1538.547840]       ext4_mb_new_blocks+0x44e/0x720
-[ 1538.548145]       ext4_ext_map_blocks+0x7f1/0xd00
-[ 1538.548455]       ext4_map_blocks+0x19e/0x680
-[ 1538.548743]       ext4_getblk+0x5f/0x1f0
-[ 1538.549006]       ext4_bread+0xc/0x70
-[ 1538.549250]       ext4_append+0x48/0xf0
-[ 1538.549505]       ext4_init_new_dir+0xc8/0x160
-[ 1538.549798]       ext4_mkdir+0x19a/0x320
-[ 1538.550058]       vfs_mkdir+0x83/0xe0
-[ 1538.550302]       do_mkdirat+0x8c/0x130
-[ 1538.550557] 
-[ 1538.550660] [E] up_write(&ei->i_data_sem:0):
-[ 1538.550940] (N/A)
-[ 1538.551071] ---------------------------------------------------
-[ 1538.551459] context B's detail
-[ 1538.551662] ---------------------------------------------------
-[ 1538.552047] context B
-[ 1538.552202]     [S] (unknown)(pglocked:0)
-[ 1538.552466]     [W] down_write(&ei->i_data_sem:0)
-[ 1538.552775]     [E] folio_wake_bit(pglocked:0)
-[ 1538.553071] 
-[ 1538.553174] [S] (unknown)(pglocked:0):
-[ 1538.553422] (N/A)
-[ 1538.553553] 
-[ 1538.553656] [W] down_write(&ei->i_data_sem:0):
-[ 1538.553948] [<ffffffff8141c01b>] ext4_map_blocks+0x17b/0x680
-[ 1538.554320] stacktrace:
-[ 1538.554485]       ext4_map_blocks+0x17b/0x680
-[ 1538.554772]       mpage_map_and_submit_extent+0xef/0x530
-[ 1538.555122]       ext4_writepages+0x798/0x990
-[ 1538.555409]       do_writepages+0xcf/0x1c0
-[ 1538.555682]       __writeback_single_inode+0x58/0x3f0
-[ 1538.556014]       writeback_sb_inodes+0x210/0x540
-[ 1538.556324]       __writeback_inodes_wb+0x4c/0xe0
-[ 1538.556635]       wb_writeback+0x298/0x450
-[ 1538.556911]       wb_do_writeback+0x29e/0x320
-[ 1538.557199]       wb_workfn+0x6a/0x2c0
-[ 1538.557447]       process_one_work+0x302/0x650
-[ 1538.557743]       worker_thread+0x55/0x400
-[ 1538.558013]       kthread+0xf0/0x120
-[ 1538.558251]       ret_from_fork+0x1f/0x30
-[ 1538.558518] 
-[ 1538.558621] [E] folio_wake_bit(pglocked:0):
-[ 1538.558896] [<ffffffff814418c0>] ext4_bio_write_page+0x400/0x560
-[ 1538.559290] stacktrace:
-[ 1538.559455]       ext4_bio_write_page+0x400/0x560
-[ 1538.559765]       mpage_submit_page+0x5c/0x80
-[ 1538.560051]       mpage_map_and_submit_buffers+0x15a/0x250
-[ 1538.560409]       mpage_map_and_submit_extent+0x134/0x530
-[ 1538.560764]       ext4_writepages+0x798/0x990
-[ 1538.561057]       do_writepages+0xcf/0x1c0
-[ 1538.561329]       __writeback_single_inode+0x58/0x3f0
-[ 1538.561662]       writeback_sb_inodes+0x210/0x540
-[ 1538.561973]       __writeback_inodes_wb+0x4c/0xe0
-[ 1538.562283]       wb_writeback+0x298/0x450
-[ 1538.562555]       wb_do_writeback+0x29e/0x320
-[ 1538.562842]       wb_workfn+0x6a/0x2c0
-[ 1538.563095]       process_one_work+0x302/0x650
-[ 1538.563387]       worker_thread+0x55/0x400
-[ 1538.563658]       kthread+0xf0/0x120
-[ 1538.563895]       ret_from_fork+0x1f/0x30
-[ 1538.564161] ---------------------------------------------------
-[ 1538.564548] information that might be helpful
-[ 1538.564832] ---------------------------------------------------
-[ 1538.565223] CPU: 1 PID: 46539 Comm: dirstress Not tainted 5.18.0-rc5-xfstests-dept-00021-g8d3d751c9964 #571
-[ 1538.565854] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-[ 1538.566394] Call Trace:
-[ 1538.566559]  <TASK>
-[ 1538.566701]  dump_stack_lvl+0x4f/0x68
-[ 1538.566945]  print_circle.cold+0x15b/0x169
-[ 1538.567218]  ? print_circle+0xe0/0xe0
-[ 1538.567461]  cb_check_dl+0x55/0x60
-[ 1538.567687]  bfs+0xd5/0x1b0
-[ 1538.567874]  add_dep+0xd3/0x1a0
-[ 1538.568083]  ? __filemap_get_folio+0x3e4/0x420
-[ 1538.568374]  add_wait+0xe3/0x250
-[ 1538.568590]  ? __filemap_get_folio+0x3e4/0x420
-[ 1538.568886]  dept_wait_split_map+0xb1/0x130
-[ 1538.569163]  folio_wait_bit_common+0x2fa/0x460
-[ 1538.569456]  ? lock_is_held_type+0xfc/0x130
-[ 1538.569733]  __filemap_get_folio+0x3e4/0x420
-[ 1538.570013]  ? __lock_release+0x1b2/0x2c0
-[ 1538.570278]  pagecache_get_page+0x11/0x40
-[ 1538.570543]  ext4_mb_init_group+0x80/0x2e0
-[ 1538.570813]  ? ext4_get_group_desc+0xb2/0x200
-[ 1538.571102]  ext4_mb_good_group_nolock+0x2a3/0x2d0
-[ 1538.571418]  ext4_mb_regular_allocator+0x391/0x780
-[ 1538.571733]  ? rcu_read_lock_sched_held+0x3f/0x70
-[ 1538.572044]  ? trace_kmem_cache_alloc+0x2c/0xd0
-[ 1538.572343]  ? kmem_cache_alloc+0x1f7/0x3f0
-[ 1538.572618]  ext4_mb_new_blocks+0x44e/0x720
-[ 1538.572896]  ext4_ext_map_blocks+0x7f1/0xd00
-[ 1538.573179]  ? find_held_lock+0x2b/0x80
-[ 1538.573434]  ext4_map_blocks+0x19e/0x680
-[ 1538.573693]  ext4_getblk+0x5f/0x1f0
-[ 1538.573927]  ext4_bread+0xc/0x70
-[ 1538.574141]  ext4_append+0x48/0xf0
-[ 1538.574369]  ext4_init_new_dir+0xc8/0x160
-[ 1538.574634]  ext4_mkdir+0x19a/0x320
-[ 1538.574866]  vfs_mkdir+0x83/0xe0
-[ 1538.575082]  do_mkdirat+0x8c/0x130
-[ 1538.575308]  __x64_sys_mkdir+0x29/0x30
-[ 1538.575557]  do_syscall_64+0x40/0x90
-[ 1538.575795]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[ 1538.576128] RIP: 0033:0x7f0960466b07
-[ 1538.576367] Code: 1f 40 00 48 8b 05 89 f3 0c 00 64 c7 00 5f 00 00 00 b8 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 b8 53 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 59 f3 0c 00 f7 d8 64 89 01 48
-[ 1538.577576] RSP: 002b:00007ffd0fa955a8 EFLAGS: 00000246 ORIG_RAX: 0000000000000053
-[ 1538.578069] RAX: ffffffffffffffda RBX: 0000000000000239 RCX: 00007f0960466b07
-[ 1538.578533] RDX: 0000000000000000 RSI: 00000000000001ff RDI: 00007ffd0fa955d0
-[ 1538.578995] RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000010
-[ 1538.579458] R10: 00007ffd0fa95345 R11: 0000000000000246 R12: 00000000000003e8
-[ 1538.579923] R13: 0000000000000000 R14: 00007ffd0fa955d0 R15: 00007ffd0fa95dd0
-[ 1538.580389]  </TASK>
-[ 1540.581382] EXT4-fs (vdb): mounted filesystem with ordered data mode. Quota mode: none.
- [20:11:24] 8s
-
-
-P.S.  Later on the console, the test ground to the halt because DEPT
-started WARNING over and over and over again....
-
-[ 3129.686102] DEPT_WARN_ON: dt->ecxt_held_pos == DEPT_MAX_ECXT_HELD
-[ 3129.686396]  ? __might_fault+0x32/0x80
-[ 3129.686660] WARNING: CPU: 1 PID: 107320 at kernel/dependency/dept.c:1537 add_ecxt+0x1c0/0x1d0
-[ 3129.687040]  ? __might_fault+0x32/0x80
-[ 3129.687282] CPU: 1 PID: 107320 Comm: aio-stress Tainted: G        W         5.18.0-rc5-xfstests-dept-00021-g8d3d751c9964 #571
-
-with multiple CPU's completely spamming the serial console.  This
-should probably be a WARN_ON_ONCE, or some thing that disables DEPT
-entirely, since apparently won't be any useful DEPT reports (or any
-useful kernel work, for that matteR) is going to be happening after
-this.
-
+- Eric
