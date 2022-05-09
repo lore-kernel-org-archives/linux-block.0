@@ -2,188 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 447ECC433F5
-	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 13:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99B3DC433F5
+	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 13:23:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235304AbiEINUO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 May 2022 09:20:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45296 "EHLO
+        id S235915AbiEIN1u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 May 2022 09:27:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235737AbiEINUB (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 09:20:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 02190275FF
-        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 06:15:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652102142;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=FnJcKq4yzTm/6Z9rAR5yEtYWk0jc0IRNNX7S/5GvlzQ=;
-        b=TorYASL4tnwuqvUyOgZe1H7LcaJvXpTmBwezf0KQzdD/Q91EdO3HisI8VmiGCHTaXM/cvM
-        f9X3cSf1RZmkO+T2R2RXGQcycR1i1pXi6T3w/R1u/tLlBJY3H25gZ0vv+jXji4sRLZD/pc
-        N0//zLpUa9UntMOUlquilcWp8wmfiX8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-39-_mBnqn2wO4anM-wkiqrMBQ-1; Mon, 09 May 2022 09:15:38 -0400
-X-MC-Unique: _mBnqn2wO4anM-wkiqrMBQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6EDC71161A70;
-        Mon,  9 May 2022 13:15:18 +0000 (UTC)
-Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 70D2A40D017A;
-        Mon,  9 May 2022 13:15:13 +0000 (UTC)
-Date:   Mon, 9 May 2022 21:15:08 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Cc:     ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: Follow up on UBD discussion
-Message-ID: <YnkT3BXnm0RW3L7f@T590>
-References: <874k27rfwm.fsf@collabora.com>
- <YnDhorlKgOKiWkiz@T590>
- <8a52ed85-3ffa-44a4-3e28-e13cdc793732@linux.alibaba.com>
- <YnaonsoDjQjrutRb@T590>
- <55edea6e-e7dc-054a-b79b-fcfc40c22f2f@linux.alibaba.com>
- <YnjEaM5T2aO0mlyi@T590>
- <2ed84b17-e9cf-973f-170c-f56eb90517ba@linux.alibaba.com>
+        with ESMTP id S235895AbiEIN1l (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 09:27:41 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 384E31E251A;
+        Mon,  9 May 2022 06:23:28 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id bu29so23828707lfb.0;
+        Mon, 09 May 2022 06:23:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-transfer-encoding:content-language;
+        bh=1K2obVx3YG8QEPrenU4QI5guJQ8Phbo/6yP70JTaawU=;
+        b=ctuOdHCyg4DfJDMuVyrfXjafqsIBGrPq9u27BiBAquJftMSjYFJ55Dztcsr8bNMn0w
+         oeM//L+QbMc5cqR/YL4ZYXu9SspJYNvQLipuO/dxUV/COK7qJD4YPieEuwN+Da6gnICg
+         tiL5ifQOF61sLM7j5k+TfKf3keD2QE9+mfbjkcLau1uokLQ0TJXXWGRj10hWZc6mNTCY
+         ZiPlrCXkxh/d8AP+hVzj144bdbLZ6gunWEeo3XTOHdZMf+1T4Dk4fDvhUDM82hKq6q3x
+         a24gfPwl0eQuynyAnF+v9tUB7WbmPEsnBDi3opOHoOjQkJbqyH8fYmRySBDQ1lHi3t+I
+         lY6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-transfer-encoding
+         :content-language;
+        bh=1K2obVx3YG8QEPrenU4QI5guJQ8Phbo/6yP70JTaawU=;
+        b=mIkc0TZp+d1LwPecfcRJtDyH8BAqmNXPw1gYvuKs2yAX+y/qu14tJVn5mKfiCdAUiD
+         J1PqhiIjZpmt4I41YmLtpvg+xbziJgzNGHXGMiOFa6DvXp7/eZptbtwLH2IAhvwlPCxS
+         NabvguI5sndh9CnuM7+Nbt5RqzIBU1d3G0QPTQgzq002Of+D7T6HGgaawOrPEptXXb3P
+         eUYjlsTq3r2LFbCvBBF+mq0oXHqqNcckY+cE/SOi0e0PXu5RldMDfIevfXgKBHyWePHP
+         0sgqvfjsdEogwf9f3gIvaQlDCS3kpPAdvafbIWiQQWGKMr+zn7KSbobrxskZHZW/vLap
+         5kFg==
+X-Gm-Message-State: AOAM530ONvoAN48p67Wf1oX/vzg/HnhHcWEtfhjcp+b/GIzlzZTrFcLh
+        BlXgCeuNzxRrgAUVOGngXGI=
+X-Google-Smtp-Source: ABdhPJy54uNV0a0Y5a5xZUhU6QHCMVecZmAJ2frVW6KAYppShjM44jXuH8rdrMemcTVYgMIiSG1E7g==
+X-Received: by 2002:ac2:4c49:0:b0:473:ca4f:9345 with SMTP id o9-20020ac24c49000000b00473ca4f9345mr12622420lfk.203.1652102606387;
+        Mon, 09 May 2022 06:23:26 -0700 (PDT)
+Received: from [192.168.1.7] ([212.22.223.21])
+        by smtp.gmail.com with ESMTPSA id h5-20020a056512338500b0047255d2111csm1941442lfg.75.2022.05.09.06.23.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 May 2022 06:23:25 -0700 (PDT)
+Subject: Re: [PATCH v3 00/21] xen: simplify frontend side ring setup
+To:     Juergen Gross <jgross@suse.com>, xen-devel@lists.xenproject.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        netdev@vger.kernel.org, linux-scsi@vger.kernel.org,
+        linux-usb@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-integrity@vger.kernel.org, linux-pci@vger.kernel.org
+Cc:     Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Oleksandr Andrushchenko <oleksandr_andrushchenko@epam.com>,
+        David Airlie <airlied@linux.ie>,
+        Daniel Vetter <daniel@ffwll.ch>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, alsa-devel@alsa-project.org,
+        Peter Huewe <peterhuewe@gmx.de>,
+        Jarkko Sakkinen <jarkko@kernel.org>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Bjorn Helgaas <bhelgaas@google.com>
+References: <20220505081640.17425-1-jgross@suse.com>
+From:   Oleksandr <olekstysh@gmail.com>
+Message-ID: <409fb110-646a-2973-aff3-c97fdfb9bfbc@gmail.com>
+Date:   Mon, 9 May 2022 16:23:24 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2ed84b17-e9cf-973f-170c-f56eb90517ba@linux.alibaba.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+In-Reply-To: <20220505081640.17425-1-jgross@suse.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 09, 2022 at 07:53:05PM +0800, Xiaoguang Wang wrote:
-> hi,
-> 
-> >
-> >>>> Second, I'd like to share some ideas on UBD. I'm not sure if they are
-> >>>> reasonable so please figure out my mistakes.
-> >>>>
-> >>>> 1) UBD issues one sqe to commit last completed request and fetch a new
-> >>>> one. Then, blk-mq's queue_rq() issues a new UBD IO request and completes
-> >>>> one cqe for the fetch command. We have evaluated that io_submit_sqes()
-> >>>> costs some CPU and steps of building a new sqe may lower throughput.
-> >>>> Here I'd like to give a new solution: never submit sqe but trump up a
-> >>>> cqe(with information of new UBD IO request) when calling queue_rq(). I
-> >>>> am inspired by one io_uring flag: IORING_POLL_ADD_MULTI, with which a
-> >>>> user issues only one sqe for polling an fd and repeatedly gets multiple
-> >>>> cqes when new events occur. Dose this solution break the architecture of
-> >>>> UBD?
-> >>> But each cqe has to be associated with one sqe, if I understand
-> >>> correctly.
-> >> Yeah, for current io_uring implementation, it is. But if io_uring offers below
-> >> helper:
-> >> void io_gen_cqe_direct(struct file *file, u64 user_data, s32 res, u32 cflags)
-> >> {
-> >>         struct io_ring_ctx *ctx;
-> >>         ctx = file->private_data;
-> >>
-> >>         spin_lock(&ctx->completion_lock);
-> >>         __io_fill_cqe(ctx, user_data, res, cflags);
-> >>         io_commit_cqring(ctx);
-> >>         spin_unlock(&ctx->completion_lock);
-> >>         io_cqring_ev_posted(ctx);
-> >> }
-> >>
-> >> Then in ubd driver:
-> >> 1) device setup stage
-> >> We attach io_uring files and user_data to every ubd hard queue.
-> >>
-> >> 2) when blk-mq->queue_rq() is called.
-> >> io_gen_cqe_direct() will be called in ubd's queue_rq, and we put ubd io request's
-> >> qid and tag info into cqe's res field, then we don't need to issue sqe to fetch io cmds.
-> > The above way is actually anti io_uring design, and I don't think it may
-> > improve much since submitting UBD_IO_COMMIT_AND_FETCH_REQ is pretty lightweight.
-> Actually I don't come up with this idea mostly for performance reason :) Just try to
-> simplify codes a bit:
-> 1) In current implementation, ubdsrv will need to submit queue depth number of
-> sqes firstly, and ubd_ctrl_start_dev() will also need to wait all sqes to be submitted.
 
-Yes, because handling IO need the associated io_uring commend reached to ubd driver
-first.
+On 05.05.22 11:16, Juergen Gross wrote:
 
-> 2) Try to make ubd_queue_rq simpler, it maybe just call one io_gen_cqe_direct().
-
-But it has to work at least. Also not see real simplification in your
-suggestion.
-
-> 
-> >
-> > Also without re-submitting UBD_IO_COMMIT_AND_FETCH_REQ command, how can you
-> > commit io handling result from ubd server and ask ubd driver to complete
-> > io request?
-> No, I don't mean to remove COMMIT command, we still need io_uring async
-> command feature to support ubd COMMIT or GETDATA command.
-
-GETDATA command has been removed, because task_work_add() is used to
-complete io_uring command(UBD_IO_COMMIT_AND_FETCH_REQ or UBD_IO_FETCH_REQ),
-so pinning pages and copying data is always done in ubdsrv daemon
-context.
-
-You may not get the whole idea:
-
-1) UBD_IO_FETCH_REQ is only submitted to ubd driver before starting
-device because at the beginning there isn't any IO handled, so no need
-to send COMMIT.
-
-2) after device is started, only UBD_IO_COMMIT_AND_FETCH_REQ is
-submitted for both committing io handling result to driver and fetching new
-io request, and UBD_IO_COMMIT_AND_FETCH_REQ can be thought as combined
-command of COMMIT and UBD_IO_FETCH_REQ.
-
-3) COMMIT command is just submitted after queue is aborted, since we
-needn't to fetch request any more, and just need to commit in-flight
-request's result to ubd driver.
-
-If you meant using COMMIT with io_gen_cqe_direct(), what benefit can we
-get? Still one command is required for handling IO, that is exactly what
-UBD_IO_COMMIT_AND_FETCH_REQ is doing.
-
-> 
-> I have another concern that currently there are may flags in ubd kernel or
-> ubdsrv, such as:
-> #define UBDSRV_NEED_FETCH_RQ (1UL << 0)
-
-UBDSRV_NEED_FETCH_RQ means the to be queued io_uring command has to fetch
-new io request from ubd driver.
-
-> #define UBDSRV_NEED_COMMIT_RQ_COMP (1UL << 1)
-
-UBDSRV_NEED_COMMIT_RQCOMP means the to be queued io_uring command has to
-commit io handling result to ubd driver.
-
-> #define UBDSRV_IO_FREE (1UL << 2)
-
-Only io with this flag can be queued to ubd driver. Once this flag is
-cleared, it means the io command has been submitted to ubd driver.
-
-> #define UBDSRV_IO_HANDLING (1UL << 3)
-
-UBDSRV_IO_HANDLING means the io command is being handled by target code.
-
-> #define UBDSRV_NEED_GET_DATA (1UL << 4)
-
-The above one has been removed.
-
-> 
-> Some of their names looks weird, for example UBDSRV_IO_FREE. I think
-> more flags may result in more state machine error.
-
-Figuring out perfect name is always not easy, but I don't think they
-are weird since the above short comments explained them clearly.
+Hello Juergen.
 
 
-Thanks,
-Ming
+
+> Many Xen PV frontends share similar code for setting up a ring page
+> (allocating and granting access for the backend) and for tearing it
+> down.
+>
+> Create new service functions doing all needed steps in one go.
+>
+> This requires all frontends to use a common value for an invalid
+> grant reference in order to make the functions idempotent.
+>
+> Changes in V3:
+> - new patches 1 and 2, comments addressed
+>
+> Changes in V2:
+> - new patch 9 and related changes in patches 10-18
+>
+> Juergen Gross (21):
+>    xen: update grant_table.h
+>    xen/grant-table: never put a reserved grant on the free list
+>    xen/blkfront: switch blkfront to use INVALID_GRANT_REF
+>    xen/netfront: switch netfront to use INVALID_GRANT_REF
+>    xen/scsifront: remove unused GRANT_INVALID_REF definition
+>    xen/usb: switch xen-hcd to use INVALID_GRANT_REF
+>    xen/drm: switch xen_drm_front to use INVALID_GRANT_REF
+>    xen/sound: switch xen_snd_front to use INVALID_GRANT_REF
+>    xen/dmabuf: switch gntdev-dmabuf to use INVALID_GRANT_REF
+>    xen/shbuf: switch xen-front-pgdir-shbuf to use INVALID_GRANT_REF
+>    xen: update ring.h
+>    xen/xenbus: add xenbus_setup_ring() service function
+>    xen/blkfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/netfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/tpmfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/drmfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/pcifront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/scsifront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/usbfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/sndfront: use xenbus_setup_ring() and xenbus_teardown_ring()
+>    xen/xenbus: eliminate xenbus_grant_ring()
+
+
+For the patches that touch PV display (#07, #16), PV sound (#08, #20) 
+and shared buffer framework used by both frontends (#10):
+
+Reviewed-by: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+
+
+Also I didn't see any issues with these frontends while testing on Arm64 
+based board.
+So, you can also add:
+
+[Arm64 only]
+Tested-by: Oleksandr Tyshchenko <oleksandr_tyshchenko@epam.com>
+
+
+Thanks!
+
+
+>
+>   drivers/block/xen-blkfront.c                |  57 +++----
+>   drivers/char/tpm/xen-tpmfront.c             |  18 +--
+>   drivers/gpu/drm/xen/xen_drm_front.h         |   9 --
+>   drivers/gpu/drm/xen/xen_drm_front_evtchnl.c |  43 ++----
+>   drivers/net/xen-netfront.c                  |  85 ++++-------
+>   drivers/pci/xen-pcifront.c                  |  19 +--
+>   drivers/scsi/xen-scsifront.c                |  31 +---
+>   drivers/usb/host/xen-hcd.c                  |  65 ++------
+>   drivers/xen/gntdev-dmabuf.c                 |  13 +-
+>   drivers/xen/grant-table.c                   |  12 +-
+>   drivers/xen/xen-front-pgdir-shbuf.c         |  18 +--
+>   drivers/xen/xenbus/xenbus_client.c          |  82 +++++++---
+>   include/xen/grant_table.h                   |   2 -
+>   include/xen/interface/grant_table.h         | 161 ++++++++++++--------
+>   include/xen/interface/io/ring.h             |  19 ++-
+>   include/xen/xenbus.h                        |   4 +-
+>   sound/xen/xen_snd_front_evtchnl.c           |  44 ++----
+>   sound/xen/xen_snd_front_evtchnl.h           |   9 --
+>   18 files changed, 287 insertions(+), 404 deletions(-)
+>
+-- 
+Regards,
+
+Oleksandr Tyshchenko
 
