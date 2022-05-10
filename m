@@ -2,199 +2,247 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FE0BC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 23:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B502C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 23:48:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238018AbiEJXlV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 19:41:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48812 "EHLO
+        id S229927AbiEJXse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 19:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45260 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238564AbiEJXlN (ORCPT
+        with ESMTP id S236563AbiEJXsd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 19:41:13 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A38DA4F9FE
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:41:08 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo04.lge.com) (156.147.1.127)
-        by 156.147.23.52 with ESMTP; 11 May 2022 08:41:07 +0900
-X-Original-SENDERIP: 156.147.1.127
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.127 with ESMTP; 11 May 2022 08:41:07 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Wed, 11 May 2022 08:39:29 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Hyeonggon Yoo <42.hyeyoo@gmail.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
-Message-ID: <20220510233929.GB18445@X58A-UD3R>
-References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
- <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
- <YnYd0hd+yTvVQxm5@hyeyoo>
- <20220509001637.GA6047@X58A-UD3R>
- <YnpJ9Mtf+pjx4JYm@hyeyoo>
+        Tue, 10 May 2022 19:48:33 -0400
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01FBD606DB
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:48:32 -0700 (PDT)
+Received: by mail-pf1-f172.google.com with SMTP id bo5so509291pfb.4
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:48:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=3v+p0mkjcjVcYZsVzpz7K33Xoaqzsk12OmOvm8nvT6E=;
+        b=pefuasflU7Th0lP8Hv4JbkGoDmnvnaoH6kl1ODGMuN0/vTWTx/XQKQaJsRaK5iZ7io
+         BO4EOt/YzRfpgm09qFP2uSxrVN8xBDXtdHjijkntWJncxcbddOKtUP/lmGRT3GERcxSJ
+         BBCvYQMCazGbGtValWgkBUYML30wqtxbzOJpCyzYKXfPqHPpJCPcHd+h26vkRZ4CNVBp
+         yrr1p3lkH0NroPFd1Zks7y0ZZ1+Rni2KR15rAGM6Q5FnW5zYOIg0d2PF7F25dsaqX+yY
+         /FX0KOuIxGqUXhPd7OTD+kTZVgk4DTSAwxfN7KkiXCd6q0EDgr86rQGWBFHQ4eHKmEKu
+         ZUtg==
+X-Gm-Message-State: AOAM532/JJDlEMEABB/LJdN1WklOAyM6ysuWLUg2Z/LVjaOuL3buHXAs
+        IQM7+WW0sSgUJxx2tbumFoo=
+X-Google-Smtp-Source: ABdhPJxBH3ZzFAMX8tmiVtXSkg7M8wADCwG50qATAXW/1EUPKFBzrhrpdaFwRg4hdHcUNRL//MbNtQ==
+X-Received: by 2002:a05:6a00:174a:b0:4fd:ac35:6731 with SMTP id j10-20020a056a00174a00b004fdac356731mr22714238pfc.71.1652226511410;
+        Tue, 10 May 2022 16:48:31 -0700 (PDT)
+Received: from [10.69.0.118] ([131.107.8.246])
+        by smtp.gmail.com with ESMTPSA id s20-20020a170902989400b0015e8d4eb206sm197883plp.80.2022.05.10.16.48.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 May 2022 16:48:31 -0700 (PDT)
+Message-ID: <6eab7100-168f-e371-dbc4-a8946925099f@grimberg.me>
+Date:   Tue, 10 May 2022 16:48:29 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YnpJ9Mtf+pjx4JYm@hyeyoo>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.5.0
+Subject: Re: [PATCH v2 blktests] tests/nvme: add tests for error logging
+Content-Language: en-US
+To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Cc:     Alan Adamson <alan.adamson@oracle.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "osandov@fb.com" <osandov@fb.com>
+References: <20220510164304.86178-1-alan.adamson@oracle.com>
+ <20220510164304.86178-2-alan.adamson@oracle.com>
+ <da090342-f3c5-b3fa-d062-553a4f8a522c@grimberg.me>
+ <20220510232919.xoxet3k7cxboixmt@shindev>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220510232919.xoxet3k7cxboixmt@shindev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 10, 2022 at 08:18:12PM +0900, Hyeonggon Yoo wrote:
-> On Mon, May 09, 2022 at 09:16:37AM +0900, Byungchul Park wrote:
-> > On Sat, May 07, 2022 at 04:20:50PM +0900, Hyeonggon Yoo wrote:
-> > > On Fri, May 06, 2022 at 09:11:35AM +0900, Byungchul Park wrote:
-> > > > Linus wrote:
-> > > > >
-> > > > > On Wed, May 4, 2022 at 1:19 AM Byungchul Park <byungchul.park@lge.com> wrote:
-> > > > > >
-> > > > > > Hi Linus and folks,
-> > > > > >
-> > > > > > I've been developing a tool for detecting deadlock possibilities by
-> > > > > > tracking wait/event rather than lock(?) acquisition order to try to
-> > > > > > cover all synchonization machanisms.
-> > > > > 
-> > > > > So what is the actual status of reports these days?
-> > > > > 
-> > > > > Last time I looked at some reports, it gave a lot of false positives
-> > > > > due to mis-understanding prepare_to_sleep().
-> > > > 
-> > > > Yes, it was. I handled the case in the following way:
-> > > > 
-> > > > 1. Stage the wait at prepare_to_sleep(), which might be used at commit.
-> > > >    Which has yet to be an actual wait that Dept considers.
-> > > > 2. If the condition for sleep is true, the wait will be committed at
-> > > >    __schedule(). The wait becomes an actual one that Dept considers.
-> > > > 3. If the condition is false and the task gets back to TASK_RUNNING,
-> > > >    clean(=reset) the staged wait.
-> > > > 
-> > > > That way, Dept only works with what actually hits to __schedule() for
-> > > > the waits through sleep.
-> > > > 
-> > > > > For this all to make sense, it would need to not have false positives
-> > > > > (or at least a very small number of them together with a way to sanely
-> > > > 
-> > > > Yes. I agree with you. I got rid of them that way I described above.
-> > > >
-> > > 
-> > > IMHO DEPT should not report what lockdep allows (Not talking about
-> > 
-> > No.
-> > 
-> > > wait events). I mean lockdep allows some kind of nested locks but
-> > > DEPT reports them.
-> > 
-> > You have already asked exactly same question in another thread of
-> > LKML. That time I answered to it but let me explain it again.
-> > 
-> > ---
-> > 
-> > CASE 1.
-> > 
-> >    lock L with depth n
-> >    lock_nested L' with depth n + 1
-> >    ...
-> >    unlock L'
-> >    unlock L
-> > 
-> > This case is allowed by Lockdep.
-> > This case is allowed by DEPT cuz it's not a deadlock.
-> > 
-> > CASE 2.
-> > 
-> >    lock L with depth n
-> >    lock A
-> >    lock_nested L' with depth n + 1
-> >    ...
-> >    unlock L'
-> >    unlock A
-> >    unlock L
-> > 
-> > This case is allowed by Lockdep.
-> > This case is *NOT* allowed by DEPT cuz it's a *DEADLOCK*.
-> >
-> 
-> Yeah, in previous threads we discussed this [1]
-> 
-> And the case was:
-> 	scan_mutex -> object_lock -> kmemleak_lock -> object_lock
-> And dept reported:
-> 	object_lock -> kmemleak_lock, kmemleak_lock -> object_lock as
-> 	deadlock.
-> 
-> But IIUC - What DEPT reported happens only under scan_mutex and
-> It is not simple just not to take them because the object can be removed from the
-> list and freed while scanning via kmemleak_free() without kmemleak_lock and object_lock.
 
-That should be one of the following order:
-
-1. kmemleak_lock -> object_lock -> object_lock(nested)
-2. object_lock -> object_lock(nested) -> kmemleak_lock
-
-> Just I'm still not sure that someone will fix the warning in the future - even if the
-> locking rule is not good - if it will not cause a real deadlock.
-
-There's more important thing than making code just work for now. For
-example, maintainance, communcation via code between current developers
-and potential new commers in the future and so on.
-
-At least, a comment describing why the wrong order in the code is safe
-should be added. I wouldn't allow the current order in the code if I
-were the maintainer.
-
-	Byungchul
-
-> > ---
-> > 
-> > The following scenario would explain why CASE 2 is problematic.
-> > 
-> >    THREAD X			THREAD Y
-> > 
-> >    lock L with depth n
-> > 				lock L' with depth n
-> >    lock A
-> > 				lock A
-> >    lock_nested L' with depth n + 1
-> > 				lock_nested L'' with depth n + 1
-> >    ...				...
-> >    unlock L'			unlock L''
-> >    unlock A			unlock A
-> >    unlock L			unlock L'
-> > 
-> > Yes. I need to check if the report you shared with me is a true one, but
-> > it's not because DEPT doesn't work with *_nested() APIs.
-> >
+>> On 5/10/22 19:43, Alan Adamson wrote:
+>>> Test nvme error logging by injecting errors. Kernel must have FAULT_INJECTION
+>>> and FAULT_INJECTION_DEBUG_FS configured to use error injector. Tests can be
+>>> run with or without NVME_VERBOSE_ERRORS configured.
+>>>
+>>> These test verify the functionality delivered by the follow:
+>>> 	commit bd83fe6f2cd2 ("nvme: add verbose error logging")
+>>>
+>>> Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
+>>> Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+>>> ---
+>>>    tests/nvme/039     | 185 +++++++++++++++++++++++++++++++++++++++++++++
+>>>    tests/nvme/039.out |   7 ++
+>>>    2 files changed, 192 insertions(+)
+>>>    create mode 100755 tests/nvme/039
+>>>    create mode 100644 tests/nvme/039.out
+>>>
+>>> diff --git a/tests/nvme/039 b/tests/nvme/039
+>>> new file mode 100755
+>>> index 000000000000..e6d45a6e3fe5
+>>> --- /dev/null
+>>> +++ b/tests/nvme/039
+>>> @@ -0,0 +1,185 @@
+>>> +#!/bin/bash
+>>> +# SPDX-License-Identifier: GPL-3.0+
+>>> +# Copyright (C) 2022 Oracle and/or its affiliates
+>>> +#
+>>> +# Test nvme error logging by injecting errors. Kernel must have FAULT_INJECTION
+>>> +# and FAULT_INJECTION_DEBUG_FS configured to use error injector. Tests can be
+>>> +# run with or without NVME_VERBOSE_ERRORS configured.
+>>> +#
+>>> +# Test for commit bd83fe6f2cd2 ("nvme: add verbose error logging").
+>>> +
+>>> +. tests/nvme/rc
+>>> +DESCRIPTION="test error logging"
+>>> +QUICK=1
+>>> +
+>>> +requires() {
+>>> +	_nvme_requires
+>>> +	_have_kernel_option FAULT_INJECTION && \
+>>> +	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
+>>> +}
+>>> +
+>>> +declare -A NS_DEV_FAULT_INJECT_SAVE
+>>> +declare -A CTRL_DEV_FAULT_INJECT_SAVE
+>>> +
+>>> +save_err_inject_attr()
+>>> +{
+>>> +	local a
+>>> +
+>>> +	for a in /sys/kernel/debug/"${ns_dev}"/fault_inject/*; do
+>>> +		NS_DEV_FAULT_INJECT_SAVE[${a}]=$(<"${a}")
+>>> +	done
+>>> +	for a in /sys/kernel/debug/"${ctrl_dev}"/fault_inject/*; do
+>>> +		CTRL_DEV_FAULT_INJECT_SAVE[${a}]=$(<"${a}")
+>>> +	done
+>>> +}
+>>> +
+>>> +restore_err_inject_attr()
+>>> +{
+>>> +	local a
+>>> +
+>>> +	for a in /sys/kernel/debug/"${ns_dev}"/fault_inject/*; do
+>>> +		echo "${NS_DEV_FAULT_INJECT_SAVE[${a}]}" > "${a}"
+>>> +	done
+>>> +	for a in /sys/kernel/debug/"${ctrl_dev}"/fault_inject/*; do
+>>> +		echo "${CTRL_DEV_FAULT_INJECT_SAVE[${a}]}" > "${a}"
+>>> +	done
+>>> +}
+>>> +
+>>> +set_verbose_prob_retry()
+>>> +{
+>>> +	echo 0 > /sys/kernel/debug/"$1"/fault_inject/verbose
+>>> +	echo 100 > /sys/kernel/debug/"$1"/fault_inject/probability
+>>> +	echo 1 > /sys/kernel/debug/"$1"/fault_inject/dont_retry
+>>> +}
+>>> +
+>>> +set_status_time()
+>>> +{
+>>> +	echo "$1" > /sys/kernel/debug/"$3"/fault_inject/status
+>>> +	echo "$2" > /sys/kernel/debug/"$3"/fault_inject/times
+>>> +}
+>>> +
+>>> +inject_unrec_read_err()
+>>> +{
+>>> +	# Inject a 'Unrecovered Read Error' error on a READ
+>>> +	set_status_time 0x281 1 "$1"
+>>> +
+>>> +	dd if=/dev/"$1" of=/dev/null bs=512 count=1 iflag=direct \
+>>> +	    2> /dev/null 1>&2
+>>> +
+>>> +	if ${nvme_verbose_errors}; then
+>>> +		dmesg -t | tail -2 | grep "Unrecovered Read Error (" | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	else
+>>> +		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Read/g' | \
+>>> +		    sed 's/I\/O Error/Unrecovered Read Error/g' | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	fi
+>>> +}
+>>> +
+>>> +inject_invalid_read_err()
+>>> +{
+>>> +	# Inject a valid invalid error status (0x375) on a READ
+>>> +	set_status_time 0x375 1 "$1"
+>>> +
+>>> +	dd if=/dev/"$1" of=/dev/null bs=512 count=1 iflag=direct \
+>>> +	    2> /dev/null 1>&2
+>>> +
+>>> +	if ${nvme_verbose_errors}; then
+>>> +		dmesg -t | tail -2 | grep "Unknown (" | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	else
+>>> +		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Read/g' | \
+>>> +		    sed 's/I\/O Error/Unknown/g' | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	fi
+>>> +}
+>>> +
+>>> +inject_write_fault()
+>>> +{
+>>> +	# Inject a 'Write Fault' error on a WRITE
+>>> +	set_status_time 0x280 1 "$1"
+>>> +
+>>> +	dd if=/dev/zero of=/dev/"$1" bs=512 count=1 oflag=direct \
+>>> +	    2> /dev/null 1>&2
+>>> +
+>>> +	if ${nvme_verbose_errors}; then
+>>> +		dmesg -t | tail -2 | grep "Write Fault (" | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	else
+>>> +		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Write/g' | \
+>>> +		    sed 's/I\/O Error/Write Fault/g' | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	fi
+>>> +}
+>>> +
+>>> +inject_id_admin()
+>>> +{
+>>> +	# Inject a valid (Identify) Admin command
+>>> +	set_status_time 0x286 1000 "$1"
+>>> +
+>>> +	nvme admin-passthru /dev/"$1" --opcode=0x06 --data-len=4096 \
+>>> +	    --cdw10=1 -r 2> /dev/null 1>&2
+>>> +
+>>> +	if ${nvme_verbose_errors}; then
+>>> +		dmesg -t | tail -1 | grep "Access Denied (" | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	else
+>>> +		dmesg -t | tail -1 | grep "Admin Cmd(" | \
+>>> +		    sed 's/Admin Cmd/Identify/g' | \
+>>> +		    sed 's/I\/O Error/Access Denied/g' | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	fi
+>>> +}
+>>> +
+>>> +inject_invalid_cmd()
+>>> +{
+>>> +	# Inject an invalid command (0x96)
+>>> +	set_status_time 0x1 1 "$1"
+>>> +
+>>> +	nvme admin-passthru /dev/"$1" --opcode=0x96 --data-len=4096 \
+>>> +	    --cdw10=1 -r 2> /dev/null 1>&2
+>>> +	if ${nvme_verbose_errors}; then
+>>> +		dmesg -t | tail -1 | grep "Invalid Command Opcode (" | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	else
+>>> +		dmesg -t | tail -1 | grep "Admin Cmd(" | \
+>>> +		    sed 's/Admin Cmd/Unknown/g' | \
+>>> +		    sed 's/I\/O Error/Invalid Command Opcode/g' | \
+>>> +		    sed 's/nvme.*://g'
+>>> +	fi
+>>> +}
+>>> +
+>>
+>> All of the above seems like they belong in common code...
 > 
-> Sorry, It was not right just to say DEPT doesn't work with _nested() APIs.
+> So far, this nvme/039 is the only one user of the helper functions above. Do you
+> foresee that future new test cases in nvmeof-mp or srp group will use them?
 > 
-> > 	Byungchul
-> 
-> [1] https://lore.kernel.org/lkml/20220304002809.GA6112@X58A-UD3R/
-> 
-> -- 
-> Thanks,
-> Hyeonggon
+
+I can absolutely see other tests inject errors. I meant that this code
+should live in nvme/rc
