@@ -2,202 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A275C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 11:20:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 483E1C4332F
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 12:29:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240893AbiEJLYd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 07:24:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45308 "EHLO
+        id S241776AbiEJMdw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 08:33:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51670 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240913AbiEJLY3 (ORCPT
+        with ESMTP id S238445AbiEJMdv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 07:24:29 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4544D1868CB;
-        Tue, 10 May 2022 04:20:28 -0700 (PDT)
-Received: from fraeml709-chm.china.huawei.com (unknown [172.18.147.201])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KyFqg38W9z6GD8s;
-        Tue, 10 May 2022 19:17:03 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml709-chm.china.huawei.com (10.206.15.37) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 10 May 2022 13:20:26 +0200
-Received: from localhost.localdomain (10.69.192.58) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 10 May 2022 12:20:24 +0100
-From:   John Garry <john.garry@huawei.com>
-To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        John Garry <john.garry@huawei.com>
-Subject: [RFC PATCH 2/2] sbitmap: Spread sbitmap word allocation over NUMA nodes
-Date:   Tue, 10 May 2022 19:14:34 +0800
-Message-ID: <1652181274-136198-3-git-send-email-john.garry@huawei.com>
-X-Mailer: git-send-email 2.8.1
-In-Reply-To: <1652181274-136198-1-git-send-email-john.garry@huawei.com>
-References: <1652181274-136198-1-git-send-email-john.garry@huawei.com>
+        Tue, 10 May 2022 08:33:51 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BFAB2A376A
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:29:54 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id n18so16609946plg.5
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:29:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=Jp7HjFBFx3m1li+wnracJc1zJal8gZ4hoEqGbVeKt/I=;
+        b=dQ9mqsipznukUKDUkmGqQ6cNYBKwXMZ6FykGsE/msGVDR87AK14dpp08ZVEpPQzJ5e
+         dadLbFK2qQsI2ASI+cILavLkdHwguE51X6a896gLTxd7pS+k2pMbbmfux4zNkQrIBCfm
+         XQLVRknw18d84O0e16om6yLrPQ/nHttcRSddgewV3rh6FC6/UTZbfZR7zxZDynpjTctQ
+         OY3HP76EtZCi2sTUssIj4yml6XGZIaVfns5p2VtyBXHNN9/ASxJoiYvUt5LkNBoP8bBv
+         XQZ7dqo3urs1YpRnZCdP9P9KIJbsSGVifu13+MPT/2WJoghejG/UMHb13aw0z0/bL0AQ
+         4E6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Jp7HjFBFx3m1li+wnracJc1zJal8gZ4hoEqGbVeKt/I=;
+        b=tyvGWtkL7PHk/5DXsbzUSkQ1SgyVjHPFK39Ah0JdrcySy0vMcIT0avldqmfiqmEnQL
+         LX7Kifa3EoEJfV1/tJZLYA/ICH+J3AXp4QmhsIpONYDUpkwyyVwetzvt7NmsUEaOOG/t
+         7x145K+nQGc1f+t8kMsxcKZD2BGJRfIUMoEEvVnE6w8rjFqgFXO+jQg3KD8Jvq58tckt
+         YNEmid64lZ0lClExj1OpZuextDf3GLd8zOzfTc86HWeZUqQ0GHHQQepj7MjDq0FvXWaA
+         +ljmb5R1KU2SIuApoZG0zZlT2G/OSN5jfjmnkbZsBktfVtkSisKOfOGKV5A+Jmq1NjOk
+         MYDw==
+X-Gm-Message-State: AOAM531RpHHwZk/xjNfZQOdG0/S1qr6YAYTm+CaxYj3palEdPsQmCNL4
+        SkyEgTTGQeQo1j501Cma53SRuQ==
+X-Google-Smtp-Source: ABdhPJwgJU11iFqgteUqesG2Y4aoSdv556T/SpO5vBCJUnsWGbRSoSZAfC+9tXV7a2csI0sDnod51g==
+X-Received: by 2002:a17:90a:c595:b0:1d9:532e:52fd with SMTP id l21-20020a17090ac59500b001d9532e52fdmr23180190pjt.79.1652185794001;
+        Tue, 10 May 2022 05:29:54 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id j5-20020a170902c3c500b0015e8d4eb2besm1861400plj.264.2022.05.10.05.29.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 May 2022 05:29:53 -0700 (PDT)
+Message-ID: <c393d0dd-05a9-2a12-92a2-eebd8d49c2dd@kernel.dk>
+Date:   Tue, 10 May 2022 06:29:52 -0600
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.69.192.58]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: SPDX tag and top of file comment cleanups for the loop driver
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, tytso <tytso@mit.edu>
+Cc:     linux-block@vger.kernel.org, linux-spdx@vger.kernel.org
+References: <20220419063303.583106-1-hch@lst.de> <YnGLRAuS8QGaSADK@mit.edu>
+ <20220503201334.GA7325@lst.de> <YnGgP7ubsXxFTaZE@mit.edu>
+ <20220510072243.GB11929@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220510072243.GB11929@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Currently sbitmap words are allocated in a single array. That array is
-flagged for allocating at the NUMA node passed in sbitmap_init_node().
+On 5/10/22 1:22 AM, Christoph Hellwig wrote:
+> Jens,
+> 
+> are the comments from Ted here enough to apply the series?  Or do
+> we need a formal Acked-by to be on the safe side?
 
-However often the sbitmap will be accessed by all the CPUs in the system -
-for example, when BLK_MQ_F_TAG_HCTX_SHARED is set for the blk-mq tagset.
+Looks conclusive enough to me - if not, Ted, please holler. I'll
+queue it up.
 
-This can lead to performance issues where all CPUs in the system are doing
-cross-NUMA node accesses to read/set/unset sbitmap tags.
-
-Improve this by spreading the word allocations across all NUMA nodes as
-evenly as possible. We set the per-CPU hint to fall within range of words
-allocated for the NUMA node to which that CPU belongs.
-
-Known issues:
-- sbitmap resize does not work well for this scheme
-- Improve updating hint for sbitmap_get() failure and sbitmap_put() when
-  hint is outside range of CPU's NUMA node words.
-- Add intelligence for sub-arrays to be allocated at a single node, e.g.
-  when numa != NUMA_NO_NODE in sbitmap_init_node()
-
-Signed-off-by: John Garry <john.garry@huawei.com>
----
- include/linux/sbitmap.h |  5 ++++
- lib/sbitmap.c           | 63 +++++++++++++++++++++++++++++++++--------
- 2 files changed, 56 insertions(+), 12 deletions(-)
-
-diff --git a/include/linux/sbitmap.h b/include/linux/sbitmap.h
-index 46268f391e32..6d897032dbc6 100644
---- a/include/linux/sbitmap.h
-+++ b/include/linux/sbitmap.h
-@@ -60,6 +60,11 @@ struct sbitmap {
- 	 */
- 	unsigned int map_nr;
- 
-+	/**
-+	 * @map_nr_per_node: Number of words being used per NUMA node.
-+	 */
-+	unsigned int map_nr_per_node;
-+
- 	/**
- 	 * @round_robin: Allocate bits in strict round-robin order.
- 	 */
-diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-index 64fb9800ed8c..99c87fbfa1a1 100644
---- a/lib/sbitmap.c
-+++ b/lib/sbitmap.c
-@@ -8,6 +8,17 @@
- #include <linux/random.h>
- #include <linux/sbitmap.h>
- #include <linux/seq_file.h>
-+#include <linux/mm.h>
-+
-+static unsigned int sbitmap_get_new_hint(struct sbitmap *sb, int cpu)
-+{
-+	unsigned int shift = sb->shift;
-+	unsigned int map_nr_per_node = sb->map_nr_per_node;
-+	unsigned int bit_per_node = map_nr_per_node << shift;
-+	unsigned int hint_base = bit_per_node * cpu_to_node(cpu);
-+
-+	return hint_base + (prandom_u32() % bit_per_node);
-+}
- 
- static int init_alloc_hint(struct sbitmap *sb, gfp_t flags)
- {
-@@ -20,8 +31,10 @@ static int init_alloc_hint(struct sbitmap *sb, gfp_t flags)
- 	if (depth && !sb->round_robin) {
- 		int i;
- 
--		for_each_possible_cpu(i)
--			*per_cpu_ptr(sb->alloc_hint, i) = prandom_u32() % depth;
-+		for_each_possible_cpu(i) {
-+			*per_cpu_ptr(sb->alloc_hint, i) =
-+				sbitmap_get_new_hint(sb, i);
-+		}
- 	}
- 	return 0;
- }
-@@ -86,7 +99,8 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- {
- 	unsigned int bits_per_word;
- 	struct sbitmap_word *map;
--	int index;
-+	int index, num_nodes = num_online_nodes();
-+	int nid, map_nr_cnt;
- 
- 	if (shift < 0)
- 		shift = sbitmap_calculate_shift(depth);
-@@ -105,6 +119,11 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 		return 0;
- 	}
- 
-+	if (sb->map_nr < num_nodes) {
-+		sb->map_nr_per_node = 1;
-+	} else {
-+		sb->map_nr_per_node = sb->map_nr / num_nodes;
-+	}
- 	if (alloc_hint) {
- 		if (init_alloc_hint(sb, flags))
- 			return -ENOMEM;
-@@ -113,23 +132,43 @@ int sbitmap_init_node(struct sbitmap *sb, unsigned int depth, int shift,
- 	}
- 
- 	sb->map = kvzalloc_node(sb->map_nr * sizeof(*sb->map), flags, node);
--	if (!sb->map) {
--		free_percpu(sb->alloc_hint);
--		return -ENOMEM;
--	}
--
--	map = kvzalloc_node(sb->map_nr * sizeof(**sb->map), flags, node);
--	if (!map)
--		return -ENOMEM;
-+	if (!sb->map)
-+		goto err_map;
- 
--	for (index = 0; index < sb->map_nr; index++, map++) {
-+	for (index = 0, nid = 0; index < sb->map_nr; index++, map++, map_nr_cnt++) {
- 		struct sbitmap_word **_map;
- 
-+		if ((index % sb->map_nr_per_node) == 0) {
-+			int cnt;
-+
-+			if (index == 0) {
-+				cnt = sb->map_nr_per_node +
-+					(sb->map_nr % sb->map_nr_per_node);
-+			} else {
-+				cnt = sb->map_nr_per_node;
-+			}
-+
-+			map = kvzalloc_node(cnt * sizeof(**sb->map), flags, nid);
-+			if (!map)
-+				goto err_map_numa;
-+			nid++;
-+		}
-+
- 		_map = &sb->map[index];
- 		*_map = map;
- 	}
- 
- 	return 0;
-+err_map_numa:
-+	for (index = 0; index < sb->map_nr; index++, map++) {
-+		if ((index % sb->map_nr_per_node) == 0) {
-+			kfree(map);
-+		}
-+	}
-+err_map:
-+	free_percpu(sb->alloc_hint);
-+
-+	return -ENOMEM;
- }
- EXPORT_SYMBOL_GPL(sbitmap_init_node);
- 
 -- 
-2.26.2
+Jens Axboe
 
