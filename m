@@ -2,85 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B60FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 12:30:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF29EC4332F
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 12:45:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241468AbiEJMer (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 08:34:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52290 "EHLO
+        id S241940AbiEJMtg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 08:49:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51266 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238445AbiEJMer (ORCPT
+        with ESMTP id S241952AbiEJMte (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 08:34:47 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1E63D48C
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:30:46 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id c9so15906154plh.2
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:30:46 -0700 (PDT)
+        Tue, 10 May 2022 08:49:34 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26C165522F
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:45:34 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id k14so14574568pga.0
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 05:45:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=/Uk6+mfvugpmVcn0MtgCmjz89/UciEZk8TgXolM2dgo=;
-        b=n6FxfYsKpIqi3zde+pLOP9XzRMqSda1yCySARTFivO1jmLF9dhZ75wsFmlMwBn+hiA
-         6ghAGNeNMvK1YzOAmg+zv4TMIMiJVsEK5yXsjYgYMvUEFu/4MoXbPKmEFGHq2sDW0YH4
-         uSMF8JAO1fr5raJ/f/DZpxmSa1zrmI5YE8aiWgrQ2hYO2DYmq3I+kdaap3BHfxhTi9Ft
-         XmivOJ3HGlsx772bWPAO8V6QgklGYm8TY3gPT8i+tlawcY0cyc/Eif2b+bIJPHgpD9GF
-         UaASh6ykmgeHgJq2czqA5t/aQzlnrIhQ3xA6Y5PVHVEhSUHl7JFl8iQaCLqTY1rMzwDm
-         65SA==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=81CmoXK8W2fMc2E/XpNylErNEPWG7PeFWSGfTvENHek=;
+        b=BuizLo0eMVf1CFKzq5z5mJXXTCdmsbZnthwaSpGZvyOinz0zK1oVrwY+RjDSbz0lsj
+         W4/gcD2GsatA2CltDPm42940C9Zx8OlEiXWEDruJeUP+scX4B4Dn/BR45LSBkgx0ha/1
+         1lof9Sxe/0+TSOSmg+ZbSpzVPPfdI8D1n/IK23ovFovWMObnth4tWgSXWT44+EFOD5cw
+         YRdLOnhCKKUDhjj1PBpvvrU/SLEYIvonvF8JuhoBcVkVWvziCCxnA6XbN07WU1oTTJuX
+         9N9BICkQtsDiH2S5IvrqAAzmp2SqDTXhUfx7lB75VtVwJ+wJsJW+JGZukF4rewQyhJ7E
+         HF3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=/Uk6+mfvugpmVcn0MtgCmjz89/UciEZk8TgXolM2dgo=;
-        b=mr2cXvhkpJnkcUfn45bZVzA7LTX7VmNEME+XqTm+HgoElktlaieRxKzGYy40ygAHtn
-         v5vuf4avpdB7vx2+leyfm/SRto4ki2rX4zqndLB7KY0KekvcUlr5KUpvXdly5a589Tzw
-         0zkfQ966Xll2eOY+pSI4Dy8KNJMaPMSczRqsI1x6d+PP77F02HiKSksk3mg02r9hZMV1
-         m4vAAG3UI2pYQ+PTSX32+NCjmXgose3qsj3E0Wt4vihJe2ve2Cim33oHm9mD6JGhqiaK
-         0Jhgwzhsj7vJuZ4CCD23xjQjFcIcWcMoNH/qqQ+uuLNsJJotR56VHXShKIoMIAx28f/r
-         AIvw==
-X-Gm-Message-State: AOAM531QdjWjB46DIDuqcY5zC/5UfVPBSg3oqe6szDcrAwyg2LPB8Nla
-        gGvWare8Hkh7zEM84qGNDf1E5A==
-X-Google-Smtp-Source: ABdhPJyR3aLGa0nNh5C8QS3v/7ySucL3Oa4b18eW9Jn9qsO4AaU3v2l8Xg4b1PPXL88tXt18wwbpgA==
-X-Received: by 2002:a17:90a:fa01:b0:1d9:4008:cffc with SMTP id cm1-20020a17090afa0100b001d94008cffcmr31401680pjb.141.1652185846093;
-        Tue, 10 May 2022 05:30:46 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id 13-20020a63060d000000b003c14af5062fsm10477659pgg.71.2022.05.10.05.30.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 10 May 2022 05:30:45 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tytso@mit.edu, Christoph Hellwig <hch@lst.de>
-Cc:     linux-spdx@vger.kernel.org, linux-block@vger.kernel.org
-In-Reply-To: <20220419063303.583106-2-hch@lst.de>
-References: <20220419063303.583106-1-hch@lst.de> <20220419063303.583106-2-hch@lst.de>
-Subject: Re: [PATCH 1/4] loop: remove loop.h
-Message-Id: <165218584439.8752.11010312059919447202.b4-ty@kernel.dk>
-Date:   Tue, 10 May 2022 06:30:44 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=81CmoXK8W2fMc2E/XpNylErNEPWG7PeFWSGfTvENHek=;
+        b=gcbINwJUSKvVsJoPUV+MfIJqcC6GylHKUR7Z5y9EnPCLc+BJV8e9AkXDJ6oJ1f3vxY
+         aJRKjlCB+bmIrugkbjSyYQAPoLf59iBLoixXxEBG/rsB4mWl26AdWWrBeyAs+snk+jOt
+         bLI/5B3QkZDkeNI4xAHXK2lFr6eks77oq2qqjsvSUCZaym+SMOqSJw9UPbu6a52xCjvg
+         Y9a7hw0Vq12HMXaHUk6EeWCw+DYJm4VTb1VzaDa21nQGRLClbbZYSDZlMp7aTO5CUtK4
+         RUwBFMmaV88dRz+C58+CWSIc2heouZupKYWx0XZvm78BLdtg6gbb+SPL4l00Ha3djhTl
+         cu4Q==
+X-Gm-Message-State: AOAM531rZuzwcpXbSpdUKhRf76MA6Yktv4nTYiZW/IfmTxlngB8cA/5k
+        8FrCUVi71nqgUUAcHdj7h+m/jw==
+X-Google-Smtp-Source: ABdhPJww7Eg4/Zxst2GZrQrVNwauUtpxNCsfNjZ19FUR133ytWOXTk+q1xGx0v1s2BhN+B7mV7yS+A==
+X-Received: by 2002:a63:2c8a:0:b0:3aa:86ea:f2c9 with SMTP id s132-20020a632c8a000000b003aa86eaf2c9mr16916062pgs.46.1652186733527;
+        Tue, 10 May 2022 05:45:33 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id q187-20020a632ac4000000b003c14af5063fsm10345438pgq.87.2022.05.10.05.45.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 10 May 2022 05:45:32 -0700 (PDT)
+Message-ID: <0e1b3d10-ae79-f987-187e-58109441ccee@kernel.dk>
+Date:   Tue, 10 May 2022 06:45:31 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [syzbot] KASAN: use-after-free Read in bio_poll
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     syzbot <syzbot+99938118dfd9e1b0741a@syzkaller.appspotmail.com>,
+        andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+        daniel@iogearbox.net, john.fastabend@gmail.com, kafai@fb.com,
+        kpsingh@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        songliubraving@fb.com, syzkaller-bugs@googlegroups.com, yhs@fb.com
+References: <00000000000029572505de968021@google.com>
+ <a72282ef-650c-143b-4b88-5185009c3ec2@kernel.dk> <YnmuRuO4yplt8p/p@T590>
+ <20220510055039.GA10576@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220510055039.GA10576@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 19 Apr 2022 08:33:00 +0200, Christoph Hellwig wrote:
-> Merge loop.h into loop.c as all the content is only used there.
+On 5/9/22 11:50 PM, Christoph Hellwig wrote:
+> On Tue, May 10, 2022 at 08:13:58AM +0800, Ming Lei wrote:
+>>> Guys, should we just queue:
+>>>
+>>> ommit 9650b453a3d4b1b8ed4ea8bcb9b40109608d1faf
+>>> Author: Ming Lei <ming.lei@redhat.com>
+>>> Date:   Wed Apr 20 22:31:10 2022 +0800
+>>>
+>>>     block: ignore RWF_HIPRI hint for sync dio
+>>>
+>>> up for 5.18 and stable?
+>>
+>> I am fine with merging to 5.18 & stable.
 > 
-> 
+> I'm fine, too.  But are we sure this actually is one and the same
+> issue?  Otherwise I'll try to find some time to feed it to syzbot
+> first.
 
-Applied, thanks!
+I re-wrote the reproducer a bit and can reproduce it, so I can certainly
+test a backport. But yes, I was skeptical on this being the same issue
+too. My initial reaction was that this is likely due to the bio being
+"downgraded" from polled to IRQ driven, and hence completes without an
+extra reference before the bio_poll() is done on it. Which is not the
+issue described in the referenced commit.
 
-[1/4] loop: remove loop.h
-      commit: 754d96798fab1316f4f14bb86cf3c0244cb2b20b
-[2/4] loop: add a SPDX header
-      commit: f21e6e185a3a95dedc0d604b468d40ff1dc71fd9
-[3/4] loop: remove most the top-of-file boilerplate comment
-      commit: eb04bb154b76a0633afc5d26c1de7619a6686e9b
-[4/4] loop: remove most the top-of-file boilerplate comment from the UAPI header
-      commit: c23d47abee3a54e4991ed3993340596d04aabd6a
-
-Best regards,
 -- 
 Jens Axboe
-
 
