@@ -2,55 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE1D2C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 17:29:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C314FC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 18:25:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348197AbiEJRdZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 13:33:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50008 "EHLO
+        id S243797AbiEJSZ4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 14:25:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348141AbiEJRdQ (ORCPT
+        with ESMTP id S245188AbiEJSZy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 13:33:16 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08D27291E5D;
-        Tue, 10 May 2022 10:29:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=sQO7/niJrUBpu2+Gosv4JX0Ptlav7tay6E7B6qWXJJ0=; b=LTeIHcyvwxvrhORF5SZATmiJTQ
-        hiuhAdAES7FIwDE5pAwAOC66j4wE5PN3KVTFNseRxc5Qmgi5SvJQcJ3RjeFEIDWMCWv7h/n7uULvv
-        9mV7UCFbOtR7/WL4acpMn48WAEFO57TQqNRxU/HUq9beB+xlSnP6IKbOt43yeHYMyJz17T1KxsiG+
-        ZQ7nj952v/31JPYo5kwGrOFHqfglAKrnCeXFx4+W8kH9e4jtKmcsODfkUfzkMe6bi0ZtzrGZ1/h2+
-        wqtUF6KaDeXDV5xJlYrSs6tqCoCmJZOr1OxjntYVbykL9qXuEfkuzs5J+HIRoP6Mx5pAtsCma8rPo
-        poabCTNQ==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1noTfh-004fLH-Es; Tue, 10 May 2022 17:29:17 +0000
-Date:   Tue, 10 May 2022 18:29:17 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Sasha Levin <sashal@kernel.org>
-Cc:     linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-        "Darrick J . Wong" <djwong@kernel.org>,
-        Brian Foster <bfoster@redhat.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH AUTOSEL 5.17 20/21] block: Do not call folio_next() on an
- unreferenced folio
-Message-ID: <Ynqg7RRxiFIKrDqX@casper.infradead.org>
-References: <20220510154340.153400-1-sashal@kernel.org>
- <20220510154340.153400-20-sashal@kernel.org>
+        Tue, 10 May 2022 14:25:54 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ED1C50E13;
+        Tue, 10 May 2022 11:25:53 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id r192so11126214pgr.6;
+        Tue, 10 May 2022 11:25:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5sDgeD0YOOWBC8MnsZdewpm6fm+8JdOylgUar+PbYV8=;
+        b=E8vh1kibB970hzIpWVqJvrUM/XAa+WhlHnQFKxRLbh2erbItToTT6MRIvKSM0P4r2x
+         58dJE/MPLzbdvNTF/8JgkiZpQ+hkUiVXgM/IptFaGGnZoMvr+KfASvNybW4eIs7Gs2P/
+         84WqOoBsFK3g0q4ZavWX9GVFjNFZuiil5rhwquelrWdxHNCbQxcbagx4CVcyzGC0nZeY
+         N4llZYPHZytpybWUkGUmCzeUXQ8BdEzXFnUyvcg0E+uA8JZH9nCmcFl8u8et4fY4uCGb
+         ELlIp5TsPXGhKeOsZM4/YeYzYMepEc6xwCceDtSxF+OdsmYoPeboh+xZ6Kfte0dCYDN+
+         GcZg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=5sDgeD0YOOWBC8MnsZdewpm6fm+8JdOylgUar+PbYV8=;
+        b=hyb3FxOaKIHQzX6VW4/tWEKcEWnOTFxmoYjPxMCNmMnWzijgtzX2OpZmhnVO3HfsEc
+         WgNMz7LcqMBHW2K4HnyF/1Q/avVZRqFxbv1oCSXznPYgpoYlqy0+E0B80NvpXxOcqlsG
+         E0ZsGI3Z1CiTKqd/5wyM2oV3jEE8yABU1aPARdiOFNnWJPO5bN0O0EOLcLjyurLRAxNM
+         N+Hpsrm4MvIga2o0BLflZCJgzn/usQCvyjXIQwOvkShYD2pGuFlITW0GGZpfkTvDdVy1
+         5ZtzBq7+jvvHXvC7V+RbtpQdNVvv6KhiL212yS/M+1t12EdOMOifLOMBKgSfSeB3S45Y
+         ZTBQ==
+X-Gm-Message-State: AOAM530T2QEwZFIzY2SQ9vvkdeoBpnHk8/3PLjNumJu7TSpNApAB/te+
+        FcD7+HB7pPQ91gyFdmdAdEE=
+X-Google-Smtp-Source: ABdhPJwF8XAszm3XpAppQTe+sM8gW2oXwZnzdwX0bTLVfL3aggJ71RwN/6h58iuJvmppSz4Z6M9JEg==
+X-Received: by 2002:a63:4f48:0:b0:3c6:b640:6046 with SMTP id p8-20020a634f48000000b003c6b6406046mr9396578pgl.118.1652207152804;
+        Tue, 10 May 2022 11:25:52 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:6c64])
+        by smtp.gmail.com with ESMTPSA id a25-20020aa780d9000000b0050dc7628182sm11266714pfn.92.2022.05.10.11.25.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 10 May 2022 11:25:52 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Tue, 10 May 2022 08:25:50 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, duanxiongchun@bytedance.com,
+        songmuchun@bytedance.com
+Subject: Re: [PATCH] blk-iocost: combine local_stat and desc_stat to stat
+Message-ID: <YnquLkBZ7UxutpYq@slm.duckdns.org>
+References: <20220510034757.21761-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220510154340.153400-20-sashal@kernel.org>
+In-Reply-To: <20220510034757.21761-1-zhouchengming@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 10, 2022 at 11:43:39AM -0400, Sasha Levin wrote:
-> From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+On Tue, May 10, 2022 at 11:47:57AM +0800, Chengming Zhou wrote:
+> When we flush usage, wait, indebt stat in iocg_flush_stat(), we use
+> local_stat and desc_stat, which has no point since the leaf iocg
+> only has local_stat and the inner iocg only has desc_stat. Also
+> we don't need to flush percpu abs_vusage for these inner iocgs.
 > 
-> [ Upstream commit 170f37d6aa6ad4582eefd7459015de79e244536e ]
+> This patch combine local_stat and desc_stat to stat, only flush
+> percpu abs_vusage for active leaf iocgs, then build inner walk
+> list to propagate.
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 
-ACK the backport of this patch.  The problem is latent in earlier
-kernels, but there's no need to leave the trap lying around.
+Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
