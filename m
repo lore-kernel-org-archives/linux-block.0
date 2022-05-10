@@ -2,137 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2F03C4332F
-	for <linux-block@archiver.kernel.org>; Mon,  9 May 2022 23:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4ACC433FE
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 00:14:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232538AbiEIXse (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 May 2022 19:48:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40256 "EHLO
+        id S233422AbiEJASQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 May 2022 20:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233272AbiEIXrc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 19:47:32 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9172B266C87
-        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 16:40:15 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo02.lge.com) (156.147.1.126)
-        by 156.147.23.52 with ESMTP; 10 May 2022 08:40:15 +0900
-X-Original-SENDERIP: 156.147.1.126
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.126 with ESMTP; 10 May 2022 08:40:14 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Tue, 10 May 2022 08:38:38 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Steven Rostedt <rostedt@goodmis.org>
-Cc:     Hyeonggon Yoo <42.hyeyoo@gmail.com>, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, airlied@linux.ie,
-        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
-        hamohammed.sa@gmail.com
-Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
-Message-ID: <20220509233838.GC6047@X58A-UD3R>
-References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
- <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
- <YnYd0hd+yTvVQxm5@hyeyoo>
- <20220509001637.GA6047@X58A-UD3R>
- <20220509164712.746e236b@gandalf.local.home>
+        with ESMTP id S233389AbiEJASP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 20:18:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 040E02631FE
+        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 17:14:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652141659;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=m/Cpn4znmGtPMU6JmBbESD0qm5X4CWqOjWVCzDX837U=;
+        b=P97i/8HX+9KZhcMn/E2CzV/ck8pW49p8vy/8HMul4Js+Rb/UYx0XvdgPZrc/Xur0Q7CSre
+        YmPxweqRBKa461E8szLLwzCezG9Abda0rQoPboeFH/npL5uLe4Elb6iIW0R8JJ1j4wHHtt
+        XTsbcxEXhO85maasg/XZlK3LlJDH2tE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-614-VeKmZPTnMrGw1e9T0pqueA-1; Mon, 09 May 2022 20:14:13 -0400
+X-MC-Unique: VeKmZPTnMrGw1e9T0pqueA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8FE9811E80;
+        Tue, 10 May 2022 00:14:12 +0000 (UTC)
+Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id CD07840D1B9A;
+        Tue, 10 May 2022 00:14:03 +0000 (UTC)
+Date:   Tue, 10 May 2022 08:13:58 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     syzbot <syzbot+99938118dfd9e1b0741a@syzkaller.appspotmail.com>,
+        andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+        daniel@iogearbox.net, john.fastabend@gmail.com, kafai@fb.com,
+        kpsingh@kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        songliubraving@fb.com, syzkaller-bugs@googlegroups.com, yhs@fb.com,
+        Christoph Hellwig <hch@lst.de>
+Subject: Re: [syzbot] KASAN: use-after-free Read in bio_poll
+Message-ID: <YnmuRuO4yplt8p/p@T590>
+References: <00000000000029572505de968021@google.com>
+ <a72282ef-650c-143b-4b88-5185009c3ec2@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220509164712.746e236b@gandalf.local.home>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <a72282ef-650c-143b-4b88-5185009c3ec2@kernel.dk>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 09, 2022 at 04:47:12PM -0400, Steven Rostedt wrote:
-> On Mon, 9 May 2022 09:16:37 +0900
-> Byungchul Park <byungchul.park@lge.com> wrote:
-> 
-> > CASE 2.
+On Mon, May 09, 2022 at 11:02:41AM -0600, Jens Axboe wrote:
+> On 5/9/22 10:14 AM, syzbot wrote:
+> > Hello,
 > > 
-> >    lock L with depth n
-> >    lock A
-> >    lock_nested L' with depth n + 1
-> >    ...
-> >    unlock L'
-> >    unlock A
-> >    unlock L
+> > syzbot found the following issue on:
 > > 
-> > This case is allowed by Lockdep.
-> > This case is *NOT* allowed by DEPT cuz it's a *DEADLOCK*.
+> > HEAD commit:    c5eb0a61238d Linux 5.18-rc6
+> > git tree:       upstream
+> > console+strace: https://syzkaller.appspot.com/x/log.txt?x=112bf03ef00000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=79caa0035f59d385
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=99938118dfd9e1b0741a
+> > compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12311571f00000
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=177a2e86f00000
 > > 
-> > ---
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+99938118dfd9e1b0741a@syzkaller.appspotmail.com
 > > 
-> > The following scenario would explain why CASE 2 is problematic.
+> > ==================================================================
+> > BUG: KASAN: use-after-free in bio_poll+0x275/0x3c0 block/blk-core.c:942
+> > Read of size 4 at addr ffff8880751d92b4 by task syz-executor486/3607
 > > 
-> >    THREAD X			THREAD Y
-> > 
-> >    lock L with depth n
-> > 				lock L' with depth n
-> >    lock A
-> > 				lock A
-> >    lock_nested L' with depth n + 1
+> > CPU: 0 PID: 3607 Comm: syz-executor486 Not tainted 5.18.0-rc6-syzkaller #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> > Call Trace:
+> >  <TASK>
+> >  __dump_stack lib/dump_stack.c:88 [inline]
+> >  dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+> >  print_address_description.constprop.0.cold+0xeb/0x495 mm/kasan/report.c:313
+> >  print_report mm/kasan/report.c:429 [inline]
+> >  kasan_report.cold+0xf4/0x1c6 mm/kasan/report.c:491
+> >  bio_poll+0x275/0x3c0 block/blk-core.c:942
+> >  __iomap_dio_rw+0x10ee/0x1ae0 fs/iomap/direct-io.c:658
+> >  iomap_dio_rw+0x38/0x90 fs/iomap/direct-io.c:681
+> >  ext4_dio_write_iter fs/ext4/file.c:566 [inline]
+> >  ext4_file_write_iter+0xe4d/0x1510 fs/ext4/file.c:677
+> >  call_write_iter include/linux/fs.h:2050 [inline]
+> >  do_iter_readv_writev+0x3d1/0x640 fs/read_write.c:726
+> >  do_iter_write+0x182/0x700 fs/read_write.c:852
+> >  vfs_writev+0x1aa/0x630 fs/read_write.c:925
+> >  do_pwritev+0x1b6/0x270 fs/read_write.c:1022
+> >  __do_sys_pwritev2 fs/read_write.c:1081 [inline]
+> >  __se_sys_pwritev2 fs/read_write.c:1072 [inline]
+> >  __x64_sys_pwritev2+0xeb/0x150 fs/read_write.c:1072
+> >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> >  do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+> >  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > RIP: 0033:0x7f6846af7e69
 > 
-> I'm confused by what exactly you are saying is a deadlock above.
+> Guys, should we just queue:
 > 
-> Are you saying that lock A and L' are inversed? If so, lockdep had better
-
-Hi Steven,
-
-Yes, I was talking about A and L'.
-
-> detect that regardless of L. A nested lock associates the the nesting with
-
-When I checked Lockdep code, L' with depth n + 1 and L' with depth n
-have different classes in Lockdep.
-
-That's why I said Lockdep cannot detect it. By any chance, has it
-changed so as to consider this case? Or am I missing something?
-
-> the same type of lock. That is, in lockdep nested tells lockdep not to
-> trigger on the L and L' but it will not ignore that A was taken.
-
-It will not ignore A but it would work like this:
-
-   THREAD X			THREAD Y
-
-   lock Ln
-				lock Ln
-   lock A
-				lock A
-   lock_nested Lm
-				lock_nested Lm
-
-So, Lockdep considers this case safe, actually not tho.
-
-	Byungchul
-
+> ommit 9650b453a3d4b1b8ed4ea8bcb9b40109608d1faf
+> Author: Ming Lei <ming.lei@redhat.com>
+> Date:   Wed Apr 20 22:31:10 2022 +0800
 > 
-> -- Steve
+>     block: ignore RWF_HIPRI hint for sync dio
 > 
-> 
-> 
-> > 				lock_nested L'' with depth n + 1
-> >    ...				...
-> >    unlock L'			unlock L''
-> >    unlock A			unlock A
-> >    unlock L			unlock L'
+> up for 5.18 and stable?
+
+I am fine with merging to 5.18 & stable.
+
+
+Thanks,
+Ming
+
