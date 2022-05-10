@@ -2,260 +2,223 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8803C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 04:55:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 286A3C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 05:06:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236498AbiEJE7Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 00:59:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33408 "EHLO
+        id S236526AbiEJFKH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 01:10:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236492AbiEJE7P (ORCPT
+        with ESMTP id S232976AbiEJFKG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 00:59:15 -0400
-Received: from out30-45.freemail.mail.aliyun.com (out30-45.freemail.mail.aliyun.com [115.124.30.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9B62A4A18
-        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 21:55:18 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R801e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04426;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---0VCopGCn_1652158514;
-Received: from 30.30.119.234(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VCopGCn_1652158514)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Tue, 10 May 2022 12:55:15 +0800
-Message-ID: <ccc8eebd-6776-ebfa-587b-2218ce23b281@linux.alibaba.com>
-Date:   Tue, 10 May 2022 12:55:14 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.8.1
-Subject: Re: Follow up on UBD discussion
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        joseph.qi@linux.alibaba.com, linux-block@vger.kernel.org
-References: <874k27rfwm.fsf@collabora.com> <YnDhorlKgOKiWkiz@T590>
- <8a52ed85-3ffa-44a4-3e28-e13cdc793732@linux.alibaba.com>
- <YnaonsoDjQjrutRb@T590>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <YnaonsoDjQjrutRb@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+        Tue, 10 May 2022 01:10:06 -0400
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13869232779;
+        Mon,  9 May 2022 22:06:07 -0700 (PDT)
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24A4cQAk020354;
+        Tue, 10 May 2022 05:06:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=content-type :
+ mime-version : subject : from : in-reply-to : date : cc :
+ content-transfer-encoding : message-id : references : to; s=pp1;
+ bh=Y1KfjmGhhSYAr8guizGm45XQlWDCQy09ghm/+4OkzjY=;
+ b=GiEQG3JK4C4J1L8ilnLdEImdsSn0gnogO/dXvTUO0ZetVQOZWsVUOVu4cfM36UmEg0rB
+ mEDCQYxpu1LZ8FG0ZflGebHyM3Ewz68IFRzYRbYCjuxyOyJOQ17laB2U3boxomWZKcJw
+ r7PRRkUDXU0d6r3yAlpuqDOLey+A7CrLFnv0rxOyZPwBne4ZGJGpChU79Fd2EkHEu1sn
+ Md/fASGG5rdoVXqeJU52y2P03Wb71LPL5Wy+nATh68W0rGb1E0HrTyIUS07HR8QCez+W
+ jUxjudGdxys51pmbpnAOCzk4L2sJ6JW4VLqq7Hkt95TlwqWzO9ktLMoFkY2wJ25dRx1p lA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyfk0ssay-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 05:06:01 +0000
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 24A4ear0025092;
+        Tue, 10 May 2022 05:06:01 GMT
+Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com [169.51.49.102])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3fyfk0ssa5-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 05:06:00 +0000
+Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
+        by ppma06ams.nl.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 24A537XT001636;
+        Tue, 10 May 2022 05:05:58 GMT
+Received: from b06avi18878370.portsmouth.uk.ibm.com (b06avi18878370.portsmouth.uk.ibm.com [9.149.26.194])
+        by ppma06ams.nl.ibm.com with ESMTP id 3fwg1j3f08-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 05:05:58 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com [9.149.105.232])
+        by b06avi18878370.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 24A55ewK35193162
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 10 May 2022 05:05:40 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9F21C52050;
+        Tue, 10 May 2022 05:05:56 +0000 (GMT)
+Received: from smtpclient.apple (unknown [9.43.28.175])
+        by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3618252051;
+        Tue, 10 May 2022 05:05:55 +0000 (GMT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.80.82.1.1\))
+Subject: Re: [powerpc]Kernel crash while running xfstests (generic/250)
+ [next-20220404]
+From:   Sachin Sant <sachinp@linux.ibm.com>
+In-Reply-To: <B34CE5E9-8635-4DF0-AC0D-FB887462DFD6@linux.ibm.com>
+Date:   Tue, 10 May 2022 10:35:53 +0530
+Cc:     dm-devel@redhat.com, riteshh@linux.ibm.com,
+        linuxppc-dev@lists.ozlabs.org,
+        open list <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <838D9600-D92F-4AD9-9E97-0116E2C01654@linux.ibm.com>
+References: <A3B628C9-A20B-4621-BC8C-C79B270297E1@linux.ibm.com>
+ <B34CE5E9-8635-4DF0-AC0D-FB887462DFD6@linux.ibm.com>
+To:     linux-block@vger.kernel.org, snitzer@redhat.com
+X-Mailer: Apple Mail (2.3696.80.82.1.1)
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cG5qL99cVGOmas-zKOfarxXZEISLQ0va
+X-Proofpoint-ORIG-GUID: kqywdsARjZjTGXm3kGfc3Ps007M1rEAM
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-09_06,2022-05-09_02,2022-02-23_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 phishscore=0 adultscore=0 mlxscore=0 malwarescore=0
+ impostorscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0 mlxlogscore=999
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2202240000 definitions=main-2205100020
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/5/8 01:13, Ming Lei wrote:
-> On Sat, May 07, 2022 at 12:20:17PM +0800, ZiyangZhang wrote:
->> On 2022/5/3 16:02, Ming Lei wrote:
->>> Hello Gabriel,
->>>
->>> CC linux-block and hope you don't mind, :-)
->>>
->>> On Mon, May 02, 2022 at 01:41:13PM -0400, Gabriel Krisman Bertazi wrote:
->>>>
->>>> Hi Ming,
->>>>
->>>> First of all, I hope I didn't put you on the spot too much during the
->>>> discussion.  My original proposal was to propose my design, but your
->>>> implementation quite solved the questions I had. :)
->>>
->>> I think that is open source, then we can put efforts together to make things
->>> better.
->>>
->>>>
->>>> I'd like to follow up to restart the communication and see
->>>> where I can help more with UBD.  As I said during the talk, I've
->>>> done some fio runs and I was able to saturate NBD much faster than UBD:
->>>>
->>>> https://people.collabora.com/~krisman/mingl-ubd/bw.png
->>>
->>> Yeah, that is true since NBD has extra socket communication cost which
->>> can't be efficient as io_uring.
->>>
->>>>
->>>> I've also wrote some fixes to the initialization path, which I
->>>> planned to send to you as soon as you published your code, but I think
->>>> you might want to take a look already and see if you want to just squash
->>>> it into your code base.
->>>>
->>>> I pushed those fixes here:
->>>>
->>>>   https://gitlab.collabora.com/krisman/linux/-/tree/mingl-ubd
->>>
->>> I have added the 1st fix and 3rd patch into my tree:
->>>
->>> https://github.com/ming1/linux/commits/v5.17-ubd-dev
->>>
->>> The added check in 2nd patch is done lockless, which may not be reliable
->>> enough, so I didn't add it. Also adding device is in slow path, and no
->>> necessary to improve in that code path.
->>>
->>> I also cleaned up ubd driver a bit: debug code cleanup, remove zero copy
->>> code, remove command of UBD_IO_GET_DATA and always make ubd driver
->>> builtin.
->>>
->>> ubdsrv part has been cleaned up too:
->>>
->>> https://github.com/ming1/ubdsrv
->>>
->>>>
->>>> I'm looking into adding support for multiple driver queues next, and
->>>> should be able to share some patches on that shortly.
->>>
->>> OK, please post them on linux-block so that more eyes can look at the
->>> code, meantime the ubdsrv side needs to handle MQ too.
->>>
->>> Sooner or later, the single ubdsrv task may be saturated by copying data and
->>> io_uring command communication only, which can be shown by running io on
->>> ubd-null target. In my lattop, the ubdsrv cpu utilization is close to
->>> 90% when IOPS is > 500K. So MQ may help some fast backing cases.
->>>
->>>
->>> Thanks,
->>> Ming
->>
->> Hi Ming,
->>
->> Now I am learning your userspace block driver(UBD) [1][2] and we plan to
->> replace TCMU by UBD as a new choice for implementing userspace bdev for
->> its high performance and simplicity.
->>
->> First, we have conducted some tests by fio and perf to evaluate UBD.
->>
->> 1) UBD achieves higher throughput than TCMU. We think TCMU suffers from
->>      the complicated SCSI layer and does not support multiqueue. However
->> UBD is simply using io_uring passthrough and may support multiqueue in
->> the future.(Note that even with a single queue now , UBD outperforms TCMU)
-> 
-> MQ isn't hard to support, and it is basically workable now:
-> 
-> https://github.com/ming1/ubdsrv/commits/devel
-> https://github.com/ming1/linux/commits/my_for-5.18-ubd-devel
-> 
-> Just the affinity of pthread for each queue isn't setup yet.
-> 
->>
->> 2) Some functions in UBD result in high CPU utilization and we guess
->> they also lower throughput. For example, ubdsrv_submit_fetch_commands()
->> frequently iterates on the array of UBD IOs and wastes CPU when no IO is
->> ready to be submitted. Besides,  ubd_copy_pages() asks CPU to copy data
->> between bio vectors and UBD internal buffers while handling write and
->> read requests and it could be eliminated by supporting zero-copy.
-> 
-> copy itself doesn't take much cpu, see the following trace:
-> 
-> -   34.36%     3.73%  ubd              [kernel.kallsyms]             [k] ubd_copy_pages.isra.0                               ▒
->    - 30.63% ubd_copy_pages.isra.0                                                                                            ▒
->       - 23.86% internal_get_user_pages_fast                                                                                  ▒
->          + 21.14% get_user_pages_unlocked                                                                                    ▒
->          + 2.62% lockless_pages_from_mm                                                                                      ▒
->         6.42% ubd_release_pages.constprop.0
-> 
-> And we may provide option to allow to pin pages in the disk lifetime for avoiding
-> the cost in _get_user_pages_fast().
-> 
-> zero-copy has to touch page table, and its cost may be expensive too.
-> The big problem is that MM doesn't provide mechanism to support generic
-> remapping kernel pages to userspace.
-> 
->>
->> Second, I'd like to share some ideas on UBD. I'm not sure if they are
->> reasonable so please figure out my mistakes.
->>
->> 1) UBD issues one sqe to commit last completed request and fetch a new
->> one. Then, blk-mq's queue_rq() issues a new UBD IO request and completes
->> one cqe for the fetch command. We have evaluated that io_submit_sqes()
->> costs some CPU and steps of building a new sqe may lower throughput.
->> Here I'd like to give a new solution: never submit sqe but trump up a
->> cqe(with information of new UBD IO request) when calling queue_rq(). I
->> am inspired by one io_uring flag: IORING_POLL_ADD_MULTI, with which a
->> user issues only one sqe for polling an fd and repeatedly gets multiple
->> cqes when new events occur. Dose this solution break the architecture of
->> UBD?
-> 
-> But each cqe has to be associated with one sqe, if I understand
-> correctly.
-> 
-> I will research IORING_POLL_ADD_MULTI a bit and see if it can help UBD.
-> And yes, batching is really important for UBD's performance.
-> 
->>
->> 2) UBDSRV(the userspace part) should not allocate data buffers itself.
->> When an application configs many queues with bigger iodepth, UBDSRV has
->> to preallocate more buffers(size = 256KiB) and results in heavy memory
->> overhead. I think data buffers should be allocated by applications
-> 
-> That is just virtual memory, and pages can be reclaimed after IO is
-> done.
 
-Hi Ming,
 
-I am worried about the fixed-size(size is max io size, 256KiB) pre-allocated data buffers in UBDSRV
-may consume too much memory. Do you mean these pages can be reclaimed by sth like madvise()?
-If swap is not set and madvise() is not called, these pages may not be reclaimed.
+> On 07-Apr-2022, at 10:19 AM, Sachin Sant <sachinp@linux.ibm.com> =
+wrote:
+>=20
+>=20
+>> On 04-Apr-2022, at 5:04 PM, Sachin Sant <sachinp@linux.ibm.com> =
+wrote:
+>>=20
+>> While running xfstests(ext4 or XFS as fs) on a Power10 LPAR booted =
+with today=E2=80=99s
+>> next (5.18.0-rc1-next-20220404) following crash is seen.=20
+>>=20
+>> This problem was possibly introduced with 5.17.0-next-20220330.=20
+>> Git bisect leads me to following patch
+>> commit 1d158814db8e7b3cbca0f2c8d9242fbec4fbc57e
+>>   dm: conditionally enable BIOSET_PERCPU_CACHE for dm_io bioset
+>>=20
+>=20
+> Continue to see this problem with latest next.=20
 
-Regards,
-Zhang
+I can still recreate this issue against latest linux-next build.
 
-> 
->> themselves and passed to UBDSRV. In this way UBD offers more
->> flexibility. However, while handling a write request, the control flow
->> returns to the kernel part again to set buf addr and copy data from bio
->> vectors. Is ioctl helpful by setting buf addr and copying write data to
->> app buf?
-> 
-> It is pretty easy to pass application buffer to UBD_IO_FETCH_REQ or
-> UBD_IO_COMMIT_AND_FETCH_REQ, just by overriding ios[i].buf_addr which
-> is sent to ubd driver via ubdsrv_io_cmd->addr.
-> 
-> No need any ioctl, and io_uring command can handle everything.
-> 
-> I think the idea is good, and we can provide one option for using
-> pre-allocated buffer or application buffer.
-> 
-> But the application buffer has to be in same process VM space with ubdsrv
-> daemon, otherwise it becomes slower to pin these application
-> buffers/pages.
-> 
->>
->> 3) ubd_fetch_and_submit() frequently iterates on the array of ubd IOs
->> and wastes CPU when no IO is ready to be submitted. I think it can be
->> optimized by adding a new array storing UBD IOs that are ready to be
->> commit back to the kernel part. Then we could batch these IOs and avoid
->> unnecessary iterations on IOs which are not ready(fetching or handling
->> by targets).
-> 
-> That should be easy to avoid the whole queue iteration, but my perf
-> trace doesn't show ubd_fetch_and_submit() consumes too much CPU.
-> 
->>
->> 4) Zero-copy support is important and we are trying to implement it now.
-> 
-> I talked with Xiaoguang wrt. zero-copy support, and looks it isn't ready
-> as one generic approach. If it is ready, it is easy to integrate to UBD.
-> 
->>
->> 5) Currently, UBD only support the loop target with io_uirng and all
->> works(1.get one cqe 2.issue target io_uring IO 3.get target io_uring IO
->> completion 4.prepare one sqe) are done in one thread. As far as I know,
-> 
-> loop is one example, and it provides similar function with kernel loop by
-> < 200 lines of userspace code.
-> 
->>  some applications such as SPDK, network fs and customized distribution
->> systems do not support io_uring well.  I think we should separate target
->> IO handling from the UBDSRV loop and allow applications handle target
->> IOs themselves. Is this suggestion reasonable? (Or UBD should focus on
->> io_uring-supported targets?)
-> 
-> UBD provides one framework for implementing userspace block driver, you
-> can do everything for handling the IO in userspace. The target code just
-> needs to implement callbacks defined in ubdsrv_tgt_type, so it has been
-> separated from ubd loop already. But UBD is still in early stage,
-> and the interface will continue to improve or re-design. Or can you
-> explain your ideas in a bit details? It could be very helpful if you
-> can provide some application background.
-> 
-> Reason why I suggested to use io_uring is that io_uring is very efficient, also
-> async IO has been proved as very efficient approach for handling io.
-> 
-> 
-> Thanks
-> Ming
+[ 1536.883400] Buffer I/O error on dev dm-0, logical block 10485497, =
+async page read
+[ 1536.936018] XFS (dm-0): Unmounting Filesystem
+[ 1536.938849] XFS (dm-0): Mounting V5 Filesystem
+[ 1536.946007] XFS (dm-0): Ending clean mount
+[ 1536.947926] xfs filesystem being mounted at /mnt/scratch supports =
+timestamps until 2038 (0x7fffffff)
+[ 1537.052850] XFS (dm-0): Unmounting Filesystem
+[ 1537.083979] BUG: Unable to handle kernel data access at =
+0x5deadbeef0000122
+[ 1537.083982] Faulting instruction address: 0xc00000000015b0bc
+[ 1537.083984] Oops: Kernel access of bad area, sig: 11 [#1]
+[ 1537.084000] LE PAGE_SIZE=3D64K MMU=3DRadix SMP NR_CPUS=3D2048 NUMA =
+pSeries
+[ 1537.084006] Modules linked in: dm_snapshot(E) dm_bufio(E) loop(E) =
+dm_flakey(E) xfs(E) dm_mod(E) nft_fib_inet(E) nft_fib_ipv4(E) =
+nft_fib_ipv6(E) nft_fib(E) nft_reject_inet(E) nf_reject_ipv4(E) =
+nf_reject_ipv6(E) nft_reject(E) nft_ct(E) nft_chain_nat(E) nf_nat(E) =
+nf_conntrack(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) rfkill(E) ip_set(E) =
+nf_tables(E) bonding(E) tls(E) libcrc32c(E) nfnetlink(E) sunrpc(E) =
+nd_pmem(E) nd_btt(E) dax_pmem(E) pseries_rng(E) papr_scm(E) libnvdimm(E) =
+vmx_crypto(E) ext4(E) mbcache(E) jbd2(E) sd_mod(E) t10_pi(E) =
+crc64_rocksoft(E) crc64(E) sg(E) ibmvscsi(E) ibmveth(E) =
+scsi_transport_srp(E) fuse(E) [last unloaded: scsi_debug]
+[ 1537.084056] CPU: 10 PID: 970489 Comm: dmsetup Tainted: G            E =
+    5.18.0-rc6-next-20220509 #2
+[ 1537.084061] NIP:  c00000000015b0bc LR: c00000000015afe8 CTR: =
+c000000000753bb0
+[ 1537.084064] REGS: c0000000211fb610 TRAP: 0380   Tainted: G            =
+E      (5.18.0-rc6-next-20220509)
+[ 1537.084068] MSR:  800000000280b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  =
+CR: 24024824  XER: 20040000
+[ 1537.084078] CFAR: c00000000015aff0 IRQMASK: 0=20
+[ 1537.084078] GPR00: c00000000015afe8 c0000000211fb8b0 c000000002a7cf00 =
+0000000000000000=20
+[ 1537.084078] GPR04: c0000000f98a1378 0000000000000000 c0000000f5043b50 =
+c00000043463e280=20
+[ 1537.084078] GPR08: c00000043463e280 5deadbeef0000100 5deadbeef0000122 =
+c00800000214dcb0=20
+[ 1537.084078] GPR12: c000000000753bb0 c000000abfff1700 0000000155ee0b60 =
+00007fffa7c29da8=20
+[ 1537.084078] GPR16: 00007fffa7c29da8 00007fffa7c29da8 00007fffa7c63670 =
+0000000000000000=20
+[ 1537.084078] GPR20: 00007fffa7c33388 00007fffa7c62040 0000000155ee0b90 =
+0000000000000131=20
+[ 1537.084078] GPR24: c0000000025adb68 ffffffffffffffff c0000000025adb30 =
+c000000103a5e000=20
+[ 1537.084078] GPR28: c000000002a23ce8 c0000000f98a1378 0000000000000017 =
+0000000000000000=20
+[ 1537.084117] NIP [c00000000015b0bc] =
+__cpuhp_state_remove_instance+0x19c/0x2c0
+[ 1537.084125] LR [c00000000015afe8] =
+__cpuhp_state_remove_instance+0xc8/0x2c0
+[ 1537.084130] Call Trace:
+[ 1537.084131] [c0000000211fb8b0] [c00000000015afe8] =
+__cpuhp_state_remove_instance+0xc8/0x2c0 (unreliable)
+[ 1537.084138] [c0000000211fb920] [c000000000753c14] =
+bioset_exit+0x64/0x280
+[ 1537.084144] [c0000000211fb9c0] [c008000002137744] =
+cleanup_mapped_device+0x4c/0x1c0 [dm_mod]
+[ 1537.084155] [c0000000211fba00] [c008000002137a60] =
+__dm_destroy+0x1a8/0x360 [dm_mod]
+[ 1537.084163] [c0000000211fbaa0] [c0080000021445c0] =
+dev_remove+0x1b8/0x290 [dm_mod]
+[ 1537.084172] [c0000000211fbb30] [c00800000214488c] =
+ctl_ioctl+0x1f4/0x7d0 [dm_mod]
+[ 1537.084181] [c0000000211fbd40] [c008000002144e88] =
+dm_ctl_ioctl+0x20/0x40 [dm_mod]
+[ 1537.084190] [c0000000211fbd60] [c00000000055ff28] =
+sys_ioctl+0xf8/0x190
+[ 1537.084195] [c0000000211fbdb0] [c00000000003377c] =
+system_call_exception+0x17c/0x350
+[ 1537.084200] [c0000000211fbe10] [c00000000000c54c] =
+system_call_common+0xec/0x270
+[ 1537.084205] --- interrupt: c00 at 0x7fffa7529210
+[ 1537.084208] NIP:  00007fffa7529210 LR: 00007fffa7c26824 CTR: =
+0000000000000000
+[ 1537.084211] REGS: c0000000211fbe80 TRAP: 0c00   Tainted: G            =
+E      (5.18.0-rc6-next-20220509)
+[ 1537.084215] MSR:  800000000280f033 =
+<SF,VEC,VSX,EE,PR,FP,ME,IR,DR,RI,LE>  CR: 24004484  XER: 00000000
+[ 1537.084224] IRQMASK: 0=20
+[ 1537.084224] GPR00: 0000000000000036 00007fffc7448c30 00007fffa7607300 =
+0000000000000003=20
+[ 1537.084224] GPR04: 00000000c138fd04 0000000155ee0b60 0000000000000004 =
+00007fffa7c33f98=20
+[ 1537.084224] GPR08: 0000000000000003 0000000000000000 0000000000000000 =
+0000000000000000=20
+[ 1537.084224] GPR12: 0000000000000000 00007fffa7d0fa80 0000000155ee0b60 =
+00007fffa7c29da8=20
+[ 1537.084224] GPR16: 00007fffa7c29da8 00007fffa7c29da8 00007fffa7c63670 =
+0000000000000000=20
+[ 1537.084224] GPR20: 00007fffa7c33388 00007fffa7c62040 0000000155ee0b90 =
+0000000155ee02e0=20
+[ 1537.084224] GPR24: 00007fffa7c29da8 00007fffa7c29da8 00007fffa7c29da8 =
+00007fffa7c29da8=20
+[ 1537.084224] GPR28: 0000000000000001 00007fffa7c29da8 0000000000000000 =
+00007fffa7c29da8=20
+[ 1537.084261] NIP [00007fffa7529210] 0x7fffa7529210
+[ 1537.084263] LR [00007fffa7c26824] 0x7fffa7c26824
+[ 1537.084265] --- interrupt: c00
+[ 1537.084267] Instruction dump:
+[ 1537.084270] 60000000 7f69db78 7f83e040 7c7f07b4 7bea1f24 419cffb4 =
+eae10028 eb210038=20
+[ 1537.084276] eb610048 e93d0000 e95d0008 2fa90000 <f92a0000> 419e0008 =
+f9490008 3d405dea=20
+[ 1537.084284] ---[ end trace 0000000000000000 ]---
+[ 1537.106557]=20
+[ 1538.106559] Kernel panic - not syncing: Fatal exception
+
+- Sachin
+
