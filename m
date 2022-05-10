@@ -2,78 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94BDFC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 23:03:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E582C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 23:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237075AbiEJXDZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 19:03:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60098 "EHLO
+        id S238135AbiEJX2c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 19:28:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231931AbiEJXDY (ORCPT
+        with ESMTP id S233658AbiEJX2T (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 19:03:24 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 715471EAE1
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:03:22 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id m12so181143plb.4
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=HPk+go5LyIucQgon9794k6akBZYk28Bmhe21akj/n20=;
-        b=0j49XluBdgJJkAIC4ixE5sWTHvQGAaXecSvRbhEqdHUlBTM0uydyVXU4MoDjh6i3YL
-         KkTyEh6oorXkRF0atEHueVIacBj9Uz1CeECriFbWLfCdxgQsBSYeUqHfEdSUARWQZwQi
-         jgZCKAHWHlIea/ntChdtcHxRYzbbCIlepjX3Yr3ns+7nRl/PTpliB72e353l2ualnyN4
-         6cfyc3Kc8rrF3gtHhets9+eL1SVN3qARBhSVoAD/1i+lu1agklbzalADLiklqDlfT42M
-         8yQvGoFr1IzZDbWYKI2xPant0UVjQ2cX70T0iakP3fR9SeKACxaWhEtHU2A6iv56qwkK
-         LacA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=HPk+go5LyIucQgon9794k6akBZYk28Bmhe21akj/n20=;
-        b=CSzQdF45FHEEtvg5WjTYw0jMwHSu35MLypf0OFtbb38QUrHtMf65WtpEBuUzDLLZvB
-         dfe6OiQKtBdLrgpVo2pnRbxj3TnCVvGc2IXISodIDyzqSctGduTCVYPzXsf3j628EfKv
-         albD6FO487o3VlqIFaTpwOPLTpvXxKfHEv5yDoT/lUPbLaZAK7+H2L93wZrmsafx+x5P
-         L0SxKC+Y1byNiPfZO27y0W3r/g7H0SDI6GCHQ5mwX5KCpIAu6p3BfMUYdO1irrg4YcqX
-         y4NGpm1lu4rZsHmlIASzDQZadGKtDho+h9jx9mydE9U1I0QvzVLiTlcinCypOekYJHTE
-         icGg==
-X-Gm-Message-State: AOAM532w+TKyYak3DOVDmjF6LUe2dFWXKWW47MWt+p7I3KN7/cvxcq7r
-        6pkDIXE35weySDer3s7dMIGhKqAekOCzDpNE
-X-Google-Smtp-Source: ABdhPJxdKTYAg7KUXD/WHP28AYe/yHERD8UaJK59wD2Y1X+HqL2x2XddrYaYpX8pwjnN3vp+DlneBA==
-X-Received: by 2002:a17:902:b684:b0:156:80b4:db03 with SMTP id c4-20020a170902b68400b0015680b4db03mr23031260pls.16.1652223801877;
-        Tue, 10 May 2022 16:03:21 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id j190-20020a6380c7000000b003c14af50627sm241761pgd.63.2022.05.10.16.03.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 10 May 2022 16:03:21 -0700 (PDT)
-Message-ID: <09a72de2-c171-63d8-ff0d-13050aa40c87@kernel.dk>
-Date:   Tue, 10 May 2022 17:03:15 -0600
+        Tue, 10 May 2022 19:28:19 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo11.lge.com [156.147.23.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 384D75DD1B
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 16:28:13 -0700 (PDT)
+Received: from unknown (HELO lgemrelse7q.lge.com) (156.147.1.151)
+        by 156.147.23.51 with ESMTP; 11 May 2022 08:28:11 +0900
+X-Original-SENDERIP: 156.147.1.151
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.151 with ESMTP; 11 May 2022 08:28:11 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Wed, 11 May 2022 08:26:33 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Steven Rostedt <rostedt@goodmis.org>
+Cc:     Hyeonggon Yoo <42.hyeyoo@gmail.com>, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
+        chris@chris-wilson.co.uk, duyuyang@gmail.com,
+        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
+        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, airlied@linux.ie,
+        rodrigosiqueiramelo@gmail.com, melissa.srw@gmail.com,
+        hamohammed.sa@gmail.com
+Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
+Message-ID: <20220510232633.GA18445@X58A-UD3R>
+References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
+ <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
+ <YnYd0hd+yTvVQxm5@hyeyoo>
+ <20220509001637.GA6047@X58A-UD3R>
+ <20220509164712.746e236b@gandalf.local.home>
+ <20220509233838.GC6047@X58A-UD3R>
+ <20220510101254.33554885@gandalf.local.home>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH] block: reorder the REQ_ flags
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20220510130058.1315400-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220510130058.1315400-1-hch@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220510101254.33554885@gandalf.local.home>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/10/22 7:00 AM, Christoph Hellwig wrote:
-> Keep the op-specific flag last.
+On Tue, May 10, 2022 at 10:12:54AM -0400, Steven Rostedt wrote:
+> On Tue, 10 May 2022 08:38:38 +0900
+> Byungchul Park <byungchul.park@lge.com> wrote:
+> 
+> > Yes, I was talking about A and L'.
+> > 
+> > > detect that regardless of L. A nested lock associates the the nesting with  
+> > 
+> > When I checked Lockdep code, L' with depth n + 1 and L' with depth n
+> > have different classes in Lockdep.
+> 
+> If that's the case, then that's a bug in lockdep.
 
-Not that I'm against the patch, but we really should have some
-justification in the commit message as to why the change is
-useful or needed.
+Yes, agree. I should've said 'Lockdep doesn't detect it currently.'
+rather than 'Lockdep can't detect it.'.
 
--- 
-Jens Axboe
+I also think we make it for this case by fixing the bug in Lockdep.
 
+> > 
+> > That's why I said Lockdep cannot detect it. By any chance, has it
+> > changed so as to consider this case? Or am I missing something?
+> 
+> No, it's not that lockdep cannot detect it, it should detect it. If it is
+> not detecting it, then we need to fix that.
+
+Yes.
+
+	Byungchul
+> 
+> -- Steve
