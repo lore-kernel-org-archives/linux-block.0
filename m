@@ -2,95 +2,67 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A845C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 14:06:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 984E9C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 14:42:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244828AbiEJOJo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 10:09:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33838 "EHLO
+        id S243820AbiEJOng (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 10:43:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245481AbiEJOJ1 (ORCPT
+        with ESMTP id S1345735AbiEJOmI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 10:09:27 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C76D326EC;
-        Tue, 10 May 2022 06:44:39 -0700 (PDT)
-Received: from fraeml713-chm.china.huawei.com (unknown [172.18.147.200])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4KyK2d3mmXz67xBy;
-        Tue, 10 May 2022 21:41:45 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml713-chm.china.huawei.com (10.206.15.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 10 May 2022 15:44:36 +0200
-Received: from [10.47.91.186] (10.47.91.186) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id 15.1.2375.24; Tue, 10 May
- 2022 14:44:36 +0100
-Message-ID: <9ede7211-ae58-5cd4-4cf6-74c1f508f1a6@huawei.com>
-Date:   Tue, 10 May 2022 14:44:50 +0100
+        Tue, 10 May 2022 10:42:08 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 427482DE5BE;
+        Tue, 10 May 2022 06:59:01 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 24ADwqEm019007
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 10 May 2022 09:58:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1652191134; bh=ELoeyyjbombVQLJQDZ90fy5JEa7g8ixVorTda9Hrh50=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=GUAtY4+MHN5s05b7akjhKsd5kU6mIDEZGVmOORprQbxynWLgSSakFl0Mj9sxdUEBE
+         vBAYn7bQHmhrWOdYksP746q+rVUW9/MnRSD4hi+B+/6lc84mvEKjZWoYoBildIkSJK
+         F8hJFMkucCdv8wHecFW1MqjbZV+IoM0aU0pK7EcwFdK7yGgVJ0UrP3WZkzjPk6QiRP
+         3+wW+1P2ZxXbgy7aMFrslRdme7nD4+/nEvUoErJUOLJ6f4oAj6hS1xu4RzYBoYMmol
+         K4NwW3tC/oK9kaB68rJ7KWy3ikbnWeisIdCCczfh/V6ZuOYN6zxz9aJYRJmJt4UOCo
+         qD5j2m9V1Dw4A==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 94B3015C3F0A; Tue, 10 May 2022 09:58:52 -0400 (EDT)
+Date:   Tue, 10 May 2022 09:58:52 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        linux-spdx@vger.kernel.org
+Subject: Re: SPDX tag and top of file comment cleanups for the loop driver
+Message-ID: <YnpvnMk+1jd7fq0z@mit.edu>
+References: <20220419063303.583106-1-hch@lst.de>
+ <YnGLRAuS8QGaSADK@mit.edu>
+ <20220503201334.GA7325@lst.de>
+ <YnGgP7ubsXxFTaZE@mit.edu>
+ <20220510072243.GB11929@lst.de>
+ <c393d0dd-05a9-2a12-92a2-eebd8d49c2dd@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-From:   John Garry <john.garry@huawei.com>
-Subject: Re: [RFC PATCH 0/2] sbitmap: NUMA node spreading
-To:     Jens Axboe <axboe@kernel.dk>, <linux-block@vger.kernel.org>
-CC:     <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-References: <1652181274-136198-1-git-send-email-john.garry@huawei.com>
- <1afd2c01-69b3-ab8f-6bfe-118e3e56001c@kernel.dk>
-In-Reply-To: <1afd2c01-69b3-ab8f-6bfe-118e3e56001c@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.47.91.186]
-X-ClientProxiedBy: lhreml705-chm.china.huawei.com (10.201.108.54) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c393d0dd-05a9-2a12-92a2-eebd8d49c2dd@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 10/05/2022 13:50, Jens Axboe wrote:
->> fio config:
->> bs=4096, iodepth=128, numjobs=10, cpus_allowed_policy=split, rw=read,
->> ioscheduler=none
->>
->> Before:
->> 7130K
->>
->> After:
->> 7630K
->>
->> So a +7% IOPS gain.
-
-Thanks for having a look.
-
-> What does the comparison run on a non-NUMA non-shared queue look like?
-> Because I bet it'd be slower.
-
-I could test more to get a solid result for that.
-
+On Tue, May 10, 2022 at 06:29:52AM -0600, Jens Axboe wrote:
+> On 5/10/22 1:22 AM, Christoph Hellwig wrote:
+> > Jens,
+> > 
+> > are the comments from Ted here enough to apply the series?  Or do
+> > we need a formal Acked-by to be on the safe side?
 > 
-> To be honest, I don't like this approach at all. It makes the normal
-> case quite a bit slower by having an extra layer of indirection for the
-> word, that's quite a bit of extra cost.
+> Looks conclusive enough to me - if not, Ted, please holler. I'll
+> queue it up.
 
-Yes, there is the extra load. I would hope that there would be a low 
-cost, but I agree that we still want to avoid it. So prob no point in 
-testing this more.
+Sounds good, thanks so much Jens!
 
-> It doesn't seem like a good
-> approach for the issue, as it pessimizes the normal fast case.
-> 
-> Spreading the memory out does probably make sense, but we need to retain
-> the fast normal case. Making sbitmap support both, selected at init
-> time, would be far more likely to be acceptable imho.
-
-I wanted to keep the code changes minimal for an initial RFC to test the 
-water.
-
-My original approach did not introduce the extra load for normal path 
-and had some init time selection for a normal word map vs numa word map, 
-but the code grew and became somewhat unmanageable. I'll revisit it to 
-see how to improve that.
-
-Cheers,
-john
+					- Ted
