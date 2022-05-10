@@ -2,221 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C1FC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 03:30:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDAAC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 10 May 2022 03:48:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235490AbiEJDeH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 9 May 2022 23:34:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50684 "EHLO
+        id S231851AbiEJDwO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 9 May 2022 23:52:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235493AbiEJDdx (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 23:33:53 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08493719C9
-        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 20:29:49 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id cx11-20020a17090afd8b00b001d9fe5965b3so947848pjb.3
-        for <linux-block@vger.kernel.org>; Mon, 09 May 2022 20:29:49 -0700 (PDT)
+        with ESMTP id S235891AbiEJDwG (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 9 May 2022 23:52:06 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C200E4F9EB
+        for <linux-block@vger.kernel.org>; Mon,  9 May 2022 20:48:05 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 202so13611087pgc.9
+        for <linux-block@vger.kernel.org>; Mon, 09 May 2022 20:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=fxdtTp3M8aUfDAUSZiH+3vfMAMB7VhyCU2mEh+hK6Ew=;
-        b=4sHLng4o/86uE+nfqNXIXDE5L+7p2bPFktoPF881vrndtItm5dFj+t2Gz8/SgvvKLe
-         G2TZRt64QCDdts+BM5JOfQ8f8vffhbevbejdIrjh44I2tvoR/YKynPJi06vlBgrp4n1r
-         /5LxwwBq+U9Nk46R34kbzREGjxz708XH4DawA/1voll+RpxbotzdfGj1w5TzGaaG0qPR
-         KUQjYUZjfoJ3j4Q8/lfgcWLAO7QklBVO2c/ZmQDmduvgvgQUBdxgFJvnpqnoXMCZnUVZ
-         xN62e9k5vuHu9gwbzE2/ETiRosRWXrfa6ZjvomGW8LXXVONocBKtNmY3lGj5GatkR1ee
-         FAKw==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WwAC7yJmQyf0urXxiRrxQbFHiuNL5jbhDc4jex67OW4=;
+        b=bZHSJ7bpkl4sSuvW6mgl1I7nbbBfYx8MmE4fDYj0YNLtudrKynpdKr6QEbVDD9Aku7
+         +lzGDsawCKQaHAvrWPKcZLCxQaCN0NzNz4g36sHzK2XrxG9ifgnZMEoGEifX9f6kOek9
+         +CAie9y1101MRdqr+KufppR9BmcT9c342MFfWejKFKACEfsMD9CvkpxUqYBRs/LLmXve
+         PfeqjwhMCkN0N8TOYDq1K5BbqFgvL9pa5lxblkiEvSuYtMc26a3IVoqe9wUnjwQGHX5m
+         9wGi3o4znFUdECTJ3L3Zpof0j1AyTUIjES45k7/AUqouZjKaJqIYGXtLlSQ7VP4DssyV
+         fU7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=fxdtTp3M8aUfDAUSZiH+3vfMAMB7VhyCU2mEh+hK6Ew=;
-        b=CPgaNZJ0m4pQaMxtYIZs3bA6LV5Z8b5t2vD10YiOeki/5mjo9yoblvsjepKiu7j/8G
-         UNtg3ZoyjqGf+t4+G5l+l5HFt1pBXv1sqfTienyzPtlhmeyjgNCQfasJk4QEAfLGJkk9
-         1eylQrPGeExVGRWFas0FtS16TtOhTSRJox0Xx5brdFQOR3uYpstekl/8X+LpwvpX+yIb
-         iYx1NncMlHlzKM3xKmJRf9KUc9+AHcl2aM1XOABFyaaqMUfdHNgiYBxDxEVKhx9s7sw3
-         lKZlkQq7c16UtuxQGsEJ/uvV0SO2f7m9iG7rENGXC+qlJqeaQh04SZYrYrSHfamkvcg7
-         2Glw==
-X-Gm-Message-State: AOAM532qJUf06wy88vl8PktTvZBI6RfKFNYphcikf31YYQyqtuNOics1
-        qUw1mLcbUbnlc0lMjkzrRu35cg==
-X-Google-Smtp-Source: ABdhPJwV4PmwcQY4MScIOkWZ3RK8xFz4p9aXLt1+NZARu9n25aZZ1Nik595PT53Cm1fFtUitXi/xOg==
-X-Received: by 2002:a17:902:74c5:b0:15f:1388:53eb with SMTP id f5-20020a17090274c500b0015f138853ebmr7521990plt.39.1652153388271;
-        Mon, 09 May 2022 20:29:48 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id g7-20020a17090a578700b001d25dfb9d39sm535687pji.14.2022.05.09.20.29.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 09 May 2022 20:29:47 -0700 (PDT)
-Message-ID: <5ac7c54a-e82b-9d28-9761-446a644e181c@kernel.dk>
-Date:   Mon, 9 May 2022 21:29:46 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [RFC PATCH] ubd: add io_uring based userspace block driver
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
+        bh=WwAC7yJmQyf0urXxiRrxQbFHiuNL5jbhDc4jex67OW4=;
+        b=eg6iFrC5Ylc+hXGqoNtlIes79CivgnOcs7f0x/9Q7sVCcyPDNDh8nCt605whcWlsiV
+         5407wOwR7eKpQd8zwTzRV3UmstWfaMpnoNAeuOdL+GBiydp0/mdBEdi+Q824KXJ0Glsw
+         vhMmEHi5nf02X2WNKdBqshyp4egqrRYd5bfOaW8gp1XIpyIhiPbGtavqBtkj6sIS15dw
+         TA4ij3t716PHI6pjMa74U8fcTl7T5GL6ic4o2R2mIIyZfGRSY81PXhEmW/ZFUgw2s+8c
+         kkOZBIPuBkYt4B6du1ld8vQoOyCQrjPo59gtF4+h/5qJL79NmgbiS+JEONr+jtVuJvQe
+         UVng==
+X-Gm-Message-State: AOAM532TmTs4L7FJd/s8w1rpvv8ScTbe9PCV6khJcLO6sSO/tgho/U4N
+        DMrIeloEmyDx47mfexCQQoygDg==
+X-Google-Smtp-Source: ABdhPJze/shPQuA0kzNOEmJipModZI0YI/vymQS2NKqCkqkUdo6hfyc+q4MB5shOw9M55p8HIrYGTw==
+X-Received: by 2002:a63:1d50:0:b0:3c2:9152:5966 with SMTP id d16-20020a631d50000000b003c291525966mr15181661pgm.525.1652154485226;
+        Mon, 09 May 2022 20:48:05 -0700 (PDT)
+Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.254])
+        by smtp.gmail.com with ESMTPSA id y16-20020a63b510000000b003c6ab6ba06csm3731640pge.79.2022.05.09.20.48.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 09 May 2022 20:48:04 -0700 (PDT)
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+To:     tj@kernel.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-References: <20220509092312.254354-1-ming.lei@redhat.com>
- <9c833e12-fd09-fe7d-d4f2-e916c6ce4524@kernel.dk> <YnnUuZve2b2LmInc@T590>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YnnUuZve2b2LmInc@T590>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        duanxiongchun@bytedance.com, songmuchun@bytedance.com,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH] blk-iocost: combine local_stat and desc_stat to stat
+Date:   Tue, 10 May 2022 11:47:57 +0800
+Message-Id: <20220510034757.21761-1-zhouchengming@bytedance.com>
+X-Mailer: git-send-email 2.35.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/9/22 8:58 PM, Ming Lei wrote:
-> On Mon, May 09, 2022 at 10:09:10AM -0600, Jens Axboe wrote:
->> On 5/9/22 3:23 AM, Ming Lei wrote:
->>> This is the driver part of userspace block driver(ubd driver), the other
->>> part is userspace daemon part(ubdsrv)[1].
->>>
->>> The two parts communicate by io_uring's IORING_OP_URING_CMD with one
->>> shared cmd buffer for storing io command, and the buffer is read only for
->>> ubdsrv, each io command is indexed by io request tag directly, and
->>> is written by ubd driver.
->>>
->>> For example, when one READ io request is submitted to ubd block driver, ubd
->>> driver stores the io command into cmd buffer first, then completes one
->>> IORING_OP_URING_CMD for notifying ubdsrv, and the URING_CMD is issued to
->>> ubd driver beforehand by ubdsrv for getting notification of any new io request,
->>> and each URING_CMD is associated with one io request by tag.
->>>
->>> After ubdsrv gets the io command, it translates and handles the ubd io
->>> request, such as, for the ubd-loop target, ubdsrv translates the request
->>> into same request on another file or disk, like the kernel loop block
->>> driver. In ubdsrv's implementation, the io is still handled by io_uring,
->>> and share same ring with IORING_OP_URING_CMD command. When the target io
->>> request is done, the same IORING_OP_URING_CMD is issued to ubd driver for
->>> both committing io request result and getting future notification of new
->>> io request.
->>>
->>> Another thing done by ubd driver is to copy data between kernel io
->>> request and ubdsrv's io buffer:
->>>
->>> 1) before ubsrv handles WRITE request, copy the request's data into
->>> ubdsrv's userspace io buffer, so that ubdsrv can handle the write
->>> request
->>>
->>> 2) after ubsrv handles READ request, copy ubdsrv's userspace io buffer
->>> into this READ request, then ubd driver can complete the READ request
->>>
->>> Zero copy may be switched if mm is ready to support it.
->>>
->>> ubd driver doesn't handle any logic of the specific user space driver,
->>> so it should be small/simple enough.
->>
->> This is pretty interesting! Just one small thing I noticed, since you
->> want to make sure batching is Good Enough:
->>
->>> +static blk_status_t ubd_queue_rq(struct blk_mq_hw_ctx *hctx,
->>> +		const struct blk_mq_queue_data *bd)
->>> +{
->>> +	struct ubd_queue *ubq = hctx->driver_data;
->>> +	struct request *rq = bd->rq;
->>> +	struct ubd_io *io = &ubq->ios[rq->tag];
->>> +	struct ubd_rq_data *data = blk_mq_rq_to_pdu(rq);
->>> +	blk_status_t res;
->>> +
->>> +	if (ubq->aborted)
->>> +		return BLK_STS_IOERR;
->>> +
->>> +	/* this io cmd slot isn't active, so have to fail this io */
->>> +	if (WARN_ON_ONCE(!(io->flags & UBD_IO_FLAG_ACTIVE)))
->>> +		return BLK_STS_IOERR;
->>> +
->>> +	/* fill iod to slot in io cmd buffer */
->>> +	res = ubd_setup_iod(ubq, rq);
->>> +	if (res != BLK_STS_OK)
->>> +		return BLK_STS_IOERR;
->>> +
->>> +	blk_mq_start_request(bd->rq);
->>> +
->>> +	/* mark this cmd owned by ubdsrv */
->>> +	io->flags |= UBD_IO_FLAG_OWNED_BY_SRV;
->>> +
->>> +	/*
->>> +	 * clear ACTIVE since we are done with this sqe/cmd slot
->>> +	 *
->>> +	 * We can only accept io cmd in case of being not active.
->>> +	 */
->>> +	io->flags &= ~UBD_IO_FLAG_ACTIVE;
->>> +
->>> +	/*
->>> +	 * run data copy in task work context for WRITE, and complete io_uring
->>> +	 * cmd there too.
->>> +	 *
->>> +	 * This way should improve batching, meantime pinning pages in current
->>> +	 * context is pretty fast.
->>> +	 */
->>> +	task_work_add(ubq->ubq_daemon, &data->work, TWA_SIGNAL);
->>> +
->>> +	return BLK_STS_OK;
->>> +}
->>
->> It'd be better to use bd->last to indicate what kind of signaling you
->> need here. TWA_SIGNAL will force an immediate transition if the app is
->> running in userspace, which may not be what you want. Also see:
->>
->> https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.19/io_uring&id=e788be95a57a9bebe446878ce9bf2750f6fe4974
->>
->> But regardless of signaling needed, you don't need it except if bd->last
->> is true. Would need a commit_rqs() as well, but that's trivial.
-> 
-> Good point, I think we may add non-last request via task_work_add(TWA_NONE),
-> and only notify via TWA_SIGNAL_NO_IPI for bd->last.
+When we flush usage, wait, indebt stat in iocg_flush_stat(), we use
+local_stat and desc_stat, which has no point since the leaf iocg
+only has local_stat and the inner iocg only has desc_stat. Also
+we don't need to flush percpu abs_vusage for these inner iocgs.
 
-Yep, I think that'd be the way to go.
+This patch combine local_stat and desc_stat to stat, only flush
+percpu abs_vusage for active leaf iocgs, then build inner walk
+list to propagate.
 
->> More importantly, what prevents ubq->ubq_daemon from going away after
->> it's been assigned? I didn't look at the details, but is this relying on
->> io_uring being closed to cancel pending requests? That should work, but
-> 
-> I think no way can prevent ubq->ubq_daemon from being killed by 'kill -9',
-> even though ubdsrv has handled SIGTERM. That is why I suggest to add
-> one service for removing all ubd devices before shutdown:
-> 
-> https://github.com/ming1/ubdsrv/blob/devel/README
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-iocost.c | 71 +++++++++++++++++++++-------------------------
+ 1 file changed, 32 insertions(+), 39 deletions(-)
 
-Right, you can't prevent a task from getting killed. But what you do
-know is that file descriptors get closed when the task goes away, and if
-you're integrated into io_uring in terms of how request are handled,
-then the closing of the io_ring ring descriptor should wait-for/cancel
-pending requests. If done right, that could perhaps exclude the issue of
-having the stored task become invalid.
-
-I haven't looked too closely at it all yet, so the above may not be a
-viable approach. Or maybe it will... It's how io_uring itself does it.
-
-> All the commands of UBD_IO_FETCH_REQ or UBD_IO_COMMIT_AND_FETCH_REQ have
-> been submitted to driver, I understand io_uring can't cancel them,
-> please correct me if it is wrong.
-
-Right, any storage IO can't get canceled if it's already hit the block
-layer or further down. So you end up waiting for them, which is fine
-too.
-
-> One solution I thought of is to use one watchdog to check if ubq->ubq_daemon
-> is dead, then abort whole device if yes. Or any suggestion?
-
-You'd still need to ensure that it remains valid.
-
->> we need some way to ensure that ->ubq_daemon is always valid here.
-> 
-> Good catch.
-> 
-> get_task_struct() should be used for assigning ubq->ubq_daemon.
-
-Yep, that could work too as long as it doesn't introduce a weird loopy
-dependency. Since it's just the task_struct itself, I think it'd be fine
-and the simplest solution. This is a setup thing, and not per-io?
-
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 9bd670999d0a..9c1982d42d65 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -533,8 +533,7 @@ struct ioc_gq {
+ 
+ 	/* statistics */
+ 	struct iocg_pcpu_stat __percpu	*pcpu_stat;
+-	struct iocg_stat		local_stat;
+-	struct iocg_stat		desc_stat;
++	struct iocg_stat		stat;
+ 	struct iocg_stat		last_stat;
+ 	u64				last_stat_abs_vusage;
+ 	u64				usage_delta_us;
+@@ -1371,7 +1370,7 @@ static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
+ 		return true;
+ 	} else {
+ 		if (iocg->indelay_since) {
+-			iocg->local_stat.indelay_us += now->now - iocg->indelay_since;
++			iocg->stat.indelay_us += now->now - iocg->indelay_since;
+ 			iocg->indelay_since = 0;
+ 		}
+ 		iocg->delay = 0;
+@@ -1419,7 +1418,7 @@ static void iocg_pay_debt(struct ioc_gq *iocg, u64 abs_vpay,
+ 
+ 	/* if debt is paid in full, restore inuse */
+ 	if (!iocg->abs_vdebt) {
+-		iocg->local_stat.indebt_us += now->now - iocg->indebt_since;
++		iocg->stat.indebt_us += now->now - iocg->indebt_since;
+ 		iocg->indebt_since = 0;
+ 
+ 		propagate_weights(iocg, iocg->active, iocg->last_inuse,
+@@ -1513,7 +1512,7 @@ static void iocg_kick_waitq(struct ioc_gq *iocg, bool pay_debt,
+ 
+ 	if (!waitqueue_active(&iocg->waitq)) {
+ 		if (iocg->wait_since) {
+-			iocg->local_stat.wait_us += now->now - iocg->wait_since;
++			iocg->stat.wait_us += now->now - iocg->wait_since;
+ 			iocg->wait_since = 0;
+ 		}
+ 		return;
+@@ -1641,11 +1640,30 @@ static void iocg_build_inner_walk(struct ioc_gq *iocg,
+ 	}
+ }
+ 
++/* propagate the deltas to the parent */
++static void iocg_flush_stat_upward(struct ioc_gq *iocg)
++{
++	if (iocg->level > 0) {
++		struct iocg_stat *parent_stat =
++			&iocg->ancestors[iocg->level - 1]->stat;
++
++		parent_stat->usage_us +=
++			iocg->stat.usage_us - iocg->last_stat.usage_us;
++		parent_stat->wait_us +=
++			iocg->stat.wait_us - iocg->last_stat.wait_us;
++		parent_stat->indebt_us +=
++			iocg->stat.indebt_us - iocg->last_stat.indebt_us;
++		parent_stat->indelay_us +=
++			iocg->stat.indelay_us - iocg->last_stat.indelay_us;
++	}
++
++	iocg->last_stat = iocg->stat;
++}
++
+ /* collect per-cpu counters and propagate the deltas to the parent */
+-static void iocg_flush_stat_one(struct ioc_gq *iocg, struct ioc_now *now)
++static void iocg_flush_stat_leaf(struct ioc_gq *iocg, struct ioc_now *now)
+ {
+ 	struct ioc *ioc = iocg->ioc;
+-	struct iocg_stat new_stat;
+ 	u64 abs_vusage = 0;
+ 	u64 vusage_delta;
+ 	int cpu;
+@@ -1661,34 +1679,9 @@ static void iocg_flush_stat_one(struct ioc_gq *iocg, struct ioc_now *now)
+ 	iocg->last_stat_abs_vusage = abs_vusage;
+ 
+ 	iocg->usage_delta_us = div64_u64(vusage_delta, ioc->vtime_base_rate);
+-	iocg->local_stat.usage_us += iocg->usage_delta_us;
+-
+-	/* propagate upwards */
+-	new_stat.usage_us =
+-		iocg->local_stat.usage_us + iocg->desc_stat.usage_us;
+-	new_stat.wait_us =
+-		iocg->local_stat.wait_us + iocg->desc_stat.wait_us;
+-	new_stat.indebt_us =
+-		iocg->local_stat.indebt_us + iocg->desc_stat.indebt_us;
+-	new_stat.indelay_us =
+-		iocg->local_stat.indelay_us + iocg->desc_stat.indelay_us;
+-
+-	/* propagate the deltas to the parent */
+-	if (iocg->level > 0) {
+-		struct iocg_stat *parent_stat =
+-			&iocg->ancestors[iocg->level - 1]->desc_stat;
+-
+-		parent_stat->usage_us +=
+-			new_stat.usage_us - iocg->last_stat.usage_us;
+-		parent_stat->wait_us +=
+-			new_stat.wait_us - iocg->last_stat.wait_us;
+-		parent_stat->indebt_us +=
+-			new_stat.indebt_us - iocg->last_stat.indebt_us;
+-		parent_stat->indelay_us +=
+-			new_stat.indelay_us - iocg->last_stat.indelay_us;
+-	}
++	iocg->stat.usage_us += iocg->usage_delta_us;
+ 
+-	iocg->last_stat = new_stat;
++	iocg_flush_stat_upward(iocg);
+ }
+ 
+ /* get stat counters ready for reading on all active iocgs */
+@@ -1699,13 +1692,13 @@ static void iocg_flush_stat(struct list_head *target_iocgs, struct ioc_now *now)
+ 
+ 	/* flush leaves and build inner node walk list */
+ 	list_for_each_entry(iocg, target_iocgs, active_list) {
+-		iocg_flush_stat_one(iocg, now);
++		iocg_flush_stat_leaf(iocg, now);
+ 		iocg_build_inner_walk(iocg, &inner_walk);
+ 	}
+ 
+ 	/* keep flushing upwards by walking the inner list backwards */
+ 	list_for_each_entry_safe_reverse(iocg, tiocg, &inner_walk, walk_list) {
+-		iocg_flush_stat_one(iocg, now);
++		iocg_flush_stat_upward(iocg);
+ 		list_del_init(&iocg->walk_list);
+ 	}
+ }
+@@ -2152,16 +2145,16 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
+ 
+ 		/* flush wait and indebt stat deltas */
+ 		if (iocg->wait_since) {
+-			iocg->local_stat.wait_us += now->now - iocg->wait_since;
++			iocg->stat.wait_us += now->now - iocg->wait_since;
+ 			iocg->wait_since = now->now;
+ 		}
+ 		if (iocg->indebt_since) {
+-			iocg->local_stat.indebt_us +=
++			iocg->stat.indebt_us +=
+ 				now->now - iocg->indebt_since;
+ 			iocg->indebt_since = now->now;
+ 		}
+ 		if (iocg->indelay_since) {
+-			iocg->local_stat.indelay_us +=
++			iocg->stat.indelay_us +=
+ 				now->now - iocg->indelay_since;
+ 			iocg->indelay_since = now->now;
+ 		}
 -- 
-Jens Axboe
+2.36.0
 
