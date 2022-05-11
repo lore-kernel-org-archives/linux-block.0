@@ -2,151 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77EEDC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 11 May 2022 16:04:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C749BC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 11 May 2022 17:44:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344265AbiEKQEb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 11 May 2022 12:04:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47034 "EHLO
+        id S1345748AbiEKRol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 11 May 2022 13:44:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344273AbiEKQEX (ORCPT
+        with ESMTP id S243097AbiEKRok (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 11 May 2022 12:04:23 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E23011A15D4;
-        Wed, 11 May 2022 09:04:19 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id CBA4A1F460;
-        Wed, 11 May 2022 16:04:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1652285057;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xc6b2DGSHNoqcRaRJAmNz3xmM8+5hVjJ6d9Uf3kedYI=;
-        b=AptAfNQUACxbGuDofIFikwhqSmZLKp4LaZkHv0nu5pVn6UGKlHaoJuH95JxLwf223Z+HIf
-        R8aoLP+L+YwysdX0gx8806E5IouENUnMmezge+u6h42ZR1TitVwdwkQ25tBBdHfU4gLBzg
-        bPkaIp0vtR6+ExEinYmIQH18c7X68Oo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1652285057;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Xc6b2DGSHNoqcRaRJAmNz3xmM8+5hVjJ6d9Uf3kedYI=;
-        b=XqXkW74F8Zok5rdnrEAgPSVAz1K4bzmN0oplvOFkQ34V3VduS2lJo/LPWmHvXSFvI7IzbV
-        VI5pIiFWh6KxVkAg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 2D07B13A76;
-        Wed, 11 May 2022 16:04:17 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Ton9CYHee2KSRQAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Wed, 11 May 2022 16:04:17 +0000
-Date:   Wed, 11 May 2022 18:00:02 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     dsterba@suse.cz, jaegeuk@kernel.org, hare@suse.de,
-        dsterba@suse.com, axboe@kernel.dk, hch@lst.de,
-        damien.lemoal@opensource.wdc.com, snitzer@kernel.org,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        bvanassche@acm.org, linux-fsdevel@vger.kernel.org,
-        matias.bjorling@wdc.com, Jens Axboe <axboe@fb.com>,
-        gost.dev@samsung.com, jonathan.derrick@linux.dev,
-        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH v3 11/11] dm-zoned: ensure only power of 2 zone sizes are
- allowed
-Message-ID: <20220511160001.GQ18596@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Pankaj Raghav <p.raghav@samsung.com>,
-        jaegeuk@kernel.org, hare@suse.de, dsterba@suse.com, axboe@kernel.dk,
-        hch@lst.de, damien.lemoal@opensource.wdc.com, snitzer@kernel.org,
-        Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        bvanassche@acm.org, linux-fsdevel@vger.kernel.org,
-        matias.bjorling@wdc.com, Jens Axboe <axboe@fb.com>,
-        gost.dev@samsung.com, jonathan.derrick@linux.dev,
-        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
-        dm-devel@redhat.com, Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>, Alasdair Kergon <agk@redhat.com>,
-        linux-block@vger.kernel.org, Chaitanya Kulkarni <kch@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20220506081105.29134-1-p.raghav@samsung.com>
- <CGME20220506081118eucas1p17f3c29cc36d748c3b5a3246f069f434a@eucas1p1.samsung.com>
- <20220506081105.29134-12-p.raghav@samsung.com>
- <20220509185432.GB18596@twin.jikos.cz>
- <d8e86c32-f122-01df-168e-648179766c55@samsung.com>
+        Wed, 11 May 2022 13:44:40 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B3A4223869
+        for <linux-block@vger.kernel.org>; Wed, 11 May 2022 10:44:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Fdbql12aOS2KSSMpsvHjuCsdrDaT82RhchbPkuB7CQA=; b=s6yel7t9GNAZwS6qrqSjlp3PPI
+        3NVQyvEBMOpN65x9M5nO7+ZVX8cjD+Gu+wMUtNKFG0YBmZtZcHA42WkEs02oTPJQkwQXc/RF+9T4z
+        slD7hGj25ix7YW9g+2KNquBufpZ+PtfsQ5Uxj+TySu94Oa7/VZ8p1Y1RFhseJymxQGDFrfBJPZ4Iz
+        CRUL9mkVKsFLo43EIrFA59srOxr0q9nrme4b274/atvTdvTNKq50Tsi+W2mYGzvZvxDwIktav2sM9
+        v8zatfQZy6acS7/cn049DeOXzwndgrqErMSgUE4e02Abu/pNH7kcSi53KQl9hZgUDAz48gcqGq3iS
+        r5G/JO4A==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1noqO5-0080ri-D7; Wed, 11 May 2022 17:44:37 +0000
+Date:   Wed, 11 May 2022 10:44:37 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     osandov@fb.com, linux-block@vger.kernel.org
+Subject: Re: [PATCH v2] blktests: replace module removal with patient module
+ removal
+Message-ID: <Ynv2BaRJcL0I3vAR@bombadil.infradead.org>
+References: <YlogluONIoc1VTCI@bombadil.infradead.org>
+ <c584cf40-2181-2617-92aa-bcdbc56a5ab8@acm.org>
+ <Yl2KU6vLxawrIXi/@bombadil.infradead.org>
+ <1293a7e7-71d0-117e-1a4f-8ccfc609bc43@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d8e86c32-f122-01df-168e-648179766c55@samsung.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <1293a7e7-71d0-117e-1a4f-8ccfc609bc43@acm.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 11, 2022 at 04:39:17PM +0200, Pankaj Raghav wrote:
-> Hi David,
-> 
-> On 2022-05-09 20:54, David Sterba wrote:>> diff --git
-> a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-> >> index 3e7b1fe15..27dc4ddf2 100644
-> >> --- a/drivers/md/dm-zone.c
-> >> +++ b/drivers/md/dm-zone.c
-> >> @@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
-> >>  	struct request_queue *q = md->queue;
-> >>  	unsigned int noio_flag;
-> >>  	int ret;
-> >> +	struct block_device *bdev = md->disk->part0;
-> >> +	sector_t zone_sectors;
-> >> +	char bname[BDEVNAME_SIZE];
-> >> +
-> >> +	zone_sectors = bdev_zone_sectors(bdev);
-> >> +
-> >> +	if (!is_power_of_2(zone_sectors)) {
+On Mon, Apr 18, 2022 at 09:39:06AM -0700, Bart Van Assche wrote:
+> On 4/18/22 08:57, Luis Chamberlain wrote:
+> > On Fri, Apr 15, 2022 at 09:01:03PM -0700, Bart Van Assche wrote:
+> > > On 4/15/22 18:49, Luis Chamberlain wrote:
+> > > > -	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
+> > > > -	if [[ "${nvme_trtype}" != "loop" ]]; then
+> > > > -		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
+> > > > -	fi
+> > > > -	modprobe -r nvmet 2>/dev/null
+> > > > +	if [[ "${nvme_trtype}" == "loop" ]]; then
+> > > > +		_patient_rmmod nvme_"${nvme_trtype}"
+> > > > +        else
+> > > > +                _patient_rmmod nvme-"${nvme_trtype}"
+> > > > +                _patient_rmmod nvmet-"${nvme_trtype}"
+> > > > +        fi
+> > > > +	_patient_rmmod nvmet 2>/dev/null
+> > > 
+> > > The statement _patient_rmmod nvme-"${nvme_trtype}" occurs twice in the above
+> > > code. How about preserving the structure of the existing code such that that
+> > > statement only occurs once?
 > > 
-> > is_power_of_2 takes 'unsigned long' and sector_t is u64, so this is not
-> > 32bit clean and we had an actual bug where value 1<<48 was not
-> > recognized as power of 2.
+> > There is one call for nvme-"${nvme_trtype}", the other is for the
+> > underscore version, so there are no two calls.
 > > 
-> Good catch. Now I understand why btrfs has a helper for is_power_of_two_u64.
+> > Did I miss something?
 > 
-> But the zone size can never be more than 32bit value so the zone size
-> sect will never greater than unsigned long.
-
-We've set the maximum supported zone size in btrfs to be 8G, which is a
-lot and should be sufficient for some time, but this also means that the
-value is larger than 32bit maximum. I have actually tested btrfs on top
-of such emaulated zoned device via TCMU, so it's not dm-zoned, so it's
-up to you to make sure that a silent overflow won't happen.
-
-> With that said, we have two options:
+> It's only now that I see the underscore/hyphen difference in the if and else
+> branches. It is not clear to me why this behavior change has been introduced?
+> The following command produces no output on my test setup:
 > 
-> 1.) We can put a comment explaining that even though it is 32 bit
-> unsafe, zone size sect can never be a 32bit value
+> find /lib/modules -name 'nvme_*'
 
-This is probably part of the protocol and specification of the zoned
-devices, the filesystem either accepts the spec or makes some room for
-larger values in case it's not too costly.
+Try:
 
-> or
+find /sys/module/ -maxdepth 1 -type d | grep loop
+
+I get:
+/sys/module/nvme_loop
+
+Blame scripts/Makefile.lib which does the s|-|_| for KBUILD_MODNAME:
+
+name-fix-token = $(subst $(comma),_,$(subst -,_,$1))                            
+name-fix = $(call stringify,$(call name-fix-token,$1))                          
+basename_flags = -DKBUILD_BASENAME=$(call name-fix,$(basetarget))               
+modname_flags  = -DKBUILD_MODNAME=$(call name-fix,$(modname)) \                 
+                 -D__KBUILD_MODNAME=kmod_$(call name-fix-token,$(modname))
+
+I'm thinking now it is best to do this hack here:
+
+diff --git a/common/rc b/common/rc
+index 67bba70..cff0eb2 100644
+--- a/common/rc
++++ b/common/rc
+@@ -390,7 +390,10 @@ _patient_rmmod_check_refcnt()
+ # ourselves.
+ _patient_rmmod()
+ {
+-	local module=$1
++	# Since we are looking for a directory we must adopt the
++	# specific directory used by scripts/Makefile.lib for
++	# KBUILD_MODNAME
++	local module=$(echo $1 | sed 's|-|_|g')
+ 	local max_tries_max=$MODPROBE_PATIENT_RM_TIMEOUT_SECONDS
+ 	local max_tries=0
+ 	local mod_ret=0
+
+
+That would allow us to keep the old order, and in fact
+would be correct for the other targets as well.
+
+> > > >    # Unload the SRP initiator driver.
+> > > >    stop_srp_ini() {
+> > > > -	local i
+> > > > -
+> > > >    	log_out
+> > > > -	for ((i=40;i>=0;i--)); do
+> > > > -		remove_mpath_devs || return $?
+> > > > -		unload_module ib_srp >/dev/null 2>&1 && break
+> > > > -		sleep 1
+> > > > -	done
+> > > > -	if [ -e /sys/module/ib_srp ]; then
+> > > > -		echo "Error: unloading kernel module ib_srp failed"
+> > > > -		return 1
+> > > > -	fi
+> > > > -	unload_module scsi_transport_srp || return $?
+> > > > +	remove_mpath_devs || return $?
+> > > > +	_patient_rmmod ib_srp || return 1
+> > > > +	_patient_rmmod scsi_transport_srp || return $?
+> > > >    }
+> > > 
+> > > Removing the loop from around remove_mpath_devs is wrong. It is important
+> > > that that loop is preserved.
+> > 
+> > Why ? Can you test and verify?
 > 
-> 2) We should move the btrfs only helper `is_power_of_two_u64` to some
-> common header and use it everywhere.
+> If I remember correctly I put remove_mpath_devs call inside the loop because
+> multipathd keeps running while the loop is ongoing and hence can modify paths
+> while the loop is running.
 
-Yeah, that can be done independently. With some macro magic it can be
-made type-safe for any argument while preserving the 'is_power_of_2'
-name.
+I suspect you ran into the issue of the refcnt being bumped by anything
+multipathd tried, and not being able to remove the module, but  if it is
+adding *new* mpath devices that would seem like a bug which we'd need to
+address. The point to the patient module removal is to keep on trying
+until the recnt  is 0 and if that fails wait and keep trying, until the
+the timeout. Anytihng userspace does, say multipathd does, like
+bdev_open(), would be yielded to.
+
+So I'd like to keep this change as it is exactly the sort of hack I am
+chasing after with this crusade.
+
+Let me know how you'd like to proceed so I can punt a v3.
+
+  Luis
