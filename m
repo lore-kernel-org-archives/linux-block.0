@@ -2,110 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B76EC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 11 May 2022 02:07:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C42A5C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 11 May 2022 03:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241002AbiEKCHS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 10 May 2022 22:07:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54460 "EHLO
+        id S236613AbiEKDBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 10 May 2022 23:01:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229825AbiEKCHO (ORCPT
+        with ESMTP id S229608AbiEKDBY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 10 May 2022 22:07:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AE02235246
-        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 19:07:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652234832;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=NlO8iEufHMnKg+NhkfN0TsHAyOYUXpgbfoZ0SDeWqus=;
-        b=SACAfeI8w2vrPlyN2SLi3p24VPF2Xaoc82LrpfnH9GfGeKR7rqgDJs0M1zSUisBjr4e9kU
-        1VLe44tPXgWbsbTeMYLg/9FyGvyHTThEv3wtrwzEE6+7dPxBWsjrxUg+dt8802kUqF0RiY
-        rK4PXXgrzXKpsi6tsVywqNTCdH79Jrc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-14-5G8zIGwkMES5IyDnPiMtrA-1; Tue, 10 May 2022 22:07:11 -0400
-X-MC-Unique: 5G8zIGwkMES5IyDnPiMtrA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 01A5C805B25;
-        Wed, 11 May 2022 02:07:11 +0000 (UTC)
-Received: from T590 (ovpn-8-27.pek2.redhat.com [10.72.8.27])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 58DBF40CF8E7;
-        Wed, 11 May 2022 02:07:05 +0000 (UTC)
-Date:   Wed, 11 May 2022 10:07:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     John Garry <john.garry@huawei.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org
-Subject: Re: [RFC PATCH 0/2] sbitmap: NUMA node spreading
-Message-ID: <YnsaRXzKR5FKjC66@T590>
-References: <1652181274-136198-1-git-send-email-john.garry@huawei.com>
- <1afd2c01-69b3-ab8f-6bfe-118e3e56001c@kernel.dk>
- <9ede7211-ae58-5cd4-4cf6-74c1f508f1a6@huawei.com>
+        Tue, 10 May 2022 23:01:24 -0400
+Received: from heian.cn.fujitsu.com (mail.cn.fujitsu.com [183.91.158.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6E0B06220D
+        for <linux-block@vger.kernel.org>; Tue, 10 May 2022 20:01:22 -0700 (PDT)
+IronPort-Data: =?us-ascii?q?A9a23=3Af3iSF69rQh2mg5z1dFUoDrUDunyTJUtcMsCJ2f8?=
+ =?us-ascii?q?bfWQNrUoqhmACyTYYWWyBMvjeZTegKtgnO4u1oEMA7J7QnNU3SFdlrnsFo1Bi8?=
+ =?us-ascii?q?5ScXYvDRqvT04J+FuWaFQQ/qZx2huDodKjYdVeB4Ef9WlTdhSMkj/vQHOKlULe?=
+ =?us-ascii?q?s1h1ZHmeIdg9w0HqPpMZp2uaEsfDha++8kYuaT//3YTdJ6BYoWo4g0J9vnTs01?=
+ =?us-ascii?q?BjEVJz0iXRlDRxDlAe2e3D4l/vzL4npR5fzatE88uJX24/+IL+FEmPxp3/BC/u?=
+ =?us-ascii?q?ulPD1b08LXqXPewOJjxK6WYD72l4b+HN0if19aZLwam8O49mNt8F4ztpd856hY?=
+ =?us-ascii?q?Qk0PKzQg/lbWB5de817FfQcpOabeibi4aR/yGWDKRMA2c5GC1o/O4Ef5M55Cyd?=
+ =?us-ascii?q?F8vlwACEMKAKDjuS56Ki2RullmoIoK8yDFIcevGxwiDvdCv0laY7MTr+M5tJC2?=
+ =?us-ascii?q?jo0wMdUEp7ji2AxAdZ0RE2YJUQRZRFMU9Rj9NpET0LXK1VwwG95b4Jui4QL8DF?=
+ =?us-ascii?q?M7Q=3D=3D?=
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3ArtcioK+f8gMtmEdP5Ipuk+DkI+orL9Y04lQ7?=
+ =?us-ascii?q?vn2ZKCYlFvBw8vrCoB1173HJYUkqMk3I9ergBEDiewK4yXcW2/hzAV7KZmCP11?=
+ =?us-ascii?q?dAR7sSj7cKrQeBJwTOssZZ1YpFN5N1EcDMCzFB5vrS0U2VFMkBzbC8nJyVuQ?=
+ =?us-ascii?q?=3D=3D?=
+X-IronPort-AV: E=Sophos;i="5.88,333,1635177600"; 
+   d="scan'208";a="124143658"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+  by heian.cn.fujitsu.com with ESMTP; 11 May 2022 11:01:21 +0800
+Received: from G08CNEXMBPEKD05.g08.fujitsu.local (unknown [10.167.33.204])
+        by cn.fujitsu.com (Postfix) with ESMTP id 07A014D1716F;
+        Wed, 11 May 2022 11:01:21 +0800 (CST)
+Received: from G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.83) by
+ G08CNEXMBPEKD05.g08.fujitsu.local (10.167.33.204) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.23; Wed, 11 May 2022 11:01:20 +0800
+Received: from localhost.localdomain (10.167.215.54) by
+ G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.209) with Microsoft SMTP Server
+ id 15.0.1497.23 via Frontend Transport; Wed, 11 May 2022 11:01:19 +0800
+From:   Xiao Yang <yangx.jy@fujitsu.com>
+To:     <osandov@fb.com>, <yi.zhang@redhat.com>
+CC:     <linux-block@vger.kernel.org>, Xiao Yang <yangx.jy@fujitsu.com>
+Subject: [PATCH blktests] Documentation: Fix typo nvme-trtype -> nvme_trtype
+Date:   Wed, 11 May 2022 11:00:59 +0800
+Message-ID: <20220511030059.205953-1-yangx.jy@fujitsu.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9ede7211-ae58-5cd4-4cf6-74c1f508f1a6@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-yoursite-MailScanner-ID: 07A014D1716F.A4F75
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: yangx.jy@fujitsu.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 10, 2022 at 02:44:50PM +0100, John Garry wrote:
-> On 10/05/2022 13:50, Jens Axboe wrote:
-> > > fio config:
-> > > bs=4096, iodepth=128, numjobs=10, cpus_allowed_policy=split, rw=read,
-> > > ioscheduler=none
-> > > 
-> > > Before:
-> > > 7130K
-> > > 
-> > > After:
-> > > 7630K
-> > > 
-> > > So a +7% IOPS gain.
-> 
-> Thanks for having a look.
-> 
-> > What does the comparison run on a non-NUMA non-shared queue look like?
-> > Because I bet it'd be slower.
-> 
-> I could test more to get a solid result for that.
-> 
-> > 
-> > To be honest, I don't like this approach at all. It makes the normal
-> > case quite a bit slower by having an extra layer of indirection for the
-> > word, that's quite a bit of extra cost.
-> 
-> Yes, there is the extra load. I would hope that there would be a low cost,
-> but I agree that we still want to avoid it. So prob no point in testing this
-> more.
-> 
-> > It doesn't seem like a good
-> > approach for the issue, as it pessimizes the normal fast case.
-> > 
-> > Spreading the memory out does probably make sense, but we need to retain
-> > the fast normal case. Making sbitmap support both, selected at init
-> > time, would be far more likely to be acceptable imho.
-> 
-> I wanted to keep the code changes minimal for an initial RFC to test the
-> water.
-> 
-> My original approach did not introduce the extra load for normal path and
-> had some init time selection for a normal word map vs numa word map, but the
-> code grew and became somewhat unmanageable. I'll revisit it to see how to
-> improve that.
+Fixes: 3be78490def5 ("Documentation: add document for nvme-rdma nvmeof-mp srp tests")
+Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+---
+ Documentation/running-tests.md | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I understand this approach just splits shared sbitmap into per-numa-node
-part, but what if all IOs are just from CPUs in one same numa node? Doesn't
-this way cause tag starvation and waste?
+diff --git a/Documentation/running-tests.md b/Documentation/running-tests.md
+index 713d7ba..586be0b 100644
+--- a/Documentation/running-tests.md
++++ b/Documentation/running-tests.md
+@@ -103,12 +103,12 @@ RUN_ZONED_TESTS=1
+ Most of these tests will use the rdma_rxe (soft-RoCE) driver by default. The siw (soft-iWARP) driver is also supported.
+ ```sh
+ To use the rdma_rxe driver:
+-nvme-trtype=rdma ./check nvme/
++nvme_trtype=rdma ./check nvme/
+ ./check nvmeof-mp/
+ ./check srp/
+ 
+ To use the siw driver:
+-use_siw=1 nvme-trtype=rdma ./check nvme/
++use_siw=1 nvme_trtype=rdma ./check nvme/
+ use_siw=1 ./check nvmeof-mp/
+ use_siw=1 ./check srp/
+ ```
+-- 
+2.25.4
 
 
-Thanks,
-Ming
 
