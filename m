@@ -2,157 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E15F2C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 23:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC161C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 23:30:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359437AbiELX0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 19:26:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44584 "EHLO
+        id S1359485AbiELX37 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 19:29:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358885AbiELX0I (ORCPT
+        with ESMTP id S1359484AbiELX36 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 19:26:08 -0400
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30128167E7
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:26:07 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id kj8so5535930qvb.6
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:26:07 -0700 (PDT)
+        Thu, 12 May 2022 19:29:58 -0400
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1396285AFD
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:29:54 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-2fb7cb07885so57377477b3.23
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:29:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=xUXLeSFBU/Yl53i6m7meyEzVn8qrtKbaK2HPoewtyUA=;
-        b=K5MwWny5bayAW1DlWqpVEjzGMcDaOQfF39LA3heFmRQ00vFGfVE41SVpdDoEf/61Ij
-         NWZ7zTLD8tedWpNEWdr2GQOBxBnI0k/CQVKFkPeWfjfuOKX7ERQokvVD1zQzqrijg7tk
-         2ofKbHeu6vVvkZgnGwo9ee0ad6yCraH/Ui7URZvLq64noHGNPmGKe3h1YYQKGzhR7L3Q
-         FJu1HdiD1nXBRa+NP7Xuhlzz8Wrm08AOdz1B1a8tZ8Sdx4N68WNeprfsI8T9ZVnugCgp
-         lvDM7t2L+F4Tw7g9vhiybXKsJTIgALRsG5WsNu0NzXcReGragzrdOQ77ViOYdetFW/O4
-         bthg==
+        bh=ll/7XSf/H3qu4hV/tAquY/NfSRFNg8NkKW4o64RepQ0=;
+        b=Q++eRMtfjcI9Weo+kStkfr2hsfPcC9L4GFNLEm94yFV/g1ZBzPR6G83a/UtRlDixkw
+         1Mot0a2ot9E4Ej2LdOq1Ytks78WCqTbHZx0yVJnvsos7xdhlaK+WsGzunh0TSnLeNOXK
+         Rmhft858TNrWZxHb1vIXyDzJqV51Ui4zlKeutD2qw2Wh05j4bkzG3cBakYQkipB/1d+c
+         2VLSAB4vN3c+D0lTWLcznHNfsa97Zo6a/KCZMcr6AA59RHowXzghwDrpb9IVJ4bWK5I5
+         Ip/NJBKvapOsic3bceuoopIlLuIsz3ifSY+XZAaN8ZSrIkbXWxoNb6mVy2d0WqiuUZPN
+         0pZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xUXLeSFBU/Yl53i6m7meyEzVn8qrtKbaK2HPoewtyUA=;
-        b=GveyR1jcbSAcxQclsyk+1Qv0IxBpaRikwMaXR1TV5lCriJGoZYzR3nahpcu1DXWvc0
-         cH8JTtvucya4dIL406vcpxqV/9q7clnLPHH8uKKAiXlbgYRWfFps4aNRq2/POiFRGvru
-         +mDqUYPfXBt5hutt03444Sxumqj6qvXMVGZb3PVT8qPwAtY+qWWjNa0/fw/ID0dVeThd
-         89ds1S9YS7GXhY75PqHPzcb3va4a4iFXhRUh3A+TmaBL/AiegalfdzdSAqt/VKUh+4aN
-         GyOtRK7RxEzIHzz0fVhL1O0X21RkW0emSNyr/3AAJ0/dyd5in9cLPDudEr2dcjuwuF3p
-         6itQ==
-X-Gm-Message-State: AOAM533QXlOvSXwsPqCVLup/is9WDMoEk7TofU/cI4qxUtvkg5015EoM
-        wX4+Hip8NPdcjvBpT3u65qCROuHSNugrqakj8WhWxg==
-X-Google-Smtp-Source: ABdhPJyu3AFyKIMYQzqMiNVvKI9ZWhXCbPNjaInVab4aqkA27bvIoZXwEs5puYZHz1jSZbV0bSPGY/+basWHEvk+NLc=
-X-Received: by 2002:ad4:5baa:0:b0:45a:989b:ed6b with SMTP id
- 10-20020ad45baa000000b0045a989bed6bmr2378404qvq.80.1652397966123; Thu, 12 May
- 2022 16:26:06 -0700 (PDT)
-MIME-Version: 1.0
-References: <CACGdZYK3iLc8u+YuyteaWqLRCHUJvR10Gem6MFyx36wP4Z2y2Q@mail.gmail.com>
-In-Reply-To: <CACGdZYK3iLc8u+YuyteaWqLRCHUJvR10Gem6MFyx36wP4Z2y2Q@mail.gmail.com>
-From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Thu, 12 May 2022 16:25:55 -0700
-Message-ID: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
-Subject: Re: Issue with 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>,
-        Al Viro <viro@zeniv.linux.org.uk>
-Cc:     linux-block@vger.kernel.org, w.bumiller@proxmox.com,
-        cgroups@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000d29ac605ded8e196"
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=ll/7XSf/H3qu4hV/tAquY/NfSRFNg8NkKW4o64RepQ0=;
+        b=5I3rX894XlVWyaQavoT5NvqUculbBfGABkCa04D5CXWkxbahKUu9ns7O238QZH8o/+
+         5PkLUjuoaQt7KFkdasDjdHatPGkaxhGeeOKUz62SIwC8Oi+/x+4Cb7rLUgxz1z7ky4Sv
+         79BjlrBqjLL/WdxinCrAd4XOdvkzA425DwwbdSmhoWfaFvBAELUhytI/dkpRqiIKNqrn
+         HrxMZpH9B9FVJGlaq5ZK2uLi0Yjt+FsbRpgPRx+fxX6tYmglHBpn9a+wB8Q9iued2yOg
+         y3+U3fIObYTo/d/blnx4tSGTw00e+K9xQMPHRKNxg9Dm3ce3WSXG1tWz+aNzLEhpdbx2
+         aZBg==
+X-Gm-Message-State: AOAM532dNfv83yby6ZKtD86y1wI2j3mOSLo/FNDi/edySOGp4Y5TsnV0
+        JHUoc8tK2H+XPtenKzXMsSlf+0xJHhg=
+X-Google-Smtp-Source: ABdhPJzwLo+8YO8Slpp9TJgLo1ENvJJUmE+JpdNMGnIkuOH30USGHB2TLD4cdG1YNKXX7zXUg53tmsP4rkQ=
+X-Received: from khazhy-linux.svl.corp.google.com ([2620:15c:2cd:202:a792:e3ab:48df:f42e])
+ (user=khazhy job=sendgmr) by 2002:a81:a016:0:b0:2f7:cfa3:4dc3 with SMTP id
+ x22-20020a81a016000000b002f7cfa34dc3mr2638289ywg.467.1652398194037; Thu, 12
+ May 2022 16:29:54 -0700 (PDT)
+Date:   Thu, 12 May 2022 16:29:07 -0700
+In-Reply-To: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
+Message-Id: <20220512232907.312855-1-khazhy@google.com>
+Mime-Version: 1.0
+References: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [RFC PATCH] blkcg: rewind seq_file if no stats
+From:   Khazhismel Kumykov <khazhy@google.com>
+To:     tj@kernel.org, axboe@kernel.dk, viro@zeniv.linux.org.uk
+Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Khazhismel Kumykov <khazhy@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000d29ac605ded8e196
-Content-Type: text/plain; charset="UTF-8"
+In lieu of get_seq_buf + seq_commit, provide a way to "undo" writes if
+we use seq_printf
 
-On Thu, May 12, 2022 at 3:42 PM Khazhy Kumykov <khazhy@google.com> wrote:
->
-> all if they have no statistics. (e.g. by having the "first"
-> stats-haver writing out the bdev name, or going back to scnprintf)
+Fixes: 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
 
-It might be cleaner (at least here where we want to conditionally
-write a prefix) if we were allowed to "rewind" seq_file (see
-following), though I'm not that familiar with seq_file to know if this
-is actually a good idea :) In principle, it doesn't seem too different
-from seq_get_buf/seq_commit, except we now have the checks in
-seq_printf preventing overruns
+Signed-off-by: Khazhismel Kumykov <khazhy@google.com>
+---
+ block/blk-cgroup.c       |  5 +++++
+ fs/seq_file.c            | 14 ++++++++++++++
+ include/linux/seq_file.h |  2 ++
+ 3 files changed, 21 insertions(+)
 
---000000000000d29ac605ded8e196
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 8dfe62786cd5..50043a742c48 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -909,6 +909,7 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+ 	const char *dname;
+ 	unsigned seq;
+ 	int i;
++	int scookie;
+ 
+ 	if (!blkg->online)
+ 		return;
+@@ -917,6 +918,8 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+ 	if (!dname)
+ 		return;
+ 
++	scookie = seq_checkpoint(s);
++
+ 	seq_printf(s, "%s ", dname);
+ 
+ 	do {
+@@ -956,6 +959,8 @@ static void blkcg_print_one_stat(struct blkcg_gq *blkg, struct seq_file *s)
+ 
+ 	if (has_stats)
+ 		seq_printf(s, "\n");
++	else
++		seq_restore(s, scookie);
+ }
+ 
+ static int blkcg_print_stat(struct seq_file *sf, void *v)
+diff --git a/fs/seq_file.c b/fs/seq_file.c
+index 7ab8a58c29b6..c3ec6b57334e 100644
+--- a/fs/seq_file.c
++++ b/fs/seq_file.c
+@@ -408,6 +408,20 @@ void seq_printf(struct seq_file *m, const char *f, ...)
+ }
+ EXPORT_SYMBOL(seq_printf);
+ 
++int seq_checkpoint(struct seq_file *m)
++{
++	return m->count;
++}
++EXPORT_SYMBOL(seq_checkpoint);
++
++void seq_restore(struct seq_file *m, int count)
++{
++	if (WARN_ON_ONCE(count > m->count || count > m->size))
++		return;
++	m->count = count;
++}
++EXPORT_SYMBOL(seq_restore);
++
+ #ifdef CONFIG_BINARY_PRINTF
+ void seq_bprintf(struct seq_file *m, const char *f, const u32 *binary)
+ {
+diff --git a/include/linux/seq_file.h b/include/linux/seq_file.h
+index 60820ab511d2..d3a05f7c2750 100644
+--- a/include/linux/seq_file.h
++++ b/include/linux/seq_file.h
+@@ -117,6 +117,8 @@ __printf(2, 0)
+ void seq_vprintf(struct seq_file *m, const char *fmt, va_list args);
+ __printf(2, 3)
+ void seq_printf(struct seq_file *m, const char *fmt, ...);
++int seq_checkpoint(struct seq_file *m);
++void seq_restore(struct seq_file *m, int count);
+ void seq_putc(struct seq_file *m, char c);
+ void seq_puts(struct seq_file *m, const char *s);
+ void seq_put_decimal_ull_width(struct seq_file *m, const char *delimiter,
+-- 
+2.36.0.550.gb090851708-goog
 
-MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-h3dPtFviTyG11HYwTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
-Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
-AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
-YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
-L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
-zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBAE0ANr7NUOqEcZce4KYP
-SjzlrshSC8sgJ8dKDDbe35PL86vDuMIrytVjiV10p/YUofun9GeHBY6r5kTyh4be5FgftiiNtWzn
-U1W5cxLYMT1hKYxXxnM2sWMQGFl4TkxxbRoVZa3ou/NxFdAZeiQSwGnzk5oIDTBZQc8q3wMa1svm
-A5Rd4MVaIUt+hyk6seAldN6k4/O34O1l2V6D+/BwagyzLWvOeMEM9hClVF+F6a20yy4dcDsprFZZ
-Sk9JzUy9F6FM7L1wT2ndjTNDja4Y2tixf31KuisZLGKmDZsW/fXF1GgWDaM0DbYJwtE3kHylWnMk
-CN4PfYgIa15C5A9lXhExggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
-YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
-EAFEftjde/YEIFcjUXqhcBUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIqXAOQA
-+ix1ev2yMsnHfFbELIaA3Ac/sVuEOQgs7m3+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTIyMDUxMjIzMjYwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
-CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
-hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBL6CqyezNXUuRQnE1y7yqXZM1E
-q/7/oL9GnKPvM4D58jwKnnOMmr6D70J7vSWUl5TKq1K0OzKcrGE7acD3t0K2bLkTxqJPm8zEL5fD
-d3ssCGBBrWc2mUpoQ2hgr/955dWGJ8G7VCIJWTyoNaJ+73QF3lZ3bdv08H7dG43fvXjTU//+4FDn
-EklebofsUjNDQ2/ptWOdU6CMK82y2ko6cEZHPVOUReuO/MIo3iLE7POI7LnQWio/OtcNxeuJvvyd
-OiNRqw/WV57idW7HcdFJtPYDAUR/vaRT4ceXBgIJXJtijqajI5wTKcKgaJSmVr1xTt70tAayf9kp
-myb353d6Igok
---000000000000d29ac605ded8e196--
