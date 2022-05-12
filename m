@@ -2,92 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74E5C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 17:22:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 604EBC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 18:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356990AbiELRWe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 13:22:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43216 "EHLO
+        id S1357595AbiELSWx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 14:22:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356992AbiELRW2 (ORCPT
+        with ESMTP id S1357591AbiELSWu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 13:22:28 -0400
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB5A66AF6;
-        Thu, 12 May 2022 10:22:26 -0700 (PDT)
-Received: by mail-pj1-f47.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso8459933pjb.1;
-        Thu, 12 May 2022 10:22:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5EH2eizEJHj786C4i7iVooWJ/uE/QSj7BBR5bCHBing=;
-        b=1PFeuc56IeMf5lH0ePlwRZL1gyOO8WGy7nV7hybICwqSHHF/zBtu3v8EhKou9vg4AP
-         RikhnfvnWIdVt6FFjmv1eXUqKnqnDNnnPBX092IPR1gDYjhjNVUzNl8YEIcCRyBInV3S
-         Tsx/q44i884cS688y9kyeNsx5dke+1TN7wW3OG9tJQn2cHxCUkdxnN7YUakfUYd1wdXX
-         6dX8m9/1lajNdjXmNukJYwzfohhg/HiQycIGfP3bj5B7J/5LHzRfg9G000T5VnMNzzBG
-         4fUQRuhTMbKaJkZ+EBRkpGVrVptiiBmRsOeKw/MnwcwtiAm0jQvME0wRzfaZvJzPLtTr
-         mxTg==
-X-Gm-Message-State: AOAM5338mmL6w4SAZr9uS5gE0OY/dSmwQSKdkvqxMMi0eGp/jpiRKFAp
-        H4b94YE471/2PET1es/GYDQ=
-X-Google-Smtp-Source: ABdhPJygkMTlAbNp9soO/418oUT6tIypetUTVmiczgfvtfjDYTiV1B21f/kf4VZ7nutFi/2LHDujOg==
-X-Received: by 2002:a17:903:230e:b0:15e:ce57:d66f with SMTP id d14-20020a170903230e00b0015ece57d66fmr874623plh.35.1652376146314;
-        Thu, 12 May 2022 10:22:26 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:78c5:5d65:4254:a5e? ([2620:15c:211:201:78c5:5d65:4254:a5e])
-        by smtp.gmail.com with ESMTPSA id d2-20020a170902cec200b0015e8d4eb2ddsm121808plg.295.2022.05.12.10.22.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 12 May 2022 10:22:25 -0700 (PDT)
-Message-ID: <b14775a9-da39-f26a-fa46-b0b1b789c30e@acm.org>
-Date:   Thu, 12 May 2022 10:22:23 -0700
+        Thu, 12 May 2022 14:22:50 -0400
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 726635D64A;
+        Thu, 12 May 2022 11:22:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652379768; x=1683915768;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=/lMp0wN6+3oR5lan9YwIxjQ08ZrF0e3S9TFAB75U+44=;
+  b=XjYlTGeKdyr4DwnhSpNA4+ymdmhh3bU7Garrw+0unxbFMBJDwBJH7K7p
+   NjEakCgAu/uOzdiuQtQ/a8vV0i6EwAarqubsRXHj6VQa8hMwwWJRoF9BX
+   KmeNbJNt66mzspl2sYyrVHN6xjRh0heK03EnMLKRYWIcZ065AVeHCXshl
+   mbOwYzV+KVRNgNNm1IIkTLqhwJmB86jliH5KxLmiC4MeSk4NEoHmH8N9C
+   1zrABXSV+U5Q4T98xutMGY6bmks1DAHohTADJQ/YTLa3DKi3YJuB12XuA
+   J7KZQv+xT1aa8E8Ffnvj7iQZ9MM8ZA+uxJWlLkMzL97Owm5WJM68hgTYR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10345"; a="250002591"
+X-IronPort-AV: E=Sophos;i="5.91,220,1647327600"; 
+   d="scan'208";a="250002591"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 May 2022 11:22:48 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,220,1647327600"; 
+   d="scan'208";a="566828491"
+Received: from lkp-server01.sh.intel.com (HELO 5056e131ad90) ([10.239.97.150])
+  by orsmga007.jf.intel.com with ESMTP; 12 May 2022 11:22:44 -0700
+Received: from kbuild by 5056e131ad90 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1npDSW-000Knx-80;
+        Thu, 12 May 2022 18:22:44 +0000
+Date:   Fri, 13 May 2022 02:22:03 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Daniel Golle <daniel@makrotopia.org>, linux-block@vger.kernel.org,
+        linux-efi@vger.kernel.org, linux-mtd@lists.infradead.org,
+        linux-kernel@vger.kernel.org
+Cc:     kbuild-all@lists.01.org, Tom Rini <trini@konsulko.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Miquel Raynal <miquel.raynal@bootlin.com>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH v2 2/5] block: add partition parser for U-Boot uImage.FIT
+Message-ID: <202205130213.kRDmMP6B-lkp@intel.com>
+References: <YnjxXASWU5Ps9ZoA@makrotopia.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH v3 10/11] null_blk: allow non power of 2 zoned devices
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        jaegeuk@kernel.org, hare@suse.de, dsterba@suse.com,
-        axboe@kernel.dk, hch@lst.de, snitzer@kernel.org
-Cc:     Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
-        linux-fsdevel@vger.kernel.org, matias.bjorling@wdc.com,
-        Jens Axboe <axboe@fb.com>, gost.dev@samsung.com,
-        jonathan.derrick@linux.dev, jiangbo.365@bytedance.com,
-        linux-nvme@lists.infradead.org, dm-devel@redhat.com,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        linux-kernel@vger.kernel.org, Johannes Thumshirn <jth@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Alasdair Kergon <agk@redhat.com>, linux-block@vger.kernel.org,
-        Chaitanya Kulkarni <kch@nvidia.com>,
-        Keith Busch <kbusch@kernel.org>, linux-btrfs@vger.kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20220506081105.29134-1-p.raghav@samsung.com>
- <CGME20220506081116eucas1p2cce67bbf30f4c9c4e6854965be41b098@eucas1p2.samsung.com>
- <20220506081105.29134-11-p.raghav@samsung.com>
- <39a80347-af70-8af0-024a-52f92e27a14a@opensource.wdc.com>
- <aef68bcf-4924-8004-3320-325e05ca9b20@samsung.com>
- <9eb00b42-ca5b-c94e-319d-a0e102b99f02@opensource.wdc.com>
- <9f1385a3-b471-fcd9-2c0c-61f544fbc855@samsung.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <9f1385a3-b471-fcd9-2c0c-61f544fbc855@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YnjxXASWU5Ps9ZoA@makrotopia.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/9/22 04:56, Pankaj Raghav wrote:
-> Even though I am not sure if this optimization will directly add value
-> looking at my experiments with the current change, I can fold this in
-> with a comment on top of zone_size_sect_shifts variable stating that
-> size can be npo2 and this variable is only meaningful for the po2 size
-> scenario.
+Hi Daniel,
 
-Have these experiments perhaps been run on an x86_64 CPU? These CPUs 
-only need a single instruction to calculate ilog2(). No equivalent of 
-that instruction is available on ARM CPUs as far as I know. I think the 
-optimization Damien proposed will help on ARM CPUs.
+I love your patch! Yet something to improve:
 
-Thanks,
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on mtd/mtd/next mtd/mtd/fixes v5.18-rc6 next-20220512]
+[cannot apply to rw-ubifs/next rw-ubifs/fixes]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-Bart.
+url:    https://github.com/intel-lab-lkp/linux/commits/Daniel-Golle/partition-parser-for-U-Boot-s-uImage-FIT/20220509-185349
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: xtensa-buildonly-randconfig-r001-20220512 (https://download.01.org/0day-ci/archive/20220513/202205130213.kRDmMP6B-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/5a69884cfc6091e8d7c5491fbf57dd5e13cd5ee8
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Daniel-Golle/partition-parser-for-U-Boot-s-uImage-FIT/20220509-185349
+        git checkout 5a69884cfc6091e8d7c5491fbf57dd5e13cd5ee8
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=xtensa SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x11c): undefined reference to `fdt_check_header'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x262): undefined reference to `fdt_check_header'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x124): undefined reference to `fdt_path_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x320): undefined reference to `fdt_path_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x128): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x337): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x130): undefined reference to `fdt_subnode_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x356): undefined reference to `fdt_subnode_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x138): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x382): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x13c): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x397): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x148): undefined reference to `fdt_path_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x3e3): undefined reference to `fdt_path_offset'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x150): undefined reference to `fdt_first_subnode'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x412): undefined reference to `fdt_first_subnode'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x154): undefined reference to `fdt_get_name'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x423): undefined reference to `fdt_get_name'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x158): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x43a): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x15c): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x44b): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+   fit.c:(.text+0x160): undefined reference to `fdt_getprop'
+   xtensa-linux-ld: block/partitions/fit.o:fit.c:(.text+0x45f): more undefined references to `fdt_getprop' follow
+   xtensa-linux-ld: block/partitions/fit.o: in function `put_page':
+>> fit.c:(.text+0x184): undefined reference to `fdt_next_subnode'
+   xtensa-linux-ld: block/partitions/fit.o: in function `parse_fit_partitions':
+   fit.c:(.text+0x6ae): undefined reference to `fdt_next_subnode'
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
