@@ -2,84 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1607CC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 22:43:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E15F2C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 23:26:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231395AbiELWnI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 18:43:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40110 "EHLO
+        id S1359437AbiELX0L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 19:26:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356984AbiELWnH (ORCPT
+        with ESMTP id S1358885AbiELX0I (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 18:43:07 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8059B282478
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 15:43:06 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id p3so5476894qvi.7
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 15:43:06 -0700 (PDT)
+        Thu, 12 May 2022 19:26:08 -0400
+Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30128167E7
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:26:07 -0700 (PDT)
+Received: by mail-qv1-xf31.google.com with SMTP id kj8so5535930qvb.6
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 16:26:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=y6tffOc2SB5O57Rvo6A696maRd7YsWc7pBwyAlaVwRo=;
-        b=jJXMzITAgCoDi6oM/wfb0OA1uGmmfwpLWSdryWFUBcwWKQH/GlLfjG1Wwqj2Ow+yB6
-         JUjHGH6EC1BI/8QwV5JnHb7W0LpcZcVnGyTEP0QnPnzofro6BYIsLl1rRzia/4LeeWTi
-         02KRjPxQhES/PPjKiHnAcQNtq/+GH+tdDCkCofmKl3WkiJLe6dAYBz9qZy11oewuql3K
-         zTo1rH0Ztq8d/oOEz6Wmu6hkTwFsFse5ZwYulbonTzi1NMOcnyW+T0Z0u33qK8MckIZ1
-         CTobQgrTI39uv2U1nsJEEtfCgRgC7uXLQNA4vST8FTmH+z77ZdL7QoUSQS+gJ3HT9Bg7
-         M9kA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xUXLeSFBU/Yl53i6m7meyEzVn8qrtKbaK2HPoewtyUA=;
+        b=K5MwWny5bayAW1DlWqpVEjzGMcDaOQfF39LA3heFmRQ00vFGfVE41SVpdDoEf/61Ij
+         NWZ7zTLD8tedWpNEWdr2GQOBxBnI0k/CQVKFkPeWfjfuOKX7ERQokvVD1zQzqrijg7tk
+         2ofKbHeu6vVvkZgnGwo9ee0ad6yCraH/Ui7URZvLq64noHGNPmGKe3h1YYQKGzhR7L3Q
+         FJu1HdiD1nXBRa+NP7Xuhlzz8Wrm08AOdz1B1a8tZ8Sdx4N68WNeprfsI8T9ZVnugCgp
+         lvDM7t2L+F4Tw7g9vhiybXKsJTIgALRsG5WsNu0NzXcReGragzrdOQ77ViOYdetFW/O4
+         bthg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=y6tffOc2SB5O57Rvo6A696maRd7YsWc7pBwyAlaVwRo=;
-        b=35lfgQcZNGgOsvceIQkh5WIOcIwBKTzE8qFqpr4lcHR5CrMudw9ZKlKW1N8kIQAGYt
-         lcEwTS06CPe8U0tZkQwO91Mqc8U9rKrcAS0dqsqQ2gboMHf/FmyOgwbZW7Suxuh9sSSj
-         M08CkWuFY1NfTQqWvy9y2d+usr/cb+GbsEVQp49wvJ38aLar+ghZDcO1bgFjOXKQP557
-         B5BRVfXUH5+14QQI6+nRRsRL4kevQXzMj1wUeftyuBIjXax52qb6iYUMNj3AofzQL3Q6
-         +L+nfa+/0PF+pA9po7+QSG8m8019wiqbgmUbLTAuXWCSsn/0TVfIvmF+T3dheuRkmHnc
-         4ttA==
-X-Gm-Message-State: AOAM532DTK+v1sVLxo0p91SdLrI1UkeVFduSZ3bV2hpfbHtz8YGWocQ+
-        J51s1zHsn/vnFDeXQ3KR7QT1Etjr8jkaTGQSFsFNEg==
-X-Google-Smtp-Source: ABdhPJxYK7yxziz6F+yn4V15rS5ApGuIGP6NpeLhq7Jxvm4/UQIKUmZ1iQYob5gt2XyqODVQvpRVU70EBpTXandwHvA=
-X-Received: by 2002:a05:6214:250b:b0:45b:9ee:730a with SMTP id
- gf11-20020a056214250b00b0045b09ee730amr1970135qvb.15.1652395385318; Thu, 12
- May 2022 15:43:05 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=xUXLeSFBU/Yl53i6m7meyEzVn8qrtKbaK2HPoewtyUA=;
+        b=GveyR1jcbSAcxQclsyk+1Qv0IxBpaRikwMaXR1TV5lCriJGoZYzR3nahpcu1DXWvc0
+         cH8JTtvucya4dIL406vcpxqV/9q7clnLPHH8uKKAiXlbgYRWfFps4aNRq2/POiFRGvru
+         +mDqUYPfXBt5hutt03444Sxumqj6qvXMVGZb3PVT8qPwAtY+qWWjNa0/fw/ID0dVeThd
+         89ds1S9YS7GXhY75PqHPzcb3va4a4iFXhRUh3A+TmaBL/AiegalfdzdSAqt/VKUh+4aN
+         GyOtRK7RxEzIHzz0fVhL1O0X21RkW0emSNyr/3AAJ0/dyd5in9cLPDudEr2dcjuwuF3p
+         6itQ==
+X-Gm-Message-State: AOAM533QXlOvSXwsPqCVLup/is9WDMoEk7TofU/cI4qxUtvkg5015EoM
+        wX4+Hip8NPdcjvBpT3u65qCROuHSNugrqakj8WhWxg==
+X-Google-Smtp-Source: ABdhPJyu3AFyKIMYQzqMiNVvKI9ZWhXCbPNjaInVab4aqkA27bvIoZXwEs5puYZHz1jSZbV0bSPGY/+basWHEvk+NLc=
+X-Received: by 2002:ad4:5baa:0:b0:45a:989b:ed6b with SMTP id
+ 10-20020ad45baa000000b0045a989bed6bmr2378404qvq.80.1652397966123; Thu, 12 May
+ 2022 16:26:06 -0700 (PDT)
 MIME-Version: 1.0
+References: <CACGdZYK3iLc8u+YuyteaWqLRCHUJvR10Gem6MFyx36wP4Z2y2Q@mail.gmail.com>
+In-Reply-To: <CACGdZYK3iLc8u+YuyteaWqLRCHUJvR10Gem6MFyx36wP4Z2y2Q@mail.gmail.com>
 From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Thu, 12 May 2022 15:42:54 -0700
-Message-ID: <CACGdZYK3iLc8u+YuyteaWqLRCHUJvR10Gem6MFyx36wP4Z2y2Q@mail.gmail.com>
-Subject: Issue with 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
+Date:   Thu, 12 May 2022 16:25:55 -0700
+Message-ID: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
+Subject: Re: Issue with 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
 To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Christoph Hellwig <hch@lst.de>
+        Christoph Hellwig <hch@lst.de>,
+        Al Viro <viro@zeniv.linux.org.uk>
 Cc:     linux-block@vger.kernel.org, w.bumiller@proxmox.com,
         cgroups@vger.kernel.org
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="000000000000007d8905ded848dd"
+        boundary="000000000000d29ac605ded8e196"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---000000000000007d8905ded848dd
+--000000000000d29ac605ded8e196
 Content-Type: text/plain; charset="UTF-8"
 
-I can see in the latest tip, if we have devices with no statistics,
-we'll print the maj:min and then nothing else, which can end up
-looking weird, (e.g. like below.) I see that in older kernels, we
-avoided printing the device name at all if there were no stats, and it
-looks like this behavior was silently broken by 252c651a4c85
-("blk-cgroup: stop using seq_get_buf"), where before we prepared the
-whole line then decided at the end whether to commit it or not.
+On Thu, May 12, 2022 at 3:42 PM Khazhy Kumykov <khazhy@google.com> wrote:
+>
+> all if they have no statistics. (e.g. by having the "first"
+> stats-haver writing out the bdev name, or going back to scnprintf)
 
-I do see a patch "blk-cgroup: always terminate io.stat lines" that
-addresses this by just unconditionally printing the newline (though it
-looks like that patch never landed). I'm wondering if it's worth
-trying to bring back the old behavior of not printing these devices at
-all if they have no statistics. (e.g. by having the "first"
-stats-haver writing out the bdev name, or going back to scnprintf)
+It might be cleaner (at least here where we want to conditionally
+write a prefix) if we were allowed to "rewind" seq_file (see
+following), though I'm not that familiar with seq_file to know if this
+is actually a good idea :) In principle, it doesn't seem too different
+from seq_get_buf/seq_commit, except we now have the checks in
+seq_printf preventing overruns
 
-9:0 8:0 rbytes=16720896 wbytes=905216 rios=768 wios=67 dbytes=0 dios=0
-1:15 1:14 1:13 1:12 1:11 1:10 1:9 1:8 1:7 1:6 1:5 1:4 1:3 1:2 1:1 1:0
-
---000000000000007d8905ded848dd
+--000000000000d29ac605ded8e196
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -146,14 +145,14 @@ A5Rd4MVaIUt+hyk6seAldN6k4/O34O1l2V6D+/BwagyzLWvOeMEM9hClVF+F6a20yy4dcDsprFZZ
 Sk9JzUy9F6FM7L1wT2ndjTNDja4Y2tixf31KuisZLGKmDZsW/fXF1GgWDaM0DbYJwtE3kHylWnMk
 CN4PfYgIa15C5A9lXhExggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
 YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
-EAFEftjde/YEIFcjUXqhcBUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHDsP3BX
-jy6RwT4vXBH4G8jwnka+73wWStMiGd08D4zQMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTIyMDUxMjIyNDMwNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
+EAFEftjde/YEIFcjUXqhcBUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIIqXAOQA
++ix1ev2yMsnHfFbELIaA3Ac/sVuEOQgs7m3+MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
+KoZIhvcNAQkFMQ8XDTIyMDUxMjIzMjYwNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
 CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
-hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQB/M8a2/yZZVUXuHOn8EDYZ0hBf
-cGKPEt/aEPEZyza35hwKNlDHzu7MwKSxCdEKjsx6OiJrZtwv9sYxQI6sRKTxFbwcb/7lNA4X97jp
-zBoy59ik1Y4Iex0mr7ZrnL45nZzvu/noKP3mM2iD7VEQg9qzYdpLz162rh389KLuzsvNqABgG8vR
-IyAbEMSfxRLOk3J0/BhJD9UmtwCNWyIUZzAssFCmMmr+muT9r9Skxsk8VWYyAlu4mBWSqInTCJzM
-AQXQ/mkdSF9Ts51hxktHWJtnhClHfUTohJl2ktb11nTJmS7qkep0ZhdUj4Zg9xoMfLNj688HaExD
-yBGkJ1wg/2KO
---000000000000007d8905ded848dd--
+hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBL6CqyezNXUuRQnE1y7yqXZM1E
+q/7/oL9GnKPvM4D58jwKnnOMmr6D70J7vSWUl5TKq1K0OzKcrGE7acD3t0K2bLkTxqJPm8zEL5fD
+d3ssCGBBrWc2mUpoQ2hgr/955dWGJ8G7VCIJWTyoNaJ+73QF3lZ3bdv08H7dG43fvXjTU//+4FDn
+EklebofsUjNDQ2/ptWOdU6CMK82y2ko6cEZHPVOUReuO/MIo3iLE7POI7LnQWio/OtcNxeuJvvyd
+OiNRqw/WV57idW7HcdFJtPYDAUR/vaRT4ceXBgIJXJtijqajI5wTKcKgaJSmVr1xTt70tAayf9kp
+myb353d6Igok
+--000000000000d29ac605ded8e196--
