@@ -2,127 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67A0CC4332F
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 16:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E216C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 17:10:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356599AbiELQl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 12:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41684 "EHLO
+        id S1348770AbiELRK3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 13:10:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236495AbiELQly (ORCPT
+        with ESMTP id S1349317AbiELRK2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 12:41:54 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 249AC5D5F6;
-        Thu, 12 May 2022 09:41:54 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d22so5421030plr.9;
-        Thu, 12 May 2022 09:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=6TwX+Uem+RX7yFMEQloRfhp790CWUfMnBz6v8ZFXqWw=;
-        b=W0iepvlelCLBuiCrQ0b37NsVuwjZqmnDvDuXQwTxPwqmfcisydLXhlvB+5bIBxb9Mo
-         DDIm9SAd9GCqOj8Y1mqJ3sPE2DDD2VG+CyW+x8zKZGJ1ncvmUcgmSj5NWAatP+ff85TH
-         ZnWqN4wW+Xvd09HvOI7ErGXsWF0qITMEkVBE8CptKkPKH0y41qpN2h8EhYFt/EnyW95X
-         LUnS06SYFHbr1Fd4ZdIEgY2aNXkWlf7fBX3yTTPM4sIzGKDRzP8t5PBqeY5+wGCWKGeI
-         4l9xLi0L1UoF0RefF/g+HEKdfK0lgVXEOyZZ3Lz8Yy/OIJTAikD/cX/wCLx1Gu2ea24/
-         QN8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=6TwX+Uem+RX7yFMEQloRfhp790CWUfMnBz6v8ZFXqWw=;
-        b=4Qx/+dLMe/UYMi/4NF5aXGTzt6txId//pn0zTeIZEmB7igS/a8vc1e7ruASYup9ViL
-         vsmmNel4A2ato1HKfpQ9nHOlL1yjEAfpnOVbWzvvUtB/Xl0WAA6SvbiepWoeWFQSdoQV
-         CX6n0ERvWDrz/IhAHDgbIJlxuWDysXisyjP3ok6RdzMcASdLNz89eix9umQIgeT9iScI
-         yV6hkMzP+qxBErEl8vBV4sE5LdXk1BOYQvtpDR4c/pVLHGJwYdmYjq8Js/6lo6dKkilF
-         jfUp1rnbu/tgBvtuyq36DlZQpZaJbdRA2eqtDTpcIbNpzi2NCzE4+Jk+pDK4Ay7duYRv
-         ResQ==
-X-Gm-Message-State: AOAM530g93I3/N321NxGBxcb0167fLbNgCKlQqX1I3cc/Ly3mZysNPCW
-        5fMuj4oJAlo5bTTqViSMhB8=
-X-Google-Smtp-Source: ABdhPJzsb54QRB11Kg0xwOQPwsZz32Td9eLOjqUbH9eOlCaQUD4CO9IvOZZ+4QXL8vYjVErb6WonGA==
-X-Received: by 2002:a17:902:ab96:b0:159:1ff:4ea0 with SMTP id f22-20020a170902ab9600b0015901ff4ea0mr779294plr.60.1652373713356;
-        Thu, 12 May 2022 09:41:53 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:6c64])
-        by smtp.gmail.com with ESMTPSA id x4-20020a62fb04000000b0050dc76281a9sm46574pfm.131.2022.05.12.09.41.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 09:41:52 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 12 May 2022 06:41:51 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tytso@mit.edu, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, mcgrof@kernel.org, holt@sgi.com
-Subject: Re: [REPORT] syscall reboot + umh + firmware fallback
-Message-ID: <Yn04z6xzqJQqYNOX@slm.duckdns.org>
-References: <YnzQHWASAxsGL9HW@slm.duckdns.org>
- <1652354304-17492-1-git-send-email-byungchul.park@lge.com>
+        Thu, 12 May 2022 13:10:28 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 522C2269EE3;
+        Thu, 12 May 2022 10:10:27 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 12AA91F38C;
+        Thu, 12 May 2022 17:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1652375426; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/9XAcRo+E2h3CTio5LOn32n4GFy+zXlhWLwgRN3/9n8=;
+        b=juGeGmWI5D/vC/Yy/fmA8IV+naKTrFWfTQxB7lDgG1rqPrZV2erbm76n3Po3TwcPYWVk4Q
+        F/KfzgtkQzT5/v2OrVJ1MQHTJDVf966rNOuSNMt91kWppLpcDyrQl3lWWR627330+0cbbF
+        em6T9V4IefCmIxUh+GGL9mKN6CkD/4o=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1652375426;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/9XAcRo+E2h3CTio5LOn32n4GFy+zXlhWLwgRN3/9n8=;
+        b=aqqg2OameJ2jGwEdBptM+puRW+2mj5eziSKcu1DbMb5SnbDNg+8lihAebI3AR6LI+7pGSs
+        WIgDYz8xRBexHUCw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id DB9FA2C141;
+        Thu, 12 May 2022 17:10:25 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 31752A062A; Thu, 12 May 2022 19:10:25 +0200 (CEST)
+Date:   Thu, 12 May 2022 19:10:25 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next 2/2] block, bfq: make bfq_has_work() more accurate
+Message-ID: <20220512171025.blstxod6aphulctm@quack3.lan>
+References: <20220510131629.1964415-1-yukuai3@huawei.com>
+ <20220510131629.1964415-3-yukuai3@huawei.com>
+ <20220511140832.w6eqphw5uepre5ws@quack3.lan>
+ <67425a7b-f9e1-d7a9-9ec8-158f9f8ce13e@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1652354304-17492-1-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <67425a7b-f9e1-d7a9-9ec8-158f9f8ce13e@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Thu, May 12, 2022 at 08:18:24PM +0900, Byungchul Park wrote:
-> > 1. wait_for_completion_killable_timeout() doesn't need someone to wake it up
-> >    to make forward progress because it will unstick itself after timeout
-> >    expires.
+On Thu 12-05-22 09:30:16, yukuai (C) wrote:
+> On 2022/05/11 22:08, Jan Kara wrote:
+> > On Tue 10-05-22 21:16:29, Yu Kuai wrote:
+> > > bfq_has_work() is using busy_queues currently, which is not accurate
+> > > because bfq_queue is busy doesn't represent that it has requests. Since
+> > > bfqd aready has a counter 'queued' to record how many requests are in
+> > > bfq, use it instead of busy_queues.
+> > > 
+> > > Noted that bfq_has_work() can be called with 'bfqd->lock' held, thus the
+> > > lock can't be held in bfq_has_work() to protect 'bfqd->queued'.
+> > > 
+> > > Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> > 
+> > So did you find this causing any real problem? Because bfq queue is
+> > accounted among busy queues once bfq_add_bfqq_busy() is called. And that
+> > happens once a new request is inserted into the queue so it should be very
+> > similar to bfqd->queued.
+> > 
+> > 								Honza
 > 
-> I have a question about this one. Yes, it would never been stuck thanks
-> to timeout. However, IIUC, timeouts are not supposed to expire in normal
-> cases. So I thought a timeout expiration means not a normal case so need
-> to inform it in terms of dependency so as to prevent further expiraton.
-> That's why I have been trying to track even timeout'ed APIs.
+> Hi,
 > 
-> Do you think DEPT shouldn't track timeout APIs? If I was wrong, I
-> shouldn't track the timeout APIs any more.
-
-Without actually surveying the use cases, I can't say for sure but my
-experience has been that we often get pretty creative with timeouts and it's
-something people actively think about and monitor (and it's usually not
-subtle). Given that, I'm skeptical about how much value it'd add for a
-dependency checker to warn about timeouts. It might be net negative than the
-other way around.
-
-> > 2. complete_all() from __fw_load_abort() isn't the only source of wakeup.
-> >    The fw loader can be, and mainly should be, woken up by firmware loading
-> >    actually completing instead of being aborted.
+> The related problem is described here:
 > 
-> This is the point I'd like to ask. In normal cases, fw_load_done() might
-> happen, of course, if the loading gets completed. However, I was
-> wondering if the kernel ensures either fw_load_done() or fw_load_abort()
-> to be called by *another* context while kernel_halt().
+> https://lore.kernel.org/all/20220510112302.1215092-1-yukuai3@huawei.com/
+> 
+> The root cause of the panic is a linux-block problem, however, it can
+> be bypassed if bfq_has_work() is accurate. On the other hand,
+> unnecessary run_work will be triggered if bfqq stays busy:
+> 
+> __blk_mq_run_hw_queue
+>  __blk_mq_sched_dispatch_requests
+>   __blk_mq_do_dispatch_sched
+>    if (!bfq_has_work())
+>     break;
+>    blk_mq_delay_run_hw_queues -> run again after 3ms
 
-We'll have to walk through the code to tell that. On a cursory look tho, up
-until that point (just before shutting down usermode helper), I don't see
-anything which would actively block firmware loading.
+Ah, I see. So it is the other way around than I thought. Due to idling
+bfq_tot_busy_queues() can be greater than 0 even if there are no requests
+to dispatch. Indeed. OK, the patch makes sense. But please use WRITE_ONCE
+for the updates of bfqd->queued. Otherwise the READ_ONCE does not really
+make sense (it can still result in some bogus value due to compiler
+optimizations on the write side).
 
-Thanks.
+								Honza
 
+> > > ---
+> > >   block/bfq-iosched.c | 4 ++--
+> > >   1 file changed, 2 insertions(+), 2 deletions(-)
+> > > 
+> > > diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> > > index 61750696e87f..1d2f8110c26b 100644
+> > > --- a/block/bfq-iosched.c
+> > > +++ b/block/bfq-iosched.c
+> > > @@ -5063,11 +5063,11 @@ static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
+> > >   	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
+> > >   	/*
+> > > -	 * Avoiding lock: a race on bfqd->busy_queues should cause at
+> > > +	 * Avoiding lock: a race on bfqd->queued should cause at
+> > >   	 * most a call to dispatch for nothing
+> > >   	 */
+> > >   	return !list_empty_careful(&bfqd->dispatch) ||
+> > > -		bfq_tot_busy_queues(bfqd) > 0;
+> > > +		READ_ONCE(bfqd->queued);
+> > >   }
+> > >   static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
+> > > -- 
+> > > 2.31.1
+> > > 
 -- 
-tejun
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
