@@ -2,110 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3F79C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 13:48:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F65FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 13:57:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354620AbiELNsZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 09:48:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48312 "EHLO
+        id S1347270AbiELN5A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 09:57:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52400 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243881AbiELNsX (ORCPT
+        with ESMTP id S1354768AbiELN4y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 09:48:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AAE7E6338A
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 06:48:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652363300;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=fcPL7ZjdcG7UkpFj1PVIS/PVnXXXrYzBpwCe/9ghwGU=;
-        b=SpZMJoq7MojgOq2s/AxMN6Pob0f8UGgcZ6UuFJWevbqT58Iz8pgIm5E1JO1TQF3j/3yPW7
-        NQiSDKfbli8IELe4FRYd2gZLsgYePbPqH1O6w8GbOMUdGsQA9OghE48qqPNAsglHB6bO/H
-        9r35C+pco6jxaKj/I6y20As2U21Rjk4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-231-0sN_IdQ1PnuowG4dKOz_Xg-1; Thu, 12 May 2022 09:48:19 -0400
-X-MC-Unique: 0sN_IdQ1PnuowG4dKOz_Xg-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D5408833A01;
-        Thu, 12 May 2022 13:48:18 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 08E62573EA7;
-        Thu, 12 May 2022 13:48:17 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: avoid to serialize blkdev_fallocate
-Date:   Thu, 12 May 2022 21:48:14 +0800
-Message-Id: <20220512134814.1454451-1-ming.lei@redhat.com>
+        Thu, 12 May 2022 09:56:54 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77A0A3982D;
+        Thu, 12 May 2022 06:56:52 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 24CDuk1S025723
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Thu, 12 May 2022 09:56:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1652363808; bh=fK1JutfKwB9RZi7LGZBoNzqwgl48auY9kCDUP4LKjGo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=UdsqUMuxNr9fe51BYBreYmwrfOY1B++I+ve8viaz0nmXc6KyQP5QUzEjOXAOAk4ra
+         g8Tr5jAwwqGdfLEZT3d8iGx07G6013fFup2jsp6fjMByQkPvPM7yC06ELxnpD8rVsB
+         1sxDQ9aqUvLS5dS7Sa3ta0hvdwNATlFnfdv/y9/oYwrKDrZxkYGSYvQXdmyBnWws2S
+         PHEQ9SuJKLtMvK42rHTFd0TlOuBN4zDHFnoLMwcvI8XW5rrTW4gTOi0+I5Kb4gWPQ8
+         UA8k4Zb1JGSopLJy9riWjPVB0MCf9k1zX5RrjRWwXGG1E7eacsHmf+ZiylDmJ6kJ9O
+         N+RhD+0vEgzeQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id B5CC215C3F2A; Thu, 12 May 2022 09:56:46 -0400 (EDT)
+Date:   Thu, 12 May 2022 09:56:46 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Byungchul Park <byungchul.park@lge.com>
+Cc:     tj@kernel.org, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
+        duyuyang@gmail.com, johannes.berg@intel.com, willy@infradead.org,
+        david@fromorbit.com, amir73il@gmail.com,
+        gregkh@linuxfoundation.org, kernel-team@lge.com,
+        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
+        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
+        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
+        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
+        ngupta@vflare.org, linux-block@vger.kernel.org,
+        paolo.valente@linaro.org, josef@toxicpanda.com,
+        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
+        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
+        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
+        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
+        42.hyeyoo@gmail.com, mcgrof@kernel.org, holt@sgi.com
+Subject: Re: [REPORT] syscall reboot + umh + firmware fallback
+Message-ID: <Yn0SHhnhB8fyd0jq@mit.edu>
+References: <YnzQHWASAxsGL9HW@slm.duckdns.org>
+ <1652354304-17492-1-git-send-email-byungchul.park@lge.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1652354304-17492-1-git-send-email-byungchul.park@lge.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit f278eb3d8178 ("block: hold ->invalidate_lock in blkdev_fallocate")
-adds ->invalidate_lock in blkdev_fallocate() for preventing stale data
-from being read during fallocate().
+On Thu, May 12, 2022 at 08:18:24PM +0900, Byungchul Park wrote:
+> I have a question about this one. Yes, it would never been stuck thanks
+> to timeout. However, IIUC, timeouts are not supposed to expire in normal
+> cases. So I thought a timeout expiration means not a normal case so need
+> to inform it in terms of dependency so as to prevent further expiraton.
+> That's why I have been trying to track even timeout'ed APIs.
 
-However, the side effect is that blkdev_fallocate() becomes serialized
-since blkdev_fallocate() always blocks.
+As I beleive I've already pointed out to you previously in ext4 and
+ocfs2, the jbd2 timeout every five seconds happens **all** the time
+while the file system is mounted.  Commits more frequently than five
+seconds is the exception case, at least for desktops/laptop workloads.
 
-Add one atomic fallocate counter for allowing blkdev_fallocate() to
-be run concurrently so that discard/write_zero bios from different
-fallocate() can be submitted in parallel.
+We *don't* get to the timeout only when a userspace process calls
+fsync(2), or if the journal was incorrectly sized by the system
+administrator so that it's too small, and the workload has so many
+file system mutations that we have to prematurely close the
+transaction ahead of the 5 second timeout.
 
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/fops.c              | 6 ++++--
- include/linux/blk_types.h | 2 ++
- 2 files changed, 6 insertions(+), 2 deletions(-)
+> Do you think DEPT shouldn't track timeout APIs? If I was wrong, I
+> shouldn't track the timeout APIs any more.
 
-diff --git a/block/fops.c b/block/fops.c
-index 9f2ecec406b0..368866b15e68 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -651,7 +651,8 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 	if ((start | len) & (bdev_logical_block_size(bdev) - 1))
- 		return -EINVAL;
- 
--	filemap_invalidate_lock(inode->i_mapping);
-+	if (atomic_inc_return(&bdev->bd_fallocate_count) == 1)
-+		filemap_invalidate_lock(inode->i_mapping);
- 
- 	/* Invalidate the page cache, including dirty pages. */
- 	error = truncate_bdev_range(bdev, file->f_mode, start, end);
-@@ -679,7 +680,8 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
- 	}
- 
-  fail:
--	filemap_invalidate_unlock(inode->i_mapping);
-+	if (!atomic_dec_return(&bdev->bd_fallocate_count))
-+		filemap_invalidate_unlock(inode->i_mapping);
- 	return error;
- }
- 
-diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
-index 1973ef9bd40f..9ccd841ea8ed 100644
---- a/include/linux/blk_types.h
-+++ b/include/linux/blk_types.h
-@@ -58,6 +58,8 @@ struct block_device {
- 	struct gendisk *	bd_disk;
- 	struct request_queue *	bd_queue;
- 
-+	atomic_t		bd_fallocate_count;
-+
- 	/* The counter of freeze processes */
- 	int			bd_fsfreeze_count;
- 	/* Mutex for freeze */
--- 
-2.31.1
+DEPT tracking timeouts will cause false positives in at least some
+cases.  At the very least, there needs to be an easy way to suppress
+these false positives on a per wait/mutex/spinlock basis.
 
+      	       	    	     	      	   	 - Ted
