@@ -2,60 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D15C43217
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 12:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6AEC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 12:33:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353655AbiELMYq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 08:24:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        id S1353719AbiELMdu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 08:33:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353669AbiELMYo (ORCPT
+        with ESMTP id S1353706AbiELMdt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 08:24:44 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD335247377
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 05:24:41 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id j14so4712255plx.3
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 05:24:41 -0700 (PDT)
+        Thu, 12 May 2022 08:33:49 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E51A5A0B9
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 05:33:49 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id c1-20020a17090a558100b001dca2694f23so4757971pji.3
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 05:33:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=NSorybdfmfgNWFB1MTbFXjyZ5W8ms9nXp2QkIM3c5PA=;
-        b=DcBLh9aRu5Kcl0BE8bwvSRrItSvbETWKB1olm5miXf5Ns8cNc12ZjFQkCTm6DGSTSq
-         W/20zTHjUKLqIZCUwSwit93zbUZ3wHmMSV0DYrOZp/DyibGwWA+eZ+6ILot4oecESsBz
-         1KVBIpm/c+HWAMeLMpLwfkuQbT/0dk5amzQByFbmCUQJlPG2xUXerRc7X3//jqkn6XPQ
-         nsi+vNzo0+OaBJ3DOBAKPxajctulirgGMJz0QwKyr1RgnmYtYRIPIflSYfNgSatrIDlk
-         MKSJoVw0KYn9TB4CxU18wTZ22Pj6R4rgzJikIU96yWxID7T/bnuLwS3/cIVgDftB6x65
-         YDfA==
+        bh=qYBC9MAoh1L0z3Uw+O0qlXefUDgsE1aZG60eo3WvUIE=;
+        b=HQUZ2+FW3u9KFGr/N3tAfzAJVSMZD+eLFnY+2qZSN5k8J6FFrgiLnV1vtibPHGW1Qd
+         fCeFU8nfiusskhV/Ivdb8pwlBFlywy9WLlEFT0rql4JPsIxPj4m8mx9jZt7DptSwy2yV
+         prHIAJd6tgEFCW6mfQxtu5XkdtcG117c2L0ToM5YJATcLU+6VHX9vhDC4BWDPwIMdLCp
+         xbRLTr48RWWkUkboLWxuRk5d60wghko1ej0c6dIkrVSqoYdx4MFIlxrbLtGSrQtqeJRq
+         8jhlLXQEF+RkSjvP4vFjGPA/bGnIR2J6lJm+H1byyPKhxciHd8waS7JNIU2lZKKdY+U+
+         ir7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=NSorybdfmfgNWFB1MTbFXjyZ5W8ms9nXp2QkIM3c5PA=;
-        b=Y2mBUsivqAhe7OuFbbUqpOPl5PGA7eJO1psVwUBFSDnfwjlCkqVk2VWAxNqsgtyn8I
-         Wq0bmzlGHCjhIM1kxvNuDhwt8Sd7jQIRMz7br7IlA0hEUyK1yDNMV5D6YqnfBMhJKEHy
-         dMpKvgACn+/9UfCgvcErVFFbPLpeSBWHGOfecNYPNNeJ8Sv6LkbJYP/T8Dbok7JduZBk
-         R/oPz/gQN3mI+E5heIqSrV/dJG47uANYRjvCTiBUnXMVAM8nSl4CJCxJZC0DDm5nnwSu
-         3C/0btESXXVDtpkmDn7+QIyjGqZeA6P1YV62Wc6DjtG+W6caiZsqiWztaAomQgFbr6qY
-         o/fw==
-X-Gm-Message-State: AOAM532jeJZVBOazqHTu3vnxvNgvZ2riiDkbMqi/nR/CDfHYP1Nw5Y+m
-        OLPObbUX9sLbOiZVwD/xtnfgJx0xPnb6dw==
-X-Google-Smtp-Source: ABdhPJxlIZgGXA7gd0Ps17hHuR/b5MP7ZADf7rgd/HdVDaXITNeplZMQYy/mgZ3fyb1ov2L2Sqxgow==
-X-Received: by 2002:a17:902:e494:b0:15a:4b81:1c16 with SMTP id i20-20020a170902e49400b0015a4b811c16mr30747200ple.10.1652358280921;
-        Thu, 12 May 2022 05:24:40 -0700 (PDT)
+        bh=qYBC9MAoh1L0z3Uw+O0qlXefUDgsE1aZG60eo3WvUIE=;
+        b=PZ45hfp3Xv786XiQSWFDwlxVmowmfF1nZNtJWWp9hflrmWExa9uUHcqGHgMlDCH851
+         Gkk8DG+zU9xzaYIr/Gy+V5NgL6ZVIt6BUJ2TDjpTepceAFWdT1DOZAAQ1syNTqV4Gr5A
+         +4119Mb6S73VPPgMUfPHQqF76Bimbsxdbx0bwALf5alOMIN/P/QnOxqilVj1rPwACaWn
+         m8iWKGVKTCtaniLHfMdXBZPySkcMRr4N9UIZCccecDYu81j+E+9E5meRBfN4hMeTdQAa
+         Pdzi9BrRvK3iiqmY702KpcexW7U6MFhUoq2Y8d7FJ4fJgScxVHGuaBU72v2H+LPq8phs
+         v5NA==
+X-Gm-Message-State: AOAM532wHQRIoILhT9+xX3U40SdJbDus2ACmFhSYRVS1fBflEfkHy+EW
+        JjU+ZvFZ/W4NtX9NJ67WJBm8YA==
+X-Google-Smtp-Source: ABdhPJyuxj5b5QTBDPK691R+Wk38Bd+aL9JmKvjgntuCXIVQGMu8zwrGm7lFtEuU4PIcfmwGh1VX8g==
+X-Received: by 2002:a17:90b:1d10:b0:1dc:dea8:d2ad with SMTP id on16-20020a17090b1d1000b001dcdea8d2admr10776295pjb.174.1652358828532;
+        Thu, 12 May 2022 05:33:48 -0700 (PDT)
 Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id g23-20020a170902d5d700b0015e8d4eb27bsm3726409plh.197.2022.05.12.05.24.39
+        by smtp.gmail.com with ESMTPSA id p10-20020a170902f08a00b0015e8d4eb205sm3736598pla.79.2022.05.12.05.33.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 05:24:39 -0700 (PDT)
+        Thu, 12 May 2022 05:33:47 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220512061408.1826595-1-hch@lst.de>
-References: <20220512061408.1826595-1-hch@lst.de>
-Subject: Re: [PATCH v2] block: reorder the REQ_ flags
-Message-Id: <165235827941.228388.17766889075262231976.b4-ty@kernel.dk>
-Date:   Thu, 12 May 2022 06:24:39 -0600
+To:     bvanassche@acm.org
+Cc:     Christoph Hellwig <hch@lst.de>, ming.lei@redhat.com,
+        linux-block@vger.kernel.org
+In-Reply-To: <20220511235152.1082246-1-bvanassche@acm.org>
+References: <20220511235152.1082246-1-bvanassche@acm.org>
+Subject: Re: [PATCH] block: Fix the bio.bi_opf comment
+Message-Id: <165235882729.234858.4820183561551148997.b4-ty@kernel.dk>
+Date:   Thu, 12 May 2022 06:33:47 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -63,17 +64,21 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 12 May 2022 08:14:08 +0200, Christoph Hellwig wrote:
-> Keep the op-specific flag last so that they are clearly separate from
-> the generic flags.  Various recent commits just kept adding new flags
-> at the end.
+On Wed, 11 May 2022 16:51:52 -0700, Bart Van Assche wrote:
+> Commit ef295ecf090d modified the Linux kernel such that the bottom bits
+> of the bi_opf member contain the operation instead of the topmost bits.
+> That commit did not update the comment next to bi_opf. Hence this patch.
 > 
+> From commit ef295ecf090d:
+> -#define bio_op(bio)    ((bio)->bi_opf >> BIO_OP_SHIFT)
+> +#define bio_op(bio)    ((bio)->bi_opf & REQ_OP_MASK)
 > 
+> [...]
 
 Applied, thanks!
 
-[1/1] block: reorder the REQ_ flags
-      commit: 5ce7729f25c16d5045deff4c9577e6d565da2d8d
+[1/1] block: Fix the bio.bi_opf comment
+      commit: 5d2ae14276e698c76fa0c8ce870103f343b38263
 
 Best regards,
 -- 
