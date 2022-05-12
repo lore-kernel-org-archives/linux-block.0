@@ -2,227 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 192EEC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 14:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B48FC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 12 May 2022 14:46:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354874AbiELOA3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 10:00:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38550 "EHLO
+        id S1355180AbiELOq1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 10:46:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354839AbiELOAU (ORCPT
+        with ESMTP id S1355568AbiELOqE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 10:00:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DE4471E15D3
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 07:00:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652364017;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=wBRhvzOm8tviAzCWarzupagnhcKdDUHar2A5ckt2EpM=;
-        b=UAGWAwn5vpX/KbKSzlwhnSwdo2VE8Ez9MgbZCpRIMpr1MrtHBRwO6V4eYVW2wRdCDJDbvq
-        MiG74JIZi4Qfjxq4+wzDVQkoCKYVYHChntb072Eiw1uUu0Rp9KSR3k2SUv/dqDTP9s20pN
-        9GnOi+cTvqEcA6FLS48416v0PDXW5m0=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-435-St9HtqVPNW6KpqMXvpDPaQ-1; Thu, 12 May 2022 10:00:16 -0400
-X-MC-Unique: St9HtqVPNW6KpqMXvpDPaQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BB473101AA42;
-        Thu, 12 May 2022 14:00:15 +0000 (UTC)
-Received: from localhost (ovpn-8-19.pek2.redhat.com [10.72.8.19])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9AA5C41617C;
-        Thu, 12 May 2022 14:00:14 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH] blk-mq: fix passthrough plugging
-Date:   Thu, 12 May 2022 22:00:10 +0800
-Message-Id: <20220512140010.1458645-1-ming.lei@redhat.com>
+        Thu, 12 May 2022 10:46:04 -0400
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD2519036
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 07:46:01 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id j12so6701167oie.1
+        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 07:46:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=Wjwrz8eauGYsUo9yAzQVALp4iNWY2BF0n5UeeEWs7Gs=;
+        b=dA2jSvBLR64YISeGzK0RkP7jCOcVZ3W0vnfN0ESOTDCQMhcn17heKIvQQyOsOvQkdc
+         e4iXmH9grp1gX6c7kq0Nlo0xCa+Wol/h1Y5OHq91YW6dHn6raBfuzKlELLYZe3y97bBL
+         t5KQn7oh7sBVW+hf+T4HlwQw7qyEWTE9cPKzyKuBeO8o45XDCovaGtBUIOZX185siXuP
+         fEIxw5Mwm2IgAuZ25wy0vCEGtLdFaK+NuOXjxrD3j7fxnO8tZDCe7++SeAqUsopSeX5O
+         FI5+NBJlioKUZaofxAtCYN8reR8piYM6bstNJW0OdVuoR22Wv97nU0f8FTBtkVtrmzpk
+         Vf3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=Wjwrz8eauGYsUo9yAzQVALp4iNWY2BF0n5UeeEWs7Gs=;
+        b=pv/Vwqn4GJvSfJMCu6NeDRftBwhUR3tL+qzGArqR9zvAErDZqZxc56KuR6CX3W/M17
+         uXQoZHRoz6kq0D81O5E9P9dk/7nA4v6i115MzQDcTWFJEqABpV1oET+j3JSROXI8uF0i
+         Q3xwHwu5OtiM9XozK/6gqcGbfq7pXLKTnENxKv06241f3cXOcrWyBOs7r9Vf6+3FMrst
+         Brvr8XozMDOsYnrRHgyqhzCPNAn2jdr67VjgeIeTZe+godT0yYECLrhDjf2tbJNNF69R
+         68M2mfHFcIRax2SAzJ5TSGr0xvqzJVpJLcvoQRmBoxjAlEvB0Nr4gtYGOcUKwWiBKY7F
+         gJkw==
+X-Gm-Message-State: AOAM532sbPEgpmxl+SlYipfkeKgCigI+tWUQkM7uxPOvMMB8dKQwxwGd
+        1WiYgv7BI0zG+a6mMM8SRQ4XKg==
+X-Google-Smtp-Source: ABdhPJwk20g+9fTKO2b7RFm0xosjR1RL98q/Bdn5nOeGTr0wFJbg79Z+utHlq1joTwBA5XgtfSE55Q==
+X-Received: by 2002:a05:6808:218a:b0:326:8755:8b08 with SMTP id be10-20020a056808218a00b0032687558b08mr5474938oib.183.1652366761058;
+        Thu, 12 May 2022 07:46:01 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id o188-20020acabec5000000b00326bab99fe5sm1830829oif.40.2022.05.12.07.45.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 May 2022 07:46:00 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     ming.lei@redhat.com
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+In-Reply-To: <20220512140010.1458645-1-ming.lei@redhat.com>
+References: <20220512140010.1458645-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-mq: fix passthrough plugging
+Message-Id: <165236675953.266833.7301121151394105931.b4-ty@kernel.dk>
+Date:   Thu, 12 May 2022 08:45:59 -0600
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-First we can't add request into plug list in blk_mq_request_bypass_insert
-which may be called when flushing plug list, so nested plug is caused.
+On Thu, 12 May 2022 22:00:10 +0800, Ming Lei wrote:
+> First we can't add request into plug list in blk_mq_request_bypass_insert
+> which may be called when flushing plug list, so nested plug is caused.
+> 
+> Second if polled passthrough request is inserted via blk_execute_rq(),
+> it can't be added to plug list too since io polling needs the request
+> to be issued to driver.
+> 
+> [...]
 
-Second if polled passthrough request is inserted via blk_execute_rq(),
-it can't be added to plug list too since io polling needs the request
-to be issued to driver.
+Applied, thanks!
 
-Fixes the two by moving plugging into blk_execute_rq_no_wait().
+[1/1] blk-mq: fix passthrough plugging
+      commit: a327c341dc65e38af7a2398e7313e6f2c4a813db
 
-Cc: Christoph Hellwig <hch@lst.de>
-Fixes: 1c2d2fff6dc0 ("block: wire-up support for passthrough plugging")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 114 +++++++++++++++++++++++++++----------------------
- 1 file changed, 63 insertions(+), 51 deletions(-)
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 2cf011b57cf9..ed1869a305c4 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -1169,6 +1169,62 @@ static void blk_end_sync_rq(struct request *rq, blk_status_t error)
- 	complete(waiting);
- }
- 
-+/*
-+ * Allow 2x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
-+ * queues. This is important for md arrays to benefit from merging
-+ * requests.
-+ */
-+static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
-+{
-+	if (plug->multiple_queues)
-+		return BLK_MAX_REQUEST_COUNT * 2;
-+	return BLK_MAX_REQUEST_COUNT;
-+}
-+
-+static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
-+{
-+	struct request *last = rq_list_peek(&plug->mq_list);
-+
-+	if (!plug->rq_count) {
-+		trace_block_plug(rq->q);
-+	} else if (plug->rq_count >= blk_plug_max_rq_count(plug) ||
-+		   (!blk_queue_nomerges(rq->q) &&
-+		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
-+		blk_mq_flush_plug_list(plug, false);
-+		trace_block_plug(rq->q);
-+	}
-+
-+	if (!plug->multiple_queues && last && last->q != rq->q)
-+		plug->multiple_queues = true;
-+	if (!plug->has_elevator && (rq->rq_flags & RQF_ELV))
-+		plug->has_elevator = true;
-+	rq->rq_next = NULL;
-+	rq_list_add(&plug->mq_list, rq);
-+	plug->rq_count++;
-+}
-+
-+static void __blk_execute_rq_nowait(struct request *rq, bool at_head,
-+		rq_end_io_fn *done, bool use_plug)
-+{
-+	WARN_ON(irqs_disabled());
-+	WARN_ON(!blk_rq_is_passthrough(rq));
-+
-+	rq->end_io = done;
-+
-+	blk_account_io_start(rq);
-+
-+	if (use_plug && current->plug) {
-+		blk_add_rq_to_plug(current->plug, rq);
-+		return;
-+	}
-+	/*
-+	 * don't check dying flag for MQ because the request won't
-+	 * be reused after dying flag is set
-+	 */
-+	blk_mq_sched_insert_request(rq, at_head, true, false);
-+}
-+
-+
- /**
-  * blk_execute_rq_nowait - insert a request to I/O scheduler for execution
-  * @rq:		request to insert
-@@ -1184,18 +1240,8 @@ static void blk_end_sync_rq(struct request *rq, blk_status_t error)
-  */
- void blk_execute_rq_nowait(struct request *rq, bool at_head, rq_end_io_fn *done)
- {
--	WARN_ON(irqs_disabled());
--	WARN_ON(!blk_rq_is_passthrough(rq));
--
--	rq->end_io = done;
-+	__blk_execute_rq_nowait(rq, at_head, done, true);
- 
--	blk_account_io_start(rq);
--
--	/*
--	 * don't check dying flag for MQ because the request won't
--	 * be reused after dying flag is set
--	 */
--	blk_mq_sched_insert_request(rq, at_head, true, false);
- }
- EXPORT_SYMBOL_GPL(blk_execute_rq_nowait);
- 
-@@ -1233,8 +1279,13 @@ blk_status_t blk_execute_rq(struct request *rq, bool at_head)
- 	DECLARE_COMPLETION_ONSTACK(wait);
- 	unsigned long hang_check;
- 
-+	/*
-+	 * iopoll requires request to be submitted to driver, so can't
-+	 * use plug
-+	 */
- 	rq->end_io_data = &wait;
--	blk_execute_rq_nowait(rq, at_head, blk_end_sync_rq);
-+	__blk_execute_rq_nowait(rq, at_head, blk_end_sync_rq,
-+			!blk_rq_is_poll(rq));
- 
- 	/* Prevent hang_check timer from firing at us during very long I/O */
- 	hang_check = sysctl_hung_task_timeout_secs;
-@@ -2340,40 +2391,6 @@ void __blk_mq_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
- 	blk_mq_hctx_mark_pending(hctx, ctx);
- }
- 
--/*
-- * Allow 2x BLK_MAX_REQUEST_COUNT requests on plug queue for multiple
-- * queues. This is important for md arrays to benefit from merging
-- * requests.
-- */
--static inline unsigned short blk_plug_max_rq_count(struct blk_plug *plug)
--{
--	if (plug->multiple_queues)
--		return BLK_MAX_REQUEST_COUNT * 2;
--	return BLK_MAX_REQUEST_COUNT;
--}
--
--static void blk_add_rq_to_plug(struct blk_plug *plug, struct request *rq)
--{
--	struct request *last = rq_list_peek(&plug->mq_list);
--
--	if (!plug->rq_count) {
--		trace_block_plug(rq->q);
--	} else if (plug->rq_count >= blk_plug_max_rq_count(plug) ||
--		   (!blk_queue_nomerges(rq->q) &&
--		    blk_rq_bytes(last) >= BLK_PLUG_FLUSH_SIZE)) {
--		blk_mq_flush_plug_list(plug, false);
--		trace_block_plug(rq->q);
--	}
--
--	if (!plug->multiple_queues && last && last->q != rq->q)
--		plug->multiple_queues = true;
--	if (!plug->has_elevator && (rq->rq_flags & RQF_ELV))
--		plug->has_elevator = true;
--	rq->rq_next = NULL;
--	rq_list_add(&plug->mq_list, rq);
--	plug->rq_count++;
--}
--
- /**
-  * blk_mq_request_bypass_insert - Insert a request at dispatch list.
-  * @rq: Pointer to request to be inserted.
-@@ -2387,12 +2404,7 @@ void blk_mq_request_bypass_insert(struct request *rq, bool at_head,
- 				  bool run_queue)
- {
- 	struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
--	struct blk_plug *plug = current->plug;
- 
--	if (plug) {
--		blk_add_rq_to_plug(plug, rq);
--		return;
--	}
- 	spin_lock(&hctx->lock);
- 	if (at_head)
- 		list_add(&rq->queuelist, &hctx->dispatch);
+Best regards,
 -- 
-2.31.1
+Jens Axboe
+
 
