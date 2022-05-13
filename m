@@ -2,91 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB90C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 02:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79011C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 03:20:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1376629AbiEMC4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 12 May 2022 22:56:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43838 "EHLO
+        id S1376712AbiEMDUx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 12 May 2022 23:20:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1376622AbiEMC4w (ORCPT
+        with ESMTP id S1376711AbiEMDUw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 12 May 2022 22:56:52 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70B1536166
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 19:56:47 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id kl21so5799213qvb.9
-        for <linux-block@vger.kernel.org>; Thu, 12 May 2022 19:56:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:subject:message-id:mime-version:content-disposition
-         :content-transfer-encoding;
-        bh=YfSyf8u/NtA/eLp0tCJ7Xe0+tnTmVim4H2pL0vEsIiU=;
-        b=0mtoDTP0h+78pMTFKFTp5W2xjK1hcv0lNhcN1E0ldAU+KruS88+d+eKT2j8jX6aaTf
-         xAxUnsQAhUijY/zcRao1hzMIrncEkUQ7nqKG5CKm/fhS0lLzQPWv03XD05t+jSF3w6Fp
-         n4j1+9tNGrnptsTapwM26mibHHeRH17d1wRomMrwpfe2j7TM/ooGkiFYVV+0K/umc9wB
-         iESWL4SXlQ0yjffaoKRY7NnCK6mRZdwVxtpBjlzXR2ZLXnLe8Y0U7R78A/K8FtX1L+vo
-         fD8Dz1+4qi03W5jcPkFTNU5uJuLkxQcOfBS2F1Axp3kuB4kReBr4cLOPA+EUDC4RKVV0
-         25kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition:content-transfer-encoding;
-        bh=YfSyf8u/NtA/eLp0tCJ7Xe0+tnTmVim4H2pL0vEsIiU=;
-        b=oDgBALFSO6UksDRxb2AXsNCb+C60ZBi6vSsvcDXyBOi9qHOH/hAc/8JmEDnDUwHkE1
-         jUYWEWBq8KxVIm+2LDIj5nNM5FuKlf4MU/CH8W+k9rOTcLM2SNU/3ppO8SRzAfj9Ytbn
-         jfasSQExh364AAaX5HhNVH2fio+0fedyjTvCJlAQT0xW3lV5iWewoCr/f99fC4HIsXPs
-         WqPIIlAuQSjJpLe6vUgeAR6Aq2GZIQfy6gEYAhbPMpXPDc61mb6O2J6fOpfEtzrux49A
-         UgsVCUK/fUinYrcKcdZiDc30REcajxE/Ir3sLbgzyZl5Ji0fbQL5Tmnt0hYrhmLIxlor
-         3aXw==
-X-Gm-Message-State: AOAM530cTxHtWGm4JO3khQIZs6RzkLrzUMYuWKxcl1EUfSAHKf+8z3Jd
-        Ao0fcntsL7TEIGY/2PSZ6CWi9g==
-X-Google-Smtp-Source: ABdhPJwEkF4mdxyhyJw1VUq1yi0cunHOiqDqtKhsTWuDuqm6cZSOXpnjZ7qhYCMJiPw/3cavmMdKaw==
-X-Received: by 2002:a05:6214:2aae:b0:45b:3d6e:e6e6 with SMTP id js14-20020a0562142aae00b0045b3d6ee6e6mr2865442qvb.111.1652410606448;
-        Thu, 12 May 2022 19:56:46 -0700 (PDT)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id e1-20020a05620a208100b0069fc13ce205sm686031qka.54.2022.05.12.19.56.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 May 2022 19:56:45 -0700 (PDT)
-Date:   Thu, 12 May 2022 22:56:44 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-        linux-block@vger.kernel.org, bpf@vger.kernel.org,
-        lsf-pc@lists.linuxfoundation.org, linux-scsi@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: LSF/MM/BPF 2022: Slides and thanks!
-Message-ID: <Yn3I7KZeuJQqVFHi@localhost.localdomain>
+        Thu, 12 May 2022 23:20:52 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB813630B;
+        Thu, 12 May 2022 20:20:49 -0700 (PDT)
+Received: from kwepemi500017.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Kzv3T5p4TzGpZj;
+        Fri, 13 May 2022 11:17:57 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500017.china.huawei.com (7.221.188.110) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 13 May 2022 11:20:47 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 13 May 2022 11:20:47 +0800
+Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
+ inotify emit udev uevent changes
+To:     Matthew Ruffell <matthew.ruffell@canonical.com>,
+        Josef Bacik <josef@toxicpanda.com>
+CC:     Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
+References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
+ <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+ <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
+ <CAKAwkKvfFn18RjupuqGpx4QeAiMYKSq7QUTd3wEL=pkZ+BENpQ@mail.gmail.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <0eb5ff67-b1f0-a8c4-281c-55a5ded58662@huawei.com>
+Date:   Fri, 13 May 2022 11:20:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+In-Reply-To: <CAKAwkKvfFn18RjupuqGpx4QeAiMYKSq7QUTd3wEL=pkZ+BENpQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+åœ¨ 2022/05/13 10:56, Matthew Ruffell å†™é“:
+> Hi Josef,
+> 
+> Just a friendly ping, I am more than happy to test a patch, if you send it
+> inline in the email, since the pastebin you used expired after 1 day, and I
+> couldn't access it.
+> 
+> I came across and tested Yu Kuai's patches [1][2] which are for the same issue,
+> and they indeed fix the hang. Thank you Yu.
+Hi, Matthew
 
-Thank all of the participants of this years LSF/MM/BPF! It was great to finally
-get together as a community, both in person and virtually.
+Thanks for your test.
+> 
+> [1] nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
+> https://lists.debian.org/nbd/2022/04/msg00212.html
+> 
+> [2] nbd: fix io hung while disconnecting device
+> https://lists.debian.org/nbd/2022/04/msg00207.html
+> 
+> I am also happy to test any patches to fix the I/O errors.
 
-If you presented this year and had slides please email the slides to
-lsf-pc@lists.linuxfoundation.org so we can attach it to the videos when the
-recordings are uploaded to YouTube. We will also forward these along to the
-staff at LWN.
+Sorry that I missed this thread. IMO, if inflight requests is cleared by
+ioctl NBD_CLEAR_SOCK after my patch [2](or other callers for
+nbd_clear_que()), such io will return as error. Thus I don't think such
+io errors need to be fixed.
 
-If any of you have objections to your sessions being posted on YouTube please
-email the lsf-pc list so we can make sure to exclude those videos.  We already
-have a couple of requests, so if you've already made one you don't need to let
-us know, we already have it marked down.
+Josef, do you have other suggestions?
 
-Thanks again for a great conference!
-
-        Josef Bacik (Filesystems)
-        Amir Goldstein (Filesystems)
-        Martin K. Petersen (Storage)
-        Omar Sandoval (Storage)
-        Michal Hocko (MM)
-        Dan Williams (MM)
-        Alexei Starovoitov (BPF)
-        Daniel Borkmann (BPF)
-
+Thanks,
+Kuai
