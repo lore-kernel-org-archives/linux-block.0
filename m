@@ -2,130 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C7B4C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 14:29:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC557C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:01:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380819AbiEMO3Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 10:29:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45246 "EHLO
+        id S1381648AbiEMPBc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 11:01:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55666 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380956AbiEMO1d (ORCPT
+        with ESMTP id S1381805AbiEMPBF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 10:27:33 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 005CA5E751;
-        Fri, 13 May 2022 07:27:29 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 8E6C162155;
-        Fri, 13 May 2022 14:27:29 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A68FC34100;
-        Fri, 13 May 2022 14:27:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1652452049;
-        bh=sq81QGVFmgwEXyTV9tn2A2eomrsrJjkZ0LhxQElS6oM=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=KjOOgPcrL8dKnYexrL4irYkNQ4rc9unCDNm44+9jmFCtWE8EXtMdbdqlBXJvNqNNH
-         RZmMo8fUn/VsLWjZcQWlxmKwYAKeyKuIXfztvzk6/E9HfbAe8+to8y2UU8+Ijd9bCS
-         H+UXbLYNCx0DVP97m0T8zzbTNzVDdCHx8MMVvt90=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        stable@vger.kernel.org,
-        Philipp Reisner <philipp.reisner@linbit.com>,
-        Lars Ellenberg <lars.ellenberg@linbit.com>,
-        Jens Axboe <axboe@kernel.dk>, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, Lee Jones <lee.jones@linaro.org>,
-        Nathan Chancellor <nathan@kernel.org>
-Subject: [PATCH 5.10 03/10] block: drbd: drbd_nl: Make conversion to enum drbd_ret_code explicit
-Date:   Fri, 13 May 2022 16:23:47 +0200
-Message-Id: <20220513142228.405740832@linuxfoundation.org>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220513142228.303546319@linuxfoundation.org>
-References: <20220513142228.303546319@linuxfoundation.org>
-User-Agent: quilt/0.66
+        Fri, 13 May 2022 11:01:05 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144E13ED35;
+        Fri, 13 May 2022 07:59:33 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id n18so8191328plg.5;
+        Fri, 13 May 2022 07:59:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iQkNXkMlycq0VUrhSvL25PiSVyr4BABvBfQJy7TRO1E=;
+        b=BdUwUxjuY8blvDl1M0G3ebioLHzHFo/SdHfq4waRnAMJZmeNz/c/PHGaFt1H//rf0s
+         QTTBCvWywsASi7F4NWzqHocotgIKx2cD1xxSjNMQXxY/cE1wiyuzb1SIkroWrdxb6dd9
+         lF0wCYi1PZYuIf+HBjpvmXghlj588Dqw2Qr5150lOxMTcREbAH0H2pZNIVTVdchzbKUH
+         OD17ZFp+QfA8pNkxYrEvRQHr5W7l+GZl/eKWzm4EmrJimZn1gFY9AvqswGM0ApfaxDlM
+         WwqwWvF6Dja+8JQJt26ceC7t6Y6lwJ0NUhQ40/gJckAEK2mAJtD0iIdf9krXJo+ylq3G
+         8auA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iQkNXkMlycq0VUrhSvL25PiSVyr4BABvBfQJy7TRO1E=;
+        b=ddO1kfPT6mqICmsRhiUHkm9PcWhdWQC+M525xCPcS7Y4eAjrp9t4H1GzPvX7OSr4Sw
+         Oz4jv7BBB/T8i7oCthGqUrttflQ6YR5jtpjk2J4rtzn74/3GTf7R47Szp8X4zGmN5kME
+         2d//gYpvJqELwy2bNrVxbvBVdeFo5oT/8AdzUJhJybCyraYGevGVx9D8UdMwPGkktNzb
+         Bh0g6dvD4hyTABYqTESieLVmQw66Nb8vdhEUB1EZiXhJit3Cini+bRuSNHcOfuNKx6xd
+         xnnOf/O5btcIVLuSlvAfdxGkgnhFdjr9ifRGrGvnwoHBW233RAH0902Lh0qvL3EUrz1W
+         0fIQ==
+X-Gm-Message-State: AOAM531447BiztF/t5/S1FqxGbgdMgfOwWs9RzY5yiVJiFAnikYUWCbM
+        EK9IDg2FsRvw96XtPRQIokestIw5fsZyE+3S
+X-Google-Smtp-Source: ABdhPJxb+6l5jOmYav5Xjhtq0BxJWbX4MhhJrZYghHiyQkWwD6Wr9kONvPNJVWmZWm+23poiptxsPw==
+X-Received: by 2002:a17:90b:33ce:b0:1dc:690e:acef with SMTP id lk14-20020a17090b33ce00b001dc690eacefmr16336081pjb.121.1652453972665;
+        Fri, 13 May 2022 07:59:32 -0700 (PDT)
+Received: from DIDI-C02G33EXQ05D.xiaojukeji.com ([111.194.46.158])
+        by smtp.gmail.com with ESMTPSA id z6-20020a170903018600b0015eb200cc00sm2011747plg.138.2022.05.13.07.59.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 13 May 2022 07:59:32 -0700 (PDT)
+From:   Yahu Gao <gaoyahu19@gmail.com>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org
+Subject: [PATCH 0/1] block,iocost: fix potential kernel NULL
+Date:   Fri, 13 May 2022 22:59:27 +0800
+Message-Id: <20220513145928.29766-1-gaoyahu19@gmail.com>
+X-Mailer: git-send-email 2.30.1 (Apple Git-130)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Lee Jones <lee.jones@linaro.org>
-
-commit 1f1e87b4dc4598eac57a69868534b92d65e47e82 upstream.
-
-Fixes the following W=1 kernel build warning(s):
-
- from drivers/block/drbd/drbd_nl.c:24:
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_set_role’:
- drivers/block/drbd/drbd_nl.c:793:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c:795:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_attach’:
- drivers/block/drbd/drbd_nl.c:1965:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_connect’:
- drivers/block/drbd/drbd_nl.c:2690:10: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
- drivers/block/drbd/drbd_nl.c: In function ‘drbd_adm_disconnect’:
- drivers/block/drbd/drbd_nl.c:2803:11: warning: implicit conversion from ‘enum drbd_state_rv’ to ‘enum drbd_ret_code’ [-Wenum-conversion]
-
-Cc: Philipp Reisner <philipp.reisner@linbit.com>
-Cc: Lars Ellenberg <lars.ellenberg@linbit.com>
-Cc: Jens Axboe <axboe@kernel.dk>
-Cc: drbd-dev@lists.linbit.com
-Cc: linux-block@vger.kernel.org
-Signed-off-by: Lee Jones <lee.jones@linaro.org>
-Link: https://lore.kernel.org/r/20210312105530.2219008-8-lee.jones@linaro.org
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Cc: Nathan Chancellor <nathan@kernel.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- drivers/block/drbd/drbd_nl.c |   13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
-
---- a/drivers/block/drbd/drbd_nl.c
-+++ b/drivers/block/drbd/drbd_nl.c
-@@ -790,9 +790,11 @@ int drbd_adm_set_role(struct sk_buff *sk
- 	mutex_lock(&adm_ctx.resource->adm_mutex);
- 
- 	if (info->genlhdr->cmd == DRBD_ADM_PRIMARY)
--		retcode = drbd_set_role(adm_ctx.device, R_PRIMARY, parms.assume_uptodate);
-+		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
-+						R_PRIMARY, parms.assume_uptodate);
- 	else
--		retcode = drbd_set_role(adm_ctx.device, R_SECONDARY, 0);
-+		retcode = (enum drbd_ret_code)drbd_set_role(adm_ctx.device,
-+						R_SECONDARY, 0);
- 
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
- 	genl_lock();
-@@ -1962,7 +1964,7 @@ int drbd_adm_attach(struct sk_buff *skb,
- 	drbd_flush_workqueue(&connection->sender_work);
- 
- 	rv = _drbd_request_state(device, NS(disk, D_ATTACHING), CS_VERBOSE);
--	retcode = rv;  /* FIXME: Type mismatch. */
-+	retcode = (enum drbd_ret_code)rv;
- 	drbd_resume_io(device);
- 	if (rv < SS_SUCCESS)
- 		goto fail;
-@@ -2687,7 +2689,8 @@ int drbd_adm_connect(struct sk_buff *skb
- 	}
- 	rcu_read_unlock();
- 
--	retcode = conn_request_state(connection, NS(conn, C_UNCONNECTED), CS_VERBOSE);
-+	retcode = (enum drbd_ret_code)conn_request_state(connection,
-+					NS(conn, C_UNCONNECTED), CS_VERBOSE);
- 
- 	conn_reconfig_done(connection);
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
-@@ -2800,7 +2803,7 @@ int drbd_adm_disconnect(struct sk_buff *
- 	mutex_lock(&adm_ctx.resource->adm_mutex);
- 	rv = conn_try_disconnect(connection, parms.force_disconnect);
- 	if (rv < SS_SUCCESS)
--		retcode = rv;  /* FIXME: Type mismatch. */
-+		retcode = (enum drbd_ret_code)rv;
- 	else
- 		retcode = NO_ERROR;
- 	mutex_unlock(&adm_ctx.resource->adm_mutex);
+There is a kernel NULL during ioc_pd_init. And the scene have analysed as
+follow:
+ioc_pd_init
+    ...
+    for (tblkg = blkg; tblkg; tblkg = tblkg->parent) {
+        struct ioc_gq *tiocg = blkg_to_iocg(tblkg);
+        // tiocg = pd_to_iocg(blkg_to_pd(blkg, &blkcg_policy_iocost));
+                               ^ returns NULL after first iteration
+        iocg->ancestors[tiocg->level] = tiocg;
+    }
 
 
+[ 5837.883640] BUG: unable to handle kernel NULL pointer dereference at 00000000000001d0
+[ 5837.930538] PGD 0 P4D 0
+[ 5837.945644] Oops: 0000 [#1] SMP NOPTI
+[ 5837.967541] CPU: 57 PID: 66239 Comm: bash Kdump: loaded Not tainted  #1
+[ 5838.010240] Hardware name:
+ 5838.051901] RIP: 0010:ioc_pd_init+0x12b/0x1a0
+[ 5838.077940] Code: 48 8b 45 28 48 8b 00 8b 80 3c 01 00 00 41 89 84 24 d0 01 00 00 48 85 ed 74 28 48 63 0d 8e 3e f1 00 48 83 c1 4c 48 8b 44 cd 00 <48> 63 90 d0 01 00 00 49 89 84 d4 d8 01 00 00 48 8b 6d 38 48 85 ed
+[ 5838.190361] RSP: 0018:ffffbf43629abce0 EFLAGS: 00010086
+[ 5838.221618] RAX: 0000000000000000 RBX: ffff9c6d9f97f000 RCX: 000000000000004f
+[ 5838.264315] RDX: 0000000000000003 RSI: 0000000000000001 RDI: ffff9c2dc1ddc738
+[ 5838.307007] RBP: ffff9c6de4809000 R08: 0000000000000000 R09: ffffdf433f1c63a8
+[ 5838.349701] R10: 00000000000000ec R11: 00000000000000ec R12: ffff9c2dc1ddc600
+[ 5838.392392] R13: 0000000000000000 R14: 0000000000000000 R15: ffffffff8bf256c0
+[ 5838.435085] FS:  00007fd943e90100(0000) GS:ffff9c2dffc40000(0000) knlGS:0000000000000000
+[ 5838.483499] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033ize
+[ 5838.517866] CR2: 00000000000001d0 CR3: 0000003f338b8001 CR4: 00000000007606e0
+[ 5838.560562] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[ 5838.603253] DR3: 0000000000000000 DR6: 009a8000fffe0ff0 DR7: 0000000000000400
+[ 5838.645946] PKRU: 55555554
+[ 5838.662103] Call Trace:
+[ 5838.676723]  blkcg_activate_policy+0x107/0x2b0
+[ 5838.706937]  blk_iocost_init+0x1af/0x240
+[ 5838.730387]  ioc_qos_write+0x311/0x410
+[ 5838.752798]  ? do_filp_open+0xa7/0x100
+[ 5838.775212]  cgroup_file_write+0x8a/0x150
+[ 5838.799181]  ? __check_object_size+0xa8/0x16b
+[ 5838.825239]  kernfs_fop_write+0x116/0x190
+[ 5838.849210]  vfs_write+0xa5/0x1a0
+[ 5838.869015]  ksys_write+0x4f/0xb0
+[ 5838.888830]  do_syscall_64+0x5b/0x1a0
+[ 5838.910724]  entry_SYSCALL_64_after_hwframe+0x65/0xca
+[ 5838.940937] RIP: 0033:0x7fd94336eb28
