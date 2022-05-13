@@ -2,154 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FCC6C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 18:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F638C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:09:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383228AbiEMSGt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 14:06:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35088 "EHLO
+        id S1383559AbiEMTJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 15:09:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244159AbiEMSGs (ORCPT
+        with ESMTP id S1344149AbiEMTJ2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 14:06:48 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8355275DE
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 11:06:45 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id k8so7625954qki.8
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 11:06:45 -0700 (PDT)
+        Fri, 13 May 2022 15:09:28 -0400
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC983BA7C
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 12:09:25 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id bq30so16108325lfb.3
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 12:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=KTJU3JDa4N1gRW1/9n5MssPgrXU2ZHAn/Ba2I141Jwk=;
-        b=sIUKVYeOZOaNhiyc1XmpLjser9N4XTRMjp3kGX1komJxH4lcS0gVeul/hAOpGLZw7T
-         F07n8aGLcB1bGW1D80TzPA6YdZaq8VC6M8w/ch4aM5FzvXimPE2VB7W1ILDA5g4mHKPa
-         zmqlF1UTjIstCZF87GHZ07VaOLbNOp/DzEHn/ypBZjcXj2LqiNfPgEhzJ2QTwuSGBKBC
-         7bLjqUtLSoi+Q4Ybd4BdPafvAy5H7kRrk0QSgxm0PnX0ztk1nmczWHHn/vV7bTzj0G0b
-         lFSEz0etFFk4P99S7zWQ+h/cF2UabPgjNoXtYT9F0jz2SdLasqHutbybzsewbWJUXMXM
-         JuNA==
+        bh=rbJzGXtyUp4FkqReU6sYBiDMNKWwFopa4KLMlmGZbuA=;
+        b=GJx1FC6PGj6rP204JhO+MVJD1p9S4B+WG3Wu3TnyVIi0CzstjPqeEwc9SpcYJe1l2R
+         TXfW9mAAliWx/XxYsTGa4JGZi1ldNXUsBVx/1fAKAjk52jHYQR53XvuCTMBvBpn6MgRR
+         nvpW/IRmtZIRvLyMS+gjblxH1h5ebwHsII+gRQJhlnTz2JmCdju6VXzbxiZrzjAU0G8S
+         qEZAkEjFjZm5uCyVG1A9FYdpEJXEIggJw4e8FDvUWWObJAj2ttke1r3VSENsFthwAaHE
+         UD/Jt3UM0xd083pDPRmEB5Y8Wcl8Crk4Yp0PFs+XzKdG15jB7LAq0MZO7OESoHhu2wHG
+         Klkw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=KTJU3JDa4N1gRW1/9n5MssPgrXU2ZHAn/Ba2I141Jwk=;
-        b=StQdhJe7d6iFqc7ajDEbFBq25v1fEVuSh/4Nj59uCbn/c4UIWycUJKp1+bwzlblen1
-         PieFYBJIy3qqwwC4Xykya21XZEbQG6tpQAHMkIxRAhuc/uRCTXbNo5w+n6CaCq2hesql
-         ymJBT2xZV5GNvpDGxn0sc6ARydiJ6lO5Ib1tuZvOujDWFB1y7sooZ5W7ageaj4FN3nE/
-         mI9CGboUumAQlDyY55ouZThZPk3ATBdWkZJDCQxk6V5eD/ZvaNa3JJ3NElrfNPOXYRHZ
-         Fejt1oBPg8tkzLyv65NUgVxs3+iUKsg51ypXn8JpbkvBsVag33JuYSiobYSPdyfILo0X
-         H8tA==
-X-Gm-Message-State: AOAM533m+77wURQPib6nNDYoTB9x72Wr1Iwt8o8oCmhX4A0XrHyIg0tA
-        veSKZyX2CIvEilr2u6pEqbOC2nclO/KKlaYB8+zhuRrHnM0=
-X-Google-Smtp-Source: ABdhPJwtsAlxvwtRTL2sVCKEEyqbYHcmIz2b5TB4ajdk6SJjT5nsmSELiLCdfSvVImbTESf1u6t5Tv42uT3m5FZ415M=
-X-Received: by 2002:a37:f508:0:b0:69b:ed2f:e56 with SMTP id
- l8-20020a37f508000000b0069bed2f0e56mr4645661qkk.384.1652465204516; Fri, 13
- May 2022 11:06:44 -0700 (PDT)
+        bh=rbJzGXtyUp4FkqReU6sYBiDMNKWwFopa4KLMlmGZbuA=;
+        b=ZgnphS+KxAYbhgVYyh6fF+H6Ez55WXgFLsm6/T/EJcyeYxAgWzBvqEQ/FvFdM9ywtD
+         5w2aXne4iH/KTCaqLf7WFbT2/nXF4UN0u6qwJwnYuaXBmYuNdPoqiCOQ8rQ6UyJTJL+j
+         stZXSWDjUBWYeeB2x+97pf0SXZ32G6SiKUCy2zBftvHPo37kkRR8N6hmNrbF/RA1UBGn
+         96aQZX7BWs0kSnDEKzJzWgoIHbyUpD0rucxayIoBEcdONjrRxtXSdKP3AiUlv3cHXeNN
+         +k0kh2yAuPSZPdrlnDuCnDJlPmCBezTZMwFSOOlBeKQvt8gta9U8CvzNB02cdiNHzZlh
+         vT2g==
+X-Gm-Message-State: AOAM530Yz81CF6SRwHfVyYPbrrRPoju0dOZ7sSiLp7tK6ns2IryNc6XC
+        qIlYnTtiZuGGPr2P7U026Dg3g//l1fftBcpMIikPZw==
+X-Google-Smtp-Source: ABdhPJw2v+78PG9kRlrr2N0DSVUm9/qtjQv8JgVoDVhvaTi3qjv3ZFLpx/pOXFQCTgDrEl1P0PwYOBSHt4h+KgElKzY=
+X-Received: by 2002:a05:6512:104a:b0:473:d38b:cdf with SMTP id
+ c10-20020a056512104a00b00473d38b0cdfmr4633370lfb.554.1652468963837; Fri, 13
+ May 2022 12:09:23 -0700 (PDT)
 MIME-Version: 1.0
-References: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
- <20220513174030.1307720-1-khazhy@google.com>
-In-Reply-To: <20220513174030.1307720-1-khazhy@google.com>
-From:   Khazhy Kumykov <khazhy@google.com>
-Date:   Fri, 13 May 2022 11:06:33 -0700
-Message-ID: <CACGdZYJAm4kwXB_76qT6PZmPO66Kt2NFSQ0+KNT=S+Tgu6SmoA@mail.gmail.com>
-Subject: Re: [RESEND][RFC PATCH] blkcg: rewind seq_file if no stats
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-        boundary="0000000000008d214d05dee88907"
+References: <20220429043913.626647-1-davidgow@google.com> <20220513083212.3537869-2-davidgow@google.com>
+In-Reply-To: <20220513083212.3537869-2-davidgow@google.com>
+From:   Daniel Latypov <dlatypov@google.com>
+Date:   Fri, 13 May 2022 12:08:46 -0700
+Message-ID: <CAGS_qxr54nYThsj6UhqX54JO5WnyJXVQURnNF1eCzGB+4GCKLA@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] kunit: Taint the kernel when KUnit tests are run
+To:     David Gow <davidgow@google.com>
+Cc:     Brendan Higgins <brendanhiggins@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        John Ogness <john.ogness@linutronix.de>,
+        Joe Fradley <joefradley@google.com>,
+        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Aaron Tomlin <atomlin@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000008d214d05dee88907
-Content-Type: text/plain; charset="UTF-8"
+On Fri, May 13, 2022 at 1:32 AM David Gow <davidgow@google.com> wrote:
+>
+> Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
+> Due to KUnit tests not being intended to run on production systems, and
+> potentially causing problems (or security issues like leaking kernel
+> addresses), the kernel's state should not be considered safe for
+> production use after KUnit tests are run.
+>
+> Signed-off-by: David Gow <davidgow@google.com>
 
-On Fri, May 13, 2022 at 10:40 AM Khazhismel Kumykov <khazhy@google.com> wrote:
-> +void seq_restore(struct seq_file *m, int count)
-(Yes, this and elsewhere should be size_t to match m->count)
-> +{
-> +       if (WARN_ON_ONCE(count > m->count || count > m->size))
-> +               return;
-> +       m->count = count;
+Tested-by: Daniel Latypov <dlatypov@google.com>
 
---0000000000008d214d05dee88907
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+Looks good to me.
 
-MIIPmwYJKoZIhvcNAQcCoIIPjDCCD4gCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-ggz1MIIEtjCCA56gAwIBAgIQeAMYYHb81ngUVR0WyMTzqzANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA3MjgwMDAwMDBaFw0yOTAzMTgwMDAwMDBaMFQxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFz
-IFIzIFNNSU1FIENBIDIwMjAwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvLe9xPU9W
-dpiHLAvX7kFnaFZPuJLey7LYaMO8P/xSngB9IN73mVc7YiLov12Fekdtn5kL8PjmDBEvTYmWsuQS
-6VBo3vdlqqXZ0M9eMkjcKqijrmDRleudEoPDzTumwQ18VB/3I+vbN039HIaRQ5x+NHGiPHVfk6Rx
-c6KAbYceyeqqfuJEcq23vhTdium/Bf5hHqYUhuJwnBQ+dAUcFndUKMJrth6lHeoifkbw2bv81zxJ
-I9cvIy516+oUekqiSFGfzAqByv41OrgLV4fLGCDH3yRh1tj7EtV3l2TngqtrDLUs5R+sWIItPa/4
-AJXB1Q3nGNl2tNjVpcSn0uJ7aFPbAgMBAAGjggGKMIIBhjAOBgNVHQ8BAf8EBAMCAYYwHQYDVR0l
-BBYwFAYIKwYBBQUHAwIGCCsGAQUFBwMEMBIGA1UdEwEB/wQIMAYBAf8CAQAwHQYDVR0OBBYEFHzM
-CmjXouseLHIb0c1dlW+N+/JjMB8GA1UdIwQYMBaAFI/wS3+oLkUkrk1Q+mOai97i3Ru8MHsGCCsG
-AQUFBwEBBG8wbTAuBggrBgEFBQcwAYYiaHR0cDovL29jc3AyLmdsb2JhbHNpZ24uY29tL3Jvb3Ry
-MzA7BggrBgEFBQcwAoYvaHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvcm9vdC1y
-My5jcnQwNgYDVR0fBC8wLTAroCmgJ4YlaHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9yb290LXIz
-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
-h3dPtFviTyG11HYwTAYDVR0gBEUwQzBBBgkrBgEEAaAyASgwNDAyBggrBgEFBQcCARYmaHR0cHM6
-Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wDAYDVR0TAQH/BAIwADCBmgYIKwYBBQUH
-AQEEgY0wgYowPgYIKwYBBQUHMAGGMmh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2NhL2dzYXRs
-YXNyM3NtaW1lY2EyMDIwMEgGCCsGAQUFBzAChjxodHRwOi8vc2VjdXJlLmdsb2JhbHNpZ24uY29t
-L2NhY2VydC9nc2F0bGFzcjNzbWltZWNhMjAyMC5jcnQwHwYDVR0jBBgwFoAUfMwKaNei6x4schvR
-zV2Vb4378mMwRgYDVR0fBD8wPTA7oDmgN4Y1aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9jYS9n
-c2F0bGFzcjNzbWltZWNhMjAyMC5jcmwwDQYJKoZIhvcNAQELBQADggEBAE0ANr7NUOqEcZce4KYP
-SjzlrshSC8sgJ8dKDDbe35PL86vDuMIrytVjiV10p/YUofun9GeHBY6r5kTyh4be5FgftiiNtWzn
-U1W5cxLYMT1hKYxXxnM2sWMQGFl4TkxxbRoVZa3ou/NxFdAZeiQSwGnzk5oIDTBZQc8q3wMa1svm
-A5Rd4MVaIUt+hyk6seAldN6k4/O34O1l2V6D+/BwagyzLWvOeMEM9hClVF+F6a20yy4dcDsprFZZ
-Sk9JzUy9F6FM7L1wT2ndjTNDja4Y2tixf31KuisZLGKmDZsW/fXF1GgWDaM0DbYJwtE3kHylWnMk
-CN4PfYgIa15C5A9lXhExggJqMIICZgIBATBoMFQxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9i
-YWxTaWduIG52LXNhMSowKAYDVQQDEyFHbG9iYWxTaWduIEF0bGFzIFIzIFNNSU1FIENBIDIwMjAC
-EAFEftjde/YEIFcjUXqhcBUwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIBoOLZS/
-wLUixiZ06eOojFIVPl5zuHue3WyR5PbSC06QMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJ
-KoZIhvcNAQkFMQ8XDTIyMDUxMzE4MDY0NVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASow
-CwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZI
-hvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQCVIpxkVlm3Bw2DBD8dQ8S2/WGh
-4gwmhTJ72vF0m/CjOWWwB772p6VpjNOj439230F0eR8R7nnH45ArXh8oOq4UKnaQQIstMyKkNZ4s
-0zBkEq2wsNJAzZlaSwOqGR3fNjJNgEJC9IRf21IWfnuhmCnsLZPa+kZCBPsJuCn5FH3ZCa5naRrg
-2OORPTNYgFzP9PL7zsxUUnf9qz+za7rPXqx+uya/UXn3BMNdbmOs8FLu+1srbX7Ua3gDjB327+P/
-TH1MIAjfWUW42lJN2rbUMUe4cBPM+wTYDhf+Zc4ft9BY4e1wH7LpXfiZPemcUM6Xih5eZX0J5MRp
-PnLuBQq6HD05
---0000000000008d214d05dee88907--
+There's an edge case where we might have 0 suites or 0 tests and we
+still taint the kernel, but I don't think we need to deal with that.
+At the start of kunit_run_tests() is the cleanest place to do this.
+
+I wasn't quite sure where this applied, but I manually applied the changes here.
+Without this patch, this command exits fine:
+$ ./tools/testing/kunit/kunit.py run --kernel_args=panic_on_taint=0x40000
+
+With it, I get
+[12:03:31] Kernel panic - not syncing: panic_on_taint set ...
+[12:03:31] CPU: 0 PID: 1 Comm: swapper Tainted: G                 N
+5.17.0-00001-gea9ee5e7aed8-dirty #60
+
+I'm a bit surprised that it prints 'G' and not 'N', but this does seem
+to be the right mask
+$ python3 -c 'print(hex(1<<18))'
+0x40000
+and it only takes effect when this patch is applied.
+I'll chalk that up to my ignorance of how taint works.
