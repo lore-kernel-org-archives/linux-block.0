@@ -2,105 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 147CFC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:02:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DFCEC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381636AbiEMPB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 11:01:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57164 "EHLO
+        id S1351501AbiEMPgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 11:36:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381842AbiEMPBI (ORCPT
+        with ESMTP id S1382203AbiEMPgT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 11:01:08 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 102BA3FDB1;
-        Fri, 13 May 2022 07:59:50 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id cq17-20020a17090af99100b001dc0386cd8fso7997485pjb.5;
-        Fri, 13 May 2022 07:59:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=L6n+4dfll/BRetr32yeP/ERgzE6Vl2zW43Zw49sqvUE=;
-        b=hnYXjKWw+87VL85SaN68rpIkMD9dCJnWQWKiMcWhIGGUu4WsnUKCWaRNmGQwUTj6XF
-         7GMMIyIetdkFWw+LSKsbtqEVp0G7o9Rhwz5e5wipdEpIfSH8wMoCN0VtYEFx6kwpKY4c
-         9vxJIt6CnuZNA4J3AR+FHs2Kly6vpvXwOwVsMcuhrO4po39rjEETXmriLaYAfGLokvvS
-         bYv4rJMoEGTQX+uzgMEJ98GSwyaI5fTbUqzxqDmUBaRw/rGW8+a9+PWvk+0eX6CNYr22
-         +IiGF82f4IrjiLG20M2yO23egnCmhbTOaBWWL7O/mPs5Vj3sMOKv6FC7w4+R4Ph3sFse
-         qh0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=L6n+4dfll/BRetr32yeP/ERgzE6Vl2zW43Zw49sqvUE=;
-        b=1fbGAgMI8r/E2YzW0O9Cc3tIn22+yx3vQ1dIO8F9Hy/7pjZlFpbk8dqSCnimH8ayTG
-         4ymP/aU62wcxtonDMGDS/ZAP1ifTVfKY35K5uVaxCo1is9x4coYH+5CggLvpCX6anSR2
-         AsK6f8Wjnigtq67Ncuq1LeL8dbtB2A1z7dSt01+x/BHQpUsBPV41EMaQxTmVlKj9kuFP
-         oWxCPWO0rwaYKBIU1GwlLp7r9n7yrhxyQkAvOQD8LFItTjstqS6vQ1pRi0cDKh1qV6Yr
-         KIuQ0LwxRsCHl8low5vWQz217CKrQeioi8tuwmr/Xjy+bUbPWgw5rwG/T1kkrPDsGaEG
-         0tTg==
-X-Gm-Message-State: AOAM533LivAwIXwnLnb3/Y4/oRnQfE1OEwzlbDxJ9OaNWkOXM3yMRzpC
-        O1vIM160zyHZxx//wbZrxxI=
-X-Google-Smtp-Source: ABdhPJyuaRFcd/12DbUN8KUJNVv6u6XAgTDMKNSA5HgDKgBB0oKA93xiH7TwON3D14cgZ9B7gocIrA==
-X-Received: by 2002:a17:903:240e:b0:158:eab9:2662 with SMTP id e14-20020a170903240e00b00158eab92662mr4845446plo.87.1652453989501;
-        Fri, 13 May 2022 07:59:49 -0700 (PDT)
-Received: from DIDI-C02G33EXQ05D.xiaojukeji.com ([111.194.46.158])
-        by smtp.gmail.com with ESMTPSA id z6-20020a170903018600b0015eb200cc00sm2011747plg.138.2022.05.13.07.59.47
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 13 May 2022 07:59:49 -0700 (PDT)
-From:   Yahu Gao <gaoyahu19@gmail.com>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        Yahu Gao <yahugao@didiglobal.com>,
-        Kunhai Dai <daikunhai@didiglobal.com>
-Subject: [PATCH] block,iocost: fix potential kernel NULL
-Date:   Fri, 13 May 2022 22:59:28 +0800
-Message-Id: <20220513145928.29766-2-gaoyahu19@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
-In-Reply-To: <20220513145928.29766-1-gaoyahu19@gmail.com>
-References: <20220513145928.29766-1-gaoyahu19@gmail.com>
+        Fri, 13 May 2022 11:36:19 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A9DB101C4;
+        Fri, 13 May 2022 08:36:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Oog80k7GQxM52zTZPMnIGwh2UY76oIYMbMWJ+awWYIA=; b=Bz/zNMH2Ro4SlXFK2FRLN1RZD6
+        APubsATHMDIJ6r0BnhE0ATsv69tLUxefVIzFUjB4dpXKigZXGu4ckLmjI1grPABCWIP+FK3LBFBjR
+        AtMYkwulP5fWXZ2ztb3htxldk/7MliWN+6A6jYZSwAgnINQB8AvVKHGY/ZZOSr0g/1TX7J4m1eqkJ
+        zLQ7EGsMXbGde5+lSrK/8eLcKpClBIswaMYkhulvMkWDfHSAPp8V3OE26ExU78iNUdWiDgm4ZuTLF
+        nj2KOvzhDPEyhJ5VJLFarc830bGDqrk3KWjmQPzOYxgTKCReCaQ0le17SiebKmQno+EMsgttzOVjf
+        Cn+9GtZg==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1npXKr-00GixM-Ep; Fri, 13 May 2022 15:36:09 +0000
+Date:   Fri, 13 May 2022 08:36:09 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     David Gow <davidgow@google.com>
+Cc:     Brendan Higgins <brendanhiggins@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        John Ogness <john.ogness@linutronix.de>,
+        Joe Fradley <joefradley@google.com>,
+        Daniel Latypov <dlatypov@google.com>,
+        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Aaron Tomlin <atomlin@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] kunit: Taint the kernel when KUnit tests are run
+Message-ID: <Yn566YlpyD1UnbY0@bombadil.infradead.org>
+References: <20220429043913.626647-1-davidgow@google.com>
+ <20220513083212.3537869-2-davidgow@google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220513083212.3537869-2-davidgow@google.com>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yahu Gao <yahugao@didiglobal.com>
+On Fri, May 13, 2022 at 04:32:12PM +0800, David Gow wrote:
+> Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
+> Due to KUnit tests not being intended to run on production systems, and
+> potentially causing problems (or security issues like leaking kernel
+> addresses), the kernel's state should not be considered safe for
+> production use after KUnit tests are run.
+> 
+> Signed-off-by: David Gow <davidgow@google.com>
 
-Some inode pinned dying memory cgroup and its parent destroyed at first.
-The parent's pd of iocost won't be allocated during function
-blkcg_activate_policy.
-Ignore the DYING CSS to avoid kernel NULL during iocost policy data init.
+Acked-by: Luis Chamberlain <mcgrof@kernel.org>
 
-Signed-off-by: Yahu Gao <yahugao@didiglobal.com>
-Signed-off-by: Kunhai Dai <daikunhai@didiglobal.com>
-
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index a91f8ae18b49..32472de2e61d 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -1418,6 +1418,9 @@ int blkcg_activate_policy(struct request_queue *q,
- 	list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
- 		struct blkg_policy_data *pd;
- 
-+		if (blkg->blkcg->css.flags & CSS_DYING)
-+			continue;
-+
- 		if (blkg->pd[pol->plid])
- 			continue;
- 
-@@ -1459,8 +1462,11 @@ int blkcg_activate_policy(struct request_queue *q,
- 
- 	/* all allocated, init in the same order */
- 	if (pol->pd_init_fn)
--		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node)
-+		list_for_each_entry_reverse(blkg, &q->blkg_list, q_node) {
-+			if (blkg->blkcg->css.flags & CSS_DYING)
-+				continue;
- 			pol->pd_init_fn(blkg->pd[pol->plid]);
-+		}
- 
- 	__set_bit(pol->plid, q->blkcg_pols);
- 	ret = 0;
--- 
-2.30.1
+  Luis
