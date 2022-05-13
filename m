@@ -2,75 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD02C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:52:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4085EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 17:13:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359757AbiEMQwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 12:52:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
+        id S1359072AbiEMRN0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 13:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379129AbiEMQwS (ORCPT
+        with ESMTP id S1382794AbiEMRNY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 12:52:18 -0400
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE4254FAC
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:51:45 -0700 (PDT)
-Received: by mail-pj1-f41.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso11337061pjb.1
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:51:45 -0700 (PDT)
+        Fri, 13 May 2022 13:13:24 -0400
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84C1045AE0
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 10:13:21 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id j14so8556466plx.3
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 10:13:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=Alv0Q5yUp4HcQx/ktizSOXMokGOXZCCo4Fvnr/F9WVE=;
-        b=44yr3gWbtWRKivkyz74tcmCNXS+Fl26bM2OMoQlSQirdFa8HibOR+CWXvUEfHbdZA9
-         h6wXFiQE3pvtzkUJra7b/+Blz3dar4A6jsLR2f3DHu+5KVpP28LZOmLlGKnaaM5F38JK
-         h6N3zahnqpEUAgG0hi+8LHtrRFbzHjDeaMqtFFjWfuk6y+aPswwAfeTepTT7wVFtz1U3
-         B9p6dBuTadiQ+MdajCqg8uQ0y6ShzV/GYi2ESOB6nSkGW5iUMDNKbDuzB2bbQvRFhz2p
-         DFWb6+jLWx52o+emX4wrmgd9JugEQkqWyPoWXnZUB4Y77c6a11Y40Fi6joW8Ljz6WBvu
-         z94w==
-X-Gm-Message-State: AOAM530ZbYTJRsCrtQ42twILIcmxpA4p/+qSwzvqJZouAxks8F+j6jt6
-        dgs0puXmPCrcPb9El4oXZP0=
-X-Google-Smtp-Source: ABdhPJw/nU+yv/v8x7oWDPRRYouf4KFyVT439ijBbIAyRgHHGYzGVcAqTyX3dQLX6nliQWzyM5wCKg==
-X-Received: by 2002:a17:90b:194f:b0:1dd:a47:3db5 with SMTP id nk15-20020a17090b194f00b001dd0a473db5mr5844014pjb.74.1652460705249;
-        Fri, 13 May 2022 09:51:45 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id d13-20020a17090ad98d00b001cd4989fee5sm3795426pjv.49.2022.05.13.09.51.43
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 13 May 2022 09:51:44 -0700 (PDT)
-Message-ID: <10b594f2-bec1-76db-5580-7bc1709805c3@acm.org>
-Date:   Fri, 13 May 2022 09:51:42 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH] block: avoid to serialize blkdev_fallocate
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
-References: <20220512134814.1454451-1-ming.lei@redhat.com>
+        bh=mmsQAq3pDdoQPAibvdtuABUHGERA0yWqJedTHtxw11Y=;
+        b=e+xycRavT00dAyi0vLVlOIhYuvzcgkpIVflkGnV9fM+5TXo4kuMh3jTwdtF+mawsiz
+         2pOiMb6DxXtcgCCS1I/FlR0DpdXOyhaqY+jtv8MUMz2T38JYqwNb99hAsRUSzyVswSQn
+         laHmcsAwiC589py7RzTVRV/lhBAGuEHrA1QZrYX5Fc9iimsFiDs7njkgNpwXNgytNJ1o
+         28TxqBK3OTlYj3Nueh0X7dIAnQ2E6UOnR+T9KxSnKiJznnR8SNRhWuGVeameU97/Jf42
+         OPDzooPcHefiy2p20Jiy0IdTgldYOCTub6KGtxrcbg139S53f+S6g6nx/bFDAIXNYx6v
+         RYsQ==
+X-Gm-Message-State: AOAM531+UUBijjtOuVgj6i6a6FKMGF2hK8psdQ4YuHCJ5NK99w0IT/OZ
+        pIdMhRWzkxZZpWn9ws+JGRQ=
+X-Google-Smtp-Source: ABdhPJyRDSBPuK8xWpy/xlzYCUCh8kviKTfazLzTbnuhbtEK5extm4GwqFHxfzBMnA+rNlbhc1Te9A==
+X-Received: by 2002:a17:90a:4897:b0:1c7:5fce:cbcd with SMTP id b23-20020a17090a489700b001c75fcecbcdmr17088245pjh.45.1652462000614;
+        Fri, 13 May 2022 10:13:20 -0700 (PDT)
+Received: from asus.hsd1.ca.comcast.net ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id 9-20020a17090a1a4900b001dcf9fe5cddsm1817718pjl.38.2022.05.13.10.13.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 13 May 2022 10:13:19 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220512134814.1454451-1-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Subject: [PATCH] block/mq-deadline: Set the fifo_time member also if inserting at head
+Date:   Fri, 13 May 2022 10:13:07 -0700
+Message-Id: <20220513171307.32564-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.36.0
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/12/22 06:48, Ming Lei wrote:
-> Commit f278eb3d8178 ("block: hold ->invalidate_lock in blkdev_fallocate")
-> adds ->invalidate_lock in blkdev_fallocate() for preventing stale data
-> from being read during fallocate().
-> 
-> However, the side effect is that blkdev_fallocate() becomes serialized
-> since blkdev_fallocate() always blocks.
-> 
-> Add one atomic fallocate counter for allowing blkdev_fallocate() to
-> be run concurrently so that discard/write_zero bios from different
-> fallocate() can be submitted in parallel.
+Before commit 322cff70d46c the fifo_time member of requests on a dispatch
+list was not used. Commit 322cff70d46c introduces code that reads the
+fifo_time member of requests on dispatch lists. Hence this patch that sets
+the fifo_time member when adding a request to a dispatch list.
 
-Please consider adding a "Fixes:" tag since otherwise this patch won't 
-be integrated automatically into any of the stable kernel trees.
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Fixes: 322cff70d46c ("block/mq-deadline: Prioritize high-priority requests")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/mq-deadline.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Thanks,
-
-Bart.
+diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+index 3ed5eaf3446a..6ed602b2f80a 100644
+--- a/block/mq-deadline.c
++++ b/block/mq-deadline.c
+@@ -742,6 +742,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+ 
+ 	if (at_head) {
+ 		list_add(&rq->queuelist, &per_prio->dispatch);
++		rq->fifo_time = jiffies;
+ 	} else {
+ 		deadline_add_rq_rb(per_prio, rq);
+ 
