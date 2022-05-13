@@ -2,67 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23DDAC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 08:10:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91543C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 08:32:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378107AbiEMIKr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 04:10:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54486 "EHLO
+        id S1378292AbiEMIcd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 04:32:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378109AbiEMIKg (ORCPT
+        with ESMTP id S241051AbiEMIcb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 04:10:36 -0400
-Received: from mail.coredeal.pl (mail.coredeal.pl [51.75.73.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAA512A4A2A
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 01:10:35 -0700 (PDT)
-Received: by mail.coredeal.pl (Postfix, from userid 1002)
-        id E89ADA5209; Fri, 13 May 2022 08:06:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=coredeal.pl; s=mail;
-        t=1652429248; bh=9KGuIG62LgzC9aYmjKxzocuYLRCVghXg6v9Q1q2LHec=;
-        h=Date:From:To:Subject:From;
-        b=VjqrYu+atFRm8XOCDspEM+o2WtDugYYGYKYrK+hyBz1rXsaGgjgAecaRDizSz7UtI
-         vp9/Hbv+6RBf2WUw6mtSad3C5oyvsXE10DcG/5Cmcs/D6fGSnb4vxQQxiPs2SUiJAS
-         8NGYHViQAMyAxOpWxgLsYTr+gUTodZNMTnh9dkRyOIHG7x8b6/5HbEPiWmhCEMfDNS
-         MkyGhT2WJIsTS9AilZYB3HeJhb8A2oNG1BzwOKHD25iVVDLA3Q43g5y4N9FY5UjV4e
-         x77ZcRgOuOSFwl3euO+MsSYzW+WLG7F8fqrak+GcQUWzBgts9lhCN7vHnE8dgoSaxa
-         q0M4Yr5A7hvyw==
-Received: by mail.coredeal.pl for <linux-block@vger.kernel.org>; Fri, 13 May 2022 08:05:55 GMT
-Message-ID: <20220513064500-0.1.33.o0sp.0.799vle4l2c@coredeal.pl>
-Date:   Fri, 13 May 2022 08:05:55 GMT
-From:   "Krzysztof Maj" <krzysztof.maj@coredeal.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: Biznesowy angielski
-X-Mailer: mail.coredeal.pl
-MIME-Version: 1.0
+        Fri, 13 May 2022 04:32:31 -0400
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD6564BC8
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 01:32:27 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-2f7ee6bc6ddso66923457b3.1
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 01:32:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=hUQluwx+IeHDQbtP0fjL9XDhdITsEoJIWpp8L9h5giw=;
+        b=F/cDv7XyzfAhrhFHas6iEitptBabeLxs7JYySMnnIYCMoVWQlm1aMRtE+/SqhaEDNm
+         CUtVY8Whw9qTUb+f6i/9SrNwUqK//hLviYObbOgELsaAp+e5PQTys3VZGSOL11haUR2h
+         JXi3PzXSBFhTXTg6T1Af2lQ5jg98qlb1DqYvd/5im6SSwHSqg3+18b/zRgwbpeniHh5w
+         dFaHx//RRMeVVvYwkpThQ2ynlPG4D3Z6TPN9+uRk3fk2kHCiIjA3uT5TTFvKie7Uwrfj
+         xvGnEU8+v1psGFcZQC5sVKJwY5jyAB/aWooaKwolISkK6dLklWtYlS3y29i6SEb8U5+M
+         i2xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=hUQluwx+IeHDQbtP0fjL9XDhdITsEoJIWpp8L9h5giw=;
+        b=7XzN0jwU2AHsF64b0bPoO79/jf7ZA3CWHrD7unD06u1O6mml9LLGf//JKWb1ddGfmQ
+         tDfduiEK7lYAsznoWacijjpT5dfAhjJFMakflrivQXya2vg3fj0mWMwULwfCnIAbAR3F
+         fqJH4B49MwZ5/8wAxiiJlo8/Ag8Ob3z8BNg8oBJJe3JxY//sDc9b/8+kQg1F/n1ail6k
+         rwPeDnQWha4eo7jUJWsacgKYT9CRu9WFYu1IiCoqZz6l5v7zOMYAnosHiOK8ZxUheyK8
+         Y6ppiBKtrHbOZBbsY1iCKLo7GVR4Yo4bB6PMJ5ianBP9JyYkOOlK19U5vZFGcSWD+ePP
+         QZew==
+X-Gm-Message-State: AOAM533sefDn/2Zz6KrF1qiJIYarhk6CETFWDZyc55mZw6khnXhhgcLi
+        AVWF0TNwCK55QtBKoXoJNa7meqn+U+rgcw==
+X-Google-Smtp-Source: ABdhPJz63iUUnCr3zTam4iVPENkFDo9Hk9l7LA5hxnjO3aj6X2c1blool5DQ+WglykBzpsoKBGog87zoHV/MCQ==
+X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
+ (user=davidgow job=sendgmr) by 2002:a0d:d689:0:b0:2fb:9a57:8517 with SMTP id
+ y131-20020a0dd689000000b002fb9a578517mr4235720ywd.502.1652430747159; Fri, 13
+ May 2022 01:32:27 -0700 (PDT)
+Date:   Fri, 13 May 2022 16:32:11 +0800
+In-Reply-To: <20220429043913.626647-1-davidgow@google.com>
+Message-Id: <20220513083212.3537869-1-davidgow@google.com>
+Mime-Version: 1.0
+References: <20220429043913.626647-1-davidgow@google.com>
+X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
+Subject: [PATCH v3 1/3] panic: Taint kernel if tests are run
+From:   David Gow <davidgow@google.com>
+To:     Brendan Higgins <brendanhiggins@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Kees Cook <keescook@chromium.org>,
+        Shuah Khan <skhan@linuxfoundation.org>,
+        Greg KH <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     David Gow <davidgow@google.com>,
+        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
+        Sebastian Reichel <sre@kernel.org>,
+        John Ogness <john.ogness@linutronix.de>,
+        Joe Fradley <joefradley@google.com>,
+        Daniel Latypov <dlatypov@google.com>,
+        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jani Nikula <jani.nikula@linux.intel.com>,
+        Lucas De Marchi <lucas.demarchi@intel.com>,
+        Aaron Tomlin <atomlin@redhat.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,=20
+Most in-kernel tests (such as KUnit tests) are not supposed to run on
+production systems: they may do deliberately illegal things to trigger
+errors, and have security implications (for example, KUnit assertions
+will often deliberately leak kernel addresses).
 
-czy rozwa=C5=BCali Pa=C5=84stwo rozw=C3=B3j kwalifikacji j=C4=99zykowych =
-swoich pracownik=C3=B3w?
+Add a new taint type, TAINT_TEST to signal that a test has been run.
+This will be printed as 'N' (originally for kuNit, as every other
+sensible letter was taken.)
 
-Opracowali=C5=9Bmy kursy j=C4=99zykowe dla r=C3=B3=C5=BCnych bran=C5=BC, =
-w kt=C3=B3rych koncentrujemy si=C4=99 na podniesieniu poziomu s=C5=82owni=
-ctwa i jako=C5=9Bci komunikacji wykorzystuj=C4=85c autorsk=C4=85 metod=C4=
-=99, stworzon=C4=85 specjalnie dla wymagaj=C4=85cego biznesu.=20
+This should discourage people from running these tests on production
+systems, and to make it easier to tell if tests have been run
+accidentally (by loading the wrong configuration, etc.)
 
-Niestandardowy kurs on-line, dopasowany do profilu firmy i obszar=C3=B3w =
-=C5=9Bwiadczonych us=C5=82ug, w szybkim czasie przyniesie efekty, kt=C3=B3=
-re zwi=C4=99ksz=C4=85 komfort i jako=C5=9B=C4=87 pracy, rozwijaj=C4=85c m=
-o=C5=BCliwo=C5=9Bci biznesowe.=20
+Signed-off-by: David Gow <davidgow@google.com>
+---
 
-Zdalne szkolenie j=C4=99zykowe to m.in. zaj=C4=99cia z native speakerami,=
- kt=C3=B3re w szybkim czasie naucz=C4=85 pracownik=C3=B3w rozmawia=C4=87 =
-za pomoc=C4=85 jasnego i zwi=C4=99z=C5=82ego j=C4=99zyka Business English=
-=2E
+Updated this to handle the most common case of selftest modules, in
+addition to KUnit tests. There's room for other tests or test frameworks
+to use this as well, either with a call to add_taint() from within the
+kernel, or by writing to /proc/sys/kernel/tainted.
 
-Czy m=C3=B3g=C5=82bym przedstawi=C4=87 wi=C4=99cej szczeg=C3=B3=C5=82=C3=B3=
-w i opowiedzie=C4=87 jak dzia=C5=82amy?=20
+The 'N' character for the taint is even less useful now that it's no
+longer short for kuNit, but all the letters in TEST are taken. :-(
 
+Changes since v2:
+https://lore.kernel.org/linux-kselftest/20220430030019.803481-1-davidgow@google.com/
+- Rename TAINT_KUNIT -> TAINT_TEST.
+- Split into separate patches for adding the taint, and triggering it.
+- Taint on a kselftest_module being loaded (patch 3/3)
 
-Pozdrawiam
-Krzysztof Maj
+Changes since v1:
+https://lore.kernel.org/linux-kselftest/20220429043913.626647-1-davidgow@google.com/
+- Make the taint per-module, to handle the case when tests are in
+  (longer lasting) modules. (Thanks Greg KH).
+
+Note that this still has checkpatch.pl warnings around bracket
+placement, which are intentional as part of matching the surrounding
+code.
+
+---
+ Documentation/admin-guide/tainted-kernels.rst | 1 +
+ include/linux/panic.h                         | 3 ++-
+ kernel/panic.c                                | 1 +
+ 3 files changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/admin-guide/tainted-kernels.rst b/Documentation/admin-guide/tainted-kernels.rst
+index ceeed7b0798d..546f3071940d 100644
+--- a/Documentation/admin-guide/tainted-kernels.rst
++++ b/Documentation/admin-guide/tainted-kernels.rst
+@@ -100,6 +100,7 @@ Bit  Log  Number  Reason that got the kernel tainted
+  15  _/K   32768  kernel has been live patched
+  16  _/X   65536  auxiliary taint, defined for and used by distros
+  17  _/T  131072  kernel was built with the struct randomization plugin
++ 18  _/N  262144  an in-kernel test (such as a KUnit test) has been run
+ ===  ===  ======  ========================================================
+ 
+ Note: The character ``_`` is representing a blank in this table to make reading
+diff --git a/include/linux/panic.h b/include/linux/panic.h
+index f5844908a089..2f5f2a9ecaf7 100644
+--- a/include/linux/panic.h
++++ b/include/linux/panic.h
+@@ -74,7 +74,8 @@ static inline void set_arch_panic_timeout(int timeout, int arch_default_timeout)
+ #define TAINT_LIVEPATCH			15
+ #define TAINT_AUX			16
+ #define TAINT_RANDSTRUCT		17
+-#define TAINT_FLAGS_COUNT		18
++#define TAINT_TEST			18
++#define TAINT_FLAGS_COUNT		19
+ #define TAINT_FLAGS_MAX			((1UL << TAINT_FLAGS_COUNT) - 1)
+ 
+ struct taint_flag {
+diff --git a/kernel/panic.c b/kernel/panic.c
+index eb4dfb932c85..1cf707e3bacd 100644
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -404,6 +404,7 @@ const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
+ 	[ TAINT_LIVEPATCH ]		= { 'K', ' ', true },
+ 	[ TAINT_AUX ]			= { 'X', ' ', true },
+ 	[ TAINT_RANDSTRUCT ]		= { 'T', ' ', true },
++	[ TAINT_TEST ]			= { 'N', ' ', true },
+ };
+ 
+ /**
+-- 
+2.36.0.550.gb090851708-goog
+
