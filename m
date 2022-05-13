@@ -2,32 +2,32 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66D63C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:36:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C917C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:38:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382098AbiEMPgc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 11:36:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45942 "EHLO
+        id S1382108AbiEMPio (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 11:38:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382165AbiEMPgH (ORCPT
+        with ESMTP id S1353368AbiEMPin (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 11:36:07 -0400
+        Fri, 13 May 2022 11:38:43 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE620101C4;
-        Fri, 13 May 2022 08:36:05 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BB70DF14;
+        Fri, 13 May 2022 08:38:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
         MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
         Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IzQ9owkt8YiZe1369EAKIafa5obLJ/EHaGRPb2JnnbM=; b=W2k6pVD2XZSvc+QSfttXCU/bUD
-        OZCk9dzOVnxPbkF5YIhtpIhTheDdhQUleH6hDnDLx9Ig0n6tIwR3KOXNS3eLATawiWFy+mnSZJABk
-        gBjQDYDw+zLRY1ZDBj5Dfck9IA37sYMald2vTwgkjYJ+C4smFN5ixIUT08bXygbb+oXOWROBQYrV5
-        zYIuXn/hjLqPR7x1rMm5x4aFhrlNkkewDUsE7XciDZx2jZW5FzIJngcsRNChagJLibuWAgIWzbtKo
-        Vx4YYrtA19tWfw0zJtsZsEU1tIOmp91enosDVjJcCHW8SFRiNc0Go+WQBd7vCJ18DykDvYplLiaQO
-        2xW34pKQ==;
+        bh=v/c3xgIDZSG7sLprEPQVRNnfFwlIrO9OdkflwaOK6ZM=; b=Uo77FcJ3BqYtJHwKgb7MfJHKRw
+        q5PxNMuRmpm6cBr3cTCMrBobW2ruAQNsG5xYUPYG7p3X4uah4VsZpCC19XgmlmHRmSSbDIEAhA+ou
+        UOTWvKzDAFlvxs0GxI77lKb9nWuZXxzCzvY95Rt69hGLehSOBu5dIck0vXM+opIrH+WR5Xn7o3omu
+        IszcPED66iVdZBM9ac0uCtZoS/jO88gl4KE6FrNkrcoBxIUntZd8y27bp9F39X++gF6gWk2RtClzy
+        98Dvgy7dPQdoITkB9aqQaJ6jx6d8tx6hEt8ycMMEL5sCT9kymzVYn1+RsIRr69BpM2jn2f9KAZtiH
+        Ks0AD77w==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1npXKY-00Giv4-Jd; Fri, 13 May 2022 15:35:50 +0000
-Date:   Fri, 13 May 2022 08:35:50 -0700
+        id 1npXN9-00GjNh-MG; Fri, 13 May 2022 15:38:31 +0000
+Date:   Fri, 13 May 2022 08:38:31 -0700
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     David Gow <davidgow@google.com>
 Cc:     Brendan Higgins <brendanhiggins@google.com>,
@@ -48,80 +48,37 @@ Cc:     Brendan Higgins <brendanhiggins@google.com>,
         Lucas De Marchi <lucas.demarchi@intel.com>,
         Aaron Tomlin <atomlin@redhat.com>,
         linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH v3 1/3] panic: Taint kernel if tests are run
-Message-ID: <Yn561lzWDuiVdTHT@bombadil.infradead.org>
+Subject: Re: [PATCH v3 3/3] selftest: Taint kernel when test module loaded
+Message-ID: <Yn57d1e6k8uv2uQj@bombadil.infradead.org>
 References: <20220429043913.626647-1-davidgow@google.com>
- <20220513083212.3537869-1-davidgow@google.com>
+ <20220513083212.3537869-3-davidgow@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220513083212.3537869-1-davidgow@google.com>
+In-Reply-To: <20220513083212.3537869-3-davidgow@google.com>
 Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 13, 2022 at 04:32:11PM +0800, David Gow wrote:
-> Most in-kernel tests (such as KUnit tests) are not supposed to run on
-> production systems: they may do deliberately illegal things to trigger
-> errors, and have security implications (for example, KUnit assertions
-> will often deliberately leak kernel addresses).
+On Fri, May 13, 2022 at 04:32:13PM +0800, David Gow wrote:
+> Make any kselftest test module (using the kselftest_module framework)
+> taint the kernel with TAINT_TEST on module load.
 > 
-> Add a new taint type, TAINT_TEST to signal that a test has been run.
-> This will be printed as 'N' (originally for kuNit, as every other
-> sensible letter was taken.)
+> Note that several selftests use kernel modules which are not based on
+> the kselftest_module framework, and so will not automatically taint the
+> kernel. These modules will have to be manually modified if they should
+> taint the kernel this way.
 > 
-> This should discourage people from running these tests on production
-> systems, and to make it easier to tell if tests have been run
-> accidentally (by loading the wrong configuration, etc.)
+> Similarly, selftests which do not load modules into the kernel generally
+> should not taint the kernel (or possibly should only do so on failure),
+> as it's assumed that testing from user-space should be safe. Regardless,
+> they can write to /proc/sys/kernel/tainted if required.
 > 
 > Signed-off-by: David Gow <davidgow@google.com>
-> ---
-> 
-> Updated this to handle the most common case of selftest modules, in
-> addition to KUnit tests. There's room for other tests or test frameworks
-> to use this as well, either with a call to add_taint() from within the
-> kernel, or by writing to /proc/sys/kernel/tainted.
-> 
-> The 'N' character for the taint is even less useful now that it's no
-> longer short for kuNit, but all the letters in TEST are taken. :-(
-> 
-> Changes since v2:
-> https://lore.kernel.org/linux-kselftest/20220430030019.803481-1-davidgow@google.com/
-> - Rename TAINT_KUNIT -> TAINT_TEST.
-> - Split into separate patches for adding the taint, and triggering it.
-> - Taint on a kselftest_module being loaded (patch 3/3)
-> 
-> Changes since v1:
-> https://lore.kernel.org/linux-kselftest/20220429043913.626647-1-davidgow@google.com/
-> - Make the taint per-module, to handle the case when tests are in
->   (longer lasting) modules. (Thanks Greg KH).
-> 
-> Note that this still has checkpatch.pl warnings around bracket
-> placement, which are intentional as part of matching the surrounding
-> code.
-> 
-> ---
->  Documentation/admin-guide/tainted-kernels.rst | 1 +
->  include/linux/panic.h                         | 3 ++-
->  kernel/panic.c                                | 1 +
->  3 files changed, 4 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/admin-guide/tainted-kernels.rst b/Documentation/admin-guide/tainted-kernels.rst
-> index ceeed7b0798d..546f3071940d 100644
-> --- a/Documentation/admin-guide/tainted-kernels.rst
-> +++ b/Documentation/admin-guide/tainted-kernels.rst
-> @@ -100,6 +100,7 @@ Bit  Log  Number  Reason that got the kernel tainted
->   15  _/K   32768  kernel has been live patched
->   16  _/X   65536  auxiliary taint, defined for and used by distros
->   17  _/T  131072  kernel was built with the struct randomization plugin
-> + 18  _/N  262144  an in-kernel test (such as a KUnit test) has been run
 
-I think mentioning just kunit fuzzes its interpretation here.
-Best to keep that out.
-
-Other than that:
-
-Acked-by: Luis Chamberlain <mcgrof@kernel.org>
+Not all selftest modules use KSTM_MODULE_LOADERS() so I'd like to see a
+modpost target as well, otherwise this just covers a sliver of
+selftests.
 
   Luis
