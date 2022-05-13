@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8F1C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2D6C43217
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:38:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383852AbiEMTij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1346242AbiEMTij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 13 May 2022 15:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44816 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44830 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346242AbiEMTii (ORCPT
+        with ESMTP id S1383685AbiEMTii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 13 May 2022 15:38:38 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4B76FD36;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FD20712D5;
         Fri, 13 May 2022 12:38:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=GAZcGk03ehrHc5Dtxk7odt4Ht5+ef2Nl5pEGHuLhXTc=; b=o1Xegp6GbvaEkEIroQaEaDuJbO
-        2zmGch5vozo3M0a8yTt7EHCU0DiarL2Ecc/pGhadzqhihoMrvMA/UnuhfGRNLraCmW9/o34DKzN49
-        ZmbWrhS09pw8kvvEkHw9EAOA2JFVUIP1ag3FXllW6g1dSEQPS3fFRrBj3n/niwLkP3co8XQBkG9Su
-        /0u+ggTYZKC9F8Db/gZkKRKDsnIueDBlSksFHNLILEgfAU5yRm1yxjPS86xaCFE1XIgmEPnyF1aV3
-        jLugS7RYjt+DaoPY7z6DyT1iH4ZWWGjXZ/TT/hBuG96asJomP91qLFFwLNb+VJvBfMONMVt4UOTm4
-        RVNNI4kA==;
+        bh=/APt/fREJUivm2PL8Qip+DxLUsOoVfNgqWfQfNmKkEM=; b=2L3lR8RT+ik15tlc3Fk0Zwr327
+        vxDNvlTDagP9N62xnZg5ps/Lo3KS5NHaRwxIkc1EHB5WJGyy9nZtqAh/snrNzXOc4eIOirgqZWhjj
+        Rg6CDQPJKppnwByCq2hXFIXhQfj+p8d5oaq+6IEJIxq7nlQhI8+3qaDXgF7LQ0qTQOSQ7Go8mcVL5
+        scX/ZXtnvESB9XTqpwLzX3zjT2O2RD99aSjGj3QR4rfKC/3GzrYomRPI6qbOtm+M5mWSrKgxs+GLH
+        igbFNYm7tbCIL98z9YO40Cng6tFVpHquoatLkTQQK86hsE9pHEuzEuBQ7Sb5+L+xZVJ+yI81mep2K
+        /7QMUxfQ==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1npb7T-00HM23-Nh; Fri, 13 May 2022 19:38:35 +0000
+        id 1npb7T-00HM1z-IL; Fri, 13 May 2022 19:38:35 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     patches@lists.linux.dev, amir73il@gmail.com, pankydev8@gmail.com,
         tytso@mit.edu, josef@toxicpanda.com, jmeneghi@redhat.com,
         jake@lwn.net, mcgrof@kernel.org
-Subject: [PATCH 4/4] kdevops: make linux-kdevops the default tree
-Date:   Fri, 13 May 2022 12:38:31 -0700
-Message-Id: <20220513193831.4136212-5-mcgrof@kernel.org>
+Subject: [PATCH 2/4] kdevops: move generic kdevops variables to its own file
+Date:   Fri, 13 May 2022 12:38:29 -0700
+Message-Id: <20220513193831.4136212-3-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220513193831.4136212-1-mcgrof@kernel.org>
 References: <20220513193831.4136212-1-mcgrof@kernel.org>
@@ -45,73 +45,102 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-At LSFMM 2022 at Palm Springs it was discussed that we should
-*strive* towards a shared expunge list for fstests / blktests. Although
-that effort requires splitting out the expunge list from kdevops to a
-new git subtree, sharing a git tree for commit work for kdevops seems
-also innevitable and desirable since some of us are already
-collaborating on at least one shared test runner, kdevops.
+There are shared kdevops variables between different workflows,
+which *can* be used by any workflow. Move these into a generic
+kdevops helper Makefile, as we can later expand on this.
 
-So we can start by using a shared organization for what we need
-to share, we call this organization linux-kdevops [0]. This encompasses a
-few usual suspects git trees which can be used by both fstests and
-blktests picking a "stable" sort of git sha1sum for each and always
-striving towards the latest:
-
-  * fstests
-  * blktests
-  * dbench
-  * ndd
-
-We'll be using the linux-kdevops organization for what trees we use and
-trust that those in the organization will communicate what is needed before
-making controversial changes.
-
-This is perhaps the first controversial change, but it only applies to
-kdevops, so if you are not using kdevops as a test runner you probably
-won't care.
-
-Those using kdevops should become aware that they should change
-their default upstream to use linux-kdevops URL now:
-
-So we switch from:
-https://github.com/mcgrof/kdevops
-To:
-https://github.com/linux-kdevops/kdevops
-
-Users which change this on a live environemtn would also then just have
-to change the CONFIG_WORKFLOW_KDEVOPS_GIT on their configuration so
-they'd just run:
-
- make menuconfig # set CONFIG_WORKFLOW_KDEVOPS_GIT to https://github.com/linux-kdevops/kdevops
- make
- make kdevops-git-reset
-
-Those who have commit access to the organization linux-kdevops can
-then just commit as needed to help move baselines forwards and if
-and when something comes up which really seems controversial we can
-use the mailing lists as with this change.
-
-[0] https://github.com/orgs/linux-kdevops/
+This makes no functional changes.
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- kconfigs/workflows/Kconfig.shared | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ workflows/Makefile        | 33 +--------------------------------
+ workflows/common/Makefile | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 35 insertions(+), 32 deletions(-)
+ create mode 100644 workflows/common/Makefile
 
-diff --git a/kconfigs/workflows/Kconfig.shared b/kconfigs/workflows/Kconfig.shared
-index 4cccfbe..4a2ecf6 100644
---- a/kconfigs/workflows/Kconfig.shared
-+++ b/kconfigs/workflows/Kconfig.shared
-@@ -47,7 +47,7 @@ endif
+diff --git a/workflows/Makefile b/workflows/Makefile
+index 928e42f..033ffc7 100644
+--- a/workflows/Makefile
++++ b/workflows/Makefile
+@@ -1,37 +1,6 @@
+ # SPDX-License-Identifier: copyleft-next-0.3.1
  
- config WORKFLOW_KDEVOPS_GIT
- 	string "Git tree of kdevops to clone on targets"
--	default "https://github.com/mcgrof/kdevops.git" if !GIT_ALTERNATIVES && !HAVE_CUSTOM_KDEVOPS_GIT
-+	default "https://github.com/linux-kdevops/kdevops.git" if !GIT_ALTERNATIVES && !HAVE_CUSTOM_KDEVOPS_GIT
- 	default "https://github.com/linux-kdevops/kdevops.git" if GIT_LINUX_KDEVOPS_GITHUB
- 	default "https://gitlab.com/linux-kdevops/kdevops.git" if GIT_LINUX_KDEVOPS_GITLAB
- 	default CUSTOM_KDEVOPS_GIT if HAVE_CUSTOM_KDEVOPS_GIT
+-# How we create the partition for the workflow data partition
+-WORKFLOW_DATA_DEVICE:=$(subst ",,$(CONFIG_WORKFLOW_DATA_DEVICE))
+-WORKFLOW_DATA_PATH:=$(subst ",,$(CONFIG_WORKFLOW_DATA_PATH))
+-WORKFLOW_DATA_FSTYPE:=$(subst ",,$(CONFIG_WORKFLOW_DATA_FSTYPE))
+-WORKFLOW_DATA_LABEL:=$(subst ",,$(CONFIG_WORKFLOW_DATA_LABEL))
+-
+-WORKFLOW_KDEVOPS_GIT:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_GIT))
+-WORKFLOW_KDEVOPS_GIT_DATA:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_GIT_DATA))
+-WORKFLOW_KDEVOPS_DIR:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_DIR))
+-
+-WORKFLOW_ARGS	+= data_device=$(WORKFLOW_DATA_DEVICE)
+-WORKFLOW_ARGS	+= data_path=$(WORKFLOW_DATA_PATH)
+-WORKFLOW_ARGS	+= data_fstype=$(WORKFLOW_DATA_FSTYPE)
+-WORKFLOW_ARGS	+= data_label=$(WORKFLOW_DATA_LABEL)
+-WORKFLOW_ARGS	+= kdevops_git=$(WORKFLOW_KDEVOPS_GIT)
+-WORKFLOW_ARGS	+= kdevops_data=\"$(WORKFLOW_KDEVOPS_GIT_DATA)\"
+-WORKFLOW_ARGS	+= kdevops_dir=\"$(WORKFLOW_KDEVOPS_DIR)\"
+-
+-ifeq (y,$(CONFIG_WORKFLOW_MAKE_CMD_OVERRIDE))
+-WORKFLOW_MAKE_CMD:=$(subst ",,$(CONFIG_WORKFLOW_MAKE_CMD))
+-endif
+-
+-ifeq (y,$(CONFIG_WORKFLOW_INFER_USER_AND_GROUP))
+-WORKFLOW_ARGS	+= infer_uid_and_group=True
+-else
+-WORKFLOW_DATA_USER:=$(subst ",,$(CONFIG_WORKFLOW_DATA_USER))
+-WORKFLOW_DATA_GROUP:=$(subst ",,$(CONFIG_WORKFLOW_DATA_GROUP))
+-
+-WORKFLOW_ARGS	+= data_user=$(WORKFLOW_DATA_USER)
+-WORKFLOW_ARGS	+= data_group=$(WORKFLOW_DATA_GROUP)
+-
+-endif # CONFIG_WORKFLOW_MAKE_CMD_OVERRIDE == y
++include workflows/common/Makefile
+ 
+ BOOTLINUX_ARGS	:=
+ ifeq (y,$(CONFIG_BOOTLINUX))
+diff --git a/workflows/common/Makefile b/workflows/common/Makefile
+new file mode 100644
+index 0000000..da21d78
+--- /dev/null
++++ b/workflows/common/Makefile
+@@ -0,0 +1,34 @@
++# SPDX-License-Identifier: copyleft-next-0.3.1
++
++# How we create the partition for the workflow data partition
++WORKFLOW_DATA_DEVICE:=$(subst ",,$(CONFIG_WORKFLOW_DATA_DEVICE))
++WORKFLOW_DATA_PATH:=$(subst ",,$(CONFIG_WORKFLOW_DATA_PATH))
++WORKFLOW_DATA_FSTYPE:=$(subst ",,$(CONFIG_WORKFLOW_DATA_FSTYPE))
++WORKFLOW_DATA_LABEL:=$(subst ",,$(CONFIG_WORKFLOW_DATA_LABEL))
++
++WORKFLOW_KDEVOPS_GIT:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_GIT))
++WORKFLOW_KDEVOPS_GIT_DATA:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_GIT_DATA))
++WORKFLOW_KDEVOPS_DIR:=$(subst ",,$(CONFIG_WORKFLOW_KDEVOPS_DIR))
++
++WORKFLOW_ARGS	+= data_device=$(WORKFLOW_DATA_DEVICE)
++WORKFLOW_ARGS	+= data_path=$(WORKFLOW_DATA_PATH)
++WORKFLOW_ARGS	+= data_fstype=$(WORKFLOW_DATA_FSTYPE)
++WORKFLOW_ARGS	+= data_label=$(WORKFLOW_DATA_LABEL)
++WORKFLOW_ARGS	+= kdevops_git=$(WORKFLOW_KDEVOPS_GIT)
++WORKFLOW_ARGS	+= kdevops_data=\"$(WORKFLOW_KDEVOPS_GIT_DATA)\"
++WORKFLOW_ARGS	+= kdevops_dir=\"$(WORKFLOW_KDEVOPS_DIR)\"
++
++ifeq (y,$(CONFIG_WORKFLOW_MAKE_CMD_OVERRIDE))
++WORKFLOW_MAKE_CMD:=$(subst ",,$(CONFIG_WORKFLOW_MAKE_CMD))
++endif
++
++ifeq (y,$(CONFIG_WORKFLOW_INFER_USER_AND_GROUP))
++WORKFLOW_ARGS	+= infer_uid_and_group=True
++else
++WORKFLOW_DATA_USER:=$(subst ",,$(CONFIG_WORKFLOW_DATA_USER))
++WORKFLOW_DATA_GROUP:=$(subst ",,$(CONFIG_WORKFLOW_DATA_GROUP))
++
++WORKFLOW_ARGS	+= data_user=$(WORKFLOW_DATA_USER)
++WORKFLOW_ARGS	+= data_group=$(WORKFLOW_DATA_GROUP)
++
++endif # CONFIG_WORKFLOW_INFER_USER_AND_GROUP == y
 -- 
 2.35.1
 
