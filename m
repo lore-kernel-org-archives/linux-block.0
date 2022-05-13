@@ -2,110 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F638C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F6AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383559AbiEMTJ3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 15:09:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41172 "EHLO
+        id S1383855AbiEMTij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 15:38:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344149AbiEMTJ2 (ORCPT
+        with ESMTP id S1383849AbiEMTii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 15:09:28 -0400
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BAC983BA7C
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 12:09:25 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id bq30so16108325lfb.3
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 12:09:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rbJzGXtyUp4FkqReU6sYBiDMNKWwFopa4KLMlmGZbuA=;
-        b=GJx1FC6PGj6rP204JhO+MVJD1p9S4B+WG3Wu3TnyVIi0CzstjPqeEwc9SpcYJe1l2R
-         TXfW9mAAliWx/XxYsTGa4JGZi1ldNXUsBVx/1fAKAjk52jHYQR53XvuCTMBvBpn6MgRR
-         nvpW/IRmtZIRvLyMS+gjblxH1h5ebwHsII+gRQJhlnTz2JmCdju6VXzbxiZrzjAU0G8S
-         qEZAkEjFjZm5uCyVG1A9FYdpEJXEIggJw4e8FDvUWWObJAj2ttke1r3VSENsFthwAaHE
-         UD/Jt3UM0xd083pDPRmEB5Y8Wcl8Crk4Yp0PFs+XzKdG15jB7LAq0MZO7OESoHhu2wHG
-         Klkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rbJzGXtyUp4FkqReU6sYBiDMNKWwFopa4KLMlmGZbuA=;
-        b=ZgnphS+KxAYbhgVYyh6fF+H6Ez55WXgFLsm6/T/EJcyeYxAgWzBvqEQ/FvFdM9ywtD
-         5w2aXne4iH/KTCaqLf7WFbT2/nXF4UN0u6qwJwnYuaXBmYuNdPoqiCOQ8rQ6UyJTJL+j
-         stZXSWDjUBWYeeB2x+97pf0SXZ32G6SiKUCy2zBftvHPo37kkRR8N6hmNrbF/RA1UBGn
-         96aQZX7BWs0kSnDEKzJzWgoIHbyUpD0rucxayIoBEcdONjrRxtXSdKP3AiUlv3cHXeNN
-         +k0kh2yAuPSZPdrlnDuCnDJlPmCBezTZMwFSOOlBeKQvt8gta9U8CvzNB02cdiNHzZlh
-         vT2g==
-X-Gm-Message-State: AOAM530Yz81CF6SRwHfVyYPbrrRPoju0dOZ7sSiLp7tK6ns2IryNc6XC
-        qIlYnTtiZuGGPr2P7U026Dg3g//l1fftBcpMIikPZw==
-X-Google-Smtp-Source: ABdhPJw2v+78PG9kRlrr2N0DSVUm9/qtjQv8JgVoDVhvaTi3qjv3ZFLpx/pOXFQCTgDrEl1P0PwYOBSHt4h+KgElKzY=
-X-Received: by 2002:a05:6512:104a:b0:473:d38b:cdf with SMTP id
- c10-20020a056512104a00b00473d38b0cdfmr4633370lfb.554.1652468963837; Fri, 13
- May 2022 12:09:23 -0700 (PDT)
+        Fri, 13 May 2022 15:38:38 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FE6712EA;
+        Fri, 13 May 2022 12:38:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
+        Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=iGO39EDVjPnTYXbXk4m8oqTPwLMaY1sb1Vley0Ob2Bs=; b=xpbCJEZVFLojPYYKLedVllObpJ
+        sIKinKb0p4nX/oHMltMoDAc0PB64XIfu2HYPQe9s403D2iryESyykHgKMjzr9inJ9W0jGRh6n0o8U
+        yaP6pEuyLGdK2XhsBydQKxUg5VkoD41qsPkLM0zM4tONyTXoFz066JnV872EBNQQ0CkqPK16Zq0PX
+        usWYLbFworSaNvmRhDJYjn2h1guPnX5ON2Wx/pk+MLUWFOE74lypAvvcuHZGNmyEA/xXfMkXvbQVS
+        X8e/cARTNoRnDpEU1nuCZ9TOLinymaY/TjPbXgJewdSLmXghwq1DboR0x77p8hLTKCawb2v9AGsxq
+        Pzvcnmsw==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1npb7T-00HM1x-Fl; Fri, 13 May 2022 19:38:35 +0000
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     patches@lists.linux.dev, amir73il@gmail.com, pankydev8@gmail.com,
+        tytso@mit.edu, josef@toxicpanda.com, jmeneghi@redhat.com,
+        jake@lwn.net, mcgrof@kernel.org
+Subject: [PATCH 1/4] workflows/Kconfig: be consistent when enabling fstests or blktests
+Date:   Fri, 13 May 2022 12:38:28 -0700
+Message-Id: <20220513193831.4136212-2-mcgrof@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220513193831.4136212-1-mcgrof@kernel.org>
+References: <20220513193831.4136212-1-mcgrof@kernel.org>
 MIME-Version: 1.0
-References: <20220429043913.626647-1-davidgow@google.com> <20220513083212.3537869-2-davidgow@google.com>
-In-Reply-To: <20220513083212.3537869-2-davidgow@google.com>
-From:   Daniel Latypov <dlatypov@google.com>
-Date:   Fri, 13 May 2022 12:08:46 -0700
-Message-ID: <CAGS_qxr54nYThsj6UhqX54JO5WnyJXVQURnNF1eCzGB+4GCKLA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/3] kunit: Taint the kernel when KUnit tests are run
-To:     David Gow <davidgow@google.com>
-Cc:     Brendan Higgins <brendanhiggins@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 13, 2022 at 1:32 AM David Gow <davidgow@google.com> wrote:
->
-> Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
-> Due to KUnit tests not being intended to run on production systems, and
-> potentially causing problems (or security issues like leaking kernel
-> addresses), the kernel's state should not be considered safe for
-> production use after KUnit tests are run.
->
-> Signed-off-by: David Gow <davidgow@google.com>
+We have two kconfig variables which we use to be able to express
+when we are going to enable fstests or blktests, either as a dedicated
+set of tests or when we want to enable testing both fstests and blktests
+in one system. But right now we only select this kconfig variable when
+we are using a dedicated system. This is not an issue as the kconfig
+is a kconfig symbols are bools which are set default to y if either
+the test is dedicated or not.
 
-Tested-by: Daniel Latypov <dlatypov@google.com>
+But to be pedantic, and clear, let's make sure the tests select the
+respective kconfig for each case as we'd expect to see it. Otherwise
+this can confuse folks reading this.
 
-Looks good to me.
+Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
+---
+ kconfigs/workflows/Kconfig | 2 ++
+ 1 file changed, 2 insertions(+)
 
-There's an edge case where we might have 0 suites or 0 tests and we
-still taint the kernel, but I don't think we need to deal with that.
-At the start of kunit_run_tests() is the cleanest place to do this.
+diff --git a/kconfigs/workflows/Kconfig b/kconfigs/workflows/Kconfig
+index 7e5c518..7f71470 100644
+--- a/kconfigs/workflows/Kconfig
++++ b/kconfigs/workflows/Kconfig
+@@ -133,6 +133,7 @@ if !WORKFLOWS_DEDICATED_WORKFLOW
+ 
+ config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_FSTESTS
+ 	bool "fstests"
++	select KDEVOPS_WORKFLOW_ENABLE_FSTESTS
+ 	help
+ 	  Select this option if you are doing filesystem development and want
+ 	  to target development for a filesystem and enable fstests so that
+@@ -146,6 +147,7 @@ config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_FSTESTS
+ 
+ config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_BLKTESTS
+ 	bool "blktests"
++	select KDEVOPS_WORKFLOW_ENABLE_BLKTESTS
+ 	help
+ 	  Select this option if you are doing block layer development and want
+ 	  to run blktests. The git tree for blktests will be git clone and
+-- 
+2.35.1
 
-I wasn't quite sure where this applied, but I manually applied the changes here.
-Without this patch, this command exits fine:
-$ ./tools/testing/kunit/kunit.py run --kernel_args=panic_on_taint=0x40000
-
-With it, I get
-[12:03:31] Kernel panic - not syncing: panic_on_taint set ...
-[12:03:31] CPU: 0 PID: 1 Comm: swapper Tainted: G                 N
-5.17.0-00001-gea9ee5e7aed8-dirty #60
-
-I'm a bit surprised that it prints 'G' and not 'N', but this does seem
-to be the right mask
-$ python3 -c 'print(hex(1<<18))'
-0x40000
-and it only takes effect when this patch is applied.
-I'll chalk that up to my ignorance of how taint works.
