@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F6AC433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D8F1C433F5
 	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 19:38:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383855AbiEMTij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1383852AbiEMTij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Fri, 13 May 2022 15:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44832 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383849AbiEMTii (ORCPT
+        with ESMTP id S1346242AbiEMTii (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Fri, 13 May 2022 15:38:38 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FE6712EA;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E4B76FD36;
         Fri, 13 May 2022 12:38:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Sender:Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:
         Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=iGO39EDVjPnTYXbXk4m8oqTPwLMaY1sb1Vley0Ob2Bs=; b=xpbCJEZVFLojPYYKLedVllObpJ
-        sIKinKb0p4nX/oHMltMoDAc0PB64XIfu2HYPQe9s403D2iryESyykHgKMjzr9inJ9W0jGRh6n0o8U
-        yaP6pEuyLGdK2XhsBydQKxUg5VkoD41qsPkLM0zM4tONyTXoFz066JnV872EBNQQ0CkqPK16Zq0PX
-        usWYLbFworSaNvmRhDJYjn2h1guPnX5ON2Wx/pk+MLUWFOE74lypAvvcuHZGNmyEA/xXfMkXvbQVS
-        X8e/cARTNoRnDpEU1nuCZ9TOLinymaY/TjPbXgJewdSLmXghwq1DboR0x77p8hLTKCawb2v9AGsxq
-        Pzvcnmsw==;
+        bh=GAZcGk03ehrHc5Dtxk7odt4Ht5+ef2Nl5pEGHuLhXTc=; b=o1Xegp6GbvaEkEIroQaEaDuJbO
+        2zmGch5vozo3M0a8yTt7EHCU0DiarL2Ecc/pGhadzqhihoMrvMA/UnuhfGRNLraCmW9/o34DKzN49
+        ZmbWrhS09pw8kvvEkHw9EAOA2JFVUIP1ag3FXllW6g1dSEQPS3fFRrBj3n/niwLkP3co8XQBkG9Su
+        /0u+ggTYZKC9F8Db/gZkKRKDsnIueDBlSksFHNLILEgfAU5yRm1yxjPS86xaCFE1XIgmEPnyF1aV3
+        jLugS7RYjt+DaoPY7z6DyT1iH4ZWWGjXZ/TT/hBuG96asJomP91qLFFwLNb+VJvBfMONMVt4UOTm4
+        RVNNI4kA==;
 Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1npb7T-00HM1x-Fl; Fri, 13 May 2022 19:38:35 +0000
+        id 1npb7T-00HM23-Nh; Fri, 13 May 2022 19:38:35 +0000
 From:   Luis Chamberlain <mcgrof@kernel.org>
 To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
 Cc:     patches@lists.linux.dev, amir73il@gmail.com, pankydev8@gmail.com,
         tytso@mit.edu, josef@toxicpanda.com, jmeneghi@redhat.com,
         jake@lwn.net, mcgrof@kernel.org
-Subject: [PATCH 1/4] workflows/Kconfig: be consistent when enabling fstests or blktests
-Date:   Fri, 13 May 2022 12:38:28 -0700
-Message-Id: <20220513193831.4136212-2-mcgrof@kernel.org>
+Subject: [PATCH 4/4] kdevops: make linux-kdevops the default tree
+Date:   Fri, 13 May 2022 12:38:31 -0700
+Message-Id: <20220513193831.4136212-5-mcgrof@kernel.org>
 X-Mailer: git-send-email 2.35.1
 In-Reply-To: <20220513193831.4136212-1-mcgrof@kernel.org>
 References: <20220513193831.4136212-1-mcgrof@kernel.org>
@@ -45,43 +45,73 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-We have two kconfig variables which we use to be able to express
-when we are going to enable fstests or blktests, either as a dedicated
-set of tests or when we want to enable testing both fstests and blktests
-in one system. But right now we only select this kconfig variable when
-we are using a dedicated system. This is not an issue as the kconfig
-is a kconfig symbols are bools which are set default to y if either
-the test is dedicated or not.
+At LSFMM 2022 at Palm Springs it was discussed that we should
+*strive* towards a shared expunge list for fstests / blktests. Although
+that effort requires splitting out the expunge list from kdevops to a
+new git subtree, sharing a git tree for commit work for kdevops seems
+also innevitable and desirable since some of us are already
+collaborating on at least one shared test runner, kdevops.
 
-But to be pedantic, and clear, let's make sure the tests select the
-respective kconfig for each case as we'd expect to see it. Otherwise
-this can confuse folks reading this.
+So we can start by using a shared organization for what we need
+to share, we call this organization linux-kdevops [0]. This encompasses a
+few usual suspects git trees which can be used by both fstests and
+blktests picking a "stable" sort of git sha1sum for each and always
+striving towards the latest:
+
+  * fstests
+  * blktests
+  * dbench
+  * ndd
+
+We'll be using the linux-kdevops organization for what trees we use and
+trust that those in the organization will communicate what is needed before
+making controversial changes.
+
+This is perhaps the first controversial change, but it only applies to
+kdevops, so if you are not using kdevops as a test runner you probably
+won't care.
+
+Those using kdevops should become aware that they should change
+their default upstream to use linux-kdevops URL now:
+
+So we switch from:
+https://github.com/mcgrof/kdevops
+To:
+https://github.com/linux-kdevops/kdevops
+
+Users which change this on a live environemtn would also then just have
+to change the CONFIG_WORKFLOW_KDEVOPS_GIT on their configuration so
+they'd just run:
+
+ make menuconfig # set CONFIG_WORKFLOW_KDEVOPS_GIT to https://github.com/linux-kdevops/kdevops
+ make
+ make kdevops-git-reset
+
+Those who have commit access to the organization linux-kdevops can
+then just commit as needed to help move baselines forwards and if
+and when something comes up which really seems controversial we can
+use the mailing lists as with this change.
+
+[0] https://github.com/orgs/linux-kdevops/
 
 Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
 ---
- kconfigs/workflows/Kconfig | 2 ++
- 1 file changed, 2 insertions(+)
+ kconfigs/workflows/Kconfig.shared | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/kconfigs/workflows/Kconfig b/kconfigs/workflows/Kconfig
-index 7e5c518..7f71470 100644
---- a/kconfigs/workflows/Kconfig
-+++ b/kconfigs/workflows/Kconfig
-@@ -133,6 +133,7 @@ if !WORKFLOWS_DEDICATED_WORKFLOW
+diff --git a/kconfigs/workflows/Kconfig.shared b/kconfigs/workflows/Kconfig.shared
+index 4cccfbe..4a2ecf6 100644
+--- a/kconfigs/workflows/Kconfig.shared
++++ b/kconfigs/workflows/Kconfig.shared
+@@ -47,7 +47,7 @@ endif
  
- config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_FSTESTS
- 	bool "fstests"
-+	select KDEVOPS_WORKFLOW_ENABLE_FSTESTS
- 	help
- 	  Select this option if you are doing filesystem development and want
- 	  to target development for a filesystem and enable fstests so that
-@@ -146,6 +147,7 @@ config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_FSTESTS
- 
- config KDEVOPS_WORKFLOW_NOT_DEDICATED_ENABLE_BLKTESTS
- 	bool "blktests"
-+	select KDEVOPS_WORKFLOW_ENABLE_BLKTESTS
- 	help
- 	  Select this option if you are doing block layer development and want
- 	  to run blktests. The git tree for blktests will be git clone and
+ config WORKFLOW_KDEVOPS_GIT
+ 	string "Git tree of kdevops to clone on targets"
+-	default "https://github.com/mcgrof/kdevops.git" if !GIT_ALTERNATIVES && !HAVE_CUSTOM_KDEVOPS_GIT
++	default "https://github.com/linux-kdevops/kdevops.git" if !GIT_ALTERNATIVES && !HAVE_CUSTOM_KDEVOPS_GIT
+ 	default "https://github.com/linux-kdevops/kdevops.git" if GIT_LINUX_KDEVOPS_GITHUB
+ 	default "https://gitlab.com/linux-kdevops/kdevops.git" if GIT_LINUX_KDEVOPS_GITLAB
+ 	default CUSTOM_KDEVOPS_GIT if HAVE_CUSTOM_KDEVOPS_GIT
 -- 
 2.35.1
 
