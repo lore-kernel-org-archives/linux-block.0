@@ -2,116 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644ECC433F5
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 08:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF4EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 12:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378318AbiEMIcn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 04:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33278 "EHLO
+        id S1380105AbiEMMBS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 08:01:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48206 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378266AbiEMIcf (ORCPT
+        with ESMTP id S241025AbiEMMBR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 04:32:35 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5713A2A7C36
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 01:32:32 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id x23-20020a170902b41700b0015ea144789fso4051787plr.13
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 01:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=0ybWbXGPDsdksfVbXJMzQ1kLilXdTLhR2XM1EfoNTaQ=;
-        b=mDbxxzGMPRe66EbTeOC0DGcg92DtfgZjKodWRekjDNOouMcdlsxRTubPmRzKzEg//+
-         NCtUoa0kB6dTGI5dBm+INXN2ngqEyVFZVXDa1xF8ystd1DFn7NF/874SjcTIb3v1qTDL
-         UymPtLbOczNqc1qU+w3EfujQ9VYJzaSa2Qnvmnf/lzLYCpJn4fZi+optc113jKzHURNo
-         Icw7XTBDwAPWE0plpyLnMfuriavPbm//BT2ukq/OrV6jT80TPt0YfRKsZBzv9Q1B6pqz
-         vgtX3KGFCOlzV8Ozs/+RNXW5okVxVEvqN77emPfFAivLiAuMxWkThJEtfhfN9RcB3J/t
-         lPcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=0ybWbXGPDsdksfVbXJMzQ1kLilXdTLhR2XM1EfoNTaQ=;
-        b=u7aAbI6319erCXAYUVHcc5/Jc7GEY0GeySbSfftRLT5cjsoJSFLEO3cXDnKiYlIVVJ
-         qE76KjDPDdsP2a4l+uNK8pkrreMZ9MNWWUvxwQm43We+6iqKMgIjS7IfkPy13dT/Aizt
-         id+6cm8VqoCrEhBZMdRXaCfiIr8/ceEuY4AfoB0UZQxQYAZUl0V/PSwZ7lPh2PQ/SOT8
-         1/WPNSxzJzoXw8EGmbFr+tDXvDAa82uwSHZvbRjfTBZZLNQI+jnaAhtxluWN7NM49+Pq
-         K7mTff2WarZKN2X49wFRuW8fdBguQbyEX8fcx5Y58LaRVjeu6QDChntrf85JvoliSY39
-         7VjQ==
-X-Gm-Message-State: AOAM530i6NpjDx9SkGU5lOHYHxkiqF/Ut6IOBOuM8TRAxHqVXNKfCUoB
-        YD91bq/g3VRrqMYHgTC1luxHKdd/Hc6+Ag==
-X-Google-Smtp-Source: ABdhPJwfM5WbnpLP6WV99kx1KJIHYyM2xlBrsLZ0h+Pzul4XBI2zEL0Co3qEuGI3DWYVY6zO3MyaEFEHAAIkrg==
-X-Received: from slicestar.c.googlers.com ([fda3:e722:ac3:cc00:4f:4b78:c0a8:20a1])
- (user=davidgow job=sendgmr) by 2002:a17:903:248:b0:155:ecb7:dfaf with SMTP id
- j8-20020a170903024800b00155ecb7dfafmr3832462plh.84.1652430751562; Fri, 13 May
- 2022 01:32:31 -0700 (PDT)
-Date:   Fri, 13 May 2022 16:32:12 +0800
-In-Reply-To: <20220429043913.626647-1-davidgow@google.com>
-Message-Id: <20220513083212.3537869-2-davidgow@google.com>
-Mime-Version: 1.0
-References: <20220429043913.626647-1-davidgow@google.com>
-X-Mailer: git-send-email 2.36.0.550.gb090851708-goog
-Subject: [PATCH v3 2/3] kunit: Taint the kernel when KUnit tests are run
-From:   David Gow <davidgow@google.com>
-To:     Brendan Higgins <brendanhiggins@google.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Kees Cook <keescook@chromium.org>,
-        Shuah Khan <skhan@linuxfoundation.org>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Cc:     David Gow <davidgow@google.com>,
-        "Guilherme G . Piccoli" <gpiccoli@igalia.com>,
-        Sebastian Reichel <sre@kernel.org>,
-        John Ogness <john.ogness@linutronix.de>,
-        Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jani Nikula <jani.nikula@linux.intel.com>,
-        Lucas De Marchi <lucas.demarchi@intel.com>,
-        Aaron Tomlin <atomlin@redhat.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Fri, 13 May 2022 08:01:17 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C51EA5536E;
+        Fri, 13 May 2022 05:01:15 -0700 (PDT)
+Received: from fraeml710-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4L06b94Tx2z688qL;
+        Fri, 13 May 2022 19:57:41 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml710-chm.china.huawei.com (10.206.15.59) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 13 May 2022 14:01:13 +0200
+Received: from [10.47.25.226] (10.47.25.226) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 13 May
+ 2022 13:01:12 +0100
+Message-ID: <2b7d091b-4caf-948f-b41a-29a7fcb9fc2a@huawei.com>
+Date:   Fri, 13 May 2022 13:01:09 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+To:     <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
+CC:     "chenxiang66@hisilicon.com >> Xiang Chen" <chenxiang66@hisilicon.com>,
+        "liyihang (E)" <liyihang6@hisilicon.com>
+From:   John Garry <john.garry@huawei.com>
+Subject: [bug report] IOMMU reports data translation fault for fio testing
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.47.25.226]
+X-ClientProxiedBy: lhreml748-chm.china.huawei.com (10.201.108.198) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Make KUnit trigger the new TAINT_TEST taint when any KUnit test is run.
-Due to KUnit tests not being intended to run on production systems, and
-potentially causing problems (or security issues like leaking kernel
-addresses), the kernel's state should not be considered safe for
-production use after KUnit tests are run.
+Hi guys,
 
-Signed-off-by: David Gow <davidgow@google.com>
----
- lib/kunit/test.c | 4 ++++
- 1 file changed, 4 insertions(+)
+My colleague Yihang Li noticed this issue when testing throughput for 
+hisi SAS arm64 controller on v5.18-rc6:
 
-diff --git a/lib/kunit/test.c b/lib/kunit/test.c
-index 0f66c13d126e..2b808117bd4a 100644
---- a/lib/kunit/test.c
-+++ b/lib/kunit/test.c
-@@ -11,6 +11,7 @@
- #include <kunit/test-bug.h>
- #include <linux/kernel.h>
- #include <linux/moduleparam.h>
-+#include <linux/panic.h>
- #include <linux/sched/debug.h>
- #include <linux/sched.h>
- 
-@@ -498,6 +499,9 @@ int kunit_run_tests(struct kunit_suite *suite)
- 	struct kunit_result_stats suite_stats = { 0 };
- 	struct kunit_result_stats total_stats = { 0 };
- 
-+	/* Taint the kernel so we know we've run tests. */
-+	add_taint(TAINT_TEST, LOCKDEP_STILL_OK);
-+
- 	kunit_print_subtest_start(suite);
- 
- 	kunit_suite_for_each_test_case(suite, test_case) {
--- 
-2.36.0.550.gb090851708-goog
+estuary:/$ bash ./create_fio_task.sh 4k read 128 1
+test2  4k
+my_runtime 1500
+Creat 4k_read_depth128_fiotest file successfully
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+job1: (g=0): rw=read, bs=4K-4K/4K-4K/4K-4K, ioengine=libaio, iodepth=128
+fio-2.2.10
+Starting 10 processes
+N[  304.798377] arm-smmu-v3 arm-smmu-v3.3.auto: event 0x10 
+received:iops] [eta 23m:39s]
+O[  304.804431] arm-smmu-v3 arm-smmu-v3.3.auto:         0x0000741000000010
+T[  304.810404] arm-smmu-v3 arm-smmu-v3.3.auto:         0x000012000000007a
+I[  304.816379] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff6000
+C[  304.822354] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff6000
+E[  304.828330] arm-smmu-v3 arm-smmu-v3.3.auto: event 0x10 received:
+:[  304.834392] arm-smmu-v3 arm-smmu-v3.3.auto:         0x0000741000000010
+[  304.840368] arm-smmu-v3 arm-smmu-v3.3.auto:         0x0000120000000058
+[  304.846344] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff6100
+R[  304.852320] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff6000
+a[  304.858297] arm-smmu-v3 arm-smmu-v3.3.auto: event 0x10 received:
+s[  304.864361] arm-smmu-v3 arm-smmu-v3.3.auto:         0x0000741000000010
+I[  304.870337] arm-smmu-v3 arm-smmu-v3.3.auto:         0x000012000000004a
+n[  304.876313] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff62c0
+t[  304.882289] arm-smmu-v3 arm-smmu-v3.3.auto:         0x00000000abff6000
 
+Event 0x10 is a translation fault, meaning the DMA mapping is prob 
+misconfigured.
+
+I don't think it's an IOMMU issue as I tested that separately with a DMA 
+mapping benchmark driver.
+
+I'm told v5.17-rc7 does not have the issue. Any idea on the possible 
+cause or if there is a fix in waiting? It could be an issue with the 
+SCSI hba driver.
+
+I'll bisect in the meantime.
+
+thanks,
+John
