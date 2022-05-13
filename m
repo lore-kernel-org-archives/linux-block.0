@@ -2,79 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD4BC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:30:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD02C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:52:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378497AbiEMQal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 12:30:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
+        id S1359757AbiEMQwj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 12:52:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53750 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235278AbiEMQak (ORCPT
+        with ESMTP id S1379129AbiEMQwS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 12:30:40 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5F395DCA;
-        Fri, 13 May 2022 09:30:39 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id j10-20020a17090a94ca00b001dd2131159aso11310069pjw.0;
-        Fri, 13 May 2022 09:30:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=ouKHIJhtyz2z49p/GFiBli4VgCyFsjzuaI9bnjYF6BE=;
-        b=E52EuWR2NYLxNtv5S2qaGtlRceZFTyXzaqLN4lrJtTXIGvVUOETXZBHV7J87JClcjy
-         EjUav1nk2VAfm8RlaZ6+sebsuQWVNu0Ek/DGBvVNM3ZmwpjHpeEAfIk0vuk2zW2255UN
-         YbHRjWcVGuIWKR+LnxcgKz3tVWwOLKnFzqQ0+tYFrfme9tLLNRLhfPMry+gDtV79xRjL
-         yT06S7z2WLQBJYPESRgzfEboM0S5f7AEwFFRsJbxXIPJPzmvM7BvtKowVW7k6Cpgzp1k
-         8rhNtp7uMQclAJDopSm2f1QSet8YMu35A63+q9O7bYJnMncJ//hfWrmJQx/es3qRUvuC
-         wlfw==
+        Fri, 13 May 2022 12:52:18 -0400
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBE4254FAC
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:51:45 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id gj17-20020a17090b109100b001d8b390f77bso11337061pjb.1
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:51:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=ouKHIJhtyz2z49p/GFiBli4VgCyFsjzuaI9bnjYF6BE=;
-        b=LTFJ443xT+BLYkn7phLkolb2/suh1ev/yp2/mUsxvmXcYVP0ely9Fo4wHPgbX32kQj
-         MEdYE5vspyrDb5/sA/7IV4zkVqH4XlYR8nwir/TyEq3WVPscBCaWkzFKyq4CcfPdNYW3
-         fndKgu3b8pGmTJNX8N6FVIu6oM9FGCvNkSGI6UnOtAcfadiEhqyKXfJMBhDGJI04Nby5
-         +KYdhwvxyissvldMfWOMXjwkvPs2CWhdqnZPKBw48E66NFmShs6SZQ1bvqSQeSdCIIQn
-         Ik7ZXZfD6x44ZobxP9f5cuYgFIjGY1X/GcelbGvJRJRVLhTi5YMTIL+lVNS+zo7k7U9m
-         LhUg==
-X-Gm-Message-State: AOAM533D9FdHIFu+2i9Z6Rv+czSzf32q0RB90a9fOzEqSpx82ugI9cwa
-        ReSsSf2esTqcBdgooZfnivY=
-X-Google-Smtp-Source: ABdhPJwsn2VlrzA8DO4+yV4PnH7NRzTnG+z6ftEh2X3MzzvFD5Dhb1cOFoc8/r4+g26ckptCoWo0Aw==
-X-Received: by 2002:a17:902:c409:b0:15e:bdd3:1fa3 with SMTP id k9-20020a170902c40900b0015ebdd31fa3mr5597175plk.67.1652459439193;
-        Fri, 13 May 2022 09:30:39 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:5607])
-        by smtp.gmail.com with ESMTPSA id n2-20020a63a502000000b003c265b7d4f6sm1818357pgf.44.2022.05.13.09.30.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 May 2022 09:30:37 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 13 May 2022 06:30:36 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Khazhismel Kumykov <khazhy@google.com>
-Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
-Subject: Re: [RFC PATCH] blkcg: rewind seq_file if no stats
-Message-ID: <Yn6HrOLcWR9bol4t@slm.duckdns.org>
-References: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
- <20220512232907.312855-1-khazhy@google.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Alv0Q5yUp4HcQx/ktizSOXMokGOXZCCo4Fvnr/F9WVE=;
+        b=44yr3gWbtWRKivkyz74tcmCNXS+Fl26bM2OMoQlSQirdFa8HibOR+CWXvUEfHbdZA9
+         h6wXFiQE3pvtzkUJra7b/+Blz3dar4A6jsLR2f3DHu+5KVpP28LZOmLlGKnaaM5F38JK
+         h6N3zahnqpEUAgG0hi+8LHtrRFbzHjDeaMqtFFjWfuk6y+aPswwAfeTepTT7wVFtz1U3
+         B9p6dBuTadiQ+MdajCqg8uQ0y6ShzV/GYi2ESOB6nSkGW5iUMDNKbDuzB2bbQvRFhz2p
+         DFWb6+jLWx52o+emX4wrmgd9JugEQkqWyPoWXnZUB4Y77c6a11Y40Fi6joW8Ljz6WBvu
+         z94w==
+X-Gm-Message-State: AOAM530ZbYTJRsCrtQ42twILIcmxpA4p/+qSwzvqJZouAxks8F+j6jt6
+        dgs0puXmPCrcPb9El4oXZP0=
+X-Google-Smtp-Source: ABdhPJw/nU+yv/v8x7oWDPRRYouf4KFyVT439ijBbIAyRgHHGYzGVcAqTyX3dQLX6nliQWzyM5wCKg==
+X-Received: by 2002:a17:90b:194f:b0:1dd:a47:3db5 with SMTP id nk15-20020a17090b194f00b001dd0a473db5mr5844014pjb.74.1652460705249;
+        Fri, 13 May 2022 09:51:45 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id d13-20020a17090ad98d00b001cd4989fee5sm3795426pjv.49.2022.05.13.09.51.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 13 May 2022 09:51:44 -0700 (PDT)
+Message-ID: <10b594f2-bec1-76db-5580-7bc1709805c3@acm.org>
+Date:   Fri, 13 May 2022 09:51:42 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220512232907.312855-1-khazhy@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH] block: avoid to serialize blkdev_fallocate
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+References: <20220512134814.1454451-1-ming.lei@redhat.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220512134814.1454451-1-ming.lei@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 12, 2022 at 04:29:07PM -0700, Khazhismel Kumykov wrote:
-> In lieu of get_seq_buf + seq_commit, provide a way to "undo" writes if
-> we use seq_printf
+On 5/12/22 06:48, Ming Lei wrote:
+> Commit f278eb3d8178 ("block: hold ->invalidate_lock in blkdev_fallocate")
+> adds ->invalidate_lock in blkdev_fallocate() for preventing stale data
+> from being read during fallocate().
 > 
-> Fixes: 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
+> However, the side effect is that blkdev_fallocate() becomes serialized
+> since blkdev_fallocate() always blocks.
+> 
+> Add one atomic fallocate counter for allowing blkdev_fallocate() to
+> be run concurrently so that discard/write_zero bios from different
+> fallocate() can be submitted in parallel.
 
-I don't hate it but can you please repost with Christoph Hellwig
-<hch@lst.de>? He might have an a lot stronger opinion on it.
+Please consider adding a "Fixes:" tag since otherwise this patch won't 
+be integrated automatically into any of the stable kernel trees.
 
-Thanks.
+Thanks,
 
-tejun
+Bart.
