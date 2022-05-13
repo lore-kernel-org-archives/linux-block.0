@@ -2,90 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43C65C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:28:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD4BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235498AbiEMQ2r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 12:28:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35100 "EHLO
+        id S1378497AbiEMQal (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 12:30:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235278AbiEMQ2q (ORCPT
+        with ESMTP id S235278AbiEMQak (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 12:28:46 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFC2391567;
-        Fri, 13 May 2022 09:28:43 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id n8so8450275plh.1;
-        Fri, 13 May 2022 09:28:43 -0700 (PDT)
+        Fri, 13 May 2022 12:30:40 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE5F395DCA;
+        Fri, 13 May 2022 09:30:39 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id j10-20020a17090a94ca00b001dd2131159aso11310069pjw.0;
+        Fri, 13 May 2022 09:30:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=ewPlolLGmE/a959g4ZA9emiwMLzM/HuRgbAmtM/bKKM=;
-        b=hBiN6IheDSJjCVGBGxNiJqN1NO8KxR5odY3itzDXivs7PJf8NZMHpFBtiOwWS44KpC
-         5QByrr9xl4phn4Ex2VvkCcHFs7vkuwG83TbENksSTbJdRJfDqAyJoFkeIWC0OmVnNYwJ
-         anTAfEIj0J+TXXUq8DOCMGeeJy4GwiDk5eMQlqXmvBI1ciYLvFqOREiudh/miO3Ug2lp
-         Sem0FDhxzNBnr8WKZmCbmJ+xgk0k0Z/+JmJLa3zxOnDTJfwDMn4qRo3ynvCG1rJk3rqz
-         UONgy6PF+YxDv4fwpfWtlrwBWekAQfPxtH74R5/TdAENGRNc44h2zM8/RoYnOpGYnYSm
-         qKoA==
+        bh=ouKHIJhtyz2z49p/GFiBli4VgCyFsjzuaI9bnjYF6BE=;
+        b=E52EuWR2NYLxNtv5S2qaGtlRceZFTyXzaqLN4lrJtTXIGvVUOETXZBHV7J87JClcjy
+         EjUav1nk2VAfm8RlaZ6+sebsuQWVNu0Ek/DGBvVNM3ZmwpjHpeEAfIk0vuk2zW2255UN
+         YbHRjWcVGuIWKR+LnxcgKz3tVWwOLKnFzqQ0+tYFrfme9tLLNRLhfPMry+gDtV79xRjL
+         yT06S7z2WLQBJYPESRgzfEboM0S5f7AEwFFRsJbxXIPJPzmvM7BvtKowVW7k6Cpgzp1k
+         8rhNtp7uMQclAJDopSm2f1QSet8YMu35A63+q9O7bYJnMncJ//hfWrmJQx/es3qRUvuC
+         wlfw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
          :references:mime-version:content-disposition:in-reply-to;
-        bh=ewPlolLGmE/a959g4ZA9emiwMLzM/HuRgbAmtM/bKKM=;
-        b=CzgYh7HRobHxXhj9Rh7tqETu/PK708J07pnsuM3bHBqeg5wnpj1xq0xDjTNmM84ur6
-         EF4N+oZFekw7xibRo0JRI96+RpxI1xZR/GvV8VZAQ7RhIkgQotNIs8JNwRiecVyNmBwd
-         mt1slcCKp3kFTibh2DA9rwCNDM5kELp7LzFHFy65VKf72yJn8VWm//B9epUx3E/etkps
-         t3NKrRjlSF9Fksmm9M9g7hdwqysF6eMW/N1jGVswNXtcu87wklcxYe2YDSi54lEJw5uM
-         RXOl3+Ygjqfhgas/0V++Zc+ip/O3qkh8w122fUtNNgJVeYTwC8NqKInz8jsiZU60rJ4S
-         57WQ==
-X-Gm-Message-State: AOAM532J2lfmzz0K7+mM/HbzbLtYe/jtaktFHQKtYrITpHjk0xzLiBIv
-        cvQZdP3g7pSL5ZuGK5jfJl0=
-X-Google-Smtp-Source: ABdhPJwT/dE+TDl8hBshKtguIUYZXsn7hWUYiz6ETIvxyAm9GztrLfAZoYOm3xuWA6x2QvGGXpC94A==
-X-Received: by 2002:a17:902:b94b:b0:15e:f33b:ec22 with SMTP id h11-20020a170902b94b00b0015ef33bec22mr5512470pls.119.1652459323334;
-        Fri, 13 May 2022 09:28:43 -0700 (PDT)
+        bh=ouKHIJhtyz2z49p/GFiBli4VgCyFsjzuaI9bnjYF6BE=;
+        b=LTFJ443xT+BLYkn7phLkolb2/suh1ev/yp2/mUsxvmXcYVP0ely9Fo4wHPgbX32kQj
+         MEdYE5vspyrDb5/sA/7IV4zkVqH4XlYR8nwir/TyEq3WVPscBCaWkzFKyq4CcfPdNYW3
+         fndKgu3b8pGmTJNX8N6FVIu6oM9FGCvNkSGI6UnOtAcfadiEhqyKXfJMBhDGJI04Nby5
+         +KYdhwvxyissvldMfWOMXjwkvPs2CWhdqnZPKBw48E66NFmShs6SZQ1bvqSQeSdCIIQn
+         Ik7ZXZfD6x44ZobxP9f5cuYgFIjGY1X/GcelbGvJRJRVLhTi5YMTIL+lVNS+zo7k7U9m
+         LhUg==
+X-Gm-Message-State: AOAM533D9FdHIFu+2i9Z6Rv+czSzf32q0RB90a9fOzEqSpx82ugI9cwa
+        ReSsSf2esTqcBdgooZfnivY=
+X-Google-Smtp-Source: ABdhPJwsn2VlrzA8DO4+yV4PnH7NRzTnG+z6ftEh2X3MzzvFD5Dhb1cOFoc8/r4+g26ckptCoWo0Aw==
+X-Received: by 2002:a17:902:c409:b0:15e:bdd3:1fa3 with SMTP id k9-20020a170902c40900b0015ebdd31fa3mr5597175plk.67.1652459439193;
+        Fri, 13 May 2022 09:30:39 -0700 (PDT)
 Received: from localhost ([2620:10d:c090:400::4:5607])
-        by smtp.gmail.com with ESMTPSA id u12-20020a62d44c000000b0050dc7628159sm1961602pfl.51.2022.05.13.09.28.42
+        by smtp.gmail.com with ESMTPSA id n2-20020a63a502000000b003c265b7d4f6sm1818357pgf.44.2022.05.13.09.30.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 13 May 2022 09:28:43 -0700 (PDT)
+        Fri, 13 May 2022 09:30:37 -0700 (PDT)
 Sender: Tejun Heo <htejun@gmail.com>
-Date:   Fri, 13 May 2022 06:28:41 -1000
+Date:   Fri, 13 May 2022 06:30:36 -1000
 From:   Tejun Heo <tj@kernel.org>
-To:     Yahu Gao <gaoyahu19@gmail.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, Yahu Gao <yahugao@didiglobal.com>,
-        Kunhai Dai <daikunhai@didiglobal.com>
-Subject: Re: [PATCH] block,iocost: fix potential kernel NULL
-Message-ID: <Yn6HOSAE/aAeMGLU@slm.duckdns.org>
-References: <20220513145928.29766-1-gaoyahu19@gmail.com>
- <20220513145928.29766-2-gaoyahu19@gmail.com>
+To:     Khazhismel Kumykov <khazhy@google.com>
+Cc:     axboe@kernel.dk, viro@zeniv.linux.org.uk,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org
+Subject: Re: [RFC PATCH] blkcg: rewind seq_file if no stats
+Message-ID: <Yn6HrOLcWR9bol4t@slm.duckdns.org>
+References: <CACGdZYLMW2KHVebfyJZVn9G=15N+Jt4+8oF5gq3wdDTOcXbk9A@mail.gmail.com>
+ <20220512232907.312855-1-khazhy@google.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220513145928.29766-2-gaoyahu19@gmail.com>
+In-Reply-To: <20220512232907.312855-1-khazhy@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-On Fri, May 13, 2022 at 10:59:28PM +0800, Yahu Gao wrote:
-> From: Yahu Gao <yahugao@didiglobal.com>
+On Thu, May 12, 2022 at 04:29:07PM -0700, Khazhismel Kumykov wrote:
+> In lieu of get_seq_buf + seq_commit, provide a way to "undo" writes if
+> we use seq_printf
 > 
-> Some inode pinned dying memory cgroup and its parent destroyed at first.
-> The parent's pd of iocost won't be allocated during function
-> blkcg_activate_policy.
-> Ignore the DYING CSS to avoid kernel NULL during iocost policy data init.
+> Fixes: 252c651a4c85 ("blk-cgroup: stop using seq_get_buf")
 
-Thanks for the analysis and patch but I'm not quite sure the analysis is
-correct. When a cgroup goes down, its blkgs are destroyed
-blkcg_destroy_blkgs() which is invoked by blkcg_unpin_online() when its
-online_pin reaches zero which is incremented and decremented recursively, so
-an ancestor's blkgs should be destroyed before a descendant's if the code is
-working as intended. Can you guys dig a bit deeper and why we're losing
-ancestor blkgs before descendants?
+I don't hate it but can you please repost with Christoph Hellwig
+<hch@lst.de>? He might have an a lot stronger opinion on it.
 
 Thanks.
 
--- 
 tejun
