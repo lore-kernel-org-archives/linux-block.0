@@ -2,250 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3555C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 15:53:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390A4C43217
+	for <linux-block@archiver.kernel.org>; Fri, 13 May 2022 16:14:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345493AbiEMPxR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 13 May 2022 11:53:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53904 "EHLO
+        id S1381697AbiEMQO0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 13 May 2022 12:14:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1382144AbiEMPxP (ORCPT
+        with ESMTP id S1381084AbiEMQOI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 13 May 2022 11:53:15 -0400
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD9B20D24D
-        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 08:53:14 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DFdC7O005769;
-        Fri, 13 May 2022 15:53:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=corp-2021-07-09;
- bh=+wn5OkM5Ai+3Pwa2ZmApyaSDNLntVr1QkElfVJ9EUuE=;
- b=KR0O2tvyB7lDBqxYj09Bd/cTUL8lOUhE2dGIoy/qRP7ddrthGsnEqo71D1ysgLqHO+3q
- PmlYBwnPa/iQOykVTZKmFb0KAT5DrATkT5kbEFBWlAI4HiSOJAVa6ZK6pCxRytaP545u
- MDV0EFg+fUKVAYtJwJLdaQWab4vbv9TjAzkW3+pLDmauh8FPxB1bHHUiIIMBWSg2yoKO
- tB2Px3+lIQH2XWXf57Zms+cK+GhBfVn1/BoLbcrx4+44qpR7gAFh6DGok+GqvsDaiUip
- 6ZQTfPYl16StMNOfowh6N00MLj/ePykXO29mjbHk/xjKiiJ7CD7G0qI/PzBbzcJkKZwL ag== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3fwhatr09d-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 May 2022 15:53:08 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 24DFjZHc012200;
-        Fri, 13 May 2022 15:53:07 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3fwf76626h-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 13 May 2022 15:53:07 +0000
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 24DFr1xS034295;
-        Fri, 13 May 2022 15:53:07 GMT
-Received: from dhcp-10-159-226-103.vpn.oracle.com (dhcp-10-159-226-103.vpn.oracle.com [10.159.226.103])
-        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3fwf766243-3;
-        Fri, 13 May 2022 15:53:07 +0000
-From:   Alan Adamson <alan.adamson@oracle.com>
-To:     linux-block@vger.kernel.org
-Cc:     alan.adamson@oracle.com, linux-nvme@lists.infradead.org,
-        osandov@fb.com
-Subject: [PATCH v3 blktests 2/2] tests/nvme: add tests for error logging
-Date:   Fri, 13 May 2022 08:52:52 -0700
-Message-Id: <20220513155252.14332-3-alan.adamson@oracle.com>
-X-Mailer: git-send-email 2.24.3 (Apple Git-128)
-In-Reply-To: <20220513155252.14332-1-alan.adamson@oracle.com>
-References: <20220513155252.14332-1-alan.adamson@oracle.com>
+        Fri, 13 May 2022 12:14:08 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBB845FC9
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:14:05 -0700 (PDT)
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24DEHjP6030569
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:14:05 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=facebook; bh=kHCxhgTRVCZCY0wTUT+Ftx2hh6wYUIhaJ3MlJ1aPO9M=;
+ b=fTOf+whYLk8GzChNP9msN4WbjgDeklvOTN+1p9RE0zOC1DXPgVFWmxbLaYouRDZRCyVc
+ g2GWksVsoisNhLK71GAgSOOJlW8dO7ZvTOD16O+wNp6VyY7BcAzrj6hig+Z2MRykS6km
+ lZYjzA3od9Jru4AusaKX54YcdIKkqFSRDmA= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g12mtsfjy-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Fri, 13 May 2022 09:14:05 -0700
+Received: from snc-exhub201.TheFacebook.com (2620:10d:c085:21d::7) by
+ snc-exhub204.TheFacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 13 May 2022 09:14:05 -0700
+Received: from twshared16483.05.ash9.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 13 May 2022 09:14:04 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 3CFF63E459A1; Fri, 13 May 2022 09:13:56 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-block@vger.kernel.org>
+CC:     <axboe@kernel.dk>, Kernel Team <kernel-team@fb.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 1/3] block: export dma_alignment attribute
+Date:   Fri, 13 May 2022 09:13:37 -0700
+Message-ID: <20220513161339.1580042-1-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: o64VwStvWTXNi9ilZa1VG9iHxGbQC7ue
-X-Proofpoint-ORIG-GUID: o64VwStvWTXNi9ilZa1VG9iHxGbQC7ue
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: Gt7Iqwr0WvKTePowi0QCKvxUlRFmQEZa
+X-Proofpoint-ORIG-GUID: Gt7Iqwr0WvKTePowi0QCKvxUlRFmQEZa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.858,Hydra:6.0.486,FMLib:17.11.64.514
+ definitions=2022-05-13_08,2022-05-13_01,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Test nvme error logging by injecting errors. Kernel must have FAULT_INJECTION
-and FAULT_INJECTION_DEBUG_FS configured to use error injector. Tests can be
-run with or without NVME_VERBOSE_ERRORS configured.
+From: Keith Busch <kbusch@kernel.org>
 
-Signed-off-by: Alan Adamson <alan.adamson@oracle.com>
-Signed-off-by: Chaitanya Kulkarni <kch@nvidia.com>
+User space may want to know how to align their buffers to avoid
+bouncing. Export the queue attribute.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
- tests/nvme/039     | 152 +++++++++++++++++++++++++++++++++++++++++++++
- tests/nvme/039.out |   7 +++
- 2 files changed, 159 insertions(+)
- create mode 100755 tests/nvme/039
- create mode 100644 tests/nvme/039.out
+ block/blk-sysfs.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tests/nvme/039 b/tests/nvme/039
-new file mode 100755
-index 000000000000..dd216cbb2ef0
---- /dev/null
-+++ b/tests/nvme/039
-@@ -0,0 +1,152 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-3.0+
-+# Copyright (C) 2022 Oracle and/or its affiliates
-+#
-+# Test nvme error logging by injecting errors. Kernel must have FAULT_INJECTION
-+# and FAULT_INJECTION_DEBUG_FS configured to use error injector. Tests can be
-+# run with or without NVME_VERBOSE_ERRORS configured.
-+#
-+# Test for commit bd83fe6f2cd2 ("nvme: add verbose error logging").
-+
-+. tests/nvme/rc
-+DESCRIPTION="test error logging"
-+QUICK=1
-+
-+requires() {
-+	_nvme_requires
-+	_have_kernel_option FAULT_INJECTION && \
-+	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
-+}
-+
-+inject_unrec_read_read()
+diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+index 88bd41d4cb59..14607565d781 100644
+--- a/block/blk-sysfs.c
++++ b/block/blk-sysfs.c
+@@ -274,6 +274,11 @@ static ssize_t queue_virt_boundary_mask_show(struct =
+request_queue *q, char *page
+ 	return queue_var_show(q->limits.virt_boundary_mask, page);
+ }
+=20
++static ssize_t queue_dma_alignment_show(struct request_queue *q, char *p=
+age)
 +{
-+	# Inject a 'Unrecovered Read Error' (0x281) status error on a READ
-+	_nvme_enable_err_inject "$1" 0 100 1 0x281 1
-+
-+	dd if=/dev/"$1" of=/dev/null bs=512 count=1 iflag=direct \
-+	    2> /dev/null 1>&2
-+
-+	_nvme_clear_err_inject "$1"
-+	if ${nvme_verbose_errors}; then
-+		dmesg -t | tail -2 | grep "Unrecovered Read Error (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Read/g' | \
-+		    sed 's/I\/O Error/Unrecovered Read Error/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
++	return queue_var_show(queue_dma_alignment(q), page);
 +}
 +
-+inject_invalid_status_read()
-+{
-+	# Inject an invalid status (0x375) on a READ
-+	_nvme_enable_err_inject "$1" 0 100 1 0x375 1
-+
-+	dd if=/dev/"$1" of=/dev/null bs=512 count=1 iflag=direct \
-+	    2> /dev/null 1>&2
-+
-+	_nvme_clear_err_inject "$1"
-+
-+	if ${nvme_verbose_errors}; then
-+		dmesg -t | tail -2 | grep "Unknown (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Read/g' | \
-+		    sed 's/I\/O Error/Unknown/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
-+inject_write_fault_write()
-+{
-+	# Inject a 'Write Fault' 0x280 status error on a WRITE
-+	_nvme_enable_err_inject "$1" 0 100 1 0x280 1
-+
-+	dd if=/dev/zero of=/dev/"$1" bs=512 count=1 oflag=direct \
-+	    2> /dev/null 1>&2
-+
-+	_nvme_clear_err_inject "$1"
-+
-+	if ${nvme_verbose_errors}; then
-+		dmesg -t | tail -2 | grep "Write Fault (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		dmesg -t | tail -2 | grep "Cmd(" | sed 's/I\/O Cmd/Write/g' | \
-+		    sed 's/I\/O Error/Write Fault/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
-+inject_access_denied_identify()
-+{
-+	# Inject a 'Access Denied' (0x286) status error on an
-+	# Identify admin command
-+	_nvme_enable_err_inject "$1" 0 100 1 0x286 1
-+
-+	nvme admin-passthru /dev/"$1" --opcode=0x06 --data-len=4096 \
-+	    --cdw10=1 -r 2> /dev/null 1>&2
-+
-+	_nvme_clear_err_inject "$1"
-+
-+	if ${nvme_verbose_errors}; then
-+		dmesg -t | tail -1 | grep "Access Denied (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		dmesg -t | tail -1 | grep "Admin Cmd(" | \
-+		    sed 's/Admin Cmd/Identify/g' | \
-+		    sed 's/I\/O Error/Access Denied/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
-+inject_invalid_cmd_admin()
-+{
-+	# Inject a 'Invalid Command Opcode' (0x1) on an invalid command (0x96)
-+	 _nvme_enable_err_inject "$1" 0 100 1 0x1 1
-+
-+	nvme admin-passthru /dev/"$1" --opcode=0x96 --data-len=4096 \
-+	    --cdw10=1 -r 2> /dev/null 1>&2
-+
-+	_nvme_clear_err_inject "$1"
-+
-+	if ${nvme_verbose_errors}; then
-+		dmesg -t | tail -1 | grep "Invalid Command Opcode (" | \
-+		    sed 's/nvme.*://g'
-+	else
-+		dmesg -t | tail -1 | grep "Admin Cmd(" | \
-+		    sed 's/Admin Cmd/Unknown/g' | \
-+		    sed 's/I\/O Error/Invalid Command Opcode/g' | \
-+		    sed 's/nvme.*://g'
-+	fi
-+}
-+
-+test_device() {
-+	local nvme_verbose_errors
-+	local ns_dev
-+	local ctrl_dev
-+
-+	echo "Running ${TEST_NAME}"
-+
-+	if _have_kernel_option NVME_VERBOSE_ERRORS; then
-+		nvme_verbose_errors=true
-+	else
-+		unset SKIP_REASON
-+		nvme_verbose_errors=false
-+	fi
-+
-+	ns_dev=${TEST_DEV##*/}
-+	ctrl_dev=${ns_dev%n*}
-+
-+	_nvme_err_inject_setup "${ns_dev}" "${ctrl_dev}"
-+
-+	inject_unrec_read_read "${ns_dev}"
-+	inject_invalid_status_read "${ns_dev}"
-+	inject_write_fault_write "${ns_dev}"
-+
-+	inject_access_denied_identify "${ctrl_dev}"
-+	inject_invalid_cmd_admin "${ctrl_dev}"
-+
-+	_nvme_err_inject_cleanup "${ns_dev}" "${ctrl_dev}"
-+
-+	echo "Test complete"
-+}
-diff --git a/tests/nvme/039.out b/tests/nvme/039.out
-new file mode 100644
-index 000000000000..162935eb1d7b
---- /dev/null
-+++ b/tests/nvme/039.out
-@@ -0,0 +1,7 @@
-+Running nvme/039
-+ Read(0x2) @ LBA 0, 1 blocks, Unrecovered Read Error (sct 0x2 / sc 0x81) DNR 
-+ Read(0x2) @ LBA 0, 1 blocks, Unknown (sct 0x3 / sc 0x75) DNR 
-+ Write(0x1) @ LBA 0, 1 blocks, Write Fault (sct 0x2 / sc 0x80) DNR 
-+ Identify(0x6), Access Denied (sct 0x2 / sc 0x86) DNR 
-+ Unknown(0x96), Invalid Command Opcode (sct 0x0 / sc 0x1) DNR 
-+Test complete
--- 
-2.27.0
+ #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
+ static ssize_t								\
+ queue_##name##_show(struct request_queue *q, char *page)		\
+@@ -606,6 +611,7 @@ QUEUE_RO_ENTRY(queue_dax, "dax");
+ QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
+ QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
+ QUEUE_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
++QUEUE_RO_ENTRY(queue_dma_alignment, "dma_alignment");
+=20
+ #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
+ QUEUE_RW_ENTRY(blk_throtl_sample_time, "throttle_sample_time");
+@@ -667,6 +673,7 @@ static struct attribute *queue_attrs[] =3D {
+ 	&blk_throtl_sample_time_entry.attr,
+ #endif
+ 	&queue_virt_boundary_mask_entry.attr,
++	&queue_dma_alignment_entry.attr,
+ 	NULL,
+ };
+=20
+--=20
+2.30.2
 
