@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AA41C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 14 May 2022 08:51:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0600C43219
+	for <linux-block@archiver.kernel.org>; Sat, 14 May 2022 08:51:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230313AbiENIvl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 May 2022 04:51:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45798 "EHLO
+        id S230335AbiENIvn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 May 2022 04:51:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230090AbiENIvj (ORCPT
+        with ESMTP id S230312AbiENIvk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 May 2022 04:51:39 -0400
+        Sat, 14 May 2022 04:51:40 -0400
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72EBA11A0E;
-        Sat, 14 May 2022 01:51:37 -0700 (PDT)
-Received: from kwepemi100002.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L0fLh19hwzGp4t;
-        Sat, 14 May 2022 16:48:44 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D1E3511A0E;
+        Sat, 14 May 2022 01:51:39 -0700 (PDT)
+Received: from kwepemi100013.china.huawei.com (unknown [172.30.72.57])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L0fPB5WvLzhYpV;
+        Sat, 14 May 2022 16:50:54 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100002.china.huawei.com (7.221.188.188) with Microsoft SMTP Server
+ kwepemi100013.china.huawei.com (7.221.188.136) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 14 May 2022 16:51:35 +0800
+ 15.1.2375.24; Sat, 14 May 2022 16:51:38 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 14 May
- 2022 16:51:34 +0800
+ 2022 16:51:37 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <jack@suse.cz>, <paolo.valente@linaro.org>, <axboe@kernel.dk>,
         <tj@kernel.org>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next 2/8] block, bfq: cleanup __bfq_weights_tree_remove()
-Date:   Sat, 14 May 2022 17:05:16 +0800
-Message-ID: <20220514090522.1669270-3-yukuai3@huawei.com>
+Subject: [PATCH -next 6/8] block, bfq: remove dead code for updating 'rq_in_driver'
+Date:   Sat, 14 May 2022 17:05:20 +0800
+Message-ID: <20220514090522.1669270-7-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220514090522.1669270-1-yukuai3@huawei.com>
 References: <20220514090522.1669270-1-yukuai3@huawei.com>
@@ -49,71 +49,40 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-It's the same with bfq_weights_tree_remove() now.
+Such code are not even compiled since they are inside marco "#if 0".
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-iosched.c | 13 +------------
- block/bfq-iosched.h |  1 -
- block/bfq-wf2q.c    |  2 +-
- 3 files changed, 2 insertions(+), 14 deletions(-)
+ block/bfq-iosched.c | 16 ----------------
+ 1 file changed, 16 deletions(-)
 
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bcbe78d71143..1d0141c450c0 100644
+index 1d0141c450c0..e36a16684fb4 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -944,8 +944,7 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq)
-  * See the comments to the function bfq_weights_tree_add() for considerations
-  * about overhead.
-  */
--void __bfq_weights_tree_remove(struct bfq_data *bfqd,
--			       struct bfq_queue *bfqq)
-+void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- {
- 	struct rb_root_cached *root;
- 	if (!bfqq->weight_counter)
-@@ -964,16 +963,6 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
- 	bfq_put_queue(bfqq);
+@@ -2322,22 +2322,6 @@ static sector_t get_sdist(sector_t last_pos, struct request *rq)
+ 	return 0;
  }
  
--/*
-- * Invoke __bfq_weights_tree_remove on bfqq and decrement the number
-- * of active groups for each queue's inactive parent entity.
-- */
--void bfq_weights_tree_remove(struct bfq_data *bfqd,
--			     struct bfq_queue *bfqq)
+-#if 0 /* Still not clear if we can do without next two functions */
+-static void bfq_activate_request(struct request_queue *q, struct request *rq)
 -{
--	__bfq_weights_tree_remove(bfqd, bfqq);
+-	struct bfq_data *bfqd = q->elevator->elevator_data;
+-
+-	bfqd->rq_in_driver++;
 -}
 -
- /*
-  * Return expired entry, or NULL to just start from scratch in rbtree.
-  */
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index 0a3415abb994..bc54b9824b1e 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -933,7 +933,6 @@ void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync);
- struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
- void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq);
--void __bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		     bool compensate, enum bfqq_expiration reason);
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index ccd227fed1c3..2f3fb45a32c3 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -790,7 +790,7 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		 * there is a counter associated with the entity).
- 		 */
- 		if (prev_weight != new_weight && bfqq)
--			__bfq_weights_tree_remove(bfqd, bfqq);
-+			bfq_weights_tree_remove(bfqd, bfqq);
- 		entity->weight = new_weight;
- 		/*
- 		 * Add the entity, if it is not a weight-raised queue,
+-static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
+-{
+-	struct bfq_data *bfqd = q->elevator->elevator_data;
+-
+-	bfqd->rq_in_driver--;
+-}
+-#endif
+-
+ static void bfq_remove_request(struct request_queue *q,
+ 			       struct request *rq)
+ {
 -- 
 2.31.1
 
