@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1DC3C43217
-	for <linux-block@archiver.kernel.org>; Sat, 14 May 2022 08:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF57C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 14 May 2022 08:51:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230106AbiENIvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 14 May 2022 04:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45834 "EHLO
+        id S230498AbiENIvv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 14 May 2022 04:51:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230288AbiENIvk (ORCPT
+        with ESMTP id S230333AbiENIvn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 14 May 2022 04:51:40 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 246DF24F30;
-        Sat, 14 May 2022 01:51:39 -0700 (PDT)
-Received: from kwepemi500021.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L0fPB0ZDhzhZ0k;
-        Sat, 14 May 2022 16:50:54 +0800 (CST)
+        Sat, 14 May 2022 04:51:43 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2155A55A7;
+        Sat, 14 May 2022 01:51:41 -0700 (PDT)
+Received: from kwepemi500024.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L0fPR4M64zgYhd;
+        Sat, 14 May 2022 16:51:07 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500021.china.huawei.com (7.221.188.245) with Microsoft SMTP Server
+ kwepemi500024.china.huawei.com (7.221.188.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 14 May 2022 16:51:37 +0800
+ 15.1.2375.24; Sat, 14 May 2022 16:51:38 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 14 May
- 2022 16:51:36 +0800
+ 2022 16:51:38 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <jack@suse.cz>, <paolo.valente@linaro.org>, <axboe@kernel.dk>,
         <tj@kernel.org>
 CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next 5/8] block, bfq: cleanup bfq_activate_requeue_entity()
-Date:   Sat, 14 May 2022 17:05:19 +0800
-Message-ID: <20220514090522.1669270-6-yukuai3@huawei.com>
+Subject: [PATCH -next 7/8] block, bfq: cleanup bfq_bfqq_update_budg_for_activation()
+Date:   Sat, 14 May 2022 17:05:21 +0800
+Message-ID: <20220514090522.1669270-8-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220514090522.1669270-1-yukuai3@huawei.com>
 References: <20220514090522.1669270-1-yukuai3@huawei.com>
@@ -49,51 +49,96 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Just make the code a litter cleaner by removing the unnecessary
-variable 'sd'.
+It will only be called from bfq_bfqq_handle_idle_busy_switch() in
+specific code branch, there is no need to precaculate
+'bfqq_wants_to_preempt' each time bfq_bfqq_handle_idle_busy_switch()
+is caleld.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/bfq-wf2q.c | 14 +++++---------
- 1 file changed, 5 insertions(+), 9 deletions(-)
+ block/bfq-iosched.c | 32 +++++++-------------------------
+ 1 file changed, 7 insertions(+), 25 deletions(-)
 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 15b97687493a..da189c732376 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1085,12 +1085,12 @@ static void __bfq_requeue_entity(struct bfq_entity *entity)
- }
- 
- static void __bfq_activate_requeue_entity(struct bfq_entity *entity,
--					  struct bfq_sched_data *sd,
- 					  bool non_blocking_wait_rq)
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index e36a16684fb4..1e57d76c8dd3 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -1555,10 +1555,11 @@ static int bfq_min_budget(struct bfq_data *bfqd)
+  * responsibility of handling the above case 2.
+  */
+ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
+-						struct bfq_queue *bfqq,
+-						bool arrived_in_time)
++						struct bfq_queue *bfqq)
  {
- 	struct bfq_service_tree *st = bfq_entity_service_tree(entity);
+ 	struct bfq_entity *entity = &bfqq->entity;
++	bool arrived_in_time = ktime_get_ns() <= bfqq->ttime.last_end_request +
++			       bfqd->bfq_slice_idle * 3;
  
--	if (sd->in_service_entity == entity || entity->tree == &st->active)
-+	if (entity->sched_data->in_service_entity == entity ||
-+	    entity->tree == &st->active)
- 		 /*
- 		  * in service or already queued on the active tree,
- 		  * requeue or reposition
-@@ -1122,14 +1122,10 @@ static void bfq_activate_requeue_entity(struct bfq_entity *entity,
- 					bool non_blocking_wait_rq,
- 					bool requeue, bool expiration)
+ 	/*
+ 	 * In the next compound condition, we check also whether there
+@@ -1567,7 +1568,7 @@ static bool bfq_bfqq_update_budg_for_activation(struct bfq_data *bfqd,
+ 	 * would be expired immediately after being selected for
+ 	 * service. This would only cause useless overhead.
+ 	 */
+-	if (bfq_bfqq_non_blocking_wait_rq(bfqq) && arrived_in_time &&
++	if (arrived_in_time && bfq_bfqq_non_blocking_wait_rq(bfqq) &&
+ 	    bfq_bfqq_budget_left(bfqq) > 0) {
+ 		/*
+ 		 * We do not clear the flag non_blocking_wait_rq here, as
+@@ -1768,17 +1769,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 					     bool *interactive)
  {
--	struct bfq_sched_data *sd;
+ 	bool soft_rt, in_burst,	wr_or_deserves_wr,
+-		bfqq_wants_to_preempt,
+-		idle_for_long_time = bfq_bfqq_idle_for_long_time(bfqd, bfqq),
+-		/*
+-		 * See the comments on
+-		 * bfq_bfqq_update_budg_for_activation for
+-		 * details on the usage of the next variable.
+-		 */
+-		arrived_in_time =  ktime_get_ns() <=
+-			bfqq->ttime.last_end_request +
+-			bfqd->bfq_slice_idle * 3;
 -
- 	for_each_entity(entity) {
--		sd = entity->sched_data;
--		__bfq_activate_requeue_entity(entity, sd, non_blocking_wait_rq);
++		idle_for_long_time = bfq_bfqq_idle_for_long_time(bfqd, bfqq);
+ 
+ 	/*
+ 	 * bfqq deserves to be weight-raised if:
+@@ -1816,14 +1807,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 		  (bfqq->bic || RQ_BIC(rq)->stably_merged) &&
+ 		   (*interactive || soft_rt)));
+ 
+-	/*
+-	 * Using the last flag, update budget and check whether bfqq
+-	 * may want to preempt the in-service queue.
+-	 */
+-	bfqq_wants_to_preempt =
+-		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
+-						    arrived_in_time);
 -
--		if (!bfq_update_next_in_service(sd, entity, expiration) &&
--		    !requeue)
-+		__bfq_activate_requeue_entity(entity, non_blocking_wait_rq);
-+		if (!bfq_update_next_in_service(entity->sched_data, entity,
-+						expiration) && !requeue)
- 			break;
- 	}
- }
+ 	/*
+ 	 * If bfqq happened to be activated in a burst, but has been
+ 	 * idle for much more than an interactive queue, then we
+@@ -1879,8 +1862,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 * guarantees or throughput. As for guarantees, we care
+ 	 * explicitly about two cases. The first is that bfqq has to
+ 	 * recover a service hole, as explained in the comments on
+-	 * bfq_bfqq_update_budg_for_activation(), i.e., that
+-	 * bfqq_wants_to_preempt is true. However, if bfqq does not
++	 * bfq_bfqq_update_budg_for_activation(). However, if bfqq does not
+ 	 * carry time-critical I/O, then bfqq's bandwidth is less
+ 	 * important than that of queues that carry time-critical I/O.
+ 	 * So, as a further constraint, we consider this case only if
+@@ -1918,7 +1900,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+ 	 * (2) this switch of bfqq to busy changes the scenario.
+ 	 */
+ 	if (bfqd->in_service_queue &&
+-	    ((bfqq_wants_to_preempt &&
++	    ((bfq_bfqq_update_budg_for_activation(bfqd, bfqq) &&
+ 	      bfqq->wr_coeff >= bfqd->in_service_queue->wr_coeff) ||
+ 	     bfq_bfqq_higher_class_or_weight(bfqq, bfqd->in_service_queue) ||
+ 	     !bfq_better_to_idle(bfqd->in_service_queue)) &&
 -- 
 2.31.1
 
