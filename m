@@ -2,88 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD869C433F5
-	for <linux-block@archiver.kernel.org>; Sun, 15 May 2022 19:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02681C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 15 May 2022 20:58:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238406AbiEOTZT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 May 2022 15:25:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34658 "EHLO
+        id S230016AbiEOU6j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 May 2022 16:58:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229587AbiEOTZS (ORCPT
+        with ESMTP id S229491AbiEOU6i (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 May 2022 15:25:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B4F0325E95
-        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 12:25:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652642713;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=3tgm7FkhgZMI1Knq5BCXmzxRNBZ0f9T8FBbOE8N4Q1k=;
-        b=F29WF6BWni1hLstxrT13hr0DnInDSSk0pS4CpWLBUBmoxHA6cgsUVCM76YWaBdh+B1F8F9
-        TTJRnvd6KuUDZxLtLUHjHyX8soRKkGdwRxQZJI6qAFPI8u3oJMg6/poVjNdlE5GdNb7VXi
-        ZboWYlKltORtNP3SzgfK2QrIP7aOhts=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-315-JWgn8x6QO-yE8dxgjrf9sg-1; Sun, 15 May 2022 15:25:11 -0400
-X-MC-Unique: JWgn8x6QO-yE8dxgjrf9sg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9477F801E80;
-        Sun, 15 May 2022 19:25:11 +0000 (UTC)
-Received: from localhost (unknown [10.39.192.39])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 56ADD111E411;
-        Sun, 15 May 2022 19:25:06 +0000 (UTC)
-Date:   Sun, 15 May 2022 20:25:05 +0100
-From:   "Richard W.M. Jones" <rjones@redhat.com>
-To:     libguestfs@redhat.com, linux-block@vger.kernel.org,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [Libguestfs] Communication issues between NBD driver and NBDKit
- server
-Message-ID: <20220515192505.GJ1127@redhat.com>
-References: <04a0a06b-e6dc-48b7-bc29-105dab888a56@www.fastmail.com>
- <20220515180525.GF8021@redhat.com>
- <87czgelidg.fsf@vostro.rath.org>
+        Sun, 15 May 2022 16:58:38 -0400
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C05B92C107
+        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 13:58:36 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id d5so18107449wrb.6
+        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 13:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=philpotter-co-uk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YfKME/JDkH531Lu6fG6fKwqq/hbTWQKEzNeth+JlmBw=;
+        b=1UrWzWjtY/i77ZX54V7TxDuwcuU3xCLPGbbZVukGF+56SSCoDRhqpgyaoGKnEsEPxA
+         zOP7CGmirl3P7jvEssv9f/dWrGh2gF7qAd0bpP4B0mhMNd3T6YOyQ/QcYsBAfobnaVBe
+         YDmpuqbO/kjlEvvigldjlPepSFzD09VZK/2puHFZ7qFpNh3Qq+ml98kCM7fWotPsGfr0
+         XVFuqzZNr3UIWa+cNY8Tk+KsfWKqHq1CiOyG3nZEVXQniMr+CllNYXwoUGdSGxpXaL0s
+         DygBjbfSqOAAZSZW+26NIO6/L7grSvURQfqUGdq6S43KKAas45leKKQwj9XXuoTERpp3
+         BD5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=YfKME/JDkH531Lu6fG6fKwqq/hbTWQKEzNeth+JlmBw=;
+        b=gnkcUInlV78mIzHai1UflUZzJLort40J4gT8c3aVlxNTdmIjlzq1wlwZqVKexPE2F0
+         OFGUl99yGKNqAdIJpXyvBKgO8fuDonxSM5e7tTaEU+DnNludafcTl2+/PCzksXXvxkq8
+         2WGnuqBGFfLdXpItnVHpdGzyrObU+2GrBy+Q3qVRQ1XPO6TMRDUBisXeJ7s2YKpwcNuX
+         jtB2WCYGu9JpFT8EhHfH/KfMtUsLeVF3NhwXVyW933mBmDbdU1Aix6aQzs2MnK57UQsg
+         6V1JGQNIKqvxXCzNF/+RFYu/LcjkaNf60ICMdQvE9oHZ5yoCGwW0wX8I5r6dMMIhRp5x
+         FA9w==
+X-Gm-Message-State: AOAM532/HvBvwDFzi3YvBc5vKCnLQvYopQybP+/Io8fC1qdyuH1JLfLI
+        Md+XRxsYQD9OeNaHcJEjN9x2w5K4OWTKcg==
+X-Google-Smtp-Source: ABdhPJyBFuN4WHy9iGVZHh3OoAaSzcz01v4DyfwN+mjllhGdQLD34JV1kVuJGroqk8rySpvSFN0HhQ==
+X-Received: by 2002:a5d:4703:0:b0:20a:ce3c:7528 with SMTP id y3-20020a5d4703000000b0020ace3c7528mr11703423wrq.688.1652648315294;
+        Sun, 15 May 2022 13:58:35 -0700 (PDT)
+Received: from localhost.localdomain (2.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.0.a.1.e.e.d.f.d.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:dfde:e1a0::2])
+        by smtp.gmail.com with ESMTPSA id r17-20020adfbb11000000b0020c5253d920sm8922074wrg.108.2022.05.15.13.58.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 15 May 2022 13:58:34 -0700 (PDT)
+From:   Phillip Potter <phil@philpotter.co.uk>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH 0/5] cdrom: patches for 5.19 merge window
+Date:   Sun, 15 May 2022 21:58:28 +0100
+Message-Id: <20220515205833.944139-1-phil@philpotter.co.uk>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87czgelidg.fsf@vostro.rath.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 15, 2022 at 08:12:59PM +0100, Nikolaus Rath wrote:
-> Do you see any way for this to happen?
+Hi Jens,
 
-I think it's impossible.  A more likely explanation follows.
+Please apply the patches from this series, including my own patch to
+remove the 'To Do' entry from drivers/cdrom/cdrom.c.
 
-If you look at the kernel code, the NBD_CMD_INFLIGHT command flag is
-cleared when a command times out:
+As previously discussed, Paul's block patch is included in this series
+too, and I've fixed it up to remove any parts that repeat changes
+already made by others, so it merges cleanly with upstream now.
 
-  https://github.com/torvalds/linux/blob/0cdd776ec92c0fec768c7079331804d3e52d4b27/drivers/block/nbd.c#L407
+Many thanks in advance.
 
-That's the place where it would have printed the "Possible stuck
-request" message.
+Regards,
+Phil
 
-Some time later, nbdkit actually replies to the message (for the first
-and only time) and in that code the flag is checked and found to be
-clear already, causing the "Suspicious reply" message to be printed:
+Enze Li (1):
+  cdrom: make EXPORT_SYMBOL follow exported function
 
-  https://github.com/torvalds/linux/blob/0cdd776ec92c0fec768c7079331804d3e52d4b27/drivers/block/nbd.c#L749
+Paul Gortmaker (3):
+  cdrom: remove the unused driver specific disc change ioctl
+  cdrom: mark CDROMGETSPINDOWN/CDROMSETSPINDOWN obsolete
+  block: remove last remaining traces of IDE documentation
 
-I'd say you need to increase the timeout and/or work out why the S3
-plugin is taking so long to respond.
+Phillip Potter (1):
+  cdrom: remove obsolete TODO list
 
-Rich.
+ Documentation/cdrom/cdrom-standard.rst      | 10 ---
+ Documentation/filesystems/proc.rst          | 92 ++-------------------
+ Documentation/userspace-api/ioctl/cdrom.rst |  6 ++
+ drivers/block/pktcdvd.c                     |  2 +-
+ drivers/cdrom/cdrom.c                       | 38 +++------
+ include/linux/cdrom.h                       |  1 -
+ include/uapi/linux/cdrom.h                  |  2 +-
+ 7 files changed, 25 insertions(+), 126 deletions(-)
 
 -- 
-Richard Jones, Virtualization Group, Red Hat http://people.redhat.com/~rjones
-Read my programming and virtualization blog: http://rwmj.wordpress.com
-libguestfs lets you edit virtual machines.  Supports shell scripting,
-bindings from many languages.  http://libguestfs.org
+2.35.3
 
