@@ -2,151 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1C3C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 12:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D25C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 12:19:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240697AbiEPMSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 08:18:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
+        id S241350AbiEPMTC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 08:19:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229697AbiEPMSB (ORCPT
+        with ESMTP id S234341AbiEPMTB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 08:18:01 -0400
-Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2E22BB20
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:17:55 -0700 (PDT)
-Received: by mail-qt1-x82f.google.com with SMTP id p4so11832165qtq.12
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:17:55 -0700 (PDT)
+        Mon, 16 May 2022 08:19:01 -0400
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848632CCA5
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:19:00 -0700 (PDT)
+Received: by mail-pf1-x42d.google.com with SMTP id d25so13844400pfo.10
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:19:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=6WoWussqs/nE0WQFdCOfcolnwp+yEL3nnakgRyZRHVE=;
-        b=dNPrnAOHFoYC1Szl537Ai+cBSuuvzo2sTNk+SMetEJzZpdGUqXGFGgUSqKF5vBUjYm
-         gMwOGHC24+4HHAibvvjAofcotuJ36Rac28QKstG6THDLsWqpUIzPO7pFtceJPS2bueKl
-         k6Q6FW3PpcgUCsCghBOONcWHLu0+iLgzdH68yD6hOCOCzmJoTVpUU82s70otH7dJRi70
-         CvCx2eMkWmxccQUs7E0erTwIIsfKLvELEoEUxLBCQqyZrq9M9U/bAL/9H9t/px39opul
-         Yvr+ep+zr9xXjHghZx2ZPyP+bdFM1UDY/fE14VXGXL6w8ZCVS+e68RZVteHzg1sPewih
-         S/Rg==
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=mauTUK/BbcN02BKF1E5WYv3nctbs4If/Xj3WrKUUUZQ=;
+        b=jCliMATnCO8tjtRg2mTj+wIggrHc1Ww95M+EpFTLeHPCom0/OxF6OWD8yQPneh4AlB
+         zhGjv7fVnX5G+btxOAZNayNSnKRmdGAXGw+PelbQosH/RdJ3NSYVeWEHhuYg2XJuaLTC
+         spem+JzWfbThl2xtEtJ0p8EAl+dealFC0vUqr59B8DUApioU5mHWVCc4/H44XcDlxZiV
+         K1aNpj/8/z0cqpQajSVsVdOktvjZePhDddDu7Cisp/HT/HzHn1capZu+tLOFWwoEkP2L
+         G+fAfZ09jL2H08kOHzh+j7tUXH3X58XT7ntG6kijy4IQSbUDCH6N8aoG7Ji768cToWv7
+         6JCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=6WoWussqs/nE0WQFdCOfcolnwp+yEL3nnakgRyZRHVE=;
-        b=pflEBD+BC8TykmsBw3BlAFHX1lPkP9uAf3bSFF6o7AezGpWKvsq1dUIt6m+9t8gIBu
-         Q/lhg2Kc0hi7Su4U2J9GouLe1fJTNB0vfsDZazEwGqioKxmk5dXPbrhRRLschig+h+D6
-         9hxRCzWr6p2Q9+lSAzs1RsHc3oBmQVkX+mA+MfotPpICPC01aDDI2Z0ElzUrJLYXGAV8
-         7kwNrl1T9Q3JAA4eDEyLnJYDuI5oA6FbHy8+Iyl0AvJiFmHXUHmXDEHM5KQsgFgPN15n
-         nv6MhCVf/upgC/RzTBhwCJYPocRs83vy26qBMWmX73AIU5ryIAEY6Et9sWu4937PwWVR
-         SvHw==
-X-Gm-Message-State: AOAM533+wY1tekz+ID0hXTqY1JiIkuVrsW3cReGIFTY5wivybvkXsHRP
-        BezBedpf9EmxgK351JYgCZjLpn5wymIL4Q==
-X-Google-Smtp-Source: ABdhPJzqEm7QHW/ub0pHz6AYCmev82zktUJyJxo3YCahnMnuMg5LtLrY7OUuAcE3jTIC8fdqjXBpvg==
-X-Received: by 2002:ac8:584a:0:b0:2f7:b19b:f9b6 with SMTP id h10-20020ac8584a000000b002f7b19bf9b6mr6722119qth.683.1652703474556;
-        Mon, 16 May 2022 05:17:54 -0700 (PDT)
-Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
-        by smtp.gmail.com with ESMTPSA id a128-20020ae9e886000000b006a2e2dde144sm2751831qkg.88.2022.05.16.05.17.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 05:17:53 -0700 (PDT)
-Date:   Mon, 16 May 2022 08:17:52 -0400
-From:   Josef Bacik <josef@toxicpanda.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Matthew Ruffell <matthew.ruffell@canonical.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        nbd <nbd@other.debian.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
- inotify emit udev uevent changes
-Message-ID: <YoJA8C2XtXY27qJ1@localhost.localdomain>
-References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
- <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
- <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
- <CAKAwkKvfFn18RjupuqGpx4QeAiMYKSq7QUTd3wEL=pkZ+BENpQ@mail.gmail.com>
- <Yn5Zf6lONff1AoOA@localhost.localdomain>
- <6efae367-12fa-1a58-7438-1b39dc0d6ef8@huawei.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=mauTUK/BbcN02BKF1E5WYv3nctbs4If/Xj3WrKUUUZQ=;
+        b=O9MOdouO1IIjyjtO+TbHZTBgiiLQsv5VOVlfl/CXESqTHXf3t0sCAdl+K1p2FnrJtY
+         GUVbOf951D1SHPYUye9jyKIWMa3dIdoE4/LhTtS8h34CCKQMfaggXrxSJPz8rEcVJaL0
+         I2mSV6lhlLChEi60zps3k/QnN0nozmOb4sat/MdPDC03MFP3jYOM6Auy53qyjZQ54xoX
+         SegQgIwqP0mhrkqxkTtrp2AIabpED6CA30dxszQ5uppM6YiDG0Jzn7dcjvH9nzFTxhKc
+         Y5TbyW47LGqOSSTdCaHLRF2AEoNJyJWzeARIOxxPjsvEAf6toK+jWSYcEWh03JmB/h9g
+         eOSQ==
+X-Gm-Message-State: AOAM533vsu0AmM+/bqUyoi2XQeR3O+f2faHRzde+fsC1Ls93REinOP31
+        OHu20a90q7uLIXg1n53PAx7ZvSd8OallQg==
+X-Google-Smtp-Source: ABdhPJz3jVAkhdYsDGcE7BnBGbvfMWWBjs7MKFZpG91v2is0HkVS7WMpZr64iZpw1P+w2KDN2v3+Ow==
+X-Received: by 2002:a63:1e1d:0:b0:3c6:a36f:7b13 with SMTP id e29-20020a631e1d000000b003c6a36f7b13mr15195060pge.447.1652703540014;
+        Mon, 16 May 2022 05:19:00 -0700 (PDT)
+Received: from [10.254.222.110] ([139.177.225.240])
+        by smtp.gmail.com with ESMTPSA id d17-20020a170902aa9100b0015e8d4eb218sm6929028plr.98.2022.05.16.05.18.57
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 May 2022 05:18:59 -0700 (PDT)
+Message-ID: <bbd8744f-d938-c4a5-cb02-145c9875ea53@bytedance.com>
+Date:   Mon, 16 May 2022 20:18:54 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <6efae367-12fa-1a58-7438-1b39dc0d6ef8@huawei.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCH] blk-iocos: fix inuse clamp when iocg deactivate or free
+Content-Language: en-US
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        duanxiongchun@bytedance.com, songmuchun@bytedance.com
+References: <20220516101909.99768-1-zhouchengming@bytedance.com>
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <20220516101909.99768-1-zhouchengming@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, May 14, 2022 at 11:39:25AM +0800, yukuai (C) wrote:
-> 在 2022/05/13 21:13, Josef Bacik 写道:
-> > On Fri, May 13, 2022 at 02:56:18PM +1200, Matthew Ruffell wrote:
-> > > Hi Josef,
-> > > 
-> > > Just a friendly ping, I am more than happy to test a patch, if you send it
-> > > inline in the email, since the pastebin you used expired after 1 day, and I
-> > > couldn't access it.
-> > > 
-> > > I came across and tested Yu Kuai's patches [1][2] which are for the same issue,
-> > > and they indeed fix the hang. Thank you Yu.
-> > > 
-> > > [1] nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
-> > > https://lists.debian.org/nbd/2022/04/msg00212.html
-> > > 
-> > > [2] nbd: fix io hung while disconnecting device
-> > > https://lists.debian.org/nbd/2022/04/msg00207.html
-> > > 
-> > > I am also happy to test any patches to fix the I/O errors.
-> > > 
-> > 
-> > Sorry, you caught me on vacation before and I forgot to reply.  Here's part one
-> > of the patch I wanted you to try which fixes the io hung part.  Thanks,
-> > 
-> > Josef
-> > 
-> > > From 0a6123520380cb84de8ccefcccc5f112bce5efb6 Mon Sep 17 00:00:00 2001
-> > Message-Id: <0a6123520380cb84de8ccefcccc5f112bce5efb6.1652447517.git.josef@toxicpanda.com>
-> > From: Josef Bacik <josef@toxicpanda.com>
-> > Date: Sat, 23 Apr 2022 23:51:23 -0400
-> > Subject: [PATCH] timeout thing
-> > 
-> > ---
-> >   drivers/block/nbd.c | 5 ++++-
-> >   1 file changed, 4 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> > index 526389351784..ab365c0e9c04 100644
-> > --- a/drivers/block/nbd.c
-> > +++ b/drivers/block/nbd.c
-> > @@ -1314,7 +1314,10 @@ static void nbd_config_put(struct nbd_device *nbd)
-> >   		kfree(nbd->config);
-> >   		nbd->config = NULL;
-> > -		nbd->tag_set.timeout = 0;
-> > +		/* Reset our timeout to something sane. */
-> > +		nbd->tag_set.timeout = 30 * HZ;
-> > +		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
-> > +
-> >   		nbd->disk->queue->limits.discard_granularity = 0;
-> >   		nbd->disk->queue->limits.discard_alignment = 0;
-> >   		blk_queue_max_discard_sectors(nbd->disk->queue, 0);
-> > 
-> Hi, Josef
+On 2022/5/16 18:19, Chengming Zhou wrote:
+> For an active leaf node, its inuse shouldn't be zero or exceed
+> its active, but it's not true when deactivate idle iocg or delete
+> iocg in ioc_pd_free().
 > 
-> This seems to try to fix the same problem that I described here:
+> Although inuse of 1 is very small, it could cause noticeable hwi
+> decrease in the long running server. So we'd better fix it.
 > 
-> nbd: fix io hung while disconnecting device
-> https://lists.debian.org/nbd/2022/04/msg00207.html
+> And check iocg->child_active_sum is enough for inner iocg, remove
+> the needless list_empty check by the way.
 > 
-> There are still some io that are stuck, which means the devcie is
-> probably still opened. Thus nbd_config_put() can't reach here.
-> I'm afraid this patch can't fix the io hung.
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+>  block/blk-iocost.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> Matthew, can you try a test with this patch together with my patch below
-> to comfirm my thought?
-> 
-> nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
-> https://lists.debian.org/nbd/2022/04/msg00212.html.
-> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 2570732b92d1..84374ebcc402 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -1073,11 +1073,11 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
+>  	 * @active. An active internal node's inuse is solely determined by the
+>  	 * inuse to active ratio of its children regardless of @inuse.
+>  	 */
+> -	if (list_empty(&iocg->active_list) && iocg->child_active_sum) {
+> +	if (iocg->child_active_sum) {
+>  		inuse = DIV64_U64_ROUND_UP(active * iocg->child_inuse_sum,
+>  					   iocg->child_active_sum);
+>  	} else {
+> -		inuse = clamp_t(u32, inuse, 1, active);
+> +		inuse = clamp_t(u32, inuse, 0, active);
 
-Re-submit this one, but fix it so we just test the bit to see if we need to skip
-it, and change it so we only CLEAR when we're sure we're going to complete the
-request.  Thanks,
+I found the commit message is wrong after a second look at the test data,
+inuse value will be zero when active is zero, since:
 
-Josef
+#define clamp_t(type, val, lo, hi) min_t(type, max_t(type, val, lo), hi)
+
+So clamp_t(u32, 0, 1, 0) will return 0, deactivate idle iocg or delete iocg
+will set its inuse to zero correctly.
+
+The inuse -> 1 happened in the test data turn out to be iocg_incur_debt(),
+which call __propagate_weights() with active = weight, inuse = 0, so
+clamp_t(u32, 0, 1, active) return 1.
+
+Then this effect is very small, unlikely to have an impact in practice. Should
+I modify the commit message to send v2 or just drop it?
+
+Thanks.
+
+>  	}
+>  
+>  	iocg->last_inuse = iocg->inuse;
