@@ -2,139 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFC44C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 10:13:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF9EC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 10:19:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232336AbiEPKNS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 06:13:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43490 "EHLO
+        id S229450AbiEPKT1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 06:19:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239637AbiEPKNQ (ORCPT
+        with ESMTP id S233215AbiEPKTX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 06:13:16 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53DCDB7CD
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:13:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1652695995; x=1684231995;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1RftvAYIAb2hGvwjDVgp5ayxfciX1CwkYmKbbeEZ82U=;
-  b=JkWKLdnbtZSZFQFqQWt8MsDvSN88PDcv84V1jUIEQxXBMU8fTffuSZH+
-   BpMNggbZ4044pSPNb/sgA/WuYV6PRfBi0hVJ3W5ESySTV/pWG6Y2Kn/C7
-   sBjo7RfKkZhhs0CnqR1VoyukPlyBsyqgvX+wM6eAu6z4XRFQuuo+bW7D6
-   d5IXMxcPGNzjsKPzyWVlwul8A5W80eaEY5JvHcMs72kjMlARNmvFUj05T
-   mLAF8J/WOUgyxiv3f1Q4Unay5cOoH8TwDDLz109PPxnTmwOhK6n2s8qZo
-   7SzANAhcC/dEia7CloWJGhmJDK1owGWRsbh4HB5oujSC8qnQHmEJTKxUl
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.91,229,1647273600"; 
-   d="scan'208";a="304642156"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 May 2022 18:13:14 +0800
-IronPort-SDR: ENQQXIu0/kBN8rtiwhonHw9m2Xq/SvrILpIRTAiZPs3fdshGSnWPzd1pA1f6eeG1pkJgC6DDIG
- lc20EQAN6vcbWOHAZ8sP8ZpRDNv1D1AW36GyaxESu8rUxPLAcoCVb0mftUU1wprXwO/sC32BRa
- etrTAFbz8KwJrXUinhV4IXi2/JNIyiavYDYLY9Yh84ElfwScc0s0gKkH+VXxn6Qe6OhFeolL4K
- zpFeGxUAx68H9S8ndvP1G1xnzi1P4NIAfbi2EPXn34+yqDz6J/wuTQVf0FAP9SBBPAGGZiB54q
- nL14bMjGkHHwAGUiFekA74ti
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 May 2022 02:38:55 -0700
-IronPort-SDR: 1NwBQ35zrY/8kKTGiwH3QxuzzHtGRWsbXO4Kch2HK1g2Fyy7mDcwLSKy827cxEC+rI7bd+3Wvo
- 7IcHY7e7RaxBWFLzkKsUn+3EeiA4vx6ZeU8I0Fpj5m61dBdYgqk2BnBkHGzOfrP5m86+273rTw
- vN0+uiDWnnugPYAj6Tv4xQsGaKvK/b7t5GCmQt0SYXPELgJcu4yw98LQnOmT2ES/i/lsri7UJ0
- 5lJeH7LlFAk7HUxYBN//7qyBa/LTOEhvjnOBnIMrkMATJWpTuqXazzT2rYkqzl3DTK4GpwFpJq
- q+0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 May 2022 03:13:15 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L1w7F5MBzz1SHwl
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:13:13 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1652695993; x=1655287994; bh=1RftvAYIAb2hGvwjDVgp5ayxfciX1CwkYmK
-        bbeEZ82U=; b=hDNjDejrH6XgfPJHLk+RImbyg66Qv/CMuxIAG9JdhojyQxMYw+9
-        ENNISSeYhpjDjvUvZNiYze9qWTy0kpz7wNugIz+sBlaig3vROOXnNOR57/BZ9eLV
-        PouRGcAv8w9yxZ9URAIfb6lvnvP6gcz8MmQ4uP/SUJlwWOjOq1H/upd5ld4H6abP
-        YiB3zesMBA5hLuMNa8DIXAimA4ELq+iGG1v/pgpZo3I0fHWbS14vKGVeKZZvYhOm
-        8lC1UoOlm3OOjIMV9dK6KLVttj8ht+8C5soBw3tTn4J5OM1AoC+Bhx5wr2ERbYG5
-        AwXoWtt9RreIPerCTaBUYxqIbZvWl3Lc7Lw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id ZLbAELd7owRN for <linux-block@vger.kernel.org>;
-        Mon, 16 May 2022 03:13:13 -0700 (PDT)
-Received: from [10.225.1.43] (unknown [10.225.1.43])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L1w7D1CLVz1Rvlc;
-        Mon, 16 May 2022 03:13:11 -0700 (PDT)
-Message-ID: <9e3cd199-4333-5db2-c201-d0d2d2a05e86@opensource.wdc.com>
-Date:   Mon, 16 May 2022 12:13:10 +0200
+        Mon, 16 May 2022 06:19:23 -0400
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDB3DEBF
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:19:20 -0700 (PDT)
+Received: by mail-pg1-x530.google.com with SMTP id 202so13641378pgc.9
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:19:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bW4la66s2/2Qkl9P/hRh2ka24n+8uceXtWH8mz/xliY=;
+        b=DlU+GBh2MfUhs6P6NuaPTzAk6CnKaIU25rlLqVbf9TmS7k560BONygkGBXfcGN1PWU
+         kiWPLIo6SQsYDD9On2cXonZktr/+RT+wBt2rKAprhyW7b7JO0f9jLHo8Y35iiL75zySQ
+         31HspQ7f9eOwvYMS1wd6418OCzJQpRKB3vJ72yz3UtDzYQBxdCBKlEQ0khnRe4FG++HD
+         HzOGGsKQlLaNL2OKEXI0D7D9rOJywmDc+GcsAtJFxyjnOSe407rX9Vl7B/qbaWWEabVZ
+         JI7sAX2aZN6LE7qPplxJztRNY87BGCg+GRukXatvKdLUfrl+II7xje4xZdHa6WFcWtK3
+         QZiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=bW4la66s2/2Qkl9P/hRh2ka24n+8uceXtWH8mz/xliY=;
+        b=MdSd8ehseSkDHTZ4QtNXa/tuwWHOtuOxYFo9mzxkk0uEiSAFpmkEYtppP5RBA6HWFX
+         rCJDXtrbejiaQiX3By0PUePA5xnU8/VD3fD3TcJCPX7MmXWP6yyGxLpsEzecAjcRz5Eg
+         iuq5HWuQ+tG3DDyHK4wxcNiqdvARqz6tUHhzvSvzrL8tOqD7TMfz+qo9J4tE1Qf+JAOK
+         Cd34Ou9iFWSEWJO1yV1Kc5Demrw2qWHHxwVQHfXDAYMB8CcF9zNavHHmbr+Yf8F5uJ+r
+         YXGhbU12uPNu0Vaza77sEmm017tIFWGL9WQmpgKAofZH2NTte9tXEYWpYhUITPgvlOMh
+         hWHQ==
+X-Gm-Message-State: AOAM533/wlVmgtZsHzK5Rn0R7rI7sq2kqWfyuNOW6VpFG8R3B/SYNVz4
+        qovXiG4V8yE7FgOAU9XAYC+KSQ==
+X-Google-Smtp-Source: ABdhPJwIkvqG1MyMUXgY2WtuJDubBjCrD5lZ9usKKsCWanfaWY6veeD8QGmqb1vDcZJoENug8S59rg==
+X-Received: by 2002:a63:2b05:0:b0:3c2:3ed1:5fa9 with SMTP id r5-20020a632b05000000b003c23ed15fa9mr14676453pgr.220.1652696359590;
+        Mon, 16 May 2022 03:19:19 -0700 (PDT)
+Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.240])
+        by smtp.gmail.com with ESMTPSA id x14-20020a170902820e00b0015e8d4eb1efsm2509699pln.57.2022.05.16.03.19.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 03:19:19 -0700 (PDT)
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        duanxiongchun@bytedance.com, songmuchun@bytedance.com,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH] blk-iocos: fix inuse clamp when iocg deactivate or free
+Date:   Mon, 16 May 2022 18:19:09 +0800
+Message-Id: <20220516101909.99768-1-zhouchengming@bytedance.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [PATCH 3/3] block: ensure direct io is a block size
-Content-Language: en-US
-To:     Keith Busch <kbusch@fb.com>, linux-block@vger.kernel.org
-Cc:     axboe@kernel.dk, Kernel Team <kernel-team@fb.com>,
-        Keith Busch <kbusch@kernel.org>
-References: <20220513161339.1580042-1-kbusch@fb.com>
- <20220513161339.1580042-3-kbusch@fb.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220513161339.1580042-3-kbusch@fb.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/05/13 18:13, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> If the iterator has an offset, filling a bio to the max bvecs may result
-> in a size that isn't aligned to the block size. Mask off bytes for the
-> bio being constructed.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  block/bio.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index 4259125e16ab..b42a9e3ff068 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1144,6 +1144,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  {
->  	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
->  	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-> +	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
->  	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
->  	struct page **pages = (struct page **)bv;
->  	bool same_page = false;
-> @@ -1160,6 +1161,9 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
->  
->  	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-> +	if (size > 0)
-> +		size = size & ~(queue_logical_block_size(q) - 1);
+For an active leaf node, its inuse shouldn't be zero or exceed
+its active, but it's not true when deactivate idle iocg or delete
+iocg in ioc_pd_free().
 
-I think that __bio_iov_append_get_pages() needs the same change. And given that
-both __bio_iov_append_get_pages() and __bio_iov_iter_get_pages() start with
-iov_iter_get_pages(), should we do that and check the size in the single caller:
-bio_iov_iter_get_pages() ?
+Although inuse of 1 is very small, it could cause noticeable hwi
+decrease in the long running server. So we'd better fix it.
 
-> +
->  	if (unlikely(size <= 0))
->  		return size ? size : -EFAULT;
->  
+And check iocg->child_active_sum is enough for inner iocg, remove
+the needless list_empty check by the way.
 
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-iocost.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 2570732b92d1..84374ebcc402 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1073,11 +1073,11 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
+ 	 * @active. An active internal node's inuse is solely determined by the
+ 	 * inuse to active ratio of its children regardless of @inuse.
+ 	 */
+-	if (list_empty(&iocg->active_list) && iocg->child_active_sum) {
++	if (iocg->child_active_sum) {
+ 		inuse = DIV64_U64_ROUND_UP(active * iocg->child_inuse_sum,
+ 					   iocg->child_active_sum);
+ 	} else {
+-		inuse = clamp_t(u32, inuse, 1, active);
++		inuse = clamp_t(u32, inuse, 0, active);
+ 	}
+ 
+ 	iocg->last_inuse = iocg->inuse;
 -- 
-Damien Le Moal
-Western Digital Research
+2.36.1
+
