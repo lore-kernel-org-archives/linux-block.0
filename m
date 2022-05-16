@@ -2,100 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AF9EC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 10:19:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 880ABC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 10:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229450AbiEPKT1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 06:19:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
+        id S241714AbiEPKv4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 06:51:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38068 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233215AbiEPKTX (ORCPT
+        with ESMTP id S243000AbiEPKv3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 06:19:23 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1FDB3DEBF
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:19:20 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 202so13641378pgc.9
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 03:19:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bW4la66s2/2Qkl9P/hRh2ka24n+8uceXtWH8mz/xliY=;
-        b=DlU+GBh2MfUhs6P6NuaPTzAk6CnKaIU25rlLqVbf9TmS7k560BONygkGBXfcGN1PWU
-         kiWPLIo6SQsYDD9On2cXonZktr/+RT+wBt2rKAprhyW7b7JO0f9jLHo8Y35iiL75zySQ
-         31HspQ7f9eOwvYMS1wd6418OCzJQpRKB3vJ72yz3UtDzYQBxdCBKlEQ0khnRe4FG++HD
-         HzOGGsKQlLaNL2OKEXI0D7D9rOJywmDc+GcsAtJFxyjnOSe407rX9Vl7B/qbaWWEabVZ
-         JI7sAX2aZN6LE7qPplxJztRNY87BGCg+GRukXatvKdLUfrl+II7xje4xZdHa6WFcWtK3
-         QZiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bW4la66s2/2Qkl9P/hRh2ka24n+8uceXtWH8mz/xliY=;
-        b=MdSd8ehseSkDHTZ4QtNXa/tuwWHOtuOxYFo9mzxkk0uEiSAFpmkEYtppP5RBA6HWFX
-         rCJDXtrbejiaQiX3By0PUePA5xnU8/VD3fD3TcJCPX7MmXWP6yyGxLpsEzecAjcRz5Eg
-         iuq5HWuQ+tG3DDyHK4wxcNiqdvARqz6tUHhzvSvzrL8tOqD7TMfz+qo9J4tE1Qf+JAOK
-         Cd34Ou9iFWSEWJO1yV1Kc5Demrw2qWHHxwVQHfXDAYMB8CcF9zNavHHmbr+Yf8F5uJ+r
-         YXGhbU12uPNu0Vaza77sEmm017tIFWGL9WQmpgKAofZH2NTte9tXEYWpYhUITPgvlOMh
-         hWHQ==
-X-Gm-Message-State: AOAM533/wlVmgtZsHzK5Rn0R7rI7sq2kqWfyuNOW6VpFG8R3B/SYNVz4
-        qovXiG4V8yE7FgOAU9XAYC+KSQ==
-X-Google-Smtp-Source: ABdhPJwIkvqG1MyMUXgY2WtuJDubBjCrD5lZ9usKKsCWanfaWY6veeD8QGmqb1vDcZJoENug8S59rg==
-X-Received: by 2002:a63:2b05:0:b0:3c2:3ed1:5fa9 with SMTP id r5-20020a632b05000000b003c23ed15fa9mr14676453pgr.220.1652696359590;
-        Mon, 16 May 2022 03:19:19 -0700 (PDT)
-Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.240])
-        by smtp.gmail.com with ESMTPSA id x14-20020a170902820e00b0015e8d4eb1efsm2509699pln.57.2022.05.16.03.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 03:19:19 -0700 (PDT)
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        duanxiongchun@bytedance.com, songmuchun@bytedance.com,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH] blk-iocos: fix inuse clamp when iocg deactivate or free
-Date:   Mon, 16 May 2022 18:19:09 +0800
-Message-Id: <20220516101909.99768-1-zhouchengming@bytedance.com>
-X-Mailer: git-send-email 2.35.1
+        Mon, 16 May 2022 06:51:29 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C205FB498;
+        Mon, 16 May 2022 03:51:27 -0700 (PDT)
+Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.226])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4L1wvs6kvwz683mQ;
+        Mon, 16 May 2022 18:48:25 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2375.24; Mon, 16 May 2022 12:51:25 +0200
+Received: from [10.47.25.151] (10.47.25.151) by lhreml724-chm.china.huawei.com
+ (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 16 May
+ 2022 11:51:24 +0100
+Message-ID: <102a4b9b-e0b8-d46f-6444-2d5f70d8f046@huawei.com>
+Date:   Mon, 16 May 2022 11:51:23 +0100
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [bug report] IOMMU reports data translation fault for fio testing
+From:   John Garry <john.garry@huawei.com>
+To:     Bart Van Assche <bvanassche@acm.org>,
+        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
+CC:     "chenxiang66@hisilicon.com >> Xiang Chen" <chenxiang66@hisilicon.com>,
+        "liyihang (E)" <liyihang6@hisilicon.com>
+References: <2b7d091b-4caf-948f-b41a-29a7fcb9fc2a@huawei.com>
+ <f5739f11-f07c-3bfe-451a-6d7a24550e61@acm.org>
+ <0f274df2-e7e2-bfca-14b5-631fe78fc6da@huawei.com>
+In-Reply-To: <0f274df2-e7e2-bfca-14b5-631fe78fc6da@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.47.25.151]
+X-ClientProxiedBy: lhreml714-chm.china.huawei.com (10.201.108.65) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-For an active leaf node, its inuse shouldn't be zero or exceed
-its active, but it's not true when deactivate idle iocg or delete
-iocg in ioc_pd_free().
+On 14/05/2022 10:49, John Garry wrote:
+>>> It could be an issue with the SCSI hba driver.
+>>
+>> That seems likely to me.
+> 
 
-Although inuse of 1 is very small, it could cause noticeable hwi
-decrease in the long running server. So we'd better fix it.
+Actually it is a LLDD problem. Sometimes it takes 45 minutes to trigger, 
+though – not nice to bisect.
 
-And check iocg->child_active_sum is enough for inner iocg, remove
-the needless list_empty check by the way.
+This looks to be the problematic patch:
 
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-iocost.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+author John Garry <john.garry@huawei.com> 2022-02-10 18:43:24 +0800
+committer Martin K. Petersen <martin.petersen@oracle.com> 2022-02-11 
+17:02:50 -0500
+commit 26fc0ea74fcb9b76b41f5e9b89728cd1c01559cd (patch)
+scsi: libsas: Drop SAS_TASK_AT_INITIATOR
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 2570732b92d1..84374ebcc402 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1073,11 +1073,11 @@ static void __propagate_weights(struct ioc_gq *iocg, u32 active, u32 inuse,
- 	 * @active. An active internal node's inuse is solely determined by the
- 	 * inuse to active ratio of its children regardless of @inuse.
- 	 */
--	if (list_empty(&iocg->active_list) && iocg->child_active_sum) {
-+	if (iocg->child_active_sum) {
- 		inuse = DIV64_U64_ROUND_UP(active * iocg->child_inuse_sum,
- 					   iocg->child_active_sum);
- 	} else {
--		inuse = clamp_t(u32, inuse, 1, active);
-+		inuse = clamp_t(u32, inuse, 0, active);
- 	}
- 
- 	iocg->last_inuse = iocg->inuse;
--- 
-2.36.1
+If interested, this looks like the issue:
+
+void hisi_sas_task_deliver(struct hisi_hba *hisi_hba,
+break;
+}
+
+- spin_lock_irqsave(&task->task_state_lock, flags);
+- task->task_state_flags |= SAS_TASK_AT_INITIATOR;
+- spin_unlock_irqrestore(&task->task_state_lock, flags);
+-
+WRITE_ONCE(slot->ready, 1);
+
+Losing the spinlock loses the barrier semantics as well, so a memory 
+ordering issue.
+
+> Sure, that would be common wisdom. However the commit before anything 
+> related to driver was added for 5.18 is also bad. It could be 
+> pre-existing, but that starts to seem unlikely. Or it could still be an 
+> IOMMU issue - we already have a performance issue there.
+> 
+> This issue can take more than 15 minutes to occur, so is pretty painful 
+> to bisect...
 
