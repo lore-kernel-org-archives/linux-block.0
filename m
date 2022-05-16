@@ -2,83 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DE8C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 17:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B553BC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 17:39:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245546AbiEPRhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 13:37:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
+        id S242101AbiEPRjm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 13:39:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46772 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243262AbiEPRhN (ORCPT
+        with ESMTP id S232511AbiEPRjl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 13:37:13 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED4820D
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:37:11 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id a10so16712673ioe.9
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:37:11 -0700 (PDT)
+        Mon, 16 May 2022 13:39:41 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8127536B42
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:39:40 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id h85so16729172iof.12
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:39:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=YwuisP7uDoVDfdXBJmqd9YIRoCZ/b+H6kmPLu7NDx7o=;
-        b=v3hXidxNGYqAeo+c7zqaHOYF0box7qSqlGLxtatUMn6AKByIl1VWHUM69zV60ZTOs2
-         bSfCBwo+0Niu3CsybHlfev1BraoJSubByQxXjbcbACJVD7TQ7YTTnEAi99XCU2V26WMW
-         YuxCxNb8E86RXzGh3qWjAZ6gXLA2cxnuAAwbNHbaz5xsozTxdjmSINHD2f3iNIfayDGO
-         crOM/KCpytP6ij9c52sVNQ0XxcI9ft+ESz3tMB7ucHiYEhxcV0hkWkznnjqWtwqDPxqP
-         d3L0g6P4KsA5lxW4oek8XSkQvDijHB2cdkGgsFQslr71Anvj4kktfrDF441taFisy0yz
-         8BxQ==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=mh56sie1dPkPYUnwa6mvPMhYEaqSra4iS7JfXXMW55U=;
+        b=qAJHetIbc57mNL80Bx30Z2qPkvcxnQSos1cYB90vvXD8rMCvUcp7tK+Ih0E+Uiaps6
+         88iqtYzkzieHEKtlccMzu4XSr9aYh7Uc6X5fsNQvNZkoSSOtgEV0ItopxSe051SaPc8q
+         utRyEINUgmS+GuC13Y0MWbXuUmUvv1g5GXftp0KAq+Bfvasck0TqP2+S2BRzI0KoX6pX
+         Wwu88Nd/qrf9opIcav2IF2irJNp0+VDMN7wxGOoSy6A0+oAfSdXhLavHnf1IuP30OqnM
+         ixsRa4y/YWE1SG8ReCh/DbVE+G2Aj6sHoj9DJWtaNvxEjj1GkQhPll2ZShQhxqgCIaI+
+         +x5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=YwuisP7uDoVDfdXBJmqd9YIRoCZ/b+H6kmPLu7NDx7o=;
-        b=va67J+iSDebdjtWaDc0xtxKZmfG6Z/e0lOEiOAEGQ01FqBhS/ZCrDzpzKRyTP7+33t
-         DI+KZ1RBxd8JCcxcMHHKCLYWEBkJi/5gqlR1CUoUBgsJNovyLp31b2ApxOz3IbjthuWl
-         9h/FuAk+fOnfjd6pH3rEK21tIe5HYoZKKexNA6HxEstv7qgx3hQKxJFFYsnwimP2J4cT
-         fnj2NfrTIvk5KHHntl1+b9P+umCq+vj4YJBU0e3keNJ9VLQjmyKst7V7BWUxjH0w5HPH
-         /6YLX1Rcj7F7SSpbtx742wL8zHTE5fuXNKYx0+RW55r+OmdUE7fVWg+26cJyvrt7qx4V
-         QSmQ==
-X-Gm-Message-State: AOAM531h+sMRuLTe47QEpPmTj4xExcXcGi4jMVGMa4RXFjk1o1mhuLSz
-        49NlRymT/9eLCOGTQQ44MX5njQ==
-X-Google-Smtp-Source: ABdhPJwT/3nonpz1WJw0lbRiEjMo1gw1L6LCJetWMq6L414QjHZUkay1am15FXkVXTr1Gb+dYQTG3g==
-X-Received: by 2002:a02:6a19:0:b0:32d:df4d:9da with SMTP id l25-20020a026a19000000b0032ddf4d09damr9300423jac.149.1652722630482;
-        Mon, 16 May 2022 10:37:10 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id k23-20020a026617000000b0032b5e78bfcbsm2951441jac.135.2022.05.16.10.37.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 May 2022 10:37:09 -0700 (PDT)
-Message-ID: <c9c389a0-650f-aea4-fe87-c5ebccc7129c@kernel.dk>
-Date:   Mon, 16 May 2022 11:37:08 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH] block: cleanup the VM accounting in submit_bio
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Cc:     linux-block@vger.kernel.org
-References: <20220516063654.2782792-1-hch@lst.de>
- <43ae0d52-9ed7-757c-4a01-4b4ca71a00ba@opensource.wdc.com>
- <20220516141141.GA11736@lst.de>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=mh56sie1dPkPYUnwa6mvPMhYEaqSra4iS7JfXXMW55U=;
+        b=xvAT2lg6JDVYIKjSklIY0CJRWYrYhK2ihp25G1XRSEjpjPVK+5G5wo3fwnJVuAC9u8
+         K3fhHKG1vPnhf1AbMrv/oCh7TGS/bSRdyq0qEYvjbjW8dmV334hX9/i3IKaIF3+TQG+M
+         IzkMnMC+zB9FbjidjrLnmhkVic+i0N27jcG+PTkMcLpiFfTTITBPIAC6q0hf6gtZhjyW
+         WWiFWkAQnnhfJffSWz732v7a26dJqKty9NkPI7EVF9AgmYVzUs9p6BfnS09exFICCoJy
+         0NZp/NY5n4n+iL21yyBhJqwef+bL2rdfYNzTG/LQmca/jT9n8hrvIJLZ7/MrIZkxyLRB
+         g7wQ==
+X-Gm-Message-State: AOAM533rrcoMkarunxkYNO202JzW9DXiK/1o+vRi9FWWnzgLcw4DUD2f
+        lv33K/L8JRKynDqUw9vrhm9kGW1wirbnLA==
+X-Google-Smtp-Source: ABdhPJwOSAmiOY0EvbJnF1yn1IJ4NBeO1tm5aNU1l6890ES/z1ezm2dDKuRp3U6XlZ2eqcTsaci5yw==
+X-Received: by 2002:a05:6602:1501:b0:65a:c412:2eeb with SMTP id g1-20020a056602150100b0065ac4122eebmr8148723iow.29.1652722779743;
+        Mon, 16 May 2022 10:39:39 -0700 (PDT)
+Received: from [127.0.1.1] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id c11-20020a02c9cb000000b0032b75b98013sm2953165jap.148.2022.05.16.10.39.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 10:39:39 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220516141141.GA11736@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     yukuai3@huawei.com, jack@suse.cz, paolo.valente@linaro.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        yi.zhang@huawei.com
+In-Reply-To: <20220513023507.2625717-1-yukuai3@huawei.com>
+References: <20220513023507.2625717-1-yukuai3@huawei.com>
+Subject: Re: [PATCH -next v2 0/2] block, bfq: make bfq_has_work() more accurate
+Message-Id: <165272277894.181860.12420245970045700212.b4-ty@kernel.dk>
+Date:   Mon, 16 May 2022 11:39:38 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/22 8:11 AM, Christoph Hellwig wrote:
-> On Mon, May 16, 2022 at 03:45:08PM +0200, Damien Le Moal wrote:
->> I know it is the same value, but for consistency, wouldn't it be better to use
->> REQ_OP_WRITE here ?
+On Fri, 13 May 2022 10:35:05 +0800, Yu Kuai wrote:
+> Changes in v2:
+>  - add reviewed-by tag for patch 1
+>  - use WRITE_ONCE() for updating of 'bfqd->queued' in patch 2
 > 
-> Yes, it absolutely would.  The use of WRITE wasn't even initentional.
+> This patchset try to make bfq_has_work() more accurate, patch 1 is a
+> small problem found by code review.
+> 
+> [...]
 
-I'll fix it up.
+Applied, thanks!
 
+[1/2] block, bfq: protect 'bfqd->queued' by 'bfqd->lock'
+      commit: 181490d5321806e537dc5386db5ea640b826bf78
+[2/2] block, bfq: make bfq_has_work() more accurate
+      commit: ddc25c86b466d2359b57bc7798f167baa1735a44
+
+Best regards,
 -- 
 Jens Axboe
+
 
