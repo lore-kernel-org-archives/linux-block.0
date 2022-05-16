@@ -2,80 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAE7AC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 17:41:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90203C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 18:37:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344407AbiEPRlO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 13:41:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48332 "EHLO
+        id S1344880AbiEPShM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 14:37:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230270AbiEPRkz (ORCPT
+        with ESMTP id S1343802AbiEPShM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 13:40:55 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 121B43701D
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:40:54 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id e194so16714209iof.11
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:40:54 -0700 (PDT)
+        Mon, 16 May 2022 14:37:12 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E033E5D4;
+        Mon, 16 May 2022 11:37:11 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id nk9-20020a17090b194900b001df2fcdc165so182899pjb.0;
+        Mon, 16 May 2022 11:37:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=bkBYbqFw8Uqt2LrlL3b8A2k4CheYeXwKOqf0DAmC3h4=;
-        b=n1mNAB+0PSwsAxiakcc+rlhe/EZVDgezWHiyER1cVuh4UPi8Ymz2Syc3w6wYTymETD
-         pr2G+uID5qk/YWsWl0tUYPtYQBsBW9gAfcctEIWpNzFxIm/5/SoH/ZugZXxd8dr/9Se4
-         DwAg20e8QGCXPzZ0AaTnlCL1hCBAjwXIyhURn+858wfM4tfuL+JPpem6qUf0vDQbC5dl
-         Fs4gXpfr0ZH7NCdNV6gDoN2V3k/rejOnfR08RACy0bUvkXOXWwFdyuW1EQIq3kHJxXNv
-         OHeH/C6qrx0Okx7gnHjXHm28c6ZlvLzHWsmSyKs9c5g5n9fH85Wz/H147j7CK8XXZD1T
-         Ujxg==
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ucmDp5IzFuPRpFg8Mq5P7wooU1Npp+faC1DqXB9wtjE=;
+        b=i5Yf/L0Z+vNQ7EdbispPOwLZNQIbBLcBjMrgWhq72LLHdSqB7/vDL24CrPd7yTBMPz
+         fD3KqlKztR7v2v2613awCLQadniOsTIDByTpLUSvCr91wQ86TdYXeTk+nszOFn3jYjIZ
+         4SF3D0P7KHJvWK8YhoV4fe4zu1lT/YmSZnxIGJ0NSMKv2543I1pdtjyFJ937LVeJECF1
+         I51Iqf0LANjmy62M6HuhHVOShLBREAbEOA6O5pKxODz8a91OW3ioSGCQbcFqazi1FiZc
+         YFc904cCMEZMNmrUKAVDM5e+5PmIBMhu7lBjBTrC0HwJwxPj3IpImKlYL5Izp2GwKEZ6
+         bLsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=bkBYbqFw8Uqt2LrlL3b8A2k4CheYeXwKOqf0DAmC3h4=;
-        b=NTdW8CUfPgoUNjYTQybFZB+EwgzDgLb3eIVbY09ff2Y4Nqq0pkwHpLRjfLHycIw4xC
-         KuxzZjf7tIGaMiVTJ/S9EcUGb9ANVikdMBo1VqdpYyXUz6EZdUDnbzIo1OyRE83Q7K+L
-         G98Zz8iqTmvqIWD0o/6qRXLrC9ka6fdzflNS6EZc+EDEtZxZNHG0wLS13qhgRIaLSfoa
-         1WawdcQVv+2goQpcsKwdED+xWqayJwBVcugOTh6H7vpKjlwR3RqvFpVtCod/6Nq8F4GV
-         AqkXak2tLLjNNiX/Gvah3L3rb/B7htGgRmiZqMw21BdWtR1ZyqovGRc68bTZ6IRzPjVr
-         ZwAA==
-X-Gm-Message-State: AOAM5303EdZLSynyFKgBkk/Ku5ERuPHFEqGwYLjsKtMCK8isFG95mjAa
-        Vf+FDnS7sdc8NlgQEFZY9OhS0g==
-X-Google-Smtp-Source: ABdhPJwzFS9gS5AVmSDi/Y7kLQ3Xm6tjAaR656Vkq1IYvhBKxr5hb7ksEb4pvoQfzpinz9N7d7RqLQ==
-X-Received: by 2002:a05:6638:196:b0:32d:fde1:582d with SMTP id a22-20020a056638019600b0032dfde1582dmr8912456jaq.134.1652722853481;
-        Mon, 16 May 2022 10:40:53 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id n11-20020a02714b000000b0032e16c566adsm1757970jaf.109.2022.05.16.10.40.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 May 2022 10:40:52 -0700 (PDT)
-Message-ID: <83042952-30e9-849a-be31-c31e951e8d70@kernel.dk>
-Date:   Mon, 16 May 2022 11:40:51 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=ucmDp5IzFuPRpFg8Mq5P7wooU1Npp+faC1DqXB9wtjE=;
+        b=l7Eh1N/aVCcTXUWegSRSr9wvvhv1pwAYA+aCJ3WUgFYEb7Xkjta46DN8U7T/vk8iCs
+         f2bokiUiMyGzw5Pi8QhZv/F4ljNvHTKBkR5mvb6jPEk50f84EE5+4k/a9ySqCoMMqCk3
+         lfk+iAnrz+phXeeGP4aqNw5IeY05CWZjQhYLAKr1TnStDJNhaRIk4W4PPHa0+qKoUj/x
+         Msi06wga8Az39TodVR6OMKnVC6YGLxaZ2VkBsEjeThQd63Vi9VI+dyNJlBVx6x5qY5Ie
+         GDntbCD4b6iB7d/kOC/kWlRqowd9nVA8mtB6a1ak3vIcZKxGSRW1jh+WghnQIQgRF24Q
+         uVNw==
+X-Gm-Message-State: AOAM531QxYJysuF80xzrGHzAPdqjV8ax9cjqVSjZ2rNxGin5AjSKKmE0
+        OkxGI3ie1ANo/PoKdiEVPWqaz5Pn+0I=
+X-Google-Smtp-Source: ABdhPJyB3pQVPbA6/qaOrkePJzCcnpi3O4B1/naaPRe5FI8Nd7Y4LRR1ixKXS+FnQFw4HiGqhWqo7A==
+X-Received: by 2002:a17:903:241:b0:15c:ee52:cbf2 with SMTP id j1-20020a170903024100b0015cee52cbf2mr18809518plh.10.1652726230437;
+        Mon, 16 May 2022 11:37:10 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:62fc])
+        by smtp.gmail.com with ESMTPSA id q5-20020a17090311c500b0015e8d4eb271sm7508595plh.187.2022.05.16.11.37.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 11:37:09 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 16 May 2022 08:37:08 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, duanxiongchun@bytedance.com,
+        songmuchun@bytedance.com
 Subject: Re: [PATCH] blk-iocos: fix inuse clamp when iocg deactivate or free
-Content-Language: en-US
-To:     Chengming Zhou <zhouchengming@bytedance.com>, tj@kernel.org
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        duanxiongchun@bytedance.com, songmuchun@bytedance.com
+Message-ID: <YoKZ1BnPjqYIUW1k@slm.duckdns.org>
 References: <20220516101909.99768-1-zhouchengming@bytedance.com>
- <bbd8744f-d938-c4a5-cb02-145c9875ea53@bytedance.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <bbd8744f-d938-c4a5-cb02-145c9875ea53@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516101909.99768-1-zhouchengming@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/16/22 6:18 AM, Chengming Zhou wrote:
-> Then this effect is very small, unlikely to have an impact in
-> practice. Should I modify the commit message to send v2 or just drop
-> it?
+On Mon, May 16, 2022 at 06:19:09PM +0800, Chengming Zhou wrote:
+> For an active leaf node, its inuse shouldn't be zero or exceed
+> its active, but it's not true when deactivate idle iocg or delete
+> iocg in ioc_pd_free().
+> 
+> Although inuse of 1 is very small, it could cause noticeable hwi
+> decrease in the long running server. So we'd better fix it.
+> 
+> And check iocg->child_active_sum is enough for inner iocg, remove
+> the needless list_empty check by the way.
 
-Send a v2 please.
+Hey, so, I'm not a fan of these "I read code a bit and thought this could be
+changed here and there" patches. There's no theme, overarching direction, or
+comprehensive view of the structure. The suggested changes can often be
+really subtle, which is likely why it may not seem immediately intuitive on
+the first look and triggered the submitter to write up the patch. There's no
+practical gain from these changes while there's substantical risk of subtle
+breakages.
+
+Here, setting inuse to 1 would cause divide by one in the donation logic and
+there are comments about the in the code too. So, nack on the patch, and
+plase reconsider your approach to sending patches. The current approach
+costs more than helps.
+
+Thanks.
 
 -- 
-Jens Axboe
-
+tejun
