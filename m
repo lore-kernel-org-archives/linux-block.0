@@ -2,154 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA085C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 16:55:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10DE8C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 17:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237183AbiEPQzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 12:55:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        id S245546AbiEPRhN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 13:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43278 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343988AbiEPQy4 (ORCPT
+        with ESMTP id S243262AbiEPRhN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 12:54:56 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68BA3C73C
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 09:54:39 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220516165438euoutp02733454bb0518e2a512916824d0dbd19e~vpCewOkP12044920449euoutp02U
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 16:54:38 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220516165438euoutp02733454bb0518e2a512916824d0dbd19e~vpCewOkP12044920449euoutp02U
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1652720078;
-        bh=6O6R+aWzFD0tH6pBlgRqy5ygmaD7SLpLHM9qftmpwuQ=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Fh6lUpOxEz1L5R0lDXKJogWDFAtYMYr19gWlbSAHU966Zw8+vMGblv2wuPQAu7a5U
-         RPyQtPr0FqsXu3HlSnG97HoIFCkN3dhmm2J3ok64Z/gmmFkIebT+VLWVGYrIW4wgRg
-         wCETrHorIbHw+GZ7QiTP96Jl1l5jjipFf9NzVwYk=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220516165437eucas1p15eb77c4c9a68927fe7695a2e5830dcb7~vpCdkUKeT1545715457eucas1p1f;
-        Mon, 16 May 2022 16:54:37 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 66.E6.10260.DC182826; Mon, 16
-        May 2022 17:54:37 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220516165436eucas1p178d079302dae3a9fca696b13b0390deb~vpCdOIri62560525605eucas1p1b;
-        Mon, 16 May 2022 16:54:36 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220516165436eusmtrp28837a89a06654af7c04d36f8d5949f97~vpCdNanu61030710307eusmtrp26;
-        Mon, 16 May 2022 16:54:36 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-5f-628281cdd3f8
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 23.10.09404.CC182826; Mon, 16
-        May 2022 17:54:36 +0100 (BST)
-Received: from localhost (unknown [106.210.248.7]) by eusmtip2.samsung.com
-        (KnoxPortal) with ESMTPA id
-        20220516165436eusmtip27c52763e39356a08b7d9cbb75f4140dd~vpCc05sQp3184631846eusmtip2E;
-        Mon, 16 May 2022 16:54:36 +0000 (GMT)
-From:   Pankaj Raghav <p.raghav@samsung.com>
-To:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, dsterba@suse.com, hch@lst.de
-Cc:     linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, jiangbo.365@bytedance.com,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        p.raghav@samsung.com, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com, Luis Chamberlain <mcgrof@kernel.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: [PATCH v4 13/13] dm-zoned: ensure only power of 2 zone sizes are
- allowed
-Date:   Mon, 16 May 2022 18:54:16 +0200
-Message-Id: <20220516165416.171196-14-p.raghav@samsung.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220516165416.171196-1-p.raghav@samsung.com>
+        Mon, 16 May 2022 13:37:13 -0400
+Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED4820D
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:37:11 -0700 (PDT)
+Received: by mail-io1-xd33.google.com with SMTP id a10so16712673ioe.9
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 10:37:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=YwuisP7uDoVDfdXBJmqd9YIRoCZ/b+H6kmPLu7NDx7o=;
+        b=v3hXidxNGYqAeo+c7zqaHOYF0box7qSqlGLxtatUMn6AKByIl1VWHUM69zV60ZTOs2
+         bSfCBwo+0Niu3CsybHlfev1BraoJSubByQxXjbcbACJVD7TQ7YTTnEAi99XCU2V26WMW
+         YuxCxNb8E86RXzGh3qWjAZ6gXLA2cxnuAAwbNHbaz5xsozTxdjmSINHD2f3iNIfayDGO
+         crOM/KCpytP6ij9c52sVNQ0XxcI9ft+ESz3tMB7ucHiYEhxcV0hkWkznnjqWtwqDPxqP
+         d3L0g6P4KsA5lxW4oek8XSkQvDijHB2cdkGgsFQslr71Anvj4kktfrDF441taFisy0yz
+         8BxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=YwuisP7uDoVDfdXBJmqd9YIRoCZ/b+H6kmPLu7NDx7o=;
+        b=va67J+iSDebdjtWaDc0xtxKZmfG6Z/e0lOEiOAEGQ01FqBhS/ZCrDzpzKRyTP7+33t
+         DI+KZ1RBxd8JCcxcMHHKCLYWEBkJi/5gqlR1CUoUBgsJNovyLp31b2ApxOz3IbjthuWl
+         9h/FuAk+fOnfjd6pH3rEK21tIe5HYoZKKexNA6HxEstv7qgx3hQKxJFFYsnwimP2J4cT
+         fnj2NfrTIvk5KHHntl1+b9P+umCq+vj4YJBU0e3keNJ9VLQjmyKst7V7BWUxjH0w5HPH
+         /6YLX1Rcj7F7SSpbtx742wL8zHTE5fuXNKYx0+RW55r+OmdUE7fVWg+26cJyvrt7qx4V
+         QSmQ==
+X-Gm-Message-State: AOAM531h+sMRuLTe47QEpPmTj4xExcXcGi4jMVGMa4RXFjk1o1mhuLSz
+        49NlRymT/9eLCOGTQQ44MX5njQ==
+X-Google-Smtp-Source: ABdhPJwT/3nonpz1WJw0lbRiEjMo1gw1L6LCJetWMq6L414QjHZUkay1am15FXkVXTr1Gb+dYQTG3g==
+X-Received: by 2002:a02:6a19:0:b0:32d:df4d:9da with SMTP id l25-20020a026a19000000b0032ddf4d09damr9300423jac.149.1652722630482;
+        Mon, 16 May 2022 10:37:10 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id k23-20020a026617000000b0032b5e78bfcbsm2951441jac.135.2022.05.16.10.37.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 May 2022 10:37:09 -0700 (PDT)
+Message-ID: <c9c389a0-650f-aea4-fe87-c5ebccc7129c@kernel.dk>
+Date:   Mon, 16 May 2022 11:37:08 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrNKsWRmVeSWpSXmKPExsWy7djP87pnG5uSDLb9FbJYfbefzeL32fPM
-        FnvfzWa1uPCjkcni5oGdTBZ7Fk1isli5+iiTRc+BDywWe29pW1x6vILdYs/ekywWl3fNYbOY
-        v+wpu8WNCU8ZLT4vbWG3WHPzKYuDgMe/E2vYPHbOusvucflsqcemVZ1sHpuX1HvsvtkAFG69
-        z+rxft9VNo++LasYPdZvucrisfl0tcfnTXIBPFFcNimpOZllqUX6dglcGT277jEVzOCquHX2
-        AGsD4yqOLkZODgkBE4npK7YydzFycQgJrGCUOPphLRuE84VR4tflmUwQzmdGiVNPTrDAtOyZ
-        fBkqsZxRonXqK3YI5zmjRMOWaYxdjBwcbAJaEo2d7CANIgJZEtNOPGQEqWEWOMwk8fzofFaQ
-        hLBAsMSqZ7fYQGwWAVWJztfPwOK8AtYSr1a8ZoXYJi8x89J3dpCZnEDx1V3cECWCEidnPgE7
-        iBmopHnrbLAfJASWc0q0Hj4KVi8h4CLRedYHYoywxKvjW9ghbBmJ/zvnM0HY1RJPb/yG6m1h
-        lOjfuZ4Notdaou9MDojJLKApsX6XPkS5o8TWLytZISr4JG68FYS4gE9i0rbpzBBhXomONiGI
-        aiWJnT+fQC2VkLjcNAcagh4S99d/YJ/AqDgLyS+zkPwyC2HvAkbmVYziqaXFuempxcZ5qeV6
-        xYm5xaV56XrJ+bmbGIHp7/S/4193MK549VHvECMTB+MhRgkOZiURXoOKhiQh3pTEyqrUovz4
-        otKc1OJDjNIcLErivMmZGxKFBNITS1KzU1MLUotgskwcnFINTEE/cltaBJZybQq4ve86NzeT
-        VsGkKjd2sZ22K8P8759Y+qz3xz4bkY9dmtyd4jGs2+5rhDmlVKxL3z9T3b3OfbVggsbU5QcY
-        3/+56/HP6Ed60qln1ZMVV1f8j55/UehI/AW93O4jSeznVgdVvHuR9vr0QjdJhQ1Gh1/eZV3e
-        8E7s64SSitWaLjx3VrimPebbt+7VvoWpp9PWRO7rnXObS7B1MdOKRoPTPCa2h5qvRxyM2MM9
-        P25955LzhvxfXGWc7A6t0z39MnL+vtPLk7OzzyptnCIe+kuwX07RTXePS/r0h3P5K3eYq8kx
-        7xbgOCRn/shmDu995+d7L2S+zQrI0/X2Wc7v2LRoObPOsbfTK5VYijMSDbWYi4oTAX69IDHu
-        AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrFIsWRmVeSWpSXmKPExsVy+t/xe7pnGpuSDO5tN7ZYfbefzeL32fPM
-        FnvfzWa1uPCjkcni5oGdTBZ7Fk1isli5+iiTRc+BDywWe29pW1x6vILdYs/ekywWl3fNYbOY
-        v+wpu8WNCU8ZLT4vbWG3WHPzKYuDgMe/E2vYPHbOusvucflsqcemVZ1sHpuX1HvsvtkAFG69
-        z+rxft9VNo++LasYPdZvucrisfl0tcfnTXIBPFF6NkX5pSWpChn5xSW2StGGFkZ6hpYWekYm
-        lnqGxuaxVkamSvp2NimpOZllqUX6dgl6GT277jEVzOCquHX2AGsD4yqOLkZODgkBE4k9ky8z
-        dTFycQgJLGWUOLjjKQtEQkLi9sImRghbWOLPtS42iKKnjBInJxwHSnBwsAloSTR2soPUiAgU
-        SMzp3wLWyyxwnkli/3p3EFtYIFBi0rZmJhCbRUBVovP1M1YQm1fAWuLVitesEPPlJWZe+s4O
-        MpITKL66ixskLCRgJfH1yS12iHJBiZMzn0CNl5do3jqbeQKjwCwkqVlIUgsYmVYxiqSWFuem
-        5xYb6RUn5haX5qXrJefnbmIERuq2Yz+37GBc+eqj3iFGJg7GQ4wSHMxKIrwGFQ1JQrwpiZVV
-        qUX58UWlOanFhxhNgc6eyCwlmpwPTBV5JfGGZgamhiZmlgamlmbGSuK8ngUdiUIC6Yklqdmp
-        qQWpRTB9TBycUg1Mk6fvdjfa5ON/83dYHLet8aHDRgZJm/7YMf6cwtBzuV9CcP2hI984F6z/
-        seXGjM/F12TvZ65qnTA74+361NWKzd1vUmt975ZEH01/uWZJ6bX7DEdaLcJcd29JOizBtSrp
-        /ZxYBjkRM9OMFQYs7780Rlw1CcpKK14we0//w40XXTsfr6lyDPmRmXv+6+q8JsuPd7iq890/
-        NKztO32j2k/8xM/V/+43BTOsWGIi95gla1/szVtnXB6FxSsd47z/WPRCpMyzahaujsfW23oZ
-        FLZ0GJYLeLIIOs7s2Z5f0ST/oPfmzT8XwhN95j1bnOKeecU2YY39l+OzpF49miMRb77ok5qX
-        ycEXx+bd+KtxtLG5XYmlOCPRUIu5qDgRAFdHucBdAwAA
-X-CMS-MailID: 20220516165436eucas1p178d079302dae3a9fca696b13b0390deb
-X-Msg-Generator: CA
-Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220516165436eucas1p178d079302dae3a9fca696b13b0390deb
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220516165436eucas1p178d079302dae3a9fca696b13b0390deb
-References: <20220516165416.171196-1-p.raghav@samsung.com>
-        <CGME20220516165436eucas1p178d079302dae3a9fca696b13b0390deb@eucas1p1.samsung.com>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH] block: cleanup the VM accounting in submit_bio
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     linux-block@vger.kernel.org
+References: <20220516063654.2782792-1-hch@lst.de>
+ <43ae0d52-9ed7-757c-4a01-4b4ca71a00ba@opensource.wdc.com>
+ <20220516141141.GA11736@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220516141141.GA11736@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Luis Chamberlain <mcgrof@kernel.org>
+On 5/16/22 8:11 AM, Christoph Hellwig wrote:
+> On Mon, May 16, 2022 at 03:45:08PM +0200, Damien Le Moal wrote:
+>> I know it is the same value, but for consistency, wouldn't it be better to use
+>> REQ_OP_WRITE here ?
+> 
+> Yes, it absolutely would.  The use of WRITE wasn't even initentional.
 
-Today dm-zoned relies on the assumption that you have a zone size
-with a power of 2. Even though the block layer today enforces this
-requirement, these devices do exist and so provide a stop-gap measure
-to ensure these devices cannot be used by mistake
+I'll fix it up.
 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
-Signed-off-by: Luis Chamberlain <mcgrof@kernel.org>
-Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
----
- drivers/md/dm-zone.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
-
-diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
-index 3e7b1fe15..f0c588c02 100644
---- a/drivers/md/dm-zone.c
-+++ b/drivers/md/dm-zone.c
-@@ -231,6 +231,18 @@ static int dm_revalidate_zones(struct mapped_device *md, struct dm_table *t)
- 	struct request_queue *q = md->queue;
- 	unsigned int noio_flag;
- 	int ret;
-+	struct block_device *bdev = md->disk->part0;
-+	sector_t zone_sectors;
-+	char bname[BDEVNAME_SIZE];
-+
-+	zone_sectors = bdev_zone_sectors(bdev);
-+
-+	if (!is_power_of_2(zone_sectors)) {
-+		DMWARN("%s: %s only power of two zone size supported",
-+		       dm_device_name(md),
-+		       bdevname(bdev, bname));
-+		return -EINVAL;
-+	}
- 
- 	/*
- 	 * Check if something changed. If yes, cleanup the current resources
 -- 
-2.25.1
+Jens Axboe
 
