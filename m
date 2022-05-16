@@ -2,92 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 491F7C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 00:32:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B69B1C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 01:08:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236611AbiEPAcE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 15 May 2022 20:32:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34376 "EHLO
+        id S236672AbiEPBIP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 15 May 2022 21:08:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49200 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229508AbiEPAcD (ORCPT
+        with ESMTP id S231768AbiEPBIO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 15 May 2022 20:32:03 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA069B1E9
-        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 17:32:01 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id o13-20020a17090a9f8d00b001df3fc52ea7so1922848pjp.3
-        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 17:32:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=oABzOL0ZZUROajzpGcdQcCRjEutzvvQvaz7gOGjVZmU=;
-        b=M1Hf+mAYP99z7QHAsv0TSsXIHPcwz/vgbK5W/eNohsehDsGpVeHj6BFqLBKR+3B4PW
-         /QEOgmQAOfG8vj+BTHbfFAliiS/x0gGbdqnOg1HQs2pJlt8tPRNypajlRVp/z5YPTFib
-         A/0COj0WO85m/vAMtx4mGoWw6JZJKvOnvQPvQwmgFCjA6DiPDV+6BIbZ/82hZqHiosie
-         3/AqSb1DDs/EmKyLnqhIR1YKy1WcN7/QCVaHGav4K3SqVBNQ2iBwxKSMYzUHFET5eSot
-         DgYSs2vN0fp0mIiWgDSZiiEpheysny2v5hxDVi7X++CIa86vTNR5S2c+X1IiPvD5WQwN
-         3SFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=oABzOL0ZZUROajzpGcdQcCRjEutzvvQvaz7gOGjVZmU=;
-        b=e+s2sElgJx62J7il32otwEwW7dWL1/FxIEY1jUHZjX2cCLXWCYEwz2j95yXsBqY+D0
-         +dGjfWz92CWu0A9tH4OObbDvWIaIPC6se6QrAx/VEspwAndaxinQ+t77sPyKgwUE3LNf
-         OJoXXq25tu3AWPE1z1SfoaiAw7Ns+8vr3//MsBozq8X5tlt8V18Gd/m3JTkv7huzy0tD
-         z1GN5X1gj4Sg6oU9f1p6mXNgK4pl/LcxV7h0t4s6IQl9BKnP/GFNM18Bu5/EPpkHdWZY
-         TiKFaaHZZD75QS6zTKu8Ha0oT/25HIqskX/iOAUvlOPfXd/H4r4t37EdJBvLLkPHRn2z
-         lmvQ==
-X-Gm-Message-State: AOAM532i7HVNukZ61FUfUMvot5hibvee/YokYy8nFJ2z1TGDkKe8nIlj
-        fuRUMqdHzUyIzFGbWzS3v0hWLly0mjrKbg==
-X-Google-Smtp-Source: ABdhPJxROl6kOCTqfjdadqG8usmR5ExAOaY+8pHFfGP04vHAC5NrXLXVXFPwLnv1P99ihZvDtOOeYQ==
-X-Received: by 2002:a17:90a:a096:b0:1df:58d7:5b20 with SMTP id r22-20020a17090aa09600b001df58d75b20mr2085451pjp.212.1652661121413;
-        Sun, 15 May 2022 17:32:01 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id g4-20020a170902868400b0016160b3331bsm2176893plo.305.2022.05.15.17.32.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 May 2022 17:32:00 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     phil@philpotter.co.uk
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220515205833.944139-1-phil@philpotter.co.uk>
-References: <20220515205833.944139-1-phil@philpotter.co.uk>
-Subject: Re: [PATCH 0/5] cdrom: patches for 5.19 merge window
-Message-Id: <165266112040.697362.10355647770292207089.b4-ty@kernel.dk>
-Date:   Sun, 15 May 2022 18:32:00 -0600
+        Sun, 15 May 2022 21:08:14 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADC1BE030
+        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 18:08:12 -0700 (PDT)
+Received: from kwepemi100013.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L1h1j00ytzhZ99;
+        Mon, 16 May 2022 09:07:36 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100013.china.huawei.com (7.221.188.136) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 16 May 2022 09:08:10 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 16 May 2022 09:08:09 +0800
+Subject: Re: [Libguestfs] Communication issues between NBD driver and NBDKit
+ server
+To:     "Richard W.M. Jones" <rjones@redhat.com>, <libguestfs@redhat.com>,
+        <linux-block@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>
+References: <04a0a06b-e6dc-48b7-bc29-105dab888a56@www.fastmail.com>
+ <20220515180525.GF8021@redhat.com> <87czgelidg.fsf@vostro.rath.org>
+ <20220515192505.GJ1127@redhat.com>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <1f37a75a-83b5-af8e-0dd3-6475652ab218@huawei.com>
+Date:   Mon, 16 May 2022 09:08:08 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220515192505.GJ1127@redhat.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 15 May 2022 21:58:28 +0100, Phillip Potter wrote:
-> Please apply the patches from this series, including my own patch to
-> remove the 'To Do' entry from drivers/cdrom/cdrom.c.
+On 2022/05/16 3:25, Richard W.M. Jones wrote:
+> On Sun, May 15, 2022 at 08:12:59PM +0100, Nikolaus Rath wrote:
+>> Do you see any way for this to happen?
 > 
-> As previously discussed, Paul's block patch is included in this series
-> too, and I've fixed it up to remove any parts that repeat changes
-> already made by others, so it merges cleanly with upstream now.
+> I think it's impossible.  A more likely explanation follows.
 > 
-> [...]
+> If you look at the kernel code, the NBD_CMD_INFLIGHT command flag is
+> cleared when a command times out:
+> 
+>    https://github.com/torvalds/linux/blob/0cdd776ec92c0fec768c7079331804d3e52d4b27/drivers/block/nbd.c#L407
+> 
+> That's the place where it would have printed the "Possible stuck
+> request" message.
+> 
+> Some time later, nbdkit actually replies to the message (for the first
+> and only time) and in that code the flag is checked and found to be
+> clear already, causing the "Suspicious reply" message to be printed:
+Hi,
 
-Applied, thanks!
+You are right, can you try the following patch?
 
-[1/5] cdrom: make EXPORT_SYMBOL follow exported function
-      commit: eeef7565e8ba1718e8e1f835f145125fa6cc8494
-[2/5] cdrom: remove the unused driver specific disc change ioctl
-      commit: 03fea699b050805ad6ee111f9db04f223f3e835e
-[3/5] cdrom: mark CDROMGETSPINDOWN/CDROMSETSPINDOWN obsolete
-      commit: 8fa10ee183c3a1ecb53e81c95895ed5bc2a5530a
-[4/5] block: remove last remaining traces of IDE documentation
-      commit: e24ccaaf7ec44e647dc56c1af2bc8d1ab67b4a11
-[5/5] cdrom: remove obsolete TODO list
-      commit: 2e10a1d693b9f1c8921bd797838cff0be7cdd537
+https://lists.debian.org/nbd/2022/04/msg00212.html
 
-Best regards,
--- 
-Jens Axboe
-
-
+Thanks,
+Kuai
+> 
+>    https://github.com/torvalds/linux/blob/0cdd776ec92c0fec768c7079331804d3e52d4b27/drivers/block/nbd.c#L749
+> 
+> I'd say you need to increase the timeout and/or work out why the S3
+> plugin is taking so long to respond.
+> 
+> Rich.
+> 
