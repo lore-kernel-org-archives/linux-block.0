@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C57DCC4167E
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 16:54:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 895C3C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 16:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343980AbiEPQym (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 12:54:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51280 "EHLO
+        id S1344008AbiEPQy6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 12:54:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244324AbiEPQyf (ORCPT
+        with ESMTP id S1343954AbiEPQyg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 12:54:35 -0400
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF6F27B33
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 09:54:31 -0700 (PDT)
+        Mon, 16 May 2022 12:54:36 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9553B381AA
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 09:54:35 -0700 (PDT)
 Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220516165430euoutp0281bb8490834b542ada4b254dcd070f78~vpCW6Y9WP2423524235euoutp02x
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 16:54:30 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220516165430euoutp0281bb8490834b542ada4b254dcd070f78~vpCW6Y9WP2423524235euoutp02x
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220516165434euoutp0128d2de687674df0fd83af9c108bcfdc4~vpCazns8V2240622406euoutp019
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 16:54:34 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220516165434euoutp0128d2de687674df0fd83af9c108bcfdc4~vpCazns8V2240622406euoutp019
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1652720070;
-        bh=v9pKtSXVKfv3MO12A+XlAy96VR3If9OGCSyPe0WYtqo=;
+        s=mail20170921; t=1652720074;
+        bh=5TXl26FaMqHEmVpoCDcYHu+PuV1m41LmMinlDGGQ4l4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AJyUg3Xx7d/T05JlQboNVpDnuD2C0HyQC4NZQ9nteyVg+/0/W8f3WysP3dg4guis/
-         rAFPDeaJu/pmznm1jOkRI/pVT2vITqtKA5ZG29QKrS3/gY4O/6i3ZSJZfBi9NTLKsx
-         e4eBs4VwWmxLp0AXVwvdEWsnGWOKahfp0o3eD7Fw=
+        b=amSXskJ08T0po78lLobDG/9GeM4Mjy4BvuB11ClYKzVzKKDHCPu4tLSPbcwgZHKkd
+         CCKvqp6EvOROkxy3gmSGlBqTN4nzMO9TM5uWbhEU1kRMkvN7rWWLQHFchW49jEvBW8
+         0fh3yBjpmaDL9qk5aycOQmr23bkW/cPHtmp7DsVU=
 Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220516165428eucas1p22c7c8955b8a9ceced9cab91a9c65ceaa~vpCViJXK00201202012eucas1p2M;
-        Mon, 16 May 2022 16:54:28 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 50.4A.09887.4C182826; Mon, 16
-        May 2022 17:54:28 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce~vpCVM0dkm0955109551eucas1p1q;
-        Mon, 16 May 2022 16:54:28 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220516165428eusmtrp2e56d4a6f4333117d0ef788ccef02efe7~vpCVMGoNz1030710307eusmtrp2v;
-        Mon, 16 May 2022 16:54:28 +0000 (GMT)
-X-AuditID: cbfec7f4-45bff7000000269f-3b-628281c4732b
+        20220516165432eucas1p28fa728357342aadebf5be26269ea5b40~vpCZc4W501887918879eucas1p2n;
+        Mon, 16 May 2022 16:54:32 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id A2.4A.09887.8C182826; Mon, 16
+        May 2022 17:54:32 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220516165432eucas1p2e1ea74d44738e44745f49e37b6b9e503~vpCYwJZGZ0200602006eucas1p2R;
+        Mon, 16 May 2022 16:54:32 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220516165432eusmtrp1057bb593a1a030e8e478dd59b33a54e3~vpCYvYe2E2961829618eusmtrp1Q;
+        Mon, 16 May 2022 16:54:32 +0000 (GMT)
+X-AuditID: cbfec7f4-45bff7000000269f-43-628281c8fad5
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms2.samsung.com (EUCPMTA) with SMTP id 2F.00.09404.4C182826; Mon, 16
-        May 2022 17:54:28 +0100 (BST)
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 02.99.09522.8C182826; Mon, 16
+        May 2022 17:54:32 +0100 (BST)
 Received: from localhost (unknown [106.210.248.7]) by eusmtip2.samsung.com
         (KnoxPortal) with ESMTPA id
-        20220516165427eusmtip26b6dcee5944cdacbd76773df89c38a05~vpCU2E_4h0611206112eusmtip24;
-        Mon, 16 May 2022 16:54:27 +0000 (GMT)
+        20220516165431eusmtip2bac363d67d5edcb5d23957c2ace71c86~vpCYcv3fi0272502725eusmtip2v;
+        Mon, 16 May 2022 16:54:31 +0000 (GMT)
 From:   Pankaj Raghav <p.raghav@samsung.com>
 To:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
         pankydev8@gmail.com, dsterba@suse.com, hch@lst.de
@@ -57,462 +57,115 @@ Cc:     linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, gost.dev@samsung.com,
         p.raghav@samsung.com, linux-kernel@vger.kernel.org,
         dm-devel@redhat.com, Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v4 07/13] btrfs: zoned: use generic btrfs zone helpers to
- support npo2 zoned devices
-Date:   Mon, 16 May 2022 18:54:10 +0200
-Message-Id: <20220516165416.171196-8-p.raghav@samsung.com>
+Subject: [PATCH v4 10/13] zonefs: allow non power of 2 zoned devices
+Date:   Mon, 16 May 2022 18:54:13 +0200
+Message-Id: <20220516165416.171196-11-p.raghav@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220516165416.171196-1-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrIKsWRmVeSWpSXmKPExsWy7djPc7pHGpuSDN50alqsvtvPZvH77Hlm
-        i73vZrNaXPjRyGRx88BOJouVq48yWfQc+MBisfeWtsWlxyvYLfbsPclicXnXHDaL+cueslvc
-        mPCU0eLz0hZ2izU3n7I48Hv8O7GGzWPnrLvsHpfPlnpsWtXJ5rF5Sb3H7psNQOHW+6we7/dd
-        ZfPo27KK0WP9lqssHp83yQVwR3HZpKTmZJalFunbJXBlTF/SyVxwtKLi88tv7A2MV5O7GDk5
-        JARMJD4d2sbUxcjFISSwglFi6blX7CAJIYEvjBKXvhdC2J8ZJS43ssI0HDv/gQ2iYTmjxL//
-        rSwQznNGid4Ts4EcDg42AS2Jxk6wQSICWRLTTjxkBKlhFljMJLFyz2QWkISwQJrEtOfTwGwW
-        AVWJtiNn2EBsXgEriUv/zrBDbJOXmHnpOzvITE4Ba4nVXdwQJYISJ2c+AWtlBipp3jqbGWS+
-        hMBsTolDUzuZIHpdJFZfOQ5lC0u8Or4FaqaMxP+d86Hi1RJPb/yGam5hlOjfuZ4NZJkE0LK+
-        MzkgJrOApsT6XfoQ5Y4SMx7vZYWo4JO48VYQ4gQ+iUnbpjNDhHklOtqEIKqVJHb+fAK1VELi
-        ctMcFgjbQ2JW632mCYyKs5A8MwvJM7MQ9i5gZF7FKJ5aWpybnlpslJdarlecmFtcmpeul5yf
-        u4kRmOpO/zv+ZQfj8lcf9Q4xMnEwHmKU4GBWEuE1qGhIEuJNSaysSi3Kjy8qzUktPsQozcGi
-        JM6bnLkhUUggPbEkNTs1tSC1CCbLxMEp1cAkn2+TEzDr6wL96UFpSaX/wpWEKw9dXed8fomy
-        T1Hz8zl8r5obeQr+i66ZJbvRV3NWiPF5Hktrrc3r2g5oVi5iefT57WcNg+rVb4I3lexViH2+
-        6uhxE1Gt8/3pL2pmf1Rfrj4jxV3pRO1cV54v5/r2tVsYyB9lOtk6pZnFb0LTxD/9PmZyxydP
-        lbo6IWZz7uIQbolPaWJREjF9EWaX7e2Ulq+5Hsb5Qrdu9rpw54m1isZOXN5HPqycoCz72UZw
-        UYUa6/wHud/d/+26szqi/9TpY2aty35vmfgn13Tm3P073Fvj5Es3Tt32dHvSd2b5c/0my5fb
-        lFks8LnTa+ZV/L3srkGhnrlv66UYhkKT1V1KLMUZiYZazEXFiQAczCbb5AMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEIsWRmVeSWpSXmKPExsVy+t/xe7pHGpuSDFr/CFisvtvPZvH77Hlm
-        i73vZrNaXPjRyGRx88BOJouVq48yWfQc+MBisfeWtsWlxyvYLfbsPclicXnXHDaL+cueslvc
-        mPCU0eLz0hZ2izU3n7I48Hv8O7GGzWPnrLvsHpfPlnpsWtXJ5rF5Sb3H7psNQOHW+6we7/dd
-        ZfPo27KK0WP9lqssHp83yQVwR+nZFOWXlqQqZOQXl9gqRRtaGOkZWlroGZlY6hkam8daGZkq
-        6dvZpKTmZJalFunbJehlTF/SyVxwtKLi88tv7A2MV5O7GDk5JARMJI6d/8DWxcjFISSwlFFi
-        x5rvbBAJCYnbC5sYIWxhiT/XuqCKnjJKdJ56zt7FyMHBJqAl0djJDlIjIlAgMad/CwtIDbPA
-        WiaJ1z/egzULC6RI7Ov7xwpiswioSrQdOQO2gFfASuLSvzPsEAvkJWZe+g42k1PAWmJ1FzdI
-        WAio5OuTW+wQ5YISJ2c+YQGxmYHKm7fOZp7AKDALSWoWktQCRqZVjCKppcW56bnFRnrFibnF
-        pXnpesn5uZsYgZG57djPLTsYV776qHeIkYmD8RCjBAezkgivQUVDkhBvSmJlVWpRfnxRaU5q
-        8SFGU6CzJzJLiSbnA1NDXkm8oZmBqaGJmaWBqaWZsZI4r2dBR6KQQHpiSWp2ampBahFMHxMH
-        p1QDUxzXzm+6D7RW+vB3LH1ey3b/h0wtzxf2PUZTBRL+MLbF2X++bPinapPR2nLWNYnZRrqd
-        U8pnMQuLzzpV4yl/cuHD3qlHjMwfvp+VLnLx3f3vh07GLXib9SKohO9DTKDlrtyYl2+3Bqsu
-        WrJCRD3tXP/E85EHUixUvz8XOHXfVTuHr0n1LP9a5ROLeyfJLtm0Lbe6ahd3e3zuTHWnGduf
-        LFbfb5e5YeEnXsegD/K6zYozdLJ2ml2Nb1NZ+uKHRqiTUEtvyxrzRetW/rk+y7BfrUTXjH+p
-        o+T67q4d8x4XhCyUMhRMVWX3i/C8wfuwW3HifIP9N1e9W1DStHe2oa6jwKf1gn+W7J/eqHfb
-        +93PNCWW4oxEQy3mouJEALkRar9VAwAA
-X-CMS-MailID: 20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrAKsWRmVeSWpSXmKPExsWy7djP87onGpuSDNY+MbZYfbefzeL32fPM
+        FnvfzWa1uPCjkcni5oGdTBYrVx9lsug58IHFYu8tbYtLj1ewW+zZe5LF4vKuOWwW85c9Zbe4
+        MeEpo8XnpS3sFmtuPmVx4Pf4d2INm8fOWXfZPS6fLfXYtKqTzWPzknqP3TcbgMKt91k93u+7
+        yubRt2UVo8f6LVdZPD5vkgvgjuKySUnNySxLLdK3S+DKOPvgCFPBdoGK6ZtOMDcwnuXtYuTk
+        kBAwkbg2/QhbFyMXh5DACkaJNVP72SGcL4wSHR9nQTmfGSV+TtzMDtPS/fcgE0RiOaPE5m3L
+        mEESQgLPGSV+vZToYuTgYBPQkmjsBKsXEciSmHbiISNIPbPAYiaJlXsms4AkhAVcJF5sPcsG
+        YrMIqEoc+riICaSXV8Ba4tl0O4hd8hIzL31nBwlzAoVXd3GDhHkFBCVOznwCNoUZqKR562xm
+        kPESAvM5Jeb8aWKG6HWR2HFvPyOELSzx6vgWqPtlJE5P7mGBsKslnt74DdXcwijRv3M9G8gy
+        CaBlfWdyQExmAU2J9bv0IcodJb6fvsUEUcEnceOtIMQJfBKTtk1nhgjzSnS0CUFUK0ns/PkE
+        aqmExOWmOSwQJR4SE78oTmBUnIXkl1lIfpmFsHYBI/MqRvHU0uLc9NRio7zUcr3ixNzi0rx0
+        veT83E2MwER3+t/xLzsYl7/6qHeIkYmD8RCjBAezkgivQUVDkhBvSmJlVWpRfnxRaU5q8SFG
+        aQ4WJXHe5MwNiUIC6YklqdmpqQWpRTBZJg5OqQYm78zlAn+e6wUbhnYXpJxsbGOen3uwIXjh
+        3NkHRRQnR3FW1S3YZ7VO4fIBsScOL6a/ahCcveJVp0HF9Efn/q2d5XL8P4t20ZtdWVfYTa9W
+        +on897i48uHuZU8v/Pgv6p6b1xcoqvOo+FeIa5vftN/q32UYZrPrmR4umrgwMoVL8ZOqwood
+        NRsChP/2dSoJOoWWnf3dlRb74rlp+OXmZ7vOqNftmHNoVw/zBafdSqvtP5z9nNg927CsgdUg
+        ZYuXNMeE6Px77zbonupobDP8N7H036c1b1b4Vzt3POP+ldk7haNI6spKn+v16358n6p2/OtV
+        xrSsPT5bfu5q2f/kQZKxvtVUo7ria5X6AatYz6ybocRSnJFoqMVcVJwIAGjJCBjjAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrIIsWRmVeSWpSXmKPExsVy+t/xe7onGpuSDM4dZrdYfbefzeL32fPM
+        FnvfzWa1uPCjkcni5oGdTBYrVx9lsug58IHFYu8tbYtLj1ewW+zZe5LF4vKuOWwW85c9Zbe4
+        MeEpo8XnpS3sFmtuPmVx4Pf4d2INm8fOWXfZPS6fLfXYtKqTzWPzknqP3TcbgMKt91k93u+7
+        yubRt2UVo8f6LVdZPD5vkgvgjtKzKcovLUlVyMgvLrFVija0MNIztLTQMzKx1DM0No+1MjJV
+        0rezSUnNySxLLdK3S9DLOPvgCFPBdoGK6ZtOMDcwnuXtYuTkkBAwkej+e5Cpi5GLQ0hgKaNE
+        46XfrBAJCYnbC5sYIWxhiT/Xutggip4ySjz++Ji5i5GDg01AS6Kxkx2kRkSgQGJO/xYWkBpm
+        gbVMEq9/vAdrFhZwkXix9SwbiM0ioCpx6OMiJpBeXgFriWfT7SDmy0vMvPSdHSTMCRRe3cUN
+        EhYSsJL4+uQW2HheAUGJkzOfsIDYzEDlzVtnM09gFJiFJDULSWoBI9MqRpHU0uLc9NxiQ73i
+        xNzi0rx0veT83E2MwLjcduzn5h2M81591DvEyMTBeIhRgoNZSYTXoKIhSYg3JbGyKrUoP76o
+        NCe1+BCjKdDVE5mlRJPzgYkhryTe0MzA1NDEzNLA1NLMWEmc17OgI1FIID2xJDU7NbUgtQim
+        j4mDU6qBSWyaspCrxJeaZzVzlFm6Fh7e6Puu9qWQTs+Hg/OqjH46mCpnut9I+HXC5H/apc//
+        t+9RvtR6Iadwe/DxZl32YDmZm49OTBHayb52r+ihZTdu2e1KPqCtzmuo8v5CaOBehYTomA0P
+        T3Qezz/lN/fi7dLVmysCUrL/GlYUTpc9saBwx4cD2xrq0ws+R3XNCPSqi/Mp0PY6G8Z3J6BU
+        euoR51se3Wzxe9JE6qYVl+s0vbNrZBD0sjDRXfaPYZp6pnpYRdfD2gV15/8cVTbQ93p31mmr
+        /umFHLNd/st+eXChVsnI/R9X762/h9sWH3X0VDvzOP+s+iHOmbckJJ6rmGqmZmf4uu9e5hO5
+        UO1dkESNEktxRqKhFnNRcSIAA7FWCVQDAAA=
+X-CMS-MailID: 20220516165432eucas1p2e1ea74d44738e44745f49e37b6b9e503
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce
+X-RootMTR: 20220516165432eucas1p2e1ea74d44738e44745f49e37b6b9e503
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce
+X-CMS-RootMailID: 20220516165432eucas1p2e1ea74d44738e44745f49e37b6b9e503
 References: <20220516165416.171196-1-p.raghav@samsung.com>
-        <CGME20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce@eucas1p1.samsung.com>
+        <CGME20220516165432eucas1p2e1ea74d44738e44745f49e37b6b9e503@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add helpers to calculate alignment, round up and round down
-for zoned devices. These helpers encapsulates the necessary handling for
-power_of_2 and non-power_of_2 zone sizes. Optimized calculations are
-performed for zone sizes that are power_of_2 with log and shifts.
-
-btrfs_zoned_is_aligned() is added instead of reusing bdev_zone_aligned()
-helper due to some use cases in btrfs where zone alignment is checked
-before having access to the underlying block device such as in this
-function: btrfs_load_block_group_zone_info().
-
-Use the generic btrfs zone helpers to calculate zone index, check zone
-alignment, round up and round down operations.
-
-The zone_size_shift field is not needed anymore as generic helpers are
-used for calculation.
+The zone size shift variable is useful only if the zone sizes are known
+to be power of 2. Remove that variable and use generic helpers from
+block layer to calculate zone index in zonefs.
 
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 ---
- fs/btrfs/volumes.c | 24 +++++++++-------
- fs/btrfs/zoned.c   | 72 ++++++++++++++++++++++------------------------
- fs/btrfs/zoned.h   | 43 +++++++++++++++++++++++----
- 3 files changed, 85 insertions(+), 54 deletions(-)
+ fs/zonefs/super.c  | 6 ++----
+ fs/zonefs/zonefs.h | 1 -
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-diff --git a/fs/btrfs/volumes.c b/fs/btrfs/volumes.c
-index 94f851592..3d6b9a25a 100644
---- a/fs/btrfs/volumes.c
-+++ b/fs/btrfs/volumes.c
-@@ -1408,7 +1408,7 @@ static u64 dev_extent_search_start(struct btrfs_device *device, u64 start)
- 		 * allocator, because we anyway use/reserve the first two zones
- 		 * for superblock logging.
- 		 */
--		return ALIGN(start, device->zone_info->zone_size);
-+		return btrfs_zoned_roundup(start, device->zone_info->zone_size);
- 	default:
- 		BUG();
- 	}
-@@ -1423,7 +1423,7 @@ static bool dev_extent_hole_check_zoned(struct btrfs_device *device,
+diff --git a/fs/zonefs/super.c b/fs/zonefs/super.c
+index 57ca775f5..e302c889a 100644
+--- a/fs/zonefs/super.c
++++ b/fs/zonefs/super.c
+@@ -451,10 +451,9 @@ static void __zonefs_io_error(struct inode *inode, bool write)
+ {
+ 	struct zonefs_inode_info *zi = ZONEFS_I(inode);
+ 	struct super_block *sb = inode->i_sb;
+-	struct zonefs_sb_info *sbi = ZONEFS_SB(sb);
+ 	unsigned int noio_flag;
+ 	unsigned int nr_zones =
+-		zi->i_zone_size >> (sbi->s_zone_sectors_shift + SECTOR_SHIFT);
++		bdev_zone_no(sb->s_bdev, zi->i_zone_size >> SECTOR_SHIFT);
+ 	struct zonefs_ioerr_data err = {
+ 		.inode = inode,
+ 		.write = write,
+@@ -1375,7 +1374,7 @@ static int zonefs_init_file_inode(struct inode *inode, struct blk_zone *zone,
+ 	struct zonefs_inode_info *zi = ZONEFS_I(inode);
  	int ret;
- 	bool changed = false;
  
--	ASSERT(IS_ALIGNED(*hole_start, zone_size));
-+	ASSERT(btrfs_zoned_is_aligned(*hole_start, zone_size));
+-	inode->i_ino = zone->start >> sbi->s_zone_sectors_shift;
++	inode->i_ino = bdev_zone_no(sb->s_bdev, zone->start);
+ 	inode->i_mode = S_IFREG | sbi->s_perm;
  
- 	while (*hole_size > 0) {
- 		pos = btrfs_find_allocatable_zones(device, *hole_start,
-@@ -1560,7 +1560,7 @@ static int find_free_dev_extent_start(struct btrfs_device *device,
- 	search_start = dev_extent_search_start(device, search_start);
- 
- 	WARN_ON(device->zone_info &&
--		!IS_ALIGNED(num_bytes, device->zone_info->zone_size));
-+		!btrfs_zoned_is_aligned(num_bytes, device->zone_info->zone_size));
- 
- 	path = btrfs_alloc_path();
- 	if (!path)
-@@ -5111,8 +5111,8 @@ static void init_alloc_chunk_ctl_policy_zoned(
- 
- 	ctl->max_stripe_size = zone_size;
- 	if (type & BTRFS_BLOCK_GROUP_DATA) {
--		ctl->max_chunk_size = round_down(BTRFS_MAX_DATA_CHUNK_SIZE,
--						 zone_size);
-+		ctl->max_chunk_size = btrfs_zoned_rounddown(
-+			BTRFS_MAX_DATA_CHUNK_SIZE, zone_size);
- 	} else if (type & BTRFS_BLOCK_GROUP_METADATA) {
- 		ctl->max_chunk_size = ctl->max_stripe_size;
- 	} else if (type & BTRFS_BLOCK_GROUP_SYSTEM) {
-@@ -5124,9 +5124,10 @@ static void init_alloc_chunk_ctl_policy_zoned(
- 	}
- 
- 	/* We don't want a chunk larger than 10% of writable space */
--	limit = max(round_down(div_factor(fs_devices->total_rw_bytes, 1),
--			       zone_size),
--		    min_chunk_size);
-+	limit = max(
-+		btrfs_zoned_rounddown(div_factor(fs_devices->total_rw_bytes, 1),
-+				      zone_size),
-+		min_chunk_size);
- 	ctl->max_chunk_size = min(limit, ctl->max_chunk_size);
- 	ctl->dev_extent_min = zone_size * ctl->dev_stripes;
- }
-@@ -6729,7 +6730,8 @@ static void submit_stripe_bio(struct btrfs_io_context *bioc,
+ 	zi->i_ztype = type;
+@@ -1752,7 +1751,6 @@ static int zonefs_fill_super(struct super_block *sb, void *data, int silent)
+ 	 * interface constraints.
  	 */
- 	if (bio_op(bio) == REQ_OP_ZONE_APPEND) {
- 		if (btrfs_dev_is_sequential(dev, physical)) {
--			u64 zone_start = round_down(physical, fs_info->zone_size);
-+			u64 zone_start = btrfs_zoned_rounddown(physical,
-+							fs_info->zone_size);
+ 	sb_set_blocksize(sb, bdev_zone_write_granularity(sb->s_bdev));
+-	sbi->s_zone_sectors_shift = ilog2(bdev_zone_sectors(sb->s_bdev));
+ 	sbi->s_uid = GLOBAL_ROOT_UID;
+ 	sbi->s_gid = GLOBAL_ROOT_GID;
+ 	sbi->s_perm = 0640;
+diff --git a/fs/zonefs/zonefs.h b/fs/zonefs/zonefs.h
+index 4b3de66c3..39895195c 100644
+--- a/fs/zonefs/zonefs.h
++++ b/fs/zonefs/zonefs.h
+@@ -177,7 +177,6 @@ struct zonefs_sb_info {
+ 	kgid_t			s_gid;
+ 	umode_t			s_perm;
+ 	uuid_t			s_uuid;
+-	unsigned int		s_zone_sectors_shift;
  
- 			bio->bi_iter.bi_sector = zone_start >> SECTOR_SHIFT;
- 		} else {
-@@ -8051,8 +8053,8 @@ static int verify_one_dev_extent(struct btrfs_fs_info *fs_info,
- 	if (dev->zone_info) {
- 		u64 zone_size = dev->zone_info->zone_size;
+ 	unsigned int		s_nr_files[ZONEFS_ZTYPE_MAX];
  
--		if (!IS_ALIGNED(physical_offset, zone_size) ||
--		    !IS_ALIGNED(physical_len, zone_size)) {
-+		if (!btrfs_zoned_is_aligned(physical_offset, zone_size) ||
-+		    !btrfs_zoned_is_aligned(physical_len, zone_size)) {
- 			btrfs_err(fs_info,
- "zoned: dev extent devid %llu physical offset %llu len %llu is not aligned to device zone",
- 				  devid, physical_offset, physical_len);
-diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-index 5be2ef7bb..3023c871e 100644
---- a/fs/btrfs/zoned.c
-+++ b/fs/btrfs/zoned.c
-@@ -177,13 +177,13 @@ static inline u32 sb_zone_number(struct block_device *bdev, int mirror)
- static inline sector_t zone_start_sector(u32 zone_number,
- 					 struct block_device *bdev)
- {
--	return (sector_t)zone_number << ilog2(bdev_zone_sectors(bdev));
-+	return zone_number * bdev_zone_sectors(bdev);
- }
- 
- static inline u64 zone_start_physical(u32 zone_number,
- 				      struct btrfs_zoned_device_info *zone_info)
- {
--	return (u64)zone_number << zone_info->zone_size_shift;
-+	return zone_number * zone_info->zone_size;
- }
- 
- /*
-@@ -236,8 +236,8 @@ static int btrfs_get_dev_zones(struct btrfs_device *device, u64 pos,
- 	if (zinfo->zone_cache) {
- 		unsigned int i;
- 
--		ASSERT(IS_ALIGNED(pos, zinfo->zone_size));
--		zno = pos >> zinfo->zone_size_shift;
-+		ASSERT(btrfs_zoned_is_aligned(pos, zinfo->zone_size));
-+		zno = bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT);
- 		/*
- 		 * We cannot report zones beyond the zone end. So, it is OK to
- 		 * cap *nr_zones to at the end.
-@@ -409,9 +409,8 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
- 	}
- 
- 	nr_sectors = bdev_nr_sectors(bdev);
--	zone_info->zone_size_shift = ilog2(zone_info->zone_size);
--	zone_info->nr_zones = nr_sectors >> ilog2(zone_sectors);
--	if (!IS_ALIGNED(nr_sectors, zone_sectors))
-+	zone_info->nr_zones = bdev_zone_no(bdev, nr_sectors);
-+	if (!btrfs_zoned_is_aligned(nr_sectors, zone_sectors))
- 		zone_info->nr_zones++;
- 
- 	max_active_zones = bdev_max_active_zones(bdev);
-@@ -823,10 +822,8 @@ int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
- 			       u64 *bytenr_ret)
- {
- 	struct blk_zone zones[BTRFS_NR_SB_LOG_ZONES];
--	sector_t zone_sectors;
- 	u32 sb_zone;
- 	int ret;
--	u8 zone_sectors_shift;
- 	sector_t nr_sectors;
- 	u32 nr_zones;
- 
-@@ -837,12 +834,10 @@ int btrfs_sb_log_location_bdev(struct block_device *bdev, int mirror, int rw,
- 
- 	ASSERT(rw == READ || rw == WRITE);
- 
--	zone_sectors = bdev_zone_sectors(bdev);
--	if (!is_power_of_2(zone_sectors))
-+	if (!is_power_of_2(bdev_zone_sectors(bdev)))
- 		return -EINVAL;
--	zone_sectors_shift = ilog2(zone_sectors);
- 	nr_sectors = bdev_nr_sectors(bdev);
--	nr_zones = nr_sectors >> zone_sectors_shift;
-+	nr_zones = bdev_zone_no(bdev, nr_sectors);
- 
- 	sb_zone = sb_zone_number(bdev, mirror);
- 	if (sb_zone + 1 >= nr_zones)
-@@ -959,14 +954,12 @@ int btrfs_reset_sb_log_zones(struct block_device *bdev, int mirror)
- {
- 	sector_t zone_sectors;
- 	sector_t nr_sectors;
--	u8 zone_sectors_shift;
- 	u32 sb_zone;
- 	u32 nr_zones;
- 
- 	zone_sectors = bdev_zone_sectors(bdev);
--	zone_sectors_shift = ilog2(zone_sectors);
- 	nr_sectors = bdev_nr_sectors(bdev);
--	nr_zones = nr_sectors >> zone_sectors_shift;
-+	nr_zones = bdev_zone_no(bdev, nr_sectors);
- 
- 	sb_zone = sb_zone_number(bdev, mirror);
- 	if (sb_zone + 1 >= nr_zones)
-@@ -992,18 +985,17 @@ u64 btrfs_find_allocatable_zones(struct btrfs_device *device, u64 hole_start,
- 				 u64 hole_end, u64 num_bytes)
- {
- 	struct btrfs_zoned_device_info *zinfo = device->zone_info;
--	const u8 shift = zinfo->zone_size_shift;
--	u64 nzones = num_bytes >> shift;
-+	u64 nzones = bdev_zone_no(device->bdev, num_bytes >> SECTOR_SHIFT);
- 	u64 pos = hole_start;
- 	u64 begin, end;
- 	bool have_sb;
- 	int i;
- 
--	ASSERT(IS_ALIGNED(hole_start, zinfo->zone_size));
--	ASSERT(IS_ALIGNED(num_bytes, zinfo->zone_size));
-+	ASSERT(btrfs_zoned_is_aligned(hole_start, zinfo->zone_size));
-+	ASSERT(btrfs_zoned_is_aligned(num_bytes, zinfo->zone_size));
- 
- 	while (pos < hole_end) {
--		begin = pos >> shift;
-+		begin = bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT);
- 		end = begin + nzones;
- 
- 		if (end > zinfo->nr_zones)
-@@ -1035,8 +1027,9 @@ u64 btrfs_find_allocatable_zones(struct btrfs_device *device, u64 hole_start,
- 			if (!(pos + num_bytes <= sb_pos ||
- 			      sb_pos + BTRFS_SUPER_INFO_SIZE <= pos)) {
- 				have_sb = true;
--				pos = ALIGN(sb_pos + BTRFS_SUPER_INFO_SIZE,
--					    zinfo->zone_size);
-+				pos = btrfs_zoned_roundup(
-+					sb_pos + BTRFS_SUPER_INFO_SIZE,
-+					zinfo->zone_size);
- 				break;
- 			}
- 		}
-@@ -1050,7 +1043,7 @@ u64 btrfs_find_allocatable_zones(struct btrfs_device *device, u64 hole_start,
- static bool btrfs_dev_set_active_zone(struct btrfs_device *device, u64 pos)
- {
- 	struct btrfs_zoned_device_info *zone_info = device->zone_info;
--	unsigned int zno = (pos >> zone_info->zone_size_shift);
-+	unsigned int zno = bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT);
- 
- 	/* We can use any number of zones */
- 	if (zone_info->max_active_zones == 0)
-@@ -1072,7 +1065,7 @@ static bool btrfs_dev_set_active_zone(struct btrfs_device *device, u64 pos)
- static void btrfs_dev_clear_active_zone(struct btrfs_device *device, u64 pos)
- {
- 	struct btrfs_zoned_device_info *zone_info = device->zone_info;
--	unsigned int zno = (pos >> zone_info->zone_size_shift);
-+	unsigned int zno = bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT);
- 
- 	/* We can use any number of zones */
- 	if (zone_info->max_active_zones == 0)
-@@ -1108,14 +1101,14 @@ int btrfs_reset_device_zone(struct btrfs_device *device, u64 physical,
- int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
- {
- 	struct btrfs_zoned_device_info *zinfo = device->zone_info;
--	const u8 shift = zinfo->zone_size_shift;
--	unsigned long begin = start >> shift;
--	unsigned long end = (start + size) >> shift;
-+	unsigned long begin = bdev_zone_no(device->bdev, start >> SECTOR_SHIFT);
-+	unsigned long end =
-+		bdev_zone_no(device->bdev, (start + size) >> SECTOR_SHIFT);
- 	u64 pos;
- 	int ret;
- 
--	ASSERT(IS_ALIGNED(start, zinfo->zone_size));
--	ASSERT(IS_ALIGNED(size, zinfo->zone_size));
-+	ASSERT(btrfs_zoned_is_aligned(start, zinfo->zone_size));
-+	ASSERT(btrfs_zoned_is_aligned(size, zinfo->zone_size));
- 
- 	if (end > zinfo->nr_zones)
- 		return -ERANGE;
-@@ -1139,8 +1132,9 @@ int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
- 		/* Free regions should be empty */
- 		btrfs_warn_in_rcu(
- 			device->fs_info,
--		"zoned: resetting device %s (devid %llu) zone %llu for allocation",
--			rcu_str_deref(device->name), device->devid, pos >> shift);
-+			"zoned: resetting device %s (devid %llu) zone %u for allocation",
-+			rcu_str_deref(device->name), device->devid,
-+			bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT));
- 		WARN_ON_ONCE(1);
- 
- 		ret = btrfs_reset_device_zone(device, pos, zinfo->zone_size,
-@@ -1237,7 +1231,7 @@ int btrfs_load_block_group_zone_info(struct btrfs_block_group *cache, bool new)
- 		return 0;
- 
- 	/* Sanity check */
--	if (!IS_ALIGNED(length, fs_info->zone_size)) {
-+	if (!btrfs_zoned_is_aligned(length, fs_info->zone_size)) {
- 		btrfs_err(fs_info,
- 		"zoned: block group %llu len %llu unaligned to zone size %llu",
- 			  logical, length, fs_info->zone_size);
-@@ -1325,7 +1319,7 @@ int btrfs_load_block_group_zone_info(struct btrfs_block_group *cache, bool new)
- 		 * The group is mapped to a sequential zone. Get the zone write
- 		 * pointer to determine the allocation offset within the zone.
- 		 */
--		WARN_ON(!IS_ALIGNED(physical[i], fs_info->zone_size));
-+		WARN_ON(!btrfs_zoned_is_aligned(physical[i], fs_info->zone_size));
- 		nofs_flag = memalloc_nofs_save();
- 		ret = btrfs_get_dev_zone(device, physical[i], &zone);
- 		memalloc_nofs_restore(nofs_flag);
-@@ -1351,10 +1345,12 @@ int btrfs_load_block_group_zone_info(struct btrfs_block_group *cache, bool new)
- 		switch (zone.cond) {
- 		case BLK_ZONE_COND_OFFLINE:
- 		case BLK_ZONE_COND_READONLY:
--			btrfs_err(fs_info,
--		"zoned: offline/readonly zone %llu on device %s (devid %llu)",
--				  physical[i] >> device->zone_info->zone_size_shift,
--				  rcu_str_deref(device->name), device->devid);
-+			btrfs_err(
-+				fs_info,
-+				"zoned: offline/readonly zone %u on device %s (devid %llu)",
-+				bdev_zone_no(device->bdev,
-+					     physical[i] >> SECTOR_SHIFT),
-+				rcu_str_deref(device->name), device->devid);
- 			alloc_offsets[i] = WP_MISSING_DEV;
- 			break;
- 		case BLK_ZONE_COND_EMPTY:
-diff --git a/fs/btrfs/zoned.h b/fs/btrfs/zoned.h
-index 694ab6d1e..b94ce4d1f 100644
---- a/fs/btrfs/zoned.h
-+++ b/fs/btrfs/zoned.h
-@@ -9,6 +9,7 @@
- #include "disk-io.h"
- #include "block-group.h"
- #include "btrfs_inode.h"
-+#include "misc.h"
- 
- #define BTRFS_DEFAULT_RECLAIM_THRESH           			(75)
- 
-@@ -18,7 +19,6 @@ struct btrfs_zoned_device_info {
- 	 * zoned block device.
- 	 */
- 	u64 zone_size;
--	u8  zone_size_shift;
- 	u32 nr_zones;
- 	unsigned int max_active_zones;
- 	atomic_t active_zones_left;
-@@ -30,6 +30,36 @@ struct btrfs_zoned_device_info {
- 	u32 sb_zone_location[BTRFS_SUPER_MIRROR_MAX];
- };
- 
-+static inline bool btrfs_zoned_is_aligned(u64 pos, u64 zone_size)
-+{
-+	u64 remainder = 0;
-+
-+	if (is_power_of_two_u64(zone_size))
-+		return IS_ALIGNED(pos, zone_size);
-+
-+	div64_u64_rem(pos, zone_size, &remainder);
-+	return remainder == 0;
-+}
-+
-+static inline u64 btrfs_zoned_roundup(u64 pos, u64 zone_size)
-+{
-+	if (is_power_of_two_u64(zone_size))
-+		return ALIGN(pos, zone_size);
-+
-+	return div64_u64(pos + zone_size - 1, zone_size) * zone_size;
-+}
-+
-+static inline u64 btrfs_zoned_rounddown(u64 pos, u64 zone_size)
-+{
-+	u64 remainder = 0;
-+	if (is_power_of_two_u64(zone_size))
-+		return round_down(pos, zone_size);
-+
-+	div64_u64_rem(pos, zone_size, &remainder);
-+	pos -= remainder;
-+	return pos;
-+}
-+
- #ifdef CONFIG_BLK_DEV_ZONED
- int btrfs_get_dev_zone(struct btrfs_device *device, u64 pos,
- 		       struct blk_zone *zone);
-@@ -253,7 +283,8 @@ static inline bool btrfs_dev_is_sequential(struct btrfs_device *device, u64 pos)
- 	if (!zone_info)
- 		return false;
- 
--	return test_bit(pos >> zone_info->zone_size_shift, zone_info->seq_zones);
-+	return test_bit(bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT),
-+			zone_info->seq_zones);
- }
- 
- static inline bool btrfs_dev_is_empty_zone(struct btrfs_device *device, u64 pos)
-@@ -263,7 +294,8 @@ static inline bool btrfs_dev_is_empty_zone(struct btrfs_device *device, u64 pos)
- 	if (!zone_info)
- 		return true;
- 
--	return test_bit(pos >> zone_info->zone_size_shift, zone_info->empty_zones);
-+	return test_bit(bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT),
-+			zone_info->empty_zones);
- }
- 
- static inline void btrfs_dev_set_empty_zone_bit(struct btrfs_device *device,
-@@ -275,7 +307,7 @@ static inline void btrfs_dev_set_empty_zone_bit(struct btrfs_device *device,
- 	if (!zone_info)
- 		return;
- 
--	zno = pos >> zone_info->zone_size_shift;
-+	zno = bdev_zone_no(device->bdev, pos >> SECTOR_SHIFT);
- 	if (set)
- 		set_bit(zno, zone_info->empty_zones);
- 	else
-@@ -329,7 +361,8 @@ static inline bool btrfs_can_zone_reset(struct btrfs_device *device,
- 		return false;
- 
- 	zone_size = device->zone_info->zone_size;
--	if (!IS_ALIGNED(physical, zone_size) || !IS_ALIGNED(length, zone_size))
-+	if (!btrfs_zoned_is_aligned(physical, zone_size) ||
-+	    !btrfs_zoned_is_aligned(length, zone_size))
- 		return false;
- 
- 	return true;
 -- 
 2.25.1
 
