@@ -2,81 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9E40C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 12:38:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA56C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 12:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234759AbiEPMi2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 08:38:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39602 "EHLO
+        id S243538AbiEPMxq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 08:53:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42216 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234272AbiEPMi2 (ORCPT
+        with ESMTP id S243416AbiEPMxZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 08:38:28 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D40D387A2
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:38:26 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso14240691pjg.0
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=JgvJ8ikDy1uFWNDRVpxtC+ddCByVmlyJ25IbZX7zpV0=;
-        b=QX0Fj6rhOa0DB15vFqBy5gkJ+3yTOqFLUUFsCmbwTbwY5pTy+f7c/Pgqtba8IUlEy9
-         ctqsAcxPtlkw92aUhzuEIqdAe7cuLZSsLXIC0NNHdbnbUFZvD1SrUEQ4vCaM0rM9hb/f
-         kwIcF2yvH89PGUkUrsiZWAGoBzQHh794fDTHeTro3axhmSggASIFCsMmDrPqXPGHILTl
-         oSmvvLdo1ehljifr0BC12ztG/MHC3oXQhMq0HhIQMa2m+0oS4KiiqCbaImO4OMk5wSzQ
-         34opqlLetKnmoVl2Jcv5QI6B0cvFMKvaJH0UO5Pw6ARvB+fpN6HCCFZMjqzW/XuHybtf
-         Mhrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=JgvJ8ikDy1uFWNDRVpxtC+ddCByVmlyJ25IbZX7zpV0=;
-        b=Yp0c4CoPN4FDsAQhJVuoF/Y7Ygk5B/uytcvKg+M0F2+rYdu2SjKxrXJAGTT/P2VyvL
-         SySEthwfvNjaSl7tOY74fvHiTBFID1FlGo0v13mrMHgMV8HhCXZVsoGd5UjYGpTk5zv+
-         Z3hALCkk89PPx+g+p+76n32ar3iOSZ697I3BZC7RU+hxsi9RCLNmZAoLTTh5Ckj53Btf
-         pj8ISumeuS/8JMsScwmypvtqnx7yZxwAUOYO6hg8CTdUohRxsDYtaBQ4UHjr3crKvyjL
-         KERBH6plA3tWa1fayM901BR8wJyyhOttjlhsD74KZysnR3CzuddruG4CM0dNqqkatTg+
-         Uhtg==
-X-Gm-Message-State: AOAM531sNYamOgYKPOXdsJukqwwpLx3813nxqh9Q8O3fubIGsLGmMM0f
-        Md5DL+Th7P9LbXq//dHHw4SsVg==
-X-Google-Smtp-Source: ABdhPJwT2BD6fwwESkJEV/Sg4epQCNNo3+2DjErSrwPDu8kTmQ5HNPZxlkaqoYy6kFYT4NusZGe2Gg==
-X-Received: by 2002:a17:90a:cd01:b0:1db:d42b:f3df with SMTP id d1-20020a17090acd0100b001dbd42bf3dfmr19051151pju.17.1652704706062;
-        Mon, 16 May 2022 05:38:26 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id f15-20020a62380f000000b0050dc76281c9sm6707445pfa.163.2022.05.16.05.38.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 05:38:25 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220516063654.2782792-1-hch@lst.de>
-References: <20220516063654.2782792-1-hch@lst.de>
-Subject: Re: [PATCH] block: cleanup the VM accounting in submit_bio
-Message-Id: <165270470501.18921.3993603396894417426.b4-ty@kernel.dk>
-Date:   Mon, 16 May 2022 06:38:25 -0600
+        Mon, 16 May 2022 08:53:25 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9127538BD0;
+        Mon, 16 May 2022 05:53:24 -0700 (PDT)
+Received: from kwepemi100016.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L1zZP5tqvzCspx;
+        Mon, 16 May 2022 20:48:29 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100016.china.huawei.com (7.221.188.123) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 16 May 2022 20:53:22 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 16 May 2022 20:53:22 +0800
+Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
+ inotify emit udev uevent changes
+To:     Josef Bacik <josef@toxicpanda.com>
+CC:     Matthew Ruffell <matthew.ruffell@canonical.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
+References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
+ <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+ <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
+ <CAKAwkKvfFn18RjupuqGpx4QeAiMYKSq7QUTd3wEL=pkZ+BENpQ@mail.gmail.com>
+ <Yn5Zf6lONff1AoOA@localhost.localdomain>
+ <6efae367-12fa-1a58-7438-1b39dc0d6ef8@huawei.com>
+ <YoJA8C2XtXY27qJ1@localhost.localdomain>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <e0718adf-fe2a-5f1d-a880-bac72cabfe42@huawei.com>
+Date:   Mon, 16 May 2022 20:53:21 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <YoJA8C2XtXY27qJ1@localhost.localdomain>
+Content-Type: text/plain; charset="utf-8"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 16 May 2022 08:36:54 +0200, Christoph Hellwig wrote:
-> submit_bio uses some extremely convoluted checks and confusing comments
-> to only account REQ_OP_READ/REQ_OP_WRITE comments.  Just switch to the
-> plain obvious checks instead.
+在 2022/05/16 20:17, Josef Bacik 写道:
+
+>> Hi, Josef
+>>
+>> This seems to try to fix the same problem that I described here:
+>>
+>> nbd: fix io hung while disconnecting device
+>> https://lists.debian.org/nbd/2022/04/msg00207.html
+>>
+>> There are still some io that are stuck, which means the devcie is
+>> probably still opened. Thus nbd_config_put() can't reach here.
+>> I'm afraid this patch can't fix the io hung.
+>>
+>> Matthew, can you try a test with this patch together with my patch below
+>> to comfirm my thought?
+>>
+>> nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
+>> https://lists.debian.org/nbd/2022/04/msg00212.html.
+>>
 > 
+> Re-submit this one, but fix it so we just test the bit to see if we need to skip
+> it, and change it so we only CLEAR when we're sure we're going to complete the
+> request.  Thanks,
+
+Ok, thanks for your advice. I'll send a new version.
+
+BTW, do you have any suggestions on other patches of the patchset?
+
+https://lore.kernel.org/all/20220426130746.885140-1-yukuai3@huawei.com/
+
+Thanks,
+Kuai
 > 
-
-Applied, thanks!
-
-[1/1] block: cleanup the VM accounting in submit_bio
-      commit: b1ec1bae3b425e145e134fd63347576c478b85db
-
-Best regards,
--- 
-Jens Axboe
-
-
+> Josef
+> .
+> 
