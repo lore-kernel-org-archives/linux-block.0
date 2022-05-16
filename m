@@ -2,92 +2,151 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 880ABC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 10:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E1C3C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 12:18:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241714AbiEPKv4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 06:51:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38068 "EHLO
+        id S240697AbiEPMSC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 08:18:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46570 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243000AbiEPKv3 (ORCPT
+        with ESMTP id S229697AbiEPMSB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 06:51:29 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C205FB498;
-        Mon, 16 May 2022 03:51:27 -0700 (PDT)
-Received: from fraeml703-chm.china.huawei.com (unknown [172.18.147.226])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4L1wvs6kvwz683mQ;
-        Mon, 16 May 2022 18:48:25 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml703-chm.china.huawei.com (10.206.15.52) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2375.24; Mon, 16 May 2022 12:51:25 +0200
-Received: from [10.47.25.151] (10.47.25.151) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 16 May
- 2022 11:51:24 +0100
-Message-ID: <102a4b9b-e0b8-d46f-6444-2d5f70d8f046@huawei.com>
-Date:   Mon, 16 May 2022 11:51:23 +0100
+        Mon, 16 May 2022 08:18:01 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F2E22BB20
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:17:55 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id p4so11832165qtq.12
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 05:17:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=toxicpanda-com.20210112.gappssmtp.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=6WoWussqs/nE0WQFdCOfcolnwp+yEL3nnakgRyZRHVE=;
+        b=dNPrnAOHFoYC1Szl537Ai+cBSuuvzo2sTNk+SMetEJzZpdGUqXGFGgUSqKF5vBUjYm
+         gMwOGHC24+4HHAibvvjAofcotuJ36Rac28QKstG6THDLsWqpUIzPO7pFtceJPS2bueKl
+         k6Q6FW3PpcgUCsCghBOONcWHLu0+iLgzdH68yD6hOCOCzmJoTVpUU82s70otH7dJRi70
+         CvCx2eMkWmxccQUs7E0erTwIIsfKLvELEoEUxLBCQqyZrq9M9U/bAL/9H9t/px39opul
+         Yvr+ep+zr9xXjHghZx2ZPyP+bdFM1UDY/fE14VXGXL6w8ZCVS+e68RZVteHzg1sPewih
+         S/Rg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=6WoWussqs/nE0WQFdCOfcolnwp+yEL3nnakgRyZRHVE=;
+        b=pflEBD+BC8TykmsBw3BlAFHX1lPkP9uAf3bSFF6o7AezGpWKvsq1dUIt6m+9t8gIBu
+         Q/lhg2Kc0hi7Su4U2J9GouLe1fJTNB0vfsDZazEwGqioKxmk5dXPbrhRRLschig+h+D6
+         9hxRCzWr6p2Q9+lSAzs1RsHc3oBmQVkX+mA+MfotPpICPC01aDDI2Z0ElzUrJLYXGAV8
+         7kwNrl1T9Q3JAA4eDEyLnJYDuI5oA6FbHy8+Iyl0AvJiFmHXUHmXDEHM5KQsgFgPN15n
+         nv6MhCVf/upgC/RzTBhwCJYPocRs83vy26qBMWmX73AIU5ryIAEY6Et9sWu4937PwWVR
+         SvHw==
+X-Gm-Message-State: AOAM533+wY1tekz+ID0hXTqY1JiIkuVrsW3cReGIFTY5wivybvkXsHRP
+        BezBedpf9EmxgK351JYgCZjLpn5wymIL4Q==
+X-Google-Smtp-Source: ABdhPJzqEm7QHW/ub0pHz6AYCmev82zktUJyJxo3YCahnMnuMg5LtLrY7OUuAcE3jTIC8fdqjXBpvg==
+X-Received: by 2002:ac8:584a:0:b0:2f7:b19b:f9b6 with SMTP id h10-20020ac8584a000000b002f7b19bf9b6mr6722119qth.683.1652703474556;
+        Mon, 16 May 2022 05:17:54 -0700 (PDT)
+Received: from localhost (cpe-174-109-172-136.nc.res.rr.com. [174.109.172.136])
+        by smtp.gmail.com with ESMTPSA id a128-20020ae9e886000000b006a2e2dde144sm2751831qkg.88.2022.05.16.05.17.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 05:17:53 -0700 (PDT)
+Date:   Mon, 16 May 2022 08:17:52 -0400
+From:   Josef Bacik <josef@toxicpanda.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Matthew Ruffell <matthew.ruffell@canonical.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        nbd <nbd@other.debian.org>,
+        Linux Kernel <linux-kernel@vger.kernel.org>
+Subject: Re: [PROBLEM] nbd requests become stuck when devices watched by
+ inotify emit udev uevent changes
+Message-ID: <YoJA8C2XtXY27qJ1@localhost.localdomain>
+References: <20220422054224.19527-1-matthew.ruffell@canonical.com>
+ <CAEzrpqe=LD3DQcEeLXmmFuq7cX_dAQ6DOCuJYWBoZWKKTmoTzA@mail.gmail.com>
+ <CAKAwkKt3yMOOW3NXcE91WkGr+8xj050CYP2pLoQVHt_2wXq=-w@mail.gmail.com>
+ <CAKAwkKvfFn18RjupuqGpx4QeAiMYKSq7QUTd3wEL=pkZ+BENpQ@mail.gmail.com>
+ <Yn5Zf6lONff1AoOA@localhost.localdomain>
+ <6efae367-12fa-1a58-7438-1b39dc0d6ef8@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [bug report] IOMMU reports data translation fault for fio testing
-From:   John Garry <john.garry@huawei.com>
-To:     Bart Van Assche <bvanassche@acm.org>,
-        <linux-block@vger.kernel.org>, <linux-scsi@vger.kernel.org>
-CC:     "chenxiang66@hisilicon.com >> Xiang Chen" <chenxiang66@hisilicon.com>,
-        "liyihang (E)" <liyihang6@hisilicon.com>
-References: <2b7d091b-4caf-948f-b41a-29a7fcb9fc2a@huawei.com>
- <f5739f11-f07c-3bfe-451a-6d7a24550e61@acm.org>
- <0f274df2-e7e2-bfca-14b5-631fe78fc6da@huawei.com>
-In-Reply-To: <0f274df2-e7e2-bfca-14b5-631fe78fc6da@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.47.25.151]
-X-ClientProxiedBy: lhreml714-chm.china.huawei.com (10.201.108.65) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
+In-Reply-To: <6efae367-12fa-1a58-7438-1b39dc0d6ef8@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14/05/2022 10:49, John Garry wrote:
->>> It could be an issue with the SCSI hba driver.
->>
->> That seems likely to me.
+On Sat, May 14, 2022 at 11:39:25AM +0800, yukuai (C) wrote:
+> 在 2022/05/13 21:13, Josef Bacik 写道:
+> > On Fri, May 13, 2022 at 02:56:18PM +1200, Matthew Ruffell wrote:
+> > > Hi Josef,
+> > > 
+> > > Just a friendly ping, I am more than happy to test a patch, if you send it
+> > > inline in the email, since the pastebin you used expired after 1 day, and I
+> > > couldn't access it.
+> > > 
+> > > I came across and tested Yu Kuai's patches [1][2] which are for the same issue,
+> > > and they indeed fix the hang. Thank you Yu.
+> > > 
+> > > [1] nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
+> > > https://lists.debian.org/nbd/2022/04/msg00212.html
+> > > 
+> > > [2] nbd: fix io hung while disconnecting device
+> > > https://lists.debian.org/nbd/2022/04/msg00207.html
+> > > 
+> > > I am also happy to test any patches to fix the I/O errors.
+> > > 
+> > 
+> > Sorry, you caught me on vacation before and I forgot to reply.  Here's part one
+> > of the patch I wanted you to try which fixes the io hung part.  Thanks,
+> > 
+> > Josef
+> > 
+> > > From 0a6123520380cb84de8ccefcccc5f112bce5efb6 Mon Sep 17 00:00:00 2001
+> > Message-Id: <0a6123520380cb84de8ccefcccc5f112bce5efb6.1652447517.git.josef@toxicpanda.com>
+> > From: Josef Bacik <josef@toxicpanda.com>
+> > Date: Sat, 23 Apr 2022 23:51:23 -0400
+> > Subject: [PATCH] timeout thing
+> > 
+> > ---
+> >   drivers/block/nbd.c | 5 ++++-
+> >   1 file changed, 4 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+> > index 526389351784..ab365c0e9c04 100644
+> > --- a/drivers/block/nbd.c
+> > +++ b/drivers/block/nbd.c
+> > @@ -1314,7 +1314,10 @@ static void nbd_config_put(struct nbd_device *nbd)
+> >   		kfree(nbd->config);
+> >   		nbd->config = NULL;
+> > -		nbd->tag_set.timeout = 0;
+> > +		/* Reset our timeout to something sane. */
+> > +		nbd->tag_set.timeout = 30 * HZ;
+> > +		blk_queue_rq_timeout(nbd->disk->queue, 30 * HZ);
+> > +
+> >   		nbd->disk->queue->limits.discard_granularity = 0;
+> >   		nbd->disk->queue->limits.discard_alignment = 0;
+> >   		blk_queue_max_discard_sectors(nbd->disk->queue, 0);
+> > 
+> Hi, Josef
+> 
+> This seems to try to fix the same problem that I described here:
+> 
+> nbd: fix io hung while disconnecting device
+> https://lists.debian.org/nbd/2022/04/msg00207.html
+> 
+> There are still some io that are stuck, which means the devcie is
+> probably still opened. Thus nbd_config_put() can't reach here.
+> I'm afraid this patch can't fix the io hung.
+> 
+> Matthew, can you try a test with this patch together with my patch below
+> to comfirm my thought?
+> 
+> nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
+> https://lists.debian.org/nbd/2022/04/msg00212.html.
 > 
 
-Actually it is a LLDD problem. Sometimes it takes 45 minutes to trigger, 
-though – not nice to bisect.
+Re-submit this one, but fix it so we just test the bit to see if we need to skip
+it, and change it so we only CLEAR when we're sure we're going to complete the
+request.  Thanks,
 
-This looks to be the problematic patch:
-
-author John Garry <john.garry@huawei.com> 2022-02-10 18:43:24 +0800
-committer Martin K. Petersen <martin.petersen@oracle.com> 2022-02-11 
-17:02:50 -0500
-commit 26fc0ea74fcb9b76b41f5e9b89728cd1c01559cd (patch)
-scsi: libsas: Drop SAS_TASK_AT_INITIATOR
-
-If interested, this looks like the issue:
-
-void hisi_sas_task_deliver(struct hisi_hba *hisi_hba,
-break;
-}
-
-- spin_lock_irqsave(&task->task_state_lock, flags);
-- task->task_state_flags |= SAS_TASK_AT_INITIATOR;
-- spin_unlock_irqrestore(&task->task_state_lock, flags);
--
-WRITE_ONCE(slot->ready, 1);
-
-Losing the spinlock loses the barrier semantics as well, so a memory 
-ordering issue.
-
-> Sure, that would be common wisdom. However the commit before anything 
-> related to driver was added for 5.18 is also bad. It could be 
-> pre-existing, but that starts to seem unlikely. Or it could still be an 
-> IOMMU issue - we already have a performance issue there.
-> 
-> This issue can take more than 15 minutes to occur, so is pretty painful 
-> to bisect...
-
+Josef
