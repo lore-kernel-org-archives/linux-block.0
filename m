@@ -2,99 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90F3EC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 06:13:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37AD4C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 16 May 2022 06:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236620AbiEPGNM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 02:13:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34684 "EHLO
+        id S231482AbiEPGhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 02:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235402AbiEPGNJ (ORCPT
+        with ESMTP id S237096AbiEPGhB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 02:13:09 -0400
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772EA20F6E
-        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 23:13:08 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id g6so26599192ejw.1
-        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 23:13:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=UMivNP1yATOqWiy4xAV1dIXzJMIjL6HYMoQwwXh9g8U=;
-        b=U9k6OUws21OayeSqTQt3GmsNurJtExmOYfgxajIaoyI7I2td2Yq9miYkQhG8IEwl5/
-         uPFve13ZyNG/Nej7aDhOlaTCbpoPm2NysOSkOXHB3C/y1d90TwZFSGsfNsvoQ1/T6SHa
-         VCl7AFEAVUNFiXJcJxF2AzwSORetVgCErxNN9jbVM/z8Zy15uLTO0l2gFcTPfbpAPD1j
-         ftj3u8hnX7+Z73WN3VhdroO/P/EJO0w4FPwbH8wTM4QoVQzu2C2xML4qcBuTn9cHAweD
-         Lf2zS/7jBL06rclsoc+G+JBIx0SdEiS/0d+iZ+bFSx6EEbdryBxn7OaTrKnRoD2obMlv
-         DIPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=UMivNP1yATOqWiy4xAV1dIXzJMIjL6HYMoQwwXh9g8U=;
-        b=lcz4Q94TKaBa0sKgwrt8xLeSsWaUe7VTfPSJOJZDF3hP/qbj0UHe0zba/WUlgQZ57M
-         WEtZBZBkCM45WAu+aOJ15PX84hZnGDKZiy4u0dT1uS7CQFllc9IGl/PbCilAHvxIQY+m
-         OFsNYgUYcs32B4b0wdz/hWjjvkWvQ2dvlpltnSScWS+lxSEnxPaCQQfgoGt9BJsCVEra
-         +xl0S4kBpY/1i0kT2eu0UQZdP/ESWGbeYYy83b60Zo05wPv1yUDX+OeMmM0BdddTkc1j
-         vMiQeK3Cqen0BuFimki7zlL82JOVKTzfBaqLfA3EyCXtmOa7ghJQ8h4HsJyfH/aLY3gr
-         f3OA==
-X-Gm-Message-State: AOAM532pfeGIFon4h3Bz1FQjjh/43M2RJi4Gl63N1g7JNR3Ogyujn1bO
-        xWhCZVumC0+pjeX67DIfolv4iR+jb2wEiCoSZLBAljYihxys
-X-Google-Smtp-Source: ABdhPJxwQU9n4T2vbv6zUUJLoz7qvcHSvdfpZ0OoVoSPI1Lmi3TIaOffSlIgVbg0SF0TtcFdY6c/pr0IlFrm5oX11lo=
-X-Received: by 2002:a17:906:dc8f:b0:6f4:e6df:a48d with SMTP id
- cs15-20020a170906dc8f00b006f4e6dfa48dmr14195693ejc.206.1652681587130; Sun, 15
- May 2022 23:13:07 -0700 (PDT)
+        Mon, 16 May 2022 02:37:01 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C2CECE3D
+        for <linux-block@vger.kernel.org>; Sun, 15 May 2022 23:36:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=9U+9UVqj4sUUJ+rN3Kos0cDX9lvKJL2K6jRuq0SrhVs=; b=LVaIuy7eJawthXIcJch4M5jqO+
+        AISXyaAN6mFgDIHKrRYBZsOca74Bdbhip+pdIvl98eqvyAw+qcg2DNH5pdD5VG7enrUJY5KQEE8VW
+        kA5i9/AwNpesPCyC1VbngcL860etxOAe/Sd3hOFz7bdpP50UZ0hMyDfB3Sk5gNhUZRHpaZc26l/7E
+        8r0zm7lbxRpWC7O/cM5fgVWS1gNaOIplzLzJWdH8fTPlbbavHRymjTXGBwF3F82QVGpresP23mbFS
+        Ejqzc4UjNPSLh1VTiHJF0Ilp5DDcswcS6IDJU13Pr2vkdjD07+ZaAEldal3IduSbIPD3dt7oecnFO
+        iFd0Kahg==;
+Received: from 213-225-11-122.nat.highway.a1.net ([213.225.11.122] helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nqULi-006DeF-DR; Mon, 16 May 2022 06:36:59 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: cleanup the VM accounting in submit_bio
+Date:   Mon, 16 May 2022 08:36:54 +0200
+Message-Id: <20220516063654.2782792-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-References: <20211227091241.103-1-xieyongji@bytedance.com> <YjotekJZcSvwoZhp@localhost.localdomain>
- <CACycT3vz4hYTFpHo0Jphs-xE-k--y63+vedTFAaDRWhpi4_5rg@mail.gmail.com>
-In-Reply-To: <CACycT3vz4hYTFpHo0Jphs-xE-k--y63+vedTFAaDRWhpi4_5rg@mail.gmail.com>
-From:   Yongji Xie <xieyongji@bytedance.com>
-Date:   Mon, 16 May 2022 14:13:48 +0800
-Message-ID: <CACycT3vExVBrmE3JN=Bay7sqX=C+wXo5imswLJv_pODbyFFSMA@mail.gmail.com>
-Subject: Re: [PATCH v2] nbd: Don't use workqueue to handle recv work
-To:     Josef Bacik <josef@toxicpanda.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Bart Van Assche <bvanassche@acm.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping.
+submit_bio uses some extremely convoluted checks and confusing comments
+to only account REQ_OP_READ/REQ_OP_WRITE comments.  Just switch to the
+plain obvious checks instead.
 
-On Wed, Mar 23, 2022 at 7:21 PM Yongji Xie <xieyongji@bytedance.com> wrote:
->
-> On Wed, Mar 23, 2022 at 4:11 AM Josef Bacik <josef@toxicpanda.com> wrote:
-> >
-> > On Mon, Dec 27, 2021 at 05:12:41PM +0800, Xie Yongji wrote:
-> > > The rescuer thread might take over the works queued on
-> > > the workqueue when the worker thread creation timed out.
-> > > If this happens, we have no chance to create multiple
-> > > recv threads which causes I/O hung on this nbd device.
-> > >
-> > > To fix it, we can not simply remove the WQ_MEM_RECLAIM
-> > > flag since the recv work is in the memory reclaim path.
-> > > So this patch tries to create kthreads directly to
-> > > handle the recv work instead of using workqueue.
-> > >
-> >
-> > I still don't understand why we can't drop WQ_MEM_RECLAIM.  IIRC your argument
-> > is that we need it because a reconnect could happen under memory pressure and we
-> > need to be able to queue work for that.  However your code makes it so we're
-> > just doing a kthread_create(), which isn't coming out of some emergency pool, so
-> > it's just as likely to fail as a !WQ_MEM_RECLAIM workqueue.  Thanks,
-> >
->
-> I think the key point is the context in which the work thread is
-> created. It's the context of the nbd process if using kthread_create()
-> to create a workthread (might do some allocation). Then we can benefit
-> from the PR_SET_IO_FLUSHER flag, so memory reclaim would never hit the
-> page cache on the nbd device. But using queue_work() to create a
-> workthread, the actual thread creation happens in the context of the
-> work thread rather than the nbd process, so we can't rely on the
-> PR_SET_IO_FLUSHER flag to avoid deadlock.
->
-> Thanks,
-> Yongji
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 18 +++++-------------
+ 1 file changed, 5 insertions(+), 13 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index ee18b6a699bdf..48a58c24d452e 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -893,19 +893,11 @@ void submit_bio(struct bio *bio)
+ 	if (blkcg_punt_bio_submit(bio))
+ 		return;
+ 
+-	/*
+-	 * If it's a regular read/write or a barrier with data attached,
+-	 * go through the normal accounting stuff before submission.
+-	 */
+-	if (bio_has_data(bio)) {
+-		unsigned int count = bio_sectors(bio);
+-
+-		if (op_is_write(bio_op(bio))) {
+-			count_vm_events(PGPGOUT, count);
+-		} else {
+-			task_io_account_read(bio->bi_iter.bi_size);
+-			count_vm_events(PGPGIN, count);
+-		}
++	if (bio_op(bio) == REQ_OP_READ) {
++		task_io_account_read(bio->bi_iter.bi_size);
++		count_vm_events(PGPGIN, bio_sectors(bio));
++	} else if (bio_op(bio) == WRITE) {
++		count_vm_events(PGPGOUT, bio_sectors(bio));
+ 	}
+ 
+ 	/*
+-- 
+2.30.2
+
