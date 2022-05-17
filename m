@@ -2,124 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D803AC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 13:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E364C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 14:07:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347956AbiEQNfo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 09:35:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55844 "EHLO
+        id S1348252AbiEQOHJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 10:07:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347907AbiEQNf2 (ORCPT
+        with ESMTP id S1348453AbiEQOHC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 09:35:28 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE9AA4CD5F;
-        Tue, 17 May 2022 06:35:26 -0700 (PDT)
-Received: from kwepemi100006.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L2cY844NkzgYsy;
-        Tue, 17 May 2022 21:34:36 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100006.china.huawei.com (7.221.188.165) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 17 May 2022 21:35:24 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 17 May
- 2022 21:35:23 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH -next] blk-throttle: delay the setting of 'BIO_THROTTLED' to when throttle is done
-Date:   Tue, 17 May 2022 21:49:09 +0800
-Message-ID: <20220517134909.2910251-1-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 17 May 2022 10:07:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D730F4D243
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 07:06:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652796406;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=3bg665HrNuvrqLGhtUkpmUDqyIrWAj2xvJx1ld4vx7g=;
+        b=S7AaVWsK+7WhkmOPELa5dP/ROtV1o2Yx1itIWkTtVPHDPFHm0qcxuHeLBr6OTmUTpmXUIG
+        w9zNemTO6uKDCJASnPywA/d8A6t6RXykoZTzBAwA9EGMmjPLnUxLeNR7tU9EEAwffmxYu7
+        TggT7i/HC+DpRWax/9H+1TwlhI1KfMI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-500-YNL4P8y7OJaFDTHMxVXhGw-1; Tue, 17 May 2022 10:06:39 -0400
+X-MC-Unique: YNL4P8y7OJaFDTHMxVXhGw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 446E11C0CE7B;
+        Tue, 17 May 2022 14:06:36 +0000 (UTC)
+Received: from localhost (unknown [10.39.194.27])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 9CB63400DFB5;
+        Tue, 17 May 2022 14:06:35 +0000 (UTC)
+Date:   Tue, 17 May 2022 15:06:34 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
+Message-ID: <YoOr6jBfgVm8GvWg@stefanha-x1.localdomain>
+References: <20220517055358.3164431-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="uCYJ7l6rM0lflhAj"
+Content-Disposition: inline
+In-Reply-To: <20220517055358.3164431-1-ming.lei@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-introduce a new problem, for example:
 
-[root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
-[root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
-[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-[1] 620
-[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-[2] 626
-[root@localhost ~]# 1+0 records in
-1+0 records out
-10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
-1+0 records out
+--uCYJ7l6rM0lflhAj
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
--> the second bio is issued after 10s instead of 20s.
+Here are some more thoughts on the ubd-control device:
 
-This is because if some bios are already queued, current bio is queued
-directly and the flag 'BIO_THROTTLED' is set. And later, when former
-bios are dispatched, this bio will be dispatched without waiting at all,
-this is due to tg_with_in_bps_limit() will return 0 if the flag is set.
+The current patch provides a ubd-control device for processes with
+suitable permissions (i.e. root) to create, start, stop, and fetch
+information about devices.
 
-Instead of setting the flag when bio starts throttle, delay to when
-throttle is done to fix the problem.
+There is no isolation between devices created by one process and those
+created by another. Therefore two processes that do not trust each other
+cannot both use UBD without potential interference. There is also no
+isolation for containers.
 
-Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- block/blk-throttle.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+I think it would be a mistake to keep the ubd-control interface in its
+current form since the current global/root model is limited. Instead I
+suggest:
+- Creating a device returns a new file descriptor instead of a global
+  dev_id. The device can be started/stopped/configured through this (and
+  only through this) per-device file descriptor. The device is not
+  visible to other processes through ubd-control so interference is not
+  possible. In order to give another process control over the device the
+  fd can be passed (e.g. SCM_RIGHTS).=20
 
-diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 447e1b8722f7..f952f2d942ff 100644
---- a/block/blk-throttle.c
-+++ b/block/blk-throttle.c
-@@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
- 	unsigned int bio_size = throtl_bio_data_size(bio);
- 
- 	/* no need to throttle if this bio's bytes have been accounted */
--	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
-+	if (bps_limit == U64_MAX) {
- 		if (wait)
- 			*wait = 0;
- 		return true;
-@@ -1226,8 +1226,10 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
- 
- 	spin_lock_irq(&q->queue_lock);
- 	for (rw = READ; rw <= WRITE; rw++)
--		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL)))
-+		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL))) {
-+			bio_set_flag(bio, BIO_THROTTLED);
- 			bio_list_add(&bio_list_on_stack, bio);
-+		}
- 	spin_unlock_irq(&q->queue_lock);
- 
- 	if (!bio_list_empty(&bio_list_on_stack)) {
-@@ -2134,7 +2136,8 @@ bool __blk_throtl_bio(struct bio *bio)
- 			}
- 			break;
- 		}
--
-+		/* this bio will be issued directly */
-+		bio_set_flag(bio, BIO_THROTTLED);
- 		/* within limits, let's charge and dispatch directly */
- 		throtl_charge_bio(tg, bio);
- 
-@@ -2190,7 +2193,6 @@ bool __blk_throtl_bio(struct bio *bio)
- 
- out_unlock:
- 	spin_unlock_irq(&q->queue_lock);
--	bio_set_flag(bio, BIO_THROTTLED);
- 
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- 	if (throttled || !td->track_bio_latency)
--- 
-2.31.1
+Now multiple applications/containers/etc can use ubd-control without
+interfering with each other. The security model still requires root
+though since devices can be malicious.
+
+FUSE allows unprivileged mounts (see fuse_allow_current_process()). Only
+processes with the same uid as the FUSE daemon can access such mounts
+(in the default configuration). This prevents security issues while
+still allowing unprivileged use cases.
+
+I suggest adapting the FUSE security model to block devices:
+- Devices can be created without CAP_SYS_ADMIN but they have an
+  'unprivileged' flag set to true.
+- Unprivileged devices are not probed for partitions and LVM doesn't
+  touch them. This means the kernel doesn't access these devices via
+  code paths that might be exploitable.
+- When another process with a different uid from ubdsrv opens an
+  unprivileged device, -EACCES is returned. This protects other
+  uids from the unprivileged device.
+- When another process with a different uid from ubdsrv opens a
+  _privileged_ device there is no special access check because ubdsrv is
+  privileged.
+
+With these changes UBD can be used by unprivileged processes and
+containers. I think it's worth discussing the details and having this
+model from the start so UBD can be used in a wide range of use cases.
+
+Stefan
+
+--uCYJ7l6rM0lflhAj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmKDq+oACgkQnKSrs4Gr
+c8gciAf+JxH0nZCAHY7X+muFxCm6VDyKoarHuOh9NAWV2JRk5Bb12LHTTfl0+1yn
+UeZAQuRg7ez0Ur8CXPkc+5FCgBR/Ahqm7iThJ6tns+mErvKkducPXLiLXudZn11o
+mdFgAI8bi2W/REoCKLYAweBWHLm2WnKVsL/wVfCDnpXWjE6HCVsFlYmQlBCWN0wD
+HolEityrNvgAQeW/hVYV/2Lo6/OVBiLqU6gxMrHUvWlj0WMoLhkhLA4FIDNxs04i
+RJYZODQv9jr+tDjYZ+s1ZN8H8AnKkRVTCcMpg76ADhuNMUQjQINGdgSty7uixy4a
+BrIMVdd/t/ldnse1423hFtYsqmKnPg==
+=OqHO
+-----END PGP SIGNATURE-----
+
+--uCYJ7l6rM0lflhAj--
 
