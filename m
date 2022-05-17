@@ -2,104 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F50DC43217
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 04:13:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54532C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 04:18:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235727AbiEQENL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 00:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53428 "EHLO
+        id S232087AbiEQESu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 00:18:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237129AbiEQENJ (ORCPT
+        with ESMTP id S229971AbiEQESs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 00:13:09 -0400
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4A53FD96;
-        Mon, 16 May 2022 21:13:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652760788; x=1684296788;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=1drYWkhJXlza+p8qJe1jaRor29et4ZBJVwKRLeAW2M8=;
-  b=SiGl200o+/Cm2HNH10aLAdWCKrnkzGLuzsLoWWSTWTAn3ioW6jA8nODT
-   cXjOaUy6E393lzwiu5aNJ2YN84WeRBmWtwdFwv04fqDJMp/npZaEntdjn
-   4W+1xF2chcWA4pI+YNbpx/oq7pEKo/zuxXUIXkcLCYLjQpYJvNXK8Hkq9
-   O07M0GCI9B/0MjupVK8obb0fh4UANapDzBY+0gGdzHn9wDr7RGclUkvPT
-   l9Ms5Gb60tnlNJY2/dSnxPdG2PvMaYEssDF4/Wes0AmGrh+2i71vNrRy/
-   gbbXfEUt5BCKaiuFhrYaSHGm7JPVLqN47rDHnNTvE2mSsDd3j2MgLjrjh
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="268630910"
-X-IronPort-AV: E=Sophos;i="5.91,231,1647327600"; 
-   d="scan'208";a="268630910"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 21:13:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,231,1647327600"; 
-   d="scan'208";a="699868498"
-Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 16 May 2022 21:13:04 -0700
-Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nqoZz-0000ap-DK;
-        Tue, 17 May 2022 04:13:03 +0000
-Date:   Tue, 17 May 2022 12:12:42 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, pankydev8@gmail.com,
-        dsterba@suse.com, hch@lst.de
-Cc:     kbuild-all@lists.01.org, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        jiangbo.365@bytedance.com, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, p.raghav@samsung.com,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Hannes Reinecke <hare@suse.de>
-Subject: Re: [PATCH v4 11/13] null_blk: allow non power of 2 zoned devices
-Message-ID: <202205171251.o9RZslnw-lkp@intel.com>
-References: <20220516165416.171196-12-p.raghav@samsung.com>
+        Tue, 17 May 2022 00:18:48 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B0B130564;
+        Mon, 16 May 2022 21:18:47 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id l7-20020a17090aaa8700b001dd1a5b9965so1195152pjq.2;
+        Mon, 16 May 2022 21:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=xf0kL1+XuM7P75yKi5gORiIETclggCfCwYHC9O/komI=;
+        b=dGfNWhVuygx3lxtV8htZeLUSrHPK74n/4zuspp12F3Ej9aM1jDUfauaeUEwwflxDd1
+         cVfzVfCyiXz6HsQHbH3uqnCyETM0yGfbehqOfgpZjYrkRamWiLEAjUjU/N6XUCAGMwTg
+         e46ZvTeAHHkSFMQ3fJwFLWMW7AwEaAJJGbRZdKmJB+TENAhuzW3836VbZX0SLgkxvjQw
+         dwvW5/dOX/UeN8Rz/zat7MKgFD1Z3C5YP+RjOmCefWIW+Hfi05TAW6USx06+pNFf9TEl
+         SSiNgdWmlpUg386INY5i3wS7xQT1lUyDL2rOcTJJurcX6Q7JtYvwt6mfdCqGBBFKud9e
+         euTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=xf0kL1+XuM7P75yKi5gORiIETclggCfCwYHC9O/komI=;
+        b=cB09Zbb6zVriwEbMMN5ELDwdNY9RRaETuDQ7hT2MCKA6HAlKwhHv6Bmm3LivHCP7N1
+         BghGuUG7XznExHpKpbaCnus+3DCIJKIj6i0vADG/nmkz0iLx+LqvwEo2w+pF2I0CaU1H
+         cKpv2K18BR2Eidt/RddM6Hm11QYoL+Y8MeBJrOc9OP3Xgyn75jLrPYggmPNufEFaOV/S
+         xgT5Zjg9p5rEh6SJl6ZgjXfNRVAxaEcXQDzGilJpg0MSF0HFSbbH+0FVtRUpYDNrLz/z
+         Ikyd5YC5IqdTq6oEHHcy3PFeLYRbN4ybS6qKCa4H0MkF7LqNLRuWMYuPfp3qVRi7onNJ
+         ECVg==
+X-Gm-Message-State: AOAM531FZpMzu23+P4IgUwZ2akRypBkZUr/IOOZ2nsNw36YE/GtuElkd
+        Vlfh3P1AmfmcOlvIkBlYPGo=
+X-Google-Smtp-Source: ABdhPJwgsWcgQL4lPVuAZ8ixm4JN/ImNMVWhzcjD3C0B9Ty9Fqsv3rJBudKOk83QYc/aHonkST0aAQ==
+X-Received: by 2002:a17:90a:9b0d:b0:1dc:e81d:6c18 with SMTP id f13-20020a17090a9b0d00b001dce81d6c18mr23151877pjp.72.1652761126747;
+        Mon, 16 May 2022 21:18:46 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:62fc])
+        by smtp.gmail.com with ESMTPSA id c1-20020a170902c2c100b0015e8d4eb28csm7790789pla.214.2022.05.16.21.18.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 16 May 2022 21:18:46 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Mon, 16 May 2022 18:18:44 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Zhang Wensheng <zhangwensheng5@huawei.com>,
+        "ming.lei@redhat.com >> Ming Lei" <ming.lei@redhat.com>,
+        axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
+Subject: Re: [PATCH -next] block: fix io hung of setting throttle limit
+ frequently
+Message-ID: <YoMiJIUehq1UyzgQ@slm.duckdns.org>
+References: <20220516014429.33723-1-zhangwensheng5@huawei.com>
+ <YoKmCOAzwzw3Lz7g@slm.duckdns.org>
+ <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220516165416.171196-12-p.raghav@samsung.com>
+In-Reply-To: <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Pankaj,
+On Tue, May 17, 2022 at 11:12:28AM +0800, yukuai (C) wrote:
+> Ming added a condition in tg_with_in_bps_limit():
+> -       if (bps_limit == U64_MAX) {
+> +       /* no need to throttle if this bio's bytes have been accounted */
+> +       if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
+> 
+> Which will let the first throttled bio to be issued immediately once
+> the config if updated.
+> 
+> Do you think this behaviour is OK? If so, we can do the same for
+> tg_with_in_iops_limit.
 
-Thank you for the patch! Yet something to improve:
+So, the current behavior is that if the user is being silly, it will get
+slower and slower. The new behavior would be that if the user is being
+silly, it can issue IOs faster and faster, which creates a perverse
+incentive to be silly.
 
-[auto build test ERROR on next-20220516]
-[also build test ERROR on v5.18-rc7]
-[cannot apply to axboe-block/for-next kdave/for-next device-mapper-dm/for-next linus/master v5.18-rc7 v5.18-rc6 v5.18-rc5]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Probably the right thing to do is probably something like translating the
+existing budget in light of the new configuration so that config change
+neither gives or takes away the budget which has already accumulated. That
+said, are you guys seeing this becoming an issue in practice?
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220517-015435
-base:    3f7bdc402fb06f897ff1f492a2d42e1f7c2efedb
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20220517/202205171251.o9RZslnw-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/1fc6f61076425c29e51cfa376f8dee4dbf588ed1
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220517-015435
-        git checkout 1fc6f61076425c29e51cfa376f8dee4dbf588ed1
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All errors (new ones prefixed by >>):
-
-   m68k-linux-ld: drivers/block/null_blk/zoned.o: in function `null_init_zoned_dev':
->> zoned.c:(.text+0x9c6): undefined reference to `__udivdi3'
-   `.exit.text' referenced in section `.data' of sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
+Thanks.
 
 -- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+tejun
