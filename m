@@ -2,100 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A91C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 01:40:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60456C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 01:58:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234112AbiEQBkk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 21:40:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
+        id S233652AbiEQB6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 21:58:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231174AbiEQBkk (ORCPT
+        with ESMTP id S232318AbiEQB6n (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 21:40:40 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A370427D0
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:40:37 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id x52so15572649pfu.11
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:40:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=pDVzTuq1/SzeqmY81K4QwNMoqKh0Q+6eYN0rYywPrGg=;
-        b=hk4Kp+/TbZw1WemFXykuFUK3XCfLW62sVOWtH8hFKd8S/ZKtMfwWNDLY/aZeOPX1od
-         tNqI82W3wqaLtWoHFxeWvo5sTxzNdsGf76Jmz699fcSWOwLPbNpWeysyFmVpwUIYMfUN
-         Tr/M0R665VtQBKVk3iCVrRVlYgccZ+xIdup39BMtjNtfQf7VhL9lZdK6o1LhRK7y93Sl
-         WHyoMybo7haTVf/9Qz9WyNdxCMg0b+9OTBgcmin96sfq/F0xhAWbpahDqVJgSe28pxXe
-         XPkZLrS0VTK/AEi+8+FeknVUZVvSfRjq7oCSoQdZCsNQl6+oyEauz9iUjmnHt9kws3nA
-         tW6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=pDVzTuq1/SzeqmY81K4QwNMoqKh0Q+6eYN0rYywPrGg=;
-        b=2ciXg5XvNm6cY9uHPrYyIC45sVNhu6AU6TYuz3afwXI/fvJxJ1iMz792vGgEIWRFcO
-         0lChyVkd3th413CDYGI/4Kf90shuqU6DMnib0OjReGg5I4El+zlnBaHI1uHmduXJFy0Q
-         LRXPM0gBOh7XM0Uhw2OwDay2lJlxBmtCxBl77TWZ0Ll5z7o9i0tJecOHlKuRjux51GOD
-         9XzL+i/EXAc1Pd6rOzkfvyyFvU9hQ8ltnWzBCKoRv5TfEXSO9ceoKQwZPvZrgLQgnfhE
-         TQIJMEBvLAsv/CrREYVj8LjZr2eRMxGZaNLLDRIhC7BVDJkUabUhP68jKajr5sIdETIy
-         SkJA==
-X-Gm-Message-State: AOAM531Rym+QJh1CrgOfpgU34Xj9YUQabLBQLIiIAn/lfGWr/z/yZvTr
-        dFZzKn8oUD9r6s0jjWm8+WmAAw==
-X-Google-Smtp-Source: ABdhPJzmZSe635ly0+vqqRrp2JZMKf7C+CYajifUBm0JR7lxq4b5pcfAzRqCWYwGoOVeaJEYrbA30A==
-X-Received: by 2002:aa7:8757:0:b0:50d:48a9:f021 with SMTP id g23-20020aa78757000000b0050d48a9f021mr20027027pfo.24.1652751636829;
-        Mon, 16 May 2022 18:40:36 -0700 (PDT)
-Received: from [10.254.192.228] ([139.177.225.229])
-        by smtp.gmail.com with ESMTPSA id h1-20020a62de01000000b0050dc762816bsm7523839pfg.69.2022.05.16.18.40.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 May 2022 18:40:36 -0700 (PDT)
-Message-ID: <1b0d20fb-ec92-6282-b8c3-4c0441ba4f8a@bytedance.com>
-Date:   Tue, 17 May 2022 09:39:14 +0800
+        Mon, 16 May 2022 21:58:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89D0440E67
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:58:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652752721;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dan4b7oMniQEPDBtcHcK4omWqrnS96Raov0S3bkdiog=;
+        b=g4jTGhG729+2xYvAw2og/YIv86l5/TITjEh8SWwLhFvkmm7XW5qczWtE2aEiDz+gWtxHVB
+        L7vLoXz/csPxngBdoIAGn7j/pqBHxL8ZPv5DTwokTJgekxZU0l8W10b1dWgan+R3PojBYT
+        Dv18pYimEh18nwgSkRpA6nEjE4LZNh0=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-19-hM4Qy6dFPTmRJTsFajiPog-1; Mon, 16 May 2022 21:58:38 -0400
+X-MC-Unique: hM4Qy6dFPTmRJTsFajiPog-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E425B3AF42A2;
+        Tue, 17 May 2022 01:58:37 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1FFD72026D64;
+        Tue, 17 May 2022 01:58:02 +0000 (UTC)
+Date:   Tue, 17 May 2022 09:57:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        kwolf@redhat.com, sgarzare@redhat.com
+Subject: Re: [RFC PATCH] ubd: add io_uring based userspace block driver
+Message-ID: <YoMBJMk0GhXk+13E@T590>
+References: <20220509092312.254354-1-ming.lei@redhat.com>
+ <YoKmFYjIe1AWk/P8@stefanha-x1.localdomain>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [Phishing Risk] Re: [Phishing Risk] [External] Re: [PATCH]
- blk-iocost: fix very large vtime when iocg activate
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, duanxiongchun@bytedance.com,
-        songmuchun@bytedance.com
-References: <20220516084045.96004-1-zhouchengming@bytedance.com>
- <YoKb7wpkz3xoCS6s@slm.duckdns.org>
- <bcd0956a-9aa0-3211-801b-1f1eace6de79@bytedance.com>
- <YoL0RHmU4tbS2f/F@slm.duckdns.org>
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <YoL0RHmU4tbS2f/F@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoKmFYjIe1AWk/P8@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/5/17 09:03, Tejun Heo wrote:
-> On Tue, May 17, 2022 at 08:57:55AM +0800, Chengming Zhou wrote:
->> #define time_after64(a,b)	\
->> 	(typecheck(__u64, a) &&	\
->> 	 typecheck(__u64, b) && \
->> 	 ((__s64)((b) - (a)) < 0))
->> #define time_before64(a,b)	time_after64(b,a)
->>
->> I still don't get why my changes are wrong. :-)
-> 
-> It's a wrapping timestamp where a lower value doesn't necessarily mean
-> earlier. The before/after relationship is defined only in relation to each
-> other. Imagine a cirle representing the whole value range and picking two
-> spots in the circle, if one is in the clockwise half from the other, the
-> former is said to be earlier than the latter and vice-versa. vtime runs way
-> faster than nanosecs and wraps regularly, so we can't use absolute values to
-> compare before/after.
+Hello Stefan,
 
-Please ignore my previous reply, you are right. I should fix the tracing
-analysis tools to test again.
+On Mon, May 16, 2022 at 08:29:25PM +0100, Stefan Hajnoczi wrote:
+> Hi,
+> This looks interesting! I have some questions:
 
-Thanks.
+Thanks for your comment!
 
 > 
-> Thanks.
+> 1. What is the ubdsrv permission model?
 > 
+> A big usability challenge for *-in-userspace interfaces is the balance
+> between security and allowing unprivileged processes to use these
+> features.
+> 
+> - Does /dev/ubd-control need to be privileged? I guess the answer is
+>   yes since an evil ubdsrv can hang I/O and corrupt data in hopes of
+>   triggering file system bugs.
+
+Yes, I think so.
+
+UBD should be in same position with NBD which does require
+capable(CAP_SYS_ADMIN).
+
+> - Can multiple processes that don't trust each other use UBD at the same
+>   time? I guess not since ubd_index_idr is global.
+
+Only single process can open /dev/ubdcN for communicating with ubd
+driver, see ubd_ch_open().
+
+> - What about containers and namespaces? They currently have (write)
+>   access to the same global ubd_index_idr.
+
+I understand contrainers/namespaces only need to see /dev/ubdbN, and
+the usage model should be same with kernel loop: the global ubd_index_idr
+is same with loop's loop_index_idr too.
+
+Or can you explain a bit in detail if I misunderstood your point.
+
+> - Maybe there should be a struct ubd_device "owner" (struct
+>   task_struct *) so only devices created by the current process can be
+>   modified?
+
+I guess it isn't needed since /dev/ubdcN is opened by single process.
+
+> 
+> 2. io_uring_cmd design
+> 
+> The rationale for the io_uring_cmd design is not explained in the cover
+> letter. I think it's worth explaining the design. Here are my guesses:
+> 
+> The same thing can be achieved with just file_operations and io_uring.
+> ubdsrv could read I/O submissions with IORING_OP_READ and write I/O
+> completions with IORING_OP_WRITE. That would require 2 sqes per
+> roundtrip instead of 1, but the same number of io_uring_enter(2) calls
+> since multiple sqes/cqes can be batched per syscall:
+> 
+> - IORING_OP_READ, addr=(struct ubdsrv_io_desc*) (for submission)
+> - IORING_OP_WRITE, addr=(struct ubdsrv_io_cmd*) (for completion)
+> 
+> Both operations require a copy_to/from_user() to access the command
+> metadata.
+
+Yes, but it can't be efficient as io_uring command.
+
+Two OPs require two long code path for read and write which are supposed
+for handling fs io, so reusing complicated FS IO interface for sending
+command via cha dev is really overkill, and nvme passthrough has shown
+better IOPS than read/write interface with io_uring command, and extra
+copy_to/from_user() may fault with extra meta copy, which can slow down
+the ubd server.
+
+Also for IORING_OP_READ, copy_to_user() has to be done in the ubq daemon
+context, even though that isn't a big deal, but with extra cost(cpu utilization)
+in the ubq deamon context or sleep for handling page fault, that is
+really what should be avoided, we need to save more CPU for handling user
+space IO logic in that context.
+
+> 
+> The io_uring_cmd approach works differently. The IORING_OP_URING_CMD sqe
+> carries a 40-byte payload so it's possible to embed struct ubdsrv_io_cmd
+> inside it. The struct ubdsrv_io_desc mmap gets around the fact that
+> io_uring cqes contain no payload. The driver therefore needs a
+> side-channel to transfer the request submission details to ubdsrv. I
+> don't see much of a difference between IORING_OP_READ and the mmap
+> approach though.
+
+At least the performance difference, ->uring_cmd() requires much less
+code path(single simple o_uring command) than read/write, without any copy
+on command data, without fault in copy_to/from_user(), without two long/
+complicated FS IO code path.
+
+Single command of UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching
+io request desc and commit command result in one trip.
+
+> 
+> It's not obvious to me how much more efficient the io_uring_cmd approach
+> is, but taking fewer trips around the io_uring submission/completion
+> code path is likely to be faster. Something similar can be done with
+> file_operations ->ioctl(), but I guess the point of using io_uring is
+> that is composes. If ubdsrv itself wants to use io_uring for other I/O
+> activity (e.g. networking, disk I/O, etc) then it can do so and won't be
+> stuck in a blocking ioctl() syscall.
+
+ioctl can't be a choice, since we will lose the benefit of batching
+handling.
+
+> 
+> It would be nice if you could write 2 or 3 paragraphs explaining why the
+> io_uring_cmd design and the struct ubdsrv_io_desc mmap was chosen.
+
+Fine, I guess most are the above inline comment?
+
+> 
+> 3. Miscellaneous stuff
+> 
+> - There isn't much in the way of memory ordering in the code. I worry a
+>   little that changes to the struct ubdsrv_io_desc mmap may not be
+>   visible at the expected time with respect to the io_uring cq ring.
+
+I believe io_uring_cmd_done() with userspace cqe helper implies enough memory
+barrier, once the cqe is observed in userspace, any memory OP done before
+io_uring_cmd_done() should be observed by user side cqe handling code,
+otherwise it can be thought as io_uring bug.
+
+If it isn't this way, we still can avoid any barrier by moving
+setting io desc into ubq daemon context(ubd_rq_task_work_fn), but I
+really want to save cpu in that context, and don't think it is needed.
+
+
+Thanks, 
+Ming
+
