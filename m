@@ -2,96 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3225FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 23:46:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B6FC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 23:47:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232046AbiEQXqn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 19:46:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56320 "EHLO
+        id S232062AbiEQXrf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 19:47:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232022AbiEQXqm (ORCPT
+        with ESMTP id S232022AbiEQXre (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 19:46:42 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B8664ECD4
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 16:46:42 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id v10so590990pgl.11
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 16:46:42 -0700 (PDT)
+        Tue, 17 May 2022 19:47:34 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6EB84ECD4
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 16:47:33 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id z7-20020a17090abd8700b001df78c7c209so4010614pjr.1
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 16:47:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=osandov-com.20210112.gappssmtp.com; s=20210112;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=qIDtcTE4GF+Bd98SUlN4+a8vN7qNorxzRLqPxTW49SM=;
-        b=5nKadTpfXno/Mt/YQ78+VOAanXukImZGYnXlPWhIfQsOUir7bl6KV9x66pAmytzYvU
-         enp7Huoam4W2EjHyFH+ykjCOY36XbshO6deTQUzXkPqL8YanDeUigi2i+pfc4NkmqeA0
-         UY9FrDFdhDDB0zzEbH5lBuYOcMIkFYGsJGo+tDe/Xjs1s9/3Qu05oCftS66SRigU3Ud5
-         3lpYXIHt2iX2xgeNGc6jX/GNWk7U7nAY9y/igeZmWIs4qUkkz4Z0jI4R2UO2l8M0donB
-         dlKodMb8+QdD9XIj7EK+bB4+2jZLEci+SBOKY1jWUB7LqpcpfjSI7ydxFjgZ6O6M69pe
-         4PPA==
+        bh=ysJF4XM43y/fSy8sU+xRfX8p6G59gQY61NVV4iA9+hU=;
+        b=J+IvTmSTGYb9oKhTFmuSHbmJI3fA1UkjQGFnRIAi7lkIgccNLk+F4B20Sf+RrKbijf
+         Os4ZhCKGywUxIcncZgWlocJg7+O/0Q57pvAymnkZSd1zswwAmBrbyGuwnFpJRsZVO1Mp
+         yWn24T5hFvm+ES+sHjexWqfN4DH+zF188o3lS2kWm2yRsB21z2WFt+A/bmp+dQWpsZVZ
+         ofaE38DWc6T4pf1W1ECW0DGhCzD0HOvW5zhk5fsFK/gqdfQ5gastwEyqaIT8g8mqfitL
+         tsQVViUzvEreVPLVYZfqiMe8qIMM/egoc4Xjmu5fECcJsHPmedxq8ZzdDFbHL7eafiqS
+         e4hA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=qIDtcTE4GF+Bd98SUlN4+a8vN7qNorxzRLqPxTW49SM=;
-        b=HIvYqAvX13uLg3tzgCAmNZ6NZFDbrRo2+zO9nimDaoqRSGFFmeKg4liTavyhPicVM3
-         YBbRXUU72oHy02vm2TaF89+BPElMPyyPPxWvYU6+8ZFUHnEf4uktGxmbKg3GsJlWUclu
-         3bYTtaNqFJdTmFuCC7FoUhGqZnJjOMJ5KdaeFDHi74PiPRmspr4q83d0EAygqNvkkP5C
-         AQPNDcFHSQW+upyrkoLfzujlleJNtAkgIwEtBOA3XzVLhhuKgkV64vE3hS7jXX4+fxmO
-         tf506k4m2q6pOfYGxjbYVoLhywIyfNxuMJRS9C1CltKVOX9HvbQ8+uyUh/tlUOtIcA9k
-         /uYA==
-X-Gm-Message-State: AOAM533J0GzJKzfWKUsO71QGz2d68t8wLSI1xsJ4xbxvr8Vey0xF0E14
-        C0gs/d8bq1FbPuu1QmwWNHd40g==
-X-Google-Smtp-Source: ABdhPJz6uagxOWHhsT2iB07Xio0TjdRe6xfVO+GkPWH2xNGbHQNn5xW2YlCFeMp/EHlEemGZgqyFFA==
-X-Received: by 2002:a05:6a00:b85:b0:510:4275:2c71 with SMTP id g5-20020a056a000b8500b0051042752c71mr25161038pfj.31.1652831201855;
-        Tue, 17 May 2022 16:46:41 -0700 (PDT)
+        bh=ysJF4XM43y/fSy8sU+xRfX8p6G59gQY61NVV4iA9+hU=;
+        b=bIe0CZeFbNOopxpg4ykPqELYqjIJG8m7RLMcWXuIZtJaYckp7YWY5WsvZGxJPrhPfa
+         6uZrG4RsCwX7gnZRJB4hksFIQwMVgbHr7ze6uh+pR40jsoRBeUj+NI0OR7vTmx9WdlCd
+         mlfnLmTxIr7Dhcwz9lliuOobTBWuVVTIG88DLM6FZNR88CvWb8xmLB87ah7VJHGiyRJW
+         LxySA6EQD7OllqzfwLD5u/IluHcKnUehOcnuY/ATu5AVPNMGKvekjDfQ7Xe2Y6rNIgwR
+         58M98exVVonz7iUt4I+WQSCGi+ywGldl0WjgWhB/zxkwOhabS3u2Tc0qDLes+bN76oWT
+         LuhQ==
+X-Gm-Message-State: AOAM530gY240p2qjWaFJ3gP+TMLFYHSxtWZncVysUofIf9Cvsej9ZSPd
+        XqUz6W22X/2EhKrY8BAxAD3KWVWr33Z5DA==
+X-Google-Smtp-Source: ABdhPJxIFKvrloDcf7qqHK4BK4ip+opxD5ldCHH2eEfZjbDmlDnRzuf3LRF3xen18akrgPg1UnAslg==
+X-Received: by 2002:a17:90b:4a07:b0:1df:7c10:7d3e with SMTP id kk7-20020a17090b4a0700b001df7c107d3emr7780600pjb.109.1652831253175;
+        Tue, 17 May 2022 16:47:33 -0700 (PDT)
 Received: from relinquished.localdomain ([2620:10d:c090:500::e2ec])
-        by smtp.gmail.com with ESMTPSA id o9-20020a056a001bc900b0050dc7628199sm287059pfw.115.2022.05.17.16.46.40
+        by smtp.gmail.com with ESMTPSA id t6-20020a17090b018600b001cd4989ff42sm171449pjs.9.2022.05.17.16.47.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 May 2022 16:46:41 -0700 (PDT)
-Date:   Tue, 17 May 2022 16:46:39 -0700
+        Tue, 17 May 2022 16:47:32 -0700 (PDT)
+Date:   Tue, 17 May 2022 16:47:31 -0700
 From:   Omar Sandoval <osandov@osandov.com>
-To:     Xiao Yang <yangx.jy@fujitsu.com>
-Cc:     linux-block@vger.kernel.org, osandov@fb.com, bvanassche@acm.org
-Subject: Re: [PATCH blktests] common/multipath-over-rdma: Remove unused debug
- operation
-Message-ID: <YoQz36ABFpjpnHHT@relinquished.localdomain>
-References: <20220517035258.43945-1-yangx.jy@fujitsu.com>
+To:     Alan Adamson <alan.adamson@oracle.com>
+Cc:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        osandov@fb.com
+Subject: Re: blktests v4 tests/nvme: add tests for error logging
+Message-ID: <YoQ0E8s6gFczuppP@relinquished.localdomain>
+References: <20220516225539.81588-1-alan.adamson@oracle.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220517035258.43945-1-yangx.jy@fujitsu.com>
+In-Reply-To: <20220516225539.81588-1-alan.adamson@oracle.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 11:52:58AM +0800, Xiao Yang wrote:
-> The loop ("for m in ;") will never be entered and it seems
-> unnecessary to debug sereval modules during test. So I try
-> to remove the debug operation.
+On Mon, May 16, 2022 at 03:55:37PM -0700, Alan Adamson wrote:
+> Test nvme error logging by injecting errors. Kernel must have FAULT_INJECTION
+> and FAULT_INJECTION_DEBUG_FS configured to use error injector. Tests can be
+> run with or without NVME_VERBOSE_ERRORS configured.
 > 
-> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
-> ---
->  common/multipath-over-rdma | 6 ------
->  1 file changed, 6 deletions(-)
+> These test verify the functionality delivered by the follow:
+>         commit bd83fe6f2cd2 ("nvme: add verbose error logging")
 > 
-> diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-> index cef05ec..8b285e6 100644
-> --- a/common/multipath-over-rdma
-> +++ b/common/multipath-over-rdma
-> @@ -655,12 +655,6 @@ setup_test() {
->  		fi
->  	)
->  
-> -	if [ -d /sys/kernel/debug/dynamic_debug ]; then
-> -		for m in ; do
-> -			echo "module $m +pmf" >/sys/kernel/debug/dynamic_debug/control
-> -		done
-> -	fi
-> -
->  	setup_rdma || return $?
->  	start_target || return $?
->  	echo "Test setup finished" >>"$FULL"
-> -- 
-> 2.34.1
+> V2 - Update from suggestions from shinichiro.kawasaki@wdc.com
+> V3 - Add error injector helper functions to nvme/rc
+> V4 - Comments from shinichiro.kawasaki@wdc.com 
+> 
+> Alan Adamson (2):
+>   tests/nvme: add helper routine to use error injector
+>   tests/nvme: add tests for error logging
+> 
+>  tests/nvme/039     | 153 +++++++++++++++++++++++++++++++++++++++++++++
+>  tests/nvme/039.out |   7 +++
+>  tests/nvme/rc      |  44 +++++++++++++
+>  3 files changed, 204 insertions(+)
+>  create mode 100755 tests/nvme/039
+>  create mode 100644 tests/nvme/039.out
 
 Thanks, applied.
