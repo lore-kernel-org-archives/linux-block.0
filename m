@@ -2,58 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE3BC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 20:45:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69EAEC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 20:58:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352981AbiEQUpP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 16:45:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55788 "EHLO
+        id S240782AbiEQU6Z (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 16:58:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346397AbiEQUpO (ORCPT
+        with ESMTP id S237362AbiEQU6Y (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 16:45:14 -0400
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6882A52B2D
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 13:45:13 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id i19so36917692eja.11
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 13:45:13 -0700 (PDT)
+        Tue, 17 May 2022 16:58:24 -0400
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 533CF52E5A
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 13:58:22 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id tk15so7268ejc.6
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 13:58:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=cSbaj6m8IruioDruqyoSFgzsLFTHdPcEb55nsCK4TWE=;
-        b=gIJl50Eulc8Vsdg9AlkQITMqbdDAC+WLftF0jWbwTU2Ox6ZAesuN7rpCB0FMaRU0ku
-         lJ4nDGxYlUcGBrMF0OBIcV7BVZ/6dQhxV8Y0AN9udmHCOs/hbsS8QNfTOzm42DOyD04B
-         INwkuTN7sK2mchrwYyIFLcP6G7cfMdvJzdCsNO6DHF0vKZ31XkNnoK+uC/5SjLn6IjFW
-         LYxNgm+TAwk3YHjlV0dMNF83/wQ0tz2C2XtfpIqEIso03Z3DCFpUgCW94yJNGTqJgJ1H
-         adGsX1arLF1hk3vyAaddUCxOoag3FN3FPGl5vEZnxDkCBBx+fmhj7tk5jbSySPZDtWuo
-         qm3A==
+        bh=wG//9LUlNxX10FI60aAD9TW4A6u0+UVzKTFUfna9EcM=;
+        b=AxBMNTbcHtmh4XBZsbTZkYEST7SubuiZ7mqjxOZOiMHXh43ts9yox8tTHJ+1hVeBIN
+         lY4fIhS+/lSj1st458hrZs6h5UyhayvPYCMRsR5CUSJGFGJ4JieKWcr5QD11SAurNEZw
+         XbaC58/XduEvKMk/yRYy0ERGkk6fE3d1ghzgCC0GhJVlhkZwQN5Ssx3QyOM8OYzflvEO
+         /RCBr0tVf2zPpkxY+sbZIfqK6likvHV1Dw4IzxHuady9FzE6y39pk3MRhizDmY4m8w0w
+         BfL2pSY84wMy/v9UJeBFzF5P3fmLp+DXF9hTrL+jC2wUiElYRRm7ExC0URvxQsbfIJ+I
+         WzlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=cSbaj6m8IruioDruqyoSFgzsLFTHdPcEb55nsCK4TWE=;
-        b=6dw58csFARk1zuat74lwi4qlEdNYSpDgRiD3kACifiqYZLK1DJAGOTHWExrt/uFh8v
-         6U9Yyts0IuKIL7aKOFDtgrrjoXDwilM3YXJdTPaGxkLteTF2ANTsFH1ePhqFMz+x5//P
-         r7HeKscAq44GqVoBYRZEdvjTlIzXGdyFv4dNBXdWmZuCM5o3nlgvVq2Q5slQam1GY8cE
-         snT0DQ3VxNRuCKJsvGPaP1StrdVqLNdf/wkY/zMsostYnL7MYofp/GADAdYle5AAOC1A
-         Hg5d1OeL+0dNbGgQCHfAYgHAq3913WiXWtV1M64oTS1JWNkcEn3qwh01m5NpT4aQ6KxQ
-         8sBg==
-X-Gm-Message-State: AOAM532ViONh/kA5z0UX7BOcnalCPMpWyW8wvJmErriiPIvqJs5hyqy/
-        3E52HW/Dlf5zR5xsacJv4B5hDjy9Sn1X4LXOrksavg==
-X-Google-Smtp-Source: ABdhPJyUT7v/+bRMzp2NCjUfzxBgDqk4IrNgbSICl9zfGmBkyXaJdmW22wa6lYaF7OVZbcBIcBpg8Xk/VoVYzb5Je8E=
+        bh=wG//9LUlNxX10FI60aAD9TW4A6u0+UVzKTFUfna9EcM=;
+        b=YfTQjr0o3TJ6wS99hsEGD+XDubpDZrFbUm3P9DV4W9Dwlzc7czhWGvDF3E6p5IkxED
+         cocccB5C53t5A0aNeePwjMMxq1Gv1dCX+0UoWkkl6/afcQA9CxBxpo8sRB1wr0/agbk0
+         u0Hc+r1ibyGEntbmt7m6ekl+UfZELKbmCdt/rdwoxOa+p3LZW0npf0VTKS3x90W0UlgJ
+         NtJB6sUUYq8pN394W73ZMBPpbOAKjfwwAj/2uqajxqe2UCgSxdQaikl1n6Q+O9EetiTT
+         qA6zPAIOgYs+MdtCirG12oCA1B2jwglPxaC0LXxcGp19hNSBMLhKWZ+nDUehs5/liEd0
+         XlaA==
+X-Gm-Message-State: AOAM5318rIsJmM3yujFiVLx0gQaS3aD182fZ97fn4o5KUwiMjRVQRF6T
+        HWvo+Yo0qDCeL0wNLrdivLGeanh+AHNXI2+FdYZhgw==
+X-Google-Smtp-Source: ABdhPJzIamuR1/kdHQioWL/LbryCYzlRAz8brhzkGJnKiTbrFbAryR+D9resD6kTTvU0KeuWD2VCw5Yxttr6yNiHuvQ=
 X-Received: by 2002:a17:907:1c89:b0:6f4:4089:8256 with SMTP id
- nb9-20020a1709071c8900b006f440898256mr20602107ejc.60.1652820311327; Tue, 17
- May 2022 13:45:11 -0700 (PDT)
+ nb9-20020a1709071c8900b006f440898256mr20638205ejc.60.1652821100668; Tue, 17
+ May 2022 13:58:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220429043913.626647-1-davidgow@google.com> <20220513083212.3537869-1-davidgow@google.com>
-In-Reply-To: <20220513083212.3537869-1-davidgow@google.com>
+References: <20220429043913.626647-1-davidgow@google.com> <20220513083212.3537869-2-davidgow@google.com>
+ <CAGS_qxr54nYThsj6UhqX54JO5WnyJXVQURnNF1eCzGB+4GCKLA@mail.gmail.com>
+ <CABVgOS=gTznLFBTZbmNH7AFDnr7O70mWR9v4q6sDA7q04fKT=Q@mail.gmail.com> <CAGS_qxqFEcw=28FxbMMtEcjqcsgFHXV6Td+uTgDj32Z=PiQJkA@mail.gmail.com>
+In-Reply-To: <CAGS_qxqFEcw=28FxbMMtEcjqcsgFHXV6Td+uTgDj32Z=PiQJkA@mail.gmail.com>
 From:   Brendan Higgins <brendanhiggins@google.com>
-Date:   Tue, 17 May 2022 16:45:00 -0400
-Message-ID: <CAFd5g46dQ=q5UuXaoXwh32kjGoFi0m59L-frm6T5Xcwo81m0Hg@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] panic: Taint kernel if tests are run
-To:     David Gow <davidgow@google.com>
-Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+Date:   Tue, 17 May 2022 16:58:09 -0400
+Message-ID: <CAFd5g45MCdydiLtn_UHku8d9-RMurLS+ep3fwZTuBafABpFrPw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] kunit: Taint the kernel when KUnit tests are run
+To:     Daniel Latypov <dlatypov@google.com>
+Cc:     David Gow <davidgow@google.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Jonathan Corbet <corbet@lwn.net>,
         Andrew Morton <akpm@linux-foundation.org>,
         Kees Cook <keescook@chromium.org>,
@@ -64,9 +67,11 @@ Cc:     Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
         Sebastian Reichel <sre@kernel.org>,
         John Ogness <john.ogness@linutronix.de>,
         Joe Fradley <joefradley@google.com>,
-        Daniel Latypov <dlatypov@google.com>,
-        kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        KUnit Development <kunit-dev@googlegroups.com>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Jani Nikula <jani.nikula@linux.intel.com>,
         Lucas De Marchi <lucas.demarchi@intel.com>,
         Aaron Tomlin <atomlin@redhat.com>,
@@ -76,25 +81,91 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 13, 2022 at 4:32 AM David Gow <davidgow@google.com> wrote:
+On Sat, May 14, 2022 at 3:25 PM Daniel Latypov <dlatypov@google.com> wrote:
 >
-> Most in-kernel tests (such as KUnit tests) are not supposed to run on
-> production systems: they may do deliberately illegal things to trigger
-> errors, and have security implications (for example, KUnit assertions
-> will often deliberately leak kernel addresses).
+> On Fri, May 13, 2022 at 8:04 PM David Gow <davidgow@google.com> wrote:
+> > Hmm... thinking about it, I think it might be worth not tainting if 0
+> > suites run, but tainting if 0 tests run.
+> >
+> > If we taint even if there are no suites present, that'll make things
+> > awkward for the "build KUnit in, but not any tests" case: the kernel
+> > would be tainted regardless. Given Android might be having the KUnit
 >
-> Add a new taint type, TAINT_TEST to signal that a test has been run.
-> This will be printed as 'N' (originally for kuNit, as every other
-> sensible letter was taken.)
+> Actually, this is what the code does right now. I was wrong.
+> If there are 0 suites => not tainted.
+> If there are 0 tests in the suites => tainted.
 >
-> This should discourage people from running these tests on production
-> systems, and to make it easier to tell if tests have been run
-> accidentally (by loading the wrong configuration, etc.)
+> For kunit being built in, it first goes through this func
+>    206  static void kunit_exec_run_tests(struct suite_set *suite_set)
+>    207  {
+>    208          struct kunit_suite * const * const *suites;
+>    209
+>    210          kunit_print_tap_header(suite_set);
+>    211
+>    212          for (suites = suite_set->start; suites <
+> suite_set->end; suites++)
+>    213                  __kunit_test_suites_init(*suites);
+>    214  }
 >
-> Signed-off-by: David Gow <davidgow@google.com>
+> So for the "build KUnit in, but not any tests" case, you'll never
+> enter that for-loop.
+> Thus you'll never call __kunit_test_suites_init() => kunit_run_tests().
+>
+> For module-based tests, we have the same behavior.
+> If there's 0 test suites, we never enter the second loop, so we never taint.
+> But if there's >0 suites, then we will, regardless of the # of test cases.
+>
+>    570  int __kunit_test_suites_init(struct kunit_suite * const * const suites)
+>    571  {
+>    572          unsigned int i;
+>    573
+>    574          for (i = 0; suites[i] != NULL; i++) {
+>    575                  kunit_init_suite(suites[i]);
+>    576                  kunit_run_tests(suites[i]);
+>    577          }
+>    578          return 0;
+>    579  }
+>
+> So this change should already work as intended.
+>
+> > execution stuff built-in (but using modules for tests), it's probably
+> > worth not tainting there. (Though I think they have a separate way of
+> > disabling KUnit as well, so it's probably not a complete
+> > deal-breaker).
+> >
+> > The case of having suites but no tests should still taint the kernel,
+> > as suite_init functions could still run.
+>
+> Yes, suite_init functions are the concern. I agree we should taint if
+> there are >0 suites but 0 test cases.
+>
+> I don't think it's worth trying to be fancy and tainting iff there >0
+> test cases or a suite_init/exit function ran.
+>
+> >
+> > Assuming that seems sensible, I'll send out a v4 with that changed.
+>
+> Just to be clear: that shouldn't be necessary.
 
-Aside from Luis' comment (which I agree with), this looks good. I am
-not an expert on the taint mechanism, but this seems pretty
-straightforward.
+Agreed. I think the current behavior is acceptable, and should be
+unobtrusive to Android: Joe has a patch that introduces a kernel param
+which disables running KUnit tests at the suite level which would
+happen before this taint occurs. So the only way the taint happens is
+if we actually try to execute some test cases (whether or not the
+cases actually run).
 
-Reviewed-by: Brendan Higgins <brendanhiggins@google.com>
+> > > I wasn't quite sure where this applied, but I manually applied the changes here.
+> > > Without this patch, this command exits fine:
+> > > $ ./tools/testing/kunit/kunit.py run --kernel_args=panic_on_taint=0x40000
+> > >
+> > > With it, I get
+> > > [12:03:31] Kernel panic - not syncing: panic_on_taint set ...
+> > > [12:03:31] CPU: 0 PID: 1 Comm: swapper Tainted: G                 N
+> >
+> > This is showing both 'G' and 'N' ('G' being the character for GPL --
+>
+> I just somehow missed the fact there was an 'N' at the end there.
+> Thanks, I thought I was going crazy. I guess I was just going blind.
+>
+>
+> Daniel
