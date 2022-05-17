@@ -2,129 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF3CEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 21:16:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82ACCC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 22:55:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238483AbiEQVQL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 17:16:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41214 "EHLO
+        id S231319AbiEQWzZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 18:55:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58622 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240732AbiEQVQK (ORCPT
+        with ESMTP id S231230AbiEQWzZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 17:16:10 -0400
-Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E676B1CE
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 14:16:06 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-        by mailout.nyi.internal (Postfix) with ESMTP id B85F85C0180;
-        Tue, 17 May 2022 17:16:03 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Tue, 17 May 2022 17:16:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rath.org; h=cc
-        :cc:content-transfer-encoding:content-type:date:date:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to; s=fm2; t=1652822163; x=
-        1652908563; bh=cnAzkdmvoPxdDd20e9pP5gA4i8RocZR9hT0QrY+6HuQ=; b=1
-        Dn5xOoHBQvyvW7nXPVGeL/KVkXHkrmxLfyfxUuYsJIRdXMf/rA0ScrGeXcuq9OGC
-        M6Wo5Ox6mukbQg8beB3Gozg8UsOeYBPL5S9Ifs7D0WYW4gJJhPTXJOw6aqbZ43gJ
-        Bre4DVx1Scx8X0b0RBNoJxERH19lDbviDtvP8R4qc/rI2dnMJdyrwnF9HFSwEm7r
-        z8GnNi0zx2sw2e/aU+sWI+nBdiLewWcSEBYBtYcVIt7iXqnptT2t8zm1iENlKDhb
-        /sry9p4Nye1JH2GsLBQPBdsodwTH2NXgmuhdo9pMXWstRkOFBvIq+FPZlWdmeFl+
-        MvzsexE9isdy9f8DRcCxQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:cc:content-transfer-encoding
-        :content-type:date:date:feedback-id:feedback-id:from:from
-        :in-reply-to:in-reply-to:message-id:mime-version:references
-        :reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1652822163; x=
-        1652908563; bh=cnAzkdmvoPxdDd20e9pP5gA4i8RocZR9hT0QrY+6HuQ=; b=s
-        RjPk4vg9l96heB3HzXwGekO/mGoTqsb4s5dUMAUSdHw+Bs05ku/m2RvVV5YV4Zxn
-        2SDnwfs58iraCY5t/lDE7t5TMuYRXTdp+CB6g7ua2jYYJRydGmG3FxxuT33b0ZGl
-        ddwdnRjR432QlVzWbl4YI3/G5yxcvwdaoGhuhQtDlaFq6xU+8ezetN2tkKawCV4Y
-        klz/H5Ry+WVXInKd3yiZawsQvfbIcI76KeT0aTKQbLck6FXI/o2snxH0/14Qhi/U
-        5m2AqbMrIcYh3PsuisEMlQuZQAS3kCjMGB9VQDXCmnPgDSfqj/TlUTcCa9JWt0hA
-        BOOxHerNJGm9+sSSc0PnA==
-X-ME-Sender: <xms:kxCEYntm-de4S7EFoRean5UDWirUKJ1AlzNNTqncOFem5Il6SU42lw>
-    <xme:kxCEYodAnXLGoX57loMW2BCDVrDhI4y88jGGmPtfHCtYoh3mXzUSbCV39T63DMhil
-    vRvWZ9HElZwfSeE>
-X-ME-Received: <xmr:kxCEYqwbwppse8Y3AJHb925zGG4a9QfED3xuZueXQetqGtjFbhp-jK1k9vcsIda1MHOWZj85TEQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvfedrheejgdduheehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhephffvvefufhffjgfkfgggtgfgsehtqhdttddtreejnecuhfhrohhmpefpihhk
-    ohhlrghushcutfgrthhhuceopfhikhholhgruhhssehrrghthhdrohhrgheqnecuggftrf
-    grthhtvghrnhepvddujeffvdevfeduhfeiueffgfehgfekieeuffelieeijeegieevudeh
-    feekhfehnecuffhomhgrihhnpehgihhthhhusgdrtghomhdpuggvsghirghnrdhorhhgne
-    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheppfhikhho
-    lhgruhhssehrrghthhdrohhrgh
-X-ME-Proxy: <xmx:kxCEYmO89TgDc3g-qKygo7aahGRofWVJFxdZ-pbslbFqSn2GzGThPg>
-    <xmx:kxCEYn_saclnwvZ4xPVSykNPV0622VsAa4icyun19_5s74Z319vO2A>
-    <xmx:kxCEYmVojpTXaarg8BwZ96anU7L9vo0F4MX7lgi6kOJFwlQaYwuRfQ>
-    <xmx:kxCEYnxgSQQY728WJEAe7qMcAnndBWxy3tWBt8pY7Wa6wgimg9RWYg>
-Feedback-ID: i53a843ae:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 17 May 2022 17:16:02 -0400 (EDT)
-Received: from vostro.rath.org (vostro [192.168.12.4])
-        by ebox.rath.org (Postfix) with ESMTPS id 66FA576E;
-        Tue, 17 May 2022 21:16:01 +0000 (UTC)
-Received: by vostro.rath.org (Postfix, from userid 1000)
-        id 0EFC472A20; Tue, 17 May 2022 22:16:01 +0100 (BST)
-From:   Nikolaus Rath <Nikolaus@rath.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     "Richard W.M. Jones" <rjones@redhat.com>, <libguestfs@redhat.com>,
-        <linux-block@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Subject: Re: [Libguestfs] Communication issues between NBD driver and NBDKit
- server
-References: <04a0a06b-e6dc-48b7-bc29-105dab888a56@www.fastmail.com>
-        <20220515180525.GF8021@redhat.com> <87czgelidg.fsf@vostro.rath.org>
-        <20220515192505.GJ1127@redhat.com>
-        <1f37a75a-83b5-af8e-0dd3-6475652ab218@huawei.com>
-Mail-Copies-To: never
-Mail-Followup-To: "yukuai (C)" <yukuai3@huawei.com>, "Richard W.M. Jones"
-        <rjones@redhat.com>, <libguestfs@redhat.com>,
-        <linux-block@vger.kernel.org>, Josef Bacik <josef@toxicpanda.com>
-Date:   Tue, 17 May 2022 22:16:01 +0100
-In-Reply-To: <1f37a75a-83b5-af8e-0dd3-6475652ab218@huawei.com> (yukuai's
-        message of "Mon, 16 May 2022 09:08:08 +0800")
-Message-ID: <87a6bflv1q.fsf@vostro.rath.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+        Tue, 17 May 2022 18:55:25 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0154F46A
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 15:55:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id DCC0A61389
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 22:55:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1ADCC385B8;
+        Tue, 17 May 2022 22:55:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652828123;
+        bh=IjhLch1Kk3hCKO0qp6OQnXnIm9Orr1T8BKONZMzVIsI=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pPZHmCE93QGa74snM7VjHIds4VZ5mBlb2/2tIuAPrrAEhhMoOtsRFP9oD3xFdStvi
+         OlRgaFYAALfhzWRqUEjFe4BNuDA00eDW5J/WxxJWuxCfYREMwfUodHr3+rue8B5+Bl
+         Xxjl7Zk85C/QoXsLdhKM+2FMXEOOgAveSX+TROS5nSFxMdBRJwRh62xM1mF12jzDdw
+         nolmzl/9lMJjhzvTMO9LDQY7gKI+K89plUKn6MrFcI2cq3EaK4YtNl+gK8mN+zIRSe
+         LI9eZQxpbRTTnQVdomP9wSvqGfO6SZu+HvTCf9FrWje8MbSKdpqzWQ2/tdJBAmTTcS
+         pyjWsm13KsH9g==
+Date:   Tue, 17 May 2022 16:55:20 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-block@vger.kernel.org,
+        axboe@kernel.dk, Kernel Team <kernel-team@fb.com>
+Subject: Re: [PATCH 1/3] block: export dma_alignment attribute
+Message-ID: <YoQn2KkI/nwnUmIG@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220513161339.1580042-1-kbusch@fb.com>
+ <YoH0vuUA4KdcpEAz@infradead.org>
+ <YoJgdrMpIiobiDy3@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoJgdrMpIiobiDy3@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 16 2022, "yukuai (C)" <yukuai3@huawei.com> wrote:
-> On 2022/05/16 3:25, Richard W.M. Jones wrote:
->> On Sun, May 15, 2022 at 08:12:59PM +0100, Nikolaus Rath wrote:
->>> Do you see any way for this to happen?
->> I think it's impossible.  A more likely explanation follows.
->> If you look at the kernel code, the NBD_CMD_INFLIGHT command flag is
->> cleared when a command times out:
->>    https://github.com/torvalds/linux/blob/0cdd776ec92c0fec768c7079331804=
-d3e52d4b27/drivers/block/nbd.c#L407
->> That's the place where it would have printed the "Possible stuck
->> request" message.
->> Some time later, nbdkit actually replies to the message (for the first
->> and only time) and in that code the flag is checked and found to be
->> clear already, causing the "Suspicious reply" message to be printed:
-> Hi,
->
-> You are right, can you try the following patch?
->
-> https://lists.debian.org/nbd/2022/04/msg00212.html
+On Mon, May 16, 2022 at 08:32:22AM -0600, Keith Busch wrote:
+>  
+> > The XFS_IOC_DIOINFO ioctl from xfs is one, although ugly, option.
+> > The other is to export the alignment requirements through statx.
+> > We had that whole discussion with the inline crypto direct I/O support,
+> > and we really need to tackle it rather sooner than later.
+> 
+> I'll try out assigning one of the spares in 'struct statx' for the purpose. I
+> like the interface for that, and looks easy enough to pass along the dma
+> alignment requirement through it.
 
-Ah, I guess that makes sense. I thought that not specifying a timeout
-meant "never time out".
+A little less easy than I thought... This is what I'm coming up with, and it's
+bad enough that I'm sure there has to be a better way. Specifically concerning
+is the new "do_dma()" function below, and was the only way I managed to get the
+correct 'struct block_device' whether we're stat'ing a filesystem file or raw
+block device file.
 
-I'll set this to a large value and report back if the problem recurs.
-
-Thanks!
--Nikolaus
-
---=20
-GPG Fingerprint: ED31 791B 2C5C 1613 AF38 8B8A D113 FCAC 3C4E 599F
-
-             =C2=BBTime flies like an arrow, fruit flies like a Banana.=C2=
-=AB
+---
+diff --git a/fs/stat.c b/fs/stat.c
+index 5c2c94464e8b..72c0b36599c2 100644
+--- a/fs/stat.c
++++ b/fs/stat.c
+@@ -17,6 +17,7 @@
+ #include <linux/syscalls.h>
+ #include <linux/pagemap.h>
+ #include <linux/compat.h>
++#include <linux/blkdev.h>
+ 
+ #include <linux/uaccess.h>
+ #include <asm/unistd.h>
+@@ -594,6 +595,7 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
+ 	tmp.stx_uid = from_kuid_munged(current_user_ns(), stat->uid);
+ 	tmp.stx_gid = from_kgid_munged(current_user_ns(), stat->gid);
+ 	tmp.stx_mode = stat->mode;
++	tmp.stx_dma = stat->dma;
+ 	tmp.stx_ino = stat->ino;
+ 	tmp.stx_size = stat->size;
+ 	tmp.stx_blocks = stat->blocks;
+@@ -615,6 +617,35 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
+ 	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
+ }
+ 
++static void do_dma(int dfd, struct filename *filename, struct kstat *stat)
++{
++	struct open_flags op = {};
++	struct block_device *bdev;
++	struct file *f;
++
++	stat->dma = 511;
++
++	if (S_ISBLK(stat->mode)) {
++		bdev = blkdev_get_no_open(stat->rdev);
++
++		if (bdev) {
++			stat->dma = bdev_dma_alignment(bdev);
++			blkdev_put_no_open(bdev);
++		}
++		return;
++	}
++
++	f = do_filp_open(dfd, filename, &op);
++	if (IS_ERR(f))
++		return;
++
++	bdev = f->f_inode->i_sb->s_bdev;
++	if (bdev)
++		stat->dma = bdev_dma_alignment(bdev);
++	fput(f);
++}
++
+ int do_statx(int dfd, struct filename *filename, unsigned int flags,
+ 	     unsigned int mask, struct statx __user *buffer)
+ {
+@@ -630,6 +661,7 @@ int do_statx(int dfd, struct filename *filename, unsigned int flags,
+ 	if (error)
+ 		return error;
+ 
++	do_dma(dfd, filename, &stat);
+ 	return cp_statx(&stat, buffer);
+ }
+ 
+diff --git a/include/linux/stat.h b/include/linux/stat.h
+index 7df06931f25d..0a12c7498aa0 100644
+--- a/include/linux/stat.h
++++ b/include/linux/stat.h
+@@ -50,6 +50,7 @@ struct kstat {
+ 	struct timespec64 btime;			/* File creation time */
+ 	u64		blocks;
+ 	u64		mnt_id;
++	u16		dma;
+ };
+ 
+ #endif
+diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+index 1500a0f58041..380820c29c35 100644
+--- a/include/uapi/linux/stat.h
++++ b/include/uapi/linux/stat.h
+@@ -106,7 +106,7 @@ struct statx {
+ 	__u32	stx_uid;	/* User ID of owner */
+ 	__u32	stx_gid;	/* Group ID of owner */
+ 	__u16	stx_mode;	/* File mode */
+-	__u16	__spare0[1];
++	__u16	stx_dma;	/* DMA alignment */
+ 	/* 0x20 */
+ 	__u64	stx_ino;	/* Inode number */
+ 	__u64	stx_size;	/* File size */
+--
