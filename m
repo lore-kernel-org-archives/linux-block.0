@@ -2,55 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4FCC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 01:25:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A91C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 01:40:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230011AbiEQBZN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 16 May 2022 21:25:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47462 "EHLO
+        id S234112AbiEQBkk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 16 May 2022 21:40:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229827AbiEQBZN (ORCPT
+        with ESMTP id S231174AbiEQBkk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 16 May 2022 21:25:13 -0400
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F161133890
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:25:11 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id a19so15461534pgw.6
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:25:11 -0700 (PDT)
+        Mon, 16 May 2022 21:40:40 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A370427D0
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:40:37 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id x52so15572649pfu.11
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 18:40:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:subject:content-language:to
          :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=D/4KPWa9dqKvg6Vz7IhEunGR8QPJbm8+0oOV8yg7pbM=;
-        b=MpBV3cHVEjwoA/pxWhWl7pRygbKPRLBVKTCykZJlfL1BLWdwzxsxciclEElu/fnDYY
-         XQgte8akdUdHG49wC/X1IB5FzH7K99fDlQBkxfnk/CqcC+RA2N3R1g/2YylKJkYJZTsv
-         MorFAPC9v32AdRW6mGxRUKGilKBkDLSOzWwqR55ZqAOXMjDvOIkT3ZkBTB5IEY5kqYaI
-         twW9Io0PbMSHH7+D+QpBrpfGhrXatFzNM85qD5hGhZexVMp5rG6Qz3AuL6/Kjnp5gNcr
-         0bfywyJ1zRlyYKT2b+Ps8i7QSHm+GOP6yysPrPJ6SAtGDURgBpvZkcdnYqlQZ11aQKfm
-         qp4A==
+        bh=pDVzTuq1/SzeqmY81K4QwNMoqKh0Q+6eYN0rYywPrGg=;
+        b=hk4Kp+/TbZw1WemFXykuFUK3XCfLW62sVOWtH8hFKd8S/ZKtMfwWNDLY/aZeOPX1od
+         tNqI82W3wqaLtWoHFxeWvo5sTxzNdsGf76Jmz699fcSWOwLPbNpWeysyFmVpwUIYMfUN
+         Tr/M0R665VtQBKVk3iCVrRVlYgccZ+xIdup39BMtjNtfQf7VhL9lZdK6o1LhRK7y93Sl
+         WHyoMybo7haTVf/9Qz9WyNdxCMg0b+9OTBgcmin96sfq/F0xhAWbpahDqVJgSe28pxXe
+         XPkZLrS0VTK/AEi+8+FeknVUZVvSfRjq7oCSoQdZCsNQl6+oyEauz9iUjmnHt9kws3nA
+         tW6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=D/4KPWa9dqKvg6Vz7IhEunGR8QPJbm8+0oOV8yg7pbM=;
-        b=qCOiafajxsubnGG6OhzFuVPKfcACcf0Bh19Z1IYB3Cjh2VR1qNfN/a+YF9G+BR/Vx5
-         /9180Rttt95xAcpVwjL0MontoAoi6MuW1zkCX3T7MxS97T410hmaMScoi2N6A+Tv3Qq4
-         B0kx4FplicuyTV3qX0ZhTMBtyHp26L/bTzn91gIOL/yVJDTa1kByBp6wW7NY7qpfhL0M
-         Ni1nI6ULuOaQe45Jf4pZLYuNCVIFKDDefWHHuwTrYq5Z3ljo0Wp06dI9XYmgGv2leZan
-         gb630+S9vud/rynqQ1+A4W0F++Y2uO6gjJZYxBtGHNUEIVXG1Sj2wugo4qLKXAOYoDQv
-         1a4A==
-X-Gm-Message-State: AOAM531t+tv9eUE4mSpwKqZAZ7wGKVL+p8sexeZaoy5xWyTTQuMnu0j1
-        4iAYj5W42WNUe6eOPoERwOUCpQ==
-X-Google-Smtp-Source: ABdhPJydH5XqRCsDp8l+O36PRizIzhQMlvxBm2Gq9jrhOMBLIIFHQ1YMgTiMJrCKCKwE4I6JgS4xGA==
-X-Received: by 2002:a05:6a00:24cc:b0:50d:58bf:5104 with SMTP id d12-20020a056a0024cc00b0050d58bf5104mr20097370pfv.36.1652750711513;
-        Mon, 16 May 2022 18:25:11 -0700 (PDT)
+        bh=pDVzTuq1/SzeqmY81K4QwNMoqKh0Q+6eYN0rYywPrGg=;
+        b=2ciXg5XvNm6cY9uHPrYyIC45sVNhu6AU6TYuz3afwXI/fvJxJ1iMz792vGgEIWRFcO
+         0lChyVkd3th413CDYGI/4Kf90shuqU6DMnib0OjReGg5I4El+zlnBaHI1uHmduXJFy0Q
+         LRXPM0gBOh7XM0Uhw2OwDay2lJlxBmtCxBl77TWZ0Ll5z7o9i0tJecOHlKuRjux51GOD
+         9XzL+i/EXAc1Pd6rOzkfvyyFvU9hQ8ltnWzBCKoRv5TfEXSO9ceoKQwZPvZrgLQgnfhE
+         TQIJMEBvLAsv/CrREYVj8LjZr2eRMxGZaNLLDRIhC7BVDJkUabUhP68jKajr5sIdETIy
+         SkJA==
+X-Gm-Message-State: AOAM531Rym+QJh1CrgOfpgU34Xj9YUQabLBQLIiIAn/lfGWr/z/yZvTr
+        dFZzKn8oUD9r6s0jjWm8+WmAAw==
+X-Google-Smtp-Source: ABdhPJzmZSe635ly0+vqqRrp2JZMKf7C+CYajifUBm0JR7lxq4b5pcfAzRqCWYwGoOVeaJEYrbA30A==
+X-Received: by 2002:aa7:8757:0:b0:50d:48a9:f021 with SMTP id g23-20020aa78757000000b0050d48a9f021mr20027027pfo.24.1652751636829;
+        Mon, 16 May 2022 18:40:36 -0700 (PDT)
 Received: from [10.254.192.228] ([139.177.225.229])
-        by smtp.gmail.com with ESMTPSA id cp19-20020a17090afb9300b001df6f16be29sm314665pjb.32.2022.05.16.18.25.08
+        by smtp.gmail.com with ESMTPSA id h1-20020a62de01000000b0050dc762816bsm7523839pfg.69.2022.05.16.18.40.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 16 May 2022 18:25:11 -0700 (PDT)
-Message-ID: <d39d5f69-950b-17c4-f511-a3cbab55177f@bytedance.com>
-Date:   Tue, 17 May 2022 09:23:49 +0800
+        Mon, 16 May 2022 18:40:36 -0700 (PDT)
+Message-ID: <1b0d20fb-ec92-6282-b8c3-4c0441ba4f8a@bytedance.com>
+Date:   Tue, 17 May 2022 09:39:14 +0800
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.9.0
@@ -91,15 +91,8 @@ On 2022/5/17 09:03, Tejun Heo wrote:
 > faster than nanosecs and wraps regularly, so we can't use absolute values to
 > compare before/after.
 
-Yes, thanks for the explanation. But the problem is not comparing two timestamp,
-since ioc->margins.target is not a timestamp. This patch just fix a corner case
-when now->vnow < ioc->margins.target:
-
-u64 vtarget;
-
-vtarget = now->vnow - ioc->margins.target; --> vtarget should be a timestamp earlier than vnow.
-
-But when now->vnow < ioc->margins.target, vtarget would be a timestamp after vnow.
+Please ignore my previous reply, you are right. I should fix the tracing
+analysis tools to test again.
 
 Thanks.
 
