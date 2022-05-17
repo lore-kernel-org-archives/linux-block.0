@@ -2,76 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1024C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 04:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F50DC43217
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 04:13:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232598AbiEQELs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 00:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47552 "EHLO
+        id S235727AbiEQENL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 00:13:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229757AbiEQELq (ORCPT
+        with ESMTP id S237129AbiEQENJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 00:11:46 -0400
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A708F3FBCA
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 21:11:44 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-2fee9fe48c2so52954347b3.3
-        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 21:11:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=NO/qVr25gl9DWObhrjxNHN1PGGWIrTbPudg44b/JLeI=;
-        b=6KEbpLl+WAWuaT8l95JqbSOJgxSfJpLNEobjxxcKridU4U1e87XUTvnUWU6odxyltG
-         sXCcYvAJY+6YB1DpztmiFEnawZUnjEhrpZdrVqDMMN1cGgA1leE+uGdC2eL9FIQFSPdB
-         xEO8+E2C/VI8ufjhzynb2Z+cjaYGHRHv3EiZaE0UgmgXsHBuI952bSfrr9GwiudXZovw
-         CVqHc0o16YBvjIQ9aiw2/bi+cIfUuynJXbTcERUtjLZy+1Zd8Een7qt0NcebDbVycA6i
-         4xth0GFVrEk/CoU07cQjxYG1M9u2NZERL1P5PXhcCQ6ywkbKUWXRQHnHLustaralGwoS
-         2tXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=NO/qVr25gl9DWObhrjxNHN1PGGWIrTbPudg44b/JLeI=;
-        b=DI+AkyfHUEPBrl3sQNJQiJtzlzP5y1LkrdOgFvWJPiFcPdHoS/sUFlBHxfJZ1l2Czf
-         CY8/izFKMKts17R6TptXfghom3T9roulOgsKWfWueYDbRrVzcb29gRCVlI8V/kAofD44
-         pTbImbj1mcmPZg/vqLR08YyUO/qKIM1IKu5w6V96jvo57oJb0Ozl4+dW8jKgAkQSPRGI
-         PetZCYHfgTmxM09L02KGJOACYVrvN3nyEuFsms1GVgS4Q69as3mfEN6c1k/XRCIvDrOL
-         DYplwkA/H2oE9uwYhEvQvGofhpmrQm8ZScoQfYSv7EH4GUxKOWEjeRn66aKIr47mNJhc
-         wqdg==
-X-Gm-Message-State: AOAM530TZeC4xA09THUGAuh5AmwaFeWh6NUa5DUf3lf/puMt9Qc0bdw3
-        equ1cG2PXJQ5vL0wy11RSAQNeU379sPddVegkorGQQ==
-X-Google-Smtp-Source: ABdhPJw94mquCu2tzO4e+v+R3EKZQm+TzZ6hT1GPqsmlWqCmuAgQDMm/rqRAJ7UuVR8eO1d1Omo9W844ZRuDq2Cs1+Q=
-X-Received: by 2002:a81:7b05:0:b0:2f4:e45a:b06e with SMTP id
- w5-20020a817b05000000b002f4e45ab06emr23607287ywc.458.1652760704159; Mon, 16
- May 2022 21:11:44 -0700 (PDT)
+        Tue, 17 May 2022 00:13:09 -0400
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC4A53FD96;
+        Mon, 16 May 2022 21:13:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652760788; x=1684296788;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=1drYWkhJXlza+p8qJe1jaRor29et4ZBJVwKRLeAW2M8=;
+  b=SiGl200o+/Cm2HNH10aLAdWCKrnkzGLuzsLoWWSTWTAn3ioW6jA8nODT
+   cXjOaUy6E393lzwiu5aNJ2YN84WeRBmWtwdFwv04fqDJMp/npZaEntdjn
+   4W+1xF2chcWA4pI+YNbpx/oq7pEKo/zuxXUIXkcLCYLjQpYJvNXK8Hkq9
+   O07M0GCI9B/0MjupVK8obb0fh4UANapDzBY+0gGdzHn9wDr7RGclUkvPT
+   l9Ms5Gb60tnlNJY2/dSnxPdG2PvMaYEssDF4/Wes0AmGrh+2i71vNrRy/
+   gbbXfEUt5BCKaiuFhrYaSHGm7JPVLqN47rDHnNTvE2mSsDd3j2MgLjrjh
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10349"; a="268630910"
+X-IronPort-AV: E=Sophos;i="5.91,231,1647327600"; 
+   d="scan'208";a="268630910"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 May 2022 21:13:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,231,1647327600"; 
+   d="scan'208";a="699868498"
+Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
+  by orsmga004.jf.intel.com with ESMTP; 16 May 2022 21:13:04 -0700
+Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nqoZz-0000ap-DK;
+        Tue, 17 May 2022 04:13:03 +0000
+Date:   Tue, 17 May 2022 12:12:42 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, pankydev8@gmail.com,
+        dsterba@suse.com, hch@lst.de
+Cc:     kbuild-all@lists.01.org, linux-nvme@lists.infradead.org,
+        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
+        jiangbo.365@bytedance.com, linux-block@vger.kernel.org,
+        gost.dev@samsung.com, p.raghav@samsung.com,
+        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH v4 11/13] null_blk: allow non power of 2 zoned devices
+Message-ID: <202205171251.o9RZslnw-lkp@intel.com>
+References: <20220516165416.171196-12-p.raghav@samsung.com>
 MIME-Version: 1.0
-References: <20220516173930.159535-1-bh1scw@gmail.com>
-In-Reply-To: <20220516173930.159535-1-bh1scw@gmail.com>
-From:   Muchun Song <songmuchun@bytedance.com>
-Date:   Tue, 17 May 2022 12:11:08 +0800
-Message-ID: <CAMZfGtU8GYN6aLepHr3z=AvJ4XivmWpPdnvUBgaJUnmf37-28Q@mail.gmail.com>
-Subject: Re: [PATCH] blk-cgroup: Remove unnecessary rcu_read_lock/unlock()
-To:     bh1scw@gmail.com
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        Cgroups <cgroups@vger.kernel.org>,
-        "open list:BLOCK LAYER" <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220516165416.171196-12-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 1:39 AM <bh1scw@gmail.com> wrote:
->
-> From: Fanjun Kong <bh1scw@gmail.com>
->
-> spin_lock_irq/spin_unlock_irq contains preempt_disable/enable().
-> Which can serve as RCU read-side critical region, so remove
-> rcu_read_lock/unlock().
->
-> Signed-off-by: Fanjun Kong <bh1scw@gmail.com>
+Hi Pankaj,
 
-Reviewed-by: Muchun Song <songmuchun@bytedance.com>
+Thank you for the patch! Yet something to improve:
 
-Thanks.
+[auto build test ERROR on next-20220516]
+[also build test ERROR on v5.18-rc7]
+[cannot apply to axboe-block/for-next kdave/for-next device-mapper-dm/for-next linus/master v5.18-rc7 v5.18-rc6 v5.18-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220517-015435
+base:    3f7bdc402fb06f897ff1f492a2d42e1f7c2efedb
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20220517/202205171251.o9RZslnw-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/1fc6f61076425c29e51cfa376f8dee4dbf588ed1
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220517-015435
+        git checkout 1fc6f61076425c29e51cfa376f8dee4dbf588ed1
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   m68k-linux-ld: drivers/block/null_blk/zoned.o: in function `null_init_zoned_dev':
+>> zoned.c:(.text+0x9c6): undefined reference to `__udivdi3'
+   `.exit.text' referenced in section `.data' of sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
