@@ -2,113 +2,148 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8442FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 07:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C394DC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 07:55:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240782AbiEQHuP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 03:50:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43262 "EHLO
+        id S242175AbiEQHzu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 03:55:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236036AbiEQHuN (ORCPT
+        with ESMTP id S239714AbiEQHzs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 03:50:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9267544775
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 00:50:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652773811;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fcxa52FaP/LJSTmTsYRMIBzyizNUgowBuXRZOO4RnAA=;
-        b=VPny+DKtQg1QfmgCXr0WbYrT3NApY27T98anfyYSZDhvv/qsGU/SSDItd9F43QV4DkT2/x
-        ObnH0U9uH7zx02JTMifgw3IiOWg9oDDUK3P4Lf5XWJfdt0FtuBeubTvewPfQL8SYCPFGPc
-        QDW+FafzXELWvwO1r2q+cPRhvBjUzY8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-433-zzZy4rXjM0e348ewSnTnaA-1; Tue, 17 May 2022 03:50:10 -0400
-X-MC-Unique: zzZy4rXjM0e348ewSnTnaA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B12DE3C138A6;
-        Tue, 17 May 2022 07:50:09 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 309F9154A380;
-        Tue, 17 May 2022 07:50:03 +0000 (UTC)
-Date:   Tue, 17 May 2022 15:49:58 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Tejun Heo <tj@kernel.org>,
-        Zhang Wensheng <zhangwensheng5@huawei.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        cgroups@vger.kernel.org
-Subject: Re: [PATCH -next] block: fix io hung of setting throttle limit
- frequently
-Message-ID: <YoNTpswO2+tEWbWo@T590>
-References: <20220516014429.33723-1-zhangwensheng5@huawei.com>
- <YoKmCOAzwzw3Lz7g@slm.duckdns.org>
- <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
+        Tue, 17 May 2022 03:55:48 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B004F6594
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 00:55:45 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220517075541euoutp025685d8dfce534761a7060481de532dff~v1VM_Qwxm0796607966euoutp02P
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 07:55:41 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220517075541euoutp025685d8dfce534761a7060481de532dff~v1VM_Qwxm0796607966euoutp02P
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1652774141;
+        bh=bx0GajEor3WyGMo16Q7LjJjnXX5wkXjOwejR898IHlA=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=I8+Az9lIdGVLHbV0AzkHCRWe5RYyWlIrvzpTwFyxkR4fAuFs1sTkhDYjXSuCEBmTc
+         RyvVuWdBiuMAOPzKJ93pJHAiB6vESnyFzwC4ID4waMa48KLl4ncMn1aYJhWvELHtXh
+         h4vasnqKTB+7eK3SYUBkb2F9kKkJNZvwCJVhzh8M=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220517075541eucas1p28071cc51330ce204f2f8758a16b48970~v1VMfzl7Q0562505625eucas1p2h;
+        Tue, 17 May 2022 07:55:41 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id F6.99.10260.DF453826; Tue, 17
+        May 2022 08:55:41 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220517075540eucas1p126d19be7cc8d727e072f48bd3212684d~v1VMGc8rS2733227332eucas1p1h;
+        Tue, 17 May 2022 07:55:40 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220517075540eusmtrp17e72e2a8e0edb40b9b0ccb6231156131~v1VMFdVfT1822418224eusmtrp1f;
+        Tue, 17 May 2022 07:55:40 +0000 (GMT)
+X-AuditID: cbfec7f5-bf3ff70000002814-d0-628354fd157b
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id DE.47.09522.CF453826; Tue, 17
+        May 2022 08:55:40 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220517075540eusmtip108cb51d13511e557ffec5666fa5ad2f5~v1VL8TtDG1204312043eusmtip10;
+        Tue, 17 May 2022 07:55:40 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.7) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Tue, 17 May 2022 08:55:38 +0100
+Message-ID: <bfcab01e-dbc8-a990-17b1-4aeadffa5685@samsung.com>
+Date:   Tue, 17 May 2022 09:55:37 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.8.1
+Subject: Re: [PATCH v4 05/13] btrfs: zoned: Cache superblock location in
+ btrfs_zoned_device_info
+Content-Language: en-US
+To:     <dsterba@suse.cz>
+CC:     <pankydev8@gmail.com>, <dsterba@suse.com>, <hch@lst.de>,
+        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
+        <linux-btrfs@vger.kernel.org>, <jiangbo.365@bytedance.com>,
+        <linux-block@vger.kernel.org>, <gost.dev@samsung.com>,
+        <linux-kernel@vger.kernel.org>, <dm-devel@redhat.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <20220516215826.GZ18596@twin.jikos.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.7]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrBKsWRmVeSWpSXmKPExsWy7djP87p/Q5qTDFbf47HY+242q8WFH41M
+        Fot/f2exWLn6KJNFz4EPLBZ7b2lbXHq8gt1iz96TLBaXd81hs5i/7Cm7xY0JTxkt1tx8yuLA
+        4/HvxBo2j52z7rJ7bFrVyeaxeUm9x+6bDWwe7/ddZfNYv+Uqi8eZBUfYPT5vkgvgjOKySUnN
+        ySxLLdK3S+DKWNKcW9DGUdH08w5TA+NRti5GTg4JAROJpoP32EFsIYEVjBK/DjlC2F8YJW7v
+        suxi5AKyPzNKzP9xEa7h4o6TLBCJ5YwSt07/ZIKrern7LFRmJ6PEufNfgOZycPAK2EkcWCcC
+        0s0ioCrRvfsbI4jNKyAocXLmExYQW1QgQmLarDNgG4QFkiR2PPgAVsMsIC5x68l8JhBbREBU
+        4tL+FWDzmQVuMEksu7KXBWQ+m4CWRGMn2AucAsYSr1u3sUD0akq0bv/NDmHLS2x/O4cZ4gNF
+        iZsrf0F9Uyux9tgZdpCZEgKHOSV+XYVJuEis+nodqkFY4tXxLewQtozE6ck9LBB2tcTTG7+Z
+        IZpbGCX6d65nAzlIQsBaou9MDkSNo0RT3weoMJ/EjbeCEPfwSUzaNp15AqPqLKSgmIXk5VlI
+        XpiF5IUFjCyrGMVTS4tz01OLjfNSy/WKE3OLS/PS9ZLzczcxAhPb6X/Hv+5gXPHqo94hRiYO
+        xkOMEhzMSiK8BhUNSUK8KYmVValF+fFFpTmpxYcYpTlYlMR5kzM3JAoJpCeWpGanphakFsFk
+        mTg4pRqYOOIuqSb8XmOhYnp4e2LYfZ0qOaMYVW3PG7tbNZ8LXHH46RuqJVws1WXkxGtnInz/
+        6Z5D4W4Nsvy/Vq5MY7D3jNBbvvSBw/fpgbol2ZOrmFVuz7dx+6V+z/HsKpeipKeRG3981Lpf
+        +qyW+YXv/8aTk4VPP7X+ZXlKi9v8ue7xRQrP1LJ6eWp0NA9mZCp659274l2etUGOx8zodj+r
+        saiJ/x+ZSXU8F7ITbws/5YrtVpz0hG3XKsM7X177bmYMSnmwXF7OTL91fzFvR6WFVKlR8D79
+        jd98qz91SjCHTt0j45qZsXB2CouGhb/Oj7gDYfI3+7wOlqZHMXxSPS3f8DvdWOWtyJHfF/Km
+        cW82VmIpzkg01GIuKk4EAN5Uwi7bAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrPIsWRmVeSWpSXmKPExsVy+t/xu7p/QpqTDI5/1rXY+242q8WFH41M
+        Fot/f2exWLn6KJNFz4EPLBZ7b2lbXHq8gt1iz96TLBaXd81hs5i/7Cm7xY0JTxkt1tx8yuLA
+        4/HvxBo2j52z7rJ7bFrVyeaxeUm9x+6bDWwe7/ddZfNYv+Uqi8eZBUfYPT5vkgvgjNKzKcov
+        LUlVyMgvLrFVija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLWNKcW9DGUdH0
+        8w5TA+NRti5GTg4JAROJiztOsnQxcnEICSxllOj40scIkZCR+HTlIzuELSzx51oXG0TRR0aJ
+        eRu3MUM4Oxkl/h55w9TFyMHBK2AncWCdCEgDi4CqRPfub2CDeAUEJU7OfMICYosKREg82H2W
+        FcQWFkiS2PHgA1gNs4C4xK0n85lAbBEBUYlL+1dAXfSCUaL/0nKwzcwCN5gkll3ZywKyjE1A
+        S6KxE+w6TgFjidet21ggBmlKtG7/zQ5hy0tsfzuHGeIDRYmbK39BvVwr8er+bsYJjKKzkNw3
+        C8kds5CMmoVk1AJGllWMIqmlxbnpucWGesWJucWleel6yfm5mxiBKWHbsZ+bdzDOe/VR7xAj
+        EwfjIUYJDmYlEV6DioYkId6UxMqq1KL8+KLSnNTiQ4ymwECayCwlmpwPTEp5JfGGZgamhiZm
+        lgamlmbGSuK8ngUdiUIC6YklqdmpqQWpRTB9TBycUg1MUeHPhW7ptaWvmbnOQvlmVln5oQDB
+        U8xe0uvK7ViXp9qK3Xfa/lrnhkKfjPL5CHf3fXsYJuSzfn0p+FfFjjP59L/HWy/ETpHQVNtW
+        q53T8v2hFtu5+NwF/wOrdhQLXE2xXjb7vYXS8uVr9/e6n1qp2GEVnqC7wuSvTctb80VnHK2D
+        dScxBykzWLL9EC+Z1edpENz66dSstLMFXot3dBgc0r7DFDr7yu5L5xeaSWaa575g3bc/JY4r
+        RNE7MTO5qOa1wK+3uSqeCbZTElis+ZdoGwe3eJ8KmTb3cChD5PaDbskrD74542l+JvnnjWsv
+        A700wpriP2w49jtMy8OhlyGTZ73ivY5/Kl2Ox24ENiixFGckGmoxFxUnAgCKt6OGkgMAAA==
+X-CMS-MailID: 20220517075540eucas1p126d19be7cc8d727e072f48bd3212684d
+X-Msg-Generator: CA
+X-RootMTR: 20220516165425eucas1p29fcd11d7051d9d3a9a9efc17cd3b6999
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220516165425eucas1p29fcd11d7051d9d3a9a9efc17cd3b6999
+References: <20220516165416.171196-1-p.raghav@samsung.com>
+        <CGME20220516165425eucas1p29fcd11d7051d9d3a9a9efc17cd3b6999@eucas1p2.samsung.com>
+        <20220516165416.171196-6-p.raghav@samsung.com>
+        <20220516215826.GZ18596@twin.jikos.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 11:12:28AM +0800, yukuai (C) wrote:
-> 在 2022/05/17 3:29, Tejun Heo 写道:
-> > On Mon, May 16, 2022 at 09:44:29AM +0800, Zhang Wensheng wrote:
-> > > diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> > > index 469c483719be..8acb205dfa85 100644
-> > > --- a/block/blk-throttle.c
-> > > +++ b/block/blk-throttle.c
-> > > @@ -1321,12 +1321,14 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
-> > >   	 * that a group's limit are dropped suddenly and we don't want to
-> > >   	 * account recently dispatched IO with new low rate.
-> > >   	 */
-> > > -	throtl_start_new_slice(tg, READ);
-> > > -	throtl_start_new_slice(tg, WRITE);
-> > > +	if (!timer_pending(&sq->parent_sq->pending_timer)) {
-> > > +		throtl_start_new_slice(tg, READ);
-> > > +		throtl_start_new_slice(tg, WRITE);
-> > > -	if (tg->flags & THROTL_TG_PENDING) {
-> > > -		tg_update_disptime(tg);
-> > > -		throtl_schedule_next_dispatch(sq->parent_sq, true);
-> > > +		if (tg->flags & THROTL_TG_PENDING) {
-> > > +			tg_update_disptime(tg);
-> > > +			throtl_schedule_next_dispatch(sq->parent_sq, true);
-> > > +		}
-> > 
-> > Yeah, but this ends up breaking the reason why it's starting the new slices
-> > in the first place explained in the commit above, right? I'm not sure what
-> > the right solution is but this likely isn't it.
-> > 
-> Hi, Tejun
+On 2022-05-16 23:58, David Sterba wrote:
+>> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+>> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+>> ---
+>>  fs/btrfs/zoned.c | 13 +++++++++----
+>>  fs/btrfs/zoned.h |  1 +
+>>  2 files changed, 10 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
+>> index 06f22c021..e8c7cebb2 100644
+>> --- a/fs/btrfs/zoned.c
+>> +++ b/fs/btrfs/zoned.c
+>> @@ -511,6 +511,11 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
+>>  			   max_active_zones - nactive);
+>>  	}
+>>  
+>> +	/* Cache the sb zone number */
+>> +	for (i = 0; i < BTRFS_SUPER_MIRROR_MAX; ++i) {
+>> +		zone_info->sb_zone_location[i] =
+>> +			sb_zone_number(zone_info->zone_size_shift, i);
+>> +	}
 > 
-> Ming added a condition in tg_with_in_bps_limit():
-> -       if (bps_limit == U64_MAX) {
-> +       /* no need to throttle if this bio's bytes have been accounted */
-> +       if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
-> 
-> Which will let the first throttled bio to be issued immediately once
-> the config if updated.
-> 
-> Do you think this behaviour is OK? If so, we can do the same for
-> tg_with_in_iops_limit.
-
-IMO, you can't do that for iops limit. If BIO_THROTTLED is set for one
-bio, all its bytes have been accounted, so no need to throttle this bio
-in case of bps limit. iops limit is another story, since io account is
-done in request IO which is based on split bio, so the bio(split bio)
-still need to be check & throttle in case of iops limit.
-
-
-Thanks,
-Ming
-
+> I don't think we need to cache the value right now, it's not in any hot
+> path and call to bdev_zone_no is relatively cheap (only dereferencing a
+> few pointers, all in-memory values).
+Ok. I will fix it up in the next revision! Thanks.
