@@ -2,97 +2,166 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54532C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 04:18:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71F57C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 05:54:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232087AbiEQESu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 00:18:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35634 "EHLO
+        id S238151AbiEQFyT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 01:54:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229971AbiEQESs (ORCPT
+        with ESMTP id S238146AbiEQFyS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 00:18:48 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B0B130564;
-        Mon, 16 May 2022 21:18:47 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id l7-20020a17090aaa8700b001dd1a5b9965so1195152pjq.2;
-        Mon, 16 May 2022 21:18:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=xf0kL1+XuM7P75yKi5gORiIETclggCfCwYHC9O/komI=;
-        b=dGfNWhVuygx3lxtV8htZeLUSrHPK74n/4zuspp12F3Ej9aM1jDUfauaeUEwwflxDd1
-         cVfzVfCyiXz6HsQHbH3uqnCyETM0yGfbehqOfgpZjYrkRamWiLEAjUjU/N6XUCAGMwTg
-         e46ZvTeAHHkSFMQ3fJwFLWMW7AwEaAJJGbRZdKmJB+TENAhuzW3836VbZX0SLgkxvjQw
-         dwvW5/dOX/UeN8Rz/zat7MKgFD1Z3C5YP+RjOmCefWIW+Hfi05TAW6USx06+pNFf9TEl
-         SSiNgdWmlpUg386INY5i3wS7xQT1lUyDL2rOcTJJurcX6Q7JtYvwt6mfdCqGBBFKud9e
-         euTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=xf0kL1+XuM7P75yKi5gORiIETclggCfCwYHC9O/komI=;
-        b=cB09Zbb6zVriwEbMMN5ELDwdNY9RRaETuDQ7hT2MCKA6HAlKwhHv6Bmm3LivHCP7N1
-         BghGuUG7XznExHpKpbaCnus+3DCIJKIj6i0vADG/nmkz0iLx+LqvwEo2w+pF2I0CaU1H
-         cKpv2K18BR2Eidt/RddM6Hm11QYoL+Y8MeBJrOc9OP3Xgyn75jLrPYggmPNufEFaOV/S
-         xgT5Zjg9p5rEh6SJl6ZgjXfNRVAxaEcXQDzGilJpg0MSF0HFSbbH+0FVtRUpYDNrLz/z
-         Ikyd5YC5IqdTq6oEHHcy3PFeLYRbN4ybS6qKCa4H0MkF7LqNLRuWMYuPfp3qVRi7onNJ
-         ECVg==
-X-Gm-Message-State: AOAM531FZpMzu23+P4IgUwZ2akRypBkZUr/IOOZ2nsNw36YE/GtuElkd
-        Vlfh3P1AmfmcOlvIkBlYPGo=
-X-Google-Smtp-Source: ABdhPJwgsWcgQL4lPVuAZ8ixm4JN/ImNMVWhzcjD3C0B9Ty9Fqsv3rJBudKOk83QYc/aHonkST0aAQ==
-X-Received: by 2002:a17:90a:9b0d:b0:1dc:e81d:6c18 with SMTP id f13-20020a17090a9b0d00b001dce81d6c18mr23151877pjp.72.1652761126747;
-        Mon, 16 May 2022 21:18:46 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:62fc])
-        by smtp.gmail.com with ESMTPSA id c1-20020a170902c2c100b0015e8d4eb28csm7790789pla.214.2022.05.16.21.18.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 May 2022 21:18:46 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Mon, 16 May 2022 18:18:44 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     Zhang Wensheng <zhangwensheng5@huawei.com>,
-        "ming.lei@redhat.com >> Ming Lei" <ming.lei@redhat.com>,
-        axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, cgroups@vger.kernel.org
-Subject: Re: [PATCH -next] block: fix io hung of setting throttle limit
- frequently
-Message-ID: <YoMiJIUehq1UyzgQ@slm.duckdns.org>
-References: <20220516014429.33723-1-zhangwensheng5@huawei.com>
- <YoKmCOAzwzw3Lz7g@slm.duckdns.org>
- <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
+        Tue, 17 May 2022 01:54:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F2663E5F3
+        for <linux-block@vger.kernel.org>; Mon, 16 May 2022 22:54:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652766856;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=RgTypiFU9MrdMuBL1b7sGuUaK5nVLbYzi48+VEP8fg4=;
+        b=LvdN4wayY8RndIIemY580ZFnduf9OLxGeFDehhnHponU04lmwcx3wXcMU5t/kNll+UN7Nq
+        wrE36iic16ZJlRocmmf65z/ZWBjMWxjvFNWgNjY0OvGa1pisAb1lOoCTUSH1N4JfuauH23
+        LAuCPtUBU4tCtAsWcZe+J85eFfak0qk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-629-z4MWKAO9Oe2XSSonbbh3UQ-1; Tue, 17 May 2022 01:54:13 -0400
+X-MC-Unique: z4MWKAO9Oe2XSSonbbh3UQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7AACA811E78;
+        Tue, 17 May 2022 05:54:12 +0000 (UTC)
+Received: from localhost (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 767951561476;
+        Tue, 17 May 2022 05:54:11 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
+Date:   Tue, 17 May 2022 13:53:57 +0800
+Message-Id: <20220517055358.3164431-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ca251645-8d52-7a93-6ac2-579d97922a9e@huawei.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 11:12:28AM +0800, yukuai (C) wrote:
-> Ming added a condition in tg_with_in_bps_limit():
-> -       if (bps_limit == U64_MAX) {
-> +       /* no need to throttle if this bio's bytes have been accounted */
-> +       if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
-> 
-> Which will let the first throttled bio to be issued immediately once
-> the config if updated.
-> 
-> Do you think this behaviour is OK? If so, we can do the same for
-> tg_with_in_iops_limit.
+Hello Guys,
 
-So, the current behavior is that if the user is being silly, it will get
-slower and slower. The new behavior would be that if the user is being
-silly, it can issue IOs faster and faster, which creates a perverse
-incentive to be silly.
+ubd driver is one kernel driver for implementing generic userspace block
+device/driver, which delivers io request from ubd block device(/dev/ubdbN) into
+ubd server[1] which is the userspace part of ubd for communicating
+with ubd driver and handling specific io logic by its target module.
 
-Probably the right thing to do is probably something like translating the
-existing budget in light of the new configuration so that config change
-neither gives or takes away the budget which has already accumulated. That
-said, are you guys seeing this becoming an issue in practice?
+Another thing ubd driver handles is to copy data between user space buffer
+and request/bio's pages, or take zero copy if mm is ready for support it in
+future. ubd driver doesn't handle any IO logic of the specific driver, so
+it is small/simple, and all io logics are done by the target code in ubdserver.
 
-Thanks.
+The above two are main jobs done by ubd driver.
+
+ubd driver can help to move IO logic into userspace, in which the
+development work is easier/more effective than doing in kernel, such as,
+ubd-loop takes < 200 lines of loop specific code to get basically same 
+function with kernel loop block driver, meantime the performance is
+still good. ubdsrv[1] provide built-in test for comparing both by running
+"make test T=loop".
+
+Another example is high performance qcow2 support[2], which could be built with
+ubd framework more easily than doing it inside kernel.
+
+Also there are more people who express interests on userspace block driver[3],
+Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
+requirement from Google. Ziyang Zhang from Alibaba said they "plan to
+replace TCMU by UBD as a new choice" because UBD can get better throughput than
+TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
+storage service for providing storage to containers.
+
+It is io_uring based: io request is delivered to userspace via new added
+io_uring command which has been proved as very efficient for making nvme
+passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
+shared/mmap buffer is used for sharing io descriptor to userspace, the
+buffer is readonly for userspace, each IO just takes 24bytes so far.
+It is suggested to use io_uring in userspace(target part of ubd server)
+to handle IO request too. And it is still easy for ubdserver to support
+io handling by non-io_uring, and this work isn't done yet, but can be
+supported easily with help o eventfd.
+
+This way is efficient since no extra io command copy is required, no sleep
+is needed in transferring io command to userspace. Meantime the communication
+protocol is simple and efficient, one single command of
+UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
+command result in one trip. IO handling is often batched after single
+io_uring_enter() returns, both IO requests from ubd server target and
+IO commands could be handled as a whole batch.
+
+Remove RFC now because ubd driver codes gets lots of cleanup, enhancement and
+bug fixes since V1:
+
+- cleanup uapi: remove ubd specific error code,  switch to linux error code,
+remove one command op, remove one field from cmd_desc
+
+- add monitor mechanism to handle ubq_daemon being killed, ubdsrv[1]
+  includes builtin tests for covering heavy IO with deleting ubd / killing
+  ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
+  and the abort/stop mechanism is simple
+
+- fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
+  MQ ubd-loop devices(test/scratch)
+
+- improve batching submission as suggested by Jens
+
+- improve handling for starting device, replace random wait/poll with
+completion
+
+- all kinds of cleanup, bug fix,..
+
+And the patch by patch change since V1 can be found in the following
+tree:
+
+https://github.com/ming1/linux/commits/my_for-5.18-ubd-devel_v2
+
+Todo:
+	- add lazy user page release for avoiding cost of pinning user pages in
+	ubd_copy_pages() most of time, so we can save CPU for handling io logic
+	in userpsace
+
+
+[1] ubd server
+https://github.com/ming1/ubdsrv/commits/devel-v2
+
+[2] qcow2 kernel driver attempt
+https://www.spinics.net/lists/kernel/msg4292965.html
+https://patchwork.kernel.org/project/linux-block/cover/20190823225619.15530-1-development@manuel-bentele.de/#22841183
+
+[3] [LSF/MM/BPF TOPIC] block drivers in user space
+https://lore.kernel.org/linux-block/87tucsf0sr.fsf@collabora.com/
+
+[4] Follow up on UBD discussion
+https://lore.kernel.org/linux-block/YnsW+utCrosF0lvm@T590/#r
+
+Ming Lei (1):
+  ubd: add io_uring based userspace block driver
+
+ drivers/block/Kconfig        |    6 +
+ drivers/block/Makefile       |    2 +
+ drivers/block/ubd_drv.c      | 1444 ++++++++++++++++++++++++++++++++++
+ include/uapi/linux/ubd_cmd.h |  158 ++++
+ 4 files changed, 1610 insertions(+)
+ create mode 100644 drivers/block/ubd_drv.c
+ create mode 100644 include/uapi/linux/ubd_cmd.h
 
 -- 
-tejun
+2.31.1
+
