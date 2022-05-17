@@ -2,184 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC4CC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 15:06:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C585C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 15:36:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349572AbiEQPGd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 11:06:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45590 "EHLO
+        id S231463AbiEQPgf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 11:36:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38566 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349853AbiEQPG1 (ORCPT
+        with ESMTP id S1350364AbiEQPfy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 11:06:27 -0400
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69EB91EECF
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 08:06:26 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id a5so21382494wrp.7
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 08:06:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=20L1AnQGYzSQVKR04Jw8F77QikCZxBe7S+3hNsTAc6c=;
-        b=L+BBagoUwR1uYtW3iG+pr5VO++HDak5anTgdsDdFZzf4BODadEmws7TagUPulN2hjI
-         ewXJs7vGg8kfKeBvSiEHaGvxioLiu/DT6fL6JWWuudqduU1SF7AaSqX+m3XSqk/H+wnJ
-         HkTsGG8shh5JIsUabop9HasWyaOmivkHFCaVJRHP+XM2rjhdzkrrvVh2SPKFGRiwgm6l
-         jMMxwQZym0vwvclHA+OkHW1Yrtq7QRxpKdfO3ETiOBjRXoPj6Dg7dGT5F3W01ryjrjNI
-         dxwepdFgG6xQdaZtwWpyBHzxTLn1upjdSKrzCkJEbrxmMVCdzwzg8HizhGDWTw+HxQTT
-         p3rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
-         :content-transfer-encoding:message-id:references:to;
-        bh=20L1AnQGYzSQVKR04Jw8F77QikCZxBe7S+3hNsTAc6c=;
-        b=DMlphysvxX8PkVnvZ8WxDqO9ZzrGKaD8N2ro77clMXHEp4+xihS2ToG252JSMOqbGQ
-         0HRmUGUubv86qJs0h0X3ykyHHhF7IOebZlDFMqIT4dIVoXQmF8USo+lC5TIO7dXRoFEz
-         fMjwm7a284CvlmQ5KhIAgkqW4IKs4XHt+27ogUm8bYYF5glVEF77BMuq3WkrBfi/8TpC
-         XW3PC9/1BYIuyrzLN1CFUbMDj/cpnSmb2+R++BBP7O11Lx/dMvJOfZs7jnLi6P3neujI
-         0UmGQ80Erm5dKVUAde7yZ6Qol9SlmQi/8Z3IgyXgx6DV25eZqTaGgIhRNO2iPH06f2xl
-         0Y0g==
-X-Gm-Message-State: AOAM533WoPTbUnaNvIkOhvHv/JuhhnUznt9sd2IqWEwnQO4L+XTxPxTv
-        ScAZHKAqwjq2YG5hEX3Z3YLO+g==
-X-Google-Smtp-Source: ABdhPJzf+iK30k9T3XnmMSIiRKp/GAivrAHeuLczhBfSCL2rARFMlhGl0EKqhd2d4xWr2T/yFEhDKQ==
-X-Received: by 2002:a5d:650f:0:b0:20d:77b:702b with SMTP id x15-20020a5d650f000000b0020d077b702bmr9925244wru.78.1652799984887;
-        Tue, 17 May 2022 08:06:24 -0700 (PDT)
-Received: from [192.168.0.17] ([83.216.184.132])
-        by smtp.gmail.com with ESMTPSA id i12-20020adfb64c000000b0020d07e7895csm6230537wre.59.2022.05.17.08.06.23
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 17 May 2022 08:06:24 -0700 (PDT)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH -next v2 2/2] block, bfq: make bfq_has_work() more
- accurate
-From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <740D270D-8723-4399-82CC-26CD861843D7@linaro.org>
-Date:   Tue, 17 May 2022 17:06:22 +0200
-Cc:     Yu Kuai <yukuai3@huawei.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <22FEB802-2872-45A7-8ED8-2DE7D0D5E6CD@linaro.org>
-References: <20220513023507.2625717-1-yukuai3@huawei.com>
- <20220513023507.2625717-3-yukuai3@huawei.com>
- <20220516095620.ge5gxmwrnbanfqea@quack3.lan>
- <740D270D-8723-4399-82CC-26CD861843D7@linaro.org>
-To:     Jan Kara <jack@suse.cz>
-X-Mailer: Apple Mail (2.3445.104.11)
+        Tue, 17 May 2022 11:35:54 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26F67506D9;
+        Tue, 17 May 2022 08:35:35 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-108-7-220-252.bstnma.fios.verizon.net [108.7.220.252])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 24HFYsQ9026768
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Tue, 17 May 2022 11:34:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1652801701; bh=vMDcL1Sj3ecZF/PHO33RMl8MajLs+NitzTG2owdTZQA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To;
+        b=QWWYv+c38E0Js5EJ5O4LH7stm0/N/0G+zlZGaxwbAbrJcoBFiFX+I8aMjlxDXtdcH
+         HpQFgO3vNojUXJc8f+tn6qApIq1oq89uILHK6aqbgkyPptilbkipvXh8b+UDCORwcJ
+         NTcZRZaecteMkr4C9FEtPqcOV8/1Z/mJK25oUPZYeYBBp6sBYjgpZEf9xgcokZgDBW
+         jWBIxHO+AVv5V5gBQlM1SENquz5Y+sM7mT5fnlB7PvD9DdOkb+WioPJCoeulEVoACn
+         ngUKDte0snQOFU95pMNMLZkRMx8s9GtBCC6kwv6i26eYPhX3g2IKwzeEwICOgNvimy
+         LqJbC9V4JwF5A==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id 8636C15C3EC0; Tue, 17 May 2022 11:34:54 -0400 (EDT)
+Date:   Tue, 17 May 2022 11:34:54 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
+        pankydev8@gmail.com, gost.dev@samsung.com,
+        damien.lemoal@opensource.wdc.com, jiangbo.365@bytedance.com,
+        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        dm-devel@redhat.com, dsterba@suse.com, linux-btrfs@vger.kernel.org
+Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned devices
+Message-ID: <YoPAnj9ufkt5nh1G@mit.edu>
+References: <CGME20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef@eucas1p2.samsung.com>
+ <20220516165416.171196-1-p.raghav@samsung.com>
+ <20220517081048.GA13947@lst.de>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220517081048.GA13947@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Tue, May 17, 2022 at 10:10:48AM +0200, Christoph Hellwig wrote:
+> I'm a little surprised about all this activity.
+> 
+> I though the conclusion at LSF/MM was that for Linux itself there
+> is very little benefit in supporting this scheme.  It will massively
+> fragment the supported based of devices and applications, while only
+> having the benefit of supporting some Samsung legacy devices.
 
+FWIW,
 
-> Il giorno 17 mag 2022, alle ore 16:21, Paolo Valente =
-<paolo.valente@linaro.org> ha scritto:
->=20
->=20
->=20
->> Il giorno 16 mag 2022, alle ore 11:56, Jan Kara <jack@suse.cz> ha =
-scritto:
->>=20
->> On Fri 13-05-22 10:35:07, Yu Kuai wrote:
->>> bfq_has_work() is using busy_queues currently, which is not accurate
->>> because bfq_queue is busy doesn't represent that it has requests. =
-Since
->>> bfqd aready has a counter 'queued' to record how many requests are =
-in
->>> bfq, use it instead of busy_queues.
->>>=20
->=20
-> The number of requests queued is not equal to the number of busy
-> queues (it is >=3D).
+That wasn't my impression from that LSF/MM session, but once the
+videos become available, folks can decide for themselves.
 
-No, sorry. It is actually !=3D in general.
-
-In particular, if queued =3D=3D 0 but there are busy queues (although
-still waiting for I/O to arrive), then responding that there is no
-work caused blk-mq to stop asking, and hence an I/O freeze.  IOW I/O
-eventually arrives for a busy queue, but blk-mq does not ask for a new
-request any longer.  But maybe things have changed around bfq since
-then.
-
-Paolo
-
->  If this patch is based on this assumption then
-> unfortunately it is wrong :(
->=20
-> Paolo
->=20
->>> Noted that bfq_has_work() can be called with 'bfqd->lock' held, thus =
-the
->>> lock can't be held in bfq_has_work() to protect 'bfqd->queued'.
->>>=20
->>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>=20
->> Looks good. Feel free to add:
->>=20
->> Reviewed-by: Jan Kara <jack@suse.cz>
->>=20
->> 								Honza
->>=20
->>> ---
->>> block/bfq-iosched.c | 16 ++++++++++++----
->>> 1 file changed, 12 insertions(+), 4 deletions(-)
->>>=20
->>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>> index 61750696e87f..740dd83853a6 100644
->>> --- a/block/bfq-iosched.c
->>> +++ b/block/bfq-iosched.c
->>> @@ -2210,7 +2210,11 @@ static void bfq_add_request(struct request =
-*rq)
->>>=20
->>> 	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
->>> 	bfqq->queued[rq_is_sync(rq)]++;
->>> -	bfqd->queued++;
->>> +	/*
->>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', =
-however, it
->>> +	 * may be read without holding the lock in bfq_has_work().
->>> +	 */
->>> +	WRITE_ONCE(bfqd->queued, bfqd->queued + 1);
->>>=20
->>> 	if (RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_sync(bfqq)) {
->>> 		bfq_check_waker(bfqd, bfqq, now_ns);
->>> @@ -2402,7 +2406,11 @@ static void bfq_remove_request(struct =
-request_queue *q,
->>> 	if (rq->queuelist.prev !=3D &rq->queuelist)
->>> 		list_del_init(&rq->queuelist);
->>> 	bfqq->queued[sync]--;
->>> -	bfqd->queued--;
->>> +	/*
->>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', =
-however, it
->>> +	 * may be read without holding the lock in bfq_has_work().
->>> +	 */
->>> +	WRITE_ONCE(bfqd->queued, bfqd->queued - 1);
->>> 	elv_rb_del(&bfqq->sort_list, rq);
->>>=20
->>> 	elv_rqhash_del(q, rq);
->>> @@ -5063,11 +5071,11 @@ static bool bfq_has_work(struct =
-blk_mq_hw_ctx *hctx)
->>> 	struct bfq_data *bfqd =3D hctx->queue->elevator->elevator_data;
->>>=20
->>> 	/*
->>> -	 * Avoiding lock: a race on bfqd->busy_queues should cause at
->>> +	 * Avoiding lock: a race on bfqd->queued should cause at
->>> 	 * most a call to dispatch for nothing
->>> 	 */
->>> 	return !list_empty_careful(&bfqd->dispatch) ||
->>> -		bfq_tot_busy_queues(bfqd) > 0;
->>> +		READ_ONCE(bfqd->queued);
->>> }
->>>=20
->>> static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx =
-*hctx)
->>> --=20
->>> 2.31.1
->>>=20
->> --=20
->> Jan Kara <jack@suse.com>
->> SUSE Labs, CR
->=20
-
+       	      		       	   	  - Ted
