@@ -2,220 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0CFC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 12:47:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 132EFC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 17 May 2022 12:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343954AbiEQMrU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 08:47:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
+        id S239422AbiEQMzi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 08:55:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35296 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346352AbiEQMrT (ORCPT
+        with ESMTP id S230233AbiEQMzh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 08:47:19 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98A813C707;
-        Tue, 17 May 2022 05:47:17 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 441B71F8B9;
-        Tue, 17 May 2022 12:47:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1652791636;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
+        Tue, 17 May 2022 08:55:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 546ED3A72C
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 05:55:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652792135;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0W2aB+gcSjG4kNtv/FxRZAREXphQHFMH1ilNeTwZmUA=;
-        b=k2psAUXokp98i31xB04jcbNRqFQR14AQgy9tjflO6J9LysSMujnjCejo/Fa4zbTev0ooEg
-        2CQo/BW+ZU4ZxpUSPql0p60m5wulSKEgwd8XwK7XH+s52P8eXn7I41Pn2OYcJUUrWI0U7c
-        fs2AfbH+hzjOovyl3SuUEr76V/g/Ov8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1652791636;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=0W2aB+gcSjG4kNtv/FxRZAREXphQHFMH1ilNeTwZmUA=;
-        b=fRTsocok6zVIpkBsGGHYSn41srt0D7U7KTJM2r3q1Rhulmrl8S1WyQKNhUEKW3h/Rnw2yw
-        P1TzucC02HahBQCA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        bh=CCBYm7JRURrb8ISptdPCXIyZxDNW+RgvRlpoFcroHpc=;
+        b=AEIzXRNhRi1iMKhUbrvWr6VpAK9rysTSFka8eQ2NX/GOkzFSoNODsoyk+dt9n3KirHRj1t
+        +8wVCN6HjlOA31yFDum3XkT9Gd06pr18HzqFLnyrPvzoEDI7dJWRlsbixZCI39+4dBQlBY
+        C3THFZTgV3I41FBeYUJJzCoHKx5g2iU=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-653-QoLd5d2PMYWgONyitcW1ZQ-1; Tue, 17 May 2022 08:55:32 -0400
+X-MC-Unique: QoLd5d2PMYWgONyitcW1ZQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D82C413305;
-        Tue, 17 May 2022 12:47:15 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id x6q+M1OZg2KuHgAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Tue, 17 May 2022 12:47:15 +0000
-Date:   Tue, 17 May 2022 14:42:57 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, dsterba@suse.com, hch@lst.de,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, jiangbo.365@bytedance.com,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com
-Subject: Re: [PATCH v4 08/13] btrfs:zoned: make sb for npo2 zone devices
- align with sb log offsets
-Message-ID: <20220517124257.GD18596@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Pankaj Raghav <p.raghav@samsung.com>,
-        axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, dsterba@suse.com, hch@lst.de,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, jiangbo.365@bytedance.com,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com
-References: <20220516165416.171196-1-p.raghav@samsung.com>
- <CGME20220516165429eucas1p272c8b4325a488675f08f2d7016aa6230@eucas1p2.samsung.com>
- <20220516165416.171196-9-p.raghav@samsung.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A900C811E84;
+        Tue, 17 May 2022 12:55:31 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D81F140CF8F6;
+        Tue, 17 May 2022 12:55:25 +0000 (UTC)
+Date:   Tue, 17 May 2022 20:55:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH V2 1/1] ubd: add io_uring based userspace block driver
+Message-ID: <YoObOMur7x/u0w1C@T590>
+References: <20220517055358.3164431-1-ming.lei@redhat.com>
+ <20220517055358.3164431-2-ming.lei@redhat.com>
+ <55d724a8-ed7d-ae92-ca6d-3582e13587db@linux.alibaba.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220516165416.171196-9-p.raghav@samsung.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <55d724a8-ed7d-ae92-ca6d-3582e13587db@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 16, 2022 at 06:54:11PM +0200, Pankaj Raghav wrote:
-> Superblocks for zoned devices are fixed as 2 zones at 0, 512GB and 4TB.
-> These are fixed at these locations so that recovery tools can reliably
-> retrieve the superblocks even if one of the mirror gets corrupted.
+On Tue, May 17, 2022 at 06:00:57PM +0800, Ziyang Zhang wrote:
+> On 2022/5/17 13:53, Ming Lei wrote:
 > 
-> power of 2 zone sizes align at these offsets irrespective of their
-> value but non power of 2 zone sizes will not align.
+> > +
+> > +static void ubd_cancel_queue(struct ubd_queue *ubq)
+> > +{
+> > +	int i;
+> > +
+> > +	for (i = 0; i < ubq->q_depth; i++) {
+> > +		struct ubd_io *io = &ubq->ios[i];
+> > +
+> > +		if (io->flags & UBD_IO_FLAG_ACTIVE) {
+> > +			io->flags &= ~UBD_IO_FLAG_ACTIVE;
+> > +			io_uring_cmd_done(io->cmd, UBD_IO_RES_ABORT, 0);
+> > +		}
+> > +	}
+> > +}
 > 
-> To make sure the first zone at mirror 1 and mirror 2 align, write zero
-> operation is performed to move the write pointer of the first zone to
-> the expected offset. This operation is performed only after a zone reset
-> of the first zone, i.e., when the second zone that contains the sb is FULL.
-
-Is it a good idea to do the "write zeros", instead of a plain "set write
-pointer"? I assume setting write pointer is instant, while writing
-potentially hundreds of megabytes may take significiant time. As the
-functions may be called from random contexts, the increased time may
-become a problem.
-
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->  fs/btrfs/zoned.c | 68 ++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 63 insertions(+), 5 deletions(-)
+> Hi Ming,
 > 
-> diff --git a/fs/btrfs/zoned.c b/fs/btrfs/zoned.c
-> index 3023c871e..805aeaa76 100644
-> --- a/fs/btrfs/zoned.c
-> +++ b/fs/btrfs/zoned.c
-> @@ -760,11 +760,44 @@ int btrfs_check_mountopts_zoned(struct btrfs_fs_info *info)
->  	return 0;
->  }
->  
-> +static int fill_sb_wp_offset(struct block_device *bdev, struct blk_zone *zone,
-> +			     int mirror, u64 *wp_ret)
-> +{
-> +	u64 offset = 0;
-> +	int ret = 0;
-> +
-> +	ASSERT(!is_power_of_two_u64(zone->len));
-> +	ASSERT(zone->wp == zone->start);
-> +	ASSERT(mirror != 0);
+> When ubdsrv sends STOP_DEV and all active IOs in ubd_drv are done(UBD_IO_RES_ABORT),
+> there may be still some IOs handled by ubdsrv(UBD_IO_FLAG_ACTIVE not set).
+> When these IOs complete and return to ubd_drv, how to handle them?
 
-This could simply accept 0 as the mirror offset too, the calculation is
-trivial.
+Either UBD_IO_COMMIT_AND_FETCH_REQ or UBD_IO_COMMIT_REQ will be sent to ubd_drv
+for completing these IOs. And finally ubd_cancel_dev() in ubd driver will
+cancel all pending io commands, so io_uring can be exited. I guess
+UBD_IO_COMMIT_REQ can be removed too.
 
-> +
-> +	switch (mirror) {
-> +	case 1:
-> +		div64_u64_rem(BTRFS_SB_LOG_FIRST_OFFSET >> SECTOR_SHIFT,
-> +			      zone->len, &offset);
-> +		break;
-> +	case 2:
-> +		div64_u64_rem(BTRFS_SB_LOG_SECOND_OFFSET >> SECTOR_SHIFT,
-> +			      zone->len, &offset);
-> +		break;
-> +	}
-> +
-> +	ret =  blkdev_issue_zeroout(bdev, zone->start, offset, GFP_NOFS, 0);
-> +	if (ret)
-> +		return ret;
-> +
-> +	zone->wp += offset;
-> +	zone->cond = BLK_ZONE_COND_IMP_OPEN;
-> +	*wp_ret = zone->wp << SECTOR_SHIFT;
-> +
-> +	return 0;
-> +}
-> +
->  static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
-> -			   int rw, u64 *bytenr_ret)
-> +			   int rw, int mirror, u64 *bytenr_ret)
->  {
->  	u64 wp;
->  	int ret;
-> +	bool zones_empty = false;
->  
->  	if (zones[0].type == BLK_ZONE_TYPE_CONVENTIONAL) {
->  		*bytenr_ret = zones[0].start << SECTOR_SHIFT;
-> @@ -775,13 +808,31 @@ static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
->  	if (ret != -ENOENT && ret < 0)
->  		return ret;
->  
-> +	if (ret == -ENOENT)
-> +		zones_empty = true;
-> +
->  	if (rw == WRITE) {
->  		struct blk_zone *reset = NULL;
-> +		bool is_sb_offset_write_req = false;
-> +		u32 reset_zone_nr = -1;
->  
-> -		if (wp == zones[0].start << SECTOR_SHIFT)
-> +		if (wp == zones[0].start << SECTOR_SHIFT) {
->  			reset = &zones[0];
-> -		else if (wp == zones[1].start << SECTOR_SHIFT)
-> +			reset_zone_nr = 0;
-> +		} else if (wp == zones[1].start << SECTOR_SHIFT) {
->  			reset = &zones[1];
-> +			reset_zone_nr = 1;
-> +		}
-> +
-> +		/*
-> +		 * Non po2 zone sizes will not align naturally at
-> +		 * mirror 1 (512GB) and mirror 2 (4TB). The wp of the
-> +		 * 1st zone in those superblock mirrors need to be
-> +		 * moved to align at those offsets.
-> +		 */
+> I find that UBD_IO_FETCH_REQ are still set,
+> so will these IOs be issued to ubdsrv again or canceled?
+> (I see ubd_drv fails IOs when the daemon is dying 
+> but maybe here the daemon is still alive)
 
-Please move this comment to the helper fill_sb_wp_offset itself, there
-it's more discoverable.
+If daemon is alive, ubd_drv will rely on ubq_daemon for completing
+all inflight IOs. Otherwise, the monitor work will be triggered for
+completing/failing inflight IOs. The mechanism is actually very simple:
 
-> +		is_sb_offset_write_req =
-> +			(zones_empty || (reset_zone_nr == 0)) && mirror &&
-> +			!is_power_of_2(zones[0].len);
+static void ubd_stop_dev(struct ubd_device *ub)
+{
+        mutex_lock(&ub->mutex);
+        if (!disk_live(ub->ub_disk))
+                goto unlock;
 
-Accepting 0 as the mirror number would also get rid of this wild
-expression substituting and 'if'.
+        del_gendisk(ub->ub_disk);	// drain & wait in-flight IOs
+        ub->dev_info.state = UBD_S_DEV_DEAD;
+        ub->dev_info.ubdsrv_pid = -1;
+        ubd_cancel_dev(ub);	   //No IO is possible now, so cancel pending io commands
+ unlock:
+        mutex_unlock(&ub->mutex);
+        cancel_delayed_work_sync(&ub->monitor_work);
+}
 
->  
->  		if (reset && reset->cond != BLK_ZONE_COND_EMPTY) {
->  			ASSERT(sb_zone_is_full(reset));
-> @@ -795,6 +846,13 @@ static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
->  			reset->cond = BLK_ZONE_COND_EMPTY;
->  			reset->wp = reset->start;
->  		}
-> +
-> +		if (is_sb_offset_write_req) {
+When waiting for IO completion in del_gendisk(), in case that ubq_daemon
+is exiting/dying, monitor work will be triggered to call ubd_abort_queue() to
+fail in-flight requests for making forward progress. ubd_abort_queue() may
+looks a bit tricky to try using task work for aborting request, that
+is just for sync with ubd_rq_task_work_fn().
 
-And get rid of the conditional. The point of supporting both po2 and
-nonpo2 is to hide any implementation details to wrappers as much as
-possible.
 
-> +			ret = fill_sb_wp_offset(bdev, &zones[0], mirror, &wp);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +
->  	} else if (ret != -ENOENT) {
->  		/*
->  		 * For READ, we want the previous one. Move write pointer to
+Thanks, 
+Ming
+
