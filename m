@@ -2,101 +2,167 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CDF9DC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 06:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C25C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 07:10:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231545AbiERGrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 02:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50228 "EHLO
+        id S231860AbiERHKO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 03:10:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231527AbiERGrI (ORCPT
+        with ESMTP id S231769AbiERHKJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 02:47:08 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 950A518E24
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 23:47:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=AaC8Wv8Wgc19tv6DjaGWjM6l0GS6aervzG+1mS2H99k=; b=e/rU5vNjyX6t0flfrUMJxXBovu
-        zbh+IFMMnX7IenJ4DSsOrYwetBYL85rkTqNDca2waerL6ddTTAB645HEXjtROG4r5w6py2JKeivVS
-        qeG4Rt1Pb+ei2UwNYy7gJfRruCP5Yp8ymv2KJK+0jHE8EihDNWa/lTDDxTBuSQ7fPX2ApJsyy62IV
-        UPBqSkAERS1lWsEXUwxpdTXjfd3tRuREC57dvE9qhxQrPqRquqNhqSGxXyZ/2WBPtfrjg+N+J/FY1
-        07yNp7NvR/KH0rh094wL5HO6TUFUsLv53ziWbb1oLGT9kmCll/lyb+X8qsCz0zyVfx4N1VKZwOQqk
-        C7GOZbdQ==;
-Received: from [2001:4bb8:19a:7bdf:8143:492c:c3b:39b6] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nrDSZ-00HTMT-SB; Wed, 18 May 2022 06:47:04 +0000
-Date:   Wed, 18 May 2022 08:47:02 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvme updates for Linux 5.19
-Message-ID: <YoSWZoB1/38DdP4S@infradead.org>
+        Wed, 18 May 2022 03:10:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F76EE52BA
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 00:10:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652857807;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=prrUFOxxPGBXsAVaNBQls2o1O45l2Jpg1ONT+gGV6XE=;
+        b=AN/CF4EpIsT+w1Zeq7+96ozKQ+L8sG7huIDGIl7yY2S/VExQmnCaoXXyqP7QwvYBCIWhvm
+        KJE/BQV3pTlGz9kiDGUMY+yacGWYWsa0M2GumPcdQFi8IHn9rPydXeWix7jqy5H9NvWFyD
+        Kzdzrmv/MmD2hq9ANcCalE5N8pRNf5k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-642-f4PwmSjFMrK1OTWJQfOgjw-1; Wed, 18 May 2022 03:10:03 -0400
+X-MC-Unique: f4PwmSjFMrK1OTWJQfOgjw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BC9DD85A5BE;
+        Wed, 18 May 2022 07:10:02 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1CF6E492C3B;
+        Wed, 18 May 2022 07:09:54 +0000 (UTC)
+Date:   Wed, 18 May 2022 15:09:46 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
+Message-ID: <YoSbuvT88sG5UkfG@T590>
+References: <20220517055358.3164431-1-ming.lei@redhat.com>
+ <YoOr6jBfgVm8GvWg@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <YoOr6jBfgVm8GvWg@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit c23d47abee3a54e4991ed3993340596d04aabd6a:
+On Tue, May 17, 2022 at 03:06:34PM +0100, Stefan Hajnoczi wrote:
+> Here are some more thoughts on the ubd-control device:
+> 
+> The current patch provides a ubd-control device for processes with
+> suitable permissions (i.e. root) to create, start, stop, and fetch
+> information about devices.
+> 
+> There is no isolation between devices created by one process and those
 
-  loop: remove most the top-of-file boilerplate comment from the UAPI header (2022-05-10 06:30:05 -0600)
+I understand linux hasn't device namespace yet, so can you share the
+rational behind the idea of device isolation, is it because ubd device
+is served by ubd daemon which belongs to one pid NS? Or the user creating
+/dev/ubdbN belongs to one user NS?
 
-are available in the Git repository at:
+IMO, ubd device is one file in VFS, and FS permission should be applied,
+then here the closest model should be user NS, and process privilege &
+file ownership.
 
-  git://git.infradead.org/nvme.git tags/nvme-5.19-2022-05-18
+> created by another. Therefore two processes that do not trust each other
+> cannot both use UBD without potential interference. There is also no
 
-for you to fetch changes up to e626f37e657adbab2a7abe51480925891662a5f3:
+Can you share what the expectation is for this situation?
 
-  nvme: split the enum used for various register constants (2022-05-17 07:33:27 +0200)
+It is the created UBD which can only be used in this NS, or can only be
+visible inside this NS? I guess the latter isn't possible since we don't
+have this kind of isolation framework yet.
 
-----------------------------------------------------------------
-nvme updates for Linux 5.19
+> isolation for containers.
+> 
+> I think it would be a mistake to keep the ubd-control interface in its
+> current form since the current global/root model is limited. Instead I
+> suggest:
+> - Creating a device returns a new file descriptor instead of a global
+>   dev_id. The device can be started/stopped/configured through this (and
+>   only through this) per-device file descriptor. The device is not
+>   visible to other processes through ubd-control so interference is not
+>   possible. In order to give another process control over the device the
+>   fd can be passed (e.g. SCM_RIGHTS). 
+> 
 
- - tighten the PCI presence check (Stefan Roese):
- - fix a potential NULL pointer dereference in an error path
-   (Kyle Miller Smith)
- - fix interpretation of the DMRSL field (Tom Yan)
- - relax the data transfer alignment (Keith Busch)
- - verbose error logging improvements (Max Gurtovoy, Chaitanya Kulkarni)
- - misc cleanups (Chaitanya Kulkarni, me)
+/dev/ubdcN can only be opened by the process which is the descendant of
+the process which creates the device by sending ADD_DEV.
 
-----------------------------------------------------------------
-Chaitanya Kulkarni (2):
-      nvme: mark internal passthru request RQF_QUIET
-      nvme-fabrics: add a request timeout helper
+But the device can be deleted/queried by other processes, however, I
+think it is reasonable if all these processes has permission to do that,
+such as all processes owns the device with same uid.
 
-Christoph Hellwig (1):
-      nvme: split the enum used for various register constants
+So can we apply process privilege & file ownership for isolating ubd device?
 
-Keith Busch (1):
-      nvme: set dma alignment to dword
+If per-process FD is used, it may confuse people, because process can
+not delete/query ubd device even though its uid shows it has the
+privilege.
 
-Max Gurtovoy (2):
-      nvme: add missing status values to verbose logging
-      nvme: remove unneeded include from constants file
+> Now multiple applications/containers/etc can use ubd-control without
+> interfering with each other. The security model still requires root
+> though since devices can be malicious.
+> 
+> FUSE allows unprivileged mounts (see fuse_allow_current_process()). Only
+> processes with the same uid as the FUSE daemon can access such mounts
+> (in the default configuration). This prevents security issues while
+> still allowing unprivileged use cases.
 
-Smith, Kyle Miller (Nimble Kernel) (1):
-      nvme-pci: fix a NULL pointer dereference in nvme_alloc_admin_tags
+OK, looks FUSE applies process privilege & file ownership for dealing
+with unprivileged mounts.
 
-Stefan Roese (1):
-      nvme-pci: harden drive presence detect in nvme_dev_disable()
+> 
+> I suggest adapting the FUSE security model to block devices:
+> - Devices can be created without CAP_SYS_ADMIN but they have an
+>   'unprivileged' flag set to true.
+> - Unprivileged devices are not probed for partitions and LVM doesn't
+>   touch them. This means the kernel doesn't access these devices via
+>   code paths that might be exploitable.
 
-Tom Yan (1):
-      nvme: fix interpretation of DMRSL
+The above two makes sense.
 
- drivers/nvme/host/constants.c |  4 +++-
- drivers/nvme/host/core.c      |  9 ++++++---
- drivers/nvme/host/fabrics.h   |  8 ++++++++
- drivers/nvme/host/nvme.h      |  1 +
- drivers/nvme/host/pci.c       |  5 ++++-
- drivers/nvme/host/rdma.c      |  5 +----
- drivers/nvme/host/tcp.c       |  5 +----
- include/linux/nvme.h          | 15 +++++++++++++--
- 8 files changed, 37 insertions(+), 15 deletions(-)
+> - When another process with a different uid from ubdsrv opens an
+>   unprivileged device, -EACCES is returned. This protects other
+>   uids from the unprivileged device.
+
+OK, only the user who owns the device can access unprivileged device.
+
+> - When another process with a different uid from ubdsrv opens a
+>   _privileged_ device there is no special access check because ubdsrv is
+>   privileged.
+
+IMO, it depends if uid of this process has permission to access the
+ubd device, and we can set ubd device's owership by the process
+credentials.
+
+> 
+> With these changes UBD can be used by unprivileged processes and
+> containers. I think it's worth discussing the details and having this
+> model from the start so UBD can be used in a wide range of use cases.
+
+I am pretty happy to discuss & figure out the details, but not sure
+it is one blocker for ubd:
+
+1) kernel driver of loop/nbd or others haven't support the isolation
+
+2) still don't know exact ubd use case for containers
+
+
+Thanks, 
+Ming
+
