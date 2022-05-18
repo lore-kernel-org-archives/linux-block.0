@@ -2,85 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CA8DC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:06:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED3DC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:12:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbiERXGx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 19:06:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55624 "EHLO
+        id S231182AbiERXM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 19:12:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45162 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230125AbiERXGw (ORCPT
+        with ESMTP id S231446AbiERXMX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 19:06:52 -0400
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F810149173;
-        Wed, 18 May 2022 16:06:51 -0700 (PDT)
-Received: by mail-pj1-f48.google.com with SMTP id f10so3500090pjs.3;
-        Wed, 18 May 2022 16:06:51 -0700 (PDT)
+        Wed, 18 May 2022 19:12:23 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD89E8BBC
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 16:11:52 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id n10so3505673pjh.5
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 16:11:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:from:subject:to:cc
+         :content-language:content-transfer-encoding;
+        bh=MBPncIlFOXvkTGNPZJICk/oWths+qrWCsRNpiokT3hc=;
+        b=XQch2AEVIDY+89vMFgLSQtd/IMHL0dD3Cev5FoxvBtcbNKrbYLr2Tu7gWD5WvxCG7D
+         ZFqiD9fNh4crDeI8IpHubQmzIrrPCD7aEBOpfnzITAB0cDTfeVMixccVTWJk0nhrTSh3
+         T7QNofGzBvJGKCnBqXwnOCMuK/kRr1sHcXqsOrupTQuDSsz2ohSuyIBPwjKwsqSjN06e
+         E5rODUKFODRe/8NzN+uGcYWAnCSCKTE3+DqzQ5N6Ja4Dg0c34Zxw2s9hmQoWV9rBggmr
+         Fe+UDKbeG5g1Xz3iWKzp7ZduLlcGFI1BotJiZ7zWcZIZmdOpVjQfvNWEfK0rWRCf+1bq
+         Lpxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=M2OU/ev/wtDvqHYNj5hP9zKluj3H/LLJ6QYPls9G5Tw=;
-        b=She1oSRkXAOR2vDYrAltVV/WB7OxYOBeezghF/surT4V49JqBCK9Nh/jSmT8WqsquH
-         7W6X8Jf+MKZfvjkXW3wVAjITl9fhJhtC+L+4dpkUvApsFZeyDnxT18dYRubYRRVTrBL7
-         BN2UbupOH3kN1JjNdoLa9w/S+E1YS0vxSYJUY938W4hxOgRH0IqlvxGOwhdLHbJWYJQj
-         rsfaAQVJz9FY/gXNt2XBQDPE92DpqgCshwTEz+W98ALbI6eWdmQmwrIsvx8fp2vKUNHA
-         dM3w9iMxU9a3hLr5n9/eKj8JbYWxCOioFOi6zYowocS4h2MbZa5SS1fLSymGij4O/DmJ
-         Edcg==
-X-Gm-Message-State: AOAM533NybFLfg2ehZTJbYlNPlb4sJ+1RExNY12cBNfWio6Cu7+LGqeU
-        5IEOwkiXieziWpob0glETJI=
-X-Google-Smtp-Source: ABdhPJxrRrwxuaXVXZU5unUYT2Wp/ah35BZYv61mf/nd9Yr//ww7daRstQvEvrGocfyzbj6E/VCrbQ==
-X-Received: by 2002:a17:90a:9282:b0:1dc:4a1b:ea55 with SMTP id n2-20020a17090a928200b001dc4a1bea55mr1854383pjo.24.1652915210525;
-        Wed, 18 May 2022 16:06:50 -0700 (PDT)
-Received: from garbanzo (136-24-173-63.cab.webpass.net. [136.24.173.63])
-        by smtp.gmail.com with ESMTPSA id t1-20020a17090340c100b0015e8d4eb271sm2130390pld.187.2022.05.18.16.06.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 16:06:49 -0700 (PDT)
-Date:   Wed, 18 May 2022 16:06:46 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     Christoph Hellwig <hch@lst.de>,
-        Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        pankydev8@gmail.com, gost.dev@samsung.com,
-        damien.lemoal@opensource.wdc.com, jiangbo.365@bytedance.com,
-        linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        dm-devel@redhat.com, dsterba@suse.com, linux-btrfs@vger.kernel.org
-Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned devices
-Message-ID: <20220518230646.5xx6dpo4helwyqcv@garbanzo>
-References: <CGME20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef@eucas1p2.samsung.com>
- <20220516165416.171196-1-p.raghav@samsung.com>
- <20220517081048.GA13947@lst.de>
- <YoPAnj9ufkt5nh1G@mit.edu>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
+         :subject:to:cc:content-language:content-transfer-encoding;
+        bh=MBPncIlFOXvkTGNPZJICk/oWths+qrWCsRNpiokT3hc=;
+        b=gWNMiaBsEj9Nr8CwvtNF5stj9oxX6hlyCZTQeu6KM3y8lqreTr7/YSwqKWH1jnjCyp
+         nFlDrrACmVzOO0kJSmQWadZta4yz/fgYdltjw70nbkInuol15JSOMaJu6J2NQQr7m1mA
+         a8PzVIeHLk0QQfo+VNQHcnT7BXaLOptLa3lQv7fZUH7lsXNt5lE6uqoEc5Kp6DAjgkOy
+         hYo2LRQRgjv4z9cORcutTQved/oDtxnjGH1ovhe+ZJgaJvwBlQNuAqrAltXJIKwt0xfg
+         Vha5e6xyzFVN4q769Vr0S7+KqmTez4pnmnI451LywUD2gPEY4hOrlJEMa9IEiu76965F
+         4GfQ==
+X-Gm-Message-State: AOAM532k7m1q+GpkZmpWNAS2haRTTdK5d3PQQtFFUYW287srL7uej7Nw
+        0du7E5ORa1hWIU7wI26iT/FuKt0LHYSBQg==
+X-Google-Smtp-Source: ABdhPJyUWc4L13trbgUNVZ5OgaXukzWx4X0dVk6g8yar0aCzUkXsfCjWEMNRCo5iaDJ2W486Xq6ltA==
+X-Received: by 2002:a17:903:244d:b0:161:ac9e:60ce with SMTP id l13-20020a170903244d00b00161ac9e60cemr1958651pls.160.1652915512142;
+        Wed, 18 May 2022 16:11:52 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b0015eab1b097dsm2269909plb.22.2022.05.18.16.11.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 May 2022 16:11:51 -0700 (PDT)
+Message-ID: <9adae644-3856-a84e-b3d4-47106c91e09f@kernel.dk>
+Date:   Wed, 18 May 2022 17:11:50 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoPAnj9ufkt5nh1G@mit.edu>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block fix for 5.18-final
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 11:34:54AM -0400, Theodore Ts'o wrote:
-> On Tue, May 17, 2022 at 10:10:48AM +0200, Christoph Hellwig wrote:
-> > I'm a little surprised about all this activity.
-> > 
-> > I though the conclusion at LSF/MM was that for Linux itself there
-> > is very little benefit in supporting this scheme.  It will massively
-> > fragment the supported based of devices and applications, while only
-> > having the benefit of supporting some Samsung legacy devices.
-> 
-> FWIW,
-> 
-> That wasn't my impression from that LSF/MM session, but once the
-> videos become available, folks can decide for themselves.
+Hi Linus,
 
-Agreed, contrary to conventional storage devices, with the zone storage
-ecosystem we simply have a requirement of zone drive replacements matching
-zone size. That requirement exists for po2 or npo2. The work in this patch
-set proves that supporting npo2 was in the end straight forward. As the one
-putting together the BoF I can say that there were no sticking points raised
-to move forward with this when the topic came up. So I am very surprised to
-hear about any other perceived conclusion.
+Just a small fix for a missing fifo time assigment for the head
+insertion case in mq-deadline.
 
-  Luis
+Please pull!
+
+
+The following changes since commit f1c8781ac9d87650ccf45a354c0bbfa3f9230371:
+
+  s390/dasd: Use kzalloc instead of kmalloc/memset (2022-05-05 20:08:27 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-18
+
+for you to fetch changes up to 725f22a1477c9c15aa67ad3af96fe28ec4fe72d2:
+
+  block/mq-deadline: Set the fifo_time member also if inserting at head (2022-05-13 17:02:46 -0600)
+
+----------------------------------------------------------------
+block-5.18-2022-05-18
+
+----------------------------------------------------------------
+Bart Van Assche (1):
+      block/mq-deadline: Set the fifo_time member also if inserting at head
+
+ block/mq-deadline.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+-- 
+Jens Axboe
+
