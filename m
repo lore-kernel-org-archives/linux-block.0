@@ -2,88 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5F13C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 07:23:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D01C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 07:23:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232046AbiERHXu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 03:23:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51272 "EHLO
+        id S232050AbiERHXw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 03:23:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232001AbiERHXt (ORCPT
+        with ESMTP id S232001AbiERHXw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 03:23:49 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D3C150020
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 00:23:47 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 466F421B2D;
-        Wed, 18 May 2022 07:23:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1652858626; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3Ia1dj7NKl9o22jOQRJtZotlEsC74MJf4jTUCXUipxI=;
-        b=lf/rAgKJlIAOh6UbzeaA+xjTlgKj3QZvOhO685zod1i/MUQ+6qQYMljvppuQ3TH+w3WjEz
-        yAb0WmBuw79o88Py0/CfUowE1qbI+h/NSGv/hgwjqZWtwYc9oERvSV+S67TmEFlYhF9k3P
-        NTwCWW0UBc3Paesu8xXHQDEMQE8fFSo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1652858626;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3Ia1dj7NKl9o22jOQRJtZotlEsC74MJf4jTUCXUipxI=;
-        b=H0h3B0xdeetM+GN5/gE06wvaNm+pQ/I75Hl2L3iT95BrqDBbduNaCtfpOgEgOC9qDWCIJX
-        cbvCnhkjC3oX85AQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 232BA133F5;
-        Wed, 18 May 2022 07:23:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id LrhcBwKfhGIATQAAMHmgww
-        (envelope-from <hare@suse.de>); Wed, 18 May 2022 07:23:46 +0000
-Message-ID: <8ff06ce2-0aa7-5999-8987-1f9d9935e4e5@suse.de>
-Date:   Wed, 18 May 2022 09:23:45 +0200
+        Wed, 18 May 2022 03:23:52 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7AA5D50E2C
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 00:23:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=cYLErFCxpD1I/acDYOobQC9MKgloOF+X7iH9mUZf2Co=; b=IuaDcPMbQz2KPXxyklqoW5Bp9G
+        EmDpIP+wzRCmnQ3q/qQS3PA4Y6t54lZ0zxINrgg/gPkX6vaJV823JthgbZ/dCpgfhkBm+VJok5kai
+        RYkinbygHVhh6IS+SCLj+oMj/v7RlaqaqmEQhP+EMfAPppchEfhz2RkSUofYXD6Q5VqdIrXtndT2H
+        rdHAVtnw0bU/33zNlgMqHzuaKq9AZgtdZnufJ2gKr9OI3xsbntFBcz/mqI8h1BRqAI1nQ/QH54Fdu
+        lyACzfn6jOw5MMxIB/7sn2DQpO7RStnVxjOrHOQkeYpqPRQFrYJKyBF7eld9WjqHTauQNoixxYJ1m
+        nuRd0wqw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nrE28-0003dM-Nq; Wed, 18 May 2022 07:23:48 +0000
+Date:   Wed, 18 May 2022 00:23:48 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Christoph Hellwig <hch@infradead.org>, Keith Busch <kbusch@fb.com>,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <kernel-team@fb.com>
+Subject: Re: [PATCH 1/3] block: export dma_alignment attribute
+Message-ID: <YoSfBA6cKV1WsZah@infradead.org>
+References: <20220513161339.1580042-1-kbusch@fb.com>
+ <YoH0vuUA4KdcpEAz@infradead.org>
+ <YoJgdrMpIiobiDy3@kbusch-mbp.dhcp.thefacebook.com>
+ <YoQn2KkI/nwnUmIG@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [GIT PULL] nvme updates for Linux 5.19
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YoSWZoB1/38DdP4S@infradead.org>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <YoSWZoB1/38DdP4S@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoQn2KkI/nwnUmIG@kbusch-mbp.dhcp.thefacebook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/22 08:47, Christoph Hellwig wrote:
-> The following changes since commit c23d47abee3a54e4991ed3993340596d04aabd6a:
-> 
->    loop: remove most the top-of-file boilerplate comment from the UAPI header (2022-05-10 06:30:05 -0600)
-> 
-Hmm. So how do we progress with the authentication patches?
-Shall I resubmit them?
-Will you be picking them up?
-Is there anything I need to fix up?
+On Tue, May 17, 2022 at 04:55:20PM -0600, Keith Busch wrote:
+> A little less easy than I thought... This is what I'm coming up with, and it's
+> bad enough that I'm sure there has to be a better way. Specifically concerning
+> is the new "do_dma()" function below, and was the only way I managed to get the
+> correct 'struct block_device' whether we're stat'ing a filesystem file or raw
+> block device file.
 
-Cheers,
+I don't think doing this in common code makes much sense.  The core
+VFS code should not have to know if something is on a block device or
+not.
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Instead add a new getattr method to block/bdev.c for the block devices,
+and just have a helper to set the alinments(s) based on that by it,
+and any file systems that is made ready to accept lower alignment.
+And I'd prefer to do them individully and tested as there might be all
+kinds of assumptions.  For all other instances keep the value as 0
+for unknown.
+
+> --- a/include/uapi/linux/stat.h
+> +++ b/include/uapi/linux/stat.h
+> @@ -106,7 +106,7 @@ struct statx {
+>  	__u32	stx_uid;	/* User ID of owner */
+>  	__u32	stx_gid;	/* Group ID of owner */
+>  	__u16	stx_mode;	/* File mode */
+> -	__u16	__spare0[1];
+> +	__u16	stx_dma;	/* DMA alignment */
+
+I'd name this dio_mem_alignment, because it is is:
+
+ a) specific to direct I/O
+ b) DMA is just the implementation detail, but not the user semantics
+
+while we're at it, please also add a dio_file_alignment for the
+alignment in the file, which can be sector or fs block size.  I'm
+perfectly fine if you only do it for the block layer first, I'll
+take up the wok to update the most common file systems after that.
