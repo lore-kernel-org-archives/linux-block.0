@@ -2,77 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60FC7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 11:57:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16269C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 12:03:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235879AbiERL5P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 07:57:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41696 "EHLO
+        id S236045AbiERMDV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 08:03:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235965AbiERL5O (ORCPT
+        with ESMTP id S236024AbiERMDV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 07:57:14 -0400
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A61A09FFD
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 04:57:10 -0700 (PDT)
-Received: by mail-ej1-f47.google.com with SMTP id n13so1460798ejv.1
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 04:57:10 -0700 (PDT)
+        Wed, 18 May 2022 08:03:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D3C1C51332
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 05:03:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652875398;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QXuzzet92SbtqRuzz00+sjnF/sjZKVtGRrKvRCDQAJI=;
+        b=NRhz37p+HW8FXabVotom98xdtZbDrzuriFcuwqOv2Nhi4MDxxTfWW2YJ2ww1lQFItKpC92
+        eHUkCLetk3YO9fLqLtwz5j4Eh7ER7gfxX3JpNk+uipTUEigl3QvOS7WJEWUWJVwHtoS0Ie
+        ZZQfm7KfLQgEPQmsh9flhCUAcROj598=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-114-7-tSXt_eO6CeR0PH_nsiCA-1; Wed, 18 May 2022 08:03:17 -0400
+X-MC-Unique: 7-tSXt_eO6CeR0PH_nsiCA-1
+Received: by mail-pj1-f71.google.com with SMTP id m6-20020a17090a730600b001d9041534e4so933864pjk.7
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 05:03:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ElQAKyjQFa361iQ5iFu5WKH/Z6KV4gAN90eFfU58mt4=;
-        b=H+020fn242MCnYxckPJizGvYGIyDO2UafYbgpMTkBY55ukKqOs5mLOV5cZ4KJmcwGu
-         vdI+L2xBsHk6dAO6SSAGG66nr8BGHF9TRI6KRavmb+sVEzooDPL+v0Ib7T8cNbOtF/AY
-         boiPGrD32c3vMQD3pnnbWZECYcxwfvfKnHePZPdb5I73xoCoHOlb+UG+gBTAD0QdbSrb
-         MMohOfOZnOqJjI1vZZpV/lzB4jCbZMBdXhf2i/b19lnDxIiJ4pGoyJvoiGJYcwgCQP3k
-         qsoif0jvZpjunp4ipOXZGkR0N6Q8yE8LF+m8VCWO+XyendbRkkmisdl6gPiX3TqO+FxL
-         +M1Q==
-X-Gm-Message-State: AOAM532A9gCDFLcyGEXzZQ8iOfbJ2dzNEdW2KuidPJxEVbzySltlliY2
-        orKr+J6GBiHl1XhOceYY80lqyt21svSX/0BE
-X-Google-Smtp-Source: ABdhPJy0TtxrnVsP4iwuo+DNj4eHXk8kP44KUOS8kx/zQlkflUHMc6Lzt7npYOGAqWM0tIeti6jegg==
-X-Received: by 2002:a17:907:1622:b0:6fe:22bb:7f8 with SMTP id hb34-20020a170907162200b006fe22bb07f8mr16984462ejc.767.1652875029296;
-        Wed, 18 May 2022 04:57:09 -0700 (PDT)
-Received: from [192.168.50.14] (178-117-55-239.access.telenet.be. [178.117.55.239])
-        by smtp.gmail.com with ESMTPSA id 28-20020a170906015c00b006f3ef214da8sm911028ejh.14.2022.05.18.04.57.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 04:57:08 -0700 (PDT)
-Message-ID: <606e9f86-b546-960e-5005-7a7827e1b1e6@acm.org>
-Date:   Wed, 18 May 2022 13:57:07 +0200
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QXuzzet92SbtqRuzz00+sjnF/sjZKVtGRrKvRCDQAJI=;
+        b=ULG3vLnzUlhES2IPL1hDOANcvOlsuqkuGtcuNWRutvhyp7NtxmFYjs324fi251Cz6P
+         cB+RElUeLEyf5er4mcUSt1Ka/PUdTs/2rkh7pSMF/ZxqD3GZvwUVZD9eN1lgvIxePJ2K
+         l4D4hjfuJ/EVc0QbRMs8KsGLpmmIMb6e1V04AGncqwxIXG9EUPIS+Ro094QKS7XEwT9K
+         UesydzCxrdADS+dOAWPnyQL4NUcHpAGHDHSJLZT5VZ3xPrl+tZCqFzdkxVXQ4pXvnNiW
+         pQNvrepZ8WIUnmG2p7UkoTq+YkRCL7KpoXfKZ2ZVo3XET7hwJ9X53BScSGitoX72GQ0g
+         ZaFQ==
+X-Gm-Message-State: AOAM5322OBVOZ57U7wNrWQuIrjPNbayr7QRFN/iP4499UKXgFHh5Gq18
+        +H/PwhPh21JYV3VouGAWmx1ImufKuQVxOr95J0oglpwnX/Rld4003suMlwOmjzaplDkFqX/NTxf
+        Iiq0R2oYj8+gpO1zRovevnPF3CCSRROiLdoIOGiA=
+X-Received: by 2002:a63:68c6:0:b0:380:3fbc:dfb6 with SMTP id d189-20020a6368c6000000b003803fbcdfb6mr23558292pgc.326.1652875396475;
+        Wed, 18 May 2022 05:03:16 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfHjJ7wOc7EfzoDw9bz9TZPPeqDCyi/9W2OTJ/0vStXrGncq07B+IOFJmoSAHUllEg6FQfXCkwecUQS45sisE=
+X-Received: by 2002:a63:68c6:0:b0:380:3fbc:dfb6 with SMTP id
+ d189-20020a6368c6000000b003803fbcdfb6mr23558282pgc.326.1652875396187; Wed, 18
+ May 2022 05:03:16 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.7.0
-Subject: Re: [PATCH blktests] srp/011: Avoid $dev becoming invalid during test
-Content-Language: en-US
-To:     Xiao Yang <yangx.jy@fujitsu.com>, osandov@fb.com,
-        yi.zhang@redhat.com
-Cc:     linux-block@vger.kernel.org
-References: <20220518064417.47473-1-yangx.jy@fujitsu.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220518064417.47473-1-yangx.jy@fujitsu.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20220518034443.46803-1-yangx.jy@fujitsu.com>
+In-Reply-To: <20220518034443.46803-1-yangx.jy@fujitsu.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Wed, 18 May 2022 20:03:04 +0800
+Message-ID: <CAHj4cs9istDHj28KRDCFoE0Y_Hqui4=Fg3em+5YfnNN+byhnFQ@mail.gmail.com>
+Subject: Re: [PATCH blktests] nvmeof-mp/001: Set expected count properly
+To:     Xiao Yang <yangx.jy@fujitsu.com>
+Cc:     osandov@fb.com, Bart Van Assche <bvanassche@acm.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/22 08:44, Xiao Yang wrote:
-> $dev will become invalid when log_out has been done
-> and fio doesn't run yet. In this case subsequent fio
-> throws the following error:
-> -------------------------------------
->      From diff -u 011.out 011.out.bad
->      Configured SRP target driver
->      -Passed
-> 
->      From 011.full:
->      fio: looks like your file system does not support direct=1/buffered=0
->      fio: destination does not support O_DIRECT
->      run_fio exit code: 1
-> -------------------------------------
-> This issue happens randomly.
-> 
-> Try to fix the issue by holding $dev before test.
+I also met this failure during my previous testing, thanks.
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+Reviewed-by: Yi Zhang <yi.zhang@redhat.com>
+
+On Wed, May 18, 2022 at 11:44 AM Xiao Yang <yangx.jy@fujitsu.com> wrote:
+>
+> The number of block devices will increase according
+> to the number of RDMA-capable NICs.
+> For example, nvmeof-mp/001 with two RDMA-capable NICs
+> got the following error:
+> -------------------------------------
+>     Configured NVMe target driver
+>     -count_devices(): 1 <> 1
+>     +count_devices(): 2 <> 1
+>     Passed
+> -------------------------------------
+>
+> Set expected count properly by calculating the number
+> of RDMA-capable NICs.
+>
+> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+> ---
+>  tests/nvmeof-mp/001     | 7 +++++--
+>  tests/nvmeof-mp/001.out | 1 -
+>  2 files changed, 5 insertions(+), 3 deletions(-)
+>
+> diff --git a/tests/nvmeof-mp/001 b/tests/nvmeof-mp/001
+> index f3e6394..82cb298 100755
+> --- a/tests/nvmeof-mp/001
+> +++ b/tests/nvmeof-mp/001
+> @@ -18,7 +18,11 @@ count_devices() {
+>  }
+>
+>  wait_for_devices() {
+> -       local expected=1 i devices
+> +       local expected=0 i devices
+> +
+> +       for i in $(rdma_network_interfaces); do
+> +               ((expected++))
+> +       done
+>
+>         use_blk_mq y || return $?
+>         for ((i=0;i<100;i++)); do
+> @@ -27,7 +31,6 @@ wait_for_devices() {
+>                 sleep .1
+>         done
+>         echo "count_devices(): $devices <> $expected" >>"$FULL"
+> -       echo "count_devices(): $devices <> $expected"
+>         [ "$devices" -ge $expected ]
+>  }
+>
+> diff --git a/tests/nvmeof-mp/001.out b/tests/nvmeof-mp/001.out
+> index 2ce8d17..a7d4cb9 100644
+> --- a/tests/nvmeof-mp/001.out
+> +++ b/tests/nvmeof-mp/001.out
+> @@ -1,3 +1,2 @@
+>  Configured NVMe target driver
+> -count_devices(): 1 <> 1
+>  Passed
+> --
+> 2.34.1
+>
+>
+>
+
+
+-- 
+Best Regards,
+  Yi Zhang
+
