@@ -2,172 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85490C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 01:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88DCDC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 01:32:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232700AbiERBRf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 21:17:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53518 "EHLO
+        id S232058AbiERBcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 17 May 2022 21:32:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233421AbiERBRc (ORCPT
+        with ESMTP id S229492AbiERBcS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 21:17:32 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C67E62FFF4;
-        Tue, 17 May 2022 18:17:26 -0700 (PDT)
-Received: from kwepemi100008.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L2w781N17zhZ6w;
-        Wed, 18 May 2022 09:16:36 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100008.china.huawei.com (7.221.188.57) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 09:17:24 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 09:17:24 +0800
-Subject: Re: [PATCH -next v2 2/2] block, bfq: make bfq_has_work() more
- accurate
-To:     Paolo Valente <paolo.valente@linaro.org>, Jan Kara <jack@suse.cz>
-CC:     Jens Axboe <axboe@kernel.dk>,
-        linux-block <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220513023507.2625717-1-yukuai3@huawei.com>
- <20220513023507.2625717-3-yukuai3@huawei.com>
- <20220516095620.ge5gxmwrnbanfqea@quack3.lan>
- <740D270D-8723-4399-82CC-26CD861843D7@linaro.org>
- <22FEB802-2872-45A7-8ED8-2DE7D0D5E6CD@linaro.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <54d06657-a5e2-a94d-c9af-2f10900e7f32@huawei.com>
-Date:   Wed, 18 May 2022 09:17:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 17 May 2022 21:32:18 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBCD8338BB
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 18:32:16 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id g184so814830pgc.1
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 18:32:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=xNnxAHcC3RUWM23wBpMAK8Y3L4EOTebAASEZluO85cE=;
+        b=k2hnY/uiyT6WSSX6lxbaW0qn5bcT12bgoL8VXXked6tMGBGzLgQJs7Oe7Ys2h5K7Xf
+         YEszS+nJLBhHDEwuXYcLnFJzch8DPZjWPY9KpBzu6Koq7N/fI8jXZQ79Qn8byopnFSmF
+         1n2nhjhBwPqGgZjKgZYdpYRz1zPMlZwSvDmrXFXrhnDDPUQKtieYV2cOV7bGifIpJEez
+         +pENNh/hdzYuWIFMlS/432DXZoE+hoqz+NKM2fEFmmAvZ6e98hrtoQYalbDp5llI91p1
+         aOt8wgtCo/kWgg6DOOSx6Yw7WdvNHHC9bPkFPK9qa4B6H4POMyPPmkgIEuNtxlrisPLQ
+         fAqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=xNnxAHcC3RUWM23wBpMAK8Y3L4EOTebAASEZluO85cE=;
+        b=0rDJ7uFrk/NBl61c30YDozOGkM26n1CHPq1zv+TiGkOtqY8Kj6nz7CynJtJZunkXjk
+         0klVJ6H+sbNwl+URF6stAEQgqq/JiKF+9rr1NG62/rrHsVGPsPTPK9W6925JxdP/8xQh
+         2fLH4YlUHe1esXYXgwfR03kz5a3QWkDdEel2lGk24LD/M7J7TNtd9ZcGLHPabCWnJjl1
+         sPE1COsy6ijV2KoAHrqDDBfkf/VfbXn7x/uDRcZxtvK6LbTcneGUi0zuaQnRJFVRyx/j
+         wvEJF2tsg/o//WTNpfSmYsiv+RlqRn1KLxY+RjqH30QMNsu7rdivjQhccB9s67QPYswi
+         SBvg==
+X-Gm-Message-State: AOAM533PLKF0RD6HBkjYgeCKQu37lvCXpcgj62uGmf6ybwlB6mMx2fJz
+        A5MINc2v5/fThDA7055YsiGFfw==
+X-Google-Smtp-Source: ABdhPJyyDuelEUIgMnKTcepZxWuBNvDevo2UbPMfYVCqGTACvkXJz5NUXazb0suHLh1CYjIKrN/Iqw==
+X-Received: by 2002:a63:dd14:0:b0:3d8:204c:2f29 with SMTP id t20-20020a63dd14000000b003d8204c2f29mr21542866pgg.512.1652837536250;
+        Tue, 17 May 2022 18:32:16 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id 20-20020a170902ee5400b00161946a7104sm253558plo.86.2022.05.17.18.32.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 May 2022 18:32:15 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     tj@kernel.org, qiulaibin@huawei.com
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+In-Reply-To: <20220301123919.2381579-1-qiulaibin@huawei.com>
+References: <20220301123919.2381579-1-qiulaibin@huawei.com>
+Subject: Re: [PATCH -next v2] blk-throttle: Set BIO_THROTTLED when bio has been throttled
+Message-Id: <165283753506.124778.6326413719734024023.b4-ty@kernel.dk>
+Date:   Tue, 17 May 2022 19:32:15 -0600
 MIME-Version: 1.0
-In-Reply-To: <22FEB802-2872-45A7-8ED8-2DE7D0D5E6CD@linaro.org>
-Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/05/17 23:06, Paolo Valente Ð´µÀ:
+On Tue, 1 Mar 2022 20:39:19 +0800, Laibin Qiu wrote:
+> 1.In current process, all bio will set the BIO_THROTTLED flag
+> after __blk_throtl_bio().
 > 
+> 2.If bio needs to be throttled, it will start the timer and
+> stop submit bio directly. Bio will submit in
+> blk_throtl_dispatch_work_fn() when the timer expires.But in
+> the current process, if bio is throttled. The BIO_THROTTLED
+> will be set to bio after timer start. If the bio has been
+> completed, it may cause use-after-free blow.
 > 
->> Il giorno 17 mag 2022, alle ore 16:21, Paolo Valente <paolo.valente@linaro.org> ha scritto:
->>
->>
->>
->>> Il giorno 16 mag 2022, alle ore 11:56, Jan Kara <jack@suse.cz> ha scritto:
->>>
->>> On Fri 13-05-22 10:35:07, Yu Kuai wrote:
->>>> bfq_has_work() is using busy_queues currently, which is not accurate
->>>> because bfq_queue is busy doesn't represent that it has requests. Since
->>>> bfqd aready has a counter 'queued' to record how many requests are in
->>>> bfq, use it instead of busy_queues.
->>>>
->>
->> The number of requests queued is not equal to the number of busy
->> queues (it is >=).
-> 
-> No, sorry. It is actually != in general.
-Hi, Paolo
+> [...]
 
-I'm aware that number of requests queued is not equal to the number of
-busy queues, and that is the motivation of this patch.
+Applied, thanks!
 
-> 
-> In particular, if queued == 0 but there are busy queues (although
-> still waiting for I/O to arrive), then responding that there is no
-> work caused blk-mq to stop asking, and hence an I/O freeze.  IOW I/O
-> eventually arrives for a busy queue, but blk-mq does not ask for a new
-> request any longer.  But maybe things have changed around bfq since
-> then.
+[1/1] blk-throttle: Set BIO_THROTTLED when bio has been throttled
+      commit: 5a011f889b4832aa80c2a872a5aade5c48d2756f
 
-The problem is that if queued == 0 while there are busy queues, is there
-any point to return true in bfq_has_work() ? IMO, it will only cause
-unecessary run queue. And if new request arrives,
-blk_mq_sched_insert_request() will trigger a run queue.
+Best regards,
+-- 
+Jens Axboe
 
-Thanks,
-Kuai
-> 
-> Paolo
-> 
->>   If this patch is based on this assumption then
->> unfortunately it is wrong :(
->>
->> Paolo
->>
->>>> Noted that bfq_has_work() can be called with 'bfqd->lock' held, thus the
->>>> lock can't be held in bfq_has_work() to protect 'bfqd->queued'.
->>>>
->>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->>>
->>> Looks good. Feel free to add:
->>>
->>> Reviewed-by: Jan Kara <jack@suse.cz>
->>>
->>> 								Honza
->>>
->>>> ---
->>>> block/bfq-iosched.c | 16 ++++++++++++----
->>>> 1 file changed, 12 insertions(+), 4 deletions(-)
->>>>
->>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
->>>> index 61750696e87f..740dd83853a6 100644
->>>> --- a/block/bfq-iosched.c
->>>> +++ b/block/bfq-iosched.c
->>>> @@ -2210,7 +2210,11 @@ static void bfq_add_request(struct request *rq)
->>>>
->>>> 	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
->>>> 	bfqq->queued[rq_is_sync(rq)]++;
->>>> -	bfqd->queued++;
->>>> +	/*
->>>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', however, it
->>>> +	 * may be read without holding the lock in bfq_has_work().
->>>> +	 */
->>>> +	WRITE_ONCE(bfqd->queued, bfqd->queued + 1);
->>>>
->>>> 	if (RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_sync(bfqq)) {
->>>> 		bfq_check_waker(bfqd, bfqq, now_ns);
->>>> @@ -2402,7 +2406,11 @@ static void bfq_remove_request(struct request_queue *q,
->>>> 	if (rq->queuelist.prev != &rq->queuelist)
->>>> 		list_del_init(&rq->queuelist);
->>>> 	bfqq->queued[sync]--;
->>>> -	bfqd->queued--;
->>>> +	/*
->>>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', however, it
->>>> +	 * may be read without holding the lock in bfq_has_work().
->>>> +	 */
->>>> +	WRITE_ONCE(bfqd->queued, bfqd->queued - 1);
->>>> 	elv_rb_del(&bfqq->sort_list, rq);
->>>>
->>>> 	elv_rqhash_del(q, rq);
->>>> @@ -5063,11 +5071,11 @@ static bool bfq_has_work(struct blk_mq_hw_ctx *hctx)
->>>> 	struct bfq_data *bfqd = hctx->queue->elevator->elevator_data;
->>>>
->>>> 	/*
->>>> -	 * Avoiding lock: a race on bfqd->busy_queues should cause at
->>>> +	 * Avoiding lock: a race on bfqd->queued should cause at
->>>> 	 * most a call to dispatch for nothing
->>>> 	 */
->>>> 	return !list_empty_careful(&bfqd->dispatch) ||
->>>> -		bfq_tot_busy_queues(bfqd) > 0;
->>>> +		READ_ONCE(bfqd->queued);
->>>> }
->>>>
->>>> static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx *hctx)
->>>> -- 
->>>> 2.31.1
->>>>
->>> -- 
->>> Jan Kara <jack@suse.com>
->>> SUSE Labs, CR
->>
-> 
-> .
-> 
+
