@@ -2,118 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FFB9C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 03:46:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1674C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 04:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229441AbiERDq5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 17 May 2022 23:46:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33160 "EHLO
+        id S229598AbiEREJW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 00:09:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiERDqo (ORCPT
+        with ESMTP id S229616AbiEREJK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 17 May 2022 23:46:44 -0400
-Received: from heian.cn.fujitsu.com (mail.cn.fujitsu.com [183.91.158.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id EFF36205F4
-        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 20:46:36 -0700 (PDT)
-IronPort-Data: =?us-ascii?q?A9a23=3AyIW86q7tLH8HwHNgpCR+qwxRtO7FchMFZxGqfqr?=
- =?us-ascii?q?LsXjdYENS0DwBm2YeXz3SaazeNmf8c9ggO9u/oRlT6sTdmtBkSwY5pCpnJ55og?=
- =?us-ascii?q?ZCbXIzGdC8cHM8zwvXrFRsht4NHAjX5BJhcokT0+1H9YtANkVEmjfvSHuCkUba?=
- =?us-ascii?q?dUsxMbVQMpBkJ2EsLd9ER0tYAbeiRW2thiPuqyyHtEAbNNw1cbgr435m+RCZH5?=
- =?us-ascii?q?5wejt+3UmsWPpintHeG/5Uc4Ql2yauZdxMUSaEMdgK2qnqq8V23wo/Z109F5tK?=
- =?us-ascii?q?NmbC9fFAIQ6LJIE6FjX8+t6qK20AE/3JtlP1gcqd0hUR/0l1lm/hgwdNCpdqyW?=
- =?us-ascii?q?C8nI6/NhP8AFRJfFkmSOIUfouOceSbv4ZH7I0ruNiGEL+9VJEsoNIsR4f18AWx?=
- =?us-ascii?q?m/PcdbjcXYXirgPm/xr68VMFijIIoK8yDFJIe/GNgxDfWJewrTZDKX+PB4tow9?=
- =?us-ascii?q?DMxgN1eWPzaYMEaQSRgYQ6GYBBVPFoTTpUkk4+VatPXG9FDgAvN4/NpvC6Il0o?=
- =?us-ascii?q?suIUB+eH9IrSiLfi5VG7Bzo4ew1nEPw=3D=3D?=
-IronPort-HdrOrdr: =?us-ascii?q?A9a23=3AiNcWz6w0a93Cav2amW+IKrPwEL1zdoMgy1kn?=
- =?us-ascii?q?xilNoH1uA6ilfqWV8cjzuiWbtN9vYhsdcLy7WZVoIkmskKKdg7NhXotKNTOO0A?=
- =?us-ascii?q?SVxepZnOnfKlPbexHWx6p00KdMV+xEAsTsMF4St63HyTj9P9E+4NTvysyVuds?=
- =?us-ascii?q?=3D?=
-X-IronPort-AV: E=Sophos;i="5.88,333,1635177600"; 
-   d="scan'208";a="124306885"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
-  by heian.cn.fujitsu.com with ESMTP; 18 May 2022 11:44:46 +0800
-Received: from G08CNEXMBPEKD06.g08.fujitsu.local (unknown [10.167.33.206])
-        by cn.fujitsu.com (Postfix) with ESMTP id 84AC54D16FDF;
-        Wed, 18 May 2022 11:44:45 +0800 (CST)
-Received: from G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.83) by
- G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206) with Microsoft SMTP Server
- (TLS) id 15.0.1497.23; Wed, 18 May 2022 11:44:45 +0800
-Received: from localhost.localdomain (10.167.215.54) by
- G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.209) with Microsoft SMTP Server
- id 15.0.1497.23 via Frontend Transport; Wed, 18 May 2022 11:44:45 +0800
-From:   Xiao Yang <yangx.jy@fujitsu.com>
-To:     <osandov@fb.com>, <yi.zhang@redhat.com>, <bvanassche@acm.org>
-CC:     <linux-block@vger.kernel.org>, Xiao Yang <yangx.jy@fujitsu.com>
-Subject: [PATCH blktests] nvmeof-mp/001: Set expected count properly
-Date:   Wed, 18 May 2022 11:44:43 +0800
-Message-ID: <20220518034443.46803-1-yangx.jy@fujitsu.com>
-X-Mailer: git-send-email 2.34.1
+        Wed, 18 May 2022 00:09:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1868415352F
+        for <linux-block@vger.kernel.org>; Tue, 17 May 2022 21:07:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652846854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=Z9yRM9cvhik+MrOqst9aIIa+hZTiZ1DUmhjVomIZNlk=;
+        b=SMaUPc1/al98pBNRlF3atX0MYP4kTjQI9KM/XcOeOUk0pKQq0LXtXqeB6kqwC+AlD+/M3b
+        vyeT9Cokr0mB5fPd4pGGpFzQrqqZQ4YjeWWlvDWM/F9Chj9Hvw0D+u7kkA9CVi9cPWic58
+        rhXI5iN7GHdx7bVSmkaHv5opyOavDxY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-216-gpGBb33fP6OpfmsjGjyVOw-1; Wed, 18 May 2022 00:07:23 -0400
+X-MC-Unique: gpGBb33fP6OpfmsjGjyVOw-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1E494185A7B2;
+        Wed, 18 May 2022 04:07:23 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 7DF06492C14;
+        Wed, 18 May 2022 04:07:17 +0000 (UTC)
+Date:   Wed, 18 May 2022 12:07:12 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next] blk-throttle: delay the setting of 'BIO_THROTTLED'
+ to when throttle is done
+Message-ID: <YoRw8J1Y/bzxVsSR@T590>
+References: <20220517134909.2910251-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-yoursite-MailScanner-ID: 84AC54D16FDF.AA2A3
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: yangx.jy@fujitsu.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220517134909.2910251-1-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The number of block devices will increase according
-to the number of RDMA-capable NICs.
-For example, nvmeof-mp/001 with two RDMA-capable NICs
-got the following error:
--------------------------------------
-    Configured NVMe target driver
-    -count_devices(): 1 <> 1
-    +count_devices(): 2 <> 1
-    Passed
--------------------------------------
+On Tue, May 17, 2022 at 09:49:09PM +0800, Yu Kuai wrote:
+> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> introduce a new problem, for example:
+> 
+> [root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+> [root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
+> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+> [1] 620
+> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+> [2] 626
+> [root@localhost ~]# 1+0 records in
+> 1+0 records out
+> 10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
+> 1+0 records out
+> 
+> 10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
+> -> the second bio is issued after 10s instead of 20s.
+> 
+> This is because if some bios are already queued, current bio is queued
+> directly and the flag 'BIO_THROTTLED' is set. And later, when former
+> bios are dispatched, this bio will be dispatched without waiting at all,
+> this is due to tg_with_in_bps_limit() will return 0 if the flag is set.
+> 
+> Instead of setting the flag when bio starts throttle, delay to when
+> throttle is done to fix the problem.
+> 
+> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-throttle.c | 10 ++++++----
+>  1 file changed, 6 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 447e1b8722f7..f952f2d942ff 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+>  	unsigned int bio_size = throtl_bio_data_size(bio);
+>  
+>  	/* no need to throttle if this bio's bytes have been accounted */
+> -	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
+> +	if (bps_limit == U64_MAX) {
 
-Set expected count properly by calculating the number
-of RDMA-capable NICs.
+This way may double account bio size for re-entered split bio.
 
-Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
----
- tests/nvmeof-mp/001     | 7 +++++--
- tests/nvmeof-mp/001.out | 1 -
- 2 files changed, 5 insertions(+), 3 deletions(-)
 
-diff --git a/tests/nvmeof-mp/001 b/tests/nvmeof-mp/001
-index f3e6394..82cb298 100755
---- a/tests/nvmeof-mp/001
-+++ b/tests/nvmeof-mp/001
-@@ -18,7 +18,11 @@ count_devices() {
- }
+>  		if (wait)
+>  			*wait = 0;
+>  		return true;
+> @@ -1226,8 +1226,10 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
+>  
+>  	spin_lock_irq(&q->queue_lock);
+>  	for (rw = READ; rw <= WRITE; rw++)
+> -		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL)))
+> +		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL))) {
+> +			bio_set_flag(bio, BIO_THROTTLED);
+>  			bio_list_add(&bio_list_on_stack, bio);
+> +		}
+>  	spin_unlock_irq(&q->queue_lock);
+>  
+>  	if (!bio_list_empty(&bio_list_on_stack)) {
+> @@ -2134,7 +2136,8 @@ bool __blk_throtl_bio(struct bio *bio)
+>  			}
+>  			break;
+>  		}
+> -
+> +		/* this bio will be issued directly */
+> +		bio_set_flag(bio, BIO_THROTTLED);
+>  		/* within limits, let's charge and dispatch directly */
+>  		throtl_charge_bio(tg, bio);
+
+Marking BIO_THROTTLED before throtle_charge_bio() causes the bio
+bytes not be charged.
+
+Another simple way is to compensate for previous extra bytes accounting,
+something like the following patch:
+
+
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 139b2d7a99e2..44773d2ba257 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -810,8 +810,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
  
- wait_for_devices() {
--	local expected=1 i devices
-+	local expected=0 i devices
+-	/* no need to throttle if this bio's bytes have been accounted */
+-	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
++	if (bps_limit == U64_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -921,10 +920,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	if (!bio_flagged(bio, BIO_THROTTLED)) {
+-		tg->bytes_disp[rw] += bio_size;
+-		tg->last_bytes_disp[rw] += bio_size;
+-	}
++	tg->bytes_disp[rw] += bio_size;
++	tg->last_bytes_disp[rw] += bio_size;
+ 
+ 	tg->io_disp[rw]++;
+ 	tg->last_io_disp[rw]++;
+@@ -2125,6 +2122,20 @@ bool __blk_throtl_bio(struct bio *bio)
+ 		if (sq->nr_queued[rw])
+ 			break;
+ 
++		/*
++		 * re-entered bio has accounted bytes already, so try to
++		 * compensate previous over-accounting. However, if new
++		 * slice is started, just forget it
++		 */
++		if (bio_flagged(bio, BIO_THROTTLED)) {
++			unsigned int bio_size = throtl_bio_data_size(bio);
 +
-+	for i in $(rdma_network_interfaces); do
-+		((expected++))
-+	done
- 
- 	use_blk_mq y || return $?
- 	for ((i=0;i<100;i++)); do
-@@ -27,7 +31,6 @@ wait_for_devices() {
- 		sleep .1
- 	done
- 	echo "count_devices(): $devices <> $expected" >>"$FULL"
--	echo "count_devices(): $devices <> $expected"
- 	[ "$devices" -ge $expected ]
- }
- 
-diff --git a/tests/nvmeof-mp/001.out b/tests/nvmeof-mp/001.out
-index 2ce8d17..a7d4cb9 100644
---- a/tests/nvmeof-mp/001.out
-+++ b/tests/nvmeof-mp/001.out
-@@ -1,3 +1,2 @@
- Configured NVMe target driver
--count_devices(): 1 <> 1
- Passed
--- 
-2.34.1
++			if (tg->bytes_disp[rw] >= bio_size)
++				tg->bytes_disp[rw] -= bio_size;
++			if (tg->last_bytes_disp[rw] - bio_size)
++				tg->last_bytes_disp[rw] -= bio_size;
++		}
++
+ 		/* if above limits, break to queue */
+ 		if (!tg_may_dispatch(tg, bio, NULL)) {
+ 			tg->last_low_overflow_time[rw] = jiffies;
 
-
+Thanks,
+Ming
 
