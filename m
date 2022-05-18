@@ -2,156 +2,207 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE680C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 13:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B388AC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 13:41:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237683AbiERNU2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 09:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
+        id S238119AbiERNlN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 09:41:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237693AbiERNU0 (ORCPT
+        with ESMTP id S238125AbiERNkv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 09:20:26 -0400
-Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8C595A37
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 06:20:25 -0700 (PDT)
-Received: by mail-pl1-x62d.google.com with SMTP id q18so1723990pln.12
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 06:20:25 -0700 (PDT)
+        Wed, 18 May 2022 09:40:51 -0400
+Received: from mail-ed1-x535.google.com (mail-ed1-x535.google.com [IPv6:2a00:1450:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A4E3B84E
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 06:40:46 -0700 (PDT)
+Received: by mail-ed1-x535.google.com with SMTP id p26so3071141eds.5
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 06:40:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/Lg1D5Qm4BDqJMULWClrb7DX6ufaCCxR8vhVSmS6AT0=;
-        b=ijSurQhTwYxB1uG0BKuAV2Dl/A8iCb9fd7gQvUnAlrIDGLmkARYozsQD5bcO8+XLXN
-         Ohhbgfhz9XaHtYHeQ2J69BerCmjyL+WDLLiCbaiMR2EPiisHfp9UdOZMGFClDo6pstzX
-         LMQgYNiqB9EVMwp4mx4+r6lGukw2xmxVIT42buRVlY740bdDO8TmeoMyAjUaoMlZFVPJ
-         efv/g/z/zAi3wMxwvd5wdYoGkuJiUbo4iNtr0y/rSewIydV0Zw3IiipTFWiT1J5wZJK0
-         M9mIlqyStp+Rb12iZeFDaS1a7oNkbH0cqYaS5bFcoj7u1hEgMKo7AjwuRs+Od7Crglz4
-         OQzw==
+        d=unimore.it; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=C4enMuSsWShHZvSMfmofWFHp1s0VWIVvo26glgzEjsU=;
+        b=P4SxG7mcd2ke1GYLJFHSLqgxP7V7hogPl4RGWYBlVVrhY0axP1Iky6IK5YixeM5qp6
+         3P9VhN+xwQ9KOpKRMWfvAQN2c6IT+8AooRe1nS9VL4wwXGzFeYH7G3Q7EscLmz15j+OW
+         OB5DmKYjWSx3K7kjSVfSN5kIKYTK2qlUaos8Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/Lg1D5Qm4BDqJMULWClrb7DX6ufaCCxR8vhVSmS6AT0=;
-        b=R7SJeVPzXj61W7lYFDXaiHEHvYfXi1E+YfwbvcncerTIFIzNZWWYXTqAqciziMku1r
-         wyQyZH1eN7qlbbDufsBVw6CTd4TT0dAn9ptUq6YgY0iqswakSbUY4c+PRCnRvv2vWwlU
-         c+zsLjeqERhlMXuImaAEqbqW45FWIcVQiuhN1B3xj8vMjqHeMvsF8DrOLGFYqWNFmefe
-         CnxyEZa45FWjJD+3qLUzL373dcmm1L1jcb2ZleG89EqETNiWuzvJ4ouX76XHEeu+e9V7
-         sXCcaD0RXAa7oveRqDc1t26zrCAFm1pCBoVeHDCxodOlBIgxPxVmVo5wCx24D3CWXZml
-         nCkw==
-X-Gm-Message-State: AOAM530scJiMP8vipGuyj4CScwLnL82B0gAOmNDoZPqmzo5tCFTHyCuS
-        Q72nf6cmcAKEN8+ngr3CNn4=
-X-Google-Smtp-Source: ABdhPJwgTd6Yx8Xqrny4el0jRVRI7/Qrx3ZIQCoWFnA2VSwDglIGqGOPruHKDexB1n0atOylsIpm4g==
-X-Received: by 2002:a17:902:b418:b0:15f:713:c914 with SMTP id x24-20020a170902b41800b0015f0713c914mr27586311plr.171.1652880025351;
-        Wed, 18 May 2022 06:20:25 -0700 (PDT)
-Received: from localhost.localdomain ([114.200.4.15])
-        by smtp.gmail.com with ESMTPSA id v10-20020a62a50a000000b00518285976cdsm1653791pfm.9.2022.05.18.06.20.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 May 2022 06:20:24 -0700 (PDT)
-Date:   Wed, 18 May 2022 22:20:15 +0900
-From:   Suwan Kim <suwan.kim027@gmail.com>
-To:     mst@redhat.com
-Cc:     virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, jasowang@redhat.com,
-        stefanha@redhat.com, pbonzini@redhat.com, mgurtovoy@nvidia.com,
-        dongli.zhang@oracle.com, hch@infradead.org, elliott@hpe.com
-Subject: Re: [PATCH v6 0/2] virtio-blk: support polling I/O and
- mq_ops->queue_rqs()
-Message-ID: <YoTyj26L2gViyKoX@localhost.localdomain>
-References: <20220406153207.163134-1-suwan.kim027@gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220406153207.163134-1-suwan.kim027@gmail.com>
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=C4enMuSsWShHZvSMfmofWFHp1s0VWIVvo26glgzEjsU=;
+        b=vhKIxp3oJomTFb/McZdU16fhQB26fGT4tJcD2IBkKg9qxCHQ8G7bIG1yjNyg6z1Uet
+         SpVjbmxU28iXmXy3NbO+187BKu6ubyI8J9LedulO3I3VggUkXz6pX65B+wY7cn92mZT4
+         QFtYEaQ+tx3OgnXW1ChPqQUFzMioZZRwo67+hKYOJkPQiwF1t6R4wX+BoKXDqWUN9vXC
+         /fQqTZdOIYmAam/0EwanQgyJhWsktJHC+/YHkhgNluHBZInxogebIndoVR5rxdMZ7/rc
+         ZU0xnobxRdtZloZLFzStmOk/xuPVTq0PtoAWJcGd3kUihdVUvCvkzPFlAN02QJregHci
+         OyzA==
+X-Gm-Message-State: AOAM530lGWZ1P17HcG3oFDLCM2yTX7bEUKhx02jwxjEXiWlUT1MvE0Fd
+        poPKlVDcM6gu6s3wVF37jWoL
+X-Google-Smtp-Source: ABdhPJwTPnRlBvY02OOPDtbxOajP27ccZ9X78R/IJy1C8Be6exSnJxYvAQyjuumvZ/BeEbQhBTQ0lQ==
+X-Received: by 2002:a05:6402:2803:b0:42a:e4de:3270 with SMTP id h3-20020a056402280300b0042ae4de3270mr4516167ede.261.1652881244720;
+        Wed, 18 May 2022 06:40:44 -0700 (PDT)
+Received: from [192.168.94.233] (mob-5-90-205-72.net.vodafone.it. [5.90.205.72])
+        by smtp.gmail.com with ESMTPSA id n24-20020a056402515800b0042ad0358c8bsm1353204edd.38.2022.05.18.06.40.22
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 18 May 2022 06:40:44 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH -next v2 2/2] block, bfq: make bfq_has_work() more
+ accurate
+From:   Paolo VALENTE <paolo.valente@unimore.it>
+In-Reply-To: <54d06657-a5e2-a94d-c9af-2f10900e7f32@huawei.com>
+Date:   Wed, 18 May 2022 15:40:05 +0200
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <75C5D422-A11F-4965-8785-781E13EC6C1B@unimore.it>
+References: <20220513023507.2625717-1-yukuai3@huawei.com>
+ <20220513023507.2625717-3-yukuai3@huawei.com>
+ <20220516095620.ge5gxmwrnbanfqea@quack3.lan>
+ <740D270D-8723-4399-82CC-26CD861843D7@linaro.org>
+ <22FEB802-2872-45A7-8ED8-2DE7D0D5E6CD@linaro.org>
+ <54d06657-a5e2-a94d-c9af-2f10900e7f32@huawei.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Apr 07, 2022 at 12:32:05AM +0900, Suwan Kim wrote:
-> This patch serise adds support for polling I/O and mq_ops->queue_rqs()
-> to virtio-blk driver.
-> 
-> Changes
-> 
-> v5 -> v6
->     - patch1 : virtblk_poll
->         - Remove memset in init_vq()
->         - Fix space indent in init_vq()
->         - Replace if condition with positive check in virtblk_map_queues()
->                 if (i == HCTX_TYPE_POLL)
->                         blk_mq_map_queues(&set->map[i]);
->                 else
->                         blk_mq_virtio_map_queues(&set->map[i], vblk->vdev, 0);
->         - Add Reviewed-by tags
->     
->     - patch2 : virtio_queue_rqs
->         - Add Reviewed-by tags
-> 
-> v4 -> v5
->     - patch1 : virtblk_poll
->         - Replace "req_done" with "found" in virtblk_poll()
->         - Split for loop into two distinct for loop in init_vq()
->           that sets callback function for each default/poll queues
->         - Replace "if (i == HCTX_TYPE_DEFAULT)" with "i != HCTX_TYPE_POLL"
->           in virtblk_map_queues()
->         - Replace "virtblk_unmap_data(req, vbr);" with
->           "virtblk_unmap_data(req, blk_mq_rq_to_pdu(req);"
->           in virtblk_complete_batch()
->     
->     - patch2 : virtio_queue_rqs
->         - Instead of using vbr.sg_num field, use vbr->sg_table.nents.
->           So, remove sg_num field in struct virtblk_req
->         - Drop the unnecessary argument of virtblk_add_req() because it
->           doens't need "data_sg" and "have_data". It can be derived from "vbr"
->           argument.
->         - Add Reviewed-by tag from Stefan
-> 
-> v3 -> v4
->     - patch1 : virtblk_poll
->         - Add print the number of default/read/poll queues in init_vq()
->         - Add blk_mq_start_stopped_hw_queues() to virtblk_poll()
->               virtblk_poll()
->                   ...
->                   if (req_done)
->                                    blk_mq_start_stopped_hw_queues(vblk->disk->queue, true);
->                   ...
-> 
->     - patch2 : virtio_queue_rqs
->         - Modify virtio_queue_rqs() to hold lock only once when it adds
->           requests to virtqueue just before virtqueue notify.
->           It will guarantee that virtio_queue_rqs() will not use
->           previous req again.
-> 
-> v2 -> v3
->         - Fix warning by kernel test robot
->           
->             static int virtblk_poll()
->                 ...
->                 if (!blk_mq_add_to_batch(req, iob, virtblk_result(vbr),
->                                                    -> vbr->status,
-> 
-> v1 -> v2
->         - To receive the number of poll queues from user,
->           use module parameter instead of QEMU uapi change.
-> 
->         - Add the comment about virtblk_map_queues().
-> 
->         - Add support for mq_ops->queue_rqs() to implement submit side
->           batch.
-> 
-> Suwan Kim (2):
->   virtio-blk: support polling I/O
->   virtio-blk: support mq_ops->queue_rqs()
-> 
->  drivers/block/virtio_blk.c | 220 +++++++++++++++++++++++++++++++++----
->  1 file changed, 201 insertions(+), 19 deletions(-)
-> 
-> -- 
-> 2.26.3
 
-Hi Michael,
 
-Can these patches be merged to your branch?
+> Il giorno 18 mag 2022, alle ore 03:17, yukuai (C) <yukuai3@huawei.com> =
+ha scritto:
+>=20
+> =E5=9C=A8 2022/05/17 23:06, Paolo Valente =E5=86=99=E9=81=93:
+>>> Il giorno 17 mag 2022, alle ore 16:21, Paolo Valente =
+<paolo.valente@linaro.org> ha scritto:
+>>>=20
+>>>=20
+>>>=20
+>>>> Il giorno 16 mag 2022, alle ore 11:56, Jan Kara <jack@suse.cz> ha =
+scritto:
+>>>>=20
+>>>> On Fri 13-05-22 10:35:07, Yu Kuai wrote:
+>>>>> bfq_has_work() is using busy_queues currently, which is not =
+accurate
+>>>>> because bfq_queue is busy doesn't represent that it has requests. =
+Since
+>>>>> bfqd aready has a counter 'queued' to record how many requests are =
+in
+>>>>> bfq, use it instead of busy_queues.
+>>>>>=20
+>>>=20
+>>> The number of requests queued is not equal to the number of busy
+>>> queues (it is >=3D).
+>> No, sorry. It is actually !=3D in general.
+> Hi, Paolo
+>=20
+> I'm aware that number of requests queued is not equal to the number of
+> busy queues, and that is the motivation of this patch.
+>=20
+>> In particular, if queued =3D=3D 0 but there are busy queues (although
+>> still waiting for I/O to arrive), then responding that there is no
+>> work caused blk-mq to stop asking, and hence an I/O freeze.  IOW I/O
+>> eventually arrives for a busy queue, but blk-mq does not ask for a =
+new
+>> request any longer.  But maybe things have changed around bfq since
+>> then.
+>=20
+> The problem is that if queued =3D=3D 0 while there are busy queues, is =
+there
+> any point to return true in bfq_has_work() ? IMO, it will only cause
+> unecessary run queue. And if new request arrives,
+> blk_mq_sched_insert_request() will trigger a run queue.
 
-Regards,
-Suwan Kim
+Great, if this is the scheme now, then the patch is correct and =
+optimizing.
+
+Thanks,
+Paolo
+
+>=20
+> Thanks,
+> Kuai
+>> Paolo
+>>>  If this patch is based on this assumption then
+>>> unfortunately it is wrong :(
+>>>=20
+>>> Paolo
+>>>=20
+>>>>> Noted that bfq_has_work() can be called with 'bfqd->lock' held, =
+thus the
+>>>>> lock can't be held in bfq_has_work() to protect 'bfqd->queued'.
+>>>>>=20
+>>>>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>>>>=20
+>>>> Looks good. Feel free to add:
+>>>>=20
+>>>> Reviewed-by: Jan Kara <jack@suse.cz>
+>>>>=20
+>>>> 								Honza
+>>>>=20
+>>>>> ---
+>>>>> block/bfq-iosched.c | 16 ++++++++++++----
+>>>>> 1 file changed, 12 insertions(+), 4 deletions(-)
+>>>>>=20
+>>>>> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+>>>>> index 61750696e87f..740dd83853a6 100644
+>>>>> --- a/block/bfq-iosched.c
+>>>>> +++ b/block/bfq-iosched.c
+>>>>> @@ -2210,7 +2210,11 @@ static void bfq_add_request(struct request =
+*rq)
+>>>>>=20
+>>>>> 	bfq_log_bfqq(bfqd, bfqq, "add_request %d", rq_is_sync(rq));
+>>>>> 	bfqq->queued[rq_is_sync(rq)]++;
+>>>>> -	bfqd->queued++;
+>>>>> +	/*
+>>>>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', =
+however, it
+>>>>> +	 * may be read without holding the lock in bfq_has_work().
+>>>>> +	 */
+>>>>> +	WRITE_ONCE(bfqd->queued, bfqd->queued + 1);
+>>>>>=20
+>>>>> 	if (RB_EMPTY_ROOT(&bfqq->sort_list) && bfq_bfqq_sync(bfqq)) {
+>>>>> 		bfq_check_waker(bfqd, bfqq, now_ns);
+>>>>> @@ -2402,7 +2406,11 @@ static void bfq_remove_request(struct =
+request_queue *q,
+>>>>> 	if (rq->queuelist.prev !=3D &rq->queuelist)
+>>>>> 		list_del_init(&rq->queuelist);
+>>>>> 	bfqq->queued[sync]--;
+>>>>> -	bfqd->queued--;
+>>>>> +	/*
+>>>>> +	 * Updating of 'bfqd->queued' is protected by 'bfqd->lock', =
+however, it
+>>>>> +	 * may be read without holding the lock in bfq_has_work().
+>>>>> +	 */
+>>>>> +	WRITE_ONCE(bfqd->queued, bfqd->queued - 1);
+>>>>> 	elv_rb_del(&bfqq->sort_list, rq);
+>>>>>=20
+>>>>> 	elv_rqhash_del(q, rq);
+>>>>> @@ -5063,11 +5071,11 @@ static bool bfq_has_work(struct =
+blk_mq_hw_ctx *hctx)
+>>>>> 	struct bfq_data *bfqd =3D hctx->queue->elevator->elevator_data;
+>>>>>=20
+>>>>> 	/*
+>>>>> -	 * Avoiding lock: a race on bfqd->busy_queues should cause at
+>>>>> +	 * Avoiding lock: a race on bfqd->queued should cause at
+>>>>> 	 * most a call to dispatch for nothing
+>>>>> 	 */
+>>>>> 	return !list_empty_careful(&bfqd->dispatch) ||
+>>>>> -		bfq_tot_busy_queues(bfqd) > 0;
+>>>>> +		READ_ONCE(bfqd->queued);
+>>>>> }
+>>>>>=20
+>>>>> static struct request *__bfq_dispatch_request(struct blk_mq_hw_ctx =
+*hctx)
+>>>>> --=20
+>>>>> 2.31.1
+>>>>>=20
+>>>> --=20
+>>>> Jan Kara <jack@suse.com>
+>>>> SUSE Labs, CR
+>>>=20
+>> .
+
