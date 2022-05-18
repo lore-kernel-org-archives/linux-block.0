@@ -2,226 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 400C7C43219
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 09:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDE2C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 09:51:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234532AbiERJmJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 05:42:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44158 "EHLO
+        id S234627AbiERJv3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 05:51:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234540AbiERJkl (ORCPT
+        with ESMTP id S234779AbiERJvP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 05:40:41 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37A7014CDD0
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 02:40:27 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220518094026euoutp01638fecadd2c7c1ecbf4abc1ca6cc35fe~wKZ8TlN_D1375613756euoutp01N
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 09:40:26 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220518094026euoutp01638fecadd2c7c1ecbf4abc1ca6cc35fe~wKZ8TlN_D1375613756euoutp01N
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1652866826;
-        bh=UINa+NuzB2qcwPdtYD8SfTNgCx/7Du9BqOastcKQAPY=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=shqc2DtzVgGL/PdyLOUSepug1aiuw0mBybg1NT2V3WnWmbVQuRexEIIafnFyxk7nt
-         WPUU6OOI9wuFuorqEYxcy2f6RYhPb0JurLw+Rv2k676PySBqE5+qKMj9oxgjqTos9c
-         NDcZAb1vKrQWTX86ufx8KjR4YztPOe9IMsP7oaZY=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220518094026eucas1p14f9febe6d48605bfce997c4ca867a8aa~wKZ77YK3K1913319133eucas1p1B;
-        Wed, 18 May 2022 09:40:26 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges1new.samsung.com (EUCPMTA) with SMTP id 84.03.10009.90FB4826; Wed, 18
-        May 2022 10:40:25 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220518094025eucas1p1a3e35a8f00348154d5ef60e61f69dfec~wKZ7bieyt1910619106eucas1p1C;
-        Wed, 18 May 2022 09:40:25 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220518094025eusmtrp2690bb9439acf332022cabbb049548d8e~wKZ7U22Pu2765427654eusmtrp2c;
-        Wed, 18 May 2022 09:40:25 +0000 (GMT)
-X-AuditID: cbfec7f2-e95ff70000002719-52-6284bf09d4d0
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id AA.0D.09522.90FB4826; Wed, 18
-        May 2022 10:40:25 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220518094025eusmtip208fc0da8c94d9d123d11609e50d861a3~wKZ7LAhz31670016700eusmtip2h;
-        Wed, 18 May 2022 09:40:25 +0000 (GMT)
-Received: from [192.168.8.130] (106.210.248.7) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Wed, 18 May 2022 10:40:23 +0100
-Message-ID: <2b169f03-11d6-9989-84cb-821d67eb6cae@samsung.com>
-Date:   Wed, 18 May 2022 11:40:22 +0200
+        Wed, 18 May 2022 05:51:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D93A5FAC
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 02:51:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652867472;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pupdpoaT7DKq0S5N7tQSpmk4iGUsYQRiyblwUNHccVQ=;
+        b=LjuT9q5TL8XFVJIArbB/N1PIEjuQmhkW+TbYSa19ADULtIsDGq/cKl9E1nAlF4QBjCuMU7
+        yPEbYzf6ecNbKXFp/nRiXWCdiOzlIktP6kpztX2vG/HfU6J+ZmpjqBEa5OKfXo/yZtJrjn
+        fNdI3hIsQN+uW9uV/fF8RS3pVuaxOj8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-296-LCdLCQR_MumfhsQ9UQEI-g-1; Wed, 18 May 2022 05:51:09 -0400
+X-MC-Unique: LCdLCQR_MumfhsQ9UQEI-g-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 127FE185A7B2;
+        Wed, 18 May 2022 09:51:09 +0000 (UTC)
+Received: from T590 (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A47B2C15D58;
+        Wed, 18 May 2022 09:51:02 +0000 (UTC)
+Date:   Wed, 18 May 2022 17:50:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2 1/2] blk-throttle: fix that io throttle can only
+ work for single bio
+Message-ID: <YoTBgJhhA14r61ZX@T590>
+References: <20220518072751.1188163-1-yukuai3@huawei.com>
+ <20220518072751.1188163-2-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.8.1
-Subject: Re: [PATCH v4 07/13] btrfs: zoned: use generic btrfs zone helpers
- to support npo2 zoned devices
-Content-Language: en-US
-To:     <dsterba@suse.cz>
-CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
-        <pankydev8@gmail.com>, <dsterba@suse.com>, <hch@lst.de>,
-        <linux-nvme@lists.infradead.org>, <linux-fsdevel@vger.kernel.org>,
-        <linux-btrfs@vger.kernel.org>, <jiangbo.365@bytedance.com>,
-        <linux-block@vger.kernel.org>, <gost.dev@samsung.com>,
-        <linux-kernel@vger.kernel.org>, <dm-devel@redhat.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <20220517123008.GC18596@twin.jikos.cz>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.7]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djP87qc+1uSDM4cMbdYfbefzeL32fPM
-        FnvfzWa1uPCjkcli8e/vLBYrVx9lsug58IHFYu8tbYtLj1ewW+zZe5LF4vKuOWwW85c9Zbe4
-        MeEpo8Wam09ZHPg8/p1Yw+axc9Zddo/LZ0s9Nq3qZPPYvKTeY/fNBqBw631Wj/f7rrJ5rN9y
-        lcXjzIIj7B6fN8kFcEdx2aSk5mSWpRbp2yVwZTT0PWEt2CRXcbzjJFsD4weJLkZODgkBE4kJ
-        O/YwdjFycQgJrGCUWPt5MRuE84VR4s35I+wgVUICnxklOppLYTrOnfnFDBFfzihx/Jw/RANQ
-        zexNn6FG7WSUeNCyixWkilfATuLYo3Y2EJtFQFVi95QtzBBxQYmTM5+wgNiiAhES02adAasR
-        FsiSmLJtI1gvs4C4xK0n85lAbBEBUYlL+1ewgCxgFpjILDHpxWSgbRwcbAJaEo2dYJdyChhL
-        rG09yQbRqynRuv03O4QtL7H97RxmiA8UJW6u/MUGYddKrD12hh1kpoTAPU6Jq7/PQxW5SFz+
-        v4QRwhaWeHV8CzuELSPxfyfEQRIC1RJPb/xmhmhuYZTo37meDeQgCQFrib4zORA1jhIzHu9l
-        hQjzSdx4KwhxD5/EpG3TmScwqs5CCopZSF6eheSFWUheWMDIsopRPLW0ODc9tdgwL7Vcrzgx
-        t7g0L10vOT93EyMwBZ7+d/zTDsa5rz7qHWJk4mA8xCjBwawkwsuY25IkxJuSWFmVWpQfX1Sa
-        k1p8iFGag0VJnDc5c0OikEB6YklqdmpqQWoRTJaJg1OqgalPhd+O73Je1X5TLlPObz8fT05U
-        M2iV2mW/5Ovduivb1mqt/3Nsx7XJC6JFDJ/MmqUaduRx1GIG46AYf6cNzWrCCUwreLit9z//
-        kG4v2jtD8Wqx7e2bdTVu0vYzLyXrJj74zDmxJ3jlIcsDnWtXPJ9ss3/Xec/S80XtAtvXGxp2
-        CL9Q9tnSoM1/6vaH1y9DJrxMmHjrwvpigeSNL5KPXNQSS1jgW5s6882a8IY5QT5z8++XzZHv
-        mtw/WUApr1Gq4aat3b8tmte75z+IYtz9zWJpYZaCobR+gc9fWZULqqrvmbatdvee7TDZVCrx
-        0duaFW2fDmYeuVXFfKr92fkNMkdd/3zOnmE5xUt5uez3Qi0lluKMREMt5qLiRABuMXZT8AMA
-        AA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprCKsWRmVeSWpSXmKPExsVy+t/xe7qc+1uSDBbPF7FYfbefzeL32fPM
-        FnvfzWa1uPCjkcli8e/vLBYrVx9lsug58IHFYu8tbYtLj1ewW+zZe5LF4vKuOWwW85c9Zbe4
-        MeEpo8Wam09ZHPg8/p1Yw+axc9Zddo/LZ0s9Nq3qZPPYvKTeY/fNBqBw631Wj/f7rrJ5rN9y
-        lcXjzIIj7B6fN8kFcEfp2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk
-        5mSWpRbp2yXoZTT0PWEt2CRXcbzjJFsD4weJLkZODgkBE4lzZ34xdzFycQgJLGWUWPfoHiNE
-        Qkbi05WP7BC2sMSfa11sEEUfGSWu7z/NAuHsZJTYuKaZBaSKV8BO4tijdjYQm0VAVWL3lC3M
-        EHFBiZMzn4DViApESDzYfZYVxBYWyJJ4dncH2AZmAXGJW0/mM4HYIgKiEpf2r4Ba8IJR4t7O
-        OWD3MQtMZJaY9GIy0H0cHGwCWhKNnWDNnALGEmtbT7JBDNKUaN3+G2qovMT2t3OYIV5QlLi5
-        8hcbhF0r8er+bsYJjKKzkNw3C8kds5CMmoVk1AJGllWMIqmlxbnpucWGesWJucWleel6yfm5
-        mxiByWPbsZ+bdzDOe/VR7xAjEwfjIUYJDmYlEV7G3JYkId6UxMqq1KL8+KLSnNTiQ4ymwECa
-        yCwlmpwPTF95JfGGZgamhiZmlgamlmbGSuK8ngUdiUIC6YklqdmpqQWpRTB9TBycUg1MysxO
-        i9cVPvq+N+ltWGp05wv/qpSYo45sQv/mbJ0174TLhKLrEvpn/686/EK+Z17ZdA3TN8cLuSLk
-        N/F2OHZv3mpnI9gaMXvibIHA6u9Kby+uPbvF2jvCv/nxNbFNTicDlfMn9nFXGfUKdEYc+FRj
-        eunYLOvXs269CFY9Fm+ZVq8Ua/zzyw6Gkrc/65xmHZs7lZuDQ/T11O2clg7zP2f/q+TLb976
-        6kVrQYRTp9ej6Z0ZzIfy5iu2KbgHsn62iJi4p13utk4Lr/vP8zuVpRnOrrj5+5LPU3OPNMHV
-        p06snnng1/GIqrRdl5a+39bYGXFv9Yu4AxVChclr5kVXBqv/NPfoOxgdNLH4nIHVv213lViK
-        MxINtZiLihMBD9bssacDAAA=
-X-CMS-MailID: 20220518094025eucas1p1a3e35a8f00348154d5ef60e61f69dfec
-X-Msg-Generator: CA
-X-RootMTR: 20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce
-References: <20220516165416.171196-1-p.raghav@samsung.com>
-        <CGME20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce@eucas1p1.samsung.com>
-        <20220516165416.171196-8-p.raghav@samsung.com>
-        <20220517123008.GC18596@twin.jikos.cz>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220518072751.1188163-2-yukuai3@huawei.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-05-17 14:30, David Sterba wrote:
-> On Mon, May 16, 2022 at 06:54:10PM +0200, Pankaj Raghav wrote:
->> Add helpers to calculate alignment, round up and round down
->> for zoned devices. These helpers encapsulates the necessary handling for
->> power_of_2 and non-power_of_2 zone sizes. Optimized calculations are
->> performed for zone sizes that are power_of_2 with log and shifts.
->>
->> btrfs_zoned_is_aligned() is added instead of reusing bdev_zone_aligned()
->> helper due to some use cases in btrfs where zone alignment is checked
->> before having access to the underlying block device such as in this
->> function: btrfs_load_block_group_zone_info().
->>
->> Use the generic btrfs zone helpers to calculate zone index, check zone
->> alignment, round up and round down operations.
->>
->> The zone_size_shift field is not needed anymore as generic helpers are
->> used for calculation.
+On Wed, May 18, 2022 at 03:27:50PM +0800, Yu Kuai wrote:
+> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> introduce a new problem, for example:
 > 
-> Overall this looks reasonable to me.
+> [root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+> [root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
+> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+> [1] 620
+> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+> [2] 626
+> [root@localhost ~]# 1+0 records in
+> 1+0 records out
+> 10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
+> 1+0 records out
 > 
->> Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
->> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
->> ---
->>  fs/btrfs/volumes.c | 24 +++++++++-------
->>  fs/btrfs/zoned.c   | 72 ++++++++++++++++++++++------------------------
->>  fs/btrfs/zoned.h   | 43 +++++++++++++++++++++++----
->>  3 files changed, 85 insertions(+), 54 deletions(-)
->>
->> --- a/fs/btrfs/zoned.c
->> +++ b/fs/btrfs/zoned.c
->> @@ -1108,14 +1101,14 @@ int btrfs_reset_device_zone(struct btrfs_device *device, u64 physical,
->>  int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
->>  {
->>  	struct btrfs_zoned_device_info *zinfo = device->zone_info;
->> -	const u8 shift = zinfo->zone_size_shift;
->> -	unsigned long begin = start >> shift;
->> -	unsigned long end = (start + size) >> shift;
->> +	unsigned long begin = bdev_zone_no(device->bdev, start >> SECTOR_SHIFT);
->> +	unsigned long end =
->> +		bdev_zone_no(device->bdev, (start + size) >> SECTOR_SHIFT);
+> 10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
+> -> the second bio is issued after 10s instead of 20s.
 > 
-> There are unsinged long types here though I'd rather see u64, better for
-> a separate patch. Fixed width types are cleaner here and in the zoned
-> code as there's always some conversion to/from sectors.
+> This is because if some bios are already queued, current bio is queued
+> directly and the flag 'BIO_THROTTLED' is set. And later, when former
+> bios are dispatched, this bio will be dispatched without waiting at all,
+> this is due to tg_with_in_bps_limit() return 0 for this bio.
 > 
-Ok. I will probably send a separate patch to convert them to fix width
-types. Is it ok if I do it as a separate patch instead of including it
-in this series?
->>  	u64 pos;
->>  	int ret;
->>  
->> -	ASSERT(IS_ALIGNED(start, zinfo->zone_size));
->> -	ASSERT(IS_ALIGNED(size, zinfo->zone_size));
->> +	ASSERT(btrfs_zoned_is_aligned(start, zinfo->zone_size));
->> +	ASSERT(btrfs_zoned_is_aligned(size, zinfo->zone_size));
->>  
->>  	if (end > zinfo->nr_zones)
->>  		return -ERANGE;
->> --- a/fs/btrfs/zoned.h
->> +++ b/fs/btrfs/zoned.h
->> @@ -30,6 +30,36 @@ struct btrfs_zoned_device_info {
->>  	u32 sb_zone_location[BTRFS_SUPER_MIRROR_MAX];
->>  };
->>  
->> +static inline bool btrfs_zoned_is_aligned(u64 pos, u64 zone_size)
->> +{
->> +	u64 remainder = 0;
->> +
->> +	if (is_power_of_two_u64(zone_size))
->> +		return IS_ALIGNED(pos, zone_size);
->> +
->> +	div64_u64_rem(pos, zone_size, &remainder);
->> +	return remainder == 0;
->> +}
->> +
->> +static inline u64 btrfs_zoned_roundup(u64 pos, u64 zone_size)
->> +{
->> +	if (is_power_of_two_u64(zone_size))
->> +		return ALIGN(pos, zone_size);
+> In order to fix the problem, don't skip flaged bio in
+> tg_with_in_bps_limit(), and for the problem that split bio can be
+> double accounted, compensate the over-accounting in __blk_throtl_bio().
 > 
-> Please use round_up as the rounddown helper uses round_down
+> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> ---
+>  block/blk-throttle.c | 24 ++++++++++++++++++------
+>  1 file changed, 18 insertions(+), 6 deletions(-)
 > 
-Ah, good catch. I will use it instead. Thanks.
->> +
->> +	return div64_u64(pos + zone_size - 1, zone_size) * zone_size;
->> +}
->> +
->> +static inline u64 btrfs_zoned_rounddown(u64 pos, u64 zone_size)
->> +{
->> +	u64 remainder = 0;
->> +	if (is_power_of_two_u64(zone_size))
->> +		return round_down(pos, zone_size);
->> +
->> +	div64_u64_rem(pos, zone_size, &remainder);
->> +	pos -= remainder;
->> +	return pos;
->> +}
->> +
->>  #ifdef CONFIG_BLK_DEV_ZONED
->>  int btrfs_get_dev_zone(struct btrfs_device *device, u64 pos,
->>  		       struct blk_zone *zone);
+> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+> index 447e1b8722f7..6f69859eae23 100644
+> --- a/block/blk-throttle.c
+> +++ b/block/blk-throttle.c
+> @@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+>  	unsigned int bio_size = throtl_bio_data_size(bio);
+>  
+>  	/* no need to throttle if this bio's bytes have been accounted */
+> -	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
+> +	if (bps_limit == U64_MAX) {
+>  		if (wait)
+>  			*wait = 0;
+>  		return true;
+> @@ -921,11 +921,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+>  	unsigned int bio_size = throtl_bio_data_size(bio);
+>  
+>  	/* Charge the bio to the group */
+> -	if (!bio_flagged(bio, BIO_THROTTLED)) {
+> -		tg->bytes_disp[rw] += bio_size;
+> -		tg->last_bytes_disp[rw] += bio_size;
+> -	}
+> -
+> +	tg->bytes_disp[rw] += bio_size;
+> +	tg->last_bytes_disp[rw] += bio_size;
+>  	tg->io_disp[rw]++;
+>  	tg->last_io_disp[rw]++;
+>  
+> @@ -2121,6 +2118,21 @@ bool __blk_throtl_bio(struct bio *bio)
+>  			tg->last_low_overflow_time[rw] = jiffies;
+>  		throtl_downgrade_check(tg);
+>  		throtl_upgrade_check(tg);
+> +
+> +		/*
+> +		 * re-entered bio has accounted bytes already, so try to
+> +		 * compensate previous over-accounting. However, if new
+> +		 * slice is started, just forget it.
+> +		 */
+> +		if (bio_flagged(bio, BIO_THROTTLED)) {
+> +			unsigned int bio_size = throtl_bio_data_size(bio);
+> +
+> +			if (tg->bytes_disp[rw] >= bio_size)
+> +				tg->bytes_disp[rw] -= bio_size;
+> +			if (tg->last_bytes_disp[rw] > bio_size)
+> +				tg->last_bytes_disp[rw] -= bio_size;
+
+The above check should be:
+			if (tg->last_bytes_disp[rw] >= bio_size)
+
+Otherwise, this patch looks fine for me.
+
+
+Thanks,
+Ming
+
