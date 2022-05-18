@@ -2,110 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47ADCC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 11:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C902BC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 11:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235570AbiERL0d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 07:26:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59668 "EHLO
+        id S235948AbiERLyI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 07:54:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235694AbiERL0E (ORCPT
+        with ESMTP id S235939AbiERLyI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 07:26:04 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA03011448;
-        Wed, 18 May 2022 04:26:00 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 543261F921;
-        Wed, 18 May 2022 11:25:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1652873159;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lzGqbB6W/4jJjPwTJUIMVwsso9o7Blm3R0BLht7tMSI=;
-        b=f+6VssfOQNjRrpyZABnQm1ZJYRE361ARv7x8KnF355SG32w2Ax34yCjoPPRxBuaxVPOhV0
-        Hm2GPKSqAIMqMPuMHudFaV8I6u1zYTIBm+V8pf1FMVTZ06nuyGcQe22FmaqLCGQumpQEZZ
-        K6tTLvqVreUvJqYmDXQeMKL/Vw9ntF8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1652873159;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lzGqbB6W/4jJjPwTJUIMVwsso9o7Blm3R0BLht7tMSI=;
-        b=sT0MzHwKutP4nbHRSXKZbIYvCH0qzaHplxeoyZZgFfGo8b8tDBuCsoErL2HuIA/5bv5Z2G
-        TGabJCLWnc1UxcCw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id F0BAF13A6D;
-        Wed, 18 May 2022 11:25:58 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 38XzOcbXhGL8TgAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Wed, 18 May 2022 11:25:58 +0000
-Date:   Wed, 18 May 2022 13:21:40 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Pankaj Raghav <p.raghav@samsung.com>
-Cc:     dsterba@suse.cz, axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, dsterba@suse.com, hch@lst.de,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, jiangbo.365@bytedance.com,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH v4 07/13] btrfs: zoned: use generic btrfs zone helpers to
- support npo2 zoned devices
-Message-ID: <20220518112140.GI18596@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Pankaj Raghav <p.raghav@samsung.com>,
-        axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, dsterba@suse.com, hch@lst.de,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        linux-btrfs@vger.kernel.org, jiangbo.365@bytedance.com,
-        linux-block@vger.kernel.org, gost.dev@samsung.com,
-        linux-kernel@vger.kernel.org, dm-devel@redhat.com,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20220516165416.171196-1-p.raghav@samsung.com>
- <CGME20220516165428eucas1p1374b5f9592db3ca6a6551aff975537ce@eucas1p1.samsung.com>
- <20220516165416.171196-8-p.raghav@samsung.com>
- <20220517123008.GC18596@twin.jikos.cz>
- <2b169f03-11d6-9989-84cb-821d67eb6cae@samsung.com>
+        Wed, 18 May 2022 07:54:08 -0400
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D30E36E35
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 04:54:06 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id er5so2624011edb.12
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 04:54:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=hW2Dr5J4nseMlDzAD5820/5Bmxx/Ly068xqN61nkp4w=;
+        b=Fh09nUyvC+LR6xBp6ghqdtF0dP6BmFBY7dMg11cNAkGY5dpr/AxxWeaM9XKV0ei2c7
+         KqsTHy007VGpkxp64XNpxlba+i2OxucEyrxUBC5OnEGkiUlj6KFz3BM+LWNG98jTp+7F
+         i/LAqjeZUXEKkn8GmVINWw4t8wXKNQU2JGRsXb9qcODddTFGq6LJMpUXV4zrj2qKlLFC
+         uNZWQhhoy1eFj3t3gdtFEOWeaEB+gj1zbXYAcqz17pw+IxoEHqA8crLJ/D6zbSKTLCjY
+         3fAYUTLDeHDx/HVgV5OA/dNbhIrgMC543mzqSg8edmmEl01GidcFCn4UW8RuMdmWrIEa
+         lW2Q==
+X-Gm-Message-State: AOAM5315Zy0fBL/rEtqZ1oUKQDyMHakikKdgPqC+r1/Ykw3zSJQW5p+G
+        l4erL0x3nrhc98O3L2MYQeDYZSmzoaH1qPMW
+X-Google-Smtp-Source: ABdhPJzk44FSoOXKG5dJzWg5JuuMY1KCVuq5dAGxZNoCUYNxgQKfz5U8ypgXTAWq1vxyZFMHpqkW9A==
+X-Received: by 2002:a05:6402:2789:b0:427:bc78:85c9 with SMTP id b9-20020a056402278900b00427bc7885c9mr24530241ede.50.1652874844673;
+        Wed, 18 May 2022 04:54:04 -0700 (PDT)
+Received: from [192.168.50.14] (178-117-55-239.access.telenet.be. [178.117.55.239])
+        by smtp.gmail.com with ESMTPSA id l3-20020a056402124300b0042617ba63d5sm1236502edw.95.2022.05.18.04.54.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 May 2022 04:54:03 -0700 (PDT)
+Message-ID: <632dfb2d-b94e-39ab-3777-d1248218daf7@acm.org>
+Date:   Wed, 18 May 2022 13:54:03 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <2b169f03-11d6-9989-84cb-821d67eb6cae@samsung.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.7.0
+Subject: Re: [PATCH blktests] nvmeof-mp/001: Set expected count properly
+Content-Language: en-US
+To:     Xiao Yang <yangx.jy@fujitsu.com>, osandov@fb.com,
+        yi.zhang@redhat.com
+Cc:     linux-block@vger.kernel.org
+References: <20220518034443.46803-1-yangx.jy@fujitsu.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220518034443.46803-1-yangx.jy@fujitsu.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 11:40:22AM +0200, Pankaj Raghav wrote:
-> On 2022-05-17 14:30, David Sterba wrote:
-> > On Mon, May 16, 2022 at 06:54:10PM +0200, Pankaj Raghav wrote:
-> >> @@ -1108,14 +1101,14 @@ int btrfs_reset_device_zone(struct btrfs_device *device, u64 physical,
-> >>  int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
-> >>  {
-> >>  	struct btrfs_zoned_device_info *zinfo = device->zone_info;
-> >> -	const u8 shift = zinfo->zone_size_shift;
-> >> -	unsigned long begin = start >> shift;
-> >> -	unsigned long end = (start + size) >> shift;
-> >> +	unsigned long begin = bdev_zone_no(device->bdev, start >> SECTOR_SHIFT);
-> >> +	unsigned long end =
-> >> +		bdev_zone_no(device->bdev, (start + size) >> SECTOR_SHIFT);
-> > 
-> > There are unsinged long types here though I'd rather see u64, better for
-> > a separate patch. Fixed width types are cleaner here and in the zoned
-> > code as there's always some conversion to/from sectors.
-> > 
-> Ok. I will probably send a separate patch to convert them to fix width
-> types. Is it ok if I do it as a separate patch instead of including it
-> in this series?
+On 5/18/22 05:44, Xiao Yang wrote:
+> The number of block devices will increase according
+> to the number of RDMA-capable NICs.
+> For example, nvmeof-mp/001 with two RDMA-capable NICs
+> got the following error:
+> -------------------------------------
+>      Configured NVMe target driver
+>      -count_devices(): 1 <> 1
+>      +count_devices(): 2 <> 1
+>      Passed
+> -------------------------------------
+> 
+> Set expected count properly by calculating the number
+> of RDMA-capable NICs.
 
-Yes, it's a cleanup for later, not directly introduced or affecting this
-patchset. I've checked zoned.c, in btrfs_ensure_empty_zones it's the
-only instance so it's not some widespread problem.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
