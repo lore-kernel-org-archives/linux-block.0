@@ -2,96 +2,180 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B426BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 15:53:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D975EC4332F
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 16:56:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239644AbiERPxo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 11:53:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54084 "EHLO
+        id S240575AbiERQ4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 12:56:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239616AbiERPxo (ORCPT
+        with ESMTP id S240506AbiERQz6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 11:53:44 -0400
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED2021C9676;
-        Wed, 18 May 2022 08:53:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1652889223; x=1684425223;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=LUhPeqjotO22QnvrKw6uAmvTIAIIFtxOBffN4kFBcJk=;
-  b=PSqmKRK63MeJcbJWIT0401dHmGFwTnRMMR825mAW8S/lqQm6mNAINJ0I
-   r9ckH318i7jG6E9BEl6s7td3mYtTK+K29x+eGcDDYd8ygm+3YgEaJvsX7
-   fgnQup0X+TrbqWlQ7HpxIpkgYdD8idEwpN6fiKfS+4+i7MGjPBhibEjLd
-   1FKhpIWRjoh/46yamk3Wre38OTdwLRZli++Kc22MrkB4v9ZW/TkSvLUDc
-   1tS4SrBA4cQzKBgHz37ByrhbbiNj5urbnFzOyHI3OdXnVjOO7mJ6Cb9OA
-   Dt3cNoTOanLBQ07i9ElMxyovsvdFtyC+VQvtO0/X9X+rN9rzJkEN0l9ez
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10351"; a="271434264"
-X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
-   d="scan'208";a="271434264"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 08:53:42 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
-   d="scan'208";a="556384353"
-Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 18 May 2022 08:53:39 -0700
-Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1nrLzW-0002MX-Ha;
-        Wed, 18 May 2022 15:53:38 +0000
-Date:   Wed, 18 May 2022 23:52:40 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Yu Kuai <yukuai3@huawei.com>, tj@kernel.org, axboe@kernel.dk,
-        ming.lei@redhat.com
-Cc:     kbuild-all@lists.01.org, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yukuai3@huawei.com, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v2 2/2] blk-throttle: fix io hung due to
- configuration updates
-Message-ID: <202205182347.tMOOqyfL-lkp@intel.com>
-References: <20220518072751.1188163-3-yukuai3@huawei.com>
+        Wed, 18 May 2022 12:55:58 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A26519287
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 09:55:56 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id n10so5005308ejk.5
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 09:55:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=soleen.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+RcN5J0ur4waoOrpP5dEneSJvtTucrgzrBX0vuvDNzg=;
+        b=jqT/3rdeSfMtEpH8kcA4/nn+EfeZSUuf8LPPqhLKI9etfw6hQt/jE/5RB9+wAn7N+Z
+         Ehawr2Lnj8Xy/V9rEAUasHDJAEfZoSITtIIF1X9hmH3oDXIBNzCPI0/8wWj68x+PdNBs
+         CYcJUtEpJeYfXt4e7pO3nCwPPYgiL7h53DO5Fuujh2Y6lzOqlHXACtVhqvzimDu3Oual
+         tfhtqDL4wOAzaNxnKSix47hX+w5GxeHrTuVV+uT6Gaq249kr69g+Sjjj703raStyIOke
+         zlWbjfU2A5GEbVZtSf4efh8q1kIlRtND9i+ESBSanFHpCYBuGyVgZ0dkOIm+//g3Sp7O
+         /xlQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+RcN5J0ur4waoOrpP5dEneSJvtTucrgzrBX0vuvDNzg=;
+        b=3oEI2P+4VvoEKp9bx0ZvgS6iOSD5RjLWXMOlByje2YS1UxbTrZYdpxNaV3VJqcDLvj
+         ajmMdkNdctDbG/XU7vcxxHD8boyM3ZvtQGzN2dqtpw6Yxt6OZTt6ILkRhsN9GBXMWpIf
+         O+5rk8salabU82tMeEsqiFwoNMKgDxEMGjiLPTLoZ9EyrQyQ5OP4ObHCc2ZQxVcu2uxw
+         GGRN7nDfhQck9ueJWsn5IlL6/R3EZmO0ZnJPdYECexg2iF4G/PgZTZsM+fVS0tTaTt4r
+         +bNz4OUBbF7hCAidgoigEHz1R0U7XuVaOQnVhCFRukbtRaQK3MZXIOszDylcezPRhSJ+
+         E+zQ==
+X-Gm-Message-State: AOAM533nCBivty9cOjN3Fi2ud2/daxApvMg++Gkt85+6euOm3UGTFfNp
+        JJrRPpg12lraNIGNrMHbT7i9WEzodjZP+FPgUm5uTQ==
+X-Google-Smtp-Source: ABdhPJzoDOL5onqSCpBWW4lu7fFIE11dPS6M11PWkiCu5oUw/XsvL6IBRO8qySJCvzfyvrHLY+M/j+7SW0BKghv5pwQ=
+X-Received: by 2002:a17:907:1c8a:b0:6e9:2a0d:d7b7 with SMTP id
+ nb10-20020a1709071c8a00b006e92a0dd7b7mr479411ejc.572.1652892954798; Wed, 18
+ May 2022 09:55:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220518072751.1188163-3-yukuai3@huawei.com>
+References: <1652860121-24092-1-git-send-email-quic_vivekuma@quicinc.com>
+In-Reply-To: <1652860121-24092-1-git-send-email-quic_vivekuma@quicinc.com>
+From:   Pasha Tatashin <pasha.tatashin@soleen.com>
+Date:   Wed, 18 May 2022 12:55:18 -0400
+Message-ID: <CA+CK2bDDphX6ANu_=8SPTy7gbB5aajtE3uVLGZrpaczZQKw4QA@mail.gmail.com>
+Subject: Re: [RFC 0/6] Bootloader based hibernation
+To:     Vivek Kumar <quic_vivekuma@quicinc.com>
+Cc:     Jonathan Corbet <corbet@lwn.net>,
+        Catalin Marinas <catalin.marinas@arm.com>,
+        Will Deacon <will@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        Marc Zyngier <maz@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        Linux Doc Mailing List <linux-doc@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-pm@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+        len.brown@intel.com, Pavel Machek <pavel@ucw.cz>,
+        paulmck@kernel.org, Borislav Petkov <bp@suse.de>,
+        Kees Cook <keescook@chromium.org>,
+        Muchun Song <songmuchun@bytedance.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        damien.lemoal@opensource.wdc.com, Fuad Tabba <tabba@google.com>,
+        Ard Biesheuvel <ardb@kernel.org>, tsoni@quicinc.com,
+        quic_psodagud@quicinc.com, quic_svaddagi@quicinc.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Yu,
+Hi Vivek,
 
-Thank you for the patch! Yet something to improve:
+Interesting stuff.
 
-[auto build test ERROR on next-20220517]
+On Wed, May 18, 2022 at 3:49 AM Vivek Kumar <quic_vivekuma@quicinc.com> wrote:
+>
+> Kernel Hibernation
+>
+> Linux Kernel has been already supporting hibernation, a process which
+> involves freezing of all userspace tasks, followed by quiescing of all
+> kernel device drivers and then a DDR snapshot is taken which is saved
+> to disc-swap partition, after the save, the system can either shutdown
+> or continue further. Generally during the next power cycle when kernel
+> boots and after probing almost all of the drivers, in the late_init()
+> part, it checks if a hibernation image is present in the specified swap
+> slot, if a valid hibernation image is found, it superimposes the currently
+> executing Kernel with an older kernel from the snapshot, moving further,
+> it calls the restore of the drivers and unfreezes the userspace tasks.
+> CONFIG_HIBERNATION and a designated swap partition needs to be present
+> for to enable Hibernation.
+>
+> Bootloader Based Hibernation:
+>
+> Automotive usecases require better boot KPIs, Hence we are proposing a
+> bootloader based hibernation restore. Purpose of bootloader based
+> hibernation is to improve the overall boot time till the first display
+> frame is seen on the screen or a camera application can be launched from
+> userspace after the power on reset key is pressed. This RFC patchset
+> implements a slightly tweaked version of hibernation in which the
+> restoration of an older snapshot into DDR is being carried out from the
+> bootloader (ABL) itself, by doing this we are saving some time
+> (1 second measured on msm-4.14 Kernel) by not running a
+> temporary kernel and figuring out the hibernation image at late_init().
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
-base:    47c1c54d1bcd0a69a56b49473bc20f17b70e5242
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20220518/202205182347.tMOOqyfL-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/f8345dbaf4ed491742aab29834aff66b4930c087
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
-        git checkout f8345dbaf4ed491742aab29834aff66b4930c087
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
+I wonder where most of the time is spent? Is it initializing struct
+pages? Potentially we could enlighten bootloader to determine whether
+hibernation image is stored or not on the swap device, and change boot
+parameter for the kernel accordingly. The booting kernel would know
+from the very beginning of boot that it will eventually resume a
+hibernated image, and therefore skip some of initilization parts, and
+perhaps limit amount of memory that it initializes.
 
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
+> In order to achieve the same bootloader checks for the hibernation
+> image at a very early stage from swap partition, it parses the image and
+> loads it in the DDR instead of loading boot image form boot partition.
+> Since we are not running the temporary kernel,which would have done some
+> basic ARM related setup like, MMU enablement, EL2 setup, CPU setup etc,
 
-All errors (new ones prefixed by >>):
+What boot loader is used? I suspect bootloader enables MMU to load the
+hibernated image into memory, otherwise the performance would be very
+poor. After the image is loaded, and prior to jumping into the entry
+address of loaded image the MMU is probably disabled.
 
-   m68k-linux-ld: block/blk-throttle.o: in function `tg_conf_updated':
->> blk-throttle.c:(.text+0x25bc): undefined reference to `__udivdi3'
->> m68k-linux-ld: blk-throttle.c:(.text+0x2626): undefined reference to `__udivdi3'
-   `.exit.text' referenced in section `.data' of sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
+> entry point into hibernation snapshot image directly from bootloader is
+> different, on similar lines, all device drivers are now re-programming
+> the IO-mapped registers as part of the restore callback (which is
+> triggered from the hibernation framework) to bring back the HW/SW sync.
+>
+> Other factors like, read-speed of the secondary storage device and
+> organization of the hibernation image in the swap partition effects the
+> total image restore time and the overall boot time. In our current
+> implementation we have serialized the allocation of swap-partition's slots
+> in kernel, so when hibernation image is being saved to disc, each page is
+> not scattered across various swap-slot offsets, rather it in a serial
+> manner. For example, if a DDR page at Page frame number 0x8005 is
+> located at a swap-slot offset 50, the next valid DDR page at PFN 0x8005
+> will be preset at the swap-slot offset 51. With this optimization in
+> place, bootloader can utilize the max capacity of issuing a disc-read
+> for reading a bigger chunk (~50 MBs at once) from the swap slot,
+> and also parsing of the image becomes simpler as it is available
+> contiguously.
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+This optimization seems generic enough that it would benefit both
+types of resume: from bootloader and from kernel.
+
+Thanks,
+Pasha
+
+>
+>
+>
+> Vivek Kumar (6):
+>   arm64: hibernate: Introduce new entry point to kernel
+>   PM: Hibernate: Add option to disable disk offset randomization
+>   block: gendisk: Add a new genhd capability flag
+>   mm: swap: Add randomization check for swapon/off calls
+>   Hibernate: Add check for pte_valid in saveable page
+>   irqchip/gic-v3: Re-init GIC hardware upon hibernation restore
+>
+>  Documentation/admin-guide/kernel-parameters.txt |  11 ++
+>  arch/arm64/kernel/hibernate.c                   |   9 ++
+>  drivers/irqchip/irq-gic-v3.c                    | 138 ++++++++++++++++-
+>  include/linux/blkdev.h                          |   1 +
+>  kernel/power/snapshot.c                         |  43 ++++++++
+>  kernel/power/swap.c                             |  12 +++
+>  mm/swapfile.c                                   |   6 +-
+>  7 files changed, 216 insertions(+), 4 deletions(-)
+>
+> --
+> 2.7.4
+>
