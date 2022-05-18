@@ -2,68 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2C35C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:26:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 618A7C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:53:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231206AbiERX00 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 19:26:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40126 "EHLO
+        id S231372AbiERXxd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 19:53:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230403AbiERX0Z (ORCPT
+        with ESMTP id S229925AbiERXxd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 19:26:25 -0400
+        Wed, 18 May 2022 19:53:33 -0400
 Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5262A193208;
-        Wed, 18 May 2022 16:26:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3B4860A96;
+        Wed, 18 May 2022 16:53:31 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 18FAEB81FB7;
-        Wed, 18 May 2022 23:26:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF081C385A9;
-        Wed, 18 May 2022 23:26:21 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 26E76B81C03;
+        Wed, 18 May 2022 23:53:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76052C385A9;
+        Wed, 18 May 2022 23:53:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652916381;
-        bh=YHM8LSfblKaa5O5EHww5P6PRrqaJ9qR7G+aTMMBzYQ0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bnNkqbj6Zp9W4+SnOmzywMhiaCUd8jEpW/Zk3ZCrqtAKGzdhEe8eQbdgURwXyRHGj
-         WHbfavehGD+A9yiGLLfp34T2qy2Katj+UsbFBOjJDc7Uh272FNYIPrR9xn9kOrkSxX
-         jdcWOSxvtRhtvyWBNZKMAEvugUamEsvKrAtHoZN2itwA/yXSSLlqi/sJVo4OoAifaB
-         gFtz/aNL7WWpoXY+bSzhqXHe/nObtSJckGvp/iIYHnJvul571WcRzfq4vYjmrFvSQd
-         q4p/nTl855zkgmH97UkVtEiiiXOXm5ufArADG5y9kwx5wubrh+qZy4GcfVH81mQMKj
-         FbF3GcbwnX9og==
-Date:   Wed, 18 May 2022 23:26:20 +0000
+        s=k20201202; t=1652918008;
+        bh=urChUY7g9muzenao6Op/35xCF3MRcXpVDil5q1s0Oy4=;
+        h=From:To:Cc:Subject:Date:From;
+        b=OV61lWEayn3LYEHqqYjdbT4rDnSYkojA/uBcYiviKrLQosTqoljlBxdyQuag4D38t
+         QD3252d92imOW+XVDTj0qjrOJ+PoJ1FHyjBnZPYlsp6uvQj29AfMW/W9l/rAHYKyz1
+         EIhGcaMmM0JN4aG/HcXCFiYrX6jbcm36zLqiheYnoEV/n8g93nWWuHGTHlbljGZIyW
+         DwtikEg30uOxeLh6dEvCADQkuEKd5jCOvDNzz3suRYVpoI0hAgf8LBxjbIdG8fLEMv
+         52a1BO/Ce+DjZrrYEzZcYdQZR3Zhx1bno/f/yNbVWXKZAiVyJNYG5rA6eoaqmksXog
+         K4HSm1NvPH8FA==
 From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@fb.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv2 0/3] direct io alignment relax
-Message-ID: <YoWAnDR/XOwegQNZ@gmail.com>
-References: <20220518171131.3525293-1-kbusch@fb.com>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: [RFC PATCH v2 0/7] make statx() return I/O alignment information
+Date:   Wed, 18 May 2022 16:50:04 -0700
+Message-Id: <20220518235011.153058-1-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220518171131.3525293-1-kbusch@fb.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 10:11:28AM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Including the fs list this time.
-> 
-> I am still working on a better interface to report the dio alignment to
-> an application. The most recent suggestion of using statx is proving to
-> be less straight forward than I thought, but I don't want to hold this
-> series up for that.
-> 
+This patchset makes the statx() system call return I/O alignment
+information, roughly following the design that was suggested at
+https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u
 
-Note that I already implemented the statx support and sent it out for review:
-https://lore.kernel.org/linux-fsdevel/20220211061158.227688-1-ebiggers@kernel.org/T/#u
-However, the patch series only received one comment.  I can send it out again if
-people have become interested in it again...
+This feature solves two problems: (a) it allows userspace to determine
+when a file supports direct I/O, and with what alignment restrictions;
+and (b) it allows userspace to determine the optimum I/O alignment for a
+file.  For more details, see patch 1.
 
-- Eric
+This is an RFC.  I'd greatly appreciate any feedback on the UAPI, as
+that obviously needs to be gotten right from the beginning.  E.g., does
+the proposed set of fields make sense?  Am I including the right
+information in stx_offset_align_optimal?
+
+Patch 1 adds the VFS support for STATX_IOALIGN.  The remaining patches
+wire it up to ext4 and f2fs.  Support for other filesystems can be added
+later.  We could also support this on block device files; however, since
+block device nodes have different inodes from the block devices
+themselves, it wouldn't apply to statx("/dev/$foo") but rather just to
+'fd = open("/dev/foo"); statx(fd)'.  I'm unsure how useful that would be.
+
+Note, f2fs has one corner case where DIO reads are allowed but not DIO
+writes.  The proposed statx fields can't represent this.  My proposal
+(patch 5) is to just eliminate this case, as it seems much too weird.
+But I'd appreciate any feedback on that part.
+
+This patchset applies to v5.18-rc7.
+
+No changes since v1, which I sent a few months ago; I'm resending this
+because people seem interested in it again
+(https://lore.kernel.org/r/20220518171131.3525293-1-kbusch@fb.com).
+
+Eric Biggers (7):
+  statx: add I/O alignment information
+  fscrypt: change fscrypt_dio_supported() to prepare for STATX_IOALIGN
+  ext4: support STATX_IOALIGN
+  f2fs: move f2fs_force_buffered_io() into file.c
+  f2fs: don't allow DIO reads but not DIO writes
+  f2fs: simplify f2fs_force_buffered_io()
+  f2fs: support STATX_IOALIGN
+
+ fs/crypto/inline_crypt.c  | 48 +++++++++++++++---------------
+ fs/ext4/ext4.h            |  1 +
+ fs/ext4/file.c            | 10 +++----
+ fs/ext4/inode.c           | 31 ++++++++++++++++++++
+ fs/f2fs/f2fs.h            | 45 -----------------------------
+ fs/f2fs/file.c            | 61 ++++++++++++++++++++++++++++++++++++++-
+ fs/stat.c                 |  3 ++
+ include/linux/fscrypt.h   |  7 ++---
+ include/linux/stat.h      |  3 ++
+ include/uapi/linux/stat.h |  9 ++++--
+ 10 files changed, 136 insertions(+), 82 deletions(-)
+
+
+base-commit: 42226c989789d8da4af1de0c31070c96726d990c
+-- 
+2.36.1
+
