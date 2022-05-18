@@ -2,117 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3157EC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 12:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73915C43217
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 12:19:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236285AbiERMNB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 08:13:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49752 "EHLO
+        id S236345AbiERMTt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 08:19:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236264AbiERMMt (ORCPT
+        with ESMTP id S236253AbiERMTs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 08:12:49 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C374714B669;
-        Wed, 18 May 2022 05:12:39 -0700 (PDT)
-Received: from kwepemi100016.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L3BZQ49YlzCsjp;
-        Wed, 18 May 2022 20:07:42 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100016.china.huawei.com (7.221.188.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 20:12:37 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 18 May
- 2022 20:12:36 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <josef@toxicpanda.com>, <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH -next v2 3/6] nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
-Date:   Wed, 18 May 2022 20:26:15 +0800
-Message-ID: <20220518122618.1702997-4-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220518122618.1702997-1-yukuai3@huawei.com>
-References: <20220518122618.1702997-1-yukuai3@huawei.com>
+        Wed, 18 May 2022 08:19:48 -0400
+Received: from vps0.lunn.ch (vps0.lunn.ch [185.16.172.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7409A5B88B;
+        Wed, 18 May 2022 05:19:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+        Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+        bh=kQKtiTZ0LH/w5S3uWV2zXb3ODADItlkkeofFb+AnfrE=; b=Wv5U2pmuhaGCoLOzHzJK+Nq6cQ
+        EGJBrHRoJFiP/8QEBn6R+hA6bbpRr8oLNh5EVEtnLyyKpJePXmTEnVYtGLqGDlyKTwfy0WSbgi6My
+        iSvOJjjGqikleFr50AmwdM1qnWFvIi3QyjQ786H9g1LQOYSReGILeRYHV25ojKWRg7h4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+        (envelope-from <andrew@lunn.ch>)
+        id 1nrIeB-003K0L-QZ; Wed, 18 May 2022 14:19:23 +0200
+Date:   Wed, 18 May 2022 14:19:23 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Vivek Kumar <quic_vivekuma@quicinc.com>
+Cc:     corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
+        tglx@linutronix.de, maz@kernel.org, axboe@kernel.dk,
+        rafael@kernel.org, akpm@linux-foundation.org,
+        linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pm@vger.kernel.org, linux-mm@kvack.org, len.brown@intel.com,
+        pavel@ucw.cz, paulmck@kernel.org, bp@suse.de,
+        keescook@chromium.org, songmuchun@bytedance.com,
+        rdunlap@infradead.org, damien.lemoal@opensource.wdc.com,
+        pasha.tatashin@soleen.com, tabba@google.com, ardb@kernel.org,
+        tsoni@quicinc.com, quic_psodagud@quicinc.com,
+        quic_svaddagi@quicinc.com,
+        Prasanna Kumar <quic_kprasan@quicinc.com>
+Subject: Re: [RFC 2/6] PM: Hibernate: Add option to disable disk offset
+ randomization
+Message-ID: <YoTkSx96vt1NTdZ/@lunn.ch>
+References: <1652860121-24092-1-git-send-email-quic_vivekuma@quicinc.com>
+ <1652860121-24092-3-git-send-email-quic_vivekuma@quicinc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1652860121-24092-3-git-send-email-quic_vivekuma@quicinc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Otherwise io will hung because request will only be completed if the
-cmd has the flag 'NBD_CMD_INFLIGHT'.
+On Wed, May 18, 2022 at 01:18:37PM +0530, Vivek Kumar wrote:
+> Add a kernel parameter to disable the disk offset randomization
+> for SSD devices in which such feature is available at the
+> firmware level. This is helpful in improving hibernation
+> resume time.
+> 
+> Signed-off-by: Vivek Kumar <quic_vivekuma@quicinc.com>
+> Signed-off-by: Prasanna Kumar <quic_kprasan@quicinc.com>
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt | 11 +++++++++++
+>  kernel/power/swap.c                             |  9 +++++++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 666ade9..06b4f10 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -5192,6 +5192,17 @@
+>  			Useful for devices that are detected asynchronously
+>  			(e.g. USB and MMC devices).
+>  
+> +	noswap_randomize
+> +			Kernel uses random disk offsets to help with wear-levelling
+> +			of SSD devices, while saving the hibernation snapshot image to
+> +			disk. Use this parameter to disable this feature for SSD
+> +			devices in scenarios when, such randomization is addressed at
+> +			the firmware level and hibenration image is not re-generated
+> +			frequently.
+> +			(Useful for improving hibernation resume time as snapshot pages
+> +			are available in disk serially and can be read in bigger chunks
+> +			without seeking)
 
-Fixes: 07175cb1baf4 ("nbd: make sure request completion won't concurrent")
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
----
- drivers/block/nbd.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+Seeking is a NOP for SSD, so it seems odd you mentioned that. Is the
+real problem here that the bootloader driver is very simple, it does
+not queue multiple reads to the hardware, but does it one block at a
+time?
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 2ee1e376d5c4..a0d0910dae2a 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -403,13 +403,14 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	if (!mutex_trylock(&cmd->lock))
- 		return BLK_EH_RESET_TIMER;
- 
--	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
-+	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
- 		mutex_unlock(&cmd->lock);
- 		return BLK_EH_DONE;
- 	}
- 
- 	if (!refcount_inc_not_zero(&nbd->config_refs)) {
- 		cmd->status = BLK_STS_TIMEOUT;
-+		__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 		mutex_unlock(&cmd->lock);
- 		goto done;
- 	}
-@@ -478,6 +479,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
- 	dev_err_ratelimited(nbd_to_dev(nbd), "Connection timed out\n");
- 	set_bit(NBD_RT_TIMEDOUT, &config->runtime_flags);
- 	cmd->status = BLK_STS_IOERR;
-+	__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
- 	mutex_unlock(&cmd->lock);
- 	sock_shutdown(nbd);
- 	nbd_config_put(nbd);
-@@ -745,7 +747,7 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
- 	cmd = blk_mq_rq_to_pdu(req);
- 
- 	mutex_lock(&cmd->lock);
--	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
-+	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
- 		dev_err(disk_to_dev(nbd->disk), "Suspicious reply %d (status %u flags %lu)",
- 			tag, cmd->status, cmd->flags);
- 		ret = -ENOENT;
-@@ -854,8 +856,16 @@ static void recv_work(struct work_struct *work)
- 		}
- 
- 		rq = blk_mq_rq_from_pdu(cmd);
--		if (likely(!blk_should_fake_timeout(rq->q)))
--			blk_mq_complete_request(rq);
-+		if (likely(!blk_should_fake_timeout(rq->q))) {
-+			bool complete;
-+
-+			mutex_lock(&cmd->lock);
-+			complete = __test_and_clear_bit(NBD_CMD_INFLIGHT,
-+							&cmd->flags);
-+			mutex_unlock(&cmd->lock);
-+			if (complete)
-+				blk_mq_complete_request(rq);
-+		}
- 		percpu_ref_put(&q->q_usage_counter);
- 	}
- 
--- 
-2.31.1
+Do you have performance numbers for both the bootloader and Linux?
+Does Linux performance reading the snapshot increase as much as for
+the bootloader?
 
+	Andrew
