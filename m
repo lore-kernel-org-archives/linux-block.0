@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B0BC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 17:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 267BFC433FE
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 17:11:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240897AbiERRLn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 13:11:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53366 "EHLO
+        id S240835AbiERRLp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 13:11:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240823AbiERRLm (ORCPT
+        with ESMTP id S240900AbiERRLo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 13:11:42 -0400
+        Wed, 18 May 2022 13:11:44 -0400
 Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C028552B31
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:40 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74BB3D1F6
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:42 -0700 (PDT)
 Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IFiBwh014227
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:40 -0700
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24IFiFTW014392
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:42 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=oWw+bc+rJhlNN3apliQ9xsJQL9S1G4MZnFOj+WYiR5w=;
- b=Fsd+vV/keQUYdqoCHJ7XVQHZ+rYT8uK8PvUFgHI22X9cm29EwB6XQPQLbL6iu5HGcfB7
- NBmh8ehxar+tf6W7GwT+OmNeba/lK5wxduFFmd2Ci59GbCgkiUmUm4rvzeaAbXQl5NNq
- jlOk3adlepEs5337FZBCzbv2KZYOFsJOz2c= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g4ap6tey3-5
+ bh=ZEK2KiizNDz+tQg7vRD1YcQXRxUip3fOuE2ugbwUxQw=;
+ b=Ez7qIpiCgQe1XAs5+rkMrjAS9f1KFAvciCsSv137kiNqq3oWxuzZEP6EDmLU1HQk81cu
+ 0qj5KCKMToe5x4VXSoNqnnB1ObUUwt1Pjdnx/zbUYlWBzmnF4+EExc3MS5snrCUfqBS9
+ movLN+WayNGsQQk1W52eXiRQPj6KZWETCKg= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g4ap6teyc-2
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:39 -0700
-Received: from twshared8508.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 10:11:41 -0700
+Received: from twshared29473.14.frc2.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 10:11:37 -0700
+ 15.1.2375.28; Wed, 18 May 2022 10:11:39 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 5DE4C414B92B; Wed, 18 May 2022 10:11:32 -0700 (PDT)
+        id 3F5DD414B928; Wed, 18 May 2022 10:11:32 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv2 3/3] block: relax direct io memory alignment
-Date:   Wed, 18 May 2022 10:11:31 -0700
-Message-ID: <20220518171131.3525293-4-kbusch@fb.com>
+Subject: [PATCHv2 1/3] block/bio: remove duplicate append pages code
+Date:   Wed, 18 May 2022 10:11:29 -0700
+Message-ID: <20220518171131.3525293-2-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220518171131.3525293-1-kbusch@fb.com>
 References: <20220518171131.3525293-1-kbusch@fb.com>
@@ -50,8 +50,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: NiFAFK9xWyK3dewiVwHqaUfk8KUfWT7C
-X-Proofpoint-ORIG-GUID: NiFAFK9xWyK3dewiVwHqaUfk8KUfWT7C
+X-Proofpoint-GUID: aX79L8cORsFtWxl1M4k8-fbyX7lN5ieX
+X-Proofpoint-ORIG-GUID: aX79L8cORsFtWxl1M4k8-fbyX7lN5ieX
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-18_06,2022-05-17_02,2022-02-23_01
@@ -61,177 +61,144 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-Use the address alignment requirements from the hardware for direct io
-instead of requiring addresses be aligned to the block size. User space
-can discover the alignment requirements from the dma_alignment queue
-attribute.
-
-User space can specify any hardware compatible DMA offset for each
-segment, but every segment length is still required to be a multiple of
-the block size.
+The setup for getting pages are identical for zone append and normal IO.
+Use common code for each.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
-v1->v2:
-
-  Squashed the alignment patch into this one
-
-  Use ALIGN_DOWN macro instead of reimplementing it
-
-  Check for unalignment in _simple case
-
- block/bio.c            |  3 +++
- block/fops.c           | 20 ++++++++++++++------
- fs/direct-io.c         | 11 +++++++----
- fs/iomap/direct-io.c   |  3 ++-
- include/linux/blkdev.h |  5 +++++
- 5 files changed, 31 insertions(+), 11 deletions(-)
+ block/bio.c | 90 ++++++++++++++++++++++-------------------------------
+ 1 file changed, 38 insertions(+), 52 deletions(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index 320514a47527..bde9b475a4d8 100644
+index a3893d80dccc..320514a47527 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -1207,6 +1207,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- {
- 	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
- 	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
-+	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
- 	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages =3D (struct page **)bv;
- 	bool same_page =3D false;
-@@ -1223,6 +1224,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- 	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
+@@ -1158,6 +1158,39 @@ static void bio_put_pages(struct page **pages, siz=
+e_t size, size_t off)
+ 		put_page(pages[i]);
+ }
 =20
- 	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-+	if (size > 0)
-+		size =3D ALIGN_DOWN(size, queue_logical_block_size(q));
++static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *=
+iter,
++				      struct page **pages, ssize_t size,
++				      size_t offset)
++{
++	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
++	unsigned int max_append_sectors =3D queue_max_zone_append_sectors(q);
++	unsigned len, i;
++	ssize_t left;
++	int ret =3D 0;
++
++	if (WARN_ON_ONCE(!max_append_sectors))
++		return 0;
++
++	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
++		struct page *page =3D pages[i];
++		bool same_page =3D false;
++
++		len =3D min_t(size_t, PAGE_SIZE - offset, left);
++		if (bio_add_hw_page(q, bio, page, len, offset,
++				max_append_sectors, &same_page) !=3D len) {
++			bio_put_pages(pages + i, left, offset);
++			ret =3D -EINVAL;
++			break;
++		}
++		if (same_page)
++			put_page(page);
++		offset =3D 0;
++	}
++
++	iov_iter_advance(iter, size - left);
++	return ret;
++}
++
+ #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct p=
+age *))
+=20
+ /**
+@@ -1193,6 +1226,10 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
+o, struct iov_iter *iter)
  	if (unlikely(size <=3D 0))
  		return size ? size : -EFAULT;
 =20
-diff --git a/block/fops.c b/block/fops.c
-index b9b83030e0df..d8537c29602f 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -54,8 +54,9 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
-iocb,
- 	struct bio bio;
- 	ssize_t ret;
++	if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
++		return __bio_iov_append_get_pages(bio, iter, pages, size,
++						  offset);
++
+ 	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
+ 		struct page *page =3D pages[i];
 =20
--	if ((pos | iov_iter_alignment(iter)) &
--	    (bdev_logical_block_size(bdev) - 1))
-+	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
- 		return -EINVAL;
-=20
- 	if (nr_pages <=3D DIO_INLINE_BIO_VECS)
-@@ -80,6 +81,11 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb =
-*iocb,
- 	ret =3D bio_iov_iter_get_pages(&bio, iter);
- 	if (unlikely(ret))
- 		goto out;
-+	if (unlikely(iov_iter_count(iter))) {
-+		/* iov is not aligned for a single bio */
-+		ret =3D -EINVAL;
-+		goto out;
-+	}
- 	ret =3D bio.bi_iter.bi_size;
-=20
- 	if (iov_iter_rw(iter) =3D=3D WRITE)
-@@ -173,8 +179,9 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb,=
- struct iov_iter *iter,
- 	loff_t pos =3D iocb->ki_pos;
- 	int ret =3D 0;
-=20
--	if ((pos | iov_iter_alignment(iter)) &
--	    (bdev_logical_block_size(bdev) - 1))
-+	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
- 		return -EINVAL;
-=20
- 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-@@ -298,8 +305,9 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb =
-*iocb,
- 	loff_t pos =3D iocb->ki_pos;
- 	int ret =3D 0;
-=20
--	if ((pos | iov_iter_alignment(iter)) &
--	    (bdev_logical_block_size(bdev) - 1))
-+	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
- 		return -EINVAL;
-=20
- 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
-diff --git a/fs/direct-io.c b/fs/direct-io.c
-index 840752006f60..64cc176be60c 100644
---- a/fs/direct-io.c
-+++ b/fs/direct-io.c
-@@ -1131,7 +1131,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, st=
-ruct inode *inode,
- 	struct dio_submit sdio =3D { 0, };
- 	struct buffer_head map_bh =3D { 0, };
- 	struct blk_plug plug;
--	unsigned long align =3D offset | iov_iter_alignment(iter);
-+	unsigned long align =3D iov_iter_alignment(iter);
-=20
- 	/*
- 	 * Avoid references to bdev if not absolutely needed to give
-@@ -1165,11 +1165,14 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, =
-struct inode *inode,
- 		goto fail_dio;
- 	}
-=20
--	if (align & blocksize_mask) {
--		if (bdev)
-+	if ((offset | align) & blocksize_mask) {
-+		if (bdev) {
- 			blkbits =3D blksize_bits(bdev_logical_block_size(bdev));
-+			if (align & bdev_dma_alignment(bdev))
-+				goto fail_dio;
-+		}
- 		blocksize_mask =3D (1 << blkbits) - 1;
--		if (align & blocksize_mask)
-+		if ((offset | count) & blocksize_mask)
- 			goto fail_dio;
- 	}
-=20
-diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
-index 80f9b047aa1b..0256d28baa8e 100644
---- a/fs/iomap/direct-io.c
-+++ b/fs/iomap/direct-io.c
-@@ -244,7 +244,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_i=
-ter *iter,
- 	size_t copied =3D 0;
- 	size_t orig_count;
-=20
--	if ((pos | length | align) & ((1 << blkbits) - 1))
-+	if ((pos | length) & ((1 << blkbits) - 1) ||
-+	    align & bdev_dma_alignment(iomap->bdev))
- 		return -EINVAL;
-=20
- 	if (iomap->type =3D=3D IOMAP_UNWRITTEN) {
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 5bdf2ac9142c..834b981ef01b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -1365,6 +1365,11 @@ static inline int queue_dma_alignment(const struct=
- request_queue *q)
- 	return q ? q->dma_alignment : 511;
+@@ -1215,54 +1252,6 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
+o, struct iov_iter *iter)
+ 	return 0;
  }
 =20
-+static inline unsigned int bdev_dma_alignment(struct block_device *bdev)
-+{
-+	return queue_dma_alignment(bdev_get_queue(bdev));
-+}
-+
- static inline int blk_rq_aligned(struct request_queue *q, unsigned long =
-addr,
- 				 unsigned int len)
- {
+-static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *=
+iter)
+-{
+-	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
+-	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
+-	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
+-	unsigned int max_append_sectors =3D queue_max_zone_append_sectors(q);
+-	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
+-	struct page **pages =3D (struct page **)bv;
+-	ssize_t size, left;
+-	unsigned len, i;
+-	size_t offset;
+-	int ret =3D 0;
+-
+-	if (WARN_ON_ONCE(!max_append_sectors))
+-		return 0;
+-
+-	/*
+-	 * Move page array up in the allocated memory for the bio vecs as far a=
+s
+-	 * possible so that we can start filling biovecs from the beginning
+-	 * without overwriting the temporary page array.
+-	 */
+-	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+-	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
+-
+-	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+-	if (unlikely(size <=3D 0))
+-		return size ? size : -EFAULT;
+-
+-	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
+-		struct page *page =3D pages[i];
+-		bool same_page =3D false;
+-
+-		len =3D min_t(size_t, PAGE_SIZE - offset, left);
+-		if (bio_add_hw_page(q, bio, page, len, offset,
+-				max_append_sectors, &same_page) !=3D len) {
+-			bio_put_pages(pages + i, left, offset);
+-			ret =3D -EINVAL;
+-			break;
+-		}
+-		if (same_page)
+-			put_page(page);
+-		offset =3D 0;
+-	}
+-
+-	iov_iter_advance(iter, size - left);
+-	return ret;
+-}
+-
+ /**
+  * bio_iov_iter_get_pages - add user or kernel pages to a bio
+  * @bio: bio to add pages to
+@@ -1297,10 +1286,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct=
+ iov_iter *iter)
+ 	}
+=20
+ 	do {
+-		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
+-			ret =3D __bio_iov_append_get_pages(bio, iter);
+-		else
+-			ret =3D __bio_iov_iter_get_pages(bio, iter);
++		ret =3D __bio_iov_iter_get_pages(bio, iter);
+ 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
+=20
+ 	/* don't account direct I/O as memory stall */
 --=20
 2.30.2
 
