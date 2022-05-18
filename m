@@ -2,204 +2,210 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20F72C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 06:30:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FA3C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 06:38:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231156AbiERGaR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 02:30:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58072 "EHLO
+        id S231367AbiERGiT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 02:38:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231146AbiERGaQ (ORCPT
+        with ESMTP id S231373AbiERGiS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 02:30:16 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E7ADE275C;
-        Tue, 17 May 2022 23:30:11 -0700 (PDT)
-Received: from kwepemi100002.china.huawei.com (unknown [172.30.72.55])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L333N0GzHz1JCJy;
-        Wed, 18 May 2022 14:28:48 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100002.china.huawei.com (7.221.188.188) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 14:30:09 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 14:30:08 +0800
-Subject: Re: [PATCH -next] blk-throttle: delay the setting of 'BIO_THROTTLED'
- to when throttle is done
+        Wed, 18 May 2022 02:38:18 -0400
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124ECA196;
+        Tue, 17 May 2022 23:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652855897; x=1684391897;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=SccqK8pQ+krYGgs0A+kpUPRwXH/oMFCZKToaB5yNYLI=;
+  b=X/A8bvYUSgijymIEAXm5yeA8/A0jXHZRQfzXy/Uq4C9TSpgMwQd7HZY8
+   SbLeiMQPHdsrHkbTyQAGESGn3VSB9nroAcQCqbf/J3gbHU0y7TsFgIZOY
+   bjeUXhwdhVB8aUFFKUoSEOdGB/OW9+TzOO8SnImjl5xxdLnikvtGk9UqK
+   8CR98KY04N1h1Ac/bU+689o9dVQwn3HVy8KdQPVReFJy68vfmZAQ3uIu4
+   8exWgzFBaeqWafd2D1aP/PsuUNbsSX621VzfLTNHuImTu5ceWVXlPitYv
+   y6d4BBwr3N/NRPABu7cF1jGyk7qAEd6S4e9Ed8uF+d56ZjPm1wIaXvSw/
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10350"; a="332125885"
+X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
+   d="scan'208";a="332125885"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 May 2022 23:38:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,234,1647327600"; 
+   d="scan'208";a="545281761"
+Received: from storage2.sh.intel.com (HELO localhost) ([10.67.110.197])
+  by orsmga006.jf.intel.com with ESMTP; 17 May 2022 23:38:11 -0700
+Date:   Wed, 18 May 2022 02:38:08 -0400
+From:   Liu Xiaodong <xiaodong.liu@intel.com>
 To:     Ming Lei <ming.lei@redhat.com>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220517134909.2910251-1-yukuai3@huawei.com>
- <YoRw8J1Y/bzxVsSR@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <73e8bdef-0f80-d255-e4f2-170813a12f5f@huawei.com>
-Date:   Wed, 18 May 2022 14:30:07 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        Liu Xiaodong <xiaodong.liu@intel.com>
+Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
+Message-ID: <20220518063808.GA168577@storage2.sh.intel.com>
+References: <20220517055358.3164431-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <YoRw8J1Y/bzxVsSR@T590>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220517055358.3164431-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.9.2 (2017-12-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/05/18 12:07, Ming Lei Ð´µÀ:
-> On Tue, May 17, 2022 at 09:49:09PM +0800, Yu Kuai wrote:
->> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
->> introduce a new problem, for example:
->>
->> [root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
->> [root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
->> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
->> [1] 620
->> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
->> [2] 626
->> [root@localhost ~]# 1+0 records in
->> 1+0 records out
->> 10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
->> 1+0 records out
->>
->> 10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
->> -> the second bio is issued after 10s instead of 20s.
->>
->> This is because if some bios are already queued, current bio is queued
->> directly and the flag 'BIO_THROTTLED' is set. And later, when former
->> bios are dispatched, this bio will be dispatched without waiting at all,
->> this is due to tg_with_in_bps_limit() will return 0 if the flag is set.
->>
->> Instead of setting the flag when bio starts throttle, delay to when
->> throttle is done to fix the problem.
->>
->> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
->> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
->> ---
->>   block/blk-throttle.c | 10 ++++++----
->>   1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
->> index 447e1b8722f7..f952f2d942ff 100644
->> --- a/block/blk-throttle.c
->> +++ b/block/blk-throttle.c
->> @@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
->>   	unsigned int bio_size = throtl_bio_data_size(bio);
->>   
->>   	/* no need to throttle if this bio's bytes have been accounted */
->> -	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
->> +	if (bps_limit == U64_MAX) {
+On Tue, May 17, 2022 at 01:53:57PM +0800, Ming Lei wrote:
+> Hello Guys,
 > 
-> This way may double account bio size for re-entered split bio.
-Hi, Ming
+> ubd driver is one kernel driver for implementing generic userspace block
+> device/driver, which delivers io request from ubd block device(/dev/ubdbN) into
+> ubd server[1] which is the userspace part of ubd for communicating
+> with ubd driver and handling specific io logic by its target module.
+> 
+> Another thing ubd driver handles is to copy data between user space buffer
+> and request/bio's pages, or take zero copy if mm is ready for support it in
+> future. ubd driver doesn't handle any IO logic of the specific driver, so
+> it is small/simple, and all io logics are done by the target code in ubdserver.
+> 
+> The above two are main jobs done by ubd driver.
 
-Yes, you are right, I forgot that...
-> 
-> 
->>   		if (wait)
->>   			*wait = 0;
->>   		return true;
->> @@ -1226,8 +1226,10 @@ static void blk_throtl_dispatch_work_fn(struct work_struct *work)
->>   
->>   	spin_lock_irq(&q->queue_lock);
->>   	for (rw = READ; rw <= WRITE; rw++)
->> -		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL)))
->> +		while ((bio = throtl_pop_queued(&td_sq->queued[rw], NULL))) {
->> +			bio_set_flag(bio, BIO_THROTTLED);
->>   			bio_list_add(&bio_list_on_stack, bio);
->> +		}
->>   	spin_unlock_irq(&q->queue_lock);
->>   
->>   	if (!bio_list_empty(&bio_list_on_stack)) {
->> @@ -2134,7 +2136,8 @@ bool __blk_throtl_bio(struct bio *bio)
->>   			}
->>   			break;
->>   		}
->> -
->> +		/* this bio will be issued directly */
->> +		bio_set_flag(bio, BIO_THROTTLED);
->>   		/* within limits, let's charge and dispatch directly */
->>   		throtl_charge_bio(tg, bio);
-> 
-> Marking BIO_THROTTLED before throtle_charge_bio() causes the bio
-> bytes not be charged.
-Yes, thanks for spotting this.
-> 
-> Another simple way is to compensate for previous extra bytes accounting,
-> something like the following patch:
-> 
-> 
-> diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-> index 139b2d7a99e2..44773d2ba257 100644
-> --- a/block/blk-throttle.c
-> +++ b/block/blk-throttle.c
-> @@ -810,8 +810,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
->   	unsigned long jiffy_elapsed, jiffy_wait, jiffy_elapsed_rnd;
->   	unsigned int bio_size = throtl_bio_data_size(bio);
->   
-> -	/* no need to throttle if this bio's bytes have been accounted */
-> -	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
-> +	if (bps_limit == U64_MAX) {
->   		if (wait)
->   			*wait = 0;
->   		return true;
-> @@ -921,10 +920,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
->   	unsigned int bio_size = throtl_bio_data_size(bio);
->   
->   	/* Charge the bio to the group */
-> -	if (!bio_flagged(bio, BIO_THROTTLED)) {
-> -		tg->bytes_disp[rw] += bio_size;
-> -		tg->last_bytes_disp[rw] += bio_size;
-> -	}
-> +	tg->bytes_disp[rw] += bio_size;
-> +	tg->last_bytes_disp[rw] += bio_size;
->   
->   	tg->io_disp[rw]++;
->   	tg->last_io_disp[rw]++;
-> @@ -2125,6 +2122,20 @@ bool __blk_throtl_bio(struct bio *bio)
->   		if (sq->nr_queued[rw])
->   			break;
->   
-> +		/*
-> +		 * re-entered bio has accounted bytes already, so try to
-> +		 * compensate previous over-accounting. However, if new
-> +		 * slice is started, just forget it
-> +		 */
-> +		if (bio_flagged(bio, BIO_THROTTLED)) {
-> +			unsigned int bio_size = throtl_bio_data_size(bio);
-> +
-> +			if (tg->bytes_disp[rw] >= bio_size)
-> +				tg->bytes_disp[rw] -= bio_size;
-> +			if (tg->last_bytes_disp[rw] - bio_size)
-> +				tg->last_bytes_disp[rw] -= bio_size;
-> +		}
-> +
-If new slice is not started, then this should fix the problem.
- From what I can see, other than tg_conf_updated, new silce can start if
-there are still bio throttled:
+Hi, Lei
 
-tg_may_dispatch
-  if (!(tg->service_queue.nr_queued[rw]))
-   throtl_start_new_slice
+Your UBD implementation looks great. Its io_uring based design is interesting
+and brilliant.
+Towards the purpose of userspace block device, last year,
+VDUSE initialized by Yongji is going to do a similar work. But VDUSE is under
+vdpa. VDUSE will present a virtio-blk device to other userspace process
+like containers, while serving virtio-blk req also by an userspace target.
+https://lists.linuxfoundation.org/pipermail/iommu/2021-June/056956.html 
 
-Thus I think the change is ok. For the case in tg_conf_updated, I'll
-remove the throtl_start_new_slice() to fix a hung problem. I'll add this
-patch with this one in next version.
+I've been working and thinking on serving RUNC container by SPDK efficiently.
+But this work requires a new proper userspace block device module in kernel.
+The highlevel design idea for userspace block device implementations
+should be that: Using ring for IO request, so client and target can exchange
+req/resp quickly in batch; Map bounce buffer between kernel and userspace
+target, so another extra IO data copy like NBD can be avoid. (Oh, yes, SPDK
+needs this kernel module has some more minor functions)
 
-Thanks,
-Kuai
+UBD and VDUSE are both implemented in this way, while of course each of
+them has specific features and advantages.
 
->   		/* if above limits, break to queue */
->   		if (!tg_may_dispatch(tg, bio, NULL)) {
->   			tg->last_low_overflow_time[rw] = jiffies;
+Not like UBD which is straightforward and starts from scratch, VDUSE is
+embedded in virtio framework. So its implementation is more complicated, but
+all virtio frontend utilities can be leveraged.
+When considering security/permission issues, feels UBD would be easier to
+solve them.
+
+So my questions are:
+1. what do you think about the purpose overlap between UBD and VDUSE?
+2. Could UBD be implemented with SPDK friendly functionalities? (mainly about
+io data mapping, since HW devices in SPDK need to access the mapped data
+buffer. Then, in function ubdsrv.c/ubdsrv_init_io_bufs(),
+"addr = mmap(,,,,dev->cdev_fd,)", SPDK needs to know the PA of "addr".
+Also memory pointed by "addr" should be pinned all the time.)
+
+Thanks
+Xiaodong
+
 > 
-> Thanks,
-> Ming
+> ubd driver can help to move IO logic into userspace, in which the
+> development work is easier/more effective than doing in kernel, such as,
+> ubd-loop takes < 200 lines of loop specific code to get basically same 
+> function with kernel loop block driver, meantime the performance is
+> still good. ubdsrv[1] provide built-in test for comparing both by running
+> "make test T=loop".
 > 
-> .
+> Another example is high performance qcow2 support[2], which could be built with
+> ubd framework more easily than doing it inside kernel.
 > 
+> Also there are more people who express interests on userspace block driver[3],
+> Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
+> requirement from Google. Ziyang Zhang from Alibaba said they "plan to
+> replace TCMU by UBD as a new choice" because UBD can get better throughput than
+> TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
+> storage service for providing storage to containers.
+> 
+> It is io_uring based: io request is delivered to userspace via new added
+> io_uring command which has been proved as very efficient for making nvme
+> passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
+> shared/mmap buffer is used for sharing io descriptor to userspace, the
+> buffer is readonly for userspace, each IO just takes 24bytes so far.
+> It is suggested to use io_uring in userspace(target part of ubd server)
+> to handle IO request too. And it is still easy for ubdserver to support
+> io handling by non-io_uring, and this work isn't done yet, but can be
+> supported easily with help o eventfd.
+> 
+> This way is efficient since no extra io command copy is required, no sleep
+> is needed in transferring io command to userspace. Meantime the communication
+> protocol is simple and efficient, one single command of
+> UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
+> command result in one trip. IO handling is often batched after single
+> io_uring_enter() returns, both IO requests from ubd server target and
+> IO commands could be handled as a whole batch.
+> 
+> Remove RFC now because ubd driver codes gets lots of cleanup, enhancement and
+> bug fixes since V1:
+> 
+> - cleanup uapi: remove ubd specific error code,  switch to linux error code,
+> remove one command op, remove one field from cmd_desc
+> 
+> - add monitor mechanism to handle ubq_daemon being killed, ubdsrv[1]
+>   includes builtin tests for covering heavy IO with deleting ubd / killing
+>   ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
+>   and the abort/stop mechanism is simple
+> 
+> - fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
+>   MQ ubd-loop devices(test/scratch)
+> 
+> - improve batching submission as suggested by Jens
+> 
+> - improve handling for starting device, replace random wait/poll with
+> completion
+> 
+> - all kinds of cleanup, bug fix,..
+> 
+> And the patch by patch change since V1 can be found in the following
+> tree:
+> 
+> https://github.com/ming1/linux/commits/my_for-5.18-ubd-devel_v2
+> 
+> Todo:
+> 	- add lazy user page release for avoiding cost of pinning user pages in
+> 	ubd_copy_pages() most of time, so we can save CPU for handling io logic
+> 	in userpsace
+> 
+> 
+> [1] ubd server
+> https://github.com/ming1/ubdsrv/commits/devel-v2
+> 
+> [2] qcow2 kernel driver attempt
+> https://www.spinics.net/lists/kernel/msg4292965.html
+> https://patchwork.kernel.org/project/linux-block/cover/20190823225619.15530-1-development@manuel-bentele.de/#22841183
+> 
+> [3] [LSF/MM/BPF TOPIC] block drivers in user space
+> https://lore.kernel.org/linux-block/87tucsf0sr.fsf@collabora.com/
+> 
+> [4] Follow up on UBD discussion
+> https://lore.kernel.org/linux-block/YnsW+utCrosF0lvm@T590/#r
+> 
+> Ming Lei (1):
+>   ubd: add io_uring based userspace block driver
+> 
+>  drivers/block/Kconfig        |    6 +
+>  drivers/block/Makefile       |    2 +
+>  drivers/block/ubd_drv.c      | 1444 ++++++++++++++++++++++++++++++++++
+>  include/uapi/linux/ubd_cmd.h |  158 ++++
+>  4 files changed, 1610 insertions(+)
+>  create mode 100644 drivers/block/ubd_drv.c
+>  create mode 100644 include/uapi/linux/ubd_cmd.h
+> 
+> -- 
+> 2.31.1
