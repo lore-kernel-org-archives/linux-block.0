@@ -2,26 +2,26 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9878AC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 07:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C3BC433F5
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 07:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231962AbiERHOU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 03:14:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47794 "EHLO
+        id S231945AbiERHOV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 03:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231958AbiERHOT (ORCPT
+        with ESMTP id S231949AbiERHOT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 18 May 2022 03:14:19 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB7CC108AB8;
-        Wed, 18 May 2022 00:14:11 -0700 (PDT)
-Received: from kwepemi100023.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L34320FdzzhZ90;
-        Wed, 18 May 2022 15:13:34 +0800 (CST)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319FB106567;
+        Wed, 18 May 2022 00:14:10 -0700 (PDT)
+Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L33y210S2zCsjB;
+        Wed, 18 May 2022 15:09:14 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100023.china.huawei.com (7.221.188.59) with Microsoft SMTP Server
+ kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Wed, 18 May 2022 15:14:09 +0800
+ 15.1.2375.24; Wed, 18 May 2022 15:14:08 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Wed, 18 May
@@ -31,9 +31,9 @@ To:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next v2 2/2] blk-throttle: fix io hung due to configuration updates
-Date:   Wed, 18 May 2022 15:27:51 +0800
-Message-ID: <20220518072751.1188163-3-yukuai3@huawei.com>
+Subject: [PATCH -next v2 1/2] blk-throttle: fix that io throttle can only work for single bio
+Date:   Wed, 18 May 2022 15:27:50 +0800
+Message-ID: <20220518072751.1188163-2-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220518072751.1188163-1-yukuai3@huawei.com>
 References: <20220518072751.1188163-1-yukuai3@huawei.com>
@@ -48,157 +48,87 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-If new configuration is submitted while a bio is throttled, then new
-waiting time is recaculated regardless that the bio might aready wait
-for some time:
+commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+introduce a new problem, for example:
 
-tg_conf_updated
- throtl_start_new_slice
-  tg_update_disptime
-  throtl_schedule_next_dispatch
+[root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+[root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
+[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+[1] 620
+[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+[2] 626
+[root@localhost ~]# 1+0 records in
+1+0 records out
+10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
+1+0 records out
 
-Then io hung can be triggered by always submmiting new configuration
-before the throttled bio is dispatched.
+10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
+-> the second bio is issued after 10s instead of 20s.
 
-Fix the problem by respecting the time that throttled bio aready waited.
-In order to do that, instead of start new slice in tg_conf_updated(),
-just update 'bytes_disp' and 'io_disp' based on the new configuration.
+This is because if some bios are already queued, current bio is queued
+directly and the flag 'BIO_THROTTLED' is set. And later, when former
+bios are dispatched, this bio will be dispatched without waiting at all,
+this is due to tg_with_in_bps_limit() return 0 for this bio.
 
+In order to fix the problem, don't skip flaged bio in
+tg_with_in_bps_limit(), and for the problem that split bio can be
+double accounted, compensate the over-accounting in __blk_throtl_bio().
+
+Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 ---
- block/blk-throttle.c | 64 +++++++++++++++++++++++++++++++++++---------
- 1 file changed, 51 insertions(+), 13 deletions(-)
+ block/blk-throttle.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 6f69859eae23..1c3dfd3d3d9a 100644
+index 447e1b8722f7..6f69859eae23 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -1271,7 +1271,42 @@ static int tg_print_conf_uint(struct seq_file *sf, void *v)
- 	return 0;
- }
+@@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
  
--static void tg_conf_updated(struct throtl_grp *tg, bool global)
-+static u64 throtl_update_bytes_disp(u64 dispatched, u64 new_limit,
-+				    u64 old_limit)
-+{
-+	if (new_limit == old_limit)
-+		return dispatched;
+ 	/* no need to throttle if this bio's bytes have been accounted */
+-	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
++	if (bps_limit == U64_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -921,11 +921,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	if (!bio_flagged(bio, BIO_THROTTLED)) {
+-		tg->bytes_disp[rw] += bio_size;
+-		tg->last_bytes_disp[rw] += bio_size;
+-	}
+-
++	tg->bytes_disp[rw] += bio_size;
++	tg->last_bytes_disp[rw] += bio_size;
+ 	tg->io_disp[rw]++;
+ 	tg->last_io_disp[rw]++;
+ 
+@@ -2121,6 +2118,21 @@ bool __blk_throtl_bio(struct bio *bio)
+ 			tg->last_low_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
+ 		throtl_upgrade_check(tg);
 +
-+	if (new_limit == U64_MAX)
-+		return 0;
++		/*
++		 * re-entered bio has accounted bytes already, so try to
++		 * compensate previous over-accounting. However, if new
++		 * slice is started, just forget it.
++		 */
++		if (bio_flagged(bio, BIO_THROTTLED)) {
++			unsigned int bio_size = throtl_bio_data_size(bio);
 +
-+	return dispatched * new_limit / old_limit;
-+}
++			if (tg->bytes_disp[rw] >= bio_size)
++				tg->bytes_disp[rw] -= bio_size;
++			if (tg->last_bytes_disp[rw] > bio_size)
++				tg->last_bytes_disp[rw] -= bio_size;
++		}
 +
-+static u32 throtl_update_io_disp(u32 dispatched, u32 new_limit, u32 old_limit)
-+{
-+	if (new_limit == old_limit)
-+		return dispatched;
-+
-+	if (new_limit == UINT_MAX)
-+		return 0;
-+
-+	return dispatched * new_limit / old_limit;
-+}
-+
-+static void throtl_update_slice(struct throtl_grp *tg, u64 *old_limits)
-+{
-+	tg->bytes_disp[READ] = throtl_update_bytes_disp(tg->bytes_disp[READ],
-+			tg_bps_limit(tg, READ), old_limits[0]);
-+	tg->bytes_disp[WRITE] = throtl_update_bytes_disp(tg->bytes_disp[WRITE],
-+			tg_bps_limit(tg, WRITE), old_limits[1]);
-+	tg->io_disp[READ] = throtl_update_io_disp(tg->io_disp[READ],
-+			tg_iops_limit(tg, READ), (u32)old_limits[2]);
-+	tg->io_disp[WRITE] = throtl_update_io_disp(tg->io_disp[WRITE],
-+			tg_iops_limit(tg, WRITE), (u32)old_limits[3]);
-+}
-+
-+static void tg_conf_updated(struct throtl_grp *tg, u64 *old_limits, bool global)
- {
- 	struct throtl_service_queue *sq = &tg->service_queue;
- 	struct cgroup_subsys_state *pos_css;
-@@ -1310,16 +1345,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 				parent_tg->latency_target);
- 	}
- 
--	/*
--	 * We're already holding queue_lock and know @tg is valid.  Let's
--	 * apply the new config directly.
--	 *
--	 * Restart the slices for both READ and WRITES. It might happen
--	 * that a group's limit are dropped suddenly and we don't want to
--	 * account recently dispatched IO with new low rate.
--	 */
--	throtl_start_new_slice(tg, READ);
--	throtl_start_new_slice(tg, WRITE);
-+	throtl_update_slice(tg, old_limits);
- 
- 	if (tg->flags & THROTL_TG_PENDING) {
- 		tg_update_disptime(tg);
-@@ -1327,6 +1353,14 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	}
- }
- 
-+static void tg_get_limits(struct throtl_grp *tg, u64 *limits)
-+{
-+	limits[0] = tg_bps_limit(tg, READ);
-+	limits[1] = tg_bps_limit(tg, WRITE);
-+	limits[2] = tg_iops_limit(tg, READ);
-+	limits[3] = tg_iops_limit(tg, WRITE);
-+}
-+
- static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 			   char *buf, size_t nbytes, loff_t off, bool is_u64)
- {
-@@ -1335,6 +1369,7 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 	struct throtl_grp *tg;
- 	int ret;
- 	u64 v;
-+	u64 old_limits[4];
- 
- 	ret = blkg_conf_prep(blkcg, &blkcg_policy_throtl, buf, &ctx);
- 	if (ret)
-@@ -1347,13 +1382,14 @@ static ssize_t tg_set_conf(struct kernfs_open_file *of,
- 		v = U64_MAX;
- 
- 	tg = blkg_to_tg(ctx.blkg);
-+	tg_get_limits(tg, old_limits);
- 
- 	if (is_u64)
- 		*(u64 *)((void *)tg + of_cft(of)->private) = v;
- 	else
- 		*(unsigned int *)((void *)tg + of_cft(of)->private) = v;
- 
--	tg_conf_updated(tg, false);
-+	tg_conf_updated(tg, old_limits, false);
- 	ret = 0;
- out_finish:
- 	blkg_conf_finish(&ctx);
-@@ -1523,6 +1559,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 	struct blkg_conf_ctx ctx;
- 	struct throtl_grp *tg;
- 	u64 v[4];
-+	u64 old_limits[4];
- 	unsigned long idle_time;
- 	unsigned long latency_time;
- 	int ret;
-@@ -1533,6 +1570,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 		return ret;
- 
- 	tg = blkg_to_tg(ctx.blkg);
-+	tg_get_limits(tg, old_limits);
- 
- 	v[0] = tg->bps_conf[READ][index];
- 	v[1] = tg->bps_conf[WRITE][index];
-@@ -1624,7 +1662,7 @@ static ssize_t tg_set_limit(struct kernfs_open_file *of,
- 			tg->td->limit_index = LIMIT_LOW;
- 	} else
- 		tg->td->limit_index = LIMIT_MAX;
--	tg_conf_updated(tg, index == LIMIT_LOW &&
-+	tg_conf_updated(tg, old_limits, index == LIMIT_LOW &&
- 		tg->td->limit_valid[LIMIT_LOW]);
- 	ret = 0;
- out_finish:
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
 -- 
 2.31.1
 
