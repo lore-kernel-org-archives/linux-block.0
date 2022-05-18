@@ -2,98 +2,152 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED3DC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:12:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3F8C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 23:24:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231182AbiERXM3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 19:12:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45162 "EHLO
+        id S231189AbiERXX7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 19:23:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59672 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231446AbiERXMX (ORCPT
+        with ESMTP id S229952AbiERXX7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 19:12:23 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFD89E8BBC
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 16:11:52 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id n10so3505673pjh.5
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 16:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:from:subject:to:cc
-         :content-language:content-transfer-encoding;
-        bh=MBPncIlFOXvkTGNPZJICk/oWths+qrWCsRNpiokT3hc=;
-        b=XQch2AEVIDY+89vMFgLSQtd/IMHL0dD3Cev5FoxvBtcbNKrbYLr2Tu7gWD5WvxCG7D
-         ZFqiD9fNh4crDeI8IpHubQmzIrrPCD7aEBOpfnzITAB0cDTfeVMixccVTWJk0nhrTSh3
-         T7QNofGzBvJGKCnBqXwnOCMuK/kRr1sHcXqsOrupTQuDSsz2ohSuyIBPwjKwsqSjN06e
-         E5rODUKFODRe/8NzN+uGcYWAnCSCKTE3+DqzQ5N6Ja4Dg0c34Zxw2s9hmQoWV9rBggmr
-         Fe+UDKbeG5g1Xz3iWKzp7ZduLlcGFI1BotJiZ7zWcZIZmdOpVjQfvNWEfK0rWRCf+1bq
-         Lpxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
-         :subject:to:cc:content-language:content-transfer-encoding;
-        bh=MBPncIlFOXvkTGNPZJICk/oWths+qrWCsRNpiokT3hc=;
-        b=gWNMiaBsEj9Nr8CwvtNF5stj9oxX6hlyCZTQeu6KM3y8lqreTr7/YSwqKWH1jnjCyp
-         nFlDrrACmVzOO0kJSmQWadZta4yz/fgYdltjw70nbkInuol15JSOMaJu6J2NQQr7m1mA
-         a8PzVIeHLk0QQfo+VNQHcnT7BXaLOptLa3lQv7fZUH7lsXNt5lE6uqoEc5Kp6DAjgkOy
-         hYo2LRQRgjv4z9cORcutTQved/oDtxnjGH1ovhe+ZJgaJvwBlQNuAqrAltXJIKwt0xfg
-         Vha5e6xyzFVN4q769Vr0S7+KqmTez4pnmnI451LywUD2gPEY4hOrlJEMa9IEiu76965F
-         4GfQ==
-X-Gm-Message-State: AOAM532k7m1q+GpkZmpWNAS2haRTTdK5d3PQQtFFUYW287srL7uej7Nw
-        0du7E5ORa1hWIU7wI26iT/FuKt0LHYSBQg==
-X-Google-Smtp-Source: ABdhPJyUWc4L13trbgUNVZ5OgaXukzWx4X0dVk6g8yar0aCzUkXsfCjWEMNRCo5iaDJ2W486Xq6ltA==
-X-Received: by 2002:a17:903:244d:b0:161:ac9e:60ce with SMTP id l13-20020a170903244d00b00161ac9e60cemr1958651pls.160.1652915512142;
-        Wed, 18 May 2022 16:11:52 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id im15-20020a170902bb0f00b0015eab1b097dsm2269909plb.22.2022.05.18.16.11.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 16:11:51 -0700 (PDT)
-Message-ID: <9adae644-3856-a84e-b3d4-47106c91e09f@kernel.dk>
-Date:   Wed, 18 May 2022 17:11:50 -0600
+        Wed, 18 May 2022 19:23:59 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E51B01D89FE;
+        Wed, 18 May 2022 16:23:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1652916236; x=1684452236;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mRamq6y/FrL9IrxKmzQMYKfzRyhfzGHairLTpmN6JHc=;
+  b=CtC+lfNDKnQw12RjOKavFSJ3288yv4TzPRU5rxWEvf0TrEwxGdaJpZaG
+   8K03M5N1c0N96IACHZUL9aT7OWAZWhVOb52kJhOlzhL7itmnQOxUFdHb9
+   Gw7dR31QEv9FRbZWSr/WG0Lk2pO4baBU0zxgpBYGAAuj1by8AsIzZXfAw
+   TVTZhFIXmOthmxOSQBHqgkSlZkI81gpo3/rYaMRKXAwvEiMiFSpKrSrgJ
+   IcCt2EEEu0uUoE/CkvcUfZxZTKyAxKLY28z0z6CEndglx07gbSumwgX08
+   CiK7VVLjq64GUqHxS2lUYs6Q6zBLAYRXkkNxqbnP49L9YFHXatS1O9LJ1
+   g==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10351"; a="272064309"
+X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
+   d="scan'208";a="272064309"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2022 16:23:56 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,235,1647327600"; 
+   d="scan'208";a="627292758"
+Received: from lkp-server02.sh.intel.com (HELO 242b25809ac7) ([10.239.97.151])
+  by fmsmga008.fm.intel.com with ESMTP; 18 May 2022 16:23:54 -0700
+Received: from kbuild by 242b25809ac7 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nrT1F-0002lT-NY;
+        Wed, 18 May 2022 23:23:53 +0000
+Date:   Thu, 19 May 2022 07:23:41 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     kbuild-all@lists.01.org, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
+Subject: Re: [PATCH 3/3] blk-mq: remove the done argument to
+ blk_execute_rq_nowait
+Message-ID: <202205190712.zyCIh9kG-lkp@intel.com>
+References: <20220517064901.3059255-4-hch@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fix for 5.18-final
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220517064901.3059255-4-hch@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+Hi Christoph,
 
-Just a small fix for a missing fifo time assigment for the head
-insertion case in mq-deadline.
+I love your patch! Yet something to improve:
 
-Please pull!
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on next-20220518]
+[cannot apply to mkp-scsi/for-next jejb-scsi/for-next linus/master v5.18-rc7]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christoph-Hellwig/blk-mq-remove-__blk_execute_rq_nowait/20220517-154900
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: arc-allyesconfig (https://download.01.org/0day-ci/archive/20220519/202205190712.zyCIh9kG-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/2dc03b4b4f1f1aa542a1ab6d6ff64be3d9db050c
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Christoph-Hellwig/blk-mq-remove-__blk_execute_rq_nowait/20220517-154900
+        git checkout 2dc03b4b4f1f1aa542a1ab6d6ff64be3d9db050c
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=arc SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   drivers/scsi/ufs/ufshpb.c: In function 'ufshpb_execute_map_req':
+>> drivers/scsi/ufs/ufshpb.c:721:41: error: expected ';' before 'hpb'
+     721 |         blk_execute_rq_nowait(req, true)
+         |                                         ^
+         |                                         ;
+     722 | 
+     723 |         hpb->stats.map_req_cnt++;
+         |         ~~~                              
 
 
-The following changes since commit f1c8781ac9d87650ccf45a354c0bbfa3f9230371:
+vim +721 drivers/scsi/ufs/ufshpb.c
 
-  s390/dasd: Use kzalloc instead of kmalloc/memset (2022-05-05 20:08:27 -0600)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-18
-
-for you to fetch changes up to 725f22a1477c9c15aa67ad3af96fe28ec4fe72d2:
-
-  block/mq-deadline: Set the fifo_time member also if inserting at head (2022-05-13 17:02:46 -0600)
-
-----------------------------------------------------------------
-block-5.18-2022-05-18
-
-----------------------------------------------------------------
-Bart Van Assche (1):
-      block/mq-deadline: Set the fifo_time member also if inserting at head
-
- block/mq-deadline.c | 1 +
- 1 file changed, 1 insertion(+)
+   683	
+   684	static int ufshpb_execute_map_req(struct ufshpb_lu *hpb,
+   685					  struct ufshpb_req *map_req, bool last)
+   686	{
+   687		struct request_queue *q;
+   688		struct request *req;
+   689		struct scsi_cmnd *scmd;
+   690		int mem_size = hpb->srgn_mem_size;
+   691		int ret = 0;
+   692		int i;
+   693	
+   694		q = hpb->sdev_ufs_lu->request_queue;
+   695		for (i = 0; i < hpb->pages_per_srgn; i++) {
+   696			ret = bio_add_pc_page(q, map_req->bio, map_req->rb.mctx->m_page[i],
+   697					      PAGE_SIZE, 0);
+   698			if (ret != PAGE_SIZE) {
+   699				dev_err(&hpb->sdev_ufs_lu->sdev_dev,
+   700					   "bio_add_pc_page fail %d - %d\n",
+   701					   map_req->rb.rgn_idx, map_req->rb.srgn_idx);
+   702				return ret;
+   703			}
+   704		}
+   705	
+   706		req = map_req->req;
+   707	
+   708		blk_rq_append_bio(req, map_req->bio);
+   709	
+   710		req->end_io_data = map_req;
+   711		req->end_io = ufshpb_map_req_compl_fn;
+   712	
+   713		if (unlikely(last))
+   714			mem_size = hpb->last_srgn_entries * HPB_ENTRY_SIZE;
+   715	
+   716		scmd = blk_mq_rq_to_pdu(req);
+   717		ufshpb_set_read_buf_cmd(scmd->cmnd, map_req->rb.rgn_idx,
+   718					map_req->rb.srgn_idx, mem_size);
+   719		scmd->cmd_len = HPB_READ_BUFFER_CMD_LENGTH;
+   720	
+ > 721		blk_execute_rq_nowait(req, true)
+   722	
+   723		hpb->stats.map_req_cnt++;
+   724		return 0;
+   725	}
+   726	
 
 -- 
-Jens Axboe
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
