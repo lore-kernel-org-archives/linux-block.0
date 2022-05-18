@@ -2,105 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 704FCC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 22:32:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF957C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 18 May 2022 22:35:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229816AbiERWb6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 18:31:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45520 "EHLO
+        id S230007AbiERWfK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 18:35:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55884 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229469AbiERWb6 (ORCPT
+        with ESMTP id S229453AbiERWfK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 18:31:58 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF163466F
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 15:31:56 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id d22so3101546plr.9
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 15:31:56 -0700 (PDT)
+        Wed, 18 May 2022 18:35:10 -0400
+Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D0EA222402
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 15:35:09 -0700 (PDT)
+Received: by mail-pf1-x42c.google.com with SMTP id u15so3407843pfi.3
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 15:35:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language
-         :from:to:cc:references:in-reply-to:content-transfer-encoding;
-        bh=thG3qSgnZW+qUMLaaxOPkQALuH6P7RbZ23MHltmMGlE=;
-        b=AQkqPj3D0tdfs64sN8mLJd9diiGRGQDbqzoTBkPKxEszGHSW23pLd3DZLq1t7J1BaH
-         N9Dc9tw3fZhqvdD7K5lreOPHKrd45AK941vaNu1U6kmB0u/LHeGMLIh4oh/lBCmsuM/R
-         nT++BAX42jIVpVd2Cbc0IDNOSqTH4QxG9Nid9TMDGCoIPhTqZxONNkMk58Jq/wMtOPZn
-         FR121zdv/+aGTq1DPhIOuVGzvj3hKtit/Buc/d9k5941ePSeMzytuGUKs98ffe6KJ8yI
-         O4tYIxZQsAbIvPWbv/KXPvXLRccYsR4v+/q7YR/qrq7ooDJjsiO24fAzsrF642GuT1FQ
-         Z4rg==
+        h=message-id:date:mime-version:user-agent:content-language:to:from
+         :subject:cc:content-transfer-encoding;
+        bh=k9cQgQ/4PPxdgUX3m8X5yYRNvrvQyApnNUSKZ4xFRTY=;
+        b=i5ccwAc3oJONdArQLxuN71Db/IdWKOKW1ECIMOIkCDRL6v4omMw/UHUSWKMVUTbTyR
+         SI0GppHbTr8bjJNlDaiYjh5fWW+URRTDMwaUmYRA4GonR30F+H/XgJWIYFdfxcaMAZVt
+         h97r7EpFy9Ysj7X0vjm6Z8uTqOI3/AE+jf7tHLwftx90IuQQfKkL4/aQ6IWdDEM2SilO
+         LSpQ8Huxk0Wkq6UZ3G1ZwB9KW92y/xyFLnhRWK4bBGacqXgZTq8yyGlsArYiBRw0nrOd
+         3UW7GPc0FQhZYkwtJeJI5dWO44uWJwBEaIGqGdwyskKiXWwyrDp0nmoxuxAhORvT08E8
+         LDCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:from:to:cc:references:in-reply-to
-         :content-transfer-encoding;
-        bh=thG3qSgnZW+qUMLaaxOPkQALuH6P7RbZ23MHltmMGlE=;
-        b=yX6yRdRGBBp445twWaCXxh0dJrZJaVmsjCFucQ6PBqf/WGxQno2WPqQD2Mktoy0HaS
-         iENMSWYmbATDQarzEJMO8yyXklzTwy9lnqEQYaxrbHdFC5zF8P3b8/JQcMirx63GnlyU
-         jhG3XTWWguOvcsSwWYMQItv2WK3KY2wJZz0x/l9hhsy5ZIqHLK1Pl8hZndBuhwxd2RfN
-         6aYaPPtyLQlMyzplWDHAKCJVe0TX/7qhdfRcOktElvqE0GYfA4QUpGX/PrZp8xXdgQFO
-         VKc5b95TGk5JOLMGFInnX4F0hC8vfLr6rpR2tw5mE6Df+hDagKlXRh+1lrP8ZBFKd42Z
-         hSwg==
-X-Gm-Message-State: AOAM533YO7x/ceLC8KRMiMGKfMT11E3VaB5A0SFSA4psSwZAbPv+E9JL
-        4qpHDgFr6ZctwgmGfmuyEhCWrQ==
-X-Google-Smtp-Source: ABdhPJxkM5dIjxffREWV17PoskbyG+tIqaT0rCNzAEMnjsyNnVjB3wANcJQX1M94VA+U2oCPAiV1OQ==
-X-Received: by 2002:a17:902:b684:b0:156:80b4:db03 with SMTP id c4-20020a170902b68400b0015680b4db03mr1626285pls.16.1652913115359;
-        Wed, 18 May 2022 15:31:55 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:from:subject:cc:content-transfer-encoding;
+        bh=k9cQgQ/4PPxdgUX3m8X5yYRNvrvQyApnNUSKZ4xFRTY=;
+        b=cOWBebej8xUeAElrQmlJ83f2L5GLBszHkwGQEm01yEEq3TBLd/GoGUhpOVt4iGGeAp
+         AwaWFZKSy7QtxrPEEgs47xtQx0yBrdwU3zF0QFFC0nP9oyetrKfeq3zPIsmizZ7KhSlf
+         XWTfw7GOU5rMFJyiNH9yxhw4KOMLKPj6d9TINflAx/K+k1we/Xg0reOjmZTMJ7GyVdp+
+         z9gtdDc4SjBtN8nKJV5Tm4OYTGw4YXoOIJLDRxLVq9/YPZXky87Q2+bIZmihqpN3xgoO
+         9ZIqV143CauO+VY1zRqwZcoZ1hVneltrzGKN3eecRg1ak8YxDVyGh63vBpBV519NbO5G
+         XDpA==
+X-Gm-Message-State: AOAM531dDuNtK5juxSUiSqVCRliToBz0KNj71vKVtgC2pkcs0o+RixJL
+        NjaA4qG8GPZNZuwRoCLR8PtU26su/wP45g==
+X-Google-Smtp-Source: ABdhPJxLWywGdFxNglKdJPEoC+UMjkaNHYWAaUcuQUdlmeRUabPIBeZ97i1hIOOdllgaaXfGIeLPfg==
+X-Received: by 2002:a63:5824:0:b0:3db:65eb:8e2f with SMTP id m36-20020a635824000000b003db65eb8e2fmr1337672pgb.349.1652913308730;
+        Wed, 18 May 2022 15:35:08 -0700 (PDT)
 Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id h1-20020a62de01000000b005181409a78esm2397294pfg.110.2022.05.18.15.31.54
+        by smtp.gmail.com with ESMTPSA id h20-20020aa786d4000000b0050dc762814fsm2491429pfo.41.2022.05.18.15.35.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 18 May 2022 15:31:54 -0700 (PDT)
-Message-ID: <de6b0f81-67e1-b167-a618-193c2303f149@kernel.dk>
-Date:   Wed, 18 May 2022 16:31:53 -0600
+        Wed, 18 May 2022 15:35:08 -0700 (PDT)
+Message-ID: <52f2c742-9e64-63b0-25c3-8052f7e85883@kernel.dk>
+Date:   Wed, 18 May 2022 16:35:07 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.1
-Subject: Re: [PATCH] blk-cgroup: Remove unnecessary rcu_read_lock/unlock()
 Content-Language: en-US
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-To:     Marek Szyprowski <m.szyprowski@samsung.com>, bh1scw@gmail.com,
-        tj@kernel.org
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, songmuchun@bytedance.com
-References: <20220516173930.159535-1-bh1scw@gmail.com>
- <CGME20220518192850eucas1p1458c00d4917c5ed39f2c37c9eb30cd46@eucas1p1.samsung.com>
- <46253c48-81cb-0787-20ad-9133afdd9e21@samsung.com>
- <1dad86bb-ae31-5bf8-5810-9e81c68be8ff@kernel.dk>
-In-Reply-To: <1dad86bb-ae31-5bf8-5810-9e81c68be8ff@kernel.dk>
+Subject: [PATCH] blk-cgroup: delete rcu_read_lock_held() WARN_ON_ONCE()
+Cc:     Marek Szyprowski <m.szyprowski@samsung.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/18/22 4:29 PM, Jens Axboe wrote:
-> On 5/18/22 1:28 PM, Marek Szyprowski wrote:
->> On 16.05.2022 19:39, bh1scw@gmail.com wrote:
->>> From: Fanjun Kong <bh1scw@gmail.com>
->>>
->>> spin_lock_irq/spin_unlock_irq contains preempt_disable/enable().
->>> Which can serve as RCU read-side critical region, so remove
->>> rcu_read_lock/unlock().
->>>
->>> Signed-off-by: Fanjun Kong <bh1scw@gmail.com>
->>
->> This patch landed in today's linux next-20220518 as commit 77c570a1ea85 
->> ("blk-cgroup: Remove unnecessary rcu_read_lock/unlock()").
->>
->> Unfortunately it triggers the following warning on ARM64 based Raspberry 
->> Pi 4B board:>
->> ------------[ cut here ]------------
->> WARNING: CPU: 0 PID: 1 at block/blk-cgroup.c:301 blkg_create+0x398/0x4e0
-> 
-> Should this use rcu_read_lock_any_held() rather than
-> rcu_read_lock_held()?
+A previous commit got rid of unnecessary rcu_read_lock() inside the
+IRQ disabling queue_lock, but this debug statement was left. It's now
+firing since we are indeed not inside a RCU read lock, but we don't
+need to be as we're still preempt safe.
 
-I think the better alternative is just to delete the WARN_ON(), we have
-a:
+Get rid of the check, as we have a lockdep assert for holding the
+queue lock right after it anyway.
 
-lockdep_assert_held(&q->queue_lock);
+Link: https://lore.kernel.org/linux-block/46253c48-81cb-0787-20ad-9133afdd9e21@samsung.com/
+Reported-by: Marek Szyprowski <m.szyprowski@samsung.com>
+Fixes: 77c570a1ea85 ("blk-cgroup: Remove unnecessary rcu_read_lock/unlock()")
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
 
-right after it. Since the queue_lock is IRQ disabling, having two checks
-serves no purpose. I'll kill the line.
+---
+
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 0676cf7a41b5..40161a3f68d0 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -298,7 +298,6 @@ static struct blkcg_gq *blkg_create(struct blkcg *blkcg,
+ 	struct blkcg_gq *blkg;
+ 	int i, ret;
+ 
+-	WARN_ON_ONCE(!rcu_read_lock_held());
+ 	lockdep_assert_held(&q->queue_lock);
+ 
+ 	/* request_queue is dying, do not create/recreate a blkg */
 
 -- 
 Jens Axboe
