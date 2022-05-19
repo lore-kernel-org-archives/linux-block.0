@@ -2,118 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16AEAC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 13:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50035C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 13:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238351AbiESNCm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 09:02:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52804 "EHLO
+        id S237524AbiESNVh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 09:21:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55610 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238313AbiESNCh (ORCPT
+        with ESMTP id S238682AbiESNVc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 09:02:37 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2075268303;
-        Thu, 19 May 2022 06:02:35 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 6B6B81F918;
-        Thu, 19 May 2022 13:02:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1652965353; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ColDhVfTgtDNAvcfht1bJmFjFnebvCnCTK2LPqx1PRE=;
-        b=JtNa1jcBjMsMUwi+5i/5rpr4WhwCaZDZW2easZBZcVaAoTAbu5UCUQg9o3RLex00s/YZ1R
-        XsvAhLvUIYxfKMjrIdYoK6f4jY4QJ7kd9juHiwZQylFc5UamCw/dss9M+ArrK9S4fQrlyB
-        6sekTKDOZPF+B1EeojxSjq67HB+XrS8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1652965353;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=ColDhVfTgtDNAvcfht1bJmFjFnebvCnCTK2LPqx1PRE=;
-        b=mNhgRujtYO0Yqplw+t8Js+Jl3K443ru1BYtpSI1RT48PR5A6Hl0aOtHI6Ji8jX2dWsBcxn
-        fHbO9OgSUlK0KzCg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 322BB13AF8;
-        Thu, 19 May 2022 13:02:33 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id rhrxCek/hmLKGgAAMHmgww
-        (envelope-from <hare@suse.de>); Thu, 19 May 2022 13:02:33 +0000
-Message-ID: <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
-Date:   Thu, 19 May 2022 15:02:32 +0200
+        Thu, 19 May 2022 09:21:32 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2CB22289;
+        Thu, 19 May 2022 06:21:29 -0700 (PDT)
+Received: from kwepemi100026.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L3r8L64NhzhZH8;
+        Thu, 19 May 2022 21:20:50 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100026.china.huawei.com (7.221.188.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 19 May 2022 21:21:27 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 19 May 2022 21:21:26 +0800
+Subject: Re: [PATCH -next 7/8] block, bfq: cleanup
+ bfq_bfqq_update_budg_for_activation()
+To:     Jan Kara <jack@suse.cz>
+CC:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>,
+        <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220514090522.1669270-1-yukuai3@huawei.com>
+ <20220514090522.1669270-8-yukuai3@huawei.com>
+ <20220519111856.wvk4oetm7odnkg3w@quack3.lan>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <6de25fae-7d36-c31c-a045-4f1668ef4ee5@huawei.com>
+Date:   Thu, 19 May 2022 21:21:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
- [drivers/nvme/host/nvme-fc.ko] undefined!
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
-        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
- <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
- <fc5f8b96-3c93-5400-b917-a1d991cbe7c9@suse.de>
- <900f57bc-9978-9ba6-22fb-48f03fcf5011@kernel.dk>
- <c2d252a1-7223-4899-e5c9-e4bb27e2fc8a@kernel.dk>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <c2d252a1-7223-4899-e5c9-e4bb27e2fc8a@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+In-Reply-To: <20220519111856.wvk4oetm7odnkg3w@quack3.lan>
+Content-Type: text/plain; charset="gbk"; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/22 14:42, Jens Axboe wrote:
-> On 5/19/22 6:40 AM, Jens Axboe wrote:
->> On Thu, May 19, 2022 at 6:38 AM Hannes Reinecke <hare@suse.de> wrote:
->>>
->>> On 5/19/22 14:14, Jens Axboe wrote:
->>>> On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
->>>>> Greetings,
->>>>>
->>>>> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
->>>>>
->>>>> Console Logs :
->>>>>
->>>>> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
->>>>> make -j 17 -s && make modules && make modules_install && make install
->>>>> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
->>>>> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
->>>>> make: *** [Makefile:1914: modules] Error 2
->>>>> make: *** Waiting for unfinished jobs....
->>>>
->>>> Christoph, can you fix this up?
->>>>
->>> Cannot reproduce with commit 21498d01d045c5b95b93e0a0625ae965b4330ebe.
->>> Please share details.
+ÔÚ 2022/05/19 19:18, Jan Kara Ð´µÀ:
+> On Sat 14-05-22 17:05:21, Yu Kuai wrote:
+>> It will only be called from bfq_bfqq_handle_idle_busy_switch() in
+>> specific code branch, there is no need to precaculate
+>> 'bfqq_wants_to_preempt' each time bfq_bfqq_handle_idle_busy_switch()
+>> is caleld.
 >>
->> The kerneltest bot also reported this a few days ago, you might be able
->> to find the details there as that includes config etc.
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 > 
-> Here: https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com/
+> Please see below:
 > 
-Right. Send a patch.
+>> @@ -1816,14 +1807,6 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+>>   		  (bfqq->bic || RQ_BIC(rq)->stably_merged) &&
+>>   		   (*interactive || soft_rt)));
+>>   
+>> -	/*
+>> -	 * Using the last flag, update budget and check whether bfqq
+>> -	 * may want to preempt the in-service queue.
+>> -	 */
+>> -	bfqq_wants_to_preempt =
+>> -		bfq_bfqq_update_budg_for_activation(bfqd, bfqq,
+>> -						    arrived_in_time);
+>> -
+>>   	/*
+>>   	 * If bfqq happened to be activated in a burst, but has been
+>>   	 * idle for much more than an interactive queue, then we
+> ...
+>> @@ -1918,7 +1900,7 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
+>>   	 * (2) this switch of bfqq to busy changes the scenario.
+>>   	 */
+>>   	if (bfqd->in_service_queue &&
+>> -	    ((bfqq_wants_to_preempt &&
+>> +	    ((bfq_bfqq_update_budg_for_activation(bfqd, bfqq) &&
+>>   	      bfqq->wr_coeff >= bfqd->in_service_queue->wr_coeff) ||
+>>   	     bfq_bfqq_higher_class_or_weight(bfqq, bfqd->in_service_queue) ||
+>>   	     !bfq_better_to_idle(bfqd->in_service_queue)) &&
+> 
+> So these changes are actually wrong because
+> bfq_bfqq_update_budg_for_activation() relies on
+> bfq_bfqq_non_blocking_wait_rq() but bfq_add_bfqq_busy() clears that. And
+> bfq_add_bfqq_busy() is called between the place where
+> bfq_bfqq_update_budg_for_activation() was called previously and now so your
+> patch breaks this logic.
 
-Cheers,
+Hi,
 
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 NÃ¼rnberg
-HRB 36809 (AG NÃ¼rnberg), GF: Felix ImendÃ¶rffer
+You are right, thanks for the explanation, I'll remove this patch and
+the next patch in next version.
+
+Kuai
+> 
+> 								Honza
+> 
