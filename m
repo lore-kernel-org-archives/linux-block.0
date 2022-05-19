@@ -2,145 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65BB2C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 13:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD21C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 13:36:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235342AbiESNdx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 09:33:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33294 "EHLO
+        id S237692AbiESNgh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 09:36:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235765AbiESNdw (ORCPT
+        with ESMTP id S229604AbiESNgf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 09:33:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B203A5716C
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 06:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652967230;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=eMu0TlQoEPsu5A0dNqyE4kosLWfd95ivJDcxXU5XZ9k=;
-        b=av4u3MY+0ZT0ZlQWJxdrhd9BvPruS2KJ6zJAdqIrP59kyVFS0cfcTv9J4ORHFCE2LQV9Y5
-        HZTxYMLxJmfE4LFBpkkHIa0jXa8FAXi6ydynwjSok/9J/h4SMtTVa/xi2qe7vr2c0+OJ+F
-        CBpzsGHAJSu7Dd/BivytikrfNAs+nLs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-310-B37KWeoPNrm0MpDgCivevw-1; Thu, 19 May 2022 09:33:47 -0400
-X-MC-Unique: B37KWeoPNrm0MpDgCivevw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 78B1E185A7BA;
-        Thu, 19 May 2022 13:33:46 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id F1AF67AE4;
-        Thu, 19 May 2022 13:33:39 +0000 (UTC)
-Date:   Thu, 19 May 2022 21:33:34 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
-Message-ID: <YoZHLrxE87t6T+Tz@T590>
-References: <20220517055358.3164431-1-ming.lei@redhat.com>
+        Thu, 19 May 2022 09:36:35 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F2634CD75
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 06:36:33 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso5322531pjg.0
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 06:36:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=/UPD8ZwuMs9z0E/L/pcyjiHnRKl0RiCwEg0dM50KlCQ=;
+        b=BaIRv+TBV5PyUUbeoDc4Lu3YKY/1YGngkOYMGIz1j24u4jviRLCYAoo6pDP5JBxv5F
+         DQAjjpJLAY4O5dhtZ5B1IFDUIeS9o0IQOmbJiPv82RKSVCrlQ2dtB8hG7lhq1LjojiYh
+         hM9enfC4/qJiB0tKncZ/NOsN5DWSJDRjnN9lWKXCFX4ctJ+xVnph2ad4JO64X/Znu7Bk
+         SCkIevVL8QQ71AXp+6KZCEUOofEls8jbQnxhA0Rbk0+OGVhv/+UW9cQqvtVQjGRCsVSG
+         vDYGVzYUMJ0KICFdyecJRZu+U5rGvn/8LvzUlJ9b3VBY0OmbCctIvIq8UuAuywPz8GKo
+         roNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=/UPD8ZwuMs9z0E/L/pcyjiHnRKl0RiCwEg0dM50KlCQ=;
+        b=cTx61xEC+zCV6FPTH/qfCeR4AslN/U4Aj843qWKYdFtjkNvaO6QpT20ZkpjTVLlGtV
+         aLZT3WTydZFQm35wTNzsyX42aSuRXEfha5U2uAvOo7tnWbvcoaCJs1kuAnNp12YTBOCd
+         hmxNSvaG7xvEd+LeGOjFx/fhKdLxNCiq00AbzqLE1Ev43K1sC10kVlsg8QKPneLmm1tZ
+         2GDuWSBB5KH8xYCiw6hylOIBNHfsNXrtbnuHiHuexwk/WRqvQqZILD9S/EDTe/J27+en
+         fiwE62yBbRNY4utfmMdjVsW5PCuIUZeKRLjUsFebun+22SQJFCGPZ9/cXQFFxhoMebqE
+         bWbA==
+X-Gm-Message-State: AOAM530u8NWsBhUCL4ffulu8qfZedZ0zhmwOjh6GmJUr4k+jwbb54SwA
+        YMQJMEIuaV+k5X1mp6x4RPPnKELJrx8Yyg==
+X-Google-Smtp-Source: ABdhPJyMrejerSWIYyizZ4TikgtH95cnKIl6MEmMLJeuW1uZyWpRl9K1ZVGVQcXYptPVnsyPZRS48A==
+X-Received: by 2002:a17:902:ce8a:b0:161:af5e:a7b9 with SMTP id f10-20020a170902ce8a00b00161af5ea7b9mr4617438plg.167.1652967392691;
+        Thu, 19 May 2022 06:36:32 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id p40-20020a056a000a2800b0050dc76281ccsm569435pfh.166.2022.05.19.06.36.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 May 2022 06:36:31 -0700 (PDT)
+Message-ID: <5acb0323-a895-d4d9-77ab-edace723074e@kernel.dk>
+Date:   Thu, 19 May 2022 07:36:30 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220517055358.3164431-1-ming.lei@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [PATCH] blk-cgroup: provide stubs for blkcg_get_fc_appid()
+Content-Language: en-US
+To:     Hannes Reinecke <hare@suse.de>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        linux-block@vger.kernel.org
+References: <20220519130207.6492-1-hare@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220519130207.6492-1-hare@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 17, 2022 at 01:53:57PM +0800, Ming Lei wrote:
-> Hello Guys,
-> 
-> ubd driver is one kernel driver for implementing generic userspace block
-> device/driver, which delivers io request from ubd block device(/dev/ubdbN) into
-> ubd server[1] which is the userspace part of ubd for communicating
-> with ubd driver and handling specific io logic by its target module.
-> 
-> Another thing ubd driver handles is to copy data between user space buffer
-> and request/bio's pages, or take zero copy if mm is ready for support it in
-> future. ubd driver doesn't handle any IO logic of the specific driver, so
-> it is small/simple, and all io logics are done by the target code in ubdserver.
-> 
-> The above two are main jobs done by ubd driver.
-> 
-> ubd driver can help to move IO logic into userspace, in which the
-> development work is easier/more effective than doing in kernel, such as,
-> ubd-loop takes < 200 lines of loop specific code to get basically same 
-> function with kernel loop block driver, meantime the performance is
-> still good. ubdsrv[1] provide built-in test for comparing both by running
-> "make test T=loop".
-> 
-> Another example is high performance qcow2 support[2], which could be built with
-> ubd framework more easily than doing it inside kernel.
-> 
-> Also there are more people who express interests on userspace block driver[3],
-> Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
-> requirement from Google. Ziyang Zhang from Alibaba said they "plan to
-> replace TCMU by UBD as a new choice" because UBD can get better throughput than
-> TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
-> storage service for providing storage to containers.
-> 
-> It is io_uring based: io request is delivered to userspace via new added
-> io_uring command which has been proved as very efficient for making nvme
-> passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
-> shared/mmap buffer is used for sharing io descriptor to userspace, the
-> buffer is readonly for userspace, each IO just takes 24bytes so far.
-> It is suggested to use io_uring in userspace(target part of ubd server)
-> to handle IO request too. And it is still easy for ubdserver to support
-> io handling by non-io_uring, and this work isn't done yet, but can be
-> supported easily with help o eventfd.
-> 
-> This way is efficient since no extra io command copy is required, no sleep
-> is needed in transferring io command to userspace. Meantime the communication
-> protocol is simple and efficient, one single command of
-> UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
-> command result in one trip. IO handling is often batched after single
-> io_uring_enter() returns, both IO requests from ubd server target and
-> IO commands could be handled as a whole batch.
-> 
-> Remove RFC now because ubd driver codes gets lots of cleanup, enhancement and
-> bug fixes since V1:
-> 
-> - cleanup uapi: remove ubd specific error code,  switch to linux error code,
-> remove one command op, remove one field from cmd_desc
-> 
-> - add monitor mechanism to handle ubq_daemon being killed, ubdsrv[1]
->   includes builtin tests for covering heavy IO with deleting ubd / killing
->   ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
->   and the abort/stop mechanism is simple
-> 
-> - fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
->   MQ ubd-loop devices(test/scratch)
-> 
-> - improve batching submission as suggested by Jens
-> 
-> - improve handling for starting device, replace random wait/poll with
-> completion
-> 
-> - all kinds of cleanup, bug fix,..
-> 
-> And the patch by patch change since V1 can be found in the following
-> tree:
-> 
-> https://github.com/ming1/linux/commits/my_for-5.18-ubd-devel_v2
+On 5/19/22 7:02 AM, Hannes Reinecke wrote:
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
 
-BTW, a one-line fix[1] is added to above branch, which fixes performance
-obviously on small BS(< 128k) test. If anyone run performance test,
-please include this fix.
+This needs both an actual commit message and a Fixes tag.
 
-[1] https://github.com/ming1/linux/commit/fa91354b418e83953304a3efad4ee6ac40ea6110
-
-Thanks,
-Ming
+-- 
+Jens Axboe
 
