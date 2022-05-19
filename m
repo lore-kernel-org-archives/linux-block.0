@@ -2,94 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FFEC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 10:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A5BC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 10:52:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236443AbiESKm7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 06:42:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45226 "EHLO
+        id S236971AbiESKwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 06:52:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235592AbiESKm6 (ORCPT
+        with ESMTP id S234382AbiESKwn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 06:42:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C8869AEE1E
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 03:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652956976;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=kvMeEsiv+LVL0/x98g8vYJ8UrLJ8yrZkVIlvlaQ/zNw=;
-        b=M3nLtp7fz3MDK2B1lltioVWjI/5VHoTA/yBhWCmfBuCb4nbfVklxaoP6bzNAJqRNQhKXfF
-        AN8793dqu7SPTXr6liNBEFdNBtZV0zWxX2w39kp5t1Q3F1hKwcZAxENiCdGzYxAeYPAVl7
-        EhTvJUWrzeZ5ykPoMSKYObCKtaqf+4A=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-616-RIA59FtANtCJd9guTTow3g-1; Thu, 19 May 2022 06:42:53 -0400
-X-MC-Unique: RIA59FtANtCJd9guTTow3g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 19 May 2022 06:52:43 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C68C6C0DF
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 03:52:39 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 5500C1F86A;
+        Thu, 19 May 2022 10:52:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1652957558; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=76k9iwtB764AkBR/gy2UDaYc9U3MSwSK6w0czfIl2Rc=;
+        b=nB9q5ey4Uti0xC9hsDRP1Q4LGIDLndtlvIEvPaqFUd81QfszqRAzFX9dIL1GRwhPY06Pq7
+        w1yuykz84bYgjSL/HwImoDZFZQg7mJXjH0KJYksZO1mpcw2LeuMV8BKpMHsH5o3cQdPMl7
+        p+GzMk05h4CjFcT37VREbXeFkavBRHo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1652957558;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=76k9iwtB764AkBR/gy2UDaYc9U3MSwSK6w0czfIl2Rc=;
+        b=TCkj1+NqHhWTJKF+zoUYf7hfoZlTys4H+ipsAnmtS4Lf78HeoirznnuDhveZUnZED6Mrhy
+        W86hhGxXc/h0tLBg==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 66C81384F808;
-        Thu, 19 May 2022 10:42:53 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 548171410DD5;
-        Thu, 19 May 2022 10:42:46 +0000 (UTC)
-Date:   Thu, 19 May 2022 18:42:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, geert@linux-m68k.org,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v3 1/2] blk-throttle: fix that io throttle can only
- work for single bio
-Message-ID: <YoYfIWlQ6ckWJOP0@T590>
-References: <20220519085811.879097-1-yukuai3@huawei.com>
- <20220519085811.879097-2-yukuai3@huawei.com>
+        by relay2.suse.de (Postfix) with ESMTPS id 44BCC2C141;
+        Thu, 19 May 2022 10:52:38 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 704E6A062F; Thu, 19 May 2022 12:52:35 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Paolo Valente <paolo.valente@linaro.org>
+Cc:     <linux-block@vger.kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        Jan Kara <jack@suse.cz>
+Subject: [PATCH 0/4] bfq: Improve waker detection
+Date:   Thu, 19 May 2022 12:52:28 +0200
+Message-Id: <20220519104621.15456-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220519085811.879097-2-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
+X-Developer-Signature: v=1; a=openpgp-sha256; l=723; h=from:subject:message-id; bh=dgid7zJjnf7k5rGKo9h8dIAbPk1Iz4zwPoMAY/VKEmg=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBihiFahICwwaM+wdhYIkprN/VQHRVeNixXxpNHD1az QUktbtGJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYoYhWgAKCRCcnaoHP2RA2XeIB/ oCw+YEX/s63DtkTsrQhu27L5p7dqLYIA7G2z5zw//rVM27ojgDH8q47W0EgmTmEeAIwuu9wEJSyacC VBFLhdmTPgiVB0otdLXdmgTRUgVXtBZ7SYObc6q5lR9q3uejIv/8Xo4JhDkhjWjPYtzfnqNPnmyoxX BarVXQB3end5QFTdlcvx8bVTrIX7aRmTGPF9vhqmBwqgyxBtuaSgixl6MP/ZBxVo6A4kPw+Vp6Aa8/ AeZh6hdIg1DEzvPu72Jd2mchI6OMiktauMZ1zda5ORCCPInrrj68Fqgil12pDq/ZkL3SDmibdbNhYQ 5RoRgbBZDNSwVhEaKUguBwEMsJF2JE
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 04:58:10PM +0800, Yu Kuai wrote:
-> commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-> introduce a new problem, for example:
-> 
-> [root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
-> [root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
-> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-> [1] 620
-> [root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
-> [2] 626
-> [root@localhost ~]# 1+0 records in
-> 1+0 records out
-> 10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
-> 1+0 records out
-> 
-> 10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
-> -> the second bio is issued after 10s instead of 20s.
-> 
-> This is because if some bios are already queued, current bio is queued
-> directly and the flag 'BIO_THROTTLED' is set. And later, when former
-> bios are dispatched, this bio will be dispatched without waiting at all,
-> this is due to tg_with_in_bps_limit() return 0 for this bio.
-> 
-> In order to fix the problem, don't skip flaged bio in
-> tg_with_in_bps_limit(), and for the problem that split bio can be
-> double accounted, compensate the over-accounting in __blk_throtl_bio().
-> 
-> Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-> ---
+Hello,
 
-Reviewed-by: Ming Lei <ming.lei@redhat.com>
+this patch series restores regression in dbench for large number of processes
+that was introduced by c65e6fd460b4 ("bfq: Do not let waker requests skip
+proper accounting"). The detailed explanation is in the first patch but the
+culprit in the end was that with large number of dbench clients it often
+happened that flush worker bfqq replaced jbd2 bfqq as a waker of the bfqq
+shared by dbench clients and that resulted in lot of idling and reduced
+throughput.
 
-Thanks,
-Ming
+The first two patches in this series improve the waker detection, the other
+two are just cleanups I've spotted when working on the code.
 
+I've tested the patches and they don't seem to cause regression for other
+workloads.
+
+								Honza
