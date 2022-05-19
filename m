@@ -2,137 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB061C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:14:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C732C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:38:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237802AbiESMOi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 08:14:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
+        id S234115AbiESMi1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 08:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237851AbiESMOe (ORCPT
+        with ESMTP id S232514AbiESMi0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 08:14:34 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF59DBA98C;
-        Thu, 19 May 2022 05:14:32 -0700 (PDT)
-Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L3pg52mbhzhYy9;
-        Thu, 19 May 2022 20:13:53 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 20:14:30 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 20:14:29 +0800
-Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
- configuration updates
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <geert@linux-m68k.org>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220519085811.879097-1-yukuai3@huawei.com>
- <20220519085811.879097-3-yukuai3@huawei.com>
- <20220519095857.GE16096@blackbody.suse.cz>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <a8953189-af42-0225-3031-daf61347524a@huawei.com>
-Date:   Thu, 19 May 2022 20:14:28 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 19 May 2022 08:38:26 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACB104C406;
+        Thu, 19 May 2022 05:38:25 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 681A51FD38;
+        Thu, 19 May 2022 12:38:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1652963904; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xf1M+QjVIhp4qI2TdVgWQA1ZXH+82asZlK2b3D1j680=;
+        b=qan6lifZrxQyTuqZ+YTDgUp5Bhvh9dCRcu1aLJlH6yrRV8zbw38VV3hGY0JvUTnhPO0Pxa
+        e1ccXbaQ1mXIo3K60bkvA0qzLaImCKPW2v/oWAOMB3xh6UEBw2Lp3k+3bOO1CMMBWJA+Pf
+        8MMTgN+b/nmtVBbLMDVCsxFCeERW6hg=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1652963904;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=xf1M+QjVIhp4qI2TdVgWQA1ZXH+82asZlK2b3D1j680=;
+        b=HPf/W/bXe1EQ0FT8SaZwRV4bAPvX9hhkMHazwG7W4Jvghynj5aGFOHHX7Xd1Nqfrfubqzt
+        sZGXx+mX8GX6C0DA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 403C613456;
+        Thu, 19 May 2022 12:38:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id HxfsDUA6hmL9DQAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 19 May 2022 12:38:24 +0000
+Message-ID: <fc5f8b96-3c93-5400-b917-a1d991cbe7c9@suse.de>
+Date:   Thu, 19 May 2022 14:38:23 +0200
 MIME-Version: 1.0
-In-Reply-To: <20220519095857.GE16096@blackbody.suse.cz>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
+ [drivers/nvme/host/nvme-fc.ko] undefined!
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
+        linux-block@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, abdhalee@linux.vnet.ibm.com,
+        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
+ <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/19 17:58, Michal Koutný 写道:
-> Hello Kuayi.
-> 
-> On Thu, May 19, 2022 at 04:58:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
->> If new configuration is submitted while a bio is throttled, then new
->> waiting time is recaculated regardless that the bio might aready wait
->> for some time:
+On 5/19/22 14:14, Jens Axboe wrote:
+> On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
+>> Greetings,
 >>
->> tg_conf_updated
->>   throtl_start_new_slice
->>    tg_update_disptime
->>    throtl_schedule_next_dispatch
+>> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
 >>
->> Then io hung can be triggered by always submmiting new configuration
->> before the throttled bio is dispatched.
+>> Console Logs :
+>>
+>> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
+>> make -j 17 -s && make modules && make modules_install && make install
+>> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+>> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
+>> make: *** [Makefile:1914: modules] Error 2
+>> make: *** Waiting for unfinished jobs....
 > 
-> O.K.
+> Christoph, can you fix this up?
 > 
->> -	/*
->> -	 * We're already holding queue_lock and know @tg is valid.  Let's
->> -	 * apply the new config directly.
->> -	 *
->> -	 * Restart the slices for both READ and WRITES. It might happen
->> -	 * that a group's limit are dropped suddenly and we don't want to
->> -	 * account recently dispatched IO with new low rate.
->> -	 */
->> -	throtl_start_new_slice(tg, READ);
->> -	throtl_start_new_slice(tg, WRITE);
->> +	throtl_update_slice(tg, old_limits);
-> 
-> throtl_start_new_slice zeroes *_disp fields.
-Hi,
+Cannot reproduce with commit 21498d01d045c5b95b93e0a0625ae965b4330ebe.
+Please share details.
 
-The problem is not just zeroes *_disp fields, in fact, the real problem
-is that 'slice_start' is reset to jiffies.
+Cheers,
 
-> If for instance, new config allowed only 0.5 throughput, the *_disp
-> fields would be scaled to 0.5.
-> How that change helps (better) the previously throttled bio to be dispatched?
-> 
-tg_with_in_bps_limit() is caculating 'wait' based on 'slice_start'and
-'bytes_disp':
-
-tg_with_in_bps_limit:
-  jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
-  tmp = bps_limit * jiffy_elapsed_rnd;
-  do_div(tmp, HZ);
-  bytes_allowed = tmp; -> how many bytes are allowed in this slice,
-		         incluing dispatched.
-  if (tg->bytes_disp[rw] + bio_size <= bytes_allowed)
-   *wait = 0 -> no need to wait if this bio is within limit
-
-  extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
-  -> extra_bytes is based on 'bytes_disp'
-
-For example:
-
-1) bps_limit is 2k, we issue two io, (1k and 9k)
-2) the first io(1k) will be dispatched, bytes_disp = 1k, slice_start = 0
-    the second io(9k) is waiting for (9 - (2 - 1)) / 2 = 4 s
-3) after 3 s, we update bps_limit to 1k, then new waiting is caculated:
-
-without this patch:  bytes_disp = 0, slict_start =3:
-bytes_allowed = 1k
-extra_bytes = 9k - 1k = 8k
-wait = 8s
-
-whth this patch: bytes_disp = 0.5k, slice_start =  0,
-bytes_allowed = 1k * 3 + 1k = 4k
-extra_bytes =  0.5k + 9k - 4k = 5.5k
-wait = 5.5s
-
-I hope I can expliain it clearly...
-
-Thanks,
-Kuai
-> (Is it because you omit update of slice_{start,end}?)
-> 
-> Thanks,
-> Michal
-> 
-> .
-> 
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
