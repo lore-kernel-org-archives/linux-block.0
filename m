@@ -2,90 +2,194 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 373DBC433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 15:05:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD6BDC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 15:11:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240132AbiESPFF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 11:05:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53548 "EHLO
+        id S240405AbiESPKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 11:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240527AbiESPEk (ORCPT
+        with ESMTP id S237745AbiESPKt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 11:04:40 -0400
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75255ED70D
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:03:54 -0700 (PDT)
-Received: by mail-il1-x12b.google.com with SMTP id s12so3820203iln.11
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:03:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=rj0LLD+GhcnwrTRHq/dFr3Mwh+FjHxEzsjGfPynBta8=;
-        b=Sp2/uiiLNbgL9R1tphyrUyI7tgSy2JPlQLF1K2JNOaKRT6V/ibDgS7OjPvB3COMec2
-         OaSQxtNqn4SoHtsZKkQFvaSwPftUrw2YyiL0FZoLZULvzgRe4jNAkc+CVeSRVHlZlaXm
-         seoT9krghOGjnl8KddC+ryWzPKDDYHX8NtuYU7uwGUfGxGec2tiO1Zq4vWv/nKM1OySQ
-         bfwEsMQiWVWYJKIK20b7dcd/8YZUf6k4HS5MNXv9lVqzQ8FZZZrpl3EWRbBOqO6ZWNJ3
-         rTaO7gPV3yNYBwVLy+djNSgOU63D35AkX+viHNI9OW09GJg17YOcFizOnOcabFJ7MUD0
-         bptg==
+        Thu, 19 May 2022 11:10:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 732E411145
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:10:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652973047;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=pYo9QwJshnDwtzE/AWbi/Y4oLV1EYJTk8x6AWwlRJHM=;
+        b=WnpN8iOkXmnxrp93krqjpxl+W1fcCNgm/ZxDbnx4rgp0TSJIOCH9dY/OBmd5SKCyEoIG7K
+        797W72EF40ywt2+O8sL049uQB03y5PjprRfBd2Ioh4qIayuRhRGZXvmF6PLL2larsGIH7S
+        TB+MsQuwPXcWCXri+yliQEm3D82BKsU=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-164-60K3By6bOgCJyCV_ULSUHw-1; Thu, 19 May 2022 11:10:46 -0400
+X-MC-Unique: 60K3By6bOgCJyCV_ULSUHw-1
+Received: by mail-qv1-f70.google.com with SMTP id fw9-20020a056214238900b0043522aa5b81so4489960qvb.21
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:10:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=rj0LLD+GhcnwrTRHq/dFr3Mwh+FjHxEzsjGfPynBta8=;
-        b=UCq6kOF+UGR9YF18w9uoZjVxnJNt+cmWl+ECj0cTQiv98P7m/QFNpG69BBQIqes41c
-         EQlSBKYeokjm3RhER84XEC7LdwsFixj7XWW/XTpaoXXoXQO59sMfeemiraqAq/lWCJyE
-         KQibeGwW7Glf2tMtuJm9MKC9VdDKW0ScoPquiv/3nx5TvGUaUxxHMQSW0IiUyCQyqhZO
-         EzqUhAbdW/EqdvtDu/J+wcoqkGsZSR/MiSntL1EPrFhCrFSnm8+aIsSKUx5L7v7p7nyj
-         Ie5d6Y9wBOETdlWIluTcv5S00NfsDtAOK11VX1DmUHM6/xWzkEsGTUkyonS7YD7FwpkH
-         pX8g==
-X-Gm-Message-State: AOAM533kRZ1XeQLFiP+jjJhS5Lz/RXe48kV8ghsgSwaQP5us74TQUSvA
-        Ziz9p5pHSRWXGRCSWVyN0rror6hTZe9XtA==
-X-Google-Smtp-Source: ABdhPJwcVoiz8Rc2uaOTrNO/AvGJLBT0BZxBlNiMr1idOVcadH9jYg5ZRjxvy6ArxdYVGO+7CLI64Q==
-X-Received: by 2002:a05:6e02:12eb:b0:2d1:6335:8e28 with SMTP id l11-20020a056e0212eb00b002d163358e28mr2553116iln.51.1652972633870;
-        Thu, 19 May 2022 08:03:53 -0700 (PDT)
-Received: from [192.168.1.172] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id cl9-20020a0566383d0900b0032b3a78177csm679227jab.64.2022.05.19.08.03.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 08:03:53 -0700 (PDT)
-Message-ID: <1ca9f030-d873-5b27-6641-fadee25b30bd@kernel.dk>
-Date:   Thu, 19 May 2022 09:03:52 -0600
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=pYo9QwJshnDwtzE/AWbi/Y4oLV1EYJTk8x6AWwlRJHM=;
+        b=R+ukgJji8Oru7fn/9eI5XnJOein6jnZS3c/Tdo8mUm37+3bvWj9SgptgR47w/jMakk
+         A/LfpXiSE9IrbFN3zyI11mu4bIKUtFymNh458xg/dMaTA5B0rbQb6CtemvzHXyRKoZ3V
+         El65+J5vp2ELd0zfsZh1AnFq0qJTKw7FzZ/ck9OxKKCADdPQWRKjVcQA8IK9WtiFV84M
+         P/n+06OfGKBiPZF0HSQj77lk6oZq/XIy6Je16oKEkLj3seglsEr1yY/LLXtoI1o/swgj
+         SMhtFJD28ti+A5OCV5kup/HwckG2qMiNHSJqbggVtfZUk584s+XySrEG+EhOwSxpLZkC
+         15Gg==
+X-Gm-Message-State: AOAM5339Lu2E2qdVzi0blH/sZhekNJCP87SaWxjfT2TE9pKUr+XUiErN
+        +BGeTkC5jRJGnHLFIcNkMyOFIUOTpuOaWFYRzcUUlZgx8sjEGi0L/snNvLh+petZ8qXhbaSoEDJ
+        l80rzPVwBY3h1AIrRverGeTk=
+X-Received: by 2002:a05:6214:2b09:b0:45b:59b:5df6 with SMTP id jx9-20020a0562142b0900b0045b059b5df6mr4346715qvb.22.1652973045430;
+        Thu, 19 May 2022 08:10:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwJU85gOlN5d5110p13TXYG+vSYE/1AP/JpUKdLmb8S5bbZQ1cCJysU/GHuoawEe0a316AkSw==
+X-Received: by 2002:a05:6214:2b09:b0:45b:59b:5df6 with SMTP id jx9-20020a0562142b0900b0045b059b5df6mr4346686qvb.22.1652973045149;
+        Thu, 19 May 2022 08:10:45 -0700 (PDT)
+Received: from zlang-mailbox ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id g7-20020a376b07000000b0069fc13ce22dsm1385619qkc.94.2022.05.19.08.10.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 08:10:44 -0700 (PDT)
+Date:   Thu, 19 May 2022 23:10:35 +0800
+From:   Zorro Lang <zlang@redhat.com>
+To:     Theodore Ts'o <tytso@mit.edu>
+Cc:     Amir Goldstein <amir73il@gmail.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <20220519151035.ouqegv3o4vktykfz@zlang-mailbox>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
+ <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
+ <YoZRyGOwde+xkK1y@mit.edu>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH] nvme-fc: mask out blkcg_get_fc_appid() if
- BLK_CGROUP_FC_APPID is not set
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Hannes Reinecke <hare@suse.de>, Keith Busch <kbusch@kernel.org>,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        Muneendra <muneendra.kumar@broadcom.com>,
-        James Smart <jsmart2021@gmail.com>
-References: <20220519144555.22197-1-hare@suse.de>
- <84a7c290-5e75-3e24-0674-7b51dcafa2eb@kernel.dk>
- <0b33e180-9e23-f737-3c93-5b5b13a7ded2@suse.de>
- <be88c0b4-ddc6-c851-c160-a929adc1e433@kernel.dk>
- <20220519145931.GA25382@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220519145931.GA25382@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoZRyGOwde+xkK1y@mit.edu>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/22 8:59 AM, Christoph Hellwig wrote:
-> On Thu, May 19, 2022 at 08:57:53AM -0600, Jens Axboe wrote:
->> I'm assuming that commit is from the scsi tree? It's certainly not in
->> mine. So your commit message may be correct, but since it was sent to me,
->> I was assuming it's breakage from my tree. Which doesn't appear to be the
->> case, and I don't see any of the SCSI maintainers on the to/cc.
+On Thu, May 19, 2022 at 10:18:48AM -0400, Theodore Ts'o wrote:
+> On Thu, May 19, 2022 at 07:24:50PM +0800, Zorro Lang wrote:
+> > 
+> > Yes, we talked about this, but if I don't rememeber wrong, I recommended each
+> > downstream testers maintain their own "testing data/config", likes exclude
+> > list, failed ratio, known failures etc. I think they're not suitable to be
+> > fixed in the mainline fstests.
 > 
-> Yes, all this went in through the scsi tree.
+> Failure ratios are the sort of thing that are only applicable for
+> 
+> * A specific filesystem
+> * A specific configuration
+> * A specific storage device / storage device class
+> * A specific CPU architecture / CPU speed
+> * A specific amount of memory available
 
-OK, Hannes please send it to the SCSI list/folks then.
+And a specific bug I suppose :)
 
--- 
-Jens Axboe
+> 
+> Put another way, there are problems that fail so close to rarely as to
+> be "hever" on, say, an x86_64 class server with gobs and gobs of
+> memory, but which can more reliably fail on, say, a Rasberry PI using
+> eMMC flash.
+> 
+> I don't think that Luis was suggesting that this kind of failure
+> annotation would go in upstream fstests.  I suspect he just wants to
+> use it in kdevops, and hope that other people would use it as well in
+> other contexts.  But even in the context of test runners like kdevops
+> and {kvm,gce,android}-xfstests, it's going to be very specific to a
+> particular test environment, and for the global list of excludes for a
+> particular file system.  So in the gce-xfstests context, this is the
+> difference between the excludes in the files:
+> 
+> 	fs/ext4/excludes
+> vs
+> 	fs/ext4/cfg/bigalloc.exclude
+> 
+> even if I only cared about, say, how things ran on GCE using
+> SSD-backed Persistent Disk (never mind that I can only run
+> gce-xfstests on Local SSD, and PD Extreme, etc.), failure percentages
+> would never make sense for fs/ext4/excludes, since that covers
+> multiple file system configs.  And my infrastructure supports kvm,
+> gce, and Android, as well as some people (such as at $WORK for our
+> data center kernels) who run the test appliacce directly on bare
+> metal, so I wouldn't use the failure percentages in these files, etc.
+> 
+> Now, what I *do* is to track this sort of thing in my own notes, e.g:
+> 
+> generic/051	ext4/adv	Failure percentage: 16% (4/25)
+>     "Basic log recovery stress test - do lots of stuff, shut down in
+>     the middle of it and check that recovery runs to completion and
+>     everything can be successfully removed afterwards."
+> 
+> generic/410 nojournal	Couldn't reproduce after running 25 times
+>      "Test mount shared subtrees, verify the state transitions..."
+> 
+> generic/68[12]	encrypt   Failure percentage: 100%
+>     The directory does grow, but blocks aren't charged to either root or
+>     the non-privileged users' quota.  So this appears to be a real bug.
+> 
+> 
+> There is one thing that I'd like to add to upstream fstests, and that
+> is some kind of option so that "check --retry-failures NN" would cause
+> fstests to automatically, upon finding a test failure, will rerun that
+> failing test NN aditional times.
+
+That makes more sense for me :) I'd like to help the testers to retry the
+(randomly) failed cases, to help them to get their testing statistics. That's
+better than recording these statistics in fstests itself.
+
+> Another potential related feature
+> which we currently have in our daily spinner infrastructure at $WORK
+> would be to on a test failure, rerun a test up to M times (typically a
+> small number, such as 3), and if it passes on a retry attempt, declare
+> the test result as "flaky", and stop running the retries.  If the test
+> repeatedly fails after M attempts, then the test result is "fail".
+> 
+> These results would be reported in the junit XML file, and would allow
+> the test runners to annotate their test summaries appropriately.
+> 
+> I'm thinking about trying to implement something like this in my
+> copious spare time; but before I do, does the general idea seem
+> acceptable?
+
+After a "./check ..." done, generally fstests shows 3 list:
+  Ran: ...
+  Not run: ...
+  Failures: ...
+
+So you mean if the "--retry-failures N" is specified. we can have one more list
+named "Flaky", which is part of "Failures" list, likes:
+  Ran: ...
+  Not run: ...
+  Failures: generic/388 generic/475 xfs/104 xfs/442
+  Flaky: generic/388 [2/N] xfs/104 [1/N]
+
+If I understand this correctly, it's acceptable for me. And it might be helpful
+for Amir's situation. But let's hear more voice from other developers, if there
+is not big objection from other fs maintainers, let's do it :)
+
+BTW, about the new group name to mark cases with random load/operations/env.,
+what do you think? Any suggestions or good names for that?
+
+Thanks,
+Zorro
+
+> 
+> Thanks,
+> 
+> 					- Ted
+> 
 
