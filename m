@@ -2,165 +2,52 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AF8AC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 07:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12829C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 07:05:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232290AbiESHCM convert rfc822-to-8bit (ORCPT
-        <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 03:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55514 "EHLO
+        id S231450AbiESHFa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 03:05:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232642AbiESHCJ (ORCPT
+        with ESMTP id S232578AbiESHF0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 03:02:09 -0400
-Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970C9B8BD5;
-        Thu, 19 May 2022 00:02:06 -0700 (PDT)
-Received: by mail-qk1-f175.google.com with SMTP id i68so2890996qke.11;
-        Thu, 19 May 2022 00:02:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8Lduo9otIskPj76nIDF1xXbuoAxPQZ4aqYfqX6zq4mc=;
-        b=sAAnsJIApG/ZwL0wpmvzxokrqGsn1cW0nL/+UFqj52FWNiBMy4X+65JmGsHtQ8SprY
-         Q6IVSqzRUkFbphaFocyoK8/71FH27BR5SztJDj9w7PN7WaxJISZsr083N+NXQY6WGA+3
-         WAMrDapEhqMq2Pcf4bqRZ0lpXc4SBEkj0K7zvNMPFhubKs05NqcP8PIirs72uIRPnvO1
-         QZL0v3Zfbe6mlT596xAQr7X7gw6im0qfOvw/xzw764U/ueIo4JL/VOXEvoNp37CVyhEV
-         s4ISuJhN4BBSmXtBfBI1KWIKRkG67SdotGT/LLZmOIip9RlbTnrKFDDU468N7kdHIYhi
-         bVPw==
-X-Gm-Message-State: AOAM53150UhSZezsMQtDcauWiE4lmiCSD647awQ91k89cpnq7ZYsdqxG
-        4n8pIZH6U203Dl3Q3ZarWkoF0GwKb2wzfw==
-X-Google-Smtp-Source: ABdhPJx9gBig7pcOCKHOYGAsUW3SWXtrLvHKl5FB6r2Ru6VzcjT8AwYxPsr4jxQOEXq6hf1I4V8kjA==
-X-Received: by 2002:a37:a492:0:b0:6a3:2a8a:530 with SMTP id n140-20020a37a492000000b006a32a8a0530mr2145443qke.552.1652943725573;
-        Thu, 19 May 2022 00:02:05 -0700 (PDT)
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com. [209.85.219.176])
-        by smtp.gmail.com with ESMTPSA id c64-20020a379a43000000b0069fc13ce212sm883701qke.67.2022.05.19.00.02.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 00:02:05 -0700 (PDT)
-Received: by mail-yb1-f176.google.com with SMTP id t26so7475907ybt.3;
-        Thu, 19 May 2022 00:02:04 -0700 (PDT)
-X-Received: by 2002:a05:6902:120e:b0:634:6f29:6b84 with SMTP id
- s14-20020a056902120e00b006346f296b84mr3068334ybu.604.1652943724521; Thu, 19
- May 2022 00:02:04 -0700 (PDT)
+        Thu, 19 May 2022 03:05:26 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5D4DBA540;
+        Thu, 19 May 2022 00:05:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=M7NmYC/Iylm9myghHwqILim55SAUt9QrM+UZYk0eJlw=; b=Y8eCw9I+3GvyTeVsRu3iF7t/os
+        G5K0v/pABcPNYA/V0ySZ5E9fkOtBGPudPc7DriUmkcsyHFP8EsG9WxdN9TewBjWVOWV10Jxsbf/UN
+        Kf3GgIakz9FIVHnUru632fnhkjetHZQYyPHNbFFyQ7cAMakjsZLeTkuapE48frmxWX2ocElecbgnJ
+        JAZYj+qxEJPzjib8lR5dFxutcI0flYsVohHR/3ID1f0UiX+dAPFmPTCf4eqqurs0hfQvWqpQvlPRS
+        16P3nvlTZBXQnBV4/y+ZgZ+hbxzxdE1V5qysznl2OlcRjhL3slS9C/QSVMbKHfsEdm7X7Iazzwm5z
+        u4uWYH6g==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nraDs-005QR0-D6; Thu, 19 May 2022 07:05:24 +0000
+Date:   Thu, 19 May 2022 00:05:24 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
+Message-ID: <YoXsNDG/WMbCzz0x@infradead.org>
+References: <20220518235011.153058-1-ebiggers@kernel.org>
+ <20220518235011.153058-2-ebiggers@kernel.org>
 MIME-Version: 1.0
-References: <20220518072751.1188163-3-yukuai3@huawei.com> <202205182347.tMOOqyfL-lkp@intel.com>
- <84fe296e-6e56-3ca9-73a8-357beb675c6e@huawei.com> <3d6878f4-1902-633d-0af2-276831364a4f@huawei.com>
-In-Reply-To: <3d6878f4-1902-633d-0af2-276831364a4f@huawei.com>
-From:   Geert Uytterhoeven <geert@linux-m68k.org>
-Date:   Thu, 19 May 2022 09:01:52 +0200
-X-Gmail-Original-Message-ID: <CAMuHMdV6NysKKh+HZ-cgHh+=SVcydmxO6ic82+t3ySTgfkoEOg@mail.gmail.com>
-Message-ID: <CAMuHMdV6NysKKh+HZ-cgHh+=SVcydmxO6ic82+t3ySTgfkoEOg@mail.gmail.com>
-Subject: Re: [PATCH -next v2 2/2] blk-throttle: fix io hung due to
- configuration updates
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     kernel test robot <lkp@intel.com>, Tejun Heo <tj@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        kbuild-all@lists.01.org, cgroups@vger.kernel.org,
-        linux-block <linux-block@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        yi.zhang@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8BIT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220518235011.153058-2-ebiggers@kernel.org>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Yukuai,
+Looks good:
 
-On Thu, May 19, 2022 at 5:25 AM yukuai (C) <yukuai3@huawei.com> wrote:
-> 在 2022/05/19 10:11, yukuai (C) 写道:
-> > 在 2022/05/18 23:52, kernel test robot 写道:
-> >> Thank you for the patch! Yet something to improve:
-> >>
-> >> [auto build test ERROR on next-20220517]
-> >>
-> >> url:
-> >> https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
-> >>
-> >> base:    47c1c54d1bcd0a69a56b49473bc20f17b70e5242
-> >> config: m68k-allyesconfig
-> >> (https://download.01.org/0day-ci/archive/20220518/202205182347.tMOOqyfL-lkp@intel.com/config)
-> >>
-> >> compiler: m68k-linux-gcc (GCC) 11.3.0
-> >> reproduce (this is a W=1 build):
-> >>          wget
-> >> https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross
-> >> -O ~/bin/make.cross
-> >>          chmod +x ~/bin/make.cross
-> >>          #
-> >> https://github.com/intel-lab-lkp/linux/commit/f8345dbaf4ed491742aab29834aff66b4930c087
-> >>
-> >>          git remote add linux-review
-> >> https://github.com/intel-lab-lkp/linux
-> >>          git fetch --no-tags linux-review
-> >> Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
-> >>          git checkout f8345dbaf4ed491742aab29834aff66b4930c087
-> >>          # save the config file
-> >>          mkdir build_dir && cp config build_dir/.config
-> >>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0
-> >> make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
-> >>
-> >> If you fix the issue, kindly add following tag as appropriate
-> >> Reported-by: kernel test robot <lkp@intel.com>
-> >>
-> >> All errors (new ones prefixed by >>):
-> >>
-> >>     m68k-linux-ld: block/blk-throttle.o: in function `tg_conf_updated':
-> >>>> blk-throttle.c:(.text+0x25bc): undefined reference to `__udivdi3'
-> >>>> m68k-linux-ld: blk-throttle.c:(.text+0x2626): undefined reference to
-> >>>> `__udivdi3'
-> > Hi,
-> >
-> > I'm confused here, the only place that I can relate to this:
-> >
-> >      return dispatched * new_limit / old_limit;
-> >
-> > However, I don't understand yet why this is problematic...
-> >>     `.exit.text' referenced in section `.data' of
-> >> sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section
-> >> `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
->
-> + static u64 throtl_update_bytes_disp(u64 dispatched, u64 new_limit,
-> +                                    u64 old_limit)
-> + {
-> +        if (new_limit == old_limit)
-> +                return dispatched;
-> +
-> +        if (new_limit == U64_MAX)
-> +                return 0;
-> +
-> +        return dispatched * new_limit / old_limit;
->
-> I understand it now. I'm doing (u64 / u64), I should use div64_u64
-
-Better, use mul_u64_u64_div_u64(), as "dispatched * new_limit"
-may overflow?
-
-> + }
-> +
-> + static u32 throtl_update_io_disp(u32 dispatched, u32 new_limit, u32 old_limit)
-> + {
-> +        if (new_limit == old_limit)
-> +                return dispatched;
-> +
-> +        if (new_limit == UINT_MAX)
-> +                return 0;
-> +
-> +        return dispatched * new_limit / old_limit;
-
-This is the same as above, but now operating on u32s instead of u64s.
-Likewise, can the multiplication overflow?
-
-> + }
-
-Gr{oetje,eeting}s,
-
-                        Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
-                                -- Linus Torvalds
+Reviewed-by: Christoph Hellwig <hch@lst.de>
