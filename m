@@ -2,169 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F6CC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 09:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51BA4C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 09:59:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235840AbiESJqv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 05:46:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45002 "EHLO
+        id S234279AbiESJ7C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 05:59:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236230AbiESJqt (ORCPT
+        with ESMTP id S230002AbiESJ7C (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 05:46:49 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6815769B58
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 02:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1652953607;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=bMReF8cCrWNT+y8fLyYoHigFI6O30lF2NYiv8Us0yFg=;
-        b=fDriS6nuUzFH4fytYTRgiN5ljsMdna59e3BLhhQ05PtgV/DHWdDuDQ1c5yoMJaIOKIvd08
-        ifU3HqenDUNUb4LULYpL+630ATT+ia70fn8AS0CBqybB5EtYPdDt/8fvw6E8gw/+BN6p6p
-        yKtr3NGiOlub5bYNrTeyYg6wDenLbYk=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-443-Fa9_pUzsMRCdUL7KDmAiGw-1; Thu, 19 May 2022 05:46:44 -0400
-X-MC-Unique: Fa9_pUzsMRCdUL7KDmAiGw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Thu, 19 May 2022 05:59:02 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE0509BAC6;
+        Thu, 19 May 2022 02:59:00 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7C264811E80;
-        Thu, 19 May 2022 09:46:43 +0000 (UTC)
-Received: from localhost (unknown [10.39.193.61])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id BFC4B401E9D;
-        Thu, 19 May 2022 09:46:42 +0000 (UTC)
-Date:   Thu, 19 May 2022 10:46:41 +0100
-From:   Stefan Hajnoczi <stefanha@redhat.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
-Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
-Message-ID: <YoYSAb8h98uVKtgV@stefanha-x1.localdomain>
-References: <20220517055358.3164431-1-ming.lei@redhat.com>
- <YoOr6jBfgVm8GvWg@stefanha-x1.localdomain>
- <YoSbuvT88sG5UkfG@T590>
- <YoTOTCooQfQQxyA8@stefanha-x1.localdomain>
- <YoTsYvnACbCNIMPE@T590>
- <YoUVb8CeWRIErJBY@stefanha-x1.localdomain>
- <YoWujjFArHaXuqYS@T590>
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 8FE8F1F86A;
+        Thu, 19 May 2022 09:58:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1652954339; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YTfOEdTrcSkHCDKW1HmDDhAr0GIpenrsTa4Zvo2nZXs=;
+        b=Uge4kVfE8iAskH/Kgfm2XliUWZI+z+sI8QNcO3VqjfBIDPPPNJecp1RBb0z51bf5tQdJOj
+        cB5OjDtenTeVB0k65w8BU1MfFd4YKSyPSnTRI+e/QlYPm8nB6IOJ1oQC60ygwIXuZCVWFC
+        a/7QdRwGQwht8HNG4U3RJ0l9wQda4R4=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 557B613456;
+        Thu, 19 May 2022 09:58:59 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id vowHFOMUhmKIPAAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Thu, 19 May 2022 09:58:59 +0000
+Date:   Thu, 19 May 2022 11:58:58 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, ming.lei@redhat.com,
+        geert@linux-m68k.org, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
+ configuration updates
+Message-ID: <20220519095857.GE16096@blackbody.suse.cz>
+References: <20220519085811.879097-1-yukuai3@huawei.com>
+ <20220519085811.879097-3-yukuai3@huawei.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="6MbhIVNGz8/JKSi2"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoWujjFArHaXuqYS@T590>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+In-Reply-To: <20220519085811.879097-3-yukuai3@huawei.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello Kuayi.
 
---6MbhIVNGz8/JKSi2
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, May 19, 2022 at 04:58:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+> If new configuration is submitted while a bio is throttled, then new
+> waiting time is recaculated regardless that the bio might aready wait
+> for some time:
+> 
+> tg_conf_updated
+>  throtl_start_new_slice
+>   tg_update_disptime
+>   throtl_schedule_next_dispatch
+> 
+> Then io hung can be triggered by always submmiting new configuration
+> before the throttled bio is dispatched.
 
-On Thu, May 19, 2022 at 10:42:22AM +0800, Ming Lei wrote:
-> On Wed, May 18, 2022 at 04:49:03PM +0100, Stefan Hajnoczi wrote:
-> > On Wed, May 18, 2022 at 08:53:54PM +0800, Ming Lei wrote:
-> > > On Wed, May 18, 2022 at 11:45:32AM +0100, Stefan Hajnoczi wrote:
-> > > > On Wed, May 18, 2022 at 03:09:46PM +0800, Ming Lei wrote:
-> > > > > On Tue, May 17, 2022 at 03:06:34PM +0100, Stefan Hajnoczi wrote:
-> > > > > > Here are some more thoughts on the ubd-control device:
-> > > > > >=20
-> > > > > > The current patch provides a ubd-control device for processes w=
-ith
-> > > > > > suitable permissions (i.e. root) to create, start, stop, and fe=
-tch
-> > > > > > information about devices.
-> > > > > >=20
-> > > > > > There is no isolation between devices created by one process an=
-d those
-> > > > >=20
-> > > > > I understand linux hasn't device namespace yet, so can you share =
-the
-> > > > > rational behind the idea of device isolation, is it because ubd d=
-evice
-> > > > > is served by ubd daemon which belongs to one pid NS? Or the user =
-creating
-> > > > > /dev/ubdbN belongs to one user NS?
-> > > >=20
-> > > > With the current model a process with access to ubd-control has con=
-trol
-> > > > over all ubd devices. This is not desirable for most container use =
-cases
-> > > > because ubd-control usage within a container means that container c=
-ould
-> > > > stop any ubd device on the system.
-> > > >=20
-> > > > Even for non-container use cases it's problematic that two applicat=
-ions
-> > > > that use ubd can interfere with each other. If an application passe=
-s the
-> > > > wrong device ID they can stop the other application's device, for
-> > > > example.
-> > > >=20
-> > > > I think it's worth supporting a model where there are multiple ubd
-> > > > daemons that are not cooperating/aware of each other. They should be
-> > > > isolated from each other.
-> > >=20
-> > > Maybe I didn't mention it clearly, I meant the following model in las=
-t email:
-> > >=20
-> > > 1) every user can send UBD_CMD_ADD_DEV to /dev/ubd-control
-> > >=20
-> > > 2) the created /dev/ubdcN & /dev/udcbN are owned by the user who crea=
-tes
-> > > it
-> >=20
-> > How does this work? Does userspace (udev) somehow get the uid/gid from
-> > the uevent so it can set the device node permissions?
->=20
-> We can let 'ubd list' export the owner info, then udev may override the d=
-efault
-> owner with exported info.
->=20
-> Or it can be done inside devtmpfs_create_node() by passing ubd's uid/gid
-> at default.
->=20
-> For /dev/ubdcN, I think it is safe, since the driver is only
-> communicating with the userspace daemon, and both belong to same owner.
-> Also ubd driver is simple enough to get full audited.
->=20
-> For /dev/ubdbN, even though FS isn't allowed to mount, there is still
-> lots of kernel code path involved, and some code path may not be run
-> with unprivileged user before, that needs careful audit.
->=20
-> So the biggest problem is if it is safe to export block disk to unprivile=
-ged
-> user, and that is the one which can't be bypassed for any approach.
+O.K.
 
-Okay.
+> -	/*
+> -	 * We're already holding queue_lock and know @tg is valid.  Let's
+> -	 * apply the new config directly.
+> -	 *
+> -	 * Restart the slices for both READ and WRITES. It might happen
+> -	 * that a group's limit are dropped suddenly and we don't want to
+> -	 * account recently dispatched IO with new low rate.
+> -	 */
+> -	throtl_start_new_slice(tg, READ);
+> -	throtl_start_new_slice(tg, WRITE);
+> +	throtl_update_slice(tg, old_limits);
 
-Stefan
+throtl_start_new_slice zeroes *_disp fields.
+If for instance, new config allowed only 0.5 throughput, the *_disp
+fields would be scaled to 0.5.
+How that change helps (better) the previously throttled bio to be dispatched?
 
---6MbhIVNGz8/JKSi2
-Content-Type: application/pgp-signature; name="signature.asc"
+(Is it because you omit update of slice_{start,end}?)
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmKGEgEACgkQnKSrs4Gr
-c8g2CwgAvaVnBulG+1c9I6BHt2M9ly7JiY7SJaDyWvG957J4B6mO+lOkkRA6Xa5q
-kY+IKgDG2RuuJcKQklVHgBWxx1+6dWN9Ax1iODGBphJVAKHiy+ZADI2YG7YnrNhp
-zVDS/gRDiSL9+HWmFcy5zzedNZvbCZK6wACLMTk8pU1euwvmQFOIbIDX9hRS5v9J
-4SEQKKLzNw8p6C1fT1/V0JRQgk5DAiNT8Zh4KDqwo29ikHv/1GXZBO31CVMOKLHH
-MHFRJrRv68BphPbhUL0wnLuiERArSYvJlWk6UH8F9kGirrERon+7eKXrrsDQwJmW
-YP3ozMHS0rN1fHDkdZKlro7Ett3oUQ==
-=O25D
------END PGP SIGNATURE-----
-
---6MbhIVNGz8/JKSi2--
+Thanks,
+Michal
 
