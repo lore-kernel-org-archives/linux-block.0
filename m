@@ -2,235 +2,236 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76DBEC433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 11:23:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35D11C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 11:25:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237363AbiESLXN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 07:23:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40382 "EHLO
+        id S237393AbiESLZH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 07:25:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232529AbiESLXM (ORCPT
+        with ESMTP id S232638AbiESLZF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 07:23:12 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F63A43ACE;
-        Thu, 19 May 2022 04:23:11 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id DEC2A1F86B;
-        Thu, 19 May 2022 11:23:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1652959389; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        Thu, 19 May 2022 07:25:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86DF443ACE
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 04:25:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652959502;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=4XMs2PfJJxMSCtw3+dlKPeSG6t2757cBDz7HszTEFRA=;
-        b=Jfd0Hdx/+XAXVGBIGSB71o9MzgnDAVNawEmkvzsB+T+4qZBDUKedP7NIIsH/f3dlDVkAL9
-        V/d9Hwzc6lNyQPPI4k4iGdz2i6MYwcLv7yT0IzvKj8xYVgbCBi7jlxsExccAVSguYk/Tf7
-        KT+eG/HIcFZjZQPogPiJhFuV8M8Wk9o=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1652959389;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=4XMs2PfJJxMSCtw3+dlKPeSG6t2757cBDz7HszTEFRA=;
-        b=vjAt2hndsGH5SowgV5vGFGaa5KhU4Trw/9za9vF1e6TlWkxcbRvX5cjD6/s8b6s0zFdx8F
-        0gfrocjMErZCROAw==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id C87A02C141;
-        Thu, 19 May 2022 11:23:09 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 841EEA062F; Thu, 19 May 2022 13:23:09 +0200 (CEST)
-Date:   Thu, 19 May 2022 13:23:09 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     jack@suse.cz, paolo.valente@linaro.org, axboe@kernel.dk,
-        tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next 8/8] block, bfq: cleanup
- bfq_bfqq_handle_idle_busy_switch()
-Message-ID: <20220519112309.nhbulnc5iz424ohl@quack3.lan>
-References: <20220514090522.1669270-1-yukuai3@huawei.com>
- <20220514090522.1669270-9-yukuai3@huawei.com>
+        bh=7vdcYJPfw3K20SGqsUJxe2PIWkf1u9aw8heNjncBU0s=;
+        b=Wt0lgbuNm//zzJXtjrP6mgYjlOVVljHIQTpWyhdAaWHy2PjKsNQcZ1+KFZLa6iMFzXhXXJ
+        jYUs0Ox/aZl8F3QIFpWnLTlH93c9XAC/kjzLHjG1Yng4I4Ig1hzyUHhUm3wEz/Q/HVms2O
+        bmR8BaDowKGbKChz8cE9jCw/syAg02Y=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-78-zgOrBXE2OeGw0pLQE5hkAw-1; Thu, 19 May 2022 07:25:01 -0400
+X-MC-Unique: zgOrBXE2OeGw0pLQE5hkAw-1
+Received: by mail-qt1-f197.google.com with SMTP id f13-20020ac8134d000000b002f9181a4d04so86118qtj.4
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 04:25:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=7vdcYJPfw3K20SGqsUJxe2PIWkf1u9aw8heNjncBU0s=;
+        b=04ErGFjwXAU1QUMMGOXsfnJGc/94/NRf/ypJUfHpO4ZPa/tsTW+IcHSU7/Igk44U9/
+         cvoXZOwpSj33Y2UA+Z474sqQEkRnSt1PJudCHJrWVad9pUWmrUtbQTNMQiNpzIiuLWTn
+         Bu2U84IN7xV2Snswh4xXdKhjGeu5+dQgfE8PuxW/RbHbqB/yTrsQvjBOiz4zfuqVfBR6
+         bzLjJkGj+fXWcDQM8grJL1Shaxgo8aP/BmNNSHzBQ/CfEKgw+7GSugeKDJBM3HXph7rX
+         HkjJGbc3fDpt4tPD1qb4DnR6goLgdKi7KT8Gfc8tV51gpCvC1bM8IJXGMUVrHr1E3758
+         Eeig==
+X-Gm-Message-State: AOAM530ouXYqBIaxs46QHmMOTaGY7lqWMMOgJRvAInxXU2u2cJzf79FR
+        NKAw8Gc547XDlg55Yee+ckctYlq1LzplhMElo3G1+Zk7lFYYLhcC7MVgQtcvna4xkUp1iC+Yga9
+        Rs3Vh2zbvAg8jDG6jkrsaQCI=
+X-Received: by 2002:a05:6214:21ee:b0:461:e557:6051 with SMTP id p14-20020a05621421ee00b00461e5576051mr3192098qvj.25.1652959500834;
+        Thu, 19 May 2022 04:25:00 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzzVLRXKQV7vapB74AbsI6Pv2aIVCodGu8MZhS0bY7xw2bb4xa+6a46uJRM71FEqv/6H91NNA==
+X-Received: by 2002:a05:6214:21ee:b0:461:e557:6051 with SMTP id p14-20020a05621421ee00b00461e5576051mr3192088qvj.25.1652959500596;
+        Thu, 19 May 2022 04:25:00 -0700 (PDT)
+Received: from zlang-mailbox ([209.132.188.80])
+        by smtp.gmail.com with ESMTPSA id p66-20020a37bf45000000b0069fcdbabdb4sm1084980qkf.69.2022.05.19.04.24.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 04:24:59 -0700 (PDT)
+Date:   Thu, 19 May 2022 19:24:50 +0800
+From:   Zorro Lang <zlang@redhat.com>
+To:     Amir Goldstein <amir73il@gmail.com>
+Cc:     Luis Chamberlain <mcgrof@kernel.org>,
+        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
+        Theodore Tso <tytso@mit.edu>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        fstests <fstests@vger.kernel.org>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+ <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220514090522.1669270-9-yukuai3@huawei.com>
+In-Reply-To: <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat 14-05-22 17:05:22, Yu Kuai wrote:
-> 'wr_or_deserves_wr' is only used in bfq_update_bfqq_wr_on_rq_arrival(),
-> which is only called from bfq_bfqq_handle_idle_busy_switch() in specific
-> code branch, thus there is no need to precaculate 'wr_or_deserves_wr'
-> each time bfq_bfqq_handle_idle_busy_switch() is called.
+On Thu, May 19, 2022 at 09:36:41AM +0300, Amir Goldstein wrote:
+> [adding fstests and Zorro]
 > 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-
-With this patch there's the same problem as with the previous one. Some of
-the variables passed to bfq_update_bfqq_wr_on_rq_arrival() (in_burst,
-soft_rt) would actually evaluate differently later in the function.
-
-								Honza
-
-> ---
->  block/bfq-iosched.c | 110 +++++++++++++++++++++++++-------------------
->  1 file changed, 62 insertions(+), 48 deletions(-)
+> On Thu, May 19, 2022 at 6:07 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+> >
+> > I've been promoting the idea that running fstests once is nice,
+> > but things get interesting if you try to run fstests multiple
+> > times until a failure is found. It turns out at least kdevops has
+> > found tests which fail with a failure rate of typically 1/2 to
+> > 1/30 average failure rate. That is 1/2 means a failure can happen
+> > 50% of the time, whereas 1/30 means it takes 30 runs to find the
+> > failure.
+> >
+> > I have tried my best to annotate failure rates when I know what
+> > they might be on the test expunge list, as an example:
+> >
+> > workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+> >
+> > The term "failure rate 1/15" is 16 characters long, so I'd like
+> > to propose to standardize a way to represent this. How about
+> >
+> > generic/530 # F:1/15
+> >
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 1e57d76c8dd3..cea8cb3f5ee2 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -1624,15 +1624,65 @@ static unsigned long bfq_smallest_from_now(void)
->  	return jiffies - MAX_JIFFY_OFFSET;
->  }
->  
-> +/*
-> + * bfqq deserves to be weight-raised if:
-> + * - it is sync,
-> + * - it does not belong to a large burst,
-> + * - it has been idle for enough time or is soft real-time,
-> + * - is linked to a bfq_io_cq (it is not shared in any sense),
-> + * - has a default weight (otherwise we assume the user wanted
-> + *   to control its weight explicitly)
-> + *
-> + * Merged bfq_queues are kept out of weight-raising
-> + * (low-latency) mechanisms. The reason is that these queues
-> + * are usually created for non-interactive and
-> + * non-soft-real-time tasks. Yet this is not the case for
-> + * stably-merged queues. These queues are merged just because
-> + * they are created shortly after each other. So they may
-> + * easily serve the I/O of an interactive or soft-real time
-> + * application, if the application happens to spawn multiple
-> + * processes. So let also stably-merged queued enjoy weight
-> + * raising.
-> + */
-> +static bool bfqq_wr_or_deserves_wr(struct bfq_data *bfqd,
-> +				   struct bfq_queue *bfqq,
-> +				   struct request *rq,
-> +				   bool interactive, bool soft_rt)
-> +{
-> +	if (!bfqd->low_latency)
-> +		return false;
-> +
-> +	if (bfqq->wr_coeff > 1)
-> +		return true;
-> +
-> +	if (!bfq_bfqq_sync(bfqq))
-> +		return false;
-> +
-> +	if (!bfqq->bic && !RQ_BIC(rq)->stably_merged)
-> +		return false;
-> +
-> +	if (!interactive && !soft_rt)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
->  static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
->  					     struct bfq_queue *bfqq,
->  					     unsigned int old_wr_coeff,
-> -					     bool wr_or_deserves_wr,
-> -					     bool interactive,
-> -					     bool in_burst,
-> -					     bool soft_rt)
-> -{
-> -	if (old_wr_coeff == 1 && wr_or_deserves_wr) {
-> +					     struct request *rq,
-> +					     bool interactive)
-> +{
-> +	bool in_burst = bfq_bfqq_in_large_burst(bfqq);
-> +	bool soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
-> +		       !BFQQ_TOTALLY_SEEKY(bfqq) &&
-> +		       !in_burst &&
-> +		       time_is_before_jiffies(bfqq->soft_rt_next_start) &&
-> +		       bfqq->dispatched == 0 &&
-> +		       bfqq->entity.new_weight == 40;
-> +
-> +	if (old_wr_coeff == 1 &&
-> +	    bfqq_wr_or_deserves_wr(bfqd, bfqq, rq, interactive, soft_rt)) {
->  		/* start a weight-raising period */
->  		if (interactive) {
->  			bfqq->service_from_wr = 0;
-> @@ -1674,9 +1724,9 @@ static void bfq_update_bfqq_wr_on_rq_arrival(struct bfq_data *bfqd,
->  		if (interactive) { /* update wr coeff and duration */
->  			bfqq->wr_coeff = bfqd->bfq_wr_coeff;
->  			bfqq->wr_cur_max_time = bfq_wr_duration(bfqd);
-> -		} else if (in_burst)
-> +		} else if (in_burst) {
->  			bfqq->wr_coeff = 1;
-> -		else if (soft_rt) {
-> +		} else if (soft_rt) {
->  			/*
->  			 * The application is now or still meeting the
->  			 * requirements for being deemed soft rt.  We
-> @@ -1768,44 +1818,11 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
->  					     struct request *rq,
->  					     bool *interactive)
->  {
-> -	bool soft_rt, in_burst,	wr_or_deserves_wr,
-> -		idle_for_long_time = bfq_bfqq_idle_for_long_time(bfqd, bfqq);
-> +	bool in_burst = bfq_bfqq_in_large_burst(bfqq);
-> +	bool idle_for_long_time = bfq_bfqq_idle_for_long_time(bfqd, bfqq);
->  
-> -	/*
-> -	 * bfqq deserves to be weight-raised if:
-> -	 * - it is sync,
-> -	 * - it does not belong to a large burst,
-> -	 * - it has been idle for enough time or is soft real-time,
-> -	 * - is linked to a bfq_io_cq (it is not shared in any sense),
-> -	 * - has a default weight (otherwise we assume the user wanted
-> -	 *   to control its weight explicitly)
-> -	 */
-> -	in_burst = bfq_bfqq_in_large_burst(bfqq);
-> -	soft_rt = bfqd->bfq_wr_max_softrt_rate > 0 &&
-> -		!BFQQ_TOTALLY_SEEKY(bfqq) &&
-> -		!in_burst &&
-> -		time_is_before_jiffies(bfqq->soft_rt_next_start) &&
-> -		bfqq->dispatched == 0 &&
-> -		bfqq->entity.new_weight == 40;
->  	*interactive = !in_burst && idle_for_long_time &&
->  		bfqq->entity.new_weight == 40;
-> -	/*
-> -	 * Merged bfq_queues are kept out of weight-raising
-> -	 * (low-latency) mechanisms. The reason is that these queues
-> -	 * are usually created for non-interactive and
-> -	 * non-soft-real-time tasks. Yet this is not the case for
-> -	 * stably-merged queues. These queues are merged just because
-> -	 * they are created shortly after each other. So they may
-> -	 * easily serve the I/O of an interactive or soft-real time
-> -	 * application, if the application happens to spawn multiple
-> -	 * processes. So let also stably-merged queued enjoy weight
-> -	 * raising.
-> -	 */
-> -	wr_or_deserves_wr = bfqd->low_latency &&
-> -		(bfqq->wr_coeff > 1 ||
-> -		 (bfq_bfqq_sync(bfqq) &&
-> -		  (bfqq->bic || RQ_BIC(rq)->stably_merged) &&
-> -		   (*interactive || soft_rt)));
->  
->  	/*
->  	 * If bfqq happened to be activated in a burst, but has been
-> @@ -1840,11 +1857,8 @@ static void bfq_bfqq_handle_idle_busy_switch(struct bfq_data *bfqd,
->  		if (time_is_before_jiffies(bfqq->split_time +
->  					   bfqd->bfq_wr_min_idle_time)) {
->  			bfq_update_bfqq_wr_on_rq_arrival(bfqd, bfqq,
-> -							 old_wr_coeff,
-> -							 wr_or_deserves_wr,
-> -							 *interactive,
-> -							 in_burst,
-> -							 soft_rt);
-> +							 old_wr_coeff, rq,
-> +							 *interactive);
->  
->  			if (old_wr_coeff != bfqq->wr_coeff)
->  				bfqq->entity.prio_changed = 1;
-> -- 
-> 2.31.1
+> I am not fond of the 1/15 annotation at all, because the only fact that you
+> are able to document is that the test failed after 15 runs.
+> Suggesting that this means failure rate of 1/15 is a very big step.
 > 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> > Then we could extend the definition. F being current estimate, and this
+> > can be just how long it took to find the first failure. A more valuable
+> > figure would be failure rate avarage, so running the test multiple
+> > times, say 10, to see what the failure rate is and then averaging the
+> > failure out. So this could be a more accurate representation. For this
+> > how about:
+> >
+> > generic/530 # FA:1/15
+> >
+> > This would mean on average there failure rate has been found to be about
+> > 1/15, and this was determined based on 10 runs.
+> >
+> > We should also go extend check for fstests/blktests to run a test
+> > until a failure is found and report back the number of successes.
+> >
+> > Thoughts?
+> >
+> 
+> I have had a discussion about those tests with Zorro.
+
+Hi Amir,
+
+Thanks for publicing this discussion.
+
+Yes, we talked about this, but if I don't rememeber wrong, I recommended each
+downstream testers maintain their own "testing data/config", likes exclude
+list, failed ratio, known failures etc. I think they're not suitable to be
+fixed in the mainline fstests.
+
+About the other idea I metioned in LSF, we can create some more group names to
+mark those cases with random load/data/env etc, they're worth to be run more
+times. I also talked about that with Darrick, we haven't maken a decision,
+but I'd like to push that if most of other forks would like to see that.
+
+In my internal regression test for RHEL, I give some fstests cases a new
+group name "redhat_random" (sure, I know it's not a good name, it's just
+for my internal test, welcome better name, I'm not a good english speaker :).
+Then combine with quick and stress group name, I loop run "redhat_random"
+cases different times, with different LOAD/TIME_FACTOR.
+
+So I hope to have one "or more specific" group name to mark those random
+test cases at first, likes [1] (I'm sure it's incomplete, but can be improved
+if we can get more help from more people :)
+
+Thanks,
+Zorro
+
+[1]
+generic/013
+generic/019
+generic/051
+generic/068
+generic/070
+generic/075
+generic/076
+generic/083
+generic/091
+generic/112
+generic/117
+generic/127
+generic/231
+generic/232
+generic/233
+generic/263
+generic/269
+generic/270
+generic/388
+generic/390
+generic/413
+generic/455
+generic/457
+generic/461
+generic/464
+generic/475
+generic/476
+generic/482
+generic/521
+generic/522
+generic/547
+generic/551
+generic/560
+generic/561
+generic/616
+generic/617
+generic/648
+generic/650
+xfs/011
+xfs/013
+xfs/017
+xfs/032
+xfs/051
+xfs/057
+xfs/068
+xfs/079
+xfs/104
+xfs/137
+xfs/141
+xfs/167
+xfs/297
+xfs/305
+xfs/442
+xfs/517
+
+> 
+> Those tests that some people refer to as "flaky" are valuable,
+> but they are not deterministic, they are stochastic.
+> 
+> I think MTBF is the standard way to describe reliability
+> of such tests, but I am having a hard time imagining how
+> the community can manage to document accurate annotations
+> of this sort, so I would stick with documenting the facts
+> (i.e. the test fails after N runs).
+> 
+> OTOH, we do have deterministic tests, maybe even the majority of
+> fstests are deterministic(?)
+> 
+> Considering that every auto test loop takes ~2 hours on our rig and that
+> I have been running over 100 loops over the past two weeks, if half
+> of fstests are deterministic, that is a lot of wait time and a lot of carbon
+> emission gone to waste.
+> 
+> It would have been nice if I was able to exclude a "deterministic" group.
+> The problem is - can a developer ever tag a test as being "deterministic"?
+> 
+> Thanks,
+> Amir.
+> 
+
