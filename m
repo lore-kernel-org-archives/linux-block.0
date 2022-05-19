@@ -2,143 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEDDC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 06:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AF8AC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 07:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229573AbiESGqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 02:46:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
+        id S232290AbiESHCM convert rfc822-to-8bit (ORCPT
+        <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 03:02:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234101AbiESGqI (ORCPT
+        with ESMTP id S232642AbiESHCJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 02:46:08 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF0915802
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 23:46:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1652942765; x=1684478765;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cqPMPg/YffdZHcCrnM3XKivoHpwnlB3DQsGm/ZDGisI=;
-  b=pnRSq1dM7T3eBZ+yiaPi+gMX6IxYI9jnXm9c0inbILJFbZDTR7HDDYpB
-   cCGD2zMXtm6rtMAK+QYwFwGc6FLthJFL773aWZ1vCKHwo1NQtWwzGFsS8
-   QIlujnI5wn8REJHPW1mvvuAiRkM3aOy6x2uei+Tk8ET9S+rUxI7vrpsbk
-   ubMCV7eG6mghd60zZcjYHaJmIdJoHQYRfDawHsITacwnRCVuu24fRMFiF
-   giTICB629n/cK8Kg5kFGuC9WOErredQM8Op5+n01BBjQt6FAkbiihr5Ko
-   mLTU2fzu+VRP7IMh/v4oHpiJ/7/De4tA1CyGYz2jDAdebmmMXcAno0WOz
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.91,236,1647273600"; 
-   d="scan'208";a="304981962"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 19 May 2022 14:45:59 +0800
-IronPort-SDR: +1FBmBFHhyMQPCyrpoHgZW07+55uxNl5IYZYFanwqHgKvbA+49gwucRjGZFQITqeysKhN0XWrP
- ZHiyUIPdep6LNerCR0dgZ/Sdy4jGjESWmqEkHn+fQfxqFAAS++m/CMia6U/+9xYILjM81YnMlE
- 782hXd25DclbbK59OJpJUoDcwgU9RNHT3sJivErXmy8DsRgwGXBeqJikdL6LIXw8f/nY1nco6m
- MQNJxY4E9CjEkgpf1kikrvWmBy1SpQH+Gp9MG9sxbKwvvElQ8GtDwwZ5EHvf6yE3Jj5qobgm+g
- Uqzmrg6/wLmEYGaSeX0P7SI7
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 May 2022 23:11:24 -0700
-IronPort-SDR: L//G76HdM3OLqhnrAm+uPiI8fTi9xS7iAHKSw9yvo7Zpi/g6/K6s7VIC8lXnEhpcY5OPGK24WT
- 3i6ffhVKoGYLyBAxpzkvw7sX9q8H03bGuCqgdfv2lwk6j9+t0o6ydxGLEEA6cGmgkf7frilbxE
- XTvIWSNIGEw0481+mfjwag4GCJGi4XH99I1+SU+clIIj9UBaLFcdHIBnOW7aiJVCGAxWzrgGt1
- CFi/wG5escx09PQADeDTMHlrZUaDTXWaAjhRPpo6rB/CrOUBcGeA5Iw3UV4pU2FNLus/ngL9OR
- bIE=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 May 2022 23:46:00 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L3gNl2SQ1z1SVp3
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 23:45:59 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1652942758; x=1655534759; bh=cqPMPg/YffdZHcCrnM3XKivoHpwnlB3DQsG
-        m/ZDGisI=; b=H2A8vDR1hn+U2YAW61OKPa7ido07LtclbMZI468okOV/RbXWPTh
-        o032LhvSNFNCTH02sTgX4vtrIT5VvHrQzZL9fDScL7339i8nOr6U5h7qNfyW+VBo
-        9Kv8K30k78V1m87g637oYh39Ue1VxQYsx0NsOVj5cavAae3enXHEUKMUMPNpQNep
-        70U53xETn9VC+edj4T4qCpYzeF9tgiv5vPimcOcbCvnVM1pxINQhNRcrVeN/pkch
-        fJJ2KS1dkAveymSqASofPwtzNoI6MR12/eS5WMUGW+cVlNsQrvaWO129DflliQcc
-        HteqKEyBIzqlDKmzO8vIhni91VSFRZqDOhg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 77ZCJWPLb3Cx for <linux-block@vger.kernel.org>;
-        Wed, 18 May 2022 23:45:58 -0700 (PDT)
-Received: from [10.225.54.48] (unknown [10.225.54.48])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L3gNj0Hhzz1Rvlc;
-        Wed, 18 May 2022 23:45:56 -0700 (PDT)
-Message-ID: <283d37e8-868a-990b-e953-4b7bb940135c@opensource.wdc.com>
-Date:   Thu, 19 May 2022 08:45:55 +0200
+        Thu, 19 May 2022 03:02:09 -0400
+Received: from mail-qk1-f175.google.com (mail-qk1-f175.google.com [209.85.222.175])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 970C9B8BD5;
+        Thu, 19 May 2022 00:02:06 -0700 (PDT)
+Received: by mail-qk1-f175.google.com with SMTP id i68so2890996qke.11;
+        Thu, 19 May 2022 00:02:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=8Lduo9otIskPj76nIDF1xXbuoAxPQZ4aqYfqX6zq4mc=;
+        b=sAAnsJIApG/ZwL0wpmvzxokrqGsn1cW0nL/+UFqj52FWNiBMy4X+65JmGsHtQ8SprY
+         Q6IVSqzRUkFbphaFocyoK8/71FH27BR5SztJDj9w7PN7WaxJISZsr083N+NXQY6WGA+3
+         WAMrDapEhqMq2Pcf4bqRZ0lpXc4SBEkj0K7zvNMPFhubKs05NqcP8PIirs72uIRPnvO1
+         QZL0v3Zfbe6mlT596xAQr7X7gw6im0qfOvw/xzw764U/ueIo4JL/VOXEvoNp37CVyhEV
+         s4ISuJhN4BBSmXtBfBI1KWIKRkG67SdotGT/LLZmOIip9RlbTnrKFDDU468N7kdHIYhi
+         bVPw==
+X-Gm-Message-State: AOAM53150UhSZezsMQtDcauWiE4lmiCSD647awQ91k89cpnq7ZYsdqxG
+        4n8pIZH6U203Dl3Q3ZarWkoF0GwKb2wzfw==
+X-Google-Smtp-Source: ABdhPJx9gBig7pcOCKHOYGAsUW3SWXtrLvHKl5FB6r2Ru6VzcjT8AwYxPsr4jxQOEXq6hf1I4V8kjA==
+X-Received: by 2002:a37:a492:0:b0:6a3:2a8a:530 with SMTP id n140-20020a37a492000000b006a32a8a0530mr2145443qke.552.1652943725573;
+        Thu, 19 May 2022 00:02:05 -0700 (PDT)
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com. [209.85.219.176])
+        by smtp.gmail.com with ESMTPSA id c64-20020a379a43000000b0069fc13ce212sm883701qke.67.2022.05.19.00.02.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 May 2022 00:02:05 -0700 (PDT)
+Received: by mail-yb1-f176.google.com with SMTP id t26so7475907ybt.3;
+        Thu, 19 May 2022 00:02:04 -0700 (PDT)
+X-Received: by 2002:a05:6902:120e:b0:634:6f29:6b84 with SMTP id
+ s14-20020a056902120e00b006346f296b84mr3068334ybu.604.1652943724521; Thu, 19
+ May 2022 00:02:04 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
-Content-Language: en-US
-To:     Keith Busch <kbusch@kernel.org>, Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org
-References: <20220518171131.3525293-1-kbusch@fb.com>
- <20220518171131.3525293-4-kbusch@fb.com> <YoWL+T8JiIO5Ln3h@sol.localdomain>
- <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
- <YoWjBxmKDQC1mCIz@sol.localdomain>
- <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
- <YoWmi0mvoIk3CfQN@sol.localdomain>
- <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
- <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
- <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220518072751.1188163-3-yukuai3@huawei.com> <202205182347.tMOOqyfL-lkp@intel.com>
+ <84fe296e-6e56-3ca9-73a8-357beb675c6e@huawei.com> <3d6878f4-1902-633d-0af2-276831364a4f@huawei.com>
+In-Reply-To: <3d6878f4-1902-633d-0af2-276831364a4f@huawei.com>
+From:   Geert Uytterhoeven <geert@linux-m68k.org>
+Date:   Thu, 19 May 2022 09:01:52 +0200
+X-Gmail-Original-Message-ID: <CAMuHMdV6NysKKh+HZ-cgHh+=SVcydmxO6ic82+t3ySTgfkoEOg@mail.gmail.com>
+Message-ID: <CAMuHMdV6NysKKh+HZ-cgHh+=SVcydmxO6ic82+t3ySTgfkoEOg@mail.gmail.com>
+Subject: Re: [PATCH -next v2 2/2] blk-throttle: fix io hung due to
+ configuration updates
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     kernel test robot <lkp@intel.com>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        kbuild-all@lists.01.org, cgroups@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        yi.zhang@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/05/19 6:56, Keith Busch wrote:
-> On Wed, May 18, 2022 at 08:27:31PM -0700, Eric Biggers wrote:
->>
->> So the bio ends up with a total length that is a multiple of the logical block
->> size, but the lengths of the individual bvecs in the bio are *not* necessarily
->> multiples of the logical block size.  That's the problem.
-> 
-> I'm surely missing something here. I know the bvecs are not necessarily lbs
-> aligned, but why does that matter? Is there some driver that can only take
-> exactly 1 bvec, but allows it to be unaligned? If so, we could take the segment
-> queue limit into account, but I am not sure that we need to.
+Hi Yukuai,
 
-For direct IO, the first bvec will always be aligned to a logical block size.
-See __blkdev_direct_IO() and __blkdev_direct_IO_simple():
+On Thu, May 19, 2022 at 5:25 AM yukuai (C) <yukuai3@huawei.com> wrote:
+> 在 2022/05/19 10:11, yukuai (C) 写道:
+> > 在 2022/05/18 23:52, kernel test robot 写道:
+> >> Thank you for the patch! Yet something to improve:
+> >>
+> >> [auto build test ERROR on next-20220517]
+> >>
+> >> url:
+> >> https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
+> >>
+> >> base:    47c1c54d1bcd0a69a56b49473bc20f17b70e5242
+> >> config: m68k-allyesconfig
+> >> (https://download.01.org/0day-ci/archive/20220518/202205182347.tMOOqyfL-lkp@intel.com/config)
+> >>
+> >> compiler: m68k-linux-gcc (GCC) 11.3.0
+> >> reproduce (this is a W=1 build):
+> >>          wget
+> >> https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross
+> >> -O ~/bin/make.cross
+> >>          chmod +x ~/bin/make.cross
+> >>          #
+> >> https://github.com/intel-lab-lkp/linux/commit/f8345dbaf4ed491742aab29834aff66b4930c087
+> >>
+> >>          git remote add linux-review
+> >> https://github.com/intel-lab-lkp/linux
+> >>          git fetch --no-tags linux-review
+> >> Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
+> >>          git checkout f8345dbaf4ed491742aab29834aff66b4930c087
+> >>          # save the config file
+> >>          mkdir build_dir && cp config build_dir/.config
+> >>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0
+> >> make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
+> >>
+> >> If you fix the issue, kindly add following tag as appropriate
+> >> Reported-by: kernel test robot <lkp@intel.com>
+> >>
+> >> All errors (new ones prefixed by >>):
+> >>
+> >>     m68k-linux-ld: block/blk-throttle.o: in function `tg_conf_updated':
+> >>>> blk-throttle.c:(.text+0x25bc): undefined reference to `__udivdi3'
+> >>>> m68k-linux-ld: blk-throttle.c:(.text+0x2626): undefined reference to
+> >>>> `__udivdi3'
+> > Hi,
+> >
+> > I'm confused here, the only place that I can relate to this:
+> >
+> >      return dispatched * new_limit / old_limit;
+> >
+> > However, I don't understand yet why this is problematic...
+> >>     `.exit.text' referenced in section `.data' of
+> >> sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section
+> >> `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
+>
+> + static u64 throtl_update_bytes_disp(u64 dispatched, u64 new_limit,
+> +                                    u64 old_limit)
+> + {
+> +        if (new_limit == old_limit)
+> +                return dispatched;
+> +
+> +        if (new_limit == U64_MAX)
+> +                return 0;
+> +
+> +        return dispatched * new_limit / old_limit;
+>
+> I understand it now. I'm doing (u64 / u64), I should use div64_u64
 
-        if ((pos | iov_iter_alignment(iter)) &
-            (bdev_logical_block_size(bdev) - 1))
-                return -EINVAL;
+Better, use mul_u64_u64_div_u64(), as "dispatched * new_limit"
+may overflow?
 
-And given that, all bvecs should also be LBA aligned since the LBA size is
-always a divisor of the page size. Since splitting is always done on an LBA
-boundary, I do not see how we can ever get bvecs that are not LBA aligned.
-Or I am missing something too...
+> + }
+> +
+> + static u32 throtl_update_io_disp(u32 dispatched, u32 new_limit, u32 old_limit)
+> + {
+> +        if (new_limit == old_limit)
+> +                return dispatched;
+> +
+> +        if (new_limit == UINT_MAX)
+> +                return 0;
+> +
+> +        return dispatched * new_limit / old_limit;
 
->  
->> Note, there's also lots of code that assumes that bio_vec::bv_len is a multiple
->> of 512.  
-> 
-> Could you point me to some examples?
-> 
->> That was implied by it being a multiple of the logical block size.  But
->> the DMA alignment can be much lower, like 8 bytes (see nvme_set_queue_limits()).
-> 
-> That's the driver this was tested on, though I just changed it to 4 bytes for
-> 5.19.
+This is the same as above, but now operating on u32s instead of u64s.
+Likewise, can the multiplication overflow?
 
+> + }
 
--- 
-Damien Le Moal
-Western Digital Research
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
