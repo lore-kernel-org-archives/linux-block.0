@@ -2,77 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7057C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 19:47:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC15C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 20:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242848AbiESTrL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 15:47:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
+        id S235854AbiESUCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 16:02:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240779AbiESTrK (ORCPT
+        with ESMTP id S239668AbiESUCo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 15:47:10 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A08BAED8FA
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 12:47:08 -0700 (PDT)
+        Thu, 19 May 2022 16:02:44 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD936D187;
+        Thu, 19 May 2022 13:02:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Type:MIME-Version:Message-ID:
-        Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-        Content-Description:In-Reply-To:References;
-        bh=1ivFVvaH/Bc6oWSN5A3QdGzfic2gASfrHsi7yeEYLXk=; b=qPEBoXBHLc04gcHRBNEBC5o9DO
-        HwVNEDzw5ASlNCWc9mjylZL3R35XlwTEgU6C1jIb2g4jliL9WCGlQLAxj8zHwwFl5/5HIwsec0Urx
-        NBscVkXQ+T0re0Od/8izJD1F2wYsyFO3wpOspVImUZUDveeR5Z6Qn3XjUvgm0zxmPQqTRqd3CmY5m
-        kmQS0GvL585BkQof0qA3sYpKTYHk3DFYWGDMmYWhuPZunPjYDRXva695ONP/BPg6M+u1/1MlJMCJx
-        FaorBVScHjqAlwRRBY2Zw9L/e560In/vZRqKgwvxmcn/sygbkvmKZCAZNbYJ0ikSNpP3dF+gR48fH
-        FhTp9Ygg==;
-Received: from [2001:4bb8:19a:7bdf:3c5b:8fdd:1000:1647] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nrm70-009Ab2-MS; Thu, 19 May 2022 19:47:07 +0000
-Date:   Thu, 19 May 2022 21:47:04 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] second round of nvme updates for Linux 5.19
-Message-ID: <YoaeuNGHGE/t29gY@infradead.org>
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=EyvcIebdJVNbSUKi/O56+u29Bdx5ONtpdCn9+GlRuGc=; b=ImYzwvN78w3/qFJn8r7MNseyWF
+        e4McVD2zl9Xfio2tPR8MHFE9jAY5yXUIsP2QMHnxd3rGUULaBEpwwQ1kuIkoDsywGk2FknfRD+PE8
+        mKB0RTH55YuMV4rtN20z7S1Gb4jN31bBOdPrwG0GFUxXWdwiW+2VVpso2Tkb5YUZg2ta801XlrEo+
+        Vk3FCyD/0FARw0bX0Xp4QqW9VpJG8AqloiMqCMM4BdYK55Oink5fYL1+k7AnO8ghmvPZ8qG9AEKI3
+        jqDLZ8eBLjzOH1unE5AzWMP5JARLfnXAbJV40/GHp/OC6gBCvK/RIHu+s3ZNUd4CNcK3xW4CE2xgO
+        BmQkaoxA==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nrmM3-00D3rP-8l; Thu, 19 May 2022 20:02:39 +0000
+Message-ID: <6f38a339-41b5-aafe-c788-bd34a1806d52@infradead.org>
+Date:   Thu, 19 May 2022 13:02:32 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
+ [drivers/nvme/host/nvme-fc.ko] undefined!
+Content-Language: en-US
+To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
+        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
+ <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
+ <fc5f8b96-3c93-5400-b917-a1d991cbe7c9@suse.de>
+ <900f57bc-9978-9ba6-22fb-48f03fcf5011@kernel.dk>
+ <c2d252a1-7223-4899-e5c9-e4bb27e2fc8a@kernel.dk>
+ <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[note that my GPG key expired today and I had to extent it.  It
-might take some time to propagate to all key servers]
 
-The following changes since commit da14f237ceef059ff1a9ee14de283905c2dac11c:
 
-  Merge tag 'nvme-5.19-2022-05-18' of git://git.infradead.org/nvme into for-5.19/drivers (2022-05-18 06:28:04 -0600)
+On 5/19/22 06:02, Hannes Reinecke wrote:
+> On 5/19/22 14:42, Jens Axboe wrote:
+>> On 5/19/22 6:40 AM, Jens Axboe wrote:
+>>> On Thu, May 19, 2022 at 6:38 AM Hannes Reinecke <hare@suse.de> wrote:
+>>>>
+>>>> On 5/19/22 14:14, Jens Axboe wrote:
+>>>>> On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
+>>>>>> Greetings,
+>>>>>>
+>>>>>> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+>>>>>>
+>>>>>> Console Logs :
+>>>>>>
+>>>>>> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
+>>>>>> make -j 17 -s && make modules && make modules_install && make install
+>>>>>> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+>>>>>> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
+>>>>>> make: *** [Makefile:1914: modules] Error 2
+>>>>>> make: *** Waiting for unfinished jobs....
+>>>>>
+>>>>> Christoph, can you fix this up?
+>>>>>
+>>>> Cannot reproduce with commit 21498d01d045c5b95b93e0a0625ae965b4330ebe.
+>>>> Please share details.
+>>>
+>>> The kerneltest bot also reported this a few days ago, you might be able
+>>> to find the details there as that includes config etc.
+>>
+>> Here: https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com/
+>>
+> Right. Send a patch.
 
-are available in the Git repository at:
 
-  git://git.infradead.org/nvme.git tags/nvme-5.19-2022-05-19
+https://lore.kernel.org/all/20220518045704.GA30131@lst.de/
 
-for you to fetch changes up to 78288665b5d0154978fed431985310cb4f166836:
+but it needs to be sent as a formal patch.
 
-  nvme: set non-mdts limits in nvme_scan_work (2022-05-19 21:30:22 +0200)
-
-----------------------------------------------------------------
-nvme updates for Linux 5.19
-
- - set non-mdts limits in nvme_scan_work (Chaitanya Kulkarni)
- - add support for TP4084 - Time-to-Ready Enhancements (me)
-
-----------------------------------------------------------------
-Chaitanya Kulkarni (1):
-      nvme: set non-mdts limits in nvme_scan_work
-
-Christoph Hellwig (1):
-      nvme: add support for TP4084 - Time-to-Ready Enhancements
-
- drivers/nvme/host/constants.c |  1 +
- drivers/nvme/host/core.c      | 95 ++++++++++++++++++++++++++++++++++++++-----
- include/linux/nvme.h          | 31 ++++++++++++++
- 3 files changed, 117 insertions(+), 10 deletions(-)
+-- 
+~Randy
