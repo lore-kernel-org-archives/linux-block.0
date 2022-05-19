@@ -2,80 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DD64C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:58:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5802DC4332F
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 15:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240070AbiESO6s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 10:58:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41152 "EHLO
+        id S240190AbiESPBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 11:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240059AbiESO6m (ORCPT
+        with ESMTP id S240346AbiESPAP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 10:58:42 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F23E9A5A89;
-        Thu, 19 May 2022 07:58:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=bOAgmeR6UE8Jq8eTwtkBILkXF6ykn4b5YwRwZCX7b7E=; b=qEDHH7DSiP/DGEjXLjijAwKUfs
-        ymY04FdevHDrpotuF87hsVzBvNWWYvNH5zQhntY0z8c7nSKJIfMAdBXaymRN048YEk4ndlrZoQD15
-        NANKGMUYqo0oGmL0hRZTeYr1ikIEIqYufdgH/Wjmb1HDJe04rDmC7aUODLhN7/6tL1XlIcZvB++v3
-        Hl/FBOF926zEo8TRYzn/bh0dk53P0Sdf1P+GULrCZa4uFykTTfJi2E8QxnXDQE6XC37QdYeMcDyu5
-        tMNcqhHGGHdChjWN5LkgL9kgSJyvavUF4uxYX5d1l93jC0JBM8P4vnDqS5HARbf6yK0jSYky7xUnn
-        1QKLksqA==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nrhbj-00CoKR-FB; Thu, 19 May 2022 14:58:31 +0000
-Date:   Thu, 19 May 2022 15:58:31 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     Zorro Lang <zlang@redhat.com>
-Cc:     Amir Goldstein <amir73il@gmail.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
-        Theodore Tso <tytso@mit.edu>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        fstests <fstests@vger.kernel.org>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for
- expunges
-Message-ID: <YoZbF90qS+LlSDfS@casper.infradead.org>
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
- <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
- <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
+        Thu, 19 May 2022 11:00:15 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CB99EBE8D
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 07:59:35 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 7623D68AFE; Thu, 19 May 2022 16:59:31 +0200 (CEST)
+Date:   Thu, 19 May 2022 16:59:31 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Hannes Reinecke <hare@suse.de>, Christoph Hellwig <hch@lst.de>,
+        Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Muneendra <muneendra.kumar@broadcom.com>,
+        James Smart <jsmart2021@gmail.com>
+Subject: Re: [PATCH] nvme-fc: mask out blkcg_get_fc_appid() if
+ BLK_CGROUP_FC_APPID is not set
+Message-ID: <20220519145931.GA25382@lst.de>
+References: <20220519144555.22197-1-hare@suse.de> <84a7c290-5e75-3e24-0674-7b51dcafa2eb@kernel.dk> <0b33e180-9e23-f737-3c93-5b5b13a7ded2@suse.de> <be88c0b4-ddc6-c851-c160-a929adc1e433@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220519112450.zbje64mrh65pifnz@zlang-mailbox>
+In-Reply-To: <be88c0b4-ddc6-c851-c160-a929adc1e433@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 07:24:50PM +0800, Zorro Lang wrote:
-> Yes, we talked about this, but if I don't rememeber wrong, I recommended each
-> downstream testers maintain their own "testing data/config", likes exclude
-> list, failed ratio, known failures etc. I think they're not suitable to be
-> fixed in the mainline fstests.
+On Thu, May 19, 2022 at 08:57:53AM -0600, Jens Axboe wrote:
+> I'm assuming that commit is from the scsi tree? It's certainly not in
+> mine. So your commit message may be correct, but since it was sent to me,
+> I was assuming it's breakage from my tree. Which doesn't appear to be the
+> case, and I don't see any of the SCSI maintainers on the to/cc.
 
-This assumes a certain level of expertise, which is a barrier to entry.
-
-For someone who wants to check "Did my patch to filesystem Y that I have
-never touched before break anything?", having non-deterministic tests
-run by default is bad.
-
-As an example, run xfstests against jfs.  Hundreds of failures, including
-some very scary-looking assertion failures from the page allocator.
-They're (mostly) harmless in fact, just being a memory leak, but it
-makes xfstests useless for this scenario.
-
-Even for well-maintained filesystems like xfs which is regularly tested,
-I expect generic/270 and a few others to fail.  They just do, and they're
-not an indication that *I* broke anything.
-
-By all means, we want to keep tests around which have failures, but
-they need to be restricted to people who have a level of expertise and
-interest in fixing long-standing problems, not people who are looking
-for regressions.
+Yes, all this went in through the scsi tree.
