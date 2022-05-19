@@ -2,77 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FD21C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 13:36:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1357C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237692AbiESNgh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 09:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36014 "EHLO
+        id S233807AbiESOCH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 10:02:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229604AbiESNgf (ORCPT
+        with ESMTP id S240215AbiESOBq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 09:36:35 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F2634CD75
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 06:36:33 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso5322531pjg.0
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 06:36:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=/UPD8ZwuMs9z0E/L/pcyjiHnRKl0RiCwEg0dM50KlCQ=;
-        b=BaIRv+TBV5PyUUbeoDc4Lu3YKY/1YGngkOYMGIz1j24u4jviRLCYAoo6pDP5JBxv5F
-         DQAjjpJLAY4O5dhtZ5B1IFDUIeS9o0IQOmbJiPv82RKSVCrlQ2dtB8hG7lhq1LjojiYh
-         hM9enfC4/qJiB0tKncZ/NOsN5DWSJDRjnN9lWKXCFX4ctJ+xVnph2ad4JO64X/Znu7Bk
-         SCkIevVL8QQ71AXp+6KZCEUOofEls8jbQnxhA0Rbk0+OGVhv/+UW9cQqvtVQjGRCsVSG
-         vDYGVzYUMJ0KICFdyecJRZu+U5rGvn/8LvzUlJ9b3VBY0OmbCctIvIq8UuAuywPz8GKo
-         roNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/UPD8ZwuMs9z0E/L/pcyjiHnRKl0RiCwEg0dM50KlCQ=;
-        b=cTx61xEC+zCV6FPTH/qfCeR4AslN/U4Aj843qWKYdFtjkNvaO6QpT20ZkpjTVLlGtV
-         aLZT3WTydZFQm35wTNzsyX42aSuRXEfha5U2uAvOo7tnWbvcoaCJs1kuAnNp12YTBOCd
-         hmxNSvaG7xvEd+LeGOjFx/fhKdLxNCiq00AbzqLE1Ev43K1sC10kVlsg8QKPneLmm1tZ
-         2GDuWSBB5KH8xYCiw6hylOIBNHfsNXrtbnuHiHuexwk/WRqvQqZILD9S/EDTe/J27+en
-         fiwE62yBbRNY4utfmMdjVsW5PCuIUZeKRLjUsFebun+22SQJFCGPZ9/cXQFFxhoMebqE
-         bWbA==
-X-Gm-Message-State: AOAM530u8NWsBhUCL4ffulu8qfZedZ0zhmwOjh6GmJUr4k+jwbb54SwA
-        YMQJMEIuaV+k5X1mp6x4RPPnKELJrx8Yyg==
-X-Google-Smtp-Source: ABdhPJyMrejerSWIYyizZ4TikgtH95cnKIl6MEmMLJeuW1uZyWpRl9K1ZVGVQcXYptPVnsyPZRS48A==
-X-Received: by 2002:a17:902:ce8a:b0:161:af5e:a7b9 with SMTP id f10-20020a170902ce8a00b00161af5ea7b9mr4617438plg.167.1652967392691;
-        Thu, 19 May 2022 06:36:32 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id p40-20020a056a000a2800b0050dc76281ccsm569435pfh.166.2022.05.19.06.36.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 06:36:31 -0700 (PDT)
-Message-ID: <5acb0323-a895-d4d9-77ab-edace723074e@kernel.dk>
-Date:   Thu, 19 May 2022 07:36:30 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH] blk-cgroup: provide stubs for blkcg_get_fc_appid()
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>
+        Thu, 19 May 2022 10:01:46 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33564387A8;
+        Thu, 19 May 2022 07:00:29 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id B6C2321B99;
+        Thu, 19 May 2022 14:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1652968827; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=wTqudo5wQlyg1w3+A05CZWILaGIJg7yHzxFqv2JSStU=;
+        b=w0ZLWhiuwju9XubSFtRcoXD4yjVT0PCiZWtheVeQ6sChohmbUDMjp2n38K0KG2X1nQZKVD
+        zvrFl8hObz+qL8CXBedB816Y89rh+bjtoWkMqbmAjURCZvp7RdE5SbHtu6611E4ibJKrGF
+        FcgPCwkYQSKYcftBqhp4/ZIEFanLw/c=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1652968827;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=wTqudo5wQlyg1w3+A05CZWILaGIJg7yHzxFqv2JSStU=;
+        b=CnOTz4BqfGdcCNEc4CRKGEBskmazrBYgtn7hF32JXyw2Yw71UUalmExWQJvAaDmMJI1ueS
+        9peAxosgquldp6AQ==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id A982A2C141;
+        Thu, 19 May 2022 14:00:27 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+        id 9AD545194577; Thu, 19 May 2022 16:00:27 +0200 (CEST)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
 Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
-        linux-block@vger.kernel.org
-References: <20220519130207.6492-1-hare@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220519130207.6492-1-hare@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        linux-block@vger.kernel.org,
+        James Smart <james.smart@broadcom.com>,
+        linux-scsi@vger.kernel.org, Hannes Reinecke <hare@suse.de>
+Subject: [PATCH] blk-cgroup: provide stubs for blkcg_get_fc_appid()
+Date:   Thu, 19 May 2022 16:00:21 +0200
+Message-Id: <20220519140021.6905-1-hare@suse.de>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/22 7:02 AM, Hannes Reinecke wrote:
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
+Provide stubs for blkcg_set_fc_appid() and  blkcg_get_fc_appid() to allow
+for compilation with cgroups disabled.
 
-This needs both an actual commit message and a Fixes tag.
+Fixes: db05628435aa ("blk-cgroup: move blkcg_{get,set}_fc_appid out of line")
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ include/linux/blk-cgroup.h | 15 ++++++++++++---
+ 1 file changed, 12 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/blk-cgroup.h b/include/linux/blk-cgroup.h
+index 9f40dbc65f82..4756f4d2b8e7 100644
+--- a/include/linux/blk-cgroup.h
++++ b/include/linux/blk-cgroup.h
+@@ -33,6 +33,9 @@ void blkcg_unpin_online(struct cgroup_subsys_state *blkcg_css);
+ struct list_head *blkcg_get_cgwb_list(struct cgroup_subsys_state *css);
+ struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio);
+ 
++int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len);
++char *blkcg_get_fc_appid(struct bio *bio);
++
+ #else	/* CONFIG_BLK_CGROUP */
+ 
+ #define blkcg_root_css	((struct cgroup_subsys_state *)ERR_PTR(-EINVAL))
+@@ -44,9 +47,15 @@ static inline struct cgroup_subsys_state *bio_blkcg_css(struct bio *bio)
+ {
+ 	return NULL;
+ }
++static inline int blkcg_set_fc_appid(char *app_id, u64 cgrp_id,
++				     size_t app_id_len)
++{
++	return -EINVAL;
++}
++static inline char *blkcg_get_fc_appid(struct bio *bio)
++{
++	return NULL;
++}
+ #endif	/* CONFIG_BLK_CGROUP */
+ 
+-int blkcg_set_fc_appid(char *app_id, u64 cgrp_id, size_t app_id_len);
+-char *blkcg_get_fc_appid(struct bio *bio);
+-
+ #endif	/* _BLK_CGROUP_H */
 -- 
-Jens Axboe
+2.29.2
 
