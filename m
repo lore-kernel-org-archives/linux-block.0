@@ -2,137 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01150C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 06:36:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDEDDC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 06:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231849AbiESGgz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 02:36:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
+        id S229573AbiESGqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 02:46:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53644 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229829AbiESGgy (ORCPT
+        with ESMTP id S234101AbiESGqI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 02:36:54 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6472BE8;
-        Wed, 18 May 2022 23:36:53 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id k8so4109765qki.8;
-        Wed, 18 May 2022 23:36:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Z1OyebEqky4Oe0zwnP9eg21l4J+bevlDJ8+xqEADNNM=;
-        b=Z+ORlfWO/S1nKkRn+dn8DHEwJ5DYi8HR/X5RooNa6qUX/pd8EtZ9MzIV7hrefrVMWQ
-         9pNQQ8rfly1X5xcKMfWn5ojjOlA4R6JscLMZKdIQBYwkywg5lJQ7/72ZAZG2+bfpQwPn
-         FRRj9l/QNhQ3apC/Cd8hk8JjuGRjJ49yQKwgoPkPqztMvWyQWuBu9EcVqpxQ6kzfWmW6
-         BJNqyDBlEQSW+6SCNAqV1Pz2wgFJ9ZqZdGdrNwMf7vIYU7zxDbXzFFiWIjD2xbeczsLp
-         tqU+2ps2spTBx/YNuA+oG4ihNOLIzPO1CA1Ddxoj7U/JvGjq6r4Qcm6Oh4xIqXbqfAXi
-         2kqA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Z1OyebEqky4Oe0zwnP9eg21l4J+bevlDJ8+xqEADNNM=;
-        b=ItnVHnjM5p+akDY66fZG0t+qV5T6MDf6iTEsjfhOAgi/qk784mh/ykIacF/cfhasYD
-         X6N2mPYBiJjkwzBp4ZxCtjMy3Xzw5puC+i5+6wFlkA46pyppgCuxQgTShsZDedO703li
-         8shPNtJyZ8Yb3KgiBUMo/XoqQ+lkhbGJ1cUmFgQt5COm1Skw4EN7VfY/zB77ZIhw25M2
-         MQYqimdrbqZkqLJ55woLylzxVzN+IFQ+J3lbJ3oyee270HkS8hmXpbwmnmmQd/oAczol
-         Wx/U+kh9CIr7uiiQgLnceVE7PvdIJh5kdzZM0QX2Kh7jaOaj654Km36/iND99ocEdNNc
-         Vrig==
-X-Gm-Message-State: AOAM533V1NnVNDoNbpeI7mJUleDi3nbVoz9Ni94QdmSno97pEqPWObxx
-        QjEhrL3jyek+bD8IuWu3nTfY7I6Mu43rLnDSzXE=
-X-Google-Smtp-Source: ABdhPJw9M0Ywfk5vrY98XRwu85oOlt42KN+yVK4PM2g6rKV67xs7yIMXznAgkO7WMqoJo8E1DLshSDWFfjoc1H9UIHw=
-X-Received: by 2002:a05:620a:2909:b0:6a0:472b:a30d with SMTP id
- m9-20020a05620a290900b006a0472ba30dmr2129359qkp.258.1652942213030; Wed, 18
- May 2022 23:36:53 -0700 (PDT)
+        Thu, 19 May 2022 02:46:08 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CF0915802
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 23:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1652942765; x=1684478765;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=cqPMPg/YffdZHcCrnM3XKivoHpwnlB3DQsGm/ZDGisI=;
+  b=pnRSq1dM7T3eBZ+yiaPi+gMX6IxYI9jnXm9c0inbILJFbZDTR7HDDYpB
+   cCGD2zMXtm6rtMAK+QYwFwGc6FLthJFL773aWZ1vCKHwo1NQtWwzGFsS8
+   QIlujnI5wn8REJHPW1mvvuAiRkM3aOy6x2uei+Tk8ET9S+rUxI7vrpsbk
+   ubMCV7eG6mghd60zZcjYHaJmIdJoHQYRfDawHsITacwnRCVuu24fRMFiF
+   giTICB629n/cK8Kg5kFGuC9WOErredQM8Op5+n01BBjQt6FAkbiihr5Ko
+   mLTU2fzu+VRP7IMh/v4oHpiJ/7/De4tA1CyGYz2jDAdebmmMXcAno0WOz
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.91,236,1647273600"; 
+   d="scan'208";a="304981962"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 19 May 2022 14:45:59 +0800
+IronPort-SDR: +1FBmBFHhyMQPCyrpoHgZW07+55uxNl5IYZYFanwqHgKvbA+49gwucRjGZFQITqeysKhN0XWrP
+ ZHiyUIPdep6LNerCR0dgZ/Sdy4jGjESWmqEkHn+fQfxqFAAS++m/CMia6U/+9xYILjM81YnMlE
+ 782hXd25DclbbK59OJpJUoDcwgU9RNHT3sJivErXmy8DsRgwGXBeqJikdL6LIXw8f/nY1nco6m
+ MQNJxY4E9CjEkgpf1kikrvWmBy1SpQH+Gp9MG9sxbKwvvElQ8GtDwwZ5EHvf6yE3Jj5qobgm+g
+ Uqzmrg6/wLmEYGaSeX0P7SI7
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 May 2022 23:11:24 -0700
+IronPort-SDR: L//G76HdM3OLqhnrAm+uPiI8fTi9xS7iAHKSw9yvo7Zpi/g6/K6s7VIC8lXnEhpcY5OPGK24WT
+ 3i6ffhVKoGYLyBAxpzkvw7sX9q8H03bGuCqgdfv2lwk6j9+t0o6ydxGLEEA6cGmgkf7frilbxE
+ XTvIWSNIGEw0481+mfjwag4GCJGi4XH99I1+SU+clIIj9UBaLFcdHIBnOW7aiJVCGAxWzrgGt1
+ CFi/wG5escx09PQADeDTMHlrZUaDTXWaAjhRPpo6rB/CrOUBcGeA5Iw3UV4pU2FNLus/ngL9OR
+ bIE=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 May 2022 23:46:00 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L3gNl2SQ1z1SVp3
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 23:45:59 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1652942758; x=1655534759; bh=cqPMPg/YffdZHcCrnM3XKivoHpwnlB3DQsG
+        m/ZDGisI=; b=H2A8vDR1hn+U2YAW61OKPa7ido07LtclbMZI468okOV/RbXWPTh
+        o032LhvSNFNCTH02sTgX4vtrIT5VvHrQzZL9fDScL7339i8nOr6U5h7qNfyW+VBo
+        9Kv8K30k78V1m87g637oYh39Ue1VxQYsx0NsOVj5cavAae3enXHEUKMUMPNpQNep
+        70U53xETn9VC+edj4T4qCpYzeF9tgiv5vPimcOcbCvnVM1pxINQhNRcrVeN/pkch
+        fJJ2KS1dkAveymSqASofPwtzNoI6MR12/eS5WMUGW+cVlNsQrvaWO129DflliQcc
+        HteqKEyBIzqlDKmzO8vIhni91VSFRZqDOhg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 77ZCJWPLb3Cx for <linux-block@vger.kernel.org>;
+        Wed, 18 May 2022 23:45:58 -0700 (PDT)
+Received: from [10.225.54.48] (unknown [10.225.54.48])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L3gNj0Hhzz1Rvlc;
+        Wed, 18 May 2022 23:45:56 -0700 (PDT)
+Message-ID: <283d37e8-868a-990b-e953-4b7bb940135c@opensource.wdc.com>
+Date:   Thu, 19 May 2022 08:45:55 +0200
 MIME-Version: 1.0
-References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
-In-Reply-To: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
-From:   Amir Goldstein <amir73il@gmail.com>
-Date:   Thu, 19 May 2022 09:36:41 +0300
-Message-ID: <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
-Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for expunges
-To:     Luis Chamberlain <mcgrof@kernel.org>
-Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
-        Theodore Tso <tytso@mit.edu>,
-        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
-        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
-        Zorro Lang <zlang@redhat.com>,
-        fstests <fstests@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
+Content-Language: en-US
+To:     Keith Busch <kbusch@kernel.org>, Eric Biggers <ebiggers@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org
+References: <20220518171131.3525293-1-kbusch@fb.com>
+ <20220518171131.3525293-4-kbusch@fb.com> <YoWL+T8JiIO5Ln3h@sol.localdomain>
+ <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
+ <YoWjBxmKDQC1mCIz@sol.localdomain>
+ <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
+ <YoWmi0mvoIk3CfQN@sol.localdomain>
+ <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
+ <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
+ <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[adding fstests and Zorro]
+On 2022/05/19 6:56, Keith Busch wrote:
+> On Wed, May 18, 2022 at 08:27:31PM -0700, Eric Biggers wrote:
+>>
+>> So the bio ends up with a total length that is a multiple of the logical block
+>> size, but the lengths of the individual bvecs in the bio are *not* necessarily
+>> multiples of the logical block size.  That's the problem.
+> 
+> I'm surely missing something here. I know the bvecs are not necessarily lbs
+> aligned, but why does that matter? Is there some driver that can only take
+> exactly 1 bvec, but allows it to be unaligned? If so, we could take the segment
+> queue limit into account, but I am not sure that we need to.
 
-On Thu, May 19, 2022 at 6:07 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
->
-> I've been promoting the idea that running fstests once is nice,
-> but things get interesting if you try to run fstests multiple
-> times until a failure is found. It turns out at least kdevops has
-> found tests which fail with a failure rate of typically 1/2 to
-> 1/30 average failure rate. That is 1/2 means a failure can happen
-> 50% of the time, whereas 1/30 means it takes 30 runs to find the
-> failure.
->
-> I have tried my best to annotate failure rates when I know what
-> they might be on the test expunge list, as an example:
->
-> workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
->
-> The term "failure rate 1/15" is 16 characters long, so I'd like
-> to propose to standardize a way to represent this. How about
->
-> generic/530 # F:1/15
->
+For direct IO, the first bvec will always be aligned to a logical block size.
+See __blkdev_direct_IO() and __blkdev_direct_IO_simple():
 
-I am not fond of the 1/15 annotation at all, because the only fact that you
-are able to document is that the test failed after 15 runs.
-Suggesting that this means failure rate of 1/15 is a very big step.
+        if ((pos | iov_iter_alignment(iter)) &
+            (bdev_logical_block_size(bdev) - 1))
+                return -EINVAL;
 
-> Then we could extend the definition. F being current estimate, and this
-> can be just how long it took to find the first failure. A more valuable
-> figure would be failure rate avarage, so running the test multiple
-> times, say 10, to see what the failure rate is and then averaging the
-> failure out. So this could be a more accurate representation. For this
-> how about:
->
-> generic/530 # FA:1/15
->
-> This would mean on average there failure rate has been found to be about
-> 1/15, and this was determined based on 10 runs.
->
-> We should also go extend check for fstests/blktests to run a test
-> until a failure is found and report back the number of successes.
->
-> Thoughts?
->
+And given that, all bvecs should also be LBA aligned since the LBA size is
+always a divisor of the page size. Since splitting is always done on an LBA
+boundary, I do not see how we can ever get bvecs that are not LBA aligned.
+Or I am missing something too...
 
-I have had a discussion about those tests with Zorro.
+>  
+>> Note, there's also lots of code that assumes that bio_vec::bv_len is a multiple
+>> of 512.  
+> 
+> Could you point me to some examples?
+> 
+>> That was implied by it being a multiple of the logical block size.  But
+>> the DMA alignment can be much lower, like 8 bytes (see nvme_set_queue_limits()).
+> 
+> That's the driver this was tested on, though I just changed it to 4 bytes for
+> 5.19.
 
-Those tests that some people refer to as "flaky" are valuable,
-but they are not deterministic, they are stochastic.
 
-I think MTBF is the standard way to describe reliability
-of such tests, but I am having a hard time imagining how
-the community can manage to document accurate annotations
-of this sort, so I would stick with documenting the facts
-(i.e. the test fails after N runs).
-
-OTOH, we do have deterministic tests, maybe even the majority of
-fstests are deterministic(?)
-
-Considering that every auto test loop takes ~2 hours on our rig and that
-I have been running over 100 loops over the past two weeks, if half
-of fstests are deterministic, that is a lot of wait time and a lot of carbon
-emission gone to waste.
-
-It would have been nice if I was able to exclude a "deterministic" group.
-The problem is - can a developer ever tag a test as being "deterministic"?
-
-Thanks,
-Amir.
+-- 
+Damien Le Moal
+Western Digital Research
