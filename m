@@ -2,111 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BC05C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 03:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7F3AC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 03:07:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230035AbiESDB0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 23:01:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35430 "EHLO
+        id S229952AbiESDHX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 23:07:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50246 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbiESDBZ (ORCPT
+        with ESMTP id S231875AbiESDHW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 23:01:25 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8825F25286;
-        Wed, 18 May 2022 20:01:22 -0700 (PDT)
-Received: from kwepemi100015.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L3ZNr3Q4TzhZDS;
-        Thu, 19 May 2022 11:00:44 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100015.china.huawei.com (7.221.188.125) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 11:01:20 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 11:01:20 +0800
-Subject: Re: [PATCH -next v2 2/2] blk-throttle: fix io hung due to
- configuration updates
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     kernel test robot <lkp@intel.com>, <tj@kernel.org>,
-        <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <kbuild-all@lists.01.org>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220518072751.1188163-3-yukuai3@huawei.com>
- <202205182347.tMOOqyfL-lkp@intel.com>
- <84fe296e-6e56-3ca9-73a8-357beb675c6e@huawei.com>
-Message-ID: <3d6878f4-1902-633d-0af2-276831364a4f@huawei.com>
-Date:   Thu, 19 May 2022 11:01:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 18 May 2022 23:07:22 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D08FD410B;
+        Wed, 18 May 2022 20:07:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
+        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=ucU2ycwR/3vbing5KlGnmp6Xzs7PQTT5XGfqvZ+d7l4=; b=1Sh30bhcNyvFY5B5eD1Ueq4AHQ
+        IzEfAlCFMNRbh0FijzOilVJEwAhL8JUxcnYiO3MxsM8PhEt0KXNWGObbiaSW6DQ7I5Fb0+ddDDHsD
+        3z3wx5TJWw79GtBq7nX72xPPWe2zjkXEAsG7gkgIy7w1ajqlnRDwAUlcZD+fM0VzUeyZJ7Sj1eRom
+        KtD7haft5MShpQhmEGSDIgwUf4bQYySXhneRj67Sv+AAcLBppX0fjHXEFBnxAa6JTNcL9xO599FBC
+        6p02EVZXfjaacXcDECWV3rRYhV2+dU9JoU9SCjlCiq94EzwSBYMuRwPwu7IAAG8iPxUgwU/T+Sq54
+        2O6ZZ26g==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nrWVQ-004lFn-Bo; Thu, 19 May 2022 03:07:16 +0000
+Date:   Wed, 18 May 2022 20:07:16 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org
+Cc:     amir73il@gmail.com, pankydev8@gmail.com, tytso@mit.edu,
+        josef@toxicpanda.com, jmeneghi@redhat.com, Jan Kara <jack@suse.cz>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>
+Subject: [RFC: kdevops] Standardizing on failure rate nomenclature for
+ expunges
+Message-ID: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
 MIME-Version: 1.0
-In-Reply-To: <84fe296e-6e56-3ca9-73a8-357beb675c6e@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/19 10:11, yukuai (C) 写道:
-> 
-> 
-> 在 2022/05/18 23:52, kernel test robot 写道:
->> Hi Yu,
->>
->> Thank you for the patch! Yet something to improve:
->>
->> [auto build test ERROR on next-20220517]
->>
->> url:    
->> https://github.com/intel-lab-lkp/linux/commits/Yu-Kuai/bugfix-for-blk-throttle/20220518-151713 
->>
->> base:    47c1c54d1bcd0a69a56b49473bc20f17b70e5242
->> config: m68k-allyesconfig 
->> (https://download.01.org/0day-ci/archive/20220518/202205182347.tMOOqyfL-lkp@intel.com/config) 
->>
->> compiler: m68k-linux-gcc (GCC) 11.3.0
->> reproduce (this is a W=1 build):
->>          wget 
->> https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross 
->> -O ~/bin/make.cross
->>          chmod +x ~/bin/make.cross
->>          # 
->> https://github.com/intel-lab-lkp/linux/commit/f8345dbaf4ed491742aab29834aff66b4930c087 
->>
->>          git remote add linux-review 
->> https://github.com/intel-lab-lkp/linux
->>          git fetch --no-tags linux-review 
->> Yu-Kuai/bugfix-for-blk-throttle/20220518-151713
->>          git checkout f8345dbaf4ed491742aab29834aff66b4930c087
->>          # save the config file
->>          mkdir build_dir && cp config build_dir/.config
->>          COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 
->> make.cross W=1 O=build_dir ARCH=m68k SHELL=/bin/bash
->>
->> If you fix the issue, kindly add following tag as appropriate
->> Reported-by: kernel test robot <lkp@intel.com>
->>
->> All errors (new ones prefixed by >>):
->>
->>     m68k-linux-ld: block/blk-throttle.o: in function `tg_conf_updated':
->>>> blk-throttle.c:(.text+0x25bc): undefined reference to `__udivdi3'
->>>> m68k-linux-ld: blk-throttle.c:(.text+0x2626): undefined reference to 
->>>> `__udivdi3'
-> Hi,
-> 
-> I'm confused here, the only place that I can relate to this:
-> 
->      return dispatched * new_limit / old_limit;
-> 
-I understand it now. I'm doing (u64 / u64), I should use div64_u64
-> However, I don't understand yet why this is problematic...
->>     `.exit.text' referenced in section `.data' of 
->> sound/soc/codecs/tlv320adc3xxx.o: defined in discarded section 
->> `.exit.text' of sound/soc/codecs/tlv320adc3xxx.o
->>
+I've been promoting the idea that running fstests once is nice,
+but things get interesting if you try to run fstests multiple
+times until a failure is found. It turns out at least kdevops has
+found tests which fail with a failure rate of typically 1/2 to
+1/30 average failure rate. That is 1/2 means a failure can happen
+50% of the time, whereas 1/30 means it takes 30 runs to find the
+failure.
+
+I have tried my best to annotate failure rates when I know what
+they might be on the test expunge list, as an example:
+
+workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+
+The term "failure rate 1/15" is 16 characters long, so I'd like
+to propose to standardize a way to represent this. How about
+
+generic/530 # F:1/15
+
+Then we could extend the definition. F being current estimate, and this
+can be just how long it took to find the first failure. A more valuable
+figure would be failure rate avarage, so running the test multiple
+times, say 10, to see what the failure rate is and then averaging the
+failure out. So this could be a more accurate representation. For this
+how about:
+
+generic/530 # FA:1/15
+
+This would mean on average there failure rate has been found to be about
+1/15, and this was determined based on 10 runs.
+
+We should also go extend check for fstests/blktests to run a test
+until a failure is found and report back the number of successes.
+
+Thoughts?
+
+Note: yes failure rates lower than 1/100 do exist but they are rare
+creatures. I love them though as my experience shows so far that they
+uncover hidden bones in the closet, and they they make take months and
+a lot of eyeballs to resolve.
+
+  Luis
