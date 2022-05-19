@@ -2,100 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3A5AC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F243C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:52:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232181AbiESMqN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 08:46:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44806 "EHLO
+        id S238184AbiESMwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 08:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32774 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229667AbiESMqM (ORCPT
+        with ESMTP id S237082AbiESMwz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 08:46:12 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 356AD3669D
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:46:11 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d22so4674369plr.9
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:46:11 -0700 (PDT)
+        Thu, 19 May 2022 08:52:55 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1D845EBD2
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:52:54 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 31so4965266pgp.8
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:52:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=2ZWlEemDZrTKXDOdy25O0sTye2+vppjZ+Zvhbx0G8CM=;
-        b=jVaMTqh/9vGO8AgRz8vjEUjwMNXjzZNqAS+wPzoNXDZEQQYtcCDzwDz0NxrfteeFi6
-         ZM0YG+Q+FJ13HQBu7KYxMg/sHny/5mlDR52MaKdeONgI01nUdYlTZVcdtIIXnIukS4Ps
-         hfJxUxLRJtFbXmVaPv3X9hewE3EfstAYunBR72XrpxZbMYxF1RIZSVFyzQB64PCFrvIU
-         m4UVZyB0WkjdPcXUZ8jLRQzAAH8BK4R/NZJGJrFC4+XVHnz9jIhniF399MPl/roWOhwR
-         5LbJRuCstBRehBfuKUaaMhjQEatsbYQHEwOvuvN62sSyoP8DmqYqZlJoGtCUWjUuVMd5
-         /wNQ==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=XBvJMrl14EnC34WYBVBw35o7wIoCcHMgKelu8t+rPK4=;
+        b=QcmoNqpX1VO9kAs3ivBI15PfPUrgIwce04JLhOsVqAD7YVEdH2mSpYmYshlfgg9tTR
+         i9N493MYyx5kSNoYMRadJGGqI30ivQdOhf1aWzq2/Z0Qc1iU5Xw+B0eS1fDtqJJfAyF/
+         7F/VnNXK2aKX4XbYIZwVBrcQb8u5FmOdt74xcZGbAPo46eAFMRj3GzHa/r6bpTachOOj
+         S8qxZebT82hCvmpYru774OKbsZkXTQFAvNciw3wF6tvR1Z9pB0iojsA75MPnU8n1ibBT
+         +VxijKfFGafrv5U2JxTJNNx4trI5auSmblBUNijMFahGQ2GzqKmV1EfW4T8oT4J2RyUQ
+         rhHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=2ZWlEemDZrTKXDOdy25O0sTye2+vppjZ+Zvhbx0G8CM=;
-        b=AKI2VAxcaVM9CYI7QPGLkn37tICaxrsXmyL602VfC8Z4EuQVRwwskFyloYWzwT5lBb
-         qzL2YpE1SmhqpA+OhiAZl4YSSm3NkFjLMZ+3g2G/60JL/BBiBU4hng2qDhnoBZiOL4Y/
-         UdVhwpHi1GCcHZikcKWYFqXBvos3aSS80207YkcjPkU7w8bItGWSXyaLzQ3U4xRiooOW
-         8t6Vyrus+bGVAc80rclhmX+OdkWcAqxdvUtpbuJJFr/Fy6xPHmQH0H7oPna/kcKHCDiX
-         NtQpQr7tnK7UI/BScmSlkRbAiJF+b5IVABZW9xOaL3Nk/A6cjzNjK/wX8/Bq9hr+4afL
-         pO/w==
-X-Gm-Message-State: AOAM531DomtVoINGy2sqySxpUkl7gsq4IcKRTBK9TrzlBFzWgj1n2jOO
-        eVioTNdGFDi0I2K3RngORF2+zg==
-X-Google-Smtp-Source: ABdhPJzeF1qWqkRiWbULZci50AO29+Nb/8GtFi7I5tFhGULXNKR0KIOSxrWV8X415nx1dqKWrSau0Q==
-X-Received: by 2002:a17:90b:388f:b0:1dc:6e0f:372b with SMTP id mu15-20020a17090b388f00b001dc6e0f372bmr4969307pjb.93.1652964370610;
-        Thu, 19 May 2022 05:46:10 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id p17-20020a63e651000000b003f5e19c047dsm3456890pgj.37.2022.05.19.05.46.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 05:46:10 -0700 (PDT)
-Message-ID: <92ee257f-c19f-adee-7bd2-409546b95d47@kernel.dk>
-Date:   Thu, 19 May 2022 06:46:08 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCHv2 0/3] direct io alignment relax
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, Kernel Team <Kernel-team@fb.com>,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        Keith Busch <kbusch@kernel.org>
-References: <20220518171131.3525293-1-kbusch@fb.com>
- <dc8e7b85-fba1-b45e-231e-9c8054aea505@kernel.dk>
- <20220519074225.GH22301@lst.de>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=XBvJMrl14EnC34WYBVBw35o7wIoCcHMgKelu8t+rPK4=;
+        b=uGo7sTszN7HLaCahd+G/hYYzGtEePY8sMtHkDeC7I/BEQYuauaSD4BefLM2TI/m4se
+         iv3hsdNLm5XyNp1OiijPlY6BX4ZtP7XvrEFRDzGbK3efrPoiOpBGZr8sgi274uLIIExS
+         A/cVrqvxLk+PavENPEFJWPFi2Lg2dm+hmach5rE38GQgZz+7grpizjB/7inDQEglDXfD
+         m850ql8fYmo3QVkdkcR49lJIb+pvo9swh91RO6zatvPPa9KVjRojAI1nw8K7jugzVUhD
+         e8F+TH5Cb1QPMhkYkP1VlT2IKWvl4Cv83O0Z4g2GkDW+xdCp0sVevm2kunqwVFJ7WhbG
+         CvnQ==
+X-Gm-Message-State: AOAM530BO7DbubgOSplRFWsJPetSjNcXhD/elKAazhQ8/QYu3ZYCByKT
+        93sJMOs4j59b9MvntOYvrrZG0Q==
+X-Google-Smtp-Source: ABdhPJwHmZPlAM7IpzSh9YZsTPk0t6DVSZIqFFAGrjeRLl1aROMXGBClqrSJ1yX4gW190vyNF+amJg==
+X-Received: by 2002:a05:6a00:1891:b0:50d:e6e7:acae with SMTP id x17-20020a056a00189100b0050de6e7acaemr4647371pfh.26.1652964774074;
+        Thu, 19 May 2022 05:52:54 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id f13-20020a631f0d000000b003c6cb43a9aesm3489136pgf.41.2022.05.19.05.52.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 May 2022 05:52:53 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220519074225.GH22301@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     paolo.valente@linaro.org, jack@suse.cz
+Cc:     linux-block@vger.kernel.org
+In-Reply-To: <20220519104621.15456-1-jack@suse.cz>
+References: <20220519104621.15456-1-jack@suse.cz>
+Subject: Re: [PATCH 0/4] bfq: Improve waker detection
+Message-Id: <165296477295.22920.8265546871543348179.b4-ty@kernel.dk>
+Date:   Thu, 19 May 2022 06:52:52 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/22 1:42 AM, Christoph Hellwig wrote:
-> On Wed, May 18, 2022 at 04:45:10PM -0600, Jens Axboe wrote:
->> On 5/18/22 11:11 AM, Keith Busch wrote:
->>> From: Keith Busch <kbusch@kernel.org>
->>>
->>> Including the fs list this time.
->>>
->>> I am still working on a better interface to report the dio alignment to
->>> an application. The most recent suggestion of using statx is proving to
->>> be less straight forward than I thought, but I don't want to hold this
->>> series up for that.
->>
->> This looks good to me. Anyone object to queueing this one up?
+On Thu, 19 May 2022 12:52:28 +0200, Jan Kara wrote:
+> this patch series restores regression in dbench for large number of processes
+> that was introduced by c65e6fd460b4 ("bfq: Do not let waker requests skip
+> proper accounting"). The detailed explanation is in the first patch but the
+> culprit in the end was that with large number of dbench clients it often
+> happened that flush worker bfqq replaced jbd2 bfqq as a waker of the bfqq
+> shared by dbench clients and that resulted in lot of idling and reduced
+> throughput.
 > 
-> Yes.  I really do like this feature, but I don't think it is ready to
-> rush it in.  In addition to the ongoing discussions in this thread
-> we absolutely need proper statx support for the alignments to avoid
-> userspace growing all kinds of sysfs growling crap to make use of it.
+> [...]
 
-OK fair enough, I do agree that we need a better story for exposing this
-data, and in fact for a whole bunch of other stuff that is currently
-hard to get programatically. We can defer to 5.20 and get the statx side
-hashed out at the same time.
+Applied, thanks!
 
+[1/4] bfq: Relax waker detection for shared queues
+      commit: f950667356ce90a41b446b726d4595a10cb65415
+[2/4] bfq: Allow current waker to defend against a tentative one
+      commit: c5ac56bb6110e42e79d3106866658376b2e48ab9
+[3/4] bfq: Remove superfluous conversion from RQ_BIC()
+      commit: e79cf8892e332b9dafc99aef02189a2897eced24
+[4/4] bfq: Remove bfq_requeue_request_body()
+      commit: a249ca7dfbce1eb82bcd3a5a6bb21daeade20469
+
+Best regards,
 -- 
 Jens Axboe
+
 
