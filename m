@@ -2,210 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A260C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 390B2C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:20:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231191AbiESOTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 10:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45380 "EHLO
+        id S236242AbiESOUp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 10:20:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239275AbiESOTq (ORCPT
+        with ESMTP id S231272AbiESOUo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 10:19:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A124B225F;
-        Thu, 19 May 2022 07:19:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 19 May 2022 10:20:44 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F307338;
+        Thu, 19 May 2022 07:20:43 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 6FADFB824AB;
-        Thu, 19 May 2022 14:19:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C0BEC385AA;
-        Thu, 19 May 2022 14:19:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652969979;
-        bh=AjcVgLoqYhR+OmjDZ/KC9hQplvQiRocHLy3+qkbQDfk=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=QdjVjQPnxxFIK55MMaaGa6M3zks5qKVGEKHVtrlY48UpoWbJgGNfj8egsjgeu8Rzc
-         0fvtF2YcNKanPs1pljIo6gxkvbjA+c/Bq26Gswomfq+2Sixs0DlN1eXxzlSA0rnfiW
-         cGzyA3p51UdS43U9GMsq9dV9QyRS5DdXhnENVXVLujguvvBYy+AvySLDaA69q7bEzr
-         6c7BXWqU8uQTg6v+WyJAFRSF9x2x8ptKkOwkA0gmbO3+B84qyJS1iu0p/MMZLLgOdw
-         3OrRTCMvcAOQopjnQMZ7SaeSvEeCVf7ojsW8UlVKMNDI4FW5nt1QWRgB4gh9FwTsJ4
-         IUdaJH0Cxe4lQ==
-Date:   Thu, 19 May 2022 08:19:35 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, bvanassche@acm.org,
-        damien.lemoal@opensource.wdc.com
-Subject: Re: [PATCHv2 1/3] block/bio: remove duplicate append pages code
-Message-ID: <YoZR9zJl/o0XgQtN@kbusch-mbp>
-References: <20220518171131.3525293-1-kbusch@fb.com>
- <20220518171131.3525293-2-kbusch@fb.com>
- <20220519073256.GC22301@lst.de>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 5C20121BB6;
+        Thu, 19 May 2022 14:20:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1652970042; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4mcQiV4AE4z0aWeh0xQx7UaAAQat/Av8+Bd9PwkDtEE=;
+        b=uaTBbOXseXBJUTecWEGUswddvUyaVyafVSInsJ5dYou/zvRWNPTFPOHWnLQCLNMTqmjR/a
+        b4hSZ0JkUCaAX1tpC6cTF3JGr/bXqkkX0+mk3EXXEPIfgZ6/1VDXCnUG4rq20UMaUtnvyv
+        zeD0vmX0418OvRu09g2xGPdU5F5YsTU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1652970042;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=4mcQiV4AE4z0aWeh0xQx7UaAAQat/Av8+Bd9PwkDtEE=;
+        b=WqbVpNO+UEIUyEA853LeZyxXVYvq25b+XYLocKP12GIB9ZPYFOJWI85aamFtQhW841yPe1
+        6zfJ+hMq4BqRk0Dg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3496A13456;
+        Thu, 19 May 2022 14:20:42 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id EJbSCzpShmIsQwAAMHmgww
+        (envelope-from <hare@suse.de>); Thu, 19 May 2022 14:20:42 +0000
+Message-ID: <b34a5081-dcb5-dd33-46f4-283e9d31fc0f@suse.de>
+Date:   Thu, 19 May 2022 16:20:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220519073256.GC22301@lst.de>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [PATCH] blk-cgroup: provide stubs for blkcg_get_fc_appid()
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Keith Busch <kbusch@kernel.org>,
+        linux-block@vger.kernel.org,
+        James Smart <james.smart@broadcom.com>,
+        linux-scsi@vger.kernel.org
+References: <20220519140021.6905-1-hare@suse.de>
+ <20220519140816.GA21378@lst.de>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <20220519140816.GA21378@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 09:32:56AM +0200, Christoph Hellwig wrote:
-> On Wed, May 18, 2022 at 10:11:29AM -0700, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > The setup for getting pages are identical for zone append and normal IO.
-> > Use common code for each.
+On 5/19/22 07:08, Christoph Hellwig wrote:
+> On Thu, May 19, 2022 at 04:00:21PM +0200, Hannes Reinecke wrote:
+>> Provide stubs for blkcg_set_fc_appid() and  blkcg_get_fc_appid() to allow
+>> for compilation with cgroups disabled.
+>>
+>> Fixes: db05628435aa ("blk-cgroup: move blkcg_{get,set}_fc_appid out of line")
+>> Signed-off-by: Hannes Reinecke <hare@suse.de>
 > 
-> How about using even more common code and avoiding churn at the same
-> time?  Something like:
+> No, it does not fix that commit, which is perfectly fine.  It fixes
+> the recently added second caller of blkcg_get_fc_appid, and James
+> has just resent a new version of that which fixes this properly.
 
-Yes, I'll fold this in.
- 
-> diff --git a/block/bio.c b/block/bio.c
-> index a3893d80dccc9..15da722ed26d1 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -1158,6 +1158,37 @@ static void bio_put_pages(struct page **pages, size_t size, size_t off)
->  		put_page(pages[i]);
->  }
->  
-> +static int bio_iov_add_page(struct bio *bio, struct page *page,
-> +		unsigned int len, unsigned int offset)
-> +{
-> +	bool same_page = false;
-> +
-> +	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-> +		if (WARN_ON_ONCE(bio_full(bio, len)))
-> +			return -EINVAL;
-> +		__bio_add_page(bio, page, len, offset);
-> +		return 0;
-> +	}
-> +
-> +	if (same_page)
-> +		put_page(page);
-> +	return 0;
-> +}
-> +
-> +static int bio_iov_add_zone_append_page(struct bio *bio, struct page *page,
-> +		unsigned int len, unsigned int offset)
-> +{
-> +	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-> +	bool same_page = false;
-> +
-> +	if (bio_add_hw_page(q, bio, page, len, offset,
-> +			queue_max_zone_append_sectors(q), &same_page) != len)
-> +		return -EINVAL;
-> +	if (same_page)
-> +		put_page(page);
-> +	return 0;
-> +}
-> +
->  #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct page *))
->  
->  /**
-> @@ -1176,7 +1207,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
->  	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
->  	struct page **pages = (struct page **)bv;
-> -	bool same_page = false;
->  	ssize_t size, left;
->  	unsigned len, i;
->  	size_t offset;
-> @@ -1195,18 +1225,18 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  
->  	for (left = size, i = 0; left > 0; left -= len, i++) {
->  		struct page *page = pages[i];
-> +		int ret;
->  
->  		len = min_t(size_t, PAGE_SIZE - offset, left);
-> +		if (bio_op(bio) == REQ_OP_ZONE_APPEND)	
-> +			ret = bio_iov_add_zone_append_page(bio, page, len,
-> +					offset);
-> +		else
-> +			ret = bio_iov_add_page(bio, page, len, offset);
->  
-> -		if (__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-> -			if (same_page)
-> -				put_page(page);
-> -		} else {
-> -			if (WARN_ON_ONCE(bio_full(bio, len))) {
-> -				bio_put_pages(pages + i, left, offset);
-> -				return -EINVAL;
-> -			}
-> -			__bio_add_page(bio, page, len, offset);
-> +		if (ret) {
-> +			bio_put_pages(pages + i, left, offset);
-> +			return ret;
->  		}
->  		offset = 0;
->  	}
-> @@ -1215,54 +1245,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	return 0;
->  }
->  
-> -static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
-> -{
-> -	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
-> -	unsigned short entries_left = bio->bi_max_vecs - bio->bi_vcnt;
-> -	struct request_queue *q = bdev_get_queue(bio->bi_bdev);
-> -	unsigned int max_append_sectors = queue_max_zone_append_sectors(q);
-> -	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
-> -	struct page **pages = (struct page **)bv;
-> -	ssize_t size, left;
-> -	unsigned len, i;
-> -	size_t offset;
-> -	int ret = 0;
-> -
-> -	if (WARN_ON_ONCE(!max_append_sectors))
-> -		return 0;
-> -
-> -	/*
-> -	 * Move page array up in the allocated memory for the bio vecs as far as
-> -	 * possible so that we can start filling biovecs from the beginning
-> -	 * without overwriting the temporary page array.
-> -	 */
-> -	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
-> -	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
-> -
-> -	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-> -	if (unlikely(size <= 0))
-> -		return size ? size : -EFAULT;
-> -
-> -	for (left = size, i = 0; left > 0; left -= len, i++) {
-> -		struct page *page = pages[i];
-> -		bool same_page = false;
-> -
-> -		len = min_t(size_t, PAGE_SIZE - offset, left);
-> -		if (bio_add_hw_page(q, bio, page, len, offset,
-> -				max_append_sectors, &same_page) != len) {
-> -			bio_put_pages(pages + i, left, offset);
-> -			ret = -EINVAL;
-> -			break;
-> -		}
-> -		if (same_page)
-> -			put_page(page);
-> -		offset = 0;
-> -	}
-> -
-> -	iov_iter_advance(iter, size - left);
-> -	return ret;
-> -}
-> -
->  /**
->   * bio_iov_iter_get_pages - add user or kernel pages to a bio
->   * @bio: bio to add pages to
-> @@ -1297,10 +1279,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
->  	}
->  
->  	do {
-> -		if (bio_op(bio) == REQ_OP_ZONE_APPEND)
-> -			ret = __bio_iov_append_get_pages(bio, iter);
-> -		else
-> -			ret = __bio_iov_iter_get_pages(bio, iter);
-> +		ret = __bio_iov_iter_get_pages(bio, iter);
->  	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
->  
->  	/* don't account direct I/O as memory stall */
+Really? blk-cgroup.h provides the function declaration
+blkcg_get_fc_appid() unconditionally, but the implementation
+for blkcg_get_fc_appid() depends on CONFIG_CGROUP.
+Neither of which is changed by James patchset.
+
+And besides, the first version is already merged.
+
+Am I missing something?
+
+Cheers,
+
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
