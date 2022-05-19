@@ -2,92 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D014C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:14:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB061C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 12:14:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237779AbiESMO0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 08:14:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40298 "EHLO
+        id S237802AbiESMOi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 08:14:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237805AbiESMOV (ORCPT
+        with ESMTP id S237851AbiESMOe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 08:14:21 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2B5EB8BF2
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:14:20 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso5111926pjg.0
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 05:14:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=J/AZdo3YK6FsmMYvPOANnKaQrNFnw7qbb6vl5sarRlE=;
-        b=p27yU6tdtyX4ZiycgPNJ1iNvzRs1b87/Voz0GLihHtppsn0VQ3J005iotBD+d8vcfc
-         pSl70SwV2zgj2wW1XGGR3wzVPV7Ted5GdEV4zVKBunzNd7u8sjyc1eF/FWWXPgUxIwIf
-         rp0p9c8opyZr+BSNShaf8iK1fu1Cbe4GNVcGr4uk4VJx3YUoRhpv0RT1/T/lPz5S7v4J
-         A75Bhgl5CyQT7JAgoVP2i1Z78/9hWaX9YUb5WeKxD0xv9+85PAj0cNWCP3s0G31qjmJ6
-         8diBYNnWVIkLmLoJXFzKa8Ez8S2M3Cog4RKVqWXlcK5ghGu7VAX+O5HJqzjgeyXisdvo
-         GKyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=J/AZdo3YK6FsmMYvPOANnKaQrNFnw7qbb6vl5sarRlE=;
-        b=RJQeNB52I+TtuiGYfQod/BUDQ4ChK6+fthmOI2h4xyHFaGLcJrwEqtmCcfXcf8LgJ0
-         FoGQG4qVTxM3DEHnVGNHTjk5vx5Gc10fdf+eZ/oPYQv/aadRH+ptJRP+rL2a+TR47Fik
-         Rmc8w8786sP8/x6O2Ev/44hy3LWwwqmbRit18aN6zvnRUTdXYtwOUYWVz0SAJPrlHzZA
-         WLhaLL2SszLyCv51g3LfVRGsxT4GNUdxt7UdikGgspzLkApaq/KNnFjSiBzO1yS4wc0r
-         N9IxyfneedR73b9aVTTkxufEI9BuJCD+bcUuLhrJD7mnqJmS79wdi/158WcuqugQePA9
-         m3EA==
-X-Gm-Message-State: AOAM532tKFHd+O1TmqUT/N8RtJJXAuGjBU0+icmE7cHXXwHTRxXFF6DB
-        cj3NEC51XE4HRDJ3Nky/dXPbNw==
-X-Google-Smtp-Source: ABdhPJw2DRKb0mxn4KqbWP/jQzIrlt0CfwCkmk5n6p40P9UnKG1Hxulsj0NJK/Dq6iFqITKjk7qNMQ==
-X-Received: by 2002:a17:90a:de02:b0:1df:3f94:811c with SMTP id m2-20020a17090ade0200b001df3f94811cmr5442544pjv.112.1652962460260;
-        Thu, 19 May 2022 05:14:20 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id v10-20020a62a50a000000b00518285976cdsm3671518pfm.9.2022.05.19.05.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 05:14:19 -0700 (PDT)
-Message-ID: <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
-Date:   Thu, 19 May 2022 06:14:18 -0600
+        Thu, 19 May 2022 08:14:34 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF59DBA98C;
+        Thu, 19 May 2022 05:14:32 -0700 (PDT)
+Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L3pg52mbhzhYy9;
+        Thu, 19 May 2022 20:13:53 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 19 May 2022 20:14:30 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 19 May 2022 20:14:29 +0800
+Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
+ configuration updates
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <geert@linux-m68k.org>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220519085811.879097-1-yukuai3@huawei.com>
+ <20220519085811.879097-3-yukuai3@huawei.com>
+ <20220519095857.GE16096@blackbody.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <a8953189-af42-0225-3031-daf61347524a@huawei.com>
+Date:   Thu, 19 May 2022 20:14:28 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
- [drivers/nvme/host/nvme-fc.ko] undefined!
-Content-Language: en-US
-To:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
-        linux-block@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, abdhalee@linux.vnet.ibm.com,
-        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220519095857.GE16096@blackbody.suse.cz>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
-> Greetings,
+在 2022/05/19 17:58, Michal Koutný 写道:
+> Hello Kuayi.
 > 
-> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+> On Thu, May 19, 2022 at 04:58:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>> If new configuration is submitted while a bio is throttled, then new
+>> waiting time is recaculated regardless that the bio might aready wait
+>> for some time:
+>>
+>> tg_conf_updated
+>>   throtl_start_new_slice
+>>    tg_update_disptime
+>>    throtl_schedule_next_dispatch
+>>
+>> Then io hung can be triggered by always submmiting new configuration
+>> before the throttled bio is dispatched.
 > 
-> Console Logs :
+> O.K.
 > 
-> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
-> make -j 17 -s && make modules && make modules_install && make install
-> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
-> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
-> make: *** [Makefile:1914: modules] Error 2
-> make: *** Waiting for unfinished jobs....
+>> -	/*
+>> -	 * We're already holding queue_lock and know @tg is valid.  Let's
+>> -	 * apply the new config directly.
+>> -	 *
+>> -	 * Restart the slices for both READ and WRITES. It might happen
+>> -	 * that a group's limit are dropped suddenly and we don't want to
+>> -	 * account recently dispatched IO with new low rate.
+>> -	 */
+>> -	throtl_start_new_slice(tg, READ);
+>> -	throtl_start_new_slice(tg, WRITE);
+>> +	throtl_update_slice(tg, old_limits);
+> 
+> throtl_start_new_slice zeroes *_disp fields.
+Hi,
 
-Christoph, can you fix this up?
+The problem is not just zeroes *_disp fields, in fact, the real problem
+is that 'slice_start' is reset to jiffies.
 
--- 
-Jens Axboe
+> If for instance, new config allowed only 0.5 throughput, the *_disp
+> fields would be scaled to 0.5.
+> How that change helps (better) the previously throttled bio to be dispatched?
+> 
+tg_with_in_bps_limit() is caculating 'wait' based on 'slice_start'and
+'bytes_disp':
 
+tg_with_in_bps_limit:
+  jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+  tmp = bps_limit * jiffy_elapsed_rnd;
+  do_div(tmp, HZ);
+  bytes_allowed = tmp; -> how many bytes are allowed in this slice,
+		         incluing dispatched.
+  if (tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+   *wait = 0 -> no need to wait if this bio is within limit
+
+  extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+  -> extra_bytes is based on 'bytes_disp'
+
+For example:
+
+1) bps_limit is 2k, we issue two io, (1k and 9k)
+2) the first io(1k) will be dispatched, bytes_disp = 1k, slice_start = 0
+    the second io(9k) is waiting for (9 - (2 - 1)) / 2 = 4 s
+3) after 3 s, we update bps_limit to 1k, then new waiting is caculated:
+
+without this patch:  bytes_disp = 0, slict_start =3:
+bytes_allowed = 1k
+extra_bytes = 9k - 1k = 8k
+wait = 8s
+
+whth this patch: bytes_disp = 0.5k, slice_start =  0,
+bytes_allowed = 1k * 3 + 1k = 4k
+extra_bytes =  0.5k + 9k - 4k = 5.5k
+wait = 5.5s
+
+I hope I can expliain it clearly...
+
+Thanks,
+Kuai
+> (Is it because you omit update of slice_{start,end}?)
+> 
+> Thanks,
+> Michal
+> 
+> .
+> 
