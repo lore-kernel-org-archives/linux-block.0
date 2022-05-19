@@ -2,68 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 821A5C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 00:35:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 773D4C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 00:51:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232165AbiESAfa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 20:35:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33856 "EHLO
+        id S231321AbiESAvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 20:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232124AbiESAf2 (ORCPT
+        with ESMTP id S232329AbiESAvs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 20:35:28 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330F4CEB8D
-        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 17:35:28 -0700 (PDT)
+        Wed, 18 May 2022 20:51:48 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62508340E4;
+        Wed, 18 May 2022 17:51:47 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id C2FDC617B5
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 00:35:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 30E7BC385A5;
-        Thu, 19 May 2022 00:35:27 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1BEB4B82280;
+        Thu, 19 May 2022 00:51:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8CF5C385A9;
+        Thu, 19 May 2022 00:51:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652920527;
-        bh=eT99SxJjblR35KBrIMsRkpJ3Zznq4pDgZMdbdzyILho=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=MMZbJAMSQ8B1Jq3NBfigJuBRfCi6QRYOlfupdng+KUfe7Kr5ulbW7PoORcCVgO5FE
-         4qt9AUPRoSvnNAkYWOpylZDuh0ccTFwPzNWFdw/uqMCwVgsEwV+x0BcIieI1ywp94t
-         vsOMkYvK3aGUIgC7gT+yvFvCoq7YqgAFL40MrU46WT+tkjM/e6oD57vBW3RhbDH54C
-         ThL5OOxn6Dt5fQsnEHwNFlTkN7pkFQcHPO8Ch0HPW3qfnW4SMmaXERd8VVE2LGNm9i
-         HPoK8xfRqtttgr9wkVfs0wu+cHlGxSI0eaqrKNN+azEuDBz8T5lrToEM1vCsy+IS7G
-         gVsowFvhdP0aQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1EEAFF03935;
-        Thu, 19 May 2022 00:35:27 +0000 (UTC)
-Subject: Re: [GIT PULL] Block fix for 5.18-final
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <9adae644-3856-a84e-b3d4-47106c91e09f@kernel.dk>
-References: <9adae644-3856-a84e-b3d4-47106c91e09f@kernel.dk>
-X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
-X-PR-Tracked-Message-Id: <9adae644-3856-a84e-b3d4-47106c91e09f@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-18
-X-PR-Tracked-Commit-Id: 725f22a1477c9c15aa67ad3af96fe28ec4fe72d2
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: f993aed406eaf968ba3867a76bb46c95336a33d0
-Message-Id: <165292052712.29647.14817703874793601282.pr-tracker-bot@kernel.org>
-Date:   Thu, 19 May 2022 00:35:27 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+        s=k20201202; t=1652921504;
+        bh=fwVc+6Xc0iUbXyELkwMo9i9DOVpVDqMPtAxdUfp2NWA=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=lFCMo8ZCd+I3eZTRU+GEd0Xd9U/0Ru5wqasInnoIq8WylHmP0A6/LLPh817DrOYRL
+         oOBFyv6bcGarFAe+lkspi5dCXb/+cGPUSNTx3Yj0J3KBFRZfD8WjeFgn7I0V1ZoAbm
+         64MMwc2xPMM0FUf4fxy10+E3fZZIBWgn5KejVRX8OQtg6kic+YHKMs1fPCmjowRnxN
+         OfAsZpFqRwc0IxIOyFTRezvZwihbIhDM6Wi+NRU/5WNJiBztC8+ITGmvtRSkkQC+aW
+         DD9KcX3DpgFhBmIadesAeyi38Ax7ZdXjdV54QZdn1YzPq0gTVxEOkpXZAfPN1j5RQE
+         qqosu7dcq7yjg==
+Date:   Wed, 18 May 2022 18:51:41 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
+Subject: Re: [PATCHv2 0/3] direct io alignment relax
+Message-ID: <YoWUnTxag7TsCBwa@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220518171131.3525293-1-kbusch@fb.com>
+ <YoWAnDR/XOwegQNZ@gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoWAnDR/XOwegQNZ@gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Wed, 18 May 2022 17:11:50 -0600:
+On Wed, May 18, 2022 at 11:26:20PM +0000, Eric Biggers wrote:
+> On Wed, May 18, 2022 at 10:11:28AM -0700, Keith Busch wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > 
+> > Including the fs list this time.
+> > 
+> > I am still working on a better interface to report the dio alignment to
+> > an application. The most recent suggestion of using statx is proving to
+> > be less straight forward than I thought, but I don't want to hold this
+> > series up for that.
+> > 
+> 
+> Note that I already implemented the statx support and sent it out for review:
+> https://lore.kernel.org/linux-fsdevel/20220211061158.227688-1-ebiggers@kernel.org/T/#u
+> However, the patch series only received one comment.  I can send it out again if
+> people have become interested in it again...
 
-> git://git.kernel.dk/linux-block.git tags/block-5.18-2022-05-18
-
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/f993aed406eaf968ba3867a76bb46c95336a33d0
-
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+Thanks, I didn't see that the first time around, but I'll be sure to look at
+your new version. It sounds like you encountered the same problem I did
+regarding block device handles: the devtmpfs inodes for the raw block device
+handles are not the bdev inodes. I do think it's useful the alignment
+attributes are accessible through the block device files, though.
