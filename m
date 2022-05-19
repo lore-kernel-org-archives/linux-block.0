@@ -2,112 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 811DEC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 01:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1659BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 01:53:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232495AbiESBG1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 21:06:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49478 "EHLO
+        id S232262AbiESBxP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 21:53:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55282 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbiESBGZ (ORCPT
+        with ESMTP id S229995AbiESBxP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 21:06:25 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D1624F9E7;
-        Wed, 18 May 2022 18:06:24 -0700 (PDT)
-Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.53])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L3WrB0D1jzhZ13;
-        Thu, 19 May 2022 09:05:46 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 09:06:22 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 19 May 2022 09:06:21 +0800
-Subject: Re: [PATCH -next v2 6/6] nbd: use pr_err to output error message
-To:     Joe Perches <joe@perches.com>, <josef@toxicpanda.com>,
-        <axboe@kernel.dk>, <ming.lei@redhat.com>
-CC:     <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220518122618.1702997-1-yukuai3@huawei.com>
- <20220518122618.1702997-7-yukuai3@huawei.com>
- <f0acebb66b9b46ad472e0d0989dc0f5810cac3dd.camel@perches.com>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <65fe63ed-91d4-35bd-3e25-39c4457295d0@huawei.com>
-Date:   Thu, 19 May 2022 09:06:20 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Wed, 18 May 2022 21:53:15 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56094C5E6E;
+        Wed, 18 May 2022 18:53:14 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id F0AF061839;
+        Thu, 19 May 2022 01:53:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 215ECC385A5;
+        Thu, 19 May 2022 01:53:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652925193;
+        bh=aR9cS75tdLbbSx+T3PLo+uQZ1YiTcPLqyagxqI8zzkk=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=M+0sDSn6M7YqlZAJOe5uP7318UVtZq1YUyEtcz2GbCbPvBWRYjoxmoY8iVrfUzg/T
+         4f29LFZHO+WVZbsh8groIyO94Xa345t5ZBnywUW3uTmpHyHCJ759oUSTVPMfrXLy3O
+         vEum7NNX0bVx7LQ1+1dKYQkJbcJ0LZz+twtaS6EGZEy08vij39aeCH+SmG1Z3HHgRg
+         wl4hTyyTpK1G+KD/Q+LtCP37/EO/5Ku2U/Z6jX/m7/SgNTb2DunuQrSMlZRMyJ3OrK
+         qN2YBkL5ErJLCF5/OsHRZ80l9YuxTJLHNeytD7Emer9jHEIfjkXF94tBBy085UuNEj
+         K/dw/LN6DLOrg==
+Date:   Wed, 18 May 2022 18:53:11 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
+Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
+Message-ID: <YoWjBxmKDQC1mCIz@sol.localdomain>
+References: <20220518171131.3525293-1-kbusch@fb.com>
+ <20220518171131.3525293-4-kbusch@fb.com>
+ <YoWL+T8JiIO5Ln3h@sol.localdomain>
+ <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-In-Reply-To: <f0acebb66b9b46ad472e0d0989dc0f5810cac3dd.camel@perches.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/05/19 2:12, Joe Perches Ð´µÀ:
-> On Wed, 2022-05-18 at 20:26 +0800, Yu Kuai wrote:
->> Instead of using the long printk(KERN_ERR "nbd: ...") to
->> output error message, defining pr_fmt and using
->> the short pr_err("") to do that. The replacemen is done
->> by using the following command:
->>
->>    sed -i 's/printk(KERN_ERR "nbd: /pr_err("/g' \
->> 		  drivers/block/nbd.c
+On Wed, May 18, 2022 at 07:00:39PM -0600, Keith Busch wrote:
+> On Wed, May 18, 2022 at 05:14:49PM -0700, Eric Biggers wrote:
+> > On Wed, May 18, 2022 at 10:11:31AM -0700, Keith Busch wrote:
+> > > diff --git a/block/fops.c b/block/fops.c
+> > > index b9b83030e0df..d8537c29602f 100644
+> > > --- a/block/fops.c
+> > > +++ b/block/fops.c
+> > > @@ -54,8 +54,9 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+> > >  	struct bio bio;
+> > >  	ssize_t ret;
+> > >  
+> > > -	if ((pos | iov_iter_alignment(iter)) &
+> > > -	    (bdev_logical_block_size(bdev) - 1))
+> > > +	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
+> > > +		return -EINVAL;
+> > > +	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
+> > >  		return -EINVAL;
+> > 
+> > The block layer makes a lot of assumptions that bios can be split at any bvec
+> > boundary.  With this patch, bios whose length isn't a multiple of the logical
+> > block size can be generated by splitting, which isn't valid.
 > 
-> It's also good to rewrap to 80 columns where possible.
-> 
->> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> []
->> @@ -2130,13 +2130,13 @@ static int nbd_genl_disconnect(struct sk_buff *skb, struct genl_info *info)
->>   	nbd = idr_find(&nbd_index_idr, index);
->>   	if (!nbd) {
->>   		mutex_unlock(&nbd_index_mutex);
->> -		printk(KERN_ERR "nbd: couldn't find device at index %d\n",
->> +		pr_err("couldn't find device at index %d\n",
->>   		       index);
-> 
-> like here
-> 
->>   		return -EINVAL;
->>   	}
->>   	if (!refcount_inc_not_zero(&nbd->refs)) {
->>   		mutex_unlock(&nbd_index_mutex);
->> -		printk(KERN_ERR "nbd: device at index %d is going down\n",
->> +		pr_err("device at index %d is going down\n",
->>   		       index);
-> 
-> and here and below...
-Hi, Josef
+> How? This patch ensures every segment is block size aligned.
 
-Thanks for your advice, I'll send a new version.
+No, it doesn't.  It ensures that the *total* length of each bio is logical block
+size aligned.  It doesn't ensure that for the individual bvecs.  By decreasing
+the required memory alignment to below the logical block size, you're allowing
+logical blocks to span a page boundary.  Whenever the two pages involved aren't
+physically contiguous, the data of the block will be split across two bvecs.
+
+> > Also some devices aren't compatible with logical blocks spanning bdevs at all.
+> > dm-crypt errors out in this case, for example.
 > 
->> @@ -2170,7 +2170,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
->>   	nbd = idr_find(&nbd_index_idr, index);
->>   	if (!nbd) {
->>   		mutex_unlock(&nbd_index_mutex);
->> -		printk(KERN_ERR "nbd: couldn't find a device at index %d\n",
->> +		pr_err("couldn't find a device at index %d\n",
->>   		       index);
->>   		return -EINVAL;
->>   	}
->> @@ -2192,7 +2192,7 @@ static int nbd_genl_reconfigure(struct sk_buff *skb, struct genl_info *info)
->>   	}
->>   	if (!refcount_inc_not_zero(&nbd->refs)) {
->>   		mutex_unlock(&nbd_index_mutex);
->> -		printk(KERN_ERR "nbd: device at index %d is going down\n",
->> +		pr_err("device at index %d is going down\n",
->>   		       index);
->>   		return -EINVAL;
->>   	}
-> 
-> 
-> 
-> .
-> 
+> I'm sorry, but I am not understanding this.
+
+I meant to write bvecs, not bdevs.
+
+- Eric
