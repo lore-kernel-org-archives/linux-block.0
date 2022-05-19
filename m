@@ -2,80 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD3C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 04:56:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01150C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 06:36:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233853AbiESE4M (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 00:56:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47014 "EHLO
+        id S231849AbiESGgz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 02:36:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231965AbiESE4K (ORCPT
+        with ESMTP id S229829AbiESGgy (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 00:56:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F3D53DDC8;
-        Wed, 18 May 2022 21:56:09 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id F0D1F619C5;
-        Thu, 19 May 2022 04:56:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6AC2C385B8;
-        Thu, 19 May 2022 04:56:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652936168;
-        bh=Mlu435KOBZN9YaaP2njYDaCi7dTqDX12su/oOqTE3TA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=TA3uT4S1inQrAp/hoFhxBBckcMayyyl3WrP1LsbSNRxxHqGz+Qh70ZJH6wbZ6n5E1
-         I5mKLj6+Yyaz4H+vrXbfoOPkq6XMoVFdFoPw6AWl7G8S9Pifcv1ioX41gu/wJahPbq
-         bre4/Ty4BEl6HUsKtOxuXzQ0LXr3b1s86vCMJGDqZiR9IBOosiLWFdLg22vRdkQAk6
-         6Z9Ui0xPmfQwB+92RUyG+qboCoxC1L6zlXzl3NdMq2bk89UjZhfPHj0gqOE2Gx+HxG
-         iG0Qye2Tw7iVXOwuKaRcb6YLPgTTshmFDR+oDNc3agFRscwOWa5HVW70GXIpHDiBBe
-         VZ5KFXAZnasIA==
-Date:   Wed, 18 May 2022 22:56:04 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
-Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
-Message-ID: <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220518171131.3525293-1-kbusch@fb.com>
- <20220518171131.3525293-4-kbusch@fb.com>
- <YoWL+T8JiIO5Ln3h@sol.localdomain>
- <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
- <YoWjBxmKDQC1mCIz@sol.localdomain>
- <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
- <YoWmi0mvoIk3CfQN@sol.localdomain>
- <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
- <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
+        Thu, 19 May 2022 02:36:54 -0400
+Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6472BE8;
+        Wed, 18 May 2022 23:36:53 -0700 (PDT)
+Received: by mail-qk1-x72b.google.com with SMTP id k8so4109765qki.8;
+        Wed, 18 May 2022 23:36:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Z1OyebEqky4Oe0zwnP9eg21l4J+bevlDJ8+xqEADNNM=;
+        b=Z+ORlfWO/S1nKkRn+dn8DHEwJ5DYi8HR/X5RooNa6qUX/pd8EtZ9MzIV7hrefrVMWQ
+         9pNQQ8rfly1X5xcKMfWn5ojjOlA4R6JscLMZKdIQBYwkywg5lJQ7/72ZAZG2+bfpQwPn
+         FRRj9l/QNhQ3apC/Cd8hk8JjuGRjJ49yQKwgoPkPqztMvWyQWuBu9EcVqpxQ6kzfWmW6
+         BJNqyDBlEQSW+6SCNAqV1Pz2wgFJ9ZqZdGdrNwMf7vIYU7zxDbXzFFiWIjD2xbeczsLp
+         tqU+2ps2spTBx/YNuA+oG4ihNOLIzPO1CA1Ddxoj7U/JvGjq6r4Qcm6Oh4xIqXbqfAXi
+         2kqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Z1OyebEqky4Oe0zwnP9eg21l4J+bevlDJ8+xqEADNNM=;
+        b=ItnVHnjM5p+akDY66fZG0t+qV5T6MDf6iTEsjfhOAgi/qk784mh/ykIacF/cfhasYD
+         X6N2mPYBiJjkwzBp4ZxCtjMy3Xzw5puC+i5+6wFlkA46pyppgCuxQgTShsZDedO703li
+         8shPNtJyZ8Yb3KgiBUMo/XoqQ+lkhbGJ1cUmFgQt5COm1Skw4EN7VfY/zB77ZIhw25M2
+         MQYqimdrbqZkqLJ55woLylzxVzN+IFQ+J3lbJ3oyee270HkS8hmXpbwmnmmQd/oAczol
+         Wx/U+kh9CIr7uiiQgLnceVE7PvdIJh5kdzZM0QX2Kh7jaOaj654Km36/iND99ocEdNNc
+         Vrig==
+X-Gm-Message-State: AOAM533V1NnVNDoNbpeI7mJUleDi3nbVoz9Ni94QdmSno97pEqPWObxx
+        QjEhrL3jyek+bD8IuWu3nTfY7I6Mu43rLnDSzXE=
+X-Google-Smtp-Source: ABdhPJw9M0Ywfk5vrY98XRwu85oOlt42KN+yVK4PM2g6rKV67xs7yIMXznAgkO7WMqoJo8E1DLshSDWFfjoc1H9UIHw=
+X-Received: by 2002:a05:620a:2909:b0:6a0:472b:a30d with SMTP id
+ m9-20020a05620a290900b006a0472ba30dmr2129359qkp.258.1652942213030; Wed, 18
+ May 2022 23:36:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
+References: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+In-Reply-To: <YoW0ZC+zM27Pi0Us@bombadil.infradead.org>
+From:   Amir Goldstein <amir73il@gmail.com>
+Date:   Thu, 19 May 2022 09:36:41 +0300
+Message-ID: <CAOQ4uxhKHMjGq0QKKMPFAV6iJFwe1H5hBomCVVeT1EWJzo0eXg@mail.gmail.com>
+Subject: Re: [RFC: kdevops] Standardizing on failure rate nomenclature for expunges
+To:     Luis Chamberlain <mcgrof@kernel.org>
+Cc:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>, pankydev8@gmail.com,
+        Theodore Tso <tytso@mit.edu>,
+        Josef Bacik <josef@toxicpanda.com>, jmeneghi@redhat.com,
+        Jan Kara <jack@suse.cz>, Davidlohr Bueso <dave@stgolabs.net>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jake Edge <jake@lwn.net>, Klaus Jensen <its@irrelevant.dk>,
+        Zorro Lang <zlang@redhat.com>,
+        fstests <fstests@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 08:27:31PM -0700, Eric Biggers wrote:
-> 
-> So the bio ends up with a total length that is a multiple of the logical block
-> size, but the lengths of the individual bvecs in the bio are *not* necessarily
-> multiples of the logical block size.  That's the problem.
+[adding fstests and Zorro]
 
-I'm surely missing something here. I know the bvecs are not necessarily lbs
-aligned, but why does that matter? Is there some driver that can only take
-exactly 1 bvec, but allows it to be unaligned? If so, we could take the segment
-queue limit into account, but I am not sure that we need to.
- 
-> Note, there's also lots of code that assumes that bio_vec::bv_len is a multiple
-> of 512.  
+On Thu, May 19, 2022 at 6:07 AM Luis Chamberlain <mcgrof@kernel.org> wrote:
+>
+> I've been promoting the idea that running fstests once is nice,
+> but things get interesting if you try to run fstests multiple
+> times until a failure is found. It turns out at least kdevops has
+> found tests which fail with a failure rate of typically 1/2 to
+> 1/30 average failure rate. That is 1/2 means a failure can happen
+> 50% of the time, whereas 1/30 means it takes 30 runs to find the
+> failure.
+>
+> I have tried my best to annotate failure rates when I know what
+> they might be on the test expunge list, as an example:
+>
+> workflows/fstests/expunges/5.17.0-rc7/xfs/unassigned/xfs_reflink.txt:generic/530 # failure rate about 1/15 https://gist.github.com/mcgrof/4129074db592c170e6bf748aa11d783d
+>
+> The term "failure rate 1/15" is 16 characters long, so I'd like
+> to propose to standardize a way to represent this. How about
+>
+> generic/530 # F:1/15
+>
 
-Could you point me to some examples?
+I am not fond of the 1/15 annotation at all, because the only fact that you
+are able to document is that the test failed after 15 runs.
+Suggesting that this means failure rate of 1/15 is a very big step.
 
-> That was implied by it being a multiple of the logical block size.  But
-> the DMA alignment can be much lower, like 8 bytes (see nvme_set_queue_limits()).
+> Then we could extend the definition. F being current estimate, and this
+> can be just how long it took to find the first failure. A more valuable
+> figure would be failure rate avarage, so running the test multiple
+> times, say 10, to see what the failure rate is and then averaging the
+> failure out. So this could be a more accurate representation. For this
+> how about:
+>
+> generic/530 # FA:1/15
+>
+> This would mean on average there failure rate has been found to be about
+> 1/15, and this was determined based on 10 runs.
+>
+> We should also go extend check for fstests/blktests to run a test
+> until a failure is found and report back the number of successes.
+>
+> Thoughts?
+>
 
-That's the driver this was tested on, though I just changed it to 4 bytes for
-5.19.
+I have had a discussion about those tests with Zorro.
+
+Those tests that some people refer to as "flaky" are valuable,
+but they are not deterministic, they are stochastic.
+
+I think MTBF is the standard way to describe reliability
+of such tests, but I am having a hard time imagining how
+the community can manage to document accurate annotations
+of this sort, so I would stick with documenting the facts
+(i.e. the test fails after N runs).
+
+OTOH, we do have deterministic tests, maybe even the majority of
+fstests are deterministic(?)
+
+Considering that every auto test loop takes ~2 hours on our rig and that
+I have been running over 100 loops over the past two weeks, if half
+of fstests are deterministic, that is a lot of wait time and a lot of carbon
+emission gone to waste.
+
+It would have been nice if I was able to exclude a "deterministic" group.
+The problem is - can a developer ever tag a test as being "deterministic"?
+
+Thanks,
+Amir.
