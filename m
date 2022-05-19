@@ -2,74 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 773D4C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 00:51:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06793C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 01:00:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231321AbiESAvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 20:51:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33974 "EHLO
+        id S232348AbiESBAt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 21:00:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35856 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232329AbiESAvs (ORCPT
+        with ESMTP id S231552AbiESBAs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 20:51:48 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62508340E4;
-        Wed, 18 May 2022 17:51:47 -0700 (PDT)
+        Wed, 18 May 2022 21:00:48 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 354ADB496;
+        Wed, 18 May 2022 18:00:45 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1BEB4B82280;
-        Thu, 19 May 2022 00:51:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8CF5C385A9;
-        Thu, 19 May 2022 00:51:43 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 4B52CCE2225;
+        Thu, 19 May 2022 01:00:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10031C385A5;
+        Thu, 19 May 2022 01:00:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652921504;
-        bh=fwVc+6Xc0iUbXyELkwMo9i9DOVpVDqMPtAxdUfp2NWA=;
+        s=k20201202; t=1652922042;
+        bh=teuUUHJv1w1WIKqBd3yZ4A1Y/Iy2Xta7+Y8wePbXFU8=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lFCMo8ZCd+I3eZTRU+GEd0Xd9U/0Ru5wqasInnoIq8WylHmP0A6/LLPh817DrOYRL
-         oOBFyv6bcGarFAe+lkspi5dCXb/+cGPUSNTx3Yj0J3KBFRZfD8WjeFgn7I0V1ZoAbm
-         64MMwc2xPMM0FUf4fxy10+E3fZZIBWgn5KejVRX8OQtg6kic+YHKMs1fPCmjowRnxN
-         OfAsZpFqRwc0IxIOyFTRezvZwihbIhDM6Wi+NRU/5WNJiBztC8+ITGmvtRSkkQC+aW
-         DD9KcX3DpgFhBmIadesAeyi38Ax7ZdXjdV54QZdn1YzPq0gTVxEOkpXZAfPN1j5RQE
-         qqosu7dcq7yjg==
-Date:   Wed, 18 May 2022 18:51:41 -0600
+        b=ZjOnjx1Y2+5HnKp+oyOoBszE7ADqR2uur0TSDCPXLsp70HQQwsuWvMdBSdbBwOhrW
+         JaZn3TeaA7dwEED0CH7M1FCR7yyw4W9t02dvNvZZ1SsB8KVF40+kd0B0idgu7PfjqJ
+         9P72MX3TDEgm3Bye1jC1GROsQ/UuYJxYrF752AyoEM/MnpveU6bmI7VM9chisnni1e
+         1dC9A1d1w0rTA12zcmBMoYUo0RVRKck7gSsFDXDGpvXncIB034KhhTiWJM+SgbIK6G
+         rFAbVVgaZop1/bYW/NGmoVjroczShuFLXOIxY0MdS+daubs4L/4gc2eLZGkRFFHNnZ
+         5K8ZtcXtOrvug==
+Date:   Wed, 18 May 2022 19:00:39 -0600
 From:   Keith Busch <kbusch@kernel.org>
 To:     Eric Biggers <ebiggers@kernel.org>
 Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org, axboe@kernel.dk,
         Kernel Team <Kernel-team@fb.com>, hch@lst.de,
         bvanassche@acm.org, damien.lemoal@opensource.wdc.com
-Subject: Re: [PATCHv2 0/3] direct io alignment relax
-Message-ID: <YoWUnTxag7TsCBwa@kbusch-mbp.dhcp.thefacebook.com>
+Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
+Message-ID: <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
 References: <20220518171131.3525293-1-kbusch@fb.com>
- <YoWAnDR/XOwegQNZ@gmail.com>
+ <20220518171131.3525293-4-kbusch@fb.com>
+ <YoWL+T8JiIO5Ln3h@sol.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoWAnDR/XOwegQNZ@gmail.com>
+In-Reply-To: <YoWL+T8JiIO5Ln3h@sol.localdomain>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 11:26:20PM +0000, Eric Biggers wrote:
-> On Wed, May 18, 2022 at 10:11:28AM -0700, Keith Busch wrote:
-> > From: Keith Busch <kbusch@kernel.org>
-> > 
-> > Including the fs list this time.
-> > 
-> > I am still working on a better interface to report the dio alignment to
-> > an application. The most recent suggestion of using statx is proving to
-> > be less straight forward than I thought, but I don't want to hold this
-> > series up for that.
-> > 
+On Wed, May 18, 2022 at 05:14:49PM -0700, Eric Biggers wrote:
+> On Wed, May 18, 2022 at 10:11:31AM -0700, Keith Busch wrote:
+> > diff --git a/block/fops.c b/block/fops.c
+> > index b9b83030e0df..d8537c29602f 100644
+> > --- a/block/fops.c
+> > +++ b/block/fops.c
+> > @@ -54,8 +54,9 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+> >  	struct bio bio;
+> >  	ssize_t ret;
+> >  
+> > -	if ((pos | iov_iter_alignment(iter)) &
+> > -	    (bdev_logical_block_size(bdev) - 1))
+> > +	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
+> > +		return -EINVAL;
+> > +	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
+> >  		return -EINVAL;
 > 
-> Note that I already implemented the statx support and sent it out for review:
-> https://lore.kernel.org/linux-fsdevel/20220211061158.227688-1-ebiggers@kernel.org/T/#u
-> However, the patch series only received one comment.  I can send it out again if
-> people have become interested in it again...
+> The block layer makes a lot of assumptions that bios can be split at any bvec
+> boundary.  With this patch, bios whose length isn't a multiple of the logical
+> block size can be generated by splitting, which isn't valid.
 
-Thanks, I didn't see that the first time around, but I'll be sure to look at
-your new version. It sounds like you encountered the same problem I did
-regarding block device handles: the devtmpfs inodes for the raw block device
-handles are not the bdev inodes. I do think it's useful the alignment
-attributes are accessible through the block device files, though.
+How? This patch ensures every segment is block size aligned. We can always
+split a bio in the middle of a bvec for any lower level hardware constraints,
+and I'm not finding any splitting criteria that would try to break a bio on a
+non-block aligned boundary.
+
+> Also some devices aren't compatible with logical blocks spanning bdevs at all.
+> dm-crypt errors out in this case, for example.
+
+I'm sorry, but I am not understanding this.
