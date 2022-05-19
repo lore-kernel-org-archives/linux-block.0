@@ -2,100 +2,95 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAC15C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 20:02:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14FCAC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 22:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235854AbiESUCp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 16:02:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53392 "EHLO
+        id S245465AbiESWbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 18:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36686 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239668AbiESUCo (ORCPT
+        with ESMTP id S233817AbiESWbm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 16:02:44 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0AD936D187;
-        Thu, 19 May 2022 13:02:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-        :Reply-To:Content-ID:Content-Description;
-        bh=EyvcIebdJVNbSUKi/O56+u29Bdx5ONtpdCn9+GlRuGc=; b=ImYzwvN78w3/qFJn8r7MNseyWF
-        e4McVD2zl9Xfio2tPR8MHFE9jAY5yXUIsP2QMHnxd3rGUULaBEpwwQ1kuIkoDsywGk2FknfRD+PE8
-        mKB0RTH55YuMV4rtN20z7S1Gb4jN31bBOdPrwG0GFUxXWdwiW+2VVpso2Tkb5YUZg2ta801XlrEo+
-        Vk3FCyD/0FARw0bX0Xp4QqW9VpJG8AqloiMqCMM4BdYK55Oink5fYL1+k7AnO8ghmvPZ8qG9AEKI3
-        jqDLZ8eBLjzOH1unE5AzWMP5JARLfnXAbJV40/GHp/OC6gBCvK/RIHu+s3ZNUd4CNcK3xW4CE2xgO
-        BmQkaoxA==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nrmM3-00D3rP-8l; Thu, 19 May 2022 20:02:39 +0000
-Message-ID: <6f38a339-41b5-aafe-c788-bd34a1806d52@infradead.org>
-Date:   Thu, 19 May 2022 13:02:32 -0700
+        Thu, 19 May 2022 18:31:42 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2822DB2278;
+        Thu, 19 May 2022 15:31:40 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 751D5CE2342;
+        Thu, 19 May 2022 22:31:38 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD56CC385AA;
+        Thu, 19 May 2022 22:31:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652999496;
+        bh=Iaxpi9hTjAW8iCfpRG71IePectgAbW/eCtLlmP4qyK0=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=IFvIyPHPxqoB6w7qrFLAOkgLYPL+WoxsIPIr2J8LofwbWLLdQYjrbTaUx1Cd5sRRe
+         xr+CXAuORJFgmoj8oh8ggViUdxmZ3Ozyb5UatYp/c6m2eH/cZkgitTkQzvaJJt3Gi+
+         7LSaTpBrWobaLRe2/2fv/Ype0SzTEYsU2na76LrCe9Pz+2FASDkZk1kGIRTjqDjnyC
+         WBCVj3HhyVsOE/F2jqH0NR7UO1/kHJT0oKUBLUZZ3+X9Iv5xxxuInTMCgbCzl0VS9h
+         eqNWTQEm47jFKyRtlG2r8gbe8iY0Z+D8yFik3Y2A2uZbwnR7lqzbT3qsVhGG4MeaC8
+         fszVaWGJr0yFw==
+Date:   Thu, 19 May 2022 16:31:32 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Eric Biggers <ebiggers@kernel.org>, Keith Busch <kbusch@fb.com>,
+        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
+Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
+Message-ID: <YobFRH2BCzmQ6lE8@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220518171131.3525293-1-kbusch@fb.com>
+ <20220518171131.3525293-4-kbusch@fb.com>
+ <YoWL+T8JiIO5Ln3h@sol.localdomain>
+ <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
+ <20220519073912.GF22301@lst.de>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
- [drivers/nvme/host/nvme-fc.ko] undefined!
-Content-Language: en-US
-To:     Hannes Reinecke <hare@suse.de>, Jens Axboe <axboe@kernel.dk>
-Cc:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>,
-        Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
-        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
-        Christoph Hellwig <hch@lst.de>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
-References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
- <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
- <fc5f8b96-3c93-5400-b917-a1d991cbe7c9@suse.de>
- <900f57bc-9978-9ba6-22fb-48f03fcf5011@kernel.dk>
- <c2d252a1-7223-4899-e5c9-e4bb27e2fc8a@kernel.dk>
- <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220519073912.GF22301@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Thu, May 19, 2022 at 09:39:12AM +0200, Christoph Hellwig wrote:
+> On Wed, May 18, 2022 at 07:00:39PM -0600, Keith Busch wrote:
+> > How? This patch ensures every segment is block size aligned. We can always
+> > split a bio in the middle of a bvec for any lower level hardware constraints,
+> > and I'm not finding any splitting criteria that would try to break a bio on a
+> > non-block aligned boundary.
+> 
+> Do you mean bio_vec with segment here?  How do we ensure that?
 
+I may not be understanding what you're asking here, but I'll try to answer.
 
-On 5/19/22 06:02, Hannes Reinecke wrote:
-> On 5/19/22 14:42, Jens Axboe wrote:
->> On 5/19/22 6:40 AM, Jens Axboe wrote:
->>> On Thu, May 19, 2022 at 6:38 AM Hannes Reinecke <hare@suse.de> wrote:
->>>>
->>>> On 5/19/22 14:14, Jens Axboe wrote:
->>>>> On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
->>>>>> Greetings,
->>>>>>
->>>>>> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
->>>>>>
->>>>>> Console Logs :
->>>>>>
->>>>>> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
->>>>>> make -j 17 -s && make modules && make modules_install && make install
->>>>>> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
->>>>>> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
->>>>>> make: *** [Makefile:1914: modules] Error 2
->>>>>> make: *** Waiting for unfinished jobs....
->>>>>
->>>>> Christoph, can you fix this up?
->>>>>
->>>> Cannot reproduce with commit 21498d01d045c5b95b93e0a0625ae965b4330ebe.
->>>> Please share details.
->>>
->>> The kerneltest bot also reported this a few days ago, you might be able
->>> to find the details there as that includes config etc.
->>
->> Here: https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com/
->>
-> Right. Send a patch.
+In this path, we are dealing with ITER_IOVEC type. This patch ensures each
+virtually contiguous segment is a block size multiple via the ALIGN_DOWN part
+of the patch, and builds the bvec accordingly. An error will occur if the
+ALIGN_DOWN ever results in a 0 size, so we will know each segment the user
+provided is appropriately sized.
 
+That's not to say each resulting bvec is block sized. Only the sum of all the
+bvecs is guaranteed that property.
 
-https://lore.kernel.org/all/20220518045704.GA30131@lst.de/
+Consider something like the below userspace snippet reading a 512b sector
+crossing a page with an unusual offset. If the two pages are not contiguous:
 
-but it needs to be sent as a formal patch.
+  bvec[0].bv_offset = 4092
+  bvec[0].bv_len = 4
 
--- 
-~Randy
+  bvec[1].bv_offset = 0
+  bvec[1].bv_len = 508
+
+If they are contiguous, you'd just get 1 bvec with the same bv_offset, but a
+512b len.
+
+---
+	int ret, fd;
+	char *buf;
+...
+	ret = posix_memalign((void **)&buf, 4096, 8192);
+...
+	ret = pread(fd, buf + 4092, 512, 0);
+--
