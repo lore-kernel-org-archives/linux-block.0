@@ -2,79 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72433C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 17:43:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F05B3C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 17:55:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235464AbiESRnP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 13:43:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38856 "EHLO
+        id S241450AbiESRz1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 13:55:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233298AbiESRnO (ORCPT
+        with ESMTP id S243355AbiESRzS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 13:43:14 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1EF3266ACB;
-        Thu, 19 May 2022 10:43:14 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id ACAC4618A8;
-        Thu, 19 May 2022 17:43:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64D97C385AA;
-        Thu, 19 May 2022 17:43:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652982193;
-        bh=w0vM6llzlBWvcQuMIhQ7/Nhu4fqdoSodIqG/xxpKXGs=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=IMoqCW50z17khpKaWyeceg4CvENAXlhw/3ezwPkAdv5o5kVui7TLZtEqKFeju7E1k
-         ePjSzFMGgOkl+ZlO+LSTWa/WnQrDx4S/914RGQuwu4IXKdZ2gLCXJbr3PqBfSceuKz
-         e+7kd7g6OUf1mwzd1QK31EHHPyg3iID8Vs78kZBKKNnw/bLqAYgCASsp3EyrGBX/iu
-         aDGnSTWRUYJ2Ey55Ee5dBmE8+Xoc4etr9BrvkzYqzB+76ykjiuCNCX+0nrY5P+sl7F
-         khhyoxnPRSlA2tWOKPxWOFgdBtLswv5GMK14VJbLEVw5NkjhYXZ8v2g9+CDozaIFNg
-         91i5sxM3Vza2Q==
-Date:   Thu, 19 May 2022 11:43:09 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
-Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
-Message-ID: <YoaBrQSTJeDMYFOO@kbusch-mbp.dhcp.thefacebook.com>
-References: <YoWL+T8JiIO5Ln3h@sol.localdomain>
- <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
- <YoWjBxmKDQC1mCIz@sol.localdomain>
- <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
- <YoWmi0mvoIk3CfQN@sol.localdomain>
- <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
- <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
- <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
- <YoZ30XROoiFleT16@kbusch-mbp.dhcp.thefacebook.com>
- <YoZ96LBMOiNwFhRZ@sol.localdomain>
+        Thu, 19 May 2022 13:55:18 -0400
+Received: from mail-il1-x133.google.com (mail-il1-x133.google.com [IPv6:2607:f8b0:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90CD03A190
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 10:55:17 -0700 (PDT)
+Received: by mail-il1-x133.google.com with SMTP id d3so4145663ilr.10
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 10:55:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=m8eq6dPWUoWeZS1L7nj7RcIbqUi0YUVwYlZrz6HT0go=;
+        b=uOhwFDU9U3y2+r0pdUEQCp8Vo4e3bzsSgI3f9CRLmLTI+QLyzyypw0Zusk6bZREcon
+         tFizgfwiBBAwU0TgSJIm82/pp8xlB6nCtUt7Fl93tLfdcbFy2KvWgbfXEPmqQ/zbIC7l
+         jMrs3ikN6wAy27St9PEZefgiPVH1Bs98qW5I9KYHnezPuHsJUZbs7NNbT1hNWtkMlAW5
+         dO/UwnVCnn6ZEYauC2RdcX9zCR4BpmHqNE7Z8c4LrJIharfm6EDYwa++6tVBqwl3Gvy4
+         zQ+Srdx2gtQaRkIMj0mqDXu+eJnr6si4y/7PQkFb9iZX5MwQf7Q+lP5tz8A9+c0QveXP
+         nqUQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=m8eq6dPWUoWeZS1L7nj7RcIbqUi0YUVwYlZrz6HT0go=;
+        b=hMELQAdxcy9LE+I6bqcutzhlWZC9m1AExtVn7qdHI4VPJ/ib1YyRMOsYQybCoKao14
+         DMcbxZrnZGym2JV6m82RxMRcq6dG90B9li2jICA1BcMygTZzq2OHrCtiFtfaSPBPo7qZ
+         JADWHnAiAE0ZAlKm1XkHUAq/v4Jia0A5qDUnAV3pxjqiQR20EMGUllAwdB4ZQIAAZUN5
+         W43pW4RAV0r6PgXHLGP+Un2Nc0pVzZkj+xbXolnT5+JIiXYEwEKzXvkcCB5m9GzKu+tU
+         oR8ccGwoCVz6J6MlycapH5VGRypJL+2T0QQjs6CdQE0Sz/QxUVm//610qtqMkCR4HzBi
+         RCGA==
+X-Gm-Message-State: AOAM530Or/oR0Kto82IJyQme5qP3lnG2YmttXvOStUkuC8fniQRmIMKm
+        HMc4k3g3abwP6z4tTFpJ0E6T6Q==
+X-Google-Smtp-Source: ABdhPJwa6aVQFkLlTNi1aQWv4SOYTcIHaKZtohX4UGWJLcs0j2xXt49h/1RxCRvR3WGv479fmq8XmQ==
+X-Received: by 2002:a92:d149:0:b0:2d1:5bd:1ec2 with SMTP id t9-20020a92d149000000b002d105bd1ec2mr3401610ilg.100.1652982916874;
+        Thu, 19 May 2022 10:55:16 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id x17-20020a029711000000b0032e36d3843fsm77678jai.19.2022.05.19.10.55.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 May 2022 10:55:16 -0700 (PDT)
+Message-ID: <27cf9159-341a-5e26-fa72-fb3b07f4eb80@kernel.dk>
+Date:   Thu, 19 May 2022 11:55:15 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoZ96LBMOiNwFhRZ@sol.localdomain>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.1
+Subject: Re: [blk] 77c570a1ea: WARNING:at_block/blk-cgroup.c:#blkg_create
+Content-Language: en-US
+To:     Ammar Faizi <ammarfaizi2@gnuweeb.org>,
+        kernel test robot <oliver.sang@intel.com>,
+        Fanjun Kong <bh1scw@gmail.com>
+Cc:     Muchun Song <songmuchun@bytedance.com>, Tejun Heo <tj@kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Linux Block Mailing List <linux-block@vger.kernel.org>,
+        GNU/Weeb Mailing List <gwml@vger.gnuweeb.org>,
+        lkp@lists.01.org, lkp@intel.com
+References: <20220519070506.GA34017@xsang-OptiPlex-9020>
+ <cb7d3a8a-c393-a691-4d20-2cfcbb075201@gnuweeb.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <cb7d3a8a-c393-a691-4d20-2cfcbb075201@gnuweeb.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 10:27:04AM -0700, Eric Biggers wrote:
-> On Thu, May 19, 2022 at 11:01:05AM -0600, Keith Busch wrote:
-> > On Wed, May 18, 2022 at 10:56:04PM -0600, Keith Busch wrote:
-> > > On Wed, May 18, 2022 at 08:27:31PM -0700, Eric Biggers wrote:
-> > > > Note, there's also lots of code that assumes that bio_vec::bv_len is a multiple
-> > > > of 512.  
-> > > 
-> > > Could you point me to some examples?
-> > 
-> > Just to answer my own question, blk-crypto and blk-merge appear to have these
-> > 512 byte bv_len assumptions.
+On 5/19/22 11:41 AM, Ammar Faizi wrote:
 > 
-> blk_bio_segment_split() and bio_advance_iter() are two more examples.
+> Adding the committer, reviewer and acker to the CC list. See the full message here:
+> https://lore.kernel.org/all/20220519070506.GA34017@xsang-OptiPlex-9020/
 
-I agree about blk_bio_segment_split(), but bio_advance_iter() looks fine. That
-just assumes the entire length is a multiple of 512, not any particular bvec.
+This has been fixed:
 
-Anyway, I accept your point that some existing code has this assumption, and
-will address these before the next revision.
+https://lore.kernel.org/linux-block/52f2c742-9e64-63b0-25c3-8052f7e85883@kernel.dk/
+
+-- 
+Jens Axboe
+
