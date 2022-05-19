@@ -2,90 +2,127 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3081C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 15:26:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2625DC433FE
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 15:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240502AbiESP0S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 11:26:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40560 "EHLO
+        id S240951AbiESP1h (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 11:27:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240922AbiESPZv (ORCPT
+        with ESMTP id S240957AbiESP1d (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 11:25:51 -0400
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63384266F
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:25:49 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id en5so7453154edb.1
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 08:25:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=javigon-com.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=QTIQet1MwfaPkuVkZ6VAO4F74yKlRL1Luu8IUjHxYMk=;
-        b=l5svAHMFi6jauc3S7FX1DSGsV4mLJ6QQLIh3+rvFHlDUF24PdDRSfAjzgFwm49iJA0
-         NNE97fjiMLBGBtFHfDtvXWYYjbqJi8iEGw3rJ9JZ0SfbRfZxVUjm+1AcAAGsQiCmn+ee
-         89gRyY7ZHIuDSeuO9fuwbQvPzhQmzgICC/Zi2cvMq2Lohgjpg55kK0iwP+n2k0T3yUlz
-         q18HivfgFoQnhbgYxOH73LlZzlbv2CCITUbrLuXpgXq0vqfrPGH3EtRYLR0iE9Cf3tIo
-         jDXJ3/g1yY1JU1XpBiIE3iub60yT7wRm4Z2jDiczHn7xwf/pOKwY8+kEsQfKRV1mJHdJ
-         KpPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=QTIQet1MwfaPkuVkZ6VAO4F74yKlRL1Luu8IUjHxYMk=;
-        b=65Ba/m6J+q3Zo16q5hgNIhCh5HeLA4JThb9M4MLrpx083vnzUirRnKrHT8NMimdmsX
-         Zvk5S5FgM+GO5gOVSZyUKQg/PpBgSms+CuLuO32MvoZShHqVS4U3ISXCLcVQMeiVcOKh
-         9RssZnk3Z13bGodc2+IaFiPBS+1U1Zekea1nWYABi3yp34kVm/pDxrqTtoSVq3jNze53
-         Ytal7572X1fvGbyf0xzWFfq0V5+wybKK8ia0bYUXDbEdeBuvPUTaSlyRl7HMPeYayaGz
-         UaD2iF0g+ikzTBY/G4tKpv7Hf7XelDmg+sJKId3ExkremW8iNOYScK3vOafcSzn0GQCS
-         E+CQ==
-X-Gm-Message-State: AOAM530OytgLdAyDagCNIhM4E6u4xfoxet4LwzJIrOElJygMIYIXsWwp
-        54IZ1L2F63sVZJRmLeWgX0nKpg==
-X-Google-Smtp-Source: ABdhPJxqZsGrBLw1XfZ4Nx2omW80JrXR4I67dHiPrXDO/V/6B5AKsOnb4m6w+WedzFlbburvxrD0kQ==
-X-Received: by 2002:a05:6402:2741:b0:41f:69dc:9bcd with SMTP id z1-20020a056402274100b0041f69dc9bcdmr5928160edd.239.1652973947883;
-        Thu, 19 May 2022 08:25:47 -0700 (PDT)
-Received: from smtpclient.apple (5.186.196.163.dhcp.fibianet.dk. [5.186.196.163])
-        by smtp.gmail.com with ESMTPSA id ca7-20020aa7cd67000000b0042617ba63absm2892556edb.53.2022.05.19.08.25.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 19 May 2022 08:25:47 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier@javigon.com>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH v4 00/13] support non power of 2 zoned devices
-Date:   Thu, 19 May 2022 17:25:46 +0200
-Message-Id: <40FFE5A8-35B9-4707-8D8C-A24254EB9A9B@javigon.com>
-References: <20220518080020.GA3697@lst.de>
-Cc:     =?utf-8?Q?Javier_Gonz=C3=A1lez?= <javier.gonz@samsung.com>,
-        Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, pankydev8@gmail.com,
-        dsterba@suse.com, linux-nvme@lists.infradead.org,
-        linux-fsdevel@vger.kernel.org, linux-btrfs@vger.kernel.org,
-        jiangbo.365@bytedance.com, linux-block@vger.kernel.org,
-        gost.dev@samsung.com, linux-kernel@vger.kernel.org,
-        dm-devel@redhat.com
-In-Reply-To: <20220518080020.GA3697@lst.de>
-To:     Christoph Hellwig <hch@lst.de>
-X-Mailer: iPhone Mail (19E258)
+        Thu, 19 May 2022 11:27:33 -0400
+Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85F86EC3D4;
+        Thu, 19 May 2022 08:27:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 817F5CE2508;
+        Thu, 19 May 2022 15:27:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5DC7C385AA;
+        Thu, 19 May 2022 15:27:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1652974048;
+        bh=fWzT1RDzL+g/G2pbgJJD/u9obC3MZhKB4yK9conyL8g=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=KhPlyqr5DQ+2cxzW0xu4vYkoXbmxOHVwbib+1FOdSi4DyM1fdNRJKpkCXmhKC8/sw
+         jNg5Ewr2ACxNFq6z9vUY4tGKAxaJ6wujFNx5o7sLHygM2LxCMvsb+AXZ+kJbtwHbrm
+         TcVxENBVaAuttLzbvtbAahxCC7LXKKuezdvoJFBMa9CL6AZPR13x9yJAJs3w9JdE2M
+         gILeHgLB+1/mYxOpjc9gAt4SIVhmBzql+/b7dKEEToGvpMwDfrRpEtcjpy6FnzQ5iP
+         1yGgwc3aZNTv1BV6VUHo14UYj1DGJ41lfxRRnI3gGhcTloxiboRbNY0M0VvQwEOy+f
+         tiNlDxh+Nzn/g==
+Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
+        by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <maz@kernel.org>)
+        id 1nri3i-00CSzu-B2; Thu, 19 May 2022 16:27:26 +0100
+MIME-Version: 1.0
+Date:   Thu, 19 May 2022 16:27:26 +0100
+From:   Marc Zyngier <maz@kernel.org>
+To:     Vivek Kumar <quic_vivekuma@quicinc.com>
+Cc:     corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org,
+        tglx@linutronix.de, axboe@kernel.dk, rafael@kernel.org,
+        akpm@linux-foundation.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-mm@kvack.org, len.brown@intel.com, pavel@ucw.cz,
+        paulmck@kernel.org, bp@suse.de, keescook@chromium.org,
+        songmuchun@bytedance.com, rdunlap@infradead.org,
+        damien.lemoal@opensource.wdc.com, pasha.tatashin@soleen.com,
+        tabba@google.com, ardb@kernel.org, tsoni@quicinc.com,
+        quic_psodagud@quicinc.com, quic_svaddagi@quicinc.com,
+        Prasanna Kumar <quic_kprasan@quicinc.com>
+Subject: Re: [RFC 1/6] arm64: hibernate: Introduce new entry point to kernel
+In-Reply-To: <1652860121-24092-2-git-send-email-quic_vivekuma@quicinc.com>
+References: <1652860121-24092-1-git-send-email-quic_vivekuma@quicinc.com>
+ <1652860121-24092-2-git-send-email-quic_vivekuma@quicinc.com>
+User-Agent: Roundcube Webmail/1.4.13
+Message-ID: <1d517a7598f7833196ec0c8258816aba@kernel.org>
+X-Sender: maz@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 51.254.78.96
+X-SA-Exim-Rcpt-To: quic_vivekuma@quicinc.com, corbet@lwn.net, catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de, axboe@kernel.dk, rafael@kernel.org, akpm@linux-foundation.org, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org, linux-pm@vger.kernel.org, linux-mm@kvack.org, len.brown@intel.com, pavel@ucw.cz, paulmck@kernel.org, bp@suse.de, keescook@chromium.org, songmuchun@bytedance.com, rdunlap@infradead.org, damien.lemoal@opensource.wdc.com, pasha.tatashin@soleen.com, tabba@google.com, ardb@kernel.org, tsoni@quicinc.com, quic_psodagud@quicinc.com, quic_svaddagi@quicinc.com, quic_kprasan@quicinc.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 2022-05-18 08:48, Vivek Kumar wrote:
+> Introduce a new entry point to hibernated kernel image.
+> This is generally needed when bootloader restores the
+> hibernated image from disc to ddr and passes control
+> to it by turning off the mmu, also initialize this new
+> entry point with cpu_resume which turns on the mmu and
+> then proceeds with restore routines.
+> 
+> Signed-off-by: Vivek Kumar <quic_vivekuma@quicinc.com>
+> Signed-off-by: Prasanna Kumar <quic_kprasan@quicinc.com>
+> ---
+>  arch/arm64/kernel/hibernate.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/arch/arm64/kernel/hibernate.c 
+> b/arch/arm64/kernel/hibernate.c
+> index 6328308..4e294b3 100644
+> --- a/arch/arm64/kernel/hibernate.c
+> +++ b/arch/arm64/kernel/hibernate.c
+> @@ -74,6 +74,14 @@ static struct arch_hibernate_hdr {
+>  	void		(*reenter_kernel)(void);
+> 
+>  	/*
+> +	 * Another entry point if jump to kernel happens with mmu disabled,
+> +	 * generally done when restoring hibernation image from bootloader
+> +	 * context
+> +	 */
+> +
+> +	phys_addr_t	phys_reenter_kernel;
+> +
+> +	/*
+>  	 * We need to know where the __hyp_stub_vectors are after restore to
+>  	 * re-configure el2.
+>  	 */
+> @@ -116,6 +124,7 @@ int arch_hibernation_header_save(void *addr,
+> unsigned int max_size)
+>  	arch_hdr_invariants(&hdr->invariants);
+>  	hdr->ttbr1_el1		= __pa_symbol(swapper_pg_dir);
+>  	hdr->reenter_kernel	= _cpu_resume;
+> +	hdr->phys_reenter_kernel  = __pa(cpu_resume);
+> 
+>  	/* We can't use __hyp_get_vectors() because kvm may still be loaded 
+> */
+>  	if (el2_reset_needed())
 
-> On 18 May 2022, at 10.16, Christoph Hellwig <hch@lst.de> wrote:
->=20
-> =EF=BB=BFOn Tue, May 17, 2022 at 11:18:34AM +0200, Javier Gonz=C3=A1lez wr=
-ote:
->> Does the above help you reconsidering your interest in supporting this
->> in NVMe?
->=20
-> Very little.  It just seems like a really bad idea.
+So here, you are creating a new ABI with the bootloader, based on
+a data structure that isn't mean't to be ABI. It means that we
+wouldn't be allowed to ever change this data structure, as this
+would mean having to update the bootloader in sync.
 
-I understand you don=E2=80=99t like this, but I still hope you see value in s=
-upporting it. We are getting close to a very minimal patchset, which is also=
- helping to fix bugs in the zoned stack.
+Clearly, this isn't acceptable.
 
-If you take a look at the last version abs give some feedback, I=E2=80=99m s=
-ure we can end up with a good solution.=20
-
-Can you help?=
+         M.
+-- 
+Jazz is not dead. It just smells funny...
