@@ -2,57 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 089E8C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:34:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5AFC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 14:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239703AbiESOeW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 10:34:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45184 "EHLO
+        id S239366AbiESOqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 10:46:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239822AbiESOeR (ORCPT
+        with ESMTP id S230056AbiESOqK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 10:34:17 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4968EAD2D;
-        Thu, 19 May 2022 07:34:10 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0BB6668AFE; Thu, 19 May 2022 16:34:07 +0200 (CEST)
-Date:   Thu, 19 May 2022 16:34:06 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Hannes Reinecke <hare@suse.de>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        James Smart <james.smart@broadcom.com>,
-        linux-scsi@vger.kernel.org
-Subject: Re: [PATCH] blk-cgroup: provide stubs for blkcg_get_fc_appid()
-Message-ID: <20220519143406.GA23363@lst.de>
-References: <20220519140021.6905-1-hare@suse.de> <20220519140816.GA21378@lst.de> <b34a5081-dcb5-dd33-46f4-283e9d31fc0f@suse.de>
+        Thu, 19 May 2022 10:46:10 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF8D41328
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 07:46:08 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 56EA821A5B;
+        Thu, 19 May 2022 14:46:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1652971567; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MEf0YQ0y4ow8e54jZ8PV+UCsNTU4jzl8U+Ize2jaT8U=;
+        b=C3bb2GCbVo1qL9zOJif67llkxX150g+9d9bSTbSSXssSWEmdgstE0mIhPMHgvj06qvGhgn
+        /awLeSzN7TYLiJAO4nnqROGeNSsIjwx/lMDY1AVmJGgV4dP3Iel5C2mtPll9uUsOhB9zsa
+        vU0SV5rhSBR9l1TO5cyOXsuetfdkFHs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1652971567;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=MEf0YQ0y4ow8e54jZ8PV+UCsNTU4jzl8U+Ize2jaT8U=;
+        b=96lVQVUH6Gqp5wpuRROphjzua0vGwRrWJce59soBdNfSpibarOJy74VpZ36aweiMpIVOAl
+        kLJJ2iP2Ei2cMXAw==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id 443862C141;
+        Thu, 19 May 2022 14:46:07 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+        id 35495519457A; Thu, 19 May 2022 16:46:07 +0200 (CEST)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>,
+        Muneendra <muneendra.kumar@broadcom.com>,
+        James Smart <jsmart2021@gmail.com>
+Subject: [PATCH] nvme-fc: mask out blkcg_get_fc_appid() if BLK_CGROUP_FC_APPID is not set
+Date:   Thu, 19 May 2022 16:45:55 +0200
+Message-Id: <20220519144555.22197-1-hare@suse.de>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b34a5081-dcb5-dd33-46f4-283e9d31fc0f@suse.de>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 04:20:40PM +0200, Hannes Reinecke wrote:
->>
->> No, it does not fix that commit, which is perfectly fine.  It fixes
->> the recently added second caller of blkcg_get_fc_appid, and James
->> has just resent a new version of that which fixes this properly.
->
-> Really? blk-cgroup.h provides the function declaration
-> blkcg_get_fc_appid() unconditionally, but the implementation
-> for blkcg_get_fc_appid() depends on CONFIG_CGROUP.
+If BLK_CGROUP_FC_APPID is not configured the symbol blkcg_get_fc_appid()
+is undefined, so it needs to be masked out.
 
-Take a look at the IS_ENABLED macro that we have for a few years now.
+This patch is just a diff to the v2 patchset, as the original version has
+already been merged.
 
-> Neither of which is changed by James patchset.
->
-> And besides, the first version is already merged.
->
-> Am I missing something?
+Fixes: 980a0e068d14 ("scsi: nvme-fc: Add new routine nvme_fc_io_getuuid()")
+Cc: Muneendra <muneendra.kumar@broadcom.com>
+Cc: James Smart <jsmart2021@gmail.com>
+Signed-off-by: Hannes Reinecke <hare@suse.de>
+---
+ drivers/nvme/host/fc.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-https://lore.kernel.org/linux-scsi/20220519123110.17361-1-jsmart2021@gmail.com/T/#t
+diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
+index a11c69e68118..3c778bb0c294 100644
+--- a/drivers/nvme/host/fc.c
++++ b/drivers/nvme/host/fc.c
+@@ -1911,7 +1911,9 @@ char *nvme_fc_io_getuuid(struct nvmefc_fcp_req *req)
+ 	struct nvme_fc_fcp_op *op = fcp_req_to_fcp_op(req);
+ 	struct request *rq = op->rq;
+ 
+-	return rq->bio ? blkcg_get_fc_appid(rq->bio) : NULL;
++	if (!IS_ENABLED(CONFIG_BLK_CGROUP_FC_APPID) || !rq->bio)
++		return NULL;
++	return blkcg_get_fc_appid(rq->bio);
+ }
+ EXPORT_SYMBOL_GPL(nvme_fc_io_getuuid);
+ 
+-- 
+2.29.2
 
