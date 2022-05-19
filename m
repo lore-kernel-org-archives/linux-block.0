@@ -2,109 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A21F5C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 02:25:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBECFC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 02:42:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230457AbiESCZc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 18 May 2022 22:25:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52032 "EHLO
+        id S229790AbiESCmm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 18 May 2022 22:42:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229589AbiESCZc (ORCPT
+        with ESMTP id S232958AbiESCml (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 18 May 2022 22:25:32 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41E8C19F81;
-        Wed, 18 May 2022 19:25:31 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Wed, 18 May 2022 22:42:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 48B13A30BA
+        for <linux-block@vger.kernel.org>; Wed, 18 May 2022 19:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1652928159;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=OLLmfXiXzvWZFrGfu99utiSX147UCnqhw6D8tGfkdG0=;
+        b=ASKcwNkPAgIy8gaSBF5l163dQrexe/DOBWfqRfhpQVXcbezz7rODlPAiBzO2WPwk27cADh
+        v+9hLXwvBIUv4+mQRDAPOJMysXfJUupyJhD6q71ZfG0gLpngTgWxuO4210yWvxLbvWHETK
+        JwhhXLxuBJ4s7d4l05PwFhqUyxuNWsE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-31-4kio-BwRMTSeYgIXtcsBrA-1; Wed, 18 May 2022 22:42:36 -0400
+X-MC-Unique: 4kio-BwRMTSeYgIXtcsBrA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id B35A061879;
-        Thu, 19 May 2022 02:25:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67A16C385A5;
-        Thu, 19 May 2022 02:25:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1652927130;
-        bh=TydeY+jtKnJsH8MD4u7T9PDCuCkyRPCbzKN2YzuDzCo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=C7KUr50bcjN0SR7p08PFvWwjd1+HJGvsNNpzRB54ByPt15479RBA02nbID94vp8nZ
-         jMQm/+4KzwoqtsqyZK/OqPRzcxO4IvtVXAg0Iww459TkSioSG7MI8XHI4/EQL8bfhR
-         v3yi9qxwFBRqoxlJ+kEflQoQabpP0hsZuglx2vXyl+FE7wTnAfPjAxiQo4EqiWXkUS
-         BohNM5ghRi5FD1ceNeAs8q/HHNrH1JjMQk0c9LRDob027dxV5lUJaDFL8EeA3ni+rr
-         lPVpyBmWLyCmJHri0YF8uk6Ry3pM/gEbjH7gnrdOO285qHBj7nCz2b501FueVeq0Jr
-         EcoE0faimbCgA==
-Date:   Wed, 18 May 2022 20:25:26 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com
-Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
-Message-ID: <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220518171131.3525293-1-kbusch@fb.com>
- <20220518171131.3525293-4-kbusch@fb.com>
- <YoWL+T8JiIO5Ln3h@sol.localdomain>
- <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
- <YoWjBxmKDQC1mCIz@sol.localdomain>
- <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
- <YoWmi0mvoIk3CfQN@sol.localdomain>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A1096101AA42;
+        Thu, 19 May 2022 02:42:35 +0000 (UTC)
+Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id A36061410DD5;
+        Thu, 19 May 2022 02:42:29 +0000 (UTC)
+Date:   Thu, 19 May 2022 10:42:22 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Stefan Hajnoczi <stefanha@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        ming.lei@redhat.com
+Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
+Message-ID: <YoWujjFArHaXuqYS@T590>
+References: <20220517055358.3164431-1-ming.lei@redhat.com>
+ <YoOr6jBfgVm8GvWg@stefanha-x1.localdomain>
+ <YoSbuvT88sG5UkfG@T590>
+ <YoTOTCooQfQQxyA8@stefanha-x1.localdomain>
+ <YoTsYvnACbCNIMPE@T590>
+ <YoUVb8CeWRIErJBY@stefanha-x1.localdomain>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoWmi0mvoIk3CfQN@sol.localdomain>
+In-Reply-To: <YoUVb8CeWRIErJBY@stefanha-x1.localdomain>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 07:08:11PM -0700, Eric Biggers wrote:
-> On Wed, May 18, 2022 at 07:59:36PM -0600, Keith Busch wrote:
-> > I'm aware that spanning pages can cause bad splits on the bi_max_vecs
-> > condition, but I believe it's well handled here. Unless I'm terribly confused,
-> > which is certainly possible, I think you may have missed this part of the
-> > patch:
+On Wed, May 18, 2022 at 04:49:03PM +0100, Stefan Hajnoczi wrote:
+> On Wed, May 18, 2022 at 08:53:54PM +0800, Ming Lei wrote:
+> > On Wed, May 18, 2022 at 11:45:32AM +0100, Stefan Hajnoczi wrote:
+> > > On Wed, May 18, 2022 at 03:09:46PM +0800, Ming Lei wrote:
+> > > > On Tue, May 17, 2022 at 03:06:34PM +0100, Stefan Hajnoczi wrote:
+> > > > > Here are some more thoughts on the ubd-control device:
+> > > > > 
+> > > > > The current patch provides a ubd-control device for processes with
+> > > > > suitable permissions (i.e. root) to create, start, stop, and fetch
+> > > > > information about devices.
+> > > > > 
+> > > > > There is no isolation between devices created by one process and those
+> > > > 
+> > > > I understand linux hasn't device namespace yet, so can you share the
+> > > > rational behind the idea of device isolation, is it because ubd device
+> > > > is served by ubd daemon which belongs to one pid NS? Or the user creating
+> > > > /dev/ubdbN belongs to one user NS?
+> > > 
+> > > With the current model a process with access to ubd-control has control
+> > > over all ubd devices. This is not desirable for most container use cases
+> > > because ubd-control usage within a container means that container could
+> > > stop any ubd device on the system.
+> > > 
+> > > Even for non-container use cases it's problematic that two applications
+> > > that use ubd can interfere with each other. If an application passes the
+> > > wrong device ID they can stop the other application's device, for
+> > > example.
+> > > 
+> > > I think it's worth supporting a model where there are multiple ubd
+> > > daemons that are not cooperating/aware of each other. They should be
+> > > isolated from each other.
 > > 
-> > @@ -1223,6 +1224,8 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
-> >  	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
+> > Maybe I didn't mention it clearly, I meant the following model in last email:
 > > 
-> >  	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-> > +	if (size > 0)
-> > +		size = ALIGN_DOWN(size, queue_logical_block_size(q));
-> >  	if (unlikely(size <= 0))
-> >  		return size ? size : -EFAULT;
+> > 1) every user can send UBD_CMD_ADD_DEV to /dev/ubd-control
 > > 
+> > 2) the created /dev/ubdcN & /dev/udcbN are owned by the user who creates
+> > it
 > 
-> That makes the total length of each "batch" of pages be a multiple of the
-> logical block size, but individual logical blocks within that batch can still be
-> divided into multiple bvecs in the loop just below it:
+> How does this work? Does userspace (udev) somehow get the uid/gid from
+> the uevent so it can set the device node permissions?
 
-I understand that, but the existing code conservatively assumes all pages are
-physically discontiguous and wouldn't have requested more pages if it didn't
-have enough bvecs for each of them:
+We can let 'ubd list' export the owner info, then udev may override the default
+owner with exported info.
 
-	unsigned short nr_pages = bio->bi_max_vecs - bio->bi_vcnt;
+Or it can be done inside devtmpfs_create_node() by passing ubd's uid/gid
+at default.
 
-So with the segment alignment guarantee, and ensured available bvec space, the
-created bio will always be a logical block size multiple.
+For /dev/ubdcN, I think it is safe, since the driver is only
+communicating with the userspace daemon, and both belong to same owner.
+Also ubd driver is simple enough to get full audited.
 
-If we need to split it later due to some other constraint, we'll only split on
-a logical block size, even if its in the middle of a bvec.
+For /dev/ubdbN, even though FS isn't allowed to mount, there is still
+lots of kernel code path involved, and some code path may not be run
+with unprivileged user before, that needs careful audit.
 
-> 	for (left = size, i = 0; left > 0; left -= len, i++) {
-> 		struct page *page = pages[i];
-> 
-> 		len = min_t(size_t, PAGE_SIZE - offset, left);
-> 
-> 		if (__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-> 			if (same_page)
-> 				put_page(page);
-> 		} else {
-> 			if (WARN_ON_ONCE(bio_full(bio, len))) {
-> 				bio_put_pages(pages + i, left, offset);
-> 				return -EINVAL;
-> 			}
-> 			__bio_add_page(bio, page, len, offset);
-> 		}
-> 		offset = 0;
-> 	}
-> 
-> - Eric
+So the biggest problem is if it is safe to export block disk to unprivileged
+user, and that is the one which can't be bypassed for any approach.
+
+
+
+
+Thanks, 
+Ming
+
