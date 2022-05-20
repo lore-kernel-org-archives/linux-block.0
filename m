@@ -2,236 +2,143 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78340C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 06:59:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69E42C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 07:02:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343743AbiETG7t (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 02:59:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33322 "EHLO
+        id S1346319AbiETHCk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 03:02:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36652 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231716AbiETG7r (ORCPT
+        with ESMTP id S1346245AbiETHCT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 02:59:47 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F25F14FC9F
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 23:59:44 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220520065942euoutp01e3d2784cc3fe1ef442ecab19cabf334d~wvgLkq4GZ0326503265euoutp017
-        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 06:59:42 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220520065942euoutp01e3d2784cc3fe1ef442ecab19cabf334d~wvgLkq4GZ0326503265euoutp017
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1653029982;
-        bh=mJkxTYPikvkdqTMnJ+Lh+vfvviEKxyPCWIK29LAgqws=;
-        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-        b=swsxlRu1VxG+DdDzUzvU03+imNBl0+XdLJnfrOfxED07fxJ02FbQpAFkycPX3NJ9V
-         xwT+lYqttY2PLjzxx5OJF94sO0bRsM+pYtiKJNWFY0DYRiD/i8FP6iDKcEWABbacly
-         9AkvwNGliox3mt8vgfw+0BZV9TYYbIFCJFpt6iUQ=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220520065942eucas1p2c8721732b62af59ccfc2110b4655da17~wvgLVSAmh0722907229eucas1p2_;
-        Fri, 20 May 2022 06:59:42 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id 9C.29.10260.E5C37826; Fri, 20
-        May 2022 07:59:42 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220520065941eucas1p105cf273ede995dc4bf92f3245fad09b1~wvgKPDE413192831928eucas1p1m;
-        Fri, 20 May 2022 06:59:41 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20220520065941eusmtrp119cec5b2f3eb4133ff4c909e1066456d~wvgKM9niN0344103441eusmtrp19;
-        Fri, 20 May 2022 06:59:41 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-c5-62873c5e7aec
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id F4.76.09522.D5C37826; Fri, 20
-        May 2022 07:59:41 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20220520065941eusmtip2778dbf13ef9c02edb6e5f1e63237ea6b~wvgKAjsFg2107821078eusmtip2U;
-        Fri, 20 May 2022 06:59:41 +0000 (GMT)
-Received: from localhost (106.210.248.142) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 20 May 2022 07:59:40 +0100
-Date:   Fri, 20 May 2022 08:59:39 +0200
-From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
-CC:     Hannes Reinecke <hare@suse.de>,
-        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        "Theodore Ts'o" <tytso@mit.edu>, Christoph Hellwig <hch@lst.de>,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        "axboe@kernel.dk" <axboe@kernel.dk>,
-        "pankydev8@gmail.com" <pankydev8@gmail.com>,
-        "gost.dev@samsung.com" <gost.dev@samsung.com>,
-        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "dm-devel@redhat.com" <dm-devel@redhat.com>,
-        "dsterba@suse.com" <dsterba@suse.com>,
-        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned
- devices
-Message-ID: <20220520065939.yjqlgsxs3qchpgzo@mpHalley-2.localdomain>
+        Fri, 20 May 2022 03:02:19 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF2355DE69;
+        Fri, 20 May 2022 00:02:16 -0700 (PDT)
+Received: from kwepemi100019.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4HgQ5Q39zfbXk;
+        Fri, 20 May 2022 15:00:50 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100019.china.huawei.com (7.221.188.189) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 15:02:14 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 15:02:14 +0800
+Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220520032542.3331610-1-yukuai3@huawei.com>
+ <YocOsw6n3y11lNym@T590> <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+Message-ID: <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com>
+Date:   Fri, 20 May 2022 15:02:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Disposition: inline
+In-Reply-To: <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <be429864-09cb-e3fb-2afe-46a3453c4d73@opensource.wdc.com>
-X-Originating-IP: [106.210.248.142]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA02Se0xTZxjG851bDzUlh+rgHTq3ISabOtCo29F6YRku5x8G2T+iTkehZ0Bo
-        i+ttg41ZblMoA2QLbIXgMhDQegsKEQdbZWuxAURoOinjoqHFDURBIRSnOMvRjf9+3/s8z/t9
-        T/LRuPQBGUqnqnW8Ri1XhlFiotk+3/PWoR1HEzeWT6xiLUMlFPtPdw/Ott2rJNkbvmyMbf2p
-        DGNPWWwY6zlvxtki6xTBPikcxti2gfVs32iDiG1tcxCs80oVxZ6o84rY/lIvYs+4vQSbXzQv
-        igriFq6dobgW85CIc3brucbTBRR3sfYI97PbSHE5XTaca8kfIbn7v7go7vwlF8Fd7PyCe9i4
-        mjtqNWFxkv3iHQpemWrgNZG7EsQpg1cH8MO21z+vscySRvQ4tBAF0MBsgUn7DaoQiWkp04Cg
-        ZnwQ+QUpM4PAeT1TEB4iGL5dK3qR+N5TjQShHoHn3hT6z5VjySWEQxOC6tFszB8hmLVQ98cE
-        7meK2Q19dQOLvILZCpNF+YsBnLlDQZ0zh/QLy5lYOH5lkPKzhImG7ptPCYGDwPGDZ5FxZjsU
-        TPn99DNeCfULtDB+FXKbKhf3BzDvw+UJJ+a3ALMG6itihAZZcNbeJfJfC8yjAHhc5aIEIRoq
-        TAtI4OUw3nHpeeVV0PltESFwGvR2mXCBdVBz344L+2VQ3KUUxu/CufwSShgHQv9kkPCyQChr
-        rnjulsCxr6WlKNy8pJZ5SS3z/7XMS2r9iIjTKITXa1XJvHazmv8sQitXafXq5IikdFUjevYt
-        Oxc6Zi+jhvHpiHaE0agdAY2HrZAgVV6iVKKQZ2TymvSPNXolr21HK2kiLESSlHpBLmWS5To+
-        jecP85oXKkYHhBqxN8669P2kwRMMzQdXv3lnzJm4VbxNYc3FNMF5LbH4oLPW/sF09ElRa4Li
-        6ga0mx+xpm0Xgel3dkbZc7c7yvfhLJC3quYOzZHmGXH8Xxv3pMorsyLSs7V7P32vXJEhXdb7
-        6JtiW9aEdVfksrsjjqdxke2h3t/c3k8mZXtePuAL7+tdqxoP37Dvz+vH/naLh+ZqGmbJkp3m
-        jLz1+6qJ8gLfS9iQWpN4arh5NObLlCgU/wANlJGS7+Y7Qhodrl8NbxvcTZm1N2+PXYu0+G5t
-        VmWkHNkrM2TGHgx0GF4jdPxJY85H72ySTSd4q7cUnwveZpR9FZM0EzetKx2Lt+18xfQkjNCm
-        yDetwzVa+b9FxuryBQQAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprLKsWRmVeSWpSXmKPExsVy+t/xe7qxNu1JBj9nC1msvtvPZvH77Hlm
-        i73vZrNaXPjRyGSxZ9EkJouVq48yWTxZP4vZoufABxaLv133mCz23tK2uPR4BbvFnr0nWSwu
-        75rDZjF/2VN2ixsTnjJarLn5lMWitecnu4Ogx78Ta9g8ds66y+5x+Wypx6ZVnWwem5fUe+y+
-        2cDm0XTmKLPHztb7rB7v911l81i/5SqLx+bT1R6fN8l5tB/oZgrgjdKzKcovLUlVyMgvLrFV
-        ija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLuHPwFnPBUcWKxau/sjYw/pHq
-        YuTkkBAwkZjxZB5jFyMXh5DAUkaJf38Ws0IkZCQ+XfnIDmELS/y51sUGUfSRUeLozslsIAkh
-        ga2MEmsulYPYLAKqEsuuvWYGsdkE7CUuLbsFZosImEq87WllAWlmFnjKJnH+3U9GkISwgK/E
-        1SlvWEBsXgEXibPX/7NAbFjCInHp41JGiISgxMmZT8CKmAUsJGbOPw8U5wCypSWW/+OACMtL
-        NG+dDbaMU8BNYsfry0wgJRICyhLLp/tCPFAr8er+bsYJjCKzkAydhWToLIShs5AMXcDIsopR
-        JLW0ODc9t9hQrzgxt7g0L10vOT93EyMwnWw79nPzDsZ5rz7qHWJk4mA8xCjBwawkwsuY25Ik
-        xJuSWFmVWpQfX1Sak1p8iNEUGEQTmaVEk/OBCS2vJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUgg
-        PbEkNTs1tSC1CKaPiYNTqoEpQNSsz/fuIQbdhzqvWlK3CRjn5c/2c+x4Ycs385PYpcz7fcdW
-        Fttc2X3ZJEIz0rlr9ivNI4a9ug217xYvX25flT7RM0//m3tC56tJbVoGR7y3Pn7w5GzL1ca2
-        /LgjzaHO99gbPPaHR+Ts5mxbZ6LBfkrCafY84Y9HZ00ROcL26VWOScYXph3nY3d7L79bePum
-        Pmv7niiejxPbH6npPtF5Om36va74CRlJJ/Vlgn3aXa0S/sy9WHc10ftm45HNSTYP2mV/VHod
-        Y7RJXG7avZjhyrZrJyItE6TObnPxyPwh2v5+gdB1uwnZ6xteGielz3NkmWaYsGbVy7L8qt6e
-        lgf3z6za/ZvrwqnsA+LdzNJKLMUZiYZazEXFiQDpv0hasAMAAA==
-X-CMS-MailID: 20220520065941eucas1p105cf273ede995dc4bf92f3245fad09b1
-X-Msg-Generator: CA
-X-RootMTR: 20220520065941eucas1p105cf273ede995dc4bf92f3245fad09b1
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220520065941eucas1p105cf273ede995dc4bf92f3245fad09b1
-References: <20220517081048.GA13947@lst.de> <YoPAnj9ufkt5nh1G@mit.edu>
-        <7f9cb19b-621b-75ea-7273-2d2769237851@opensource.wdc.com>
-        <20220519031237.sw45lvzrydrm7fpb@garbanzo>
-        <69f06f90-d31b-620b-9009-188d1d641562@opensource.wdc.com>
-        <PH0PR04MB74166C87F694B150A5AE0F009BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
-        <4a8f0e1b-0acb-1ed4-8d7a-c9ba93fcfd02@opensource.wdc.com>
-        <16f3f9ee-7db7-2173-840c-534f67bcaf04@suse.de>
-        <20220520062720.wxdcp5lkscesppch@mpHalley-2.localdomain>
-        <be429864-09cb-e3fb-2afe-46a3453c4d73@opensource.wdc.com>
-        <CGME20220520065941eucas1p105cf273ede995dc4bf92f3245fad09b1@eucas1p1.samsung.com>
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20.05.2022 15:41, Damien Le Moal wrote:
->On 5/20/22 15:27, Javier González wrote:
->> On 20.05.2022 08:07, Hannes Reinecke wrote:
->>> On 5/19/22 20:47, Damien Le Moal wrote:
->>>> On 5/19/22 16:34, Johannes Thumshirn wrote:
->>>>> On 19/05/2022 05:19, Damien Le Moal wrote:
->>>>>> On 5/19/22 12:12, Luis Chamberlain wrote:
->>>>>>> On Thu, May 19, 2022 at 12:08:26PM +0900, Damien Le Moal wrote:
->>>>>>>> On 5/18/22 00:34, Theodore Ts'o wrote:
->>>>>>>>> On Tue, May 17, 2022 at 10:10:48AM +0200, Christoph Hellwig wrote:
->>>>>>>>>> I'm a little surprised about all this activity.
->>>>>>>>>>
->>>>>>>>>> I though the conclusion at LSF/MM was that for Linux itself there
->>>>>>>>>> is very little benefit in supporting this scheme.  It will massively
->>>>>>>>>> fragment the supported based of devices and applications, while only
->>>>>>>>>> having the benefit of supporting some Samsung legacy devices.
->>>>>>>>>
->>>>>>>>> FWIW,
->>>>>>>>>
->>>>>>>>> That wasn't my impression from that LSF/MM session, but once the
->>>>>>>>> videos become available, folks can decide for themselves.
->>>>>>>>
->>>>>>>> There was no real discussion about zone size constraint on the zone
->>>>>>>> storage BoF. Many discussions happened in the hallway track though.
->>>>>>>
->>>>>>> Right so no direct clear blockers mentioned at all during the BoF.
->>>>>>
->>>>>> Nor any clear OK.
->>>>>
->>>>> So what about creating a device-mapper target, that's taking npo2 drives and
->>>>> makes them po2 drives for the FS layers? It will be very similar code to
->>>>> dm-linear.
->>>>
->>>> +1
->>>>
->>>> This will simplify the support for FSes, at least for the initial drop (if
->>>> accepted).
->>>>
->>>> And more importantly, this will also allow addressing any potential
->>>> problem with user space breaking because of the non power of 2 zone size.
->>>>
->>> Seconded (or maybe thirded).
+在 2022/05/20 14:23, yukuai (C) 写道:
+> 在 2022/05/20 11:44, Ming Lei 写道:
+>> On Fri, May 20, 2022 at 11:25:42AM +0800, Yu Kuai wrote:
+>>> Our test report a following crash:
 >>>
->>> The changes to support npo2 in the block layer are pretty simple, and
->>> really I don't have an issue with those.
->>> Then adding a device-mapper target transforming npo2 drives in po2
->>> block devices should be pretty trivial.
+>>> BUG: kernel NULL pointer dereference, address: 0000000000000018
+>>> PGD 0 P4D 0
+>>> Oops: 0000 [#1] SMP NOPTI
+>>> CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G           
+>>> O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
+>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 
+>>> rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+>>> Workqueue: kblockd blk_mq_run_work_fn
+>>> RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
+>>> RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
+>>> RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
+>>> RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
+>>> RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
+>>> R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
+>>> R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
+>>> FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000) 
+>>> knlGS:0000000000000000
+>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
+>>> Call Trace:
+>>>   __blk_mq_do_dispatch_sched+0x2a7/0x2c0
+>>>   ? newidle_balance+0x23e/0x2f0
+>>>   __blk_mq_sched_dispatch_requests+0x13f/0x190
+>>>   blk_mq_sched_dispatch_requests+0x30/0x60
+>>>   __blk_mq_run_hw_queue+0x47/0xd0
+>>>   process_one_work+0x1b0/0x350
+>>>   worker_thread+0x49/0x300
+>>>   ? rescuer_thread+0x3a0/0x3a0
+>>>   kthread+0xfe/0x140
+>>>   ? kthread_park+0x90/0x90
+>>>   ret_from_fork+0x22/0x30
 >>>
->>> And once that is in you can start arguing with the the FS folks on
->>> whether to implement it natively.
+>>> After digging from vmcore, I found that the queue is cleaned
+>>> up(blk_cleanup_queue() is done) and tag set is
+>>> freed(blk_mq_free_tag_set() is done).
 >>>
+>>> There are two problems here:
+>>>
+>>> 1) blk_mq_delay_run_hw_queues() will only be called from
+>>> __blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
+>>> This seems impossible because blk_cleanup_queue() is done, and there
+>>> should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
+>>> more accurate") fix the problem in bfq. And currently ohter schedulers
+>>> don't have such problem.
+>>>
+>>> 2) 'hctx->run_work' still exists after blk_cleanup_queue().
+>>> blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
+>>> all the 'run_work'. However, there is no guarantee that new 'run_work'
+>>> won't be queued after that(and before blk_mq_exit_queue() is done).
 >>
->> So you are suggesting adding support for !PO2 in the block layer and
->> then a dm to present the device as a PO2 to the FS? This at least
->> addresses the hole issue for raw zoned block devices, so it can be a
->> first step.
->
->Yes, and it also allows supporting these new !po2 devices without
->regressions (read lack of) in the support at FS level.
->
+>> It is blk_mq_run_hw_queue() caller's responsibility to grab
+>> ->q_usage_counter for avoiding queue cleaned up, so please fix the user
+>> side.
 >>
->> This said, it seems to me that the changes to the FS are not being a
->> real issue. In fact, we are exposing some bugs while we generalize the
->> zone size support.
->
->Not arguing with that. But since we are still stabilizing btrfs ZNS
->support, adding more code right now is a little painful.
->
->>
->> Could you point out what the challenges in btrfs are in the current
->> patches, that it makes sense to add an extra dm layer?
->
->See above. No real challenge, just needs to be done if a clear agreement
->can be reached on zone size alignment constraints. As mentioned above, the
->btrfs changes timing is not ideal right now though.
->
->Also please do not forget applications that may expect a power of 2 zone
->size. A dm-zsp2 would be a nice solution for these. So regardless of the
->FS work, that new DM target will be *very* nice to have.
->
->>
->> Note that for F2FS there is no blocker. Jaegeuk picked the initial
->> patches, and he agreed to add native support.
->
->And until that is done, f2fs will not work with these new !po2 devices...
->Having the new dm will avoid that support fragmentation which I personally
->really dislike. With the new dm, we can keep support for *all* zoned block
->devices, albeit needing a different setup depending on the device. That is
->not nice at all but at least there is a way to make things work continuously.
+> Hi,
+> 
+> Thanks for your advice.
+> 
+> blk_mq_run_hw_queue() can be called async, in order to do that, what I
+> can think of is that grab 'q_usage_counte' before queuing 'run->work'
+> and release it after. Which is very similar to this patch...
 
-All the above sounds very reasonable. Thanks Damien.
+Hi,
 
-If we all can agree, we can address this in the next version and come
-maintain the native FS support off-tree until you see that general btrfs
-support for zoned devicse is stable. We will be happy to help with this
-too.
+How do you think about following change:
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index cedc355218db..7d5370b5b5e1 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1627,8 +1627,16 @@ static void __blk_mq_delay_run_hw_queue(struct 
+blk_mq_hw_ctx *hctx, bool async,
+                 put_cpu();
+         }
+
++       /*
++        * No need to queue work if there is no io, and this can avoid race
++        * with blk_cleanup_queue().
++        */
++       if (!percpu_ref_tryget(&hctx->queue->q_usage_counter))
++               return;
++
+         kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), 
+&hctx->run_work,
+                                     msecs_to_jiffies(msecs));
++       percpu_ref_put(&hctx->queue->q_usage_counter);
+  }
 
