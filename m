@@ -2,193 +2,164 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A869C433FE
-	for <linux-block@archiver.kernel.org>; Thu, 19 May 2022 23:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F22F2C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 01:23:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245653AbiESXGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 19:06:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        id S1344534AbiETBXD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 21:23:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232543AbiESXGL (ORCPT
+        with ESMTP id S1344597AbiETBW4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 19:06:11 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA0DCDF93;
-        Thu, 19 May 2022 16:06:08 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A67DAB828CA;
-        Thu, 19 May 2022 23:06:07 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64BADC34113;
-        Thu, 19 May 2022 23:06:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653001566;
-        bh=KMqSVGwJXZoPClyc0+dns0g5106HUQ8FYrDrNyZ1+Ss=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=fBlEfGZoJUrD9oClATZzZKLN8ZFJlQB8Dxuz5bkukbY+dXdMi2PGWRdrHIrfMtylZ
-         rAm/IQI6ygK94t2HHXYO51oagM4DGsDy6VWUgkZ0YRqX5fb/QlSfRQIB2R6nvprPNd
-         2Db0MBMJTladGran2Xl5jsm6oZEanP6WXFxRWT9G2uDo2fFTWfKp208ptQxqQHTlGR
-         qkd/+Mmx9fTNs0Nu9YOkfWfR5yS5pFsr9CtBeveGBTnqzfiahvMg7wmLh4jlL5lt8r
-         mz8b9uqFZpp/qbZ5cq5VOn9Cr0M1y8iKEEgwhwytFoF4WlY7Q17f6vID4KNjCwS15r
-         +n9QH9f76eLrw==
-Date:   Thu, 19 May 2022 16:06:05 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
-Message-ID: <YobNXbYnhBiqniTH@magnolia>
-References: <20220518235011.153058-1-ebiggers@kernel.org>
- <20220518235011.153058-2-ebiggers@kernel.org>
+        Thu, 19 May 2022 21:22:56 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B3481498C3;
+        Thu, 19 May 2022 18:22:21 -0700 (PDT)
+Received: from kwepemi500023.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L48861JKvzhZ4h;
+        Fri, 20 May 2022 09:21:42 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500023.china.huawei.com (7.221.188.76) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 09:22:19 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 09:22:18 +0800
+Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
+ configuration updates
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <geert@linux-m68k.org>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220519085811.879097-1-yukuai3@huawei.com>
+ <20220519085811.879097-3-yukuai3@huawei.com>
+ <20220519095857.GE16096@blackbody.suse.cz>
+ <a8953189-af42-0225-3031-daf61347524a@huawei.com>
+ <20220519161026.GG16096@blackbody.suse.cz>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <73464ca6-9412-cc55-d9c0-f2e8a10f0607@huawei.com>
+Date:   Fri, 20 May 2022 09:22:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220518235011.153058-2-ebiggers@kernel.org>
+In-Reply-To: <20220519161026.GG16096@blackbody.suse.cz>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 04:50:05PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
+在 2022/05/20 0:10, Michal Koutný 写道:
+> On Thu, May 19, 2022 at 08:14:28PM +0800, "yukuai (C)" <yukuai3@huawei.com> wrote:
+>> tg_with_in_bps_limit:
+>>   jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
+>>   tmp = bps_limit * jiffy_elapsed_rnd;
+>>   do_div(tmp, HZ);
+>>   bytes_allowed = tmp; -> how many bytes are allowed in this slice,
+>> 		         incluing dispatched.
+>>   if (tg->bytes_disp[rw] + bio_size <= bytes_allowed)
+>>    *wait = 0 -> no need to wait if this bio is within limit
+>>
+>>   extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
+>>   -> extra_bytes is based on 'bytes_disp'
+>>
+>> For example:
+>>
+>> 1) bps_limit is 2k, we issue two io, (1k and 9k)
+>> 2) the first io(1k) will be dispatched, bytes_disp = 1k, slice_start = 0
+>>     the second io(9k) is waiting for (9 - (2 - 1)) / 2 = 4 s
 > 
-> Traditionally, the conditions for when DIO (direct I/O) is supported
-> were fairly simple: filesystems either supported DIO aligned to the
-> block device's logical block size, or didn't support DIO at all.
+> The 2nd io arrived at 1s, the wait time is 4s, i.e. it can be dispatched
+> at 5s (i.e. 10k/*2kB/s = 5s).
+No, the example is that the second io arrived together with first io.
 > 
-> However, due to filesystem features that have been added over time (e.g,
-> data journalling, inline data, encryption, verity, compression,
-> checkpoint disabling, log-structured mode), the conditions for when DIO
-> is allowed on a file have gotten increasingly complex.  Whether a
-> particular file supports DIO, and with what alignment, can depend on
-> various file attributes and filesystem mount options, as well as which
-> block device(s) the file's data is located on.
+>> 3) after 3 s, we update bps_limit to 1k, then new waiting is caculated:
+>>
+>> without this patch:  bytes_disp = 0, slict_start =3:
+>> bytes_allowed = 1k	                            <--- why 1k and not 0?
+Because slice_start == jiffies, bytes_allowed is equal to bps_limit
+>> extra_bytes = 9k - 1k = 8k
+>> wait = 8s
 > 
-> XFS has an ioctl XFS_IOC_DIOINFO which exposes this information to
-> applications.  However, as discussed
-> (https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u),
-> this ioctl is rarely used and not known to be used outside of
-> XFS-specific code.  It also was never intended to indicate when a file
-> doesn't support DIO at all, and it only exposes the minimum I/O
-> alignment, not the optimal I/O alignment which has been requested too.
-> 
-> Therefore, let's expose this information via statx().  Add the
-> STATX_IOALIGN flag and three fields associated with it:
-> 
-> * stx_mem_align_dio: the alignment (in bytes) required for user memory
->   buffers for DIO, or 0 if DIO is not supported on the file.
-> 
-> * stx_offset_align_dio: the alignment (in bytes) required for file
->   offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
->   on the file.  This will only be nonzero if stx_mem_align_dio is
->   nonzero, and vice versa.
-> 
-> * stx_offset_align_optimal: the alignment (in bytes) suggested for file
->   offsets and I/O segment lengths to get optimal performance.  This
->   applies to both DIO and buffered I/O.  It differs from stx_blocksize
->   in that stx_offset_align_optimal will contain the real optimum I/O
->   size, which may be a large value.  In contrast, for compatibility
->   reasons stx_blocksize is the minimum size needed to avoid page cache
->   read/write/modify cycles, which may be much smaller than the optimum
->   I/O size.  For more details about the motivation for this field, see
->   https://lore.kernel.org/r/20220210040304.GM59729@dread.disaster.area
+> This looks like it was calculated at time 4s (1s after new config was
+> set).
+No... it was caculated at time 3s:
 
-Hmm.  So I guess this is supposed to be the filesystem's best guess at
-the IO size that will minimize RMW cycles in the entire stack?  i.e. if
-the user does not want RMW of pagecache pages, of file allocation units
-(if COW is enabled), of RAID stripes, or in the storage itself, then it
-should ensure that all IOs are aligned to this value?
+jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
 
-I guess that means for XFS it's effectively max(pagesize, i_blocksize,
-bdev io_opt, sb_width, and (pretend XFS can reflink the realtime volume)
-the rt extent size)?  I didn't see a manpage update for statx(2) but
-that's mostly what I'm interested in. :)
-
-Looking ahead, it looks like the ext4/f2fs implementations only seem to
-be returning max(i_blocksize, bdev io_opt)?  But not the pagesize?  Did
-I misunderstood this, then?
-
-(The plumbing changes in this patch look ok.)
-
---D
-
-> Note that as with other statx() extensions, if STATX_IOALIGN isn't set
-> in the returned statx struct, then these new fields won't be filled in.
-> This will happen if the filesystem doesn't support STATX_IOALIGN, or if
-> the file isn't a regular file.  (It might be supported on block device
-> files in the future.)  It might also happen if the caller didn't include
-> STATX_IOALIGN in the request mask, since statx() isn't required to
-> return information that wasn't requested.
+jiffies should be greater than 3s here, thus jiffy_elapsed_rnd is
+3s + throtl_slice (I'm using throtl_slice = 1s here, it should not
+affect result)
 > 
-> This commit adds the VFS-level plumbing for STATX_IOALIGN.  Individual
-> filesystems will still need to add code to support it.
+>>
+>> whth this patch: bytes_disp = 0.5k, slice_start =  0,
+>> bytes_allowed = 1k * 3 + 1k = 4k
+>> extra_bytes =  0.5k + 9k - 4k = 5.5k
+>> wait = 5.5s
 > 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
->  fs/stat.c                 | 3 +++
->  include/linux/stat.h      | 3 +++
->  include/uapi/linux/stat.h | 9 +++++++--
->  3 files changed, 13 insertions(+), 2 deletions(-)
+> This looks like calculated at 4s, so the IO would be waiting till
+> 4s+5.5s = 9.5s.
+wait time is based on extra_bytes, this is really 5.5s, add 4s is
+wrong here.
+
+bytes_allowed = ((jiffies - slice_start) / Hz + 1) * bps_limit
+extra_bytes = bio_size + bytes_disp - bytes_allowed
+wait = extra_bytes / bps_limit
 > 
-> diff --git a/fs/stat.c b/fs/stat.c
-> index 5c2c94464e8b0..9d477218545b8 100644
-> --- a/fs/stat.c
-> +++ b/fs/stat.c
-> @@ -611,6 +611,9 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
->  	tmp.stx_dev_major = MAJOR(stat->dev);
->  	tmp.stx_dev_minor = MINOR(stat->dev);
->  	tmp.stx_mnt_id = stat->mnt_id;
-> +	tmp.stx_mem_align_dio = stat->mem_align_dio;
-> +	tmp.stx_offset_align_dio = stat->offset_align_dio;
-> +	tmp.stx_offset_align_optimal = stat->offset_align_optimal;
->  
->  	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
->  }
-> diff --git a/include/linux/stat.h b/include/linux/stat.h
-> index 7df06931f25d8..48b8b1ad1567c 100644
-> --- a/include/linux/stat.h
-> +++ b/include/linux/stat.h
-> @@ -50,6 +50,9 @@ struct kstat {
->  	struct timespec64 btime;			/* File creation time */
->  	u64		blocks;
->  	u64		mnt_id;
-> +	u32		mem_align_dio;
-> +	u32		offset_align_dio;
-> +	u32		offset_align_optimal;
->  };
->  
->  #endif
-> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
-> index 1500a0f58041a..f822b23e81091 100644
-> --- a/include/uapi/linux/stat.h
-> +++ b/include/uapi/linux/stat.h
-> @@ -124,9 +124,13 @@ struct statx {
->  	__u32	stx_dev_minor;
->  	/* 0x90 */
->  	__u64	stx_mnt_id;
-> -	__u64	__spare2;
-> +	__u32	stx_mem_align_dio;	/* Memory buffer alignment for direct I/O */
-> +	__u32	stx_offset_align_dio;	/* File offset alignment for direct I/O */
->  	/* 0xa0 */
-> -	__u64	__spare3[12];	/* Spare space for future expansion */
-> +	__u32	stx_offset_align_optimal; /* Optimal file offset alignment for I/O */
-> +	__u32	__spare2;
-> +	/* 0xa8 */
-> +	__u64	__spare3[11];	/* Spare space for future expansion */
->  	/* 0x100 */
->  };
->  
-> @@ -152,6 +156,7 @@ struct statx {
->  #define STATX_BASIC_STATS	0x000007ffU	/* The stuff in the normal stat struct */
->  #define STATX_BTIME		0x00000800U	/* Want/got stx_btime */
->  #define STATX_MNT_ID		0x00001000U	/* Got stx_mnt_id */
-> +#define STATX_IOALIGN		0x00002000U	/* Want/got IO alignment info */
->  
->  #define STATX__RESERVED		0x80000000U	/* Reserved for future struct statx expansion */
->  
-> -- 
-> 2.36.1
+> As I don't know why using time 4s, I'll shift this calculation to the
+> time 3s (when the config changes):
+> 
+> bytes_disp = 0.5k, slice_start =  0,
+> bytes_allowed = 1k * 3  = 3k
+> extra_bytes =  0.5k + 9k - 3k = 7.5k
+6.5k
+> wait = 7.5s
+> 
+> In absolute time, the IO would wait till 3s+7.5s = 10.5s
+Like I said above, wait time should not add (jiffies - slice_start)
+> 
+> OK, either your 9.5s or my 10.5s looks weird (although earlier than
+> original 4s+8s=12s).
+> However, the IO should ideally only wait till
+> 
+>      3s + (9k -   (6k    -    1k)     ) / 1k/s =
+>           bio - (allowed - dispatched)  / new_limit
+> 
+>     =3s + 4k / 1k/s = 7s
+> 
+>     ('allowed' is based on old limit)
+> 
+> Or in another example, what if you change the config from 2k/s to ∞k/s
+> (unlimited, let's neglect the arithmetic overflow that you handle
+> explicitly, imagine a big number but not so big to be greater than
+> division result).
+> 
+> In such a case, the wait time should be zero, i.e. IO should be
+> dispatched right at the time of config change.
+
+I thought about it, however, IMO, this is not a good idea. If user
+updated config quite frequently, io throttle will be invalid.
+
+Thanks,
+Kuai
+> (With your patch that still calculates >0 wait time (and the original
+> behavior gives >0 wait too.)
+> 
+>> I hope I can expliain it clearly...
+> 
+> Yes, thanks for pointing me to relevant parts.
+> I hope I grasped them correctly.
+> 
+> IOW, your patch and formula make the wait time shorter but still IO can
+> be delayed indefinitely if you pass a sequence of new configs. (AFAIU)
+> 
+> Regards,
+> Michal
+> .
 > 
