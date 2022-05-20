@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59BF0C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 03:42:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A86CFC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 03:47:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239759AbiETDmE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 23:42:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42802 "EHLO
+        id S1345211AbiETDrT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 23:47:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345182AbiETDmD (ORCPT
+        with ESMTP id S1345207AbiETDrQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 23:42:03 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B123C1EF1
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 20:42:02 -0700 (PDT)
+        Thu, 19 May 2022 23:47:16 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46BFB340F1
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 20:47:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653018122; x=1684554122;
+  t=1653018434; x=1684554434;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=vsP9rR0bmsdYi/b/kU26DDrdo3eIaFFijAIs7ZCN7N4=;
-  b=ZnxQKA7eICsLBJC/Bn9FPoMXDC49oDaLTI2fLUgpC/DMOpygde6uPo9P
-   8o8TaQ5efl34ipeICndxhqxoR/T+b71baJbV/HscmgYBelxliO09MebdE
-   ygFE8KZITnOJzczAaUNAsQkPF9vITxHpYf2K12mwO+edpRtelW0331znQ
-   9lT1oYe9ydhoStqPlwDAXC4ppy/PlZFOzNZo8+/mbyEH9rCduTCj2EOa8
-   N3tS15TBPBoW7i0PEn0bOK11eLKOOQja43uKqe3Koe4Q4eEh90fC0fVV0
-   RBmIyYemA6luqeAmNt237eQ83LqM7T4nqOkhhx6H7VSWrU8SYHd3cZhqY
-   A==;
+  bh=6lc1EXDyRH/qdIBQrgfdid5K6UO5RT0eqtEDiI6MCtI=;
+  b=UTXtkRQuc8LhJYZHKrE6M5vFktpj4WL9lot2eO++A4QKswwdDiPm3eMJ
+   tiTlXxKDd+TvMlOFATMA/bWrv+zRQYxSTfb6GyLHQM2t7uKOHPMlWl4ym
+   OWAW+U9LSzvg2zSAu5SjHa9//9wKsupMuA9PlNikEJOtO8UKtoDTC1WfH
+   CEYmxpZSb96oEiIKHnu3+bjKgYQ/g9vg5Cn9MKAD+iT0BiQMnF0/1Tw7y
+   sjD65V/bn+x8WBtmwOcm0Q1HgKgIV6GZ6GYotXiiiEKlWTSmEZHDnxJ39
+   AJfAg2AzpJyyXD3Uq1lhtpkvClZ4h2ep5mYrtDWYnFYpZw8EJsuXm51pp
+   w==;
 X-IronPort-AV: E=Sophos;i="5.91,238,1647273600"; 
-   d="scan'208";a="312850101"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 20 May 2022 11:42:01 +0800
-IronPort-SDR: piVJCNAg3I1Ec7M9S06Fq3cb7UbJVc/L5/CuqTAH/jc/Q2h4gpTiX88BjfO+jX4ghJTG90Rr6C
- WhJY/Fo58zZFkJWgMq+nIYchKDSbWTNU/FZBlkEjCy+QFBnulF/z9GjJy0lGsIK8OUILGTqKwx
- zdXqCEr0MPgPSykTsNoPP2dbvXvveHOcEtoq/pSfhqYRWH6/SheXkgIF0x5ROcbe6FQnQPQvFM
- OdM+ymePxXfci+3M4fyHXdsy6rj217WJe0ShQbVaa5lcIJPam1XPCYy2JQ3GYASFmH8hNIvLO1
- AuI8iHut6fqdruzgM6uqayE/
+   d="scan'208";a="305089253"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 May 2022 11:47:09 +0800
+IronPort-SDR: fLp3kAMrEHUWRzhADXlHIigDXkap209f4aZZpx9KxM9MiLVws94Mq3Y9hfwWLNpY5BCgclaiOV
+ ZuWebYuhLvRa5Ot95WNY+wBTr2huFdjOy5w2iqIWkyv+lC3GZC/0IslUzKA3vUOrBXfbNMBV+q
+ dFU7Kn2i/3loFh98RXGUH9LaMjzbp8fiWZtqmjzIUuEE6zGhp8bnARtGzoSP4bezDkoAGH1I3+
+ i7SWzwV9Hc5EIVkAr5urI7tVPQYDTh/DzW7A8FCTfV0ph6PoLqqBtibLLsJ8352syBhCayjVgh
+ QVAJkxkOW3jfWiAlGhcHXCH0
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 May 2022 20:04:52 -0700
-IronPort-SDR: 0TAPPHXo3hFA6Nbsl/EGaYv3lsrS/M/wPHDRh96rlsYIornTXvWezKHYP8dZawyHcUEASHeNcl
- 9odzK4b2NGx5DnzShPKagZn0ypV2cnSeEpYxPOm4UNOgcJFFmORd11gueZfKydf5siZuaDxFiE
- Dq2aXPVvmOcl0D/FL9wP6G1jzi3HwsojACYFnrMLwgaobKusJKoCBME1yqbeWoK8hrnAXCJmM+
- pCLYk6b3X9I322L5XzsQAUDzL08MmwFdAN2gAWjhW4aoeZ3azjjZVmzXZ4xbCHBDrKFYD6iqMY
- 87U=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 May 2022 20:12:32 -0700
+IronPort-SDR: OZf5spczlT8IwmI/7WUuKBO3mgRl43kN7Sl+K9eHeLyZcuLnrYTaNZKRSjQzv7H2KvtqtJ5leA
+ DwX+YAMJWCKHhCbVqj9TsrSUb0SwT7e9pwN8a/81XKufgKG5lNrlQbOGJDGXWMjPRWOsKHMbrZ
+ 2CxXdPKXjqe5CiL+tTmVSMlvcllO/xAWGHq/onEZhguWNsXbqqV6fur+rxjHyJhyEeBASEuetu
+ keOkOH3Q1rpKLanbjYy3HKl3J0MBbGxr0q442V4tajkGgkWoPsesj0COUgU+uRnHJzB6qLR4hk
+ Iic=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 May 2022 20:41:54 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 May 2022 20:47:09 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L4CFs4d3Nz1SVp3
-        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 20:41:53 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L4CMw5Clwz1SVp8
+        for <linux-block@vger.kernel.org>; Thu, 19 May 2022 20:47:08 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,97 +57,108 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1653018112; x=1655610113; bh=vsP9rR0bmsdYi/b/kU26DDrdo3eIaFFijAI
-        s7ZCN7N4=; b=TOOPyIZkc/aHTy2wEvoXXElTfusvRXNu1QsteanVuHg5bqU7wWO
-        mwbjBiXuQbiTRw7xOyeeg1G9XUUTu1p7ojInIix0A20JmYpba9eWGV64Io5bxJAX
-        YM2UKPXaoFkpFvWRoEEF3xbTnSWhxN0Ur4ew39qYPlfCIPZoRhPdEn1d6JvvFvnC
-        vaxvAvp50cS5sqgaHhkvG+W+GB7GOB7JDE7zHiORzahyLnZEifUqJ8UnvoCDbblp
-        QQPrHhnakW49nTbPvFpfzOrvstlSaJp7ilas6c1UXq+ywivUEYDpx3eIHWuHMhuE
-        a2qqGH20HOi7zag1S+AceVtOJ8x2SsAWXPQ==
+        1653018427; x=1655610428; bh=6lc1EXDyRH/qdIBQrgfdid5K6UO5RT0eqtE
+        DiI6MCtI=; b=Qs9M+NujlyY8B4k/o4j7hSbfG13ti0oADtMb/umY3xRCYTQNY3J
+        T2xdFmUh9CSB7RfRlgugV018loJtAR0z9EGT0S58D6UYUFDTmHf8P8VRWqemnD12
+        hS5OmTUPjVTzO+ZX5W6IdWB0kk6jh2k0nN3xK9Z0v3wpoOMnabK1LKBbkgGTqBxf
+        z7r3LFquTotFb5ib6u0lxv3Tw3J3qHygfRYrez3CbkQ5MZOQjEIeRlWkIKwHWt+R
+        TYFK2ggtvkfb8RaQH6RyquQyFCRfVmNQe16t3cZb3xRBq3AUFjgPefGP0/pWMal0
+        Ic2RxZWrwEWckGJNSitECSJ/V7Iv8+V+Fqg==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 56hXLDgAm5jc for <linux-block@vger.kernel.org>;
-        Thu, 19 May 2022 20:41:52 -0700 (PDT)
+        with ESMTP id sJV9S2lqLHkd for <linux-block@vger.kernel.org>;
+        Thu, 19 May 2022 20:47:07 -0700 (PDT)
 Received: from [10.225.163.45] (unknown [10.225.163.45])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L4CFp71jmz1Rvlc;
-        Thu, 19 May 2022 20:41:50 -0700 (PDT)
-Message-ID: <e4b57864-a685-d7a4-b8dd-1078547f7b0b@opensource.wdc.com>
-Date:   Fri, 20 May 2022 12:41:49 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L4CMr5cBWz1Rvlc;
+        Thu, 19 May 2022 20:47:04 -0700 (PDT)
+Message-ID: <4a8f0e1b-0acb-1ed4-8d7a-c9ba93fcfd02@opensource.wdc.com>
+Date:   Fri, 20 May 2022 12:47:03 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [PATCHv2 3/3] block: relax direct io memory alignment
+Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned devices
 Content-Language: en-US
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Keith Busch <kbusch@kernel.org>, Keith Busch <kbusch@fb.com>,
-        linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org
-References: <20220518171131.3525293-4-kbusch@fb.com>
- <YoWL+T8JiIO5Ln3h@sol.localdomain>
- <YoWWtwsiKGqoTbVU@kbusch-mbp.dhcp.thefacebook.com>
- <YoWjBxmKDQC1mCIz@sol.localdomain>
- <YoWkiCdduzyQxHR+@kbusch-mbp.dhcp.thefacebook.com>
- <YoWmi0mvoIk3CfQN@sol.localdomain>
- <YoWqlqIzBcYGkcnu@kbusch-mbp.dhcp.thefacebook.com>
- <YoW5Iy+Vbk4Rv3zT@sol.localdomain>
- <YoXN5CpSGGe7+OJs@kbusch-mbp.dhcp.thefacebook.com>
- <283d37e8-868a-990b-e953-4b7bb940135c@opensource.wdc.com>
- <YoZ8OKDXZBiNd9XB@sol.localdomain>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     Theodore Ts'o <tytso@mit.edu>, Christoph Hellwig <hch@lst.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "dsterba@suse.com" <dsterba@suse.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>
+References: <CGME20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef@eucas1p2.samsung.com>
+ <20220516165416.171196-1-p.raghav@samsung.com>
+ <20220517081048.GA13947@lst.de> <YoPAnj9ufkt5nh1G@mit.edu>
+ <7f9cb19b-621b-75ea-7273-2d2769237851@opensource.wdc.com>
+ <20220519031237.sw45lvzrydrm7fpb@garbanzo>
+ <69f06f90-d31b-620b-9009-188d1d641562@opensource.wdc.com>
+ <PH0PR04MB74166C87F694B150A5AE0F009BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <YoZ8OKDXZBiNd9XB@sol.localdomain>
+In-Reply-To: <PH0PR04MB74166C87F694B150A5AE0F009BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/20/22 02:19, Eric Biggers wrote:
-> On Thu, May 19, 2022 at 08:45:55AM +0200, Damien Le Moal wrote:
->> On 2022/05/19 6:56, Keith Busch wrote:
->>> On Wed, May 18, 2022 at 08:27:31PM -0700, Eric Biggers wrote:
+On 5/19/22 16:34, Johannes Thumshirn wrote:
+> On 19/05/2022 05:19, Damien Le Moal wrote:
+>> On 5/19/22 12:12, Luis Chamberlain wrote:
+>>> On Thu, May 19, 2022 at 12:08:26PM +0900, Damien Le Moal wrote:
+>>>> On 5/18/22 00:34, Theodore Ts'o wrote:
+>>>>> On Tue, May 17, 2022 at 10:10:48AM +0200, Christoph Hellwig wrote:
+>>>>>> I'm a little surprised about all this activity.
+>>>>>>
+>>>>>> I though the conclusion at LSF/MM was that for Linux itself there
+>>>>>> is very little benefit in supporting this scheme.  It will massively
+>>>>>> fragment the supported based of devices and applications, while only
+>>>>>> having the benefit of supporting some Samsung legacy devices.
+>>>>>
+>>>>> FWIW,
+>>>>>
+>>>>> That wasn't my impression from that LSF/MM session, but once the
+>>>>> videos become available, folks can decide for themselves.
 >>>>
->>>> So the bio ends up with a total length that is a multiple of the logical block
->>>> size, but the lengths of the individual bvecs in the bio are *not* necessarily
->>>> multiples of the logical block size.  That's the problem.
+>>>> There was no real discussion about zone size constraint on the zone
+>>>> storage BoF. Many discussions happened in the hallway track though.
 >>>
->>> I'm surely missing something here. I know the bvecs are not necessarily lbs
->>> aligned, but why does that matter? Is there some driver that can only take
->>> exactly 1 bvec, but allows it to be unaligned? If so, we could take the segment
->>> queue limit into account, but I am not sure that we need to.
+>>> Right so no direct clear blockers mentioned at all during the BoF.
 >>
->> For direct IO, the first bvec will always be aligned to a logical block size.
->> See __blkdev_direct_IO() and __blkdev_direct_IO_simple():
->>
->>         if ((pos | iov_iter_alignment(iter)) &
->>             (bdev_logical_block_size(bdev) - 1))
->>                 return -EINVAL;
->>
->> And given that, all bvecs should also be LBA aligned since the LBA size is
->> always a divisor of the page size. Since splitting is always done on an LBA
->> boundary, I do not see how we can ever get bvecs that are not LBA aligned.
->> Or I am missing something too...
->>
+>> Nor any clear OK.
 > 
-> You're looking at the current upstream code.  This patch changes that to:
-> 
-> 	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-> 		return -EINVAL;
-> 	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
-> 		return -EINVAL;
-> 
-> So, if this patch is accepted, then the file position and total I/O length will
-> need to be logical block aligned (as before), but the memory address and length
-> of each individual iovec will no longer need to be logical block aligned.  How
-> the iovecs get turned into bios (and thus bvecs) is a little complicated, but
-> the result is that logical blocks will be able to span bvecs.
+> So what about creating a device-mapper target, that's taking npo2 drives and
+> makes them po2 drives for the FS layers? It will be very similar code to 
+> dm-linear.
 
-Indeed. I missed that change in patch 3. Got it.
++1
+
+This will simplify the support for FSes, at least for the initial drop (if
+accepted).
+
+And more importantly, this will also allow addressing any potential
+problem with user space breaking because of the non power of 2 zone size.
 
 > 
-> - Eric
+> After all zoned support for FSes started with a device-mapper (dm-zoned) and 
+> as the need for a more integrated solution arose, it changed into natiive
+> support.
+> 
+> And all that is there is simple arithmetic and a bio_clone(), if this is the
+> slowest part of the stack involving a FS like f2fs or btrfs I'm throwing a
+> round of anyone's favorite beverage at next year's LSFMM.
+> 
+> Byte,
+> 	Johannes
+> 
 
 
 -- 
