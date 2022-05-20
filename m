@@ -2,178 +2,153 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B465BC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 01:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E79C2C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 03:12:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344536AbiETBgR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 19 May 2022 21:36:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53742 "EHLO
+        id S1345045AbiETDMH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 19 May 2022 23:12:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45100 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245148AbiETBgQ (ORCPT
+        with ESMTP id S1345057AbiETDMG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 19 May 2022 21:36:16 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3036F3A72B;
-        Thu, 19 May 2022 18:36:15 -0700 (PDT)
-Received: from kwepemi100021.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L48Rs2CSczjWw5;
-        Fri, 20 May 2022 09:35:21 +0800 (CST)
+        Thu, 19 May 2022 23:12:06 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0EBFA149DBC;
+        Thu, 19 May 2022 20:12:03 -0700 (PDT)
+Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L4BTh4nw1zCspc;
+        Fri, 20 May 2022 11:07:04 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100021.china.huawei.com (7.221.188.223) with Microsoft SMTP Server
+ kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 09:36:13 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 09:36:12 +0800
-Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
- configuration updates
-From:   "yukuai (C)" <yukuai3@huawei.com>
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <geert@linux-m68k.org>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220519085811.879097-1-yukuai3@huawei.com>
- <20220519085811.879097-3-yukuai3@huawei.com>
- <20220519095857.GE16096@blackbody.suse.cz>
- <a8953189-af42-0225-3031-daf61347524a@huawei.com>
- <20220519161026.GG16096@blackbody.suse.cz>
- <73464ca6-9412-cc55-d9c0-f2e8a10f0607@huawei.com>
-Message-ID: <fe3c03f7-9b52-7948-075d-cbdf431363e1@huawei.com>
-Date:   Fri, 20 May 2022 09:36:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ 15.1.2375.24; Fri, 20 May 2022 11:12:01 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 20 May
+ 2022 11:12:00 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <ming.lei@redhat.com>, <axboe@kernel.dk>
+CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yukuai3@huawei.com>, <yi.zhang@huawei.com>
+Subject: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+Date:   Fri, 20 May 2022 11:25:42 +0800
+Message-ID: <20220520032542.3331610-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <73464ca6-9412-cc55-d9c0-f2e8a10f0607@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/20 9:22, yukuai (C) 写道:
-> 在 2022/05/20 0:10, Michal Koutný 写道:
->> On Thu, May 19, 2022 at 08:14:28PM +0800, "yukuai (C)" 
->> <yukuai3@huawei.com> wrote:
->>> tg_with_in_bps_limit:
->>>   jiffy_elapsed_rnd = jiffies - tg->slice_start[rw];
->>>   tmp = bps_limit * jiffy_elapsed_rnd;
->>>   do_div(tmp, HZ);
->>>   bytes_allowed = tmp; -> how many bytes are allowed in this slice,
->>>                  incluing dispatched.
->>>   if (tg->bytes_disp[rw] + bio_size <= bytes_allowed)
->>>    *wait = 0 -> no need to wait if this bio is within limit
->>>
->>>   extra_bytes = tg->bytes_disp[rw] + bio_size - bytes_allowed;
->>>   -> extra_bytes is based on 'bytes_disp'
->>>
->>> For example:
->>>
->>> 1) bps_limit is 2k, we issue two io, (1k and 9k)
->>> 2) the first io(1k) will be dispatched, bytes_disp = 1k, slice_start = 0
->>>     the second io(9k) is waiting for (9 - (2 - 1)) / 2 = 4 s
->>
->> The 2nd io arrived at 1s, the wait time is 4s, i.e. it can be dispatched
->> at 5s (i.e. 10k/*2kB/s = 5s).
-> No, the example is that the second io arrived together with first io.
->>
->>> 3) after 3 s, we update bps_limit to 1k, then new waiting is caculated:
->>>
->>> without this patch:  bytes_disp = 0, slict_start =3:
->>> bytes_allowed = 1k                                <--- why 1k and not 0?
-> Because slice_start == jiffies, bytes_allowed is equal to bps_limit
->>> extra_bytes = 9k - 1k = 8k
->>> wait = 8s
->>
->> This looks like it was calculated at time 4s (1s after new config was
->> set).
-> No... it was caculated at time 3s:
-> 
-> jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
-> 
-> jiffies should be greater than 3s here, thus jiffy_elapsed_rnd is
-> 3s + throtl_slice (I'm using throtl_slice = 1s here, it should not
-> affect result)
-Hi,
+Our test report a following crash:
 
-Just to simplify explanation (assum that throtl_slice is greater than
-0.5s):
-Without this patch:
-wait time is caculated based on issuing 9k from now(3s) without any
-bytes aready dispatched.
+BUG: kernel NULL pointer dereference, address: 0000000000000018
+PGD 0 P4D 0
+Oops: 0000 [#1] SMP NOPTI
+CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G           O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+Workqueue: kblockd blk_mq_run_work_fn
+RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
+RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
+RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
+RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
+RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
+R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
+R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
+FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
+Call Trace:
+ __blk_mq_do_dispatch_sched+0x2a7/0x2c0
+ ? newidle_balance+0x23e/0x2f0
+ __blk_mq_sched_dispatch_requests+0x13f/0x190
+ blk_mq_sched_dispatch_requests+0x30/0x60
+ __blk_mq_run_hw_queue+0x47/0xd0
+ process_one_work+0x1b0/0x350
+ worker_thread+0x49/0x300
+ ? rescuer_thread+0x3a0/0x3a0
+ kthread+0xfe/0x140
+ ? kthread_park+0x90/0x90
+ ret_from_fork+0x22/0x30
 
-With this patch:
-wait time is caculated based on issuing 9k from 0s with 0.5 bytes
-aready dispatched.
->>
->>>
->>> whth this patch: bytes_disp = 0.5k, slice_start =  0,
->>> bytes_allowed = 1k * 3 + 1k = 4k
->>> extra_bytes =  0.5k + 9k - 4k = 5.5k
->>> wait = 5.5s
->>
->> This looks like calculated at 4s, so the IO would be waiting till
->> 4s+5.5s = 9.5s.
-> wait time is based on extra_bytes, this is really 5.5s, add 4s is
-> wrong here.
-> 
-> bytes_allowed = ((jiffies - slice_start) / Hz + 1) * bps_limit
-> extra_bytes = bio_size + bytes_disp - bytes_allowed
-> wait = extra_bytes / bps_limit
->>
->> As I don't know why using time 4s, I'll shift this calculation to the
->> time 3s (when the config changes):
->>
->> bytes_disp = 0.5k, slice_start =  0,
->> bytes_allowed = 1k * 3  = 3k
->> extra_bytes =  0.5k + 9k - 3k = 7.5k
-> 6.5k
->> wait = 7.5s
->>
->> In absolute time, the IO would wait till 3s+7.5s = 10.5s
-> Like I said above, wait time should not add (jiffies - slice_start)
->>
->> OK, either your 9.5s or my 10.5s looks weird (although earlier than
->> original 4s+8s=12s).
->> However, the IO should ideally only wait till
->>
->>      3s + (9k -   (6k    -    1k)     ) / 1k/s =
->>           bio - (allowed - dispatched)  / new_limit
->>
->>     =3s + 4k / 1k/s = 7s
->>
->>     ('allowed' is based on old limit)
->>
->> Or in another example, what if you change the config from 2k/s to ∞k/s
->> (unlimited, let's neglect the arithmetic overflow that you handle
->> explicitly, imagine a big number but not so big to be greater than
->> division result).
->>
->> In such a case, the wait time should be zero, i.e. IO should be
->> dispatched right at the time of config change.
-> 
-> I thought about it, however, IMO, this is not a good idea. If user
-> updated config quite frequently, io throttle will be invalid.
-> 
-> Thanks,
-> Kuai
->> (With your patch that still calculates >0 wait time (and the original
->> behavior gives >0 wait too.)
->>
->>> I hope I can expliain it clearly...
->>
->> Yes, thanks for pointing me to relevant parts.
->> I hope I grasped them correctly.
->>
->> IOW, your patch and formula make the wait time shorter but still IO can
->> be delayed indefinitely if you pass a sequence of new configs. (AFAIU)
->>
->> Regards,
->> Michal
->> .
->>
+After digging from vmcore, I found that the queue is cleaned
+up(blk_cleanup_queue() is done) and tag set is
+freed(blk_mq_free_tag_set() is done).
+
+There are two problems here:
+
+1) blk_mq_delay_run_hw_queues() will only be called from
+__blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
+This seems impossible because blk_cleanup_queue() is done, and there
+should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
+more accurate") fix the problem in bfq. And currently ohter schedulers
+don't have such problem.
+
+2) 'hctx->run_work' still exists after blk_cleanup_queue().
+blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
+all the 'run_work'. However, there is no guarantee that new 'run_work'
+won't be queued after that(and before blk_mq_exit_queue() is done).
+
+The first problem is not the root cause, it will only increase the
+probability of the second problem. this patch fix the second problem by
+checking the 'QUEUE_FLAG_DEAD' before queuing 'hctx->run_work', and
+using 'queue_lock' to synchronize queuing new work and cacelling the
+old work.
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/blk-core.c |  3 +++
+ block/blk-mq.c   | 10 ++++++++--
+ 2 files changed, 11 insertions(+), 2 deletions(-)
+
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 80fa73c419a9..f3e36d8143ec 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -314,7 +314,10 @@ void blk_cleanup_queue(struct request_queue *q)
+ 	 */
+ 	blk_freeze_queue(q);
+ 
++	/* New 'hctx->run_work' can't be queued after setting the dead flag */
++	spin_lock_irq(&q->queue_lock);
+ 	blk_queue_flag_set(QUEUE_FLAG_DEAD, q);
++	spin_unlock_irq(&q->queue_lock);
+ 
+ 	blk_sync_queue(q);
+ 	if (queue_is_mq(q)) {
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ed1869a305c4..fb35d335d554 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2093,6 +2093,8 @@ static int blk_mq_hctx_next_cpu(struct blk_mq_hw_ctx *hctx)
+ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 					unsigned long msecs)
+ {
++	unsigned long flags;
++
+ 	if (unlikely(blk_mq_hctx_stopped(hctx)))
+ 		return;
+ 
+@@ -2107,8 +2109,12 @@ static void __blk_mq_delay_run_hw_queue(struct blk_mq_hw_ctx *hctx, bool async,
+ 		put_cpu();
+ 	}
+ 
+-	kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx), &hctx->run_work,
+-				    msecs_to_jiffies(msecs));
++	spin_lock_irqsave(&hctx->queue->queue_lock, flags);
++	if (!blk_queue_dead(hctx->queue))
++		kblockd_mod_delayed_work_on(blk_mq_hctx_next_cpu(hctx),
++					    &hctx->run_work,
++					    msecs_to_jiffies(msecs));
++	spin_unlock_irqrestore(&hctx->queue->queue_lock, flags);
+ }
+ 
+ /**
+-- 
+2.31.1
+
