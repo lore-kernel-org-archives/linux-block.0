@@ -2,168 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDCC2C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 08:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DCAC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:07:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347380AbiETIt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 04:49:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47450 "EHLO
+        id S1347552AbiETJHF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 05:07:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51194 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347404AbiETIt1 (ORCPT
+        with ESMTP id S1347549AbiETJHD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 04:49:27 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF1E5CFE0E;
-        Fri, 20 May 2022 01:49:22 -0700 (PDT)
-Received: from kwepemi500012.china.huawei.com (unknown [172.30.72.54])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L4L313CQtz1JBtc;
-        Fri, 20 May 2022 16:47:57 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500012.china.huawei.com (7.221.188.12) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 16:49:21 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 16:49:20 +0800
-Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220520032542.3331610-1-yukuai3@huawei.com>
- <YocOsw6n3y11lNym@T590> <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
- <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com> <YodSlSm/sIC8G2iG@T590>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com>
-Date:   Fri, 20 May 2022 16:49:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 20 May 2022 05:07:03 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A47413C4C5
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:07:01 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220520090659euoutp02f90dec6cc27ffbc4f2f8cbcbf900046b~wxPTjBKwa1131911319euoutp026
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 09:06:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220520090659euoutp02f90dec6cc27ffbc4f2f8cbcbf900046b~wxPTjBKwa1131911319euoutp026
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1653037619;
+        bh=7sUENLoCJCYs1MSYcCbbd75YbMDrAHaelawSM1l7SHo=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=U83b2tqKHnKKza0eNrjooK0Gqmpuqkt3920Uitjbn4gdgQQdjZU7jem4VnboYRXna
+         ArdQRocEFlAEG9LIitKHQtNlq0D5G5/Ak6NfWqOGBVJb4fDDI0Upxui8KlE5l8dwMd
+         AfAQPCPWAr0TiU9OVIrPc60cAsNJb9StPy9f8Ous=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220520090658eucas1p19241042c1d4d4bf5821401c597a1af02~wxPTNJ9M-0637606376eucas1p1x;
+        Fri, 20 May 2022 09:06:58 +0000 (GMT)
+Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 42.2D.10009.23A57826; Fri, 20
+        May 2022 10:06:58 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220520090658eucas1p1b33f4cb964566691674c4b015509ceec~wxPS0eI0V3138931389eucas1p1D;
+        Fri, 20 May 2022 09:06:58 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220520090658eusmtrp1fc09ac06a8697122e1bebb8cc020ff52~wxPSzj_us2148821488eusmtrp1T;
+        Fri, 20 May 2022 09:06:58 +0000 (GMT)
+X-AuditID: cbfec7f2-e7fff70000002719-2a-62875a32e7b5
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id CA.BC.09522.23A57826; Fri, 20
+        May 2022 10:06:58 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220520090658eusmtip198be26f25d7bc7783e6b666edad5d54a~wxPSqRLcC1273112731eusmtip1c;
+        Fri, 20 May 2022 09:06:58 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.20) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 20 May 2022 10:06:56 +0100
+Message-ID: <2252c3b2-0f65-945e-dc39-c0726bce72e8@samsung.com>
+Date:   Fri, 20 May 2022 11:06:55 +0200
 MIME-Version: 1.0
-In-Reply-To: <YodSlSm/sIC8G2iG@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.8.1
+Subject: Re: [PATCH v4 08/13] btrfs:zoned: make sb for npo2 zone devices
+ align with sb log offsets
+Content-Language: en-US
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        "dsterba@suse.cz" <dsterba@suse.cz>
+CC:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        "damien.lemoal@opensource.wdc.com" <damien.lemoal@opensource.wdc.com>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "dsterba@suse.com" <dsterba@suse.com>, "hch@lst.de" <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <PH0PR04MB7416FF84CE207FEC3ED8912F9BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.20]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrFKsWRmVeSWpSXmKPExsWy7djP87pGUe1JBi9uGVusvtvPZvH77Hlm
+        i73vZrNaXPjRyGSx+Pd3FouVq48yWfQc+MBi8bfrHpPF3lvaFpcer2C32LP3JIvF5V1z2Czm
+        L3vKbrHm5lMWBz6PfyfWsHnsnHWX3ePy2VKPzUvqPXbfbACKtN5n9Xi/7yqbx/otV1k8ziw4
+        wu7xeZOcR/uBbqYA7igum5TUnMyy1CJ9uwSujL9f7jMVnOKuWLbqIksD40TOLkYODgkBE4kz
+        P7O6GLk4hARWMEocOzSLDcL5wiix+PURFgjnM6PEtv/3gDKcYB3fT/2CqlrOKDHjbD8bXNXt
+        TV+YIJxdjBKTlz5mB2nhFbCTeLS1A8xmEVCVWLNwJSNEXFDi5MwnLCC2qECExLRZZ9hAjhIW
+        SJHYsbIIJMwsIC5x68l8JpCwiECUxK93ASDjmQUOs0psOnuOFSTOJqAl0djJDmJyCsRKfP/h
+        C9GpKdG6/Tc7hC0vsf3tHGaIj5Uktv0ygXilVmLtsTPsIBMlBO5xSky88Y0dIuEisX/2IyYI
+        W1ji1fEtUHEZidOTe1gg7GqJpzd+M0M0tzBK9O9czwaxwFqi70wORI2jxKVvn6H28knceCsI
+        cQ6fxKRt05knMKrOQgqGWUj+nYXkg1lIPljAyLKKUTy1tDg3PbXYMC+1XK84Mbe4NC9dLzk/
+        dxMjMPmd/nf80w7Gua8+6h1iZOJgPMQowcGsJMLLmNuSJMSbklhZlVqUH19UmpNafIhRmoNF
+        SZw3OXNDopBAemJJanZqakFqEUyWiYNTqoEpQ2Dqnx+JRanq3I1XvVZM2b/zQnodu4NsqUmX
+        XmqfK8uDX5JOAs+Vc+YemHcy2eK67v+wuSrft+w3+LvQOc6W81LyAX7tt7WnGvdwsEa8nhp7
+        KSCKYyPrcl6bQPsrUf1F/itWen26xrZJKk6Q9522cO+04ohnlis+Xg4xsXofoxSsv0Al+Yht
+        U4n5xGZL3mKOpfn7tqQ8b7FMiHm+NveK05xlEzou+27+7vRlj+mPd9+qOBx2briXzNZqe5y5
+        VHrXIxWriUKyW9Q9OrzVOgVblvmezw7xNc57w1c2kTevkd9ZfK9gyNwJXJPmxQr6yLB2hR36
+        2ZTSV6T2carCujez14vdzwj4nPtzRtYpDSWW4oxEQy3mouJEAI6rGDvtAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupnleLIzCtJLcpLzFFi42I5/e/4XV2jqPYkg7ezpC1W3+1ns/h99jyz
+        xd53s1ktLvxoZLJY/Ps7i8XK1UeZLHoOfGCx+Nt1j8li7y1ti0uPV7Bb7Nl7ksXi8q45bBbz
+        lz1lt1hz8ymLA5/HvxNr2Dx2zrrL7nH5bKnH5iX1HrtvNgBFWu+zerzfd5XNY/2WqyweZxYc
+        Yff4vEnOo/1AN1MAd5SeTVF+aUmqQkZ+cYmtUrShhZGeoaWFnpGJpZ6hsXmslZGpkr6dTUpq
+        TmZZapG+XYJext8v95kKTnFXLFt1kaWBcSJnFyMnh4SAicT3U7/Yuhi5OIQEljJKzDy7hh0i
+        ISPx6cpHKFtY4s+1LjYQW0jgI6PEuhfKEA27GCUWnO8GK+IVsJN4tLUDzGYRUJVYs3AlI0Rc
+        UOLkzCcsILaoQITEg91nWUFsYYEUiUefZoPZzALiEreezGfqYuTgEBGIkvj1LgAifJhVYtcS
+        cYhdH5gkHt+axgJSwyagJdHYyQ5icgrESnz/4QtRrinRuv03O4QtL7H97RxmkBIJASWJbb9M
+        ID6plXh1fzfjBEbRWUhum4XkhllIJs1CMmkBI8sqRpHU0uLc9NxiQ73ixNzi0rx0veT83E2M
+        wJSx7djPzTsY5736qHeIkYmD8RCjBAezkggvY25LkhBvSmJlVWpRfnxRaU5q8SFGU2AATWSW
+        Ek3OByatvJJ4QzMDU0MTM0sDU0szYyVxXs+CjkQhgfTEktTs1NSC1CKYPiYOTqkGpuhgPda3
+        v54fzDnk17HzgM7sJXNPscZfP5Eh/EB7efPOEtOQn9XV1zy+fyr/d4Dr7tqTy59YC5oe+n5x
+        9vI5OUm3eKYdkbabvm67x4Nv37ddC+lXlgp5s2ftbgPOma8zprFs0o4O3j4l9v0BJk4tywL9
+        KcdaPO+8D/khVXjqWffhv1NOhF/+J+TBrR7F/YvvIGf+Vu4HzyQcPq//kmZc03uSIaYjzDVp
+        xvu+6gm//fZ4u557nDol7bdqwr79l36u+Pax9c7igDkmMmlqVzTbZhZM/rEs8ejcjTZ/toRL
+        vzXiOi/VZqZvmV51drLJUrO3kZsu7M/mzT3r5+Zkt/VtxwJVCR37c4pTXulc82EJ29StxFKc
+        kWioxVxUnAgA6L2ujKIDAAA=
+X-CMS-MailID: 20220520090658eucas1p1b33f4cb964566691674c4b015509ceec
+X-Msg-Generator: CA
+X-RootMTR: 20220516165429eucas1p272c8b4325a488675f08f2d7016aa6230
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220516165429eucas1p272c8b4325a488675f08f2d7016aa6230
+References: <20220516165416.171196-1-p.raghav@samsung.com>
+        <CGME20220516165429eucas1p272c8b4325a488675f08f2d7016aa6230@eucas1p2.samsung.com>
+        <20220516165416.171196-9-p.raghav@samsung.com>
+        <20220517124257.GD18596@twin.jikos.cz>
+        <717a2c83-0678-9310-4c75-9ad5da0472f6@samsung.com>
+        <PH0PR04MB7416FF84CE207FEC3ED8912F9BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/20 16:34, Ming Lei 写道:
-> On Fri, May 20, 2022 at 03:02:13PM +0800, yukuai (C) wrote:
->> 在 2022/05/20 14:23, yukuai (C) 写道:
->>> 在 2022/05/20 11:44, Ming Lei 写道:
->>>> On Fri, May 20, 2022 at 11:25:42AM +0800, Yu Kuai wrote:
->>>>> Our test report a following crash:
->>>>>
->>>>> BUG: kernel NULL pointer dereference, address: 0000000000000018
->>>>> PGD 0 P4D 0
->>>>> Oops: 0000 [#1] SMP NOPTI
->>>>> CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G
->>>>> O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
->>>>> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
->>>>> rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
->>>>> Workqueue: kblockd blk_mq_run_work_fn
->>>>> RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
->>>>> RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
->>>>> RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
->>>>> RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
->>>>> RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
->>>>> R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
->>>>> R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
->>>>> FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000)
->>>>> knlGS:0000000000000000
->>>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>> CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
->>>>> Call Trace:
->>>>>    __blk_mq_do_dispatch_sched+0x2a7/0x2c0
->>>>>    ? newidle_balance+0x23e/0x2f0
->>>>>    __blk_mq_sched_dispatch_requests+0x13f/0x190
->>>>>    blk_mq_sched_dispatch_requests+0x30/0x60
->>>>>    __blk_mq_run_hw_queue+0x47/0xd0
->>>>>    process_one_work+0x1b0/0x350
->>>>>    worker_thread+0x49/0x300
->>>>>    ? rescuer_thread+0x3a0/0x3a0
->>>>>    kthread+0xfe/0x140
->>>>>    ? kthread_park+0x90/0x90
->>>>>    ret_from_fork+0x22/0x30
->>>>>
->>>>> After digging from vmcore, I found that the queue is cleaned
->>>>> up(blk_cleanup_queue() is done) and tag set is
->>>>> freed(blk_mq_free_tag_set() is done).
->>>>>
->>>>> There are two problems here:
->>>>>
->>>>> 1) blk_mq_delay_run_hw_queues() will only be called from
->>>>> __blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
->>>>> This seems impossible because blk_cleanup_queue() is done, and there
->>>>> should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
->>>>> more accurate") fix the problem in bfq. And currently ohter schedulers
->>>>> don't have such problem.
->>>>>
->>>>> 2) 'hctx->run_work' still exists after blk_cleanup_queue().
->>>>> blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
->>>>> all the 'run_work'. However, there is no guarantee that new 'run_work'
->>>>> won't be queued after that(and before blk_mq_exit_queue() is done).
->>>>
->>>> It is blk_mq_run_hw_queue() caller's responsibility to grab
->>>> ->q_usage_counter for avoiding queue cleaned up, so please fix the user
->>>> side.
->>>>
->>> Hi,
->>>
->>> Thanks for your advice.
->>>
->>> blk_mq_run_hw_queue() can be called async, in order to do that, what I
->>> can think of is that grab 'q_usage_counte' before queuing 'run->work'
->>> and release it after. Which is very similar to this patch...
->>
->> Hi,
->>
->> How do you think about following change:
+On 5/19/22 09:57, Johannes Thumshirn wrote:
+>> Unfortunately it is not possible to just move the WP in zoned devices.
+>> The only alternative that I could use is to do write zeroes which are
+>> natively supported by some devices such as ZNS. It would be nice to know
+>> if someone had a better solution to this instead of doing write zeroes
+>> in zoned devices.
 >>
 > 
-> I think the issue is in blk_mq_map_queue_type() which may touch tagset.
+> I have another question. In case we need to pad the sb zone with a write
+> zeros and have a power fail between the write-zeros and the regular 
+> super-block write, what happens? I know this padding is only done for the
+> backup super blocks, never the less it can happen and it can happen when
+> the primary super block is also corrupted.
 > 
-> So please try the following patch:
+> AFAIU we're then trying to reach out for a backup super block, look at the
+> write pointer and it only contains zeros but no super block, as only the 
+> write-zeros has reached the device and not the super block write.
 > 
+> How is this situation handled?
 > 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ed1869a305c4..5789e971ac83 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
->    */
->   static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
->   {
-> -	struct blk_mq_hw_ctx *hctx;
-> -
-> +	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
->   	/*
->   	 * If the IO scheduler does not respect hardware queues when
->   	 * dispatching, we just don't bother with multiple HW queues and
-> @@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
->   	 * just causes lock contention inside the scheduler and pointless cache
->   	 * bouncing.
->   	 */
-> -	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
-> -				     raw_smp_processor_id());
-> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-> +
->   	if (!blk_mq_hctx_stopped(hctx))
->   		return hctx;
->   	return NULL;
-
-Hi, Ming
-
-This patch do make sense, however, this doesn't fix the root cause, it
-just bypass the problem like commit ddc25c86b466 ("block, bfq: make 
-bfq_has_work() more accurate"), which will prevent
-blk_mq_delay_run_hw_queues() to be called in such case.
-
-I do think we need to make sure 'run_work' doesn't exist after
-blk_cleanup_queue().
-
-Thanks,
-Kuai
+That is a very good point. I did think about this situation while adding
+padding to the mirror superblock with write zeroes. If the drive is
+**less than 4TB** and with the **primary superblock corrupted**, then it
+will be an issue with the situation you have described for npo2 drives.
+That situation is not handled here. Ofc this is not an issue when we
+have the second mirror at 4TB for bigger drives. Do you have some ideas
+in mind for this failure mode?
+> Thanks,
+> 	Johannes
