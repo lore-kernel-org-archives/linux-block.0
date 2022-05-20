@@ -2,70 +2,140 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB73C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 06:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C93C433FE
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 06:33:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345849AbiETGaH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 02:30:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34726 "EHLO
+        id S1345878AbiETGdb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 02:33:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41936 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345817AbiETGaG (ORCPT
+        with ESMTP id S235315AbiETGda (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 02:30:06 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89EC214AF51;
-        Thu, 19 May 2022 23:30:05 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Fri, 20 May 2022 02:33:30 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FD0714CA03;
+        Thu, 19 May 2022 23:33:29 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2517A61D97;
-        Fri, 20 May 2022 06:30:05 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 342CEC385A9;
-        Fri, 20 May 2022 06:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653028204;
-        bh=zLcVAySAGbHavOCyzZ3mHIX/dLccYG2RDrRrXi8XEwY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mIi0kfLHATOya+xGeR0ur/w+CnAM2SQc8hib3dEpvbOubRYGldcau8s/33XCt2s76
-         SThI5nP5Bka/U8+8maJc8ic6ISPZUSR89qgmdoBjvGiqKfq7osmnUSaJHcB6JaG+kf
-         KbTo0iwc3dep7dA/EntYOhibh5zEl3e1WihnZHvrlzXhxsrS7FoVV8b6UdpGBAyRFf
-         Mgjw7EIhBzad06vU33Lx5bn2irSQTKaen9hMmsvds+j654UiaktBoZjKnKcWp+uVfB
-         Vi6Px9ntf2zfzBRwDwtTs3Xltn/kmUYIPpa1ptWnO+w7PtNiWQmW0CZDuhK4HMXxOi
-         7bR3YsuCNmwWQ==
-Date:   Thu, 19 May 2022 23:30:02 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     "Darrick J. Wong" <djwong@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
-Message-ID: <Yoc1asB6Ud4Su3gf@sol.localdomain>
-References: <20220518235011.153058-1-ebiggers@kernel.org>
- <20220518235011.153058-2-ebiggers@kernel.org>
- <YobNXbYnhBiqniTH@magnolia>
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 010BD21CA9;
+        Fri, 20 May 2022 06:33:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653028408; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yIdItr1/0sk8Hct1nUAzdlPfadG1r1sjxjLpyY6HNY0=;
+        b=lO9Rxf1icYNXycNnpBFEiQdpXvMTjhY70jO4AaDn6Vhc4k5DazzpPsKO9PcXshBeF5/mmL
+        ygo5+WzDKCp/BDi2ADlTq94VyARijKUut6GdeQysOPi09TUyXjd9q8zwCOBbSy3gruzG4h
+        seCUY9tS3S5CM4gGB69TBAtRo/rkrDI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653028408;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=yIdItr1/0sk8Hct1nUAzdlPfadG1r1sjxjLpyY6HNY0=;
+        b=b8ybhCvriW2Q+mSZmTSLE1dGuhFOwU4GvFZUT7LQNHTX8adlfNTotgiZuIJtuy6LuSBmDc
+        uN9Mz2bcbpQ8HmDg==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 93A2113A5F;
+        Fri, 20 May 2022 06:33:27 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 4q0QIjc2h2LjGQAAMHmgww
+        (envelope-from <hare@suse.de>); Fri, 20 May 2022 06:33:27 +0000
+Message-ID: <eabd386f-9e25-b05c-654e-2b3da0217634@suse.de>
+Date:   Fri, 20 May 2022 08:33:26 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YobNXbYnhBiqniTH@magnolia>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.0
+Subject: Re: [linux-next] build fails modpost: "blkcg_get_fc_appid"
+ [drivers/nvme/host/nvme-fc.ko] undefined!
+Content-Language: en-US
+To:     Randy Dunlap <rdunlap@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>
+Cc:     Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-kernel <linux-kernel@vger.kernel.org>,
+        Abdul Haleem <abdhalee@linux.vnet.ibm.com>,
+        sachinp@linux.vnet.com, mputtash@linux.vnet.com,
+        Christoph Hellwig <hch@lst.de>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
+References: <86768c9d-9a9c-653b-ab99-86de3bc434d8@linux.vnet.ibm.com>
+ <7b16694b-0281-d06d-7564-c4f26760a25e@kernel.dk>
+ <fc5f8b96-3c93-5400-b917-a1d991cbe7c9@suse.de>
+ <900f57bc-9978-9ba6-22fb-48f03fcf5011@kernel.dk>
+ <c2d252a1-7223-4899-e5c9-e4bb27e2fc8a@kernel.dk>
+ <268233c7-88ad-6b5c-6991-e3a4f1ac2540@suse.de>
+ <6f38a339-41b5-aafe-c788-bd34a1806d52@infradead.org>
+From:   Hannes Reinecke <hare@suse.de>
+In-Reply-To: <6f38a339-41b5-aafe-c788-bd34a1806d52@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 04:06:05PM -0700, Darrick J. Wong wrote:
-> I guess that means for XFS it's effectively max(pagesize, i_blocksize,
-> bdev io_opt, sb_width, and (pretend XFS can reflink the realtime volume)
-> the rt extent size)?  I didn't see a manpage update for statx(2) but
-> that's mostly what I'm interested in. :)
+On 5/19/22 13:02, Randy Dunlap wrote:
+> 
+> 
+> On 5/19/22 06:02, Hannes Reinecke wrote:
+>> On 5/19/22 14:42, Jens Axboe wrote:
+>>> On 5/19/22 6:40 AM, Jens Axboe wrote:
+>>>> On Thu, May 19, 2022 at 6:38 AM Hannes Reinecke <hare@suse.de> wrote:
+>>>>>
+>>>>> On 5/19/22 14:14, Jens Axboe wrote:
+>>>>>> On 5/19/22 1:49 AM, Tasmiya Nalatwad wrote:
+>>>>>>> Greetings,
+>>>>>>>
+>>>>>>> linux-next build fails modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+>>>>>>>
+>>>>>>> Console Logs :
+>>>>>>>
+>>>>>>> [console-expect]#make -j 17 -s && make modules && make modules_install && make install
+>>>>>>> make -j 17 -s && make modules && make modules_install && make install
+>>>>>>> ERROR: modpost: "blkcg_get_fc_appid" [drivers/nvme/host/nvme-fc.ko] undefined!
+>>>>>>> make[1]: *** [scripts/Makefile.modpost:134: modules-only.symvers] Error 1
+>>>>>>> make: *** [Makefile:1914: modules] Error 2
+>>>>>>> make: *** Waiting for unfinished jobs....
+>>>>>>
+>>>>>> Christoph, can you fix this up?
+>>>>>>
+>>>>> Cannot reproduce with commit 21498d01d045c5b95b93e0a0625ae965b4330ebe.
+>>>>> Please share details.
+>>>>
+>>>> The kerneltest bot also reported this a few days ago, you might be able
+>>>> to find the details there as that includes config etc.
+>>>
+>>> Here: https://lore.kernel.org/linux-mm/202205190527.o9wVEvHI-lkp@intel.com/
+>>>
+>> Right. Send a patch.
+> 
+> 
+> https://lore.kernel.org/all/20220518045704.GA30131@lst.de/
+> 
+> but it needs to be sent as a formal patch.
+> 
+I am confused.
+The 'for-next' branch from Martin Petersen has the updated patch
+(827fc630e4c8 ("scsi: nvme-fc: Add new routine nvme_fc_io_getuuid()")
+but linux-next is still on the old (v1) version.
 
-I'll send out a man page update with the next version.  I don't think there will
-be much new information that isn't already included in this patchset, though.
+Not sure what to do here.
+Martin?
 
-> Looking ahead, it looks like the ext4/f2fs implementations only seem to
-> be returning max(i_blocksize, bdev io_opt)?  But not the pagesize?
+Cheers,
 
-I think that's just an oversight.  ext4 and f2fs should round the value up to
-PAGE_SIZE.
-
-- Eric
+Hannes
+-- 
+Dr. Hannes Reinecke                Kernel Storage Architect
+hare@suse.de                              +49 911 74053 688
+SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
+Myers, Andrew McDonald, Martje Boudien Moerman
