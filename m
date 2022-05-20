@@ -2,217 +2,192 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D30EBC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:37:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89369C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:53:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242399AbiETJhX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 05:37:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51424 "EHLO
+        id S240039AbiETJxp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 05:53:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54138 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235632AbiETJhV (ORCPT
+        with ESMTP id S1347924AbiETJxn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 05:37:21 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 814073819D
-        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653039440; x=1684575440;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=44AYEkHwwvqPKNwUh0h18QP8POBKNd/3hPueT0JllVE=;
-  b=QgYuZkUVFYlg+POdpFM/Fm6wsSRCNZpvCw1rPWwd13fBLTU5zOmbqKhN
-   DtAK/C5oykudcEIfKQ4q2V+WP6uusukJhXTC3lW0wtMb4BNn+SRHyjkr2
-   N9XRXc9hCIFVoCQMb7Jxdk4i7iYEcGp0CurK2IbJS7mJ+gWkKAwKXlhhT
-   CzIIuJeu7vrkgQ3T1ynTs1XFTM8wL2eJZ33APSwGUbytj/sLmKC990IaX
-   eGA4bxG+KPzr1kFyPEWp+HrHvMNUhoRt0tg33YUqWg0PdTYy0cTXKT4Pr
-   klRLvMX+ukfgY4Q+8CWxINNN8Ivz11qot8zyiqY66RZmArapOAmEuJ31E
-   Q==;
-X-IronPort-AV: E=Sophos;i="5.91,238,1647273600"; 
-   d="scan'208";a="305116983"
-Received: from mail-dm6nam10lp2101.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.101])
-  by ob1.hgst.iphmx.com with ESMTP; 20 May 2022 17:37:19 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=megLEazfICCNww2sjKiQgBA2ScCZmC3UP8QmqJZq8FYuPmUnUf+jdApbkKrNiHBmfzA0AywhlqtCdsJX+NG0Za7khIJlzHboWk43iuLgXKbnHfpGMtAWcKpRxipQ98eBo7io7dFbtG+y6OGg3//Fx4iHIik+7Ajim1+nD9QyI9HZT6NhO13QjZx+3inX5SDX3U/We/7kEkFFOQhVcaesmbGC3G9jiEX4B5E2p6pdxwdXAPqwhdIJxX+RFNWr3mK/C4Kad9JwTqVYMkgknnjOwlz2uwkMG5NUPnxvPlhJLToZtOAZVkm/TGE+RSWv6MMDQXEclzXSS3y+TIEw23NY3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dNvEfXRwA5PhYSu/IjmPPeDA7FppmX1kJI023sy06IY=;
- b=Oi6TnsRHE81PzXyFYCkOZ8endRQc/8kopeNDS3722ZcRIeAheziNPs4rJky8AWuCO9KCFLhnvXewjiXL6wu8zKAsIpRcFLib0beBPN4B8HC6OCbgRARi9Yuk60pAoXr6sG0oepWYU82L838U4dsbFJg+XJ3yKoc+YjRVOKidVM9ZL56/WOUmDd+PZz6g5tETuaPwd9RGLYK2/ynHCW9nFti/PvMfJdGF26xB3v1BIfkX6a/RtJPYOzd34k/MSx1LiMuo00yUiF1ACr25yfyht+hfSwfuefXgA7W+oESWZxkIk2KFk4Rv2VnpQ7/T0tWAwRwpVEM+y7j6xGrhDxenig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dNvEfXRwA5PhYSu/IjmPPeDA7FppmX1kJI023sy06IY=;
- b=NMkYi4szmxn9il40OCCSgN/cDMUo+CxVMuGAj2iBlblFEW1h45Y4BoPXIkY7TZinGZeEYhVxBHv8uoOO4a63joBKE96wGx/NOF2tWSujOq89WhQNssPFxEA2DVnMxYMlG15OuJaTcDo0vhZxX0waHEyrPhAV3DIhx25/kzhtazY=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- CY4PR04MB3718.namprd04.prod.outlook.com (2603:10b6:903:e8::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5273.14; Fri, 20 May 2022 09:37:18 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5273.017; Fri, 20 May 2022
- 09:37:18 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Xiao Yang <yangx.jy@fujitsu.com>
-CC:     "osandov@fb.com" <osandov@fb.com>,
-        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] nvmeof-mp/001: Set expected count properly
-Thread-Topic: [PATCH blktests] nvmeof-mp/001: Set expected count properly
-Thread-Index: AQHYbC0yyY3KuFA5xk+PPTPW3T8YDA==
-Date:   Fri, 20 May 2022 09:37:18 +0000
-Message-ID: <20220520093717.gecy5qngf6l3xpm3@shindev>
-References: <20220518034443.46803-1-yangx.jy@fujitsu.com>
-In-Reply-To: <20220518034443.46803-1-yangx.jy@fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c3464a6c-5955-4ed3-e8aa-08da3a4454f2
-x-ms-traffictypediagnostic: CY4PR04MB3718:EE_
-x-microsoft-antispam-prvs: <CY4PR04MB371805CBF916ACBF7BB3882EEDD39@CY4PR04MB3718.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: zysbvxqVKl3JXTAhTceg7FYHoiBTlqxtiwR0I0SKNyIOaYDQQ3Bs7J0NEQy79xWAoDRUnH07qdLRAcTN2ZLtP69fpp0ApVFXSqIdo+nDKbeucG0Gp62RQlq/28CAuLiPaC+gP41fNiAwIcbX8vR69jpp6hQYFEfWo1MVuQzs7lTK10pB7Mm2l7slLCvfZVZtLt7ZhnTZmmyI7wCssIYjS5C87hegZB2CpVDzjULdC0modg4BKziGoCu5WnaNtGlVA2n7FgmB0Vrt78JRjxLXUp3AVKYSFQyvzUjBhHdnt1uiEBN8IqhSEPbUgeN9WdnE4UsYk1+Ms/CKe4qrVDlIWxMJPsGe9NwKFz8V0pSP/XWtlEdJYLFV2hwS4vd8xiSqriYxkD7JST+gCtW8toZ1oWAr7ekq4tx5kPcQDv/K+Rh8SlquFOsRONu/LA4XRKmhNxwlDhB/xDBYc3VrhqHKK7V61axWlK3dp3urhXA3EDpa3MpA1plN+IX2IHDcJ1fPMkOmEEUiAiHFZpwr3sT5jFZPid00rB9J9FPGDojqSaXpa2k0GGahsrSksVv1Fqm0hsh73uPKfA2k9gfA7sg/ZZ+A7ZA4p3cpgs7PVTCKPBb1cZczj5jK9C9DZSGRkfM4ZeEn48M5vGguRCFSLaqAU1yIkT8aP9Lvb9LcmjvA6RSdIa8Wb7CO+IPzD6NGeu7T+Ju1S8EA+hMEGQ4XHxnhxA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(33716001)(508600001)(6486002)(83380400001)(71200400001)(8936002)(316002)(54906003)(6916009)(44832011)(26005)(38070700005)(38100700002)(186003)(1076003)(4326008)(66556008)(122000001)(8676002)(91956017)(66946007)(76116006)(6506007)(5660300002)(6512007)(9686003)(2906002)(82960400001)(64756008)(86362001)(66446008)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?f+P1ndxXwvgU/7h7GeF++ASwn6umLhk6tTXEWGgH4A9ueSaSDgzKnLb8LVx3?=
- =?us-ascii?Q?mc/q39mZ4q4mXVO8QLKksqNT1OFRirDJLuyec1eUu5IrG54I7vbCcv+LJ+by?=
- =?us-ascii?Q?OVyZmJZViGbftQA3IuW6NBb3jGPKst5jmRjf6WiHriusJ+t+LaTywfmDm6j8?=
- =?us-ascii?Q?7TPN+N18SkNQpr8QGIok5tXtsALtc1R3h30+/kyoTrci8ITlWhorSsQqZ/Hd?=
- =?us-ascii?Q?HvDyqdFkBLMDNWVe6yBDRsgW5GDKh/kN6wmnG6er3rzC8Tw00l6qYY6A3txw?=
- =?us-ascii?Q?OioN3a5/0ac5vCVpbYefgeUErT7S71impTopUxU6g59tj0IobtaH1fTd1KCz?=
- =?us-ascii?Q?X4QvIO55wcrmO//aK37biuYemZMDKf4+jyySxD4EnvVmk2kzXZ3/at9mMdHH?=
- =?us-ascii?Q?mKOpV6amJCYVLJ3Puqt0J3oEMVi+ypFeoRPYyLUioJe0OEIxG4sJfV3VbWxJ?=
- =?us-ascii?Q?W0fULOtE1xXhq/Vhuf7IQESEVqM5K+qFfZ688G9aDm9Z+UVGJY1ChizavCh5?=
- =?us-ascii?Q?gGmQ6jv9osC59hcpxRChxOSWb0I6oyXRu3fHtNywhsuOVDOQStjOKj/k/dIo?=
- =?us-ascii?Q?x51lpRQbIH0vZdBLVI57jZ16/5nqnlEIP6QK0hwRw8ZOQVDRHMWzUJCKAY3o?=
- =?us-ascii?Q?FUWM0C0Y92Pdn6RvA23S+gIR1Jh3TE8LbWQDJRmjJsdcJfxqprNK2Bd+X68o?=
- =?us-ascii?Q?pH58oA7gE9ZAjIm16Sx1fTqFHkb83Bt7wOmR1017DwIo5tD5mrkQMFrp/ynu?=
- =?us-ascii?Q?l+nDRaFIWVBH5KjD+uBCWSk5ebVyXHNPi1SVVEttG1dCdkSY1cOx4d0YW0eU?=
- =?us-ascii?Q?VyzIxsi7dqBNfNaeuwdF8Zscoeing7neN7ZF5pfpI8NmJnsDYKjUhB1Irt0C?=
- =?us-ascii?Q?5/7Q7K5bPMhJDcIREVOWzxhXZy2lgV09/TTlP66laeo63QtV83H2G4JYM1r3?=
- =?us-ascii?Q?lZqTq3H8wMwnEugMtO/rvicm8YkoU4cnTDfWVouRz3Yp4sR5rJfHBD8wx/4q?=
- =?us-ascii?Q?wz4CLkxk9aWQJHG7s4W76Nl4RJmC3Jy88D4sOZ1Tyt2LWxZ6/Poy67o9yXXU?=
- =?us-ascii?Q?KLeUB0NCsFzKBJ5l7ipjz/uK7H1PDjUwv49XNQrspjV/JCXuCy0vkPdhPEHB?=
- =?us-ascii?Q?S39sPY3//KcUSlrrNztmFUuT7qE8bYlfJiHiAkLzF+G3/If+o7i21qSIc4ZS?=
- =?us-ascii?Q?2xZmV5YEVmP8gICA3y2RIOMQzXKYTYk0HsmDVy1niFa252jf95lxXz/NbsFV?=
- =?us-ascii?Q?rn7cX1jUgnFEJWjKIOOTUuN9uVOV3w23rE9Cy9/RbTQ+CgiSJ+fucWjAaicl?=
- =?us-ascii?Q?ZcSKe6h5jiMW9o4YF/u+DeV4jPGaXbVcwtIYiRkfrmxnzciruJ8D8Cej40lF?=
- =?us-ascii?Q?7RT18LVuNRZyrqKZ9UgS8z5B0s9iUHkrrtxGB0uxBrBE2VysIJtDN7iJYaGF?=
- =?us-ascii?Q?hUwc/3aBSoo3BuIlP1GBqPVwHjtaUQJbL0xmuHfBReOMzR6ZRntCYBV0rjof?=
- =?us-ascii?Q?xFtBtl2FZl1V4ikA75VeKpFCAFX7kuceU8qt3LZGicJALRrLxTJJvnwiMmRV?=
- =?us-ascii?Q?WBnfDW9l5aLx4v7XIHfSpPnJywORVhpEUnpFYmDaWLZFSC72ZvFnUcVHEQPv?=
- =?us-ascii?Q?9OsmD9xAUUWTMQJwFUoCF80xed8Wiw1/t0gKWgdVdrQ2sP9gqy0aYsRq8W2d?=
- =?us-ascii?Q?xK/lFRI62qv5gnOnhtcD0cBnrTwUDnYZUjGdw9xHrkf/DMYcbkAS63iharkB?=
- =?us-ascii?Q?TTbFkd7IoCWmR7aLCzasT6dxJNZq7KkZnhVo/ZyPPku4UzzIBcRp?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <384ABE73F3C462498BC0C02A4C312F91@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 20 May 2022 05:53:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C656B14AF52
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:53:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653040420;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Dn41worp1wDo6PF9XTuid7e1vcUmdBzXAlYAQOBdYHw=;
+        b=GK/jB8nxFnOSWVo1O6/QmkzkU7sOFqP5xOWgJ97j6XCfczD05n2IwtMlYepZu4ITtBOe3H
+        YSJuRcINUWjk27ZUx+0kd3WHvDU55a8OR1k2U9XkSHwj2buttwoEWgJ0sHf7g8/M3Cc2ur
+        4ilL8nusBa/XvjA5uj2+2xnIFVwRBKM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-582-qZJNmVo8MNCtiMbwrNHQYA-1; Fri, 20 May 2022 05:53:39 -0400
+X-MC-Unique: qZJNmVo8MNCtiMbwrNHQYA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 180FD8015BA;
+        Fri, 20 May 2022 09:53:39 +0000 (UTC)
+Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0562A492C3B;
+        Fri, 20 May 2022 09:53:34 +0000 (UTC)
+Date:   Fri, 20 May 2022 17:53:28 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+Message-ID: <YodlGOo7vrUa7DZK@T590>
+References: <20220520032542.3331610-1-yukuai3@huawei.com>
+ <YocOsw6n3y11lNym@T590>
+ <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+ <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com>
+ <YodSlSm/sIC8G2iG@T590>
+ <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3464a6c-5955-4ed3-e8aa-08da3a4454f2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 May 2022 09:37:18.3582
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: uCMZIVHwXh7H2hnTn8oMnhvvNq7Q3ltz7NN3ba3p8FRHnGHqnGnU9ZqynGFw/R2Lkhql2dRkDWiBr/Wb8x/hd+gWNBRXUndjn1X4Q0g36vk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR04MB3718
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 18, 2022 / 11:44, Xiao Yang wrote:
-> The number of block devices will increase according
-> to the number of RDMA-capable NICs.
-> For example, nvmeof-mp/001 with two RDMA-capable NICs
-> got the following error:
-> -------------------------------------
->     Configured NVMe target driver
->     -count_devices(): 1 <> 1
->     +count_devices(): 2 <> 1
->     Passed
-> -------------------------------------
->=20
-> Set expected count properly by calculating the number
-> of RDMA-capable NICs.
->=20
-> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
-> ---
->  tests/nvmeof-mp/001     | 7 +++++--
->  tests/nvmeof-mp/001.out | 1 -
->  2 files changed, 5 insertions(+), 3 deletions(-)
->=20
-> diff --git a/tests/nvmeof-mp/001 b/tests/nvmeof-mp/001
-> index f3e6394..82cb298 100755
-> --- a/tests/nvmeof-mp/001
-> +++ b/tests/nvmeof-mp/001
-> @@ -18,7 +18,11 @@ count_devices() {
->  }
-> =20
->  wait_for_devices() {
-> -	local expected=3D1 i devices
-> +	local expected=3D0 i devices
-> +
-> +	for i in $(rdma_network_interfaces); do
-> +		((expected++))
-> +	done
-> =20
->  	use_blk_mq y || return $?
->  	for ((i=3D0;i<100;i++)); do
-> @@ -27,7 +31,6 @@ wait_for_devices() {
->  		sleep .1
->  	done
->  	echo "count_devices(): $devices <> $expected" >>"$FULL"
-> -	echo "count_devices(): $devices <> $expected"
->  	[ "$devices" -ge $expected ]
+On Fri, May 20, 2022 at 04:49:19PM +0800, yukuai (C) wrote:
+> 在 2022/05/20 16:34, Ming Lei 写道:
+> > On Fri, May 20, 2022 at 03:02:13PM +0800, yukuai (C) wrote:
+> > > 在 2022/05/20 14:23, yukuai (C) 写道:
+> > > > 在 2022/05/20 11:44, Ming Lei 写道:
+> > > > > On Fri, May 20, 2022 at 11:25:42AM +0800, Yu Kuai wrote:
+> > > > > > Our test report a following crash:
+> > > > > > 
+> > > > > > BUG: kernel NULL pointer dereference, address: 0000000000000018
+> > > > > > PGD 0 P4D 0
+> > > > > > Oops: 0000 [#1] SMP NOPTI
+> > > > > > CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G
+> > > > > > O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
+> > > > > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> > > > > > rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+> > > > > > Workqueue: kblockd blk_mq_run_work_fn
+> > > > > > RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
+> > > > > > RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
+> > > > > > RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
+> > > > > > RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
+> > > > > > RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
+> > > > > > R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
+> > > > > > R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
+> > > > > > FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000)
+> > > > > > knlGS:0000000000000000
+> > > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > > > CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
+> > > > > > Call Trace:
+> > > > > >    __blk_mq_do_dispatch_sched+0x2a7/0x2c0
+> > > > > >    ? newidle_balance+0x23e/0x2f0
+> > > > > >    __blk_mq_sched_dispatch_requests+0x13f/0x190
+> > > > > >    blk_mq_sched_dispatch_requests+0x30/0x60
+> > > > > >    __blk_mq_run_hw_queue+0x47/0xd0
+> > > > > >    process_one_work+0x1b0/0x350
+> > > > > >    worker_thread+0x49/0x300
+> > > > > >    ? rescuer_thread+0x3a0/0x3a0
+> > > > > >    kthread+0xfe/0x140
+> > > > > >    ? kthread_park+0x90/0x90
+> > > > > >    ret_from_fork+0x22/0x30
+> > > > > > 
+> > > > > > After digging from vmcore, I found that the queue is cleaned
+> > > > > > up(blk_cleanup_queue() is done) and tag set is
+> > > > > > freed(blk_mq_free_tag_set() is done).
+> > > > > > 
+> > > > > > There are two problems here:
+> > > > > > 
+> > > > > > 1) blk_mq_delay_run_hw_queues() will only be called from
+> > > > > > __blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
+> > > > > > This seems impossible because blk_cleanup_queue() is done, and there
+> > > > > > should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
+> > > > > > more accurate") fix the problem in bfq. And currently ohter schedulers
+> > > > > > don't have such problem.
+> > > > > > 
+> > > > > > 2) 'hctx->run_work' still exists after blk_cleanup_queue().
+> > > > > > blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
+> > > > > > all the 'run_work'. However, there is no guarantee that new 'run_work'
+> > > > > > won't be queued after that(and before blk_mq_exit_queue() is done).
+> > > > > 
+> > > > > It is blk_mq_run_hw_queue() caller's responsibility to grab
+> > > > > ->q_usage_counter for avoiding queue cleaned up, so please fix the user
+> > > > > side.
+> > > > > 
+> > > > Hi,
+> > > > 
+> > > > Thanks for your advice.
+> > > > 
+> > > > blk_mq_run_hw_queue() can be called async, in order to do that, what I
+> > > > can think of is that grab 'q_usage_counte' before queuing 'run->work'
+> > > > and release it after. Which is very similar to this patch...
+> > > 
+> > > Hi,
+> > > 
+> > > How do you think about following change:
+> > > 
+> > 
+> > I think the issue is in blk_mq_map_queue_type() which may touch tagset.
+> > 
+> > So please try the following patch:
+> > 
+> > 
+> > diff --git a/block/blk-mq.c b/block/blk-mq.c
+> > index ed1869a305c4..5789e971ac83 100644
+> > --- a/block/blk-mq.c
+> > +++ b/block/blk-mq.c
+> > @@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
+> >    */
+> >   static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+> >   {
+> > -	struct blk_mq_hw_ctx *hctx;
+> > -
+> > +	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
+> >   	/*
+> >   	 * If the IO scheduler does not respect hardware queues when
+> >   	 * dispatching, we just don't bother with multiple HW queues and
+> > @@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+> >   	 * just causes lock contention inside the scheduler and pointless cache
+> >   	 * bouncing.
+> >   	 */
+> > -	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
+> > -				     raw_smp_processor_id());
+> > +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
+> > +
+> >   	if (!blk_mq_hctx_stopped(hctx))
+> >   		return hctx;
+> >   	return NULL;
+> 
+> Hi, Ming
+> 
+> This patch do make sense, however, this doesn't fix the root cause, it
 
-The change looks good for me other than a nit: after applying this patch,
-shellcheck complains:
+Isn't the root cause that tagset is referred after blk_cleanup_queue
+returns?
 
-$ make check
-shellcheck -x -e SC2119 -f gcc check new common/* \
-        tests/*/rc tests/*/[0-9]*[0-9]
-tests/nvmeof-mp/001:30:20: note: Double quote to prevent globbing and word =
-splitting. [SC2086]
-tests/nvmeof-mp/001:34:19: note: Double quote to prevent globbing and word =
-splitting. [SC2086]
+> just bypass the problem like commit ddc25c86b466 ("block, bfq: make
+> bfq_has_work() more accurate"), which will prevent
+> blk_mq_delay_run_hw_queues() to be called in such case.
 
-As the commit changes value of the variable $expected, its references need
-double quotes:
+How can?
 
-diff --git a/tests/nvmeof-mp/001 b/tests/nvmeof-mp/001
-index 82cb298..70a4455 100755
---- a/tests/nvmeof-mp/001
-+++ b/tests/nvmeof-mp/001
-@@ -27,11 +27,11 @@ wait_for_devices() {
-        use_blk_mq y || return $?
-        for ((i=3D0;i<100;i++)); do
-                devices=3D$(count_devices)
--               [ "$devices" -ge $expected ] && break
-+               [ "$devices" -ge "$expected" ] && break
-                sleep .1
-        done
-        echo "count_devices(): $devices <> $expected" >>"$FULL"
--       [ "$devices" -ge $expected ]
-+       [ "$devices" -ge "$expected" ]
- }
+> 
+> I do think we need to make sure 'run_work' doesn't exist after
+> blk_cleanup_queue().
 
- test() {
+Both hctx and request queue are fine to be referred after blk_cleanup_queue
+returns, what can't be referred is tagset.
 
---=20
-Best Regards,
-Shin'ichiro Kawasaki=
+
+Thanks,
+Ming
+
