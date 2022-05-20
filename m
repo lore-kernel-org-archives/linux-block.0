@@ -2,165 +2,220 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A35ECC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:24:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C002C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:30:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347627AbiETJYk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 05:24:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58158 "EHLO
+        id S1347714AbiETJaW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 05:30:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347703AbiETJYg (ORCPT
+        with ESMTP id S236050AbiETJaV (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 05:24:36 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B54D72F381
-        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:24:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653038674; x=1684574674;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=abAMhGfLUuRWCFdevNOA0JyLJA5Df8TYDtLoW/Vtq5U=;
-  b=kBxuHY1NHqhK1IqKIKb9MPDjw8jWL/3sUrEJLEwjo5WF5rcZYdxCMV5W
-   cKbYtoR+bTPKt7o9X6u1HYoZekrqZof/iz+Fd3x/sTFa2JlqY7UFfLmys
-   sngIIK5yVRqQ8YQ+OFcAmrm0jCpfBKOe6kXZ0WpVilfFAX/ZL/C25/iXQ
-   5UE9AY3je0YOh2Dc4LMaAjb/h7yQbVHEIvlbRMRcKDqWAGppzI12OcdLd
-   Zr+ma7PlfRBrxjloUBlu7dyWXbaA07UuxbyCURYFQOBhFPLHLbAT6xKGK
-   2Nd5exqGl1g3zHr21JJdri0N/wjrJVKPp7V0v8l1xmN/YpIMNWpxb/y4U
-   A==;
-X-IronPort-AV: E=Sophos;i="5.91,238,1647273600"; 
-   d="scan'208";a="305115369"
-Received: from mail-dm6nam10lp2106.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.106])
-  by ob1.hgst.iphmx.com with ESMTP; 20 May 2022 17:24:33 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MZ4uwdaTHvFpAHvbe+tLO6tFkjtUi4/s/a6y9YjswNxpouFWnVArYfZtthMyUqEoN1KC563eYHUTboAE4xdgn3AuzMh1oZfqSaG8yfry7NhHGLt4QqxPvCAk3T8jjv81bJKcvvS7nDaV6mSTaCKqVlGGNoxa8SXjBmULYJSfQPqfvWZfN0cTB3d+SGWnN2JWiGtljscIpaZIt/9ZlpSOghbezfLbBGQMeGV5aDRcfdC+Zazw6pFQYvnZ++bFP9dTbWqNlnyFo72JSl47saYjPxiWHecZcSiX7oZJdUdTJxn+uMe/zubfmOTIu9sjHkLPLHmsLMj/LldanLOTfBJngg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=s1lxyaqShARVB03Z5pHNOyRTkvmnn8rXlmzdUAKWLrM=;
- b=bkx52inZ06qn4ypVcSW1BUY/DDPa1Cdk1egUZgbRkPQkXbwUKsEjd8+tAPEjjFf8wWSCuiBVXWRsmQbsP/W3Uoe7m6jbohk+cyshZb4TTm8gz5XUOJyFU4FoiffxX8mSArLWwhVqEd8W9sRGCuEp7R0sojvHLBwoGAyZDVBKiVZRjQiIZ4xqwyBojqVYV4+2ixFMIaIBQ6yinVZ+qD2X5W5Q1pdpx77l4f12vNmk3eEGyvC9cEGD+w1+3FJPlqDgCbPuwpYmZD0dsoATZbRdhK887Apoe0KVieOMm76ITS7nFifQpv01k05konbk86hNZRF9ckURKcd4605o4Gdm+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s1lxyaqShARVB03Z5pHNOyRTkvmnn8rXlmzdUAKWLrM=;
- b=E5tUwhP57ndNZFMhGfWLmbtqkvCGLQU5V0nVH8l2xNRdBRkL0SfiRohNWaW2R/e8qr55StHncY82DGhKREQr66ksllnDQVXX6cZGAZN/TupZUml7/wF6F4cwbFttVBGJ0axi75uwKJwNsFgd2ls0o2Es/Mpv/0AUlHioQqqLUX0=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM6PR04MB6154.namprd04.prod.outlook.com (2603:10b6:5:12b::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5273.17; Fri, 20 May 2022 09:24:31 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5273.017; Fri, 20 May 2022
- 09:24:31 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Xiao Yang <yangx.jy@fujitsu.com>
-CC:     "osandov@fb.com" <osandov@fb.com>,
-        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests] srp/011: Avoid $dev becoming invalid during test
-Thread-Topic: [PATCH blktests] srp/011: Avoid $dev becoming invalid during
- test
-Thread-Index: AQHYbCtpB2+1P+ICEEOyiRv/Yjs6iw==
-Date:   Fri, 20 May 2022 09:24:31 +0000
-Message-ID: <20220520092430.lqjfkzrtoyrkg4wo@shindev>
-References: <20220518064417.47473-1-yangx.jy@fujitsu.com>
-In-Reply-To: <20220518064417.47473-1-yangx.jy@fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: ba59aa36-342f-43aa-32bc-08da3a428bef
-x-ms-traffictypediagnostic: DM6PR04MB6154:EE_
-x-microsoft-antispam-prvs: <DM6PR04MB615474CB9D14C68D3B95EFEEEDD39@DM6PR04MB6154.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: BvIMdNnYxk/YjiICcw9A68rPq57ttyhi0qohyVMpSPDK93A1/bUxdqtQOVqw9v+k5eIqJFYH+TJ1f+cOSAzUSMFPnhw3eAHAM+y0B6Z4O1bWUrlUS2tv6ygxdYXluS6ZVozF4cLRrHWY6j1naEdFnkr+XLLoiHyKeE0fiqtACBaV9v0dEyMLdA8bbfXIZBF8v26IX361Y5R3CTvqq0xrwMsKT0QQ3ydVAXI0Ir6J9gQxtUIpbWM3t/SHfjDpi+wZDAWcJdYXWC4NAwf/6SQYl9IKosSsUP/0+NnBvzuIAPczgi77nP97uipj0mUaWMUCxUxo6SBOuN4U7OkDNJ/Z2kiGRNi79Lvnuk0WqQDR3pXLAw9J8azh27+4Gzvt/DHXgbqyfjPwaBnrfqk16NE9QjvbxSodfALweN2qPF5L4JG88PXbWVbT/0b0gTAD++Vxt6+T1/ZGCxtYJ9wOUvwCwapLMBFyu8pvwwCmbq0b26JuuM5PTvlNEyA5eiCngmjTgghOAXjrZ7Uj32fkd7JLSmjhcnk/IKda2DbuelD30Vetw2xGs0Ui22qoKgKeLHtAd7SYvlmr0iWh8PwRS7Hw7QQ9+Q5xcm925/WXaDEuRnVVD0eA555fK1onYpZyWiJiup51FKq05TZIxOqsJF9fLry5hNCMmgImA+5wVL+q14N0le6P/AXFw5dsSINVyNMok9lTrSm2WebXT8E7sOhWYg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(1076003)(8936002)(6486002)(38070700005)(5660300002)(508600001)(91956017)(122000001)(4326008)(8676002)(4744005)(76116006)(66476007)(66446008)(64756008)(66946007)(71200400001)(82960400001)(44832011)(33716001)(2906002)(66556008)(316002)(38100700002)(54906003)(6916009)(6512007)(9686003)(26005)(6506007)(186003)(86362001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?z6ZPveQ0CYlLY2lCiYy554dsaZtm7i5zSy3V25WrTv+M8Ojo1q/yQrT6K2Tn?=
- =?us-ascii?Q?VJ7f1FIPDUBSGXq44yeZV3zZtgGKmXW2FqR6RwJV2GGxdlvvVcY+z2xzcwc9?=
- =?us-ascii?Q?nW4ABEGSvW3yyhAfC8GT0SiEW9EtYLKnFOqlGC+vybpI6M4r9FiaHBZsmSgG?=
- =?us-ascii?Q?tkr4qdS3Og0ka43YL0OmydLSp/9nt47bFyDV17MWa2bRUAvWaauIh8w8JlwU?=
- =?us-ascii?Q?JJbgzZa4ckWmrwj2RPsVSEA1TYFpOmfcJODYL9Nik/ZU8zdPGgUNlnfCrgk1?=
- =?us-ascii?Q?9ilbsAm/mU0hHcJTqIQ8/84wIw+mde8nrWmaG/1axEFH9afoWFhX4qY1X9VB?=
- =?us-ascii?Q?L3iZ0eGDTRNXK6akTzqcy7Pf93ZQxwCnAo9c+UDSDQSfcRgtI9bJ7fwbTGQk?=
- =?us-ascii?Q?Fcs4kF30JjJ6fvehCcdJEJ42LXt2cxekJqxYSgCbMLGNMWqgiQCEeXkud8fn?=
- =?us-ascii?Q?QNwrh6kRdyEsvw1yxW4PUXPrF2KMbK+R1Rpp0t7+sEUF6jAdh7JuUTMpcmq1?=
- =?us-ascii?Q?8NLVmxFzccpLvaAzrY+yp3SAJgtffqhl1oNPDt5FX7qGYRH9pMt+xwfkeRFm?=
- =?us-ascii?Q?+iT/cS6hJ2lBu3Xk30uoAkqBtviJ0Ie2Mb9w9SpIazgU28GcqKuErWmbIWko?=
- =?us-ascii?Q?bABac+nnsRaSZdYLzoJJILR2CntXAROwaA6DjPvWcse+WIoX/3hk5j5XAxgh?=
- =?us-ascii?Q?5WBSSz5EOvmR9ZWMHhxUHyVws9jmoy7ryUuABp596e8Lk2bYgBkN3ga1sUv/?=
- =?us-ascii?Q?A3LZD42VbsQfKxaPQRobhvZsDom7Mq6OkMvZ1yNhit/id2Cl/EpeNloTwppP?=
- =?us-ascii?Q?t5DFQ74xsqHNuJUGK+jeH4V6iv/Av5ekiWkmFInIYdd6LqkwimqpwaQzWtfJ?=
- =?us-ascii?Q?r+J/pYZvHd5Ylu1Tr1U+u32LgxhnBYL1FywDOFTxFy6mF/rZlfx3JT0KlVWI?=
- =?us-ascii?Q?YEeVXn0FDIyi2bPzD2ckCtCq0Zc/ge3GEyzXiBctY7bybXLBnsaWHTEmH/Qc?=
- =?us-ascii?Q?iQUpmKTK6XJ9e0qym6z5yQB6IaJz0afhxi56J5HFEdPbOvkUQlWyjgdMmHKS?=
- =?us-ascii?Q?QDdtk5kvBxyODj3ai2vPtOHPiuOiZMwFVfYxj7w2a7MLjQoR4ggTeWI1nTmq?=
- =?us-ascii?Q?yN/5byxr/T2G5oF+V3tb6bxfC2WMIxOryGVbbUBpQ2XD8NB17V68+0JzkNZ5?=
- =?us-ascii?Q?mwu/0vWjeTp4W8QiMQEfROB3wH/c5GG9kJzQBaqOV/f7zBFFcLt3D+zFthBD?=
- =?us-ascii?Q?ZcZUT4PNY2UupKTcu/hivgSVA1JhSfEsBHgQCtctK0vwexOKHwCNMd3ODyvs?=
- =?us-ascii?Q?QwSEs/Ednfh2JlHiKS3q+sq9uVlx9L3MXw8/Uys2yrTO5MKsovTFyFN+dy0m?=
- =?us-ascii?Q?hTWon+olHK9DVNgAc8aAPf8GQ1y7I1kUYsYLzOWgEF1c7tWCZwAK7a0lRlrq?=
- =?us-ascii?Q?qUI1vO0L3oO3lCzKW48K1ZACkKV691g94TDWNgR6BIIiBQ1gdScPwhuTWtmB?=
- =?us-ascii?Q?0N3HeS7xS7wGlucBVrvtX6I0ktuqhQQejAPsWfcIJDmVHHgibeU5wMCL7Hdq?=
- =?us-ascii?Q?IZH2P+WY3Sc2Xg/fm4Tues0R0rddH8tHnJFOoc6bdALpAVtKz5/ZAqAFnzFQ?=
- =?us-ascii?Q?0k5sXDrhJzVrUOK71anbHCrESp5dXe/6KIO/ix26r4yi58mRws4p9kf4D6Pq?=
- =?us-ascii?Q?GeE6ujBVUVthSX1NDGPpow/uQhftcvxUC0DSNmwpXrQ9A1miRkWnz0ulD7wT?=
- =?us-ascii?Q?o+d2XJeiyELy3z1X5vLCn3qDpUcpvBkpRS5AIPLOOz+RaWU1E/VW?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2E969D37C470574282855CD90BEB0333@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 20 May 2022 05:30:21 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C400513C1C2
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:30:18 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220520093016euoutp0262bc338aaaaff532af8a0f889be622d9~wxjouuLTB0165501655euoutp02c
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 09:30:16 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220520093016euoutp0262bc338aaaaff532af8a0f889be622d9~wxjouuLTB0165501655euoutp02c
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1653039016;
+        bh=vAZzIiKGtzLph1c5bgWAoA6BkNu+uSouEMHm/FmJjYM=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=HABm8G8AlqCv+3bWkAh2iBbci9UsSVWGX3X8GFVCvEa8GWtOtHqXSQ1m02AG+g/RQ
+         1OIkLVASdXnXNzWsfLng7G4xhZRccGRxGrS092ejlsVK49TZC7vdvpBprWjhjm42K2
+         yEQMgvJZvw5splKOtdk8D6QxI6cVKFPbDKkM5wvI=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220520093015eucas1p28fa395b4d8335a5d020fa99543301444~wxjoTWiMT1631716317eucas1p2L;
+        Fri, 20 May 2022 09:30:15 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 82.1C.09887.7AF57826; Fri, 20
+        May 2022 10:30:15 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220520093015eucas1p2dcc087b20f5173d8edfd45259c255138~wxjn0ZfEm0183701837eucas1p2F;
+        Fri, 20 May 2022 09:30:15 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220520093015eusmtrp2043f1a2f3fc4fc8ec250258aa9dbc8e3~wxjnzZXuh0483004830eusmtrp2m;
+        Fri, 20 May 2022 09:30:15 +0000 (GMT)
+X-AuditID: cbfec7f4-471ff7000000269f-f0-62875fa799e3
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms2.samsung.com (EUCPMTA) with SMTP id 55.96.09404.7AF57826; Fri, 20
+        May 2022 10:30:15 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220520093015eusmtip137654dbfcd65cc97ccae5dbc46c28914~wxjnnPNey3102231022eusmtip1p;
+        Fri, 20 May 2022 09:30:15 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.20) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 20 May 2022 10:30:10 +0100
+Message-ID: <aee22e8a-b89b-378c-3d5b-238c1215b01d@samsung.com>
+Date:   Fri, 20 May 2022 11:30:09 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ba59aa36-342f-43aa-32bc-08da3a428bef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 May 2022 09:24:31.5839
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LuiE1+6Fh4I4TWhwBWRQuDrBLRXhFsll33JAi+hNTfauPxw2UyBc/41vpJyI/57WEy9zdzS7qyHslAijBJuhPmKOAr/SHxwpzBk4iLeIDNE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB6154
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.8.1
+Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned
+ devices
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        =?UTF-8?Q?Javier_Gonz=c3=a1lez?= <javier.gonz@samsung.com>,
+        Hannes Reinecke <hare@suse.de>,
+        Johannes Thumshirn <Johannes.Thumshirn@wdc.com>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Christoph Hellwig <hch@lst.de>
+CC:     Luis Chamberlain <mcgrof@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "dsterba@suse.com" <dsterba@suse.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        Adam Manzanares <a.manzanares@samsung.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <be429864-09cb-e3fb-2afe-46a3453c4d73@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.20]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA02SfUxTZxTG9957e++lpt2lZeNNnXVpYpYBlin88RoM4kbkxriwLdmymGWu
+        wA10o0X7wTaYDhY+ZjFK2QKzwADB1aGkUBuktd0QkMqksFA7+XZRGhYNoog6+Zzl4sJ/zznn
+        +Z2c581L45JVgYxWaw2cTqvKVpBCor332cB266HStLeK3HHo/MQpEi36BnHkuV8tQH/+W4gh
+        95kKDP16/iqGpmwWHJ3ofECgZdMkhiq6/gLIMxqNhu6co5Db00cgv6uGRHW/BCk0XB4E6MJI
+        kEAlbY8BKj7xjEqSsivXLpCs0zJBsX6fkbU3HyfZi03fspdHCkj2u/6rOOssviVgZ38LkKzN
+        ESDYi9fz2Ud2OVvaWYa9Jzoo3J3BZatzOV1s4mfCrJk26vBN+JXVfEtQAH6XmkAYDZl4OFlY
+        j5uAkJYw5wBs7LVjfDEP4JC5EvDFIwCnXV7iBVI/66L4gRVAS3kt+b+ro9q0zrsA7DnbA0KI
+        iEmENYErWEgTzDZ41j2y3g+Hfaen1ta+wnwMKy39ZEhLmVRodo2vaZyJhKNTdWtLI5gyDM6V
+        rApCBc5UkfCfJ4HnNE2TTBQsPE6FgDBmH+y458d4+E1YfGmR4vVWeGmmBg/ZIaOA7QvxfJyj
+        sKW3fy0OZE4L4c+XG0jekwyDvnd5jxTe9TooXr8GV511GK/zYXB4EefZIgBPOW3rbAI82Z/N
+        e/bC0lEPxbfFcHgmnL9GDCvaq/BysM2y4SUsGxJbNgSwbAhQD4hmEMkZ9ZpMTr9Ty32p1Ks0
+        eqM2U5meo7GD53/0+op3vgNY7z5UdgGMBl0A0rgiQgQ0RWkSUYbq6zxOl3NIZ8zm9F1gM00o
+        IkXp6laVhMlUGbgvOO4wp3sxxegwWQGmSBTH59yu3TV9NGnsDBtbktzwtHHTkfS5GH/c/T5f
+        AhF/TCZ3ytSDRxwJYzubM715xVv1y/LtKXpzytzTaBMuXW1aTrr9pGWFTVY6nEPWG1E1YdXM
+        9OaBm9KMD8jx6V174hpilN6ljP1Lsd0x82LBgd4EuT/daI3+4+3K/Ds/nEzZXSRuzPvwmNzW
+        2rBHbq7eO3HvYPjLubafYr+ZLWmVlyV/bhzSdLet1BrkWSLTfnzB+fcO9UcR/nfSKprf6Hz1
+        0x8luaamTb7Rx2Oz7xcMPkhdWNiyBLU5D/NTeqh9Ww6w1wYMHakex+vulnHxS5+IbuR2q2YC
+        V9wxVZMyA2X/XkHos1Q7onCdXvUf9V8ubRIEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrCKsWRmVeSWpSXmKPExsVy+t/xu7rL49uTDJ6+ErFYfbefzeL32fPM
+        FnvfzWa1uPCjkcliz6JJTBYrVx9lsniyfhazRc+BDywWf7vuMVlMOnSN0WLvLW2LS49XsFvs
+        2XuSxeLyrjlsFvOXPWW3uDHhKaPFmptPWSzaNn5ltGjt+cnuIOzx78QaNo+ds+6ye1w+W+qx
+        aVUnm8fmJfUeu282sHk0nTnK7LGz9T6rx/t9V9k81m+5yuKx+XS1x+dNch7tB7qZAnij9GyK
+        8ktLUhUy8otLbJWiDS2M9AwtLfSMTCz1DI3NY62MTJX07WxSUnMyy1KL9O0S9DLebmQvuC5R
+        sXzifdYGxv3CXYycHBICJhIL3u9i72Lk4hASWMooMffWHjaIhIzEpysf2SFsYYk/17rA4kIC
+        HxklutrrIRp2MUpM7b/JDJLgFbCTmHP1IBOIzSKgKrF0z01GiLigxMmZT1hAbFGBCIkHu8+y
+        gtjCAr4SV6e8AYszC4hL3HoynwlkqIhAN5NE/9OjLCAOs8B0NokX366yQKxbziqx8s0SoDIO
+        DjYBLYnGTrDzOAXcJHa8vswEMUlTonX7b3YIW15i+9s5zCDlEgJKEtt+mUB8Uyvx6v5uxgmM
+        orOQ3DcLyR2zkEyahWTSAkaWVYwiqaXFuem5xUZ6xYm5xaV56XrJ+bmbGIHJZ9uxn1t2MK58
+        9VHvECMTB+MhRgkOZiURXsbcliQh3pTEyqrUovz4otKc1OJDjKbAQJrILCWanA9Mf3kl8YZm
+        BqaGJmaWBqaWZsZK4ryeBR2JQgLpiSWp2ampBalFMH1MHJxSDUyL1tYq7bTsea4Ye+Q965yK
+        923SSqdqWNxb63q+1s41/hx5LurM5U0Owb/K9srfPHDhzTTTf4pCYkE57z3EtFfPCilWmLgr
+        bDb/1WePnoscaFzjrTtlGdu1+vlGl1aeWOtRN/epxXNGzbDrR2/rXe4oXZTGtNmax3yXioOr
+        +yn1CTVr736qbHQXfOdg7HFG+c+tk8eUmO/9tTvGur6+3nrddD7rm/Ne2t98KsjU4+be3vau
+        3U9STpTzo/3My/F2sopv/+YL+37gnBwnybn5ysL1TAVm20xfT9biyZgf/enHJV9ff6MeE2HV
+        uVevSC6b12XOu2bjk2ah5Zlq4YduzWpwsX7F5F769Jn1fLUAi2QlluKMREMt5qLiRADUu03a
+        xwMAAA==
+X-CMS-MailID: 20220520093015eucas1p2dcc087b20f5173d8edfd45259c255138
+X-Msg-Generator: CA
+X-RootMTR: 20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef
+References: <CGME20220516165418eucas1p2be592d9cd4b35f6b71d39ccbe87f3fef@eucas1p2.samsung.com>
+        <20220516165416.171196-1-p.raghav@samsung.com>
+        <20220517081048.GA13947@lst.de> <YoPAnj9ufkt5nh1G@mit.edu>
+        <7f9cb19b-621b-75ea-7273-2d2769237851@opensource.wdc.com>
+        <20220519031237.sw45lvzrydrm7fpb@garbanzo>
+        <69f06f90-d31b-620b-9009-188d1d641562@opensource.wdc.com>
+        <PH0PR04MB74166C87F694B150A5AE0F009BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
+        <4a8f0e1b-0acb-1ed4-8d7a-c9ba93fcfd02@opensource.wdc.com>
+        <16f3f9ee-7db7-2173-840c-534f67bcaf04@suse.de>
+        <20220520062720.wxdcp5lkscesppch@mpHalley-2.localdomain>
+        <be429864-09cb-e3fb-2afe-46a3453c4d73@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 18, 2022 / 14:44, Xiao Yang wrote:
-> $dev will become invalid when log_out has been done
-> and fio doesn't run yet. In this case subsequent fio
-> throws the following error:
-> -------------------------------------
->     From diff -u 011.out 011.out.bad
->     Configured SRP target driver
->     -Passed
->=20
->     From 011.full:
->     fio: looks like your file system does not support direct=3D1/buffered=
-=3D0
->     fio: destination does not support O_DIRECT
->     run_fio exit code: 1
-> -------------------------------------
-> This issue happens randomly.
->=20
-> Try to fix the issue by holding $dev before test.
->=20
-> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+On 5/20/22 08:41, Damien Le Moal wrote:
+>>>>>
+>>>>> So what about creating a device-mapper target, that's taking npo2 drives and
+>>>>> makes them po2 drives for the FS layers? It will be very similar code to
+>>>>> dm-linear.
+>>>>
+Keith and Adam had a similar suggestion to go create a device mapper
+(dm-unholy) when we tried the po2 emulation[1].
+>>>> +1
+>>>>
+>>>> This will simplify the support for FSes, at least for the initial drop (if
+>>>> accepted).
+>>>>
+>>>> And more importantly, this will also allow addressing any potential
+>>>> problem with user space breaking because of the non power of 2 zone size.
+>>>>
+>>> Seconded (or maybe thirded).
+>>>
+>>> The changes to support npo2 in the block layer are pretty simple, and 
+>>> really I don't have an issue with those.
+>>> Then adding a device-mapper target transforming npo2 drives in po2 
+>>> block devices should be pretty trivial.
+>>>
+>>> And once that is in you can start arguing with the the FS folks on 
+>>> whether to implement it natively.
+>>>
+>>
+>> So you are suggesting adding support for !PO2 in the block layer and
+>> then a dm to present the device as a PO2 to the FS? This at least
+>> addresses the hole issue for raw zoned block devices, so it can be a
+>> first step.
+> 
+> Yes, and it also allows supporting these new !po2 devices without
+> regressions (read lack of) in the support at FS level.
+> 
+>>
+>> This said, it seems to me that the changes to the FS are not being a
+>> real issue. In fact, we are exposing some bugs while we generalize the
+>> zone size support.
+> 
+> Not arguing with that. But since we are still stabilizing btrfs ZNS
+> support, adding more code right now is a little painful.
+> 
+>>
+>> Could you point out what the challenges in btrfs are in the current
+>> patches, that it makes sense to add an extra dm layer?
+> 
+> See above. No real challenge, just needs to be done if a clear agreement
+> can be reached on zone size alignment constraints. As mentioned above, the
+> btrfs changes timing is not ideal right now though.
+> 
+> Also please do not forget applications that may expect a power of 2 zone
+> size. A dm-zsp2 would be a nice solution for these. So regardless of the
+> FS work, that new DM target will be *very* nice to have.
+> 
+>>
+>> Note that for F2FS there is no blocker. Jaegeuk picked the initial
+>> patches, and he agreed to add native support.
+> 
+> And until that is done, f2fs will not work with these new !po2 devices...
+> Having the new dm will avoid that support fragmentation which I personally
+> really dislike. With the new dm, we can keep support for *all* zoned block
+> devices, albeit needing a different setup depending on the device. That is
+> not nice at all but at least there is a way to make things work continuously.
+> 
 
-Looks good to me.
+I see that many people in the community feel it is better to target the
+dm layer for the initial support of npo2 devices. I can give it a shot
+and maintain a native out-of-tree support for FSs for npo2 devices and
+merge it upstream as we see fit later.
 
-Reviewed-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-
---=20
-Best Regards,
-Shin'ichiro Kawasaki=
+[1]
+https://lore.kernel.org/all/20220311223032.GA2439@dhcp-10-100-145-180.wdc.com/
