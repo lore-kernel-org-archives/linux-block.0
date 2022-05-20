@@ -2,113 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD07C4332F
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 11:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FA0FC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 12:02:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348768AbiETLwq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 07:52:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35972 "EHLO
+        id S1348894AbiETMCF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 08:02:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348762AbiETLwp (ORCPT
+        with ESMTP id S1348908AbiETMBl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 07:52:45 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F31F615E48E;
-        Fri, 20 May 2022 04:52:44 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 4FFC461DEB;
-        Fri, 20 May 2022 11:52:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BDA2C385A9;
-        Fri, 20 May 2022 11:52:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653047563;
-        bh=KjobZP6O6Jgwt6QhmllP83ZeT6Jg+VwnOafaxcAZ+8c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=bptv6Mg3TVFF3Sk1DQV4g4ILT2blHfHJLQtoU4tvyhqF7sBMSi7SFHPt3GYix9zDj
-         fmabFBKLLAt+mzYpio3Dnr/a7b1Bzz/E1lwcSx8VAf8RLyOdKVCKRepQRXrq4mW3NI
-         xqhUOLKtCR6bJJICVsEgK6en7zdhRbI3TuWM4uIQLCEtyDzROd1z4XU0U6Eg3HnHGC
-         6Vu5Fs1CZPey2sZjUfEvTvZXyBNZShJ6tvoIR9/5uN7AJh/Mv7cAPeyxtXUC8GLCOr
-         f3oZpQCpTLgA7aCs25q+jmOHsq0cBJOc1BrqKgBXL2hPTHR0+nkHa+zQP+BSejsGZ5
-         JQb/K98Kky8rA==
-Date:   Fri, 20 May 2022 13:52:37 +0200
-From:   Christian Brauner <brauner@kernel.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
-Message-ID: <20220520115237.w2oa5bdzyzhkgwin@wittgenstein>
-References: <20220518235011.153058-1-ebiggers@kernel.org>
- <20220518235011.153058-2-ebiggers@kernel.org>
+        Fri, 20 May 2022 08:01:41 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9135149920;
+        Fri, 20 May 2022 05:01:35 -0700 (PDT)
+Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L4QH04bTnzQkBG;
+        Fri, 20 May 2022 19:58:36 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 20:01:32 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 20 May 2022 20:01:32 +0800
+Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220520032542.3331610-1-yukuai3@huawei.com>
+ <YocOsw6n3y11lNym@T590> <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+ <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com> <YodSlSm/sIC8G2iG@T590>
+ <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com> <YodlGOo7vrUa7DZK@T590>
+ <0e7967de-0c32-790d-fa08-b0bc9ef5923d@huawei.com> <Yod93DOdYosa+SvS@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <8e6a806b-f42e-319b-e6c8-de1f07befce2@huawei.com>
+Date:   Fri, 20 May 2022 20:01:31 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220518235011.153058-2-ebiggers@kernel.org>
+In-Reply-To: <Yod93DOdYosa+SvS@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 04:50:05PM -0700, Eric Biggers wrote:
-> From: Eric Biggers <ebiggers@google.com>
-> 
-> Traditionally, the conditions for when DIO (direct I/O) is supported
-> were fairly simple: filesystems either supported DIO aligned to the
-> block device's logical block size, or didn't support DIO at all.
-> 
-> However, due to filesystem features that have been added over time (e.g,
-> data journalling, inline data, encryption, verity, compression,
-> checkpoint disabling, log-structured mode), the conditions for when DIO
-> is allowed on a file have gotten increasingly complex.  Whether a
-> particular file supports DIO, and with what alignment, can depend on
-> various file attributes and filesystem mount options, as well as which
-> block device(s) the file's data is located on.
-> 
-> XFS has an ioctl XFS_IOC_DIOINFO which exposes this information to
-> applications.  However, as discussed
-> (https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u),
-> this ioctl is rarely used and not known to be used outside of
-> XFS-specific code.  It also was never intended to indicate when a file
-> doesn't support DIO at all, and it only exposes the minimum I/O
-> alignment, not the optimal I/O alignment which has been requested too.
-> 
-> Therefore, let's expose this information via statx().  Add the
-> STATX_IOALIGN flag and three fields associated with it:
-> 
-> * stx_mem_align_dio: the alignment (in bytes) required for user memory
->   buffers for DIO, or 0 if DIO is not supported on the file.
-> 
-> * stx_offset_align_dio: the alignment (in bytes) required for file
->   offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
->   on the file.  This will only be nonzero if stx_mem_align_dio is
->   nonzero, and vice versa.
-> 
-> * stx_offset_align_optimal: the alignment (in bytes) suggested for file
->   offsets and I/O segment lengths to get optimal performance.  This
->   applies to both DIO and buffered I/O.  It differs from stx_blocksize
->   in that stx_offset_align_optimal will contain the real optimum I/O
->   size, which may be a large value.  In contrast, for compatibility
->   reasons stx_blocksize is the minimum size needed to avoid page cache
->   read/write/modify cycles, which may be much smaller than the optimum
->   I/O size.  For more details about the motivation for this field, see
->   https://lore.kernel.org/r/20220210040304.GM59729@dread.disaster.area
-> 
-> Note that as with other statx() extensions, if STATX_IOALIGN isn't set
-> in the returned statx struct, then these new fields won't be filled in.
-> This will happen if the filesystem doesn't support STATX_IOALIGN, or if
-> the file isn't a regular file.  (It might be supported on block device
-> files in the future.)  It might also happen if the caller didn't include
-> STATX_IOALIGN in the request mask, since statx() isn't required to
-> return information that wasn't requested.
-> 
-> This commit adds the VFS-level plumbing for STATX_IOALIGN.  Individual
-> filesystems will still need to add code to support it.
-> 
-> Signed-off-by: Eric Biggers <ebiggers@google.com>
-> ---
+在 2022/05/20 19:39, Ming Lei 写道:
 
-Looks good to me,
-Reviewed-by: Christian Brauner (Microsoft) <brauner@kernel.org>
+> 
+> In short:
+> 
+> 1) run queue can be in-progress during cleanup queue, or returns from
+> cleanup queue; we drain it in both blk_cleanup_queue() and
+> disk_release_mq(), see commit 2a19b28f7929 ("blk-mq: cancel blk-mq dispatch
+> work in both blk_cleanup_queue and disk_release()")
+I understand that, however, there is no garantee new 'hctx->run_work'
+won't be queued after 'drain it', for this crash, I think this is how
+it triggered:
+
+assum that there is no io, while some bfq_queue is still busy:
+
+blk_cleanup_queue
+  blk_freeze_queue
+  blk_mq_cancel_work_sync
+  cancel_delayed_work_sync(hctx1)
+				blk_mq_run_work_fn -> hctx2
+				 __blk_mq_run_hw_queue
+				  blk_mq_sched_dispatch_requests
+				   __blk_mq_do_dispatch_sched
+				    blk_mq_delay_run_hw_queues
+				     blk_mq_delay_run_hw_queue
+				      -> add hctx1->run_work again
+  cancel_delayed_work_sync(hctx2)
+> 
+> 2) tagset can't be touched after blk_cleanup_queue returns because
+> tagset lifetime is covered by driver, which is often released after
+> blk_cleanup_queue() returns.
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
