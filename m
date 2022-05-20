@@ -2,152 +2,169 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FA2C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 07:23:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B75C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 08:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346367AbiETHXF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 03:23:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54644 "EHLO
+        id S1347041AbiETIfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 04:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346348AbiETHXE (ORCPT
+        with ESMTP id S1347174AbiETIex (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 03:23:04 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9213514ACB9;
-        Fri, 20 May 2022 00:23:02 -0700 (PDT)
-Received: from kwepemi100016.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L4J800KcXzhYR4;
-        Fri, 20 May 2022 15:22:08 +0800 (CST)
-Received: from kwepemm600017.china.huawei.com (7.193.23.234) by
- kwepemi100016.china.huawei.com (7.221.188.123) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 15:23:00 +0800
-Received: from localhost.localdomain (10.175.112.125) by
- kwepemm600017.china.huawei.com (7.193.23.234) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 20 May 2022 15:22:58 +0800
-From:   Peng Liu <liupeng256@huawei.com>
-To:     <bhelgaas@google.com>, <tglx@linutronix.de>, <mingo@redhat.com>,
-        <bp@alien8.de>, <dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        <hpa@zytor.com>, <lorenzo.pieralisi@arm.com>,
-        <guohanjun@huawei.com>, <sudeep.holla@arm.com>,
-        <rafael@kernel.org>, <lenb@kernel.org>,
-        <akpm@linux-foundation.org>, <logang@deltatee.com>,
-        <martin.oliveira@eideticom.com>, <thunder.leizhen@huawei.com>,
-        <axboe@kernel.dk>, <kch@nvidia.com>, <ming.lei@redhat.com>,
-        <shinichiro.kawasaki@wdc.com>, <mcgrof@kernel.org>,
-        <jiangguoqing@kylinos.cn>, <jpittman@redhat.com>,
-        <dave@stgolabs.net>, <liupeng256@huawei.com>,
-        <wangkefeng.wang@huawei.com>, <linux-block@vger.kernel.org>,
-        <linux-ia64@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-pci@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-mm@kvack.org>
-Subject: [PATCH v2 2/2] null_blk: fix wrong use of nr_online_nodes
-Date:   Fri, 20 May 2022 07:37:47 +0000
-Message-ID: <20220520073747.1184091-3-liupeng256@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20220520073747.1184091-1-liupeng256@huawei.com>
-References: <20220520073747.1184091-1-liupeng256@huawei.com>
+        Fri, 20 May 2022 04:34:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 99C805BE50
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 01:34:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653035683;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=Aden0zBjHpHh6vfYkJ5RkS0c4wpPoEEgX60xnl8bYGo=;
+        b=Fe7kucRpAzW24b9gLbtjaIMLfZ2fGIkfueu3pNHmiFdTxOqdg3ZAdpuFjwL6/8JBsIcoso
+        zb+zBBy8Fly7FKrt6qYkMI8EWrQepjQ5hatMs2N4tYtPrVSKpiIZlznL6SrxexXXbSB3my
+        2NErhDeVA6qH26DB8+4Y+Dred7h2PL8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-122-Acn1Ez1uOnSgRHFaeB9fkw-1; Fri, 20 May 2022 04:34:40 -0400
+X-MC-Unique: Acn1Ez1uOnSgRHFaeB9fkw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8A318811E75;
+        Fri, 20 May 2022 08:34:39 +0000 (UTC)
+Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3F51D40E8B05;
+        Fri, 20 May 2022 08:34:34 +0000 (UTC)
+Date:   Fri, 20 May 2022 16:34:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        ming.lei@redhat.com
+Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+Message-ID: <YodSlSm/sIC8G2iG@T590>
+References: <20220520032542.3331610-1-yukuai3@huawei.com>
+ <YocOsw6n3y11lNym@T590>
+ <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+ <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.112.125]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600017.china.huawei.com (7.193.23.234)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Certain systems are designed to have sparse/discontiguous nodes,
-a valid node may be greater than nr_online_nodes. So, the use of
-"nid >= nr_online_nodes" to judge if a node is online is wrong.
+On Fri, May 20, 2022 at 03:02:13PM +0800, yukuai (C) wrote:
+> 在 2022/05/20 14:23, yukuai (C) 写道:
+> > 在 2022/05/20 11:44, Ming Lei 写道:
+> > > On Fri, May 20, 2022 at 11:25:42AM +0800, Yu Kuai wrote:
+> > > > Our test report a following crash:
+> > > > 
+> > > > BUG: kernel NULL pointer dereference, address: 0000000000000018
+> > > > PGD 0 P4D 0
+> > > > Oops: 0000 [#1] SMP NOPTI
+> > > > CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G
+> > > > O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
+> > > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
+> > > > rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
+> > > > Workqueue: kblockd blk_mq_run_work_fn
+> > > > RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
+> > > > RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
+> > > > RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
+> > > > RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
+> > > > RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
+> > > > R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
+> > > > R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
+> > > > FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000)
+> > > > knlGS:0000000000000000
+> > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > > CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
+> > > > Call Trace:
+> > > >   __blk_mq_do_dispatch_sched+0x2a7/0x2c0
+> > > >   ? newidle_balance+0x23e/0x2f0
+> > > >   __blk_mq_sched_dispatch_requests+0x13f/0x190
+> > > >   blk_mq_sched_dispatch_requests+0x30/0x60
+> > > >   __blk_mq_run_hw_queue+0x47/0xd0
+> > > >   process_one_work+0x1b0/0x350
+> > > >   worker_thread+0x49/0x300
+> > > >   ? rescuer_thread+0x3a0/0x3a0
+> > > >   kthread+0xfe/0x140
+> > > >   ? kthread_park+0x90/0x90
+> > > >   ret_from_fork+0x22/0x30
+> > > > 
+> > > > After digging from vmcore, I found that the queue is cleaned
+> > > > up(blk_cleanup_queue() is done) and tag set is
+> > > > freed(blk_mq_free_tag_set() is done).
+> > > > 
+> > > > There are two problems here:
+> > > > 
+> > > > 1) blk_mq_delay_run_hw_queues() will only be called from
+> > > > __blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
+> > > > This seems impossible because blk_cleanup_queue() is done, and there
+> > > > should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
+> > > > more accurate") fix the problem in bfq. And currently ohter schedulers
+> > > > don't have such problem.
+> > > > 
+> > > > 2) 'hctx->run_work' still exists after blk_cleanup_queue().
+> > > > blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
+> > > > all the 'run_work'. However, there is no guarantee that new 'run_work'
+> > > > won't be queued after that(and before blk_mq_exit_queue() is done).
+> > > 
+> > > It is blk_mq_run_hw_queue() caller's responsibility to grab
+> > > ->q_usage_counter for avoiding queue cleaned up, so please fix the user
+> > > side.
+> > > 
+> > Hi,
+> > 
+> > Thanks for your advice.
+> > 
+> > blk_mq_run_hw_queue() can be called async, in order to do that, what I
+> > can think of is that grab 'q_usage_counte' before queuing 'run->work'
+> > and release it after. Which is very similar to this patch...
+> 
+> Hi,
+> 
+> How do you think about following change:
+> 
 
-Node id is a basic parameter of the system, a user-configured node
-must be checked as early as possible. Otherwise, it may cause panic
-when calling some vulnerable functions such as node_online which
-will cause panic if a very big node is received.
+I think the issue is in blk_mq_map_queue_type() which may touch tagset.
 
-Check g_home_node once users config it, and use node_available to
-make node-checking compatible with sparse/discontiguous nodes.
+So please try the following patch:
 
-Fixes: 7ff684a683d7 ("null_blk: prevent crash from bad home_node value")
-Signed-off-by: Peng Liu <liupeng256@huawei.com>
-Suggested-by: Davidlohr Bueso <dave@stgolabs.net>
----
- drivers/block/null_blk/main.c | 45 ++++++++++++++++++++++-------------
- 1 file changed, 28 insertions(+), 17 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index c441a4972064..312903f3a09e 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -97,7 +97,33 @@ module_param_named(poll_queues, g_poll_queues, int, 0444);
- MODULE_PARM_DESC(poll_queues, "Number of IOPOLL submission queues");
- 
- static int g_home_node = NUMA_NO_NODE;
--module_param_named(home_node, g_home_node, int, 0444);
-+
-+static int null_param_store_val(const char *str, int *val, int min, int max)
-+{
-+	int ret, new_val;
-+
-+	ret = kstrtoint(str, 10, &new_val);
-+	if (ret)
-+		return -EINVAL;
-+
-+	if (new_val < min || new_val > max)
-+		return -EINVAL;
-+
-+	*val = new_val;
-+	return 0;
-+}
-+
-+static int null_set_home_node(const char *str, const struct kernel_param *kp)
-+{
-+	return null_param_store_val(str, &g_home_node, 0, MAX_NUMNODES - 1);
-+}
-+
-+static const struct kernel_param_ops null_home_node_param_ops = {
-+	.set	= null_set_home_node,
-+	.get	= param_get_int,
-+};
-+
-+device_param_cb(home_node, &null_home_node_param_ops, &g_home_node, 0444);
- MODULE_PARM_DESC(home_node, "Home node for the device");
- 
- #ifdef CONFIG_BLK_DEV_NULL_BLK_FAULT_INJECTION
-@@ -120,21 +146,6 @@ MODULE_PARM_DESC(init_hctx, "Fault injection to fail hctx init. init_hctx=<inter
- 
- static int g_queue_mode = NULL_Q_MQ;
- 
--static int null_param_store_val(const char *str, int *val, int min, int max)
--{
--	int ret, new_val;
--
--	ret = kstrtoint(str, 10, &new_val);
--	if (ret)
--		return -EINVAL;
--
--	if (new_val < min || new_val > max)
--		return -EINVAL;
--
--	*val = new_val;
--	return 0;
--}
--
- static int null_set_queue_mode(const char *str, const struct kernel_param *kp)
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ed1869a305c4..5789e971ac83 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
+  */
+ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
  {
- 	return null_param_store_val(str, &g_queue_mode, NULL_Q_BIO, NULL_Q_MQ);
-@@ -2107,7 +2118,7 @@ static int __init null_init(void)
- 		g_max_sectors = BLK_DEF_MAX_SECTORS;
- 	}
- 
--	if (g_home_node != NUMA_NO_NODE && g_home_node >= nr_online_nodes) {
-+	if (!node_available(g_home_node)) {
- 		pr_err("invalid home_node value\n");
- 		g_home_node = NUMA_NO_NODE;
- 	}
--- 
-2.25.1
+-	struct blk_mq_hw_ctx *hctx;
+-
++	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
+ 	/*
+ 	 * If the IO scheduler does not respect hardware queues when
+ 	 * dispatching, we just don't bother with multiple HW queues and
+@@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+ 	 * just causes lock contention inside the scheduler and pointless cache
+ 	 * bouncing.
+ 	 */
+-	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
+-				     raw_smp_processor_id());
++	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
++
+ 	if (!blk_mq_hctx_stopped(hctx))
+ 		return hctx;
+ 	return NULL;
+
+
+Thanks,
+Ming
 
