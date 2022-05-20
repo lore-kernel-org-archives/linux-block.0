@@ -2,192 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89369C433F5
-	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 09:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B9BC433F5
+	for <linux-block@archiver.kernel.org>; Fri, 20 May 2022 10:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240039AbiETJxp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 05:53:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54138 "EHLO
+        id S1348015AbiETKQU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 06:16:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59982 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347924AbiETJxn (ORCPT
+        with ESMTP id S240366AbiETKQS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 05:53:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C656B14AF52
-        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 02:53:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653040420;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Dn41worp1wDo6PF9XTuid7e1vcUmdBzXAlYAQOBdYHw=;
-        b=GK/jB8nxFnOSWVo1O6/QmkzkU7sOFqP5xOWgJ97j6XCfczD05n2IwtMlYepZu4ITtBOe3H
-        YSJuRcINUWjk27ZUx+0kd3WHvDU55a8OR1k2U9XkSHwj2buttwoEWgJ0sHf7g8/M3Cc2ur
-        4ilL8nusBa/XvjA5uj2+2xnIFVwRBKM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-582-qZJNmVo8MNCtiMbwrNHQYA-1; Fri, 20 May 2022 05:53:39 -0400
-X-MC-Unique: qZJNmVo8MNCtiMbwrNHQYA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 180FD8015BA;
-        Fri, 20 May 2022 09:53:39 +0000 (UTC)
-Received: from T590 (ovpn-8-21.pek2.redhat.com [10.72.8.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 0562A492C3B;
-        Fri, 20 May 2022 09:53:34 +0000 (UTC)
-Date:   Fri, 20 May 2022 17:53:28 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     "yukuai (C)" <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
-Message-ID: <YodlGOo7vrUa7DZK@T590>
-References: <20220520032542.3331610-1-yukuai3@huawei.com>
- <YocOsw6n3y11lNym@T590>
- <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
- <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com>
- <YodSlSm/sIC8G2iG@T590>
- <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com>
+        Fri, 20 May 2022 06:16:18 -0400
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9547750047
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 03:16:16 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220520101612euoutp02e78a6914337f698432d50894a833b68b~wyLvF1PQm2166821668euoutp02I
+        for <linux-block@vger.kernel.org>; Fri, 20 May 2022 10:16:12 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220520101612euoutp02e78a6914337f698432d50894a833b68b~wyLvF1PQm2166821668euoutp02I
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1653041772;
+        bh=FtiPxxeAqMIydXwHrRmAPLbmQRTffpcOCZWfzxgX4dc=;
+        h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+        b=lbsQvIKjmr7DQm90bC35XjusJN3VDdtxYqakSNKuWhxjpVZM3XI8N8B5gb36z8DIB
+         6w+vF34ajTMKNRA2/wDSKjxb1YUOSlpaTjlsviiSRmfCATSwUXtjhTUVZxqj1gsZOP
+         4+IeCbocrVHw7VRQL61WYU1TZtaKhRO0ogqy8tZ4=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220520101611eucas1p13dd922345f7e91a0211cced9694b3ca9~wyLuh2GuU0792907929eucas1p1Q;
+        Fri, 20 May 2022 10:16:11 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges1new.samsung.com (EUCPMTA) with SMTP id 07.A9.10009.B6A67826; Fri, 20
+        May 2022 11:16:11 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220520101610eucas1p1822ca6014e2a1d55ae74476f83c4de1d~wyLuEwPad0813608136eucas1p1M;
+        Fri, 20 May 2022 10:16:10 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220520101610eusmtrp1b047ec44358d3e2d4b2d8fd18217aacf~wyLuDudnP3260932609eusmtrp1e;
+        Fri, 20 May 2022 10:16:10 +0000 (GMT)
+X-AuditID: cbfec7f2-e95ff70000002719-0a-62876a6b4f0d
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 76.A7.09522.A6A67826; Fri, 20
+        May 2022 11:16:10 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220520101610eusmtip1c7c8b787f20b055e8d604b8a9c64259c~wyLt1hgig2764527645eusmtip1t;
+        Fri, 20 May 2022 10:16:10 +0000 (GMT)
+Received: from localhost (106.210.248.142) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 20 May 2022 11:16:09 +0100
+Date:   Fri, 20 May 2022 12:16:08 +0200
+From:   Javier =?utf-8?B?R29uesOhbGV6?= <javier.gonz@samsung.com>
+To:     Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+CC:     Hannes Reinecke <hare@suse.de>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Theodore Ts'o <tytso@mit.edu>, Christoph Hellwig <hch@lst.de>,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        "axboe@kernel.dk" <axboe@kernel.dk>,
+        "pankydev8@gmail.com" <pankydev8@gmail.com>,
+        "gost.dev@samsung.com" <gost.dev@samsung.com>,
+        "jiangbo.365@bytedance.com" <jiangbo.365@bytedance.com>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "dm-devel@redhat.com" <dm-devel@redhat.com>,
+        "dsterba@suse.com" <dsterba@suse.com>,
+        "linux-btrfs@vger.kernel.org" <linux-btrfs@vger.kernel.org>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: Re: [dm-devel] [PATCH v4 00/13] support non power of 2 zoned
+ devices
+Message-ID: <20220520101608.m6lngep5bvp22k6p@ArmHalley.local>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset="utf-8"; format="flowed"
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+In-Reply-To: <PH0PR04MB741634259FDCF264BF1CA7259BD39@PH0PR04MB7416.namprd04.prod.outlook.com>
+X-Originating-IP: [106.210.248.142]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAKsWRmVeSWpSXmKPExsWy7djPc7rZWe1JBi+milmsvtvPZvH77Hlm
+        i73vZrNaXPjRyGSxZ9EkJouVq48yWTxZP4vZoufABxaLv133mCz23tK2uPR4BbvFnr0nWSwu
+        75rDZjF/2VN2ixsTnjJarLn5lMWitecnu4Ogx78Ta9g8ds66y+5x+Wypx6ZVnWwem5fUe+y+
+        2cDm0XTmKLPHztb7rB7v911l81i/5SqLx+bT1R6fN8l5tB/oZgrgjeKySUnNySxLLdK3S+DK
+        uHnwD1vBep6KJbM+MzcwNnN1MXJySAiYSHRN+cXYxcjFISSwglHi2cKVLBDOF0aJX/OXQjmf
+        GSXWTNjKAtPSeWMJM0RiOaPEwrfTWEESYFVPHptCJLYySkx985qti5GDg0VAVeLpI22QGjYB
+        e4lLy24xg4RFBIwlfq6zBilnFnjOJrH01w92kBphAX+JibvusIHYvAK2Esd2NjBD2IISJ2c+
+        ATuCWcBKovNDEyvIHGYBaYnl/zggwvISzVtng5VzCsRKtD5ZAFYiIaAssXy6L8T5tRJrj51h
+        B1krIfCJU6L1SCMTRMJFor/3CCOELSzx6vgWdghbRuL05B6o37MlLp7pZoawSyQWvz/GDDHf
+        WqLvTA5E2FFi16T/jBBhPokbbwUhLuOTmLRtOlQ1r0RHm9AERpVZSN6aheStWQhvzULy1gJG
+        llWM4qmlxbnpqcWGeanlesWJucWleel6yfm5mxiBifL0v+OfdjDOffVR7xAjEwfjIUYJDmYl
+        EV7G3JYkId6UxMqq1KL8+KLSnNTiQ4zSHCxK4rzJmRsShQTSE0tSs1NTC1KLYLJMHJxSDUyG
+        nEIXztz3vhu9S/FVmABz2MlOXaaDKbsD2bYtdfEyLQz+7Pr8jYyjzfrSV4J3EtXtd55n9NDU
+        vfO8svHUHd7DJTesQ3LTL05oPO3rNEdm2pwY5wrVfz+ezSwsqJoVtPvSQ+Eb8sI36367rpv8
+        OUszwsj6d2Dit5po1e1fdd88W3muat/9OW89w4RLJ+k8sHmdJ7Xp8ami/cYyvierZucv/yXk
+        JLr31ZfgH0dfrKg7+tX8RtyVDz1SeQceyhfdtOoyqTgSfL9HZ664sYjwlNYDcx7c8na996c/
+        6UX/qYOLIz6J3+UqZbm19NkXz9kve/bsvrz2q9Ox0Pp1BxLU/9zdEOP/fN5V/ndFC2cZGxvL
+        KrEUZyQaajEXFScCAP71JLADBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFprDKsWRmVeSWpSXmKPExsVy+t/xu7pZWe1JBm9uGVisvtvPZvH77Hlm
+        i73vZrNaXPjRyGSxZ9EkJouVq48yWTxZP4vZoufABxaLv133mCz23tK2uPR4BbvFnr0nWSwu
+        75rDZjF/2VN2ixsTnjJarLn5lMWitecnu4Ogx78Ta9g8ds66y+5x+Wypx6ZVnWwem5fUe+y+
+        2cDm0XTmKLPHztb7rB7v911l81i/5SqLx+bT1R6fN8l5tB/oZgrgjdKzKcovLUlVyMgvLrFV
+        ija0MNIztLTQMzKx1DM0No+1MjJV0rezSUnNySxLLdK3S9DLuHnwD1vBep6KJbM+MzcwNnN1
+        MXJySAiYSHTeWMLcxcjFISSwlFHi5dU/bBAJGYlPVz6yQ9jCEn+udbFBFH1klPh7/yErhLOV
+        UeLJ/DdA7RwcLAKqEk8faYM0sAnYS1xadgssLCJgLPFznTVIObPAUzaJxR9PsIDUCAv4Slyd
+        8gbM5hWwlTi2swHqit0sEucXLIVKCEqcnPkEzGYWsJCYOf88I8hQZgFpieX/OCDC8hLNW2cz
+        g9icArESrU8WsIKUSAgoSyyf7gtxf63Eq/u7GScwisxCMnQWkqGzEIbOQjJ0ASPLKkaR1NLi
+        3PTcYkO94sTc4tK8dL3k/NxNjMBksu3Yz807GOe9+qh3iJGJg/EQowQHs5IIL2NuS5IQb0pi
+        ZVVqUX58UWlOavEhRlNgAE1klhJNzgems7ySeEMzA1NDEzNLA1NLM2MlcV7Pgo5EIYH0xJLU
+        7NTUgtQimD4mDk6pBibmupTz6mKn6297tPhpBH5z/B5ZeVtmweyHqhETZLJSC8yqVDfv77e8
+        qPJPRajC484M9dSph6Q60lb5T7zUfrWySDxlocBNE4UP4ntUFe98XbZVTeUxU2W1Bae2h4tL
+        4FmZS1e+sP5OMuotX35x8vb4h5sufNTOy3RZffpzxfK4pIcfqm4+eJvPt2HvRP4bNXETg48a
+        uF05tK5SwKyCs5/z/aV5M/T3cm9S6xWQYq/Yta3rYnLK1gMbDPZP97/p+VDL6qmbQZxl9twD
+        cTymGg6xEdLZ7mEKRYa5McqX1rC8vPXhGvMV2eWnG1M0jEtOqE/vOCYn3LJYwWi/RLoAc+jL
+        W8mabN/MGBcbbPPfp8RSnJFoqMVcVJwIAH96gSuvAwAA
+X-CMS-MailID: 20220520101610eucas1p1822ca6014e2a1d55ae74476f83c4de1d
+X-Msg-Generator: CA
+X-RootMTR: 20220520101610eucas1p1822ca6014e2a1d55ae74476f83c4de1d
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220520101610eucas1p1822ca6014e2a1d55ae74476f83c4de1d
+References: <20220517081048.GA13947@lst.de> <YoPAnj9ufkt5nh1G@mit.edu>
+        <7f9cb19b-621b-75ea-7273-2d2769237851@opensource.wdc.com>
+        <20220519031237.sw45lvzrydrm7fpb@garbanzo>
+        <69f06f90-d31b-620b-9009-188d1d641562@opensource.wdc.com>
+        <PH0PR04MB74166C87F694B150A5AE0F009BD09@PH0PR04MB7416.namprd04.prod.outlook.com>
+        <4a8f0e1b-0acb-1ed4-8d7a-c9ba93fcfd02@opensource.wdc.com>
+        <16f3f9ee-7db7-2173-840c-534f67bcaf04@suse.de>
+        <20220520062720.wxdcp5lkscesppch@mpHalley-2.localdomain>
+        <PH0PR04MB741634259FDCF264BF1CA7259BD39@PH0PR04MB7416.namprd04.prod.outlook.com>
+        <CGME20220520101610eucas1p1822ca6014e2a1d55ae74476f83c4de1d@eucas1p1.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 20, 2022 at 04:49:19PM +0800, yukuai (C) wrote:
-> 在 2022/05/20 16:34, Ming Lei 写道:
-> > On Fri, May 20, 2022 at 03:02:13PM +0800, yukuai (C) wrote:
-> > > 在 2022/05/20 14:23, yukuai (C) 写道:
-> > > > 在 2022/05/20 11:44, Ming Lei 写道:
-> > > > > On Fri, May 20, 2022 at 11:25:42AM +0800, Yu Kuai wrote:
-> > > > > > Our test report a following crash:
-> > > > > > 
-> > > > > > BUG: kernel NULL pointer dereference, address: 0000000000000018
-> > > > > > PGD 0 P4D 0
-> > > > > > Oops: 0000 [#1] SMP NOPTI
-> > > > > > CPU: 6 PID: 265 Comm: kworker/6:1H Kdump: loaded Tainted: G
-> > > > > > O      5.10.0-60.17.0.h43.eulerosv2r11.x86_64 #1
-> > > > > > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS
-> > > > > > rel-1.12.1-0-ga5cab58-20220320_160524-szxrtosci10000 04/01/2014
-> > > > > > Workqueue: kblockd blk_mq_run_work_fn
-> > > > > > RIP: 0010:blk_mq_delay_run_hw_queues+0xb6/0xe0
-> > > > > > RSP: 0018:ffffacc6803d3d88 EFLAGS: 00010246
-> > > > > > RAX: 0000000000000006 RBX: ffff99e2c3d25008 RCX: 00000000ffffffff
-> > > > > > RDX: 0000000000000000 RSI: 0000000000000003 RDI: ffff99e2c911ae18
-> > > > > > RBP: ffffacc6803d3dd8 R08: 0000000000000000 R09: ffff99e2c0901f6c
-> > > > > > R10: 0000000000000018 R11: 0000000000000018 R12: ffff99e2c911ae18
-> > > > > > R13: 0000000000000000 R14: 0000000000000003 R15: ffff99e2c911ae18
-> > > > > > FS:  0000000000000000(0000) GS:ffff99e6bbf00000(0000)
-> > > > > > knlGS:0000000000000000
-> > > > > > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > > > CR2: 0000000000000018 CR3: 000000007460a006 CR4: 00000000003706e0
-> > > > > > Call Trace:
-> > > > > >    __blk_mq_do_dispatch_sched+0x2a7/0x2c0
-> > > > > >    ? newidle_balance+0x23e/0x2f0
-> > > > > >    __blk_mq_sched_dispatch_requests+0x13f/0x190
-> > > > > >    blk_mq_sched_dispatch_requests+0x30/0x60
-> > > > > >    __blk_mq_run_hw_queue+0x47/0xd0
-> > > > > >    process_one_work+0x1b0/0x350
-> > > > > >    worker_thread+0x49/0x300
-> > > > > >    ? rescuer_thread+0x3a0/0x3a0
-> > > > > >    kthread+0xfe/0x140
-> > > > > >    ? kthread_park+0x90/0x90
-> > > > > >    ret_from_fork+0x22/0x30
-> > > > > > 
-> > > > > > After digging from vmcore, I found that the queue is cleaned
-> > > > > > up(blk_cleanup_queue() is done) and tag set is
-> > > > > > freed(blk_mq_free_tag_set() is done).
-> > > > > > 
-> > > > > > There are two problems here:
-> > > > > > 
-> > > > > > 1) blk_mq_delay_run_hw_queues() will only be called from
-> > > > > > __blk_mq_do_dispatch_sched() if e->type->ops.has_work() return true.
-> > > > > > This seems impossible because blk_cleanup_queue() is done, and there
-> > > > > > should be no io. Commit ddc25c86b466 ("block, bfq: make bfq_has_work()
-> > > > > > more accurate") fix the problem in bfq. And currently ohter schedulers
-> > > > > > don't have such problem.
-> > > > > > 
-> > > > > > 2) 'hctx->run_work' still exists after blk_cleanup_queue().
-> > > > > > blk_mq_cancel_work_sync() is called from blk_cleanup_queue() to cancel
-> > > > > > all the 'run_work'. However, there is no guarantee that new 'run_work'
-> > > > > > won't be queued after that(and before blk_mq_exit_queue() is done).
-> > > > > 
-> > > > > It is blk_mq_run_hw_queue() caller's responsibility to grab
-> > > > > ->q_usage_counter for avoiding queue cleaned up, so please fix the user
-> > > > > side.
-> > > > > 
-> > > > Hi,
-> > > > 
-> > > > Thanks for your advice.
-> > > > 
-> > > > blk_mq_run_hw_queue() can be called async, in order to do that, what I
-> > > > can think of is that grab 'q_usage_counte' before queuing 'run->work'
-> > > > and release it after. Which is very similar to this patch...
-> > > 
-> > > Hi,
-> > > 
-> > > How do you think about following change:
-> > > 
-> > 
-> > I think the issue is in blk_mq_map_queue_type() which may touch tagset.
-> > 
-> > So please try the following patch:
-> > 
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index ed1869a305c4..5789e971ac83 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
-> >    */
-> >   static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
-> >   {
-> > -	struct blk_mq_hw_ctx *hctx;
-> > -
-> > +	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
-> >   	/*
-> >   	 * If the IO scheduler does not respect hardware queues when
-> >   	 * dispatching, we just don't bother with multiple HW queues and
-> > @@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
-> >   	 * just causes lock contention inside the scheduler and pointless cache
-> >   	 * bouncing.
-> >   	 */
-> > -	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
-> > -				     raw_smp_processor_id());
-> > +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-> > +
-> >   	if (!blk_mq_hctx_stopped(hctx))
-> >   		return hctx;
-> >   	return NULL;
-> 
-> Hi, Ming
-> 
-> This patch do make sense, however, this doesn't fix the root cause, it
+On 20.05.2022 09:30, Johannes Thumshirn wrote:
+>On 20/05/2022 08:27, Javier González wrote:
+>> So you are suggesting adding support for !PO2 in the block layer and
+>> then a dm to present the device as a PO2 to the FS? This at least
+>> addresses the hole issue for raw zoned block devices, so it can be a
+>> first step.
+>>
+>> This said, it seems to me that the changes to the FS are not being a
+>> real issue. In fact, we are exposing some bugs while we generalize the
+>> zone size support.
+>>
+>> Could you point out what the challenges in btrfs are in the current
+>> patches, that it makes sense to add an extra dm layer?
+>
+>I personally don't like the padding we need to do for the super block.
+>
+>As I've pointed out to Pankaj already, I don't think it is 100% powerfail
+>safe as of now. It could probably be made, but that would also involve
+>changing non-zoned btrfs code which we try to avoid as much as we can.
+>
+>As Damien already said, we still have issues with the general zoned
+>support in btrfs, just have a look at the list of open issues [1] we
+>have.
+>
+Sounds good Johannes. I understand that the priority is to make btrfs
+stable now, before introducing more variables. Let's stick to this and
+then we can bring it back as the list of open issues becomes more
+manageable.
 
-Isn't the root cause that tagset is referred after blk_cleanup_queue
-returns?
+>[1] https://protect2.fireeye.com/v1/url?k=f14a1d6f-90c10859-f14b9620-74fe485fffe0-3f1861e7739d8cc7&q=1&e=213fcc28-3f9d-41a1-b653-0dc0e203c718&u=https%3A%2F%2Fgithub.com%2Fnaota%2Flinux%2Fissues%2F
 
-> just bypass the problem like commit ddc25c86b466 ("block, bfq: make
-> bfq_has_work() more accurate"), which will prevent
-> blk_mq_delay_run_hw_queues() to be called in such case.
-
-How can?
-
-> 
-> I do think we need to make sure 'run_work' doesn't exist after
-> blk_cleanup_queue().
-
-Both hctx and request queue are fine to be referred after blk_cleanup_queue
-returns, what can't be referred is tagset.
-
-
-Thanks,
-Ming
-
+Thanks for sharing this too. It is a good way to where to help
