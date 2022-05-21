@@ -2,96 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E7CFC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 12:21:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEA44C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 12:30:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233879AbiEUMVd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 May 2022 08:21:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38046 "EHLO
+        id S239480AbiEUMa0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 08:30:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232452AbiEUMVc (ORCPT
+        with ESMTP id S233731AbiEUMaZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 May 2022 08:21:32 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94C4A1FA5C
-        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:21:30 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id v10so9825845pgl.11
-        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:21:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=gfHmtlCQtYvyaOp3BTWx/NwfcevCZ/dQvENt+OCB6OU=;
-        b=i1Z7sKvKg/r7Fu90Re3JGKGo4OH8g8Rh6cF/OLtxysHA/ntRqQvqKVSVq2oF1hT6L4
-         cNnY4wBcAg9kqs771D/Xc0PAxFm6ZZUDIHEvQjJlLqiY3ZTF1MkvntDJylyJoP3yjEBy
-         aEgkl0OIh0MepffoSk4c1rEgxTlrxXHO0w8y7AoWrX0RPPOstSM83S7ponJCoxe2/3Fk
-         cwTavtZmoY0/bOt2sJHHNhlb66apetZalZEVahMDSTFRMRHJpK3IFC3Iowh6/6VEjb2O
-         U9kKXX8EL0eVtbcvNrYJg2Z3WKlp5dK6tZVXG5aOLhqu829Yw3YQXHKun68AuCwVTcgC
-         vCTw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=gfHmtlCQtYvyaOp3BTWx/NwfcevCZ/dQvENt+OCB6OU=;
-        b=E8w3IKiuMGQHkAPbqGBrb09qA18P5rqyAB4iOkVBx9LbzxCCSh4VBMFuHNI0uV1crK
-         Ntgmg/tp5pRfScLKKfq2kpuqL9NUBRBvpwdpkxkMC00p9wmKivmix8/bUOM4B258QSeY
-         jBJJQvCu1SuXgbfVGyxBsUUZ6OUqdeOC9+85wmExPkrTHk31uRa7p0+SsyAISieJSQsU
-         fKyoETSQddhzrtwFrJW34FwW90zRB7nwnBiwc6wbJEM/cc+LRKYVnafe5EYamkoTQMay
-         AkY/yjlC53+9NVNHeB1GWwA3nd/7kzRvKgJOnwcG8iCryHA4B6UQNa96rZ5Fyoill7sU
-         QoVA==
-X-Gm-Message-State: AOAM530ecnFvk6N1J0WWqsQEUpj59TYBVYapFF7di8gCXiT56bLJMDIE
-        aYUtxCp+yffkQ3/yPDwd+tuDZQ==
-X-Google-Smtp-Source: ABdhPJw+5j9W+uGqvyx64pvj2Pi9VtZZrzR4LWDDdBMSzozlbeja1Pr6gXBE/S71yWDyxP7HGY8Qjg==
-X-Received: by 2002:a63:3c05:0:b0:3f2:6ea8:aff2 with SMTP id j5-20020a633c05000000b003f26ea8aff2mr12765049pga.340.1653135689908;
-        Sat, 21 May 2022 05:21:29 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id t71-20020a63784a000000b003db610ebdd0sm1403982pgc.65.2022.05.21.05.21.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 21 May 2022 05:21:29 -0700 (PDT)
-Message-ID: <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
-Date:   Sat, 21 May 2022 06:21:28 -0600
+        Sat, 21 May 2022 08:30:25 -0400
+Received: from heian.cn.fujitsu.com (mail.cn.fujitsu.com [183.91.158.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6157087203
+        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:30:24 -0700 (PDT)
+IronPort-Data: =?us-ascii?q?A9a23=3Acr7/6KBaqQF+MhVW/9zhw5YqxClBgxIJ4g17XOL?=
+ =?us-ascii?q?fDVHr1Tgh0DQAzGYfWGmCb6yDNGOmKd4iPovj9UoDusKAx9UxeLYW3SszFioV8?=
+ =?us-ascii?q?6IpJjg4wn/YZnrUdouaJK5ex512huLocYZkHhcwmj/3auK79SMkjPnRLlbBILW?=
+ =?us-ascii?q?s1h5ZFFYMpBgJ2UoLd94R2uaEsPDha++/kYqaT/73ZDdJ7wVJ3lc8sMpvnv/AU?=
+ =?us-ascii?q?MPa41v0tnRmDRxCUcS3e3M9VPrzLonpR5f0rxU9IwK0ewrD5OnREmLx9BFrBM6?=
+ =?us-ascii?q?nk6rgbwsBRbu60Qqm0yIQAvb9xEMZ4HFaPqUTbZLwbW9GgjOGj5Zz2f1DqJ6xV?=
+ =?us-ascii?q?Rw0eKbLnYzxVjEBSX0iZfQZoOGvzX+X9Jb7I1f9W3HyyvNnF1o9PYAw8+1yR2Z?=
+ =?us-ascii?q?U+pQwLysEaByEmcq4yvSwTewErtUiatvrNYUQkmttwTHQEbAtRpWra6HL48JIm?=
+ =?us-ascii?q?T00gctNNejRatBfajd1ahnEJRpVNT8/E5I/muajhnjldHtboU2cvqM04kDMwAc?=
+ =?us-ascii?q?327/oWOc50PTiqd59xx7e/zyZuT+iRExyCTBW8hLdmlrEuwMFtXqTtFouKYCF?=
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3A1j3ioKjstpCHfLbeIvo7mq3AS3BQXuYji2hC?=
+ =?us-ascii?q?6mlwRA09TyX4rbHLoB1/73LJYVkqNk3I5urrBEDtexLhHP1OkOws1NWZLWrbUQ?=
+ =?us-ascii?q?KTRekM0WKI+UyDJ8SRzI5g/JYlW61/Jfm1NlJikPv9iTPSL/8QhPWB74Ck7N2z?=
+ =?us-ascii?q?80tQ?=
+X-IronPort-AV: E=Sophos;i="5.88,333,1635177600"; 
+   d="scan'208";a="124401706"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+  by heian.cn.fujitsu.com with ESMTP; 21 May 2022 20:30:23 +0800
+Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
+        by cn.fujitsu.com (Postfix) with ESMTP id 47BA04D1718A;
+        Sat, 21 May 2022 20:30:22 +0800 (CST)
+Received: from G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.83) by
+ G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.23; Sat, 21 May 2022 20:30:23 +0800
+Received: from localhost.localdomain (10.167.215.54) by
+ G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.209) with Microsoft SMTP Server
+ id 15.0.1497.23 via Frontend Transport; Sat, 21 May 2022 20:30:23 +0800
+From:   Xiao Yang <yangx.jy@fujitsu.com>
+To:     <osandov@fb.com>, <yi.zhang@redhat.com>, <bvanassche@acm.org>,
+        <shinichiro.kawasaki@wdc.com>
+CC:     <linux-block@vger.kernel.org>, Xiao Yang <yangx.jy@fujitsu.com>
+Subject: [PATCH blktests v2] nvmeof-mp/001: Set expected count properly
+Date:   Sat, 21 May 2022 20:30:20 +0800
+Message-ID: <20220521123020.90046-1-yangx.jy@fujitsu.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
- specail occasion
-Content-Language: en-US
-To:     "yukuai (C)" <yukuai3@huawei.com>, paolo.valente@linaro.org
-Cc:     jack@suse.cz, tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220428120837.3737765-1-yukuai3@huawei.com>
- <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
- <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
- <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-yoursite-MailScanner-ID: 47BA04D1718A.A65DD
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: yangx.jy@fujitsu.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/21/22 1:22 AM, yukuai (C) wrote:
-> 在 2022/05/14 17:29, yukuai (C) 写道:
->> 在 2022/05/05 9:00, yukuai (C) 写道:
->>> Hi, Paolo
->>>
->>> Can you take a look at this patchset? It has been quite a long time
->>> since we spotted this problem...
->>>
->>
->> friendly ping ...
-> friendly ping ...
+The number of block devices will increase according
+to the number of RDMA-capable NICs.
+For example, nvmeof-mp/001 with two RDMA-capable NICs
+got the following error:
+-------------------------------------
+    Configured NVMe target driver
+    -count_devices(): 1 <> 1
+    +count_devices(): 2 <> 1
+    Passed
+-------------------------------------
 
-I can't speak for Paolo, but I've mentioned before that the majority
-of your messages end up in my spam. That's still the case, in fact
-I just marked maybe 10 of them as not spam.
+Set expected count properly by calculating the number
+of RDMA-capable NICs.
 
-You really need to get this issued sorted out, or you will continue
-to have patches ignore because folks may simply not see them.
+Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+---
+ tests/nvmeof-mp/001     | 11 +++++++----
+ tests/nvmeof-mp/001.out |  1 -
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
+diff --git a/tests/nvmeof-mp/001 b/tests/nvmeof-mp/001
+index f3e6394..70a4455 100755
+--- a/tests/nvmeof-mp/001
++++ b/tests/nvmeof-mp/001
+@@ -18,17 +18,20 @@ count_devices() {
+ }
+ 
+ wait_for_devices() {
+-	local expected=1 i devices
++	local expected=0 i devices
++
++	for i in $(rdma_network_interfaces); do
++		((expected++))
++	done
+ 
+ 	use_blk_mq y || return $?
+ 	for ((i=0;i<100;i++)); do
+ 		devices=$(count_devices)
+-		[ "$devices" -ge $expected ] && break
++		[ "$devices" -ge "$expected" ] && break
+ 		sleep .1
+ 	done
+ 	echo "count_devices(): $devices <> $expected" >>"$FULL"
+-	echo "count_devices(): $devices <> $expected"
+-	[ "$devices" -ge $expected ]
++	[ "$devices" -ge "$expected" ]
+ }
+ 
+ test() {
+diff --git a/tests/nvmeof-mp/001.out b/tests/nvmeof-mp/001.out
+index 2ce8d17..a7d4cb9 100644
+--- a/tests/nvmeof-mp/001.out
++++ b/tests/nvmeof-mp/001.out
+@@ -1,3 +1,2 @@
+ Configured NVMe target driver
+-count_devices(): 1 <> 1
+ Passed
 -- 
-Jens Axboe
+2.34.1
+
+
 
