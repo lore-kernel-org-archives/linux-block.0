@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B54EC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 07:21:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6351C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 07:21:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232213AbiEUHVu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 May 2022 03:21:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46826 "EHLO
+        id S240891AbiEUHVv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 03:21:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46828 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240705AbiEUHVt (ORCPT
+        with ESMTP id S240747AbiEUHVt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 21 May 2022 03:21:49 -0400
 Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45BF54C423;
-        Sat, 21 May 2022 00:21:47 -0700 (PDT)
-Received: from kwepemi100025.china.huawei.com (unknown [172.30.72.57])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L4w4317JwzjWvf;
-        Sat, 21 May 2022 15:20:51 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FF3E4D278;
+        Sat, 21 May 2022 00:21:48 -0700 (PDT)
+Received: from kwepemi100020.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L4w1j1LrqzQk7F;
+        Sat, 21 May 2022 15:18:49 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100025.china.huawei.com (7.221.188.158) with Microsoft SMTP Server
+ kwepemi100020.china.huawei.com (7.221.188.48) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 15:21:44 +0800
+ 15.1.2375.24; Sat, 21 May 2022 15:21:46 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 21 May
- 2022 15:21:43 +0800
+ 2022 15:21:45 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <jack@suse.cz>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next v2 1/6] block, bfq: cleanup bfq_weights_tree add/remove apis
-Date:   Sat, 21 May 2022 15:35:18 +0800
-Message-ID: <20220521073523.3118246-2-yukuai3@huawei.com>
+Subject: [PATCH -next v2 3/6] block, bfq: factor out code to update 'active_entities'
+Date:   Sat, 21 May 2022 15:35:20 +0800
+Message-ID: <20220521073523.3118246-4-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220521073523.3118246-1-yukuai3@huawei.com>
 References: <20220521073523.3118246-1-yukuai3@huawei.com>
@@ -48,127 +48,124 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-They already pass 'bfqd' as the first parameter, there is no need to
-pass 'bfqd->queue_weights_tree' as another parameter.
+Current code is a bit ugly and hard to read.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-iosched.c | 13 +++++++------
- block/bfq-iosched.h | 10 +++-------
- block/bfq-wf2q.c    | 16 +++++-----------
- 3 files changed, 15 insertions(+), 24 deletions(-)
+ block/bfq-wf2q.c | 61 +++++++++++++++++++++++++-----------------------
+ 1 file changed, 32 insertions(+), 29 deletions(-)
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index d32b8340510a..c408c5a79d97 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -870,9 +870,9 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
-  * In most scenarios, the rate at which nodes are created/destroyed
-  * should be low too.
-  */
--void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
--			  struct rb_root_cached *root)
-+void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- {
-+	struct rb_root_cached *root = &bfqd->queue_weights_tree;
- 	struct bfq_entity *entity = &bfqq->entity;
- 	struct rb_node **new = &(root->rb_root.rb_node), *parent = NULL;
- 	bool leftmost = true;
-@@ -945,12 +945,14 @@ void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-  * about overhead.
-  */
- void __bfq_weights_tree_remove(struct bfq_data *bfqd,
--			       struct bfq_queue *bfqq,
--			       struct rb_root_cached *root)
-+			       struct bfq_queue *bfqq)
- {
-+	struct rb_root_cached *root;
-+
- 	if (!bfqq->weight_counter)
- 		return;
- 
-+	root = &bfqd->queue_weights_tree;
- 	bfqq->weight_counter->num_active--;
- 	if (bfqq->weight_counter->num_active > 0)
- 		goto reset_entity_pointer;
-@@ -970,8 +972,7 @@ void __bfq_weights_tree_remove(struct bfq_data *bfqd,
- void bfq_weights_tree_remove(struct bfq_data *bfqd,
- 			     struct bfq_queue *bfqq)
- {
--	__bfq_weights_tree_remove(bfqd, bfqq,
--				  &bfqd->queue_weights_tree);
-+	__bfq_weights_tree_remove(bfqd, bfqq);
- }
- 
- /*
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index c3bd8ab169e0..0a3415abb994 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -932,13 +932,9 @@ struct bfq_queue *bic_to_bfqq(struct bfq_io_cq *bic, bool is_sync);
- void bic_set_bfqq(struct bfq_io_cq *bic, struct bfq_queue *bfqq, bool is_sync);
- struct bfq_data *bic_to_bfqd(struct bfq_io_cq *bic);
- void bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq);
--void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq,
--			  struct rb_root_cached *root);
--void __bfq_weights_tree_remove(struct bfq_data *bfqd,
--			       struct bfq_queue *bfqq,
--			       struct rb_root_cached *root);
--void bfq_weights_tree_remove(struct bfq_data *bfqd,
--			     struct bfq_queue *bfqq);
-+void bfq_weights_tree_add(struct bfq_data *bfqd, struct bfq_queue *bfqq);
-+void __bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq);
-+void bfq_weights_tree_remove(struct bfq_data *bfqd, struct bfq_queue *bfqq);
- void bfq_bfqq_expire(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 		     bool compensate, enum bfqq_expiration reason);
- void bfq_put_queue(struct bfq_queue *bfqq);
 diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 42464e6ff40c..ccd227fed1c3 100644
+index 2f3fb45a32c3..c58568a4b009 100644
 --- a/block/bfq-wf2q.c
 +++ b/block/bfq-wf2q.c
-@@ -727,7 +727,6 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
- 		unsigned int prev_weight, new_weight;
- 		struct bfq_data *bfqd = NULL;
--		struct rb_root_cached *root;
- #ifdef CONFIG_BFQ_GROUP_IOSCHED
- 		struct bfq_sched_data *sd;
- 		struct bfq_group *bfqg;
-@@ -790,19 +789,15 @@ __bfq_entity_update_weight_prio(struct bfq_service_tree *old_st,
- 		 * queue, remove the entity from its old weight counter (if
- 		 * there is a counter associated with the entity).
- 		 */
--		if (prev_weight != new_weight && bfqq) {
--			root = &bfqd->queue_weights_tree;
--			__bfq_weights_tree_remove(bfqd, bfqq, root);
--		}
-+		if (prev_weight != new_weight && bfqq)
-+			__bfq_weights_tree_remove(bfqd, bfqq);
- 		entity->weight = new_weight;
- 		/*
- 		 * Add the entity, if it is not a weight-raised queue,
- 		 * to the counter associated with its new weight.
- 		 */
--		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1) {
--			/* If we get here, root has been initialized. */
--			bfq_weights_tree_add(bfqd, bfqq, root);
--		}
-+		if (prev_weight != new_weight && bfqq && bfqq->wr_coeff == 1)
-+			bfq_weights_tree_add(bfqd, bfqq);
+@@ -230,6 +230,26 @@ static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
+ 		bfqq->bfqd->num_groups_with_busy_queues--;
+ }
  
- 		new_st->wsum += entity->weight;
++static void bfq_inc_active_entities(struct bfq_entity *entity)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_group *bfqg = container_of(sd, struct bfq_group, sched_data);
++	struct bfq_data *bfqd = (struct bfq_data *)bfqg->bfqd;
++
++	if (bfqg != bfqd->root_group)
++		bfqg->active_entities++;
++}
++
++static void bfq_dec_active_entities(struct bfq_entity *entity)
++{
++	struct bfq_sched_data *sd = entity->sched_data;
++	struct bfq_group *bfqg = container_of(sd, struct bfq_group, sched_data);
++	struct bfq_data *bfqd = (struct bfq_data *)bfqg->bfqd;
++
++	if (bfqg != bfqd->root_group)
++		bfqg->active_entities--;
++}
++
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
  
-@@ -1695,8 +1690,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
+@@ -250,6 +270,14 @@ static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
+ {
+ }
  
- 	if (!bfqq->dispatched)
- 		if (bfqq->wr_coeff == 1)
--			bfq_weights_tree_add(bfqd, bfqq,
--					     &bfqd->queue_weights_tree);
-+			bfq_weights_tree_add(bfqd, bfqq);
++static void bfq_inc_active_entities(struct bfq_entity *entity)
++{
++}
++
++static void bfq_dec_active_entities(struct bfq_entity *entity)
++{
++}
++
+ #endif /* CONFIG_BFQ_GROUP_IOSCHED */
  
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues++;
+ /*
+@@ -476,11 +504,6 @@ static void bfq_active_insert(struct bfq_service_tree *st,
+ {
+ 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 	struct rb_node *node = &entity->rb_node;
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	struct bfq_sched_data *sd = NULL;
+-	struct bfq_group *bfqg = NULL;
+-	struct bfq_data *bfqd = NULL;
+-#endif
+ 
+ 	bfq_insert(&st->active, entity);
+ 
+@@ -491,17 +514,10 @@ static void bfq_active_insert(struct bfq_service_tree *st,
+ 
+ 	bfq_update_active_tree(node);
+ 
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	sd = entity->sched_data;
+-	bfqg = container_of(sd, struct bfq_group, sched_data);
+-	bfqd = (struct bfq_data *)bfqg->bfqd;
+-#endif
+ 	if (bfqq)
+ 		list_add(&bfqq->bfqq_list, &bfqq->bfqd->active_list);
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	if (bfqg != bfqd->root_group)
+-		bfqg->active_entities++;
+-#endif
++
++	bfq_inc_active_entities(entity);
+ }
+ 
+ /**
+@@ -578,29 +594,16 @@ static void bfq_active_extract(struct bfq_service_tree *st,
+ {
+ 	struct bfq_queue *bfqq = bfq_entity_to_bfqq(entity);
+ 	struct rb_node *node;
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	struct bfq_sched_data *sd = NULL;
+-	struct bfq_group *bfqg = NULL;
+-	struct bfq_data *bfqd = NULL;
+-#endif
+ 
+ 	node = bfq_find_deepest(&entity->rb_node);
+ 	bfq_extract(&st->active, entity);
+ 
+ 	if (node)
+ 		bfq_update_active_tree(node);
+-
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	sd = entity->sched_data;
+-	bfqg = container_of(sd, struct bfq_group, sched_data);
+-	bfqd = (struct bfq_data *)bfqg->bfqd;
+-#endif
+ 	if (bfqq)
+ 		list_del(&bfqq->bfqq_list);
+-#ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	if (bfqg != bfqd->root_group)
+-		bfqg->active_entities--;
+-#endif
++
++	bfq_dec_active_entities(entity);
+ }
+ 
+ /**
 -- 
 2.31.1
 
