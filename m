@@ -2,90 +2,185 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C27F9C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 16:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E3DC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 17:05:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343623AbiEUQp4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 May 2022 12:45:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39694 "EHLO
+        id S1343772AbiEURFN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 13:05:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230294AbiEUQpw (ORCPT
+        with ESMTP id S229896AbiEURFM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 May 2022 12:45:52 -0400
-Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54170FF3;
-        Sat, 21 May 2022 09:45:50 -0700 (PDT)
-Received: by mail-qt1-x82e.google.com with SMTP id g3so9986222qtb.7;
-        Sat, 21 May 2022 09:45:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=hIMTrtnjZ9gqkDWInY5qR+iQZXXgSvv+Fs8Mw2FuFq0=;
-        b=fBn1s4wNEYbraZzXmKP2EyONUlmW8I8BgBrKTm5RQON25DyvbzWLg+/vl/bwdVHJKP
-         QLioOfyR5jbf6Mt2MzSfCjKCAdkuQc5TfsUvQ57u7K8AbEDJfIL87aaSCPXeCWwKkV3f
-         dMJqant5hrCiOAypmsMB/vmwysoDXDMAMLzq1gr4/q8Q2ESVzZBC9HKmlrD7Ah0d6xMj
-         ZkX9koF2urPM0YdiGb5YmK471qrZNZ8UtkIOgNpV2POVXJlc/AWy7TKU7Q48INKmVJVS
-         5s0b6e5rN7dcLAhe0mi7xDXh/BScbmWMvrX9cqvnKm8ONl3Vrfa/m8+TiYmJI+0Kymvn
-         17hA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=hIMTrtnjZ9gqkDWInY5qR+iQZXXgSvv+Fs8Mw2FuFq0=;
-        b=rCulwQbc9YqiyOegLpjU1sWESCq2Df+PXRc6JdQ9Ib42hoCh+dYQJz/hbAH+qYVEix
-         ZwcS1AAb8wthz5sYuZlNtAbrIpRUmXjmZECxZTfjmAQdJEolaX+CMbAidg2E6Zqh6uTm
-         /h5q3Rw8dUKBriTmdQQVJOmlEXK9MudVa+YL1wy1QJ9923rHshZYPbF/0cb7ryIWzExL
-         kehHkWx1vURyUrh9K6DBJVKbayiH2o3dvbNcKjI1q0INUtJ9PfH5sZnQM6wkcgsyZBnz
-         I/fY9qPQqt4FaJ3X9xnRkegVUe7MJbiqfcvn7Z3vaqGo0m84QrZoPNd07Ie4513YnbaT
-         +wFg==
-X-Gm-Message-State: AOAM5324Xt2f2qOof7EG4eUI58MRjWS2WAKnqWBUi0XgGOm5IHqZAeSn
-        UVl6bKDhvQrtJmQwwedZYA==
-X-Google-Smtp-Source: ABdhPJyek8YSkEb5b3A0KQzbpWST89kREvGQc6v6hOXCeHBh9vLoseUyMrXzt0U1xN0KuHBx4A9llQ==
-X-Received: by 2002:a05:622a:41:b0:2f3:c678:34df with SMTP id y1-20020a05622a004100b002f3c67834dfmr11396132qtw.67.1653151549474;
-        Sat, 21 May 2022 09:45:49 -0700 (PDT)
-Received: from moria.home.lan (c-73-219-103-14.hsd1.vt.comcast.net. [73.219.103.14])
-        by smtp.gmail.com with ESMTPSA id y76-20020a37644f000000b0069ffe63228fsm1690243qkb.121.2022.05.21.09.45.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 May 2022 09:45:48 -0700 (PDT)
-Date:   Sat, 21 May 2022 12:45:46 -0400
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     Andrew Lunn <andrew@lunn.ch>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, netdev@vger.kernel.org,
-        mcgrof@kernel.org, tytso@mit.edu
-Subject: Re: RFC: Ioctl v2
-Message-ID: <20220521164546.h7huckdwvguvmmyy@moria.home.lan>
-References: <20220520161652.rmhqlvwvfrvskg4w@moria.home.lan>
- <Yof6hsC1hLiYITdh@lunn.ch>
+        Sat, 21 May 2022 13:05:12 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEE033BA5C;
+        Sat, 21 May 2022 10:05:10 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 8E2A91F95F;
+        Sat, 21 May 2022 17:05:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653152709; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=vzA3qWmeCqPx4k/yYTvG3mgQXpDOLLr4ex0hPbI2Bhc=;
+        b=wdTdquh4GVqWUsMJ7t6thpEqhXElvoJjiKOphB3MHppA4MoC1y5icFvZgPUYxbfg2HK2Q6
+        o5DQgBS0RUPCJBXggbDhfcYyIvFKrazUdHqg+/Hek8T84Vap8ATVuIkzcUc90Jp8Km85Ba
+        L9dJtfP2RNToyaUs/BBGzCvyiLEQ9uo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653152709;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=vzA3qWmeCqPx4k/yYTvG3mgQXpDOLLr4ex0hPbI2Bhc=;
+        b=GfPBBwBkEXiprD7vA7i10fLPz0PBo784lIdXi2+R+kLGipuz35PSuEYKwQ59vRWy5LUK6d
+        SnYYoeIHeSOHeLBw==
+Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
+        by relay2.suse.de (Postfix) with ESMTP id C9E442C141;
+        Sat, 21 May 2022 17:05:07 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     linux-bcache@vger.kernel.org
+Cc:     linux-block@vger.kernel.org, Coly Li <colyli@suse.de>,
+        stable@vger.kernel.org
+Subject: [PATCH 1/4] bcache: improve multithreaded bch_btree_check()
+Date:   Sun, 22 May 2022 01:04:59 +0800
+Message-Id: <20220521170502.20026-1-colyli@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yof6hsC1hLiYITdh@lunn.ch>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 20, 2022 at 10:31:02PM +0200, Andrew Lunn wrote:
-> > I want to circulate this and get some comments and feedback, and if
-> > no one raises any serious objections - I'd love to get collaborators
-> > to work on this with me. Flame away!
-> 
-> Hi Kent
-> 
-> I doubt you will get much interest from netdev. netdev already
-> considers ioctl as legacy, and mostly uses netlink and a message
-> passing structure, which is easy to extend in a backwards compatible
-> manor.
+Commit 8e7102273f59 ("bcache: make bch_btree_check() to be
+multithreaded") makes bch_btree_check() to be much faster when checking
+all btree nodes during cache device registration. But it isn't in ideal
+shap yet, still can be improved.
 
-The more I look at netlink the more I wonder what on earth it's targeted at or
-was trying to solve. It must exist for a reason, but I've written a few ioctls
-myself and I can't fathom a situation where I'd actually want any of the stuff
-netlink provides.
+This patch does the following thing to improve current parallel btree
+nodes check by multiple threads in bch_btree_check(),
+- Add read lock to root node while checking all the btree nodes with
+  multiple threads. Although currently it is not mandatory but it is
+  good to have a read lock in code logic.
+- Remove local variable 'char name[32]', and generate kernel thread name
+  string directly when calling kthread_run().
+- Allocate local variable "struct btree_check_state check_state" on the
+  stack and avoid unnecessary dynamic memory allocation for it.
+- Increase check_state->started to count created kernel thread after it
+  succeeds to create.
+- When wait for all checking kernel threads to finish, use wait_event()
+  to replace wait_event_interruptible().
 
-Why bother with getting a special socket type? Why asynchronous messages with
-all the marshalling/unmarshalling that entails?
+With this change, the code is more clear, and some potential error
+conditions are avoided.
 
-From what I've seen all we really want is driver private syscalls, and the
-things about ioctls that suck are where it's _not_ like syscalls. Let's just
-make it work more like normal function calls.
+Fixes: 8e7102273f59 ("bcache: make bch_btree_check() to be multithreaded")
+Signed-off-by: Coly Li <colyli@suse.de>
+Cc: stable@vger.kernel.org
+---
+ drivers/md/bcache/btree.c | 58 ++++++++++++++++++---------------------
+ 1 file changed, 26 insertions(+), 32 deletions(-)
+
+diff --git a/drivers/md/bcache/btree.c b/drivers/md/bcache/btree.c
+index ad9f16689419..2362bb8ef6d1 100644
+--- a/drivers/md/bcache/btree.c
++++ b/drivers/md/bcache/btree.c
+@@ -2006,8 +2006,7 @@ int bch_btree_check(struct cache_set *c)
+ 	int i;
+ 	struct bkey *k = NULL;
+ 	struct btree_iter iter;
+-	struct btree_check_state *check_state;
+-	char name[32];
++	struct btree_check_state check_state;
+ 
+ 	/* check and mark root node keys */
+ 	for_each_key_filter(&c->root->keys, k, &iter, bch_ptr_invalid)
+@@ -2018,63 +2017,58 @@ int bch_btree_check(struct cache_set *c)
+ 	if (c->root->level == 0)
+ 		return 0;
+ 
+-	check_state = kzalloc(sizeof(struct btree_check_state), GFP_KERNEL);
+-	if (!check_state)
+-		return -ENOMEM;
+-
+-	check_state->c = c;
+-	check_state->total_threads = bch_btree_chkthread_nr();
+-	check_state->key_idx = 0;
+-	spin_lock_init(&check_state->idx_lock);
+-	atomic_set(&check_state->started, 0);
+-	atomic_set(&check_state->enough, 0);
+-	init_waitqueue_head(&check_state->wait);
++	check_state.c = c;
++	check_state.total_threads = bch_btree_chkthread_nr();
++	check_state.key_idx = 0;
++	spin_lock_init(&check_state.idx_lock);
++	atomic_set(&check_state.started, 0);
++	atomic_set(&check_state.enough, 0);
++	init_waitqueue_head(&check_state.wait);
+ 
++	rw_lock(0, c->root, c->root->level);
+ 	/*
+ 	 * Run multiple threads to check btree nodes in parallel,
+-	 * if check_state->enough is non-zero, it means current
++	 * if check_state.enough is non-zero, it means current
+ 	 * running check threads are enough, unncessary to create
+ 	 * more.
+ 	 */
+-	for (i = 0; i < check_state->total_threads; i++) {
+-		/* fetch latest check_state->enough earlier */
++	for (i = 0; i < check_state.total_threads; i++) {
++		/* fetch latest check_state.enough earlier */
+ 		smp_mb__before_atomic();
+-		if (atomic_read(&check_state->enough))
++		if (atomic_read(&check_state.enough))
+ 			break;
+ 
+-		check_state->infos[i].result = 0;
+-		check_state->infos[i].state = check_state;
+-		snprintf(name, sizeof(name), "bch_btrchk[%u]", i);
+-		atomic_inc(&check_state->started);
++		check_state.infos[i].result = 0;
++		check_state.infos[i].state = &check_state;
+ 
+-		check_state->infos[i].thread =
++		check_state.infos[i].thread =
+ 			kthread_run(bch_btree_check_thread,
+-				    &check_state->infos[i],
+-				    name);
+-		if (IS_ERR(check_state->infos[i].thread)) {
++				    &check_state.infos[i],
++				    "bch_btrchk[%d]", i);
++		if (IS_ERR(check_state.infos[i].thread)) {
+ 			pr_err("fails to run thread bch_btrchk[%d]\n", i);
+ 			for (--i; i >= 0; i--)
+-				kthread_stop(check_state->infos[i].thread);
++				kthread_stop(check_state.infos[i].thread);
+ 			ret = -ENOMEM;
+ 			goto out;
+ 		}
++		atomic_inc(&check_state.started);
+ 	}
+ 
+ 	/*
+ 	 * Must wait for all threads to stop.
+ 	 */
+-	wait_event_interruptible(check_state->wait,
+-				 atomic_read(&check_state->started) == 0);
++	wait_event(check_state.wait, atomic_read(&check_state.started) == 0);
+ 
+-	for (i = 0; i < check_state->total_threads; i++) {
+-		if (check_state->infos[i].result) {
+-			ret = check_state->infos[i].result;
++	for (i = 0; i < check_state.total_threads; i++) {
++		if (check_state.infos[i].result) {
++			ret = check_state.infos[i].result;
+ 			goto out;
+ 		}
+ 	}
+ 
+ out:
+-	kfree(check_state);
++	rw_unlock(0, c->root);
+ 	return ret;
+ }
+ 
+-- 
+2.35.3
+
