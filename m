@@ -2,61 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53695C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 12:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E360C433FE
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 12:32:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241329AbiEUMco (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 May 2022 08:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57362 "EHLO
+        id S243128AbiEUMcr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 08:32:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241134AbiEUMco (ORCPT
+        with ESMTP id S241954AbiEUMcq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 May 2022 08:32:44 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CFB99C2FA
-        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:32:42 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id c22so9876385pgu.2
-        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:32:42 -0700 (PDT)
+        Sat, 21 May 2022 08:32:46 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 980239C2E7
+        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:32:45 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id p8so9801981pfh.8
+        for <linux-block@vger.kernel.org>; Sat, 21 May 2022 05:32:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=from:to:cc:in-reply-to:references:subject:message-id:date
          :mime-version:content-transfer-encoding;
-        bh=lIe2BuS+hmdG8AC61X4W4lVxIRLtVNB5bIbXaAUes2E=;
-        b=xZn9e0CtL2ijpN1+ZzPITsYQVlCKSIw0zYEYMs9ibNQYitl3G4yzlB4qAfrtuBjd48
-         /fq0XGp1DtLEMxe+SyW4PMENlvb0VDj0TthBZUFT62Yy4cg94EcfhRToAlP0T1v3A3gQ
-         OS+8wvpaf3bwj+IMsGplvjg1RIaSmsZ5vWoTolouyPwGJuW/0pHzx519NSJKJZWXV58f
-         LDvMDP7pO1dYPKdALkVtEsKyB8UCL9zqr5wxLrwYisc00/4VDDMmJBNylGz8Psp1ZrQ/
-         lxPQUJneD4nB2J0kfdSCkvWHIzsKxQlOzFWq27Sj19TAt/6PF3wL5QOxV1LfZaA1c5oU
-         gpXw==
+        bh=JgECGUYQPfzQccxjQJUi8fr2KJeySrPf4gVLNaVPy0U=;
+        b=WXY1ugt3fKDzvhExzkLtPKfAnoaTleIm5nLQSD1VDR4y9vBVjrL0twjYEe0rHhtMV6
+         1RyA3k/9mC8X7ckdY1XjXshHVglKqwrEMD2ZwIElo41MmucmJlUFkiMHR61XvU+Zf/6Z
+         mylPQ6yvSzXb3yoRzuFcEw3dgwcJJ/uKKF355S7fw325qu/3dGuDPXD/sxL2KlkTWXcL
+         spDpLa6rx2va0TFSjedicNGQH+fWRBMhIG0Zpx2uNTcJpO2y63MXlYsCKf0O5dCyLf/D
+         8FLzBK1swN4AFRFmYptHnjLmAke3cowmC+hgzlRSKMV260ru/V6fjelTbufXtI8ZVVWU
+         P/GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
          :message-id:date:mime-version:content-transfer-encoding;
-        bh=lIe2BuS+hmdG8AC61X4W4lVxIRLtVNB5bIbXaAUes2E=;
-        b=ZjXTlIaqcPksudSSah+2UcZkYvi40Rw1g/Dazzs5aW6WzyfF1eH2Nfy01Xd1aFPLtW
-         Ht9e1VSyS/KhN6Sd/DnJ8MADPcyyigLduF2U/OrRoQC4HO2LZm6BCp6Q/rSyl0m+Kp//
-         tQPAAG63sCXIHcCe1WsfaSwHaSk/bbSk3W9simd6UFxpLOS84YwCvo6Rt8t/9O/jxhp3
-         D3kv+bZHF04tUgagCRfGmhNNP12WFzPEU3QiJ2tmhqNiKsQlvkGS8ha5PGOc1sUm2WoJ
-         d+BiCBgk39gC0IcoKlpKuy3inqXGAjBGaqkjkh9un1PnQ5JirZ5YfstUsykVJvFYfjdD
-         BH9Q==
-X-Gm-Message-State: AOAM531ZKOqTNZPxLD02Hg2jfnJ3c/fgtzGJeLuYRfgkMe62DVMPvWT5
-        zKCpCjlD3khKA9nvAuopR3HHBov/jmBeig==
-X-Google-Smtp-Source: ABdhPJzRWPrUcTvufMhYzwWmLFMMgDj0nDGFmOBoKj6xLvfnguKOugOol+/wchoN4E3ubIosscAlRg==
-X-Received: by 2002:a63:e50b:0:b0:3f5:e132:4526 with SMTP id r11-20020a63e50b000000b003f5e1324526mr12449716pgh.506.1653136361824;
-        Sat, 21 May 2022 05:32:41 -0700 (PDT)
+        bh=JgECGUYQPfzQccxjQJUi8fr2KJeySrPf4gVLNaVPy0U=;
+        b=r1LHN/4gTtwhXU5LyKFvRF5gKDC8o9Tsb1isWVMVKn6qGHOEQHrJGkvbASh9RhV0PQ
+         YC8qSSG1zetsRrV/7k+BcKaGt4gUkiNmqr15SmLRpBoWDI2mWYzGcCk7dN01bwDLrDsu
+         zwVSrNVb8vq+gXp7PZwuHWiHmymih3ApqTnIsSnNgKlxmqUiF8afPoMt+wIxKfzVqV49
+         P8jC8+II9kbo+H+VhsD9TVnMHyu55/PgxSpiw1pcN/h5beOMaG5kpKiq0sf2cm7TAMsR
+         2vsyPgkmyjg0xWUlTaqTV9ty++Qk8W3SC8qz++1prLdCPp9gTEx1iYtpKsR4uaLgZoRw
+         DIxw==
+X-Gm-Message-State: AOAM5302/Ag93GD29ZVK+HkCCiQ59Wz+nNIOheguFttJe1TH35lO1Flq
+        QhMz2FGCb5If0l5nbLsDNxDhkQ==
+X-Google-Smtp-Source: ABdhPJyywiQeka0cL1QIQ52HrCa75B117/TtMloSmZELBFW0UPcqBV4nCigEW/gs58JskI9ne6BDZg==
+X-Received: by 2002:a63:4765:0:b0:3ab:812a:ded2 with SMTP id w37-20020a634765000000b003ab812aded2mr12851246pgk.214.1653136365061;
+        Sat, 21 May 2022 05:32:45 -0700 (PDT)
 Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id h16-20020a170902f55000b0016194c1df58sm1497724plf.105.2022.05.21.05.32.40
+        by smtp.gmail.com with ESMTPSA id e20-20020a170902ed9400b0015e8d4eb1f5sm1506394plj.63.2022.05.21.05.32.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 21 May 2022 05:32:41 -0700 (PDT)
+        Sat, 21 May 2022 05:32:44 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
 To:     Julia.Lawall@inria.fr
-Cc:     linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-In-Reply-To: <20220521111145.81697-29-Julia.Lawall@inria.fr>
-References: <20220521111145.81697-29-Julia.Lawall@inria.fr>
-Subject: Re: [PATCH] blk-mq: fix typo in comment
-Message-Id: <165313636064.19338.15073887794756259717.b4-ty@kernel.dk>
-Date:   Sat, 21 May 2022 06:32:40 -0600
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+In-Reply-To: <20220521111145.81697-28-Julia.Lawall@inria.fr>
+References: <20220521111145.81697-28-Julia.Lawall@inria.fr>
+Subject: Re: [PATCH] mtip32xx: fix typo in comment
+Message-Id: <165313636386.19482.14816930857839555999.b4-ty@kernel.dk>
+Date:   Sat, 21 May 2022 06:32:43 -0600
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -64,7 +64,7 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, 21 May 2022 13:10:39 +0200, Julia Lawall wrote:
+On Sat, 21 May 2022 13:10:38 +0200, Julia Lawall wrote:
 > Spelling mistake (triple letters) in comment.
 > Detected with the help of Coccinelle.
 > 
@@ -72,8 +72,8 @@ On Sat, 21 May 2022 13:10:39 +0200, Julia Lawall wrote:
 
 Applied, thanks!
 
-[1/1] blk-mq: fix typo in comment
-      commit: 2aaf516084184e4e6f80da01b2b3ed882fd20a79
+[1/1] mtip32xx: fix typo in comment
+      commit: 537b9f2bf60f4bbd8ab89cea16aaab70f0c1560d
 
 Best regards,
 -- 
