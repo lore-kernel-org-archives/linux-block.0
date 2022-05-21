@@ -2,87 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 525C4C43219
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 07:21:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68526C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 07:23:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352932AbiEUHVz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 21 May 2022 03:21:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46924 "EHLO
+        id S240838AbiEUHXL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 03:23:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240838AbiEUHVv (ORCPT
+        with ESMTP id S1354750AbiEUHWz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 21 May 2022 03:21:51 -0400
+        Sat, 21 May 2022 03:22:55 -0400
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B70F4C423;
-        Sat, 21 May 2022 00:21:50 -0700 (PDT)
-Received: from kwepemi100019.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4w4P3YCtzhYsK;
-        Sat, 21 May 2022 15:21:09 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8E5D16644A;
+        Sat, 21 May 2022 00:22:37 -0700 (PDT)
+Received: from kwepemi100018.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4w4Q3gCSzgY9W;
+        Sat, 21 May 2022 15:21:10 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100019.china.huawei.com (7.221.188.189) with Microsoft SMTP Server
+ kwepemi100018.china.huawei.com (7.221.188.35) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 15:21:48 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 21 May
- 2022 15:21:47 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <jack@suse.cz>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+ 15.1.2375.24; Sat, 21 May 2022 15:22:35 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 21 May 2022 15:22:35 +0800
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+From:   "yukuai (C)" <yukuai3@huawei.com>
+To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>
+CC:     <jack@suse.cz>, <tj@kernel.org>, <linux-block@vger.kernel.org>,
+        <cgroups@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next v2 6/6] block, bfq: remove dead code for updating 'rq_in_driver'
-Date:   Sat, 21 May 2022 15:35:23 +0800
-Message-ID: <20220521073523.3118246-7-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220521073523.3118246-1-yukuai3@huawei.com>
-References: <20220521073523.3118246-1-yukuai3@huawei.com>
+References: <20220428120837.3737765-1-yukuai3@huawei.com>
+ <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
+ <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+Message-ID: <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+Date:   Sat, 21 May 2022 15:22:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+In-Reply-To: <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Such code are not even compiled since they are inside marco "#if 0".
-
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c | 16 ----------------
- 1 file changed, 16 deletions(-)
-
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index c0bc463d236c..be75bd9835f5 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2323,22 +2323,6 @@ static sector_t get_sdist(sector_t last_pos, struct request *rq)
- 	return 0;
- }
- 
--#if 0 /* Still not clear if we can do without next two functions */
--static void bfq_activate_request(struct request_queue *q, struct request *rq)
--{
--	struct bfq_data *bfqd = q->elevator->elevator_data;
--
--	bfqd->rq_in_driver++;
--}
--
--static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
--{
--	struct bfq_data *bfqd = q->elevator->elevator_data;
--
--	bfqd->rq_in_driver--;
--}
--#endif
--
- static void bfq_remove_request(struct request_queue *q,
- 			       struct request *rq)
- {
--- 
-2.31.1
-
+在 2022/05/14 17:29, yukuai (C) 写道:
+> 在 2022/05/05 9:00, yukuai (C) 写道:
+>> Hi, Paolo
+>>
+>> Can you take a look at this patchset? It has been quite a long time
+>> since we spotted this problem...
+>>
+> 
+> friendly ping ...
+friendly ping ...
+>> Thanks,
+>> Kuai
+>>
+>> 在 2022/04/28 20:08, Yu Kuai 写道:
+>>> Changes in v5:
+>>>   - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
+>>>   - fix wrong definition in patch 1
+>>>   - fix spelling mistake in patch 2: leaset -> least
+>>>   - update comments in patch 3
+>>>   - add reviewed-by tag in patch 2,3
+>>>
+>>> Changes in v4:
+>>>   - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
+>>>     suggested by Jan Kara.
+>>>   - remove unused 'in_groups_with_pending_reqs',
+>>>
+>>> Changes in v3:
+>>>   - remove the cleanup patch that is irrelevant now(I'll post it
+>>>     separately).
+>>>   - instead of hacking wr queues and using weights tree 
+>>> insertion/removal,
+>>>     using bfq_add/del_bfqq_busy() to count the number of groups
+>>>     (suggested by Jan Kara).
+>>>
+>>> Changes in v2:
+>>>   - Use a different approch to count root group, which is much simple.
+>>>
+>>> Currently, bfq can't handle sync io concurrently as long as they
+>>> are not issued from root group. This is because
+>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>>> bfq_asymmetric_scenario().
+>>>
+>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+>>>
+>>> Before this patchset:
+>>>   1) root group will never be counted.
+>>>   2) Count if bfqg or it's child bfqgs have pending requests.
+>>>   3) Don't count if bfqg and it's child bfqgs complete all the requests.
+>>>
+>>> After this patchset:
+>>>   1) root group is counted.
+>>>   2) Count if bfqg have at least one bfqq that is marked busy.
+>>>   3) Don't count if bfqg doesn't have any busy bfqqs.
+>>>
+>>> The main reason to use busy state of bfqq instead of 'pending requests'
+>>> is that bfqq can stay busy after dispatching the last request if idling
+>>> is needed for service guarantees.
+>>>
+>>> With the above changes, concurrent sync io can be supported if only
+>>> one group is activated.
+>>>
+>>> fio test script(startdelay is used to avoid queue merging):
+>>> [global]
+>>> filename=/dev/nvme0n1
+>>> allow_mounted_write=0
+>>> ioengine=psync
+>>> direct=1
+>>> ioscheduler=bfq
+>>> offset_increment=10g
+>>> group_reporting
+>>> rw=randwrite
+>>> bs=4k
+>>>
+>>> [test1]
+>>> numjobs=1
+>>>
+>>> [test2]
+>>> startdelay=1
+>>> numjobs=1
+>>>
+>>> [test3]
+>>> startdelay=2
+>>> numjobs=1
+>>>
+>>> [test4]
+>>> startdelay=3
+>>> numjobs=1
+>>>
+>>> [test5]
+>>> startdelay=4
+>>> numjobs=1
+>>>
+>>> [test6]
+>>> startdelay=5
+>>> numjobs=1
+>>>
+>>> [test7]
+>>> startdelay=6
+>>> numjobs=1
+>>>
+>>> [test8]
+>>> startdelay=7
+>>> numjobs=1
+>>>
+>>> test result:
+>>> running fio on root cgroup
+>>> v5.18-rc1:       550 Mib/s
+>>> v5.18-rc1-patched: 550 Mib/s
+>>>
+>>> running fio on non-root cgroup
+>>> v5.18-rc1:       349 Mib/s
+>>> v5.18-rc1-patched: 550 Mib/s
+>>>
+>>> Note that I also test null_blk with "irqmode=2
+>>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
+>>> that service guarantees are still preserved.
+>>>
+>>> Previous versions:
+>>> RFC: 
+>>> https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
+>>> v1: 
+>>> https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
+>>> v2: 
+>>> https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
+>>> v3: 
+>>> https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
+>>> v4: 
+>>> https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
+>>>
+>>> Yu Kuai (3):
+>>>    block, bfq: record how many queues are busy in bfq_group
+>>>    block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+>>>    block, bfq: do not idle if only one group is activated
+>>>
+>>>   block/bfq-cgroup.c  |  1 +
+>>>   block/bfq-iosched.c | 48 +++-----------------------------------
+>>>   block/bfq-iosched.h | 57 +++++++--------------------------------------
+>>>   block/bfq-wf2q.c    | 35 +++++++++++++++++-----------
+>>>   4 files changed, 35 insertions(+), 106 deletions(-)
+>>>
