@@ -2,129 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734B1C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 03:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39774C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 03:33:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241655AbiEUDZP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 23:25:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46540 "EHLO
+        id S1347047AbiEUDdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 23:33:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231743AbiEUDZO (ORCPT
+        with ESMTP id S241133AbiEUDdQ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 23:25:14 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A4E05187D8F;
-        Fri, 20 May 2022 20:25:12 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id gg20so9528989pjb.1;
-        Fri, 20 May 2022 20:25:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=srHucyXa3M3L2xwtZzIWQdA+RV7TAlhAfzh/7sAefe8=;
-        b=NTqXHE9UCcyj7Bih4sgeeQfhBLD7/niyepd8g2nJpwh3FEhdqVm1Lb13kRt+qOogHX
-         owgvx4hSBva1Y9OvIwr3lxDFxN0quT7ul8Bn3r4xRK72lRAQsq+EkrgtbWmPuHWRK0NC
-         F6qm2rsKnWWuIqSL0VChbsbwzF9+8rRSLV4wJALe2OQ5bShU3wXbGtUUk8INKcNplcn1
-         XGKUi0cUDD5O160LpOhU91QAW8+nMiEd4JkBdWIN3tz8WsBj90ker8ZL5aTmzWWmUEtQ
-         eBywN02hMHBhmc8lj22ZmpRGqb9LGM2cPYOtSdJlCd6A1zBO4dfbpedwHHcPTrYaoMFB
-         KWiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=srHucyXa3M3L2xwtZzIWQdA+RV7TAlhAfzh/7sAefe8=;
-        b=e2lctWyqxzTYYbcOseXuDpZSnRqI2twfV/QxYmNG1qGgY/RHfF6j2jP1jEDOfwKIV2
-         Qf639iy1QC65/L6731Z5T3M+kWzkSHQRTYEDX0komp7pJbJxF0Y4ALumS5J2TILHhJda
-         zpABNVw5FBoh5S/X2kqS8OE29xAZ89ZffaGQnSYhDVASbLewJE4o2oruQGT+6RBecebz
-         iZ7g3rEdVPa4KaTJd3XYsaoLOZc6vcoS1lM0ke4KK2n5Mt/9OnrNIYT7+cr1zSFTT2Tl
-         0TX/GUhUGE4FQj/3FswiKjJVZnCowte03cDTtqQiSTPU1aszrmcj6Y4NYURSJAGxeDl7
-         368g==
-X-Gm-Message-State: AOAM5337xhiLphQXoBVSLa6BXG+FnCB/PGq+l5N4izXMNkp8UJGkgsbs
-        fKEwbokTX3sjwbpEhchxUrc=
-X-Google-Smtp-Source: ABdhPJz7hkAsuMIxzrZUQvOGLFk7XGtePhFKoNgQzk26Rbwa+SGIYLu8hqxi0XatY3eNzsWsIrWgRg==
-X-Received: by 2002:a17:903:3112:b0:161:80df:f11 with SMTP id w18-20020a170903311200b0016180df0f11mr12268414plc.68.1653103512206;
-        Fri, 20 May 2022 20:25:12 -0700 (PDT)
-Received: from hyeyoo ([114.29.24.243])
-        by smtp.gmail.com with ESMTPSA id e1-20020a170902b78100b0015e8d4eb229sm448235pls.115.2022.05.20.20.24.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 20 May 2022 20:25:11 -0700 (PDT)
-Date:   Sat, 21 May 2022 12:24:56 +0900
-From:   Hyeonggon Yoo <42.hyeyoo@gmail.com>
-To:     Byungchul Park <byungchul.park@lge.com>
-Cc:     torvalds@linux-foundation.org, damien.lemoal@opensource.wdc.com,
-        linux-ide@vger.kernel.org, adilger.kernel@dilger.ca,
-        linux-ext4@vger.kernel.org, mingo@redhat.com,
-        linux-kernel@vger.kernel.org, peterz@infradead.org,
-        will@kernel.org, tglx@linutronix.de, rostedt@goodmis.org,
-        joel@joelfernandes.org, sashal@kernel.org, daniel.vetter@ffwll.ch,
-        chris@chris-wilson.co.uk, duyuyang@gmail.com,
-        johannes.berg@intel.com, tj@kernel.org, tytso@mit.edu,
-        willy@infradead.org, david@fromorbit.com, amir73il@gmail.com,
-        bfields@fieldses.org, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH RFC v6 02/21] dept: Implement Dept(Dependency Tracker)
-Message-ID: <YohbiJquna5LlgVv@hyeyoo>
-References: <1651652269-15342-1-git-send-email-byungchul.park@lge.com>
- <1651652269-15342-3-git-send-email-byungchul.park@lge.com>
+        Fri, 20 May 2022 23:33:16 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D513185C9B;
+        Fri, 20 May 2022 20:33:15 -0700 (PDT)
+Received: from kwepemi500013.china.huawei.com (unknown [172.30.72.57])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4q0f4M26zhYQn;
+        Sat, 21 May 2022 11:32:34 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500013.china.huawei.com (7.221.188.120) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 21 May 2022 11:33:13 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 21 May 2022 11:33:12 +0800
+Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220520032542.3331610-1-yukuai3@huawei.com>
+ <YocOsw6n3y11lNym@T590> <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
+ <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com> <YodSlSm/sIC8G2iG@T590>
+ <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com> <YodlGOo7vrUa7DZK@T590>
+ <0e7967de-0c32-790d-fa08-b0bc9ef5923d@huawei.com> <Yod93DOdYosa+SvS@T590>
+ <8e6a806b-f42e-319b-e6c8-de1f07befce2@huawei.com> <YoeeEw4SFvWtXNRk@T590>
+From:   "yukuai (C)" <yukuai3@huawei.com>
+Message-ID: <759cb032-ccb4-0d74-ad7f-e84c791fc0af@huawei.com>
+Date:   Sat, 21 May 2022 11:33:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1651652269-15342-3-git-send-email-byungchul.park@lge.com>
+In-Reply-To: <YoeeEw4SFvWtXNRk@T590>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 04, 2022 at 05:17:30PM +0900, Byungchul Park wrote:
-> CURRENT STATUS
-> +/*
+在 2022/05/20 21:56, Ming Lei 写道:
+> On Fri, May 20, 2022 at 08:01:31PM +0800, yukuai (C) wrote:
+>> 在 2022/05/20 19:39, Ming Lei 写道:
+>>
+>>>
+>>> In short:
+>>>
+>>> 1) run queue can be in-progress during cleanup queue, or returns from
+>>> cleanup queue; we drain it in both blk_cleanup_queue() and
+>>> disk_release_mq(), see commit 2a19b28f7929 ("blk-mq: cancel blk-mq dispatch
+>>> work in both blk_cleanup_queue and disk_release()")
+>> I understand that, however, there is no garantee new 'hctx->run_work'
+>> won't be queued after 'drain it', for this crash, I think this is how
+> 
+> No, run queue activity will be shutdown after both disk_release_mq()
+> and blk_cleanup_queue() are done.
+> 
+> disk_release_mq() is called after all FS IOs are done, so there isn't
+> any run queue from FS IO code path, either sync or async.
+> 
+> In blk_cleanup_queue(), we only focus on passthrough request, and
+> passthrough request is always explicitly allocated & freed by
+> its caller, so once queue is frozen, all sync dispatch activity
+> for passthrough request has been done, then it is enough to just cancel
+> dispatch work for avoiding any dispatch activity.
+> 
+Hi, Ming
 
-[...]
+Thanks for you explanation, it really help me understand the code
+better.
 
-> + * Ensure it has been called on ON/OFF transition.
-> + */
-> +void dept_enirq_transition(unsigned long ip)
-> +{
-> +	struct dept_task *dt = dept_task();
-> +	unsigned long flags;
-> +
-> +	if (unlikely(READ_ONCE(dept_stop) || in_nmi()))
-> +		return;
-> +
-> +	/*
-> +	 * IRQ ON/OFF transition might happen while Dept is working.
-> +	 * We cannot handle recursive entrance. Just ingnore it.
-> +	 * Only transitions outside of Dept will be considered.
-> +	 */
-> +	if (dt->recursive)
-> +		return;
-> +
-> +	flags = dept_enter();
-> +
-> +	enirq_update(ip);
-> +
-> +	dept_exit(flags);
-> +}
+In our test kernel, elevator_exit() is not called from
+disk_release_mq(), that is the reason I thought differently about
+root cause...
 
-EXPORT_SYMBOL_GPL(dept_enirq_transition);
+> That is why both request queue and hctx can be released safely
+> after the two are done.
+> 
+>> it triggered:
+>>
+>> assum that there is no io, while some bfq_queue is still busy:
+>>
+>> blk_cleanup_queue
+>>   blk_freeze_queue
+>>   blk_mq_cancel_work_sync
+>>   cancel_delayed_work_sync(hctx1)
+>> 				blk_mq_run_work_fn -> hctx2
+>> 				 __blk_mq_run_hw_queue
+>> 				  blk_mq_sched_dispatch_requests
+>> 				   __blk_mq_do_dispatch_sched
+>> 				    blk_mq_delay_run_hw_queues
+>> 				     blk_mq_delay_run_hw_queue
+>> 				      -> add hctx1->run_work again
+>>   cancel_delayed_work_sync(hctx2)
+> 
+> Yes, even blk_mq_delay_run_hw_queues() can be called after all
+> hctx->run_work are canceled since __blk_mq_run_hw_queue() could be
+> running in sync io code path, not via ->run_work.
+> 
+> And my patch will fix the issue, won't it?
 
-ERROR: modpost: "dept_enirq_transition" [arch/x86/kvm/kvm-amd.ko] undefined!
-ERROR: modpost: "dept_enirq_transition" [arch/x86/kvm/kvm-intel.ko] undefined!
+Yes, like I said before, your patch do make sense. It seems like
+commit 28ce942fa2d5 ("block: move blk_exit_queue into disk_release")
+is the real fix for the crash in out test.
 
-This function needs to be exported for modules.
-
-Thanks.
-
--- 
 Thanks,
-Hyeonggon
+Kuai
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
