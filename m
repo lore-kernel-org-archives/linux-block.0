@@ -2,128 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39774C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 03:33:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B63C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 03:51:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347047AbiEUDdQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 23:33:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59664 "EHLO
+        id S1354499AbiEUDvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 20 May 2022 23:51:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241133AbiEUDdQ (ORCPT
+        with ESMTP id S1354490AbiEUDvT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 23:33:16 -0400
+        Fri, 20 May 2022 23:51:19 -0400
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D513185C9B;
-        Fri, 20 May 2022 20:33:15 -0700 (PDT)
-Received: from kwepemi500013.china.huawei.com (unknown [172.30.72.57])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4q0f4M26zhYQn;
-        Sat, 21 May 2022 11:32:34 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5A0DF41;
+        Fri, 20 May 2022 20:51:15 -0700 (PDT)
+Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4qNX0XZszgY8y;
+        Sat, 21 May 2022 11:49:48 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500013.china.huawei.com (7.221.188.120) with Microsoft SMTP Server
+ kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 11:33:13 +0800
+ 15.1.2375.24; Sat, 21 May 2022 11:51:13 +0800
 Received: from [10.174.176.73] (10.174.176.73) by
  kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 11:33:12 +0800
-Subject: Re: [PATCH -next v2] blk-mq: fix panic during blk_mq_run_work_fn()
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
+ 15.1.2375.24; Sat, 21 May 2022 11:51:12 +0800
+Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
+ configuration updates
+To:     Tejun Heo <tj@kernel.org>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <geert@linux-m68k.org>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220520032542.3331610-1-yukuai3@huawei.com>
- <YocOsw6n3y11lNym@T590> <2b7a82e0-1e33-e2ff-74d7-d80f152fdc75@huawei.com>
- <afe9dec4-733d-88e9-850d-5c36e9201119@huawei.com> <YodSlSm/sIC8G2iG@T590>
- <dbe2deec-b007-470f-eb5a-35fae63ad134@huawei.com> <YodlGOo7vrUa7DZK@T590>
- <0e7967de-0c32-790d-fa08-b0bc9ef5923d@huawei.com> <Yod93DOdYosa+SvS@T590>
- <8e6a806b-f42e-319b-e6c8-de1f07befce2@huawei.com> <YoeeEw4SFvWtXNRk@T590>
+References: <20220519085811.879097-1-yukuai3@huawei.com>
+ <20220519085811.879097-3-yukuai3@huawei.com>
+ <20220519095857.GE16096@blackbody.suse.cz>
+ <a8953189-af42-0225-3031-daf61347524a@huawei.com>
+ <20220519161026.GG16096@blackbody.suse.cz>
+ <73464ca6-9412-cc55-d9c0-f2e8a10f0607@huawei.com>
+ <fe3c03f7-9b52-7948-075d-cbdf431363e1@huawei.com>
+ <20220520160305.GA17335@blackbody.suse.cz> <Yoe/1BRYzSRI0JBd@slm.duckdns.org>
 From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <759cb032-ccb4-0d74-ad7f-e84c791fc0af@huawei.com>
-Date:   Sat, 21 May 2022 11:33:11 +0800
+Message-ID: <97be6af0-ea94-f4ee-5ab2-02b6fc02cbff@huawei.com>
+Date:   Sat, 21 May 2022 11:51:11 +0800
 User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
  Thunderbird/60.8.0
 MIME-Version: 1.0
-In-Reply-To: <YoeeEw4SFvWtXNRk@T590>
-Content-Type: text/plain; charset="utf-8"; format=flowed
+In-Reply-To: <Yoe/1BRYzSRI0JBd@slm.duckdns.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/20 21:56, Ming Lei 写道:
-> On Fri, May 20, 2022 at 08:01:31PM +0800, yukuai (C) wrote:
->> 在 2022/05/20 19:39, Ming Lei 写道:
+在 2022/05/21 0:20, Tejun Heo 写道:
+> Hello,
+> 
+> On Fri, May 20, 2022 at 06:03:05PM +0200, Michal Koutný wrote:
+>>> Then io hung can be triggered by always submmiting new configuration
+>>> before the throttled bio is dispatched.
 >>
->>>
->>> In short:
->>>
->>> 1) run queue can be in-progress during cleanup queue, or returns from
->>> cleanup queue; we drain it in both blk_cleanup_queue() and
->>> disk_release_mq(), see commit 2a19b28f7929 ("blk-mq: cancel blk-mq dispatch
->>> work in both blk_cleanup_queue and disk_release()")
->> I understand that, however, there is no garantee new 'hctx->run_work'
->> won't be queued after 'drain it', for this crash, I think this is how
+>> How big is this a problem actually? Is it only shooting oneself in the leg
+>> or can there be a user who's privileged enough to modify throttling
+>> configuration yet not privileged enough to justify the hung's
+>> consequences (like some global FS locks).
 > 
-> No, run queue activity will be shutdown after both disk_release_mq()
-> and blk_cleanup_queue() are done.
-> 
-> disk_release_mq() is called after all FS IOs are done, so there isn't
-> any run queue from FS IO code path, either sync or async.
-> 
-> In blk_cleanup_queue(), we only focus on passthrough request, and
-> passthrough request is always explicitly allocated & freed by
-> its caller, so once queue is frozen, all sync dispatch activity
-> for passthrough request has been done, then it is enough to just cancel
-> dispatch work for avoiding any dispatch activity.
-> 
-Hi, Ming
+> So, the problem in itself is of the self-inflicted type and I'd prefer to
+> ignore it. Unfortunately, the kernel doesn't have the kind of isolation
+> where stalling out some aribtrary tasks is generally safe, especially not
+> blk-throtl as it doesn't handle bio_issue_as_root() and thus can have a
+> pretty severe priority inversions where IOs which can block system-wide
+> operations (e.g. memory reclaim) get trapped in a random cgroup.
+Hi, Tejun
 
-Thanks for you explanation, it really help me understand the code
-better.
+It's right the problem is self-inflicted. However, I do think with
+Michal's suggestion, how throttled bios are handled while new config is
+submitted really make sense from the functional poinit of view.
 
-In our test kernel, elevator_exit() is not called from
-disk_release_mq(), that is the reason I thought differently about
-root cause...
+Do you think the solution is OK?
 
-> That is why both request queue and hctx can be released safely
-> after the two are done.
-> 
->> it triggered:
->>
->> assum that there is no io, while some bfq_queue is still busy:
->>
->> blk_cleanup_queue
->>   blk_freeze_queue
->>   blk_mq_cancel_work_sync
->>   cancel_delayed_work_sync(hctx1)
->> 				blk_mq_run_work_fn -> hctx2
->> 				 __blk_mq_run_hw_queue
->> 				  blk_mq_sched_dispatch_requests
->> 				   __blk_mq_do_dispatch_sched
->> 				    blk_mq_delay_run_hw_queues
->> 				     blk_mq_delay_run_hw_queue
->> 				      -> add hctx1->run_work again
->>   cancel_delayed_work_sync(hctx2)
-> 
-> Yes, even blk_mq_delay_run_hw_queues() can be called after all
-> hctx->run_work are canceled since __blk_mq_run_hw_queue() could be
-> running in sync io code path, not via ->run_work.
-> 
-> And my patch will fix the issue, won't it?
-
-Yes, like I said before, your patch do make sense. It seems like
-commit 28ce942fa2d5 ("block: move blk_exit_queue into disk_release")
-is the real fix for the crash in out test.
-
-Thanks,
+Thnaks,
 Kuai
 > 
+> Even ignoring that, the kernel in general assumes some forward progress from
+> everybody and when a part stalls it's relatively easy to spread to the rest
+> of the system, sometimes gradually, sometimes suddenly - e.g. if the stalled
+> IO was being performed while holding the mmap_sem, which isn't rare, then
+> anything which tries to read its proc cmdline will hang behind it.
 > 
-> Thanks,
-> Ming
+> So, we wanna avoid a situation where a non-priviledged user can cause
+> indefinite UNINTERRUPTIBLE sleeps to prevent local DoS attacks. I mean,
+> preventing local attacks is almost never fool proof but we don't want to
+> make it too easy at least.
 > 
-> .
+> Thanks.
 > 
