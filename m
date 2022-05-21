@@ -2,37 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96B63C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 03:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2680C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 21 May 2022 05:00:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354499AbiEUDvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 20 May 2022 23:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54980 "EHLO
+        id S1352617AbiEUFAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 21 May 2022 01:00:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354490AbiEUDvT (ORCPT
+        with ESMTP id S229740AbiEUFAT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 20 May 2022 23:51:19 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5A0DF41;
-        Fri, 20 May 2022 20:51:15 -0700 (PDT)
-Received: from kwepemi500009.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L4qNX0XZszgY8y;
-        Sat, 21 May 2022 11:49:48 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500009.china.huawei.com (7.221.188.199) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 11:51:13 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 21 May 2022 11:51:12 +0800
+        Sat, 21 May 2022 01:00:19 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9ABF170F2C;
+        Fri, 20 May 2022 22:00:17 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id bo5so9290589pfb.4;
+        Fri, 20 May 2022 22:00:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=TT52cKU8Oo9pvmq53QQ/gpy/l4ehF6WUmfOqY1Ifb5w=;
+        b=Ri4Q2yDK9UddopX/efZVecxLBB/qzjAX8bOizIYqnYBz/IVPnAqRxKzwm1vJ0T8X0+
+         nuqli3W/XU2w+3+GIA1ghzD5MCISZJd+atg1PhfSHFZW8V7M+vLgShlWqqVmmArVHAAj
+         zffrOtgFX9Rqj5/HifljRxmrvGxNRZ4O1kzoXZZs4f9WN5Ykt4MQYUKi7LteHzVVgHyW
+         bpJ7xFRb4wFhtzMY02KmxQhyr0XbS9Y1JJhNAkx9exmbRdG/+E4chTBnMvnwAbkQWjFw
+         0NmE6kHrDNabzqwLUR32uOHW5Rv+xwsWUiIYDkEz1PtdnS4d6hk0vr0HXy7biSD13qSm
+         FTBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=TT52cKU8Oo9pvmq53QQ/gpy/l4ehF6WUmfOqY1Ifb5w=;
+        b=WhsCt/Ya/yYrrTRc+2eXgjqY6pui/1isCdBudiEPx7IYA619HY/JmmSun9ngDuHuNq
+         Ph3SPGcjEXaAVkCRIT6goD8P31hEpFWuyCFMsvKeRkCMGhRBz/x2LkEB6HcW0cbq+DXS
+         R/iUoBGIPCF39U3ert/zg541/7f0Uk9QI/suZOXsF0ei7CV00fSeE4PyehH/ZFQrrQmW
+         FIa7CVk+t55Cylo9td8h8oBPbesnDJZdAms7BSTCGrThknmiTP5aeQDVhV8O30ILP5ht
+         WK1UhawlDgsHak6r2vrU0reRCQ/monfOIjol/8SihOiueOPz3k0vSl9Co9evYcvxs358
+         sJmw==
+X-Gm-Message-State: AOAM531RtiChTVSCULvRyAukCg4LUeVWuxVzrI8bfZcuxHFHu4VgROFY
+        vtihJzdY5QnYIQ9xX1X3seirOFVzpU0=
+X-Google-Smtp-Source: ABdhPJy1pzrVnSH8RYDdkvaQ97w0zLTB4FwLCQZ3KInQR5+wRhOBGCaAkd5Yze73kQyif3z+3cxqFA==
+X-Received: by 2002:a05:6a00:1acd:b0:50e:1872:c680 with SMTP id f13-20020a056a001acd00b0050e1872c680mr13571991pfv.16.1653109217238;
+        Fri, 20 May 2022 22:00:17 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:1761])
+        by smtp.gmail.com with ESMTPSA id bo4-20020a056a000e8400b0050dc76281e2sm2565515pfb.188.2022.05.20.22.00.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 May 2022 22:00:16 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Fri, 20 May 2022 19:00:15 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     "yukuai (C)" <yukuai3@huawei.com>
+Cc:     Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>,
+        axboe@kernel.dk, ming.lei@redhat.com, geert@linux-m68k.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
 Subject: Re: [PATCH -next v3 2/2] blk-throttle: fix io hung due to
  configuration updates
-To:     Tejun Heo <tj@kernel.org>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-CC:     <axboe@kernel.dk>, <ming.lei@redhat.com>, <geert@linux-m68k.org>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+Message-ID: <Yohx305S2bkSemQx@slm.duckdns.org>
 References: <20220519085811.879097-1-yukuai3@huawei.com>
  <20220519085811.879097-3-yukuai3@huawei.com>
  <20220519095857.GE16096@blackbody.suse.cz>
@@ -40,63 +66,29 @@ References: <20220519085811.879097-1-yukuai3@huawei.com>
  <20220519161026.GG16096@blackbody.suse.cz>
  <73464ca6-9412-cc55-d9c0-f2e8a10f0607@huawei.com>
  <fe3c03f7-9b52-7948-075d-cbdf431363e1@huawei.com>
- <20220520160305.GA17335@blackbody.suse.cz> <Yoe/1BRYzSRI0JBd@slm.duckdns.org>
-From:   "yukuai (C)" <yukuai3@huawei.com>
-Message-ID: <97be6af0-ea94-f4ee-5ab2-02b6fc02cbff@huawei.com>
-Date:   Sat, 21 May 2022 11:51:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+ <20220520160305.GA17335@blackbody.suse.cz>
+ <Yoe/1BRYzSRI0JBd@slm.duckdns.org>
+ <97be6af0-ea94-f4ee-5ab2-02b6fc02cbff@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <Yoe/1BRYzSRI0JBd@slm.duckdns.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <97be6af0-ea94-f4ee-5ab2-02b6fc02cbff@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/21 0:20, Tejun Heo 写道:
-> Hello,
+On Sat, May 21, 2022 at 11:51:11AM +0800, yukuai (C) wrote:
+> It's right the problem is self-inflicted. However, I do think with
+> Michal's suggestion, how throttled bios are handled while new config is
+> submitted really make sense from the functional poinit of view.
 > 
-> On Fri, May 20, 2022 at 06:03:05PM +0200, Michal Koutný wrote:
->>> Then io hung can be triggered by always submmiting new configuration
->>> before the throttled bio is dispatched.
->>
->> How big is this a problem actually? Is it only shooting oneself in the leg
->> or can there be a user who's privileged enough to modify throttling
->> configuration yet not privileged enough to justify the hung's
->> consequences (like some global FS locks).
-> 
-> So, the problem in itself is of the self-inflicted type and I'd prefer to
-> ignore it. Unfortunately, the kernel doesn't have the kind of isolation
-> where stalling out some aribtrary tasks is generally safe, especially not
-> blk-throtl as it doesn't handle bio_issue_as_root() and thus can have a
-> pretty severe priority inversions where IOs which can block system-wide
-> operations (e.g. memory reclaim) get trapped in a random cgroup.
-Hi, Tejun
+> Do you think the solution is OK?
 
-It's right the problem is self-inflicted. However, I do think with
-Michal's suggestion, how throttled bios are handled while new config is
-submitted really make sense from the functional poinit of view.
+I haven't followed the details but anything which isn't overly complex and
+doesn't produce extra budget or eat into existing one on config change is
+fine by me.
 
-Do you think the solution is OK?
+Thanks.
 
-Thnaks,
-Kuai
-> 
-> Even ignoring that, the kernel in general assumes some forward progress from
-> everybody and when a part stalls it's relatively easy to spread to the rest
-> of the system, sometimes gradually, sometimes suddenly - e.g. if the stalled
-> IO was being performed while holding the mmap_sem, which isn't rare, then
-> anything which tries to read its proc cmdline will hang behind it.
-> 
-> So, we wanna avoid a situation where a non-priviledged user can cause
-> indefinite UNINTERRUPTIBLE sleeps to prevent local DoS attacks. I mean,
-> preventing local attacks is almost never fool proof but we don't want to
-> make it too easy at least.
-> 
-> Thanks.
-> 
+-- 
+tejun
