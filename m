@@ -2,96 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B23CC433FE
-	for <linux-block@archiver.kernel.org>; Sun, 22 May 2022 17:43:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52AE6C433F5
+	for <linux-block@archiver.kernel.org>; Sun, 22 May 2022 20:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349946AbiEVRnK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 May 2022 13:43:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39872 "EHLO
+        id S1350907AbiEVUlL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 May 2022 16:41:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237813AbiEVRnJ (ORCPT
+        with ESMTP id S1351223AbiEVUlD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 May 2022 13:43:09 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF283969C
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 10:43:08 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id 10so7800644plj.0
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 10:43:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=EfnEA+O5nIjrLI4sMBqJH1ChEsauuK1CZkXSDQaVoQw=;
-        b=7gbkL1QhnCD9yCDSJ30BEVzu2O4Pt9jCh5zrIG3k0eIhFFeQqDaTyEol8UBGKiD66z
-         V8KyLdKV17oZ1ATYqhFHx35abuF3Jl1HIj1kxmUDXhrX0x6p3NuJOb6hI/YIRdKIInV8
-         BO8cCFrKk3miGDbWnHGXEPZDTom0HRvdENMi1aWQ7CuNyHXASlfMwyBCGeYcM132vIL7
-         j3GB9cJ9qNuBovlPrhM72blglUhkdE2Ih8E6At/g8jnqgaGuT/nfqyfbPh5ROF3ZemEM
-         4KAjXTKV4K5RyzkYSgmwVF6jlQCdoXaMz8Wg/f9fgcdmVC9q5Yuf0DKD5e12iN1TwRQd
-         KBYA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=EfnEA+O5nIjrLI4sMBqJH1ChEsauuK1CZkXSDQaVoQw=;
-        b=ctkL8thXPi04hH8Zk2t+TwOlzKPTztBZzIBYVbbgDiVJKsHSKnXsaYNg2TPyHgKoMZ
-         KEpQDgGfyEEpTofNy7Lx4WhGJuKvDbWvLAUouTYF16vSi/pFIonZuD04ku719uUfcx/A
-         Glsi4uZNpK3xGsPyaZCYFOnpsIEFZdHw+O0VYXFEOkkFh6No45geNkuoVpOYcJDEDB+E
-         +ZB5QVfpkW6i54tO6+3vQrZP8owxIUqPv7+1fQ2ZWfeRQbNFSHpvl8T4Hu6dkTl8a6I5
-         +ZwB8NLEO/1Unl9quPXPLkDipeNYnGM8IeWEWanHaLdzhCp3xJrZTF9AsIz6noeWws7t
-         XSDA==
-X-Gm-Message-State: AOAM533JNJToRrmgq0tqmRILBoRX3Ohnvp87j+r4ZHa1jyX1UD0eLOM5
-        q97Iv0RV872jqnBGFc5e2TUdNw==
-X-Google-Smtp-Source: ABdhPJy334YvYjB7ZhmDp1PiuiIAlNpn7sSbzpy9NTOT9Iy1mrTyAx7wbaXG9SLZQGJ6ipjPUaafJQ==
-X-Received: by 2002:a17:90a:688a:b0:1df:6940:e83e with SMTP id a10-20020a17090a688a00b001df6940e83emr21789008pjd.120.1653241387683;
-        Sun, 22 May 2022 10:43:07 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id z11-20020aa7958b000000b005103abd2fdbsm5475622pfj.206.2022.05.22.10.43.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 May 2022 10:43:05 -0700 (PDT)
-Message-ID: <ece7e00e-5d03-41c0-4013-75809958e9d7@kernel.dk>
-Date:   Sun, 22 May 2022 11:43:04 -0600
+        Sun, 22 May 2022 16:41:03 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5274FE5
+        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 13:41:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=IhGfJBF1F6BJDdhicPBGQuKVWrA58Ble6RRUi+jw9tU=; b=GSSt9eILneY1h2v1DatjnZanXC
+        qM8GU0d9ulhQDSOHfq67YY2d07VtMmGUb2Vd0mN/bC5DwkmbElE1KrDuvO2bfInoKXsG56eyNydPd
+        IFkk3vSbRSFaOSras0exnizcSKqQK6XFJR7symKuoPaF3C+Agucd4az4TPZgH9Rf6nKbexkP7Y3AG
+        5lF/+DMGr2GRgTJWhHU9J61kM7x1d2OTUbk5m/v1Fy9ZRd+o4Fgbm3erfG44kzCcJV6P/ofPvAbLk
+        MLKPZYDZ/nBZ9hC+QMjebEQqVmLH47miRMDQciD6yedksuuDlV8xdUl8u137uSWuTgv9Sk4KjMJgv
+        wFjo93Pw==;
+Received: from [2601:1c0:6280:3f0::aa0b] (helo=casper.infradead.org)
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nssNM-00Faoq-VF; Sun, 22 May 2022 20:40:33 +0000
+From:   Randy Dunlap <rdunlap@infradead.org>
+To:     linux-mm@kvack.org
+Cc:     patches@lists.linux.dev, Randy Dunlap <rdunlap@infradead.org>,
+        Johannes Weiner <hannes@cmpxchg.org>,
+        Minchan Kim <minchan@kernel.org>,
+        Nitin Gupta <ngupta@vflare.org>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH -next] zram: fix Kconfig dependency warning
+Date:   Sun, 22 May 2022 13:40:27 -0700
+Message-Id: <20220522204027.22964-1-rdunlap@infradead.org>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.1
-Subject: Re: [PATCH 0/4] bcache patches for Linux v5.19 (1st wave)
-Content-Language: en-US
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220522170736.6582-1-colyli@suse.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220522170736.6582-1-colyli@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/22/22 11:07 AM, Coly Li wrote:
-> Hi Jens,
-> 
-> The bcache has 4 patches for Linux v5.19 merge window, all from me.
-> - The first 2 patches are code clean up and potential bug fixes for
-> multi- threaded btree nodes check (for cache device) and dirty sectors
-> counting (for backing device), although no report from mailing list for
-> them, it is good to have the fixes.
-> - The 3rd patch removes incremental dirty sectors counting because it
-> is conflicted with multithreaded dirty sectors counting and the latter
-> one is 10x times faster.
-> - The last patch fixes a journal no-space deadlock during cache device
-> registration, it always reserves one journal bucket and only uses it
-> in registration time, so the no-spance condition won't happen anymore.
-> 
-> There are still 2 fixes are still under the long time I/O pressure
-> testing, once they are accomplished, I will submit to you in later
-> RC cycles.
-> 
-> Please take them, and thanks in advance.
+ZSMALLOC depends on MMU so ZRAM should also depend on MMU
+since 'select' does not follow any dependency chains.
 
-It's late for sending in that stuff, now I have to do a round 2 or
-your patches would get zero time in linux-next. Please send patches
-a week in advance at least, not on the day of release...
+Fixes this Kconfig warning:
 
--- 
-Jens Axboe
+WARNING: unmet direct dependencies detected for ZSMALLOC
+  Depends on [n]: MMU [=n]
+  Selected by [y]:
+  - ZRAM [=y] && BLK_DEV [=y] && BLOCK [=y] && SYSFS [=y] && (CRYPTO_LZO [=y] || CRYPTO_ZSTD [=m] || CRYPTO_LZ4 [=m] || CRYPTO_LZ4HC [=n] || CRYPTO_842 [=n])
 
+Fixes: b3fbd58fcbb10 ("mm: Kconfig: simplify zswap configuration")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Cc: Johannes Weiner <hannes@cmpxchg.org>
+Cc: Minchan Kim <minchan@kernel.org>
+Cc: Nitin Gupta <ngupta@vflare.org>
+Cc: Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc: Jens Axboe <axboe@kernel.dk>
+Cc: linux-block@vger.kernel.org
+Cc: Andrew Morton <akpm@linux-foundation.org>
+---
+ drivers/block/zram/Kconfig |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+--- a/drivers/block/zram/Kconfig
++++ b/drivers/block/zram/Kconfig
+@@ -1,7 +1,7 @@
+ # SPDX-License-Identifier: GPL-2.0
+ config ZRAM
+ 	tristate "Compressed RAM block device support"
+-	depends on BLOCK && SYSFS
++	depends on BLOCK && SYSFS && MMU
+ 	depends on CRYPTO_LZO || CRYPTO_ZSTD || CRYPTO_LZ4 || CRYPTO_LZ4HC || CRYPTO_842
+ 	select ZSMALLOC
+ 	help
