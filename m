@@ -2,97 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 722BBC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 22 May 2022 12:24:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F90C4332F
+	for <linux-block@archiver.kernel.org>; Sun, 22 May 2022 14:37:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235036AbiEVMYD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 May 2022 08:24:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52472 "EHLO
+        id S1347135AbiEVOh0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 May 2022 10:37:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58702 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229928AbiEVMYC (ORCPT
+        with ESMTP id S1346465AbiEVOh0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 May 2022 08:24:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9D18C3BBDE
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 05:24:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653222240;
+        Sun, 22 May 2022 10:37:26 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A371E3A728;
+        Sun, 22 May 2022 07:37:25 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1653230240;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=vGe10+KvALtqKSJJ4vZvOXErApf4ZIk806K3vNO5L8A=;
-        b=hVA0T3pkKSXE0HT6+reMMJgn8RVlY/S/Bg9ra4zZB4vsR7+pQz4lUztONby0jL7I3L1aGp
-        6xeGeltydpW/nC5Pjp9UPn43lUoG2IquCEBMREVIIOfNWP9GoX2SJ1bmSOZ51NIux7h+RR
-        icv544VE68iZR4UviYLsQ7b1LHb19bo=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-611-FaPG7--JMVW6u2rxeb7b9A-1; Sun, 22 May 2022 08:23:57 -0400
-X-MC-Unique: FaPG7--JMVW6u2rxeb7b9A-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D70243831C40;
-        Sun, 22 May 2022 12:23:56 +0000 (UTC)
-Received: from localhost (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id B4270492C14;
-        Sun, 22 May 2022 12:23:55 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>
-Subject: [PATCH] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
-Date:   Sun, 22 May 2022 20:23:50 +0800
-Message-Id: <20220522122350.743103-1-ming.lei@redhat.com>
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v5Fe8A93A6DD/J1N/jpffgipxZd+155XlRgjaweWdIE=;
+        b=yVhg1amxUWOuwbdcyEaGP+ffz8Ve8j/Cd6tSIS1y6Cgd4v9A8j+peCHGPh2C6xk1fJ+uwL
+        mDSOpPpoEzhSpRkci7p0aGh1BVh2GcV0OIxkj5ft3t5OFw8094YkM/3iVeA0A8hsNkTb7Q
+        PpCFgh74l5bf/wxDzwyfprw2qRUkCQa3x2ZWj30RadZstSnVhjwPW5yeOcLwZsE/FhxnzA
+        Zv64lpw6ZM+gqgiBKxzBq5K14nryyokhvMo5efmYr73y5/omaml6kZ2qoIziTN8Edg6o68
+        +GIQcdA8y2nZcJH/LKmEA2A+p0+e3kMXjorM9MQ+AeHnL8Ij3bgwKtI9HYvmlA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1653230240;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=v5Fe8A93A6DD/J1N/jpffgipxZd+155XlRgjaweWdIE=;
+        b=laPnb48NsLJLrQPzN+cLvGDrjuUi2Z2r08uPV5oiF2Nn2R8axKFylC1t1VwGWxm8/LLGLo
+        1i//NEMJ/DAl8pAA==
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Cc:     tj@kernel.org, akpm@linux-foundation.org, jeyu@kernel.org,
+        shuah@kernel.org, bvanassche@acm.org, dan.j.williams@intel.com,
+        joe@perches.com, keescook@chromium.org, rostedt@goodmis.org,
+        minchan@kernel.org, linux-spdx@vger.kernel.org,
+        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 3/6] selftests: add tests_sysfs module
+In-Reply-To: <Yao3vtSKBKLyQY1E@kroah.com>
+References: <20211029184500.2821444-1-mcgrof@kernel.org>
+ <20211029184500.2821444-4-mcgrof@kernel.org> <Yao3vtSKBKLyQY1E@kroah.com>
+Date:   Sun, 22 May 2022 16:37:19 +0200
+Message-ID: <87fsl1iqg0.ffs@tglx>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-blk_mq_run_hw_queues() could be run when there isn't queued request and
-after queue is cleaned up, at that time tagset is freed, because tagset
-lifetime is covered by driver, and often freed after blk_cleanup_queue()
-returns.
+Greg,
 
-So don't touch ->tagset for figuring out current default hctx by the mapping
-built in request queue, so use-after-free on tagset can be avoided. Meantime
-this way should be fast than retrieving mapping from tagset.
+On Fri, Dec 03 2021 at 16:29, Greg KH wrote:
+> On Fri, Oct 29, 2021 at 11:44:57AM -0700, Luis Chamberlain wrote:
 
-Cc: "yukuai (C)" <yukuai3@huawei.com>
-Cc: Jan Kara <jack@suse.cz>
-Fixes: b6e68ee82585 ("blk-mq: Improve performance of non-mq IO schedulers with multiple HW queues")
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 7 +++----
- 1 file changed, 3 insertions(+), 4 deletions(-)
+sorry for missing this thread. I came accross it now as I'm looking into
+the licensing mess again.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ed1869a305c4..5789e971ac83 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
-  */
- static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
- {
--	struct blk_mq_hw_ctx *hctx;
--
-+	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
- 	/*
- 	 * If the IO scheduler does not respect hardware queues when
- 	 * dispatching, we just don't bother with multiple HW queues and
-@@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
- 	 * just causes lock contention inside the scheduler and pointless cache
- 	 * bouncing.
- 	 */
--	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
--				     raw_smp_processor_id());
-+	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-+
- 	if (!blk_mq_hctx_stopped(hctx))
- 		return hctx;
- 	return NULL;
--- 
-2.31.1
+>> +// SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
+>
+> Again, sorry, but no, I am going to object to this license as you are
+> only accessing a GPL-v2-only api.  Any other license on a file that
+> interacts with that, especially for core stuff like testing the
+> functionality of this code, needs to have that same license.  Sorry.
 
+That's a bogus argument. First of all the code is dual licensed and
+second we have enough code in the kernel which is licensed MIT/BSD and
+happily can access the GPL-v2-only APIs.
+
+Aside of that we have already code in the kernel which is dual licensed
+
+     GPL-2.0-or-later OR copyleft-next-0.3.1
+
+We just can't make it SPDX clean because copyleft-next-0.3.1 is not in
+LICENSING.
+
+While I agree that we want to keep the number of licenses as small as
+possible, we cannot really dictate which dual licensing options a
+submitter selects unless the license is GPL-2.0-only incompatible, which
+copyleft-next is not.
+
+Can we just get over this, add the license with the SPDX identifier and
+move on?
+
+Thanks,
+
+        tglx
