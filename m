@@ -2,62 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F98C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 10:01:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F066BC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 12:28:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233686AbiEWKBJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 06:01:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33534 "EHLO
+        id S235488AbiEWM2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 08:28:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35118 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233776AbiEWKAy (ORCPT
+        with ESMTP id S235484AbiEWM2x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 06:00:54 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9913565A6
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 03:00:52 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 0B4991F8B8;
-        Mon, 23 May 2022 10:00:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1653300051; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kjclq8HZk0uCZwVJjzDySbZDXmr+RzvN2W0O503t8EQ=;
-        b=EqJZfLsrLA8Z1Y3fozFwk8s3pXckHQ28g6jfTEzvhwumDHse11V4zoAFr7P93IpkCOkb2x
-        AIoer0ZxDw1OUNZERV0y6+ts/kv4a4XpfQuSIx5AeEekh8vG8EM20g/j1yW2oClIdW+ibx
-        2F/q+lc6Ez4CddqUnF3m341BuFCvJPE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1653300051;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kjclq8HZk0uCZwVJjzDySbZDXmr+RzvN2W0O503t8EQ=;
-        b=NdIk+lnRpMAfECz4Hyglg6cEdLGcUI/OZYRXlbJ/ruTK+il3mx2Hdq+tLAbK74d8ZMDNcz
-        5HR6pIjzDmRMgEBQ==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id ECD182C141;
-        Mon, 23 May 2022 10:00:50 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 6017CA0632; Mon, 23 May 2022 12:00:50 +0200 (CEST)
-Date:   Mon, 23 May 2022 12:00:50 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        "yukuai (C)" <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
-Message-ID: <20220523100050.dlyzg6fjmveyxmpl@quack3.lan>
-References: <20220522122350.743103-1-ming.lei@redhat.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+        Mon, 23 May 2022 08:28:53 -0400
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D639841632
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:28:51 -0700 (PDT)
+Received: by mail-pj1-x1035.google.com with SMTP id ob14-20020a17090b390e00b001dff2a43f8cso6060257pjb.1
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:28:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=BQG28UlEYcr8A85oce3InSxdg5B3vG0GxSj7UdX4+lw=;
+        b=Tzc2jBqSorBWlTvHNHN3J56nJpaB2gvtmIahJMNSXGXeQp0JiJd2wrRQB6zQx8J4i9
+         vlTYgc1xWYPBdGVCp0aVzcCpvfrG4pt6rODRiajfh07yZZOxBv90OzkaTs5PZoFvJCAM
+         FmmRoYI9U0bd6Qw6xVP/CQLZWEFXyLrJLIwlzdPxVgsM+Km+OIyGFj4Tg+CioLjNRvnz
+         pG2+/HYbs1pQSE9X360fLmSUkuQk32XFf+PAdfrfMzkqFZAAOcDz1sN+99nqvckbjfxl
+         rvEZeutRD8+V/v0QryhIIwMkQc0nbldXvPGRQCVp8zK8gRBHEaan+SptkyCttyUpOWhC
+         P5mQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=BQG28UlEYcr8A85oce3InSxdg5B3vG0GxSj7UdX4+lw=;
+        b=zIkrSpe3CDoJFBc2Xh+K8+uUEFhTPJC5rmtp3+O8nXu6h3IUyySTPk4NvahfP776QI
+         sTmcKtfs+5Gu0vVPJKVAaFBXXf4acTep838qJm3I78UridAtY7rsZUe+/67MRBmQVdMh
+         Q145GPLEK5Sbv4lNNUsv/lwmQdDAgTzcPa1n3nged007/F6B4C+EudGeLz4MTNxHsKj8
+         dJ2vzeHPeSOkoQ31Zn3/hRI5BaCL6W/SWNWcLsJGtZXY8eMP2ASh9cr91u7YymsvJSLo
+         RGJZZ+T2Ase/F3gnl9VMx1PTU4sHT+CqCq1SWcgUPm1SwVBO9jXKywMiMxta3XPoX4wM
+         7qIg==
+X-Gm-Message-State: AOAM531XxvvbdJmynam1pw6twrmYxv3r+YGUeKX///qguytXf79afznf
+        whSBio6i3VhkZgMULMtLvrKZV7iOtP2COQ==
+X-Google-Smtp-Source: ABdhPJwsYBLu6eoFsvyNaQNTkFYbNgelSEItCSF9TU3j+Uja0+5qNOIoSffjHfwZnsAKgku3zKG3GQ==
+X-Received: by 2002:a17:90b:1b43:b0:1e0:4bda:13bf with SMTP id nv3-20020a17090b1b4300b001e04bda13bfmr5573438pjb.109.1653308931137;
+        Mon, 23 May 2022 05:28:51 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id n13-20020a056a0007cd00b0051844a64d3dsm7146881pfu.25.2022.05.23.05.28.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 23 May 2022 05:28:50 -0700 (PDT)
+From:   Jens Axboe <axboe@kernel.dk>
+To:     ming.lei@redhat.com
+Cc:     linux-block@vger.kernel.org, jack@suse.cz, yukuai3@huawei.com
 In-Reply-To: <20220522122350.743103-1-ming.lei@redhat.com>
+References: <20220522122350.743103-1-ming.lei@redhat.com>
+Subject: Re: [PATCH] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
+Message-Id: <165330893019.361005.16959517425064628353.b4-ty@kernel.dk>
+Date:   Mon, 23 May 2022 06:28:50 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun 22-05-22 20:23:50, Ming Lei wrote:
+On Sun, 22 May 2022 20:23:50 +0800, Ming Lei wrote:
 > blk_mq_run_hw_queues() could be run when there isn't queued request and
 > after queue is cleaned up, at that time tagset is freed, because tagset
 > lifetime is covered by driver, and often freed after blk_cleanup_queue()
@@ -67,49 +73,15 @@ On Sun 22-05-22 20:23:50, Ming Lei wrote:
 > built in request queue, so use-after-free on tagset can be avoided. Meantime
 > this way should be fast than retrieving mapping from tagset.
 > 
-> Cc: "yukuai (C)" <yukuai3@huawei.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Fixes: b6e68ee82585 ("blk-mq: Improve performance of non-mq IO schedulers with multiple HW queues")
-> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> [...]
 
-Thanks! This indeed looks better. Feel free to add:
+Applied, thanks!
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+[1/1] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
+      commit: 5d05426e2d5fd7df8afc866b78c36b37b00188b7
 
-								Honza
-
-> ---
->  block/blk-mq.c | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ed1869a305c4..5789e971ac83 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2174,8 +2174,7 @@ static bool blk_mq_has_sqsched(struct request_queue *q)
->   */
->  static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
->  {
-> -	struct blk_mq_hw_ctx *hctx;
-> -
-> +	struct blk_mq_ctx *ctx = blk_mq_get_ctx(q);
->  	/*
->  	 * If the IO scheduler does not respect hardware queues when
->  	 * dispatching, we just don't bother with multiple HW queues and
-> @@ -2183,8 +2182,8 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
->  	 * just causes lock contention inside the scheduler and pointless cache
->  	 * bouncing.
->  	 */
-> -	hctx = blk_mq_map_queue_type(q, HCTX_TYPE_DEFAULT,
-> -				     raw_smp_processor_id());
-> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-> +
->  	if (!blk_mq_hctx_stopped(hctx))
->  		return hctx;
->  	return NULL;
-> -- 
-> 2.31.1
-> 
+Best regards,
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Jens Axboe
+
+
