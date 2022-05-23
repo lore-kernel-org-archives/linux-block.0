@@ -2,112 +2,168 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1188C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 01:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B97EBC433FE
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 02:45:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347183AbiEWBYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 May 2022 21:24:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
+        id S236611AbiEWCpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 May 2022 22:45:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236556AbiEWBYl (ORCPT
+        with ESMTP id S236761AbiEWCpR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 May 2022 21:24:41 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACC2E0DF
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 18:24:40 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 31so12385098pgp.8
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 18:24:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=oximGdL85AdyYM4EyrHBMR8JY42eOGAKAouksms98f0=;
-        b=pxJ2UZmJRrY2NLXz4OLAZ67pT7PJyixhai/tBlwrwNUjBRr2Udq+056WLiclqUMvTB
-         4wcC8pgS+GP0WO+CZHJMuYGwNxuusVHJFZiD7vp9f8RQ/myi6BbozzuhsWIBOopwlrL/
-         kWN6Qlngaz8YJjX+3Qe5O1hpgPiR7WpgMJpewWQIplVVcjOxnX+QXsMGe3StX+4ZQpZF
-         4s7aK6xqj7cPwtpRBin3N0DduqOlwrwLGhDAXaIblyfx5wSap5mPaGLJoMjrYt4qz3aU
-         VkmLiY+dEYPkpbAFKIlrO5EhGWlNWrOC74rEqzgx3wQPO5mjKBV46fHwvHeL73yt89bu
-         YLCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=oximGdL85AdyYM4EyrHBMR8JY42eOGAKAouksms98f0=;
-        b=c5FTjbD67RlmIB93dzKhCiYtXH5+ViRaCgDsiHfvyS6I/5HQgVi9vpRC3Rrpy5THqv
-         YUKfJ//nhry11YQwv49+ZXq4RzzTNhdhC/+XVUk3Ef8l/fOD+/aGtb5k7cP4Uhz3vvCw
-         lEOXKUD6HrERqJqsdwKnzW0mNx684DJYrhY+JHwb3E7ez2xhWe1IrDkei92gQlCPnEdV
-         ZvDq1hk23waQSIG19kDsjDmtn+xiGvh7gs8vhMv+AEkG8mvOjSM1Pc2Qq7IozupUzUN9
-         xRHVGcSKT9HnfUTbQTkVYWAzNdtAx4o9Jg6YUCYx0ZjvUAmWOr4NLYhqao9phdbqolKm
-         56Eg==
-X-Gm-Message-State: AOAM531eo0StbIxwH/KnADEi9ammbgHly1X7tjIwtXMLUprzYrgfk3Yj
-        bziBnHweGXQtAQaMw39qW/lhBiB0ro7pXw==
-X-Google-Smtp-Source: ABdhPJylwLfBUUYnWSOWSv13Eee2jo+ut/I0y5+pZB7Awa3MmYJZPro0Ta7eXHvl/qGL9ZOpoU506A==
-X-Received: by 2002:a63:f518:0:b0:3fa:6f09:aac5 with SMTP id w24-20020a63f518000000b003fa6f09aac5mr947876pgh.515.1653269079511;
-        Sun, 22 May 2022 18:24:39 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id u12-20020a170902a60c00b00161a16f0050sm3713018plq.222.2022.05.22.18.24.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 22 May 2022 18:24:39 -0700 (PDT)
-Message-ID: <b32ed748-a141-862c-ed35-debb474962ed@kernel.dk>
-Date:   Sun, 22 May 2022 19:24:37 -0600
+        Sun, 22 May 2022 22:45:17 -0400
+Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0AD232E0B0
+        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 19:45:13 -0700 (PDT)
+Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
+        by 156.147.23.52 with ESMTP; 23 May 2022 11:45:12 +0900
+X-Original-SENDERIP: 156.147.1.121
+X-Original-MAILFROM: byungchul.park@lge.com
+Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
+        by 156.147.1.121 with ESMTP; 23 May 2022 11:45:12 +0900
+X-Original-SENDERIP: 10.177.244.38
+X-Original-MAILFROM: byungchul.park@lge.com
+Date:   Mon, 23 May 2022 11:43:21 +0900
+From:   Byungchul Park <byungchul.park@lge.com>
+To:     Catalin Marinas <catalin.marinas@arm.com>
+Cc:     Hyeonggon Yoo <42.hyeyoo@gmail.com>, torvalds@linux-foundation.org,
+        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
+        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
+        mingo@redhat.com, linux-kernel@vger.kernel.org,
+        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
+        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
+        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
+        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
+        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
+        amir73il@gmail.com, gregkh@linuxfoundation.org,
+        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
+        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
+        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
+        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
+        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
+        linux-block@vger.kernel.org, paolo.valente@linaro.org,
+        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
+        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
+        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
+        djwong@kernel.org, dri-devel@lists.freedesktop.org,
+        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
+        melissa.srw@gmail.com, hamohammed.sa@gmail.com
+Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
+Message-ID: <20220523024321.GB16721@X58A-UD3R>
+References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
+ <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
+ <YnYd0hd+yTvVQxm5@hyeyoo>
+ <20220509001637.GA6047@X58A-UD3R>
+ <YnpJ9Mtf+pjx4JYm@hyeyoo>
+ <20220510233929.GB18445@X58A-UD3R>
+ <YnuKQ9UIhk9WYoz7@hyeyoo>
+ <YoYXvsgVJwwaWrrZ@arm.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
- specail occasion
-Content-Language: en-US
-To:     "yukuai (C)" <yukuai3@huawei.com>, paolo.valente@linaro.org
-Cc:     jack@suse.cz, tj@kernel.org, linux-block@vger.kernel.org,
-        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-References: <20220428120837.3737765-1-yukuai3@huawei.com>
- <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
- <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
- <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
- <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
- <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YoYXvsgVJwwaWrrZ@arm.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/22/22 7:10 PM, yukuai (C) wrote:
-> ? 2022/05/21 20:21, Jens Axboe ??:
->> On 5/21/22 1:22 AM, yukuai (C) wrote:
->>> ? 2022/05/14 17:29, yukuai (C) ??:
->>>> ? 2022/05/05 9:00, yukuai (C) ??:
->>>>> Hi, Paolo
->>>>>
->>>>> Can you take a look at this patchset? It has been quite a long time
->>>>> since we spotted this problem...
->>>>>
->>>>
->>>> friendly ping ...
->>> friendly ping ...
->>
->> I can't speak for Paolo, but I've mentioned before that the majority
->> of your messages end up in my spam. That's still the case, in fact
->> I just marked maybe 10 of them as not spam.
->>
->> You really need to get this issued sorted out, or you will continue
->> to have patches ignore because folks may simply not see them.
->>
-> Hi,
+On Thu, May 19, 2022 at 11:11:10AM +0100, Catalin Marinas wrote:
+> On Wed, May 11, 2022 at 07:04:51PM +0900, Hyeonggon Yoo wrote:
+> > On Wed, May 11, 2022 at 08:39:29AM +0900, Byungchul Park wrote:
+> > > On Tue, May 10, 2022 at 08:18:12PM +0900, Hyeonggon Yoo wrote:
+> > > > On Mon, May 09, 2022 at 09:16:37AM +0900, Byungchul Park wrote:
+> > > > > CASE 1.
+> > > > > 
+> > > > >    lock L with depth n
+> > > > >    lock_nested L' with depth n + 1
+> > > > >    ...
+> > > > >    unlock L'
+> > > > >    unlock L
+> > > > > 
+> > > > > This case is allowed by Lockdep.
+> > > > > This case is allowed by DEPT cuz it's not a deadlock.
+> > > > > 
+> > > > > CASE 2.
+> > > > > 
+> > > > >    lock L with depth n
+> > > > >    lock A
+> > > > >    lock_nested L' with depth n + 1
+> > > > >    ...
+> > > > >    unlock L'
+> > > > >    unlock A
+> > > > >    unlock L
+> > > > > 
+> > > > > This case is allowed by Lockdep.
+> > > > > This case is *NOT* allowed by DEPT cuz it's a *DEADLOCK*.
+> > > > 
+> > > > Yeah, in previous threads we discussed this [1]
+> > > > 
+> > > > And the case was:
+> > > > 	scan_mutex -> object_lock -> kmemleak_lock -> object_lock
+> > > > And dept reported:
+> > > > 	object_lock -> kmemleak_lock, kmemleak_lock -> object_lock as
+> > > > 	deadlock.
+> > > > 
+> > > > But IIUC - What DEPT reported happens only under scan_mutex and it
+> > > > is not simple just not to take them because the object can be
+> > > > removed from the list and freed while scanning via kmemleak_free()
+> > > > without kmemleak_lock and object_lock.
 > 
-> Thanks for your notice.
+> The above kmemleak sequence shouldn't deadlock since those locks, even
+> if taken in a different order, are serialised by scan_mutex. For various
+> reasons, trying to reduce the latency, I ended up with some
+> fine-grained, per-object locking.
+
+I understand why you introduced the fine-grained lock. However, the
+different order should be avoided anyway. As Steven said, Lockdep also
+should've detected this case, say, this would have been detected if
+Lockdep worked correctly.
+
+It's not a technical issue to make a tool skip the reversed order when
+it's already protected by another lock. Because each lock has its own
+purpose as you explained, no body knows if the cases might arise that
+use kmemleak_lock and object_lock only w/o holding scan_mutex someday.
+
+I'm wondering how other folks think this case should be handled tho.
+
+> For object allocation (rbtree modification) and tree search, we use
+> kmemleak_lock. During scanning (which can take minutes under
+> scan_mutex), we want to prevent (a) long latencies and (b) freeing the
+> object being scanned. We release the locks regularly for (a) and hold
+> the object->lock for (b).
 > 
-> Is it just me or do you see someone else's messages from *huawei.com
-> end up in spam? I tried to seek help from our IT support, however, they
-> didn't find anything unusual...
+> In another thread Byungchul mentioned:
+> 
+> |    context X			context Y
+> | 
+> |    lock mutex A		lock mutex A
+> |    lock B			lock C
+> |    lock C			lock B
+> |    unlock C			unlock B
+> |    unlock B			unlock C
+> |    unlock mutex A		unlock mutex A
+> | 
+> | In my opinion, lock B and lock C are unnecessary if they are always
+> | along with lock mutex A. Or we should keep correct lock order across all
+> | the code.
+> 
+> If these are the only two places, yes, locks B and C would be
+> unnecessary. But we have those locks acquired (not nested) on the
+> allocation path (kmemleak_lock) and freeing path (object->lock). We
+> don't want to block those paths while scan_mutex is held.
+> 
+> That said, we may be able to use a single kmemleak_lock for everything.
+> The object freeing path may be affected slightly during scanning but the
+> code does release it every MAX_SCAN_SIZE bytes. It may even get slightly
+> faster as we'd hammer a single lock (I'll do some benchmarks).
+> 
+> But from a correctness perspective, I think the DEPT tool should be
+> improved a bit to detect when such out of order locking is serialised by
+> an enclosing lock/mutex.
 
-Not sure, I think it's just you. It may be the name as well "yukuai (C)"
-probably makes gmail think it's not a real name? Or maybe it's the
-yukuai3 in the email? Pure speculation on my side.
+Again, I don't think this is a technical issue.
 
--- 
-Jens Axboe
-
+	Byungchul
+> 
+> -- 
+> Catalin
