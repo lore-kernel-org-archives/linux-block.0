@@ -2,86 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F066BC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 12:28:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5A7C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 12:36:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235488AbiEWM2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 08:28:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35118 "EHLO
+        id S235576AbiEWMgd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 08:36:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235484AbiEWM2x (ORCPT
+        with ESMTP id S235757AbiEWMgP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 08:28:53 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D639841632
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:28:51 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id ob14-20020a17090b390e00b001dff2a43f8cso6060257pjb.1
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:28:51 -0700 (PDT)
+        Mon, 23 May 2022 08:36:15 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62EBC14D07
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:36:06 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id b135so1824980pfb.12
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 05:36:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=BQG28UlEYcr8A85oce3InSxdg5B3vG0GxSj7UdX4+lw=;
-        b=Tzc2jBqSorBWlTvHNHN3J56nJpaB2gvtmIahJMNSXGXeQp0JiJd2wrRQB6zQx8J4i9
-         vlTYgc1xWYPBdGVCp0aVzcCpvfrG4pt6rODRiajfh07yZZOxBv90OzkaTs5PZoFvJCAM
-         FmmRoYI9U0bd6Qw6xVP/CQLZWEFXyLrJLIwlzdPxVgsM+Km+OIyGFj4Tg+CioLjNRvnz
-         pG2+/HYbs1pQSE9X360fLmSUkuQk32XFf+PAdfrfMzkqFZAAOcDz1sN+99nqvckbjfxl
-         rvEZeutRD8+V/v0QryhIIwMkQc0nbldXvPGRQCVp8zK8gRBHEaan+SptkyCttyUpOWhC
-         P5mQ==
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=INkfgsb8DgkgWmtKMANQ1Vo1QXhIfhnDd/K2kDPrH3Q=;
+        b=1fhqz3+apWfJ+ZsEhTE6mAVaEw1c/7DNg5ozDW0PFTFoPjcNQOq1PewkdDlvrMsykq
+         zYigUM7hOavb8VqDpEuzNufWasevbXmlT6JhI1F/KHvLNxI23r+ANzri4beDnNmNEL13
+         ODquPR328ZY4b40JXwFPQTOnTnwYkbGYWED9ZOV5MeVDmCJrfQPqUoJFL7W7Y48MHVtx
+         BnpWrbGRb4TRH9+dWCJo8TrBOSVnWQ+NMpzcn0l3qKbGeVKPKOffJedFeiBSm8MDr5s6
+         IuVdKGNPEhNpBRS154C67LLzdc0nq4Z/9VZCWPjPwJ9aAKXm0EQahgtm9sGMSkF1DvIm
+         VMnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=BQG28UlEYcr8A85oce3InSxdg5B3vG0GxSj7UdX4+lw=;
-        b=zIkrSpe3CDoJFBc2Xh+K8+uUEFhTPJC5rmtp3+O8nXu6h3IUyySTPk4NvahfP776QI
-         sTmcKtfs+5Gu0vVPJKVAaFBXXf4acTep838qJm3I78UridAtY7rsZUe+/67MRBmQVdMh
-         Q145GPLEK5Sbv4lNNUsv/lwmQdDAgTzcPa1n3nged007/F6B4C+EudGeLz4MTNxHsKj8
-         dJ2vzeHPeSOkoQ31Zn3/hRI5BaCL6W/SWNWcLsJGtZXY8eMP2ASh9cr91u7YymsvJSLo
-         RGJZZ+T2Ase/F3gnl9VMx1PTU4sHT+CqCq1SWcgUPm1SwVBO9jXKywMiMxta3XPoX4wM
-         7qIg==
-X-Gm-Message-State: AOAM531XxvvbdJmynam1pw6twrmYxv3r+YGUeKX///qguytXf79afznf
-        whSBio6i3VhkZgMULMtLvrKZV7iOtP2COQ==
-X-Google-Smtp-Source: ABdhPJwsYBLu6eoFsvyNaQNTkFYbNgelSEItCSF9TU3j+Uja0+5qNOIoSffjHfwZnsAKgku3zKG3GQ==
-X-Received: by 2002:a17:90b:1b43:b0:1e0:4bda:13bf with SMTP id nv3-20020a17090b1b4300b001e04bda13bfmr5573438pjb.109.1653308931137;
-        Mon, 23 May 2022 05:28:51 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id n13-20020a056a0007cd00b0051844a64d3dsm7146881pfu.25.2022.05.23.05.28.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 23 May 2022 05:28:50 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org, jack@suse.cz, yukuai3@huawei.com
-In-Reply-To: <20220522122350.743103-1-ming.lei@redhat.com>
-References: <20220522122350.743103-1-ming.lei@redhat.com>
-Subject: Re: [PATCH] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
-Message-Id: <165330893019.361005.16959517425064628353.b4-ty@kernel.dk>
-Date:   Mon, 23 May 2022 06:28:50 -0600
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=INkfgsb8DgkgWmtKMANQ1Vo1QXhIfhnDd/K2kDPrH3Q=;
+        b=FYHhfYgSAf3sdjQQjK2Q0/zpEmVVtIFoAui/kYh6TgQK+MeWATc0yiXzMyQxUJeL38
+         tqlguU0+Uq9wo35DG5cBZ8rL3DX1JwX5NTfu/eP0DAW9Qgy1g+RO/VebQNy2kkVCKNOJ
+         5FnkDeNc6YAyn9xWn7LwOkrZYmRVPYDmZ0kNInTTq9YeRvSDwh99z64ShuZREWY3XxUx
+         lmUYt6FOmPThbYM8reaivGFQ6/3Hw/L71G5b3AVNShJ1ig+AZVCB9CUbR2fsGSfJ/XsN
+         oMKLrNA9O2nyb8dWJ4oATth3XcNkalJpvHwSwPAN+G2zjjrGTYC17zVAA1scK4oKxZ/5
+         E0Kw==
+X-Gm-Message-State: AOAM530XC2IHUPk9Gpw4tPWQcSLDhLx6yOTKPUfT2kzIrepI8DTbX+Vn
+        CeFK/TPqLgU2o1XZDOruJBKisg==
+X-Google-Smtp-Source: ABdhPJxgbS504JkLNi1GG1RBkkzpmYhy4T9e/1i/En0Pu2KHyWvPQjZQaaYP37Mzz2R5Jcq9YxVMNg==
+X-Received: by 2002:a63:cd0b:0:b0:3c6:afc0:32a6 with SMTP id i11-20020a63cd0b000000b003c6afc032a6mr19958954pgg.436.1653309365142;
+        Mon, 23 May 2022 05:36:05 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b24-20020a056a0002d800b0050dc76281besm7012750pft.152.2022.05.23.05.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 May 2022 05:36:04 -0700 (PDT)
+Message-ID: <dfd2ac0b-74da-85f4-ff66-2eb307578d93@kernel.dk>
+Date:   Mon, 23 May 2022 06:36:03 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+Content-Language: en-US
+To:     Yu Kuai <yukuai3@huawei.com>, paolo.valente@linaro.org
+Cc:     jack@suse.cz, tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220428120837.3737765-1-yukuai3@huawei.com>
+ <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
+ <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+ <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+ <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
+ <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+ <b32ed748-a141-862c-ed35-debb474962ed@kernel.dk>
+ <1172d00f-0843-1d7c-721f-fdb60a0945cb@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <1172d00f-0843-1d7c-721f-fdb60a0945cb@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, 22 May 2022 20:23:50 +0800, Ming Lei wrote:
-> blk_mq_run_hw_queues() could be run when there isn't queued request and
-> after queue is cleaned up, at that time tagset is freed, because tagset
-> lifetime is covered by driver, and often freed after blk_cleanup_queue()
-> returns.
+On 5/23/22 2:18 AM, Yu Kuai wrote:
+> ? 2022/05/23 9:24, Jens Axboe ??:
+>> On 5/22/22 7:10 PM, yukuai (C) wrote:
+>>> ? 2022/05/21 20:21, Jens Axboe ??:
+>>>> On 5/21/22 1:22 AM, yukuai (C) wrote:
+>>>>> ? 2022/05/14 17:29, yukuai (C) ??:
+>>>>>> ? 2022/05/05 9:00, yukuai (C) ??:
+>>>>>>> Hi, Paolo
+>>>>>>>
+>>>>>>> Can you take a look at this patchset? It has been quite a long time
+>>>>>>> since we spotted this problem...
+>>>>>>>
+>>>>>>
+>>>>>> friendly ping ...
+>>>>> friendly ping ...
+>>>>
+>>>> I can't speak for Paolo, but I've mentioned before that the majority
+>>>> of your messages end up in my spam. That's still the case, in fact
+>>>> I just marked maybe 10 of them as not spam.
+>>>>
+>>>> You really need to get this issued sorted out, or you will continue
+>>>> to have patches ignore because folks may simply not see them.
+>>>>
+>>> Hi,
+>>>
+>>> Thanks for your notice.
+>>>
+>>> Is it just me or do you see someone else's messages from *huawei.com
+>>> end up in spam? I tried to seek help from our IT support, however, they
+>>> didn't find anything unusual...
+>>
+>> Not sure, I think it's just you. It may be the name as well "yukuai (C)"
+> Hi, Jens
 > 
-> So don't touch ->tagset for figuring out current default hctx by the mapping
-> built in request queue, so use-after-free on tagset can be avoided. Meantime
-> this way should be fast than retrieving mapping from tagset.
+> I just change this default name "yukuai (C)" to "Yu Kuai", can you
+> please have a check if following emails still go to spam?
 > 
-> [...]
+> https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
 
-Applied, thanks!
+These did not go into spam, were delivered just fine.
 
-[1/1] blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
-      commit: 5d05426e2d5fd7df8afc866b78c36b37b00188b7
-
-Best regards,
 -- 
 Jens Axboe
-
 
