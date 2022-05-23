@@ -2,141 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84E26C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 14:57:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3388C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 15:13:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237480AbiEWO5G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 10:57:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33124 "EHLO
+        id S237689AbiEWPNm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 11:13:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237417AbiEWO46 (ORCPT
+        with ESMTP id S237687AbiEWPNg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 10:56:58 -0400
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7475A15C;
-        Mon, 23 May 2022 07:56:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653317814; x=1684853814;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=kt7b9LLaTfA52fM3CoAr+iwZKWbwibeMswffviI6OJ8=;
-  b=Pdg6bAQeVYlGzdFKn112u3fXdOhJk8tTOFUo2KbYzSTAFAvdq2s3Ig7h
-   3H+/LI1W/3btpEKnjC1qLKm2SzhoB1DJ3sf3Jv8eGDrIW1rnT9sLViMBs
-   y01Ivkdv6cvc8957ONVjOA9646EQdtL75a0LGEeMgJp1t9o05f7oMEF10
-   78eiWooGgvzWrsSCRS3Y4Mn9cMJjnCbJcbgGCE1kDQTFKRCUxVf+heNhE
-   BswzjXbAX5J8LXdgnp98dAHcnz50FKdcycQHKjvLjkM7pLwSoZXpJlXma
-   DEUohwk02aa04RKP5uNhQiL75h7ubywcqGiDh1WRGKx4Alit0G/zEhsox
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10356"; a="273363190"
-X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
-   d="scan'208";a="273363190"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 May 2022 07:56:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,246,1647327600"; 
-   d="scan'208";a="663467052"
-Received: from storage2.sh.intel.com (HELO localhost) ([10.67.110.197])
-  by FMSMGA003.fm.intel.com with ESMTP; 23 May 2022 07:56:49 -0700
-Date:   Mon, 23 May 2022 10:56:43 -0400
-From:   Liu Xiaodong <xiaodong.liu@intel.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com,
-        xiaodong.liu@intel.com
-Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
-Message-ID: <20220523145643.GA232396@storage2.sh.intel.com>
-References: <20220518063808.GA168577@storage2.sh.intel.com>
- <YoTyNVccpIYDpx9q@T590>
+        Mon, 23 May 2022 11:13:36 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01C264C407;
+        Mon, 23 May 2022 08:13:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 8F2246126D;
+        Mon, 23 May 2022 15:13:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57F7CC34119;
+        Mon, 23 May 2022 15:13:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1653318803;
+        bh=uO25Tzc06fqGR87hf2VJ5iR4cfjKvSlQqYudM+ajRcM=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mGTmjfMY0StxAmJQgb1MJIGv+3trot1pf+C/KC2Utl4oo0QdXUOd0TQ+khBB9XoAV
+         YoScFeKFDjhlNftEGpssq/07h/NtETt14aQMuLlSOp5Z9M3ZWW80gScnn3k7Uxm+p+
+         mD2mq9BDlajh1iZZNvPBeCzaik4T4bEWpFhaKFHE=
+Date:   Mon, 23 May 2022 17:13:19 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Gwendal Grignou <gwendal@chromium.org>
+Cc:     paolo.valente@linaro.org, axboe@kernel.dk, xieyongji@bytedance.com,
+        ming.lei@redhat.com, linux-block@vger.kernel.org,
+        Oleksandr Natalenko <oleksandr@natalenko.name>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] block: return ELEVATOR_DISCARD_MERGE if possible
+Message-ID: <Youkj8RWDNlpNUnL@kroah.com>
+References: <20220521185626.3333530-1-gwendal@chromium.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoTyNVccpIYDpx9q@T590>
-User-Agent: Mutt/1.9.2 (2017-12-15)
+In-Reply-To: <20220521185626.3333530-1-gwendal@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 18, 2022 at 09:18:45PM +0800, Ming Lei wrote:
-> Hello Liu,
+On Sat, May 21, 2022 at 11:56:26AM -0700, Gwendal Grignou wrote:
+> From: Ming Lei <ming.lei@redhat.com>
 > 
-> On Wed, May 18, 2022 at 02:38:08AM -0400, Liu Xiaodong wrote:
-> > On Tue, May 17, 2022 at 01:53:57PM +0800, Ming Lei wrote:
-> > > Hello Guys,
-> > > 
-> > > ubd driver is one kernel driver for implementing generic userspace block
-> > > device/driver, which delivers io request from ubd block device(/dev/ubdbN) into
-> > > ubd server[1] which is the userspace part of ubd for communicating
-> > > with ubd driver and handling specific io logic by its target module.
-> > > 
-> > > Another thing ubd driver handles is to copy data between user space buffer
-> > > and request/bio's pages, or take zero copy if mm is ready for support it in
-> > > future. ubd driver doesn't handle any IO logic of the specific driver, so
-> > > it is small/simple, and all io logics are done by the target code in ubdserver.
-> > > 
-> > > The above two are main jobs done by ubd driver.
-> > 
-> > Not like UBD which is straightforward and starts from scratch, VDUSE is
-> > embedded in virtio framework. So its implementation is more complicated, but
-> > all virtio frontend utilities can be leveraged.
-> > When considering security/permission issues, feels UBD would be easier to
-> > solve them.
+> When merging one bio to request, if they are discard IO and the queue
+> supports multi-range discard, we need to return ELEVATOR_DISCARD_MERGE
+> because both block core and related drivers(nvme, virtio-blk) doesn't
+> handle mixed discard io merge(traditional IO merge together with
+> discard merge) well.
 > 
-> Stefan Hajnoczi and I are discussing related security/permission
-> issues, can you share more details in your case?
+> Fix the issue by returning ELEVATOR_DISCARD_MERGE in this situation,
+> so both blk-mq and drivers just need to handle multi-range discard.
+> 
+> Reported-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Signed-off-by: Ming Lei <ming.lei@redhat.com>
+> Tested-by: Oleksandr Natalenko <oleksandr@natalenko.name>
+> Fixes: 2705dfb20947 ("block: fix discard request merge")
+> Link: https://lore.kernel.org/r/20210729034226.1591070-1-ming.lei@redhat.com
+> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> 
+> commit 866663b7b52d2 upstream.
+> 
+> Similar to commit 87aa69aa10b42 ("block: return ELEVATOR_DISCARD_MERGE if possible")
+> in 5.10 kernel.
+> 
+> Conflicts:
+>    block/blk-merge.c: function at a different place.
+>    block/mq-deadline-main.c: not in 5.4, use mq-deadline.c instead.
+> 
+> Cc: <stable@vger.kernel.org> # 5.4.y
+> Signed-off-by: Gwendal Grignou <gwendal@chromium.org>
 
-Hi, Ming
-Security/permission things covered by your discussion are more than I've
-considered.
- 
-> > 
-> > So my questions are:
-> > 1. what do you think about the purpose overlap between UBD and VDUSE?
-> 
-> Sorry, I am not familiar with VDUSE, motivation of ubd is just to make one
-> high performance generic userspace block driver. ubd driver(kernel part) is
-> just responsible for communication and copying data between userspace buffers
-> and kernel io request pages, and the ubdsrv(userspace) target handles io
-> logic.
-> 
-> > 2. Could UBD be implemented with SPDK friendly functionalities? (mainly about
-> > io data mapping, since HW devices in SPDK need to access the mapped data
-> > buffer. Then, in function ubdsrv.c/ubdsrv_init_io_bufs(),
-> > "addr = mmap(,,,,dev->cdev_fd,)",
-> 
-> No, that code is actually for supporting zero copy.
-> 
-> But each request's buffer is allocated by ubdsrv and definitely available for any
-> target, please see loop_handle_io_async() which handles IO from /dev/ubdbN about
-> how to use the buffer. Fro READ, the target code needs to implement READ
-> logic and fill data to the buffer, then the buffer will be copied to
-> kernel io request pages; for WRITE, the target code needs to use the buffer to handle
-> WRITE and the buffer has been updated with kernel io request.
-> 
+Now queued up, thanks.
 
-Oh, I see. Yes, you are right. Mmapped addr in ubdsrv_init_io_bufs is not
-used yet. Request's buffer is allocated by ubdsrv.
-
-
-> > SPDK needs to know the PA of "addr".
-> 
-> What is PA? and why?
-
-Physical address. Sorry, I forgot to expand it.
-Previously I've thought Request data buffer is from mmap addr on corresponding
-ubd cdev, then I just thought SPDK need to know the PA of the buffer for
-its backend hardware devices.
-If the request data buffer is allocated by srv process, then it was not
-needed. So maybe SPDK can be efficiently working on your corrent implementation.
-I'll try to draft an SPDK service backend later.
-
-Thanks
-Xiaodong
-
- 
+greg k-h
