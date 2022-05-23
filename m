@@ -2,55 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4D9C433FE
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 12:59:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 193BEC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 13:04:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235810AbiEWM7E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 08:59:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35302 "EHLO
+        id S235842AbiEWNEq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 09:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235726AbiEWM66 (ORCPT
+        with ESMTP id S235729AbiEWNEq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 08:58:58 -0400
+        Mon, 23 May 2022 09:04:46 -0400
 Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9018353A74;
-        Mon, 23 May 2022 05:58:57 -0700 (PDT)
-Received: from kwepemi500004.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L6HT95KyrzDqLt;
-        Mon, 23 May 2022 20:58:53 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 204F92DF;
+        Mon, 23 May 2022 06:04:45 -0700 (PDT)
+Received: from kwepemi500006.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4L6Hbs0zfJzDqMC;
+        Mon, 23 May 2022 21:04:41 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500004.china.huawei.com (7.221.188.17) with Microsoft SMTP Server
+ kwepemi500006.china.huawei.com (7.221.188.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 23 May 2022 20:58:55 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 23 May 2022 20:58:54 +0800
-Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
- specail occasion
-To:     Jens Axboe <axboe@kernel.dk>, <paolo.valente@linaro.org>
-CC:     <jack@suse.cz>, <tj@kernel.org>, <linux-block@vger.kernel.org>,
-        <cgroups@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220428120837.3737765-1-yukuai3@huawei.com>
- <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
- <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
- <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
- <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
- <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
- <b32ed748-a141-862c-ed35-debb474962ed@kernel.dk>
- <1172d00f-0843-1d7c-721f-fdb60a0945cb@huawei.com>
- <dfd2ac0b-74da-85f4-ff66-2eb307578d93@kernel.dk>
+ 15.1.2375.24; Mon, 23 May 2022 21:04:42 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 23 May
+ 2022 21:04:42 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <8f0b5115-6a96-d5eb-5243-0be832cf121b@huawei.com>
-Date:   Mon, 23 May 2022 20:58:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     <jack@suse.cz>, <tj@kernel.org>, <axboe@kernel.dk>,
+        <paolo.valente@linaro.org>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v6 1/3] block, bfq: record how many queues are busy in bfq_group
+Date:   Mon, 23 May 2022 21:18:16 +0800
+Message-ID: <20220523131818.2798712-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220523131818.2798712-1-yukuai3@huawei.com>
+References: <20220523131818.2798712-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <dfd2ac0b-74da-85f4-ff66-2eb307578d93@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
 X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
@@ -58,47 +49,103 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/23 20:36, Jens Axboe 写道:
-> On 5/23/22 2:18 AM, Yu Kuai wrote:
->> ? 2022/05/23 9:24, Jens Axboe ??:
->>> On 5/22/22 7:10 PM, yukuai (C) wrote:
->>>> ? 2022/05/21 20:21, Jens Axboe ??:
->>>>> On 5/21/22 1:22 AM, yukuai (C) wrote:
->>>>>> ? 2022/05/14 17:29, yukuai (C) ??:
->>>>>>> ? 2022/05/05 9:00, yukuai (C) ??:
->>>>>>>> Hi, Paolo
->>>>>>>>
->>>>>>>> Can you take a look at this patchset? It has been quite a long time
->>>>>>>> since we spotted this problem...
->>>>>>>>
->>>>>>>
->>>>>>> friendly ping ...
->>>>>> friendly ping ...
->>>>>
->>>>> I can't speak for Paolo, but I've mentioned before that the majority
->>>>> of your messages end up in my spam. That's still the case, in fact
->>>>> I just marked maybe 10 of them as not spam.
->>>>>
->>>>> You really need to get this issued sorted out, or you will continue
->>>>> to have patches ignore because folks may simply not see them.
->>>>>
->>>> Hi,
->>>>
->>>> Thanks for your notice.
->>>>
->>>> Is it just me or do you see someone else's messages from *huawei.com
->>>> end up in spam? I tried to seek help from our IT support, however, they
->>>> didn't find anything unusual...
->>>
->>> Not sure, I think it's just you. It may be the name as well "yukuai (C)"
->> Hi, Jens
->>
->> I just change this default name "yukuai (C)" to "Yu Kuai", can you
->> please have a check if following emails still go to spam?
->>
->> https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
-> 
-> These did not go into spam, were delivered just fine.
-> 
-Cheers for solving this, I'll resend this patchset just in case they are
-in spam for Paolo...
+Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
+
+Add a counter 'busy_queues' in bfq_group, and update it in
+bfq_add/del_bfqq_busy().
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Jan Kara <jack@suse.cz>
+---
+ block/bfq-cgroup.c  |  1 +
+ block/bfq-iosched.h |  2 ++
+ block/bfq-wf2q.c    | 20 ++++++++++++++++++++
+ 3 files changed, 23 insertions(+)
+
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 09574af83566..4d516879d9fa 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
+ 				   */
+ 	bfqg->bfqd = bfqd;
+ 	bfqg->active_entities = 0;
++	bfqg->busy_queues = 0;
+ 	bfqg->online = true;
+ 	bfqg->rq_pos_tree = RB_ROOT;
+ }
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index 978ef5d6fe6a..3847f4ab77ac 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -906,6 +906,7 @@ struct bfq_group_data {
+  *                   are groups with more than one active @bfq_entity
+  *                   (see the comments to the function
+  *                   bfq_bfqq_may_idle()).
++ * @busy_queues: number of busy bfqqs.
+  * @rq_pos_tree: rbtree sorted by next_request position, used when
+  *               determining if two or more queues have interleaving
+  *               requests (see bfq_find_close_cooperator()).
+@@ -942,6 +943,7 @@ struct bfq_group {
+ 	struct bfq_entity *my_entity;
+ 
+ 	int active_entities;
++	int busy_queues;
+ 
+ 	struct rb_root rq_pos_tree;
+ 
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index f8eb340381cf..d9ff33e0be38 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -218,6 +218,16 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+ 	return false;
+ }
+ 
++static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
++{
++	bfqq_group(bfqq)->busy_queues++;
++}
++
++static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
++{
++	bfqq_group(bfqq)->busy_queues--;
++}
++
+ #else /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+ static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
+@@ -230,6 +240,14 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
+ 	return true;
+ }
+ 
++static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
++{
++}
++
++static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
++{
++}
++
+ #endif /* CONFIG_BFQ_GROUP_IOSCHED */
+ 
+ /*
+@@ -1660,6 +1678,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 	bfq_clear_bfqq_busy(bfqq);
+ 
+ 	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
++	bfq_inc_busy_queues(bfqq);
+ 
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues--;
+@@ -1683,6 +1702,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
++	bfq_dec_busy_queues(bfqq);
+ 
+ 	if (!bfqq->dispatched)
+ 		if (bfqq->wr_coeff == 1)
+-- 
+2.31.1
+
