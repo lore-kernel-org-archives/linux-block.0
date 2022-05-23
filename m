@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7DC0C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42D55C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:02:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230271AbiEWVCP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 17:02:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58164 "EHLO
+        id S229746AbiEWVCQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 17:02:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230256AbiEWVB4 (ORCPT
+        with ESMTP id S229920AbiEWVB7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 17:01:56 -0400
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BB46544D6
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:54 -0700 (PDT)
-Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
-        by m0089730.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 24NKGS7I006514
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:53 -0700
+        Mon, 23 May 2022 17:01:59 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2261D4F9F4
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:58 -0700 (PDT)
+Received: from pps.filterd (m0044010.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24NKGfnj012220
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:58 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=ilot6pF2tnHcFgaXZ5dBLN2SL/JleYqHLnnHZG/ZMrY=;
- b=NWzM4z0yrVK6M8HqzbubslSNH2njepeMor6vTNfJmpMugXHZG/qU+JJMG2OluNSrD8+4
- AwYYYrkmiRYidvqJ0PFUM4OnJWaVXloKlO7p2XTs3NfGQMgadmFz7DvEHQ9AYTsADl1r
- czGI9FOdENUF+EUH+1jtI/nU8ly0HrA6egA= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by m0089730.ppops.net (PPS) with ESMTPS id 3g6uk7m7cs-2
+ bh=3InifA8iBF2XdI/hDz3sCcXF6tYj0vr17287zoar5NU=;
+ b=I4hRXl+ziRDpinZDMBn8dn7QAgwJY2H5yNKGp7ZZP/l+o8S3jBEg0r19Ix/8W+HPpvps
+ /MCt73FTx/cOCMJYUMea3uPcih6o3NJUltBBSakQGvHF33Fv17bGDB6p5IcTUpHKKC/P
+ izvN8xM5couV9mSUH8dliO7yUO/SSF/WI4o= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g6udnm7ne-5
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:53 -0700
-Received: from twshared8508.05.ash9.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:57 -0700
+Received: from twshared6696.05.ash7.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:11d::6) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 23 May 2022 14:01:51 -0700
+ 15.1.2375.28; Mon, 23 May 2022 14:01:55 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 8C8934464152; Mon, 23 May 2022 14:01:34 -0700 (PDT)
+        id CB9C54464158; Mon, 23 May 2022 14:01:34 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         <ebiggers@kernel.org>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 2/6] block: export dma_alignment attribute
-Date:   Mon, 23 May 2022 14:01:15 -0700
-Message-ID: <20220523210119.2500150-3-kbusch@fb.com>
+Subject: [PATCHv3 6/6] block: relax direct io memory alignment
+Date:   Mon, 23 May 2022 14:01:19 -0700
+Message-ID: <20220523210119.2500150-7-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220523210119.2500150-1-kbusch@fb.com>
 References: <20220523210119.2500150-1-kbusch@fb.com>
@@ -50,8 +50,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: d5w-ST-C0CVljUzOIj0yn1NC5MIpJWOg
-X-Proofpoint-GUID: d5w-ST-C0CVljUzOIj0yn1NC5MIpJWOg
+X-Proofpoint-GUID: x4A9NycbYGDsmlwCSamgEPg-_7N7ETeC
+X-Proofpoint-ORIG-GUID: x4A9NycbYGDsmlwCSamgEPg-_7N7ETeC
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-23_09,2022-05-23_01,2022-02-23_01
@@ -61,74 +61,160 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-User space may want to know how to align their buffers to avoid
-bouncing. Export the queue attribute.
+Use the address alignment requirements from the hardware for direct io
+instead of requiring addresses be aligned to the block size. User space
+can discover the alignment requirements from the dma_alignment queue
+attribute.
+
+User space can specify any hardware compatible DMA offset for each
+segment, but every segment length is still required to be a multiple of
+the block size.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
 v2->v3:
 
-  Added Documentation (Bart)
+  Removed iomap support for now
 
- Documentation/ABI/stable/sysfs-block | 9 +++++++++
- block/blk-sysfs.c                    | 7 +++++++
- 2 files changed, 16 insertions(+)
+  Added alignment help function instead of duplicating it (Christoph)
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
-ble/sysfs-block
-index e8797cd09aff..08f6d00df138 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -142,6 +142,15 @@ Description:
- 		Default value of this file is '1'(on).
+  Added comment explaining ALIGN_DOWN
+
+  Added check for iov alignment in _async case
+
+ block/bio.c  | 13 +++++++++++++
+ block/fops.c | 41 ++++++++++++++++++++++++++++++-----------
+ 2 files changed, 43 insertions(+), 11 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index 55d2a9c4e312..c8ea14ad87f6 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1205,6 +1205,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
+, struct iov_iter *iter)
+ {
+ 	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
+ 	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
++	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
+ 	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages =3D (struct page **)bv;
+ 	ssize_t size, left;
+@@ -1219,7 +1220,19 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
+o, struct iov_iter *iter)
+ 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+ 	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
 =20
++	/*
++	 * Each segment in the iov is required to be a block size multiple.
++	 * However, we may not be able to get the entire segment if it spans
++	 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
++	 * result to ensure the bio's total size is correct. The remainder of
++	 * the iov data will be picked up in the next bio iteration.
++	 *
++	 * If the result is ever 0, that indicates the iov fails the segment
++	 * size requirement and is an error.
++	 */
+ 	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
++	if (size > 0)
++		size =3D ALIGN_DOWN(size, queue_logical_block_size(q));
+ 	if (unlikely(size <=3D 0))
+ 		return size ? size : -EFAULT;
 =20
-+What:		/sys/block/<disk>/queue/dma_alignment
-+Date:		May 2022
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		Reports the alignment that user space addresses must have to be
-+		used for raw block device access with O_DIRECT and other driver
-+		specific passthrough mechanisms.
-+
-+
- What:		/sys/block/<disk>/queue/chunk_sectors
- Date:		September 2016
- Contact:	Hannes Reinecke <hare@suse.com>
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 88bd41d4cb59..14607565d781 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -274,6 +274,11 @@ static ssize_t queue_virt_boundary_mask_show(struct =
-request_queue *q, char *page
- 	return queue_var_show(q->limits.virt_boundary_mask, page);
+diff --git a/block/fops.c b/block/fops.c
+index b9b83030e0df..218e4a8b92aa 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -42,6 +42,16 @@ static unsigned int dio_bio_write_op(struct kiocb *ioc=
+b)
+ 	return op;
  }
 =20
-+static ssize_t queue_dma_alignment_show(struct request_queue *q, char *p=
-age)
++static int blkdev_dio_aligned(struct block_device *bdev, loff_t pos,
++			      struct iov_iter *iter)
 +{
-+	return queue_var_show(queue_dma_alignment(q), page);
++	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
++		return -EINVAL;
++	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
++		return -EINVAL;
++	return 0;
 +}
 +
- #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
- static ssize_t								\
- queue_##name##_show(struct request_queue *q, char *page)		\
-@@ -606,6 +611,7 @@ QUEUE_RO_ENTRY(queue_dax, "dax");
- QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
- QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
- QUEUE_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
-+QUEUE_RO_ENTRY(queue_dma_alignment, "dma_alignment");
+ #define DIO_INLINE_BIO_VECS 4
 =20
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- QUEUE_RW_ENTRY(blk_throtl_sample_time, "throttle_sample_time");
-@@ -667,6 +673,7 @@ static struct attribute *queue_attrs[] =3D {
- 	&blk_throtl_sample_time_entry.attr,
- #endif
- 	&queue_virt_boundary_mask_entry.attr,
-+	&queue_dma_alignment_entry.attr,
- 	NULL,
- };
+ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+@@ -54,9 +64,9 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *=
+iocb,
+ 	struct bio bio;
+ 	ssize_t ret;
 =20
+-	if ((pos | iov_iter_alignment(iter)) &
+-	    (bdev_logical_block_size(bdev) - 1))
+-		return -EINVAL;
++	ret =3D blkdev_dio_aligned(bdev, pos, iter);
++	if (ret)
++		return ret;
+=20
+ 	if (nr_pages <=3D DIO_INLINE_BIO_VECS)
+ 		vecs =3D inline_vecs;
+@@ -80,6 +90,11 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb =
+*iocb,
+ 	ret =3D bio_iov_iter_get_pages(&bio, iter);
+ 	if (unlikely(ret))
+ 		goto out;
++	/* check if iov is not aligned */
++	if (unlikely(iov_iter_count(iter))) {
++		ret =3D -EINVAL;
++		goto out;
++	}
+ 	ret =3D bio.bi_iter.bi_size;
+=20
+ 	if (iov_iter_rw(iter) =3D=3D WRITE)
+@@ -171,11 +186,11 @@ static ssize_t __blkdev_direct_IO(struct kiocb *ioc=
+b, struct iov_iter *iter,
+ 	bool is_read =3D (iov_iter_rw(iter) =3D=3D READ), is_sync;
+ 	unsigned int opf =3D is_read ? REQ_OP_READ : dio_bio_write_op(iocb);
+ 	loff_t pos =3D iocb->ki_pos;
+-	int ret =3D 0;
++	int ret;
+=20
+-	if ((pos | iov_iter_alignment(iter)) &
+-	    (bdev_logical_block_size(bdev) - 1))
+-		return -EINVAL;
++	ret =3D blkdev_dio_aligned(bdev, pos, iter);
++	if (ret)
++		return ret;
+=20
+ 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+ 		opf |=3D REQ_ALLOC_CACHE;
+@@ -296,11 +311,11 @@ static ssize_t __blkdev_direct_IO_async(struct kioc=
+b *iocb,
+ 	struct blkdev_dio *dio;
+ 	struct bio *bio;
+ 	loff_t pos =3D iocb->ki_pos;
+-	int ret =3D 0;
++	int ret;
+=20
+-	if ((pos | iov_iter_alignment(iter)) &
+-	    (bdev_logical_block_size(bdev) - 1))
+-		return -EINVAL;
++	ret =3D blkdev_dio_aligned(bdev, pos, iter);
++	if (ret)
++		return ret;
+=20
+ 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+ 		opf |=3D REQ_ALLOC_CACHE;
+@@ -323,6 +338,10 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb=
+ *iocb,
+ 		bio_iov_bvec_set(bio, iter);
+ 	} else {
+ 		ret =3D bio_iov_iter_get_pages(bio, iter);
++
++		/* check if iov is not aligned */
++		if (unlikely(iov_iter_count(iter)))
++			ret =3D -EINVAL;
+ 		if (unlikely(ret)) {
+ 			bio_put(bio);
+ 			return ret;
 --=20
 2.30.2
 
