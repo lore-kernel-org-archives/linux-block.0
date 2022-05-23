@@ -2,168 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97EBC433FE
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 02:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E177C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 07:33:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236611AbiEWCpS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 May 2022 22:45:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55180 "EHLO
+        id S230236AbiEWHdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 03:33:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236761AbiEWCpR (ORCPT
+        with ESMTP id S230272AbiEWHcg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 May 2022 22:45:17 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0AD232E0B0
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 19:45:13 -0700 (PDT)
-Received: from unknown (HELO lgemrelse6q.lge.com) (156.147.1.121)
-        by 156.147.23.52 with ESMTP; 23 May 2022 11:45:12 +0900
-X-Original-SENDERIP: 156.147.1.121
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.121 with ESMTP; 23 May 2022 11:45:12 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Mon, 23 May 2022 11:43:21 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Catalin Marinas <catalin.marinas@arm.com>
-Cc:     Hyeonggon Yoo <42.hyeyoo@gmail.com>, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, tj@kernel.org,
-        tytso@mit.edu, willy@infradead.org, david@fromorbit.com,
-        amir73il@gmail.com, gregkh@linuxfoundation.org,
-        kernel-team@lge.com, linux-mm@kvack.org, akpm@linux-foundation.org,
-        mhocko@kernel.org, minchan@kernel.org, hannes@cmpxchg.org,
-        vdavydov.dev@gmail.com, sj@kernel.org, jglisse@redhat.com,
-        dennis@kernel.org, cl@linux.com, penberg@kernel.org,
-        rientjes@google.com, vbabka@suse.cz, ngupta@vflare.org,
-        linux-block@vger.kernel.org, paolo.valente@linaro.org,
-        josef@toxicpanda.com, linux-fsdevel@vger.kernel.org,
-        viro@zeniv.linux.org.uk, jack@suse.cz, jack@suse.com,
-        jlayton@kernel.org, dan.j.williams@intel.com, hch@infradead.org,
-        djwong@kernel.org, dri-devel@lists.freedesktop.org,
-        airlied@linux.ie, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com
-Subject: Re: [PATCH RFC v6 00/21] DEPT(Dependency Tracker)
-Message-ID: <20220523024321.GB16721@X58A-UD3R>
-References: <CAHk-=whnPePcffsNQM+YSHMGttLXvpf8LbBQ8P7HEdqFXaV7Lg@mail.gmail.com>
- <1651795895-8641-1-git-send-email-byungchul.park@lge.com>
- <YnYd0hd+yTvVQxm5@hyeyoo>
- <20220509001637.GA6047@X58A-UD3R>
- <YnpJ9Mtf+pjx4JYm@hyeyoo>
- <20220510233929.GB18445@X58A-UD3R>
- <YnuKQ9UIhk9WYoz7@hyeyoo>
- <YoYXvsgVJwwaWrrZ@arm.com>
+        Mon, 23 May 2022 03:32:36 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365EE2600;
+        Mon, 23 May 2022 00:31:34 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id C529A1F383;
+        Mon, 23 May 2022 06:26:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653287191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tWdRYkYeTd6L1kFlWAZqosjLUp2g2JWMcn4ZCfMoyaE=;
+        b=MUunQvOlxIOLBymvojg7kwEf0Fbin7+nEyYmtSE5BudcRbOIWYiNhDdJb+bWEw7pSpiGr1
+        Et6xkbpJf0C0y4taW5t6NaSM3qwsDho9FagM8xigLBP2jfxZbVV0yjVkDAqqcUGq30uPH6
+        ED2zLwll9WBxw2twcPgAd6sMLkNp6ug=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653287191;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=tWdRYkYeTd6L1kFlWAZqosjLUp2g2JWMcn4ZCfMoyaE=;
+        b=rzRIP95V4SHfqW8hnDoxWJ2P5s3+LZbohbqSa3MqDGMxDCIQ0rSYbzZYzdHMluYmG3uT8D
+        EAosH2b+wB72c9CQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C550113AA5;
+        Mon, 23 May 2022 06:26:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id RFjLIRYpi2IFfQAAMHmgww
+        (envelope-from <colyli@suse.de>); Mon, 23 May 2022 06:26:30 +0000
+Message-ID: <9c3fddec-1741-872f-1cdb-b44316e2ff64@suse.de>
+Date:   Mon, 23 May 2022 14:26:28 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YoYXvsgVJwwaWrrZ@arm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCH 0/4] bcache patches for Linux v5.19 (1st wave)
+Content-Language: en-US
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20220522170736.6582-1-colyli@suse.de>
+ <ece7e00e-5d03-41c0-4013-75809958e9d7@kernel.dk>
+From:   Coly Li <colyli@suse.de>
+In-Reply-To: <ece7e00e-5d03-41c0-4013-75809958e9d7@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 19, 2022 at 11:11:10AM +0100, Catalin Marinas wrote:
-> On Wed, May 11, 2022 at 07:04:51PM +0900, Hyeonggon Yoo wrote:
-> > On Wed, May 11, 2022 at 08:39:29AM +0900, Byungchul Park wrote:
-> > > On Tue, May 10, 2022 at 08:18:12PM +0900, Hyeonggon Yoo wrote:
-> > > > On Mon, May 09, 2022 at 09:16:37AM +0900, Byungchul Park wrote:
-> > > > > CASE 1.
-> > > > > 
-> > > > >    lock L with depth n
-> > > > >    lock_nested L' with depth n + 1
-> > > > >    ...
-> > > > >    unlock L'
-> > > > >    unlock L
-> > > > > 
-> > > > > This case is allowed by Lockdep.
-> > > > > This case is allowed by DEPT cuz it's not a deadlock.
-> > > > > 
-> > > > > CASE 2.
-> > > > > 
-> > > > >    lock L with depth n
-> > > > >    lock A
-> > > > >    lock_nested L' with depth n + 1
-> > > > >    ...
-> > > > >    unlock L'
-> > > > >    unlock A
-> > > > >    unlock L
-> > > > > 
-> > > > > This case is allowed by Lockdep.
-> > > > > This case is *NOT* allowed by DEPT cuz it's a *DEADLOCK*.
-> > > > 
-> > > > Yeah, in previous threads we discussed this [1]
-> > > > 
-> > > > And the case was:
-> > > > 	scan_mutex -> object_lock -> kmemleak_lock -> object_lock
-> > > > And dept reported:
-> > > > 	object_lock -> kmemleak_lock, kmemleak_lock -> object_lock as
-> > > > 	deadlock.
-> > > > 
-> > > > But IIUC - What DEPT reported happens only under scan_mutex and it
-> > > > is not simple just not to take them because the object can be
-> > > > removed from the list and freed while scanning via kmemleak_free()
-> > > > without kmemleak_lock and object_lock.
-> 
-> The above kmemleak sequence shouldn't deadlock since those locks, even
-> if taken in a different order, are serialised by scan_mutex. For various
-> reasons, trying to reduce the latency, I ended up with some
-> fine-grained, per-object locking.
+On 5/23/22 1:43 AM, Jens Axboe wrote:
+> On 5/22/22 11:07 AM, Coly Li wrote:
+>> Hi Jens,
+>>
+>> The bcache has 4 patches for Linux v5.19 merge window, all from me.
+>> - The first 2 patches are code clean up and potential bug fixes for
+>> multi- threaded btree nodes check (for cache device) and dirty sectors
+>> counting (for backing device), although no report from mailing list for
+>> them, it is good to have the fixes.
+>> - The 3rd patch removes incremental dirty sectors counting because it
+>> is conflicted with multithreaded dirty sectors counting and the latter
+>> one is 10x times faster.
+>> - The last patch fixes a journal no-space deadlock during cache device
+>> registration, it always reserves one journal bucket and only uses it
+>> in registration time, so the no-spance condition won't happen anymore.
+>>
+>> There are still 2 fixes are still under the long time I/O pressure
+>> testing, once they are accomplished, I will submit to you in later
+>> RC cycles.
+>>
+>> Please take them, and thanks in advance.
+> It's late for sending in that stuff, now I have to do a round 2 or
+> your patches would get zero time in linux-next. Please send patches
+> a week in advance at least, not on the day of release...
+>
+Hi Jens,
 
-I understand why you introduced the fine-grained lock. However, the
-different order should be avoided anyway. As Steven said, Lockdep also
-should've detected this case, say, this would have been detected if
-Lockdep worked correctly.
+This time the situation was awkward, indeed I didn't expect I can submit 
+the fix in this merge window, but just around 1 week before I found the 
+difficult was from influence by other depending issues. After fixed all 
+of them and do I/O pressure testing for 24x2 hours, it comes to such 
+close day to the merge window.
 
-It's not a technical issue to make a tool skip the reversed order when
-it's already protected by another lock. Because each lock has its own
-purpose as you explained, no body knows if the cases might arise that
-use kmemleak_lock and object_lock only w/o holding scan_mutex someday.
+My confusion was, it was very close to the merge window so maybe I 
+should submit them in next merge window (5.20), but this series were bug 
+fixes which should go into mainline earlier. It seems neither option was 
+proper, so I chose the first one...
 
-I'm wondering how other folks think this case should be handled tho.
+Could you give me a hint, what is the proper way that I should do for 
+such situation? Then I will try to follow that and avoid adding more 
+workload to you.
 
-> For object allocation (rbtree modification) and tree search, we use
-> kmemleak_lock. During scanning (which can take minutes under
-> scan_mutex), we want to prevent (a) long latencies and (b) freeing the
-> object being scanned. We release the locks regularly for (a) and hold
-> the object->lock for (b).
-> 
-> In another thread Byungchul mentioned:
-> 
-> |    context X			context Y
-> | 
-> |    lock mutex A		lock mutex A
-> |    lock B			lock C
-> |    lock C			lock B
-> |    unlock C			unlock B
-> |    unlock B			unlock C
-> |    unlock mutex A		unlock mutex A
-> | 
-> | In my opinion, lock B and lock C are unnecessary if they are always
-> | along with lock mutex A. Or we should keep correct lock order across all
-> | the code.
-> 
-> If these are the only two places, yes, locks B and C would be
-> unnecessary. But we have those locks acquired (not nested) on the
-> allocation path (kmemleak_lock) and freeing path (object->lock). We
-> don't want to block those paths while scan_mutex is held.
-> 
-> That said, we may be able to use a single kmemleak_lock for everything.
-> The object freeing path may be affected slightly during scanning but the
-> code does release it every MAX_SCAN_SIZE bytes. It may even get slightly
-> faster as we'd hammer a single lock (I'll do some benchmarks).
-> 
-> But from a correctness perspective, I think the DEPT tool should be
-> improved a bit to detect when such out of order locking is serialised by
-> an enclosing lock/mutex.
+Thanks in advance.
 
-Again, I don't think this is a technical issue.
 
-	Byungchul
-> 
-> -- 
-> Catalin
+Coly Li
+
