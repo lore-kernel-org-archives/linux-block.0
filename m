@@ -2,47 +2,47 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1780C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:01:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A52EEC43217
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230261AbiEWVB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S229886AbiEWVB5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Mon, 23 May 2022 17:01:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57504 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57744 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229886AbiEWVBt (ORCPT
+        with ESMTP id S230023AbiEWVBw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 17:01:49 -0400
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 404CC41602
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:47 -0700 (PDT)
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 24NKGxPi016140
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:46 -0700
+        Mon, 23 May 2022 17:01:52 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 058D84E395
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:51 -0700 (PDT)
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24NKGd7u025899
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:50 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=dIriWM7eeYA9Ml6wgxp7wP/hAy2C7xDt8yRSAd5OODM=;
- b=TbHJSycH0yfvN49f1YjBh6ZNm4q0D8QgGFjFY6A0KdddyCihaVyBHPz2BRgciX33UnnS
- W9K9uMK6LParNSQ7SWvYOaledLmCrwYVmwaszcQu5A9H70kBJRZZ9zwnnKZrWRkMnQyE
- L6bFFwfAWR3RBL7vSIEi5/soPk+kLjxohdY= 
+ bh=MuvN3ozMauA3nHBRAqMRRKMOhmhpA4TYHL+gbOVraQs=;
+ b=rLy8RcDLqUnnjOQC4x96EhctvYFw8UVvu69bkubM2RolaydvQ7Q5CXQQ4Pm26PApI1q6
+ OYv4zeJoEDq2OZC77/QZDpgGU2Q4cN5PYGm12xLMHdw7kThl2Fuc7AWQNA3MI9AVjfR5
+ C4D1DR23YaFNt7Ifj+3WJ+KJxIpSk9z3CsU= 
 Received: from mail.thefacebook.com ([163.114.132.120])
-        by m0001303.ppops.net (PPS) with ESMTPS id 3g6urvv60e-1
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g6yd3bh09-7
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:46 -0700
-Received: from twshared10560.18.frc3.facebook.com (2620:10d:c085:208::f) by
- mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:01:50 -0700
+Received: from twshared14577.08.ash8.facebook.com (2620:10d:c085:108::8) by
+ mail.thefacebook.com (2620:10d:c085:11d::4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Mon, 23 May 2022 14:01:44 -0700
+ 15.1.2375.28; Mon, 23 May 2022 14:01:49 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 7625B4464150; Mon, 23 May 2022 14:01:34 -0700 (PDT)
+        id C170B4464157; Mon, 23 May 2022 14:01:34 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         <ebiggers@kernel.org>, Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv3 1/6] block/bio: remove duplicate append pages code
-Date:   Mon, 23 May 2022 14:01:14 -0700
-Message-ID: <20220523210119.2500150-2-kbusch@fb.com>
+Subject: [PATCHv3 5/6] block/bounce: count bytes instead of sectors
+Date:   Mon, 23 May 2022 14:01:18 -0700
+Message-ID: <20220523210119.2500150-6-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220523210119.2500150-1-kbusch@fb.com>
 References: <20220523210119.2500150-1-kbusch@fb.com>
@@ -50,8 +50,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: jBY3RuAeExhdS2QUoLwIybM5xWHa7Dxh
-X-Proofpoint-ORIG-GUID: jBY3RuAeExhdS2QUoLwIybM5xWHa7Dxh
+X-Proofpoint-GUID: DRx8siQboicnW7fgFgU2so4302PvK3WO
+X-Proofpoint-ORIG-GUID: DRx8siQboicnW7fgFgU2so4302PvK3WO
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-23_09,2022-05-23_01,2022-02-23_01
@@ -61,183 +61,39 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-The getting pages setup for zone append and normal IO are identical. Use
-common code for each.
+Individual bv_len's may not be a sector size.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 ---
-v2->v3:
+ block/bounce.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-  Folded in improvement suggestions from Christoph
-
- block/bio.c | 105 +++++++++++++++++++++-------------------------------
- 1 file changed, 42 insertions(+), 63 deletions(-)
-
-diff --git a/block/bio.c b/block/bio.c
-index a3893d80dccc..55d2a9c4e312 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1158,6 +1158,37 @@ static void bio_put_pages(struct page **pages, siz=
-e_t size, size_t off)
- 		put_page(pages[i]);
- }
+diff --git a/block/bounce.c b/block/bounce.c
+index 8f7b6fe3b4db..20a43c4dbdda 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -207,17 +207,18 @@ void __blk_queue_bounce(struct request_queue *q, st=
+ruct bio **bio_orig)
+ 	struct bvec_iter iter;
+ 	unsigned i =3D 0;
+ 	bool bounce =3D false;
+-	int sectors =3D 0;
++	int sectors =3D 0, bytes =3D 0;
 =20
-+static int bio_iov_add_page(struct bio *bio, struct page *page,
-+		unsigned int len, unsigned int offset)
-+{
-+	bool same_page =3D false;
-+
-+	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
-+		if (WARN_ON_ONCE(bio_full(bio, len)))
-+			return -EINVAL;
-+		__bio_add_page(bio, page, len, offset);
-+		return 0;
-+	}
-+
-+	if (same_page)
-+		put_page(page);
-+	return 0;
-+}
-+
-+static int bio_iov_add_zone_append_page(struct bio *bio, struct page *pa=
-ge,
-+		unsigned int len, unsigned int offset)
-+{
-+	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
-+	bool same_page =3D false;
-+
-+	if (bio_add_hw_page(q, bio, page, len, offset,
-+			queue_max_zone_append_sectors(q), &same_page) !=3D len)
-+		return -EINVAL;
-+	if (same_page)
-+		put_page(page);
-+	return 0;
-+}
-+
- #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct p=
-age *))
-=20
- /**
-@@ -1176,7 +1207,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- 	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
- 	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
- 	struct page **pages =3D (struct page **)bv;
--	bool same_page =3D false;
- 	ssize_t size, left;
- 	unsigned len, i;
- 	size_t offset;
-@@ -1185,7 +1215,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
-, struct iov_iter *iter)
- 	 * Move page array up in the allocated memory for the bio vecs as far a=
-s
- 	 * possible so that we can start filling biovecs from the beginning
- 	 * without overwriting the temporary page array.
--	*/
-+	 */
- 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
- 	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
-=20
-@@ -1195,18 +1225,18 @@ static int __bio_iov_iter_get_pages(struct bio *b=
-io, struct iov_iter *iter)
-=20
- 	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
- 		struct page *page =3D pages[i];
-+		int ret;
-=20
- 		len =3D min_t(size_t, PAGE_SIZE - offset, left);
-+		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
-+			ret =3D bio_iov_add_zone_append_page(bio, page, len,
-+					offset);
-+		else
-+			ret =3D bio_iov_add_page(bio, page, len, offset);
-=20
--		if (__bio_try_merge_page(bio, page, len, offset, &same_page)) {
--			if (same_page)
--				put_page(page);
--		} else {
--			if (WARN_ON_ONCE(bio_full(bio, len))) {
--				bio_put_pages(pages + i, left, offset);
--				return -EINVAL;
--			}
--			__bio_add_page(bio, page, len, offset);
-+		if (ret) {
-+			bio_put_pages(pages + i, left, offset);
-+			return ret;
- 		}
- 		offset =3D 0;
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_VECS)
+-			sectors +=3D from.bv_len >> 9;
++			bytes +=3D from.bv_len;
+ 		if (PageHighMem(from.bv_page))
+ 			bounce =3D true;
  	}
-@@ -1215,54 +1245,6 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
-o, struct iov_iter *iter)
- 	return 0;
- }
+ 	if (!bounce)
+ 		return;
 =20
--static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *=
-iter)
--{
--	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
--	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
--	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
--	unsigned int max_append_sectors =3D queue_max_zone_append_sectors(q);
--	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
--	struct page **pages =3D (struct page **)bv;
--	ssize_t size, left;
--	unsigned len, i;
--	size_t offset;
--	int ret =3D 0;
--
--	if (WARN_ON_ONCE(!max_append_sectors))
--		return 0;
--
--	/*
--	 * Move page array up in the allocated memory for the bio vecs as far a=
-s
--	 * possible so that we can start filling biovecs from the beginning
--	 * without overwriting the temporary page array.
--	 */
--	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
--	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
--
--	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
--	if (unlikely(size <=3D 0))
--		return size ? size : -EFAULT;
--
--	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
--		struct page *page =3D pages[i];
--		bool same_page =3D false;
--
--		len =3D min_t(size_t, PAGE_SIZE - offset, left);
--		if (bio_add_hw_page(q, bio, page, len, offset,
--				max_append_sectors, &same_page) !=3D len) {
--			bio_put_pages(pages + i, left, offset);
--			ret =3D -EINVAL;
--			break;
--		}
--		if (same_page)
--			put_page(page);
--		offset =3D 0;
--	}
--
--	iov_iter_advance(iter, size - left);
--	return ret;
--}
--
- /**
-  * bio_iov_iter_get_pages - add user or kernel pages to a bio
-  * @bio: bio to add pages to
-@@ -1297,10 +1279,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct=
- iov_iter *iter)
- 	}
-=20
- 	do {
--		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
--			ret =3D __bio_iov_append_get_pages(bio, iter);
--		else
--			ret =3D __bio_iov_iter_get_pages(bio, iter);
-+		ret =3D __bio_iov_iter_get_pages(bio, iter);
- 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
-=20
- 	/* don't account direct I/O as memory stall */
++	sectors =3D ALIGN_DOWN(bytes, queue_logical_block_size(q)) >> 9;
+ 	if (sectors < bio_sectors(*bio_orig)) {
+ 		bio =3D bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
+ 		bio_chain(bio, *bio_orig);
 --=20
 2.30.2
 
