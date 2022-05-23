@@ -2,116 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E177C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 07:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1FF3C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 08:13:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230236AbiEWHdE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 03:33:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40058 "EHLO
+        id S231435AbiEWINB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 04:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230272AbiEWHcg (ORCPT
+        with ESMTP id S231402AbiEWINB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 03:32:36 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 365EE2600;
-        Mon, 23 May 2022 00:31:34 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id C529A1F383;
-        Mon, 23 May 2022 06:26:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1653287191; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tWdRYkYeTd6L1kFlWAZqosjLUp2g2JWMcn4ZCfMoyaE=;
-        b=MUunQvOlxIOLBymvojg7kwEf0Fbin7+nEyYmtSE5BudcRbOIWYiNhDdJb+bWEw7pSpiGr1
-        Et6xkbpJf0C0y4taW5t6NaSM3qwsDho9FagM8xigLBP2jfxZbVV0yjVkDAqqcUGq30uPH6
-        ED2zLwll9WBxw2twcPgAd6sMLkNp6ug=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1653287191;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=tWdRYkYeTd6L1kFlWAZqosjLUp2g2JWMcn4ZCfMoyaE=;
-        b=rzRIP95V4SHfqW8hnDoxWJ2P5s3+LZbohbqSa3MqDGMxDCIQ0rSYbzZYzdHMluYmG3uT8D
-        EAosH2b+wB72c9CQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id C550113AA5;
-        Mon, 23 May 2022 06:26:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id RFjLIRYpi2IFfQAAMHmgww
-        (envelope-from <colyli@suse.de>); Mon, 23 May 2022 06:26:30 +0000
-Message-ID: <9c3fddec-1741-872f-1cdb-b44316e2ff64@suse.de>
-Date:   Mon, 23 May 2022 14:26:28 +0800
+        Mon, 23 May 2022 04:13:01 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C422A9FCA;
+        Mon, 23 May 2022 01:12:59 -0700 (PDT)
+Received: from kwepemi100007.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L693q1kVFzQkDD;
+        Mon, 23 May 2022 16:09:59 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100007.china.huawei.com (7.221.188.115) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Mon, 23 May 2022 16:12:57 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 23 May
+ 2022 16:12:57 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <mkoutny@suse.com>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v4 1/4] blk-throttle: fix that io throttle can only work for single bio
+Date:   Mon, 23 May 2022 16:26:30 +0800
+Message-ID: <20220523082633.2324980-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220523082633.2324980-1-yukuai3@huawei.com>
+References: <20220523082633.2324980-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.1
-Subject: Re: [PATCH 0/4] bcache patches for Linux v5.19 (1st wave)
-Content-Language: en-US
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
-References: <20220522170736.6582-1-colyli@suse.de>
- <ece7e00e-5d03-41c0-4013-75809958e9d7@kernel.dk>
-From:   Coly Li <colyli@suse.de>
-In-Reply-To: <ece7e00e-5d03-41c0-4013-75809958e9d7@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/22 1:43 AM, Jens Axboe wrote:
-> On 5/22/22 11:07 AM, Coly Li wrote:
->> Hi Jens,
->>
->> The bcache has 4 patches for Linux v5.19 merge window, all from me.
->> - The first 2 patches are code clean up and potential bug fixes for
->> multi- threaded btree nodes check (for cache device) and dirty sectors
->> counting (for backing device), although no report from mailing list for
->> them, it is good to have the fixes.
->> - The 3rd patch removes incremental dirty sectors counting because it
->> is conflicted with multithreaded dirty sectors counting and the latter
->> one is 10x times faster.
->> - The last patch fixes a journal no-space deadlock during cache device
->> registration, it always reserves one journal bucket and only uses it
->> in registration time, so the no-spance condition won't happen anymore.
->>
->> There are still 2 fixes are still under the long time I/O pressure
->> testing, once they are accomplished, I will submit to you in later
->> RC cycles.
->>
->> Please take them, and thanks in advance.
-> It's late for sending in that stuff, now I have to do a round 2 or
-> your patches would get zero time in linux-next. Please send patches
-> a week in advance at least, not on the day of release...
->
-Hi Jens,
+commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+introduce a new problem, for example:
 
-This time the situation was awkward, indeed I didn't expect I can submit 
-the fix in this merge window, but just around 1 week before I found the 
-difficult was from influence by other depending issues. After fixed all 
-of them and do I/O pressure testing for 24x2 hours, it comes to such 
-close day to the merge window.
+[root@localhost ~]# echo "8:0 1024" > /sys/fs/cgroup/blkio/blkio.throttle.write_bps_device
+[root@localhost ~]# echo $$ > /sys/fs/cgroup/blkio/cgroup.procs
+[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+[1] 620
+[root@localhost ~]# dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+[2] 626
+[root@localhost ~]# 1+0 records in
+1+0 records out
+10240 bytes (10 kB, 10 KiB) copied, 10.0038 s, 1.0 kB/s1+0 records in
+1+0 records out
 
-My confusion was, it was very close to the merge window so maybe I 
-should submit them in next merge window (5.20), but this series were bug 
-fixes which should go into mainline earlier. It seems neither option was 
-proper, so I chose the first one...
+10240 bytes (10 kB, 10 KiB) copied, 9.23076 s, 1.1 kB/s
+-> the second bio is finished after 10s instead of 20s.
 
-Could you give me a hint, what is the proper way that I should do for 
-such situation? Then I will try to follow that and avoid adding more 
-workload to you.
+This is because if some bios are already queued, current bio is queued
+directly and the flag 'BIO_THROTTLED' is set. And later, when former
+bios are dispatched, this bio will be dispatched without waiting at all,
+this is due to tg_with_in_bps_limit() return 0 for this bio.
 
-Thanks in advance.
+In order to fix the problem, don't skip flaged bio in
+tg_with_in_bps_limit(), and for the problem that split bio can be
+double accounted, compensate the over-accounting in __blk_throtl_bio().
 
+Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/blk-throttle.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
-Coly Li
+diff --git a/block/blk-throttle.c b/block/blk-throttle.c
+index 447e1b8722f7..0c37be08ff28 100644
+--- a/block/blk-throttle.c
++++ b/block/blk-throttle.c
+@@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* no need to throttle if this bio's bytes have been accounted */
+-	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
++	if (bps_limit == U64_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -921,11 +921,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	if (!bio_flagged(bio, BIO_THROTTLED)) {
+-		tg->bytes_disp[rw] += bio_size;
+-		tg->last_bytes_disp[rw] += bio_size;
+-	}
+-
++	tg->bytes_disp[rw] += bio_size;
++	tg->last_bytes_disp[rw] += bio_size;
+ 	tg->io_disp[rw]++;
+ 	tg->last_io_disp[rw]++;
+ 
+@@ -2121,6 +2118,21 @@ bool __blk_throtl_bio(struct bio *bio)
+ 			tg->last_low_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
+ 		throtl_upgrade_check(tg);
++
++		/*
++		 * re-entered bio has accounted bytes already, so try to
++		 * compensate previous over-accounting. However, if new
++		 * slice is started, just forget it.
++		 */
++		if (bio_flagged(bio, BIO_THROTTLED)) {
++			unsigned int bio_size = throtl_bio_data_size(bio);
++
++			if (tg->bytes_disp[rw] >= bio_size)
++				tg->bytes_disp[rw] -= bio_size;
++			if (tg->last_bytes_disp[rw] >= bio_size)
++				tg->last_bytes_disp[rw] -= bio_size;
++		}
++
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
+-- 
+2.31.1
 
