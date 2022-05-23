@@ -2,105 +2,112 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5E5C43217
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 01:12:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1188C433FE
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 01:24:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232974AbiEWBMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 22 May 2022 21:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41240 "EHLO
+        id S1347183AbiEWBYm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 22 May 2022 21:24:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233043AbiEWBMm (ORCPT
+        with ESMTP id S236556AbiEWBYl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 22 May 2022 21:12:42 -0400
-Received: from lgeamrelo11.lge.com (lgeamrelo12.lge.com [156.147.23.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C106037A01
-        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 18:12:37 -0700 (PDT)
-Received: from unknown (HELO lgeamrelo01.lge.com) (156.147.1.125)
-        by 156.147.23.52 with ESMTP; 23 May 2022 10:12:36 +0900
-X-Original-SENDERIP: 156.147.1.125
-X-Original-MAILFROM: byungchul.park@lge.com
-Received: from unknown (HELO X58A-UD3R) (10.177.244.38)
-        by 156.147.1.125 with ESMTP; 23 May 2022 10:12:36 +0900
-X-Original-SENDERIP: 10.177.244.38
-X-Original-MAILFROM: byungchul.park@lge.com
-Date:   Mon, 23 May 2022 10:10:45 +0900
-From:   Byungchul Park <byungchul.park@lge.com>
-To:     Theodore Ts'o <tytso@mit.edu>
-Cc:     tj@kernel.org, torvalds@linux-foundation.org,
-        damien.lemoal@opensource.wdc.com, linux-ide@vger.kernel.org,
-        adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org,
-        mingo@redhat.com, linux-kernel@vger.kernel.org,
-        peterz@infradead.org, will@kernel.org, tglx@linutronix.de,
-        rostedt@goodmis.org, joel@joelfernandes.org, sashal@kernel.org,
-        daniel.vetter@ffwll.ch, chris@chris-wilson.co.uk,
-        duyuyang@gmail.com, johannes.berg@intel.com, willy@infradead.org,
-        david@fromorbit.com, amir73il@gmail.com,
-        gregkh@linuxfoundation.org, kernel-team@lge.com,
-        linux-mm@kvack.org, akpm@linux-foundation.org, mhocko@kernel.org,
-        minchan@kernel.org, hannes@cmpxchg.org, vdavydov.dev@gmail.com,
-        sj@kernel.org, jglisse@redhat.com, dennis@kernel.org, cl@linux.com,
-        penberg@kernel.org, rientjes@google.com, vbabka@suse.cz,
-        ngupta@vflare.org, linux-block@vger.kernel.org,
-        paolo.valente@linaro.org, josef@toxicpanda.com,
-        linux-fsdevel@vger.kernel.org, viro@zeniv.linux.org.uk,
-        jack@suse.cz, jack@suse.com, jlayton@kernel.org,
-        dan.j.williams@intel.com, hch@infradead.org, djwong@kernel.org,
-        dri-devel@lists.freedesktop.org, rodrigosiqueiramelo@gmail.com,
-        melissa.srw@gmail.com, hamohammed.sa@gmail.com,
-        42.hyeyoo@gmail.com, mcgrof@kernel.org, holt@sgi.com
-Subject: Re: [REPORT] syscall reboot + umh + firmware fallback
-Message-ID: <20220523011045.GA16721@X58A-UD3R>
-References: <YnzQHWASAxsGL9HW@slm.duckdns.org>
- <1652354304-17492-1-git-send-email-byungchul.park@lge.com>
- <Yn0SHhnhB8fyd0jq@mit.edu>
+        Sun, 22 May 2022 21:24:41 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ACC2E0DF
+        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 18:24:40 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 31so12385098pgp.8
+        for <linux-block@vger.kernel.org>; Sun, 22 May 2022 18:24:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=oximGdL85AdyYM4EyrHBMR8JY42eOGAKAouksms98f0=;
+        b=pxJ2UZmJRrY2NLXz4OLAZ67pT7PJyixhai/tBlwrwNUjBRr2Udq+056WLiclqUMvTB
+         4wcC8pgS+GP0WO+CZHJMuYGwNxuusVHJFZiD7vp9f8RQ/myi6BbozzuhsWIBOopwlrL/
+         kWN6Qlngaz8YJjX+3Qe5O1hpgPiR7WpgMJpewWQIplVVcjOxnX+QXsMGe3StX+4ZQpZF
+         4s7aK6xqj7cPwtpRBin3N0DduqOlwrwLGhDAXaIblyfx5wSap5mPaGLJoMjrYt4qz3aU
+         VkmLiY+dEYPkpbAFKIlrO5EhGWlNWrOC74rEqzgx3wQPO5mjKBV46fHwvHeL73yt89bu
+         YLCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=oximGdL85AdyYM4EyrHBMR8JY42eOGAKAouksms98f0=;
+        b=c5FTjbD67RlmIB93dzKhCiYtXH5+ViRaCgDsiHfvyS6I/5HQgVi9vpRC3Rrpy5THqv
+         YUKfJ//nhry11YQwv49+ZXq4RzzTNhdhC/+XVUk3Ef8l/fOD+/aGtb5k7cP4Uhz3vvCw
+         lEOXKUD6HrERqJqsdwKnzW0mNx684DJYrhY+JHwb3E7ez2xhWe1IrDkei92gQlCPnEdV
+         ZvDq1hk23waQSIG19kDsjDmtn+xiGvh7gs8vhMv+AEkG8mvOjSM1Pc2Qq7IozupUzUN9
+         xRHVGcSKT9HnfUTbQTkVYWAzNdtAx4o9Jg6YUCYx0ZjvUAmWOr4NLYhqao9phdbqolKm
+         56Eg==
+X-Gm-Message-State: AOAM531eo0StbIxwH/KnADEi9ammbgHly1X7tjIwtXMLUprzYrgfk3Yj
+        bziBnHweGXQtAQaMw39qW/lhBiB0ro7pXw==
+X-Google-Smtp-Source: ABdhPJylwLfBUUYnWSOWSv13Eee2jo+ut/I0y5+pZB7Awa3MmYJZPro0Ta7eXHvl/qGL9ZOpoU506A==
+X-Received: by 2002:a63:f518:0:b0:3fa:6f09:aac5 with SMTP id w24-20020a63f518000000b003fa6f09aac5mr947876pgh.515.1653269079511;
+        Sun, 22 May 2022 18:24:39 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id u12-20020a170902a60c00b00161a16f0050sm3713018plq.222.2022.05.22.18.24.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 22 May 2022 18:24:39 -0700 (PDT)
+Message-ID: <b32ed748-a141-862c-ed35-debb474962ed@kernel.dk>
+Date:   Sun, 22 May 2022 19:24:37 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yn0SHhnhB8fyd0jq@mit.edu>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+Content-Language: en-US
+To:     "yukuai (C)" <yukuai3@huawei.com>, paolo.valente@linaro.org
+Cc:     jack@suse.cz, tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+References: <20220428120837.3737765-1-yukuai3@huawei.com>
+ <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
+ <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+ <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+ <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
+ <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, May 12, 2022 at 09:56:46AM -0400, Theodore Ts'o wrote:
-> On Thu, May 12, 2022 at 08:18:24PM +0900, Byungchul Park wrote:
-> > I have a question about this one. Yes, it would never been stuck thanks
-> > to timeout. However, IIUC, timeouts are not supposed to expire in normal
-> > cases. So I thought a timeout expiration means not a normal case so need
-> > to inform it in terms of dependency so as to prevent further expiraton.
-> > That's why I have been trying to track even timeout'ed APIs.
+On 5/22/22 7:10 PM, yukuai (C) wrote:
+> ? 2022/05/21 20:21, Jens Axboe ??:
+>> On 5/21/22 1:22 AM, yukuai (C) wrote:
+>>> ? 2022/05/14 17:29, yukuai (C) ??:
+>>>> ? 2022/05/05 9:00, yukuai (C) ??:
+>>>>> Hi, Paolo
+>>>>>
+>>>>> Can you take a look at this patchset? It has been quite a long time
+>>>>> since we spotted this problem...
+>>>>>
+>>>>
+>>>> friendly ping ...
+>>> friendly ping ...
+>>
+>> I can't speak for Paolo, but I've mentioned before that the majority
+>> of your messages end up in my spam. That's still the case, in fact
+>> I just marked maybe 10 of them as not spam.
+>>
+>> You really need to get this issued sorted out, or you will continue
+>> to have patches ignore because folks may simply not see them.
+>>
+> Hi,
 > 
-> As I beleive I've already pointed out to you previously in ext4 and
-> ocfs2, the jbd2 timeout every five seconds happens **all** the time
-> while the file system is mounted.  Commits more frequently than five
-> seconds is the exception case, at least for desktops/laptop workloads.
-
-Thanks, Ted. It's easy to stop tracking APIs with timeout. I've been
-just afraid that the cases that we want to suppress anyway will be
-skipped.
-
-However, I should stop it if it produces too many false alarms.
-
-> We *don't* get to the timeout only when a userspace process calls
-> fsync(2), or if the journal was incorrectly sized by the system
-> administrator so that it's too small, and the workload has so many
-> file system mutations that we have to prematurely close the
-> transaction ahead of the 5 second timeout.
-
-Yeah... It's how journaling works. Thanks.
-
-> > Do you think DEPT shouldn't track timeout APIs? If I was wrong, I
-> > shouldn't track the timeout APIs any more.
+> Thanks for your notice.
 > 
-> DEPT tracking timeouts will cause false positives in at least some
-> cases.  At the very least, there needs to be an easy way to suppress
-> these false positives on a per wait/mutex/spinlock basis.
+> Is it just me or do you see someone else's messages from *huawei.com
+> end up in spam? I tried to seek help from our IT support, however, they
+> didn't find anything unusual...
 
-The easy way is to stop tracking those that are along with timeout until
-DEPT starts to consider waits/events by timeout functionality itself.
+Not sure, I think it's just you. It may be the name as well "yukuai (C)"
+probably makes gmail think it's not a real name? Or maybe it's the
+yukuai3 in the email? Pure speculation on my side.
 
-Thanks.
+-- 
+Jens Axboe
 
-	Byungchul
-> 
->       	       	    	     	      	   	 - Ted
