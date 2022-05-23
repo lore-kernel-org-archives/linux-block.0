@@ -2,106 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC26BC4332F
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 20:19:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A95DC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 20:19:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232754AbiEWUTg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 16:19:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37652 "EHLO
+        id S232913AbiEWUTu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 16:19:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37782 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229600AbiEWUTf (ORCPT
+        with ESMTP id S232809AbiEWUTm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 16:19:35 -0400
-X-Greylist: delayed 1069 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 May 2022 13:19:34 PDT
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33978BCE9E;
-        Mon, 23 May 2022 13:19:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=NPVP0vP+ExmNroRIHFq1qAD6xpWTFjMAiNHPjfVwZHs=; b=ELvOYeRnaJaljBF9bn7TrryW0X
-        Idy3hj2oF4skLt14h3gGeXSbKVmNEQ+zOmAq+TfdEh9NbZ/0XGz/MXFB0xU8fuJuUp2NnxmLFkd/E
-        tz9t12EEbZ6SYURJp/2/fSBW+kDV3tq0tF+O05/5NHSLVQdy5GIl2YBTiPhzzcs4wqHrm7Ux3TTCp
-        IJB/Kb7KeoU2wu5FF4yqeh+HJQ7EMxjcTmD4bwiYlHWZc5KVqiwSrjEAdNUDVhAh80joDt0vp9MtF
-        wcyB2EP0oDwJPsQcsPx+Jhtmw7fZQScA53pA/FIH7+P//5cENFcALfga+orkN77ZbuMFs9PGfKiHI
-        ovXWuwIA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntC0w-005Q5a-21; Mon, 23 May 2022 17:38:42 +0000
-Date:   Mon, 23 May 2022 10:38:42 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Pankaj Raghav <pankydev8@gmail.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        patches@lists.linux.dev, amir73il@gmail.com, tytso@mit.edu,
-        josef@toxicpanda.com, jmeneghi@redhat.com, jake@lwn.net
-Subject: Re: [PATCH 3/4] playbooks: add a common playbook a git reset task
- for kdevops
-Message-ID: <YovGojXJQMbGQkqu@bombadil.infradead.org>
-References: <20220513193831.4136212-1-mcgrof@kernel.org>
- <20220513193831.4136212-4-mcgrof@kernel.org>
- <20220520144405.uzzejos24qizwa5c@quentin>
+        Mon, 23 May 2022 16:19:42 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AADFEBC6C1
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 13:19:40 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id l7-20020a17090aaa8700b001dd1a5b9965so307862pjq.2
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 13:19:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=X6KzDWV2s9CddCeS2n3xLkn5ljOP7g4ucSnb8sgeU+g=;
+        b=Junva1dQ9VVrtil0/VpAz8ZRAtOPljAlGJVh05PqgLdrJhGyiHPb7kbuqAuAAxGIE7
+         gznLGGFfa94LmzfgcSigDTio2gqW3/nwqKVWoyDOaLD9k5uuwxT4+F0toncGxj1+ccfJ
+         3Me7uu2SBTRg2wvnFbtpnAUWBlpWG6VOt3SGMYz9uiRs/NFLGSww8HPDSX1KAtvqKPlx
+         Q+TWhEIh53KZp75I4AI0GD0i47vRV82w6zcC1yk1hie6QObR5Azm9pvoLfsQTVSB/OpS
+         tYWuCJYLFbhCC8Gth4ilRFHlY5bXVVT5ZxroqDiYWubXmqwATuCgwu/N4/AHm2ICgJY2
+         5VUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=X6KzDWV2s9CddCeS2n3xLkn5ljOP7g4ucSnb8sgeU+g=;
+        b=P/JMsTEL+ckjEh9aeetoDuZOk32aEcDIQQLspTJ5ERyCqBNYxfmsGkAi+yFVEhGRmp
+         xibSIdYB/wtpPd5Ie3PhqIwqnB6IU2jKKv9sO32vnERQqa31R7CB5isqQNGoHynGQ2rs
+         TFPY29YhVrQag2abB1xN1FGq5jnRd+ahJNXIFAC46xIXoqCXaP0taHRvl6PhG8DRJbz2
+         OKC3FF9kY0zAqbqeEGT5rOQe8KS2tcW5uRisIvLzrAclccokHy2bUJPiej2PLD8LyItC
+         t0+dJvinPupasiKtwkQt918vE4Yf/sfNbZWchPlI0bq2pHwsLLqcjLtcyhC1/l5sURvM
+         XKkQ==
+X-Gm-Message-State: AOAM533xYfJNg6wzo5g80b8hn/ogahaDsnqmr1Lk2tubqbyES6jxFwhx
+        2BW7gK6xXBYC3Ne3dzEKd9muWlEbIfneoA==
+X-Google-Smtp-Source: ABdhPJwE2FyhUuyJfb2fxL0s3tzgZw/zFzPrpAe0yTUW02/5PzAcT2O1SW5Msdq10Wsdt/kQI9SVVQ==
+X-Received: by 2002:a17:902:e94e:b0:158:91e6:501 with SMTP id b14-20020a170902e94e00b0015891e60501mr24261902pll.29.1653337180154;
+        Mon, 23 May 2022 13:19:40 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id ck18-20020a17090afe1200b001cb6527ca39sm129991pjb.0.2022.05.23.13.19.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 23 May 2022 13:19:39 -0700 (PDT)
+Message-ID: <caa5e85c-2bfe-b9e3-1e32-c11f78e6ad29@kernel.dk>
+Date:   Mon, 23 May 2022 14:19:38 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220520144405.uzzejos24qizwa5c@quentin>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [GIT PULL] io_uring passthrough support
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     io-uring <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+References: <6f712c75-c849-ae89-d763-b2a18da52844@kernel.dk>
+ <CAHk-=whfi3FE3O7KrziqPbyGvAmNFas3xxLz2O+ttzBkCOQmfw@mail.gmail.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=whfi3FE3O7KrziqPbyGvAmNFas3xxLz2O+ttzBkCOQmfw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 20, 2022 at 04:44:05PM +0200, Pankaj Raghav wrote:
-> Hi Luis,
+On 5/23/22 2:15 PM, Linus Torvalds wrote:
+> On Sun, May 22, 2022 at 2:26 PM Jens Axboe <axboe@kernel.dk> wrote:
+>>
+>> This will cause a merge conflict as well, with the provided buffer
+>> change from the core branch, and adding CQE32 support for NOP in this
+>> branch.
 > 
-> On Fri, May 13, 2022 at 12:38:30PM -0700, Luis Chamberlain wrote:
-> > Two playbooks share the concept of git cloning kdevops into
-> > the target nodes (guests, cloud hosts, baremetal hosts) so that
-> > expunge files can be used for avoiding tests. If you decide
-> > you want to change the URL for that git tree it may not be
-> > so obvious what to do.
-> > 
-> > Fortunately the solution is simple. You just tell ansible to use
-> > the new git tree URL. That's it. It won't remove the old directory
-> > and things work as expected.
-> > 
-> > But since we use the kdevops git tree on both fstests and blktests
-> > it is not so obvious to developers that the thing to do here is
-> > to just run 'make fstests' or 'make blktests' and even that is not
-> > as efficient as that will also re-clone the fstests or blktests
-> > tree respectively. When we just want to reset the kdevops git tree
-> > we currently have no semantics to specify that. But since this is
-> > a common post-deployment goal, just add a common playbook that let's
-> > us do common tasks.
-> > 
-> > All we need then is the kconfig logic to define when some commmon
-> > tasks might make sense. So to reset your kdevops git tree, all you
-> > have to do now is change the configuration for it, then run:
-> > 
-> > make
-> > make kdevops-git-reset
-> > 
+> Ugh, that really hits home how ugly this CQE32 support was.
 > 
-> While I do like the idea of having this option, I still do not
-> understand the main use case to have it as a separate make target.
-> Wouldn't the developer already put the custom kdevops tree with
-> CONFIG_WORKFLOW_KDEVOPS_GIT during the initial make menuconfig phase?
+> Dammit, it shouldn't have been done this way. That io_nop() code is
+> disgusting, and how it wants that separate "with extra info" case is
+> just nasty.
+> 
+> I've pulled this, but with some swearing. That whole "extra1" and
+> "extra2" is ugly as hell, and just the naming shows that it has no
+> sane semantics, much less documentation.
+> 
+> And the way it's randomly hidden in 'struct io_nop' *and* then a union
+> with that hash_node is just disgusting beyond words. Why do you need
+> both fields when you just copy one to the other at cmd start and then
+> back at cmd end?
+> 
+> I must be missing something, but that it is incredibly ugly is clear.
 
-For initial setup yes. The value of the new make target is for when
-you already deployed kdevops, and now you want to change the git URL
-for the guests if they have workflows which clone kdevops for using
-expunges when testing such as with fstests and blktest.
+I think you are! The NOP case is just a sample way of exercising the
+CQE32 support, with extra1+2 being what is passed back in the bigger
+CQE. The NOP command exists purely to test things, and the CQE32 support
+there is a bit forced because NOP just always completes with '0' in the
+normal res field.
 
-> I am just trying to understand the usecase when someone wants to change
-> the kdevops tree after a test run. Maybe I am missing something here.
+We can obviously dump this as it isn't integral to anything, and
+honestly now that the NVMe is wired up, there's no great need to have a
+separate test for it. But it doesn't really hurt and there are already
+regression tests for it.
 
-That is right, the use case here of the new make target is so that a
-user can change the target kdevops tree on the guests if they are
-working with fstests and blktests. Otherwise then the git tree will
-only change on the host. If you ran 'make fstests' for instance you
-git cloned fstests, compiled and installed it, but the kdevops tree
-was also cloned and used on each guest so to ensure only tests which
-are not expunged for the target test are run. Without this new make
-target if you wanted to reset the git tree on the guests you'd have to
-re-run 'make fstests'. Where as with the new target, it's just a one
-liner.
+-- 
+Jens Axboe
 
-  Luis
