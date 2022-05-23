@@ -2,73 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E0CAC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4B3C4332F
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:28:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230177AbiEWV2G (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 17:28:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51434 "EHLO
+        id S229599AbiEWV2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 17:28:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231808AbiEWV1m (ORCPT
+        with ESMTP id S229911AbiEWV2w (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 17:27:42 -0400
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B99069859B;
-        Mon, 23 May 2022 14:27:36 -0700 (PDT)
-From:   Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020; t=1653341254;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lyoADbaI9emEad6jxvsYrqkAZsvu9nykyZtsZApDNGk=;
-        b=U5JSdkBfUq+/gQs6cgBxyfnRFOkp3Zi8j+l4uZcB0Kl8MdOLSVnp6TTibzHBwIUixnPKV2
-        Rtde+pvh2XvPAEX2n6oOFAiiR5aG5TDmwijdyvwEyHUXs/VrIDHg0G+OycqrPlB4XeS+1t
-        x46iIVpcqgmy1iMi6m7fkBxNDmPkU7UWHDQuwAX8XaY7kRNZI5ujTeIp36qt6ah3Gtpd1Q
-        a69DJyOnkP3forcj4Vju+62Y8+EYWoL+W80/BO42YfRUe5sM46RhApf0IEiZpEC6TRPuwd
-        FlxSXvkflX9xQ82ypW5chavkGnICUkKjzUQpGqr0DdwZzPQIqakzTZd+h+ZMjg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-        s=2020e; t=1653341254;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=lyoADbaI9emEad6jxvsYrqkAZsvu9nykyZtsZApDNGk=;
-        b=ZRFd0DHKFx2tvHdvBqapAmLm1Gtb088QyRoFCfzolsaPjkOVDT7sbYSSrJPENH443xtZnY
-        djojoPCD2iM4FFBg==
-To:     Luis Chamberlain <mcgrof@kernel.org>, tj@kernel.org,
-        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
-        jeyu@kernel.org, shuah@kernel.org
-Cc:     bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        mcgrof@kernel.org, keescook@chromium.org, rostedt@goodmis.org,
-        minchan@kernel.org, linux-spdx@vger.kernel.org,
-        linux-doc@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-fsdevel@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>,
-        Kuno Woudt <kuno@frob.nl>,
-        Richard Fontana <fontana@sharpeleven.org>,
-        copyleft-next@lists.fedorahosted.org,
-        Ciaran Farrell <Ciaran.Farrell@suse.com>,
-        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-In-Reply-To: <20211029184500.2821444-2-mcgrof@kernel.org>
+        Mon, 23 May 2022 17:28:52 -0400
+X-Greylist: delayed 5226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 May 2022 14:28:51 PDT
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089C0A2056;
+        Mon, 23 May 2022 14:28:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=0TgBdWDrgCwk3/yiVL4MjST4OruMage9l2vL9QRHrUI=; b=DEPNVraFW2DF3xnuijyQYottQI
+        EnzvrRqNHh6tdFjrww5RoRUiKbcMnwDONbrvvay2nocBtbdlpj6vOkSk82OCn6LO7yGqjCa8mTFGP
+        1unIyHtE8ceJZphYFwv/RAGJlsR00fpL9uMACN/7kz1yKM+SaopXnXn2N8S2BWamZqidXlSYrSRip
+        SeO/AzJLndNbm5diDt1KOmBF9QNaXiIzfF8s4Hsc0kdDE8d4/C4LDjg0wp7xajO+12IWm11+S82S0
+        iNRZBktO0eWh7LwCLFJaFhPmwY4Zym97HGYjIhdxL77wFwVNWNWiCitM3w+m18cmGkLIBUsLUQVuu
+        mIRJ0BAA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ntDrR-005iLS-B4; Mon, 23 May 2022 19:37:01 +0000
+Date:   Mon, 23 May 2022 12:37:01 -0700
+From:   Luis Chamberlain <mcgrof@kernel.org>
+To:     Thomas Gleixner <tglx@linutronix.de>
+Cc:     Greg KH <gregkh@linuxfoundation.org>, tj@kernel.org,
+        akpm@linux-foundation.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        keescook@chromium.org, rostedt@goodmis.org, minchan@kernel.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v9 3/6] selftests: add tests_sysfs module
+Message-ID: <YoviXT37FAUqpQEu@bombadil.infradead.org>
 References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
-Date:   Mon, 23 May 2022 23:27:34 +0200
-Message-ID: <87bkvo0wjd.ffs@tglx>
+ <20211029184500.2821444-4-mcgrof@kernel.org>
+ <Yao3vtSKBKLyQY1E@kroah.com>
+ <87fsl1iqg0.ffs@tglx>
+ <YopM5XGMdqVCU+bL@kroah.com>
+ <87czg5ip2z.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87czg5ip2z.ffs@tglx>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Oct 29 2021 at 11:44, Luis Chamberlain wrote:
-> +    "FSF-Free" means classified as 'free' by the Free Software Foundation.
-> +
-> +    "OSI-Approved" means approved as 'Open Source' by the Open Source
-> +    Initiative.
+On Sun, May 22, 2022 at 05:06:44PM +0200, Thomas Gleixner wrote:
+> On Sun, May 22 2022 at 16:47, Greg KH wrote:
+> > On Sun, May 22, 2022 at 04:37:19PM +0200, Thomas Gleixner wrote:
+> >> On Fri, Dec 03 2021 at 16:29, Greg KH wrote:
+> >> 
+> >> While I agree that we want to keep the number of licenses as small as
+> >> possible, we cannot really dictate which dual licensing options a
+> >> submitter selects unless the license is GPL-2.0-only incompatible, which
+> >> copyleft-next is not.
+> >> 
+> >> Can we just get over this, add the license with the SPDX identifier and
+> >> move on?
+> >
+> > From what I recall, I had technical reasons I didn't take this series,
+> > but that was a long time ago and I would be glad to review it again if
+> > it were rebased and resubmitted after the next merge window is closed.
+> 
+> The license addition and the SPDX identifier cleanup should be seperated
+> from the new test code which was part of the series.
 
-copyleft-next is neither nor. Confused...
+I'll send a re-spin after the merge window and split this up.
+
+And FWIW, AFAICT I addressed all the comments, so I can resend after
+the spdx stuff gets merged so to make the series easier to read /
+review.
+
+  Luis
