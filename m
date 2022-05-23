@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB3DC433F5
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 16:16:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3F52C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 16:16:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238589AbiEWQQN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 12:16:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56916 "EHLO
+        id S238593AbiEWQQP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 12:16:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238396AbiEWQQM (ORCPT
+        with ESMTP id S238578AbiEWQQM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 23 May 2022 12:16:12 -0400
 Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2111186FA
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 09:16:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FC6D2BB2C
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 09:16:11 -0700 (PDT)
 Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220523161606euoutp028476b436f8e6fd997e9f466548ddcdaf~xyB1oFCjH1865418654euoutp02I
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 16:16:06 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220523161606euoutp028476b436f8e6fd997e9f466548ddcdaf~xyB1oFCjH1865418654euoutp02I
+        by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20220523161609euoutp0203c8953fd0db9b7e0c9b89ccd659dd67~xyB4gfFsh1844818448euoutp02Y
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 16:16:09 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20220523161609euoutp0203c8953fd0db9b7e0c9b89ccd659dd67~xyB4gfFsh1844818448euoutp02Y
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1653322566;
-        bh=rvHQ6KWAJnN/wTk9uOYb03xRJQdEtVRuH/wx1RtE7HE=;
+        s=mail20170921; t=1653322569;
+        bh=6J0Iplh4tce831c/jnAAFO2oDxaRYKcCTdK8i5OmHgA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=WBsJ86uPBgkd1zGBINfTPSluZ/eUp/FPZX/vg3WS/MjB5tLR81q0rHEbBYRLkpLTv
-         dYBunt9svDngg+yn/0YLWEf2uLKQQL97koSOjz2EuWVPEeX1D0JhyD1IEItGYZQ0Z5
-         AClXkk7/thGcTd9hQGk9+sI6hs1A4G5mUGSj8A+g=
-Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
-        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-        20220523161605eucas1p255aa2158f858eacd6ec421d41a1f2849~xyB0MFXqD2258022580eucas1p2u;
-        Mon, 23 May 2022 16:16:05 +0000 (GMT)
+        b=b5+KIcOhpslMtERqQsgPnlcn04NYjXYmUEyrBFsrU4TmHrF50lX11vW/vH4VqhtH+
+         S7AW3KFSkmyB9ORlP0qIIfJbkA0ULebOghyqNRj+jL3aaBU4k+Sjo9sWmWTyQPxTVK
+         VY+BbYnWhpFO8+kc819gAbP/LqgWpTeIw1LMZPXI=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220523161608eucas1p143166bad2bfc87c8a63cae98d3176bc9~xyB2_9lVd1546315463eucas1p1P;
+        Mon, 23 May 2022 16:16:08 +0000 (GMT)
 Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-        eusmges3new.samsung.com (EUCPMTA) with SMTP id FC.A9.10260.543BB826; Mon, 23
-        May 2022 17:16:05 +0100 (BST)
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 37.7E.09887.843BB826; Mon, 23
+        May 2022 17:16:08 +0100 (BST)
 Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
         eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
-        20220523161604eucas1p2927e20dbd0602c08b6df4fc41e62dfbe~xyBz1_CQs1186311863eucas1p29;
-        Mon, 23 May 2022 16:16:04 +0000 (GMT)
+        20220523161607eucas1p2b6245eafb81dee3e2efbec3ab86a854d~xyB2jZFqS0957009570eucas1p2Y;
+        Mon, 23 May 2022 16:16:07 +0000 (GMT)
 Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
         eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220523161604eusmtrp21f0d4014a48df01085abb009a150ac3b~xyBz1Gxts0219002190eusmtrp2I;
-        Mon, 23 May 2022 16:16:04 +0000 (GMT)
-X-AuditID: cbfec7f5-bddff70000002814-fc-628bb345b402
+        20220523161607eusmtrp233ab159abe41b38a4d3ff39500eb5828~xyB2inzO30219402194eusmtrp2F;
+        Mon, 23 May 2022 16:16:07 +0000 (GMT)
+X-AuditID: cbfec7f4-45bff7000000269f-16-628bb3482653
 Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id C8.92.09522.443BB826; Mon, 23
-        May 2022 17:16:04 +0100 (BST)
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id FA.92.09522.743BB826; Mon, 23
+        May 2022 17:16:07 +0100 (BST)
 Received: from localhost (unknown [106.210.248.20]) by eusmtip2.samsung.com
         (KnoxPortal) with ESMTPA id
-        20220523161604eusmtip262af8805d5f532401444730d338bcc3f~xyBzeftlD0812708127eusmtip2K;
-        Mon, 23 May 2022 16:16:04 +0000 (GMT)
+        20220523161607eusmtip2323c9d601f46486d915afc977081c585~xyB2MHWoU0812708127eusmtip2M;
+        Mon, 23 May 2022 16:16:07 +0000 (GMT)
 From:   Pankaj Raghav <p.raghav@samsung.com>
 To:     axboe@kernel.dk, hch@lst.de, snitzer@redhat.com,
         damien.lemoal@opensource.wdc.com, hare@suse.de,
@@ -59,130 +59,134 @@ Cc:     linux-nvme@lists.infradead.org, dm-devel@redhat.com,
         linux-block@vger.kernel.org, jaegeuk@kernel.org,
         Pankaj Raghav <p.raghav@samsung.com>,
         Luis Chamberlain <mcgrof@kernel.org>
-Subject: [PATCH v5 1/7] block: make blkdev_nr_zones and blk_queue_zone_no
- generic for npo2 zsze
-Date:   Mon, 23 May 2022 18:15:55 +0200
-Message-Id: <20220523161601.58078-2-p.raghav@samsung.com>
+Subject: [PATCH v5 3/7] nvme: zns: Allow ZNS drives that have non-power_of_2
+ zone size
+Date:   Mon, 23 May 2022 18:15:57 +0200
+Message-Id: <20220523161601.58078-4-p.raghav@samsung.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20220523161601.58078-1-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrDKsWRmVeSWpSXmKPExsWy7djP87qum7uTDDr+8lmsvtvPZvH77Hlm
-        i73vZrNaXPjRyGRx88BOJos9iyYxWaxcfZTJ4sn6WcwWPQc+sFj87brHZLH3lrbF5V1z2Czm
-        L3vKbnFjwlNGi89LW9gt2jZ+ZXQQ8Ph3Yg2bx+WzpR6bVnWyeWxeUu+x+2YDm8fO1vusHu/3
-        XWXz6NuyitFj/ZarLB6bT1d7fN4k59F+oJspgCeKyyYlNSezLLVI3y6BK+NS1zOWgpkiFd8a
-        77A2MD4R6GLk5JAQMJHYueomexcjF4eQwApGiSuf7jNBOF8YJXY/uQeV+cwoMX/ZDWaYlqUb
-        LjBCJJYzSmyesQPKecEosW/1IiCHg4NNQEuisROsW0SgkVHi/dF5rCAOs8BsJolzD66xgowS
-        FkiUaGy/zArSwCKgKrFgnRBImFfAUuLozI9sENvkJWZe+s4OYnMKWElcv3qVDaJGUOLkzCcs
-        IDYzUE3z1tnMIPMlBNZzSsyb0cMCMlNCwEXi7XQ/iDnCEq+Ob2GHsGUk/u+czwRhV0s8vfEb
-        qreFUaJ/53o2iF5rib4zOSAms4CmxPpd+hDljhI3Xi1lh6jgk7jxVhDiAj6JSdumM0OEeSU6
-        2oQgqpUkdv58ArVUQuJy0xwWCNtD4tyBu0wTGBVnIfllFpJfZiHsXcDIvIpRPLW0ODc9tdg4
-        L7Vcrzgxt7g0L10vOT93EyMwAZ7+d/zrDsYVrz7qHWJk4mA8xCjBwawkwrs9sSNJiDclsbIq
-        tSg/vqg0J7X4EKM0B4uSOG9y5oZEIYH0xJLU7NTUgtQimCwTB6dUAxP/O6Npf9jtY2ak+87c
-        /ejZ/R0ZP1t9OQuiv8Qe3fPZT5/7FP99pTTNi3l9SkUvA7hFU48JbN30cVu+tcnrcBFe/fhu
-        jSlczYsfSO2ctqm1/FXQI5Z5K4XPvpd/J91lcPrpzt7Zs0pYmH7Hd2j/ZjGb1VT2wSrzzIXz
-        metn/b2/LkvRc1blicefN0Xz16Y95PK9edvkV716t5PRvi+e65W561ZveX7/X/VD+29O3X/f
-        rj4wRcK5forkhatPJ3XZ8hc3W1Qu7wu+56izJzZN5IT9kauHfx9+49dfcU3w+i+2BQYSkgtb
-        vPVV57L8qLhvb8w9ld3wzq3WBWf7lvDJufk8/lGc+I7n3/kVp/+/Va1UYinOSDTUYi4qTgQA
-        g4h1Pe8DAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrNIsWRmVeSWpSXmKPExsVy+t/xe7oum7uTDJZdMLBYfbefzeL32fPM
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrLKsWRmVeSWpSXmKPExsWy7djP87oem7uTDF4s5rdYfbefzeL32fPM
+        FnvfzWa1uPCjkcni5oGdTBZ7Fk1isli5+iiTxZP1s5gteg58YLH423WPyWLvLW2Ly7vmsFnM
+        X/aU3eLGhKeMFp+XtrBbtG38yugg4PHvxBo2j8tnSz02repk89i8pN5j980GNo+drfdZPd7v
+        u8rm0bdlFaPH+i1XWTw2n672+LxJzqP9QDdTAE8Ul01Kak5mWWqRvl0CV8bXiydYCq6IVly9
+        vZ61gfGZYBcjJ4eEgInEupmTmLsYuTiEBFYwShzc9pkFJCEk8IVR4vQ0H4jEZ0aJeTNPscF1
+        zJnKApFYzijx80MjG4TzglFiRv8exi5GDg42AS2Jxk52kLiIQCOjxPuj81hBHGaB2UwS5x5c
+        YwUZJSwQIfHw0m4wm0VAVaJn1hx2EJtXwFJiYfMPVoh18hIzL30Hi3MKWElcv3qVDaJGUOLk
+        zCdgtzID1TRvnQ32hITAak6JM/MvMUM0u0ise3kcapCwxKvjW9ghbBmJ/zvnM0HY1RJPb/yG
+        am5hlOjfuZ4N5AUJAWuJvjM5ICazgKbE+l36EOWOEm1PJzNCVPBJ3HgrCHECn8SkbdOZIcK8
+        Eh1tQhDVShI7fz6BWiohcblpDguE7SFxuf0j6wRGxVlInpmF5JlZCHsXMDKvYhRPLS3OTU8t
+        NspLLdcrTswtLs1L10vOz93ECEyBp/8d/7KDcfmrj3qHGJk4GA8xSnAwK4nwbk/sSBLiTUms
+        rEotyo8vKs1JLT7EKM3BoiTOm5y5IVFIID2xJDU7NbUgtQgmy8TBKdXA1CgV+trUNi5xhvIr
+        4e0fftSdtNi0S/eg/O8fDzLOLJErizTzC3pgPTF7XmfWWzcB//wlG8/amkxc832a+qYCNcNm
+        E/3fi4505y8JLfqZN2F7166DBdkN3UZNxl9vrenmLFntuWOrhZ3YQpPjYY2y/g1LX5r66x1m
+        tWLZVsW4rFza5tjUzanLN5Y2b1r5uOrzg4kXS/9/vHunM6Py7GvRXwbVHyXc7wdclNTsuHyn
+        dsvR9h6HI+Y+TWJOv+N/3ePY2bnv0RrjeZ1ex+S/TUzUn3lsZYzv1vjXRyN652yUC/j+aPqX
+        WsGExu5J84NkX3t8X70vYmvK64f7tM93d8m//7lp/VKZn71zy77kXtbWsFFiKc5INNRiLipO
+        BACvjWFD8AMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrLIsWRmVeSWpSXmKPExsVy+t/xe7rum7uTDP7f1rFYfbefzeL32fPM
         FnvfzWa1uPCjkcni5oGdTBZ7Fk1isli5+iiTxZP1s5gteg58YLH423WPyWLvLW2Ly7vmsFnM
         X/aU3eLGhKeMFp+XtrBbtG38yugg4PHvxBo2j8tnSz02repk89i8pN5j980GNo+drfdZPd7v
         u8rm0bdlFaPH+i1XWTw2n672+LxJzqP9QDdTAE+Unk1RfmlJqkJGfnGJrVK0oYWRnqGlhZ6R
-        iaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsalrmcsBTNFKr413mFtYHwi0MXIySEhYCKxdMMF
-        xi5GLg4hgaWMEieaNzNDJCQkbi9sYoSwhSX+XOtigyh6xihxZsoEpi5GDg42AS2Jxk52kLiI
-        QCejxNEVp1hAHGaB5UwSL9csZgQpEhaIl7g2KRvEZBFQlViwTghkJq+ApcTRmR/ZIObLS8y8
-        9J0dxOYUsJK4fvUqWFwIqObU+gnsEPWCEidnPmEBsZmB6pu3zmaewCgwC0lqFpLUAkamVYwi
-        qaXFuem5xYZ6xYm5xaV56XrJ+bmbGIGxuu3Yz807GOe9+qh3iJGJg/EQowQHs5II7/bEjiQh
-        3pTEyqrUovz4otKc1OJDjKZAZ09klhJNzgcmi7ySeEMzA1NDEzNLA1NLM2MlcV7Pgo5EIYH0
-        xJLU7NTUgtQimD4mDk6pBiaJLZmvjI9JfihXXDh53eKXwa8q5TJfST2wD56aWPr9jUt/tPtD
-        oa2Cqx2XZeu7WGXEfzl85TVT1vFFlg8/vxE5L/qRqdL45OmQH8e/3dZTCStestx4yztTzT1H
-        OWf9fqEhYH5zxU/tNyURhyUZeDmYd7uvmXPuiKTG7RxzJtH/trsnifj+C4uLbas2Oays0fFx
-        6qQfSxoP/Vjb9JDpRtGdcJGHlwWMv2YdttkqduDngcWxH2Q+r9QxC9g2b7PXFb8l+TbSBuw/
-        v5/Zrdruwio6ZZ/3WYULKcKq4RkxyTqvEqV6FH+YHBIq5vXz5e9e437lllZ49TNnb30r2/mK
-        HA9frtGeWp5kybHd1SSsfZUSS3FGoqEWc1FxIgB2oD+lXgMAAA==
-X-CMS-MailID: 20220523161604eucas1p2927e20dbd0602c08b6df4fc41e62dfbe
+        iaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsbXiydYCq6IVly9vZ61gfGZYBcjJ4eEgInEujlT
+        WboYuTiEBJYySqxeeoYFIiEhcXthEyOELSzx51oXG0TRM0aJz3snADkcHGwCWhKNnewgcRGB
+        TkaJoytOgU1iFljOJPFyzWKwbmGBMIm7k/ezgdgsAqoSPbPmsIPYvAKWEgubf7BCbJCXmHnp
+        O1icU8BK4vrVq2D1QkA1p9ZPgKoXlDg58wnYdcxA9c1bZzNPYBSYhSQ1C0lqASPTKkaR1NLi
+        3PTcYkO94sTc4tK8dL3k/NxNjMB43Xbs5+YdjPNefdQ7xMjEwXiIUYKDWUmEd3tiR5IQb0pi
+        ZVVqUX58UWlOavEhRlOguycyS4km5wMTRl5JvKGZgamhiZmlgamlmbGSOK9nQUeikEB6Yklq
+        dmpqQWoRTB8TB6dUA1Ou8GyW5w7e4U2MEbvZffiyuzc5c892XjyJWd90PxN3+2quz32Hfqa6
+        F/X8+Trl24UnlyT1PE1XbYyZHLAr6pcf2/mr169/77uV8/7QwVe51TsPhpmLCc9afPQrX+Tr
+        bVP/PS++ZNN9q7DzTKjhtgefu28V16a+v6viOVG+ceoBnqWreh73z1zXyJl60/Tcwa9q/pUb
+        +J705756PVt2m2zPibXPJgsk3fx6zcZVt/2L2Hql5L1FIlPP31KukK9c5a56fZYME39SWW0U
+        d/f+1ttrUyQWH364+/vcCB7GfbMdjv4Iz5/p22Ntbup8fdfm3Qevy0d/PaOz6d2l90xKMxOs
+        lTb8bQl4tEZ+x4VO7nIOJZbijERDLeai4kQA/5ecNWADAAA=
+X-CMS-MailID: 20220523161607eucas1p2b6245eafb81dee3e2efbec3ab86a854d
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
-X-RootMTR: 20220523161604eucas1p2927e20dbd0602c08b6df4fc41e62dfbe
+X-RootMTR: 20220523161607eucas1p2b6245eafb81dee3e2efbec3ab86a854d
 X-EPHeader: CA
 CMS-TYPE: 201P
-X-CMS-RootMailID: 20220523161604eucas1p2927e20dbd0602c08b6df4fc41e62dfbe
+X-CMS-RootMailID: 20220523161607eucas1p2b6245eafb81dee3e2efbec3ab86a854d
 References: <20220523161601.58078-1-p.raghav@samsung.com>
-        <CGME20220523161604eucas1p2927e20dbd0602c08b6df4fc41e62dfbe@eucas1p2.samsung.com>
+        <CGME20220523161607eucas1p2b6245eafb81dee3e2efbec3ab86a854d@eucas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Adapt blkdev_nr_zones and blk_queue_zone_no function so that it can
-also work for non-power-of-2 zone sizes.
+Remove the condition which disallows non-power_of_2 zone size ZNS drive
+to be updated and use generic method to calculate number of zones
+instead of relying on log and shift based calculation on zone size.
 
-As the existing deployments of zoned devices had power-of-2
-assumption, power-of-2 optimized calculation is kept for those devices.
+The power_of_2 calculation has been replaced directly with generic
+calculation without special handling. Both modified functions are not
+used in hot paths, they are only used during initialization &
+revalidation of the ZNS device.
 
-There are no direct hot paths modified and the changes just
-introduce one new branch per call.
+As rounddown macro from math.h does not work for 32 bit architectures,
+round down operation is open coded.
 
 Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
 Reviewed by: Adam Manzanares <a.manzanares@samsung.com>
-Reviewed-by: Hannes Reinecke <hare@suse.de>
 Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
 ---
- block/blk-zoned.c      | 12 +++++++++---
- include/linux/blkdev.h |  8 +++++++-
- 2 files changed, 16 insertions(+), 4 deletions(-)
+ drivers/nvme/host/zns.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
 
-diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-index 38cd840d8838..e7eec513dd42 100644
---- a/block/blk-zoned.c
-+++ b/block/blk-zoned.c
-@@ -111,16 +111,22 @@ EXPORT_SYMBOL_GPL(__blk_req_zone_write_unlock);
-  * blkdev_nr_zones - Get number of zones
-  * @disk:	Target gendisk
-  *
-- * Return the total number of zones of a zoned block device.  For a block
-- * device without zone capabilities, the number of zones is always 0.
-+ * Return the total number of zones of a zoned block device, including the
-+ * eventual small last zone if present. For a block device without zone
-+ * capabilities, the number of zones is always 0.
-  */
- unsigned int blkdev_nr_zones(struct gendisk *disk)
- {
- 	sector_t zone_sectors = blk_queue_zone_sectors(disk->queue);
-+	sector_t capacity = get_capacity(disk);
+diff --git a/drivers/nvme/host/zns.c b/drivers/nvme/host/zns.c
+index 9f81beb4df4e..d92f937d5cb9 100644
+--- a/drivers/nvme/host/zns.c
++++ b/drivers/nvme/host/zns.c
+@@ -101,13 +101,6 @@ int nvme_update_zone_info(struct nvme_ns *ns, unsigned lbaf)
+ 	}
  
- 	if (!blk_queue_is_zoned(disk->queue))
- 		return 0;
--	return (get_capacity(disk) + zone_sectors - 1) >> ilog2(zone_sectors);
-+
-+	if (is_power_of_2(zone_sectors))
-+		return (capacity + zone_sectors - 1) >> ilog2(zone_sectors);
-+
-+	return div64_u64(capacity + zone_sectors - 1, zone_sectors);
- }
- EXPORT_SYMBOL_GPL(blkdev_nr_zones);
+ 	ns->zsze = nvme_lba_to_sect(ns, le64_to_cpu(id->lbafe[lbaf].zsze));
+-	if (!is_power_of_2(ns->zsze)) {
+-		dev_warn(ns->ctrl->device,
+-			"invalid zone size:%llu for namespace:%u\n",
+-			ns->zsze, ns->head->ns_id);
+-		status = -ENODEV;
+-		goto free_data;
+-	}
  
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 60d016138997..c4e4c7071b7b 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -665,9 +665,15 @@ static inline unsigned int blk_queue_nr_zones(struct request_queue *q)
- static inline unsigned int blk_queue_zone_no(struct request_queue *q,
- 					     sector_t sector)
- {
-+	sector_t zone_sectors = blk_queue_zone_sectors(q);
-+
- 	if (!blk_queue_is_zoned(q))
- 		return 0;
--	return sector >> ilog2(q->limits.chunk_sectors);
-+
-+	if (is_power_of_2(zone_sectors))
-+		return sector >> ilog2(zone_sectors);
-+
-+	return div64_u64(sector, zone_sectors);
- }
+ 	blk_queue_set_zoned(ns->disk, BLK_ZONED_HM);
+ 	blk_queue_flag_set(QUEUE_FLAG_ZONE_RESETALL, q);
+@@ -128,8 +121,13 @@ static void *nvme_zns_alloc_report_buffer(struct nvme_ns *ns,
+ 	const size_t min_bufsize = sizeof(struct nvme_zone_report) +
+ 				   sizeof(struct nvme_zone_descriptor);
  
- static inline bool blk_queue_zone_is_seq(struct request_queue *q,
++	/*
++	 * Division is used to calculate nr_zones with no special handling
++	 * for power of 2 zone sizes as this function is not invoked in a
++	 * hot path
++	 */
+ 	nr_zones = min_t(unsigned int, nr_zones,
+-			 get_capacity(ns->disk) >> ilog2(ns->zsze));
++			 div64_u64(get_capacity(ns->disk), ns->zsze));
+ 
+ 	bufsize = sizeof(struct nvme_zone_report) +
+ 		nr_zones * sizeof(struct nvme_zone_descriptor);
+@@ -182,6 +180,7 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
+ 	int ret, zone_idx = 0;
+ 	unsigned int nz, i;
+ 	size_t buflen;
++	u64 remainder = 0;
+ 
+ 	if (ns->head->ids.csi != NVME_CSI_ZNS)
+ 		return -EINVAL;
+@@ -197,7 +196,11 @@ int nvme_ns_report_zones(struct nvme_ns *ns, sector_t sector,
+ 	c.zmr.zrasf = NVME_ZRASF_ZONE_REPORT_ALL;
+ 	c.zmr.pr = NVME_REPORT_ZONE_PARTIAL;
+ 
+-	sector &= ~(ns->zsze - 1);
++	/*
++	 * Round down the sector value to the nearest zone start
++	 */
++	div64_u64_rem(sector, ns->zsze, &remainder);
++	sector -= remainder;
+ 	while (zone_idx < nr_zones && sector < get_capacity(ns->disk)) {
+ 		memset(report, 0, buflen);
+ 
 -- 
 2.25.1
 
