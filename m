@@ -2,70 +2,110 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61D67C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 20:42:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F369DC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 20:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233534AbiEWUmL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 16:42:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55370 "EHLO
+        id S232792AbiEWUuO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 16:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233192AbiEWUmF (ORCPT
+        with ESMTP id S230007AbiEWUuN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 16:42:05 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D5AA76EB;
-        Mon, 23 May 2022 13:42:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id E6C8B614D7;
-        Mon, 23 May 2022 20:42:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5BB71C36AE7;
-        Mon, 23 May 2022 20:42:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653338522;
-        bh=JYoATB/ve1NQy/envTJY1JYre41R+XhDAt9dolOQe9Y=;
-        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-        b=mlJfkzwPxEbA9xE1flTWye5oKxYeaGnv0P0uJ0iNf20DjY6m5kssg48+uY9N92yG9
-         b8VaZYRJYNs6tORZhcHzF66WM4kgWELB7j5JMiPygtRy3A5DitmgBxg8/cQY/PRAhO
-         zrmnpTUR8g63FQly5QeC2U1Sov29ygUOGHi8M2+IAsNzjhCuFsda+oPeG0CsNs7lRV
-         2PMZo8v53jUg1hLZepEpmt2wujpx3Sf+VjIveLUSkuqBg2zjO+I3usm1dsF9UNy3fM
-         HQPdF+aZGIGK3sKhO84WsqSVDfGSd/ZY+0IYCTATo+DvmKEVYM+rYznBPoUXzrOg45
-         pMZq73AdcDB2A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 489FCF03935;
-        Mon, 23 May 2022 20:42:02 +0000 (UTC)
-Subject: Re: [GIT PULL] io_uring passthrough support
-From:   pr-tracker-bot@kernel.org
-In-Reply-To: <6f712c75-c849-ae89-d763-b2a18da52844@kernel.dk>
-References: <6f712c75-c849-ae89-d763-b2a18da52844@kernel.dk>
-X-PR-Tracked-List-Id: <io-uring.vger.kernel.org>
-X-PR-Tracked-Message-Id: <6f712c75-c849-ae89-d763-b2a18da52844@kernel.dk>
-X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/for-5.19/io_uring-passthrough-2022-05-22
-X-PR-Tracked-Commit-Id: 3fe07bcd800d6e5e4e4263ca2564d69095c157bf
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 9836e93c0a7e031ac6a71c56171c229de1eea7cf
-Message-Id: <165333852229.17690.10519267879279637393.pr-tracker-bot@kernel.org>
-Date:   Mon, 23 May 2022 20:42:02 +0000
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
-        io-uring <io-uring@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+        Mon, 23 May 2022 16:50:13 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7551B7093A;
+        Mon, 23 May 2022 13:50:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=MWvG6nn3a+gK5OQ89UpHcVMgSWbGiApDZs43xBQyuAQ=; b=jZ5RgpQGKwUBBbA0ZdHQ3ge2qv
+        JhwcNDKoPemRk3s77IzW6EO20sjiH1DhUcQ13atArXRcjCq0UM02GOejd3Q5xBsgEugT/I+hhy26g
+        4Kp9xy0YpjBsbEAuJddwANSqj37eNk6MehElmYHZpY+r2ZMG1vaI7/wkpjX3+xH/NYxJmJIondBxy
+        +L7c2izCVNz9zitq/KvvNVVHICfXgJqfGbyRzpjzJ7bubMHZhDrfYYFQCgURue0HEBat23MdvOREc
+        3z+1BAGrSOmTcM4wcSbOnvWlt1BKGcar/IW/Rcxxp0HY1QQwDxgmUoJQtCuEiZZ0jCSqL0x6HUy2v
+        oOGiBiMw==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by casper.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ntEzs-00GXI2-R3; Mon, 23 May 2022 20:49:49 +0000
+Message-ID: <f99153be-2636-60a3-2630-c592cc230b53@infradead.org>
+Date:   Mon, 23 May 2022 13:49:38 -0700
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [RFC 2/6] PM: Hibernate: Add option to disable disk offset
+ randomization
+Content-Language: en-US
+To:     Vivek Kumar <quic_vivekuma@quicinc.com>, corbet@lwn.net,
+        catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de,
+        maz@kernel.org, axboe@kernel.dk, rafael@kernel.org,
+        akpm@linux-foundation.org, linux-doc@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pm@vger.kernel.org,
+        linux-mm@kvack.org
+Cc:     len.brown@intel.com, pavel@ucw.cz, paulmck@kernel.org, bp@suse.de,
+        keescook@chromium.org, songmuchun@bytedance.com,
+        damien.lemoal@opensource.wdc.com, pasha.tatashin@soleen.com,
+        tabba@google.com, ardb@kernel.org, tsoni@quicinc.com,
+        quic_psodagud@quicinc.com, quic_svaddagi@quicinc.com,
+        Prasanna Kumar <quic_kprasan@quicinc.com>
+References: <1652860121-24092-1-git-send-email-quic_vivekuma@quicinc.com>
+ <1652860121-24092-3-git-send-email-quic_vivekuma@quicinc.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <1652860121-24092-3-git-send-email-quic_vivekuma@quicinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The pull request you sent on Sun, 22 May 2022 15:26:23 -0600:
 
-> git://git.kernel.dk/linux-block.git tags/for-5.19/io_uring-passthrough-2022-05-22
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/9836e93c0a7e031ac6a71c56171c229de1eea7cf
+On 5/18/22 00:48, Vivek Kumar wrote:
+> Add a kernel parameter to disable the disk offset randomization
+> for SSD devices in which such feature is available at the
+> firmware level. This is helpful in improving hibernation
+> resume time.
+> 
+> Signed-off-by: Vivek Kumar <quic_vivekuma@quicinc.com>
+> Signed-off-by: Prasanna Kumar <quic_kprasan@quicinc.com>
+> ---
+>  Documentation/admin-guide/kernel-parameters.txt | 11 +++++++++++
+>  kernel/power/swap.c                             |  9 +++++++++
+>  2 files changed, 20 insertions(+)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index 666ade9..06b4f10 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -5192,6 +5192,17 @@
+>  			Useful for devices that are detected asynchronously
+>  			(e.g. USB and MMC devices).
+>  
+> +	noswap_randomize
+> +			Kernel uses random disk offsets to help with wear-levelling
 
-Thank you!
+			                                             wear-leveling
+
+> +			of SSD devices, while saving the hibernation snapshot image to
+> +			disk. Use this parameter to disable this feature for SSD
+> +			devices in scenarios when, such randomization is addressed at
+
+			               no comma  ^
+
+> +			the firmware level and hibenration image is not re-generated
+
+			                       hibernation
+
+> +			frequently.
+> +			(Useful for improving hibernation resume time as snapshot pages
+> +			are available in disk serially and can be read in bigger chunks
+> +			without seeking)
+> +
+>  	retain_initrd	[RAM] Keep initrd memory after extraction
+>  
+>  	rfkill.default_state=
+
 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+~Randy
