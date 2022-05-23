@@ -2,83 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4B3C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A428FC433EF
+	for <linux-block@archiver.kernel.org>; Mon, 23 May 2022 21:50:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbiEWV2y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 17:28:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53870 "EHLO
+        id S230040AbiEWVuG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 17:50:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38458 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229911AbiEWV2w (ORCPT
+        with ESMTP id S229515AbiEWVuF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 17:28:52 -0400
-X-Greylist: delayed 5226 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 May 2022 14:28:51 PDT
+        Mon, 23 May 2022 17:50:05 -0400
+X-Greylist: delayed 5425 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 23 May 2022 14:50:01 PDT
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 089C0A2056;
-        Mon, 23 May 2022 14:28:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECE0526C1
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 14:50:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=0TgBdWDrgCwk3/yiVL4MjST4OruMage9l2vL9QRHrUI=; b=DEPNVraFW2DF3xnuijyQYottQI
-        EnzvrRqNHh6tdFjrww5RoRUiKbcMnwDONbrvvay2nocBtbdlpj6vOkSk82OCn6LO7yGqjCa8mTFGP
-        1unIyHtE8ceJZphYFwv/RAGJlsR00fpL9uMACN/7kz1yKM+SaopXnXn2N8S2BWamZqidXlSYrSRip
-        SeO/AzJLndNbm5diDt1KOmBF9QNaXiIzfF8s4Hsc0kdDE8d4/C4LDjg0wp7xajO+12IWm11+S82S0
-        iNRZBktO0eWh7LwCLFJaFhPmwY4Zym97HGYjIhdxL77wFwVNWNWiCitM3w+m18cmGkLIBUsLUQVuu
-        mIRJ0BAA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntDrR-005iLS-B4; Mon, 23 May 2022 19:37:01 +0000
-Date:   Mon, 23 May 2022 12:37:01 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Greg KH <gregkh@linuxfoundation.org>, tj@kernel.org,
-        akpm@linux-foundation.org, jeyu@kernel.org, shuah@kernel.org,
-        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
-        keescook@chromium.org, rostedt@goodmis.org, minchan@kernel.org,
-        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v9 3/6] selftests: add tests_sysfs module
-Message-ID: <YoviXT37FAUqpQEu@bombadil.infradead.org>
-References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-4-mcgrof@kernel.org>
- <Yao3vtSKBKLyQY1E@kroah.com>
- <87fsl1iqg0.ffs@tglx>
- <YopM5XGMdqVCU+bL@kroah.com>
- <87czg5ip2z.ffs@tglx>
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=XGWyS9M4v/8rYbPomtgL43gdQZPyiCqFsQGUPRBoEE8=; b=jNJY8+U4ieTF5pw5yCPUYrQQeJ
+        eAMrGcxb8toU27SrvnmOckiH2cW5J3IbdrTHEVBhFqcikl3MlZsyS6tR7cLki+4Gelg+bdRF+mKFd
+        icOXGQlihA0qFmnNRTH+QA/NRc4V62c74evkbg9IRBzAPnEhgA0wJlQDDe/w0p7RTHG7bfo+mMOo7
+        zu1b7ndtsmvkItGFlj5+v5SiRb4xw5OZZP6VpZtwtxPGg6yS6K651JQk5Xim5R8415uFb7GYH1DQh
+        9GGbwlG6azepMd8cfZhAQ/mlW3cUFBEmPik5KaUG2/t0wGPOCsWPs8+o4lDkQ2jwFgJq0Ext4sboh
+        aBLvia6Q==;
+Received: from [2001:4bb8:18c:7298:c299:b72c:6660:451c] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nt7Or-004Fq2-5z; Mon, 23 May 2022 12:43:05 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: use bio_queue_enter instead of blk_queue_enter in bio_poll
+Date:   Mon, 23 May 2022 14:43:02 +0200
+Message-Id: <20220523124302.526186-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87czg5ip2z.ffs@tglx>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, May 22, 2022 at 05:06:44PM +0200, Thomas Gleixner wrote:
-> On Sun, May 22 2022 at 16:47, Greg KH wrote:
-> > On Sun, May 22, 2022 at 04:37:19PM +0200, Thomas Gleixner wrote:
-> >> On Fri, Dec 03 2021 at 16:29, Greg KH wrote:
-> >> 
-> >> While I agree that we want to keep the number of licenses as small as
-> >> possible, we cannot really dictate which dual licensing options a
-> >> submitter selects unless the license is GPL-2.0-only incompatible, which
-> >> copyleft-next is not.
-> >> 
-> >> Can we just get over this, add the license with the SPDX identifier and
-> >> move on?
-> >
-> > From what I recall, I had technical reasons I didn't take this series,
-> > but that was a long time ago and I would be glad to review it again if
-> > it were rebased and resubmitted after the next merge window is closed.
-> 
-> The license addition and the SPDX identifier cleanup should be seperated
-> from the new test code which was part of the series.
+We want to have a valid live gendisk to call ->poll and not just a
+request_queue, so call the right helper.
 
-I'll send a re-spin after the merge window and split this up.
+Fixes: 3e08773c3841 ("block: switch polling to be bio based")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/blk-core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-And FWIW, AFAICT I addressed all the comments, so I can resend after
-the spdx stuff gets merged so to make the series easier to read /
-review.
+diff --git a/block/blk-core.c b/block/blk-core.c
+index 80fa73c419a99..06ff5bbfe8f66 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -939,7 +939,7 @@ int bio_poll(struct bio *bio, struct io_comp_batch *iob, unsigned int flags)
+ 
+ 	blk_flush_plug(current->plug, false);
+ 
+-	if (blk_queue_enter(q, BLK_MQ_REQ_NOWAIT))
++	if (bio_queue_enter(bio))
+ 		return 0;
+ 	if (queue_is_mq(q)) {
+ 		ret = blk_mq_poll(q, cookie, iob, flags);
+-- 
+2.30.2
 
-  Luis
