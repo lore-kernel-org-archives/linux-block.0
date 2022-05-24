@@ -2,150 +2,122 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 620FEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 02:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63C2DC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 03:02:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232561AbiEXC71 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 22:59:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53828 "EHLO
+        id S230416AbiEXDCu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 23:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34292 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233004AbiEXC7Z (ORCPT
+        with ESMTP id S234587AbiEXDCp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 22:59:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6A18C9CF09
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 19:59:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653361163;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=Jgi47uEDCSDEBXMjON2icaSZ1qxn/LW2b7pS1wUdrEA=;
-        b=BBFg4Pkv1q4cPU/jsh8mozVXsWCq5wNnwKQH57qvpuAyg1EAbtEROdB/lN42qNjTQW+6js
-        8rNYH2FXrIdx9aibasgkwzoNlTu2SQ3GJynmvdMo6bSGtcO2aXg9Htriu7qeH76R2t76pF
-        XbBOQpCLf2jFdrRbOmHwbVnfu5FVz/w=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-550-55gLLX85O-6cowadX8_jrw-1; Mon, 23 May 2022 22:59:19 -0400
-X-MC-Unique: 55gLLX85O-6cowadX8_jrw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        Mon, 23 May 2022 23:02:45 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3DE87E1EB;
+        Mon, 23 May 2022 20:02:43 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5B6298032E5;
-        Tue, 24 May 2022 02:59:19 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 3FDB440D1B98;
-        Tue, 24 May 2022 02:59:11 +0000 (UTC)
-Date:   Tue, 24 May 2022 10:59:06 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Liu Xiaodong <xiaodong.liu@intel.com>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, ming.lei@redhat.com
-Subject: Re: [PATCH V2 0/1] ubd: add io_uring based userspace block driver
-Message-ID: <YoxJ+tagaYY8Lre9@T590>
-References: <20220518063808.GA168577@storage2.sh.intel.com>
- <YoTyNVccpIYDpx9q@T590>
- <20220523145643.GA232396@storage2.sh.intel.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 3782361226;
+        Tue, 24 May 2022 03:02:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052AAC385AA;
+        Tue, 24 May 2022 03:02:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653361362;
+        bh=gSDICma7qdNeYy3eh+IRUicbClYtmCsMGCOKhaxkfVg=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=Ln0gya3UZwr4BEB/r9seXF6ekAnWCv7NOn6o/3LitiBmGettpyOOrZHnweBMmHfCc
+         4Eo0T7lLUXOvmm1ImPHUCnHKPJxR3Kx4EubRjcNlg3lYrOumdo8y8Pxd6kED1ziB3I
+         GasU4j4STaRIUgEBTSsKjJ+rA0Dp9gwIYO4mJRjZU3Cx0Flxc/ecyJ8Ccapj8iIJXd
+         V56mePNmIE7xjCS1WmVVbfsqKEAacZ73lEGWCPaZnzUikfPL0K8HWjoD8VbLBsibMf
+         H4VJmSA3VqCHUXcwgjhS1/VmAMunhF63kYgnsEaHrCIWpXk046i9xZ+3uD8afkiBGo
+         MVOTqTnNbJUuQ==
+Date:   Mon, 23 May 2022 21:02:39 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+Subject: Re: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
+Message-ID: <YoxKz51EAu3j2qwK@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220420143110.2679002-1-ming.lei@redhat.com>
+ <YowMVODoNIyaqVdC@kbusch-mbp.dhcp.thefacebook.com>
+ <YowpjtLfZPld1H6T@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220523145643.GA232396@storage2.sh.intel.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+In-Reply-To: <YowpjtLfZPld1H6T@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 23, 2022 at 10:56:43AM -0400, Liu Xiaodong wrote:
-> On Wed, May 18, 2022 at 09:18:45PM +0800, Ming Lei wrote:
-> > Hello Liu,
+On Tue, May 24, 2022 at 08:40:46AM +0800, Ming Lei wrote:
+> On Mon, May 23, 2022 at 04:36:04PM -0600, Keith Busch wrote:
+> > On Wed, Apr 20, 2022 at 10:31:10PM +0800, Ming Lei wrote:
+> > > So far bio is marked as REQ_POLLED if RWF_HIPRI/IOCB_HIPRI is passed
+> > > from userspace sync io interface, then block layer tries to poll until
+> > > the bio is completed. But the current implementation calls
+> > > blk_io_schedule() if bio_poll() returns 0, and this way causes io hang or
+> > > timeout easily.
 > > 
-> > On Wed, May 18, 2022 at 02:38:08AM -0400, Liu Xiaodong wrote:
-> > > On Tue, May 17, 2022 at 01:53:57PM +0800, Ming Lei wrote:
-> > > > Hello Guys,
-> > > > 
-> > > > ubd driver is one kernel driver for implementing generic userspace block
-> > > > device/driver, which delivers io request from ubd block device(/dev/ubdbN) into
-> > > > ubd server[1] which is the userspace part of ubd for communicating
-> > > > with ubd driver and handling specific io logic by its target module.
-> > > > 
-> > > > Another thing ubd driver handles is to copy data between user space buffer
-> > > > and request/bio's pages, or take zero copy if mm is ready for support it in
-> > > > future. ubd driver doesn't handle any IO logic of the specific driver, so
-> > > > it is small/simple, and all io logics are done by the target code in ubdserver.
-> > > > 
-> > > > The above two are main jobs done by ubd driver.
-> > > 
-> > > Not like UBD which is straightforward and starts from scratch, VDUSE is
-> > > embedded in virtio framework. So its implementation is more complicated, but
-> > > all virtio frontend utilities can be leveraged.
-> > > When considering security/permission issues, feels UBD would be easier to
-> > > solve them.
-> > 
-> > Stefan Hajnoczi and I are discussing related security/permission
-> > issues, can you share more details in your case?
+> > Wait a second. The task's current state is TASK_RUNNING when bio_poll() returns
+> > zero, so calling blk_io_schedule() isn't supposed to hang.
 > 
-> Hi, Ming
-> Security/permission things covered by your discussion are more than I've
-> considered.
+> void __sched io_schedule(void)
+> {
+>         int token;
+> 
+>         token = io_schedule_prepare();
+>         schedule();
+>         io_schedule_finish(token);
+> }
+> 
+> But who can wakeup this task after scheduling out? There can't be irq
+> handler for POLLED request.
 
-BTW, I'd rather make a summery about the discussion:
+No one. If everything was working, the task state would be RUNNING, so it is
+immediately available to be scheduled back in.
+ 
+> The hang can be triggered on nvme/qemu reliably:
 
-1) Stefan suggested that ubd device may be made as one container block
-device, which can be isolated from others, such as, the ubd device
-created in one container can only be controlled and read write inside
-this container, and this way is useful for container use case.
+And clearly it's not working, but for a different reason. The polling thread
+sees an invalid cookie and fails to set the task back to RUNNING, so yes, it
+will sleep with no waker in the current code.
 
-2) the requirement actually needs both /dev/ubdcN and /dev/ubdbN to
-be allowed for unprivileged user; so it could be solved by existed
-process privilege & file ownership; let user of the process creating
-the two devices owns the two devices, and apply FS's file permission
-on the two devices;
+We usually expect the cookie to be set inline with submit_bio(), but we're not
+guaranteed it won't be punted off to .run_work for a variety of reasons, so
+the thread writing the cookie may be racing with the reader.
 
-3) it shouldn't be hard to allow unprivileged user to control
-/dev/ubdcN or /dev/ubd-control
+This was fine before the bio polling support since the cookie was always
+returned with submit_bio() before that.
 
-- every user can create ubd by sending ADD_DEV command to
-  /dev/ubd-control; only user with permission to /dev/ubdcN can send
-  other control commands to /dev/ubd-control for controlling/querying
-  the specified device
+And I would like psync to continue working with polling. As great as io_uring
+is, it's just not as efficient @qd1.
 
-- ubd driver is simple, both in interface and implementation, so we
-can make it stable from the beginning
+Here's a bandaid, though I assume it'll break something...
 
-- only the daemon can communicate with /dev/ubdcN, which is only
-  allowed to be opened by one process
-
-4) the challenge is in allowing unprivileged user to access /dev/ubdbN:
-
-- no any serious bug in io path(io hang, kernel panic), such as ubd io
-  hang may cause sync() hang
-
-- can't affect other users or processes or system, such as, one
-  malicious may make a extremely slow device to dirty lots of pages, or
-  prevent device from being deleted
-
-- ...
-
-5) as Stefan mentioned, we may start by:
-- not allow unprivileged ubd device to be mounted
-- not allow unprivileged ubd device's partition table to be read from
-  kernel
-- not support buffered io for unprivileged ubd device, and only direct io
-  is allowed
-- maybe more limit for minimizing security risk.
-
-
-ubd for container is hard, and it should be one extra feature added
-in future, especially after fully review/verification.
-
-
-Thanks,
-Ming
-
+---
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index ed1869a305c4..348136dc7ba9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -1146,8 +1146,6 @@ void blk_mq_start_request(struct request *rq)
+ 	if (blk_integrity_rq(rq) && req_op(rq) == REQ_OP_WRITE)
+ 		q->integrity.profile->prepare_fn(rq);
+ #endif
+-	if (rq->bio && rq->bio->bi_opf & REQ_POLLED)
+-	        WRITE_ONCE(rq->bio->bi_cookie, blk_rq_to_qc(rq));
+ }
+ EXPORT_SYMBOL(blk_mq_start_request);
+ 
+@@ -2464,6 +2462,9 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
+ 	WARN_ON_ONCE(err);
+ 
+ 	blk_account_io_start(rq);
++
++	if (rq->bio->bi_opf & REQ_POLLED)
++	        WRITE_ONCE(rq->bio->bi_cookie, blk_rq_to_qc(rq));
+ }
+ 
+ static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
+--
