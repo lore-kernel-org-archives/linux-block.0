@@ -2,89 +2,132 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D04CC4332F
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 00:41:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F84C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 01:07:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231239AbiEXAlP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 23 May 2022 20:41:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45422 "EHLO
+        id S232370AbiEXBHz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 23 May 2022 21:07:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230441AbiEXAlN (ORCPT
+        with ESMTP id S229782AbiEXBHz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 23 May 2022 20:41:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 531EC140BE
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 17:41:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653352870;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=idPCA1Ojor4LlTh+O1e95QR6iGVjUCXmp+mNYdObBb0=;
-        b=BAfZjvbY7JYBHhGARlvMgIMOCBft6kxYPtiYBIR2qAA2jWfs70QD7A3CvO7KyZ2CFc78IV
-        RUvgrJdm9Ijsp5rHgIb15/4PiAvsC7097xszTN267rvXCYGmu2KsxErsrWNG9m5XBLoe4S
-        pm/geoho1lzYYh+7oQi1w0E90GIyjtI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-167-erIJ1uDUOEqeqNxZvElaCA-1; Mon, 23 May 2022 20:41:09 -0400
-X-MC-Unique: erIJ1uDUOEqeqNxZvElaCA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CC140101A52C;
-        Tue, 24 May 2022 00:41:08 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B63D7492C14;
-        Tue, 24 May 2022 00:40:55 +0000 (UTC)
-Date:   Tue, 24 May 2022 08:40:46 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
-Message-ID: <YowpjtLfZPld1H6T@T590>
-References: <20220420143110.2679002-1-ming.lei@redhat.com>
- <YowMVODoNIyaqVdC@kbusch-mbp.dhcp.thefacebook.com>
+        Mon, 23 May 2022 21:07:55 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA6FE45AFA;
+        Mon, 23 May 2022 18:07:52 -0700 (PDT)
+Received: from kwepemi100022.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L6bd91NKdzjX1W;
+        Tue, 24 May 2022 09:06:53 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi100022.china.huawei.com (7.221.188.126) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 09:07:50 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 09:07:50 +0800
+Subject: Re: [PATCH -next v3 3/6] nbd: don't clear 'NBD_CMD_INFLIGHT' flag if
+ request is not completed
+To:     Josef Bacik <josef@toxicpanda.com>
+CC:     <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <linux-block@vger.kernel.org>, <nbd@other.debian.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220521073749.3146892-1-yukuai3@huawei.com>
+ <20220521073749.3146892-4-yukuai3@huawei.com>
+ <YouWXEcyoBNUXLb7@localhost.localdomain>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <6a549193-909b-6f6e-532b-99cd2898ad80@huawei.com>
+Date:   Tue, 24 May 2022 09:07:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YowMVODoNIyaqVdC@kbusch-mbp.dhcp.thefacebook.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+In-Reply-To: <YouWXEcyoBNUXLb7@localhost.localdomain>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 23, 2022 at 04:36:04PM -0600, Keith Busch wrote:
-> On Wed, Apr 20, 2022 at 10:31:10PM +0800, Ming Lei wrote:
-> > So far bio is marked as REQ_POLLED if RWF_HIPRI/IOCB_HIPRI is passed
-> > from userspace sync io interface, then block layer tries to poll until
-> > the bio is completed. But the current implementation calls
-> > blk_io_schedule() if bio_poll() returns 0, and this way causes io hang or
-> > timeout easily.
+ÔÚ 2022/05/23 22:12, Josef Bacik Ð´µÀ:
+> On Sat, May 21, 2022 at 03:37:46PM +0800, Yu Kuai wrote:
+>> Otherwise io will hung because request will only be completed if the
+>> cmd has the flag 'NBD_CMD_INFLIGHT'.
+>>
+>> Fixes: 07175cb1baf4 ("nbd: make sure request completion won't concurrent")
+>> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+>> ---
+>>   drivers/block/nbd.c | 18 ++++++++++++++----
+>>   1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+>> index 2ee1e376d5c4..a0d0910dae2a 100644
+>> --- a/drivers/block/nbd.c
+>> +++ b/drivers/block/nbd.c
+>> @@ -403,13 +403,14 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>>   	if (!mutex_trylock(&cmd->lock))
+>>   		return BLK_EH_RESET_TIMER;
+>>   
+>> -	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
+>> +	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
+>>   		mutex_unlock(&cmd->lock);
+>>   		return BLK_EH_DONE;
+>>   	}
+>>   
+>>   	if (!refcount_inc_not_zero(&nbd->config_refs)) {
+>>   		cmd->status = BLK_STS_TIMEOUT;
+>> +		__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
+>>   		mutex_unlock(&cmd->lock);
+>>   		goto done;
+>>   	}
+>> @@ -478,6 +479,7 @@ static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
+>>   	dev_err_ratelimited(nbd_to_dev(nbd), "Connection timed out\n");
+>>   	set_bit(NBD_RT_TIMEDOUT, &config->runtime_flags);
+>>   	cmd->status = BLK_STS_IOERR;
+>> +	__clear_bit(NBD_CMD_INFLIGHT, &cmd->flags);
+>>   	mutex_unlock(&cmd->lock);
+>>   	sock_shutdown(nbd);
+>>   	nbd_config_put(nbd);
+>> @@ -745,7 +747,7 @@ static struct nbd_cmd *nbd_handle_reply(struct nbd_device *nbd, int index,
+>>   	cmd = blk_mq_rq_to_pdu(req);
+>>   
+>>   	mutex_lock(&cmd->lock);
+>> -	if (!__test_and_clear_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
+>> +	if (!test_bit(NBD_CMD_INFLIGHT, &cmd->flags)) {
+>>   		dev_err(disk_to_dev(nbd->disk), "Suspicious reply %d (status %u flags %lu)",
+>>   			tag, cmd->status, cmd->flags);
+>>   		ret = -ENOENT;
+>> @@ -854,8 +856,16 @@ static void recv_work(struct work_struct *work)
+>>   		}
+>>   
+>>   		rq = blk_mq_rq_from_pdu(cmd);
+>> -		if (likely(!blk_should_fake_timeout(rq->q)))
+>> -			blk_mq_complete_request(rq);
+>> +		if (likely(!blk_should_fake_timeout(rq->q))) {
+>> +			bool complete;
+>> +
+>> +			mutex_lock(&cmd->lock);
+>> +			complete = __test_and_clear_bit(NBD_CMD_INFLIGHT,
+>> +							&cmd->flags);
+>> +			mutex_unlock(&cmd->lock);
+>> +			if (complete)
+>> +				blk_mq_complete_request(rq);
+>> +		}
 > 
-> Wait a second. The task's current state is TASK_RUNNING when bio_poll() returns
-> zero, so calling blk_io_schedule() isn't supposed to hang.
+> I'd rather this be handled in nbd_handle_reply.  We should return with it
+> cleared if it's ready to be completed.  Thanks,
+Hi,
 
-void __sched io_schedule(void)
-{
-        int token;
+Thanks for your advice, I'll do that in next version. I'll still have to
+hold the lock to set the bit again in case blk_should_fake_timeout()
+pass...
 
-        token = io_schedule_prepare();
-        schedule();
-        io_schedule_finish(token);
-}
-
-But who can wakeup this task after scheduling out? There can't be irq
-handler for POLLED request.
-
-The hang can be triggered on nvme/qemu reliably:
-
-fio --bs=4k --size=1G --ioengine=pvsync2 --norandommap --hipri=1 --iodepth=64 \
-	--slat_percentiles=1 --nowait=0 --filename=/dev/nvme0n1 --direct=1 \
-	--runtime=10 --numjobs=1 --rw=rw --name=test --group_reporting
-
-Thanks, 
-Ming
-
+Thanks,
+Kuai
+> 
+> Josef
+> .
+> 
