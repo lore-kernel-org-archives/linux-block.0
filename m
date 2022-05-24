@@ -2,104 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF59C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 19:08:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A09C6C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 20:14:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238474AbiEXTIf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 15:08:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48362 "EHLO
+        id S238992AbiEXUO3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 16:14:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241126AbiEXTIW (ORCPT
+        with ESMTP id S241475AbiEXUO0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 15:08:22 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0FF3EA9C;
-        Tue, 24 May 2022 12:08:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1653419292; x=1684955292;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=McrA50umS7uFNif0OKWyvZB3Gg9wX6U3OTSnaLvoS2o=;
-  b=DLh6++HQLO4bH2PEb83CowW9IPaPK47mgCytTW1ObJmk/lINBJR9tb9T
-   wc4cnLUVksJkh0qcZvayxcJ8as6Wj6zOed4TdkTYTL5biSHiskKbc4BpU
-   H2k+dH7s9nPleRT7nq4ENTToDw0litFX+kcr8HXzfqsFrTF82He02Kegy
-   ob+6twRut7cCyf2GEgy4AUX2kYpFiKKS2NrfrN7bCnSifKDzOTGyiIrRK
-   Mpd1S6NPfIoQ2eF+1LeS3Whc05S6hSDEC+PBTZFQxlLcvFp5mljsHFLbq
-   +kJNs5xVLtDUhSXBKJEBPF6UfQKPBMzKrjplwnTQYyhe90i1U8IsaqgNi
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10357"; a="360021578"
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="360021578"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 12:08:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
-   d="scan'208";a="630022328"
-Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 24 May 2022 12:08:07 -0700
-Received: from kbuild by db63a1be7222 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1ntZt1-0002Mu-5D;
-        Tue, 24 May 2022 19:08:07 +0000
-Date:   Wed, 25 May 2022 03:07:57 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk, hch@lst.de,
-        snitzer@redhat.com, damien.lemoal@opensource.wdc.com, hare@suse.de,
-        Johannes.Thumshirn@wdc.com
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
-        linux-nvme@lists.infradead.org, dm-devel@redhat.com,
-        dsterba@suse.com, jiangbo.365@bytedance.com,
-        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, jaegeuk@kernel.org,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH v5 5/7] null_blk: allow non power of 2 zoned devices
-Message-ID: <202205250258.tP8p4wdJ-lkp@intel.com>
-References: <20220523161601.58078-6-p.raghav@samsung.com>
+        Tue, 24 May 2022 16:14:26 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6BC87214;
+        Tue, 24 May 2022 13:14:22 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id EB5A447;
+        Tue, 24 May 2022 13:14:21 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id mCSfHmktOpz2; Tue, 24 May 2022 13:14:21 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 01A8A40;
+        Tue, 24 May 2022 13:14:20 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 01A8A40
+Date:   Tue, 24 May 2022 13:14:18 -0700 (PDT)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Coly Li <colyli@suse.de>,
+        Adriano Silva <adriano_da_silva@yahoo.com.br>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
+In-Reply-To: <YoxuYU4tze9DYqHy@infradead.org>
+Message-ID: <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net>
+References: <958894243.922478.1652201375900.ref@mail.yahoo.com> <958894243.922478.1652201375900@mail.yahoo.com> <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net> <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net> <YoxuYU4tze9DYqHy@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220523161601.58078-6-p.raghav@samsung.com>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Pankaj,
+Hi Christoph,
 
-Thank you for the patch! Yet something to improve:
+On Mon, 23 May 2022, Christoph Hellwig wrote:
+> ... wait.
+> 
+> Can someone explain what this is all about?  Devices with power fail 
+> protection will advertise that (using VWC flag in NVMe for example) and 
+> we will never send flushes. So anything that explicitly disables flushed 
+> will generally cause data corruption.
 
-[auto build test ERROR on axboe-block/for-next]
-[also build test ERROR on device-mapper-dm/for-next linus/master hch-configfs/for-next v5.18 next-20220524]
-[cannot apply to linux-nvme/for-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+Adriano was getting 1.5ms sync-write ioping's to an NVMe through bcache 
+(instead of the expected ~70us), so perhaps the NVMe flushes were killing 
+performance if every write was also forcing an erase cycle.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220524-011616
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: i386-randconfig-a015 (https://download.01.org/0day-ci/archive/20220525/202205250258.tP8p4wdJ-lkp@intel.com/config)
-compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 10c9ecce9f6096e18222a331c5e7d085bd813f75)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/3d3c81da0adbd40eb0d2125327b7e227582b2a37
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220524-011616
-        git checkout 3d3c81da0adbd40eb0d2125327b7e227582b2a37
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+The suggestion was to disable flushes in bcache as a troubleshooting step 
+to see if that solved the problem, but with the warning that it could be 
+unsafe.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+Questions:
 
-All errors (new ones prefixed by >>):
+1. If a user knows their disks have a non-volatile cache then is it safe 
+   to drop flushes?
 
->> ld.lld: error: undefined symbol: __umoddi3
-   >>> referenced by zoned.c:89 (drivers/block/null_blk/zoned.c:89)
-   >>>               block/null_blk/zoned.o:(null_init_zoned_dev) in archive drivers/built-in.a
+2. If not, then under what circumstances is it unsafe with a non-volatile 
+   cache?
+  
+3. Since the block layer wont send flushes when the hardware reports that 
+   the cache is non-volatile, then how do you query the device to make 
+   sure it is reporting correctly?  For NVMe you can get VWC as:
+	nvme id-ctrl -H /dev/nvme0 |grep -A1 vwc
+   
+   ...but how do you query a block device (like a RAID LUN) to make sure 
+   it is reporting a non-volatile cache correctly?
 
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+--
+Eric Wheeler
+
+
+
+> 
+> 
