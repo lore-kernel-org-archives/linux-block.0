@@ -2,112 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1589C433FE
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 14:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73AF9C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 14:39:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237538AbiEXOct (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 10:32:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33048 "EHLO
+        id S238175AbiEXOjY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 10:39:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44190 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232850AbiEXOcp (ORCPT
+        with ESMTP id S235060AbiEXOjX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 10:32:45 -0400
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD4C544E6;
-        Tue, 24 May 2022 07:32:44 -0700 (PDT)
-Received: by mail-lf1-x12b.google.com with SMTP id w14so31097031lfl.13;
-        Tue, 24 May 2022 07:32:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=4j39NJc6sU41M/B8jcObsiWIvg/EWGFaCCygzdidZ7s=;
-        b=TvsA2sgYm5FcpmwHRkqs7sSnhMfLjPPmcMRXKok5mjT2juwx1x8mTWhAc1Ge+Hd6xW
-         8HAo5jJ3Gui4w/5aG8c3U6mGHZtKVMuc3krA0GEIDomezldTxlC8lIb8U+MlxS6PaiJ5
-         CA7mOaNJKg4zsSEy8YcnkGE1O1qrOrkPQYROdnHjVmUOhQ2ylKIUM76wWcVtM/pQ2q/M
-         so9cY+r3TKWxf0o5Dl1wMEcmkwI/+NYPISg480vbwjiQuQc75bRkOLIh/74fsxsuXRco
-         O17F3Tl2q/ZS4eDttgebwwukbYNQGLnukQRBGGAvDBup02KcEninFSeC5z2qjVV+PFRb
-         4+cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=4j39NJc6sU41M/B8jcObsiWIvg/EWGFaCCygzdidZ7s=;
-        b=ZdXNy+5YrxmnalWCC+6YYfwuedEC9HTak3lmJFz4/xh83IycNjOw1mnzXuCfh7fWdA
-         udojBJ8c8sQ2vbsC7No7/5xBI+CTrZ8DtD1Q0RYQEuXq9EeJ2+rIQADvlvzucMnhJYVE
-         jISSKcIgcZSG1TLPG9TuxS8mevJpuo3tgiJlFupi0uqccpZ/fOm7vCOQlFqTvRghEOK9
-         DRB+J2NOIQhqfS1ZaZUJRKJ6h1AR5NX+Cue+GsW6CQ3XkQAvgNbkLRmTz8Q4cikp7Woz
-         VoI2v7ZBp91eZh6wGOfBG+Eodhnc6rnCW37PAA41/Dj1OmCV/XR8h/LdvY9z1hNyN6sg
-         YRXQ==
-X-Gm-Message-State: AOAM530EliY4VE6wtfaprOTE1BrMWt+/gT4jeyB7hdsltAbsTXi9q773
-        7MvHpx1nKbx6HbyaqAeC5IA=
-X-Google-Smtp-Source: ABdhPJw602Y4kbrtjezGEuz/h1G0EQTkgESbEJpilAdtsxM3Qysju7aQ0R1xKc+N1XK5tfOJ4eHc+A==
-X-Received: by 2002:a05:6512:39c1:b0:473:be4f:726d with SMTP id k1-20020a05651239c100b00473be4f726dmr20308428lfu.259.1653402762625;
-        Tue, 24 May 2022 07:32:42 -0700 (PDT)
-Received: from localhost (87-49-45-243-mobile.dk.customer.tdc.net. [87.49.45.243])
-        by smtp.gmail.com with ESMTPSA id l14-20020a2ea30e000000b0025099660220sm2526539lje.137.2022.05.24.07.32.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 07:32:42 -0700 (PDT)
-Date:   Tue, 24 May 2022 16:32:40 +0200
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Keith Busch <kbusch@fb.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv3 5/6] block/bounce: count bytes instead of sectors
-Message-ID: <20220524143240.rpnq3a5zbqy3n5ao@quentin>
-References: <20220523210119.2500150-1-kbusch@fb.com>
- <20220523210119.2500150-6-kbusch@fb.com>
+        Tue, 24 May 2022 10:39:23 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF1FF8FF90
+        for <linux-block@vger.kernel.org>; Tue, 24 May 2022 07:39:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=fqfRmBPDePeAQ/5ed4zX6XQlXizUd7fklGIsWzQ68Ao=; b=kq2+H/SaIvAyxrsB2sRUhXgck8
+        q8XVbveBLz+qWaK7BBDCZU2CYKl7VnaDJ7C33XBiOHbhGOn20KGGAcuEBoyh48UgZmH9PwK85bWnd
+        QBGGVRoe2YICqN2vEgcJK7rbT6FstCZf340Jbs2LvsOqySi0FszpyWxwof3diEMtv89NYIMvyHGfE
+        dw/PgBqH5MKpGV/WahgzYYyquj4vvVqlB/WmQjvCpI/J9wgUmmQQLl9H2dif6L9ITjXCE0y8/dI1L
+        s0ZkKrzNcti+ud8VMPJVSvBiBM5bWQNgwXa4dldExNKxBHLLHLGinmxnbNPqM5DkPWhPQvKKxXeSj
+        kS6xZgHQ==;
+Received: from [2001:4bb8:18c:7298:91b6:63de:2998:b8b2] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ntVgv-008Hdn-GU; Tue, 24 May 2022 14:39:21 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org
+Subject: [PATCH] block: take destination bvec offsets into account in bio_copy_data_iter
+Date:   Tue, 24 May 2022 16:39:19 +0200
+Message-Id: <20220524143919.1155501-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220523210119.2500150-6-kbusch@fb.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 23, 2022 at 02:01:18PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> Individual bv_len's may not be a sector size.
-> 
-> Signed-off-by: Keith Busch <kbusch@kernel.org>
-> ---
->  block/bounce.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/bounce.c b/block/bounce.c
-> index 8f7b6fe3b4db..20a43c4dbdda 100644
-> --- a/block/bounce.c
-> +++ b/block/bounce.c
-> @@ -207,17 +207,18 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
->  	struct bvec_iter iter;
->  	unsigned i = 0;
->  	bool bounce = false;
-> -	int sectors = 0;
-> +	int sectors = 0, bytes = 0;
->  
->  	bio_for_each_segment(from, *bio_orig, iter) {
->  		if (i++ < BIO_MAX_VECS)
-> -			sectors += from.bv_len >> 9;
-> +			bytes += from.bv_len;
-bv.len is unsigned int. bytes variable should also unsigned int to be on
-the safe side.
+Appartly bcache can copy into bios that do not just contain fresh
+pages but can have offsets into the bio_vecs.  Restore support for tht
+in bio_copy_data_iter.
 
->  		if (PageHighMem(from.bv_page))
->  			bounce = true;
->  	}
->  	if (!bounce)
->  		return;
->  
-> +	sectors = ALIGN_DOWN(bytes, queue_logical_block_size(q)) >> 9;
->  	if (sectors < bio_sectors(*bio_orig)) {
->  		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
->  		bio_chain(bio, *bio_orig);
-> -- 
-> 2.30.2
-> 
+Fixes: 8b679a070c53 ("block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec")
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
+diff --git a/block/bio.c b/block/bio.c
+index a3893d80dccc9..8a1b3d650a7f7 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1366,10 +1366,12 @@ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 		struct bio_vec src_bv = bio_iter_iovec(src, *src_iter);
+ 		struct bio_vec dst_bv = bio_iter_iovec(dst, *dst_iter);
+ 		unsigned int bytes = min(src_bv.bv_len, dst_bv.bv_len);
+-		void *src_buf;
++		void *src_buf = bvec_kmap_local(&src_bv);
++		void *dst_buf = bvec_kmap_local(&dst_bv);
+ 
+-		src_buf = bvec_kmap_local(&src_bv);
+-		memcpy_to_bvec(&dst_bv, src_buf);
++		memcpy(dst_buf, src_buf, bytes);
++
++		kunmap_local(dst_buf);
+ 		kunmap_local(src_buf);
+ 
+ 		bio_advance_iter_single(src, src_iter, bytes);
 -- 
-Pankaj Raghav
+2.30.2
+
