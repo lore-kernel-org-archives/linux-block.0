@@ -2,147 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A88A0C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 05:22:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FFAC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 05:34:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233675AbiEXFWv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 01:22:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57176 "EHLO
+        id S233923AbiEXFee (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 01:34:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42490 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbiEXFWv (ORCPT
+        with ESMTP id S230014AbiEXFed (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 01:22:51 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DCC97523B;
-        Mon, 23 May 2022 22:22:50 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 16494219FE;
-        Tue, 24 May 2022 05:22:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1653369769; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+GLvmgEcXiba5nd15D94qUgg8T1Rge4swFj4Nc7zveY=;
-        b=Gu5tpl9pHHLcy0h4gI4eNyZKKn8OlcjJs6HHHkn0hV9hwH5f7rdkZBX+34bKGW9Ae25UtH
-        /ar50f8k1i5WEy/X+f23ZWt42kjM1VWHo1i1Nn0Vab+YcyENhwLeXz8r5nVI/YLa5nKwZn
-        eQb1KG3pMGW0m1NDGq0Wg2F4lnU2bUs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1653369769;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=+GLvmgEcXiba5nd15D94qUgg8T1Rge4swFj4Nc7zveY=;
-        b=d2YwGc8+Yl6E6c8QbCc0m3r5RjtUToQD7Em/kfsOubDZ/Hn0gkzdxHnpZQTA7Pktgogeev
-        T9rcW8mkSnKjkbDA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id B708013ADF;
-        Tue, 24 May 2022 05:22:48 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id nXFgK6hrjGIBGwAAMHmgww
-        (envelope-from <hare@suse.de>); Tue, 24 May 2022 05:22:48 +0000
-Message-ID: <3d387876-342d-1516-92aa-24d39aa3f95c@suse.de>
-Date:   Tue, 24 May 2022 07:22:48 +0200
+        Tue, 24 May 2022 01:34:33 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7187CDD1
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 22:34:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=hiYG0doWoNHSl19CzciToKxwixUfyPZAVTaj/Lgu68w=; b=rsU7ZVUg8qbj27IiW8uZPAQD1C
+        J6cTqlibwvzq1yT6VsVFm+agQNBcKPmim3f37jMRWmybH3JVyznm8hmMXIjyFlFnfTRC2RaqqvIxh
+        orrwkttQ52nUXNOwP8wDCOYVHW5IqMle6fTglaneX1JK3qCrJzS7lqTmGDtdQUypnjNeB7TXSv1rY
+        nE3d9GWc/xlaTTtIi/CWeJbwqLORt741MMK8OglnevQ8v6nd7bNiYWLF9u5xYqMHX+ABk1bpvKayN
+        dRcFZuMjzCPhkZkOrzIcskC0ERQYapn5hJsssg33NJs8tsWdI9emj+YD3zrYcnbWqhjySU/F9i0uq
+        CESFvCGQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ntNBZ-006s2O-GI; Tue, 24 May 2022 05:34:25 +0000
+Date:   Mon, 23 May 2022 22:34:25 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     Coly Li <colyli@suse.de>,
+        Adriano Silva <adriano_da_silva@yahoo.com.br>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
+Message-ID: <YoxuYU4tze9DYqHy@infradead.org>
+References: <958894243.922478.1652201375900.ref@mail.yahoo.com>
+ <958894243.922478.1652201375900@mail.yahoo.com>
+ <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net>
+ <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH v5 6/7] null_blk: use zone_size_sects_shift for power of 2
- zoned devices
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk, hch@lst.de,
-        snitzer@redhat.com, damien.lemoal@opensource.wdc.com,
-        Johannes.Thumshirn@wdc.com
-Cc:     linux-nvme@lists.infradead.org, dm-devel@redhat.com,
-        dsterba@suse.com, jiangbo.365@bytedance.com,
-        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
-        linux-block@vger.kernel.org, jaegeuk@kernel.org,
-        Damien Le Moal <damien.lemoal@wdc.com>
-References: <20220523161601.58078-1-p.raghav@samsung.com>
- <CGME20220523161612eucas1p102a76ba431c934230309042521018915@eucas1p1.samsung.com>
- <20220523161601.58078-7-p.raghav@samsung.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <20220523161601.58078-7-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/22 18:16, Pankaj Raghav wrote:
-> Instead of doing is_power_of_2 and ilog2 operation for every IO, cache
-> the zone_size_sects_shift variable and use it for power of 2 zoned
-> devices.
-> 
-> This variable will be set to zero for non power of 2 zoned devices.
-> 
-> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
-> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
-> ---
->   drivers/block/null_blk/null_blk.h |  6 ++++++
->   drivers/block/null_blk/zoned.c    | 10 ++++++++--
->   2 files changed, 14 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/block/null_blk/null_blk.h b/drivers/block/null_blk/null_blk.h
-> index 78eb56b0ca55..3d6e41a9491f 100644
-> --- a/drivers/block/null_blk/null_blk.h
-> +++ b/drivers/block/null_blk/null_blk.h
-> @@ -74,6 +74,12 @@ struct nullb_device {
->   	unsigned int imp_close_zone_no;
->   	struct nullb_zone *zones;
->   	sector_t zone_size_sects;
-> +	/*
-> +	 * zone_size_sects_shift is only useful when the zone size is
-> +	 * power of 2. This variable is set to zero when zone size is non
-> +	 * power of 2.
-> +	 */
-> +	unsigned int zone_size_sects_shift;
->   	bool need_zone_res_mgmt;
->   	spinlock_t zone_res_lock;
->   
-> diff --git a/drivers/block/null_blk/zoned.c b/drivers/block/null_blk/zoned.c
-> index 00c34e65ef0a..806bef98ac83 100644
-> --- a/drivers/block/null_blk/zoned.c
-> +++ b/drivers/block/null_blk/zoned.c
-> @@ -13,8 +13,8 @@ static inline sector_t mb_to_sects(unsigned long mb)
->   
->   static inline unsigned int null_zone_no(struct nullb_device *dev, sector_t sect)
->   {
-> -	if (is_power_of_2(dev->zone_size_sects))
-> -		return sect >> ilog2(dev->zone_size_sects);
-> +	if (dev->zone_size_sects_shift)
-> +		return sect >> dev->zone_size_sects_shift;
->   
->   	return div64_u64(sect, dev->zone_size_sects);
->   }
-> @@ -82,6 +82,12 @@ int null_init_zoned_dev(struct nullb_device *dev, struct request_queue *q)
->   	zone_capacity_sects = mb_to_sects(dev->zone_capacity);
->   	dev_capacity_sects = mb_to_sects(dev->size);
->   	dev->zone_size_sects = mb_to_sects(dev->zone_size);
-> +
-> +	if (is_power_of_2(dev->zone_size_sects))
-> +		dev->zone_size_sects_shift = ilog2(dev->zone_size_sects);
-> +	else
-> +		dev->zone_size_sects_shift = 0;
-> +
->   	dev->nr_zones =
->   		div64_u64(roundup(dev_capacity_sects, dev->zone_size_sects),
->   			  dev->zone_size_sects);
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+... wait.
 
-Cheers,
+Can someone explain what this is all about?  Devices with power fail
+protection will advertise that (using VWC flag in NVMe for example) and
+we will never send flushes.  So anything that explicitly disables
+flushed will generally cause data corruption.
 
-Hannes
--- 
-Dr. Hannes Reinecke                Kernel Storage Architect
-hare@suse.de                              +49 911 74053 688
-SUSE Software Solutions GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), Geschäftsführer: Ivo Totev, Andrew
-Myers, Andrew McDonald, Martje Boudien Moerman
