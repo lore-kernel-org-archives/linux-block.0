@@ -2,64 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04CFAC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 15:38:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DF59C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 19:08:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238002AbiEXPij (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 11:38:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40352 "EHLO
+        id S238474AbiEXTIf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 15:08:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236252AbiEXPii (ORCPT
+        with ESMTP id S241126AbiEXTIW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 11:38:38 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6DD560042;
-        Tue, 24 May 2022 08:38:36 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 52FDE61738;
-        Tue, 24 May 2022 15:38:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA2F6C34113;
-        Tue, 24 May 2022 15:38:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653406715;
-        bh=/C51yg+CCjCOCB+JuDI7mFSSoCnKtz1WFrfWQAnKBdc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ToxsMttbGO/2yHoHh0UE6b0LgwRjYUPCH/BMC4ShNwsw3lKLJXL9IjSK18LcwUL1I
-         +29AGbloMBik4i4Ph1EXKu9LJqJ1/1OOPONb2y9IcL/RSH4MQiRWS3tcfR4vThgBN1
-         T7n9JDlJ3+18i5F90xE1jhh7Y74Dcy7T6Zcyja4NBTnlGkalSjvfUTFYOOpdrrE6M7
-         lN8sUVlodqf6+d6Fa5XHm3Lkbq75cg/C0G9sDbyUHvEhErpPFYXdQxYt7bPaHzk3j1
-         7t0WAkdZGlbz+f9NFKPl5p+/AWL/Hu/mrH+7BRq/U/Sj1U43o7S62QbsGB5p2szS30
-         0FGp/Qsp2DWyQ==
-Date:   Tue, 24 May 2022 09:38:32 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Pankaj Raghav <pankydev8@gmail.com>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org
-Subject: Re: [PATCHv3 1/6] block/bio: remove duplicate append pages code
-Message-ID: <Yoz7+O2CAQTNfvlV@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220523210119.2500150-1-kbusch@fb.com>
- <20220523210119.2500150-2-kbusch@fb.com>
- <20220524141754.msmt6s4spm4istsb@quentin>
+        Tue, 24 May 2022 15:08:22 -0400
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B0FF3EA9C;
+        Tue, 24 May 2022 12:08:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1653419292; x=1684955292;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=McrA50umS7uFNif0OKWyvZB3Gg9wX6U3OTSnaLvoS2o=;
+  b=DLh6++HQLO4bH2PEb83CowW9IPaPK47mgCytTW1ObJmk/lINBJR9tb9T
+   wc4cnLUVksJkh0qcZvayxcJ8as6Wj6zOed4TdkTYTL5biSHiskKbc4BpU
+   H2k+dH7s9nPleRT7nq4ENTToDw0litFX+kcr8HXzfqsFrTF82He02Kegy
+   ob+6twRut7cCyf2GEgy4AUX2kYpFiKKS2NrfrN7bCnSifKDzOTGyiIrRK
+   Mpd1S6NPfIoQ2eF+1LeS3Whc05S6hSDEC+PBTZFQxlLcvFp5mljsHFLbq
+   +kJNs5xVLtDUhSXBKJEBPF6UfQKPBMzKrjplwnTQYyhe90i1U8IsaqgNi
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10357"; a="360021578"
+X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
+   d="scan'208";a="360021578"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 May 2022 12:08:11 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,250,1647327600"; 
+   d="scan'208";a="630022328"
+Received: from lkp-server01.sh.intel.com (HELO db63a1be7222) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 24 May 2022 12:08:07 -0700
+Received: from kbuild by db63a1be7222 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1ntZt1-0002Mu-5D;
+        Tue, 24 May 2022 19:08:07 +0000
+Date:   Wed, 25 May 2022 03:07:57 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Pankaj Raghav <p.raghav@samsung.com>, axboe@kernel.dk, hch@lst.de,
+        snitzer@redhat.com, damien.lemoal@opensource.wdc.com, hare@suse.de,
+        Johannes.Thumshirn@wdc.com
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-nvme@lists.infradead.org, dm-devel@redhat.com,
+        dsterba@suse.com, jiangbo.365@bytedance.com,
+        linux-kernel@vger.kernel.org, gost.dev@samsung.com,
+        linux-block@vger.kernel.org, jaegeuk@kernel.org,
+        Pankaj Raghav <p.raghav@samsung.com>,
+        Luis Chamberlain <mcgrof@kernel.org>
+Subject: Re: [PATCH v5 5/7] null_blk: allow non power of 2 zoned devices
+Message-ID: <202205250258.tP8p4wdJ-lkp@intel.com>
+References: <20220523161601.58078-6-p.raghav@samsung.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220524141754.msmt6s4spm4istsb@quentin>
+In-Reply-To: <20220523161601.58078-6-p.raghav@samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 24, 2022 at 04:17:54PM +0200, Pankaj Raghav wrote:
-> On Mon, May 23, 2022 at 02:01:14PM -0700, Keith Busch wrote:
-> > -	if (WARN_ON_ONCE(!max_append_sectors))
-> > -		return 0;
-> I don't see this check in the append path. Should it be added in
-> bio_iov_add_zone_append_page() function?
+Hi Pankaj,
 
-I'm not sure this check makes a lot of sense. If it just returns 0 here, then
-won't that get bio_iov_iter_get_pages() stuck in an infinite loop? The bio
-isn't filling, the iov isn't advancing, and 0 indicates keep-going.
+Thank you for the patch! Yet something to improve:
+
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on device-mapper-dm/for-next linus/master hch-configfs/for-next v5.18 next-20220524]
+[cannot apply to linux-nvme/for-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220524-011616
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: i386-randconfig-a015 (https://download.01.org/0day-ci/archive/20220525/202205250258.tP8p4wdJ-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project 10c9ecce9f6096e18222a331c5e7d085bd813f75)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/3d3c81da0adbd40eb0d2125327b7e227582b2a37
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220524-011616
+        git checkout 3d3c81da0adbd40eb0d2125327b7e227582b2a37
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=i386 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+>> ld.lld: error: undefined symbol: __umoddi3
+   >>> referenced by zoned.c:89 (drivers/block/null_blk/zoned.c:89)
+   >>>               block/null_blk/zoned.o:(null_init_zoned_dev) in archive drivers/built-in.a
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
