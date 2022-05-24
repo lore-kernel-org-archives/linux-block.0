@@ -2,59 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61FFAC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 05:34:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29948C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 05:56:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233923AbiEXFee (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 01:34:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42490 "EHLO
+        id S232999AbiEXF4x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 01:56:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230014AbiEXFed (ORCPT
+        with ESMTP id S233852AbiEXF4t (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 01:34:33 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A7187CDD1
-        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 22:34:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=hiYG0doWoNHSl19CzciToKxwixUfyPZAVTaj/Lgu68w=; b=rsU7ZVUg8qbj27IiW8uZPAQD1C
-        J6cTqlibwvzq1yT6VsVFm+agQNBcKPmim3f37jMRWmybH3JVyznm8hmMXIjyFlFnfTRC2RaqqvIxh
-        orrwkttQ52nUXNOwP8wDCOYVHW5IqMle6fTglaneX1JK3qCrJzS7lqTmGDtdQUypnjNeB7TXSv1rY
-        nE3d9GWc/xlaTTtIi/CWeJbwqLORt741MMK8OglnevQ8v6nd7bNiYWLF9u5xYqMHX+ABk1bpvKayN
-        dRcFZuMjzCPhkZkOrzIcskC0ERQYapn5hJsssg33NJs8tsWdI9emj+YD3zrYcnbWqhjySU/F9i0uq
-        CESFvCGQ==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntNBZ-006s2O-GI; Tue, 24 May 2022 05:34:25 +0000
-Date:   Mon, 23 May 2022 22:34:25 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Wheeler <bcache@lists.ewheeler.net>
-Cc:     Coly Li <colyli@suse.de>,
-        Adriano Silva <adriano_da_silva@yahoo.com.br>,
-        Bcache Linux <linux-bcache@vger.kernel.org>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        linux-block@vger.kernel.org
-Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
- Bcache in writes direct with fsync)
-Message-ID: <YoxuYU4tze9DYqHy@infradead.org>
-References: <958894243.922478.1652201375900.ref@mail.yahoo.com>
- <958894243.922478.1652201375900@mail.yahoo.com>
- <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net>
- <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
+        Tue, 24 May 2022 01:56:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AED21BB2;
+        Mon, 23 May 2022 22:56:46 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 6DB9E219F0;
+        Tue, 24 May 2022 05:56:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653371805; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=naQIfyYNGj1jh99yLG3sNyAz1D0BD52kAYTi1iUqw7M=;
+        b=U+wU2N3qlCVAXvXAxfWykfJdeKKZYUu7UpmTqVtj6TFQrLZxr7dEGeCmgzyXofeK+0lfPU
+        vOAGbCWKzA0riFTKXdwq5qoIEQgIR4zsi/TeSafiGz7hp0qtqj2kIRvZFt2TkV9oPgNopg
+        yFGSv+cwJ5yB54d2znhbvZ8LiDOPSSI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653371805;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=naQIfyYNGj1jh99yLG3sNyAz1D0BD52kAYTi1iUqw7M=;
+        b=9qBfR2fcPEd1WkhtjBqGbFj+k0834sNkI67cTAlCNSzwRb9I+xeQIJewcA5O5EGNqobOPE
+        5kmoy5iCTyvgPnBQ==
+Received: from adalid.arch.suse.de (adalid.arch.suse.de [10.161.8.13])
+        by relay2.suse.de (Postfix) with ESMTP id 621382C142;
+        Tue, 24 May 2022 05:56:45 +0000 (UTC)
+Received: by adalid.arch.suse.de (Postfix, from userid 16045)
+        id 317A45194632; Tue, 24 May 2022 07:56:45 +0200 (CEST)
+From:   Hannes Reinecke <hare@suse.de>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        James Bottomley <james.bottomley@hansenpartnership.com>,
+        linux-block@vger.kernel.org, linux-scsi@vger.kernel.org,
+        Hannes Reinecke <hare@suse.de>
+Subject: [PATCH 0/2] block,scsi: BLK_STS_AGAIN clarification
+Date:   Tue, 24 May 2022 07:56:29 +0200
+Message-Id: <20220524055631.85480-1-hare@suse.de>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-... wait.
+Hi all,
 
-Can someone explain what this is all about?  Devices with power fail
-protection will advertise that (using VWC flag in NVMe for example) and
-we will never send flushes.  So anything that explicitly disables
-flushed will generally cause data corruption.
+BLK_STS_AGAIN should only be used under very specify circumstances,
+so we should better document that. And modify the SCSI midlayer to
+not return it, of course.
+
+As usual, comments and reviews are welcome.
+
+Hannes Reinecke (2):
+  block: document BLK_STS_AGAIN usage
+  scsi: return BLK_STS_TRANSPORT for ALUA transitioning
+
+ drivers/scsi/scsi_lib.c   | 2 +-
+ include/linux/blk_types.h | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
+
+-- 
+2.29.2
 
