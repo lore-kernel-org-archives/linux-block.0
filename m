@@ -2,84 +2,144 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F04AC433F5
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 11:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2167EC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 11:47:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236567AbiEXLrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 07:47:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
+        id S234288AbiEXLrz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 07:47:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235046AbiEXLrT (ORCPT
+        with ESMTP id S232178AbiEXLrx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 07:47:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 016B02AC57
-        for <linux-block@vger.kernel.org>; Tue, 24 May 2022 04:47:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653392838;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=sGMVpibRIlNAjHxwoYd+XhOfhbPAbDd/looSsIjvotA=;
-        b=SlVYKfgDiKQ+Fg+aP2JVoBaAmOwfHY038CrL5SnKrGYzmYRCsHGrgn2mxC2gOmWKCHMdyG
-        BLNHgKfP5pIY/mmya0D0z+hus5XhvBoXvMXBCPChzU+2nq76ydouLQbY0eRRIoOoFSttU6
-        +XH7l8oJlMvWfIbgpnuGRxsmBDYO2Bc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-166-FZGXZKJ0Me6V5Rf0u_pHXg-1; Tue, 24 May 2022 07:47:15 -0400
-X-MC-Unique: FZGXZKJ0Me6V5Rf0u_pHXg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E13A101AA45;
-        Tue, 24 May 2022 11:47:14 +0000 (UTC)
-Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 120E7401E9D;
-        Tue, 24 May 2022 11:47:08 +0000 (UTC)
-Date:   Tue, 24 May 2022 19:47:03 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, shinichiro.kawasaki@wdc.com,
-        dan.j.williams@intel.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org, ming.lei@redhat.com
-Subject: Re: [PATCH] block: remove per-disk debugfs files in
- blk_unregister_queue
-Message-ID: <YozFt0qFCvZVt67m@T590>
-References: <20220524083325.833981-1-hch@lst.de>
+        Tue, 24 May 2022 07:47:53 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A142122BCA;
+        Tue, 24 May 2022 04:47:52 -0700 (PDT)
+Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L6snH1B3kzQk91;
+        Tue, 24 May 2022 19:44:51 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 19:47:50 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 24 May 2022 19:47:49 +0800
+Subject: Re: [PATCH -next v4 4/4] blk-throttle: fix io hung due to config
+ updates
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220523082633.2324980-1-yukuai3@huawei.com>
+ <20220523082633.2324980-5-yukuai3@huawei.com>
+ <20220524095936.GB2434@blackbody.suse.cz>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <9b3712a1-1f6d-9c9a-4133-a058fe3b111c@huawei.com>
+Date:   Tue, 24 May 2022 19:47:49 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220524083325.833981-1-hch@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+In-Reply-To: <20220524095936.GB2434@blackbody.suse.cz>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 24, 2022 at 10:33:25AM +0200, Christoph Hellwig wrote:
-> The block debugfs files are created in blk_register_queue, which is
-> called by add_disk and use a naming scheme based on the disk_name.
-> After del_gendisk returns that name can be reused and thus we must not
-> leave these debugfs files around, otherwise the kernel is unhappy
-> and spews messages like:
+在 2022/05/24 17:59, Michal Koutný 写道:
+> On Mon, May 23, 2022 at 04:26:33PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>> Fix the problem by respecting the time that throttled bio aready waited.
+>> In order to do that, add new fields to record how many bytes/io already
+>> waited, and use it to calculate wait time for throttled bio under new
+>> configuration.
 > 
-> 	Directory XXXXX with parent 'block' already present!
+> This new approach is correctly conserving the bandwidth upon changes.
+> (Looking and BPS paths.)
 > 
-> and the newly created devices will not have working debugfs files.
+>>
+>> Some simple test:
+>> 1)
+>> cd /sys/fs/cgroup/blkio/
+>> echo $$ > cgroup.procs
+>> echo "8:0 2048" > blkio.throttle.write_bps_device
+>> {
+>>          sleep 3
+>>          echo "8:0 1024" > blkio.throttle.write_bps_device
+>> } &
+>> sleep 1
+>> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
+>>
+>> 2)
+>> cd /sys/fs/cgroup/blkio/
+>> echo $$ > cgroup.procs
+>> echo "8:0 1024" > blkio.throttle.write_bps_device
+>> {
+>>          sleep 5
+>>          echo "8:0 2048" > blkio.throttle.write_bps_device
+>> } &
+>> sleep 1
+>> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
+>>
 > 
-> Move the unregistration to blk_unregister_queue instead (which matches
-> the sysfs unregistration) to make sure the debugfs life time rules match
-> those of the disk name.
+> It's interesting that you're getting these numbers (w/patch)
+> 
+>> test results: io finish time
+>> 	before this patch	with this patch
+>> 1)	10s			6s
+>> 2)	8s			6s
+> 
+> wait := (disp + bio - Δt*l_old) / l_new
+> 
+> 1)
+> wait = (0k + 8k - 3s*2k/s) / 1k/s = 2s -> i.e. 5s absolute
+> 
+> 2)
+> wait = (0k + 8k - 5s*1k/s) / 2k/s = 2.5s -> i.e. 6.5s absolute
+> 
+> Are you numbers noisy+rounded or do I still mis anything?
+Hi, Michal
 
-Not look into details yet, but as one blk-mq debugfs user, I don't like
-the idea, since I often see io hang issue when calling
-blk_mq_freeze_queue_wait(), and blk-mq debugfs is very helpful for
-investigating this kind of issue.
+The way of your caculation is right, however, it seems like you missed
+that io is dispatched after 1s:
 
-But now blk-mq debugfs is gone with this patch __before__ draining IO in
-del_gendisk, and it becomes not useful as before.
-
+sleep 1  -> here
+dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
+> 
+> (Also isn't it worth having this more permanent in tools/testing/selftest?)
+> 
+>> +static void tg_update_skipped(struct throtl_grp *tg)
+>> +{
+>> +	if (tg->service_queue.nr_queued[READ])
+>> +		__tg_update_skipped(tg, READ);
+>> +	if (tg->service_queue.nr_queued[WRITE])
+>> +		__tg_update_skipped(tg, WRITE);
+> 
+> On one hand, the callers of tg_update_skipped() know whether R/W limit
+> is changed, so only the respective variant could be called.
+> On the other hand, this conditions look implied by tg->flags &
+> THROTL_TG_PENDING.
+> (Just noting, it's likely still not possibly to pass the skipped value
+> only via stack.)
+> 
+> 
+>> @@ -115,6 +115,10 @@ struct throtl_grp {
+>>   	uint64_t bytes_disp[2];
+>>   	/* Number of bio's dispatched in current slice */
+>>   	unsigned int io_disp[2];
+>> +	/* Number of bytes will be skipped in current slice */
+>> +	uint64_t bytes_skipped[2];
+>> +	/* Number of bio's will be skipped in current slice */
+>> +	unsigned int io_skipped[2];
+> 
+> Please add a comment these fields exists to facilitate config updates
+> (the bytes to be skipped is sort of obvious from the name :-).
+Ok, will do that in next iteration.
 
 Thanks,
-Ming
-
+Kuai
