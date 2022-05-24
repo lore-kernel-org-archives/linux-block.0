@@ -2,109 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE036C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 15:19:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8CC0C433FE
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 15:20:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236047AbiEXPT6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 11:19:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33346 "EHLO
+        id S231649AbiEXPUK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 11:20:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33472 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235078AbiEXPT5 (ORCPT
+        with ESMTP id S235596AbiEXPUK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 11:19:57 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 291CD19F87;
-        Tue, 24 May 2022 08:19:56 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id p4so29968727lfg.4;
-        Tue, 24 May 2022 08:19:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=PfBkeEIe7SnLZ5YxvF7Yu7ggG7hoYDnozcRlnP1XlkM=;
-        b=MFQuhR8xgZf1+SgiQXaKoeCp3B57M0EgNLlR83nMJUX2SPZjU+O5mSDZV6ISvFWyjk
-         R//FLYj++J3jPoptd4FPhgDII+TQAd24Gj2UIslJe2ICk8dpnJLviDM8WNMOeOtB5LX1
-         gncM81eKMEsUMRt6p+oF82WrW4IN9Qygv8I//2bREjx11YsDg1rRACqTg2EOKKg0/va5
-         pcVyw0G/rRmkh+EzIH5ic2Tmm0GMQxkueK7hQBktD1+lSkUQn4RqJq80NPzc3Pm7/2Mb
-         HhFTOPKu/b5PFM7nOKznbhvOV63v0IBKNe4ywUp9og/iGSWOQ8of+tFF+vl53IY0sbpQ
-         3ADg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=PfBkeEIe7SnLZ5YxvF7Yu7ggG7hoYDnozcRlnP1XlkM=;
-        b=JByLSnejvKn31x9e2eOCZe1jYJMhOx1K96yGWLrYkS9xMgLDAHNpRtyGuKB7IUu7aH
-         Xo8wb+5rBDLaVoxV1XqZ7mSyn88NrPXzfqPTVewo1mOWY8GSeYU/nl8EKdn0WNVfe7bj
-         l78V1DFDGhnCrsMnbvqPYERYLtVJWycsLWIYzkBdWSXt8kqCEZnUR8dnVpVXzR6O69my
-         lXXgrvmK+DdLbIQ5BDRNn5vZPPd4cyVt38tiIAnWJyJwSaQ6IH8atcS0pCnFIHwqMMXF
-         h4Sz9RrgIqlGRS5TDzqJCARMp0ZMk4kqLfCHY5HZ0OA6Wsx0pxPzPuvu8Ae2+BlGm3F6
-         tAbA==
-X-Gm-Message-State: AOAM530u1aCDC0C7Td0Z5Ximqa0n4rOrFSepad8OnG8WhxFFNqBRVplU
-        H2+383eEJsdZj2ucQZXkweE=
-X-Google-Smtp-Source: ABdhPJzhTr/RdxlKuqjBVY5tdK2ZfKA2s5U/DczQGJy970Ev+DiGYCWRYk8Q+PclJk/JBwMHvxXgUA==
-X-Received: by 2002:a05:6512:39c1:b0:44a:e25d:47fd with SMTP id k1-20020a05651239c100b0044ae25d47fdmr19543149lfu.580.1653405594486;
-        Tue, 24 May 2022 08:19:54 -0700 (PDT)
-Received: from localhost (87-49-45-243-mobile.dk.customer.tdc.net. [87.49.45.243])
-        by smtp.gmail.com with ESMTPSA id a23-20020a056512201700b0047255d210f2sm2584706lfb.33.2022.05.24.08.19.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 May 2022 08:19:53 -0700 (PDT)
-Date:   Tue, 24 May 2022 17:19:52 +0200
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Keith Busch <kbusch@fb.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, Keith Busch <kbusch@kernel.org>,
-        Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCHv3 6/6] block: relax direct io memory alignment
-Message-ID: <20220524151952.mcv6pqwwrd5bebli@quentin>
-References: <20220523210119.2500150-1-kbusch@fb.com>
- <20220523210119.2500150-7-kbusch@fb.com>
+        Tue, 24 May 2022 11:20:10 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772845003B;
+        Tue, 24 May 2022 08:20:09 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 13016616EF;
+        Tue, 24 May 2022 15:20:09 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0E6EC34113;
+        Tue, 24 May 2022 15:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653405608;
+        bh=IW3RND1D6FLNAz8IY81qq+Ng2PVrV4Y+5Y+V1m1ThxU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ux22iTMayVuaz9NVAe02w7VtIXotOlPsjqbvrADuy8iUaURlY69yKXwTUc+fp+Oth
+         WFIqvhQMCa1ithe+Nev2NIxnutxuP7ECqooUgFHrnS7zCWDx6ME59VkKbSGAJsskbI
+         lcKoBOb+rtqF8UATejhz6YG1gzLi5tJ00511fgdLUIIVWxWRzu5aVSSDUoMLSRoLUa
+         m5UakIt7GhReQ2v+G6WPt2ygiTqST5l79kLt973xfbmenlMpcizB99UlrGcsfdO3Lg
+         vOq3JbiMM1hS2GjtXayUMFx+qjQz4qrX9Dv5vq6RPSjWvN5IXNbCkdK6TZ6DRZr623
+         nKC8A5jYQqu+A==
+Date:   Tue, 24 May 2022 09:20:04 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
+Subject: Re: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
+Message-ID: <Yoz3pG97VmdT4bmE@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220420143110.2679002-1-ming.lei@redhat.com>
+ <YowMVODoNIyaqVdC@kbusch-mbp.dhcp.thefacebook.com>
+ <YowpjtLfZPld1H6T@T590>
+ <YoxKz51EAu3j2qwK@kbusch-mbp.dhcp.thefacebook.com>
+ <YoxgU5/P460FZ3rl@kbusch-mbp.dhcp.thefacebook.com>
+ <Yox7Kp2N1NzSes0C@T590>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220523210119.2500150-7-kbusch@fb.com>
+In-Reply-To: <Yox7Kp2N1NzSes0C@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 23, 2022 at 02:01:19PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> diff --git a/block/fops.c b/block/fops.c
-> index b9b83030e0df..218e4a8b92aa 100644
-> --- a/block/fops.c
-> +++ b/block/fops.c
-> @@ -42,6 +42,16 @@ static unsigned int dio_bio_write_op(struct kiocb *iocb)
->  	return op;
->  }
->  
-> +static int blkdev_dio_aligned(struct block_device *bdev, loff_t pos,
-> +			      struct iov_iter *iter)
-> +{
-> +	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-Minor nit as ALIGN* macros have been used in other places, this
-alignment check can also be changed to using IS_ALIGNED macro:
-if (!IS_ALIGNED(pos | iov_iter_count(iter), bdev_logical_block_size(bdev)))
-> +		return -EINVAL;
-> +	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
-> +		return -EINVAL;
-> +	return 0;
-> +}
-> +
->  #define DIO_INLINE_BIO_VECS 4
->  
->  static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
-> @@ -54,9 +64,9 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
->  	struct bio bio;
->  	ssize_t ret;
->  
-> -	if ((pos | iov_iter_alignment(iter)) &
-> -	    (bdev_logical_block_size(bdev) - 1))
-> -		return -EINVAL;
-> +	ret = blkdev_dio_aligned(bdev, pos, iter);
-> +	if (ret)
-> +		return ret;
->  
+On Tue, May 24, 2022 at 02:28:58PM +0800, Ming Lei wrote:
+> On Mon, May 23, 2022 at 10:34:27PM -0600, Keith Busch wrote:
+> > On Mon, May 23, 2022 at 09:02:39PM -0600, Keith Busch wrote:
+> > > Here's a bandaid, though I assume it'll break something...
+> > 
+> > On second thought, maybe this is okay! The encoded hctx doesn't change after
+> > this call, which is the only thing polling cares about. The tag portion doesn't
+> > matter.
+> 
+> I guess it still may change in case that nvme mpath bio is requeued.
 
--- 
-Pankaj Raghav
+A path failover requeue strips the REQ_POLL flag out of the bio, so it would be
+interrupt driven at that point.
