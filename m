@@ -2,200 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5599FC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 10:24:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F04AC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 11:47:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236061AbiEXKYF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 06:24:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48740 "EHLO
+        id S236567AbiEXLrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 07:47:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60914 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236062AbiEXKYE (ORCPT
+        with ESMTP id S235046AbiEXLrT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 06:24:04 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ADEA84A07;
-        Tue, 24 May 2022 03:24:03 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 53F0221A33;
-        Tue, 24 May 2022 10:24:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1653387842; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
+        Tue, 24 May 2022 07:47:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 016B02AC57
+        for <linux-block@vger.kernel.org>; Tue, 24 May 2022 04:47:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653392838;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=wmJpe9/Kua8zJtz04nyJuieA4qrmKJ7yZERYmqpEk9U=;
-        b=kL3pgzhQwy+p9basbRNDyUTjsHRB0/JIOa1/SjQHHY3uHXlWmg38gv9arjBXjieWxnrgik
-        +sUBk6YlXy99wl2Y+0uKWoTekZOcRrt5jEGveaUFYybtwlfZ5PuAaBgMcEvrs33ZGZyknT
-        9XSOrACj/AuX7r+yGt66Rvxp8s9jCjo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1653387842;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=wmJpe9/Kua8zJtz04nyJuieA4qrmKJ7yZERYmqpEk9U=;
-        b=2ZUYf07VUG2cNKyTEZCRjJXAmLYGky1fYaxUEx6AD6kgTdWnRdxtXyMYa9f9Ypkoz0/INk
-        BkDHewXqwmkwNRDw==
-Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
-        by relay2.suse.de (Postfix) with ESMTP id 11E602C141;
-        Tue, 24 May 2022 10:23:59 +0000 (UTC)
-From:   Coly Li <colyli@suse.de>
-To:     axboe@kernel.dk
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Coly Li <colyli@suse.de>,
-        Nikhil Kshirsagar <nkshirsagar@gmail.com>,
-        stable@vger.kernel.org
-Subject: [PATCH 4/4] bcache: avoid journal no-space deadlock by reserving 1 journal bucket
-Date:   Tue, 24 May 2022 18:23:36 +0800
-Message-Id: <20220524102336.10684-5-colyli@suse.de>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220524102336.10684-1-colyli@suse.de>
-References: <20220524102336.10684-1-colyli@suse.de>
+        bh=sGMVpibRIlNAjHxwoYd+XhOfhbPAbDd/looSsIjvotA=;
+        b=SlVYKfgDiKQ+Fg+aP2JVoBaAmOwfHY038CrL5SnKrGYzmYRCsHGrgn2mxC2gOmWKCHMdyG
+        BLNHgKfP5pIY/mmya0D0z+hus5XhvBoXvMXBCPChzU+2nq76ydouLQbY0eRRIoOoFSttU6
+        +XH7l8oJlMvWfIbgpnuGRxsmBDYO2Bc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-166-FZGXZKJ0Me6V5Rf0u_pHXg-1; Tue, 24 May 2022 07:47:15 -0400
+X-MC-Unique: FZGXZKJ0Me6V5Rf0u_pHXg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E13A101AA45;
+        Tue, 24 May 2022 11:47:14 +0000 (UTC)
+Received: from T590 (ovpn-8-20.pek2.redhat.com [10.72.8.20])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 120E7401E9D;
+        Tue, 24 May 2022 11:47:08 +0000 (UTC)
+Date:   Tue, 24 May 2022 19:47:03 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, shinichiro.kawasaki@wdc.com,
+        dan.j.williams@intel.com, yukuai3@huawei.com,
+        linux-block@vger.kernel.org, ming.lei@redhat.com
+Subject: Re: [PATCH] block: remove per-disk debugfs files in
+ blk_unregister_queue
+Message-ID: <YozFt0qFCvZVt67m@T590>
+References: <20220524083325.833981-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220524083325.833981-1-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The journal no-space deadlock was reported time to time. Such deadlock
-can happen in the following situation.
+On Tue, May 24, 2022 at 10:33:25AM +0200, Christoph Hellwig wrote:
+> The block debugfs files are created in blk_register_queue, which is
+> called by add_disk and use a naming scheme based on the disk_name.
+> After del_gendisk returns that name can be reused and thus we must not
+> leave these debugfs files around, otherwise the kernel is unhappy
+> and spews messages like:
+> 
+> 	Directory XXXXX with parent 'block' already present!
+> 
+> and the newly created devices will not have working debugfs files.
+> 
+> Move the unregistration to blk_unregister_queue instead (which matches
+> the sysfs unregistration) to make sure the debugfs life time rules match
+> those of the disk name.
 
-When all journal buckets are fully filled by active jset with heavy
-write I/O load, the cache set registration (after a reboot) will load
-all active jsets and inserting them into the btree again (which is
-called journal replay). If a journaled bkey is inserted into a btree
-node and results btree node split, new journal request might be
-triggered. For example, the btree grows one more level after the node
-split, then the root node record in cache device super block will be
-upgrade by bch_journal_meta() from bch_btree_set_root(). But there is no
-space in journal buckets, the journal replay has to wait for new journal
-bucket to be reclaimed after at least one journal bucket replayed. This
-is one example that how the journal no-space deadlock happens.
+Not look into details yet, but as one blk-mq debugfs user, I don't like
+the idea, since I often see io hang issue when calling
+blk_mq_freeze_queue_wait(), and blk-mq debugfs is very helpful for
+investigating this kind of issue.
 
-The solution to avoid the deadlock is to reserve 1 journal bucket in
-run time, and only permit the reserved journal bucket to be used during
-cache set registration procedure for things like journal replay. Then
-the journal space will never be fully filled, there is no chance for
-journal no-space deadlock to happen anymore.
+But now blk-mq debugfs is gone with this patch __before__ draining IO in
+del_gendisk, and it becomes not useful as before.
 
-This patch adds a new member "bool do_reserve" in struct journal, it is
-inititalized to 0 (false) when struct journal is allocated, and set to
-1 (true) by bch_journal_space_reserve() when all initialization done in
-run_cache_set(). In the run time when journal_reclaim() tries to
-allocate a new journal bucket, free_journal_buckets() is called to check
-whether there are enough free journal buckets to use. If there is only
-1 free journal bucket and journal->do_reserve is 1 (true), the last
-bucket is reserved and free_journal_buckets() will return 0 to indicate
-no free journal bucket. Then journal_reclaim() will give up, and try
-next time to see whetheer there is free journal bucket to allocate. By
-this method, there is always 1 jouranl bucket reserved in run time.
 
-During the cache set registration, journal->do_reserve is 0 (false), so
-the reserved journal bucket can be used to avoid the no-space deadlock.
-
-Reported-by: Nikhil Kshirsagar <nkshirsagar@gmail.com>
-Signed-off-by: Coly Li <colyli@suse.de>
-Cc: stable@vger.kernel.org
----
- drivers/md/bcache/journal.c | 31 ++++++++++++++++++++++++++-----
- drivers/md/bcache/journal.h |  2 ++
- drivers/md/bcache/super.c   |  1 +
- 3 files changed, 29 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/md/bcache/journal.c b/drivers/md/bcache/journal.c
-index df5347ea450b..e5da469a4235 100644
---- a/drivers/md/bcache/journal.c
-+++ b/drivers/md/bcache/journal.c
-@@ -405,6 +405,11 @@ int bch_journal_replay(struct cache_set *s, struct list_head *list)
- 	return ret;
- }
- 
-+void bch_journal_space_reserve(struct journal *j)
-+{
-+	j->do_reserve = true;
-+}
-+
- /* Journalling */
- 
- static void btree_flush_write(struct cache_set *c)
-@@ -621,12 +626,30 @@ static void do_journal_discard(struct cache *ca)
- 	}
- }
- 
-+static unsigned int free_journal_buckets(struct cache_set *c)
-+{
-+	struct journal *j = &c->journal;
-+	struct cache *ca = c->cache;
-+	struct journal_device *ja = &c->cache->journal;
-+	unsigned int n;
-+
-+	/* In case njournal_buckets is not power of 2 */
-+	if (ja->cur_idx >= ja->discard_idx)
-+		n = ca->sb.njournal_buckets +  ja->discard_idx - ja->cur_idx;
-+	else
-+		n = ja->discard_idx - ja->cur_idx;
-+
-+	if (n > (1 + j->do_reserve))
-+		return n - (1 + j->do_reserve);
-+
-+	return 0;
-+}
-+
- static void journal_reclaim(struct cache_set *c)
- {
- 	struct bkey *k = &c->journal.key;
- 	struct cache *ca = c->cache;
- 	uint64_t last_seq;
--	unsigned int next;
- 	struct journal_device *ja = &ca->journal;
- 	atomic_t p __maybe_unused;
- 
-@@ -649,12 +672,10 @@ static void journal_reclaim(struct cache_set *c)
- 	if (c->journal.blocks_free)
- 		goto out;
- 
--	next = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
--	/* No space available on this device */
--	if (next == ja->discard_idx)
-+	if (!free_journal_buckets(c))
- 		goto out;
- 
--	ja->cur_idx = next;
-+	ja->cur_idx = (ja->cur_idx + 1) % ca->sb.njournal_buckets;
- 	k->ptr[0] = MAKE_PTR(0,
- 			     bucket_to_sector(c, ca->sb.d[ja->cur_idx]),
- 			     ca->sb.nr_this_dev);
-diff --git a/drivers/md/bcache/journal.h b/drivers/md/bcache/journal.h
-index f2ea34d5f431..cd316b4a1e95 100644
---- a/drivers/md/bcache/journal.h
-+++ b/drivers/md/bcache/journal.h
-@@ -105,6 +105,7 @@ struct journal {
- 	spinlock_t		lock;
- 	spinlock_t		flush_write_lock;
- 	bool			btree_flushing;
-+	bool			do_reserve;
- 	/* used when waiting because the journal was full */
- 	struct closure_waitlist	wait;
- 	struct closure		io;
-@@ -182,5 +183,6 @@ int bch_journal_replay(struct cache_set *c, struct list_head *list);
- 
- void bch_journal_free(struct cache_set *c);
- int bch_journal_alloc(struct cache_set *c);
-+void bch_journal_space_reserve(struct journal *j);
- 
- #endif /* _BCACHE_JOURNAL_H */
-diff --git a/drivers/md/bcache/super.c b/drivers/md/bcache/super.c
-index bf3de149d3c9..2bb55278d22d 100644
---- a/drivers/md/bcache/super.c
-+++ b/drivers/md/bcache/super.c
-@@ -2128,6 +2128,7 @@ static int run_cache_set(struct cache_set *c)
- 
- 	flash_devs_run(c);
- 
-+	bch_journal_space_reserve(&c->journal);
- 	set_bit(CACHE_SET_RUNNING, &c->flags);
- 	return 0;
- err:
--- 
-2.35.3
+Thanks,
+Ming
 
