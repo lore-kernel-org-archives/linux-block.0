@@ -2,90 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E990AC433FE
-	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 04:34:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF406C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 24 May 2022 05:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234455AbiEXEeh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 24 May 2022 00:34:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39536 "EHLO
+        id S231891AbiEXFQG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 24 May 2022 01:16:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234450AbiEXEef (ORCPT
+        with ESMTP id S230201AbiEXFQF (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 24 May 2022 00:34:35 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6AD5595A11;
-        Mon, 23 May 2022 21:34:33 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1C619B81613;
-        Tue, 24 May 2022 04:34:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F977C385AA;
-        Tue, 24 May 2022 04:34:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653366870;
-        bh=/4PzKarf9FLLX+CAcx710Fdds9eFxxCXnHAxyF1yTcc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=WNN/hP8+1WxYNdG/BGcwO5Luds+lsF2npcnIELGBbgMaJ/at6wh5oe3bBPC8OEF0x
-         Ht0Du6ADFlo6EWA641CuDqqlxhcBAsI72ic30RmCzRppcnojGAAkex4jwa7r10HvWN
-         EVxG+ASs6Fe16RKgRlrn9anfggDB1WXyL/y2/X0c7cTvyL6UZhFI4FEY03mcRn19vM
-         KxOUSS2oFftcgC7PKFXpKO8HWRuevwVi9G3zt9HDjntmTdHA2S2se1NQ59z+bEyY7K
-         PA5r5iGhmP6jAolokOOAQC78BdFH/mLwLff+NWkkakiUNdbSPsolw2EwfiUPmV+cuP
-         /giiWNxLiQinQ==
-Date:   Mon, 23 May 2022 22:34:27 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, Changhui Zhong <czhong@redhat.com>
-Subject: Re: [PATCH V2] block: ignore RWF_HIPRI hint for sync dio
-Message-ID: <YoxgU5/P460FZ3rl@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220420143110.2679002-1-ming.lei@redhat.com>
- <YowMVODoNIyaqVdC@kbusch-mbp.dhcp.thefacebook.com>
- <YowpjtLfZPld1H6T@T590>
- <YoxKz51EAu3j2qwK@kbusch-mbp.dhcp.thefacebook.com>
+        Tue, 24 May 2022 01:16:05 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 287D431D
+        for <linux-block@vger.kernel.org>; Mon, 23 May 2022 22:16:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=Xspr9q8wrCQ7j9SHJRfFWrr/gJIyMTnBbmdu+lbI3DE=; b=npe8XcGtbFzrIey6KxjzcJM/lN
+        2KAayELHKWfk/kP5dk7mlufKZauN2T9sXvYPJVqW03nsWK53Pae+CC7GbyoPGyd7iZID629SJn0V3
+        iTNvEzDwVtRD3xPIoy9A4FG2Ac0xeVGoz/yuetq+NmBACg1jgDLQB1E7op2H74jPshfEnY92L78lo
+        KBWdiXcP0ijER4u6Z6ItKvPsV8u6AYWHzl0xqUJ2fAxbd2EGBlt3mBa103BHJ+dNPEdYC3MT1k2dX
+        wjLA9WDG8xJlje54DFm/0vFmdY52Wet7sTTivbSwXV4+7s7JDYmoxt6FnaRu8m1w2fhmq7WnjAUfg
+        B0beg3Fw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1ntMti-006q39-Aj; Tue, 24 May 2022 05:15:58 +0000
+Date:   Mon, 23 May 2022 22:15:58 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        io-uring <io-uring@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>
+Subject: Re: [GIT PULL] io_uring passthrough support
+Message-ID: <YoxqDtk71JuyydDv@infradead.org>
+References: <6f712c75-c849-ae89-d763-b2a18da52844@kernel.dk>
+ <CAHk-=whfi3FE3O7KrziqPbyGvAmNFas3xxLz2O+ttzBkCOQmfw@mail.gmail.com>
+ <caa5e85c-2bfe-b9e3-1e32-c11f78e6ad29@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YoxKz51EAu3j2qwK@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <caa5e85c-2bfe-b9e3-1e32-c11f78e6ad29@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, May 23, 2022 at 09:02:39PM -0600, Keith Busch wrote:
-> Here's a bandaid, though I assume it'll break something...
+On Mon, May 23, 2022 at 02:19:38PM -0600, Jens Axboe wrote:
+> We can obviously dump this as it isn't integral to anything, and
+> honestly now that the NVMe is wired up, there's no great need to have a
+> separate test for it. But it doesn't really hurt and there are already
+> regression tests for it.
 
-On second thought, maybe this is okay! The encoded hctx doesn't change after
-this call, which is the only thing polling cares about. The tag portion doesn't
-matter.
-
-The only user for the rq tag part of the cookie is hybrid polling and falls
-back to classic polling if the tag wasn't valid, so that scenario is already
-hangled. And hybrid polling breaks down anyway if queue-depth is >1, so leaving
-an invalid tag might be a good thing.
- 
-> ---
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index ed1869a305c4..348136dc7ba9 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1146,8 +1146,6 @@ void blk_mq_start_request(struct request *rq)
->  	if (blk_integrity_rq(rq) && req_op(rq) == REQ_OP_WRITE)
->  		q->integrity.profile->prepare_fn(rq);
->  #endif
-> -	if (rq->bio && rq->bio->bi_opf & REQ_POLLED)
-> -	        WRITE_ONCE(rq->bio->bi_cookie, blk_rq_to_qc(rq));
->  }
->  EXPORT_SYMBOL(blk_mq_start_request);
->  
-> @@ -2464,6 +2462,9 @@ static void blk_mq_bio_to_request(struct request *rq, struct bio *bio,
->  	WARN_ON_ONCE(err);
->  
->  	blk_account_io_start(rq);
-> +
-> +	if (rq->bio->bi_opf & REQ_POLLED)
-> +	        WRITE_ONCE(rq->bio->bi_cookie, blk_rq_to_qc(rq));
->  }
->  
->  static blk_status_t __blk_mq_issue_directly(struct blk_mq_hw_ctx *hctx,
-> --
+Yes, please dump it.  It is not actually useful and is just more
+code around for no good reason.
