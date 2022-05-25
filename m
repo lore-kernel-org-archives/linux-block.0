@@ -2,90 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 762B0C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 18:11:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E32DCC43217
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 18:44:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234972AbiEYSLk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 14:11:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60818 "EHLO
+        id S240870AbiEYSoS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 14:44:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbiEYSLj (ORCPT
+        with ESMTP id S233325AbiEYSoR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 14:11:39 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1EEB36150;
-        Wed, 25 May 2022 11:11:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=IzBNdpoK6rQ9t3eD/Vrcougov8ztUF0Tuvm1p+muAlM=; b=AbkeM+u3a96EGti69YYmAfMTaH
-        txW7t1WdtlkrGx9frT4Pjpi2wk9I6g2xKOqupqJIwlmAvLnoMC6jzEaA6qnDa4hZharsP97SWpGcU
-        HucXNzkmnIqD1hIsYQQUTaChTHeVgoXTFR5uToIv1EYDQelCM3pfRGHe0f8FSfRJo5cIyyLdZxZyP
-        1+T2QfoFrTVGzIL8k/fJ9lF5VPXOTQmmFTNVi/82b+1e5nj1r+sMFdrY+SU32Zx3p2aWmV09CF7Hp
-        DOxaBnNOh84mY7J5WXvJWGRHY+q2hQo2VVIxH6QTMOs4bxHLfBMpIwi2PVE6nNWHDhN+poSI0uqO8
-        FpPx7ZwA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntvTj-00C5lz-F9; Wed, 25 May 2022 18:11:27 +0000
-Date:   Wed, 25 May 2022 11:11:27 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     "Bird, Tim" <Tim.Bird@sony.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Richard Fontana <fontana@sharpeleven.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "jeyu@kernel.org" <jeyu@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>,
-        Kuno Woudt <kuno@frob.nl>,
-        "copyleft-next@lists.fedorahosted.org" 
-        <copyleft-next@lists.fedorahosted.org>,
-        Ciaran Farrell <Ciaran.Farrell@suse.com>,
-        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-Message-ID: <Yo5xTwGLmbsgJhfM@bombadil.infradead.org>
-References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
- <87bkvo0wjd.ffs@tglx>
- <Yo5cxWghV/v2Fnzf@bombadil.infradead.org>
- <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
+        Wed, 25 May 2022 14:44:17 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 022DAA186;
+        Wed, 25 May 2022 11:44:16 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id A065046;
+        Wed, 25 May 2022 11:44:16 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id AGSuPP3Baxbp; Wed, 25 May 2022 11:44:15 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by mx.ewheeler.net (Postfix) with ESMTPSA id 9037940;
+        Wed, 25 May 2022 11:44:15 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net 9037940
+Date:   Wed, 25 May 2022 11:44:01 -0700 (PDT)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Keith Busch <kbusch@kernel.org>, Coly Li <colyli@suse.de>,
+        Adriano Silva <adriano_da_silva@yahoo.com.br>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
+In-Reply-To: <Yo28kDw8rZgFWpHu@infradead.org>
+Message-ID: <77e7dbf9-d5bd-424-1ef7-8a1bb49e9010@ewheeler.net>
+References: <958894243.922478.1652201375900.ref@mail.yahoo.com> <958894243.922478.1652201375900@mail.yahoo.com> <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net> <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net> <YoxuYU4tze9DYqHy@infradead.org>
+ <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net> <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com> <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net> <Yo28kDw8rZgFWpHu@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 25, 2022 at 05:05:54PM +0000, Bird, Tim wrote:
-> I know it's being submitted as an OR, but I question
-> the value of introducing another license into the kernel's licensing mix.
+On Tue, 24 May 2022, Christoph Hellwig wrote:
+> On Tue, May 24, 2022 at 02:34:23PM -0700, Eric Wheeler wrote:
+> > Is this flag influced at all when /sys/block/sdX/queue/scheduler is set 
+> > to "none", or does the write_cache flag operate independently of the 
+> > selected scheduler?
+> 
+> This is up to the stacking driver.  dm and tend to pass through flushes
+> where needed.
+> 
+> > This confirms what I have suspected all along: We have an LSI MegaRAID 
+> > SAS-3516 where the write policy is "write back" in the LUN, but the cache 
+> > is flagged in Linux as write-through:
+> > 
+> > 	]# cat /sys/block/sdb/queue/write_cache 
+> > 	write through
+> > 
+> > I guess this is the correct place to adjust that behavior!
+> 
+> MegaRAID has had all kinds of unsafe policies in the past unfortunately.
+> I'm not even sure all of them could pass through flushes properly if we
+> asked them to :(
 
-As a free software hacker *I* value the evolution of copyleft and copyleft-next
-does just that. Some may have thought that it may not have been possible to
-evolve copyleft and work with an evolved license on Linux, but copyleft-next
-shows it is possible. Here in lies the value I see in it.
+Thanks for the feedback, great info!
 
-I agree that we want to keep the number of licenses as small as
-possible but we cannot really dictate which dual licensing options a
-submitter selects unless the license is GPL-2.0-only incompatible,
-which copyleft-next is not.
-
-  Luis
+In your experience, which SAS/SATA RAID controllers are best behaved in 
+terms of policies and reporting things like io_opt and 
+writeback/writethrough to the kernel?
