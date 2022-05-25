@@ -2,62 +2,83 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DBFCEC433F5
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 13:18:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF34FC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 13:37:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231880AbiEYNSB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 09:18:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36942 "EHLO
+        id S241480AbiEYNhy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 09:37:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241789AbiEYNRq (ORCPT
+        with ESMTP id S231968AbiEYNhx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 09:17:46 -0400
-X-Greylist: delayed 99416 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 25 May 2022 06:17:45 PDT
-Received: from box.indicandustries.com (hwsrv-970840.hostwindsdns.com [104.168.149.109])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D2610FEB
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 06:17:45 -0700 (PDT)
-Received: from authenticated-user (box.indicandustries.com [104.168.149.109])
+        Wed, 25 May 2022 09:37:53 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A37E6BFD9;
+        Wed, 25 May 2022 06:37:52 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by box.indicandustries.com (Postfix) with ESMTPSA id 4B8F1107FBF
-        for <linux-block@vger.kernel.org>; Tue, 24 May 2022 03:24:18 -0600 (MDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=box.indicandustries.com; s=mail; t=1653384258;
-        bh=V6VCn7WEbqHjVVQ20/+SYu6rwS1WmTHcxX88g+j430s=;
-        h=Reply-To:From:To:Subject:Date:From;
-        b=iyxySI7s4hB4plFm5U/j4A5WG8wEdqWHqZMzxkwI1IF5WhnZh2fO8OBMKBcoRzzC1
-         /fHgX7uNgMkHA2hgvgSy+paaMBqhUjJZiMrgKy47j5/nmd7kWiZpOz8SecQWhScTmT
-         1rUldEDwn/cM5Sfri98E3xNdDJRxb93WMqWB87LgJSZXEibZ2xUXFKmdb0v0oYNHxU
-         E1WeygsZpIC3ZqMMVsP5qcVdLZXqdkr6DQr/VKJ/5Ub80xp/PG6BUB+jT/GnA4Wpsv
-         prj6lveF4j7M7bgmy+/EML6UIOnHtJybpHpM6rcVENp5UGffrkbTSoxtqsvaZEo5vt
-         uAfYO40ENYJYg==
-Reply-To: amjalia90@gmail.com
-From:   amjad.ali@box.indicandustries.com
-To:     linux-block@vger.kernel.org
-Subject: Hello Sir, I seek your urgent consideration.
-Date:   24 May 2022 11:24:17 +0200
-Message-ID: <20220524112417.1135F50EEDDBA9B0@box.indicandustries.com>
+        by ams.source.kernel.org (Postfix) with ESMTPS id B7C38B81D99;
+        Wed, 25 May 2022 13:37:50 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93C71C34117;
+        Wed, 25 May 2022 13:37:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653485869;
+        bh=xlUASOGBdGw6fvHq4BDNMenv9iWftkupHWxoGxdfLaw=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eE28Gc/PPxzo7SmaqHsc80YkSvcgEe/itl6cQrG/3QpssQkcnYHDGOXl+slhMlm7q
+         zcpWmuSWKAyaJKTcRh5SRNz8n0dUeKH1RgxmPcixzUYsmaGIjoae7unscy85w7rCcR
+         nuXh1fdaroFusYK9lbpZZ6sJxDFE8XShoa4Ga7nxP1tIBMIzxhJYBl+X7QwqB1hBf2
+         ZN08pUufYR8X4ycr3pcd/BnZJp/2vGtwx97d3SYjIwzYY1pct9lfztsdG+r/aSnj/s
+         f5rzOK9B+poekFzTHVGZAEPnr+0JH0lgsw0aaH7u/BpiSvanJ0m+Bk3haO2emQqHUp
+         jRdA5R7pVP/AA==
+Date:   Wed, 25 May 2022 07:37:45 -0600
+From:   Keith Busch <kbusch@kernel.org>
+To:     Pankaj Raghav <pankydev8@gmail.com>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        ebiggers@kernel.org, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCHv3 1/6] block/bio: remove duplicate append pages code
+Message-ID: <Yo4xKSEI9Kh93gtf@kbusch-mbp.dhcp.thefacebook.com>
+References: <20220523210119.2500150-1-kbusch@fb.com>
+ <20220523210119.2500150-2-kbusch@fb.com>
+ <20220524141754.msmt6s4spm4istsb@quentin>
+ <Yoz7+O2CAQTNfvlV@kbusch-mbp.dhcp.thefacebook.com>
+ <20220525074941.2biavbbrjdjcnlsd@quentin>
 MIME-Version: 1.0
-Content-Type: text/plain;
-        charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220525074941.2biavbbrjdjcnlsd@quentin>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+On Wed, May 25, 2022 at 09:49:41AM +0200, Pankaj Raghav wrote:
+> On Tue, May 24, 2022 at 09:38:32AM -0600, Keith Busch wrote:
+> > On Tue, May 24, 2022 at 04:17:54PM +0200, Pankaj Raghav wrote:
+> > > On Mon, May 23, 2022 at 02:01:14PM -0700, Keith Busch wrote:
+> > > > -	if (WARN_ON_ONCE(!max_append_sectors))
+> > > > -		return 0;
+> > > I don't see this check in the append path. Should it be added in
+> > > bio_iov_add_zone_append_page() function?
+> > 
+> > I'm not sure this check makes a lot of sense. If it just returns 0 here, then
+> > won't that get bio_iov_iter_get_pages() stuck in an infinite loop? The bio
+> > isn't filling, the iov isn't advancing, and 0 indicates keep-going.
+> Yeah but if max_append_sectors is zero, then bio_add_hw_page() also
+> returns 0 as follows:
+> ....
+> 	if (((bio->bi_iter.bi_size + len) >> 9) > max_sectors)
+> 		return 0;
+> ....
+> With WARN_ON_ONCE, we at least get a warning message if it gets stuck in an
+> infinite loop because of max_append_sectors being zero right?
 
-Greetings? I am Amjad. I work with a leading Bio Firm.  Due to=20
-the setbacks of the pandemic, my company has opened a bid in=20
-search of new suppliers for basic raw materials needed in=20
-production.
+The return for this function is the added length, not an indicator of success.
+And we already handle '0' as an error from bio_iov_add_zone_append_page():
 
-I am seeking a representative=C2=A0as I am a staff, I can not be=20
-involved directly. It may not be your area of work but the=20
-profits are great and I will guide you through. I have already=20
-sourced a local supplier for this. I only need a reliable=20
-representative.
-
-Please get back to me so I can explain this in full.
-
-Amjad
+	if (bio_add_hw_page(q, bio, page, len, offset,
+			queue_max_zone_append_sectors(q), &same_page) != len)
+		return -EINVAL;
