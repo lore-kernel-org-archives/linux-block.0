@@ -2,148 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66EFCC433FE
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 19:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B323C433FE
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 20:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346106AbiEYTol (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 15:44:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43392 "EHLO
+        id S1343496AbiEYUvt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 16:51:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346035AbiEYTo2 (ORCPT
+        with ESMTP id S231415AbiEYUvs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 15:44:28 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7209D1145C;
-        Wed, 25 May 2022 12:44:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=S6qisVcKaqKCfdGaJluvCYtDQBbD/bLcDlVDzzD0wUo=; b=d6Lzkm3nKu9wkp/Tn/FwPo54dE
-        o7OQMJ82dZigbjNoim9XQ+8czVUTEu9Q+nDeOSKu1iP5PjtnY5/D2ltdqSbP6Zdzd+v5xBWC7uKJf
-        myeuJ1iRJEmkG90gqlMTb2KwfFAUdQOm+g99VVCpyLIBc8RpcqoJQgAR2J9Z2H8/fXbWeypdpWhuG
-        3UhrDDBbXjBH2N6caTSiJGTTZMi/do7rk40BLwdHIom+fTn7+i75cTYP2GyZROV7K0RyA+ryRCp9d
-        Zx04LGEZag2yXoYwXgh6bNMu7jSwy2g1Sd6JCwGEoIdzKzREfw88nAVRndD+aAPrrCLZJLLbUqd/y
-        5UD1mlWw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntwvT-00CT7x-8u; Wed, 25 May 2022 19:44:11 +0000
-Date:   Wed, 25 May 2022 12:44:11 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     "Bird, Tim" <Tim.Bird@sony.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Richard Fontana <fontana@sharpeleven.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "jeyu@kernel.org" <jeyu@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Wed, 25 May 2022 16:51:48 -0400
+Received: from galois.linutronix.de (Galois.linutronix.de [IPv6:2a0a:51c0:0:12e:550::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B186390CC8;
+        Wed, 25 May 2022 13:51:47 -0700 (PDT)
+From:   Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020; t=1653511903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qZDl80JBPxS+b93PiaRkd25Ow2PNjtzjUYJRAybObzk=;
+        b=BzoGER2of+N4xtQYPriqeW8SV1MPtswLranOSADCpWbhYI1J/1CG3k2nfX/FmrR7elc3Ne
+        8L7X4xJ2brkeEpD6XGeGKYM4aM/nVfxoWxA+2ayKTIr1Zb/h7/r2u7RIC5c8CFkrwB6y/e
+        Wkr2nIvuP9zg87/51fxlH8t3bXWzj+tctOM2kK1rpVBoZqeMoeX+LBPk+TAM8IjcX8paIf
+        0mBhurZQFAnJ8g1+UsM1OKAQgn8GAYi6ETiVZoSUMkKvtp/XaovaTpiSj7bXo7/htx8PsW
+        qJgC3uvmzwYvT0B4DLrcWS3qSLgARx6ohJZmGCQzxG5KOXI+9zU/BFCXdDDjfA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+        s=2020e; t=1653511903;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=qZDl80JBPxS+b93PiaRkd25Ow2PNjtzjUYJRAybObzk=;
+        b=TPSBS0MBJUFg5dH1oSqss/pt8r3y81Z0jbqklBFKISMUg2FHDCSf7Sul+A7m+O3zLV9/Ym
+        STpGccm/zC/57CBg==
+To:     Luis Chamberlain <mcgrof@kernel.org>,
+        Richard Fontana <fontana@sharpeleven.org>
+Cc:     tj@kernel.org, gregkh@linuxfoundation.org,
+        akpm@linux-foundation.org, jeyu@kernel.org, shuah@kernel.org,
+        bvanassche@acm.org, dan.j.williams@intel.com, joe@perches.com,
+        keescook@chromium.org, rostedt@goodmis.org, minchan@kernel.org,
+        linux-spdx@vger.kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
         Goldwyn Rodrigues <rgoldwyn@suse.com>,
         Kuno Woudt <kuno@frob.nl>,
-        "copyleft-next@lists.fedorahosted.org" 
-        <copyleft-next@lists.fedorahosted.org>,
+        copyleft-next@lists.fedorahosted.org,
         Ciaran Farrell <Ciaran.Farrell@suse.com>,
         Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Jonathan Corbet <corbet@lwn.net>,
         Thorsten Leemhuis <linux@leemhuis.info>
 Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-Message-ID: <Yo6HC9BfkCo3MBbH@bombadil.infradead.org>
+In-Reply-To: <Yo5f9nctTwHZqPbl@bombadil.infradead.org>
 References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
- <87bkvo0wjd.ffs@tglx>
- <Yo5cxWghV/v2Fnzf@bombadil.infradead.org>
- <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
- <Yo5xTwGLmbsgJhfM@bombadil.infradead.org>
- <BN7PR13MB2499BA2AFAC1C79197734D81FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
+ <20211029184500.2821444-2-mcgrof@kernel.org> <87ee0k0wrn.ffs@tglx>
+ <Yo5f9nctTwHZqPbl@bombadil.infradead.org>
+Date:   Wed, 25 May 2022 22:51:43 +0200
+Message-ID: <874k1dz674.ffs@tglx>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN7PR13MB2499BA2AFAC1C79197734D81FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 25, 2022 at 07:05:31PM +0000, Bird, Tim wrote:
-> > -----Original Message-----
-> > From: Luis Chamberlain <mcgrof@infradead.org> On Behalf Of Luis Chamberlain
-> > 
-> > On Wed, May 25, 2022 at 05:05:54PM +0000, Bird, Tim wrote:
-> > > I know it's being submitted as an OR, but I question
-> > > the value of introducing another license into the kernel's licensing mix.
-> > 
-> > I agree that we want to keep the number of licenses as small as
-> > possible but we cannot really dictate which dual licensing options a
-> > submitter selects unless the license is GPL-2.0-only incompatible,
-> > which copyleft-next is not.
-> 
-> Um, yes we can dictate that. 
+On Wed, May 25 2022 at 09:57, Luis Chamberlain wrote:
+> On Mon, May 23, 2022 at 11:22:36PM +0200, Thomas Gleixner wrote:
+>> This paragraph is not really understandable for Joe Developer.
+>> 
+>>   copyleft-next-0.3.1 is explicitly compatible with GPLv2 (or later) and
+>>   can therefore be used for kernel code. Though the best and recommended
+>>   practice is to express this in the SPDX license identifier by
+>>   licensing the code under both licenses expressed by the OR operator.
+>> 
+>> Hmm?
+>
+> Let me try clarifying this further, how about:
+>
+>    copyleft-next-0.3.1 is explicitly compatible with GPLv2 (or later) and
+>    can therefore be used for kernel code. Despite this, if you use
+>    copyleft-next-0.3.1 on Linux, the recommended practice is to express
+>    dual licensing with GPL using in the SPDX license identifiers by
+>    using by the OR operator.
 
-The statement about us not being able to dictate which dual licensing
-options a submitter selects does not actually come from me, Thomas noted
-this [0].
+  'using in the ..' ?
 
-[0] https://lkml.kernel.org/r/87fsl1iqg0.ffs@tglx
+and
 
-> There were good reasons that the original
-> BSD dual-licenses were allowed.
+  'by using by' is off by one 'by' :)
 
-I helped spearhead some of that effort.
+I'm not seeing how that clarifies stuff further. I might be biased, but
+the version I suggested is crystal clear.
 
-> Those same reasons don't apply here.
+>> > +  To use the copyleft-next-0.3.1 license put the following SPDX tag/value
+>> > +  pair into a comment according to the placement guidelines in the
+>> > +  licensing rules documentation:
+>> > +    SPDX-License-Identifier: GPL-2.0 OR copyleft-next-0.3.1
+>> > +    SPDX-License-Identifier: GPL-2.0-only OR copyleft-next 0.3.1
+>> > +    SPDX-License-Identifier: GPL-2.0+ OR copyleft-next-0.3.1
+>> > +    SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
+>> 
+>> Please don't propagate the GPL-2.0 and GPL-2.0+ tags. They are
+>> outdated (still valid) in the SPDX spec, which reminds me that I should
+>> update the relevant documentation...
+>
+> OK thanks for the recommendation, I'll leave it at:
+>
+> +    SPDX-License-Identifier: GPL-2.0 OR copyleft-next-0.3.1
 
-Correct, and I noted my own reasoning for now dual licensing with
-copyleft-next, which you seem to be disregarding?
+	SPDX-License-Identifier: GPL-2.0-only OR copyleft-next-0.3.1
 
-> Each license added to the kernel (even when added as an OR), requires
-> additional legal analysis.
+please. See my previous reply quoted above.
 
-And I noted in my cover letter that copyleft-next-0.3.1 has been found to be
-to be GPLv2 compatible by three attorneys at SUSE and Redhat [1], but
-to err on the side of caution we simply recommend to always use the "OR"
-language for this license [2].
+> +    SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
 
-[1] https://lore.kernel.org/lkml/20170516232702.GL17314@wotan.suse.de/
-[2] https://lkml.kernel.org/r/1495234558.7848.122.camel@linux.intel.com
+Thanks,
 
-> And here's the thing.
-> The copyleft-next license has a number of legal issues that make it problematic.
-
-You say number of legal issues.
-
-> Not the least of which are that some of its terms are dependent on external
-> situations that can change over time, in a matter that is uncontrolled by either
-> the licensor or the licensee.  In order to determine what terms are effective, you
-> have to know when the license was granted, and what the FSF and OSI approved
-> licenses were at various points in time.  You literally have to use the Internet
-> Archive wayback machine, and do a bunch of research, to interpret the license terms.
-> It is not, as currently constructed, a good license, due to this lack of legal clarity.
-
-But the above seems to indicate one technical pain point in so far as
-two sections:
-
-4. Condition Against Further Restrictions; Inbound License Compatibility
-7. Nullification of Copyleft/Proprietary Dual Licensing
-
-If you are going to offer to pay for an alternative proprietary
-licensing, I'm sure you can do the work.
-
-And if in so far as clause 4 is concerned, yeah I think wayback machine
-is a sensible solution. Good idea, seems like we have that covered since
-1999 [3].
-
-[3] https://web.archive.org/web/*/https://opensource.org/licenses
-
-  Luis
+        tglx
