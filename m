@@ -2,85 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F676C433F5
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 05:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB264C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 07:49:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237251AbiEYFUZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 01:20:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42260 "EHLO
+        id S234179AbiEYHtt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 03:49:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34192 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236574AbiEYFUY (ORCPT
+        with ESMTP id S243014AbiEYHtp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 01:20:24 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B85471DA64;
-        Tue, 24 May 2022 22:20:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=YbBZJecasFJChD0Qx766ygv34+7CE3nsA11f44Yl+UI=; b=OPYvc+r5yRmAXpLvPMiOYs/E8G
-        mcFb7ZPfMh5tPcXBZXIy2Tw//q2WNL/BnmHUJeRnqvYIGqlQGhaeJBNUvzVR/qcUmvtE3GquNOu7J
-        qE/5nd70uqkfnkgb3+MI0cZxe6qRi0fLP9nolxFOeNLS9TVZybFjampx5UxLYGc1pnC4G8h0jo1lS
-        wglmXsdJtVM625U+esHSCVFJ5QXyx8MzYdwFJAlBfQo9xzN6zCaHmAl1JyqVdjW5UyDgKuC7imgeD
-        f5XXJjZxFVhFBjytgKzA/v11J2EQKlIxiFY/AVDdmrNLVHqCxpfaK3YS1OdKMSv0quwNNSRWkcIDC
-        en+FWfhA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1ntjRQ-009yDS-6p; Wed, 25 May 2022 05:20:16 +0000
-Date:   Tue, 24 May 2022 22:20:16 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Wheeler <bcache@lists.ewheeler.net>
-Cc:     Keith Busch <kbusch@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        Coly Li <colyli@suse.de>,
-        Adriano Silva <adriano_da_silva@yahoo.com.br>,
-        Bcache Linux <linux-bcache@vger.kernel.org>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        linux-block@vger.kernel.org
-Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
- Bcache in writes direct with fsync)
-Message-ID: <Yo28kDw8rZgFWpHu@infradead.org>
-References: <958894243.922478.1652201375900.ref@mail.yahoo.com>
- <958894243.922478.1652201375900@mail.yahoo.com>
- <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net>
- <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
- <YoxuYU4tze9DYqHy@infradead.org>
- <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net>
- <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com>
- <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net>
+        Wed, 25 May 2022 03:49:45 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C085A7A464;
+        Wed, 25 May 2022 00:49:44 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id w14so34631043lfl.13;
+        Wed, 25 May 2022 00:49:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5lt8k9K2KA1UoNzPTqNHW6qCt9JmIf/2CxYFA0xls5w=;
+        b=CfVSjrQvck8vA31E2hsBpi6h670x34m7ft7yCObkg7qf7beHCrH3SGu6oHC997qOPu
+         4mSXsXFxEQfD93KdNCo2jw9XKSzfdXOu8jClV5pqVLSwo+MioeJ4lB1EJtrEw6YMsYZf
+         SS6OFE7MSVyagxIKABg1tmOiWKzyAxO1zvDaskeWjQmwlJilmB4TJFmOhmkKhAl8354K
+         um+tTO+J31ehacSxb71M5XWP0v2Q0bi0dVURma+Bv4JcLlnz6TSQZSed84ERj4iQFzNl
+         aHOpbUaivbWryKUd+DcIX6eImCVN9C/GHJgWVGk1g1pgk2DGAMjj8pE1sWHww/mpqUN9
+         0zPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5lt8k9K2KA1UoNzPTqNHW6qCt9JmIf/2CxYFA0xls5w=;
+        b=1oKzRWSp1N86uAYJgT9Sxu1Y7kTcL7WoJc2FRij3fZwLMfWVqE5EMV5N97iW8UARkG
+         8KQi1VxxvJDCOfsndCzQsClhez5NbhROPt4LYLn38uHnmFSHz5UdzgqeCGgLXpzb3YCa
+         TWUtw5YJ48cxaR74lSED7a0wGqjhPKpGuGZTltM37xqkGM15MIAVTkCsWD2bNzXKMHjq
+         Y/ScDKfBgg5x7/Z/Ohy0KwWfMNvHw5SJEj3floyRzpPfZ08E+OhgpucJt2v+DL61jjtb
+         V5DXnO0NTNqlRN4JgXdyyG+GVPXNmqaYhf3Acgjl0rMH7dBGhqp6cDCthLoQq3yjXffN
+         6mDw==
+X-Gm-Message-State: AOAM533WI0eaZidbYSW+xbCbPQBNToZIQN0ISWQ1kJLCVSXV/xOQjoHN
+        PLwZPMeIXFHyeaZpjOoW4Kk=
+X-Google-Smtp-Source: ABdhPJxA905EhstCxny+fZM9fEKL7H9BHS5faz6etePJul9Gm/eDBlyaZ94GS+SAE51ckRyHznRS1A==
+X-Received: by 2002:a05:6512:3e26:b0:478:5972:54b7 with SMTP id i38-20020a0565123e2600b00478597254b7mr16559490lfv.646.1653464982986;
+        Wed, 25 May 2022 00:49:42 -0700 (PDT)
+Received: from localhost (87-49-45-243-mobile.dk.customer.tdc.net. [87.49.45.243])
+        by smtp.gmail.com with ESMTPSA id f11-20020ac2532b000000b00477cae4880fsm2840295lfh.260.2022.05.25.00.49.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 May 2022 00:49:42 -0700 (PDT)
+Date:   Wed, 25 May 2022 09:49:41 +0200
+From:   Pankaj Raghav <pankydev8@gmail.com>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        ebiggers@kernel.org, Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCHv3 1/6] block/bio: remove duplicate append pages code
+Message-ID: <20220525074941.2biavbbrjdjcnlsd@quentin>
+References: <20220523210119.2500150-1-kbusch@fb.com>
+ <20220523210119.2500150-2-kbusch@fb.com>
+ <20220524141754.msmt6s4spm4istsb@quentin>
+ <Yoz7+O2CAQTNfvlV@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <Yoz7+O2CAQTNfvlV@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 24, 2022 at 02:34:23PM -0700, Eric Wheeler wrote:
-> Is this flag influced at all when /sys/block/sdX/queue/scheduler is set 
-> to "none", or does the write_cache flag operate independently of the 
-> selected scheduler?
-
-This in completely independent from ﬆhe scheduler.
-
-> Does the block layer stop sending flushes at the first device in the stack 
-> that is set to "write back"?  For example, if a device mapper target is 
-> writeback will it strip flushes on the way to the backing device?
-
-This is up to the stacking driver.  dm and tend to pass through flushes
-where needed.
-
-> This confirms what I have suspected all along: We have an LSI MegaRAID 
-> SAS-3516 where the write policy is "write back" in the LUN, but the cache 
-> is flagged in Linux as write-through:
+On Tue, May 24, 2022 at 09:38:32AM -0600, Keith Busch wrote:
+> On Tue, May 24, 2022 at 04:17:54PM +0200, Pankaj Raghav wrote:
+> > On Mon, May 23, 2022 at 02:01:14PM -0700, Keith Busch wrote:
+> > > -	if (WARN_ON_ONCE(!max_append_sectors))
+> > > -		return 0;
+> > I don't see this check in the append path. Should it be added in
+> > bio_iov_add_zone_append_page() function?
 > 
-> 	]# cat /sys/block/sdb/queue/write_cache 
-> 	write through
-> 
-> I guess this is the correct place to adjust that behavior!
+> I'm not sure this check makes a lot of sense. If it just returns 0 here, then
+> won't that get bio_iov_iter_get_pages() stuck in an infinite loop? The bio
+> isn't filling, the iov isn't advancing, and 0 indicates keep-going.
+Yeah but if max_append_sectors is zero, then bio_add_hw_page() also
+returns 0 as follows:
+....
+	if (((bio->bi_iter.bi_size + len) >> 9) > max_sectors)
+		return 0;
+....
+With WARN_ON_ONCE, we at least get a warning message if it gets stuck in an
+infinite loop because of max_append_sectors being zero right?
 
-MegaRAID has had all kinds of unsafe policies in the past unfortunately.
-I'm not even sure all of them could pass through flushes properly if we
-asked them to :(
+-- 
+Pankaj Raghav
