@@ -2,106 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96F42C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 14:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 826F9C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 14:36:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237159AbiEYOZ1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 10:25:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52860 "EHLO
+        id S233619AbiEYOgQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 10:36:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59440 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230026AbiEYOZZ (ORCPT
+        with ESMTP id S231803AbiEYOgO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 10:25:25 -0400
-Received: from mail-lj1-x22a.google.com (mail-lj1-x22a.google.com [IPv6:2a00:1450:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1A28BF;
-        Wed, 25 May 2022 07:25:24 -0700 (PDT)
-Received: by mail-lj1-x22a.google.com with SMTP id g7so5322792lja.3;
-        Wed, 25 May 2022 07:25:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=mavW/LGtnxP01FpE6h9ua1E8SGrgUbvbFScKYyfwT9I=;
-        b=SpmhM9zO3tyRxP9X3H2YXWOp+aNFq7mpCNLFjwWLtdzTSnG6KlSpijfc8xwa73AKmM
-         /WQKiclvHxETn9GfoLO5+LuMOUi6HyHVehJjbuPJEyf2xnYTj/4DreeVmDSa68PvGHmC
-         jFv2NtX5NuzDGVLehUMiQ4o/+aWit1Uqqb7iZlTIAESlPM18IjzyhhI6KB1t9+gqaw+V
-         p/tJC8FV9QdEPeGNRPEgWJbhoJgMFTPyLuhwm1fq0vOBEr7HYmmzRbWhR6CZ3SMMv/74
-         wxgXZi35COnlggf2ntKeVip00ufMQHv2G0PR7OL7RrYJ55GdKSfNiwVmBvuAsIWmWXEg
-         t2hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mavW/LGtnxP01FpE6h9ua1E8SGrgUbvbFScKYyfwT9I=;
-        b=lTcGFXVzPQsctOQbeVLJLQ7n2hCife0i7nPSauoxji1etAwOcB1YDCwMmYpcqU+7gb
-         6RWdvnYta5a20KSBLMU4ryahd6QfC+UOhO+f3e6OEtirGPUpBHDqohCe2gfnOt3ewHMf
-         lhThDndPBOKyLP5mfEMy7dVRUyyMjrUR5f8PnkAAtleKjtYdlQoZn5/6fXEpk//5JWVa
-         CZvRNIFpOMj1lcqg0K6Rjz7UDiKqjPMlEgfHdz4W2T9Sw6xp/nKyCK03RsiDEWMfaMJU
-         lnHPj9SMDovH24J39tB7WITyja/oCRokQs8rhBxo2TC/w0C73kSCMN5BrRE052PE5HKm
-         SSvw==
-X-Gm-Message-State: AOAM530wY/3Ho5M54DuvuODQa5EJMvPJtd9JsVWWo9H/et6c9yoGVKVR
-        H6QGttfaFhDq4Mimj+pjdy0=
-X-Google-Smtp-Source: ABdhPJyKM1y/BNj0ssY3RhzGfsiidwrfpMZeIJAfq/8NSduFcQzG12W3E3F+pjeq/oTiP9iqNCEtYg==
-X-Received: by 2002:a2e:1617:0:b0:253:d9cd:ed73 with SMTP id w23-20020a2e1617000000b00253d9cded73mr17483798ljd.291.1653488722876;
-        Wed, 25 May 2022 07:25:22 -0700 (PDT)
-Received: from localhost (87-49-45-243-mobile.dk.customer.tdc.net. [87.49.45.243])
-        by smtp.gmail.com with ESMTPSA id h29-20020a0565123c9d00b00478931a619csm889661lfv.60.2022.05.25.07.25.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 May 2022 07:25:22 -0700 (PDT)
-Date:   Wed, 25 May 2022 16:25:21 +0200
-From:   Pankaj Raghav <pankydev8@gmail.com>
-To:     Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, Pankaj Raghav <p.raghav@samsung.com>
-Subject: Re: [PATCHv3 1/6] block/bio: remove duplicate append pages code
-Message-ID: <20220525142521.comlig5xrtpsw7tb@quentin>
-References: <20220523210119.2500150-1-kbusch@fb.com>
- <20220523210119.2500150-2-kbusch@fb.com>
- <20220524141754.msmt6s4spm4istsb@quentin>
- <Yoz7+O2CAQTNfvlV@kbusch-mbp.dhcp.thefacebook.com>
- <20220525074941.2biavbbrjdjcnlsd@quentin>
- <Yo4xKSEI9Kh93gtf@kbusch-mbp.dhcp.thefacebook.com>
+        Wed, 25 May 2022 10:36:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 65CAB2DA9C
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 07:36:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1653489372;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=7eghtolzwl0drnd0tYSGSUnL+HRSRExNXVsg8ngNKhI=;
+        b=BA+D+si3XTPdCuFCn/S2fbtI2WxLHQeY0RHXU3OVry9YSChqVMTgxKizK9uxZHpbAqB7ug
+        KE3qXd6vMgRE5HmrARKCBVlNeEn0D61f72ucaR2MCgrPbYQqRKUc4Gfk3Q1TrxMDUyXWPI
+        Ekdv0IXi4lcFMg2GJ/kozW15gW5DM78=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-482-dH-7GMT3P1Wh4rOdr0nFOg-1; Wed, 25 May 2022 10:36:07 -0400
+X-MC-Unique: dH-7GMT3P1Wh4rOdr0nFOg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BE8161C00ACB;
+        Wed, 25 May 2022 14:36:06 +0000 (UTC)
+Received: from T590 (ovpn-8-19.pek2.redhat.com [10.72.8.19])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 90B35112131B;
+        Wed, 25 May 2022 14:36:01 +0000 (UTC)
+Date:   Wed, 25 May 2022 22:35:56 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ulf Hansson <ulf.hansson@linaro.org>,
+        linux-block@vger.kernel.org, linux-mmc@vger.kernel.org,
+        linux-scsi@vger.kernel.org
+Subject: Re: [PATCH 11/14] block: remove GENHD_FL_EXT_DEVT
+Message-ID: <Yo4+zEnrBTnoEMCz@T590>
+References: <20211122130625.1136848-1-hch@lst.de>
+ <20211122130625.1136848-12-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Yo4xKSEI9Kh93gtf@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <20211122130625.1136848-12-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 25, 2022 at 07:37:45AM -0600, Keith Busch wrote:
-> On Wed, May 25, 2022 at 09:49:41AM +0200, Pankaj Raghav wrote:
-> > On Tue, May 24, 2022 at 09:38:32AM -0600, Keith Busch wrote:
-> > > On Tue, May 24, 2022 at 04:17:54PM +0200, Pankaj Raghav wrote:
-> > > > On Mon, May 23, 2022 at 02:01:14PM -0700, Keith Busch wrote:
-> > > > > -	if (WARN_ON_ONCE(!max_append_sectors))
-> > > > > -		return 0;
-> > > > I don't see this check in the append path. Should it be added in
-> > > > bio_iov_add_zone_append_page() function?
-> > > 
-> > > I'm not sure this check makes a lot of sense. If it just returns 0 here, then
-> > > won't that get bio_iov_iter_get_pages() stuck in an infinite loop? The bio
-> > > isn't filling, the iov isn't advancing, and 0 indicates keep-going.
-> > Yeah but if max_append_sectors is zero, then bio_add_hw_page() also
-> > returns 0 as follows:
-> > ....
-> > 	if (((bio->bi_iter.bi_size + len) >> 9) > max_sectors)
-> > 		return 0;
-> > ....
-> > With WARN_ON_ONCE, we at least get a warning message if it gets stuck in an
-> > infinite loop because of max_append_sectors being zero right?
-> 
-> The return for this function is the added length, not an indicator of success.
-> And we already handle '0' as an error from bio_iov_add_zone_append_page():
-> 
-> 	if (bio_add_hw_page(q, bio, page, len, offset,
-> 			queue_max_zone_append_sectors(q), &same_page) != len)
-Ah. I didn't see the `!=len` part. Sorry for the noise and ignore this
-comment.
-> 		return -EINVAL;
+Hi Christoph,
 
--- 
-Pankaj Raghav
+On Mon, Nov 22, 2021 at 02:06:22PM +0100, Christoph Hellwig wrote:
+> All modern drivers can support extra partitions using the extended
+> dev_t.  In fact except for the ioctl method drivers never even see
+> partitions in normal operation.
+> 
+> So remove the GENHD_FL_EXT_DEVT and allow extra partitions for all
+> block devices that do support partitions, and require those that
+> do not support partitions to explicit disallow them using
+> GENHD_FL_NO_PART.
+> 
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
+> ---
+>  block/genhd.c                  |  6 +++---
+>  block/partitions/core.c        |  9 ++++-----
+>  drivers/block/amiflop.c        |  1 +
+>  drivers/block/ataflop.c        |  1 +
+>  drivers/block/brd.c            |  1 -
+>  drivers/block/drbd/drbd_main.c |  1 +
+>  drivers/block/floppy.c         |  1 +
+>  drivers/block/loop.c           |  1 -
+>  drivers/block/null_blk/main.c  |  1 -
+>  drivers/block/paride/pcd.c     |  1 +
+>  drivers/block/paride/pf.c      |  1 +
+>  drivers/block/pktcdvd.c        |  2 +-
+>  drivers/block/ps3vram.c        |  1 +
+>  drivers/block/rbd.c            |  6 ++----
+>  drivers/block/swim.c           |  1 +
+>  drivers/block/swim3.c          |  2 +-
+>  drivers/block/virtio_blk.c     |  1 -
+>  drivers/block/z2ram.c          |  1 +
+>  drivers/block/zram/zram_drv.c  |  1 +
+>  drivers/cdrom/gdrom.c          |  1 +
+>  drivers/md/dm.c                |  1 +
+>  drivers/md/md.c                |  5 -----
+>  drivers/mmc/core/block.c       |  1 -
+>  drivers/mtd/ubi/block.c        |  1 +
+>  drivers/scsi/sd.c              |  1 -
+>  drivers/scsi/sr.c              |  1 +
+>  include/linux/genhd.h          | 28 +++++-----------------------
+>  27 files changed, 30 insertions(+), 48 deletions(-)
+> 
+> diff --git a/block/genhd.c b/block/genhd.c
+> index 09abd41249fd4..e9346fae48ad4 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -376,7 +376,7 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+>  {
+>  	struct block_device *bdev;
+>  
+> -	if (!disk_part_scan_enabled(disk))
+> +	if (disk->flags & GENHD_FL_NO_PART)
+>  		return -EINVAL;
+>  	if (disk->open_partitions)
+>  		return -EBUSY;
+> @@ -438,7 +438,6 @@ int __must_check device_add_disk(struct device *parent, struct gendisk *disk,
+>  			return ret;
+>  		disk->major = BLOCK_EXT_MAJOR;
+>  		disk->first_minor = ret;
+> -		disk->flags |= GENHD_FL_EXT_DEVT;
+>  	}
+>  
+>  	ret = disk_alloc_events(disk);
+> @@ -872,7 +871,8 @@ static ssize_t disk_ext_range_show(struct device *dev,
+>  {
+>  	struct gendisk *disk = dev_to_disk(dev);
+>  
+> -	return sprintf(buf, "%d\n", disk_max_parts(disk));
+> +	return sprintf(buf, "%d\n",
+> +		(disk->flags & GENHD_FL_NO_PART) ? 1 : DISK_MAX_PARTS);
+
+The above change breaks parted on loop, which reads 'ext_range' to add
+partitions.
+
+Follows the test case:
+
+	fallocate -l 4096M loop0.img
+	losetup /dev/loop0 loop0.img
+	parted -s /dev/loop0 mklabel MSDOS
+	parted -s /dev/loop0 mkpart pri 1 1248
+
+Since this patch is merged, /dev/loop0p1 can't be created any more
+by above script.
+
+
+
+Thanks,
+Ming
+
