@@ -2,35 +2,44 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 154DEC4332F
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 23:54:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE7FDC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 23:55:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233961AbiEYXyR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 19:54:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33884 "EHLO
+        id S1345450AbiEYXy7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 19:54:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34418 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbiEYXyP (ORCPT
+        with ESMTP id S1345035AbiEYXy5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 19:54:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 147B69D070;
-        Wed, 25 May 2022 16:54:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=l4fKDERpiICSOVgCQ8QwCarZ+nXg0XUnq0ATowURuHc=; b=dzwK7kFgMsM4dtgzFXJxmWXZFa
-        u+Q7RFwB4jvwWWz8PwBDLQpHj4ZK0YGZiyHU+lI4x2bdXw5XdPK1jJ4rxeSbi0iM9LtMiUjwiCMGK
-        sk07Lf4YOWErKZDftjL5EUS6bSB+I4To98jq/cbHVJYzq336XwpuNwFstUEWVUW911uW9NiZh86Dl
-        glQIo5lGtlpAyKujL6jZzNtS5izUCyWSs8RcUticJXAxL0UBNTsem/IXOFrXk02tosz4FEzKSD99r
-        HjN3iYpVp6vLptw5OEzyRio/9aMzIA5bMm9QOG5QhrN7Gz3D7nlgWgRVNkbVz4ahCkN4/pjws9RbT
-        LUmv21/A==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nu0pC-00CynK-Py; Wed, 25 May 2022 23:53:58 +0000
-Date:   Wed, 25 May 2022 16:53:58 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     Thomas Gleixner <tglx@linutronix.de>
-Cc:     Richard Fontana <fontana@sharpeleven.org>, tj@kernel.org,
+        Wed, 25 May 2022 19:54:57 -0400
+X-Greylist: delayed 7465 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 25 May 2022 16:54:56 PDT
+Received: from mx1.supremebox.com (mx2.supremebox.com [198.23.53.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C91369D070;
+        Wed, 25 May 2022 16:54:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=jilayne.com
+        ; s=default; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+        References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+        Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+        Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+        List-Subscribe:List-Post:List-Owner:List-Archive;
+        bh=TqucRm9Dg5uQc0lXNeeQRLwX8YON2kIDkDZmFacymJY=; b=fZ40LqRrXVlxCFWC9k9qJlmFy2
+        r4P8w3C1HmYxhdFmJKdwUovESGYAPtZu7BE7Po5tZGjBrDap7oYpDu9lPYQoMlExFqWhDNhXwhN7B
+        dEQaTT/Zh+gU3LEwqFeh2NOcXjc8ArWnVeNLw6N1dfiPazNCJWdYHgRUnLYgNBSHC+PM=;
+Received: from 75-166-140-231.hlrn.qwest.net ([75.166.140.231] helo=[192.168.0.91])
+        by mx1.supremebox.com with esmtpa (Exim 4.92)
+        (envelope-from <opensource@jilayne.com>)
+        id 1ntytc-0000Pc-UT; Wed, 25 May 2022 21:50:25 +0000
+Message-ID: <a8c4636b-707c-2563-c521-2455ac08237c@jilayne.com>
+Date:   Wed, 25 May 2022 15:50:23 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
+Content-Language: en-US
+To:     "Bradley M. Kuhn" <bkuhn@ebb.org>,
+        Thomas Gleixner <tglx@linutronix.de>,
+        copyleft-next@lists.fedorahosted.org
+Cc:     Luis Chamberlain <mcgrof@kernel.org>, tj@kernel.org,
         gregkh@linuxfoundation.org, akpm@linux-foundation.org,
         jeyu@kernel.org, shuah@kernel.org, bvanassche@acm.org,
         dan.j.williams@intel.com, joe@perches.com, keescook@chromium.org,
@@ -40,89 +49,82 @@ Cc:     Richard Fontana <fontana@sharpeleven.org>, tj@kernel.org,
         linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
         Goldwyn Rodrigues <rgoldwyn@suse.com>,
         Kuno Woudt <kuno@frob.nl>,
-        copyleft-next@lists.fedorahosted.org,
+        Richard Fontana <fontana@sharpeleven.org>,
         Ciaran Farrell <Ciaran.Farrell@suse.com>,
         Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
         Christoph Hellwig <hch@lst.de>,
         Jonathan Corbet <corbet@lwn.net>,
         Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-Message-ID: <Yo7Blhgke3WhZSLe@bombadil.infradead.org>
 References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
- <87ee0k0wrn.ffs@tglx>
- <Yo5f9nctTwHZqPbl@bombadil.infradead.org>
- <874k1dz674.ffs@tglx>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874k1dz674.ffs@tglx>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+ <20211029184500.2821444-2-mcgrof@kernel.org> <87h75g0xbm.ffs@tglx>
+ <87y1yph1cm.fsf@ebb.org>
+From:   J Lovejoy <opensource@jilayne.com>
+In-Reply-To: <87y1yph1cm.fsf@ebb.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Sender-Ident-agJab5osgicCis: opensource@jilayne.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 25, 2022 at 10:51:43PM +0200, Thomas Gleixner wrote:
-> On Wed, May 25 2022 at 09:57, Luis Chamberlain wrote:
-> > On Mon, May 23, 2022 at 11:22:36PM +0200, Thomas Gleixner wrote:
-> >> This paragraph is not really understandable for Joe Developer.
-> >> 
-> >>   copyleft-next-0.3.1 is explicitly compatible with GPLv2 (or later) and
-> >>   can therefore be used for kernel code. Though the best and recommended
-> >>   practice is to express this in the SPDX license identifier by
-> >>   licensing the code under both licenses expressed by the OR operator.
-> >> 
-> >> Hmm?
-> >
-> > Let me try clarifying this further, how about:
-> >
-> >    copyleft-next-0.3.1 is explicitly compatible with GPLv2 (or later) and
-> >    can therefore be used for kernel code. Despite this, if you use
-> >    copyleft-next-0.3.1 on Linux, the recommended practice is to express
-> >    dual licensing with GPL using in the SPDX license identifiers by
-> >    using by the OR operator.
-> 
->   'using in the ..' ?
-> 
-> and
-> 
->   'by using by' is off by one 'by' :)
-> 
-> I'm not seeing how that clarifies stuff further. I might be biased, but
-> the version I suggested is crystal clear.
 
-Oh sorry, I didn't realize the paragraph you posted was a suggestion, I
-thought it was the one you were indicating needed further enhancement!
 
-I'll just take yours then.
+On 5/25/22 1:13 PM, Bradley M. Kuhn wrote:
+> In answering Thomas' question …
+>
+> Thomas Gleixner wrote at 14:10 (PDT) on Monday:
+>> If I want to remove this option, then how do I express this with a SPDX
+>> license identifier?
+> … some licensing/SPDX background is in order.  (I apologize in advance for a
+> few paragraphs of license-splaining, as I know that many on this thread know
+> these points already, but I suspect most only have only vague familiarity
+> with this issue.)
+>
+> copyleft-next 0.3.1 reads:
+>>> +11. Later License Versions
+>>> +    The Copyleft-Next Project may release new versions of copyleft-next,
+>>> +    designated by a distinguishing version number ("Later Versions").
+> Many don't realize that GPL is (or was, pre-copyleft-next) unique in
+> structure among copyleft licenses in that the -or-later clause of all
+> licenses in the GPL family is configurable.  That yields the complex forms
+> of: GPLv1-only, GPLv1-or-later, GPLv2-only, GPLv2-or-later, etc.  GPLv3 even
+> added the proxy upgrade clause (— a formulation SPDX can't handle at all).
+>
+> Other non-trivial FOSS licenses — such as Mozilla Public License (MPL),
+> Common Development and Distribution License (CDDL), and Eclipse Public
+> License (EPL) (as just three examples) — all have “automatic -or-later”.
+> Thus, “MPLv2.0” *always* means “MPLv2.0-or-later”, so if you use the SPDX
+> moniker for that (“MPL-2.0”), it really is akin to using “GPLv2-or-later”.
+> Meanwhile, there is no *actual* way to license code under “MPLv2-only” — the
+> license text itself prohibits it.
+A few folks on the SPDX legal team did a summary chart of all the 
+nuances and while I'm not going to go down that road again, suffice to 
+say, the "or later" clauses have more variation than most people would 
+think (which is probably b/c most people don't need to pay attention to 
+it). The "+" operator is always available if someone so chooses to apply 
+it as needed.
+>
+> All that's to say: the GPL has (historically) always been a huge FOSS
+> licensing special-case because of the complex configurability of its
+> “-or-later” clause.
+Agreed.
+>
+> One of the last activities I did with SPDX (in late 2017) was to help
+> negotiate a solution on reworking the GPL identifiers to deal with this
+> special case.  The solution was a classic political compromise — where
+> *everyone* left unhappy — but that's what led to the deprecation of SPDX's
+> “GPL-2.0” identifier in favor of “GPL-2.0-or-later” and “GPL-2.0-only”.
+I would agree with this characterization, except this was the outcome 
+the FSF wanted, so ostensibly they were happy (and you forgot that 
+GPL-2.0+ ).
+(And to give credit where credit is due, Bradley's input during that 
+challenging "negotiation" was very helpful. :)
+>
+> So, this problem that Thomas notes above is definitely an error by the SPDX
+> project, *just like* the one that exists for the deprecated “GPL-2.0”
+To be clear, the GPL-2.0 identifier was never an error by the SPDX team 
+- we were always very clear as to what it meant/means. It was that the 
+FSF didn't like it. That is clearly explained in the blog post on the 
+SPDX website, as well as the post on the FSF site on the subject.
 
-> >> > +  To use the copyleft-next-0.3.1 license put the following SPDX tag/value
-> >> > +  pair into a comment according to the placement guidelines in the
-> >> > +  licensing rules documentation:
-> >> > +    SPDX-License-Identifier: GPL-2.0 OR copyleft-next-0.3.1
-> >> > +    SPDX-License-Identifier: GPL-2.0-only OR copyleft-next 0.3.1
-> >> > +    SPDX-License-Identifier: GPL-2.0+ OR copyleft-next-0.3.1
-> >> > +    SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
-> >> 
-> >> Please don't propagate the GPL-2.0 and GPL-2.0+ tags. They are
-> >> outdated (still valid) in the SPDX spec, which reminds me that I should
-> >> update the relevant documentation...
-> >
-> > OK thanks for the recommendation, I'll leave it at:
-> >
-> > +    SPDX-License-Identifier: GPL-2.0 OR copyleft-next-0.3.1
-> 
-> 	SPDX-License-Identifier: GPL-2.0-only OR copyleft-next-0.3.1
-> 
-> please. See my previous reply quoted above.
-> 
-> > +    SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
-
-Sorry I hadn't had my coffee yet so I should only list:
-
-SPDX-License-Identifier: GPL-2.0-only OR copyleft-next 0.3.1
-SPDX-License-Identifier: GPL-2.0-or-later OR copyleft-next-0.3.1
-
-Will do this on the next spin.
-
-  Luis
+Jilayne
