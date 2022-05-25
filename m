@@ -2,76 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0A82C433FE
-	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 22:18:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F75C433F5
+	for <linux-block@archiver.kernel.org>; Wed, 25 May 2022 22:43:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245084AbiEYWSH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 18:18:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51440 "EHLO
+        id S1343667AbiEYWn5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 18:43:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbiEYWSG (ORCPT
+        with ESMTP id S240439AbiEYWn5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 18:18:06 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A568674FC
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 15:18:06 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id z25so174407pfr.1
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 15:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=osandov-com.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=uOobr8g0kT4vEBTgEu41bzRQi+qLtEZA9dzxHh988+w=;
-        b=xpDGw8HD+rq0ijZElDdUGvJGAZlpyvFvuENAf0s86Ef94wJeHiSRryth3N/ygc6E7L
-         5EbTlAWA2vba+4KQRF0YHYTiOMYpfCE8L2MgOsIZ+w+i7JO5KPkF9xH/YAcXmLPaP1qy
-         eQEVgSNsp37uRxguZlUK9MNiE7LoerAZtQ37XcBYz13entkCPWgEagwijO6PNNqKOvJh
-         5bm9YGNvIy7wXQ/y81JLv6eS0t7JYb+HoHct/wdceSe1KE2/lnipDp4lcsvCGvwe64zJ
-         iGyy7lWhoVTUfy7udPnkAQXCA0uBzZF/jRknEzFU9mqEnFQnJMD/T9ZZ9i97TYy2Tgur
-         DZtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=uOobr8g0kT4vEBTgEu41bzRQi+qLtEZA9dzxHh988+w=;
-        b=CLK+Qy6/tCLrGK/7+H3uGgwu/XOXCMdmTy/s0Ivqn0urPQWdbxTmNEm7+3Z6wfu/Wn
-         YCCHSsH/I4Jr3Fx+LMUoXTh11WwdTEs1RNvkOzVm9nKannYN8bRPI6tzToTjiqner8lX
-         9Bp+lEGQ5uEsQ/BlHf0noIpHkUJmqQi0YEqpdg5BIj8FidwfLBUJJUWXyVicsqadTl8I
-         89W3yz47XV9uMDLJ/4XSXFAHKu/oFy5BgW+qjJKpxNPk6Wf6itm5LL3kEkqLbLVI+iVC
-         izdK2gEvkm3rXarZ0wG0TaFNR+2mpOxT2MpNgE7hLhZoTXlBZS2zxBxVuVHmG7/3kpXT
-         ft8Q==
-X-Gm-Message-State: AOAM5335KjBqiH3dhlicpi6m9rwuX9Eh9HkJYSAllPA9r6BdDloAbsUf
-        Jm6V/nTe1h52T8r88Einnt1HTRY5fTFCBQ==
-X-Google-Smtp-Source: ABdhPJxpuTeIO1Oa9xMYMhqTlBj9aldPGGnhN2rnoNHGuNNCWXN2iKcf2lIwWGTCgnzjOycuK/okqg==
-X-Received: by 2002:a63:5565:0:b0:3fa:78b7:55a0 with SMTP id f37-20020a635565000000b003fa78b755a0mr12773469pgm.384.1653517085208;
-        Wed, 25 May 2022 15:18:05 -0700 (PDT)
-Received: from relinquished.localdomain ([2620:10d:c090:400::4:38c1])
-        by smtp.gmail.com with ESMTPSA id y21-20020a056a001c9500b00518895f0dabsm9109191pfw.59.2022.05.25.15.18.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 25 May 2022 15:18:04 -0700 (PDT)
-Date:   Wed, 25 May 2022 15:18:02 -0700
-From:   Omar Sandoval <osandov@osandov.com>
-To:     linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-scsi@vger.kernel.org
-Cc:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Subject: [ANNOUNCE] blktests under new maintainership
-Message-ID: <Yo6rGhGdccNJXCe8@relinquished.localdomain>
+        Wed, 25 May 2022 18:43:57 -0400
+Received: from protestant.ebb.org (protestant.ebb.org [50.56.179.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7D6EA3098;
+        Wed, 25 May 2022 15:43:55 -0700 (PDT)
+Received: from localhost (unknown [216.161.86.18])
+        (Authenticated sender: bkuhn)
+        by protestant.ebb.org (Postfix) with ESMTPSA id 2EF49820B4;
+        Wed, 25 May 2022 15:43:54 -0700 (PDT)
+Date:   Wed, 25 May 2022 15:29:20 -0700
+From:   "Bradley M. Kuhn" <bkuhn@ebb.org>
+To:     linux-spdx@vger.kernel.org, J Lovejoy <opensource@jilayne.com>,
+        copyleft-next@lists.fedorahosted.org
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Luis Chamberlain <mcgrof@kernel.org>, tj@kernel.org,
+        gregkh@linuxfoundation.org, akpm@linux-foundation.org,
+        jeyu@kernel.org, shuah@kernel.org, bvanassche@acm.org,
+        dan.j.williams@intel.com, joe@perches.com, keescook@chromium.org,
+        rostedt@goodmis.org, minchan@kernel.org, linux-doc@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>,
+        Kuno Woudt <kuno@frob.nl>,
+        Richard Fontana <fontana@sharpeleven.org>,
+        Ciaran Farrell <Ciaran.Farrell@suse.com>,
+        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thorsten Leemhuis <linux@leemhuis.info>
+Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
+Message-ID: <Yo6twJ5rqrB/J/rJ@ebb.org>
+References: <20211029184500.2821444-1-mcgrof@kernel.org>
+ <20211029184500.2821444-2-mcgrof@kernel.org>
+ <87h75g0xbm.ffs@tglx>
+ <87y1yph1cm.fsf@ebb.org>
+ <a8c4636b-707c-2563-c521-2455ac08237c@jilayne.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a8c4636b-707c-2563-c521-2455ac08237c@jilayne.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, everyone,
+J Lovejoy wrote:
+> (And to give credit where credit is due, Bradley's input during that
+> challenging "negotiation" was very helpful. :)
 
-I'm happy to announce that Shin'ichiro Kawasaki is taking over as
-maintainer of blktests. I haven't been working in the storage space for
-awhile, and I also haven't been very prompt to review or merge patches
-lately, so this should hopefully make things easier for everyone.
+😊 … thank you!
 
-The GitHub repo will be staying in the same place
-(https://github.com/osandov/blktests) for now. The main difference is
-that you should now Cc Shin'ichiro instead of me when submitting
-patches, and he'll be the one applying them.
+I'd written today:
+>> So, this problem that Thomas notes above is definitely an error by the
+>> SPDX project, *just like* the one that exists for the deprecated “GPL-2.0”
 
-Thanks!
-Omar Sandoval
+J Lovejoy replied:
+> To be clear, the GPL-2.0 identifier was never an error by the SPDX team - we
+> were always very clear as to what it meant/means.
+
+… but notwithstanding a clear definition of a moniker (which I agree indeed
+you've made for most SPDX identifiers), if that definition fails to
+adequately match historically understanding (and/or fails to take into
+account nuances in the document it represents), confusion ensues for users.
+Users *were* confused about “GPL-2.0” (remember, we did a small (admittedly
+non-scientific) survey at a session at a conference — FOSDEM I think it was?)
+
+Most SPDX *users* won't speak its defined terms fluently; I suspect most of
+Linux's licensors (and even most licensees) don't speak SPDX fluently, so
+presumably you want SPDX identifiers to have some intuitiveness —
+particularly for the use case of linux-spdx, which requires the identifiers
+to be *both* human-readable and machine-readable.
+
+This is relevant to the copyleft-next-0.3.1 identifier.  SPDX could define
+“copyleft-next-0.3.1” to mean for SPDX purposes: “the text of copyleft-next
+without any options in its terms exercised/removed” (— although I note
+https://spdx.org/licenses/copyleft-next-0.3.1.html seems to be wholly silent
+regarding options exercising/removing).  However, there is currently
+confusion — shown in the fact that Thomas still asked:
+>>>> If I want to remove this option, then how do I express this with a SPDX
+>>>> license identifier?  Sigh!
+… upon noticing this part of copyleft-next:
+>>> +    Unless I explicitly remove the option of Distributing Covered Works
+>>> +    under Later Versions, You may Distribute Covered Works under any Later
+>>> +    Version.
+
+Anyway, I'm pointing out SPDX's shortcomings on this point *not* to
+captiously admonish SPDX, but rather to point out that any issues with SPDX
+identifiers and their formal definitions shouldn't influence a decision about
+what licenses are acceptable for inclusion as dual-license options in Linux.
+
+Plus, I remain hopeful that over the long-term, the SPDX project will take
+feedback from efforts like linux-spdx to solve the kinds of problems that
+have come up in this thread and others.
+
+Finally, I've already started a sub-thread on the copyleft-next list to start
+discussing maybe the license (in future versions) shouldn't have this option
+anyway (for unrelated policy reasons).  That might yield a side-benefit of
+making the problem evaporate entirely for SPDX.  (Anyway, after 25 years of
+living with GPL's “-or-later vs. -only” mess — I, for one, am convinced new
+licenses like copyleft-next should try very hard to not repeat that mistake.)
+
+ -- bkuhn
