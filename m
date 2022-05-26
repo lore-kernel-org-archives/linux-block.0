@@ -2,157 +2,188 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D030C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 07:36:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81523C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 08:12:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346423AbiEZHg0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 May 2022 03:36:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44348 "EHLO
+        id S241476AbiEZIMS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 May 2022 04:12:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233719AbiEZHgY (ORCPT
+        with ESMTP id S233416AbiEZIMR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 May 2022 03:36:24 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A52C8994FC
-        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 00:36:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653550584; x=1685086584;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=qHTK2iE1QjMm/cknfYz08RFBrM0fspmizhcpAzFXLH4=;
-  b=Il1Vd6+5svVBnwRvchIq/s4bUnhsmtHkxK+9+6ZVOEV/ZmpNUJ5I+JYC
-   4WwbtsyjJfUPLjNiP4qhYKsxvAGfD/qOtUVs3Jw/6IwvYCqPdN9rI7488
-   viD1s8KZt4mMeD9Hwrg/OvM2Wb7Mtx8VfKZZQHXVzZmGWwj9glQ8TDiGp
-   giyBXJE67jCxc7OKOhwUqx0SNFiW2sEaNobEe9ObVmy/vrNDTIIVCNGQQ
-   ongCOEuIOMgOMjxZxg86Av76PfvNVYZgmjVbvoppqq0rpUlrL6OCxFpUt
-   TSKC3vGh+EcpE59qhToaztxKlHIR6Vvi+N1E19mXGEkCkibAUq1FRZn1T
-   A==;
-X-IronPort-AV: E=Sophos;i="5.91,252,1647273600"; 
-   d="scan'208";a="202318438"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 26 May 2022 15:36:23 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kZwL5pZUUpmTRtHeDtrsDOWkaUBR4W3Pq7sBQrfVOnWFaLLNvAcIxEO3PkGDZVN85bmk4O7sHUayMHgNJOlla4XCDV2qAPnWG9f5iu6AmQYdJIsJ/WsUu4w/MjXBR00B0PQb5ytVxz1trDQfPLb0bBvrLUDgsr/pAoU9B8xi+M0DjdCDpmA38kSgWquk/3dJHLNmNKBjEPITIR/qSu+MAvNnPV0yYvQ+LfAj4si8Lj7VcYDvAh8MFpRg+AIn8q1zt6Z0GCHx/nxF82m5Oc0qDWcmANm28sptig2tRNsqKOBRfHHmWVP+K3QegKljQXDvrkSbKKWEuVbzbelMet94oQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ujyXZKTxMuz6BKMQI0u+JEYz3PRSZDVV8KHWp/4DCpk=;
- b=iDn2m9lXBFVcz/EcWL7JOjkU/stpzpz9PPg3DJVxNDvoiTW/1dN13G3/jNx1k/vwOchdv6hekihWw3TH4C1nvFDEPftwLtdXpPqMBUyQqZD8pKkDXFDi/wmRomiei0uBpqxwmI9sRDPkO1WflvOIc/Q9qgy1ItvSjweexEuSRAlA/y3m3iB0jTjiRFnlsoCWGTcFN7PVCpg5VO3cebgZi4vzLIZSv27p2RkYMirdqUT0scORJU9PjdfCl1t7rGAuwNuziNdJxxh8U5axTu4fkYGm+AnI31QhSvnTwsfIf/Soy05EA3pbbrukz0ur83Dx9KAdH/63iAluhv0IoNY1YQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ujyXZKTxMuz6BKMQI0u+JEYz3PRSZDVV8KHWp/4DCpk=;
- b=kshYsqUnRCZa5JLDHaUjMKnoaifqVC757bzi1E66/PEJM92xvUL3hAhe3uJjBQwD13LDAlnEEfMNE0FMiogSVoX3UUoZ9K6PINHZ/Pnw7k03B4UsjNB9COL7644/sKst7h36wZRCzIZqobS7INzKSiBEiVdv95z43/FnnbvUC78=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SA0PR04MB7372.namprd04.prod.outlook.com (2603:10b6:806:da::14) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5293.13; Thu, 26 May 2022 07:36:20 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5293.013; Thu, 26 May 2022
- 07:36:20 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Xiao Yang <yangx.jy@fujitsu.com>
-CC:     "osandov@fb.com" <osandov@fb.com>,
-        "yi.zhang@redhat.com" <yi.zhang@redhat.com>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests v2] nvmeof-mp/001: Set expected count properly
-Thread-Topic: [PATCH blktests v2] nvmeof-mp/001: Set expected count properly
-Thread-Index: AQHYbQ6PWTWInQpfsUS5qcjfUUQCvq0wzHaA
-Date:   Thu, 26 May 2022 07:36:20 +0000
-Message-ID: <20220526073619.xyrwfudl5ibdw3rg@shindev>
-References: <20220521123020.90046-1-yangx.jy@fujitsu.com>
-In-Reply-To: <20220521123020.90046-1-yangx.jy@fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 5c637973-0fb5-474c-ce66-08da3eea6d3a
-x-ms-traffictypediagnostic: SA0PR04MB7372:EE_
-x-microsoft-antispam-prvs: <SA0PR04MB73725E2A008981B2A932C592EDD99@SA0PR04MB7372.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: xrf4o+xMmb78VMHYRCb4WwVnPGKUXEtsm3uwtcPmJmOIBIYT6QzZ7r+46Vt4U0AMu/x5LPSdE00+mqVFdhnsX4Gj9ZKuzD5ZW4Dl3iS4HHIOAl1KAV6LHWh+b/FcELVSHg0D3pui6iUfY0XvvAzrLExDJS+t1j5R39/pa5VZ1x0W9T0b91z1aJLgoJqKuzEDEctqjfdUPngf4ijxB3Kf6Mpv9iFRDagIBL3R0nPo3fLEnX1rzeleIJ3pSMai0Gr2bvwFy7MNC8YlPXkpGH6lNja6FFtJ6MBosDgnXjtuvhJwDsl8UEd8hexOLDx4EUlJSfpuvHwqbIHqcgBpvbiXq7vaPDOiSqPaGh3cf98qAteash3B2TEz3K5FeFhNIqzj+T5+pat2or9vWighpNgAcdgueE8bYJ7cc4fu1Gw9kmoqEicnzZr5INJUGbLuCDYJqFslFoN+dPaHa0DOiwnQ/i6oMIYDkRZVmhv7KYoOqeNyDBCtR9DVzbaO8fw9Agbo4ph4u1PstH92XHlwGG4GDkJQY0iZ6cbsZRECBiRd5ORpC1GJhC50gZDAEciKXnD1/Hmcpz7qxa5hv42447ocy5z+NWGA3M9JaUiUhJ32o7pmDQi3jIZK2sQhaC1Yb7TAUpPsDBDmGSv0VSRA25J7avsxQHQaKv9ggm6eE3pLeWCOWZBAUZwqZi/qh5LshvsaQshmj1oHVwdEMSTbYHwdWg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(4744005)(5660300002)(1076003)(2906002)(122000001)(186003)(6486002)(44832011)(9686003)(6506007)(26005)(6512007)(8936002)(83380400001)(38070700005)(38100700002)(508600001)(82960400001)(71200400001)(66446008)(66946007)(66556008)(76116006)(91956017)(64756008)(86362001)(4326008)(66476007)(6916009)(316002)(54906003)(8676002)(33716001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zVGaZpTi/8PDd8RVg3Xcbt/hlA1ycmBe8etL6Qu4jvFv3ezAsq0ybrsK7ZM1?=
- =?us-ascii?Q?NVPSxLhtFcn23KFJwITtmJdy7dyHD3Er3yDwZ7eQbnGiCLVjAjewZxLCjSYz?=
- =?us-ascii?Q?g9TF8z2o//ALVtvhsYWSAawAV91VYQqW0jpVemaB2Wtb+HeZz333LUbL5yvl?=
- =?us-ascii?Q?7s06hR4GXlhwWuLUMdvK8eYARxCLuQuCVK2CZMVJkx3Qw3ieiYN1+pyCTLFX?=
- =?us-ascii?Q?MuP3FZf9jOwBG69ocYlR9ZgwVFBcjihzosUsJTtHzVqUbBwevGKpnPdEgSF1?=
- =?us-ascii?Q?gs5sbJ0lqzSyvjqd+uhMlLmB50xtcNb5RrcgqnGagFHAdoJVJYtiJRS5HXmS?=
- =?us-ascii?Q?BpyLSd+S1a8LSFUFu7Uc/mrsLsINnwOzrmBO13HCoED8xGTl1cle19SjbJDL?=
- =?us-ascii?Q?I385sLAWx1quOiGdDLeVxud+vAW3a1AWBZSZCoKT1CS/Jv1yJZQHpJ08iASS?=
- =?us-ascii?Q?hqs2sjVE/KddwtbVt6Q/SG1MtpvrcMHlNXKr8vOy8pdNPrx9nkA8mpsio9kM?=
- =?us-ascii?Q?nzq4EgHNa8+dUoHoOs2m8CgX9B3gpYwv+tjl61cQ37+OzZsCM5S/fxyyL8Qw?=
- =?us-ascii?Q?Q5SWS+ikV3tGv2OMwMSDq8RN51n8nb2lCTn1AeL4aofWmKeH3st5GVQV5Md1?=
- =?us-ascii?Q?HZbWK8ljhcZow6tbTtEC8mb/LrJo+mEKfg7R3IQeRY5F3rzpbWxfCxVxDC/r?=
- =?us-ascii?Q?mT462iRT4VKrgsPtUWXA82jjRdT/188U3ZuUeXjG85Vve559GLZCNmg7KU7U?=
- =?us-ascii?Q?judyjM1x9Fpt3GyapzNM2LJFIoHxj2piJG1FGuSVYdSms7iNGBO+UNTZ87Y/?=
- =?us-ascii?Q?gZuu39dL5NP7SSX0QuiXrUivMEqsoiUD0J/22whbe7Mc/m9TyeM4GhQnwZvU?=
- =?us-ascii?Q?C1S7OPw2s+nwafmL3x4NxQwP2ZtElk8GmRN/Wtrw7pu9eTfipx8t3ij0VxPi?=
- =?us-ascii?Q?PO1Lz2t6xddpUN1LOrOGlbBGVygKE2zORuq9QuhU+Q9mpYSkZpAWtpP9zX/N?=
- =?us-ascii?Q?ac1SoiBV8EHYlKRx/6stVfqdsQArQOirRpwkvqsR0RwygjyqKH7eMOwYLUm9?=
- =?us-ascii?Q?Ws9V9zsCNl0IAsd/tvf9bPPRfPYopTc8s/uLogVx3wI+7IOtcDgZarTIGH92?=
- =?us-ascii?Q?jF0D1OoIe8+37xRxgNtRx6UwN0DE4PxhFUQL3YUXAcoDrUWoZzspBFm9Xdn/?=
- =?us-ascii?Q?9Pb45r7KObca3YGWgRY/S54iC5znkzrNc3EEMgyWj8NlMKDNWbKulqv0Eze5?=
- =?us-ascii?Q?m4qZquMwg9W0w2zRUWHt56/qd5cHxAu6rlpjhyTnwvmsCTu1SAfY/n0WtL51?=
- =?us-ascii?Q?fSIfxjAep+sSggzWTMjaNZ8G4r2JYXGIOrP0EJmFNvelGFNAyXdS5ta2h33o?=
- =?us-ascii?Q?yGAfMLsdF6Jnf35cCcW94QJIR3ZtLdfprhk9Xu80bqQsgVPFBE5LBj54/lZF?=
- =?us-ascii?Q?g6BG2NAkfrjyubZQIjrLtUCrR0rUvzlUkWb2h2Z0VsL03aeqDcZCgjEPsIun?=
- =?us-ascii?Q?tj7M90YciGMgXfWEDBEMMX7PaLdH5KRyyicdBHD8uKTRxQ7+UpS+8Cqa2HeA?=
- =?us-ascii?Q?yh5tpDy/gYYWjDIm7mxQbo2x6BokhOqZlASIuwSCF0jGRUtk/Ks8Lw391EXg?=
- =?us-ascii?Q?dTD/h7mmesdxW+jJtX1jFbDDnftE5tbc26SguZRg7XzOU0ve5x79INH+/Cfp?=
- =?us-ascii?Q?nLb1We7MpY7DXZYUfn6NgZwNkYqdzG1RYK2bORnA7GBT/vJu1Uweybmv4hvW?=
- =?us-ascii?Q?rP4qEYwnjoZFsWGmTeol/n3OvwUOUiWNqKYYbGBNZDFmdUOHrLzz?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <9A9E78B494F109449760A6C9EEB84228@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Thu, 26 May 2022 04:12:17 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2C6422B21
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 01:12:13 -0700 (PDT)
+Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220526081208euoutp0113add0652e796b541ba951056163b0ab~ymXH-2tWa0935709357euoutp01G
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 08:12:08 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220526081208euoutp0113add0652e796b541ba951056163b0ab~ymXH-2tWa0935709357euoutp01G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1653552728;
+        bh=sRas2qHYxGK26QnM0GFTIv2tqbVuA6ew52jA7d50Ke4=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=u4CNpUNBsZNfGY8XCXMlSrtQ6OEG7NfUmZhZeUrqECHG7F1B6gaUATwtK1mKRZREp
+         NfckJQ+AMDp36iRSs6fx+52oYdwBwGG6uBxkH0KkgNGx7TGCMidkKw/7bzGI1K4gIq
+         rOis8hnSW/Qq26mGEQOPFxdXiYA6EjKATknN89xg=
+Received: from eusmges3new.samsung.com (unknown [203.254.199.245]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220526081207eucas1p262ca8d7088c8d4898fe9d4be45008a35~ymXHoT8V80059300593eucas1p2P;
+        Thu, 26 May 2022 08:12:07 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges3new.samsung.com (EUCPMTA) with SMTP id B5.78.10260.7563F826; Thu, 26
+        May 2022 09:12:07 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+        eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+        20220526081207eucas1p25fb941ce7f8344420295750bb810501d~ymXHKcZIZ1109011090eucas1p2_;
+        Thu, 26 May 2022 08:12:07 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20220526081207eusmtrp1b0614131c1302506df87eb12313c097c~ymXHJaB9E2331823318eusmtrp1c;
+        Thu, 26 May 2022 08:12:07 +0000 (GMT)
+X-AuditID: cbfec7f5-bddff70000002814-09-628f3657ef99
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id 2E.35.09522.7563F826; Thu, 26
+        May 2022 09:12:07 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20220526081206eusmtip24929ef2f4ad0112677d59e7337e17df4~ymXG5LKB43167731677eusmtip2k;
+        Thu, 26 May 2022 08:12:06 +0000 (GMT)
+Received: from [192.168.8.130] (106.210.248.20) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Thu, 26 May 2022 09:12:04 +0100
+Message-ID: <0bb57f61-9a33-0273-4b89-2cdf042e56dd@samsung.com>
+Date:   Thu, 26 May 2022 10:12:03 +0200
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c637973-0fb5-474c-ce66-08da3eea6d3a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 May 2022 07:36:20.1873
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kHFfQ8fS+LRQpKPWmCC6NaoRV6YWG1HKxkceFYM4/q1Jn5RpGSNW7aVOZYZ2ciH2n6feaCxnJcaeYMwOHOFV6lywu+zUmvfcWzJdjterkPI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR04MB7372
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+        Thunderbird/91.9.1
+Subject: Re: [PATCH v6 8/8] dm: ensure only power of 2 zone sizes are
+ allowed
+Content-Language: en-US
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        <axboe@kernel.dk>, <snitzer@redhat.com>,
+        <Johannes.Thumshirn@wdc.com>, <hch@lst.de>, <hare@suse.de>
+CC:     <dsterba@suse.com>, <dm-devel@redhat.com>,
+        <jiangbo.365@bytedance.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <jaegeuk@kernel.org>, <gost.dev@samsung.com>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <9703ca4c-33cf-cb3a-b46b-6b0e5537cfd6@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.20]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrOKsWRmVeSWpSXmKPExsWy7djPc7rhZv1JBkd2KlmsvtvPZvH77Hlm
+        i73vZrNaXPjRyGSxZ9EkJouVq48yWTxZP4vZoufABxaLv133mCz23tK2uLxrDpvF/GVP2S3a
+        Nn5ldOD1+HdiDZvH5bOlHptWdbJ5bF5S77H7ZgObx87W+6we7/ddZfNYv+Uqi8fm09UenzfJ
+        ebQf6GYK4I7isklJzcksSy3St0vgyni98j1jwSnxinnzNrA0MJ4R6mLk5JAQMJGYt/04axcj
+        F4eQwApGiZltP9kgnC+MEvfObWEDqRIS+MwosWF2YhcjB1jHvle8EDXLGSVePT8N1QBU07zm
+        JZSzi1Hi9qzfYN28AnYSc9uWsIDYLAKqEnf2NDNCxAUlTs58AhYXFYiQWNn6BswWFvCXOH77
+        LhOIzSwgLnHryXwmkKEiAvMYJeb9+A/mMAvcB9rw/AILyE1sAloSjZ3sIA2cAm4SFxafZ4Vo
+        1pRo3f6bHcKWl9j+dg4zxAtKEtt+mUD8Xyux9tgZdpCREgK3OCXuXO1mgUi4SHQtWMQOYQtL
+        vDq+BcqWkTg9uQeqplri6Y3fzBDNLYwS/TvXs0EssJboO5MDUeMo8bPxGtRePokbbwUhzuGT
+        mLRtOvMERtVZSEExC8nLs5B8MAvJBwsYWVYxiqeWFuempxYb56WW6xUn5haX5qXrJefnbmIE
+        pr3T/45/3cG44tVHvUOMTByMhxglOJiVRHgvPO1NEuJNSaysSi3Kjy8qzUktPsQozcGiJM6b
+        nLkhUUggPbEkNTs1tSC1CCbLxMEp1cAUcvySRJi2Rq69+MXfAq+knJ2PaMwr/3pZS+nIFwtD
+        FdkJEwoZJDpX7tctmjf5PHvUvQehZSbPk/qVVU7usRLqNxB5O1F73UKbyQqV/Cq1M3anR1xQ
+        cjuWYXlzYd0ENQ3DZ/z37/3MfiOXMN3y3fbjuy1OB+yTyuA1E7Hl4rgQcfLQf6aCzVXlAZvV
+        bumX3A1syd+30Kf7xMfkr1HqBYab/obb+YbELrWrLDyd/T1wks2HfZNy/d+qmsg7LCj73JtV
+        9NVaRKueP/JC3HKRsEvb7tr3KMuUvnKSjCnscjA+dJ/BUvR/ptflTuXDNeWi12R74ztr3rdm
+        KVxlO8fcMyFzhp7lqYZZ/W9d2DJElFiKMxINtZiLihMBgYDfpuoDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFuplleLIzCtJLcpLzFFi42I5/e/4Pd1ws/4kg3vnWS1W3+1ns/h99jyz
+        xd53s1ktLvxoZLLYs2gSk8XK1UeZLJ6sn8Vs0XPgA4vF3657TBZ7b2lbXN41h81i/rKn7BZt
+        G78yOvB6/Duxhs3j8tlSj02rOtk8Ni+p99h9s4HNY2frfVaP9/uusnms33KVxWPz6WqPz5vk
+        PNoPdDMFcEfp2RTll5akKmTkF5fYKkUbWhjpGVpa6BmZWOoZGpvHWhmZKunb2aSk5mSWpRbp
+        2yXoZbxe+Z6x4JR4xbx5G1gaGM8IdTFycEgImEjse8XbxcjFISSwlFHi16MLzF2MnEBxGYlP
+        Vz6yQ9jCEn+udbFBFH1klLh4tYEdwtnFKDH33AQ2kCpeATuJuW1LWEBsFgFViTt7mhkh4oIS
+        J2c+AYuLCkRIfFo2gRXEFhbwlZi+8xyYzSwgLnHryXwmkKEiAvMYJeb9+A/mMAvcZ5S4/fwC
+        C8S634wSPff3MIMcziagJdHYCXYfp4CbxIXF56EmaUq0bv/NDmHLS2x/O4cZ4k8liW2/TCDe
+        qZV4dX834wRG0VlI7puF5I5ZSCbNQjJpASPLKkaR1NLi3PTcYkO94sTc4tK8dL3k/NxNjMB0
+        se3Yz807GOe9+qh3iJGJg/EQowQHs5II74WnvUlCvCmJlVWpRfnxRaU5qcWHGE2BgTSRWUo0
+        OR+YsPJK4g3NDEwNTcwsDUwtzYyVxHk9CzoShQTSE0tSs1NTC1KLYPqYODilGpjKi22z3hlt
+        5Yv7I7a81yZKnN+rf9GcV9Kdod3Z8kGGt9/nfdXmWvHBiufWo5L8/UKH5Wq3XWNZELW08uHG
+        DYwPz3DMnXlepSI+U9l/Q6DAlOffBUNPhrNx7CtL53w2S8d+4eyHPfuyuo9+CrhzgOX4uerP
+        InqpynXMBp49KYcVz2pfP7xX9USyb0TDTZZELSXzj6dW6+c8Oj5d1Z61ZJGYyTquldqlq1dn
+        1V7Y0bvgtsvOEqeZGzgu3BYuO3Uka0Ly/VjnxkZ+9ydV/Xem31jR+e/lHjP+ufNO3E5mcbHW
+        yjwxh6M8NqNRPkn7XRPL3QAZaSu3uQ4cD28H8s/ZvTi3PvbYpJu7OY9djLnIlaTEUpyRaKjF
+        XFScCABGat9hoAMAAA==
+X-CMS-MailID: 20220526081207eucas1p25fb941ce7f8344420295750bb810501d
+X-Msg-Generator: CA
+X-RootMTR: 20220525155008eucas1p2c843cc9098f2920e961f80ffaf535789
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220525155008eucas1p2c843cc9098f2920e961f80ffaf535789
+References: <20220525154957.393656-1-p.raghav@samsung.com>
+        <CGME20220525155008eucas1p2c843cc9098f2920e961f80ffaf535789@eucas1p2.samsung.com>
+        <20220525154957.393656-9-p.raghav@samsung.com>
+        <9703ca4c-33cf-cb3a-b46b-6b0e5537cfd6@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 21, 2022 / 20:30, Xiao Yang wrote:
-> The number of block devices will increase according
-> to the number of RDMA-capable NICs.
-> For example, nvmeof-mp/001 with two RDMA-capable NICs
-> got the following error:
-> -------------------------------------
->     Configured NVMe target driver
->     -count_devices(): 1 <> 1
->     +count_devices(): 2 <> 1
->     Passed
-> -------------------------------------
->=20
-> Set expected count properly by calculating the number
-> of RDMA-capable NICs.
->=20
-> Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+Hi Damien,
+On 5/26/22 01:13, Damien Le Moal wrote:
+> On 5/26/22 00:49, Pankaj Raghav wrote:
+>> Ensure that only power of 2 zoned devices are enabled for dm targets that
+>> supports zoned devices. This constraint can be relaxed once non power of
+>> 2 zone size support is added to the DM layer.
+>>
+>> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
+>> ---
+>>  drivers/md/dm-table.c | 6 ++++++
+>>  1 file changed, 6 insertions(+)
+>>
+>> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+>> index 03541cfc2317..2a8af70d1d4a 100644
+>> --- a/drivers/md/dm-table.c
+>> +++ b/drivers/md/dm-table.c
+>> @@ -251,6 +251,12 @@ static int device_area_is_invalid(struct dm_target *ti, struct dm_dev *dev,
+>>  	if (bdev_is_zoned(bdev)) {
+>>  		unsigned int zone_sectors = bdev_zone_sectors(bdev);
+>>  
+>> +		if (!is_power_of_2(zone_sectors)) {
+>> +			DMWARN("%s: %pg only power of two zone size supported",
+>> +			       dm_device_name(ti->table->md), bdev);
+>> +			return 1;
+>> +		}
+>> +
+>>  		if (start & (zone_sectors - 1)) {
+>>  			DMWARN("%s: start=%llu not aligned to h/w zone size %u of %pg",
+>>  			       dm_device_name(ti->table->md),
+> 
+> I thought the agreed upon idea is be to add a dm-linear like target to
+> emulate power of 2 zone size so that we can keep btrfs and f2fs running on
+> this new class of device. So why this patch ?
+> 
+> The entire series as is will fragment zoned block device support, which is
+> not a good thing at all. Without the new dm target, none of the current
+> kernel supported zone stuff will work.
+> 
+I have mentioned this in my cover letter:
+The support is planned to be added in two phases:
+- Add npo2 support to block, nvme layer and necessary stop gap patches
+  in the filesystems
+- Add dm target for npo2 devices so that they are presented as a po2
+  device to filesystems
 
-Thanks, applied.
+This series is targeting the first phase where we have stop gap patches
+and add support to the block and nvme layer and in the next phase we
+will add a dm linear like target for npo2 zone sizes which can be used
+by all the filesystems. This patch makes sure that we can't use npo2
+zoned devices without the proper support that will be added in the next
+phase in the DM.
 
---=20
-Shin'ichiro Kawasaki=
+Even though we decided we would like to take the direction of DM, I am
+still awaiting reply from Christoph who raised concerns about npo2 zoned
+device support and Mike Snitzer about this approach. That is one of the
+reason I split this effort into two phases.
+> The zonefs patch is also gone from the series. Why ? As is, zonefs will
+> break if it is passed a non power of 2 zone size drive.
+> 
+I think this was my mistake. If you agree with the above approach, then
+I can add a stop gap patch also to zonefs npo2 zoned devices. This way
+all the zone filesystem support goes via DM for npo2 zoned devices. I am
+proposing this so that initially we always have only one way of
+accessing a npo2 zoned device (via DM) from **filesystems** until we add
+native support.
