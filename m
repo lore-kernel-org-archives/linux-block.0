@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF147C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 01:59:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F00BC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 02:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345859AbiEZB7N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 21:59:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40262 "EHLO
+        id S235804AbiEZCBX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 22:01:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232245AbiEZB7B (ORCPT
+        with ESMTP id S233597AbiEZCBW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 21:59:01 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7A69BCE84
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:59:00 -0700 (PDT)
+        Wed, 25 May 2022 22:01:22 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B38D5A
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 19:01:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653530340; x=1685066340;
+  t=1653530479; x=1685066479;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=Jfax4/+o7wWRlUxJ58mTLPx93F9LIro2F7EUGaGjyaQ=;
-  b=cETZLQxizk02f3MsxxXd+JPOW9xrLyYkccCX14NYaG/uxRbBPg503CCd
-   y8HcK/HuQ8nrElAK0u/R870wurH/4jITCM4uEQtnF7GC+f6DB2KJO3p7U
-   m064DKeWdZdnaB4fLY+h83lQr3LzVrYDLxDOS5a2lj8DAcrwwOVLec6L3
-   vKFKJVGaIOeVnk0KcqqGN8Y+WSk5yXFYz2uThkTf2pXL+gPdzS+uFeT/K
-   flj16RRHX+wG1arKtk9dSCO58cz8bmiC5VVDU9UR+xJuB7hfFuv9i27fc
-   ikSTv011HqXbErZUJlNhNvEmBbyM2fG81uDo1HhgHjxVAiuboF+6OJ4Sy
-   A==;
+  bh=Kw/sAdj4ukNgcfd6qDl3p7FNW5+pO8XjZkjcbAYSL9s=;
+  b=Ksf/xsSR/m+VnVUfKppsA3s/QtbErfbE88dxkCZUdAcQu/sdtMIhCKIm
+   Jkaa4DKv7RRQhd+gJaV7XkvIc9MefFXaJP7RRf9Su5qhfa4DudlEGQyny
+   AgBKVh7QHuzZXkQpGALjwEz8Yo4YNU9vXtGfG42V/iH9vWV756e7v9tEm
+   EAsG7AtPK7ONhshsWJwy61TqYOXtmSMb3g6QpsqtGyzHFnEvDI4jfTTAR
+   Yc/dMjXbS2+fzhnavNrNavva9RX1XluYEBrhCfxJ0RpJ9o/FMbDynuouw
+   eVamyl8m5DkfsBCbSrPljQCdmAwans/p8TLoJjlsRsr6Z98OoqQD/QTbQ
+   g==;
 X-IronPort-AV: E=Sophos;i="5.91,252,1647273600"; 
-   d="scan'208";a="313462388"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 26 May 2022 09:58:59 +0800
-IronPort-SDR: 5zI8YC4LDL+Md7lgiqGJcjgh+EogLmKq6O68qN1HmF/zZtm43MIZEaox1Oj02H7zTwexKQl9UK
- ihsrY6gl0n0Nni++Rfah5wpmrQr7YykUL3YYZJ1+27t3lVcA43eSlwmVmFTRxjDw93zF/flBDk
- uz4l6u0CsEQiUep9G5j3lrdb7TQGRhkq9TxbuHoFIbdkvRmOx9E785BjFvCwINcgpM35xiKqW/
- KDvwD1tgMtyyTouA27KEjffUWMgXrwYE6Drvq7Y6yEaoK7ExIz15kLKsCd1DxjNIV6pSNzqbmH
- TPBdzAF0glG6gaCKcrZhcHH2
+   d="scan'208";a="206333492"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2022 10:01:16 +0800
+IronPort-SDR: wGLLfmnBnJEqDeM9cxHvbnBlHD2yfVk4RFTXKMX6ASN1j45CYNNGALj8lqMO2QiASKqhVcPfAL
+ aDQ3svYvUURwEfkMWmHeLfGkRqQ5IH2da6yYw1wk0Ax1BdIAMo1pSkPocVzSGIuTDoD2n+VEBz
+ Gf0Tj3clg+YDLGH8cjzsfLusjktSe8SGHm2Zd4O8/1RrsiB5nKYkiOOvyJF08YqvRuKQBtclIn
+ XOFiKTzWWW1UKMU0QGwAD/TTaisKCD9gvfodda68raS0k4BjsgQjOp/d+XBHWD4F7toXkIGe84
+ LbR/pVXHSaZvGolRwSpaRBlv
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 18:22:54 -0700
-IronPort-SDR: nlDh3mxdm+MC7/BDRmT21JMu6fsXmuOodsKXR+0ngdaJB1TK2ncxCVbC37WNNQCd1kp0UEuWxm
- zhJ31c8qlKEEBmwy+rlNnYdmIVTFdx4fbyCBH2lX4gp+JRUEwJj5G9HG+SYBLFg8sud+4KusGT
- goy2EvXPI3c9CXx/gOeiA6epl3qCU8Z5haoyCPVotFY6t6dPvHVpavLlazFKfx2dPoxlBtfk1V
- IZTPqe8Iz9YvC3SAVrszZ0zp1E1qysDjRICTPaHVoOl0y5vUXLz4k7Rd14Ns/TrE6LwHAXihH6
- Yek=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 18:20:47 -0700
+IronPort-SDR: Dug2E8MZwQr6NSCllRN+Ros7nlyT3Z/F9hhwqJltClnFQvaZ//udAXJ/37EJLjuPEdL5uDnSKI
+ yv1FN3ozKB2/bAlUBYyNokbZWXMrphAuy+un4BGCs/74ZR9KV/eP/O8WubpVOQe1ZrhY3KLpIp
+ uou0jrnJj/Ji0Op7aRd5T0GHrxfy66aYrMx+02/Wd7sSnw7pf9j4sDQLgHDSevyr0GDDZs+J24
+ uHWc+5Fh9j0qW5YabHhU1OsGcdDOYRM9c9/l8S2M0sPDDXuK9Xh+Qqu0TIun4S8a1xFILjUwty
+ oMo=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 18:59:00 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 19:01:18 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L7rhL5S9qz1Rvlx
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:58:58 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L7rl05WmWz1SVnx
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 19:01:16 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,27 +57,27 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1653530338; x=1656122339; bh=Jfax4/+o7wWRlUxJ58mTLPx93F9LIro2F7E
-        UGaGjyaQ=; b=je4cUUhXcPquMpIdPRIPnEHSDzZ06F6IEND2ihyiFFwAi1inVXq
-        YSl/oJgivbNBK15zDtuoli7n9u/nbew9lfAuFmXrvaxKaUw9p9KfLKywGsh3aPfQ
-        4MIpQr5vMTEcLN8A1tKFduNDJ4OIUDhujXDYWc34jxD8fRygY2peBNGIhLeesFXg
-        iYnIkzx1fqoMBSi93aFwDfCiMgqRtTIiYU0KK9v7Mw86+8kFM9agbTRJcuQgNKV9
-        1V8fMANNSmsxzLcXtk6lAAf4iKI7N07v1DksW35JUAiWMVKhEcy2wxScD/EnQ9Bx
-        JC0fy0+2zk6aMm4lpS2sxvtItTpwZmXIsXQ==
+        1653530476; x=1656122477; bh=Kw/sAdj4ukNgcfd6qDl3p7FNW5+pO8XjZkj
+        cbAYSL9s=; b=jq3vRWPnwiepq/pX6oKU2WgrkOJUAgKObTdal4/UG+61HQNDAZQ
+        JidwA3GrtxABJIYsNg7Zv5nRGWOTtUllbXQmYiJTw8flc0ipS1345zsYbxZGeJdB
+        GSg/ymOCjoQKKnnhhLNXM3HHnY4iulLiAJwQ+EaUuDpQHjXijPJsdzM/2fqtxnVg
+        vbxMrYkwNcPhHzDbPB1wWUZNCnN4nGMN0jwWqFmGmqod6OTk4tPP0ArjUMgYfX8+
+        E4dxSfXzrqHtB51vctLlBWCadKkd8dksW6c5YFmMIbDS9opeo8CERFSO27PjbyCu
+        YnMW7EG2uc0phPBmMEA6n4uHnQqd0c3ox1A==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id QmkfYV9xvhlR for <linux-block@vger.kernel.org>;
-        Wed, 25 May 2022 18:58:58 -0700 (PDT)
+        with ESMTP id vzHsB9rZzxXD for <linux-block@vger.kernel.org>;
+        Wed, 25 May 2022 19:01:16 -0700 (PDT)
 Received: from [10.225.54.48] (unknown [10.225.54.48])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L7rhJ4wFBz1Rvlc;
-        Wed, 25 May 2022 18:58:56 -0700 (PDT)
-Message-ID: <2c3c98de-e9de-eebb-87b6-fa59cd2784c4@opensource.wdc.com>
-Date:   Thu, 26 May 2022 10:58:55 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L7rky3k27z1Rvlc;
+        Wed, 25 May 2022 19:01:14 -0700 (PDT)
+Message-ID: <119d9df0-8c9d-4512-d5e8-d5013d2222e6@opensource.wdc.com>
+Date:   Thu, 26 May 2022 11:01:13 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
  Gecko/20100101 Thunderbird/91.9.1
-Subject: Re: [PATCHv4 7/9] block/bounce: count bytes instead of sectors
+Subject: Re: [PATCHv4 9/9] fs: add support for dma aligned direct-io
 Content-Language: en-US
 To:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
         linux-block@vger.kernel.org
@@ -85,10 +85,10 @@ Cc:     axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
         bvanassche@acm.org, ebiggers@kernel.org, pankydev8@gmail.com,
         Keith Busch <kbusch@kernel.org>
 References: <20220526010613.4016118-1-kbusch@fb.com>
- <20220526010613.4016118-8-kbusch@fb.com>
+ <20220526010613.4016118-10-kbusch@fb.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220526010613.4016118-8-kbusch@fb.com>
+In-Reply-To: <20220526010613.4016118-10-kbusch@fb.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -98,56 +98,62 @@ X-Mailing-List: linux-block@vger.kernel.org
 On 2022/05/26 10:06, Keith Busch wrote:
 > From: Keith Busch <kbusch@kernel.org>
 > 
-> Individual bv_len's may not be a sector size.
+> Use the address alignment requirements from the hardware for direct io
+> instead of requiring addresses be aligned to the block size.
 > 
 > Signed-off-by: Keith Busch <kbusch@kernel.org>
 > ---
-> v3->v4:
+>  fs/direct-io.c       | 11 +++++++----
+>  fs/iomap/direct-io.c |  3 ++-
+>  2 files changed, 9 insertions(+), 5 deletions(-)
 > 
->   Use sector shift
-> 
->   Add comment explaing the ALIGN_DOWN
-> 
->   Use unsigned int type for counting bytes
-> 
->  block/bounce.c | 12 +++++++++---
->  1 file changed, 9 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/bounce.c b/block/bounce.c
-> index 8f7b6fe3b4db..f6ae21ec2a70 100644
-> --- a/block/bounce.c
-> +++ b/block/bounce.c
-> @@ -205,19 +205,25 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
->  	int rw = bio_data_dir(*bio_orig);
->  	struct bio_vec *to, from;
->  	struct bvec_iter iter;
-> -	unsigned i = 0;
-> +	unsigned i = 0, bytes = 0;
->  	bool bounce = false;
-> -	int sectors = 0;
-> +	int sectors;
+> diff --git a/fs/direct-io.c b/fs/direct-io.c
+> index 840752006f60..64cc176be60c 100644
+> --- a/fs/direct-io.c
+> +++ b/fs/direct-io.c
+> @@ -1131,7 +1131,7 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+>  	struct dio_submit sdio = { 0, };
+>  	struct buffer_head map_bh = { 0, };
+>  	struct blk_plug plug;
+> -	unsigned long align = offset | iov_iter_alignment(iter);
+> +	unsigned long align = iov_iter_alignment(iter);
 >  
->  	bio_for_each_segment(from, *bio_orig, iter) {
->  		if (i++ < BIO_MAX_VECS)
-> -			sectors += from.bv_len >> 9;
-> +			bytes += from.bv_len;
->  		if (PageHighMem(from.bv_page))
->  			bounce = true;
+>  	/*
+>  	 * Avoid references to bdev if not absolutely needed to give
+> @@ -1165,11 +1165,14 @@ ssize_t __blockdev_direct_IO(struct kiocb *iocb, struct inode *inode,
+>  		goto fail_dio;
 >  	}
->  	if (!bounce)
->  		return;
 >  
-> +	/*
-> +	 * If the original has more than BIO_MAX_VECS biovecs, the total bytes
-> +	 * may not be block size aligned. Align down to ensure both sides of
-> +	 * the split bio are appropriately sized.
-> +	 */
-> +	sectors = ALIGN_DOWN(bytes, queue_logical_block_size(q)) >> SECTOR_SHIFT;
->  	if (sectors < bio_sectors(*bio_orig)) {
->  		bio = bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
->  		bio_chain(bio, *bio_orig);
+> -	if (align & blocksize_mask) {
+> -		if (bdev)
+> +	if ((offset | align) & blocksize_mask) {
+> +		if (bdev) {
+>  			blkbits = blksize_bits(bdev_logical_block_size(bdev));
+> +			if (align & bdev_dma_alignment(bdev))
+> +				goto fail_dio;
+> +		}
+>  		blocksize_mask = (1 << blkbits) - 1;
+> -		if (align & blocksize_mask)
+> +		if ((offset | count) & blocksize_mask)
+>  			goto fail_dio;
+>  	}
+>  
+> diff --git a/fs/iomap/direct-io.c b/fs/iomap/direct-io.c
+> index 80f9b047aa1b..0256d28baa8e 100644
+> --- a/fs/iomap/direct-io.c
+> +++ b/fs/iomap/direct-io.c
+> @@ -244,7 +244,8 @@ static loff_t iomap_dio_bio_iter(const struct iomap_iter *iter,
+>  	size_t copied = 0;
+>  	size_t orig_count;
+>  
+> -	if ((pos | length | align) & ((1 << blkbits) - 1))
+> +	if ((pos | length) & ((1 << blkbits) - 1) ||
+> +	    align & bdev_dma_alignment(iomap->bdev))
+>  		return -EINVAL;
+>  
+>  	if (iomap->type == IOMAP_UNWRITTEN) {
 
-Looks good.
+Looks good to me.
 
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
