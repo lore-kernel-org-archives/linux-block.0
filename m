@@ -2,85 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96321C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 17:43:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93D7CC433F5
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 18:13:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242325AbiEZRn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 May 2022 13:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45628 "EHLO
+        id S238240AbiEZSN4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 May 2022 14:13:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32960 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343820AbiEZRn1 (ORCPT
+        with ESMTP id S236329AbiEZSN4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 May 2022 13:43:27 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A546A186
-        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 10:43:27 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id 2so2291409iou.5
-        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 10:43:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=Cf7d3NdarROeO1DBR6AQD9JX7+zz8hgqvCHij6VuBns=;
-        b=i5RGf+k9walnItpnx9yAiefDNhrFFACOtNsgMSJlDnHnGephcTbEi+zjiQHLzVAo8+
-         k4SOaRKhzngDYnGwYINC/jcFhBXif0tYHZG1v64RMdPBfa37Yi+uID+4jOE5YZBtIxsp
-         /oNXEJf0IJTtKa/P3aFhK+s4XLxW35f0F62le9b/Gv75WZ0HZCkI4qfnO8HskWQDrc6S
-         Ka9onSdDxRZz6vP8LqwtlPVdt1BRWqJ5NGq2vMOkOYPSXEgrqiGy/inAMtVE3RNMsGHZ
-         MPjOhsctJI1j24aSzqOjcdy6C4/LB1SdNH1GTRd7nAlWFgQ1MGj7bYciI3JfvLXyP68P
-         pCfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=Cf7d3NdarROeO1DBR6AQD9JX7+zz8hgqvCHij6VuBns=;
-        b=B1w+rNBrZ2IaAl8u8KLv0zL3k+Jt+zCIdkrxd7LMkKDAyS4l5LzUyIXcgRc5kDBjA5
-         HM+RY3dlUVm3xc6vOYMWC9A1L0fHZ3/bqfMkUCy9fTXe+OtHJPNUIDMZtdQHz1tx5sbg
-         592BrOTdd/6IOaHMO8N30Mj9TQQY10CVlSyJYzC3v4h0l2q7DuWugBB6JIBcO52MFdYy
-         HLsQsjtyjz7a3PJ5KkdRayzLlwND8ioDiSo4YxymXJrcW6FK8susWiuSCe9jd6pclL6k
-         j64yCKezkh5qFKNDmHbuzfOquYy9iGROmQ6LT7sq59N3YdlrsSuP8mpQgaSXR4fWMY+9
-         pyvA==
-X-Gm-Message-State: AOAM530gvtqZKhlyfgQuSkQtdZgcGpdJiRiLQYcdMk07kla1ZLUc0bTJ
-        bRQbucdRjdFZ6AzFpMmvxJJL2+Bgwr8Jhg==
-X-Google-Smtp-Source: ABdhPJzAPHoImUvr5c2HdKzi8nCAIOvgk3aG8fJbLYXnzTkl+x/PRDnKjx1gTAaHdP+CGKkq/NKUiw==
-X-Received: by 2002:a6b:8e0d:0:b0:65e:50f1:afd8 with SMTP id q13-20020a6b8e0d000000b0065e50f1afd8mr14714599iod.112.1653587006740;
-        Thu, 26 May 2022 10:43:26 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id x18-20020a927c12000000b002d149ec2606sm652748ilc.65.2022.05.26.10.43.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 26 May 2022 10:43:25 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     tj@kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        bo.liu@linux.alibaba.com, kernel-team@fb.com, josef@toxicpanda.com
-In-Reply-To: <Yn9ScX6Nx2qIiQQi@slm.duckdns.org>
-References: <Yn9ScX6Nx2qIiQQi@slm.duckdns.org>
-Subject: Re: [PATCH block/for-5.19] blk-iolatency: Fix inflight count imbalances and IO hangs on offline
-Message-Id: <165358700562.497212.14751047590663347545.b4-ty@kernel.dk>
-Date:   Thu, 26 May 2022 11:43:25 -0600
+        Thu, 26 May 2022 14:13:56 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 964AFB2272;
+        Thu, 26 May 2022 11:13:55 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id C85AE61640;
+        Thu, 26 May 2022 18:13:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B241AC385A9;
+        Thu, 26 May 2022 18:13:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653588834;
+        bh=e6S1wsx8dmsbh7szOOlugfAeR1nroErTcI2BgiOX/FU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=QCgShyLY+H5CQf3JN8bBEE7latBQ1v5NiNG0GuvYaFefMGEm7yVcxpP4hoCJDaXX8
+         AdYKSYAQCi5hQwepnCCNe+EQv1KxgaojqJ++ItqeJWr4cwJu41CUTPu6EMtgVGcFmX
+         k/1bXzqgDJ+EcdV3d96001eIDoVwh5u6F+E4zrRE1UstKRPSKKOQuf0ej58ElEHKLQ
+         +VxjNnU7TAeo4l+lfv9iuL/UOY8XWAu2qWDTxkMRkXSMGPpyv7xlrqbYT9Z2byd4uY
+         7uJU3inaSu7Qf5z65rvHQ8ktq/MtGggMpPvRk0GB214PSWr+rtybLbMdqNFiP4aZv/
+         Dm1Zu8FmwCNjg==
+Date:   Thu, 26 May 2022 11:13:52 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        pankydev8@gmail.com
+Subject: Re: [PATCHv4 8/9] block: relax direct io memory alignment
+Message-ID: <Yo/DYI17KWgXJNyB@sol.localdomain>
+References: <20220526010613.4016118-1-kbusch@fb.com>
+ <20220526010613.4016118-9-kbusch@fb.com>
+ <Yo8sZWNNTKM2Kwqm@sol.localdomain>
+ <Yo+FtQ8GlHtMT3pT@kbusch-mbp.dhcp.thefacebook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Yo+FtQ8GlHtMT3pT@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 13 May 2022 20:55:45 -1000, Tejun Heo wrote:
-> iolatency needs to track the number of inflight IOs per cgroup. As this
-> tracking can be expensive, it is disabled when no cgroup has iolatency
-> configured for the device. To ensure that the inflight counters stay
-> balanced, iolatency_set_limit() freezes the request_queue while manipulating
-> the enabled counter, which ensures that no IO is in flight and thus all
-> counters are zero.
+On Thu, May 26, 2022 at 07:50:45AM -0600, Keith Busch wrote:
+> On Thu, May 26, 2022 at 12:29:41AM -0700, Eric Biggers wrote:
+> > On Wed, May 25, 2022 at 06:06:12PM -0700, Keith Busch wrote:
+> > > +	/*
+> > > +	 * Each segment in the iov is required to be a block size multiple.
+> > 
+> > Where is this enforced?
 > 
-> [...]
+> Right below the comment. If it isn't a block size multiple, then ALIGN_DOWN
+> will eventually result in 0 and -EFAULT is returned. 
 
-Applied, thanks!
+That's interesting, I would have expected it to be checked in
+blkdev_dio_aligned().
 
-[1/1] blk-iolatency: Fix inflight count imbalances and IO hangs on offline
-      commit: 8a177a36da6c54c98b8685d4f914cb3637d53c0d
+EFAULT isn't the correct error code for this case; it should be EINVAL as is
+normally the case for bad alignment.  See the man pages for read and write.
 
-Best regards,
--- 
-Jens Axboe
-
-
+- Eric
