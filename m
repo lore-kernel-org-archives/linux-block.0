@@ -2,144 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC080C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 11:53:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05766C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 13:36:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232135AbiEZLxm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 May 2022 07:53:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35794 "EHLO
+        id S232728AbiEZNgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 May 2022 09:36:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37698 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229478AbiEZLxm (ORCPT
+        with ESMTP id S234784AbiEZNgJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 May 2022 07:53:42 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8EDD0280;
-        Thu, 26 May 2022 04:53:41 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 3AF6521A18;
-        Thu, 26 May 2022 11:53:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1653566020; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=auqJ6PaB+ZD9Fx16q8TjHflpK31Qk9mptp15/0/O1xk=;
-        b=ltuVrpu4i/EO+evjI7NGg8RZJcyxhhyKcJ4WNjS4eqOV15HATtONiRdNK7dD18pNZilQzM
-        KL4Asz3/Ei0uxlvybIaaBoQU2lUtV0K88JAU7HgFwKS41ESj/wQK4vpGONYOszHZ205pxQ
-        UAXcvo23EWTBVQJSZH/OP6gU3B2z/Kk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1653566020;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=auqJ6PaB+ZD9Fx16q8TjHflpK31Qk9mptp15/0/O1xk=;
-        b=IuXzplGM7Pl6/SWMHnLdpvd2WznZVWFe8TnGfxlQxClw91KFgrIbA3znaMfcv/lXe0067k
-        f9xfLdWH9tjISFAg==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 1AE0A2C141;
-        Thu, 26 May 2022 11:53:40 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id AD1ECA0632; Thu, 26 May 2022 13:53:36 +0200 (CEST)
-Date:   Thu, 26 May 2022 13:53:36 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     Guoqing Jiang <guoqing.jiang@linux.dev>,
-        Donald Buczek <buczek@molgen.mpg.de>,
-        Song Liu <song@kernel.org>, Jan Kara <jack@suse.cz>,
-        Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        linux-raid <linux-raid@vger.kernel.org>,
-        Tejun Heo <tj@kernel.org>,
-        Christoph Hellwig <hch@infradead.org>,
-        linux-block@vger.kernel.org
-Subject: Re: [Update PATCH V3] md: don't unregister sync_thread with
- reconfig_mutex held
-Message-ID: <20220526115336.2whsfdcuqwfzk5fk@quack3.lan>
-References: <141b4110-767e-7670-21d5-6a5f636d1207@linux.dev>
- <CAPhsuW6U3g-Xikbw4mAJOH1-kN42rYHLiq_ocv==436azhm33g@mail.gmail.com>
- <b4244eab-d9e2-20a0-ebce-1a96e8fadb91@deltatee.com>
- <836b2a93-65be-8d6c-8610-18373b88f86d@molgen.mpg.de>
- <5b0584a3-c128-cb53-7c8a-63744c60c667@linux.dev>
- <4edc9468-d195-6937-f550-211bccbd6756@molgen.mpg.de>
- <954f9c33-7801-b6d2-65e3-9e5237905886@linux.dev>
- <82a08e9c-e3f4-4eb6-cb06-58b96c0f01a8@deltatee.com>
- <775d6734-2b08-21a8-a093-f750d31ce6ce@linux.dev>
- <ae6d294a-e9ec-a81d-6085-a9341ed8a470@deltatee.com>
+        Thu, 26 May 2022 09:36:09 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 817B9D9E88
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 06:36:06 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id o10-20020a17090a4e8a00b001df2fcdc165so4470715pjh.0
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 06:36:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y1ZHCc6xNO0U73whru3kCBTDHIP9p4rXtSNp3afIMD8=;
+        b=KdRKDCFGAtjWtyuddQOjMrITCNVaocp7i+0/GFQnwGty9rVgYvh+rbmyuK26PIAv3c
+         gkYMPztmvClmArM4lRY8ekPkB3fuu3jwWR+CBaMKnJZZQqi/Yad6ZtpmHOpw+UMeikrp
+         2rqylks1mOWSW9vcNddUCSnlXEpA1qfshm81ynv2M9+jLj2w+YF4lGkHd8IjCqdDQrdy
+         IxWXRETgsiwKVPWpI5evm6YzJRHn0LLmcZHgIv7zfmVVJWHxhYEjdv1gQJOhp1r4Sug/
+         x1cBQlqhSK0NQjjbp6GcstpykI93/cxxfD2A4GCYv6aOAFshAJrkjw4gD/kZoJf/MNSm
+         BHBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=y1ZHCc6xNO0U73whru3kCBTDHIP9p4rXtSNp3afIMD8=;
+        b=M18Nq3y10x1ol8SvT9JuD7MP1mrEwq7YOodwCfZSciNZeAgbs8jsBxW96wTIDFYlFG
+         BEKDNPwRoFUe5E56yfV4pVvPlTOtSZJKiGSuj7M3933D1BtP4z3JKG//kMPgRD7+UlZ3
+         9zUyz+9zh3SXT2LM8E5T8BJ24enLTaaeileLs46q13tjQLA+K1PoAtfbDOCd0o26nhdr
+         DbOvITrW90KQXRDRhgfMiFVaiMaKQjqAuw0A+hw/YVcOJCAtX+flJoFHgGxbiGSF3+xK
+         toDsfDPWhiY9F7hsS6m0rHaUHFdNBAKqmXHBrZEDdiisLwxNCIJ2gy8vQtsJMAj6TcMN
+         JYBg==
+X-Gm-Message-State: AOAM533eLXm+/BwuNCtm+POJE7H52iRv9l5gur3ykKyIx7+2x+1jNPo7
+        kBRZRD6cJwPyaj2RgTIiftcLBg==
+X-Google-Smtp-Source: ABdhPJzadwTNEqbf2/nS04B6qn8DPyWmRbTYUVYX+TpInXl9V8aylkBa9fpPl4zxmpL1j22HhoxIcQ==
+X-Received: by 2002:a17:902:6bc1:b0:15d:1e15:1a75 with SMTP id m1-20020a1709026bc100b0015d1e151a75mr38992126plt.114.1653572166012;
+        Thu, 26 May 2022 06:36:06 -0700 (PDT)
+Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.225])
+        by smtp.gmail.com with ESMTPSA id v1-20020a170902b7c100b0015e8d4eb290sm1522067plz.218.2022.05.26.06.36.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 26 May 2022 06:36:05 -0700 (PDT)
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Chengming Zhou <zhouchengming@bytedance.com>
+Subject: [PATCH] blk-iocost: fix false positive lagging
+Date:   Thu, 26 May 2022 21:35:54 +0800
+Message-Id: <20220526133554.21079-1-zhouchengming@bytedance.com>
+X-Mailer: git-send-email 2.35.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ae6d294a-e9ec-a81d-6085-a9341ed8a470@deltatee.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[Added couple of CCs since this seems to be an issue in the generic block
-layer]
+I found many false positive lagging during iocost test.
 
-On Wed 25-05-22 12:22:06, Logan Gunthorpe wrote:
-> On 2022-05-25 03:04, Guoqing Jiang wrote:
-> > I would prefer to focus on block tree or md tree. With latest block tree
-> > (commit 44d8538d7e7dbee7246acda3b706c8134d15b9cb), I get below
-> > similar issue as Donald reported, it happened with the cmd (which did
-> > work with 5.12 kernel).
-> > 
-> > vm79:~/mdadm> sudo ./test --dev=loop --tests=05r1-add-internalbitmap
-> 
-> Ok, so this test passes for me, but my VM was not running with bfq. It
-> also seems we have layers upon layers of different bugs to untangle.
-> Perhaps you can try the tests with bfq disabled to make progress on the
-> other regression I reported.
-> 
-> If I enable bfq and set the loop devices to the bfq scheduler, then I
-> hit the same bug as you and Donald. It's clearly a NULL pointer
-> de-reference in the bfq code, which seems to be triggered on the
-> partition read after mdadm opens a block device (not sure if it's the md
-> device or the loop device but I suspect the latter seeing it's not going
-> through any md code).
-> 
-> Simplifying things down a bit, the null pointer dereference can be
-> triggered by creating an md device with loop devices that have bfq
-> scheduler set:
-> 
->   mdadm --create --run /dev/md0 --level=1 -n2 /dev/loop0 /dev/loop1
-> 
-> The crash occurs in bfq_bio_bfqg() with blkg_to_bfqg() returning NULL.
-> It's hard to trace where the NULL comes from in there -- the code is a
-> bit complex.
-> 
-> I've found that the bfq bug exists in current md-next (42b805af102) but
-> did not trigger in the base tag of v5.18-rc3. Bisecting revealed the bug
-> was introduced by:
-> 
->   4e54a2493e58 ("bfq: Get rid of __bio_blkcg() usage")
-> 
-> Reverting that commit and the next commit (075a53b7) on top of md-next
-> was confirmed to fix the bug.
-> 
-> I've copied Jan, Jens and Paolo who can hopefully help with this. A
-> cleaned up stack trace follows this email for their benefit.
+Since iocg->vtime will be advanced to (vnow - margins.target)
+in hweight_after_donation(), which called throw away excess,
+the iocg->done_vtime will also be advanced that much.
 
-So I've debugged this. The crash happens on the very first bio submitted to
-the md0 device. The problem is that this bio gets remapped to loop0 - this
-happens through bio_alloc_clone() -> __bio_clone() which ends up calling
-bio_clone_blkg_association(). Now the resulting bio is inconsistent - it's
-dst_bio->bi_bdev is pointing to loop0 while dst_bio->bi_blkg is pointing to
-blkcg_gq associated with md0 request queue. And this breaks BFQ because
-when this bio is inserted to loop0 request queue, BFQ looks at
-bio->bi_blkg->q (it is a bit more complex than that but this is the gist
-of the problem), expects its data there but BFQ is not initialized for md0
-request_queue.
+       period_at_vtime  <--period_vtime-->  vnow
+              |                              |
+  --------------------------------------------------->
+        |<--->|
+     margins.target
+        |->
+  vtime, done_vtime
 
-Now I think this is a bug in __bio_clone() but the inconsistency in the bio
-is very much what we asked bio_clone_blkg_association() to do so maybe I'm
-missing something and bios that are associated with one bdev but pointing
-to blkg of another bdev are fine and controllers are supposed to handle
-that (although I'm not sure how should they do that). So I'm asking here
-before I just go and delete bio_clone_blkg_association() from
-__bio_clone()...
+If that iocg has some inflight io when vnow, but its done_vtime
+is before period_at_vtime, ioc_timer_fn() will think it has
+lagging io, even these io maybe issued just before now.
 
-								Honza
+This patch change the condition to check if vdone is before
+(period_at_vtime - margins.target) instead of period_at_vtime.
+
+But there is another problem that this patch doesn't fix.
+Since vtime will be advanced, we can't check if vtime is
+after (vnow - MAX_LAGGING_PERIODS * period_vtime) to tell
+whether this iocg pin lagging for too long.
+
+Maybe we can add lagging_periods in iocg to record how many
+periods this iocg pin lagging, but I don't know when to clean it.
+
+Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+---
+ block/blk-iocost.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 33a11ba971ea..42e301b7527b 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -2259,7 +2259,7 @@ static void ioc_timer_fn(struct timer_list *timer)
+ 		    time_after64(vtime, vdone) &&
+ 		    time_after64(vtime, now.vnow -
+ 				 MAX_LAGGING_PERIODS * period_vtime) &&
+-		    time_before64(vdone, now.vnow - period_vtime))
++		    time_before64(vdone, ioc->period_at_vtime - ioc->margins.target))
+ 			nr_lagging++;
+ 
+ 		/*
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.36.1
+
