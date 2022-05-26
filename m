@@ -2,49 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87FB3C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 01:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CCAC2C433FE
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 01:08:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245509AbiEZBIk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 21:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59204 "EHLO
+        id S1343841AbiEZBIp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 21:08:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59682 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242436AbiEZBIj (ORCPT
+        with ESMTP id S1344668AbiEZBIo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 21:08:39 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4882691575
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:38 -0700 (PDT)
-Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24Q0QNXc009810
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:37 -0700
+        Wed, 25 May 2022 21:08:44 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E92C92D05
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:39 -0700 (PDT)
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 24PGtasN012117
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:38 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=dAu9R2sAQLSaRAT82clt0hL+Poo0w/bpDIcs6PokFXc=;
- b=jwUVoEs8b9vq4ZdOUa8GND0rVjsNKS1EMNsaayhRXZFiEsCgQbgMF3UXs92j3rfRQgK1
- mFYkxK6XLuhd+Dcop+OlKqp0ezcQ594VnWypQq9dPtzkVDIIsjBL4YbWXoZn8VM7BGxH
- y9t5TCwqdTnAvY/Fk29B5YlZjJPOH2GXuWY= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g93tvt478-1
+ bh=ng5jvbQ8e5kkQ3+8JRxl9hl6c4zipP7NfhMRhPIwcAQ=;
+ b=G0/oah+kRKu/W1WggEFAxp6KmjshoKODoYEYfUvKn7tRqDwhgev6URHqwRJBe579q7ki
+ y0DAKmYrS+WTbbHut6WbhRVixUIS4FrbsehOxsPjGx5oVKBlaMP9K4OyV1wMlR5SkmF0
+ NZyOIYaQkpEF7CXYy/AOIj18STttQBC7NfU= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by m0001303.ppops.net (PPS) with ESMTPS id 3g9qtub5x7-2
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:37 -0700
-Received: from twshared14577.08.ash8.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:82::d) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:38 -0700
+Received: from twshared10276.08.ash9.facebook.com (2620:10d:c085:108::8) by
+ mail.thefacebook.com (2620:10d:c085:21d::4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Wed, 25 May 2022 18:08:36 -0700
+ 15.1.2375.28; Wed, 25 May 2022 18:08:37 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 9C8E545C0BD3; Wed, 25 May 2022 18:06:20 -0700 (PDT)
+        id 1A68045C0BDE; Wed, 25 May 2022 18:06:20 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
 CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         <ebiggers@kernel.org>, <pankydev8@gmail.com>,
-        Keith Busch <kbusch@kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCHv4 3/9] block: export dma_alignment attribute
-Date:   Wed, 25 May 2022 18:06:07 -0700
-Message-ID: <20220526010613.4016118-4-kbusch@fb.com>
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv4 7/9] block/bounce: count bytes instead of sectors
+Date:   Wed, 25 May 2022 18:06:11 -0700
+Message-ID: <20220526010613.4016118-8-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220526010613.4016118-1-kbusch@fb.com>
 References: <20220526010613.4016118-1-kbusch@fb.com>
@@ -52,8 +51,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: tG05R-nnBxdv834mS0fTolZwouyfETsd
-X-Proofpoint-ORIG-GUID: tG05R-nnBxdv834mS0fTolZwouyfETsd
+X-Proofpoint-GUID: 5B4RBcIp4hl1xTI7XJR10-hrbQwW1qs-
+X-Proofpoint-ORIG-GUID: 5B4RBcIp4hl1xTI7XJR10-hrbQwW1qs-
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
  definitions=2022-05-25_07,2022-05-25_02,2022-02-23_01
@@ -63,72 +62,56 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-User space may want to know how to align their buffers to avoid
-bouncing. Export the queue attribute.
+Individual bv_len's may not be a sector size.
 
 Signed-off-by: Keith Busch <kbusch@kernel.org>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- Documentation/ABI/stable/sysfs-block | 9 +++++++++
- block/blk-sysfs.c                    | 7 +++++++
- 2 files changed, 16 insertions(+)
+v3->v4:
 
-diff --git a/Documentation/ABI/stable/sysfs-block b/Documentation/ABI/sta=
-ble/sysfs-block
-index e8797cd09aff..08f6d00df138 100644
---- a/Documentation/ABI/stable/sysfs-block
-+++ b/Documentation/ABI/stable/sysfs-block
-@@ -142,6 +142,15 @@ Description:
- 		Default value of this file is '1'(on).
+  Use sector shift
+
+  Add comment explaing the ALIGN_DOWN
+
+  Use unsigned int type for counting bytes
+
+ block/bounce.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
+
+diff --git a/block/bounce.c b/block/bounce.c
+index 8f7b6fe3b4db..f6ae21ec2a70 100644
+--- a/block/bounce.c
++++ b/block/bounce.c
+@@ -205,19 +205,25 @@ void __blk_queue_bounce(struct request_queue *q, st=
+ruct bio **bio_orig)
+ 	int rw =3D bio_data_dir(*bio_orig);
+ 	struct bio_vec *to, from;
+ 	struct bvec_iter iter;
+-	unsigned i =3D 0;
++	unsigned i =3D 0, bytes =3D 0;
+ 	bool bounce =3D false;
+-	int sectors =3D 0;
++	int sectors;
 =20
+ 	bio_for_each_segment(from, *bio_orig, iter) {
+ 		if (i++ < BIO_MAX_VECS)
+-			sectors +=3D from.bv_len >> 9;
++			bytes +=3D from.bv_len;
+ 		if (PageHighMem(from.bv_page))
+ 			bounce =3D true;
+ 	}
+ 	if (!bounce)
+ 		return;
 =20
-+What:		/sys/block/<disk>/queue/dma_alignment
-+Date:		May 2022
-+Contact:	linux-block@vger.kernel.org
-+Description:
-+		Reports the alignment that user space addresses must have to be
-+		used for raw block device access with O_DIRECT and other driver
-+		specific passthrough mechanisms.
-+
-+
- What:		/sys/block/<disk>/queue/chunk_sectors
- Date:		September 2016
- Contact:	Hannes Reinecke <hare@suse.com>
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 88bd41d4cb59..14607565d781 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -274,6 +274,11 @@ static ssize_t queue_virt_boundary_mask_show(struct =
-request_queue *q, char *page
- 	return queue_var_show(q->limits.virt_boundary_mask, page);
- }
-=20
-+static ssize_t queue_dma_alignment_show(struct request_queue *q, char *p=
-age)
-+{
-+	return queue_var_show(queue_dma_alignment(q), page);
-+}
-+
- #define QUEUE_SYSFS_BIT_FNS(name, flag, neg)				\
- static ssize_t								\
- queue_##name##_show(struct request_queue *q, char *page)		\
-@@ -606,6 +611,7 @@ QUEUE_RO_ENTRY(queue_dax, "dax");
- QUEUE_RW_ENTRY(queue_io_timeout, "io_timeout");
- QUEUE_RW_ENTRY(queue_wb_lat, "wbt_lat_usec");
- QUEUE_RO_ENTRY(queue_virt_boundary_mask, "virt_boundary_mask");
-+QUEUE_RO_ENTRY(queue_dma_alignment, "dma_alignment");
-=20
- #ifdef CONFIG_BLK_DEV_THROTTLING_LOW
- QUEUE_RW_ENTRY(blk_throtl_sample_time, "throttle_sample_time");
-@@ -667,6 +673,7 @@ static struct attribute *queue_attrs[] =3D {
- 	&blk_throtl_sample_time_entry.attr,
- #endif
- 	&queue_virt_boundary_mask_entry.attr,
-+	&queue_dma_alignment_entry.attr,
- 	NULL,
- };
-=20
++	/*
++	 * If the original has more than BIO_MAX_VECS biovecs, the total bytes
++	 * may not be block size aligned. Align down to ensure both sides of
++	 * the split bio are appropriately sized.
++	 */
++	sectors =3D ALIGN_DOWN(bytes, queue_logical_block_size(q)) >> SECTOR_SH=
+IFT;
+ 	if (sectors < bio_sectors(*bio_orig)) {
+ 		bio =3D bio_split(*bio_orig, sectors, GFP_NOIO, &bounce_bio_split);
+ 		bio_chain(bio, *bio_orig);
 --=20
 2.30.2
 
