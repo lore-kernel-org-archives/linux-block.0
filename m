@@ -2,149 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC9DC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 01:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5615C433F5
+	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 01:48:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345556AbiEZBJG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 25 May 2022 21:09:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59688 "EHLO
+        id S231230AbiEZBsV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 25 May 2022 21:48:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345553AbiEZBIu (ORCPT
+        with ESMTP id S230192AbiEZBsU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 25 May 2022 21:08:50 -0400
-Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF68392D2E
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:48 -0700 (PDT)
-Received: from pps.filterd (m0109331.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24PGterv008742
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:48 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=facebook;
- bh=p1SrztScHuNblAyNzaIrLrE3P0hdGIoUW1/0kG6YeG0=;
- b=bI4l3PPlztGf+5lncfJTmG775gE70vfmcBpB/sEWiibua7XR+31Mhg/W+4lDpnmlJA3k
- XP14kJxvoBYPhP9RVMdaLL2S4Nn86NOmN0pY7lAU3cQfIPd488F0uKzP6vHj3qEUAXUm
- tVNHNOAmxJr7td0Lb7PTzGkOADbJyNDlfwI= 
-Received: from mail.thefacebook.com ([163.114.132.120])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3g93vut4d3-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:08:48 -0700
-Received: from twshared10276.08.ash9.facebook.com (2620:10d:c085:108::8) by
- mail.thefacebook.com (2620:10d:c085:11d::7) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Wed, 25 May 2022 18:08:46 -0700
-Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id 269D045C0BDF; Wed, 25 May 2022 18:06:20 -0700 (PDT)
-From:   Keith Busch <kbusch@fb.com>
-To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>
-CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
-        <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
-        <ebiggers@kernel.org>, <pankydev8@gmail.com>,
-        Keith Busch <kbusch@kernel.org>
-Subject: [PATCHv4 8/9] block: relax direct io memory alignment
-Date:   Wed, 25 May 2022 18:06:12 -0700
-Message-ID: <20220526010613.4016118-9-kbusch@fb.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220526010613.4016118-1-kbusch@fb.com>
-References: <20220526010613.4016118-1-kbusch@fb.com>
+        Wed, 25 May 2022 21:48:20 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C03EB8DDD2
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1653529698; x=1685065698;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FME4v/EvPahQmZZ4OvbyPPXbKI1vSzlssNTi3dekI9U=;
+  b=nBC6cOWnnZ9E7Ba/YXj1XU8tAIx2JycPIliyeexS5ygvirLaULBrGwmz
+   KZPhDwgb5pKm64EVydFP3+3s0pgpGJL1Rzbnnhe8a8peCBV2UOJ57Sc7f
+   KOGLfu5EINoKdbz8dQw7DEiSBf6YM245pRRDquJO3BNMwRep1HsSjtGN1
+   x/A+SUxeRbjTnv3WFySFcxm03gZ1I9yxXzicS1lz4Y4WSNjT0W1b1UP9D
+   s2wbrFdoo3CFmJntUbavC6qr0qNU1lOSMjqY5AmYnvOSPqvvwN+tMGBB5
+   Eda/qtKBGlEWA5yADK+1g3tArl0JY4dhk1Wh5HJsMErq3CiU2gLYrKrZF
+   A==;
+X-IronPort-AV: E=Sophos;i="5.91,252,1647273600"; 
+   d="scan'208";a="305693463"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 26 May 2022 09:48:17 +0800
+IronPort-SDR: TOuNNJuEPlrQA5wazG1s1BJd9JruX8u2OiUbspiwMX+dlKvjef/fjhM2wqLUSL5QvnCidWGkZo
+ V3Ow0WJJICv+sM+ZnxxAQmHQnJ2rZdqGFf+c9RfO64GsNzTCkuUsfKyGIMRY35BPza8N40ae4d
+ Rs14eo8xFkbf2nH2FbBA0c8rmKn4a2u3ZUy8o5WxP0NZ5nI4ocfYEuE/cPX5i7piNI5puZ6zqW
+ XS1+HGVLXWtL/r5WygLlom8I1surQHHAZrYy1BomExYKjDMtkqNL1qwkIU+82SPPEi99NnwPSt
+ 6HtV/fF6V/WRll0/D4Pn3J/J
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 18:12:11 -0700
+IronPort-SDR: xn1iSVmDXCdIf3oB4Ipp92xVQbSth9sUddIAIkYrR/GYER5p3pR/OolY3OCN+SHWMO0s47qmE+
+ td1MHrMXMqYYzGjcYODDJ3/Wrj7HZ/mn0qlh/Trq9Kg/SB3F1zDejr7wrRr6uUVQ7AsVIX0EwO
+ xKoF9hzbJsXindE/qvf7sZEj/ANIDZxP0aPf8QKGqvEmQYdG15SS9tFH2ezx0qeE/Dlyl9CFGj
+ q6w1MoFMEms/KB3W4HZuRopxWl8co+0Go5F+3M087XNFTaXFQnHhwleZhiXBcleisCFnY8ql/L
+ xNQ=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 May 2022 18:48:16 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4L7rRz6w9Lz1SVny
+        for <linux-block@vger.kernel.org>; Wed, 25 May 2022 18:48:15 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1653529695; x=1656121696; bh=FME4v/EvPahQmZZ4OvbyPPXbKI1vSzlssNT
+        i3dekI9U=; b=Fx0wKIHJ+JDiE1SD2WiE4srfh71/huzJ3xospp7ZZaUzHD7ihGk
+        RQHUhJsRjvtR6YeYvOPp5jIPH0hjuJAND3dEGFfww7Lcw/sx3Lvbri0zlM/WZ2Zw
+        KnMQHfTxQS+ZtJ6PY1lHBDazZg04KnXIYvL5UuMSip6PLOX9YcGMmSAiFFXUj3un
+        9xYPgc8IWHI0f03PFXqa9H1u6zfE9BowxTwDd6G3VUGPS1PSLa/Lp6YGgv/kn6GT
+        xES39eNzj/Iz92JsAAQMeLCbaHsxKO/YUvPW7Oq7/cUOoUNcVVdAno7R1FeQYaDH
+        2VFVfmssDJFjNcmnk3X9tBinhyRPc5JbVkA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id qxuzdRDGJsqL for <linux-block@vger.kernel.org>;
+        Wed, 25 May 2022 18:48:15 -0700 (PDT)
+Received: from [10.225.54.48] (unknown [10.225.54.48])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4L7rRx5hf6z1Rvlc;
+        Wed, 25 May 2022 18:48:13 -0700 (PDT)
+Message-ID: <e87bd23a-1316-0396-0bb0-658c6105eaab@opensource.wdc.com>
+Date:   Thu, 26 May 2022 10:48:12 +0900
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-GUID: mzkDhkfj7cpc8CR3kb8OAXcqFPlavjFz
-X-Proofpoint-ORIG-GUID: mzkDhkfj7cpc8CR3kb8OAXcqFPlavjFz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.486,FMLib:17.11.64.514
- definitions=2022-05-25_07,2022-05-25_02,2022-02-23_01
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCHv4 1/9] block: fix infiniate loop for invalid zone append
+Content-Language: en-US
+To:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org
+Cc:     axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, ebiggers@kernel.org, pankydev8@gmail.com,
+        Keith Busch <kbusch@kernel.org>
+References: <20220526010613.4016118-1-kbusch@fb.com>
+ <20220526010613.4016118-2-kbusch@fb.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220526010613.4016118-2-kbusch@fb.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Keith Busch <kbusch@kernel.org>
+On 2022/05/26 10:06, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
 
-Use the address alignment requirements from the hardware for direct io
-instead of requiring addresses be aligned to the block size. User space
-can discover the alignment requirements from the dma_alignment queue
-attribute.
+s/infiniate/infinite in the patch title.
 
-User space can specify any hardware compatible DMA offset for each
-segment, but every segment length is still required to be a multiple of
-the block size.
+> Returning 0 early from __bio_iov_append_get_pages() for the
+> max_append_sectors warning just creates an infinite loop since 0 means
+> success, and the bio will never fill from the unadvancing iov_iter. We
+> could turn the return into an error value, but it will already be turned
+> into an error value later on, so just remove the warning. Clearly no one
+> ever hit it anyway.
+> 
+> Fixes: 0512a75b98f84 ("block: Introduce REQ_OP_ZONE_APPEND")
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> ---
+>  block/bio.c | 3 ---
+>  1 file changed, 3 deletions(-)
+> 
+> diff --git a/block/bio.c b/block/bio.c
+> index a3893d80dccc..e249f6414fd5 100644
+> --- a/block/bio.c
+> +++ b/block/bio.c
+> @@ -1228,9 +1228,6 @@ static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *iter)
+>  	size_t offset;
+>  	int ret = 0;
+>  
+> -	if (WARN_ON_ONCE(!max_append_sectors))
+> -		return 0;
+> -
+>  	/*
+>  	 * Move page array up in the allocated memory for the bio vecs as far as
+>  	 * possible so that we can start filling biovecs from the beginning
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- block/bio.c  | 12 ++++++++++++
- block/fops.c | 14 +++++++++++---
- 2 files changed, 23 insertions(+), 3 deletions(-)
+Otherwise looks good.
 
-diff --git a/block/bio.c b/block/bio.c
-index 55d2a9c4e312..c492881959d1 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -1219,7 +1219,19 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
-o, struct iov_iter *iter)
- 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
- 	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
-=20
-+	/*
-+	 * Each segment in the iov is required to be a block size multiple.
-+	 * However, we may not be able to get the entire segment if it spans
-+	 * more pages than bi_max_vecs allows, so we have to ALIGN_DOWN the
-+	 * result to ensure the bio's total size is correct. The remainder of
-+	 * the iov data will be picked up in the next bio iteration.
-+	 *
-+	 * If the result is ever 0, that indicates the iov fails the segment
-+	 * size requirement and is an error.
-+	 */
- 	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
-+	if (size > 0)
-+		size =3D ALIGN_DOWN(size, bdev_logical_block_size(bio->bi_bdev));
- 	if (unlikely(size <=3D 0))
- 		return size ? size : -EFAULT;
-=20
-diff --git a/block/fops.c b/block/fops.c
-index bd6c2e13a4e3..6ecbccc552b9 100644
---- a/block/fops.c
-+++ b/block/fops.c
-@@ -45,10 +45,10 @@ static unsigned int dio_bio_write_op(struct kiocb *io=
-cb)
- static int blkdev_dio_aligned(struct block_device *bdev, loff_t pos,
- 			      struct iov_iter *iter)
- {
--	if ((pos | iov_iter_alignment(iter)) &
--	    (bdev_logical_block_size(bdev) - 1))
-+	if ((pos | iov_iter_count(iter)) & (bdev_logical_block_size(bdev) - 1))
-+		return -EINVAL;
-+	if (iov_iter_alignment(iter) & bdev_dma_alignment(bdev))
- 		return -EINVAL;
--
- 	return 0;
- }
-=20
-@@ -88,6 +88,10 @@ static ssize_t __blkdev_direct_IO_simple(struct kiocb =
-*iocb,
- 	bio.bi_ioprio =3D iocb->ki_ioprio;
-=20
- 	ret =3D bio_iov_iter_get_pages(&bio, iter);
-+
-+	/* check if iov is not aligned */
-+	if (unlikely(!ret && iov_iter_count(iter)))
-+		ret =3D -EINVAL;
- 	if (unlikely(ret))
- 		goto out;
- 	ret =3D bio.bi_iter.bi_size;
-@@ -333,6 +337,10 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb=
- *iocb,
- 		bio_iov_bvec_set(bio, iter);
- 	} else {
- 		ret =3D bio_iov_iter_get_pages(bio, iter);
-+
-+		/* check if iov is not aligned */
-+		if (unlikely(!ret && iov_iter_count(iter)))
-+			ret =3D -EINVAL;
- 		if (unlikely(ret)) {
- 			bio_put(bio);
- 			return ret;
---=20
-2.30.2
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
+-- 
+Damien Le Moal
+Western Digital Research
