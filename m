@@ -2,88 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64057C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 09:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07501C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 10:19:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240896AbiE0JGl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 05:06:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49696 "EHLO
+        id S1345545AbiE0KTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 06:19:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351230AbiE0JGB (ORCPT
+        with ESMTP id S240807AbiE0KTd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 05:06:01 -0400
+        Fri, 27 May 2022 06:19:33 -0400
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DFC1C115C82
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 02:02:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7AD011269A9
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 03:19:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653642177;
+        s=mimecast20190719; t=1653646771;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=VxSx5WHE/is7ha0Qn9ZHkh6x3/barWbE89a+k35Foho=;
-        b=daGBZP5mCAvYrVxHFIEV1DHk+SCD6VFdNCQNb4iddCg26pSsLPfoVMxbOk5u8wSW1kOZQO
-        m36q8RzXHuti248pqAfK5LJbLzOW2b3maB+yFXj6foXYKMjEeGFK2IOcPrw0SBMTKE+v2l
-        9Pe7Se+YZGtu3vOnJYHNf6oop/0/kig=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=0t2zU9MXz4VT6MECWOHvsoDoBu3fXaqhY69+YDYTXFs=;
+        b=iSthZXA6Zjt4uw3ofPtU05aaQc3w4+6gIUKWFHjL4dD4szFfcY2YYAwVrS5IaLlp9tta5A
+        ck67FDaIwDVHR+p6u0lw9uPcpBoKuMCqYbzEK5BhffZTtRZZUTtnJnxX7yiL/OJGO5cWpl
+        EC5d0mIVZs4v/GElmTTcHMTzm5AMnb8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-391-NTi_t_sZMdal6y7vIU_a0A-1; Fri, 27 May 2022 05:02:51 -0400
-X-MC-Unique: NTi_t_sZMdal6y7vIU_a0A-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id BF12E858EEE;
-        Fri, 27 May 2022 09:02:50 +0000 (UTC)
-Received: from oldenburg.str.redhat.com (unknown [10.39.192.71])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 64FE7492C3B;
-        Fri, 27 May 2022 09:02:48 +0000 (UTC)
-From:   Florian Weimer <fweimer@redhat.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
-References: <20220518235011.153058-1-ebiggers@kernel.org>
-        <20220518235011.153058-2-ebiggers@kernel.org>
-Date:   Fri, 27 May 2022 11:02:46 +0200
-In-Reply-To: <20220518235011.153058-2-ebiggers@kernel.org> (Eric Biggers's
-        message of "Wed, 18 May 2022 16:50:05 -0700")
-Message-ID: <87r14ffivd.fsf@oldenburg.str.redhat.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
+ us-mta-91-h3Z6-r8ROvKzm25PUVbvKA-1; Fri, 27 May 2022 06:19:30 -0400
+X-MC-Unique: h3Z6-r8ROvKzm25PUVbvKA-1
+Received: by mail-ej1-f69.google.com with SMTP id v13-20020a170906b00d00b006f51e289f7cso2159609ejy.19
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 03:19:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=0t2zU9MXz4VT6MECWOHvsoDoBu3fXaqhY69+YDYTXFs=;
+        b=26PDbVpUWFdBKF8vJNSLmLamiwBs9Iijtl+qjB8kuPS3P7GPaA+fhCMssUx9qvmPX2
+         +Xy0qgRIlpHVHqkmzXF0m5SPDkZdg3BSPLOw0hUBBrGQjS6N2dfmxNmaDJ0xPkFyny73
+         2b852brKX55G+a8EaV6o8OS5AgQbA0XGhTl+Om9ueAT0DF8iWVA+6RPa9uzuhIYmRALF
+         HsuOYQe4pr9S/uuV1BPT2MAKgbOfT4nBVI5pdmAHRLutjg+F8il+bwBLqlV7jvUtEqPE
+         7CCYbNZl+b+J3Hsdgm8hBhtPvAxe43Fo90OOSTDHMUhNdKp0HD+YkqY1rubhR4lbb/St
+         Gl5A==
+X-Gm-Message-State: AOAM531/+jzUlYUcg32cgdGJm72yTQe+msi1qYFCb6IdVbJDGNQfwwjl
+        RIK3nSwArCd7C72o6HCGCfQVUdGtCC+OzK4dkwBucWBKv9zLKjdLVB5LRp0n846w+rK1nhdahOC
+        ljnq6yiUqXdiftnXFLJ05LTg=
+X-Received: by 2002:aa7:cc01:0:b0:42a:402b:b983 with SMTP id q1-20020aa7cc01000000b0042a402bb983mr44184447edt.257.1653646768543;
+        Fri, 27 May 2022 03:19:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy2w1aOFqWoL18Qhgq6ACsfKPjRn/tewWbSjC97sWOBqBfI9rnw+ZKnDTyxZqb0tSdLhb6XOg==
+X-Received: by 2002:aa7:cc01:0:b0:42a:402b:b983 with SMTP id q1-20020aa7cc01000000b0042a402bb983mr44184423edt.257.1653646768272;
+        Fri, 27 May 2022 03:19:28 -0700 (PDT)
+Received: from redhat.com ([2.55.130.213])
+        by smtp.gmail.com with ESMTPSA id s23-20020a1709064d9700b006fe8b3d8cb6sm1338752eju.62.2022.05.27.03.19.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 27 May 2022 03:19:27 -0700 (PDT)
+Date:   Fri, 27 May 2022 06:19:22 -0400
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc:     kch@nvidia.com, jasowang@redhat.com, linux-block@vger.kernel.org,
+        pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        keliu <liuke94@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 4/4] virtio-blk: remove deprecated ida_simple_XXX()
+Message-ID: <20220527061845-mutt-send-email-mst@kernel.org>
+References: <fa54e172-ef9d-fba5-ad37-72a6698c7cb8@wanadoo.fr>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fa54e172-ef9d-fba5-ad37-72a6698c7cb8@wanadoo.fr>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-* Eric Biggers:
+On Fri, May 27, 2022 at 10:04:46AM +0200, Christophe JAILLET wrote:
+> (Resend, my email client sent it as HTML. So sorry for the duplicate)
+> 
+> 
+> Hi,
+> 
+> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+> > index 74c3a48cd1e5..e05748337dd1 100644
+> > --- a/drivers/block/virtio_blk.c
+> > +++ b/drivers/block/virtio_blk.c
+> > @@ -720,8 +720,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+> > 		return -EINVAL;
+> > 	}
+> >
+> >-	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
+> >-			     GFP_KERNEL);
+> >+	err = ida_alloc_max(&vd_index_ida, minor_to_index(1 << MINORBITS),
+> >+			    GFP_KERNEL);
+> > 	if (err < 0)
+> > 		goto out;
+> > 	index = err;
+> 
+> 
+> this patch, already applied to -next, is wrong.
+> 
+> 
+> The upper bound of ida_simple_get() is exlcusive, while the one of
+> ida_alloc_max() is inclusive.
+> 
+> So, 'minor_to_index(1 << MINORBITS)' should be 'minor_to_index(1 <<
+> MINORBITS) - 1' here.
+> 
+> 
+> (adding keliu in cc: because he is proposing the same kind of patches, so he
+> will see how to to these changes that are slighly tricky)
+> 
+> 
+> CJ
 
-> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
-> index 1500a0f58041a..f822b23e81091 100644
-> --- a/include/uapi/linux/stat.h
-> +++ b/include/uapi/linux/stat.h
-> @@ -124,9 +124,13 @@ struct statx {
->  	__u32	stx_dev_minor;
->  	/* 0x90 */
->  	__u64	stx_mnt_id;
-> -	__u64	__spare2;
-> +	__u32	stx_mem_align_dio;	/* Memory buffer alignment for direct I/O */
-> +	__u32	stx_offset_align_dio;	/* File offset alignment for direct I/O */
->  	/* 0xa0 */
-> -	__u64	__spare3[12];	/* Spare space for future expansion */
-> +	__u32	stx_offset_align_optimal; /* Optimal file offset alignment for I/O */
-> +	__u32	__spare2;
-> +	/* 0xa8 */
-> +	__u64	__spare3[11];	/* Spare space for future expansion */
->  	/* 0x100 */
->  };
+I will drop this for now, please resend with either
+a corrected version or a comment explaining why it's correct.
 
-Are 32 bits enough?  Would it make sense to store the base-2 logarithm
-instead?
+Thanks!
 
-Thanks,
-Florian
+-- 
+MST
 
