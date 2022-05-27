@@ -2,86 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA74FC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 15:50:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA36FC4332F
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 16:23:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346458AbiE0PuK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 11:50:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55754 "EHLO
+        id S1348189AbiE0QW6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 12:22:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242714AbiE0PuJ (ORCPT
+        with ESMTP id S232903AbiE0QW5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 11:50:09 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E297F134E17
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 08:50:08 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id 2so5038299iou.5
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 08:50:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=n/fJ9wjC1pXIX0DkPRAjEiWZ9G1KQvCFPCpSJkb5kZs=;
-        b=HHVjUg8t4BWFFgTKNQj18T7ROAfp8yg3lU1yYo3y5F7lcH1FgXr5rV0DWfzjs63qIo
-         HhkcCTMKyf+YiTJyNyCl5LnUBI5n+6bkABchoWZZe++/BmlDlprh/CgKz2cslBjFAESt
-         0I46rY6nNzUpEHl8OkXwyipRNsAcokT2/n5tBpZ3XXXxfvtVR2JAmP1VGCH977ohz5k0
-         71ThdrNoFx3MQx+zgIKpZzk0/ec/MEFsy0aP8ZstL2E1Wm/qSmB4d6xHOUPWjDq0qRrm
-         6THasFNsoZK1l/s2ZqOk8Q7gxsRtonRUahfG4E0VZnKXHVxGIrBO6/JxN2+GmCuJkxDL
-         XU9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=n/fJ9wjC1pXIX0DkPRAjEiWZ9G1KQvCFPCpSJkb5kZs=;
-        b=1avRRrXf9PjUp8Tjh+Yxcb4FQcHIgBTvW/2mk/wfS/O/hHnUikLYGAdwAJ7Q1pdYet
-         jxYwiFBiVn1oiz2OZkrLgE3TBwWgy/uplEtWSPzOeoUHT010J66MxUp1VE+6dVg7KJhx
-         YpbPab3FSs0CDXbMt0Y5FG3aaKOhNuc9sy9R9EnYqXUKChlafu99i01WMRTp+R+OnZzt
-         7R9GPCrfXSDvefucnlEsziLzZeMwa9mOL1h5YLkXNIHMoaOzKU4iLThimKbKdr8Po7Mu
-         1cLsvPMt5rrBjJuoqN8vTxWlu430GpvTAiSkNg93WaWDqEN9dhKsbdMZvsKD56RfD8S5
-         DZBw==
-X-Gm-Message-State: AOAM531Pv6heD4KCwf9MZz7x0oTOCzXvPXGWjf9+dHNI68Y+JN8efk5c
-        DGik0iHMsKc8BzjeHzE1Ya0A4hG+WTKBHg==
-X-Google-Smtp-Source: ABdhPJw2KdfmHyyNNE4chqN4Y7/j5DxuJsK4COnZirkfKvSFiDy3UwdbdrfGBhj/0lAasoeyVWU6ZA==
-X-Received: by 2002:a05:6638:4883:b0:32e:4d19:4583 with SMTP id ct3-20020a056638488300b0032e4d194583mr21849565jab.312.1653666607800;
-        Fri, 27 May 2022 08:50:07 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id k22-20020a6b3c16000000b0065a989b183asm1251723iob.41.2022.05.27.08.50.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 May 2022 08:50:07 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     colyli@suse.de
-Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
-In-Reply-To: <20220527152818.27545-1-colyli@suse.de>
-References: <20220527152818.27545-1-colyli@suse.de>
-Subject: Re: (subset) [PATCH 0/3] bcache fixes for Linux v5.19 (2nd wave)
-Message-Id: <165366660711.122737.5293591142225711731.b4-ty@kernel.dk>
-Date:   Fri, 27 May 2022 09:50:07 -0600
+        Fri, 27 May 2022 12:22:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B043C403C6;
+        Fri, 27 May 2022 09:22:56 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4CD0E61DDB;
+        Fri, 27 May 2022 16:22:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99ED1C385A9;
+        Fri, 27 May 2022 16:22:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1653668575;
+        bh=8XAC02Xg3Py4hds1HUWlnnOVkjDum3hK8PsY6LQ/M1I=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=nbanzFw6hk+ZxmKvBYBHJvrevsjnL/H+zkSXoD9fxEqQWa7YQ/GM2r6J2flebnNPk
+         NPe+mNUtTNeKCCPHpf61gVNd7xWNTcyonFkBcaeqXmsOROx2Ap0VSGkpyGvAJurXaJ
+         5ajqSsKilEN0lvcbMrGl0mLjavEHF4KFROBKRTL2fVZsqYOy5Zzvi56y3UKk8c6TXn
+         L6BQzUAinNqQ0mKfP7nt6aqyxJT9lbnXadeQhxBkRQRKxxjgLiIzD9tfJGcqEM4P+B
+         GAlP947kLR30hrfGsg9aVcc34w4x2YXwmE8rlgwV+ki8cEbsPdRfrkMTujtXO1bTzb
+         lT0LXL87H+JvQ==
+Date:   Fri, 27 May 2022 09:22:54 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Florian Weimer <fweimer@redhat.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
+Message-ID: <YpD63ocQmmgpZVrd@magnolia>
+References: <20220518235011.153058-1-ebiggers@kernel.org>
+ <20220518235011.153058-2-ebiggers@kernel.org>
+ <87r14ffivd.fsf@oldenburg.str.redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87r14ffivd.fsf@oldenburg.str.redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 27 May 2022 23:28:15 +0800, Coly Li wrote:
-> Here are the 2nd wave bcache fixes for Linux v5.19, they just survives
-> from my I/O pressure testing and look fine.
+On Fri, May 27, 2022 at 11:02:46AM +0200, Florian Weimer wrote:
+> * Eric Biggers:
 > 
-> The patch from Jia-Ju Bai is in my testing queue for a while, it handles
-> a memory allocation failure in the I/O path on a backing device when it
-> is not attached to cache device.
+> > diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+> > index 1500a0f58041a..f822b23e81091 100644
+> > --- a/include/uapi/linux/stat.h
+> > +++ b/include/uapi/linux/stat.h
+> > @@ -124,9 +124,13 @@ struct statx {
+> >  	__u32	stx_dev_minor;
+> >  	/* 0x90 */
+> >  	__u64	stx_mnt_id;
+> > -	__u64	__spare2;
+> > +	__u32	stx_mem_align_dio;	/* Memory buffer alignment for direct I/O */
+> > +	__u32	stx_offset_align_dio;	/* File offset alignment for direct I/O */
+> >  	/* 0xa0 */
+> > -	__u64	__spare3[12];	/* Spare space for future expansion */
+> > +	__u32	stx_offset_align_optimal; /* Optimal file offset alignment for I/O */
+> > +	__u32	__spare2;
+> > +	/* 0xa8 */
+> > +	__u64	__spare3[11];	/* Spare space for future expansion */
+> >  	/* 0x100 */
+> >  };
 > 
-> [...]
+> Are 32 bits enough?  Would it make sense to store the base-2 logarithm
+> instead?
 
-Applied, thanks!
+I don't think a log2 will work here, XFS will want to report things like
+raid stripe sizes, which can be any multiple of the fs blocksize.
 
-[1/3] bcache: memset on stack variables in bch_btree_check() and bch_sectors_dirty_init()
-      commit: 7d6b902ea0e02b2a25c480edf471cbaa4ebe6b3c
-[3/3] md: bcache: check the return value of kzalloc() in detached_dev_do_request()
-      commit: 40f567bbb3b0639d2ec7d1c6ad4b1b018f80cf19
+32 bits is probably enough, seeing as the kernel won't do an IO larger
+than 2GB anyway.
 
-Best regards,
--- 
-Jens Axboe
+--D
 
-
+> Thanks,
+> Florian
+> 
