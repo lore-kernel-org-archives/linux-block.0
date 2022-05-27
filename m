@@ -2,121 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07501C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 10:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3363C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 12:37:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345545AbiE0KTe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 06:19:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52094 "EHLO
+        id S1348612AbiE0Mg4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 08:36:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240807AbiE0KTd (ORCPT
+        with ESMTP id S1352147AbiE0Mer (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 06:19:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 7AD011269A9
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 03:19:32 -0700 (PDT)
+        Fri, 27 May 2022 08:34:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 15A7315E63F
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 05:15:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1653646771;
+        s=mimecast20190719; t=1653653749;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=0t2zU9MXz4VT6MECWOHvsoDoBu3fXaqhY69+YDYTXFs=;
-        b=iSthZXA6Zjt4uw3ofPtU05aaQc3w4+6gIUKWFHjL4dD4szFfcY2YYAwVrS5IaLlp9tta5A
-        ck67FDaIwDVHR+p6u0lw9uPcpBoKuMCqYbzEK5BhffZTtRZZUTtnJnxX7yiL/OJGO5cWpl
-        EC5d0mIVZs4v/GElmTTcHMTzm5AMnb8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+        bh=2bGPVPvfFk4EyyzDfsuiyfWcJ9auiucrugHfToxISX8=;
+        b=EhXe/8s65o8TCTcWfnP58p+x8K6S3G2m0N3cbQ6CSiJ5W3eiaVWiWojvOkrtEF6nBbRTjX
+        5QdML9NwzkX16VxwKpicUhO/Pn946rBY5paUkXNjYEufj+tvK7ZAGa79BiSWXSgUEetQdc
+        Zd73StJiLilWAIP6MCYuqopAUGbVZkA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-91-h3Z6-r8ROvKzm25PUVbvKA-1; Fri, 27 May 2022 06:19:30 -0400
-X-MC-Unique: h3Z6-r8ROvKzm25PUVbvKA-1
-Received: by mail-ej1-f69.google.com with SMTP id v13-20020a170906b00d00b006f51e289f7cso2159609ejy.19
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 03:19:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0t2zU9MXz4VT6MECWOHvsoDoBu3fXaqhY69+YDYTXFs=;
-        b=26PDbVpUWFdBKF8vJNSLmLamiwBs9Iijtl+qjB8kuPS3P7GPaA+fhCMssUx9qvmPX2
-         +Xy0qgRIlpHVHqkmzXF0m5SPDkZdg3BSPLOw0hUBBrGQjS6N2dfmxNmaDJ0xPkFyny73
-         2b852brKX55G+a8EaV6o8OS5AgQbA0XGhTl+Om9ueAT0DF8iWVA+6RPa9uzuhIYmRALF
-         HsuOYQe4pr9S/uuV1BPT2MAKgbOfT4nBVI5pdmAHRLutjg+F8il+bwBLqlV7jvUtEqPE
-         7CCYbNZl+b+J3Hsdgm8hBhtPvAxe43Fo90OOSTDHMUhNdKp0HD+YkqY1rubhR4lbb/St
-         Gl5A==
-X-Gm-Message-State: AOAM531/+jzUlYUcg32cgdGJm72yTQe+msi1qYFCb6IdVbJDGNQfwwjl
-        RIK3nSwArCd7C72o6HCGCfQVUdGtCC+OzK4dkwBucWBKv9zLKjdLVB5LRp0n846w+rK1nhdahOC
-        ljnq6yiUqXdiftnXFLJ05LTg=
-X-Received: by 2002:aa7:cc01:0:b0:42a:402b:b983 with SMTP id q1-20020aa7cc01000000b0042a402bb983mr44184447edt.257.1653646768543;
-        Fri, 27 May 2022 03:19:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy2w1aOFqWoL18Qhgq6ACsfKPjRn/tewWbSjC97sWOBqBfI9rnw+ZKnDTyxZqb0tSdLhb6XOg==
-X-Received: by 2002:aa7:cc01:0:b0:42a:402b:b983 with SMTP id q1-20020aa7cc01000000b0042a402bb983mr44184423edt.257.1653646768272;
-        Fri, 27 May 2022 03:19:28 -0700 (PDT)
-Received: from redhat.com ([2.55.130.213])
-        by smtp.gmail.com with ESMTPSA id s23-20020a1709064d9700b006fe8b3d8cb6sm1338752eju.62.2022.05.27.03.19.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 27 May 2022 03:19:27 -0700 (PDT)
-Date:   Fri, 27 May 2022 06:19:22 -0400
-From:   "Michael S. Tsirkin" <mst@redhat.com>
-To:     Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc:     kch@nvidia.com, jasowang@redhat.com, linux-block@vger.kernel.org,
-        pbonzini@redhat.com, stefanha@redhat.com,
-        virtualization@lists.linux-foundation.org,
-        keliu <liuke94@huawei.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 4/4] virtio-blk: remove deprecated ida_simple_XXX()
-Message-ID: <20220527061845-mutt-send-email-mst@kernel.org>
-References: <fa54e172-ef9d-fba5-ad37-72a6698c7cb8@wanadoo.fr>
+ us-mta-520--iRcPKWJMeOptrTrH4ZeZQ-1; Fri, 27 May 2022 08:15:38 -0400
+X-MC-Unique: -iRcPKWJMeOptrTrH4ZeZQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F0306800882;
+        Fri, 27 May 2022 12:15:37 +0000 (UTC)
+Received: from T590 (ovpn-8-30.pek2.redhat.com [10.72.8.30])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1278A1678F;
+        Fri, 27 May 2022 12:15:34 +0000 (UTC)
+Date:   Fri, 27 May 2022 20:15:29 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block, loop: support partitions without scanning
+Message-ID: <YpDA4Ux6IYi5XwOZ@T590>
+References: <20220527055806.1972352-1-hch@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <fa54e172-ef9d-fba5-ad37-72a6698c7cb8@wanadoo.fr>
+In-Reply-To: <20220527055806.1972352-1-hch@lst.de>
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 10:04:46AM +0200, Christophe JAILLET wrote:
-> (Resend, my email client sent it as HTML. So sorry for the duplicate)
+On Fri, May 27, 2022 at 07:58:06AM +0200, Christoph Hellwig wrote:
+> Historically we did distinguish between a flag that surpressed partition
+> scanning, and a combinations of the minors variable and another flag if
+> any partitions were supported.  This was generally confusing and doesn't
+> make much sense, but some corner case uses of the loop driver actually
+> do want to support manually added partitions on a device that does not
+> actively scan for partitions.  To make things worsee the loop driver
+> also wants to dynamically toggle the scanning for partitions on a live
+> gendisk, which makes the disk->flags updates non-atomic.
 > 
+> Introduce a new GD_SUPPRESS_PART_SCAN bit in disk->state that disables
+> just scanning for partitions, and toggle that instead of GENHD_FL_NO_PART
+> in the loop driver.
 > 
-> Hi,
-> 
-> > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-> > index 74c3a48cd1e5..e05748337dd1 100644
-> > --- a/drivers/block/virtio_blk.c
-> > +++ b/drivers/block/virtio_blk.c
-> > @@ -720,8 +720,8 @@ static int virtblk_probe(struct virtio_device *vdev)
-> > 		return -EINVAL;
-> > 	}
-> >
-> >-	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
-> >-			     GFP_KERNEL);
-> >+	err = ida_alloc_max(&vd_index_ida, minor_to_index(1 << MINORBITS),
-> >+			    GFP_KERNEL);
-> > 	if (err < 0)
-> > 		goto out;
-> > 	index = err;
-> 
-> 
-> this patch, already applied to -next, is wrong.
-> 
-> 
-> The upper bound of ida_simple_get() is exlcusive, while the one of
-> ida_alloc_max() is inclusive.
-> 
-> So, 'minor_to_index(1 << MINORBITS)' should be 'minor_to_index(1 <<
-> MINORBITS) - 1' here.
-> 
-> 
-> (adding keliu in cc: because he is proposing the same kind of patches, so he
-> will see how to to these changes that are slighly tricky)
-> 
-> 
-> CJ
+> Fixes: 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
+> Reported-by: Ming Lei <ming.lei@redhat.com>
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-I will drop this for now, please resend with either
-a corrected version or a comment explaining why it's correct.
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 
-Thanks!
-
--- 
-MST
+Thanks,
+Ming
 
