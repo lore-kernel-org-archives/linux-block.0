@@ -2,130 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50DE7C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 07:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A44CAC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 08:06:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239955AbiE0H2p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 03:28:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38912 "EHLO
+        id S1348751AbiE0IE4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 04:04:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244479AbiE0H2o (ORCPT
+        with ESMTP id S1346376AbiE0IEz (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 03:28:44 -0400
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DE17BA557;
-        Fri, 27 May 2022 00:28:43 -0700 (PDT)
-Received: from dggpemm500020.china.huawei.com (unknown [172.30.72.53])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4L8bwX1YVHz1JBsg;
-        Fri, 27 May 2022 15:27:08 +0800 (CST)
-Received: from dggpemm500018.china.huawei.com (7.185.36.111) by
- dggpemm500020.china.huawei.com (7.185.36.49) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 27 May 2022 15:28:41 +0800
-Received: from localhost.localdomain (10.175.112.125) by
- dggpemm500018.china.huawei.com (7.185.36.111) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 27 May 2022 15:28:40 +0800
-From:   keliu <liuke94@huawei.com>
-To:     <axboe@kernel.dk>, <idryomov@gmail.com>,
-        <dongsheng.yang@easystack.cn>, <mst@redhat.com>,
-        <jasowang@redhat.com>, <pbonzini@redhat.com>,
-        <stefanha@redhat.com>, <kch@nvidia.com>, <ming.lei@redhat.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <ceph-devel@vger.kernel.org>,
-        <virtualization@lists.linux-foundation.org>
-CC:     keliu <liuke94@huawei.com>
-Subject: [PATCH] drivers: block: Directly use ida_alloc()/free()
-Date:   Fri, 27 May 2022 07:50:10 +0000
-Message-ID: <20220527075010.2475520-1-liuke94@huawei.com>
-X-Mailer: git-send-email 2.25.1
+        Fri, 27 May 2022 04:04:55 -0400
+Received: from smtp.smtpout.orange.fr (smtp03.smtpout.orange.fr [80.12.242.125])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D539FF596
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 01:04:49 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.191.102])
+        by smtp.orange.fr with ESMTPA
+        id uUxinqBKs26JCuUxinnMVg; Fri, 27 May 2022 10:04:47 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Fri, 27 May 2022 10:04:47 +0200
+X-ME-IP: 90.11.191.102
+Message-ID: <fa54e172-ef9d-fba5-ad37-72a6698c7cb8@wanadoo.fr>
+Date:   Fri, 27 May 2022 10:04:46 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.112.125]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500018.china.huawei.com (7.185.36.111)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+X-Mozilla-News-Host: news://news.gmane.org:119
+Content-Language: fr
+To:     kch@nvidia.com
+Cc:     jasowang@redhat.com, linux-block@vger.kernel.org, mst@redhat.com,
+        pbonzini@redhat.com, stefanha@redhat.com,
+        virtualization@lists.linux-foundation.org,
+        keliu <liuke94@huawei.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Subject: Re: [PATCH 4/4] virtio-blk: remove deprecated ida_simple_XXX()
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use ida_alloc()/ida_free() instead of deprecated
-ida_simple_get()/ida_simple_remove() .
+(Resend, my email client sent it as HTML. So sorry for the duplicate)
 
-Signed-off-by: keliu <liuke94@huawei.com>
----
- drivers/block/null_blk/main.c | 4 ++--
- drivers/block/rbd.c           | 4 ++--
- drivers/block/virtio_blk.c    | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-index c441a4972064..a189f6ba3496 100644
---- a/drivers/block/null_blk/main.c
-+++ b/drivers/block/null_blk/main.c
-@@ -1724,7 +1724,7 @@ static void null_del_dev(struct nullb *nullb)
- 
- 	dev = nullb->dev;
- 
--	ida_simple_remove(&nullb_indexes, nullb->index);
-+	ida_free(&nullb_indexes, nullb->index);
- 
- 	list_del_init(&nullb->list);
- 
-@@ -2044,7 +2044,7 @@ static int null_add_dev(struct nullb_device *dev)
- 	blk_queue_flag_clear(QUEUE_FLAG_ADD_RANDOM, nullb->q);
- 
- 	mutex_lock(&lock);
--	nullb->index = ida_simple_get(&nullb_indexes, 0, 0, GFP_KERNEL);
-+	nullb->index = ida_alloc(&nullb_indexes, GFP_KERNEL);
- 	dev->index = nullb->index;
- 	mutex_unlock(&lock);
- 
-diff --git a/drivers/block/rbd.c b/drivers/block/rbd.c
-index b844432bad20..6508085d3dd5 100644
---- a/drivers/block/rbd.c
-+++ b/drivers/block/rbd.c
-@@ -5280,7 +5280,7 @@ static void rbd_dev_release(struct device *dev)
- 
- 	if (need_put) {
- 		destroy_workqueue(rbd_dev->task_wq);
--		ida_simple_remove(&rbd_dev_id_ida, rbd_dev->dev_id);
-+		ida_free(&rbd_dev_id_ida, rbd_dev->dev_id);
- 	}
- 
- 	rbd_dev_free(rbd_dev);
-@@ -5381,7 +5381,7 @@ static struct rbd_device *rbd_dev_create(struct rbd_client *rbdc,
- 	return rbd_dev;
- 
- fail_dev_id:
--	ida_simple_remove(&rbd_dev_id_ida, rbd_dev->dev_id);
-+	ida_free(&rbd_dev_id_ida, rbd_dev->dev_id);
- fail_rbd_dev:
- 	rbd_dev_free(rbd_dev);
- 	return NULL;
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index a8bcf3f664af..d8f4e98a80a7 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -415,7 +415,7 @@ static void virtblk_free_disk(struct gendisk *disk)
- {
- 	struct virtio_blk *vblk = disk->private_data;
- 
--	ida_simple_remove(&vd_index_ida, vblk->index);
-+	ida_free(&vd_index_ida, vblk->index);
- 	mutex_destroy(&vblk->vdev_mutex);
- 	kfree(vblk);
- }
-@@ -917,7 +917,7 @@ static int virtblk_probe(struct virtio_device *vdev)
- out_free_vblk:
- 	kfree(vblk);
- out_free_index:
--	ida_simple_remove(&vd_index_ida, index);
-+	ida_free(&vd_index_ida, index);
- out:
- 	return err;
- }
--- 
-2.25.1
+Hi,
+
+ > diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
+ > index 74c3a48cd1e5..e05748337dd1 100644
+ > --- a/drivers/block/virtio_blk.c
+ > +++ b/drivers/block/virtio_blk.c
+ > @@ -720,8 +720,8 @@ static int virtblk_probe(struct virtio_device *vdev)
+ > 		return -EINVAL;
+ > 	}
+ >
+ >-	err = ida_simple_get(&vd_index_ida, 0, minor_to_index(1 << MINORBITS),
+ >-			     GFP_KERNEL);
+ >+	err = ida_alloc_max(&vd_index_ida, minor_to_index(1 << MINORBITS),
+ >+			    GFP_KERNEL);
+ > 	if (err < 0)
+ > 		goto out;
+ > 	index = err;
+
+
+this patch, already applied to -next, is wrong.
+
+
+The upper bound of ida_simple_get() is exlcusive, while the one of 
+ida_alloc_max() is inclusive.
+
+So, 'minor_to_index(1 << MINORBITS)' should be 'minor_to_index(1 << 
+MINORBITS) - 1' here.
+
+
+(adding keliu in cc: because he is proposing the same kind of patches, 
+so he will see how to to these changes that are slighly tricky)
+
+
+CJ
 
