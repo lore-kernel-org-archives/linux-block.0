@@ -2,145 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 297E7C433FE
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 21:34:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB5C6C433F5
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 22:41:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353044AbiE0VeC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 17:34:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55474 "EHLO
+        id S1354867AbiE0WlZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 18:41:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229752AbiE0VeA (ORCPT
+        with ESMTP id S235014AbiE0WlX (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 17:34:00 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761361C934;
-        Fri, 27 May 2022 14:33:59 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 2764AB82522;
-        Fri, 27 May 2022 21:33:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2C07C385A9;
-        Fri, 27 May 2022 21:33:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653687236;
-        bh=gfujXJB2bf8jciwwiwps5AH82Rg/VMT8hb2RsJAdj5c=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=faHHxdhtD0wc/aKhgN9YtTBdSTT/+JV2Rn1pV1aS3SS32teQJcMJ0kLlIxGgh02N9
-         tidDnavnUcJAiMmvppKQIAikjejmMGpQJJK1bB8yBbCClm1/ZIXWbiMQu6FdHjWinx
-         1TXuA+136++o5iNz0N2uTf6f64u+jC1oh9lvEIFqQ4gVhkpVQjrNUc2qkxkeoDF4A+
-         Ud7QNmt/sAkZij3vYlrH+X48FTzxEtQPAuD9Tk/ZuHN6ttq/1+1hMag9TjakE0If0/
-         s3N6SAlYelfzSI8vbisbIg6IjiXO05gXaYTVtHLUPQrfjlIB35TRXRrfq4JhoF3MX2
-         yaUA1pbLPmUJQ==
-Date:   Fri, 27 May 2022 21:33:55 +0000
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH] f2fs: add sysfs entry to avoid FUA
-Message-ID: <YpFDw3mQjN1LBd2j@gmail.com>
-References: <20220527205955.3251982-1-jaegeuk@kernel.org>
+        Fri, 27 May 2022 18:41:23 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0C7E5F9A;
+        Fri, 27 May 2022 15:41:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=o7BqcxOiBncbWbb00d8kbjXH2HBy9dF17WHfCcK75YE=; b=EAbzHprt/T+zp9x4cktS1Vebkz
+        acGerWRT8JwrK+2uOMsK1Ug+v3jDk3VFA3oGyBrAB5tnJc982LKNjrUc7OaItvm44nNV0u44SRokZ
+        a3aMc6P6g3Dcnm/C7JZh3H+ypL4Lq77HricOS8CTumdAFqX1Aw+ck4k9NDPBUvo/JUXfo2O48sjlZ
+        B6VODvxwB+jUS8ODQNaeHmeBG7xIM6MOYhPpYhO4MWHp61N4kl2PD/BEUStcacj0MPalPUobpAs4k
+        8i9nGqdGEyMJNsRptj6r3IEkDWVRoZ20dgOwLKAA1gwwJGWRT+40bKQkdd59LzJPcXRx1hqlcOwcY
+        /4Z0kVGg==;
+Received: from guinness.priv.deltatee.com ([172.16.1.162])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1nuidw-009AgX-Kv; Fri, 27 May 2022 16:41:18 -0600
+Message-ID: <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
+Date:   Fri, 27 May 2022 16:41:08 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220527205955.3251982-1-jaegeuk@kernel.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-CA
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+References: <20220407154717.7695-1-logang@deltatee.com>
+ <20220407154717.7695-21-logang@deltatee.com>
+ <20220527125501.GD2960187@ziepe.ca>
+ <a2590e27-41e8-59dc-3576-b5b8d716a198@deltatee.com>
+ <20220527190307.GG2960187@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220527190307.GG2960187@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 172.16.1.162
+X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, bhelgaas@google.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-[+Cc linux-block for FUA, and linux-xfs for iomap]
 
-On Fri, May 27, 2022 at 01:59:55PM -0700, Jaegeuk Kim wrote:
-> Some UFS storage gives slower performance on FUA than write+cache_flush.
-> Let's give a way to manage it.
+
+On 2022-05-27 13:03, Jason Gunthorpe wrote:
+> On Fri, May 27, 2022 at 09:35:07AM -0600, Logan Gunthorpe wrote:
+>>
+>>
+>> On 2022-05-27 06:55, Jason Gunthorpe wrote:
+>>> On Thu, Apr 07, 2022 at 09:47:16AM -0600, Logan Gunthorpe wrote:
+>>>> +static void pci_p2pdma_unmap_mappings(void *data)
+>>>> +{
+>>>> +	struct pci_dev *pdev = data;
+>>>> +	struct pci_p2pdma *p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
+>>>> +
+>>>> +	/* Ensure no new pages can be allocated in mappings */
+>>>> +	p2pdma->active = false;
+>>>> +	synchronize_rcu();
+>>>> +
+>>>> +	unmap_mapping_range(p2pdma->inode->i_mapping, 0, 0, 1);
+>>>> +
+>>>> +	/*
+>>>> +	 * On some architectures, TLB flushes are done with call_rcu()
+>>>> +	 * so to ensure GUP fast is done with the pages, call synchronize_rcu()
+>>>> +	 * before freeing them.
+>>>> +	 */
+>>>> +	synchronize_rcu();
+>>>> +	pci_p2pdma_free_mappings(p2pdma->inode->i_mapping);
+>>>
+>>> With the series from Felix getting close this should get updated to
+>>> not set pte_devmap and use proper natural refcounting without any of
+>>> this stuff.
+>>
+>> Can you send a link? I'm not sure what you are referring to.
 > 
-> Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
-
-Should the driver even be saying that it has FUA support in this case?  If the
-driver didn't claim FUA support, that would also solve this problem.
-
-> ---
->  Documentation/ABI/testing/sysfs-fs-f2fs | 7 +++++++
->  fs/f2fs/data.c                          | 2 ++
->  fs/f2fs/f2fs.h                          | 1 +
->  fs/f2fs/sysfs.c                         | 2 ++
->  4 files changed, 12 insertions(+)
+> IIRC this is the last part:
 > 
-> diff --git a/Documentation/ABI/testing/sysfs-fs-f2fs b/Documentation/ABI/testing/sysfs-fs-f2fs
-> index 9b583dd0298b..cd96b09d7182 100644
-> --- a/Documentation/ABI/testing/sysfs-fs-f2fs
-> +++ b/Documentation/ABI/testing/sysfs-fs-f2fs
-> @@ -434,6 +434,7 @@ Date:		April 2020
->  Contact:	"Daeho Jeong" <daehojeong@google.com>
->  Description:	Give a way to change iostat_period time. 3secs by default.
->  		The new iostat trace gives stats gap given the period.
-> +
->  What:		/sys/fs/f2fs/<disk>/max_io_bytes
->  Date:		December 2020
->  Contact:	"Jaegeuk Kim" <jaegeuk@kernel.org>
-> @@ -442,6 +443,12 @@ Description:	This gives a control to limit the bio size in f2fs.
->  		whereas, if it has a certain bytes value, f2fs won't submit a
->  		bio larger than that size.
->  
-> +What:		/sys/fs/f2fs/<disk>/no_fua_dio
-> +Date:		May 2022
-> +Contact:	"Jaegeuk Kim" <jaegeuk@kernel.org>
-> +Description:	This gives a signal to iomap, which should not use FUA for
-> +		direct IOs. Default: 0.
+> https://lore.kernel.org/linux-mm/20220524190632.3304-1-alex.sierra@amd.com/
+> 
+> And the earlier bit with Christoph's pieces looks like it might get
+> merged to v5.19..
+> 
+> The general idea is once pte_devmap is not set then all the
+> refcounting works the way it should. This is what all new ZONE_DEVICE
+> users should do..
 
-iomap is an implementation detail, so it shouldn't be mentioned in UAPI
-documentation.  UAPI documentation should describe user-visible behavior only.
+Ok, I don't actually follow how those patches relate to this.
 
-> +
->  What:		/sys/fs/f2fs/<disk>/stat/sb_status
->  Date:		December 2020
->  Contact:	"Chao Yu" <yuchao0@huawei.com>
-> diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-> index f5f2b7233982..23486486eab2 100644
-> --- a/fs/f2fs/data.c
-> +++ b/fs/f2fs/data.c
-> @@ -4153,6 +4153,8 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
->  	if ((inode->i_state & I_DIRTY_DATASYNC) ||
->  	    offset + length > i_size_read(inode))
->  		iomap->flags |= IOMAP_F_DIRTY;
-> +	if (F2FS_I_SB(inode)->no_fua_dio)
-> +		iomap->flags |= IOMAP_F_DIRTY;
+Based on your description I guess I don't need to set PFN_DEV and
+perhaps not use vmf_insert_mixed()? And then just use vm_normal_page()?
 
-This is overloading the IOMAP_F_DIRTY flag to mean something other than dirty.
-Perhaps this flag needs to be renamed, or a new flag should be added?
+But the refcounting of the pages seemed like it was already sane to me,
+unless you mean that the code no longer has to synchronize_rcu() before
+returning the pages... that would be spectacular and clean things up a
+lot (plus fix an annoying issue where if you use then free all the
+memory you can't allocate new memory for an indeterminate amount of time).
 
-> diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-> index e10838879538..c2400ea0080b 100644
-> --- a/fs/f2fs/f2fs.h
-> +++ b/fs/f2fs/f2fs.h
-> @@ -1671,6 +1671,7 @@ struct f2fs_sb_info {
->  	int dir_level;				/* directory level */
->  	int readdir_ra;				/* readahead inode in readdir */
->  	u64 max_io_bytes;			/* max io bytes to merge IOs */
-> +	int no_fua_dio;				/* avoid FUA in DIO */
-
-Make this a bool?
-
-> diff --git a/fs/f2fs/sysfs.c b/fs/f2fs/sysfs.c
-> index 4c50aedd5144..24d628ca92cc 100644
-> --- a/fs/f2fs/sysfs.c
-> +++ b/fs/f2fs/sysfs.c
-> @@ -771,6 +771,7 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, iostat_period_ms, iostat_period_ms);
->  #endif
->  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, readdir_ra, readdir_ra);
->  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, max_io_bytes, max_io_bytes);
-> +F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, no_fua_dio, no_fua_dio);
->  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, gc_pin_file_thresh, gc_pin_file_threshold);
->  F2FS_RW_ATTR(F2FS_SBI, f2fs_super_block, extension_list, extension_list);
->  #ifdef CONFIG_F2FS_FAULT_INJECTION
-> @@ -890,6 +891,7 @@ static struct attribute *f2fs_attrs[] = {
->  #endif
->  	ATTR_LIST(readdir_ra),
->  	ATTR_LIST(max_io_bytes),
-> +	ATTR_LIST(no_fua_dio),
-
-Where is it validated that only valid values (0 or 1) can be written to this
-file?
-
-- Eric
+Logan
