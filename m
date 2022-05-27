@@ -2,128 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F595C433F5
-	for <linux-block@archiver.kernel.org>; Thu, 26 May 2022 23:43:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC05EC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 03:39:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238257AbiEZXnf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 26 May 2022 19:43:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48860 "EHLO
+        id S238396AbiE0DjX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 26 May 2022 23:39:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237049AbiEZXne (ORCPT
+        with ESMTP id S236956AbiE0DjW (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 26 May 2022 19:43:34 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893E324F05
-        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 16:43:33 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id j21so2541081pga.13
-        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 16:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=LVT+hnAFEArODTLjjL6u957Oo8LFMcs8Kqe5NqWbyq0=;
-        b=50hwK5Xdsh8uEqJ/XEkV/OV3UKXNHFz0lvEkauUBLEMmhAHpB2I1ZJDnIaewr8qiVI
-         ur+pSBNRGjLPzB3v5Xo8zCb2Njei+xAtlPYL7d6CM2xdqjK145tL17zb2MjQAkU+glSt
-         IBqx0NtBPgM7tpTnWyCRWijLZzv2Unn5dh1FhMlEWqW2fDtS1OVG9yMZqLynaVpSCwNW
-         Ymt8MwkTBQ4RJHE8m453cTATa3GYAGlqS254D124yOv+BR6lD+RkZ+SSqLokLtIBl4uz
-         4amiI4oh13Y2e/KHe4T53m+puWtOEeDEvowWW+S9eua1YxkTcbpGG+054W+/FaBvyAcF
-         Ipag==
+        Thu, 26 May 2022 23:39:22 -0400
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A94EBE90
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 20:39:20 -0700 (PDT)
+Received: by mail-il1-f197.google.com with SMTP id a12-20020a92c54c000000b002d2f39932e8so1297143ilj.19
+        for <linux-block@vger.kernel.org>; Thu, 26 May 2022 20:39:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LVT+hnAFEArODTLjjL6u957Oo8LFMcs8Kqe5NqWbyq0=;
-        b=yV6G6YJMRUOZQyUi02HUHo30OSMgdbhnskWtaDVOioXH2CjjdOYlqDAq+PKI2jTWVV
-         eay2oh8AU6doxXD2GvD1q/bDqwVeDoeYfTI8BOQoOMov9sk4AJavwZK1/76elDwaIcZ1
-         XrtBIiaIg6IlkZWJ/75EnybOtXn5fNJPtgjnsf+CnLe9eNIutKawiElVdwqEODTMNLir
-         WKZslKNEyDhFzXalIkSGzw+bCNV5n1FX9IVAfiLVtv0ulDjSIHvlMssD3Pld7WOFmogn
-         rAEUTJAri1ytoKNTQ2imnyFbn9cKp9dXU43BiJoV8v1xdHzbgvrcZOREwyVH+iTaAedf
-         J1kw==
-X-Gm-Message-State: AOAM533kqjhmEqo/YITQtr5Th6Mo997ZXgOUS2UBODpymUXeKlL9G3kD
-        S7A/SXHx7/+QMIlgLDksP4weQQ==
-X-Google-Smtp-Source: ABdhPJyAS/kjg2C00QbkfvCAuSDQJgvx0IkWdvaLJ7VQSQaTmaTuPrel1QRS5EoXASHMELn4xvaiWw==
-X-Received: by 2002:a62:ae19:0:b0:518:db6a:5b85 with SMTP id q25-20020a62ae19000000b00518db6a5b85mr13085709pff.61.1653608613048;
-        Thu, 26 May 2022 16:43:33 -0700 (PDT)
-Received: from ?IPV6:2409:8a28:e6d:c000:9d26:281f:3d89:5507? ([2409:8a28:e6d:c000:9d26:281f:3d89:5507])
-        by smtp.gmail.com with ESMTPSA id i5-20020a17090332c500b00161b797fc42sm2247016plr.106.2022.05.26.16.43.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 26 May 2022 16:43:32 -0700 (PDT)
-Message-ID: <d7309ffb-ee19-6097-9f0d-5b811e14e8b7@bytedance.com>
-Date:   Fri, 27 May 2022 07:43:24 +0800
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=CbgmDYSLsmbeCmm9RIC3R+sTBJbYG3oF2mSfvudPXkE=;
+        b=2+pchvFOYlUm7XdWLe/n4xZ+IWA4yc3GFuPJcMbQ3AT9a+fwCbM6wtFIdMGgG210hL
+         4qzzWlBHbtoiq6EWRPWNqtY1N0OyeMtL9btcBRnhJanTt62X9yISOKbOw8ijUnDadJ0/
+         A9TytsVzf3XbNViJ3xUk3DOn4g3uRM/HTrz+FTsdRotEIBy4alO9n8gm8TUKz4j08ac1
+         XMqZ0SObVUPS8GKpU3goS8TVWi/5Wks2Wsn1Y5oeYsYi+UZtl/hhu4MUM0FuDCHswhGM
+         9TieqG5T4IJp613MpfVMyX5Te7OOPPjrl8TOb4nxwUboCNw2vN7zwQT6MTYw/TI3m4Y3
+         et7Q==
+X-Gm-Message-State: AOAM5333yLuGqce7T/GqBJGICKtY2wQ3rPjzo4cuCQDGHjd31/VTRx8v
+        08U4AAPEnFMvGuyX2GpiZi1QBWnYj59B7A/zT3VV+uC2IUAo
+X-Google-Smtp-Source: ABdhPJzllylfqbbGCo/rixmvjSkzNOiB6i7ltnRRWPdVDCjGUbR47zRA75sLjX+/qxGBprHzlT+rW/gNO07B2+HJU7f868kUklL2
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.1
-Subject: Re: [Phishing Risk] [External] Re: [PATCH] blk-iocost: fix false
- positive lagging
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220526133554.21079-1-zhouchengming@bytedance.com>
- <Yo+8K9MrFMl59BGj@slm.duckdns.org>
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <Yo+8K9MrFMl59BGj@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1646:b0:2d3:789a:58a with SMTP id
+ v6-20020a056e02164600b002d3789a058amr352292ilu.197.1653622760339; Thu, 26 May
+ 2022 20:39:20 -0700 (PDT)
+Date:   Thu, 26 May 2022 20:39:20 -0700
+In-Reply-To: <00000000000085bef105dd398c3d@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000039009305dff60da4@google.com>
+Subject: Re: [syzbot] WARNING in __floppy_read_block_0
+From:   syzbot <syzbot+bac6723617710898abd3@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
+syzbot has found a reproducer for the following issue on:
 
-On 2022/5/27 01:43, Tejun Heo wrote:
-> Hello,
-> 
-> On Thu, May 26, 2022 at 09:35:54PM +0800, Chengming Zhou wrote:
->> I found many false positive lagging during iocost test.
->>
->> Since iocg->vtime will be advanced to (vnow - margins.target)
->> in hweight_after_donation(), which called throw away excess,
->> the iocg->done_vtime will also be advanced that much.
->>
->>        period_at_vtime  <--period_vtime-->  vnow
->>               |                              |
->>   --------------------------------------------------->
->>         |<--->|
->>      margins.target
->>         |->
->>   vtime, done_vtime
-> 
-> All it does is shifting the vtime (and done_vtime) within the current window
-> so that we don't build up budget too lage a budget possibly spanning
-> multiple periods. 
+HEAD commit:    babf0bb978e3 Merge tag 'xfs-5.19-for-linus' of git://git.k..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1256f1d3f00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fb7a468cb4ea251
+dashboard link: https://syzkaller.appspot.com/bug?extid=bac6723617710898abd3
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+userspace arch: i386
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1107de15f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1104a36df00000
 
-Yes, this is necessary. Suppose in the last timer, the iocg doesn't have inflights
-and have excess, then iocg->vtime = iocg->done_vtime = (period_at_vtime - margins.target)
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bac6723617710898abd3@syzkaller.appspotmail.com
 
-> The lagging detection is supposed to detect IOs which are
-> issued two+ periods ago which didn't finish in the last period. So, I don't
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 3673 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
+WARNING: CPU: 1 PID: 3673 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
+WARNING: CPU: 1 PID: 3673 at drivers/block/floppy.c:999 __floppy_read_block_0.isra.0+0x292/0x330 drivers/block/floppy.c:4160
+Modules linked in:
+CPU: 1 PID: 3673 Comm: syz-executor234 Not tainted 5.18.0-syzkaller-07857-gbabf0bb978e3 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
+RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
+RIP: 0010:__floppy_read_block_0.isra.0+0x292/0x330 drivers/block/floppy.c:4160
+Code: 84 24 b8 01 00 00 65 48 2b 04 25 28 00 00 00 0f 85 a0 00 00 00 48 81 c4 c0 01 00 00 5b 5d 41 5c 41 5d 41 5e c3 e8 9e 76 e1 fc <0f> 0b e9 5a ff ff ff e8 62 bc 2d fd e9 7c fe ff ff e8 88 76 e1 fc
+RSP: 0018:ffffc90002b3f6a0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 1ffff92000567ed4 RCX: 0000000000000000
+RDX: ffff888015c3bb00 RSI: ffffffff849851d2 RDI: 0000000000000003
+RBP: ffffea000068d3c0 R08: 0000000000000000 R09: ffffffff8c8e8b47
+R10: ffffffff8498512a R11: 0000000000000000 R12: 0000000000000001
+R13: 0000000000000001 R14: dffffc0000000000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff88802cb00000(0063) knlGS:00000000570f32c0
+CS:  0010 DS: 002b ES: 002b CR0: 0000000080050033
+CR2: 00000000f7f88ca8 CR3: 0000000018139000 CR4: 0000000000150ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ floppy_revalidate.isra.0+0x801/0xae0 drivers/block/floppy.c:4206
+ floppy_open+0xac5/0xd70 drivers/block/floppy.c:4058
+ blkdev_get_whole+0x99/0x2d0 block/bdev.c:673
+ blkdev_get_by_dev.part.0+0x5ec/0xb90 block/bdev.c:823
+ blkdev_get_by_dev+0x6b/0x80 block/bdev.c:857
+ blkdev_open+0x13c/0x2c0 block/fops.c:481
+ do_dentry_open+0x4a1/0x11e0 fs/open.c:824
+ do_open fs/namei.c:3477 [inline]
+ path_openat+0x1c71/0x2910 fs/namei.c:3610
+ do_filp_open+0x1aa/0x400 fs/namei.c:3637
+ do_sys_openat2+0x16d/0x4c0 fs/open.c:1213
+ do_sys_open fs/open.c:1229 [inline]
+ __do_compat_sys_openat fs/open.c:1289 [inline]
+ __se_compat_sys_openat fs/open.c:1287 [inline]
+ __ia32_compat_sys_openat+0x13f/0x1f0 fs/open.c:1287
+ do_syscall_32_irqs_on arch/x86/entry/common.c:112 [inline]
+ __do_fast_syscall_32+0x65/0xf0 arch/x86/entry/common.c:178
+ do_fast_syscall_32+0x2f/0x70 arch/x86/entry/common.c:203
+ entry_SYSENTER_compat_after_hwframe+0x53/0x62
+RIP: 0023:0xf7f15549
+Code: 03 74 c0 01 10 05 03 74 b8 01 10 06 03 74 b4 01 10 07 03 74 b0 01 10 08 03 74 d8 01 00 00 00 00 00 51 52 55 89 e5 0f 34 cd 80 <5d> 5a 59 c3 90 90 90 90 8d b4 26 00 00 00 00 8d b4 26 00 00 00 00
+RSP: 002b:00000000ffb136c0 EFLAGS: 00000246 ORIG_RAX: 0000000000000127
+RAX: ffffffffffffffda RBX: 00000000ffffff9c RCX: 00000000ffb13710
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 00000000f7fbe000
+RBP: 0000000066666667 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	03 74 c0 01          	add    0x1(%rax,%rax,8),%esi
+   4:	10 05 03 74 b8 01    	adc    %al,0x1b87403(%rip)        # 0x1b8740d
+   a:	10 06                	adc    %al,(%rsi)
+   c:	03 74 b4 01          	add    0x1(%rsp,%rsi,4),%esi
+  10:	10 07                	adc    %al,(%rdi)
+  12:	03 74 b0 01          	add    0x1(%rax,%rsi,4),%esi
+  16:	10 08                	adc    %cl,(%rax)
+  18:	03 74 d8 01          	add    0x1(%rax,%rbx,8),%esi
+  1c:	00 00                	add    %al,(%rax)
+  1e:	00 00                	add    %al,(%rax)
+  20:	00 51 52             	add    %dl,0x52(%rcx)
+  23:	55                   	push   %rbp
+  24:	89 e5                	mov    %esp,%ebp
+  26:	0f 34                	sysenter
+  28:	cd 80                	int    $0x80
+* 2a:	5d                   	pop    %rbp <-- trapping instruction
+  2b:	5a                   	pop    %rdx
+  2c:	59                   	pop    %rcx
+  2d:	c3                   	retq
+  2e:	90                   	nop
+  2f:	90                   	nop
+  30:	90                   	nop
+  31:	90                   	nop
+  32:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
+  39:	8d b4 26 00 00 00 00 	lea    0x0(%rsi,%riz,1),%esi
 
-Yes, I understand.
-
-> think the above sliding up the window affects that detection given that the
-> lagging detection is done before the window sliding. All it's checking is
-> whether there still are in-flight IOs which were issued two+ windows ago, so
-> how the last window has been fast forwarded shouldn't affect the detection,
-> no?
-
-Right, the lagging detection is done before the window sliding in this period timer.
-The conditions that it checks vtime, done_vtime have been slided in the last timer.
-
-time_after64(vtime, vdone) &&
-time_after64(vtime, now.vnow - MAX_LAGGING_PERIODS * period_vtime) &&
-time_before64(vdone, now.vnow - period_vtime)
-
-The first condition says it has some inflights, the second condition is always true
-if vtime has been slided in the last timer, the third condition will be true if the
-cost of io completed since last timer < ioc->margins.target.
-
-So I think it doesn't check correctly whether it has inflights that were issued two+
-windows ago.
-
-Thanks.
-
-> 
-> Thanks.
-> 
