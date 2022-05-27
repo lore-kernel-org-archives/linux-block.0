@@ -2,109 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA208C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 15:35:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55C05C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 15:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347828AbiE0PfV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 11:35:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53748 "EHLO
+        id S1352806AbiE0Pt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 11:49:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243719AbiE0PfU (ORCPT
+        with ESMTP id S1352485AbiE0Pt1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 11:35:20 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E00FC4FA;
-        Fri, 27 May 2022 08:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=iVJ9fBLNdTiKEt9G340BRFfSyp3FLS4feBnXCUGEiYw=; b=LK0tOmWxLk3f/jP34DJDcVbw9k
-        7FkvN62gBPKgtF5GHbzQjRxhicgPqm2Y0f6rnJC1wzsiq1VPMUwE7lbhyg2Wb2wmOtwdosFsCyBev
-        C+pH6Z+zfZFV7DK2Lq/L4Fx9Tzo2Esnbtf4idNVxuPx/hUdAsdtZJB+bGTuxqU8ZC6esYn25HCHlP
-        C7mzMuI1d9VM5EbOwJRlj828gX7M9YfiT/tDp8fR8eVX8rPBMx/i1jYJg8S3l83aYSY8Rbxegbl79
-        BKGvmLPOAVF+yorF40Wo/OhfP9diUw8Y3r/R2PGBoTMq+LtTE3+tHiLIwGLa7GSO7vvraU/8nFe0e
-        5weL+HIA==;
-Received: from guinness.priv.deltatee.com ([172.16.1.162])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1nubze-0093NF-Rc; Fri, 27 May 2022 09:35:15 -0600
-Message-ID: <a2590e27-41e8-59dc-3576-b5b8d716a198@deltatee.com>
-Date:   Fri, 27 May 2022 09:35:07 -0600
+        Fri, 27 May 2022 11:49:27 -0400
+Received: from mail-io1-xd2a.google.com (mail-io1-xd2a.google.com [IPv6:2607:f8b0:4864:20::d2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 923E6123888
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 08:49:25 -0700 (PDT)
+Received: by mail-io1-xd2a.google.com with SMTP id z20so5064909iof.1
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 08:49:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=DfQBEt+DBhNdyw6RNSIOsmJe0RNwf7dOUcu/f23zdto=;
+        b=21HUBJEgr2AP2FKoOb69yTfAXQzLblhnjppKtx21dSIoWLNHc+iqndjrIckA3FVdIr
+         U0MnM2DYb7kXQT/dI62Xz6J4sNQDaSCFJh4F7n5LvBG7AACuszxE6VYfKpYoznXbPkc5
+         OHyxpl/pWjuOkATS5K79VT3aR9/NaejcnasF7HEiz34IdH6LEsSL4k+2682Df8VXgiTI
+         yqjv7yu5ikfpdzIBjSPHzVF8OS1qiHBSo7tTIRv8+L3/ScS9F0fnk+LKLAIdHK4Ka9Le
+         0kDE5s5tD0pH1Tt1zW0xSsSfSO9zxAubyVBDFu+QxArJMfkbmMCeVYOf7H1is35NmA43
+         vE9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=DfQBEt+DBhNdyw6RNSIOsmJe0RNwf7dOUcu/f23zdto=;
+        b=Hxtqv/Nj3hZLl/VxD0LaoQnVsSd1eo4ECDX0zAH2D1xErbp5CozFb5fusRPaSU0IbX
+         QH3yQnNbaugQEqRlnmRXdd7zyxwtKjhDXMQ5Q16R9eMQZMRB3G8tyJj0X5v3Q9DrnDwk
+         Tc1uTJODG6NYybjyAMTV6US1+19AZ6mARbd3RCJamd5/xE07K328oerGDyML9Zdy7gNP
+         LRsvc+mKLlIZtxYRPX6KmzditQb+M2Awmg0Wlzuwna0TvLmQFnMsSkZzC4mNJT455NPW
+         g1c7mD2r71CLwSuCTAkybsgK4dUokxXbfmxDeHDpe5umlXhleMOO+pyxZdUSLBpz6Gf1
+         fstQ==
+X-Gm-Message-State: AOAM530cEaA38+vuynYUTovnn2HL9d5MQyV+gd93pCmqo5Su4xm+/PmU
+        DRlP5an1NmLm85dfD2ihcuw44D/4xZKcEA==
+X-Google-Smtp-Source: ABdhPJzzYG7T7RGV9RmrG+wYAKbicjL2wY9FibFOakIxaXEuXuKNTERKCKRB1O98pul7N1AZ9xcnWg==
+X-Received: by 2002:a5e:8f49:0:b0:664:7e2e:ca76 with SMTP id x9-20020a5e8f49000000b006647e2eca76mr11610194iop.199.1653666564896;
+        Fri, 27 May 2022 08:49:24 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id k44-20020a056638372c00b0032e7b54eb01sm633089jav.157.2022.05.27.08.49.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 May 2022 08:49:24 -0700 (PDT)
+Message-ID: <ebf7c9e4-89cb-59e4-8304-d7f8a28966f3@kernel.dk>
+Date:   Fri, 27 May 2022 09:49:22 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Content-Language: en-CA
-To:     Jason Gunthorpe <jgg@ziepe.ca>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-References: <20220407154717.7695-1-logang@deltatee.com>
- <20220407154717.7695-21-logang@deltatee.com>
- <20220527125501.GD2960187@ziepe.ca>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <20220527125501.GD2960187@ziepe.ca>
+Subject: Re: [PATCH 2/3] bcache: avoid unnecessary soft lockup in kworker
+ update_writeback_rate()
+Content-Language: en-US
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20220527152818.27545-1-colyli@suse.de>
+ <20220527152818.27545-3-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220527152818.27545-3-colyli@suse.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 172.16.1.162
-X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, bhelgaas@google.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On 5/27/22 9:28 AM, Coly Li wrote:
+> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+> index d138a2d73240..c51671abe74e 100644
+> --- a/drivers/md/bcache/writeback.c
+> +++ b/drivers/md/bcache/writeback.c
+> @@ -214,6 +214,7 @@ static void update_writeback_rate(struct work_struct *work)
+>  					     struct cached_dev,
+>  					     writeback_rate_update);
+>  	struct cache_set *c = dc->disk.c;
+> +	bool contention = false;
+>  
+>  	/*
+>  	 * should check BCACHE_DEV_RATE_DW_RUNNING before calling
+> @@ -243,13 +244,41 @@ static void update_writeback_rate(struct work_struct *work)
+>  		 * in maximum writeback rate number(s).
+>  		 */
+>  		if (!set_at_max_writeback_rate(c, dc)) {
+> -			down_read(&dc->writeback_lock);
+> -			__update_writeback_rate(dc);
+> -			update_gc_after_writeback(c);
+> -			up_read(&dc->writeback_lock);
+> +			/*
+> +			 * When contention happens on dc->writeback_lock with
+> +			 * the writeback thread, this kwork may be blocked for
+> +			 * very long time if there are too many dirty data to
+> +			 * writeback, and kerne message will complain a (bogus)
+> +			 * software lockup kernel message. To avoid potential
+> +			 * starving, if down_read_trylock() fails, writeback
+> +			 * rate updating will be skipped for dc->retry_max times
+> +			 * at most while delay this worker a bit longer time.
+> +			 * If dc->retry_max times are tried and the trylock
+> +			 * still fails, then call down_read() to wait for
+> +			 * dc->writeback_lock.
+> +			 */
+> +			if (!down_read_trylock((&dc->writeback_lock))) {
+> +				contention = true;
+> +				dc->retry_nr++;
+> +				if (dc->retry_nr > dc->retry_max)
+> +					down_read(&dc->writeback_lock);
+> +			}
+> +
+> +			if (!contention || dc->retry_nr > dc->retry_max) {
+> +				__update_writeback_rate(dc);
+> +				update_gc_after_writeback(c);
+> +				up_read(&dc->writeback_lock);
+> +				dc->retry_nr = 0;
+> +			}
+>  		}
+>  	}
 
+This is really not very pretty. First of all, why bother with storing a
+max retry value in there? Doesn't seem like it'd ever be different per
+'dc' anyway. Secondly, something like the below would be a lot more
+readable. Totally untested.
 
-On 2022-05-27 06:55, Jason Gunthorpe wrote:
-> On Thu, Apr 07, 2022 at 09:47:16AM -0600, Logan Gunthorpe wrote:
->> +static void pci_p2pdma_unmap_mappings(void *data)
->> +{
->> +	struct pci_dev *pdev = data;
->> +	struct pci_p2pdma *p2pdma = rcu_dereference_protected(pdev->p2pdma, 1);
->> +
->> +	/* Ensure no new pages can be allocated in mappings */
->> +	p2pdma->active = false;
->> +	synchronize_rcu();
->> +
->> +	unmap_mapping_range(p2pdma->inode->i_mapping, 0, 0, 1);
->> +
->> +	/*
->> +	 * On some architectures, TLB flushes are done with call_rcu()
->> +	 * so to ensure GUP fast is done with the pages, call synchronize_rcu()
->> +	 * before freeing them.
->> +	 */
->> +	synchronize_rcu();
->> +	pci_p2pdma_free_mappings(p2pdma->inode->i_mapping);
-> 
-> With the series from Felix getting close this should get updated to
-> not set pte_devmap and use proper natural refcounting without any of
-> this stuff.
+diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+index 9ee0005874cd..cbc01372c7a1 100644
+--- a/drivers/md/bcache/writeback.c
++++ b/drivers/md/bcache/writeback.c
+@@ -235,19 +235,27 @@ static void update_writeback_rate(struct work_struct *work)
+ 		return;
+ 	}
+ 
+-	if (atomic_read(&dc->has_dirty) && dc->writeback_percent) {
++	if (atomic_read(&dc->has_dirty) && dc->writeback_percent &&
++	    !set_at_max_writeback_rate(c, dc)) {
+ 		/*
+ 		 * If the whole cache set is idle, set_at_max_writeback_rate()
+ 		 * will set writeback rate to a max number. Then it is
+ 		 * unncessary to update writeback rate for an idle cache set
+ 		 * in maximum writeback rate number(s).
+ 		 */
+-		if (!set_at_max_writeback_rate(c, dc)) {
+-			down_read(&dc->writeback_lock);
++		do {
++			if (!down_read_trylock(&dc->writeback_lock)) {
++				dc->rate_update_retry++;
++				if (dc->rate_update_retry < MY_MAX)
++					break;
++				down_read(&dc->writeback_lock);
++				dc->rate_update_retry = 0;
++			}
++
+ 			__update_writeback_rate(dc);
+ 			update_gc_after_writeback(c);
+ 			up_read(&dc->writeback_lock);
+-		}
++		} while (0);
+ 	}
+ 
+-- 
+Jens Axboe
 
-Can you send a link? I'm not sure what you are referring to.
-
-Thanks,
-
-Logan
