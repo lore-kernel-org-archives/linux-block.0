@@ -2,46 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DDDC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 04:52:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D4BC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 04:59:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229935AbiE1Ewk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 00:52:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
+        id S230044AbiE1E7d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 00:59:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46526 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229870AbiE1Ewj (ORCPT
+        with ESMTP id S235749AbiE1E7c (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 00:52:39 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E2111CB4B
-        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 21:52:37 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id AE78E68B05; Sat, 28 May 2022 06:52:33 +0200 (CEST)
-Date:   Sat, 28 May 2022 06:52:33 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
-Subject: Re: [PATCH] block: take destination bvec offsets into account in
- bio_copy_data_iter
-Message-ID: <20220528045233.GA13168@lst.de>
-References: <20220524143919.1155501-1-hch@lst.de> <a1e6fd92-ed3d-f94c-43a7-ff4fca27b759@kernel.dk>
+        Sat, 28 May 2022 00:59:32 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D00111E1C9;
+        Fri, 27 May 2022 21:59:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=I6GCrYizEHBFAOs821vvXvYfsFS7YQawP3WHmCMuohI=; b=BLblWJHCAq5D3v2HE8ca/iciVT
+        HdhjFa5NeIiShLcGQVu/GBV/AR8xC/+0VSIC6dYKYggm0HFOY92lueMLiqxBwzuno1E/SAOIh4qOX
+        MX0cLktsi3P8sESizSixXUvuimTQrxpkt4ltUPqyvGYNQsiQPaSeOStNy6xAy2v0hwyzcrvgo29mH
+        thxuTWysjV4FyJPMOj+Jc0/q0CMwJMRwWQAEoa5YVN4ZJuTwuM6bv919nUqMVaJ/OaqGJckO6fO86
+        5c5MRTS3A2VSyB3bR+z/OITykGzU13O7fP4JpHQyzRSaFfud0K/cAOe6wBGI4Hp7MSaw6Rl4cyatl
+        Yxzq05dA==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nuoXo-001SGP-Td; Sat, 28 May 2022 04:59:20 +0000
+Date:   Fri, 27 May 2022 21:59:20 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Eric Wheeler <bcache@lists.ewheeler.net>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Keith Busch <kbusch@kernel.org>, Coly Li <colyli@suse.de>,
+        Adriano Silva <adriano_da_silva@yahoo.com.br>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
+Message-ID: <YpGsKDQ1aAzXfyWl@infradead.org>
+References: <958894243.922478.1652201375900.ref@mail.yahoo.com>
+ <958894243.922478.1652201375900@mail.yahoo.com>
+ <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net>
+ <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
+ <YoxuYU4tze9DYqHy@infradead.org>
+ <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net>
+ <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com>
+ <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net>
+ <Yo28kDw8rZgFWpHu@infradead.org>
+ <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a1e6fd92-ed3d-f94c-43a7-ff4fca27b759@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 08:36:47PM -0600, Jens Axboe wrote:
-> On 5/24/22 8:39 AM, Christoph Hellwig wrote:
-> > Appartly bcache can copy into bios that do not just contain fresh
-> > pages but can have offsets into the bio_vecs.  Restore support for tht
-> > in bio_copy_data_iter.
-> > 
-> > Fixes: 8b679a070c53 ("block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec")
-> 
-> Applied, but where is this sha from? The upstream one is f8b679a070c5.
+On Fri, May 27, 2022 at 06:52:22PM -0700, Eric Wheeler wrote:
+> Adriano who started this thread (cc'ed) reported that setting 
+> queue/write_cache to "write back" provides much higher latency on his NVMe 
+> than "write through"; I tested a system here and found the same thing.
+>
+> [...]
+>
+> Is this expected?
 
-Apparently from my copy and pasting discarding the initial f of that..
+Once you do that, the block layer ignores all flushes and FUA bits, so
+yes it is going to be a lot faster.  But also completely unsafe because
+it does not provide any data durability guarantees.
