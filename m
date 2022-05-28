@@ -2,171 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53EDAC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 01:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBADC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 01:52:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347636AbiE1Bmk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 21:42:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40884 "EHLO
+        id S242118AbiE1Bw2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 21:52:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231386AbiE1Bmk (ORCPT
+        with ESMTP id S231386AbiE1Bw0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 21:42:40 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58CD913C1DE;
-        Fri, 27 May 2022 18:42:39 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        Fri, 27 May 2022 21:52:26 -0400
+Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F7C814D14;
+        Fri, 27 May 2022 18:52:24 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+        by mx.ewheeler.net (Postfix) with ESMTP id BA8D981;
+        Fri, 27 May 2022 18:52:23 -0700 (PDT)
+X-Virus-Scanned: amavisd-new at ewheeler.net
+Received: from mx.ewheeler.net ([127.0.0.1])
+        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
+        with LMTP id x3FTyepQWAUe; Fri, 27 May 2022 18:52:23 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 172B2B82649;
-        Sat, 28 May 2022 01:42:38 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADD6BC34113;
-        Sat, 28 May 2022 01:42:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653702156;
-        bh=j+FxAMoUxjrnMrkR7+D1UfkLzawirXG78XCfbEzPawQ=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=R0J7/2/Z1LOYV6ZvC1PmKypkWwchOrYxwuMKAaqcXJCLnOBI88CcuguJD/eVPIiD2
-         IsG0nubaNWnNBM8znoo03xQnRefWQPH9rizLT2ZwJdACppyXUh7yWz/5eLaZxwIWl2
-         h+v2nxcdpsZoXSTlMZ//vPxAFjloY8TS3atKPXPvMRZfNrtEbZPq0O5NN9lqDtR/mk
-         dvzcW2qG5BE8/0LnkGXadkRLYjyZ4FIoeMgRP9u0Uz+wf3xJzt+2zQGV5JvClIkEYu
-         1uvQaMaphfvDY5ijvLX149ZhOgdk68QXAS3j4+vz7lWkVsRGywmr7bQgwTh0QPBn3E
-         x/DziNugDCEPQ==
-Date:   Fri, 27 May 2022 18:42:36 -0700
-From:   "Darrick J. Wong" <djwong@kernel.org>
-To:     Jaegeuk Kim <jaegeuk@kernel.org>
-Cc:     Eric Biggers <ebiggers@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH] f2fs: add sysfs entry to avoid FUA
-Message-ID: <YpF+DIuXQFhzflag@magnolia>
-References: <20220527205955.3251982-1-jaegeuk@kernel.org>
- <YpFDw3mQjN1LBd2j@gmail.com>
- <YpF1gPrQY3UFsgwC@google.com>
+        by mx.ewheeler.net (Postfix) with ESMTPSA id BB3C3B;
+        Fri, 27 May 2022 18:52:22 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net BB3C3B
+Date:   Fri, 27 May 2022 18:52:22 -0700 (PDT)
+From:   Eric Wheeler <bcache@lists.ewheeler.net>
+To:     Christoph Hellwig <hch@infradead.org>
+cc:     Keith Busch <kbusch@kernel.org>, Coly Li <colyli@suse.de>,
+        Adriano Silva <adriano_da_silva@yahoo.com.br>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        linux-block@vger.kernel.org
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
+In-Reply-To: <Yo28kDw8rZgFWpHu@infradead.org>
+Message-ID: <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net>
+References: <958894243.922478.1652201375900.ref@mail.yahoo.com> <958894243.922478.1652201375900@mail.yahoo.com> <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net> <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net> <YoxuYU4tze9DYqHy@infradead.org>
+ <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net> <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com> <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net> <Yo28kDw8rZgFWpHu@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YpF1gPrQY3UFsgwC@google.com>
+Content-Type: multipart/mixed; BOUNDARY="8323328-1504673015-1653701678=:2952"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 06:06:08PM -0700, Jaegeuk Kim wrote:
-> On 05/27, Eric Biggers wrote:
-> > [+Cc linux-block for FUA, and linux-xfs for iomap]
-> > 
-> > On Fri, May 27, 2022 at 01:59:55PM -0700, Jaegeuk Kim wrote:
-> > > Some UFS storage gives slower performance on FUA than write+cache_flush.
-> > > Let's give a way to manage it.
-> > > 
-> > > Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
-> > 
-> > Should the driver even be saying that it has FUA support in this case?  If the
-> > driver didn't claim FUA support, that would also solve this problem.
-> 
-> I think there's still some benefit to use FUA such as small chunk writes
-> for checkpoint.
-> 
-> > 
-> > > ---
-> > >  Documentation/ABI/testing/sysfs-fs-f2fs | 7 +++++++
-> > >  fs/f2fs/data.c                          | 2 ++
-> > >  fs/f2fs/f2fs.h                          | 1 +
-> > >  fs/f2fs/sysfs.c                         | 2 ++
-> > >  4 files changed, 12 insertions(+)
-> > > 
-> > > diff --git a/Documentation/ABI/testing/sysfs-fs-f2fs b/Documentation/ABI/testing/sysfs-fs-f2fs
-> > > index 9b583dd0298b..cd96b09d7182 100644
-> > > --- a/Documentation/ABI/testing/sysfs-fs-f2fs
-> > > +++ b/Documentation/ABI/testing/sysfs-fs-f2fs
-> > > @@ -434,6 +434,7 @@ Date:		April 2020
-> > >  Contact:	"Daeho Jeong" <daehojeong@google.com>
-> > >  Description:	Give a way to change iostat_period time. 3secs by default.
-> > >  		The new iostat trace gives stats gap given the period.
-> > > +
-> > >  What:		/sys/fs/f2fs/<disk>/max_io_bytes
-> > >  Date:		December 2020
-> > >  Contact:	"Jaegeuk Kim" <jaegeuk@kernel.org>
-> > > @@ -442,6 +443,12 @@ Description:	This gives a control to limit the bio size in f2fs.
-> > >  		whereas, if it has a certain bytes value, f2fs won't submit a
-> > >  		bio larger than that size.
-> > >  
-> > > +What:		/sys/fs/f2fs/<disk>/no_fua_dio
-> > > +Date:		May 2022
-> > > +Contact:	"Jaegeuk Kim" <jaegeuk@kernel.org>
-> > > +Description:	This gives a signal to iomap, which should not use FUA for
-> > > +		direct IOs. Default: 0.
-> > 
-> > iomap is an implementation detail, so it shouldn't be mentioned in UAPI
-> > documentation.  UAPI documentation should describe user-visible behavior only.
-> 
-> Ok.
-> 
-> > 
-> > > +
-> > >  What:		/sys/fs/f2fs/<disk>/stat/sb_status
-> > >  Date:		December 2020
-> > >  Contact:	"Chao Yu" <yuchao0@huawei.com>
-> > > diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
-> > > index f5f2b7233982..23486486eab2 100644
-> > > --- a/fs/f2fs/data.c
-> > > +++ b/fs/f2fs/data.c
-> > > @@ -4153,6 +4153,8 @@ static int f2fs_iomap_begin(struct inode *inode, loff_t offset, loff_t length,
-> > >  	if ((inode->i_state & I_DIRTY_DATASYNC) ||
-> > >  	    offset + length > i_size_read(inode))
-> > >  		iomap->flags |= IOMAP_F_DIRTY;
-> > > +	if (F2FS_I_SB(inode)->no_fua_dio)
-> > > +		iomap->flags |= IOMAP_F_DIRTY;
-> > 
-> > This is overloading the IOMAP_F_DIRTY flag to mean something other than dirty.
-> > Perhaps this flag needs to be renamed, or a new flag should be added?
-> 
-> I'm not sure it's acceptable to add another flag for f2fs only.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-I think Al and willy have been throwing around patches to tell
-iomap_dio_rw or someone that the caller will handle cache flushes and
-that it shouldn't initiate them on its own; would that help here?
+--8323328-1504673015-1653701678=:2952
+Content-Type: text/plain; CHARSET=UTF-8
+Content-Transfer-Encoding: 8BIT
 
---D
+On Tue, 24 May 2022, Christoph Hellwig wrote:
+> On Tue, May 24, 2022 at 02:34:23PM -0700, Eric Wheeler wrote:
+> > Is this flag influced at all when /sys/block/sdX/queue/scheduler is set 
+> > to "none", or does the write_cache flag operate independently of the 
+> > selected scheduler?
+> 
+> This in completely independent from ﬆhe scheduler.
+> 
+> > Does the block layer stop sending flushes at the first device in the stack 
+> > that is set to "write back"?  For example, if a device mapper target is 
+> > writeback will it strip flushes on the way to the backing device?
+> 
+> This is up to the stacking driver.  dm and tend to pass through flushes
+> where needed.
+> 
+> > This confirms what I have suspected all along: We have an LSI MegaRAID 
+> > SAS-3516 where the write policy is "write back" in the LUN, but the cache 
+> > is flagged in Linux as write-through:
+> > 
+> > 	]# cat /sys/block/sdb/queue/write_cache 
+> > 	write through
 
-> > 
-> > > diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
-> > > index e10838879538..c2400ea0080b 100644
-> > > --- a/fs/f2fs/f2fs.h
-> > > +++ b/fs/f2fs/f2fs.h
-> > > @@ -1671,6 +1671,7 @@ struct f2fs_sb_info {
-> > >  	int dir_level;				/* directory level */
-> > >  	int readdir_ra;				/* readahead inode in readdir */
-> > >  	u64 max_io_bytes;			/* max io bytes to merge IOs */
-> > > +	int no_fua_dio;				/* avoid FUA in DIO */
-> > 
-> > Make this a bool?
-> 
-> Done.
-> 
-> > 
-> > > diff --git a/fs/f2fs/sysfs.c b/fs/f2fs/sysfs.c
-> > > index 4c50aedd5144..24d628ca92cc 100644
-> > > --- a/fs/f2fs/sysfs.c
-> > > +++ b/fs/f2fs/sysfs.c
-> > > @@ -771,6 +771,7 @@ F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, iostat_period_ms, iostat_period_ms);
-> > >  #endif
-> > >  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, readdir_ra, readdir_ra);
-> > >  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, max_io_bytes, max_io_bytes);
-> > > +F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, no_fua_dio, no_fua_dio);
-> > >  F2FS_RW_ATTR(F2FS_SBI, f2fs_sb_info, gc_pin_file_thresh, gc_pin_file_threshold);
-> > >  F2FS_RW_ATTR(F2FS_SBI, f2fs_super_block, extension_list, extension_list);
-> > >  #ifdef CONFIG_F2FS_FAULT_INJECTION
-> > > @@ -890,6 +891,7 @@ static struct attribute *f2fs_attrs[] = {
-> > >  #endif
-> > >  	ATTR_LIST(readdir_ra),
-> > >  	ATTR_LIST(max_io_bytes),
-> > > +	ATTR_LIST(no_fua_dio),
-> > 
-> > Where is it validated that only valid values (0 or 1) can be written to this
-> > file?
-> 
-> Added.
-> 
-> > 
-> > - Eric
+Hi Keith, Christoph:
+
+Adriano who started this thread (cc'ed) reported that setting 
+queue/write_cache to "write back" provides much higher latency on his NVMe 
+than "write through"; I tested a system here and found the same thing.
+
+Here is Adriano's summary:
+
+        # cat /sys/block/nvme0n1/queue/write_cache
+        write through
+        # ioping -c10 /dev/nvme0n1 -D -Y -WWW -s4K
+        ...
+        min/avg/max/mdev = 60.0 us / 78.7 us / 91.2 us / 8.20 us
+                                     ^^^^ ^^
+
+        # for i in /sys/block/*/queue/write_cache; do echo 'write back' > $i; done
+        # ioping -c10 /dev/nvme0n1 -D -Y -WWW -s4K
+        ...
+        min/avg/max/mdev = 1.81 ms / 1.89 ms / 2.01 ms / 82.3 us
+                                     ^^^^ ^^
+
+Interestingly, Adriano's is 24.01x and ours is 23.97x higher latency
+higher (see below).  These 24x numbers seem too similar to be a
+coincidence on such different configurations.  He's running Linux 5.4
+and we are on 4.19.
+
+Is this expected?
+
+
+More info:
+
+The stack where I verified the behavior Adriano reported is slightly
+different, NVMe's are under md RAID1 with LVM on top, so latency is
+higher, but still basically the same high latency difference with
+writeback enabled:
+
+	]# cat /sys/block/nvme[01]n1/queue/write_cache
+	write through
+	write through
+	]# ionice -c1 -n1 ioping -c10 /dev/ssd/ssd-test -D -s4k -WWW -Y
+	...
+	min/avg/max/mdev = 119.1 us / 754.9 us / 2.67 ms / 1.02 ms
+
+
+	]# cat /sys/block/nvme[01]n1/queue/write_cache
+	write back
+	write back
+	]# ionice -c1 -n1 ioping -c10 /dev/ssd/ssd-test -D -s4k -WWW -Y
+	...
+	min/avg/max/mdev = 113.4 us / 18.1 ms / 29.2 ms / 9.53 ms
+
+
+--
+Eric Wheeler
+--8323328-1504673015-1653701678=:2952--
