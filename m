@@ -2,66 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5205C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 08:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9B17C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 08:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350709AbiE1ISM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 04:18:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58384 "EHLO
+        id S1353738AbiE1ISQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 04:18:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236886AbiE1ISL (ORCPT
+        with ESMTP id S1350445AbiE1ISP (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 04:18:11 -0400
-Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56F910B0
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:08 -0700 (PDT)
-Received: by mail-ej1-x629.google.com with SMTP id rq11so12520735ejc.4
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:08 -0700 (PDT)
+        Sat, 28 May 2022 04:18:15 -0400
+Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6B7DDECE
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:14 -0700 (PDT)
+Received: by mail-ed1-x52c.google.com with SMTP id g20so7851708edj.10
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=1CT1M4q9x/F1LvMuC7ejZ75BshMSN5GVHe0OC5UIK3I=;
-        b=IqkEfDGcjR6ZSjvTXzpfjz9jvMRNgTDZTCwKII1/mNVN+pHuwaUKb7HOs3ttYIZ5Oq
-         IkI81WvAgM5OSkNCQK1HsOpC4BbqRksGW6/3KOrN56OzxW0igQM41STGSZintMntb238
-         ZTKLHecIdPgDAR4JjqyHESC6A/8c3yx4DypzZIwRpvjiz/OfmU4JrRzuJ2Illq8Lwuln
-         ve+mlvLfGGU4qp1/cZMTppci1++lbF9IQfzMwVyB1Mph0k+RTA3FAb74FHM0QycneFcL
-         x30PVXifOXuM259SLbBuQeH+sTz8uwOrk5koVuclcSLYNWyZ0AL4CMt45Mr6T0neIw4L
-         /eOA==
+        bh=zKQyiSCqOmFTXYg1oyMhrbRM1Y8cO4uyy6QdrPFWc8E=;
+        b=Frk0CGa66mdgvvN98mA9x6NKT/Z+nOGLGMG5bYj54sZE8Lhp9JhuJvuNY8yJL6EsZI
+         J3KIhCqyxlqhcg12/bSe/job0NO779KynECC8rcca8uR6CiSMYGeq+csLaG62ntXqacJ
+         dES90AYO7hHJd/EBXB70EazwxzZAxQ/XqUC68IfGd/viKP5tX3k5dd7+J3dFugplJ0ZL
+         HCtaNmUK65p5QGjx9s99ZizndE/FKgUz8a6LdwkrXWbXo8MBz6hq33pm7UTq4M7V0Qgp
+         HStjHM0DBPi2iLS3eYgBuKVtopPlt2JeDZsqhPmHs5vRh2cFRTyoyDGf+vcfRFuYNDFQ
+         jvNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
          :content-transfer-encoding:message-id:references:to;
-        bh=1CT1M4q9x/F1LvMuC7ejZ75BshMSN5GVHe0OC5UIK3I=;
-        b=4w00X3h8/RAczlqRqoIBH5rUE2qgfjXAifftG54gWKvDiEEfh5UzJaNE6PkOPqi4Ya
-         /qjz1wV986MfgiMOeYbkCeB8WcAk0b79pAsrdBbipEQsiqX8xNBC51igBFbkcWnZ4xnL
-         /rRP7ivzS62wexA/k7rj9jeIDirYAiI1neLKjOeudG76qnZRK6Cld0oEAbwvrAlZbov0
-         c33D61Gmm3S/qLCGmzLHIqEGvpQU6AODH0Eh5BBjezHz+HMKUP1ucWLWLWjkCRVLM5fj
-         9C3SAC279ETsqulqNhhH1GnzuD8Sv2uC9I3SS39lxdASQc260Umx9sQfng8iXnx7izvi
-         04jQ==
-X-Gm-Message-State: AOAM5314Z5+ni6uEWW/z89/pqqcfzuIgOeD9gHfjKMkEOZEtE7u2U8xJ
-        i8GC8pB2hm6qbkfO4iAxLJtRXQ==
-X-Google-Smtp-Source: ABdhPJzjmDtnRPCXsFm7fSlHGomICMQNqQhsD569ZC1mBguJl/wzEnkiniwN9KLsoCeVr9EHpoLWcA==
-X-Received: by 2002:a17:907:3f12:b0:6fe:f8c6:257 with SMTP id hq18-20020a1709073f1200b006fef8c60257mr22661053ejc.544.1653725887367;
-        Sat, 28 May 2022 01:18:07 -0700 (PDT)
+        bh=zKQyiSCqOmFTXYg1oyMhrbRM1Y8cO4uyy6QdrPFWc8E=;
+        b=mS/kTu74K4jFouS70/0YpBvyOQ5RAxkrKe2ZM+s4/exDkTZnO9kT5IQRk1K39oqrys
+         fphiCdoryoIvZnT4Mboiaosw6NFdcW/vjw5VfcvdArHg+62rrFcvnXJOf4HY+XTju/tO
+         u43vvoMArfEPCpFu5ZIBaNbTP1uPJqAFjaytmtjbEAlomk1399xFQHqJOp2Ol1eevqgF
+         ZwI0gP697psVcu9GMRDcVNFs0HDn706Xyx9Zi7gTAlpKItAfir3dB0cV8wZM7glOpGCH
+         qV03ub8RXl7+fGElPhyd7CPBuT4ROAdsVYFn43ID0q1LG68FmsMZkxG2276ITQt582HD
+         W4wg==
+X-Gm-Message-State: AOAM531CgZledrBnR3jnDBs1iO1glziJQeOgRkDnUACEO4EBNYhlG42S
+        t6e7HgvWohlZ72ejSriyFjrJHw==
+X-Google-Smtp-Source: ABdhPJzkCFu6x05fcv5zy5p9pRsXjO3tHc/29aE81RFzfZb8y9BAPOboblWZf2SnMwvN6zlvY9fC0w==
+X-Received: by 2002:a05:6402:1d50:b0:42b:6da9:ed34 with SMTP id dz16-20020a0564021d5000b0042b6da9ed34mr29184832edb.333.1653725892829;
+        Sat, 28 May 2022 01:18:12 -0700 (PDT)
 Received: from mbp-di-paolo.station (net-93-144-98-177.cust.vodafonedsl.it. [93.144.98.177])
-        by smtp.gmail.com with ESMTPSA id g20-20020a170906955400b006feec47dae9sm2126208ejy.157.2022.05.28.01.18.06
+        by smtp.gmail.com with ESMTPSA id g20-20020a170906955400b006feec47dae9sm2126208ejy.157.2022.05.28.01.18.11
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sat, 28 May 2022 01:18:06 -0700 (PDT)
+        Sat, 28 May 2022 01:18:12 -0700 (PDT)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
-Subject: Re: [PATCH -next v6 0/3] support concurrent sync io for bfq on a
- specail occasion
+Subject: Re: [PATCH -next v6 1/3] block, bfq: record how many queues are busy
+ in bfq_group
 From:   Paolo Valente <paolo.valente@linaro.org>
-In-Reply-To: <20220523131818.2798712-1-yukuai3@huawei.com>
-Date:   Sat, 28 May 2022 10:18:05 +0200
-Cc:     Jan Kara <jack@suse.cz>, tj@kernel.org, axboe@kernel.dk,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+In-Reply-To: <20220523131818.2798712-2-yukuai3@huawei.com>
+Date:   Sat, 28 May 2022 10:18:11 +0200
+Cc:     Jan Kara <jack@suse.cz>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <09387792-EBE6-41CC-89F8-A857ECDE4634@linaro.org>
+Message-Id: <8D29A46A-4B8A-4F05-BCE3-D9D0F0D2DD5A@linaro.org>
 References: <20220523131818.2798712-1-yukuai3@huawei.com>
+ <20220523131818.2798712-2-yukuai3@huawei.com>
 To:     Yu Kuai <yukuai3@huawei.com>
 X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
@@ -73,149 +75,124 @@ X-Mailing-List: linux-block@vger.kernel.org
 > Il giorno 23 mag 2022, alle ore 15:18, Yu Kuai <yukuai3@huawei.com> ha =
 scritto:
 >=20
-> Resend these patches just in case v5 end up in spam (for Paolo).
+> Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
+>=20
+> Add a counter 'busy_queues' in bfq_group, and update it in
+> bfq_add/del_bfqq_busy().
+>=20
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+> Reviewed-by: Jan Kara <jack@suse.cz>
+> ---
+> block/bfq-cgroup.c  |  1 +
+> block/bfq-iosched.h |  2 ++
+> block/bfq-wf2q.c    | 20 ++++++++++++++++++++
+> 3 files changed, 23 insertions(+)
+>=20
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index 09574af83566..4d516879d9fa 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data =
+*pd)
+> 				   */
+> 	bfqg->bfqd =3D bfqd;
+> 	bfqg->active_entities =3D 0;
+> +	bfqg->busy_queues =3D 0;
+> 	bfqg->online =3D true;
+> 	bfqg->rq_pos_tree =3D RB_ROOT;
+> }
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index 978ef5d6fe6a..3847f4ab77ac 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -906,6 +906,7 @@ struct bfq_group_data {
+>  *                   are groups with more than one active @bfq_entity
+>  *                   (see the comments to the function
+>  *                   bfq_bfqq_may_idle()).
+> + * @busy_queues: number of busy bfqqs.
+>  * @rq_pos_tree: rbtree sorted by next_request position, used when
+>  *               determining if two or more queues have interleaving
+>  *               requests (see bfq_find_close_cooperator()).
+> @@ -942,6 +943,7 @@ struct bfq_group {
+> 	struct bfq_entity *my_entity;
+>=20
+> 	int active_entities;
+> +	int busy_queues;
+>=20
+> 	struct rb_root rq_pos_tree;
+>=20
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index f8eb340381cf..d9ff33e0be38 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -218,6 +218,16 @@ static bool bfq_no_longer_next_in_service(struct =
+bfq_entity *entity)
+> 	return false;
+> }
+>=20
+> +static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +	bfqq_group(bfqq)->busy_queues++;
+> +}
+> +
+> +static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +	bfqq_group(bfqq)->busy_queues--;
+> +}
+> +
+> #else /* CONFIG_BFQ_GROUP_IOSCHED */
+>=20
+> static bool bfq_update_parent_budget(struct bfq_entity =
+*next_in_service)
+> @@ -230,6 +240,14 @@ static bool bfq_no_longer_next_in_service(struct =
+bfq_entity *entity)
+> 	return true;
+> }
+>=20
+> +static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +}
+> +
+> +static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
+> +{
+> +}
+> +
+> #endif /* CONFIG_BFQ_GROUP_IOSCHED */
+>=20
+> /*
+> @@ -1660,6 +1678,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq,
+> 	bfq_clear_bfqq_busy(bfqq);
+>=20
+> 	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
+> +	bfq_inc_busy_queues(bfqq);
+>=20
 
-Thank you for resending, I do think I lost some email before.
+Why do you increment the number of busy queues for the group on a
+del_bfqq_busy, instead of an add_bfqq_busy?
 
+Besides, the name of the function bfq_inc_busy_queues does not mention
+the target of the update, namely the group.  This creates a little
+confusion at a first sight, as one sees this function invoked right
+after the update of a field with the same name: bfqd->busy_queues.
+
+> 	if (bfqq->wr_coeff > 1)
+> 		bfqd->wr_busy_queues--;
+> @@ -1683,6 +1702,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, =
+struct bfq_queue *bfqq)
+>=20
+> 	bfq_mark_bfqq_busy(bfqq);
+> 	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
+> +	bfq_dec_busy_queues(bfqq);
+
+Same pair of comments as above.
+
+Thanks,
 Paolo
 
-> Changes in v6:
-> - add reviewed-by tag for patch 1
 >=20
-> Changes in v5:
-> - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
-> - fix wrong definition in patch 1
-> - fix spelling mistake in patch 2: leaset -> least
-> - update comments in patch 3
-> - add reviewed-by tag in patch 2,3
->=20
-> Changes in v4:
-> - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
->   suggested by Jan Kara.
-> - remove unused 'in_groups_with_pending_reqs',
->=20
-> Changes in v3:
-> - remove the cleanup patch that is irrelevant now(I'll post it
->   separately).
-> - instead of hacking wr queues and using weights tree =
-insertion/removal,
->   using bfq_add/del_bfqq_busy() to count the number of groups
->   (suggested by Jan Kara).
->=20
-> Changes in v2:
-> - Use a different approch to count root group, which is much simple.
->=20
-> Currently, bfq can't handle sync io concurrently as long as they
-> are not issued from root group. This is because
-> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
-> bfq_asymmetric_scenario().
->=20
-> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->=20
-> Before this patchset:
-> 1) root group will never be counted.
-> 2) Count if bfqg or it's child bfqgs have pending requests.
-> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->=20
-> After this patchset:
-> 1) root group is counted.
-> 2) Count if bfqg have at least one bfqq that is marked busy.
-> 3) Don't count if bfqg doesn't have any busy bfqqs.
->=20
-> The main reason to use busy state of bfqq instead of 'pending =
-requests'
-> is that bfqq can stay busy after dispatching the last request if =
-idling
-> is needed for service guarantees.
->=20
-> With the above changes, concurrent sync io can be supported if only
-> one group is activated.
->=20
-> fio test script(startdelay is used to avoid queue merging):
-> [global]
-> filename=3D/dev/nvme0n1
-> allow_mounted_write=3D0
-> ioengine=3Dpsync
-> direct=3D1
-> ioscheduler=3Dbfq
-> offset_increment=3D10g
-> group_reporting
-> rw=3Drandwrite
-> bs=3D4k
->=20
-> [test1]
-> numjobs=3D1
->=20
-> [test2]
-> startdelay=3D1
-> numjobs=3D1
->=20
-> [test3]
-> startdelay=3D2
-> numjobs=3D1
->=20
-> [test4]
-> startdelay=3D3
-> numjobs=3D1
->=20
-> [test5]
-> startdelay=3D4
-> numjobs=3D1
->=20
-> [test6]
-> startdelay=3D5
-> numjobs=3D1
->=20
-> [test7]
-> startdelay=3D6
-> numjobs=3D1
->=20
-> [test8]
-> startdelay=3D7
-> numjobs=3D1
->=20
-> test result:
-> running fio on root cgroup
-> v5.18-rc1:	   550 Mib/s
-> v5.18-rc1-patched: 550 Mib/s
->=20
-> running fio on non-root cgroup
-> v5.18-rc1:	   349 Mib/s
-> v5.18-rc1-patched: 550 Mib/s
->=20
-> Note that I also test null_blk with "irqmode=3D2
-> completion_nsec=3D100000000(100ms) hw_queue_depth=3D1", and tests show
-> that service guarantees are still preserved.
->=20
-> Follow-up cleanup:
-> =
-https://lore.kernel.org/all/20220521073523.3118246-1-yukuai3@huawei.com/
->=20
-> Previous versions:
-> RFC: =
-https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
-> v1: =
-https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
-> v2: =
-https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
-> v3: =
-https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
-> v4: =
-https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
-> v5: =
-https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
->=20
-> Yu Kuai (3):
->  block, bfq: record how many queues are busy in bfq_group
->  block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
->  block, bfq: do not idle if only one group is activated
->=20
-> block/bfq-cgroup.c  |  1 +
-> block/bfq-iosched.c | 48 +++-----------------------------------
-> block/bfq-iosched.h | 57 +++++++--------------------------------------
-> block/bfq-wf2q.c    | 35 +++++++++++++++++-----------
-> 4 files changed, 35 insertions(+), 106 deletions(-)
->=20
+> 	if (!bfqq->dispatched)
+> 		if (bfqq->wr_coeff =3D=3D 1)
 > --=20
 > 2.31.1
 >=20
