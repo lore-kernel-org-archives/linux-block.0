@@ -2,157 +2,221 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2F41C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 08:17:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5205C433F5
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 08:18:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349586AbiE1IRc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 04:17:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55318 "EHLO
+        id S1350709AbiE1ISM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 04:18:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245061AbiE1IRb (ORCPT
+        with ESMTP id S236886AbiE1ISL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 04:17:31 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9AF8133A1B
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:17:29 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id c65so5668047pfb.1
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:17:29 -0700 (PDT)
+        Sat, 28 May 2022 04:18:11 -0400
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56F910B0
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:08 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id rq11so12520735ejc.4
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 01:18:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=c5QAguI+Lbk8TT+nFUnJqGkRX4WjRMjAO2PU0fsdrJw=;
-        b=XmykWlyGO4QL8IniYO0O2SHJlyl/JTaIT4C350CtDuUm/OwbOMuU5kBh85eoVWj9fR
-         aZGhgL4yPDDJlcDDCPy3WIlUqTYlALqMZVeJCm+G7e/86DYfzge+ddVcdSvtZbDaXqti
-         /JRJSwEwhGqlQMXIfsk8oTDUBxwDm8ZSKSKL57tMlQJAYdzgSKGy8kiL8YJg/YWH6uYN
-         MfWfQFxyapzurtu7gRVqSUnkNLnfAOHdIQvh1YV1RANgxY5DtueqJpmU4omILZXaRqAq
-         R3hzv/4Lgr42K9CKP/jZFq5owRReQyq5wa2kNZhwO73EHaXyTSQ83pmgraqkdBcfNEN/
-         krCA==
+        d=linaro.org; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=1CT1M4q9x/F1LvMuC7ejZ75BshMSN5GVHe0OC5UIK3I=;
+        b=IqkEfDGcjR6ZSjvTXzpfjz9jvMRNgTDZTCwKII1/mNVN+pHuwaUKb7HOs3ttYIZ5Oq
+         IkI81WvAgM5OSkNCQK1HsOpC4BbqRksGW6/3KOrN56OzxW0igQM41STGSZintMntb238
+         ZTKLHecIdPgDAR4JjqyHESC6A/8c3yx4DypzZIwRpvjiz/OfmU4JrRzuJ2Illq8Lwuln
+         ve+mlvLfGGU4qp1/cZMTppci1++lbF9IQfzMwVyB1Mph0k+RTA3FAb74FHM0QycneFcL
+         x30PVXifOXuM259SLbBuQeH+sTz8uwOrk5koVuclcSLYNWyZ0AL4CMt45Mr6T0neIw4L
+         /eOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=c5QAguI+Lbk8TT+nFUnJqGkRX4WjRMjAO2PU0fsdrJw=;
-        b=GdZd6nkAxveCps5+eR2iZjRWjwETcM8FhDMWytj4r3g3pvFmWDelL7ThPykPhJo5O4
-         PNF511n2qpO+yvk6oscyBCv7RZZUSZQZ4KJkcieVHs+ORm/hGtAQ7JxRQncIA/4E2n2M
-         eM4OOZnpDF9sKGU0amb9BFYG3GOcWlSLOCdMzSkE8g3OPAmFcXeCMbClEBb0QqPgYps3
-         YzSosq/jSVOo5KL6+CeWJwkgnDULFMo163qHvWkiVEp+zKxwf9Twf87jAZ8Y7IElhIy/
-         Nbm6uFG2NmH6V5yHooA0RGQA81if2NGoFg03CU4Ct6DvyQ5QAXVNkb2Yrl3yUFktXKul
-         CGgw==
-X-Gm-Message-State: AOAM532ECXET3Dx8ZrnKvkqBs3AkVbE/lkPbUi8MOi1grOGX3rQwwZhk
-        14szGr3pmU+NFvQD6MfnwgzEJQ==
-X-Google-Smtp-Source: ABdhPJywGMdzhJQWZhaASe7KCIjsGY399FeZY50UwZzFMVUa8CmoHZjRvFwqOnfP2aSM8og7PUqnLA==
-X-Received: by 2002:a63:235b:0:b0:3fb:de4b:4de1 with SMTP id u27-20020a63235b000000b003fbde4b4de1mr979995pgm.198.1653725848963;
-        Sat, 28 May 2022 01:17:28 -0700 (PDT)
-Received: from ?IPV6:2409:8a28:e62:c260:d4c7:b261:8d6:3a6b? ([2409:8a28:e62:c260:d4c7:b261:8d6:3a6b])
-        by smtp.gmail.com with ESMTPSA id p10-20020a170902ebca00b00161ac982b52sm5063978plg.95.2022.05.28.01.17.25
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 May 2022 01:17:28 -0700 (PDT)
-Message-ID: <c76ee7e2-3dfe-b645-c32f-4f061b22ebc9@bytedance.com>
-Date:   Sat, 28 May 2022 16:17:19 +0800
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.1
-Subject: Re: [PATCH] blk-iocost: fix false positive lagging
-Content-Language: en-US
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220526133554.21079-1-zhouchengming@bytedance.com>
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-In-Reply-To: <20220526133554.21079-1-zhouchengming@bytedance.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=1CT1M4q9x/F1LvMuC7ejZ75BshMSN5GVHe0OC5UIK3I=;
+        b=4w00X3h8/RAczlqRqoIBH5rUE2qgfjXAifftG54gWKvDiEEfh5UzJaNE6PkOPqi4Ya
+         /qjz1wV986MfgiMOeYbkCeB8WcAk0b79pAsrdBbipEQsiqX8xNBC51igBFbkcWnZ4xnL
+         /rRP7ivzS62wexA/k7rj9jeIDirYAiI1neLKjOeudG76qnZRK6Cld0oEAbwvrAlZbov0
+         c33D61Gmm3S/qLCGmzLHIqEGvpQU6AODH0Eh5BBjezHz+HMKUP1ucWLWLWjkCRVLM5fj
+         9C3SAC279ETsqulqNhhH1GnzuD8Sv2uC9I3SS39lxdASQc260Umx9sQfng8iXnx7izvi
+         04jQ==
+X-Gm-Message-State: AOAM5314Z5+ni6uEWW/z89/pqqcfzuIgOeD9gHfjKMkEOZEtE7u2U8xJ
+        i8GC8pB2hm6qbkfO4iAxLJtRXQ==
+X-Google-Smtp-Source: ABdhPJzjmDtnRPCXsFm7fSlHGomICMQNqQhsD569ZC1mBguJl/wzEnkiniwN9KLsoCeVr9EHpoLWcA==
+X-Received: by 2002:a17:907:3f12:b0:6fe:f8c6:257 with SMTP id hq18-20020a1709073f1200b006fef8c60257mr22661053ejc.544.1653725887367;
+        Sat, 28 May 2022 01:18:07 -0700 (PDT)
+Received: from mbp-di-paolo.station (net-93-144-98-177.cust.vodafonedsl.it. [93.144.98.177])
+        by smtp.gmail.com with ESMTPSA id g20-20020a170906955400b006feec47dae9sm2126208ejy.157.2022.05.28.01.18.06
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 28 May 2022 01:18:06 -0700 (PDT)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH -next v6 0/3] support concurrent sync io for bfq on a
+ specail occasion
+From:   Paolo Valente <paolo.valente@linaro.org>
+In-Reply-To: <20220523131818.2798712-1-yukuai3@huawei.com>
+Date:   Sat, 28 May 2022 10:18:05 +0200
+Cc:     Jan Kara <jack@suse.cz>, tj@kernel.org, axboe@kernel.dk,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <09387792-EBE6-41CC-89F8-A857ECDE4634@linaro.org>
+References: <20220523131818.2798712-1-yukuai3@huawei.com>
+To:     Yu Kuai <yukuai3@huawei.com>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/5/26 21:35, Chengming Zhou wrote:
-> I found many false positive lagging during iocost test.
-> 
-> Since iocg->vtime will be advanced to (vnow - margins.target)
-> in hweight_after_donation(), which called throw away excess,
-> the iocg->done_vtime will also be advanced that much.
-> 
->        period_at_vtime  <--period_vtime-->  vnow
->               |                              |
->   --------------------------------------------------->
->         |<--->|
->      margins.target
->         |->
->   vtime, done_vtime
-> 
-> If that iocg has some inflight io when vnow, but its done_vtime
-> is before period_at_vtime, ioc_timer_fn() will think it has
-> lagging io, even these io maybe issued just before now.
-> 
-> This patch change the condition to check if vdone is before
-> (period_at_vtime - margins.target) instead of period_at_vtime.
-> 
-> But there is another problem that this patch doesn't fix.
-> Since vtime will be advanced, we can't check if vtime is
-> after (vnow - MAX_LAGGING_PERIODS * period_vtime) to tell
-> whether this iocg pin lagging for too long.
-> 
-> Maybe we can add lagging_periods in iocg to record how many
-> periods this iocg pin lagging, but I don't know when to clean it.
-
-Hello tejun, I add lagging_periods in iocg based on the original patch,
-to record how many periods this iocg pin lagging. So we can use it to
-avoid letting cmds which take a very long time pin lagging for too long.
-
-Thanks.
 
 
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 33a11ba971ea..998bb38ffb37 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -541,6 +541,8 @@ struct ioc_gq {
-        u64                             indebt_since;
-        u64                             indelay_since;
+> Il giorno 23 mag 2022, alle ore 15:18, Yu Kuai <yukuai3@huawei.com> ha =
+scritto:
+>=20
+> Resend these patches just in case v5 end up in spam (for Paolo).
 
-+       int                             lagging_periods;
-+
-        /* this iocg's depth in the hierarchy and ancestors including self */
-        int                             level;
-        struct ioc_gq                   *ancestors[];
-@@ -2257,10 +2259,13 @@ static void ioc_timer_fn(struct timer_list *timer)
-                if ((ppm_rthr != MILLION || ppm_wthr != MILLION) &&
-                    !atomic_read(&iocg_to_blkg(iocg)->use_delay) &&
-                    time_after64(vtime, vdone) &&
--                   time_after64(vtime, now.vnow -
--                                MAX_LAGGING_PERIODS * period_vtime) &&
--                   time_before64(vdone, now.vnow - period_vtime))
--                       nr_lagging++;
-+                   time_before64(vdone, ioc->period_at_vtime - ioc->margins.target)) {
-+                       if (iocg->lagging_periods < MAX_LAGGING_PERIODS) {
-+                               nr_lagging++;
-+                               iocg->lagging_periods++;
-+                       }
-+               } else if (iocg->lagging_periods)
-+                       iocg->lagging_periods = 0;
+Thank you for resending, I do think I lost some email before.
 
-                /*
-                 * Determine absolute usage factoring in in-flight IOs to avoid
+Paolo
 
+> Changes in v6:
+> - add reviewed-by tag for patch 1
+>=20
+> Changes in v5:
+> - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
+> - fix wrong definition in patch 1
+> - fix spelling mistake in patch 2: leaset -> least
+> - update comments in patch 3
+> - add reviewed-by tag in patch 2,3
+>=20
+> Changes in v4:
+> - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
+>   suggested by Jan Kara.
+> - remove unused 'in_groups_with_pending_reqs',
+>=20
+> Changes in v3:
+> - remove the cleanup patch that is irrelevant now(I'll post it
+>   separately).
+> - instead of hacking wr queues and using weights tree =
+insertion/removal,
+>   using bfq_add/del_bfqq_busy() to count the number of groups
+>   (suggested by Jan Kara).
+>=20
+> Changes in v2:
+> - Use a different approch to count root group, which is much simple.
+>=20
+> Currently, bfq can't handle sync io concurrently as long as they
+> are not issued from root group. This is because
+> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+> bfq_asymmetric_scenario().
+>=20
+> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+>=20
+> Before this patchset:
+> 1) root group will never be counted.
+> 2) Count if bfqg or it's child bfqgs have pending requests.
+> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
+>=20
+> After this patchset:
+> 1) root group is counted.
+> 2) Count if bfqg have at least one bfqq that is marked busy.
+> 3) Don't count if bfqg doesn't have any busy bfqqs.
+>=20
+> The main reason to use busy state of bfqq instead of 'pending =
+requests'
+> is that bfqq can stay busy after dispatching the last request if =
+idling
+> is needed for service guarantees.
+>=20
+> With the above changes, concurrent sync io can be supported if only
+> one group is activated.
+>=20
+> fio test script(startdelay is used to avoid queue merging):
+> [global]
+> filename=3D/dev/nvme0n1
+> allow_mounted_write=3D0
+> ioengine=3Dpsync
+> direct=3D1
+> ioscheduler=3Dbfq
+> offset_increment=3D10g
+> group_reporting
+> rw=3Drandwrite
+> bs=3D4k
+>=20
+> [test1]
+> numjobs=3D1
+>=20
+> [test2]
+> startdelay=3D1
+> numjobs=3D1
+>=20
+> [test3]
+> startdelay=3D2
+> numjobs=3D1
+>=20
+> [test4]
+> startdelay=3D3
+> numjobs=3D1
+>=20
+> [test5]
+> startdelay=3D4
+> numjobs=3D1
+>=20
+> [test6]
+> startdelay=3D5
+> numjobs=3D1
+>=20
+> [test7]
+> startdelay=3D6
+> numjobs=3D1
+>=20
+> [test8]
+> startdelay=3D7
+> numjobs=3D1
+>=20
+> test result:
+> running fio on root cgroup
+> v5.18-rc1:	   550 Mib/s
+> v5.18-rc1-patched: 550 Mib/s
+>=20
+> running fio on non-root cgroup
+> v5.18-rc1:	   349 Mib/s
+> v5.18-rc1-patched: 550 Mib/s
+>=20
+> Note that I also test null_blk with "irqmode=3D2
+> completion_nsec=3D100000000(100ms) hw_queue_depth=3D1", and tests show
+> that service guarantees are still preserved.
+>=20
+> Follow-up cleanup:
+> =
+https://lore.kernel.org/all/20220521073523.3118246-1-yukuai3@huawei.com/
+>=20
+> Previous versions:
+> RFC: =
+https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
+> v1: =
+https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
+> v2: =
+https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
+> v3: =
+https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
+> v4: =
+https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
+> v5: =
+https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
+>=20
+> Yu Kuai (3):
+>  block, bfq: record how many queues are busy in bfq_group
+>  block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+>  block, bfq: do not idle if only one group is activated
+>=20
+> block/bfq-cgroup.c  |  1 +
+> block/bfq-iosched.c | 48 +++-----------------------------------
+> block/bfq-iosched.h | 57 +++++++--------------------------------------
+> block/bfq-wf2q.c    | 35 +++++++++++++++++-----------
+> 4 files changed, 35 insertions(+), 106 deletions(-)
+>=20
+> --=20
+> 2.31.1
+>=20
 
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
-> ---
->  block/blk-iocost.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-> index 33a11ba971ea..42e301b7527b 100644
-> --- a/block/blk-iocost.c
-> +++ b/block/blk-iocost.c
-> @@ -2259,7 +2259,7 @@ static void ioc_timer_fn(struct timer_list *timer)
->  		    time_after64(vtime, vdone) &&
->  		    time_after64(vtime, now.vnow -
->  				 MAX_LAGGING_PERIODS * period_vtime) &&
-> -		    time_before64(vdone, now.vnow - period_vtime))
-> +		    time_before64(vdone, ioc->period_at_vtime - ioc->margins.target))
->  			nr_lagging++;
->  
->  		/*
