@@ -2,87 +2,126 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DB3CC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 09:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E10AC433FE
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 12:20:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352545AbiE1Jqk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 05:46:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41106 "EHLO
+        id S235177AbiE1MUM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 08:20:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241279AbiE1Jqf (ORCPT
+        with ESMTP id S1353050AbiE1MUH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 05:46:35 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42FE465D3;
-        Sat, 28 May 2022 02:46:34 -0700 (PDT)
-Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L9Gxh3NvrzjX0P;
-        Sat, 28 May 2022 17:45:28 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 28 May 2022 17:46:32 +0800
-Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
- (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 28 May
- 2022 17:46:31 +0800
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>
-CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
-        <yi.zhang@huawei.com>
-Subject: [PATCH -next v3 6/6] block, bfq: remove dead code for updating 'rq_in_driver'
-Date:   Sat, 28 May 2022 17:59:58 +0800
-Message-ID: <20220528095958.270455-7-yukuai3@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220528095958.270455-1-yukuai3@huawei.com>
-References: <20220528095958.270455-1-yukuai3@huawei.com>
+        Sat, 28 May 2022 08:20:07 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826801DA53
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 05:20:05 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id j7so942639pjn.4
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 05:20:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=y77sSvpwInuFJDiNYp/3GCu0KvBwGdgfHS//h3DpWbM=;
+        b=VxsGWE4ml7nFCgy1+eZ+wz6x/fGWVT/fa8zyF1euXXpTclJf4tuZl7Hsb+GtorsgJX
+         1d4NcwJ/3OOKVqaI3e69Dla5Es+7rtJKDoGDSYUofbziAKAy2jhihAb8yc4UOmgR1Zj0
+         wUqbIeTbNtx5WgA+kNnIpsOqGK09nq+eb4ggTmUrPJQhrrITeYR8/baK2yQR3fh9S93L
+         4j68XsBEixxOsQq6oirLkA/dk9YnVswqGrCls5o8UaQ33s345BY3eR3QebZdJ5014Ilt
+         yhB27pOvZJXMAEToqO4ETFAJROzt9eHtlA6iPI6ovoe2gCD9Lvl56IP1nCrmJ2ZBMJfj
+         11xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=y77sSvpwInuFJDiNYp/3GCu0KvBwGdgfHS//h3DpWbM=;
+        b=zVpteg815Yr7Kd8DHUt5Mpkx2hV6Dre8rSO2FugKae7vm+6+KVZzR6zLypY0zudFXZ
+         dOXBuswqs/6d6fE8uAnxSODMVB8V4ou2EghjFkb0LgCiUX/ZtOh7Xn7mWO2ICDvHj76s
+         EQi6aeom17CStWc1xI3hwTt5KLrkjbgCJq6wMb0MaEBg3aCARMarILF3sSs8lk8iWfG0
+         gV7611H4HoqAhezBlJPzeFQ64nzPWYfzebv40gKDeQpJrVRSeDqdNwr5ZHovQkqswMiZ
+         ZKUk1PP5/xX11O9m4P9Zu2JQZ3DVw/3xaUvhFbHcS+ajXC6VBhlKDUnT+TstfxSgEVDB
+         XeYw==
+X-Gm-Message-State: AOAM5314rDhZDav1WR7JQoE3Bn9XQP9M5Abkc8LcPfs0LL8OaEzWwQm+
+        xJCh1FKZZllRkKCkvhzq1w74SownYEDPOw==
+X-Google-Smtp-Source: ABdhPJyAphsKmZO7ie8SGqewH6n/13vXkWFJfFnldWE/6AMkmHNKDXBGpU7vJN2nwsMr0h9rGGdcHA==
+X-Received: by 2002:a17:903:213:b0:15f:4ea:cd63 with SMTP id r19-20020a170903021300b0015f04eacd63mr48068332plh.68.1653740404711;
+        Sat, 28 May 2022 05:20:04 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id m16-20020a170902f65000b0015e8d4eb2ccsm5472254plg.278.2022.05.28.05.20.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 28 May 2022 05:20:03 -0700 (PDT)
+Message-ID: <8a45c9fa-4cd8-e0e0-63f3-03adb761f9ca@kernel.dk>
+Date:   Sat, 28 May 2022 06:20:02 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH 1/1] bcache: avoid unnecessary soft lockup in kworker
+ update_writeback_rate()
+Content-Language: en-US
+To:     Coly Li <colyli@suse.de>
+Cc:     linux-block@vger.kernel.org, linux-bcache@vger.kernel.org
+References: <20220528061949.28519-1-colyli@suse.de>
+ <20220528061949.28519-2-colyli@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220528061949.28519-2-colyli@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Such code are not even compiled since they are inside marco "#if 0".
+On 5/28/22 12:19 AM, Coly Li wrote:
+> The kworker routine update_writeback_rate() is schedued to update the
+> writeback rate in every 5 seconds by default. Before calling
+> __update_writeback_rate() to do real job, semaphore dc->writeback_lock
+> should be held by the kworker routine.
+> 
+> At the same time, bcache writeback thread routine bch_writeback_thread()
+> also needs to hold dc->writeback_lock before flushing dirty data back
+> into the backing device. If the dirty data set is large, it might be
+> very long time for bch_writeback_thread() to scan all dirty buckets and
+> releases dc->writeback_lock. In such case update_writeback_rate() can be
+> starved for long enough time so that kernel reports a soft lockup warn-
+> ing started like:
+>   watchdog: BUG: soft lockup - CPU#246 stuck for 23s! [kworker/246:31:179713]
+> 
+> Such soft lockup condition is unnecessary, because after the writeback
+> thread finishes its job and releases dc->writeback_lock, the kworker
+> update_writeback_rate() may continue to work and everything is fine
+> indeed.
+> 
+> This patch avoids the unnecessary soft lockup by the following method,
+> - Add new member to struct cached_dev
+>   - dc->rate_update_retry (0 by default)
+> - In update_writeback_rate() call down_read_trylock(&dc->writeback_lock)
+>   firstly, if it fails then lock contention happens.
+> - If dc->rate_update_retry <= BCH_WBRATE_UPDATE_RETRY_MAX (15), doesn't
+>   acquire the lock and reschedules the kworker for next try.
+> - If dc->rate_update_retry > BCH_WBRATE_UPDATE_RETRY_MAX, no retry
+>   anymore and call down_read(&dc->writeback_lock) to wait for the lock.
+> 
+> By the above method, at worst case update_writeback_rate() may retry for
+> 1+ minutes before blocking on dc->writeback_lock by calling down_read().
+> For a 4TB cache device with 1TB dirty data, 90%+ of the unnecessary soft
+> lockup warning message can be avoided.
+> 
+> When retrying to acquire dc->writeback_lock in update_writeback_rate(),
+> of course the writeback rate cannot be updated. It is fair, because when
+> the kworker is blocked on the lock contention of dc->writeback_lock, the
+> writeback rate cannot be updated neither.
+> 
+> This change follows Jens Axboe's suggestion to a more clear and simple
+> version.
 
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Jan Kara <jack@suse.cz>
----
- block/bfq-iosched.c | 16 ----------------
- 1 file changed, 16 deletions(-)
+This looks fine, but it doesn't apply to my current for-5.19/drivers
+branch which the previous ones did. Did you spin this one without the
+other patches, perhaps?
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 8c7020f8cdf2..79e6a60d61d8 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -2321,22 +2321,6 @@ static sector_t get_sdist(sector_t last_pos, struct request *rq)
- 	return 0;
- }
- 
--#if 0 /* Still not clear if we can do without next two functions */
--static void bfq_activate_request(struct request_queue *q, struct request *rq)
--{
--	struct bfq_data *bfqd = q->elevator->elevator_data;
--
--	bfqd->rq_in_driver++;
--}
--
--static void bfq_deactivate_request(struct request_queue *q, struct request *rq)
--{
--	struct bfq_data *bfqd = q->elevator->elevator_data;
--
--	bfqd->rq_in_driver--;
--}
--#endif
--
- static void bfq_remove_request(struct request_queue *q,
- 			       struct request *rq)
- {
+One minor thing we might want to change if you're respinning it -
+BCH_WBRATE_UPDATE_RETRY_MAX isn't really named for what it does, since
+it doesn't retry anything, it simply allows updates to be skipped. Why
+not call it BCH_WBRATE_UPDATE_MAX_SKIPS instead? I think that'd be
+better convey what it does.
+
 -- 
-2.31.1
+Jens Axboe
 
