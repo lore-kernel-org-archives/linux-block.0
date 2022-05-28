@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 208A1C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 09:37:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3DB8C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 09:37:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232958AbiE1Jg7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 05:36:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36918 "EHLO
+        id S232957AbiE1JhC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 05:37:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229525AbiE1Jg4 (ORCPT
+        with ESMTP id S232487AbiE1Jg4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 May 2022 05:36:56 -0400
 Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FA34167C9;
-        Sat, 28 May 2022 02:36:53 -0700 (PDT)
-Received: from kwepemi500017.china.huawei.com (unknown [172.30.72.56])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L9Gks1XttzjX6L;
-        Sat, 28 May 2022 17:36:05 +0800 (CST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C23D1707D;
+        Sat, 28 May 2022 02:36:54 -0700 (PDT)
+Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.53])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L9Gkt4fmWzjX6x;
+        Sat, 28 May 2022 17:36:06 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500017.china.huawei.com (7.221.188.110) with Microsoft SMTP Server
+ kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 28 May 2022 17:36:51 +0800
+ 15.1.2375.24; Sat, 28 May 2022 17:36:52 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 28 May
- 2022 17:36:50 +0800
+ 2022 17:36:51 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <tj@kernel.org>, <axboe@kernel.dk>, <paolo.valente@linaro.org>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next v7 1/3] block, bfq: record how many queues are busy in bfq_group
-Date:   Sat, 28 May 2022 17:50:18 +0800
-Message-ID: <20220528095020.186970-2-yukuai3@huawei.com>
+Subject: [PATCH -next v7 3/3] block, bfq: do not idle if only one group is activated
+Date:   Sat, 28 May 2022 17:50:20 +0800
+Message-ID: <20220528095020.186970-4-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220528095020.186970-1-yukuai3@huawei.com>
 References: <20220528095020.186970-1-yukuai3@huawei.com>
@@ -48,109 +48,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
+Now that root group is counted into 'num_groups_with_busy_queues',
+'num_groups_with_busy_queues > 0' is always true in
+bfq_asymmetric_scenario(). Thus change the condition to '> 1'.
 
-Add a counter 'busy_queues' in bfq_group, and update it in
-bfq_add/del_bfqq_busy().
+On the other hand, this change can enable concurrent sync io if only
+one group is activated.
 
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 Reviewed-by: Jan Kara <jack@suse.cz>
 ---
- block/bfq-cgroup.c  |  1 +
- block/bfq-iosched.h |  2 ++
- block/bfq-wf2q.c    | 26 ++++++++++++++++++++++++--
- 3 files changed, 27 insertions(+), 2 deletions(-)
+ block/bfq-iosched.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 09574af83566..4d516879d9fa 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
- 				   */
- 	bfqg->bfqd = bfqd;
- 	bfqg->active_entities = 0;
-+	bfqg->busy_queues = 0;
- 	bfqg->online = true;
- 	bfqg->rq_pos_tree = RB_ROOT;
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index eb1da1bd5eb4..ffbc2d1593af 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -820,7 +820,7 @@ bfq_pos_tree_add_move(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+  * much easier to maintain the needed state:
+  * 1) all active queues have the same weight,
+  * 2) all active queues belong to the same I/O-priority class,
+- * 3) there are no active groups.
++ * 3) there are one active group at most.
+  * In particular, the last condition is always true if hierarchical
+  * support or the cgroups interface are not enabled, thus no state
+  * needs to be maintained in this case.
+@@ -852,7 +852,7 @@ static bool bfq_asymmetric_scenario(struct bfq_data *bfqd,
+ 
+ 	return varied_queue_weights || multiple_classes_busy
+ #ifdef CONFIG_BFQ_GROUP_IOSCHED
+-	       || bfqd->num_groups_with_busy_queues > 0
++	       || bfqd->num_groups_with_busy_queues > 1
+ #endif
+ 		;
  }
-diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-index ca8177d7bf7c..d92adbdd70ee 100644
---- a/block/bfq-iosched.h
-+++ b/block/bfq-iosched.h
-@@ -907,6 +907,7 @@ struct bfq_group_data {
-  *                   are groups with more than one active @bfq_entity
-  *                   (see the comments to the function
-  *                   bfq_bfqq_may_idle()).
-+ * @busy_queues: number of busy bfqqs.
-  * @rq_pos_tree: rbtree sorted by next_request position, used when
-  *               determining if two or more queues have interleaving
-  *               requests (see bfq_find_close_cooperator()).
-@@ -943,6 +944,7 @@ struct bfq_group {
- 	struct bfq_entity *my_entity;
- 
- 	int active_entities;
-+	int busy_queues;
- 
- 	struct rb_root rq_pos_tree;
- 
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index f8eb340381cf..b97e33688335 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -218,6 +218,18 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
- 	return false;
- }
- 
-+static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
-+{
-+	bfqq->bfqd->busy_queues[bfqq->ioprio_class - 1]++;
-+	bfqq_group(bfqq)->busy_queues++;
-+}
-+
-+static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
-+{
-+	bfqq->bfqd->busy_queues[bfqq->ioprio_class - 1]--;
-+	bfqq_group(bfqq)->busy_queues--;
-+}
-+
- #else /* CONFIG_BFQ_GROUP_IOSCHED */
- 
- static bool bfq_update_parent_budget(struct bfq_entity *next_in_service)
-@@ -230,6 +242,16 @@ static bool bfq_no_longer_next_in_service(struct bfq_entity *entity)
- 	return true;
- }
- 
-+static void bfq_inc_busy_queues(struct bfq_queue *bfqq)
-+{
-+	bfqq->bfqd->busy_queues[bfqq->ioprio_class - 1]++;
-+}
-+
-+static void bfq_dec_busy_queues(struct bfq_queue *bfqq)
-+{
-+	bfqq->bfqd->busy_queues[bfqq->ioprio_class - 1]--;
-+}
-+
- #endif /* CONFIG_BFQ_GROUP_IOSCHED */
- 
- /*
-@@ -1659,7 +1681,7 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
- 
- 	bfq_clear_bfqq_busy(bfqq);
- 
--	bfqd->busy_queues[bfqq->ioprio_class - 1]--;
-+	bfq_dec_busy_queues(bfqq);
- 
- 	if (bfqq->wr_coeff > 1)
- 		bfqd->wr_busy_queues--;
-@@ -1682,7 +1704,7 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
- 	bfq_activate_bfqq(bfqd, bfqq);
- 
- 	bfq_mark_bfqq_busy(bfqq);
--	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
-+	bfq_inc_busy_queues(bfqq);
- 
- 	if (!bfqq->dispatched)
- 		if (bfqq->wr_coeff == 1)
 -- 
 2.31.1
 
