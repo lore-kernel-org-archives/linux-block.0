@@ -2,87 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3721BC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 09:41:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82E78C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 09:46:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233030AbiE1Jlx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 05:41:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39472 "EHLO
+        id S233465AbiE1Jqd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 05:46:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232644AbiE1Jlv (ORCPT
+        with ESMTP id S232586AbiE1Jqb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 05:41:51 -0400
-Received: from mail.sberdevices.ru (mail.sberdevices.ru [45.89.227.171])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 350C61C111;
-        Sat, 28 May 2022 02:41:46 -0700 (PDT)
-Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
-        by mail.sberdevices.ru (Postfix) with ESMTP id 8C7BB5FD04;
-        Sat, 28 May 2022 12:41:42 +0300 (MSK)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-        s=mail; t=1653730902;
-        bh=Ex77ge4+cVuN9VwweqWv0CsC0vVpo2OdRP2djs/jzgg=;
-        h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version;
-        b=KoOHTF7M9/JlRuF2m+QKeCoDpTcLM/8r2P6SOgZVim4uUOODb0JFQ73lS6dNiRxT+
-         KqPiay2xPpfJr4KmiARud8MhGikuSvnEDIRssIPiap8ExLF/0nOwp9v15zSu7QDkp9
-         lRtzvIvyZOBwMZecyLCZDQLmLrqy6ukthfqZ/b9QjJ++KV/gMGa7zyDYqF864AJobI
-         IUyXdRO/eCAMVIkGdwwtq7tun3B8beh1AfwUJo53FyZbfR6m8mCVV+R+QCZV6FaE5c
-         CqXBwPn2oNeeg0/zJSjp75RZ8AwImWdvvsdZEJCGH2VwgDqnkK9lpLQG8dbc5XDYDU
-         +4yQ+nLQUGw5w==
-Received: from S-MS-EXCH01.sberdevices.ru (S-MS-EXCH01.sberdevices.ru [172.16.1.4])
-        by mail.sberdevices.ru (Postfix) with ESMTP;
-        Sat, 28 May 2022 12:41:32 +0300 (MSK)
-From:   Aleksey Romanov <AVRomanov@sberdevices.ru>
-To:     "minchan@kernel.org" <minchan@kernel.org>,
-        "ngupta@vflare.org" <ngupta@vflare.org>,
-        "senozhatsky@chromium.org" <senozhatsky@chromium.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "axboe@chromium.org" <axboe@chromium.org>
-CC:     kernel <kernel@sberdevices.ru>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "mnitenko@gmail.com" <mnitenko@gmail.com>
-Subject: Re: [RFC PATCH v1] zram: experimental patch with entropy calculation
-Thread-Topic: [RFC PATCH v1] zram: experimental patch with entropy calculation
-Thread-Index: AQHYbGz3WSsk9a8KK0ibVrkSkBx6g60z4D2A
-Date:   Sat, 28 May 2022 09:30:53 +0000
-Message-ID: <20220528093121.zqejxapd7xxrbu5c@cab-wsm-0029881>
-References: <20220520171309.26768-1-avromanov@sberdevices.ru>
-In-Reply-To: <20220520171309.26768-1-avromanov@sberdevices.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.16.1.12]
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <62DE108081885948A39634B3871D0FB7@sberdevices.ru>
-Content-Transfer-Encoding: quoted-printable
+        Sat, 28 May 2022 05:46:31 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A331E65A0;
+        Sat, 28 May 2022 02:46:30 -0700 (PDT)
+Received: from kwepemi500018.china.huawei.com (unknown [172.30.72.56])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L9Gxc2jf7zjX54;
+        Sat, 28 May 2022 17:45:24 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500018.china.huawei.com (7.221.188.213) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sat, 28 May 2022 17:46:28 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 28 May
+ 2022 17:46:27 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <paolo.valente@linaro.org>, <axboe@kernel.dk>, <tj@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v3 0/6] multiple cleanup patches for bfq
+Date:   Sat, 28 May 2022 17:59:52 +0800
+Message-ID: <20220528095958.270455-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-KSMG-Rule-ID: 4
-X-KSMG-Message-Action: clean
-X-KSMG-AntiSpam-Status: not scanned, disabled by settings
-X-KSMG-AntiSpam-Interceptor-Info: not scanned
-X-KSMG-AntiPhishing: not scanned, disabled by settings
-X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2022/05/28 05:16:00 #19603934
-X-KSMG-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I also try this for /lib and /bin direcories. See results below.
+Resend just in case v2 end up in spam (for Paolo).
 
-/lib folder as .tar (not compressed):
-+-----+-------------+------------+--------+--------------+-------------+
-| ent |  orig_size  | compr_size |  time  | instructions | branches    |
-+-----+-------------+------------+--------+--------------+-------------+
-|  Y  | 16527126528 | 5921855963 | 16.46s | 71366805304  | 11693084550 |
-+-----+-------------+------------+--------+--------------+-------------+
-|  N  | 16527126528 | 5594516871 | 21.87s | 112664002524 | 16184998761 |
-+-----+-------------+------------+--------+--------------+-------------+
+Changes in v2:
+ - add missing blank line in patch 1.
+ - remove patch 7,8, since they are wrong.
+ - add reviewed-by tag
 
-/bin folder as .tar (not compressed):
-+-----+------------+------------+--------+--------------+------------+
-| ent | orig_size  | compr_size |  time  | instructions | branches   |
-+-----+------------+------------+--------+--------------+------------+
-|  Y  | 5594516871 | 387226648  | 4.772s | 35688596793  | 4486177586 |
-+-----+------------+------------+--------+--------------+------------+
-|  N  | 5594516871 | 326629907  | 5.811s | 43886087430  | 5161907045 |
-+-----+------------+------------+--------+--------------+------------+=
+There are no functional changes in this patchset, just some places
+that I think can be improved during code review.
+
+Previous version:
+v1: https://lore.kernel.org/all/20220514090522.1669270-1-yukuai3@huawei.com/
+
+Yu Kuai (6):
+  block, bfq: cleanup bfq_weights_tree add/remove apis
+  block, bfq: cleanup __bfq_weights_tree_remove()
+  block, bfq: factor out code to update 'active_entities'
+  block, bfq: don't declare 'bfqd' as type 'void *' in bfq_group
+  block, bfq: cleanup bfq_activate_requeue_entity()
+  block, bfq: remove dead code for updating 'rq_in_driver'
+
+ block/bfq-cgroup.c  |  2 +-
+ block/bfq-iosched.c | 38 +++----------------
+ block/bfq-iosched.h | 11 ++----
+ block/bfq-wf2q.c    | 91 ++++++++++++++++++++-------------------------
+ 4 files changed, 51 insertions(+), 91 deletions(-)
+
+-- 
+2.31.1
+
