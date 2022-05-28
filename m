@@ -2,83 +2,210 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 088F2C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 27 May 2022 23:55:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A22AC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 00:00:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355197AbiE0XzM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 19:55:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42946 "EHLO
+        id S229690AbiE1AAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 27 May 2022 20:00:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244378AbiE0XzM (ORCPT
+        with ESMTP id S235955AbiE1AAf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 19:55:12 -0400
-Received: from mail104.syd.optusnet.com.au (mail104.syd.optusnet.com.au [211.29.132.246])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 95E5B66AD2;
-        Fri, 27 May 2022 16:55:11 -0700 (PDT)
-Received: from dread.disaster.area (pa49-181-2-147.pa.nsw.optusnet.com.au [49.181.2.147])
-        by mail104.syd.optusnet.com.au (Postfix) with ESMTPS id CE065538A2A;
-        Sat, 28 May 2022 09:55:10 +1000 (AEST)
-Received: from dave by dread.disaster.area with local (Exim 4.92.3)
-        (envelope-from <david@fromorbit.com>)
-        id 1nujnR-00HD7K-5X; Sat, 28 May 2022 09:55:09 +1000
-Date:   Sat, 28 May 2022 09:55:09 +1000
-From:   Dave Chinner <david@fromorbit.com>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Jaegeuk Kim <jaegeuk@kernel.org>, linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-xfs@vger.kernel.org
-Subject: Re: [PATCH] f2fs: add sysfs entry to avoid FUA
-Message-ID: <20220527235509.GW1098723@dread.disaster.area>
-References: <20220527205955.3251982-1-jaegeuk@kernel.org>
- <YpFDw3mQjN1LBd2j@gmail.com>
+        Fri, 27 May 2022 20:00:35 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8EA3CF6880
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 17:00:33 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id c10-20020a17090a4d0a00b001e283823a00so2245553pjg.0
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 17:00:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=a1MsHWRtqv4pb08/jqHeIuyx7ylNcBjCYFYxSe1BUtg=;
+        b=JAiJeyUUfP5cJ/dZ+inOXmOvPiRn49BlEGGRtcJWjZvkxZRkN8cEVX8D1oIrQfiH1M
+         lIAYB/VH6mbCYcGUp5W6E+uTknkS/drZLwzVV4TQAhUYvdWiCs93cQdGizvhET1ue6eL
+         gbN2iMoemPMAKjmbLZhqudaWUTC6FFHxPmtDS4UGXaHxayMwrznTDJcTTLY4sGWrblvQ
+         SwHiIcvuQqVhMqyOAmnQCCWBh9hqfxa/9aM4hC++qCh7aUtDbUEUqlk31RhB8GJompzl
+         W5ZMt3TbR+nZt+26mljKAQHOSZ5/dCqqQdWf7FrY0wgPw6WUwJejWP650wgwe9HVQX+t
+         xz/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=a1MsHWRtqv4pb08/jqHeIuyx7ylNcBjCYFYxSe1BUtg=;
+        b=1yF8AEllvxPqu3WUeeH8v7jEgGAuEgglEb90Zb0LHJUSGGtFIHQVlLXm+0ECChVlF3
+         CFP/eJaQoSOH+39qGBPdlOvBbU6ElWTRoM49aM+R7w7DGdBdIGBFzO4iR/zg0jiJr38a
+         vikUONbMjTAAHMg5gGoq9MXGPk8VJK307w/UaSrQW5BM/OOeKu/SuE+5nNb2YwY3O7GI
+         Rfx3hvHPsvDOmoVTaiK7VRC6EBeGsAbpaumJp2Mrykfi3srULoyUAUOp3ltUOiMDQ7GL
+         rfNzu1on1IHsT4ETywbiT+3Z6rlIduW/G00rdEml0eNlkFB8lNiSKg69Hu2580MS4V8z
+         V1DQ==
+X-Gm-Message-State: AOAM532JEq0U4l+lcbSoiYF4GkphI/G1/1bBEpH+Rfa6X3hwBCtqmdwo
+        NvSEilWUGvMLKeJmzDsm6CKXk3dCAFQBbg==
+X-Google-Smtp-Source: ABdhPJxJqSlAvieCyXh6CZ/xq9vd1V5dUvjkwHdGMdyt6DjumzKQVokFxc3hQS7INiyRKoCUDIW1bg==
+X-Received: by 2002:a17:90b:1d8f:b0:1e0:37a5:17e3 with SMTP id pf15-20020a17090b1d8f00b001e037a517e3mr10615432pjb.246.1653696032483;
+        Fri, 27 May 2022 17:00:32 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id m10-20020a170902f64a00b0016196bd15f4sm1541063plg.15.2022.05.27.17.00.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 27 May 2022 17:00:31 -0700 (PDT)
+Message-ID: <1a3a151e-a8f9-7f53-f9fc-e7eaea42a462@kernel.dk>
+Date:   Fri, 27 May 2022 18:00:30 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YpFDw3mQjN1LBd2j@gmail.com>
-X-Optus-CM-Score: 0
-X-Optus-CM-Analysis: v=2.4 cv=VuxAv86n c=1 sm=1 tr=0 ts=629164de
-        a=ivVLWpVy4j68lT4lJFbQgw==:117 a=ivVLWpVy4j68lT4lJFbQgw==:17
-        a=kj9zAlcOel0A:10 a=oZkIemNP1mAA:10 a=VwQbUJbxAAAA:8 a=7-415B0cAAAA:8
-        a=SVjUjkoNg4n66X4JJ_kA:9 a=CjuIK1q_8ugA:10 a=AjGcO6oz07-iQ99wixmX:22
-        a=biEYGPWJfzWAr4FL6Ov7:22
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH 2/3] bcache: avoid unnecessary soft lockup in kworker
+ update_writeback_rate()
+Content-Language: en-US
+To:     colyli <colyli@suse.de>
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org
+References: <20220527152818.27545-1-colyli@suse.de>
+ <20220527152818.27545-3-colyli@suse.de>
+ <ebf7c9e4-89cb-59e4-8304-d7f8a28966f3@kernel.dk>
+ <8251ee2fab43b59ecd5a6140655eeb47@suse.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <8251ee2fab43b59ecd5a6140655eeb47@suse.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 09:33:55PM +0000, Eric Biggers wrote:
-> [+Cc linux-block for FUA, and linux-xfs for iomap]
-
-linux-fsdevel should really be used for iomap stuff...
-
+On 5/27/22 11:05 AM, colyli wrote:
+> ? 2022-05-27 23:49?Jens Axboe ???
+>> On 5/27/22 9:28 AM, Coly Li wrote:
+>>> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+>>> index d138a2d73240..c51671abe74e 100644
+>>> --- a/drivers/md/bcache/writeback.c
+>>> +++ b/drivers/md/bcache/writeback.c
+>>> @@ -214,6 +214,7 @@ static void update_writeback_rate(struct work_struct *work)
+>>>                           struct cached_dev,
+>>>                           writeback_rate_update);
+>>>      struct cache_set *c = dc->disk.c;
+>>> +    bool contention = false;
+>>>
+>>>      /*
+>>>       * should check BCACHE_DEV_RATE_DW_RUNNING before calling
+>>> @@ -243,13 +244,41 @@ static void update_writeback_rate(struct work_struct *work)
+>>>           * in maximum writeback rate number(s).
+>>>           */
+>>>          if (!set_at_max_writeback_rate(c, dc)) {
+>>> -            down_read(&dc->writeback_lock);
+>>> -            __update_writeback_rate(dc);
+>>> -            update_gc_after_writeback(c);
+>>> -            up_read(&dc->writeback_lock);
+>>> +            /*
+>>> +             * When contention happens on dc->writeback_lock with
+>>> +             * the writeback thread, this kwork may be blocked for
+>>> +             * very long time if there are too many dirty data to
+>>> +             * writeback, and kerne message will complain a (bogus)
+>>> +             * software lockup kernel message. To avoid potential
+>>> +             * starving, if down_read_trylock() fails, writeback
+>>> +             * rate updating will be skipped for dc->retry_max times
+>>> +             * at most while delay this worker a bit longer time.
+>>> +             * If dc->retry_max times are tried and the trylock
+>>> +             * still fails, then call down_read() to wait for
+>>> +             * dc->writeback_lock.
+>>> +             */
+>>> +            if (!down_read_trylock((&dc->writeback_lock))) {
+>>> +                contention = true;
+>>> +                dc->retry_nr++;
+>>> +                if (dc->retry_nr > dc->retry_max)
+>>> +                    down_read(&dc->writeback_lock);
+>>> +            }
+>>> +
+>>> +            if (!contention || dc->retry_nr > dc->retry_max) {
+>>> +                __update_writeback_rate(dc);
+>>> +                update_gc_after_writeback(c);
+>>> +                up_read(&dc->writeback_lock);
+>>> +                dc->retry_nr = 0;
+>>> +            }
+>>>          }
+>>>      }
+>>
 > 
-> On Fri, May 27, 2022 at 01:59:55PM -0700, Jaegeuk Kim wrote:
-> > Some UFS storage gives slower performance on FUA than write+cache_flush.
-> > Let's give a way to manage it.
-> > 
-> > Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+> Hi Jens,
 > 
-> Should the driver even be saying that it has FUA support in this case?  If the
-> driver didn't claim FUA support, that would also solve this problem.
+> Thanks for looking into this :-)
+> 
+>> This is really not very pretty. First of all, why bother with storing a
+>> max retry value in there? Doesn't seem like it'd ever be different per
+> 
+> It is because the probability of the lock contention on
+> dc->writeback_lock depends on the I/O speed backing device. From my
+> observation during the tests, for fast backing device with larger
+> cache device, its writeback thread may work harder to flush more dirty
+> data to backing device, the lock contention happens more and longer,
+> so the writeback rate update kworker has to wait longer time before
+> acquires dc->writeback_lock. So its dc->retry_max should be larger
+> then slow backing device.
+> 
+> Therefore I'd like to have a tunable per-backing-device retry_max. And
+> the syses interface will be added when users/customers want it. The
+> use case is from SAP HANA users, I have report that they observe the
+> soft lockup warning for dc->writeback_lock contention and worry about
+> whether data is corrupted (indeed, of course not).
 
-Agreed, this is a hardware problem that need to addressed with a
-driver quirk to stop it advertising FUA support. The high level
-fs/iomap code should always issue FUA writes where possible and
-the lower layers tell the block layer whether to issue the FUA as
-a FUA or write+cache flush pair.
+The initial patch has 5 as the default, and there are no sysfs knobs. If
+you ever need a sysfs knob, by all means make it a variable and make it
+configurable too. But don't do it upfront where the '5' suitabled named
+would do the job.
 
-And, quite frankly, exposing this sort of "hardware needs help" knob
-as a sysfs variable is exactly the sort of thing we should never do.
+>> diff --git a/drivers/md/bcache/writeback.c b/drivers/md/bcache/writeback.c
+>> index 9ee0005874cd..cbc01372c7a1 100644
+>> --- a/drivers/md/bcache/writeback.c
+>> +++ b/drivers/md/bcache/writeback.c
+>> @@ -235,19 +235,27 @@ static void update_writeback_rate(struct
+>> work_struct *work)
+>>          return;
+>>      }
+>>
+>> -    if (atomic_read(&dc->has_dirty) && dc->writeback_percent) {
+>> +    if (atomic_read(&dc->has_dirty) && dc->writeback_percent &&
+>> +        !set_at_max_writeback_rate(c, dc)) {
+>>          /*
+>>           * If the whole cache set is idle, set_at_max_writeback_rate()
+>>           * will set writeback rate to a max number. Then it is
+>>           * unncessary to update writeback rate for an idle cache set
+>>           * in maximum writeback rate number(s).
+>>           */
+>> -        if (!set_at_max_writeback_rate(c, dc)) {
+> 
+> The reason I didn't place '!set_at_max_writeback_rate' with other items in
+> previous if() was for the above code comment. If I moved it to previous
+> if() without other items, I was not comfortable to place the code comments
+> neither before or after the if() check. So I used a separated if() check for
+> '!set_at_max_writeback_rate'.
+> 
+> From your change, it seems placing the code comments behind is fine (or
+> better), can I understand in this way? I try to learn and follow your way
+> to handle such code comments situation.
 
-Users have no idea how to tune stuff like this correctly (even if
-they knew it existed!), yet we know exactly what hardware has this
-problem and the kernel already has mechanisms that would allow it to
-just Do The Right Thing. IOWs, we can fix this without the user even
-having to know that they have garbage hardware that needs special
-help....
+Just put it higher up if you want, it doesn't really matter, or leave it
+where it is.
 
-Cheers,
+>>              __update_writeback_rate(dc);
+>>              update_gc_after_writeback(c);
+>>              up_read(&dc->writeback_lock);
+>> -        }
+>> +        } while (0);
+> 
+> Aha, this is cool! I never though of using do{}while(0) and break in
+> such a genius way! Sure I will use this, thanks for the hint :-)
+> 
+> After you reply my defense of dc->retry_max, and the question of code
+> comments location, I will update and test the patch again, and
+> re-sbumit to you.
+> 
+> Thanks for your constructive suggestion, especially the do{}while(0)
+> part!
 
-Dave.
+I would do something similar to my change and drop the 'dc' addition for
+the max retries as it, by definition, can only be one value right now.
+For all I know, you'll never need to change it again, and then you're
+just wasting memory and making the code harder to read by putting it in
+dc instead of just having this define.
+
 -- 
-Dave Chinner
-david@fromorbit.com
+Jens Axboe
+
