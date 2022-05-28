@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1A70C433FE
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 06:30:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D0BC433F5
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 06:31:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355866AbiE1Gak (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 02:30:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43338 "EHLO
+        id S1355862AbiE1GbJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 02:31:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355854AbiE1GaY (ORCPT
+        with ESMTP id S1355835AbiE1GaY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Sat, 28 May 2022 02:30:24 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F3F66007E;
-        Fri, 27 May 2022 23:30:08 -0700 (PDT)
-Received: from kwepemi500005.china.huawei.com (unknown [172.30.72.54])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4L9BXl3LnNzRhW7;
-        Sat, 28 May 2022 14:27:03 +0800 (CST)
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2569846669;
+        Fri, 27 May 2022 23:30:04 -0700 (PDT)
+Received: from kwepemi100014.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4L9BbG6F2gzjX4V;
+        Sat, 28 May 2022 14:29:14 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500005.china.huawei.com (7.221.188.179) with Microsoft SMTP Server
+ kwepemi100014.china.huawei.com (7.221.188.106) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sat, 28 May 2022 14:30:06 +0800
+ 15.1.2375.24; Sat, 28 May 2022 14:30:00 +0800
 Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
  (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Sat, 28 May
- 2022 14:30:05 +0800
+ 2022 14:30:00 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
 To:     <tj@kernel.org>, <mkoutny@suse.com>, <axboe@kernel.dk>,
         <ming.lei@redhat.com>
 CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
         <yi.zhang@huawei.com>
-Subject: [PATCH -next v5 8/8] blk-throttle: clean up flag 'THROTL_TG_PENDING'
-Date:   Sat, 28 May 2022 14:43:30 +0800
-Message-ID: <20220528064330.3471000-9-yukuai3@huawei.com>
+Subject: [PATCH -next v5 1/8] blk-throttle: fix that io throttle can only work for single bio
+Date:   Sat, 28 May 2022 14:43:23 +0800
+Message-ID: <20220528064330.3471000-2-yukuai3@huawei.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20220528064330.3471000-1-yukuai3@huawei.com>
 References: <20220528064330.3471000-1-yukuai3@huawei.com>
@@ -49,88 +49,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-All related operations are inside 'queue_lock', there is no need to use
-the flag, we only need to make sure throtl_enqueue_tg() is called when
-the first bio is throttled, and throtl_dequeue_tg() is called when the
-last throttled bio is dispatched.
+commit 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
+introduce a new problem, for example:
 
+Test scripts:
+cd /sys/fs/cgroup/blkio/
+echo "8:0 1024" > blkio.throttle.write_bps_device
+echo $$ > cgroup.procs
+dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+dd if=/dev/zero of=/dev/sda bs=10k count=1 oflag=direct &
+
+Test result:
+10240 bytes (10 kB, 10 KiB) copied, 10.0134 s, 1.0 kB/s
+10240 bytes (10 kB, 10 KiB) copied, 10.0135 s, 1.0 kB/s
+
+The problem is that the second bio is finished after 10s instead of 20s.
+This is because if some bios are already queued, current bio is queued
+directly and the flag 'BIO_THROTTLED' is set. And later, when former
+bios are dispatched, this bio will be dispatched without waiting at all,
+this is due to tg_with_in_bps_limit() return 0 for this bio.
+
+In order to fix the problem, don't skip flaged bio in
+tg_with_in_bps_limit(), and for the problem that split bio can be
+double accounted, compensate the over-accounting in __blk_throtl_bio().
+
+Fixes: 9f5ede3c01f9 ("block: throttle split bio in case of iops limit")
 Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
 ---
- block/blk-throttle.c | 22 ++++++++--------------
- block/blk-throttle.h |  7 +++----
- 2 files changed, 11 insertions(+), 18 deletions(-)
+ block/blk-throttle.c | 24 ++++++++++++++++++------
+ 1 file changed, 18 insertions(+), 6 deletions(-)
 
 diff --git a/block/blk-throttle.c b/block/blk-throttle.c
-index 297ce54ceaa3..fe7f01c61ba8 100644
+index 139b2d7a99e2..5c1d1c4d8188 100644
 --- a/block/blk-throttle.c
 +++ b/block/blk-throttle.c
-@@ -561,23 +561,16 @@ static void tg_service_queue_add(struct throtl_grp *tg)
+@@ -811,7 +811,7 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
  
- static void throtl_enqueue_tg(struct throtl_grp *tg)
- {
--	if (!(tg->flags & THROTL_TG_PENDING)) {
--		tg_service_queue_add(tg);
--		tg->flags |= THROTL_TG_PENDING;
--		tg->service_queue.parent_sq->nr_pending++;
+ 	/* no need to throttle if this bio's bytes have been accounted */
+-	if (bps_limit == U64_MAX || bio_flagged(bio, BIO_THROTTLED)) {
++	if (bps_limit == U64_MAX) {
+ 		if (wait)
+ 			*wait = 0;
+ 		return true;
+@@ -921,11 +921,8 @@ static void throtl_charge_bio(struct throtl_grp *tg, struct bio *bio)
+ 	unsigned int bio_size = throtl_bio_data_size(bio);
+ 
+ 	/* Charge the bio to the group */
+-	if (!bio_flagged(bio, BIO_THROTTLED)) {
+-		tg->bytes_disp[rw] += bio_size;
+-		tg->last_bytes_disp[rw] += bio_size;
 -	}
-+	tg_service_queue_add(tg);
-+	tg->service_queue.parent_sq->nr_pending++;
- }
+-
++	tg->bytes_disp[rw] += bio_size;
++	tg->last_bytes_disp[rw] += bio_size;
+ 	tg->io_disp[rw]++;
+ 	tg->last_io_disp[rw]++;
  
- static void throtl_dequeue_tg(struct throtl_grp *tg)
- {
--	if (tg->flags & THROTL_TG_PENDING) {
--		struct throtl_service_queue *parent_sq =
--			tg->service_queue.parent_sq;
-+	struct throtl_service_queue *parent_sq = tg->service_queue.parent_sq;
- 
--		throtl_rb_erase(&tg->rb_node, parent_sq);
--		--parent_sq->nr_pending;
--		tg->flags &= ~THROTL_TG_PENDING;
--	}
-+	throtl_rb_erase(&tg->rb_node, parent_sq);
-+	--parent_sq->nr_pending;
- }
- 
- /* Call with queue lock held */
-@@ -1015,8 +1008,9 @@ static void throtl_add_bio_tg(struct bio *bio, struct throtl_qnode *qn,
- 
- 	throtl_qnode_add_bio(bio, qn, &sq->queued[rw]);
- 
-+	if (!sq->nr_queued[READ] && !sq->nr_queued[WRITE])
-+		throtl_enqueue_tg(tg);
- 	sq->nr_queued[rw]++;
--	throtl_enqueue_tg(tg);
- }
- 
- static void tg_update_disptime(struct throtl_grp *tg)
-@@ -1371,7 +1365,7 @@ static void tg_conf_updated(struct throtl_grp *tg, bool global)
- 	throtl_start_new_slice(tg, READ, false);
- 	throtl_start_new_slice(tg, WRITE, false);
- 
--	if (tg->flags & THROTL_TG_PENDING) {
-+	if (sq->nr_queued[READ] || sq->nr_queued[WRITE]) {
- 		tg_update_disptime(tg);
- 		throtl_schedule_next_dispatch(sq->parent_sq, true);
- 	}
-diff --git a/block/blk-throttle.h b/block/blk-throttle.h
-index b8178e6b4d30..f68b95999f83 100644
---- a/block/blk-throttle.h
-+++ b/block/blk-throttle.h
-@@ -53,10 +53,9 @@ struct throtl_service_queue {
- };
- 
- enum tg_state_flags {
--	THROTL_TG_PENDING	= 1 << 0,	/* on parent's pending tree */
--	THROTL_TG_WAS_EMPTY	= 1 << 1,	/* bio_lists[] became non-empty */
--	THROTL_TG_HAS_IOPS_LIMIT = 1 << 2,	/* tg has iops limit */
--	THROTL_TG_CANCELING	= 1 << 3,	/* starts to cancel bio */
-+	THROTL_TG_WAS_EMPTY	= 1 << 0,	/* bio_lists[] became non-empty */
-+	THROTL_TG_HAS_IOPS_LIMIT = 1 << 1,	/* tg has iops limit */
-+	THROTL_TG_CANCELING	= 1 << 2,	/* starts to cancel bio */
- };
- 
- enum {
+@@ -2121,6 +2118,21 @@ bool __blk_throtl_bio(struct bio *bio)
+ 			tg->last_low_overflow_time[rw] = jiffies;
+ 		throtl_downgrade_check(tg);
+ 		throtl_upgrade_check(tg);
++
++		/*
++		 * re-entered bio has accounted bytes already, so try to
++		 * compensate previous over-accounting. However, if new
++		 * slice is started, just forget it.
++		 */
++		if (bio_flagged(bio, BIO_THROTTLED)) {
++			unsigned int bio_size = throtl_bio_data_size(bio);
++
++			if (tg->bytes_disp[rw] >= bio_size)
++				tg->bytes_disp[rw] -= bio_size;
++			if (tg->last_bytes_disp[rw] >= bio_size)
++				tg->last_bytes_disp[rw] -= bio_size;
++		}
++
+ 		/* throtl is FIFO - if bios are already queued, should queue */
+ 		if (sq->nr_queued[rw])
+ 			break;
 -- 
 2.31.1
 
