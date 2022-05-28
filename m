@@ -2,90 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 690DBC433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 12:25:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B33BC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 12:46:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343732AbiE1MZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 08:25:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36716 "EHLO
+        id S235332AbiE1Mp7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 08:45:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235352AbiE1MZA (ORCPT
+        with ESMTP id S229734AbiE1Mp7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 08:25:00 -0400
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F5A526FD
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 05:24:59 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id j7so949544pjn.4
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 05:24:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=SKUkS97rxdoIcZ01usMPCg8MKu4QzvixAgQo/OMynjA=;
-        b=7YD3kY+poIf5j4XfOOmRdjDa+R2EbeE4LH2yzgjMadf4Kw8+VxwHMd35UFNeD2JK9v
-         pfoB/cYYCbC/09j5ZtXhW2MOuV2gBN8KV935ZFtuWhvaFYWqJDp6n5+5aX/gsVMMMleC
-         z1KiaovY4+ziZW33PHoicF0mUEiKAhEYRwWK6kSWfyf8PL5/pHWOrd42ez6uoDpVUIQR
-         llu2fhIrEcjuSXhZ7AboZdvFrOlYXNd3keRHoy3lH2Eqv4C2t83tKRsflA1eKlaqhanN
-         llIdpZttPC25bx5kfWDGjomKCn02MM4/ZxrHv0yfkr8myKerqyusKlzxV0EIV4ZdXR2H
-         y2HQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SKUkS97rxdoIcZ01usMPCg8MKu4QzvixAgQo/OMynjA=;
-        b=hcP59We7gVlTplKb5Gonpownj18d1a6S8md56YasMsVtNlW28Ly24YbW1G/w/IhvIz
-         7q6h5ah1CiH0g0f0U5Y10f0rsBqQb3QMCDgHl1KGR/Bw8ucJ/ArwKCzhiRfvp1ftRPaH
-         9nGgwFj6DnwHTwv+iNtJr2++Oi3qkKsi8kDnYfOo6lXrO57iHx39ny0rKfMSoZXxAR1F
-         QPM4xxrhYG1mZyDf1Dp5mB/R+qZf0limN7vVE4thsthjIQLurA6Xg8BFgQS9HRiCjfAC
-         2CVqBIizCudgez+kd0yqkBUJHViXlLLaZAhUfxVyJHc0GWXuQLZSVFNGvElV118iy1vm
-         b6qg==
-X-Gm-Message-State: AOAM530DUAw2PHDxP00mtUWyY+hyTNmhZ9Qi5TO2zbYgMkQRwHRCbdYA
-        eHg7AJWmmao3TVvPEzMmXOFZmw==
-X-Google-Smtp-Source: ABdhPJzlnDloDNwRAurXN79GhHsiOGP2PX3xeOmHBwmWdk6P08PVDDym+jwEpXRfC0yMtm5Z33hjzQ==
-X-Received: by 2002:a17:902:bb92:b0:153:4eae:c77e with SMTP id m18-20020a170902bb9200b001534eaec77emr46490298pls.93.1653740699077;
-        Sat, 28 May 2022 05:24:59 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ch12-20020a056a00288c00b004fa743ba3f9sm5217665pfb.2.2022.05.28.05.24.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 28 May 2022 05:24:58 -0700 (PDT)
-Message-ID: <37bbcb23-685e-d5f2-8b71-f700ef9a6e44@kernel.dk>
-Date:   Sat, 28 May 2022 06:24:57 -0600
+        Sat, 28 May 2022 08:45:59 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 436A9F8;
+        Sat, 28 May 2022 05:45:58 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id D8D301F895;
+        Sat, 28 May 2022 12:45:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1653741956; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=9xrVbFIVymZq1V70QCLlhSccycDdU6BeYBBfd+tOcck=;
+        b=b/OeU6kXBe9l5thlLSge1AWzNrIKam+rvj9PxDTsbOKV/0nsRE1LR98RwBkBiaIgRAyZva
+        ZKShkWCp8ew2C0vfwwaW69ev9tjLUuIxiTNu8htA0JhoVGjtKsB/n1XDBgEFzqbdFXdJTn
+        XtU+YlMm3RohmHOKY7cIrLInb0UPtbY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1653741956;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=9xrVbFIVymZq1V70QCLlhSccycDdU6BeYBBfd+tOcck=;
+        b=TDmw6a3nhl1q30EWo1QzPmAF1A/zRWGdrRE1HxwgBQqarO9Y13G+0sNyjjWffB1CAUxuiZ
+        rA4zqHZocCs9BqCw==
+Received: from localhost.localdomain (colyli.tcp.ovpn1.nue.suse.de [10.163.16.22])
+        by relay2.suse.de (Postfix) with ESMTP id 602292C141;
+        Sat, 28 May 2022 12:45:55 +0000 (UTC)
+From:   Coly Li <colyli@suse.de>
+To:     axboe@kernel.dk
+Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
+        Coly Li <colyli@suse.de>
+Subject: [PATCH v2 0/1] bcache fix for Linux v5.19 (3rd wave)
+Date:   Sat, 28 May 2022 20:45:49 +0800
+Message-Id: <20220528124550.32834-1-colyli@suse.de>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH] block: take destination bvec offsets into account in
- bio_copy_data_iter
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <20220524143919.1155501-1-hch@lst.de>
- <a1e6fd92-ed3d-f94c-43a7-ff4fca27b759@kernel.dk>
- <20220528045233.GA13168@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220528045233.GA13168@lst.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/27/22 10:52 PM, Christoph Hellwig wrote:
-> On Fri, May 27, 2022 at 08:36:47PM -0600, Jens Axboe wrote:
->> On 5/24/22 8:39 AM, Christoph Hellwig wrote:
->>> Appartly bcache can copy into bios that do not just contain fresh
->>> pages but can have offsets into the bio_vecs.  Restore support for tht
->>> in bio_copy_data_iter.
->>>
->>> Fixes: 8b679a070c53 ("block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec")
->>
->> Applied, but where is this sha from? The upstream one is f8b679a070c5.
-> 
-> Apparently from my copy and pasting discarding the initial f of that..
+Hi Jens,
 
-Heh, my tired eyes missed that, makes sense. Anyway, I did correct it
-when applying.
+This is the last bcache patch from me for Linux v5.19, which tries to
+avoid bogus soft lockup warning from the bcache writeback rate update
+kworker.
+
+Comparing to previous version, the only change in this version is to
+change BCH_WBRATE_UPDATE_RETRY_MAX to BCH_WBRATE_UPDATE_RETRY_MAX. This
+is only about naming change, no other thing touched.
+
+This patch is generated againt linux-block:for-5.19/drivers, the latest
+patch in the branch I see is commit 1243172d5894 ("nbd: use pr_err to
+output error message").
+
+Thank you for the suggestion for a more clear and simple patch.
+
+Coly Li
+---
+
+Coly Li (1):
+  bcache: avoid unnecessary soft lockup in kworker
+    update_writeback_rate()
+
+ drivers/md/bcache/bcache.h    |  7 +++++++
+ drivers/md/bcache/writeback.c | 31 +++++++++++++++++++++----------
+ 2 files changed, 28 insertions(+), 10 deletions(-)
 
 -- 
-Jens Axboe
+2.35.3
 
