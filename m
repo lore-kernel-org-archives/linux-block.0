@@ -2,87 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B081FC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 03:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0DDDC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 04:52:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354286AbiE1D5Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 27 May 2022 23:57:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57760 "EHLO
+        id S229935AbiE1Ewk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 00:52:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43578 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229683AbiE1D5X (ORCPT
+        with ESMTP id S229870AbiE1Ewj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 27 May 2022 23:57:23 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFAB35EBCD;
-        Fri, 27 May 2022 20:57:19 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id CFED6CE26B8;
-        Sat, 28 May 2022 03:57:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 707C8C34100;
-        Sat, 28 May 2022 03:57:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653710236;
-        bh=hPdRKRSbGNtynRtPm6nGXdsDdNGivcCdDbeGsIRnlj4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=BSN/iHMUqDTJpKStecbkXDNjqvyffM67d9WHWbR296ZE9fuj1QJa4TL/US4Kz6OxR
-         JL2xUiiLxfK541zlWnV9Tv7QR2PGnJEl6Ox10wC5fNW8S07/xf/HKGonemGuGEm5H8
-         65TfQXM1M0VIbhHWQ1j9OWXYOtoYgV7Doms56j5YqNYjcXglovYWIs/vUd4BGnwnzC
-         ZFFufetr/p9Wlk6e7l3uHVooTwse/U4Ntok+bfXqpv3sVG9aveZR+rG8wlUyQxg4sd
-         FBifA60Oqx1p5K1qs+LWIPQFlqvCWYeeUaonUC68m/fkJ/3R33nw6LYnKcxMxHmZR6
-         3qsXrYzngn7eA==
-Date:   Fri, 27 May 2022 21:57:12 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Wheeler <bcache@lists.ewheeler.net>
-Cc:     Christoph Hellwig <hch@infradead.org>, Coly Li <colyli@suse.de>,
-        Adriano Silva <adriano_da_silva@yahoo.com.br>,
-        Bcache Linux <linux-bcache@vger.kernel.org>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        linux-block@vger.kernel.org
-Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
- Bcache in writes direct with fsync)
-Message-ID: <YpGdmDeCZXBF2IOH@kbusch-mbp.dhcp.thefacebook.com>
-References: <958894243.922478.1652201375900.ref@mail.yahoo.com>
- <958894243.922478.1652201375900@mail.yahoo.com>
- <9d59af25-d648-4777-a5c0-c38c246a9610@ewheeler.net>
- <27ef674d-67e-5739-d5d8-f4aa2887e9c2@ewheeler.net>
- <YoxuYU4tze9DYqHy@infradead.org>
- <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net>
- <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com>
- <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net>
- <Yo28kDw8rZgFWpHu@infradead.org>
- <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net>
+        Sat, 28 May 2022 00:52:39 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13E2111CB4B
+        for <linux-block@vger.kernel.org>; Fri, 27 May 2022 21:52:37 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id AE78E68B05; Sat, 28 May 2022 06:52:33 +0200 (CEST)
+Date:   Sat, 28 May 2022 06:52:33 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org
+Subject: Re: [PATCH] block: take destination bvec offsets into account in
+ bio_copy_data_iter
+Message-ID: <20220528045233.GA13168@lst.de>
+References: <20220524143919.1155501-1-hch@lst.de> <a1e6fd92-ed3d-f94c-43a7-ff4fca27b759@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net>
+In-Reply-To: <a1e6fd92-ed3d-f94c-43a7-ff4fca27b759@kernel.dk>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 06:52:22PM -0700, Eric Wheeler wrote:
-> Hi Keith, Christoph:
+On Fri, May 27, 2022 at 08:36:47PM -0600, Jens Axboe wrote:
+> On 5/24/22 8:39 AM, Christoph Hellwig wrote:
+> > Appartly bcache can copy into bios that do not just contain fresh
+> > pages but can have offsets into the bio_vecs.  Restore support for tht
+> > in bio_copy_data_iter.
+> > 
+> > Fixes: 8b679a070c53 ("block: rewrite bio_copy_data_iter to use bvec_kmap_local and memcpy_to_bvec")
 > 
-> Adriano who started this thread (cc'ed) reported that setting 
-> queue/write_cache to "write back" provides much higher latency on his NVMe 
-> than "write through"; I tested a system here and found the same thing.
-> 
-> Here is Adriano's summary:
-> 
->         # cat /sys/block/nvme0n1/queue/write_cache
->         write through
->         # ioping -c10 /dev/nvme0n1 -D -Y -WWW -s4K
->         ...
->         min/avg/max/mdev = 60.0 us / 78.7 us / 91.2 us / 8.20 us
->                                      ^^^^ ^^
-> 
->         # for i in /sys/block/*/queue/write_cache; do echo 'write back' > $i; done
->         # ioping -c10 /dev/nvme0n1 -D -Y -WWW -s4K
->         ...
->         min/avg/max/mdev = 1.81 ms / 1.89 ms / 2.01 ms / 82.3 us
->                                      ^^^^ ^^
+> Applied, but where is this sha from? The upstream one is f8b679a070c5.
 
-With the "write back" setting, I find that the writes dispatched from ioping
-will have the force-unit-access bit set in the commands, so it is expected to
-take longer.
+Apparently from my copy and pasting discarding the initial f of that..
