@@ -2,117 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3755C433F5
-	for <linux-block@archiver.kernel.org>; Sat, 28 May 2022 20:46:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 485D2C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 29 May 2022 00:17:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229916AbiE1Uqc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 28 May 2022 16:46:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33254 "EHLO
+        id S229493AbiE2ARi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 28 May 2022 20:17:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229520AbiE1Uqb (ORCPT
+        with ESMTP id S229472AbiE2ARh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 28 May 2022 16:46:31 -0400
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B75C218D
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 13:46:30 -0700 (PDT)
-Received: by mail-il1-f198.google.com with SMTP id j2-20020a056e02218200b002d16c950c5cso5239932ila.12
-        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 13:46:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=plwxnWiwuDRda2tElF8zSuOr/unxfzwclNr7d4wq3r4=;
-        b=AlQH4kGC6ZqmJIuOC6p3jYsb0E8RpG88Tj0SSibruL5p0I8Q0ly19wbWRHnY3wUrNz
-         i9/qII4dyhBzU8ye5rb5D9RDs60Io0ISzHMCxyruXdqtbdqKYGAjmAYcBt8aLqyWxn2T
-         BI3ZVcvJtCMrIt8RZLJVnA+6Sigr1Veg9hcqXedIiqYfGsglpzc90kbMZOkFShd0zL2A
-         LTd2kViRz68A7RGxrYwI4f+bJL+Kv9BHqe7HKYsPoGhpXYj0RUzmHQaYKkDJ8eljKhUc
-         Ea6zPBfCWAnBj+ujx9Dg0OXk1R2CRRJGtHaIsbO2ecroWyN1Dh8HkIk36Y+U7khxCIOc
-         8EEQ==
-X-Gm-Message-State: AOAM533hYtqiYueTBaMeahMnaGKyrgTWRjGVWBLLCP6emd1L88+kyx3V
-        eF59f9ak6INrke94LTzxKgumWrk9M+dKBARl9sGmYcvh9c9F
-X-Google-Smtp-Source: ABdhPJxhApFxnQvi8joZ/AIBhnEksxTRD5blkJIkEhELyl/h2FnMLg3S8WfDCj/hv9TWnBdAXRKXwFqYloC4ZQzyIdpx9QAQVcmv
+        Sat, 28 May 2022 20:17:37 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5819540A34
+        for <linux-block@vger.kernel.org>; Sat, 28 May 2022 17:17:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Type:MIME-Version:Message-ID:
+        Subject:To:From:Date:Sender:Reply-To:Cc:Content-Transfer-Encoding:Content-ID:
+        Content-Description:In-Reply-To:References;
+        bh=UDJlJSNbzJ+L31x4X4Jb/+dKOjWCFYf/Q0kV79iKh2E=; b=UkkiY2ixmesvOdN8dCAb6ShMm5
+        +Jn31FABJQoRd5iYAoTIRUkbBOV7PMwbyssbKTxc6cpZTSncJh4T+h1NZrpE+ahno9kCyqGZo1+fI
+        /6aNOlRsP7LWYzNcNLZ5wW/gHk3xibhUptrYPn9u1jDDB2p6QmkAYkv8UkHrR+QoZMKoZ4zMIFP+2
+        BOxROsLFeFvOJ8e0jquYD+Dl/bvlxThoKPKh3ZOctqWVyqwOhjzNKWQqD9GzxS+kjA2g+YTwGYJRE
+        CYvdToZ3WfgGLMkaF0up4EDLFNhH8sCLqU7435kVqLLqcXPxGnEMNwJtHhm6OUJ5G4+VNTR4GFPWO
+        l6t8N4xg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nv6cd-003F2Y-Dg; Sun, 29 May 2022 00:17:31 +0000
+Date:   Sun, 29 May 2022 01:17:31 +0100
+From:   Matthew Wilcox <willy@infradead.org>
+To:     dm-devel@redhat.com, linux-block@vger.kernel.org
+Subject: bioset_exit poison from dm_destroy
+Message-ID: <YpK7m+14A+pZKs5k@casper.infradead.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3388:b0:330:a236:163f with SMTP id
- h8-20020a056638338800b00330a236163fmr10460245jav.93.1653770789598; Sat, 28
- May 2022 13:46:29 -0700 (PDT)
-Date:   Sat, 28 May 2022 13:46:29 -0700
-In-Reply-To: <000000000000361f9005dd7fea88@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000743f8505e0188496@google.com>
-Subject: Re: [syzbot] WARNING in wait_til_done
-From:   syzbot <syzbot+3562be49b8e09d424a6f@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Not quite sure whose bug this is.  Current Linus head running xfstests
+against ext4 (probably not ext4's fault?)
 
-HEAD commit:    9d004b2f4fea Merge tag 'cxl-for-5.19' of git://git.kernel...
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=118576f3f00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=34d5ab77e4ca65e1
-dashboard link: https://syzkaller.appspot.com/bug?extid=3562be49b8e09d424a6f
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10f15913f00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=157ad36bf00000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3562be49b8e09d424a6f@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 3690 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 0 PID: 3690 at drivers/block/floppy.c:999 wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Modules linked in:
-CPU: 0 PID: 3690 Comm: syz-executor202 Not tainted 5.18.0-syzkaller-10643-g9d004b2f4fea #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:wait_til_done+0x350/0x3c0 drivers/block/floppy.c:2018
-Code: fc 41 83 fd 01 7e ac e8 8e 1e e0 fc 4c 89 e6 48 c7 c7 20 7b 8e 8c e8 8f b4 c0 fc e8 7a 1e e0 fc e9 c3 fd ff ff e8 70 1e e0 fc <0f> 0b e9 4b fd ff ff e8 54 38 2c fd e9 0f fe ff ff e8 5a 1e e0 fc
-RSP: 0018:ffffc90002f8f718 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 1ffff920005f1ee3 RCX: 0000000000000000
-RDX: ffff88801430c140 RSI: ffffffff84998450 RDI: 0000000000000007
-RBP: 0000000000000000 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000001
-R13: ffffffff84995460 R14: 0000000000000000 R15: 0000000000000003
-FS:  0000555556c30300(0000) GS:ffff88802ca00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000088 CR3: 000000002457a000 CR4: 0000000000150ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- floppy_check_events+0x3d0/0x560 drivers/block/floppy.c:4098
- disk_check_events+0xc2/0x420 block/disk-events.c:193
- disk_clear_events block/disk-events.c:248 [inline]
- bdev_check_media_change+0x12c/0x310 block/disk-events.c:279
- floppy_open+0x75d/0xd70 drivers/block/floppy.c:4057
- blkdev_get_whole+0x99/0x2d0 block/bdev.c:673
- blkdev_get_by_dev.part.0+0x5ec/0xb90 block/bdev.c:823
- blkdev_get_by_dev+0x6b/0x80 block/bdev.c:857
- blkdev_open+0x13c/0x2c0 block/fops.c:481
- do_dentry_open+0x4a1/0x11f0 fs/open.c:824
- do_open fs/namei.c:3477 [inline]
- path_openat+0x1c71/0x2910 fs/namei.c:3610
- do_filp_open+0x1aa/0x400 fs/namei.c:3637
- do_sys_openat2+0x16d/0x4c0 fs/open.c:1254
- do_sys_open fs/open.c:1270 [inline]
- __do_sys_openat fs/open.c:1286 [inline]
- __se_sys_openat fs/open.c:1281 [inline]
- __x64_sys_openat+0x13f/0x1f0 fs/open.c:1281
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x46/0xb0
-RIP: 0033:0x7f936c227597
-Code: 25 00 00 41 00 3d 00 00 41 00 74 47 64 8b 04 25 18 00 00 00 85 c0 75 6b 44 89 e2 48 89 ee bf 9c ff ff ff b8 01 01 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 95 00 00 00 48 8b 4c 24 28 64 48 2b 0c 25
-RSP: 002b:00007ffc43d5dfb0 EFLAGS: 00000246 ORIG_RAX: 0000000000000101
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f936c227597
-RDX: 0000000000000000 RSI: 00007ffc43d5e030 RDI: 00000000ffffff9c
-RBP: 00007ffc43d5e030 R08: 000000000000ffff R09: 00007ffc43d5dec0
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 431bde82d7b634db R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+01818 generic/250	run fstests generic/250 at 2022-05-28 23:48:09
+01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+01818 EXT4-fs (dm-0): unmounting filesystem.
+01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+01818 EXT4-fs (dm-0): unmounting filesystem.
+01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+01818 Buffer I/O error on dev dm-0, logical block 3670000, async page read
+01818 EXT4-fs (dm-0): unmounting filesystem.
+01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+01818 EXT4-fs (dm-0): unmounting filesystem.
+01818 general protection fault, probably for non-canonical address 0xdead000000000122: 0000 [#1] PREEMPT SMP NOPTI
+01818 CPU: 0 PID: 1579117 Comm: dmsetup Kdump: loaded Not tainted 5.18.0-11049-g1dec3d7fd0c3-dirty #262
+01818 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+01818 RIP: 0010:__cpuhp_state_remove_instance+0xf0/0x1b0
+01818 Code: a0 f8 d7 81 42 3b 1c 28 7f d9 4c 89 e1 31 d2 89 de 89 7d dc e8 01 fd ff ff 8b 7d dc eb c5 49 8b 04 24 49 8b 54 24 08 48 85 c0 <48> 89 02 74 04 48 89 50 08 48 b8 00 01 00 00 00 00 ad de 48 c7 c7
+01818 RSP: 0018:ffff888101fcfc60 EFLAGS: 00010286
+01818 RAX: dead000000000100 RBX: 0000000000000017 RCX: 0000000000000000
+01818 RDX: dead000000000122 RSI: ffff8881233b0ae8 RDI: ffffffff81e3b080
+01818 RBP: ffff888101fcfc88 R08: 0000000000000008 R09: 0000000000000003
+01818 R10: 0000000000000000 R11: 00000000002dc6c0 R12: ffff8881233b0ae8
+01818 R13: 0000000000000000 R14: ffffffff81e38f58 R15: ffff88817b5a3c00
+01818 FS:  00007ff56daec280(0000) GS:ffff888275800000(0000) knlGS:0000000000000000
+01818 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+01818 CR2: 00005591ad94f198 CR3: 000000017b5a0004 CR4: 0000000000770eb0
+01818 PKRU: 55555554
+01818 Call Trace:
+01818  <TASK>
+01818  ? kfree+0x66/0x250
+01818  bioset_exit+0x32/0x210
+01818  cleanup_mapped_device+0x34/0xf0
+01818  __dm_destroy+0x149/0x1f0
+01818  ? table_clear+0xc0/0xc0
+01818  dm_destroy+0xe/0x10
+01818  dev_remove+0xd9/0x120
+01818  ctl_ioctl+0x1cb/0x420
+01818  dm_ctl_ioctl+0x9/0x10
+01818  __x64_sys_ioctl+0x89/0xb0
+01818  do_syscall_64+0x35/0x80
+01818  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+01818 RIP: 0033:0x7ff56de3b397
+01818 Code: 3c 1c e8 1c ff ff ff 85 c0 79 87 49 c7 c4 ff ff ff ff 5b 5d 4c 89 e0 41 5c c3 66 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a9 da 0d 00 f7 d8 64 89 01 48
+01818 RSP: 002b:00007ffe55367ef8 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
+01818 RAX: ffffffffffffffda RBX: 00007ff56df31a8e RCX: 00007ff56de3b397
+01818 RDX: 000055daad7cab30 RSI: 00000000c138fd04 RDI: 0000000000000003
+01818 RBP: 00007ffe55367fb0 R08: 00007ff56df81558 R09: 00007ffe55367d60
+01818 R10: 00007ff56df808a2 R11: 0000000000000206 R12: 00007ff56df808a2
+01818 R13: 00007ff56df808a2 R14: 00007ff56df808a2 R15: 00007ff56df808a2
+01818  </TASK>
+01818 Modules linked in: crct10dif_generic crct10dif_common [last unloaded: crc_t10dif]
 
