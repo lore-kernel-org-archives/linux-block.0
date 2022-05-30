@@ -2,98 +2,71 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F53FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 06:42:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD5DC433F5
+	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 07:07:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230084AbiE3Gl6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 May 2022 02:41:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50392 "EHLO
+        id S233291AbiE3HHM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 May 2022 03:07:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231516AbiE3Gl6 (ORCPT
+        with ESMTP id S233294AbiE3HHL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 May 2022 02:41:58 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D53A92E6B1;
-        Sun, 29 May 2022 23:41:56 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id e66so9325955pgc.8;
-        Sun, 29 May 2022 23:41:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=gHi7sfDkWSGQyFcI8BoQxzCXchHKCpyPbiqXNicxgx0=;
-        b=NlMYSwV0KMtZs43xH1LoNZ7eAhM1aR7OXBiZZe9Rl5ZSoUI1YHvBlnSZkpSv084jq+
-         rzwXZKf++77ANXoArZm/N9Fzp/AgmvWx6lYgA03OUEVmVM5qaHRAWX3bOPpVLmrrvh6B
-         iz0VVYEXKgzBp2oVOlWt1ntwJP2SB97nTfu21gVgNRoHpEj1zmUU5XJbiNz6wbUJCu4+
-         mpaDq3mG5M5e4wf8bbrnBCA1C3hsyn2lHtHf9qu8MFYQA+WAN/ktFnpgFboj2H2raDuG
-         wWiWvD3RrQ0iKqqROlyNJ5LILa9fqTZK59GlcGy39hs1o5IPaphDpntK8zU4WAEyAfpy
-         Kz8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=gHi7sfDkWSGQyFcI8BoQxzCXchHKCpyPbiqXNicxgx0=;
-        b=PHwYRagFZ9mRPyhXr/4Bw9pVIlOY5/tvhgCgFPkYzCwLz6aEjRlx4x+VNN7FfTB6ve
-         xw9bw+dnCihY59qDjV7w1jT0ugZd/7gS2dqs6b9Jo6uXo9nBDN6RQ5S0ms2M2WfgRIBH
-         V5J0CiFrnXIVuYqaIgWYmuZE4xWuF6UTdcC6rqtvupX+QdzMxuYbIpDQ7fy4KGr2+U1d
-         oeqxk8H1fns+V+pGHjX6n2ysh8I9QKbde9+mhFFneKw3Vjej6aGcLzwg3mThDb9nJm4U
-         9onWN8ZqDO3CtCqUdgGIJ77eYa/9FTdqSiEJ6n9nXvHY30xLLdNAmAkxpEK6vJ4TxWeF
-         1GSg==
-X-Gm-Message-State: AOAM533glIClplPPoXY8sn1K4bfszh5DldEUXRiae/SIpYMi62gHus08
-        DxzlVWKOijI+v+uDvUBXSxlH91S0HZ0n3OaLvyw=
-X-Google-Smtp-Source: ABdhPJyadpwvJ7jgcamhg2q6er/pQIzVTSfVslfbaApzXRkF7vvYeE4LW9LBeT7ePXNjyX0RkLWNsQ==
-X-Received: by 2002:a63:de01:0:b0:3fa:1a35:36e0 with SMTP id f1-20020a63de01000000b003fa1a3536e0mr34132357pgg.92.1653892916390;
-        Sun, 29 May 2022 23:41:56 -0700 (PDT)
-Received: from localhost.localdomain ([43.132.141.3])
-        by smtp.gmail.com with ESMTPSA id bb4-20020a170902bc8400b0015e8d4eb2d8sm8168569plb.290.2022.05.29.23.41.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 May 2022 23:41:56 -0700 (PDT)
-From:   iamhswang@gmail.com
-X-Google-Original-From: haisuwang@tencent.com
-To:     axboe@kernel.dk
-Cc:     zhangwensheng5@huawei.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Haisu Wang <haisuwang@tencent.com>,
-        samuelliao <samuelliao@tencent.com>
-Subject: [PATCH] blk-mq: do not update io_ticks with passthrough requests
-Date:   Mon, 30 May 2022 14:40:59 +0800
-Message-Id: <20220530064059.1120058-1-haisuwang@tencent.com>
-X-Mailer: git-send-email 2.27.0
+        Mon, 30 May 2022 03:07:11 -0400
+Received: from jabberwock.ucw.cz (jabberwock.ucw.cz [46.255.230.98])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA0DF62E7;
+        Mon, 30 May 2022 00:07:02 -0700 (PDT)
+Received: by jabberwock.ucw.cz (Postfix, from userid 1017)
+        id 7C4DF1C0B8A; Mon, 30 May 2022 09:07:01 +0200 (CEST)
+Date:   Mon, 30 May 2022 09:07:00 +0200
+From:   Pavel Machek <pavel@ucw.cz>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: [RFC PATCH] ubd: add io_uring based userspace block driver
+Message-ID: <20220530070700.GF1363@bug>
+References: <20220509092312.254354-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220509092312.254354-1-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.23 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Haisu Wang <haisuwang@tencent.com>
+Hi!
 
-Flush or passthrough requests are not accounted as normal IO in completion.
-To reflect iostat for slow IO, io_ticks is updated when stat show called
-based on inflight numbers.
-It may cause inconsistent io_ticks calculation result.
+> This is the driver part of userspace block driver(ubd driver), the other
+> part is userspace daemon part(ubdsrv)[1].
 
-So do not account non-passthrough request when check inflight.
+> @@ -0,0 +1,1193 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * Userspace block device - block device which IO is handled from userspace
+> + *
+> + * Take full use of io_uring passthrough command for communicating with
+> + * ubd userspace daemon(ubdsrvd) for handling basic IO request.
 
-Fixes: 86d7331299fd ("block: update io_ticks when io hang")
-Signed-off-by: Haisu Wang <haisuwang@tencent.com>
-Reviewed-by: samuelliao <samuelliao@tencent.com>
----
- block/blk-mq.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> +
+> +static inline unsigned int ubd_req_build_flags(struct request *req)
+> +{
+...
+> +	if (req->cmd_flags & REQ_SWAP)
+> +		flags |= UBD_IO_F_SWAP;
+> +
+> +	return flags;
+> +}
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index ae116b755648..3912cae42da3 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -133,7 +133,8 @@ static bool blk_mq_check_inflight(struct request *rq, void *priv,
- {
- 	struct mq_inflight *mi = priv;
- 
--	if ((!mi->part->bd_partno || rq->part == mi->part) &&
-+	if (rq->part && blk_do_io_stat(rq) &&
-+	    (!mi->part->bd_partno || rq->part == mi->part) &&
- 	    blk_mq_rq_state(rq) == MQ_RQ_IN_FLIGHT)
- 		mi->inflight[rq_data_dir(rq)]++;
- 
--- 
-2.27.0
+Does it work? How do you guarantee operation will be deadlock-free with swapping and
+writebacks going on?
 
+What are restriction on ubdsrv? What happens when it needs to allocate memory, or is
+swapped out?
+
+Have mm people seen this?
+
+Best regards,
+										Pavel
