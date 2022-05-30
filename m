@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A0A8C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 14:13:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681AEC4332F
+	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 14:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239075AbiE3ONL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 May 2022 10:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47440 "EHLO
+        id S240662AbiE3OWY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 May 2022 10:22:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40312 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240489AbiE3OMI (ORCPT
+        with ESMTP id S241410AbiE3ORe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 May 2022 10:12:08 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99452E15F3;
-        Mon, 30 May 2022 06:43:01 -0700 (PDT)
+        Mon, 30 May 2022 10:17:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 308269C2DA;
+        Mon, 30 May 2022 06:46:26 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 475BEB80DA7;
-        Mon, 30 May 2022 13:42:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5DABC3411A;
-        Mon, 30 May 2022 13:42:56 +0000 (UTC)
+        by ams.source.kernel.org (Postfix) with ESMTPS id D6B4CB80DAC;
+        Mon, 30 May 2022 13:46:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7C59C341C0;
+        Mon, 30 May 2022 13:46:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653918178;
-        bh=bnrcRjMfckQxsM84Kybl6SlPqIVCfrWLK493AIts6sk=;
+        s=k20201202; t=1653918383;
+        bh=1zEFXMbvXcZkAgqY5Nud7gU+5hyXg2RAGsbNg8AZIwo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=f5iZYFPr5UknKz5wqn8vTEBY68qdItMErhDqHtaH+258IHmbJ6SQqH7bGIO3b6u33
-         YXGxa5xhr8mZVuDpfUB2plYuB3Dqxk1ppVZ9xxfpBF/sX1BELTn5V+ugBSObE3oBXs
-         nnbiAH3M979YmsILs7OoFrADcn3DoiERgNmh9RWbI9DyZS2IGbvYXaYDJzzrRnjQSh
-         q16kmoRDfuGsDUW0dKwEupEz8mcI1lPbFFjSvyXNWNWMsVIQPGySLDHFBuZD8JnHzC
-         HoUY9PaJd3guRpNNSA9FAZWlpHlfkmB5q57RrVUcatCZn4Bo8kfLPgdXpVQAFETQ5z
-         L3/oLQ0mlcCPw==
+        b=erSvUQnFnJFzs4UN8IGKZhXhh28GkqkYq14Ca0N5M4gW1ahHCkrzDYnQc6jgYrDic
+         eZUjf1e3LcFHXcxCRpLogE1zLqCt98I3cZEu4U6+zzbmTh3Nx9U1uuPaiLi4+ohqm0
+         hcjwfocfAuJwuUIB9joV5emL0TQOmbeOPJHWyKU1sWV3pAugvBO7gyKqfYWjMH3fiv
+         7ERFDFXBX+MLlsK+SGzyQIgP5vnJix0TqR+3nsFuQgk2wbp+GtfIiNGmdfLkw2lnGR
+         /fq+81Ofs1JLtuR9I+WLJfhiX1nREHvdRUlF471APdfGUUGjBg+zg4vumxHCd0v6tQ
+         i0lpICNTGv6BA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xie Yongji <xieyongji@bytedance.com>,
@@ -39,12 +39,12 @@ Cc:     Xie Yongji <xieyongji@bytedance.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.15 087/109] nbd: Fix hung on disconnect request if socket is closed before
-Date:   Mon, 30 May 2022 09:38:03 -0400
-Message-Id: <20220530133825.1933431-87-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 62/76] nbd: Fix hung on disconnect request if socket is closed before
+Date:   Mon, 30 May 2022 09:43:52 -0400
+Message-Id: <20220530134406.1934928-62-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220530133825.1933431-1-sashal@kernel.org>
-References: <20220530133825.1933431-1-sashal@kernel.org>
+In-Reply-To: <20220530134406.1934928-1-sashal@kernel.org>
+References: <20220530134406.1934928-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -77,10 +77,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 582b23befb5c..8704212482e5 100644
+index 59c452fff835..ecde800ba210 100644
 --- a/drivers/block/nbd.c
 +++ b/drivers/block/nbd.c
-@@ -896,11 +896,15 @@ static int wait_for_reconnect(struct nbd_device *nbd)
+@@ -880,11 +880,15 @@ static int wait_for_reconnect(struct nbd_device *nbd)
  	struct nbd_config *config = nbd->config;
  	if (!config->dead_conn_timeout)
  		return 0;
@@ -100,14 +100,14 @@ index 582b23befb5c..8704212482e5 100644
  }
  
  static int nbd_handle_cmd(struct nbd_cmd *cmd, int index)
-@@ -2026,6 +2030,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
+@@ -2029,6 +2033,7 @@ static void nbd_disconnect_and_put(struct nbd_device *nbd)
  	mutex_lock(&nbd->config_lock);
  	nbd_disconnect(nbd);
  	sock_shutdown(nbd);
 +	wake_up(&nbd->config->conn_wait);
  	/*
- 	 * Make sure recv thread has finished, we can safely call nbd_clear_que()
- 	 * to cancel the inflight I/Os.
+ 	 * Make sure recv thread has finished, so it does not drop the last
+ 	 * config ref and try to destroy the workqueue from inside the work
 -- 
 2.35.1
 
