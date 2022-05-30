@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22EB6C4332F
-	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 13:38:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 960AAC38A2B
+	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 13:53:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237809AbiE3Niv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 30 May 2022 09:38:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56334 "EHLO
+        id S238446AbiE3Nwz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 May 2022 09:52:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34854 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237468AbiE3Ngr (ORCPT
+        with ESMTP id S238225AbiE3Nv5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 30 May 2022 09:36:47 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E682ADF0E;
-        Mon, 30 May 2022 06:30:17 -0700 (PDT)
+        Mon, 30 May 2022 09:51:57 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49A7F75239;
+        Mon, 30 May 2022 06:36:59 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id D8289B80DA8;
-        Mon, 30 May 2022 13:30:13 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F3EEC36AE3;
-        Mon, 30 May 2022 13:30:11 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 310EF60F95;
+        Mon, 30 May 2022 13:36:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81499C385B8;
+        Mon, 30 May 2022 13:36:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1653917412;
+        s=k20201202; t=1653917817;
         bh=y3bhC0rUOrF3icDOfUWiGnm7BKnScQLuWa8qmBsViaY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=gS7JqJPDuop2TRgoVTntfUNVRJuqIWlK2hxboYk/LN8/FpLf1yiRp28HbmXwRh0zE
-         OJmh6Y3sHzxi45eqQ6ZhRVC9mCYZW32XQQNNo+2NSLKrf8iT9PH6ePvSstvKbbLwNf
-         wL6EUtTMmJsTvOaz9pRQwqOOrBknQ5JrWu7DtDHBMHTm0m/VItx3YonwvPkjKAcWcw
-         zJtZGGDSLjGRGIhGmTiHYaeT8hFXZg9qC70e1TOdxeZajeMRLeXnC5rC32jNCsKKiR
-         t1zfM4FQB82dqgBMPaoVnjOFhYUPHuajGv/fflaLucobRtH9iMNg+wmNqCFXcop92Y
-         C4rDcZvWQ8Qvw==
+        b=BNTkZ6/Dobl4kgV5CORwDdm9WPkSS0+dQe6FaDzIpm1aXiUxE7CTJuJhWOOK+0ga0
+         +NQOkrE9vLV0lH5C98FGbMSEXgkRwhjkVphTxbMZbrF3277AsZWAR1OXTYBWLv6Mug
+         r/rDI6a934fdzIVkIurrTngMBei0MnxUltM8Sgx0oVwmpJukg0JIeH3P43A14BCRrM
+         hPmGatF82v+IDxu5P2lnmSC+vEKjFKZB6B3Q9iBkh1LBhJ/W9+Cc4yPpdPm8eHM3MU
+         hF/le2dD7JMx/52+PJns0pSJazm98yWZzqRGOFC36dF08Qz6B6gQDUPPGOfKkh/CpR
+         9T4BkHdt+d5YQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Xie Yongji <xieyongji@bytedance.com>,
@@ -39,12 +39,12 @@ Cc:     Xie Yongji <xieyongji@bytedance.com>,
         Josef Bacik <josef@toxicpanda.com>,
         Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
         linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 5.18 128/159] nbd: Fix hung on disconnect request if socket is closed before
-Date:   Mon, 30 May 2022 09:23:53 -0400
-Message-Id: <20220530132425.1929512-128-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.17 107/135] nbd: Fix hung on disconnect request if socket is closed before
+Date:   Mon, 30 May 2022 09:31:05 -0400
+Message-Id: <20220530133133.1931716-107-sashal@kernel.org>
 X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220530132425.1929512-1-sashal@kernel.org>
-References: <20220530132425.1929512-1-sashal@kernel.org>
+In-Reply-To: <20220530133133.1931716-1-sashal@kernel.org>
+References: <20220530133133.1931716-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
