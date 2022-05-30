@@ -2,141 +2,327 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 498C7C433F5
-	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 03:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8D2C433F5
+	for <linux-block@archiver.kernel.org>; Mon, 30 May 2022 05:00:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232350AbiE3DV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 29 May 2022 23:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55030 "EHLO
+        id S232478AbiE3FAV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 30 May 2022 01:00:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54188 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232348AbiE3DVY (ORCPT
+        with ESMTP id S231517AbiE3FAU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 29 May 2022 23:21:24 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C8CE57B09
-        for <linux-block@vger.kernel.org>; Sun, 29 May 2022 20:21:21 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id t2so1565888pld.4
-        for <linux-block@vger.kernel.org>; Sun, 29 May 2022 20:21:21 -0700 (PDT)
+        Mon, 30 May 2022 01:00:20 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DF447093F
+        for <linux-block@vger.kernel.org>; Sun, 29 May 2022 22:00:18 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id f34so4141506ybj.6
+        for <linux-block@vger.kernel.org>; Sun, 29 May 2022 22:00:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=oKTxyqHKV6Y4Q04nTfwFIxPEKKD5FrMOG1VemYyqUD0=;
-        b=acCkzLQ/S/obsEI7AFkSJHJ616FCDG1yKoM1lpRHNClhdVTcnuYB2a0kF0OzCPxs30
-         jL9ARmC6vn3hnj/a7cH8zoRs1e4wTUJPF/yiQyiBFSM2qvNeMbyppXY6CpfHMaOJeyLx
-         GOUHR1CeL26nGasw8SdWmC/1xHJNq2kfE74dXmeHCYDCD7dwBUeNnryfmL0FQkDmvnJy
-         4jHRES8g/dFtZ5/TxbIeGX1JHwYaxsGOvqu5d0aeve0s72Cy/DFs8++PJfRp58+6LFqu
-         t3AMV98NvWwUmq5kg+gB9iKgIHWQrO/gHuSx5N7IaWm78fS7gzyIa/5SB8wI4JH1M4jh
-         HWPQ==
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=S+03JWP8LqFizkdu8BAr30l+13Hx2X9LWKbjZC6DUoo=;
+        b=lw4v6BmxbvzBFhrCE0UETLXyDdPq0f4xwoieXuRfzg4qhI+w8B7o1IohItK3JzWvDu
+         lNLGsH36sgnQkJsJuhpN2oo4wrlJeKff8KpxwxnItQQrZlfErA8j8dX1NsE0mn7P4zca
+         hjH4QVDEf4cjeXCla+S7g+OtvPd+WIBvWalufpHVA7BN3ru0V8icIhHV1yCp4zvZh5LI
+         LgDThkR3HKwwh438shwHrAJmDYIetcHR4u3scAdWu+tJNicj1U66MIzdCJqtWhvSyz4O
+         5PxiJEAU3ApOLX5H3FoYQOmqpkOXQdYLys3ZESIUgSkv4AlDmyWRku5bd6YnlAXqXC/Q
+         3qOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=oKTxyqHKV6Y4Q04nTfwFIxPEKKD5FrMOG1VemYyqUD0=;
-        b=M6+QeBJmnMZEW+DDEzXYKIUTG40IRvB1HgNtPXY3RBRZownsp5EfyecB+MhPcMwSg9
-         uSeQLOuVMCA9Tx9XiZnQ6YENkSp6zxHn2Ps8Zxgxp977kW1btkDu+43tGQ7ou+NMBEDe
-         j8pk6zzQ6k64/xeZgyroGRVBOak/qYw8sP6nYA2Ng46kE57nBjzyb/5UnVZr8M4kCrRR
-         7abEjLjOmExFWNxXqhREYZHlSgo4hDtya2koYW2ycMxrYEkg2V12gPW0t1C+v94EULu1
-         mBTUINsMjeCSKqFYVVc0mD4Ag7LqkL/3OFRPVO8bPv1fq9laHLw4GBbZs9j6Fk1l2jft
-         7M3g==
-X-Gm-Message-State: AOAM530N39jBpIthLoeKza6lmN4oh6WreLDZKoGGV5UX/jPUW9nwHgGI
-        KN5EESQIP141lG9mPcpxG/mJYZd4yo6AbQ==
-X-Google-Smtp-Source: ABdhPJzSofslggTbJcruV7Fpclh+BpIX3CLebNGEtIss8t8A2kPfhu+aeyuPXc3VC0fdAszRmSiVlg==
-X-Received: by 2002:a17:902:da84:b0:161:d2d2:184d with SMTP id j4-20020a170902da8400b00161d2d2184dmr54956194plx.81.1653880880505;
-        Sun, 29 May 2022 20:21:20 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id t189-20020a6281c6000000b005187c4d53c9sm7578340pfd.160.2022.05.29.20.21.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 May 2022 20:21:19 -0700 (PDT)
-Message-ID: <b8400bfc-c47e-2791-6f73-c6f174e8736d@kernel.dk>
-Date:   Sun, 29 May 2022 21:21:18 -0600
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=S+03JWP8LqFizkdu8BAr30l+13Hx2X9LWKbjZC6DUoo=;
+        b=6X2a048XwOs59eXL/WQOCTlH2n8N26V11qJyutMuXRx77xRxjDXusJ+aeuMm4Hk4h1
+         qvNaT5vJIqO9vlX2J/GOutcYi2ZTdENAaADujvBqVsmBU2FMKRZ2amuXzDXREkirJaWy
+         pfJKIGElFOtv3wDxrox4LfNK1F+96mP77M4a7fFB33tWL0Vx9YrufjB9+5/AsPNRPWZW
+         kVMx3LmVOVEJegt0ZmEquyAWF93qLbo/Lb0wN7/qf1jbBR/Y+ZlJroZJnzyAWOESOnIm
+         t0ZRr+939HGHqmKxeLJ9xYEfkJtZj+9Qh+kQembdhBS1vq3xM8wsMI4wfVA4pUtC647x
+         mhdA==
+X-Gm-Message-State: AOAM531yb0E6MWTns5pc/sImY+nTmIMjNJK05kkL65pS+JGyWAGxCKc9
+        WMFE/R1ugJG2fDJ23tUxCUzosecrNSWLCvIX9YgbTA==
+X-Google-Smtp-Source: ABdhPJwPRUUf5U1aqUPaZTY1gOwSQ19UWn0xveiElXnhR3CF6ZITgEcqC+Ddb+k6yigJAG+0/KxPFQs9KDfrzOte1r4=
+X-Received: by 2002:a25:8d83:0:b0:65c:e76f:a4d7 with SMTP id
+ o3-20020a258d83000000b0065ce76fa4d7mr2684932ybl.80.1653886817303; Sun, 29 May
+ 2022 22:00:17 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH -next] block: fix use-after-free in
- __cpuhp_state_remove_instance
-Content-Language: en-US
-To:     Ye Bin <yebin10@huawei.com>, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc:     ming.lei@redhat.com
-References: <20220530024729.2621465-1-yebin10@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220530024729.2621465-1-yebin10@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <YogsiMCDupNUhMgL@dev-fedora.thelio-3990X> <CAGETcx-JyWwoGA3o8eep7E29Cm4DcVT6D1JFJh72jLcqm_mjCQ@mail.gmail.com>
+ <Youleo3Ganxbc1sq@dev-arch.thelio-3990X> <CAGETcx-sL08h2toEyxY6ztc6xNuJiPok6iDEeuJ1mOA3nvE+vA@mail.gmail.com>
+ <YowHNo4sBjr9ijZr@dev-arch.thelio-3990X> <CAGETcx91_WgpmwEA7mBSvUdyJV0a8ymfaNKTmXq=mAJYAjzq1A@mail.gmail.com>
+ <Yo0KyWx+3oX3cMCS@linutronix.de> <CAGETcx_qTLwbjzMruLThLYV+MZD5W2Ox-QwLFQeW=eQgxzq-Hw@mail.gmail.com>
+ <Yo3WvGnNk3LvLb7R@linutronix.de> <CAGETcx84ja_w_=vXKDOZnM8EVEcuAg1tX9Kqy57PTkDb1=H4FA@mail.gmail.com>
+ <YpMv/QRaY/KV0oxY@x1-carbon>
+In-Reply-To: <YpMv/QRaY/KV0oxY@x1-carbon>
+From:   Saravana Kannan <saravanak@google.com>
+Date:   Sun, 29 May 2022 21:59:41 -0700
+Message-ID: <CAGETcx8+fQsouyg64Af_rdtezAOB6s_Yj2rOG36BwceCDVjYrQ@mail.gmail.com>
+Subject: Re: [PATCH v1] driver core: Extend deferred probe timeout on driver registration
+To:     Niklas Cassel <Niklas.Cassel@wdc.com>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+        Nathan Chancellor <nathan@kernel.org>,
+        Jonathan Corbet <corbet@lwn.net>,
+        "Rafael J. Wysocki" <rafael@kernel.org>,
+        "Rafael J. Wysocki" <rjw@rjwysocki.net>,
+        Rob Herring <robh@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Will Deacon <will@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Kevin Hilman <khilman@kernel.org>,
+        Thierry Reding <treding@nvidia.com>,
+        Mark Brown <broonie@kernel.org>, Pavel Machek <pavel@ucw.cz>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+        Paul Kocialkowski <paul.kocialkowski@bootlin.com>,
+        "linux-gpio@vger.kernel.org" <linux-gpio@vger.kernel.org>,
+        "linux-pm@vger.kernel.org" <linux-pm@vger.kernel.org>,
+        "iommu@lists.linux-foundation.org" <iommu@lists.linux-foundation.org>,
+        "kernel-team@android.com" <kernel-team@android.com>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+        John Stultz <jstultz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/29/22 8:47 PM, Ye Bin wrote:
-> We got issue when remove device mapper as follows:
-> dmsetup create test --table "0 1048576 linear /dev/sda 0"
-> dmsetup suspend --nolockfs test
-> dmsetup load test --table "0 1048576 error /dev/sda 0"
-> dmsetup resume test
-> dmsetup suspend --nolockfs test
-> dmsetup load test --table "0 1048576 linear /dev/sda 0"
-> dmsetup resume test
-> dmsetup remove test
-> ==================================================================
-> BUG: KASAN: wild-memory-access in __cpuhp_state_remove_instance+0x1ea/0x310
-> Write of size 8 at addr dead000000000122 by task dmsetup/1969
-> 
-> CPU: 1 PID: 1969 Comm: dmsetup Not tainted 5.18.0-next-20220524 #225
-> Call Trace:
->  <TASK>
->  dump_stack_lvl+0x6e/0x91
->  print_report.cold+0x494/0x6b7
->  kasan_report+0xa9/0x120
->  __cpuhp_state_remove_instance+0x1ea/0x310
->  bioset_exit+0x45/0x2e0
->  cleanup_mapped_device+0x4f/0x190
->  __dm_destroy+0x230/0x3c0
->  dev_remove+0x18b/0x1d0
->  ctl_ioctl+0x3d8/0x7c0
->  dm_ctl_ioctl+0x21/0x30
->  __x64_sys_ioctl+0x12c/0x170
->  do_syscall_64+0x3b/0x90
->  entry_SYSCALL_64_after_hwframe+0x46/0xb0
-> RIP: 0033:0x7f0d9aa7a8d7
-> RSP: 002b:00007fff1ecedce8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00007f0d9ad5ff50 RCX: 00007f0d9aa7a8d7
-> RDX: 000055c98c17d130 RSI: 00000000c138fd04 RDI: 0000000000000003
-> RBP: 00007f0d9ad9a503 R08: 00007f0d9ad9b040 R09: 00007fff1ecedc10
-> R10: 0000000000000006 R11: 0000000000000246 R12: 000055c98c17d130
-> R13: 00007f0d9ad9a503 R14: 000055c98c17d050 R15: 00007f0d9ad9a503
-> ==================================================================
-> 
-> As load different table may lead to bioset flag changes. But bio_alloc_cache_destroy
-> to free cache depends on if cache is NULL, and also this after free cache didn't
-> set 'bs->cache' NULL. So this will lead to UAF.
-> To solve above issue just set ''bs->cache' NULL after free cache.
-> 
-> Fixes: be4d234d7aeb("bio: add allocation cache abstraction")
-> Signed-off-by: Ye Bin <yebin10@huawei.com>
-> ---
->  block/bio.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/block/bio.c b/block/bio.c
-> index a3893d80dccc..be3937b84e68 100644
-> --- a/block/bio.c
-> +++ b/block/bio.c
-> @@ -722,6 +722,7 @@ static void bio_alloc_cache_destroy(struct bio_set *bs)
->  		bio_alloc_cache_prune(cache, -1U);
->  	}
->  	free_percpu(bs->cache);
-> +	bs->cache = NULL;
->  }
->  
->  /**
+On Sun, May 29, 2022 at 1:34 AM 'Niklas Cassel' via kernel-team
+<kernel-team@android.com> wrote:
+>
+> On Wed, May 25, 2022 at 12:49:00PM -0700, Saravana Kannan wrote:
+> > On Wed, May 25, 2022 at 12:12 AM Sebastian Andrzej Siewior
+> > <bigeasy@linutronix.de> wrote:
+> > >
+> > > On 2022-05-24 10:46:49 [-0700], Saravana Kannan wrote:
+> > > > > Removing probe_timeout_waitqueue (as suggested) or setting the ti=
+meout
+> > > > > to 0 avoids the delay.
+> > > >
+> > > > In your case, I think it might be working as intended? Curious, wha=
+t
+> > > > was the call stack in your case where it was blocked?
+> > >
+> > > Why is then there 10sec delay during boot? The backtrace is
+> > > |------------[ cut here ]------------
+> > > |WARNING: CPU: 4 PID: 1 at drivers/base/dd.c:742 wait_for_device_prob=
+e+0x30/0x110
+> > > |Modules linked in:
+> > > |CPU: 4 PID: 1 Comm: swapper/0 Not tainted 5.18.0-rc5+ #154
+> > > |RIP: 0010:wait_for_device_probe+0x30/0x110
+> > > |Call Trace:
+> > > | <TASK>
+> > > | prepare_namespace+0x2b/0x160
+> > > | kernel_init_freeable+0x2b3/0x2dd
+> > > | kernel_init+0x11/0x110
+> > > | ret_from_fork+0x22/0x30
+> > > | </TASK>
+> > >
+> > > Looking closer, it can't access init. This in particular box boots
+> > > directly the kernel without an initramfs so the kernel later mounts
+> > > /dev/sda1 and everything is good.  So that seems to be the reason=E2=
+=80=A6
+> >
+>
+> Hello there,
+>
+> My (QEMU) boot times were recently extended by 10 seconds.
+> Looking at the timestamps, it looks like nothing is being done for 10 who=
+le
+> seconds.
+>
+> A git bisect landed me at the patch in $subject:
+> 2b28a1a84a0e ("driver core: Extend deferred probe timeout on driver regis=
+tration")
+>
+> Adding a WARN_ON(1) in wait_for_device_probe(), as requested by the patch
+> author from the others seeing a regression with this patch, gives two dif=
+ferent
+> stacktraces during boot:
 
-I already queued this up, just haven't sent it out yet:
+Thanks for the report. My patch was exposing an existing issue. I
+already sent a fix for that a few days ago. Waiting for it to get
+picked up.
 
-https://git.kernel.dk/cgit/linux-block/commit/?h=for-5.19/block&id=605f7415ecfb426610195dd6c7577b30592b3369
+-Saravana
 
-
--- 
-Jens Axboe
-
+>
+> [    0.459633] printk: console [netcon0] enabled
+> [    0.459636] printk: console [netcon0] printing thread started
+> [    0.459637] netconsole: network logging started
+> [    0.459896] cfg80211: Loading compiled-in X.509 certificates for regul=
+atory database
+> [    0.460230] kworker/u8:6 (105) used greatest stack depth: 14744 bytes =
+left
+> [    0.461031] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+> [    0.461077] platform regulatory.0: Direct firmware load for regulatory=
+.db failed with error -2
+> [    0.461085] cfg80211: failed to load regulatory.db
+> [    0.461113] ALSA device list:
+> [    0.461116]   No soundcards found.
+> [    0.461614] ------------[ cut here ]------------
+> [    0.461615] WARNING: CPU: 2 PID: 1 at drivers/base/dd.c:741 wait_for_d=
+evice_probe+0x1a/0x160
+> [    0.485809] Modules linked in:
+> [    0.486089] CPU: 2 PID: 1 Comm: swapper/0 Not tainted 5.18.0-next-2022=
+0526-00004-g74f936013b08-dirty #20
+> [    0.486842] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS r=
+el-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> [    0.487707] RIP: 0010:wait_for_device_probe+0x1a/0x160
+> [    0.488103] Code: 00 e8 fa e4 b5 ff 8b 44 24 04 48 83 c4 08 5b c3 0f 1=
+f 44 00 00 53 48 83 ec 30 65 48 8b 04 25 28 00 00 00 48 89 44 24 28 31 c0 <=
+0f> 0b e8 1f ac 57 00 8b 15 f1 b3 24 01 85 d2 75 3d 48 c7 c7 60 2f
+> [    0.489539] RSP: 0000:ffff9c7900013ed8 EFLAGS: 00010246
+> [    0.489965] RAX: 0000000000000000 RBX: 0000000000000008 RCX: 000000000=
+0000d02
+> [    0.490597] RDX: 0000000000000cc2 RSI: 0000000000000000 RDI: 000000000=
+002e990
+> [    0.491181] RBP: 0000000000000214 R08: 000000000000000f R09: 000000000=
+0000064
+> [    0.491788] R10: ffff9c7900013c6c R11: 0000000000000000 R12: ffff8964c=
+0343640
+> [    0.492384] R13: ffffffff9e51791c R14: 0000000000000000 R15: 000000000=
+0000000
+> [    0.492960] FS:  0000000000000000(0000) GS:ffff896637d00000(0000) knlG=
+S:0000000000000000
+> [    0.493658] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [    0.494501] CR2: 0000000000000000 CR3: 00000001ed20c001 CR4: 000000000=
+0370ee0
+> [    0.495621] Call Trace:
+> [    0.496059]  <TASK>
+> [    0.496266]  ? init_eaccess+0x3b/0x76
+> [    0.496657]  prepare_namespace+0x30/0x16a
+> [    0.497016]  kernel_init_freeable+0x207/0x212
+> [    0.497407]  ? rest_init+0xc0/0xc0
+> [    0.497714]  kernel_init+0x16/0x120
+> [    0.498250]  ret_from_fork+0x1f/0x30
+> [    0.498898]  </TASK>
+> [    0.499307] ---[ end trace 0000000000000000 ]---
+> [    0.748413] ata2: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+> [    0.749053] ata1: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+> [    0.749461] ata2.00: ATA-7: QEMU HARDDISK, version, max UDMA/100
+> [    0.749470] ata2.00: 732 sectors, multi 16: LBA48 NCQ (depth 32)
+> [    0.749479] ata2.00: applying bridge limits
+> [    0.750915] ata4: SATA link down (SStatus 0 SControl 300)
+> [    0.752110] ata5: SATA link down (SStatus 0 SControl 300)
+> [    0.753424] ata6: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+> [    0.754877] ata3: SATA link down (SStatus 0 SControl 300)
+> [    0.755342] ata1.00: ATA-7: QEMU HARDDISK, version, max UDMA/100
+> [    0.755377] ata1.00: 268435456 sectors, multi 16: LBA48 NCQ (depth 32)
+> [    0.755387] ata1.00: applying bridge limits
+> [    0.755486] ata6.00: ATA-7: QEMU HARDDISK, version, max UDMA/100
+> [    0.755492] ata6.00: 8388608 sectors, multi 16: LBA48 NCQ (depth 32)
+> [    0.755500] ata6.00: applying bridge limits
+> [    0.757330] ata1.00: configured for UDMA/100
+> [    0.757441] ata6.00: configured for UDMA/100
+> [    0.757505] ata2.00: configured for UDMA/100
+> [    0.758015] scsi 0:0:0:0: Direct-Access     ATA      QEMU HARDDISK    =
+ion  PQ: 0 ANSI: 5
+> [    0.760542] sd 0:0:0:0: Attached scsi generic sg0 type 0
+> [    0.760669] sd 0:0:0:0: [sda] 268435456 512-byte logical blocks: (137 =
+GB/128 GiB)
+> [    0.760778] sd 0:0:0:0: [sda] Write Protect is off
+> [    0.760787] sd 0:0:0:0: [sda] Mode Sense: 00 3a 00 00
+> [    0.760847] sd 0:0:0:0: [sda] Write cache: enabled, read cache: enable=
+d, doesn't support DPO or FUA
+> [    0.760981] sd 0:0:0:0: [sda] Preferred minimum I/O size 512 bytes
+> [    0.761319] scsi 1:0:0:0: Direct-Access     ATA      QEMU HARDDISK    =
+ion  PQ: 0 ANSI: 5
+> [    0.762808] sd 1:0:0:0: Attached scsi generic sg1 type 0
+> [    0.763004] sd 1:0:0:0: [sdb] 732 512-byte logical blocks: (375 kB/366=
+ KiB)
+> [    0.763649] sd 1:0:0:0: [sdb] Write Protect is off
+> [    0.763661] sd 1:0:0:0: [sdb] Mode Sense: 00 3a 00 00
+> [    0.763965] sd 1:0:0:0: [sdb] Write cache: enabled, read cache: enable=
+d, doesn't support DPO or FUA
+> [    0.764026] sd 1:0:0:0: [sdb] Preferred minimum I/O size 512 bytes
+> [    0.765923] scsi 5:0:0:0: Direct-Access     ATA      QEMU HARDDISK    =
+ion  PQ: 0 ANSI: 5
+> [    0.767987] sd 5:0:0:0: Attached scsi generic sg2 type 0
+> [    0.768626] sd 5:0:0:0: [sdc] 8388608 512-byte logical blocks: (4.29 G=
+B/4.00 GiB)
+> [    0.769909] sd 5:0:0:0: [sdc] Write Protect is off
+> [    0.769920] sd 5:0:0:0: [sdc] Mode Sense: 00 3a 00 00
+> [    0.770515] sd 1:0:0:0: [sdb] Attached SCSI disk
+> [    0.770900] sd 5:0:0:0: [sdc] Write cache: enabled, read cache: enable=
+d, doesn't support DPO or FUA
+> [    0.771782] sd 5:0:0:0: [sdc] Preferred minimum I/O size 512 bytes
+> [    0.773900]  sda: sda1 sda14 sda15
+> [    0.774499] sd 5:0:0:0: [sdc] Attached SCSI disk
+> [    0.774907] sd 0:0:0:0: [sda] Attached SCSI disk
+> [    1.084011] input: ImExPS/2 Generic Explorer Mouse as /devices/platfor=
+m/i8042/serio1/input/input3
+> [   10.887350] md: Waiting for all devices to be available before autodet=
+ect
+> [   10.887395] md: If you don't use raid, use raid=3Dnoautodetect
+> [   10.887445] ------------[ cut here ]------------
+> [   10.887448] WARNING: CPU: 1 PID: 1 at drivers/base/dd.c:741 wait_for_d=
+evice_probe+0x1a/0x160
+> [   10.893987] Modules linked in:
+> [   10.894314] CPU: 1 PID: 1 Comm: swapper/0 Tainted: G        W         =
+5.18.0-next-20220526-00004-g74f936013b08-dirty #20
+> [   10.895389] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS r=
+el-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+> [   10.896590] RIP: 0010:wait_for_device_probe+0x1a/0x160
+> [   10.897215] Code: 00 e8 fa e4 b5 ff 8b 44 24 04 48 83 c4 08 5b c3 0f 1=
+f 44 00 00 53 48 83 ec 30 65 48 8b 04 25 28 00 00 00 48 89 44 24 28 31 c0 <=
+0f> 0b e8 1f ac 57 00 8b 15 f1 b3 24 01 85 d2 75 3d 48 c7 c7 60 2f
+> [   10.899269] RSP: 0000:ffff9c7900013ec8 EFLAGS: 00010246
+> [   10.899762] RAX: 0000000000000000 RBX: 0000000000000008 RCX: 000000000=
+0000000
+> [   10.900424] RDX: 0000000000000000 RSI: ffffffff9d998089 RDI: 00000000f=
+fffffff
+> [   10.901060] RBP: 0000000000000214 R08: 80000000ffffe1ca R09: ffff9c790=
+0013ea8
+> [   10.901839] R10: 3fffffffffffffff R11: 0000000000000000 R12: ffff8964c=
+0343640
+> [   10.902615] R13: ffffffff9e51791c R14: 0000000000000000 R15: 000000000=
+0000000
+> [   10.903371] FS:  0000000000000000(0000) GS:ffff896637c80000(0000) knlG=
+S:0000000000000000
+> [   10.904188] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   10.904721] CR2: 0000000000000000 CR3: 00000001ed20c001 CR4: 000000000=
+0370ee0
+> [   10.905340] Call Trace:
+> [   10.905558]  <TASK>
+> [   10.905739]  md_run_setup+0x3c/0x6a
+> [   10.906036]  prepare_namespace+0x35/0x16a
+> [   10.906391]  kernel_init_freeable+0x207/0x212
+> [   10.906748]  ? rest_init+0xc0/0xc0
+> [   10.907021]  kernel_init+0x16/0x120
+> [   10.907312]  ret_from_fork+0x1f/0x30
+> [   10.907617]  </TASK>
+> [   10.907796] ---[ end trace 0000000000000000 ]---
+> [   10.908159] md: Autodetecting RAID arrays.
+> [   10.908160] md: autorun ...
+> [   10.908160] md: ... autorun DONE.
+> [   10.911301] EXT4-fs (sda1): INFO: recovery required on readonly filesy=
+stem
+> [   10.911303] EXT4-fs (sda1): write access will be enabled during recove=
+ry
+> [   11.038001] EXT4-fs (sda1): orphan cleanup on readonly fs
+> [   11.038466] EXT4-fs (sda1): 2 orphan inodes deleted
+> [   11.038475] EXT4-fs (sda1): recovery complete
+> [   11.053033] EXT4-fs (sda1): mounted filesystem with ordered data mode.=
+ Quota mode: none.
+> [   11.053074] VFS: Mounted root (ext4 filesystem) readonly on device 8:1=
+.
+> [   11.053175] devtmpfs: mounted
+> [   11.061921] Freeing unused kernel image (initmem) memory: 1680K
+> [   11.061930] Write protecting the kernel read-only data: 24576k
+> [   11.071108] Freeing unused kernel image (text/rodata gap) memory: 2032=
+K
+> [   11.073596] Freeing unused kernel image (rodata/data gap) memory: 924K
+> [   11.073609] Run /sbin/init as init process
+>
+>
+> Kind regards,
+> Niklas
+>
+> --
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to kernel-team+unsubscribe@android.com.
+>
