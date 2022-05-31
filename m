@@ -2,130 +2,240 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10B08C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC507C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:22:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345604AbiEaTWI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 15:22:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57396 "EHLO
+        id S1345934AbiEaTWy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 15:22:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33340 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233781AbiEaTWI (ORCPT
+        with ESMTP id S233708AbiEaTWx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 15:22:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 33A7D255BF
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:22:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654024926;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=pNuYhGjHpBJ5mo2/tAgARNCrlXvxHpBtckO9zEZXb9Y=;
-        b=f10m2FcSb3ZSiHEzKuph5MrKKU27rHbYL4BxVRH/EO4Igxv66calNOfGLDTxY6gUoqv7iw
-        pJUEP7vG1DcXfRBNZR5WJzUbed46sFD/T88aqhjGubd9x6iukOYAM2a3eDUI0hEwuDCQPv
-        /rv7ewL1bpDzgosJWRgwzaSJGVp+Yb4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-227-7CscXrHQNl-WyBY-LAfctA-1; Tue, 31 May 2022 15:22:03 -0400
-X-MC-Unique: 7CscXrHQNl-WyBY-LAfctA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B35563C1618E;
-        Tue, 31 May 2022 19:22:02 +0000 (UTC)
-Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 79D9110725;
-        Tue, 31 May 2022 19:22:02 +0000 (UTC)
-Message-ID: <341bbbed-23cc-12f4-d68c-a4e839a97a9f@redhat.com>
-Date:   Tue, 31 May 2022 15:22:02 -0400
+        Tue, 31 May 2022 15:22:53 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7861753728
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:22:52 -0700 (PDT)
+Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VFiJSD020530
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:22:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=IPGZEoZLlJcqR4y6vi40ehjfP/MqoJW85cjDrHKckc4=;
+ b=QYEcrZNf+hVe4oJ1zvfngKNwQmhfUUVb4niGahxQrJ6zIiWxYkwB5rOZfLS8Zc2hOEj8
+ s0KHBRvWUMRKh6iNfg+VZnx7GDBbyteXjq9xeY6G3cxuAq68RHkAe7xOdlMIZOY7WIFe
+ TwKTbssPNx164WOZL8vwcapD7KsDOW70wxY= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3gbguqqxhk-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:22:52 -0700
+Received: from twshared10276.08.ash9.facebook.com (2620:10d:c085:208::f) by
+ mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 31 May 2022 12:22:51 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id F18AD4924B0C; Tue, 31 May 2022 12:11:38 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>
+CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
+        <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
+        <ebiggers@kernel.org>, <pankydev8@gmail.com>,
+        Keith Busch <kbusch@kernel.org>,
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCHv5 02/11] block/bio: remove duplicate append pages code
+Date:   Tue, 31 May 2022 12:11:28 -0700
+Message-ID: <20220531191137.2291467-3-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220531191137.2291467-1-kbusch@fb.com>
+References: <20220531191137.2291467-1-kbusch@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
-From:   Waiman Long <longman@redhat.com>
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220531181821.187834-1-longman@redhat.com>
- <YpZdWNGW1bTGnApp@slm.duckdns.org>
- <70a2763a-f7c4-e161-23e4-33815e76380c@redhat.com>
-In-Reply-To: <70a2763a-f7c4-e161-23e4-33815e76380c@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: fCrl5TQx5WGjPFBS9oTHPQ5IPLBZkRvn
+X-Proofpoint-ORIG-GUID: fCrl5TQx5WGjPFBS9oTHPQ5IPLBZkRvn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-05-31_07,2022-05-30_03,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/22 15:03, Waiman Long wrote:
-> On 5/31/22 14:24, Tejun Heo wrote:
->> Hello, Waiman.
->>
->> On Tue, May 31, 2022 at 02:18:21PM -0400, Waiman Long wrote:
->>> For a system with many CPUs and block devices, the time to do
->>> blkcg_rstat_flush() from cgroup_rstat_flush() can be rather long. It
->>> can be especially problematic as interrupt is disabled during the 
->>> flush.
->>> It was reported that it might take seconds in some extreme cases 
->>> leading
->>> to hard lockup messages.
->>>
->>> As it is likely that not all the percpu blkg_iostat_set's has been
->>> updated since the last flush, those stale blkg_iostat_set's don't need
->>> to be flushed in this case. This patch optimizes blkcg_rstat_flush()
->>> by checking the current sequence number against the one recorded since
->>> the last flush and skip the blkg_iostat_set if the sequence number
->>> hasn't changed. There is a slight chance that it may miss an update
->>> that is being done in parallel, the new update will just have to wait
->>> until the next flush.
->>>
->>> Signed-off-by: Waiman Long <longman@redhat.com>
->>> ---
->>>   block/blk-cgroup.c | 18 +++++++++++++++---
->>>   block/blk-cgroup.h |  1 +
->>>   2 files changed, 16 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->>> index 40161a3f68d0..79b89af61ef2 100644
->>> --- a/block/blk-cgroup.c
->>> +++ b/block/blk-cgroup.c
->>> @@ -864,11 +864,23 @@ static void blkcg_rstat_flush(struct 
->>> cgroup_subsys_state *css, int cpu)
->>>           unsigned long flags;
->>>           unsigned int seq;
->>>   +        seq = u64_stats_fetch_begin(&bisc->sync);
->>> +        /*
->>> +         * If the sequence number hasn't been updated since the last
->>> +         * flush, we can skip this blkg_iostat_set though we may miss
->>> +         * an update that is happening in parallel.
->>> +         */
->>> +        if (seq == bisc->last_seq)
->>> +            continue;
->> Is this a sufficient solution? The code assumes that there aren't too 
->> many
->> blkgs for the cgroup, which can be wrong in some cases. Wouldn't it be
->> better to create a list of updated blkg's per blkcg so that we don't 
->> walk
->> all the dormant ones?
->
-> It is probably not a sufficient solution, but it is simple. The 
-> problem with keeping a list of recently updated blkg's is that 
-> sequence lock does not provide enough synchronization on the read side 
-> to guarantee a race free reset of the list. It may be doable, but I 
-> need to think harder on the best way to do it without too much overhead.
->
-> Thanks,
-> Longman
->
-I think we can use a lockless list to keep a list of recently updated 
-blkg for each blkcg. There is an atomic operation overhead when an entry 
-is added to the list though. I will send an updated patch later today or 
-tomorrow.
+From: Keith Busch <kbusch@kernel.org>
 
-Thanks,
-Longman
+The getting pages setup for zone append and normal IO are identical. Use
+common code for each.
+
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c | 102 ++++++++++++++++++++++------------------------------
+ 1 file changed, 42 insertions(+), 60 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index e249f6414fd5..55d2a9c4e312 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1158,6 +1158,37 @@ static void bio_put_pages(struct page **pages, siz=
+e_t size, size_t off)
+ 		put_page(pages[i]);
+ }
+=20
++static int bio_iov_add_page(struct bio *bio, struct page *page,
++		unsigned int len, unsigned int offset)
++{
++	bool same_page =3D false;
++
++	if (!__bio_try_merge_page(bio, page, len, offset, &same_page)) {
++		if (WARN_ON_ONCE(bio_full(bio, len)))
++			return -EINVAL;
++		__bio_add_page(bio, page, len, offset);
++		return 0;
++	}
++
++	if (same_page)
++		put_page(page);
++	return 0;
++}
++
++static int bio_iov_add_zone_append_page(struct bio *bio, struct page *pa=
+ge,
++		unsigned int len, unsigned int offset)
++{
++	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
++	bool same_page =3D false;
++
++	if (bio_add_hw_page(q, bio, page, len, offset,
++			queue_max_zone_append_sectors(q), &same_page) !=3D len)
++		return -EINVAL;
++	if (same_page)
++		put_page(page);
++	return 0;
++}
++
+ #define PAGE_PTRS_PER_BVEC     (sizeof(struct bio_vec) / sizeof(struct p=
+age *))
+=20
+ /**
+@@ -1176,7 +1207,6 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
+, struct iov_iter *iter)
+ 	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
+ 	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages =3D (struct page **)bv;
+-	bool same_page =3D false;
+ 	ssize_t size, left;
+ 	unsigned len, i;
+ 	size_t offset;
+@@ -1185,7 +1215,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio=
+, struct iov_iter *iter)
+ 	 * Move page array up in the allocated memory for the bio vecs as far a=
+s
+ 	 * possible so that we can start filling biovecs from the beginning
+ 	 * without overwriting the temporary page array.
+-	*/
++	 */
+ 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+ 	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
+=20
+@@ -1195,18 +1225,18 @@ static int __bio_iov_iter_get_pages(struct bio *b=
+io, struct iov_iter *iter)
+=20
+ 	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
+ 		struct page *page =3D pages[i];
++		int ret;
+=20
+ 		len =3D min_t(size_t, PAGE_SIZE - offset, left);
++		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
++			ret =3D bio_iov_add_zone_append_page(bio, page, len,
++					offset);
++		else
++			ret =3D bio_iov_add_page(bio, page, len, offset);
+=20
+-		if (__bio_try_merge_page(bio, page, len, offset, &same_page)) {
+-			if (same_page)
+-				put_page(page);
+-		} else {
+-			if (WARN_ON_ONCE(bio_full(bio, len))) {
+-				bio_put_pages(pages + i, left, offset);
+-				return -EINVAL;
+-			}
+-			__bio_add_page(bio, page, len, offset);
++		if (ret) {
++			bio_put_pages(pages + i, left, offset);
++			return ret;
+ 		}
+ 		offset =3D 0;
+ 	}
+@@ -1215,51 +1245,6 @@ static int __bio_iov_iter_get_pages(struct bio *bi=
+o, struct iov_iter *iter)
+ 	return 0;
+ }
+=20
+-static int __bio_iov_append_get_pages(struct bio *bio, struct iov_iter *=
+iter)
+-{
+-	unsigned short nr_pages =3D bio->bi_max_vecs - bio->bi_vcnt;
+-	unsigned short entries_left =3D bio->bi_max_vecs - bio->bi_vcnt;
+-	struct request_queue *q =3D bdev_get_queue(bio->bi_bdev);
+-	unsigned int max_append_sectors =3D queue_max_zone_append_sectors(q);
+-	struct bio_vec *bv =3D bio->bi_io_vec + bio->bi_vcnt;
+-	struct page **pages =3D (struct page **)bv;
+-	ssize_t size, left;
+-	unsigned len, i;
+-	size_t offset;
+-	int ret =3D 0;
+-
+-	/*
+-	 * Move page array up in the allocated memory for the bio vecs as far a=
+s
+-	 * possible so that we can start filling biovecs from the beginning
+-	 * without overwriting the temporary page array.
+-	 */
+-	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+-	pages +=3D entries_left * (PAGE_PTRS_PER_BVEC - 1);
+-
+-	size =3D iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
+-	if (unlikely(size <=3D 0))
+-		return size ? size : -EFAULT;
+-
+-	for (left =3D size, i =3D 0; left > 0; left -=3D len, i++) {
+-		struct page *page =3D pages[i];
+-		bool same_page =3D false;
+-
+-		len =3D min_t(size_t, PAGE_SIZE - offset, left);
+-		if (bio_add_hw_page(q, bio, page, len, offset,
+-				max_append_sectors, &same_page) !=3D len) {
+-			bio_put_pages(pages + i, left, offset);
+-			ret =3D -EINVAL;
+-			break;
+-		}
+-		if (same_page)
+-			put_page(page);
+-		offset =3D 0;
+-	}
+-
+-	iov_iter_advance(iter, size - left);
+-	return ret;
+-}
+-
+ /**
+  * bio_iov_iter_get_pages - add user or kernel pages to a bio
+  * @bio: bio to add pages to
+@@ -1294,10 +1279,7 @@ int bio_iov_iter_get_pages(struct bio *bio, struct=
+ iov_iter *iter)
+ 	}
+=20
+ 	do {
+-		if (bio_op(bio) =3D=3D REQ_OP_ZONE_APPEND)
+-			ret =3D __bio_iov_append_get_pages(bio, iter);
+-		else
+-			ret =3D __bio_iov_iter_get_pages(bio, iter);
++		ret =3D __bio_iov_iter_get_pages(bio, iter);
+ 	} while (!ret && iov_iter_count(iter) && !bio_full(bio, 0));
+=20
+ 	/* don't account direct I/O as memory stall */
+--=20
+2.30.2
 
