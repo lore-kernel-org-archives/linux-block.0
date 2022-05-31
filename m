@@ -2,89 +2,116 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AD13C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:01:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A35C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347212AbiEaTBK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 15:01:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59800 "EHLO
+        id S234416AbiEaTDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 15:03:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347210AbiEaTBJ (ORCPT
+        with ESMTP id S231464AbiEaTDM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 15:01:09 -0400
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F8A553707
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:01:08 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id f7-20020a1c3807000000b0039c1a10507fso1686861wma.1
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:01:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=mPEfXyjun4aQ6gkwMJLI2I5JtWWH7OC6kUgPVQfKdxQ=;
-        b=A9gDEfvpYgPF0Q7OoWSV+lHxjdl60iuAMiKlY08ShS8VBNz42HXJwgSmk1FPL5UI7P
-         D2ITPA0Z/ju0w4Q5vA8fBy/e8xdKJf4RjxUmeR014elZ9NN6zgBnZ02dqQrXqWdlI/T0
-         yCqNJ4LjwsnrXa9FTa5cH58iIbBruuyQQzJ5lsuvg/+yO/mqr1Y78katz+WKhaPAyruZ
-         7BCgoKuyF3jQk2YlikXN9HeaYrWGavbc6DCGHkuFK+zTSEsr1ssrdnLyVihsxHfdia+b
-         M6L47XFUdbkiv1kBgvN00K/UZCmGrAaSc1bz4PCQQU36lfQ/9+qgix9VDOb1ZrmiFeRy
-         snMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=mPEfXyjun4aQ6gkwMJLI2I5JtWWH7OC6kUgPVQfKdxQ=;
-        b=LkLYPPCEFCLoatIZUdLcK5wH+eM2ow9B5nrQVRSwctO558suZmpTClnzlY+BLlSg6+
-         6j2kKv3Crx8W2i+/Kejk1RgFQz6jEQ2pae2QzxjJ16f6CBecnCAQD4y8SEYSM2c28K37
-         KwxSDirJUuQArTOe9dOJ8shNL2VKdv68FGxkECQwJ2De0l5yHSuXVEcMbCirUos6J1DW
-         5fDWxURYzzyOzA8RI+QztXFTdfkorBqmi0omYbi6abnf3loNQU2Qqg6bQo5UUWr3eHWw
-         dnFZyChvFIyQvErM9pKOfj5VAG3pkvRvasIG1Dyp1F5B12Q1jz/ZXTyIX3bXExm9dVd+
-         6D6w==
-X-Gm-Message-State: AOAM531CXyX52JayNh788rD066Tm1I17wmzSSeAirZNwMMAuwDiNcxyf
-        97xft8A8mWlBJmILCT4CQAaCjw==
-X-Google-Smtp-Source: ABdhPJzh2KbBAMkk8MtAcoVgIZankz5ONM7gsZ/WOxgOKeOITtavXysER/SbpAnFFCwCK4T7DdAZEw==
-X-Received: by 2002:a7b:c445:0:b0:397:28d3:d9cf with SMTP id l5-20020a7bc445000000b0039728d3d9cfmr24896122wmi.116.1654023667085;
-        Tue, 31 May 2022 12:01:07 -0700 (PDT)
-Received: from [10.188.163.71] (cust-east-parth2-46-193-73-98.wb.wifirst.net. [46.193.73.98])
-        by smtp.gmail.com with ESMTPSA id c10-20020adffb4a000000b0021003082534sm14467305wrs.36.2022.05.31.12.01.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 May 2022 12:01:06 -0700 (PDT)
-Message-ID: <f0dadb60-c02d-d569-3004-81eafeebb95f@kernel.dk>
-Date:   Tue, 31 May 2022 13:01:05 -0600
+        Tue, 31 May 2022 15:03:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5AD315AEE3
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:03:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654023790;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=cL2SGtd/DsycKVQbAXVtuQFVW3sDNR72Qll7mqMvf/Y=;
+        b=Lf4P5Cgax08huI/Zph/LRGF+GuV+I0o5UYaB7xSgObIuAq8CfRznGqB9YkDu7EAl+bdhe0
+        yCFY2VJsMTyOqlmT/MvKlw0kjqCI2oh3EzvSpN+LRQx8qgempPhq0DJc3mYqtJcnuMq9x+
+        fAB3HC9Cty1PL4xyP7pPVc3PWUst0U4=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-427-OauRHQbzP7aEHx3VSA0hZQ-1; Tue, 31 May 2022 15:03:09 -0400
+X-MC-Unique: OauRHQbzP7aEHx3VSA0hZQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 890853816843;
+        Tue, 31 May 2022 19:03:08 +0000 (UTC)
+Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 512E45F245;
+        Tue, 31 May 2022 19:03:08 +0000 (UTC)
+Message-ID: <70a2763a-f7c4-e161-23e4-33815e76380c@redhat.com>
+Date:   Tue, 31 May 2022 15:03:08 -0400
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
-Subject: Re: [PATCH] null_blk: add memory_backed module parameter
+Subject: Re: [PATCH] blk-cgroup: Optimize blkcg_rstat_flush()
 Content-Language: en-US
-To:     Vincent Fu <vincent.fu@samsung.com>,
-        linux-block <linux-block@vger.kernel.org>
-Cc:     Akinobu Mita <akinobu.mita@gmail.com>
-References: <CGME20220531185258uscas1p29fc501690df21576af035ef48af16daf@uscas1p2.samsung.com>
- <20220531185231.169102-1-vincent.fu@samsung.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220531185231.169102-1-vincent.fu@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Tejun Heo <tj@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220531181821.187834-1-longman@redhat.com>
+ <YpZdWNGW1bTGnApp@slm.duckdns.org>
+From:   Waiman Long <longman@redhat.com>
+In-Reply-To: <YpZdWNGW1bTGnApp@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/22 12:52 PM, Vincent Fu wrote:
-> Allow the memory_backed option to be set via a module parameter.
-> Currently memory-backed null_blk devices can only be created using
-> configfs. Having a module parameter makes it easier to create these
-> devices.
-> 
-> This patch was originally submitted by Akinobu Mita in 2020 but received
-> no response. I modified the original patch to apply cleanly and reworded
-> the documentation from the original patch.
+On 5/31/22 14:24, Tejun Heo wrote:
+> Hello, Waiman.
+>
+> On Tue, May 31, 2022 at 02:18:21PM -0400, Waiman Long wrote:
+>> For a system with many CPUs and block devices, the time to do
+>> blkcg_rstat_flush() from cgroup_rstat_flush() can be rather long. It
+>> can be especially problematic as interrupt is disabled during the flush.
+>> It was reported that it might take seconds in some extreme cases leading
+>> to hard lockup messages.
+>>
+>> As it is likely that not all the percpu blkg_iostat_set's has been
+>> updated since the last flush, those stale blkg_iostat_set's don't need
+>> to be flushed in this case. This patch optimizes blkcg_rstat_flush()
+>> by checking the current sequence number against the one recorded since
+>> the last flush and skip the blkg_iostat_set if the sequence number
+>> hasn't changed. There is a slight chance that it may miss an update
+>> that is being done in parallel, the new update will just have to wait
+>> until the next flush.
+>>
+>> Signed-off-by: Waiman Long <longman@redhat.com>
+>> ---
+>>   block/blk-cgroup.c | 18 +++++++++++++++---
+>>   block/blk-cgroup.h |  1 +
+>>   2 files changed, 16 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+>> index 40161a3f68d0..79b89af61ef2 100644
+>> --- a/block/blk-cgroup.c
+>> +++ b/block/blk-cgroup.c
+>> @@ -864,11 +864,23 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
+>>   		unsigned long flags;
+>>   		unsigned int seq;
+>>   
+>> +		seq = u64_stats_fetch_begin(&bisc->sync);
+>> +		/*
+>> +		 * If the sequence number hasn't been updated since the last
+>> +		 * flush, we can skip this blkg_iostat_set though we may miss
+>> +		 * an update that is happening in parallel.
+>> +		 */
+>> +		if (seq == bisc->last_seq)
+>> +			continue;
+> Is this a sufficient solution? The code assumes that there aren't too many
+> blkgs for the cgroup, which can be wrong in some cases. Wouldn't it be
+> better to create a list of updated blkg's per blkcg so that we don't walk
+> all the dormant ones?
 
-Ideally we'd have full parity between what can be set at module load
-time and configfs setup, doesn't really make any sense to have them not
-be identical.
+It is probably not a sufficient solution, but it is simple. The problem 
+with keeping a list of recently updated blkg's is that sequence lock 
+does not provide enough synchronization on the read side to guarantee a 
+race free reset of the list. It may be doable, but I need to think 
+harder on the best way to do it without too much overhead.
 
-Patch looks fine to me.
-
--- 
-Jens Axboe
+Thanks,
+Longman
 
