@@ -2,116 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72A35C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA96C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:13:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234416AbiEaTDN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 15:03:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38274 "EHLO
+        id S1346378AbiEaTNv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 15:13:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231464AbiEaTDM (ORCPT
+        with ESMTP id S1346344AbiEaTNu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 15:03:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5AD315AEE3
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:03:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654023790;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=cL2SGtd/DsycKVQbAXVtuQFVW3sDNR72Qll7mqMvf/Y=;
-        b=Lf4P5Cgax08huI/Zph/LRGF+GuV+I0o5UYaB7xSgObIuAq8CfRznGqB9YkDu7EAl+bdhe0
-        yCFY2VJsMTyOqlmT/MvKlw0kjqCI2oh3EzvSpN+LRQx8qgempPhq0DJc3mYqtJcnuMq9x+
-        fAB3HC9Cty1PL4xyP7pPVc3PWUst0U4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-427-OauRHQbzP7aEHx3VSA0hZQ-1; Tue, 31 May 2022 15:03:09 -0400
-X-MC-Unique: OauRHQbzP7aEHx3VSA0hZQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 890853816843;
-        Tue, 31 May 2022 19:03:08 +0000 (UTC)
-Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 512E45F245;
-        Tue, 31 May 2022 19:03:08 +0000 (UTC)
-Message-ID: <70a2763a-f7c4-e161-23e4-33815e76380c@redhat.com>
-Date:   Tue, 31 May 2022 15:03:08 -0400
+        Tue, 31 May 2022 15:13:50 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AE3F674FC
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:13:50 -0700 (PDT)
+Received: from pps.filterd (m0109333.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VFiPpV020101
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:13:50 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=2A9g7lOqg1/RobT9/8ycPm/h1/V/agiJy74TxI+fFok=;
+ b=iVqxCtgBCcI0a/ow8V5LGvAmm8FK1XfIiuAWgM/BlivM7ptaoM08sQ7R/Q7ssloc352k
+ kV0gzZYO21svDya6FhygZrBlSsaPTC/ytVnnfvIxP+ZBr7heYWlPwkmFMgtGDeh666wW
+ QS2DLZHR1M3c7jMmKKUi32fT9Kb9DzDPZj4= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3gbfsj00an-2
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:13:49 -0700
+Received: from twshared26317.07.ash9.facebook.com (2620:10d:c085:208::11) by
+ mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 31 May 2022 12:13:48 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id D306B4924B0B; Tue, 31 May 2022 12:11:38 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>
+CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
+        <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
+        <ebiggers@kernel.org>, <pankydev8@gmail.com>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCHv5 01/11] block: fix infinite loop for invalid zone append
+Date:   Tue, 31 May 2022 12:11:27 -0700
+Message-ID: <20220531191137.2291467-2-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220531191137.2291467-1-kbusch@fb.com>
+References: <20220531191137.2291467-1-kbusch@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220531181821.187834-1-longman@redhat.com>
- <YpZdWNGW1bTGnApp@slm.duckdns.org>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <YpZdWNGW1bTGnApp@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: WO4xLK-r-hHK0znm1N1Wrd7CdKdV0vvE
+X-Proofpoint-ORIG-GUID: WO4xLK-r-hHK0znm1N1Wrd7CdKdV0vvE
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
+ definitions=2022-05-31_07,2022-05-30_03,2022-02-23_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/31/22 14:24, Tejun Heo wrote:
-> Hello, Waiman.
->
-> On Tue, May 31, 2022 at 02:18:21PM -0400, Waiman Long wrote:
->> For a system with many CPUs and block devices, the time to do
->> blkcg_rstat_flush() from cgroup_rstat_flush() can be rather long. It
->> can be especially problematic as interrupt is disabled during the flush.
->> It was reported that it might take seconds in some extreme cases leading
->> to hard lockup messages.
->>
->> As it is likely that not all the percpu blkg_iostat_set's has been
->> updated since the last flush, those stale blkg_iostat_set's don't need
->> to be flushed in this case. This patch optimizes blkcg_rstat_flush()
->> by checking the current sequence number against the one recorded since
->> the last flush and skip the blkg_iostat_set if the sequence number
->> hasn't changed. There is a slight chance that it may miss an update
->> that is being done in parallel, the new update will just have to wait
->> until the next flush.
->>
->> Signed-off-by: Waiman Long <longman@redhat.com>
->> ---
->>   block/blk-cgroup.c | 18 +++++++++++++++---
->>   block/blk-cgroup.h |  1 +
->>   2 files changed, 16 insertions(+), 3 deletions(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 40161a3f68d0..79b89af61ef2 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -864,11 +864,23 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
->>   		unsigned long flags;
->>   		unsigned int seq;
->>   
->> +		seq = u64_stats_fetch_begin(&bisc->sync);
->> +		/*
->> +		 * If the sequence number hasn't been updated since the last
->> +		 * flush, we can skip this blkg_iostat_set though we may miss
->> +		 * an update that is happening in parallel.
->> +		 */
->> +		if (seq == bisc->last_seq)
->> +			continue;
-> Is this a sufficient solution? The code assumes that there aren't too many
-> blkgs for the cgroup, which can be wrong in some cases. Wouldn't it be
-> better to create a list of updated blkg's per blkcg so that we don't walk
-> all the dormant ones?
+From: Keith Busch <kbusch@kernel.org>
 
-It is probably not a sufficient solution, but it is simple. The problem 
-with keeping a list of recently updated blkg's is that sequence lock 
-does not provide enough synchronization on the read side to guarantee a 
-race free reset of the list. It may be doable, but I need to think 
-harder on the best way to do it without too much overhead.
+Returning 0 early from __bio_iov_append_get_pages() for the
+max_append_sectors warning just creates an infinite loop since 0 means
+success, and the bio will never fill from the unadvancing iov_iter. We
+could turn the return into an error value, but it will already be turned
+into an error value later on, so just remove the warning. Clearly no one
+ever hit it anyway.
 
-Thanks,
-Longman
+Fixes: 0512a75b98f84 ("block: Introduce REQ_OP_ZONE_APPEND")
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+---
+ block/bio.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/block/bio.c b/block/bio.c
+index a3893d80dccc..e249f6414fd5 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1228,9 +1228,6 @@ static int __bio_iov_append_get_pages(struct bio *b=
+io, struct iov_iter *iter)
+ 	size_t offset;
+ 	int ret =3D 0;
+=20
+-	if (WARN_ON_ONCE(!max_append_sectors))
+-		return 0;
+-
+ 	/*
+ 	 * Move page array up in the allocated memory for the bio vecs as far a=
+s
+ 	 * possible so that we can start filling biovecs from the beginning
+--=20
+2.30.2
 
