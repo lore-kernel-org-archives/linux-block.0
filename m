@@ -2,187 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14197C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 10:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2A53C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 11:08:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242459AbiEaK7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 06:59:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50416 "EHLO
+        id S234350AbiEaLIW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 07:08:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237843AbiEaK7K (ORCPT
+        with ESMTP id S233919AbiEaLIU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 06:59:10 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38C1698594;
-        Tue, 31 May 2022 03:59:08 -0700 (PDT)
-Received: from kwepemi500008.china.huawei.com (unknown [172.30.72.55])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LC8Mh3VXzzDq60;
-        Tue, 31 May 2022 18:56:00 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500008.china.huawei.com (7.221.188.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 31 May 2022 18:59:05 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 31 May 2022 18:59:05 +0800
-Subject: Re: [PATCH -next v7 2/3] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Jan Kara <jack@suse.cz>
-CC:     Paolo Valente <paolo.valente@unimore.it>,
-        Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        <cgroups@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220528095020.186970-1-yukuai3@huawei.com>
- <20220528095020.186970-3-yukuai3@huawei.com>
- <0D9355CE-F85B-4B1A-AEC3-F63DFC4B3A54@linaro.org>
- <b9a4ea60-28e5-b7aa-0154-ad7481eafbd3@huawei.com>
- <efe01dd1-0f99-dadf-956d-b0e80e1e602c@huawei.com>
- <1803FD7E-9FB1-4A1E-BD6D-D6657006589A@unimore.it>
- <a0d8452c-e421-45d3-b012-5355207fc0e1@huawei.com>
- <81214347-3806-4F54-B60F-3E5A1A5EC84D@unimore.it>
- <756631ee-6a85-303c-aca1-d60aaf477d0d@huawei.com>
- <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <0f3fb7e6-2f73-81bd-3930-e166b210a74e@huawei.com>
-Date:   Tue, 31 May 2022 18:59:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 31 May 2022 07:08:20 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9655439810
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 04:08:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1653995296; x=1685531296;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=q7nO6G6z6MfsliaPdrkjnQqAaOfkvmsnClB16EwHO9Q=;
+  b=ZRmoeVEI9RCRtwyhU4ikDV6kCI3ajSf5J3w9iap0SbexGJZKk9fDzdGq
+   RM7IcSygZeK8ITiJh4wiNzLFtVyjC7O+73HfYVXw3qkTB/UYA2sCzWYqe
+   8zuP+QE2JzbplkdFqY7wgSLjCC1xL2a4sLZx1GM+wJJuvApFdpOWi0KRD
+   bo+YhY7AIsZt8no8jCxafE5or8pPDQlpcu5vclyKRfr9Zf/y8Kz3mR4OT
+   UAQopKWqxCwaSFIpW9KUfYCN1AJbXN9N9/Ho9vdEOtLF498zB7+yNuDhB
+   Xgl/nsS3ubB/JOCKYxB36Y8v5R00a6vjT28May2MlLb5WddSpnY+liv7p
+   A==;
+X-IronPort-AV: E=Sophos;i="5.91,265,1647273600"; 
+   d="scan'208";a="201879055"
+Received: from mail-dm6nam10lp2102.outbound.protection.outlook.com (HELO NAM10-DM6-obe.outbound.protection.outlook.com) ([104.47.58.102])
+  by ob1.hgst.iphmx.com with ESMTP; 31 May 2022 19:08:17 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gDvg/4RWlSriODeo9PfPBhivMhvsMrkUWxgYPlpH4dc6KMR6RdOOODJ94uz7Tt1yrk6tTmiOHn0vBg6d/4XphbWAOvBBXnn5+sKcFGqS1SU220f4tJ97ZiaN9ieUUQWqLylhHXGTIPdyRkIMvuFf4EBa8DFsAFBCodZJDxUhwswtkjUy5u5L2l48MmCepX16p1tma0zbV7g16GyiF60hAaqxoHywiwj1DdVA560IWwZf5PW374QjKhoiEvGajOv2PpsHzLGdyfq5LPF5dOZse/jkHiGhl8Y1waq0nyGMG/+bIQ6jKLkGCJBQFd/cX1gbeaFADRQ0gg+0ZvxQKCGEWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q7nO6G6z6MfsliaPdrkjnQqAaOfkvmsnClB16EwHO9Q=;
+ b=lSRXhDqWhxd9hqRCxxHzBJsZ8mTk/orfc6V9/+7lQOUOyG3UU4JpVa9ta2npetXVPctBODXq0BODuq2IFgkehKyzA8/MgbyCRp4IRqc1wpg4au2p3gbX0iedTe7vy/bKE173sms4rVjuDxUajm2Z9BA8ywMEolnme/BX8axi02yddMHLcSsP6qm/v7+qm/QPyOidAVBCh9yl4cZ2quu/EL/TDKeQFac6QBaYObwJRKqxHApKtJPQpi6ovqHUrvGkVeRElhVG352z2+mK/JR1CQY/re7szGhl+a9SFu/2tT27b+GUT4efRpDTVNOAZMM/qtcPfgm/6P2HSQy8QHv5/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=q7nO6G6z6MfsliaPdrkjnQqAaOfkvmsnClB16EwHO9Q=;
+ b=B/YdBGiyJU0NcCZcnRZhBCmmCru3HHfHlZKFvUX4FpQcQknj/EeMBlIRwymttp/VM9Sp9XRHZyvuw0ZMJNPGuB1sc0D0EZ5ap1Yq4v1BiXiopZmTWOiV0B/0hWWLXP1j5gGpvIXATxKmDLr0o/hoV0APXHR7ERhjU4/h6Uq1G5A=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ MN2PR04MB5581.namprd04.prod.outlook.com (2603:10b6:208:d9::13) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5293.17; Tue, 31 May 2022 11:08:15 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5293.019; Tue, 31 May 2022
+ 11:08:15 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [PATCH blktests 1/9] nvme: use _have_loop instead of
+ _have_modules loop
+Thread-Topic: [PATCH blktests 1/9] nvme: use _have_loop instead of
+ _have_modules loop
+Thread-Index: AQHYdCZisGwmvSP2t0+vFZtVxupzr6041SOA
+Date:   Tue, 31 May 2022 11:08:14 +0000
+Message-ID: <20220531110813.wvrsqsdjng3bcto2@shindev>
+References: <20220530130811.3006554-1-hch@lst.de>
+ <20220530130811.3006554-2-hch@lst.de>
+In-Reply-To: <20220530130811.3006554-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 1849706a-41a7-4579-b538-08da42f5dbe6
+x-ms-traffictypediagnostic: MN2PR04MB5581:EE_
+x-microsoft-antispam-prvs: <MN2PR04MB5581D8C495DFC3E4B19C49EFEDDC9@MN2PR04MB5581.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: jaD3Attjx8cIUo4a2pX9nfi8kIAhux9D1JfBYL268aYEkHTEM6XeDVMUPlbV1ijp2K1Dk5mP9hJGZC85Sz+z0MWmMrc82R7RZQ7X3K1ubEZScm9fW71H4XPr6Fj/T4JRwgHyhuC7G2RrzRnTNwYVY8G+w4bCMj4ea75f4RNriNHA8dKL9lvEo+YBwCQ0KkF5XddzDCsYeOIojZUp9aJAEeLKzVStk41DCCxCDcuolEBGBzQnbILEobGCJXkRKSkjmcN02yXWRc5/djv/WvKlgt8tE/yvbG7Op2NVD4KIxkiiDyKg8ST6ozkd7VB8W+4Z5JIu35SEXOyFVnrf6cjNC5ap/XwacUgY3P1/lnmrarZyyjAVBspLmIg1Pgo/dvX+7cgDQOeWeuZqgm7Io9Kv0RL8jhW+7FKbP0waALBZ5OVEZDTvUEsHvuHDNvsJDAHWewsGeBOJX9XgSP230EwBPg2iE4KfxiljTmysQiwyK4wQbgt8dTceLaGeWMCXDIPlwquw7z5iNeySuARZvj8IhrEHElPmuJxMcwEigGXiRhj/upPszvGvTRjmLpdHsyK4BG3TS7paWwt4z5Ey6lb9VulkzgKGkJb/aUL45Rr7jLY+C3BibFo7+T8gWSnd+l0cD9s5nw4xSWgjzu/oxOj7ggi5DsKNCvbOOuHLNaLS/neV8Ti3fIbY8MLYb9uk7UZAW8HiZdLbZFhuy1x4kkEDkA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(4636009)(366004)(8936002)(6506007)(9686003)(5660300002)(4326008)(26005)(76116006)(8676002)(2906002)(82960400001)(91956017)(66946007)(66556008)(66476007)(6512007)(44832011)(33716001)(38070700005)(66446008)(64756008)(558084003)(6486002)(38100700002)(508600001)(6916009)(316002)(86362001)(71200400001)(122000001)(186003)(1076003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Oj/jPR77G26tb0ctjFcnEM7rnI+91kFv7+0W0LqWB2NDIckvGCPk/ge9Y+MI?=
+ =?us-ascii?Q?pnzCija8RjC9A1HqH4MrfbSx4We8rWCUW5Xg5DO/95Flo/ydu7SHIhrG9vzI?=
+ =?us-ascii?Q?+HT+/QwOLypXYU/H0DQd2HKy8L1CWW7tYmAvFykWyYi3UmTTKhk9YM0Llfe7?=
+ =?us-ascii?Q?tYu+qrx7eZjGKbpwJLPv5xofqF01eKRnTIgqFihE8D7cQSnFDQuOrb2FDpM1?=
+ =?us-ascii?Q?i+gnQZYZh+jyOXXAkupZ98fBqKUqByi/3xM0MpRBo5SgEg+43lTJLCMjMi5H?=
+ =?us-ascii?Q?LJ2wEg1OCU/fdyeg2th4NIR/fILLELmGcZTpZHn7ZllTBjq4J3QNLN/MsMca?=
+ =?us-ascii?Q?GMfjAbxZ6GFDG5QXIloNucMBLkR3SZkwrdaZNiuMqWqPEZvTMKUALQL5KSpu?=
+ =?us-ascii?Q?8wELW15fs6UIspd/79eukWHf9XA3LxU3PsRtBzZlteNQGqdRzcmQ07/v0ZRK?=
+ =?us-ascii?Q?yrJsx3dCX3N2optfAuAMkCCGPzK7Ga2fg9rauKUzsRxzOv67d06oFX0u6KA7?=
+ =?us-ascii?Q?Sdkd9/McVnBkDQEubbjIQOZHzO7dpfku4IsBOSpWvsCIIWjM2y6D6e2YVT29?=
+ =?us-ascii?Q?lGrDuVUkURzQ1GtA+qRJktYWJ5DURh5QbPI15qzqjIEo+GeirdlS21RlNFMd?=
+ =?us-ascii?Q?Bq+m0PLHBw2a/v9klOUCFNoYDHznq+8KKJtvEQRD2PHyRNbEsGfjACtIFIaw?=
+ =?us-ascii?Q?2n9j7kUV707ngTdddJL4dHLsAX2qO7IIxLOvydlTp/l0AW9XciEu19+P+Oxp?=
+ =?us-ascii?Q?tq3OqOeYxd1m1o2qLbZAQGhEsrHDD04lXbL9dHStZjBC6wouy5aiPpgCR12z?=
+ =?us-ascii?Q?iSVY6MqJRTPagXYUQaKaTCS3XZnFrKrzjgFhujrNToI3PETw7lnHnfeeG50E?=
+ =?us-ascii?Q?LsIF+4qA1wqGtI5Ap/MAIS5ovhsOA0nEltxslUKOKbFxHPjZQTpbRgRjCqip?=
+ =?us-ascii?Q?/59SyWJvMKY6s9QezXE8puIM2BhJnwDZc1Hm66UlfqWAmXLbug5FgP822DNd?=
+ =?us-ascii?Q?scLnrw9E8XyjSPqmKHcFidhcW6nyoDiT9uZhE8CqoRWC01YIzto2PVpdnZAH?=
+ =?us-ascii?Q?cfGKJTvFLu354bGUUOdxLHUHu6z6Wb4LY3b2NHPjsHgxmxvzmoZsOJpuJZwv?=
+ =?us-ascii?Q?ozIF6HaxgaXj2Kr63v238MFoIrYUgy5UtmMql9yySriio6S2+JE5tAJMbZlk?=
+ =?us-ascii?Q?y5lglh4m2ITAHx2AWK6qmsmu0pr7EbbjqGzXXkUeYK7yeVG96fZVb8KAK0U1?=
+ =?us-ascii?Q?SlJjtqn7xBnTFVRtplVU8zYig0JrlCXpnuMwrJf3F3WbpmcjJieRlQ+RXxAN?=
+ =?us-ascii?Q?h+W5Iy6mEYdL8zqgXM+vEAykqQTfEfIr28qRHVvgVeb4ioUsW9wzAhO3VUfN?=
+ =?us-ascii?Q?CRLXbzQQL1adwixuPvhj440VoM7QcKBALEem1MOeVuR97eIajKpM16fS9ZKm?=
+ =?us-ascii?Q?Crv3ETPlXzyhkYqqZimtejWhrzQFabLg9xq/F1N7iNng3AmpgMZFkzzwqk5S?=
+ =?us-ascii?Q?a+e4vYuoLBhHLaj5ZwLENyi9xh+4OuxiqXE0o3xGTmaWvhotBb0PIiFpRwPl?=
+ =?us-ascii?Q?qBao/P8vbmp+kBEXtAX9PbUT0F6IgNw8+TdywITkngP/V4zxAIXn/1NVlcKY?=
+ =?us-ascii?Q?pIEKC0b6+ecrVc89/jbxOuoOUBeNugs0uVEPE3sU3VOYOZWC4fu7mIrtPJkY?=
+ =?us-ascii?Q?ALRDL9dd1bpDkyJ2ICPJ7ZkumPGvrP52NcNcGotN0BrGD7DatHsfcrB2oLf6?=
+ =?us-ascii?Q?2pgBDGvOum4OFx61Pygjl+xcpleTvefCsdLddEKulFp8mN+wkfcH?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <D947FCBB89B7A84994A893BB4D9B25EB@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1849706a-41a7-4579-b538-08da42f5dbe6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2022 11:08:14.9628
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 0uoE93IfM0NtbojNOMB8pXfx4as1l4gUOkXI92EyE/FdxvGUw7T5rdl3VQRG7YMwSUSY24Eyg9Bu1zFe+3Gbyxf0TJqZXJfdeeALU1SIwiM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR04MB5581
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/31 18:01, Jan Kara 写道:
-> On Tue 31-05-22 17:33:25, Yu Kuai wrote:
->> 在 2022/05/31 17:19, Paolo Valente 写道:
->>>> Il giorno 31 mag 2022, alle ore 11:06, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>
->>>> 在 2022/05/31 16:36, Paolo VALENTE 写道:
->>>>>> Il giorno 30 mag 2022, alle ore 10:40, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>
->>>>>> 在 2022/05/30 16:34, Yu Kuai 写道:
->>>>>>> 在 2022/05/30 16:10, Paolo Valente 写道:
->>>>>>>>
->>>>>>>>
->>>>>>>>> Il giorno 28 mag 2022, alle ore 11:50, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>>>>
->>>>>>>>> Currently, bfq can't handle sync io concurrently as long as they
->>>>>>>>> are not issued from root group. This is because
->>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>>>>> bfq_asymmetric_scenario().
->>>>>>>>>
->>>>>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>>>>>>
->>>>>>>>> Before this patch:
->>>>>>>>> 1) root group will never be counted.
->>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->>>>>>>>>
->>>>>>>>> After this patch:
->>>>>>>>> 1) root group is counted.
->>>>>>>>> 2) Count if bfqg have at least one bfqq that is marked busy.
->>>>>>>>> 3) Don't count if bfqg doesn't have any busy bfqqs.
->>>>>>>>
->>>>>>>> Unfortunately, I see a last problem here. I see a double change:
->>>>>>>> (1) a bfqg is now counted only as a function of the state of its child
->>>>>>>>        queues, and not of also its child bfqgs
->>>>>>>> (2) the state considered for counting a bfqg moves from having pending
->>>>>>>>        requests to having busy queues
->>>>>>>>
->>>>>>>> I'm ok with with (1), which is a good catch (you are lady explained
->>>>>>>> the idea to me some time ago IIRC).
->>>>>>>>
->>>>>>>> Yet I fear that (2) is not ok.  A bfqq can become non busy even if it
->>>>>>>> still has in-flight I/O, i.e.  I/O being served in the drive.  The
->>>>>>>> weight of such a bfqq must still be considered in the weights_tree,
->>>>>>>> and the group containing such a queue must still be counted when
->>>>>>>> checking whether the scenario is asymmetric.  Otherwise service
->>>>>>>> guarantees are broken.  The reason is that, if a scenario is deemed as
->>>>>>>> symmetric because in-flight I/O is not taken into account, then idling
->>>>>>>> will not be performed to protect some bfqq, and in-flight I/O may
->>>>>>>> steal bandwidth to that bfqq in an uncontrolled way.
->>>>>>> Hi, Paolo
->>>>>>> Thanks for your explanation.
->>>>>>> My orginal thoughts was using weights_tree insertion/removal, however,
->>>>>>> Jan convinced me that using bfq_add/del_bfqq_busy() is ok.
->>>>>>>   From what I see, when bfqq dispatch the last request,
->>>>>>> bfq_del_bfqq_busy() will not be called from __bfq_bfqq_expire() if
->>>>>>> idling is needed, and it will delayed to when such bfqq get scheduled as
->>>>>>> in-service queue again. Which means the weight of such bfqq should still
->>>>>>> be considered in the weights_tree.
->>>>>>> I also run some tests on null_blk with "irqmode=2
->>>>>>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
->>>>>>> that service guarantees are still preserved on slow device.
->>>>>>> Do you this is strong enough to cover your concern?
->>>>> Unfortunately it is not.  Your very argument is what made be believe
->>>>> that considering busy queues was enough, in the first place.  But, as
->>>>> I found out, the problem is caused by the queues that do not enjoy
->>>>> idling.  With your patch (as well as in my initial version) they are
->>>>> not counted when they remain without requests queued.  And this makes
->>>>> asymmetric scenarios be considered erroneously as symmetric.  The
->>>>> consequence is that idling gets switched off when it had to be kept
->>>>> on, and control on bandwidth is lost for the victim in-service queues.
->>>>
->>>> Hi，Paolo
->>>>
->>>> Thanks for your explanation, are you thinking that if bfqq doesn't enjoy
->>>> idling, then such bfqq will clear busy after dispatching the last
->>>> request?
->>>>
->>>> Please kindly correct me if I'm wrong in the following process:
->>>>
->>>> If there are more than one bfqg that is activatied, then bfqqs that are
->>>> not enjoying idle are still left busy after dispatching the last
->>>> request.
->>>>
->>>> details in __bfq_bfqq_expire:
->>>>
->>>>          if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
->>>>          ┊   !(reason == BFQQE_PREEMPTED &&
->>>>          ┊     idling_needed_for_service_guarantees(bfqd, bfqq))) {
->>>> -> idling_needed_for_service_guarantees will always return true,
->>>
->>> It returns true only is the scenario is symmetric.  Not counting bfqqs
->>> with in-flight requests makes an asymmetric scenario be considered
->>> wrongly symmetric.  See function bfq_asymmetric_scenario().
->>
->> Hi, Paolo
->>
->> Do you mean this gap?
->>
->> 1. io1 is issued from bfqq1(from bfqg1)
->> 2. bfqq1 dispatched this io, it's busy is cleared
->> 3. *before io1 is completed*, io2 is issued from bfqq2(bfqg2)
-> 
-> Yes. So as far as I understand Paolo is concerned about this scenario.
-> 
->> 4. with this patchset, while dispatching io2 from bfqq2, the scenario
->> should be symmetric while it's considered wrongly asymmetric.
-> 
-> But with this patchset, we will consider this scenario symmetric because at
-> any point in time there is only one busy bfqq. Before, we considered this
-> scenario asymmetric because two different bfq groups have bfqq in their
-> weights_tree. So before this patchset
-> idling_needed_for_service_guarantees() returned true, after this patchset
-> the function returns false so we won't idle anymore and Paolo argues that
-> bfqq1 does not get adequate protection from bfqq2 as a result.
-> 
-> I agree with Paolo this seems possible. The fix is relatively simple though
-> - instead of changing how weights_tree is used for weight raised queues as
-> you did originally, I'd move the accounting of groups with pending requests
-> to bfq_add/del_bfqq_busy() and bfq_completed_request().
-> 
-> 								Honza
+On May 30, 2022 / 15:08, Christoph Hellwig wrote:
+> Also check for the losetup existance.
+>=20
+> Signed-off-by: Christoph Hellwig <hch@lst.de>
 
-Thanks for your explanation, I'll send a new version.
+Looks good to me.
 
-Kuai
+Reviewed-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+
+--=20
+Shin'ichiro Kawasaki=
