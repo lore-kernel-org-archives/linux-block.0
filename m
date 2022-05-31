@@ -2,117 +2,172 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1ED3C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 18:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8126BC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 18:53:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347014AbiEaSY2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 14:24:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55956 "EHLO
+        id S1345235AbiEaSxE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 14:53:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346948AbiEaSY2 (ORCPT
+        with ESMTP id S236812AbiEaSxD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 14:24:28 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E3887A823;
-        Tue, 31 May 2022 11:24:27 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so3627736pjl.4;
-        Tue, 31 May 2022 11:24:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=aASmjf/pnI60SUyA+vo4oipwPmuVquT6UTuMWtth16E=;
-        b=b0id0ljyEJ0A/BY68TcNQin8MFxEUP8/YY3UNzivhDGBEenqWTe/+aVQCXUF8mOaFa
-         YOO0EU29eTkoKmgRpmqlacunMUw0EUoR6CTK9iZruDkT2J2rlorxz5r6+eLgaMSUcCV6
-         ACYvJ+0bZWXhVxPwtNmTgxg5agQ5hhotR0skd6dDH1x2NIpYa+bHadXaCmklo+xSmQAp
-         3cDk1C7/OL4VRpAPQwYsTYJbu32wrZ1mfMznQhu3UidlC4xzZpX2Nh5WrtFGjxf5vzbe
-         RrU44InIpqTW71q+AT4Tz847CoAO23+wD1Kyri81QgGgK2fYkWGaZSJ1rtR8Hfq55JUh
-         JhFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=aASmjf/pnI60SUyA+vo4oipwPmuVquT6UTuMWtth16E=;
-        b=zjo2HXkixjWEU8uUWeOOGtul3esGOvjWHOXAh6Qr/nsCmbLRVLFMjx3HRlTxPgm8Uy
-         dbNMa3YtEz12SWH/1OAYwx7R7TAnl3HvWilhRdzMdfb3lfoCtqGD1u7VeR3KTEQb5cMA
-         zQJZO13hpL0xF4VAknNmcxMY4qIdutOA3Gx8UJSAgyxU8to3Q/3l/cyLM4Unr33VKtc6
-         pt1sdSKUE+vOKVstuo3OqQo0p/ZDOwuv0RL/9HHggg7NLOaqvViVakl5IPl9zk7qzBMz
-         rqbqvL55/ullGp7UB7kDRBIC8Xi9ou0DOZJNGtwf9SIdFhlQ9cmHentnz0MpFVFulDil
-         JeNA==
-X-Gm-Message-State: AOAM533S01kH6Xa7poM1mMNvpjcPB1YibjmMBVkLAKAzZNseyidsZLgg
-        5ju2vQuIaHj0N0tATqu3dddnbaLq6Gk=
-X-Google-Smtp-Source: ABdhPJwzDxVGmi3KE9VGnz8OLz53LiiQxmKtewnPo/T1sRhlbwVNGBuhYNslynstct/hP7p72Zy/FA==
-X-Received: by 2002:a17:902:7049:b0:162:962:5b04 with SMTP id h9-20020a170902704900b0016209625b04mr49934617plt.167.1654021466804;
-        Tue, 31 May 2022 11:24:26 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:987b])
-        by smtp.gmail.com with ESMTPSA id u1-20020a17090282c100b00163fbb2bae5sm2572448plz.209.2022.05.31.11.24.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 31 May 2022 11:24:26 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 31 May 2022 08:24:24 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH] blk-cgroup: Optimize blkcg_rstat_flush()
-Message-ID: <YpZdWNGW1bTGnApp@slm.duckdns.org>
-References: <20220531181821.187834-1-longman@redhat.com>
+        Tue, 31 May 2022 14:53:03 -0400
+Received: from mailout2.w2.samsung.com (mailout2.w2.samsung.com [211.189.100.12])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1591EEFE
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 11:53:01 -0700 (PDT)
+Received: from uscas1p2.samsung.com (unknown [182.198.245.207])
+        by mailout2.w2.samsung.com (KnoxPortal) with ESMTP id 20220531185259usoutp02c02ca31ea6aa96a6a36bc43acae3d343~0RVFwVcYW0552505525usoutp02e;
+        Tue, 31 May 2022 18:52:59 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w2.samsung.com 20220531185259usoutp02c02ca31ea6aa96a6a36bc43acae3d343~0RVFwVcYW0552505525usoutp02e
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1654023179;
+        bh=0ytobJGplczLTQneSo5vdPHD9o73Cy9oqki+mftraTg=;
+        h=From:To:CC:Subject:Date:References:From;
+        b=bQcMKOwW4zRStCDzRQTK0J5Xj9nlpjhqGXEaLx2S9tEIHqRF1/EZlv0oFhJ1bC3xU
+         qc1X764RBT3huMrG0a2aUmsXHVECZI7T1OWYQpA1Ajn/QXRljCmkh/5ILFtGmiLPi9
+         a9pYXpyuooiq3nF97cz7pgC5m5bAyhf9SWbnQFgk=
+Received: from ussmges2new.samsung.com (u111.gpu85.samsung.co.kr
+        [203.254.195.111]) by uscas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220531185258uscas1p192830738ad21590747a73965f7e8f2b1~0RVFZNpDe1869918699uscas1p1V;
+        Tue, 31 May 2022 18:52:58 +0000 (GMT)
+Received: from uscas1p2.samsung.com ( [182.198.245.207]) by
+        ussmges2new.samsung.com (USCPEMTA) with SMTP id 18.FE.09642.A0466926; Tue,
+        31 May 2022 14:52:58 -0400 (EDT)
+Received: from ussmgxs1new.samsung.com (u89.gpu85.samsung.co.kr
+        [203.254.195.89]) by uscas1p2.samsung.com (KnoxPortal) with ESMTP id
+        20220531185258uscas1p29fc501690df21576af035ef48af16daf~0RVFMfv4N0707707077uscas1p2F;
+        Tue, 31 May 2022 18:52:58 +0000 (GMT)
+X-AuditID: cbfec36f-bfdff700000025aa-c8-6296640a0ed5
+Received: from SSI-EX3.ssi.samsung.com ( [105.128.2.145]) by
+        ussmgxs1new.samsung.com (USCPEXMTA) with SMTP id 9B.F6.52349.A0466926; Tue,
+        31 May 2022 14:52:58 -0400 (EDT)
+Received: from SSI-EX3.ssi.samsung.com (105.128.2.228) by
+        SSI-EX3.ssi.samsung.com (105.128.2.228) with Microsoft SMTP Server
+        (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+        15.1.2375.24; Tue, 31 May 2022 11:52:57 -0700
+Received: from SSI-EX3.ssi.samsung.com ([105.128.5.228]) by
+        SSI-EX3.ssi.samsung.com ([105.128.5.228]) with mapi id 15.01.2375.024; Tue,
+        31 May 2022 11:52:57 -0700
+From:   Vincent Fu <vincent.fu@samsung.com>
+To:     "axboe@kernel.dk" <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>
+CC:     Vincent Fu <vincent.fu@samsung.com>,
+        Akinobu Mita <akinobu.mita@gmail.com>
+Subject: [PATCH] null_blk: add memory_backed module parameter
+Thread-Topic: [PATCH] null_blk: add memory_backed module parameter
+Thread-Index: AQHYdR+kBhCunBIlp0yswCbxVP1rHw==
+Date:   Tue, 31 May 2022 18:52:57 +0000
+Message-ID: <20220531185231.169102-1-vincent.fu@samsung.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [105.128.2.176]
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220531181821.187834-1-longman@redhat.com>
+X-CFilter-Loop: Reflected
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrLIsWRmVeSWpSXmKPExsWy7djX87pcKdOSDDbvN7B4daCD0WL13X42
+        i723tB2YPXbOusvucflsqcfnTXIBzFFcNimpOZllqUX6dglcGXtPN7AWHBet+LvHo4HxvFAX
+        IyeHhICJxL+57YwgtpDASkaJv9N5uxi5gOxWJokfb5cwwRS9m3+aDSKxllGi6fExVgjnE6PE
+        rbZzLBDOMkaJTZteA83i4GAT0JR4u78ApFtEIERi38JLLCA2s0CAxIud81lBbGEBW4n2i+cY
+        IWqcJP4/mcwGYetJrJ/3lhlkDIuAqkTXZnaQMK+AjcSu7avADmIUEJP4fmoNE8RIcYlbT+ZD
+        HSoosWj2HmYIW0zi366HbBC2osT97y/ZIer1JG5MncIGYWtLLFv4mhlivqDEyZlPWCDqJSUO
+        rrgB9paEwF92ifMzvrFCJFwknv48DGVLS1y9PpUZoqidUWLuxi9Q3RMYJa4/kYKwrSX+dV6D
+        2swn8ffXI3D4SAjwSnS0CU1gVJqF5IdZSO6bheS+WUjuW8DIsopRvLS4ODc9tdgoL7Vcrzgx
+        t7g0L10vOT93EyMwhZz+dzh/B+P1Wx/1DjEycTAeYpTgYFYS4S3ZNTVJiDclsbIqtSg/vqg0
+        J7X4EKM0B4uSOO+yzA2JQgLpiSWp2ampBalFMFkmDk6pBibjP8rBz/kNe3eaWKu8ZYlju8n6
+        obnZ+cqNgm77/WFWqne1m1aVzzx5USNy2e5N+de53LZMu+FqzGguWhgkbCg774+U2MESRnXv
+        Y31xNfW9L55UeazfUGc6Z/7k/1K8r8WVMvZMEorueTv1UdlfK5GtpqqLRa6nHPA8UWyUOldp
+        sfL6sHwb9j1rpGQmr+nfs2fBfb0uZk7bZ39eij1+FWAdwON9Q6nl18TgMN3r363Kj4aeSF9l
+        fIH7vcXzzwwavczblu0PCfc7dOX5ls/PFWZqZJoKbbly8ITCCa6jX0xcDmUdC05/GfpmeZyS
+        ye43h4+3TVt7LS+9VIzxjcbrlcnXMzcmiKRuXd19TOHDgjYlluKMREMt5qLiRAC+FnQjkAMA
+        AA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrGLMWRmVeSWpSXmKPExsWS2cA0UZcrZVqSwa8XchavDnQwWqy+289m
+        sfeWtgOzx85Zd9k9Lp8t9fi8SS6AOYrLJiU1J7MstUjfLoErY+/pBtaC46IVf/d4NDCeF+pi
+        5OSQEDCReDf/NFsXIxeHkMBqRon/n9+zQjifGCWeT9sF5SxjlDhxfhVjFyMHB5uApsTb/QUg
+        3SICIRL7Fl5iAQkzC/hJvLrPChIWFrCVaL94jhGixEni/5PJbBC2nsT6eW+ZQcpZBFQlujaz
+        g4R5BWwkdm1fxQRiMwqISXw/tQbMZhYQl7j1ZD4TxJ0CEkv2nGeGsEUlXj7+xwphK0rc//6S
+        HaJeT+LG1ClsELa2xLKFr5kh5gtKnJz5hAWiXlLi4IobLBMYRWchWTELSfssJO2zkLQvYGRZ
+        xSheWlycm15RbJiXWq5XnJhbXJqXrpecn7uJERg1p/8djtzBePTWR71DjEwcjIcYJTiYlUR4
+        S3ZNTRLiTUmsrEotyo8vKs1JLT7EKM3BoiTOK+Q6MV5IID2xJDU7NbUgtQgmy8TBKdXAVFje
+        0eV4ouPw2oJ1m8omPqqMqZH+9Coq5kcv3/xQk4RHZ+cnPSmcO/t2srm3T0vixl5Z44LcK1ee
+        z4/9LxAd8Ddp1xF2rvvLfthzvf4j45sYylZftqDN7cfNiYXee2bUeNtPnhugNiHtsue2xNqD
+        v5YtyDjuvqBi6VJ7l5PTGO6/Ff+ysNBl9eupCx/vVl3NstUh0HXVH8MOk93sU55eb9rSc5ot
+        ZhnDku8L1i4Rf2ps2+IjM9uh2C9Pe9mJIFWTGLn7DJwpL3vTt+2WeHPjm1m83BPr/RaS+wXi
+        mY6qBV3T23YtQ/Kxdu80exuLv3ESs5obDDa3JcW8nBtkXn+60KPF9OjT7fL5PbdXyvBlKbEU
+        ZyQaajEXFScCAEZKv7kJAwAA
+X-CMS-MailID: 20220531185258uscas1p29fc501690df21576af035ef48af16daf
+CMS-TYPE: 301P
+X-CMS-RootMailID: 20220531185258uscas1p29fc501690df21576af035ef48af16daf
+References: <CGME20220531185258uscas1p29fc501690df21576af035ef48af16daf@uscas1p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello, Waiman.
+Allow the memory_backed option to be set via a module parameter.
+Currently memory-backed null_blk devices can only be created using
+configfs. Having a module parameter makes it easier to create these
+devices.
 
-On Tue, May 31, 2022 at 02:18:21PM -0400, Waiman Long wrote:
-> For a system with many CPUs and block devices, the time to do
-> blkcg_rstat_flush() from cgroup_rstat_flush() can be rather long. It
-> can be especially problematic as interrupt is disabled during the flush.
-> It was reported that it might take seconds in some extreme cases leading
-> to hard lockup messages.
-> 
-> As it is likely that not all the percpu blkg_iostat_set's has been
-> updated since the last flush, those stale blkg_iostat_set's don't need
-> to be flushed in this case. This patch optimizes blkcg_rstat_flush()
-> by checking the current sequence number against the one recorded since
-> the last flush and skip the blkg_iostat_set if the sequence number
-> hasn't changed. There is a slight chance that it may miss an update
-> that is being done in parallel, the new update will just have to wait
-> until the next flush.
-> 
-> Signed-off-by: Waiman Long <longman@redhat.com>
-> ---
->  block/blk-cgroup.c | 18 +++++++++++++++---
->  block/blk-cgroup.h |  1 +
->  2 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 40161a3f68d0..79b89af61ef2 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -864,11 +864,23 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
->  		unsigned long flags;
->  		unsigned int seq;
->  
-> +		seq = u64_stats_fetch_begin(&bisc->sync);
-> +		/*
-> +		 * If the sequence number hasn't been updated since the last
-> +		 * flush, we can skip this blkg_iostat_set though we may miss
-> +		 * an update that is happening in parallel.
-> +		 */
-> +		if (seq == bisc->last_seq)
-> +			continue;
+This patch was originally submitted by Akinobu Mita in 2020 but received
+no response. I modified the original patch to apply cleanly and reworded
+the documentation from the original patch.
 
-Is this a sufficient solution? The code assumes that there aren't too many
-blkgs for the cgroup, which can be wrong in some cases. Wouldn't it be
-better to create a list of updated blkg's per blkcg so that we don't walk
-all the dormant ones?
+Originally-by: Akinobu Mita <akinobu.mita@gmail.com>
+Signed-off-by: Vincent Fu <vincent.fu@samsung.com>
+---
+ Documentation/block/null_blk.rst | 8 ++++++++
+ drivers/block/null_blk/main.c    | 5 +++++
+ 2 files changed, 13 insertions(+)
 
-Thanks.
-
--- 
-tejun
+diff --git a/Documentation/block/null_blk.rst b/Documentation/block/null_bl=
+k.rst
+index edbbab2f1..618a491fa 100644
+--- a/Documentation/block/null_blk.rst
++++ b/Documentation/block/null_blk.rst
+@@ -72,6 +72,14 @@ submit_queues=3D[1..nr_cpus]: Default: 1
+ hw_queue_depth=3D[0..qdepth]: Default: 64
+   The hardware queue depth of the device.
+=20
++memory_backed=3D[0/1]: Default: 0
++  Whether or not to use a memory buffer to respond to IO requests
++
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++  0  Transfer no data in response to IO requests
++  1  Use a memory buffer to respond to IO requests
++  =3D  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
++
+ Multi-queue specific parameters
+ -------------------------------
+=20
+diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
+index 539cfeac2..e97623c55 100644
+--- a/drivers/block/null_blk/main.c
++++ b/drivers/block/null_blk/main.c
+@@ -203,6 +203,10 @@ static int g_hw_queue_depth =3D 64;
+ module_param_named(hw_queue_depth, g_hw_queue_depth, int, 0444);
+ MODULE_PARM_DESC(hw_queue_depth, "Queue depth for each hardware queue. Def=
+ault: 64");
+=20
++static bool g_memory_backed;
++module_param_named(memory_backed, g_memory_backed, bool, 0444);
++MODULE_PARM_DESC(memory_backed, "Create a memory-backed block device. Defa=
+ult: false");
++
+ static bool g_use_per_node_hctx;
+ module_param_named(use_per_node_hctx, g_use_per_node_hctx, bool, 0444);
+ MODULE_PARM_DESC(use_per_node_hctx, "Use per-node allocation for hardware =
+context queues. Default: false");
+@@ -656,6 +660,7 @@ static struct nullb_device *null_alloc_dev(void)
+ 	dev->irqmode =3D g_irqmode;
+ 	dev->hw_queue_depth =3D g_hw_queue_depth;
+ 	dev->blocking =3D g_blocking;
++	dev->memory_backed =3D g_memory_backed;
+ 	dev->use_per_node_hctx =3D g_use_per_node_hctx;
+ 	dev->zoned =3D g_zoned;
+ 	dev->zone_size =3D g_zone_size;
+--=20
+2.25.1
