@@ -2,39 +2,43 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8DD6C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C105EC433F5
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 19:35:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347285AbiEaT2x (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 15:28:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51600 "EHLO
+        id S230232AbiEaTfG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 15:35:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57202 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347282AbiEaT2w (ORCPT
+        with ESMTP id S1346254AbiEaTe7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 15:28:52 -0400
-Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B188996A7
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:28:51 -0700 (PDT)
-Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
-        by m0001303.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 24VFiHNv013596
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:28:50 -0700
+        Tue, 31 May 2022 15:34:59 -0400
+Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E4489BAC0
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:34:58 -0700 (PDT)
+Received: from pps.filterd (m0109334.ppops.net [127.0.0.1])
+        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 24VFiDiA027313
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:34:58 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=lI9/WEjnfnDuWcRiQSaF2aLpe846GbmeqIxTbGLKddc=;
- b=ZauHY6c4d/ia/pDbpjVxQCViArpCov5euMiuw68ev04j96FzFiJ8nTy+AnZ2mvEHUgak
- ShSU5+rVKtZJGXHLRFIVi+gInb6rq11g3zn2XggBWCEazLGpXCrudr4Rj20DJJMcB9DN
- gbJfwn3GW4MtIzQkMXXlI8XJMpORm6JTdMo= 
-Received: from maileast.thefacebook.com ([163.114.130.16])
-        by m0001303.ppops.net (PPS) with ESMTPS id 3gbfdtg7nf-3
+ bh=faOcvTN3625CjqrjeCHz0BkjmPq+BgAMSxF65DUtUoM=;
+ b=o+Yz1J/lJmFWJxCQC08urvZ/4CXyrNLPg4C8MzGWsS4hd+uDw+QeKJMGdf1dOfzgGppI
+ xScI39G1CWTtqDUOHCM4S/VdGvaHVzHFlrjhKjWUCMPBuZUTq28+NxbrkGn5N64Zcm1e
+ XoEn/bn/CHj2IW6ZUN7dwH+rxrLj+ZN0Fnc= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3gdj4su7f1-3
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:28:50 -0700
-Received: from twshared14818.18.frc3.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:82::f) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 12:34:58 -0700
+Received: from snc-exhub201.TheFacebook.com (2620:10d:c085:21d::7) by
+ snc-exhub102.TheFacebook.com (2620:10d:c085:11d::6) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Tue, 31 May 2022 12:34:57 -0700
+Received: from twshared3353.07.ash9.facebook.com (2620:10d:c085:108::4) by
+ mail.thefacebook.com (2620:10d:c085:21d::7) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Tue, 31 May 2022 12:28:49 -0700
+ 15.1.2375.28; Tue, 31 May 2022 12:34:56 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id F19C44924B18; Tue, 31 May 2022 12:11:38 -0700 (PDT)
+        id 8D0D34924B0E; Tue, 31 May 2022 12:11:38 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>
@@ -42,10 +46,10 @@ CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         <ebiggers@kernel.org>, <pankydev8@gmail.com>,
         Keith Busch <kbusch@kernel.org>,
-        Alexander Viro <viro@zeniv.linux.org.uk>
-Subject: [PATCHv5 08/11] iov: introduce iov_iter_aligned
-Date:   Tue, 31 May 2022 12:11:34 -0700
-Message-ID: <20220531191137.2291467-9-kbusch@fb.com>
+        Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Subject: [PATCHv5 04/11] block: introduce bdev_dma_alignment helper
+Date:   Tue, 31 May 2022 12:11:30 -0700
+Message-ID: <20220531191137.2291467-5-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220531191137.2291467-1-kbusch@fb.com>
 References: <20220531191137.2291467-1-kbusch@fb.com>
@@ -53,8 +57,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: Qu387vanj-UZcx09D8K-iPbLkCuj7Lp8
-X-Proofpoint-GUID: Qu387vanj-UZcx09D8K-iPbLkCuj7Lp8
+X-Proofpoint-GUID: B26JT7aUzUZYQXsIhQmzJoyoXk_4VS--
+X-Proofpoint-ORIG-GUID: B26JT7aUzUZYQXsIhQmzJoyoXk_4VS--
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-05-31_07,2022-05-30_03,2022-02-23_01
@@ -64,142 +68,34 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-The existing iov_iter_alignment() function returns the logical OR of
-address and length. For cases where address and length need to be
-considered separately, introduce a helper function that a caller can
-specificy length and address masks that indicate if the iov is
-unaligned.
+Preparing for upcoming dma_alignment users that have a block_device, but
+don't need the request_queue.
 
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
 ---
- include/linux/uio.h |  2 +
- lib/iov_iter.c      | 92 +++++++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 94 insertions(+)
+ include/linux/blkdev.h | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/include/linux/uio.h b/include/linux/uio.h
-index 739285fe5a2f..34ba4a731179 100644
---- a/include/linux/uio.h
-+++ b/include/linux/uio.h
-@@ -219,6 +219,8 @@ size_t _copy_mc_to_iter(const void *addr, size_t byte=
-s, struct iov_iter *i);
- #endif
-=20
- size_t iov_iter_zero(size_t bytes, struct iov_iter *);
-+bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
-+			unsigned len_mask);
- unsigned long iov_iter_alignment(const struct iov_iter *i);
- unsigned long iov_iter_gap_alignment(const struct iov_iter *i);
- void iov_iter_init(struct iov_iter *i, unsigned int direction, const str=
-uct iovec *iov,
-diff --git a/lib/iov_iter.c b/lib/iov_iter.c
-index 6dd5330f7a99..a39b24496878 100644
---- a/lib/iov_iter.c
-+++ b/lib/iov_iter.c
-@@ -1268,6 +1268,98 @@ void iov_iter_discard(struct iov_iter *i, unsigned=
- int direction, size_t count)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 5bdf2ac9142c..834b981ef01b 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1365,6 +1365,11 @@ static inline int queue_dma_alignment(const struct=
+ request_queue *q)
+ 	return q ? q->dma_alignment : 511;
  }
- EXPORT_SYMBOL(iov_iter_discard);
 =20
-+static bool iov_iter_aligned_iovec(const struct iov_iter *i, unsigned ad=
-dr_mask,
-+				   unsigned len_mask)
++static inline unsigned int bdev_dma_alignment(struct block_device *bdev)
 +{
-+	size_t size =3D i->count;
-+	size_t skip =3D i->iov_offset;
-+	unsigned k;
-+
-+	for (k =3D 0; k < i->nr_segs; k++, skip =3D 0) {
-+		size_t len =3D i->iov[k].iov_len - skip;
-+
-+		if (len > size)
-+			len =3D size;
-+		if (len & len_mask)
-+			return false;
-+		if ((unsigned long)(i->iov[k].iov_base + skip) & addr_mask)
-+			return false;
-+
-+		size -=3D len;
-+		if (!size)
-+			break;
-+	}
-+	return true;
++	return queue_dma_alignment(bdev_get_queue(bdev));
 +}
 +
-+static bool iov_iter_aligned_bvec(const struct iov_iter *i, unsigned add=
-r_mask,
-+				  unsigned len_mask)
-+{
-+	size_t size =3D i->count;
-+	unsigned skip =3D i->iov_offset;
-+	unsigned k;
-+
-+	for (k =3D 0; k < i->nr_segs; k++, skip =3D 0) {
-+		size_t len =3D i->bvec[k].bv_len - skip;
-+
-+		if (len > size)
-+			len =3D size;
-+		if (len & len_mask)
-+			return false;
-+		if ((unsigned long)(i->bvec[k].bv_offset + skip) & addr_mask)
-+			return false;
-+
-+		size -=3D len;
-+		if (!size)
-+			break;
-+	}
-+	return true;
-+}
-+
-+/**
-+ * iov_iter_is_aligned() - Check if the addresses and lengths of each se=
-gments
-+ * 	are aligned to the parameters.
-+ *
-+ * @i: &struct iov_iter to restore
-+ * @addr_mask: bit mask to check against the iov element's addresses
-+ * @len_mask: bit mask to check against the iov element's lengths
-+ *
-+ * Return: false if any addresses or lengths intersect with the provided=
- masks
-+ */
-+bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
-+			 unsigned len_mask)
-+{
-+	if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
-+		return iov_iter_aligned_iovec(i, addr_mask, len_mask);
-+
-+	if (iov_iter_is_bvec(i))
-+		return iov_iter_aligned_bvec(i, addr_mask, len_mask);
-+
-+	if (iov_iter_is_pipe(i)) {
-+		unsigned int p_mask =3D i->pipe->ring_size - 1;
-+		size_t size =3D i->count;
-+
-+		if (size & len_mask)
-+			return false;
-+		if (size && allocated(&i->pipe->bufs[i->head & p_mask])) {
-+			if (i->iov_offset & addr_mask)
-+				return false;
-+		}
-+
-+		return true;
-+	}
-+
-+	if (iov_iter_is_xarray(i)) {
-+		if (i->count & len_mask)
-+			return false;
-+		if ((i->xarray_start + i->iov_offset) & addr_mask)
-+			return false;
-+	}
-+
-+	return true;
-+}
-+EXPORT_SYMBOL_GPL(iov_iter_is_aligned);
-+
- static unsigned long iov_iter_alignment_iovec(const struct iov_iter *i)
+ static inline int blk_rq_aligned(struct request_queue *q, unsigned long =
+addr,
+ 				 unsigned int len)
  {
- 	unsigned long res =3D 0;
 --=20
 2.30.2
 
