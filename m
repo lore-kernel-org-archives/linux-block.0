@@ -2,187 +2,276 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5467C433F5
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 12:21:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF054C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 12:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241614AbiEaMV0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 08:21:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57170 "EHLO
+        id S1344382AbiEaM5g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 08:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232616AbiEaMVY (ORCPT
+        with ESMTP id S1344147AbiEaM5f (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 08:21:24 -0400
-Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E2EF8149D
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 05:21:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1653999683; x=1685535683;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=yeVmRVIWtHmIHJwu3ADKQtZKNfbTRr5P5l1L8nRl6OI=;
-  b=MeMitrVeytcjESsaRwuAX3E6Roxv5EfaG3exc59C/G4HGSLPgA7Ri1Hz
-   rA+KrFIMJA/+TdZexkUfGIDBV9coyfo0SET3QSRTTR+oDf9jSsoHJt/zj
-   jXdztXLu0fvRuSgQK814P5k5+5O8I83CvpjbkjoyalgLzMjiXAP3BEm38
-   simxqjCfSXfV5CU4Ao4aEjtp1dv1zy69xL4aMMnagYKRAddpSiiVvkofb
-   32WoCritiWVJV0Niv4qvywbCiYfdClVAp5iY1X66CUTTuSbUNnDdjTwma
-   4iexk8foW2ArUKiHoG5AwHjDa2qWh84i0zL9sw5aSRgVIoVedRB0Ocnzz
-   w==;
-X-IronPort-AV: E=Sophos;i="5.91,265,1647273600"; 
-   d="scan'208";a="313903970"
-Received: from mail-bn8nam08lp2048.outbound.protection.outlook.com (HELO NAM04-BN8-obe.outbound.protection.outlook.com) ([104.47.74.48])
-  by ob1.hgst.iphmx.com with ESMTP; 31 May 2022 20:21:23 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fqhnhMn7VKLsHyrDsrKDMyN51Laiyw5ZSLsh2sHFNdRAoa0SQi5weSagWZglbsqSTjlIWLMIU6M5foOZJe+N5oS8/fqVjiBV7ZCpsAfFU1BOWvwB+bx8VNibIipVE/UntIz5MlpV6xKuQvgIgAJ4Udl5IIrbGkFJx7OvDvuVbQN/PF2DgBo8q+Ty1dWgNCpup6sMclTEPhHwQ2p49lFW1F6FCK6wkDv6g9e+19Po81RJyzRjeHgJBORZc/NaLBluuyN/Rw9uACz/cS7xRJkXGFxNCWCs78vPnuAV2IyHbo5Eopgqf5naSi0MBuA0SXATwjYhsQF2xqLVSIcT+05ULA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u8AYp/WazrWnWSlhXXBvEOXDaHhmMO4S5P6d8qa/igk=;
- b=WTtWheG6fLgzEqapiz4HXuUpRCPxRgo5Ba/kahxN0T2QDuYHk5VTp4KdoyyLYLrSg56JMtjbzUNWmAw3Dq9tvypCKGf2QtsWxGksrr27/+sxX7PZjdp/jbmS/4ooezPYshYBCkW3Sbvakfru8dLNxWhzinNiOxHG5GwCEp80HDBK1ym8zrFRsBx1CA8NcDDiwkKUw1Ii4QZ821G5BYZT+ZvRh4X+IET2NB2VhxEkQEnZVpPlUraXST1EgmhJHPUyFPuV/2pjlPrHNnrgrcJ65fA28AAYAA1pXZQ4zQCABC5pQb20ZDu3RE0zRITl87UvFcQtP5gnpft93Z/p0PgUMQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Tue, 31 May 2022 08:57:35 -0400
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60B67165A2
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 05:57:33 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id u3so18570049wrg.3
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 05:57:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u8AYp/WazrWnWSlhXXBvEOXDaHhmMO4S5P6d8qa/igk=;
- b=icUVkcBnLbuCKZfY/nqVH6dAQxz0clwC4EYYowKx6Dd+KRfKUdD7CdI+/mEjkRVHtl4L6ezzqYrTl3asXCC9ZxmWNzTJlBZVMPbN1vBbxZoIOr7rYGe38L12e2W04fReiRLc+KfF9V3IFExX/SldrM8JJeMk9gmnAE0uNdtzibw=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- SA1PR04MB8238.namprd04.prod.outlook.com (2603:10b6:806:1e5::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.12; Tue, 31 May
- 2022 12:21:19 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5293.019; Tue, 31 May 2022
- 12:21:18 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH blktests 9/9] common: do not require scsi_debug support to
- be modular
-Thread-Topic: [PATCH blktests 9/9] common: do not require scsi_debug support
- to be modular
-Thread-Index: AQHYdCZjIbXE+Sj6HU6lvM3bVmbTw6046Y8A
-Date:   Tue, 31 May 2022 12:21:18 +0000
-Message-ID: <20220531122118.xrx2bwx4caywez7y@shindev>
-References: <20220530130811.3006554-1-hch@lst.de>
- <20220530130811.3006554-10-hch@lst.de>
-In-Reply-To: <20220530130811.3006554-10-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: c15306a9-26d0-4ff7-d56c-08da430010f3
-x-ms-traffictypediagnostic: SA1PR04MB8238:EE_
-x-microsoft-antispam-prvs: <SA1PR04MB8238A5CBCA50A7F9A9F89555EDDC9@SA1PR04MB8238.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: XFHkMDxTo/94Lc5M5LcprsqaV1bEa/mk+yyNGopIUktpnIa2Etj2oSrW4nAPrgA09VGJzB+a4uxxoaB0edzZbzmt6GKtnW6No7DMYoqKMQW9XnQT+fvLUIiY7fvTk8Fl8bUX/ZH35YVt1wv1CM/IcHL3MPwPG5pieHRG+RWomfxSskh8uesNKiLoKMJbEYCaWqlzhW2PBMItS3er34czvlAxUQv/HAWwFEnenWZwCyjT34Y9/YHfqoaxDsTudD15XdNwSLZGf+hGzKR8szOSCNT8X7ctOjLkmiAEnuI8CIsgpU584K86qXol8SK2oC4FAS5eevJ4keCXI0s30EUMFXinhKaPY5h9qxRThiBxg9rjJ+xDAl4TQACrxDlo5/SvIbNzC05LHo14FyuRDyKHYikC1AiQ7s7RmopXVhU6z3mQNwUaWnRJlc9UV6Z4Gzq6/A+J1bfsmpGrxRu5RfX9ThlRiatWZh9Nm8cccHc/GEzSLyVDg19F/sV6hm4M8CrqghjlW+puCnsDrGMLTZ4GR1WAKyHQVOvUffVxxPA2aRE67IGeIEYy5RhoqIGZfviDfLeeTs5lXTWH1+WWTEzLPlj56nTW34F2G+yUiZ1Is9wYTO7qC7t+JKPsoBSt7DcK7L7LB1XgOC4E+cnXzALkq360iTZIC98vhF/oo2ySki5rXzPF2n9PoUIbedkxFHTQiFmNsxPDT/fEOgGcpzS71g==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(4636009)(366004)(26005)(186003)(33716001)(9686003)(6512007)(6506007)(66556008)(66476007)(38070700005)(6916009)(82960400001)(316002)(8676002)(4326008)(64756008)(122000001)(71200400001)(76116006)(66946007)(91956017)(66446008)(8936002)(6486002)(38100700002)(5660300002)(508600001)(2906002)(86362001)(83380400001)(44832011)(1076003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?Qq6c8sQo37CNuD1LNBOg8tJoomCFMr/ngtJnjwtfdOZSNpUY/onTTjuHmA7j?=
- =?us-ascii?Q?nDO4LZW0afyfm8Pw86roZ7UfhBN89o0xEtb/crq7ufgY8F9EpNpdGc8pFt3b?=
- =?us-ascii?Q?NQEzEC/dIAknUi6CMGTizQ7Yxzyh2YWN82dLEpA19HEklzzIY7OSsgo4gwmT?=
- =?us-ascii?Q?ZxIZhA7sq8JpX346S434yQ/AcFJD5aZqpQjAUKdnW7c09KKFMSYlzHNkUZSE?=
- =?us-ascii?Q?wdCpIYX6uZKwPSJlZEzcyFfe14kLmUUMn1aQVXHVz4JFiwI/RVKXyyik/aTI?=
- =?us-ascii?Q?gUelfN4mt+vYNErfd7ceReDJbHXQW1/EfjQcaSKkd0eXuwjW9rAUJ9PGKOGK?=
- =?us-ascii?Q?MuwdFSJCexj5WcuuEZUdsgXXZkCRTVUOfLADHbbzadgucWWwklFwAcbnb/Po?=
- =?us-ascii?Q?HAvMxOYwKR4v9QYy+fMXU0Yeog3NEHwKnTw6nKpySbVu3Q+NNdSZNOlZgo52?=
- =?us-ascii?Q?Z58gf/vF6yNpG+qXFQOZHtiS5D55gAdLEcnxdqCx5wb8PiPDyUXPGeyss7br?=
- =?us-ascii?Q?g10oiIa0SBJ/KBhTL8kw0rBeL6BNOHI00iYqejUG0n/8c0hpU+X/0Z0Z24uL?=
- =?us-ascii?Q?4SRdmWfUxpLV9uiCKe+yEMT4j7OCBApmErMT2tRPZhGuI4gup1yMlCK+ypmi?=
- =?us-ascii?Q?7idvpdN2RDjmeY+KDzmF3lssKi1WN5Bw/LAalcSVwSREes2KJOSElQ/yjPpL?=
- =?us-ascii?Q?/O4Kmr6DM4PDB1JnWKoTPDei20Z64WUosOsb5QyObnhGdGDmdfJn9DOs6EnI?=
- =?us-ascii?Q?qsBZc2sWVPCKhVF/1ua4lWZGXv6aNtCsMaJSw0XmO0SaREQLgbcwHe+5cEEw?=
- =?us-ascii?Q?lP1Umqbuhd0xxyq5UFQUuZ++qtxy2cmUfX4mJPZjQQ4ORrWPJJgjumXzeJe3?=
- =?us-ascii?Q?iIO9lbrFxzmEBHSaMr8HHCcEsAZ6+puCHrS6Sat9HgSiDhSTvTuBIpo9LrI4?=
- =?us-ascii?Q?g2zWDW9jli6MXenRG7aWnXRQmRga25tV8t27ijZ58nHLN5q5Zepbz9nP/ZEb?=
- =?us-ascii?Q?mj7JRg0h/grptlo7B0xj57s0OoJ8D0rMCz4xyX9Moh0FxWKvVytOevOJOJDu?=
- =?us-ascii?Q?30+tkheNlGdNLj01eR1nE7x/q4zrZ5dg7pn+JZv2tXy54eolz+q2UAg4d0Je?=
- =?us-ascii?Q?GkkDC4eG67bkPYRcbOqSygDbVR8MhcVqzY3kzHXk9YfcYcJsHFwdFVD9mXW+?=
- =?us-ascii?Q?1F6lhf4W2b8Os44oqpUg8L7fcZhrFIQt1OSlo6KYpmf3Mljsqk5XIDOKoa5Y?=
- =?us-ascii?Q?gsem+ZM0SvCc5sMADArW9YbQrRZy2CJEdbg25jSjqNe4tXBZhDCcK99XP1/c?=
- =?us-ascii?Q?1PXNnNw1NEYuWFHdULZKnmefcGD82mIqSyvSa/+iek93QNy1BeU1D5bwcZPN?=
- =?us-ascii?Q?JjsTseoXyyBZL8vhn1UFtkXfqKQ9ChX2OJoD0ko72M3VWuN5GOz4agaNKXVw?=
- =?us-ascii?Q?u2Cu0IdILAWtzy9ML+V8TtiRNqGhRkdlm9dxqWJR+b+8MCy1ejC0C8O5cc7/?=
- =?us-ascii?Q?BaTyuj5AU+dn9RRquAbU7umIO21nzXmEeoQ63FiRbp+ufRMgDdDre5Uq6obz?=
- =?us-ascii?Q?PGLVGJtHaUhFjhOccBMAPheAF8C8YzoqCFlEUDTQwGHxaXc25HRtt5p78rXf?=
- =?us-ascii?Q?xad69B0CrQhXUToGZUREnF4GcuR4r7UIQ4OZ/0bTnPqPAkFWL+4odFnb2FLq?=
- =?us-ascii?Q?LQgLIV9IkKy/xOvgFOMxlcrmA+Kj2awLJw3OjwAoMC85vhwDPSHEYLyRh3k8?=
- =?us-ascii?Q?VvT/FO2pjgm/GkD78I5X6RoXqPCRbY7d28HF/jG0LLKc9RV8vn8F?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <349FC7096610494983ADCFA356291E72@namprd04.prod.outlook.com>
+        d=unimore.it; s=google;
+        h=mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Ym2vxiiSkZboWqTFrRQZchxrLmktCPU70VmDq1pV1v4=;
+        b=GweWDN2paf8rGlIMYmyTJ3RStJiXhyeaMgOIxn5bmRswJTGDQcps/CLw/KbzXFomiA
+         4KhohHfJlwcwbGnRKUJXzEpF1m1IbAd3P0qb+H1V6M5jTDnC0Qu0/CoTdCxdU188whOB
+         e9wEy6RdvNimUcyK0rnGDM2Fzx/sytVRTrb1c=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:subject:from:in-reply-to:date:cc
+         :content-transfer-encoding:message-id:references:to;
+        bh=Ym2vxiiSkZboWqTFrRQZchxrLmktCPU70VmDq1pV1v4=;
+        b=jSIPh83ziH9VdtErKIAUreQl3GnSRV8geOy5ooiSHsSMqmpEV7knsAg3s7vJ2pCUXD
+         KFExLVC1tpK52RvpqChOPTm8+8vrjsYoAXbbXqb4x0h7tj9oirn7gEdOK2LT+QnAAbof
+         rx7ku4tVNZ4Bg16Xo6WedtG18Qs54zn9oxlNjDd9+OmgQiFKDcbFb/E0MkvHjr7kDHNT
+         4xS7pvWUXXePoYh8TyxgWm394bIDq3SkwRrym0dTq/KsW4M2H3xYcnAUW6jxmaWuxL8I
+         ThmfRH/ILJcSeREAxFslIQMUUupjjRgAsLwTyNnI/Xju7zqDtTw7YUFRE806KliqlVeT
+         k2Ag==
+X-Gm-Message-State: AOAM531+SlcU0jJjIZqbCqJ9eNLZ9Eg5eBNkp/AJACY3M4j+GQy0njVc
+        12GlV/yCPsDGCwwTied4MadD
+X-Google-Smtp-Source: ABdhPJxpnU5J/GyE7eu8WLhTw2SZt/rpWQYrTZUhMwcox8MqVAuEIRihh3QYdVns41cYWR72/jffWg==
+X-Received: by 2002:adf:ce0f:0:b0:210:2f54:9ce9 with SMTP id p15-20020adfce0f000000b002102f549ce9mr10036041wrn.649.1654001851862;
+        Tue, 31 May 2022 05:57:31 -0700 (PDT)
+Received: from mbp-di-paolo.station (net-93-144-98-177.cust.vodafonedsl.it. [93.144.98.177])
+        by smtp.gmail.com with ESMTPSA id b16-20020a056000055000b0020d03b5c33dsm8798551wrf.46.2022.05.31.05.57.30
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 31 May 2022 05:57:31 -0700 (PDT)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.11\))
+Subject: Re: [PATCH -next v7 2/3] block, bfq: refactor the counting of
+ 'num_groups_with_pending_reqs'
+From:   Paolo Valente <paolo.valente@unimore.it>
+In-Reply-To: <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
+Date:   Tue, 31 May 2022 14:57:29 +0200
+Cc:     Yu Kuai <yukuai3@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Tejun Heo <tj@kernel.org>, cgroups@vger.kernel.org,
+        linux-block <linux-block@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>, yi.zhang@huawei.com
 Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c15306a9-26d0-4ff7-d56c-08da430010f3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 May 2022 12:21:18.9197
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zejWX86zkSuNOY3NVsiVVpe07sFN+H0J167lhWkEyKGAFANOYEjRUE0eATCI+kEBCRmEw52BdE+UeL1v2jZrP2YGlzlcnOqkex1/H7mgMx8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR04MB8238
+Message-Id: <CB1A8F13-76DB-4469-A5CA-D0AD17975E38@unimore.it>
+References: <20220528095020.186970-1-yukuai3@huawei.com>
+ <20220528095020.186970-3-yukuai3@huawei.com>
+ <0D9355CE-F85B-4B1A-AEC3-F63DFC4B3A54@linaro.org>
+ <b9a4ea60-28e5-b7aa-0154-ad7481eafbd3@huawei.com>
+ <efe01dd1-0f99-dadf-956d-b0e80e1e602c@huawei.com>
+ <1803FD7E-9FB1-4A1E-BD6D-D6657006589A@unimore.it>
+ <a0d8452c-e421-45d3-b012-5355207fc0e1@huawei.com>
+ <81214347-3806-4F54-B60F-3E5A1A5EC84D@unimore.it>
+ <756631ee-6a85-303c-aca1-d60aaf477d0d@huawei.com>
+ <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
+To:     Jan Kara <jack@suse.cz>
+X-Mailer: Apple Mail (2.3445.104.11)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 30, 2022 / 15:08, Christoph Hellwig wrote:
-> Use _have_driver instead of _have_modules in _have_scsi_debug for the
-> basic scsi_debug check, and instead only require an actual module in
-> _init_null_blk when specific module parameters are passed.
->=20
-> Signed-off-by: Christoph Hellwig <hch@lst.de>
-> ---
->  common/scsi_debug | 14 ++++++++++----
->  tests/block/001   |  4 +++-
->  2 files changed, 13 insertions(+), 5 deletions(-)
->=20
-> diff --git a/common/scsi_debug b/common/scsi_debug
-> index 95da14e..e9161d3 100644
-> --- a/common/scsi_debug
-> +++ b/common/scsi_debug
-> @@ -5,7 +5,7 @@
->  # scsi_debug helper functions.
-> =20
->  _have_scsi_debug() {
-> -	_have_modules scsi_debug
-> +	_have_driver scsi_debug
->  }
-> =20
->  _init_scsi_debug() {
-> @@ -18,8 +18,14 @@ _init_scsi_debug() {
->  		args+=3D(zbc=3Dhost-managed zone_nr_conv=3D0)
->  	fi
-> =20
-> -	if ! modprobe -r scsi_debug || ! modprobe scsi_debug "${args[@]}"; then
-> -		return 1
-> +	if ((${#args[@]})); then
-> +		if ! modprobe -qr scsi_debug; then
-> +			exit 1
-> +		fi
-> +		if ! modprobe scsi_debug "${args[@]}"; then
-> +			SKIP_REASON=3D"scsi_debug not modular"
 
-I tried scsi_debug built-in kernel and observed that 'modprobe -qr scsi_deb=
-ug'
-command fails, and the script exits at the line of "exit 1". The SKIP_REASO=
-N
-comment above will not be printed. I think we need to check the scsi_debug =
-is
-not built-in. As I commented for _init_null_blk, _have_modules needs
-modification to check if the module is not built-in. I guess it can be used=
- for
-scsi_debug also.
 
---=20
-Shin'ichiro Kawasaki=
+> Il giorno 31 mag 2022, alle ore 12:01, Jan Kara <jack@suse.cz> ha =
+scritto:
+>=20
+> On Tue 31-05-22 17:33:25, Yu Kuai wrote:
+>> =E5=9C=A8 2022/05/31 17:19, Paolo Valente =E5=86=99=E9=81=93:
+>>>> Il giorno 31 mag 2022, alle ore 11:06, Yu Kuai <yukuai3@huawei.com> =
+ha scritto:
+>>>>=20
+>>>> =E5=9C=A8 2022/05/31 16:36, Paolo VALENTE =E5=86=99=E9=81=93:
+>>>>>> Il giorno 30 mag 2022, alle ore 10:40, Yu Kuai =
+<yukuai3@huawei.com> ha scritto:
+>>>>>>=20
+>>>>>> =E5=9C=A8 2022/05/30 16:34, Yu Kuai =E5=86=99=E9=81=93:
+>>>>>>> =E5=9C=A8 2022/05/30 16:10, Paolo Valente =E5=86=99=E9=81=93:
+>>>>>>>>=20
+>>>>>>>>=20
+>>>>>>>>> Il giorno 28 mag 2022, alle ore 11:50, Yu Kuai =
+<yukuai3@huawei.com> ha scritto:
+>>>>>>>>>=20
+>>>>>>>>> Currently, bfq can't handle sync io concurrently as long as =
+they
+>>>>>>>>> are not issued from root group. This is because
+>>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+>>>>>>>>> bfq_asymmetric_scenario().
+>>>>>>>>>=20
+>>>>>>>>> The way that bfqg is counted into =
+'num_groups_with_pending_reqs':
+>>>>>>>>>=20
+>>>>>>>>> Before this patch:
+>>>>>>>>> 1) root group will never be counted.
+>>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
+>>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the =
+requests.
+>>>>>>>>>=20
+>>>>>>>>> After this patch:
+>>>>>>>>> 1) root group is counted.
+>>>>>>>>> 2) Count if bfqg have at least one bfqq that is marked busy.
+>>>>>>>>> 3) Don't count if bfqg doesn't have any busy bfqqs.
+>>>>>>>>=20
+>>>>>>>> Unfortunately, I see a last problem here. I see a double =
+change:
+>>>>>>>> (1) a bfqg is now counted only as a function of the state of =
+its child
+>>>>>>>>      queues, and not of also its child bfqgs
+>>>>>>>> (2) the state considered for counting a bfqg moves from having =
+pending
+>>>>>>>>      requests to having busy queues
+>>>>>>>>=20
+>>>>>>>> I'm ok with with (1), which is a good catch (you are lady =
+explained
+>>>>>>>> the idea to me some time ago IIRC).
+>>>>>>>>=20
+>>>>>>>> Yet I fear that (2) is not ok.  A bfqq can become non busy even =
+if it
+>>>>>>>> still has in-flight I/O, i.e.  I/O being served in the drive.  =
+The
+>>>>>>>> weight of such a bfqq must still be considered in the =
+weights_tree,
+>>>>>>>> and the group containing such a queue must still be counted =
+when
+>>>>>>>> checking whether the scenario is asymmetric.  Otherwise service
+>>>>>>>> guarantees are broken.  The reason is that, if a scenario is =
+deemed as
+>>>>>>>> symmetric because in-flight I/O is not taken into account, then =
+idling
+>>>>>>>> will not be performed to protect some bfqq, and in-flight I/O =
+may
+>>>>>>>> steal bandwidth to that bfqq in an uncontrolled way.
+>>>>>>> Hi, Paolo
+>>>>>>> Thanks for your explanation.
+>>>>>>> My orginal thoughts was using weights_tree insertion/removal, =
+however,
+>>>>>>> Jan convinced me that using bfq_add/del_bfqq_busy() is ok.
+>>>>>>> =46rom what I see, when bfqq dispatch the last request,
+>>>>>>> bfq_del_bfqq_busy() will not be called from __bfq_bfqq_expire() =
+if
+>>>>>>> idling is needed, and it will delayed to when such bfqq get =
+scheduled as
+>>>>>>> in-service queue again. Which means the weight of such bfqq =
+should still
+>>>>>>> be considered in the weights_tree.
+>>>>>>> I also run some tests on null_blk with "irqmode=3D2
+>>>>>>> completion_nsec=3D100000000(100ms) hw_queue_depth=3D1", and =
+tests show
+>>>>>>> that service guarantees are still preserved on slow device.
+>>>>>>> Do you this is strong enough to cover your concern?
+>>>>> Unfortunately it is not.  Your very argument is what made be =
+believe
+>>>>> that considering busy queues was enough, in the first place.  But, =
+as
+>>>>> I found out, the problem is caused by the queues that do not enjoy
+>>>>> idling.  With your patch (as well as in my initial version) they =
+are
+>>>>> not counted when they remain without requests queued.  And this =
+makes
+>>>>> asymmetric scenarios be considered erroneously as symmetric.  The
+>>>>> consequence is that idling gets switched off when it had to be =
+kept
+>>>>> on, and control on bandwidth is lost for the victim in-service =
+queues.
+>>>>=20
+>>>> Hi=EF=BC=8CPaolo
+>>>>=20
+>>>> Thanks for your explanation, are you thinking that if bfqq doesn't =
+enjoy
+>>>> idling, then such bfqq will clear busy after dispatching the last
+>>>> request?
+>>>>=20
+>>>> Please kindly correct me if I'm wrong in the following process:
+>>>>=20
+>>>> If there are more than one bfqg that is activatied, then bfqqs that =
+are
+>>>> not enjoying idle are still left busy after dispatching the last
+>>>> request.
+>>>>=20
+>>>> details in __bfq_bfqq_expire:
+>>>>=20
+>>>>        if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
+>>>>        =E2=94=8A   !(reason =3D=3D BFQQE_PREEMPTED &&
+>>>>        =E2=94=8A     idling_needed_for_service_guarantees(bfqd, =
+bfqq))) {
+>>>> -> idling_needed_for_service_guarantees will always return true,
+>>>=20
+>>> It returns true only is the scenario is symmetric.  Not counting =
+bfqqs
+>>> with in-flight requests makes an asymmetric scenario be considered
+>>> wrongly symmetric.  See function bfq_asymmetric_scenario().
+>>=20
+>> Hi, Paolo
+>>=20
+>> Do you mean this gap?
+>>=20
+>> 1. io1 is issued from bfqq1(from bfqg1)
+>> 2. bfqq1 dispatched this io, it's busy is cleared
+>> 3. *before io1 is completed*, io2 is issued from bfqq2(bfqg2)
+>=20
+> Yes. So as far as I understand Paolo is concerned about this scenario.
+>=20
+>> 4. with this patchset, while dispatching io2 from bfqq2, the scenario
+>> should be symmetric while it's considered wrongly asymmetric.
+>=20
+> But with this patchset, we will consider this scenario symmetric =
+because at
+> any point in time there is only one busy bfqq. Before, we considered =
+this
+> scenario asymmetric because two different bfq groups have bfqq in =
+their
+> weights_tree. So before this patchset
+> idling_needed_for_service_guarantees() returned true, after this =
+patchset
+> the function returns false so we won't idle anymore and Paolo argues =
+that
+> bfqq1 does not get adequate protection from bfqq2 as a result.
+>=20
+> I agree with Paolo this seems possible. The fix is relatively simple =
+though
+> - instead of changing how weights_tree is used for weight raised =
+queues as
+> you did originally, I'd move the accounting of groups with pending =
+requests
+> to bfq_add/del_bfqq_busy() and bfq_completed_request().
+>=20
+
+Why don't we use simply the existing logic? I mean, as for the changes =
+made by this patch, we could simply turn the loop:
+
+void bfq_weights_tree_remove(struct bfq_data *bfqd,
+			     struct bfq_queue *bfqq)
+{
+	...
+	for_each_entity(entity) {
+		struct bfq_sched_data *sd =3D entity->my_sched_data;
+
+		...
+		if (entity->in_groups_with_pending_reqs) {
+			entity->in_groups_with_pending_reqs =3D false;
+			bfqd->num_groups_with_pending_reqs--;
+		}
+	}
+	...
+}
+
+into a single:
+
+	bfqd->num_groups_with_pending_reqs--;
+
+so that only the parent group is concerned.
+
+Thanks,
+Paolo
+
+
+
+> 								Honza
+> --=20
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+
