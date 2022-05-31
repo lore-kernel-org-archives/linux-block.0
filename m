@@ -2,217 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92582C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 13:29:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ED8C433F5
+	for <linux-block@archiver.kernel.org>; Tue, 31 May 2022 13:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243558AbiEaN3B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 09:29:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59112 "EHLO
+        id S242346AbiEaNzo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 09:55:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229939AbiEaN3B (ORCPT
+        with ESMTP id S245530AbiEaNzm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 09:29:01 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F5D764BF2;
-        Tue, 31 May 2022 06:28:58 -0700 (PDT)
-Received: from kwepemi500010.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LCCkD6c4yzgYNm;
-        Tue, 31 May 2022 21:27:16 +0800 (CST)
+        Tue, 31 May 2022 09:55:42 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03CF5D5C;
+        Tue, 31 May 2022 06:55:35 -0700 (PDT)
+Received: from kwepemi500016.china.huawei.com (unknown [172.30.72.54])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LCDHJ2D70zRhVj;
+        Tue, 31 May 2022 21:52:28 +0800 (CST)
 Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi500010.china.huawei.com (7.221.188.191) with Microsoft SMTP Server
+ kwepemi500016.china.huawei.com (7.221.188.220) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 31 May 2022 21:28:55 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 31 May 2022 21:28:54 +0800
-Subject: Re: [PATCH -next v7 2/3] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Paolo Valente <paolo.valente@unimore.it>, Jan Kara <jack@suse.cz>
-CC:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        <cgroups@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220528095020.186970-1-yukuai3@huawei.com>
- <20220528095020.186970-3-yukuai3@huawei.com>
- <0D9355CE-F85B-4B1A-AEC3-F63DFC4B3A54@linaro.org>
- <b9a4ea60-28e5-b7aa-0154-ad7481eafbd3@huawei.com>
- <efe01dd1-0f99-dadf-956d-b0e80e1e602c@huawei.com>
- <1803FD7E-9FB1-4A1E-BD6D-D6657006589A@unimore.it>
- <a0d8452c-e421-45d3-b012-5355207fc0e1@huawei.com>
- <81214347-3806-4F54-B60F-3E5A1A5EC84D@unimore.it>
- <756631ee-6a85-303c-aca1-d60aaf477d0d@huawei.com>
- <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
- <CB1A8F13-76DB-4469-A5CA-D0AD17975E38@unimore.it>
+ 15.1.2375.24; Tue, 31 May 2022 21:55:33 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 31 May
+ 2022 21:55:33 +0800
 From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <60c462fd-752a-1c52-f1a8-ad6b51146bc4@huawei.com>
-Date:   Tue, 31 May 2022 21:28:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+To:     <paolo.valente@linaro.org>, <jack@suse.cz>, <axboe@kernel.dk>,
+        <tj@kernel.org>
+CC:     <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH -next v8 1/4] block, bfq: support to track if bfqq has pending requests
+Date:   Tue, 31 May 2022 22:08:55 +0800
+Message-ID: <20220531140858.3324294-2-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220531140858.3324294-1-yukuai3@huawei.com>
+References: <20220531140858.3324294-1-yukuai3@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <CB1A8F13-76DB-4469-A5CA-D0AD17975E38@unimore.it>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
  kwepemm600009.china.huawei.com (7.193.23.164)
 X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/31 20:57, Paolo Valente 写道:
-> 
-> 
->> Il giorno 31 mag 2022, alle ore 12:01, Jan Kara <jack@suse.cz> ha scritto:
->>
->> On Tue 31-05-22 17:33:25, Yu Kuai wrote:
->>> 在 2022/05/31 17:19, Paolo Valente 写道:
->>>>> Il giorno 31 mag 2022, alle ore 11:06, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>
->>>>> 在 2022/05/31 16:36, Paolo VALENTE 写道:
->>>>>>> Il giorno 30 mag 2022, alle ore 10:40, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>>
->>>>>>> 在 2022/05/30 16:34, Yu Kuai 写道:
->>>>>>>> 在 2022/05/30 16:10, Paolo Valente 写道:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>>> Il giorno 28 mag 2022, alle ore 11:50, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>>>>>
->>>>>>>>>> Currently, bfq can't handle sync io concurrently as long as they
->>>>>>>>>> are not issued from root group. This is because
->>>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>>>>>> bfq_asymmetric_scenario().
->>>>>>>>>>
->>>>>>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>>>>>>>
->>>>>>>>>> Before this patch:
->>>>>>>>>> 1) root group will never be counted.
->>>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->>>>>>>>>>
->>>>>>>>>> After this patch:
->>>>>>>>>> 1) root group is counted.
->>>>>>>>>> 2) Count if bfqg have at least one bfqq that is marked busy.
->>>>>>>>>> 3) Don't count if bfqg doesn't have any busy bfqqs.
->>>>>>>>>
->>>>>>>>> Unfortunately, I see a last problem here. I see a double change:
->>>>>>>>> (1) a bfqg is now counted only as a function of the state of its child
->>>>>>>>>       queues, and not of also its child bfqgs
->>>>>>>>> (2) the state considered for counting a bfqg moves from having pending
->>>>>>>>>       requests to having busy queues
->>>>>>>>>
->>>>>>>>> I'm ok with with (1), which is a good catch (you are lady explained
->>>>>>>>> the idea to me some time ago IIRC).
->>>>>>>>>
->>>>>>>>> Yet I fear that (2) is not ok.  A bfqq can become non busy even if it
->>>>>>>>> still has in-flight I/O, i.e.  I/O being served in the drive.  The
->>>>>>>>> weight of such a bfqq must still be considered in the weights_tree,
->>>>>>>>> and the group containing such a queue must still be counted when
->>>>>>>>> checking whether the scenario is asymmetric.  Otherwise service
->>>>>>>>> guarantees are broken.  The reason is that, if a scenario is deemed as
->>>>>>>>> symmetric because in-flight I/O is not taken into account, then idling
->>>>>>>>> will not be performed to protect some bfqq, and in-flight I/O may
->>>>>>>>> steal bandwidth to that bfqq in an uncontrolled way.
->>>>>>>> Hi, Paolo
->>>>>>>> Thanks for your explanation.
->>>>>>>> My orginal thoughts was using weights_tree insertion/removal, however,
->>>>>>>> Jan convinced me that using bfq_add/del_bfqq_busy() is ok.
->>>>>>>>  From what I see, when bfqq dispatch the last request,
->>>>>>>> bfq_del_bfqq_busy() will not be called from __bfq_bfqq_expire() if
->>>>>>>> idling is needed, and it will delayed to when such bfqq get scheduled as
->>>>>>>> in-service queue again. Which means the weight of such bfqq should still
->>>>>>>> be considered in the weights_tree.
->>>>>>>> I also run some tests on null_blk with "irqmode=2
->>>>>>>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
->>>>>>>> that service guarantees are still preserved on slow device.
->>>>>>>> Do you this is strong enough to cover your concern?
->>>>>> Unfortunately it is not.  Your very argument is what made be believe
->>>>>> that considering busy queues was enough, in the first place.  But, as
->>>>>> I found out, the problem is caused by the queues that do not enjoy
->>>>>> idling.  With your patch (as well as in my initial version) they are
->>>>>> not counted when they remain without requests queued.  And this makes
->>>>>> asymmetric scenarios be considered erroneously as symmetric.  The
->>>>>> consequence is that idling gets switched off when it had to be kept
->>>>>> on, and control on bandwidth is lost for the victim in-service queues.
->>>>>
->>>>> Hi，Paolo
->>>>>
->>>>> Thanks for your explanation, are you thinking that if bfqq doesn't enjoy
->>>>> idling, then such bfqq will clear busy after dispatching the last
->>>>> request?
->>>>>
->>>>> Please kindly correct me if I'm wrong in the following process:
->>>>>
->>>>> If there are more than one bfqg that is activatied, then bfqqs that are
->>>>> not enjoying idle are still left busy after dispatching the last
->>>>> request.
->>>>>
->>>>> details in __bfq_bfqq_expire:
->>>>>
->>>>>         if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
->>>>>         ┊   !(reason == BFQQE_PREEMPTED &&
->>>>>         ┊     idling_needed_for_service_guarantees(bfqd, bfqq))) {
->>>>> -> idling_needed_for_service_guarantees will always return true,
->>>>
->>>> It returns true only is the scenario is symmetric.  Not counting bfqqs
->>>> with in-flight requests makes an asymmetric scenario be considered
->>>> wrongly symmetric.  See function bfq_asymmetric_scenario().
->>>
->>> Hi, Paolo
->>>
->>> Do you mean this gap?
->>>
->>> 1. io1 is issued from bfqq1(from bfqg1)
->>> 2. bfqq1 dispatched this io, it's busy is cleared
->>> 3. *before io1 is completed*, io2 is issued from bfqq2(bfqg2)
->>
->> Yes. So as far as I understand Paolo is concerned about this scenario.
->>
->>> 4. with this patchset, while dispatching io2 from bfqq2, the scenario
->>> should be symmetric while it's considered wrongly asymmetric.
->>
->> But with this patchset, we will consider this scenario symmetric because at
->> any point in time there is only one busy bfqq. Before, we considered this
->> scenario asymmetric because two different bfq groups have bfqq in their
->> weights_tree. So before this patchset
->> idling_needed_for_service_guarantees() returned true, after this patchset
->> the function returns false so we won't idle anymore and Paolo argues that
->> bfqq1 does not get adequate protection from bfqq2 as a result.
->>
->> I agree with Paolo this seems possible. The fix is relatively simple though
->> - instead of changing how weights_tree is used for weight raised queues as
->> you did originally, I'd move the accounting of groups with pending requests
->> to bfq_add/del_bfqq_busy() and bfq_completed_request().
->>
-> 
-> Why don't we use simply the existing logic? I mean, as for the changes made by this patch, we could simply turn the loop:
-> 
-> void bfq_weights_tree_remove(struct bfq_data *bfqd,
-> 			     struct bfq_queue *bfqq)
-> {
-> 	...
-> 	for_each_entity(entity) {
-> 		struct bfq_sched_data *sd = entity->my_sched_data;
-> 
-> 		...
-> 		if (entity->in_groups_with_pending_reqs) {
-> 			entity->in_groups_with_pending_reqs = false;
-> 			bfqd->num_groups_with_pending_reqs--;
-> 		}
-> 	}
-> 	...
-> }
-> 
-> into a single:
-> 
-> 	bfqd->num_groups_with_pending_reqs--;
-> 
-> so that only the parent group is concerned.
+If entity belongs to bfqq, then entity->in_groups_with_pending_reqs
+is not used currently. This patch use it to track if bfqq has pending
+requests through callers of weights_tree insertion and removal.
 
-It's ok to decrease it here, however, we need another place to increase
-it in order to count root group... And bfq_weights_tree_add is not good
-because it bypass wr queues.
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ block/bfq-iosched.c |  1 +
+ block/bfq-iosched.h |  1 +
+ block/bfq-wf2q.c    | 24 ++++++++++++++++++++++--
+ 3 files changed, 24 insertions(+), 2 deletions(-)
 
-Thanks,
-Kuai
+diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+index 0d46cb728bbf..0ec21018daba 100644
+--- a/block/bfq-iosched.c
++++ b/block/bfq-iosched.c
+@@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+ 		 */
+ 		bfqq->budget_timeout = jiffies;
+ 
++		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+ 		bfq_weights_tree_remove(bfqd, bfqq);
+ 	}
+ 
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index ca8177d7bf7c..3b9b1a0e7c1c 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -1080,6 +1080,7 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 		       bool expiration);
+ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
++void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
+ 
+ /* --------------- end of interface of B-WF2Q+ ---------------- */
+ 
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index f8eb340381cf..12d20f26ad69 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -1647,6 +1647,22 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 				    bfqq == bfqd->in_service_queue, expiration);
+ }
+ 
++static void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	if (!entity->in_groups_with_pending_reqs)
++		entity->in_groups_with_pending_reqs = true;
++}
++
++void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
++{
++	struct bfq_entity *entity = &bfqq->entity;
++
++	if (entity->in_groups_with_pending_reqs)
++		entity->in_groups_with_pending_reqs = false;
++}
++
+ /*
+  * Called when the bfqq no longer has requests pending, remove it from
+  * the service tree. As a special case, it can be invoked during an
+@@ -1668,8 +1684,10 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ 
+ 	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+ 
+-	if (!bfqq->dispatched)
++	if (!bfqq->dispatched) {
++		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+ 		bfq_weights_tree_remove(bfqd, bfqq);
++	}
+ }
+ 
+ /*
+@@ -1684,10 +1702,12 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+ 	bfq_mark_bfqq_busy(bfqq);
+ 	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
+ 
+-	if (!bfqq->dispatched)
++	if (!bfqq->dispatched) {
++		bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
+ 		if (bfqq->wr_coeff == 1)
+ 			bfq_weights_tree_add(bfqd, bfqq,
+ 					     &bfqd->queue_weights_tree);
++	}
+ 
+ 	if (bfqq->wr_coeff > 1)
+ 		bfqd->wr_busy_queues++;
+-- 
+2.31.1
+
