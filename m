@@ -2,152 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2136C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 06:16:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D10A4C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 06:19:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349815AbiFAGQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 02:16:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39948 "EHLO
+        id S236801AbiFAGS7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 02:18:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349802AbiFAGQQ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 02:16:16 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3B567354B
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:16:14 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id e2so864599wrc.1
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:16:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=vUroyxhPDzujIL+srQrQJbzj1rBmcTjbEH4aNuHu6u8=;
-        b=QDJd+JMtSbictp3JXuSTnUcFtrUT8VgQ8R4hk/9xlsI/xQieNS7UamrA41uiFJDkE0
-         XgXgIUC97MDtbIyS67TN33hdGqO8YaB+srytVD+PJ14E7d7vsrFEhpMTzqWyXGrzVlFm
-         kDRVuH3aEqSRdWf/O74FOrdH7KOZfsmBdqoh5qFApkyER06xLe6zCZiQ8H9iQe2zY55u
-         eyn6hIdNB1JF2C6qhvvOjwehBoCsMjCLsgLH3zNYlhWCw8WVu/pKywVfU8cKQu2miYWf
-         vIx2rrFhgSljAMJPD5g2A07ERmaAmjazqSRuhq2OHA3MjJTsglOO8+RMT4T1VMeObNF6
-         ZyJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=vUroyxhPDzujIL+srQrQJbzj1rBmcTjbEH4aNuHu6u8=;
-        b=hvphIX5qWCbPJ9rST7Lc8kkrHF9yK+HeO1CiWVCgVBkgbWIaocRHlFa/CDtazCoJeZ
-         3pD3qbyyEqOwGuCxhXn9qXozDV0KtkP3w7rI8bo2MmugDEBa5XAlkiXQdRzQ0qhKwmXl
-         1RBHRRYKjjyZk6M0BIELnaxy2e46HVy+KKMFYvUF8WWFCFOzgLDcVYDPAsegqdvqlQ8G
-         AzJqtcYB11dffK7YwX0+a8WlR/Ng1hPg6XcawCAUWgfBiPxuXMe5F9ZsV6zJsxOCcSLI
-         Iih8cUviWrch+GoxL63BvyvuL35ITayODwoa49+Zmimwrxe7SFlcS8lZQsVU9wE+Q635
-         zfog==
-X-Gm-Message-State: AOAM531XlKt0olafueYPkljRprnj23Wy4I2/3pHZW1ONXBOBIM424TVw
-        Mia5daI9WE6GQ2KyHrHVCAG9+A==
-X-Google-Smtp-Source: ABdhPJymVvDLqx+/1DvfStNIMCuy4P2eY1dbazYi71Vp6xbE1/EYlA1FwV6n4UNJYRhaRUEHGJ1WWA==
-X-Received: by 2002:a05:6000:384:b0:210:28d:29f1 with SMTP id u4-20020a056000038400b00210028d29f1mr28708376wrf.512.1654064172802;
-        Tue, 31 May 2022 23:16:12 -0700 (PDT)
-Received: from [10.188.163.71] (cust-east-parth2-46-193-73-98.wb.wifirst.net. [46.193.73.98])
-        by smtp.gmail.com with ESMTPSA id h1-20020a5d6e01000000b0020d03c14b9csm617451wrz.1.2022.05.31.23.16.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 31 May 2022 23:16:12 -0700 (PDT)
-Message-ID: <03b3a6bc-586a-2b45-a60c-5ab81076bf13@kernel.dk>
-Date:   Wed, 1 Jun 2022 00:16:11 -0600
+        with ESMTP id S243882AbiFAGS6 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 02:18:58 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF27356C00
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:18:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=3C+6WzgEOxD3Th3lbBMw2iqkkXvLHiw6iB/fnEH+cRU=; b=AzrBlc0/9f06o/RXllSaaZmP6w
+        EkP5jjoEaq6TA3GA0uPJppx/4kzrgoRR6Y9tpJ5NdW5sxDF+JQVAN7XXi2GsoemhFYu/ocH6SZEYm
+        7JbbNXq31laVCKNhhWVIZgr0k0iAx3JXZfG20LR8SyJUndD0sDNBJXeMBBWOafPcTzE5X2pdZGAOU
+        0SOkJBGsF9DgKsFgltRBVgCYGFi82Fvs6UQNjI4Ym9bePT/q17MYw6HajA/xgeFv0OlO8XbANzPbU
+        F/1OQC5wtGnxO2rJf2SjVaVXLOjrZT7VcmjAKglCKF9iNlobSLhnFgf0U+XrFYFbi4W26W/h6jn9f
+        JMJXuEUw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nwHgz-00E5mV-3C; Wed, 01 Jun 2022 06:18:53 +0000
+Date:   Tue, 31 May 2022 23:18:53 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@infradead.org>,
+        Mike Snitzer <snitzer@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, david@fromorbit.com
+Subject: Re: bioset_exit poison from dm_destroy
+Message-ID: <YpcEzU11WS52gpmk@infradead.org>
+References: <YpK7m+14A+pZKs5k@casper.infradead.org>
+ <2523e5b0-d89c-552e-40a6-6d414418749d@kernel.dk>
+ <YpZlOCMept7wFjOw@redhat.com>
+ <YpcBgY9MMgumEjTL@infradead.org>
+ <08625f5f-4781-52c5-46fc-d1250f70626c@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
- specail occasion
-Content-Language: en-US
-To:     Yu Kuai <yukuai3@huawei.com>, Jan Kara <jack@suse.cz>
-Cc:     paolo.valente@linaro.org, tj@kernel.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-References: <20220428120837.3737765-1-yukuai3@huawei.com>
- <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
- <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
- <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
- <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
- <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
- <20220523085902.wmxoebyq3crerecr@quack3.lan>
- <25f6703e-9e10-75d9-a893-6df1e6b75254@kernel.dk>
- <20220523152516.7sr247i3bzwhr44w@quack3.lan>
- <13ad158e-7859-ca61-209e-7d1fe99d0bdb@huawei.com>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <13ad158e-7859-ca61-209e-7d1fe99d0bdb@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <08625f5f-4781-52c5-46fc-d1250f70626c@kernel.dk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 5/23/22 7:13 PM, Yu Kuai wrote:
-> ? 2022/05/23 23:25, Jan Kara ??:
->> On Mon 23-05-22 06:36:58, Jens Axboe wrote:
->>> On 5/23/22 2:59 AM, Jan Kara wrote:
->>>> On Mon 23-05-22 09:10:38, yukuai (C) wrote:
->>>>> ? 2022/05/21 20:21, Jens Axboe ??:
->>>>>> On 5/21/22 1:22 AM, yukuai (C) wrote:
->>>>>>> ? 2022/05/14 17:29, yukuai (C) ??:
->>>>>>>> ? 2022/05/05 9:00, yukuai (C) ??:
->>>>>>>>> Hi, Paolo
->>>>>>>>>
->>>>>>>>> Can you take a look at this patchset? It has been quite a long time
->>>>>>>>> since we spotted this problem...
->>>>>>>>>
->>>>>>>>
->>>>>>>> friendly ping ...
->>>>>>> friendly ping ...
->>>>>>
->>>>>> I can't speak for Paolo, but I've mentioned before that the majority
->>>>>> of your messages end up in my spam. That's still the case, in fact
->>>>>> I just marked maybe 10 of them as not spam.
->>>>>>
->>>>>> You really need to get this issued sorted out, or you will continue
->>>>>> to have patches ignore because folks may simply not see them.
->>>>>>
->>>>> Hi,
->>>>>
->>>>> Thanks for your notice.
->>>>>
->>>>> Is it just me or do you see someone else's messages from *huawei.com
->>>>> end up in spam? I tried to seek help from our IT support, however, they
->>>>> didn't find anything unusual...
->>>>
->>>> So actually I have noticed that a lot of (valid) email from huawei.com (not
->>>> just you) ends up in the spam mailbox. For me direct messages usually pass
->>>> (likely matching SPF records for originating mail server save the email
->>>> from going to spam) but messages going through mailing lists are flagged as
->>>> spam because the emails are missing valid DKIM signature but huawei.com
->>>> DMARC config says there should be DKIM signature (even direct messages are
->>>> missing DKIM so this does not seem as a mailing list configuration issue).
->>>> So this seems as some misconfiguration of the mails on huawei.com side
->>>> (likely missing DKIM signing of outgoing email).
->>>
->>> SPF/DKIM was indeed a problem earlier for yukaui patches, but I don't
->>> see that anymore. Maybe it's still an issue for some emails, from them
->>> or Huawei in general?
->>
->> Hum, for me all emails from Huawei I've received even today fail the DKIM
->> check. After some more digging there is interesting inconsistency in DMARC
->> configuration for huawei.com domain. There is DMARC record for huawei.com
->> like:
->>
->> huawei.com.        600    IN    TXT    "v=DMARC1;p=none;rua=mailto:dmarc@edm.huawei.com"
->>
->> which means no DKIM is required but _dmarc.huawei.com has:
->>
->> _dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
->>
->> which says that DKIM is required. I guess this inconsistency may be the
->> reason why there are problems with DKIM validation for senders from
->> huawei.com. Yu Kuai, can you perhaps take this to your IT support to fix
->> this? Either make sure huawei.com emails get properly signed with DKIM or
->> remove the 'quarantine' record from _dmarc.huawei.com. Thanks!
-> Of course, I'll try to contact our IT support.
+On Wed, Jun 01, 2022 at 12:08:57AM -0600, Jens Axboe wrote:
+> Yes, that was my point in the previous email - get rid of
+> bioset_initialized() and just fixup dm, which is the only user of it.
+> There really should be no need to have this kind of conditional checking
+> and initialization.
 
-I second that, pretty much every email has been going into spam since, I
-guess you just had a few lucky ones. Looks like Jan is right, it's a
-server side configuration error that's causing this, and it's still
-happening
-
--- 
-Jens Axboe
-
+dm and md, but yes, we should not really use this check anywhere.
