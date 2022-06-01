@@ -2,85 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE8EC433F5
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 07:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D62EEC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 07:19:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245562AbiFAHLo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 03:11:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46232 "EHLO
+        id S1350244AbiFAHTY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 03:19:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347985AbiFAHLn (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 03:11:43 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468BF1094;
-        Wed,  1 Jun 2022 00:11:43 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DD10561348;
-        Wed,  1 Jun 2022 07:11:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF87AC385B8;
-        Wed,  1 Jun 2022 07:11:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654067502;
-        bh=msvXeenbVZkFFjDrBwDGhupiSlP9tbiX4Ft0x4Ech6Y=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=uZEnabnhlnptNTwlqLetggxM0qB9RfzMjTfcYWooe8t39hTdz3Neg44WxfFOcxWZu
-         GseZdVPiLFptSKd3XGZrDbTo0pqhWAuzVVytqByTMVvrg7cTHwE5Us4XzXdaC1HF2A
-         N7C/oVr7CcFSN7FzyEo5KvBCsd05XUmyRQWCU8fAifVwI3KXc2jMeaPQLOV2YzvPgL
-         kQwoBIZv/IQN/ugsODtQsBIXGRrpjAqSJw2oNo3+a00mim7kk7GVOHTsm81sGj98yl
-         rGA8dmLVmIrzLofXBsyt6/uCMb+3xHt8UV0mZ4S4ty748cnysXqJMXPeWgKtyEfQVg
-         unHxy8dSjbJjw==
-Date:   Wed, 1 Jun 2022 00:11:40 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Keith Busch <kbusch@fb.com>
-Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, axboe@kernel.dk,
-        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        pankydev8@gmail.com, Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCHv5 00/11] direct-io dma alignment
-Message-ID: <YpcRLKwZpN+NQRxn@sol.localdomain>
-References: <20220531191137.2291467-1-kbusch@fb.com>
+        with ESMTP id S1350234AbiFAHTX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 03:19:23 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 645C14DF4A;
+        Wed,  1 Jun 2022 00:19:21 -0700 (PDT)
+Received: from kwepemi500013.china.huawei.com (unknown [172.30.72.53])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LCgW02QC4zDqYc;
+        Wed,  1 Jun 2022 15:19:08 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ kwepemi500013.china.huawei.com (7.221.188.120) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 1 Jun 2022 15:19:19 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 1 Jun 2022 15:19:18 +0800
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+To:     Jens Axboe <axboe@kernel.dk>, Jan Kara <jack@suse.cz>
+CC:     <paolo.valente@linaro.org>, <tj@kernel.org>,
+        <linux-block@vger.kernel.org>, <cgroups@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220428120837.3737765-1-yukuai3@huawei.com>
+ <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
+ <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+ <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+ <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
+ <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+ <20220523085902.wmxoebyq3crerecr@quack3.lan>
+ <25f6703e-9e10-75d9-a893-6df1e6b75254@kernel.dk>
+ <20220523152516.7sr247i3bzwhr44w@quack3.lan>
+ <13ad158e-7859-ca61-209e-7d1fe99d0bdb@huawei.com>
+ <03b3a6bc-586a-2b45-a60c-5ab81076bf13@kernel.dk>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <3e2bc90f-464d-f80d-a624-5337af420ec9@huawei.com>
+Date:   Wed, 1 Jun 2022 15:19:17 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220531191137.2291467-1-kbusch@fb.com>
+In-Reply-To: <03b3a6bc-586a-2b45-a60c-5ab81076bf13@kernel.dk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, May 31, 2022 at 12:11:26PM -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
+在 2022/06/01 14:16, Jens Axboe 写道:
+> On 5/23/22 7:13 PM, Yu Kuai wrote:
+>> ? 2022/05/23 23:25, Jan Kara ??:
+>>> On Mon 23-05-22 06:36:58, Jens Axboe wrote:
+>>>> On 5/23/22 2:59 AM, Jan Kara wrote:
+>>>>> On Mon 23-05-22 09:10:38, yukuai (C) wrote:
+>>>>>> ? 2022/05/21 20:21, Jens Axboe ??:
+>>>>>>> On 5/21/22 1:22 AM, yukuai (C) wrote:
+>>>>>>>> ? 2022/05/14 17:29, yukuai (C) ??:
+>>>>>>>>> ? 2022/05/05 9:00, yukuai (C) ??:
+>>>>>>>>>> Hi, Paolo
+>>>>>>>>>>
+>>>>>>>>>> Can you take a look at this patchset? It has been quite a long time
+>>>>>>>>>> since we spotted this problem...
+>>>>>>>>>>
+>>>>>>>>>
+>>>>>>>>> friendly ping ...
+>>>>>>>> friendly ping ...
+>>>>>>>
+>>>>>>> I can't speak for Paolo, but I've mentioned before that the majority
+>>>>>>> of your messages end up in my spam. That's still the case, in fact
+>>>>>>> I just marked maybe 10 of them as not spam.
+>>>>>>>
+>>>>>>> You really need to get this issued sorted out, or you will continue
+>>>>>>> to have patches ignore because folks may simply not see them.
+>>>>>>>
+>>>>>> Hi,
+>>>>>>
+>>>>>> Thanks for your notice.
+>>>>>>
+>>>>>> Is it just me or do you see someone else's messages from *huawei.com
+>>>>>> end up in spam? I tried to seek help from our IT support, however, they
+>>>>>> didn't find anything unusual...
+>>>>>
+>>>>> So actually I have noticed that a lot of (valid) email from huawei.com (not
+>>>>> just you) ends up in the spam mailbox. For me direct messages usually pass
+>>>>> (likely matching SPF records for originating mail server save the email
+>>>>> from going to spam) but messages going through mailing lists are flagged as
+>>>>> spam because the emails are missing valid DKIM signature but huawei.com
+>>>>> DMARC config says there should be DKIM signature (even direct messages are
+>>>>> missing DKIM so this does not seem as a mailing list configuration issue).
+>>>>> So this seems as some misconfiguration of the mails on huawei.com side
+>>>>> (likely missing DKIM signing of outgoing email).
+>>>>
+>>>> SPF/DKIM was indeed a problem earlier for yukaui patches, but I don't
+>>>> see that anymore. Maybe it's still an issue for some emails, from them
+>>>> or Huawei in general?
+>>>
+>>> Hum, for me all emails from Huawei I've received even today fail the DKIM
+>>> check. After some more digging there is interesting inconsistency in DMARC
+>>> configuration for huawei.com domain. There is DMARC record for huawei.com
+>>> like:
+>>>
+>>> huawei.com.        600    IN    TXT    "v=DMARC1;p=none;rua=mailto:dmarc@edm.huawei.com"
+>>>
+>>> which means no DKIM is required but _dmarc.huawei.com has:
+>>>
+>>> _dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
+>>>
+>>> which says that DKIM is required. I guess this inconsistency may be the
+>>> reason why there are problems with DKIM validation for senders from
+>>> huawei.com. Yu Kuai, can you perhaps take this to your IT support to fix
+>>> this? Either make sure huawei.com emails get properly signed with DKIM or
+>>> remove the 'quarantine' record from _dmarc.huawei.com. Thanks!
+>> Of course, I'll try to contact our IT support.
 > 
-> The most significant change from v4 is the alignment is now checked
-> prior to building the bio. This gets the expected EINVAL error for
-> misaligned userspace iovecs in all cases now (Eric Biggers).
-> 
-> I've removed the legacy fs change, so only iomap filesystems get to use
-> this alignement capability (Christoph Hellwig).
-> 
-> The block fops check for alignment returns a bool now (Damien).
-> 
-> Adjusted some comments, docs, and other minor style issues.
-> 
-> Reviews added for unchanged or trivially changed patches, removed
-> reviews for ones that changed more significantly.
-> 
-> As before, I tested using 'fio' with forced misaligned user buffers on
-> raw block, xfs, and ext4 (example raw block profile below).
+> I second that, pretty much every email has been going into spam since, I
+> guess you just had a few lucky ones. Looks like Jan is right, it's a
+> server side configuration error that's causing this, and it's still
+> happening
 > 
 
-I still don't think you've taken care of all the assumptions that bv_len is a
-multiple of logical block size, or at least SECTOR_SIZE.  Try this:
+Thanks for your response 😄
 
-	git grep -E 'bv_len (>>|/)'
-
-Also:
-
-	git grep '<.*bv_len;'
-
-Also take a look at bio_for_each_segment(), specifically how iter->bi_sector is
-updated.
-
-- Eric
+I aready contack our IT support, and hopefully this can be solved
+soon...
