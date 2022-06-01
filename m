@@ -2,165 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B0BC433EF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 00:57:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA12EC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 03:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348832AbiFAA54 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 31 May 2022 20:57:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39032 "EHLO
+        id S1349376AbiFAD1p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 31 May 2022 23:27:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229849AbiFAA5z (ORCPT
+        with ESMTP id S1349399AbiFAD1o (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 31 May 2022 20:57:55 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57143532EC
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 17:57:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1654045073; x=1685581073;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=GBQ0ewJwqvPgPww6XLxIwDW77/gHWm7/90d0k6ZxQTU=;
-  b=WFT+DoH0tRyXLey2BnqvzXSyIbOIMYxkhXZmT1BZJ2LzywtHgxm/agpJ
-   MAnN5pB/Lms1rKtheSGOPcppzFqtGABuXTw0XPl7GrJdAwqty1MlJN7xu
-   KEzh/MJCyRZCERRzghuHqRv3wyh7Rd5kU4BG/PqyFDxJ+eG9wCPzRNeCV
-   kueZQX7bJlLBb8ish0DrSsPjpFIL65v6v4qvXMZVzIKD1JhKJg8wtRJf3
-   4fIkMt3GYrJGAoCBQJkIhPUiqKjlhjobYCqmMYVcqVxZhZMArRiVYYCqR
-   JreHaThhUkckvo0Xo6Bau7ukqTMgtpr0NIgxQD8QgCmzJmJiOE2vYuurd
-   g==;
-X-IronPort-AV: E=Sophos;i="5.91,266,1647273600"; 
-   d="scan'208";a="306184744"
-Received: from mail-co1nam11lp2171.outbound.protection.outlook.com (HELO NAM11-CO1-obe.outbound.protection.outlook.com) ([104.47.56.171])
-  by ob1.hgst.iphmx.com with ESMTP; 01 Jun 2022 08:57:52 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E+mOp7gn6WewiGzzP97IDyPNSzla1s0yx4eHiltfQHhVvXBofj69x6+ZuGO98j/RFbmYM0oOeyGxA8KT/gUcfgPBRKt80UYmzApo7g3JFH7y41qSgqFtYVAqzvf7DpI4S/Anro6ih6hvq2L08ci61945aamiYoQ2+XL/HdmVYf3QAkwQC5u0+Z7jJ4o1h7KSBO1msr0/wvSP+sND7pjwCpIA+yW4GU/WO8MDtRkRWxiN2vpYecj09TcchTmzuCbv5+E19Y5c4+8B0EbCN4B94cFMfTaZbApxxjGDlGUeW/0qRDVvUse0XNki6OBtKHKRbvbnp94d6vA+2SQDthBbKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DqxJO2wKKk1TvSRnxLmt1HLmbUPHVRgRbO5xOIfkmL8=;
- b=Boo8T35q4b1+EWEP2AxPON42IaHCuHfL+pDUpgeeoV30CnQxvH+X/cQ75IgaRuYmvzNnmMP+ctRaAvhv8pU0kT0TONZQHQvkPpz+r76TvR7IsDPNeKElXvH5bpcQwIDLlIn3zRFSx0E0ehIVO7RUWESz40EOPM7ICAWr8ucq0mNfr91BHrcAzGrqT2YuUr6RGHXHAt1sENcI6541hAuL0T7fJgiwq/GAlk7V3LtaxImxq1cZZ1g3NYLCHD/GZemR/7PhVx9sVFajP+3xytMKN+DTKuY03EiagPuyPzdEihKU8KLrx/h2/lU/EuhXqkcj5wVW9ezRiM7QLRLXwCA/JQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
+        Tue, 31 May 2022 23:27:44 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68AC91C10D
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 20:27:41 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id l13so606956lfp.11
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 20:27:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DqxJO2wKKk1TvSRnxLmt1HLmbUPHVRgRbO5xOIfkmL8=;
- b=ZGjvIi2F4T1kamXu6d0PHDYeagiehTrkd8fSn+4Aikg4osIIw9136FfgbxUOKfM/vPdvHu4rzUmJn6qyivcPfct2VkgRGpS5xQODRc92sovZpRZcfXJAPnSsPWKuXW6TqolYSkyFcXZjYx6Sid0HXYLMg0cKKmvL+CJt5MxxcnA=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- DM6PR04MB3850.namprd04.prod.outlook.com (2603:10b6:5:b9::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5293.13; Wed, 1 Jun 2022 00:57:50 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5293.019; Wed, 1 Jun 2022
- 00:57:50 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: reduce the dependency on modules
-Thread-Topic: reduce the dependency on modules
-Thread-Index: AQHYdCZZ3c9NzDfI5ECRDQ/agTEfEq05vO4A
-Date:   Wed, 1 Jun 2022 00:57:50 +0000
-Message-ID: <20220601005750.aq36rjxln43ipsme@shindev>
-References: <20220530130811.3006554-1-hch@lst.de>
-In-Reply-To: <20220530130811.3006554-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e83e1e69-8d42-4217-8b5b-08da4369c083
-x-ms-traffictypediagnostic: DM6PR04MB3850:EE_
-x-microsoft-antispam-prvs: <DM6PR04MB385066560584FD14801F7435EDDF9@DM6PR04MB3850.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /LKNrIDDvea+P8xJ0Pa6rkB7cynB9oo+V2OJrA/ZKerir+GWmk7/j1rOi3oN7W81GmNc2ADjAMMDHbmXXttZSOu5fYwARxr9DgQGE5utI5t0PnaX2PoqVdgn4Tte1HD5xnFLDEw3Cg7hlomPqdABLS1CjJu1whpAKCJG3SwLZa91c1VAqGtghhTosWFAGrYlCAOOXlNZF16e3wL1KnWItazDPGoMXyn2Naweole9Hlnvjd1F0m0nh4KJwGpu2Ph06Fz2WaWTUNohBQp46cZz23dLy4U2g8FEKlcDwR0/tAacHdCzjbVDosxkUj4ywCNI0n50cyoQgOwSe6Xtjd08iv6ehZnGXZ+abgdqXW4N3ZeTnNLkJyugNFYBHTplSZa4C0EN4OZhkAdmZkJ009JyK40zD/gLc3tNyd/bXRI7PbaOQ+xeH9c0dGlAfF4TWeYVeekpkyPp41ut10snLLRITKdDE/MEliadf5lEHflJB1UzB4m3xdPySyc3F6hMdrRnBXJ7PCDx5kJAQnQA7cyrZPe1zRiaWQwvAf2WhikdvrYmVyygS68Uou8EMCE3CzelCdTV0tycFH4qdW+CuA1VhrS1rBtO1Sgw+xCVsHZ3GPhSTsgNb2RHCGLMYcsy6ZYns63ieKmGneKpS7Y4YNuaSsyCzI5SSdaALr/gZ5SE94+uFsQvjT0hDe1QrLP2DOoBi0Kt/xmB0xaJ5c8EiG9wDQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(7916004)(366004)(186003)(83380400001)(38100700002)(38070700005)(122000001)(82960400001)(86362001)(1076003)(6506007)(66556008)(66476007)(66946007)(6916009)(66446008)(508600001)(316002)(6486002)(71200400001)(76116006)(64756008)(91956017)(2906002)(9686003)(4326008)(26005)(8676002)(6512007)(5660300002)(44832011)(8936002)(33716001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?OD2QpffjAiX4QTtjV6NsRNlkEsOPFDJ+55kHXf1XVkT4XFGOLmnHiiAm1PBJ?=
- =?us-ascii?Q?Ou4MrYpFw18Tb92LjKsrGUrNYEBQ5QLgUpfaGTuDPayXHuvnVQnaj1AAjeHP?=
- =?us-ascii?Q?Zrz1C2eL3+5cMdMRwzCjKtuVtJt0tZeJxe4GKSK3pY5tfyqHD3mFB3OhzECB?=
- =?us-ascii?Q?4R8ULX0P9gphYRXAp66ZKt5S+oQl9TTVGY3cDkxEUqWyP4eW0Kj2kQK054gp?=
- =?us-ascii?Q?kdNkVxCVrM+3a6Zw+1PNw3tNVTyTdkgYlFLDtvOZsWz6qMdD7iEq6WLn9UN5?=
- =?us-ascii?Q?o4m/0Lg/rOtg2Dkos53M59LWSuJiJmgPcyJw5BYusHHszDaM2kJEB4F5Y94i?=
- =?us-ascii?Q?PjLP0VI8yqs+eFnHBJuMxnWceHCiMixEB77K0UWQwPMDsHL9wTDsHGQWR79u?=
- =?us-ascii?Q?OkPHUdaLRiCHEYJTeXoP611B+ojk40hnRW6xA3AHrmiGiTEOugJOj5RnCye4?=
- =?us-ascii?Q?9ftPCblpzV0rr5slsa8jLKGOFEh9I4a47MB0zkcDl1HytiouvCX/WfXF+Y1F?=
- =?us-ascii?Q?0HUdNtC4IMWdVU2VXY5YjbU/VQsQ4F7EQgGuU+HxKRsA26+aVH0PUJltpMXb?=
- =?us-ascii?Q?pvfgN76Lb1mCUm8fvOp41R+ndZGwwBYLeqnlbSbVCm7bGeP59SeUg6OYmnbZ?=
- =?us-ascii?Q?x3ApN9ytN+3CJd2aLJliIIcCjvNtd4mb9V/ORA2vL18k06hVLpnISvbPYOjG?=
- =?us-ascii?Q?WG0YdEXGs3fSq20OTbN9dgvxT7HMJRdZN6cMKoazNw38bYK4zKc4CPP736x2?=
- =?us-ascii?Q?cuqBegr3ALV40G+1UznehYfwmBIkBPlNq5KcgiR5JzzQgzCogvP6zGqe/vhj?=
- =?us-ascii?Q?yrvX+yKwvvptJtHgYKSaBEDo2/ZgF0DK1S3OxXvLzIbCh4Aas09ztauU9g5V?=
- =?us-ascii?Q?egAmV+DT31Le5aX7MZF3pOhCtrs6I+y2bw4qDlfO89FBpD8v6sWVlnLW3YF9?=
- =?us-ascii?Q?1SC5dBKIn+HiLofrqzaUyT16GThSIl5JfLXrOKC5tOYS6/5vmQ6ox5Am4G6U?=
- =?us-ascii?Q?kpmL2GGMKYFmkJKxDtFKI+rngx6SzarsLWMSM+S3WBEJ1p6/79hxWmK+ifrn?=
- =?us-ascii?Q?pc6vtQrGWYW81ew2NBdklpZlzBqYKT5t67RkRr/GsCgIooNUYkKCmlHC9jZ/?=
- =?us-ascii?Q?rjCihVxQeWSlalyKXSF/WuzKYr8+70fA54Q8IFDuEC9PAHTSuL1a+xl9v/nI?=
- =?us-ascii?Q?fP0ET5yIt+iW17E0VZ8HMSfR2G9GEWp4xaLlwww2MWTxBLSVf7MUx0ReUGUc?=
- =?us-ascii?Q?sF1jBpH0+Jb3VctsZM14XpXTOgT2VFCLTEfW0ec40Db8WxljJfH9urqYCFk1?=
- =?us-ascii?Q?NHg/nCs44tifU2Zt+AT1ffP5WV9zHuKPAH11mTyZbinJi38e5opjC+voBNs7?=
- =?us-ascii?Q?VFAjSifhlUvHzsEXB1+bHXB5NlV03HUlFJLDIj3+igHhhcjyIC5Wpx7HKwJn?=
- =?us-ascii?Q?U7+LRBl6h3yi156t3OgSa9PFvRnCQvMm5rdWpGfo8BD1cZ8irA00g8S/9E4F?=
- =?us-ascii?Q?HtLYp5V1KmpKThhONeio4NU5Hp9t6Mp0PnbIYcamypsfgW514m8lkQ1RaVIA?=
- =?us-ascii?Q?kzKMjnMOMy99UlJa9mlwR5p+n87I3fpscEi1O8i8MzNYLV6LYl9Aw7jIc9WC?=
- =?us-ascii?Q?0c+t7L9ee4KQIpRA9DRIF50sMkBEazBsNUncwRsvLpblEwr87ivjQoNvb12F?=
- =?us-ascii?Q?RU7UWTh18XPqrA3JUNskuTIU2q6dFfashmNH33NU1CC3g8TozLEVukAPCWv6?=
- =?us-ascii?Q?SE4iW/+TmOM2BpZGwmw4CIYrPVuTAIcVlr1ejgCF4tDgLZ+TqvJ6?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E518CB2312FC6D4CAD68899B0FE84D24@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=uWE/tlnw2tByHU+mXjZ+jRPcFVoufodKiFqk051MZR4=;
+        b=FDETkjVNev2bwE0gd7KO4gXYzGXFHsd/brl/7XmqB7hqVP9Qua1X0iYslCPL4xCohU
+         5Vz59UKH3SJ3aBaPDso2ALz5rf8dW77CDWbAp98MxvRMiPv7CGm4Mpc3pMsdPsegxYNh
+         ivOaFyNmDOMNVGa6xbojIwb/YsonBONeJabAWlx9AD9EOPDLenu0EMMJRwhvCWeWMdnb
+         Ff0I7Ep9BtoZh2j0IEOgx9jZ/vJR0SZJUqgaGPEAvcifBmvvtm/05M1R60CivbO2WMW+
+         guFFlY1sFKtL1BXEvVtUKwtTjJqIbB/eWH7YWd7WpuLET9ZjV/3F6pAPnolJmUMvrff/
+         xT6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=uWE/tlnw2tByHU+mXjZ+jRPcFVoufodKiFqk051MZR4=;
+        b=eoiZP0y/6ITEV0JCIeb1J1QBu4gFMLrbA1HqsNQZPlabso7GCKmPZDrasH7yC+ZsbK
+         PXMF/0HyG+mFO350VNmD5ZixfwQT67n0TrkMtFUbIcblKUfbyEbBMhu3jdHWGV0vTPmm
+         iq8Rm1flW94+RdO3i88uiL55aC5/05BJubKenh+8cmhFNoJZY6FHPllmX3QfseBbroxY
+         RkZtwqOZddSakdGZx9y7NJ7NV1mGEKWcoD5VC2tol4FXTavhAdb9yHKfkA1cy8puneUL
+         urxzIUiNH0gzkv9OLzUiLr8mjQbJLwu/ZF+dWRhkv/l9SmphYz3YLoOAEesAJqBEiccn
+         sWMA==
+X-Gm-Message-State: AOAM5327x2veCajbU7dk1yls0lE3nw8+WZB5tbOO2m503hCRfmjkUIIE
+        BHnvoW/JucJdnr7bXHonlI+fbCSiy4gDP6HD
+X-Google-Smtp-Source: ABdhPJzatB2O7qy43HFTOdYED0i4F4fVJ+N4n+yDhea/CLDLvvZGS6wSvGM56t/eojTX01SEBIOfJg==
+X-Received: by 2002:a5d:6d09:0:b0:20f:bef8:665b with SMTP id e9-20020a5d6d09000000b0020fbef8665bmr45911540wrq.548.1654054048882;
+        Tue, 31 May 2022 20:27:28 -0700 (PDT)
+Received: from [10.188.163.71] (cust-east-parth2-46-193-73-98.wb.wifirst.net. [46.193.73.98])
+        by smtp.gmail.com with ESMTPSA id r12-20020a05600c2c4c00b0039750c29cf7sm473034wmg.40.2022.05.31.20.27.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 31 May 2022 20:27:28 -0700 (PDT)
+Message-ID: <434b4857-12fd-feb7-7e3e-466831a3f36b@kernel.dk>
+Date:   Tue, 31 May 2022 21:27:27 -0600
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e83e1e69-8d42-4217-8b5b-08da4369c083
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Jun 2022 00:57:50.6663
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6Zj1TS41WbiyJ2HqN/5+QXwpc/fGqJlLl4irEWpVeLqXkWKK0ZL85l4N+z1gqRbR+x/Sk5WHG4tNMT7vZQHyGeH0hBwIwFsWLlEZz8+HsdE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR04MB3850
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: bioset_exit poison from dm_destroy
+Content-Language: en-US
+To:     Mike Snitzer <snitzer@redhat.com>
+Cc:     Matthew Wilcox <willy@infradead.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org, david@fromorbit.com
+References: <YpK7m+14A+pZKs5k@casper.infradead.org>
+ <2523e5b0-d89c-552e-40a6-6d414418749d@kernel.dk>
+ <YpZlOCMept7wFjOw@redhat.com>
+ <6995e822-79a0-ca17-9c32-6089d14b5be5@kernel.dk>
+ <YpZxVH7DRUkrbWUa@redhat.com>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YpZxVH7DRUkrbWUa@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On May 30, 2022 / 15:08, Christoph Hellwig wrote:
-> Hi Shin'ichiro,
->=20
-> this series reduces the dependency of blktests on modular builds
-> of various block drivers.  There are still plenty of tests that
-> do require modules, mostly because a lot of scsi_debug and null_blk
-> can only be set at load time, but I plan to address those in the
-> kernel soon.
+On 5/31/22 1:49 PM, Mike Snitzer wrote:
+> On Tue, May 31 2022 at  3:00P -0400,
+> Jens Axboe <axboe@kernel.dk> wrote:
+> 
+>> On 5/31/22 12:58 PM, Mike Snitzer wrote:
+>>> On Sun, May 29 2022 at  8:46P -0400,
+>>> Jens Axboe <axboe@kernel.dk> wrote:
+>>>
+>>>> On 5/28/22 6:17 PM, Matthew Wilcox wrote:
+>>>>> Not quite sure whose bug this is.  Current Linus head running xfstests
+>>>>> against ext4 (probably not ext4's fault?)
+>>>>>
+>>>>> 01818 generic/250	run fstests generic/250 at 2022-05-28 23:48:09
+>>>>> 01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+>>>>> 01818 EXT4-fs (dm-0): unmounting filesystem.
+>>>>> 01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+>>>>> 01818 EXT4-fs (dm-0): unmounting filesystem.
+>>>>> 01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+>>>>> 01818 Buffer I/O error on dev dm-0, logical block 3670000, async page read
+>>>>> 01818 EXT4-fs (dm-0): unmounting filesystem.
+>>>>> 01818 EXT4-fs (dm-0): mounted filesystem with ordered data mode. Quota mode: none.
+>>>>> 01818 EXT4-fs (dm-0): unmounting filesystem.
+>>>>> 01818 general protection fault, probably for non-canonical address 0xdead000000000122: 0000 [#1] PREEMPT SMP NOPTI
+>>>>> 01818 CPU: 0 PID: 1579117 Comm: dmsetup Kdump: loaded Not tainted 5.18.0-11049-g1dec3d7fd0c3-dirty #262
+>>>>> 01818 Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+>>>>> 01818 RIP: 0010:__cpuhp_state_remove_instance+0xf0/0x1b0
+>>>>> 01818 Code: a0 f8 d7 81 42 3b 1c 28 7f d9 4c 89 e1 31 d2 89 de 89 7d dc e8 01 fd ff ff 8b 7d dc eb c5 49 8b 04 24 49 8b 54 24 08 48 85 c0 <48> 89 02 74 04 48 89 50 08 48 b8 00 01 00 00 00 00 ad de 48 c7 c7
+>>>>> 01818 RSP: 0018:ffff888101fcfc60 EFLAGS: 00010286
+>>>>> 01818 RAX: dead000000000100 RBX: 0000000000000017 RCX: 0000000000000000
+>>>>> 01818 RDX: dead000000000122 RSI: ffff8881233b0ae8 RDI: ffffffff81e3b080
+>>>>> 01818 RBP: ffff888101fcfc88 R08: 0000000000000008 R09: 0000000000000003
+>>>>> 01818 R10: 0000000000000000 R11: 00000000002dc6c0 R12: ffff8881233b0ae8
+>>>>> 01818 R13: 0000000000000000 R14: ffffffff81e38f58 R15: ffff88817b5a3c00
+>>>>> 01818 FS:  00007ff56daec280(0000) GS:ffff888275800000(0000) knlGS:0000000000000000
+>>>>> 01818 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>>>> 01818 CR2: 00005591ad94f198 CR3: 000000017b5a0004 CR4: 0000000000770eb0
+>>>>> 01818 PKRU: 55555554
+>>>>> 01818 Call Trace:
+>>>>> 01818  <TASK>
+>>>>> 01818  ? kfree+0x66/0x250
+>>>>> 01818  bioset_exit+0x32/0x210
+>>>>> 01818  cleanup_mapped_device+0x34/0xf0
+>>>>> 01818  __dm_destroy+0x149/0x1f0
+>>>>> 01818  ? table_clear+0xc0/0xc0
+>>>>> 01818  dm_destroy+0xe/0x10
+>>>>> 01818  dev_remove+0xd9/0x120
+>>>>> 01818  ctl_ioctl+0x1cb/0x420
+>>>>> 01818  dm_ctl_ioctl+0x9/0x10
+>>>>> 01818  __x64_sys_ioctl+0x89/0xb0
+>>>>> 01818  do_syscall_64+0x35/0x80
+>>>>> 01818  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>>>> 01818 RIP: 0033:0x7ff56de3b397
+>>>>> 01818 Code: 3c 1c e8 1c ff ff ff 85 c0 79 87 49 c7 c4 ff ff ff ff 5b 5d 4c 89 e0 41 5c c3 66 0f 1f 84 00 00 00 00 00 b8 10 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d a9 da 0d 00 f7 d8 64 89 01 48
+>>>>> 01818 RSP: 002b:00007ffe55367ef8 EFLAGS: 00000206 ORIG_RAX: 0000000000000010
+>>>>> 01818 RAX: ffffffffffffffda RBX: 00007ff56df31a8e RCX: 00007ff56de3b397
+>>>>> 01818 RDX: 000055daad7cab30 RSI: 00000000c138fd04 RDI: 0000000000000003
+>>>>> 01818 RBP: 00007ffe55367fb0 R08: 00007ff56df81558 R09: 00007ffe55367d60
+>>>>> 01818 R10: 00007ff56df808a2 R11: 0000000000000206 R12: 00007ff56df808a2
+>>>>> 01818 R13: 00007ff56df808a2 R14: 00007ff56df808a2 R15: 00007ff56df808a2
+>>>>> 01818  </TASK>
+>>>>> 01818 Modules linked in: crct10dif_generic crct10dif_common [last unloaded: crc_t10dif]
+>>>>
+>>>> I suspect dm is calling bioset_exit() multiple times? Which it probably
+>>>> should not.
+>>>>
+>>>> The reset of bioset_exit() is resilient against this, so might be best
+>>>> to include bio_alloc_cache_destroy() in that.
+>>>>
+>>>>
+>>>> diff --git a/block/bio.c b/block/bio.c
+>>>> index a3893d80dccc..be3937b84e68 100644
+>>>> --- a/block/bio.c
+>>>> +++ b/block/bio.c
+>>>> @@ -722,6 +722,7 @@ static void bio_alloc_cache_destroy(struct bio_set *bs)
+>>>>  		bio_alloc_cache_prune(cache, -1U);
+>>>>  	}
+>>>>  	free_percpu(bs->cache);
+>>>> +	bs->cache = NULL;
+>>>>  }
+>>>>  
+>>>>  /**
+>>>
+>>> Yes, we need the above to fix the crash.  Does it also make sense to
+>>> add this?
+>>>
+>>> diff --git a/include/linux/bio.h b/include/linux/bio.h
+>>> index 49eff01fb829..f410c78e9c0c 100644
+>>> --- a/include/linux/bio.h
+>>> +++ b/include/linux/bio.h
+>>> @@ -681,7 +681,7 @@ struct bio_set {
+>>>
+>>>  static inline bool bioset_initialized(struct bio_set *bs)
+>>>  {
+>>> -	return bs->bio_slab != NULL;
+>>> +	return (bs->bio_slab != NULL || bs->cache != NULL);
+>>>  }
+>>
+>> Should not be possible to have valid bs->cache without bs->bio_slab?
+> 
+> Not quite following your question, but I sprinkled this extra check in
+> purely because DM core uses bioset_initialized() to verify that the
+> bioset is _not_ yet initialized.
+> 
+> But it really doesn't make sense to consider the bioset _fully_
+> initialized if bs->bio_slab is NULL but bs->cache is NOT...
 
-Hi Christoph, thank you for the pathces. I think this is the nice first-ste=
-p to
-avoid the module load dependency.
+Honestly, I'd be way happier getting rid of bioset_initialized()!
 
-I tried to run blktests with the patches. At first, I kept blktests depende=
-nt
-drivers as modules, and observed no additional failure. Good. As the next s=
-tep,
-I ran blktests making blktests dependent drivers built into kernel, and obs=
-erved
-some unexpected behaviors. For example, block/016, which calls _init_null_b=
-lk,
-was not skipped and failed. block/025, which calls _init_scsi_debug was
-terminated unexpectedly. I made related comments on 5th and 9th patches.
+> Anyway, really don't need this change but we do need your earlier
+> patch to reset bs->cache to NULL.
 
-My other comments are nits. Many of them are related to shellcheck warnings=
-. It
-will be appreciated to run 'make check' command to see the warnings and cle=
-an
-them up.
+Certainly, that patch will be going upstream in a day or two.
 
---=20
-Shin'ichiro Kawasaki=
+-- 
+Jens Axboe
+
