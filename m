@@ -2,79 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12E47C43334
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 16:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF182C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 16:34:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347656AbiFAQX2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 12:23:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49454 "EHLO
+        id S1350575AbiFAQeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 12:34:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51414 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1356214AbiFAQXU (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 12:23:20 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 764DD3D4B1;
-        Wed,  1 Jun 2022 09:23:17 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id e11so2429638pfj.5;
-        Wed, 01 Jun 2022 09:23:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=TXmcbpS90c6cPs5yYXuKNTVjXQN/kwuO3h1E2mahOJQ=;
-        b=OIIziShah+SIqCYkZ2hpQ8ztiPri03CRgwsAgzGoGc+gCBV4WnTZanGCwO3ZAVwOkp
-         iAnyq90+hw53VI5qPY2cnSSKWEWSSrtfNc6lUxPjLcLlRFKysQh1Fluo6hgqKfLmY/1P
-         TIkH5+HLNH5t1cynBxuwQq+Tg0qvYLXw2/jEIrkOtjoWD91xo6tWLkS6yZIVrIKkSQKc
-         l9ggoB1W4xvrn3wztxxMPH1SUf3HKSMa7YSNtZx/GLSa2prG1x6euAU1SYqaL+bpl72L
-         w5rdbS4Lsyumr2J2WMUZknwQher3KfxIqauU7HbW/o7TXPTWVxLusThAPXFeNN/W99tu
-         Z8oA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=TXmcbpS90c6cPs5yYXuKNTVjXQN/kwuO3h1E2mahOJQ=;
-        b=WraE6+BLDi06oQD63EmD//F478awz10R6kfIAdaA/C3DMNJlAPB1IvWbNeDtrnv2ac
-         SriSAmJJlTrRKHFrZl5NSWh0UNbWREsEqCM9Up1vebJSjwpG7YG8jtr1hb0hURmD6nYb
-         RSPEW4jYrVdu3dC6d/3AuInLXZc3Yk3UMYz6GlZua1eS4+mdEBC8q/8VTbmsxJVoZK9K
-         Q40wEA+TKxg0RcC0zfcUF4BTwWKruL4cy06hPPNltCfNFOcrmFE0haOuk092kgwFnJIa
-         8jBC7EByC4XY2Ixr/yJEfXaKXfEJji/jRYOy4ncxR3umExzF40XAz4NKGyXsaJEmpJpx
-         +fvA==
-X-Gm-Message-State: AOAM533xoaoyNUznaAZSXrfy4Z6a0x6F6YsIwShID0/LGorjwlPtKtnN
-        h32vjeDN9zjX9jDs/gQdRjk=
-X-Google-Smtp-Source: ABdhPJy5NaAJAwcdBWVbCBE+v8EFNGENmF1xslwE7g06Df/I2ptaJbXFWoeRD2wxbrsIkxUK+xDC6A==
-X-Received: by 2002:a05:6a00:24c1:b0:518:c52f:f5 with SMTP id d1-20020a056a0024c100b00518c52f00f5mr347753pfv.15.1654100596743;
-        Wed, 01 Jun 2022 09:23:16 -0700 (PDT)
-Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
-        by smtp.gmail.com with ESMTPSA id k7-20020aa79987000000b005104c6d7941sm1750753pfh.31.2022.06.01.09.23.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 09:23:16 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Wed, 1 Jun 2022 06:23:14 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Chengming Zhou <zhouchengming@bytedance.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] blk-iocost: only flush wait and indebt stat deltas
- when needed
-Message-ID: <YpeSct3LJcBjnZ2x@slm.duckdns.org>
-References: <20220601122007.1057-1-zhouchengming@bytedance.com>
- <20220601122007.1057-2-zhouchengming@bytedance.com>
+        with ESMTP id S1356124AbiFAQeT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 12:34:19 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6E9866ACA;
+        Wed,  1 Jun 2022 09:34:17 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 73AC81F938;
+        Wed,  1 Jun 2022 16:34:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1654101256; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=cFhOhGTkWOdWt0QDJ4fs9W4sHYX2lYn7+ibFFbNYJyQ=;
+        b=cm5KNBn7DCZzV+joGwMLKRjBP0czN0uMJmaAB3x4SrpgJB3sPwvCoaLbZ2+Wed7cwI67kb
+        3iy4B/JME2TaCJhdNppEdnmJL0UHl03qd2yH5j1P5nWqrXqZNWP3AHEvE1brC5Hx5SrZ1m
+        ByxKN3a4zo6UafM/cDN8Dkk5qCItw+0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1654101256;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=cFhOhGTkWOdWt0QDJ4fs9W4sHYX2lYn7+ibFFbNYJyQ=;
+        b=A1r4sS/rCAep8NYncDlK4u6dVSaqVg2VQ0WhYu7dgfYnCY00VWfNSsoT0qXmEFUN7Yhbvi
+        /uHsxi073Y17OaDA==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 56B5D2C141;
+        Wed,  1 Jun 2022 16:34:16 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 6F9D6A0633; Wed,  1 Jun 2022 18:34:10 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Tejun Heo <tj@kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Donald Buczek <buczek@molgen.mpg.de>, Jan Kara <jack@suse.cz>,
+        stable@vger.kernel.org
+Subject: [PATCH] block: fix bio_clone_blkg_association() to associate with proper blkcg_gq
+Date:   Wed,  1 Jun 2022 18:34:05 +0200
+Message-Id: <20220601163405.29478-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220601122007.1057-2-zhouchengming@bytedance.com>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1641; h=from:subject; bh=u9pcp5UoDXQxoj3ZLRxhk9+TbpWRpxKK60xlgA8lMSI=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBil5TyMyUsMh/fbgu37NGo92nB19CiU4LXI6JYwS11 MFgzuRCJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYpeU8gAKCRCcnaoHP2RA2dOoCA DnfrA2cy6qkYowi2KyLKJ63v496xyBIJpICXnEfFTUaJoymJgrj+M5sUTpFvk2+WdYc1HKJZo918Hd lGTd0De4fJh6eoYkswcYXfPfwuvQGQMBAg5Mn3VysD0amh4SU0t3aC1m4iqzYWjixX8GK+XBhkbj14 5r1AUd+/HX3wJhCjeUgcWWBsVQ0CVey+hKnHhKFq3Zk2qeYcsItadggzguInv0nQkH/WwMOHoXGHuq 8QTKCEdhH0bfTYSc6XIxlEI+UX6TQEJpJBNq04YS2+WkH4tn59Sak9kMOT1yOsTZyPVjxtv8t/hN3e 1X5R+DwHgpr3k/v0aPcBAyb3fmwMuZ
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 08:20:07PM +0800, Chengming Zhou wrote:
-> We only need to flush wait and indebt stat deltas when the iocg
-> is in these status.
+Commit d92c370a16cb ("block: really clone the block cgroup in
+bio_clone_blkg_association") changed bio_clone_blkg_association() to
+just clone bio->bi_blkg reference from source to destination bio. This
+is however wrong if the source and destination bios are against
+different block devices because struct blkcg_gq is different for each
+bdev-blkcg pair. This will result in IOs being accounted (and throttled
+as a result) multiple times against the same device (src bdev) while
+throttling of the other device (dst bdev) is ignored. In case of BFQ the
+inconsistency can even result in crashes in bfq_bic_update_cgroup().
+Fix the problem by looking up correct blkcg_gq for the cloned bio.
 
-Hey, so, I'm not seeing any actual benefits of the suggested patches and
-none of them has actual justifications. For the time being, I'm gonna be
-ignoring these patches.
+Reported-by: Logan Gunthorpe <logang@deltatee.com>
+Reported-by: Donald Buczek <buczek@molgen.mpg.de>
+Fixes: d92c370a16cb ("block: really clone the block cgroup in bio_clone_blkg_association")
+CC: stable@vger.kernel.org
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/blk-cgroup.c | 7 +++----
+ 1 file changed, 3 insertions(+), 4 deletions(-)
 
-Thanks.
-
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 40161a3f68d0..ecb4eaff6817 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1975,10 +1975,9 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
+ void bio_clone_blkg_association(struct bio *dst, struct bio *src)
+ {
+ 	if (src->bi_blkg) {
+-		if (dst->bi_blkg)
+-			blkg_put(dst->bi_blkg);
+-		blkg_get(src->bi_blkg);
+-		dst->bi_blkg = src->bi_blkg;
++		rcu_read_lock();
++		bio_associate_blkg_from_css(dst, bio_blkcg_css(src));
++		rcu_read_unlock();
+ 	}
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
 -- 
-tejun
+2.35.3
+
