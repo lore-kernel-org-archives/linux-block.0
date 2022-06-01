@@ -2,173 +2,99 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D21EC433FE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 13:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED845CCA468
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 14:24:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345062AbiFANSP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 09:18:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39692 "EHLO
+        id S1355336AbiFAOYB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 10:24:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43892 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242413AbiFANSO (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 09:18:14 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9C29FF7;
-        Wed,  1 Jun 2022 06:18:13 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 9AC8621ADB;
-        Wed,  1 Jun 2022 13:18:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1654089492; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
+        with ESMTP id S1355382AbiFAOXw (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 10:23:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5BC011021CA
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 07:13:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654092819;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=XlDIaOdMh++5TaTNkEqP7Z+0BP2y4tj9ghae6D/SYZ4=;
-        b=gJ8P+L0egLun2U4orfffIleneGyLzcb0nvFFjoIh9nX10gj0nf00pmZSEv7YCtWpP+fP8X
-        OBT5DAF02ElKH6ruRtP0Xb8moMWhZARCbVHKNqDeGHN9gOa50OaJ1r5ZZIApuzRIhvjsHK
-        X1blH5INrkMj3wfNgfME6dveXH5usdI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1654089492;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=XlDIaOdMh++5TaTNkEqP7Z+0BP2y4tj9ghae6D/SYZ4=;
-        b=vbc5jBV9j8HjUhgDLh7LRZCB2EFp6umMm1CuQgzSicrmsinShWGcQ0bcPnTa+JPEuYBwgE
-        rWIVMANGhGgQjIAg==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 86B382C141;
-        Wed,  1 Jun 2022 13:18:12 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7CE3DA0633; Wed,  1 Jun 2022 15:18:06 +0200 (CEST)
-Date:   Wed, 1 Jun 2022 15:18:06 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     paolo.valente@linaro.org, jack@suse.cz, tj@kernel.org,
-        axboe@kernel.dk, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next v9 2/4] block, bfq: record how many queues have
- pending requests
-Message-ID: <20220601131806.gs3txjgvhhbn5ign@quack3.lan>
-References: <20220601114340.949953-1-yukuai3@huawei.com>
- <20220601114340.949953-3-yukuai3@huawei.com>
+        bh=/6cFmagpZS+hji6WNkFHLta2n7SzyuJJ+i8HVMquW3Y=;
+        b=Lpi6hFpNgKDrFVp0YZ5Ig5FzvEo04p6dXKVpLPE14sidqMlrepce43LyUdJKJ0xWa34phv
+        t9LyjgXyR7KwKhElcV1p28mLkR3kxbIqbhBdhaLxq1Dsn3PNGxXDSXPLdkgtVa0ZUSo4vN
+        Ibuw2k35qV4JvwMqJjFNt9mB8/B9Mc0=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-480-4ct46U8DOuGlHyVyNnyuPw-1; Wed, 01 Jun 2022 10:13:37 -0400
+X-MC-Unique: 4ct46U8DOuGlHyVyNnyuPw-1
+Received: by mail-qk1-f198.google.com with SMTP id b1-20020a05620a118100b006a36dec1b16so1387538qkk.2
+        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 07:13:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/6cFmagpZS+hji6WNkFHLta2n7SzyuJJ+i8HVMquW3Y=;
+        b=E1PWsKltbtlFeALxBLZs4VwBOylUHyJF2cFikYsXb7Iu8IA3ttgKAtjVQr2yizxKpw
+         OLHc8NUSDY/Xu7s2ZaeO+adIG7TZUqvdH+patiqtok5dzG/rWxQeTkBagix8M0Fr349w
+         vu59kt8Tv+FLCHQRP6nBch4PZR0zWsFJALw9snVbK6tJbFrQJrke7X7WZpkpQJril8lv
+         Hs0O8n3UMw1UpNt5LwcbW7wP4Hu/ptDZtJujibNjwr1qdceyIyPPh17LMLm+8U58ySy4
+         lHcF17lwnjcvSjL1PyDFXRXlGUhuCK0wukzKM9ifYCte2bU6OLkU4g39o5PuYijHefEh
+         WWLA==
+X-Gm-Message-State: AOAM533Od44SN9ns6VluOcCKy10ojrG6gT+bRlAFTGWymQkEhUKFi3ag
+        Oj2huUzbo92PBs5oA+zfqkqsyClXb/drtK/YHoppi7IWY1DfgrUGwv6wmUwtOMzIDX9si0zqCIZ
+        oBLyHZpJCQDWDi6aAGwLCRg==
+X-Received: by 2002:a05:622a:14ca:b0:304:c23f:bf48 with SMTP id u10-20020a05622a14ca00b00304c23fbf48mr44103qtx.250.1654092816392;
+        Wed, 01 Jun 2022 07:13:36 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyTtzbPjDv8fpmrGbyUXl2t6UMgh4OaBJ04+ZVxvQBYai7b7j9eAy3BavkBCtobjtfzDJlUqQ==
+X-Received: by 2002:a05:622a:14ca:b0:304:c23f:bf48 with SMTP id u10-20020a05622a14ca00b00304c23fbf48mr44046qtx.250.1654092815837;
+        Wed, 01 Jun 2022 07:13:35 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id l186-20020a3789c3000000b006a37710ef89sm1404072qkd.115.2022.06.01.07.13.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jun 2022 07:13:35 -0700 (PDT)
+Date:   Wed, 1 Jun 2022 10:13:34 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+        dm-devel@redhat.com, linux-block@vger.kernel.org,
+        david@fromorbit.com
+Subject: Re: bioset_exit poison from dm_destroy
+Message-ID: <Ypd0DnmjvCoWj+1P@redhat.com>
+References: <YpK7m+14A+pZKs5k@casper.infradead.org>
+ <2523e5b0-d89c-552e-40a6-6d414418749d@kernel.dk>
+ <YpZlOCMept7wFjOw@redhat.com>
+ <YpcBgY9MMgumEjTL@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220601114340.949953-3-yukuai3@huawei.com>
+In-Reply-To: <YpcBgY9MMgumEjTL@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 01-06-22 19:43:38, Yu Kuai wrote:
-> Prepare to refactor the counting of 'num_groups_with_pending_reqs'.
+On Wed, Jun 01 2022 at  2:04P -0400,
+Christoph Hellwig <hch@infradead.org> wrote:
+
+> On Tue, May 31, 2022 at 02:58:00PM -0400, Mike Snitzer wrote:
+> > Yes, we need the above to fix the crash.  Does it also make sense to
+> > add this?
 > 
-> Add a counter in bfq_group, update it while tracking if bfqq have pending
-> requests and when bfq_bfqq_move() is called.
+> Can we just stop treating bio_sets so sloppily and make the callers
+> handle their lifetime properly?  No one should have to use
+> bioset_initialized (or double free bio_sets).
 > 
-> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
 
-Looks good. Feel free to add:
+Please take the time to look at the code and save your judgement until
+you do.  That said, I'm not in love with the complexity of how DM
+handles bioset initialization.  But both you and Jens keep taking
+shots at DM for doing things wrong without actually looking.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+DM uses bioset_init_from_src().  Yet you've both assumed double frees
+and such (while not entirely wrong your glossing over the detail that
+there is intervening reinitialization of DM's biosets between the
+bioset_exit()s)
 
-								Honza
+And it really can just be that the block code had a bug where it
+didn't clear bs->cache.  Doesn't need to be cause for attacks.
 
-
-> ---
->  block/bfq-cgroup.c  | 10 ++++++++++
->  block/bfq-iosched.h |  1 +
->  block/bfq-wf2q.c    | 12 ++++++++++--
->  3 files changed, 21 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-> index 09574af83566..88c0c320ddf3 100644
-> --- a/block/bfq-cgroup.c
-> +++ b/block/bfq-cgroup.c
-> @@ -557,6 +557,7 @@ static void bfq_pd_init(struct blkg_policy_data *pd)
->  				   */
->  	bfqg->bfqd = bfqd;
->  	bfqg->active_entities = 0;
-> +	bfqg->num_queues_with_pending_reqs = 0;
->  	bfqg->online = true;
->  	bfqg->rq_pos_tree = RB_ROOT;
->  }
-> @@ -646,6 +647,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  {
->  	struct bfq_entity *entity = &bfqq->entity;
->  	struct bfq_group *old_parent = bfqq_group(bfqq);
-> +	bool has_pending_reqs = false;
->  
->  	/*
->  	 * No point to move bfqq to the same group, which can happen when
-> @@ -666,6 +668,11 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  	 */
->  	bfqq->ref++;
->  
-> +	if (entity->in_groups_with_pending_reqs) {
-> +		has_pending_reqs = true;
-> +		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
-> +	}
-> +
->  	/* If bfqq is empty, then bfq_bfqq_expire also invokes
->  	 * bfq_del_bfqq_busy, thereby removing bfqq and its entity
->  	 * from data structures related to current group. Otherwise we
-> @@ -693,6 +700,9 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
->  	/* pin down bfqg and its associated blkg  */
->  	bfqg_and_blkg_get(bfqg);
->  
-> +	if (has_pending_reqs)
-> +		bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
-> +
->  	if (bfq_bfqq_busy(bfqq)) {
->  		if (unlikely(!bfqd->nonrot_with_queueing))
->  			bfq_pos_tree_add_move(bfqd, bfqq);
-> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
-> index 69c7d15417e5..de2446a9b7ab 100644
-> --- a/block/bfq-iosched.h
-> +++ b/block/bfq-iosched.h
-> @@ -943,6 +943,7 @@ struct bfq_group {
->  	struct bfq_entity *my_entity;
->  
->  	int active_entities;
-> +	int num_queues_with_pending_reqs;
->  
->  	struct rb_root rq_pos_tree;
->  
-> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-> index 5704a0315cf2..6f36f3fe5cc8 100644
-> --- a/block/bfq-wf2q.c
-> +++ b/block/bfq-wf2q.c
-> @@ -1651,16 +1651,24 @@ void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
->  {
->  	struct bfq_entity *entity = &bfqq->entity;
->  
-> -	if (!entity->in_groups_with_pending_reqs)
-> +	if (!entity->in_groups_with_pending_reqs) {
->  		entity->in_groups_with_pending_reqs = true;
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> +		bfqq_group(bfqq)->num_queues_with_pending_reqs++;
-> +#endif
-> +	}
->  }
->  
->  void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
->  {
->  	struct bfq_entity *entity = &bfqq->entity;
->  
-> -	if (entity->in_groups_with_pending_reqs)
-> +	if (entity->in_groups_with_pending_reqs) {
->  		entity->in_groups_with_pending_reqs = false;
-> +#ifdef CONFIG_BFQ_GROUP_IOSCHED
-> +		bfqq_group(bfqq)->num_queues_with_pending_reqs--;
-> +#endif
-> +	}
->  }
->  
->  /*
-> -- 
-> 2.31.1
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
