@@ -2,106 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AEE2C433FE
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 08:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ABCEC433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 08:32:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350745AbiFAI3V (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 04:29:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48772 "EHLO
+        id S1350827AbiFAIcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 04:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349252AbiFAI3T (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 04:29:19 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25824B861;
-        Wed,  1 Jun 2022 01:29:18 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        with ESMTP id S245286AbiFAIcC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 04:32:02 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2CE425C59;
+        Wed,  1 Jun 2022 01:31:59 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 71B411F8C2;
+        Wed,  1 Jun 2022 08:31:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1654072318; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N+sBqa5KqKk9l80H2r4a0EQswvDm6hf4uMYYGP+soqU=;
+        b=UxNmGl10x6Mtb4IZHTscIz8gWRW6HgF7JeSkIFA3/SMZ5MwO0itfPzFfdXeKigeq6uDjFv
+        4bN0nY9B+vKQGrWWuPqxBwF5Z497j6B5lQghIy91xnE+J+DE61r32CWreN75yDmIIi/rxx
+        YqGgm/bp0Nehl08MPwXkSt/rXYKsbtM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1654072318;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=N+sBqa5KqKk9l80H2r4a0EQswvDm6hf4uMYYGP+soqU=;
+        b=Vs/bVFe2dUMiW8BMd3aoA58GmzvJhI2Br3qV3wc/S6BZRK+F80A/62NZGf4xz6rrZK0LnZ
+        x5Ym+gWftWBAPUBA==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 513D3B81854;
-        Wed,  1 Jun 2022 08:29:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8AB1C385A5;
-        Wed,  1 Jun 2022 08:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654072155;
-        bh=1iXjC+c5NDksDK4JWBcsRyUMhftWpjNZ5o01WmkxYAc=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=HAildSU/sq7Bgxx0sWq8pyb5IW7hO4kp1mXK9VDpSGGieB/7DZd6I8AvLt0YkEDB5
-         +9cFXyLVug9Vm/WIEm8VnZNUT1z4Cq5kg6vxviY5FCRX+zYt+qLBnUkiDVvOmLyK5S
-         Vg07weRxFj18FDJWZQi0lB1p2bS1+QR/pMOUgNmyRTu+bsRv+D/tdfQN1BzCCN+cV2
-         efEexTSPtk+K5OXjyDx9LUL8ZJ2inc1V9RNShdvvit0zVWv85IWkYtNwak3eDwNJsp
-         Te868s6mOvSqgnV87dZx3TlrTHQeRWEjOuELjgaBo7/vwhXdgF+CD8Y975G7UB7sz/
-         TDqCVKcQG9zjg==
-Date:   Wed, 1 Jun 2022 11:29:10 +0300
-From:   Leon Romanovsky <leon@kernel.org>
-To:     Kent Overstreet <kent.overstreet@gmail.com>
-Cc:     Stephen Hemminger <stephen@networkplumber.org>,
-        Andrew Lunn <andrew@lunn.ch>, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        netdev@vger.kernel.org, mcgrof@kernel.org, tytso@mit.edu,
-        RDMA mailing list <linux-rdma@vger.kernel.org>
-Subject: Re: RFC: Ioctl v2
-Message-ID: <YpcjVs/41EzAtr9k@unreal>
-References: <20220520161652.rmhqlvwvfrvskg4w@moria.home.lan>
- <Yof6hsC1hLiYITdh@lunn.ch>
- <20220521164546.h7huckdwvguvmmyy@moria.home.lan>
- <20220521124559.69414fec@hermes.local>
- <20220525170233.2yxb5pm75dehrjuj@moria.home.lan>
+        by relay2.suse.de (Postfix) with ESMTPS id 5C3822C141;
+        Wed,  1 Jun 2022 08:31:58 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id CF690A0633; Wed,  1 Jun 2022 10:31:54 +0200 (CEST)
+Date:   Wed, 1 Jun 2022 10:31:54 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     paolo.valente@linaro.org, jack@suse.cz, axboe@kernel.dk,
+        tj@kernel.org, linux-block@vger.kernel.org,
+        cgroups@vger.kernel.org, linux-kernel@vger.kernel.org,
+        yi.zhang@huawei.com
+Subject: Re: [PATCH -next v8 1/4] block, bfq: support to track if bfqq has
+ pending requests
+Message-ID: <20220601083154.5ip7r6w7kjb3bof2@quack3.lan>
+References: <20220531140858.3324294-1-yukuai3@huawei.com>
+ <20220531140858.3324294-2-yukuai3@huawei.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220525170233.2yxb5pm75dehrjuj@moria.home.lan>
+In-Reply-To: <20220531140858.3324294-2-yukuai3@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, May 25, 2022 at 01:02:33PM -0400, Kent Overstreet wrote:
-> On Sat, May 21, 2022 at 12:45:59PM -0700, Stephen Hemminger wrote:
-> > On Sat, 21 May 2022 12:45:46 -0400
-> > Kent Overstreet <kent.overstreet@gmail.com> wrote:
-> > 
-> > > On Fri, May 20, 2022 at 10:31:02PM +0200, Andrew Lunn wrote:
-> > > > > I want to circulate this and get some comments and feedback, and if
-> > > > > no one raises any serious objections - I'd love to get collaborators
-> > > > > to work on this with me. Flame away!  
-> > > > 
-> > > > Hi Kent
-> > > > 
-> > > > I doubt you will get much interest from netdev. netdev already
-> > > > considers ioctl as legacy, and mostly uses netlink and a message
-> > > > passing structure, which is easy to extend in a backwards compatible
-> > > > manor.  
-> > > 
-> > > The more I look at netlink the more I wonder what on earth it's targeted at or
-> > > was trying to solve. It must exist for a reason, but I've written a few ioctls
-> > > myself and I can't fathom a situation where I'd actually want any of the stuff
-> > > netlink provides.
-> > 
-> > Netlink was built for networking operations, you want to set something like a route with a large
-> > number of varying parameters in one transaction. And you don't want to have to invent
-> > a new system call every time a new option is added.
-> > 
-> > Also, you want to monitor changes and see these events for a userspace control
-> > application such as a routing daemon.
+On Tue 31-05-22 22:08:55, Yu Kuai wrote:
+> If entity belongs to bfqq, then entity->in_groups_with_pending_reqs
+> is not used currently. This patch use it to track if bfqq has pending
+> requests through callers of weights_tree insertion and removal.
 > 
-> That makes sense - perhaps the new mount API could've been done as a netlink
-> interface :)
+> Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+
+Looks good. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c |  1 +
+>  block/bfq-iosched.h |  1 +
+>  block/bfq-wf2q.c    | 24 ++++++++++++++++++++++--
+>  3 files changed, 24 insertions(+), 2 deletions(-)
 > 
-> But perhaps it makes sense to have both - netlink for the big complicated
-> stateful operations, ioctl v2 for the simpler ones. I haven't looked at netlink
-> usage at all, but most of the filesystem ioctls I've looked at fall into the the
-> simple bucket, for me.
-
-In RDMA, we solved this thing (standard entry points, multiple
-parameters and vendor specific data) by combining netlink and ioctls.
-
-The entry point is done with ioctls (mainly performance reason, but not
-only) while data is passed in netlink attributes style.
-
-ib_uverbs_ioctl:
-https://elixir.bootlin.com/linux/v5.18/source/drivers/infiniband/core/uverbs_ioctl.c#L605
-
-Latest example of newly added global to whole stack command:
-RDMA/uverbs: Add uverbs command for dma-buf based MR registration
-https://lore.kernel.org/linux-rdma/1608067636-98073-4-git-send-email-jianxin.xiong@intel.com/
-
-Thanks
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0d46cb728bbf..0ec21018daba 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -6263,6 +6263,7 @@ static void bfq_completed_request(struct bfq_queue *bfqq, struct bfq_data *bfqd)
+>  		 */
+>  		bfqq->budget_timeout = jiffies;
+>  
+> +		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>  		bfq_weights_tree_remove(bfqd, bfqq);
+>  	}
+>  
+> diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+> index ca8177d7bf7c..3b9b1a0e7c1c 100644
+> --- a/block/bfq-iosched.h
+> +++ b/block/bfq-iosched.h
+> @@ -1080,6 +1080,7 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>  void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>  		       bool expiration);
+>  void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq);
+> +void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq);
+>  
+>  /* --------------- end of interface of B-WF2Q+ ---------------- */
+>  
+> diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+> index f8eb340381cf..12d20f26ad69 100644
+> --- a/block/bfq-wf2q.c
+> +++ b/block/bfq-wf2q.c
+> @@ -1647,6 +1647,22 @@ void bfq_requeue_bfqq(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>  				    bfqq == bfqd->in_service_queue, expiration);
+>  }
+>  
+> +static void bfq_add_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+> +{
+> +	struct bfq_entity *entity = &bfqq->entity;
+> +
+> +	if (!entity->in_groups_with_pending_reqs)
+> +		entity->in_groups_with_pending_reqs = true;
+> +}
+> +
+> +void bfq_del_bfqq_in_groups_with_pending_reqs(struct bfq_queue *bfqq)
+> +{
+> +	struct bfq_entity *entity = &bfqq->entity;
+> +
+> +	if (entity->in_groups_with_pending_reqs)
+> +		entity->in_groups_with_pending_reqs = false;
+> +}
+> +
+>  /*
+>   * Called when the bfqq no longer has requests pending, remove it from
+>   * the service tree. As a special case, it can be invoked during an
+> @@ -1668,8 +1684,10 @@ void bfq_del_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>  
+>  	bfq_deactivate_bfqq(bfqd, bfqq, true, expiration);
+>  
+> -	if (!bfqq->dispatched)
+> +	if (!bfqq->dispatched) {
+> +		bfq_del_bfqq_in_groups_with_pending_reqs(bfqq);
+>  		bfq_weights_tree_remove(bfqd, bfqq);
+> +	}
+>  }
+>  
+>  /*
+> @@ -1684,10 +1702,12 @@ void bfq_add_bfqq_busy(struct bfq_data *bfqd, struct bfq_queue *bfqq)
+>  	bfq_mark_bfqq_busy(bfqq);
+>  	bfqd->busy_queues[bfqq->ioprio_class - 1]++;
+>  
+> -	if (!bfqq->dispatched)
+> +	if (!bfqq->dispatched) {
+> +		bfq_add_bfqq_in_groups_with_pending_reqs(bfqq);
+>  		if (bfqq->wr_coeff == 1)
+>  			bfq_weights_tree_add(bfqd, bfqq,
+>  					     &bfqd->queue_weights_tree);
+> +	}
+>  
+>  	if (bfqq->wr_coeff > 1)
+>  		bfqd->wr_busy_queues++;
+> -- 
+> 2.31.1
+> 
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
