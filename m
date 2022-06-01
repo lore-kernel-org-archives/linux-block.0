@@ -2,119 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 670A0C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 06:49:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CED79C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 07:04:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245519AbiFAGtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 02:49:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
+        id S1350170AbiFAHEh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 03:04:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233201AbiFAGs7 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 02:48:59 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F37954A4
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:48:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=rVtv4hqHRIiBfzH3a3TRr9+YdmhHgE1PAv/ncRPpl0c=; b=ys4ARIJTVPyEBap1jOVb4wZhPX
-        aAOp2drORDU5Qj8Sg5SrUAOe7vo9UCwjB9ZXZUuoH2pVMASoGsx9F1K7c8uqWZKWcfJ2IAkDfROCz
-        1E4XxIPrb6n0ZmOFceZy7JRWL0CV6l2knpWWqbuWi7PNgTgZKRgUSQ0jHGic69pi0l8aAeV16t81D
-        FGPTjok0cnR8L95wBS9IDvzftTbOCYQn943obIAB0lb0Lc2PtaLUWH1VtaLkfD7p3V4/A0DeSmUyL
-        AosNJryIZchp4nkC/OL3TfX7VBAl7VMLdN1RchZVQvRM4mcK+1dEKHc53ucVYPWLvPluSPpcOIMwz
-        areYcjww==;
-Received: from [2001:4bb8:185:a81e:471a:4927:bd2e:6050] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwIA6-00EEZX-Aj; Wed, 01 Jun 2022 06:48:58 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests 7/7] nvme: don't require the nvme drivers to be built in
-Date:   Wed,  1 Jun 2022 08:48:37 +0200
-Message-Id: <20220601064837.3473709-8-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220601064837.3473709-1-hch@lst.de>
-References: <20220601064837.3473709-1-hch@lst.de>
+        with ESMTP id S1348130AbiFAHEh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 03:04:37 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E0B28BD3D;
+        Wed,  1 Jun 2022 00:04:36 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id BD21361323;
+        Wed,  1 Jun 2022 07:04:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C864AC385B8;
+        Wed,  1 Jun 2022 07:04:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654067075;
+        bh=BfAsk3P+5WEVQwfCV3N2UzTi5iZs95agLnGWAp6Lvso=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kd2/kzakSesSChevVq3SafU+B04oNWyNUh1UNpOrbH7SWTxzlN+lyP5MwKhBb+/p6
+         z+XD701W2xtoWCv+4MKqii1IMzIC9q9aoAPbkGjpWG23RDOoVfrgW51I4COCJSJqkS
+         2JfuMLXtYG61hSXg7PRzPfm+MsjOHihY3CNdIVU6LgGU4R2QThf6oqgmZWKe5byGwy
+         FKsmV7YBe+MnVv6Uz180jU7SpA1CFJELS8CVnfvahvArK326gv6mIFrNm7uSZlfoJm
+         F8eBtcGPPB7nXqLhakeeVsKy64boFtnRdrRSx2yo61puc92G54MKbHev29X+OrAF1j
+         ZZt3SnV4WffEQ==
+Date:   Wed, 1 Jun 2022 00:04:25 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Keith Busch <kbusch@fb.com>
+Cc:     linux-fsdevel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-nvme@lists.infradead.org, axboe@kernel.dk,
+        Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        pankydev8@gmail.com, Keith Busch <kbusch@kernel.org>,
+        Pankaj Raghav <p.raghav@samsung.com>
+Subject: Re: [PATCHv5 07/11] block/bounce: count bytes instead of sectors
+Message-ID: <YpcPecSPRG6kkydy@sol.localdomain>
+References: <20220531191137.2291467-1-kbusch@fb.com>
+ <20220531191137.2291467-8-kbusch@fb.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220531191137.2291467-8-kbusch@fb.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use _have_driver instead of _have_modules to check for the availability
-of the nvme drivers, and don't bother checking at all for drivers that
-are pulled in as dependencies.
+On Tue, May 31, 2022 at 12:11:33PM -0700, Keith Busch wrote:
+> From: Keith Busch <kbusch@kernel.org>
+> 
+> Individual bv_len's may not be a sector size.
+> 
+> Signed-off-by: Keith Busch <kbusch@kernel.org>
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Reviewed-by: Pankaj Raghav <p.raghav@samsung.com>
+> ---
+> v4->v5:
+> 
+>   Updated comment (Christoph)
+> 
+>  block/bounce.c | 13 ++++++++++---
+>  1 file changed, 10 insertions(+), 3 deletions(-)
+> 
+> diff --git a/block/bounce.c b/block/bounce.c
+> index 8f7b6fe3b4db..fbadf179601f 100644
+> --- a/block/bounce.c
+> +++ b/block/bounce.c
+> @@ -205,19 +205,26 @@ void __blk_queue_bounce(struct request_queue *q, struct bio **bio_orig)
+>  	int rw = bio_data_dir(*bio_orig);
+>  	struct bio_vec *to, from;
+>  	struct bvec_iter iter;
+> -	unsigned i = 0;
+> +	unsigned i = 0, bytes = 0;
+>  	bool bounce = false;
+> -	int sectors = 0;
+> +	int sectors;
+>  
+>  	bio_for_each_segment(from, *bio_orig, iter) {
+>  		if (i++ < BIO_MAX_VECS)
+> -			sectors += from.bv_len >> 9;
+> +			bytes += from.bv_len;
+>  		if (PageHighMem(from.bv_page))
+>  			bounce = true;
+>  	}
+>  	if (!bounce)
+>  		return;
+>  
+> +	/*
+> +	 * Individual bvecs may not be logical block aligned. Round down
+> +	 * the split size so that each bio is properly sector size aligned,
+> +	 * even if we do not use the full hardware limits.
+> +	 */
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
----
- tests/nvme/rc | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+Please write "might not" instead of "may not", since "may not" is ambiguous; it
+sometimes means "are not allowed to".  Likewise in other patches.
 
-diff --git a/tests/nvme/rc b/tests/nvme/rc
-index ccdccf9..998b181 100644
---- a/tests/nvme/rc
-+++ b/tests/nvme/rc
-@@ -16,21 +16,23 @@ _nvme_requires() {
- 	_have_program nvme
- 	case ${nvme_trtype} in
- 	loop)
--		_have_modules nvmet nvme-core nvme-loop
-+		_have_driver nvme-loop
- 		_have_configfs
- 		;;
- 	pci)
--		_have_modules nvme nvme-core
-+		_have_driver nvme
- 		;;
- 	tcp)
--		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
-+		_have_driver nvme-tcp
-+		_have_driver nvmet-tcp
- 		_have_configfs
- 		;;
- 	rdma)
--		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
-+		_have_driver nvme-rdma
-+		_have_driver nvmet-rdma
- 		_have_configfs
- 		_have_program rdma
--		_have_modules rdma_rxe || _have_modules siw
-+		_have_driver rdma_rxe || _have_driver siw
- 		;;
- 	*)
- 		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
-@@ -125,11 +127,11 @@ _cleanup_nvmet() {
- 	shopt -u nullglob
- 	trap SIGINT
- 
--	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
-+	modprobe -rq nvme-"${nvme_trtype}" 2>/dev/null
- 	if [[ "${nvme_trtype}" != "loop" ]]; then
--		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
-+		modprobe -rq nvmet-"${nvme_trtype}" 2>/dev/null
- 	fi
--	modprobe -r nvmet 2>/dev/null
-+	modprobe -rq nvmet 2>/dev/null
- 	if [[ "${nvme_trtype}" == "rdma" ]]; then
- 		stop_soft_rdma
- 	fi
-@@ -137,11 +139,11 @@ _cleanup_nvmet() {
- 
- _setup_nvmet() {
- 	_register_test_cleanup _cleanup_nvmet
--	modprobe nvmet
-+	modprobe -q nvmet
- 	if [[ "${nvme_trtype}" != "loop" ]]; then
--		modprobe nvmet-"${nvme_trtype}"
-+		modprobe -q nvmet-"${nvme_trtype}"
- 	fi
--	modprobe nvme-"${nvme_trtype}"
-+	modprobe -q nvme-"${nvme_trtype}"
- 	if [[ "${nvme_trtype}" == "rdma" ]]; then
- 		start_soft_rdma
- 		for i in $(rdma_network_interfaces)
--- 
-2.30.2
+"Sector size" is ambiguous as well.  I think you mean "logical block size"?
 
+- Eric
