@@ -2,65 +2,155 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64B6DC43334
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 17:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CD96C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 17:48:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355771AbiFARmi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 13:42:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57160 "EHLO
+        id S1353325AbiFARsN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 13:48:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352351AbiFARmi (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 13:42:38 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8F6E562F5;
-        Wed,  1 Jun 2022 10:42:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=BgNUX8C4C5dSbDctWdWKZdF5CNkQMgBr9Y2XYkkie84=; b=C4bp+UOhckd9fn8goR7eqbq4ma
-        eZTZAKGwURzY4p6S0wLybt2XX3sTKJ23GAccY8ngfFGDgDwwSa/GFYoIQ7/r6crjEGyC4GlKukWEc
-        9SghjMt1xmYgz5il4tyT35l0bct01WnjpugTUcN7gz8yegk9CgOUe2Lu4w4srt0UAkaV3/UeO0HxT
-        P+qCrfmn63IogS+3Tq9Il/+AbAXwT0fM5UPpgGBDhLAYdJAfbNSCNl7INttayrYHu5CkeK7Ivkwqv
-        CtLsN1w/LrfJ/bxwUozXQHsO0N5DqticYyOLhh8Yki7xGQN7Uly+4Y5Djf5C9FcJUgZ4JClFUnoms
-        Pgor1k2A==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwSMa-00HL12-C6; Wed, 01 Jun 2022 17:42:32 +0000
-Date:   Wed, 1 Jun 2022 10:42:32 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@infradead.org>,
-        Tejun Heo <tj@kernel.org>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Donald Buczek <buczek@molgen.mpg.de>, stable@vger.kernel.org
-Subject: Re: [PATCH] block: fix bio_clone_blkg_association() to associate
- with proper blkcg_gq
-Message-ID: <YpelCJ66S9KaYg+0@infradead.org>
-References: <20220601163405.29478-1-jack@suse.cz>
+        with ESMTP id S233130AbiFARsK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 13:48:10 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 719D66A02F;
+        Wed,  1 Jun 2022 10:48:09 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso2772260pjg.0;
+        Wed, 01 Jun 2022 10:48:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=i0RZ8l73WFDDzM6Aj8EMNY9HnT718p+wPtqJImpAAXg=;
+        b=S3qixs5BU1PZ015xxJdsdLuFlKjPKLu5LQhK9EbUs3wNr7hohaemHdXqaFP38FJxhS
+         NOdL63FvglE0nVP/ytYaAQ8/SI+xisMk8kKFHjOr3Ms4MaIECDFfFugdb/7zdQw4gIfu
+         z4jL2kM1LV6bt8zgoBPQ90Y2K7oI8ROA5R7kA49kP+DzTSQyhU/yk5JoliBZbvJUGjj0
+         QXmS7mjQGFEewCudnT6f/JBAKstnLrbMznCYT9p4iZQKD35NI/VAH+GllJr6xxbwAkXh
+         fZW4CRltCagOkCaM9d1YSvrCzLQisoFLpHHzeI/j9BQ32TzG4soMEMqy2Gf1po7c/nvH
+         RDXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=i0RZ8l73WFDDzM6Aj8EMNY9HnT718p+wPtqJImpAAXg=;
+        b=27L9/7sGGzydvfO3PrjYXprlCNd+01tdzS/cr/m687kcfLJcLUQhIu/2FACdAwMk8w
+         HiVZVP1XWWB96zUIgQCHz0LkDfkeHbYIe1cMCl428Bp5cpuq7ZOimTyOaNoQ03ZK89iF
+         NCrg2fpCNPlUpvGF9BNwfZSx4g+6YLZw/+a+HmDWvlwgdopnbKW232r+6TAns8IbDj63
+         1TX+pR3RC3aVF6axTApME/kxwQgH8gnTcF38t9Ed46JrwH3yeDZD5AY/Vt9p5mYLJwQi
+         00pcGncd3q6b1dCb5ZP52COjbHDy69allNfyWvYCk6kL1zdShiIvHlq/5mE2dZjGmZHd
+         W/Cw==
+X-Gm-Message-State: AOAM531IJwiX+YEC/gUqqbuq3DpfmgQSkek0LVkCDy8nrsQLWe5yHe+m
+        QPsYIRtJwN1sy01o75EXdqbP/wcLqBw=
+X-Google-Smtp-Source: ABdhPJxZ0uPByzaE81WrLrAl6/5NjIv/VzL+/GMbIeHfQK4VDBfF+GX9JxV39g3M9z/PFCeU37nCVQ==
+X-Received: by 2002:a17:90b:1d0a:b0:1e0:c34d:8c9c with SMTP id on10-20020a17090b1d0a00b001e0c34d8c9cmr544436pjb.238.1654105688741;
+        Wed, 01 Jun 2022 10:48:08 -0700 (PDT)
+Received: from localhost (2603-800c-1a02-1bae-a7fa-157f-969a-4cde.res6.spectrum.com. [2603:800c:1a02:1bae:a7fa:157f:969a:4cde])
+        by smtp.gmail.com with ESMTPSA id 84-20020a621857000000b0050dc7628158sm1766629pfy.50.2022.06.01.10.48.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Jun 2022 10:48:07 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Wed, 1 Jun 2022 07:48:06 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v2 2/2] blk-cgroup: Optimize blkcg_rstat_flush()
+Message-ID: <YpemVpvaPomwH7mt@slm.duckdns.org>
+References: <20220601165324.60892-1-longman@redhat.com>
+ <20220601165324.60892-2-longman@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220601163405.29478-1-jack@suse.cz>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20220601165324.60892-2-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 06:34:05PM +0200, Jan Kara wrote:
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -1975,10 +1975,9 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
->  void bio_clone_blkg_association(struct bio *dst, struct bio *src)
+Hello,
+
+On Wed, Jun 01, 2022 at 12:53:24PM -0400, Waiman Long wrote:
+> +static struct llist_node llist_last;	/* Last sentinel node of llist */
+
+Can you please add comment explaining why we need the special sentinel and
+empty helper?
+
+> +static inline bool blkcg_llist_empty(struct llist_head *lhead)
+> +{
+> +	return lhead->first == &llist_last;
+> +}
+> +
+> +static inline void init_blkcg_llists(struct blkcg *blkcg)
+> +{
+> +	int cpu;
+> +
+> +	for_each_possible_cpu(cpu)
+> +		per_cpu_ptr(blkcg->lhead, cpu)->first = &llist_last;
+> +}
+> +
+> +static inline struct llist_node *
+> +fetch_delete_blkcg_llist(struct llist_head *lhead)
+> +{
+> +	return xchg(&lhead->first, &llist_last);
+> +}
+> +
+> +/*
+> + * The retrieved blkg_iostat_set is immediately marked as not in the
+> + * lockless list by clearing its node->next pointer. It could be put
+> + * back into the list by a parallel update before the iostat's are
+> + * finally flushed. So being in the list doesn't always mean it has new
+> + * iostat's to be flushed.
+> + */
+
+Isn't the above true for any sort of mechanism which tracking pending state?
+You gotta clear the pending state before consuming so that you don't miss
+the events which happen while data is being consumed.
+
+> +#define blkcg_llist_for_each_entry_safe(pos, node, nxt)			\
+> +	for (; (node != &llist_last) &&					\
+> +	       (pos = llist_entry(node, struct blkg_iostat_set, lnode),	\
+> +		nxt = node->next, node->next = NULL, true);		\
+> +		node = nxt)
+> +
+>  /**
+>   * blkcg_css - find the current css
+>   *
+...
+> @@ -852,17 +888,26 @@ static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
+>  static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
 >  {
->  	if (src->bi_blkg) {
-> +		rcu_read_lock();
-> +		bio_associate_blkg_from_css(dst, bio_blkcg_css(src));
-> +		rcu_read_unlock();
+>  	struct blkcg *blkcg = css_to_blkcg(css);
+> -	struct blkcg_gq *blkg;
+> +	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+> +	struct llist_node *lnode, *lnext;
+> +	struct blkg_iostat_set *bisc;
+>  
+>  	/* Root-level stats are sourced from system-wide IO stats */
+>  	if (!cgroup_parent(css->cgroup))
+>  		return;
+>  
+> -	rcu_read_lock();
+> +	if (blkcg_llist_empty(lhead))
+> +		return;
+>  
+> -	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
+> +	lnode = fetch_delete_blkcg_llist(lhead);
+> +
+> +	/*
+> +	 * No RCU protection is needed as it is assumed that blkg_iostat_set's
+> +	 * in the percpu lockless list won't go away until the flush is done.
+> +	 */
 
-What do we even need the rcu critical section here?
+Can you please elaborate on why this is safe?
 
-Otherwise looks good:
+> +	blkcg_llist_for_each_entry_safe(bisc, lnode, lnext) {
+> +		struct blkcg_gq *blkg = bisc->blkg;
+>  		struct blkcg_gq *parent = blkg->parent;
+> -		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
+>  		struct blkg_iostat cur, delta;
+>  		unsigned long flags;
+>  		unsigned int seq;
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+Overall, looks fantastic to me. Thanks a lot for working on it.
+
+-- 
+tejun
