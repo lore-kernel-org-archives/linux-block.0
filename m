@@ -2,150 +2,124 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62FC3C4332F
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 12:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1C72C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 12:22:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352994AbiFAMVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 08:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42942 "EHLO
+        id S243225AbiFAMWF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 08:22:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344635AbiFAMVV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 08:21:21 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 538C95D641
-        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 05:21:19 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id v11-20020a17090a4ecb00b001e2c5b837ccso6042845pjl.3
-        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 05:21:19 -0700 (PDT)
+        with ESMTP id S1352193AbiFAMVW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 08:21:22 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC1295D648
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 05:21:21 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id v15so1728336pgk.11
+        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 05:21:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cvyMZ32vWUq0PQ25pSdJ7F9z18j1tkrk0X4DK0wb+pM=;
-        b=kxnZ7vRN+WQqWOB5MR7wfAgarJxLA8uLDRHyri1tlk0f3K2IslXSjPSWuFg5pMnFdh
-         HDprEkLHaoZeQty7cXur4ieJIQFBwHlhllSwX0QHPN5RZ18H+aLarpAS4eTynppFq7tr
-         8u6ndn8SaZbl57XrVoqT3djuazguIoR19fS3i/SyMs63WJtK++FLs/FpvVbyFjEW6dY5
-         r3+JiisF0irEv6sMXMqmLlQvAsAwuK6WoHky9FPY8nBi/NWIgEfT9T+kg2uW+emFntPh
-         Uq361otGJ8ZZOo4bGCiX/3ngHRQ/ra8xFDjVDh2xuWumlHmfa+nBgNtDMNJ2pZEVshRR
-         lOnA==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=s5ua/r45roXfkQ5hrpMLZbr0p+EmyEspzho/oSN+Lzc=;
+        b=7ZLzivQcWHT/fZLvUnhrnUfj964Nf9oki+lLUmPDgm3tT1NkPsx65NAMA/pIfo8fz5
+         8XmKwUEWO1aq3Y5S8cwNVZHu83FaoDYbH3OwSCYDmyn9m71XUW7EmqoDVQjVFzFp3Kby
+         dHsxWGfqI5ml3ym3Zkfo19ZEWlJhHH2Wh/eW5Hf6eH3W2OD7EfxldSvs4ZUI8Tkj0A6y
+         zXBL7hF7Qe3WplF+DLg13shRaSlZUwM//s3p+ev+0vSYfZpymN+gxqhiwBWW39lEf3Zi
+         V5ZPW4NvFxxhPoyOk2b/v4WbV/NU0I8UhLixDgBeemnSf2QXLxVYEZmZiz4pJ3+PVfXk
+         ulIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=cvyMZ32vWUq0PQ25pSdJ7F9z18j1tkrk0X4DK0wb+pM=;
-        b=nqSAZwQrpO4h2AiRZUxQ4oxkoHi8enkaOAYrjjZyzbfmSsZ5sg5Fq88Wmg0t3aS1+q
-         mpz74gVtCvXYmPTIoPrjmws4P3knsk6bKfTM02BpDKtjsV2tdFiUDjPJvXX6/XB+VA6Y
-         Ffku5U8ys1KznAUoTTiaq+BqoXn5V6E0wmI6fQD3VvV8AgwWJjCNnslEZG+zBqeQvunQ
-         svxR07sbrFzc6ts4glxxvpmth3WUy+tc+9Vt8+OjnlJIIQIHFEPocBqcDEmOXOCXmrs4
-         wRcGVcrMQZnF12nFsSvrv31UinmLY4Ry7ohgqRUOUU9cmXLEJ35OQ6JdiML2hIXwxQl4
-         leMQ==
-X-Gm-Message-State: AOAM53016q3vqMjqh1aBBIjbVYiWt6qQSkxzQBVQfaOKO+fl838LmX/4
-        Ay4dGJx/5loqjA4QR+mF41yFVA==
-X-Google-Smtp-Source: ABdhPJxGNOmMnzBvygoNU/XIaL9fFEvwZd9o7+MdRm17YWKvByOJnl3tUA+d8dJYE9JdwafzFEa25A==
-X-Received: by 2002:a17:90b:4c47:b0:1df:ad5b:e32e with SMTP id np7-20020a17090b4c4700b001dfad5be32emr33826198pjb.59.1654086078831;
-        Wed, 01 Jun 2022 05:21:18 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=s5ua/r45roXfkQ5hrpMLZbr0p+EmyEspzho/oSN+Lzc=;
+        b=1yrbJzET5+MmNvUB6PIpN3n8Cvp/RmgcZQR4LG/rq5lSMv7e3e40coPN2eY2UBGwsi
+         zYmBqT/u5zI52lOL0shMi6r5JnLvWCQvO3AutHjAjZhnfpJu9W4OrLQxOBQ+/OlNcMR7
+         CWT5EAoE9Sq9Tz7PWdrlcVUw8ZPX1iDVdJ3lvS51XP2Xx4mAE4BRUmGJNGSBOQbCun4W
+         uz3SAoIHJXvu0adBr2YC314h0TidFHQT2YcYXk4PdUx7Onm4EcozTe1NWkqw6ENFctNs
+         ZhbJfZ/dJ28FLhsbe8DwEtNKbVpiGy0SmhWauGDYKbOrx6sTjdcTXRdry+Kdp//MeBJ7
+         rIxQ==
+X-Gm-Message-State: AOAM530iy4RT4gxRO3U2kFFjkWZDI1uZS7imtUoJpKbeDMukKgyn02gS
+        UCv+YmWqgFZkftJV6kg312li5L2HEKj4XQ==
+X-Google-Smtp-Source: ABdhPJykF5V8wdIz+24+3hXF1BEqN6fMbgYxPfSjrxb6lRi/c7LiocB7K9uaafs9UPDJYbpSxmXKDg==
+X-Received: by 2002:a05:6a00:a8f:b0:51b:5ca1:47f1 with SMTP id b15-20020a056a000a8f00b0051b5ca147f1mr12074388pfl.50.1654086081610;
+        Wed, 01 Jun 2022 05:21:21 -0700 (PDT)
 Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.231])
-        by smtp.gmail.com with ESMTPSA id ij24-20020a170902ab5800b0015e8d4eb1f7sm1427535plb.65.2022.06.01.05.21.16
+        by smtp.gmail.com with ESMTPSA id ij24-20020a170902ab5800b0015e8d4eb1f7sm1427535plb.65.2022.06.01.05.21.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 05:21:18 -0700 (PDT)
+        Wed, 01 Jun 2022 05:21:21 -0700 (PDT)
 From:   Chengming Zhou <zhouchengming@bytedance.com>
 To:     tj@kernel.org, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
         Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH 1/2] blk-iocost: factor out iocg_deactivate()
-Date:   Wed,  1 Jun 2022 20:20:06 +0800
-Message-Id: <20220601122007.1057-1-zhouchengming@bytedance.com>
+Subject: [PATCH 2/2] blk-iocost: only flush wait and indebt stat deltas when needed
+Date:   Wed,  1 Jun 2022 20:20:07 +0800
+Message-Id: <20220601122007.1057-2-zhouchengming@bytedance.com>
 X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220601122007.1057-1-zhouchengming@bytedance.com>
+References: <20220601122007.1057-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch factor out iocg deactivation into a separate function:
-iocg_deactivate(). No functional changes.
+We only need to flush wait and indebt stat deltas when the iocg
+is in these status.
 
 Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 ---
- block/blk-iocost.c | 59 ++++++++++++++++++++++++++--------------------
- 1 file changed, 33 insertions(+), 26 deletions(-)
+ block/blk-iocost.c | 32 ++++++++++++++++----------------
+ 1 file changed, 16 insertions(+), 16 deletions(-)
 
 diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 33a11ba971ea..b1f2305e8032 100644
+index b1f2305e8032..502425b44475 100644
 --- a/block/blk-iocost.c
 +++ b/block/blk-iocost.c
-@@ -1322,6 +1322,37 @@ static bool iocg_activate(struct ioc_gq *iocg, struct ioc_now *now)
- 	return false;
- }
+@@ -2174,28 +2174,28 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
  
-+static void iocg_deactivate(struct ioc_gq *iocg, struct ioc_now *now)
-+{
-+	struct ioc *ioc = iocg->ioc;
-+	u64 vtime = atomic64_read(&iocg->vtime);
-+	s64 excess;
-+
-+	lockdep_assert_held(&ioc->lock);
-+	lockdep_assert_held(&iocg->waitq.lock);
-+
-+	/*
-+	 * @iocg has been inactive for a full duration and will
-+	 * have a high budget. Account anything above target as
-+	 * error and throw away. On reactivation, it'll start
-+	 * with the target budget.
-+	 */
-+	excess = now->vnow - vtime - ioc->margins.target;
-+	if (excess > 0) {
-+		u32 old_hwi;
-+
-+		current_hweight(iocg, NULL, &old_hwi);
-+		ioc->vtime_err -= div64_u64(excess * old_hwi,
-+					    WEIGHT_ONE);
-+	}
-+
-+	TRACE_IOCG_PATH(iocg_idle, iocg, now,
-+			atomic64_read(&iocg->active_period),
-+			atomic64_read(&ioc->cur_period), vtime);
-+	__propagate_weights(iocg, 0, 0, false, now);
-+	list_del_init(&iocg->active_list);
-+}
-+
- static bool iocg_kick_delay(struct ioc_gq *iocg, struct ioc_now *now)
- {
- 	struct ioc *ioc = iocg->ioc;
-@@ -2165,32 +2196,8 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
+ 		spin_lock(&iocg->waitq.lock);
+ 
+-		/* flush wait and indebt stat deltas */
+-		if (iocg->wait_since) {
+-			iocg->stat.wait_us += now->now - iocg->wait_since;
+-			iocg->wait_since = now->now;
+-		}
+-		if (iocg->indebt_since) {
+-			iocg->stat.indebt_us +=
+-				now->now - iocg->indebt_since;
+-			iocg->indebt_since = now->now;
+-		}
+-		if (iocg->indelay_since) {
+-			iocg->stat.indelay_us +=
+-				now->now - iocg->indelay_since;
+-			iocg->indelay_since = now->now;
+-		}
+-
+ 		if (waitqueue_active(&iocg->waitq) || iocg->abs_vdebt ||
+ 		    iocg->delay) {
+ 			/* might be oversleeping vtime / hweight changes, kick */
  			iocg_kick_waitq(iocg, true, now);
  			if (iocg->abs_vdebt || iocg->delay)
  				nr_debtors++;
--		} else if (iocg_is_idle(iocg)) {
--			/* no waiter and idle, deactivate */
--			u64 vtime = atomic64_read(&iocg->vtime);
--			s64 excess;
--
--			/*
--			 * @iocg has been inactive for a full duration and will
--			 * have a high budget. Account anything above target as
--			 * error and throw away. On reactivation, it'll start
--			 * with the target budget.
--			 */
--			excess = now->vnow - vtime - ioc->margins.target;
--			if (excess > 0) {
--				u32 old_hwi;
--
--				current_hweight(iocg, NULL, &old_hwi);
--				ioc->vtime_err -= div64_u64(excess * old_hwi,
--							    WEIGHT_ONE);
--			}
--
--			TRACE_IOCG_PATH(iocg_idle, iocg, now,
--					atomic64_read(&iocg->active_period),
--					atomic64_read(&ioc->cur_period), vtime);
--			__propagate_weights(iocg, 0, 0, false, now);
--			list_del_init(&iocg->active_list);
--		}
-+		} else if (iocg_is_idle(iocg))
-+			iocg_deactivate(iocg, now);
++
++			/* flush wait and indebt stat deltas */
++			if (iocg->wait_since) {
++				iocg->stat.wait_us += now->now - iocg->wait_since;
++				iocg->wait_since = now->now;
++			}
++			if (iocg->indebt_since) {
++				iocg->stat.indebt_us +=
++					now->now - iocg->indebt_since;
++				iocg->indebt_since = now->now;
++			}
++			if (iocg->indelay_since) {
++				iocg->stat.indelay_us +=
++					now->now - iocg->indelay_since;
++				iocg->indelay_since = now->now;
++			}
+ 		} else if (iocg_is_idle(iocg))
+ 			iocg_deactivate(iocg, now);
  
- 		spin_unlock(&iocg->waitq.lock);
- 	}
 -- 
 2.36.1
 
