@@ -2,88 +2,117 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90CA3C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 21:32:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1596C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 21:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231590AbiFAVcT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 17:32:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39198 "EHLO
+        id S231626AbiFAVno (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 17:43:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231574AbiFAVcS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 17:32:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9C4591C4F07
-        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 14:32:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654119136;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Kydqna2S/fNnNfFhR9vYtc6J6licD3U6v9tlZqx3JCg=;
-        b=a+efBeisOk2PtK/1YBzjumzGv5OCY7WfaKoc7B/7JOEEInZzfBZZ4idk7e2iaDH3Fx7qFR
-        JPaUhfKw6b307CvJpacPnHlYemEPC7YfuNglOEJp7zsSkmPhg72vQquzs1yYhhI28bL9c7
-        E2gzpIJzRmTx5vTxT1Sx7S5QX1VpVoM=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-503-nxe11axJOkGj6dRd8brr-A-1; Wed, 01 Jun 2022 17:32:12 -0400
-X-MC-Unique: nxe11axJOkGj6dRd8brr-A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E8BA2383328C;
-        Wed,  1 Jun 2022 21:32:11 +0000 (UTC)
-Received: from [10.18.17.215] (dhcp-17-215.bos.redhat.com [10.18.17.215])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id A81FCC23DBF;
-        Wed,  1 Jun 2022 21:32:11 +0000 (UTC)
-Message-ID: <6734ae25-27eb-0024-8524-ab8885a5fae0@redhat.com>
-Date:   Wed, 1 Jun 2022 17:32:11 -0400
+        with ESMTP id S231491AbiFAVnl (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 17:43:41 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABCA2C133
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 14:43:39 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id n28so3905132edb.9
+        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 14:43:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=rROPJDXC0BSDIKkq62Y3eAfugF0fDNsfhrQHzbt7NtU=;
+        b=XKSko4kOJRH2iwn+HXhyRF2svcP+8l8SfsNelRJReLTOwZ7qnLYbsMr+QjAieLw2Pa
+         +3osXaE4YAQKEViXnvbKDndD/U3DIdouDaZz8ANy/yaIDy2iwE3tLkdMVML/ZbesLUFi
+         1diYZRV7ROKmXYdETmNvVpEak/Kot8Mg6OrZk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=rROPJDXC0BSDIKkq62Y3eAfugF0fDNsfhrQHzbt7NtU=;
+        b=pHThJjMiIVshvRrEs1W4t4cmqkz7n82qBZEDsMGkCHqXHxZe5vZkntqPe4VFMyUvHg
+         eZBMEkgi5DbowtKg/9+ODSABm9N50TawD4gY4YEQP9t9k4H5J4HEfmgL0Uiy9HWgWe3w
+         neKTW556/CHpYR3dg2yoOa+ryDfaUuv5oSashOa6EkUEVWWolcXkD5oUdSkEAowINwoG
+         13GnZBtI8hvKOi0fS6QAKUJmJawX7RVYFUAyHKqaCRiWyqIdbxIpOfXpZetF0s18D5cX
+         46MTO1DA/hLRbmWfvUsz4JEL8B9iWzVp+lJelAapbGABuZL4n23nndwVmj4c+QspvB7h
+         OF/w==
+X-Gm-Message-State: AOAM532hclTibc38q6q7eLuBiUvotMlZmDXCVVzveOXY0ha3og2qSEpv
+        VxbszqZ/rD+XF7k3dcOlK4KzLKgsX2w+rTIt
+X-Google-Smtp-Source: ABdhPJw7QYAiwqpQ7yMYHJnYMgkQqKwRGl+nindbUoEUPv9PRKdVv8+/lvuVZvodOvfEoyXNHYr/Xg==
+X-Received: by 2002:a05:6402:40d4:b0:42b:3203:aafe with SMTP id z20-20020a05640240d400b0042b3203aafemr1955279edb.376.1654119818219;
+        Wed, 01 Jun 2022 14:43:38 -0700 (PDT)
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com. [209.85.221.53])
+        by smtp.gmail.com with ESMTPSA id a2-20020a1709062b0200b0070569ed5429sm1090992ejg.55.2022.06.01.14.43.36
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jun 2022 14:43:36 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id p10so4023398wrg.12
+        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 14:43:36 -0700 (PDT)
+X-Received: by 2002:a05:6000:1b0f:b0:210:313a:ef2a with SMTP id
+ f15-20020a0560001b0f00b00210313aef2amr1083904wrz.281.1654119816176; Wed, 01
+ Jun 2022 14:43:36 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 2/2] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220601165324.60892-1-longman@redhat.com>
- <20220601165324.60892-2-longman@redhat.com>
- <YpemVpvaPomwH7mt@slm.duckdns.org>
- <ca091a5c-4ae1-e973-403e-4086d4527102@redhat.com>
- <YpexWFptr/l2Y0rU@slm.duckdns.org>
- <bca31669-7107-ebe4-7fbf-2449940a5cc8@redhat.com>
- <c26f153c-304c-e109-6626-bb8b79a2e2ad@redhat.com>
- <YpfaC+wB5Th4tLDY@slm.duckdns.org>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <YpfaC+wB5Th4tLDY@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.8
+References: <YpfTQgw6RsEYxSFD@redhat.com>
+In-Reply-To: <YpfTQgw6RsEYxSFD@redhat.com>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed, 1 Jun 2022 14:43:20 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wjTOB7yuygFwz64xFHYthwdTOYoC=L2kM4k1GW2a80uNQ@mail.gmail.com>
+Message-ID: <CAHk-=wjTOB7yuygFwz64xFHYthwdTOYoC=L2kM4k1GW2a80uNQ@mail.gmail.com>
+Subject: Re: [git pull] device mapper fixes for 5.19-rc1
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     device-mapper development <dm-devel@redhat.com>,
+        linux-block <linux-block@vger.kernel.org>,
+        Alasdair G Kergon <agk@redhat.com>,
+        Sarthak Kukreti <sarthakkukreti@google.com>,
+        Kees Cook <keescook@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-On 6/1/22 17:28, Tejun Heo wrote:
-> On Wed, Jun 01, 2022 at 05:25:53PM -0400, Waiman Long wrote:
->> I think the best way to protect against blkg destruction is to get a percpu
->> reference when put into lockless list and put it back when removed.
->>
->> BTW, when I ran a test that continuously create and destroy containers, the
->> total number of blkcg's kept on increasing. There are some freeing of
->> blkcg's but no freeing of blkg's at all. Maybe we have a similar dying
->> blkcg's problem here. I will take a further look at that when I have time.
-> They get pinned by per-cgroup writebacks which gets pinned by lingering page
-> cache and other remaining accounted memory areas, so I think they can hang
-> around if there's no memory pressure. But, yeah, it'd be great to verify
-> that they actually go away under memory pressure.
+On Wed, Jun 1, 2022 at 1:59 PM Mike Snitzer <snitzer@kernel.org> wrote:
 >
-> Thanks.
->
-Thanks for the explanation. It makes sense to me.
+> ----------------------------------------------------------------
+> - Fix DM core's dm_table_supports_poll to return false if no data
+>   devices.
 
-Cheers,
-Longman
+So looking at that one (mainly because of the incomprehensible
+explanation), I do note:
 
+ (a) the caller does
+
+        for (i = 0; i < t->num_targets; i++) {
+                ti = t->targets + i;
+
+    while the callee does
+
+        unsigned i = 0;
+
+        while (i < dm_table_get_num_targets(t)) {
+                ti = dm_table_get_target(t, i++);
+
+Now, those things are entirely equivalent, but that latter form is
+likely to generate horribly bad code because those helper functions
+aren't some kind of trivial inline, they are actually normal functions
+that are defined later in that same source file.
+
+Maybe a compiler will do optimizations within that source file even
+for functions that haven't been defined yet. Traditionally not.
+
+Whatever. Probably not a case where anybody cares about performance,
+but it does strike me that the "use abstractions" version probably not
+only generates worse code, it seems less legible too.
+
+Very odd pattern.
+
+ (b) The commit message (which is why I started looking at this) says
+that it used to return true even if there are no data devices.
+
+     But dm_table_supports_poll() actually _still_ returns true for at
+least one case of no data devices: if the dm_table has no targets at
+all.
+
+So I don't know. Maybe that is a "can't happen". But since I looked at
+this, I thought I'd just point out the two oddities I found while
+doing so.
+
+                    Linus
