@@ -2,180 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 845A4C43334
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 21:12:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D338ACCA473
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 21:18:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbiFAVMA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 17:12:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35008 "EHLO
+        id S231345AbiFAVSp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 17:18:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231172AbiFAVL5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 17:11:57 -0400
-Received: from mx.ewheeler.net (mx.ewheeler.net [173.205.220.69])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34DA355A0;
-        Wed,  1 Jun 2022 14:11:55 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        by mx.ewheeler.net (Postfix) with ESMTP id 719F539;
-        Wed,  1 Jun 2022 14:11:55 -0700 (PDT)
-X-Virus-Scanned: amavisd-new at ewheeler.net
-Received: from mx.ewheeler.net ([127.0.0.1])
-        by localhost (mx.ewheeler.net [127.0.0.1]) (amavisd-new, port 10024)
-        with LMTP id 3rIBJrIb89lU; Wed,  1 Jun 2022 14:11:51 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        with ESMTP id S231244AbiFAVSp (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 17:18:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id AA7486EB34
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 14:18:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654118318;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=YXLuT1Yk9DAXTYl5NoX/oMeS35ik4rQo8uu3jun7bK8=;
+        b=GsjHjqI+bbWkfkmBN4bHlWdaZxIn6D8Y9xpiYrxyi3Ko28vFjG/Z+E+jmIIzlCp1hW32gT
+        Ck5N0cCYg65eDxUdP3Kn1n981/g+vwi3gApvNu6zuWYWAHNK0nmo4V7jjlwGE+R05kF4W5
+        KB6N7Mu1XbX9n+QApsMwCEp1Vz8qCn4=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-612-zPI8cbarPQGIcchXo8gl-A-1; Wed, 01 Jun 2022 17:18:37 -0400
+X-MC-Unique: zPI8cbarPQGIcchXo8gl-A-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mx.ewheeler.net (Postfix) with ESMTPSA id DD5A348;
-        Wed,  1 Jun 2022 14:11:35 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx.ewheeler.net DD5A348
-Date:   Wed, 1 Jun 2022 14:11:35 -0700 (PDT)
-From:   Eric Wheeler <bcache@lists.ewheeler.net>
-To:     Adriano Silva <adriano_da_silva@yahoo.com.br>
-cc:     Keith Busch <kbusch@kernel.org>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Bcache Linux <linux-bcache@vger.kernel.org>,
-        Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
- Bcache in writes direct with fsync)
-In-Reply-To: <1295433800.3263424.1654111657911@mail.yahoo.com>
-Message-ID: <8a95d4f-b263-5231-537d-b1f88fdd5090@ewheeler.net>
-References: <YoxuYU4tze9DYqHy@infradead.org> <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net> <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com> <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net> <Yo28kDw8rZgFWpHu@infradead.org>
- <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net> <YpGsKDQ1aAzXfyWl@infradead.org> <24456292.2324073.1653742646974@mail.yahoo.com> <YpLmDtMgyNLxJgNQ@kbusch-mbp.dhcp.thefacebook.com> <2064546094.2440522.1653825057164@mail.yahoo.com>
- <YpTKfHHWz27Qugi+@kbusch-mbp.dhcp.thefacebook.com> <1295433800.3263424.1654111657911@mail.yahoo.com>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3EE8880159B;
+        Wed,  1 Jun 2022 21:18:37 +0000 (UTC)
+Received: from llong.com (dhcp-17-215.bos.redhat.com [10.18.17.215])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C8C91406AD49;
+        Wed,  1 Jun 2022 21:18:36 +0000 (UTC)
+From:   Waiman Long <longman@redhat.com>
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH v3 1/2] blk-cgroup: Correctly free percpu iostat_cpu in blkg on error exit
+Date:   Wed,  1 Jun 2022 17:18:23 -0400
+Message-Id: <20220601211824.89626-2-longman@redhat.com>
+In-Reply-To: <20220601211824.89626-1-longman@redhat.com>
+References: <20220601211824.89626-1-longman@redhat.com>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1241708468-1654117895=:2952"
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Commit f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup
+rstat") changes block cgroup IO stats to use the rstat APIs. It added
+a new percpu iostat_cpu field into blkg. The blkg_alloc() was modified
+to allocate the new percpu iostat_cpu but didn't free it when an error
+happened. Fix this by freeing the percpu iostat_cpu on error exit.
 
---8323328-1241708468-1654117895=:2952
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8BIT
+Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+Signed-off-by: Waiman Long <longman@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-cgroup.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-On Wed, 1 Jun 2022, Adriano Silva wrote:
-> I don't know if my NVME's devices are 4K LBA. I do not think so. They 
-> are all the same model and manufacturer. I know that they work with 
-> blocks of 512 Bytes, but that their latency is very high when processing 
-> blocks of this size.
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 40161a3f68d0..acd9b0aa8dc8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -219,11 +219,11 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 		return NULL;
+ 
+ 	if (percpu_ref_init(&blkg->refcnt, blkg_release, 0, gfp_mask))
+-		goto err_free;
++		goto err_free_blkg;
+ 
+ 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
+ 	if (!blkg->iostat_cpu)
+-		goto err_free;
++		goto err_free_blkg;
+ 
+ 	if (!blk_get_queue(q))
+ 		goto err_free;
+@@ -259,6 +259,9 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 	return blkg;
+ 
+ err_free:
++	free_percpu(blkg->iostat_cpu);
++
++err_free_blkg:
+ 	blkg_free(blkg);
+ 	return NULL;
+ }
+-- 
+2.31.1
 
-Ok, it should be safe in terms of the possible bcache bug I was referring 
-to if it supports 512b IOs.
-
-> However, in all the tests I do with them with 4K blocks, the result is 
-> much better. So I always use 4K blocks. Because in real life I don't 
-> think I'll use blocks smaller than 4K.
-
-Makes sense, format with -w 4k.  There is probably some CPU benefit to 
-having page-aligned IOs, too.
-
-> > You can remove the kernel interpretation using passthrough commands. Here's an
-> > example comparing with and without FUA assuming a 512b logical block format:
-> > 
-> >   # echo "" | nvme write /dev/nvme0n1 --block-count=7 --data-size=4k --force-unit-access --latency
-> >   # echo "" | nvme write /dev/nvme0n1 --block-count=7 --data-size=4k --latency
-> > 
-> > if you have a 4k LBA format, use "--block-count=0".
-> > 
-> > And you may want to run each of the above several times to get an average since
-> > other factors can affect the reported latency.
-> 
-> I created a bash script capable of executing the two commands you 
-> suggested to me in a period of 10 seconds in a row, to get some more 
-> acceptable average. The result is the following:
-> 
-> root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write back' > $i; done
-> root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
-> write back
-> root@pve-21:~# ./nvme_write.sh
-> Total: 10 seconds, 3027 tests. Latency (us) : min: 29  /  avr: 37   /  max: 98
-> root@pve-21:~# ./nvme_write.sh --force-unit-access
-> Total: 10 seconds, 2985 tests. Latency (us) : min: 29  /  avr: 37   /  max: 111
-> root@pve-21:~#
-> root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=0
-> Total: 10 seconds, 2556 tests. Latency (us) : min: 404  /  avr: 428   /  max: 492
-> root@pve-21:~# ./nvme_write.sh --block-count=0
-> Total: 10 seconds, 2521 tests. Latency (us) : min: 403  /  avr: 428   /  max: 496
-> root@pve-21:~#
-> root@pve-21:~#
-> root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write through' > $i; done
-> root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
-> write through
-> root@pve-21:~# ./nvme_write.sh
-> Total: 10 seconds, 2988 tests. Latency (us) : min: 29  /  avr: 37   /  max: 114
-> root@pve-21:~# ./nvme_write.sh --force-unit-access
-> Total: 10 seconds, 2926 tests. Latency (us) : min: 29  /  avr: 36   /  max: 71
-> root@pve-21:~#
-> root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=0
-> Total: 10 seconds, 2456 tests. Latency (us) : min: 31  /  avr: 428   /  max: 496
-> root@pve-21:~# ./nvme_write.sh --block-count=0
-> Total: 10 seconds, 2627 tests. Latency (us) : min: 402  /  avr: 428   /  max: 509
-> 
-> Well, as we can see above, in almost 3k tests run in a period of ten 
-> seconds, with each of the commands, I got even better results than I 
-> already got with ioping. I did tests with isolated commands as well, but 
-> I decided to write a bash script to be able to execute many commands in 
-> a short period of time and make an average. And we can see an average of 
-> about 37us in any situation. Very low!
-> 
-> However, when using that suggested command --block-count=0 the latency 
-> is very high in any situation, around 428us.
-> 
-> But as we see, using the nvme command, the latency is always the same in 
-> any scenario, whether with or without --force-unit-access, having a 
-> difference only regarding the use of the command directed to devices 
-> that don't have LBA or that aren't.
-> 
-> What do you think?
-
-It looks like the NVMe works well except in 512b situations.  Its 
-interesting that --force-unit-access doesn't increase the latency: Perhaps 
-the NVMe ignores sync flags since it knows it has a non-volatile cache.
-
--Eric
-
-> 
-> Tanks,
-> 
-> 
-> Em segunda-feira, 30 de maio de 2022 10:45:37 BRT, Keith Busch <kbusch@kernel.org> escreveu: 
-> 
-> 
-> 
-> 
-> 
-> On Sun, May 29, 2022 at 11:50:57AM +0000, Adriano Silva wrote:
-> 
-> > So why the slowness? Is it just the time spent in kernel code to set 
-> > FUA and Flush Cache bits on writes that would cause all this latency 
-> > increment (84us to 1.89ms) ?
-> 
-> 
-> I don't think the kernel's handling accounts for that great of a difference. I
-> think the difference is probably on the controller side.
-> 
-> The NVMe spec says that a Write command with FUA set:
-> 
-> "the controller shall write that data and metadata, if any, to non-volatile
-> media before indicating command completion."
-> 
-> So if the memory is non-volatile, it can complete the command without writing
-> to the backing media. It can also commit the data to the backing media if it
-> wants to before completing the command, but that's implementation specific
-> details.
-> 
-> You can remove the kernel interpretation using passthrough commands. Here's an
-> example comparing with and without FUA assuming a 512b logical block format:
-> 
->   # echo "" | nvme write /dev/nvme0n1 --block-count=7 --data-size=4k --force-unit-access --latency
->   # echo "" | nvme write /dev/nvme0n1 --block-count=7 --data-size=4k --latency
-> 
-> If you have a 4k LBA format, use "--block-count=0".
-> 
-> And you may want to run each of the above several times to get an average since
-> other factors can affect the reported latency.
-> 
---8323328-1241708468-1654117895=:2952--
