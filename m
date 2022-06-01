@@ -2,37 +2,37 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBC1C433F5
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 06:48:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 670A0C433F5
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 06:49:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245483AbiFAGs5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 02:48:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47398 "EHLO
+        id S245519AbiFAGtA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 02:49:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233201AbiFAGs4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 02:48:56 -0400
+        with ESMTP id S233201AbiFAGs7 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 02:48:59 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68DEB954A4
-        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:48:56 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28F37954A4
+        for <linux-block@vger.kernel.org>; Tue, 31 May 2022 23:48:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=4aroAkV9hqMPY4J3fHjOJ8aK1ZmGud0BInPy3cIbfy8=; b=U8CHWPtT4XtaL78W8OeygRsZCi
-        e31xynRjfuOjarU4bH6lZkgSNlM9ZM9/2TpVrq/PDgKD5MxYRLb7KPZBdk8br2zufnXsJlynE26GD
-        ac7aLHlqF0QgmzsAJ3hRWzOawkj2+HtLrDdMghhnkt/HZAHohOOKjnT3jlOv6BO4fEXyCLJw4bUaH
-        VRsTWX6KkhHreMOK0yk+KGf90PEmmZ1/nkKizoayAota/ogbYjT8RKm0FzudkEgDeoBETB3JCECgW
-        2dd7qiv4WR1FAQvYnomxCDGH7y8nnuZKx97u0drZP+J7NpgA2dQWau2Y4rK691AOA8tBHY4L0X8Jv
-        SYxTD5pA==;
+        bh=rVtv4hqHRIiBfzH3a3TRr9+YdmhHgE1PAv/ncRPpl0c=; b=ys4ARIJTVPyEBap1jOVb4wZhPX
+        aAOp2drORDU5Qj8Sg5SrUAOe7vo9UCwjB9ZXZUuoH2pVMASoGsx9F1K7c8uqWZKWcfJ2IAkDfROCz
+        1E4XxIPrb6n0ZmOFceZy7JRWL0CV6l2knpWWqbuWi7PNgTgZKRgUSQ0jHGic69pi0l8aAeV16t81D
+        FGPTjok0cnR8L95wBS9IDvzftTbOCYQn943obIAB0lb0Lc2PtaLUWH1VtaLkfD7p3V4/A0DeSmUyL
+        AosNJryIZchp4nkC/OL3TfX7VBAl7VMLdN1RchZVQvRM4mcK+1dEKHc53ucVYPWLvPluSPpcOIMwz
+        areYcjww==;
 Received: from [2001:4bb8:185:a81e:471a:4927:bd2e:6050] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwIA3-00EEYF-L3; Wed, 01 Jun 2022 06:48:56 +0000
+        id 1nwIA6-00EEZX-Aj; Wed, 01 Jun 2022 06:48:58 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests 6/7] scsi: don't require sg to be built in
-Date:   Wed,  1 Jun 2022 08:48:36 +0200
-Message-Id: <20220601064837.3473709-7-hch@lst.de>
+Subject: [PATCH blktests 7/7] nvme: don't require the nvme drivers to be built in
+Date:   Wed,  1 Jun 2022 08:48:37 +0200
+Message-Id: <20220601064837.3473709-8-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220601064837.3473709-1-hch@lst.de>
 References: <20220601064837.3473709-1-hch@lst.de>
@@ -43,27 +43,78 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use _have_driver instead of _have_modules in _have_scsi_generic as
-nothing requires the sg driver to be modular.
+Use _have_driver instead of _have_modules to check for the availability
+of the nvme drivers, and don't bother checking at all for drivers that
+are pulled in as dependencies.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/scsi/rc | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/nvme/rc | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
 
-diff --git a/tests/scsi/rc b/tests/scsi/rc
-index c8d2f42..0751e77 100644
---- a/tests/scsi/rc
-+++ b/tests/scsi/rc
-@@ -15,7 +15,7 @@ group_device_requires() {
- }
+diff --git a/tests/nvme/rc b/tests/nvme/rc
+index ccdccf9..998b181 100644
+--- a/tests/nvme/rc
++++ b/tests/nvme/rc
+@@ -16,21 +16,23 @@ _nvme_requires() {
+ 	_have_program nvme
+ 	case ${nvme_trtype} in
+ 	loop)
+-		_have_modules nvmet nvme-core nvme-loop
++		_have_driver nvme-loop
+ 		_have_configfs
+ 		;;
+ 	pci)
+-		_have_modules nvme nvme-core
++		_have_driver nvme
+ 		;;
+ 	tcp)
+-		_have_modules nvmet nvme-core nvme-tcp nvmet-tcp
++		_have_driver nvme-tcp
++		_have_driver nvmet-tcp
+ 		_have_configfs
+ 		;;
+ 	rdma)
+-		_have_modules nvmet nvme-core nvme-rdma nvmet-rdma
++		_have_driver nvme-rdma
++		_have_driver nvmet-rdma
+ 		_have_configfs
+ 		_have_program rdma
+-		_have_modules rdma_rxe || _have_modules siw
++		_have_driver rdma_rxe || _have_driver siw
+ 		;;
+ 	*)
+ 		SKIP_REASON="unsupported nvme_trtype=${nvme_trtype}"
+@@ -125,11 +127,11 @@ _cleanup_nvmet() {
+ 	shopt -u nullglob
+ 	trap SIGINT
  
- _have_scsi_generic() {
--	_have_modules sg
-+	_have_driver sg
- }
+-	modprobe -r nvme-"${nvme_trtype}" 2>/dev/null
++	modprobe -rq nvme-"${nvme_trtype}" 2>/dev/null
+ 	if [[ "${nvme_trtype}" != "loop" ]]; then
+-		modprobe -r nvmet-"${nvme_trtype}" 2>/dev/null
++		modprobe -rq nvmet-"${nvme_trtype}" 2>/dev/null
+ 	fi
+-	modprobe -r nvmet 2>/dev/null
++	modprobe -rq nvmet 2>/dev/null
+ 	if [[ "${nvme_trtype}" == "rdma" ]]; then
+ 		stop_soft_rdma
+ 	fi
+@@ -137,11 +139,11 @@ _cleanup_nvmet() {
  
- _require_test_dev_is_scsi() {
+ _setup_nvmet() {
+ 	_register_test_cleanup _cleanup_nvmet
+-	modprobe nvmet
++	modprobe -q nvmet
+ 	if [[ "${nvme_trtype}" != "loop" ]]; then
+-		modprobe nvmet-"${nvme_trtype}"
++		modprobe -q nvmet-"${nvme_trtype}"
+ 	fi
+-	modprobe nvme-"${nvme_trtype}"
++	modprobe -q nvme-"${nvme_trtype}"
+ 	if [[ "${nvme_trtype}" == "rdma" ]]; then
+ 		start_soft_rdma
+ 		for i in $(rdma_network_interfaces)
 -- 
 2.30.2
 
