@@ -2,123 +2,90 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A32EC43334
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 23:10:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51703C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 23:57:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232513AbiFAXKk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 19:10:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49944 "EHLO
+        id S232646AbiFAX5u (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 19:57:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39442 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232538AbiFAXKj (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 19:10:39 -0400
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD6B4FC66
-        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 16:10:38 -0700 (PDT)
-Received: by mail-qt1-f173.google.com with SMTP id hh4so2307224qtb.10
-        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 16:10:38 -0700 (PDT)
+        with ESMTP id S232654AbiFAX5q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 19:57:46 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBDA280F28
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 16:57:45 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id gd1so3446181pjb.2
+        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 16:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=2XYIiNyPAxUCbPTW69gSeTjEEL/1p7bXfOfkRP2R+fc=;
+        b=AnVtflFbxLoXdOq9BIgNzWOJWX5MjLy5hTpl10niEjW/MiLfkhVpK/bYI4PNqt+hXL
+         CndBf+09kS+cPl/8TKkLg1gCenAXWq7DZXfTDhyfmBw1f2r9AZ7TnlxY2owMbEg7vIuX
+         eZBe+mDq7MnY2egmLsIh/foumg7cvgUEOX36FX01x9dUIsgpY1sD/10/K45uSuLxS5Xl
+         oFqSvLV9R6p24dJ5kBOhFU4Z/DlNGgijY4aPr7Z72wgUFxfe2/LwZY4SEjeg6X3h3Fw+
+         AB34r+vkLrWYYnCTT7Iv0Bg49Aa3hxHQZGDpnrBG1tMSUscRxjT0FG6abSwGLZsK5CtJ
+         NSbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=3BL2j27uOeKUjZvjS9fDhhPdKAKOn2fyQ3uqHAJSWmw=;
-        b=1XE3XaZQnL/7BITd9IJf/mS/vZp2RjAQ9IqGFxGD6ruaTylpeJNYMB/itf7nuWirko
-         gGPnAA+1JabIglg9HyOCE4QGErItgqtTHNlvtPOHWKu0zrWv47JHCkNVqe964lm3/XwL
-         IwRhRPw7sBbbRMJ/77TdMa8fkDinAarHJg7O9vT3gndJmNAA5CLhgJSlCah8pTD8/MnF
-         YTh8jgqYua7jMLuRP548NJiGCAb3qaDFpfPdBsg8N71abG/zHiWtfy2ygTh8Ib9Vyu1j
-         4XcXhXUaFsR/P46dR+Dn6m11c3Uddb9H0doAIP2ZZoXn7g1/Sq6oA7XxClY2GUqre1Sv
-         nmcA==
-X-Gm-Message-State: AOAM530P2a8q3ctvatc+Cg53uB+0IZUGc4WY1C6Kp2MGYLL+lx/iZi5q
-        QLFcJsKURmkFqh7QCs+cTK1O
-X-Google-Smtp-Source: ABdhPJxDP8Use9lg+iACzkQhLsjrYAfgKdP6/Xd1MUjR7GEHLk4x+Yr8dJBFQe84kuV1GR8lB+i1tQ==
-X-Received: by 2002:a05:622a:1452:b0:304:5453:fa43 with SMTP id v18-20020a05622a145200b003045453fa43mr1722231qtx.297.1654125037749;
-        Wed, 01 Jun 2022 16:10:37 -0700 (PDT)
-Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id fb11-20020a05622a480b00b002fbf0114477sm1949883qtb.3.2022.06.01.16.10.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 16:10:37 -0700 (PDT)
-Date:   Wed, 1 Jun 2022 19:10:36 -0400
-From:   Mike Snitzer <snitzer@kernel.org>
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     linux-block <linux-block@vger.kernel.org>,
-        Sarthak Kukreti <sarthakkukreti@google.com>,
-        device-mapper development <dm-devel@redhat.com>,
-        Kees Cook <keescook@chromium.org>,
-        Alasdair G Kergon <agk@redhat.com>
-Subject: Re: [git pull] device mapper fixes for 5.19-rc1
-Message-ID: <Ypfx7MPYGehYdwCo@redhat.com>
-References: <YpfTQgw6RsEYxSFD@redhat.com>
- <CAHk-=wjTOB7yuygFwz64xFHYthwdTOYoC=L2kM4k1GW2a80uNQ@mail.gmail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=2XYIiNyPAxUCbPTW69gSeTjEEL/1p7bXfOfkRP2R+fc=;
+        b=lfLruacAhCSaLMTHVLBZs9HLnJ3c5R1gvKRe/7gnm2CBlbaZRxwStAkH3+E0xLKnw2
+         YW4E/zlHeEJI/pF83FbwcUf2IDjuleEtUa3ByuVxU+cQh1X7umPtUZx5SL1KHc2r+hL7
+         QkjYm0ebpAn1YI2RG3w1IcwWjXB385jVsKEHRWSZFTFWbdlbNsFS1e3qE8qcKl0E/r+J
+         k3cggY+jNNk3U4LoAobicLlBO/fJOVHkLqL2qM7bXrWIS/FLuXmFXSC64FPz5sJVTt2Y
+         RSup0T29RHbjMKNkQmbWWFIpxR6GCwPjz6PhEBClSFu+jA7dvodxMYUeHy3lG2FlMqwN
+         TdSw==
+X-Gm-Message-State: AOAM530yXANvnx9+cwkCxg4HDV+nC63LKXJGlV11YMbFAn+spd2dOsgD
+        uSophULldQOtyX6l2GuN0mPj2g==
+X-Google-Smtp-Source: ABdhPJyZ89NVGJO9n6rvyH2+UnhVOjm73j5+UWD3ThnWFMT8FpPVXYSUW9vfwDtLfITlXb6Ggo/ykQ==
+X-Received: by 2002:a17:90a:6441:b0:1e0:b413:c290 with SMTP id y1-20020a17090a644100b001e0b413c290mr36860926pjm.179.1654127864974;
+        Wed, 01 Jun 2022 16:57:44 -0700 (PDT)
+Received: from ?IPV6:2409:8a28:e67:690:38d5:dec6:94e6:8d4b? ([2409:8a28:e67:690:38d5:dec6:94e6:8d4b])
+        by smtp.gmail.com with ESMTPSA id t17-20020a62ea11000000b0051874318772sm2018554pfh.201.2022.06.01.16.57.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 01 Jun 2022 16:57:44 -0700 (PDT)
+Message-ID: <cd11d854-31c4-57a4-4732-ecb7999d672c@bytedance.com>
+Date:   Thu, 2 Jun 2022 07:57:35 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHk-=wjTOB7yuygFwz64xFHYthwdTOYoC=L2kM4k1GW2a80uNQ@mail.gmail.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCH 2/2] blk-iocost: only flush wait and indebt stat deltas
+ when needed
+Content-Language: en-US
+To:     Tejun Heo <tj@kernel.org>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+References: <20220601122007.1057-1-zhouchengming@bytedance.com>
+ <20220601122007.1057-2-zhouchengming@bytedance.com>
+ <YpeSct3LJcBjnZ2x@slm.duckdns.org>
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <YpeSct3LJcBjnZ2x@slm.duckdns.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 01 2022 at  5:43P -0400,
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+On 2022/6/2 00:23, Tejun Heo wrote:
+> On Wed, Jun 01, 2022 at 08:20:07PM +0800, Chengming Zhou wrote:
+>> We only need to flush wait and indebt stat deltas when the iocg
+>> is in these status.
+> 
+> Hey, so, I'm not seeing any actual benefits of the suggested patches and
+> none of them has actual justifications. For the time being, I'm gonna be
+> ignoring these patches.
 
-> On Wed, Jun 1, 2022 at 1:59 PM Mike Snitzer <snitzer@kernel.org> wrote:
-> >
-> > ----------------------------------------------------------------
-> > - Fix DM core's dm_table_supports_poll to return false if no data
-> >   devices.
-> 
-> So looking at that one (mainly because of the incomprehensible
-> explanation), I do note:
-> 
->  (a) the caller does
-> 
->         for (i = 0; i < t->num_targets; i++) {
->                 ti = t->targets + i;
-> 
->     while the callee does
-> 
->         unsigned i = 0;
-> 
->         while (i < dm_table_get_num_targets(t)) {
->                 ti = dm_table_get_target(t, i++);
-> 
-> Now, those things are entirely equivalent, but that latter form is
-> likely to generate horribly bad code because those helper functions
-> aren't some kind of trivial inline, they are actually normal functions
-> that are defined later in that same source file.
+Hi, the current code will flush wait and indebt stat deltas even for idle
+iocgs, which seems strange. This patch only do that for iocgs that are in
+wait or indebt status, so it's a performance and code improvements, although
+it's minor.
 
-Yes, that needs fixing.. but not urgently so.
- 
-> Maybe a compiler will do optimizations within that source file even
-> for functions that haven't been defined yet. Traditionally not.
+Thanks.
+
 > 
-> Whatever. Probably not a case where anybody cares about performance,
-> but it does strike me that the "use abstractions" version probably not
-> only generates worse code, it seems less legible too.
+> Thanks.
 > 
-> Very odd pattern.
-
-OK, I can just nuke those wrappers.  But yeah, none of this setup code
-is fast path.
-
->  (b) The commit message (which is why I started looking at this) says
-> that it used to return true even if there are no data devices.
-> 
->      But dm_table_supports_poll() actually _still_ returns true for at
-> least one case of no data devices: if the dm_table has no targets at
-> all.
-
-Right, I'm aware.. ugly but not a case that really matters (more below).
-
-> So I don't know. Maybe that is a "can't happen". But since I looked at
-> this, I thought I'd just point out the two oddities I found while
-> doing so.
-
-It can happen that someone loads a table without any targets but it
-isn't a case that matters given IO cannot be sent anywhere.  For that
-to happen the DM table will have been reloaded to have targets (at
-which point all will be setup properly, assuming no bugs like was
-fixed here).
-
-I do see you've since pulled the changes.
-
-Thanks,
-Mike
