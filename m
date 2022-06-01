@@ -2,196 +2,205 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE9E8C43334
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 20:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CF4CCA479
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 20:42:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229477AbiFAUmX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 16:42:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37730 "EHLO
+        id S229571AbiFAUmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 16:42:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39136 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229495AbiFAUmW (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 16:42:22 -0400
-Received: from mail-vk1-f173.google.com (mail-vk1-f173.google.com [209.85.221.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC20323418;
-        Wed,  1 Jun 2022 13:22:51 -0700 (PDT)
-Received: by mail-vk1-f173.google.com with SMTP id d132so1384047vke.0;
-        Wed, 01 Jun 2022 13:22:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=36+ek962W4ESiUtGpxVRYFAjd+VwVWl5kF1SkjDtZMw=;
-        b=UgQWMNlwAFDSyhOYxlXAYkCIl2mc/sh4SXHL5oEpmTBjCaoAGPvuIVJY/EBVObhLpn
-         Tz91Ti4l40qj4sNbS7uKLNC9gcnNRG5R+zImHy1Cp949Upag0/8ZrU1yI6qHOdzk3vmU
-         SBeuB10CrxBpO3gRydMNeTXEZucGMbZc5K7F2E3UrLO8iOWDda/dE0Zo2p/9PLMv5/6z
-         bzVRmmCN567UJ78Ejrskf3ZRMFAUDpCM/u7icHrzh0Z17zrP9xbdUmXisw6dKLBclYlu
-         TX2X+ASp7cE/K5iM3qCQ/abc7GzGW8Qqm/ks1GR6NE3stV8bKbmnhKyh44hxwPl2+Hk7
-         DpUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=36+ek962W4ESiUtGpxVRYFAjd+VwVWl5kF1SkjDtZMw=;
-        b=iFgBPLcgdPSCCnEXQ1WgV+S/zPV+UbsL+di0Ya0MlNW4uo3L2wim6C8K0GUErBu+1y
-         b/CZwTnxunh0mCHKsZQQ6FTByI2QSPuoUx5b8c5XzcYuAvzrR7aBkrrBgCE8zpqYpbvL
-         hmPdfBwVLiNA55iRGpdI0QK73a8og0hHT1hPlBMLVvptRhOQCPdB4MICmaiX3WBfG8Dg
-         cmPAFXVcjbGHAvVoD8r91iGjkAGRYUhsQx4F8dUkupqPeHZjY4FbXzrn5IXDW1ow1+vt
-         284PjEA7uyvrZsEzn1vNIIBo4fUPiKZk42I+HHtFrCyH7ua7aZO7TtpMBwshO9v8ND0d
-         tV9A==
-X-Gm-Message-State: AOAM530bkxLn7B5SKQzVHxwzO7emlYwuNU3xgDK6l9hEI8LTGK0uGlO/
-        DeBaWU8IVdaWKyK7AdE9on0yyYSNha0=
-X-Google-Smtp-Source: ABdhPJxGZUdP2s4a2nDmTBCP5a2DzP2YjvJu5cPJlIPUmCxdTJANOqM8werYrhiWx0CWKbMBpK77Vw==
-X-Received: by 2002:ad4:4ee5:0:b0:464:358b:4a00 with SMTP id dv5-20020ad44ee5000000b00464358b4a00mr21716379qvb.19.1654113260787;
-        Wed, 01 Jun 2022 12:54:20 -0700 (PDT)
-Received: from pm2-ws13.praxislan02.com ([2001:470:8:67e:c14:2162:8bd0:d95])
-        by smtp.gmail.com with ESMTPSA id x22-20020ae9e916000000b0069fc13ce205sm1706737qkf.54.2022.06.01.12.54.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 12:54:19 -0700 (PDT)
-From:   Jason Andryuk <jandryuk@gmail.com>
-To:     =?UTF-8?q?Roger=20Pau=20Monn=C3=A9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>
-Cc:     Jason Andryuk <jandryuk@gmail.com>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?= 
-        <marmarek@invisiblethingslab.com>
-Subject: [PATCH] xen-blkfront: Handle NULL gendisk
-Date:   Wed,  1 Jun 2022 15:53:41 -0400
-Message-Id: <20220601195341.28581-1-jandryuk@gmail.com>
-X-Mailer: git-send-email 2.36.1
+        with ESMTP id S229551AbiFAUmh (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 16:42:37 -0400
+Received: from sonic317-26.consmr.mail.bf2.yahoo.com (sonic317-26.consmr.mail.bf2.yahoo.com [74.6.129.81])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73DB51D5A81
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 13:23:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com.br; s=s2048; t=1654115014; bh=Sj6cWzijNiLid1l5f1mucnt70q4+kCaKcJx1W31WgJY=; h=Date:From:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=rwpCbrJhtTvqTC56MshADh1wORnKGRBDM+hfGR8MkwaSz2hYmQukcysl1Uv9QrfqRF6L7xJMxG7cPX2G/1EXYk6VfyWrCogY6DGVJk+Ecm9PQ9xQ21H65nymRd+qmmlY/kp+yf7V0O6jg1WeNX50nWkD/at9e64asZ+iFmQqigtE7BjKaGhsJ08a5vsxb8Iddqj/TJkl59RKP0tS0ajPp1owvkLAdp5AOcZ8iJGb89UJwmSg7nkOlMiSOUGlTh2DbaTxAxJlDCOv4aShMI5o9KF9QTzmvHUh+zzVOCkTQ63mO00VIsmyS+zU3x4Cp12c++okCq3MEGzQ0QPR/HiJuQ==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1654115014; bh=ojkjkGJHrtI7QxDAasaKik39ehxGpeWlrfsfvQw2eDP=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=LT5mczNhf5P6oJXSm4r2TCWQFOj9DagwHwNn9Qr67gBhhS0AafDz/mVCwhqc4dyNnem2E+rVzWXjVBbKW0BhWFXTsEkeQSn3qQ6ubRIhLqK0/HB1EQ7l5u2ZPZ8Kya+26ljlOaatIyz5t+fPB3z/7nmXvp8wKtMcpcHTamkhMtDW2sb+LuR1Z7wHab8X39ESsEOVDod5++tnXTd8IRDaO/vU504f7UMr3tmWtf+c5mkYLmWcAsvlJ4KYHduH52OecelhrJQ61qerbdmV2ABI2OQQbxBtOBWPd7qpbZLjH5PYBOdHrVGl9El6APKfIkML2Kf1Tr0OWvEulpFly4I60g==
+X-YMail-OSG: 4nhryFkVM1kvrMoSs3HItA5Nr3t7j6Nprmu_It7ZuS9mOtA7r9qXBNs1A3rZ2M3
+ sBGMNGnE4Drhj68kML8qJC7B8dhWet14tx.0RgzIHdBxSAYXV1K1fwFUxtZOLK0imI5vbVizxc6w
+ FQ0CKMKIOq1gz9I7JchQA04LXYrM0FbETY9BgCJtGDcwFYcT0rwpXzkfddsZxwfzf2CZZwEvbjz8
+ ISddNiZgSow97KEMM1_qZh9u8EWqOJDjcx0J650NSeA3QnMkZUxtLs7rbhPo2qHCC8QaMd.uozFk
+ Q1LnN5bSfoJEPnFZ4yrt0z9A6jjzfQRsf1lJ8ICxM9QvckJs.XRaKFWGK0m5DDW6Qvwp.g0QwGLw
+ 63dn8p9K4PANe50rPD8U.7bmDnDdUzdA41bLZbH2RHXQxdITUnHkAryGaapryCKwvEQvISKTkrZ4
+ TEsduDd2rF7qve08Hr3V5Is8kGtNGAWXZAc02pzjrtVF5AXWvzZqFFwxg.XDg.Pyu7VKB_NSgr_4
+ Rau54zqLhC6qESZkf1xe6oGRVGRLk1Ex54JZInjarZIBUmNJZZOLnCRw4wWxK96.z2a6CoHFtD5t
+ qmkd91gyaij551gfLb4Xtaca62md1LWWySAArtPiKn1lpsz8DgkZCKewMMylb3vxNF37Tu.oegxi
+ sD.7Xt5X24BUKag62x1GOvMfY2Ne6DKhTPo4iic9zJdqoz1JiUklJHjZRXdceWSYlZp4NP8yKCGA
+ kxvv1V9v1upvcghU4_sqmjzMBU9RZgtZ5YviK8VtG.8Y0HxFd_PKBL3.m0XMUTVSzpfxmzfBpkYS
+ uDqSXdx12VriAXJHobOGvqvCLlbcqETav.o1Mi26J5bbsZXsoeXHI4zx.iTE8eQUCl3XeBguqJLx
+ .UkXAo1u.sKIkacei8vAxLByBxHC0U2_S.RQGqqeLttQKLvAgZ26YEWFZ5eo3ztzcCMN4WpeCR87
+ czBokzNcwMppDJaQZ0.GMLoGozQ0.JxiGcMiKEhXMCGosC82VpH0ULNW.mr79jp9L6s2XaE1ExI6
+ fPLJEpYek1OpzY.leKeo_KJL7T523oJoFHvBcUWykIPaaTRrKKlLFdoRK9PBP8EPbt_hvuEXcMz5
+ hs.FmEEHbVoJS6fUiw3sBknDKma.TsaW3LDLv.2sR2FwP5qQZYdM2qN.ve5Aj_vG715jFnREceEF
+ CXTx7k2jMe7DaszRswd42BpsheiTXAB3r0Huo2722yga3Rb4fW1M8WnXl1zt8fgnSxSulABTWFzw
+ 8iklNiQKhtUGejtYrDMgn2NmlU90T0EpCkn90873b2Fy3t3vID7ho_70RaCmViGXJzb5LlNAUtEO
+ 5KuX.P5RomOlm.B0NaFHuYTpaFdIF.EVoaikj4YLYJWXGszeOI3AubpTMR0y0m25g.i6YaWgNb4P
+ jz.AsGZZMdLEh51YEneSmkg3aYfHoM2evZVmdc4XsBxKbsCLBnkLp_r8ymMdDszPDhVR0Nfy8w5c
+ gz1lxKGa3b2Aw1dsn9VQQL9_R.348LnJGwXcXp35nEYhEPzh7kwTRHXJUBDjkaQX3AHcBoBYJFSS
+ zr6vv6lyFLt0V4UicCjo74GrtA75rcGf9yoKzXIXeBk8djKBTzsYTPg8dYDoOXK6lERebux2zH8i
+ LzUNZa.qeE0zReZTKQM0ulqhNsR46Ouj7oJ6MG5c5_lFouA28zFScLrTWLIfQTqc19ibx2vG0DsA
+ ULvByLt5N3oUIS1fzK5oBnh0MP6EyuWeGVAvEGjXfiNVm128BeGrtL7IlLbzuKsxKhIyXn5k4Bep
+ McIkfMuYwAjJBItMiHE.DDLrSEo7lmm8Theot9C3hrmzIMRCDnfD7AScKISzb9QyEMdn92DCbqLR
+ l5wjwbzO20jf3ubFNKxsAcwkzOrX5CJ2HE51zWuC_mlMncKhi.WI5gW0cBrnbg4.tyryV_i6J5na
+ aPyaUYBVa14CrN52QBoPz5WrmL0AWxK8jlc_UVUDfRaRBABCc2bdtbTbLEwghUWMmo0JMbMprwgE
+ SC1JeDR22Pn983bFWSN6B.BFEwvFDWt2hhe.xGYdJ5qBDvq0ZFi4SuqfIYxVh0ZIpxTklwq_h2qw
+ iTRntU_RIxEm2UHHR3qLCNWW5qJlN1Fpb36mGy1GcPYJB.XkAbZisCR2nUGBT9Fp7jfZzQM66p4H
+ QGnxcnDORoVhdZ3.PXQjFXzsX_eSa0vKpGyNcqmFkyEzRAIxFJ4e79Yx8kqqah9uE2caJSQojpjB
+ _kUFFKT.BCAdZLm7zsAS50jSG
+X-Sonic-MF: <adriano_da_silva@yahoo.com.br>
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.bf2.yahoo.com with HTTP; Wed, 1 Jun 2022 20:23:34 +0000
+Date:   Wed, 1 Jun 2022 19:27:37 +0000 (UTC)
+From:   Adriano Silva <adriano_da_silva@yahoo.com.br>
+To:     Keith Busch <kbusch@kernel.org>,
+        Eric Wheeler <bcache@lists.ewheeler.net>,
+        Matthias Ferdinand <bcache@mfedv.net>,
+        Bcache Linux <linux-bcache@vger.kernel.org>,
+        Coly Li <colyli@suse.de>,
+        Christoph Hellwig <hch@infradead.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Message-ID: <1295433800.3263424.1654111657911@mail.yahoo.com>
+In-Reply-To: <YpTKfHHWz27Qugi+@kbusch-mbp.dhcp.thefacebook.com>
+References: <YoxuYU4tze9DYqHy@infradead.org> <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net> <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com> <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net> <Yo28kDw8rZgFWpHu@infradead.org> <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net> <YpGsKDQ1aAzXfyWl@infradead.org> <24456292.2324073.1653742646974@mail.yahoo.com> <YpLmDtMgyNLxJgNQ@kbusch-mbp.dhcp.thefacebook.com> <2064546094.2440522.1653825057164@mail.yahoo.com> <YpTKfHHWz27Qugi+@kbusch-mbp.dhcp.thefacebook.com>
+Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
+ Bcache in writes direct with fsync)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: WebService/1.1.20225 YMailNorrin
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-When a VBD is not fully created and then closed, the kernel can have a
-NULL pointer dereference:
+Tankyou,
 
-The reproducer is trivial:
+I don't know if my NVME's devices are 4K LBA. I do not think so. They are a=
+ll the same model and manufacturer. I know that they work with blocks of 51=
+2 Bytes, but that their latency is very high when processing blocks of this=
+ size.
 
-[user@dom0 ~]$ sudo xl block-attach work backend=sys-usb vdev=xvdi target=/dev/sdz
-[user@dom0 ~]$ xl block-list work
-Vdev  BE  handle state evt-ch ring-ref BE-path
-51712 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51712
-51728 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51728
-51744 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51744
-51760 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51760
-51840 3   241    3     -1     -1       /local/domain/3/backend/vbd/241/51840
-                 ^ note state, the /dev/sdz doesn't exist in the backend
+However, in all the tests I do with them with 4K blocks, the result is much=
+ better. So I always use 4K blocks. Because in real life I don't think I'll=
+ use blocks smaller than 4K.
 
-[user@dom0 ~]$ sudo xl block-detach work xvdi
-[user@dom0 ~]$ xl block-list work
-Vdev  BE  handle state evt-ch ring-ref BE-path
-work is an invalid domain identifier
+> You can remove the kernel interpretation using passthrough commands. Here=
+'s an
+> example comparing with and without FUA assuming a 512b logical block form=
+at:
+>=20
+> =C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=
+=3D4k --force-unit-access --latency
+>=C2=A0=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-=
+size=3D4k --latency
+>=20
+> if you have a 4k LBA format, use "--block-count=3D0".
+>=20
+> And you may want to run each of the above several times to get an average=
+ since
+> other factors can affect the reported latency.
 
-And its console has:
+I created a bash script capable of executing the two commands you suggested=
+ to me in a period of 10 seconds in a row, to get some more acceptable aver=
+age. The result is the following:
 
-BUG: kernel NULL pointer dereference, address: 0000000000000050
-PGD 80000000edebb067 P4D 80000000edebb067 PUD edec2067 PMD 0
-Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 1 PID: 52 Comm: xenwatch Not tainted 5.16.18-2.43.fc32.qubes.x86_64 #1
-RIP: 0010:blk_mq_stop_hw_queues+0x5/0x40
-Code: 00 48 83 e0 fd 83 c3 01 48 89 85 a8 00 00 00 41 39 5c 24 50 77 c0 5b 5d 41 5c 41 5d c3 c3 0f 1f 80 00 00 00 00 0f 1f 44 00 00 <8b> 47 50 85 c0 74 32 41 54 49 89 fc 55 53 31 db 49 8b 44 24 48 48
-RSP: 0018:ffffc90000bcfe98 EFLAGS: 00010293
-RAX: ffffffffc0008370 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000000
-RBP: ffff88800775f000 R08: 0000000000000001 R09: ffff888006e620b8
-R10: ffff888006e620b0 R11: f000000000000000 R12: ffff8880bff39000
-R13: ffff8880bff39000 R14: 0000000000000000 R15: ffff88800604be00
-FS:  0000000000000000(0000) GS:ffff8880f3300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000050 CR3: 00000000e932e002 CR4: 00000000003706e0
-Call Trace:
- <TASK>
- blkback_changed+0x95/0x137 [xen_blkfront]
- ? read_reply+0x160/0x160
- xenwatch_thread+0xc0/0x1a0
- ? do_wait_intr_irq+0xa0/0xa0
- kthread+0x16b/0x190
- ? set_kthread_struct+0x40/0x40
- ret_from_fork+0x22/0x30
- </TASK>
-Modules linked in: snd_seq_dummy snd_hrtimer snd_seq snd_seq_device snd_timer snd soundcore ipt_REJECT nf_reject_ipv4 xt_state xt_conntrack nft_counter nft_chain_nat xt_MASQUERADE nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_compat nf_tables nfnetlink intel_rapl_msr intel_rapl_common crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel xen_netfront pcspkr xen_scsiback target_core_mod xen_netback xen_privcmd xen_gntdev xen_gntalloc xen_blkback xen_evtchn ipmi_devintf ipmi_msghandler fuse bpf_preload ip_tables overlay xen_blkfront
-CR2: 0000000000000050
----[ end trace 7bc9597fd06ae89d ]---
-RIP: 0010:blk_mq_stop_hw_queues+0x5/0x40
-Code: 00 48 83 e0 fd 83 c3 01 48 89 85 a8 00 00 00 41 39 5c 24 50 77 c0 5b 5d 41 5c 41 5d c3 c3 0f 1f 80 00 00 00 00 0f 1f 44 00 00 <8b> 47 50 85 c0 74 32 41 54 49 89 fc 55 53 31 db 49 8b 44 24 48 48
-RSP: 0018:ffffc90000bcfe98 EFLAGS: 00010293
-RAX: ffffffffc0008370 RBX: 0000000000000005 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000000
-RBP: ffff88800775f000 R08: 0000000000000001 R09: ffff888006e620b8
-R10: ffff888006e620b0 R11: f000000000000000 R12: ffff8880bff39000
-R13: ffff8880bff39000 R14: 0000000000000000 R15: ffff88800604be00
-FS:  0000000000000000(0000) GS:ffff8880f3300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000050 CR3: 00000000e932e002 CR4: 00000000003706e0
-Kernel panic - not syncing: Fatal exception
-Kernel Offset: disabled
+root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write back=
+' > $i; done
+root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
+write back
+root@pve-21:~# ./nvme_write.sh
+Total: 10 seconds, 3027 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
+=C2=A0=C2=A0 /=C2=A0 max: 98
+root@pve-21:~# ./nvme_write.sh --force-unit-access
+Total: 10 seconds, 2985 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
+=C2=A0=C2=A0 /=C2=A0 max: 111
+root@pve-21:~#
+root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=3D0
+Total: 10 seconds, 2556 tests. Latency (us) : min: 404=C2=A0 /=C2=A0 avr: 4=
+28=C2=A0=C2=A0 /=C2=A0 max: 492
+root@pve-21:~# ./nvme_write.sh --block-count=3D0
+Total: 10 seconds, 2521 tests. Latency (us) : min: 403=C2=A0 /=C2=A0 avr: 4=
+28=C2=A0=C2=A0 /=C2=A0 max: 496
+root@pve-21:~#
+root@pve-21:~#
+root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write thro=
+ugh' > $i; done
+root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
+write through
+root@pve-21:~# ./nvme_write.sh
+Total: 10 seconds, 2988 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
+=C2=A0=C2=A0 /=C2=A0 max: 114
+root@pve-21:~# ./nvme_write.sh --force-unit-access
+Total: 10 seconds, 2926 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 36=
+=C2=A0=C2=A0 /=C2=A0 max: 71
+root@pve-21:~#
+root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=3D0
+Total: 10 seconds, 2456 tests. Latency (us) : min: 31=C2=A0 /=C2=A0 avr: 42=
+8=C2=A0=C2=A0 /=C2=A0 max: 496
+root@pve-21:~# ./nvme_write.sh --block-count=3D0
+Total: 10 seconds, 2627 tests. Latency (us) : min: 402=C2=A0 /=C2=A0 avr: 4=
+28=C2=A0=C2=A0 /=C2=A0 max: 509
 
-info->rq and info->gd are only set in blkfront_connect(), which is
-called for state 4 (XenbusStateConnected).  Guard against using NULL
-variables in blkfront_closing() to avoid the issue.
+Well, as we can see above, in almost 3k tests run in a period of ten second=
+s, with each of the commands, I got even better results than I already got =
+with ioping. I did tests with isolated commands as well, but I decided to w=
+rite a bash script to be able to execute many commands in a short period of=
+ time and make an average. And we can see an average of about 37us in any s=
+ituation. Very low!
 
-The rest of blkfront_closing looks okay.  If info->nr_rings is 0, then
-for_each_rinfo won't do anything.
+However, when using that suggested command --block-count=3D0 the latency is=
+ very high in any situation, around 428us.
 
-blkfront_remove also needs to check for non-NULL pointers before
-cleaning up the gendisk and request queue.
+But as we see, using the nvme command, the latency is always the same in an=
+y scenario, whether with or without --force-unit-access, having a differenc=
+e only regarding the use of the command directed to devices that don't have=
+ LBA or that aren't.
 
-Fixes: 05d69d950d9d "xen-blkfront: sanitize the removal state machine"
-Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
----
- drivers/block/xen-blkfront.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+What do you think?
 
-diff --git a/drivers/block/xen-blkfront.c b/drivers/block/xen-blkfront.c
-index 003056d4f7f5..966a6bf4c162 100644
---- a/drivers/block/xen-blkfront.c
-+++ b/drivers/block/xen-blkfront.c
-@@ -2137,9 +2137,11 @@ static void blkfront_closing(struct blkfront_info *info)
- 		return;
- 
- 	/* No more blkif_request(). */
--	blk_mq_stop_hw_queues(info->rq);
--	blk_mark_disk_dead(info->gd);
--	set_capacity(info->gd, 0);
-+	if (info->rq && info->gd) {
-+		blk_mq_stop_hw_queues(info->rq);
-+		blk_mark_disk_dead(info->gd);
-+		set_capacity(info->gd, 0);
-+	}
- 
- 	for_each_rinfo(info, rinfo, i) {
- 		/* No more gnttab callback work. */
-@@ -2480,16 +2482,19 @@ static int blkfront_remove(struct xenbus_device *xbdev)
- 
- 	dev_dbg(&xbdev->dev, "%s removed", xbdev->nodename);
- 
--	del_gendisk(info->gd);
-+	if (info->gd)
-+		del_gendisk(info->gd);
- 
- 	mutex_lock(&blkfront_mutex);
- 	list_del(&info->info_list);
- 	mutex_unlock(&blkfront_mutex);
- 
- 	blkif_free(info, 0);
--	xlbd_release_minors(info->gd->first_minor, info->gd->minors);
--	blk_cleanup_disk(info->gd);
--	blk_mq_free_tag_set(&info->tag_set);
-+	if (info->gd) {
-+		xlbd_release_minors(info->gd->first_minor, info->gd->minors);
-+		blk_cleanup_disk(info->gd);
-+		blk_mq_free_tag_set(&info->tag_set);
-+	}
- 
- 	kfree(info);
- 	return 0;
--- 
-2.36.1
+Tanks,
 
+
+Em segunda-feira, 30 de maio de 2022 10:45:37 BRT, Keith Busch <kbusch@kern=
+el.org> escreveu:=20
+
+
+
+
+
+On Sun, May 29, 2022 at 11:50:57AM +0000, Adriano Silva wrote:
+
+> So why the slowness? Is it just the time spent in kernel code to set FUA =
+and Flush Cache bits on writes that would cause all this latency increment =
+(84us to 1.89ms) ?
+
+
+I don't think the kernel's handling accounts for that great of a difference=
+. I
+think the difference is probably on the controller side.
+
+The NVMe spec says that a Write command with FUA set:
+
+"the controller shall write that data and metadata, if any, to non-volatile
+media before indicating command completion."
+
+So if the memory is non-volatile, it can complete the command without writi=
+ng
+to the backing media. It can also commit the data to the backing media if i=
+t
+wants to before completing the command, but that's implementation specific
+details.
+
+You can remove the kernel interpretation using passthrough commands. Here's=
+ an
+example comparing with and without FUA assuming a 512b logical block format=
+:
+
+=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=3D=
+4k --force-unit-access --latency
+=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=3D=
+4k --latency
+
+If you have a 4k LBA format, use "--block-count=3D0".
+
+And you may want to run each of the above several times to get an average s=
+ince
+other factors can affect the reported latency.
