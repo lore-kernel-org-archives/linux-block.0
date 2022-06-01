@@ -2,205 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78CF4CCA479
-	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 20:42:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 020FCC433EF
+	for <linux-block@archiver.kernel.org>; Wed,  1 Jun 2022 20:44:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229571AbiFAUmj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 16:42:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39136 "EHLO
+        id S229952AbiFAUoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 16:44:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229551AbiFAUmh (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 16:42:37 -0400
-Received: from sonic317-26.consmr.mail.bf2.yahoo.com (sonic317-26.consmr.mail.bf2.yahoo.com [74.6.129.81])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73DB51D5A81
-        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 13:23:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com.br; s=s2048; t=1654115014; bh=Sj6cWzijNiLid1l5f1mucnt70q4+kCaKcJx1W31WgJY=; h=Date:From:To:In-Reply-To:References:Subject:From:Subject:Reply-To; b=rwpCbrJhtTvqTC56MshADh1wORnKGRBDM+hfGR8MkwaSz2hYmQukcysl1Uv9QrfqRF6L7xJMxG7cPX2G/1EXYk6VfyWrCogY6DGVJk+Ecm9PQ9xQ21H65nymRd+qmmlY/kp+yf7V0O6jg1WeNX50nWkD/at9e64asZ+iFmQqigtE7BjKaGhsJ08a5vsxb8Iddqj/TJkl59RKP0tS0ajPp1owvkLAdp5AOcZ8iJGb89UJwmSg7nkOlMiSOUGlTh2DbaTxAxJlDCOv4aShMI5o9KF9QTzmvHUh+zzVOCkTQ63mO00VIsmyS+zU3x4Cp12c++okCq3MEGzQ0QPR/HiJuQ==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1654115014; bh=ojkjkGJHrtI7QxDAasaKik39ehxGpeWlrfsfvQw2eDP=; h=X-Sonic-MF:Date:From:To:Subject:From:Subject; b=LT5mczNhf5P6oJXSm4r2TCWQFOj9DagwHwNn9Qr67gBhhS0AafDz/mVCwhqc4dyNnem2E+rVzWXjVBbKW0BhWFXTsEkeQSn3qQ6ubRIhLqK0/HB1EQ7l5u2ZPZ8Kya+26ljlOaatIyz5t+fPB3z/7nmXvp8wKtMcpcHTamkhMtDW2sb+LuR1Z7wHab8X39ESsEOVDod5++tnXTd8IRDaO/vU504f7UMr3tmWtf+c5mkYLmWcAsvlJ4KYHduH52OecelhrJQ61qerbdmV2ABI2OQQbxBtOBWPd7qpbZLjH5PYBOdHrVGl9El6APKfIkML2Kf1Tr0OWvEulpFly4I60g==
-X-YMail-OSG: 4nhryFkVM1kvrMoSs3HItA5Nr3t7j6Nprmu_It7ZuS9mOtA7r9qXBNs1A3rZ2M3
- sBGMNGnE4Drhj68kML8qJC7B8dhWet14tx.0RgzIHdBxSAYXV1K1fwFUxtZOLK0imI5vbVizxc6w
- FQ0CKMKIOq1gz9I7JchQA04LXYrM0FbETY9BgCJtGDcwFYcT0rwpXzkfddsZxwfzf2CZZwEvbjz8
- ISddNiZgSow97KEMM1_qZh9u8EWqOJDjcx0J650NSeA3QnMkZUxtLs7rbhPo2qHCC8QaMd.uozFk
- Q1LnN5bSfoJEPnFZ4yrt0z9A6jjzfQRsf1lJ8ICxM9QvckJs.XRaKFWGK0m5DDW6Qvwp.g0QwGLw
- 63dn8p9K4PANe50rPD8U.7bmDnDdUzdA41bLZbH2RHXQxdITUnHkAryGaapryCKwvEQvISKTkrZ4
- TEsduDd2rF7qve08Hr3V5Is8kGtNGAWXZAc02pzjrtVF5AXWvzZqFFwxg.XDg.Pyu7VKB_NSgr_4
- Rau54zqLhC6qESZkf1xe6oGRVGRLk1Ex54JZInjarZIBUmNJZZOLnCRw4wWxK96.z2a6CoHFtD5t
- qmkd91gyaij551gfLb4Xtaca62md1LWWySAArtPiKn1lpsz8DgkZCKewMMylb3vxNF37Tu.oegxi
- sD.7Xt5X24BUKag62x1GOvMfY2Ne6DKhTPo4iic9zJdqoz1JiUklJHjZRXdceWSYlZp4NP8yKCGA
- kxvv1V9v1upvcghU4_sqmjzMBU9RZgtZ5YviK8VtG.8Y0HxFd_PKBL3.m0XMUTVSzpfxmzfBpkYS
- uDqSXdx12VriAXJHobOGvqvCLlbcqETav.o1Mi26J5bbsZXsoeXHI4zx.iTE8eQUCl3XeBguqJLx
- .UkXAo1u.sKIkacei8vAxLByBxHC0U2_S.RQGqqeLttQKLvAgZ26YEWFZ5eo3ztzcCMN4WpeCR87
- czBokzNcwMppDJaQZ0.GMLoGozQ0.JxiGcMiKEhXMCGosC82VpH0ULNW.mr79jp9L6s2XaE1ExI6
- fPLJEpYek1OpzY.leKeo_KJL7T523oJoFHvBcUWykIPaaTRrKKlLFdoRK9PBP8EPbt_hvuEXcMz5
- hs.FmEEHbVoJS6fUiw3sBknDKma.TsaW3LDLv.2sR2FwP5qQZYdM2qN.ve5Aj_vG715jFnREceEF
- CXTx7k2jMe7DaszRswd42BpsheiTXAB3r0Huo2722yga3Rb4fW1M8WnXl1zt8fgnSxSulABTWFzw
- 8iklNiQKhtUGejtYrDMgn2NmlU90T0EpCkn90873b2Fy3t3vID7ho_70RaCmViGXJzb5LlNAUtEO
- 5KuX.P5RomOlm.B0NaFHuYTpaFdIF.EVoaikj4YLYJWXGszeOI3AubpTMR0y0m25g.i6YaWgNb4P
- jz.AsGZZMdLEh51YEneSmkg3aYfHoM2evZVmdc4XsBxKbsCLBnkLp_r8ymMdDszPDhVR0Nfy8w5c
- gz1lxKGa3b2Aw1dsn9VQQL9_R.348LnJGwXcXp35nEYhEPzh7kwTRHXJUBDjkaQX3AHcBoBYJFSS
- zr6vv6lyFLt0V4UicCjo74GrtA75rcGf9yoKzXIXeBk8djKBTzsYTPg8dYDoOXK6lERebux2zH8i
- LzUNZa.qeE0zReZTKQM0ulqhNsR46Ouj7oJ6MG5c5_lFouA28zFScLrTWLIfQTqc19ibx2vG0DsA
- ULvByLt5N3oUIS1fzK5oBnh0MP6EyuWeGVAvEGjXfiNVm128BeGrtL7IlLbzuKsxKhIyXn5k4Bep
- McIkfMuYwAjJBItMiHE.DDLrSEo7lmm8Theot9C3hrmzIMRCDnfD7AScKISzb9QyEMdn92DCbqLR
- l5wjwbzO20jf3ubFNKxsAcwkzOrX5CJ2HE51zWuC_mlMncKhi.WI5gW0cBrnbg4.tyryV_i6J5na
- aPyaUYBVa14CrN52QBoPz5WrmL0AWxK8jlc_UVUDfRaRBABCc2bdtbTbLEwghUWMmo0JMbMprwgE
- SC1JeDR22Pn983bFWSN6B.BFEwvFDWt2hhe.xGYdJ5qBDvq0ZFi4SuqfIYxVh0ZIpxTklwq_h2qw
- iTRntU_RIxEm2UHHR3qLCNWW5qJlN1Fpb36mGy1GcPYJB.XkAbZisCR2nUGBT9Fp7jfZzQM66p4H
- QGnxcnDORoVhdZ3.PXQjFXzsX_eSa0vKpGyNcqmFkyEzRAIxFJ4e79Yx8kqqah9uE2caJSQojpjB
- _kUFFKT.BCAdZLm7zsAS50jSG
-X-Sonic-MF: <adriano_da_silva@yahoo.com.br>
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.bf2.yahoo.com with HTTP; Wed, 1 Jun 2022 20:23:34 +0000
-Date:   Wed, 1 Jun 2022 19:27:37 +0000 (UTC)
-From:   Adriano Silva <adriano_da_silva@yahoo.com.br>
-To:     Keith Busch <kbusch@kernel.org>,
-        Eric Wheeler <bcache@lists.ewheeler.net>,
-        Matthias Ferdinand <bcache@mfedv.net>,
-        Bcache Linux <linux-bcache@vger.kernel.org>,
-        Coly Li <colyli@suse.de>,
-        Christoph Hellwig <hch@infradead.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Message-ID: <1295433800.3263424.1654111657911@mail.yahoo.com>
-In-Reply-To: <YpTKfHHWz27Qugi+@kbusch-mbp.dhcp.thefacebook.com>
-References: <YoxuYU4tze9DYqHy@infradead.org> <5486e421-b8d0-3063-4cb9-84e69c41b7a3@ewheeler.net> <Yo1BRxG3nvGkQoyG@kbusch-mbp.dhcp.thefacebook.com> <7759781b-dac-7f84-ff42-86f4b1983ca1@ewheeler.net> <Yo28kDw8rZgFWpHu@infradead.org> <a2ed37b8-2f4a-ef7a-c097-d58c2b965af3@ewheeler.net> <YpGsKDQ1aAzXfyWl@infradead.org> <24456292.2324073.1653742646974@mail.yahoo.com> <YpLmDtMgyNLxJgNQ@kbusch-mbp.dhcp.thefacebook.com> <2064546094.2440522.1653825057164@mail.yahoo.com> <YpTKfHHWz27Qugi+@kbusch-mbp.dhcp.thefacebook.com>
-Subject: Re: [RFC] Add sysctl option to drop disk flushes in bcache? (was:
- Bcache in writes direct with fsync)
+        with ESMTP id S229965AbiFAUnt (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 16:43:49 -0400
+Received: from mail.itouring.de (mail.itouring.de [IPv6:2a01:4f8:a0:4463::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1A2A1E174E
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 13:28:09 -0700 (PDT)
+Received: from tux.applied-asynchrony.com (p5ddd7616.dip0.t-ipconnect.de [93.221.118.22])
+        by mail.itouring.de (Postfix) with ESMTPSA id 546A3125BCA
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 22:19:41 +0200 (CEST)
+Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
+        by tux.applied-asynchrony.com (Postfix) with ESMTP id 06CF5F01600
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 22:19:41 +0200 (CEST)
+To:     linux-block <linux-block@vger.kernel.org>
+From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
+Subject: Q: fsync on a blockdev fd worked in 5.15, but no longer does. Should
+ it?
+Organization: Applied Asynchrony, Inc.
+Message-ID: <cca51ad8-052c-769d-62cc-99a3e3efe4f0@applied-asynchrony.com>
+Date:   Wed, 1 Jun 2022 22:19:40 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: WebService/1.1.20225 YMailNorrin
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Tankyou,
 
-I don't know if my NVME's devices are 4K LBA. I do not think so. They are a=
-ll the same model and manufacturer. I know that they work with blocks of 51=
-2 Bytes, but that their latency is very high when processing blocks of this=
- size.
+Hi,
 
-However, in all the tests I do with them with 4K blocks, the result is much=
- better. So I always use 4K blocks. Because in real life I don't think I'll=
- use blocks smaller than 4K.
+Weird story time!
 
-> You can remove the kernel interpretation using passthrough commands. Here=
-'s an
-> example comparing with and without FUA assuming a 512b logical block form=
-at:
->=20
-> =C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=
-=3D4k --force-unit-access --latency
->=C2=A0=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-=
-size=3D4k --latency
->=20
-> if you have a 4k LBA format, use "--block-count=3D0".
->=20
-> And you may want to run each of the above several times to get an average=
- since
-> other factors can affect the reported latency.
+I recently moved from 5.15 to 5.18 and noticed that noflushd -
+a daemon that suspends rotational drives after a while - would now cause
+dirty writeback buffers to accumulate endlessly for all unstopped devices
+(like SSDs). Manually calling sync or exceeding the dirty threshold
+would still work as expected and flush dirty data, just not the periodic
+writeback. This surprised me since it has been working perfectly fine
+for the last 12 years or so, incl. 5.15.
 
-I created a bash script capable of executing the two commands you suggested=
- to me in a period of 10 seconds in a row, to get some more acceptable aver=
-age. The result is the following:
+After some source spelunking I found that noflushd (basically) disables
+writeback and manually performs periodic fsync on fds of the *un*stopped
+devices and partitions - as in fsync(<fd of /dev/sda1>). This surprised me,
+since I never would have expected this to work in the first place, yet it did
+all these ears. Maybe by accident, maybe intentionally.
 
-root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write back=
-' > $i; done
-root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
-write back
-root@pve-21:~# ./nvme_write.sh
-Total: 10 seconds, 3027 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
-=C2=A0=C2=A0 /=C2=A0 max: 98
-root@pve-21:~# ./nvme_write.sh --force-unit-access
-Total: 10 seconds, 2985 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
-=C2=A0=C2=A0 /=C2=A0 max: 111
-root@pve-21:~#
-root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=3D0
-Total: 10 seconds, 2556 tests. Latency (us) : min: 404=C2=A0 /=C2=A0 avr: 4=
-28=C2=A0=C2=A0 /=C2=A0 max: 492
-root@pve-21:~# ./nvme_write.sh --block-count=3D0
-Total: 10 seconds, 2521 tests. Latency (us) : min: 403=C2=A0 /=C2=A0 avr: 4=
-28=C2=A0=C2=A0 /=C2=A0 max: 496
-root@pve-21:~#
-root@pve-21:~#
-root@pve-21:~# for i in /sys/block/*/queue/write_cache; do echo 'write thro=
-ugh' > $i; done
-root@pve-21:~# cat /sys/block/nvme0n1/queue/write_cache
-write through
-root@pve-21:~# ./nvme_write.sh
-Total: 10 seconds, 2988 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 37=
-=C2=A0=C2=A0 /=C2=A0 max: 114
-root@pve-21:~# ./nvme_write.sh --force-unit-access
-Total: 10 seconds, 2926 tests. Latency (us) : min: 29=C2=A0 /=C2=A0 avr: 36=
-=C2=A0=C2=A0 /=C2=A0 max: 71
-root@pve-21:~#
-root@pve-21:~# ./nvme_write.sh --force-unit-access --block-count=3D0
-Total: 10 seconds, 2456 tests. Latency (us) : min: 31=C2=A0 /=C2=A0 avr: 42=
-8=C2=A0=C2=A0 /=C2=A0 max: 496
-root@pve-21:~# ./nvme_write.sh --block-count=3D0
-Total: 10 seconds, 2627 tests. Latency (us) : min: 402=C2=A0 /=C2=A0 avr: 4=
-28=C2=A0=C2=A0 /=C2=A0 max: 509
+Since 5.16 the block layer had many cleanups, starting around ~October 2021.
+Instead of trying to figure out which commit broke the daemon's back, for now
+I'm more curious about whether this *should* have worked all those years?
+Is it a bug that it no longer does, or just an accidental behaviour change?
 
-Well, as we can see above, in almost 3k tests run in a period of ten second=
-s, with each of the commands, I got even better results than I already got =
-with ioping. I did tests with isolated commands as well, but I decided to w=
-rite a bash script to be able to execute many commands in a short period of=
- time and make an average. And we can see an average of about 37us in any s=
-ituation. Very low!
+Obviously if anybody (Jens, Christoph..?) has an idea what changed this
+behaviour and thinks it's a bug I'm more than happy to test a fix,
+however for now I'd be happy to understand what's going on.
 
-However, when using that suggested command --block-count=3D0 the latency is=
- very high in any situation, around 428us.
+Oh, and no, I cannot (fully) use hdparm-induced suspend since my HD's firmware
+is buggy and suspend timer values >11 don't work right. grmbl.
 
-But as we see, using the nvme command, the latency is always the same in an=
-y scenario, whether with or without --force-unit-access, having a differenc=
-e only regarding the use of the command directed to devices that don't have=
- LBA or that aren't.
-
-What do you think?
-
-Tanks,
-
-
-Em segunda-feira, 30 de maio de 2022 10:45:37 BRT, Keith Busch <kbusch@kern=
-el.org> escreveu:=20
-
-
-
-
-
-On Sun, May 29, 2022 at 11:50:57AM +0000, Adriano Silva wrote:
-
-> So why the slowness? Is it just the time spent in kernel code to set FUA =
-and Flush Cache bits on writes that would cause all this latency increment =
-(84us to 1.89ms) ?
-
-
-I don't think the kernel's handling accounts for that great of a difference=
-. I
-think the difference is probably on the controller side.
-
-The NVMe spec says that a Write command with FUA set:
-
-"the controller shall write that data and metadata, if any, to non-volatile
-media before indicating command completion."
-
-So if the memory is non-volatile, it can complete the command without writi=
-ng
-to the backing media. It can also commit the data to the backing media if i=
-t
-wants to before completing the command, but that's implementation specific
-details.
-
-You can remove the kernel interpretation using passthrough commands. Here's=
- an
-example comparing with and without FUA assuming a 512b logical block format=
-:
-
-=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=3D=
-4k --force-unit-access --latency
-=C2=A0 # echo "" | nvme write /dev/nvme0n1 --block-count=3D7 --data-size=3D=
-4k --latency
-
-If you have a 4k LBA format, use "--block-count=3D0".
-
-And you may want to run each of the above several times to get an average s=
-ince
-other factors can affect the reported latency.
+Thanks!
+Holger
