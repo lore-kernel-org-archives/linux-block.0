@@ -2,94 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF3BCCA479
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 08:05:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A9CDC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 08:06:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230284AbiFBIFp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 04:05:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46468 "EHLO
+        id S230526AbiFBIGU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 04:06:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230100AbiFBIFo (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 04:05:44 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B390D12099
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 01:05:42 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id h5so5433632wrb.0
-        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 01:05:42 -0700 (PDT)
+        with ESMTP id S230100AbiFBIGU (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 04:06:20 -0400
+Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07E0D12099
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 01:06:19 -0700 (PDT)
+Received: by mail-wm1-x333.google.com with SMTP id r129so2171706wmr.3
+        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 01:06:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=CqOoFv5ajKhhxuaIXwvvd9yF2mOBWHc6FT8FH9XleP4=;
-        b=dUEHQ0iLv5JTPM8zRlQ2Xk5Quzir1yaICVyODgCYssqVnR7oCUfDPh7WVPI7fbnAXf
-         YmTbwmormFhGjp8219I9Kt+r4MqHPUk5uroTQeciDbu2NBFDQ8sMD8PeUsepfUyDI/iE
-         4CXeJ3WyCGNMRm03y07B5wuLf3+qDchEcQ4wcDWsihzlhvo55vCJTjmrJDTIuo/KV6u3
-         keDpgvJNAtdowjc5BgEpx/fSJjVFwDD9FGS+mUDZu8C3vHJz4WBU5/bMVHJoF5tHvsaD
-         KrGZe/2MmASd72xISXRjkgpCWylgKlYz2k+wU5VyLfm6mTE0S/lt1Ozv0Y9D93JlYWgk
-         5MPg==
+        h=from:to:in-reply-to:references:subject:message-id:date:mime-version
+         :content-transfer-encoding;
+        bh=2lMhFbk+SdxLunWWYyO18vtZNhNfr1j57Vw9Dh2CY0Q=;
+        b=C1nqFUbUznbngP3CiwRfGdD8/i57RqSmZ14UryXx71Tj8Soiiv8pZUCjQbVwOANBqB
+         NY3PK4Ays/Q+xYi5QrJOsKCZOJ7hxj3x8ydqeOHZ6mItxOiyGB/Y/8mwvJ8spnkojadG
+         5epWh9UOh5kmN/IIHdW5Z7QgMTK57bzbGtnLbm8tquFV5TmPuG3GQuwXRHrZj6RBHMLt
+         Z47Rj4h0heeODzofvpcfIAwAO/0MI+Y3/a5DauH4WCZZ/puQSSrKanMs600gZ4TaWUfM
+         4YXTuKkvxu8Lt2HRoStQxHiLtT1sDziqX0L0CBUMB1VxQMqW2j/pOKfKDqRyu8sPYziY
+         n4jg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=CqOoFv5ajKhhxuaIXwvvd9yF2mOBWHc6FT8FH9XleP4=;
-        b=fl8O0n4qKIDYMA6gsbWIzuHKRAdutQwb+vCewOYtSuwBzT281KEj1ld13GlE6AbM8L
-         oNX2CoiYuxH0Ajbese0Sxvz+ZVHaDsJ957eZAAAiKK3H3h0zAeffPH7pTxztV9zjQtcH
-         Sj2fxYkSEekej/CkBhVV+ayHKBCR8u4hpCL4Ffw2i07KJFUTIkxyoKM4P0BRwckQsP6o
-         EQWeS7plsUIIo+tnLEbk9+pERaKd4SWZkwY7XYgvkyFkcT6Kgy/nkqLuOr+WtRN9uSjx
-         HgJGXcNf5J0kgerPv9moCDjD8W8qDfo/h3ITL5PGn7Dc48yEF3jR+q/0UwUfXWiAg9a5
-         00gw==
-X-Gm-Message-State: AOAM5329irRdYDGhTLHJhMnfzWRUP5G4kp4H7imXVxuK9fFWAmPmj1tu
-        DouksA+9ZaB/aWVZB/D3OlMiGQ==
-X-Google-Smtp-Source: ABdhPJyVe7JZW48l90LBJZKfQaeiwP+tN9o+v5/aRcI01HsnqA/Dtwqg+SouYLPIhJ1nBazalS6rSw==
-X-Received: by 2002:a05:6000:1b8d:b0:20c:d372:f07c with SMTP id r13-20020a0560001b8d00b0020cd372f07cmr2535752wru.607.1654157141231;
-        Thu, 02 Jun 2022 01:05:41 -0700 (PDT)
-Received: from [10.40.36.78] ([193.52.24.5])
-        by smtp.gmail.com with ESMTPSA id v19-20020a1cf713000000b0039c18d3fe27sm4151716wmh.19.2022.06.02.01.05.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jun 2022 01:05:40 -0700 (PDT)
-Message-ID: <f333ef06-6aab-81cb-e998-44b91670f9ef@kernel.dk>
-Date:   Thu, 2 Jun 2022 02:05:39 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [GIT PULL] nvmes fixes for Linux 5.19
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YphKZBtmtKFRNIPL@infradead.org>
- <2ae24afc-6474-60f3-ece0-fb5a1d19f8c5@kernel.dk>
- <Yphtx84vMpkX+bsb@infradead.org>
+        h=x-gm-message-state:from:to:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=2lMhFbk+SdxLunWWYyO18vtZNhNfr1j57Vw9Dh2CY0Q=;
+        b=zdJn6LDcanG6aFb0Nv0Hlm0vOuf1RZYIl9YNzP3MiWq/bFhUnWb9E1Lw4gBj3WUEMx
+         RF6/FCgYZAAOv0BmPVvtrMVwxczINYSEKztSAgkKpY4WJVvNEz+43XCEjMZdvBHGcfJy
+         nY0h8ZyKqNsFNUgyMVN0G/APzVR+WxEyhPSQcgE2ISLTeuPl84DNGApTsNdeH0Zn2jIf
+         yTh3T0+whBqWH3O2ZqPJ3Bkcj5jLPhZMX1pc8lJiqAQJDOJSoM3Phj28v4X64s/IH4wu
+         xyJYeGGbmAGLJp4ifjs7S4jFCHO2XWmSINsBervfLXs4fhryPL/vunTtkF8y1E6GJXpD
+         8Nhw==
+X-Gm-Message-State: AOAM531bVQBXolh5eQK99HHqTb4cUxREwiFBPATLcQ8ikII6s3s6H1Vg
+        8LVZ0USnpQt2+Qb7QDjcNGz+3edz3+cSFeFB
+X-Google-Smtp-Source: ABdhPJzL3xsgYs/PdoNT5InIYHNwCu+nWtWGLl9y9BbP99jG66yUp2VpdXg2vY8WkxUSWU6SjAYQuw==
+X-Received: by 2002:a05:600c:3843:b0:397:476f:ceb8 with SMTP id s3-20020a05600c384300b00397476fceb8mr31813470wmr.200.1654157177501;
+        Thu, 02 Jun 2022 01:06:17 -0700 (PDT)
+Received: from [127.0.1.1] ([193.52.24.5])
+        by smtp.gmail.com with ESMTPSA id f6-20020a05600c4e8600b0039466988f6csm9819636wmq.31.2022.06.02.01.06.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 01:06:16 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Yphtx84vMpkX+bsb@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     damien.lemoal@opensource.wdc.com, linux-block@vger.kernel.org
+In-Reply-To: <20220602075159.1273366-1-damien.lemoal@opensource.wdc.com>
+References: <20220602075159.1273366-1-damien.lemoal@opensource.wdc.com>
+Subject: Re: [PATCH] block: remove useless BUG_ON() in blk_mq_put_tag()
+Message-Id: <165415717661.52400.6392351041659666381.b4-ty@kernel.dk>
+Date:   Thu, 02 Jun 2022 02:06:16 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/2/22 1:59 AM, Christoph Hellwig wrote:
-> On Thu, Jun 02, 2022 at 01:49:09AM -0600, Jens Axboe wrote:
->> On 6/1/22 11:28 PM, Christoph Hellwig wrote:
->>> The following changes since commit a1a2d8f0162b27e85e7ce0ae6a35c96a490e0559:
->>>
->>>   bcache: avoid unnecessary soft lockup in kworker update_writeback_rate() (2022-05-28 06:48:26 -0600)
->>>
->>> are available in the Git repository at:
->>>
->>>   ssh://git.infradead.org/var/lib/git/nvme.git tags/nvme-5.19-2022-06-02
->>
->> Eh, I can't pull from that... I used the usual git url with this tag.
+On Thu, 2 Jun 2022 16:51:59 +0900, Damien Le Moal wrote:
+> Since the if condition in blk_mq_put_tag() checks that the tag to put is
+> not a reserved one, the BUG_ON() check in the else branch checking if
+> the tag is indeed a reserved one is useless. Remove it.
 > 
-> Sorry, that was my push url.  The external facing one is:
 > 
-> git://git.infradead.org/nvme.git tags/nvme-5.19-2022-06-02
 
-Yep that's what I used, and matches what it should look like. All queued
-up.
+Applied, thanks!
 
+[1/1] block: remove useless BUG_ON() in blk_mq_put_tag()
+      commit: ff47dbd18b8db251fe1fd013a8fa067d381ecd5b
+
+Best regards,
 -- 
 Jens Axboe
+
 
