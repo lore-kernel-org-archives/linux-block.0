@@ -2,34 +2,34 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFACCCA47B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 16:46:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9332ECCA47B
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 16:49:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237182AbiFBQqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 12:46:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53656 "EHLO
+        id S237087AbiFBQtY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 12:49:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39040 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237183AbiFBQqE (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 12:46:04 -0400
+        with ESMTP id S237251AbiFBQtX (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 12:49:23 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DCC2B12FC;
-        Thu,  2 Jun 2022 09:46:02 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80CEF137464;
+        Thu,  2 Jun 2022 09:49:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
         MIME-Version:Date:Message-ID:content-disposition;
-        bh=yHMITh+N130iuSnYvU2I4WotSms4ADBqIIhjmWEL4ZQ=; b=O6Xl4kM8MUO00BCgiQ9hWPp+gB
-        2m7ZVz8sHNAOQKpiy5iEU/brZWoHl9L3YI08j4vZrZwZONQy6WWyOSXW66i+Zcv9QKlOeesm8TgjQ
-        pABnUdHP29eKXg17nEZ/MnWYIcmY/29mOmJme4RbBeYYarSUthGM7iOo3qpUFKlkgq37Ue76GJEjA
-        MfSw6YBYC+/0IQghP6E8FIRiZlTGbFFCXvUfzWrCRinU718CfdX6Eh08/4ZrDvJWXnPQwmRp+4WdA
-        1qxJEJvrytnpdt9tHqZk0bsYRw6b+C0O39SAOTytYjPcg2eYDgsp57ejuIJbnxeryaQkNoi8uOxrW
-        ueUPAsxQ==;
+        bh=G4jNGHaxScm6QRbg+/bUKEbD3ZVb5hKMPQYYoCPSz9U=; b=PTeaYAOF/4ng1MbqblI0wc/ZgX
+        i5VfwwrtyjYWA/pvSZh6UV7JKtQ9wG/KjAY6EFS4AgDOzIxqxJGmEIpWadj3Ho28i4xmqfhYntJAO
+        JrdI3Y++iHNLCQ1JdqlaHPgjmYyrKWmS/Fp7YazQGJ0ieFbhkp+YrrMxy8wv7mKcAjUfRXmV9EQE4
+        a4AFx87aKsvRfY1XjqZMtlTGWurF7mn+aqy5D/6ZF2Eziu4rlwNKpcJYAdKLbRdXleAhhHCDdc7Kq
+        mwkvfJr+Rq28q712EFrfu8CgUPgSO2xy86e4KyfCtbPG5OAFoNzTk/TMHic0abIyw8cAxRgYjyQUl
+        CvFCr70w==;
 Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
         by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <logang@deltatee.com>)
-        id 1nwnxQ-00EOAT-Fz; Thu, 02 Jun 2022 10:46:01 -0600
-Message-ID: <28824558-4fd5-e054-6c8d-5e045d52f795@deltatee.com>
-Date:   Thu, 2 Jun 2022 10:45:55 -0600
+        id 1nwo0a-00EODR-OS; Thu, 02 Jun 2022 10:49:17 -0600
+Message-ID: <51cc6645-2504-6d01-5626-238ed6ffff04@deltatee.com>
+Date:   Thu, 2 Jun 2022 10:49:15 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
@@ -83,7 +83,6 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-
 On 2022-06-02 10:30, Jason Gunthorpe wrote:
 > On Thu, Jun 02, 2022 at 10:16:10AM -0600, Logan Gunthorpe wrote:
 > 
@@ -100,17 +99,14 @@ On 2022-06-02 10:30, Jason Gunthorpe wrote:
 > A couple drivers go out of their way to allow unbinding while a live
 > userspace exists but this can get complicated. Usually there should be
 > a good reason.
+> 
+> The module will already be refcounted anyhow because the mmap points
+> to a char file which holds a module reference - meaning a simple rmmod
+> of the driver shouldn't work already..
 
-This is not my experience. All the drivers I've worked with do not block
-unbind with open file descriptors (at least for char devices). I know,
-for example, that having a file descriptor open of /dev/nvmeX does not
-cause unbinding to block. I figured this was the expectation as the
-userspace process doing the unbind won't be able to be interrupted
-seeing there's no way to fail on that path. Though, it certainly would
-make things a lot easier if the unbind can block indefinitely as it
-usually requires some complicated locking.
-
-Do you have an example of this? What mechanisms are developers using to
-block unbind with open file descriptors?
+Also, I just tried it... If I open a sysfs file for an nvme device (ie.
+/sys/class/nvme/nvme4/cntlid) and unbind the device, it does not block.
+A subsequent read on that file descriptor returns ENODEV. Which is what
+I would have expected.
 
 Logan
