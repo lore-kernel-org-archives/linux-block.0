@@ -2,60 +2,111 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C0B2C43334
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 12:12:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E00EC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 12:22:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234473AbiFBMMe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 08:12:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59698 "EHLO
+        id S232097AbiFBMW4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 08:22:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47214 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234855AbiFBMMe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 08:12:34 -0400
-Received: from mail.itouring.de (mail.itouring.de [IPv6:2a01:4f8:a0:4463::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E373628D68D
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 05:12:31 -0700 (PDT)
-Received: from tux.applied-asynchrony.com (p5ddd7616.dip0.t-ipconnect.de [93.221.118.22])
-        by mail.itouring.de (Postfix) with ESMTPSA id 5C7F9125BCF;
-        Thu,  2 Jun 2022 14:12:30 +0200 (CEST)
-Received: from [192.168.100.221] (hho.applied-asynchrony.com [192.168.100.221])
-        by tux.applied-asynchrony.com (Postfix) with ESMTP id 0A1F5F01600;
-        Thu,  2 Jun 2022 14:12:30 +0200 (CEST)
-Subject: Re: Q: fsync on a blockdev fd worked in 5.15, but no longer does.
- Should it?
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     linux-block <linux-block@vger.kernel.org>
-References: <cca51ad8-052c-769d-62cc-99a3e3efe4f0@applied-asynchrony.com>
- <YphR19tJNqFuB/xh@infradead.org>
-From:   =?UTF-8?Q?Holger_Hoffst=c3=a4tte?= <holger@applied-asynchrony.com>
-Organization: Applied Asynchrony, Inc.
-Message-ID: <f4f29cf8-eb99-0276-caaa-d6af5083925a@applied-asynchrony.com>
-Date:   Thu, 2 Jun 2022 14:12:29 +0200
+        with ESMTP id S232484AbiFBMWz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 08:22:55 -0400
+Received: from mail-lf1-x135.google.com (mail-lf1-x135.google.com [IPv6:2a00:1450:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 867F82192;
+        Thu,  2 Jun 2022 05:22:53 -0700 (PDT)
+Received: by mail-lf1-x135.google.com with SMTP id s6so7506893lfo.13;
+        Thu, 02 Jun 2022 05:22:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=VOQZA0pHYqK4XdbW9GaYy4EgHWG2TtOSiKjo+AkEHcM=;
+        b=UnE1Rplcr6LJMmwXyiL8ub39B1DsH07ftzTp2OVzdHGbBuxHegfEbgNiYk0LTgRA8Q
+         52K0TR54JuB4WxHpGvQ8tl2RYold0dDK00bsLnJbq8Yg+lCaOSCQFasYxpY0dLfInTgs
+         7gQ19qYW1M6D6Z3e4mL14Y9+XIwN3YOm/MtYtG/Wv7bJJs9vyp/VNaV0eQM3FEhoyMIi
+         3x7yA+IhqxRTNkOak9X+TW13moVPwvJqYCv4jKAf/TucWy6yL6+bZaHiQjnbCqwEN+ih
+         cDn2R3aLAl1xQWUM+KA8AFT23ALZPYKaRyK6YHf/zAkApYAkW0pA3x1pXfoJQkUNTFDv
+         g2wg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=VOQZA0pHYqK4XdbW9GaYy4EgHWG2TtOSiKjo+AkEHcM=;
+        b=URF+7EYcfLXv9ffDV1OeuEof9+z6Yb++7NZmwMeVKfD3DVvoNayx7RiPr1+6c073Ls
+         TPaUnTwGPqxesLxhvdfHMXMJx3lf2mlmpDsRjLd+123OxSYXzxfoHoieAaKQGELFjiii
+         9bKCnRsBgSGZ4a8d8YSIWrQzGbrEkLUZylxRME3UK929ELFQQZyijsY6O1UlTCEqJs+E
+         tAYwq6P1Gqv74KKxRO3/CiTKd63+5YfVxQWyq3sSFkiXFD+noRfehZbfXtbKhDTz0LMh
+         mORzg4C4wz2TAOAejaj8L1B3DougDa+yPK9LZGe0zR6aX4w2vx5pzQMMFnVKCJdXWEIJ
+         hP5g==
+X-Gm-Message-State: AOAM532s0L9mtqhEHQ4llkuarSSHLcbRn50uFXS440wuvKdMjbftzMCh
+        vA4aPc5AjtYUBpCI2BoZHwXpXZkQK34MnbhscuY=
+X-Google-Smtp-Source: ABdhPJyVvZ/uTNq8sMKoJG6ijdTCL0j2WKweW33CgjPbnGda+c3G9nCqp0xIzgTsfNiXS+BPfYkG1BIjTPHHQt2wSv4=
+X-Received: by 2002:a05:6512:b17:b0:478:d66d:f747 with SMTP id
+ w23-20020a0565120b1700b00478d66df747mr17038767lfu.447.1654172571822; Thu, 02
+ Jun 2022 05:22:51 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <YphR19tJNqFuB/xh@infradead.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20220601195341.28581-1-jandryuk@gmail.com> <YphSYfdzy8kekhTZ@infradead.org>
+In-Reply-To: <YphSYfdzy8kekhTZ@infradead.org>
+From:   Jason Andryuk <jandryuk@gmail.com>
+Date:   Thu, 2 Jun 2022 08:22:40 -0400
+Message-ID: <CAKf6xpsbgyvJjdRGrE3ru114iuXv98rumf8nVvKu5WmErf+zTA@mail.gmail.com>
+Subject: Re: [PATCH] xen-blkfront: Handle NULL gendisk
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     =?UTF-8?Q?Roger_Pau_Monn=C3=A9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Juergen Gross <jgross@suse.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>,
+        xen-devel <xen-devel@lists.xenproject.org>,
+        linux-block@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        =?UTF-8?Q?Marek_Marczykowski=2DG=C3=B3recki?= 
+        <marmarek@invisiblethingslab.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-06-02 07:59, Christoph Hellwig wrote:
-> On Wed, Jun 01, 2022 at 10:19:40PM +0200, Holger Hoffstätte wrote:
->> Obviously if anybody (Jens, Christoph..?) has an idea what changed this
->> behaviour and thinks it's a bug I'm more than happy to test a fix,
->> however for now I'd be happy to understand what's going on.
-> 
-> I just tested fsync on SCSI disk and NVMe SSDs and they make it down
-> perfectly fine to the driver and device as Synchronize Cache / Flush
-> commands, including the block device node for a partition.
-> 
-> Everything else would be really horrible for data integrity anyway..
+On Thu, Jun 2, 2022 at 2:02 AM Christoph Hellwig <hch@infradead.org> wrote:
+>
+> On Wed, Jun 01, 2022 at 03:53:41PM -0400, Jason Andryuk wrote:
+> > When a VBD is not fully created and then closed, the kernel can have a
+> > NULL pointer dereference:
+> >
 
-Thanks for confirming. Unfortunately that still doesn't explain
-why dirty buffers now keep accumulating, but whatever.
-In the meantime I found a much less intrusive solution (hd-idle) that
-just monitors /proc/diskstats for selected devices instead of trying
-to replace periodic writeback wholesale.
+> >
+> > info->rq and info->gd are only set in blkfront_connect(), which is
+> > called for state 4 (XenbusStateConnected).  Guard against using NULL
+> > variables in blkfront_closing() to avoid the issue.
+> >
+> > The rest of blkfront_closing looks okay.  If info->nr_rings is 0, then
+> > for_each_rinfo won't do anything.
+> >
+> > blkfront_remove also needs to check for non-NULL pointers before
+> > cleaning up the gendisk and request queue.
+> >
+> > Fixes: 05d69d950d9d "xen-blkfront: sanitize the removal state machine"
+> > Reported-by: Marek Marczykowski-G=C3=B3recki <marmarek@invisiblethingsl=
+ab.com>
+> > Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+>
+> Tis looks ok, but do we have anything that prevents races between
+> blkfront_connect, blkfront_closing and blkfront_remove?
 
-cheers
-Holger
+Thanks for taking a look, Christoph.
+
+blkfront_connect and blkfront_closing are called by the state machine
+in blkback_changed.  blkback_changed is the xenbus_driver
+.otherend_changed callback.  The xenwatch kthread calls callbacks
+synchronously and one at a time, so that seems okay today.
+
+blkfront_remove is the xenbus_driver .remove callback, so it is tied
+to the life cycle of the device.  It's called after the
+otherend_changed callback is unregistered, so those won't run when
+blkfront_remove is running.
+
+Given that, I think it's okay.
+
+Regards,
+Jason
