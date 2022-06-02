@@ -2,135 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 822F2C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 00:00:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8D18C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 00:56:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232617AbiFBAAp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 20:00:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55006 "EHLO
+        id S232845AbiFBA4X (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 20:56:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40956 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232606AbiFBAAm (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 20:00:42 -0400
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30A752941D5
-        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 17:00:41 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id v29so2367232qtc.12
-        for <linux-block@vger.kernel.org>; Wed, 01 Jun 2022 17:00:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=XHclFl6TiOnpsdbRTbpf8I5ef93NwLHxOT7ZftAP5OQ=;
-        b=PNI9gR5OxCMLK2wesmPP7beTza1LVUIA9KonYJGbDAFowaWR1+gOMSPFQyILlCbdK9
-         gUfn5ltQQND4Igpr1PcoJgKaxcD5dBAwzrvhneuGmR5cB6Xf3NpyEwE9pIIgcm5WsDfj
-         OMBTPHZn69Csi4sdfYc+o9dQdNtlWVyz5OxRR+X8nyDPYF6K2ahO4BRlxiavJkdgkk5b
-         vBCAgX831wn8MMIkjC+ZBM62WCGcevuCk6vOX7Pr2o1vHeySgvRlg6SFXHlD9BjBBgRR
-         tgzeldcoyTnuS2Xyrkl/LEo9UbgD40oyCdtA/wA5nQPC/hTnaLXrjoV5QjIEjd2lSEr7
-         qhiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=XHclFl6TiOnpsdbRTbpf8I5ef93NwLHxOT7ZftAP5OQ=;
-        b=d9P1HiPtMEj8y41Ib4WvcJSdaRYa6cs3dve/XFt4e0FlCQK/OgCFBjkX0Q/u8Rt//f
-         Vygn8huAnmsQJ9o9hRg+RirDUUWDKBHr5z/bQouONzrXPfo7pZxyiswQ39vmvjMnNhLe
-         KKaj6xpF/xA2esD5rsKh4wDE5ERTdGeVKr/dcO4XQ7pd/YboiTQBmfyzI2Kz9L1slsdd
-         oljLmX/BOGGz0HgZU73xeomrxdH7RtncyHH6Cunqq0fmVmBrBdasJEIc2uRAWMDyDYMZ
-         ENMcNMX3FiUEeZMsqefvYPdEecvWoDCDRhtpOXaYswWEEF+l8vsFHFIXE1iZdJfFc4Ed
-         AcOg==
-X-Gm-Message-State: AOAM532sg9VydXoJFv13+aEaWE7irOoVO80VGF7Lu+YGRs8BYMS8riVM
-        WIf6icZjPwnYpqqryVTeBQzE+w==
-X-Google-Smtp-Source: ABdhPJyvPa7jsnbpw9EbFCPQVbuxZnWhMX7Sx5D9T0fweaGvqMgcaf7CabbpUfVwopaFMLH+hIknjw==
-X-Received: by 2002:a05:622a:313:b0:2f3:b9a1:dd4a with SMTP id q19-20020a05622a031300b002f3b9a1dd4amr1870963qtw.536.1654128040009;
-        Wed, 01 Jun 2022 17:00:40 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id b16-20020a05620a04f000b006a38debe62csm1867208qkh.89.2022.06.01.17.00.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 01 Jun 2022 17:00:39 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nwYGU-00GCY4-Af; Wed, 01 Jun 2022 21:00:38 -0300
-Date:   Wed, 1 Jun 2022 21:00:38 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220602000038.GK2960187@ziepe.ca>
-References: <20220407154717.7695-1-logang@deltatee.com>
- <20220407154717.7695-21-logang@deltatee.com>
- <20220527125501.GD2960187@ziepe.ca>
- <a2590e27-41e8-59dc-3576-b5b8d716a198@deltatee.com>
- <20220527190307.GG2960187@ziepe.ca>
- <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
+        with ESMTP id S232850AbiFBA4R (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 20:56:17 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9331C2440BC
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 17:56:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1654131376; x=1685667376;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=uuNmgm2vbeCXCkJfYxMy8RoXDcuzOiqsSNOZ+jR55ys=;
+  b=n1o2hVxoSngdxJJSinUVKZAMT8iZzpQRO46ApxEmPQMb4SBbQDD7F6Ne
+   P99sgm9RgvYSgdXisQwHYPVIsrdyRhWt3FZkr5AT255T9VDC74rhqFlY2
+   3VdhJu5pTj0L871iuL15Cg07qb5Py3LBNLaNHtc/zlnsYYhWGu+NBrXy0
+   ESr7OWJMQd+aCOCtniq2Xn7LM2P3Nf/WB1P8Ok2s6+TvOB97FexdbJAzc
+   YEv0Kzxt3Oy39rP3nJpxI7xVVRFkrDzp9D4QlV+WZXqSs+HRoJSgAOBPu
+   INmBMaOVGMboFOeKOjZUKVNziyyJQcREz7r6ww3TyGkB8kGqE4FgSnDb7
+   w==;
+X-IronPort-AV: E=Sophos;i="5.91,270,1647273600"; 
+   d="scan'208";a="306297115"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jun 2022 08:56:15 +0800
+IronPort-SDR: nYr447XUQLtrZmG6RMzzDMux4YKZ/VFzo9vjJW7Pz5/ta68EQEzv/5UTwZfOZUfxV8o2RnD9K1
+ n3buqRh6Lu1pvJlUGf9ZpLJ+3vkOwHWO1dexyqvd9uS1GRlMu4y6gUQ7gATL+UYUyo7eUPMNL3
+ DREpCSs2UXH8v2K1DcGNJ6RVbq8dCIPOT9mVRskQAAXAGbA/4HyGVgeomkc9Io1eDS83zoF5lf
+ Ql7lAFne7mVdM8nJI/8tR3y0Ej+o71TkBIllZtBYrnFekjDidnhkpOnHVwb/+oCJYjAkOU17qO
+ iEtySPR1yqppX8Ku8U5hLSok
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Jun 2022 17:19:56 -0700
+IronPort-SDR: 1HBns0UJxbl/GUcTnjbNhSvCX2aWm2v7T0vNJXVWe52syP5Di3CaqdpDN+zDrkg7SiIA42t8YB
+ LvcbEch+KM52IiqaLtZi0PUFswQ4ZcdXFdJBPDyT5aNDM0mU0vuifYaNv34YaxezRMv8cI0ZUY
+ q2UyoNelFR+BXSwMNU6GPEzF9aNiIopLZ2wKjVDbL2YBaZMPfSPAgf4ZM1VFElOOkwxZXxCzKv
+ U1+O7K7niVW24KBpnhuODHpkwgksGIGT7v3hC6GTpO2QefbR43kfUuMbUjaDYzUHqUz6y0TqB1
+ usI=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Jun 2022 17:56:16 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LD6yl2THLz1SVnx
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 17:56:15 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1654131374; x=1656723375; bh=uuNmgm2vbeCXCkJfYxMy8RoXDcuzOiqsSNO
+        Z+jR55ys=; b=cyxOFEMZqjlgksJ/mvoiRH6LC0akHH206GRpwtaxOc/7hwr9WLG
+        ozCF69wupTH1LI62IgZ2IRIM/TBPi3cg8yFWlw1ta9gobQExti1jmVCaDHO5V8uN
+        8s2YA8Jb5kcFRoJ3eY2RDAR5dMlHk+CK4iFUiKVo+p2LIvu172o0voPgvu0462+i
+        EGiqCzZ/WufHqC5s5I8VBfBr2BKtWOV3n1qUx0Q2wA+ugs4O0uNEIlxcExgtXEEL
+        PjvP17pv/uyVwH2cc36uN0WRnhtAxtfzFVzSWPQvjkW+Ta39GBLM5bfoONK9cy8a
+        DG5LfzQMhpsxFu88igj0PQ5B+lDi3VKpINg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 88270HzWYfT3 for <linux-block@vger.kernel.org>;
+        Wed,  1 Jun 2022 17:56:14 -0700 (PDT)
+Received: from [10.89.84.115] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.84.115])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LD6yk1SzZz1Rvlc;
+        Wed,  1 Jun 2022 17:56:13 -0700 (PDT)
+Message-ID: <678bdc0b-db31-4c6a-2ef9-afe8f91905d1@opensource.wdc.com>
+Date:   Thu, 2 Jun 2022 09:56:12 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCH 1/3] block: Fix handling of tasks without ioprio in
+ ioprio_get(2)
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <20220601132347.13543-1-jack@suse.cz>
+ <20220601145110.18162-1-jack@suse.cz>
+ <6d40bebc-2880-5290-16dc-2807e1db9e77@opensource.wdc.com>
+ <20220601152358.lgmn52cpwdfa7mxq@quack3.lan>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220601152358.lgmn52cpwdfa7mxq@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, May 27, 2022 at 04:41:08PM -0600, Logan Gunthorpe wrote:
-> > 
-> > IIRC this is the last part:
-> > 
-> > https://lore.kernel.org/linux-mm/20220524190632.3304-1-alex.sierra@amd.com/
-> > 
-> > And the earlier bit with Christoph's pieces looks like it might get
-> > merged to v5.19..
-> > 
-> > The general idea is once pte_devmap is not set then all the
-> > refcounting works the way it should. This is what all new ZONE_DEVICE
-> > users should do..
+On 2022/06/02 0:23, Jan Kara wrote:
+> On Thu 02-06-22 00:11:29, Damien Le Moal wrote:
+>> On 2022/06/01 23:51, Jan Kara wrote:
+>>> ioprio_get(2) can be asked to return the best IO priority from several
+>>> tasks (IOPRIO_WHO_PGRP, IOPRIO_WHO_USER). Currently the call treats
+>>> tasks without set IO priority as having priority
+>>> IOPRIO_CLASS_BE/IOPRIO_BE_NORM however this does not really reflect the
+>>> IO priority the task will get (which depends on task's nice value) and
+>>> with the following fix it will not even match returned IO priority for a
+>>> single task. So fix IO priority comparison to treat unset IO priority as
+>>> the lowest possible one. This way we will return IOPRIO_CLASS_NONE
+>>> priority only if none of the considered tasks has explicitely set IO
+>>> priority, otherwise we return the highest set IO priority. This changes
+>>> userspace visible behavior but hopefully the results are clearer and
+>>> nothing breaks.
+>>>
+>>> Signed-off-by: Jan Kara <jack@suse.cz>
+>>> ---
+>>>  block/ioprio.c | 5 ++---
+>>>  1 file changed, 2 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/block/ioprio.c b/block/ioprio.c
+>>> index 2fe068fcaad5..62890391fc80 100644
+>>> --- a/block/ioprio.c
+>>> +++ b/block/ioprio.c
+>>> @@ -157,10 +157,9 @@ static int get_task_ioprio(struct task_struct *p)
+>>>  int ioprio_best(unsigned short aprio, unsigned short bprio)
+>>>  {
+>>>  	if (!ioprio_valid(aprio))
+>>> -		aprio = IOPRIO_DEFAULT;
+>>> +		return bprio;
+>>
+>> bprio may not be valid...
 > 
-> Ok, I don't actually follow how those patches relate to this.
+> Yes, bprio may be from IOPRIO_CLASS_NONE as well and IMHO that is a
+> desirable return in that case. ioprio_valid() is IMHO a bit of a misnomer
+> because IOPRIO_CLASS_NONE is a valid class and can be even set by
+> userspace. It actually means, set IO priority based on task's CPU priority.
+> But lets first settle on the desired meaning of ioprio in the discussion
+> over patch 3/3. How we should behave in this case is a detail we can sort
+> out after the general meaning is clear.
+
+Sounds all good to me.
+
 > 
-> Based on your description I guess I don't need to set PFN_DEV and
+> 								Honza
 
-Yes
 
-> perhaps not use vmf_insert_mixed()? And then just use vm_normal_page()?
-
-I'm not sure ATM the best function to use, but yes, a function that
-doesn't set PFN_DEV is needed here.
- 
-> But the refcounting of the pages seemed like it was already sane to me,
-> unless you mean that the code no longer has to synchronize_rcu() before
-> returning the pages... 
-
-Right. It also doesn't need to call unmap range or keep track of the
-inode, or do any of that stuff unless it really needs mmap revokation
-semantics (which I doubt this use case does)
-
-unmap range was only necessary because the refcounting is wrong -
-since the pte's don't hold a ref on the page in PFN_DEV mode it is
-necessary to wipe all the PTE explicitly before going ahead to
-decrement the refcount on this path.
-
-Just stuff the pages into the mmap, and your driver unprobe will
-automatically block until all the mmaps are closed - no different than
-having an open file descriptor or something.
-
-Jason
+-- 
+Damien Le Moal
+Western Digital Research
