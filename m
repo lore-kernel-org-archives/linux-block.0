@@ -2,114 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F2AACCA47E
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 19:41:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 646FFC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 20:39:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238742AbiFBTln (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 15:41:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54700 "EHLO
+        id S239280AbiFBUjk (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 16:39:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238914AbiFBTl3 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 15:41:29 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F4712E9E8;
-        Thu,  2 Jun 2022 12:41:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=Eceey+RredpO1DUpw4XgOlm7hqUoNbIq9MwFfP+irVY=; b=VRfjtgzVIIfFh/6aegPoMJ5pyK
-        7gk1arWHebBfVWqJyt7uVOHx6SccEXwTqEY4lmki3xAk/qtzDLUH/1h6P7WkO5+TI+V+WeXu+q1zW
-        MKwPhqjFfksjbafDWz/o58AsRSqI3qKUxVt/TG5ZyxlpLgjf4xYG3vQzdOW3Ojhl0/k9BEK7hVPge
-        vQQDgt2E+uzU7nGqfhz+pdZ8UvuHHOEjUTBveG1XXbJ7+qD58PscQcpWReyxghMtyCtLvZexlxH5A
-        xWrB7CHz3eMGKOSGlDx1LQXODDK1IYdclZ9DSkkwRBSPLbaiNjrWly5+ox1t3zfrMt6ueTradwhiw
-        j+OX/Zrw==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwqgx-0047ut-H1; Thu, 02 Jun 2022 19:41:11 +0000
-Date:   Thu, 2 Jun 2022 12:41:11 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-Cc:     "Bird, Tim" <Tim.Bird@sony.com>,
-        Thomas Gleixner <tglx@linutronix.de>,
-        Richard Fontana <fontana@sharpeleven.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "jeyu@kernel.org" <jeyu@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>,
-        Kuno Woudt <kuno@frob.nl>,
-        "copyleft-next@lists.fedorahosted.org" 
-        <copyleft-next@lists.fedorahosted.org>,
-        Ciaran Farrell <Ciaran.Farrell@suse.com>,
-        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-Message-ID: <YpkSV51Pieq7K4x2@bombadil.infradead.org>
-References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
- <87bkvo0wjd.ffs@tglx>
- <Yo5cxWghV/v2Fnzf@bombadil.infradead.org>
- <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
- <Yo5xTwGLmbsgJhfM@bombadil.infradead.org>
- <BN7PR13MB2499BA2AFAC1C79197734D81FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
- <871qwhz2aa.ffs@tglx>
- <BYAPR13MB2503DAC31B8B5CC69F8FECD3FDDE9@BYAPR13MB2503.namprd13.prod.outlook.com>
- <YphWomPaMdLCa3Pt@kroah.com>
+        with ESMTP id S239284AbiFBUj3 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 16:39:29 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E4BE1FCDE;
+        Thu,  2 Jun 2022 13:39:19 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id gd1so5906222pjb.2;
+        Thu, 02 Jun 2022 13:39:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=NYkACjksTq7D5aqYKY+rKmNd5ashkIfCvgLNEkSUbY4=;
+        b=VOoyvWVAcqaU05NT1mJw6gqT2XZyQl9VZosdCL3rWV7Sfb31CIedlhghvwKlyCTlgM
+         4EmYtZsp0oDGXH7Sfq9OUYqx6T57oS/fqxkS6XU+BF9VG8iMEagWxwaCBeV59dwks9Ne
+         +sxGEJ/V+morFEZXMOgoH98Qnf5I3+3Konysn2VkKRxS8dwpQN7ZIORUzMQmYcIcn/mO
+         fHc7VZN2++Hb/wqYaHVxLILDutZdZurupx6x2KAVR1NzmA/9ttj5Ao0OePBo66dbNrpW
+         B6sbZXTu632SvtkE+Y9GLIw2dJcS8mZ9L9eOGSedtmCMHTljAxs32Md+vZk2pkQZlFLS
+         S/zQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=NYkACjksTq7D5aqYKY+rKmNd5ashkIfCvgLNEkSUbY4=;
+        b=ixSNDwue02pvkZnfE4blIZO4XGIuqwDeOVkZA9ps8bpIRXpE4muzipdHKLZw0334M1
+         J8iNiJ+UTptJbju//R0aWg13a0z7hwTAb+nRQHmNK7xVlXxUItwyu8nUG57/ps3jqH19
+         n06LjiInXPw62x+3KocmSo8uUnsZ7Kk8T/yUDeDXzOtF2v7zTfqAUdKxKOdB3JD3gayo
+         0kA4Zl34enNBzvYmQhDHm50MrzFHGpmlcW+AJ+qg/g3hmtj905m9c3kq9ca56budd+aI
+         201UOn3hUkrTQzeNWRx6BFoh6YA/Qe4I3K3ybHPQYQvuD1gW6LQINdCIkBx/6QHKdGVT
+         9g9Q==
+X-Gm-Message-State: AOAM532X6PSxvUv5jigD5EtC4zmLTzmO/q4xsH+2glv67oG9Y8c0J2BZ
+        QdJO04yXUceMP3ZifvmwRwk=
+X-Google-Smtp-Source: ABdhPJwCauiVmlbZVrmjHvh14oNg3atOmWAenuo+u7mo7KfDoP3F/8vvEv+MM5EaVGAijl7adpq+6g==
+X-Received: by 2002:a17:90a:9505:b0:1df:2162:2bb5 with SMTP id t5-20020a17090a950500b001df21622bb5mr42153874pjo.73.1654202358802;
+        Thu, 02 Jun 2022 13:39:18 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:49ff])
+        by smtp.gmail.com with ESMTPSA id p16-20020a1709027ed000b0016403cae7desm3209918plb.276.2022.06.02.13.39.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 02 Jun 2022 13:39:18 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 2 Jun 2022 10:39:16 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v6 2/3] blk-cgroup: Return -ENOMEM directly in
+ blkcg_css_alloc() error path
+Message-ID: <Ypkf9N0sIZdzizL1@slm.duckdns.org>
+References: <20220602192020.166940-1-longman@redhat.com>
+ <20220602192020.166940-3-longman@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YphWomPaMdLCa3Pt@kroah.com>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+In-Reply-To: <20220602192020.166940-3-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 02, 2022 at 08:20:18AM +0200, gregkh@linuxfoundation.org wrote:
-> On Thu, Jun 02, 2022 at 04:11:16AM +0000, Bird, Tim wrote:
-> > I don't think that the Linux kernel should be used for license promotion, but if it is,
-> > then it should be used to promote GPL-v2-only.
+On Thu, Jun 02, 2022 at 03:20:19PM -0400, Waiman Long wrote:
+> For blkcg_css_alloc(), the only error that will be returned is -ENOMEM.
+> Simplify error handling code by returning this error directly instead
+> of setting an intermediate "ret" variable.
 > 
-> I agree, and in a way, I feel like that is what is happening here for
-> this original submission.  See below for more...
+> Signed-off-by: Waiman Long <longman@redhat.com>
 
-I have been using copyleft-next for years and cross polination for me is real.
+Acked-by: Tejun Heo <tj@kernel.org>
 
-> I agree, dual licensed code that is added to the kernel is either done:
-> 	- because the original code had a non-GPL license and it was
-> 	  added so that it could be compatible so that it could be added
-> 	  to Linux.
-> 	- because the code being accepted into Linux can also be used in
-> 	  another non-Linux codebase now or in the future.
+Thanks.
 
-Sometimes such cross polination is purely speculative, but we don't
-stop and ask people for evidence of this.
-
-You forgot that another reason is because some attorneys like some
-permissive license more. That's it. The Clear BSD license is an example.
-In that case it was a new license to Linux. So let us be clear that one
-could argue that was a bit of license promotion.
-
-> The submission here was neither of these.
-
-You are incorrect.
-
-I have a vision for Linux kernel testing and I have put *years* of
-effort in this regard and thinking about architecture behind all this.
-So yes cross polination is *extremely* important to me and hence some
-of this effort.
-
-  Luis
+-- 
+tejun
