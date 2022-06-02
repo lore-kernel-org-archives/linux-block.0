@@ -2,74 +2,59 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DB6ACCA47B
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 15:21:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23BEBC43334
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 15:41:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232948AbiFBPVY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 11:21:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52162 "EHLO
+        id S236501AbiFBPlW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 11:41:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42010 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229899AbiFBPVX (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 11:21:23 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A5112A5515;
-        Thu,  2 Jun 2022 08:21:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Sender:Content-Type:MIME-Version:
-        Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=JIw8aKjJnDAUMfW/ZoAS3ykhzT+7C9tK1kg2A9Q7aFE=; b=dYtKQhtFUXzYAr4tHRCc7eIobY
-        OqE7Yfif70F45glOPSt41CFw8FgQ2zhaeZ3A/xgayBzLDgf+ROvjy8kRRwlJaAYsMz/YEwBiWD/sB
-        ZrLliJldX1+hlCnicbZof+iHBL23JEPGsqhvZhH5j4CUn5DYwW1ul0zhElxLUFKBwFL6NBGvCAmZF
-        4CBDk8rDX9m4nRfBovQRJQN8n18btfznjKeXOG8KfT0WtgyAqS75TbN/w1hhD4EdZtpBz3pzvSIkZ
-        AoSEugHfWhTAQKEYwcckFIspB8DdPsM8Ku00B6z52MznXh+xLsicwOMlmM26FQZcLmxAgCjaiozEF
-        P0lBVFRA==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwmdU-003gSj-6r; Thu, 02 Jun 2022 15:21:20 +0000
-Date:   Thu, 2 Jun 2022 08:21:20 -0700
-From:   Luis Chamberlain <mcgrof@kernel.org>
-To:     linux-fsdevel <linux-fsdevel@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        fstests <fstests@vger.kernel.org>,
-        linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     Amir Goldstein <amir73il@gmail.com>, pankydev8@gmail.com,
-        Josef Bacik <josef@toxicpanda.com>,
-        Theodore Tso <tytso@mit.edu>,
-        Davidlohr Bueso <dave@stgolabs.net>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Javier Gonzalez <javier.gonz@samsung.com>,
-        a.manzanares@samsung.com, Tyler Hicks <code@tyhicks.com>,
-        Leah Rumancik <lrumancik@google.com>,
-        Klaus Jensen <its@irrelevant.dk>,
-        Zorro Lang <zlang@redhat.com>, shirley.ma@oracle.com,
-        chandan.babu@oracle.com, konrad.wilk@oracle.com, mcgrof@kernel.org
-Subject: [ANN] Discord server for testing Linux with kdevops
-Message-ID: <YpjVcHuxhEQwPusN@bombadil.infradead.org>
+        with ESMTP id S232621AbiFBPlW (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 11:41:22 -0400
+Received: from mail1.wrs.com (unknown-3-146.windriver.com [147.11.3.146])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 649A8279E75;
+        Thu,  2 Jun 2022 08:41:20 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.corp.ad.wrs.com [147.11.82.252])
+        by mail1.wrs.com (8.15.2/8.15.2) with ESMTPS id 252EnJEW009792
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 2 Jun 2022 07:49:19 -0700
+Received: from otp-dpanait-l2.corp.ad.wrs.com (128.224.125.150) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Thu, 2 Jun 2022 07:49:17 -0700
+From:   Dragos-Marian Panait <dragos.panait@windriver.com>
+To:     <stable@vger.kernel.org>
+CC:     Haimin Zhang <tcs.kernel@gmail.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Subject: [PATCH 4.19 0/1] block-map: backport fix for CVE-2022-0494
+Date:   Thu, 2 Jun 2022 17:49:07 +0300
+Message-ID: <20220602144908.2250166-1-dragos.panait@windriver.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Sender: Luis Chamberlain <mcgrof@infradead.org>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [128.224.125.150]
+X-ClientProxiedBy: ala-exchng01.corp.ad.wrs.com (147.11.82.252) To
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-I've setup a discord server for general discussions around Linux
-kernel testing with kdevops. This should help with coordination
-around kdevops in an accessible way for:
+The following commit is needed to fix CVE-2022-0494:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cc8f7fe1f5eab010191aa4570f27641876fa1267
 
-  * The shared kdevops repository and dependent trees on the linux-kdevops
-    organization: https://github.com/linux-kdevops/
-  * Sharing of expunges for fstests / blktests for different
-    filesystems / configuration / kernel releases
-  * Shared hardware resources such as the public Super Micro bigtwin server
-    currently used to help test fstests and blktests
-  * Future potential shared cloud credits
-  * Streamlining reports for new issues found on stable kernels or
-    Linus's tree or linux-next
-  * Storing / sharing test failure artifacts
+Haimin Zhang (1):
+  block-map: add __GFP_ZERO flag for alloc_page in function
+    bio_copy_kern
 
-The discord server:
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-https://discord.gg/pWgZZhRp
 
-  Luis
+base-commit: 06d93c33da2cc9c3ca79f5ba757e08306455d9d6
+-- 
+2.36.1
+
