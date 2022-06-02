@@ -2,104 +2,128 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD5DC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 17:46:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14F08C43334
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 17:49:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237663AbiFBRqv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 13:46:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59330 "EHLO
+        id S237687AbiFBRtj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 13:49:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237660AbiFBRqu (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 13:46:50 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C71739A;
-        Thu,  2 Jun 2022 10:46:48 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id 187so5336022pfu.9;
-        Thu, 02 Jun 2022 10:46:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=S0kiPQZyWlYVIOJkiV7UkjYaE9b35apJIAe4jrH0pmE=;
-        b=kO2DY3HPvb+3eEPd6LYATCmZzcBFTRNM1TmFlyQ3BCQ39OQfDP/80su+HJub539UCX
-         mAAf/8f5bBYQJFafrQBX7h++LbgnuLdMzl84tr9BbOpVvDrSmosmtasLj+l+LzkUbHe2
-         WugmU0OhU6xm0rEawAcbdFCgSh/LizY4ldHmL0VbAWhHRTJrKQEviTclXHeXRp5GdOa5
-         XyHQpuxVbS51/K59T9mIXRr5jMinKxlt/1bMd7/ZIY/7ayduain8sOvhTGiixu1OnRBF
-         3qgdn49fml1TLsnCDFoipgFQP9QJrxuStRusAYujgTf2nhuOf08B35nG2Bpg1j4HO85p
-         fXuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=S0kiPQZyWlYVIOJkiV7UkjYaE9b35apJIAe4jrH0pmE=;
-        b=hjWUpLFY1p2Bb9uKvgQKUenkU618lGQZCWMRZT7BDIfm2axNWGLup7HwPwnr5myacx
-         OOzcht+22lRPhgAam0ulONOFp+SeoJlJrWfXNDEmkJZn0AgANtFaT5A1Leulpw6+PaIH
-         7duXQBKKjq/lvOsgF9CxpbJG0f1wfvODuMM8vq15mZeAyhrQXPFPv5IFkR4c/XLnH+eb
-         KMv79dywHO36pc/a4j+8ZC3Od8PJyDFq5HIuBa1GZ4PZ3wDz6caZI1XtZKB1vn/jdAAa
-         Ca6Vq6E2CLfAjh3IxBvmw79/gcfWE2xD0z6CDAH47jgLrKQvr+Vjc0dQamgjkZ3EGIIM
-         c86w==
-X-Gm-Message-State: AOAM530WGeNqp6V9+O85TF5fgUBcsg0zrfoEfkWV226yVIHm1cw6b1jd
-        UPiM1yS9MtjEvvgPfyqcFP8=
-X-Google-Smtp-Source: ABdhPJz7y32iYDT2F/DMmapftPbyZXOxJDY02/3F1ptZUEjlRkeChivP9vk2/181q5VWGJeZ8Wd3Yg==
-X-Received: by 2002:a62:7b94:0:b0:51b:c723:5724 with SMTP id w142-20020a627b94000000b0051bc7235724mr4685709pfc.8.1654192007390;
-        Thu, 02 Jun 2022 10:46:47 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:49ff])
-        by smtp.gmail.com with ESMTPSA id y17-20020a170903011100b00163ef7be14csm3744464plc.89.2022.06.02.10.46.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 10:46:46 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Thu, 2 Jun 2022 07:46:45 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v5 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Message-ID: <Ypj3hcodkAU1MUR7@slm.duckdns.org>
-References: <20220601211824.89626-1-longman@redhat.com>
- <20220602133543.128088-4-longman@redhat.com>
- <YpjsTNZx4DG+kot4@slm.duckdns.org>
- <42da456d-8f6a-3af0-4cd3-d33a07e3b81e@redhat.com>
+        with ESMTP id S236902AbiFBRti (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 13:49:38 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E073613B2E2;
+        Thu,  2 Jun 2022 10:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=iyck+wOifMpSZlLxRfCrWDgusCm3mWKdpT17Ia+B9wY=; b=rnaKQUhn8m0zyN0RqZEYQDjsXS
+        bQq3WwRpeKjVK1qMYZK6mfxOtb/vSCH4EYY+RMt8unUUNIFPAn8qkWOpu0WY8P+7ycxavtU8c1x42
+        GL4bMz3u3uliqUKkk/rKHRiF6ip5UbjhpBdiEMfIJ6nrjfPr/5Sq6euvL6HgLOAijk7z3HlBHP7ls
+        pcXQ0r9j5pF9NW3clGalNpKN8L7zkm/dgY51Cgy5nTN+GYoKstvVBkAR/a/aEoyXotFUOBWnP/yvp
+        eUKOoQvmroULemDQpPRn3ppgTUJ3ZUx9YNJrBF5YBjbqtvmxd7j82k4fvWwyzEA+XJ6DtYonhy2aI
+        X2SqWSig==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1nwoww-00EP6z-6D; Thu, 02 Jun 2022 11:49:35 -0600
+Message-ID: <251c6028-c53a-28dd-2bbf-d5c8ec2496b3@deltatee.com>
+Date:   Thu, 2 Jun 2022 11:49:24 -0600
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <42da456d-8f6a-3af0-4cd3-d33a07e3b81e@redhat.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-CA
+To:     Jason Gunthorpe <jgg@ziepe.ca>
+Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Jakowski Andrzej <andrzej.jakowski@intel.com>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+References: <20220407154717.7695-1-logang@deltatee.com>
+ <20220407154717.7695-21-logang@deltatee.com>
+ <20220527125501.GD2960187@ziepe.ca>
+ <a2590e27-41e8-59dc-3576-b5b8d716a198@deltatee.com>
+ <20220527190307.GG2960187@ziepe.ca>
+ <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
+ <20220602000038.GK2960187@ziepe.ca>
+ <400baba7-1cd6-09d4-4de9-2a73f08afc79@deltatee.com>
+ <20220602163059.GL2960187@ziepe.ca>
+ <51cc6645-2504-6d01-5626-238ed6ffff04@deltatee.com>
+ <20220602172811.GN2960187@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220602172811.GN2960187@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, bhelgaas@google.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 02, 2022 at 01:26:10PM -0400, Waiman Long wrote:
+
+
+On 2022-06-02 11:28, Jason Gunthorpe wrote:
+> On Thu, Jun 02, 2022 at 10:49:15AM -0600, Logan Gunthorpe wrote:
+>>
+>>
+>> On 2022-06-02 10:30, Jason Gunthorpe wrote:
+>>> On Thu, Jun 02, 2022 at 10:16:10AM -0600, Logan Gunthorpe wrote:
+>>>
+>>>>> Just stuff the pages into the mmap, and your driver unprobe will
+>>>>> automatically block until all the mmaps are closed - no different than
+>>>>> having an open file descriptor or something.
+>>>>
+>>>> Oh is that what we want?
+>>>
+>>> Yes, it is the typical case - eg if you have a sysfs file open unbind
+>>> hangs indefinitely. Many drivers can't unbind while they have open file
+>>> descriptors/etc.
+>>>
+>>> A couple drivers go out of their way to allow unbinding while a live
+>>> userspace exists but this can get complicated. Usually there should be
+>>> a good reason.
+>>>
+>>> The module will already be refcounted anyhow because the mmap points
+>>> to a char file which holds a module reference - meaning a simple rmmod
+>>> of the driver shouldn't work already..
+>>
+>> Also, I just tried it... If I open a sysfs file for an nvme device (ie.
+>> /sys/class/nvme/nvme4/cntlid) and unbind the device, it does not block.
+>> A subsequent read on that file descriptor returns ENODEV. Which is what
+>> I would have expected.
 > 
-> On 6/2/22 12:58, Tejun Heo wrote:
-> > Hello,
-> > 
-> > On Thu, Jun 02, 2022 at 09:35:43AM -0400, Waiman Long wrote:
-> > > @@ -2011,9 +2076,16 @@ void blk_cgroup_bio_start(struct bio *bio)
-> > >   	}
-> > >   	bis->cur.ios[rwd]++;
-> > > +	if (!READ_ONCE(bis->lnode.next)) {
-> > > +		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
-> > > +
-> > > +		llist_add(&bis->lnode, lhead);
-> > > +		percpu_ref_get(&bis->blkg->refcnt);
-> > Hmm... what guarantees that more than one threads race here? llist assumes
-> > that there's a single writer for a given llist_node and the ref count would
-> > be off too, right?
-> 
-> The llist_add() function is atomic. It calls into llist_add_batch() in
-> lib/llist.c which uses cmpxchg() to make the change. There is a non-atomic
-> version __llist_add() which may be problematic in this case. Note that irq
-> is disabled in the u64_stats_update* critical section, there shouldn't be a
-> racing thread running in the same cpu. Other cpus will modify their own
-> version of lhead. Perhaps the non-atomic version can be used here as well.
+> Oh interesting, this has been changed since years ago when I last
+> looked, the kernfs_get_active() is now more narrowed than it once
+> was. So manybe sysfs isn't the same concern it used to be!
 
-Ah, right, this is per-cpu, so there can be no second writer trying to add
-the same node at the same time. Can you add a comment explaining the overall
-design / behavior? Other than that, please feel free to add
+Yeah, so I really think *not* blocking unbind indefinitely is the better
+approach here. It's what has always been done with device dax, etc.
+mmaps in userspace processes get unmapped and will fault with SIGBUS on
+next access and unbind will actually unbind the device relatively
+promptly. Userspace processes can fail or try to handle the device going
+away gracefully.
 
- Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+Logan
