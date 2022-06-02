@@ -2,277 +2,107 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B55C43334
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 08:12:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20DD8C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 08:13:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232062AbiFBIMQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 04:12:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45158 "EHLO
+        id S232060AbiFBIM6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 04:12:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47052 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232060AbiFBIMP (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 04:12:15 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCE321A569
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 01:12:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=5oapP+lsKtf4OHa7XoosHti47a87X58GzZN+HyBP5L0=; b=h7D3l6hfTyc1YcvYIh3q3dWEP+
-        kleLBDRF8IgSvQk6e5kl3UAtyixGF2XIpJzEqcLe15uFrLl24lpF9YMMugTnrV6LZRv9emh9dmv8l
-        t1XBnlk1WY8YURd2FmwA3vwXQrNV8+6FdF8pqDzCtoYZv+NxUHw6F4PzRWDUSgDNqnZMEM18RdXFf
-        wQVNZxk6bR8FOy1tEYJiYa3PObYt1xCAeyaXnBe/GrmpzFTvqEp2dKdE5icrKQez9mWUUJNqqzwUU
-        6HeyY2Csxq4afJ9PsLOcz3xwGRSL/asSiD5/wzH655qP6abcKs/MemL+szlfPWqEr/MpN1pqbmuEg
-        nJkZwFgA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwfwA-002Atb-MB; Thu, 02 Jun 2022 08:12:10 +0000
-Date:   Thu, 2 Jun 2022 01:12:10 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Mike Snitzer <snitzer@redhat.com>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Jens Axboe <axboe@kernel.dk>,
-        Matthew Wilcox <willy@infradead.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org, david@fromorbit.com
-Subject: Re: bioset_exit poison from dm_destroy
-Message-ID: <Yphw2n3ERoFsWgEe@infradead.org>
-References: <YpK7m+14A+pZKs5k@casper.infradead.org>
- <2523e5b0-d89c-552e-40a6-6d414418749d@kernel.dk>
- <YpZlOCMept7wFjOw@redhat.com>
- <YpcBgY9MMgumEjTL@infradead.org>
- <Ypd0DnmjvCoWj+1P@redhat.com>
+        with ESMTP id S232097AbiFBIMz (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 04:12:55 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E830B239094;
+        Thu,  2 Jun 2022 01:12:54 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 8AE141F8C7;
+        Thu,  2 Jun 2022 08:12:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1654157573; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=kfIIAThWtEk1d6dpEsw8g4j1ltC0Xe7EwKNluxQa/ys=;
+        b=jA0WkSVY7l3tfE7VzceBG2YYxeGHJouWRal6oOpW+oPmEriTAZJOA4e7BsAi9+2pXonE4j
+        OZQQyQea5COy6/M1PgJiox+dPLrRWqYOUeRlbayt+JF0FfxT/wEsEnBhQJZEnGdm4xkOqG
+        qDreZi8xH9qzAyaTmocp7q1G91IRR/g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1654157573;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=kfIIAThWtEk1d6dpEsw8g4j1ltC0Xe7EwKNluxQa/ys=;
+        b=7YJsHXi9Xj17dqbHPbSjNeJIr11sCgfg/vrainBCCN9yAtEhpgPLYXC0NbtfIPaCWY3FDJ
+        oWKSFJeZljXLIfBA==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 739F22C141;
+        Thu,  2 Jun 2022 08:12:53 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 2637DA0633; Thu,  2 Jun 2022 10:12:53 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@infradead.org>,
+        Tejun Heo <tj@kernel.org>,
+        Paolo Valente <paolo.valente@linaro.org>,
+        Logan Gunthorpe <logang@deltatee.com>,
+        Donald Buczek <buczek@molgen.mpg.de>, Jan Kara <jack@suse.cz>,
+        stable@vger.kernel.org, Christoph Hellwig <hch@lst.de>
+Subject: [PATCH v2] block: fix bio_clone_blkg_association() to associate with proper blkcg_gq
+Date:   Thu,  2 Jun 2022 10:12:42 +0200
+Message-Id: <20220602081242.7731-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Ypd0DnmjvCoWj+1P@redhat.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1757; h=from:subject; bh=L9TDv6pt6PvZaowD3JImOB0iZkdUaZqUtEHfWoBiY4I=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBimHDp4cWcSxJ0pN4cOxYBEarR4iuKonoL6o88z+ZS ha8xnbmJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYphw6QAKCRCcnaoHP2RA2UdDB/ 96H0v5glgVt2obSrlzh+SDeBpzQ1Iduw0gEmPdTPtA6VlTkqsO29l7Lod/m5pF5g956cNwQ+t2Gd0Y hVxA7BQtZaxitjiyg5oJhNCFFilJWgvWustBYPFk5h487/uGR72ZDWX7Yj8/O5uU9HKm1XE2aSJCdw Wpb5REUUyZpA3WQeA/+qaYUZtUrI352pZkUlNsj1Wj6yn4SBI/ki2hSpOztuU++uDqsPrXNE4XzStz WvcmdlxscsnUgt+lGfz3j+THZK/ydkHB3X/d5JPE7BdC2IvsM3NQPvglUUzy1oxoVu5vRKYAnOTOFR luJ3pQ05kihXrtrbQNeP6Pi+oifvPe
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 10:13:34AM -0400, Mike Snitzer wrote:
-> Please take the time to look at the code and save your judgement until
-> you do.  That said, I'm not in love with the complexity of how DM
-> handles bioset initialization.  But both you and Jens keep taking
-> shots at DM for doing things wrong without actually looking.
+Commit d92c370a16cb ("block: really clone the block cgroup in
+bio_clone_blkg_association") changed bio_clone_blkg_association() to
+just clone bio->bi_blkg reference from source to destination bio. This
+is however wrong if the source and destination bios are against
+different block devices because struct blkcg_gq is different for each
+bdev-blkcg pair. This will result in IOs being accounted (and throttled
+as a result) multiple times against the same device (src bdev) while
+throttling of the other device (dst bdev) is ignored. In case of BFQ the
+inconsistency can even result in crashes in bfq_bic_update_cgroup().
+Fix the problem by looking up correct blkcg_gq for the cloned bio.
 
-I'm not taking shots.  I'm just saying we should kill this API.  In
-the worse case the caller can keep track of if a bioset is initialized,
-but in most cases we should be able to deduct it in a nicer way.
+Reported-by: Logan Gunthorpe <logang@deltatee.com>
+Reported-and-tested-by: Donald Buczek <buczek@molgen.mpg.de>
+Fixes: d92c370a16cb ("block: really clone the block cgroup in bio_clone_blkg_association")
+CC: stable@vger.kernel.org
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ block/blk-cgroup.c | 8 ++------
+ 1 file changed, 2 insertions(+), 6 deletions(-)
 
-> DM uses bioset_init_from_src().  Yet you've both assumed double frees
-> and such (while not entirely wrong your glossing over the detail that
-> there is intervening reinitialization of DM's biosets between the
-> bioset_exit()s)
+Changes since v1:
+* Added tags
+* Removed unnecessary RCU protection
 
-And looking at the code, that use of bioset_init_from_src is completely
-broken.  It does not actually preallocated anything as intended by
-dm (maybe that isn't actually needed) but just uses the biosets in
-dm_md_mempools as an awkward way to carry parameters.  And completely
-loses bringing over the integrity allocations.  And no, this is not
-intended as a "cheap shot" against Jens who did that either..
-
-This is what I think should fix this, and will allow us to remove
-bioset_init_from_src which was a bad idea from the start:
-
-
-diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
-index d21648a923ea9..54c0473a51dde 100644
---- a/drivers/md/dm-core.h
-+++ b/drivers/md/dm-core.h
-@@ -33,6 +33,14 @@ struct dm_kobject_holder {
-  * access their members!
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 40161a3f68d0..764e740b0c0f 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1974,12 +1974,8 @@ EXPORT_SYMBOL_GPL(bio_associate_blkg);
   */
- 
-+/*
-+ * For mempools pre-allocation at the table loading time.
-+ */
-+struct dm_md_mempools {
-+	struct bio_set bs;
-+	struct bio_set io_bs;
-+};
-+
- struct mapped_device {
- 	struct mutex suspend_lock;
- 
-@@ -110,8 +118,7 @@ struct mapped_device {
- 	/*
- 	 * io objects are allocated from here.
- 	 */
--	struct bio_set io_bs;
--	struct bio_set bs;
-+	struct dm_md_mempools *mempools;
- 
- 	/* kobject and completion */
- 	struct dm_kobject_holder kobj_holder;
-diff --git a/drivers/md/dm-rq.c b/drivers/md/dm-rq.c
-index 6087cdcaad46d..a83b98a8d2a99 100644
---- a/drivers/md/dm-rq.c
-+++ b/drivers/md/dm-rq.c
-@@ -319,7 +319,7 @@ static int setup_clone(struct request *clone, struct request *rq,
+ void bio_clone_blkg_association(struct bio *dst, struct bio *src)
  {
- 	int r;
- 
--	r = blk_rq_prep_clone(clone, rq, &tio->md->bs, gfp_mask,
-+	r = blk_rq_prep_clone(clone, rq, &tio->md->mempools->bs, gfp_mask,
- 			      dm_rq_bio_constructor, tio);
- 	if (r)
- 		return r;
-diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
-index 0e833a154b31d..a8b016d6bf16e 100644
---- a/drivers/md/dm-table.c
-+++ b/drivers/md/dm-table.c
-@@ -1044,11 +1044,6 @@ void dm_table_free_md_mempools(struct dm_table *t)
- 	t->mempools = NULL;
- }
- 
--struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t)
--{
--	return t->mempools;
--}
--
- static int setup_indexes(struct dm_table *t)
- {
- 	int i;
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index dfb0a551bd880..8b21155d3c4f5 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -136,14 +136,6 @@ static int get_swap_bios(void)
- 	return latch;
- }
- 
--/*
-- * For mempools pre-allocation at the table loading time.
-- */
--struct dm_md_mempools {
--	struct bio_set bs;
--	struct bio_set io_bs;
--};
--
- struct table_device {
- 	struct list_head list;
- 	refcount_t count;
-@@ -581,7 +573,7 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio)
- 	struct dm_target_io *tio;
- 	struct bio *clone;
- 
--	clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->io_bs);
-+	clone = bio_alloc_clone(NULL, bio, GFP_NOIO, &md->mempools->io_bs);
- 	/* Set default bdev, but target must bio_set_dev() before issuing IO */
- 	clone->bi_bdev = md->disk->part0;
- 
-@@ -628,7 +620,8 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
- 	} else {
- 		struct mapped_device *md = ci->io->md;
- 
--		clone = bio_alloc_clone(NULL, ci->bio, gfp_mask, &md->bs);
-+		clone = bio_alloc_clone(NULL, ci->bio, gfp_mask,
-+					&md->mempools->bs);
- 		if (!clone)
- 			return NULL;
- 		/* Set default bdev, but target must bio_set_dev() before issuing IO */
-@@ -1876,8 +1869,7 @@ static void cleanup_mapped_device(struct mapped_device *md)
- {
- 	if (md->wq)
- 		destroy_workqueue(md->wq);
--	bioset_exit(&md->bs);
--	bioset_exit(&md->io_bs);
-+	dm_free_md_mempools(md->mempools);
- 
- 	if (md->dax_dev) {
- 		dax_remove_host(md->disk);
-@@ -2049,48 +2041,6 @@ static void free_dev(struct mapped_device *md)
- 	kvfree(md);
- }
- 
--static int __bind_mempools(struct mapped_device *md, struct dm_table *t)
--{
--	struct dm_md_mempools *p = dm_table_get_md_mempools(t);
--	int ret = 0;
--
--	if (dm_table_bio_based(t)) {
--		/*
--		 * The md may already have mempools that need changing.
--		 * If so, reload bioset because front_pad may have changed
--		 * because a different table was loaded.
--		 */
--		bioset_exit(&md->bs);
--		bioset_exit(&md->io_bs);
--
--	} else if (bioset_initialized(&md->bs)) {
--		/*
--		 * There's no need to reload with request-based dm
--		 * because the size of front_pad doesn't change.
--		 * Note for future: If you are to reload bioset,
--		 * prep-ed requests in the queue may refer
--		 * to bio from the old bioset, so you must walk
--		 * through the queue to unprep.
--		 */
--		goto out;
+-	if (src->bi_blkg) {
+-		if (dst->bi_blkg)
+-			blkg_put(dst->bi_blkg);
+-		blkg_get(src->bi_blkg);
+-		dst->bi_blkg = src->bi_blkg;
 -	}
--
--	BUG_ON(!p ||
--	       bioset_initialized(&md->bs) ||
--	       bioset_initialized(&md->io_bs));
--
--	ret = bioset_init_from_src(&md->bs, &p->bs);
--	if (ret)
--		goto out;
--	ret = bioset_init_from_src(&md->io_bs, &p->io_bs);
--	if (ret)
--		bioset_exit(&md->bs);
--out:
--	/* mempool bind completed, no longer need any mempools in the table */
--	dm_table_free_md_mempools(t);
--	return ret;
--}
--
- /*
-  * Bind a table to the device.
-  */
-@@ -2144,12 +2094,28 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
- 		 * immutable singletons - used to optimize dm_mq_queue_rq.
- 		 */
- 		md->immutable_target = dm_table_get_immutable_target(t);
--	}
++	if (src->bi_blkg)
++		bio_associate_blkg_from_css(dst, bio_blkcg_css(src));
+ }
+ EXPORT_SYMBOL_GPL(bio_clone_blkg_association);
  
--	ret = __bind_mempools(md, t);
--	if (ret) {
--		old_map = ERR_PTR(ret);
--		goto out;
-+		/*
-+		 * There is no need to reload with request-based dm because the
-+		 * size of front_pad doesn't change.
-+		 *
-+		 * Note for future: If you are to reload bioset, prep-ed
-+		 * requests in the queue may refer to bio from the old bioset,
-+		 * so you must walk through the queue to unprep.
-+		 */
-+		if (!md->mempools) {
-+			md->mempools = t->mempools;
-+			t->mempools = NULL;
-+		}
-+	} else {
-+		/*
-+		 * The md may already have mempools that need changing.
-+		 * If so, reload bioset because front_pad may have changed
-+		 * because a different table was loaded.
-+		 */
-+		dm_free_md_mempools(md->mempools);
-+		md->mempools = t->mempools;
-+		t->mempools = NULL;
- 	}
- 
- 	ret = dm_table_set_restrictions(t, md->queue, limits);
-diff --git a/drivers/md/dm.h b/drivers/md/dm.h
-index 3f89664fea010..86642234d4adb 100644
---- a/drivers/md/dm.h
-+++ b/drivers/md/dm.h
-@@ -72,7 +72,6 @@ struct dm_target *dm_table_get_wildcard_target(struct dm_table *t);
- bool dm_table_bio_based(struct dm_table *t);
- bool dm_table_request_based(struct dm_table *t);
- void dm_table_free_md_mempools(struct dm_table *t);
--struct dm_md_mempools *dm_table_get_md_mempools(struct dm_table *t);
- 
- void dm_lock_md_type(struct mapped_device *md);
- void dm_unlock_md_type(struct mapped_device *md);
+-- 
+2.35.3
+
