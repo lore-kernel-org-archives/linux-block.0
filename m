@@ -2,132 +2,158 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CD6C433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 06:02:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FB1C43334
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 06:20:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230266AbiFBGCV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 02:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52684 "EHLO
+        id S230465AbiFBGU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 02:20:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38096 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbiFBGCV (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 02:02:21 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ACCB17E3E;
-        Wed,  1 Jun 2022 23:02:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=h2ZY8VEFgpSaofTKAI8U3Wwg8+8pVIAh16eQkIT60+w=; b=eqmhX3QclN9MlaR/0mwyStXb9K
-        NOfcklljy6MQ77D15aoesLM1/t5jG5lKjBAg+zjdCmOipjYeIwcMAt7c391tje9RzUCmz40ZUr8SD
-        PkwWxPOcLvYoWgEN/5fzukgPf85mr7wPyo0x2Hd2fs0dFBprgWahMRCVfWbbBuFE1y+hVQNpNUhUV
-        AfozbbnIKEaIMOubfcgJZgIwBi4JNMy7O36+tB2XoNgBRJ5q4QiGgIgYzXhWWy4sKEteuV5GeV0Mr
-        fpc6Fuh5n1cq/iKxGb0E6G9KmKJLmmzyM3T6LurMLWWRhvyLFGVouXm3HQ0VY1hmfflcPHWfDCwz3
-        vzc0SN2w==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwduL-001bSd-8A; Thu, 02 Jun 2022 06:02:09 +0000
-Date:   Wed, 1 Jun 2022 23:02:09 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jason Andryuk <jandryuk@gmail.com>
-Cc:     Roger Pau =?iso-8859-1?Q?Monn=E9?= <roger.pau@citrix.com>,
-        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
-        Juergen Gross <jgross@suse.com>,
-        Stefano Stabellini <sstabellini@kernel.org>,
-        Jens Axboe <axboe@kernel.dk>, xen-devel@lists.xenproject.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Marek =?iso-8859-1?Q?Marczykowski-G=F3recki?= 
-        <marmarek@invisiblethingslab.com>
-Subject: Re: [PATCH] xen-blkfront: Handle NULL gendisk
-Message-ID: <YphSYfdzy8kekhTZ@infradead.org>
-References: <20220601195341.28581-1-jandryuk@gmail.com>
+        with ESMTP id S230462AbiFBGUZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 02:20:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 697FE280B2F;
+        Wed,  1 Jun 2022 23:20:24 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 1D54FB81EC0;
+        Thu,  2 Jun 2022 06:20:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 700BEC385A5;
+        Thu,  2 Jun 2022 06:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1654150821;
+        bh=Gn0mmCHssjpDmMOxhtbBTwvuYite/0yMZNqpBs7V2nE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=mAWmwIszHR/E98n1VFJCtqm9AVMJpD5/gp2CyX4Vv5NixDiD++yaQLzJte1lSGNKp
+         xuWU6DvmIBmp48RMTO0iZI4wV+Q7MMLEOulO9Jc6txAMg8LocxRjnvBdfi4XDAxWBA
+         Um1envM6ziHjyF3c1yHIpv9bv/zIIyurqyzjyWX8=
+Date:   Thu, 2 Jun 2022 08:20:18 +0200
+From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
+To:     "Bird, Tim" <Tim.Bird@sony.com>
+Cc:     Thomas Gleixner <tglx@linutronix.de>,
+        Luis Chamberlain <mcgrof@kernel.org>,
+        Richard Fontana <fontana@sharpeleven.org>,
+        "tj@kernel.org" <tj@kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
+        "jeyu@kernel.org" <jeyu@kernel.org>,
+        "shuah@kernel.org" <shuah@kernel.org>,
+        "bvanassche@acm.org" <bvanassche@acm.org>,
+        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
+        "joe@perches.com" <joe@perches.com>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "rostedt@goodmis.org" <rostedt@goodmis.org>,
+        "minchan@kernel.org" <minchan@kernel.org>,
+        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
+        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
+        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Goldwyn Rodrigues <rgoldwyn@suse.com>,
+        Kuno Woudt <kuno@frob.nl>,
+        "copyleft-next@lists.fedorahosted.org" 
+        <copyleft-next@lists.fedorahosted.org>,
+        Ciaran Farrell <Ciaran.Farrell@suse.com>,
+        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Jonathan Corbet <corbet@lwn.net>,
+        Thorsten Leemhuis <linux@leemhuis.info>
+Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
+Message-ID: <YphWomPaMdLCa3Pt@kroah.com>
+References: <20211029184500.2821444-1-mcgrof@kernel.org>
+ <20211029184500.2821444-2-mcgrof@kernel.org>
+ <87bkvo0wjd.ffs@tglx>
+ <Yo5cxWghV/v2Fnzf@bombadil.infradead.org>
+ <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
+ <Yo5xTwGLmbsgJhfM@bombadil.infradead.org>
+ <BN7PR13MB2499BA2AFAC1C79197734D81FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
+ <871qwhz2aa.ffs@tglx>
+ <BYAPR13MB2503DAC31B8B5CC69F8FECD3FDDE9@BYAPR13MB2503.namprd13.prod.outlook.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20220601195341.28581-1-jandryuk@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <BYAPR13MB2503DAC31B8B5CC69F8FECD3FDDE9@BYAPR13MB2503.namprd13.prod.outlook.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 01, 2022 at 03:53:41PM -0400, Jason Andryuk wrote:
-> When a VBD is not fully created and then closed, the kernel can have a
-> NULL pointer dereference:
+On Thu, Jun 02, 2022 at 04:11:16AM +0000, Bird, Tim wrote:
+> > -----Original Message-----
+> > From: Thomas Gleixner <tglx@linutronix.de>
+> > 
+> > Tim!
+> > 
+> > On Wed, May 25 2022 at 19:05, Bird, Tim wrote:
+> > >> From: Luis Chamberlain <mcgrof@infradead.org> On Behalf Of Luis Chamberlain
+> > >> I agree that we want to keep the number of licenses as small as
+> > >> possible but we cannot really dictate which dual licensing options a
+> > >> submitter selects unless the license is GPL-2.0-only incompatible,
+> > >> which copyleft-next is not.
+> > >
+> > > Um, yes we can dictate that.
+> > 
+> > No!
+> Sorry for the delayed response.  I was on vacation over memorial day weekend
+> (holiday in the US.)
 > 
-> The reproducer is trivial:
+> I think that the option to reject a contribution based on its license should be
+> available to the community, using criteria beyond those that Luis has mentioned
+> (and that you mention below).
 > 
-> [user@dom0 ~]$ sudo xl block-attach work backend=sys-usb vdev=xvdi target=/dev/sdz
-> [user@dom0 ~]$ xl block-list work
-> Vdev  BE  handle state evt-ch ring-ref BE-path
-> 51712 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51712
-> 51728 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51728
-> 51744 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51744
-> 51760 0   241    4     -1     -1       /local/domain/0/backend/vbd/241/51760
-> 51840 3   241    3     -1     -1       /local/domain/3/backend/vbd/241/51840
->                  ^ note state, the /dev/sdz doesn't exist in the backend
+> I could create a license that was GPL-2.0-only compatible, and use it to cover a new
+> contribution to the Linux kernel (in dual-license format), in order to get exposure
+> for the license or to promote it.  We could use the SPDX identifier "Tims-license-0.1".
+> I think it would be fair for the community to reject a contribution based
+> on those license circumstances, even though it met all the criteria you mention.
 > 
-> [user@dom0 ~]$ sudo xl block-detach work xvdi
-> [user@dom0 ~]$ xl block-list work
-> Vdev  BE  handle state evt-ch ring-ref BE-path
-> work is an invalid domain identifier
-> 
-> And its console has:
-> 
-> BUG: kernel NULL pointer dereference, address: 0000000000000050
-> PGD 80000000edebb067 P4D 80000000edebb067 PUD edec2067 PMD 0
-> Oops: 0000 [#1] PREEMPT SMP PTI
-> CPU: 1 PID: 52 Comm: xenwatch Not tainted 5.16.18-2.43.fc32.qubes.x86_64 #1
-> RIP: 0010:blk_mq_stop_hw_queues+0x5/0x40
-> Code: 00 48 83 e0 fd 83 c3 01 48 89 85 a8 00 00 00 41 39 5c 24 50 77 c0 5b 5d 41 5c 41 5d c3 c3 0f 1f 80 00 00 00 00 0f 1f 44 00 00 <8b> 47 50 85 c0 74 32 41 54 49 89 fc 55 53 31 db 49 8b 44 24 48 48
-> RSP: 0018:ffffc90000bcfe98 EFLAGS: 00010293
-> RAX: ffffffffc0008370 RBX: 0000000000000005 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000000
-> RBP: ffff88800775f000 R08: 0000000000000001 R09: ffff888006e620b8
-> R10: ffff888006e620b0 R11: f000000000000000 R12: ffff8880bff39000
-> R13: ffff8880bff39000 R14: 0000000000000000 R15: ffff88800604be00
-> FS:  0000000000000000(0000) GS:ffff8880f3300000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000050 CR3: 00000000e932e002 CR4: 00000000003706e0
-> Call Trace:
->  <TASK>
->  blkback_changed+0x95/0x137 [xen_blkfront]
->  ? read_reply+0x160/0x160
->  xenwatch_thread+0xc0/0x1a0
->  ? do_wait_intr_irq+0xa0/0xa0
->  kthread+0x16b/0x190
->  ? set_kthread_struct+0x40/0x40
->  ret_from_fork+0x22/0x30
->  </TASK>
-> Modules linked in: snd_seq_dummy snd_hrtimer snd_seq snd_seq_device snd_timer snd soundcore ipt_REJECT nf_reject_ipv4 xt_state xt_conntrack nft_counter nft_chain_nat xt_MASQUERADE nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 nft_compat nf_tables nfnetlink intel_rapl_msr intel_rapl_common crct10dif_pclmul crc32_pclmul crc32c_intel ghash_clmulni_intel xen_netfront pcspkr xen_scsiback target_core_mod xen_netback xen_privcmd xen_gntdev xen_gntalloc xen_blkback xen_evtchn ipmi_devintf ipmi_msghandler fuse bpf_preload ip_tables overlay xen_blkfront
-> CR2: 0000000000000050
-> ---[ end trace 7bc9597fd06ae89d ]---
-> RIP: 0010:blk_mq_stop_hw_queues+0x5/0x40
-> Code: 00 48 83 e0 fd 83 c3 01 48 89 85 a8 00 00 00 41 39 5c 24 50 77 c0 5b 5d 41 5c 41 5d c3 c3 0f 1f 80 00 00 00 00 0f 1f 44 00 00 <8b> 47 50 85 c0 74 32 41 54 49 89 fc 55 53 31 db 49 8b 44 24 48 48
-> RSP: 0018:ffffc90000bcfe98 EFLAGS: 00010293
-> RAX: ffffffffc0008370 RBX: 0000000000000005 RCX: 0000000000000000
-> RDX: 0000000000000000 RSI: 0000000000000005 RDI: 0000000000000000
-> RBP: ffff88800775f000 R08: 0000000000000001 R09: ffff888006e620b8
-> R10: ffff888006e620b0 R11: f000000000000000 R12: ffff8880bff39000
-> R13: ffff8880bff39000 R14: 0000000000000000 R15: ffff88800604be00
-> FS:  0000000000000000(0000) GS:ffff8880f3300000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000000000050 CR3: 00000000e932e002 CR4: 00000000003706e0
-> Kernel panic - not syncing: Fatal exception
-> Kernel Offset: disabled
-> 
-> info->rq and info->gd are only set in blkfront_connect(), which is
-> called for state 4 (XenbusStateConnected).  Guard against using NULL
-> variables in blkfront_closing() to avoid the issue.
-> 
-> The rest of blkfront_closing looks okay.  If info->nr_rings is 0, then
-> for_each_rinfo won't do anything.
-> 
-> blkfront_remove also needs to check for non-NULL pointers before
-> cleaning up the gendisk and request queue.
-> 
-> Fixes: 05d69d950d9d "xen-blkfront: sanitize the removal state machine"
-> Reported-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
-> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
+> I don't think that the Linux kernel should be used for license promotion, but if it is,
+> then it should be used to promote GPL-v2-only.
 
-Tis looks ok, but do we have anything that prevents races between
-blkfront_connect, blkfront_closing and blkfront_remove?
+I agree, and in a way, I feel like that is what is happening here for
+this original submission.  See below for more...
+
+> > > There were good reasons that the original BSD dual-licenses were
+> > > allowed.  Those same reasons don't apply here.
+> > 
+> > That's just wrong. The reason why dual licensing is allowed is to share
+> > code across licesce preferences. The very same reason applies here.
+> 
+> I was talking about why dual licensing was originally introduced, which was
+> a situation different from what went on in 2016, when the copyleft-next
+> dual license was discussed.
+> 
+> Dual-licensing in the Linux kernel was originally introduced because code was being
+> taken from BSD and placed into Linux (under GPL v2), often by someone other than the
+> original author.  This created a bit of hard feelings between the BSD community
+> and the Linux community.  So dual-licensing was introduced so that derivative works
+> (created by Linux developers) of BSD code could flow back into the BSD project.
+> 
+> This was code that existed before being introduced into Linux, and there was
+> no notion of using the kernel to promote the BSD license.
+
+I agree, dual licensed code that is added to the kernel is either done:
+	- because the original code had a non-GPL license and it was
+	  added so that it could be compatible so that it could be added
+	  to Linux.
+	- because the code being accepted into Linux can also be used in
+	  another non-Linux codebase now or in the future.
+
+The submission here was neither of these.
+
+It was to test core Linux kernel functionality that is ONLY GPL-v2.
+That functionality and interactions within the Linux core could never be
+used in any non-Linux project as it does not make any sense.  Or if it
+could be used in a non-Linux project, that would only be if that project
+was also GPLv2 licensed as the kernel core code would have been copied
+out of Linux into that other project.
+
+I feel that the dual-license of this code is purely done to support an
+additional license and give it attention as it could never be invoked on
+this codebase due to the contents of it.  Which makes it not necessary
+and has only distracted us from the real technical issues of why I
+rejected this code in the first place :(
+
+thanks,
+
+greg k-h
