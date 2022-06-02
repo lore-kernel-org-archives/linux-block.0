@@ -2,158 +2,189 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10FB1C43334
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 06:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C3DC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 06:33:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230465AbiFBGU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 02:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38096 "EHLO
+        id S231187AbiFBGdU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 02:33:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbiFBGUZ (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 02:20:25 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 697FE280B2F;
-        Wed,  1 Jun 2022 23:20:24 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 1D54FB81EC0;
-        Thu,  2 Jun 2022 06:20:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 700BEC385A5;
-        Thu,  2 Jun 2022 06:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1654150821;
-        bh=Gn0mmCHssjpDmMOxhtbBTwvuYite/0yMZNqpBs7V2nE=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=mAWmwIszHR/E98n1VFJCtqm9AVMJpD5/gp2CyX4Vv5NixDiD++yaQLzJte1lSGNKp
-         xuWU6DvmIBmp48RMTO0iZI4wV+Q7MMLEOulO9Jc6txAMg8LocxRjnvBdfi4XDAxWBA
-         Um1envM6ziHjyF3c1yHIpv9bv/zIIyurqyzjyWX8=
-Date:   Thu, 2 Jun 2022 08:20:18 +0200
-From:   "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To:     "Bird, Tim" <Tim.Bird@sony.com>
-Cc:     Thomas Gleixner <tglx@linutronix.de>,
-        Luis Chamberlain <mcgrof@kernel.org>,
-        Richard Fontana <fontana@sharpeleven.org>,
-        "tj@kernel.org" <tj@kernel.org>,
-        "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
-        "jeyu@kernel.org" <jeyu@kernel.org>,
-        "shuah@kernel.org" <shuah@kernel.org>,
-        "bvanassche@acm.org" <bvanassche@acm.org>,
-        "dan.j.williams@intel.com" <dan.j.williams@intel.com>,
-        "joe@perches.com" <joe@perches.com>,
-        "keescook@chromium.org" <keescook@chromium.org>,
-        "rostedt@goodmis.org" <rostedt@goodmis.org>,
-        "minchan@kernel.org" <minchan@kernel.org>,
-        "linux-spdx@vger.kernel.org" <linux-spdx@vger.kernel.org>,
-        "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
-        "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Goldwyn Rodrigues <rgoldwyn@suse.com>,
-        Kuno Woudt <kuno@frob.nl>,
-        "copyleft-next@lists.fedorahosted.org" 
-        <copyleft-next@lists.fedorahosted.org>,
-        Ciaran Farrell <Ciaran.Farrell@suse.com>,
-        Christopher De Nicolo <Christopher.DeNicolo@suse.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Jonathan Corbet <corbet@lwn.net>,
-        Thorsten Leemhuis <linux@leemhuis.info>
-Subject: Re: [PATCH v9 1/6] LICENSES: Add the copyleft-next-0.3.1 license
-Message-ID: <YphWomPaMdLCa3Pt@kroah.com>
-References: <20211029184500.2821444-1-mcgrof@kernel.org>
- <20211029184500.2821444-2-mcgrof@kernel.org>
- <87bkvo0wjd.ffs@tglx>
- <Yo5cxWghV/v2Fnzf@bombadil.infradead.org>
- <BN7PR13MB24998CAFCFB973C80549F308FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
- <Yo5xTwGLmbsgJhfM@bombadil.infradead.org>
- <BN7PR13MB2499BA2AFAC1C79197734D81FDD69@BN7PR13MB2499.namprd13.prod.outlook.com>
- <871qwhz2aa.ffs@tglx>
- <BYAPR13MB2503DAC31B8B5CC69F8FECD3FDDE9@BYAPR13MB2503.namprd13.prod.outlook.com>
+        with ESMTP id S229737AbiFBGdT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 02:33:19 -0400
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14EFD188E5D;
+        Wed,  1 Jun 2022 23:33:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1654151597; x=1685687597;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bfI6YfacDQFmkZ6odkoNNWz0vnBz6nu6DVsXX5PqRSE=;
+  b=UTYKXKFmHTNPwVjoX6Nxzc8d1VWqUFPG2ZGdqAOqtEKZ7w8nL7LfeDJI
+   oMbVkHCgOXTdLRwmmkfU6QS0HTnGMSOo+ZmV8NT3DpPYdwdDJ8y7d1x0X
+   PQCoVyT9v6FrNeay1mFh/AzwJGu/QZFQNrSTF7vqHRCVAv4ucHRk6/IFm
+   tU9ZuBCAzKFsXDtfvMwD2Ot6YHjRsUQ09JZsO8yNlWUPNkYbmYKtFrYfW
+   3OIQXAgVG5dxcq3gbDpVp9qBkx7Ws0q1BovJvrY7B7wNV9aeehgkP13lr
+   WJCtYJPW7YJOihMJUIEvsEC+QxkTteon9F716tTtGr9dCAyTNMu/5MMdy
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10365"; a="275915795"
+X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
+   d="scan'208";a="275915795"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jun 2022 23:33:15 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.91,270,1647327600"; 
+   d="scan'208";a="707418066"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 01 Jun 2022 23:33:13 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1nweOO-0004nN-Gq;
+        Thu, 02 Jun 2022 06:33:12 +0000
+Date:   Thu, 2 Jun 2022 14:32:57 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Waiman Long <longman@redhat.com>, Tejun Heo <tj@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Waiman Long <longman@redhat.com>
+Subject: Re: [PATCH v3 2/2] blk-cgroup: Optimize blkcg_rstat_flush()
+Message-ID: <202206021418.wpJNbe3g-lkp@intel.com>
+References: <20220601211824.89626-3-longman@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BYAPR13MB2503DAC31B8B5CC69F8FECD3FDDE9@BYAPR13MB2503.namprd13.prod.outlook.com>
+In-Reply-To: <20220601211824.89626-3-longman@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 02, 2022 at 04:11:16AM +0000, Bird, Tim wrote:
-> > -----Original Message-----
-> > From: Thomas Gleixner <tglx@linutronix.de>
-> > 
-> > Tim!
-> > 
-> > On Wed, May 25 2022 at 19:05, Bird, Tim wrote:
-> > >> From: Luis Chamberlain <mcgrof@infradead.org> On Behalf Of Luis Chamberlain
-> > >> I agree that we want to keep the number of licenses as small as
-> > >> possible but we cannot really dictate which dual licensing options a
-> > >> submitter selects unless the license is GPL-2.0-only incompatible,
-> > >> which copyleft-next is not.
-> > >
-> > > Um, yes we can dictate that.
-> > 
-> > No!
-> Sorry for the delayed response.  I was on vacation over memorial day weekend
-> (holiday in the US.)
-> 
-> I think that the option to reject a contribution based on its license should be
-> available to the community, using criteria beyond those that Luis has mentioned
-> (and that you mention below).
-> 
-> I could create a license that was GPL-2.0-only compatible, and use it to cover a new
-> contribution to the Linux kernel (in dual-license format), in order to get exposure
-> for the license or to promote it.  We could use the SPDX identifier "Tims-license-0.1".
-> I think it would be fair for the community to reject a contribution based
-> on those license circumstances, even though it met all the criteria you mention.
-> 
-> I don't think that the Linux kernel should be used for license promotion, but if it is,
-> then it should be used to promote GPL-v2-only.
+Hi Waiman,
 
-I agree, and in a way, I feel like that is what is happening here for
-this original submission.  See below for more...
+I love your patch! Perhaps something to improve:
 
-> > > There were good reasons that the original BSD dual-licenses were
-> > > allowed.  Those same reasons don't apply here.
-> > 
-> > That's just wrong. The reason why dual licensing is allowed is to share
-> > code across licesce preferences. The very same reason applies here.
-> 
-> I was talking about why dual licensing was originally introduced, which was
-> a situation different from what went on in 2016, when the copyleft-next
-> dual license was discussed.
-> 
-> Dual-licensing in the Linux kernel was originally introduced because code was being
-> taken from BSD and placed into Linux (under GPL v2), often by someone other than the
-> original author.  This created a bit of hard feelings between the BSD community
-> and the Linux community.  So dual-licensing was introduced so that derivative works
-> (created by Linux developers) of BSD code could flow back into the BSD project.
-> 
-> This was code that existed before being introduced into Linux, and there was
-> no notion of using the kernel to promote the BSD license.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master next-20220601]
+[cannot apply to v5.18]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-I agree, dual licensed code that is added to the kernel is either done:
-	- because the original code had a non-GPL license and it was
-	  added so that it could be compatible so that it could be added
-	  to Linux.
-	- because the code being accepted into Linux can also be used in
-	  another non-Linux codebase now or in the future.
+url:    https://github.com/intel-lab-lkp/linux/commits/Waiman-Long/blk-cgroup-Optimize-blkcg_rstat_flush/20220602-052441
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: x86_64-randconfig-a012 (https://download.01.org/0day-ci/archive/20220602/202206021418.wpJNbe3g-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project c825abd6b0198fb088d9752f556a70705bc99dfd)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/3f979cef411e5d5512b725753034b02f3b7baf44
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Waiman-Long/blk-cgroup-Optimize-blkcg_rstat_flush/20220602-052441
+        git checkout 3f979cef411e5d5512b725753034b02f3b7baf44
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash
 
-The submission here was neither of these.
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-It was to test core Linux kernel functionality that is ONLY GPL-v2.
-That functionality and interactions within the Linux core could never be
-used in any non-Linux project as it does not make any sense.  Or if it
-could be used in a non-Linux project, that would only be if that project
-was also GPLv2 licensed as the kernel core code would have been copied
-out of Linux into that other project.
+All warnings (new ones prefixed by >>):
 
-I feel that the dual-license of this code is purely done to support an
-additional license and give it attention as it could never be invoked on
-this codebase due to the contents of it.  Which makes it not necessary
-and has only distracted us from the real technical issues of why I
-rejected this code in the first place :(
+>> block/blk-cgroup.c:1255:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is true [-Wsometimes-uninitialized]
+           if (!blkcg->lhead)
+               ^~~~~~~~~~~~~
+   block/blk-cgroup.c:1306:9: note: uninitialized use occurs here
+           return ret;
+                  ^~~
+   block/blk-cgroup.c:1255:2: note: remove the 'if' if its condition is always false
+           if (!blkcg->lhead)
+           ^~~~~~~~~~~~~~~~~~
+   block/blk-cgroup.c:1239:33: note: initialize the variable 'ret' to silence this warning
+           struct cgroup_subsys_state *ret;
+                                          ^
+                                           = NULL
+   1 warning generated.
 
-thanks,
 
-greg k-h
+vim +1255 block/blk-cgroup.c
+
+  1234	
+  1235	static struct cgroup_subsys_state *
+  1236	blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
+  1237	{
+  1238		struct blkcg *blkcg;
+  1239		struct cgroup_subsys_state *ret;
+  1240		int i;
+  1241	
+  1242		mutex_lock(&blkcg_pol_mutex);
+  1243	
+  1244		if (!parent_css) {
+  1245			blkcg = &blkcg_root;
+  1246		} else {
+  1247			blkcg = kzalloc(sizeof(*blkcg), GFP_KERNEL);
+  1248			if (!blkcg) {
+  1249				ret = ERR_PTR(-ENOMEM);
+  1250				goto unlock;
+  1251			}
+  1252		}
+  1253	
+  1254		blkcg->lhead = alloc_percpu_gfp(struct llist_head, GFP_KERNEL);
+> 1255		if (!blkcg->lhead)
+  1256			goto free_blkcg;
+  1257		init_blkcg_llists(blkcg);
+  1258	
+  1259		for (i = 0; i < BLKCG_MAX_POLS ; i++) {
+  1260			struct blkcg_policy *pol = blkcg_policy[i];
+  1261			struct blkcg_policy_data *cpd;
+  1262	
+  1263			/*
+  1264			 * If the policy hasn't been attached yet, wait for it
+  1265			 * to be attached before doing anything else. Otherwise,
+  1266			 * check if the policy requires any specific per-cgroup
+  1267			 * data: if it does, allocate and initialize it.
+  1268			 */
+  1269			if (!pol || !pol->cpd_alloc_fn)
+  1270				continue;
+  1271	
+  1272			cpd = pol->cpd_alloc_fn(GFP_KERNEL);
+  1273			if (!cpd) {
+  1274				ret = ERR_PTR(-ENOMEM);
+  1275				goto free_pd_blkcg;
+  1276			}
+  1277			blkcg->cpd[i] = cpd;
+  1278			cpd->blkcg = blkcg;
+  1279			cpd->plid = i;
+  1280			if (pol->cpd_init_fn)
+  1281				pol->cpd_init_fn(cpd);
+  1282		}
+  1283	
+  1284		spin_lock_init(&blkcg->lock);
+  1285		refcount_set(&blkcg->online_pin, 1);
+  1286		INIT_RADIX_TREE(&blkcg->blkg_tree, GFP_NOWAIT | __GFP_NOWARN);
+  1287		INIT_HLIST_HEAD(&blkcg->blkg_list);
+  1288	#ifdef CONFIG_CGROUP_WRITEBACK
+  1289		INIT_LIST_HEAD(&blkcg->cgwb_list);
+  1290	#endif
+  1291		list_add_tail(&blkcg->all_blkcgs_node, &all_blkcgs);
+  1292	
+  1293		mutex_unlock(&blkcg_pol_mutex);
+  1294		return &blkcg->css;
+  1295	
+  1296	free_pd_blkcg:
+  1297		for (i--; i >= 0; i--)
+  1298			if (blkcg->cpd[i])
+  1299				blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
+  1300		free_percpu(blkcg->lhead);
+  1301	free_blkcg:
+  1302		if (blkcg != &blkcg_root)
+  1303			kfree(blkcg);
+  1304	unlock:
+  1305		mutex_unlock(&blkcg_pol_mutex);
+  1306		return ret;
+  1307	}
+  1308	
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
