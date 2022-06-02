@@ -2,222 +2,294 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18C74C43334
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 01:05:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 509ADC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 01:53:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232769AbiFBBFs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 1 Jun 2022 21:05:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53046 "EHLO
+        id S232904AbiFBBxf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 1 Jun 2022 21:53:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232763AbiFBBFr (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 21:05:47 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE2D42A1D70;
-        Wed,  1 Jun 2022 18:05:45 -0700 (PDT)
-Received: from kwepemi100011.china.huawei.com (unknown [172.30.72.53])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LD79R689DzKmHf;
-        Thu,  2 Jun 2022 09:05:31 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- kwepemi100011.china.huawei.com (7.221.188.134) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 2 Jun 2022 09:05:43 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 2 Jun 2022 09:05:42 +0800
-Subject: Re: [PATCH -next v7 2/3] block, bfq: refactor the counting of
- 'num_groups_with_pending_reqs'
-To:     Paolo Valente <paolo.valente@unimore.it>, Jan Kara <jack@suse.cz>
-CC:     Jens Axboe <axboe@kernel.dk>, Tejun Heo <tj@kernel.org>,
-        <cgroups@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220528095020.186970-1-yukuai3@huawei.com>
- <20220528095020.186970-3-yukuai3@huawei.com>
- <0D9355CE-F85B-4B1A-AEC3-F63DFC4B3A54@linaro.org>
- <b9a4ea60-28e5-b7aa-0154-ad7481eafbd3@huawei.com>
- <efe01dd1-0f99-dadf-956d-b0e80e1e602c@huawei.com>
- <1803FD7E-9FB1-4A1E-BD6D-D6657006589A@unimore.it>
- <a0d8452c-e421-45d3-b012-5355207fc0e1@huawei.com>
- <81214347-3806-4F54-B60F-3E5A1A5EC84D@unimore.it>
- <756631ee-6a85-303c-aca1-d60aaf477d0d@huawei.com>
- <20220531100101.pdnrpkxbapur5gsk@quack3.lan>
- <CB1A8F13-76DB-4469-A5CA-D0AD17975E38@unimore.it>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <15f765c1-9399-7fff-6019-10f90fc45095@huawei.com>
-Date:   Thu, 2 Jun 2022 09:05:41 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S232944AbiFBBxf (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 1 Jun 2022 21:53:35 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 255B025F434
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 18:53:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1654134811; x=1685670811;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ubD3ntNWmcpNqwymZFWCFjx8IkEeXWsf6dOGoduVlaU=;
+  b=ffgKB17PGbRsL8cLKPVOBodOZUtl+EN7DoixfkWI1tzFk+sv90iB8JNU
+   Gp8eggzoY8j1YKw/zwplTmXVCzVQEN0k8l1UL88He+hc+9XgxJRFfv86G
+   Bp2n+0LoNw4oq/Y7N4Cwk2+ysZ3nzqjxtB+dRD9Nkpin2LpJRz63OGEL1
+   haEbJBXD1HydU/Y5BN+Aj0JWwihfZdOReI6mSbXBhSgNPo3272QEEafvp
+   rOCEs8ZTlMytiui8CptbTGRZwmuEzaq0RRxJnsd24EVaFJcysxoK3aLz0
+   o3fuFkvZrZR7WOcyjHkuSIFTkecp6LjEAIop0VSnm6MlubbYwSgkAFIyr
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.91,270,1647273600"; 
+   d="scan'208";a="206911461"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 02 Jun 2022 09:53:31 +0800
+IronPort-SDR: M+vVtdUGuvm9tgYgFqN9383Vb3dzsm+X4cAFEwI/FWy9KBt9UF/yFqQB8Ol6S9+/8jcIjl1Hrs
+ E7+PyD54pcSsCZfW2blRsj4dxkdsxe6+KtYTO8bt0Imh5WjTtmMkSNnffMfoW4SvDdT+GS7boL
+ XF32atX+yNMD46DO6UfZQ8UCaw4iYlRpOo5AipvWddxB5sOxvCDK6tSXLLpmenIuv51b7+92mN
+ Zn8UPO7VZh2amHDAsg1r4664xby5VumEcSKuJtGF8OeKwpLhyqj41jdjhRC40Qj37EKBoY9bSn
+ JtQui8ecKc1jb1/BBUJQUHyD
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Jun 2022 18:17:13 -0700
+IronPort-SDR: 7XJDhyKUCeDJehI+iMO2QRYlN/VAHZDp/O0ANYDIpfOjr7p5YvCA12EUbTL9LTd+C9LImZhLaT
+ Ek+9gsML3yMSlw+H8dHuhktGIO5UD+JNLchPycWgQwKpkPH2BDdUFb7LmVTxCVy+/EaPHN96YJ
+ TnNMq18H2kY36nuCWqh5+Riid4KekWXb8fBDTk1vDvQIBpt75eyIqW/AKf1ocDkTOIxMcEWig8
+ ZJjL0DB9oahjRFuCe8qx4VO+S9qKKB4koxfc7mwd48k3UqdCGSFQYjth9ywG4fsv7ae2v4vNgN
+ Iss=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Jun 2022 18:53:33 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LD8Dr3Gsgz1Rwrw
+        for <linux-block@vger.kernel.org>; Wed,  1 Jun 2022 18:53:32 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1654134811; x=1656726812; bh=ubD3ntNWmcpNqwymZFWCFjx8IkEeXWsf6dO
+        GoduVlaU=; b=QA89cWzQFZFkPmS9rLQOKILtu/sn/dlO8VWvuDG6RmcKZufnX+t
+        +qSqKglS9y5/6xjchHQ2BdfHatyv3FE4nb7UzA/LLcSRol73q0qHnez8KGo+FoR+
+        ti3srcAGDIV0NlomCGBb2d9if7OpSl/kuqBtpZT3SShDtx3nFx1iis/4oWWazRB9
+        FKlr0BZ3tvvGd0FvUYhSmEsGQn1DtiOyUAudiDLgVzQeD0lVeedg1KOBEnhS8MV3
+        gk/l/ujNbNDqJu2neJu0l8hXwFe/MRYnrsHQo4vRSYkGq9XkLGPp1a1AAj3bAbTx
+        1pKy3/d4hR7ZolLvPG1jQH2a1Ftya3qi5Lw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 4zf-jHjb8937 for <linux-block@vger.kernel.org>;
+        Wed,  1 Jun 2022 18:53:31 -0700 (PDT)
+Received: from [10.89.84.115] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.84.115])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LD8Dq0Wh3z1Rvlc;
+        Wed,  1 Jun 2022 18:53:30 -0700 (PDT)
+Message-ID: <c79b25f4-88dc-c432-e69b-ef5abdf37720@opensource.wdc.com>
+Date:   Thu, 2 Jun 2022 10:53:29 +0900
 MIME-Version: 1.0
-In-Reply-To: <CB1A8F13-76DB-4469-A5CA-D0AD17975E38@unimore.it>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.1
+Subject: Re: [PATCH 3/3] block: fix default IO priority handling again
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@infradead.org>
+References: <20220601132347.13543-1-jack@suse.cz>
+ <20220601145110.18162-3-jack@suse.cz>
+ <cadb5688-cfba-3311-52d4-533f6afab96e@opensource.wdc.com>
+ <20220601160443.v5cu4oxijjasxhj7@quack3.lan>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220601160443.v5cu4oxijjasxhj7@quack3.lan>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/05/31 20:57, Paolo Valente 写道:
-> 
-> 
->> Il giorno 31 mag 2022, alle ore 12:01, Jan Kara <jack@suse.cz> ha scritto:
->>
->> On Tue 31-05-22 17:33:25, Yu Kuai wrote:
->>> 在 2022/05/31 17:19, Paolo Valente 写道:
->>>>> Il giorno 31 mag 2022, alle ore 11:06, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>
->>>>> 在 2022/05/31 16:36, Paolo VALENTE 写道:
->>>>>>> Il giorno 30 mag 2022, alle ore 10:40, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>>
->>>>>>> 在 2022/05/30 16:34, Yu Kuai 写道:
->>>>>>>> 在 2022/05/30 16:10, Paolo Valente 写道:
->>>>>>>>>
->>>>>>>>>
->>>>>>>>>> Il giorno 28 mag 2022, alle ore 11:50, Yu Kuai <yukuai3@huawei.com> ha scritto:
->>>>>>>>>>
->>>>>>>>>> Currently, bfq can't handle sync io concurrently as long as they
->>>>>>>>>> are not issued from root group. This is because
->>>>>>>>>> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
->>>>>>>>>> bfq_asymmetric_scenario().
->>>>>>>>>>
->>>>>>>>>> The way that bfqg is counted into 'num_groups_with_pending_reqs':
->>>>>>>>>>
->>>>>>>>>> Before this patch:
->>>>>>>>>> 1) root group will never be counted.
->>>>>>>>>> 2) Count if bfqg or it's child bfqgs have pending requests.
->>>>>>>>>> 3) Don't count if bfqg and it's child bfqgs complete all the requests.
->>>>>>>>>>
->>>>>>>>>> After this patch:
->>>>>>>>>> 1) root group is counted.
->>>>>>>>>> 2) Count if bfqg have at least one bfqq that is marked busy.
->>>>>>>>>> 3) Don't count if bfqg doesn't have any busy bfqqs.
->>>>>>>>>
->>>>>>>>> Unfortunately, I see a last problem here. I see a double change:
->>>>>>>>> (1) a bfqg is now counted only as a function of the state of its child
->>>>>>>>>       queues, and not of also its child bfqgs
->>>>>>>>> (2) the state considered for counting a bfqg moves from having pending
->>>>>>>>>       requests to having busy queues
->>>>>>>>>
->>>>>>>>> I'm ok with with (1), which is a good catch (you are lady explained
->>>>>>>>> the idea to me some time ago IIRC).
->>>>>>>>>
->>>>>>>>> Yet I fear that (2) is not ok.  A bfqq can become non busy even if it
->>>>>>>>> still has in-flight I/O, i.e.  I/O being served in the drive.  The
->>>>>>>>> weight of such a bfqq must still be considered in the weights_tree,
->>>>>>>>> and the group containing such a queue must still be counted when
->>>>>>>>> checking whether the scenario is asymmetric.  Otherwise service
->>>>>>>>> guarantees are broken.  The reason is that, if a scenario is deemed as
->>>>>>>>> symmetric because in-flight I/O is not taken into account, then idling
->>>>>>>>> will not be performed to protect some bfqq, and in-flight I/O may
->>>>>>>>> steal bandwidth to that bfqq in an uncontrolled way.
->>>>>>>> Hi, Paolo
->>>>>>>> Thanks for your explanation.
->>>>>>>> My orginal thoughts was using weights_tree insertion/removal, however,
->>>>>>>> Jan convinced me that using bfq_add/del_bfqq_busy() is ok.
->>>>>>>>  From what I see, when bfqq dispatch the last request,
->>>>>>>> bfq_del_bfqq_busy() will not be called from __bfq_bfqq_expire() if
->>>>>>>> idling is needed, and it will delayed to when such bfqq get scheduled as
->>>>>>>> in-service queue again. Which means the weight of such bfqq should still
->>>>>>>> be considered in the weights_tree.
->>>>>>>> I also run some tests on null_blk with "irqmode=2
->>>>>>>> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
->>>>>>>> that service guarantees are still preserved on slow device.
->>>>>>>> Do you this is strong enough to cover your concern?
->>>>>> Unfortunately it is not.  Your very argument is what made be believe
->>>>>> that considering busy queues was enough, in the first place.  But, as
->>>>>> I found out, the problem is caused by the queues that do not enjoy
->>>>>> idling.  With your patch (as well as in my initial version) they are
->>>>>> not counted when they remain without requests queued.  And this makes
->>>>>> asymmetric scenarios be considered erroneously as symmetric.  The
->>>>>> consequence is that idling gets switched off when it had to be kept
->>>>>> on, and control on bandwidth is lost for the victim in-service queues.
->>>>>
->>>>> Hi，Paolo
->>>>>
->>>>> Thanks for your explanation, are you thinking that if bfqq doesn't enjoy
->>>>> idling, then such bfqq will clear busy after dispatching the last
->>>>> request?
->>>>>
->>>>> Please kindly correct me if I'm wrong in the following process:
->>>>>
->>>>> If there are more than one bfqg that is activatied, then bfqqs that are
->>>>> not enjoying idle are still left busy after dispatching the last
->>>>> request.
->>>>>
->>>>> details in __bfq_bfqq_expire:
->>>>>
->>>>>         if (RB_EMPTY_ROOT(&bfqq->sort_list) &&
->>>>>         ┊   !(reason == BFQQE_PREEMPTED &&
->>>>>         ┊     idling_needed_for_service_guarantees(bfqd, bfqq))) {
->>>>> -> idling_needed_for_service_guarantees will always return true,
->>>>
->>>> It returns true only is the scenario is symmetric.  Not counting bfqqs
->>>> with in-flight requests makes an asymmetric scenario be considered
->>>> wrongly symmetric.  See function bfq_asymmetric_scenario().
+On 2022/06/02 1:04, Jan Kara wrote:
+> On Thu 02-06-22 00:08:28, Damien Le Moal wrote:
+>> On 2022/06/01 23:51, Jan Kara wrote:
+>>> Commit e70344c05995 ("block: fix default IO priority handling")
+>>> introduced an inconsistency in get_current_ioprio() that tasks without
+>>> IO context return IOPRIO_DEFAULT priority while tasks with freshly
+>>> allocated IO context will return 0 (IOPRIO_CLASS_NONE/0) IO priority.
+>>> Tasks without IO context used to be rare before 5a9d041ba2f6 ("block:
+>>> move io_context creation into where it's needed") but after this commit
+>>> they became common because now only BFQ IO scheduler setups task's IO
+>>> context. Similar inconsistency is there for get_task_ioprio() so this
+>>> inconsistency is now exposed to userspace and userspace will see
+>>> different IO priority for tasks operating on devices with BFQ compared
+>>> to devices without BFQ. Furthemore the changes done by commit
+>>> e70344c05995 change the behavior when no IO priority is set for BFQ IO
+>>> scheduler which is also documented in ioprio_set(2) manpage - namely
+>>> that tasks without set IO priority will use IO priority based on their
+>>> nice value.
 >>>
->>> Hi, Paolo
+>>> So make sure we default to IOPRIO_CLASS_NONE as used to be the case
+>>> before commit e70344c05995. Also cleanup alloc_io_context() to
+>>> explicitely set this IO priority for the allocated IO context.
 >>>
->>> Do you mean this gap?
+>>> Fixes: e70344c05995 ("block: fix default IO priority handling")
+>>> Signed-off-by: Jan Kara <jack@suse.cz>
+>>> ---
+>>>  block/blk-ioc.c        | 2 ++
+>>>  include/linux/ioprio.h | 2 +-
+>>>  2 files changed, 3 insertions(+), 1 deletion(-)
 >>>
->>> 1. io1 is issued from bfqq1(from bfqg1)
->>> 2. bfqq1 dispatched this io, it's busy is cleared
->>> 3. *before io1 is completed*, io2 is issued from bfqq2(bfqg2)
+>>> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
+>>> index df9cfe4ca532..63fc02042408 100644
+>>> --- a/block/blk-ioc.c
+>>> +++ b/block/blk-ioc.c
+>>> @@ -247,6 +247,8 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
+>>>  	INIT_HLIST_HEAD(&ioc->icq_list);
+>>>  	INIT_WORK(&ioc->release_work, ioc_release_fn);
+>>>  #endif
+>>> +	ioc->ioprio = IOPRIO_DEFAULT;
+>>> +
+>>>  	return ioc;
+>>>  }
+>>>  
+>>> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+>>> index 774bb90ad668..d9dc78a15301 100644
+>>> --- a/include/linux/ioprio.h
+>>> +++ b/include/linux/ioprio.h
+>>> @@ -11,7 +11,7 @@
+>>>  /*
+>>>   * Default IO priority.
+>>>   */
+>>> -#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM)
+>>> +#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0)
 >>
->> Yes. So as far as I understand Paolo is concerned about this scenario.
+>> "man ioprio_set" says:
 >>
->>> 4. with this patchset, while dispatching io2 from bfqq2, the scenario
->>> should be symmetric while it's considered wrongly asymmetric.
+>> IOPRIO_CLASS_BE (2)
+>> This is the best-effort scheduling class, which is the default for any process
+>> that hasn't set  a  specific I/O  priority.
 >>
->> But with this patchset, we will consider this scenario symmetric because at
->> any point in time there is only one busy bfqq. Before, we considered this
->> scenario asymmetric because two different bfq groups have bfqq in their
->> weights_tree. So before this patchset
->> idling_needed_for_service_guarantees() returned true, after this patchset
->> the function returns false so we won't idle anymore and Paolo argues that
->> bfqq1 does not get adequate protection from bfqq2 as a result.
->>
->> I agree with Paolo this seems possible. The fix is relatively simple though
->> - instead of changing how weights_tree is used for weight raised queues as
->> you did originally, I'd move the accounting of groups with pending requests
->> to bfq_add/del_bfqq_busy() and bfq_completed_request().
->>
+>> Which is why patch e70344c05995 introduced IOPRIO_DEFAULT definition using the
+>> BE class, to have the kernel in sync with the manual.
 > 
-> Why don't we use simply the existing logic? I mean, as for the changes made by this patch, we could simply turn the loop:
+> Yes, but it also has:
 > 
-> void bfq_weights_tree_remove(struct bfq_data *bfqd,
-> 			     struct bfq_queue *bfqq)
-> {
+>        If no I/O scheduler has been set for a thread, then by default the  I/O
+>        priority  will  follow  the  CPU nice value (setpriority(2)).  In Linux
+>        kernels before version 2.6.24, once an I/O priority had been set  using
+>        ioprio_set(),  there was no way to reset the I/O scheduling behavior to
+>        the default.  Since Linux 2.6.24, specifying ioprio as 0 can be used to
+>        reset to the default I/O scheduling behavior.
+> 
+> So apparently even the manpage itself is inconsistent ;) (and I will
+> neglect the mistake that the text says "no I/O scheduler" instead of "no
+> I/O priority"). And there is actually code in BFQ (and there used to be
+> code in CFQ) that does:
+
+Arg, indeed, it is a mess. We need to fix this manpage too.
+
+
+>         switch (ioprio_class) {
 > 	...
-> 	for_each_entity(entity) {
-> 		struct bfq_sched_data *sd = entity->my_sched_data;
-> 
-> 		...
-> 		if (entity->in_groups_with_pending_reqs) {
-> 			entity->in_groups_with_pending_reqs = false;
-> 			bfqd->num_groups_with_pending_reqs--;
-> 		}
-> 	}
-> 	...
-> }
-> 
-> into a single:
-> 
-> 	bfqd->num_groups_with_pending_reqs--;
-> 
-> so that only the parent group is concerned.
-> 
-> Thanks,
-> Paolo
+>         case IOPRIO_CLASS_NONE:
+>                 /*
+>                  * No prio set, inherit CPU scheduling settings.
+>                  */
+>                 bfqq->new_ioprio = task_nice_ioprio(tsk);
+>                 bfqq->new_ioprio_class = task_nice_ioclass(tsk);
+>                 break;
+> 	
+> So IOPRIO_CLASS_NONE indeed has a meaning and it used to be the default
+> one until Christoph's 5a9d041ba2f6 in most cases. Your change e70344c05995
+> happening before that actually didn't change much practically because IO
+> contexts were initialized with 0 priority anyway and that was what
+> get_current_ioprio() was returning.
 
-Hi, Paolo
+5a9d041ba2f6 was from Jens, but agreed, io priority initialization never has
+been correct.
 
-Can you please take a look if this patchset(v9) delivered to you? There
-are still some problems with out mail server...
+> 
+>> The different ioprio leading to no BIO merging is definitely a problem
+>> but this patch is not really fixing anything in my opinion. It simply
+>> gets back to the previous "all 0s" ioprio initialization, which do not
+>> show the places where we actually have missing ioprio initialization to
+>> IOPRIO_DEFAULT.
+> 
+> So I agree we should settle on how to treat IOs with unset IO priority. The
+> behavior to use task's CPU priority when IO priority is unset is there for
+> a *long* time and so I think we should preserve that. The question is where
+> in the stack should the switch from "unset" value to "effective ioprio"
+> happen. Switching in IO context is IMO too early since userspace needs to
+> be able to differentiate "unset" from "set to
+> IOPRIO_CLASS_BE,IOPRIO_BE_NORM". But we could have a helper like
+> current_effective_ioprio() that will do the magic with mangling unset IO
+> priority based on task's CPU priority.
 
-https://patchwork.kernel.org/project/linux-block/cover/20220601114340.949953-1-yukuai3@huawei.com/
+I agree that the task's CPU priority is a more sensible default. However, I do
+not understand your point about the IO context being too early to set the
+effective priority. If we do not do that, getting the issuer CPU priority will
+not be easily possible, right ?
 
-Thanks,
-Kuai
+> 
+> The fact is that bio->bi_ioprio gets set to anything only for direct IO in
+> iomap_dio_rw(). The rest of the IO has priority unset (BFQ fetches the
+> priority from task's IO context and ignores priority on bios BTW). And the
+> only place where req->ioprio (inherited from bio->bi_ioprio) gets used is
+> in a few drivers to set HIGHPRI flag for IOPRIO_CLASS_RT IO and then the
+> relatively new code in mq-deadline.
+
+Yes, only IOPRIO_CLASS_RT has an effect at the hardware level right now.
+Everything else is only for the IO scheduler to play with. I am preparing a
+patch series to support scsi/ata command duration limits though. That adds a new
+IOPRIO_CLASS_DL and that one will also have an effect on the hardware.
+
+Note that if a process/thread use ioprio_set(), we should also honor the ioprio
+set for buffered reads, at least those page IOs that are issued directly from
+the IO issuer context (which may include readahead... hmmm).
+
+> 
+> So it all is very inconsistent mess :-|
+
+Indeed it is.
+
+> 
+>> Isn't it simply that IOPRIO_DEFAULT should be set as the default for any bio
+>> being allocated (in bio_alloc ?) before it is setup and inherits the user io
+>> priority ? Otherwise, the bio io prio is indeed IOPRIO_CLASS_NONE/0 and changing
+>> IOPRIO_DEFAULT to that value removes the differences you observed.
+> 
+> Yes, I think that would make sence although as I explain above this is
+> somewhat independent to what the default IO priority behavior should be.
+I am OK with the use of the task CPU priority/ionice value as the default when
+no other ioprio is set for a bio using the user aio_reqprio or ioprio_set(). If
+this relies on task_nice_ioclass() as it is today (I see no reason to change
+that), then the default class for regular tasks remains IOPRIO_CLASS_BE as is
+defined by IOPRIO_DEFAULT.
+
+But to avoid the performance regression you observed, we really need to be 100%
+sure that all bios have their ->bi_ioprio field correctly initialized. Something
+like:
+
+void bio_set_effective_ioprio(struct *bio)
+{
+	switch (IOPRIO_PRIO_CLASS(bio->bi_ioprio)) {
+	case IOPRIO_CLASS_RT:
+	case IOPRIO_CLASS_BE:
+	case IOPRIO_CLASS_IDLE:
+		/*
+		 * the bio ioprio was already set from an aio kiocb ioprio
+		 * (aio->aio_reqprio) or from the issuer context ioprio if that
+		 * context used ioprio_set().
+		 */;
+		return;
+	case IOPRIO_CLASS_NONE:
+	default:
+		/* Use the current task CPU priority */
+		bio->ioprio =
+			IOPRIO_PRIO_VALUE(task_nice_ioclass(current),
+					  task_nice_ioprio(current));
+		return;
+	}
+}
+
+being called before a bio is inserted in a scheduler or bypass inserted in the
+dispatch queues should result in all BIOs having an ioprio that is set to
+something other than IOPRIO_CLASS_NONE. And the obvious place may be simply at
+the beginning of submit_bio(), before submit_bio_noacct() is called.
+
+I am tempted to argue that block device drivers should never see any req with an
+ioprio set to IOPRIO_CLASS_NONE, which means that no bio should ever enter the
+block stack with that ioprio either. With the above solution, bios from DM
+targets submitted with submit_bio_noacct() could still have IOPRIO_CLASS_NONE...
+So would submit_bio_noacct() be the better place to call the effective ioprio
+helper ?
+
+
+-- 
+Damien Le Moal
+Western Digital Research
