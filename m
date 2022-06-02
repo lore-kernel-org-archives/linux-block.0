@@ -2,64 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A84CCA47A
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 16:31:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CFACCCA47B
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 16:46:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237066AbiFBQbH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 12:31:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53006 "EHLO
+        id S237182AbiFBQqM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 12:46:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237057AbiFBQbH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 12:31:07 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE602B12C5
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 09:31:01 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id p8so3728331qtx.9
-        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 09:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=k8kPkxVeNMtdQt55yGN/Nkf+fdNFP4n1eqHNYFzt/EM=;
-        b=RBKGIdGVGyENiynuzvWzxsfKrlShOYG7LDNM6zk7j/0cpFAWM0CNoQ/RikC676Zwip
-         BMHOMh5FSPCGjY61J1z6G+8c1X+4G/XGBmJ3fum6tDtClMi6od+zOdkcyAAKXb0oiOit
-         b12jjL7nGu0mjk8vwPx18er2whDmGOBIM4slv0jp+xyv6iWVZkV8Hkprx2Ft3TnlNr8S
-         F3ZKnuaS0udbsMCk0y55d04otKL6PRXBEyvPN62xIots/ndr10XIEf2q5FJvYZj2hwlD
-         Ppp12ccOTvvIFXm+WxGW6jlLIOBk5xmPC4ktWEJBo/O94h/wW5jv5ZkhHpnGnc8M8pyV
-         u4zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=k8kPkxVeNMtdQt55yGN/Nkf+fdNFP4n1eqHNYFzt/EM=;
-        b=61F5Yv1oazP3auh5jY0dpLvFjIRkUwLymhYOvesxu3ZELki/MM5V/Sh4IrBfMH/Y8/
-         Yxyt5ZuJAuC/HnTEq8uu0Os5rLjMyVHEz7Hi8l0b9rFwazzVlSsddL8FthK+hctH63eh
-         4R5Inx18u63RG0nLayT02oFe/OJOHgTAvVb3p6R499IKcQL1d/Yr8/sNItINjEQFhpWC
-         0nrlyS61ulpEVDf4IN6t+tQpjdD+LxwRsrzb76+2Z6JZVgXyEm8+DT1WL8mn1KFZSdeJ
-         t3AzYyUrAqER4MrUVEAy958D7qdX+gCkh76Ot4GYYA0wT/r9v0nb/Y5jddK/jB/tKl5m
-         XK1Q==
-X-Gm-Message-State: AOAM532iCe/XejKDWX4RRdwL6UYIhjQSKBz6wJwRh4u8++WPoyacorZS
-        wd9pExsebGHk1sxqPdhMBKAS2w==
-X-Google-Smtp-Source: ABdhPJzLJBnwcPaBtEw6VCmlLIOgqY/pJrxby5kBrBBtbBNr2VGXxQBgSbsEw14Z2kEr0zlwr/+sfg==
-X-Received: by 2002:ac8:5e49:0:b0:304:c7db:6a2f with SMTP id i9-20020ac85e49000000b00304c7db6a2fmr4316676qtx.274.1654187460731;
-        Thu, 02 Jun 2022 09:31:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id ci11-20020a05622a260b00b00304bc2acc25sm3261689qtb.6.2022.06.02.09.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 09:30:59 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nwnit-00GTLv-7Y; Thu, 02 Jun 2022 13:30:59 -0300
-Date:   Thu, 2 Jun 2022 13:30:59 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
+        with ESMTP id S237183AbiFBQqE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 12:46:04 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6DCC2B12FC;
+        Thu,  2 Jun 2022 09:46:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=yHMITh+N130iuSnYvU2I4WotSms4ADBqIIhjmWEL4ZQ=; b=O6Xl4kM8MUO00BCgiQ9hWPp+gB
+        2m7ZVz8sHNAOQKpiy5iEU/brZWoHl9L3YI08j4vZrZwZONQy6WWyOSXW66i+Zcv9QKlOeesm8TgjQ
+        pABnUdHP29eKXg17nEZ/MnWYIcmY/29mOmJme4RbBeYYarSUthGM7iOo3qpUFKlkgq37Ue76GJEjA
+        MfSw6YBYC+/0IQghP6E8FIRiZlTGbFFCXvUfzWrCRinU718CfdX6Eh08/4ZrDvJWXnPQwmRp+4WdA
+        1qxJEJvrytnpdt9tHqZk0bsYRw6b+C0O39SAOTytYjPcg2eYDgsp57ejuIJbnxeryaQkNoi8uOxrW
+        ueUPAsxQ==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1nwnxQ-00EOAT-Fz; Thu, 02 Jun 2022 10:46:01 -0600
+Message-ID: <28824558-4fd5-e054-6c8d-5e045d52f795@deltatee.com>
+Date:   Thu, 2 Jun 2022 10:45:55 -0600
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-CA
+To:     Jason Gunthorpe <jgg@ziepe.ca>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
         linux-mm@kvack.org, iommu@lists.linux-foundation.org,
         Stephen Bates <sbates@raithlin.com>,
         Christoph Hellwig <hch@lst.de>,
         Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
         John Hubbard <jhubbard@nvidia.com>,
         Don Dutile <ddutile@redhat.com>,
         Matthew Wilcox <willy@infradead.org>,
@@ -76,8 +58,6 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220602163059.GL2960187@ziepe.ca>
 References: <20220407154717.7695-1-logang@deltatee.com>
  <20220407154717.7695-21-logang@deltatee.com>
  <20220527125501.GD2960187@ziepe.ca>
@@ -86,32 +66,51 @@ References: <20220407154717.7695-1-logang@deltatee.com>
  <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
  <20220602000038.GK2960187@ziepe.ca>
  <400baba7-1cd6-09d4-4de9-2a73f08afc79@deltatee.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <400baba7-1cd6-09d4-4de9-2a73f08afc79@deltatee.com>
+ <20220602163059.GL2960187@ziepe.ca>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <20220602163059.GL2960187@ziepe.ca>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: jgg@ziepe.ca, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, andrzej.jakowski@intel.com, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, bhelgaas@google.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 02, 2022 at 10:16:10AM -0600, Logan Gunthorpe wrote:
 
-> > Just stuff the pages into the mmap, and your driver unprobe will
-> > automatically block until all the mmaps are closed - no different than
-> > having an open file descriptor or something.
+
+
+On 2022-06-02 10:30, Jason Gunthorpe wrote:
+> On Thu, Jun 02, 2022 at 10:16:10AM -0600, Logan Gunthorpe wrote:
 > 
-> Oh is that what we want?
+>>> Just stuff the pages into the mmap, and your driver unprobe will
+>>> automatically block until all the mmaps are closed - no different than
+>>> having an open file descriptor or something.
+>>
+>> Oh is that what we want?
+> 
+> Yes, it is the typical case - eg if you have a sysfs file open unbind
+> hangs indefinitely. Many drivers can't unbind while they have open file
+> descriptors/etc.
+> 
+> A couple drivers go out of their way to allow unbinding while a live
+> userspace exists but this can get complicated. Usually there should be
+> a good reason.
 
-Yes, it is the typical case - eg if you have a sysfs file open unbind
-hangs indefinitely. Many drivers can't unbind while they have open file
-descriptors/etc.
+This is not my experience. All the drivers I've worked with do not block
+unbind with open file descriptors (at least for char devices). I know,
+for example, that having a file descriptor open of /dev/nvmeX does not
+cause unbinding to block. I figured this was the expectation as the
+userspace process doing the unbind won't be able to be interrupted
+seeing there's no way to fail on that path. Though, it certainly would
+make things a lot easier if the unbind can block indefinitely as it
+usually requires some complicated locking.
 
-A couple drivers go out of their way to allow unbinding while a live
-userspace exists but this can get complicated. Usually there should be
-a good reason.
+Do you have an example of this? What mechanisms are developers using to
+block unbind with open file descriptors?
 
-The module will already be refcounted anyhow because the mmap points
-to a char file which holds a module reference - meaning a simple rmmod
-of the driver shouldn't work already..
-
-Jason
+Logan
