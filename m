@@ -2,100 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB231C43334
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 13:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C5D2CCA478
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 15:02:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235425AbiFBNgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 09:36:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51988 "EHLO
+        id S236322AbiFBPCT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 11:02:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235428AbiFBNgA (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 09:36:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5E40E70379
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 06:35:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654176958;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=YXLuT1Yk9DAXTYl5NoX/oMeS35ik4rQo8uu3jun7bK8=;
-        b=KHk8Q0w88jKlWb3n+xQS225haxcacaJ8aBPgvh4NmJKIPPUB1tIQhWpmDmDbnmAGzg4B68
-        yW1QClx/IA8DbkKaBxR9UslDK0e9kXSaXdCzbgW3IWS/TFEJvS5dODtYQDEvfgB7iupY2E
-        AX61bzFZnqPbitOdkUIOBbfNchcjEx0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-610-kEgn3EQiObSe0z98QPm7CQ-1; Thu, 02 Jun 2022 09:35:52 -0400
-X-MC-Unique: kEgn3EQiObSe0z98QPm7CQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2F00B3C7B139;
-        Thu,  2 Jun 2022 13:35:52 +0000 (UTC)
-Received: from llong.com (unknown [10.22.32.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id DD7D02166B26;
-        Thu,  2 Jun 2022 13:35:51 +0000 (UTC)
-From:   Waiman Long <longman@redhat.com>
-To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
-Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
-        Waiman Long <longman@redhat.com>
-Subject: [PATCH v5 1/3] blk-cgroup: Correctly free percpu iostat_cpu in blkg on error exit
-Date:   Thu,  2 Jun 2022 09:35:41 -0400
-Message-Id: <20220602133543.128088-2-longman@redhat.com>
-In-Reply-To: <20220601211824.89626-1-longman@redhat.com>
-References: <20220601211824.89626-1-longman@redhat.com>
+        with ESMTP id S236330AbiFBPCS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 11:02:18 -0400
+X-Greylist: delayed 133 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 02 Jun 2022 08:02:17 PDT
+Received: from mail1.wrs.com (unknown-3-146.windriver.com [147.11.3.146])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A765411E1F8;
+        Thu,  2 Jun 2022 08:02:17 -0700 (PDT)
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.corp.ad.wrs.com [147.11.82.252])
+        by mail1.wrs.com (8.15.2/8.15.2) with ESMTPS id 252F2AvY010739
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+        Thu, 2 Jun 2022 08:02:10 -0700
+Received: from otp-dpanait-l2.corp.ad.wrs.com (128.224.125.150) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.12; Thu, 2 Jun 2022 08:02:08 -0700
+From:   Dragos-Marian Panait <dragos.panait@windriver.com>
+To:     <stable@vger.kernel.org>
+CC:     Haimin Zhang <tcs.kernel@gmail.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
+        Dragos-Marian Panait <dragos.panait@windriver.com>
+Subject: [PATCH 4.14 1/1] block-map: add __GFP_ZERO flag for alloc_page in function bio_copy_kern
+Date:   Thu, 2 Jun 2022 18:01:57 +0300
+Message-ID: <20220602150157.2255674-2-dragos.panait@windriver.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20220602150157.2255674-1-dragos.panait@windriver.com>
+References: <20220602150157.2255674-1-dragos.panait@windriver.com>
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [128.224.125.150]
+X-ClientProxiedBy: ala-exchng01.corp.ad.wrs.com (147.11.82.252) To
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup
-rstat") changes block cgroup IO stats to use the rstat APIs. It added
-a new percpu iostat_cpu field into blkg. The blkg_alloc() was modified
-to allocate the new percpu iostat_cpu but didn't free it when an error
-happened. Fix this by freeing the percpu iostat_cpu on error exit.
+From: Haimin Zhang <tcs.kernel@gmail.com>
 
-Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
-Signed-off-by: Waiman Long <longman@redhat.com>
-Acked-by: Tejun Heo <tj@kernel.org>
+commit cc8f7fe1f5eab010191aa4570f27641876fa1267 upstream.
+
+Add __GFP_ZERO flag for alloc_page in function bio_copy_kern to initialize
+the buffer of a bio.
+
+Signed-off-by: Haimin Zhang <tcs.kernel@gmail.com>
+Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+Reviewed-by: Christoph Hellwig <hch@lst.de>
+Link: https://lore.kernel.org/r/20220216084038.15635-1-tcs.kernel@gmail.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+[DP: Backported to 4.14: Manually added __GFP_ZERO flag]
+Signed-off-by: Dragos-Marian Panait <dragos.panait@windriver.com>
 ---
- block/blk-cgroup.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ block/bio.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 40161a3f68d0..acd9b0aa8dc8 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -219,11 +219,11 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 		return NULL;
+diff --git a/block/bio.c b/block/bio.c
+index 30df1b45dde8..1eaf31976702 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1657,7 +1657,7 @@ struct bio *bio_copy_kern(struct request_queue *q, void *data, unsigned int len,
+ 		if (bytes > len)
+ 			bytes = len;
  
- 	if (percpu_ref_init(&blkg->refcnt, blkg_release, 0, gfp_mask))
--		goto err_free;
-+		goto err_free_blkg;
+-		page = alloc_page(q->bounce_gfp | gfp_mask);
++		page = alloc_page(q->bounce_gfp | __GFP_ZERO | gfp_mask);
+ 		if (!page)
+ 			goto cleanup;
  
- 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
- 	if (!blkg->iostat_cpu)
--		goto err_free;
-+		goto err_free_blkg;
- 
- 	if (!blk_get_queue(q))
- 		goto err_free;
-@@ -259,6 +259,9 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
- 	return blkg;
- 
- err_free:
-+	free_percpu(blkg->iostat_cpu);
-+
-+err_free_blkg:
- 	blkg_free(blkg);
- 	return NULL;
- }
 -- 
-2.31.1
+2.36.1
 
