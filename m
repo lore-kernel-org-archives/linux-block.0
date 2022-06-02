@@ -2,80 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF9DDC433EF
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 19:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1868C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 19:21:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238331AbiFBTNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 15:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39046 "EHLO
+        id S238631AbiFBTU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 15:20:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43724 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238437AbiFBTM6 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 15:12:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 15CD6101C9
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 12:12:58 -0700 (PDT)
+        with ESMTP id S238464AbiFBTUo (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 15:20:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 3733AE03A
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 12:20:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654197177;
+        s=mimecast20190719; t=1654197641;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=ura6WzJRfDCe639hKtMahR5YURQ9sPrCG1JQZM8gR34=;
-        b=QIRXaLXQPNcR+T3pSWTavt/mCfYgHvX7fff5mvqqvQ4bABMdka3p5jTg2EqdU0GaTuWeKk
-        XrZEfkqOux2emF3Mb+OwJIXMEhOC87eX+ltokKx/QZnowjQtJ7Vwm7BLjWzk+YGg8keYhj
-        h6DRji3QsYXGW/daXxm9UII/iImSq10=
+        bh=YXLuT1Yk9DAXTYl5NoX/oMeS35ik4rQo8uu3jun7bK8=;
+        b=K4QL8BlnWy7vmo4+TM40WeRZfVhcm35ExfhlLD8jug3ylBUfeq+/hnJPi2XwUK6p1yLL9G
+        zqXMgl+11omYkMdMUGxd69tOWW3jl7UURl+pc88ODAe7a1dhaLRiOX+5NWUqn/aCbyio+8
+        NOe+ZbgCSRrRW+vlYP2HLjg0kE83jt0=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-283-l6nvbvmKOSeZhTBelqCCeQ-1; Thu, 02 Jun 2022 15:12:54 -0400
-X-MC-Unique: l6nvbvmKOSeZhTBelqCCeQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+ us-mta-464-JYHiyKh-OYa4-xByhrW6Jg-1; Thu, 02 Jun 2022 15:20:39 -0400
+X-MC-Unique: JYHiyKh-OYa4-xByhrW6Jg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 993753C10142;
-        Thu,  2 Jun 2022 19:12:53 +0000 (UTC)
-Received: from [10.22.32.147] (unknown [10.22.32.147])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5CD8F403371;
-        Thu,  2 Jun 2022 19:12:53 +0000 (UTC)
-Message-ID: <3ba0799f-c008-bbdf-bbc1-626d8bb4b821@redhat.com>
-Date:   Thu, 2 Jun 2022 15:12:53 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v5 4/4] blk-cgroup: Document the design of new lockless
- iostat_cpu list
-Content-Language: en-US
-To:     Tejun Heo <tj@kernel.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220602133543.128088-2-longman@redhat.com>
- <20220602185401.162937-1-longman@redhat.com>
- <YpkJ6rDTR24ScuEq@slm.duckdns.org>
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B645738005CB;
+        Thu,  2 Jun 2022 19:20:38 +0000 (UTC)
+Received: from llong.com (unknown [10.22.32.147])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 6FB9940CFD0A;
+        Thu,  2 Jun 2022 19:20:38 +0000 (UTC)
 From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <YpkJ6rDTR24ScuEq@slm.duckdns.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+To:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc:     cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>,
+        Waiman Long <longman@redhat.com>
+Subject: [PATCH v6 1/3] blk-cgroup: Correctly free percpu iostat_cpu in blkg on error exit
+Date:   Thu,  2 Jun 2022 15:20:18 -0400
+Message-Id: <20220602192020.166940-2-longman@redhat.com>
+In-Reply-To: <20220602192020.166940-1-longman@redhat.com>
+References: <20220602192020.166940-1-longman@redhat.com>
+MIME-Version: 1.0
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/2/22 15:05, Tejun Heo wrote:
-> On Thu, Jun 02, 2022 at 02:54:01PM -0400, Waiman Long wrote:
->> A set of percpu lockless lists per block cgroup (blkcg) is added to
->> track the set of recently updated iostat_cpu structures. Add comment
->> in the code to document the design of this new set of lockless lists.
->>
->> Signed-off-by: Waiman Long <longman@redhat.com>
-> Acked-by: Tejun Heo <tj@kernel.org>
->
-> Thanks.
+Commit f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup
+rstat") changes block cgroup IO stats to use the rstat APIs. It added
+a new percpu iostat_cpu field into blkg. The blkg_alloc() was modified
+to allocate the new percpu iostat_cpu but didn't free it when an error
+happened. Fix this by freeing the percpu iostat_cpu on error exit.
 
-I have just realized that I forgot to free the percpu blkcg->lhead in 
-blkcg_css_free(). I will send out v6 with this change as well as 
-integrating this documentation patch back. Sorry for the omission.
+Fixes: f73316482977 ("blk-cgroup: reimplement basic IO stats using cgroup rstat")
+Signed-off-by: Waiman Long <longman@redhat.com>
+Acked-by: Tejun Heo <tj@kernel.org>
+---
+ block/blk-cgroup.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Thanks,
-Longman
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 40161a3f68d0..acd9b0aa8dc8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -219,11 +219,11 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 		return NULL;
+ 
+ 	if (percpu_ref_init(&blkg->refcnt, blkg_release, 0, gfp_mask))
+-		goto err_free;
++		goto err_free_blkg;
+ 
+ 	blkg->iostat_cpu = alloc_percpu_gfp(struct blkg_iostat_set, gfp_mask);
+ 	if (!blkg->iostat_cpu)
+-		goto err_free;
++		goto err_free_blkg;
+ 
+ 	if (!blk_get_queue(q))
+ 		goto err_free;
+@@ -259,6 +259,9 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
+ 	return blkg;
+ 
+ err_free:
++	free_percpu(blkg->iostat_cpu);
++
++err_free_blkg:
+ 	blkg_free(blkg);
+ 	return NULL;
+ }
+-- 
+2.31.1
 
