@@ -2,132 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C2CCCA47D
-	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 17:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFD5DC433EF
+	for <linux-block@archiver.kernel.org>; Thu,  2 Jun 2022 17:46:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237553AbiFBR2Q (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 13:28:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60980 "EHLO
+        id S237663AbiFBRqv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 13:46:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59330 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236282AbiFBR2O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 13:28:14 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2EF623141
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 10:28:13 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id 190so4142776qkj.8
-        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 10:28:13 -0700 (PDT)
+        with ESMTP id S237660AbiFBRqu (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 13:46:50 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C71739A;
+        Thu,  2 Jun 2022 10:46:48 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id 187so5336022pfu.9;
+        Thu, 02 Jun 2022 10:46:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
+        d=gmail.com; s=20210112;
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=GuOinXdzP0oJ6BfwGVGRF9opnqUN4LYO3Y/RmknOScs=;
-        b=nERzx0gJZv2PpNEuSU7ZGuwa6QR4KAFkZQcX+7G15YcgRySvW6qb9+1khratoVExRd
-         E2cV1E+y5eNUdrv7iEhYvw6adm9tR0J0w0Y5RG/qlzn3N/ExPpw5VFSVcBiyiAfseShj
-         RtXbQnx/36eWCdWlBGeV1GIY74fg8syx0d0tBb6JCdM+OFqTrueuf3t4tmn+ivjrfwFi
-         G+YqxQ/XoZIxp/zm5ZUgHxZvv3ENrre3J5G2iipdg5D6ioSBpapAVxA8rxNBc3hfH6JN
-         xgR8Rb7bKKjuhDjx6rhbKloVBy4fbfQj9wlUkZziCVhgTTnOfjGMKfLsZNNy+YXFPJkc
-         II8g==
+        bh=S0kiPQZyWlYVIOJkiV7UkjYaE9b35apJIAe4jrH0pmE=;
+        b=kO2DY3HPvb+3eEPd6LYATCmZzcBFTRNM1TmFlyQ3BCQ39OQfDP/80su+HJub539UCX
+         mAAf/8f5bBYQJFafrQBX7h++LbgnuLdMzl84tr9BbOpVvDrSmosmtasLj+l+LzkUbHe2
+         WugmU0OhU6xm0rEawAcbdFCgSh/LizY4ldHmL0VbAWhHRTJrKQEviTclXHeXRp5GdOa5
+         XyHQpuxVbS51/K59T9mIXRr5jMinKxlt/1bMd7/ZIY/7ayduain8sOvhTGiixu1OnRBF
+         3qgdn49fml1TLsnCDFoipgFQP9QJrxuStRusAYujgTf2nhuOf08B35nG2Bpg1j4HO85p
+         fXuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GuOinXdzP0oJ6BfwGVGRF9opnqUN4LYO3Y/RmknOScs=;
-        b=4h3OvLAcna7Rqt3bsbHeLbtZSmi67ZDSCMdlt1Jc/S4qq8noSOcnDDeDJMARzlv+9T
-         wEGO2yZB6ospri3R07+lrIaxw98uE+SdoUXzBKvijlf4b8kI/tF0FZ4uGLIwp4Cs5Auj
-         P2O1GZ6HsD5RNFClhQdSIGrRDUsWMedc+wMUwUMPt2Yda6fcvScg+6OAmsEAqOPYgdlq
-         D3S2MSkxv0R8+Z95G+TUiwtPeqwpr7RFFC8hHLXPdwuC9eTB29OQzZlsX9BY40MyjC1r
-         MpL6FWg8lfsfuGdda0T6btgFPzdlxsgPjhulgcRfoWqgLTLWIZM0ob3becZPGRQM1Cl6
-         PxXg==
-X-Gm-Message-State: AOAM5307QqUfhuHEzEeC/te2hY2ANkkS8StOLbDogpeBjMHX/aVXZTwZ
-        yQvSztzRoXoh9QtL1Ih8YE4NhItJQarywQ==
-X-Google-Smtp-Source: ABdhPJxtqXs49dqqYwrrFL2D/sBWEpVH5naaCbeJ3Pryu+awdiRfY3cTorJuf9ghsWhGGy5AkAoh5A==
-X-Received: by 2002:a05:620a:f0d:b0:67e:1c14:bc5e with SMTP id v13-20020a05620a0f0d00b0067e1c14bc5emr3899163qkl.502.1654190892765;
-        Thu, 02 Jun 2022 10:28:12 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
-        by smtp.gmail.com with ESMTPSA id q188-20020ae9dcc5000000b0069fc13ce1f2sm3649937qkf.35.2022.06.02.10.28.11
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=S0kiPQZyWlYVIOJkiV7UkjYaE9b35apJIAe4jrH0pmE=;
+        b=hjWUpLFY1p2Bb9uKvgQKUenkU618lGQZCWMRZT7BDIfm2axNWGLup7HwPwnr5myacx
+         OOzcht+22lRPhgAam0ulONOFp+SeoJlJrWfXNDEmkJZn0AgANtFaT5A1Leulpw6+PaIH
+         7duXQBKKjq/lvOsgF9CxpbJG0f1wfvODuMM8vq15mZeAyhrQXPFPv5IFkR4c/XLnH+eb
+         KMv79dywHO36pc/a4j+8ZC3Od8PJyDFq5HIuBa1GZ4PZ3wDz6caZI1XtZKB1vn/jdAAa
+         Ca6Vq6E2CLfAjh3IxBvmw79/gcfWE2xD0z6CDAH47jgLrKQvr+Vjc0dQamgjkZ3EGIIM
+         c86w==
+X-Gm-Message-State: AOAM530WGeNqp6V9+O85TF5fgUBcsg0zrfoEfkWV226yVIHm1cw6b1jd
+        UPiM1yS9MtjEvvgPfyqcFP8=
+X-Google-Smtp-Source: ABdhPJz7y32iYDT2F/DMmapftPbyZXOxJDY02/3F1ptZUEjlRkeChivP9vk2/181q5VWGJeZ8Wd3Yg==
+X-Received: by 2002:a62:7b94:0:b0:51b:c723:5724 with SMTP id w142-20020a627b94000000b0051bc7235724mr4685709pfc.8.1654192007390;
+        Thu, 02 Jun 2022 10:46:47 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::4:49ff])
+        by smtp.gmail.com with ESMTPSA id y17-20020a170903011100b00163ef7be14csm3744464plc.89.2022.06.02.10.46.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 02 Jun 2022 10:28:12 -0700 (PDT)
-Received: from jgg by mlx with local (Exim 4.94)
-        (envelope-from <jgg@ziepe.ca>)
-        id 1nwocF-00GUaJ-Fg; Thu, 02 Jun 2022 14:28:11 -0300
-Date:   Thu, 2 Jun 2022 14:28:11 -0300
-From:   Jason Gunthorpe <jgg@ziepe.ca>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Jakowski Andrzej <andrzej.jakowski@intel.com>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>
-Subject: Re: [PATCH v6 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
-Message-ID: <20220602172811.GN2960187@ziepe.ca>
-References: <20220407154717.7695-1-logang@deltatee.com>
- <20220407154717.7695-21-logang@deltatee.com>
- <20220527125501.GD2960187@ziepe.ca>
- <a2590e27-41e8-59dc-3576-b5b8d716a198@deltatee.com>
- <20220527190307.GG2960187@ziepe.ca>
- <d336cfe8-2451-04c3-a2ce-0e8e47afd1e3@deltatee.com>
- <20220602000038.GK2960187@ziepe.ca>
- <400baba7-1cd6-09d4-4de9-2a73f08afc79@deltatee.com>
- <20220602163059.GL2960187@ziepe.ca>
- <51cc6645-2504-6d01-5626-238ed6ffff04@deltatee.com>
+        Thu, 02 Jun 2022 10:46:46 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date:   Thu, 2 Jun 2022 07:46:45 -1000
+From:   Tejun Heo <tj@kernel.org>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, cgroups@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v5 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
+Message-ID: <Ypj3hcodkAU1MUR7@slm.duckdns.org>
+References: <20220601211824.89626-1-longman@redhat.com>
+ <20220602133543.128088-4-longman@redhat.com>
+ <YpjsTNZx4DG+kot4@slm.duckdns.org>
+ <42da456d-8f6a-3af0-4cd3-d33a07e3b81e@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <51cc6645-2504-6d01-5626-238ed6ffff04@deltatee.com>
+In-Reply-To: <42da456d-8f6a-3af0-4cd3-d33a07e3b81e@redhat.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 02, 2022 at 10:49:15AM -0600, Logan Gunthorpe wrote:
+On Thu, Jun 02, 2022 at 01:26:10PM -0400, Waiman Long wrote:
 > 
+> On 6/2/22 12:58, Tejun Heo wrote:
+> > Hello,
+> > 
+> > On Thu, Jun 02, 2022 at 09:35:43AM -0400, Waiman Long wrote:
+> > > @@ -2011,9 +2076,16 @@ void blk_cgroup_bio_start(struct bio *bio)
+> > >   	}
+> > >   	bis->cur.ios[rwd]++;
+> > > +	if (!READ_ONCE(bis->lnode.next)) {
+> > > +		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
+> > > +
+> > > +		llist_add(&bis->lnode, lhead);
+> > > +		percpu_ref_get(&bis->blkg->refcnt);
+> > Hmm... what guarantees that more than one threads race here? llist assumes
+> > that there's a single writer for a given llist_node and the ref count would
+> > be off too, right?
 > 
-> On 2022-06-02 10:30, Jason Gunthorpe wrote:
-> > On Thu, Jun 02, 2022 at 10:16:10AM -0600, Logan Gunthorpe wrote:
-> > 
-> >>> Just stuff the pages into the mmap, and your driver unprobe will
-> >>> automatically block until all the mmaps are closed - no different than
-> >>> having an open file descriptor or something.
-> >>
-> >> Oh is that what we want?
-> > 
-> > Yes, it is the typical case - eg if you have a sysfs file open unbind
-> > hangs indefinitely. Many drivers can't unbind while they have open file
-> > descriptors/etc.
-> > 
-> > A couple drivers go out of their way to allow unbinding while a live
-> > userspace exists but this can get complicated. Usually there should be
-> > a good reason.
-> > 
-> > The module will already be refcounted anyhow because the mmap points
-> > to a char file which holds a module reference - meaning a simple rmmod
-> > of the driver shouldn't work already..
-> 
-> Also, I just tried it... If I open a sysfs file for an nvme device (ie.
-> /sys/class/nvme/nvme4/cntlid) and unbind the device, it does not block.
-> A subsequent read on that file descriptor returns ENODEV. Which is what
-> I would have expected.
+> The llist_add() function is atomic. It calls into llist_add_batch() in
+> lib/llist.c which uses cmpxchg() to make the change. There is a non-atomic
+> version __llist_add() which may be problematic in this case. Note that irq
+> is disabled in the u64_stats_update* critical section, there shouldn't be a
+> racing thread running in the same cpu. Other cpus will modify their own
+> version of lhead. Perhaps the non-atomic version can be used here as well.
 
-Oh interesting, this has been changed since years ago when I last
-looked, the kernfs_get_active() is now more narrowed than it once
-was. So manybe sysfs isn't the same concern it used to be!
+Ah, right, this is per-cpu, so there can be no second writer trying to add
+the same node at the same time. Can you add a comment explaining the overall
+design / behavior? Other than that, please feel free to add
 
-Thanks,
-Jason
+ Acked-by: Tejun Heo <tj@kernel.org>
+
+Thanks.
+
+-- 
+tejun
