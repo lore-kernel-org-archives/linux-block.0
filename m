@@ -2,37 +2,37 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C62F8C43334
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 04:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81B71C43334
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 04:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239075AbiFCE4P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jun 2022 00:56:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50718 "EHLO
+        id S239091AbiFCE4R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jun 2022 00:56:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50742 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231318AbiFCE4O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 00:56:14 -0400
+        with ESMTP id S231318AbiFCE4Q (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 00:56:16 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2C4536E10
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 21:56:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8FB36E10
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 21:56:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=YZqL45OZLXfGdFUrW98mhAIJnOCPS8lTW1cNSXZmPb8=; b=n/nXkNzj9wXiTA87jPUT8s/+f4
-        O0i25IiFtF02P8vxV+6mwiKgBdhJZ16az2GjS+iyPf3Vo3AkTqi7oH54Uck75AT9Q86q5WjM/sBHp
-        SQclnUHm0gSTR7coCabkk0uS9elegJ0S9HcqhKECXaYwWKIE6+9t91MqNnD9Oxco2vbzlbHw/JUeo
-        Bl7+KJpuAAxXOX7LqqBctDw6M8yAWJDRiVgO6M6Z4cnNujEt5YStOuTbKQvqjq7MaN8iWKfaI5Ahw
-        /vQRfpGyLdSDKPUfGpkoaX55WJ0EPbikO3SNUMm9NbgTxnd9zPHvT76EDgSBYDe3qFb1eEU5P6M2J
-        D9y0Va0A==;
+        bh=MSo0KHkZgIYFHJZ42AzFvKbwN7oNudFzfkVTVPAxH7Q=; b=EhviBmHkbac3x9F4U1A2xBktJR
+        382bGEFW15AwamhBV9Oo5vPpUUYGLzf85YXaShwDT5jj72iEM5NhLGalrDeGpDhqSCk1P86KQpAth
+        QTwlNL23VOLd/F/t+ZWI1+iS+VUPYxMznSdWEiwvCHYZy60KNfeQQo3RNuKnDmH37KG27N7yjwHcC
+        PWIZjTdNWaLSP1cgdcy6A0T3kBPeUmPzFV48/Rd2KAQawqQyFf7ZBguO0zfwBib5ee1Uh1X7gmCUo
+        GnGUMKn0qAi28+4AgpVUh64RE45BS8VT5f+mFr11YVYUNLPNUVwRR+twi/8wjZMguknYz0jBetSK/
+        ojKnRY3w==;
 Received: from [2001:4bb8:185:a81e:9865:e17e:4c0c:3e17] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nwzM5-005qPg-3n; Fri, 03 Jun 2022 04:56:13 +0000
+        id 1nwzM7-005qQ5-Jr; Fri, 03 Jun 2022 04:56:16 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests 05/13] block/006: convert to use _configure_null_blk
-Date:   Fri,  3 Jun 2022 06:55:50 +0200
-Message-Id: <20220603045558.466760-6-hch@lst.de>
+Subject: [PATCH blktests 06/13] block/016: convert to use _configure_null_blk
+Date:   Fri,  3 Jun 2022 06:55:51 +0200
+Message-Id: <20220603045558.466760-7-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220603045558.466760-1-hch@lst.de>
 References: <20220603045558.466760-1-hch@lst.de>
@@ -48,35 +48,40 @@ supported, which implies not using the default nullb0 device.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/block/006 | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tests/block/016 | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/tests/block/006 b/tests/block/006
-index 7ca1021..7d05b11 100755
---- a/tests/block/006
-+++ b/tests/block/006
-@@ -24,18 +24,18 @@ test() {
- 	_divide_timeout 2
- 	FIO_PERF_FIELDS=("read iops")
+diff --git a/tests/block/016 b/tests/block/016
+index 2b7a05f..775069c 100755
+--- a/tests/block/016
++++ b/tests/block/016
+@@ -20,21 +20,22 @@ requires() {
+ test() {
+ 	echo "Running ${TEST_NAME}"
  
--	if ! _init_null_blk submit_queues=2 blocking=1; then
-+	if ! _configure_null_blk nullb1 submit_queues=2 blocking=1 power=1; then
+-	if ! _init_null_blk irqmode=2 completion_nsec=2000000000; then
++	if ! _configure_null_blk nullb1 irqmode=2 completion_nsec=2000000000 \
++			power=1; then
  		return 1
  	fi
  
- 	# run sync test
- 	_fio_perf --bs=4k --ioengine=sync --rw=randread --norandommap --name=sync \
--		--filename=/dev/nullb0 --size=5g --direct=1
-+		--filename=/dev/nullb1 --size=5g --direct=1
+ 	# Start an I/O, which will take two seconds.
+-	dd if=/dev/nullb0 of=/dev/null bs=512 iflag=direct count=1 status=none &
++	dd if=/dev/nullb1 of=/dev/null bs=512 iflag=direct count=1 status=none &
+ 	sleep 0.5
  
- 	# run async test
- 	_fio_perf --bs=4k --ioengine=libaio --iodepth=8 --numjobs="$(nproc)" \
- 		--rw=randread --norandommap --name=async \
--		--filename=/dev/nullb0 --size=5g --direct=1
-+		--filename=/dev/nullb1 --size=5g --direct=1
+ 	# This will freeze the queue, and since we have an I/O in flight, it
+ 	# will stay frozen until the I/O completes.
+-	echo 64 > /sys/block/nullb0/queue/nr_requests &
++	echo 64 > /sys/block/nullb1/queue/nr_requests &
+ 	sleep 0.5
  
- 	_exit_null_blk
+ 	# Do an I/O, which will wait for the queue to unfreeze.
+-	dd if=/dev/nullb0 of=/dev/null bs=512 iflag=direct count=1 status=none &
++	dd if=/dev/nullb1 of=/dev/null bs=512 iflag=direct count=1 status=none &
+ 	sleep 0.5
  
+ 	# While dd is blocked, send a signal which we know dd has a handler
 -- 
 2.30.2
 
