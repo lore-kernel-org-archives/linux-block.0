@@ -2,53 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1F5CC433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 05:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6221DC433EF
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 05:32:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240495AbiFCFae (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jun 2022 01:30:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41796 "EHLO
+        id S238961AbiFCFca (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jun 2022 01:32:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44072 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237022AbiFCFad (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 01:30:33 -0400
-Received: from mail-wm1-x32e.google.com (mail-wm1-x32e.google.com [IPv6:2a00:1450:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7390238BE9
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 22:30:31 -0700 (PDT)
-Received: by mail-wm1-x32e.google.com with SMTP id h62-20020a1c2141000000b0039aa4d054e2so5786782wmh.1
-        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 22:30:31 -0700 (PDT)
+        with ESMTP id S237023AbiFCFc2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 01:32:28 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7150B31374
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 22:32:26 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id t13so8967567wrg.9
+        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 22:32:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
         h=message-id:date:mime-version:user-agent:content-language:to:cc:from
          :subject:content-transfer-encoding;
-        bh=Q6RmMYZZS3YNA4h/3d5FnPuIp3grPTJIBtra+FKnT/A=;
-        b=SRb4HgBJYRqYy8wbsQz9X2Ctqv1KHch8y4uepCTujGMIeCJXMj6MtwoJ9yAgCSD6gr
-         hxMkFtIas2EZAtMpl4LgUctOMFmEjK9hPNNQmoURQ2EBXIK+DESn9/XvDwiqQ9Qklokv
-         7uI8pkMzs/1XNqB/CiZ78CepKE/XVcn3WWPfeGO06bQaOXnLqpe+vI/g7GtkD2GN3x1U
-         N3Jo+FM7QOWoeOnxBcCBjf4VwwIYnmXEwX4DoKNDG74K6yPt40tQOvPH/bjuamnmLPoP
-         VYK6T9rJ2t4nbg6sfOaMciMAiBFIsTXC3HxgB+EsFSeXw+XXTV0+ieaQ9+kbsv0c+fWW
-         9pYQ==
+        bh=EGhxoklc9Tv+TTxKxVIJsGhPC/O9A0vKlHcW2n5dCOY=;
+        b=pICnoZ8K0mg5rXvaf1/3b+ZJlJNn//rWM67q5UTI+wvxf8MNtqPaGlG5UnwtuzIVF9
+         uRjk6ThA+n/YoxYbOVKs4z5PisUkYPVtMuFFHFsgHmAR9O7DvMy4aCzE3Nyd23VJ4fDe
+         rP8Nl1camD4Ks4TGQHLHKIzYc0ltooo1C6JhO0ECK/rlyvp/mtft0yO2+Bf6Y7ND7t/5
+         UktJl+AtvUFLdZy3rpsLbsMd1x1GrHSitSQW7jMfZ+r+VXFhoXXkRXfKm9DbWkVJhcjs
+         78Bw65dOgCtXo9CgS+LrQ8qzXwRW590JjsBMfv1lWJMGNI9QZkP3jzzTB6nufZSKHr9/
+         g5/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent
          :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=Q6RmMYZZS3YNA4h/3d5FnPuIp3grPTJIBtra+FKnT/A=;
-        b=BP0XvoRd2LQN+N35qE1lrmB6Kg2s6z3PGVJslC3T8bBmJxIklRoXHUJChMHEPbM45X
-         SDWAWCubyzwDH29OfgJlSEXWlwi0TMkMwkMLtO6ZBt00d5Qg6nOrHWAX6F6qmsqIm6fb
-         Br8KXunfK6MZ3FD3A4MLbgII7L1kWYthqtAF6lMnd6CQ8RajZcwyDWurkPRETLz23UXT
-         6iQf8k59Oc7CdLBpjHNSrASbJJHLGBROtZ77p1E4RZGHG+PVn5bf2T0m8tXpJA0pYb3R
-         L6sjuFzTQVXgOQS+nCXYRHEG0kbYjeiYEIg3b9rYUnMKWzj/mBk5DyfrYoq+azTChKDh
-         YG2g==
-X-Gm-Message-State: AOAM532H9TiQM/Ny+7gAIm7szeKeARPcUiuTIcMWGLnMFkO7iCGgDDZq
-        61q/0hqbw+B2hH0csiZb+yDaQTJd1LpigSK/
-X-Google-Smtp-Source: ABdhPJzOKdM6GIEZOPOFQnRivuox7UpOHAquEsTUqNm/LGHN0XCwBxEhojbLJ3DIltw1JLcxO0v2tQ==
-X-Received: by 2002:a05:600c:4e94:b0:397:63d7:1f6c with SMTP id f20-20020a05600c4e9400b0039763d71f6cmr6834766wmq.150.1654234229980;
-        Thu, 02 Jun 2022 22:30:29 -0700 (PDT)
+        bh=EGhxoklc9Tv+TTxKxVIJsGhPC/O9A0vKlHcW2n5dCOY=;
+        b=tJr7E42fJCWGN4gXMoASB1dxFbMf72C4/7+lEPZHvoUuC/RcaGUBo3LYEVndc5nbWs
+         MmbBTLFJdPpVlOOsJkxkNeY0NdHz+cjRCDthkqqDuwi11Q5/kovw9M5Ea6qSZP536Bnt
+         QR2B7BsTlB1NeiO45TAbvxV2JzmfwEwabSpOQJwmngV2dQ2VibNs7lML8miUCtcB3uDY
+         L7xDd+WS5Fpz2Qkx+oNfPTKCDCl9r+Ja/4YXTk6Ce4jkm8U4//Z0I4BhJrUd5aOfLrJ5
+         +xBoDEdifKYkT72yCNqQuuGte+zfKGNflh5CGWHQTZPY2lfuvHQ+bU8YSKH0hepmdUNy
+         AQgw==
+X-Gm-Message-State: AOAM530duDOOqegAMoge8PbCY++8fi9b/EHVY593/BBzrE2JFT/n7MLw
+        cMvR59twt9Ii6ZYaScVuxkgYjXC7RUqVdLUX
+X-Google-Smtp-Source: ABdhPJyGrR0Nq+7FTt/oeniKfIZBN2tVAe7gJc3KVrgeiFfnjud2AeJznkUURHg+My6MN5HpNzh4bw==
+X-Received: by 2002:a5d:4352:0:b0:213:4910:6616 with SMTP id u18-20020a5d4352000000b0021349106616mr4943527wrr.226.1654234344927;
+        Thu, 02 Jun 2022 22:32:24 -0700 (PDT)
 Received: from [10.188.163.71] (cust-east-parth2-46-193-73-98.wb.wifirst.net. [46.193.73.98])
-        by smtp.gmail.com with ESMTPSA id e40-20020a5d5968000000b00213ba0cab3asm1446025wri.44.2022.06.02.22.30.29
+        by smtp.gmail.com with ESMTPSA id o15-20020a5d4a8f000000b0020c5253d8edsm6188458wrq.57.2022.06.02.22.32.23
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 02 Jun 2022 22:30:29 -0700 (PDT)
-Message-ID: <d6400df1-3a34-b17a-0647-a7f0bb63d559@kernel.dk>
-Date:   Thu, 2 Jun 2022 23:30:28 -0600
+        Thu, 02 Jun 2022 22:32:24 -0700 (PDT)
+Message-ID: <0d5a62fc-6d6a-5dc8-bb15-d494184909b9@kernel.dk>
+Date:   Thu, 2 Jun 2022 23:32:23 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.0
@@ -56,7 +56,7 @@ Content-Language: en-US
 To:     Linus Torvalds <torvalds@linux-foundation.org>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Follow up block core changes and fixes
+Subject: [GIT PULL] Block exec cleanup series
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -65,65 +65,49 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 Hi Linus,
 
-Just a collection of fixes that have been queued up since the initial
-5.19 merge window pull request, the majority of which are targeted for
-stable as well. One bio_set fix that fixes an issue with the dm adoption
-of cached bio structs that got introduced in this merge window.
+This change was advertised in the initial core block pull request, but
+didn't actually make that branch as we deferred it to a post-merge pull
+request to avoid a bunch of cross branch issues.
+
+This series cleans up the block execute path quite nicely.
 
 Please pull!
 
 
-The following changes since commit 2aaf516084184e4e6f80da01b2b3ed882fd20a79:
+The following changes since commit bf272460d744112bacd4c4d562592decbf0edf64:
 
-  blk-mq: fix typo in comment (2022-05-21 06:32:16 -0600)
+  Merge tag '5.19-rc-smb3-client-fixes-updated' of git://git.samba.org/sfrench/cifs-2.6 (2022-05-27 16:05:57 -0700)
 
 are available in the Git repository at:
 
-  git://git.kernel.dk/linux-block.git tags/for-5.19/block-2022-06-02
+  git://git.kernel.dk/linux-block.git tags/for-5.19/block-exec-2022-06-02
 
-for you to fetch changes up to 41e46b3c2aa24f755b2ae9ec4ce931ba5f0d8532:
+for you to fetch changes up to e2e530867245d051dc7800b0d07193b3e581f5b9:
 
-  block: Fix potential deadlock in blk_ia_range_sysfs_show() (2022-06-02 23:02:37 -0600)
-
-----------------------------------------------------------------
-for-5.19/block-2022-06-02
+  blk-mq: remove the done argument to blk_execute_rq_nowait (2022-05-28 06:15:27 -0600)
 
 ----------------------------------------------------------------
-Christoph Hellwig (2):
-      block: take destination bvec offsets into account in bio_copy_data_iter
-      block: use bio_queue_enter instead of blk_queue_enter in bio_poll
+for-5.19/block-exec-2022-06-02
 
-Damien Le Moal (2):
-      block: remove useless BUG_ON() in blk_mq_put_tag()
-      block: Fix potential deadlock in blk_ia_range_sysfs_show()
+----------------------------------------------------------------
+Christoph Hellwig (3):
+      blk-mq: remove __blk_execute_rq_nowait
+      blk-mq: avoid a mess of casts for blk_end_sync_rq
+      blk-mq: remove the done argument to blk_execute_rq_nowait
 
-Haisu Wang (1):
-      blk-mq: do not update io_ticks with passthrough requests
-
-Hannes Reinecke (1):
-      block: document BLK_STS_AGAIN usage
-
-Jan Kara (1):
-      block: fix bio_clone_blkg_association() to associate with proper blkcg_gq
-
-Jens Axboe (1):
-      block: make bioset_exit() fully resilient against being called twice
-
-Ming Lei (1):
-      blk-mq: don't touch ->tagset in blk_mq_get_sq_hctx
-
-Tejun Heo (1):
-      blk-iolatency: Fix inflight count imbalances and IO hangs on offline
-
- block/bio.c               |   9 ++--
- block/blk-cgroup.c        |   8 +--
- block/blk-core.c          |   2 +-
- block/blk-ia-ranges.c     |   7 +--
- block/blk-iolatency.c     | 122 ++++++++++++++++++++++++----------------------
- block/blk-mq-tag.c        |   1 -
- block/blk-mq.c            |  10 ++--
- include/linux/blk_types.h |   4 ++
- 8 files changed, 83 insertions(+), 80 deletions(-)
+ block/blk-mq.c                     | 109 ++++++++++++++++---------------------
+ drivers/block/sx8.c                |   4 +-
+ drivers/nvme/host/core.c           |   3 +-
+ drivers/nvme/host/ioctl.c          |   3 +-
+ drivers/nvme/host/pci.c            |  10 +++-
+ drivers/nvme/target/passthru.c     |   3 +-
+ drivers/scsi/scsi_error.c          |   5 +-
+ drivers/scsi/sg.c                  |   3 +-
+ drivers/scsi/st.c                  |   3 +-
+ drivers/scsi/ufs/ufshpb.c          |   6 +-
+ drivers/target/target_core_pscsi.c |   3 +-
+ include/linux/blk-mq.h             |   3 +-
+ 12 files changed, 75 insertions(+), 80 deletions(-)
 
 -- 
 Jens Axboe
