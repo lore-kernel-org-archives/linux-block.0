@@ -2,128 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2D5AC43334
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 12:47:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14D6FC43334
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 12:50:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244380AbiFCMra (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jun 2022 08:47:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43326 "EHLO
+        id S230051AbiFCMuD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jun 2022 08:50:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244370AbiFCMr2 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 08:47:28 -0400
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43E72624E
-        for <linux-block@vger.kernel.org>; Fri,  3 Jun 2022 05:47:27 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id u8so5937219wrm.13
-        for <linux-block@vger.kernel.org>; Fri, 03 Jun 2022 05:47:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=ernKh7q0koX2BgfmbtKyvN+sg+w6Vr7ESQoRzLB3iMc=;
-        b=JRjI1YhO3OMnpJqoPgRm8jo8atjsJf/awv7LDrMgBEmraIDVecraxoyzrdvif7TeZv
-         p/rpk5pKcsMRxcL06Z/8LLrLgqe4K9iEfIVst1W+y3URe9T7WIzz+DgjaKI7lgsx1E5Y
-         IdJkC5eXVEctg7X5aiZ0lFomxlxG1mhz1Z0W9Gyjb1TscH+ZW69wlO8wwo/bpqQzInIn
-         9m6rMB/aSHVKrcy1L0k4ZBmauPmWGWZfIRSULDQ751gFI1T+eUZmWEBiRMcFNV7XJtA1
-         ew4P+TNEBUC7L1NdTzDDvB3tlmRTtGc1idpKzCRnzEw1GMTE9JIhT5Lq9zi2f/3ToMmH
-         EukA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=ernKh7q0koX2BgfmbtKyvN+sg+w6Vr7ESQoRzLB3iMc=;
-        b=jvmORVrulnBc5Q+uQ82cHrrEoNXxlOThQy9TVrz6Nt5kbUa29PlopaV2iY4w1gZK3/
-         JjuzY3YJ00ZKvmoX42cB26AXrkyZug1eTWOUB3PCO1yPgxsJqqsntyoQu76oFYsHt+Ku
-         J2ikbbQrCmvV9z2NZzZHcP//dWxX2VUtLf+II7QibeZYIQ73857oHSU6L/W7yqylBDgT
-         wfz3XUXVwQjxj3ZN5mKZ6VXUA9L3Q8aBRfTz5o/St3DYK9aIbgUe4MXzYHxdyrO9qcy3
-         9WQgcu7V39c4oGVZludoi53t5FEJhZ7ITJnoSppedlk++8VFFc9gJMQXoTNZOa6YSYVA
-         PrDA==
-X-Gm-Message-State: AOAM5331eHCL+o58p5u/gNRumT7s41Ybs8YreDIiAnbasRy3C0bUw8Ol
-        gcW/7WUkHEhCVg9sG01Yyx6RJYxUwAir3LuuT28v1+Mg63RITw==
-X-Google-Smtp-Source: ABdhPJzA3MAsqbhrglKAnMzFv+rkvY0j8WZELmwPb8U9af72b+nK0qRcTfi5bQ7VIe9dd3ua7OB3k8UPZqsTk16C9i4=
-X-Received: by 2002:a5d:6481:0:b0:20f:ed13:f28d with SMTP id
- o1-20020a5d6481000000b0020fed13f28dmr7965679wri.719.1654260444757; Fri, 03
- Jun 2022 05:47:24 -0700 (PDT)
-MIME-Version: 1.0
-From:   Michael Schaller <misch@google.com>
-Date:   Fri, 3 Jun 2022 14:46:48 +0200
-Message-ID: <CALt099JajMVCwHgdRdRSF1uhNC=EO+tTq4T4Bg8QDwUO3uX83w@mail.gmail.com>
-Subject: New partition on loop device doesn't appear in /dev anymore with
- kernel 5.17.0 and newer (repro script included)
-To:     axboe@kernel.dk
-Cc:     hch@lst.de, linux-block@vger.kernel.org,
+        with ESMTP id S229936AbiFCMuC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 08:50:02 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8384039691;
+        Fri,  3 Jun 2022 05:50:01 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0317A68B05; Fri,  3 Jun 2022 14:49:56 +0200 (CEST)
+Date:   Fri, 3 Jun 2022 14:49:56 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Michael Schaller <misch@google.com>
+Cc:     axboe@kernel.dk, linux-block@vger.kernel.org, hch@lst.de,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: multipart/mixed; boundary="0000000000002d888805e08a8672"
+Subject: Re: New partition on loop device doesn't appear in /dev anymore
+ with kernel 5.17.0 and newer (repro script included)
+Message-ID: <20220603124956.GA18365@lst.de>
+References: <CALt099+y4-kJ0OqVeKaAjAbs4inOkR-WE0FmyiJRDc1-Ev9UKw@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CALt099+y4-kJ0OqVeKaAjAbs4inOkR-WE0FmyiJRDc1-Ev9UKw@mail.gmail.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
---0000000000002d888805e08a8672
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+You probably want this attached fix:
 
-Dear maintainer,
+---
+From b9684a71fca793213378dd410cd11675d973eaa1 Mon Sep 17 00:00:00 2001
+From: Christoph Hellwig <hch@lst.de>
+Date: Fri, 27 May 2022 07:58:06 +0200
+Subject: block, loop: support partitions without scanning
 
-Since kernel 5.17.0 it appears that creating a partition on a loop
-device doesn't automatically create the corresponding /dev/loop#p#
-entry anymore. We rolled back to kernel 5.16.18, which doesn't have
-this issue. I also tested kernel 5.18.1 and it is affected as well.
+Historically we did distinguish between a flag that surpressed partition
+scanning, and a combinations of the minors variable and another flag if
+any partitions were supported.  This was generally confusing and doesn't
+make much sense, but some corner case uses of the loop driver actually
+do want to support manually added partitions on a device that does not
+actively scan for partitions.  To make things worsee the loop driver
+also wants to dynamically toggle the scanning for partitions on a live
+gendisk, which makes the disk->flags updates non-atomic.
 
-I've attached repro.sh, which is a Bash script that reproduces the
-issue (tested on Debian testing). The script only requires standard
-Linux tools (including GNU Parted). The script creates a raw disk
-image file (sparse), associates the file with a loop device and
-partitions the loop device so that it only contains an ESP. At this
-point there should be a /dev/loop#p1 entry so that the following
-mkfs.vfat can create the filesystem for the ESP. However on kernel
-5.17.0 and newer /dev/loop#p1 isn't created and mkfs.vfat fails with
-"No such file or directory". Furthermore on kernel 5.17.0 and newer we
-see the following error in the kernel log: "I/O error, dev loop#,
-sector 32640 op 0x0:(READ) flags 0x80700 phys_seg 1 prio class 0"
+Introduce a new GD_SUPPRESS_PART_SCAN bit in disk->state that disables
+just scanning for partitions, and toggle that instead of GENHD_FL_NO_PART
+in the loop driver.
 
-I also did a kernel bisect against the vanilla stable kernels and that
-revealed commit 1ebe2e5f9d68e94c524aba876f27b945669a7879 as the first
-problematic commit. I've cc'ed the commit author as well.
+Fixes: 1ebe2e5f9d68 ("block: remove GENHD_FL_EXT_DEVT")
+Reported-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+Reviewed-by: Ming Lei <ming.lei@redhat.com>
+Link: https://lore.kernel.org/r/20220527055806.1972352-1-hch@lst.de
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ block/genhd.c          | 2 ++
+ drivers/block/loop.c   | 8 ++++----
+ include/linux/blkdev.h | 1 +
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-This issue is also tracked on the Debian side with
-https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1012298.
+diff --git a/block/genhd.c b/block/genhd.c
+index 36532b9318419..27205ae47d593 100644
+--- a/block/genhd.c
++++ b/block/genhd.c
+@@ -385,6 +385,8 @@ int disk_scan_partitions(struct gendisk *disk, fmode_t mode)
+ 
+ 	if (disk->flags & (GENHD_FL_NO_PART | GENHD_FL_HIDDEN))
+ 		return -EINVAL;
++	if (test_bit(GD_SUPPRESS_PART_SCAN, &disk->state))
++		return -EINVAL;
+ 	if (disk->open_partitions)
+ 		return -EBUSY;
+ 
+diff --git a/drivers/block/loop.c b/drivers/block/loop.c
+index 01b4e257016a1..121f96dfc23eb 100644
+--- a/drivers/block/loop.c
++++ b/drivers/block/loop.c
+@@ -1102,7 +1102,7 @@ static int loop_configure(struct loop_device *lo, fmode_t mode,
+ 		lo->lo_flags |= LO_FLAGS_PARTSCAN;
+ 	partscan = lo->lo_flags & LO_FLAGS_PARTSCAN;
+ 	if (partscan)
+-		lo->lo_disk->flags &= ~GENHD_FL_NO_PART;
++		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 
+ 	loop_global_unlock(lo, is_loop);
+ 	if (partscan)
+@@ -1198,7 +1198,7 @@ static void __loop_clr_fd(struct loop_device *lo, bool release)
+ 	 */
+ 	lo->lo_flags = 0;
+ 	if (!part_shift)
+-		lo->lo_disk->flags |= GENHD_FL_NO_PART;
++		set_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 	mutex_lock(&lo->lo_mutex);
+ 	lo->lo_state = Lo_unbound;
+ 	mutex_unlock(&lo->lo_mutex);
+@@ -1308,7 +1308,7 @@ loop_set_status(struct loop_device *lo, const struct loop_info64 *info)
+ 
+ 	if (!err && (lo->lo_flags & LO_FLAGS_PARTSCAN) &&
+ 	     !(prev_lo_flags & LO_FLAGS_PARTSCAN)) {
+-		lo->lo_disk->flags &= ~GENHD_FL_NO_PART;
++		clear_bit(GD_SUPPRESS_PART_SCAN, &lo->lo_disk->state);
+ 		partscan = true;
+ 	}
+ out_unlock:
+@@ -2009,7 +2009,7 @@ static int loop_add(int i)
+ 	 * userspace tools. Parameters like this in general should be avoided.
+ 	 */
+ 	if (!part_shift)
+-		disk->flags |= GENHD_FL_NO_PART;
++		set_bit(GD_SUPPRESS_PART_SCAN, &disk->state);
+ 	mutex_init(&lo->lo_mutex);
+ 	lo->lo_number		= i;
+ 	spin_lock_init(&lo->lo_lock);
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index afad3d1d0dac0..691b4c15b8ce1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -147,6 +147,7 @@ struct gendisk {
+ #define GD_DEAD				2
+ #define GD_NATIVE_CAPACITY		3
+ #define GD_ADDED			4
++#define GD_SUPPRESS_PART_SCAN		5
+ 
+ 	struct mutex open_mutex;	/* open/close mutex */
+ 	unsigned open_partitions;	/* number of open partitions */
+-- 
+2.30.2
 
-Best,
-
-Michael Schaller
-Site Reliability Engineer - Software Engineer
-misch@google.com
-
-Google Germany GmbH
-Erika-Mann-Stra=C3=9Fe 33
-80636 M=C3=BCnchen
-
-Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
-Registergericht und -nummer: Hamburg, HRB 86891
-Sitz der Gesellschaft: Hamburg
-
---0000000000002d888805e08a8672
-Content-Type: application/x-shellscript; name="repro.sh"
-Content-Disposition: attachment; filename="repro.sh"
-Content-Transfer-Encoding: base64
-Content-ID: <f_l3yfw9qh0>
-X-Attachment-Id: f_l3yfw9qh0
-
-IyEvYmluL2Jhc2gKCnNldCAtZXgKCmlmIFtbICIke0VVSUR9IiAhPSAwIF1dOyB0aGVuCiAgPiYy
-IGVjaG8gInJvb3QgcmlnaHRzIHJlcXVpcmVkIgogIGV4aXQgMgpmaQoKaW1nPScvdG1wL3Jhdy5p
-bWcnICAjIFJhdyBkaXNrIGltYWdlIGZpbGUuCmRldj0nJyAgIyBMb29wIGRldmljZSBhc3NvY2lh
-dGVkIHdpdGggdGhlIHJhdyBkaXNrIGltYWdlIGZpbGUuCgpmdW5jdGlvbiBjbGVhbnVwIHsKICBz
-ZXQgK2UKICBybSAtcmYgIiR7cmVzfSIKICBybSAtZiAiJHtjZmd9IgogIGlmIFsgLW4gIiR7ZGV2
-fSIgXTsgdGhlbgogICAgIyBGcmVlIGxvb3AgZGV2aWNlLgogICAgbG9zZXR1cCAtLWRldGFjaCAi
-JHtkZXZ9IgogIGZpCiAgcm0gLWYgIiR7aW1nfSIKfQp0cmFwIGNsZWFudXAgRVhJVAoKIyBDcmVh
-dGUgc3BhcnNlIGZpbGUgZm9yIGEgcmF3IGRpc2sgaW1hZ2UuCmRkIGlmPS9kZXYvemVybyBzdGF0
-dXM9bm9uZSBvZj0iJHtpbWd9IiBicz0xIGNvdW50PTAgc2Vlaz0xNk1pQgoKIyBBc3NvY2lhdGUg
-YSBsb29wIGRldmljZSB3aXRoIHRoZSByYXcgZGlzayBpbWFnZS4KbG9zZXR1cCAtLWZpbmQgIiR7
-aW1nfSIKCiMgR2V0IHRoZSBhc3NvY2lhdGVkIGxvb3AgZGV2aWNlLgpkZXY9JChsb3NldHVwIC0t
-YXNzb2NpYXRlZCAiJHtpbWd9IiB8IGN1dCAtZCAnOicgLWYgMSkKaWYgWyAteiAiJHtkZXZ9IiBd
-OyB0aGVuCiAgPiYyIGVjaG8gJ2ZhaWxlZCB0byBmaW5kIGFzc29jaWF0ZWQgbG9vcCBkZXZpY2Un
-CiAgZXhpdCAxCmZpCgojIENyZWF0ZSBHUFQgcGFydGl0aW9uIHRhYmxlIHdpdGggYW4gRVNQLgpw
-YXJ0ZWQgLXMgIiR7ZGV2fSIgbWtsYWJlbCBncHQKcGFydGVkIC1zICIke2Rldn0iIG1rcGFydCBw
-cmltYXJ5ICJmYXQzMiIgMU1pQiAxMDAlCnBhcnRlZCAtcyAiJHtkZXZ9IiBzZXQgMSBib290IG9u
-CnBhcnRwcm9iZSAiJHtkZXZ9IiAgIyBGb3IgZ29vZCBtZWFzdXJlIGJ1dCBub3QgbmVlZGVkIG9u
-IGtlcm5lbCA1LjE2Cm1rZnMudmZhdCAgIiR7ZGV2fXAxIiAgIyBUaGlzIGNvbW1hbmQgZmFpbHMg
-d2l0aCBrZXJuZWwgNS4xNwo=
---0000000000002d888805e08a8672--
