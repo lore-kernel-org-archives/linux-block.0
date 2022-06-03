@@ -2,121 +2,187 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B53ADCCA473
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 05:35:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01A51C43334
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 05:37:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240799AbiFCFfg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 3 Jun 2022 01:35:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50698 "EHLO
+        id S238470AbiFCFg7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 3 Jun 2022 01:36:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240737AbiFCFfe (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 01:35:34 -0400
-Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C7B738DB6
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 22:35:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1654234531; x=1685770531;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pTkbDw92AA62sgODPO0jtgA6O/KaMXycK3Vphuhgn7Q=;
-  b=OBwS68WJZvLN7/8HFtVCBO1oPHrHPGg0W+NRALIHCUPjNJgpPFvrxorG
-   N1jeA3XbFkbf8DwYJmCh6LLVQXzwdDspEt7jKUAJQKZXXfb1XmLAtjbPs
-   3CEqI7SMEAHW2sHZKW7pzFDF7EgpZmvvpJLpBmcCzXIqYTL3Q7kQfWpLm
-   qHQ4B3+O2xR8/WnpPtOy3bCtl2EmeXSLpaT9zbRHNLS7iuER4ULyTQWpV
-   +8+dj9zqnuO9k9QZAbjHmZbsrrSnQ1Pn7+1DTFrBEqNLkspoKugiu/+uk
-   q+MIKDQnfh3xezkyTrCYw4gPeyea2/J/xDiEqOOiq7c0qnrDdFnD5PNMn
-   A==;
-X-IronPort-AV: E=Sophos;i="5.91,273,1647273600"; 
-   d="scan'208";a="202171435"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2022 13:35:30 +0800
-IronPort-SDR: +9oxXGYt+EpeoQ1qzJH7oKg43gOwutEIg9rnfEsMJA3oUMtEbqCNZ+6jtVlo5aaTWHp9fmLJEX
- VuL8ny1b/IQc0ZYBcNCEK4BNCy6Awad/yvLGJXyUlV76+g/hkNC6QTW2gIFm6Nfpqe7kJBG2zj
- YYd0aDJx/aEW4Voe7kPDtroLqq28HsJD5aBai27ccGDY3hWoxeruWTD1NwhFaxv4zh9hLEkuDA
- SGgvCDaQ7oDQ+kHRnuj6vMkBEwMsCEolcKCQxaI/rHmUePn9yG48b4TSkiFY84jLprvkG34wnB
- 6GqNhfvVD6kT6wuEVqlaMYGW
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jun 2022 21:59:01 -0700
-IronPort-SDR: aOyHW9s7g48xJNdkXSyorK4PCKuGRFBRB67lcBF3Ah6MXnX6/C04/tH3Mu9cP2/uxF/gf70Yjn
- OlvVYcDoZyPOx+WODY2yjYZlNO4HwARNi/C/585Umy38l/ysLhIBGJJ+KNxkBrZ/EX789gWaq7
- oDVFj1Ht9qYFeYRau5e9HgPZF51UDMRojJPlc3LFX+zl59NlxGS4wIRIfow5sc/SEvfy69fjLF
- 0Y6NPmClW2CDsbISqWacS0qfcOXVm6zUTGGElPkWf3eCWW20aDEoL9AUnDbB4DGsgmSDjinqEi
- JN4=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jun 2022 22:35:33 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LDs6X1X8Sz1Rvlx
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 22:35:32 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:mime-version
-        :x-mailer:message-id:date:subject:to:from; s=dkim; t=1654234531;
-         x=1656826532; bh=pTkbDw92AA62sgODPO0jtgA6O/KaMXycK3Vphuhgn7Q=; b=
-        VyWC6V00rYCewerZCgrR8TEUkPRHYKiAzl4zGfdAkygFmjfQ3F1JXOXIXtRTSBmU
-        QwGvCxvd0dYpo+6v1n9JpAP7ulGN5uBSs5QplaO8WFx+TK6wEUZBjGzGaGN35jqq
-        Eo9KDPHPGtIrgLx7Ynmb8gB8qRgUwKXDyf3WS7D2YXdHi3AKekXcCZbiOs3CZ6e5
-        yiGDnLRoDssU9k+u/N9lermKgYX1f6JEZM1mofNhCrfGoH7FrUCfDrj1N894yIB5
-        2zqA6gDWgv37HJ2DsGc74kU66cmG6CECO9OPDbowl4VgQ1b313UOk5bOJQ9WxSwU
-        YoU19oKH1WANBIEk1Dyzmg==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id gHJ8nG7LSRw2 for <linux-block@vger.kernel.org>;
-        Thu,  2 Jun 2022 22:35:31 -0700 (PDT)
-Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LDs6W36N7z1Rvlc;
-        Thu,  2 Jun 2022 22:35:31 -0700 (PDT)
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: [PATCH] block: remove queue from struct blk_independent_access_range
-Date:   Fri,  3 Jun 2022 14:35:29 +0900
-Message-Id: <20220603053529.76405-1-damien.lemoal@opensource.wdc.com>
-X-Mailer: git-send-email 2.36.1
+        with ESMTP id S240805AbiFCFg5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Fri, 3 Jun 2022 01:36:57 -0400
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69D9FE0F
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 22:36:53 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id f7-20020a1c3807000000b0039c1a10507fso3761130wma.1
+        for <linux-block@vger.kernel.org>; Thu, 02 Jun 2022 22:36:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
+         :subject:content-transfer-encoding;
+        bh=tCL49V1mbAryKUIBaJWelcmoBwoZ8ij+4fK8tFV8xu0=;
+        b=nDYE3tSJ4GKZqjj6lUDzwrUOaGXaTT9t1kX+/3c/m4jj4yADAv8ttf/qsrvNSJcUHq
+         A+pm2gxU2Aelog/JQRs43x1lw6svW6hnkcT36njdhb7t64JTN5riL4MaGFrZGsiJDaam
+         C5qqAmUZz5PPYLDzPFdZTPuHvKCRUiaQtGRJiAcK88+CoRMpD+JRg7vCdbU/xaPlJNYT
+         5LCHszu2Ll9wM/N4qgpXNaYleGMn5+jgVqxJ+WCaeW+Vxfztb83pFHg1f72A+AI/Vpjw
+         BRrudW4mlntcBvKgLdSeF7UjNJEWzzyT+CdAng6JjbEGAqt3sXluTVa3KmXoOjOpRXtt
+         q6cA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:from:subject:content-transfer-encoding;
+        bh=tCL49V1mbAryKUIBaJWelcmoBwoZ8ij+4fK8tFV8xu0=;
+        b=J5ojLNLTkD5nnF3rTjzCHLrc5h1jTX80WPqYKB1p7Y+jDTVsXHIpkZXXqIt5z3u3DO
+         jkk7rOQ1esAyZXLjvjl9YJ2l6OdbYbCx4mJQfIfTP9CrBQio9IS2vvazK4kNCMnQEJ5K
+         wlMDETPIFkxyrFVtVc/Z5flgZ8D4V5GOAFPUG7mQ02pm9+QU9vSu1TWswQf1xyVzeY6a
+         fHS/DXi5NCIMALqFU+3ue6UFTG0DYQiT0LRK5rfehjPPd+ktOnTQxnWagAZHCB/CRlci
+         sspXTcpMW2o10cGnrvWQKPmebXFS7wm0Zj+siKFhrHhjeKpOS3G+NVJ7Vxe6OEGlPZxR
+         UDng==
+X-Gm-Message-State: AOAM533USoLpb4FVhB1eyiYNfEeS357uEBmFEVnHyJl8bn4iaThcwWM4
+        owyAWQFIdIPLG3vRsLvYeErBILtEvResMxFr
+X-Google-Smtp-Source: ABdhPJxWpedsU+1Bp3nw9a/kVM4xv8RZdUCFWVkebdo+EtrgUZgNSDdDZQWcbMwiuDLptiuECZk8Kg==
+X-Received: by 2002:a05:600c:21c3:b0:39c:38da:e3ec with SMTP id x3-20020a05600c21c300b0039c38dae3ecmr2623253wmj.120.1654234611897;
+        Thu, 02 Jun 2022 22:36:51 -0700 (PDT)
+Received: from [10.188.163.71] (cust-east-parth2-46-193-73-98.wb.wifirst.net. [46.193.73.98])
+        by smtp.gmail.com with ESMTPSA id s3-20020a5d6a83000000b0020cfed0bb7fsm6210968wru.53.2022.06.02.22.36.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Jun 2022 22:36:51 -0700 (PDT)
+Message-ID: <c47ef1fc-eac8-5b2b-9952-6e5fcdbce590@kernel.dk>
+Date:   Thu, 2 Jun 2022 23:36:50 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-US
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [GIT PULL] Block drivers followup pull request
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The request queue pointer in struct blk_independent_access_range is
-unused. Remove it.
+Hi Linus,
 
-Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
----
- block/blk-ia-ranges.c  | 1 -
- include/linux/blkdev.h | 1 -
- 2 files changed, 2 deletions(-)
+A collection of stragglers that were late on sending in their changes
+and just followup fixes.
 
-diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
-index 56ed48d2954e..47c89e65b57f 100644
---- a/block/blk-ia-ranges.c
-+++ b/block/blk-ia-ranges.c
-@@ -144,7 +144,6 @@ int disk_register_independent_access_ranges(struct ge=
-ndisk *disk,
- 	}
-=20
- 	for (i =3D 0; i < iars->nr_ia_ranges; i++) {
--		iars->ia_range[i].queue =3D q;
- 		ret =3D kobject_init_and_add(&iars->ia_range[i].kobj,
- 					   &blk_ia_range_ktype, &iars->kobj,
- 					   "%d", i);
-diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
-index 1b24c1fb3bb1..62633619146e 100644
---- a/include/linux/blkdev.h
-+++ b/include/linux/blkdev.h
-@@ -341,7 +341,6 @@ static inline int blkdev_zone_mgmt_ioctl(struct block=
-_device *bdev,
-  */
- struct blk_independent_access_range {
- 	struct kobject		kobj;
--	struct request_queue	*queue;
- 	sector_t		sector;
- 	sector_t		nr_sectors;
- };
---=20
-2.36.1
+- NVMe fixes pull request via Christoph:
+	- set controller enable bit in a separate write (Niklas Cassel)
+	- disable namespace identifiers for the MAXIO MAP1001 (Christoph)
+	- fix a comment typo (Julia Lawall)"
+
+- MD fixes pull request via Song:
+	- Remove uses of bdevname (Christoph Hellwig)
+	- Bug fixes (Guoqing Jiang, and Xiao Ni)
+
+- bcache fixes series (Coly)
+
+- null_blk zoned write fix (Damien)
+
+- nbd fixes (Yu, Zhang)
+
+- Fix for loop partition scanning (Christoph)
+
+Please pull!
+
+
+The following changes since commit 537b9f2bf60f4bbd8ab89cea16aaab70f0c1560d:
+
+  mtip32xx: fix typo in comment (2022-05-21 06:32:27 -0600)
+
+are available in the Git repository at:
+
+  git://git.kernel.dk/linux-block.git tags/for-5.19/drivers-2022-06-02
+
+for you to fetch changes up to aacae8c469f9ce4b303a2eb61593ff522c1420bc:
+
+  block: null_blk: Fix null_zone_write() (2022-06-02 07:11:28 -0600)
+
+----------------------------------------------------------------
+for-5.19/drivers-2022-06-02
+
+----------------------------------------------------------------
+Christoph Hellwig (3):
+      md: remove most calls to bdevname
+      block, loop: support partitions without scanning
+      nvme-pci: disable namespace identifiers for the MAXIO MAP1001
+
+Coly Li (6):
+      bcache: improve multithreaded bch_btree_check()
+      bcache: improve multithreaded bch_sectors_dirty_init()
+      bcache: remove incremental dirty sector counting for bch_sectors_dirty_init()
+      bcache: avoid journal no-space deadlock by reserving 1 journal bucket
+      bcache: memset on stack variables in bch_btree_check() and bch_sectors_dirty_init()
+      bcache: avoid unnecessary soft lockup in kworker update_writeback_rate()
+
+Damien Le Moal (1):
+      block: null_blk: Fix null_zone_write()
+
+Guoqing Jiang (2):
+      md: don't unregister sync_thread with reconfig_mutex held
+      md: protect md_unregister_thread from reentrancy
+
+Jens Axboe (2):
+      Merge branch 'md-next' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into for-5.19/drivers
+      Merge tag 'nvme-5.19-2022-06-02' of git://git.infradead.org/nvme into for-5.19/drivers
+
+Jia-Ju Bai (1):
+      md: bcache: check the return value of kzalloc() in detached_dev_do_request()
+
+Julia Lawall (1):
+      nvmet: fix typo in comment
+
+Niklas Cassel (1):
+      nvme: set controller enable bit in a separate write
+
+Xiao Ni (2):
+      md: Don't set mddev private to NULL in raid0 pers->free
+      md: fix double free of io_acct_set bioset
+
+Yu Kuai (5):
+      nbd: call genl_unregister_family() first in nbd_cleanup()
+      nbd: fix race between nbd_alloc_config() and module removal
+      nbd: don't clear 'NBD_CMD_INFLIGHT' flag if request is not completed
+      nbd: fix io hung while disconnecting device
+      nbd: use pr_err to output error message
+
+Zhang Wensheng (1):
+      nbd: fix possible overflow on 'first_minor' in nbd_dev_add()
+
+ block/genhd.c                     |   2 +
+ drivers/block/loop.c              |   8 +-
+ drivers/block/nbd.c               | 114 +++++++++++++----------
+ drivers/block/null_blk/main.c     |   6 --
+ drivers/block/null_blk/null_blk.h |   7 ++
+ drivers/block/null_blk/zoned.c    |   6 +-
+ drivers/md/bcache/bcache.h        |   7 ++
+ drivers/md/bcache/btree.c         |  59 ++++++------
+ drivers/md/bcache/btree.h         |   2 +-
+ drivers/md/bcache/journal.c       |  31 +++++--
+ drivers/md/bcache/journal.h       |   2 +
+ drivers/md/bcache/request.c       |   6 ++
+ drivers/md/bcache/super.c         |   1 +
+ drivers/md/bcache/writeback.c     | 131 ++++++++++++---------------
+ drivers/md/bcache/writeback.h     |   2 +-
+ drivers/md/dm-raid.c              |   2 +-
+ drivers/md/md-linear.c            |   5 +-
+ drivers/md/md-multipath.c         |  15 ++--
+ drivers/md/md.c                   | 185 +++++++++++++++++---------------------
+ drivers/md/md.h                   |   2 +-
+ drivers/md/raid0.c                |  29 +++---
+ drivers/md/raid1.c                |  24 +++--
+ drivers/md/raid10.c               |  54 +++++------
+ drivers/md/raid5-cache.c          |   5 +-
+ drivers/md/raid5-ppl.c            |  27 +++---
+ drivers/md/raid5.c                |  37 ++++----
+ drivers/nvme/host/core.c          |  10 ++-
+ drivers/nvme/host/pci.c           |   2 +
+ drivers/nvme/target/passthru.c    |   2 +-
+ include/linux/blkdev.h            |   1 +
+ 30 files changed, 394 insertions(+), 390 deletions(-)
+
+-- 
+Jens Axboe
 
