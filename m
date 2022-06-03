@@ -2,145 +2,137 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84128C433EF
-	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 01:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85F7DC43334
+	for <linux-block@archiver.kernel.org>; Fri,  3 Jun 2022 02:19:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239390AbiFCBYJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 2 Jun 2022 21:24:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41042 "EHLO
+        id S235427AbiFCCTK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 2 Jun 2022 22:19:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41028 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235464AbiFCBYI (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 21:24:08 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C146E26CB
-        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 18:23:56 -0700 (PDT)
+        with ESMTP id S230193AbiFCCTK (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 2 Jun 2022 22:19:10 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D38C193E7
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 19:19:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1654219436; x=1685755436;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=g4so0IAW42jl4h6cu3EG6jmOzEizf4I6CnVRNN7qhdU=;
-  b=BUMW1HkmiYGbqBO0SVe5pLa3tGaK6MP281y/U7/zIyA+do2HEAsCzY/v
-   654zCFYMhafnCUpFxUN0bjMNcI3FnlYY2RFJVY0Y63lOlFVumactq6ZCK
-   XtRNtOKCGoYrcc8Vhbnf+4MuA0mYfRbaI920N62CiYuOQ2WDVRvCtpH4Z
-   yQuNquu1o/zceBMhwBJXJCZg3he9ykGJVNyLlAsApMFBhI1tY7BhOtsGK
-   4LDPHYFENsQ73b0rlC6dsb8vqaf0pbn5I0yIbckjnpVtxaWYLy1EjUj6+
-   7Umours1AeAZcrxcWXiC7V1bvTGOy72QOTJmPhxRM7E6l+FpzzsNAQW0t
-   g==;
+  t=1654222748; x=1685758748;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QPOoq/55hfROcbQr6JrcSvVlM/CD+CrNgHW0khnwMaY=;
+  b=OmApV2eyXnc4KJJT1CLdW9Vssc1cW6nCbOdCTxQV8eS+mnteibioYEZT
+   dD6kj0GngeB26Ve/lPEnd4Zy2e+5XE8SAlpZiNLcGgl1HY3a6dW2WGr8i
+   m97IOgGt88HO1t0L+0b/0nIPXEB7SQpnySjm3xgZfMo9Mwsyh5j19qR4f
+   r6PY1ykUiq00PkQqMjanTqhWCYrcZ4MF/JF7BKO06gVTTSUF0mvs7kdnC
+   n0j6RT0vFUIi2isDZTClbHVOFbwCXpPxMqB2CMypa4g9mrY2l/nuvOrn6
+   m0BlvwS6uibvKzW8LPoADjEa5WcnHn3JJYH1oZ6ce8KCvJ6C43ccpbgqF
+   A==;
 X-IronPort-AV: E=Sophos;i="5.91,273,1647273600"; 
-   d="scan'208";a="200898377"
-Received: from mail-dm6nam04lp2043.outbound.protection.outlook.com (HELO NAM04-DM6-obe.outbound.protection.outlook.com) ([104.47.73.43])
-  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2022 09:23:22 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YffufJx0TwkJNDxVqSpal2FzRZo4HGkLYBDK79LAGmtJJVjgT/hkn41ZmmxnKktCDW1dSlyWYZNOtHm+q5+yQD+ZyOfrfi64X7EH2o6loR7x7fXtjwWc3o09yQqrKDXs2a6kxStHw/kuCiy4cKYqdNzL2SoVKD62XPAokdyKVUu+U/daWAsBmRUfayJCjCYmOaq6uLs64z4SyvA4OvRp84/gMVjkRG9YoWkhk3BaIifyYyuI7UcDQP2rmzuORBhk7JMisFzs7osaB9Pq7vDpc9emDtfmAcRf92R3/KZURHvd/G2jFYSwjhdgsXDQMtsGNjUHPfG3RNCaohUROKTKcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ksDAEUiZKVGdld2hOJNOj0vSmlWTQxA/QGzX0KD/feA=;
- b=eE984aE0rvieM6+vIhS+ZYDD4MNxksxldMwznuQYTEzVYK0M2qNTtVZZCabLtNOHDf0/WfqUNu75mwsHIJB+p8wyd5Xu1LthkN2OHQezcODfAtOny0hfBQh9bsW3kEEaZW0eO6MXVT64W5LM/QsfdzFsnovV8cqvo7J0ibTokuwDplrDcXLonlFNGpPBo+/eYv2JeDxK9xeX7LyOsE3GbTpgHpuiykM/D/F3TpL6tXvNocsnzz0aTsQ6fdULZDlhuWBT7Okvu6Z55/gnaoIba+k2eepWIln7zRM0nLbxWESwW5vb4qQ6qHGW0c8oyvpmOIjNq6nNQ4kEPPZcJQoL8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ksDAEUiZKVGdld2hOJNOj0vSmlWTQxA/QGzX0KD/feA=;
- b=Xcx51hJ5KvRFZ6GFrIfky9uaH2BjWere29+ZvokhDOnIZujv1WPmtj2GyDRn+FoELU/hNE1NNT7rDMJebJLVljH5TM86iX+w/QURmqQ70EAmxgLPtJLHuJTM4BvTFs6tQfzKtomC+Sp1D7mcyNQns/KBOeRVr/K7QzCQq4I+WuE=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BYAPR04MB5030.namprd04.prod.outlook.com (2603:10b6:a03:47::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5314.12; Fri, 3 Jun 2022 01:23:20 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5314.014; Fri, 3 Jun 2022
- 01:23:20 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     Christoph Hellwig <hch@lst.de>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: reduce the dependency on modules v2
-Thread-Topic: reduce the dependency on modules v2
-Thread-Index: AQHYdYOlQyu8fPUOAkS5yrxM8IeFOa085fyA
-Date:   Fri, 3 Jun 2022 01:23:20 +0000
-Message-ID: <20220603012319.duh6egbfapk7veie@shindev>
-References: <20220601064837.3473709-1-hch@lst.de>
-In-Reply-To: <20220601064837.3473709-1-hch@lst.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d00cf4b3-67c6-4425-9797-08da44ffa51e
-x-ms-traffictypediagnostic: BYAPR04MB5030:EE_
-x-microsoft-antispam-prvs: <BYAPR04MB50302B9272C6ACC8790F4C0CEDA19@BYAPR04MB5030.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1EOjB8QHzucsLQAaz3V0tqCmGG6ZaTfPbejYxnUqLWDmAri4+S2gctHSWI1DzYlJL9MOM4+DIM51zKmvBtSh523yFq3mHNWflZWOU00VOUkb98u5z5a6ZCb+9Io3L3oL3CcF05OXAwJsE6v+uBi0EuASCBOKBiKYrvBUcvD5Pgp4+Fdg0E3nO09RUp3mz2aEoyKY2ZAF7KO4xIgE+az6UaYgs17kya+pc0wONg0sKEgBg/D84PODoxjuhmB4uKLuKx3DYUJmYtpSDVckaGOF5mwSvvEBAVugEF/v/HcuK1h33jWqFm4ElAH/fvSv7HApD1s4j5iUOTKzlXj+jpaJoOX8Nk7/POyuFFtwctSJZkWRMyF0TfE2lRD8JfQhA5OxEgYJ/zSZPGw7LZiHygZDznLpYK4VQ70UhBuRF30Q5JktYCA3JAdqGc1yajXZ0VJGDRtpfBTOHW0GN3WJmvzBYvlqGPOajassT3FyppuPlcrvFi7reZdG7s6GsAMpz3DJwV1vuTQ3FBHh2Klzx857JMi3ARY2wRyvbIhBrg0zz7NP7pLgmJYhrKJ8vZqf73u+EldFofLCQtpBx0EaXhvDDB4tVgYeeg4UIu/7Ywwmur1xsrkIR2eoEov2WV/sqFdTvn1d4Ps4Ad5luiESZw5WZ1bZn/+NtnobVCBMSQEwbRC0cjF20eCyU2vAOtK8fkJ5zog27U7PA2IU4QqNRH9xdw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(4636009)(366004)(8676002)(86362001)(6512007)(6506007)(64756008)(26005)(38070700005)(76116006)(83380400001)(4326008)(66946007)(4744005)(8936002)(71200400001)(82960400001)(5660300002)(6486002)(2906002)(186003)(6916009)(122000001)(91956017)(66556008)(316002)(66446008)(66476007)(38100700002)(508600001)(44832011)(1076003)(33716001)(9686003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?INyJ1es0ANmmR3u6LfZuJxg3P3EeXrXip3dUCa22ouWIqbiXL4JTeRnWNjZ+?=
- =?us-ascii?Q?OvM6MA0vuP9c1WKcetjId+8npVTV8pQi+R7yoO646jp37P5hz/GN6t3xOLey?=
- =?us-ascii?Q?/N1vf7D1M51y0fHSaQzgbI3k/5RQKgli6D8270gxXzmlPLifooK5aAhMImJE?=
- =?us-ascii?Q?H0l9NG3ueThNSMy98hcUrL02usAchg1yPtB1ejnuNHuxRDJQFy3e0im70MSe?=
- =?us-ascii?Q?S5XBDaxJs8V2GVFjQmOcvoNrQpPF1+JXbN97cBg3IuirzWx+MKQ5jd0oVlIg?=
- =?us-ascii?Q?jdK9liTjdnPBeqxYTkvug9kDzIaa9WdKdxC+Nn/UMzy8tOe1Y5XnYIDnczXc?=
- =?us-ascii?Q?BjIRtjdC6AqAZVxAvw2NVH0rVUUT4/LP53JSB/ydtqQ9EfEqo2XwtbSYifAs?=
- =?us-ascii?Q?Md+SULPbVgRCQLAFi/CwAc4REVZdHiUTKxPstWMjsvKN8zGSy9Nz5a45htKZ?=
- =?us-ascii?Q?mP2Hfagu9f6JWMogW0F4jSyMfS9XkpcCcYCatvJ4mbOAYZlP1ZVXFIZlqNkY?=
- =?us-ascii?Q?tK4pXfU4UTSM30FCKJUABANWtEHP4odZAMfcUorfqw/5EapPKRayM2kZ3Yxt?=
- =?us-ascii?Q?uCTHyHXeYOt3NbyB3gmPJdOagQJbDothykzNBLJKD0cO60K451PeoyuCy45H?=
- =?us-ascii?Q?NEnWbajPpJ6ZL6/Sil9GTpZvVK97gGTMiJhb7fY0VZTSTH9cOlcaxhouuWaR?=
- =?us-ascii?Q?evkJsag5Kf3KMI3uDheIR+ZFpAgcTpqDQHz5xcyIB8HU5fiQKk8RPoK7GUH1?=
- =?us-ascii?Q?47qFXKwF8GjsI8gU7tqT/Y/DdyN+gBSq4Sja22XRE9FFt+lDsxjB33/enpdM?=
- =?us-ascii?Q?nshK4Sk92I2Zfr7LcyUyuPQ3M/r1CbJNMCSbxebUft5zBZnLFDF/DlbwkpTC?=
- =?us-ascii?Q?5Bg8sGebseSAyQsWdtdq+Ewcuhz7mkT8IeIjTDtgUBDzDreP/X+uVg2qC7eW?=
- =?us-ascii?Q?9rr33WWTeZee7mSsz46Oj2JobXrbybJuka35/TZpNZLD4omzBkU4C5tmKuyf?=
- =?us-ascii?Q?SS2cauVdGdG4U9CtPJ8K91R9n8k5l+R+DiDHhKd5FQ4DQ8TbPAS4qsaHMvrP?=
- =?us-ascii?Q?Ls9FnNVLP4dPc1alx1+zDmAvMBcHV8VOVBADfLMj5GVbtEQ8c8wch8ECUGzo?=
- =?us-ascii?Q?0J6RvJkiR8ndhEk+tQ02EO66UkRPsSP/BVcjmluU7pnq3C06SxXAwffGY898?=
- =?us-ascii?Q?kgsFUFGFwB6cD/Bf4C+pqIO3nZyDxttQ+iofqBhAxn9lvwg4Mpf84x14D7OU?=
- =?us-ascii?Q?V+XpAamk+F49z0BQ3pamRZbT0gb5CMyKJH5N+CXtTMWmNGnUAeKnOibBBgvY?=
- =?us-ascii?Q?QcS408kuT525PiiNz5AhS8EqoqhtqnrT7UAci0uge+Q3lGTZnF60hl4tE7+I?=
- =?us-ascii?Q?REjw33n9w8wbMy6+GMzL07QrX3fApH9VEYd1oyxzox9G8bkH3rR5C6wjw8oB?=
- =?us-ascii?Q?6e8/DX74c4HA2vv4v1Edi2vzXTY9iM7UM28bHb/De4TTgwibI+jf74V4zZfq?=
- =?us-ascii?Q?TeSD4bKyzxhXT1UV4qOZlNN0ecjF5LoIoEF/1OEx+BmLeLqytRaNNsBYxyMF?=
- =?us-ascii?Q?IT0ESc7XzwnQxkfSh96og19pnTadVm/pxyp6K1wWPxUOgoDt1Z9mg7cvOC+m?=
- =?us-ascii?Q?D4JQGn2Z7QgTVJItDcD06TgQcqM/fgrgOc6xF60/7f+ul/Js7vdFsVFzzfiw?=
- =?us-ascii?Q?C/XQXKT6fh2MSBs13cqtYZLDgTNy91M+WgDRR91GpbJ3bc7+xa61pbZtffGY?=
- =?us-ascii?Q?CQh4j5wBnrKF4lOQn8E04Eg5HHG0IdYugUa8btd46w8f7esXIwQ3?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <99E36A80A2265A4C8F4AA457D6783DFE@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+   d="scan'208";a="202159821"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 03 Jun 2022 10:19:08 +0800
+IronPort-SDR: MpuItvxOGcYiSRVcUpCAr0tGclYqdkaNt7FjxkQWkh+93pt0RRr/GjHCjfkMcE/Oa1m395Vpqg
+ 3xh5z/ttK/I6NbNjkyZtxwrMr+mr7PJVmVDP2uLdAt/mi2sj6Z7jkG/Uapv55lh8f+3xhTtUFD
+ kpDvNqH2DWrmL+wjpaWnFfmjTu688LYtWI62kCngkLCi80RCacZ3ePB+WF78UViieA52YNhE0l
+ usAhxxEtyTlfI14jpXXAJM++1Hg9DIlGJYbJuhLvD/FgXr9nipaOYhpnYwDKcxHwwGw4gwywiD
+ VGKfu6eo8l856e4qa7EUOD8y
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jun 2022 18:38:17 -0700
+IronPort-SDR: CArx8DYE0Qaw4NBlG5Bv81cEUfQwWjUQPVy5WOw2znvZErpXwxLUkPiZN3mnOLvgSYqAeF5AWH
+ 1QrlrcTZBaNQFdQdfjkp6d4KU1ST9ez6Ehg6C8qDhWZNMDXmIIjHfd2byRWe2B82UvxkcHO6dd
+ 3iEUwyJKWeaPk1ZdPzyB/2mhqiVUESbDbWxB/Zn6bTpMNgPuszgc9K4ypvrIcljCTjkt6ulBrU
+ LafwfNHJaZia7FqMsC/OYNU9b4GE+f/5ylmMwg0eSaItPBqS7rJPObeZSdYDjuSJKXnxVWsrMS
+ Qok=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 02 Jun 2022 19:19:08 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LDmlw2JRYz1Rwrw
+        for <linux-block@vger.kernel.org>; Thu,  2 Jun 2022 19:19:08 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:mime-version
+        :x-mailer:message-id:date:subject:to:from; s=dkim; t=1654222747;
+         x=1656814748; bh=QPOoq/55hfROcbQr6JrcSvVlM/CD+CrNgHW0khnwMaY=; b=
+        lkiSUUoXnd/NLucRN77voQSV1IFzXnhf4ybuF3q8b4CVpT0ztmphWCO1FFd6x4d8
+        zg2I4yLJfeaDl7j6bh/KsE8ytzCbO/jPb+EMH/GXO7m+P7XKKghYpuqNfGb1w4bQ
+        juHd9OIFcOyIfrlprF1FubrX6eQCyldLIPdtrj8WEUBrDmldRM9tYzsi7akCqxk4
+        mVI8C0Aw4QK3ngleE27qsx6pbp1wjF90X8DqCt55dB24YQGVOTumR+VJAjUloV2A
+        +U1FUtKOh63IyJ/IQw9noq1Q3EWvbEk0AOqaExStufg7dJfaQbG0UWtiR7WzonZ0
+        FvcIjwq5/OR/TUhg+YD5Jg==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id cRoak93JUr8Y for <linux-block@vger.kernel.org>;
+        Thu,  2 Jun 2022 19:19:07 -0700 (PDT)
+Received: from washi.fujisawa.hgst.com (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LDmlt5f6jz1Rvlc;
+        Thu,  2 Jun 2022 19:19:06 -0700 (PDT)
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+Cc:     Tyler Erickson <tyler.erickson@seagate.com>,
+        Muhammad Ahmad <muhammad.ahmad@seagate.com>
+Subject: [PATCH] block: Fix potential deadlock in blk_ia_range_sysfs_show()
+Date:   Fri,  3 Jun 2022 11:19:05 +0900
+Message-Id: <20220603021905.1441419-1-damien.lemoal@opensource.wdc.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d00cf4b3-67c6-4425-9797-08da44ffa51e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jun 2022 01:23:20.3316
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lGVbGpTdh3ON6jlLICJxEa7AMnBbhwbBBqDIC7RQqmlzuc/02LU+wVtYVjR243W7nYHISBdadjGg27hjNYxJr8q0krU+fr10AO4VZjZwi1U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB5030
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 01, 2022 / 08:48, Christoph Hellwig wrote:
-> Hi Shin'ichiro,
->=20
-> this series reduces the dependency of blktests on modular builds
-> of various block drivers.  There are still plenty of tests that
-> do require modules, mostly because a lot of scsi_debug and null_blk
-> can only be set at load time, but I plan to address those in the
-> kernel soon.
+When being read, a sysfs attribute is already protected against removal
+with the kobject node active reference counter. As a result, in
+blk_ia_range_sysfs_show(), there is no need to take the queue sysfs
+lock when reading the value of a range attribute. Using the queue sysfs
+lock in this function creates a potential deadlock situation with the
+disk removal, something that a lockdep signals with a splat when the
+device is removed:
 
-Thanks, applied!
+[  760.703551]  Possible unsafe locking scenario:
+[  760.703551]
+[  760.703554]        CPU0                    CPU1
+[  760.703556]        ----                    ----
+[  760.703558]   lock(&q->sysfs_lock);
+[  760.703565]                                lock(kn->active#385);
+[  760.703573]                                lock(&q->sysfs_lock);
+[  760.703579]   lock(kn->active#385);
+[  760.703587]
+[  760.703587]  *** DEADLOCK ***
 
+Solve this by removing the mutex_lock()/mutex_unlock() calls from
+blk_ia_range_sysfs_show().
+
+Fixes: a2247f19ee1c ("block: Add independent access ranges support")
+Cc: stable@vger.kernel.org
+Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+---
+ block/blk-ia-ranges.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
+
+diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
+index 18c68d8b9138..56ed48d2954e 100644
+--- a/block/blk-ia-ranges.c
++++ b/block/blk-ia-ranges.c
+@@ -54,13 +54,8 @@ static ssize_t blk_ia_range_sysfs_show(struct kobject =
+*kobj,
+ 		container_of(attr, struct blk_ia_range_sysfs_entry, attr);
+ 	struct blk_independent_access_range *iar =3D
+ 		container_of(kobj, struct blk_independent_access_range, kobj);
+-	ssize_t ret;
+=20
+-	mutex_lock(&iar->queue->sysfs_lock);
+-	ret =3D entry->show(iar, buf);
+-	mutex_unlock(&iar->queue->sysfs_lock);
+-
+-	return ret;
++	return entry->show(iar, buf);
+ }
+=20
+ static const struct sysfs_ops blk_ia_range_sysfs_ops =3D {
 --=20
-Shin'ichiro Kawasaki=
+2.36.1
+
