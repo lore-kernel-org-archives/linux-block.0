@@ -2,429 +2,146 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79F13C43334
-	for <linux-block@archiver.kernel.org>; Sun,  5 Jun 2022 23:15:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5C07C433EF
+	for <linux-block@archiver.kernel.org>; Sun,  5 Jun 2022 23:23:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345791AbiFEXPf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jun 2022 19:15:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60758 "EHLO
+        id S242861AbiFEXXF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jun 2022 19:23:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50998 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231932AbiFEXPd (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jun 2022 19:15:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9F46815A02
-        for <linux-block@vger.kernel.org>; Sun,  5 Jun 2022 16:15:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654470930;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aRgosKq9OTbXVCl09xW0FQJj48XSXGcstqSEKHwuXWM=;
-        b=JrmCprrB2rP7Ns9LBiouiGudWfpqXgku+FO5/WB5UF7IgNXSpBBni9krxY4M+JIwiyQ/eh
-        YxrH7lmDxMTES0X5rJ7n0rrmxfrbk3OaGtvaF9gZO68HtLSnwKYFmrABygqfPNK0CePOdv
-        BIHfcWWCv9djWgrIax3z4m1E8GZ/utg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-349-JIQXL8JdPnunLz3BX_CkMQ-1; Sun, 05 Jun 2022 19:15:28 -0400
-X-MC-Unique: JIQXL8JdPnunLz3BX_CkMQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 68B50185A794;
-        Sun,  5 Jun 2022 23:15:28 +0000 (UTC)
-Received: from [10.22.32.31] (unknown [10.22.32.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 00C5E9D7F;
-        Sun,  5 Jun 2022 23:15:27 +0000 (UTC)
-Message-ID: <ee754359-cefd-7d4b-7861-1405860bba9b@redhat.com>
-Date:   Sun, 5 Jun 2022 19:15:27 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v6 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
+        with ESMTP id S1348570AbiFEXXE (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jun 2022 19:23:04 -0400
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2064.outbound.protection.outlook.com [40.107.94.64])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 342EF1FCE6
+        for <linux-block@vger.kernel.org>; Sun,  5 Jun 2022 16:23:03 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=U0hHRlLTI6Oqp3iXYv1hLQVu9dylca4/DK3foYqDQ799kL35I0ySA27uCTcaUw+A3AB6dtxQT/4fDT+aEUF6yjib7RleKRY7kNMa7W7mrpqj8MyIUTG3JdBr63ntAkZjPFsc8s1/t6v/rh67wfjaEBMM8j2XrIg11a+xsZocSJZ/Xf3UvGIRYO2UYer10jT9h2GFDS1dAS+DOJmftD0rmtNTMSp9T39G+JMGdrmtKlPbZtsS8Z7ta/Y+fpJCC5s84fPmd2AZn2RmoV63qripkYUAcrPboou8y4vF73mkvPAxmlDKXj9731Tte5xJDO2BMuxYT3o1ixgYCSxh64O7NQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9xZcLYy/UXkTWD0cWI8ePq3zeoCKVyqM1qMSSidwka8=;
+ b=mn7HbcgbYaENHDIFxnaZKkkOYUu7w0drI1/4/CpJ3kdPTjxaldBZoAwghd3nUU3TOe7Ho/Jqu/QY9lAe3hTfIlFmBt2br1dx8YH722hmGqnjaRShCMaYvIwA4Fuhx4zYgL+FoB+0UJgndTp4U+oYxfMhr6E7Q0nEszkkfApl3pda+b8HL3TWb2dMnJg6RF4scrvfp7GHG6sJtXqS/J3oJdgMQo7DlqJ3M8fFuMs6wTkIFcjwFcyqK1Mm3PtWyE7HKypliVgVxUOi68op9fgRJjl4L8ULytxXwFIAxLVhc6wpyvJw4vU0w1BJrgNm3m2VRoWkrzTavLQNlxJ471zckg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9xZcLYy/UXkTWD0cWI8ePq3zeoCKVyqM1qMSSidwka8=;
+ b=VicEbX1CMCSeJQkuA16fkmGsV9SQXUa+mxPKdmYIcf6isp5suxy/RenddVh57AL5quaDTFKM/RgorYLVe5nuRAuxGXf424Gmh2o+tlBfhx3zYgTHBQmtgjALNp1bs1nC5txo7HJOKZhN8bsBCweZlMaMzODdeUb3ZrWvYtfjBXWo4Z+Cle5Mb6yGz7/3H9fbizCrLWv44sbx6GbKH6IKTeZXXKUTO9Hp437DWb2BGWh5q7y6and/P8gIe1Fojv4xh4aLT5yN+PDO3f82UYmV1oiOQ2sBOWAedCh5yql+28MIe8TDoaI6RUgaxMaZX/mfi9Z12l+M2gWyuwQs/oklig==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by CY5PR12MB6369.namprd12.prod.outlook.com (2603:10b6:930:21::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.18; Sun, 5 Jun
+ 2022 23:23:00 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6dff:6121:50c:b72e]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6dff:6121:50c:b72e%7]) with mapi id 15.20.5314.019; Sun, 5 Jun 2022
+ 23:23:00 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Xiao Yang <yangx.jy@fujitsu.com>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "logang@deltatee.com" <logang@deltatee.com>
+Subject: Re: [PATCH blktests] nvme/033: Remove volatile output
+Thread-Topic: [PATCH blktests] nvme/033: Remove volatile output
+Thread-Index: AQHYeC0Zx//CHU8PaEWiGsMKauZppa1BdgmA
+Date:   Sun, 5 Jun 2022 23:22:59 +0000
+Message-ID: <41fc2524-3b7d-dbcb-04c6-9dc803dccddb@nvidia.com>
+References: <20220604160638.1118-1-yangx.jy@fujitsu.com>
+In-Reply-To: <20220604160638.1118-1-yangx.jy@fujitsu.com>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220602192020.166940-1-longman@redhat.com>
- <20220602192020.166940-4-longman@redhat.com> <YprYgdV0IxAeJZsz@T590>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <YprYgdV0IxAeJZsz@T590>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.11.54.5
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 648911bb-f3e6-486c-bb43-08da474a54b2
+x-ms-traffictypediagnostic: CY5PR12MB6369:EE_
+x-microsoft-antispam-prvs: <CY5PR12MB6369C438E6780BE3B5330C31A3A39@CY5PR12MB6369.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: PHenkidaanP1vq/SccDAhm0TVDqR7dfLVLb9GnkHZIXx4hBqOTVgUnMxjJxdY2y1zTi492/D6nszttLYa5HuZqcjSAravOSlhSL8KEkNydpJ8WLmnqOWnXuWQlDe/RRFlaD8QfTll3ofKZxq0XY1xzidfd1wjMeM37r4NuDE8JlAdPmj26rOz1nXbH0d0wlJ8hAsRCfp7HmFgvnpsyJw1EYMpCyNGKg6xquzw/mIvA1zQhD+yKU1XrNKpPkJyTBr9icJlE4Z0+F1bgJG0lN74lJwaAd+vM4z8BShEZH7jou9Q25lmzy1abc5eDfZl0WD+/LcSqbHKUkWbwiggxCx6DfZgxO2cgdt09JX3P3xfKGpXQffTBP5wq8D+PNttej46eAOXg0N19f1LdeZYNtY70DMqTByXutOkxWZhOIbgFgG1CFvrJiu1Tz3ImM1FQeOHjsbcpc3bmAPIsIjkyV+hdYWn6PkKjUojGmcashZ7AN2dWlFwSwmsfSR6SFbJpVrK3G8CeNpfHONyz4IY7H4OKGe+bUDWMX3ILv4sujfXeM+G6Mk3WM92ByPiIBGzCmHZei/OhAi35r9dgKngJuqdLkc2fjZD6vcRq5UKnvS3P5NHJPMP7Bl1iRtfdAei9xb0hKzYBiJ7XZIYaeie3KIFGui/qVZ2tO1jYKXDeDDmatbosWRmHF0D3+5PsYG5rcJUDINuXd3GKvju27HugtXSlufnYBlwIaaxoOieec01Y0AEWmDlktcwZKsYLg0kLAC0qW9of2XHLIlvMnxBhN+LA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(2906002)(122000001)(186003)(4744005)(38070700005)(71200400001)(6486002)(6506007)(31686004)(83380400001)(38100700002)(2616005)(6512007)(53546011)(36756003)(26005)(508600001)(31696002)(4326008)(86362001)(8936002)(91956017)(8676002)(76116006)(66476007)(66556008)(64756008)(66946007)(66446008)(5660300002)(54906003)(316002)(110136005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?ZGdLMnEzOTRMOUZ6eEY1Zk14MlFMUDhwam5CSnIvVXlyd0RiM3k3M1I4ek9B?=
+ =?utf-8?B?UXU0MnVIZUxucm5NTzlzc3pEQnBudy9LeWg3Y1gzc2Vua1c4ei9DNWl6T1JN?=
+ =?utf-8?B?b3M1ck1LUVB4TlA1aDlTYUJNa2hRM254c3Q0RFY0eEpnQjFmQmxUUWh0L2hO?=
+ =?utf-8?B?cUI3MlVGRm1lZEZZWE9ObDVnSkxVWERwUWIwSzJRS0ZiWUMzSDZqQW5VUWxQ?=
+ =?utf-8?B?cmdRa1hLU2ZLR0g2QXpKYUlKQUs0UURRd0FocFVseHlCOGhLd2Q3VGJ6aGhM?=
+ =?utf-8?B?amxscFowWWJsTmFqWDdRK2NQamdVSVJYZFpyYk9KUld4cGxKc2JWaEJ3M2JD?=
+ =?utf-8?B?dXU5VnczS282bXJ3aFZvR2ozWkxnYXVSSVRIVHUvbTl3S2pVMEFRcE0yeXI3?=
+ =?utf-8?B?M0QrVkc1MlVnbUVYRTVmMTFmOEpPY3M1NytHNGg1WkkreXlIM1JZN3pvYTY1?=
+ =?utf-8?B?VTJPcE9MZXpOK1d4L3JBZ3pMbUJSaElJVUtaWFFMVklQTmtSamk3U0U2Qmdx?=
+ =?utf-8?B?dmdCVEViK3U1OVN5bmVtRnlndWNISE9TR2tYSUt2K0hHelB5UTI0Y0o5b2c2?=
+ =?utf-8?B?S3orb2Z6QkNtTlZqS3hGbm0xS0ljWUR2RU50OTdEVkkvUHAvMUltUXMrbURw?=
+ =?utf-8?B?eENMM2V5VTIyb0xWN1VsZFpxMGpOdFRUNlZFQ3NhSHlJQlhPTjI1WmdWVWxD?=
+ =?utf-8?B?WFJEbTBYQ0ZWSm1tYnduS1FuemQrWDlmOSs5WGZTenFiTVFxZE5sd0RuZm4z?=
+ =?utf-8?B?WUdiTndZdmNpK2R1Y2FvbXZGL3FmcDNSdnlraGxTQzl4TE83YTRFMmp1V3Rw?=
+ =?utf-8?B?QmN2bUpINU16T0pmWHpwZGRQdVo2eWZCRXdwYkkya3RhRmE3Q2s4Q002SmJZ?=
+ =?utf-8?B?SFphdUs3NWtRU1NYWFp0enlQc2JlKzZMQVhuY3ZEM2hOLzR1TzN5a0xqdmRz?=
+ =?utf-8?B?L0xnRGJCZ1BkMnJxd2tzOFdObWc5VzdZNmNSbjhPNnB3c0IvbUFYY3VGTnU4?=
+ =?utf-8?B?MWtXb0hUaFZ6cFo4ZnNpenI4UkNCRHdWbkhJQ2dlUEM0WFpIY2w4TWZjaFcr?=
+ =?utf-8?B?eC91cVFEczZEZll5SnZuRVArMlNRUVpXT2NBSzNPYTJxb0c3d25VLzEva2Vn?=
+ =?utf-8?B?cFd6azRzZ0xzb1hsTTRYZG5OTWo4U3dYNmtoc1dJMUhCcHRpRGoyeUdzMXZG?=
+ =?utf-8?B?ajl4dEtRSjIvQkJnc0NKbzJBUXNBcVJRWjhIZmJORFFvRmtsNWdiNGNFeUwr?=
+ =?utf-8?B?dTdUajlIMlRsQlAyTW9UMnBCRWRiUlhUZEJiL29leVJDejlZa095a282dkpv?=
+ =?utf-8?B?SGlHb0tSbCt4NE9yOXNQbnFQQnJZOTRxdDFSN0FNVmdFZkJoSFlGSjdoRmM5?=
+ =?utf-8?B?NDJ1T0drNkJMemNUbk5xSXlLQmpKNll1ck5YM2ZJTUtybkk1Qnp4SlhYUmlq?=
+ =?utf-8?B?R2FqMitMYkR5UjlJemsrNVl2cmJEZWdpZHJ5VVh3LzhGK3dnemYzdktBMFhz?=
+ =?utf-8?B?Snc1TjlPQ01xTitPOTZXVmRSR250QVF0VCt3THUxck4yWmdmY1l0bkFKc0dm?=
+ =?utf-8?B?TDZmMk5mVUtLem15Z204WkJQVEhQRXpUN0FwUHNrdWZlMVJmYjY5ZkxHcjRw?=
+ =?utf-8?B?MWlyQzFqV0dWTVkxcUtKak1rTlQvMnNldFBDQkNjaHVSdDJHSElPQS9TdXJ5?=
+ =?utf-8?B?U2ViMGpLTmNCcEwyWmRheWc0Qk5GVUV3NkRWdU9kaVN3MEIweTlpZkwvTnJQ?=
+ =?utf-8?B?eVlONnNKYzRHNmVta29DeHVEaFl4cmpWbU9RREtKcVZneWpXVzRuSlVjRU1y?=
+ =?utf-8?B?MHhTbmxvNytvK2tvZUtiYmt1M1FqNVhUVlRITWlnN0pSckxnejRZbm1FVlFj?=
+ =?utf-8?B?WHB6emdRMHBkSUdGZlZyemJVOUd1dkdad0E3OFYzaW5UWG1FM2I2bmNVWVlO?=
+ =?utf-8?B?dWZXTllPQUtKMXpKeUxxWFE3aEhqK1BubEVyZUdaK2JJTTdFcXo2K1hFUnhE?=
+ =?utf-8?B?dElhZXdoci94QktqTm5YcVFuZDBFVnhad0pPVGZGVHJoUCt6aSszOEJvdnFP?=
+ =?utf-8?B?blRidEZPVHB0bjVGeG5aTmFpaUQwQlZ6eFhqUGRzOUgwejVFdlpkMkg2S1V1?=
+ =?utf-8?B?Mk9FMXRGWGk0NWpJaVAydWQyR1JPUktLVlRQT3BGdUNRY2Nlc2c2WTk3UGlJ?=
+ =?utf-8?B?aG1mOTVSSFl1bStyY2lrT2MwZGRLd0dZUUVVUno2OXQ2Nm9HQXlJSVowd1lo?=
+ =?utf-8?B?QVd4VEZXN2VobWQyU2JQZDRSd0JwbkZhSEJtdThTYU4zTjBDV2xVZkRmaC9s?=
+ =?utf-8?B?TGtjRlI1ckUvZjNKNjY0Wi9NWk5pOE5MVk13VmVzSlJDUE5ReFp6QT09?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <601FF3E99034F645B4E915DA4D976781@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 648911bb-f3e6-486c-bb43-08da474a54b2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Jun 2022 23:22:59.9873
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +S04Wa6GKPPxrVVJiClOeYfzmY4zhwxm15yuzK0M9TINDZiT2c6iCRJ2I9w98ZsQWLIuWL1Uy5Ui2ROoEPKyHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6369
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/3/22 23:58, Ming Lei wrote:
-> Hi Waiman,
->
-> On Thu, Jun 02, 2022 at 03:20:20PM -0400, Waiman Long wrote:
->> For a system with many CPUs and block devices, the time to do
->> blkcg_rstat_flush() from cgroup_rstat_flush() can be rather long. It
->> can be especially problematic as interrupt is disabled during the flush.
->> It was reported that it might take seconds to complete in some extreme
->> cases leading to hard lockup messages.
->>
->> As it is likely that not all the percpu blkg_iostat_set's has been
->> updated since the last flush, those stale blkg_iostat_set's don't need
->> to be flushed in this case. This patch optimizes blkcg_rstat_flush()
->> by keeping a lockless list of recently updated blkg_iostat_set's in a
->> newly added percpu blkcg->lhead pointer.
->>
->> The blkg_iostat_set is added to the lockless list on the update side
->> in blk_cgroup_bio_start(). It is removed from the lockless list when
->> flushed in blkcg_rstat_flush(). Due to racing, it is possible that
->> blk_iostat_set's in the lockless list may have no new IO stats to be
->> flushed. To protect against destruction of blkg, a percpu reference is
->> gotten when putting into the lockless list and put back when removed.
->>
->> A blkg_iostat_set can determine if it is in a lockless list by checking
->> the content of its lnode.next pointer which will be non-NULL when in
->> a lockless list. This requires the presence of a special llist_last
->> sentinel node to be put at the end of the lockless list.
->>
->> When booting up an instrumented test kernel with this patch on a
->> 2-socket 96-thread system with cgroup v2, out of the 2051 calls to
->> cgroup_rstat_flush() after bootup, 1788 of the calls were exited
->> immediately because of empty lockless list. After an all-cpu kernel
->> build, the ratio became 6295424/6340513. That was more than 99%.
->>
->> Signed-off-by: Waiman Long <longman@redhat.com>
->> Acked-by: Tejun Heo <tj@kernel.org>
->> ---
->>   block/blk-cgroup.c | 100 ++++++++++++++++++++++++++++++++++++++++++---
->>   block/blk-cgroup.h |   9 ++++
->>   2 files changed, 103 insertions(+), 6 deletions(-)
->>
->> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
->> index 9021f75fc752..963a779c4cab 100644
->> --- a/block/blk-cgroup.c
->> +++ b/block/blk-cgroup.c
->> @@ -59,6 +59,71 @@ static struct workqueue_struct *blkcg_punt_bio_wq;
->>   
->>   #define BLKG_DESTROY_BATCH_SIZE  64
->>   
->> +/*
->> + * Lockless lists for tracking IO stats update
->> + *
->> + * New IO stats are stored in the percpu iostat_cpu within blkcg_gq (blkg).
->> + * There are multiple blkg's (one for each block device) attached to each
->> + * blkcg. The rstat code keeps track of which cpu has IO stats updated,
->> + * but it doesn't know which blkg has the updated stats. If there are many
->> + * block devices in a system, the cost of iterating all the blkg's to flush
->> + * out the IO stats can be high. To reduce such overhead, a set of percpu
->> + * lockless lists (lhead) per blkcg are used to track the set of recently
->> + * updated iostat_cpu's since the last flush. An iostat_cpu will be put
->> + * onto the lockless list on the update side [blk_cgroup_bio_start()] if
->> + * not there yet and then removed when being flushed [blkcg_rstat_flush()].
->> + * References to blkg are gotten and then put back in the process to
->> + * protect against blkg removal.
->> + *
->> + * lnode.next of the last entry in a lockless list is NULL. To enable us to
->> + * use lnode.next as a boolean flag to indicate its presence in a lockless
->> + * list, we have to make it non-NULL for all. This is done by using a
->> + * sentinel node at the end of the lockless list. All the percpu lhead's
->> + * are initialized to point to that sentinel node as being empty.
->> + */
->> +static struct llist_node llist_last;
->> +
->> +static bool blkcg_llist_empty(struct llist_head *lhead)
->> +{
->> +	return lhead->first == &llist_last;
->> +}
->> +
->> +static void init_blkcg_llists(struct blkcg *blkcg)
->> +{
->> +	int cpu;
->> +
->> +	for_each_possible_cpu(cpu)
->> +		per_cpu_ptr(blkcg->lhead, cpu)->first = &llist_last;
->> +}
->> +
->> +static struct llist_node *fetch_delete_blkcg_llist(struct llist_head *lhead)
->> +{
->> +	return xchg(&lhead->first, &llist_last);
->> +}
->> +
->> +static struct llist_node *fetch_delete_lnode_next(struct llist_node *lnode)
->> +{
->> +	struct llist_node *next = READ_ONCE(lnode->next);
->> +	struct blkcg_gq *blkg = llist_entry(lnode, struct blkg_iostat_set,
->> +					    lnode)->blkg;
->> +
->> +	WRITE_ONCE(lnode->next, NULL);
->> +	percpu_ref_put(&blkg->refcnt);
->> +	return next;
->> +}
->> +
->> +/*
->> + * The retrieved blkg_iostat_set is immediately marked as not in the
->> + * lockless list by clearing its node->next pointer. It could be put
->> + * back into the list by a parallel update before the iostat's are
->> + * finally flushed including probably the new update.
->> + */
->> +#define blkcg_llist_for_each_entry_safe(pos, node, nxt)			\
->> +	for (; (node != &llist_last) &&					\
->> +	       (pos = llist_entry(node, struct blkg_iostat_set, lnode),	\
->> +		nxt = fetch_delete_lnode_next(node), true);		\
->> +		node = nxt)
->> +
->>   /**
->>    * blkcg_css - find the current css
->>    *
->> @@ -236,8 +301,10 @@ static struct blkcg_gq *blkg_alloc(struct blkcg *blkcg, struct request_queue *q,
->>   	blkg->blkcg = blkcg;
->>   
->>   	u64_stats_init(&blkg->iostat.sync);
->> -	for_each_possible_cpu(cpu)
->> +	for_each_possible_cpu(cpu) {
->>   		u64_stats_init(&per_cpu_ptr(blkg->iostat_cpu, cpu)->sync);
->> +		per_cpu_ptr(blkg->iostat_cpu, cpu)->blkg = blkg;
->> +	}
->>   
->>   	for (i = 0; i < BLKCG_MAX_POLS; i++) {
->>   		struct blkcg_policy *pol = blkcg_policy[i];
->> @@ -852,17 +919,23 @@ static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
->>   static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
->>   {
->>   	struct blkcg *blkcg = css_to_blkcg(css);
->> -	struct blkcg_gq *blkg;
->> +	struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
->> +	struct llist_node *lnode, *lnext;
->> +	struct blkg_iostat_set *bisc;
->>   
->>   	/* Root-level stats are sourced from system-wide IO stats */
->>   	if (!cgroup_parent(css->cgroup))
->>   		return;
->>   
->> +	if (blkcg_llist_empty(lhead))
->> +		return;
->> +
->>   	rcu_read_lock();
->>   
->> -	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
->> +	lnode = fetch_delete_blkcg_llist(lhead);
->> +	blkcg_llist_for_each_entry_safe(bisc, lnode, lnext) {
->> +		struct blkcg_gq *blkg = bisc->blkg;
->>   		struct blkcg_gq *parent = blkg->parent;
->> -		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
->>   		struct blkg_iostat cur, delta;
->>   		unsigned long flags;
->>   		unsigned int seq;
->> @@ -1170,6 +1243,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
->>   
->>   	mutex_unlock(&blkcg_pol_mutex);
->>   
->> +	free_percpu(blkcg->lhead);
->>   	kfree(blkcg);
->>   }
->>   
->> @@ -1189,6 +1263,11 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
->>   			goto unlock;
->>   	}
->>   
->> +	blkcg->lhead = alloc_percpu_gfp(struct llist_head, GFP_KERNEL);
->> +	if (!blkcg->lhead)
->> +		goto free_blkcg;
->> +	init_blkcg_llists(blkcg);
->> +
->>   	for (i = 0; i < BLKCG_MAX_POLS ; i++) {
->>   		struct blkcg_policy *pol = blkcg_policy[i];
->>   		struct blkcg_policy_data *cpd;
->> @@ -1229,7 +1308,8 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
->>   	for (i--; i >= 0; i--)
->>   		if (blkcg->cpd[i])
->>   			blkcg_policy[i]->cpd_free_fn(blkcg->cpd[i]);
->> -
->> +	free_percpu(blkcg->lhead);
->> +free_blkcg:
->>   	if (blkcg != &blkcg_root)
->>   		kfree(blkcg);
->>   unlock:
->> @@ -1993,6 +2073,7 @@ static int blk_cgroup_io_type(struct bio *bio)
->>   
->>   void blk_cgroup_bio_start(struct bio *bio)
->>   {
->> +	struct blkcg *blkcg = bio->bi_blkg->blkcg;
->>   	int rwd = blk_cgroup_io_type(bio), cpu;
->>   	struct blkg_iostat_set *bis;
->>   	unsigned long flags;
->> @@ -2011,9 +2092,16 @@ void blk_cgroup_bio_start(struct bio *bio)
->>   	}
->>   	bis->cur.ios[rwd]++;
->>   
->> +	if (!READ_ONCE(bis->lnode.next)) {
->> +		struct llist_head *lhead = per_cpu_ptr(blkcg->lhead, cpu);
->> +
->> +		llist_add(&bis->lnode, lhead);
->> +		percpu_ref_get(&bis->blkg->refcnt);
->> +	}
-> The above still adds cost in fast io path.
-
-That is true, but it depends on how often is cgroup_rstat_flush*() is 
-called. There is a one time setup cost after a flush. Subsequent IO ops 
-on the same device and cpu will have negligible cost.
-
-
->
->> +
->>   	u64_stats_update_end_irqrestore(&bis->sync, flags);
->>   	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
->> -		cgroup_rstat_updated(bio->bi_blkg->blkcg->css.cgroup, cpu);
->> +		cgroup_rstat_updated(blkcg->css.cgroup, cpu);
->>   	put_cpu();
->>   }
-> IMO, it seems one cgroup generic issue. More importantly, the percpu
-> lock of cgroup_rstat_cpu_lock is held in both cgroup_rstat_updated()
-> and cgroup_rstat_flush_locked(), which can provide enough sync with
-> zero extra cost, meantime other cgroups can benefit from this kind of
-> much simpler improvement.
->
-> So what do you think of the following approach?
->
-> BTW, the cpumask can be replaced with one plain percpu variable for avoiding
-> cache conflict.
->
-> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-> index 23ec30f50cca..f8287fced726 100644
-> --- a/block/blk-cgroup.c
-> +++ b/block/blk-cgroup.c
-> @@ -858,6 +858,11 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
->   	if (!cgroup_parent(css->cgroup))
->   		return;
->   
-> +	if (!cpumask_test_cpu(cpu, blkcg->iostat_cpumask))
-> +		return;
-> +
-> +	cpumask_clear_cpu(cpu, blkcg->iostat_cpumask);
-> +
->   	rcu_read_lock();
->   
->   	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
-> @@ -1170,6 +1175,7 @@ static void blkcg_css_free(struct cgroup_subsys_state *css)
->   
->   	mutex_unlock(&blkcg_pol_mutex);
->   
-> +	free_cpumask_var(blkcg->iostat_cpumask);
->   	kfree(blkcg);
->   }
->   
-> @@ -1213,6 +1219,9 @@ blkcg_css_alloc(struct cgroup_subsys_state *parent_css)
->   			pol->cpd_init_fn(cpd);
->   	}
->   
-> +	if (!zalloc_cpumask_var(&blkcg->iostat_cpumask, GFP_KERNEL))
-> +		goto free_pd_blkcg;
-> +
->   	spin_lock_init(&blkcg->lock);
->   	refcount_set(&blkcg->online_pin, 1);
->   	INIT_RADIX_TREE(&blkcg->blkg_tree, GFP_NOWAIT | __GFP_NOWARN);
-> @@ -2009,7 +2018,8 @@ void blk_cgroup_bio_start(struct bio *bio)
->   
->   	u64_stats_update_end_irqrestore(&bis->sync, flags);
->   	if (cgroup_subsys_on_dfl(io_cgrp_subsys))
-> -		cgroup_rstat_updated(bio->bi_blkg->blkcg->css.cgroup, cpu);
-> +		cgroup_rstat_updated(bio->bi_blkg->blkcg->css.cgroup, cpu,
-> +				bio->bi_blkg->blkcg->iostat_cpumask);
->   	put_cpu();
->   }
->   
-> diff --git a/block/blk-cgroup.h b/block/blk-cgroup.h
-> index d4de0a35e066..458b40ca045a 100644
-> --- a/block/blk-cgroup.h
-> +++ b/block/blk-cgroup.h
-> @@ -103,6 +103,7 @@ struct blkcg {
->   #ifdef CONFIG_CGROUP_WRITEBACK
->   	struct list_head		cgwb_list;
->   #endif
-> +	cpumask_var_t			iostat_cpumask;
->   };
->   
->   static inline struct blkcg *css_to_blkcg(struct cgroup_subsys_state *css)
-> diff --git a/include/linux/cgroup.h b/include/linux/cgroup.h
-> index 0d1ada8968d7..4fa5dde3a62c 100644
-> --- a/include/linux/cgroup.h
-> +++ b/include/linux/cgroup.h
-> @@ -763,7 +763,7 @@ static inline struct cgroup *cgroup_get_from_id(u64 id)
->   /*
->    * cgroup scalable recursive statistics.
->    */
-> -void cgroup_rstat_updated(struct cgroup *cgrp, int cpu);
-> +void cgroup_rstat_updated(struct cgroup *cgrp, int cpu, cpumask_var_t cpumask);
->   void cgroup_rstat_flush(struct cgroup *cgrp);
->   void cgroup_rstat_flush_irqsafe(struct cgroup *cgrp);
->   void cgroup_rstat_flush_hold(struct cgroup *cgrp);
-> diff --git a/kernel/cgroup/rstat.c b/kernel/cgroup/rstat.c
-> index 24b5c2ab5598..f4eb63b86e56 100644
-> --- a/kernel/cgroup/rstat.c
-> +++ b/kernel/cgroup/rstat.c
-> @@ -22,7 +22,7 @@ static struct cgroup_rstat_cpu *cgroup_rstat_cpu(struct cgroup *cgrp, int cpu)
->    * rstat_cpu->updated_children list.  See the comment on top of
->    * cgroup_rstat_cpu definition for details.
->    */
-> -void cgroup_rstat_updated(struct cgroup *cgrp, int cpu)
-> +void cgroup_rstat_updated(struct cgroup *cgrp, int cpu, cpumask_var_t cpumask)
->   {
->   	raw_spinlock_t *cpu_lock = per_cpu_ptr(&cgroup_rstat_cpu_lock, cpu);
->   	unsigned long flags;
-> @@ -40,6 +40,9 @@ void cgroup_rstat_updated(struct cgroup *cgrp, int cpu)
->   
->   	raw_spin_lock_irqsave(cpu_lock, flags);
->   
-> +	if (cpumask)
-> +		cpumask_set_cpu(cpu, cpumask);
-> +
->   	/* put @cgrp and all ancestors on the corresponding updated lists */
->   	while (true) {
->   		struct cgroup_rstat_cpu *rstatc = cgroup_rstat_cpu(cgrp, cpu);
-> @@ -366,7 +369,7 @@ static void cgroup_base_stat_cputime_account_end(struct cgroup *cgrp,
->   						 unsigned long flags)
->   {
->   	u64_stats_update_end_irqrestore(&rstatc->bsync, flags);
-> -	cgroup_rstat_updated(cgrp, smp_processor_id());
-> +	cgroup_rstat_updated(cgrp, smp_processor_id(), NULL);
->   	put_cpu_ptr(rstatc);
->   }
->   
-> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
-> index abec50f31fe6..8c4f204dbf5b 100644
-> --- a/mm/memcontrol.c
-> +++ b/mm/memcontrol.c
-> @@ -622,7 +622,7 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
->   {
->   	unsigned int x;
->   
-> -	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id());
-> +	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id(), NULL);
->   
->   	x = __this_cpu_add_return(stats_updates, abs(val));
->   	if (x > MEMCG_CHARGE_BATCH) {
-
-I think the rstat set of functions are doing that already. So flush will 
-only call CPUs that have called cgroup_rstat_updated() before. However, 
-one deficiency that I am aware of is that there is no bitmap of which 
-controller have update. The problem that I saw in cgroup v2 is that in a 
-cgroup with both memory controller and block controller enabled, a 
-cgroup_rstat_updated() call from memory cgroup later causes the rstat 
-function to call into block cgroup flush method even though there is no 
-update in the block controller. This is an area that needs improvement.
-
-Your code does allow the block controller to be aware of that and avoid 
-further action, but I think it has to be done in the rstat code to be 
-applicable to all controllers instead of just specific to block controller.
-
-There is another problem that this approach. Suppose the system have 20 
-block devices and one of them has an IO operation. Now the flush method 
-still needs to iterate all the 20 blkg's to do an update. The block 
-controller is kind of special that the number of per-cgroup IO stats 
-depends on the number of block devices present. Other controllers just 
-have one set of stats per cgroup.
-
-Thanks,
-Longman
-
-
+T24gNi80LzIyIDA5OjA2LCBYaWFvIFlhbmcgd3JvdGU6DQo+IFRoZSBvdXRwdXQgb2YgX252bWVf
+ZGlzY292ZXIoKSB3aWxsIGJlIGNoYW5nZWQgYWNjb3JkaW5nIHRvDQo+ICR7bnZtZV90cnR5cGV9
+IGFuZCB0aGUgbnVtYmVyIG9mIE5JQ3MuIEZvciBleGFtcGxlOiBudm1lLzAzMw0KPiB3aXRoIG52
+bWVfdHJ0eXBlPXRjcCBhbmQgdHdvIE5JQ3MgZ290IHRoZSBmb2xsb3dpbmcgZXJyb3I6DQo+IC0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQ0KPiAgIFJ1bm5p
+bmcgbnZtZS8wMzMNCj4gLURpc2NvdmVyeSBMb2cgTnVtYmVyIG9mIFJlY29yZHMgMSwgR2VuZXJh
+dGlvbiBjb3VudGVyIFgNCj4gK0Rpc2NvdmVyeSBMb2cgTnVtYmVyIG9mIFJlY29yZHMgMiwgR2Vu
+ZXJhdGlvbiBjb3VudGVyIFgNCj4gICA9PT09PURpc2NvdmVyeSBMb2cgRW50cnkgMD09PT09PQ0K
+PiAtdHJ0eXBlOiAgbG9vcA0KPiArdHJ0eXBlOiAgdGNwDQo+ICtzdWJucW46ICBucW4uMjAxNC0w
+OC5vcmcubnZtZXhwcmVzcy5kaXNjb3ZlcnkNCj4gKz09PT09RGlzY292ZXJ5IExvZyBFbnRyeSAx
+PT09PT09DQo+ICt0cnR5cGU6ICB0Y3ANCj4gICBzdWJucW46ICBibGt0ZXN0cy1zdWJzeXN0ZW0t
+MQ0KPiAgIE5RTjpibGt0ZXN0cy1zdWJzeXN0ZW0tMSBkaXNjb25uZWN0ZWQgMSBjb250cm9sbGVy
+KHMpDQo+ICAgVGVzdCBjb21wbGV0ZQ0KPiAtLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0NCj4gDQo+IFJlbW92ZSB2b2xhdGlsZSBvdXRwdXQgdG8gZml4IHRo
+ZSBpc3N1ZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFhpYW8gWWFuZyA8eWFuZ3guanlAZnVqaXRz
+dS5jb20+DQo+IC0tLQ0KPiAgIHRlc3RzL252bWUvMDMzICAgICB8IDIgLS0NCj4gICB0ZXN0cy9u
+dm1lLzAzMy5vdXQgfCA0IC0tLS0NCj4gICAyIGZpbGVzIGNoYW5nZWQsIDYgZGVsZXRpb25zKC0p
+DQo+IA0KDQpMb29rcyBnb29kLg0KDQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxr
+Y2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
