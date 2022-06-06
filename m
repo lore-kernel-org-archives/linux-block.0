@@ -2,57 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0A2CCA473
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jun 2022 18:07:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83E1EC433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jun 2022 20:47:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231128AbiFFSHe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jun 2022 14:07:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37644 "EHLO
+        id S234471AbiFFUrX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jun 2022 16:47:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230519AbiFFSHc (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 14:07:32 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02B971A839;
-        Mon,  6 Jun 2022 11:07:27 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id DA5A6B81A79;
-        Mon,  6 Jun 2022 18:07:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DF02C385A9;
-        Mon,  6 Jun 2022 18:07:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1654538844;
-        bh=V609pr5ev5J8Nn+gPyV2nr6oXqVNR3OZd3l5qsfLjQY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=lUTvNDvIFOnfkIQ3e1q/+5WTf8s4WIFngS69Ef4XUBsPyOln+reY8V6r3dAS/d69G
-         vUi/5BsTQsMejz6tR5d2+2qW/1YIWIUo8F0pBYtr3QFyFrR+ZFKkK4yB4SHhqfL004
-         n6ln+FqKxRoiQWvYvFwQs57uNbVF4e9tywBid6DY=
-Date:   Mon, 6 Jun 2022 20:07:21 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     stable@vger.kernel.org, linux-block@vger.kernel.org,
-        Paolo Valente <paolo.valente@linaro.org>,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH 0/6] bfq: cgroup fixes for 5.10 stable
-Message-ID: <Yp5CWVgVsZ59m21g@kroah.com>
-References: <20220606174118.10992-1-jack@suse.cz>
+        with ESMTP id S234482AbiFFUqs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 16:46:48 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20CD513B8F2;
+        Mon,  6 Jun 2022 13:40:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+        Content-Type:Content-ID:Content-Description;
+        bh=dRkMHaR981UE2djNCVPW4MUdY2rPYJAa6UnQ1arpxn4=; b=VhRq5mA6U/Le0FhZhCp9BX9vX0
+        eEJWByASrVCSrm9WetxXqV0UXZBjF0SuYe4mFnGXMFsUgOilHz8p+squ/1rM4gM36CwhSe5BBEQp6
+        i1dQyrlxzSUP+hK9Ax4brjnRi7zxuvpEv+ymkWeCRkQK8HkgmO0y7Vc+lYVUA7Hlj90Pkf8iPWxqv
+        CYXqz3bl8ul96I36GIcF4ldupbg1VWOjM55w+RuDYjPUC/TOKQiKqMH+XKBjwoHp0p03NK+LpBfPw
+        iNV++FmUm87jwl9SX46KBPV+Ri5X6qeVBMjICnW8mirhgRNBkbRKdvNkLwdTh42fXKSQ5I7volu41
+        cllWb9Yg==;
+Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nyJWw-00B19O-PM; Mon, 06 Jun 2022 20:40:54 +0000
+From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
+        linux-mtd@lists.infradead.org,
+        virtualization@lists.linux-foundation.org
+Subject: [PATCH 03/20] mm/migrate: Convert writeout() to take a folio
+Date:   Mon,  6 Jun 2022 21:40:33 +0100
+Message-Id: <20220606204050.2625949-4-willy@infradead.org>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20220606204050.2625949-1-willy@infradead.org>
+References: <20220606204050.2625949-1-willy@infradead.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220606174118.10992-1-jack@suse.cz>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 06, 2022 at 07:56:35PM +0200, Jan Kara wrote:
-> Hello,
-> 
-> In this series are BFQ upstream fixes that didn't apply to 5.10 stable tree
-> cleanly and needed some massaging before they apply. The result did pass
-> some cgroup testing with bfq and the backport is based on the one we have
-> in our SLES kernel so I'm reasonably confident things are fine.
+Use a folio throughout this function.
 
-Now queued up, thanks for the backports!
+Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+---
+ mm/migrate.c | 21 ++++++++++-----------
+ 1 file changed, 10 insertions(+), 11 deletions(-)
 
-greg k-h
+diff --git a/mm/migrate.c b/mm/migrate.c
+index d772ce63d7e2..f19246c12fe9 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -762,11 +762,10 @@ int buffer_migrate_page_norefs(struct address_space *mapping,
+ #endif
+ 
+ /*
+- * Writeback a page to clean the dirty state
++ * Writeback a folio to clean the dirty state
+  */
+-static int writeout(struct address_space *mapping, struct page *page)
++static int writeout(struct address_space *mapping, struct folio *folio)
+ {
+-	struct folio *folio = page_folio(page);
+ 	struct writeback_control wbc = {
+ 		.sync_mode = WB_SYNC_NONE,
+ 		.nr_to_write = 1,
+@@ -780,25 +779,25 @@ static int writeout(struct address_space *mapping, struct page *page)
+ 		/* No write method for the address space */
+ 		return -EINVAL;
+ 
+-	if (!clear_page_dirty_for_io(page))
++	if (!folio_clear_dirty_for_io(folio))
+ 		/* Someone else already triggered a write */
+ 		return -EAGAIN;
+ 
+ 	/*
+-	 * A dirty page may imply that the underlying filesystem has
+-	 * the page on some queue. So the page must be clean for
+-	 * migration. Writeout may mean we loose the lock and the
+-	 * page state is no longer what we checked for earlier.
++	 * A dirty folio may imply that the underlying filesystem has
++	 * the folio on some queue. So the folio must be clean for
++	 * migration. Writeout may mean we lose the lock and the
++	 * folio state is no longer what we checked for earlier.
+ 	 * At this point we know that the migration attempt cannot
+ 	 * be successful.
+ 	 */
+ 	remove_migration_ptes(folio, folio, false);
+ 
+-	rc = mapping->a_ops->writepage(page, &wbc);
++	rc = mapping->a_ops->writepage(&folio->page, &wbc);
+ 
+ 	if (rc != AOP_WRITEPAGE_ACTIVATE)
+ 		/* unlocked. Relock */
+-		lock_page(page);
++		folio_lock(folio);
+ 
+ 	return (rc < 0) ? -EIO : -EAGAIN;
+ }
+@@ -818,7 +817,7 @@ static int fallback_migrate_folio(struct address_space *mapping,
+ 		default:
+ 			return -EBUSY;
+ 		}
+-		return writeout(mapping, &src->page);
++		return writeout(mapping, src);
+ 	}
+ 
+ 	/*
+-- 
+2.35.1
+
