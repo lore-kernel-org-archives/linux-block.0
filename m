@@ -2,117 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27B40C43334
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jun 2022 02:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B477CC433EF
+	for <linux-block@archiver.kernel.org>; Mon,  6 Jun 2022 02:15:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243317AbiFFB76 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 5 Jun 2022 21:59:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57082 "EHLO
+        id S240339AbiFFCPn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 5 Jun 2022 22:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232266AbiFFB75 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jun 2022 21:59:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 484914F473
-        for <linux-block@vger.kernel.org>; Sun,  5 Jun 2022 18:59:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654480794;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Bvyf6sQjmkfCDLNK49ZrMJaEbj0blM3ELQjytG3RjZU=;
-        b=XfMZtmy7e3DJdnqhO46Vzp6/nFzir4UFGYgfpwl3I+xWAImZoy0TP5bJviRAaRc/dx5PVc
-        wpc100RF19C+abKcLUn3ctnoY+KoA6M74/jCSCEDFXe+YFhfOwpnAGnMspG6IZhTd5yGea
-        ehOE/cKYN61UhmClcmetQOdQ+5aiGUs=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-505-ctW413vmOo2SsU0iXf4QNg-1; Sun, 05 Jun 2022 21:59:50 -0400
-X-MC-Unique: ctW413vmOo2SsU0iXf4QNg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7EC52801228;
-        Mon,  6 Jun 2022 01:59:50 +0000 (UTC)
-Received: from [10.22.32.31] (unknown [10.22.32.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3FA4140EC001;
-        Mon,  6 Jun 2022 01:59:50 +0000 (UTC)
-Message-ID: <c9ab0e91-76db-430f-272c-558c269d62ce@redhat.com>
-Date:   Sun, 5 Jun 2022 21:59:50 -0400
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v6 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Content-Language: en-US
+        with ESMTP id S232360AbiFFCPm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Sun, 5 Jun 2022 22:15:42 -0400
+Received: from out30-42.freemail.mail.aliyun.com (out30-42.freemail.mail.aliyun.com [115.124.30.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2332D366A4;
+        Sun,  5 Jun 2022 19:15:39 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=hsiangkao@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VFPsTeZ_1654481735;
+Received: from B-P7TQMD6M-0146.local(mailfrom:hsiangkao@linux.alibaba.com fp:SMTPD_---0VFPsTeZ_1654481735)
+          by smtp.aliyun-inc.com(127.0.0.1);
+          Mon, 06 Jun 2022 10:15:37 +0800
+Date:   Mon, 6 Jun 2022 10:15:35 +0800
+From:   Gao Xiang <hsiangkao@linux.alibaba.com>
 To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-References: <20220602192020.166940-1-longman@redhat.com>
- <20220602192020.166940-4-longman@redhat.com> <YprYgdV0IxAeJZsz@T590>
- <ee754359-cefd-7d4b-7861-1405860bba9b@redhat.com> <Yp1atoLkZPvA1Zd3@T590>
-From:   Waiman Long <longman@redhat.com>
-In-Reply-To: <Yp1atoLkZPvA1Zd3@T590>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+Cc:     Pavel Machek <pavel@ucw.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+Subject: Re: [RFC PATCH] ubd: add io_uring based userspace block driver
+Message-ID: <Yp1jRw6kiUf5jCrW@B-P7TQMD6M-0146.local>
+Mail-Followup-To: Ming Lei <ming.lei@redhat.com>,
+        Pavel Machek <pavel@ucw.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>
+References: <20220509092312.254354-1-ming.lei@redhat.com>
+ <20220530070700.GF1363@bug>
+ <YpgsTojc4mVKghZA@T590>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <YpgsTojc4mVKghZA@T590>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/22 21:39, Ming Lei wrote:
-> On Sun, Jun 05, 2022 at 07:15:27PM -0400, Waiman Long wrote:
->> On 6/3/22 23:58, Ming Lei wrote:
->>
->>> diff --git a/mm/memcontrol.c b/mm/memcontrol.c
->>> index abec50f31fe6..8c4f204dbf5b 100644
->>> --- a/mm/memcontrol.c
->>> +++ b/mm/memcontrol.c
->>> @@ -622,7 +622,7 @@ static inline void memcg_rstat_updated(struct mem_cgroup *memcg, int val)
->>>    {
->>>    	unsigned int x;
->>> -	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id());
->>> +	cgroup_rstat_updated(memcg->css.cgroup, smp_processor_id(), NULL);
->>>    	x = __this_cpu_add_return(stats_updates, abs(val));
->>>    	if (x > MEMCG_CHARGE_BATCH) {
->> I think the rstat set of functions are doing that already. So flush will
->> only call CPUs that have called cgroup_rstat_updated() before. However, one
-> Yeah, I guess the detail is in cgroup_rstat_cpu_pop_updated(), but the
-> percpu lock(raw_spin_lock_irqsave) is still required, and cgroup_rstat_cpu_pop_updated()
-> is still called even through there isn't any update on this CPU.
-Yes, I think we may need to add a bitmask of what controllers have 
-updates in cgroup_rstat_cpu structure.
+On Thu, Jun 02, 2022 at 11:19:42AM +0800, Ming Lei wrote:
+> Hello Pavel,
+> 
+> On Mon, May 30, 2022 at 09:07:00AM +0200, Pavel Machek wrote:
+> > Hi!
+> > 
+> > > This is the driver part of userspace block driver(ubd driver), the other
+> > > part is userspace daemon part(ubdsrv)[1].
+> > 
+> > > @@ -0,0 +1,1193 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-or-later
+> > > +/*
+> > > + * Userspace block device - block device which IO is handled from userspace
+> > > + *
+> > > + * Take full use of io_uring passthrough command for communicating with
+> > > + * ubd userspace daemon(ubdsrvd) for handling basic IO request.
+> > 
+> > > +
+> > > +static inline unsigned int ubd_req_build_flags(struct request *req)
+> > > +{
+> > ...
+> > > +	if (req->cmd_flags & REQ_SWAP)
+> > > +		flags |= UBD_IO_F_SWAP;
+> > > +
+> > > +	return flags;
+> > > +}
+> > 
+> > Does it work? How do you guarantee operation will be deadlock-free with swapping and
+> > writebacks going on?
+> 
+> The above is just for providing command flags to user side, so that the
+> user side can understand/handle the request better.
+> 
+> prtrl(PR_SET_IO_FLUSHER) has been merged for avoiding the deadlock.
 >
->> deficiency that I am aware of is that there is no bitmap of which controller
->> have update. The problem that I saw in cgroup v2 is that in a cgroup with
->> both memory controller and block controller enabled, a
->> cgroup_rstat_updated() call from memory cgroup later causes the rstat
->> function to call into block cgroup flush method even though there is no
->> update in the block controller. This is an area that needs improvement.
->>
->> Your code does allow the block controller to be aware of that and avoid
->> further action, but I think it has to be done in the rstat code to be
->> applicable to all controllers instead of just specific to block controller.
-> I guess it can be done by adding one percpu variable to 'struct cgroup'.
->
->> There is another problem that this approach. Suppose the system have 20
->> block devices and one of them has an IO operation. Now the flush method
->> still needs to iterate all the 20 blkg's to do an update. The block
->> controller is kind of special that the number of per-cgroup IO stats depends
->> on the number of block devices present. Other controllers just have one set
->> of stats per cgroup.
-> Yeah, and this one is really blkio specific issue, and your patch does
-> cover this one. Maybe you can add one callback to
-> cgroup_rstat_updated(), so the "blkg_iostat_set" instance is added into
-> percpu list under percpu lock of cgroup_rstat_cpu_lock, then the lockless
-> list isn't needed.
 
-The rstat API is generic. It may not be a good idea to put controller 
-specific information into it. Yes, cgroup_rstat_cpu_lock is taken at the 
-read side (flush). It may not taken on the write side (update). So it 
-may not be easy to rely on this lock for synchronization between the 
-read and write side.
+I've pointed out a case before that (I think) PR_SET_IO_FLUSHER doesn't work:
+https://lore.kernel.org/all/YhbYOeMUv5+U1XdQ@B-P7TQMD6M-0146.local
 
-Cheers,
-Longman
+I don't think handling writeback in the userspace under the direct reclaim
+context is _safe_ honestly. Because userspace program can call any system
+call under direct reclaim, which can interconnect to another process context
+and wait for it. yet I don't look into ubd implementation.
 
+Thanks,
+Gao Xiang
