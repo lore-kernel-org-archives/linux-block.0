@@ -2,394 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E083C433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 01:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5D5C43334
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 01:47:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235616AbiFGBVm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jun 2022 21:21:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56634 "EHLO
+        id S234559AbiFGBrj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jun 2022 21:47:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45310 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232641AbiFGBVl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 21:21:41 -0400
-Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F9128FD54
-        for <linux-block@vger.kernel.org>; Mon,  6 Jun 2022 18:21:39 -0700 (PDT)
-Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-30fa61b1a83so154802107b3.0
-        for <linux-block@vger.kernel.org>; Mon, 06 Jun 2022 18:21:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=8Ld7rffB2zM0P1L5Muws5rr5XFvlh7I9fPWlnoLfiEY=;
-        b=PuDUQdj3k5JzUdrWtsn57sBlmcMedekZSDyGA5yl2nVOwm1wib5/UMKaLaX0B4kgud
-         Fe02Q8sELDv1qdv6NXGdG4YHAPGWqNOVZkoazfAr0i6ek0CiCONdnmIxvvM994xWJo/U
-         1rImxR80rrn0F2vuH6GkoQ4+8/dIcIUiflUO9VQyeI4O+MVuHLdas6b7mXXMB/t/+UOm
-         FIzkw9b5pzm1r+C1pcdRqg4oV59hJIDz/MlMcSNGfYyAKrX8VsPDJ9zFq9sqjpcg6nEe
-         aamB1wztAA6YzZwXVwvp2QoMYPzqUQqfrD4KRfJ2MhupWtodQNKUYF6+MNugJrBXuFhJ
-         5ORQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=8Ld7rffB2zM0P1L5Muws5rr5XFvlh7I9fPWlnoLfiEY=;
-        b=rTbXoKNg4gMS19uOVDaOQ77YAPBHrLcLWQHrqZn4pgNiQjjfR9pJNajoRY8XX+pRho
-         r7JjpFlBZHuzwY6avAiSgHm8k9BDpLy3KzxqZOY4Nu+d9NfyiUKkMHkUXtxkgRHGDO8r
-         EseM1SHF8JjK9ku+a3XG1QoqafobSaeBThLPUMPcnXCQgucIq/xX/+30CQ/ePmEgMArO
-         BQIJNce2/iXyIpmEmnjc8ivf70Yk0cvQ9StEV5wFURlXYasLUa3UdzdMjzcMW6Jr8JUC
-         RKc0RbBuJ4gMJRm9c5wTclriZLWnuFw2MiY6kHbl6nQjjfb456ZhZdXew6UwAej+XwFk
-         KmCg==
-X-Gm-Message-State: AOAM531rdVzbUCUzZKw15QyOhcgNSwWNV5NNK9YMTY/5Dw9PmrNzdwhR
-        XQ1EImTig4BnV8pO7OtJIfBbYi8D/amF7uFhdPaRxg==
-X-Google-Smtp-Source: ABdhPJwOEbQvUXK2zbhJ/RyjOVoJhvGmYn/P4I+zJ60e/dsXVROieVlz2v4124GGuj1BXyCUegvRD3t0vhZ23yuqwXA=
-X-Received: by 2002:a81:1a43:0:b0:30c:78b1:f23d with SMTP id
- a64-20020a811a43000000b0030c78b1f23dmr29325800ywa.166.1654564898296; Mon, 06
- Jun 2022 18:21:38 -0700 (PDT)
+        with ESMTP id S233175AbiFGBri (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 21:47:38 -0400
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2052.outbound.protection.outlook.com [40.107.223.52])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C3141FCEC
+        for <linux-block@vger.kernel.org>; Mon,  6 Jun 2022 18:47:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oYXplWcagRx83qkBKLk7FjlSGtS9df7clRDNOiwcUF6BXjYnT2fY0hGp9ubd+6YvEimfRAVhmzja3PaeKKWcj9LOmRASwQl/Lay6luSdznQ9iSBgbIYinp9ePEK6G6SPNZVU+WJ+Y1OkECcZpjrw1m23ANpr/kO9cxgTuh/riDCDPCvnufa8RDAeLmEeLILJHZlS5xOYu9bHsrhifvnX+hqwPyzwPFAkJ6kbQEWEtGjJv2GLIO4f/8jkYYD/DgiXQ/fCFpS6+AQh39+rYjuO2bwVoFgM9+YPeytott62/4G7lgaqoklTOyJzuM4EeYdPtguPvWA2UQjsxZLCNHmZJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=GbS5xu6acJxRf1tT61NMShIxyG3I3DkwuA9KQlyi+/Q=;
+ b=gAyKOgzyU+mZSJvRIZ5VYE8mdAWVwypXhTuaXk/M12umXantqj/EHc28TrbyLZHzjS0WKQo+ro8KYbZ6KmJ/VED3miJiNkHNQRnqfuCh6soxX6zWqZ/Vh5drTg6J2lk5bisb15yV0yjANopa8K5deCoLLvJ3dl1Lrzr2S3Xxf+9FncdORcT3QSdmW4hN1utUY9yxLncdCDOVhpOfswIbIcvrYBe+DC/P04+chcSZQtx2uMUetyrpBqKOG2s5yiLF6QNc6Q/maVoABIzgkVktBFeZRrS2HzGa7Ntbf1FE0duFxq5vPw9p3xRpf8cbOZpgqxtq0Bn47LoF1iBAW2KuZw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=GbS5xu6acJxRf1tT61NMShIxyG3I3DkwuA9KQlyi+/Q=;
+ b=tUuQpgQFehqo8Y9jjmFd/TrJNg2rXt123hlceqohpVKScqQ1nMa01y5EzLdM4rRhiWfh9NI9mP4fc90rx4lzGPOrCKXeY+7yIeju9nIwBgP3wzMRea0/pgvaXcxbuTjqWBeCqb/mshRKHiGUnxhXagBjDgh7wJX0+fVjFTi1jnmHT9l0Ufya62FT2mPaDoPprmDeEjl7MUDNE7eKrvSO/2losNGcAwOSwTvSMG03hPMnz8n3BTu9DQZmcGuW371BqGJ5/Y1OiZXvGPPhyogOaHQUDm5bqVa2CrsbyBhkqFJP73uxqeJrgzX6/mxCjMzjNeY8NQi6VG1KlG+LqX2hQw==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by DM5PR12MB1273.namprd12.prod.outlook.com (2603:10b6:3:76::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5314.13; Tue, 7 Jun
+ 2022 01:47:35 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6dff:6121:50c:b72e]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::6dff:6121:50c:b72e%7]) with mapi id 15.20.5314.019; Tue, 7 Jun 2022
+ 01:47:35 +0000
+From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To:     Christoph Hellwig <hch@lst.de>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH blktests 01/13] common/null_blk: remove explicit
+ queue_mode=2 parameters
+Thread-Topic: [PATCH blktests 01/13] common/null_blk: remove explicit
+ queue_mode=2 parameters
+Thread-Index: AQHYdwmJTcLLiGEB5kCDrQsV4oCwLa1DMwoA
+Date:   Tue, 7 Jun 2022 01:47:34 +0000
+Message-ID: <10872495-a171-da84-2d7d-37d256f08d40@nvidia.com>
+References: <20220603045558.466760-1-hch@lst.de>
+ <20220603045558.466760-2-hch@lst.de>
+In-Reply-To: <20220603045558.466760-2-hch@lst.de>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+user-agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6e34c114-3bc0-4009-9d93-08da4827b1c2
+x-ms-traffictypediagnostic: DM5PR12MB1273:EE_
+x-microsoft-antispam-prvs: <DM5PR12MB127347D7B02611A1661CCDABA3A59@DM5PR12MB1273.namprd12.prod.outlook.com>
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: lESx2GML/rdPyDLFCBhT2Ps/9+kgjGuEo4HCbcB4n1hDKGQnzzv7beoCSKeAUzQVcHW+0TVG1t4scXY/MnMYKztCnkmUoSkNmDhFTtWQDjgJT8nyespe5JULgPyMzJ3kHEwipt+g2523YJbtyBSHDioNSH+phxUkde8AdfayzAE7FIVYfaLzSfqZ76c3eXx0kZvUHkaQh6F9B3ZVjj0f962cKArJhI5s9s5MfWcXDNzVegn0EtvKkUQ+OOETLel+tntpJfxQprDswyjcsgigBeQ79UR8IySKsYUf8geDDMigwncws5hV9L3vg0V+8HoGgkxp/CqGxsGCxfUj/zbJfoMCjaMG+3n7OUA31Wt/e3Rc9340/D+hFSY609aVgLUcB0yr6syS4tBPoE0UCPBI4PVeaVhncH2Dt/w+WtX+jAARd+nz1bUvOCE6iXlXI0vah7ltgcosA17dvp0vfdn3+yt4BSLodWkGnozCoBbRt83Aqinxbd54lB/siX/tVYeXZFv1utf4Ox4eoBlPzQoSRxhq42TFdZsoNCJ7VC9S0DJuKJakHfiaj3dFvOSiiF7d5ZhhK06V09Par/ZrPp5wMTPkTB+UmN8Pop0ynHnlDGXaBQyYRI72cXWO9iSG+1vizbhbAd7vAQvn9q4zolz6ZLQEJ7BFuNMgKzJQ9RFSjzG9aOw245yi+y0TpDTDvNH9HLDSX0adyxf7moulwYnQ27nWvs5JANbqxzxn+jqjQ6luED2jr96PjTzKY1F1EyPqT8uajKY0B4MrnPZ7oUgjrQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(4636009)(366004)(86362001)(38100700002)(6486002)(508600001)(316002)(31696002)(558084003)(2616005)(2906002)(186003)(53546011)(6916009)(54906003)(6512007)(6506007)(71200400001)(122000001)(5660300002)(36756003)(4326008)(8936002)(8676002)(91956017)(66446008)(64756008)(66946007)(66556008)(66476007)(76116006)(31686004)(38070700005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?d0NEamRGRDcwcVFWOG9SOEppMUhVMVQwVURDNnYvQzRTVnhBMWNzWGdDa1hM?=
+ =?utf-8?B?OU9yWm44NkNzWmtUZFhMWHJUYnh4OFgxR0g2dlA4N2VCd3BWOG8wcU1BNnQx?=
+ =?utf-8?B?dUFTWmdoUFJLU0dldmJ0ZUtmM0IzNUU4TjFnT1BEUVAweC9JMFBIKzU3Wjcx?=
+ =?utf-8?B?cXZKWlB2OFZXOWZZTysrQXpzbDlMWEt3cnpzcE1jU2piazRHQ1JqMUcrS2dS?=
+ =?utf-8?B?TFIxTEdidGFrMzVzYnNxa1ZOS1A1cHV2QzJhU2VveUxKZWQzM2QrNHg4NXBp?=
+ =?utf-8?B?TklTbUFvSit1NG5xcFk5SmMrZW5TdFlTVWF3bGFwVmkxUkJaeDRla01SbGdL?=
+ =?utf-8?B?TDRMS3JndklrYytuTU1tbitFRmdaZ09rU1BneTNVRk4vdzhncmFSUDRqanlJ?=
+ =?utf-8?B?OWFVNnNUTVBVTVZIWHdocWN4eHhqbHJWNGtzcjJRakJmZnhZcktiZEFOeit3?=
+ =?utf-8?B?VEdFWjh3SzJjcWM2SUlvYXJVQ0hZNGFhNXM2QlNrMXpJejZJbyt6NDdqOW5w?=
+ =?utf-8?B?T1lBN3NoLzVqcXVPZnM0Y2U0eUl3MmpCRUNGYkZXUzhKYWtNQjcwY3l0aG1n?=
+ =?utf-8?B?SDlLWXRxSWpYRVhvdSs0UVdYNCtSYTZ4UnlXeEpxaVZkcFdmREpwQnI1akd5?=
+ =?utf-8?B?MkRYRWdVbHB6aUxBa1NsdVEwaEwybEpwbjU5TXU3bnJGeFhQbnAzc2p5NDlS?=
+ =?utf-8?B?L2xqL1pWeDNCV0laREp6c052UHErZVpRKzZZbnpicjVVNThOTnJOcjJ4akd3?=
+ =?utf-8?B?ajQ4Ylo1R1JKbWJrQlJicjNQcXZmK0ZSbUtaNmViRVloVmU3ZXNiNk9kTzV6?=
+ =?utf-8?B?akJLTjF1K0JjR2p2VWNoQlhiZDRwSlhnOWxWakRmejRkZFdkTUhwZE80NFBU?=
+ =?utf-8?B?NmVITVdjVUtpWFdZQ3lWd0pJOCtBRW9ZSVRRTHlRMWVXTzg0NjA2UHh1cnBY?=
+ =?utf-8?B?Q3dnNi9tbm1sSk1saFRNdlNoV0h0bWJBVzB6d3dISFJ3VGVNOUJJNGVPQTFY?=
+ =?utf-8?B?TUNWVGlSTnBlUEZoRTlCL0VMTDZMWHcvOUJmWXBKS21MWXIvdWE1SEpyd2pv?=
+ =?utf-8?B?VXdOYno3cDFzQWo1MGpYY29ITFFUMVRUM2F6RHVIK0JYQXVsbSt1Y0d4SVRz?=
+ =?utf-8?B?cjJROUY2dFN1YmhlcnRmK3hXakJIWlNzT2E3R1U5MW5yTzdkWUFER1JiNXhm?=
+ =?utf-8?B?VzlGK2lIWXNOV0pCZ3BINTl3dXBiYkV5T2NsNXNoazRCdUE5U2YzQ1lCSHQv?=
+ =?utf-8?B?aEYrK0hZM3dWZjJrQ1dsVm5jT05PdEVrdGFGTzBFYjNJaVpvVDNneDBoMnI0?=
+ =?utf-8?B?WUxvUU94ajNZQVdaV3ZFc3Erdno0Q25HL2lrVm5RTkJKNGl0NGdPeUFNYmJj?=
+ =?utf-8?B?UWczMTY0dXJyTnlER2xIcUJHMVVXQlFPMVhuSU9JYnJkT3dGUjFpUkV1dWhJ?=
+ =?utf-8?B?VjRuSkhNWHlIcnhCaC9QRFZMSEhVc2srQ3B6VzdMYUlKRFBYeXFYcnR6d0d2?=
+ =?utf-8?B?RkpHRkMxek5wZm14OCt4TUhpOTlLYUhLS00zNVg0M3JBQTRJSHgwOWJtMmRN?=
+ =?utf-8?B?SWF3eXFTT3cvRWsxYmc0c1VONGFySEQ0dzhvc0QvaEVEd2FraisreW1idnFB?=
+ =?utf-8?B?cW1IWFFTZXU5U2N2cjRRaUpEeGpGbFdBSi9rZjYwUWF4a25kOTRXeFFOdCt6?=
+ =?utf-8?B?V21wOHh5eUEwcXhSVmFBRUJNWTJlcVdtM2NBbS82UUdpZWRCWDl1eDhuT3py?=
+ =?utf-8?B?cTZvNDloMTVta25FY2l4cHVYMm9Ta2RYZzhVUm9CdmlTM2FZZkJwN1NJT3cx?=
+ =?utf-8?B?b0xHTlU4VlY2QlRlcjcreGQweVNRRmdiMGNVb2w1STBZUmtFcHVIM041R3g0?=
+ =?utf-8?B?WGVQZmtSKzhCSCtTZ2F1SnJaNGhjREI0LzErQTArRXJHNTREblp6ckpjS2pY?=
+ =?utf-8?B?K2VxZlVobnYrck1kV09OQUNNSG5obkpFSHZJVXRWRG85a3VaalNHTGlZckNk?=
+ =?utf-8?B?eUxLNmlDN3JMR3RPZERLdWpYS2NLS0IraUtITmo1VEhuZVF5V3drWkxybktP?=
+ =?utf-8?B?YjM5bGk5Si9ocnc3OXRkN3ovaFFIRTRjOTVGTEo0dXhqQzhYOU9oOGJLWEdG?=
+ =?utf-8?B?YVhNdzVSMGMwcnBoU0hUOXI3RmMrV0tKbEVRNWpKTGNYV1BHdWdzWGk2UXdk?=
+ =?utf-8?B?OG5yOStOcHNGNW1IVW0zUi8zUll1UDBLRFY4eHJhdnNLUjd0WDVoNWoxT1pP?=
+ =?utf-8?B?eEhnWjk2L1cwQ1MrME93SHBON0xlT3hEMy9xcDRWZmJYK1ozV3g2Y05sRnpk?=
+ =?utf-8?B?ZS9aNVY0U1RhTEdwd3daemxsUjdMaFJxbmkzeWMrOFkwYWJFNDU1RGlmRlJ0?=
+ =?utf-8?Q?Z6iYa8Jh4NihFHY/FCGecSxo2WbIREQAjOqs1MqwKB5/M?=
+x-ms-exchange-antispam-messagedata-1: mBoiVYfSddkbeg==
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <4491ED7D91B61A44A6FC2EB10AA307D2@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <CA+G9fYtVOfWWpx96fa3zzKzBPKiNu1w3FOD4j++G8MOG3Vs0EA@mail.gmail.com>
- <Yp47DODPCz0kNgE8@google.com>
-In-Reply-To: <Yp47DODPCz0kNgE8@google.com>
-From:   Naresh Kamboju <naresh.kamboju@linaro.org>
-Date:   Tue, 7 Jun 2022 06:51:27 +0530
-Message-ID: <CA+G9fYsjn0zySHU4YYNJWAgkABuJuKtHty7ELHmN-+30VYgCDA@mail.gmail.com>
-Subject: Re: qemu-arm: zram: mkfs.ext4 : Unable to handle kernel NULL pointer
- dereference at virtual address 00000140
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        regressions@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Nitin Gupta <ngupta@vflare.org>
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e34c114-3bc0-4009-9d93-08da4827b1c2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jun 2022 01:47:34.8967
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wLN8lHRTRReB+2LiZ/feYtu4x37pCguzJqCLItDffZ/AJMPu6+zGudRFR9dPUEWP6fM6BVwTwtcnWJ91A6PLow==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR12MB1273
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, 6 Jun 2022 at 23:06, Minchan Kim <minchan@kernel.org> wrote:
->
-> On Thu, Jun 02, 2022 at 02:19:34PM +0530, Naresh Kamboju wrote:
-> > The following kernel crash reported while running selftests: zram: zram.sh
-> > test case on qemu-arm with Linux mainline v5.18.0 kernel version.
-> >
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> >
-> > Started noticing from kernel crash from
-> > BAD: git_sha: cdeffe87f790dfd1baa193020411ce9a538446d7
-> > GOOD:   git_sha: babf0bb978e3c9fce6c4eba6b744c8754fd43d8e
-> >
-> > # git log  --oneline
-> > babf0bb978e3c9fce6c4eba6b744c8754fd43d8e..cdeffe87f790dfd1baa193020411ce9a538446d7
-> >   -- drivers/block/
-> > 98931dd95fd4 Merge tag 'mm-stable-2022-05-25' of
-> > git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
-> > 6140ae41effe zram: fix Kconfig dependency warning
-> > b3fbd58fcbb1 mm: Kconfig: simplify zswap configuration
-> > e7be8d1dd983 zram: remove double compression logic
-> > a2ad63daa88b VFS: add FMODE_CAN_ODIRECT file flag
-> > 30226b69f876 zram: add a huge_idle writeback mode
->
-> Hi Nalesh,
->
-> Thanks for the reporting the bug!
->
-> I locally ran the test in my x86 KVM machine but couldn't reproduce it.
-> How is it easy to reproduce?  Could you help to bisect it?
-
-It works on qemu_x86-64
-It is always reproducible in qemu arm32 environment.
-
-steps to reproduce:
-# Please download and use this rootfs and kernel zImage
-
-rootfs: https://oebuilds.tuxbuild.com/29zhlbEc3EWq2wod9Uy964Bp27q/images/am57xx-evm/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4.gz
-kernel: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC/zImage
-
-Boot command,
- /usr/bin/qemu-system-aarch64 -cpu host,aarch64=off -machine
-virt-2.10,accel=kvm -nographic -net
-nic,model=virtio,maaacaddr=BA:DD:AD:CC:09:04 -net tap -m 2048 -monitor
-none -kernel kernel/zImage --append "console=ttyAMA0 root=/dev/vda rw"
--hda rootfs/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4
--m 4096 -smp 2
-
-# cd /opt/kselftests/default-in-kernel/zram
-# ./zram.sh
-
-Allow me sometime I will try to bisect this problem.
-
->
-> >
-> >
-> > metadata:
-> >   git_ref: master
-> >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline
-> >   git_sha: 54eb8462f21fb170a05ad64620f0d8d0cf2b7fb5
-> >   git_describe: v5.18-11934-g54eb8462f21f
-> >   kernel_version: 5.18.0
-> >   kernel-config: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC/config
-> >   build-url: https://gitlab.com/Linaro/lkft/mirrors/torvalds/linux-mainline/-/pipelines/553652229
-> >   artifact-location: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC
-> >   toolchain: gcc-10
-> >
-> >
-> > # selftests: zram: zram.sh
-> > # --------------------
-> > # running zram tests
-> > # --------------------
-> > # create '1' zram device(s)
-> > [  637.356319] zram: Added device: zram0
-> > # all zram devices (/dev/zram0~0) successfully created
-> > # set max_comp_streams to zram device(s)
-> > # The device attribute max_comp_streams was deprecated in 4.7
-> > # test that we can set compression algorithm
-> > [  637.494965] zram0: detected capacity change from 0 to 4096
-> > # supported algs: lzo [lzo-rle] lz4 lz4hc 842 zstd
-> > # /sys/block/zram0/comp_algorithm = 'lzo'
-> > # zram set compression algorithm: OK
-> > # set disk size to zram device(s)
-> > # /sys/block/zram0/disksize = '2097152'
-> > # zram set disksizes: OK
-> > # set memory limit to zram device(s)
-> > # /sys/block/zram0/mem_limit = '2M'
-> > # zram set memory limit: OK
-> > # make ext4 filesystem on /dev/zram0
-> > [  637.601876] 8<--- cut here ---
-> > [  637.603507] Unable to handle kernel NULL pointer dereference at
-> > virtual address 00000140
-> > [  637.607417] [00000140] *pgd=fb433835
-> > [  637.609482] Internal error: Oops: 17 [#1] SMP ARM
-> > [  637.612210] Modules linked in: zram zsmalloc crc32_arm_ce
-> > sha2_arm_ce sha256_arm sha1_arm_ce sha1_arm aes_arm_ce crypto_simd
-> > fuse [last unloaded: test_user_copy]
-> > [  637.620508] CPU: 0 PID: 1841 Comm: mkfs.ext4 Not tainted 5.18.0 #1
-> > [  637.624068] Hardware name: Generic DT based system
-> > [  637.626863] PC is at strcmp+0x4/0x34
-> > [  637.628970] LR is at register_lock_class+0x420/0x990
-> > [  637.631865] pc : [<c09a55b0>]    lr : [<c03d2750>]    psr: a00d0093
-> > [  637.635534] sp : f8ddda08  ip : 00000001  fp : c223c860
-> > [  637.638621] r10: 00000000  r9 : ee4d62b4  r8 : c4bfd8c0
-> > [  637.641668] r7 : ee4d62b4  r6 : c2b1b468  r5 : 00000140  r4 : c296e298
-> > [  637.645436] r3 : 00000028  r2 : c223cd14  r1 : 00000140  r0 : c1ce4c99
-> > [  637.649203] Flags: NzCv  IRQs off  FIQs on  Mode SVC_32  ISA ARM
-> > Segment none
-> > [  637.653360] Control: 10c5383d  Table: 44ba406a  DAC: 00000051
-> > [  637.656672] Register r0 information: non-slab/vmalloc memory
-> > [  637.659948] Register r1 information: non-paged memory
-> > [  637.662879] Register r2 information: non-slab/vmalloc memory
-> > [  637.666158] Register r3 information: non-paged memory
-> > [  637.669080] Register r4 information: non-slab/vmalloc memory
-> > [  637.672359] Register r5 information: non-paged memory
-> > [  637.675297] Register r6 information: non-slab/vmalloc memory
-> > [  637.678576] Register r7 information: non-slab/vmalloc memory
-> > [  637.681866] Register r8 information: slab task_struct start
-> > c4bfd8c0 pointer offset 0
-> > [  637.686367] Register r9 information: non-slab/vmalloc memory
-> > [  637.689643] Register r10 information: NULL pointer
-> > [  637.692425] Register r11 information: non-slab/vmalloc memory
-> > [  637.695753] Register r12 information: non-paged memory
-> > [  637.698763] Process mkfs.ext4 (pid: 1841, stack limit = 0xf5a44654)
-> > [  637.702444] Stack: (0xf8ddda08 to 0xf8dde000)
-> > [  637.704993] da00:                   c4bfe180 c03cb19c c223c80c
-> > c250fde0 00000e9c c2966278
-> > [  637.709779] da20: c21955d0 c2212b38 c298c1e4 c2969ce8 c223c80c
-> > 000004cb c223c860 c298c1ec
-> > [  637.714547] da40: 00000000 00000000 ee4d62b4 44aaea53 c4bfe1a0
-> > 00000000 ee4d62b4 00000000
-> > [  637.719313] da60: 00000000 00000000 c4bfd8c0 c21955d0 600d0013
-> > c03ce488 c4bfd8c0 c2212b3c
-> > [  637.724079] da80: 00000000 c2b1b468 00000001 c2212b38 c21955d0
-> > 00000001 00000001 00000000
-> > [  637.728872] daa0: fc90bff3 695acb4d c1cd9994 c2212b38 c03c9c78
-> > 00000081 c278cf1c 00000000
-> > [  637.733663] dac0: c4bfd8c0 c4bfd8c0 00000000 c03f543c c24c8120
-> > c298c054 00cd9994 00000000
-> > [  637.738484] dae0: 00000000 00000000 000325c8 efe7b070 c2211fd0
-> > 00000000 c4bfe180 00000001
-> > [  637.742919] db00: c4bfe1a0 44aaea53 c4bfd8c0 c4bfe1c0 c298c180
-> > 00000002 00000003 00000001
-> > [  637.747712] db20: c4bfe1a0 44aaea53 c4bfd8c0 c4bfd8c0 c21955d0
-> > f8dddb50 2c337000 00000000
-> > [  637.752446] db40: 00000000 c21955d0 600d0013 c03d1f0c 00000001
-> > 00000000 00000000 bf03b20c
-> > [  637.757225] db60: 00000000 00000000 600d0013 00000000 c4bfe1a0
-> > 00000003 c4bfe8c0 c03d1bf8
-> > [  637.761947] db80: bf03b214 00000000 efe7b070 00000001 00000001
-> > 44aaea53 c5a2a45c c4bfd8c0
-> > [  637.766631] dba0: c219f2b4 00000000 efe7b070 c4f67500 00000000
-> > c5dc4480 ee4d62b4 bf03b284
-> > [  637.771341] dbc0: 00000001 00000000 bf03b20c efe7b070 00000001
-> > 00000002 c4d6c000 44aaea53
-> > [  637.776474] dbe0: 00000041 c4b87400 c4bfd8c0 00000008 00000001
-> > 00000000 c5ffd000 c25096d8
-> > [  637.781409] dc00: c4bfe8c0 bf05db68 00000001 ee5d05bc ff7e1b00
-> > c08d4100 00000041 44aaea53
-> > [  637.786573] dc20: 000083db 00001000 c4b7ab40 c4b87400 00001000
-> > 00001000 00000000 00000001
-> > [  637.791837] dc40: 00000000 bf05e694 00000001 c4b7ab40 00000000
-> > 00000000 c4bfd8c0 000083db
-> > [  637.796665] dc60: ee5d05bc 00001000 00000000 44aaea53 f8dddef0
-> > c4b7ab40 c5b6a200 c488ca50
-> > [  637.801628] dc80: 00000000 c488ca50 c0637bf4 f8dddef0 ee5d05bc
-> > c08d3434 c4bfd8c0 f8dddcac
-> > [  637.806855] dca0: f8dddcb4 c08d384c f8dddef0 00000000 00000000
-> > 00000000 00000000 44aaea53
-> > [  637.811925] dcc0: c57e1900 c4b7ab40 f8dddef0 00000001 c15a0678
-> > c063690c c2b805e4 00000000
-> > [  637.816901] dce0: c57e1900 c57e1900 c57e1900 00000001 00000800
-> > c063ae74 00000001 00000000
-> > [  637.821961] dd00: c063b460 c21955d0 c388b60c ee5d05bc c08ca7b4
-> > 00000800 00001000 c03d1b80
-> > [  637.827194] dd20: f8dddef0 c1d0be34 00000000 c388b568 ee5d05bc
-> > c054b91c 200d0013 c08ca7b4
-> > [  637.832004] dd40: f8dddef0 00000001 c388b60c c063b460 c0637bf4
-> > 00000000 c054b91c 00000000
-> > [  637.837231] dd60: c054d370 00000000 000003bf ee5d05bc c388b6e0
-> > 00000000 f8dddef0 c388b6e0
-> > [  637.842190] dd80: 00000001 c1cec1c8 c4bfd8c0 c054b91c ee5d05bc
-> > 00000002 00000000 c054c3bc
-> > [  637.846933] dda0: 00000002 c2b1b468 c295c3a8 0000000f c24c87a0
-> > c054b900 c388b6e0 ffffffff
-> > [  637.852066] ddc0: 00000002 00000000 c24c4d16 00000001 c1cc76d0
-> > c056c994 000001f4 c054000f
-> > [  637.856917] dde0: ee5d02ec ee5d05bc ee5d0f70 ee5d0574 ee5d0550
-> > ee5d0604 ee5d0628 ee5d064c
-> > [  637.861861] de00: ee5d0670 ee5d05e0 ee5d0598 ee5d0310 ee5d0334
-> > ee5d0358 ee5d037c 44aaea53
-> > [  637.867225] de20: f8dddf10 c388b6e0 f8dddef0 c4bfd8c0 c24bec40
-> > c5a29040 c2205d40 c054b900
-> > [  637.872597] de40: c4bfd8c0 c054c754 600d0013 00000000 00000000
-> > 00000001 00000000 f8ddde5c
-> > [  637.877550] de60: f8ddde5c 44aaea53 000083db f8dddef0 c388b6e0
-> > c054f870 00000000 c03c94bc
-> > [  637.882533] de80: c4bfd8c0 c21955d0 c388b5e8 600d0013 c053df8c
-> > c03d1b80 f8dddf10 c388b5d8
-> > [  637.887577] dea0: c388b6e0 00000001 00000000 44aaea53 c388b5d8
-> > c388b568 c388b6e0 f8dddef0
-> > [  637.892439] dec0: c4bfd8c0 ffffffff 7fffffff c388b6e0 bee70850
-> > c053df98 c4d8d140 00000000
-> > [  637.897445] dee0: 00000000 c053f8e8 c05e6a9c 00002000 7ffffffe
-> > 00000000 00000000 00000000
-> > [  637.902564] df00: ffffffff 7fffffff 00000001 00000000 00000000
-> > 00000000 00000000 00000000
-> > [  637.907597] df20: 00000000 00000000 00000000 00000000 00000000
-> > 00000000 00000000 44aaea53
-> > [  637.912524] df40: 00000000 c4d8d140 c388b200 ffffffff 7fffffff
-> > c03002f0 c4bfd8c0 00000076
-> > [  637.917404] df60: bee70850 c08caa6c ffffffff 7fffffff c4bfd8c0
-> > c4d8d140 00000000 c4d8d140
-> > [  637.922414] df80: 00000076 c062dea8 ffffffff 7fffffff 00000000
-> > c0484968 0003b930 0003b828
-> > [  637.927508] dfa0: 00000000 c03000c0 0003b930 0003b828 00000005
-> > 00046ac0 00000064 00000000
-> > [  637.932747] dfc0: 0003b930 0003b828 00000000 00000076 00000000
-> > bee70858 bee70848 bee70850
-> > [  637.937624] dfe0: b6dcc5ec bee707f8 b6f0e0d0 b6dcc614 600d0010
-> > 00000005 00000000 00000000
-> > [  637.942533]  strcmp from register_lock_class+0x420/0x990
-> > [  637.945907]  register_lock_class from __lock_acquire+0x6c/0x3160
-> > [  637.949593]  __lock_acquire from lock_acquire+0x110/0x368
-> > [  637.953086]  lock_acquire from zs_map_object+0x114/0x338 [zsmalloc]
-> > [  637.957120]  zs_map_object [zsmalloc] from zram_bvec_rw+0x254/0xa58 [zram]
-> > [  637.961317]  zram_bvec_rw [zram] from zram_submit_bio+0x1a0/0x3fc [zram]
-> > [  637.965458]  zram_submit_bio [zram] from __submit_bio+0x50/0x80
-> > [  637.969232]  __submit_bio from submit_bio_noacct_nocheck+0xb8/0x218
-> > [  637.973158]  submit_bio_noacct_nocheck from submit_bh_wbc+0x150/0x184
-> > [  637.977451]  submit_bh_wbc from __block_write_full_page+0x3d0/0x6d0
-> > [  637.981234]  __block_write_full_page from block_write_full_page+0x148/0x18c
-> > [  637.985521]  block_write_full_page from __writepage+0x1c/0x74
-> > [  637.989230]  __writepage from write_cache_pages+0x1b4/0x4f4
-> > [  637.992870]  write_cache_pages from generic_writepages+0x58/0x84
-> > [  637.996662]  generic_writepages from do_writepages+0x7c/0x1b8
-> > [  638.000211]  do_writepages from filemap_fdatawrite_wbc+0x6c/0x8c
-> > [  638.003882]  filemap_fdatawrite_wbc from file_write_and_wait_range+0x90/0xec
-> > [  638.008430]  file_write_and_wait_range from blkdev_fsync+0x20/0x44
-> > [  638.012599]  blkdev_fsync from do_fsync+0x44/0x78
-> > [  638.015687]  do_fsync from ret_fast_syscall+0x0/0x1c
-> > [  638.018753] Exception stack(0xf8dddfa8 to 0xf8dddff0)
-> > [  638.021970] dfa0:                   0003b930 0003b828 00000005
-> > 00046ac0 00000064 00000000
-> > [  638.027005] dfc0: 0003b930 0003b828 00000000 00000076 00000000
-> > bee70858 bee70848 bee70850
-> > [  638.032283] dfe0: b6dcc5ec bee707f8 b6f0e0d0 b6dcc614
-> > [  638.035336] Code: e3520000 1afffffb e12fff1e e4d03001 (e4d12001)
-> > [  638.038967] ---[ end trace 0000000000000000 ]---
-> > [  638.042059] note: mkfs.ext4[1841] exited with preempt_count 3
-> > [  638.045764] ------------[ cut here ]------------
-> > [  638.048739] WARNING: CPU: 0 PID: 1841 at kernel/exit.c:741
-> > do_exit+0x89c/0xabc
-> > [  638.053078] Modules linked in: zram zsmalloc crc32_arm_ce
-> > sha2_arm_ce sha256_arm sha1_arm_ce sha1_arm aes_arm_ce crypto_simd
-> > fuse [last unloaded: test_user_copy]
-> > [  638.062016] CPU: 0 PID: 1841 Comm: mkfs.ext4 Tainted: G      D
-> >      5.18.0 #1
-> > [  638.066616] Hardware name: Generic DT based system
-> > [  638.069774]  unwind_backtrace from show_stack+0x18/0x1c
-> > [  638.073014]  show_stack from dump_stack_lvl+0x58/0x70
-> > [  638.076068]  dump_stack_lvl from __warn+0xd4/0x1f8
-> > [  638.079207]  __warn from warn_slowpath_fmt+0x64/0xc8
-> > [  638.082237]  warn_slowpath_fmt from do_exit+0x89c/0xabc
-> > [  638.085673]  do_exit from make_task_dead+0x64/0x108
-> > [  638.088805]  make_task_dead from die+0x4c8/0x4e8
-> > [  638.091686]  die from die_kernel_fault+0x6c/0x7c
-> > [  638.094593]  die_kernel_fault from do_page_fault+0x260/0x4d0
-> > [  638.098154]  do_page_fault from do_DataAbort+0x44/0xb8
-> > [  638.101252]  do_DataAbort from __dabt_svc+0x50/0x80
-> > [  638.104195] Exception stack(0xf8ddd9b8 to 0xf8ddda00)
-> > [  638.107270] d9a0:
-> >     c1ce4c99 00000140
-> > [  638.112202] d9c0: c223cd14 00000028 c296e298 00000140 c2b1b468
-> > ee4d62b4 c4bfd8c0 ee4d62b4
-> > [  638.117497] d9e0: 00000000 c223c860 00000001 f8ddda08 c03d2750
-> > c09a55b0 a00d0093 ffffffff
-> > [  638.122444]  __dabt_svc from strcmp+0x4/0x34
-> > [  638.125046]  strcmp from register_lock_class+0x420/0x990
-> > [  638.128479]  register_lock_class from __lock_acquire+0x6c/0x3160
-> > [  638.132377]  __lock_acquire from lock_acquire+0x110/0x368
-> > [  638.135805]  lock_acquire from zs_map_object+0x114/0x338 [zsmalloc]
-> > [  638.139633]  zs_map_object [zsmalloc] from zram_bvec_rw+0x254/0xa58 [zram]
-> > [  638.143938]  zram_bvec_rw [zram] from zram_submit_bio+0x1a0/0x3fc [zram]
-> > [  638.148313]  zram_submit_bio [zram] from __submit_bio+0x50/0x80
-> > [  638.152092]  __submit_bio from submit_bio_noacct_nocheck+0xb8/0x218
-> > [  638.155933]  submit_bio_noacct_nocheck from submit_bh_wbc+0x150/0x184
-> > [  638.159978]  submit_bh_wbc from __block_write_full_page+0x3d0/0x6d0
-> > [  638.164067]  __block_write_full_page from block_write_full_page+0x148/0x18c
-> > [  638.168468]  block_write_full_page from __writepage+0x1c/0x74
-> > [  638.171927]  __writepage from write_cache_pages+0x1b4/0x4f4
-> > [  638.175439]  write_cache_pages from generic_writepages+0x58/0x84
-> > [  638.179326]  generic_writepages from do_writepages+0x7c/0x1b8
-> > [  638.183127]  do_writepages from filemap_fdatawrite_wbc+0x6c/0x8c
-> > [  638.186969]  filemap_fdatawrite_wbc from file_write_and_wait_range+0x90/0xec
-> > [  638.191265]  file_write_and_wait_range from blkdev_fsync+0x20/0x44
-> > [  638.195170]  blkdev_fsync from do_fsync+0x44/0x78
-> > [  638.198082]  do_fsync from ret_fast_syscall+0x0/0x1c
-> > [  638.201275] Exception stack(0xf8dddfa8 to 0xf8dddff0)
-> > [  638.204268] dfa0:                   0003b930 0003b828 00000005
-> > 00046ac0 00000064 00000000
-> > [  638.209369] dfc0: 0003b930 0003b828 00000000 00000076 00000000
-> > bee70858 bee70848 bee70850
-> > [  638.214332] dfe0: b6dcc5ec bee707f8 b6f0e0d0 b6dcc614
-> > [  638.217355] irq event stamp: 8301
-> > [  638.219375] hardirqs last  enabled at (8301): [<c056b870>]
-> > inc_zone_page_state+0x5c/0x64
-> > [  638.224163] hardirqs last disabled at (8300): [<c056b860>]
-> > inc_zone_page_state+0x4c/0x64
-> > [  638.228961] softirqs last  enabled at (8066): [<c0301f40>]
-> > __do_softirq+0x300/0x538
-> > [  638.233533] softirqs last disabled at (8057): [<c035a19c>]
-> > __irq_exit_rcu+0x14c/0x170
-> > [  638.238189] ---[ end trace 0000000000000000 ]---
-> >
-> >
-> > Full test log link:
-> > https://lkft.validation.linaro.org/scheduler/job/5121436#L1583
-> > https://lkft.validation.linaro.org/scheduler/job/5123008
-> > https://qa-reports.linaro.org/lkft/linux-mainline-master/build/v5.18-11934-g54eb8462f21f/testrun/9879010/suite/log-parser-test/test/check-kernel-oops-5121436/details/
-> >
-> > --
-> > Linaro LKFT
-> > https://lkft.linaro.org
-
-- Naresh
+T24gNi8yLzIyIDIxOjU1LCBDaHJpc3RvcGggSGVsbHdpZyB3cm90ZToNCj4gcXVldWVfbW9kZSAy
+IChha2EgYmxrLW1xKSBpcyB0aGUgZGVmYXVsdCBpbiBudWxsX2Jsaywgc28gcmVtb3ZlIHRoZQ0K
+PiBleHRyYSBleHBsaWNpdGx5IHBhcmFtZXRlci4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IENocmlz
+dG9waCBIZWxsd2lnIDxoY2hAbHN0LmRlPg0KPiAtLS0NCg0KDQpMb29rcyBnb29kLg0KDQpSZXZp
+ZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCg0KLWNrDQoNCg0K
