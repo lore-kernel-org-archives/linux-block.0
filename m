@@ -2,107 +2,121 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B85C43334
-	for <linux-block@archiver.kernel.org>; Mon,  6 Jun 2022 20:51:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98319C433EF
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 00:42:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234790AbiFFUvW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 6 Jun 2022 16:51:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33332 "EHLO
+        id S232645AbiFGAmT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 6 Jun 2022 20:42:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51064 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234664AbiFFUt4 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 16:49:56 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA339F5BE;
-        Mon,  6 Jun 2022 13:41:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-        Content-Type:Content-ID:Content-Description;
-        bh=PTb1fSw49y2qxNUUq4k5t2uIOYf1rKQU0qM36b/uqdM=; b=moAsLc7xAe9cCO2yLS/2VDmHEw
-        YBwWTVJr9kJRjwoeFhsNnd8JLuuJjbq0xBtc3hJNd0koz0AzNRiu2y+N5Os1g1/u53LaRvxXW4rdM
-        tHwy5XlETEs430Lov51yIttD+nu/AmMuCt1+6O5d08aKIMBYPTBY0Yt54xqFYELLNo0/O6twSwDnU
-        wa3c1U/y/ETekmwC5gKHpa1nMck5VNxLTjucI7KCgMp9l5cOztmW0nCXmpkBfBeAli7aijjbj7GhC
-        zHPVo0ax+4QE/HagbZZ6pGGOB2yVWmyQYd5p+40+xWsAl8Ab1eGJlEDyjqzfn+/+j35DgUlM4Y7a4
-        FS4d0iCw==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nyJWw-00B19S-UW; Mon, 06 Jun 2022 20:40:54 +0000
-From:   "Matthew Wilcox (Oracle)" <willy@infradead.org>
-To:     linux-fsdevel@vger.kernel.org
-Cc:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org
-Subject: [PATCH 05/20] mm/migrate: Convert expected_page_refs() to folio_expected_refs()
-Date:   Mon,  6 Jun 2022 21:40:35 +0100
-Message-Id: <20220606204050.2625949-6-willy@infradead.org>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220606204050.2625949-1-willy@infradead.org>
-References: <20220606204050.2625949-1-willy@infradead.org>
+        with ESMTP id S232593AbiFGAmS (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Mon, 6 Jun 2022 20:42:18 -0400
+Received: from fudo.makrotopia.org (fudo.makrotopia.org [IPv6:2a07:2ec0:3002::71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B62F42;
+        Mon,  6 Jun 2022 17:42:11 -0700 (PDT)
+Received: from local
+        by fudo.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+         (Exim 4.94.2)
+        (envelope-from <daniel@makrotopia.org>)
+        id 1nyNIM-0000rx-Ke; Tue, 07 Jun 2022 02:42:06 +0200
+Date:   Tue, 7 Jun 2022 01:42:01 +0100
+From:   Daniel Golle <daniel@makrotopia.org>
+To:     Miquel Raynal <miquel.raynal@bootlin.com>
+Cc:     linux-block@vger.kernel.org, linux-efi@vger.kernel.org,
+        linux-mtd@lists.infradead.org, linux-kernel@vger.kernel.org,
+        Tom Rini <trini@konsulko.com>, Jens Axboe <axboe@kernel.dk>,
+        Davidlohr Bueso <dave@stgolabs.net>,
+        Richard Weinberger <richard@nod.at>,
+        Vignesh Raghavendra <vigneshr@ti.com>,
+        Masahiro Yamada <masahiroy@kernel.org>
+Subject: Re: [PATCH v3 4/5] mtd_blkdevs: add option to enable scanning for
+ partitions
+Message-ID: <Yp6e2XXJ7SlkdX+B@makrotopia.org>
+References: <Yn1ibyUeXZttNX2a@makrotopia.org>
+ <20220603154804.2705bcb6@xps-13>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20220603154804.2705bcb6@xps-13>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Now that both callers have a folio, convert this function to
-take a folio & rename it.
+On Fri, Jun 03, 2022 at 03:48:04PM +0200, Miquel Raynal wrote:
+> Hi Daniel,
+> 
+> daniel@makrotopia.org wrote on Thu, 12 May 2022 20:39:27 +0100:
+> 
+> > Add Kconfig boolean CONFIG_MTD_BLOCK_PARTITIONS and enable block
+> > partition parsers on non-NAND mtdblock devices in case it is selected.
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> >  drivers/mtd/Kconfig       | 11 +++++++++++
+> >  drivers/mtd/mtd_blkdevs.c |  4 +++-
+> >  2 files changed, 14 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/mtd/Kconfig b/drivers/mtd/Kconfig
+> > index 796a2eccbef0b8..12874dec15692a 100644
+> > --- a/drivers/mtd/Kconfig
+> > +++ b/drivers/mtd/Kconfig
+> > @@ -69,6 +69,17 @@ config MTD_BLOCK_RO
+> >  	  You do not need this option for use with the DiskOnChip devices. For
+> >  	  those, enable NFTL support (CONFIG_NFTL) instead.
+> >  
+> > +config MTD_BLOCK_PARTITIONS
+> > +	bool "Scan for partitions on MTD block devices"
+> > +	depends on MTD_BLOCK || MTD_BLOCK_RO
+> > +	default y if FIT_PARTITION
+> > +	help
+> > +	  Scan MTD block devices for partitions (ie. MBR, GPT, uImage.FIT, ...).
+> > +	  (NAND devices are omitted, ubiblock should be used instead when)
+> > +
+> > +	  Unless your MTD partitions contain sub-partitions mapped using a
+> > +	  partition table, say no.
+> > +
+> >  comment "Note that in some cases UBI block is preferred. See MTD_UBI_BLOCK."
+> >  	depends on MTD_BLOCK || MTD_BLOCK_RO
+> >  
+> > diff --git a/drivers/mtd/mtd_blkdevs.c b/drivers/mtd/mtd_blkdevs.c
+> > index f7317211146550..c67ce2e6fbeb0a 100644
+> > --- a/drivers/mtd/mtd_blkdevs.c
+> > +++ b/drivers/mtd/mtd_blkdevs.c
+> > @@ -359,7 +359,9 @@ int add_mtd_blktrans_dev(struct mtd_blktrans_dev *new)
+> >  	} else {
+> >  		snprintf(gd->disk_name, sizeof(gd->disk_name),
+> >  			 "%s%d", tr->name, new->devnum);
+> > -		gd->flags |= GENHD_FL_NO_PART;
+> > +
+> > +		if (!IS_ENABLED(CONFIG_MTD_BLOCK_PARTITIONS) || mtd_type_is_nand(new->mtd))
+> > +			gd->flags |= GENHD_FL_NO_PART;
+> 
+> I really wonder if we need this in mtdblock ? Isn't ubiblock enough?
 
-Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
----
- mm/migrate.c | 19 ++++++++++++-------
- 1 file changed, 12 insertions(+), 7 deletions(-)
+One of the ideas behind this series is to be able to use the exact same
+image (which includes a rootfs filesystem sub-image) on devices with
+different boot storage options instead of having to write kernel and
+root filesystems separately in a storage-type specific manner.
 
-diff --git a/mm/migrate.c b/mm/migrate.c
-index 77b8c662c9ca..e0a593e5b5f9 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -337,13 +337,18 @@ void pmd_migration_entry_wait(struct mm_struct *mm, pmd_t *pmd)
- }
- #endif
- 
--static int expected_page_refs(struct address_space *mapping, struct page *page)
-+static int folio_expected_refs(struct address_space *mapping,
-+		struct folio *folio)
- {
--	int expected_count = 1;
-+	int refs = 1;
-+	if (!mapping)
-+		return refs;
- 
--	if (mapping)
--		expected_count += compound_nr(page) + page_has_private(page);
--	return expected_count;
-+	refs += folio_nr_pages(folio);
-+	if (folio_get_private(folio))
-+		refs++;
-+
-+	return refs;;
- }
- 
- /*
-@@ -360,7 +365,7 @@ int folio_migrate_mapping(struct address_space *mapping,
- 	XA_STATE(xas, &mapping->i_pages, folio_index(folio));
- 	struct zone *oldzone, *newzone;
- 	int dirty;
--	int expected_count = expected_page_refs(mapping, &folio->page) + extra_count;
-+	int expected_count = folio_expected_refs(mapping, folio) + extra_count;
- 	long nr = folio_nr_pages(folio);
- 
- 	if (!mapping) {
-@@ -670,7 +675,7 @@ static int __buffer_migrate_folio(struct address_space *mapping,
- 		return migrate_page(mapping, &dst->page, &src->page, mode);
- 
- 	/* Check whether page does not have extra refs before we do more work */
--	expected_count = expected_page_refs(mapping, &src->page);
-+	expected_count = folio_expected_refs(mapping, src);
- 	if (folio_ref_count(src) != expected_count)
- 		return -EAGAIN;
- 
--- 
-2.35.1
+So the very same uImage.FIT on devices with block-based storage can be
+written into a GPT partition (see 3/5), on devices with NAND flash
+where UBI is used into a UBI volume (see 5/5) and on devices with NOR
+flash into an MTD partition (this patch).
 
+> 
+> Anyhow,
+> Acked-by: Miquel Raynal <miquel.raynal@bootlin.com>
+
+Thank you for the review!
+
+
+> 
+> I'll let Richard ack the ubiblock patch.
+> 
+> Thanks,
+> Miquèl
+> 
+> ______________________________________________________
+> Linux MTD discussion mailing list
+> http://lists.infradead.org/mailman/listinfo/linux-mtd/
