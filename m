@@ -2,37 +2,37 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A198C43334
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 12:48:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4242FCCA47C
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 12:48:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244181AbiFGMsR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 08:48:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37466 "EHLO
+        id S244193AbiFGMsS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 08:48:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244176AbiFGMsG (ORCPT
+        with ESMTP id S244190AbiFGMsG (ORCPT
         <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 08:48:06 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2960C313B1
-        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 05:48:03 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2DAF19030
+        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 05:48:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=Z2CkPnYlffK5GNSK1h/kYKOR8TaKi66VozXAAmMXrbg=; b=PlEUO63RaUw8Yb05QUhE3Hw4Sm
-        UTBtg1NEoDWZXnOOUioVlRRy2ACVDd/5me050kMg7Kdqk5CdWKNUc98F6ULu7XxUJQ0CMmbNCdyBS
-        bvW7PWGp8LiNH5ZZ9AgkyePVYkNL24eQu/sdmDNMWphn5BUXd4IKJsD+YmJ5ibNqurnM3IKuy8JlJ
-        t8ZY4TEI65TghHH8aqR/S7KxkvIgzOF2JUwiUf+ebRmytPzImoYS1bBUF+GMRhEUdoGsthhuicnZB
-        7QV30rGDs6Qkug7wjZF1WtPx9JNZuTR3Q+E7bQP2q2QM8wU6IsXoP42yjSkilik1A5jIEgC/NIku6
-        oc/qX+uw==;
+        bh=2W4S3a1VuQDwEOsgchh+sd14l85+LMpS0eeU2cEnqkk=; b=Cx8cgw2sFOrmacgGhGPeFwEEpQ
+        BMQ1cXi7EjkrB+Sv5t/TWk0QSAqWpgtHK2Q1tQGLaSiVZop8sp9lGaD8kAwWNUAwoqt1QJXhT4WzS
+        x5EW6lYw8yXX6lr0GFQMnHg72NKMnIloTjwxlXaoibMBy4/LBvy7N/u1/aBQ72MIQjroUX0loGgx/
+        s3chclR98h3cRU6VixpejVpiek5ZRCDleIPFQo4CiqAjdcXw686exMB60nBqrF/DYNk+fK/i+2K/r
+        gbZknjqdmy752jfLFhfZlsAHDAWYtUYN2sqchQpqA14g7ra647v6yz3u7t4J3fT0m+DmHgzMyvHnC
+        SkY3GDKg==;
 Received: from [2001:4bb8:190:726c:b34a:228:52ee:6d34] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nyYcs-007SeT-DH; Tue, 07 Jun 2022 12:48:02 +0000
+        id 1nyYcv-007Sfq-2d; Tue, 07 Jun 2022 12:48:05 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH blktests 07/13] block/017: convert to use _configure_null_blk
-Date:   Tue,  7 Jun 2022 14:47:33 +0200
-Message-Id: <20220607124739.1259977-8-hch@lst.de>
+Subject: [PATCH blktests 08/13] block/018: convert to use _configure_null_blk
+Date:   Tue,  7 Jun 2022 14:47:34 +0200
+Message-Id: <20220607124739.1259977-9-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220607124739.1259977-1-hch@lst.de>
 References: <20220607124739.1259977-1-hch@lst.de>
@@ -48,43 +48,60 @@ supported, which implies not using the default nullb0 device.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- tests/block/017 | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tests/block/018 | 21 +++++++++++----------
+ 1 file changed, 11 insertions(+), 10 deletions(-)
 
-diff --git a/tests/block/017 b/tests/block/017
-index c84b661..8596888 100755
---- a/tests/block/017
-+++ b/tests/block/017
-@@ -19,23 +19,24 @@ requires() {
- 
- show_inflight() {
- 	awk '{ printf "sysfs inflight reads %d\nsysfs inflight writes %d\n", $1, $2 }' \
--		/sys/block/nullb0/inflight
--	awk '{ print "sysfs stat " $9 }' /sys/block/nullb0/stat
--	awk '$3 == "nullb0" { print "diskstats " $12 }' /proc/diskstats
-+		/sys/block/nullb1/inflight
-+	awk '{ print "sysfs stat " $9 }' /sys/block/nullb1/stat
-+	awk '$3 == "nullb1" { print "diskstats " $12 }' /proc/diskstats
+diff --git a/tests/block/018 b/tests/block/018
+index a80ecbc..e7ac445 100755
+--- a/tests/block/018
++++ b/tests/block/018
+@@ -15,13 +15,13 @@ requires() {
  }
  
- test() {
+ init_times() {
+-	init_read_ms="$(awk '{ print $4 }' /sys/block/nullb0/stat)"
+-	init_write_ms="$(awk '{ print $8 }' /sys/block/nullb0/stat)"
++	init_read_ms="$(awk '{ print $4 }' /sys/block/nullb1/stat)"
++	init_write_ms="$(awk '{ print $8 }' /sys/block/nullb1/stat)"
+ }
+ 
+ show_times() {
+-	read_ms="$(awk '{ print $4 }' /sys/block/nullb0/stat)"
+-	write_ms="$(awk '{ print $8 }' /sys/block/nullb0/stat)"
++	read_ms="$(awk '{ print $4 }' /sys/block/nullb1/stat)"
++	write_ms="$(awk '{ print $8 }' /sys/block/nullb1/stat)"
+ 
+ 	# Print rounded to the nearest second
+ 	printf 'read %d s\n' $(((read_ms - init_read_ms + 500) / 1000))
+@@ -33,22 +33,23 @@ test() {
+ 
  	echo "Running ${TEST_NAME}"
  
--	if ! _init_null_blk irqmode=2 completion_nsec=500000000; then
-+	if ! _configure_null_blk nullb1 irqmode=2 completion_nsec=500000000 \
+-	if ! _init_null_blk irqmode=2 completion_nsec=1000000000; then
++	if ! _configure_null_blk nullb1 irqmode=2 completion_nsec=1000000000 \
 +			power=1; then
  		return 1
  	fi
  
--	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
-+	dd if=/dev/nullb1 of=/dev/null bs=4096 iflag=direct count=1 status=none &
- 	sleep 0.1
- 	show_inflight
+ 	init_times
+ 	show_times
  
+-	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none
++	dd if=/dev/nullb1 of=/dev/null bs=4096 iflag=direct count=1 status=none
+ 	show_times
+ 
+-	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none
++	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1 status=none
+ 	show_times
+ 
+-	dd if=/dev/nullb0 of=/dev/null bs=4096 iflag=direct count=1 status=none &
 -	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
+-	dd if=/dev/zero of=/dev/nullb0 bs=4096 oflag=direct count=1 status=none &
++	dd if=/dev/nullb1 of=/dev/null bs=4096 iflag=direct count=1 status=none &
 +	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1 status=none &
- 	sleep 0.1
- 	show_inflight
++	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1 status=none &
+ 	wait
+ 	show_times
  
 -- 
 2.30.2
