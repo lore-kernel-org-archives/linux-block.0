@@ -2,166 +2,224 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65618C43334
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 00:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4F8C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 00:47:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234542AbiFHAnl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 20:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60826 "EHLO
+        id S1347254AbiFHAr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 20:47:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37238 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1839311AbiFHAC5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 20:02:57 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2ED511CB7F;
-        Tue,  7 Jun 2022 16:52:07 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id l20-20020a17090a409400b001dd2a9d555bso16851699pjg.0;
-        Tue, 07 Jun 2022 16:52:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=b3NZKzwwnS36QL4ucaqxtIuHPEUyyTomuKdcLQyEKAY=;
-        b=Gf7bKdJ2hUOr/LphELuKt2o2il5QdNDO4rPQYRQp+1RKXfjR13N6bKmp5cYllzWRT1
-         xhWgDv9jhC081rAPWRyoHtai4YiXoOEshYmG98xEi3wfEpFCM2PDCdIuy+YcJ0chYvKT
-         atBYZkLGl8/N43pToDTwRSTpFzFaMaAypJvvAQf+dndtlcYidM4/cRGYnwFcXWEtFEWi
-         Tcg9DoCiNNhHm/4hSnGnujiO9+rEPF9ieyuGMobYFn67e4mR2wStVhet3fN/z1EhPV1t
-         aMmWf/7BmFv9yBtn8Iwp64KBjrIImavp8mV1C3jBkHuJyJPrwDy+v+PnhrbQjoGDC5sB
-         2t0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=b3NZKzwwnS36QL4ucaqxtIuHPEUyyTomuKdcLQyEKAY=;
-        b=PMNOqZv0gYYje7LKbxAyJDyL+ZlHZfMhp5bM+Gk/YtCO37w6dt/stbuRPAuHeIQxEU
-         W/9lu/ToLXXewh7L2Dp0vLRwzv3rrH3vq7aHe/XbS947qmv4b9OyOVqtmqtUaiNXoMnT
-         0VC86ADX/oAYxpXqrBh0FK1wBuYB/5BebDWAs10wjvToBJt151B9sM6ZuoHGamjimXMw
-         rdeJTuxFqN88UTCvNS7E4h8+EPKJYxzxiXiDNkjJYNJSMScfxEHhelqBPQC9dcXiOwWi
-         9qAnrgYpRHQ7b7/V4xZPg5i4FfbQf4Zc1Qs2zXqvXmSbfbK+/iKTsGAhg90+IKW4mdqC
-         rwjA==
-X-Gm-Message-State: AOAM533xkF3DKvaZ61c7W0Rhme3N5NdJlRfA9RnL3Pf0QGFDFR7ZHWue
-        lk613blWefXo7l5Xb85Ya34=
-X-Google-Smtp-Source: ABdhPJxccdrile2mSoYxkExBirNwrH/WiEDWbZeQDdUwJ0Lkq9krO4qFXX5rn/DFlb/QY2Iq77CWPw==
-X-Received: by 2002:a17:902:ce11:b0:167:7d4a:964b with SMTP id k17-20020a170902ce1100b001677d4a964bmr12617889plg.37.1654645927119;
-        Tue, 07 Jun 2022 16:52:07 -0700 (PDT)
-Received: from google.com ([2620:15c:211:201:f30f:4d03:66e6:b121])
-        by smtp.gmail.com with ESMTPSA id t9-20020a1709027fc900b00167863f0e68sm4026924plb.237.2022.06.07.16.52.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 16:52:06 -0700 (PDT)
-Sender: Minchan Kim <minchan.kim@gmail.com>
-Date:   Tue, 7 Jun 2022 16:52:04 -0700
-From:   Minchan Kim <minchan@kernel.org>
-To:     Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc:     open list <linux-kernel@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        regressions@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>,
-        Nitin Gupta <ngupta@vflare.org>
-Subject: Re: qemu-arm: zram: mkfs.ext4 : Unable to handle kernel NULL pointer
- dereference at virtual address 00000140
-Message-ID: <Yp/kpPA7GdbArXDo@google.com>
-References: <CA+G9fYtVOfWWpx96fa3zzKzBPKiNu1w3FOD4j++G8MOG3Vs0EA@mail.gmail.com>
- <Yp47DODPCz0kNgE8@google.com>
- <CA+G9fYsjn0zySHU4YYNJWAgkABuJuKtHty7ELHmN-+30VYgCDA@mail.gmail.com>
+        with ESMTP id S1447492AbiFGXG5 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 19:06:57 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B12CB30B6C7;
+        Tue,  7 Jun 2022 13:37:58 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id BEA211F92D;
+        Tue,  7 Jun 2022 20:30:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1654633808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S662GbsRJEF6AHR2EvNBu53yF5E9DczgAYsnFafgTMM=;
+        b=y+HqAzNlLnb/PDQh+aDQgxfaXgDgFlpkBvWu4r6aN2XYXDxi3irQSc60/Y6dgoXm04rQFz
+        sMIP6F+daG66o5WdjUGi8iXe0PX2bcB6wbrwQ2R2UcXjAnNoLODEBL5wUSyeLtPeK9WQ/b
+        3OsfhBPVSLIhjCFDsHZphJ5Ha5hkf30=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1654633808;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=S662GbsRJEF6AHR2EvNBu53yF5E9DczgAYsnFafgTMM=;
+        b=TcXr8fp5++MDzVzG7XmA0OcwUhraygWKTXnVJ0DJDg28V6CTQfFJS6yQY+qyTnTVBROKFH
+        KpQDy3na/34Y1jCw==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 9D1392C141;
+        Tue,  7 Jun 2022 20:30:08 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 251ABA0633; Tue,  7 Jun 2022 22:30:08 +0200 (CEST)
+Date:   Tue, 7 Jun 2022 22:30:08 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, tj@kernel.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+Message-ID: <20220607203008.nk4cpcny5sfl4am7@quack3.lan>
+References: <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+ <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
+ <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+ <20220523085902.wmxoebyq3crerecr@quack3.lan>
+ <25f6703e-9e10-75d9-a893-6df1e6b75254@kernel.dk>
+ <20220523152516.7sr247i3bzwhr44w@quack3.lan>
+ <21cd1c49-838a-7f03-ab13-9a4f2ac65979@huawei.com>
+ <20220607095430.kac5jgzm2gvd7x3c@quack3.lan>
+ <9a51c7b1-ba6c-0a56-85cf-5e602b9c6ec2@huawei.com>
+ <75ebf18b-0e21-3906-7862-6ca80b2f181d@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <CA+G9fYsjn0zySHU4YYNJWAgkABuJuKtHty7ELHmN-+30VYgCDA@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <75ebf18b-0e21-3906-7862-6ca80b2f181d@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 07, 2022 at 06:51:27AM +0530, Naresh Kamboju wrote:
-> On Mon, 6 Jun 2022 at 23:06, Minchan Kim <minchan@kernel.org> wrote:
-> >
-> > On Thu, Jun 02, 2022 at 02:19:34PM +0530, Naresh Kamboju wrote:
-> > > The following kernel crash reported while running selftests: zram: zram.sh
-> > > test case on qemu-arm with Linux mainline v5.18.0 kernel version.
-> > >
-> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > >
-> > > Started noticing from kernel crash from
-> > > BAD: git_sha: cdeffe87f790dfd1baa193020411ce9a538446d7
-> > > GOOD:   git_sha: babf0bb978e3c9fce6c4eba6b744c8754fd43d8e
-> > >
-> > > # git log  --oneline
-> > > babf0bb978e3c9fce6c4eba6b744c8754fd43d8e..cdeffe87f790dfd1baa193020411ce9a538446d7
-> > >   -- drivers/block/
-> > > 98931dd95fd4 Merge tag 'mm-stable-2022-05-25' of
-> > > git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
-> > > 6140ae41effe zram: fix Kconfig dependency warning
-> > > b3fbd58fcbb1 mm: Kconfig: simplify zswap configuration
-> > > e7be8d1dd983 zram: remove double compression logic
-> > > a2ad63daa88b VFS: add FMODE_CAN_ODIRECT file flag
-> > > 30226b69f876 zram: add a huge_idle writeback mode
-> >
-> > Hi Nalesh,
-> >
-> > Thanks for the reporting the bug!
-> >
-> > I locally ran the test in my x86 KVM machine but couldn't reproduce it.
-> > How is it easy to reproduce?  Could you help to bisect it?
+On Tue 07-06-22 21:06:55, Yu Kuai wrote:
+> 在 2022/06/07 19:51, Yu Kuai 写道:
+> > 在 2022/06/07 17:54, Jan Kara 写道:
+> > > On Tue 07-06-22 11:10:27, Yu Kuai wrote:
+> > > > 在 2022/05/23 23:25, Jan Kara 写道:
+> > > > > Hum, for me all emails from Huawei I've received even today
+> > > > > fail the DKIM
+> > > > > check. After some more digging there is interesting
+> > > > > inconsistency in DMARC
+> > > > > configuration for huawei.com domain. There is DMARC record
+> > > > > for huawei.com
+> > > > > like:
+> > > > > 
+> > > > > huawei.com.        600    IN    TXT
+> > > > > "v=DMARC1;p=none;rua=mailto:dmarc@edm.huawei.com"
+> > > > > 
+> > > > > which means no DKIM is required but _dmarc.huawei.com has:
+> > > > > 
+> > > > > _dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
+> > > > > 
+> > > > > 
+> > > > > which says that DKIM is required. I guess this inconsistency may be the
+> > > > > reason why there are problems with DKIM validation for senders from
+> > > > > huawei.com. Yu Kuai, can you perhaps take this to your IT
+> > > > > support to fix
+> > > > > this? Either make sure huawei.com emails get properly signed
+> > > > > with DKIM or
+> > > > > remove the 'quarantine' record from _dmarc.huawei.com. Thanks!
+> > > > > 
+> > > > >                                 Honza
+> > > > > 
+> > > > Hi, Jan and Jens
+> > > > 
+> > > > I just got response from our IT support:
+> > > > 
+> > > > 'fo' is not set in our dmarc configuration(default is 0), which means
+> > > > SPF and DKIM verify both failed so that emails will end up in spam.
+> > > > 
+> > > > It right that DKIM verify is failed because there is no signed key,
+> > > > however, our IT support are curious how SPF verify faild.
+> > > > 
+> > > > Can you guys please take a look at ip address of sender? So our IT
+> > > > support can take a look if they miss it from SPF records.
+> > > 
+> > > So SPF is what makes me receive direct emails from you. For example
+> > > on this
+> > > email I can see:
+> > > 
+> > > Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
+> > >          [185.176.79.56])
+> > >          (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256
+> > > (128/128
+> > >          bits))
+> > >          (No client certificate requested)
+> > >          by smtp-in2.suse.de (Postfix) with ESMTPS id 4LHFjN2L0dzZfj
+> > >          for <jack@suse.cz>; Tue,  7 Jun 2022 03:10:32 +0000 (UTC)
+> > > ...
+> > > Authentication-Results: smtp-in2.suse.de;
+> > >          dkim=none;
+> > >          dmarc=pass (policy=quarantine) header.from=huawei.com;
+> > >          spf=pass (smtp-in2.suse.de: domain of yukuai3@huawei.com
+> > > designates
+> > >          185.176.79.56 as permitted sender)
+> > > smtp.mailfrom=yukuai3@huawei.com
+> > > 
+> > > So indeed frasgout.his.huawei.com is correct outgoing server which makes
+> > > smtp-in2.suse.de believe the email despite missing DKIM signature.
+> > > But the
+> > > problem starts when you send email to a mailing list. Let me take for
+> > > example your email from June 2 with Message-ID
+> > > <20220602082129.2805890-1-yukuai3@huawei.com>, subject "[PATCH -next]
+> > > mm/filemap: fix that first page is not mark accessed in filemap_read()".
+> > > There the mailing list server forwards the email so we have:
+> > > 
+> > > Received: from smtp-in2.suse.de ([192.168.254.78])
+> > >          (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256
+> > > bits))
+> > >          by dovecot-director2.suse.de with LMTPS
+> > >          id 8MC5NfVvmGIPLwAApTUePA
+> > >          (envelope-from <linux-fsdevel-owner@vger.kernel.org>)
+> > >          for <jack@imap.suse.de>; Thu, 02 Jun 2022 08:08:21 +0000
+> > > Received: from out1.vger.email (out1.vger.email
+> > > [IPv6:2620:137:e000::1:20])
+> > >          by smtp-in2.suse.de (Postfix) with ESMTP id 4LDJYK5bf0zZg5
+> > >          for <jack@suse.cz>; Thu,  2 Jun 2022 08:08:21 +0000 (UTC)
+> > > Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+> > >          id S232063AbiFBIIM (ORCPT <rfc822;jack@suse.cz>);
+> > >          Thu, 2 Jun 2022 04:08:12 -0400
+> > > Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
+> > >          lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by
+> > >          vger.kernel.org
+> > >          with ESMTP id S232062AbiFBIIL (ORCPT
+> > >          <rfc822;linux-fsdevel@vger.kernel.org>);
+> > >          Thu, 2 Jun 2022 04:08:11 -0400
+> > > Received: from szxga02-in.huawei.com (szxga02-in.huawei.com
+> > > [45.249.212.188])
+> > >          by lindbergh.monkeyblade.net (Postfix) with ESMTPS id
+> > >          75DDB25FE;
+> > >          Thu,  2 Jun 2022 01:08:08 -0700 (PDT)
+> > > 
+> > > and thus smtp-in2.suse.de complains:
+> > > 
+> > > Authentication-Results: smtp-in2.suse.de;
+> > >          dkim=none;
+> > >          dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM"
+> > >          header.from=huawei.com (policy=quarantine);
+> > >          spf=pass (smtp-in2.suse.de: domain of
+> > >          linux-fsdevel-owner@vger.kernel.org designates
+> > > 2620:137:e000::1:20 as
+> > >          permitted sender)
+> > > smtp.mailfrom=linux-fsdevel-owner@vger.kernel.org
+> > > 
+> > > Because now we've got email with "From" header from huawei.com
+> > > domain from
+> > > a vger mail server which was forwarding it. So SPF has no chance to match
+> > > (in fact SPF did pass for the Return-Path header which points to
+> > > vger.kernel.org but DMARC defines that if "From" and "Return-Path" do not
+> > > match, additional validation is needed - this is the "SPF not aligned
+> > > (relaxed)" message above). And missing DKIM (the additional validation
+> > > method) sends the email to spam.
+> > 
+> > Thanks a lot for your analysis, afaics, in order to fix the
+> > problem, either your mail server change the configuration to set
+> > alignment mode to "relaxed" instead of "strict", or our mail server
+> > add correct DKIM signature for emails.
+> > 
+> > I'll contact with our IT support and try to add DKIM signature.
+> > 
+> > Thanks,
+> > Kuai
 > 
-> It works on qemu_x86-64
-> It is always reproducible in qemu arm32 environment.
+> Hi, Jan
 > 
-> steps to reproduce:
-> # Please download and use this rootfs and kernel zImage
-> 
-> rootfs: https://oebuilds.tuxbuild.com/29zhlbEc3EWq2wod9Uy964Bp27q/images/am57xx-evm/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4.gz
-> kernel: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC/zImage
-> 
-> Boot command,
->  /usr/bin/qemu-system-aarch64 -cpu host,aarch64=off -machine
-> virt-2.10,accel=kvm -nographic -net
-> nic,model=virtio,maaacaddr=BA:DD:AD:CC:09:04 -net tap -m 2048 -monitor
-> none -kernel kernel/zImage --append "console=ttyAMA0 root=/dev/vda rw"
-> -hda rootfs/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4
-> -m 4096 -smp 2
-> 
-> # cd /opt/kselftests/default-in-kernel/zram
-> # ./zram.sh
-> 
-> Allow me sometime I will try to bisect this problem.
+> Our IT support is worried that add DKIM signature will degrade
+> performance, may I ask that how is your mail server configuation? policy
+> is quarantine or none, and dkim signature is supportted or not.
 
-Thanks for sharing the info. 
+The DMARC policy (relaxed / quarantine) is not configured on the side of
+the receiving mail server but on huawei.com side. As I wrote above it is
+this DMARC record in DNS of huawei.com domain that makes receiving mail
+servers refuse the email without DKIM signature (if SPF does not match):
 
-I managed to work your rootfs with my local arm build
-based on the problematic git tip. 
-However, I couldn't suceed to reproduce it.
+_dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
 
-I needed to build zsmalloc/zram built-in instead of modules
-Is it related? Hmm,
+So if your IT admins do not want to introduce DKIM signatures on outgoing
+email, they should set policy to 'p=none' in the DMARC DNS record to tell
+that fact to receiving mail servers.
 
-Yeah, It would be very helpful if you could help to bisect it.
-Thanks!
-
-=== &< ====
-create '1' zram device(s)
-zram modules already loaded, kernel supports zram-control interface
-[  936.188541] zram: Added device: zram1
-all zram devices (/dev/zram1~1 successfully created
-set max_comp_streams to zram device(s)
-The device attribute max_comp_streams was deprecated in 4.7
-set disk size to zram device(s)
-/sys/block/zram1/disksize = '1048576'
-zram set disksizes: OK
-set memory limit to zram device(s)
-[  936.214438] zram1: detected capacity change from 0 to 2048
-/sys/block/zram1/mem_limit = '1M'
-zram set memory limit: OK
-make swap with zram device(s)
-[  936.608854] Adding 1020k swap on /dev/zram1.  Priority:-2 extents:1 across:1020k SS
-done with /dev/zram1
-zram making zram mkswap and swapon: OK
-zram swapoff: OK
-zram cleanup
-[  937.063416] zram1: detected capacity change from 2048 to 0
-[  937.189223] zram: Removed device: zram1
-zram02 : [PASS]
-root@am57xx-evm:/opt/kselftests/default-in-kernel/zram# uname -r
-5.18.0-11934-g54eb8462f21f
-
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
