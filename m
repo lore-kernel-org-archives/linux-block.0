@@ -2,143 +2,260 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1E1CCA47F
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 09:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F3E8CCA482
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 09:15:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239121AbiFGJPi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 05:15:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39746 "EHLO
+        id S239082AbiFGJPm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 05:15:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39812 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239093AbiFGJPf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 05:15:35 -0400
+        with ESMTP id S239106AbiFGJPg (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 05:15:36 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB633A776E;
-        Tue,  7 Jun 2022 02:15:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52161B0A7D;
+        Tue,  7 Jun 2022 02:15:34 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 84E4C21B58;
+        by smtp-out1.suse.de (Postfix) with ESMTP id 83F6921B50;
         Tue,  7 Jun 2022 09:15:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1654593329; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=V5dg/wUOoO9SM3oJPIIBt0UdXVmYrDYlPq0iKnn5AuM=;
-        b=oTWcK4ZOlzooLs2J4s0O5kIyJatZrLYSeDPTJzT8xXDsFpkOt3waHqfcvcyaSC9DMhSKfS
-        UWzCIADhvFY64bhMcIqQtii9BLPqiIVEfwSkHKPd4NdnT+rCN+okSlMxIK21Rqqr64sc1V
-        B9wkxBDtgAthvwxsXMndWUXyBzHdhvo=
+        bh=sg7PMCcZBQ27G7750WAquLF4In4PaH6ZF1MZj8QPU4M=;
+        b=ROWbxK6scq6BiQdOGcJ7B/0RO8dvs+O3nhFhbgROE3ofT8iUdL//K8q8NGjKuHyoDoUg5u
+        UShTnJFAqMYzLhcHNHFC1D0oTXCMPIelT2jycTvYMSXV828/VNKjdNP9zULQ9FxaeQ4N94
+        OhTHZihGLhOjXSzp/fMfFvldhBqg8Is=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1654593329;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=V5dg/wUOoO9SM3oJPIIBt0UdXVmYrDYlPq0iKnn5AuM=;
-        b=Bz73TwkGbAcijTehyi4UtbGsuC02ZF6pRJ0k0TkQqDYuC+pA8YBwyr5dFn3T8ao1wzRmPC
-        O+K+nnqZid19BNCw==
+        bh=sg7PMCcZBQ27G7750WAquLF4In4PaH6ZF1MZj8QPU4M=;
+        b=5XBG21TgFfehaXz8jri0mUCQNrazavbPyEQuFs1RDPTRYZYNFPpMVnkAGMUq9RXdkSNHO3
+        W7BgJ6W+oAoRtYAQ==
 Received: from quack3.suse.cz (unknown [10.163.28.18])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 735DE2C14B;
+        by relay2.suse.de (Postfix) with ESMTPS id 6CE312C146;
         Tue,  7 Jun 2022 09:15:29 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 7AEEEA0634; Tue,  7 Jun 2022 11:15:28 +0200 (CEST)
+        id 910D8A0638; Tue,  7 Jun 2022 11:15:28 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     stable@vger.kernel.org
 Cc:     Jens Axboe <axboe@kernel.dk>,
         Paolo Valente <paolo.valente@linaro.org>,
         <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
         "yukuai (C)" <yukuai3@huawei.com>, Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 1/6] bfq: Avoid merging queues with different parents
-Date:   Tue,  7 Jun 2022 11:15:09 +0200
-Message-Id: <20220607091528.11906-1-jack@suse.cz>
+Subject: [PATCH 4/6] bfq: Get rid of __bio_blkcg() usage
+Date:   Tue,  7 Jun 2022 11:15:12 +0200
+Message-Id: <20220607091528.11906-4-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20220607091209.24033-1-jack@suse.cz>
 References: <20220607091209.24033-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3153; h=from:subject; bh=x8EcsMWFV5ZF6dfyNu1C9oUWnseaKZo+fdZjYpisFKE=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBinxccB0AstANtSZ3QYIqOGKttnBn7G+uSPzHDevqk /ho2I7eJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYp8XHAAKCRCcnaoHP2RA2aceB/ 91Gg7CEIV4oOeZLg/udzUtLEoH9VAN855GsEbidPeps3DqLlPxXkG1kIqW1iA1LCP5OeC2lhLq5Xuk APR5AHPtpYbMAKGvx4s4KeIM84m65QQTcFDlAxwWVAOBSD6N34M3jeukQCNnh6bMBkajQn4JlzKxXN pBBcpn00C3NQtZYMF+gWPJvt8yrrZbnz9Vx6QtiFF7HCudqPf2adBd73DeHyS3zUNd9k3hUk15Yvgc ZhsvDBS34Zn7Q/vSrh/HDkOBYh6Lsh10+RgTUN140Jj6wzkhIS4xi4p3qCZ63UwSekowm03ZKkamUQ X1Js8OJJVWjZz9NSAIfZHWPM+6A2+B
+X-Developer-Signature: v=1; a=openpgp-sha256; l=6875; h=from:subject; bh=a5LTzZkNapz9chCL2j23V6jlrlCZrxyrMH3GEOEotwU=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBinxcf3Qlighhow2o0U8BI+Q5zBUDE7Ka9uMa1mk4L 094KHhaJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYp8XHwAKCRCcnaoHP2RA2Y7TB/ 9q6N2fpqYSB+zc6tCWMQCvNPT2lqc7S03Guwtj3Kt+qwZYB4w6DiqE1Yq/erkf+Qplrvdm3tQJsrhU 3ECjonx1Vkn9BaqtYQlQs5XxGYt02ADBrw6Ofbuhg0pzfObfvD28Gx+q5iIcvkffULgA2xDmQ6uG0X Obke6JYoRK69jlh9BFnL+P17Bdct+IU/wDU4NzYGwn93bpIt2iV13b3cEuMp4Ovl00+2lhHwFVVRc/ z4Vl9MVOOPOT68YFYsQ5PakK53GR+45AXD/5+LR9QvHhy1eu/OBU+qhByg1fgwqEi62OUN6KAKJYEG vAp3YWzVnmnSVAXwCKJ0fHYylGvGb4
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit c1cee4ab36acef271be9101590756ed0c0c374d9 upstream.
+commit 4e54a2493e582361adc3bfbf06c7d50d19d18837 upstream.
 
-It can happen that the parent of a bfqq changes between the moment we
-decide two queues are worth to merge (and set bic->stable_merge_bfqq)
-and the moment bfq_setup_merge() is called. This can happen e.g. because
-the process submitted IO for a different cgroup and thus bfqq got
-reparented. It can even happen that the bfqq we are merging with has
-parent cgroup that is already offline and going to be destroyed in which
-case the merge can lead to use-after-free issues such as:
+BFQ usage of __bio_blkcg() is a relict from the past. Furthermore if bio
+would not be associated with any blkcg, the usage of __bio_blkcg() in
+BFQ is prone to races with the task being migrated between cgroups as
+__bio_blkcg() calls at different places could return different blkcgs.
 
-BUG: KASAN: use-after-free in __bfq_deactivate_entity+0x9cb/0xa50
-Read of size 8 at addr ffff88800693c0c0 by task runc:[2:INIT]/10544
+Convert BFQ to the new situation where bio->bi_blkg is initialized in
+bio_set_dev() and thus practically always valid. This allows us to save
+blkcg_gq lookup and noticeably simplify the code.
 
-CPU: 0 PID: 10544 Comm: runc:[2:INIT] Tainted: G            E     5.15.2-0.g5fb85fd-default #1 openSUSE Tumbleweed (unreleased) f1f3b891c72369aebecd2e43e4641a6358867c70
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a-rebuilt.opensuse.org 04/01/2014
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x46/0x5a
- print_address_description.constprop.0+0x1f/0x140
- ? __bfq_deactivate_entity+0x9cb/0xa50
- kasan_report.cold+0x7f/0x11b
- ? __bfq_deactivate_entity+0x9cb/0xa50
- __bfq_deactivate_entity+0x9cb/0xa50
- ? update_curr+0x32f/0x5d0
- bfq_deactivate_entity+0xa0/0x1d0
- bfq_del_bfqq_busy+0x28a/0x420
- ? resched_curr+0x116/0x1d0
- ? bfq_requeue_bfqq+0x70/0x70
- ? check_preempt_wakeup+0x52b/0xbc0
- __bfq_bfqq_expire+0x1a2/0x270
- bfq_bfqq_expire+0xd16/0x2160
- ? try_to_wake_up+0x4ee/0x1260
- ? bfq_end_wr_async_queues+0xe0/0xe0
- ? _raw_write_unlock_bh+0x60/0x60
- ? _raw_spin_lock_irq+0x81/0xe0
- bfq_idle_slice_timer+0x109/0x280
- ? bfq_dispatch_request+0x4870/0x4870
- __hrtimer_run_queues+0x37d/0x700
- ? enqueue_hrtimer+0x1b0/0x1b0
- ? kvm_clock_get_cycles+0xd/0x10
- ? ktime_get_update_offsets_now+0x6f/0x280
- hrtimer_interrupt+0x2c8/0x740
-
-Fix the problem by checking that the parent of the two bfqqs we are
-merging in bfq_setup_merge() is the same.
-
-Link: https://lore.kernel.org/linux-block/20211125172809.GC19572@quack2.suse.cz/
 CC: stable@vger.kernel.org
-Fixes: 430a67f9d616 ("block, bfq: merge bursts of newly-created queues")
+Fixes: 0fe061b9f03c ("blkcg: fix ref count issue with bio_blkcg() using task_css")
 Tested-by: "yukuai (C)" <yukuai3@huawei.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Link: https://lore.kernel.org/r/20220401102752.8599-2-jack@suse.cz
+Link: https://lore.kernel.org/r/20220401102752.8599-8-jack@suse.cz
 Signed-off-by: Jens Axboe <axboe@kernel.dk>
 ---
- block/bfq-iosched.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ block/bfq-cgroup.c  | 63 +++++++++++++++++----------------------------
+ block/bfq-iosched.c | 10 +------
+ block/bfq-iosched.h |  3 +--
+ 3 files changed, 25 insertions(+), 51 deletions(-)
 
+diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+index 095f2f65bc16..3835cd920587 100644
+--- a/block/bfq-cgroup.c
++++ b/block/bfq-cgroup.c
+@@ -565,27 +565,11 @@ static void bfq_group_set_parent(struct bfq_group *bfqg,
+ 	entity->sched_data = &parent->sched_data;
+ }
+ 
+-static struct bfq_group *bfq_lookup_bfqg(struct bfq_data *bfqd,
+-					 struct blkcg *blkcg)
++static void bfq_link_bfqg(struct bfq_data *bfqd, struct bfq_group *bfqg)
+ {
+-	struct blkcg_gq *blkg;
+-
+-	blkg = blkg_lookup(blkcg, bfqd->queue);
+-	if (likely(blkg))
+-		return blkg_to_bfqg(blkg);
+-	return NULL;
+-}
+-
+-struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+-				     struct blkcg *blkcg)
+-{
+-	struct bfq_group *bfqg, *parent;
++	struct bfq_group *parent;
+ 	struct bfq_entity *entity;
+ 
+-	bfqg = bfq_lookup_bfqg(bfqd, blkcg);
+-	if (unlikely(!bfqg))
+-		return NULL;
+-
+ 	/*
+ 	 * Update chain of bfq_groups as we might be handling a leaf group
+ 	 * which, along with some of its relatives, has not been hooked yet
+@@ -602,8 +586,15 @@ struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+ 			bfq_group_set_parent(curr_bfqg, parent);
+ 		}
+ 	}
++}
+ 
+-	return bfqg;
++struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
++{
++	struct blkcg_gq *blkg = bio->bi_blkg;
++
++	if (!blkg)
++		return bfqd->root_group;
++	return blkg_to_bfqg(blkg);
+ }
+ 
+ /**
+@@ -679,25 +670,15 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+  * Move bic to blkcg, assuming that bfqd->lock is held; which makes
+  * sure that the reference to cgroup is valid across the call (see
+  * comments in bfq_bic_update_cgroup on this issue)
+- *
+- * NOTE: an alternative approach might have been to store the current
+- * cgroup in bfqq and getting a reference to it, reducing the lookup
+- * time here, at the price of slightly more complex code.
+  */
+-static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
+-						struct bfq_io_cq *bic,
+-						struct blkcg *blkcg)
++static void *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
++				     struct bfq_io_cq *bic,
++				     struct bfq_group *bfqg)
+ {
+ 	struct bfq_queue *async_bfqq = bic_to_bfqq(bic, 0);
+ 	struct bfq_queue *sync_bfqq = bic_to_bfqq(bic, 1);
+-	struct bfq_group *bfqg;
+ 	struct bfq_entity *entity;
+ 
+-	bfqg = bfq_find_set_group(bfqd, blkcg);
+-
+-	if (unlikely(!bfqg))
+-		bfqg = bfqd->root_group;
+-
+ 	if (async_bfqq) {
+ 		entity = &async_bfqq->entity;
+ 
+@@ -749,20 +730,24 @@ static struct bfq_group *__bfq_bic_change_cgroup(struct bfq_data *bfqd,
+ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
+ {
+ 	struct bfq_data *bfqd = bic_to_bfqd(bic);
+-	struct bfq_group *bfqg = NULL;
++	struct bfq_group *bfqg = bfq_bio_bfqg(bfqd, bio);
+ 	uint64_t serial_nr;
+ 
+-	rcu_read_lock();
+-	serial_nr = __bio_blkcg(bio)->css.serial_nr;
++	serial_nr = bfqg_to_blkg(bfqg)->blkcg->css.serial_nr;
+ 
+ 	/*
+ 	 * Check whether blkcg has changed.  The condition may trigger
+ 	 * spuriously on a newly created cic but there's no harm.
+ 	 */
+ 	if (unlikely(!bfqd) || likely(bic->blkcg_serial_nr == serial_nr))
+-		goto out;
++		return;
+ 
+-	bfqg = __bfq_bic_change_cgroup(bfqd, bic, __bio_blkcg(bio));
++	/*
++	 * New cgroup for this process. Make sure it is linked to bfq internal
++	 * cgroup hierarchy.
++	 */
++	bfq_link_bfqg(bfqd, bfqg);
++	__bfq_bic_change_cgroup(bfqd, bic, bfqg);
+ 	/*
+ 	 * Update blkg_path for bfq_log_* functions. We cache this
+ 	 * path, and update it here, for the following
+@@ -815,8 +800,6 @@ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio)
+ 	 */
+ 	blkg_path(bfqg_to_blkg(bfqg), bfqg->blkg_path, sizeof(bfqg->blkg_path));
+ 	bic->blkcg_serial_nr = serial_nr;
+-out:
+-	rcu_read_unlock();
+ }
+ 
+ /**
+@@ -1433,7 +1416,7 @@ void bfq_end_wr_async(struct bfq_data *bfqd)
+ 	bfq_end_wr_async_queues(bfqd, bfqd->root_group);
+ }
+ 
+-struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd, struct blkcg *blkcg)
++struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio)
+ {
+ 	return bfqd->root_group;
+ }
 diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index bdfa707ce236..29c15079c4d5 100644
+index f91c9bb687a8..962701d3f46b 100644
 --- a/block/bfq-iosched.c
 +++ b/block/bfq-iosched.c
-@@ -2509,6 +2509,14 @@ bfq_setup_merge(struct bfq_queue *bfqq, struct bfq_queue *new_bfqq)
- 	if (process_refs == 0 || new_process_refs == 0)
- 		return NULL;
+@@ -5158,14 +5158,7 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
+ 	struct bfq_queue *bfqq;
+ 	struct bfq_group *bfqg;
  
-+	/*
-+	 * Make sure merged queues belong to the same parent. Parents could
-+	 * have changed since the time we decided the two queues are suitable
-+	 * for merging.
-+	 */
-+	if (new_bfqq->entity.parent != bfqq->entity.parent)
-+		return NULL;
-+
- 	bfq_log_bfqq(bfqq->bfqd, bfqq, "scheduling merge with queue %d",
- 		new_bfqq->pid);
+-	rcu_read_lock();
+-
+-	bfqg = bfq_find_set_group(bfqd, __bio_blkcg(bio));
+-	if (!bfqg) {
+-		bfqq = &bfqd->oom_bfqq;
+-		goto out;
+-	}
+-
++	bfqg = bfq_bio_bfqg(bfqd, bio);
+ 	if (!is_sync) {
+ 		async_bfqq = bfq_async_queue_prio(bfqd, bfqg, ioprio_class,
+ 						  ioprio);
+@@ -5209,7 +5202,6 @@ static struct bfq_queue *bfq_get_queue(struct bfq_data *bfqd,
+ out:
+ 	bfqq->ref++; /* get a process reference to this queue */
+ 	bfq_log_bfqq(bfqd, bfqq, "get_queue, at end: %p, %d", bfqq, bfqq->ref);
+-	rcu_read_unlock();
+ 	return bfqq;
+ }
  
+diff --git a/block/bfq-iosched.h b/block/bfq-iosched.h
+index be1f4c1febf8..f6cc2b418008 100644
+--- a/block/bfq-iosched.h
++++ b/block/bfq-iosched.h
+@@ -978,8 +978,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+ void bfq_init_entity(struct bfq_entity *entity, struct bfq_group *bfqg);
+ void bfq_bic_update_cgroup(struct bfq_io_cq *bic, struct bio *bio);
+ void bfq_end_wr_async(struct bfq_data *bfqd);
+-struct bfq_group *bfq_find_set_group(struct bfq_data *bfqd,
+-				     struct blkcg *blkcg);
++struct bfq_group *bfq_bio_bfqg(struct bfq_data *bfqd, struct bio *bio);
+ struct blkcg_gq *bfqg_to_blkg(struct bfq_group *bfqg);
+ struct bfq_group *bfqq_group(struct bfq_queue *bfqq);
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node);
 -- 
 2.35.3
 
