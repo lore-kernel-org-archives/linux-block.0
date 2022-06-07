@@ -2,171 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87198C43334
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 18:52:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E3F8C43334
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 20:06:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353486AbiFGSv6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 14:51:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58410 "EHLO
+        id S1353938AbiFGUGj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 16:06:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353454AbiFGStK (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 14:49:10 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 518A719297;
-        Tue,  7 Jun 2022 11:03:13 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0E7FE617A7;
-        Tue,  7 Jun 2022 18:03:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74B89C3411C;
-        Tue,  7 Jun 2022 18:03:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1654624991;
-        bh=V6p5BQsO1+EU/j6FqgbS3TxvSYHwUNOeiBDZG2dot3E=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qZ3gAlVFx54ytPaMmNxozGFDV5lkGumvTVhRkJ2fCBSgGfHnOpnefkkz/j5BrgvvV
-         NaeGerqaJukRBFRTBCJQVtmfmr1DFjq/A+eNXaRUPVq7X+2lYDp21nlhMJpIWnqroo
-         SCjur5/otmpWw0ly9IpoEITaxzo5cIwjRU/tqrRMiIU4DHGcrXG/D58mqxltIGSDJD
-         Pglu0VUtalhNkgIG0Vaz1qiIGs7agXP6160+2GCGvRrz0fI61F1TeCdsRcdqlgZDhd
-         1jDQKNK8Vl6nFe5y3Nrgq6Nr3QsDYR2USKVJY7K/pfKH3u0X1DrsjQSBTzYkROwnOS
-         gq1hKk5Ty8Hbg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yu Kuai <yukuai3@huawei.com>, Hou Tao <houtao1@huawei.com>,
-        Josef Bacik <josef@toxicpanda.com>,
-        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
-        linux-block@vger.kernel.org, nbd@other.debian.org
-Subject: [PATCH AUTOSEL 4.14 23/25] nbd: fix race between nbd_alloc_config() and module removal
-Date:   Tue,  7 Jun 2022 14:02:24 -0400
-Message-Id: <20220607180229.482040-23-sashal@kernel.org>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220607180229.482040-1-sashal@kernel.org>
-References: <20220607180229.482040-1-sashal@kernel.org>
+        with ESMTP id S1358406AbiFGUDx (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 16:03:53 -0400
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49FAE1C285A
+        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 11:25:41 -0700 (PDT)
+Received: by mail-io1-f70.google.com with SMTP id i126-20020a6bb884000000b006691e030971so6005230iof.15
+        for <linux-block@vger.kernel.org>; Tue, 07 Jun 2022 11:25:41 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=k1e8Tc/bhXaKPbvd4ORPtFyg8YT3uAhzDyuaK7uM+Js=;
+        b=v6GguwpOw4ZxKlHBZxUhkLlVkRCFCxkPPu6h35UZnmxaAjJXcggJ3tUom9/nn2tEPB
+         hOMh2ylL1HaWMs6AyNj1fRVJ0jl9wdMqF6TsAU5Mw1PnMze4S8wcTnceN8xYkQuyr2TF
+         qi4qiMvuLSIC/I+8Za1Jph0o7gLACq1Pb3QI1wOf+TCaVcfmbRXWl0vV/fzlmDsgN3JO
+         uwra2rgvU1wZbMTgRh7dKjLN8al+XgQQzmJREZCeJ8tqPq0fdWrGV4mH6KENltA1k6H2
+         ldVocZ4TnhfmRq3KJDEnFlaAwUI2T5mlmVGQmUoB+EYM0LzQLiL62VM/IbMJjB3H/jDy
+         HZyA==
+X-Gm-Message-State: AOAM533SMDOtOYVLEbF1b/Up9KrPld1d6BQfbaJi5yV41EiNreFV44HY
+        1r8Z0cUImA3ewDsgmr5NtQrdJydBWNXjPiIxAN2TPUL3/ESr
+X-Google-Smtp-Source: ABdhPJz1VGU8BKz+izWU7o5gCU8RmLnE5bPfn5dnUbUENVntlYs7SI1MIryy7TOVwCfxPjNN7UPXo4ky6Bwv6B+DmLmIj+Waeo+f
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1a83:b0:2d1:bb9a:bade with SMTP id
+ k3-20020a056e021a8300b002d1bb9abademr17126640ilv.189.1654626321631; Tue, 07
+ Jun 2022 11:25:21 -0700 (PDT)
+Date:   Tue, 07 Jun 2022 11:25:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000023102605e0dfb6c0@google.com>
+Subject: [syzbot] general protection fault in reset_interrupt (2)
+From:   syzbot <syzbot+682e25dfa0255204491a@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Yu Kuai <yukuai3@huawei.com>
+Hello,
 
-[ Upstream commit c55b2b983b0fa012942c3eb16384b2b722caa810 ]
+syzbot found the following issue on:
 
-When nbd module is being removing, nbd_alloc_config() may be
-called concurrently by nbd_genl_connect(), although try_module_get()
-will return false, but nbd_alloc_config() doesn't handle it.
+HEAD commit:    50fd82b3a9a9 Merge tag 'docs-5.19-2' of git://git.lwn.net/..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=17b08fbdf00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bb7e6d86633f6f71
+dashboard link: https://syzkaller.appspot.com/bug?extid=682e25dfa0255204491a
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=165f5277f00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171403aff00000
 
-The race may lead to the leak of nbd_config and its related
-resources (e.g, recv_workq) and oops in nbd_read_stat() due
-to the unload of nbd module as shown below:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+682e25dfa0255204491a@syzkaller.appspotmail.com
 
-  BUG: kernel NULL pointer dereference, address: 0000000000000040
-  Oops: 0000 [#1] SMP PTI
-  CPU: 5 PID: 13840 Comm: kworker/u17:33 Not tainted 5.14.0+ #1
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
-  Workqueue: knbd16-recv recv_work [nbd]
-  RIP: 0010:nbd_read_stat.cold+0x130/0x1a4 [nbd]
-  Call Trace:
-   recv_work+0x3b/0xb0 [nbd]
-   process_one_work+0x1ed/0x390
-   worker_thread+0x4a/0x3d0
-   kthread+0x12a/0x150
-   ret_from_fork+0x22/0x30
+c1 00                                            ..
+status=d0
+fdc_busy=0
+cont=0000000000000000
+current_req=0000000000000000
+command_status=-1
+general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+CPU: 3 PID: 3441 Comm: kworker/u16:2 Not tainted 5.18.0-syzkaller-12234-g50fd82b3a9a9 #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+Workqueue: floppy floppy_work_workfn
+RIP: 0010:reset_interrupt.cold+0x3d/0x88 drivers/block/floppy.c:1789
+Code: e8 da f0 ff ff e9 89 61 52 fb e8 e1 39 33 f8 48 8b 1d 8a 3b dd 07 b8 ff ff 37 00 48 c1 e0 2a 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 3e 48 8b 73 10 48 c7 c7 40 51 42 8a e8 5c 28 eb ff
+RSP: 0018:ffffc90002d2fd08 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000002 RSI: ffffffff89467b8f RDI: 0000000000000010
+RBP: ffffffff8c8e71e0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
+R13: ffffc90002d2fda8 R14: ffff888014ba4100 R15: ffff888011875800
+FS:  0000000000000000(0000) GS:ffff88802cb00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f751b73001d CR3: 000000001f1bf000 CR4: 0000000000150ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ process_one_work+0x996/0x1610 kernel/workqueue.c:2289
+ worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+ kthread+0x2e9/0x3a0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:reset_interrupt.cold+0x3d/0x88 drivers/block/floppy.c:1789
+Code: e8 da f0 ff ff e9 89 61 52 fb e8 e1 39 33 f8 48 8b 1d 8a 3b dd 07 b8 ff ff 37 00 48 c1 e0 2a 48 8d 7b 10 48 89 fa 48 c1 ea 03 <80> 3c 02 00 75 3e 48 8b 73 10 48 c7 c7 40 51 42 8a e8 5c 28 eb ff
+RSP: 0018:ffffc90002d2fd08 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000002 RSI: ffffffff89467b8f RDI: 0000000000000010
+RBP: ffffffff8c8e71e0 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000001
+R13: ffffc90002d2fda8 R14: ffff888014ba4100 R15: ffff888011875800
+FS:  0000000000000000(0000) GS:ffff88802cb00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f751b73001d CR3: 000000001f1bf000 CR4: 0000000000150ee0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	e8 da f0 ff ff       	callq  0xfffff0df
+   5:	e9 89 61 52 fb       	jmpq   0xfb526193
+   a:	e8 e1 39 33 f8       	callq  0xf83339f0
+   f:	48 8b 1d 8a 3b dd 07 	mov    0x7dd3b8a(%rip),%rbx        # 0x7dd3ba0
+  16:	b8 ff ff 37 00       	mov    $0x37ffff,%eax
+  1b:	48 c1 e0 2a          	shl    $0x2a,%rax
+  1f:	48 8d 7b 10          	lea    0x10(%rbx),%rdi
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	75 3e                	jne    0x6e
+  30:	48 8b 73 10          	mov    0x10(%rbx),%rsi
+  34:	48 c7 c7 40 51 42 8a 	mov    $0xffffffff8a425140,%rdi
+  3b:	e8 5c 28 eb ff       	callq  0xffeb289c
 
-Fixing it by checking the return value of try_module_get()
-in nbd_alloc_config(). As nbd_alloc_config() may return ERR_PTR(-ENODEV),
-assign nbd->config only when nbd_alloc_config() succeeds to ensure
-the value of nbd->config is binary (valid or NULL).
 
-Also adding a debug message to check the reference counter
-of nbd_config during module removal.
-
-Signed-off-by: Hou Tao <houtao1@huawei.com>
-Signed-off-by: Yu Kuai <yukuai3@huawei.com>
-Reviewed-by: Josef Bacik <josef@toxicpanda.com>
-Link: https://lore.kernel.org/r/20220521073749.3146892-3-yukuai3@huawei.com
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/block/nbd.c | 28 +++++++++++++++++++---------
- 1 file changed, 19 insertions(+), 9 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-index 1c9f866d9338..9596f93d98b2 100644
---- a/drivers/block/nbd.c
-+++ b/drivers/block/nbd.c
-@@ -1382,15 +1382,20 @@ static struct nbd_config *nbd_alloc_config(void)
- {
- 	struct nbd_config *config;
- 
-+	if (!try_module_get(THIS_MODULE))
-+		return ERR_PTR(-ENODEV);
-+
- 	config = kzalloc(sizeof(struct nbd_config), GFP_NOFS);
--	if (!config)
--		return NULL;
-+	if (!config) {
-+		module_put(THIS_MODULE);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
- 	atomic_set(&config->recv_threads, 0);
- 	init_waitqueue_head(&config->recv_wq);
- 	init_waitqueue_head(&config->conn_wait);
- 	config->blksize = NBD_DEF_BLKSIZE;
- 	atomic_set(&config->live_connections, 0);
--	try_module_get(THIS_MODULE);
- 	return config;
- }
- 
-@@ -1417,12 +1422,13 @@ static int nbd_open(struct block_device *bdev, fmode_t mode)
- 			mutex_unlock(&nbd->config_lock);
- 			goto out;
- 		}
--		config = nbd->config = nbd_alloc_config();
--		if (!config) {
--			ret = -ENOMEM;
-+		config = nbd_alloc_config();
-+		if (IS_ERR(config)) {
-+			ret = PTR_ERR(config);
- 			mutex_unlock(&nbd->config_lock);
- 			goto out;
- 		}
-+		nbd->config = config;
- 		refcount_set(&nbd->config_refs, 1);
- 		refcount_inc(&nbd->refs);
- 		mutex_unlock(&nbd->config_lock);
-@@ -1803,13 +1809,14 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
- 		nbd_put(nbd);
- 		return -EINVAL;
- 	}
--	config = nbd->config = nbd_alloc_config();
--	if (!nbd->config) {
-+	config = nbd_alloc_config();
-+	if (IS_ERR(config)) {
- 		mutex_unlock(&nbd->config_lock);
- 		nbd_put(nbd);
- 		printk(KERN_ERR "nbd: couldn't allocate config\n");
--		return -ENOMEM;
-+		return PTR_ERR(config);
- 	}
-+	nbd->config = config;
- 	refcount_set(&nbd->config_refs, 1);
- 	set_bit(NBD_BOUND, &config->runtime_flags);
- 
-@@ -2334,6 +2341,9 @@ static void __exit nbd_cleanup(void)
- 	while (!list_empty(&del_list)) {
- 		nbd = list_first_entry(&del_list, struct nbd_device, list);
- 		list_del_init(&nbd->list);
-+		if (refcount_read(&nbd->config_refs))
-+			printk(KERN_ERR "nbd: possibly leaking nbd_config (ref %d)\n",
-+					refcount_read(&nbd->config_refs));
- 		if (refcount_read(&nbd->refs) != 1)
- 			printk(KERN_ERR "nbd: possibly leaking a device\n");
- 		nbd_put(nbd);
--- 
-2.35.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
