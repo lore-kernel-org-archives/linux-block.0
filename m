@@ -2,122 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDFEC43334
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 17:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6088DCCA47C
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 18:23:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345547AbiFGRKN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 13:10:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41242 "EHLO
+        id S1344861AbiFGSXJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 14:23:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345476AbiFGRKM (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 13:10:12 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706F390CE6
-        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 10:10:10 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id s39so4623724ybi.0
-        for <linux-block@vger.kernel.org>; Tue, 07 Jun 2022 10:10:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=P/gAWYTYcE9jrOxJP6iVGHeZQzn3G/Awl1C3CYU0ggw=;
-        b=VXII/SB83wb/H7vaEllfp+qolXwA53Jspz/m3zQC+mAcIKQGnMclloaomhvdrQ8owB
-         vHO+Uly527y09F5DuLehOkJ0mwZ30gZgyk4g+U2wxwHl0Y4mgV7S9RqtLgSETdNyx6OK
-         8wsp+Y0MkbwvJsfsXmdr6DrYRUD/m0pnxwbu4ivj1VDOAf7zsCj+Ktal0VQ7rxQPrYRu
-         evoywSOsVTSGWCD45fXiF7PxxA2UqM85zCTd9mNp4mxBdN1I/K+pmrs8z9//RXW9UQ6Z
-         9+tq5ACnviSi88l2ctFEs/bsJAV9hXkEtq0QnXCfz7aME/5cbdjMuehnAIQURMtCzTDA
-         gtAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=P/gAWYTYcE9jrOxJP6iVGHeZQzn3G/Awl1C3CYU0ggw=;
-        b=WuEZ88tWak9KHOMZpeppxQ3wX91G8BqFkY8vdwvzfHiF02R52VjbMqNSIQ3B+XM17+
-         3Hf7ImY4r4zvHkZjCH8hQu8Ru+CrzQ2LPDkMqXw15/ru2P2J8SpMPxLlGlmPtFYGm9nk
-         biBd90BYGKaexwq8EBYzPERmXB8AlQSCoDiPqu8Za2Up3Ej2F1q7BoFAQt38j+InbGSW
-         CNj6X3Z8r2j7ljyWaO4wFu+gk5+j9NrY1In9hI3Da8D1bNV0vJE/p5KfKB+OV/vzLMkQ
-         eQNE22rFF/59UzzjLMVjtXE8qbRNKhS0KqdkPgDt8zSQ2b7LRswIB5G7JGIAgZc630x5
-         Ykdw==
-X-Gm-Message-State: AOAM533sHLCxXbeoyrGc/Mf8WIenDF3DxctwiKN45H3YM40Tacj/6KpM
-        GNyPglWU8PL+fF0RGVukbW6aNRoTCMFyW//xb0mzpQ==
-X-Google-Smtp-Source: ABdhPJxpq/x/7JkNme4htfnqYHKUS7ec2XhW2i49YnLrj8HJECrnh2rhb90mOqlSloG8c/1l1755jAZFUZHfIMAjA2o=
-X-Received: by 2002:a25:22d7:0:b0:663:c13a:893a with SMTP id
- i206-20020a2522d7000000b00663c13a893amr7638158ybi.98.1654621809618; Tue, 07
- Jun 2022 10:10:09 -0700 (PDT)
+        with ESMTP id S1352664AbiFGSRZ (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 14:17:25 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00F4813B2CE;
+        Tue,  7 Jun 2022 10:52:29 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 67AB2B82373;
+        Tue,  7 Jun 2022 17:52:29 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF5EFC34115;
+        Tue,  7 Jun 2022 17:52:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654624348;
+        bh=/AeziWqD0UgPgL+eWiFNYnEEuboJIxNJ/rnLkFTpcdU=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=qMgItK4jWHjWX8FqrdCSa8u5V1wfPehfvMw55p/AUowkvYlBjixodQDhiKrFXPb/8
+         t0I3oZQFspnjAmFZ19NOHG9xsKm0H5B7vc+okFkoVJ4VGqdxIpSuQ6ui5XuCpQXN4t
+         rPcfCfzzanIgG5EDnPNOcBwF5VmrCKqW+JzSprnVN0qVDYZwVEeO0DhB7QEFjnsyZA
+         uEC6ywVXl3KGdjjlR+EvKXIFoQTPW8K4AFIMtXGAfb/GZRy4PpowIFM83305LL61l9
+         5HZhSgyBQvOu6BrY+uxmT/gSG/+/H9wPblI96SYCULkoX5izqcEma3K72sVL1ACdnN
+         rfX5blKtW7F/g==
+From:   Sasha Levin <sashal@kernel.org>
+To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Cc:     Yu Kuai <yukuai3@huawei.com>, Hou Tao <houtao1@huawei.com>,
+        Josef Bacik <josef@toxicpanda.com>,
+        Jens Axboe <axboe@kernel.dk>, Sasha Levin <sashal@kernel.org>,
+        linux-block@vger.kernel.org, nbd@other.debian.org
+Subject: [PATCH AUTOSEL 5.18 57/68] nbd: fix race between nbd_alloc_config() and module removal
+Date:   Tue,  7 Jun 2022 13:48:23 -0400
+Message-Id: <20220607174846.477972-57-sashal@kernel.org>
+X-Mailer: git-send-email 2.35.1
+In-Reply-To: <20220607174846.477972-1-sashal@kernel.org>
+References: <20220607174846.477972-1-sashal@kernel.org>
 MIME-Version: 1.0
-From:   Yongqin Liu <yongqin.liu@linaro.org>
-Date:   Wed, 8 Jun 2022 01:09:54 +0800
-Message-ID: <CAMSo37WW9veYH6=tHqUR2pa_7YX1UuzHqLBHit60P2QyzQmCEw@mail.gmail.com>
-Subject: Please help cherry pick four mmc related changes into the 4.14 stable kernel
-To:     stable@vger.kernel.org
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Benjamin Copeland <benjamin.copeland@linaro.org>,
-        Sumit Semwal <sumit.semwal@linaro.org>,
-        =?UTF-8?B?RGFuaWVsIETDrWF6?= <daniel.diaz@linaro.org>,
-        Alistair Delva <adelva@google.com>,
-        Steve Muckle <smuckle@google.com>,
-        Todd Kjos <tkjos@google.com>,
-        "Bajjuri, Praneeth" <praneeth@ti.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Anders Roxell <anders.roxell@linaro.org>,
-        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
-        Ulf Hansson <ulf.hansson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+X-stable: review
+X-Patchwork-Hint: Ignore
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi, All
+From: Yu Kuai <yukuai3@huawei.com>
 
-With the 4.14.281 version[1], there were three mmc related changes merged,
-but that causes one boot failure with the X15 Android builds, a problem
-similar to one reported before here[2].
-After being confirmed with Ulf Hansson, and verified with the X15 Android build,
-it needs to have the following four commits cherry-picked to the 4.14
-branch as well.
+[ Upstream commit c55b2b983b0fa012942c3eb16384b2b722caa810 ]
 
-    4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
-    5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for erase/trim/discard
-    d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC sleep command
-    23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
-MMC_CAP_NEED_RSP_BUSY
+When nbd module is being removing, nbd_alloc_config() may be
+called concurrently by nbd_genl_connect(), although try_module_get()
+will return false, but nbd_alloc_config() doesn't handle it.
 
-The above four commits are from the 4.19 branch, as they are a little
-easier to be cherry-picked
-into the 4.14 branch, compared to the commits from the mainline branch.
-(I have confirmed that the four commits are all in 4.19, 5.4, 5.10 and
-mainline branches already).
+The race may lead to the leak of nbd_config and its related
+resources (e.g, recv_workq) and oops in nbd_read_stat() due
+to the unload of nbd module as shown below:
 
-Saying that, there will be still one merge conflict reported when
-cherry picking the commit of
-4f32b45c9a2c, it's easy to resolve though.
-To avoid the merge conflict, it could be done like this as well:
-1. revert the 327b6689898b commit from 4.14 first, so that the commits in step#2
-    could be cherry-picked without any problem
-        327b6689898b mmc: core: Default to generic_cmd6_time as
-timeout in __mmc_switch()
-2. git cherry-pick the following commits from 4.19 into the 4.14 branch
-        4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
-        5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for
-erase/trim/discard
-        d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC
-sleep command
-        23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
-MMC_CAP_NEED_RSP_BUSY
-        26c6f614cf02 mmc: mmc: core: Default to generic_cmd6_time as
-timeout in __mmc_switch()
-    The last commit of 26c6f614cf02 is for the revert in step#1.
+  BUG: kernel NULL pointer dereference, address: 0000000000000040
+  Oops: 0000 [#1] SMP PTI
+  CPU: 5 PID: 13840 Comm: kworker/u17:33 Not tainted 5.14.0+ #1
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996)
+  Workqueue: knbd16-recv recv_work [nbd]
+  RIP: 0010:nbd_read_stat.cold+0x130/0x1a4 [nbd]
+  Call Trace:
+   recv_work+0x3b/0xb0 [nbd]
+   process_one_work+0x1ed/0x390
+   worker_thread+0x4a/0x3d0
+   kthread+0x12a/0x150
+   ret_from_fork+0x22/0x30
 
-I am not sure which way is more convenient for the maintenance work
-here, so just list both of them here
-for your information.
-And please let me know if there is anything else I could help on this
-cherry pick work here.
+Fixing it by checking the return value of try_module_get()
+in nbd_alloc_config(). As nbd_alloc_config() may return ERR_PTR(-ENODEV),
+assign nbd->config only when nbd_alloc_config() succeeds to ensure
+the value of nbd->config is binary (valid or NULL).
 
-[1]: https://lore.kernel.org/lkml/16534624745741@kroah.com/T/
-[2]: https://lore.kernel.org/lkml/CA+G9fYuqAQfhzF2BzHr7vMHx68bo8-jT+ob_F3eHQ3=oFjgYdg@mail.gmail.com/
+Also adding a debug message to check the reference counter
+of nbd_config during module removal.
+
+Signed-off-by: Hou Tao <houtao1@huawei.com>
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+Reviewed-by: Josef Bacik <josef@toxicpanda.com>
+Link: https://lore.kernel.org/r/20220521073749.3146892-3-yukuai3@huawei.com
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/block/nbd.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
+index 9dc27f9e9ddc..f26cdb51812b 100644
+--- a/drivers/block/nbd.c
++++ b/drivers/block/nbd.c
+@@ -1519,15 +1519,20 @@ static struct nbd_config *nbd_alloc_config(void)
+ {
+ 	struct nbd_config *config;
+ 
++	if (!try_module_get(THIS_MODULE))
++		return ERR_PTR(-ENODEV);
++
+ 	config = kzalloc(sizeof(struct nbd_config), GFP_NOFS);
+-	if (!config)
+-		return NULL;
++	if (!config) {
++		module_put(THIS_MODULE);
++		return ERR_PTR(-ENOMEM);
++	}
++
+ 	atomic_set(&config->recv_threads, 0);
+ 	init_waitqueue_head(&config->recv_wq);
+ 	init_waitqueue_head(&config->conn_wait);
+ 	config->blksize_bits = NBD_DEF_BLKSIZE_BITS;
+ 	atomic_set(&config->live_connections, 0);
+-	try_module_get(THIS_MODULE);
+ 	return config;
+ }
+ 
+@@ -1554,12 +1559,13 @@ static int nbd_open(struct block_device *bdev, fmode_t mode)
+ 			mutex_unlock(&nbd->config_lock);
+ 			goto out;
+ 		}
+-		config = nbd->config = nbd_alloc_config();
+-		if (!config) {
+-			ret = -ENOMEM;
++		config = nbd_alloc_config();
++		if (IS_ERR(config)) {
++			ret = PTR_ERR(config);
+ 			mutex_unlock(&nbd->config_lock);
+ 			goto out;
+ 		}
++		nbd->config = config;
+ 		refcount_set(&nbd->config_refs, 1);
+ 		refcount_inc(&nbd->refs);
+ 		mutex_unlock(&nbd->config_lock);
+@@ -1966,13 +1972,14 @@ static int nbd_genl_connect(struct sk_buff *skb, struct genl_info *info)
+ 		nbd_put(nbd);
+ 		return -EINVAL;
+ 	}
+-	config = nbd->config = nbd_alloc_config();
+-	if (!nbd->config) {
++	config = nbd_alloc_config();
++	if (IS_ERR(config)) {
+ 		mutex_unlock(&nbd->config_lock);
+ 		nbd_put(nbd);
+ 		printk(KERN_ERR "nbd: couldn't allocate config\n");
+-		return -ENOMEM;
++		return PTR_ERR(config);
+ 	}
++	nbd->config = config;
+ 	refcount_set(&nbd->config_refs, 1);
+ 	set_bit(NBD_RT_BOUND, &config->runtime_flags);
+ 
+@@ -2544,6 +2551,9 @@ static void __exit nbd_cleanup(void)
+ 	while (!list_empty(&del_list)) {
+ 		nbd = list_first_entry(&del_list, struct nbd_device, list);
+ 		list_del_init(&nbd->list);
++		if (refcount_read(&nbd->config_refs))
++			printk(KERN_ERR "nbd: possibly leaking nbd_config (ref %d)\n",
++					refcount_read(&nbd->config_refs));
+ 		if (refcount_read(&nbd->refs) != 1)
+ 			printk(KERN_ERR "nbd: possibly leaking a device\n");
+ 		nbd_put(nbd);
 -- 
-Best Regards,
-Yongqin Liu
----------------------------------------------------------------
-#mailing list
-linaro-android@lists.linaro.org
-http://lists.linaro.org/mailman/listinfo/linaro-android
+2.35.1
+
