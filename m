@@ -2,106 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 288DFC433EF
-	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 09:15:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB3EC43334
+	for <linux-block@archiver.kernel.org>; Tue,  7 Jun 2022 09:54:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239070AbiFGJPl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 05:15:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
+        id S238598AbiFGJyg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 7 Jun 2022 05:54:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34432 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239074AbiFGJPg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 05:15:36 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51EF0AFAE1;
-        Tue,  7 Jun 2022 02:15:34 -0700 (PDT)
+        with ESMTP id S233046AbiFGJye (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 05:54:34 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEF3954BD6;
+        Tue,  7 Jun 2022 02:54:32 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 9F4F421B78;
-        Tue,  7 Jun 2022 09:15:29 +0000 (UTC)
+        by smtp-out2.suse.de (Postfix) with ESMTP id 4756D1F96B;
+        Tue,  7 Jun 2022 09:54:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1654593329; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+        t=1654595671; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+ii05atEF00YMJ+cIpsYGnGaF+aCI0IEq4yGVXlod3w=;
-        b=lliEZP8Gakqdo6WzXRYwtnen3Lg7+WpiDnGMkmRkqdNkClTTozk2I024k+HWKjxUdV2bxC
-        GvWxgKgq06KBY5zyXisevfP5vGSI2WH3g1uXMa54lXUTsdZDNmy5iJWg7IhVcjVB+KgPL4
-        Ve/Vn0GnRscW+wtpz5nj7kVE4qq5qTQ=
+        bh=O8/KOd5RYhzrnOAPVQE4xuS4q6J8PzmLXIB3TWqGbFM=;
+        b=NEs8zRvIERoG5fRYWA54xWuP8i8LaG63Rfdtf7qBjO8A1VSxWCBA4alfAHU+0qAbOEd3Ot
+        CP787/d5R1NJYGi7vECKxq1ljc9ewslFTPeXoBzR2njoZyq0yiImPH4QQU5w7AgxuQkRuF
+        kuh2D6lbIpsx3S5au3aTxAsXgEFkuaI=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1654593329;
+        s=susede2_ed25519; t=1654595671;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:
+         mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+ii05atEF00YMJ+cIpsYGnGaF+aCI0IEq4yGVXlod3w=;
-        b=FxeGHSX8vUGwvc3QQloqKhaFZeIkJPaU2s8+NRLKw3/uPxbnSAHG0fQSoiPNDLw6tg21C6
-        t61Y9wc1uPrvTIDQ==
+        bh=O8/KOd5RYhzrnOAPVQE4xuS4q6J8PzmLXIB3TWqGbFM=;
+        b=P38gmVGqg0HxMFB2/Ayh0jQtyPMu11PbOdDqv8hxy5f/eOFUB92Wkk7OCbTpHNoNHLhnXE
+        1992k22RkQ7QlPCA==
 Received: from quack3.suse.cz (unknown [10.163.28.18])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 601742C142;
-        Tue,  7 Jun 2022 09:15:29 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTPS id 2CA262C141;
+        Tue,  7 Jun 2022 09:54:30 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 9FC44A063A; Tue,  7 Jun 2022 11:15:28 +0200 (CEST)
+        id A61C5A0633; Tue,  7 Jun 2022 11:54:30 +0200 (CEST)
+Date:   Tue, 7 Jun 2022 11:54:30 +0200
 From:   Jan Kara <jack@suse.cz>
-To:     stable@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>,
-        Paolo Valente <paolo.valente@linaro.org>,
-        <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Donald Buczek <buczek@molgen.mpg.de>,
-        Christoph Hellwig <hch@lst.de>
-Subject: [PATCH 6/6] block: fix bio_clone_blkg_association() to associate with proper blkcg_gq
-Date:   Tue,  7 Jun 2022 11:15:14 +0200
-Message-Id: <20220607091528.11906-6-jack@suse.cz>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20220607091209.24033-1-jack@suse.cz>
-References: <20220607091209.24033-1-jack@suse.cz>
+To:     Yu Kuai <yukuai3@huawei.com>
+Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, tj@kernel.org,
+        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
+        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
+        Jens Axboe <axboe@kernel.dk>
+Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
+ specail occasion
+Message-ID: <20220607095430.kac5jgzm2gvd7x3c@quack3.lan>
+References: <20220428120837.3737765-1-yukuai3@huawei.com>
+ <d50df657-d859-79cf-c292-412eaa383d2c@huawei.com>
+ <61b67d5e-829c-8130-7bda-81615d654829@huawei.com>
+ <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
+ <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
+ <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
+ <20220523085902.wmxoebyq3crerecr@quack3.lan>
+ <25f6703e-9e10-75d9-a893-6df1e6b75254@kernel.dk>
+ <20220523152516.7sr247i3bzwhr44w@quack3.lan>
+ <21cd1c49-838a-7f03-ab13-9a4f2ac65979@huawei.com>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1666; h=from:subject; bh=ie/QQClk1abjXbvdvx/E2/2QpV2ElofdhAw8aV40hDc=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBinxch7/QAIxj2oZkQt+uJQJOAu7XVxAVDy/HI6BxQ iFF/uuSJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYp8XIQAKCRCcnaoHP2RA2co5B/ wLCxI4IAm+CLh73XB9CvQ0urk7b0l5MUaRKAqx+npYIkJ+KelwAUXiF0aXNA+OS64oJHDoy+p61JIL 1n+hONX/yGRT65+F55q44X0olU2suk9dRyeLnZc3gzJJWQZDR2KwMlKn/xwB8Kf12+/vtRbpecrSeW cQFabILBGZRkgW3xOaFbqEMgPC0ich8nZFl/wc+ehnTxfmTQg9tZq8BqfG4lbRvhpGs4s8rkf01eru RRvPrZZNOKCD9ChYd+eXMbP02mfuTyGmn9JiCdUBDd3nYSp5dtUmux7K00q+PXI6xVkuWDvObKbIAW /QM2fGIce5tK9Eqi0ik8D+TWPsjSHK
-X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <21cd1c49-838a-7f03-ab13-9a4f2ac65979@huawei.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit 22b106e5355d6e7a9c3b5cb5ed4ef22ae585ea94 upstream.
+On Tue 07-06-22 11:10:27, Yu Kuai wrote:
+> 在 2022/05/23 23:25, Jan Kara 写道:
+> > Hum, for me all emails from Huawei I've received even today fail the DKIM
+> > check. After some more digging there is interesting inconsistency in DMARC
+> > configuration for huawei.com domain. There is DMARC record for huawei.com
+> > like:
+> > 
+> > huawei.com.		600	IN	TXT	"v=DMARC1;p=none;rua=mailto:dmarc@edm.huawei.com"
+> > 
+> > which means no DKIM is required but _dmarc.huawei.com has:
+> > 
+> > _dmarc.huawei.com.	600	IN	TXT	"v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
+> > 
+> > which says that DKIM is required. I guess this inconsistency may be the
+> > reason why there are problems with DKIM validation for senders from
+> > huawei.com. Yu Kuai, can you perhaps take this to your IT support to fix
+> > this? Either make sure huawei.com emails get properly signed with DKIM or
+> > remove the 'quarantine' record from _dmarc.huawei.com. Thanks!
+> > 
+> > 								Honza
+> > 
+> Hi, Jan and Jens
+> 
+> I just got response from our IT support:
+> 
+> 'fo' is not set in our dmarc configuration(default is 0), which means
+> SPF and DKIM verify both failed so that emails will end up in spam.
+> 
+> It right that DKIM verify is failed because there is no signed key,
+> however, our IT support are curious how SPF verify faild.
+> 
+> Can you guys please take a look at ip address of sender? So our IT
+> support can take a look if they miss it from SPF records.
 
-Commit d92c370a16cb ("block: really clone the block cgroup in
-bio_clone_blkg_association") changed bio_clone_blkg_association() to
-just clone bio->bi_blkg reference from source to destination bio. This
-is however wrong if the source and destination bios are against
-different block devices because struct blkcg_gq is different for each
-bdev-blkcg pair. This will result in IOs being accounted (and throttled
-as a result) multiple times against the same device (src bdev) while
-throttling of the other device (dst bdev) is ignored. In case of BFQ the
-inconsistency can even result in crashes in bfq_bic_update_cgroup().
-Fix the problem by looking up correct blkcg_gq for the cloned bio.
+So SPF is what makes me receive direct emails from you. For example on this
+email I can see:
 
-Reported-by: Logan Gunthorpe <logang@deltatee.com>
-Reported-and-tested-by: Donald Buczek <buczek@molgen.mpg.de>
-Fixes: d92c370a16cb ("block: really clone the block cgroup in bio_clone_blkg_association")
-CC: stable@vger.kernel.org
-Reviewed-by: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Jan Kara <jack@suse.cz>
-Link: https://lore.kernel.org/r/20220602081242.7731-1-jack@suse.cz
-Signed-off-by: Jens Axboe <axboe@kernel.dk>
----
- block/bio.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
+        [185.176.79.56])
+        (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256 (128/128
+        bits))
+        (No client certificate requested)
+        by smtp-in2.suse.de (Postfix) with ESMTPS id 4LHFjN2L0dzZfj
+        for <jack@suse.cz>; Tue,  7 Jun 2022 03:10:32 +0000 (UTC)
+...
+Authentication-Results: smtp-in2.suse.de;
+        dkim=none;
+        dmarc=pass (policy=quarantine) header.from=huawei.com;
+        spf=pass (smtp-in2.suse.de: domain of yukuai3@huawei.com designates
+        185.176.79.56 as permitted sender) smtp.mailfrom=yukuai3@huawei.com
 
-diff --git a/block/bio.c b/block/bio.c
-index 40004a3631a8..08dbdc32ceaa 100644
---- a/block/bio.c
-+++ b/block/bio.c
-@@ -2179,7 +2179,7 @@ void bio_clone_blkg_association(struct bio *dst, struct bio *src)
- 	rcu_read_lock();
- 
- 	if (src->bi_blkg)
--		__bio_associate_blkg(dst, src->bi_blkg);
-+		bio_associate_blkg_from_css(dst, &bio_blkcg(src)->css);
- 
- 	rcu_read_unlock();
- }
+So indeed frasgout.his.huawei.com is correct outgoing server which makes
+smtp-in2.suse.de believe the email despite missing DKIM signature. But the
+problem starts when you send email to a mailing list. Let me take for
+example your email from June 2 with Message-ID
+<20220602082129.2805890-1-yukuai3@huawei.com>, subject "[PATCH -next]
+mm/filemap: fix that first page is not mark accessed in filemap_read()".
+There the mailing list server forwards the email so we have:
+
+Received: from smtp-in2.suse.de ([192.168.254.78])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+        by dovecot-director2.suse.de with LMTPS
+        id 8MC5NfVvmGIPLwAApTUePA
+        (envelope-from <linux-fsdevel-owner@vger.kernel.org>)
+        for <jack@imap.suse.de>; Thu, 02 Jun 2022 08:08:21 +0000
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+        by smtp-in2.suse.de (Postfix) with ESMTP id 4LDJYK5bf0zZg5
+        for <jack@suse.cz>; Thu,  2 Jun 2022 08:08:21 +0000 (UTC)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S232063AbiFBIIM (ORCPT <rfc822;jack@suse.cz>);
+        Thu, 2 Jun 2022 04:08:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by
+        vger.kernel.org
+        with ESMTP id S232062AbiFBIIL (ORCPT
+        <rfc822;linux-fsdevel@vger.kernel.org>);
+        Thu, 2 Jun 2022 04:08:11 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id
+        75DDB25FE;
+        Thu,  2 Jun 2022 01:08:08 -0700 (PDT)
+
+and thus smtp-in2.suse.de complains:
+
+Authentication-Results: smtp-in2.suse.de;
+        dkim=none;
+        dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM"
+        header.from=huawei.com (policy=quarantine);
+        spf=pass (smtp-in2.suse.de: domain of
+        linux-fsdevel-owner@vger.kernel.org designates 2620:137:e000::1:20 as
+        permitted sender) smtp.mailfrom=linux-fsdevel-owner@vger.kernel.org
+
+Because now we've got email with "From" header from huawei.com domain from
+a vger mail server which was forwarding it. So SPF has no chance to match
+(in fact SPF did pass for the Return-Path header which points to
+vger.kernel.org but DMARC defines that if "From" and "Return-Path" do not
+match, additional validation is needed - this is the "SPF not aligned
+(relaxed)" message above). And missing DKIM (the additional validation
+method) sends the email to spam.
+
+								Honza
 -- 
-2.35.3
-
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
