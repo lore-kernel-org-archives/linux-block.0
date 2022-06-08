@@ -2,80 +2,199 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9244DC43334
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 12:06:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02327CCA47E
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 12:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238562AbiFHMG4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 08:06:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34826 "EHLO
+        id S239218AbiFHM1r (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 08:27:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49286 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230111AbiFHMGz (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 08:06:55 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C329B2408A;
-        Wed,  8 Jun 2022 05:06:54 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 5B3D26187F;
-        Wed,  8 Jun 2022 12:06:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67F6FC3411C;
-        Wed,  8 Jun 2022 12:06:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1654690013;
-        bh=3OGpcCZEusqeV7WTYQWC5s+kZ9Fakcr/VjfHB1Q0iqg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Nv60BFxCLTZpsg9a095nuV92mujJrLLFgD/N4VzGvLYLu/LpYsM5DK/YQfi6wJIrD
-         HklSFIksJNxMskO+6rbmtz+Q9Cz3CeVH0ZwuBc5InXaZ+6yU0pAZn+i4vPiI2bzi86
-         OscKygEfWcljX1VbdFugnfQ09o+/fZf7omHwjf3c=
-Date:   Wed, 8 Jun 2022 14:06:43 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Jan Kara <jack@suse.cz>
-Cc:     stable@vger.kernel.org, linux-block@vger.kernel.org,
-        Jens Axboe <axboe@kernel.dk>,
-        Logan Gunthorpe <logang@deltatee.com>,
-        Donald Buczek <buczek@molgen.mpg.de>,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH] block: fix bio_clone_blkg_association() to associate
- with proper blkcg_gq
-Message-ID: <YqCQ0xJBpAqbbF/k@kroah.com>
-References: <20220608114528.15611-1-jack@suse.cz>
+        with ESMTP id S239222AbiFHM1p (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 08:27:45 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FD223C67D;
+        Wed,  8 Jun 2022 05:27:43 -0700 (PDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LJ61Q3TQsz17HMS;
+        Wed,  8 Jun 2022 20:27:22 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 8 Jun 2022 20:27:41 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 8 Jun 2022 20:27:40 +0800
+Subject: Re: [PATCH -next v9 0/4] support concurrent sync io for bfq on a
+ specail occasion
+To:     <paolo.valente@linaro.org>, <jack@suse.cz>, <tj@kernel.org>,
+        <axboe@kernel.dk>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220601114340.949953-1-yukuai3@huawei.com>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <3e2aea7f-a6a9-04aa-e22f-5d08b5686116@huawei.com>
+Date:   Wed, 8 Jun 2022 20:27:39 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220608114528.15611-1-jack@suse.cz>
+In-Reply-To: <20220601114340.949953-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 08, 2022 at 01:45:28PM +0200, Jan Kara wrote:
-> commit 22b106e5355d6e7a9c3b5cb5ed4ef22ae585ea94 upstream.
-> 
-> Commit d92c370a16cb ("block: really clone the block cgroup in
-> bio_clone_blkg_association") changed bio_clone_blkg_association() to
-> just clone bio->bi_blkg reference from source to destination bio. This
-> is however wrong if the source and destination bios are against
-> different block devices because struct blkcg_gq is different for each
-> bdev-blkcg pair. This will result in IOs being accounted (and throttled
-> as a result) multiple times against the same device (src bdev) while
-> throttling of the other device (dst bdev) is ignored. In case of BFQ the
-> inconsistency can even result in crashes in bfq_bic_update_cgroup().
-> Fix the problem by looking up correct blkcg_gq for the cloned bio.
-> 
-> Reported-by: Logan Gunthorpe <logang@deltatee.com>
-> Reported-and-tested-by: Donald Buczek <buczek@molgen.mpg.de>
-> Fixes: d92c370a16cb ("block: really clone the block cgroup in bio_clone_blkg_association")
-> CC: stable@vger.kernel.org
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> Link: https://lore.kernel.org/r/20220602081242.7731-1-jack@suse.cz
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ---
->  block/blk-cgroup.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> This patch should be a backport for 5.15, 5.17, and 5.18 stable branches.
+ÔÚ 2022/06/01 19:43, Yu Kuai Ð´µÀ:
 
-Now queued up, thanks.
+Hi, Paolo
 
-greg k-h
+Since there is no response from you, I assum that you didn't receive
+these emails(probably end up in your spam). I'll try to resend them
+soon.
+
+Thanks,
+Kuai
+> Changes in v9:
+>   - also update how many bfqqs have pending_reqs bfq_bfqq_move().
+>   - fix one language in patch 4
+>   - Add reviewed-tag for patch 1,3,4
+> 
+> Changes in v8:
+>   - Instead of using whether bfqq is busy, using whether bfqq has pending
+>   requests. As Paolo pointed out the former way is problematic.
+> 
+> Changes in v7:
+>   - fix mismatch bfq_inc/del_busy_queues() and bfqq_add/del_bfqq_busy(),
+>   also retest this patchset on v5.18 to make sure functionality is
+>   correct.
+>   - move the updating of 'bfqd->busy_queues' into new apis
+> 
+> Changes in v6:
+>   - add reviewed-by tag for patch 1
+> 
+> Changes in v5:
+>   - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
+>   - fix wrong definition in patch 1
+>   - fix spelling mistake in patch 2: leaset -> least
+>   - update comments in patch 3
+>   - add reviewed-by tag in patch 2,3
+> 
+> Changes in v4:
+>   - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
+>     suggested by Jan Kara.
+>   - remove unused 'in_groups_with_pending_reqs',
+> 
+> Changes in v3:
+>   - remove the cleanup patch that is irrelevant now(I'll post it
+>     separately).
+>   - instead of hacking wr queues and using weights tree insertion/removal,
+>     using bfq_add/del_bfqq_busy() to count the number of groups
+>     (suggested by Jan Kara).
+> 
+> Changes in v2:
+>   - Use a different approch to count root group, which is much simple.
+> 
+> Currently, bfq can't handle sync io concurrently as long as they
+> are not issued from root group. This is because
+> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+> bfq_asymmetric_scenario().
+> 
+> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+> 
+> Before this patchset:
+>   1) root group will never be counted.
+>   2) Count if bfqg or it's child bfqgs have pending requests.
+>   3) Don't count if bfqg and it's child bfqgs complete all the requests.
+> 
+> After this patchset:
+>   1) root group is counted.
+>   2) Count if bfqg has pending requests.
+>   3) Don't count if bfqg complete all the requests.
+> 
+> With the above changes, concurrent sync io can be supported if only
+> one group is activated.
+> 
+> fio test script(startdelay is used to avoid queue merging):
+> [global]
+> filename=/dev/sda
+> allow_mounted_write=0
+> ioengine=psync
+> direct=1
+> ioscheduler=bfq
+> offset_increment=10g
+> group_reporting
+> rw=randwrite
+> bs=4k
+> 
+> [test1]
+> numjobs=1
+> 
+> [test2]
+> startdelay=1
+> numjobs=1
+> 
+> [test3]
+> startdelay=2
+> numjobs=1
+> 
+> [test4]
+> startdelay=3
+> numjobs=1
+> 
+> [test5]
+> startdelay=4
+> numjobs=1
+> 
+> [test6]
+> startdelay=5
+> numjobs=1
+> 
+> [test7]
+> startdelay=6
+> numjobs=1
+> 
+> [test8]
+> startdelay=7
+> numjobs=1
+> 
+> test result:
+> running fio on root cgroup
+> v5.18:	   112 Mib/s
+> v5.18-patched: 112 Mib/s
+> 
+> running fio on non-root cgroup
+> v5.18:	   51.2 Mib/s
+> v5.18-patched: 112 Mib/s
+> 
+> Note that I also test null_blk with "irqmode=2
+> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
+> that service guarantees are still preserved.
+> 
+> Previous versions:
+> RFC: https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
+> v1: https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
+> v2: https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
+> v3: https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
+> v4: https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
+> v5: https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
+> v6: https://lore.kernel.org/all/20220523131818.2798712-1-yukuai3@huawei.com/
+> v7: https://lore.kernel.org/all/20220528095020.186970-1-yukuai3@huawei.com/
+> 
+> 
+> Yu Kuai (4):
+>    block, bfq: support to track if bfqq has pending requests
+>    block, bfq: record how many queues have pending requests
+>    block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+>    block, bfq: do not idle if only one group is activated
+> 
+>   block/bfq-cgroup.c  | 10 ++++++++++
+>   block/bfq-iosched.c | 47 +++------------------------------------------
+>   block/bfq-iosched.h | 21 +++++++++++---------
+>   block/bfq-wf2q.c    | 47 ++++++++++++++++++++++++++++++---------------
+>   4 files changed, 57 insertions(+), 68 deletions(-)
+> 
