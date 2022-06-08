@@ -2,80 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5228C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 22:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF93CCA47F
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 22:28:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234747AbiFHWOV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 18:14:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
+        id S234374AbiFHW2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 18:28:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229862AbiFHWOT (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 18:14:19 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A5B60D0;
-        Wed,  8 Jun 2022 15:14:18 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id D1FB61FD42;
-        Wed,  8 Jun 2022 22:14:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1654726456; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=bYRBaqQ5xfDUzDMhvL/gENcLA6nTCJt7le5LzsPSniY=;
-        b=E8LMadkm3oV0PagrJYsbb9CJD02ZCJKLnfI+SV3wWkspNytEU+mEt9e0Xfr8NDYsFmKi1k
-        D0IIgWsaHyT4g/EnsJ4cTeMnDvFPy7xV3TgWjpVp9blE6TuD1CCF4okKm/Q7cb2YPuJpLw
-        RtRxhJxH2wDE05ScRVzlUNeWWaswivo=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9C2B113AD9;
-        Wed,  8 Jun 2022 22:14:16 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id Lzm/JDgfoWINHQAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Wed, 08 Jun 2022 22:14:16 +0000
-Date:   Thu, 9 Jun 2022 00:14:14 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Waiman Long <longman@redhat.com>
-Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
-Subject: Re: [PATCH v6 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
-Message-ID: <YqEfNgUc8jxlAq8D@blackbook>
-References: <20220602192020.166940-1-longman@redhat.com>
- <20220602192020.166940-4-longman@redhat.com>
- <20220608165732.GB19399@blackbody.suse.cz>
- <506eaa3d-be84-c51e-3252-2979847054fe@redhat.com>
- <YqEQ1cudjZmUU7rs@blackbook>
+        with ESMTP id S231161AbiFHW2J (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 18:28:09 -0400
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5821142ED0;
+        Wed,  8 Jun 2022 15:28:08 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1033)
+        id E908320BE66A; Wed,  8 Jun 2022 15:28:07 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E908320BE66A
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+        s=default; t=1654727287;
+        bh=MF2Y1CBDjZevU8fKZUp5kTEpEkoKnGareWA0GYzqeq8=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=rTkhDmYdY7rpVbQEn9L9mKl43RlPXNjWiPuTNIqmZzVD1Iy9c2bksxjgfYkkouLUq
+         UPAyhyoSZskG+YgEI73GZWcdXpE59XsE7Wc7P1fKK/FdeMciH5m3kdKbrOjuvWo3TL
+         GZqDCdh02EtKnOhBTJsUGaZi51u2R0kWzglRF03M=
+Date:   Wed, 8 Jun 2022 15:28:07 -0700
+From:   Deven Bowers <deven.desai@linux.microsoft.com>
+To:     Casey Schaufler <casey@schaufler-ca.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
+        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
+        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
+        linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v8 10/17] block|security: add LSM blob to block_device
+Message-ID: <20220608222807.GA7650@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1654714889-26728-11-git-send-email-deven.desai@linux.microsoft.com>
+ <14754d16-75ae-cc92-cfc5-adce0628d9d9@schaufler-ca.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <YqEQ1cudjZmUU7rs@blackbook>
+In-Reply-To: <14754d16-75ae-cc92-cfc5-adce0628d9d9@schaufler-ca.com>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 08, 2022 at 11:12:55PM +0200, Michal Koutný <mkoutny@suse.com> wrote:
-> Wouldn't that mean submitting a bio from offlined blkcg?
-> blkg_tryget_closest() should prevent that.
+On Wed, Jun 08, 2022 at 01:07:39PM -0700, Casey Schaufler wrote:
+> On 6/8/2022 12:01 PM, Deven Bowers wrote:
+> >block_device structures can have valuable security properties,
+> >based on how they are created, and what subsystem manages them.
+> >
+> >By adding LSM storage to this structure, this data can be accessed
+> >at the LSM layer.
+> >
+> >Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+> 
+> Reviewed-by: Casey Schaufler <casey@schaufler-ca.com>
+> 
+> Not everyone is going to appreciate the infrastructure allocation
+> of the block_device security blob, but I do.
 
-Self-correction -- no, forgot blkg_tryget_closest() gets any non-zero
-reference, not just a live one (percpu_ref_tryget_live()), furthermore,
-I can see that offlined blkcg may still issue writeback bios for
-instance.
+Thanks Casey.
 
-> > I guess one possible solution may be to abandon the llist and revert
-> > back to list iteration when offline. I need to think a bit more about
-> > that.
-
-Since blkcg stats are only used for io.stat of an online blkcg, the
-update may be skipped on an offlined blkcg. (Which of course breaks when
-something starts to depend on the stats of an offlined blkcg.)
-
-Michal
