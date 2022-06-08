@@ -2,64 +2,80 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6687FC43334
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 21:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5228C433EF
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 22:14:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbiFHVZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 17:25:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33000 "EHLO
+        id S234747AbiFHWOV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 18:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38248 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229882AbiFHVZF (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 17:25:05 -0400
-X-Greylist: delayed 2344 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Jun 2022 14:25:04 PDT
-Received: from mail.esperi.org.uk (icebox.esperi.org.uk [81.187.191.129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 521521979A2
-        for <linux-block@vger.kernel.org>; Wed,  8 Jun 2022 14:25:03 -0700 (PDT)
-Received: from loom (nix@sidle.srvr.nix [192.168.14.8])
-        by mail.esperi.org.uk (8.16.1/8.16.1) with ESMTPS id 258KjtIX006175
-        (version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=NO);
-        Wed, 8 Jun 2022 21:45:55 +0100
-From:   Nix <nix@esperi.org.uk>
-To:     Coly Li <colyli@suse.de>
-Cc:     linux-bcache@vger.kernel.org, linux-block@vger.kernel.org,
-        Nikhil Kshirsagar <nkshirsagar@gmail.com>,
-        stable@vger.kernel.org
-Subject: Re: [PATCH 4/4] bcache: avoid journal no-space deadlock by
- reserving 1 journal bucket
-References: <20220521170502.20026-1-colyli@suse.de>
-        <20220521170502.20026-4-colyli@suse.de>
-Emacs:  the definitive fritterware.
-Date:   Wed, 08 Jun 2022 21:45:55 +0100
-In-Reply-To: <20220521170502.20026-4-colyli@suse.de> (Coly Li's message of
-        "Sun, 22 May 2022 01:05:02 +0800")
-Message-ID: <8735geanp8.fsf@esperi.org.uk>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2.50 (gnu/linux)
+        with ESMTP id S229862AbiFHWOT (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 18:14:19 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20A5B60D0;
+        Wed,  8 Jun 2022 15:14:18 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id D1FB61FD42;
+        Wed,  8 Jun 2022 22:14:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1654726456; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=bYRBaqQ5xfDUzDMhvL/gENcLA6nTCJt7le5LzsPSniY=;
+        b=E8LMadkm3oV0PagrJYsbb9CJD02ZCJKLnfI+SV3wWkspNytEU+mEt9e0Xfr8NDYsFmKi1k
+        D0IIgWsaHyT4g/EnsJ4cTeMnDvFPy7xV3TgWjpVp9blE6TuD1CCF4okKm/Q7cb2YPuJpLw
+        RtRxhJxH2wDE05ScRVzlUNeWWaswivo=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9C2B113AD9;
+        Wed,  8 Jun 2022 22:14:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id Lzm/JDgfoWINHQAAMHmgww
+        (envelope-from <mkoutny@suse.com>); Wed, 08 Jun 2022 22:14:16 +0000
+Date:   Thu, 9 Jun 2022 00:14:14 +0200
+From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+To:     Waiman Long <longman@redhat.com>
+Cc:     Tejun Heo <tj@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Ming Lei <ming.lei@redhat.com>
+Subject: Re: [PATCH v6 3/3] blk-cgroup: Optimize blkcg_rstat_flush()
+Message-ID: <YqEfNgUc8jxlAq8D@blackbook>
+References: <20220602192020.166940-1-longman@redhat.com>
+ <20220602192020.166940-4-longman@redhat.com>
+ <20220608165732.GB19399@blackbody.suse.cz>
+ <506eaa3d-be84-c51e-3252-2979847054fe@redhat.com>
+ <YqEQ1cudjZmUU7rs@blackbook>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-DCC--Metrics: loom 1480; Body=5 Fuz1=5 Fuz2=5
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <YqEQ1cudjZmUU7rs@blackbook>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 21 May 2022, Coly Li spake thusly:
+On Wed, Jun 08, 2022 at 11:12:55PM +0200, Michal Koutný <mkoutny@suse.com> wrote:
+> Wouldn't that mean submitting a bio from offlined blkcg?
+> blkg_tryget_closest() should prevent that.
 
-> When all journal buckets are fully filled by active jset with heavy
-> write I/O load, the cache set registration (after a reboot) will load
-> all active jsets and inserting them into the btree again (which is
-> called journal replay). If a journaled bkey is inserted into a btree
-> node and results btree node split, new journal request might be
-> triggered. For example, the btree grows one more level after the node
-> split, then the root node record in cache device super block will be
-> upgrade by bch_journal_meta() from bch_btree_set_root(). But there is no
-> space in journal buckets, the journal replay has to wait for new journal
-> bucket to be reclaimed after at least one journal bucket replayed. This
-> is one example that how the journal no-space deadlock happens.
-> 
-> The solution to avoid the deadlock is to reserve 1 journal bucket in
+Self-correction -- no, forgot blkg_tryget_closest() gets any non-zero
+reference, not just a live one (percpu_ref_tryget_live()), furthermore,
+I can see that offlined blkcg may still issue writeback bios for
+instance.
 
-It seems to me that this could happen more than once in a single journal
-replay (multiple nodes might be split, etc). Is one bucket actually
-always enough, or is it merely enough nearly all the time?
+> > I guess one possible solution may be to abandon the llist and revert
+> > back to list iteration when offline. I need to think a bit more about
+> > that.
 
--- 
-NULL && (void)
+Since blkcg stats are only used for io.stat of an online blkcg, the
+update may be skipped on an offlined blkcg. (Which of course breaks when
+something starts to depend on the stats of an offlined blkcg.)
+
+Michal
