@@ -2,57 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D61E5C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 09:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED68CCA47E
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 10:14:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234705AbiFHJXJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 05:23:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56262 "EHLO
+        id S236300AbiFHKOx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 06:14:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234754AbiFHJWb (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 05:22:31 -0400
-X-Greylist: delayed 2221 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 08 Jun 2022 01:43:18 PDT
-Received: from mail.puregrowthonline.pl (mail.puregrowthonline.pl [51.38.124.91])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F9D5400B
-        for <linux-block@vger.kernel.org>; Wed,  8 Jun 2022 01:43:17 -0700 (PDT)
-Received: by mail.puregrowthonline.pl (Postfix, from userid 1002)
-        id B2018A29EC; Wed,  8 Jun 2022 08:05:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=puregrowthonline.pl;
-        s=mail; t=1654675554;
-        bh=CSKXLMgcdpWkXuTgJn5+jsCVobtU9JEF4vCnS5z6McM=;
-        h=Date:From:To:Subject:From;
-        b=L6qZ/d/+RVhdRKK6X7Q8OeZcksK3kCIWD9popXcsJBUBt3e5M7rdRFmuDQ8ExXcHN
-         yymQYX+RaxHr3tc0I7w854/usc5EMS2M31PB0dsIPXL6FZW6SdKRGBbM2T2Im6gKDL
-         7SFpcWAx21XbOgk3nBawCEPm7Fx/kr/PHlrgU4vQXoyxloz8VQ77JwW0t9LeuuOPgi
-         dasVcZ6idbNO3BoQqOL7F0erO3xrsj6FPboihwQ/V9YJ1/bPsczY7hc4/g4AUrIHAT
-         KdzAVYIlGY626tSFNkSj30U1NMeMnUCcrk9kvxO54afAiQPCoNdUCAd+oP7DD7RSzx
-         MzZHay9cFSicg==
-Received: by mail.puregrowthonline.pl for <linux-block@vger.kernel.org>; Wed,  8 Jun 2022 08:05:19 GMT
-Message-ID: <20220608064500-0.1.41.cy82.0.ashy4gmxob@puregrowthonline.pl>
-Date:   Wed,  8 Jun 2022 08:05:19 GMT
-From:   "Wiktor Nurek" <wiktor.nurek@puregrowthonline.pl>
-To:     <linux-block@vger.kernel.org>
-Subject: =?UTF-8?Q?Nap=C5=82yw_Klient=C3=B3w_ze_strony?=
-X-Mailer: mail.puregrowthonline.pl
+        with ESMTP id S236397AbiFHKNM (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 06:13:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 382A521D4B2
+        for <linux-block@vger.kernel.org>; Wed,  8 Jun 2022 02:59:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654682376;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=X7ko0a61KQIEYlZE2OolrSj5KPboqylHtHlNY2Rk0xk=;
+        b=HTgr1iTc2yNBJ1TMG1abAXJSSpfxGYB6q8DDg6rnb5L77rqSUjLmyMcw5MKS9W8Bqf+0lQ
+        ibC36RSLfFLbCsI4FDLUl0aYLyQa6T26wEi9aO21DVIT3Gz7UrtMwowP+cKEuztqrX1UQe
+        1eaWq5xsDk+ZtqJ0xrl8XsuNvnaiHOY=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-34-YKyQ962ENRK2K0vH4fKpfw-1; Wed, 08 Jun 2022 05:59:35 -0400
+X-MC-Unique: YKyQ962ENRK2K0vH4fKpfw-1
+Received: by mail-wm1-f71.google.com with SMTP id u12-20020a05600c19cc00b0038ec265155fso14184579wmq.6
+        for <linux-block@vger.kernel.org>; Wed, 08 Jun 2022 02:59:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:cc:references:from:organization:subject
+         :in-reply-to:content-transfer-encoding;
+        bh=X7ko0a61KQIEYlZE2OolrSj5KPboqylHtHlNY2Rk0xk=;
+        b=S0zWnzEl6yA/0J9m9alj2uTjOT/QRoAFMdJ78DZUtuUfl9vCnnjdDpyAmPdxSdNmEs
+         r+0E2WK7TrzSb8wE0ZCN36yMkNrHoUnf9tRCEc3QBrXmE/XfDZo19+vVCvvlF7pTsxsO
+         8TWWUQMb1ZGk8GwgbUBoe8rbJ7YngABr3tmuNh6rLud29HMBynoFCdCzQTlwp0TakXwp
+         XzxgzcIlerPwcttGgEwVRp+pJuorX+C9Lnm91dMUGxbYaOArhHPHaWqe754vn4rODGq3
+         LFzyvrEv/yxDvGITi2wmuBFdUMYYx6cVuLCS4FFhIDz2UkNXKIyxBwclpL4qTq5bM035
+         hBHw==
+X-Gm-Message-State: AOAM533mSwfpP7tphjnNd9YAN+uhcL2xn4oGN4Me20EiH4ZtCE80TnRY
+        nJ8JGylBWSYL3cBcBrWE3BsX5Tgi195O0/RrWP6nCfqzZBS23h3ZyE/HXmVSqSMZxJeyQ7EZbuT
+        SPd5HKLFiReQriejS4HauN9M=
+X-Received: by 2002:a05:600c:154d:b0:394:8d64:9166 with SMTP id f13-20020a05600c154d00b003948d649166mr33665188wmg.102.1654682374066;
+        Wed, 08 Jun 2022 02:59:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw4BCTXIM51kCwL6Z6H/hpvqsMvzu1fv9X/GhiUOzp5r00CIAo0BKvmPAyhZ/PubqP5kGP1SQ==
+X-Received: by 2002:a05:600c:154d:b0:394:8d64:9166 with SMTP id f13-20020a05600c154d00b003948d649166mr33665171wmg.102.1654682373804;
+        Wed, 08 Jun 2022 02:59:33 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c705:ad00:db2:4c6:8f3a:2ec4? (p200300cbc705ad000db204c68f3a2ec4.dip0.t-ipconnect.de. [2003:cb:c705:ad00:db2:4c6:8f3a:2ec4])
+        by smtp.gmail.com with ESMTPSA id p19-20020a05600c1d9300b003942a244f39sm2898272wms.18.2022.06.08.02.59.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 08 Jun 2022 02:59:33 -0700 (PDT)
+Message-ID: <36cc5e2b-b768-ce1c-fa30-72a932587289@redhat.com>
+Date:   Wed, 8 Jun 2022 11:59:31 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Content-Language: en-US
+To:     Matthew Wilcox <willy@infradead.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-aio@kvack.org,
+        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
+        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
+        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
+        ocfs2-devel@oss.oracle.com, linux-mtd@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        Minchan Kim <minchan@kernel.org>,
+        Rafael Aquini <aquini@redhat.com>
+References: <20220606204050.2625949-1-willy@infradead.org>
+ <20220606204050.2625949-16-willy@infradead.org>
+ <e4d017a4-556d-bb5f-9830-a8843591bc8d@redhat.com>
+ <Yp9fj/Si2qyb61Y3@casper.infradead.org>
+ <Yp+lU55H4igaV3pB@casper.infradead.org>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+Subject: Re: [PATCH 15/20] balloon: Convert to migrate_folio
+In-Reply-To: <Yp+lU55H4igaV3pB@casper.infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Dzie=C5=84 dobry,
+On 07.06.22 21:21, Matthew Wilcox wrote:
+> On Tue, Jun 07, 2022 at 03:24:15PM +0100, Matthew Wilcox wrote:
+>> On Tue, Jun 07, 2022 at 09:36:21AM +0200, David Hildenbrand wrote:
+>>> On 06.06.22 22:40, Matthew Wilcox (Oracle) wrote:
+>>>>  const struct address_space_operations balloon_aops = {
+>>>> -	.migratepage = balloon_page_migrate,
+>>>> +	.migrate_folio = balloon_migrate_folio,
+>>>>  	.isolate_page = balloon_page_isolate,
+>>>>  	.putback_page = balloon_page_putback,
+>>>>  };
+>>>
+>>> I assume you're working on conversion of the other callbacks as well,
+>>> because otherwise, this ends up looking a bit inconsistent and confusing :)
+>>
+>> My intention was to finish converting aops for the next merge window.
+>>
+>> However, it seems to me that we goofed back in 2016 by merging
+>> commit bda807d44454.  isolate_page() and putback_page() should
+>> never have been part of address_space_operations.
+>>
+>> I'm about to embark on creating a new migrate_operations struct
+>> for drivers to use that contains only isolate/putback/migrate.
+>> No filesystem uses isolate/putback, so those can just be deleted.
+>> Both migrate_operations & address_space_operations will contain a
+>> migrate callback.
 
-chcia=C5=82bym poinformowa=C4=87 Pa=C5=84stwa o mo=C5=BCliwo=C5=9Bci pozy=
-skania nowych zlece=C5=84 ze strony www.
+That makes sense to me. I wonder if there was a design
+decision/discussion behind that. CCing Rafael.
 
-Widzimy zainteresowanie potencjalnych Klient=C3=B3w Pa=C5=84stwa firm=C4=85=
-, dlatego ch=C4=99tnie pomo=C5=BCemy Pa=C5=84stwu dotrze=C4=87 z ofert=C4=
-=85 do wi=C4=99kszego grona odbiorc=C3=B3w poprzez efektywne metody pozyc=
-jonowania strony w Google.
+@Rafael, full mail at
 
-Czy m=C3=B3g=C5=82bym liczy=C4=87 na kontakt zwrotny?
+https://lkml.kernel.org/r/Yp+lU55H4igaV3pB@casper.infradead.org
+
+> 
+> Well, that went more smoothly than I thought it would.
+> 
+> I can't see a nice way to split this patch up (other than making secretmem
+> its own patch).  We just don't have enough bits in struct page to support
+> both ways of handling PageMovable at the same time, so we can't convert
+> one driver at a time.  The diffstat is pretty compelling.
+
+Yes, splitting rather overcomplicates stuff.
+
+> 
+> The patch is on top of this patch series; I think it probably makes
+> sense to shuffle it to be first, to avoid changing these drivers to
+> folios, then changing them back.
+
+Absolutely.
+
+> 
+> Questions:
+> 
+> Is what I've done with zsmalloc acceptable?  The locking in that
+> file is rather complex.
+> 
+> Can we now eliminate balloon_mnt / balloon_fs from cmm.c?  I haven't even
+> compiled thatfile , but it seems like the filesystem serves no use now.
+> 
+> Similar question for vmw_balloon.c, although I have compiled that.
+
+IIRC, virtio-balloon, cmm and vmw_balloon all have the mnt/fs just for
+page migration purposes. So if one can get rid of them, all should be
+able to get rid of them. Essentially everything that uses the balloon
+compaction framework.
+
+That should go into separate patches then.
+
+> 
+> ---
+> 
+> I just spotted a bug with zs_unregister_migration(); it won't compile
+> without CONFIG_MIGRATION.  I'll fix that up if the general approach is
+> acceptable.
+> 
+>  arch/powerpc/platforms/pseries/cmm.c |   13 --------
+>  drivers/misc/vmw_balloon.c           |   10 ------
+>  include/linux/balloon_compaction.h   |    6 +---
+>  include/linux/fs.h                   |    2 -
+>  include/linux/migrate.h              |   27 ++++++++++++++----
+>  include/linux/page-flags.h           |    2 -
+>  mm/balloon_compaction.c              |   18 ++++++------
+>  mm/compaction.c                      |   29 ++++++++-----------
+>  mm/migrate.c                         |   23 ++++++++-------
+>  mm/secretmem.c                       |    6 ----
+>  mm/util.c                            |    4 +-
+>  mm/z3fold.c                          |   45 ++++++------------------------
+>  mm/zsmalloc.c                        |   52 +++++++++--------------------------
+>  13 files changed, 83 insertions(+), 154 deletions(-)
+> 
+> diff --git a/arch/powerpc/platforms/pseries/cmm.c b/arch/powerpc/platforms/pseries/cmm.c
+> index 15ed8206c463..2ecbab3db723 100644
+> --- a/arch/powerpc/platforms/pseries/cmm.c
+> +++ b/arch/powerpc/platforms/pseries/cmm.c
+> @@ -578,23 +578,10 @@ static int cmm_balloon_compaction_init(void)
+>  		return rc;
+>  	}
+>  
+> -	b_dev_info.inode = alloc_anon_inode(balloon_mnt->mnt_sb);
+> -	if (IS_ERR(b_dev_info.inode)) {
+> -		rc = PTR_ERR(b_dev_info.inode);
+> -		b_dev_info.inode = NULL;
+> -		kern_unmount(balloon_mnt);
+> -		balloon_mnt = NULL;
+> -		return rc;
+> -	}
+> -
+> -	b_dev_info.inode->i_mapping->a_ops = &balloon_aops;
 
 
-Pozdrawiam serdecznie,
-Wiktor Nurek
+Are you missing similar updates to drivers/virtio/virtio_balloon.c ?
+
+At least, there we're also using balloon_aops, so this patch shouldn't
+compile.
+
+
+Skimming over it, nothing else jumped at me.
+
+-- 
+Thanks,
+
+David / dhildenb
+
