@@ -2,224 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE4F8C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 00:47:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62574C43334
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 05:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347254AbiFHAr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 7 Jun 2022 20:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37238 "EHLO
+        id S233535AbiFHFZW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 01:25:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54060 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1447492AbiFGXG5 (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Tue, 7 Jun 2022 19:06:57 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B12CB30B6C7;
-        Tue,  7 Jun 2022 13:37:58 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id BEA211F92D;
-        Tue,  7 Jun 2022 20:30:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1654633808; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S662GbsRJEF6AHR2EvNBu53yF5E9DczgAYsnFafgTMM=;
-        b=y+HqAzNlLnb/PDQh+aDQgxfaXgDgFlpkBvWu4r6aN2XYXDxi3irQSc60/Y6dgoXm04rQFz
-        sMIP6F+daG66o5WdjUGi8iXe0PX2bcB6wbrwQ2R2UcXjAnNoLODEBL5wUSyeLtPeK9WQ/b
-        3OsfhBPVSLIhjCFDsHZphJ5Ha5hkf30=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1654633808;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=S662GbsRJEF6AHR2EvNBu53yF5E9DczgAYsnFafgTMM=;
-        b=TcXr8fp5++MDzVzG7XmA0OcwUhraygWKTXnVJ0DJDg28V6CTQfFJS6yQY+qyTnTVBROKFH
-        KpQDy3na/34Y1jCw==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 9D1392C141;
-        Tue,  7 Jun 2022 20:30:08 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 251ABA0633; Tue,  7 Jun 2022 22:30:08 +0200 (CEST)
-Date:   Tue, 7 Jun 2022 22:30:08 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     Jan Kara <jack@suse.cz>, paolo.valente@linaro.org, tj@kernel.org,
-        linux-block@vger.kernel.org, cgroups@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com,
-        Jens Axboe <axboe@kernel.dk>
-Subject: Re: [PATCH -next v5 0/3] support concurrent sync io for bfq on a
- specail occasion
-Message-ID: <20220607203008.nk4cpcny5sfl4am7@quack3.lan>
-References: <81411289-e13c-20f5-df63-c059babca57a@huawei.com>
- <d5a90a08-1ac6-587a-e900-0436bd45543a@kernel.dk>
- <55919e29-1f22-e8aa-f3d2-08c57d9e1c22@huawei.com>
- <20220523085902.wmxoebyq3crerecr@quack3.lan>
- <25f6703e-9e10-75d9-a893-6df1e6b75254@kernel.dk>
- <20220523152516.7sr247i3bzwhr44w@quack3.lan>
- <21cd1c49-838a-7f03-ab13-9a4f2ac65979@huawei.com>
- <20220607095430.kac5jgzm2gvd7x3c@quack3.lan>
- <9a51c7b1-ba6c-0a56-85cf-5e602b9c6ec2@huawei.com>
- <75ebf18b-0e21-3906-7862-6ca80b2f181d@huawei.com>
+        with ESMTP id S234666AbiFHFYy (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 01:24:54 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D61F66466
+        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 19:39:58 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id w13-20020a17090a780d00b001e8961b355dso5372528pjk.5
+        for <linux-block@vger.kernel.org>; Tue, 07 Jun 2022 19:39:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=6bOa4esw0xksLVfNdAT6B93rV/P/8VSGEKMP6EjzR0E=;
+        b=K6KpXwM81tTGGNFDdq17Lj1eMk1q3eODHH8nocGcaU9nWe7rFntrd/gnI4dJmrX5ot
+         jelT47mS9pdJT0S2PzSCrNgL5Sh63CeXCG+aYcN+ywbxrVtSsSCUllZRXU38BSZmlUri
+         DAKxKJgyjtIwfLg5ysES88sOtfU39kmTixM4U=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=6bOa4esw0xksLVfNdAT6B93rV/P/8VSGEKMP6EjzR0E=;
+        b=MKZUKujbxIr5npY0+KU3Ac6rjL7EJZpbeQMXa4E7swKtvtcoIc8deEMo5hUlC7QPrG
+         tv0ozxYZWWMV5b2VZtTAagSbe6Xf8CrO551En6fh+hOAUHwcxh+razwUH5t7yjsJayA3
+         Aw9UZ3Wi19Jlw4y0tZ0pve/q88AXlqWijqFsPNID8Hn8QiFrhI1bS7Y+EAWsMURdjJyt
+         3lwlTqsEHRci1RPmskYR4uLes/wSUa3y/TyE8ZZuYg3qKrLn7ilpbZEdq26OiQzyM/4t
+         cFA6plve1/gN5mV2n05EbR/jtr55TI4b0QPJta8F7R3WJ4LzNIXgzuq7h0lp7zwxUm5d
+         u0VA==
+X-Gm-Message-State: AOAM5315CFWMAOWnWKD5RrBgHaQIsQF63Aw6wEsMVPd4mDUnJxYM/rdm
+        QpA0aEkodP67iYraMGkDnVwesA==
+X-Google-Smtp-Source: ABdhPJyJZwIgrQupdT+vh6Z2lrRhM1s6jhssKdeRPoFc/TqToiSIDBj6GM5p6VPlbfki0O4rCxkesQ==
+X-Received: by 2002:a17:90b:3a8f:b0:1e8:7669:8a2f with SMTP id om15-20020a17090b3a8f00b001e876698a2fmr16728205pjb.55.1654655998366;
+        Tue, 07 Jun 2022 19:39:58 -0700 (PDT)
+Received: from google.com ([2401:fa00:8f:203:463d:a192:6128:66e])
+        by smtp.gmail.com with ESMTPSA id 84-20020a621857000000b0050dc7628158sm13612168pfy.50.2022.06.07.19.39.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Jun 2022 19:39:57 -0700 (PDT)
+Date:   Wed, 8 Jun 2022 11:39:52 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-fsdevel@vger.kernel.org,
+        Linux ARM <linux-arm-kernel@lists.infradead.org>,
+        "open list:KERNEL SELFTEST FRAMEWORK" 
+        <linux-kselftest@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        regressions@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
+        Sergey Senozhatsky <senozhatsky@chromium.org>,
+        Nitin Gupta <ngupta@vflare.org>
+Subject: Re: qemu-arm: zram: mkfs.ext4 : Unable to handle kernel NULL pointer
+ dereference at virtual address 00000140
+Message-ID: <YqAL+HeZDk5Wug28@google.com>
+References: <CA+G9fYtVOfWWpx96fa3zzKzBPKiNu1w3FOD4j++G8MOG3Vs0EA@mail.gmail.com>
+ <Yp47DODPCz0kNgE8@google.com>
+ <CA+G9fYsjn0zySHU4YYNJWAgkABuJuKtHty7ELHmN-+30VYgCDA@mail.gmail.com>
+ <Yp/kpPA7GdbArXDo@google.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <75ebf18b-0e21-3906-7862-6ca80b2f181d@huawei.com>
+In-Reply-To: <Yp/kpPA7GdbArXDo@google.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 07-06-22 21:06:55, Yu Kuai wrote:
-> 在 2022/06/07 19:51, Yu Kuai 写道:
-> > 在 2022/06/07 17:54, Jan Kara 写道:
-> > > On Tue 07-06-22 11:10:27, Yu Kuai wrote:
-> > > > 在 2022/05/23 23:25, Jan Kara 写道:
-> > > > > Hum, for me all emails from Huawei I've received even today
-> > > > > fail the DKIM
-> > > > > check. After some more digging there is interesting
-> > > > > inconsistency in DMARC
-> > > > > configuration for huawei.com domain. There is DMARC record
-> > > > > for huawei.com
-> > > > > like:
-> > > > > 
-> > > > > huawei.com.        600    IN    TXT
-> > > > > "v=DMARC1;p=none;rua=mailto:dmarc@edm.huawei.com"
-> > > > > 
-> > > > > which means no DKIM is required but _dmarc.huawei.com has:
-> > > > > 
-> > > > > _dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
-> > > > > 
-> > > > > 
-> > > > > which says that DKIM is required. I guess this inconsistency may be the
-> > > > > reason why there are problems with DKIM validation for senders from
-> > > > > huawei.com. Yu Kuai, can you perhaps take this to your IT
-> > > > > support to fix
-> > > > > this? Either make sure huawei.com emails get properly signed
-> > > > > with DKIM or
-> > > > > remove the 'quarantine' record from _dmarc.huawei.com. Thanks!
-> > > > > 
-> > > > >                                 Honza
-> > > > > 
-> > > > Hi, Jan and Jens
-> > > > 
-> > > > I just got response from our IT support:
-> > > > 
-> > > > 'fo' is not set in our dmarc configuration(default is 0), which means
-> > > > SPF and DKIM verify both failed so that emails will end up in spam.
-> > > > 
-> > > > It right that DKIM verify is failed because there is no signed key,
-> > > > however, our IT support are curious how SPF verify faild.
-> > > > 
-> > > > Can you guys please take a look at ip address of sender? So our IT
-> > > > support can take a look if they miss it from SPF records.
-> > > 
-> > > So SPF is what makes me receive direct emails from you. For example
-> > > on this
-> > > email I can see:
-> > > 
-> > > Received: from frasgout.his.huawei.com (frasgout.his.huawei.com
-> > >          [185.176.79.56])
-> > >          (using TLSv1.2 with cipher ECDHE-ECDSA-AES128-GCM-SHA256
-> > > (128/128
-> > >          bits))
-> > >          (No client certificate requested)
-> > >          by smtp-in2.suse.de (Postfix) with ESMTPS id 4LHFjN2L0dzZfj
-> > >          for <jack@suse.cz>; Tue,  7 Jun 2022 03:10:32 +0000 (UTC)
-> > > ...
-> > > Authentication-Results: smtp-in2.suse.de;
-> > >          dkim=none;
-> > >          dmarc=pass (policy=quarantine) header.from=huawei.com;
-> > >          spf=pass (smtp-in2.suse.de: domain of yukuai3@huawei.com
-> > > designates
-> > >          185.176.79.56 as permitted sender)
-> > > smtp.mailfrom=yukuai3@huawei.com
-> > > 
-> > > So indeed frasgout.his.huawei.com is correct outgoing server which makes
-> > > smtp-in2.suse.de believe the email despite missing DKIM signature.
-> > > But the
-> > > problem starts when you send email to a mailing list. Let me take for
-> > > example your email from June 2 with Message-ID
-> > > <20220602082129.2805890-1-yukuai3@huawei.com>, subject "[PATCH -next]
-> > > mm/filemap: fix that first page is not mark accessed in filemap_read()".
-> > > There the mailing list server forwards the email so we have:
-> > > 
-> > > Received: from smtp-in2.suse.de ([192.168.254.78])
-> > >          (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256
-> > > bits))
-> > >          by dovecot-director2.suse.de with LMTPS
-> > >          id 8MC5NfVvmGIPLwAApTUePA
-> > >          (envelope-from <linux-fsdevel-owner@vger.kernel.org>)
-> > >          for <jack@imap.suse.de>; Thu, 02 Jun 2022 08:08:21 +0000
-> > > Received: from out1.vger.email (out1.vger.email
-> > > [IPv6:2620:137:e000::1:20])
-> > >          by smtp-in2.suse.de (Postfix) with ESMTP id 4LDJYK5bf0zZg5
-> > >          for <jack@suse.cz>; Thu,  2 Jun 2022 08:08:21 +0000 (UTC)
-> > > Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-> > >          id S232063AbiFBIIM (ORCPT <rfc822;jack@suse.cz>);
-> > >          Thu, 2 Jun 2022 04:08:12 -0400
-> > > Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56178 "EHLO
-> > >          lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by
-> > >          vger.kernel.org
-> > >          with ESMTP id S232062AbiFBIIL (ORCPT
-> > >          <rfc822;linux-fsdevel@vger.kernel.org>);
-> > >          Thu, 2 Jun 2022 04:08:11 -0400
-> > > Received: from szxga02-in.huawei.com (szxga02-in.huawei.com
-> > > [45.249.212.188])
-> > >          by lindbergh.monkeyblade.net (Postfix) with ESMTPS id
-> > >          75DDB25FE;
-> > >          Thu,  2 Jun 2022 01:08:08 -0700 (PDT)
-> > > 
-> > > and thus smtp-in2.suse.de complains:
-> > > 
-> > > Authentication-Results: smtp-in2.suse.de;
-> > >          dkim=none;
-> > >          dmarc=fail reason="SPF not aligned (relaxed), No valid DKIM"
-> > >          header.from=huawei.com (policy=quarantine);
-> > >          spf=pass (smtp-in2.suse.de: domain of
-> > >          linux-fsdevel-owner@vger.kernel.org designates
-> > > 2620:137:e000::1:20 as
-> > >          permitted sender)
-> > > smtp.mailfrom=linux-fsdevel-owner@vger.kernel.org
-> > > 
-> > > Because now we've got email with "From" header from huawei.com
-> > > domain from
-> > > a vger mail server which was forwarding it. So SPF has no chance to match
-> > > (in fact SPF did pass for the Return-Path header which points to
-> > > vger.kernel.org but DMARC defines that if "From" and "Return-Path" do not
-> > > match, additional validation is needed - this is the "SPF not aligned
-> > > (relaxed)" message above). And missing DKIM (the additional validation
-> > > method) sends the email to spam.
+On (22/06/07 16:52), Minchan Kim wrote:
+> > rootfs: https://oebuilds.tuxbuild.com/29zhlbEc3EWq2wod9Uy964Bp27q/images/am57xx-evm/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4.gz
+> > kernel: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC/zImage
 > > 
-> > Thanks a lot for your analysis, afaics, in order to fix the
-> > problem, either your mail server change the configuration to set
-> > alignment mode to "relaxed" instead of "strict", or our mail server
-> > add correct DKIM signature for emails.
+> > Boot command,
+> >  /usr/bin/qemu-system-aarch64 -cpu host,aarch64=off -machine
+> > virt-2.10,accel=kvm -nographic -net
+> > nic,model=virtio,maaacaddr=BA:DD:AD:CC:09:04 -net tap -m 2048 -monitor
+> > none -kernel kernel/zImage --append "console=ttyAMA0 root=/dev/vda rw"
+> > -hda rootfs/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4
+> > -m 4096 -smp 2
 > > 
-> > I'll contact with our IT support and try to add DKIM signature.
+> > # cd /opt/kselftests/default-in-kernel/zram
+> > # ./zram.sh
 > > 
-> > Thanks,
-> > Kuai
+> > Allow me sometime I will try to bisect this problem.
 > 
-> Hi, Jan
+> Thanks for sharing the info. 
 > 
-> Our IT support is worried that add DKIM signature will degrade
-> performance, may I ask that how is your mail server configuation? policy
-> is quarantine or none, and dkim signature is supportted or not.
+> I managed to work your rootfs with my local arm build
+> based on the problematic git tip. 
+> However, I couldn't suceed to reproduce it.
+> 
+> I needed to build zsmalloc/zram built-in instead of modules
+> Is it related? Hmm,
+> 
+> Yeah, It would be very helpful if you could help to bisect it.
 
-The DMARC policy (relaxed / quarantine) is not configured on the side of
-the receiving mail server but on huawei.com side. As I wrote above it is
-this DMARC record in DNS of huawei.com domain that makes receiving mail
-servers refuse the email without DKIM signature (if SPF does not match):
-
-_dmarc.huawei.com.    600    IN    TXT    "v=DMARC1;p=quarantine;ruf=mailto:dmarc@huawei.com;rua=mailto:dmarc@huawei.com"
-
-So if your IT admins do not want to introduce DKIM signatures on outgoing
-email, they should set policy to 'p=none' in the DMARC DNS record to tell
-that fact to receiving mail servers.
-
-								Honza
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+This looks like a NULL lock->name dereference in lockdep. I suspect
+that somehow local_lock doesn't get .dep_map initialized. Maybe running
+the kernel with CONFIG_DEBUG_LOCK_ALLOC would help us? Naresh, can you
+help us with this?
