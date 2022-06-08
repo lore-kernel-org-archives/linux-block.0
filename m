@@ -2,29 +2,29 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF9FCCA483
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 19:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9349CCA48F
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 19:01:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233950AbiFHTBr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 15:01:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51528 "EHLO
+        id S234526AbiFHTBu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 15:01:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51736 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbiFHTBq (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 15:01:46 -0400
+        with ESMTP id S234083AbiFHTBs (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 15:01:48 -0400
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2EA4F644C;
-        Wed,  8 Jun 2022 12:01:44 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1610735242;
+        Wed,  8 Jun 2022 12:01:46 -0700 (PDT)
 Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
-        by linux.microsoft.com (Postfix) with ESMTPSA id BF05F20BE626;
-        Wed,  8 Jun 2022 12:01:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com BF05F20BE626
+        by linux.microsoft.com (Postfix) with ESMTPSA id 860D220BE670;
+        Wed,  8 Jun 2022 12:01:44 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 860D220BE670
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1654714903;
-        bh=NYCsUJkuOE9DQil3YSnJJ1tvgdJy8Ehg8KLtyONiSu4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=I3HVXxw9b/vJ1NVbnWxrQFcCJUD9ubSW452/GFz2eiPXSHGXCZIwkGqGp18VhgiqU
-         fqFbeAZpt6QumowYJZVlhx6VEHHKZsxHTv5MNYznuZRwZbpf8h3Pfsk5HeS3FydrpZ
-         kOOvZEk2jrBESAMnqjNdJmhumQeVPxuICB+2Hr0I=
+        s=default; t=1654714904;
+        bh=097dEATcWhLqRc/23Y/0yKACK1hWd9dewZKfKYQTbIo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=R6FdjkgOU1LC1lDib0oDwbnNYP8XgpDgI51UsngPDnC2EdZt8MMt8KjJPLxWptdkz
+         9NX5lqmBhBa6KASF6O6O6P3/ejubKLjyGeBeA9IE0lZ6N+RWHDOV/0SAM/MeMwuUYd
+         gUEWBmHZE6FHRqxX7qVKyGhan5vNjY/ewjTJQciE=
 From:   Deven Bowers <deven.desai@linux.microsoft.com>
 To:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
         serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
@@ -35,573 +35,777 @@ Cc:     linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
         linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, linux-audit@redhat.com,
         roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH v8 00/17] Integrity Policy Enforcement LSM (IPE)
-Date:   Wed,  8 Jun 2022 12:01:12 -0700
-Message-Id: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
+Subject: [RFC PATCH v8 07/17] ipe: add auditing support
+Date:   Wed,  8 Jun 2022 12:01:19 -0700
+Message-Id: <1654714889-26728-8-git-send-email-deven.desai@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
+References: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Overview:
----------
-
-IPE is a Linux Security Module which takes a complimentary approach to
-access control. Whereas existing mandatory access control mechanisms
-base their decisions on labels and paths, IPE instead determines
-whether or not an operation should be allowed based on immutable
-security properties of the system component the operation is being
-performed on.
-
-IPE itself does not mandate how the security property should be
-evaluated, but relies on an extensible set of external property providers
-to evaluate the component. IPE makes its decision based on reference
-values for the selected properties, specified in the IPE policy.
-
-The reference values represent the value that the policy writer and the
-local system administrator (based on the policy signature) trust for the
-system to accomplish the desired tasks.
-
-One such provider is for example dm-verity, which is able to represent
-the integrity property of a partition (its immutable state) with a digest.
-
-IPE is compiled under CONFIG_SECURITY_IPE.
-
-Use Cases
----------
-
-IPE works best in fixed-function devices: Devices in which their purpose
-is clearly defined and not supposed to be changed (e.g. network firewall
-device in a data center, an IoT device, etcetera), where all software and
-configuration is built and provisioned by the system owner.
-
-IPE is a long-way off for use in general-purpose computing: the Linux
-community as a whole tends to follow a decentralized trust model,
-known as the web of trust, which IPE has no support for as of yet.
-
-There are exceptions, to this general-purpose computing rule; however,
-such as the scenario, wherein Linux distribution vendors trust only
-their own keys - in this case, IPE can be used to enforce the trust
-reqiurement.
-
-IPE, instead of supporting web of trust, supports PKI, which generally
-designates a set of entities that provide a measure absolute trust.
-Commonly used in embedded systems, 
-
-Additionally, while most packages are signed today, the files inside
-the packages (for instance, the executables), tend to be unsigned. This
-makes it difficult to utilize IPE in systems where a package manager is
-expected to be functional, without major changes to the package manager
-and ecosystem behind it.
-
-DIGLIM[1] is a system that when combined with IPE, could be used to
-enable general purpose computing scenarios.
-
-Policy:
--------
-
-IPE policy is a plain-text policy composed of multiple statements
-over several lines. There is one required line, at the top of the
-policy, indicating the policy name, and the policy version, for
-instance:
-
-  policy_name="Ex Policy" policy_version=0.0.0
-
-The policy version indicates the current version of the policy (NOT the
-policy syntax version). This is used to prevent roll-back of policy to
-potentially insecure previous versions of the policy.
-
-The next portion of IPE policy, are rules. Rules are formed by key=value
-pairs, known as properties. IPE rules require two keys: "action", which
-determines what IPE does when it encounters a match against the policy
- and "op", which determines when that rule should be evaluated.
-
-Thus, a minimal rule is:
-
-  op=EXECUTE action=ALLOW
-
-This example will allow any execution. Additional properties are used to
-restrict attributes about the files being evaluated. These properties are
-intended to be deterministic attributes that are resident in the kernel.
-Available properties for IPE described in the documentation patch of this
-series.
-
-A rule is required to have the "op" property as the first token of a rule,
-and the "action" as the last token of the rule. Rules are evaluated
-top-to-bottom. As a result, any revocation rules, or denies should be
-placed early in the file to ensure that these rules are evaluated before
-a rule with "action=ALLOW" is hit.
-
-Any unknown syntax in IPE policy will result in a fatal error to parse
-the policy. User mode can interrogate the kernel to understand what
-properties and the associated versions through the securityfs node,
-$securityfs/ipe/config, which will return a string of form:
-
-  key1=version1
-  key2=version2
-  .
-  .
-  .
-  keyN=versionN
-
-User-mode should correlate these versions with the supported values
-identified in the documentation to determine whether a policy should
-be accepted by the system without actually trying to deploy the policy.
-
-Additionally, a DEFAULT operation must be set for all understood
-operations within IPE. For policies to remain completely forwards
-compatible, it is recommended that users add a "DEFAULT action=ALLOW"
-and override the defaults on a per-operation basis.
-
-For more information about the policy syntax, see the kernel
-documentation page.
-
-Early Usermode Protection:
---------------------------
-
-IPE can be provided with a policy at startup to load and enforce.
-This is intended to be a minimal policy to get the system to a state
-where userland is setup and ready to receive commands, at which
-point a policy can be deployed via securityfs. This "boot policy" can be
-specified via the config, SECURITY_IPE_BOOT_POLICY, which accepts a path
-to a plain-text version of the IPE policy to apply. This policy will be
-compiled into the kernel. If not specified, IPE will be disabled until a
-policy is deployed and activated through the method above.
-
-Policy Examples:
-----------------
-
-Allow all:
-
-  policy_name="Allow All" policy_version=0.0.0
-  DEFAULT action=ALLOW
-
-Allow only initial superblock:
-
-  policy_name="Allow All Initial SB" policy_version=0.0.0
-  DEFAULT action=DENY
-
-  op=EXECUTE boot_verified=TRUE action=ALLOW
-
-Allow any signed dm-verity volume and the initial superblock:
-
-  policy_name="AllowSignedAndInitial" policy_version=0.0.0
-  DEFAULT action=DENY
-
-  op=EXECUTE boot_verified=TRUE action=ALLOW
-  op=EXECUTE dmverity_signature=TRUE action=ALLOW
-
-Prohibit execution from a specific dm-verity volume, while allowing
-all signed volumes and the initial superblock:
-
-  policy_name="ProhibitSingleVolume" policy_version=0.0.0
-  DEFAULT action=DENY
-
-  op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=DENY
-  op=EXECUTE boot_verified=TRUE action=ALLOW
-  op=EXECUTE dmverity_signature=TRUE action=ALLOW
-
-Allow only a specific dm-verity volume:
-
-  policy_name="AllowSpecific" policy_version=0.0.0
-  DEFAULT action=DENY
-
-  op=EXECUTE dmverity_roothash=sha256:401fcec5944823ae12f62726e8184407a5fa9599783f030dec146938 action=ALLOW
-
-Deploying Policies:
--------------------
-
-First sign a plain text policy, with a certificate that is present in
-the SYSTEM_TRUSTED_KEYRING of your test machine. Through openssl, the
-signing can be done via:
-
-  openssl smime -sign -in "$MY_POLICY" -signer "$MY_CERTIFICATE" \
-    -inkey "$MY_PRIVATE_KEY" -outform der -noattr -nodetach \
-    -out "$MY_POLICY.p7s"
-
-Then, simply cat the file into the IPE's "new_policy" securityfs node:
-
-  cat "$MY_POLICY.p7s" > /sys/kernel/security/ipe/new_policy
-
-The policy should now be present under the policies/ subdirectory, under
-its "policy_name" attribute.
-
-The policy is now present in the kernel and can be marked as active,
-via the securityfs node:
-
-  echo 1 > "/sys/kernel/security/ipe/$MY_POLICY_NAME/active"
-
-This will now mark the policy as active and the system will be enforcing
-$MY_POLICY_NAME.
-
-There is one requirement when marking a policy as active, the policy_version
-attribute must either increase, or remain the same as the currently running
-policy.
-
-Policies can be updated via:
-
-  cat "$MY_UPDATED_POLICY.p7s" > \
-    "/sys/kernel/security/ipe/policies/$MY_POLICY_NAME/update"
-
-Additionally, policies can be deleted via the "delete" securityfs
-node. Simply write "1" to the corresponding node in the policy folder:
-
-  echo 1 > "/sys/kernel/security/ipe/policies/$MY_POLICY_NAME/delete"
-
-There is only one requirement to delete policies, the policy being
-deleted must not be the active policy.
-
-NOTE: Any securityfs write to IPE's nodes will require CAP_MAC_ADMIN.
-
-Integrations:
--------------
-
-This patch series adds support for fsverity via digest and signature
-(fsverity_signature and fsverity_digest), dm-verity by digest and
-signature (dmverity_signature and dmverity_roothash), and trust for
-the initramfs (boot_verified).
-
-Please see the documentation patch for more information about the
-integrations available.
-
-Testing:
---------
-
-KUnit Tests are available. Recommended kunitconfig:
-
-    CONFIG_KUNIT=y
-    CONFIG_SECURITY=y
-    CONFIG_SECURITYFS=y
-    CONFIG_PKCS7_MESSAGE_PARSER=y
-    CONFIG_SYSTEM_DATA_VERIFICATION=y
-    CONFIG_FS_VERITY=y
-    CONFIG_FS_VERITY_BUILTIN_SIGNATURES=y
-    CONFIG_BLOCK=y
-    CONFIG_MD=y
-    CONFIG_BLK_DEV_DM=y
-    CONFIG_DM_VERITY=y
-    CONFIG_DM_VERITY_VERIFY_ROOTHASH_SIG=y
-
-    CONFIG_SECURITY_IPE=y
-    CONFIG_SECURITY_IPE_KUNIT_TEST=y
-    CONFIG_IPE_PROP_BOOT_VERIFIED=y
-    CONFIG_IPE_PROP_DM_VERITY_SIGNATURE=y
-    CONFIG_IPE_PROP_DM_VERITY_ROOTHASH=y
-    CONFIG_IPE_PROP_FS_VERITY_SIGNATURE=y
-    CONFIG_IPE_PROP_FS_VERITY_DIGEST=y
-
-Simply run:
-
-    make ARCH=um mrproper 
-    ./tools/testing/kunit/kunit.py run --kunitconfig <path/to/config>
-
-And the tests will execute and report the result. For more indepth testing,
-it will require you to create and mount a dm-verity volume or fs-verity
-enabled file.
-
-Documentation:
---------------
-
-There is both documentation available on github at
-https://microsoft.github.io/ipe, and Documentation in this patch series,
-to be added in-tree.
-
-Known Gaps:
------------
-
-IPE has two known gaps:
-
-1. IPE cannot verify the integrity of anonymous executable memory, such as
-  the trampolines created by gcc closures and libffi (<3.4.2), or JIT'd code.
-  Unfortunately, as this is dynamically generated code, there is no way
-  for IPE to ensure the integrity of this code to form a trust basis. In all
-  cases, the return result for these operations will be whatever the admin
-  configures the DEFAULT action for "EXECUTE".
-
-2. IPE cannot verify the integrity of interpreted languages' programs when
-  these scripts invoked via ``<interpreter> <file>``. This is because the
-  way interpreters execute these files, the scripts themselves are not
-  evaluated as executable code through one of IPE's hooks. Interpreters
-  can be enlightened to the usage of IPE by trying to mmap a file into
-  executable memory (+X), after opening the file and responding to the
-  error code appropriately. This also applies to included files, or high
-  value files, such as configuration files of critical system components.
-
-Appendix:
----------
-
-A. IPE Github Repository: https://github.com/microsoft/ipe
-B. IPE Users' Guide: Documentation/admin-guide/LSM/ipe.rst
-
-References:
------------
-
-1: https://lore.kernel.org/bpf/4d6932e96d774227b42721d9f645ba51@huawei.com/T/
-
-FAQ:
-----
-
-Q: What is the difference between IMA and IPE?
-
-A: See the documentation patch for more on this topic. 
-
-Previous Postings
------------------
-
-v1: https://patchwork.kernel.org/project/linux-security-module/list/?series=267061&archive=both
-v2: https://patchwork.kernel.org/project/linux-security-module/list/?series=267169&archive=both
-v3: https://patchwork.kernel.org/project/linux-security-module/list/?series=271685&archive=both
-v4: https://patchwork.kernel.org/project/linux-security-module/list/?series=320403&archive=both
-v5: https://patchwork.kernel.org/project/linux-security-module/list/?series=325703&archive=both
-v6: https://patchwork.kernel.org/project/linux-security-module/list/?series=326359&archive=both
-v7: https://patchwork.kernel.org/project/linux-security-module/list/?series=562971&archive=both
-
-Changelog:
-----------
-
+Users of IPE require a way to identify when and why an operation fails,
+allowing them to both respond to violations of policy and be notified
+of potentially malicious actions on their systens with respect to IPE
+itself.
+
+The new 1420 audit, AUDIT_IPE_ACCESS indicates the result of a policy
+evaulation of a resource. The other two events, AUDIT_MAC_POLICY_LOAD,
+and AUDIT_MAC_CONFIG_CHANGE represent a new policy was loaded into the
+kernel and the currently active policy changed, respectively.
+
+This patch also adds support for success auditing, allowing users to
+identify how a resource passed policy. It is recommended to use this
+option with caution, as it is quite noisy.
+
+Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+---
+
+This patch adds the following audit records:
+
+  type=1420 audit(1653364735.161:64):
+    rule="DEFAULT op=EXECUTE action=DENY"
+
+  type=1420 audit(1653364370.067:61): path="/root/fs/rw/plain/execve"
+    dev="vdc1" ino=16 rule="DEFAULT op=EXECUTE action=DENY"
+
+  type=1405 audit(1653425583.136:54): policy_name="dmverity_roothash"
+    policy_version=0.0.0 sha256=A9C5803309F80D2B84D7C047534BE8B60EF121C8E1F351F2A8EFFA617B7F0686
+
+  type=1403 audit(1653425529.927:53): policy_name="dmverity_roothash"
+    policy_version=0.0.0 sha256=A9C5803309F80D2B84D7C047534BE8B60EF121C8E1F351F2A8EFFA617B7F0686
+
+This results in the following events (the audit records are always
+prior to a SYSCALL record):
+
+  type=1420 audit(1653364735.161:64):
+    rule="DEFAULT op=EXECUTE action=DENY"
+  type=1300 audit(1653364735.161:64): arch=c000003e syscall=9
+    success=no exit=-13 a0=0 a1=1000 a2=4 a3=20 items=0 ppid=455 pid=774
+    auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=0 sgid=0 fsgid=0
+    tty=ttyS0 ses=3 comm="mmap" exe="/root/host/mmap" subj=kernel
+    key=(null)
+  audit: type=1327 audit(1653364735.161:64):
+    proctitle=686F73742F6D6D617000410058
+
+  type=1420 audit(1653364370.067:61): path="/root/fs/rw/plain/execve"
+    dev="vdc1" ino=16 rule="DEFAULT op=EXECUTE action=DENY"
+  type=1300 audit(1653364370.067:61): arch=c000003e syscall=10
+    success=no exit=-13 a0=7f0bf0644000 a1=4f80 a2=5 a3=7f0bf043d300
+    items=0 ppid=455 pid=737 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0
+    egid=0 sgid=0 fsgid=0 tty=ttyS0 ses=3 comm="mprotect"
+    exe="/root/host/mprotect" subj=kernel key=(null)
+  type=1327 audit(1653364370.067:61):
+    proctitle=686F73742F6D70726F7465637400534800527C5700527C5800706C61696E2F657865637665
+
+  type=1403 audit(1653425529.927:53): policy_name="dmverity_roothash"
+    policy_version=0.0.0 sha256=A9C5803309F80D2B84D7C047534BE8B60EF121C8E1F351F2A8EFFA617B7F0686
+  type=1300 audit(1653425529.927:53): arch=c000003e syscall=1
+    success=yes exit=6215 a0=1 a1=7f07adfe4000 a2=1847 a3=22 items=0
+    ppid=441 pid=445 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 egid=)
+  type=1327 audit(1653425529.927:53):
+    proctitle=63617400706F6C69636965732F646D7665726974795F726F6F74686173682E706F6C2E703762
+
+  type=1405 audit(1653425583.136:54): policy_name="dmverity_roothash"
+    policy_version=0.0.0 sha256=A9C5803309F80D2B84D7C047534BE8B60EF121C8E1F351F2A8EFFA617B7F0686
+  type=1300 audit(1653425583.136:54): arch=c000003e syscall=1 success=yes
+    exit=2 a0=1 a1=55c1065e5c60 a2=2 a3=7fe683990020 items=0 ppid=405
+    pid=441 auid=0 uid=0 gid=0 euid=0 suid=0 fsuid=0 e)
+  type=1327 audit(1653425583.136:54): proctitle="-bash"
+
+---
 v2:
-  Split the second patch of the previous series into two.
-  Minor corrections in the cover-letter and documentation
-  comments regarding CAP_MAC_ADMIN checks in IPE.
+  + Split evaluation loop, access control hooks,
+    and evaluation loop from policy parser and userspace
+    interface to pass mailing list character limit
 
 v3:
-  Address various comments by Jann Horn. Highlights:
-    Switch various audit allocators to GFP_KERNEL.
-    Utilize rcu_access_pointer() in various locations.
-    Strip out the caching system for properties
-    Strip comments from headers
-    Move functions around in patches
-    Remove kernel command line parameters
-    Reconcile the race condition on the delete node for policy by
-      expanding the policy critical section.
-
-  Address a few comments by Jonathan Corbet around the documentation
-    pages for IPE.
-
-  Fix an issue with the initialization of IPE policy with a "-0"
-    version, caused by not initializing the hlist entries before
-    freeing.
+  + Move ipe_load_properties to patch 04.
+  + Remove useless 0-initializations
+  + Prefix extern variables with ipe_
+  + Remove kernel module parameters, as these are
+    exposed through sysctls.
+  + Add more prose to the IPE base config option
+    help text.
+  + Use GFP_KERNEL for audit_log_start.
+  + Remove unnecessary caching system.
+  + Remove comments from headers
+  + Use rcu_access_pointer for rcu-pointer null check
+  + Remove usage of reqprot; use prot only.
+  + Move policy load and activation audit event to 03/12
 
 v4:
-  Address a concern around IPE's behavior with unknown syntax.
-    Specifically, make any unknown syntax a fatal error instead of a
-    warning, as suggested by Mickaël Salaün.
-  Introduce a new securityfs node, $securityfs/ipe/property_config,
-    which provides a listing of what properties are enabled by the
-    kernel and their versions. This allows usermode to predict what
-    policies should be allowed.
-  Strip some comments from c files that I missed.
-  Clarify some documentation comments around 'boot_verified'.
-    While this currently does not functionally change the property
-    itself, the distinction is important when IPE can enforce verified
-    reads. Additionally, 'KERNEL_READ' was omitted from the documentation.
-    This has been corrected.
-  Change SecurityFS and SHA1 to a reverse dependency.
-  Update the cover-letter with the updated behavior of unknown syntax.
-  Remove all sysctls, making an equivalent function in securityfs.
-  Rework the active/delete mechanism to be a node under the policy in
-    $securityfs/ipe/policies.
-  The kernel command line parameters ipe.enforce and ipe.success_audit
-    have returned as this functionality is no longer exposed through
-    sysfs.
+  + Remove sysctls in favor of securityfs nodes
+  + Re-add kernel module parameters, as these are now
+    exposed through securityfs.
+  + Refactor property audit loop to a separate function.
 
 v5:
-  Correct some grammatical errors reported by Randy Dunlap.
-  Fix some warnings reported by kernel test bot.
-  Change convention around security_bdev_setsecurity. -ENOSYS
-    is now expected if an LSM does not implement a particular @name,
-    as suggested by Casey Schaufler.
-  Minor string corrections related to the move from sysfs to securityfs
-  Correct a spelling of an #ifdef for the permissive argument.
-  Add the kernel parameters re-added to the documentation.
-  Fix a minor bug where the mode being audited on permissive switch
-    was the original mode, not the mode being swapped to.
-  Cleanup doc comments, fix some whitespace alignment issues.
+  + fix minor grammatical errors
+  + do not group rule by curly-brace in audit record,
+    reconstruct the exact rule.
 
 v6:
-  Change if statement condition in security_bdev_setsecurity to be
-    more concise, as suggested by Casey Schaufler and Al Viro
-  Drop the 6th patch in the series, "dm-verity move signature check..."
-    due to numerous issues, and it ultimately providing no real value.
-  Fix the patch tree - the previous iteration appears to have been in a
-    torn state (patches 8+9 were merged). This has since been corrected.
+  + No changes
 
 v7:
-  * Reword cover letter to more accurate convey IPE's purpose
-    and latest updates.
-  * Refactor series to:
-      1. Support a context structure, enabling:
-          1. Easier Testing via KUNIT
-          2. A better architecture for future designs
-      2. Make parser code cleaner
-  * Move patch 01/12 to [14/16] of the series
-  * Split up patch 02/12 into four parts:
-      1. context creation [01/16]
-      2. audit [07/16]
-      3. evaluation loop [03/16]
-      4. access control hooks [05/16]
-      5. permissive mode [08/16]
-  * Split up patch 03/12 into two parts:
-      1. parser [02/16]
-      2. userspace interface [04/16]
-  * Reword and refactor patch 04/12 to [09/16]
-  * Squash patch 05/12, 07/12, 09/12 to [10/16]
-  * Squash patch 08/12, 10/12 to [11/16]
-  * Change audit records to MAC region (14XX) from Integrity region (18XX)
-  * Add FSVerity Support
-  * Interface changes:
-      1. "raw" was renamed to "pkcs7" and made read only
-      2. "raw"'s write functionality (update a policy) moved to "update"
-      3. introduced "version", "policy_name" nodes.
-      4. "content" renamed to "policy"
-      5. The boot policy can now be updated like any other policy.
-  * Add additional developer-level documentation
-  * Update admin-guide docs to reflect changes.
-  * Kunit tests
-  * Dropped CONFIG_SECURITY_IPE_PERMISSIVE_SWITCH - functionality can
-    easily come later with a small patch.
-  * Use partition0 for block_device for dm-verity patch
+  + Further split lsm creation, the audit system, the evaluation loop,
+    and access control hooks into separate patches.
+  + Further split audit system patch into two separate patches; one
+    for include/uapi, and the usage of the new defines.
+  + Split out the permissive functionality into another separate patch,
+    for easier review.
+  + Correct misuse of audit_log_n_untrusted string to audit_log_format
+  + Use get_task_comm instead of comm directly.
+  + Quote certain audit values
+  + Remove unnecessary help text on choice options - these were previously
+    idented at the wrong level
+  + Correct a stale string constant (ctx_ns_enforce to ctx_enforce)
 
 v8:
-  * Add changelog information to individual commits
-  * A large number of changes to the audit patch.
-  * split fs/ & security/ changes to two separate patches.
-  * split block/, security/ & drivers/md/ changes to separate patches.
-  * Add some historical context to what lead to the creation of IPE
-    in the documentation patch.
-  * Cover-letter changes suggested by Roberto Sassu.
 
-Deven Bowers (15):
-  security: add ipe lsm & initial context creation
-  ipe: add policy parser
-  ipe: add evaluation loop
-  ipe: add userspace interface
-  ipe: add LSM hooks on execution and kernel read
-  uapi|audit: add ipe audit message definitions
-  ipe: add auditing support
-  ipe: add permissive toggle
-  ipe: introduce 'boot_verified' as a trust provider
-  block|security: add LSM blob to block_device
-  dm-verity: consume root hash digest and signature data via LSM hook
-  ipe: add support for dm-verity as a trust provider
-  scripts: add boot policy generation program
-  ipe: kunit tests
-  documentation: add ipe documentation
+  + Change dependency for CONFIG_AUDIT to CONFIG_AUDITSYSCALL
+  + Drop ctx_* prefix
+  + Reuse, where appropriate, the audit fields from the field
+    dictionary. This transforms:
+      ctx_pathname  -> path
+      ctx_ino       -> ino
+      ctx_dev       -> dev
 
-Fan Wu (2):
-  fsverity: consume builtin signature via LSM hook
-  ipe: enable support for fs-verity as a trust provider
+  + Add audit records and event examples to commit description.
+  + Remove new_audit_ctx, replace with audit_log_start. All data that
+    would provided by new_audit_ctx is already present in the syscall
+    audit record, that is always emitted on these actions. The audit
+    records should be correlated as such.
+  + Change audit types:
+    + AUDIT_TRUST_RESULT                -> AUDIT_IPE_ACCESS
+      +  This prevents overloading of the AVC type.
+    + AUDIT_TRUST_POLICY_ACTIVATE       -> AUDIT_MAC_CONFIG_CHANGE
+    + AUDIT_TRUST_POLICY_LOAD           -> AUDIT_MAC_POLICY_LOAD
+      + There were no significant difference in meaning between
+        these types.
 
- Documentation/admin-guide/LSM/index.rst       |    1 +
- Documentation/admin-guide/LSM/ipe.rst         |  739 ++++++++++++
- .../admin-guide/kernel-parameters.txt         |   12 +
- Documentation/security/index.rst              |    1 +
- Documentation/security/ipe.rst                |  559 +++++++++
- MAINTAINERS                                   |    9 +
- block/bdev.c                                  |    7 +
- drivers/md/dm-verity-target.c                 |   25 +-
- drivers/md/dm-verity-verify-sig.c             |   16 +-
- drivers/md/dm-verity-verify-sig.h             |   10 +-
- fs/verity/fsverity_private.h                  |    2 +-
- fs/verity/open.c                              |   13 +-
- fs/verity/signature.c                         |    1 +
- include/asm-generic/vmlinux.lds.h             |   16 +
- include/linux/blk_types.h                     |    1 +
- include/linux/dm-verity.h                     |   19 +
- include/linux/fsverity.h                      |    2 +
- include/linux/lsm_hook_defs.h                 |    5 +
- include/linux/lsm_hooks.h                     |   12 +
- include/linux/security.h                      |   22 +
- include/uapi/linux/audit.h                    |    1 +
- scripts/Makefile                              |    1 +
- scripts/ipe/Makefile                          |    2 +
- scripts/ipe/polgen/.gitignore                 |    1 +
- scripts/ipe/polgen/Makefile                   |    6 +
- scripts/ipe/polgen/polgen.c                   |  145 +++
- security/Kconfig                              |   11 +-
- security/Makefile                             |    1 +
- security/ipe/.gitignore                       |    1 +
- security/ipe/Kconfig                          |  101 ++
- security/ipe/Makefile                         |   37 +
- security/ipe/audit.c                          |  227 ++++
- security/ipe/audit.h                          |   39 +
- security/ipe/ctx.c                            |  368 ++++++
- security/ipe/ctx.h                            |   43 +
- security/ipe/ctx_test.c                       |  718 ++++++++++++
- security/ipe/eval.c                           |  240 ++++
- security/ipe/eval.h                           |   52 +
- security/ipe/fs.c                             |  340 ++++++
- security/ipe/fs.h                             |   13 +
- security/ipe/hooks.c                          |  298 +++++
- security/ipe/hooks.h                          |   45 +
- security/ipe/ipe.c                            |  159 +++
- security/ipe/ipe.h                            |   28 +
- security/ipe/ipe_parser.h                     |   59 +
- security/ipe/modules.c                        |  272 +++++
- security/ipe/modules.h                        |   17 +
- security/ipe/modules/Kconfig                  |   66 ++
- security/ipe/modules/Makefile                 |   12 +
- security/ipe/modules/boot_verified.c          |   26 +
- security/ipe/modules/dmverity_roothash.c      |   31 +
- security/ipe/modules/dmverity_signature.c     |   26 +
- security/ipe/modules/fsverity_digest.c        |   39 +
- security/ipe/modules/fsverity_signature.c     |   34 +
- security/ipe/modules/ipe_module.h             |   46 +
- security/ipe/parsers.c                        |  143 +++
- security/ipe/parsers/Makefile                 |   12 +
- security/ipe/parsers/default.c                |  106 ++
- security/ipe/parsers/policy_header.c          |  126 ++
- security/ipe/policy.c                         | 1037 +++++++++++++++++
- security/ipe/policy.h                         |  113 ++
- security/ipe/policy_parser_tests.c            |  313 +++++
- security/ipe/policyfs.c                       |  528 +++++++++
- security/security.c                           |   70 ++
- 64 files changed, 7409 insertions(+), 16 deletions(-)
- create mode 100644 Documentation/admin-guide/LSM/ipe.rst
- create mode 100644 Documentation/security/ipe.rst
- create mode 100644 include/linux/dm-verity.h
- create mode 100644 scripts/ipe/Makefile
- create mode 100644 scripts/ipe/polgen/.gitignore
- create mode 100644 scripts/ipe/polgen/Makefile
- create mode 100644 scripts/ipe/polgen/polgen.c
- create mode 100644 security/ipe/.gitignore
- create mode 100644 security/ipe/Kconfig
- create mode 100644 security/ipe/Makefile
+  + Remove enforcing parameter passed from the context structure
+    for AUDIT_IPE_ACCESS.
+    +  This field can be inferred from the SYSCALL audit event,
+       based on the success field.
+
+  + Remove all fields already captured in the syscall record. "hook",
+    an IPE specific field, can be determined via the syscall field in
+    the syscall record itself, so it has been removed.
+      + ino, path, and dev in IPE's record refer to the subject of the
+        syscall, while the syscall record refers to the calling process.
+
+  + remove IPE prefix from policy load/policy activation events
+  + fix a bug wherein a policy change audit record was not fired when
+    updating a policy
+---
+ security/ipe/Kconfig              |  55 +++++++++
+ security/ipe/Makefile             |   2 +
+ security/ipe/audit.c              | 184 ++++++++++++++++++++++++++++++
+ security/ipe/audit.h              |  34 ++++++
+ security/ipe/ctx.c                |  21 ++++
+ security/ipe/ctx.h                |   2 +
+ security/ipe/eval.c               |   9 ++
+ security/ipe/eval.h               |   7 ++
+ security/ipe/fs.c                 |  79 +++++++++++++
+ security/ipe/modules/ipe_module.h |   2 +
+ 10 files changed, 395 insertions(+)
  create mode 100644 security/ipe/audit.c
  create mode 100644 security/ipe/audit.h
- create mode 100644 security/ipe/ctx.c
- create mode 100644 security/ipe/ctx.h
- create mode 100644 security/ipe/ctx_test.c
- create mode 100644 security/ipe/eval.c
- create mode 100644 security/ipe/eval.h
- create mode 100644 security/ipe/fs.c
- create mode 100644 security/ipe/fs.h
- create mode 100644 security/ipe/hooks.c
- create mode 100644 security/ipe/hooks.h
- create mode 100644 security/ipe/ipe.c
- create mode 100644 security/ipe/ipe.h
- create mode 100644 security/ipe/ipe_parser.h
- create mode 100644 security/ipe/modules.c
- create mode 100644 security/ipe/modules.h
- create mode 100644 security/ipe/modules/Kconfig
- create mode 100644 security/ipe/modules/Makefile
- create mode 100644 security/ipe/modules/boot_verified.c
- create mode 100644 security/ipe/modules/dmverity_roothash.c
- create mode 100644 security/ipe/modules/dmverity_signature.c
- create mode 100644 security/ipe/modules/fsverity_digest.c
- create mode 100644 security/ipe/modules/fsverity_signature.c
- create mode 100644 security/ipe/modules/ipe_module.h
- create mode 100644 security/ipe/parsers.c
- create mode 100644 security/ipe/parsers/Makefile
- create mode 100644 security/ipe/parsers/default.c
- create mode 100644 security/ipe/parsers/policy_header.c
- create mode 100644 security/ipe/policy.c
- create mode 100644 security/ipe/policy.h
- create mode 100644 security/ipe/policy_parser_tests.c
- create mode 100644 security/ipe/policyfs.c
 
---
+diff --git a/security/ipe/Kconfig b/security/ipe/Kconfig
+index e4875fb04883..1ad2f34b98ec 100644
+--- a/security/ipe/Kconfig
++++ b/security/ipe/Kconfig
+@@ -15,3 +15,58 @@ menuconfig SECURITY_IPE
+ 	  admins to reconfigure trust requirements on the fly.
+ 
+ 	  If unsure, answer N.
++
++if SECURITY_IPE
++
++config IPE_AUDIT
++	bool "Enable IPE's audit events"
++	depends on AUDIT && AUDITSYSCALL
++	help
++	  This option causes IPE to emit audit records on certain key
++	  events during IPE's normal operation. Examples include:
++	  when an action is denied by IPE policy, when a new policy is
++	  loaded, and when a new policy is active. This allows system
++	  admins to analyze what is happening on their systems, and
++	  validate through audit records that IPE is responsible for
++	  certain behaviors.
++
++	  if unsure, answer Y.
++
++choice
++	prompt "Hash algorithm used in auditing policies"
++	default IPE_AUDIT_HASH_SHA1
++	depends on IPE_AUDIT
++	help
++	  Specify the hash algorithm used when auditing policies.
++	  The hash is used to uniquely identify a policy from other
++	  policies on the system.
++
++	  If unsure, leave default.
++
++	config IPE_AUDIT_HASH_SHA1
++		bool "sha1"
++		select CRYPTO_SHA1
++
++	config IPE_AUDIT_HASH_SHA256
++		bool "sha256"
++		select CRYPTO_SHA256
++
++	config IPE_AUDIT_HASH_SHA384
++		bool "sha384"
++		select CRYPTO_SHA512
++
++	config IPE_AUDIT_HASH_SHA512
++		bool "sha512"
++		select CRYPTO_SHA512
++
++endchoice
++
++config IPE_AUDIT_HASH_ALG
++	string
++	depends on IPE_AUDIT
++	default "sha1" if IPE_AUDIT_HASH_SHA1
++	default "sha256" if IPE_AUDIT_HASH_SHA256
++	default "sha384" if IPE_AUDIT_HASH_SHA384
++	default "sha512" if IPE_AUDIT_HASH_SHA512
++
++endif
+diff --git a/security/ipe/Makefile b/security/ipe/Makefile
+index d5660a17364c..25a7d7c8f07c 100644
+--- a/security/ipe/Makefile
++++ b/security/ipe/Makefile
+@@ -18,3 +18,5 @@ obj-$(CONFIG_SECURITY_IPE) += \
+ 	parsers.o \
+ 	policy.o \
+ 	policyfs.o \
++
++obj-$(CONFIG_IPE_AUDIT) += audit.o
+diff --git a/security/ipe/audit.c b/security/ipe/audit.c
+new file mode 100644
+index 000000000000..0442cc51a4bd
+--- /dev/null
++++ b/security/ipe/audit.c
+@@ -0,0 +1,184 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#include "ipe.h"
++#include "eval.h"
++#include "hooks.h"
++#include "policy.h"
++#include "audit.h"
++#include "modules/ipe_module.h"
++
++#include <linux/slab.h>
++#include <linux/audit.h>
++#include <linux/types.h>
++#include <crypto/hash.h>
++
++#define ACTSTR(x) ((x) == ipe_action_allow ? "ALLOW" : "DENY")
++
++#define POLICY_LOAD_FMT "policy_name=\"%s\" policy_version=%hu.%hu.%hu "\
++			CONFIG_IPE_AUDIT_HASH_ALG "="
++
++static const char *const audit_op_names[ipe_operation_max] = {
++	"EXECUTE",
++	"FIRMWARE",
++	"KMODULE",
++	"KEXEC_IMAGE",
++	"KEXEC_INITRAMFS",
++	"IMA_POLICY",
++	"IMA_X509_CERT",
++};
++
++/**
++ * audit_rule: audit an IPE policy rule approximation.
++ * @ab: Supplies a poniter to the audit_buffer to append to.
++ * @r: Supplies a pointer to the ipe_rule to approximate a string form for.
++ *
++ * This is an approximation because aliases like "KERNEL_READ" will be
++ * emitted in their expanded form.
++ */
++static void audit_rule(struct audit_buffer *ab, const struct ipe_rule *r)
++{
++	const struct ipe_policy_mod *ptr;
++
++	audit_log_format(ab, "rule=\"op=%s ", audit_op_names[r->op]);
++
++	list_for_each_entry(ptr, &r->modules, next) {
++		audit_log_format(ab, "%s=", ptr->mod->name);
++
++		ptr->mod->audit(ab, ptr->mod_value);
++
++		audit_log_format(ab, " ");
++	}
++
++	audit_log_format(ab, "action=%s\"", ACTSTR(r->action));
++}
++
++/**
++ * ipe_audit_match: audit a match for IPE policy.
++ * @ctx: Supplies a poniter to the evaluation context that was used in the
++ *	 evaluation.
++ * @match_type: Supplies the scope of the match: rule, operation default,
++ *		global default.
++ * @act: Supplies the IPE's evaluation decision, deny or allow.
++ * @r: Supplies a pointer to the rule that was matched, if possible.
++ * @enforce: Supplies the enforcement/permissive state at the point
++ *	     the enforcement decision was made.
++ */
++void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
++		     enum ipe_match match_type,
++		     enum ipe_action act, const struct ipe_rule *const r)
++{
++	bool success_audit;
++	struct inode *inode;
++	struct audit_buffer *ab;
++	const char *op = audit_op_names[ctx->op];
++
++	rcu_read_lock();
++	success_audit = READ_ONCE(ctx->ci_ctx->success_audit);
++	rcu_read_unlock();
++
++	if (act != ipe_action_deny && !success_audit)
++		return;
++
++	ab = audit_log_start(audit_context(), GFP_KERNEL, AUDIT_IPE_ACCESS);
++	if (!ab)
++		return;
++
++	if (ctx->file) {
++		audit_log_d_path(ab, "path=", &ctx->file->f_path);
++		inode = file_inode(ctx->file);
++		if (inode) {
++			audit_log_format(ab, " dev=");
++			audit_log_untrustedstring(ab, inode->i_sb->s_id);
++			audit_log_format(ab, " ino=%lu ", inode->i_ino);
++		}
++	}
++
++	if (match_type == ipe_match_rule)
++		audit_rule(ab, r);
++	else if (match_type == ipe_match_table)
++		audit_log_format(ab, "rule=\"DEFAULT op=%s action=%s\"", op,
++				 ACTSTR(act));
++	else
++		audit_log_format(ab, "rule=\"DEFAULT action=%s\"",
++				 ACTSTR(act));
++
++	audit_log_end(ab);
++}
++
++/**
++ * audit_policy: Audit a policy's name, version and thumprint to @ab
++ * @ab: Supplies a pointer to the audit buffer to append to.
++ * @p: Supplies a pointer to the policy to audit
++ */
++static void audit_policy(struct audit_buffer *ab,
++			 const struct ipe_policy *const p)
++{
++	u8 *digest = NULL;
++	struct crypto_shash *tfm;
++	SHASH_DESC_ON_STACK(desc, tfm);
++
++	tfm = crypto_alloc_shash(CONFIG_IPE_AUDIT_HASH_ALG, 0, 0);
++	if (IS_ERR(tfm))
++		return;
++
++	desc->tfm = tfm;
++
++	digest = kzalloc(crypto_shash_digestsize(tfm), GFP_KERNEL);
++	if (!digest)
++		goto out;
++
++	if (crypto_shash_init(desc))
++		goto out;
++
++	if (crypto_shash_update(desc, p->pkcs7, p->pkcs7len))
++		goto out;
++
++	if (crypto_shash_final(desc, digest))
++		goto out;
++
++	audit_log_format(ab, POLICY_LOAD_FMT, p->parsed->name,
++			 p->parsed->version.major, p->parsed->version.minor,
++			 p->parsed->version.rev);
++	audit_log_n_hex(ab, digest, crypto_shash_digestsize(tfm));
++
++out:
++	kfree(digest);
++	crypto_free_shash(tfm);
++}
++
++/**
++ * ipe_audit_policy_activation: Audit a policy being made the active policy.
++ * @p: Supplies a pointer to the policy to audit
++ */
++void ipe_audit_policy_activation(const struct ipe_policy *const p)
++{
++	struct audit_buffer *ab;
++
++	ab = audit_log_start(audit_context(), GFP_KERNEL, AUDIT_MAC_CONFIG_CHANGE);
++	if (!ab)
++		return;
++
++	audit_policy(ab, p);
++
++	audit_log_end(ab);
++}
++
++/**
++ * ipe_audit_policy_load: Audit a policy being loaded into the kernel.
++ * @p: Supplies a pointer to the policy to audit
++ */
++void ipe_audit_policy_load(const struct ipe_policy *const p)
++{
++	struct audit_buffer *ab;
++
++	ab = audit_log_start(audit_context(), GFP_KERNEL, AUDIT_MAC_POLICY_LOAD);
++	if (!ab)
++		return;
++
++	audit_policy(ab, p);
++
++	audit_log_end(ab);
++}
+diff --git a/security/ipe/audit.h b/security/ipe/audit.h
+new file mode 100644
+index 000000000000..bec03208042d
+--- /dev/null
++++ b/security/ipe/audit.h
+@@ -0,0 +1,34 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * Copyright (C) Microsoft Corporation. All rights reserved.
++ */
++
++#ifndef IPE_AUDIT_H
++#define IPE_AUDIT_H
++
++#include "ipe.h"
++#include "eval.h"
++
++#ifdef CONFIG_IPE_AUDIT
++void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
++		     enum ipe_match match_type,
++		     enum ipe_action act, const struct ipe_rule *const r);
++void ipe_audit_policy_load(const struct ipe_policy *const p);
++void ipe_audit_policy_activation(const struct ipe_policy *const p);
++#else
++static inline void ipe_audit_match(const struct ipe_eval_ctx *const ctx,
++				   enum ipe_match match_type,
++				   enum ipe_action act, const struct ipe_rule *const r)
++{
++}
++
++static inline void ipe_audit_policy_load(const struct ipe_policy *const p)
++{
++}
++
++static inline void ipe_audit_policy_activation(const struct ipe_policy *const p)
++{
++}
++#endif /* CONFIG_IPE_AUDIT */
++
++#endif /* IPE_AUDIT_H */
+diff --git a/security/ipe/ctx.c b/security/ipe/ctx.c
+index 177f60f02ed4..391c7102e08d 100644
+--- a/security/ipe/ctx.c
++++ b/security/ipe/ctx.c
+@@ -6,12 +6,16 @@
+ #include "ipe.h"
+ #include "ctx.h"
+ #include "policy.h"
++#include "audit.h"
+ 
+ #include <linux/slab.h>
+ #include <linux/types.h>
+ #include <linux/parser.h>
+ #include <linux/refcount.h>
+ #include <linux/spinlock.h>
++#include <linux/moduleparam.h>
++
++static bool success_audit;
+ 
+ /**
+  * ver_to_u64: convert an internal ipe_policy_version to a u64
+@@ -217,6 +221,9 @@ int ipe_replace_policy(struct ipe_policy *old, struct ipe_policy *new)
+ 	spin_unlock(&ctx->lock);
+ 	synchronize_rcu();
+ 
++	if (!rc)
++		ipe_audit_policy_load(new);
++
+ 	ipe_put_policy(p);
+ 	ipe_put_ctx(ctx);
+ 	return rc;
+@@ -249,6 +256,7 @@ int ipe_set_active_pol(const struct ipe_policy *p)
+ 	spin_unlock(&ctx->lock);
+ 	synchronize_rcu();
+ 
++	ipe_audit_policy_activation(p);
+ out:
+ 	ipe_put_policy(ap);
+ 	ipe_put_ctx(ctx);
+@@ -314,6 +322,10 @@ int __init ipe_init_ctx(void)
+ 		goto err;
+ 	}
+ 
++	spin_lock(&lns->lock);
++	WRITE_ONCE(lns->success_audit, success_audit);
++	spin_unlock(&lns->lock);
++
+ 	rcu_assign_pointer(*ipe_tsk_ctx(current), lns);
+ 
+ 	return 0;
+@@ -321,3 +333,12 @@ int __init ipe_init_ctx(void)
+ 	ipe_put_ctx(lns);
+ 	return rc;
+ }
++
++/* Set the right module name */
++#ifdef KBUILD_MODNAME
++#undef KBUILD_MODNAME
++#define KBUILD_MODNAME "ipe"
++#endif
++
++module_param(success_audit, bool, 0400);
++MODULE_PARM_DESC(success_audit, "Start IPE with success auditing enabled");
+diff --git a/security/ipe/ctx.h b/security/ipe/ctx.h
+index fe11fb767788..31aea2fb9e49 100644
+--- a/security/ipe/ctx.h
++++ b/security/ipe/ctx.h
+@@ -15,6 +15,8 @@
+ struct ipe_context {
+ 	struct ipe_policy __rcu *active_policy;
+ 
++	bool __rcu success_audit;
++
+ 	refcount_t refcount;
+ 	/* Protects concurrent writers */
+ 	spinlock_t lock;
+diff --git a/security/ipe/eval.c b/security/ipe/eval.c
+index b3e4277fe6bd..fcfa3a37b0ed 100644
+--- a/security/ipe/eval.c
++++ b/security/ipe/eval.c
+@@ -9,6 +9,7 @@
+ #include "hooks.h"
+ #include "policy.h"
+ #include "modules/ipe_module.h"
++#include "audit.h"
+ 
+ #include <linux/slab.h>
+ #include <linux/file.h>
+@@ -71,7 +72,9 @@ static int evaluate(const struct ipe_eval_ctx *const ctx)
+ {
+ 	int rc = 0;
+ 	bool match = false;
++	bool enforcing = true;
+ 	enum ipe_action action;
++	enum ipe_match match_type;
+ 	struct ipe_policy *pol = NULL;
+ 	const struct ipe_rule *rule = NULL;
+ 	const struct ipe_policy_mod *module = NULL;
+@@ -83,6 +86,7 @@ static int evaluate(const struct ipe_eval_ctx *const ctx)
+ 
+ 	if (ctx->op == ipe_operation_max) {
+ 		action = pol->parsed->global_default;
++		match_type = ipe_match_global;
+ 		goto eval;
+ 	}
+ 
+@@ -100,13 +104,18 @@ static int evaluate(const struct ipe_eval_ctx *const ctx)
+ 
+ 	if (match) {
+ 		action = rule->action;
++		match_type = ipe_match_rule;
+ 	} else if (rules->default_action != ipe_action_max) {
+ 		action = rules->default_action;
++		match_type = ipe_match_table;
+ 	} else {
+ 		action = pol->parsed->global_default;
++		match_type = ipe_match_global;
+ 	}
+ 
+ eval:
++	ipe_audit_match(ctx, match_type, action, rule);
++
+ 	if (action == ipe_action_deny)
+ 		rc = -EACCES;
+ 
+diff --git a/security/ipe/eval.h b/security/ipe/eval.h
+index bc3a5da3badc..50bc16b0be25 100644
+--- a/security/ipe/eval.h
++++ b/security/ipe/eval.h
+@@ -19,6 +19,13 @@ struct ipe_eval_ctx {
+ 	struct ipe_context *ci_ctx;
+ };
+ 
++enum ipe_match {
++	ipe_match_rule = 0,
++	ipe_match_table,
++	ipe_match_global,
++	ipe_match_max
++};
++
+ int ipe_process_event(const struct file *file, enum ipe_operation op);
+ 
+ #endif /* IPE_EVAL_H */
+diff --git a/security/ipe/fs.c b/security/ipe/fs.c
+index 18100cfbd8d5..6e28807780c0 100644
+--- a/security/ipe/fs.c
++++ b/security/ipe/fs.c
+@@ -5,6 +5,7 @@
+ #include "ipe.h"
+ #include "fs.h"
+ #include "policy.h"
++#include "audit.h"
+ 
+ #include <linux/dcache.h>
+ #include <linux/security.h>
+@@ -12,6 +13,70 @@
+ static struct dentry *np __ro_after_init;
+ static struct dentry *root __ro_after_init;
+ static struct dentry *config __ro_after_init;
++static struct dentry *success_audit __ro_after_init;
++
++/**
++ * setaudit: Write handler for the securityfs node, "ipe/success_audit"
++ * @f: Supplies a file structure representing the securityfs node.
++ * @data: Supplies a buffer passed to the write syscall
++ * @len: Supplies the length of @data
++ * @offset: unused.
++ *
++ * Return:
++ * >0 - Success, Length of buffer written
++ * <0 - Error
++ */
++static ssize_t setaudit(struct file *f, const char __user *data,
++			size_t len, loff_t *offset)
++{
++	int rc = 0;
++	bool value;
++	struct ipe_context *ctx;
++
++	if (!file_ns_capable(f, &init_user_ns, CAP_MAC_ADMIN))
++		return -EPERM;
++
++	rc = kstrtobool_from_user(data, len, &value);
++	if (rc)
++		return rc;
++
++	ctx = ipe_current_ctx();
++
++	spin_lock(&ctx->lock);
++	WRITE_ONCE(ctx->success_audit, value);
++	spin_unlock(&ctx->lock);
++	synchronize_rcu();
++
++	ipe_put_ctx(ctx);
++	return len;
++}
++
++/**
++ * getaudit: Read handler for the securityfs node, "ipe/success_audit"
++ * @f: Supplies a file structure representing the securityfs node.
++ * @data: Supplies a buffer passed to the read syscall
++ * @len: Supplies the length of @data
++ * @offset: unused.
++ *
++ * Return:
++ * >0 - Success, Length of buffer written
++ * <0 - Error
++ */
++static ssize_t getaudit(struct file *f, char __user *data,
++			size_t len, loff_t *offset)
++{
++	const char *result;
++	struct ipe_context *ctx;
++
++	ctx = ipe_current_ctx();
++
++	rcu_read_lock();
++	result = ((READ_ONCE(ctx->success_audit)) ? "1" : "0");
++	rcu_read_unlock();
++
++	ipe_put_ctx(ctx);
++	return simple_read_from_buffer(data, len, offset, result, 2);
++}
+ 
+ /**
+  * new_policy: Write handler for the securityfs node, "ipe/new_policy"
+@@ -54,6 +119,7 @@ static ssize_t new_policy(struct file *f, const char __user *data,
+ 		goto err;
+ 
+ 	ipe_add_policy(ctx, p);
++	ipe_audit_policy_load(p);
+ err:
+ 	ipe_put_policy(p);
+ 	ipe_put_ctx(ctx);
+@@ -119,6 +185,11 @@ static const struct file_operations np_fops = {
+ 	.write = new_policy,
+ };
+ 
++static const struct file_operations audit_fops = {
++	.write = setaudit,
++	.read = getaudit,
++};
++
+ /**
+  * ipe_init_securityfs: Initialize IPE's securityfs tree at fsinit
+  *
+@@ -155,6 +226,13 @@ static int __init ipe_init_securityfs(void)
+ 		goto err;
+ 	}
+ 
++	success_audit = securityfs_create_file("success_audit", 0600, root,
++					       NULL, &audit_fops);
++	if (IS_ERR(success_audit)) {
++		rc = PTR_ERR(success_audit);
++		goto err;
++	}
++
+ 	ctx->policy_root = securityfs_create_dir("policies", root);
+ 	if (IS_ERR(ctx->policy_root)) {
+ 		rc = PTR_ERR(ctx->policy_root);
+@@ -166,6 +244,7 @@ static int __init ipe_init_securityfs(void)
+ 	securityfs_remove(np);
+ 	securityfs_remove(root);
+ 	securityfs_remove(config);
++	securityfs_remove(success_audit);
+ 	securityfs_remove(ctx->policy_root);
+ 	return rc;
+ }
+diff --git a/security/ipe/modules/ipe_module.h b/security/ipe/modules/ipe_module.h
+index 1157c5363048..1381ab977da5 100644
+--- a/security/ipe/modules/ipe_module.h
++++ b/security/ipe/modules/ipe_module.h
+@@ -6,6 +6,7 @@
+ #define IPE_MODULE_H
+ 
+ #include <linux/types.h>
++#include <linux/audit.h>
+ #include "../eval.h"
+ 
+ /**
+@@ -26,6 +27,7 @@ struct ipe_module {
+ 	void (*free)(void **value);			/* optional */
+ 	bool (*eval)(const struct ipe_eval_ctx *ctx,	/* required */
+ 		     const void *val);
++	void (*audit)(struct audit_buffer *ab, const void *val); /* required */
+ };
+ 
+ #define IPE_MODULE(parser)				\
+-- 
 2.25.1
+
