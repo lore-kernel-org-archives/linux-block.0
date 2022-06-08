@@ -2,111 +2,243 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2778C433EF
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 05:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4A2C43334
+	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 06:44:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233694AbiFHF2c (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 01:28:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56628 "EHLO
+        id S230330AbiFHGoA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 02:44:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233741AbiFHF2O (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 01:28:14 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6F7F177054
-        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 19:42:41 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id s14so16425716plk.8
-        for <linux-block@vger.kernel.org>; Tue, 07 Jun 2022 19:42:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=eACAcP76K1gXeQHMPXfrh6MRwMHogkqclcM3ucohxaU=;
-        b=DtL5BKl38TK1JmQCoo9VNTuilRXtIQQb8aA+2j5JWDKkTJMcHWV5I4ayrf85wEAp/D
-         +SPamuT0V/GS1H3+TGA7bsJrj/vQJTAzHMhmUFqbAjw6QppecD8ydZLJWGxGusTbuS3B
-         DrmzebuZhbfui1ZylFkqA44lBIOUX+RiD7kEk=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=eACAcP76K1gXeQHMPXfrh6MRwMHogkqclcM3ucohxaU=;
-        b=iW1aPxPC80cn8l4KCALpqOMXzRs2KSyPHS551ZcZ6+gvg1KYCNTuWmFu2ZLoP8WYrY
-         dvmuK7FWhvhIeUK/jgyy0Lq5tznZKhiEV6KyPtFrGTYdSz0m34ykG06+lF5R8a8snzQV
-         cDArt5X4gK3XCT94T1qnhR/XBhGCPw+OVR+L/8EWazgdMhv86fVEV5mUWwqCGFhOhl3d
-         zyMVb/kKpkNsu8FJKUdVmpIrqFXR6xn4jkSMiXF3xgzr8t3jS3hExUBWbWhzFPV0GLz1
-         6za1nDBQFIfh4FNf8tF6yuddQRVbfh1mHHVAyHnXVkevkzcsc1q8px5yFu8uELFUkwZZ
-         j/BA==
-X-Gm-Message-State: AOAM532Q1FSlYCToU1XRaleRl/2OBF3EotWaqkQ+cA4Eq3oDEBrLhHI1
-        tBkSC3kV8BJr+8hG9+JP4P82qg==
-X-Google-Smtp-Source: ABdhPJzYCcpDtcoi5LZAO+0GSYALVef0pXg5v/EV8ii/oeXqYV5OV4RF4wJ5iDiynw1qdkxhjkSp7A==
-X-Received: by 2002:a17:902:6bc6:b0:166:3c39:50a1 with SMTP id m6-20020a1709026bc600b001663c3950a1mr31493176plt.36.1654656158650;
-        Tue, 07 Jun 2022 19:42:38 -0700 (PDT)
-Received: from google.com ([2401:fa00:8f:203:463d:a192:6128:66e])
-        by smtp.gmail.com with ESMTPSA id n7-20020aa78a47000000b0051bb61c0eacsm13512317pfa.20.2022.06.07.19.42.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Jun 2022 19:42:38 -0700 (PDT)
-Date:   Wed, 8 Jun 2022 11:42:33 +0900
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Minchan Kim <minchan@kernel.org>
-Cc:     Naresh Kamboju <naresh.kamboju@linaro.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-fsdevel@vger.kernel.org,
-        Linux ARM <linux-arm-kernel@lists.infradead.org>,
-        "open list:KERNEL SELFTEST FRAMEWORK" 
-        <linux-kselftest@vger.kernel.org>,
-        linux-block <linux-block@vger.kernel.org>,
-        regressions@lists.linux.dev, Jens Axboe <axboe@kernel.dk>,
-        Nitin Gupta <ngupta@vflare.org>,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: Re: qemu-arm: zram: mkfs.ext4 : Unable to handle kernel NULL pointer
- dereference at virtual address 00000140
-Message-ID: <YqAMmTiwcyS3Ttla@google.com>
-References: <CA+G9fYtVOfWWpx96fa3zzKzBPKiNu1w3FOD4j++G8MOG3Vs0EA@mail.gmail.com>
- <Yp47DODPCz0kNgE8@google.com>
- <CA+G9fYsjn0zySHU4YYNJWAgkABuJuKtHty7ELHmN-+30VYgCDA@mail.gmail.com>
- <Yp/kpPA7GdbArXDo@google.com>
- <YqAL+HeZDk5Wug28@google.com>
+        with ESMTP id S234691AbiFHGe2 (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 02:34:28 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB7344578B
+        for <linux-block@vger.kernel.org>; Tue,  7 Jun 2022 23:34:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
+        :Reply-To:Content-Type:Content-ID:Content-Description;
+        bh=K+NAFYrqZWqm32DoEkXhJem4nw/Y+8UPZvD0lotRpPA=; b=YnYs6RUq90jHVBzO5WWEmq8W/I
+        0d3OTz5rh5Tu5U9FDR7FI7mXcB5wj0CUq7Mxn+N7illyR43I9oSBSX1MpsrHkWh7SmRDLAoBliow9
+        Q0mNyYT29vAPi6wYxXLRsy3+XYnKxFybnk/yjSSAXn46rBoPYbpo6FdXtfh5lEEZaW0GFVO+gMS02
+        E6VwGxuUWsklT5bBk0LvpYOxUNtX96rjdPNyCUvWtK2Yit0L7rcznhHmFWZX8BYGdqxCc2gtKMAgu
+        NbThiG9f0t19//7bgb6XPfR0CRoqjYT3inbPFb5WVfWgHGP/d+lhabSjH8YuW40R8wJ7duAdx82P0
+        tR/WRATg==;
+Received: from [2001:4bb8:190:726c:66c4:f635:4b37:bdda] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1nypGo-00BJUc-RV; Wed, 08 Jun 2022 06:34:23 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Mike Snitzer <snitzer@kernel.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: [PATCH 4/4] dm: refactor dm_md_mempool allocation
+Date:   Wed,  8 Jun 2022 08:34:09 +0200
+Message-Id: <20220608063409.1280968-5-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220608063409.1280968-1-hch@lst.de>
+References: <20220608063409.1280968-1-hch@lst.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YqAL+HeZDk5Wug28@google.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On (22/06/08 11:39), Sergey Senozhatsky wrote:
-> On (22/06/07 16:52), Minchan Kim wrote:
-> > > rootfs: https://oebuilds.tuxbuild.com/29zhlbEc3EWq2wod9Uy964Bp27q/images/am57xx-evm/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4.gz
-> > > kernel: https://builds.tuxbuild.com/29zhqJJizU2Y7Ka7ArhryUOrNDC/zImage
-> > > 
-> > > Boot command,
-> > >  /usr/bin/qemu-system-aarch64 -cpu host,aarch64=off -machine
-> > > virt-2.10,accel=kvm -nographic -net
-> > > nic,model=virtio,maaacaddr=BA:DD:AD:CC:09:04 -net tap -m 2048 -monitor
-> > > none -kernel kernel/zImage --append "console=ttyAMA0 root=/dev/vda rw"
-> > > -hda rootfs/rpb-console-image-lkft-am57xx-evm-20220601222434.rootfs.ext4
-> > > -m 4096 -smp 2
-> > > 
-> > > # cd /opt/kselftests/default-in-kernel/zram
-> > > # ./zram.sh
-> > > 
-> > > Allow me sometime I will try to bisect this problem.
-> > 
-> > Thanks for sharing the info. 
-> > 
-> > I managed to work your rootfs with my local arm build
-> > based on the problematic git tip. 
-> > However, I couldn't suceed to reproduce it.
-> > 
-> > I needed to build zsmalloc/zram built-in instead of modules
-> > Is it related? Hmm,
-> > 
-> > Yeah, It would be very helpful if you could help to bisect it.
-> 
-> This looks like a NULL lock->name dereference in lockdep. I suspect
-> that somehow local_lock doesn't get .dep_map initialized. Maybe running
-> the kernel with CONFIG_DEBUG_LOCK_ALLOC would help us? Naresh, can you
-> help us with this?
+The current split between dm_table_alloc_md_mempools and
+dm_alloc_md_mempools is rather arbitrary, so merge the two
+into one easy to follow function.
 
-Hmm, actually, hold on. mapping_area is per-CPU, so what happens if CPU
-get offlined and onlined again? I don't see us re-initializing mapping_area
-local_lock_init(&zs_map_area.lock) and so on.
+Signed-off-by: Christoph Hellwig <hch@lst.de>
+---
+ drivers/md/dm-core.h  |  3 +++
+ drivers/md/dm-table.c | 57 +++++++++++++++++++++++++++++++------------
+ drivers/md/dm.c       | 52 ---------------------------------------
+ drivers/md/dm.h       |  3 ---
+ 4 files changed, 44 insertions(+), 71 deletions(-)
+
+diff --git a/drivers/md/dm-core.h b/drivers/md/dm-core.h
+index 54c0473a51dde..eea3922f1abc6 100644
+--- a/drivers/md/dm-core.h
++++ b/drivers/md/dm-core.h
+@@ -230,6 +230,9 @@ struct dm_target_io {
+ 	sector_t old_sector;
+ 	struct bio clone;
+ };
++#define DM_TARGET_IO_BIO_OFFSET (offsetof(struct dm_target_io, clone))
++#define DM_IO_BIO_OFFSET \
++	(offsetof(struct dm_target_io, clone) + offsetof(struct dm_io, tio))
+ 
+ /*
+  * dm_target_io flags
+diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
+index bd539afbfe88f..3f29b1113294e 100644
+--- a/drivers/md/dm-table.c
++++ b/drivers/md/dm-table.c
+@@ -6,6 +6,7 @@
+  */
+ 
+ #include "dm-core.h"
++#include "dm-rq.h"
+ 
+ #include <linux/module.h>
+ #include <linux/vmalloc.h>
+@@ -1010,32 +1011,56 @@ static bool dm_table_supports_poll(struct dm_table *t);
+ static int dm_table_alloc_md_mempools(struct dm_table *t, struct mapped_device *md)
+ {
+ 	enum dm_queue_mode type = dm_table_get_type(t);
+-	unsigned per_io_data_size = 0;
+-	unsigned min_pool_size = 0;
+-	struct dm_target *ti;
+-	unsigned i;
+-	bool poll_supported = false;
++	unsigned int per_io_data_size = 0, front_pad, io_front_pad;
++	unsigned int min_pool_size = 0, pool_size;
++	struct dm_md_mempools *pools;
+ 
+ 	if (unlikely(type == DM_TYPE_NONE)) {
+ 		DMWARN("no table type is set, can't allocate mempools");
+ 		return -EINVAL;
+ 	}
+ 
+-	if (__table_type_bio_based(type)) {
+-		for (i = 0; i < t->num_targets; i++) {
+-			ti = t->targets + i;
+-			per_io_data_size = max(per_io_data_size, ti->per_io_data_size);
+-			min_pool_size = max(min_pool_size, ti->num_flush_bios);
+-		}
+-		poll_supported = dm_table_supports_poll(t);
++	pools = kzalloc_node(sizeof(*pools), GFP_KERNEL, md->numa_node_id);
++	if (!pools)
++		return -ENOMEM;
++
++	if (type == DM_TYPE_REQUEST_BASED) {
++		pool_size = dm_get_reserved_rq_based_ios();
++		front_pad = offsetof(struct dm_rq_clone_bio_info, clone);
++		goto init_bs;
+ 	}
+ 
+-	t->mempools = dm_alloc_md_mempools(md, type, per_io_data_size, min_pool_size,
+-					   t->integrity_supported, poll_supported);
+-	if (!t->mempools)
+-		return -ENOMEM;
++	for (unsigned int i = 0; i < t->num_targets; i++) {
++		struct dm_target *ti = t->targets + i;
+ 
++		per_io_data_size = max(per_io_data_size, ti->per_io_data_size);
++		min_pool_size = max(min_pool_size, ti->num_flush_bios);
++	}
++	pool_size = max(dm_get_reserved_bio_based_ios(), min_pool_size);
++	front_pad = roundup(per_io_data_size,
++		__alignof__(struct dm_target_io)) + DM_TARGET_IO_BIO_OFFSET;
++
++	io_front_pad = roundup(per_io_data_size,
++		__alignof__(struct dm_io)) + DM_IO_BIO_OFFSET;
++	if (bioset_init(&pools->io_bs, pool_size, io_front_pad,
++			dm_table_supports_poll(t) ? BIOSET_PERCPU_CACHE : 0))
++		goto out_free_pools;
++	if (t->integrity_supported &&
++	    bioset_integrity_create(&pools->io_bs, pool_size))
++		goto out_free_pools;
++init_bs:
++	if (bioset_init(&pools->bs, pool_size, front_pad, 0))
++		goto out_free_pools;
++	if (t->integrity_supported &&
++	    bioset_integrity_create(&pools->bs, pool_size))
++		goto out_free_pools;
++
++	t->mempools = pools;
+ 	return 0;
++
++out_free_pools:
++	dm_free_md_mempools(pools);
++	return -ENOMEM;
+ }
+ 
+ static int setup_indexes(struct dm_table *t)
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 8b21155d3c4f5..ca390a8c9ae6f 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -88,10 +88,6 @@ struct clone_info {
+ 	bool submit_as_polled:1;
+ };
+ 
+-#define DM_TARGET_IO_BIO_OFFSET (offsetof(struct dm_target_io, clone))
+-#define DM_IO_BIO_OFFSET \
+-	(offsetof(struct dm_target_io, clone) + offsetof(struct dm_io, tio))
+-
+ static inline struct dm_target_io *clone_to_tio(struct bio *clone)
+ {
+ 	return container_of(clone, struct dm_target_io, clone);
+@@ -2972,54 +2968,6 @@ int dm_noflush_suspending(struct dm_target *ti)
+ }
+ EXPORT_SYMBOL_GPL(dm_noflush_suspending);
+ 
+-struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_queue_mode type,
+-					    unsigned per_io_data_size, unsigned min_pool_size,
+-					    bool integrity, bool poll)
+-{
+-	struct dm_md_mempools *pools = kzalloc_node(sizeof(*pools), GFP_KERNEL, md->numa_node_id);
+-	unsigned int pool_size = 0;
+-	unsigned int front_pad, io_front_pad;
+-	int ret;
+-
+-	if (!pools)
+-		return NULL;
+-
+-	switch (type) {
+-	case DM_TYPE_BIO_BASED:
+-	case DM_TYPE_DAX_BIO_BASED:
+-		pool_size = max(dm_get_reserved_bio_based_ios(), min_pool_size);
+-		front_pad = roundup(per_io_data_size, __alignof__(struct dm_target_io)) + DM_TARGET_IO_BIO_OFFSET;
+-		io_front_pad = roundup(per_io_data_size,  __alignof__(struct dm_io)) + DM_IO_BIO_OFFSET;
+-		ret = bioset_init(&pools->io_bs, pool_size, io_front_pad, poll ? BIOSET_PERCPU_CACHE : 0);
+-		if (ret)
+-			goto out;
+-		if (integrity && bioset_integrity_create(&pools->io_bs, pool_size))
+-			goto out;
+-		break;
+-	case DM_TYPE_REQUEST_BASED:
+-		pool_size = max(dm_get_reserved_rq_based_ios(), min_pool_size);
+-		front_pad = offsetof(struct dm_rq_clone_bio_info, clone);
+-		/* per_io_data_size is used for blk-mq pdu at queue allocation */
+-		break;
+-	default:
+-		BUG();
+-	}
+-
+-	ret = bioset_init(&pools->bs, pool_size, front_pad, 0);
+-	if (ret)
+-		goto out;
+-
+-	if (integrity && bioset_integrity_create(&pools->bs, pool_size))
+-		goto out;
+-
+-	return pools;
+-
+-out:
+-	dm_free_md_mempools(pools);
+-
+-	return NULL;
+-}
+-
+ void dm_free_md_mempools(struct dm_md_mempools *pools)
+ {
+ 	if (!pools)
+diff --git a/drivers/md/dm.h b/drivers/md/dm.h
+index a8405ce305a96..62816b647f827 100644
+--- a/drivers/md/dm.h
++++ b/drivers/md/dm.h
+@@ -218,9 +218,6 @@ void dm_kcopyd_exit(void);
+ /*
+  * Mempool operations
+  */
+-struct dm_md_mempools *dm_alloc_md_mempools(struct mapped_device *md, enum dm_queue_mode type,
+-					    unsigned per_io_data_size, unsigned min_pool_size,
+-					    bool integrity, bool poll);
+ void dm_free_md_mempools(struct dm_md_mempools *pools);
+ 
+ /*
+-- 
+2.30.2
+
