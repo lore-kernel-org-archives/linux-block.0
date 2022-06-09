@@ -2,151 +2,120 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1F71C43334
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 07:35:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A018EC43334
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 10:24:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239338AbiFIHff (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jun 2022 03:35:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48788 "EHLO
+        id S242400AbiFIKYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jun 2022 06:24:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238500AbiFIHfS (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 03:35:18 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2B01A390
-        for <linux-block@vger.kernel.org>; Thu,  9 Jun 2022 00:35:17 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id a10so20654105pju.3
-        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2022 00:35:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=dYw6wvPJ7Xei/HGruHsIypVM6+sZb5U/lhRvaoIzlbw=;
-        b=QhaY0KimCJ7at9K6S0OXb5L3mB9z34R2FTDzj0Jghmx7QumPqtodv+9bcOIlOJow64
-         3/BWCjbNtxyIKj2VFlSmT5eo7Ovr5uQ4t1tYbyCJ6YT0Btm/8kzoArqvJY1TNzRPZMB8
-         V2Wgc5UOPmDZEol3qH0XdoQcPkpnvPvCRYj1b9rYIxclFNbfH1pSAl7hMH9dT3qKrS3D
-         AXckhuDY+6PUjI+HOUvCI2cKzV0l+HkWPSU2GSgaHj1uoPWRW9ZZOJQCz3NEWu02g4Dj
-         s4E1cFhD/usRtWVcqDTniYwm+mK1iV+NeKeN/BdxowLR3MD/8OpaPsSKvstKxoPyvOvT
-         VBcg==
+        with ESMTP id S241103AbiFIKYH (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 06:24:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 383138020F
+        for <linux-block@vger.kernel.org>; Thu,  9 Jun 2022 03:24:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654770243;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=6a5SsgsnTuFo9sIZWQwmUlikCgiuGiGF/De3NllGDd0=;
+        b=O1xC9fxZOMxaqC6rSRf/wp7oRubAOdtuQF660ZO5XT5/cyF74PDWeE2QN9m27mc+BMztdJ
+        4cTCEIEgzKecWwUfZ7+HFqcmlsf3bRPqSVsgzJFiymh+8vAQB/cUacDsI0Qr52taSElHs3
+        mqthmRsXI3hdg1HfHwjn9aCD07YEUwY=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-643-c3bsFLUTPLCI60hJp2zclw-1; Thu, 09 Jun 2022 06:24:02 -0400
+X-MC-Unique: c3bsFLUTPLCI60hJp2zclw-1
+Received: by mail-wr1-f71.google.com with SMTP id d14-20020adfa40e000000b00219b63c426bso305342wra.16
+        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2022 03:24:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=dYw6wvPJ7Xei/HGruHsIypVM6+sZb5U/lhRvaoIzlbw=;
-        b=k4NOCaVAWTWpapl7LFyf8DUMXwLloxXdPWHLQqxXd1iQSZEkPBGZVDOeGwoUFPJM3n
-         IFr/1u999n4NgWjfU1qUSYFLfHZ7yRaXWh3rq/wxwBlgZ6JFEAY4BPi44eerEQoa8QiU
-         P1Q6qjsD0vH3Y0qJRbJaVgA5bQDi5sTTyD6y430niSU5HqNsinBUBdlP+Ujv1ASWKnYj
-         A+J+KdfWLESuK4jlESANtC5HAQr36vi/Kv1+WYuWECHkqyenFKgmo54X01YLebraJKAT
-         Xt2wkwWgLCcDNPtWOISbdu6oZrp6BFS+wUxpQamedhCnggFnLwKjrPgvmFoCB7BCcXmd
-         TCrg==
-X-Gm-Message-State: AOAM531rk8sVvhxRSV1Tq81Jy/n6SApC7gVJZ4WCPoPq9lT6dft4SYsP
-        vyz4AlzmRInDYWJox1NQlbyUIRxD9wrGxQ==
-X-Google-Smtp-Source: ABdhPJwKMgkKBTOY+kiwZqtSuwSPoJjYIG63GIF3HIGXDYGokUyK7wRZ/g9ktVM5DkV4RU2vvRtn1w==
-X-Received: by 2002:a17:902:da87:b0:164:395:71d7 with SMTP id j7-20020a170902da8700b00164039571d7mr38363713plx.81.1654760116980;
-        Thu, 09 Jun 2022 00:35:16 -0700 (PDT)
-Received: from C02CV1DAMD6P.bytedance.net ([139.177.225.224])
-        by smtp.gmail.com with ESMTPSA id g2-20020aa79f02000000b005185407eda5sm16484841pfr.44.2022.06.09.00.35.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Jun 2022 00:35:16 -0700 (PDT)
-From:   Chengming Zhou <zhouchengming@bytedance.com>
-To:     tj@kernel.org, axboe@kernel.dk
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Chengming Zhou <zhouchengming@bytedance.com>
-Subject: [PATCH 2/2] blk-iocost: fix vtime loss calculation when iocg deactivate
-Date:   Thu,  9 Jun 2022 15:34:50 +0800
-Message-Id: <20220609073450.98975-2-zhouchengming@bytedance.com>
-X-Mailer: git-send-email 2.35.1
-In-Reply-To: <20220609073450.98975-1-zhouchengming@bytedance.com>
-References: <20220609073450.98975-1-zhouchengming@bytedance.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=6a5SsgsnTuFo9sIZWQwmUlikCgiuGiGF/De3NllGDd0=;
+        b=PBoYFL7u8tGQMMNXEvli79Z4FmyNjSREM7YE4l6XOdflkNnY3STVzuCKL0mG6G0Q6X
+         1dOChENu9moTabVDMCHJljFW3I+wJtUZ38D53QisMhbbNSZ7XJx1VdJOG3i7pjqhNfJY
+         aw63jo5BJPKwb0mGGNhECNqoJ2cDSS5YtloL613RX2wWV13hooTfreTC6EqEwuepOZFT
+         xnRiYV8J4Jt8YPYd6HHv9PQH21X9NVLI6T9L0bmTs0I7MKCCsxW3uZP5PBJb4W9Sxj/n
+         XZ44SxUZIEAPAiiDC6ZJK7bdfNgFGzKChZl0oFQ0Iy7VNNdHjgd0D3B9SWKLgVCBzypX
+         jQuQ==
+X-Gm-Message-State: AOAM532DhYSSp1h5ZAcMPau7ucmlCfnW479xOETT7EIIGgGEbjjwUm4W
+        7Eb6o1yMFME2sS9gWK60tAizgtuQy/oGhVtOoh8M2KmDLmoGtibEqWkEB5gTldnS7vnBH/AoVGK
+        Gx2P8P5jC7mVLpg6xKUrGP1w=
+X-Received: by 2002:a1c:a301:0:b0:392:9bc5:203c with SMTP id m1-20020a1ca301000000b003929bc5203cmr2594371wme.67.1654770241336;
+        Thu, 09 Jun 2022 03:24:01 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy58rh3fuuccVM2J0IS1QrE1vJ3CH41QyKYHa1IrWm/Rvain2xs2JDw35eE5SOSwtsykjkKLA==
+X-Received: by 2002:a1c:a301:0:b0:392:9bc5:203c with SMTP id m1-20020a1ca301000000b003929bc5203cmr2594345wme.67.1654770240948;
+        Thu, 09 Jun 2022 03:24:00 -0700 (PDT)
+Received: from ?IPV6:2a09:80c0:192:0:20af:34be:985b:b6c8? ([2a09:80c0:192:0:20af:34be:985b:b6c8])
+        by smtp.gmail.com with ESMTPSA id t10-20020a5d460a000000b0021552eebde6sm17782568wrq.32.2022.06.09.03.23.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 09 Jun 2022 03:23:59 -0700 (PDT)
+Message-ID: <a079ed41-1978-0551-2b5c-6d61aff7ddf2@redhat.com>
+Date:   Thu, 9 Jun 2022 12:23:58 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH v2 02/19] mm: Convert all PageMovable users to
+ movable_operations
+Content-Language: en-US
+To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        linux-fsdevel@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        cluster-devel@redhat.com, linux-mm@kvack.org,
+        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
+        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
+        linux-mtd@lists.infradead.org,
+        virtualization@lists.linux-foundation.org
+References: <20220608150249.3033815-1-willy@infradead.org>
+ <20220608150249.3033815-3-willy@infradead.org>
+From:   David Hildenbrand <david@redhat.com>
+Organization: Red Hat
+In-Reply-To: <20220608150249.3033815-3-willy@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The commit ac33e91e2dac ("blk-iocost: implement vtime loss compensation")
-will accumulate vtime loss of iocgs on the period, to compensate
-the vtime loss we throw away, which is good for device utilization.
+On 08.06.22 17:02, Matthew Wilcox (Oracle) wrote:
+> These drivers are rather uncomfortably hammered into the
+> address_space_operations hole.  They aren't filesystems and don't behave
+> like filesystems.  They just need their own movable_operations structure,
+> which we can point to directly from page->mapping.
+> 
+> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+> ---
+>  arch/powerpc/platforms/pseries/cmm.c |  60 +---------------
+>  drivers/misc/vmw_balloon.c           |  61 +---------------
+>  drivers/virtio/virtio_balloon.c      |  47 +-----------
+>  include/linux/balloon_compaction.h   |   6 +-
+>  include/linux/fs.h                   |   2 -
+>  include/linux/migrate.h              |  26 +++++--
+>  include/linux/page-flags.h           |   2 +-
+>  include/uapi/linux/magic.h           |   4 --
+>  mm/balloon_compaction.c              |  10 ++-
+>  mm/compaction.c                      |  29 ++++----
+>  mm/migrate.c                         |  24 +++----
+>  mm/util.c                            |   4 +-
+>  mm/z3fold.c                          |  82 +++------------------
+>  mm/zsmalloc.c                        | 102 ++++++---------------------
+>  14 files changed, 94 insertions(+), 365 deletions(-)
 
-But the vtime loss calculation of iocg is wrong because of different
-hweight_gen when having some iocgs deactivated.
+You probably should have cc'ed the relevant maintainers (including me :P ).
 
-ioc_check_iocgs()
-  ...
-  } else if (iocg_is_idle(iocg)) {
-    ioc->vtime_err -= div64_u64(excess * old_hwi,	--> old_hwi_1
-                                WEIGHT_ONE);
-  }
+For everything except z3fold.c and zsmalloc.c,
 
-  commit_weights(ioc);			--> hweight_gen increase
+Reviewed-by: David Hildenbrand <david@redhat.com>
 
-hweight_after_donation()
-  ...
-  ioc->vtime_err -= div64_u64(excess * old_hwi,		--> old_hwi_2
-                              WEIGHT_ONE);
-
-The old_hwi_2 of active iocgs is in fact not of the same hweight_gen
-as the old_hwi_1 of idle iocgs. After idle iocgs deactivate and
-hweight_gen increase, the old_hwi_2 become larger than it should be,
-which cause the calculated vtime_err more than it should be.
-
-I found this problem by noticing some abnormal vtime loss compensation
-when having some cgroups with intermittent IO.
-
-Since we already have recorded the usage_delta_us of each iocg, and
-usage_us_sum is the sum of them, so the vtime loss calculation of
-the period is straightforward and more accurate.
-
-Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
----
- block/blk-iocost.c | 21 ++++-----------------
- 1 file changed, 4 insertions(+), 17 deletions(-)
-
-diff --git a/block/blk-iocost.c b/block/blk-iocost.c
-index 3cda08224d51..6c55c69d4aad 100644
---- a/block/blk-iocost.c
-+++ b/block/blk-iocost.c
-@@ -1730,7 +1730,6 @@ static u32 hweight_after_donation(struct ioc_gq *iocg, u32 old_hwi, u32 hwm,
- 		atomic64_add(excess, &iocg->vtime);
- 		atomic64_add(excess, &iocg->done_vtime);
- 		vtime += excess;
--		ioc->vtime_err -= div64_u64(excess * old_hwi, WEIGHT_ONE);
- 	}
- 
- 	/*
-@@ -2168,22 +2167,6 @@ static int ioc_check_iocgs(struct ioc *ioc, struct ioc_now *now)
- 		} else if (iocg_is_idle(iocg)) {
- 			/* no waiter and idle, deactivate */
- 			u64 vtime = atomic64_read(&iocg->vtime);
--			s64 excess;
--
--			/*
--			 * @iocg has been inactive for a full duration and will
--			 * have a high budget. Account anything above target as
--			 * error and throw away. On reactivation, it'll start
--			 * with the target budget.
--			 */
--			excess = now->vnow - vtime - ioc->margins.target;
--			if (excess > 0) {
--				u32 old_hwi;
--
--				current_hweight(iocg, NULL, &old_hwi);
--				ioc->vtime_err -= div64_u64(excess * old_hwi,
--							    WEIGHT_ONE);
--			}
- 
- 			TRACE_IOCG_PATH(iocg_idle, iocg, now,
- 					atomic64_read(&iocg->active_period),
-@@ -2348,6 +2331,10 @@ static void ioc_timer_fn(struct timer_list *timer)
- 	list_for_each_entry_safe(iocg, tiocg, &surpluses, surplus_list)
- 		list_del_init(&iocg->surplus_list);
- 
-+	/* calculate vtime loss in this period */
-+	if (period_vtime > usage_us_sum * ioc->vtime_base_rate)
-+		ioc->vtime_err -= period_vtime - usage_us_sum * ioc->vtime_base_rate;
-+
- 	/*
- 	 * If q is getting clogged or we're missing too much, we're issuing
- 	 * too much IO and should lower vtime rate.  If we're not missing
 -- 
-2.36.1
+Thanks,
+
+David / dhildenb
 
