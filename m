@@ -2,109 +2,186 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 681D3C43334
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 00:59:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCF46C43334
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 02:01:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230172AbiFIA7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 20:59:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32888 "EHLO
+        id S230504AbiFICBm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 22:01:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230003AbiFIA7V (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 20:59:21 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E910271E;
-        Wed,  8 Jun 2022 17:59:18 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LJQgs19lfzjXH7;
-        Thu,  9 Jun 2022 08:58:17 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 9 Jun 2022 08:59:15 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 9 Jun 2022 08:59:14 +0800
-Subject: Re: [PATCH -next v5 0/8] bugfix and cleanup for blk-throttle
-From:   Yu Kuai <yukuai3@huawei.com>
-To:     <tj@kernel.org>, <mkoutny@suse.com>, <axboe@kernel.dk>,
-        <ming.lei@redhat.com>
-CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220528064330.3471000-1-yukuai3@huawei.com>
- <244865d4-e7e7-432f-8e9c-248ab900d283@huawei.com>
-Message-ID: <66910926-39e8-85df-bd13-2ca6b2b03cac@huawei.com>
-Date:   Thu, 9 Jun 2022 08:59:13 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        with ESMTP id S230391AbiFICBm (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 22:01:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C260D6CAAF
+        for <linux-block@vger.kernel.org>; Wed,  8 Jun 2022 19:01:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654740099;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=JtA0Os03CVtRSp7h6k9ZuUuJw6y8mU+CRq3SbgSX1qE=;
+        b=LOsFLqtx9pG8EkB2WXLxY3gidOQWDaCEQw4qQDHYU3YutyQQKdPSsij/4ideD/cG7YEyyG
+        aPJ6M3in+kGRewyUUIpu3UtcVeY11OnmDrRAXxBy7escCc+212rBTQRsgDhm1jw6+EmI/1
+        NYN9nGXyiaMtgsBKm9qwVyOu0Bj+WFs=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-223-ZRhbaNyJNMOw6Dmq_9Wd8w-1; Wed, 08 Jun 2022 22:01:36 -0400
+X-MC-Unique: ZRhbaNyJNMOw6Dmq_9Wd8w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1083929DD9A4;
+        Thu,  9 Jun 2022 02:01:36 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id AC5AD1121314;
+        Thu,  9 Jun 2022 02:01:29 +0000 (UTC)
+Date:   Thu, 9 Jun 2022 10:01:23 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        hsiangkao@linux.alibaba.com
+Cc:     Pavel Machek <pavel@ucw.cz>, linux-fsdevel@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Message-ID: <YqFUc8jhYp5ijS/C@T590>
+References: <YhXMu/GcceyDx637@B-P7TQMD6M-0146.local>
+ <a55211a1-a610-3d86-e21a-98751f20f21e@opensource.wdc.com>
+ <YhXsQdkOpBY2nmFG@B-P7TQMD6M-0146.local>
+ <3702afe7-2918-42e7-110b-efa75c0b58e8@opensource.wdc.com>
+ <YhbYOeMUv5+U1XdQ@B-P7TQMD6M-0146.local>
 MIME-Version: 1.0
-In-Reply-To: <244865d4-e7e7-432f-8e9c-248ab900d283@huawei.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YhbYOeMUv5+U1XdQ@B-P7TQMD6M-0146.local>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/06/02 19:14, Yu Kuai 写道:
-> 在 2022/05/28 14:43, Yu Kuai 写道:
->> Changes in v5:
->>   - add comments in patch 4
->>   - clear bytes/io_skipped in throtl_start_new_slice_with_credit() in
->>   patch 4
->>   - and cleanup patches 5-8
->> Changes in v4:
->>   - add reviewed-by tag for patch 1
->>   - add patch 2,3
->>   - use a different way to fix io hung in patch 4
->> Changes in v3:
->>   - fix a check in patch 1
->>   - fix link err in patch 2 on 32-bit platform
->>   - handle overflow in patch 2
->> Changes in v2:
->>   - use a new solution suggested by Ming
->>   - change the title of patch 1
->>   - add patch 2
->>
->> Patch 1 fix that blk-throttle can't work if multiple bios are throttle,
->> Patch 2 fix overflow while calculating wait time
->> Patch 3,4 fix io hung due to configuration updates.
->> Patch 5-8 are cleanup patches, there are no functional changes, just
->> some places that I think can be optimized during code review.
+On Thu, Feb 24, 2022 at 08:58:33AM +0800, Gao Xiang wrote:
+> On Thu, Feb 24, 2022 at 07:40:47AM +0900, Damien Le Moal wrote:
+> > On 2/23/22 17:11, Gao Xiang wrote:
+> > > On Wed, Feb 23, 2022 at 04:46:41PM +0900, Damien Le Moal wrote:
+> > >> On 2/23/22 14:57, Gao Xiang wrote:
+> > >>> On Mon, Feb 21, 2022 at 02:59:48PM -0500, Gabriel Krisman Bertazi wrote:
+> > >>>> I'd like to discuss an interface to implement user space block devices,
+> > >>>> while avoiding local network NBD solutions.  There has been reiterated
+> > >>>> interest in the topic, both from researchers [1] and from the community,
+> > >>>> including a proposed session in LSFMM2018 [2] (though I don't think it
+> > >>>> happened).
+> > >>>>
+> > >>>> I've been working on top of the Google iblock implementation to find
+> > >>>> something upstreamable and would like to present my design and gather
+> > >>>> feedback on some points, in particular zero-copy and overall user space
+> > >>>> interface.
+> > >>>>
+> > >>>> The design I'm pending towards uses special fds opened by the driver to
+> > >>>> transfer data to/from the block driver, preferably through direct
+> > >>>> splicing as much as possible, to keep data only in kernel space.  This
+> > >>>> is because, in my use case, the driver usually only manipulates
+> > >>>> metadata, while data is forwarded directly through the network, or
+> > >>>> similar. It would be neat if we can leverage the existing
+> > >>>> splice/copy_file_range syscalls such that we don't ever need to bring
+> > >>>> disk data to user space, if we can avoid it.  I've also experimented
+> > >>>> with regular pipes, But I found no way around keeping a lot of pipes
+> > >>>> opened, one for each possible command 'slot'.
+> > >>>>
+> > >>>> [1] https://dl.acm.org/doi/10.1145/3456727.3463768
+> > >>>> [2] https://www.spinics.net/lists/linux-fsdevel/msg120674.html
+> > >>>
+> > >>> I'm interested in this general topic too. One of our use cases is
+> > >>> that we need to process network data in some degree since many
+> > >>> protocols are application layer protocols so it seems more reasonable
+> > >>> to process such protocols in userspace. And another difference is that
+> > >>> we may have thousands of devices in a machine since we'd better to run
+> > >>> containers as many as possible so the block device solution seems
+> > >>> suboptimal to us. Yet I'm still interested in this topic to get more
+> > >>> ideas.
+> > >>>
+> > >>> Btw, As for general userspace block device solutions, IMHO, there could
+> > >>> be some deadlock issues out of direct reclaim, writeback, and userspace
+> > >>> implementation due to writeback user requests can be tripped back to
+> > >>> the kernel side (even the dependency crosses threads). I think they are
+> > >>> somewhat hard to fix with user block device solutions. For example,
+> > >>> https://lore.kernel.org/r/CAM1OiDPxh0B1sXkyGCSTEpdgDd196-ftzLE-ocnM8Jd2F9w7AA@mail.gmail.com
+> > >>
+> > >> This is already fixed with prctl() support. See:
+> > >>
+> > >> https://lore.kernel.org/linux-fsdevel/20191112001900.9206-1-mchristi@redhat.com/
+> > > 
+> > > As I mentioned above, IMHO, we could add some per-task state to avoid
+> > > the majority of such deadlock cases (also what I mentioned above), but
+> > > there may still some potential dependency could happen between threads,
+> > > such as using another kernel workqueue and waiting on it (in principle
+> > > at least) since userspace program can call any syscall in principle (
+> > > which doesn't like in-kernel drivers). So I think it can cause some
+> > > risk due to generic userspace block device restriction, please kindly
+> > > correct me if I'm wrong.
+> > 
+> > Not sure what you mean with all this. prctl() works per process/thread
+> > and a context that has PR_SET_IO_FLUSHER set will have PF_MEMALLOC_NOIO
+> > set. So for the case of a user block device driver, setting this means
+> > that it cannot reenter itself during a memory allocation, regardless of
+> > the system call it executes (FS etc): all memory allocations in any
+> > syscall executed by the context will have GFP_NOIO.
 > 
-> friendly ping ...
+> I mean,
+> 
+> assuming PR_SET_IO_FLUSHER is already set on Thread A by using prctl,
+> but since it can call any valid system call, therefore, after it
+> received data due to direct reclaim and writeback, it is still
+> allowed to call some system call which may do something as follows:
+> 
+>    Thread A (PR_SET_IO_FLUSHER)   Kernel thread B (another context)
+> 
+>    (call some syscall which)
+> 
+>    submit something to Thread B
+>                                   
+>                                   ... (do something)
+> 
+>                                   memory allocation with GFP_KERNEL (it
+>                                   may trigger direct memory reclaim
+>                                   again and reenter the original fs.)
+> 
+>                                   wake up Thread A
+> 
+>    wait Thread B to complete
+> 
+> Normally such system call won't cause any problem since userspace
+> programs cannot be in a context out of writeback and direct reclaim.
+> Yet I'm not sure if it works under userspace block driver
+> writeback/direct reclaim cases.
 
-friendly ping ...
+Hi Gao Xiang,
 
-I'll resend this patchset soon if there are still no response.
+I'd rather to reply you in this original thread, and the recent
+discussion is from the following link:
+
+https://lore.kernel.org/linux-block/Yp1jRw6kiUf5jCrW@B-P7TQMD6M-0146.local/
+
+kernel loop & nbd is really in the same situation.
+
+For example of kernel loop, PF_MEMALLOC_NOIO is added in commit
+d0a255e795ab ("loop: set PF_MEMALLOC_NOIO for the worker thread"),
+so loop's worker thread can be thought as the above Thread A, and
+of course, writeback/swapout IO can reach the loop worker thread(
+the above Thread A), then loop just calls into FS from the worker
+thread for handling the loop IO, that is same with user space driver's
+case, and the kernel 'thread B' should be in FS code.
+
+Your theory might be true, but it does depend on FS's implementation,
+and we don't see such report in reality.
+
+Also you didn't mentioned that what kernel thread B exactly is? And what
+the allocation is in kernel thread B.
+
+If you have actual report, I am happy to take account into it, otherwise not
+sure if it is worth of time/effort in thinking/addressing one pure theoretical
+concern.
+
 
 Thanks,
-Kuai
->>
->> Previous version:
->> v1: 
->> https://lore.kernel.org/all/20220517134909.2910251-1-yukuai3@huawei.com/
->> v2: 
->> https://lore.kernel.org/all/20220518072751.1188163-1-yukuai3@huawei.com/
->> v3: 
->> https://lore.kernel.org/all/20220519085811.879097-1-yukuai3@huawei.com/
->> v4: 
->> https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
->>
->> Yu Kuai (8):
->>    blk-throttle: fix that io throttle can only work for single bio
->>    blk-throttle: prevent overflow while calculating wait time
->>    blk-throttle: factor out code to calculate ios/bytes_allowed
->>    blk-throttle: fix io hung due to config updates
->>    blk-throttle: use 'READ/WRITE' instead of '0/1'
->>    blk-throttle: calling throtl_dequeue/enqueue_tg in pairs
->>    blk-throttle: cleanup tg_update_disptime()
->>    blk-throttle: clean up flag 'THROTL_TG_PENDING'
->>
->>   block/blk-throttle.c | 158 +++++++++++++++++++++++++++++--------------
->>   block/blk-throttle.h |  16 +++--
->>   2 files changed, 120 insertions(+), 54 deletions(-)
->>
+Ming
+
