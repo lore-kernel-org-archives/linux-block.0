@@ -2,94 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D103CCA473
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 17:40:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0BB4C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 18:16:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245560AbiFIRkl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jun 2022 13:40:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46492 "EHLO
+        id S230167AbiFISQQ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jun 2022 14:16:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237051AbiFIRkl (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 13:40:41 -0400
-Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3F4E155319;
-        Thu,  9 Jun 2022 10:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-        References:Message-ID:Subject:To:From:Date:Sender:Reply-To:Cc:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=50LH8Dogtui4JOE7bz/ojMzo0HRhZGWl5FgghUdbsso=; b=H80hSPNqGiAd5chM6yyxpXe7GI
-        v16rR9GPk1lsBvZCxGkkfPwwIt580VMmgSt7/ZwfufekJhmrwARChvfRps5Isb2jo31hImz/J8zhg
-        3Gqid/DHTzlBHrEnpsHq7tbmdB6lizbSwvMg1psBh47cB986OJv32t09q9JTTsGSl5f5sM+mUmbDC
-        kBxIqffET9U+LDZy+bNXjBWIq4ozQI6dP3A/jTcDrHF2DBz9xSzltFjBNcK5NRZczIeDZyfqJ8lJf
-        qfewZREEYM3aHIjRrfEfYKtBKEBJRQ6UywKBfP0QJhwiV/qPmGd6+tb1EV1S0HSjXDX6WidFPIyNN
-        +S04cl5w==;
-Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nzM8y-00DjCy-V3; Thu, 09 Jun 2022 17:40:28 +0000
-Date:   Thu, 9 Jun 2022 18:40:28 +0100
-From:   Matthew Wilcox <willy@infradead.org>
-To:     dsterba@suse.cz, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 12/19] btrfs: Convert btrfs_migratepage to
- migrate_folio
-Message-ID: <YqIwjEO1a0Sbxbym@casper.infradead.org>
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-13-willy@infradead.org>
- <20220609163323.GV20633@twin.jikos.cz>
+        with ESMTP id S232018AbiFISQP (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 14:16:15 -0400
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97AA9E4B15
+        for <linux-block@vger.kernel.org>; Thu,  9 Jun 2022 11:16:13 -0700 (PDT)
+Received: by mail-qt1-f170.google.com with SMTP id hh4so17733637qtb.10
+        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2022 11:16:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=IqBa9uKPuzMBYw7EO8+JYWz3LeyC2Z89LKKu3TPj9R0=;
+        b=Vp7TGIrFglsiVwALJZTZqyHHC7QffJwSgLv7ph8NohX25F2AnT8rIStVqrgjEsfH0F
+         LeR6X1TiQBO8GcqD42Xbd9Md7OCuZ4cfUPoTc+xHfsR2BS725yAr/LXSRjRBnZtqgOFi
+         FIq1ICv+z16RytBv48whWw0w7d1Nm0o5kXDoDpyhWO44qJESNly2XPoZvUQMhUzmSU3H
+         4FG0sZGje0UgLLs8P+SegEzGjTxZq7/BZPWUEw/SupKZb3XTLDn00QOCSzo6gt4mjpCF
+         a5e3kLNG9pcZyqvP2LOK0wAcI0DcuYjRvPdTnIdJmnYDTsbwavELLZMm7CpwL92C9Jgc
+         0Isw==
+X-Gm-Message-State: AOAM533FStf/G0pkkh/9lDVmgsUK4ednWcUN0YYGYdAoUPphcP+u9+tv
+        p292RK+9VKoXk9yMCsH8STPW
+X-Google-Smtp-Source: ABdhPJytzPNfgq8ZJoYGppEW1woIaioYo1mXF5NBN1eY+hf5YvYEfiA0kUdl0ynUP975PfILGVrNaA==
+X-Received: by 2002:a05:622a:47:b0:305:1ab:e52d with SMTP id y7-20020a05622a004700b0030501abe52dmr7932244qtw.688.1654798572745;
+        Thu, 09 Jun 2022 11:16:12 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id d19-20020a05620a241300b006a6c230f5e0sm10910899qkn.31.2022.06.09.11.16.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Jun 2022 11:16:12 -0700 (PDT)
+Date:   Thu, 9 Jun 2022 14:16:11 -0400
+From:   Mike Snitzer <snitzer@kernel.org>
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: Re: fix and cleanup device mapper bioset initialization
+Message-ID: <YqI460bUfFdsn3I5@redhat.com>
+References: <20220608063409.1280968-1-hch@lst.de>
+ <YqDneqyp33PvkCLm@redhat.com>
+ <20220609041149.GA31649@lst.de>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220609163323.GV20633@twin.jikos.cz>
+In-Reply-To: <20220609041149.GA31649@lst.de>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 09, 2022 at 06:33:23PM +0200, David Sterba wrote:
-> On Wed, Jun 08, 2022 at 04:02:42PM +0100, Matthew Wilcox (Oracle) wrote:
-> > Use filemap_migrate_folio() to do the bulk of the work, and then copy
-> > the ordered flag across if needed.
+On Thu, Jun 09 2022 at 12:11P -0400,
+Christoph Hellwig <hch@lst.de> wrote:
+
+> On Wed, Jun 08, 2022 at 02:16:26PM -0400, Mike Snitzer wrote:
+> > All looks good to me.  Are you OK with me picking up the first 3 to
+> > send to Linus for 5.19-rc2 (given the integrity bioset fix)?
 > > 
-> > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> > Reviewed-by: Christoph Hellwig <hch@lst.de>
+> > And hold patch 4 until 5.20 merge?
 > 
-> Acked-by: David Sterba <dsterba@suse.com>
+> Sounds good to me.
 > 
-> > +static int btrfs_migrate_folio(struct address_space *mapping,
-> > +			     struct folio *dst, struct folio *src,
-> >  			     enum migrate_mode mode)
-> >  {
-> > -	int ret;
-> > +	int ret = filemap_migrate_folio(mapping, dst, src, mode);
-> >  
-> > -	ret = migrate_page_move_mapping(mapping, newpage, page, 0);
-> >  	if (ret != MIGRATEPAGE_SUCCESS)
-> >  		return ret;
-> >  
-> > -	if (page_has_private(page))
-> > -		attach_page_private(newpage, detach_page_private(page));
+> > Or would you prefer that cleanup to land now too?
 > 
-> If I'm reading it correctly, the private pointer does not need to be set
-> like that anymore because it's done somewhere during the
-> filemap_migrate_folio() call.
+> I don't think Linus would like that :)  In fact even patch 3 might be
+> 5.20 material.
 
-That's correct.  Everything except moving the ordered flag across is
-done for you, and I'm kind of tempted to modify folio_migrate_flags()
-to copy the ordered flag across as well.  Then you could just use
-filemap_migrate_folio() directly.
+Ha, yeah I agree.  I'll just send the first 2 (likely tomorrow after
+more testing today).
 
-> > -
-> > -	if (PageOrdered(page)) {
-> > -		ClearPageOrdered(page);
-> > -		SetPageOrdered(newpage);
-> > +	if (folio_test_ordered(src)) {
-> > +		folio_clear_ordered(src);
-> > +		folio_set_ordered(dst);
-> >  	}
+Thanks.
