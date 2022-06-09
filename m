@@ -2,125 +2,88 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80779C43334
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 23:09:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81EA9C433EF
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 23:47:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240922AbiFIXJi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jun 2022 19:09:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48136 "EHLO
+        id S235543AbiFIXrD (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jun 2022 19:47:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345214AbiFIXJg (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 19:09:36 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75DF1E86C2;
-        Thu,  9 Jun 2022 16:09:33 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        with ESMTP id S231949AbiFIXrC (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 19:47:02 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2BBFC965D;
+        Thu,  9 Jun 2022 16:47:00 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id A49541FF09;
-        Thu,  9 Jun 2022 23:09:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1654816172;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qJ6CI0mpfkDIaS/pnwJC/3BIuCFzValbcslJLDqCmdg=;
-        b=I4/06b2ltiKrPbL7GgKqUfyrBDeCyX3UBUG59EJr4ULzJeSHMklpbChcFfJ1kbSeucBXix
-        La6qOv94FBGz6zARxy9vvZ/rfr+o4fJAO1+4sOg84lO5ESeVeDRRH4GNx2iw82Lzfy4RBp
-        n/81rXgBPEK2N99/Wl5n9BN9FjCnnSs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1654816172;
-        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-         cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=qJ6CI0mpfkDIaS/pnwJC/3BIuCFzValbcslJLDqCmdg=;
-        b=L3W4XRXz86YAqVEeWGz5ZqCwllS9CYkUvRzkZLgLEjLQjJDb2qGw16RPUqD736ufsddkqi
-        GP6X1OhCsdJk3BBQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 31C9113456;
-        Thu,  9 Jun 2022 23:09:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id kuItC6x9omLpJgAAMHmgww
-        (envelope-from <dsterba@suse.cz>); Thu, 09 Jun 2022 23:09:32 +0000
-Date:   Fri, 10 Jun 2022 01:05:01 +0200
-From:   David Sterba <dsterba@suse.cz>
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     dsterba@suse.cz, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH v2 12/19] btrfs: Convert btrfs_migratepage to
- migrate_folio
-Message-ID: <20220609230501.GY20633@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-Mail-Followup-To: dsterba@suse.cz, Matthew Wilcox <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-13-willy@infradead.org>
- <20220609163323.GV20633@twin.jikos.cz>
- <YqIwjEO1a0Sbxbym@casper.infradead.org>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 6E1616201E;
+        Thu,  9 Jun 2022 23:47:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43018C34114;
+        Thu,  9 Jun 2022 23:46:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1654818419;
+        bh=75ma3gShevB/s+RL0PO7tBwv+TZNSdvzkkGB14y8o+U=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=kcX+PwMw5mFGo3Hvd5s+OCw0NUn7tGUaFLmRiU7V0WspqeDtxnP4hKHuGR04d0Zh/
+         CmqrhaiNPpoiltOTf+gpcxwOtF2MvuPkzFtYsPvf0fFIr2JbSi7wNC+Csv9+lRUjWi
+         opbqKAFrkAoeuRc7dMMJbhCkSkK4kowoEKuE5crEYe4xnUSu/eOOgwMqFaDAPU8na3
+         fphsoQ/VKiMJbP/Epu6c/rwA+3yiRDVQI2cSRN8LsM296JFCP0HRNxCApnQHSLL/bN
+         I3irVFNVvS/5ZSLwPzuIsM3L6DDs8FHN/TmjloO4XV1i006u9oLMGJ4ej4H8MhUo/V
+         11soWc+hYdL8Q==
+Date:   Thu, 9 Jun 2022 16:46:57 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Deven Bowers <deven.desai@linux.microsoft.com>
+Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
+        serge@hallyn.com, tytso@mit.edu, axboe@kernel.dk, agk@redhat.com,
+        snitzer@kernel.org, eparis@redhat.com, paul@paul-moore.com,
+        linux-doc@vger.kernel.org, linux-integrity@vger.kernel.org,
+        linux-security-module@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        dm-devel@redhat.com, linux-audit@redhat.com,
+        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v8 13/17] fsverity: consume builtin signature via LSM
+ hook
+Message-ID: <YqKGcdM3t5gjqBpq@sol.localdomain>
+References: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
+ <1654714889-26728-14-git-send-email-deven.desai@linux.microsoft.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YqIwjEO1a0Sbxbym@casper.infradead.org>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
+In-Reply-To: <1654714889-26728-14-git-send-email-deven.desai@linux.microsoft.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 09, 2022 at 06:40:28PM +0100, Matthew Wilcox wrote:
-> On Thu, Jun 09, 2022 at 06:33:23PM +0200, David Sterba wrote:
-> > On Wed, Jun 08, 2022 at 04:02:42PM +0100, Matthew Wilcox (Oracle) wrote:
-> > > Use filemap_migrate_folio() to do the bulk of the work, and then copy
-> > > the ordered flag across if needed.
-> > > 
-> > > Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> > > Reviewed-by: Christoph Hellwig <hch@lst.de>
-> > 
-> > Acked-by: David Sterba <dsterba@suse.com>
-> > 
-> > > +static int btrfs_migrate_folio(struct address_space *mapping,
-> > > +			     struct folio *dst, struct folio *src,
-> > >  			     enum migrate_mode mode)
-> > >  {
-> > > -	int ret;
-> > > +	int ret = filemap_migrate_folio(mapping, dst, src, mode);
-> > >  
-> > > -	ret = migrate_page_move_mapping(mapping, newpage, page, 0);
-> > >  	if (ret != MIGRATEPAGE_SUCCESS)
-> > >  		return ret;
-> > >  
-> > > -	if (page_has_private(page))
-> > > -		attach_page_private(newpage, detach_page_private(page));
-> > 
-> > If I'm reading it correctly, the private pointer does not need to be set
-> > like that anymore because it's done somewhere during the
-> > filemap_migrate_folio() call.
+On Wed, Jun 08, 2022 at 12:01:25PM -0700, Deven Bowers wrote:
+> From: Fan Wu <wufan@linux.microsoft.com>
 > 
-> That's correct.  Everything except moving the ordered flag across is
-> done for you, and I'm kind of tempted to modify folio_migrate_flags()
-> to copy the ordered flag across as well.  Then you could just use
-> filemap_migrate_folio() directly.
+> fsverity represents a mechanism to support both integrity and
+> authenticity protection of a file, supporting both signed and unsigned
+> digests.
+> 
+> An LSM which controls access to a resource based on authenticity and
+> integrity of said resource, can then use this data to make an informed
+> decision on the authorization (provided by the LSM's policy) of said
+> claim.
+> 
+> This effectively allows the extension of a policy enforcement layer in
+> LSM for fsverity, allowing for more granular control of how a
+> particular authenticity claim can be used. For example, "all (built-in)
+> signed fsverity files should be allowed to execute, but only these
+> hashes are allowed to be loaded as kernel modules".
+> 
+> This enforcement must be done in kernel space, as a userspace only
+> solution would fail a simple litmus test: Download a self-contained
+> malicious binary that never touches the userspace stack. This
+> binary would still be able to execute.
+> 
+> Signed-off-by: Fan Wu <wufan@linux.microsoft.com>
+> Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
 
-Either way it works for me. If it would mean an unsafe change in folios
-or complicate other code I'm fine with the migration callback that
-does additional work for btrfs that could be changed later.
+The IMA support for fs-verity, which is now upstream, already does this (except
+that IMA isn't an LSM).  It also doesn't rely on the fs-verity builtin
+signatures, which shouldn't really be used.  Can you elaborate on how what
+you're doing is better?
+
+- Eric
