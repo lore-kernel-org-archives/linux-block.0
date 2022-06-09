@@ -2,68 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DF93CCA47F
-	for <linux-block@archiver.kernel.org>; Wed,  8 Jun 2022 22:28:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 681D3C43334
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 00:59:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234374AbiFHW2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 8 Jun 2022 18:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42584 "EHLO
+        id S230172AbiFIA7W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 8 Jun 2022 20:59:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231161AbiFHW2J (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 18:28:09 -0400
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 5821142ED0;
-        Wed,  8 Jun 2022 15:28:08 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1033)
-        id E908320BE66A; Wed,  8 Jun 2022 15:28:07 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com E908320BE66A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1654727287;
-        bh=MF2Y1CBDjZevU8fKZUp5kTEpEkoKnGareWA0GYzqeq8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=rTkhDmYdY7rpVbQEn9L9mKl43RlPXNjWiPuTNIqmZzVD1Iy9c2bksxjgfYkkouLUq
-         UPAyhyoSZskG+YgEI73GZWcdXpE59XsE7Wc7P1fKK/FdeMciH5m3kdKbrOjuvWo3TL
-         GZqDCdh02EtKnOhBTJsUGaZi51u2R0kWzglRF03M=
-Date:   Wed, 8 Jun 2022 15:28:07 -0700
-From:   Deven Bowers <deven.desai@linux.microsoft.com>
-To:     Casey Schaufler <casey@schaufler-ca.com>
-Cc:     corbet@lwn.net, zohar@linux.ibm.com, jmorris@namei.org,
-        serge@hallyn.com, tytso@mit.edu, ebiggers@kernel.org,
-        axboe@kernel.dk, agk@redhat.com, snitzer@kernel.org,
-        eparis@redhat.com, paul@paul-moore.com, linux-doc@vger.kernel.org,
-        linux-integrity@vger.kernel.org,
-        linux-security-module@vger.kernel.org,
-        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, linux-audit@redhat.com,
-        roberto.sassu@huawei.com, linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH v8 10/17] block|security: add LSM blob to block_device
-Message-ID: <20220608222807.GA7650@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1654714889-26728-1-git-send-email-deven.desai@linux.microsoft.com>
- <1654714889-26728-11-git-send-email-deven.desai@linux.microsoft.com>
- <14754d16-75ae-cc92-cfc5-adce0628d9d9@schaufler-ca.com>
+        with ESMTP id S230003AbiFIA7V (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Wed, 8 Jun 2022 20:59:21 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E910271E;
+        Wed,  8 Jun 2022 17:59:18 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LJQgs19lfzjXH7;
+        Thu,  9 Jun 2022 08:58:17 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 08:59:15 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 08:59:14 +0800
+Subject: Re: [PATCH -next v5 0/8] bugfix and cleanup for blk-throttle
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <tj@kernel.org>, <mkoutny@suse.com>, <axboe@kernel.dk>,
+        <ming.lei@redhat.com>
+CC:     <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220528064330.3471000-1-yukuai3@huawei.com>
+ <244865d4-e7e7-432f-8e9c-248ab900d283@huawei.com>
+Message-ID: <66910926-39e8-85df-bd13-2ca6b2b03cac@huawei.com>
+Date:   Thu, 9 Jun 2022 08:59:13 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <14754d16-75ae-cc92-cfc5-adce0628d9d9@schaufler-ca.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+In-Reply-To: <244865d4-e7e7-432f-8e9c-248ab900d283@huawei.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 08, 2022 at 01:07:39PM -0700, Casey Schaufler wrote:
-> On 6/8/2022 12:01 PM, Deven Bowers wrote:
-> >block_device structures can have valuable security properties,
-> >based on how they are created, and what subsystem manages them.
-> >
-> >By adding LSM storage to this structure, this data can be accessed
-> >at the LSM layer.
-> >
-> >Signed-off-by: Deven Bowers <deven.desai@linux.microsoft.com>
+在 2022/06/02 19:14, Yu Kuai 写道:
+> 在 2022/05/28 14:43, Yu Kuai 写道:
+>> Changes in v5:
+>>   - add comments in patch 4
+>>   - clear bytes/io_skipped in throtl_start_new_slice_with_credit() in
+>>   patch 4
+>>   - and cleanup patches 5-8
+>> Changes in v4:
+>>   - add reviewed-by tag for patch 1
+>>   - add patch 2,3
+>>   - use a different way to fix io hung in patch 4
+>> Changes in v3:
+>>   - fix a check in patch 1
+>>   - fix link err in patch 2 on 32-bit platform
+>>   - handle overflow in patch 2
+>> Changes in v2:
+>>   - use a new solution suggested by Ming
+>>   - change the title of patch 1
+>>   - add patch 2
+>>
+>> Patch 1 fix that blk-throttle can't work if multiple bios are throttle,
+>> Patch 2 fix overflow while calculating wait time
+>> Patch 3,4 fix io hung due to configuration updates.
+>> Patch 5-8 are cleanup patches, there are no functional changes, just
+>> some places that I think can be optimized during code review.
 > 
-> Reviewed-by: Casey Schaufler <casey@schaufler-ca.com>
-> 
-> Not everyone is going to appreciate the infrastructure allocation
-> of the block_device security blob, but I do.
+> friendly ping ...
 
-Thanks Casey.
+friendly ping ...
 
+I'll resend this patchset soon if there are still no response.
+
+Thanks,
+Kuai
+>>
+>> Previous version:
+>> v1: 
+>> https://lore.kernel.org/all/20220517134909.2910251-1-yukuai3@huawei.com/
+>> v2: 
+>> https://lore.kernel.org/all/20220518072751.1188163-1-yukuai3@huawei.com/
+>> v3: 
+>> https://lore.kernel.org/all/20220519085811.879097-1-yukuai3@huawei.com/
+>> v4: 
+>> https://lore.kernel.org/all/20220523082633.2324980-1-yukuai3@huawei.com/
+>>
+>> Yu Kuai (8):
+>>    blk-throttle: fix that io throttle can only work for single bio
+>>    blk-throttle: prevent overflow while calculating wait time
+>>    blk-throttle: factor out code to calculate ios/bytes_allowed
+>>    blk-throttle: fix io hung due to config updates
+>>    blk-throttle: use 'READ/WRITE' instead of '0/1'
+>>    blk-throttle: calling throtl_dequeue/enqueue_tg in pairs
+>>    blk-throttle: cleanup tg_update_disptime()
+>>    blk-throttle: clean up flag 'THROTL_TG_PENDING'
+>>
+>>   block/blk-throttle.c | 158 +++++++++++++++++++++++++++++--------------
+>>   block/blk-throttle.h |  16 +++--
+>>   2 files changed, 120 insertions(+), 54 deletions(-)
+>>
