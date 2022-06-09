@@ -2,120 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A018EC43334
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 10:24:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3EDC43334
+	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 10:36:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242400AbiFIKYK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jun 2022 06:24:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36518 "EHLO
+        id S233799AbiFIKgB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jun 2022 06:36:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58090 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241103AbiFIKYH (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 06:24:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 383138020F
-        for <linux-block@vger.kernel.org>; Thu,  9 Jun 2022 03:24:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654770243;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=6a5SsgsnTuFo9sIZWQwmUlikCgiuGiGF/De3NllGDd0=;
-        b=O1xC9fxZOMxaqC6rSRf/wp7oRubAOdtuQF660ZO5XT5/cyF74PDWeE2QN9m27mc+BMztdJ
-        4cTCEIEgzKecWwUfZ7+HFqcmlsf3bRPqSVsgzJFiymh+8vAQB/cUacDsI0Qr52taSElHs3
-        mqthmRsXI3hdg1HfHwjn9aCD07YEUwY=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-643-c3bsFLUTPLCI60hJp2zclw-1; Thu, 09 Jun 2022 06:24:02 -0400
-X-MC-Unique: c3bsFLUTPLCI60hJp2zclw-1
-Received: by mail-wr1-f71.google.com with SMTP id d14-20020adfa40e000000b00219b63c426bso305342wra.16
-        for <linux-block@vger.kernel.org>; Thu, 09 Jun 2022 03:24:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=6a5SsgsnTuFo9sIZWQwmUlikCgiuGiGF/De3NllGDd0=;
-        b=PBoYFL7u8tGQMMNXEvli79Z4FmyNjSREM7YE4l6XOdflkNnY3STVzuCKL0mG6G0Q6X
-         1dOChENu9moTabVDMCHJljFW3I+wJtUZ38D53QisMhbbNSZ7XJx1VdJOG3i7pjqhNfJY
-         aw63jo5BJPKwb0mGGNhECNqoJ2cDSS5YtloL613RX2wWV13hooTfreTC6EqEwuepOZFT
-         xnRiYV8J4Jt8YPYd6HHv9PQH21X9NVLI6T9L0bmTs0I7MKCCsxW3uZP5PBJb4W9Sxj/n
-         XZ44SxUZIEAPAiiDC6ZJK7bdfNgFGzKChZl0oFQ0Iy7VNNdHjgd0D3B9SWKLgVCBzypX
-         jQuQ==
-X-Gm-Message-State: AOAM532DhYSSp1h5ZAcMPau7ucmlCfnW479xOETT7EIIGgGEbjjwUm4W
-        7Eb6o1yMFME2sS9gWK60tAizgtuQy/oGhVtOoh8M2KmDLmoGtibEqWkEB5gTldnS7vnBH/AoVGK
-        Gx2P8P5jC7mVLpg6xKUrGP1w=
-X-Received: by 2002:a1c:a301:0:b0:392:9bc5:203c with SMTP id m1-20020a1ca301000000b003929bc5203cmr2594371wme.67.1654770241336;
-        Thu, 09 Jun 2022 03:24:01 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy58rh3fuuccVM2J0IS1QrE1vJ3CH41QyKYHa1IrWm/Rvain2xs2JDw35eE5SOSwtsykjkKLA==
-X-Received: by 2002:a1c:a301:0:b0:392:9bc5:203c with SMTP id m1-20020a1ca301000000b003929bc5203cmr2594345wme.67.1654770240948;
-        Thu, 09 Jun 2022 03:24:00 -0700 (PDT)
-Received: from ?IPV6:2a09:80c0:192:0:20af:34be:985b:b6c8? ([2a09:80c0:192:0:20af:34be:985b:b6c8])
-        by smtp.gmail.com with ESMTPSA id t10-20020a5d460a000000b0021552eebde6sm17782568wrq.32.2022.06.09.03.23.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 09 Jun 2022 03:23:59 -0700 (PDT)
-Message-ID: <a079ed41-1978-0551-2b5c-6d61aff7ddf2@redhat.com>
-Date:   Thu, 9 Jun 2022 12:23:58 +0200
+        with ESMTP id S233351AbiFIKgB (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 06:36:01 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 542CE31536;
+        Thu,  9 Jun 2022 03:35:59 -0700 (PDT)
+Received: from fraeml738-chm.china.huawei.com (unknown [172.18.147.207])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LJgNr6RXCz682sD;
+        Thu,  9 Jun 2022 18:31:08 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml738-chm.china.huawei.com (10.206.15.219) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 12:35:56 +0200
+Received: from localhost.localdomain (10.69.192.58) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 9 Jun 2022 11:35:53 +0100
+From:   John Garry <john.garry@huawei.com>
+To:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <brking@us.ibm.com>, <hare@suse.de>, <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <chenxiang66@hisilicon.com>, John Garry <john.garry@huawei.com>
+Subject: [PATCH RFC v2 00/18] blk-mq/libata/scsi: SCSI driver tagging improvements
+Date:   Thu, 9 Jun 2022 18:29:01 +0800
+Message-ID: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 02/19] mm: Convert all PageMovable users to
- movable_operations
-Content-Language: en-US
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-aio@kvack.org, linux-btrfs@vger.kernel.org,
-        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-        cluster-devel@redhat.com, linux-mm@kvack.org,
-        linux-xfs@vger.kernel.org, linux-nfs@vger.kernel.org,
-        linux-ntfs-dev@lists.sourceforge.net, ocfs2-devel@oss.oracle.com,
-        linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-3-willy@infradead.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <20220608150249.3033815-3-willy@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.69.192.58]
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 08.06.22 17:02, Matthew Wilcox (Oracle) wrote:
-> These drivers are rather uncomfortably hammered into the
-> address_space_operations hole.  They aren't filesystems and don't behave
-> like filesystems.  They just need their own movable_operations structure,
-> which we can point to directly from page->mapping.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-> ---
->  arch/powerpc/platforms/pseries/cmm.c |  60 +---------------
->  drivers/misc/vmw_balloon.c           |  61 +---------------
->  drivers/virtio/virtio_balloon.c      |  47 +-----------
->  include/linux/balloon_compaction.h   |   6 +-
->  include/linux/fs.h                   |   2 -
->  include/linux/migrate.h              |  26 +++++--
->  include/linux/page-flags.h           |   2 +-
->  include/uapi/linux/magic.h           |   4 --
->  mm/balloon_compaction.c              |  10 ++-
->  mm/compaction.c                      |  29 ++++----
->  mm/migrate.c                         |  24 +++----
->  mm/util.c                            |   4 +-
->  mm/z3fold.c                          |  82 +++------------------
->  mm/zsmalloc.c                        | 102 ++++++---------------------
->  14 files changed, 94 insertions(+), 365 deletions(-)
+Currently SCSI low-level drivers are required to manage tags for commands
+which do not come via the block layer - libata internal commands would be
+an example of one of these. We want to make blk-mq manage these tags also.
 
-You probably should have cc'ed the relevant maintainers (including me :P ).
+There was some work to provide "reserved commands" support in such series
+as https://lore.kernel.org/linux-scsi/20211125151048.103910-1-hare@suse.de/
 
-For everything except z3fold.c and zsmalloc.c,
+This was based on allocating a request for the lifetime of the "internal"
+command.
 
-Reviewed-by: David Hildenbrand <david@redhat.com>
+This series tries to solve that problem by not just allocating the request
+but also sending it as a request through the block layer. Reasons to do
+this:
+- Normal flow of a request and also commonality for regular scsi command
+  lifetime
+- We don't leave request and scsi_cmnd fields dangling as when we just
+  allocate and free the request for the lifetime of the "internal" command
+- For poll mode support we can only poll in block layer, so could not send
+  internal commands on poll mode queues if we did not do this, which is a
+  problem
+- Can get rid of duplicated code like libsas internal command timeout
+  handling
+
+Based on v5.19-rc1
+
+Please consider as an PoC for now. I have broken builds, bisectablility,
+and functionality for a lot of libsas drivers, like pm8001. Indeed, 
+10/18 onwards need a lot of work...
+
+Testing:
+QEMU with AHCI with disk and cdrom attached and hisi_sas v2 both boot.
+
+v1 was sent here:
+https://lore.kernel.org/linux-scsi/1647945585-197349-1-git-send-email-john.garry@huawei.com/
+
+Hannes Reinecke (1):
+  scsi: core: Implement reserved command handling
+
+John Garry (17):
+  blk-mq: Add a flag for reserved requests
+  scsi: core: Resurrect scsi_{get,free}_host_dev()
+  scsi: core: Add support to send reserved commands
+  scsi: core: Allocate SCSI host sdev when required
+  libata-scsi: Add ata_scsi_queue_internal()
+  libata-scsi: Add ata_internal_queuecommand()
+  libata: Queue ATA internal commands as requests
+  scsi: ipr: Support reserved commands
+  libata/scsi: libsas: Add sas_queuecommand_internal()
+  scsi: libsas: Don't attempt to find scsi host rphy in slave alloc
+  scsi: libsas drivers: Prepare for reserved commands
+  scsi: libsas: Allocate SCSI commands for tasks
+  scsi: libsas: Queue SMP commands as requests
+  scsi: libsas: Queue TMF commands as requests
+  scsi: core: Add scsi_alloc_request_hwq()
+  scsi: libsas: Queue internal abort commands as requests
+  scsi: libsas drivers: Remove private tag management
+
+ block/blk-mq.c                         |   6 +
+ drivers/ata/libata-core.c              | 145 +++++++++++++++----------
+ drivers/ata/libata-sata.c              |   5 +-
+ drivers/ata/libata-scsi.c              |  61 ++++++++++-
+ drivers/ata/libata.h                   |   4 -
+ drivers/scsi/hisi_sas/hisi_sas_main.c  |  93 ++++------------
+ drivers/scsi/hisi_sas/hisi_sas_v2_hw.c |   6 +-
+ drivers/scsi/hisi_sas/hisi_sas_v3_hw.c |   3 +-
+ drivers/scsi/hosts.c                   |  14 +++
+ drivers/scsi/ipr.c                     |  17 ++-
+ drivers/scsi/libsas/sas_ata.c          |  22 ++--
+ drivers/scsi/libsas/sas_expander.c     |  24 ++--
+ drivers/scsi/libsas/sas_init.c         |  74 ++++++++-----
+ drivers/scsi/libsas/sas_internal.h     |   6 +
+ drivers/scsi/libsas/sas_scsi_host.c    | 121 +++++++++++++++------
+ drivers/scsi/scsi_lib.c                |  50 ++++++++-
+ drivers/scsi/scsi_scan.c               |  57 ++++++++++
+ include/linux/blk-mq.h                 |   6 +
+ include/linux/libata.h                 |  13 ++-
+ include/scsi/libsas.h                  |  57 +++++++++-
+ include/scsi/scsi_cmnd.h               |   8 ++
+ include/scsi/scsi_host.h               |  34 +++++-
+ 22 files changed, 597 insertions(+), 229 deletions(-)
 
 -- 
-Thanks,
-
-David / dhildenb
+2.26.2
 
