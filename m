@@ -2,69 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B7AC43334
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 08:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AAFFCCA47E
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 08:46:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244485AbiFJINu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jun 2022 04:13:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44516 "EHLO
+        id S1348147AbiFJIqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jun 2022 04:46:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41476 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236674AbiFJINs (ORCPT
+        with ESMTP id S1348229AbiFJIqE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jun 2022 04:13:48 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7634824581;
-        Fri, 10 Jun 2022 01:13:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Transfer-Encoding
-        :Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=mfo6gnsnKvWPQGI70J9oynwrmqtAtRBKV8BUH0Vequw=; b=UAWAcU1Hf8sZPfCD2b0J+jM0T1
-        SaY3iiJSWUskfoWLJErOAFaf/RbRu6QlXlTfzyI2008+Gu8NDj3h8mK0/+mGBrjIkGrMSQD9qIuax
-        8SndR03P0qOaNNa2XDK933lJEznT7iDReE70hHPDQ9fldQ3pZrlBW+o09FeAqkwWav7iKNvflV/Zo
-        zL6Y9wtXQE/qOrQGevqith5HqKckyowtWuN+Cc2L+cdtYs4M74BVP9pDbm0beMbsTF3dyZ70AfgkR
-        qxkDLuvTTqGTgB9Sl7cJ0lKmjr80/ftESHV1RGrUxVIen+/aUjXLsyQj+3kZ/4dQSorg/3VJKdv/E
-        YV7fz0cw==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1nzZm6-006hyG-A7; Fri, 10 Jun 2022 08:13:46 +0000
-Date:   Fri, 10 Jun 2022 01:13:46 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Sun Feng <loyou85@gmail.com>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        Fri, 10 Jun 2022 04:46:04 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC667205E3;
+        Fri, 10 Jun 2022 01:46:02 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 2351621FD4;
+        Fri, 10 Jun 2022 08:46:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1654850761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ggKEnI6cVqPW68aMINv0KESIBxxtyHQnG9dFax/521w=;
+        b=q6nQ9Cb8BFbi50uUd2y+55kL5K66OPSrgWczmbg5kszbZJF6ZLL8h5UDPy9yEPGxUy2KPg
+        e01hyomD/hFh8kOuwQmIAUle28Q3WluqYbG7IAT5nK3mZ04ixQJxp+e3B3QzVe9Gi7Ad2W
+        Dk5e2aiOaQJ6RPSUNM/MssdU120znmo=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1654850761;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ggKEnI6cVqPW68aMINv0KESIBxxtyHQnG9dFax/521w=;
+        b=MAbi+7nKDKt3zgUoi2CKfv1T/a/MeCpuYw39jK9kxM7wzTOdSgZ61MwRUeHSg0C8N9BRDS
+        gPW0ahFmAiUh6sBw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A2EF7139ED;
+        Fri, 10 Jun 2022 08:46:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id byiiJMgEo2JfUAAAMHmgww
+        (envelope-from <aherrmann@suse.de>); Fri, 10 Jun 2022 08:46:00 +0000
+Date:   Fri, 10 Jun 2022 10:45:58 +0200
+From:   Andreas Herrmann <aherrmann@suse.de>
+To:     Chengming Zhou <zhouchengming@bytedance.com>
+Cc:     tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
         linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] block: fix attribute_group lost if set before add_disk
-Message-ID: <YqL9Ou+UlweAH/Me@infradead.org>
-References: <1654845389-21741-1-git-send-email-loyou85@gmail.com>
+Subject: Re: [PATCH 1/2] blk-iocost: remove the second superfluous
+ current_hweight
+Message-ID: <YqMExo7u9N4sVnyM@suselix>
+References: <20220609073450.98975-1-zhouchengming@bytedance.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1654845389-21741-1-git-send-email-loyou85@gmail.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20220609073450.98975-1-zhouchengming@bytedance.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 10, 2022 at 03:16:29PM +0800, Sun Feng wrote:
-> after commit 52b85909f85d("block: fold register_disk into device_add_disk")
-> when set attribute_group with following code:
+On Thu, Jun 09, 2022 at 03:34:49PM +0800, Chengming Zhou wrote:
+> The commit ac33e91e2dac ("blk-iocost: implement vtime loss compensation")
+> add the second current_hweight() in the loop of active iocgs list to
+> get old_hwi to calculate the vtime loss of the iocg.
 > 
->   disk_to_dev(disk)->groups = attr_groups;
->   err = add_disk(disk);
+> Since the hwi can't change and the first current_hweight already get
+> hwa and hwi, so this second superfluous current_hweight() can be
+> removed. There should be no functional changes.
 > 
-> disk_to_dev(disk)->groups will set to NULL in device_add_disk,
-> 
->   static inline int __must_check add_disk(struct gendisk *disk)
->   {
->        	return device_add_disk(NULL, disk, NULL);
->   }
->   int __must_check device_add_disk(struct device *parent, ...
->                                  const struct attribute_group **groups)
->   {
-> 	…
-> 	ddev->groups = groups
-> 
-> and it will lose attribute group set.
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
 
-Well, your are not supposed to set the attribute group yourself, but
-instead pass it to device_add_disk.
+FWIW. Looks ok.
+Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
