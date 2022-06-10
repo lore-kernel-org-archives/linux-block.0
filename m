@@ -2,78 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9AAFFCCA47E
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 08:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B007DC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 09:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348147AbiFJIqK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jun 2022 04:46:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41476 "EHLO
+        id S243106AbiFJJIg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jun 2022 05:08:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348229AbiFJIqE (ORCPT
+        with ESMTP id S1346754AbiFJJH2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jun 2022 04:46:04 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC667205E3;
-        Fri, 10 Jun 2022 01:46:02 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out1.suse.de (Postfix) with ESMTPS id 2351621FD4;
-        Fri, 10 Jun 2022 08:46:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1654850761; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ggKEnI6cVqPW68aMINv0KESIBxxtyHQnG9dFax/521w=;
-        b=q6nQ9Cb8BFbi50uUd2y+55kL5K66OPSrgWczmbg5kszbZJF6ZLL8h5UDPy9yEPGxUy2KPg
-        e01hyomD/hFh8kOuwQmIAUle28Q3WluqYbG7IAT5nK3mZ04ixQJxp+e3B3QzVe9Gi7Ad2W
-        Dk5e2aiOaQJ6RPSUNM/MssdU120znmo=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1654850761;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=ggKEnI6cVqPW68aMINv0KESIBxxtyHQnG9dFax/521w=;
-        b=MAbi+7nKDKt3zgUoi2CKfv1T/a/MeCpuYw39jK9kxM7wzTOdSgZ61MwRUeHSg0C8N9BRDS
-        gPW0ahFmAiUh6sBw==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A2EF7139ED;
-        Fri, 10 Jun 2022 08:46:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id byiiJMgEo2JfUAAAMHmgww
-        (envelope-from <aherrmann@suse.de>); Fri, 10 Jun 2022 08:46:00 +0000
-Date:   Fri, 10 Jun 2022 10:45:58 +0200
-From:   Andreas Herrmann <aherrmann@suse.de>
-To:     Chengming Zhou <zhouchengming@bytedance.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/2] blk-iocost: remove the second superfluous
- current_hweight
-Message-ID: <YqMExo7u9N4sVnyM@suselix>
-References: <20220609073450.98975-1-zhouchengming@bytedance.com>
+        Fri, 10 Jun 2022 05:07:28 -0400
+Received: from out0-151.mail.aliyun.com (out0-151.mail.aliyun.com [140.205.0.151])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2D1E27E464;
+        Fri, 10 Jun 2022 02:06:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=alibaba-inc.com; s=default;
+        t=1654852008; h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
+        bh=e6YItSYSvR2X0RI4hmCMDtqJZC08EPzkVeRsalHStFU=;
+        b=f/G9YoMhuId38ijqLTqa4r3FpN1iz7bRYw7BOan19fEbOFZe1QQiiDYrWL1AgnNyxIEQpC/HkS1NA1TWbWgfKJNqwZVgdO1NAzrGaj+b0sGc+h0kZZiEyaMFgmmCQ7rAqQoWHBgt6ERam97lkUV/odb13IAFGeMW5IONrGD6lhE=
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047208;MF=zhaowuyun.zwy@alibaba-inc.com;NM=1;PH=DW;RN=4;SR=0;TI=W4_0.1.30_v5ForWebDing_2126A81F_1654851901386_o7001c428;
+Received: from WS-web (zhaowuyun.zwy@alibaba-inc.com[W4_0.1.30_v5ForWebDing_2126A81F_1654851901386_o7001c428]) by ay29a011140100180.et135 at Fri, 10 Jun 2022 17:06:48 +0800
+Date:   Fri, 10 Jun 2022 17:06:48 +0800
+From:   "=?UTF-8?B?6LW15q2m5LqR?=" <zhaowuyun.zwy@alibaba-inc.com>
+To:     "axboe" <axboe@kernel.dk>
+Cc:     "linux-block" <linux-block@vger.kernel.org>,
+        "linux-kernel" <linux-kernel@vger.kernel.org>,
+        "zhaowuyun.zwy" <zhaowuyun.zwy@alibaba-inc.com>
+Reply-To: "=?UTF-8?B?6LW15q2m5LqR?=" <zhaowuyun.zwy@alibaba-inc.com>
+Message-ID: <fd0ee676-4083-4b89-a58a-429d74fb2d33.zhaowuyun.zwy@alibaba-inc.com>
+Subject: =?UTF-8?B?W1BBVENIXSBibG9jazogcGVlayBQTSByZXF1ZXN0cyBkdXJpbmcgcnVudGltZSBQTQ==?=
+X-Mailer: [Alimail-Mailagent revision 5][W4_0.1.30][v5ForWebDing][Safari]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20220609073450.98975-1-zhouchengming@bytedance.com>
+x-aliyun-mail-creator: W4_0.1.30_v5ForWebDing_QvNTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNjA1LjEuMTUgKEtIVE1MLCBsaWtlIEdlY2tvKSBWZXJzaW9uLzE1LjIgU2FmYXJpLzYwNS4xLjE1La
+Content-Type: multipart/mixed;
+  boundary="----=ALIBOUNDARY_75069_7f504c844700_62a309a8_23b95d"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 09, 2022 at 03:34:49PM +0800, Chengming Zhou wrote:
-> The commit ac33e91e2dac ("blk-iocost: implement vtime loss compensation")
-> add the second current_hweight() in the loop of active iocgs list to
-> get old_hwi to calculate the vtime loss of the iocg.
-> 
-> Since the hwi can't change and the first current_hweight already get
-> hwa and hwi, so this second superfluous current_hweight() can be
-> removed. There should be no functional changes.
-> 
-> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+This is a multi-part message in MIME format.
 
-FWIW. Looks ok.
-Reviewed-by: Andreas Herrmann <aherrmann@suse.de>
+------=ALIBOUNDARY_75069_7f504c844700_62a309a8_23b95d
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+SGkgSmVucywKCnBsZWFzZSBjaGVjayB0aGlzIHBhdGNoIGZvciA0LjE5IGluIHRoZSBhdHRhY2ht
+ZW50LgpiZWNhdXNlIGkgY2FuIG5vdCB1c2UgZ2l0IHNlbmQtZW1haWwgd2l0aCBlbWFpbCBvZiBv
+dXIgY29tcGFueSwgc28gaSBzZW5kIGF0dGFjaG1lbnQuCgoKCg==
+------=ALIBOUNDARY_75069_7f504c844700_62a309a8_23b95d
+Content-Type: application/octet-stream
+Content-Disposition: attachment; filename="=?UTF-8?B?MDAwMS1ibG9jay1wZWVrLVBNLXJlcXVlc3RzLWR1cmluZy1ydW50aW1lLVBNLnBhdGNo?="
+Content-Transfer-Encoding: base64
+
+RnJvbSBjNDczM2M3MTY2YjdlNjk2YmE1YzZmNGI3OGUxMGQ0MDkzNmFlYzA0IE1vbiBTZXAgMTcg
+MDA6MDA6MDAgMjAwMQpGcm9tOiBaaGFvIFd1eXVuIDx6aGFvd3V5dW4uend5QGFsaWJhYmEtaW5j
+LmNvbT4KRGF0ZTogRnJpLCAxMCBKdW4gMjAyMiAxNjowMTo0MyArMDgwMApTdWJqZWN0OiBbUEFU
+Q0hdIGJsb2NrOiBwZWVrIFBNIHJlcXVlc3RzIGR1cmluZyBydW50aW1lIFBNCgpxdWV1ZSBibG9j
+a2VkIGR1cmluZyBydW50aW1lIFBNIHdoZW4gYXQgdGhlIGZvbGxvd2luZyBzaXR1YXRpb246Cgpw
+cm9jZXNzIEE6CiAgICBydW50aW1lIHN1c3BlbmQgcnVuIGFuZCBzZXQgdGhlIFBNIHN0YXR1cyB0
+byBSUE1fU1VTUEVORElORwogICAgdGhlbiBydW4gcmVxIHdpdGggUlFGX1BNIHdpdGggYmxrX2V4
+ZWN1dGVfcnEocmVxLT5xLCBOVUxMLCByZXEsIDEpCiAgICB0aGVuIHRoZSByZXEgcXVldWVkIHRv
+IGhlYWQKICAgIGl0IGlzIG5vdCBleGVjdXRlZCB3aGVuIHRoZSBkcml2ZXIgaXMgYnVzeQoKcHJv
+Y2VzcyBCOgogICAgbm9ybWFsIGRldmljZSBtYW5hZ2VtZW50IG9wZXJhdGlvbgogICAgcnVuIHJl
+cSB3aXRoIG5vIFJRRl9QTSB3aXRoIGJsa19leGVjdXRlX3JxKHJlcS0+cSwgTlVMTCwgcmVxLCAx
+KQogICAgdGhlIHRoZSByZXEgaXMgcXVldWVkIGluIGZyb250IG9mIHRoZSBSUUZfUE0gcmVxIG9m
+IHByb2Nlc3MgQQogICAgX19ibGtfcnVuX3F1ZXVlIHN0aWxsIG5vdCBydW4KCmJlY2F1c2UgdGhl
+IGZpcnN0IHJlcSBpcyBub24gUlFGX1BNIHJlcSBhbmQgd2l0aCBSUUZfU09GVEJBUlJJRVIsCnNv
+IHRoZSBxdWV1ZSBpcyB0b3RhbGx5IGJsb2NrZWQgd2hlbiBhdCBSUE1fU1VTUEVORElORyBzdGF0
+dXMuCgpzZWUgdGhlIGZvbGxvd2luZyB0YXNrIGNhbGx0cmFjZToKCnByb2Nlc3MgQToKICAgIFs8
+ZmZmZmZmOWQ4N2U4NjE1MD5dIF9fc3dpdGNoX3RvKzB4MTBjCiAgICBbPGZmZmZmZjlkODhlZDhh
+YjA+XSBfX3NjaGVkdWxlKzB4NjcwCiAgICBbPGZmZmZmZjlkODhlZDhkMTg+XSBzY2hlZHVsZSsw
+eDc0CiAgICBbPGZmZmZmZjlkODhlZGM4ZjQ+XSBzY2hlZHVsZV90aW1lb3V0KzB4MzI4CiAgICBb
+PGZmZmZmZjlkODhlZDkxMzA+XSBpb19zY2hlZHVsZV90aW1lb3V0KzB4MjQKICAgIFs8ZmZmZmZm
+OWQ4OGVkOWIxMD5dIHdhaXRfZm9yX2NvbW1vbl9pbysweDkwCiAgICBbPGZmZmZmZjlkODhlZDli
+YjQ+XSB3YWl0X2Zvcl9jb21wbGV0aW9uX2lvX3RpbWVvdXQrMHgyNAogICAgWzxmZmZmZmY5ZDg4
+MjllMWUwPl0gYmxrX2V4ZWN1dGVfcnErMHg4OAogICAgWzxmZmZmZmY5ZDg4NTliM2E0Pl0gc2Nz
+aV9leGVjdXRlKzB4MTE0CiAgICBbPGZmZmZmZjlkODg1YzQwNzA+XSBzZF9zeW5jX2NhY2hlKzB4
+ZmMKICAgIFs8ZmZmZmZmOWQ4ODVjNDM5Yz5dIHNkX3N1c3BlbmRfY29tbW9uKzB4NTgKICAgIFs8
+ZmZmZmZmOWQ4ODVjNDMzOD5dIHNkX3N1c3BlbmRfcnVudGltZSsweDIwCiAgICBbPGZmZmZmZjlk
+ODg1YTczY2M+XSBzY3NpX3J1bnRpbWVfc3VzcGVuZCsweDcwCiAgICBbPGZmZmZmZjlkODg1MzQx
+ZTg+XSBfX3JwbV9jYWxsYmFjaysweGNjCiAgICBbPGZmZmZmZjlkODg1MzQwZTg+XSBycG1fY2Fs
+bGJhY2srMHg1YwogICAgWzxmZmZmZmY5ZDg4NTMyMTM0Pl0gcnBtX3N1c3BlbmQrMHgxZTgKICAg
+IFs8ZmZmZmZmOWQ4ODUzM2IyOD5dIHBtX3J1bnRpbWVfd29yaysweDdjCiAgICBbPGZmZmZmZjlk
+ODdlZDMxZDQ+XSBwcm9jZXNzX29uZV93b3JrKzB4MWJjCiAgICBbPGZmZmZmZjlkODdlZDM2Njg+
+XSB3b3JrZXJfdGhyZWFkKzB4MjE0CiAgICBbPGZmZmZmZjlkODdlZDgzOWM+XSBrdGhyZWFkKzB4
+MTFjCiAgICBbPGZmZmZmZjlkODdlODRmY2M+XSByZXRfZnJvbV9mb3JrKzB4MTAKCnByb2Nlc3Mg
+QjoKICAgIFs8ZmZmZmZmOWQ4N2U4NjE1MD5dIF9fc3dpdGNoX3RvKzB4MTBjCiAgICBbPGZmZmZm
+ZjlkODhlZDhhYjA+XSBfX3NjaGVkdWxlKzB4NjcwCiAgICBbPGZmZmZmZjlkODhlZDhkMTg+XSBz
+Y2hlZHVsZSsweDc0CiAgICBbPGZmZmZmZjlkODhlZGM4ZjQ+XSBzY2hlZHVsZV90aW1lb3V0KzB4
+MzI4CiAgICBbPGZmZmZmZjlkODhlZDkxMzA+XSBpb19zY2hlZHVsZV90aW1lb3V0KzB4MjQKICAg
+IFs8ZmZmZmZmOWQ4OGVkOWIxMD5dIHdhaXRfZm9yX2NvbW1vbl9pbysweDkwCiAgICBbPGZmZmZm
+ZjlkODhlZDliYjQ+XSB3YWl0X2Zvcl9jb21wbGV0aW9uX2lvX3RpbWVvdXQrMHgyNAogICAgWzxm
+ZmZmZmY5ZDg4MjllMWUwPl0gYmxrX2V4ZWN1dGVfcnErMHg4OAogICAgWzxmZmZmZmY5ZDg4NTli
+M2E0Pl0gc2NzaV9leGVjdXRlKzB4MTE0CiAgICBbPGZmZmZmZjlkODg1OWQ4NTQ+XSBzY3NpX3Rl
+c3RfdW5pdF9yZWFkeSsweDcwCiAgICBbPGZmZmZmZjlkODg1YzJmNDg+XSBzZF9jaGVja19ldmVu
+dHMrMHhkNAogICAgWzxmZmZmZmY5ZDg4MmFiZGU4Pl0gZGlza19jaGVja19ldmVudHMrMHg1OAog
+ICAgWzxmZmZmZmY5ZDg4MmFjYzBjPl0gZGlza19ldmVudHNfd29ya2ZuKzB4MjAKICAgIFs8ZmZm
+ZmZmOWQ4N2VkMzFkND5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxYmMKICAgIFs8ZmZmZmZmOWQ4N2Vk
+MzY2OD5dIHdvcmtlcl90aHJlYWQrMHgyMTQKICAgIFs8ZmZmZmZmOWQ4N2VkODM5Yz5dIGt0aHJl
+YWQrMHgxMWMKICAgIFs8ZmZmZmZmOWQ4N2U4NGZjYz5dIHJldF9mcm9tX2ZvcmsrMHgxMAoKU2ln
+bmVkLW9mZi1ieTogWmhhbyBXdXl1biA8emhhb3d1eXVuLnp3eUBhbGliYWJhLWluYy5jb20+Ci0t
+LQogYmxvY2svYmxrLWNvcmUuYyB8IDkgKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgOSBpbnNl
+cnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUuYyBiL2Jsb2NrL2Jsay1jb3Jl
+LmMKaW5kZXggYTMzNzc1Y2Q5N2JlLi44YjkyNzJiZmRjMDkgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2Js
+ay1jb3JlLmMKKysrIGIvYmxvY2svYmxrLWNvcmUuYwpAQCAtMjg1Niw2ICsyODU2LDE1IEBAIHN0
+YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqZWx2X25leHRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9xdWV1
+ZSAqcSkKIAkJCWlmIChibGtfcG1fYWxsb3dfcmVxdWVzdChycSkpCiAJCQkJcmV0dXJuIHJxOwog
+CisJCQkvKgorCQkJICogbGV0IHRoZSBQTSByZXF1ZXN0IHJ1biwKKwkJCSAqIG9yIHRoZSBxdWV1
+ZSBtYXkgYmUgYmxvY2tlZCBieSB0aGUgbm9uLVBNIHJlcXVlc3QKKwkJCSAqIHdpdGggUlFGX1NP
+RlRCQVJSSUVSIGZvcmV2ZXIgd2hpbGUgZG9pbmcgcnVudGltZSBQTS4KKwkJCSAqLworCQkJaWYg
+KHEtPnJwbV9zdGF0dXMgPT0gUlBNX1NVU1BFTkRJTkcKKwkJCQkJCXx8IHEtPnJwbV9zdGF0dXMg
+PT0gUlBNX1JFU1VNSU5HKQorCQkJCWNvbnRpbnVlOworCiAJCQlpZiAocnEtPnJxX2ZsYWdzICYg
+UlFGX1NPRlRCQVJSSUVSKQogCQkJCWJyZWFrOwogCQl9Ci0tIAoyLjMyLjEgKEFwcGxlIEdpdC0x
+MzMpCgo=
+
+------=ALIBOUNDARY_75069_7f504c844700_62a309a8_23b95d--
+
