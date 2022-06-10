@@ -2,39 +2,39 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDA4C43334
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 20:10:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2BE8C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 20:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347094AbiFJUKP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jun 2022 16:10:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44366 "EHLO
+        id S1347052AbiFJUQH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jun 2022 16:16:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347206AbiFJUKO (ORCPT
+        with ESMTP id S1350511AbiFJUQG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jun 2022 16:10:14 -0400
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C41023F222
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:10:13 -0700 (PDT)
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-        by mx0a-00082601.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25AIAHeN020085
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:10:13 -0700
+        Fri, 10 Jun 2022 16:16:06 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A25F0248244
+        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:16:05 -0700 (PDT)
+Received: from pps.filterd (m0001303.ppops.net [127.0.0.1])
+        by m0001303.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 25AHfkCM023139
+        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:16:05 -0700
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding : content-type; s=facebook;
- bh=mlVah37siRWUWBy0LAmeGrNqNHKmkneld6bcywwyZNw=;
- b=XVtUQEGF87zrS1oOcqaWmHPRxNMJniZ9tdOWqFKowFkODVkvbKdg39TEWsuVYZHuBwaU
- ycjRfRfinI27x/Pa65F2318wWjpkyU1LEP4EQEWfKSQy06t8b4iki1giYooFNCn7ZxCx
- c65DfK1eNkeonpkKk6k7b8Q+HUjCaHEY2+M= 
+ bh=yZwAcMb7nvm5kT10B/5We7Ift1xV1Z3biqKS4IGAik0=;
+ b=R1g4AndrsLF0QN5ADX8A51Nc86xdhtJWrXWSICpv58MHs4FJ4rRl9lDMKKRNDK3u5/g8
+ RyQJ4p5LYyvkLfT6lda5QSJJbesVsDGaGDDv5rl8qWo+NK5EnJxUDkgAG5YG1gPkayg7
+ mq7ojV2cfpDedZF7Evugh7ygJd47cGu7S2U= 
 Received: from maileast.thefacebook.com ([163.114.130.16])
-        by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3gmb0hgprc-2
+        by m0001303.ppops.net (PPS) with ESMTPS id 3gmak510n2-6
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:10:13 -0700
-Received: from twshared10560.18.frc3.facebook.com (2620:10d:c0a8:1b::d) by
- mail.thefacebook.com (2620:10d:c0a8:83::6) with Microsoft SMTP Server
+        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 13:16:04 -0700
+Received: from twshared18317.08.ash9.facebook.com (2620:10d:c0a8:1b::d) by
+ mail.thefacebook.com (2620:10d:c0a8:83::4) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.28; Fri, 10 Jun 2022 13:10:11 -0700
+ 15.1.2375.28; Fri, 10 Jun 2022 13:16:04 -0700
 Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
-        id DF25F4E9D6A4; Fri, 10 Jun 2022 12:58:31 -0700 (PDT)
+        id 1FEAC4E9D6A8; Fri, 10 Jun 2022 12:58:31 -0700 (PDT)
 From:   Keith Busch <kbusch@fb.com>
 To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
         <linux-nvme@lists.infradead.org>
@@ -42,10 +42,10 @@ CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
         <bvanassche@acm.org>, <damien.lemoal@opensource.wdc.com>,
         <ebiggers@kernel.org>, <pankydev8@gmail.com>,
         Keith Busch <kbusch@kernel.org>,
-        Johannes Thumshirn <johannes.thumshirn@wdc.com>
-Subject: [PATCHv6 06/11] block/merge: count bytes instead of sectors
-Date:   Fri, 10 Jun 2022 12:58:25 -0700
-Message-ID: <20220610195830.3574005-7-kbusch@fb.com>
+        Alexander Viro <viro@zeniv.linux.org.uk>
+Subject: [PATCHv6 08/11] iov: introduce iov_iter_aligned
+Date:   Fri, 10 Jun 2022 12:58:27 -0700
+Message-ID: <20220610195830.3574005-9-kbusch@fb.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220610195830.3574005-1-kbusch@fb.com>
 References: <20220610195830.3574005-1-kbusch@fb.com>
@@ -53,8 +53,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 X-FB-Internal: Safe
 Content-Type: text/plain
-X-Proofpoint-GUID: J9VHSdKzGFLL9pNhrv13XbW8lRmEbltD
-X-Proofpoint-ORIG-GUID: J9VHSdKzGFLL9pNhrv13XbW8lRmEbltD
+X-Proofpoint-GUID: tQZbNZv-ZDJo5ew4L4B2vmbPgenVrWDn
+X-Proofpoint-ORIG-GUID: tQZbNZv-ZDJo5ew4L4B2vmbPgenVrWDn
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.205,Aquarius:18.0.874,Hydra:6.0.517,FMLib:17.11.64.514
  definitions=2022-06-10_08,2022-06-09_02,2022-02-23_01
@@ -64,141 +64,143 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Keith Busch <kbusch@kernel.org>
 
-Individual bv_len's may not be a sector size.
+The existing iov_iter_alignment() function returns the logical OR of
+address and length. For cases where address and length need to be
+considered separately, introduce a helper function that a caller can
+specificy length and address masks that indicate if the iov is
+unaligned.
 
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>
 Signed-off-by: Keith Busch <kbusch@kernel.org>
 Reviewed-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
 ---
- block/blk-merge.c | 41 ++++++++++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 17 deletions(-)
+ include/linux/uio.h |  2 +
+ lib/iov_iter.c      | 92 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 94 insertions(+)
 
-diff --git a/block/blk-merge.c b/block/blk-merge.c
-index 7771dacc99cb..3874619ba136 100644
---- a/block/blk-merge.c
-+++ b/block/blk-merge.c
-@@ -201,11 +201,11 @@ static inline unsigned get_max_segment_size(const s=
-truct request_queue *q,
-  * @nsegs:    [in,out] Number of segments in the bio being built. Increm=
-ented
-  *            by the number of segments from @bv that may be appended to=
- that
-  *            bio without exceeding @max_segs
-- * @sectors:  [in,out] Number of sectors in the bio being built. Increme=
-nted
-- *            by the number of sectors from @bv that may be appended to =
-that
-- *            bio without exceeding @max_sectors
-+ * @bytes:    [in,out] Number of bytes in the bio being built. Increment=
-ed
-+ *            by the number of bytes from @bv that may be appended to th=
-at
-+ *            bio without exceeding @max_bytes
-  * @max_segs: [in] upper bound for *@nsegs
-- * @max_sectors: [in] upper bound for *@sectors
-+ * @max_bytes: [in] upper bound for *@bytes
-  *
-  * When splitting a bio, it can happen that a bvec is encountered that i=
-s too
-  * big to fit in a single segment and hence that it has to be split in t=
-he
-@@ -216,10 +216,10 @@ static inline unsigned get_max_segment_size(const s=
-truct request_queue *q,
-  */
- static bool bvec_split_segs(const struct request_queue *q,
- 			    const struct bio_vec *bv, unsigned *nsegs,
--			    unsigned *sectors, unsigned max_segs,
--			    unsigned max_sectors)
-+			    unsigned *bytes, unsigned max_segs,
-+			    unsigned max_bytes)
- {
--	unsigned max_len =3D (min(max_sectors, UINT_MAX >> 9) - *sectors) << 9;
-+	unsigned max_len =3D min(max_bytes, UINT_MAX) - *bytes;
- 	unsigned len =3D min(bv->bv_len, max_len);
- 	unsigned total_len =3D 0;
- 	unsigned seg_size =3D 0;
-@@ -237,7 +237,7 @@ static bool bvec_split_segs(const struct request_queu=
-e *q,
- 			break;
- 	}
+diff --git a/include/linux/uio.h b/include/linux/uio.h
+index 739285fe5a2f..34ba4a731179 100644
+--- a/include/linux/uio.h
++++ b/include/linux/uio.h
+@@ -219,6 +219,8 @@ size_t _copy_mc_to_iter(const void *addr, size_t byte=
+s, struct iov_iter *i);
+ #endif
 =20
--	*sectors +=3D total_len >> 9;
-+	*bytes +=3D total_len;
+ size_t iov_iter_zero(size_t bytes, struct iov_iter *);
++bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
++			unsigned len_mask);
+ unsigned long iov_iter_alignment(const struct iov_iter *i);
+ unsigned long iov_iter_gap_alignment(const struct iov_iter *i);
+ void iov_iter_init(struct iov_iter *i, unsigned int direction, const str=
+uct iovec *iov,
+diff --git a/lib/iov_iter.c b/lib/iov_iter.c
+index 6dd5330f7a99..a39b24496878 100644
+--- a/lib/iov_iter.c
++++ b/lib/iov_iter.c
+@@ -1268,6 +1268,98 @@ void iov_iter_discard(struct iov_iter *i, unsigned=
+ int direction, size_t count)
+ }
+ EXPORT_SYMBOL(iov_iter_discard);
 =20
- 	/* tell the caller to split the bvec if it is too big to fit */
- 	return len > 0 || bv->bv_len > max_len;
-@@ -269,8 +269,8 @@ static struct bio *blk_bio_segment_split(struct reque=
-st_queue *q,
- {
- 	struct bio_vec bv, bvprv, *bvprvp =3D NULL;
- 	struct bvec_iter iter;
--	unsigned nsegs =3D 0, sectors =3D 0;
--	const unsigned max_sectors =3D get_max_io_size(q, bio);
-+	unsigned nsegs =3D 0, bytes =3D 0;
-+	const unsigned max_bytes =3D get_max_io_size(q, bio) << 9;
- 	const unsigned max_segs =3D queue_max_segments(q);
-=20
- 	bio_for_each_bvec(bv, bio, iter) {
-@@ -282,12 +282,12 @@ static struct bio *blk_bio_segment_split(struct req=
-uest_queue *q,
- 			goto split;
-=20
- 		if (nsegs < max_segs &&
--		    sectors + (bv.bv_len >> 9) <=3D max_sectors &&
-+		    bytes + bv.bv_len <=3D max_bytes &&
- 		    bv.bv_offset + bv.bv_len <=3D PAGE_SIZE) {
- 			nsegs++;
--			sectors +=3D bv.bv_len >> 9;
--		} else if (bvec_split_segs(q, &bv, &nsegs, &sectors, max_segs,
--					 max_sectors)) {
-+			bytes +=3D bv.bv_len;
-+		} else if (bvec_split_segs(q, &bv, &nsegs, &bytes, max_segs,
-+					   max_bytes)) {
- 			goto split;
- 		}
-=20
-@@ -300,13 +300,20 @@ static struct bio *blk_bio_segment_split(struct req=
-uest_queue *q,
- split:
- 	*segs =3D nsegs;
-=20
-+	/*
-+	 * Individual bvecs might not be logical block aligned. Round down the
-+	 * split size so that each bio is properly block size aligned, even if
-+	 * we do not use the full hardware limits.
-+	 */
-+	bytes =3D ALIGN_DOWN(bytes, queue_logical_block_size(q));
++static bool iov_iter_aligned_iovec(const struct iov_iter *i, unsigned ad=
+dr_mask,
++				   unsigned len_mask)
++{
++	size_t size =3D i->count;
++	size_t skip =3D i->iov_offset;
++	unsigned k;
 +
- 	/*
- 	 * Bio splitting may cause subtle trouble such as hang when doing sync
- 	 * iopoll in direct IO routine. Given performance gain of iopoll for
- 	 * big IO can be trival, disable iopoll when split needed.
- 	 */
- 	bio_clear_polled(bio);
--	return bio_split(bio, sectors, GFP_NOIO, bs);
-+	return bio_split(bio, bytes >> SECTOR_SHIFT, GFP_NOIO, bs);
- }
-=20
- /**
-@@ -375,7 +382,7 @@ EXPORT_SYMBOL(blk_queue_split);
- unsigned int blk_recalc_rq_segments(struct request *rq)
++	for (k =3D 0; k < i->nr_segs; k++, skip =3D 0) {
++		size_t len =3D i->iov[k].iov_len - skip;
++
++		if (len > size)
++			len =3D size;
++		if (len & len_mask)
++			return false;
++		if ((unsigned long)(i->iov[k].iov_base + skip) & addr_mask)
++			return false;
++
++		size -=3D len;
++		if (!size)
++			break;
++	}
++	return true;
++}
++
++static bool iov_iter_aligned_bvec(const struct iov_iter *i, unsigned add=
+r_mask,
++				  unsigned len_mask)
++{
++	size_t size =3D i->count;
++	unsigned skip =3D i->iov_offset;
++	unsigned k;
++
++	for (k =3D 0; k < i->nr_segs; k++, skip =3D 0) {
++		size_t len =3D i->bvec[k].bv_len - skip;
++
++		if (len > size)
++			len =3D size;
++		if (len & len_mask)
++			return false;
++		if ((unsigned long)(i->bvec[k].bv_offset + skip) & addr_mask)
++			return false;
++
++		size -=3D len;
++		if (!size)
++			break;
++	}
++	return true;
++}
++
++/**
++ * iov_iter_is_aligned() - Check if the addresses and lengths of each se=
+gments
++ * 	are aligned to the parameters.
++ *
++ * @i: &struct iov_iter to restore
++ * @addr_mask: bit mask to check against the iov element's addresses
++ * @len_mask: bit mask to check against the iov element's lengths
++ *
++ * Return: false if any addresses or lengths intersect with the provided=
+ masks
++ */
++bool iov_iter_is_aligned(const struct iov_iter *i, unsigned addr_mask,
++			 unsigned len_mask)
++{
++	if (likely(iter_is_iovec(i) || iov_iter_is_kvec(i)))
++		return iov_iter_aligned_iovec(i, addr_mask, len_mask);
++
++	if (iov_iter_is_bvec(i))
++		return iov_iter_aligned_bvec(i, addr_mask, len_mask);
++
++	if (iov_iter_is_pipe(i)) {
++		unsigned int p_mask =3D i->pipe->ring_size - 1;
++		size_t size =3D i->count;
++
++		if (size & len_mask)
++			return false;
++		if (size && allocated(&i->pipe->bufs[i->head & p_mask])) {
++			if (i->iov_offset & addr_mask)
++				return false;
++		}
++
++		return true;
++	}
++
++	if (iov_iter_is_xarray(i)) {
++		if (i->count & len_mask)
++			return false;
++		if ((i->xarray_start + i->iov_offset) & addr_mask)
++			return false;
++	}
++
++	return true;
++}
++EXPORT_SYMBOL_GPL(iov_iter_is_aligned);
++
+ static unsigned long iov_iter_alignment_iovec(const struct iov_iter *i)
  {
- 	unsigned int nr_phys_segs =3D 0;
--	unsigned int nr_sectors =3D 0;
-+	unsigned int bytes =3D 0;
- 	struct req_iterator iter;
- 	struct bio_vec bv;
-=20
-@@ -398,7 +405,7 @@ unsigned int blk_recalc_rq_segments(struct request *r=
-q)
- 	}
-=20
- 	rq_for_each_bvec(bv, rq, iter)
--		bvec_split_segs(rq->q, &bv, &nr_phys_segs, &nr_sectors,
-+		bvec_split_segs(rq->q, &bv, &nr_phys_segs, &bytes,
- 				UINT_MAX, UINT_MAX);
- 	return nr_phys_segs;
- }
+ 	unsigned long res =3D 0;
 --=20
 2.30.2
 
