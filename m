@@ -2,418 +2,379 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 582EECCA473
-	for <linux-block@archiver.kernel.org>; Thu,  9 Jun 2022 23:53:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C8F20C43334
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 01:53:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237113AbiFIXxj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 9 Jun 2022 19:53:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50756 "EHLO
+        id S237331AbiFJBxT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 9 Jun 2022 21:53:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38382 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229924AbiFIXxf (ORCPT
-        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 19:53:35 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DD5F765C;
-        Thu,  9 Jun 2022 16:53:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1654818813; x=1686354813;
-  h=from:to:subject:date:message-id:content-id:
-   content-transfer-encoding:mime-version;
-  bh=hFkB+PIrqZHeJeKu4b1BOmiypm7r9pvuFOBNZA3Wgcw=;
-  b=LsK5iVlZBXH2iBunzaA2UHhXdp2cdek+HAxAyt+7TY90UJ684eY0K0VC
-   1Tv6qTgnw7GBToIVUdS8BUUFeAZV5LEwdxw70Mpe5YofXFn7BVYye0Emg
-   RCKSYfNU4RBN76HySdAkdTjh6JImprJiGO6d4qtNQC3ZGbgxwMz0dczdU
-   N+QKRl09qhMpWPXl37DfKtUwUW05fBFcrLO2K4H8MY83jrTgNeDZqyTtz
-   zuiskf9aMB19RbJuLJQ9UNUTqGjnCBFbp6yln/YVRv90ej/mZ0Qq4djo7
-   pj8x/eId32W6d+7aLn1/c0BFvPsctXp6xpZZWdh4ekRVSCRXW8lTpGblq
-   w==;
-X-IronPort-AV: E=Sophos;i="5.91,288,1647273600"; 
-   d="scan'208";a="307026387"
-Received: from mail-mw2nam10lp2107.outbound.protection.outlook.com (HELO NAM10-MW2-obe.outbound.protection.outlook.com) ([104.47.55.107])
-  by ob1.hgst.iphmx.com with ESMTP; 10 Jun 2022 07:53:32 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=c1i7oepc7duSK2g+7lMkew8ed337pIjpd8s1TkiA/LofL1bkBIILrA/07EAhFB8nc1o82F0fGDwlchZhIM3ffwsH89vQimBtYtAEksfGV6YcmNOyPVu1RXLKcVvE2cFMjnQdkVIdjhiPUuIXzKaVdjs5RwaR+w1NBUnS1abagUsg3NO1YwWlbfY4hIfjTh2RlX4UF6jTh/FKA1c3idYxz79PxR2OjUHPE97k4aFMVyl6s7wZZQeGWplIQMwfiB4CoQ8Zl8oRiABO8OAdXRbs43soqSOToK63wXrhxndkmK433hOmGpkT3rQgfjeqj8oCdqmuOxaF7P3Nyh9/KE/RQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gIWgPtjSBMLq3+xPQOyHsfgIdxMMURTBys7ZJqLTOlo=;
- b=A+Eaiq5+xyqTPKK2SdnjNBnp6JQ606ND8V4MWL+cE2lBTHkH3iaJPFmbVh6FF7wp2S6pjnyev3tv0iwoboiik4ySZ86mdq94CWcgAkEbeptna9dGDnM9fBcY7GnQXs9iXKEX//ywKMb2djld4qFcA5iIbhlloGI9RNqMXuuP5ZigB4qY8FSteOx/+tyAFFFqO0nuYAXTeC4NH2Co5oghsOM9DY/J/Vuna6F9SA78/seNTEcIFVbndGNxqst848/qFZbkX4FbRxuqr7Tj6hAspy+boKpq+OqIEX1cdMglbgA+8eWTqbuejie7NozD26rhcvLAwk9ustDlSj5TaDY/ZQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gIWgPtjSBMLq3+xPQOyHsfgIdxMMURTBys7ZJqLTOlo=;
- b=Hs8NvbVW12+ByCMtt+uiGnF8rOfpLwjhWDyCg3wmS+AHH6KeBq9EKdtOO4DwauPC4Tbhv5TKUTP6hCeLFU+tsYVWoLmCRbTbWTxT/0d//9IkMYpVLZ6l2/RuvwaUp2m29/zz1wsVv+MtyHiDxQpDdrAqFnmynkS7TH6qHTl7WJY=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BN3PR04MB2276.namprd04.prod.outlook.com (2a01:111:e400:7bb9::27) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.12; Thu, 9 Jun
- 2022 23:53:30 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5332.013; Thu, 9 Jun 2022
- 23:53:30 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>
-Subject: blktests failures with v5.19-rc1
-Thread-Topic: blktests failures with v5.19-rc1
-Thread-Index: AQHYfFwe8PMwMXtEZEqIJFDj8WJWFQ==
-Date:   Thu, 9 Jun 2022 23:53:30 +0000
-Message-ID: <20220609235329.4jbz4wr3eg2nmzqa@shindev>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 580c390f-deaf-453e-3ef5-08da4a734141
-x-ms-traffictypediagnostic: BN3PR04MB2276:EE_
-x-microsoft-antispam-prvs: <BN3PR04MB22762D8B68550C57D65129C2EDA79@BN3PR04MB2276.namprd04.prod.outlook.com>
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: SinYB7m0XDfI+uNXVt9XHCCfLCjGbsenFs15oQK+B/3l7/JOzwNRhf4HLVuP52AGYePj++qy1c/StoW+xooO2C5J6Ke8pRlVjnWQvxyQ8NfnikkZkgsaRHpTXWotpqU1iI1lQlpaKIjW3lfD0AVHU6SAEU+BPKS263CaJbwKjxisiJg080u8HD1MIhFn5czBDlCTly/Lw/ZbDhMC2gTJkrvFW5L6Mz86yCjbK3Ik7ahWQDQNBmN9zUluIK7bcD3Umj15dK5RVpHDOXiKU1dNqv5c36fsrrV21bApEXZUXHM3aiP5uc7Abt2VtDLc8xI0qprUb0t2s7zNGHonl3/ELjQA4xWZGQMB5D3oWi9QIdyF20tw1CpGaLLrXuEHed6lxYNQ6lq/dRrSptrbbfgAud/CG4C0wq3o4zW3WdCuvCYcix8QhEwm2mGpsTUUfsJG+HR+UySyReLpI3DprBhp02XqqahS1QtS9zSZ48bb+m1DXydo1+reavG7fdoLgp/5TrgAMPLm4nhPM3SamcnlbSfkndzzLCTRZ2+YezynEd9LUFXV0oB2Z6GfRlwYjlq6sFP8OkAhvYjmRK1z90ZSpwjS0GpGjVRc1IKdIjoXnN6xL7pH4JzqW3YWXhCoBqOXUgeJU32FsmmCW0S0mbHoVqtc8hpMYcFkFSWd3kcewO03miekgkYaypptc2C0ne61ahCWrQ4MhdzCiP83cmbJqkv0OSrkkWiGWlae8rq7UW4FL4l/nHkr2O/5SvXXL4vIXYQhhZ0w0IAKmsH+/cP4wWYhvuAWi+zvZaZ/JMrXPIE=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230001)(7916004)(4636009)(366004)(110136005)(966005)(30864003)(38100700002)(33716001)(8676002)(64756008)(122000001)(91956017)(5660300002)(6486002)(9686003)(66446008)(66946007)(66476007)(66556008)(76116006)(6506007)(6512007)(26005)(316002)(83380400001)(71200400001)(186003)(508600001)(1076003)(86362001)(38070700005)(44832011)(2906002)(82960400001)(8936002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?WElf8suAKXBnXhqcaDpiHpKOSahdeXXMouPE/RgV8EPz2emkeF4YMQJSE1fZ?=
- =?us-ascii?Q?ZgUdP7HtxI7GAE/c9gfg3xnH0upJRDYs/ePswYwj8V1pnAkmZ+o5iVYufyk9?=
- =?us-ascii?Q?cMZT7M3kZDTFp6GqxUaeVjeIN7UubNQYTq39uq6rea3zqQONZMCjXqhlFSa8?=
- =?us-ascii?Q?4nT0HYQXep2o1g9j2RmQ+EPClSwD1kXzF9aRSufTgwFBRkkJITAiDQPq+PD5?=
- =?us-ascii?Q?Sz0c0i2dXbZmzIkUxZCDA3BX1aZETFSGCJCh/Aiy0qu88HtD7l1Ip+ToomQL?=
- =?us-ascii?Q?yvyWl3y9N8ZHmJyeD+JuWrovfZ+o1s5xPaHTY3QlZ5YuaBn1Q40tCYKZWXbn?=
- =?us-ascii?Q?yqMSBTJKBRRtNt0gjHRfMFBFz8pabSdIWbMQVV8ZcaRATcJXpNwN857/MVvS?=
- =?us-ascii?Q?nm3DD5kmo0aoVAsSBOrSlpBq3vHBt61ceP0MVWAKMfr9I/YT2oVQbK3C+nqG?=
- =?us-ascii?Q?XkTO+NFYDia1XFymGKa4EE9Mq9DcvzPU0wvjCAyq+ciorrQMwp/uo/9fwQ0V?=
- =?us-ascii?Q?0tMYNrtmm0ltb+Qx0AxZsMY1IB7GPKJwrqcv1f7ShmYsbJpm6ugDe4ccubZ6?=
- =?us-ascii?Q?oYmCtMB5skam2e+QynpRi1rGY8PT2SmycTK42WmJIEG8HJ1wjDiFLsS71V/K?=
- =?us-ascii?Q?RV2S/Ln6hOV2IG8U0QNbG+TCRwJQ/Poinj3c0OUUnRraRjaOBRFe9RhZVF/A?=
- =?us-ascii?Q?yPbwvBKWh2F1My5IgiDsqcb93TPoq/ahIwKPUqVx5O3srt8YV2p0q0Io12Me?=
- =?us-ascii?Q?V4PX1y+QxUp5RNDhHibmgGIrfwEa+/PgHPHH9gyyLMk4F2ZF4x00T3j10/Ca?=
- =?us-ascii?Q?dAuv8XDOAgGe5s/SrM5fSi6XzndXPbrlHD5uUmTppzZL0LNG4tfHxMEK18eo?=
- =?us-ascii?Q?D9kugvr9EP5nwOHgl2AjfiMP53knVczGzEKM/Gv3f1V5wK4h1yoHdUbqlgIy?=
- =?us-ascii?Q?DHJ+QdwuSxzf8CSBS9OqnZmXTCp3JAAnBVLdq2evCFrr/GeCeaaLXvLYe9lm?=
- =?us-ascii?Q?g01AGDEMzOgv2OILR33CRgV1NxUCZw8tZ5TqleKjoXVgW4LMEkT+y5Zg0zOm?=
- =?us-ascii?Q?WGN+Bw9lvfjNaua9BZBZmevZGyUaPidQjx/HpHmYBmiV5b4kVN21JU+DGE5X?=
- =?us-ascii?Q?0vwi8ZmPD9xY11SE9eyqOfYPuP8/cG4YgNz9P4Py2xIVBi/mx91JLilzzHyQ?=
- =?us-ascii?Q?CCaQzRXesKULxswBgTul36KjCmAvmObQSrayhd0gs3Ng6IpHabL1fqJC/P/Q?=
- =?us-ascii?Q?Sybf5QLD1VDf1J91teSyk51BZcjUzLSMcOg22LyZQ24B6/QCLPZZYRbuwMdd?=
- =?us-ascii?Q?C+W9BGb2KmtcglFl7l2KVP7g7AfhC21hzWyyrDede2W2urSulb2NoUGhDe8r?=
- =?us-ascii?Q?RkDv1gTi1MJ2kNG5Vi1mUP/oEOBaY9Fpr78WgLUAqRxOhzaK40TpYOBb9ogv?=
- =?us-ascii?Q?oqyq4hlbW9rVJ0sF0k6HNY/A2rhc5EE4AVoBO02CpKV80oZO8uwoGVq2Td60?=
- =?us-ascii?Q?VC+3gJYya2+/yWqNP0218kVUMISJwwu3nHV8A+aZR70KhRiVO7AbaQbUK+e+?=
- =?us-ascii?Q?JDtTivVFjva8D7SePZC0E2Bs3hdpfxKDWGgnFWliLhMz8AmKk0qziqhma6DJ?=
- =?us-ascii?Q?N/+f8VHlt02eExses3NNJFGcwQJENZwP1Tx9oCr5OlX4alBqnzdlCskb1eNF?=
- =?us-ascii?Q?FIRIBms/meJejcQXwRITn9ibxCJuJtJd/6KVenk+faRIhcSYqjr0ak4sHfj5?=
- =?us-ascii?Q?afZh7B4Njw1ccFnGS8j+5S8EyVpLjwNif8qR4WPiJznfHfpk244M?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <5C0BA5CCF1B43945A54DDF418748EDAD@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        with ESMTP id S242210AbiFJBxN (ORCPT
+        <rfc822;linux-block@vger.kernel.org>); Thu, 9 Jun 2022 21:53:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DB9AD220FC2
+        for <linux-block@vger.kernel.org>; Thu,  9 Jun 2022 18:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654825991;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=xmmaPFipZtWgGS15GnP0nxoz6LYFbNPObNJ/8AvuP4c=;
+        b=KlAik8BZDfdiiTdGkBF0MNk6+Hf2lVqucShclqKFocL4hytx0Lk+hx22vzXHFMK0nq6QFL
+        L0A9vrEa3QXy7oIqK7Uzhzq0WO3EGY6dMMjshtPE1yNL1ciIvMM61+ess5EPZsaGNnjjXT
+        1JOqQ4lq80+fXIAslLVSKYcOzmZ5RPI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-613-riay9_iON9CozCfn_JatVA-1; Thu, 09 Jun 2022 21:53:05 -0400
+X-MC-Unique: riay9_iON9CozCfn_JatVA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 317E11C0518D;
+        Fri, 10 Jun 2022 01:53:05 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id D39D91415100;
+        Fri, 10 Jun 2022 01:52:59 +0000 (UTC)
+Date:   Fri, 10 Jun 2022 09:52:53 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        lsf-pc@lists.linux-foundation.org, linux-block@vger.kernel.org,
+        Pavel Machek <pavel@ucw.cz>, linux-fsdevel@vger.kernel.org
+Subject: Re: [LSF/MM/BPF TOPIC] block drivers in user space
+Message-ID: <YqKj9UqPjbYqnSii@T590>
+References: <YhXMu/GcceyDx637@B-P7TQMD6M-0146.local>
+ <a55211a1-a610-3d86-e21a-98751f20f21e@opensource.wdc.com>
+ <YhXsQdkOpBY2nmFG@B-P7TQMD6M-0146.local>
+ <3702afe7-2918-42e7-110b-efa75c0b58e8@opensource.wdc.com>
+ <YhbYOeMUv5+U1XdQ@B-P7TQMD6M-0146.local>
+ <YqFUc8jhYp5ijS/C@T590>
+ <YqFashbvU+v5lGZy@B-P7TQMD6M-0146.local>
+ <YqFx2GGACopPmLaM@T590>
+ <YqF9X0sJjeCxwxBb@B-P7TQMD6M-0146.local>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 580c390f-deaf-453e-3ef5-08da4a734141
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Jun 2022 23:53:30.2523
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: YqYb2IQKaktluOy1oTNsfxkyUP848tBcoaumb5sRFIBw3pKqL+t88gwgHw8jJ/rKYWMRegswW07/NGytO2x4fXR392VkS1ONEqtKLJsozrE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN3PR04MB2276
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YqF9X0sJjeCxwxBb@B-P7TQMD6M-0146.local>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all,
+On Thu, Jun 09, 2022 at 12:55:59PM +0800, Gao Xiang wrote:
+> On Thu, Jun 09, 2022 at 12:06:48PM +0800, Ming Lei wrote:
+> > On Thu, Jun 09, 2022 at 10:28:02AM +0800, Gao Xiang wrote:
+> > > On Thu, Jun 09, 2022 at 10:01:23AM +0800, Ming Lei wrote:
+> > > > On Thu, Feb 24, 2022 at 08:58:33AM +0800, Gao Xiang wrote:
+> > > > > On Thu, Feb 24, 2022 at 07:40:47AM +0900, Damien Le Moal wrote:
+> > > > > > On 2/23/22 17:11, Gao Xiang wrote:
+> > > > > > > On Wed, Feb 23, 2022 at 04:46:41PM +0900, Damien Le Moal wrote:
+> > > > > > >> On 2/23/22 14:57, Gao Xiang wrote:
+> > > > > > >>> On Mon, Feb 21, 2022 at 02:59:48PM -0500, Gabriel Krisman Bertazi wrote:
+> > > > > > >>>> I'd like to discuss an interface to implement user space block devices,
+> > > > > > >>>> while avoiding local network NBD solutions.  There has been reiterated
+> > > > > > >>>> interest in the topic, both from researchers [1] and from the community,
+> > > > > > >>>> including a proposed session in LSFMM2018 [2] (though I don't think it
+> > > > > > >>>> happened).
+> > > > > > >>>>
+> > > > > > >>>> I've been working on top of the Google iblock implementation to find
+> > > > > > >>>> something upstreamable and would like to present my design and gather
+> > > > > > >>>> feedback on some points, in particular zero-copy and overall user space
+> > > > > > >>>> interface.
+> > > > > > >>>>
+> > > > > > >>>> The design I'm pending towards uses special fds opened by the driver to
+> > > > > > >>>> transfer data to/from the block driver, preferably through direct
+> > > > > > >>>> splicing as much as possible, to keep data only in kernel space.  This
+> > > > > > >>>> is because, in my use case, the driver usually only manipulates
+> > > > > > >>>> metadata, while data is forwarded directly through the network, or
+> > > > > > >>>> similar. It would be neat if we can leverage the existing
+> > > > > > >>>> splice/copy_file_range syscalls such that we don't ever need to bring
+> > > > > > >>>> disk data to user space, if we can avoid it.  I've also experimented
+> > > > > > >>>> with regular pipes, But I found no way around keeping a lot of pipes
+> > > > > > >>>> opened, one for each possible command 'slot'.
+> > > > > > >>>>
+> > > > > > >>>> [1] https://dl.acm.org/doi/10.1145/3456727.3463768
+> > > > > > >>>> [2] https://www.spinics.net/lists/linux-fsdevel/msg120674.html
+> > > > > > >>>
+> > > > > > >>> I'm interested in this general topic too. One of our use cases is
+> > > > > > >>> that we need to process network data in some degree since many
+> > > > > > >>> protocols are application layer protocols so it seems more reasonable
+> > > > > > >>> to process such protocols in userspace. And another difference is that
+> > > > > > >>> we may have thousands of devices in a machine since we'd better to run
+> > > > > > >>> containers as many as possible so the block device solution seems
+> > > > > > >>> suboptimal to us. Yet I'm still interested in this topic to get more
+> > > > > > >>> ideas.
+> > > > > > >>>
+> > > > > > >>> Btw, As for general userspace block device solutions, IMHO, there could
+> > > > > > >>> be some deadlock issues out of direct reclaim, writeback, and userspace
+> > > > > > >>> implementation due to writeback user requests can be tripped back to
+> > > > > > >>> the kernel side (even the dependency crosses threads). I think they are
+> > > > > > >>> somewhat hard to fix with user block device solutions. For example,
+> > > > > > >>> https://lore.kernel.org/r/CAM1OiDPxh0B1sXkyGCSTEpdgDd196-ftzLE-ocnM8Jd2F9w7AA@mail.gmail.com
+> > > > > > >>
+> > > > > > >> This is already fixed with prctl() support. See:
+> > > > > > >>
+> > > > > > >> https://lore.kernel.org/linux-fsdevel/20191112001900.9206-1-mchristi@redhat.com/
+> > > > > > > 
+> > > > > > > As I mentioned above, IMHO, we could add some per-task state to avoid
+> > > > > > > the majority of such deadlock cases (also what I mentioned above), but
+> > > > > > > there may still some potential dependency could happen between threads,
+> > > > > > > such as using another kernel workqueue and waiting on it (in principle
+> > > > > > > at least) since userspace program can call any syscall in principle (
+> > > > > > > which doesn't like in-kernel drivers). So I think it can cause some
+> > > > > > > risk due to generic userspace block device restriction, please kindly
+> > > > > > > correct me if I'm wrong.
+> > > > > > 
+> > > > > > Not sure what you mean with all this. prctl() works per process/thread
+> > > > > > and a context that has PR_SET_IO_FLUSHER set will have PF_MEMALLOC_NOIO
+> > > > > > set. So for the case of a user block device driver, setting this means
+> > > > > > that it cannot reenter itself during a memory allocation, regardless of
+> > > > > > the system call it executes (FS etc): all memory allocations in any
+> > > > > > syscall executed by the context will have GFP_NOIO.
+> > > > > 
+> > > > > I mean,
+> > > > > 
+> > > > > assuming PR_SET_IO_FLUSHER is already set on Thread A by using prctl,
+> > > > > but since it can call any valid system call, therefore, after it
+> > > > > received data due to direct reclaim and writeback, it is still
+> > > > > allowed to call some system call which may do something as follows:
+> > > > > 
+> > > > >    Thread A (PR_SET_IO_FLUSHER)   Kernel thread B (another context)
+> > > > > 
+> > > > >    (call some syscall which)
+> > > > > 
+> > > > >    submit something to Thread B
+> > > > >                                   
+> > > > >                                   ... (do something)
+> > > > > 
+> > > > >                                   memory allocation with GFP_KERNEL (it
+> > > > >                                   may trigger direct memory reclaim
+> > > > >                                   again and reenter the original fs.)
+> > > > > 
+> > > > >                                   wake up Thread A
+> > > > > 
+> > > > >    wait Thread B to complete
+> > > > > 
+> > > > > Normally such system call won't cause any problem since userspace
+> > > > > programs cannot be in a context out of writeback and direct reclaim.
+> > > > > Yet I'm not sure if it works under userspace block driver
+> > > > > writeback/direct reclaim cases.
+> > > > 
+> > > > Hi Gao Xiang,
+> > > > 
+> > > > I'd rather to reply you in this original thread, and the recent
+> > > > discussion is from the following link:
+> > > > 
+> > > > https://lore.kernel.org/linux-block/Yp1jRw6kiUf5jCrW@B-P7TQMD6M-0146.local/
+> > > > 
+> > > > kernel loop & nbd is really in the same situation.
+> > > > 
+> > > > For example of kernel loop, PF_MEMALLOC_NOIO is added in commit
+> > > > d0a255e795ab ("loop: set PF_MEMALLOC_NOIO for the worker thread"),
+> > > > so loop's worker thread can be thought as the above Thread A, and
+> > > > of course, writeback/swapout IO can reach the loop worker thread(
+> > > > the above Thread A), then loop just calls into FS from the worker
+> > > > thread for handling the loop IO, that is same with user space driver's
+> > > > case, and the kernel 'thread B' should be in FS code.
+> > > > 
+> > > > Your theory might be true, but it does depend on FS's implementation,
+> > > > and we don't see such report in reality.
+> > > > 
+> > > > Also you didn't mentioned that what kernel thread B exactly is? And what
+> > > > the allocation is in kernel thread B.
+> > > > 
+> > > > If you have actual report, I am happy to take account into it, otherwise not
+> > > > sure if it is worth of time/effort in thinking/addressing one pure theoretical
+> > > > concern.
+> > > 
+> > > Hi Ming,
+> > > 
+> > > Thanks for your look & reply.
+> > > 
+> > > That is not a wild guess. That is a basic difference between
+> > > in-kernel native block-based drivers and user-space block drivers.
+> > 
+> > Please look at my comment, wrt. your pure theoretical concern, userspace
+> > block driver is same with kernel loop/nbd.
+> 
+> Hi Ming,
+> 
+> I don't have time to audit some potential risky system call, but I guess
+> security folks or researchers may be interested in finding such path.
 
-I ran the latest blktests (git hash: c17a19d) with v5.19-rc1 kernel and obs=
-erved
-6 test cases fail. I call for helps to fix them. Please refer the list of t=
-he
-failure cases and descriptions below.
+Why do you think system call has potential risk? Isn't syscall designed
+for userspace? Any syscall called from the userspace context is covered
+by PR_SET_IO_FLUSHER, and your concern is just in Kernel thread B,
+right?
 
-- I don't know details of these failures. Not sure if they are kernel bugs =
-or
-  not. Some of them might be test script bugs or test system set up issues.
-- All of the test cases failed also with v5.18 kernel, except scsi/007. The
-  scsi/007 failure could be a new issue introduced with v5.19-rc1.
-- I used Fedora 36 on QEMU for test runs. Related drivers were built as mod=
-ules.
+If yes, let's focus on this scenario, so I posted it one more time:
 
-If further information is required for fixes, please let me know.
+>    Thread A (PR_SET_IO_FLUSHER)   Kernel thread B (another context)
+> 
+>    (call some syscall which)
+> 
+>    submit something to Thread B
+>                                   
+>                                   ... (do something)
+> 
+>                                   memory allocation with GFP_KERNEL (it
+>                                   may trigger direct memory reclaim
+>                                   again and reenter the original fs.)
+> 
+>                                   wake up Thread A
+> 
+>    wait Thread B to complete
+
+You didn't mention why normal writeback IO from other context won't call
+into this kind of kernel thread B too, so can you explain it a bit?
+
+As I said, both loop/nbd has same situation, for example of loop, thread
+A is loop worker thread with PF_MEMALLOC_NOIO, and generic FS code(read,
+write, fallocate, fsync, ...) is called into from the worker thread, so
+there might be the so called kernel thread B for loop. But we don't see
+such report.
+
+Yeah, you may argue that other non-FS syscalls may be involved in
+userspace driver. But in reality, userspace block driver should only deal
+with FS and network IO most of times, and both network and FS code path
+are already in normal IO code path for long time, so your direct claim
+concern shouldn't be one problem. Not mention nbd/tcmu/... have been used
+or long long time, so far so good. 
+
+If you think it is real risk, please find it for nbd/tcmu/dm-multipath/...
+first. IMO, it isn't useful to say there is such generic concern without
+further investigation and without providing any detail, and devil is always
+in details.
+
+> 
+> The big problem is, you cannot avoid people to write such system call (or 
+> ioctls) in their user daemon, since most system call (or ioctls)
+> implementation assumes that they're never called under the kernel memory
+> direct reclaim context (even with PR_SET_IO_FLUSHER) but userspace block
+> driver can give such context to userspace and user problems can do
+> whatever they do in principle.
+> 
+> IOWs, we can audit in-kernel block drivers and fix all buggy paths with
+> GFP_NOIO since the source code is already there and they should be fixed.
+> 
+> But you have no way to audit all user programs to call proper system calls
+> or random ioctls which can be safely worked in the direct reclaim context
+> (even with PR_SET_IO_FLUSHER).
+> 
+> > 
+> > Did you see such report on loop & nbd? Can you answer my questions wrt.
+> > kernel thread B?
+> 
+> I don't think it has some relationship with in-kernel loop device, since
+> the loop device I/O paths are all under control.
+
+No, it is completely same situation wrt. your concern, please look at the above
+scenario.
+
+> 
+> > 
+> > > 
+> > > That is userspace block driver can call _any_ system call if they want.
+> > > Since users can call any system call and any _new_ system call can be
+> > > introduced later, you have to audit all system calls "Which are safe
+> > > and which are _not_ safe" all the time. Otherwise, attacker can make
+> > 
+> > Isn't nbd server capable of calling any system call? Is there any
+> > security risk for nbd?
+> 
+> Note that I wrote this email initially as a generic concern (prior to your
+> ubd annoucement ), so that isn't related to your ubd from my POV.
+
+OK, I guess I needn't to waste time on this 'generic concern'.
+
+> 
+> > 
+> > > use of it to hung the system if such userspace driver is used widely.
+> > 
+> > >From the beginning, only ADMIN can create ubd, that is same with
+> > nbd/loop, and it gets default permission as disk device.
+> 
+> loop device is different since the path can be totally controlled by the
+> kernel.
+> 
+> > 
+> > ubd is really in same situation with nbd wrt. security, the only difference
+> > is just that nbd uses socket for communication, and ubd uses io_uring, that
+> > is all.
+> > 
+> > Yeah, Stefan Hajnoczi and I discussed to make ubd as one container
+> > block device, so normal user can create & use ubd, but it won't be done
+> > from the beginning, and won't be enabled until the potential security
+> > risks are addressed, and there should be more limits on ubd when normal user
+> > can create & use it, such as:
+> > 
+> > - not allow unprivileged ubd device to be mounted
+> > - not allow unprivileged ubd device's partition table to be read from
+> >   kernel
+> > - not support buffered io for unprivileged ubd device, and only direct io
+> >   is allowed
+> 
+> How could you do that? I think it needs a wide modification to mm/fs.
+> and how about mmap I/O?
+
+Firstly mount isn't allowed, then we can deal with mmap on def_blk_fops, and
+only allow open with O_DIRECT.
+
+> 
+> > - maybe more limit for minimizing security risk.
+> > 
+> > > 
+> > > IOWs, in my humble opinion, that is quite a fundamental security
+> > > concern of all userspace block drivers.
+> > 
+> > But nbd is still there and widely used, and there are lots of people who
+> > shows interest in userspace block device. Then think about who is wrong?
+> > 
+> > As one userspace block driver, it is normal to see some limits there,
+> > but I don't agree that there is fundamental security issue.
+> 
+> That depends, if you think it's a real security issue that there could be
+> a path reported to public to trigger that after it's widely used, that is
+> fine.
+
+But nbd/tcmu is widely used already...
+
+> 
+> > 
+> > > 
+> > > Actually, you cannot ignore block I/O requests if they actually push
+> > 
+> > Who wants to ignore block I/O? And why ignore it?
+> 
+> I don't know how to express that properly. Sorry for my bad English.
+> 
+> For example, userspace FS implementation can ignore any fs operations
+> triggered under direct reclaim.
+> 
+> But if you runs a userspace block driver under a random fs, they will
+> just send data & metadata I/O to your driver unconditionally. I think
+> that is too late to avoid such deadlock.
+
+What is the deadlock? Is that triggered with your kernel thread B deadlock?
+
+> 
+> > 
+> > > into block layer, since that is too late if I/O actually is submitted
+> > > by some FS. And you don't even know which type of such I/O is.
+> > 
+> > We do know the I/O type.
+> 
+> 1) you don't know meta or data I/O. I know there is a REQ_META, but
+>    that is not a strict mark.
+> 
+> 2) even you know an I/O is under direct reclaim, how to deal with that?
+>   just send to userspace unconditionally?
+
+All block driver doesn't care REQ_META, why is it special for userspace
+block driver?
 
 
-List of failure cases
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-#1: block/002
-#2: scsi/007
-#3: nvme/002
-#4: nvme/016
-#5: nvme/017
-#6: nvme/032
+Thanks,
+Ming
 
-Failure descriptiion
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-#1: block/002: Failed 3 times with 3 trials.
-    Known issue. It is suggested to remove this test case [1].
-    [1] https://lore.kernel.org/linux-block/20220530134548.3108185-3-hch@ls=
-t.de/
-
-    runtime    ...  1.250s
-    --- tests/block/002.out     2022-06-02 10:18:53.526739780 +0900
-    +++ /home/shin/kts/kernel-test-suite/src/blktests/results/nodev/block/0=
-02.out.bad   2022-06-09 09:44:02.779122029 +0900
-    @@ -1,2 +1,3 @@
-     Running block/002
-    +debugfs directory leaked
-     Test complete
-
-#2: scsi/007: Failed 3 times with 3 trials.
-
-    runtime  29.867s  ...  40.688s
-    --- tests/scsi/007.out      2022-06-02 10:18:53.550739780 +0900
-    +++ /home/shin/kts/kernel-test-suite/src/blktests/results/nodev/scsi/00=
-7.out.bad    2022-06-09 09:18:38.644237681 +0900
-    @@ -1,3 +1,3 @@
-     Running scsi/007
-    -Reading from scsi_debug failed
-    +Reading from scsi_debug succeeded
-     Test complete
-
-#3: nvme/002: Failed 3 times with 3 trials.
-
-    runtime    ...  85.697s
-    --- tests/nvme/002.out      2022-06-02 10:18:53.538739780 +0900
-    +++ /home/shin/kts/kernel-test-suite/src/blktests/results/nodev/nvme/00=
-2.out.bad    2022-06-09 09:51:45.714027241 +0900
-    @@ -1,3003 +1,3006 @@
-     Running nvme/002
-    -Discovery Log Number of Records 1000, Generation counter X
-    +Discovery Log Number of Records 1001, Generation counter X
-     =3D=3D=3D=3D=3DDiscovery Log Entry 0=3D=3D=3D=3D=3D=3D
-     trtype:  loop
-    -subnqn:  blktests-subsystem-0
-    +subnqn:  nqn.2014-08.org.nvmexpress.discovery
-    ...
-
-#4: nvme/016: Failed 3 times with 3 trials.
-
-    runtime  36.240s  ...  35.984s
-    --- tests/nvme/016.out      2022-06-02 10:18:53.541739780 +0900
-    +++ /home/shin/kts/kernel-test-suite/src/blktests/results/nodev/nvme/01=
-6.out.bad    2022-06-09 10:06:11.797004672 +0900
-    @@ -1,6 +1,9 @@
-     Running nvme/016
-    -Discovery Log Number of Records 1, Generation counter X
-    +Discovery Log Number of Records 2, Generation counter X
-     =3D=3D=3D=3D=3DDiscovery Log Entry 0=3D=3D=3D=3D=3D=3D
-     trtype:  loop
-    +subnqn:  nqn.2014-08.org.nvmexpress.discovery
-    +=3D=3D=3D=3D=3DDiscovery Log Entry 1=3D=3D=3D=3D=3D=3D
-    ...
-
-#5: nvme/017: Failed 3 times with 3 trials.
-
-    runtime  43.724s  ...  42.912s
-    --- tests/nvme/017.out      2022-06-02 10:18:53.541739780 +0900
-    +++ /home/shin/kts/kernel-test-suite/src/blktests/results/nodev/nvme/01=
-7.out.bad    2022-06-09 10:09:18.016394996 +0900
-    @@ -1,6 +1,9 @@
-     Running nvme/017
-    -Discovery Log Number of Records 1, Generation counter X
-    +Discovery Log Number of Records 2, Generation counter X
-     =3D=3D=3D=3D=3DDiscovery Log Entry 0=3D=3D=3D=3D=3D=3D
-     trtype:  loop
-    +subnqn:  nqn.2014-08.org.nvmexpress.discovery
-    +=3D=3D=3D=3D=3DDiscovery Log Entry 1=3D=3D=3D=3D=3D=3D
-    ...
-
-#6: nvme/032: Failed at the first run after system reboot.
-              Used QEMU NVME device as TEST_DEV.
-
-    runtime    ...  8.458s
-    something found in dmesg:
-    [ 1589.976481] run blktests nvme/032 at 2022-06-09 10:57:20
-
-    [ 1597.221547] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-    [ 1597.221549] WARNING: possible circular locking dependency detected
-    [ 1597.221551] 5.19.0-rc1 #1 Not tainted
-    [ 1597.221554] ------------------------------------------------------
-    [ 1597.221554] check/970 is trying to acquire lock:
-    [ 1597.221556] ffff8881026f8cb8 (kn->active#227){++++}-{0:0}, at: kernf=
-s_remove_by_name_ns+0x90/0xe0
-    [ 1597.221580]
-                   but task is already holding lock:
-    ...
-
-dmesg output:
-[ 1589.976481] run blktests nvme/032 at 2022-06-09 10:57:20
-
-[ 1597.221547] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[ 1597.221549] WARNING: possible circular locking dependency detected
-[ 1597.221551] 5.19.0-rc1 #1 Not tainted
-[ 1597.221554] ------------------------------------------------------
-[ 1597.221554] check/970 is trying to acquire lock:
-[ 1597.221556] ffff8881026f8cb8 (kn->active#227){++++}-{0:0}, at: kernfs_re=
-move_by_name_ns+0x90/0xe0
-[ 1597.221580]=20
-               but task is already holding lock:
-[ 1597.221580] ffffffff889c0668 (pci_rescan_remove_lock){+.+.}-{3:3}, at: p=
-ci_stop_and_remove_bus_device_locked+0xe/0x30
-[ 1597.221590]=20
-               which lock already depends on the new lock.
-
-[ 1597.221591]=20
-               the existing dependency chain (in reverse order) is:
-[ 1597.221592]=20
-               -> #1 (pci_rescan_remove_lock){+.+.}-{3:3}:
-[ 1597.221598]        __mutex_lock+0x14c/0x12b0
-[ 1597.221604]        dev_rescan_store+0x94/0xd0
-[ 1597.221607]        kernfs_fop_write_iter+0x34f/0x520
-[ 1597.221610]        new_sync_write+0x2ca/0x500
-[ 1597.221614]        vfs_write+0x62d/0x980
-[ 1597.221616]        ksys_write+0xe7/0x1b0
-[ 1597.221619]        do_syscall_64+0x37/0x80
-[ 1597.221622]        entry_SYSCALL_64_after_hwframe+0x46/0xb0
-[ 1597.221625]=20
-               -> #0 (kn->active#227){++++}-{0:0}:
-[ 1597.221629]        __lock_acquire+0x2875/0x5510
-[ 1597.221634]        lock_acquire+0x194/0x4f0
-[ 1597.221636]        __kernfs_remove+0x6f3/0x910
-[ 1597.221638]        kernfs_remove_by_name_ns+0x90/0xe0
-[ 1597.221641]        remove_files+0x8c/0x1a0
-[ 1597.221644]        sysfs_remove_group+0x77/0x150
-[ 1597.221646]        sysfs_remove_groups+0x4f/0x90
-[ 1597.221649]        device_remove_attrs+0x19e/0x240
-[ 1597.221652]        device_del+0x492/0xb60
-[ 1597.221654]        pci_remove_bus_device+0x12c/0x350
-[ 1597.221656]        pci_stop_and_remove_bus_device_locked+0x1e/0x30
-[ 1597.221659]        remove_store+0xac/0xc0
-[ 1597.221662]        kernfs_fop_write_iter+0x34f/0x520
-[ 1597.221664]        new_sync_write+0x2ca/0x500
-[ 1597.221666]        vfs_write+0x62d/0x980
-[ 1597.221669]        ksys_write+0xe7/0x1b0
-[ 1597.221671]        do_syscall_64+0x37/0x80
-[ 1597.221673]        entry_SYSCALL_64_after_hwframe+0x46/0xb0
-[ 1597.221675]=20
-               other info that might help us debug this:
-
-[ 1597.221676]  Possible unsafe locking scenario:
-
-[ 1597.221677]        CPU0                    CPU1
-[ 1597.221678]        ----                    ----
-[ 1597.221678]   lock(pci_rescan_remove_lock);
-[ 1597.221680]                                lock(kn->active#227);
-[ 1597.221683]                                lock(pci_rescan_remove_lock);
-[ 1597.221685]   lock(kn->active#227);
-[ 1597.221687]=20
-                *** DEADLOCK ***
-
-[ 1597.221688] 3 locks held by check/970:
-[ 1597.221689]  #0: ffff888110106460 (sb_writers#4){.+.+}-{0:0}, at: ksys_w=
-rite+0xe7/0x1b0
-[ 1597.221697]  #1: ffff888120f69088 (&of->mutex){+.+.}-{3:3}, at: kernfs_f=
-op_write_iter+0x216/0x520
-[ 1597.221703]  #2: ffffffff889c0668 (pci_rescan_remove_lock){+.+.}-{3:3}, =
-at: pci_stop_and_remove_bus_device_locked+0xe/0x30
-[ 1597.221709]=20
-               stack backtrace:
-[ 1597.221714] CPU: 1 PID: 970 Comm: check Not tainted 5.19.0-rc1 #1
-[ 1597.221717] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS =
-rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-[ 1597.221723] Call Trace:
-[ 1597.221728]  <TASK>
-[ 1597.221732]  dump_stack_lvl+0x5b/0x74
-[ 1597.221742]  check_noncircular+0x23f/0x2e0
-[ 1597.221745]  ? lock_chain_count+0x20/0x20
-[ 1597.221748]  ? print_circular_bug+0x1e0/0x1e0
-[ 1597.221751]  ? mark_lock+0xee/0x1610
-[ 1597.221754]  ? mark_lock+0xee/0x1610
-[ 1597.221759]  ? lockdep_lock+0xb8/0x1a0
-[ 1597.221762]  ? call_rcu_zapped+0xb0/0xb0
-[ 1597.221766]  __lock_acquire+0x2875/0x5510
-[ 1597.221773]  ? lockdep_hardirqs_on_prepare+0x410/0x410
-[ 1597.221779]  lock_acquire+0x194/0x4f0
-[ 1597.221782]  ? kernfs_remove_by_name_ns+0x90/0xe0
-[ 1597.221786]  ? lock_downgrade+0x6b0/0x6b0
-[ 1597.221791]  ? up_write+0x14d/0x460
-[ 1597.221795]  __kernfs_remove+0x6f3/0x910
-[ 1597.221798]  ? kernfs_remove_by_name_ns+0x90/0xe0
-[ 1597.221803]  ? kernfs_next_descendant_post+0x280/0x280
-[ 1597.221807]  ? lock_is_held_type+0xe3/0x140
-[ 1597.221811]  ? kernfs_name_hash+0x16/0xc0
-[ 1597.221815]  ? kernfs_find_ns+0x1e3/0x330
-[ 1597.221819]  kernfs_remove_by_name_ns+0x90/0xe0
-[ 1597.221822]  remove_files+0x8c/0x1a0
-[ 1597.221826]  sysfs_remove_group+0x77/0x150
-[ 1597.221831]  sysfs_remove_groups+0x4f/0x90
-[ 1597.221835]  device_remove_attrs+0x19e/0x240
-[ 1597.221838]  ? device_remove_file+0x20/0x20
-[ 1597.221842]  device_del+0x492/0xb60
-[ 1597.221846]  ? __device_link_del+0x350/0x350
-[ 1597.221848]  ? kfree+0xc5/0x340
-[ 1597.221856]  pci_remove_bus_device+0x12c/0x350
-[ 1597.221860]  pci_stop_and_remove_bus_device_locked+0x1e/0x30
-[ 1597.221863]  remove_store+0xac/0xc0
-[ 1597.221867]  ? subordinate_bus_number_show+0xa0/0xa0
-[ 1597.221870]  ? sysfs_kf_write+0x3d/0x170
-[ 1597.221874]  kernfs_fop_write_iter+0x34f/0x520
-[ 1597.221881]  new_sync_write+0x2ca/0x500
-[ 1597.221885]  ? new_sync_read+0x500/0x500
-[ 1597.221888]  ? perf_callchain_user+0x7c0/0xaa0
-[ 1597.221893]  ? lock_downgrade+0x6b0/0x6b0
-[ 1597.221896]  ? inode_security+0x54/0xf0
-[ 1597.221903]  ? lock_is_held_type+0xe3/0x140
-[ 1597.221909]  vfs_write+0x62d/0x980
-[ 1597.221913]  ksys_write+0xe7/0x1b0
-[ 1597.221916]  ? __ia32_sys_read+0xa0/0xa0
-[ 1597.221919]  ? syscall_enter_from_user_mode+0x20/0x70
-[ 1597.221925]  do_syscall_64+0x37/0x80
-[ 1597.221928]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
-[ 1597.221931] RIP: 0033:0x7f5608901c17
-[ 1597.221939] Code: 0f 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f =
-00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48=
-> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-[ 1597.221942] RSP: 002b:00007fff89480c08 EFLAGS: 00000246 ORIG_RAX: 000000=
-0000000001
-[ 1597.221945] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f56089=
-01c17
-[ 1597.221948] RDX: 0000000000000002 RSI: 000055572288f080 RDI: 00000000000=
-00001
-[ 1597.221949] RBP: 000055572288f080 R08: 0000000000000000 R09: 00000000000=
-00073
-[ 1597.221951] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000=
-00002
-[ 1597.221953] R13: 00007f56089f8780 R14: 0000000000000002 R15: 00007f56089=
-f39e0
-[ 1597.221960]  </TASK>
-[ 1597.227490] pci 0000:00:09.0: [1b36:0010] type 00 class 0x010802
-[ 1597.230489] pci 0000:00:09.0: reg 0x10: [mem 0xfebc4000-0xfebc7fff 64bit=
-]
-[ 1597.278136] pci 0000:00:09.0: BAR 0: assigned [mem 0x640000000-0x640003f=
-ff 64bit]
-[ 1597.283549] nvme nvme5: pci function 0000:00:09.0
-[ 1598.372141] nvme nvme5: 10/0/0 default/read/poll queues
-[ 1598.375349] nvme nvme5: Ignoring bogus Namespace Identifiers
-[ 1618.928153] run blktests nvme/032 at 2022-06-09 10:57:49
-[ 1625.557584] pci 0000:00:09.0: [1b36:0010] type 00 class 0x010802
-[ 1625.558348] pci 0000:00:09.0: reg 0x10: [mem 0x640000000-0x640003fff 64b=
-it]
-[ 1625.577856] pci 0000:00:09.0: BAR 0: assigned [mem 0x640000000-0x640003f=
-ff 64bit]
-[ 1625.581168] nvme nvme5: pci function 0000:00:09.0
-[ 1626.695897] nvme nvme5: 10/0/0 default/read/poll queues
-[ 1626.701014] nvme nvme5: Ignoring bogus Namespace Identifiers
-
---=20
-Shin'ichiro Kawasaki=
