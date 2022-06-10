@@ -2,166 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA0AC43334
-	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 10:17:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E8FE1CCA480
+	for <linux-block@archiver.kernel.org>; Fri, 10 Jun 2022 12:15:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344926AbiFJKRm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 10 Jun 2022 06:17:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34338 "EHLO
+        id S1344520AbiFJMP0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 10 Jun 2022 08:15:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49390 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244412AbiFJKRl (ORCPT
+        with ESMTP id S245662AbiFJMP0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 10 Jun 2022 06:17:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id E654CBF43
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 03:17:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1654856257;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=Ekvjf5YPr7Sjtvmnh5pMqvNXgm63w4q321GSzdMpiws=;
-        b=R422DQNibOldKWlgmARWqJj/jnBflxYGCJ34dPCeAmqGiPs+R8ZIsaALOJs26KSF7i5shV
-        8c4iGAzs36ZifLrsLUUvTTYBlEKMNjAuWAXnLpu9z/IiIszg0EPqkub8BmaIO/xtiimXrM
-        E/8YUE26JcZOBvyiHFzLj8IJXPCzQcQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-591-0ygIBCfqMfCL5TAmr5R_tQ-1; Fri, 10 Jun 2022 06:17:36 -0400
-X-MC-Unique: 0ygIBCfqMfCL5TAmr5R_tQ-1
-Received: by mail-wm1-f70.google.com with SMTP id bg40-20020a05600c3ca800b00394779649b1so1103306wmb.3
-        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 03:17:36 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:organization:in-reply-to
-         :content-transfer-encoding;
-        bh=Ekvjf5YPr7Sjtvmnh5pMqvNXgm63w4q321GSzdMpiws=;
-        b=G+B4yLPOqf70ufJiptDsX/kShTCc8pPlSouwLgeZB/9eqRB0gT1vhAEjeMpRXqOHCb
-         W6tsdm73xN2kz1o5tlsLopIcOuV5yqCHncOHCWYSEE14meE/1GGpgKM5uXIiVQa9bMds
-         S9CPp6QsDGOTdGd9DYMIjhGdW00cUkTfmggSPEQoBv4NMw5ljeYtN49jCvDhsA8Af0lU
-         IFpvGHhEVMsE+QVeJMBjUQtwYq5wPTFv9XE5Tlh+3IjNw6iy6hvV3MLYaWkxWIUObgfY
-         zlgmOjIcxfhNazOaldDF4Ad7oSjzv6IrrtEnYlx90xPKd27yFjbFH9w3KSlEiy70CT1p
-         /Haw==
-X-Gm-Message-State: AOAM532GqHW37MNqneMb8P+jsawTxdoersDUJR6r7MqC5RxVEG7bJGNI
-        0/yCT7+nEsvpzIaef1w2Uu2b+bQAJj0qrzEVuEadPNcAQGBnjLuXwjY88S2PTnFLcHiDIRz8cTC
-        kRwF5Csf5/7uFq8IcF5+GBgo=
-X-Received: by 2002:a05:6000:91:b0:217:8efc:f572 with SMTP id m17-20020a056000009100b002178efcf572mr29122728wrx.186.1654856255658;
-        Fri, 10 Jun 2022 03:17:35 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMoCknlizO69Nl0wuEIzBALIZP/2+KDolU3ne+3dmHgzec6LJk/2XhtTIsrJ35XnXVn7hgfw==
-X-Received: by 2002:a05:6000:91:b0:217:8efc:f572 with SMTP id m17-20020a056000009100b002178efcf572mr29122693wrx.186.1654856255339;
-        Fri, 10 Jun 2022 03:17:35 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c705:1f00:4727:6420:1d4d:ca23? (p200300cbc7051f00472764201d4dca23.dip0.t-ipconnect.de. [2003:cb:c705:1f00:4727:6420:1d4d:ca23])
-        by smtp.gmail.com with ESMTPSA id m17-20020a05600c4f5100b0039c4f53c4fdsm3105741wmq.45.2022.06.10.03.17.34
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 10 Jun 2022 03:17:34 -0700 (PDT)
-Message-ID: <e287a12d-29d9-da69-9315-52414341cbd1@redhat.com>
-Date:   Fri, 10 Jun 2022 12:17:33 +0200
+        Fri, 10 Jun 2022 08:15:26 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C6A522CEDE
+        for <linux-block@vger.kernel.org>; Fri, 10 Jun 2022 05:15:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1654863321; x=1686399321;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=NRvTo4xriIjZRPuzweXRN+adnzdcjWKj+3jKMRo876k=;
+  b=gb70n4mm5Vir2zKdlumFMGFuflpd/d6bIQTQdpgivliK2FVCeJNidGP5
+   r2aGHC0cOCi3eCjcYTFWI+Wuk7kI8AkJTdB0he/jpZ3RIPQ14IJBqU02p
+   FCk3vJMs30M2e10UCpTvZMzRLFzkyvn56TvjV5IzB6P9mOM3/AIDPzjTd
+   sWU60eqxVTZNuxIIqIgznnoO5UyaGRQrGmh4u7E5PwUkVO8NN9hn/lJ9d
+   AjGcm7ihMMjm+HqcicwJ4pA4v9oVb+17MI/hq3W5sRaCTasFrCCFUZaeZ
+   YTJPeQIFJX1KVtR//kCRte/WOxZ9CGPfAHR9eYcQHgdlXNJK41td42z5h
+   w==;
+X-IronPort-AV: E=Sophos;i="5.91,290,1647273600"; 
+   d="scan'208";a="201520182"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 10 Jun 2022 20:15:19 +0800
+IronPort-SDR: Z/cC7VUmHUsDA4GPlx+jz/wNYX/lIKHX0kavH38SiceDkiY4ndykfMDKlWK/t8oYmDtbTjdCOm
+ snNB55LDeh0nr53hGYSzQoCDmpDjZ6IiTDbwiaowoxkEqs/ODuLlNiqFvP5iSNoqSuVlOxtZtk
+ Y/z6+TuEtf0uLBGUc19qoqI1imoSjofvv0eN2n5RRwJTzOmbkduXes1z3s21u6Ti5Xtc1NUGX1
+ TectmIH5Las5f7OPCd+YwUWCZw3pLsHuF/G9XSoj7msYWwn1QQUPO0+41dWe8Y/x1dGamErMSD
+ NsSfjUPZvonfLwuGpJ8lcQq9
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 10 Jun 2022 04:38:27 -0700
+IronPort-SDR: 247upAS2s2FMRRNJvZLoi1+GlNjTcQ85/v7EG8GBFXug4HZbt/JCEGnu74TgsGEMXU/k4XOs3w
+ rntHO3wUQRkeq6yO6Qe9kgaKfzWINL6ycWe1BxDxU+D0uo+O+a9Hx2i+2oI5Whh3EDnltH1yIb
+ DaHdQwpFJR8NtT8AnAzjcbe/vEXZ8GA6ZpRRNqpypmkVu0HzcFJ5LiHfb6J/ThweYj0s36YOdz
+ PuMfeeEHkUuVuOAa6SFyhuabY6CNHMEaD4dKbKQjfAiwuIfUAOirlWOvwA3VNzt4oeJv1YFC3D
+ ZSU=
+WDCIronportException: Internal
+Received: from shindev.dhcp.fujisawa.hgst.com (HELO shindev.fujisawa.hgst.com) ([10.149.52.207])
+  by uls-op-cesaip02.wdc.com with ESMTP; 10 Jun 2022 05:15:19 -0700
+From:   Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     linux-block@vger.kernel.org
+Cc:     Alan Adamson <alan.adamson@oracle.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Subject: [PATCH blktests] nvme/039: avoid module loads for various transport types
+Date:   Fri, 10 Jun 2022 21:15:18 +0900
+Message-Id: <20220610121518.548549-1-shinichiro.kawasaki@wdc.com>
+X-Mailer: git-send-email 2.36.1
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.0
-Subject: Re: [PATCH v2 03/19] fs: Add aops->migrate_folio
-Content-Language: en-US
-To:     Matthew Wilcox <willy@infradead.org>
-Cc:     linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-aio@kvack.org,
-        linux-btrfs@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
-        linux-mm@kvack.org, linux-xfs@vger.kernel.org,
-        linux-nfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
-        ocfs2-devel@oss.oracle.com, linux-mtd@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        Christoph Hellwig <hch@lst.de>
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-4-willy@infradead.org>
- <b2a81248-03fc-afb3-1041-d8206e95e08a@redhat.com>
- <YqIFHPJZNMrmtXlh@casper.infradead.org>
-From:   David Hildenbrand <david@redhat.com>
-Organization: Red Hat
-In-Reply-To: <YqIFHPJZNMrmtXlh@casper.infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 09.06.22 16:35, Matthew Wilcox wrote:
-> On Thu, Jun 09, 2022 at 02:50:20PM +0200, David Hildenbrand wrote:
->> On 08.06.22 17:02, Matthew Wilcox (Oracle) wrote:
->>> diff --git a/Documentation/filesystems/locking.rst b/Documentation/filesystems/locking.rst
->>> index c0fe711f14d3..3d28b23676bd 100644
->>> --- a/Documentation/filesystems/locking.rst
->>> +++ b/Documentation/filesystems/locking.rst
->>> @@ -253,7 +253,8 @@ prototypes::
->>>  	void (*free_folio)(struct folio *);
->>>  	int (*direct_IO)(struct kiocb *, struct iov_iter *iter);
->>>  	bool (*isolate_page) (struct page *, isolate_mode_t);
->>> -	int (*migratepage)(struct address_space *, struct page *, struct page *);
->>> +	int (*migrate_folio)(struct address_space *, struct folio *dst,
->>> +			struct folio *src, enum migrate_mode);
->>>  	void (*putback_page) (struct page *);
->>
->> isolate_page/putback_page are leftovers from the previous patch, no?
-> 
-> Argh, right, I completely forgot I needed to update the documentation in
-> that patch.
-> 
->>> +++ b/Documentation/vm/page_migration.rst
->>> @@ -181,22 +181,23 @@ which are function pointers of struct address_space_operations.
->>>     Once page is successfully isolated, VM uses page.lru fields so driver
->>>     shouldn't expect to preserve values in those fields.
->>>  
->>> -2. ``int (*migratepage) (struct address_space *mapping,``
->>> -|	``struct page *newpage, struct page *oldpage, enum migrate_mode);``
->>> -
->>> -   After isolation, VM calls migratepage() of driver with the isolated page.
->>> -   The function of migratepage() is to move the contents of the old page to the
->>> -   new page
->>> -   and set up fields of struct page newpage. Keep in mind that you should
->>> -   indicate to the VM the oldpage is no longer movable via __ClearPageMovable()
->>> -   under page_lock if you migrated the oldpage successfully and returned
->>> -   MIGRATEPAGE_SUCCESS. If driver cannot migrate the page at the moment, driver
->>> -   can return -EAGAIN. On -EAGAIN, VM will retry page migration in a short time
->>> -   because VM interprets -EAGAIN as "temporary migration failure". On returning
->>> -   any error except -EAGAIN, VM will give up the page migration without
->>> -   retrying.
->>> -
->>> -   Driver shouldn't touch the page.lru field while in the migratepage() function.
->>> +2. ``int (*migrate_folio) (struct address_space *mapping,``
->>> +|	``struct folio *dst, struct folio *src, enum migrate_mode);``
->>> +
->>> +   After isolation, VM calls the driver's migrate_folio() with the
->>> +   isolated folio.  The purpose of migrate_folio() is to move the contents
->>> +   of the source folio to the destination folio and set up the fields
->>> +   of destination folio.  Keep in mind that you should indicate to the
->>> +   VM the source folio is no longer movable via __ClearPageMovable()
->>> +   under folio if you migrated the source successfully and returned
->>> +   MIGRATEPAGE_SUCCESS.  If driver cannot migrate the folio at the
->>> +   moment, driver can return -EAGAIN. On -EAGAIN, VM will retry folio
->>> +   migration in a short time because VM interprets -EAGAIN as "temporary
->>> +   migration failure".  On returning any error except -EAGAIN, VM will
->>> +   give up the folio migration without retrying.
->>> +
->>> +   Driver shouldn't touch the folio.lru field while in the migrate_folio()
->>> +   function.
->>>  
->>>  3. ``void (*putback_page)(struct page *);``
->>
->> Hmm, here it's a bit more complicated now, because we essentially have
->> two paths: LRU+migrate_folio or !LRU+movable_ops
->> (isolate/migrate/putback page)
-> 
-> Oh ... actually, this is just documenting the driver side of things.
-> I don't really like how it's written.  Here, have some rewritten
-> documentation (which is now part of the previous patch):
-> 
+The test case nvme/039 does not depend on nvme transport type and does
+not require modules for the transport types. The _nvme_requires call in
+requires() loads the modules and those modules are left unloaded after
+the test case run. This causes failures of following nvmeof-mp test runs
+with message:
 
-LGTM, thanks.
+  modprobe: FATAL: Module nvmet is in use.
 
+To avoid the unnecessary module loads, remove _nvme_requires call.
+Instead, just check existence of nvme command.
 
+Fixes: 9accb5f86670 ("tests/nvme: add tests for error logging")
+Signed-off-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+---
+ tests/nvme/039 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tests/nvme/039 b/tests/nvme/039
+index 9ed5059..85827fa 100755
+--- a/tests/nvme/039
++++ b/tests/nvme/039
+@@ -13,7 +13,7 @@ DESCRIPTION="test error logging"
+ QUICK=1
+ 
+ requires() {
+-	_nvme_requires
++	_have_program nvme
+ 	_have_kernel_option FAULT_INJECTION && \
+ 	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
+ }
 -- 
-Thanks,
-
-David / dhildenb
+2.36.1
 
