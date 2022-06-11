@@ -2,99 +2,179 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD41AC433EF
-	for <linux-block@archiver.kernel.org>; Sat, 11 Jun 2022 04:46:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC1B4C43334
+	for <linux-block@archiver.kernel.org>; Sat, 11 Jun 2022 08:34:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347612AbiFKEqw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 11 Jun 2022 00:46:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56804 "EHLO
+        id S231422AbiFKIeT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 11 Jun 2022 04:34:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347541AbiFKEqu (ORCPT
+        with ESMTP id S231386AbiFKIeS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 11 Jun 2022 00:46:50 -0400
-Received: from out0-138.mail.aliyun.com (out0-138.mail.aliyun.com [140.205.0.138])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D5D3719E1;
-        Fri, 10 Jun 2022 21:46:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=alibaba-inc.com; s=default;
-        t=1654922803; h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type;
-        bh=QTu5c2AsKOp6O4fWUnSs1v4gHqsCVklvaNllZ7AbTYI=;
-        b=i+8/E59a3TELE0fLZsavCKoN6pSlIfGhQEDu2po/PbHBNJYsDdvtvbE1WFQ2789ts47IIs/TBE+BGLUjyar/0XvyYx+hEuPMERtdX0cehaC+1AM6JUw9NiVuQC/K4LPIVzkO39M3widePjZpUSI53mCrV7IEnoBPIxlbuad729U=
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018047205;MF=zhaowuyun.zwy@alibaba-inc.com;NM=1;PH=DW;RN=5;SR=0;TI=W4_0.1.30_v5ForWebDing_212543F5_1654922517723_o7001c314;
-Received: from WS-web (zhaowuyun.zwy@alibaba-inc.com[W4_0.1.30_v5ForWebDing_212543F5_1654922517723_o7001c314]) by ay29a011140100218.et135 at Sat, 11 Jun 2022 12:46:42 +0800
-Date:   Sat, 11 Jun 2022 12:46:42 +0800
-From:   "=?UTF-8?B?6LW15q2m5LqR?=" <zhaowuyun.zwy@alibaba-inc.com>
-To:     "axboe" <axboe@kernel.dk>, "jejb" <jejb@linux.vnet.ibm.com>,
-        "martin.petersen" <martin.petersen@oracle.com>
-Cc:     "linux-block" <linux-block@vger.kernel.org>,
-        "linux-kernel" <linux-kernel@vger.kernel.org>
-Reply-To: "=?UTF-8?B?6LW15q2m5LqR?=" <zhaowuyun.zwy@alibaba-inc.com>
-Message-ID: <4a2754ad-d76d-482f-9337-5364d46cd38d.zhaowuyun.zwy@alibaba-inc.com>
-Subject: =?UTF-8?B?W1BBVENIXSBibG9jazogcGVlayBQTSByZXF1ZXN0cyBkdXJpbmcgcnVudGltZSBQTQ==?=
-X-Mailer: [Alimail-Mailagent revision 5][W4_0.1.30][v5ForWebDing][Chrome]
+        Sat, 11 Jun 2022 04:34:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 86E0060D87
+        for <linux-block@vger.kernel.org>; Sat, 11 Jun 2022 01:34:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1654936456;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=/nj+eyQDOKupY5Gm0LaROjAymDtcr/UJJJ5aW9KO+7o=;
+        b=FNcH+RrOxh2OapHNMLvVhL4Zykwk3UdLQq/Xkb8tGPewZvjoGdTOGRjX89PkRvdoDdlc+V
+        HHir3IKRSH8BgZ7RlJQQ2NFw/60JMKpwa3xmxMWhdVlpQaT5Qcnlqnv6LrW2nCc7ypMV/K
+        u0ok3Mu+nOqBfk69LEO4bgGyW3Atbtk=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-171-sut-Vcv9MjiZIl76OMMkVQ-1; Sat, 11 Jun 2022 04:34:15 -0400
+X-MC-Unique: sut-Vcv9MjiZIl76OMMkVQ-1
+Received: by mail-pl1-f199.google.com with SMTP id l14-20020a170903120e00b00168af494a94so835693plh.4
+        for <linux-block@vger.kernel.org>; Sat, 11 Jun 2022 01:34:15 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=/nj+eyQDOKupY5Gm0LaROjAymDtcr/UJJJ5aW9KO+7o=;
+        b=SNBpnaTiyGiJU6ptKB4MJbOaI1rPskKqCN1gauJ1ungtNF0N73ByOkLMpnppP8P9Aw
+         So3wSLixBQoXHS2TYvOrx0QjJe3+mkh17vMdushy6rNK6ZBENB7y8jDtoFIIJgBjRi+y
+         ZdY26ngeubKp1osKLPdCHpm0ZpWJF+a/DjOWuWNLICrW66GhK7kcrdks1+rOHSaQng0t
+         vrHAmzMr8bKJCdt7Oc/YzeRIWrevqlzBsSpIFsxjTgbZSxj0BNAKkfhImW1OXYQ3V2iC
+         ELRsZwBECNIjwSvFRSGQXZeW3V3kxiZjPSQz1cDeICOjOb9qi/189NR8uxinOJ5637H7
+         MiAQ==
+X-Gm-Message-State: AOAM53313ndnQ3mwSEsjriIUVZ+GNQjV++NDE4b+7S3sRe6J3WO8HMpU
+        KLyRAalQRmK0aieGlhCDu1QO40MF7m5pyYwwyoFJpTIlNiUu1VzOgMuuV5VDA3Qrd0oROCjFjjm
+        nWuB1HivvcqnpOLamgaAL28ZPUNRncILigV0Ndrs=
+X-Received: by 2002:a17:902:db0a:b0:165:1299:29ea with SMTP id m10-20020a170902db0a00b00165129929eamr48944641plx.15.1654936454243;
+        Sat, 11 Jun 2022 01:34:14 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwfWWDvxzi4zRM2HC5pva6+1ZddS5YtzIfpQd2mOSo+97x+Ci2mnxI88oS4vUcT4M5duK0ikun/yAmArwpjtg0=
+X-Received: by 2002:a17:902:db0a:b0:165:1299:29ea with SMTP id
+ m10-20020a170902db0a00b00165129929eamr48944619plx.15.1654936453917; Sat, 11
+ Jun 2022 01:34:13 -0700 (PDT)
 MIME-Version: 1.0
-x-aliyun-mail-creator: W4_0.1.30_v5ForWebDing_M3LTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMi4wLjUwMDUuNjEgU2FmYXJpLzUzNy4zNg==vN
+References: <20220609235329.4jbz4wr3eg2nmzqa@shindev> <717734c9-c633-fb48-499e-7e3e15113020@nvidia.com>
+ <19d09611-42cc-5a81-d676-c5375865c14c@nvidia.com> <20220610122517.6pt5y63hcosk5mes@shindev>
+ <YqNZiMw+rH5gyZDI@kbusch-mbp.dhcp.thefacebook.com>
+In-Reply-To: <YqNZiMw+rH5gyZDI@kbusch-mbp.dhcp.thefacebook.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Sat, 11 Jun 2022 16:34:03 +0800
+Message-ID: <CAHj4cs9G0WDrnSS6iVZJfgfOcRR0ysJhw+9yqcbqE=_8mkF0zw@mail.gmail.com>
+Subject: Re: blktests failures with v5.19-rc1
+To:     Keith Busch <kbusch@kernel.org>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        mstowe@redhat.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-RnJvbTogWmhhbyBXdXl1biA8emhhb3d1eXVuLnp3eUBhbGliYWJhLWluYy5jb20+CgpxdWV1ZSBi
-bG9ja2VkIGR1cmluZyBydW50aW1lIFBNIHdoZW4gYXQgdGhlIGZvbGxvd2luZyBzaXR1YXRpb246
-Cgpwcm9jZXNzIEE6CiAgICBydW50aW1lIHN1c3BlbmQgcnVuIGFuZCBzZXQgdGhlIFBNIHN0YXR1
-cyB0byBSUE1fU1VTUEVORElORwogICAgdGhlbiBydW4gcmVxIHdpdGggUlFGX1BNIHdpdGggYmxr
-X2V4ZWN1dGVfcnEocmVxLT5xLCBOVUxMLCByZXEsIDEpCiAgICB0aGVuIHRoZSByZXEgcXVldWVk
-IHRvIGhlYWQKICAgIGl0IGlzIG5vdCBleGVjdXRlZCB3aGVuIHRoZSBkcml2ZXIgaXMgYnVzeQoK
-cHJvY2VzcyBCOgogICAgbm9ybWFsIGRldmljZSBtYW5hZ2VtZW50IG9wZXJhdGlvbgogICAgcnVu
-IHJlcSB3aXRoIG5vIFJRRl9QTSB3aXRoIGJsa19leGVjdXRlX3JxKHJlcS0+cSwgTlVMTCwgcmVx
-LCAxKQogICAgdGhlIHRoZSByZXEgaXMgcXVldWVkIGluIGZyb250IG9mIHRoZSBSUUZfUE0gcmVx
-IG9mIHByb2Nlc3MgQQogICAgX19ibGtfcnVuX3F1ZXVlIHN0aWxsIG5vdCBydW4KCmJlY2F1c2Ug
-dGhlIGZpcnN0IHJlcSBpcyBub24gUlFGX1BNIHJlcSBhbmQgd2l0aCBSUUZfU09GVEJBUlJJRVIs
-CnNvIHRoZSBxdWV1ZSBpcyB0b3RhbGx5IGJsb2NrZWQgd2hlbiBhdCBSUE1fU1VTUEVORElORyBz
-dGF0dXMuCgpzZWUgdGhlIGZvbGxvd2luZyB0YXNrIGNhbGx0cmFjZToKCnByb2Nlc3MgQToKICAg
-IFs8ZmZmZmZmOWQ4N2U4NjE1MD5dIF9fc3dpdGNoX3RvKzB4MTBjCiAgICBbPGZmZmZmZjlkODhl
-ZDhhYjA+XSBfX3NjaGVkdWxlKzB4NjcwCiAgICBbPGZmZmZmZjlkODhlZDhkMTg+XSBzY2hlZHVs
-ZSsweDc0CiAgICBbPGZmZmZmZjlkODhlZGM4ZjQ+XSBzY2hlZHVsZV90aW1lb3V0KzB4MzI4CiAg
-ICBbPGZmZmZmZjlkODhlZDkxMzA+XSBpb19zY2hlZHVsZV90aW1lb3V0KzB4MjQKICAgIFs8ZmZm
-ZmZmOWQ4OGVkOWIxMD5dIHdhaXRfZm9yX2NvbW1vbl9pbysweDkwCiAgICBbPGZmZmZmZjlkODhl
-ZDliYjQ+XSB3YWl0X2Zvcl9jb21wbGV0aW9uX2lvX3RpbWVvdXQrMHgyNAogICAgWzxmZmZmZmY5
-ZDg4MjllMWUwPl0gYmxrX2V4ZWN1dGVfcnErMHg4OAogICAgWzxmZmZmZmY5ZDg4NTliM2E0Pl0g
-c2NzaV9leGVjdXRlKzB4MTE0CiAgICBbPGZmZmZmZjlkODg1YzQwNzA+XSBzZF9zeW5jX2NhY2hl
-KzB4ZmMKICAgIFs8ZmZmZmZmOWQ4ODVjNDM5Yz5dIHNkX3N1c3BlbmRfY29tbW9uKzB4NTgKICAg
-IFs8ZmZmZmZmOWQ4ODVjNDMzOD5dIHNkX3N1c3BlbmRfcnVudGltZSsweDIwCiAgICBbPGZmZmZm
-ZjlkODg1YTczY2M+XSBzY3NpX3J1bnRpbWVfc3VzcGVuZCsweDcwCiAgICBbPGZmZmZmZjlkODg1
-MzQxZTg+XSBfX3JwbV9jYWxsYmFjaysweGNjCiAgICBbPGZmZmZmZjlkODg1MzQwZTg+XSBycG1f
-Y2FsbGJhY2srMHg1YwogICAgWzxmZmZmZmY5ZDg4NTMyMTM0Pl0gcnBtX3N1c3BlbmQrMHgxZTgK
-ICAgIFs8ZmZmZmZmOWQ4ODUzM2IyOD5dIHBtX3J1bnRpbWVfd29yaysweDdjCiAgICBbPGZmZmZm
-ZjlkODdlZDMxZDQ+XSBwcm9jZXNzX29uZV93b3JrKzB4MWJjCiAgICBbPGZmZmZmZjlkODdlZDM2
-Njg+XSB3b3JrZXJfdGhyZWFkKzB4MjE0CiAgICBbPGZmZmZmZjlkODdlZDgzOWM+XSBrdGhyZWFk
-KzB4MTFjCiAgICBbPGZmZmZmZjlkODdlODRmY2M+XSByZXRfZnJvbV9mb3JrKzB4MTAKCnByb2Nl
-c3MgQjoKICAgIFs8ZmZmZmZmOWQ4N2U4NjE1MD5dIF9fc3dpdGNoX3RvKzB4MTBjCiAgICBbPGZm
-ZmZmZjlkODhlZDhhYjA+XSBfX3NjaGVkdWxlKzB4NjcwCiAgICBbPGZmZmZmZjlkODhlZDhkMTg+
-XSBzY2hlZHVsZSsweDc0CiAgICBbPGZmZmZmZjlkODhlZGM4ZjQ+XSBzY2hlZHVsZV90aW1lb3V0
-KzB4MzI4CiAgICBbPGZmZmZmZjlkODhlZDkxMzA+XSBpb19zY2hlZHVsZV90aW1lb3V0KzB4MjQK
-ICAgIFs8ZmZmZmZmOWQ4OGVkOWIxMD5dIHdhaXRfZm9yX2NvbW1vbl9pbysweDkwCiAgICBbPGZm
-ZmZmZjlkODhlZDliYjQ+XSB3YWl0X2Zvcl9jb21wbGV0aW9uX2lvX3RpbWVvdXQrMHgyNAogICAg
-WzxmZmZmZmY5ZDg4MjllMWUwPl0gYmxrX2V4ZWN1dGVfcnErMHg4OAogICAgWzxmZmZmZmY5ZDg4
-NTliM2E0Pl0gc2NzaV9leGVjdXRlKzB4MTE0CiAgICBbPGZmZmZmZjlkODg1OWQ4NTQ+XSBzY3Np
-X3Rlc3RfdW5pdF9yZWFkeSsweDcwCiAgICBbPGZmZmZmZjlkODg1YzJmNDg+XSBzZF9jaGVja19l
-dmVudHMrMHhkNAogICAgWzxmZmZmZmY5ZDg4MmFiZGU4Pl0gZGlza19jaGVja19ldmVudHMrMHg1
-OAogICAgWzxmZmZmZmY5ZDg4MmFjYzBjPl0gZGlza19ldmVudHNfd29ya2ZuKzB4MjAKICAgIFs8
-ZmZmZmZmOWQ4N2VkMzFkND5dIHByb2Nlc3Nfb25lX3dvcmsrMHgxYmMKICAgIFs8ZmZmZmZmOWQ4
-N2VkMzY2OD5dIHdvcmtlcl90aHJlYWQrMHgyMTQKICAgIFs8ZmZmZmZmOWQ4N2VkODM5Yz5dIGt0
-aHJlYWQrMHgxMWMKICAgIFs8ZmZmZmZmOWQ4N2U4NGZjYz5dIHJldF9mcm9tX2ZvcmsrMHgxMAoK
-U2lnbmVkLW9mZi1ieTogWmhhbyBXdXl1biA8emhhb3d1eXVuLnp3eUBhbGliYWJhLWluYy5jb20+
-Ci0tLQogYmxvY2svYmxrLWNvcmUuYyB8IDkgKysrKysrKysrCiAxIGZpbGUgY2hhbmdlZCwgOSBp
-bnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLWNvcmUuYyBiL2Jsb2NrL2Jsay1j
-b3JlLmMKaW5kZXggYTMzNzc1Y2Q5N2JlLi44YjkyNzJiZmRjMDkgMTAwNjQ0Ci0tLSBhL2Jsb2Nr
-L2Jsay1jb3JlLmMKKysrIGIvYmxvY2svYmxrLWNvcmUuYwpAQCAtMjg1Niw2ICsyODU2LDE1IEBA
-IHN0YXRpYyBzdHJ1Y3QgcmVxdWVzdCAqZWx2X25leHRfcmVxdWVzdChzdHJ1Y3QgcmVxdWVzdF9x
-dWV1ZSAqcSkKIAkJCWlmIChibGtfcG1fYWxsb3dfcmVxdWVzdChycSkpCiAJCQkJcmV0dXJuIHJx
-OwogCisJCQkvKgorCQkJICogbGV0IHRoZSBQTSByZXF1ZXN0IHJ1biwKKwkJCSAqIG9yIHRoZSBx
-dWV1ZSBtYXkgYmUgYmxvY2tlZCBieSB0aGUgbm9uLVBNIHJlcXVlc3QKKwkJCSAqIHdpdGggUlFG
-X1NPRlRCQVJSSUVSIGZvcmV2ZXIgd2hpbGUgZG9pbmcgcnVudGltZSBQTS4KKwkJCSAqLworCQkJ
-aWYgKHEtPnJwbV9zdGF0dXMgPT0gUlBNX1NVU1BFTkRJTkcKKwkJCQkJCXx8IHEtPnJwbV9zdGF0
-dXMgPT0gUlBNX1JFU1VNSU5HKQorCQkJCWNvbnRpbnVlOworCiAJCQlpZiAocnEtPnJxX2ZsYWdz
-ICYgUlFGX1NPRlRCQVJSSUVSKQogCQkJCWJyZWFrOwogCQl9Ci0tIAoyLjMyLjEgKEFwcGxlIEdp
-dC0xMzMpCgoKCgoK
+On Fri, Jun 10, 2022 at 10:49 PM Keith Busch <kbusch@kernel.org> wrote:
+>
+> On Fri, Jun 10, 2022 at 12:25:17PM +0000, Shinichiro Kawasaki wrote:
+> > On Jun 10, 2022 / 09:32, Chaitanya Kulkarni wrote:
+> > > >> #6: nvme/032: Failed at the first run after system reboot.
+> > > >>                 Used QEMU NVME device as TEST_DEV.
+> > > >>
+> > >
+> > > ofcourse we need to fix this issue but can you also
+> > > try it with the real H/W ?
+> >
+> > Hi Chaitanya, thank you for looking into the failures. I have just run the test
+> > case nvme/032 with real NVME device and observed the exactly same symptom as
+> > QEMU NVME device.
+>
+> QEMU is perfectly fine for this test. There's no need to bring in "real"
+> hardware for this.
+>
+> And I am not even sure this is real. I don't know yet why this is showing up
+> only now, but this should fix it:
+
+Hi Keith
+
+Confirmed the WARNING issue was fixed with the change, here is the log:
+
+# ./check nvme/032
+nvme/032 => nvme0n1 (test nvme pci adapter rescan/reset/remove during
+I/O) [passed]
+    runtime  5.165s  ...  5.142s
+nvme/032 => nvme1n1 (test nvme pci adapter rescan/reset/remove during
+I/O) [passed]
+    runtime  6.723s  ...  6.635s
+nvme/032 => nvme2n1 (test nvme pci adapter rescan/reset/remove during
+I/O) [passed]
+    runtime  7.708s  ...  7.808s
+
+[  307.477948] run blktests nvme/032 at 2022-06-11 04:27:46
+[  312.603452] pcieport 0000:40:03.1: bridge window [io
+0x1000-0x0fff] to [bus 42] add_size 1000
+[  312.603599] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  312.603603] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  312.603729] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  312.603733] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  313.397440] run blktests nvme/032 at 2022-06-11 04:27:51
+[  318.732273] nvme nvme1: Shutdown timeout set to 16 seconds
+[  318.785945] nvme nvme1: 16/0/0 default/read/poll queues
+[  319.268544] pci 0000:44:00.0: Removing from iommu group 33
+[  319.326814] pci 0000:44:00.0: [1e0f:0007] type 00 class 0x010802
+[  319.326866] pci 0000:44:00.0: reg 0x10: [mem 0xa4900000-0xa4907fff 64bit]
+[  319.483234] pci 0000:44:00.0: 31.504 Gb/s available PCIe bandwidth,
+limited by 8.0 GT/s PCIe x4 link at 0000:40:03.3 (capable of 63.012
+Gb/s with 16.0 GT/s PCIe x4 link)
+[  319.531324] pci 0000:44:00.0: Adding to iommu group 33
+[  319.547381] pcieport 0000:40:03.1: bridge window [io
+0x1000-0x0fff] to [bus 42] add_size 1000
+[  319.547448] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  319.547453] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  319.547547] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  319.547550] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  319.547607] pci 0000:44:00.0: BAR 0: assigned [mem
+0xa4900000-0xa4907fff 64bit]
+[  319.556620] nvme nvme1: pci function 0000:44:00.0
+[  319.838233] nvme nvme1: Shutdown timeout set to 16 seconds
+[  319.911826] nvme nvme1: 16/0/0 default/read/poll queues
+[  320.900025] run blktests nvme/032 at 2022-06-11 04:27:59
+[  326.311357] nvme nvme2: 16/0/0 default/read/poll queues
+[  327.771945] pci 0000:45:00.0: Removing from iommu group 34
+[  327.839066] pci 0000:45:00.0: [8086:0b60] type 00 class 0x010802
+[  327.839106] pci 0000:45:00.0: reg 0x10: [mem 0xa4800000-0xa4803fff 64bit]
+[  328.011204] pci 0000:45:00.0: 31.504 Gb/s available PCIe bandwidth,
+limited by 8.0 GT/s PCIe x4 link at 0000:40:03.4 (capable of 63.012
+Gb/s with 16.0 GT/s PCIe x4 link)
+[  328.058523] pci 0000:45:00.0: Adding to iommu group 34
+[  328.072575] pcieport 0000:40:03.1: bridge window [io
+0x1000-0x0fff] to [bus 42] add_size 1000
+[  328.072628] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  328.072632] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  328.072685] pcieport 0000:40:03.1: BAR 13: no space for [io  size 0x1000]
+[  328.072688] pcieport 0000:40:03.1: BAR 13: failed to assign [io  size 0x1000]
+[  328.072741] pci 0000:45:00.0: BAR 0: assigned [mem
+0xa4800000-0xa4803fff 64bit]
+[  328.079857] nvme nvme2: pci function 0000:45:00.0
+[  328.153256] nvme nvme2: 16/0/0 default/read/poll queues
+>
+> ---
+> diff --git a/drivers/pci/pci-sysfs.c b/drivers/pci/pci-sysfs.c
+> index fc804e08e3cb..bebd816c11e6 100644
+> --- a/drivers/pci/pci-sysfs.c
+> +++ b/drivers/pci/pci-sysfs.c
+> @@ -476,7 +476,7 @@ static ssize_t dev_rescan_store(struct device *dev,
+>         }
+>         return count;
+>  }
+> -static struct device_attribute dev_attr_dev_rescan = __ATTR(rescan, 0200, NULL,
+> +static struct device_attribute dev_attr_dev_rescan = __ATTR_IGNORE_LOCKDEP(rescan, 0200, NULL,
+>                                                             dev_rescan_store);
+>
+>  static ssize_t remove_store(struct device *dev, struct device_attribute *attr,
+> --
+>
+
+
+-- 
+Best Regards,
+  Yi Zhang
+
