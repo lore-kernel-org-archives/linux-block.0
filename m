@@ -2,45 +2,45 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69831C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7963CCA47F
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:55:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345539AbiFMSzq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:55:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37962 "EHLO
+        id S240761AbiFMSzs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 14:55:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345126AbiFMSz1 (ORCPT
+        with ESMTP id S235969AbiFMSz1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Mon, 13 Jun 2022 14:55:27 -0400
-Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CEA7FC834;
+Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D829713CEB;
         Mon, 13 Jun 2022 08:59:53 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx4.veeam.com (Postfix) with ESMTPS id 964A1CCE22;
-        Mon, 13 Jun 2022 18:54:09 +0300 (MSK)
+        by mx2.veeam.com (Postfix) with ESMTPS id DF704431EB;
+        Mon, 13 Jun 2022 11:54:45 -0400 (EDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx4-2022; t=1655135649;
-        bh=97rDGsYHY6FzJ/7EYHPrK0e3He7aLaaXB6akQRVjLgQ=;
+        s=mx2-2022; t=1655135686;
+        bh=cFkkDlybIJ5f0OhAldQCwzHkD51Q6ycCiV+lYTe5N48=;
         h=From:To:CC:Subject:Date:In-Reply-To:References:From;
-        b=HBOhLLGplABG+QDfCP2gNGLBCftDwb+oxmENW0/ib4NS6FmaSsSej2NhIW+VMRiAg
-         mWaTAxvHm7uuSSVHa6jHonycIjMunAC5rtGLoCG0Y5+ZmEZ0E5ls7IacaMlgBnkIR9
-         LPJeIBWTw2vYmc2EwFokJzVkkcSq28Rs7WbojCOrDa/KMurQ5ywNA70slwHAQYvx9a
-         W+xhTAIfr8n4oKYoifeH4Vgxhj0i9Q+Z2DMwlnU1C/lP8gQRrnKZKAdhLlgaN0Qvcn
-         jp0zvnhUpW5J1yeGglsLRdBNWJb/k1UEXqllE7fEx5Ys8FrGEdRbcK9CkmjPinf/NO
-         27fqaocZKmWCA==
+        b=Gi6aKAV2pQMB9dU+kEqDcuwVTajjbiHADFKAE3QezSseZAGQYQLVvOzpBhyU0f35s
+         zx3bItjo/LZUkRTti07wbN02IkZskEpgNowQ4Olc6VG5AC/IxSsLlrK0c8mARpQ3T3
+         FReOdraYBjz3qNUwSDf+zSax+Kr+0t4rLInWtIH5hjEwaQ2hyX6YXr8Plb5XxJ4grh
+         Zyq7XjN7t0CQAIzX9R8HDNAgVOWqZ17NjBF/P52ZnbrWBrGOLpj/ZbVgJx4U4qqt7O
+         Hi58fATcIJTZgpO7S+gKmiauOu3DPAHAWF5CJIcPLxDLu4+KGBIUs117U+V8D7igMc
+         DbF5qE22COtiw==
 Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.9; Mon, 13 Jun 2022 17:54:07 +0200
+ 15.2.1118.9; Mon, 13 Jun 2022 17:54:31 +0200
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 CC:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: [PATCH 03/20] block, blksnap: module management interface functions
-Date:   Mon, 13 Jun 2022 18:52:56 +0300
-Message-ID: <1655135593-1900-4-git-send-email-sergei.shtepa@veeam.com>
+Subject: [PATCH 10/20] block, blksnap: buffer in memory for the minimum data storage unit
+Date:   Mon, 13 Jun 2022 18:53:03 +0300
+Message-ID: <1655135593-1900-11-git-send-email-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
 References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
@@ -56,482 +56,255 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Implementation of module management interface functions. At this level,
-the input and output parameters are converted and the corresponding
-subsystems of the module are called.
+The struct diff_buffer describes a buffer in memory for the minimum data
+storage block of the original block device (struct chunk).
+Buffer allocation and release functions allow to reduce the number of
+allocations and releases of a large number of memory pages.
 
 Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
 ---
- drivers/block/blksnap/ctrl.c | 445 +++++++++++++++++++++++++++++++++++
- drivers/block/blksnap/ctrl.h |   7 +
- 2 files changed, 452 insertions(+)
- create mode 100644 drivers/block/blksnap/ctrl.c
- create mode 100644 drivers/block/blksnap/ctrl.h
+ drivers/block/blksnap/diff_buffer.c | 146 ++++++++++++++++++++++++++++
+ drivers/block/blksnap/diff_buffer.h |  78 +++++++++++++++
+ 2 files changed, 224 insertions(+)
+ create mode 100644 drivers/block/blksnap/diff_buffer.c
+ create mode 100644 drivers/block/blksnap/diff_buffer.h
 
-diff --git a/drivers/block/blksnap/ctrl.c b/drivers/block/blksnap/ctrl.c
+diff --git a/drivers/block/blksnap/diff_buffer.c b/drivers/block/blksnap/diff_buffer.c
 new file mode 100644
-index 000000000000..30c3f538f5b4
+index 000000000000..8f9532a4922b
 --- /dev/null
-+++ b/drivers/block/blksnap/ctrl.c
-@@ -0,0 +1,445 @@
++++ b/drivers/block/blksnap/diff_buffer.c
+@@ -0,0 +1,146 @@
 +// SPDX-License-Identifier: GPL-2.0
-+#define pr_fmt(fmt) KBUILD_MODNAME "-ctrl: " fmt
-+
-+#include <linux/module.h>
-+#include <linux/poll.h>
-+#include <linux/uaccess.h>
-+#include <linux/slab.h>
-+#include <linux/blk_snap.h>
++#define pr_fmt(fmt) KBUILD_MODNAME "-diff-buffer: " fmt
 +#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
 +#include "memory_checker.h"
 +#endif
-+#include "ctrl.h"
 +#include "params.h"
-+#include "version.h"
-+#include "snapshot.h"
-+#include "snapimage.h"
-+#include "tracker.h"
-+#include "big_buffer.h"
++#include "diff_buffer.h"
++#include "diff_area.h"
 +
-+static int blk_snap_major;
-+
-+static long ctrl_unlocked_ioctl(struct file *filp, unsigned int cmd,
-+				unsigned long arg);
-+
-+static const struct file_operations ctrl_fops = {
-+	.owner = THIS_MODULE,
-+	.unlocked_ioctl = ctrl_unlocked_ioctl,
-+};
-+
-+static const struct blk_snap_version version = {
-+	.major = VERSION_MAJOR,
-+	.minor = VERSION_MINOR,
-+	.revision = VERSION_REVISION,
-+	.build = VERSION_BUILD,
-+};
-+
-+int get_blk_snap_major(void)
++void diff_buffer_free(struct diff_buffer *diff_buffer)
 +{
-+	return blk_snap_major;
-+}
++	size_t inx = 0;
++	struct page *page;
 +
-+int ctrl_init(void)
-+{
-+	int ret;
++	if (unlikely(!diff_buffer))
++		return;
 +
-+	ret = register_chrdev(0, BLK_SNAP_MODULE_NAME, &ctrl_fops);
-+	if (ret < 0) {
-+		pr_err("Failed to register a character device. errno=%d\n",
-+		       abs(blk_snap_major));
-+		return ret;
-+	}
-+
-+	blk_snap_major = ret;
-+	pr_info("Register control device [%d:0].\n", blk_snap_major);
-+	return 0;
-+}
-+
-+void ctrl_done(void)
-+{
-+	pr_info("Unregister control device\n");
-+
-+	unregister_chrdev(blk_snap_major, BLK_SNAP_MODULE_NAME);
-+}
-+
-+static int ioctl_version(unsigned long arg)
-+{
-+	if (copy_to_user((void *)arg, &version, sizeof(version))) {
-+		pr_err("Unable to get version: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ioctl_tracker_remove(unsigned long arg)
-+{
-+	struct blk_snap_tracker_remove karg;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg)) != 0) {
-+		pr_err("Unable to remove device from tracking: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+	return tracker_remove(MKDEV(karg.dev_id.mj, karg.dev_id.mn));
-+}
-+
-+static int ioctl_tracker_collect(unsigned long arg)
-+{
-+	int res;
-+	struct blk_snap_tracker_collect karg;
-+	struct blk_snap_cbt_info *cbt_info = NULL;
-+
-+	pr_debug("Collecting tracking devices\n");
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to collect tracking devices: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	if (!karg.cbt_info_array) {
-+		/*
-+		 * If the buffer is empty, this is a request to determine
-+		 * the number of trackers.
-+		 */
-+		res = tracker_collect(0, NULL, &karg.count);
-+		if (res) {
-+			pr_err("Failed to execute tracker_collect. errno=%d\n",
-+			       abs(res));
-+			return res;
++	for (inx = 0; inx < diff_buffer->page_count; inx++) {
++		page = diff_buffer->pages[inx];
++		if (page) {
++			__free_page(page);
++#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
++			memory_object_dec(memory_object_page);
++#endif
 +		}
-+		if (copy_to_user((void *)arg, (void *)&karg, sizeof(karg))) {
-+			pr_err("Unable to collect tracking devices: invalid user buffer for arguments\n");
-+			return -ENODATA;
-+		}
-+		return 0;
 +	}
 +
-+	cbt_info = kcalloc(karg.count, sizeof(struct blk_snap_cbt_info),
-+			   GFP_KERNEL);
-+	if (cbt_info == NULL)
-+		return -ENOMEM;
++	kfree(diff_buffer);
 +#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_inc(memory_object_blk_snap_cbt_info);
++	memory_object_dec(memory_object_diff_buffer);
 +#endif
-+	res = tracker_collect(karg.count, cbt_info, &karg.count);
-+	if (res) {
-+		pr_err("Failed to execute tracker_collect. errno=%d\n",
-+		       abs(res));
-+		goto fail;
-+	}
-+
-+	if (copy_to_user(karg.cbt_info_array, cbt_info,
-+			 karg.count * sizeof(struct blk_snap_cbt_info))) {
-+		pr_err("Unable to collect tracking devices: invalid user buffer for CBT info\n");
-+		res = -ENODATA;
-+		goto fail;
-+	}
-+
-+	if (copy_to_user((void *)arg, (void *)&karg, sizeof(karg))) {
-+		pr_err("Unable to collect tracking devices: invalid user buffer for arguments\n");
-+		res = -ENODATA;
-+		goto fail;
-+	}
-+fail:
-+	kfree(cbt_info);
-+#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_dec(memory_object_blk_snap_cbt_info);
-+#endif
-+	return res;
 +}
 +
-+static int ioctl_tracker_read_cbt_map(unsigned long arg)
++struct diff_buffer *diff_buffer_new(size_t page_count, size_t buffer_size,
++				    gfp_t gfp_mask)
 +{
-+	struct blk_snap_tracker_read_cbt_bitmap karg;
++	struct diff_buffer *diff_buffer;
++	size_t inx = 0;
++	struct page *page;
 +
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to read CBT map: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return tracker_read_cbt_bitmap(MKDEV(karg.dev_id.mj, karg.dev_id.mn),
-+				       karg.offset, karg.length,
-+				       (char __user *)karg.buff);
-+}
-+
-+static int ioctl_tracker_mark_dirty_blocks(unsigned long arg)
-+{
-+	int ret = 0;
-+	struct blk_snap_tracker_mark_dirty_blocks karg;
-+	struct blk_snap_block_range *dirty_blocks_array;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to mark dirty blocks: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	dirty_blocks_array = kcalloc(
-+		karg.count, sizeof(struct blk_snap_block_range), GFP_KERNEL);
-+	if (!dirty_blocks_array)
-+		return -ENOMEM;
-+
-+#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_inc(memory_object_blk_snap_block_range);
-+#endif
-+	if (copy_from_user(dirty_blocks_array, (void *)karg.dirty_blocks_array,
-+			   karg.count * sizeof(struct blk_snap_block_range))) {
-+		pr_err("Unable to mark dirty blocks: invalid user buffer\n");
-+		ret = -ENODATA;
-+	} else {
-+		if (karg.dev_id.mj == snapimage_major())
-+			ret = snapshot_mark_dirty_blocks(
-+				MKDEV(karg.dev_id.mj, karg.dev_id.mn),
-+				dirty_blocks_array, karg.count);
-+		else
-+			ret = tracker_mark_dirty_blocks(
-+				MKDEV(karg.dev_id.mj, karg.dev_id.mn),
-+				dirty_blocks_array, karg.count);
-+	}
-+
-+	kfree(dirty_blocks_array);
-+#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_dec(memory_object_blk_snap_block_range);
-+#endif
-+	return ret;
-+}
-+
-+static int ioctl_snapshot_create(unsigned long arg)
-+{
-+	int ret;
-+	struct blk_snap_snapshot_create karg;
-+	struct blk_snap_dev_t *dev_id_array = NULL;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to create snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	dev_id_array =
-+		kcalloc(karg.count, sizeof(struct blk_snap_dev_t), GFP_KERNEL);
-+	if (dev_id_array == NULL) {
-+		pr_err("Unable to create snapshot: too many devices %d\n",
-+		       karg.count);
-+		return -ENOMEM;
-+	}
-+#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_inc(memory_object_blk_snap_dev_t);
-+#endif
-+	if (copy_from_user(dev_id_array, (void *)karg.dev_id_array,
-+			   karg.count * sizeof(struct blk_snap_dev_t))) {
-+		pr_err("Unable to create snapshot: invalid user buffer\n");
-+		ret = -ENODATA;
-+		goto out;
-+	}
-+
-+	ret = snapshot_create(dev_id_array, karg.count, &karg.id);
-+	if (ret)
-+		goto out;
-+
-+	if (copy_to_user((void *)arg, &karg, sizeof(karg))) {
-+		pr_err("Unable to create snapshot: invalid user buffer\n");
-+		ret = -ENODATA;
-+	}
-+out:
-+	kfree(dev_id_array);
-+#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_dec(memory_object_blk_snap_dev_t);
-+#endif
-+	return ret;
-+}
-+
-+static int ioctl_snapshot_destroy(unsigned long arg)
-+{
-+	struct blk_snap_snapshot_destroy karg;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to destroy snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return snapshot_destroy(&karg.id);
-+}
-+
-+static int ioctl_snapshot_append_storage(unsigned long arg)
-+{
-+	int res = 0;
-+	struct blk_snap_snapshot_append_storage karg;
-+	struct big_buffer *ranges = NULL;
-+	size_t ranges_buffer_size;
-+
-+	pr_debug("Append difference storage\n");
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to append difference storage: invalid user buffer\n");
-+		return -EINVAL;
-+	}
++	if (unlikely(page_count <= 0))
++		return NULL;
 +
 +	/*
-+	 * Rarely, but there are file systems in which the blocks on the disk
-+	 * are significantly fragmented. And the drive for the diff storage can be
-+	 * quite large.
-+	 * At the same time, an attempt to allocate several pages of continuous
-+	 * address space on such systems often causes an ENOMEM error.
-+	 * Therefore, an array of pages is used to store an array of ranges of
-+	 * available disk space.
++	 * In case of overflow, it is better to get a null pointer
++	 * than a pointer to some memory area. Therefore + 1.
 +	 */
-+	ranges_buffer_size = karg.count * sizeof(struct blk_snap_block_range);
-+	ranges = big_buffer_alloc(ranges_buffer_size, GFP_KERNEL);
-+	if (!ranges) {
-+		pr_err("Unable to append difference storage: cannot allocate [%zu] bytes\n",
-+		       ranges_buffer_size);
-+		return -ENOMEM;
-+	}
-+
-+	if (big_buffer_copy_from_user((void *)karg.ranges, 0, ranges,
-+				      ranges_buffer_size) !=
-+	    ranges_buffer_size) {
-+		pr_err("Unable to add file to snapstore: invalid user buffer for parameters\n");
-+		big_buffer_free(ranges);
-+		return -ENODATA;
-+	}
-+
-+	res = snapshot_append_storage(&karg.id, karg.dev_id, ranges,
-+				      (size_t)karg.count);
-+	big_buffer_free(ranges);
-+
-+	return res;
-+}
-+
-+static int ioctl_snapshot_take(unsigned long arg)
-+{
-+	struct blk_snap_snapshot_take karg;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to take snapshot: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return snapshot_take(&karg.id);
-+}
-+
-+static int ioctl_snapshot_wait_event(unsigned long arg)
-+{
-+	int ret = 0;
-+	struct blk_snap_snapshot_event *karg;
-+	struct event *event;
-+
-+	//pr_debug("Wait event\n");
-+	karg = kzalloc(sizeof(struct blk_snap_snapshot_event), GFP_KERNEL);
-+	if (!karg)
-+		return -ENOMEM;
++	diff_buffer = kzalloc(sizeof(struct diff_buffer) +
++				      (page_count + 1) * sizeof(struct page *),
++			      gfp_mask);
++	if (!diff_buffer)
++		return NULL;
 +#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_inc(memory_object_blk_snap_snapshot_event);
++	memory_object_inc(memory_object_diff_buffer);
 +#endif
-+	if (copy_from_user(karg, (void *)arg,
-+			   sizeof(struct blk_snap_snapshot_event))) {
-+		pr_err("Unable failed to get snapstore error code: invalid user buffer\n");
-+		ret = -EINVAL;
-+		goto out;
-+	}
++	INIT_LIST_HEAD(&diff_buffer->link);
++	diff_buffer->size = buffer_size;
++	diff_buffer->page_count = page_count;
 +
-+	event = snapshot_wait_event(&karg->id, karg->timeout_ms);
-+	if (IS_ERR(event)) {
-+		ret = PTR_ERR(event);
-+		goto out;
-+	}
-+
-+	pr_debug("Received event=%lld code=%d data_size=%d\n", event->time,
-+		 event->code, event->data_size);
-+	karg->code = event->code;
-+	karg->time_label = event->time;
-+
-+	if (event->data_size > sizeof(karg->data)) {
-+		pr_err("Event size %d is too big\n", event->data_size);
-+		ret = -ENOSPC;
-+		/* If we can't copy all the data, we copy only part of it. */
-+	}
-+	memcpy(karg->data, event->data, event->data_size);
-+	//min_t(size_t, event->data_size, sizeof(karg->data)));
-+	event_free(event);
-+
-+	if (copy_to_user((void *)arg, karg,
-+			 sizeof(struct blk_snap_snapshot_event))) {
-+		pr_err("Unable to get snapstore error code: invalid user buffer\n");
-+		ret = -EINVAL;
-+	}
-+out:
-+	kfree(karg);
++	for (inx = 0; inx < page_count; inx++) {
++		page = alloc_page(gfp_mask);
++		if (!page)
++			goto fail;
 +#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-+	memory_object_dec(memory_object_blk_snap_snapshot_event);
++		memory_object_inc(memory_object_page);
 +#endif
-+	return ret;
++		diff_buffer->pages[inx] = page;
++	}
++	return diff_buffer;
++fail:
++	diff_buffer_free(diff_buffer);
++	return NULL;
 +}
 +
-+static int ioctl_snapshot_collect(unsigned long arg)
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait)
 +{
-+	int ret;
-+	struct blk_snap_snapshot_collect karg;
++	struct diff_buffer *diff_buffer = NULL;
++	sector_t chunk_sectors;
++	size_t page_count;
++	size_t buffer_size;
 +
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to collect available snapshots: invalid user buffer\n");
-+		return -ENODATA;
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	diff_buffer = list_first_entry_or_null(&diff_area->free_diff_buffers,
++					       struct diff_buffer, link);
++	if (diff_buffer) {
++		list_del(&diff_buffer->link);
++		atomic_dec(&diff_area->free_diff_buffers_count);
++	}
++	spin_unlock(&diff_area->free_diff_buffers_lock);
++
++	/* Return free buffer if it was found in a pool */
++	if (diff_buffer)
++		return diff_buffer;
++
++	/* Allocate new buffer */
++	chunk_sectors = diff_area_chunk_sectors(diff_area);
++	page_count = round_up(chunk_sectors, SECTOR_IN_PAGE) / SECTOR_IN_PAGE;
++	buffer_size = chunk_sectors << SECTOR_SHIFT;
++
++	diff_buffer =
++		diff_buffer_new(page_count, buffer_size,
++				is_nowait ? (GFP_NOIO | GFP_NOWAIT) : GFP_NOIO);
++	if (unlikely(!diff_buffer)) {
++		if (is_nowait)
++			return ERR_PTR(-EAGAIN);
++		else
++			return ERR_PTR(-ENOMEM);
 +	}
 +
-+	ret = snapshot_collect(&karg.count, karg.ids);
-+
-+	if (copy_to_user((void *)arg, &karg, sizeof(karg))) {
-+		pr_err("Unable to collect available snapshots: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return ret;
++	return diff_buffer;
 +}
 +
-+static int ioctl_snapshot_collect_images(unsigned long arg)
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer)
 +{
-+	int ret;
-+	struct blk_snap_snapshot_collect_images karg;
-+
-+	if (copy_from_user(&karg, (void *)arg, sizeof(karg))) {
-+		pr_err("Unable to collect snapshot images: invalid user buffer\n");
-+		return -ENODATA;
++	if (atomic_read(&diff_area->free_diff_buffers_count) >
++	    free_diff_buffer_pool_size) {
++		diff_buffer_free(diff_buffer);
++		return;
 +	}
-+
-+	ret = snapshot_collect_images(&karg.id, karg.image_info_array,
-+				      &karg.count);
-+
-+	if (copy_to_user((void *)arg, &karg, sizeof(karg))) {
-+		pr_err("Unable to collect snapshot images: invalid user buffer\n");
-+		return -ENODATA;
-+	}
-+
-+	return ret;
++	spin_lock(&diff_area->free_diff_buffers_lock);
++	list_add_tail(&diff_buffer->link, &diff_area->free_diff_buffers);
++	atomic_inc(&diff_area->free_diff_buffers_count);
++	spin_unlock(&diff_area->free_diff_buffers_lock);
 +}
 +
-+static int (*const blk_snap_ioctl_table[])(unsigned long arg) = {
-+	ioctl_version,
-+	ioctl_tracker_remove,
-+	ioctl_tracker_collect,
-+	ioctl_tracker_read_cbt_map,
-+	ioctl_tracker_mark_dirty_blocks,
-+	ioctl_snapshot_create,
-+	ioctl_snapshot_destroy,
-+	ioctl_snapshot_append_storage,
-+	ioctl_snapshot_take,
-+	ioctl_snapshot_collect,
-+	ioctl_snapshot_collect_images,
-+	ioctl_snapshot_wait_event,
-+};
-+
-+static_assert(
-+	sizeof(blk_snap_ioctl_table) == (blk_snap_ioctl_end * sizeof(void *)),
-+	"The size of table blk_snap_ioctl_table does not match the enum blk_snap_ioctl.");
-+
-+static long ctrl_unlocked_ioctl(struct file *filp, unsigned int cmd,
-+				unsigned long arg)
++void diff_buffer_cleanup(struct diff_area *diff_area)
 +{
-+	int nr = _IOC_NR(cmd);
++	struct diff_buffer *diff_buffer = NULL;
 +
-+	if (nr > (sizeof(blk_snap_ioctl_table) / sizeof(void *)))
-+		return -ENOTTY;
++	do {
++		spin_lock(&diff_area->free_diff_buffers_lock);
++		diff_buffer =
++			list_first_entry_or_null(&diff_area->free_diff_buffers,
++						 struct diff_buffer, link);
++		if (diff_buffer) {
++			list_del(&diff_buffer->link);
++			atomic_dec(&diff_area->free_diff_buffers_count);
++		}
++		spin_unlock(&diff_area->free_diff_buffers_lock);
 +
-+	if (!blk_snap_ioctl_table[nr])
-+		return -ENOTTY;
-+
-+	return blk_snap_ioctl_table[nr](arg);
++		if (diff_buffer)
++			diff_buffer_free(diff_buffer);
++	} while (diff_buffer);
 +}
-diff --git a/drivers/block/blksnap/ctrl.h b/drivers/block/blksnap/ctrl.h
+diff --git a/drivers/block/blksnap/diff_buffer.h b/drivers/block/blksnap/diff_buffer.h
 new file mode 100644
-index 000000000000..4f313891febb
+index 000000000000..1d504e445d59
 --- /dev/null
-+++ b/drivers/block/blksnap/ctrl.h
-@@ -0,0 +1,7 @@
++++ b/drivers/block/blksnap/diff_buffer.h
+@@ -0,0 +1,78 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
 +#pragma once
++#include <linux/types.h>
++#include <linux/slab.h>
++#include <linux/list.h>
++#include <linux/blkdev.h>
 +
-+int get_blk_snap_major(void);
++struct diff_area;
 +
-+int ctrl_init(void);
-+void ctrl_done(void);
++/**
++ * struct diff_buffer - Difference buffer.
++ * @link:
++ *	The list header allows to create a pool of the diff_buffer structures.
++ * @size:
++ *	Count of bytes in the buffer.
++ * @page_count:
++ *	The number of pages reserved for the buffer.
++ * @pages:
++ *	An array of pointers to pages.
++ *
++ * Describes the memory buffer for a chunk in the memory.
++ */
++struct diff_buffer {
++	struct list_head link;
++	size_t size;
++	size_t page_count;
++	struct page *pages[0];
++};
++
++/**
++ * struct diff_buffer_iter - Iterator for &struct diff_buffer.
++ * @page:
++ *      A pointer to the current page.
++ * @offset:
++ *      The offset in bytes in the current page.
++ * @bytes:
++ *      The number of bytes that can be read or written from the current page.
++ *
++ * It is convenient to use when copying data from or to &struct bio_vec.
++ */
++struct diff_buffer_iter {
++	struct page *page;
++	size_t offset;
++	size_t bytes;
++};
++
++#define SECTOR_IN_PAGE (1 << (PAGE_SHIFT - SECTOR_SHIFT))
++
++static inline bool diff_buffer_iter_get(struct diff_buffer *diff_buffer,
++					sector_t ofs,
++					struct diff_buffer_iter *iter)
++{
++	size_t page_inx;
++
++	if (diff_buffer->size <= (ofs << SECTOR_SHIFT))
++		return false;
++
++	page_inx = ofs >> (PAGE_SHIFT - SECTOR_SHIFT);
++
++	iter->page = diff_buffer->pages[page_inx];
++	iter->offset = (size_t)(ofs & (SECTOR_IN_PAGE - 1)) << SECTOR_SHIFT;
++	/*
++	 * The size cannot exceed the size of the page, taking into account
++	 * the offset in this page.
++	 * But at the same time it is unacceptable to go beyond the allocated
++	 * buffer.
++	 */
++	iter->bytes = min_t(size_t, (PAGE_SIZE - iter->offset),
++			    (diff_buffer->size - (ofs << SECTOR_SHIFT)));
++
++	return true;
++};
++
++struct diff_buffer *diff_buffer_take(struct diff_area *diff_area,
++				     const bool is_nowait);
++void diff_buffer_release(struct diff_area *diff_area,
++			 struct diff_buffer *diff_buffer);
++void diff_buffer_cleanup(struct diff_area *diff_area);
 -- 
 2.20.1
 
