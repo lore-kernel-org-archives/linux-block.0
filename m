@@ -2,46 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F980C43334
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:55:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED76C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:55:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345271AbiFMSzm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:55:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43008 "EHLO
+        id S1345364AbiFMSzn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 14:55:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37966 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245063AbiFMSzX (ORCPT
+        with ESMTP id S1345077AbiFMSz1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:55:23 -0400
-Received: from mx2.veeam.com (mx2.veeam.com [64.129.123.6])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E87F5FC83C;
+        Mon, 13 Jun 2022 14:55:27 -0400
+Received: from mx4.veeam.com (mx4.veeam.com [104.41.138.86])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 570C4FC833;
         Mon, 13 Jun 2022 08:59:53 -0700 (PDT)
 Received: from mail.veeam.com (prgmbx01.amust.local [172.24.128.102])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mx2.veeam.com (Postfix) with ESMTPS id 071F243194;
-        Mon, 13 Jun 2022 11:53:52 -0400 (EDT)
+        by mx4.veeam.com (Postfix) with ESMTPS id 6F344CCE27;
+        Mon, 13 Jun 2022 18:54:16 +0300 (MSK)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=veeam.com;
-        s=mx2-2022; t=1655135632;
-        bh=MTBFqtYh8vFqi/JPaarIPLoyKboTzrz+Y7pswS/tquw=;
-        h=From:To:CC:Subject:Date:From;
-        b=TZ/zgaRe7hf0qksdwP7DMkjvez1ETKht2Y7kbgb20D0+HFNzonsQwi2KDvekQcpL9
-         tiulLR1yz071OQr/rIRExLGY3OXWpDUFRFv27wThhOPXu/FhJq+VjaDqEtNsc7iNtw
-         BGVmj8Ri89xTw6ZXFlxgAaeDi4IAzl//UK1OE310TgZuYewkCZcM9zFKIPmq7VFFwQ
-         GERwyRsiPYhre4+bXokU0+G7l7SiFz3oypwnTm4X+LJASTyTsg8QUeaPSJ4T8T6n1o
-         bTnMGfg4Xvhk9uXkKsPdF7GqG+ubn+y6IBb+IZ5FnVHzggqAdnB3trsTfr6MYuEtnM
-         AVaYCU781r+Pg==
+        s=mx4-2022; t=1655135656;
+        bh=JeE4IDLZnrkgWQvxzU/0/BAJVvEljvMQrQHfVZ+A+xM=;
+        h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+        b=MSw3FLACURP7Fe6FANRB+tcHjJCINeI7ZI37CTeiDgUlFR2XJRltn5tsnfM+yuHoY
+         FNZzluNQuZfT5fgGj7Dcv08r5DiisCtJFpSprCrkfXsnBWz1/fcTVJa5crAORO937f
+         /TIeBLgrdXB6E3zjchji9n92+F5Vc05RW2Ok72gfeBH7C6pSHj08jsvA7geN3fxp9s
+         7MFxLla0NsIDOSijG+vNB96pTrm4mA0Riizc0DHk5XOnhOk7szGX/es7cWzCDLBMO2
+         Oigk8zuPXYS00O1nzCWmIzxttXAAJht/mND7KsB69RtWjyLMdzDP+Dy7WsPt4KCkvO
+         W+R01to3DUp4A==
 Received: from prgdevlinuxpatch01.amust.local (172.24.14.5) by
  prgmbx01.amust.local (172.24.128.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.9; Mon, 13 Jun 2022 17:53:49 +0200
+ 15.2.1118.9; Mon, 13 Jun 2022 17:54:14 +0200
 From:   Sergei Shtepa <sergei.shtepa@veeam.com>
 To:     <axboe@kernel.dk>, <linux-block@vger.kernel.org>,
         <linux-kernel@vger.kernel.org>
 CC:     Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: [PATCH 00/20] blksnap - creating non-persistent snapshots for backup
-Date:   Mon, 13 Jun 2022 18:52:53 +0300
-Message-ID: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+Subject: [PATCH 05/20] block, blksnap: interaction with sysfs
+Date:   Mon, 13 Jun 2022 18:52:58 +0300
+Message-ID: <1655135593-1900-6-git-send-email-sergei.shtepa@veeam.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [172.24.14.5]
@@ -54,149 +56,115 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi all.
+Provides creation of a class file /sys/class/blksnap and a device file
+/dev/blksnap for module management.
 
-I suggest the blksnap kernel module for consideration. It allows to create
-non-persistent snapshots of any block devices. The main purpose of such
-snapshots is to create a backup of block devices.
-
-A snapshot is created simultaneously for several block devices, ensuring
-their mutual consistency in the backup.
-
-A change tracker is implemented in the module. It allows to determine
-which blocks were changed during the time between the last snapshot
-created and any of the previous snapshots of the same generation.
-This allows to implement incremental and differential backups.
-
-An arbitrary range of sectors on any block device can be used to store
-snapshot changes. The size of the storage for changes can be increased after the
-snapshot is created by adding new sector ranges. This allows to create a
-storage of differences in individual files on a file system that can occupy
-the entire space of a block device and increase the storage of differences
-as needed.
-
-To create images of snapshots of block devices, the module stores blocks
-of the original block device that have been changed since the snapshot was
-taken. To do this, the module intercepts write requests and reads blocks
-that need to be overwritten. This algorithm guarantees the safety of the
-data of the original block device in case of overflow of the snapshot and
-even in case of unpredictable critical errors.
-
-To connect and disconnect the module to the block layer, the concept of a
-block device filter is introduced. Functions for connecting filters are
-added to the block layer and the ability to intercept I/O requests is
-provided.
-
-The blksnap module was created specifically for upstream based on the
-experience of operating the out-of-tree veeamsnap module, which is part of
-the Veeam Agent for Linux product. I am sure that the module will be in
-demand by other creators of backup tools and will save them from having to
-use their out-of-tree kernel modules.
-
-A tool, a library for working with blksnap, tests and some documentations
-can be found at www.github.com/veeam/blksnap.
-
-Sergei Shtepa (20):
-  block, blk_filter: enable block device filters
-  block, blksnap: header file of the module interface
-  block, blksnap: module management interface functions
-  block, blksnap: init() and exit() functions
-  block, blksnap: interaction with sysfs
-  block, blksnap: attaching and detaching the filter and handling a bios
-  block, blksnap: map of change block tracking
-  block, blksnap: big buffer in the form of an array of pages
-  block, blksnap: minimum data storage unit of the original block device
-  block, blksnap: buffer in memory for the minimum data storage unit
-  block, blksnap: functions and structures for performing block I/O
-    operations
-  block, blksnap: storage for storing difference blocks
-  block, blksnap: event queue from the difference storage
-  block, blksnap: owner of information about overwritten blocks of the
-    original block device
-  block, blksnap: snapshot image block device
-  block, blksnap: snapshot
-  block, blksnap: debugging mechanism for monitoring memory consumption
-  block, blksnap: Kconfig
-  block, blksnap: Makefile
-  block, blksnap: adds a blksnap to the kernel tree
-
- block/Kconfig                          |   8 +
- block/bdev.c                           | 129 +++++
- block/blk-core.c                       |  88 ++++
- drivers/block/Kconfig                  |   2 +
- drivers/block/Makefile                 |   1 +
- drivers/block/blksnap/Kconfig          | 101 ++++
- drivers/block/blksnap/Makefile         |  20 +
- drivers/block/blksnap/big_buffer.c     | 218 ++++++++
- drivers/block/blksnap/big_buffer.h     |  27 +
- drivers/block/blksnap/cbt_map.c        | 280 ++++++++++
- drivers/block/blksnap/cbt_map.h        | 112 ++++
- drivers/block/blksnap/chunk.c          | 352 +++++++++++++
- drivers/block/blksnap/chunk.h          | 129 +++++
- drivers/block/blksnap/ctrl.c           | 445 ++++++++++++++++
- drivers/block/blksnap/ctrl.h           |   7 +
- drivers/block/blksnap/diff_area.c      | 602 +++++++++++++++++++++
- drivers/block/blksnap/diff_area.h      | 179 +++++++
- drivers/block/blksnap/diff_buffer.c    | 146 ++++++
- drivers/block/blksnap/diff_buffer.h    |  78 +++
- drivers/block/blksnap/diff_io.c        | 204 ++++++++
- drivers/block/blksnap/diff_io.h        | 122 +++++
- drivers/block/blksnap/diff_storage.c   | 316 +++++++++++
- drivers/block/blksnap/diff_storage.h   |  94 ++++
- drivers/block/blksnap/event_queue.c    |  90 ++++
- drivers/block/blksnap/event_queue.h    |  64 +++
- drivers/block/blksnap/main.c           | 109 ++++
- drivers/block/blksnap/memory_checker.c | 100 ++++
- drivers/block/blksnap/memory_checker.h |  41 ++
- drivers/block/blksnap/params.h         |  10 +
- drivers/block/blksnap/snapimage.c      | 345 ++++++++++++
- drivers/block/blksnap/snapimage.h      |  65 +++
- drivers/block/blksnap/snapshot.c       | 671 ++++++++++++++++++++++++
- drivers/block/blksnap/snapshot.h       |  76 +++
- drivers/block/blksnap/sysfs.c          |  81 +++
- drivers/block/blksnap/sysfs.h          |   5 +
- drivers/block/blksnap/tracker.c        | 693 +++++++++++++++++++++++++
- drivers/block/blksnap/tracker.h        |  71 +++
- drivers/block/blksnap/version.h        |   8 +
- include/linux/blk_snap.h               | 460 ++++++++++++++++
- include/linux/blk_types.h              |  22 +
- include/linux/blkdev.h                 |  81 +++
- 41 files changed, 6652 insertions(+)
- create mode 100644 drivers/block/blksnap/Kconfig
- create mode 100644 drivers/block/blksnap/Makefile
- create mode 100644 drivers/block/blksnap/big_buffer.c
- create mode 100644 drivers/block/blksnap/big_buffer.h
- create mode 100644 drivers/block/blksnap/cbt_map.c
- create mode 100644 drivers/block/blksnap/cbt_map.h
- create mode 100644 drivers/block/blksnap/chunk.c
- create mode 100644 drivers/block/blksnap/chunk.h
- create mode 100644 drivers/block/blksnap/ctrl.c
- create mode 100644 drivers/block/blksnap/ctrl.h
- create mode 100644 drivers/block/blksnap/diff_area.c
- create mode 100644 drivers/block/blksnap/diff_area.h
- create mode 100644 drivers/block/blksnap/diff_buffer.c
- create mode 100644 drivers/block/blksnap/diff_buffer.h
- create mode 100644 drivers/block/blksnap/diff_io.c
- create mode 100644 drivers/block/blksnap/diff_io.h
- create mode 100644 drivers/block/blksnap/diff_storage.c
- create mode 100644 drivers/block/blksnap/diff_storage.h
- create mode 100644 drivers/block/blksnap/event_queue.c
- create mode 100644 drivers/block/blksnap/event_queue.h
- create mode 100644 drivers/block/blksnap/main.c
- create mode 100644 drivers/block/blksnap/memory_checker.c
- create mode 100644 drivers/block/blksnap/memory_checker.h
- create mode 100644 drivers/block/blksnap/params.h
- create mode 100644 drivers/block/blksnap/snapimage.c
- create mode 100644 drivers/block/blksnap/snapimage.h
- create mode 100644 drivers/block/blksnap/snapshot.c
- create mode 100644 drivers/block/blksnap/snapshot.h
+Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+---
+ drivers/block/blksnap/sysfs.c | 81 +++++++++++++++++++++++++++++++++++
+ drivers/block/blksnap/sysfs.h |  5 +++
+ 2 files changed, 86 insertions(+)
  create mode 100644 drivers/block/blksnap/sysfs.c
  create mode 100644 drivers/block/blksnap/sysfs.h
- create mode 100644 drivers/block/blksnap/tracker.c
- create mode 100644 drivers/block/blksnap/tracker.h
- create mode 100644 drivers/block/blksnap/version.h
- create mode 100644 include/linux/blk_snap.h
 
+diff --git a/drivers/block/blksnap/sysfs.c b/drivers/block/blksnap/sysfs.c
+new file mode 100644
+index 000000000000..32a34609d106
+--- /dev/null
++++ b/drivers/block/blksnap/sysfs.c
+@@ -0,0 +1,81 @@
++// SPDX-License-Identifier: GPL-2.0
++#define pr_fmt(fmt) KBUILD_MODNAME "-sysfs: " fmt
++#include <linux/blkdev.h>
++#include <linux/sysfs.h>
++#include <linux/device.h>
++#include <linux/blk_snap.h>
++#ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
++#include "memory_checker.h"
++#endif
++#include "sysfs.h"
++#include "ctrl.h"
++
++static ssize_t major_show(struct class *class, struct class_attribute *attr,
++			  char *buf)
++{
++	sprintf(buf, "%d", get_blk_snap_major());
++	return strlen(buf);
++}
++
++/* Declare class_attr_major */
++CLASS_ATTR_RO(major);
++
++static struct class *blk_snap_class;
++
++static struct device *blk_snap_device;
++
++int sysfs_init(void)
++{
++	struct device *dev;
++	int res;
++
++	blk_snap_class = class_create(THIS_MODULE, BLK_SNAP_MODULE_NAME);
++	if (IS_ERR(blk_snap_class)) {
++		res = PTR_ERR(blk_snap_class);
++
++		pr_err("Bad class create. errno=%d\n", abs(res));
++		return res;
++	}
++
++	pr_info("Create 'major' sysfs attribute\n");
++	res = class_create_file(blk_snap_class, &class_attr_major);
++	if (res) {
++		pr_err("Failed to create 'major' sysfs file\n");
++
++		class_destroy(blk_snap_class);
++		blk_snap_class = NULL;
++		return res;
++	}
++
++	dev = device_create(blk_snap_class, NULL,
++			    MKDEV(get_blk_snap_major(), 0), NULL,
++			    BLK_SNAP_MODULE_NAME);
++	if (IS_ERR(dev)) {
++		res = PTR_ERR(dev);
++		pr_err("Failed to create device, errno=%d\n", abs(res));
++
++		class_remove_file(blk_snap_class, &class_attr_major);
++		class_destroy(blk_snap_class);
++		blk_snap_class = NULL;
++		return res;
++	}
++
++	blk_snap_device = dev;
++	return res;
++}
++
++void sysfs_done(void)
++{
++	pr_info("Cleanup sysfs\n");
++
++	if (blk_snap_device) {
++		device_unregister(blk_snap_device);
++		blk_snap_device = NULL;
++	}
++
++	if (blk_snap_class != NULL) {
++		class_remove_file(blk_snap_class, &class_attr_major);
++		class_destroy(blk_snap_class);
++		blk_snap_class = NULL;
++	}
++}
+diff --git a/drivers/block/blksnap/sysfs.h b/drivers/block/blksnap/sysfs.h
+new file mode 100644
+index 000000000000..b41c301fe33b
+--- /dev/null
++++ b/drivers/block/blksnap/sysfs.h
+@@ -0,0 +1,5 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++#pragma once
++
++int sysfs_init(void);
++void sysfs_done(void);
 -- 
 2.20.1
 
