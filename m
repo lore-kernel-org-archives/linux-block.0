@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D23EC43334
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 07:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0568CCA47B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 07:16:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238947AbiFMHMw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 03:12:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37698 "EHLO
+        id S239040AbiFMHQj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 03:16:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41302 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238555AbiFMHMv (ORCPT
+        with ESMTP id S231834AbiFMHQ0 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 03:12:51 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DC11A39B
-        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:12:50 -0700 (PDT)
+        Mon, 13 Jun 2022 03:16:26 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D74B1A824
+        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:16:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655104371; x=1686640371;
+  t=1655104585; x=1686640585;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=mwWtBRJWqJTQqkv9N+KiDQ+C5naTYFLMDpQnieAA+9k=;
-  b=biHkAXs3voItoCkdHKjv/GcWEcTE3MJL1jdHLZ5xLZuvhFeAHYZrdzfD
-   NH+iyPylsotxySNxhyiaMLW5op6Zswt7mxt/Z6p5E48SndTm0pcYWZBSo
-   MV5HHiqdp/j0LEzy9v64yot/F1hEdhKyQSdWet/BpqZhFLHQFSkDLp8rM
-   G1Dr2kQAVzpJOd7FUy4/xgU8UO9vkTlmGVT8w+MDUbsHQRgdrW7YzVmFa
-   TRQkmGm8K3jungJ+ITVRH5DQ2FPIiOaUtZCDT/vn7DCj9Yl2dpAhbME3e
-   L7bwHzyBHkVyi2pX4ZVqtXMDBN6TdTwVvxIWIqSxQepEOpuZJPabkj6v2
-   g==;
+  bh=EPDBR3zIPt7rRmwu4Ziipqqlcg4evRJWn7liFflbhis=;
+  b=BhkT0PaO6LSA5xhOdSRTTiFVgUZcXKlEhcdBq8DUT6Mz37ZzcKARKkpI
+   vMEnNY1ANa0HzvoWdp6snctmG8T5wT14SCW0pUnBbtW0Jp3YiFEfBYkrk
+   FBaNz1zNn/5SrIfrjf2pd8sHyzDp2pPcTR3Rg6ogJFEN/7HsGQV5ZRFt/
+   zNQKFwwDf2cvEMvcN/lArNw5M+Ht/sE3em+sw5RyVaBEZCUDCjIoVpIdg
+   Ro1Fw8OZGQxfl2T0SvbF3BedPh+pCtfyKa+xUC1CN+sjlJMNAxlU+jS8x
+   Jy+Za/UYzkK/B88llP3yuqoV1673yweJIlnqoneSiSc2raP8qVs2HkEjT
+   w==;
 X-IronPort-AV: E=Sophos;i="5.91,296,1647273600"; 
-   d="scan'208";a="307260571"
+   d="scan'208";a="207826633"
 Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 13 Jun 2022 15:12:49 +0800
-IronPort-SDR: jOJN88q80UVYAr2OnPgntGDKPQ/lisEN0cR80/I8xdunDJnVjcagO9sBureKXYTXHXDjYi0UzG
- H6/Nv5RX4LWomJGqcE4XWQU57aHoh+z2ccTJHehcowqH7I1UePYo6VYsHPwrCRxd69QxRjLmeZ
- RrNz8YLSBQmklhYSngBHAOhQUg7dVKHEKmH5WkbOfXM0Sf+7CwIGME3MVKDD/pKq6rSdFa2UQD
- FMG0Y/L9eqXJN+EhgySFhdtqoON49TEjKFiM+P8aOBJ1QTM1PObGZLfxa4pPaOuCrfN8IuE5d1
- IvHi+PTkFr3txamdywF5sbTp
+  by ob1.hgst.iphmx.com with ESMTP; 13 Jun 2022 15:16:24 +0800
+IronPort-SDR: 7EMfFcxxRUNVlAAhx702RH8JxqrqLN9QaVyH/iGpASPhZ9SApCKQS/vb0hjGhzBfXONB1fAL+o
+ vkTMMv0evE7Idm4smX1uvGi2yX9IHYrZl/7kTze5sYnRf6k3rbGz2+UN1lgyzqJr+540ncYvE2
+ nzVT/I2Cb1Kuuznybnknch1vo9u1KGekYOTOVE/2MAOATCT/HU7/cKH4fqOF+pJ0TvJvcvTzym
+ O9WxhLmoXF1w9AmGbfFTbgYG5y88KkZcOmZx/URGhIDhS80R51aZPtbtqz82qZnZiEhe3lsk3f
+ f1DzTTWzXwEPxg/ToFt6qfxr
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jun 2022 23:31:29 -0700
-IronPort-SDR: lm061Oyws2uDl6eUJ7VCsg4E0WlZpPeVaB0ZCA6gBdquI2Loe4t5rNJJX+3gfW06waltNC62c2
- xnPDejchs95kqsI7PcH3Q43BYF98bmJ4+gTRwMYVgUrQPghi6Tu40g9p09dh2TYv9BdKC1Se4c
- jNu8zTiYCLiK9DycKFyMK1GFGNqe7kfbYWt6tYGkpwM9fNHFI/nVzaTfAwVqZITXPCvrg7hr9D
- O3tq/y4v9+0hoLNMBwVNXYst8J8WjiiLVNmDZMzHicFOtR/Qnm9fIqz9aJykvHdnVR79Ffw39g
- +SM=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jun 2022 23:35:04 -0700
+IronPort-SDR: /U0pq/Dc0x1jmKij8lGFJPXtczRDxcrZMWgzcAuVKm1BggA+vECu5TWqFE/D2vxele9/r1RchI
+ VModAjDFxwvRXs1eCBLnqnnEmWZBH7nvvU1uFfa+taenNuDct8jCb/rISIG3xZPnc9JGMwtg4S
+ wvcn7oG/suWWCJfYqPpofxW39FaS9lKBBfE0tKTl2oQAn5ChFS3W7azBwmorSxM/8ctXftLCm2
+ wOYVacUSxK90EzNMPF7A+J3d9INbXhapjlZzS2hBCn05/uqUVxrCwxryGsgKJW10CSxOydFwdv
+ MrY=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2022 00:12:50 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2022 00:16:25 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LM2p85cfGz1SVp2
-        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:12:48 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LM2tH51JRz1SVp6
+        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:16:23 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,27 +57,27 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655104367; x=1657696368; bh=mwWtBRJWqJTQqkv9N+KiDQ+C5naTYFLMDpQ
-        nieAA+9k=; b=jeXWUVtR5blL8+t05y0+OMluKqIdnHKhunF60WmzHW8Zxoz7gT7
-        oFRc+SCLUxjK4orBhEgrjAnsXe7aE0bNpumjVGIgm3bCHchjAxuf2IOSwTHjlMYr
-        ftfGUJ/9I3MpLk8k+0+PFdfua5WKjOW9j0WV5y1OVmA7DOrjmzs/KYatFY0KhO/N
-        a6ZCxhUIHSlGssVOCiP6aLieeGn1NsTNYbM6QEr9pVBG5pFetoby12XxflIE4zd1
-        yf8hTcwlojQC7hl8Rdl+FH1dD8/S2Xkxnskr3iElMXnKska6FrcAtHBPBnip7BTG
-        /NLJa1F9wgMvscwwEzhDkQSUcJAmAvXrkxA==
+        1655104582; x=1657696583; bh=EPDBR3zIPt7rRmwu4Ziipqqlcg4evRJWn7l
+        iFflbhis=; b=asnsycXMe2O7nEaoOSKFhaEb/fGGHjM6sQ1v9FwCaWqickekIqW
+        Xl6d3mwryF0wayMxgZNpplbVmTS8bqVaw9zy8uJY1qQoi3KeFHuJ/uz7ilFpwn8T
+        KINnWGct9IkE5dfqwhKm3PKgCsPQBLHG2xvPbUIHxzGX8VX6YnVg0FXNZAOjSB1o
+        4BAfUqJ01NU/e/Of29wmDbdChiWIkK9Jjch64B4+XxTL5WsbzLb4Bby2/uXhuP4r
+        yBV2soUlIAHn386SoJbhoHrFgsq9ng9mcJ1h1UsoxSEaDD0m40za+rsx988T67sO
+        xyRMhfAMgBMLpAQSLcx3Ehg26/1lR4hrjtw==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 2MsIqe7mb7Po for <linux-block@vger.kernel.org>;
-        Mon, 13 Jun 2022 00:12:47 -0700 (PDT)
+        with ESMTP id DKoZfiec8R-b for <linux-block@vger.kernel.org>;
+        Mon, 13 Jun 2022 00:16:22 -0700 (PDT)
 Received: from [10.225.163.77] (unknown [10.225.163.77])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LM2p55NkMz1Rvlc;
-        Mon, 13 Jun 2022 00:12:45 -0700 (PDT)
-Message-ID: <5b4d17c2-9ee6-7d44-e4cd-6402b0a61c01@opensource.wdc.com>
-Date:   Mon, 13 Jun 2022 16:12:44 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LM2tD5tDrz1Rvlc;
+        Mon, 13 Jun 2022 00:16:20 -0700 (PDT)
+Message-ID: <da6a77ff-0dde-b0b4-4d6c-047eab48d595@opensource.wdc.com>
+Date:   Mon, 13 Jun 2022 16:16:19 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH RFC v2 06/18] libata-scsi: Add ata_scsi_queue_internal()
+Subject: Re: [PATCH RFC v2 07/18] libata-scsi: Add ata_internal_queuecommand()
 Content-Language: en-US
 To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
         jejb@linux.ibm.com, martin.petersen@oracle.com, brking@us.ibm.com,
@@ -86,10 +86,10 @@ Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
         chenxiang66@hisilicon.com
 References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
- <1654770559-101375-7-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-8-git-send-email-john.garry@huawei.com>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <1654770559-101375-7-git-send-email-john.garry@huawei.com>
+In-Reply-To: <1654770559-101375-8-git-send-email-john.garry@huawei.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -97,108 +97,81 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/9/22 19:29, John Garry wrote:
-> Add a function to handle queued ATA internal SCSI cmnds - does much the
-> same as ata_exec_internal_sg() does (which will be fixed up later to
-> actually queue internal cmnds through this function).
+> Add callback to queue reserved commands - call it "internal" as this is
+> what libata uses.
+> 
+> Also add it to the base ATA SHT, and set nr_reserved_cmds = 1, which
+> matches tag ATA_TAG_INTERNAL.
 > 
 > Signed-off-by: John Garry <john.garry@huawei.com>
 > ---
->  drivers/ata/libata-scsi.c | 47 ++++++++++++++++++++++++++++++++++++++-
->  include/linux/libata.h    |  6 +++++
->  2 files changed, 52 insertions(+), 1 deletion(-)
+>  drivers/ata/libata-scsi.c | 14 ++++++++++++++
+>  include/linux/libata.h    |  6 +++++-
+>  2 files changed, 19 insertions(+), 1 deletion(-)
 > 
 > diff --git a/drivers/ata/libata-scsi.c b/drivers/ata/libata-scsi.c
-> index 42cecf95a4e5..baac35dd17ca 100644
+> index baac35dd17ca..b2702ab0183b 100644
 > --- a/drivers/ata/libata-scsi.c
 > +++ b/drivers/ata/libata-scsi.c
-> @@ -3963,6 +3963,49 @@ static inline ata_xlat_func_t ata_get_xlat_func(struct ata_device *dev, u8 cmd)
->  	return NULL;
+> @@ -1114,6 +1114,20 @@ int ata_scsi_dev_config(struct scsi_device *sdev, struct ata_device *dev)
+>  	return 0;
 >  }
 >  
-> +static unsigned int ata_scsi_queue_internal(struct scsi_cmnd *scmd,
-> +					    struct ata_device *dev)
+> +int ata_internal_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmd)
+
+ata_scsi_internal_queuecommand()
+
+But given that this is used for the .reserved_queuecommand() method, I
+would call it ata_scsi_reserved_queuecommand().
+
 > +{
-> +	struct ata_link *link = dev->link;
-> +	struct ata_port *ap = link->ap;
-> +	struct ata_queued_cmd *qc;
+> +	struct ata_port *ap;
+> +	int res;
 > +
-> +	/* no internal command while frozen */
-> +	if (ap->pflags & ATA_PFLAG_FROZEN)
-> +		goto did_err;
+> +	ap = ata_shost_to_port(shost);
+
+You can move this to ap declaration.
+
+	struct ata_port *ap = ata_shost_to_port(shost);
+
+> +	spin_lock_irq(ap->lock);
+
+spin_lock_irqsave() ?
+
+> +	res = ata_sas_queuecmd(scmd, ap);
+> +	spin_unlock_irq(ap->lock);
 > +
-> +	/* initialize internal qc */
-> +	qc = __ata_qc_from_tag(ap, ATA_TAG_INTERNAL);
-> +	link->preempted_tag = link->active_tag;
-> +	link->preempted_sactive = link->sactive;
-> +	ap->preempted_qc_active = ap->qc_active;
-> +	ap->preempted_nr_active_links = ap->nr_active_links;
-> +	link->active_tag = ATA_TAG_POISON;
-> +	link->sactive = 0;
-> +	ap->qc_active = 0;
-> +	ap->nr_active_links = 0;> +
-> +	if (qc->dma_dir != DMA_NONE) {
-> +		int n_elem;
-> +
-> +		n_elem = 1;
-> +		qc->n_elem = n_elem;
-> +		qc->sg = scsi_sglist(scmd);
-> +		qc->nbytes = qc->sg->length;
-> +		ata_sg_init(qc, qc->sg, n_elem);
-> +	}
-> +
-> +	scmd->submitter = SUBMITTED_BY_BLOCK_LAYER;
-> +
-> +	ata_qc_issue(qc);
-> +
-> +	return 0;
-> +did_err:
-> +	scmd->result = (DID_ERROR << 16);
-> +	scsi_done(scmd);
-> +	return 0;
+> +	return res;
 > +}
+> +EXPORT_SYMBOL_GPL(ata_internal_queuecommand);
 > +
->  int __ata_scsi_queuecmd(struct scsi_cmnd *scmd, struct ata_device *dev)
->  {
->  	u8 scsi_op = scmd->cmnd[0];
-> @@ -3971,7 +4014,9 @@ int __ata_scsi_queuecmd(struct scsi_cmnd *scmd, struct ata_device *dev)
->  	if (unlikely(!scmd->cmd_len))
->  		goto bad_cdb_len;
->  
-> -	if (dev->class == ATA_DEV_ATA || dev->class == ATA_DEV_ZAC) {
-> +	if (scsi_is_reserved_cmd(scmd)) {
-> +		return ata_scsi_queue_internal(scmd, dev);
-> +	} else if (dev->class == ATA_DEV_ATA || dev->class == ATA_DEV_ZAC) {
-
-No need for the else here.
-
->  		if (unlikely(scmd->cmd_len > dev->cdb_len))
->  			goto bad_cdb_len;
->  
+>  /**
+>   *	ata_scsi_slave_config - Set SCSI device attributes
+>   *	@sdev: SCSI device to examine
 > diff --git a/include/linux/libata.h b/include/linux/libata.h
-> index 732de9014626..43f4bcfe9a5f 100644
+> index 43f4bcfe9a5f..5fa6f56bba81 100644
 > --- a/include/linux/libata.h
 > +++ b/include/linux/libata.h
-> @@ -767,7 +767,9 @@ struct ata_link {
+> @@ -1141,6 +1141,8 @@ extern int ata_std_bios_param(struct scsi_device *sdev,
+>  			      sector_t capacity, int geom[]);
+>  extern void ata_scsi_unlock_native_capacity(struct scsi_device *sdev);
+>  extern int ata_scsi_slave_config(struct scsi_device *sdev);
+> +extern int ata_internal_queuecommand(struct Scsi_Host *shost,
+> +				struct scsi_cmnd *scmd);
+>  extern void ata_scsi_slave_destroy(struct scsi_device *sdev);
+>  extern int ata_scsi_change_queue_depth(struct scsi_device *sdev,
+>  				       int queue_depth);
+> @@ -1390,7 +1392,9 @@ extern const struct attribute_group *ata_common_sdev_groups[];
+>  	.proc_name		= drv_name,			\
+>  	.slave_destroy		= ata_scsi_slave_destroy,	\
+>  	.bios_param		= ata_std_bios_param,		\
+> -	.unlock_native_capacity	= ata_scsi_unlock_native_capacity
+> +	.unlock_native_capacity	= ata_scsi_unlock_native_capacity,\
+> +	.nr_reserved_cmds = 1,\
+> +	.reserved_queuecommand = ata_internal_queuecommand
 >  
->  	struct device		tdev;
->  	unsigned int		active_tag;	/* active tag on this link */
-> +	unsigned int		preempted_tag;
->  	u32			sactive;	/* active NCQ commands */
-> +	u32			preempted_sactive;
->  
->  	unsigned int		flags;		/* ATA_LFLAG_xxx */
->  
-> @@ -861,6 +863,10 @@ struct ata_port {
->  #ifdef CONFIG_ATA_ACPI
->  	struct ata_acpi_gtm	__acpi_init_gtm; /* use ata_acpi_init_gtm() */
->  #endif
-> +
-> +	u64 preempted_qc_active;
-> +	int preempted_nr_active_links;
-> +
->  	/* owned by EH */
->  	u8			sector_buf[ATA_SECT_SIZE] ____cacheline_aligned;
->  };
+>  #define ATA_SUBBASE_SHT(drv_name)				\
+>  	__ATA_BASE_SHT(drv_name),				\
 
 
 -- 
