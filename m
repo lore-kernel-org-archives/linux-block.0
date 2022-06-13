@@ -2,75 +2,135 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CE9EC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:32:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8CF0C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 18:44:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240396AbiFMScn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 14:32:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53544 "EHLO
+        id S244943AbiFMSop (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 14:44:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51690 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245516AbiFMScQ (ORCPT
+        with ESMTP id S245622AbiFMSoU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 14:32:16 -0400
-Received: from resdmta-c1p-023852.sys.comcast.net (resdmta-c1p-023852.sys.comcast.net [IPv6:2001:558:fd00:56::c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ADA9C3674
-        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 07:50:17 -0700 (PDT)
-Received: from resomta-c1p-023269.sys.comcast.net ([96.102.18.227])
-        by resdmta-c1p-023852.sys.comcast.net with ESMTP
-        id 0jy5oNA8G76j10lORogoaH; Mon, 13 Jun 2022 14:50:15 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=comcast.net;
-        s=20190202a; t=1655131815;
-        bh=pSfJ4sxdG1vpIY6izypHze2+EKPLMDx2R4V2f+sHpIo=;
-        h=Received:Received:Message-ID:Date:MIME-Version:Subject:To:From:
-         Content-Type;
-        b=nX1XovlTULmoXWM5RYBZpEH04UwI9Ndc9CZBGtWgSaVPmDC5GkNO+mZtExCYazIhz
-         g/WlCqBBkOD4J00Jzzmy2uZSwNoWTHjNOZlRYabW3FMpifkws4GPRTNlxyT9NVvyhw
-         RfJbwSvZKF0jQUqfwFXBXY3FKWY8gMVDPqJRi4p5u8b6MIoio/PH6SK3J/KOL8z37y
-         xRcUr/tRZn9z/EQe0JvKJ79NgbeqYOHmnBUF29kabTZADGLjN+WcgJJeKxiuL8zY2x
-         5l/yOYzPfgjoAFdHQjWDBaLib9FT1zwdJ8pDGHKPSaOJaDe5luFwYRDWgTRrKj0EMk
-         FBH/VHfFg5qCg==
-Received: from [IPV6:2601:647:4700:284:aefb:677c:684d:580a]
- ([IPv6:2601:647:4700:284:aefb:677c:684d:580a])
-        by resomta-c1p-023269.sys.comcast.net with ESMTPSA
-        id 0lOPo0S0lU9CF0lOQoPbqH; Mon, 13 Jun 2022 14:50:15 +0000
-X-Xfinity-VMeta: sc=-100.00;st=legit
-Message-ID: <368afc66-3781-4f56-134e-e08210ad6c93@comcast.net>
-Date:   Mon, 13 Jun 2022 07:50:13 -0700
+        Mon, 13 Jun 2022 14:44:20 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53DA0DB364
+        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 08:17:27 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id A89B621B94;
+        Mon, 13 Jun 2022 15:17:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655133446; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=5XGvE6a11G1pe4IdfgztNVcwtiKfHEawmpfq5SOcOIA=;
+        b=zhSdd/PmcBa0m067W7OaScvcCrkPAN0eRQYGUdSE8Rt4TiZjtwuIcw9vpSSlhUVNCN1873
+        /TY5O5ZemAQBgel0n51kK5t+kbd/Xxs2353pennJ5US5X7hD+bnLlsgJNa1S04E1YW/HyU
+        8HgrpfjZmPBV74cWTs+8g+0MZHiYeWM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655133446;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=5XGvE6a11G1pe4IdfgztNVcwtiKfHEawmpfq5SOcOIA=;
+        b=T2roQafyYk0zUuKfxmnI4QJnz66pMhyVUm2jXuAEhZSFQMVPgORuh7UgvYs7gB+dIkQZXA
+        pYoeoiKIEQH/B8CQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 9A99A2C141;
+        Mon, 13 Jun 2022 15:17:26 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 348CFA0634; Mon, 13 Jun 2022 17:17:26 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     osandov@fb.com
+Cc:     <linux-block@vger.kernel.org>, Jan Kara <jack@suse.cz>
+Subject: [PATCH] blktests: Ignore errors from wait(1)
+Date:   Mon, 13 Jun 2022 17:17:21 +0200
+Message-Id: <20220613151721.18664-1-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: loop device failure on 5.19-rc1 RISC-V
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     linux-block@vger.kernel.org
-References: <849cea40-4665-14fe-fa46-e555af730214@comcast.net>
- <20220613143210.GB4110@lst.de>
-From:   Ron Economos <w6rz@comcast.net>
-In-Reply-To: <20220613143210.GB4110@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/13/22 07:32, Christoph Hellwig wrote:
-> On Sat, Jun 11, 2022 at 02:46:33AM -0700, Ron Economos wrote:
->> The following error messages occur on 5.19-rc1 RISC-V Ubuntu 22.04:
->>
->> Jun 08 21:00:20 riscv64 kernel: Dev loop0: unable to read RDB block 8
->> Jun 08 21:00:20 riscv64 kernel:  loop0: unable to read partition table
->> Jun 08 21:00:20 riscv64 kernel: loop0: partition table beyond EOD, truncated
->>
->> This happens when the snapd daemon tries to mount loop0.
->>
->> Reverting commit b9684a71fca793213378dd410cd11675d973eaa1
->>
->> block, loop: support partitions without scanning
-> In which case the snapd daemon explicitly asks for a partitions scan,
-> and we fixed a regression that makes it behave like it did in 5.16
-> and earlier.  But why do you have support for Amiga partitions enabled
-> on RISC-V anyway?
+Multiple blktests use wait(1) to wait for background tasks. However in
+some cases tasks can exit before wait(1) is called and in that case
+wait(1) complains which breaks expected output. Make sure we ignore
+output from wait(1) to avoid this breakage.
 
-I'm using the kernel config file from Ubuntu 22.04 for RISC-V. It has 
-Amiga partitions enabled. I'll just disable it.
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ tests/block/016 | 2 +-
+ tests/block/017 | 2 +-
+ tests/block/018 | 2 +-
+ tests/block/024 | 2 +-
+ tests/block/029 | 2 +-
+ 5 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/tests/block/016 b/tests/block/016
+index 775069c..d399ec6 100755
+--- a/tests/block/016
++++ b/tests/block/016
+@@ -41,7 +41,7 @@ test() {
+ 	# While dd is blocked, send a signal which we know dd has a handler
+ 	# for.
+ 	kill -USR1 $!
+-	wait
++	wait &>/dev/null
+ 
+ 	_exit_null_blk
+ 
+diff --git a/tests/block/017 b/tests/block/017
+index 8596888..ff68e24 100755
+--- a/tests/block/017
++++ b/tests/block/017
+@@ -40,7 +40,7 @@ test() {
+ 	sleep 0.1
+ 	show_inflight
+ 
+-	wait
++	wait &>/dev/null
+ 	show_inflight
+ 
+ 	_exit_null_blk
+diff --git a/tests/block/018 b/tests/block/018
+index e7ac445..d2c97ea 100755
+--- a/tests/block/018
++++ b/tests/block/018
+@@ -50,7 +50,7 @@ test() {
+ 	dd if=/dev/nullb1 of=/dev/null bs=4096 iflag=direct count=1 status=none &
+ 	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1 status=none &
+ 	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1 status=none &
+-	wait
++	wait &>/dev/null
+ 	show_times
+ 
+ 	_exit_null_blk
+diff --git a/tests/block/024 b/tests/block/024
+index 2a7c934..dd99f0c 100755
+--- a/tests/block/024
++++ b/tests/block/024
+@@ -57,7 +57,7 @@ test() {
+ 	dd if=/dev/nullb1 of=/dev/null bs=4096 iflag=direct count=1500 status=none &
+ 	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1800 status=none &
+ 	dd if=/dev/zero of=/dev/nullb1 bs=4096 oflag=direct count=1800 status=none &
+-	wait
++	wait &>/dev/null
+ 	show_times
+ 
+ 	_exit_null_blk
+diff --git a/tests/block/029 b/tests/block/029
+index b9a897d..cb8fd03 100755
+--- a/tests/block/029
++++ b/tests/block/029
+@@ -41,7 +41,7 @@ test() {
+ 		    --runtime="${TIMEOUT}" --name=nullb1 \
+ 		    --output="${RESULTS_DIR}/block/fio-output-029.txt" \
+ 		    >>"$FULL"
+-		wait
++		wait &>/dev/null
+ 	else
+ 		echo "Skipping test because $sq cannot be modified" >>"$FULL"
+ 	fi
+-- 
+2.26.2
 
