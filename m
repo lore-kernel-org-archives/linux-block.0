@@ -2,146 +2,215 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1D0C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 05:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF18CCA47E
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 07:02:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232674AbiFMFvo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 01:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48080 "EHLO
+        id S238582AbiFMHB6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 03:01:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50384 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232418AbiFMFvo (ORCPT
+        with ESMTP id S238760AbiFMHBs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 01:51:44 -0400
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AC33C36
-        for <linux-block@vger.kernel.org>; Sun, 12 Jun 2022 22:51:43 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Yl7kPH3ztpMk1FqE7+PvhUqqI1b/bqkrOvxRF3qmoEWkTAaq7SG5FLPuUPRCTsQbATGgas9ze0vejuAL3MQFh61HwPpXs8o2JCRPQr7TuXp7+AM4y8vE/Z+8mua1SzizQnEcwtnCokNjNkSxixFH3IWzL/kMaz+e/o3bX2QXW2/T9LsFuj2xFOILrhO/FE1lqk/fOHW1ksx+RgHSmdRxaH9L3he0H35obswC0JJVXld9YWofZ/x4SOJAtSeO55ZN7IL4/bhHD+sQvWu8AufLPXv7fX6prM8vXM4WN6a8HwELyZSe4dU1ltV5jB2Zp5Z55+2fFpFGas2jS+ZHrPbq0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uKkfJWzAkNRf10+Htm+nt3QSRAtzry0Ja+LmvP22G6U=;
- b=dtk+MkGznHSmf7GtVJVaBpitow9pcgeTm5NK3XaRYdB042Nyo8xWNhtiMKoQ90L2R7ApVwO7otAldqCBCA7h5A8zsFKHQn4sYdb4XvJm+XOuD0l1L4n9OXMBO4jRb1Bhl2GT/UDOkVQv5qdQfhefmHgCbbE8B6H8GLBy3oj1a2ZuqvHz4iuqeJ689UK7V1QXf0b6GI5pA1jWAb9jX5LUN5CDaHgny3l+PedThOiM68qh0NgT59Xz8aA4q9Wm8LHAEiB9PMsbSlaHovpsMoOE7zjF7ldKNw4sBxC2jwfA+6Um/rvVxtYM2BPyvl9Sxbqs8PrUZELazqOJIBKCU2y+TA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uKkfJWzAkNRf10+Htm+nt3QSRAtzry0Ja+LmvP22G6U=;
- b=LabGEbAM+FP+AfvAeZ+mTv3jnSQD/DxgxbSJhSSzG7jZy4B+cbaRuq4X3qhZwfQ53+z4Z7HC5DGhw1iI9P/Spz/7RlnojrGpYuT2nUFPxq+SYWk7wZQBtQmocvX2AjBzROEoOxOkQ1jZ4HSeB/Q68Y3UKQjIP6WimiklKwwoO77CdUt6zMjOFSNC2SPJGqQUYL1uyg8ACggfrJh/EY793/vwLSetXJytUfdHgPtrlJFHSDhyrrv71m4TKn/8sf8PisTIchUran6mFQymswnQJPsXAoJgGKhvfwI1sxAMpTc9jZN8QgAVUAw/DAuLD+Dhr2VVEnF2tlyPVW7IXSbkVg==
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
- by SA0PR12MB4446.namprd12.prod.outlook.com (2603:10b6:806:71::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.13; Mon, 13 Jun
- 2022 05:51:41 +0000
-Received: from MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6dff:6121:50c:b72e]) by MW2PR12MB4667.namprd12.prod.outlook.com
- ([fe80::6dff:6121:50c:b72e%7]) with mapi id 15.20.5332.020; Mon, 13 Jun 2022
- 05:51:41 +0000
-From:   Chaitanya Kulkarni <chaitanyak@nvidia.com>
-To:     Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-CC:     Alan Adamson <alan.adamson@oracle.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>
-Subject: Re: [PATCH blktests] nvme/039: avoid module loads for various
- transport types
-Thread-Topic: [PATCH blktests] nvme/039: avoid module loads for various
- transport types
-Thread-Index: AQHYfMPCNl1t0VEPd0icKrQgH0uNCK1M2csA
-Date:   Mon, 13 Jun 2022 05:51:41 +0000
-Message-ID: <d7c3df9c-b46e-3751-b681-43c17ab97da4@nvidia.com>
-References: <20220610121518.548549-1-shinichiro.kawasaki@wdc.com>
-In-Reply-To: <20220610121518.548549-1-shinichiro.kawasaki@wdc.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 68315c26-0e6f-487f-147f-08da4d00ca48
-x-ms-traffictypediagnostic: SA0PR12MB4446:EE_
-x-microsoft-antispam-prvs: <SA0PR12MB44462EB7FA1C37D0A15B4B12A3AB9@SA0PR12MB4446.namprd12.prod.outlook.com>
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: ZZTsVPptUaj4wN9SsXFFNsNlW9/5Ue4DA6Fee+jYYMi+JObypIbVIaxbPIThpOIVwn2UIG11cFrY6m+uYGtX9xpb6b8OeE3x9dlsV2S+Fme1nGIKZQcMUJrxL/y33ueQqhO3WMB4otYfUcyT33iS8f/+258/SdyLtLH37Rf4N3tML6v4XWT4xZqV3G+GOENLJlqY3YXX6g8apFiE5FFAB+LmL8GuYQ0/JD/RKuJHJiUPLcoKmkAIVg+Te2KfBnnGtJWjmDGmr5xT+GGdVxqQqgBpnrMFsPTLCz9GjeVDPac8Qlvmf0bwJLn7MDkBPOVVH6hRP/Okp+C8nlpQsnaUz/jDzA+y4OySj+UKo96vv/OPW7BwNimKcZYwXTqLAM3uV/RGxOuNt9dI/VaisblOJjKJk5C2XL8lAPtTfyISmoJDhxTLGPKoXsdzHZV65Q06lc6szziK1WLZS3pJnvQBU4MMxtFK2ScXIu/yyl8mZ5taKljWx2zwOcTraTzMidqJo0kSEEPBHOtY2TorATxwKIS42tbcRY7yT9KCRfOixOIPTh1p4X24OgSaGRefq/eY0xpRqA6CxIhgRflP7ve8hagLGv8UzEP+tfKznpReoZAJ+pYNlB1U/eeA1T3Ax/ipoZV/Ar0YVLkNx+KQmuptnNaspvzKuL/du5lFkSejDORk2ySMEQVgrsUZaGTikC1v3XwPiOIpwcBGZPtuSFxf0+heHalKQTHbSx7ROhp3umTp/EdUQfQddgpBw+iwRnV7e8cT6dPRYZHHMTgXY5tdmg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(66946007)(76116006)(66556008)(91956017)(66476007)(66446008)(4326008)(2906002)(8676002)(64756008)(8936002)(508600001)(6486002)(4744005)(5660300002)(31686004)(38100700002)(6512007)(6506007)(86362001)(71200400001)(31696002)(53546011)(122000001)(36756003)(54906003)(316002)(110136005)(2616005)(107886003)(38070700005)(186003)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 2
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Sng2T2p2dTZzRjg3aXRlbVJ6aGQrZGI1dlE0STNjT3VLMHEzMmtTcCtTeXlx?=
- =?utf-8?B?eVNreU5aQm0wS0tHNFprdUtkWlJzb0VpTERCcllwYTRTNXdjRUwydWtGYTh6?=
- =?utf-8?B?ditPN2xuUlRqT2NGWXRZYy96RUZkWHpJR0lERW9yWTZlUW9sQ0R6TnRwMlZr?=
- =?utf-8?B?bVB3cDFWRlFINDRScHFSNHNSTzI2NVZCSEZYWWxLKzUwM3FodFRyQXo4OFhZ?=
- =?utf-8?B?Y0RZWGZxaFR5OFBwdEhiempPVCtlVlRoRmJ4dzdFam95Y29SZTQxd0NPNzVy?=
- =?utf-8?B?OHhCdTdkVHZldVFMV3I1bkt3cWs2Qmd6bGdjR2lTbmovL1dJbVMxdHpaOUVD?=
- =?utf-8?B?WTF3TEYvKzhJOXhqTnhpRGlwNUpSNkZMa3dSSE0vK2FCTTlTaFAvazZIaWNF?=
- =?utf-8?B?MnFwb2xacVRBZU96anU4YWRWMlRxemRNT1kySUE4dlptems2Mkd4a1M3azlU?=
- =?utf-8?B?dkpYcytMSU1BRE9la3BsdkRBSUtpRUhiSjJ0WWMwU1BFblJ2Sys5QXFtVEl6?=
- =?utf-8?B?QWt2cDhLN0RTalBTSUJ5ZWtHMzQyWTNDQmhTYmpaVmQ4VUNCWEltVlVKeGFS?=
- =?utf-8?B?ZEVjSzJ2QzEyeWVDYXZya2N4eTFXRk1yOGwxWkdQT2ZycmFoRmNVeVJyQ2lN?=
- =?utf-8?B?VmhDSFZjb0JYVVRsVWJyVk9LWVZqcFBVQ0dyY01oVDlxbktDdmQySzBpUy9Z?=
- =?utf-8?B?c1k5L05LdVI0WWl6anhRYWxLQnJuRFZqQ0Y4WHBRWHhwTGpsWFRDeThST0VF?=
- =?utf-8?B?V25GRkFFbllYcjZOZG9aeFJ4M0Z0dzN4elRvZjR0YUIxa2pTQ3I2eWRPTE1Q?=
- =?utf-8?B?UWlPNjUwR21JMjBXa2RYclFSS2J5amxCWi9pTGxYZkFMWUFGa083ck1pTkt3?=
- =?utf-8?B?ZDlMTUJEd2VxSmszSU4zVWhjbktRTm16ajlqY09YbktBOURneHF4MXBYNTdQ?=
- =?utf-8?B?ZStKWGRSK2xKZTRMUXFUY21RZTFRQTNoVEJRcGJQL2x1MjRRenJFU0NLcldy?=
- =?utf-8?B?T1BkaW5XVTJzRWJTQUJqTUJlU3hXOHdBOHVVTmpxNXh6QXh2cWhzeVR6RjFM?=
- =?utf-8?B?Ri9tenZpVGtwakVPVk9JUm1lYTMxQ3ZRb2RCZHJVZS9CK2NFQ05Qd0UvK0Nt?=
- =?utf-8?B?em8wdXU2amFXWWhXMjgwYTVDRUx4OGRCQmxURitmQnlndGUwYjdXYmVhQkNU?=
- =?utf-8?B?YUxIQlpacy9PT1RGa2VPeEwyYmhJZDRaNWtEWHY3ZGJQenA4RUhDZW02VEdv?=
- =?utf-8?B?QzFiZ0RNMklzNk5Bc0V6M2IrNm51SGdIL2tZMVRYQVhacEJHNldQMm5Qc05m?=
- =?utf-8?B?THNlQ0hUSGExSk92YzZEMVhhYmdRZE1JMzRSZXEyWGJKdzFHNU5KNkJGV0dy?=
- =?utf-8?B?Q0IwdkFHUUlzczRudmZ4cFYvYnZNKzg4SjBzMDhsK0t3RlBFa0NFVlFUWXpk?=
- =?utf-8?B?U0NTYi9SQ3AzOWo2QlpyaWl0akxSOWRaTE1seDhpc1ZxM001RE1pNlViUE1P?=
- =?utf-8?B?Z0dieXVpUWtOZjFRcSswc3pzRGZ2ZXJrbzhCc3c2ZkhPQk40MEozd2NGQ3RS?=
- =?utf-8?B?ZTNSTVBIem53dk1jMGVNYzQzZFpGWnRHZnE1THdqMmY5ZWFJL2ZDYktjMVlj?=
- =?utf-8?B?bnJwZnQ1bzZVZzlLL3R5TmtGdEFRd0hZN0gvRkNLdDNZbGVtMUkxck1Ebit3?=
- =?utf-8?B?V2VrakkrSldnZHl4WjNnbGZLbFArTUk4a1JZcGRPUEhJUU1UbkpacS9BTURx?=
- =?utf-8?B?NVAwN2tjUHRQbDRxOXRRNUJqK2ZIMkNPNEtZSzRRZE00YXUyWHJFb3ZCUy92?=
- =?utf-8?B?TkMvYU5GbjhlZTZ6U2kwcktQZ2lQc1B1b3NsM3hXU1U4YTdUSFgxVDN3MEtX?=
- =?utf-8?B?eFBRZlU3ekZCSng3MmtTNW9LWVZ5VmdWbi9hUjgyYURFb2pSTUNVdHovMU1i?=
- =?utf-8?B?TDdpc3RzY3gyWnY2dnM0N29qQ2R4dnk3bnVNSkhId3NFdXVyQ0RBdU1NR1pS?=
- =?utf-8?B?eS93MnhVOW83VUlseHBCR2ltV05UVFh0U1ZvYmsvZUhNcUZQTVdLTHNNb1NS?=
- =?utf-8?B?eXVRSG9Ec2VyS01yeDlDMm5VQ2UvK1dEeFhnZFpPMjdTTnJDL01qK0YweTNY?=
- =?utf-8?B?QjJ1aHN3S2dxVFVlUFVKTUZDQnRDV1RoVjhieVBCdDd1ZWdTMGszKzZjT2Uz?=
- =?utf-8?B?dEFwUUtScGhFSUNoeWlaeWVvSHZEaGE2VDVQeGdwUm02ZDkzblZlbHo1S0xM?=
- =?utf-8?B?RmN3MHJQWUpyUXZLUTJtUUtnNURoUGc3ais2aWtPMTdCRmZWaENlYTd0ZkNj?=
- =?utf-8?B?Sjh5Smw5M1ZGZHV0TmxsUEpQb0lyN2xDdm9lUEdlTE55MVRIWEgxcmsvSll6?=
- =?utf-8?Q?JSYC/ohk8t+Cdr/nHUQYPLZ2l7wY3dfJjq/jPDLVmCfgu?=
-x-ms-exchange-antispam-messagedata-1: lchGn7WXwWK+jg==
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <C889ADA886461943991BD675F5853F0D@namprd12.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Mon, 13 Jun 2022 03:01:48 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3090919F90
+        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:01:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655103699; x=1686639699;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=2WDWmTstpttzQMnzDUtwtitJl5qbFuuxhfKS7fyFC48=;
+  b=J102CryXJ5oyjb9U1R1OtCLkUwjdEgrxbenM6gGGUIh6vvJptYGOQdQC
+   tbmAaeLbS8/WMwDWyH2gEIbbHEaOU7XdSc3j2jXwyBD7RJo9DuEMJUBcF
+   pf1kTLSFGC4UfQR8zOfQIX0///9rOmjbvrarySE3Q1L6TMOu7XJbL+qTM
+   aRunLUMEBDpyMEdh/J3czD12hqRB15NqW76859ObL+4KYJrMSZDiVRA+y
+   sBV9jWswhJuY9FA6lwa0+HP4vjSFPa4rL1fmkqyccWTf+Vzvx6cFMcHtp
+   vPGiL2SJMxBfRKt7DCmS4SlOaVhGs4dsjs371/KzC9FBTuey+gTPoguvB
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.91,296,1647273600"; 
+   d="scan'208";a="315034293"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 13 Jun 2022 15:01:23 +0800
+IronPort-SDR: zDVbdw/WeHywzCu9y068uVCE2yM8vLnMPATbHwWO8yYJiQXmU0JmFSvK78ZjwsLEIiMqb2a9M8
+ 8Lff+DzgKx4qkP7w9wQ2DoK/Y6HKgv6q3r1gucyQVlBKLBXUNjY4mxAU+Qq9zfyYLfH1n41J4c
+ EiEhf2hde7b/VsXHBRUgDyJ9WHiW2Lq9FrJ4M2OPJ2jbdJR28anoJIKOX5djVOOHCtsLKTxzlT
+ 898By4Cluf1wVc78X0otjnv5yx96m5peAFnmxB6ic96JGouh2YqKPO7yjCv2ray+VMmdkOUnrI
+ 9c+D6u0MEkUIOIbvSM219JX7
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Jun 2022 23:20:03 -0700
+IronPort-SDR: JYO/jIoFv8SfXhi8dX4Xl6Ck/ckaT9xe7kCNWGTqox+4OmaY1MXDVD9gqbFNhtC+QDV7cJX1Fj
+ QCECCvRtPkGnPxwDxVPNVvpsZX2nKzOD/1M/iqSbb27VmBABL34qvWhQe0Q+AcntxMMhJ1c++4
+ HMxTuf/mf/3wWqHPbQJVgCLzAQNj9zflpiHi96zPqzHeYUzvUrqShL0YmDGq8zg2DZHKIxxGVB
+ r8geSfUcAY2xP9fJ0kQZu/4gMb8cQjGz7JX2HM/XqOhkv7zYSsuvQCFrii5D2stFyysmdmKxUu
+ rvI=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 13 Jun 2022 00:01:23 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LM2Xy0f3lz1SVp2
+        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 00:01:22 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1655103681; x=1657695682; bh=2WDWmTstpttzQMnzDUtwtitJl5qbFuuxhfK
+        S7fyFC48=; b=NAC1DTbeyxKroJVWMYklxSfOC6ojkBozAkqbY2tbC0u8SWJPGp5
+        nAtl8CO4eCWVrBSvAtAOgW/rrNEhlYIDJZUcIgJkNWZIXeOhDRhJqqGqo+NdrDaP
+        tV8tL3QSHXzM2FyVWQqs3ftYJOjcClIMTcqmOXY8aAMpGcQ1cTFQOy5pPdoTX42y
+        EBpb3dqccpn866Sp2GDOjNJ1htIg8oqqlEFuBsoR3yZYbd+nA1jc/DtB17Dugbmt
+        8P+rPboRjUQzmsstjdBUVdGdgfs5Mi+seJM/79+j8hIIf0rXXMZoFZZGUDWIj9gi
+        GD7Jz8fxf12bYNpOo0/wvN2fHKnKkULAO3A==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Us9t2bWXeSOi for <linux-block@vger.kernel.org>;
+        Mon, 13 Jun 2022 00:01:21 -0700 (PDT)
+Received: from [10.225.163.77] (unknown [10.225.163.77])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LM2Xv09BWz1Rvlc;
+        Mon, 13 Jun 2022 00:01:18 -0700 (PDT)
+Message-ID: <b4a0ede5-95a3-4388-e808-7627b5484d01@opensource.wdc.com>
+Date:   Mon, 13 Jun 2022 16:01:17 +0900
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68315c26-0e6f-487f-147f-08da4d00ca48
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Jun 2022 05:51:41.4937
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qpUnfiiLHyUM/GQhgbrY+EumoEKsCD/feCv4kfACF0yxxC0POhY/S041BzAT+tcwzXjFqSDVAdpifX6z6jzofQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR12MB4446
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH RFC v2 03/18] scsi: core: Implement reserved command
+ handling
+Content-Language: en-US
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, brking@us.ibm.com,
+        hare@suse.de, hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        chenxiang66@hisilicon.com
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-4-git-send-email-john.garry@huawei.com>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <1654770559-101375-4-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gNi8xMC8yMDIyIDU6MTUgQU0sIFNoaW4naWNoaXJvIEthd2FzYWtpIHdyb3RlOg0KPiBUaGUg
-dGVzdCBjYXNlIG52bWUvMDM5IGRvZXMgbm90IGRlcGVuZCBvbiBudm1lIHRyYW5zcG9ydCB0eXBl
-IGFuZCBkb2VzDQo+IG5vdCByZXF1aXJlIG1vZHVsZXMgZm9yIHRoZSB0cmFuc3BvcnQgdHlwZXMu
-IFRoZSBfbnZtZV9yZXF1aXJlcyBjYWxsIGluDQo+IHJlcXVpcmVzKCkgbG9hZHMgdGhlIG1vZHVs
-ZXMgYW5kIHRob3NlIG1vZHVsZXMgYXJlIGxlZnQgdW5sb2FkZWQgYWZ0ZXINCj4gdGhlIHRlc3Qg
-Y2FzZSBydW4uIFRoaXMgY2F1c2VzIGZhaWx1cmVzIG9mIGZvbGxvd2luZyBudm1lb2YtbXAgdGVz
-dCBydW5zDQo+IHdpdGggbWVzc2FnZToNCj4gDQo+ICAgIG1vZHByb2JlOiBGQVRBTDogTW9kdWxl
-IG52bWV0IGlzIGluIHVzZS4NCj4gDQo+IFRvIGF2b2lkIHRoZSB1bm5lY2Vzc2FyeSBtb2R1bGUg
-bG9hZHMsIHJlbW92ZSBfbnZtZV9yZXF1aXJlcyBjYWxsLg0KPiBJbnN0ZWFkLCBqdXN0IGNoZWNr
-IGV4aXN0ZW5jZSBvZiBudm1lIGNvbW1hbmQuDQo+IA0KPiBGaXhlczogOWFjY2I1Zjg2NjcwICgi
-dGVzdHMvbnZtZTogYWRkIHRlc3RzIGZvciBlcnJvciBsb2dnaW5nIikNCj4gU2lnbmVkLW9mZi1i
-eTogU2hpbidpY2hpcm8gS2F3YXNha2kgPHNoaW5pY2hpcm8ua2F3YXNha2lAd2RjLmNvbT4NCj4g
-LS0tDQoNClJldmlld2VkLWJ5OiBDaGFpdGFueWEgS3Vsa2FybmkgPGtjaEBudmlkaWEuY29tPg0K
-DQotY2sNCg0KDQo=
+On 6/9/22 19:29, John Garry wrote:
+> From: Hannes Reinecke <hare@suse.de>
+> 
+> Quite some drivers are using management commands internally, which
+> typically use the same hardware tag pool (ie they are being allocated
+> from the same hardware resources) as the 'normal' I/O commands.
+> These commands are set aside before allocating the block-mq tag bitmap,
+> so they'll never show up as busy in the tag map.
+> The block-layer, OTOH, already has 'reserved_tags' to handle precisely
+> this situation.
+> So this patch adds a new field 'nr_reserved_cmds' to the SCSI host
+> template to instruct the block layer to set aside a tag space for these
+> management commands by using reserved tags.
+> 
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> Signed-off-by: John Garry <john.garry@huawei.com>
+> ---
+>  drivers/scsi/hosts.c     |  3 +++
+>  drivers/scsi/scsi_lib.c  |  6 +++++-
+>  include/scsi/scsi_host.h | 22 +++++++++++++++++++++-
+>  3 files changed, 29 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/scsi/hosts.c b/drivers/scsi/hosts.c
+> index 8352f90d997d..27296addaf63 100644
+> --- a/drivers/scsi/hosts.c
+> +++ b/drivers/scsi/hosts.c
+> @@ -474,6 +474,9 @@ struct Scsi_Host *scsi_host_alloc(struct scsi_host_template *sht, int privsize)
+>  	if (sht->virt_boundary_mask)
+>  		shost->virt_boundary_mask = sht->virt_boundary_mask;
+>  
+> +	if (sht->nr_reserved_cmds)
+> +		shost->nr_reserved_cmds = sht->nr_reserved_cmds;
+> +
+>  	device_initialize(&shost->shost_gendev);
+>  	dev_set_name(&shost->shost_gendev, "host%d", shost->host_no);
+>  	shost->shost_gendev.bus = &scsi_bus_type;
+> diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+> index 6ffc9e4258a8..f6e53c6d913c 100644
+> --- a/drivers/scsi/scsi_lib.c
+> +++ b/drivers/scsi/scsi_lib.c
+> @@ -1974,8 +1974,12 @@ int scsi_mq_setup_tags(struct Scsi_Host *shost)
+>  	else
+>  		tag_set->ops = &scsi_mq_ops_no_commit;
+>  	tag_set->nr_hw_queues = shost->nr_hw_queues ? : 1;
+> +
+>  	tag_set->nr_maps = shost->nr_maps ? : 1;
+> -	tag_set->queue_depth = shost->can_queue;
+> +	tag_set->queue_depth =
+> +		shost->can_queue + shost->nr_reserved_cmds;
+> +	tag_set->reserved_tags = shost->nr_reserved_cmds;
+> +
+>  	tag_set->cmd_size = cmd_size;
+>  	tag_set->numa_node = dev_to_node(shost->dma_dev);
+>  	tag_set->flags = BLK_MQ_F_SHOULD_MERGE;
+> diff --git a/include/scsi/scsi_host.h b/include/scsi/scsi_host.h
+> index 59aef1f178f5..149dcbd4125e 100644
+> --- a/include/scsi/scsi_host.h
+> +++ b/include/scsi/scsi_host.h
+> @@ -366,10 +366,19 @@ struct scsi_host_template {
+>  	/*
+>  	 * This determines if we will use a non-interrupt driven
+>  	 * or an interrupt driven scheme.  It is set to the maximum number
+> -	 * of simultaneous commands a single hw queue in HBA will accept.
+> +	 * of simultaneous commands a single hw queue in HBA will accept
+> +	 * excluding internal commands.
+>  	 */
+>  	int can_queue;
+>  
+> +	/*
+> +	 * This determines how many commands the HBA will set aside
+> +	 * for internal commands. This number will be added to
+> +	 * @can_queue to calcumate the maximum number of simultaneous
+
+s/calcumate/calculate
+
+But this is weird. For SATA, can_queue is 32. Having reserved commands,
+that number needs to stay the same. We cannot have more than 32 tags.
+I think keeping can_queue as the max queue depth with at most
+nr_reserved_cmds tags reserved is better.
+
+> +	 * commands sent to the host.
+> +	 */
+> +	int nr_reserved_cmds;
+> +
+>  	/*
+>  	 * In many instances, especially where disconnect / reconnect are
+>  	 * supported, our host also has an ID on the SCSI bus.  If this is
+> @@ -602,6 +611,11 @@ struct Scsi_Host {
+>  	unsigned short max_cmd_len;
+>  
+>  	int this_id;
+> +
+> +	/*
+> +	 * Number of commands this host can handle at the same time.
+> +	 * This excludes reserved commands as specified by nr_reserved_cmds.
+> +	 */
+>  	int can_queue;
+>  	short cmd_per_lun;
+>  	short unsigned int sg_tablesize;
+> @@ -620,6 +634,12 @@ struct Scsi_Host {
+>  	 */
+>  	unsigned nr_hw_queues;
+>  	unsigned nr_maps;
+> +
+> +	/*
+> +	 * Number of reserved commands to allocate, if any.
+> +	 */
+> +	unsigned nr_reserved_cmds;
+> +
+>  	unsigned active_mode:2;
+>  
+>  	/*
+
+
+-- 
+Damien Le Moal
+Western Digital Research
