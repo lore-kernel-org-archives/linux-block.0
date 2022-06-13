@@ -2,109 +2,221 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F97DC43334
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 21:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E9A1C43334
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 21:39:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351757AbiFMVaC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 17:30:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57420 "EHLO
+        id S229947AbiFMVjR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 17:39:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352795AbiFMV25 (ORCPT
+        with ESMTP id S1352638AbiFMVjM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 17:28:57 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E674EDF8
-        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 14:22:19 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id g16-20020a17090a7d1000b001ea9f820449so5353415pjl.5
-        for <linux-block@vger.kernel.org>; Mon, 13 Jun 2022 14:22:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=De70A128M136BzcvUcDhFvWwtReZNa93TwdWArPgNw0=;
-        b=wMhSJPuYIysiFwTN0rrpT3P9RK3mKPf/aUbDCs2PEUQJWku7YD57LLGZE58wmDZrAr
-         OEJfJz50T181/f6I0fCF7BCxiM2g5aiiufxhqIjQo4BBlhmh6+kS9D7wUFsHYhmt8+Av
-         cPRUO1F1tQ9KOMD0zYmhZdMTbxqxs/V6F2DT8qZv3jSqdXHMwZEowWjrDwYUu7RgpcA2
-         dPLZFSNQfA7omcbet+DMlaIQRA2r/kXrpP/JuoL9RW/Dhwy81iguXw0f9NsTuqpa+lgo
-         gZz8xcTlcsA2Q+OxolRv2BEHk6RNnHIe6Gqq3p5NuAgB9Gu3Dfjwyk24NGhs6ZW0M17B
-         n5rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=De70A128M136BzcvUcDhFvWwtReZNa93TwdWArPgNw0=;
-        b=Dw+y2Mq/mOBxJrkB7M1ebuHqxgV0G0hv6UBUEXdTm1n5SsS6NnEDDHEZv41HZaU3r0
-         QLTUxF20InL5PrCKETX6OWGxSF9WNLbgW2licUJOtCDFYVilBYl4M/Anq9d/Au5GvUR3
-         v1aO+L7cUrj5UHGKIu8nNtsSo4WZ6JVbpy/RVO2mt4HdfvUBdZKGylw1TNfbvGeoomaZ
-         Z2I94F483oMrtZRx1BEfRKxtlr7fSOxXpjGcynz6dtw3O+FcXoA+1GNI78lakIQVQZ4F
-         GTlNFffFMj6vjkbF7ZB4/XuJgbzg7+Ky3GLhfiTyFa9wmlxhg9ItGJaN0TBzlAOrzrXp
-         5Bug==
-X-Gm-Message-State: AJIora9fH2j3Q+niLptUq1OWzGtwnyj7B8/evS7BaRsK98gO3eeDCbAo
-        13I7x4ly+xFhDiFCGuhV6cwTcQ==
-X-Google-Smtp-Source: AGRyM1sPSnFY+821fUYw3RfnTBageuTpEriPGizdyessVR1YgznLprR3pLTNMc9iVpLL2eNsdqp13A==
-X-Received: by 2002:a17:902:d48b:b0:167:770b:67d with SMTP id c11-20020a170902d48b00b00167770b067dmr901304plg.162.1655155339407;
-        Mon, 13 Jun 2022 14:22:19 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id iz3-20020a170902ef8300b0015e9d4a5d27sm5605697plb.23.2022.06.13.14.22.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Jun 2022 14:22:18 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     kbusch@fb.com, linux-block@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org
-Cc:     bvanassche@acm.org, ebiggers@kernel.org,
-        damien.lemoal@opensource.wdc.com, Kernel-team@fb.com,
-        pankydev8@gmail.com, kbusch@kernel.org,
-        Christoph Hellwig <hch@lst.de>
-In-Reply-To: <20220610195830.3574005-1-kbusch@fb.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
-Subject: Re: [PATCHv6 00/11] direct-io dma alignment
-Message-Id: <165515533813.6829.11794160430022485799.b4-ty@kernel.dk>
-Date:   Mon, 13 Jun 2022 15:22:18 -0600
+        Mon, 13 Jun 2022 17:39:12 -0400
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 929EE102B;
+        Mon, 13 Jun 2022 14:39:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+        :In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
+        Reply-To:Cc:Content-ID:Content-Description;
+        bh=ZHOzswuFc4gDE4h/q3IgGDDruuCRynevUPtETq+uhC8=; b=cIj2OZ6FBCoDpgRhR4glzTdRLk
+        jb0j9dbYysOB6CZkdv39d56ve50HV4HDWhDGkh9VVzrV6FVmFI8syoqrueJVuhLSO0hu4ddITQ5C2
+        rzThyHpmqPlzyttInYVAx9ZmcRpy7c6WCACl/1zEzT0VbKflvnUeWC6/hCIRNErjLIFmtQFH02nnQ
+        12ovjPszvmUDjJkOvtPKgRpySY4+o/yyPwSo7UUTynvw0jAfuhfT3FvhCJEZQuYgtXEqhLJdiTuaa
+        D/ZvniR/3H6xOAe0CUb0syF1elqrFC53cd088z5abIBQmTCiNmraMplqwa1mHmSo/E972M5UiVLsX
+        IDoDMUYA==;
+Received: from [2601:1c0:6280:3f0::aa0b]
+        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o0rm2-007gHb-Oy; Mon, 13 Jun 2022 21:39:03 +0000
+Message-ID: <61dd808d-daff-55c7-7213-26f6bae3a5c7@infradead.org>
+Date:   Mon, 13 Jun 2022 14:38:59 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 18/20] block, blksnap: Kconfig
+Content-Language: en-US
+To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <1655135593-1900-1-git-send-email-sergei.shtepa@veeam.com>
+ <1655135593-1900-19-git-send-email-sergei.shtepa@veeam.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <1655135593-1900-19-git-send-email-sergei.shtepa@veeam.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, 10 Jun 2022 12:58:19 -0700, Keith Busch wrote:
-> From: Keith Busch <kbusch@kernel.org>
-> 
-> The previous version is available here:
-> 
->   https://lore.kernel.org/linux-block/Yp4qQRI5awiycml1@kbusch-mbp.dhcp.thefacebook.com/T/#m0a93b6392038aad6144e066fb5ada2cbf316f78e
-> 
-> Changes from the previous are all trivial changes:
-> 
-> [...]
+Hi--
 
-Applied, thanks!
+On 6/13/22 08:53, Sergei Shtepa wrote:
+> The module configuration file allows you to set default values for
+> module parameters.
+> 
+> Signed-off-by: Sergei Shtepa <sergei.shtepa@veeam.com>
+> ---
+>  drivers/block/blksnap/Kconfig | 101 ++++++++++++++++++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 drivers/block/blksnap/Kconfig
+> 
+> diff --git a/drivers/block/blksnap/Kconfig b/drivers/block/blksnap/Kconfig
+> new file mode 100644
+> index 000000000000..8588a89e30ad
+> --- /dev/null
+> +++ b/drivers/block/blksnap/Kconfig
+> @@ -0,0 +1,101 @@
+> +# SPDX-License-Identifier: GPL-2.0
+> +#
+> +# block io layer filter module configuration
 
-[01/11] block: fix infinite loop for invalid zone append
-        commit: 1180b55c93f6b060ad930db151fe6d2b425f9215
-[02/11] block/bio: remove duplicate append pages code
-        commit: 7a2b81b95a89e578343b1c944ddd64d1b14ee49a
-[03/11] block: export dma_alignment attribute
-        commit: 5f507439f051daaa1e3273ff536afda3ad1f1505
-[04/11] block: introduce bdev_dma_alignment helper
-        commit: 24b10a6e0bc22619535b0ed982b7735910981661
-[05/11] block: add a helper function for dio alignment
-        commit: 8a39418810a65f0bcbe559261ef011fe0e298eeb
-[06/11] block/merge: count bytes instead of sectors
-        commit: 4ff782f24a4cad4b033d0f4f6e38cd50e0d463b0
-[07/11] block/bounce: count bytes instead of sectors
-        commit: 4b5310470e72d77c9b52f8544b98aa8cf77d956f
-[08/11] iov: introduce iov_iter_aligned
-        commit: ab7c0c3abb2e5fa15655e4b87bb7b937ca7e18c3
-[09/11] block: introduce bdev_iter_is_aligned helper
-        commit: 72230944b7a53280c1f351a0d5cafed12732ec21
-[10/11] block: relax direct io memory alignment
-        commit: 84f970d415ef4d048e664ac308792eb93d0152fc
-[11/11] iomap: add support for dma aligned direct-io
-        commit: 40e11e7a6cc74f11b5ca23ceefec7c84af5c4c73
+I prefer   IO or I/O
+but that's up to Jens.
 
-Best regards,
+> +#
+> +#
+> +
+> +config BLK_SNAP
+> +	tristate "Block device snapshot and change tracker module"
+> +	depends on BLK_FILTER
+> +	help
+> +	  Allow to create snapshots and track block changes for a block
+
+	                                                    for block
+
+> +	  devices. Designed for creating backups for any block devices
+> +	  (without device mapper). Snapshots are temporary and are released
+> +	  then backup is completed. Change block tracking allows you to
+> +	  create incremental or differential backups.
+> +
+> +config BLK_SNAP_TRACKING_BLOCK_MINIMUM_SHIFT
+> +	depends on BLK_SNAP
+> +	int "The power of 2 for minimum trackings block size"
+
+	                                tracking                 (I think.)
+
+> +	default 16
+> +	help
+> +	  The minimum tracking block size by default is 64 KB (shift 16)
+
+	End above with a period ('.'):                        (shift 16).
+
+> +	  It's looks good for block device 128 GB or lower.
+
+          It looks good
+except saying something about performance would be better than "looks good".
+
+> +	  In this case, the block device is divided into 2097152 blocks.
+> +
+> +config BLK_SNAP_TRACKING_BLOCK_MAXIMUM_COUNT
+> +	depends on BLK_SNAP
+> +	int "The limit of the maximum number of trackings blocks"
+
+	                                        tracking           (IMO)
+
+> +	default 2097152
+> +	help
+> +	  As the size of the block device grows, the size of the tracking block
+> +	  size should also grow. For this purpose, the limit of the maximum
+> +	  number of block size is set.
+> +
+> +config BLK_SNAP_CHUNK_MINIMUM_SHIFT
+> +	depends on BLK_SNAP
+> +	int "The power of 2 for minimum snapshots chunk size"
+> +	default 18
+> +	help
+> +	  The minimum chunk size by default is 256 KB (shift 18)
+
+	                                              (shift 18).
+
+> +	  It's looks good for block device 128 GB or lower.
+
+	  It looks good
+except that something more technical would be better here.
+
+> +	  In this case, the block device is divided into 524288 chunks.
+> +
+> +config BLK_SNAP_CHUNK_MAXIMUM_COUNT
+> +	depends on BLK_SNAP
+> +	int "The limit of the maximum number of snapshots chunks"
+> +	default 2097152
+> +	help
+> +	  As the size of the block device grows, the size of the chunk
+> +	  should also grow. For this purpose, the limit of the maximum number
+> +	  of chunks is set.
+
+Is the "limit of the maximum number" the same as "the maximum number" of chunks?
+Using "limit ... maximum" seems redundant to me.
+
+> +
+> +config BLK_SNAP_CHUNK_MAXIMUM_IN_CACHE
+> +	depends on BLK_SNAP
+> +	int "The limit of the maximum chunks in memory cache"
+
+or just     "Maximum number of chunks in memory cache"
+?
+
+> +	default 64
+> +	help
+> +	  Since reading and writing to snapshots is performed in large chunks,
+> +	  a cache is implemented to optimize reading small portions of data
+> +	  from the snapshot image. As the number of chunks in the cache
+> +	  increases, memory consumption also increases.
+> +	  The minimum recommended value is four.
+> +
+> +config BLK_SNAP_FREE_DIFF_BUFFER_POOL_SIZE
+> +	depends on BLK_SNAP
+> +	int "The maximum size of the free buffers pool"
+> +	default 128
+> +	help
+> +	  A buffer can be allocated for each chunk. After use, this buffer is
+> +	  not released immediately, but is sent to the pool of free buffers.
+> +	  However, if there are too many free buffers in the pool, they are
+
+	                                          Here,  does      "they"
+mean the extra buffers (> BLK_SNAP_DIFF_BUFFER_POOL_SIZE) or all of the
+pool of free buffers?
+
+
+> +	  released immediately. The maximum size of the pool is regulated by
+> +	  this define.
+
+I would s/define/configuration/.
+
+> +
+> +config BLK_SNAP_DIFF_STORAGE_MINIMUM
+> +	depends on BLK_SNAP
+> +	int "The minimum allowable size of the difference storage in sectors"
+
+What is "difference storage"?
+
+> +	default 2097152
+> +	help
+> +	  When reached, an event is generated about the lack of free space.
+> +
+> +config BLK_SNAP_DEBUG_MEMORY_LEAK
+> +	depends on BLK_SNAP
+> +	bool "Enable memory leak detector"
+> +	default n
+> +	help
+> +	  Enables debugging code to monitor memory consumption by the module.
+> +
+> +	  If unsure, say N.
+> +
+> +config BLK_SNAP_ALLOW_DIFF_STORAGE_IN_MEMORY
+> +	depends on BLK_SNAP
+> +	bool "Allow difference storage in memory"
+
+Is "difference storage" described somewhere?
+
+> +	default n
+> +	help
+> +	  Enables the ability to create a repository of changes in memory.
+> +	  This feature can be useful for debugging. Or it can be used for
+> +	  mobile phones or other devices if there are guaranteed not to be
+> +	  a large number of writings during the snapshot hold.
+> +
+> +	  If unsure, say N.
+
+thanks.
 -- 
-Jens Axboe
-
-
+~Randy
