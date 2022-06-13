@@ -2,49 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44FBCC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 19:08:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5B78CCA47B
+	for <linux-block@archiver.kernel.org>; Mon, 13 Jun 2022 19:42:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347227AbiFMTIE (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 13 Jun 2022 15:08:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60682 "EHLO
+        id S1344166AbiFMTm1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 13 Jun 2022 15:42:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347664AbiFMTHy (ORCPT
+        with ESMTP id S1344627AbiFMTmD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 13 Jun 2022 15:07:54 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA728D31BB;
-        Mon, 13 Jun 2022 10:02:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=SF1l8Qz9/K72VhTgB8P+cXYCh+NrzEDi0Nkv+Tnn95E=; b=2WazOj0lkc3ICz6cVZvBtYACLd
-        4SQ27dxYrNgXbdKdxDe3MW+VhdKfKPRMOuRgeDgzZtF8Xk++XRjJbMtoJt89z4jVdQcJvfKkep7eO
-        anW+SEfaoQk1gHJuwLo9oajAL+phHwApEgqL04CUy45JRosropHICdKvOnqpCUGxt2XhDTVv4Dn8j
-        3tzOXVdb75Erel+ya0cY08wt9KLFGSoLMShjvsQ0CV/QUw/Z8E1aTUet1a/C7ksRWKtscH1UXJfjn
-        jzS1u2hrINGbPzZISFvN1p1gI13sGQ5EWTVafddc0BfunDigSuZCPTKfL79XciZU9BbV0FT6zfevl
-        GPqRTOYg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o0nSF-004oyL-SP; Mon, 13 Jun 2022 17:02:19 +0000
-Date:   Mon, 13 Jun 2022 10:02:19 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     =?utf-8?B?6LW15q2m5LqR?= <zhaowuyun.zwy@alibaba-inc.com>
-Cc:     axboe <axboe@kernel.dk>, jejb <jejb@linux.vnet.ibm.com>,
-        "martin.petersen" <martin.petersen@oracle.com>,
-        linux-block <linux-block@vger.kernel.org>,
-        linux-kernel <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] block: peek PM requests during runtime PM
-Message-ID: <Yqdtm9LtSVyjpJnS@infradead.org>
-References: <4a2754ad-d76d-482f-9337-5364d46cd38d.zhaowuyun.zwy@alibaba-inc.com>
+        Mon, 13 Jun 2022 15:42:03 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB406129A;
+        Mon, 13 Jun 2022 11:11:22 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 4DB1461224;
+        Mon, 13 Jun 2022 18:11:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 38F9EC34114;
+        Mon, 13 Jun 2022 18:11:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1655143881;
+        bh=r/uQoIAptd2kdH1sDPm8Dl5Ok9Z2t+kx5mOqVHxzwHY=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=oRlwMuHdrdha/YRPgL48dWRuDAB2I+9v1s68B6cwvOAFMGYE45MgdO9fFWO9Yddvt
+         7DM6HxgbVaNSjdfQ+MwWTP1sy7QY3kmC09577rVITa+zQBgEJIaecUzizPBRbfIV1d
+         eRHxJRS18mV2I8+Epp866LNxbCPbzPhozn+8iwJE=
+Date:   Mon, 13 Jun 2022 20:11:18 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Yongqin Liu <yongqin.liu@linaro.org>
+Cc:     stable@vger.kernel.org, Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Benjamin Copeland <benjamin.copeland@linaro.org>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        Daniel =?iso-8859-1?Q?D=EDaz?= <daniel.diaz@linaro.org>,
+        Alistair Delva <adelva@google.com>,
+        Steve Muckle <smuckle@google.com>,
+        Todd Kjos <tkjos@google.com>,
+        "Bajjuri, Praneeth" <praneeth@ti.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Subject: Re: Please help cherry pick four mmc related changes into the 4.14
+ stable kernel
+Message-ID: <Yqd9xjOiOapfBt/A@kroah.com>
+References: <CAMSo37WW9veYH6=tHqUR2pa_7YX1UuzHqLBHit60P2QyzQmCEw@mail.gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4a2754ad-d76d-482f-9337-5364d46cd38d.zhaowuyun.zwy@alibaba-inc.com>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <CAMSo37WW9veYH6=tHqUR2pa_7YX1UuzHqLBHit60P2QyzQmCEw@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-What tree is this against?  Neither elv_next_request nor
-blk_pm_allow_request exist in upstream, and haven't for a long time.
+On Wed, Jun 08, 2022 at 01:09:54AM +0800, Yongqin Liu wrote:
+> Hi, All
+> 
+> With the 4.14.281 version[1], there were three mmc related changes merged,
+> but that causes one boot failure with the X15 Android builds, a problem
+> similar to one reported before here[2].
+> After being confirmed with Ulf Hansson, and verified with the X15 Android build,
+> it needs to have the following four commits cherry-picked to the 4.14
+> branch as well.
+> 
+>     4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
+>     5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for erase/trim/discard
+>     d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC sleep command
+>     23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
+> MMC_CAP_NEED_RSP_BUSY
+> 
+> The above four commits are from the 4.19 branch, as they are a little
+> easier to be cherry-picked
+> into the 4.14 branch, compared to the commits from the mainline branch.
+> (I have confirmed that the four commits are all in 4.19, 5.4, 5.10 and
+> mainline branches already).
+> 
+> Saying that, there will be still one merge conflict reported when
+> cherry picking the commit of
+> 4f32b45c9a2c, it's easy to resolve though.
+> To avoid the merge conflict, it could be done like this as well:
+> 1. revert the 327b6689898b commit from 4.14 first, so that the commits in step#2
+>     could be cherry-picked without any problem
+>         327b6689898b mmc: core: Default to generic_cmd6_time as
+> timeout in __mmc_switch()
+> 2. git cherry-pick the following commits from 4.19 into the 4.14 branch
+>         4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
+>         5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for
+> erase/trim/discard
+>         d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC
+> sleep command
+>         23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
+> MMC_CAP_NEED_RSP_BUSY
+>         26c6f614cf02 mmc: mmc: core: Default to generic_cmd6_time as
+> timeout in __mmc_switch()
+>     The last commit of 26c6f614cf02 is for the revert in step#1.
+> 
+> I am not sure which way is more convenient for the maintenance work
+> here, so just list both of them here
+> for your information.
+> And please let me know if there is anything else I could help on this
+> cherry pick work here.
+
+Please send properly backported patches to us, trying to do the revert
+and fixup like you describe above is going to be hard to verify I got it
+right.  A series of patches is best as that way we know you tested it
+properly and sent us the correct patches.
+
+thanks,
+
+greg k-h
