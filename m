@@ -2,109 +2,142 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 174DAC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 13:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C53C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 13:15:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241156AbiFNNJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 09:09:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55796 "EHLO
+        id S236188AbiFNNPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 09:15:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33546 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234149AbiFNNJt (ORCPT
+        with ESMTP id S233395AbiFNNPn (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 09:09:49 -0400
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642B836695
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 06:09:48 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 237FB21A82;
-        Tue, 14 Jun 2022 13:09:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1655212187; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SZdXDqx2FcKfc5tK2OjYKWz5aChMyNIgpuuDl6ZYhBM=;
-        b=FafK9N7BONdevsgiycxYthmFlmIY3z4oHBs5M+lq+ueLCJI1dRuyDfKfB+WC50MgYoCnL8
-        aWzBefJ0yO5ZSrmwXN++dq1OuOX54ptr709XSwwt0Im6lNRxe3Fy7Gwqezop1WES2KDM/T
-        D5QvjdTtOzijEzPAsdg9fcVH5gD1Hb0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1655212187;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=SZdXDqx2FcKfc5tK2OjYKWz5aChMyNIgpuuDl6ZYhBM=;
-        b=PlouNPihnOt8s9ccBxRuJTDnmrF7p9PYXXkOkgLF9cl3edXvEqAnNEQmH5qABk8ngk2GDU
-        smZsJH1FXsS3zyDg==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id C66F32C141;
-        Tue, 14 Jun 2022 13:09:45 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id 705E0A062E; Tue, 14 Jun 2022 15:09:42 +0200 (CEST)
-Date:   Tue, 14 Jun 2022 15:09:42 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Cixi Geng <cixi.geng1@unisoc.com>, Jan Kara <jack@suse.cz>,
-        Yu Kuai <yukuai3@huawei.com>,
-        Paolo Valente <paolo.valente@unimore.it>
-Subject: Re: [PATCH] block/bfq: Enable I/O statistics
-Message-ID: <20220614130942.q7rekncnyh2pvgbd@quack3.lan>
-References: <20220613163234.3593026-1-bvanassche@acm.org>
+        Tue, 14 Jun 2022 09:15:43 -0400
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F24369FA;
+        Tue, 14 Jun 2022 06:15:40 -0700 (PDT)
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LMpn60vbzzjY3r;
+        Tue, 14 Jun 2022 21:14:34 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 14 Jun 2022 21:15:38 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 14 Jun 2022 21:15:37 +0800
+Subject: Re: [PATCH -next] blk-mq: fix boot time regression for scsi drives
+ with multiple hctx
+To:     Ming Lei <ming.lei@redhat.com>
+CC:     <axboe@kernel.dk>, <djeffery@redhat.com>, <bvanassche@acm.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220614071410.3571204-1-yukuai3@huawei.com>
+ <Yqg5QxSM+lub8DY0@T590>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <01cb0e49-1154-33db-f572-3960c972fe08@huawei.com>
+Date:   Tue, 14 Jun 2022 21:15:36 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220613163234.3593026-1-bvanassche@acm.org>
+In-Reply-To: <Yqg5QxSM+lub8DY0@T590>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon 13-06-22 09:32:34, Bart Van Assche wrote:
-> BFQ uses io_start_time_ns. That member variable is only set if I/O
-> statistics are enabled. Hence this patch that enables I/O statistics
-> at the time BFQ is associated with a request queue.
+ÔÚ 2022/06/14 15:31, Ming Lei Ð´µÀ:
+> On Tue, Jun 14, 2022 at 03:14:10PM +0800, Yu Kuai wrote:
+>> We found that boot time is increased for about 8s after upgrading kernel
+>> from v4.19 to v5.10(megaraid-sas is used in the environment).
 > 
-> Compile-tested only.
+> But 'blk-mq: clearing flush request reference in tags->rqs[]' was merged
+> to v5.14, :-)
+Hi,
+
+Yes, but this patch is applied to 5.10 stable, thus we backport in our
+v5.10. Sorry that I didn't mention that.
+
 > 
-> Reported-by: Cixi Geng <cixi.geng1@unisoc.com>
-> Cc: Cixi Geng <cixi.geng1@unisoc.com>
-> Cc: Jan Kara <jack@suse.cz>
-> Cc: Yu Kuai <yukuai3@huawei.com>
-> Cc: Paolo Valente <paolo.valente@unimore.it>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-
-Looks good. Thanks for the fix. Feel free to add:
-
-Reviewed-by: Jan Kara <jack@suse.cz>
-
-								Honza
-
-> ---
->  block/bfq-iosched.c | 3 +++
->  1 file changed, 3 insertions(+)
+>>
+>> Following is where the extra time is spent:
+>>
+>> 
+>>   __scsi_remove_device
+>>    blk_cleanup_queue
+>>     blk_mq_exit_queue
+>>      blk_mq_exit_hw_queues
+>>       blk_mq_exit_hctx
+>>        blk_mq_clear_flush_rq_mapping -> function latency is 0.1ms
 > 
-> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-> index 0d46cb728bbf..519862d82473 100644
-> --- a/block/bfq-iosched.c
-> +++ b/block/bfq-iosched.c
-> @@ -7046,6 +7046,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
->  	spin_unlock_irq(&bfqd->lock);
->  #endif
->  
-> +	blk_stat_disable_accounting(bfqd->queue);
->  	wbt_enable_default(bfqd->queue);
->  
->  	kfree(bfqd);
-> @@ -7189,6 +7190,8 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
->  	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
->  
->  	wbt_disable_default(q);
-> +	blk_stat_enable_accounting(q);
-> +
->  	return 0;
->  
->  out_free:
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> So queue_depth looks pretty long, is it 4k?
+No, in the environment, it's just 32, and nr_hw_queues is 128, which
+means each blk_cleanup_queue() will cost about 10-20 ms.
+
+> 
+> But if it is 0.1ms, how can the 8sec delay be caused? That requires 80K hw queues
+> for making so long, so I guess there must be other delay added by the feature
+> of BLK_MQ_F_TAG_HCTX_SHARED.
+
+Please see details in the reasons 2), scsi scan will call
+__scsi_remove_device() a lot of times(each host, each channel, each
+target).
+> 
+>>         cmpxchg
+>>
+>> There are three reasons:
+>> 1) megaraid-sas is using multiple hctxs in v5.10, thus blk_mq_exit_hctx()
+>> will be called much more times in v5.10 compared to v4.19.
+>> 2) scsi will scan for each target thus __scsi_remove_device() will be
+>> called for many times.
+>> 3) blk_mq_clear_flush_rq_mapping() is introduced after v4.19, it will
+>> call cmpxchg() for each request, and function latency is abount 0.1ms.
+>>
+>> Since that blk_mq_clear_flush_rq_mapping() will only be called while the
+>> queue is freezed already, which means there is no inflight request,
+>> it's safe to set NULL for 'tags->rqs[]' directly instead of using
+>> cmpxchg(). Tests show that with this change, function latency of
+>> blk_mq_clear_flush_rq_mapping() is about 1us, and boot time is not
+>> increased.
+> 
+> tags is shared among all LUNs attached to the host, so freezing single
+> request queue here means nothing, so your patch doesn't work.
+
+You'are right, I forgot about that tags can be shared.
+
+> 
+> Please test the following patch, and see if it can improve boot delay for
+> your case.
+> 
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e9bf950983c7..1463076a527c 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -3443,8 +3443,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
+>   	if (blk_mq_hw_queue_mapped(hctx))
+>   		blk_mq_tag_idle(hctx);
+>   
+> -	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
+> -			set->queue_depth, flush_rq);
+> +	if (blk_queue_init_done(q))
+> +		blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
+> +				set->queue_depth, flush_rq);
+>   	if (set->ops->exit_request)
+>   		set->ops->exit_request(set, flush_rq, hctx_idx);
+>   
+
+Thanks for the patch, I test it and boot delay is fixed.
+
+Kuai
+> 
+> 
+> Thanks,
+> Ming
+> 
+> .
+> 
