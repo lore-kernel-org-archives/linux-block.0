@@ -2,84 +2,105 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02773C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 18:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 767E5C43334
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 18:27:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238089AbiFNS0g (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 14:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45944 "EHLO
+        id S1354232AbiFNS1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 14:27:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46576 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238534AbiFNS0f (ORCPT
+        with ESMTP id S1353350AbiFNS1S (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 14:26:35 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 478A733A17
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 11:26:34 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id r5so2532401pgr.3
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 11:26:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=URzV4jleoUWouE1Wp0sYypw+fpessHdkHQsSuiNYtxk=;
-        b=OFY2K2mNiUM7NSpYpDkyzxRw0r14DOpmoQLsWwqsMytbfipelgdZODJExbhB3PvSjQ
-         RjPGLP3UVr0chdD1CGt7Gi0HIGfvi5Wqumi88zXi5bYaIlfKUsTXAHr4fzT8yoi7JQKR
-         7p3+1xn/s7hZRo4nMEjxVBBpBC9O5D8nBqRm6arb5FF0Bx86tNYHHXLMhbUt/ZkBFjHf
-         pKxR6LrAB7szJqg+EXbuA0UQoudHgrEkECygvmYleOkvurWgE/jBeaajIbIJ+/7VPoGI
-         cI8IfM1cpXCLkuQObnpqqOJMf09j8cZSUBuqtZ4BIPMd2Y88+7F8O8X4f0SNsQwikdGm
-         XbXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
-         :references:mime-version:content-disposition:in-reply-to;
-        bh=URzV4jleoUWouE1Wp0sYypw+fpessHdkHQsSuiNYtxk=;
-        b=aNmzEBh1Se3EIZrjT+d6ja+ae35wn2R5UWrvsnQMkSZ8WFd9sJMJX5Ik24kaGo592P
-         ANjr/wS6UVC5kPXo/vKEnR5KFsHu48AyxcUye+jlKRkSDsu2WpbqrBDJC92zOAyU7DlM
-         acUFyER2w6F6vhWcePf3mbKgKVH3UrbqI8urRfQO6mlYENKg4I4Qz4ItZnffYz/zzUyN
-         i2vmY6k6ErZwSHJPFFZDTKIGXQ4GEeE83Yd6id8AltlIM5wnjMHI/PhhYEyVinFn2igT
-         E65GKBeCMuruaK7lSQS0LroBkrSZfNtvDda9iPTnzZ5D1JlqlEECZi17vAxHWoo8saV7
-         /D6w==
-X-Gm-Message-State: AOAM530eC7UcjP9sW6dmCfgY1iNQn5+2I4aJwSLlEB1T1EMDGl5C9kBa
-        HurUB1h1tABuqp2+77SupzE=
-X-Google-Smtp-Source: ABdhPJwcyndvHTQL2WJvQyl0PQ8xr1H5FzP2xAo5AZ6LR8qkhmHsfXe3lneEy5cTMHzua0nTyy4E/Q==
-X-Received: by 2002:a05:6a00:218c:b0:51c:c64:3f6a with SMTP id h12-20020a056a00218c00b0051c0c643f6amr5696086pfi.50.1655231193628;
-        Tue, 14 Jun 2022 11:26:33 -0700 (PDT)
-Received: from localhost ([2620:10d:c090:400::4:d337])
-        by smtp.gmail.com with ESMTPSA id iz20-20020a170902ef9400b00168c52319c3sm7599484plb.149.2022.06.14.11.26.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 14 Jun 2022 11:26:33 -0700 (PDT)
-Sender: Tejun Heo <htejun@gmail.com>
-Date:   Tue, 14 Jun 2022 08:26:31 -1000
-From:   Tejun Heo <tj@kernel.org>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Subject: Re: [PATCH 1/3] blk-iocost: Simplify ioc_rqos_done()
-Message-ID: <YqjS1xysCIj2jBlQ@slm.duckdns.org>
-References: <20220614175725.612878-1-bvanassche@acm.org>
- <20220614175725.612878-2-bvanassche@acm.org>
+        Tue, 14 Jun 2022 14:27:18 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD8B46C9E;
+        Tue, 14 Jun 2022 11:27:16 -0700 (PDT)
+Received: from fraeml708-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LMxdc2MYlz67Zjl;
+        Wed, 15 Jun 2022 02:23:32 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml708-chm.china.huawei.com (10.206.15.36) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 14 Jun 2022 20:27:13 +0200
+Received: from [10.195.33.253] (10.195.33.253) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Tue, 14 Jun 2022 19:27:12 +0100
+Message-ID: <bc567212-af8c-6aba-30ab-fb1b2390e2e4@huawei.com>
+Date:   Tue, 14 Jun 2022 19:30:20 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220614175725.612878-2-bvanassche@acm.org>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH RFC v2 01/18] blk-mq: Add a flag for reserved requests
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <damien.lemoal@opensource.wdc.com>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <brking@us.ibm.com>, <hare@suse.de>,
+        <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <chenxiang66@hisilicon.com>
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-2-git-send-email-john.garry@huawei.com>
+ <1f8e7891-a557-bd8e-221a-6cb14770ea8b@acm.org>
+From:   John Garry <john.garry@huawei.com>
+In-Reply-To: <1f8e7891-a557-bd8e-221a-6cb14770ea8b@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.195.33.253]
+X-ClientProxiedBy: lhreml746-chm.china.huawei.com (10.201.108.196) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 10:57:23AM -0700, Bart Van Assche wrote:
-> Leave out the superfluous "& REQ_OP_MASK" code. The definition of req_op()
-> shows that that code is superfluous:
+On 14/06/2022 19:00, Bart Van Assche wrote:
+> On 6/9/22 03:29, John Garry wrote:
+>> Add a flag for reserved requests so that drivers may know this for any
+>> special handling.
+>>
+>> The 'reserved' argument in blk_mq_ops.timeout callback could now be
+>> replaced by using this flag.
 > 
->  #define req_op(req) ((req)->cmd_flags & REQ_OP_MASK)
+> Why not to combine that change into this patch?
 > 
-> Compile-tested only.
+
+If we remove the 'reserved' argument in blk_mq_ops.timeout callback then 
+we can also remove the 'reserved' member of busy_tag_iter_fn. I gave 
+that all a try and the diffstat looks like this:
+
+  block/blk-mq-debugfs.c              |  2 +-
+  block/blk-mq-tag.c                  | 13 +++++--------
+  block/blk-mq.c                      | 22 +++++++++++++---------
+  block/bsg-lib.c                     |  2 +-
+  drivers/block/mtip32xx/mtip32xx.c   | 11 +++++------
+  drivers/block/nbd.c                 |  5 ++---
+  drivers/block/null_blk/main.c       |  2 +-
+  drivers/infiniband/ulp/srp/ib_srp.c |  3 +--
+  drivers/mmc/core/queue.c            |  3 +--
+  drivers/nvme/host/apple.c           |  3 +--
+  drivers/nvme/host/core.c            |  2 +-
+  drivers/nvme/host/fc.c              |  6 ++----
+  drivers/nvme/host/nvme.h            |  2 +-
+  drivers/nvme/host/pci.c             |  2 +-
+  drivers/nvme/host/rdma.c            |  3 +--
+  drivers/nvme/host/tcp.c             |  3 +--
+  drivers/s390/block/dasd.c           |  2 +-
+  drivers/scsi/aacraid/comminit.c     |  2 +-
+  drivers/scsi/aacraid/linit.c        |  2 +-
+  drivers/scsi/hosts.c                | 14 ++++++--------
+  drivers/scsi/mpi3mr/mpi3mr_os.c     | 15 ++++-----------
+  drivers/scsi/scsi_lib.c             | 12 ++----------
+  include/linux/blk-mq.h              | 10 ++++++++--
+  include/scsi/scsi_host.h            |  2 +-
+  24 files changed, 62 insertions(+), 81 deletions(-)
+
+It would seem sensible to send that all separately and break it down a 
+bit - this series is already almost unmanageable.
+
+> Anyway:
 > 
-> Cc: Tejun Heo <tj@kernel.org>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+> .
 
-Acked-by: Tejun Heo <tj@kernel.org>
-
-Thanks.
-
--- 
-tejun
+Thanks
