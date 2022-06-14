@@ -2,109 +2,109 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F70FC43334
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 11:28:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 174DAC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 13:09:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235910AbiFNL2P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 07:28:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49982 "EHLO
+        id S241156AbiFNNJu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 09:09:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232149AbiFNL2O (ORCPT
+        with ESMTP id S234149AbiFNNJt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 07:28:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 82720393CC
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 04:28:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655206092;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Tue, 14 Jun 2022 09:09:49 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 642B836695
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 06:09:48 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 237FB21A82;
+        Tue, 14 Jun 2022 13:09:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655212187; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=KvXmd4bdqtEG9mUnG5cWrQk4WL5cMwLqoDvFzCaXz38=;
-        b=FkRVsJiOdhj4H6mCtHdX/ZyJhsnrVNTgR7iTBEpF+NpAzm93MK5qaiXf83WuEvj+bU0kdT
-        Drye+Hq6mNVeCo4MuNXm0I7mXTD7J9W2451H0IWGTF/TZatqi0PVto+/GDCnyau9JMjGtO
-        3xs16tJ7WbeoWhebEN+8BY7RqPADn08=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-531-EdLcKhXjNzakwlxRVEPf8g-1; Tue, 14 Jun 2022 07:28:09 -0400
-X-MC-Unique: EdLcKhXjNzakwlxRVEPf8g-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=SZdXDqx2FcKfc5tK2OjYKWz5aChMyNIgpuuDl6ZYhBM=;
+        b=FafK9N7BONdevsgiycxYthmFlmIY3z4oHBs5M+lq+ueLCJI1dRuyDfKfB+WC50MgYoCnL8
+        aWzBefJ0yO5ZSrmwXN++dq1OuOX54ptr709XSwwt0Im6lNRxe3Fy7Gwqezop1WES2KDM/T
+        D5QvjdTtOzijEzPAsdg9fcVH5gD1Hb0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655212187;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SZdXDqx2FcKfc5tK2OjYKWz5aChMyNIgpuuDl6ZYhBM=;
+        b=PlouNPihnOt8s9ccBxRuJTDnmrF7p9PYXXkOkgLF9cl3edXvEqAnNEQmH5qABk8ngk2GDU
+        smZsJH1FXsS3zyDg==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B408529ABA38;
-        Tue, 14 Jun 2022 11:28:08 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A86CB492CA2;
-        Tue, 14 Jun 2022 11:28:04 +0000 (UTC)
-Date:   Tue, 14 Jun 2022 19:27:59 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, shinichiro.kawasaki@wdc.com,
-        dan.j.williams@intel.com, yukuai3@huawei.com,
-        linux-block@vger.kernel.org,
-        syzbot+3e3f419f4a7816471838@syzkaller.appspotmail.com
-Subject: Re: [PATCH 1/4] block: disable the elevator int del_gendisk
-Message-ID: <Yqhwv0POjMi1TNo3@T590>
-References: <20220614074827.458955-1-hch@lst.de>
- <20220614074827.458955-2-hch@lst.de>
- <YqhFiDx0/IW25bSp@T590>
- <20220614083453.GA6999@lst.de>
+        by relay2.suse.de (Postfix) with ESMTPS id C66F32C141;
+        Tue, 14 Jun 2022 13:09:45 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id 705E0A062E; Tue, 14 Jun 2022 15:09:42 +0200 (CEST)
+Date:   Tue, 14 Jun 2022 15:09:42 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        Cixi Geng <cixi.geng1@unisoc.com>, Jan Kara <jack@suse.cz>,
+        Yu Kuai <yukuai3@huawei.com>,
+        Paolo Valente <paolo.valente@unimore.it>
+Subject: Re: [PATCH] block/bfq: Enable I/O statistics
+Message-ID: <20220614130942.q7rekncnyh2pvgbd@quack3.lan>
+References: <20220613163234.3593026-1-bvanassche@acm.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220614083453.GA6999@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+In-Reply-To: <20220613163234.3593026-1-bvanassche@acm.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 10:34:53AM +0200, Christoph Hellwig wrote:
-> On Tue, Jun 14, 2022 at 04:23:36PM +0800, Ming Lei wrote:
-> > >  	blk_sync_queue(q);
-> > >  	blk_flush_integrity();
-> > > +	blk_mq_cancel_work_sync(q);
-> > > +
-> > > +	blk_mq_quiesce_queue(q);
-> > 
-> > quiesce queue adds a bit long delay in del_gendisk, not sure if this way may
-> > cause regression in big machines with lots of disks.
+On Mon 13-06-22 09:32:34, Bart Van Assche wrote:
+> BFQ uses io_start_time_ns. That member variable is only set if I/O
+> statistics are enabled. Hence this patch that enables I/O statistics
+> at the time BFQ is associated with a request queue.
 > 
-> It does.  But at least we remove a freeze in the queue teardown path.
-> But either way I'd really like to get things correct first before
-> looking into optimizations.
-
-The removed one works at atomic mode and it is super fast.
-
+> Compile-tested only.
 > 
-> > 
-> > > +	if (q->elevator) {
-> > > +		mutex_lock(&q->sysfs_lock);
-> > > +		elevator_exit(q);
-> > > +		mutex_unlock(&q->sysfs_lock);
-> > > +	}
-> > > +	rq_qos_exit(q);
-> > > +	blk_mq_unquiesce_queue(q);
-> > 
-> > Also tearing down elevator here has to be carefully, that means any
-> > elevator reference has to hold rcu read lock or .q_usage_counter,
-> > meantime it has to be checked, otherwise use-after-free may be caused.
+> Reported-by: Cixi Geng <cixi.geng1@unisoc.com>
+> Cc: Cixi Geng <cixi.geng1@unisoc.com>
+> Cc: Jan Kara <jack@suse.cz>
+> Cc: Yu Kuai <yukuai3@huawei.com>
+> Cc: Paolo Valente <paolo.valente@unimore.it>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+
+Looks good. Thanks for the fix. Feel free to add:
+
+Reviewed-by: Jan Kara <jack@suse.cz>
+
+								Honza
+
+> ---
+>  block/bfq-iosched.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> This is not a new pattern.  We have the same locking here as a
-> sysfs-induced change of the elevator to none which also clears
-> q->elevator under a queue that is frozen and quiesced.
-
-Then looks this pattern has problem in dealing with the examples I
-mentioned.
-
-And the elevator usage in __blk_mq_update_nr_hw_queues() looks one
-old problem, but easy to fix by protecting it via sysfs_lock.
-
-And fixing blk_mq_has_sqsched() should be easy too.
-
-I will send patches later.
-
-
-Thanks,
-Ming
-
+> diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
+> index 0d46cb728bbf..519862d82473 100644
+> --- a/block/bfq-iosched.c
+> +++ b/block/bfq-iosched.c
+> @@ -7046,6 +7046,7 @@ static void bfq_exit_queue(struct elevator_queue *e)
+>  	spin_unlock_irq(&bfqd->lock);
+>  #endif
+>  
+> +	blk_stat_disable_accounting(bfqd->queue);
+>  	wbt_enable_default(bfqd->queue);
+>  
+>  	kfree(bfqd);
+> @@ -7189,6 +7190,8 @@ static int bfq_init_queue(struct request_queue *q, struct elevator_type *e)
+>  	bfq_init_entity(&bfqd->oom_bfqq.entity, bfqd->root_group);
+>  
+>  	wbt_disable_default(q);
+> +	blk_stat_enable_accounting(q);
+> +
+>  	return 0;
+>  
+>  out_free:
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
