@@ -2,156 +2,63 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E0CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 14:26:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6BECC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 16:39:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244855AbiFNO0U (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 10:26:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44314 "EHLO
+        id S235753AbiFNQj1 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 12:39:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233764AbiFNO0U (ORCPT
+        with ESMTP id S235697AbiFNQj1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 10:26:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 671192D1D1
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 07:26:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655216778;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=3goaNNlZGKcUOSCn63Kmn8EryeqyrRqX2pllfZiGspY=;
-        b=bTvk0nYtVyWEiCyzOVZGqOrif1AsITTFafjsB1Hs9WtGOhibyj3KfqjFRfrWyRunknpDqb
-        4zrHHD7JRty0eSCqxRxcaY+fUA9x2gNnJE9JzpeMsyYwa2f6yCCBhbpS81Ntz2zESmqu65
-        JyP+ubPijc/R0yuizJM/gGkAWdxIjvw=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-189-wAIJXfSKPQOuneiO6ZHBHQ-1; Tue, 14 Jun 2022 10:26:15 -0400
-X-MC-Unique: wAIJXfSKPQOuneiO6ZHBHQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E7DC385A582;
-        Tue, 14 Jun 2022 14:26:13 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 18998492CA2;
-        Tue, 14 Jun 2022 14:26:08 +0000 (UTC)
-Date:   Tue, 14 Jun 2022 22:26:01 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, djeffery@redhat.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com
-Subject: Re: [PATCH -next] blk-mq: fix boot time regression for scsi drives
- with multiple hctx
-Message-ID: <YqiaebRquFDjwcPO@T590>
-References: <20220614071410.3571204-1-yukuai3@huawei.com>
- <Yqg5QxSM+lub8DY0@T590>
- <01cb0e49-1154-33db-f572-3960c972fe08@huawei.com>
+        Tue, 14 Jun 2022 12:39:27 -0400
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83BD7167E0
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 09:39:21 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id h1so8174313plf.11
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 09:39:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=8gfxpJvHcIjCg9eZ7VpKQJ9lwYv6reCJqVJnZWks3cE=;
+        b=mBL9slbn7ELeu0x7oYMTmptUG8ZBj0vScy0IgMMiax7sMwH6ZAmy9XhhMXx1Vti5aA
+         W3TpjtiAk36F68g8O2zJJ4R1HPay345fCGuFDLiN/cobN9osfFPVcxiwLYbtam7yiZkY
+         9ialEUBrf3nMoBwRWGUubYMR5IepLk1EtfsD4ORd8u18Cfw3rYwHd6NFK+f6HUED/Hlh
+         1GjMyANRQsqJI5EpQFBES8h+lRZGKcvQID8QdF8AMhkybC0MfcRlf2kxd4IWZmjWxCC0
+         oPvLaKvcSJUB5DvmcO5ZEx3BIPs0/+iUE3Ff8VZ0/c/yLdxH1IaqjL/4YoDFbh0/u/gz
+         lotw==
+X-Gm-Message-State: AJIora/B10ZxHtASamKYZBY7+EBbouTQbMSVJrDgBJYzHb7nOgouMDS1
+        OJSPpqc9+F9XG+gJ4QungsY=
+X-Google-Smtp-Source: AGRyM1vmYNK+JN+7FV3Iy9BrVVtauHt15Mvwagcwi/WHAsUuZbIsqq5gugNNjIjt2hEv0WETxpOK9w==
+X-Received: by 2002:a17:902:9b83:b0:164:59e:b189 with SMTP id y3-20020a1709029b8300b00164059eb189mr5016967plp.91.1655224760927;
+        Tue, 14 Jun 2022 09:39:20 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:ab60:e1ea:e2eb:c1b6? ([2620:15c:211:201:ab60:e1ea:e2eb:c1b6])
+        by smtp.gmail.com with ESMTPSA id b10-20020a170902bd4a00b00168b7d639acsm7460789plx.170.2022.06.14.09.39.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jun 2022 09:39:19 -0700 (PDT)
+Message-ID: <126e6f2e-a8a9-872e-0efd-668dfaa660c4@acm.org>
+Date:   Tue, 14 Jun 2022 09:39:17 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <01cb0e49-1154-33db-f572-3960c972fe08@huawei.com>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.9
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 1/6] block: factor out a chunk_size_left helper
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+References: <20220614090934.570632-1-hch@lst.de>
+ <20220614090934.570632-2-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220614090934.570632-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 09:15:36PM +0800, Yu Kuai wrote:
-> 在 2022/06/14 15:31, Ming Lei 写道:
-> > On Tue, Jun 14, 2022 at 03:14:10PM +0800, Yu Kuai wrote:
-> > > We found that boot time is increased for about 8s after upgrading kernel
-> > > from v4.19 to v5.10(megaraid-sas is used in the environment).
-> > 
-> > But 'blk-mq: clearing flush request reference in tags->rqs[]' was merged
-> > to v5.14, :-)
-> Hi,
-> 
-> Yes, but this patch is applied to 5.10 stable, thus we backport in our
-> v5.10. Sorry that I didn't mention that.
-> 
-> > 
-> > > 
-> > > Following is where the extra time is spent:
-> > > 
-> > > 
-> > >   __scsi_remove_device
-> > >    blk_cleanup_queue
-> > >     blk_mq_exit_queue
-> > >      blk_mq_exit_hw_queues
-> > >       blk_mq_exit_hctx
-> > >        blk_mq_clear_flush_rq_mapping -> function latency is 0.1ms
-> > 
-> > So queue_depth looks pretty long, is it 4k?
-> No, in the environment, it's just 32, and nr_hw_queues is 128, which
-> means each blk_cleanup_queue() will cost about 10-20 ms.
-
-So 32 * cmpxchg takes 100us, which is really crazy, what is the arch
-and processor?
-
-> 
-> > 
-> > But if it is 0.1ms, how can the 8sec delay be caused? That requires 80K hw queues
-> > for making so long, so I guess there must be other delay added by the feature
-> > of BLK_MQ_F_TAG_HCTX_SHARED.
-> 
-> Please see details in the reasons 2), scsi scan will call
-> __scsi_remove_device() a lot of times(each host, each channel, each
-> target).
-
-80K / 128 = 640 LUNs.
-
-OK, that can be true.
-
-> > 
-> > >         cmpxchg
-> > > 
-> > > There are three reasons:
-> > > 1) megaraid-sas is using multiple hctxs in v5.10, thus blk_mq_exit_hctx()
-> > > will be called much more times in v5.10 compared to v4.19.
-> > > 2) scsi will scan for each target thus __scsi_remove_device() will be
-> > > called for many times.
-> > > 3) blk_mq_clear_flush_rq_mapping() is introduced after v4.19, it will
-> > > call cmpxchg() for each request, and function latency is abount 0.1ms.
-> > > 
-> > > Since that blk_mq_clear_flush_rq_mapping() will only be called while the
-> > > queue is freezed already, which means there is no inflight request,
-> > > it's safe to set NULL for 'tags->rqs[]' directly instead of using
-> > > cmpxchg(). Tests show that with this change, function latency of
-> > > blk_mq_clear_flush_rq_mapping() is about 1us, and boot time is not
-> > > increased.
-> > 
-> > tags is shared among all LUNs attached to the host, so freezing single
-> > request queue here means nothing, so your patch doesn't work.
-> 
-> You'are right, I forgot about that tags can be shared.
-> 
-> > 
-> > Please test the following patch, and see if it can improve boot delay for
-> > your case.
-> > 
-> > diff --git a/block/blk-mq.c b/block/blk-mq.c
-> > index e9bf950983c7..1463076a527c 100644
-> > --- a/block/blk-mq.c
-> > +++ b/block/blk-mq.c
-> > @@ -3443,8 +3443,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
-> >   	if (blk_mq_hw_queue_mapped(hctx))
-> >   		blk_mq_tag_idle(hctx);
-> > -	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-> > -			set->queue_depth, flush_rq);
-> > +	if (blk_queue_init_done(q))
-> > +		blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-> > +				set->queue_depth, flush_rq);
-> >   	if (set->ops->exit_request)
-> >   		set->ops->exit_request(set, flush_rq, hctx_idx);
-> 
-> Thanks for the patch, I test it and boot delay is fixed.
-
-Thanks for the test, and I will send it out tomorrow.
-
-Thanks,
-Ming
-
+On 6/14/22 02:09, Christoph Hellwig wrote:
+> Factor out a helper from blk_max_size_offset so that it can be reused
+> independently. 
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
