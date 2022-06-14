@@ -2,105 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 767E5C43334
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 18:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE13CC43334
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 19:31:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354232AbiFNS1T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 14:27:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46576 "EHLO
+        id S233944AbiFNTbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 15:31:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353350AbiFNS1S (ORCPT
+        with ESMTP id S229676AbiFNTbm (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 14:27:18 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CD8B46C9E;
-        Tue, 14 Jun 2022 11:27:16 -0700 (PDT)
-Received: from fraeml708-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LMxdc2MYlz67Zjl;
-        Wed, 15 Jun 2022 02:23:32 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml708-chm.china.huawei.com (10.206.15.36) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 14 Jun 2022 20:27:13 +0200
-Received: from [10.195.33.253] (10.195.33.253) by
- lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 14 Jun 2022 19:27:12 +0100
-Message-ID: <bc567212-af8c-6aba-30ab-fb1b2390e2e4@huawei.com>
-Date:   Tue, 14 Jun 2022 19:30:20 +0100
+        Tue, 14 Jun 2022 15:31:42 -0400
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8973C1D0EB
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id e11so9438509pfj.5
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=Q6OTJob8vIl7OODLdgfc1ydKz9RBvsEiHyUohJfg4o4=;
+        b=Cd2Hkartfv1CsL+/MtJzuCQeYzSpIXKO1EM7gsSKez2NODdPuDwXUBP2Xtda2SCP7/
+         TjjANmffnsbHAzMyAhDGCME6dycBvs4XiauKXjAUx/vsHK9ZREDyvEZ9+kMKuUtmbi0n
+         g4RbOLQ4LOGOa1XyckZvDCFid8HLmYvH0KMq1FtIp7LTVirU5EfdojpTu++JPGL59drl
+         XR72FDEbj4GXkcvGkn36Mp5JLFhvq4xiaGOK2qSW8CdkHqicy5ZgijrSxkO8rFW3MCZF
+         j0l/yc55ozvOoi+43Ns7HMZ1L+JOrz5Bw/A6Z//FWdSwyK1wQdw706Jua9oFOKIFk/JV
+         dBEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Q6OTJob8vIl7OODLdgfc1ydKz9RBvsEiHyUohJfg4o4=;
+        b=XxHLPv5qSLCL9KMRweAbWeJq7YtjFzwMrFOD+hdiNnWvzQSJl4PMkFh1SVb2tswi5n
+         bma9a1qte5JotvBc87Gs87Qk8EdjLZaZAGV955qazK4Da9tjdXAwvvpIlTgCB5mSBvOE
+         D/+PUeGxaCiX796oBDJu6/fUiiW3Xljw2lSR0aNb5PVhwy4CFgJFQQmcOy505reYFhkw
+         GvavPOhHDd1lXzc7y1DrQ03Uqmv/4feGO8uN43iKbCeqzEk8W2w8UcrVQ02Y+NKrdcu3
+         neshVfCfNiMWf3QPpbyNeyiTVdymEXWXFr0hLKbdsStSA2oBkILr/V82mm+DT0s5Vham
+         qHyg==
+X-Gm-Message-State: AOAM532R7Zda6HrAD4kmaS7O2jMPM70RMsx8F2aVdakUfOD1JB7lfc8A
+        QUVSI2zaFOwi4Ufch5lDixlDBD97Rq3FKg==
+X-Google-Smtp-Source: ABdhPJzPwd/dKv+tN/cOqQE0iNvL5PSAzG6wKthqZFnZevSvdz9eIvy95esCqEc/+Odi/iK8ctDtxQ==
+X-Received: by 2002:a63:82c8:0:b0:406:59b2:b5b2 with SMTP id w191-20020a6382c8000000b0040659b2b5b2mr5906048pgd.302.1655235101006;
+        Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id l13-20020a637c4d000000b003fc5fd21752sm8197347pgn.50.2022.06.14.12.31.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 14 Jun 2022 12:31:40 -0700 (PDT)
+Message-ID: <365606bf-bc4b-dac9-d17a-efacd99de054@kernel.dk>
+Date:   Tue, 14 Jun 2022 13:31:39 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH RFC v2 01/18] blk-mq: Add a flag for reserved requests
-To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
-        <damien.lemoal@opensource.wdc.com>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <brking@us.ibm.com>, <hare@suse.de>,
-        <hch@lst.de>
-CC:     <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
-        <chenxiang66@hisilicon.com>
-References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
- <1654770559-101375-2-git-send-email-john.garry@huawei.com>
- <1f8e7891-a557-bd8e-221a-6cb14770ea8b@acm.org>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <1f8e7891-a557-bd8e-221a-6cb14770ea8b@acm.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 3/3] block: Specify the operation type when calling
+ blk_mq_map_queue()
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220614175725.612878-1-bvanassche@acm.org>
+ <20220614175725.612878-4-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220614175725.612878-4-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.33.253]
-X-ClientProxiedBy: lhreml746-chm.china.huawei.com (10.201.108.196) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 14/06/2022 19:00, Bart Van Assche wrote:
-> On 6/9/22 03:29, John Garry wrote:
->> Add a flag for reserved requests so that drivers may know this for any
->> special handling.
->>
->> The 'reserved' argument in blk_mq_ops.timeout callback could now be
->> replaced by using this flag.
-> 
-> Why not to combine that change into this patch?
-> 
+On 6/14/22 11:57 AM, Bart Van Assche wrote:
+> Since the introduction of blk_mq_get_hctx_type() the operation type in
+> the second argument of blk_mq_get_hctx_type() matters. Make sure that
+> a hardware queue of type HCTX_TYPE_DEFAULT is selected instead of a
+> hardware queue of type HCTX_TYPE_READ.
 
-If we remove the 'reserved' argument in blk_mq_ops.timeout callback then 
-we can also remove the 'reserved' member of busy_tag_iter_fn. I gave 
-that all a try and the diffstat looks like this:
+Just reading this commit message, it only states that we need to make
+sure that a write vs read queue. But not why that is important. Can you
+augment it a little bit?
 
-  block/blk-mq-debugfs.c              |  2 +-
-  block/blk-mq-tag.c                  | 13 +++++--------
-  block/blk-mq.c                      | 22 +++++++++++++---------
-  block/bsg-lib.c                     |  2 +-
-  drivers/block/mtip32xx/mtip32xx.c   | 11 +++++------
-  drivers/block/nbd.c                 |  5 ++---
-  drivers/block/null_blk/main.c       |  2 +-
-  drivers/infiniband/ulp/srp/ib_srp.c |  3 +--
-  drivers/mmc/core/queue.c            |  3 +--
-  drivers/nvme/host/apple.c           |  3 +--
-  drivers/nvme/host/core.c            |  2 +-
-  drivers/nvme/host/fc.c              |  6 ++----
-  drivers/nvme/host/nvme.h            |  2 +-
-  drivers/nvme/host/pci.c             |  2 +-
-  drivers/nvme/host/rdma.c            |  3 +--
-  drivers/nvme/host/tcp.c             |  3 +--
-  drivers/s390/block/dasd.c           |  2 +-
-  drivers/scsi/aacraid/comminit.c     |  2 +-
-  drivers/scsi/aacraid/linit.c        |  2 +-
-  drivers/scsi/hosts.c                | 14 ++++++--------
-  drivers/scsi/mpi3mr/mpi3mr_os.c     | 15 ++++-----------
-  drivers/scsi/scsi_lib.c             | 12 ++----------
-  include/linux/blk-mq.h              | 10 ++++++++--
-  include/scsi/scsi_host.h            |  2 +-
-  24 files changed, 62 insertions(+), 81 deletions(-)
+-- 
+Jens Axboe
 
-It would seem sensible to send that all separately and break it down a 
-bit - this series is already almost unmanageable.
-
-> Anyway:
-> 
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> .
-
-Thanks
