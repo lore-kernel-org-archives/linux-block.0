@@ -2,125 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5F79C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 07:31:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E351C43334
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 07:39:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354527AbiFNHbg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 03:31:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47278 "EHLO
+        id S230187AbiFNHjf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 03:39:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55992 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354502AbiFNHbf (ORCPT
+        with ESMTP id S234289AbiFNHje (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 03:31:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id A9D543E5C8
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 00:31:32 -0700 (PDT)
+        Tue, 14 Jun 2022 03:39:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 24FC431911
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 00:39:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655191891;
+        s=mimecast20190719; t=1655192372;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=2u1UJeCG+WneWifdMmrdhoGBRpopTVWJT/OvMvoPDO4=;
-        b=OxsNwEpQMg4rmbYxtiFLgaj75lcu9bASiLGCx1TrU0RMfK0njgcmovH1QsJXaWAi1uMFWb
-        HG4eWlsL0t+DJjhsnbe5bpxC8HnPYyVL3aVO0dzpidjlV7gzhg76wFWQITW9r9Jx3aHNAm
-        EE5VwFuD7xzKP35c0fzQuDV1U2sh93k=
+        bh=p/bWEyiZpCozkfleSHQ8auR+9PrMiw1OSCsZJihursk=;
+        b=FraizmIS2rmWDnuQ2WOWl4bztbdZWKn0A6ciZfPxqCz1fGEa6L8kH6tTrLfihLPMWc1tgK
+        sYE278kaqjbPPyARK8WdXkzpAD22f1o7FSeRd+3xmg3Fc5nHSRMChqMTHQFcLzIx9l9Oss
+        droDBvM36FcoJ0k8u8r5UptoFg3f1C8=
 Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
  [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-290-4ZXueI-ENXCFF3VJOXoeCA-1; Tue, 14 Jun 2022 03:31:27 -0400
-X-MC-Unique: 4ZXueI-ENXCFF3VJOXoeCA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+ us-mta-149-wbNf4Y5sPmuGAQis424FFA-1; Tue, 14 Jun 2022 03:39:30 -0400
+X-MC-Unique: wbNf4Y5sPmuGAQis424FFA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E9828101A54E;
-        Tue, 14 Jun 2022 07:31:26 +0000 (UTC)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2B6A2811E75;
+        Tue, 14 Jun 2022 07:39:30 +0000 (UTC)
 Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id A581E40EC003;
-        Tue, 14 Jun 2022 07:31:20 +0000 (UTC)
-Date:   Tue, 14 Jun 2022 15:31:15 +0800
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 21EA12026D64;
+        Tue, 14 Jun 2022 07:39:26 +0000 (UTC)
+Date:   Tue, 14 Jun 2022 15:39:22 +0800
 From:   Ming Lei <ming.lei@redhat.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     axboe@kernel.dk, djeffery@redhat.com, bvanassche@acm.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        yi.zhang@huawei.com, ming.lei@redhat.com
-Subject: Re: [PATCH -next] blk-mq: fix boot time regression for scsi drives
- with multiple hctx
-Message-ID: <Yqg5QxSM+lub8DY0@T590>
-References: <20220614071410.3571204-1-yukuai3@huawei.com>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Yi Zhang <yi.zhang@redhat.com>
+Subject: Re: [PATCH] block: fix rq_qos leak for bio based queue
+Message-ID: <Yqg7KqXs38G3i2YY@T590>
+References: <20220614064426.552843-1-ming.lei@redhat.com>
+ <Yqg0w2tC6ac39ayJ@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220614071410.3571204-1-yukuai3@huawei.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.2
+In-Reply-To: <Yqg0w2tC6ac39ayJ@infradead.org>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.4
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 03:14:10PM +0800, Yu Kuai wrote:
-> We found that boot time is increased for about 8s after upgrading kernel
-> from v4.19 to v5.10(megaraid-sas is used in the environment).
-
-But 'blk-mq: clearing flush request reference in tags->rqs[]' was merged
-to v5.14, :-)
-
+On Tue, Jun 14, 2022 at 12:12:03AM -0700, Christoph Hellwig wrote:
+> On Tue, Jun 14, 2022 at 02:44:26PM +0800, Ming Lei wrote:
+> > Commit 5ca7546fe317 ("block: move rq_qos_exit() into disk_release()")
+> > moves rq_qos_exit() to disk_release(), but only done for blk-mq queue.
+> > 
+> > However, now rq qos can be created via blkcg_init_queue() for bio based
+> > queue, so we need to call rq_qos_exit() for bio queue too.
+> > 
+> > In theory, so far, rq_qos is only implemented for request based queue,
+> > and we should only add it for blk-mq queue. However, if using blk-mq
+> > during allocating queue may not be known, fix the rq qos leak issue by
+> > always releasing rq qos for both two kinds of queues.
 > 
-> Following is where the extra time is spent:
-> 
-> scsi_probe_and_add_lun
->  __scsi_remove_device
->   blk_cleanup_queue
->    blk_mq_exit_queue
->     blk_mq_exit_hw_queues
->      blk_mq_exit_hctx
->       blk_mq_clear_flush_rq_mapping -> function latency is 0.1ms
-
-So queue_depth looks pretty long, is it 4k?
-
-But if it is 0.1ms, how can the 8sec delay be caused? That requires 80K hw queues
-for making so long, so I guess there must be other delay added by the feature
-of BLK_MQ_F_TAG_HCTX_SHARED.
-
->        cmpxchg
-> 
-> There are three reasons:
-> 1) megaraid-sas is using multiple hctxs in v5.10, thus blk_mq_exit_hctx()
-> will be called much more times in v5.10 compared to v4.19.
-> 2) scsi will scan for each target thus __scsi_remove_device() will be
-> called for many times.
-> 3) blk_mq_clear_flush_rq_mapping() is introduced after v4.19, it will
-> call cmpxchg() for each request, and function latency is abount 0.1ms.
-> 
-> Since that blk_mq_clear_flush_rq_mapping() will only be called while the
-> queue is freezed already, which means there is no inflight request,
-> it's safe to set NULL for 'tags->rqs[]' directly instead of using
-> cmpxchg(). Tests show that with this change, function latency of
-> blk_mq_clear_flush_rq_mapping() is about 1us, and boot time is not
-> increased.
-
-tags is shared among all LUNs attached to the host, so freezing single
-request queue here means nothing, so your patch doesn't work.
-
-Please test the following patch, and see if it can improve boot delay for
-your case.
-
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9bf950983c7..1463076a527c 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3443,8 +3443,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (blk_mq_hw_queue_mapped(hctx))
- 		blk_mq_tag_idle(hctx);
+> This is also fixed by "block: disable the elevator int del_gendisk"
+> which was just resent yesterday, and fundamentally gets the lifetimes
+> right rather than doctoring around even more.
  
--	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
--			set->queue_depth, flush_rq);
-+	if (blk_queue_init_done(q))
-+		blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-+				set->queue_depth, flush_rq);
- 	if (set->ops->exit_request)
- 		set->ops->exit_request(set, flush_rq, hctx_idx);
- 
+Just checked my block mbox and lore, not see the patch sent from
+yesterday.
 
-
-Thanks,
+Thanks, 
 Ming
 
