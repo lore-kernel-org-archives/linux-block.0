@@ -2,84 +2,55 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30485C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 09:02:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E71A6C43334
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 09:09:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240543AbiFNJCa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 05:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41122 "EHLO
+        id S233174AbiFNJJs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 05:09:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242176AbiFNJC1 (ORCPT
+        with ESMTP id S1350773AbiFNJJq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 05:02:27 -0400
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903C728D;
-        Tue, 14 Jun 2022 02:02:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655197345; x=1686733345;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=w0Lwj0WHXq5DvIM05cukc4RzsTQJxK8reJqxBhNXM9w=;
-  b=GvrtWt1yhC2i2dsNiiMx2ryyFzY+Ev/2ekv2P/jI/26ty3TKRSksrZ9I
-   BupC6ypmX4CspMo8PZwNchQeFKMr1JDmynFWqu++ElNYg/vNfHQj0+czm
-   TdUoHdnSUdZexxV119fp7T9YjUlqqjk/S7x9glsPTNNWcV+jKLcLzALXk
-   K4pYHFmgZuVqdFZ63GZnudGkbQNUFOtQlgkt1KHshx7pRz7aWBdh8zrBe
-   tAa3Fta53/Lnn2AECyHUIqbX2t/HB8rwz06JMt0m+N2+O7O5wdGEvi9Ts
-   SkKAyUPoUGi0/FK4Se2oWXryzIdHfcX8NaZwpe9Ex0/GeVx2iMHDeJaYq
-   A==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10377"; a="364894313"
-X-IronPort-AV: E=Sophos;i="5.91,299,1647327600"; 
-   d="scan'208";a="364894313"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Jun 2022 02:02:24 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,299,1647327600"; 
-   d="scan'208";a="761887848"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by orsmga005.jf.intel.com with ESMTP; 14 Jun 2022 02:02:23 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o12RK-000Lha-9y;
-        Tue, 14 Jun 2022 09:02:22 +0000
-Date:   Tue, 14 Jun 2022 17:01:42 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: Re: [PATCH 01/20] block, blk_filter: enable block device filters
-Message-ID: <202206141610.QsI0Qgur-lkp@intel.com>
-References: <1655135593-1900-2-git-send-email-sergei.shtepa@veeam.com>
+        Tue, 14 Jun 2022 05:09:46 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5233940919
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 02:09:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=fI0tRANQH2nU3PtBFf55+GFG0RwSOinhoWxQkZND0uY=; b=XE2jYITqh3q2aiDYUAJA8pwXv/
+        eibTjnSwfCUzt+FL9Okq4ml800HI3OLzdgLm8oAdy0cR+8ulwmhSil7Poxe1G1kF3kAQ4ryMWD68g
+        VIZkfI+CXi7lABZzGXxX6HLITF8dMMUUk6xpXMxjNEuKSAMt+s9p8yrkFnPOwqOptyyFS3+RQZjJU
+        LH33LLvKDGFLex05yeaptIXPQw/je3uSKejaKIM6f1PjhFe+oYnowhmrLJrC4Dx2tIgfdacyC2FsZ
+        wzkYYWPcf7v71DJWPCUF/rHEBL3eipnUOvb5BUJIjL/W6C/eh0UstCd1owNH3MIzjTYccFqY+Qkz3
+        KsyePyKQ==;
+Received: from [2001:4bb8:180:36f6:1fed:6d48:cf16:d13c] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o12YN-008ZcG-4L; Tue, 14 Jun 2022 09:09:39 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
+        linux-block@vger.kernel.org
+Subject: clean up the chunk_sizehandling helpers a little
+Date:   Tue, 14 Jun 2022 11:09:28 +0200
+Message-Id: <20220614090934.570632-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1655135593-1900-2-git-send-email-sergei.shtepa@veeam.com>
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sergei,
+Hi Jens,
 
-Thank you for the patch! Perhaps something to improve:
+this series cleans up a bunch of block layer helpers related to the chunk
+size.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on v5.19-rc2 next-20220614]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Sergei-Shtepa/blksnap-creating-non-persistent-snapshots-for-backup/20220614-025950
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: openrisc-randconfig-c023-20220613 (https://download.01.org/0day-ci/archive/20220614/202206141610.QsI0Qgur-lkp@intel.com/config)
-compiler: or1k-linux-gcc (GCC) 11.3.0
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-
-cocci warnings: (new ones prefixed by >>)
->> block/blk-core.c:792:3-4: Unneeded semicolon
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+Diffstat:
+ block/blk-merge.c      |   28 ++++++++++++++++------------
+ block/blk.h            |   13 +++++++++++++
+ drivers/md/dm.c        |   17 ++++++-----------
+ include/linux/blkdev.h |   39 +++++++--------------------------------
+ 4 files changed, 42 insertions(+), 55 deletions(-)
