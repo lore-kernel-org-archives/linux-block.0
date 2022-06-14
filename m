@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0AEC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 23:29:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C38AFC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 23:40:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234627AbiFNX30 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 19:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50622 "EHLO
+        id S232221AbiFNXkP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 19:40:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232918AbiFNX3Z (ORCPT
+        with ESMTP id S230343AbiFNXkO (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 19:29:25 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4129C4AE06
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 16:29:23 -0700 (PDT)
+        Tue, 14 Jun 2022 19:40:14 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E8644ECC0
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 16:40:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655249364; x=1686785364;
+  t=1655250013; x=1686786013;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=+XncXI8eMEeyF1rceibLDKgbRoZqSqmlCtN38028VBg=;
-  b=IpkJKRoLyoi8IlHsHJcUBjh1o0MLBCNV3rqSKUQRtu1sSJ1ugz3RrBKb
-   yynkvw7uVNRaK6Cl2eymHXbCOcnAk89ctrt2J319fp9hv+JxbbEmtVBGV
-   bBbIPVRKJxPEDgpof/rofQXByzO89Nq79WLHuV/ShwUk1chaW0yFrCcZT
-   rBmU3+OW/DEG48S6TlhNy86EPo+/DuBNRdwPbTaxxdkpjKB3CYHhNqXMm
-   4Egge0XxYHPEi8cg8EiiJOMwjISvwFy4Z0xFKEi+i+6D7B6PFYKtAvx5M
-   7/sTUuNIOm056twDdiJ1C5hjC3O7j8BMJs7zkBSeIriVURHiWrrHAgDPZ
-   A==;
+  bh=PuylZKQ7uT6jPu6TT451nQIoW9XVuF7UsaTzxmAADZg=;
+  b=IVDytOw1M793bdPwjH7iswr+/7JRg3PGWp2yOuOB31ytSUP0baFR5Sq4
+   lmsWHVBKd9Q4l7CTsyKA/NXP06VDaPhz2HpnrdH+gUVbGcTbkvvB4GlXq
+   qKzHssv2GUTY+geIfSNoWps/47sq8dZ+DeXZ+KiD/8KBOCJh63arvx+Cx
+   pOnOslV6O1laPRXUaOKocjUOMNo9w45pl/QAz1dRzwwPXfERDJIquUAQp
+   Dqm9Gquhdvu9RGrUoid9Anubn0yoOsgt3/W+MdWxlF5CUjyzAf6SpM0ZT
+   C0YmRHVZWuIf1SpoiHtg3mWQShuRFrpwY7qGT5H5YChJBVW2egrAhX//w
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.91,300,1647273600"; 
-   d="scan'208";a="203935561"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Jun 2022 07:29:23 +0800
-IronPort-SDR: 3v1+jmPAaHcCl6vMxX1l1tV4KN8hTiqkANfXKlJGUnHvt0RnIwod9e/Zh2oa694WubkZPLtNmp
- G+RUeY07hYHEl8Cc/XAzsqjKYIE48OFylDxHqw2vcwslKSMg7yt7t88tdCVbJJGYNBXcEMrk0m
- 9GfuosUR8zj18PS5Fgti6iJWMGWmOlrL6+QgG8E6n0QdQz39wgrKKuFjsZWrA8Li1Ps96FW611
- kHZMszyS7fkdEAMiuYROeJcvrxBQG2iGI9JcHPlx9KgElpyA0Tmfr6Rn8To/fG81Y+jSRkPg+w
- kQgHTCkwImbp7ll/JKztd41L
+   d="scan'208";a="307462102"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jun 2022 07:40:12 +0800
+IronPort-SDR: gfiih5BB4gBpMSaquaYLsKe7nmKWpgrARJu3qo9OmeAssM3JNkIY1cOAkW9W8FgSF2A5TBlWMa
+ vdnes1asj7aTYAJgWsJDodWV1vjjxzzJ2jA9v05Aa7V4ybshfJYTYLLq5kpAVS4UTJMVW2jFPm
+ lfzaHl9v/qAuloozqknwNxWyhsCCVH1k3YJV21b/Y9D6ty8I8AnxjSBgMzeTVougIQFg1v+DiJ
+ Z3egEJkhehnOq0TWTmEo64EDXW5QpkZhlamTc4pwgqDKIiMUw0zsNyOfYGSb9CSuuOQy1Erqgf
+ w6v1r3DqYll4g2QtPbxFOhzb
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 15:47:57 -0700
-IronPort-SDR: Z6eHK9bo29bFP/1qjQgDxOWD4LP6qxVjvb2YAHoTewpFHIjMY7u6QLCRWfy1R7BF/Ord9FQHpS
- Dh9a9VJGcxN8KcjtgFxfxxUWZvpH1J0MB3qbzQMDk0GyZZt6ps1+cXtmi457QGvp3ugJh6P7fD
- uO7lt4Cau8eitcqHrLkibt3mKPYgTwbs7MdM/fE64hExnLENR93Wr+EK61n3x9LIme6m5kR+WY
- iaoOkQlKl1oNXIfeQ3CFrvKGoIatAdwbeQoDtb3NyQfSXBAppFJZ+I+8FD4U3NrMuHC0fcCBTo
- b4c=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 16:03:10 -0700
+IronPort-SDR: zoae6i8/EElwJ8wXaDREjArWx9l8KghJBD+OVKkbyWJYjV7a3a/ESuLIYwtTepOKXAsyreTl0c
+ SBFqRLz4f2oY/rwGxcmr8MXpi9dRUoaAh1himzMfiAz4xGFJ4OH0Hg0lCEprMk7B2om6OTWbaC
+ 11FGBlwHZ5CFEjxGyy9g0laGbK/+HQXEdIkbkezOG8Zv5swOIopQ5k3JZS/+sXo7y+D1UXpXTD
+ hxnBbwJH3p7P62c9E6IhC6s2Lo4mnbafzut/RAJC2fZ4oUxRIB71lkZsyyAaCP2W2T1GykpUuy
+ Th4=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 16:29:23 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 16:40:13 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LN4QV69LTz1Rwrw
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 16:29:22 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LN4g02hsRz1Rvlx
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 16:40:12 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,27 +57,27 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655249362; x=1657841363; bh=+XncXI8eMEeyF1rceibLDKgbRoZqSqmlCtN
-        38028VBg=; b=t5PzsPtq6aUvX0JdlBjTXgPYIJSlXomEx38+pzCL6TGWPY/z6xB
-        DO9V54vemSG4eA6ajhpM48V/OnYldYWfo5G+lcfI8iFgDXUwaWAU77Vumi5UwxTr
-        oPbhjasxFScstDDiQncqV2oKEMCPdWtDy68BC/vOgDEEevzDS9bnL56AO0UkQfEc
-        q1JjPAILMuyHNL5Bg8ORKxKDd9MrQviUSPyOmt9Ja5WB+xSXvpbiAjdZmmrlwz4I
-        nNZO8Gjl8KyZ6dJ5zOsUU/Mgs4T72bahlcNPzZ3OD9+lLRb3xnj0jbNl3AVAMVzD
-        QcD2QHDBdfuxvjqfHeR8V6IFGwGR2uoqbVw==
+        1655250011; x=1657842012; bh=PuylZKQ7uT6jPu6TT451nQIoW9XVuF7UsaT
+        zxmAADZg=; b=bOZeyQzVfgFR66elM+gdaM2VtVY+yyhjEEoNnd3eNPEDiWbJ3lr
+        lKRK53ob4D2sfC4AyznsZjKY5TxguNlkxPQsL70WURUAJHcWwy2Yjh3l+jrFgLKW
+        9hv15D7RDQ8sEDtqsJI4m/Fsf7TVxesjh9+WJG8dViqe+X2Xn028Uwn/PLa1Pg2g
+        7T87uHoFA96TJc1xDJx97iTf76nMoRy/sxuPcT7d6f4j8FIe1+PD7IS67N12+2T2
+        Nq6W8nHBSvtIGL7ZD5FC1tiSMZhz9sc+rVV8r2+ifNpW7BTT7PjQe792p3NuE4wH
+        4sw0Lf1QL07jrEZsKwxoMCssRYS7ZVEmBrQ==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id LJgoFBrKCwwo for <linux-block@vger.kernel.org>;
-        Tue, 14 Jun 2022 16:29:22 -0700 (PDT)
+        with ESMTP id 1fvOQ1uBCC1n for <linux-block@vger.kernel.org>;
+        Tue, 14 Jun 2022 16:40:11 -0700 (PDT)
 Received: from [10.225.163.81] (unknown [10.225.163.81])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LN4QS6XlJz1Rvlc;
-        Tue, 14 Jun 2022 16:29:20 -0700 (PDT)
-Message-ID: <399e595b-06d2-ceb1-1b42-2a98a7724320@opensource.wdc.com>
-Date:   Wed, 15 Jun 2022 08:29:19 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LN4fx5nyrz1Rvlc;
+        Tue, 14 Jun 2022 16:40:09 -0700 (PDT)
+Message-ID: <582c6c13-9bed-f4b8-ddfa-55071d32b4cc@opensource.wdc.com>
+Date:   Wed, 15 Jun 2022 08:40:08 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH 2/5] scsi: Retry unaligned zoned writes
+Subject: Re: [PATCH 5/5] block/mq-deadline: Remove zone locking
 Content-Language: en-US
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -86,10 +86,10 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Khazhy Kumykov <khazhy@google.com>,
         Jaegeuk Kim <jaegeuk@kernel.org>
 References: <20220614174943.611369-1-bvanassche@acm.org>
- <20220614174943.611369-3-bvanassche@acm.org>
+ <20220614174943.611369-6-bvanassche@acm.org>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220614174943.611369-3-bvanassche@acm.org>
+In-Reply-To: <20220614174943.611369-6-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -97,67 +97,203 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/15/22 02:49, Bart Van Assche wrote:
-> From ZBC-2: "The device server terminates with CHECK CONDITION status, with
-> the sense key set to ILLEGAL REQUEST, and the additional sense code set to
-> UNALIGNED WRITE COMMAND a write command, other than an entire medium write
-> same command, that specifies: a) the starting LBA in a sequential write
-> required zone set to a value that is not equal to the write pointer for that
-> sequential write required zone; or b) an ending LBA that is not equal to the
-> last logical block within a physical block (see SBC-5)."
-> 
-> I am not aware of any other conditions that may trigger the UNALIGNED
-> WRITE COMMAND response.
-> 
-> Retry unaligned writes in preparation of removing zone locking.
+> Measurements have shown that limiting the queue depth to one has a
+> significant negative performance impact on zoned UFS devices. Hence this
+> patch that removes zone locking from the mq-deadline scheduler. This
+> patch is based on the following assumptions:
+> - Applications submit write requests to sequential write required zones
+>   in order.
+> - If such write requests get reordered by the software or hardware queue
+>   mechanism, nr_hw_queues * nr_requests - 1 retries are sufficient to
+>   reorder the write requests.
 
-Arg. No. No way. AHCI will totally break with that because most AHCI
-adapters do not send commands to the drive in the order they are delivered
-to the LLD. In more details, the order in which tag bit in the AHCI ready
-register are set does not determine the order of command delivery to the
-disk. So if zone locking is removed, you constantly get unaligned write
-errors.
+As mentioned in my previous reply for patch 2, AHCI will not behave like
+that, at all. Retrying will be useless most of the time because the
+adapter send commands to the drive randomly from the set of commands that
+are marked ready in the ready register. So no. I am opposed to
+unconditionally removing zone write locking.
+
+If UFS LLD can deliver commands in order then use a queue flag to say
+"zone write locking not needed" to disable it for that device class. There
+probably are some SAS HBAs that could benefit from this too, but I have
+seen so many reordering bugs with these (e.g. requeue at tail of a write
+that got a TSF) that I would not want to remove zone write locking for these.
+
+And I also do not want to start getting 10 calls a day from customers
+complaining about very bad write performance due to all these retries
+which are likely going to be slower in the end than writing at QD=1 per zone.
+
+> - It happens infrequently that zoned write requests are reordered by the
+>   block layer.
+
+What make you say that ? It only takes 2 contexts trying to dispatch
+commands to different queues. Or a write process being rescheduled to a
+different CPU/queue.
+
+> - Either no I/O scheduler is used or an I/O scheduler is used that
+>   submits write requests per zone in LBA order.
+
+And unfortunately, as the AHCI example shows, having the scheduler
+dispatch requests in LBA order is not enough.
 
 > 
-> Increase the number of retries for write commands sent to a sequential
-> zone to the maximum number of outstanding commands.
+> DD_BE_PRIO is selected for sequential writes to preserve the LBA order.
+
+So if the application wanted the writes to have RT policy so that these
+commands get the high priority bit set on SATA disks, that will not be
+honored. No to that too.
+
 > 
-> Cc: Martin K. Petersen <martin.petersen@oracle.com>
+> See also commit 5700f69178e9 ("mq-deadline: Introduce zone locking
+> support").
+> 
+> Cc: Damien Le Moal <damien.lemoal@wdc.com>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  drivers/scsi/scsi_error.c | 6 ++++++
->  drivers/scsi/sd.c         | 2 ++
->  2 files changed, 8 insertions(+)
+>  block/mq-deadline.c | 74 ++++-----------------------------------------
+>  1 file changed, 6 insertions(+), 68 deletions(-)
 > 
-> diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> index 49ef864df581..8e22d4ba22a3 100644
-> --- a/drivers/scsi/scsi_error.c
-> +++ b/drivers/scsi/scsi_error.c
-> @@ -674,6 +674,12 @@ enum scsi_disposition scsi_check_sense(struct scsi_cmnd *scmd)
->  		fallthrough;
+> diff --git a/block/mq-deadline.c b/block/mq-deadline.c
+> index 6ed602b2f80a..e168fc9a980a 100644
+> --- a/block/mq-deadline.c
+> +++ b/block/mq-deadline.c
+> @@ -104,7 +104,6 @@ struct deadline_data {
+>  	int prio_aging_expire;
 >  
->  	case ILLEGAL_REQUEST:
-> +		/*
-> +		 * Unaligned write command. Retry immediately to handle
-> +		 * out-of-order zoned writes.
-> +		 */
-> +		if (sshdr.asc == 0x21 && sshdr.ascq == 0x04)
-> +			return NEEDS_RETRY;
->  		if (sshdr.asc == 0x20 || /* Invalid command operation code */
->  		    sshdr.asc == 0x21 || /* Logical block address out of range */
->  		    sshdr.asc == 0x22 || /* Invalid function */
-> diff --git a/drivers/scsi/sd.c b/drivers/scsi/sd.c
-> index a1a2ac09066f..8d68bd20723e 100644
-> --- a/drivers/scsi/sd.c
-> +++ b/drivers/scsi/sd.c
-> @@ -1202,6 +1202,8 @@ static blk_status_t sd_setup_read_write_cmnd(struct scsi_cmnd *cmd)
->  	cmd->transfersize = sdp->sector_size;
->  	cmd->underflow = nr_blocks << 9;
->  	cmd->allowed = sdkp->max_retries;
-> +	if (blk_rq_is_seq_write(rq))
-> +		cmd->allowed += rq->q->nr_hw_queues * rq->q->nr_requests;
->  	cmd->sdb.length = nr_blocks * sdp->sector_size;
+>  	spinlock_t lock;
+> -	spinlock_t zone_lock;
+>  };
 >  
->  	SCSI_LOG_HLQUEUE(1,
+>  /* Maps an I/O priority class to a deadline scheduler priority. */
+> @@ -285,30 +284,10 @@ static struct request *
+>  deadline_fifo_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>  		      enum dd_data_dir data_dir)
+>  {
+> -	struct request *rq;
+> -	unsigned long flags;
+> -
+>  	if (list_empty(&per_prio->fifo_list[data_dir]))
+>  		return NULL;
+>  
+> -	rq = rq_entry_fifo(per_prio->fifo_list[data_dir].next);
+> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
+> -		return rq;
+> -
+> -	/*
+> -	 * Look for a write request that can be dispatched, that is one with
+> -	 * an unlocked target zone.
+> -	 */
+> -	spin_lock_irqsave(&dd->zone_lock, flags);
+> -	list_for_each_entry(rq, &per_prio->fifo_list[DD_WRITE], queuelist) {
+> -		if (blk_req_can_dispatch_to_zone(rq))
+> -			goto out;
+> -	}
+> -	rq = NULL;
+> -out:
+> -	spin_unlock_irqrestore(&dd->zone_lock, flags);
+> -
+> -	return rq;
+> +	return rq_entry_fifo(per_prio->fifo_list[data_dir].next);
+>  }
+>  
+>  /*
+> @@ -319,29 +298,7 @@ static struct request *
+>  deadline_next_request(struct deadline_data *dd, struct dd_per_prio *per_prio,
+>  		      enum dd_data_dir data_dir)
+>  {
+> -	struct request *rq;
+> -	unsigned long flags;
+> -
+> -	rq = per_prio->next_rq[data_dir];
+> -	if (!rq)
+> -		return NULL;
+> -
+> -	if (data_dir == DD_READ || !blk_queue_is_zoned(rq->q))
+> -		return rq;
+> -
+> -	/*
+> -	 * Look for a write request that can be dispatched, that is one with
+> -	 * an unlocked target zone.
+> -	 */
+> -	spin_lock_irqsave(&dd->zone_lock, flags);
+> -	while (rq) {
+> -		if (blk_req_can_dispatch_to_zone(rq))
+> -			break;
+> -		rq = deadline_latter_request(rq);
+> -	}
+> -	spin_unlock_irqrestore(&dd->zone_lock, flags);
+> -
+> -	return rq;
+> +	return per_prio->next_rq[data_dir];
+>  }
+>  
+>  /*
+> @@ -467,10 +424,6 @@ static struct request *__dd_dispatch_request(struct deadline_data *dd,
+>  	ioprio_class = dd_rq_ioclass(rq);
+>  	prio = ioprio_class_to_prio[ioprio_class];
+>  	dd->per_prio[prio].stats.dispatched++;
+> -	/*
+> -	 * If the request needs its target zone locked, do it.
+> -	 */
+> -	blk_req_zone_write_lock(rq);
+>  	rq->rq_flags |= RQF_STARTED;
+>  	return rq;
+>  }
+> @@ -640,7 +593,6 @@ static int dd_init_sched(struct request_queue *q, struct elevator_type *e)
+>  	dd->fifo_batch = fifo_batch;
+>  	dd->prio_aging_expire = prio_aging_expire;
+>  	spin_lock_init(&dd->lock);
+> -	spin_lock_init(&dd->zone_lock);
+>  
+>  	q->elevator = eq;
+>  	return 0;
+> @@ -716,17 +668,13 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  	u8 ioprio_class = IOPRIO_PRIO_CLASS(ioprio);
+>  	struct dd_per_prio *per_prio;
+>  	enum dd_prio prio;
+> +	bool seq_write = blk_rq_is_seq_write(rq);
+>  	LIST_HEAD(free);
+>  
+>  	lockdep_assert_held(&dd->lock);
+>  
+> -	/*
+> -	 * This may be a requeue of a write request that has locked its
+> -	 * target zone. If it is the case, this releases the zone lock.
+> -	 */
+> -	blk_req_zone_write_unlock(rq);
+> -
+> -	prio = ioprio_class_to_prio[ioprio_class];
+> +	prio = seq_write ? DD_BE_PRIO :
+> +		ioprio_class_to_prio[ioprio_class];
+>  	per_prio = &dd->per_prio[prio];
+>  	if (!rq->elv.priv[0]) {
+>  		per_prio->stats.inserted++;
+> @@ -740,7 +688,7 @@ static void dd_insert_request(struct blk_mq_hw_ctx *hctx, struct request *rq,
+>  
+>  	trace_block_rq_insert(rq);
+>  
+> -	if (at_head) {
+> +	if (at_head && !seq_write) {
+>  		list_add(&rq->queuelist, &per_prio->dispatch);
+>  		rq->fifo_time = jiffies;
+>  	} else {
+> @@ -819,16 +767,6 @@ static void dd_finish_request(struct request *rq)
+>  		return;
+>  
+>  	atomic_inc(&per_prio->stats.completed);
+> -
+> -	if (blk_queue_is_zoned(q)) {
+> -		unsigned long flags;
+> -
+> -		spin_lock_irqsave(&dd->zone_lock, flags);
+> -		blk_req_zone_write_unlock(rq);
+> -		if (!list_empty(&per_prio->fifo_list[DD_WRITE]))
+> -			blk_mq_sched_mark_restart_hctx(rq->mq_hctx);
+> -		spin_unlock_irqrestore(&dd->zone_lock, flags);
+> -	}
+>  }
+>  
+>  static bool dd_has_work_for_prio(struct dd_per_prio *per_prio)
 
 
 -- 
