@@ -2,84 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE13CC43334
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 19:31:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24610CCA47A
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 19:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233944AbiFNTbn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 15:31:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41632 "EHLO
+        id S234344AbiFNTdO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 15:33:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbiFNTbm (ORCPT
+        with ESMTP id S229676AbiFNTdN (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 15:31:42 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8973C1D0EB
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id e11so9438509pfj.5
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=Q6OTJob8vIl7OODLdgfc1ydKz9RBvsEiHyUohJfg4o4=;
-        b=Cd2Hkartfv1CsL+/MtJzuCQeYzSpIXKO1EM7gsSKez2NODdPuDwXUBP2Xtda2SCP7/
-         TjjANmffnsbHAzMyAhDGCME6dycBvs4XiauKXjAUx/vsHK9ZREDyvEZ9+kMKuUtmbi0n
-         g4RbOLQ4LOGOa1XyckZvDCFid8HLmYvH0KMq1FtIp7LTVirU5EfdojpTu++JPGL59drl
-         XR72FDEbj4GXkcvGkn36Mp5JLFhvq4xiaGOK2qSW8CdkHqicy5ZgijrSxkO8rFW3MCZF
-         j0l/yc55ozvOoi+43Ns7HMZ1L+JOrz5Bw/A6Z//FWdSwyK1wQdw706Jua9oFOKIFk/JV
-         dBEA==
+        Tue, 14 Jun 2022 15:33:13 -0400
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B9819F8D;
+        Tue, 14 Jun 2022 12:33:11 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id v11-20020a17090a4ecb00b001e2c5b837ccso12745973pjl.3;
+        Tue, 14 Jun 2022 12:33:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=Q6OTJob8vIl7OODLdgfc1ydKz9RBvsEiHyUohJfg4o4=;
-        b=XxHLPv5qSLCL9KMRweAbWeJq7YtjFzwMrFOD+hdiNnWvzQSJl4PMkFh1SVb2tswi5n
-         bma9a1qte5JotvBc87Gs87Qk8EdjLZaZAGV955qazK4Da9tjdXAwvvpIlTgCB5mSBvOE
-         D/+PUeGxaCiX796oBDJu6/fUiiW3Xljw2lSR0aNb5PVhwy4CFgJFQQmcOy505reYFhkw
-         GvavPOhHDd1lXzc7y1DrQ03Uqmv/4feGO8uN43iKbCeqzEk8W2w8UcrVQ02Y+NKrdcu3
-         neshVfCfNiMWf3QPpbyNeyiTVdymEXWXFr0hLKbdsStSA2oBkILr/V82mm+DT0s5Vham
-         qHyg==
-X-Gm-Message-State: AOAM532R7Zda6HrAD4kmaS7O2jMPM70RMsx8F2aVdakUfOD1JB7lfc8A
-        QUVSI2zaFOwi4Ufch5lDixlDBD97Rq3FKg==
-X-Google-Smtp-Source: ABdhPJzPwd/dKv+tN/cOqQE0iNvL5PSAzG6wKthqZFnZevSvdz9eIvy95esCqEc/+Odi/iK8ctDtxQ==
-X-Received: by 2002:a63:82c8:0:b0:406:59b2:b5b2 with SMTP id w191-20020a6382c8000000b0040659b2b5b2mr5906048pgd.302.1655235101006;
-        Tue, 14 Jun 2022 12:31:41 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id l13-20020a637c4d000000b003fc5fd21752sm8197347pgn.50.2022.06.14.12.31.39
+        bh=0yuY33WdxMB76iynhvTSZPcdcuymbepOOB6v4k/PQOY=;
+        b=jbB+qjSucecXj/HEgCIw1t9EsXmppQ+DavJNYSpUNrariNuH3b/MN6vnNGUdupzrv7
+         Ts0oisAV493ABkX7o5r7XccRpuoTotG9aYWaLeuZGI5NEEZXg5xfH8Etn/oGwBlELKIw
+         TwFDZQIkZR1UsNS3pH4oJd13pgkrt18JLVnTkjk4bOcTyHifJQa2WUIi1z0Kl8sYWRpJ
+         MgV5Npe92Yhbs0SFQkMYx1XllUWHvxta87xXoEo8DX4zVvAgCFprz/61JCFbRLimYkZm
+         0TJQNlQbQOd+0rkt+/RR5M9wFXZg/BRG7CbluA+SR9ofD3E8XaLaWoUvQr6afvSgr/zb
+         jlJw==
+X-Gm-Message-State: AJIora8eDAXkXliL2whctKXAYlQ8Lf1nlHvLBa3mSBrA2fNN3yX/Z7Wy
+        N/cfMLZaKfOSc3sJ38NCO019JbLPqIk=
+X-Google-Smtp-Source: AGRyM1s5w76ZfqYj/+26pMyhfynVA754uE8tmVNVmVHD3j64emOukGeeDvplcoiOLZ4wwUSbu4tMLA==
+X-Received: by 2002:a17:90a:e50c:b0:1ea:14c1:2236 with SMTP id t12-20020a17090ae50c00b001ea14c12236mr6274836pjy.2.1655235190627;
+        Tue, 14 Jun 2022 12:33:10 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:ab60:e1ea:e2eb:c1b6? ([2620:15c:211:201:ab60:e1ea:e2eb:c1b6])
+        by smtp.gmail.com with ESMTPSA id kv18-20020a17090b169200b001ea629a431bsm7969640pjb.8.2022.06.14.12.33.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 14 Jun 2022 12:31:40 -0700 (PDT)
-Message-ID: <365606bf-bc4b-dac9-d17a-efacd99de054@kernel.dk>
-Date:   Tue, 14 Jun 2022 13:31:39 -0600
+        Tue, 14 Jun 2022 12:33:09 -0700 (PDT)
+Message-ID: <b61d3687-70ea-1ab7-63e1-44e381d36012@acm.org>
+Date:   Tue, 14 Jun 2022 12:33:07 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 3/3] block: Specify the operation type when calling
- blk_mq_map_queue()
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH RFC v2 02/18] scsi: core: Resurrect
+ scsi_{get,free}_host_dev()
 Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220614175725.612878-1-bvanassche@acm.org>
- <20220614175725.612878-4-bvanassche@acm.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220614175725.612878-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
+To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
+        damien.lemoal@opensource.wdc.com, jejb@linux.ibm.com,
+        martin.petersen@oracle.com, brking@us.ibm.com, hare@suse.de,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        chenxiang66@hisilicon.com
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-3-git-send-email-john.garry@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <1654770559-101375-3-git-send-email-john.garry@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/22 11:57 AM, Bart Van Assche wrote:
-> Since the introduction of blk_mq_get_hctx_type() the operation type in
-> the second argument of blk_mq_get_hctx_type() matters. Make sure that
-> a hardware queue of type HCTX_TYPE_DEFAULT is selected instead of a
-> hardware queue of type HCTX_TYPE_READ.
+On 6/9/22 03:29, John Garry wrote:
+> +/**
+> + * scsi_get_host_dev - Create a scsi_device that points to the host adapter itself
+                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+What does this mean? That part of the function description is not
+clear to me.
 
-Just reading this commit message, it only states that we need to make
-sure that a write vs read queue. But not why that is important. Can you
-augment it a little bit?
+> + * @shost: Host that needs a scsi_device
+                               ^^^^^^^^^^^^^
+This is not detailed enough. Consider changing "a scsi_device" into
+"a scsi device for allocating reserved commands from".
 
--- 
-Jens Axboe
+> + *
+> + * Lock status: None assumed.
+> + *
+> + * Returns:     The scsi_device or NULL
+> + *
+> + * Notes:
+> + *	Attach a single scsi_device to the Scsi_Host - this should
+> + *	be made to look like a "pseudo-device" that points to the
+> + *	HA itself.
+> + *
+> + *	Note - this device is not accessible from any high-level
+> + *	drivers (including generics), which is probably not
+> + *	optimal.  We can add hooks later to attach.
 
+The "which is probably not optimal. We can add hooks later to attach."
+part probably should be moved to the patch description.
+
+> + */
+> +struct scsi_device *scsi_get_host_dev(struct Scsi_Host *shost)
+> +{
+> +	struct scsi_device *sdev = NULL;
+> +	struct scsi_target *starget;
+> +
+> +	mutex_lock(&shost->scan_mutex);
+> +	if (!scsi_host_scan_allowed(shost))
+> +		goto out;
+> +	starget = scsi_alloc_target(&shost->shost_gendev, 0, shost->this_id);
+                                                           ^^^^^^^^^^^^^^^^^^
+Is it guaranteed that this channel / id combination will not be used for
+any other SCSI device?
+
+What if shost->this_id == -1?
+
+> +	if (!starget)
+> +		goto out;
+> +
+> +	sdev = scsi_alloc_sdev(starget, 0, NULL);
+> +	if (sdev)
+> +		sdev->borken = 0;
+> +	else
+> +		scsi_target_reap(starget);
+> +	put_device(&starget->dev);
+> + out:
+> +	mutex_unlock(&shost->scan_mutex);
+> +	return sdev;
+> +}
+> +EXPORT_SYMBOL(scsi_get_host_dev);
+
+Elsewhere in the SCSI core "get..dev" means increment the reference count of
+a SCSI device. Maybe scsi_alloc_host_dev() is a better name?
+
+> +/*
+> + * These two functions are used to allocate and free a pseudo device
+> + * which will connect to the host adapter itself rather than any
+> + * physical device.  You must deallocate when you are done with the
+> + * thing.  This physical pseudo-device isn't real and won't be available
+> + * from any high-level drivers.
+> + */
+
+Please keep function comments in .c files because that makes it more likely
+that the comment and the implementation will remain in sync.
+
+Thanks,
+
+Bart.
