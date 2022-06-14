@@ -2,142 +2,79 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C53C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 13:15:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 169FDC43334
+	for <linux-block@archiver.kernel.org>; Tue, 14 Jun 2022 13:16:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236188AbiFNNPo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 09:15:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33546 "EHLO
+        id S233395AbiFNNQG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 14 Jun 2022 09:16:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233395AbiFNNPn (ORCPT
+        with ESMTP id S243990AbiFNNQD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 09:15:43 -0400
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55F24369FA;
-        Tue, 14 Jun 2022 06:15:40 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4LMpn60vbzzjY3r;
-        Tue, 14 Jun 2022 21:14:34 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 14 Jun 2022 21:15:38 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Tue, 14 Jun 2022 21:15:37 +0800
-Subject: Re: [PATCH -next] blk-mq: fix boot time regression for scsi drives
- with multiple hctx
-To:     Ming Lei <ming.lei@redhat.com>
-CC:     <axboe@kernel.dk>, <djeffery@redhat.com>, <bvanassche@acm.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220614071410.3571204-1-yukuai3@huawei.com>
- <Yqg5QxSM+lub8DY0@T590>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <01cb0e49-1154-33db-f572-3960c972fe08@huawei.com>
-Date:   Tue, 14 Jun 2022 21:15:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Tue, 14 Jun 2022 09:16:03 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F4F536E14
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 06:16:00 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 5EBFD21B3C;
+        Tue, 14 Jun 2022 13:15:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655212559; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SHtw3Ou51NqimLAHY3kx282e8j9v7oS4wJt2Bcy9vVk=;
+        b=iFYFfD79R3hu+4PnD6wQvEgOKGJDcvVw/ncQGIKX+aEFqdeO3Ll3Nlt+BJ+sy5pHlpzy0O
+        cb4NQw2jTXn/IXtzhvJcLJ4hxUX3IQ5gPJOuOupOApQdiqNMGYgId6rbzvQYGkv2EZSY+5
+        hTPYmXKNFVV2PA9nQJZWw3P4wSCFgNs=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655212559;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=SHtw3Ou51NqimLAHY3kx282e8j9v7oS4wJt2Bcy9vVk=;
+        b=XFqqzKgp+1FFxuHyEpPs5i7XBLJfslftbf5mfaHp72iD0HWK5dl6lLgWJr14xOkIFM2G33
+        eiXVsnBgBLAAW3AQ==
+Received: from quack3.suse.cz (unknown [10.163.28.18])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id 293CB2C142;
+        Tue, 14 Jun 2022 13:15:59 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D108DA062E; Tue, 14 Jun 2022 15:15:58 +0200 (CEST)
+Date:   Tue, 14 Jun 2022 15:15:58 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Jan Kara <jack@suse.cz>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        "shinichiro.kawasaki@wdc.com" <shinichiro.kawasaki@wdc.com>
+Subject: Re: [PATCH] blktests: Ignore errors from wait(1)
+Message-ID: <20220614131558.nzxkqgqlwzjnksda@quack3.lan>
+References: <20220613151721.18664-1-jack@suse.cz>
+ <0b0ec2ce-9d96-2324-c10c-ad2b0c6d688e@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <Yqg5QxSM+lub8DY0@T590>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0b0ec2ce-9d96-2324-c10c-ad2b0c6d688e@nvidia.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-ÔÚ 2022/06/14 15:31, Ming Lei Ð´µÀ:
-> On Tue, Jun 14, 2022 at 03:14:10PM +0800, Yu Kuai wrote:
->> We found that boot time is increased for about 8s after upgrading kernel
->> from v4.19 to v5.10(megaraid-sas is used in the environment).
+On Mon 13-06-22 22:48:20, Chaitanya Kulkarni wrote:
+> On 6/13/22 08:17, Jan Kara wrote:
+> > Multiple blktests use wait(1) to wait for background tasks. However in
+> > some cases tasks can exit before wait(1) is called and in that case
+> > wait(1) complains which breaks expected output. Make sure we ignore
+> > output from wait(1) to avoid this breakage.
+> > 
+> > Signed-off-by: Jan Kara <jack@suse.cz>
 > 
-> But 'blk-mq: clearing flush request reference in tags->rqs[]' was merged
-> to v5.14, :-)
-Hi,
+> Please note that Shinichiro (CC'd here) is a new blktests
+> maintainer and not Omar.
 
-Yes, but this patch is applied to 5.10 stable, thus we backport in our
-v5.10. Sorry that I didn't mention that.
+Thanks for review and notifying me. Maybe CONTRIBUTING.md should be updated
+to speak about Shinichiro and not Omar?
 
-> 
->>
->> Following is where the extra time is spent:
->>
->> 
->>   __scsi_remove_device
->>    blk_cleanup_queue
->>     blk_mq_exit_queue
->>      blk_mq_exit_hw_queues
->>       blk_mq_exit_hctx
->>        blk_mq_clear_flush_rq_mapping -> function latency is 0.1ms
-> 
-> So queue_depth looks pretty long, is it 4k?
-No, in the environment, it's just 32, and nr_hw_queues is 128, which
-means each blk_cleanup_queue() will cost about 10-20 ms.
-
-> 
-> But if it is 0.1ms, how can the 8sec delay be caused? That requires 80K hw queues
-> for making so long, so I guess there must be other delay added by the feature
-> of BLK_MQ_F_TAG_HCTX_SHARED.
-
-Please see details in the reasons 2), scsi scan will call
-__scsi_remove_device() a lot of times(each host, each channel, each
-target).
-> 
->>         cmpxchg
->>
->> There are three reasons:
->> 1) megaraid-sas is using multiple hctxs in v5.10, thus blk_mq_exit_hctx()
->> will be called much more times in v5.10 compared to v4.19.
->> 2) scsi will scan for each target thus __scsi_remove_device() will be
->> called for many times.
->> 3) blk_mq_clear_flush_rq_mapping() is introduced after v4.19, it will
->> call cmpxchg() for each request, and function latency is abount 0.1ms.
->>
->> Since that blk_mq_clear_flush_rq_mapping() will only be called while the
->> queue is freezed already, which means there is no inflight request,
->> it's safe to set NULL for 'tags->rqs[]' directly instead of using
->> cmpxchg(). Tests show that with this change, function latency of
->> blk_mq_clear_flush_rq_mapping() is about 1us, and boot time is not
->> increased.
-> 
-> tags is shared among all LUNs attached to the host, so freezing single
-> request queue here means nothing, so your patch doesn't work.
-
-You'are right, I forgot about that tags can be shared.
-
-> 
-> Please test the following patch, and see if it can improve boot delay for
-> your case.
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index e9bf950983c7..1463076a527c 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -3443,8 +3443,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
->   	if (blk_mq_hw_queue_mapped(hctx))
->   		blk_mq_tag_idle(hctx);
->   
-> -	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-> -			set->queue_depth, flush_rq);
-> +	if (blk_queue_init_done(q))
-> +		blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-> +				set->queue_depth, flush_rq);
->   	if (set->ops->exit_request)
->   		set->ops->exit_request(set, flush_rq, hctx_idx);
->   
-
-Thanks for the patch, I test it and boot delay is fixed.
-
-Kuai
-> 
-> 
-> Thanks,
-> Ming
-> 
-> .
-> 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
