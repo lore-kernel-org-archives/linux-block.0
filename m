@@ -2,85 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF779C43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 21:29:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8263CCA47D
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 21:30:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347692AbiFOV3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 17:29:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
+        id S1346948AbiFOVah (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 17:30:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54038 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348255AbiFOV3O (ORCPT
+        with ESMTP id S1345137AbiFOVaf (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 17:29:14 -0400
-Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09459562C8
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:29:14 -0700 (PDT)
-Received: by mail-pl1-x630.google.com with SMTP id t2so11476939pld.4
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:29:14 -0700 (PDT)
+        Wed, 15 Jun 2022 17:30:35 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C356562D0
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:30:34 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id h192so12540882pgc.4
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:30:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=ldmBi8APWWuyNzxGvJAEFdPJdaAowmPS/Vlf+myf3zs=;
-        b=dbWi6Vk2bqjrc8vUfNT3gf9Tpobn1o5c5p5I4GS9d4Mo14fwwZzLC+2+IWr2LZoh4R
-         JCz1axMB5dx3FhR4jwYUZfYX55Vqkr/bSTHw15BVz1mjo7CQSUB8REEJR1n5vq2Zt5Kk
-         W4p6cW2tAH0xKOU9xBtnajmRUgCd1F35bYbTybTnuV15olWhFStIe5sN/WvZq/1od5rW
-         cE9FrRIQMGIvOWbvj8/UmqvUdF2s/XjpyiRt8m1IbSHCL6tr0vU/4l5W/oq9E56OOIDK
-         dh80OCMd1rh/nZQi/kg+6j/SsaVcm7EaxcF9jejMqTbj/wPVkPyBxsJfIY9dUAsMV0V+
-         ia+w==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=gj8zUzDSKIR2PtxM/UZSWlhmSPN0w/aiFm/JeXggx3M=;
+        b=weZbBbUSK+6ocvp/YzFFHERgkjbmlZTADEbrz1GAxTVzxSC0U49PCdEOH6oQqf7vPz
+         nnHfHtXXNUDmyBx+yThH5CR4nybHplJAsV0CqFWV/6gMaSaL4qy+qeUGgvujL9s2yaWK
+         4F6Uc981Rii/LasC0DFpKRLwmglkSD+vTqFfpdHMk+CQ7Lth+H7DzmI4llkqjDALQutO
+         g/FQ6ChGc1D71hkvXTzI8me3/McOdQExjqL6ujqiWcUPZDRGGn4hoZO8oXDvSXwEU3L2
+         6iKQkcF2xrS7xqRwL/WHHo3p0pIG/NlpMPnXukfcAG2XpyKd61H/Pi8VXAduwxBymBg5
+         OGQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=ldmBi8APWWuyNzxGvJAEFdPJdaAowmPS/Vlf+myf3zs=;
-        b=olyTvk+uxgNYfXKiam8BNIOj2sMO9Hs/ngq42Fu5Pr5wWHzPQ5BcLBTbAkYCidJS/W
-         0oNIJs1Z5bSmzcGvUnwnOHbdfE1PrvI65lx0mhQIheFkbbBThAcEkz4ttlQjz5X7VL5c
-         7rJ8XmIT/tV1Eaw+g3Zihzp2/CWLHID5S5ERov4xRMzPV+1uLV4Hsxgwh8QyMtpklYTx
-         35Z/Z8uSu+LWj14zfe1XNIrV2XOeg2ZMwt12h0XZdpYqn4bMaKlZPuJMaZ8kL6dE8H66
-         BrXQqU5UQu6b1TAkFiMEjfDm7bUK08yP3HqZNgqxtyrZcc+Cb9IXSjkEyVTSBCbGwUCI
-         xXlw==
-X-Gm-Message-State: AJIora/PnsAKDL5U3imQpK9zU35xpoc2fPCo1+lpy9/KohXECRwukgOS
-        TKDJpT2PF86LOjLxPm04hAg+hAG0vd1hgg==
-X-Google-Smtp-Source: AGRyM1uXsTN49BEmlVW1t5M3nREGbQLY+LBgVpXTGMXryhzFXN8kwF9RnSzuYvtVDxunHnDnrQq6pw==
-X-Received: by 2002:a17:903:2451:b0:167:8179:62a8 with SMTP id l17-20020a170903245100b00167817962a8mr1483402pls.148.1655328553467;
-        Wed, 15 Jun 2022 14:29:13 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e3-20020a170903240300b0015ef27092aasm80082plo.190.2022.06.15.14.29.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jun 2022 14:29:13 -0700 (PDT)
-Message-ID: <c6a9a981-815e-58c2-1f8a-e60e119de88a@kernel.dk>
-Date:   Wed, 15 Jun 2022 15:29:11 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 3/3] block: Improve blk_mq_get_sq_hctx()
-Content-Language: en-US
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Ming Lei <ming.lei@redhat.com>
-References: <20220615210136.1032199-1-bvanassche@acm.org>
- <20220615210136.1032199-4-bvanassche@acm.org>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=gj8zUzDSKIR2PtxM/UZSWlhmSPN0w/aiFm/JeXggx3M=;
+        b=gIdPbwyy27ijDaLm1U2eQpb3JWGOP6/A8LAxJs/rMb78UpxxVWmadBuDPEQHK9jSbV
+         K3jB1xlyyBdcngctinzFJkSePJ/CGZWd0sf9yYApr9zfQJRLj+CQ2TzUYpUJk3qgTQNf
+         ADC7La8x5RvriW4vHTHMqpV0QlLxl9WdxhTXslMz9jbMwl8pQx/pQ2wwuofWL6UHHxEq
+         HfWvyfa2hHUqEjZ/JTcJRcaPXbemtocmQQ9W0MmqeYTnDCxZorSrdFlIDR8aMrDqWbhL
+         pstqajeMkRof9Nfva5VicDjw8JEJWUeYSrlGUxE1OC56Yt3RevFNehx74m2AiiHb32xB
+         fOAA==
+X-Gm-Message-State: AJIora9Iiusd0Gg6dlaugEIUuiWysjpkARxYkm40y3SLAmptAKJtrToJ
+        wZPYY9pJS8fEP25WKLpFtJPb/rR57HOECA==
+X-Google-Smtp-Source: AGRyM1v0IMTmN8GOvRn4uNva8PDhOEex3sAELCaW2rWI3VxM7LPVY+4GwPMUV/TKADCMwWmQqaUbnA==
+X-Received: by 2002:a63:194c:0:b0:408:a9d1:400c with SMTP id 12-20020a63194c000000b00408a9d1400cmr1544266pgz.559.1655328633528;
+        Wed, 15 Jun 2022 14:30:33 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id js12-20020a17090b148c00b001e86be34c98sm2313057pjb.13.2022.06.15.14.30.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jun 2022 14:30:33 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220615210136.1032199-4-bvanassche@acm.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To:     liubo03@inspur.com
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20220615081816.4342-1-liubo03@inspur.com>
+References: <20220615081816.4342-1-liubo03@inspur.com>
+Subject: Re: [PATCH] block: Directly use ida_alloc()/free()
+Message-Id: <165532863283.858456.2064903368423247771.b4-ty@kernel.dk>
+Date:   Wed, 15 Jun 2022 15:30:32 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/22 3:01 PM, Bart Van Assche wrote:
-> Since the introduction of blk_mq_get_hctx_type() the operation type in
-> the second argument of blk_mq_get_hctx_type() matters. Make sure that
-> blk_mq_get_sq_hctx() selects a hardware queue of type HCTX_TYPE_DEFAULT
-> instead of a hardware queue of type HCTX_TYPE_READ.
+On Wed, 15 Jun 2022 04:18:16 -0400, Bo Liu wrote:
+> Use ida_alloc()/ida_free() instead of
+> ida_simple_get()/ida_simple_remove().
+> The latter is deprecated and more verbose.
+> 
+> 
 
-You ignored my comment here. A good changelog explains WHY a change is
-made, not what the change does. For that, I can just read the change.
+Applied, thanks!
 
-So please change the commit message to say WHY it's important. Or if
-it's not, make it clear that it is a cosmetic thing.
+[1/1] block: Directly use ida_alloc()/free()
+      commit: c13794dbe936a62a9b509ece1423a59287b9c80f
 
+Best regards,
 -- 
 Jens Axboe
+
 
