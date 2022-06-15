@@ -2,164 +2,130 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 699C9C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 14:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12455C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 14:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347663AbiFOOU6 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 10:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36740 "EHLO
+        id S230231AbiFOOxr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 10:53:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347762AbiFOOUv (ORCPT
+        with ESMTP id S229755AbiFOOxq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 10:20:51 -0400
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB29935A97;
-        Wed, 15 Jun 2022 07:20:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655302822; x=1686838822;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BKDMg8fI4/oxE7Ct5GmeyilLeRcSIf/mmkwDwOrZrs4=;
-  b=Np2qGOeiYtkc96s3V/SkabOv6grGMngz+uIUgNj0MIsQ7p9JJ/P4YvkD
-   pZAWo1FGbSKGgaFrCuiGYLY8tn1Oq1mToKh1TKHABdRNTEaLNkwIh3PsC
-   ULUYbqv6qSD6NVpaWExqm9uSfJAmonS8L1+046KU3Oixhbdir1Ppd8skj
-   Rvnt5PG0nd/X6fCTupuOlrX7P2S2nGdbzVBjgp+w2C4Si1qzB83wudVWl
-   +HJsyZTpHlvac8I435rlwjqc5wUWTXCWr5sYJ/mrF1ToiJczFB0NHw3md
-   gqgu/OCnBTTsj+LDeZRmceW7WvsWu4qdCZRy7PG8yqeVRbexzNRuNCv2F
-   w==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10378"; a="280012571"
-X-IronPort-AV: E=Sophos;i="5.91,302,1647327600"; 
-   d="scan'208";a="280012571"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jun 2022 07:20:22 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.91,302,1647327600"; 
-   d="scan'208";a="727417450"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 15 Jun 2022 07:20:18 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o1TsX-000MvF-LV;
-        Wed, 15 Jun 2022 14:20:17 +0000
-Date:   Wed, 15 Jun 2022 22:19:48 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
-        snitzer@redhat.com, damien.lemoal@opensource.wdc.com,
-        axboe@kernel.dk
-Cc:     kbuild-all@lists.01.org, bvanassche@acm.org,
-        linux-kernel@vger.kernel.org, jiangbo.365@bytedance.com,
-        hare@suse.de, pankydev8@gmail.com, dm-devel@redhat.com,
-        jonathan.derrick@linux.dev, gost.dev@samsung.com, dsterba@suse.com,
-        jaegeuk@kernel.org, linux-nvme@lists.infradead.org,
-        Johannes.Thumshirn@wdc.com, linux-block@vger.kernel.org,
-        Pankaj Raghav <p.raghav@samsung.com>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: Re: [PATCH v7 13/13] dm: add non power of 2 zoned target
-Message-ID: <202206152257.pnoPyl7X-lkp@intel.com>
-References: <20220615101920.329421-14-p.raghav@samsung.com>
+        Wed, 15 Jun 2022 10:53:46 -0400
+Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC315255B2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 07:53:45 -0700 (PDT)
+Received: by mail-pj1-x102c.google.com with SMTP id q12-20020a17090a304c00b001e2d4fb0eb4so2352268pjl.4
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 07:53:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance-com.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=ZC/vAUwnt16cnIDHnHVWxxFjsEFG6NHxlu49GtEvBqg=;
+        b=FxJ4f3JGU5spOZCkifs9tv0qoQ3LMnq5o4+rI2EaouvetSY9lDrkFUeVDQvtuk6JZZ
+         XqHh2TG31+MkWQsXnwoz6i67O2tuP6CUmTje8lnlUZlXcvcBAls9N2/cmw+NJjtPYrU/
+         rlqYw+GNZULfYg0TvWJF7ztJkkFtTLQkIVlMCLQIAypwJskIADulcM0/5JPfqhfcPLaz
+         T90zVdFXbFyhdb5+gcduX4wkiMPWiBIc993mdZUVr0/mxbTA66rV80I1NCMvfrTv4/zv
+         UMVTHfGSZNEJ0QTKbVAOhEQfeRQc1F5lH81Q3BL8j05K25DcgtcYSVqUaenalkJuuzWa
+         rVpw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ZC/vAUwnt16cnIDHnHVWxxFjsEFG6NHxlu49GtEvBqg=;
+        b=yjSQZw5EVl6dMQqS5LJhILz9tZAQAETAo8mFhgMmmHowu0Es6UU6ilOos7PpLcEUKL
+         YY2rWOdvIWYTutUiRxHKTHFDq2MCR03xit0w+S+7gsZxGBBvC1frK93/u3ZtHX/mQUpZ
+         1xqSeYIrK/r68+9kOTML3nqtPCC/XRcIfcsE82rciMzQJFhll7jTHtTNmT/L34zzoUfi
+         /KSM4hmeXfUi8Zrm7Fvn/WKbpDlwkzV3Yo0Mi7yJCEVRiFIdmbkQqPm2XSP4NiJS1TRE
+         GwjYHTNlEvYK3Uonmy4Oh0+x6y+IdmcxiK1tcnhiiXc/XOaat2JfCfJmt0xgKTWrv0a3
+         PNgA==
+X-Gm-Message-State: AJIora9m1g5LGxR+FhJiFubK/i/gKykUqM6F7MGifuiZ5SB+FSY7PKa+
+        FMVJ1oehDAwsc2UZWkrj6g0fUDjA8K90Tg==
+X-Google-Smtp-Source: AGRyM1uEZlmej3FRRSuBGwHjEpYnuEbnQJqaWyjuatDenHh+Y1t2tmMKCCvBjzWtqei8aSIcfieojQ==
+X-Received: by 2002:a17:902:e746:b0:164:1974:e46c with SMTP id p6-20020a170902e74600b001641974e46cmr9975019plf.139.1655304825255;
+        Wed, 15 Jun 2022 07:53:45 -0700 (PDT)
+Received: from [10.4.220.81] ([139.177.225.239])
+        by smtp.gmail.com with ESMTPSA id e129-20020a636987000000b00408a3724b38sm4243427pgc.76.2022.06.15.07.53.42
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jun 2022 07:53:44 -0700 (PDT)
+Message-ID: <e815f04d-2646-05d2-ef96-7cd050ebc31c@bytedance.com>
+Date:   Wed, 15 Jun 2022 22:53:40 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220615101920.329421-14-p.raghav@samsung.com>
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.10.0
+Subject: Re: [PATCH] blk-iocost: fix lagging in-flight IOs detection
+Content-Language: en-US
+To:     tj@kernel.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220603092024.49273-1-zhouchengming@bytedance.com>
+From:   Chengming Zhou <zhouchengming@bytedance.com>
+In-Reply-To: <20220603092024.49273-1-zhouchengming@bytedance.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Pankaj,
+Hello, friendly ping...
 
-Thank you for the patch! Perhaps something to improve:
+Thanks.
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on device-mapper-dm/for-next linus/master v5.19-rc2 next-20220615]
-[cannot apply to song-md/md-next]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220615-191927
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20220615/202206152257.pnoPyl7X-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/add4ab54d5b34d4a2f91f241007f23a56c164fb3
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Pankaj-Raghav/block-make-blkdev_nr_zones-and-blk_queue_zone_no-generic-for-npo2-zsze/20220615-191927
-        git checkout add4ab54d5b34d4a2f91f241007f23a56c164fb3
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=s390 SHELL=/bin/bash
-
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
-   drivers/md/dm-zoned-npo2-target.c: In function 'dmz_npo2_ctr':
->> drivers/md/dm-zoned-npo2-target.c:62:13: warning: variable 'ret' set but not used [-Wunused-but-set-variable]
-      62 |         int ret = 0;
-         |             ^~~
-
-
-vim +/ret +62 drivers/md/dm-zoned-npo2-target.c
-
-    53	
-    54	/*
-    55	 * <dev-path>
-    56	 * This target works on the complete zoned device. Partial mapping is not
-    57	 * supported
-    58	 */
-    59	static int dmz_npo2_ctr(struct dm_target *ti, unsigned int argc, char **argv)
-    60	{
-    61		struct dmz_npo2_target *dmh = NULL;
-  > 62		int ret = 0;
-    63		sector_t zsze;
-    64		sector_t disk_size;
-    65	
-    66		if (argc < 1)
-    67			return -EINVAL;
-    68	
-    69		dmh = kmalloc(sizeof(*dmh), GFP_KERNEL);
-    70		if (!dmh)
-    71			return -ENOMEM;
-    72	
-    73		ret = dm_get_device(ti, argv[0], dm_table_get_mode(ti->table),
-    74				    &dmh->dev);
-    75	
-    76		zsze = blk_queue_zone_sectors(bdev_get_queue(dmh->dev->bdev));
-    77	
-    78		disk_size = get_capacity(dmh->dev->bdev->bd_disk);
-    79	
-    80		if (ti->len != disk_size || ti->begin) {
-    81			DMERR("%pg Partial mapping of the target not supported",
-    82			      dmh->dev->bdev);
-    83			return -EINVAL;
-    84		}
-    85	
-    86		if (is_power_of_2(zsze)) {
-    87			DMERR("%pg zone size is power of 2", dmh->dev->bdev);
-    88			return -EINVAL;
-    89		}
-    90	
-    91		dmh->zsze = zsze;
-    92		dmh->zsze_po2 = 1 << get_count_order_long(zsze);
-    93		dmh->zsze_diff = dmh->zsze_po2 - dmh->zsze;
-    94	
-    95		ti->private = dmh;
-    96		ti->num_flush_bios = 1;
-    97		ti->num_discard_bios = 1;
-    98		ti->num_secure_erase_bios = 1;
-    99		ti->num_write_zeroes_bios = 1;
-   100	
-   101		dmh->nr_zones = npo2_zone_no(dmh, ti->len);
-   102		ti->len = dmh->zsze_po2 * dmh->nr_zones;
-   103	
-   104		return 0;
-   105	}
-   106	
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+On 2022/6/3 17:20, Chengming Zhou wrote:
+> Since latency Qos detection doesn't account for IOs which
+> are in-flight for longer than a period, we detect them by
+> comparing vdone against period start. If lagging behind
+> IOs from past periods, don't increase vrate, but don't let
+> cmds which take a very long time pin lagging for too long.
+> 
+> The current code compares vdone against (vnow - period_vtime),
+> which is thought to be the period start. But the earliest
+> period start should be (vnow - period_vtime - margins.target).
+> 
+> And we will slide forward vtime and vdone on each period timer,
+> so we can't depend on vtime to check if the iocg has pinned
+> lagging for longer than MAX_LAGGING_PERIODS.
+> 
+> This patch adds lagging_periods in iocg to record how long
+> the iocg has pinned lagging, will not be thought as lagging
+> if longer than MAX_LAGGING_PERIODS.
+> 
+> Signed-off-by: Chengming Zhou <zhouchengming@bytedance.com>
+> ---
+> v2:
+>  - add lagging_periods to check very long lagging iocg.
+> ---
+>  block/blk-iocost.c | 13 +++++++++----
+>  1 file changed, 9 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+> index 33a11ba971ea..998bb38ffb37 100644
+> --- a/block/blk-iocost.c
+> +++ b/block/blk-iocost.c
+> @@ -541,6 +541,8 @@ struct ioc_gq {
+>  	u64				indebt_since;
+>  	u64				indelay_since;
+>  
+> +	int				lagging_periods;
+> +
+>  	/* this iocg's depth in the hierarchy and ancestors including self */
+>  	int				level;
+>  	struct ioc_gq			*ancestors[];
+> @@ -2257,10 +2259,13 @@ static void ioc_timer_fn(struct timer_list *timer)
+>  		if ((ppm_rthr != MILLION || ppm_wthr != MILLION) &&
+>  		    !atomic_read(&iocg_to_blkg(iocg)->use_delay) &&
+>  		    time_after64(vtime, vdone) &&
+> -		    time_after64(vtime, now.vnow -
+> -				 MAX_LAGGING_PERIODS * period_vtime) &&
+> -		    time_before64(vdone, now.vnow - period_vtime))
+> -			nr_lagging++;
+> +		    time_before64(vdone, ioc->period_at_vtime - ioc->margins.target)) {
+> +			if (iocg->lagging_periods < MAX_LAGGING_PERIODS) {
+> +				nr_lagging++;
+> +				iocg->lagging_periods++;
+> +			}
+> +		} else if (iocg->lagging_periods)
+> +			iocg->lagging_periods = 0;
+>  
+>  		/*
+>  		 * Determine absolute usage factoring in in-flight IOs to avoid
