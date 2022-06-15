@@ -2,82 +2,161 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F34BC43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 22:56:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A8FCCA473
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 23:13:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347483AbiFOW4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 18:56:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
+        id S1346327AbiFOXNj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 19:13:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57412 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348865AbiFOW4A (ORCPT
+        with ESMTP id S1350548AbiFOXNg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 18:56:00 -0400
-Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6DAE9C
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:56:00 -0700 (PDT)
-Received: by mail-pg1-f180.google.com with SMTP id 31so11054904pgv.11
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:56:00 -0700 (PDT)
+        Wed, 15 Jun 2022 19:13:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4D7922E9D2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 16:13:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655334814;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YhMuwxHqfosW3sDO+A+XNbEnO/HpuOv59r7ZSdjm4Q8=;
+        b=fBN6s6pP4m2CDcTPhVVmCItNEMHPURBaS4uFFa9AGuYZ84vhMobdhVjH9WCcv2f52X4w6l
+        pAU5jGx6vdzEtQcCpaCRjO4k4QZIXlXYHlcbO/lwC0KgXySgKc9ugJkCxXN2uyfxP/6/K7
+        HdGdGIiBfigOKCd1xMaS7n1hv5F7xGg=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-82-4gc4lOZKMfyGia7zXY3VFw-1; Wed, 15 Jun 2022 19:13:33 -0400
+X-MC-Unique: 4gc4lOZKMfyGia7zXY3VFw-1
+Received: by mail-pj1-f70.google.com with SMTP id ob5-20020a17090b390500b001e2f03294a7so92542pjb.8
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 16:13:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=D0iTTMQMQJ+C/1Ot+ZUcpq31mZl+d5hkJIQ4cfjmUiU=;
-        b=6MUh1t7r7By3tc5Ml87I2nkkY+/Kmh7OaV/7ZjZZux7ZzIgkT9DP+8s29zYtH98Pbj
-         1r0AYYBz5ZlTnvffxIWF/SvVx5GwfbBbvHCAU1J54tjfb1nmNESxJ6E+3Bz2oo/ACBVa
-         3KasmBFziv6WCFW+d7Xbd1TcJIHSmeshLk/N40cEijD4TgstD72a6yUBOPLb2AeEEgm9
-         LXNX/7vf4w5BVqvSsg7a0bhhrSvBUinfUWSIXgc12sU6U/0Dn29X3/oQdnDGUpDth5XF
-         vyusdZRNeWR6ZGQoZOFcKUy5yP9ohKrvX4VRpxJIdK/rjNGTG+qvUcmFGXAJ/raGAbRc
-         yHnw==
-X-Gm-Message-State: AJIora8ykFyWYIPjU5Lk4OmRSTb+C+MPWOsy7W5fSYucm9rQpGZuFr4K
-        NIq2I6ncAAekk6S3JMytqYk=
-X-Google-Smtp-Source: AGRyM1vhrOJrgCJWzDEOFSLw9To7RARwaGwW52qYlgx1o/s+Mlob6+qEOEJ5tMqvz2TJ+g8M3Vdqsw==
-X-Received: by 2002:a62:1687:0:b0:50d:3364:46d4 with SMTP id 129-20020a621687000000b0050d336446d4mr1860539pfw.74.1655333759776;
-        Wed, 15 Jun 2022 15:55:59 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:36ac:cabd:84b2:80f6])
-        by smtp.gmail.com with ESMTPSA id f62-20020a17090a704400b001eae95c381fsm158611pjk.10.2022.06.15.15.55.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 15:55:58 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v3 3/3] block: Make blk_mq_get_sq_hctx() select the proper hardware queue type
-Date:   Wed, 15 Jun 2022 15:55:49 -0700
-Message-Id: <20220615225549.1054905-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-In-Reply-To: <20220615225549.1054905-1-bvanassche@acm.org>
-References: <20220615225549.1054905-1-bvanassche@acm.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=YhMuwxHqfosW3sDO+A+XNbEnO/HpuOv59r7ZSdjm4Q8=;
+        b=QsNc5/mqDFkPVfx4Z7UOlqaaFgUNGahoS4QUsF+qzoSWHTBM0d/zQYMyJxho4l3Pzm
+         eT0/lmByRqZrVR7guCqZhQWTPfS8U1A4zISSmGVITM3VXU/nw7fGTndylGMnmCne7oJn
+         4WLOU81/bIG8PQazpD1UpDVnhrdVIYur1/0J1auvjGZZ7lTMSg2a3SxlWVjcLDyZJwu+
+         D9yVSNaSMUiuN+NxCFBmOmK0pirPFkq8fPRAam6CdZMVdGgOzYZshoSW7ouwG0KucWdy
+         GFsaIVgPqICy+dQNmlHpSp3+wgm0cbHDT7C68x/CJkUsIh0oGtofGY8Jyg3/kYxB0Vlc
+         Ph8w==
+X-Gm-Message-State: AJIora+5EQub4LtvzRixblYcgvabgS898UOioBKgOJ34UfJgX+tijuuQ
+        Gx1U1fXMnwBmpiTjGjemYja1My/1qlorLZ7yTX46vnI+uz5xnf8i17Mny9ueNzz1DkLnKGo2Asj
+        jYMWpQ3PB1CIVwIp2Hu/BJnxcpYvZ4ItbxlICWvQ=
+X-Received: by 2002:a05:6a00:2291:b0:51b:e4c5:627 with SMTP id f17-20020a056a00229100b0051be4c50627mr1837919pfe.20.1655334812011;
+        Wed, 15 Jun 2022 16:13:32 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1sg+mVCN3WuVePBvyzN+o71gqddvsTeRC94xefuc698SvRbjp423NUsbHPJxu4Wg5t3ZOUyX2uinaLerv8Pyyg=
+X-Received: by 2002:a05:6a00:2291:b0:51b:e4c5:627 with SMTP id
+ f17-20020a056a00229100b0051be4c50627mr1837892pfe.20.1655334811679; Wed, 15
+ Jun 2022 16:13:31 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20220615194727.GA1022614@bhelgaas> <cfaee02b-0390-6e1c-e26c-fa0ba3689704@nvidia.com>
+In-Reply-To: <cfaee02b-0390-6e1c-e26c-fa0ba3689704@nvidia.com>
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Thu, 16 Jun 2022 07:13:19 +0800
+Message-ID: <CAHj4cs88gLYMMefQVrH_+kSsrZhV+VJa5yapEaYXc1Cjnd2w_Q@mail.gmail.com>
+Subject: Re: blktests failures with v5.19-rc1
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Keith Busch <kbusch@kernel.org>,
+        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
+        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
+        "mstowe@redhat.com" <mstowe@redhat.com>,
+        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
+        Bjorn Helgaas <helgaas@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the introduction of blk_mq_get_hctx_type() the operation type in
-the second argument of blk_mq_get_hctx_type() matters. The introduction
-of blk_mq_get_hctx_type() caused blk_mq_get_sq_hctx() to select a
-hardware queue of type HCTX_TYPE_READ instead of HCTX_TYPE_DEFAULT.
-Switch to hardware queue type HCTX_TYPE_DEFAULT since HCTX_TYPE_READ
-should only be used for read requests.
+On Thu, Jun 16, 2022 at 6:01 AM Chaitanya Kulkarni
+<chaitanyak@nvidia.com> wrote:
+>
+> On 6/15/22 12:47, Bjorn Helgaas wrote:
+> > On Tue, Jun 14, 2022 at 04:00:45AM +0000, Shinichiro Kawasaki wrote:
+> >> On Jun 14, 2022 / 02:38, Chaitanya Kulkarni wrote:
+> >>> Shinichiro,
+> >>>
+> >>> On 6/13/22 19:23, Keith Busch wrote:
+> >>>> On Tue, Jun 14, 2022 at 01:09:07AM +0000, Shinichiro Kawasaki wrote:
+> >>>>> (CC+: linux-pci)
+> >>>>> On Jun 11, 2022 / 16:34, Yi Zhang wrote:
+> >>>>>> On Fri, Jun 10, 2022 at 10:49 PM Keith Busch <kbusch@kernel.org> wrote:
+> >>>>>>>
+> >>>>>>> And I am not even sure this is real. I don't know yet why
+> >>>>>>> this is showing up only now, but this should fix it:
+> >>>>>>
+> >>>>>> Hi Keith
+> >>>>>>
+> >>>>>> Confirmed the WARNING issue was fixed with the change, here is
+> >>>>>> the log:
+> >>>>>
+> >>>>> Thanks. I also confirmed that Keith's change to add
+> >>>>> __ATTR_IGNORE_LOCKDEP to dev_attr_dev_rescan avoids the fix, on
+> >>>>> v5.19-rc2.
+> >>>>>
+> >>>>> I took a closer look into this issue and found The deadlock
+> >>>>> WARN can be recreated with following two commands:
+> >>>>>
+> >>>>> # echo 1 > /sys/bus/pci/devices/0000\:00\:09.0/rescan
+> >>>>> # echo 1 > /sys/bus/pci/devices/0000\:00\:09.0/remove
+> >>>>>
+> >>>>> And it can be recreated with PCI devices other than NVME
+> >>>>> controller, such as SCSI controller or VGA controller. Then
+> >>>>> this is not a storage sub-system issue.
+> >>>>>
+> >>>>> I checked function call stacks of the two commands above. As
+> >>>>> shown below, it looks like ABBA deadlock possibility is
+> >>>>> detected and warned.
+> >>>>
+> >>>> Yeah, I was mistaken on this report, so my proposal to suppress
+> >>>> the warning is definitely not right. If I run both 'echo'
+> >>>> commands in parallel, I see it deadlock frequently. I'm not
+> >>>> familiar enough with this code to any good ideas on how to fix,
+> >>>> but I agree this is a generic pci issue.
+> >>>
+> >>> I think it is worth adding a testcase to blktests to make sure
+> >>> these future releases will test this.
+> >>
+> >> Yeah, this WARN is confusing for us then it would be valuable to
+> >> test by blktests not to repeat it. One point I wonder is: which test
+> >> group the test case will it fall in? The nvme group could be the
+> >> group to add, probably.
+> >>
+>
+> since this issue been discovered with nvme rescan and revmoe,
+> it should be added to the nvme category.
 
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We already have nvme/032 which tests nvme rescan/reset/remove and the
+issue was reported by running this one, do we still need one more?
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9bf950983c7..7a5558bbc7f6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2168,7 +2168,7 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
- 	 * just causes lock contention inside the scheduler and pointless cache
- 	 * bouncing.
- 	 */
--	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-+	struct blk_mq_hw_ctx *hctx = ctx->hctxs[HCTX_TYPE_DEFAULT];
- 
- 	if (!blk_mq_hctx_stopped(hctx))
- 		return hctx;
+>
+> >> Another point I wonder is other kernel test suite than blktests.
+> >> Don't we have more appropriate test suite to check PCI device
+> >> rescan/remove race ? Such a test sounds more like a PCI bus
+> >> sub-system test than block/storage test.
+>
+> I don't think so we could have caught it long time back,
+> but we clearly did not.
+>
+> >
+> > I'm not aware of such a test, but it would be nice to have one.
+> >
+> > Can you share your qemu config so I can reproduce this locally?
+> >
+> > Thanks for finding and reporting this!
+> >
+> > Bjorn
+>
+> -ck
+>
+>
+
+
+-- 
+Best Regards,
+  Yi Zhang
+
