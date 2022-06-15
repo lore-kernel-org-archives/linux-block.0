@@ -2,84 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8148C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 15:39:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A7EC43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 16:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243007AbiFOPjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 11:39:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35288 "EHLO
+        id S245445AbiFOQMx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 12:12:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39746 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236389AbiFOPjk (ORCPT
+        with ESMTP id S235498AbiFOQMw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 11:39:40 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A424313DC6
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id m14so336026plg.5
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=edqEgyj1aQJgqVQU6EdhYMAIpwztdCTolhlaMIVQJAA=;
-        b=LMx819ruwdoW6TQqOHWhQQa7z0SFBi8W4FuE4hmY3Rsjh+8lKKoVZu7tk8/vNgKQJ4
-         uWBzb9hBnhV4GZqLzzFSZX9m83AuBKCJTxGN3il6rHAq3AdT3UF0x08LeVwbm+iyr/gh
-         2SM0jGjkUIc6nmnPKdsyURIyZBivqH2fbPBTJDJ2Q+/tPDmoF9afeDYnaLPcBdGw6YX1
-         YiUM16bLP8Uz0vgxo92xUk0z4SvhL4V3I/doXN6WShM06cuoY1eeT/hGFtxp2uiCVtNQ
-         NTCM2TMnTah6DszqGELMYls/55vaIx93z6s3IFf8i5NpS9KL3bVGTJgojkkaOxSsOAEi
-         +FYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=edqEgyj1aQJgqVQU6EdhYMAIpwztdCTolhlaMIVQJAA=;
-        b=zZ0jq5dgZqz5FFrMs0Hl2Me9Jo/60uabj+TPbbDf1aFZZCgEpNPwmppIjKxJBSna3K
-         sqzk/IoLSXx1iMOARxO4zNR5X4lksmW3Oc+g6KvB06KL71MOaauVnUn9SXSMst9XWz9M
-         ipgiuReMKo2biiklBCKcUSsEMWIJW+IiiDFYnTZzU0pF0ZAMVFZNr7UwFGoxR1t/lC4/
-         t9k/oYEOtoYOno3LRtG+njq4oTgV/PGx5eOO668txMdsRmZeindZ18zwpXwtfx6mt7Oj
-         yOd6Jm2bNZQPUG3rYimCZ8rgi0m5NAiVYZjCk0WEZ3eDQ+1xu/LYOkeY2MrXbZzsaCro
-         Jc9A==
-X-Gm-Message-State: AJIora8ubS5o127calgReWvW6wFmlbD0eeSU7AtI6vH/bR2sWqNPRNj2
-        uKQE/cssbZRkxmb3PkQifHTd6A==
-X-Google-Smtp-Source: AGRyM1sF8ewweLMdOZ4+abu2W9yM5IN/bhLQXvRlCf8Us7XqgX83BB8sTa1LHpN/EUDyKE09tiM3HA==
-X-Received: by 2002:a17:90a:be16:b0:1ea:e19f:b3a2 with SMTP id a22-20020a17090abe1600b001eae19fb3a2mr903760pjs.191.1655307579040;
-        Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id x13-20020a63b20d000000b003faebbb772esm10346530pge.25.2022.06.15.08.39.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jun 2022 08:39:38 -0700 (PDT)
-Message-ID: <98db9274-67ef-1e8d-33d3-e9020337cb02@kernel.dk>
-Date:   Wed, 15 Jun 2022 09:39:37 -0600
+        Wed, 15 Jun 2022 12:12:52 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97D8B2181C;
+        Wed, 15 Jun 2022 09:12:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
+        Message-Id:Date:Cc:To:From:content-disposition;
+        bh=OqVljjCs7GJPfFJtCSMELP7hz7tpfnVYUqS/KYMT6cE=; b=D4xQJkI4XeiyHus7VGwGco9/eT
+        CWBRfM3M9mPI7KhaQok5aaace5jsJ66GPHd0+bjL351TCnWoppTHSeVyW6ItHXgJGDaRJ7hd2IjiM
+        F+kw1tcTRsPYrcDQzs2AykzCRimr2Zvwz2+TG3Yj8eCSUTt7BF3j2IR7Sq5QbQB0NBLtsSoXiMJpa
+        dL7PRG248B15XgI06t6MosY+U92Q+v/iTv48RWM+JfmN+UMx2ilS1x342uwJrz5aoLn/s5TTg1Ggk
+        H0HOUX/IOvALtFUR5mtAWvXlY6k08p6E637EzSv1gougvqbFBVszN6lMOnaLAfpvvZyeF3giITm3y
+        oEzjQ+9g==;
+Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
+        by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+        (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1o1VdP-0084iR-O3; Wed, 15 Jun 2022 10:12:48 -0600
+Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
+        (envelope-from <gunthorp@deltatee.com>)
+        id 1o1VdJ-0004aw-Gi; Wed, 15 Jun 2022 10:12:41 -0600
+From:   Logan Gunthorpe <logang@deltatee.com>
+To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
+        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
+        linux-mm@kvack.org, iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Logan Gunthorpe <logang@deltatee.com>
+Date:   Wed, 15 Jun 2022 10:12:31 -0600
+Message-Id: <20220615161233.17527-20-logang@deltatee.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220615161233.17527-1-logang@deltatee.com>
+References: <20220615161233.17527-1-logang@deltatee.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [GIT PULL] nvmes fixes for Linux 5.19
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <YqngkWynuVHY+aDS@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <YqngkWynuVHY+aDS@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 172.16.1.31
+X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
+X-SA-Exim-Mail-From: gunthorp@deltatee.com
+Subject: [PATCH v7 19/21] block: set FOLL_PCI_P2PDMA in bio_map_user_iov()
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/22 7:37 AM, Christoph Hellwig wrote:
-> The following changes since commit b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f3:
-> 
->   Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.19-2022-06-15
+When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
+iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be
+passed from userspace and enables the NVMe passthru requests to
+use P2PDMA pages.
 
-Pulled, thanks.
+Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+---
+ block/blk-map.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/block/blk-map.c b/block/blk-map.c
+index df8b066cd548..1d6bcf193a42 100644
+--- a/block/blk-map.c
++++ b/block/blk-map.c
+@@ -236,6 +236,7 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ {
+ 	unsigned int max_sectors = queue_max_hw_sectors(rq->q);
+ 	unsigned int nr_vecs = iov_iter_npages(iter, BIO_MAX_VECS);
++	unsigned int flags = 0;
+ 	struct bio *bio;
+ 	int ret;
+ 	int j;
+@@ -248,13 +249,17 @@ static int bio_map_user_iov(struct request *rq, struct iov_iter *iter,
+ 		return -ENOMEM;
+ 	bio_init(bio, NULL, bio->bi_inline_vecs, nr_vecs, req_op(rq));
+ 
++	if (blk_queue_pci_p2pdma(rq->q))
++		flags |= FOLL_PCI_P2PDMA;
++
+ 	while (iov_iter_count(iter)) {
+ 		struct page **pages;
+ 		ssize_t bytes;
+ 		size_t offs, added = 0;
+ 		int npages;
+ 
+-		bytes = iov_iter_get_pages_alloc(iter, &pages, LONG_MAX, &offs);
++		bytes = iov_iter_get_pages_alloc_flags(iter, &pages, LONG_MAX,
++						       &offs, flags);
+ 		if (unlikely(bytes <= 0)) {
+ 			ret = bytes ? bytes : -EFAULT;
+ 			goto out_unmap;
 -- 
-Jens Axboe
+2.30.2
 
