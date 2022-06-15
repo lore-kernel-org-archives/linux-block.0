@@ -2,125 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C36C43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 07:21:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77A9DCCA47F
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 07:32:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235803AbiFOHVx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 03:21:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33402 "EHLO
+        id S237299AbiFOHcC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 03:32:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232467AbiFOHVw (ORCPT
+        with ESMTP id S231258AbiFOHcA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 03:21:52 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B847943AC3
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 00:21:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655277711; x=1686813711;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=izlKgFtXFAiS7qlPzgUvTlFl3rHcGt2DCiEG8dyFTgk=;
-  b=d3aO/6W4YEJJNFcYT1nytZ6cTKmFlEPzcSPstccy1YgPpV3f0tV1nJ+f
-   Ui4di/IsgqhC9v349WidDUh2X+GlE6KFhBgGau5k2QVJ2qkkyTvH5j51W
-   MBIkuEpy4ebeUnJoyYJMEoxiGG41pzd8B7P+5pd9f8IzkAA4kBZ0xeBhD
-   8WUkJfkvfAkbwUaj2CyJmH7O9WbtXRRv70WGnbMThxjzzeTOas7z9tPL7
-   4Us2ul2IyU35kcYr2sOtP1Fhb1pkcXRYW01GK03El3GZ/IyBPfiFOOXiS
-   yALBkUiVU2aAR4BpHkDlPj9Fj+7mF0A4kKZDsmVZ6LHVhgRssjBeV1ONp
-   w==;
-X-IronPort-AV: E=Sophos;i="5.91,300,1647273600"; 
-   d="scan'208";a="307495022"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 15 Jun 2022 15:21:51 +0800
-IronPort-SDR: xnD4ojduN5/yI1IIGrerrYqSDYVt68z+fmaUzCDfQ7YZRSFIsSqPWwUgOPzq3Bfz4iTPibLvCO
- bfi8lWJZVRSvazmVaaV3BWkKGrlYNKTvt0pni4jYzox+5PQV3+9o2beBNgIG2u3sSK9+Kucjsf
- VKSRGuKedz00mttfWLx+LeyM+PkBQE4TEDvmA/PHYjf8EIMWlbrU/tXxDI8K01956lXEMRHPW0
- 3kYK7rAwoQ3uEjbzuvkn8broDChtgcdXRONXBi5g1gjYsGtextqRsGPDBQiE8CYkPqg+km5QFF
- 6BJ/p1KFw8pL6qe35VmlB19j
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 23:40:15 -0700
-IronPort-SDR: yAG7haH1CxfXT0n3y4lpyv74DFxUely0YsMksHsHSUm5YdAKmPg0XR92rCBuiMVHoZLrjXtOmw
- o3k/617m2cPzEZQOsaAU597XyXG3yYA6tNSG70PC7cFCYqkSyHux3Z8446aHhhq1qIsZki3jkM
- EynbuDhz0n3qzMB86nSo5i9hkIc0vE+Btv0cLqdH0xucCopk3/kb+C92OLR9wWFLnGWSZIt5ok
- sbMc+1kslStH2V3b7DVeSjRUv5MWWOn4iOz30/JmabxoV9wndXvMEhEB4sWvnYrtp66rdIaENI
- pV0=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jun 2022 00:21:51 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LNGvf4KDpz1SVp2
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 00:21:50 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655277710; x=1657869711; bh=izlKgFtXFAiS7qlPzgUvTlFl3rHcGt2DCiE
-        G8dyFTgk=; b=rT9XRuf1TcAnN665s2ZMLjiTWsT+WDgHH6sTJVqGEbjeORNuhVR
-        rDD6pEagAYlSZnajBECIH+iT3jk0+WEBB0jLG/mtw4mrSlgH/HEj2aCVLMlvGPvi
-        lqxTaIFzPadT0x0ibr6sYyGpk15AS9oGtt+K9FJrfwiz/QUJQQmVmUjmX4YA1FRt
-        4FX1rPoZLHPRnZuaUa/BbTyVo2SDHB+b5v5zcWPLUDXqZMi7GKQy6MZw7WnTC0BG
-        Uzf3POvBDH4sxYgssvzfQrGKujhaFrikpDHn3oSjypSNuLBKjFsh+24sUgviDN9B
-        GNKrj6xS0hgzlxLuHN5eR1X9bRMfpLnAxxw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 2l4ScYk0ZqHi for <linux-block@vger.kernel.org>;
-        Wed, 15 Jun 2022 00:21:50 -0700 (PDT)
-Received: from [10.225.163.82] (unknown [10.225.163.82])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LNGvc524nz1Rvlc;
-        Wed, 15 Jun 2022 00:21:48 -0700 (PDT)
-Message-ID: <434cb0ae-a6e7-62a0-81dc-cd86f55108d4@opensource.wdc.com>
-Date:   Wed, 15 Jun 2022 16:21:47 +0900
+        Wed, 15 Jun 2022 03:32:00 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A2E2473A0;
+        Wed, 15 Jun 2022 00:31:58 -0700 (PDT)
+Received: from fraeml711-chm.china.huawei.com (unknown [172.18.147.206])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LNH7B4jvmz6GD9p;
+        Wed, 15 Jun 2022 15:31:50 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml711-chm.china.huawei.com (10.206.15.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 09:31:55 +0200
+Received: from [10.195.33.253] (10.195.33.253) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 08:31:54 +0100
+Message-ID: <3a27b6ff-e495-8f11-6925-1487c9d14fa9@huawei.com>
+Date:   Wed, 15 Jun 2022 08:35:02 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 2/5] scsi: Retry unaligned zoned writes
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Khazhy Kumykov <khazhy@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20220614174943.611369-1-bvanassche@acm.org>
- <20220614174943.611369-3-bvanassche@acm.org>
- <399e595b-06d2-ceb1-1b42-2a98a7724320@opensource.wdc.com>
- <29a13708-56b1-60e8-558a-ec4a469eaa6d@acm.org>
- <20220615054909.GA22044@lst.de>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220615054909.GA22044@lst.de>
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+Subject: Re: [PATCH RFC v2 03/18] scsi: core: Implement reserved command
+ handling
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <jejb@linux.ibm.com>, <martin.petersen@oracle.com>,
+        <brking@us.ibm.com>, <hare@suse.de>, <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <chenxiang66@hisilicon.com>
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-4-git-send-email-john.garry@huawei.com>
+ <b4a0ede5-95a3-4388-e808-7627b5484d01@opensource.wdc.com>
+ <9e89360d-3325-92af-0436-b34df748f3e2@acm.org>
+ <e36bba7e-d78d-27b4-a0e2-9d921bc82f5d@opensource.wdc.com>
+From:   John Garry <john.garry@huawei.com>
+In-Reply-To: <e36bba7e-d78d-27b4-a0e2-9d921bc82f5d@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.195.33.253]
+X-ClientProxiedBy: lhreml746-chm.china.huawei.com (10.201.108.196) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/22 14:49, Christoph Hellwig wrote:
-> On Tue, Jun 14, 2022 at 04:56:52PM -0700, Bart Van Assche wrote:
->> The performance penalty of zone locking is not acceptable for our use case. 
->> Does this mean that zone locking needs to be preserved for AHCI but not for 
->> UFS?
+On 15/06/2022 00:43, Damien Le Moal wrote:
+> On 6/15/22 03:20, Bart Van Assche wrote:
+>> On 6/13/22 00:01, Damien Le Moal wrote:
+>>> On 6/9/22 19:29, John Garry wrote:
+>>>> +	/*
+>>>> +	 * This determines how many commands the HBA will set aside
+>>>> +	 * for internal commands. This number will be added to
+>>>> +	 * @can_queue to calcumate the maximum number of simultaneous
+>>>
+>>> s/calcumate/calculate
+>>>
+>>> But this is weird. For SATA, can_queue is 32. Having reserved commands,
+>>> that number needs to stay the same. We cannot have more than 32 tags.
+>>> I think keeping can_queue as the max queue depth with at most
+>>> nr_reserved_cmds tags reserved is better.
+>>>
+>>>> +	 * commands sent to the host.
+>>>> +	 */
+>>>> +	int nr_reserved_cmds;
+>>
+>> +1 for Damien's request. I also prefer to keep can_queue as the maximum
+>> queue depth, whether or not nr_reserved_cmds has been set.
 > 
-> It means you use case needs to use zone append, and we need to make sure
-> it is added to SCSI assuming your are on SCSI based on your other comments.
+> For non SATA drives, I still think that is a good idea. However, for SATA,
+> we always have the internal tag command that is special. With John's
+> change, it would have to be reserved but that means we are down to 31 max
+> QD,
 
-For scsi, we already have the zone append emulation in the sd driver which
-issues regular writes together with taking the zone lock. So UFS has zone
-append, not as a native command though. But if for UFS device there are no
-issue of command reordering underneath sd, then the zone append emulation
-can be done without taking the zone write lock, which would result in the
-same performance as what a native zone append command would give.
+My intention is to keep regular tag depth at 32 for SATA. We add an 
+extra tag as a reserved tag. Indeed, this is called a 'tag', but it's 
+just really the placeholder for what will be the ATA_TAG_INTERNAL request.
 
-At least for the short term, that could be a good solution until native
-zone append is added to zbc specs. That last part may face a lot of
-pushback because of the difficulty of having that same command on ATA side.
+About how we set scsi_host.can_queue, in this series we set .can_queue 
+as max regular tags, and the handling is as follows:
 
+scsi_mq_setup_tags():
+tag_set->queue_depth = shost->can_queue + shost->nr_reserved_cmds
+tag_set->reserved_tags = shost->nr_reserved_cmds
 
--- 
-Damien Le Moal
-Western Digital Research
+So we honour the rule that blk_mq_tag_set.queue_depth is the total tag 
+depth, including reserved.
+
+Incidentally I think Christoph prefers to keep .can_queue at total max 
+tags including reserved:
+https://lore.kernel.org/linux-scsi/337339b7-6f4a-a25c-f11c-7f701b42d6a8@suse.de/
+
+> so going backward several years... That internal tag for ATA does not
+> need to be reserved since this command is always used when the drive is
+> idle and no other NCQ commands are on-going.
+
+So do you mean that ATA_TAG_INTERNAL qc is used for other commands apart 
+from internal commands?
+
+> 
+> So the solution to all this is a likely a little more complicated if we
+> want to keep ATA max QD to 32.
+> 
+
+thanks,
+John
