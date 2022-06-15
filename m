@@ -2,80 +2,85 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2D9C43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 21:01:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF779C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 21:29:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344961AbiFOVBu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 17:01:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55798 "EHLO
+        id S1347692AbiFOV3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 17:29:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244905AbiFOVBt (ORCPT
+        with ESMTP id S1348255AbiFOV3O (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 17:01:49 -0400
-Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD41B5523E
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:01:48 -0700 (PDT)
-Received: by mail-pg1-f172.google.com with SMTP id s135so12448681pgs.10
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:01:48 -0700 (PDT)
+        Wed, 15 Jun 2022 17:29:14 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09459562C8
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:29:14 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id t2so11476939pld.4
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:29:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=ldmBi8APWWuyNzxGvJAEFdPJdaAowmPS/Vlf+myf3zs=;
+        b=dbWi6Vk2bqjrc8vUfNT3gf9Tpobn1o5c5p5I4GS9d4Mo14fwwZzLC+2+IWr2LZoh4R
+         JCz1axMB5dx3FhR4jwYUZfYX55Vqkr/bSTHw15BVz1mjo7CQSUB8REEJR1n5vq2Zt5Kk
+         W4p6cW2tAH0xKOU9xBtnajmRUgCd1F35bYbTybTnuV15olWhFStIe5sN/WvZq/1od5rW
+         cE9FrRIQMGIvOWbvj8/UmqvUdF2s/XjpyiRt8m1IbSHCL6tr0vU/4l5W/oq9E56OOIDK
+         dh80OCMd1rh/nZQi/kg+6j/SsaVcm7EaxcF9jejMqTbj/wPVkPyBxsJfIY9dUAsMV0V+
+         ia+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=4p0cxX/rZYC8fAm9zYjDWwNMUnRBs/tR8ubV1YfFzfY=;
-        b=5uIFjqQ/9mICFbQUq1pWC/qMfcmT2n+2nqQJdPp3urINFUhb9U18hCv6YTPQTbl6sI
-         /8KOcEAts9x6ISfpf7yv5qNCizgX5pKpT9eUZhRqYUYBm56Ep/X1VzOqWb1MY1jPofFH
-         fdJgJRIrCpH6yB65syLw8cUMjCQepzXQBLPa7aypqiH2ObnnpH7eJHTuBJW979GeXntV
-         pP5NqDFrOy8LoTjumRNN9bQWGBsel0jdlZvQDxTmCp5IWEz6gBPN6DyJqeU7a5dlSa/Y
-         8iAtqB/XuYG/2eNBhULjjegEL6Yd9SSPv9xhJv8HcSXnp3Y77A0jfA0rtpxcZQjbGOdI
-         DUNg==
-X-Gm-Message-State: AJIora/A3RuNRmMqREtrjrcc5MPCRvV/ZVA0Ji97iUoXWC01i+Qc31p5
-        pHViOcQgtOZSovG4veyjwcQ=
-X-Google-Smtp-Source: AGRyM1s4MvWYG7RoIQQSMg6mXpAHymWGtSrtyOAfxFEUJ9hdvhowQbJC78l7ejLNc+e4EvmPND8pOA==
-X-Received: by 2002:a63:6984:0:b0:405:3980:197e with SMTP id e126-20020a636984000000b004053980197emr1411142pgc.621.1655326908152;
-        Wed, 15 Jun 2022 14:01:48 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:36ac:cabd:84b2:80f6])
-        by smtp.gmail.com with ESMTPSA id e12-20020a170902ed8c00b0015e8da1fb07sm68986plj.127.2022.06.15.14.01.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 14:01:47 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Ming Lei <ming.lei@redhat.com>
-Subject: [PATCH v2 3/3] block: Improve blk_mq_get_sq_hctx()
-Date:   Wed, 15 Jun 2022 14:01:36 -0700
-Message-Id: <20220615210136.1032199-4-bvanassche@acm.org>
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
-In-Reply-To: <20220615210136.1032199-1-bvanassche@acm.org>
-References: <20220615210136.1032199-1-bvanassche@acm.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=ldmBi8APWWuyNzxGvJAEFdPJdaAowmPS/Vlf+myf3zs=;
+        b=olyTvk+uxgNYfXKiam8BNIOj2sMO9Hs/ngq42Fu5Pr5wWHzPQ5BcLBTbAkYCidJS/W
+         0oNIJs1Z5bSmzcGvUnwnOHbdfE1PrvI65lx0mhQIheFkbbBThAcEkz4ttlQjz5X7VL5c
+         7rJ8XmIT/tV1Eaw+g3Zihzp2/CWLHID5S5ERov4xRMzPV+1uLV4Hsxgwh8QyMtpklYTx
+         35Z/Z8uSu+LWj14zfe1XNIrV2XOeg2ZMwt12h0XZdpYqn4bMaKlZPuJMaZ8kL6dE8H66
+         BrXQqU5UQu6b1TAkFiMEjfDm7bUK08yP3HqZNgqxtyrZcc+Cb9IXSjkEyVTSBCbGwUCI
+         xXlw==
+X-Gm-Message-State: AJIora/PnsAKDL5U3imQpK9zU35xpoc2fPCo1+lpy9/KohXECRwukgOS
+        TKDJpT2PF86LOjLxPm04hAg+hAG0vd1hgg==
+X-Google-Smtp-Source: AGRyM1uXsTN49BEmlVW1t5M3nREGbQLY+LBgVpXTGMXryhzFXN8kwF9RnSzuYvtVDxunHnDnrQq6pw==
+X-Received: by 2002:a17:903:2451:b0:167:8179:62a8 with SMTP id l17-20020a170903245100b00167817962a8mr1483402pls.148.1655328553467;
+        Wed, 15 Jun 2022 14:29:13 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id e3-20020a170903240300b0015ef27092aasm80082plo.190.2022.06.15.14.29.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jun 2022 14:29:13 -0700 (PDT)
+Message-ID: <c6a9a981-815e-58c2-1f8a-e60e119de88a@kernel.dk>
+Date:   Wed, 15 Jun 2022 15:29:11 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v2 3/3] block: Improve blk_mq_get_sq_hctx()
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Ming Lei <ming.lei@redhat.com>
+References: <20220615210136.1032199-1-bvanassche@acm.org>
+ <20220615210136.1032199-4-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220615210136.1032199-4-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since the introduction of blk_mq_get_hctx_type() the operation type in
-the second argument of blk_mq_get_hctx_type() matters. Make sure that
-blk_mq_get_sq_hctx() selects a hardware queue of type HCTX_TYPE_DEFAULT
-instead of a hardware queue of type HCTX_TYPE_READ.
+On 6/15/22 3:01 PM, Bart Van Assche wrote:
+> Since the introduction of blk_mq_get_hctx_type() the operation type in
+> the second argument of blk_mq_get_hctx_type() matters. Make sure that
+> blk_mq_get_sq_hctx() selects a hardware queue of type HCTX_TYPE_DEFAULT
+> instead of a hardware queue of type HCTX_TYPE_READ.
 
-Cc: Ming Lei <ming.lei@redhat.com>
-Cc: Christoph Hellwig <hch@lst.de>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+You ignored my comment here. A good changelog explains WHY a change is
+made, not what the change does. For that, I can just read the change.
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index e9bf950983c7..7a5558bbc7f6 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -2168,7 +2168,7 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
- 	 * just causes lock contention inside the scheduler and pointless cache
- 	 * bouncing.
- 	 */
--	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
-+	struct blk_mq_hw_ctx *hctx = ctx->hctxs[HCTX_TYPE_DEFAULT];
- 
- 	if (!blk_mq_hctx_stopped(hctx))
- 		return hctx;
+So please change the commit message to say WHY it's important. Or if
+it's not, make it clear that it is a cosmetic thing.
+
+-- 
+Jens Axboe
+
