@@ -2,110 +2,94 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A2E1C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 16:56:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD93C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 18:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234700AbiFOQ4b (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 12:56:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58524 "EHLO
+        id S245563AbiFOSiM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 14:38:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47456 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245134AbiFOQ4X (ORCPT
+        with ESMTP id S235181AbiFOSiK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 12:56:23 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA10E4EA3E
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 09:56:22 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 9BD841F967;
-        Wed, 15 Jun 2022 16:56:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1655312181; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wQbhT2k92/E7pNF5NGUzO0piFKL9BMGkKUkdICGYIg8=;
-        b=Onhi+GiZp2ClSwqyvvkdoSNs1r/dGA+loKRjqtrccDOP/lhBNjCaYVM8yNNz/yZmMIXzmQ
-        1XwflpJDPE08+8GSwjO+oa8CNPnOeJ1XCgTAeQcsFcKOv+XdfrUzq/UqLVM9qN7LckLgmj
-        59sGC3mEytgBvk6b8z2npSAb6jsgbqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1655312181;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=wQbhT2k92/E7pNF5NGUzO0piFKL9BMGkKUkdICGYIg8=;
-        b=jDs0gxs3iujy+Cix9wg2jXHkgti+ziEfxnaQqGMrkQMUurDV4zmZRdUoHBALUX6+86xUcx
-        MH8vUDBxlyFMg2Dw==
-Received: from quack3.suse.cz (unknown [10.163.28.18])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 2B4E72C141;
-        Wed, 15 Jun 2022 16:56:21 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id C5718A062E; Wed, 15 Jun 2022 18:56:20 +0200 (CEST)
-Date:   Wed, 15 Jun 2022 18:56:20 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     Jan Kara <jack@suse.cz>, "osandov@fb.com" <osandov@fb.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Subject: Re: [PATCH] blktests: Ignore errors from wait(1)
-Message-ID: <20220615165620.fs4yilch7nlcjmrl@quack3.lan>
-References: <20220613151721.18664-1-jack@suse.cz>
- <20220614070454.5tcyunt53nqf3y7q@shindev>
- <20220614131803.hwoykpwzfh6pxmda@quack3.lan>
- <20220615115014.nm3utxgvq2hkhuzo@shindev>
+        Wed, 15 Jun 2022 14:38:10 -0400
+Received: from smtp.smtpout.orange.fr (smtp08.smtpout.orange.fr [80.12.242.130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8843F27B31
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 11:38:09 -0700 (PDT)
+Received: from [192.168.1.18] ([90.11.190.129])
+        by smtp.orange.fr with ESMTPA
+        id 1Xu2oIs6ogNxB1Xu2o39DQ; Wed, 15 Jun 2022 20:38:07 +0200
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: YWZlNiIxYWMyZDliZWIzOTcwYTEyYzlhMmU3ZiQ1M2U2MzfzZDfyZTMxZTBkMTYyNDBjNDJlZmQ3ZQ==
+X-ME-Date: Wed, 15 Jun 2022 20:38:07 +0200
+X-ME-IP: 90.11.190.129
+Message-ID: <a1f3152a-6102-f5d9-0f27-a6e6f43705a7@wanadoo.fr>
+Date:   Wed, 15 Jun 2022 20:38:06 +0200
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220615115014.nm3utxgvq2hkhuzo@shindev>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH] block: Directly use ida_alloc()/free()
+Content-Language: fr
+To:     Bo Liu <liubo03@inspur.com>, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20220615081816.4342-1-liubo03@inspur.com>
+From:   Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20220615081816.4342-1-liubo03@inspur.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed 15-06-22 11:50:14, Shinichiro Kawasaki wrote:
-> On Jun 14, 2022 / 15:18, Jan Kara wrote:
-> > On Tue 14-06-22 07:04:54, Shinichiro Kawasaki wrote:
+Le 15/06/2022 à 10:18, Bo Liu a écrit :
+> Use ida_alloc()/ida_free() instead of
+> ida_simple_get()/ida_simple_remove().
+> The latter is deprecated and more verbose.
 > 
-> [...]
-> 
-> > Yes, I suspect it depends on the shell as well (because otherwise I expect
-> > people would hit this much earlier than me :). The bash I have is
-> > "4.4.23(1)-release" - the one in openSUSE 15.3 and it shows the error
-> > pretty reliably...
-> 
-> I guess the problematic wait command output is job exit status report. To
-> confirm my guess, could your share example of the wait command output?
-> 
-> Based on my guess, I checked difference between bash 4.4 and my bash 5.1, but I
-> did not find notable bash code change about job exit status report. Hmm.
-> 
-> Your patch covers several waits in the block group. I suspect other waits in
-> other groups may have same risk. Instead of your patch, could you try the patch
-> below on your system? If it works, all waits in all groups can be addressed.
+> Signed-off-by: Bo Liu <liubo03@inspur.com>
 
-Ah, indeed. This patch fixes the problem for me as well. Thanks for looking
-into this!
+Hi,
+for what it's worth:
 
-								Honza
+Reviewed-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
 
+> ---
+>   block/blk-core.c  | 4 ++--
+>   block/blk-sysfs.c | 2 +-
+>   2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/check b/check
-> index 7037d88..ac24afa 100755
-> --- a/check
-> +++ b/check
-> @@ -440,6 +440,10 @@ _run_test() {
->  	RUN_FOR_ZONED=0
->  	FALLBACK_DEVICE=0
->  
-> +	# Ensure job control monitor mode is off in this sub-shell to suppress
-> +	# job status output.
-> +	set +m
-> +
->  	# shellcheck disable=SC1090
->  	. "tests/${TEST_NAME}"
->  
-> 
-> 
-> -- 
-> Shin'ichiro Kawasaki
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+> diff --git a/block/blk-core.c b/block/blk-core.c
+> index 06ff5bbfe8f6..eb86c756a7fd 100644
+> --- a/block/blk-core.c
+> +++ b/block/blk-core.c
+> @@ -448,7 +448,7 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
+>   
+>   	q->last_merge = NULL;
+>   
+> -	q->id = ida_simple_get(&blk_queue_ida, 0, 0, GFP_KERNEL);
+> +	q->id = ida_alloc(&blk_queue_ida, GFP_KERNEL);
+>   	if (q->id < 0)
+>   		goto fail_srcu;
+>   
+> @@ -498,7 +498,7 @@ struct request_queue *blk_alloc_queue(int node_id, bool alloc_srcu)
+>   fail_split:
+>   	bioset_exit(&q->bio_split);
+>   fail_id:
+> -	ida_simple_remove(&blk_queue_ida, q->id);
+> +	ida_free(&blk_queue_ida, q->id);
+>   fail_srcu:
+>   	if (alloc_srcu)
+>   		cleanup_srcu_struct(q->srcu);
+> diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
+> index 14607565d781..2ed9e7d52b47 100644
+> --- a/block/blk-sysfs.c
+> +++ b/block/blk-sysfs.c
+> @@ -799,7 +799,7 @@ static void blk_release_queue(struct kobject *kobj)
+>   	if (blk_queue_has_srcu(q))
+>   		cleanup_srcu_struct(q->srcu);
+>   
+> -	ida_simple_remove(&blk_queue_ida, q->id);
+> +	ida_free(&blk_queue_ida, q->id);
+>   	call_rcu(&q->rcu_head, blk_free_queue_rcu);
+>   }
+>   
+
