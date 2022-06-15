@@ -2,90 +2,159 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9BE1C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 13:37:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2A55C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 13:41:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237047AbiFONhh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 09:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44690 "EHLO
+        id S1348784AbiFONlw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 09:41:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344188AbiFONhg (ORCPT
+        with ESMTP id S232167AbiFONlw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 09:37:36 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3DF2292
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 06:37:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=Olw5KXnhihAXNLgi8gB31e2MWGWril1WP4iwNiYTYJs=; b=hdm3I9GWRmJ5fii+SLDgFmZPT1
-        ImPKPXVTIQfXuTWI3FPGh2c9Z0N5m4venrIcNWJgN7c7WSCz89jLNZJM0ti96C1B8hCUPOHHNyAnN
-        juzVOsAucpRB818fVIaqq00QR1bG/2Gdiv+/iNxtTTuL8HBF8rNPmuvjhpWkCPCpMTSzJ1YsdVgFv
-        xPNZX0e1IeE6Jk6fjayRjhZUwooJdPmJwO9MTcuQGSxUGRRLOxHyq/j+WO9w4kEK/oZ0WM8iCGigI
-        WbGjtl8+ZI1we1g5a8FYd33yRnhEbt97xQpDC+5wTZozzIrsYyjfvmCAJnQaTegp7LXwnHmiZ/PwC
-        4v37vtpQ==;
-Received: from 213-147-167-122.nat.highway.webapn.at ([213.147.167.122] helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o1TD3-00EkEX-G6; Wed, 15 Jun 2022 13:37:26 +0000
-Date:   Wed, 15 Jun 2022 15:37:21 +0200
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-Subject: [GIT PULL] nvmes fixes for Linux 5.19
-Message-ID: <YqngkWynuVHY+aDS@infradead.org>
+        Wed, 15 Jun 2022 09:41:52 -0400
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 051F037A3A;
+        Wed, 15 Jun 2022 06:41:51 -0700 (PDT)
+Received: from fraeml735-chm.china.huawei.com (unknown [172.18.147.201])
+        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LNRFp14TFz688JQ;
+        Wed, 15 Jun 2022 21:38:06 +0800 (CST)
+Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
+ fraeml735-chm.china.huawei.com (10.206.15.216) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 15:41:48 +0200
+Received: from [10.202.227.197] (10.202.227.197) by
+ lhreml724-chm.china.huawei.com (10.201.108.75) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Wed, 15 Jun 2022 14:41:47 +0100
+Message-ID: <56cd28b3-da05-7737-c053-3c28459581e4@huawei.com>
+Date:   Wed, 15 Jun 2022 14:44:54 +0100
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.6.1
+From:   John Garry <john.garry@huawei.com>
+Subject: Re: [PATCH RFC v2 02/18] scsi: core: Resurrect
+ scsi_{get,free}_host_dev()
+To:     Bart Van Assche <bvanassche@acm.org>, <axboe@kernel.dk>,
+        <damien.lemoal@opensource.wdc.com>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <brking@us.ibm.com>, <hare@suse.de>,
+        <hch@lst.de>
+CC:     <linux-block@vger.kernel.org>, <linux-ide@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <chenxiang66@hisilicon.com>
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-3-git-send-email-john.garry@huawei.com>
+ <b61d3687-70ea-1ab7-63e1-44e381d36012@acm.org>
+In-Reply-To: <b61d3687-70ea-1ab7-63e1-44e381d36012@acm.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+X-Originating-IP: [10.202.227.197]
+X-ClientProxiedBy: lhreml722-chm.china.huawei.com (10.201.108.73) To
+ lhreml724-chm.china.huawei.com (10.201.108.75)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-The following changes since commit b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f3:
+On 14/06/2022 20:33, Bart Van Assche wrote:
 
-  Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
+Hi Bart,
 
-are available in the Git repository at:
+> On 6/9/22 03:29, John Garry wrote:
+>> +/**
+>> + * scsi_get_host_dev - Create a scsi_device that points to the host 
+>> adapter itself
+>                                                 
+> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> What does this mean? That part of the function description is not
+> clear to me.
+> 
 
-  git://git.infradead.org/nvme.git tags/nvme-5.19-2022-06-15
+Agreed, this text is just as it was before (it was originally deleted) 
+but I can fix it up to make sense.
 
-for you to fetch changes up to 43047e082b90ead395c44b0e8497bc853bd13845:
+>> + * @shost: Host that needs a scsi_device
+>                                ^^^^^^^^^^^^^
+> This is not detailed enough. Consider changing "a scsi_device" into
+> "a scsi device for allocating reserved commands from".
+> 
+>> + *
+>> + * Lock status: None assumed.
+>> + *
+>> + * Returns:     The scsi_device or NULL
+>> + *
+>> + * Notes:
+>> + *    Attach a single scsi_device to the Scsi_Host - this should
+>> + *    be made to look like a "pseudo-device" that points to the
+>> + *    HA itself.
+>> + *
+>> + *    Note - this device is not accessible from any high-level
+>> + *    drivers (including generics), which is probably not
+>> + *    optimal.  We can add hooks later to attach.
+> 
+> The "which is probably not optimal. We can add hooks later to attach."
+> part probably should be moved to the patch description.
 
-  nvme-pci: disable write zeros support on UMIC and Samsung SSDs (2022-06-13 19:56:57 +0200)
+ok
 
-----------------------------------------------------------------
-nvme fixes for Linux 5.19
+> 
+>> + */
+>> +struct scsi_device *scsi_get_host_dev(struct Scsi_Host *shost)
+>> +{
+>> +    struct scsi_device *sdev = NULL;
+>> +    struct scsi_target *starget;
+>> +
+>> +    mutex_lock(&shost->scan_mutex);
+>> +    if (!scsi_host_scan_allowed(shost))
+>> +        goto out;
+>> +    starget = scsi_alloc_target(&shost->shost_gendev, 0, 
+>> shost->this_id);
+>                                                            
+> ^^^^^^^^^^^^^^^^^^
+> Is it guaranteed that this channel / id combination will not be used for
+> any other SCSI device?
 
- - quirks, quirks, quirks to work around buggy consumer grade devices
-   (Keith Bush, Ning Wang, Stefan Reiter, Rasheed Hsueh)
- - better kernel messages for devices that need quirking (Keith Bush)
- - make a kernel message more useful (Thomas Wei�schuh)
+Does it matter if the parent device is different?
 
-----------------------------------------------------------------
-Keith Busch (5):
-      nvme: add bug report info for global duplicate id
-      nvme-pci: add trouble shooting steps for timeouts
-      nvme-pci: phison e12 has bogus namespace ids
-      nvme-pci: smi has bogus namespace ids
-      nvme-pci: sk hynix p31 has bogus namespace ids
+> 
+> What if shost->this_id == -1?
+> 
+>> +    if (!starget)
+>> +        goto out;
+>> +
+>> +    sdev = scsi_alloc_sdev(starget, 0, NULL);
+>> +    if (sdev)
+>> +        sdev->borken = 0;
+>> +    else
+>> +        scsi_target_reap(starget);
+>> +    put_device(&starget->dev);
+>> + out:
+>> +    mutex_unlock(&shost->scan_mutex);
+>> +    return sdev;
+>> +}
+>> +EXPORT_SYMBOL(scsi_get_host_dev);
+> 
+> Elsewhere in the SCSI core "get..dev" means increment the reference 
+> count of
+> a SCSI device. Maybe scsi_alloc_host_dev() is a better name?
 
-Ning Wang (1):
-      nvme-pci: avoid the deepest sleep state on ZHITAI TiPro7000 SSDs
+I think that the intention is to only use this once for a shost, i.e. 
+get or allocate that scsi_device once and use it for the lifetime of the 
+shost. But I can rename if you think it's better.
 
-Stefan Reiter (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for ADATA XPG GAMMIX S50
+> 
+>> +/*
+>> + * These two functions are used to allocate and free a pseudo device
+>> + * which will connect to the host adapter itself rather than any
+>> + * physical device.  You must deallocate when you are done with the
+>> + * thing.  This physical pseudo-device isn't real and won't be available
+>> + * from any high-level drivers.
+>> + */
+> 
+> Please keep function comments in .c files because that makes it more likely
+> that the comment and the implementation will remain in sync.
+> 
 
-Thomas Wei�schuh (1):
-      nvme: add device name to warning in uuid_show()
+fine, I can relocate this.
 
-rasheed.hsueh (1):
-      nvme-pci: disable write zeros support on UMIC and Samsung SSDs
-
- drivers/nvme/host/core.c |  5 +++--
- drivers/nvme/host/nvme.h | 28 ++++++++++++++++++++++++++++
- drivers/nvme/host/pci.c  | 43 ++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 73 insertions(+), 3 deletions(-)
+Thanks,
+John
