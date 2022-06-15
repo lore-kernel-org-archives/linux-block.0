@@ -2,48 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 239B9C433EF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F34BC43334
 	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 22:56:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349710AbiFOW4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1347483AbiFOW4B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 15 Jun 2022 18:56:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41726 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41734 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347483AbiFOW4A (ORCPT
+        with ESMTP id S1348865AbiFOW4A (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 15 Jun 2022 18:56:00 -0400
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7E7BE93
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:55:58 -0700 (PDT)
-Received: by mail-pf1-f177.google.com with SMTP id c196so12739524pfb.1
-        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:55:58 -0700 (PDT)
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D6DAE9C
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:56:00 -0700 (PDT)
+Received: by mail-pg1-f180.google.com with SMTP id 31so11054904pgv.11
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 15:56:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=dVeILHo/zjiFSEXMBzjhqHFosgjFC+lhya61qoAKjlQ=;
-        b=ttUy3U6CX6vLeetTGWZ9eVlqZlQat7nNGry5HDIkf9L/a/bkHHUbk57lhpiNcrVQDY
-         oOOE4SkZT009CjtR9qVFvYOdV+FhBDFsvVGg4tqpnPeuTo0yLRiwEWhK4JpMZChM6f1r
-         X3KPwseUscZ9OBs9OudtbH26yAYV8gpvYFZcesfkCMBjfmW+CoUKlQDKa9wLj4xAETYz
-         AdHvWkaT5c8W8lNw7Hp3+x5oO/auu2Ff1xYjHdWYM3IGLQ8EdLH81eOUY4VviGQ4Nc/1
-         ydJaraWxpOY7prUKp1IHhNY4fj+kpSuSXaNNLBVvgOXP9FCZPXhCnRYwJJ7VVZ8B9nGN
-         PJ6Q==
-X-Gm-Message-State: AJIora9IYqLnVjQZmJ3mwyNdpiQ/Vb5MFRcSXQcKJN48LbkuF/r/hWIZ
-        k7kvl9RmuhYg7ltZIbroC2A=
-X-Google-Smtp-Source: AGRyM1s9OyB6fwiET6PGOp0xPt7uss92vWVDf3r2THpf/kD6QwPnpQdInZuJcTe+fSWCB8p2ganeyg==
-X-Received: by 2002:a63:8ac3:0:b0:3fc:948b:a1d9 with SMTP id y186-20020a638ac3000000b003fc948ba1d9mr1800283pgd.50.1655333758067;
-        Wed, 15 Jun 2022 15:55:58 -0700 (PDT)
+        bh=D0iTTMQMQJ+C/1Ot+ZUcpq31mZl+d5hkJIQ4cfjmUiU=;
+        b=6MUh1t7r7By3tc5Ml87I2nkkY+/Kmh7OaV/7ZjZZux7ZzIgkT9DP+8s29zYtH98Pbj
+         1r0AYYBz5ZlTnvffxIWF/SvVx5GwfbBbvHCAU1J54tjfb1nmNESxJ6E+3Bz2oo/ACBVa
+         3KasmBFziv6WCFW+d7Xbd1TcJIHSmeshLk/N40cEijD4TgstD72a6yUBOPLb2AeEEgm9
+         LXNX/7vf4w5BVqvSsg7a0bhhrSvBUinfUWSIXgc12sU6U/0Dn29X3/oQdnDGUpDth5XF
+         vyusdZRNeWR6ZGQoZOFcKUy5yP9ohKrvX4VRpxJIdK/rjNGTG+qvUcmFGXAJ/raGAbRc
+         yHnw==
+X-Gm-Message-State: AJIora8ykFyWYIPjU5Lk4OmRSTb+C+MPWOsy7W5fSYucm9rQpGZuFr4K
+        NIq2I6ncAAekk6S3JMytqYk=
+X-Google-Smtp-Source: AGRyM1vhrOJrgCJWzDEOFSLw9To7RARwaGwW52qYlgx1o/s+Mlob6+qEOEJ5tMqvz2TJ+g8M3Vdqsw==
+X-Received: by 2002:a62:1687:0:b0:50d:3364:46d4 with SMTP id 129-20020a621687000000b0050d336446d4mr1860539pfw.74.1655333759776;
+        Wed, 15 Jun 2022 15:55:59 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:36ac:cabd:84b2:80f6])
-        by smtp.gmail.com with ESMTPSA id f62-20020a17090a704400b001eae95c381fsm158611pjk.10.2022.06.15.15.55.56
+        by smtp.gmail.com with ESMTPSA id f62-20020a17090a704400b001eae95c381fsm158611pjk.10.2022.06.15.15.55.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 15:55:57 -0700 (PDT)
+        Wed, 15 Jun 2022 15:55:58 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH v3 2/3] block: Rename a blk_mq_map_queue() argument
-Date:   Wed, 15 Jun 2022 15:55:48 -0700
-Message-Id: <20220615225549.1054905-3-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH v3 3/3] block: Make blk_mq_get_sq_hctx() select the proper hardware queue type
+Date:   Wed, 15 Jun 2022 15:55:49 -0700
+Message-Id: <20220615225549.1054905-4-bvanassche@acm.org>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
 In-Reply-To: <20220615225549.1054905-1-bvanassche@acm.org>
 References: <20220615225549.1054905-1-bvanassche@acm.org>
@@ -53,58 +54,30 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Before the introduction of blk_mq_get_hctx_type(), blk_mq_map_queue()
-only used the flags from its second argument. Since the introduction of
-blk_mq_get_hctx_type(), blk_mq_map_queue() uses both the operation and
-the flags encoded in that argument. Rename the second argument of
-blk_mq_map_queue() to make this clear.
+Since the introduction of blk_mq_get_hctx_type() the operation type in
+the second argument of blk_mq_get_hctx_type() matters. The introduction
+of blk_mq_get_hctx_type() caused blk_mq_get_sq_hctx() to select a
+hardware queue of type HCTX_TYPE_READ instead of HCTX_TYPE_DEFAULT.
+Switch to hardware queue type HCTX_TYPE_DEFAULT since HCTX_TYPE_READ
+should only be used for read requests.
 
+Cc: Ming Lei <ming.lei@redhat.com>
 Cc: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-mq.h | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/blk-mq.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index 2615bd58bad3..e4c6fe2c8ac8 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -86,16 +86,16 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue_type(struct request_queue *
- 	return xa_load(&q->hctx_table, q->tag_set->map[type].mq_map[cpu]);
- }
- 
--static inline enum hctx_type blk_mq_get_hctx_type(unsigned int flags)
-+static inline enum hctx_type blk_mq_get_hctx_type(unsigned int opf)
- {
- 	enum hctx_type type = HCTX_TYPE_DEFAULT;
- 
- 	/*
- 	 * The caller ensure that if REQ_POLLED, poll must be enabled.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e9bf950983c7..7a5558bbc7f6 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2168,7 +2168,7 @@ static struct blk_mq_hw_ctx *blk_mq_get_sq_hctx(struct request_queue *q)
+ 	 * just causes lock contention inside the scheduler and pointless cache
+ 	 * bouncing.
  	 */
--	if (flags & REQ_POLLED)
-+	if (opf & REQ_POLLED)
- 		type = HCTX_TYPE_POLL;
--	else if ((flags & REQ_OP_MASK) == REQ_OP_READ)
-+	else if ((opf & REQ_OP_MASK) == REQ_OP_READ)
- 		type = HCTX_TYPE_READ;
- 	return type;
- }
-@@ -103,14 +103,14 @@ static inline enum hctx_type blk_mq_get_hctx_type(unsigned int flags)
- /*
-  * blk_mq_map_queue() - map (cmd_flags,type) to hardware queue
-  * @q: request queue
-- * @flags: request command flags
-+ * @opf: operation type (REQ_OP_*) and flags (e.g. REQ_POLLED).
-  * @ctx: software queue cpu ctx
-  */
- static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
--						     unsigned int flags,
-+						     unsigned int opf,
- 						     struct blk_mq_ctx *ctx)
- {
--	return ctx->hctxs[blk_mq_get_hctx_type(flags)];
-+	return ctx->hctxs[blk_mq_get_hctx_type(opf)];
- }
+-	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
++	struct blk_mq_hw_ctx *hctx = ctx->hctxs[HCTX_TYPE_DEFAULT];
  
- /*
+ 	if (!blk_mq_hctx_stopped(hctx))
+ 		return hctx;
