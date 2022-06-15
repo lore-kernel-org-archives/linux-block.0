@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 52649CCA483
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 16:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 392B0CCA488
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 16:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348844AbiFOQMz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1348944AbiFOQMz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 15 Jun 2022 12:12:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39772 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229755AbiFOQMw (ORCPT
+        with ESMTP id S243145AbiFOQMx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 12:12:52 -0400
+        Wed, 15 Jun 2022 12:12:53 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976491C108;
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 072D5645C;
         Wed, 15 Jun 2022 09:12:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=CEsEo1LL0bapP/SgeXBMkHfYqc6Wv4poDHt3UT6FxEg=; b=Nn5f3rDAO5IH26Vm3tZC0/G00z
-        08nWaGa176sIR0AMP9ufpCFl8dqGInHVEIurBrhZxq8qyYDrYDC/FLwjHaP0xkmUhL0tsPpMFsnzC
-        TrHv4QKvFeifgNV5SXw6bzeBiEo5BMK1Wn4z1hGAMBkF+nRrTHuJRTK9R1MaGtIlhbHed9Xofrf+/
-        /E6cLO35IfpR+c+O/fl3k708ke9cdQ/QBKGT2Ot+27a8SgRnqOwwPWqIzU5BypTjVOfuD2fhybceo
-        a/BKPzddCviQTOWiZgVLC94Cl7+8/HNXYOTzmN6fEQW6XtzPv1NSvwCLPRKV2ZpBid/6o/AbJcz6B
-        VA4O9vnw==;
+        bh=lkkVGV05lv0CRWPOx1aNSbQEHovTv1Jz5BwTja4gYMc=; b=UA65EMT8xNvd8UHWetmwqme2a8
+        mbh5ZAtLMo8oOkZni6a7e7xdFqgBaoKX6BW/nxEmRzBODrgtFlIhBvcgXCHi8DFCSj6ybFs8cFwFU
+        JN5NcIKa2YwfaEFkGBKhq98tfYdc1ip6TDMNluisXCqwKBiArxGhT8ctmSh7yv0ONfMQKfAbFrlZ9
+        GPQ1EKHrP0E8uLkOsybyw5PjBkPkxm2wJNwPMXA7XshLSwQare9mNo0JzCLQGmtGTjS8GRORUOZTW
+        4uR6gNCfjlfo6idpW5EL2HFlkSZ0pa8rOW0YLmVjRT5GSymz5ydETTSteAPM/W/wXKf8A0ksSqUyH
+        Qqr3rCNQ==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o1VdP-0084iP-Uw; Wed, 15 Jun 2022 10:12:48 -0600
+        id 1o1VdP-0084iS-Qu; Wed, 15 Jun 2022 10:12:48 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o1VdI-0004ak-WE; Wed, 15 Jun 2022 10:12:41 -0600
+        id 1o1VdJ-0004as-C7; Wed, 15 Jun 2022 10:12:41 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,8 +56,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 15 Jun 2022 10:12:28 -0600
-Message-Id: <20220615161233.17527-17-logang@deltatee.com>
+Date:   Wed, 15 Jun 2022 10:12:30 -0600
+Message-Id: <20220615161233.17527-19-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220615161233.17527-1-logang@deltatee.com>
 References: <20220615161233.17527-1-logang@deltatee.com>
@@ -66,83 +66,49 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v7 16/21] block: add check when merging zone device pages
+Subject: [PATCH v7 18/21] block: set FOLL_PCI_P2PDMA in __bio_iov_iter_get_pages()
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Consecutive zone device pages should not be merged into the same sgl
-or bvec segment with other types of pages or if they belong to different
-pgmaps. Otherwise getting the pgmap of a given segment is not possible
-without scanning the entire segment. This helper returns true either if
-both pages are not zone device pages or both pages are zone device
-pages with the same pgmap.
-
-Add a helper to determine if zone device pages are mergeable and use
-this helper in page_is_mergeable().
+When a bio's queue supports PCI P2PDMA, set FOLL_PCI_P2PDMA for
+iov_iter_get_pages_flags(). This allows PCI P2PDMA pages to be passed
+from userspace and enables the O_DIRECT path in iomap based filesystems
+and direct to block devices.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- block/bio.c        |  2 ++
- include/linux/mm.h | 23 +++++++++++++++++++++++
- 2 files changed, 25 insertions(+)
+ block/bio.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/block/bio.c b/block/bio.c
-index f92d0223247b..a402a4760457 100644
+index a402a4760457..0d152da8938d 100644
 --- a/block/bio.c
 +++ b/block/bio.c
-@@ -865,6 +865,8 @@ static inline bool page_is_mergeable(const struct bio_vec *bv,
- 		return false;
- 	if (xen_domain() && !xen_biovec_phys_mergeable(bv, page))
- 		return false;
-+	if (!zone_device_pages_have_same_pgmap(bv->bv_page, page))
-+		return false;
+@@ -1180,6 +1180,7 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	struct bio_vec *bv = bio->bi_io_vec + bio->bi_vcnt;
+ 	struct page **pages = (struct page **)bv;
+ 	bool same_page = false;
++	unsigned int flags = 0;
+ 	ssize_t size, left;
+ 	unsigned len, i;
+ 	size_t offset;
+@@ -1192,7 +1193,12 @@ static int __bio_iov_iter_get_pages(struct bio *bio, struct iov_iter *iter)
+ 	BUILD_BUG_ON(PAGE_PTRS_PER_BVEC < 2);
+ 	pages += entries_left * (PAGE_PTRS_PER_BVEC - 1);
  
- 	*same_page = ((vec_end_addr & PAGE_MASK) == page_addr);
- 	if (*same_page)
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 0bcb54ea503c..33b2f4d9fd0a 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -1108,6 +1108,24 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return page_zonenum(page) == ZONE_DEVICE;
- }
+-	size = iov_iter_get_pages(iter, pages, LONG_MAX, nr_pages, &offset);
++	if (bio->bi_bdev && bio->bi_bdev->bd_disk &&
++	    blk_queue_pci_p2pdma(bio->bi_bdev->bd_disk->queue))
++		flags |= FOLL_PCI_P2PDMA;
 +
-+/*
-+ * Consecutive zone device pages should not be merged into the same sgl
-+ * or bvec segment with other types of pages or if they belong to different
-+ * pgmaps. Otherwise getting the pgmap of a given segment is not possible
-+ * without scanning the entire segment. This helper returns true either if
-+ * both pages are not zone device pages or both pages are zone device pages
-+ * with the same pgmap.
-+ */
-+static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
-+						     const struct page *b)
-+{
-+	if (is_zone_device_page(a) != is_zone_device_page(b))
-+		return false;
-+	if (!is_zone_device_page(a))
-+		return true;
-+	return a->pgmap == b->pgmap;
-+}
- extern void memmap_init_zone_device(struct zone *, unsigned long,
- 				    unsigned long, struct dev_pagemap *);
- #else
-@@ -1115,6 +1133,11 @@ static inline bool is_zone_device_page(const struct page *page)
- {
- 	return false;
- }
-+static inline bool zone_device_pages_have_same_pgmap(const struct page *a,
-+						     const struct page *b)
-+{
-+	return true;
-+}
- #endif
++	size = iov_iter_get_pages_flags(iter, pages, LONG_MAX, nr_pages,
++					&offset, flags);
+ 	if (unlikely(size <= 0))
+ 		return size ? size : -EFAULT;
  
- static inline bool folio_is_zone_device(const struct folio *folio)
 -- 
 2.30.2
 
