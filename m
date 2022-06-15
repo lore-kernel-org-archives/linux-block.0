@@ -2,70 +2,57 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8261C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 08:11:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB7DFC43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 08:12:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242751AbiFOILs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 04:11:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47242 "EHLO
+        id S234943AbiFOIMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 04:12:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47408 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236475AbiFOILr (ORCPT
+        with ESMTP id S243501AbiFOIMG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 04:11:47 -0400
-Received: from sin.source.kernel.org (sin.source.kernel.org [145.40.73.55])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8B402AE02;
-        Wed, 15 Jun 2022 01:11:46 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 4C4FCCE1D62;
-        Wed, 15 Jun 2022 08:11:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 353B6C34115;
-        Wed, 15 Jun 2022 08:11:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655280703;
-        bh=G8h+IDpJR0CvhZVQBHmA8xXUGMUALrZIeamkPUOOwAc=;
-        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-        b=J6Y3XOcwoC/TgUHQEi+SmCxARb6tPwZNqAYZg5XUTUI3Q/ll5OApOdFtKbROVKu0J
-         G3wBk9/2zrpVCGzGGdhz1ESbgkoh73YGsKSRIOJUxvsHV+/K5Zd6avT4WMepRjY9H4
-         wamp6FUhQPTuGWEhQiYvx6IJuRvj3n1pbZp2ZHUm41s47toXZ4TP69nqNoX31VqQXs
-         PJkwswu6LBuH667SA02KF13mHrfORzWm/2zDlI2HgW90bjJCTh4CmOq+CyWlVyareR
-         TNZ8wmpjenOnCxxJfBdf7GMJYbuk/uABYuIiv48owX1ckCCiZaFExYBEBPHV4h2PdO
-         DbPuKfjHUQGOA==
-Message-ID: <5fdec03e-efb6-554b-55b3-49e7e7f2be5e@kernel.org>
-Date:   Wed, 15 Jun 2022 16:11:36 +0800
+        Wed, 15 Jun 2022 04:12:06 -0400
+X-Greylist: delayed 557 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 15 Jun 2022 01:12:05 PDT
+Received: from mail.olerise.pl (mail.olerise.pl [46.183.184.59])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 485233701B
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 01:12:05 -0700 (PDT)
+Received: by mail.olerise.pl (Postfix, from userid 1001)
+        id 4868A24FE9; Wed, 15 Jun 2022 10:00:38 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=olerise.pl; s=mail;
+        t=1655280044; bh=FDuFY3XQoq0gMX1b2gxgT7Py2p4Sxl0PJZYZ4NVaPho=;
+        h=Date:From:To:Subject:From;
+        b=jhSWgq02hP7dsS/9a0mPLj0BNlDD76IGRrEYSuwR7tujlV4p84uNsAR6g9o9kVdo/
+         QXDjuybDvicd48Vw/T7G5m+S3SIuBtTuf4BxrtUbReRRoh9dWJRtAYqq19nAxpx5b4
+         sLwODJknH+9V2R/ytsEAgloUUcsru3CDUubKIgtCtbkif3Tmb7JdA7y/yS/N2Kj+FM
+         hfWBFNZL9g7vqTasQ4fK58fHAbohyKQZ4xGUhLpl//VLwBxRKA248MhMFwOYVZlvh6
+         NdHwT1T86/p3qBGnPhhHQvFHV2eXSLMa79EtECimORj3T0C0NKE7D4IAbV1NPZBDgy
+         tg+mbRj0nBv6w==
+Received: by mail.olerise.pl for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 08:00:27 GMT
+Message-ID: <20220615084500-0.1.f.833h.0.027myj7rpf@olerise.pl>
+Date:   Wed, 15 Jun 2022 08:00:27 GMT
+From:   =?UTF-8?Q? "Przemys=C5=82aw_Wr=C3=B3blewski" ?= 
+        <przemyslaw.wroblewski@olerise.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Wycena paneli fotowoltaicznych
+X-Mailer: mail.olerise.pl
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [f2fs-dev] [PATCH v2 14/19] f2fs: Convert to
- filemap_migrate_folio()
-Content-Language: en-US
-To:     "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        linux-fsdevel@vger.kernel.org
-Cc:     linux-aio@kvack.org, linux-nfs@vger.kernel.org,
-        cluster-devel@redhat.com, linux-ntfs-dev@lists.sourceforge.net,
-        linux-kernel@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net,
-        linux-block@vger.kernel.org, linux-mm@kvack.org,
-        linux-mtd@lists.infradead.org, ocfs2-devel@oss.oracle.com,
-        linux-ext4@vger.kernel.org,
-        virtualization@lists.linux-foundation.org,
-        linux-xfs@vger.kernel.org, linux-btrfs@vger.kernel.org
-References: <20220608150249.3033815-1-willy@infradead.org>
- <20220608150249.3033815-15-willy@infradead.org>
-From:   Chao Yu <chao@kernel.org>
-In-Reply-To: <20220608150249.3033815-15-willy@infradead.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/6/8 23:02, Matthew Wilcox (Oracle) wrote:
-> filemap_migrate_folio() fits f2fs's needs perfectly.
-> 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
+Dzie=C5=84 dobry,
 
-Acked-by: Chao Yu <chao@kernel.org>
+dostrzegam mo=C5=BCliwo=C5=9B=C4=87 wsp=C3=B3=C5=82pracy z Pa=C5=84stwa f=
+irm=C4=85.
 
-Thanks,
+=C5=9Awiadczymy kompleksow=C4=85 obs=C5=82ug=C4=99 inwestycji w fotowolta=
+ik=C4=99, kt=C3=B3ra obni=C5=BCa koszty energii elektrycznej nawet o 90%.
+
+Czy s=C4=85 Pa=C5=84stwo zainteresowani weryfikacj=C4=85 wst=C4=99pnych p=
+ropozycji?
+
+
+Pozdrawiam,
+Przemys=C5=82aw Wr=C3=B3blewski
