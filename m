@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246E3CCA483
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A38F3CCA486
 	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 16:13:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349241AbiFOQNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        id S1349248AbiFOQNA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
         Wed, 15 Jun 2022 12:13:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39808 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348651AbiFOQMx (ORCPT
+        with ESMTP id S1348685AbiFOQMx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Wed, 15 Jun 2022 12:12:53 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C215F237C3;
-        Wed, 15 Jun 2022 09:12:50 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95C9A6479;
+        Wed, 15 Jun 2022 09:12:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:MIME-Version:References:In-Reply-To:
         Message-Id:Date:Cc:To:From:content-disposition;
-        bh=cy9XTpt2FU24C9e+HkFSboKSQbqr83R/V0hLrLGYdpk=; b=pd2HZB3bg2LSWZzj9EZpMOVi0s
-        nG+iNfaXYF8eeuTEDUoZ0U8qSJTVi7vDWTdy/zmTG7/s7iE+8risFdqTCofKryO67JiCPS74QcN/D
-        HXxUH4ZrFy8nPMUav1tnD1IuJGBOOuZbWG4zPMBXQZ2V7cHVbV5AqG0TMDbRmoolQZ69rWlMCuV15
-        T0Af4nUJnITfvcQU/YUlR3K/EW+r0rHA597WJEYgSPeOHyZlIYcSs4Bbe8tDPRZnOXOQJ6SUYYLig
-        neTok2Gg7BE33rdf0OLJdVOtUp3HtDwt/bScL/0+Sc/BKuSD5YbYRxFJoenJ2Ctdtlk2YGexdDvOk
-        vCLIivzA==;
+        bh=X1Y+xHoeQH3UW63rjymiD/emNoqwBnemSVoIxTF9EbY=; b=iKgX6plSnGYTUQgEz3h2eQ8oq4
+        FGlAIFJWTusbVwsUGEKQv5w3YldIr+Zb7y9e5Tci57QG4okfn/WNYoSJSPedAWtRsJ317QnqZ3tYN
+        B1fywGUu5iwDLF9GPEgBC7jVnfl/bzFg+cc/N6mZ6JQngmxQwJYFT1EsGSRC6XIG1doRvnySpVRU/
+        tzfXsXC/u1Ur26GJQGnmxT26Dpy7yBQ61LA/ooaFX1WIMUL63WFzcYKEzecykYtWm5V8bVzy+p78C
+        Z+iMAawOzUWIvBjOXPztbfswoP+njdZ1jiGYb3TqxWthTb6w8cx/ik5VmwwPqeARrQ2tc76XIBIjc
+        0eUneuvg==;
 Received: from cgy1-donard.priv.deltatee.com ([172.16.1.31])
         by ale.deltatee.com with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
         (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o1VdQ-0084iT-KT; Wed, 15 Jun 2022 10:12:49 -0600
+        id 1o1VdO-0084iQ-Ox; Wed, 15 Jun 2022 10:12:47 -0600
 Received: from gunthorp by cgy1-donard.priv.deltatee.com with local (Exim 4.94.2)
         (envelope-from <gunthorp@deltatee.com>)
-        id 1o1VdI-0004ac-LN; Wed, 15 Jun 2022 10:12:40 -0600
+        id 1o1VdJ-0004b4-QT; Wed, 15 Jun 2022 10:12:41 -0600
 From:   Logan Gunthorpe <logang@deltatee.com>
 To:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
@@ -56,8 +56,8 @@ Cc:     Stephen Bates <sbates@raithlin.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
         Logan Gunthorpe <logang@deltatee.com>
-Date:   Wed, 15 Jun 2022 10:12:26 -0600
-Message-Id: <20220615161233.17527-15-logang@deltatee.com>
+Date:   Wed, 15 Jun 2022 10:12:33 -0600
+Message-Id: <20220615161233.17527-22-logang@deltatee.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220615161233.17527-1-logang@deltatee.com>
 References: <20220615161233.17527-1-logang@deltatee.com>
@@ -66,98 +66,162 @@ Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 172.16.1.31
 X-SA-Exim-Rcpt-To: linux-nvme@lists.infradead.org, linux-kernel@vger.kernel.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, jgg@ziepe.ca, christian.koenig@amd.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, jason@jlekstrand.net, dave.hansen@linux.intel.com, helgaas@kernel.org, dan.j.williams@intel.com, dave.b.minturn@intel.com, jianxin.xiong@intel.com, ira.weiny@intel.com, robin.murphy@arm.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, jhubbard@nvidia.com, rcampbell@nvidia.com, logang@deltatee.com
 X-SA-Exim-Mail-From: gunthorp@deltatee.com
-Subject: [PATCH v7 14/21] mm: introduce FOLL_PCI_P2PDMA to gate getting PCI P2PDMA pages
+Subject: [PATCH v7 21/21] nvme-pci: allow mmaping the CMB in userspace
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-GUP Callers that expect PCI P2PDMA pages can now set FOLL_PCI_P2PDMA to
-allow obtaining P2PDMA pages. If GUP is called without the flag and a
-P2PDMA page is found, it will return an error.
+Allow userspace to obtain CMB memory by mmaping the controller's
+char device. The mmap call allocates and returns a hunk of CMB memory,
+(the offset is ignored) so userspace does not have control over the
+address within the CMB.
 
-FOLL_PCI_P2PDMA cannot be set if FOLL_LONGTERM is set.
+A VMA allocated in this way will only be usable by drivers that set
+FOLL_PCI_P2PDMA when calling GUP. And inter-device support will be
+checked the first time the pages are mapped for DMA.
+
+Currently this is only supported by O_DIRECT to an PCI NVMe device
+or through the NVMe passthrough IOCTL.
 
 Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
 ---
- include/linux/mm.h |  1 +
- mm/gup.c           | 22 +++++++++++++++++++++-
- 2 files changed, 22 insertions(+), 1 deletion(-)
+ drivers/nvme/host/core.c | 35 +++++++++++++++++++++++++++++++----
+ drivers/nvme/host/nvme.h |  3 +++
+ drivers/nvme/host/pci.c  | 23 +++++++++++++++++++++++
+ 3 files changed, 57 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index bc8f326be0ce..0bcb54ea503c 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2941,6 +2941,7 @@ struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
- #define FOLL_SPLIT_PMD	0x20000	/* split huge pmd before returning */
- #define FOLL_PIN	0x40000	/* pages must be released via unpin_user_page */
- #define FOLL_FAST_ONLY	0x80000	/* gup_fast: prevent fall-back to slow gup */
-+#define FOLL_PCI_P2PDMA	0x100000 /* allow returning PCI P2PDMA pages */
+diff --git a/drivers/nvme/host/core.c b/drivers/nvme/host/core.c
+index d6e76f2dc293..23fe4b544bf1 100644
+--- a/drivers/nvme/host/core.c
++++ b/drivers/nvme/host/core.c
+@@ -3166,6 +3166,7 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
+ {
+ 	struct nvme_ctrl *ctrl =
+ 		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
++	int ret = -EINVAL;
  
- /*
-  * FOLL_PIN and FOLL_LONGTERM may be used in various combinations with each
-diff --git a/mm/gup.c b/mm/gup.c
-index 551264407624..f15f01d06a09 100644
---- a/mm/gup.c
-+++ b/mm/gup.c
-@@ -564,6 +564,12 @@ static struct page *follow_page_pte(struct vm_area_struct *vma,
- 		goto out;
+ 	switch (ctrl->state) {
+ 	case NVME_CTRL_LIVE:
+@@ -3175,13 +3176,25 @@ static int nvme_dev_open(struct inode *inode, struct file *file)
  	}
  
-+	if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
-+		     is_pci_p2pdma_page(page))) {
-+		page = ERR_PTR(-EREMOTEIO);
-+		goto out;
+ 	nvme_get_ctrl(ctrl);
+-	if (!try_module_get(ctrl->ops->module)) {
+-		nvme_put_ctrl(ctrl);
+-		return -EINVAL;
+-	}
++	if (!try_module_get(ctrl->ops->module))
++		goto err_put_ctrl;
+ 
+ 	file->private_data = ctrl;
++
++	if (ctrl->ops->cdev_file_open) {
++		ret = ctrl->ops->cdev_file_open(ctrl, file);
++		if (ret)
++			goto err_put_mod;
 +	}
 +
- 	VM_BUG_ON_PAGE((flags & FOLL_PIN) && PageAnon(page) &&
- 		       !PageAnonExclusive(page), page);
- 
-@@ -994,6 +1000,9 @@ static int check_vma_flags(struct vm_area_struct *vma, unsigned long gup_flags)
- 	if ((gup_flags & FOLL_LONGTERM) && vma_is_fsdax(vma))
- 		return -EOPNOTSUPP;
- 
-+	if ((gup_flags & FOLL_LONGTERM) && (gup_flags & FOLL_PCI_P2PDMA))
-+		return -EOPNOTSUPP;
+ 	return 0;
 +
- 	if (vma_is_secretmem(vma))
- 		return -EFAULT;
- 
-@@ -2289,6 +2298,10 @@ static int gup_pte_range(pmd_t pmd, unsigned long addr, unsigned long end,
- 		VM_BUG_ON(!pfn_valid(pte_pfn(pte)));
- 		page = pte_page(pte);
- 
-+		if (unlikely(!(flags & FOLL_PCI_P2PDMA) &&
-+			     is_pci_p2pdma_page(page)))
-+			goto pte_unmap;
++err_put_mod:
++	module_put(ctrl->ops->module);
++err_put_ctrl:
++	nvme_put_ctrl(ctrl);
++	return ret;
 +
- 		folio = try_grab_folio(page, 1, flags);
- 		if (!folio)
- 			goto pte_unmap;
-@@ -2368,6 +2381,12 @@ static int __gup_device_huge(unsigned long pfn, unsigned long addr,
- 			undo_dev_pagemap(nr, nr_start, flags, pages);
- 			break;
- 		}
-+
-+		if (!(flags & FOLL_PCI_P2PDMA) && is_pci_p2pdma_page(page)) {
-+			undo_dev_pagemap(nr, nr_start, flags, pages);
-+			break;
-+		}
-+
- 		SetPageReferenced(page);
- 		pages[*nr] = page;
- 		if (unlikely(!try_grab_page(page, flags))) {
-@@ -2856,7 +2875,8 @@ static int internal_get_user_pages_fast(unsigned long start,
+ }
  
- 	if (WARN_ON_ONCE(gup_flags & ~(FOLL_WRITE | FOLL_LONGTERM |
- 				       FOLL_FORCE | FOLL_PIN | FOLL_GET |
--				       FOLL_FAST_ONLY | FOLL_NOFAULT)))
-+				       FOLL_FAST_ONLY | FOLL_NOFAULT |
-+				       FOLL_PCI_P2PDMA)))
- 		return -EINVAL;
+ static int nvme_dev_release(struct inode *inode, struct file *file)
+@@ -3189,11 +3202,24 @@ static int nvme_dev_release(struct inode *inode, struct file *file)
+ 	struct nvme_ctrl *ctrl =
+ 		container_of(inode->i_cdev, struct nvme_ctrl, cdev);
  
- 	if (gup_flags & FOLL_PIN)
++	if (ctrl->ops->cdev_file_release)
++		ctrl->ops->cdev_file_release(file);
++
+ 	module_put(ctrl->ops->module);
+ 	nvme_put_ctrl(ctrl);
+ 	return 0;
+ }
+ 
++static int nvme_dev_mmap(struct file *file, struct vm_area_struct *vma)
++{
++	struct nvme_ctrl *ctrl = file->private_data;
++
++	if (!ctrl->ops->mmap_cmb)
++		return -ENODEV;
++
++	return ctrl->ops->mmap_cmb(ctrl, vma);
++}
++
+ static const struct file_operations nvme_dev_fops = {
+ 	.owner		= THIS_MODULE,
+ 	.open		= nvme_dev_open,
+@@ -3201,6 +3227,7 @@ static const struct file_operations nvme_dev_fops = {
+ 	.unlocked_ioctl	= nvme_dev_ioctl,
+ 	.compat_ioctl	= compat_ptr_ioctl,
+ 	.uring_cmd	= nvme_dev_uring_cmd,
++	.mmap		= nvme_dev_mmap,
+ };
+ 
+ static ssize_t nvme_sysfs_reset(struct device *dev,
+diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
+index 957f79420cf3..44ff05d8e24d 100644
+--- a/drivers/nvme/host/nvme.h
++++ b/drivers/nvme/host/nvme.h
+@@ -503,6 +503,9 @@ struct nvme_ctrl_ops {
+ 	void (*delete_ctrl)(struct nvme_ctrl *ctrl);
+ 	int (*get_address)(struct nvme_ctrl *ctrl, char *buf, int size);
+ 	bool (*supports_pci_p2pdma)(struct nvme_ctrl *ctrl);
++	int (*cdev_file_open)(struct nvme_ctrl *ctrl, struct file *file);
++	void (*cdev_file_release)(struct file *file);
++	int (*mmap_cmb)(struct nvme_ctrl *ctrl, struct vm_area_struct *vma);
+ };
+ 
+ /*
+diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
+index 52b52a7efa9a..8ef3752b7ddb 100644
+--- a/drivers/nvme/host/pci.c
++++ b/drivers/nvme/host/pci.c
+@@ -2972,6 +2972,26 @@ static bool nvme_pci_supports_pci_p2pdma(struct nvme_ctrl *ctrl)
+ 	return dma_pci_p2pdma_supported(dev->dev);
+ }
+ 
++static int nvme_pci_cdev_file_open(struct nvme_ctrl *ctrl, struct file *file)
++{
++	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
++
++	return pci_p2pdma_file_open(pdev, file);
++}
++
++static void nvme_pci_cdev_file_release(struct file *file)
++{
++	pci_p2pdma_file_release(file);
++}
++
++static int nvme_pci_mmap_cmb(struct nvme_ctrl *ctrl,
++			     struct vm_area_struct *vma)
++{
++	struct pci_dev *pdev = to_pci_dev(to_nvme_dev(ctrl)->dev);
++
++	return pci_mmap_p2pmem(pdev, vma);
++}
++
+ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.name			= "pcie",
+ 	.module			= THIS_MODULE,
+@@ -2983,6 +3003,9 @@ static const struct nvme_ctrl_ops nvme_pci_ctrl_ops = {
+ 	.submit_async_event	= nvme_pci_submit_async_event,
+ 	.get_address		= nvme_pci_get_address,
+ 	.supports_pci_p2pdma	= nvme_pci_supports_pci_p2pdma,
++	.cdev_file_open		= nvme_pci_cdev_file_open,
++	.cdev_file_release	= nvme_pci_cdev_file_release,
++	.mmap_cmb		= nvme_pci_mmap_cmb,
+ };
+ 
+ static int nvme_dev_map(struct nvme_dev *dev)
 -- 
 2.30.2
 
