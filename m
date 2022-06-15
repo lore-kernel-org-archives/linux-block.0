@@ -2,108 +2,84 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 444E5C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 15:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8148C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 15:39:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345175AbiFOP0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 11:26:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47796 "EHLO
+        id S243007AbiFOPjl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 11:39:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244124AbiFOP0i (ORCPT
+        with ESMTP id S236389AbiFOPjk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 11:26:38 -0400
-Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BA0A377C1;
-        Wed, 15 Jun 2022 08:26:37 -0700 (PDT)
-Received: by mail-ed1-x52b.google.com with SMTP id o10so16704547edi.1;
-        Wed, 15 Jun 2022 08:26:37 -0700 (PDT)
+        Wed, 15 Jun 2022 11:39:40 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A424313DC6
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id m14so336026plg.5
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=2GA+lb0s1Ij1JLSWYJXX4ZOUvdN6/e+a0skrIG7B/rE=;
-        b=mVOii0QRcqNupgkgpLCIIoHG884gBkD+5Nbs2IzE/B/iYGaNeYpq2lmsYmT5RFnbCG
-         rw8vt37D1B/3uMAEIyY8KlN6/8lpGtLjQNv3+nF04r3c6cU1lu1DOFBw22xM2sQM8prv
-         vZrWZO82PyfOrlsrwCkIq8x1knfhuHL0V7KAKdT6qQJCpgJ9M8AcsZZZ2KiOSRVKMwK5
-         XoT7HaVwdC/PUj6ULwoEqxQM4rxZGEzEuw8m5MPWJFe/6pZ//Xs8kPaBD6ew78ttGv5C
-         OvbxBS2u5W5gp/2uS/PZ21I5YXg2XQ4Emm8ce83tfwq3bOFOiI7RK275Yw4Y9YRo44dt
-         3T1g==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=edqEgyj1aQJgqVQU6EdhYMAIpwztdCTolhlaMIVQJAA=;
+        b=LMx819ruwdoW6TQqOHWhQQa7z0SFBi8W4FuE4hmY3Rsjh+8lKKoVZu7tk8/vNgKQJ4
+         uWBzb9hBnhV4GZqLzzFSZX9m83AuBKCJTxGN3il6rHAq3AdT3UF0x08LeVwbm+iyr/gh
+         2SM0jGjkUIc6nmnPKdsyURIyZBivqH2fbPBTJDJ2Q+/tPDmoF9afeDYnaLPcBdGw6YX1
+         YiUM16bLP8Uz0vgxo92xUk0z4SvhL4V3I/doXN6WShM06cuoY1eeT/hGFtxp2uiCVtNQ
+         NTCM2TMnTah6DszqGELMYls/55vaIx93z6s3IFf8i5NpS9KL3bVGTJgojkkaOxSsOAEi
+         +FYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=2GA+lb0s1Ij1JLSWYJXX4ZOUvdN6/e+a0skrIG7B/rE=;
-        b=nVo66+WukxJYLr+aQExuJOPj15GaRZj7YYvBHcG+bpWryvVjQNzTJS1D+DrwwS2po+
-         tdB94EJkjm1TXC9RNcE03sVxm+rTVglkeEw4lz4PJx/VLon1ikT0HSUpmvE2SussZVnw
-         Ggdzamk8GkXEvRiIzct9ksKsJNp4eykksTx0XyPNWPt3jcT0oYLG11/ZxuytA/D4dAKg
-         /FbKUgTu0dGkzhcNjOeL3EnfrTyyF45+IqHY4HoeTrGC1AbiMFdahGZIXKc0asztNB78
-         tsdS61832+HuZpw+yxNfChs9APB1+sZtMRUYOFhPJNrwjvmviyi+n8XnFagYODe0FsRe
-         /33A==
-X-Gm-Message-State: AJIora8UIt9pEPcGsdEFyaiCJ/1YpQj7ttUGrNikJhZmHSfbtqGuNxUP
-        4iOCQdp3fCiPV9oGmCAnF91yKoSL48OkcA==
-X-Google-Smtp-Source: AGRyM1ud+rPWhipCRl8iB6S+yDEvKVKF5PxYzoyeiAwtnhXEghcZEjl0Pb7LRyGKH84e9r8KzJgscA==
-X-Received: by 2002:a05:6402:459:b0:431:665f:11ce with SMTP id p25-20020a056402045900b00431665f11cemr320886edw.35.1655306796013;
-        Wed, 15 Jun 2022 08:26:36 -0700 (PDT)
-Received: from debianHome.localdomain (dynamic-077-003-151-196.77.3.pool.telefonica.de. [77.3.151.196])
-        by smtp.gmail.com with ESMTPSA id v14-20020aa7d9ce000000b0042bc97322desm9501224eds.43.2022.06.15.08.26.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Jun 2022 08:26:35 -0700 (PDT)
-From:   =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
-To:     selinux@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Serge Hallyn <serge@hallyn.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Alistair Delva <adelva@google.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-Subject: [PATCH v3 3/8] block: use new capable_any functionality
-Date:   Wed, 15 Jun 2022 17:26:17 +0200
-Message-Id: <20220615152623.311223-2-cgzones@googlemail.com>
-X-Mailer: git-send-email 2.36.1
-In-Reply-To: <20220615152623.311223-1-cgzones@googlemail.com>
-References: <20220502160030.131168-8-cgzones@googlemail.com>
- <20220615152623.311223-1-cgzones@googlemail.com>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=edqEgyj1aQJgqVQU6EdhYMAIpwztdCTolhlaMIVQJAA=;
+        b=zZ0jq5dgZqz5FFrMs0Hl2Me9Jo/60uabj+TPbbDf1aFZZCgEpNPwmppIjKxJBSna3K
+         sqzk/IoLSXx1iMOARxO4zNR5X4lksmW3Oc+g6KvB06KL71MOaauVnUn9SXSMst9XWz9M
+         ipgiuReMKo2biiklBCKcUSsEMWIJW+IiiDFYnTZzU0pF0ZAMVFZNr7UwFGoxR1t/lC4/
+         t9k/oYEOtoYOno3LRtG+njq4oTgV/PGx5eOO668txMdsRmZeindZ18zwpXwtfx6mt7Oj
+         yOd6Jm2bNZQPUG3rYimCZ8rgi0m5NAiVYZjCk0WEZ3eDQ+1xu/LYOkeY2MrXbZzsaCro
+         Jc9A==
+X-Gm-Message-State: AJIora8ubS5o127calgReWvW6wFmlbD0eeSU7AtI6vH/bR2sWqNPRNj2
+        uKQE/cssbZRkxmb3PkQifHTd6A==
+X-Google-Smtp-Source: AGRyM1sF8ewweLMdOZ4+abu2W9yM5IN/bhLQXvRlCf8Us7XqgX83BB8sTa1LHpN/EUDyKE09tiM3HA==
+X-Received: by 2002:a17:90a:be16:b0:1ea:e19f:b3a2 with SMTP id a22-20020a17090abe1600b001eae19fb3a2mr903760pjs.191.1655307579040;
+        Wed, 15 Jun 2022 08:39:39 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id x13-20020a63b20d000000b003faebbb772esm10346530pge.25.2022.06.15.08.39.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jun 2022 08:39:38 -0700 (PDT)
+Message-ID: <98db9274-67ef-1e8d-33d3-e9020337cb02@kernel.dk>
+Date:   Wed, 15 Jun 2022 09:39:37 -0600
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [GIT PULL] nvmes fixes for Linux 5.19
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
+        Sagi Grimberg <sagi@grimberg.me>,
+        linux-nvme@lists.infradead.org
+References: <YqngkWynuVHY+aDS@infradead.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <YqngkWynuVHY+aDS@infradead.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Use the new added capable_any function in appropriate cases, where a
-task is required to have any of two capabilities.
+On 6/15/22 7:37 AM, Christoph Hellwig wrote:
+> The following changes since commit b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f3:
+> 
+>   Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
+> 
+> are available in the Git repository at:
+> 
+>   git://git.infradead.org/nvme.git tags/nvme-5.19-2022-06-15
 
-Reorder CAP_SYS_ADMIN last.
+Pulled, thanks.
 
-Fixes: 94c4b4fd25e6 ("block: Check ADMIN before NICE for IOPRIO_CLASS_RT")
-
-Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
----
-v3:
-   rename to capable_any()
----
- block/ioprio.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
-
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 2fe068fcaad5..6441c052f837 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -37,14 +37,7 @@ int ioprio_check_cap(int ioprio)
- 
- 	switch (class) {
- 		case IOPRIO_CLASS_RT:
--			/*
--			 * Originally this only checked for CAP_SYS_ADMIN,
--			 * which was implicitly allowed for pid 0 by security
--			 * modules such as SELinux. Make sure we check
--			 * CAP_SYS_ADMIN first to avoid a denial/avc for
--			 * possibly missing CAP_SYS_NICE permission.
--			 */
--			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
-+			if (!capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN))
- 				return -EPERM;
- 			fallthrough;
- 			/* rt has prio field too */
 -- 
-2.36.1
+Jens Axboe
 
