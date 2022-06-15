@@ -2,119 +2,97 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18F00C43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 20:28:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CD39C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 21:00:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345481AbiFOU2N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 16:28:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52118 "EHLO
+        id S1345430AbiFOVAM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 17:00:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54564 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345430AbiFOU2M (ORCPT
+        with ESMTP id S1345229AbiFOVAL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 16:28:12 -0400
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 435822CDDF;
-        Wed, 15 Jun 2022 13:28:11 -0700 (PDT)
-Received: by mail-pj1-f42.google.com with SMTP id v17-20020a17090a899100b001ead067eaf9so3256032pjn.0;
-        Wed, 15 Jun 2022 13:28:11 -0700 (PDT)
+        Wed, 15 Jun 2022 17:00:11 -0400
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3A2E54FB2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:00:10 -0700 (PDT)
+Received: by mail-pj1-f54.google.com with SMTP id a10so12257014pju.3
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 14:00:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=tCKjUEEB/O98mq0HYBwtkHqa14AHHAARD8/Yh00PhZE=;
-        b=zdYTNHflv0v9sjpEUhInNYYIh731vcS7qaLFpi22DKch+yKlatmZCAc7wdwOHZsJRm
-         wafk+2WQcJ0YTVVsszikpWj8PI0/qiJCrBc9V3mNj1nWBt30MH5bQ+ztarwNucgHbYE2
-         cDOuV2rQ+zymFVkB8ojgvHCxXp6BN5xJJKP8uqYVrt5bMEt2cafWaoMj9E5ZVAlj7K8Z
-         61GJ1ZkEQmh+4dv1CZd8iRIvtEAmfvijOfAs7gV/dlj3c8imi0SqvMdAuFh3zjcpt4uo
-         PZbvidK34uDfdk0Gsyu+pSzZVPi7kyT3FiS/+gjCHf1SVkWyPl6b9F7QICr0ji6Sphzk
-         b3+Q==
-X-Gm-Message-State: AJIora/1r2tDgyRXcFGDvevrQ6GQYkQKrlZtJwtOKijBf69j/TAHJSg2
-        gRG2uCRUXXGHszVWsFzbCzM=
-X-Google-Smtp-Source: AGRyM1ssYRY17vRnuP2ETISK730/klJkF/7+lw/tAz1SHcUNuW29npshKuTZX6r5VdStdPt6uTHY9Q==
-X-Received: by 2002:a17:90b:358d:b0:1ea:4718:82b8 with SMTP id mm13-20020a17090b358d00b001ea471882b8mr12165746pjb.244.1655324890558;
-        Wed, 15 Jun 2022 13:28:10 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:36ac:cabd:84b2:80f6? ([2620:15c:211:201:36ac:cabd:84b2:80f6])
-        by smtp.gmail.com with ESMTPSA id w22-20020a1709026f1600b001676f87473fsm8523plk.302.2022.06.15.13.28.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jun 2022 13:28:09 -0700 (PDT)
-Message-ID: <857c444a-02b9-9cef-0c5b-2ecdb2fd46f6@acm.org>
-Date:   Wed, 15 Jun 2022 13:28:07 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [dm-devel] [PATCH v7 02/13] block: allow blk-zoned devices to
- have non-power-of-2 zone size
-Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
-        snitzer@redhat.com, damien.lemoal@opensource.wdc.com,
-        axboe@kernel.dk
-Cc:     pankydev8@gmail.com, gost.dev@samsung.com,
-        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, jonathan.derrick@linux.dev,
-        Johannes.Thumshirn@wdc.com, dsterba@suse.com, jaegeuk@kernel.org,
-        Luis Chamberlain <mcgrof@kernel.org>
-References: <20220615101920.329421-1-p.raghav@samsung.com>
- <CGME20220615101931eucas1p15ed09ae433a2c378b599e9086130d8eb@eucas1p1.samsung.com>
- <20220615101920.329421-3-p.raghav@samsung.com>
+        bh=MB0LeXi+X0nJwTOwQ1Rbe7Z7qBzrRw1Enp7KNNRIW+s=;
+        b=HVO0lo25TESffyxB9Tl2BjHCiIkoJ/5HzLL5uGxR6qcpYZBLEoSxZtkXn1hQgYzfSg
+         2uSC01B/anx9wb0NVViNf+7Ltupv+rkIvu1KJfYZ7vJsczdrQERYO2KXSr0RBvdAIIbf
+         +2WI8EewxXAFDcv0La9h4jhgvWGZxvvg0d9EhbM+WJ0Pi0YBNHzQhJWGdLMx2Eiv0V87
+         QIa7VzYMEjYV0K8tuWEtQS4yRSw0/KKqAmh4HDYlvCmhG2lYDczR7/XYeTfctiYwA+wR
+         nSqZjhMH+vIHwYyGDvlWXrpbsxdWUG4GTEN9Ud442aBYSeL613XVPLkfUB0zU7Zco/r3
+         8S1Q==
+X-Gm-Message-State: AJIora9g6x9/wAmBexUA8miisOsyghKZ6yQHe+1udlHZYVCwby4lHKO4
+        GJb8ZtT/rQES2kVPi9tOgHE=
+X-Google-Smtp-Source: AGRyM1t0o2jTTQ0UJsoK/lEamJt6V3N6WY/28O96nc1YORwpu8aqIKYYHDVOd4m27zg6BchwpLwryQ==
+X-Received: by 2002:a17:902:ce0c:b0:168:ca2e:c944 with SMTP id k12-20020a170902ce0c00b00168ca2ec944mr1335533plg.107.1655326810147;
+        Wed, 15 Jun 2022 14:00:10 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:36ac:cabd:84b2:80f6])
+        by smtp.gmail.com with ESMTPSA id y2-20020a17090264c200b001678960e2ebsm48216pli.224.2022.06.15.14.00.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Jun 2022 14:00:09 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220615101920.329421-3-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH] block: Fix handling of offline queues in blk_mq_alloc_request_hctx()
+Date:   Wed, 15 Jun 2022 14:00:04 -0700
+Message-Id: <20220615210004.1031820-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/22 03:19, Pankaj Raghav wrote:
-> @@ -489,14 +489,27 @@ static int blk_revalidate_zone_cb(struct blk_zone *zone, unsigned int idx,
->   	 * smaller last zone.
->   	 */
->   	if (zone->start == 0) {
-> -		if (zone->len == 0 || !is_power_of_2(zone->len)) {
-> -			pr_warn("%s: Invalid zoned device with non power of two zone size (%llu)\n",
-> -				disk->disk_name, zone->len);
-> +		if (zone->len == 0) {
-> +			pr_warn("%s: Invalid zone size", disk->disk_name);
-> +			return -ENODEV;
-> +		}
-> +
-> +		/*
-> +		 * Don't allow zoned device with non power_of_2 zone size with
-> +		 * zone capacity less than zone size.
-> +		 */
+This patch prevents that test nvme/004 triggers the following:
 
-Please change "power_of_2" into "power-of-2".
+UBSAN: array-index-out-of-bounds in block/blk-mq.h:135:9
+index 512 is out of range for type 'long unsigned int [512]'
+Call Trace:
+ show_stack+0x52/0x58
+ dump_stack_lvl+0x49/0x5e
+ dump_stack+0x10/0x12
+ ubsan_epilogue+0x9/0x3b
+ __ubsan_handle_out_of_bounds.cold+0x44/0x49
+ blk_mq_alloc_request_hctx+0x304/0x310
+ __nvme_submit_sync_cmd+0x70/0x200 [nvme_core]
+ nvmf_connect_io_queue+0x23e/0x2a0 [nvme_fabrics]
+ nvme_loop_connect_io_queues+0x8d/0xb0 [nvme_loop]
+ nvme_loop_create_ctrl+0x58e/0x7d0 [nvme_loop]
+ nvmf_create_ctrl+0x1d7/0x4d0 [nvme_fabrics]
+ nvmf_dev_write+0xae/0x111 [nvme_fabrics]
+ vfs_write+0x144/0x560
+ ksys_write+0xb7/0x140
+ __x64_sys_write+0x42/0x50
+ do_syscall_64+0x35/0x80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-> +		if (!is_power_of_2(zone->len) && zone->capacity < zone->len) {
-> +			pr_warn("%s: Invalid zone capacity for non power of 2 zone size",
-> +				disk->disk_name);
->   			return -ENODEV;
->   		}
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Fixes: 20e4d8139319 ("blk-mq: simplify queue mapping & schedule with each possisble CPU")
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-mq.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The above check seems wrong to me. I don't see why devices that report a 
-capacity that is less than the zone size should be rejected.
-
-> +		/*
-> +		 * Division is used to calculate nr_zones for both power_of_2
-> +		 * and non power_of_2 zone sizes as it is not in the hot path.
-> +		 */
-
-Shouldn't the above comment be moved to the patch description? I'm not 
-sure whether having such a comment in the source code is valuable.
-
-> +static inline sector_t blk_queue_offset_from_zone_start(struct request_queue *q,
-> +							sector_t sec)
-> +{
-> +	sector_t zone_sectors = blk_queue_zone_sectors(q);
-> +	u64 remainder = 0;
-> +
-> +	if (!blk_queue_is_zoned(q))
-> +		return false;
-
-"return false" should only occur in functions returning a boolean. This 
-function returns type sector_t.
-
-Thanks,
-
-Bart.
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 7a5558bbc7f6..1c09c6017ea9 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -579,6 +579,8 @@ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+ 	if (!blk_mq_hw_queue_mapped(data.hctx))
+ 		goto out_queue_exit;
+ 	cpu = cpumask_first_and(data.hctx->cpumask, cpu_online_mask);
++	if (cpu >= nr_cpu_ids)
++		goto out_queue_exit;
+ 	data.ctx = __blk_mq_get_ctx(q, cpu);
+ 
+ 	if (!q->elevator)
