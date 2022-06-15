@@ -2,75 +2,125 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45257C43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 06:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C36C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 07:21:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbiFOG4i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 02:56:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41974 "EHLO
+        id S235803AbiFOHVx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 03:21:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33402 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230312AbiFOG4h (ORCPT
+        with ESMTP id S232467AbiFOHVw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 02:56:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id B119237A16
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 23:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655276195;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=tRlRkelPeqOCdoUlDc20pp9W6haS3weBk7iLOhjm1QI=;
-        b=doYBoFyMHO7dmyad64KQwR65xV/sJdwAJ7az3+f6cLgcWy0KfCYtz8QEKmx7GYbceUIL+u
-        Zh9uRlZDfrZEZMKA8KB/UQOtr/HJYZ9gSHMOoCzyU6w2D/cySaaqarQo5FjWW7V24jJOqj
-        QgpIXplKEfQARVsiAAlXEWsCNR7VzJc=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-508-dqBivJW-OzW-ZhIVcUAnlg-1; Wed, 15 Jun 2022 02:56:30 -0400
-X-MC-Unique: dqBivJW-OzW-ZhIVcUAnlg-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 36B9D85A581;
-        Wed, 15 Jun 2022 06:56:30 +0000 (UTC)
-Received: from T590 (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 07CE8401E68;
-        Wed, 15 Jun 2022 06:56:26 +0000 (UTC)
-Date:   Wed, 15 Jun 2022 14:56:21 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH V2 2/3] blk-mq: avoid to touch q->elevator without any
- protection
-Message-ID: <YqmClQiasYgxpurq@T590>
-References: <20220615064826.773067-1-ming.lei@redhat.com>
- <20220615064826.773067-3-ming.lei@redhat.com>
- <20220615065034.GA23449@lst.de>
+        Wed, 15 Jun 2022 03:21:52 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B847943AC3
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 00:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655277711; x=1686813711;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=izlKgFtXFAiS7qlPzgUvTlFl3rHcGt2DCiEG8dyFTgk=;
+  b=d3aO/6W4YEJJNFcYT1nytZ6cTKmFlEPzcSPstccy1YgPpV3f0tV1nJ+f
+   Ui4di/IsgqhC9v349WidDUh2X+GlE6KFhBgGau5k2QVJ2qkkyTvH5j51W
+   MBIkuEpy4ebeUnJoyYJMEoxiGG41pzd8B7P+5pd9f8IzkAA4kBZ0xeBhD
+   8WUkJfkvfAkbwUaj2CyJmH7O9WbtXRRv70WGnbMThxjzzeTOas7z9tPL7
+   4Us2ul2IyU35kcYr2sOtP1Fhb1pkcXRYW01GK03El3GZ/IyBPfiFOOXiS
+   yALBkUiVU2aAR4BpHkDlPj9Fj+7mF0A4kKZDsmVZ6LHVhgRssjBeV1ONp
+   w==;
+X-IronPort-AV: E=Sophos;i="5.91,300,1647273600"; 
+   d="scan'208";a="307495022"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 15 Jun 2022 15:21:51 +0800
+IronPort-SDR: xnD4ojduN5/yI1IIGrerrYqSDYVt68z+fmaUzCDfQ7YZRSFIsSqPWwUgOPzq3Bfz4iTPibLvCO
+ bfi8lWJZVRSvazmVaaV3BWkKGrlYNKTvt0pni4jYzox+5PQV3+9o2beBNgIG2u3sSK9+Kucjsf
+ VKSRGuKedz00mttfWLx+LeyM+PkBQE4TEDvmA/PHYjf8EIMWlbrU/tXxDI8K01956lXEMRHPW0
+ 3kYK7rAwoQ3uEjbzuvkn8broDChtgcdXRONXBi5g1gjYsGtextqRsGPDBQiE8CYkPqg+km5QFF
+ 6BJ/p1KFw8pL6qe35VmlB19j
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 14 Jun 2022 23:40:15 -0700
+IronPort-SDR: yAG7haH1CxfXT0n3y4lpyv74DFxUely0YsMksHsHSUm5YdAKmPg0XR92rCBuiMVHoZLrjXtOmw
+ o3k/617m2cPzEZQOsaAU597XyXG3yYA6tNSG70PC7cFCYqkSyHux3Z8446aHhhq1qIsZki3jkM
+ EynbuDhz0n3qzMB86nSo5i9hkIc0vE+Btv0cLqdH0xucCopk3/kb+C92OLR9wWFLnGWSZIt5ok
+ sbMc+1kslStH2V3b7DVeSjRUv5MWWOn4iOz30/JmabxoV9wndXvMEhEB4sWvnYrtp66rdIaENI
+ pV0=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jun 2022 00:21:51 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LNGvf4KDpz1SVp2
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 00:21:50 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1655277710; x=1657869711; bh=izlKgFtXFAiS7qlPzgUvTlFl3rHcGt2DCiE
+        G8dyFTgk=; b=rT9XRuf1TcAnN665s2ZMLjiTWsT+WDgHH6sTJVqGEbjeORNuhVR
+        rDD6pEagAYlSZnajBECIH+iT3jk0+WEBB0jLG/mtw4mrSlgH/HEj2aCVLMlvGPvi
+        lqxTaIFzPadT0x0ibr6sYyGpk15AS9oGtt+K9FJrfwiz/QUJQQmVmUjmX4YA1FRt
+        4FX1rPoZLHPRnZuaUa/BbTyVo2SDHB+b5v5zcWPLUDXqZMi7GKQy6MZw7WnTC0BG
+        Uzf3POvBDH4sxYgssvzfQrGKujhaFrikpDHn3oSjypSNuLBKjFsh+24sUgviDN9B
+        GNKrj6xS0hgzlxLuHN5eR1X9bRMfpLnAxxw==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id 2l4ScYk0ZqHi for <linux-block@vger.kernel.org>;
+        Wed, 15 Jun 2022 00:21:50 -0700 (PDT)
+Received: from [10.225.163.82] (unknown [10.225.163.82])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LNGvc524nz1Rvlc;
+        Wed, 15 Jun 2022 00:21:48 -0700 (PDT)
+Message-ID: <434cb0ae-a6e7-62a0-81dc-cd86f55108d4@opensource.wdc.com>
+Date:   Wed, 15 Jun 2022 16:21:47 +0900
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220615065034.GA23449@lst.de>
-X-Scanned-By: MIMEDefang 2.85 on 10.11.54.10
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 2/5] scsi: Retry unaligned zoned writes
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Khazhy Kumykov <khazhy@google.com>,
+        Jaegeuk Kim <jaegeuk@kernel.org>
+References: <20220614174943.611369-1-bvanassche@acm.org>
+ <20220614174943.611369-3-bvanassche@acm.org>
+ <399e595b-06d2-ceb1-1b42-2a98a7724320@opensource.wdc.com>
+ <29a13708-56b1-60e8-558a-ec4a469eaa6d@acm.org>
+ <20220615054909.GA22044@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220615054909.GA22044@lst.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 08:50:34AM +0200, Christoph Hellwig wrote:
-> On Wed, Jun 15, 2022 at 02:48:25PM +0800, Ming Lei wrote:
-> > q->elevator is referred in blk_mq_has_sqsched() without any protection,
-> > no .q_usage_counter is held, no queue srcu and rcu read lock is held,
-> > so potential use-after-free may be triggered.
-> > 
-> > Fix the issue by adding one queue flag for checking if the elevator
-> > uses single queue style dispatch. Meantime the elevator feature flag
-> > of ELEVATOR_F_MQ_AWARE isn't needed any more.
+On 6/15/22 14:49, Christoph Hellwig wrote:
+> On Tue, Jun 14, 2022 at 04:56:52PM -0700, Bart Van Assche wrote:
+>> The performance penalty of zone locking is not acceptable for our use case. 
+>> Does this mean that zone locking needs to be preserved for AHCI but not for 
+>> UFS?
 > 
-> We still need to clear the flag when switching elevators.
+> It means you use case needs to use zone append, and we need to make sure
+> it is added to SCSI assuming your are on SCSI based on your other comments.
 
-Indeed, or it can be cleared in initializing none and kyber. 
+For scsi, we already have the zone append emulation in the sd driver which
+issues regular writes together with taking the zone lock. So UFS has zone
+append, not as a native command though. But if for UFS device there are no
+issue of command reordering underneath sd, then the zone append emulation
+can be done without taking the zone write lock, which would result in the
+same performance as what a native zone append command would give.
 
-Thanks,
-Ming
+At least for the short term, that could be a good solution until native
+zone append is added to zbc specs. That last part may face a lot of
+pushback because of the difficulty of having that same command on ATA side.
 
+
+-- 
+Damien Le Moal
+Western Digital Research
