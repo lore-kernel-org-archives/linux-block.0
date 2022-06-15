@@ -2,92 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19AAC43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 02:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 926B6C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 04:23:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234820AbiFOChh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 14 Jun 2022 22:37:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56964 "EHLO
+        id S234332AbiFOEXH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 00:23:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59320 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233048AbiFOChh (ORCPT
+        with ESMTP id S234067AbiFOEXG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 14 Jun 2022 22:37:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 25F0B23BDA
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 19:37:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655260654;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=KdTL6ecM7P8JgNIgwLofbnPiTEMkV+2vn/XLEpr4Y7c=;
-        b=f8OiehoD3E0ymVIuayIAuW3icGQ3KLCyVmdozZfyNvqFCV1Xj4wPg9JxJWcSoUH+iNX7gp
-        Go8MrDXqRZWoqin4jlycAjOxTrfDk8IUgUCWICnhX3q0qgg1z758P6iWzXkw4gA5YuPhQP
-        oTUQ/drL7Rd44nMwbe7kdAMc1O3HAr4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-127-hHnY_ZGhMvu1cryQx0JPkQ-1; Tue, 14 Jun 2022 22:37:31 -0400
-X-MC-Unique: hHnY_ZGhMvu1cryQx0JPkQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FB481C01B2F;
-        Wed, 15 Jun 2022 02:37:30 +0000 (UTC)
-Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 5C0522166B26;
-        Wed, 15 Jun 2022 02:37:28 +0000 (UTC)
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
-        Ming Lei <ming.lei@redhat.com>, Yu Kuai <yukuai3@huawei.com>
-Subject: [PATCH 3/3] blk-mq: don't clear flush_rq from tags->rqs[]
-Date:   Wed, 15 Jun 2022 10:37:12 +0800
-Message-Id: <20220615023712.750122-4-ming.lei@redhat.com>
-In-Reply-To: <20220615023712.750122-1-ming.lei@redhat.com>
-References: <20220615023712.750122-1-ming.lei@redhat.com>
+        Wed, 15 Jun 2022 00:23:06 -0400
+Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9295B3054A
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 21:23:05 -0700 (PDT)
+Received: from cwcc.thunk.org (pool-173-48-118-63.bstnma.fios.verizon.net [173.48.118.63])
+        (authenticated bits=0)
+        (User authenticated as tytso@ATHENA.MIT.EDU)
+        by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 25F4N1Cd014471
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 15 Jun 2022 00:23:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
+        t=1655266982; bh=GaCulJnfo5iXBqtblbk9G1Lk4SsnNzEvugTOCcxnIdQ=;
+        h=Date:From:To:Subject;
+        b=pK23PdvGULr6i7DM25Q6nzV0mkTzS9xSIbNriFEz93mCRO8VMUl1PAur1n6aCMVp3
+         JG72dZu+cJrHD/5EZzP/bLE5FWBv4z6nvSWUuTa84ZIhuKm3YHWJJtzsyOX+HxC6fA
+         WhW15YAhSAQxQBc9Ug0pP1PQJ/ilHxhhuiIeB0P4LMmbDDyzSv533coVTUVrep0DCR
+         zVn3EKOXsPiPdpqaY9btTZa+DvXLYKAPVkxEgVBj4Ea1turptE8tF02hda7ZYG0VGz
+         PAWXVRs61ZfqHnRWGzjOMTnmqvwQukdUSM6yx1B2HLVyHt8Fan5oNtY3Otepxgzve+
+         E9cCW54AWKyuQ==
+Received: by cwcc.thunk.org (Postfix, from userid 15806)
+        id EA41515C42F8; Wed, 15 Jun 2022 00:23:00 -0400 (EDT)
+Date:   Wed, 15 Jun 2022 00:23:00 -0400
+From:   "Theodore Ts'o" <tytso@mit.edu>
+To:     linux-block@vger.kernel.org
+Subject: Maintainer's / Kernel Summit 2022 CFP
+Message-ID: <YqlepDtGy/+R2ZC1@mit.edu>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-commit 364b61818f65 ("blk-mq: clearing flush request reference in
-tags->rqs[]") is added to clear the to-be-free flush request from
-tags->rqs[] for avoiding use-after-free on the flush rq.
+This year, the Maintainer's Summit will be held in Dublin on September
+15th, 2022, just after the Linux Plumber's Conference (September
+12-14).
 
-Yu Kuai reported that blk_mq_clear_flush_rq_mapping() slows down boot time
-by ~8s because running scsi probe which may create and remove lots of
-unpresent LUNs on megaraid-sas which uses BLK_MQ_F_TAG_HCTX_SHARED and
-each request queue has lots of hw queues.
+As in previous years, the Maintainers Summit is invite-only, where the
+primary focus will be process issues around Linux Kernel Development.
+It will be limited to 30 invitees and a handful of sponsored
+attendees.
 
-Improve the situation by not running blk_mq_clear_flush_rq_mapping if
-disk isn't added when there can't be any flush request issued.
+Linus will be generating a core list of people to be invited to the
+Maintainers Summit.  The top ten people from that list will receive
+invites, and then program committee will use the rest of Linus's list
+as a starting point of people to be considered.  People who suggest
+topics that should be discussed at the Maintainers Summit will also
+be added to the list for consideration.  To make topic suggestions for
+the Maintainers Summit, please send e-mail to the
+ksummit-discuss@lists.linuxfoundation.org list with a subject prefix
+of [MAINTAINERS SUMMIT].
 
-Reported-by: Yu Kuai <yukuai3@huawei.com>
-Signed-off-by: Ming Lei <ming.lei@redhat.com>
----
- block/blk-mq.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+The Kernel Summit is organized as a track which is run in parallel
+with the other tracks at the Linux Plumbers Conference (LPC), and is
+open to all registered attendees of LPC.  The goal of the Kernel
+Summit track will be to provide a forum to discuss specific technical
+issues that would be easier to resolve in person than over e-mail.
+The program committee will also consider "information sharing" topics
+if they are clearly of interest to the wider development community
+(i.e., advanced training in topics that would be useful to kernel
+developers).
 
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index 112dce569192..992997f6acbd 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -3429,8 +3429,9 @@ static void blk_mq_exit_hctx(struct request_queue *q,
- 	if (blk_mq_hw_queue_mapped(hctx))
- 		blk_mq_tag_idle(hctx);
- 
--	blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
--			set->queue_depth, flush_rq);
-+	if (blk_queue_init_done(q))
-+		blk_mq_clear_flush_rq_mapping(set->tags[hctx_idx],
-+				set->queue_depth, flush_rq);
- 	if (set->ops->exit_request)
- 		set->ops->exit_request(set, flush_rq, hctx_idx);
- 
--- 
-2.31.1
+To suggest a topic for the Kernel Summit, please do two things. by
+June 19th, 2022.  First, please tag your e-mail with [TECH TOPIC].  As
+before, please use a separate e-mail for each topic, and send the
+topic suggestions to the ksummit-discuss list.
+
+Secondly, please create a topic at the Linux Plumbers Conference
+proposal submission site and target it to the Kernel Summit track:
+
+	https://lpc.events/event/16/abstracts/
+
+Please do both steps.  I'll try to notice if someone forgets one or
+the other, but your chances of making sure your proposal gets the
+necessary attention and consideration are maximized by submitting both
+to the mailing list and the web site.
+
+If you were not subscribed on to the kernel-discuss mailing list from
+last year (or if you had removed yourself after the kernel summit),
+you can subscribe to the discuss list using mailman:
+
+   https://lists.linuxfoundation.org/mailman/listinfo/ksummit-discuss
+
+The program committee this year is composed of the following people:
+
+Greg KH
+Jens Axboe
+Ted Ts'o
+Arnd Bergmann
+Jon Corbet
 
