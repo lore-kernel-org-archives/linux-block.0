@@ -2,56 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F376CC43334
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 06:27:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6964C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 06:48:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239980AbiFOG1n (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 02:27:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42564 "EHLO
+        id S240391AbiFOGsp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 02:48:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236311AbiFOG1i (ORCPT
+        with ESMTP id S241130AbiFOGsk (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 02:27:38 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D49F6320
-        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 23:27:33 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 37EB767373; Wed, 15 Jun 2022 08:27:30 +0200 (CEST)
-Date:   Wed, 15 Jun 2022 08:27:29 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        Mike Snitzer <snitzer@kernel.org>, dm-devel@redhat.com,
-        linux-block@vger.kernel.org
-Subject: Re: [PATCH 4/6] block: cleanup variable naming in get_max_io_size
-Message-ID: <20220615062729.GA22728@lst.de>
-References: <20220614090934.570632-1-hch@lst.de> <20220614090934.570632-5-hch@lst.de> <4b846753-bb89-c123-2813-bcb587fdcaaf@acm.org>
+        Wed, 15 Jun 2022 02:48:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 1577D45793
+        for <linux-block@vger.kernel.org>; Tue, 14 Jun 2022 23:48:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655275717;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Vj7coqjOQU418lkmQhHr/ZFKyLd3AXnpf+KuHq61UvU=;
+        b=Fuhty9F/6+QfHs9RQmd3SX5Y/nHBZanvxieRcd2pOop+utMtQWffASKZNiqyA6CfmHmbYK
+        oxuLIG0Y6pSV93NLZ13wPG+ffIXwMnq61C86+pbuxzFPOheNNv8lvWOv39lvzYRd0fo0PZ
+        XaajT30AVPOnbj7dpzzVNctiOmnSC+k=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-673-Z6npab6uMDa5DqxmCyonbw-1; Wed, 15 Jun 2022 02:48:33 -0400
+X-MC-Unique: Z6npab6uMDa5DqxmCyonbw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E85D6185A7B2;
+        Wed, 15 Jun 2022 06:48:32 +0000 (UTC)
+Received: from localhost (ovpn-8-18.pek2.redhat.com [10.72.8.18])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 1686840CF8E7;
+        Wed, 15 Jun 2022 06:48:31 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-block@vger.kernel.org,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V2 0/3] blk-mq: three misc patches
+Date:   Wed, 15 Jun 2022 14:48:23 +0800
+Message-Id: <20220615064826.773067-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4b846753-bb89-c123-2813-bcb587fdcaaf@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 14, 2022 at 09:50:00AM -0700, Bart Van Assche wrote:
-> On 6/14/22 02:09, Christoph Hellwig wrote:
->> get_max_io_size has a very odd choice of variables names and
->> initialization patterns.  Switch to more descriptive names and more
->> clear initialization of them.
->
-> Hmm ... what is so odd about the variable names? I have done my best to 
-> chose clear and descriptive names when I introduced these names.
+Hello Guys,
 
-Major confusion:
+The 1st two patches make referring to q->elevator more reliable, and
+avoid potential use-after-free on q->elevator in two code paths.
 
- - we have a local variable to hold the queue max sectors value,
-   but it is callled sectors
- - while we have a variable the holds the rounded end of the I/O
-   range that is called max_sectors
+The 3rd patch improves boot time for scsi host with lots of hw queues.
 
-Minor confusion:
+V2:
+	- follow Christoph's suggestion to set QUEUE_FLAG_SQ_SCHED inside
+	mq-deadline and bfq directly
 
- - a variable that hold that rounded start of the range has a random
-   _offset suffix despite not really being an offset
+Ming Lei (3):
+  blk-mq: protect q->elevator by ->sysfs_lock in blk_mq_elv_switch_none
+  blk-mq: avoid to touch q->elevator without any protection
+  blk-mq: don't clear flush_rq from tags->rqs[]
+
+ block/bfq-iosched.c    |  3 +++
+ block/blk-mq.c         | 27 ++++++++-------------------
+ block/kyber-iosched.c  |  1 -
+ block/mq-deadline.c    |  3 +++
+ include/linux/blkdev.h |  4 ++--
+ 5 files changed, 16 insertions(+), 22 deletions(-)
+
+-- 
+2.31.1
+
