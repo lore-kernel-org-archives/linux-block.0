@@ -2,112 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A801C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 19:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97187C43334
+	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 20:18:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349703AbiFOTzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 15:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55434 "EHLO
+        id S244528AbiFOUSl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 16:18:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45258 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243859AbiFOTzk (ORCPT
+        with ESMTP id S244563AbiFOUSg (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 15:55:40 -0400
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8232229345;
-        Wed, 15 Jun 2022 12:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-        :In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:
-        Sender:Reply-To:Content-ID:Content-Description;
-        bh=8/XljWZrmcL2YdcuWDBrkYF7wQr7RHmdlPcVPREXheY=; b=Smg02axWWFOzSLkQ1MAheC7JEP
-        SJ/CKjft9dSD4tgHQ/prrWKSi+UjVmSJukWNZvgcLeZ/4NRVD8QwO2fI5+rqTGoVNHHl7MMcIFhTk
-        dz/zDpWCjZ0e1FaJLuJqP1ulojg090QLnCsRWhfPkBlUFFzQXA+8eb0P8fIbDIIXo+G6zIsXoGemo
-        WKfbIpKoBvMosBfiHcZxiVbHhLd6ObgW6JD27G+xQCaZ3LFBCollqX4w7j7tBIy0gVmCLEyaW1DZr
-        bW8e7xcWBrjUAPUnlP/bI3E2i3CGj3pak2Bvy1I3Q1YsOwF9mQEMr4Cf+rWPDsmiw86SrXTzsf+Lo
-        ENCq9NQw==;
-Received: from [2601:1c0:6280:3f0::aa0b]
-        by desiato.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o1Z6S-008D8F-P3; Wed, 15 Jun 2022 19:55:03 +0000
-Message-ID: <0480d917-94e5-20ab-514c-bb1374a8d9c4@infradead.org>
-Date:   Wed, 15 Jun 2022 12:54:53 -0700
+        Wed, 15 Jun 2022 16:18:36 -0400
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03AF3FBC2;
+        Wed, 15 Jun 2022 13:18:34 -0700 (PDT)
+Received: by mail-pj1-f43.google.com with SMTP id k12-20020a17090a404c00b001eaabc1fe5dso3205742pjg.1;
+        Wed, 15 Jun 2022 13:18:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=SNU2ULTl0ChHoBmMMoN7qtu5qLqYyEFI2kUe8MWmWMo=;
+        b=1xfuyiZ4pemCYDrGJtKD1a9VxOw53omwsE6kn6VIrTTdg9gH0CAEdVltY9xDuiHv5B
+         G9ke1gSr4WIUbKOciFnLo1PAdO16w89Q5cnqt53UZBZ5NKH7jVJn053pqhZZtKLsKaEp
+         +UyMX2ESpJbaeaUPRIZjplFHic6qYedpH0SH+OtueqoqCNnz6ViWNAMT2KNxiGpTRJpp
+         +RmmKN+qB5dpfIP0m28CKD/JTgrOv44UaVdkSkKG6fWT25rBk+nTl89KBgikA3G+216J
+         3FPRKqonQhD6SPH4FL8qZE3Ztd4SXGErjH6CRG5rutYz4Cc7GzCohlGcLJUa8oLMRyEV
+         aJ5g==
+X-Gm-Message-State: AJIora9wluUylGRSf/DKhfOSST2MZi1Q4i+qqZPJr+bbDOk48MfJVmXR
+        X2z178FE5oJerCiWcqdogmc=
+X-Google-Smtp-Source: AGRyM1s3xzzOdnqeKw+fkjDbJVScgIu0tZCo++/2yYCKrn2XJapgnfJfEXIAyvKCytnUw+BXN2cYHQ==
+X-Received: by 2002:a17:902:9a97:b0:168:a97e:2457 with SMTP id w23-20020a1709029a9700b00168a97e2457mr1297905plp.33.1655324314284;
+        Wed, 15 Jun 2022 13:18:34 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:36ac:cabd:84b2:80f6? ([2620:15c:211:201:36ac:cabd:84b2:80f6])
+        by smtp.gmail.com with ESMTPSA id b9-20020a170902d88900b001663185e654sm8464plz.280.2022.06.15.13.18.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 15 Jun 2022 13:18:33 -0700 (PDT)
+Message-ID: <c2269e99-b832-1c00-a08b-14af3be4d76b@acm.org>
+Date:   Wed, 15 Jun 2022 13:18:31 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.9.1
-Subject: Re: [PATCH v7 13/13] dm: add non power of 2 zoned target
+ Thunderbird/91.8.0
+Subject: Re: [dm-devel] [PATCH v7 01/13] block: make blkdev_nr_zones and
+ blk_queue_zone_no generic for npo2 zsze
 Content-Language: en-US
 To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
         snitzer@redhat.com, damien.lemoal@opensource.wdc.com,
         axboe@kernel.dk
-Cc:     bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        jiangbo.365@bytedance.com, hare@suse.de, pankydev8@gmail.com,
+Cc:     pankydev8@gmail.com, gost.dev@samsung.com,
+        jiangbo.365@bytedance.com, linux-nvme@lists.infradead.org,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
         dm-devel@redhat.com, jonathan.derrick@linux.dev,
-        gost.dev@samsung.com, dsterba@suse.com, jaegeuk@kernel.org,
-        linux-nvme@lists.infradead.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
+        Johannes.Thumshirn@wdc.com, dsterba@suse.com, jaegeuk@kernel.org,
+        Luis Chamberlain <mcgrof@kernel.org>
 References: <20220615101920.329421-1-p.raghav@samsung.com>
- <CGME20220615102011eucas1p220368db4a186181b1927dea50a79e5d4@eucas1p2.samsung.com>
- <20220615101920.329421-14-p.raghav@samsung.com>
-From:   Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20220615101920.329421-14-p.raghav@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+ <CGME20220615101927eucas1p17220c7a36f69f59ff8ddd560b42967ec@eucas1p1.samsung.com>
+ <20220615101920.329421-2-p.raghav@samsung.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220615101920.329421-2-p.raghav@samsung.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi--
-
 On 6/15/22 03:19, Pankaj Raghav wrote:
-
-> ---
->  drivers/md/Kconfig                |   9 +
->  drivers/md/Makefile               |   2 +
->  drivers/md/dm-zone.c              |   9 +
->  drivers/md/dm-zoned-npo2-target.c | 268 ++++++++++++++++++++++++++++++
->  4 files changed, 288 insertions(+)
->  create mode 100644 drivers/md/dm-zoned-npo2-target.c
+> Adapt blkdev_nr_zones and blk_queue_zone_no function so that it can
+> also work for non-power-of-2 zone sizes.
 > 
-> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
-> index 998a5cfdb..773314536 100644
-> --- a/drivers/md/Kconfig
-> +++ b/drivers/md/Kconfig
-> @@ -518,6 +518,15 @@ config DM_FLAKEY
->  	help
->  	 A target that intermittently fails I/O for debugging purposes.
->  
-> +config DM_ZONED_NPO2
-> +	tristate "Zoned non power of 2 target"
-
-	         "Zoned non-power-of-2 target"
-
-> +	depends on BLK_DEV_DM
-> +	depends on BLK_DEV_ZONED
-> +	help
-> +	A target that converts a zoned device with non power of 2 zone size to
-
-	                                           non-power-of-2 zone size to
-
-> +	be power of 2. This is done by introducing gaps in between the zone
-> +	capacity and the power of 2 zone size.
-
-All help text should be indented with one tab and 2 spaces
-according to Documentation/process/coding-style.rst.
-
-> +
->  config DM_VERITY
->  	tristate "Verity target support"
->  	depends on BLK_DEV_DM
-
-[snip]
-
-> +
-> +MODULE_DESCRIPTION(DM_NAME " non power 2 zoned target");
-
-                                non-power-of-2
-
-> +MODULE_AUTHOR("Pankaj Raghav <p.raghav@samsung.com>");
-> +MODULE_LICENSE("GPL");
-> +
-
--- 
-~Randy
+> As the existing deployments of zoned devices had power-of-2
+> assumption, power-of-2 optimized calculation is kept for those devices.
+> 
+> There are no direct hot paths modified and the changes just
+> introduce one new branch per call.
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
