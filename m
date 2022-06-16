@@ -2,73 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D066CCCA47E
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 06:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACA25C43334
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 06:15:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229739AbiFPGHV (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jun 2022 02:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54120 "EHLO
+        id S1358633AbiFPGPH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jun 2022 02:15:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358907AbiFPGHT (ORCPT
+        with ESMTP id S232248AbiFPGPG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jun 2022 02:07:19 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06E8CCE;
-        Wed, 15 Jun 2022 23:07:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description;
-        bh=lQ1idLnL2UCMJjEJnkwsAGfziMzzcuwKz3HZqhqoSgY=; b=YpAt3w8FxJkqvgT9iUxi24xofx
-        8+MvlP+t2PLJClmbzMh18BN6ZwDbMmncgLTl17zD+v64zcQMphUoIRaaPqzZ9Kcpf+7tyKKylosSd
-        OBn0bXQZGwNn1yI7B/kUkJqGiMJWwXuRRwgQUA3cJpfiVH00RtuJeKBV1dYTiGYoxczXS8RI9iqPE
-        IKx0AVVX9KzBGe6L7/GrOI+YrFxVeLneipAWwETP8dgETplOiFEcQKIPl+aG6wgIFJdwWuEWPkEWf
-        I0c4yVCYAk3jbyZnzK9cGmY24O5LW7GYL7W6PZ6EU+ypD46A/EQ820J0qw64K/4/XVRxXZkCVCaTN
-        vOIrX+fA==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o1iez-000gG0-HX; Thu, 16 Jun 2022 06:07:17 +0000
-Date:   Wed, 15 Jun 2022 23:07:17 -0700
-From:   Christoph Hellwig <hch@infradead.org>
-To:     Eric Biggers <ebiggers@kernel.org>
-Cc:     Christoph Hellwig <hch@infradead.org>,
-        Dave Chinner <david@fromorbit.com>,
-        "Darrick J. Wong" <djwong@kernel.org>,
-        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
-        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
-        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Keith Busch <kbusch@kernel.org>
-Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
-Message-ID: <YqrIlVtI85zF9qyO@infradead.org>
-References: <20220518235011.153058-1-ebiggers@kernel.org>
- <20220518235011.153058-2-ebiggers@kernel.org>
- <YobNXbYnhBiqniTH@magnolia>
- <20220520032739.GB1098723@dread.disaster.area>
- <YqgbuDbdH2OLcbC7@sol.localdomain>
- <YqnapOLvHDmX/3py@infradead.org>
- <YqpzqZQgu0Zz+vW1@sol.localdomain>
+        Thu, 16 Jun 2022 02:15:06 -0400
+Received: from verein.lst.de (verein.lst.de [213.95.11.211])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F32A736170
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 23:15:04 -0700 (PDT)
+Received: by verein.lst.de (Postfix, from userid 2407)
+        id 0DD3D68AA6; Thu, 16 Jun 2022 08:15:01 +0200 (CEST)
+Date:   Thu, 16 Jun 2022 08:15:00 +0200
+From:   Christoph Hellwig <hch@lst.de>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
+        linux-block@vger.kernel.org, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH V3 2/3] blk-mq: avoid to touch q->elevator without any
+ protection
+Message-ID: <20220616061500.GA5144@lst.de>
+References: <20220616014401.817001-1-ming.lei@redhat.com> <20220616014401.817001-3-ming.lei@redhat.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YqpzqZQgu0Zz+vW1@sol.localdomain>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+In-Reply-To: <20220616014401.817001-3-ming.lei@redhat.com>
+User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 05:04:57PM -0700, Eric Biggers wrote:
-> One more thing.  I'm trying to add support for STATX_DIOALIGN on block devices.
-> Unfortunately I don't think it is going to work, at all, since the inode is for
-> the device node and not the block device itself.  This is true even after the
-> file is opened (I previously thought that at least that case would work).
+On Thu, Jun 16, 2022 at 09:44:00AM +0800, Ming Lei wrote:
+> q->elevator is referred in blk_mq_has_sqsched() without any protection,
+> no .q_usage_counter is held, no queue srcu and rcu read lock is held,
+> so potential use-after-free may be triggered.
+> 
+> Fix the issue by adding one queue flag for checking if the elevator
+> uses single queue style dispatch. Meantime the elevator feature flag
+> of ELEVATOR_F_MQ_AWARE isn't needed any more.
 
-For an open file the block device inode is pointed to by
-file->f_mapping->host.
+I think clearing in common code would be safer, but this does work
+as-is, so:
 
-> Were you expecting that this would work on block devices?  It seems they will
-> need a different API -- a new BLK* ioctl, or files in /sys/block/$dev/queue.
-
-blkdev_get_no_open on inode->i_rdev gets you the block device, which
-then has bdev->bd_inode point to the underlying block device, although
-for a block device those limit probably would be retrieved not from
-the inode but the gendisk / request_queue anyway.
+Reviewed-by: Christoph Hellwig <hch@lst.de>
