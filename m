@@ -2,91 +2,134 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C508C43334
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 18:36:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B23DCCA47A
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 20:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230386AbiFPSgK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jun 2022 14:36:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36628 "EHLO
+        id S238989AbiFPUSS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jun 2022 16:18:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229990AbiFPSgJ (ORCPT
+        with ESMTP id S1378388AbiFPUSR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jun 2022 14:36:09 -0400
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6B67517FC
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 11:36:07 -0700 (PDT)
-Received: by mail-pf1-f182.google.com with SMTP id x138so2190825pfc.12
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 11:36:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=LqkNOtOWACeQyVeMnUVbj8d66vhCpghKihp0RSKTVP0=;
-        b=49KFwAQuklJo2wbXIBtKgoxwlIuhC+xV9jprVbr6uHXvga9luPzlUIswohuh2W+XOq
-         9zvc5FNfvSps7m8M655wk4eSC44y2Thq85AZ/vpEu5WKzzqFvS32UaLQ/uIDUdFrS2g1
-         0kh9vBaKi9h9/y0daMiRO5AMC5mxAFH0di9g6achKbZRVoOckqQ7iO1+e9VHXX5DX3ki
-         GMf2A2SnN7zYI6lsaChSCcKwq7zkP8h2OxUPolOXCCLs7d/evnzzj0UMAnnzGjnCYP93
-         FyhvHjnBPOcB1P0JgFlEbPJUPz9pNDV3s4CtPKRfqd8AYsKncIZV3CxNJUBikM2C7sGR
-         8Tvg==
-X-Gm-Message-State: AJIora+UyiBJLG+tZ26D49FpXPHqjslT/ts2h2vEjLN/4FXCWn+cfvld
-        l/NRGszmCWLwX+5JXz0HlDc=
-X-Google-Smtp-Source: AGRyM1tTWwUYTq0F2Zi+QP1tXmj29AervucjyH1nC1BqvyNbCZ8v0ptmYp1wzDWdSebpek3pNjrgxQ==
-X-Received: by 2002:a63:5304:0:b0:3fb:92eb:8e90 with SMTP id h4-20020a635304000000b003fb92eb8e90mr5701047pgb.36.1655404567076;
-        Thu, 16 Jun 2022 11:36:07 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:55f1:e134:5606:bb89? ([2620:15c:211:201:55f1:e134:5606:bb89])
-        by smtp.gmail.com with ESMTPSA id s10-20020a62e70a000000b0051ba2c0ff24sm2140663pfh.144.2022.06.16.11.36.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Jun 2022 11:36:06 -0700 (PDT)
-Message-ID: <8c3a5d60-281e-a7c7-57d0-f5fe1db5a17c@acm.org>
-Date:   Thu, 16 Jun 2022 11:36:04 -0700
+        Thu, 16 Jun 2022 16:18:17 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1650135257;
+        Thu, 16 Jun 2022 13:18:17 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id A8CE561DB9;
+        Thu, 16 Jun 2022 20:18:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3B2AC3411F;
+        Thu, 16 Jun 2022 20:18:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655410696;
+        bh=iOxOv0QdDiqnoNfajHWkadykNw8yw6SMHWPSQ+/Z1Cs=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=XCySuz3YzYlgIHp8UL9jy8oSMx9yC+Hk6wTrq88c+IqE3hXqu0MY+j4K/xAAKTOAB
+         sAbep1qh9fUb8cPkmzPaQXFgxh+7nOMstYpxFHqIhVpafDfYexM9uSN3fhdwzTOemJ
+         vVKthy2fIB4Jh7ii0yur32iWQbzJuBIUYh4gNt3v2cHdnfB4jmyxfEh79bOgfZG9iS
+         MwwX6yNWttTI2eKEHpQxjcfMtWiL98SiARcc+j/jzMKfzRbnNY05boFEMDVUk5YG+S
+         rtMLJEhH/UUTKqs7mFfPlqVdeaqbFX2S7jZCkEZDBN+SJH0Yk7KT3G3/QA0AbK9qR/
+         ASb2CbGMlBDdA==
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     linux-fsdevel@vger.kernel.org
+Cc:     linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: [PATCH v3 2/8] vfs: support STATX_DIOALIGN on block devices
+Date:   Thu, 16 Jun 2022 13:15:00 -0700
+Message-Id: <20220616201506.124209-3-ebiggers@kernel.org>
+X-Mailer: git-send-email 2.36.1
+In-Reply-To: <20220616201506.124209-1-ebiggers@kernel.org>
+References: <20220616201506.124209-1-ebiggers@kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 2/5] scsi: Retry unaligned zoned writes
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@wdc.com>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Khazhy Kumykov <khazhy@google.com>,
-        Jaegeuk Kim <jaegeuk@kernel.org>
-References: <20220614174943.611369-1-bvanassche@acm.org>
- <20220614174943.611369-3-bvanassche@acm.org>
- <399e595b-06d2-ceb1-1b42-2a98a7724320@opensource.wdc.com>
- <29a13708-56b1-60e8-558a-ec4a469eaa6d@acm.org>
- <20220615054909.GA22044@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220615054909.GA22044@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/22 22:49, Christoph Hellwig wrote:
-> On Tue, Jun 14, 2022 at 04:56:52PM -0700, Bart Van Assche wrote:
->> The performance penalty of zone locking is not acceptable for our use case.
->> Does this mean that zone locking needs to be preserved for AHCI but not for
->> UFS?
-> 
-> It means you use case needs to use zone append, and we need to make sure
-> it is added to SCSI assuming your are on SCSI based on your other comments.
+From: Eric Biggers <ebiggers@google.com>
 
-Using ZONE APPEND instead of SCSI WRITE commands would have the 
-following consequences:
-* Data of a single file might be stored out-of-order on the storage medium.
-* A translation table would have to be stored on the storage medium with 
-one entry per ZONE APPEND command with the LBAs of where the ZONE APPEND 
-commands wrote their data. I think that translation table can be 
-considered as another L2P table. One of our motivations to switch to 
-zoned storage is to get rid of nested L2P tables.
+Add support for STATX_DIOALIGN to block devices, so that direct I/O
+alignment restrictions are exposed to userspace in a generic way.
 
-Both aspects above would have a negative impact on sequential read 
-performance. Hence our preference to use WRITE commands for zoned 
-storage instead of ZONE APPEND commands.
+Note that this breaks the tradition of stat operating only on the block
+device node, not the block device itself.  However, it was felt that
+doing this is preferable, in order to make the interface useful and
+avoid needing separate interfaces for regular files and block devices.
 
-Thanks,
+Signed-off-by: Eric Biggers <ebiggers@google.com>
+---
+ fs/stat.c | 35 +++++++++++++++++++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-Bart.
+diff --git a/fs/stat.c b/fs/stat.c
+index a7930d7444830..c1ce447c1a383 100644
+--- a/fs/stat.c
++++ b/fs/stat.c
+@@ -5,6 +5,7 @@
+  *  Copyright (C) 1991, 1992  Linus Torvalds
+  */
+ 
++#include <linux/blkdev.h>
+ #include <linux/export.h>
+ #include <linux/mm.h>
+ #include <linux/errno.h>
+@@ -198,6 +199,35 @@ int getname_statx_lookup_flags(int flags)
+ 	return lookup_flags;
+ }
+ 
++/* Handle STATX_DIOALIGN for block devices. */
++static inline void handle_bdev_dioalign(struct path *path, u32 request_mask,
++					struct kstat *stat)
++{
++#ifdef CONFIG_BLOCK
++	struct inode *inode;
++	struct block_device *bdev;
++	unsigned int lbs;
++
++	if (likely(!(request_mask & STATX_DIOALIGN)))
++		return;
++
++	inode = d_backing_inode(path->dentry);
++	if (!S_ISBLK(inode->i_mode))
++		return;
++
++	bdev = blkdev_get_no_open(inode->i_rdev);
++	if (!bdev)
++		return;
++
++	lbs = bdev_logical_block_size(bdev);
++	stat->dio_mem_align = lbs;
++	stat->dio_offset_align = lbs;
++	stat->result_mask |= STATX_DIOALIGN;
++
++	blkdev_put_no_open(bdev);
++#endif /* CONFIG_BLOCK */
++}
++
+ /**
+  * vfs_statx - Get basic and extra attributes by filename
+  * @dfd: A file descriptor representing the base dir for a relative filename
+@@ -230,11 +260,16 @@ static int vfs_statx(int dfd, struct filename *filename, int flags,
+ 		goto out;
+ 
+ 	error = vfs_getattr(&path, stat, request_mask, flags);
++
+ 	stat->mnt_id = real_mount(path.mnt)->mnt_id;
+ 	stat->result_mask |= STATX_MNT_ID;
++
+ 	if (path.mnt->mnt_root == path.dentry)
+ 		stat->attributes |= STATX_ATTR_MOUNT_ROOT;
+ 	stat->attributes_mask |= STATX_ATTR_MOUNT_ROOT;
++
++	handle_bdev_dioalign(&path, request_mask, stat);
++
+ 	path_put(&path);
+ 	if (retry_estale(error, lookup_flags)) {
+ 		lookup_flags |= LOOKUP_REVAL;
+-- 
+2.36.1
+
