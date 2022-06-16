@@ -2,101 +2,268 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E642C43334
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 03:00:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EBE5C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 03:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355783AbiFPDAX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 23:00:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59948 "EHLO
+        id S1346547AbiFPDOi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 23:14:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42076 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355750AbiFPDAV (ORCPT
+        with ESMTP id S1348016AbiFPDOh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 23:00:21 -0400
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D74A45A2C3;
-        Wed, 15 Jun 2022 20:00:20 -0700 (PDT)
-Received: by mail-pf1-f174.google.com with SMTP id s37so293663pfg.11;
-        Wed, 15 Jun 2022 20:00:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=kLu0AyZbwG8o8hfD/fv5Wh7BJxHL6y7f8uHQKEJJV6U=;
-        b=k3iAfz3repC7wE79wV5V9jmg7OTywTvZQCS6xd/4rdeiVtRUs0zT9HlIgTw3IePSeR
-         RhNy43WOSAVQPzquN2IkpzIK3DaNPvyghrQKhV8EtL9nTDjnZy8dostvB+cHEdQec+fH
-         Tg1u+9a5gEZUfGxYUqUF6kAk5XJIloDHXEtwOmprLD96Cc4f1TaWyTuKpc7UPOlpIbTh
-         TUyqq8jlRcHsWcnv4FUU3SpHDTyMi7ZzI1cAKHqppeeoQ91cGVaHIuBafjPSSwXfdMDm
-         RrJVihVqm/2zPKAfCvC1Z3fboamcD/gW9o/naihh9dpTp6dWE8IuYZ86uc7S1O7XDPmP
-         XF/A==
-X-Gm-Message-State: AJIora/hGBWpHXq9W1K2Y/z6dQ+HtYNyZaHKLTZzo+xs0Hs3aFn0PFqO
-        4qPQQBd5g1Po6nc3QnU1++4=
-X-Google-Smtp-Source: AGRyM1uRqJci6ZIfCJSBxo3jFrvP6GWbLFgj40m+japCby9a0CiFohY8D+yndlsBrHLluXlD0d2bTA==
-X-Received: by 2002:a63:8a42:0:b0:3fc:f8b5:291f with SMTP id y63-20020a638a42000000b003fcf8b5291fmr2547392pgd.550.1655348420055;
-        Wed, 15 Jun 2022 20:00:20 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id fu13-20020a17090ad18d00b001cb6527ca39sm2582309pjb.0.2022.06.15.20.00.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Jun 2022 20:00:19 -0700 (PDT)
-Message-ID: <7fd6f544-0bd2-62fe-bddd-869364f351e8@acm.org>
-Date:   Wed, 15 Jun 2022 20:00:17 -0700
+        Wed, 15 Jun 2022 23:14:37 -0400
+Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D997936E0F
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 20:14:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655349276; x=1686885276;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=99AETx/1Vc8KHzsE72Hefkm3AykmP+KUWO5chPkQj+k=;
+  b=YGkc20gPn91ZNvajv+X4KiS7OyiXH4ATAAFKpyspV78JREIXkTPUQDUV
+   V6QEejwnV/8stLxPRAh4G3uHaBWf3GIj/jx5BEXQhv3loJd9egV5lME59
+   84/dPEIhcq1Q2bL0tIYEAJhaRq8f8FfGcWTCMfkVkCPNuASeh2vVwJuIg
+   wGjnoCcp5F2bDY9scaOVGpUfnb6YIIkaBLUWDGTa4pbL+ZEVAhORI+pIS
+   FWxPvMIG5TGVIer35MbgrqXOkE10GcpuMnjSRg7KYC/foots0P82X5U5L
+   bdRXRhbxvH8MHttw9pNDGb4YWNlulKXbHWPqXjQIPwACqvWj3Z//Gbd/f
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.91,302,1647273600"; 
+   d="scan'208";a="204050252"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2022 11:14:36 +0800
+IronPort-SDR: t65NVgR+C29y5XqpXYGLMXQ6QHCRU15vEYT1xwRbO6781Pov9rhhpqlrKKTcSEyHQjBiHXx6zE
+ KCdZPrmaOcD+8Sen7mN0R6Eyi922YYmPJUBN0j1JRdh94cGxsHtOYKuzj13QvN9bbdmqOQvttG
+ 1fzEwjVZckssE9g6aC7emRWJChYtnRJjnJTEoAGiOm2Y/ckAyDUrE76wSSrP95MDjAXsWx4/gN
+ sd5i3SZeh/UE/7IqjTGES4u0QSwWyb6bjmDZjI4pqTLT6TTpdbbRMSUlb/LdIQAiSRdnvG8vIJ
+ e2S/OofYf+rZqsexFm27vxgq
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jun 2022 19:37:24 -0700
+IronPort-SDR: 4MOJkP94VqtEho5QqWx3wrf+5T1zqKacO1ARrOdglVP/Rrxc28BoUA1sDOb/Au4ngnxePEudUR
+ nwPk+X9Dgyl3bwnryzxNQy3/N5lT4Vs1/ZCj1v9H6ST9rl3lxCfRXJ7NGMnSdo7dLeGxeu62ck
+ 7+UIx0QMiI0JScNcTYX4txaMnswfZAaWlOLE9kUPohjrEtsH/oUQS9+PvQiUk16qE99OV6HGk2
+ XEFnhR4zXO/g6lGAAK3nXtRMR0GB8uhY4drWWUMVnk9CiXuTwMJw+pA8z7r0KfJN5t2JQPmZS8
+ Fms=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 15 Jun 2022 20:14:36 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LNnMt4Jryz1SHwl
+        for <linux-block@vger.kernel.org>; Wed, 15 Jun 2022 20:14:34 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1655349274; x=1657941275; bh=99AETx/1Vc8KHzsE72Hefkm3AykmP+KUWO5
+        chPkQj+k=; b=exNniC5fj0GQbY2EzKIEuvngTZmDG6fytySzoCzM9AsAiAWrtyE
+        fKsQ9OjN8hstGLp4ZMXiPlRQD7+a+U1d9DrAuV0sdbMuti6vJ2hLrBZS5Ygio3Se
+        YsaM0zvnq93619IcVd3kfvxYNvUrUMmfZQ+hftv6gTbvnKVJn7IBLvnLiboba/Y7
+        9KipSRdIHEaGz2pfdPKUbo1a3EVtjqyNpXHaM8E6kCXUKUondpy77Esmdp+4XwmT
+        nL1SLkQSWc0N793hmz1wg75pmWzOO4zjE1E7DLue8EGZcWOWcAVd0QHQIGsZben4
+        eYvIP18wHz8e4/NCI1F498CMvsmqSzmTwRA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id uVYFOsS11XJ3 for <linux-block@vger.kernel.org>;
+        Wed, 15 Jun 2022 20:14:34 -0700 (PDT)
+Received: from [10.149.53.254] (washi.fujisawa.hgst.com [10.149.53.254])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LNnMs12WKz1Rvlc;
+        Wed, 15 Jun 2022 20:14:32 -0700 (PDT)
+Message-ID: <0f6e149e-b93f-1236-23a7-f7b8fa9719a1@opensource.wdc.com>
+Date:   Thu, 16 Jun 2022 12:14:31 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH v3 3/8] block: use new capable_any functionality
+Subject: Re: [PATCH 6/8] blk-ioprio: Convert from rqos policy to direct call
 Content-Language: en-US
-To:     =?UTF-8?Q?Christian_G=c3=b6ttsche?= <cgzones@googlemail.com>,
-        selinux@vger.kernel.org
-Cc:     Jens Axboe <axboe@kernel.dk>, Serge Hallyn <serge@hallyn.com>,
-        Alistair Delva <adelva@google.com>,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-security-module@vger.kernel.org
-References: <20220502160030.131168-8-cgzones@googlemail.com>
- <20220615152623.311223-1-cgzones@googlemail.com>
- <20220615152623.311223-2-cgzones@googlemail.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220615152623.311223-2-cgzones@googlemail.com>
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20220615160437.5478-1-jack@suse.cz>
+ <20220615161616.5055-6-jack@suse.cz>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220615161616.5055-6-jack@suse.cz>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/15/22 08:26, Christian Göttsche wrote:
-> Use the new added capable_any function in appropriate cases, where a
-> task is required to have any of two capabilities.
+On 6/16/22 01:16, Jan Kara wrote:
+> Convert blk-ioprio handling from a rqos policy to a direct call from
+> blk_mq_submit_bio(). Firstly, blk-ioprio is not a much of a rqos policy
+> anyway, it just needs a hook in bio submission path to set the bio's IO
+> priority. Secondly, the rqos .track hook gets actually called too late
+> for blk-ioprio purposes and introducing a special rqos hook just for
+> blk-ioprio looks even weirder.
 > 
-> Reorder CAP_SYS_ADMIN last.
-> 
-> Fixes: 94c4b4fd25e6 ("block: Check ADMIN before NICE for IOPRIO_CLASS_RT")
-> 
-> Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
+> Signed-off-by: Jan Kara <jack@suse.cz>
 > ---
-> v3:
->     rename to capable_any()
-> ---
->   block/ioprio.c | 9 +--------
->   1 file changed, 1 insertion(+), 8 deletions(-)
+>   block/blk-cgroup.c |  1 +
+>   block/blk-ioprio.c | 50 +++++-----------------------------------------
+>   block/blk-ioprio.h |  9 +++++++++
+>   block/blk-mq.c     |  8 ++++++++
+>   4 files changed, 23 insertions(+), 45 deletions(-)
 > 
-> diff --git a/block/ioprio.c b/block/ioprio.c
-> index 2fe068fcaad5..6441c052f837 100644
-> --- a/block/ioprio.c
-> +++ b/block/ioprio.c
-> @@ -37,14 +37,7 @@ int ioprio_check_cap(int ioprio)
+> diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+> index 764e740b0c0f..6906981563f8 100644
+> --- a/block/blk-cgroup.c
+> +++ b/block/blk-cgroup.c
+> @@ -1299,6 +1299,7 @@ int blkcg_init_queue(struct request_queue *q)
+>   	ret = blk_iolatency_init(q);
+>   	if (ret) {
+>   		blk_throtl_exit(q);
+> +		blk_ioprio_exit(q);
+>   		goto err_destroy_all;
+>   	}
 >   
->   	switch (class) {
->   		case IOPRIO_CLASS_RT:
-> -			/*
-> -			 * Originally this only checked for CAP_SYS_ADMIN,
-> -			 * which was implicitly allowed for pid 0 by security
-> -			 * modules such as SELinux. Make sure we check
-> -			 * CAP_SYS_ADMIN first to avoid a denial/avc for
-> -			 * possibly missing CAP_SYS_NICE permission.
-> -			 */
-> -			if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_NICE))
-> +			if (!capable_any(CAP_SYS_NICE, CAP_SYS_ADMIN))
->   				return -EPERM;
->   			fallthrough;
->   			/* rt has prio field too */
+> diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+> index 3f605583598b..c00060a02c6e 100644
+> --- a/block/blk-ioprio.c
+> +++ b/block/blk-ioprio.c
+> @@ -181,17 +181,12 @@ static struct blkcg_policy ioprio_policy = {
+>   	.pd_free_fn	= ioprio_free_pd,
+>   };
+>   
+> -struct blk_ioprio {
+> -	struct rq_qos rqos;
+> -};
+> -
+> -static void blkcg_ioprio_track(struct rq_qos *rqos, struct request *rq,
+> -			       struct bio *bio)
+> +void blkcg_set_ioprio(struct bio *bio)
+>   {
+>   	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_bio(bio);
+>   	u16 prio;
+>   
+> -	if (blkcg->prio_policy == POLICY_NO_CHANGE)
+> +	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
 
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
+See my comment on patch 8.
+
+>   		return;
+>   
+>   	/*
+> @@ -207,49 +202,14 @@ static void blkcg_ioprio_track(struct rq_qos *rqos, struct request *rq,
+>   		bio->bi_ioprio = prio;
+>   }
+>   
+> -static void blkcg_ioprio_exit(struct rq_qos *rqos)
+> +void blk_ioprio_exit(struct request_queue *q)
+>   {
+> -	struct blk_ioprio *blkioprio_blkg =
+> -		container_of(rqos, typeof(*blkioprio_blkg), rqos);
+> -
+> -	blkcg_deactivate_policy(rqos->q, &ioprio_policy);
+> -	kfree(blkioprio_blkg);
+> +	blkcg_deactivate_policy(q, &ioprio_policy);
+>   }
+>   
+> -static struct rq_qos_ops blkcg_ioprio_ops = {
+> -	.track	= blkcg_ioprio_track,
+> -	.exit	= blkcg_ioprio_exit,
+> -};
+> -
+>   int blk_ioprio_init(struct request_queue *q)
+>   {
+> -	struct blk_ioprio *blkioprio_blkg;
+> -	struct rq_qos *rqos;
+> -	int ret;
+> -
+> -	blkioprio_blkg = kzalloc(sizeof(*blkioprio_blkg), GFP_KERNEL);
+> -	if (!blkioprio_blkg)
+> -		return -ENOMEM;
+> -
+> -	ret = blkcg_activate_policy(q, &ioprio_policy);
+> -	if (ret) {
+> -		kfree(blkioprio_blkg);
+> -		return ret;
+> -	}
+> -
+> -	rqos = &blkioprio_blkg->rqos;
+> -	rqos->id = RQ_QOS_IOPRIO;
+> -	rqos->ops = &blkcg_ioprio_ops;
+> -	rqos->q = q;
+> -
+> -	/*
+> -	 * Registering the rq-qos policy after activating the blk-cgroup
+> -	 * policy guarantees that ioprio_blkcg_from_bio(bio) != NULL in the
+> -	 * rq-qos callbacks.
+> -	 */
+> -	rq_qos_add(q, rqos);
+> -
+> -	return 0;
+> +	return blkcg_activate_policy(q, &ioprio_policy);
+>   }
+>   
+>   static int __init ioprio_init(void)
+> diff --git a/block/blk-ioprio.h b/block/blk-ioprio.h
+> index a7785c2f1aea..5a1eb550e178 100644
+> --- a/block/blk-ioprio.h
+> +++ b/block/blk-ioprio.h
+> @@ -6,14 +6,23 @@
+>   #include <linux/kconfig.h>
+>   
+>   struct request_queue;
+> +struct bio;
+>   
+>   #ifdef CONFIG_BLK_CGROUP_IOPRIO
+>   int blk_ioprio_init(struct request_queue *q);
+> +void blk_ioprio_exit(struct request_queue *q);
+> +void blkcg_set_ioprio(struct bio *bio);
+>   #else
+>   static inline int blk_ioprio_init(struct request_queue *q)
+>   {
+>   	return 0;
+>   }
+> +static inline void blk_ioprio_exit(struct request_queue *q)
+> +{
+> +}
+> +static inline void blkcg_set_ioprio(struct bio *bio)
+> +{
+> +}
+>   #endif
+>   
+>   #endif /* _BLK_IOPRIO_H_ */
+> diff --git a/block/blk-mq.c b/block/blk-mq.c
+> index e9bf950983c7..67a7bfa58b7c 100644
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -42,6 +42,7 @@
+>   #include "blk-stat.h"
+>   #include "blk-mq-sched.h"
+>   #include "blk-rq-qos.h"
+> +#include "blk-ioprio.h"
+>   
+>   static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+>   
+> @@ -2790,6 +2791,11 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+>   	return rq;
+>   }
+>   
+> +static void bio_set_ioprio(struct bio *bio)
+> +{
+> +	blkcg_set_ioprio(bio);
+> +}
+> +
+>   /**
+>    * blk_mq_submit_bio - Create and send a request to block device.
+>    * @bio: Bio pointer.
+> @@ -2830,6 +2836,8 @@ void blk_mq_submit_bio(struct bio *bio)
+>   
+>   	trace_block_getrq(bio);
+>   
+> +	bio_set_ioprio(bio);
+> +
+>   	rq_qos_track(q, rq, bio);
+>   
+>   	blk_mq_bio_to_request(rq, bio, nr_segs);
+
+
+-- 
+Damien Le Moal
+Western Digital Research
