@@ -2,171 +2,162 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E2A8C43334
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 08:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78621C43334
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 08:51:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359694AbiFPIla (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jun 2022 04:41:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58546 "EHLO
+        id S1376635AbiFPIvz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jun 2022 04:51:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbiFPIl2 (ORCPT
+        with ESMTP id S1376576AbiFPIvd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jun 2022 04:41:28 -0400
-Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63DA45DA45
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 01:41:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655368887; x=1686904887;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=q0nV+Y6VnyjEkRNkFfq754W33G/B/8foeyIm/WzodEc=;
-  b=Xd2S6spa73SS1P+qrheqy8CDPs7n1R8UQq2wMCC3ZdYwLexePPi0tEuc
-   gUrtshWUmhDn/MnJFfMafRnKiFSqiNri1vStogu77j0cpPMNvoTx9wxZj
-   BbAOdJsnWFMoYHI+MN1zuH0XLWuGtpGBOmqoKJlhyV9y2ZFNHSv7Dwiti
-   fBENVxkQxYfR93ikqbjqyu/s+nXA1CXF1HvzFGzmLOLM7LyjrYeRCxr4O
-   75xXXBBrhVo/12d0bnHVQ262IUfs+Xh4/WcaxgP8Z+m9wCJ2XT4BCdD6N
-   +IXrJzcTYjGwjmqzeJVETRz+C/bU1OGjvmVxZ/hnPiOK891gk8/+C00JC
-   g==;
-X-IronPort-AV: E=Sophos;i="5.91,304,1647273600"; 
-   d="scan'208";a="307610368"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 16 Jun 2022 16:41:26 +0800
-IronPort-SDR: F5SzH3t5xFlGxL1EDCa25uW78oNQGsBj5c0W+DgS/1kSwpTan89TWbDI5ywdmepj2rBNhsNHrm
- h+XOhqDcnMSbptZU8Z1vjH0pXlyucreTpQyEaCDgjf/jO8lmfmxe2oeaahBm8JdOibIVwLEKmc
- Cn4hluJ01paql3Vp4GtBi7fZxGmGvSpmmiS8DasULyEomVSywWYGxeamqjQ86LJCsI9nlaJD6h
- rDEWBi51y17It/aLFgz5OYmKgXurjM+TjXOFkVQhipnqMGPR6uQh18JjDc1GKA/RQvz8/ygfWU
- u9SOldxvKck+jPdD1+6Q6djE
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 01:04:03 -0700
-IronPort-SDR: 6vTLqsL6gGmrc10Im3Og7+8/jreCpXqTg/SMgKfRb39Tbzv7P6dtttmaQOjtpR9rFLGg7uJMHs
- 6C4SX/IrZ4U3a7xbGJNZmxM5Sg9wYusi+YaEwb7waqIbYcu0g/BP3+GPJIH9LT23/s0BDUV6wX
- X5F/siS4euil83iui7/bYfobs5Sy/Pe8J+kPIiRe5n9AyqL5bSfsMUFt9bE69XjrckvEJTo1uc
- Rxe3WO12ulyUmN+ItgfAxDm3wXnnH6K6qGpmHCigy7ALtPHphbhh5WQQiw4Sz4YIXgBKtFxH1/
- +NM=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 01:41:27 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LNwd21r8Zz1SVnx
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 01:41:26 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655368885; x=1657960886; bh=q0nV+Y6VnyjEkRNkFfq754W33G/B/8foeyI
-        m/WzodEc=; b=lY2eNfwJepGYRRIkNfUhDQNf2aTX2nUbwF6BrJipPQ9yPTzMexN
-        yJM+8bSHjUqGz9M6S9zi1R/EpGFwQ2oTpxi0zmUGxM/1OTCR0XDxJagn3rbAIQaK
-        H/OoEJT2aeE33MlJEu2ZOgNobrdvsL8rPqkXBnd9t4mCdpmAYbeMmSRd5asXRp5i
-        Ammxbmw055cUDp9a8K7e7esVWgx4k98tjKYBvFVbW/0BeXkao8AYTOHuV2AncjS6
-        jyKA/cOQah/OPBC3Xf0uCux4EG16CBabME9+5FRIHEVO2P5t+No3UQI0NOKOAX53
-        EdOHS5o/AloU8ZwV+w+HsqtEHWRzdz0USZA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 2jwXqhF7YJNK for <linux-block@vger.kernel.org>;
-        Thu, 16 Jun 2022 01:41:25 -0700 (PDT)
-Received: from [10.89.84.185] (c02drav6md6t.dhcp.fujisawa.hgst.com [10.89.84.185])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LNwcz1dffz1Rvlc;
-        Thu, 16 Jun 2022 01:41:23 -0700 (PDT)
-Message-ID: <98fa010d-3555-a82b-e960-f47aeeb38151@opensource.wdc.com>
-Date:   Thu, 16 Jun 2022 17:41:21 +0900
+        Thu, 16 Jun 2022 04:51:33 -0400
+Received: from mail-yw1-x112d.google.com (mail-yw1-x112d.google.com [IPv6:2607:f8b0:4864:20::112d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 842B85FF34
+        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 01:49:37 -0700 (PDT)
+Received: by mail-yw1-x112d.google.com with SMTP id 00721157ae682-316287dc2d2so7456357b3.6
+        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 01:49:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=a4EhHBsPEoGDynj/GWwfSMGe6o2SfeALT5mjq/P4vmI=;
+        b=uihogzk3XBrPzw8sph34Oye90P12Pjl/5IddUn1IQ7RaQVtFyCa33TUO4FJy1X0jBV
+         cRIjeLqHYnw3c6TNw4nkB4QZM9OZ5trdHA1sPzzBGeNUaw2um+QcpoWh1QLGVEt6QfV7
+         YvzVfKf9hfUhDNz75eUWJ9u0G9EOqbcqrkxLYJWevZAVI0K6qMQKHebMllAqMg4CYoiL
+         jYrj2MoRpbH4/vPmLwVUalEy9tAfHA6L+3g2+d3D/EYjmQVEXi9QiZ8bnJGVXAqBIuBG
+         5F0P7SASZH6sI2k/aivuonV+ic3DnM2vCY7SHRJOwg/wG41r0rjrKspxibl1pyX9Beop
+         Mg+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=a4EhHBsPEoGDynj/GWwfSMGe6o2SfeALT5mjq/P4vmI=;
+        b=vB4fpKWc5ImfNeOWP4+QBdVd8O6ngOcwJ/pG7YDtSXBK0Cozvo17gJruGSylbTXeJM
+         BPNzGYh0vv6rj+mtLQP1vLQ4NSt9F3X2rzk8u8PK8FXvm31QSbfg0IKDjAdBgh4DyGtt
+         AORPTkRoSIuh5CwbUzZLKeGSqMoFtSEx7rX8Hun2Qy5Ngu1f+PhAADMPUrnryiJu4mXI
+         K7DGLHbAK8X9Ndj8MlGGKIKA8ROvq8EeZwMtc5WWqsy680ocsNLe9ivSbWapJj86bPiM
+         XXvoCQunri5fcD5at8M2NIJAxiDRIHcMbTkP7BoVL3whHN0Q5swXF459SkeMH990P1VA
+         dGHw==
+X-Gm-Message-State: AJIora84tK9vIaDiMn5gh67r46yrPI7Q7EMqNVqNdbtLFXdlDMF5FAhU
+        yZJxHKDJd4cpp3Wcjaf5gQJXyLrjdcJ39zpfKAFe5RoPtPdX9vODXjQ=
+X-Google-Smtp-Source: AGRyM1tb4WNybmuVdppOyiaexzWe/SL8A5HBwHvhf88dHUgwJR9n5ru0AsqSH6wZ0G1kFD/y93/OOyyMNgg1WOeJDA8=
+X-Received: by 2002:a81:a50c:0:b0:30c:1f68:a375 with SMTP id
+ u12-20020a81a50c000000b0030c1f68a375mr4258856ywg.106.1655369376438; Thu, 16
+ Jun 2022 01:49:36 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.10.0
-Subject: Re: [PATCH RFC v2 03/18] scsi: core: Implement reserved command
- handling
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>,
-        Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, brking@us.ibm.com,
-        hare@suse.de, hch@lst.de
-Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-        chenxiang66@hisilicon.com
-References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
- <1654770559-101375-4-git-send-email-john.garry@huawei.com>
- <b4a0ede5-95a3-4388-e808-7627b5484d01@opensource.wdc.com>
- <9e89360d-3325-92af-0436-b34df748f3e2@acm.org>
- <e36bba7e-d78d-27b4-a0e2-9d921bc82f5d@opensource.wdc.com>
- <3a27b6ff-e495-8f11-6925-1487c9d14fa9@huawei.com>
- <c702f06e-b7da-92be-3c4f-5dd405600235@opensource.wdc.com>
- <ecfb0694-21b8-55b4-c9b8-5e738f59ce8d@huawei.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <ecfb0694-21b8-55b4-c9b8-5e738f59ce8d@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAMSo37WW9veYH6=tHqUR2pa_7YX1UuzHqLBHit60P2QyzQmCEw@mail.gmail.com>
+ <Yqd9xjOiOapfBt/A@kroah.com>
+In-Reply-To: <Yqd9xjOiOapfBt/A@kroah.com>
+From:   Yongqin Liu <yongqin.liu@linaro.org>
+Date:   Thu, 16 Jun 2022 16:49:25 +0800
+Message-ID: <CAMSo37W8E-=ceGHwky2Rs0NWeVrzcAMdeQdEnp7NTjWXAu3voQ@mail.gmail.com>
+Subject: Re: Please help cherry pick four mmc related changes into the 4.14
+ stable kernel
+To:     Greg KH <gregkh@linuxfoundation.org>
+Cc:     stable@vger.kernel.org, Naresh Kamboju <naresh.kamboju@linaro.org>,
+        Benjamin Copeland <benjamin.copeland@linaro.org>,
+        Sumit Semwal <sumit.semwal@linaro.org>,
+        =?UTF-8?B?RGFuaWVsIETDrWF6?= <daniel.diaz@linaro.org>,
+        Alistair Delva <adelva@google.com>,
+        Steve Muckle <smuckle@google.com>,
+        Todd Kjos <tkjos@google.com>,
+        "Bajjuri, Praneeth" <praneeth@ti.com>,
+        Vincent Guittot <vincent.guittot@linaro.org>,
+        Anders Roxell <anders.roxell@linaro.org>,
+        linux-mmc@vger.kernel.org, linux-block@vger.kernel.org,
+        Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/06/16 17:24, John Garry wrote:
-> On 16/06/2022 03:47, Damien Le Moal wrote:
->>>> so going backward several years... That internal tag for ATA does not
->>>> need to be reserved since this command is always used when the drive is
->>>> idle and no other NCQ commands are on-going.
->>>
->>> So do you mean that ATA_TAG_INTERNAL qc is used for other commands 
->>> apart from internal commands?
->>
->> No. It is used only for internal commands. What I meant to say is that 
->> currently, internal commands are issued only on device scan, device 
->> revalidate and error handling. All of these phases are done with the 
->> device under EH with the issuing path stopped and all commands 
->> completed, 
-> 
-> If I want to allocate a request for an ATA internal command then could I 
-> use 1x from the regular tags? I didn't think that this was possible as I 
-> thought that all tags may be outstanding when EH kicks in. I need to 
-> double check it.
+Hi, Greg
 
-When EH kicks in, the drive is in error mode and all commands are back to the
-host. From there, you need to get the drive out of error mode with read log 10h
-and then internal commands can be issued if needed. Then the aborted commands
-that are not in error are restarted.
+Sorry for the confusion here, please ignore this request.
 
-For the non-error case (revalidate), ap->ops->qc_defer() will make sure that NCQ
-and non-NCQ commands are never mixed. Since all internal commands are non-ncq,
-when an internal command is issued, there are necessarily no other commands
-ongoing, but 32 NCQ commands may be waiting, without any free tag. The internal
-command being non-NCQ can still proceed since it does not need a real device tag.
+I made a mistake there with cherry picking the changes based on one vendor tree,
+and there are actually more out of tree changes necessary for the commit
+23161bed631a("mmc: sdhci-omap: Fix busy detection by enabling
+MMC_CAP_NEED_RSP_BUSY")
+to be cherry picked into the 4.14 stable branch.
 
-The joy of ATA...
+All the necessary changes are in 4.19, but not in 4.14, and
+backporting all of the changes
+would be a bit complex task, for the moment. I will cherry pick the
+changes to the vendor tree
+which has the changes to make the build work.
 
-> Even if it were true, not using a reserved tag for ATA internal command 
-> makes things more tricky as this command requires special handling for 
-> scsi blk_mq_ops and there is no easy way to identify the command as 
-> reserved (to know special handling is required).
+Sorry again for the confusion here:(
 
-Yes. Having the ATA_TAG_INTERNAL tag as a reserved tag is fine. But from the
-above, you can see that this is not really needed at all to make things work.
-The management of ATA_TAG_INTERNAL as a reserve tag is really about getting your
-API to simplify the code.
+Thanks,
+Yongqin Liu
 
-What I am thinking is that with your patches as is, it seems that we can never
-actually reserve a real tag for ATA to do internal NCQ commands... We do not
-really need that for now though, apart maybe for speeding up device revalidate.
-Everytime that one runs, one can see a big spike in read/write IO latencies
-because of the queue drain it causes.
+On Tue, 14 Jun 2022 at 02:11, Greg KH <gregkh@linuxfoundation.org> wrote:
+>
+> On Wed, Jun 08, 2022 at 01:09:54AM +0800, Yongqin Liu wrote:
+> > Hi, All
+> >
+> > With the 4.14.281 version[1], there were three mmc related changes merged,
+> > but that causes one boot failure with the X15 Android builds, a problem
+> > similar to one reported before here[2].
+> > After being confirmed with Ulf Hansson, and verified with the X15 Android build,
+> > it needs to have the following four commits cherry-picked to the 4.14
+> > branch as well.
+> >
+> >     4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
+> >     5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for erase/trim/discard
+> >     d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC sleep command
+> >     23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
+> > MMC_CAP_NEED_RSP_BUSY
+> >
+> > The above four commits are from the 4.19 branch, as they are a little
+> > easier to be cherry-picked
+> > into the 4.14 branch, compared to the commits from the mainline branch.
+> > (I have confirmed that the four commits are all in 4.19, 5.4, 5.10 and
+> > mainline branches already).
+> >
+> > Saying that, there will be still one merge conflict reported when
+> > cherry picking the commit of
+> > 4f32b45c9a2c, it's easy to resolve though.
+> > To avoid the merge conflict, it could be done like this as well:
+> > 1. revert the 327b6689898b commit from 4.14 first, so that the commits in step#2
+> >     could be cherry-picked without any problem
+> >         327b6689898b mmc: core: Default to generic_cmd6_time as
+> > timeout in __mmc_switch()
+> > 2. git cherry-pick the following commits from 4.19 into the 4.14 branch
+> >         4f32b45c9a2c mmc: core: Allow host controllers to require R1B for CMD6
+> >         5fc615c1e3eb mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for
+> > erase/trim/discard
+> >         d091259b8d7a mmc: core: Respect MMC_CAP_NEED_RSP_BUSY for eMMC
+> > sleep command
+> >         23161bed631a mmc: sdhci-omap: Fix busy detection by enabling
+> > MMC_CAP_NEED_RSP_BUSY
+> >         26c6f614cf02 mmc: mmc: core: Default to generic_cmd6_time as
+> > timeout in __mmc_switch()
+> >     The last commit of 26c6f614cf02 is for the revert in step#1.
+> >
+> > I am not sure which way is more convenient for the maintenance work
+> > here, so just list both of them here
+> > for your information.
+> > And please let me know if there is anything else I could help on this
+> > cherry pick work here.
+>
+> Please send properly backported patches to us, trying to do the revert
+> and fixup like you describe above is going to be hard to verify I got it
+> right.  A series of patches is best as that way we know you tested it
+> properly and sent us the correct patches.
+>
+> thanks,
+>
+> greg k-h
 
-And for CDL 0xD policy error handling, I may need a reserved NCQ tag... Still
-trying to work out qc/tag reuse for now though.
-
-> 
->> so no regular commands can be issued. Only internal ones, non 
->> NCQ, using the ATA_TAG_INTERNAL. So strictly speaking, we should not 
->> need to reserve that internal tag at all.
->>
-> 
-> Thanks,
-> John
-> 
 
 
 -- 
-Damien Le Moal
-Western Digital Research
+Best Regards,
+Yongqin Liu
+---------------------------------------------------------------
+#mailing list
+linaro-android@lists.linaro.org
+http://lists.linaro.org/mailman/listinfo/linaro-android
