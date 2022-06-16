@@ -2,83 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F10FC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 15 Jun 2022 23:17:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A22D8C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 00:05:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355419AbiFOXRI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 15 Jun 2022 19:17:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59282 "EHLO
+        id S1352214AbiFPAFK (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 15 Jun 2022 20:05:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1355329AbiFOXQm (ORCPT
+        with ESMTP id S236390AbiFPAFJ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 15 Jun 2022 19:16:42 -0400
+        Wed, 15 Jun 2022 20:05:09 -0400
 Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51D1631384;
-        Wed, 15 Jun 2022 16:16:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809BD54FB2;
+        Wed, 15 Jun 2022 17:05:00 -0700 (PDT)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id DF0E56199C;
-        Wed, 15 Jun 2022 23:16:30 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9671CC3411B;
-        Wed, 15 Jun 2022 23:16:29 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 25BCA61A77;
+        Thu, 16 Jun 2022 00:05:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DE0FC3411A;
+        Thu, 16 Jun 2022 00:04:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1655334990;
-        bh=uJDAbRhUne1VpqgJp+NbX5hEuKEciyjlBdAFfwtPGyo=;
+        s=k20201202; t=1655337899;
+        bh=twKDf6UE+kS3vngFTnZTxVTzoWdtagr989JXNITgwOw=;
         h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=e1NrWr1wISPVX/Oc4CuOXXqOue8/yTb1uDlXZVqvC1gCx3LEOdyqg/jzqTONTGkv1
-         6ba4fWrvAbOBz8CQgEoWNN08NDunGqT3za13pdPvxlx6zhUsl8gVHPgNIzAKsxkKWU
-         oA+QUSZrp6ZIBv4ycORBTnqBPAjJFw/ibbuaXWLwAX5M95Ka+90fPu6xyD6z4z64PA
-         XTZQt4TNzczMZc+UfjrliYduQNquqZ/XMujw2gojUTVv3264OOYlkD4VM6IxbfXT7r
-         Dpb4f8E5ZAOx3VM4rCE6BPN+lVxcDreWjTbtvZj6TdUCczRtdXWHDVk3eqA6s4Go4C
-         TvXyGlN3C0N4g==
-Date:   Wed, 15 Jun 2022 17:16:26 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Bjorn Helgaas <helgaas@kernel.org>
-Cc:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>,
-        Chaitanya Kulkarni <chaitanyak@nvidia.com>,
-        Yi Zhang <yi.zhang@redhat.com>,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "linux-nvme@lists.infradead.org" <linux-nvme@lists.infradead.org>,
-        "linux-scsi@vger.kernel.org" <linux-scsi@vger.kernel.org>,
-        "mstowe@redhat.com" <mstowe@redhat.com>,
-        "linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>
-Subject: Re: blktests failures with v5.19-rc1
-Message-ID: <YqpoSp2F+Shqvk/u@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220614040044.rypyclhqfv5w4xy7@shindev>
- <20220615194727.GA1022614@bhelgaas>
+        b=jgVdLgvp0/JpnSn+TbW+19ECVOHgg2dvTd36K9dJ22dJewyA3ZwH85RLqqQhJ4rwu
+         eQRyLfRWbmNBVSY1p7ja1StME1gpGVXoweCk085gvuq5K3fYghi7s3zN8llC5NB4DT
+         7wMD56EHiUonIGs1WJIuErOZsdSVBXzjwJossod7XVa/UXSqTAr+0i+J9fC9mSo86u
+         MC0so6r8yjPi2hY2EBAN05ziiHSbiTb48hzbZsYl8kqWGa29RP58h+SFfWlo9UOmhj
+         mkduUSoEiKc7lQO9oM1+UBROu6epiy9J3JLrz6s5NI0683ClKMWFzU9kyryIEZ0z5n
+         RaO3GdDZGXmCw==
+Date:   Wed, 15 Jun 2022 17:04:57 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Dave Chinner <david@fromorbit.com>,
+        "Darrick J. Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [RFC PATCH v2 1/7] statx: add I/O alignment information
+Message-ID: <YqpzqZQgu0Zz+vW1@sol.localdomain>
+References: <20220518235011.153058-1-ebiggers@kernel.org>
+ <20220518235011.153058-2-ebiggers@kernel.org>
+ <YobNXbYnhBiqniTH@magnolia>
+ <20220520032739.GB1098723@dread.disaster.area>
+ <YqgbuDbdH2OLcbC7@sol.localdomain>
+ <YqnapOLvHDmX/3py@infradead.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615194727.GA1022614@bhelgaas>
+In-Reply-To: <YqnapOLvHDmX/3py@infradead.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 15, 2022 at 02:47:27PM -0500, Bjorn Helgaas wrote:
-> On Tue, Jun 14, 2022 at 04:00:45AM +0000, Shinichiro Kawasaki wrote:
-> > 
-> > Yeah, this WARN is confusing for us then it would be valuable to
-> > test by blktests not to repeat it. One point I wonder is: which test
-> > group the test case will it fall in? The nvme group could be the
-> > group to add, probably.
-> > 
-> > Another point I wonder is other kernel test suite than blktests.
-> > Don't we have more appropriate test suite to check PCI device
-> > rescan/remove race ? Such a test sounds more like a PCI bus
-> > sub-system test than block/storage test.
+On Wed, Jun 15, 2022 at 06:12:04AM -0700, Christoph Hellwig wrote:
+> On Mon, Jun 13, 2022 at 10:25:12PM -0700, Eric Biggers wrote:
+> > While working on the man-pages update, I'm having second thoughts about the
+> > stx_offset_align_optimal field.  Does any filesystem other than XFS actually
+> > want stx_offset_align_optimal, when st[x]_blksize already exists?  Many network
+> > filesystems, as well as tmpfs when hugepages are enabled, already report large
+> > (megabytes) sizes in st[x]_blksize.  And all documentation I looked at (man
+> > pages for Linux, POSIX, FreeBSD, NetBSD, macOS) documents st_blksize as
+> > something like "the preferred blocksize for efficient I/O".  It's never
+> > documented as being limited to PAGE_SIZE, which makes sense because it's not.
 > 
-> I'm not aware of such a test, but it would be nice to have one.
+> Yes.  While st_blksize is utterly misnamed, it has always aways been
+> the optimal I/O size.
 > 
-> Can you share your qemu config so I can reproduce this locally?
+> > Perhaps for now we should just add STATX_DIOALIGN instead of STATX_IOALIGN,
+> > leaving out the stx_offset_align_optimal field?  What do people think?
 > 
-> Thanks for finding and reporting this!
+> Yes, this sounds like a good plan.
 
-Hi Bjorn,
+One more thing.  I'm trying to add support for STATX_DIOALIGN on block devices.
+Unfortunately I don't think it is going to work, at all, since the inode is for
+the device node and not the block device itself.  This is true even after the
+file is opened (I previously thought that at least that case would work).
 
-This ought to be reproducible with any pci device that can be removed. Since we
-initially observed with nvme, you can try with such a device. A quick way to
-get one appearing in qemu is to add parameters:
+Were you expecting that this would work on block devices?  It seems they will
+need a different API -- a new BLK* ioctl, or files in /sys/block/$dev/queue.
 
-        -drive id=n,if=none,file=null-co://,format=raw \
-	-device nvme,serial=foobar,drive=n
+- Eric
