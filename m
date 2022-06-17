@@ -2,127 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A519C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 12:50:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F29DC43334
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 12:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235596AbiFQMui (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 08:50:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40124 "EHLO
+        id S235624AbiFQMu5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 08:50:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232477AbiFQMuh (ORCPT
+        with ESMTP id S232477AbiFQMu5 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 08:50:37 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 153BF37A84
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 05:50:35 -0700 (PDT)
-Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LPf240FVxzBrpL;
-        Fri, 17 Jun 2022 20:47:08 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 17 Jun 2022 20:50:18 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Fri, 17 Jun 2022 20:50:18 +0800
-Subject: Re: Races in sbitmap batched wakeups
-To:     Jan Kara <jack@suse.cz>
-CC:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
-        <linux-block@vger.kernel.org>
-References: <20220616172102.yrxod3ptmhiuvqsw@quack3.lan>
- <9a0f1ea5-c62c-4439-b80f-0319b9a15fd5@huawei.com>
- <20220617113112.rlmx7npkavwkhcxx@quack3>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <65beb6c4-6780-1f48-866b-63d4c4625c31@huawei.com>
-Date:   Fri, 17 Jun 2022 20:50:17 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Fri, 17 Jun 2022 08:50:57 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826DF37A84
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 05:50:55 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id l4so3967617pgh.13
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 05:50:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=yzCwp0dNQE/b6SXYRcXXgO1AIAsJ5lRGGC+6ORVDROY=;
+        b=R5LwWUD6Ox9gxhW+bJaU59XX3UklaKMygCpyv8GhWOA3oFgVadGHrCmdHfOtG14n1j
+         jW0H2up5Om3UH4HmfGi2znq/aX6GChEGGfrQtdOzFL6JQaJXHaGrWcrA5aFWAjJlDi90
+         1qdgqHv+9rpw++7t1pgQZcbYHrRWX9Qe0UdwdVjF7y1cvwt4qFNmRCQY6cWXldIDnRyW
+         N6uGjwEAXJvYgsKvzV7SB/vCW1LHijdXyQBOTPhVzY+GYBV7P1xwyS3briORtVd24sGY
+         NyHQMh97NFbyQ0zdlm9UeFGs3eR/0gjbz8x7zK9pYCcIe21wF5/g1xEIvKQeigpMyWLc
+         U/rA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=yzCwp0dNQE/b6SXYRcXXgO1AIAsJ5lRGGC+6ORVDROY=;
+        b=nCTq7ObdlAXAxZyVP/2d9XCfto7UjUVyxx2Dnh2aDhrTJCDi7RXV/HZKqq97T7JR+n
+         3DssjobUSu0kBFKxwEnemShIde+/lj9oG1WlvR4HA8nfYOLTnmatQicvNwuXYad9KIxt
+         6lAGDnlnKSoIU7ftPZYU08CyDh4K32GVDN84ENlnzzIE4Hh3zm7EcvF71id4t/rjqhqz
+         I+9Lldr/ChYqOgpUAnLbC9fXNLVRVT9xHnh9hGknr786gVy5a92eP9LidylGDxMABqge
+         rUJGAkCl7cwij5914hsq88+nMbQPuuoJ7bBZwUyio8YwQ/fd9/5LwiSKEMdAtZjqM7Pf
+         +Ziw==
+X-Gm-Message-State: AJIora/oo0kAhiFWRf3iYRRns4Min2iriQa/lPkqFfQFRM9z2yc9QXtm
+        VHNuMj/MPzncwRLeeLGuFh1Q3A==
+X-Google-Smtp-Source: AGRyM1vvwuyyy2CYmdzaiALPUuDkwWzrEfxiL+ysbPMQhtQl8eSAy7b5MJ77PyInp10l6BPGRehW2g==
+X-Received: by 2002:a63:1a56:0:b0:405:28e3:e4fb with SMTP id a22-20020a631a56000000b0040528e3e4fbmr9160654pgm.16.1655470253801;
+        Fri, 17 Jun 2022 05:50:53 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id jg1-20020a17090326c100b001640594376dsm3463347plb.183.2022.06.17.05.50.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jun 2022 05:50:52 -0700 (PDT)
+Message-ID: <d76649ab-7392-33e9-13fd-785073bbfe4c@kernel.dk>
+Date:   Fri, 17 Jun 2022 06:50:50 -0600
 MIME-Version: 1.0
-In-Reply-To: <20220617113112.rlmx7npkavwkhcxx@quack3>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/4] block: disable the elevator int del_gendisk
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>, Christoph Hellwig <hch@lst.de>
+Cc:     shinichiro.kawasaki@wdc.com, dan.j.williams@intel.com,
+        yukuai3@huawei.com, linux-block@vger.kernel.org,
+        syzbot+3e3f419f4a7816471838@syzkaller.appspotmail.com
+References: <20220614074827.458955-1-hch@lst.de>
+ <20220614074827.458955-2-hch@lst.de> <YqhFiDx0/IW25bSp@T590>
+ <20220614083453.GA6999@lst.de> <Yqhwv0POjMi1TNo3@T590>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <Yqhwv0POjMi1TNo3@T590>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/06/17 19:31, Jan Kara 写道:
-> Hi!
-> 
-> On Fri 17-06-22 09:40:11, Yu Kuai wrote:
->> 在 2022/06/17 1:21, Jan Kara 写道:
->>> I've been debugging some customer reports of tasks hanging (forever)
->>> waiting for free tags when in fact all tags are free. After looking into it
->>> for some time I think I know what it happening. First, keep in mind that
->>> it concerns a device which uses shared tags. There are 127 tags available
->>> and the number of active queues using these tags is easily 40 or more. So
->>> number of tags available for each device is rather small. Now I'm not sure
->>> how batched wakeups can ever work in such situations, but maybe I'm missing
->>> something.
+On 6/14/22 5:27 AM, Ming Lei wrote:
+> On Tue, Jun 14, 2022 at 10:34:53AM +0200, Christoph Hellwig wrote:
+>> On Tue, Jun 14, 2022 at 04:23:36PM +0800, Ming Lei wrote:
+>>>>  	blk_sync_queue(q);
+>>>>  	blk_flush_integrity();
+>>>> +	blk_mq_cancel_work_sync(q);
+>>>> +
+>>>> +	blk_mq_quiesce_queue(q);
 >>>
->>> So take for example a situation where two tags are available for a device,
->>> they are both currently used. Now a process comes into blk_mq_get_tag() and
->>> wants to allocate tag and goes to sleep. Now how can it ever be woken up if
->>> wake_batch is 4? If the two IOs complete, sbitmap will get two wakeups but
->>> that's not enough to trigger the batched wakeup to really wakeup the
->>> waiter...
+>>> quiesce queue adds a bit long delay in del_gendisk, not sure if this way may
+>>> cause regression in big machines with lots of disks.
+>>
+>> It does.  But at least we remove a freeze in the queue teardown path.
+>> But either way I'd really like to get things correct first before
+>> looking into optimizations.
+> 
+> The removed one works at atomic mode and it is super fast.
+> 
+>>
 >>>
->>> Even if we have say 4 tags available so in theory there should be enough
->>> wakeups to fill the batch, there can be the following problem. So 4 tags
->>> are in use, two processes come to blk_mq_get_tag() and sleep, one on wait
->>> queue 0, one on wait queue 1. Now four IOs complete so
->>> sbitmap_queue_wake_up() gets called 4 times and the fourth call decrements
->>> wait_cnt to 0 so it ends up calling wake_up_nr(wq0, 4). Fine, one of the
->>> waiters is woken up but the other one is still sleeping in wq1 and there
->>> are not enough wakeups to fill the batch and wake it up? This is
->>> essentially because we have lost three wakeups on wq0 because it didn't
->>> have enough waiters to wake...
->>
->>  From what I see, if tags are shared for multiple devices, wake_batch
->> should make sure that all waiter will be woke up:
->>
->> For example:
->> there are total 64 tags shared for two devices, then wake_batch is 4(if
->> both devices are active).  If there are waiters, which means at least 32
->> tags are grabed, thus 8 queues will ensure to wake up at least once
->> after 32 tags are freed.
-> 
-> Well, yes, wake_batch is updated but as my example above shows it is not
-> enough to fix "wasted" wakeups.
-
-Tags can be preempted, which means new thread can be added to waitqueue
-only if there are no free tags.
-
-With the above condition, I can't think of any possibility how the
-following scenario can be existed(dispite the wake ups can be missed):
-
-Only wake_batch tags are still in use, while multiple waitqueues are
-still active.
-
-If you think this is possible, can you share the initial conditions and
-how does it end up to the problematic scenario?
-
-Thanks,
-Kuai
-> 
->>> Finally, sbitmap_queue_wake_up() is racy and if two of them race together,
->>> they can end up decrementing wait_cnt of wq which does not have any process
->>> queued which again effectively leads to lost wakeups and possibly
->>> indefinitely sleeping tasks.
+>>>> +	if (q->elevator) {
+>>>> +		mutex_lock(&q->sysfs_lock);
+>>>> +		elevator_exit(q);
+>>>> +		mutex_unlock(&q->sysfs_lock);
+>>>> +	}
+>>>> +	rq_qos_exit(q);
+>>>> +	blk_mq_unquiesce_queue(q);
 >>>
+>>> Also tearing down elevator here has to be carefully, that means any
+>>> elevator reference has to hold rcu read lock or .q_usage_counter,
+>>> meantime it has to be checked, otherwise use-after-free may be caused.
 >>
->> BTW, I do this implementation have some problems on concurrent
->> scenario, as described in following patch:
->>
->> https://lore.kernel.org/lkml/20220415101053.554495-4-yukuai3@huawei.com/
+>> This is not a new pattern.  We have the same locking here as a
+>> sysfs-induced change of the elevator to none which also clears
+>> q->elevator under a queue that is frozen and quiesced.
 > 
-> Yes, as far as I can see you have identified similar races as I point out
-> in this email. But I'm not sure whether your patch fixes all the
-> possibilities for lost wakeups...
+> Then looks this pattern has problem in dealing with the examples I
+> mentioned.
 > 
-> 								Honza
+> And the elevator usage in __blk_mq_update_nr_hw_queues() looks one
+> old problem, but easy to fix by protecting it via sysfs_lock.
 > 
+> And fixing blk_mq_has_sqsched() should be easy too.
+> 
+> I will send patches later.
+
+Just checking in on this series, Ming did you make any progress?
+
+-- 
+Jens Axboe
+
