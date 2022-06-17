@@ -2,171 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3914CC43334
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 08:03:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F15AC43334
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 09:59:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234442AbiFQIDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 04:03:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44466 "EHLO
+        id S1380291AbiFQJ7a (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 05:59:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45428 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380724AbiFQID2 (ORCPT
+        with ESMTP id S234702AbiFQJ73 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 04:03:28 -0400
-Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD4F33EA8
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 01:03:24 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220617080319euoutp01200584c228b4434ce56d57c9f64f89bb~5Wbtr04mQ2141321413euoutp01O
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 08:03:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220617080319euoutp01200584c228b4434ce56d57c9f64f89bb~5Wbtr04mQ2141321413euoutp01O
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1655452999;
-        bh=V56MV+Qvk7y7TAMM/soQkLYo1sKwNGw8wGk0cO7nBts=;
-        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
-        b=msBXOrJKU2HMtwesLG6oLPUPTtV+MhGG8K57beMc0NorDbQIUIfIZfsAslUoUzbJX
-         p7gRHVNz2B8BppsnNQ8Z/LDzBzNvvtkGnVn9JtQiRzwqkdH0DXJtAyiOJGF3sjRpaE
-         f9gIw+8RFBU/byI2wlLacwjJ2rd/gA/hT4umzadg=
-Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-        20220617080319eucas1p1bc4b7ac79368be83ed169769bac13881~5WbtZaKPz2524025240eucas1p1F;
-        Fri, 17 Jun 2022 08:03:19 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-        eusmges2new.samsung.com (EUCPMTA) with SMTP id 1D.1A.10067.7453CA26; Fri, 17
-        Jun 2022 09:03:19 +0100 (BST)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-        20220617080318eucas1p18554421449b17c4a2ad7816dd6584383~5Wbs4YchD3237732377eucas1p1S;
-        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
-Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
-        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20220617080318eusmtrp2b71751d429c288c6d12854d27dd0fcf5~5Wbs3fT1h2980029800eusmtrp2E;
-        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
-X-AuditID: cbfec7f4-dd7ff70000002753-21-62ac3547daa1
-Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
-        eusmgms1.samsung.com (EUCPMTA) with SMTP id F1.09.09095.6453CA26; Fri, 17
-        Jun 2022 09:03:18 +0100 (BST)
-Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
-        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20220617080318eusmtip13a348e9cbb58e5ec3aaf8dfa8d77b2a0~5WbsqjC4S2368423684eusmtip1X;
-        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
-Received: from [192.168.1.12] (106.210.248.244) by CAMSVWEXC01.scsc.local
-        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-        Fri, 17 Jun 2022 09:03:12 +0100
-Message-ID: <f83eb255-89fe-90dc-3670-79b8684389f1@samsung.com>
-Date:   Fri, 17 Jun 2022 10:03:09 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
-        Thunderbird/91.9.1
-Subject: Re: [PATCH v7 13/13] dm: add non power of 2 zoned target
+        Fri, 17 Jun 2022 05:59:29 -0400
+Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F288D51323
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 02:59:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655459965; x=1686995965;
+  h=from:to:cc:subject:date:message-id:references:
+   content-transfer-encoding:mime-version;
+  bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+  b=nmmbAFsKbXMM4NYicReCsxcInoUjt38lIPpduPPE/5afeJSUE4IO7BDK
+   daitIP1gLwKy4QsGdagXss/C33cEAK+5GiGmQTMYMCH1P5xe7mA+wYdVf
+   p3gnyDV/INwJfnG3mvT6uRwQDfAt5fxcER/ZB8GpgK4NCpvQ6c2Oum5Sw
+   uxXaq9G2upU/oXMdD5U/6l0mhUfJ1Jk5LhLM0z/Udt1ohicOxaSaSy7uB
+   gij2fxNDGGHKSyyO+WZO1Tweean/SZWhjt0hIfN6X0Y8T68r2uNW73sew
+   N8tVJ+OP4jLuJkUu7Euz/J7ZuI9LzDaWmOcwxcoPh/PnAfX+cEa49dxC/
+   A==;
+X-IronPort-AV: E=Sophos;i="5.92,306,1650902400"; 
+   d="scan'208";a="208274485"
+Received: from mail-mw2nam12lp2040.outbound.protection.outlook.com (HELO NAM12-MW2-obe.outbound.protection.outlook.com) ([104.47.66.40])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Jun 2022 17:59:24 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fEr57PpUzJaCilBkypyJ4PlkR5To6UeiL658Dz8JTzuxhovm8EzBVWGLYbW0jEx030rLc5CdC7+UzU7jvhoV/ASfx/QLTlW3C1RQwmu5K6l+7WlRSZoL7n7hHmQevSUGh0NDeNCYkqOOcqay1p/KEfPjRj4HrS4XzUDcY6WiGO3VpBHRH/xg3wyNLHLD8QuSD8bmp+Jgb2Rz3Z0VtiG2+Re7RwAmegrV98ILz8C2K0KTzypqc4tMlTuB7ab3cdpeeA6MvHl7gLPgZyMvXoWhBfL6QgNs4Svqi2witi14+ZfkNIIIytFfclL80opXkGoAC6isJqtzQzq7/va4hdt6CA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=hg+MgxP4x4KjeT0qdFUUV0psjOksypGv8pi2xWvsZva0WqKMoXtiCFkSf0RZaFim3R43f/QRs7K7GTBT5fIxgrDNLBnMsMaJJyY+vl+k8Hrg2ossSw0HM2b/qS26mJ0WCkYyighMpKQ6gDb6SkqW9W46B2depWA+8mFH+pAbn7ZSGawUyj8MW1igy3o63WaZtrDvJHZ3TfvFUomKX5NktmqxQx5P4dA1CQMgMvWeKQlGQKaBYB95UACNtpXCfwE7sdgV1U1tQj50zeMxsLqswEh6k9ie2NtS8l4uOgxOR/HjN3I8yetaed4Y9+EzTn9GbEinQqVSKw2SCzN9hS712g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=G8FZ0D3PP/OudJ5uuxCAz/C/vBHo8wESZoPwxTWqVEI=;
+ b=UqGyUxktySyDIfD1wvU6UDNu/zu9XAl87tJJTznrGJUd5l0mNzRrAd4xbHv25FrJX7QGYqioqgy16OeW9S2LUtZZ5PzrFZLAONBADxTLoreBOq7cAURf685C/W0ZMJup5EhteK/8345fgwPu/4NuDemIajsb1G4VUOJIze/RMMI=
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com (2603:10b6:510:12::17)
+ by BYAPR04MB3973.namprd04.prod.outlook.com (2603:10b6:a02:b8::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5332.19; Fri, 17 Jun
+ 2022 09:59:24 +0000
+Received: from PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::f4c0:544:ac07:fe6d]) by PH0PR04MB7416.namprd04.prod.outlook.com
+ ([fe80::f4c0:544:ac07:fe6d%7]) with mapi id 15.20.5353.016; Fri, 17 Jun 2022
+ 09:59:24 +0000
+From:   Johannes Thumshirn <Johannes.Thumshirn@wdc.com>
+To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Tejun Heo <tj@kernel.org>
+Subject: Re: [PATCH v2 1/3] blk-iocost: Simplify ioc_rqos_done()
+Thread-Topic: [PATCH v2 1/3] blk-iocost: Simplify ioc_rqos_done()
+Thread-Index: AQHYgPszsjcBPBFu2UKmwlrAA3Zpiw==
+Date:   Fri, 17 Jun 2022 09:59:24 +0000
+Message-ID: <PH0PR04MB7416B56C860DF3DB09EF72299BAF9@PH0PR04MB7416.namprd04.prod.outlook.com>
+References: <20220615210136.1032199-1-bvanassche@acm.org>
+ <20220615210136.1032199-2-bvanassche@acm.org>
+Accept-Language: en-US
 Content-Language: en-US
-To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
-        <snitzer@redhat.com>, <axboe@kernel.dk>
-CC:     <bvanassche@acm.org>, <linux-kernel@vger.kernel.org>,
-        <jiangbo.365@bytedance.com>, <hare@suse.de>, <pankydev8@gmail.com>,
-        <dm-devel@redhat.com>, <jonathan.derrick@linux.dev>,
-        <gost.dev@samsung.com>, <dsterba@suse.com>, <jaegeuk@kernel.org>,
-        <linux-nvme@lists.infradead.org>, <Johannes.Thumshirn@wdc.com>,
-        <linux-block@vger.kernel.org>
-From:   Pankaj Raghav <p.raghav@samsung.com>
-In-Reply-To: <f4cf6348-dd94-aa82-7519-318248c51151@opensource.wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [106.210.248.244]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPKsWRmVeSWpSXmKPExsWy7djPc7rupmuSDK59Z7FYfbefzWLah5/M
-        Fr/Pnme22PtuNqvFhR+NTBZ7Fk1isli5+iiTxZP1s5gteg58YLH423UPKNbyEKjulrbF5V1z
-        2CzmL3vKbrHm5lMWi7aNXxkdBDwuX/H2+HdiDZvHzll32T0uny312LSqk81jYcNUZo/NS+o9
-        dt9sAMq13mf1eL/vKpvH+i1XWTw2n672+LxJzqP9QDdTAF8Ul01Kak5mWWqRvl0CV8aqu59Z
-        C/4LVHT8e8PawPiWt4uRg0NCwETix46ELkZODiGBFYwSRy9JQNhfGCWmrhDvYuQCsj8zSqxp
-        ecMKkgCp39fzhwUisZxRYt2FKexwVVNfvoBydjFKLGn+yAjSwitgJ3Hr11wWEJtFQFXi/q3F
-        UHFBiZMzn4DFRQUiJFa2vmEBOUlYwFGi6UQSSJhZQFzi1pP5TCBhEYE8iXn/oMK3mCTuP60D
-        CbMJaEk0drKDhDkF3CTuff7NDlGiKdG6HcaWl9j+dg4zxL/KEv92MkO8Uiux9tgZsIMlBL5x
-        Sux7eosJIuEi8fb4NhYIW1ji1fEt7BC2jMT/nfOhaqolnt74zQzR3MIo0b9zPRvEAmuJvjM5
-        EDWOEqtanjBChPkkbrwVhDiHT2LStunMExhVZyEFwywk/85C8sEsJB8sYGRZxSieWlqcm55a
-        bJSXWq5XnJhbXJqXrpecn7uJEZgmT/87/mUH4/JXH/UOMTJxMB5ilOBgVhLhNQtemSTEm5JY
-        WZValB9fVJqTWnyIUZqDRUmcNzlzQ6KQQHpiSWp2ampBahFMlomDU6qBKet7l0PagYbSmUyc
-        K1ySGjNvZfYwSonOn57Ix2zXnM28y1lURS9V/lbkZpW6t+wZD/f7Bja2+0wLecBgnHqkc/V8
-        U7462aAcz6u/4htO5rjt5dFdpHOHZappR9CSW0UrVSIksvrSd0R17ensm2GuxHN06fvW7r7p
-        E9bMYU2NSrm47re41dIJVo4WXneZfu8pKLXluLvIfJ7X/Mm9F+X0N56ecXtV2Sr1Dfo2NmF2
-        nj6/fZLnzGcTlfrG1GNzYoPbghUl+hsVOFeL2DBaMGWfWfRZqc9Y+pLA8tJVNufnxQTNts/2
-        4Vy9VDg8ZnNDXleA4PkvztMu7/u7brGsco6vQEdyrHbCnN47jkt7ipVYijMSDbWYi4oTAdVN
-        gNACBAAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOKsWRmVeSWpSXmKPExsVy+t/xu7pupmuSDPouKVisvtvPZjHtw09m
-        i99nzzNb7H03m9Xiwo9GJos9iyYxWaxcfZTJ4sn6WcwWPQc+sFj87boHFGt5CFR3S9vi8q45
-        bBbzlz1lt1hz8ymLRdvGr4wOAh6Xr3h7/Duxhs1j56y77B6Xz5Z6bFrVyeaxsGEqs8fmJfUe
-        u282AOVa77N6vN93lc1j/ZarLB6bT1d7fN4k59F+oJspgC9Kz6Yov7QkVSEjv7jEVina0MJI
-        z9DSQs/IxFLP0Ng81srIVEnfziYlNSezLLVI3y5BL2PV3c+sBf8FKjr+vWFtYHzL28XIySEh
-        YCKxr+cPSxcjF4eQwFJGiaa5jSwQCRmJT1c+skPYwhJ/rnWxQRR9ZJRY+OIdM4Szi1Hi2YTb
-        TCBVvAJ2Erd+zQXrZhFQlbh/azEjRFxQ4uTMJ2BxUYEIiU/LJrB2MXJwCAs4SjSdSAIJMwuI
-        S9x6Mp8JJCwikCcx7x9U+BaTxP2ndRCrzrNIXD68mR2khk1AS6KxE+w2TgE3iXuff7ND1GtK
-        tG6HseUltr+dwwxSLiGgLPFvJzPEK7USr+7vZpzAKDoLyW2zkBwxC8mkWUgmLWBkWcUoklpa
-        nJueW2yoV5yYW1yal66XnJ+7iRGYYrYd+7l5B+O8Vx/1DjEycTAeYpTgYFYS4TULXpkkxJuS
-        WFmVWpQfX1Sak1p8iNEUGEATmaVEk/OBSS6vJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUggPbEk
-        NTs1tSC1CKaPiYNTqoFJeNO+zT3SdTe6CmSn1c+ae+6E2/0gl8kcEonyM9+yng/4pZzW0fM4
-        b1Pm6lllfmpJbw+Vzr4xfc6bYO9LfwML/t+Zsdp/ouQmz4lZ525J6Xkb7ug+xSJYd8r3r5Q5
-        E9v0+dNWq5i2yU5eMeXk0za29CVW+3y2TWnjNq40iq0tM+a+XN+7jfFTRNJrqXmf2kx//n0/
-        zVLRqWqWB/d+zvIs/rMmujrtDg87K6uPln3YMOf7xcy8nJBnjSK+PyWEcjIs/i2x22J8Y3ba
-        pah6DtlOO20mOynt48kM9+7oFNzaeWHDe7PD9Wuj/5Xsfbh88paIBIXbK/+oVNjo17LnLDK1
-        dT5+3LNieuzrRqEOxa9KLMUZiYZazEXFiQATp8hqugMAAA==
-X-CMS-MailID: 20220617080318eucas1p18554421449b17c4a2ad7816dd6584383
-X-Msg-Generator: CA
-X-RootMTR: 20220615102011eucas1p220368db4a186181b1927dea50a79e5d4
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20220615102011eucas1p220368db4a186181b1927dea50a79e5d4
-References: <20220615101920.329421-1-p.raghav@samsung.com>
-        <CGME20220615102011eucas1p220368db4a186181b1927dea50a79e5d4@eucas1p2.samsung.com>
-        <20220615101920.329421-14-p.raghav@samsung.com>
-        <63b0cfb6-eb24-f058-e502-2637039c5a98@opensource.wdc.com>
-        <0b819562-8b16-37b6-9220-28bf1960bccb@samsung.com>
-        <0c4f30f2-c206-0201-31e3-fbb9edbdf666@opensource.wdc.com>
-        <4746a000-2220-211e-1bd6-79c15c18a85c@samsung.com>
-        <e0dc08fd-cd00-240d-edc4-5799d51aa5a8@opensource.wdc.com>
-        <a945def3-ba5a-7539-e96a-43ade0ae674a@samsung.com>
-        <f4cf6348-dd94-aa82-7519-318248c51151@opensource.wdc.com>
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 6441c92a-f2b5-491f-1b4d-08da50480ec2
+x-ms-traffictypediagnostic: BYAPR04MB3973:EE_
+x-microsoft-antispam-prvs: <BYAPR04MB397393F815AF38E9E1D9E0B69BAF9@BYAPR04MB3973.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: ezPs3rKBSH4eWbgNatxhdNCa2V2szl23tdZbU0n+3g8j21YYaG/nwxp816YpZl/rNTBTAzLsc3mvFmkMbiwNKeMpDBiXvgLZvgyDxhBY54NzETI5OAXzSAdS0W6aQLNmEYTwdA/vqG1uNoezL+pGFKJ4jIpee1UGg3TdlQfe4aK57YMWbfUKonoi6V1pnPwOsP2oQzu6XHRyTZS/xyvvz9zxHDWyLJuenMeoElkGoXejAEHC4wYMlHOd3YfsYqgOY02XwbU5tErOKbQ8kxqQtp3vAe02E+kBD9E71EDLCSI/vbJ7EFhzvdYDA1Vk8eXhukQSFSF488ujh14wSzvIN3nuZipE0swEUs7dKGjH9HDMxyM6mhLIwWYO5Sf9pxw4iuZtuzapT8fqED3Nyva1jz03GO0YYxzTCIX4CbhVh997LM/6PEib80HDfAwP7I/JSc6zxSlyLQOFnANHVByF2D6KUHhT1ArpaGVx8jdtXI3jkACtcajeHBGJhIueFwoZC7739/1kdq1utrAecnWARbw3uhHwWMxg2gSyRTMZPP/+xDZgejM2N6IoQ+xcAwBC20giADVAO5cThiikrqTTigQnH+C4GbuwphaP1YpV5GW9ukB/TosV2NquRymNU34MrwlKtg7/eDLAbAu/wr8aUe+/PJGulqFBxzqTVs/MGHU+9Wxkylm1X9sGGbp2tDGK2iRbxG8NTIeOH1E9Q26fwA==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR04MB7416.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(110136005)(66446008)(64756008)(55016003)(498600001)(38070700005)(66556008)(558084003)(4326008)(7696005)(122000001)(76116006)(186003)(91956017)(2906002)(66476007)(8676002)(54906003)(33656002)(6506007)(82960400001)(4270600006)(8936002)(52536014)(38100700002)(19618925003)(86362001)(5660300002)(9686003)(66946007)(71200400001)(316002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 2
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?aqgHc3pYzjApRiW9uuqf6FV+0I+uwW0vI8Pq4X9Y2pEb/OkU2I9i8ADUbc+D?=
+ =?us-ascii?Q?pYmNN1/u9vszzxMY+PtPG8s+XV/otw2Dyo2sn6xoxEIcAHLfv+b4yMzhQQVI?=
+ =?us-ascii?Q?/l2HLWQxD+oc7/zE4Jp5rh1eicXobDQvEIk8mMYN83aQY/Spzf1lHi5kFRtF?=
+ =?us-ascii?Q?oknXeyrgF8PwZFPVVD7fbVdLqJnUbeQO50Uh7DJsfGzV//lGvK6ogG4Ngy82?=
+ =?us-ascii?Q?fJsNcT7BfZyrRBJ/kN07cIIcoQrDq39bir+PbzTl3j7J9oyv1Rx1htteTjED?=
+ =?us-ascii?Q?Iyx8eAC8EgEuKgeJH7xJiqglmqaUs1oa+03NLDYr2rt1ZJbu/Ppd17MDgNTj?=
+ =?us-ascii?Q?h6HRgIEtQ+CmzDUW5itAuuXNCGVEshL5NRL5poShfA2kl7kzi/uFtlV8Cc+7?=
+ =?us-ascii?Q?H06dkAwLO4xrhI90r3GBkrbabx3sbLg65OUSu/7ytOFq/Q38nw94Inhy0ZbX?=
+ =?us-ascii?Q?n5aoq2colHBR/h0VctheK4pWGcyzs08YbwZ6rDSNF/yS3FfnlaB+HxE68xg+?=
+ =?us-ascii?Q?FBPs/w1fIo2exH83ZVwPdPUmOW61kPD/8DGx2Kf7FD5ky92LofzsKO2sbmFz?=
+ =?us-ascii?Q?JXk3p9rW3dMHeEYAdAmDa3WuK2VgUHvJC3g9o5y0NcdUCfAH8MyiIHMJZ2Ej?=
+ =?us-ascii?Q?4Rz3Fd2w3HsBIv09D9lpEq7LEksdE4lWdXwzi5diEg7kx9Bi+aUWBCNvTo1E?=
+ =?us-ascii?Q?Jwc57L6V1gqTWxFuQKzEmX5iMxctWN2XihOuXSIc5sIdQ0ucH798tQy13XDv?=
+ =?us-ascii?Q?l8uswLYVj4/SIBx5/h9EmsYmhFpvuVvZVEpSn3dwQQZXts+TrzFwd8rrJ9FV?=
+ =?us-ascii?Q?JDYfubzOcEraLnk1XWIC0ES8wO/gsdWdfuuG3a/rpgT970pOhNfclNESyv5Y?=
+ =?us-ascii?Q?bhROSXXcPwCwvqEMWXduMaBLKmInK9SxVbA32wcd7SkdwvGRSW2V0tzNkNwt?=
+ =?us-ascii?Q?eYvG5OnNXG/N4g06JzMs2Mc6ZJo7se3bUe2rfZfXean+v75cnOAYOW1CAuGm?=
+ =?us-ascii?Q?5iKTho/d4qEDe5+ZdQFZHjq0jrApJduhoggfIUuHRiHCuPgD3eBUe7D2XiKg?=
+ =?us-ascii?Q?MxaSQ79OK7QPULzpE+YVFRRCu6jsrDK3/dCCGF58hl6Gl1SGhQp9teIV43/O?=
+ =?us-ascii?Q?uWj5tKrAn8VWM/O5UnkftGG+r0+ocJrDt/alfk3vN+nbA/JIiWp573YfZRJV?=
+ =?us-ascii?Q?KJpKvZNCfLgRrLuMLbHI/Ktqfca4/rwCicHapVvGSQeCow2Th1SVNAPCC5dp?=
+ =?us-ascii?Q?B4SIehUK2/SUZPU5wiW8SYo8DMTCsuycJ3LLi2Raw/4dkMSd7SLq/7obcoVR?=
+ =?us-ascii?Q?8YglP5Dc+0/z/GX6mA2AtEWqtTMQG3N0DtD7XpEppB5AIkobn0cH99n1SJHO?=
+ =?us-ascii?Q?wSZPEDp5Ij/IGOANOxxPLtCbnaGn1GHWrNWoNvgPBnToYTSGRM/usyr7COJb?=
+ =?us-ascii?Q?VXAYb8aj+tw6l+e6JnCv3zzmUAPuw2ZSAXjObuss318yR8a8+NqMEV+xj1bJ?=
+ =?us-ascii?Q?NQczHMyXGQzdqNiQSULEnUMYI6HdFAnPFW0RsHmP1snQlglyIIf6K2vFfz/L?=
+ =?us-ascii?Q?Di68xtB3AbHjXaCF2oSGjRp9o/z276ppz/w8wZqlHWcbAYxHs1c07itvcC5h?=
+ =?us-ascii?Q?Zqa7tf2ea5Vru6g8PRJWGoKXpMDDCDnldrEL0kO5W5leX/T14Ccg0ARIKcH9?=
+ =?us-ascii?Q?tyHW9WjHe+uf9QoXDBLC39sQ0XcPlujY5ScNeBfkss4SdfmIONMpR4n57qCa?=
+ =?us-ascii?Q?gZQoHVtjBa+a/kJNsGCbON0g3pSmQzIEWjYXjhgm62vzX63cMQ6cqXIkDCwe?=
+x-ms-exchange-antispam-messagedata-1: S0Khomv9UoAPyzp2zWj779BgJ8ADxTJlB264LCVWHKPp0amjIFrUWqYM
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR04MB7416.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6441c92a-f2b5-491f-1b4d-08da50480ec2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2022 09:59:24.1659
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jPgDhq3KSk6TpPFgKjHgW/z4wpDBAs1Wco5NpmBie2doL/EVC6Fe1ILD+v6ogfnC7V2kWKrXUaSXI5KPXZCTinaQOl3wh9gUGqMu5ZI2c98=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB3973
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-06-17 08:56, Damien Le Moal wrote:
->>
->> So we call this function device_not_matches_zone_sectors() from
->> validate_hardware_zoned_model() for each target and we let the validate
->> succeed even if the target's zone size is different from the underlying
->> device zone size if this feature flag is set. Let me know if I am
->> missing something and how this can be moved to
->> validate_hardware_zoned_model().
-> 
-> Your change does not match the function name
-> device_not_matches_zone_sectors(), at all. So I think this is wrong.
-> 
-> The fact is that zone support in DM has been built under the following
-> assumptions:
-> 1) A zoned device can be used to create a *zoned* target (e.g. dm-linear,
-> dm-flakey, dm-crypt). For this case, the target *must* use the same zone
-> size as the underlying devices and all devices used for the target must
-> have the same zone size.
-> 2) A zoned device can be used to create a *regular* device target (e.g.
-> dm-zoned). All zoned devices used for the target must have the same zone size.
-> 
-> This new target driver completely breaks (1) and does not fit with (2). I
-> suspect this is why you are seeing problems with dm_revalidate_zones() as
-> that one uses the underlying device instead of the target report zones.
-> 
-> Based on this analysis, validate_hardware_zoned_model() definitely needs
-> to be changed. But device_not_matches_zone_sectors() is to check the
-> assumptions (1) and (2) so changing it for your new case is wrong in my
-> opinion. You need another set of assumptions (3) (define that well please)
-> and modify validate_hardware_zoned_model() so that the defined constraints
-> are checked. Using a target flag to indicate the type of zoned target is
-> fine by me.
-> 
-Got it. Thanks for the explanation. Renaming
-device_not_matches_zone_sectors() function to something meaningful with
-my changes should address what you have pointed out to accommodate all
-three types.
-
-I see that something similar was done to dm_table_supports_zoned_model()
-to accommodate type 2(dm-zoned) with different underlying zoned models
-even though the initial impl. supported only type 1.
+Looks good,=0A=
+Reviewed-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>=0A=
