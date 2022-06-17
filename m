@@ -2,161 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA09EC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 17:11:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0DEC43334
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 18:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229602AbiFQRLo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 13:11:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50128 "EHLO
+        id S229485AbiFQSZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 14:25:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1383145AbiFQRLn (ORCPT
+        with ESMTP id S231165AbiFQSZp (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 13:11:43 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F2A48E73
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 10:11:42 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id b12-20020a17090a6acc00b001ec2b181c98so3528515pjm.4
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 10:11:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:cc:from
-         :subject:content-transfer-encoding;
-        bh=CEY3cvzXVZJD5gWpnHz8TFCAY66BKdISdZGXy0oNJ+c=;
-        b=mvhceEfMc7D2LMySjb/Fv5DfeJZgSXv7kXsjLOBQiyxo4wMspJiQq8YHfoxJE+j+C7
-         CINxkvCiVms+5iDxO+vSGli2Ng7ERhcMc6vgxBtpg5z/ctWWD8MVEh6vTuu01FgD5z0H
-         iHW+QCWN7B4EK/0pYr7dzXt6q0yBOAj4IS3wSrPHJiYJWpMbPcidqNfMGEDifH0Y3c2a
-         Vns+IVyiU9Y65m+bjudDpN5pVRG8/bBdyAt7mx7u76WroCndwHDLNUaEbeFPrqXUCdRV
-         YUJ0Fs3PokWEfVKBilVu033yof2WqrF7P/ZkjFd4xEoZelmEe7/LFZlLWoeHs9ko+nhB
-         7Auw==
+        Fri, 17 Jun 2022 14:25:45 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38ABA3192D
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 11:25:45 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id d5so4527482plo.12
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 11:25:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:cc:from:subject:content-transfer-encoding;
-        bh=CEY3cvzXVZJD5gWpnHz8TFCAY66BKdISdZGXy0oNJ+c=;
-        b=jH3lCUgqXsNMzZRJITPNozTZsEia5oBg2F9fatsiUT8dv4gGqEk6AB/fgMs84Cj9L7
-         ruLyqGt1O9bf+aFtGaPhieyoB3/kVv+Hg3MAfa1tax0hpOPssNMYPE9KMAnKPPTO3eV/
-         Go8Btqiw4JzZK1jUNlShmvls5sO5wMgP76nVXEnGMTTW+5OiAa5uhxnaOMrs10pr27ry
-         7/Y/6oqVHh9Vy2eyQ7jMIb/BlTPPLX4UVILMAum/wry2o6Z8oHIDzIk2D69SY8HbmxXP
-         Uycorg2WEbeCcT8AZrb0O+NDO4jAglEsQgFI2723jjuUt0pPQ6FoHWiHWM4nqvIXPkPf
-         Z42A==
-X-Gm-Message-State: AJIora8uYURmAx0EfU2RzbuGE/8HbeiIAvyhLnBnpTyJEZPwn7c+vLvd
-        Ajdgo7RVgnjfUvyDiMI8cX4B75VuYi80lw==
-X-Google-Smtp-Source: AGRyM1tp+g1zq1R15LDasIB4ZwZNd2L1eSOtqYPYp76Uf22z6PHkT2q2eE0/bGKi+e2Dh2HkX6RC0g==
-X-Received: by 2002:a17:90b:508a:b0:1ec:73d9:a143 with SMTP id rt10-20020a17090b508a00b001ec73d9a143mr5133516pjb.71.1655485901629;
-        Fri, 17 Jun 2022 10:11:41 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id ms24-20020a17090b235800b001e270cc443dsm5805887pjb.46.2022.06.17.10.11.40
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=TpfDZIJDTOYGLVeEunX3azo5Zy9nVDPKvXJO3qdUTS4=;
+        b=S4U1xYUt96Ge9J+5m4O1ynwZ6MDW5p11EIUzlr/DjP5w+/lrIP5RZS0RWeMFGzJ2/o
+         WRq3QE5hPqQQ1Lvcq+op3Xl4k4Hkl8w4mEnmwm3Bfn2fiH3xroedWuynudnGf1xp7w8K
+         VF+QBmOfvHI9/caia57oXX7BgTkFf+JTId24Rl2e4FekTrANEmYZ0bVUDYaab9dap4v5
+         x1NYeOGXQfdTNXz5HlSMu5UsL9mvlyDgGGLvmNkmko/t01QeLtXEiPMyBP/FF51tXT5S
+         VpqpYNS12w4E51LHDx6k7iEsHiWr93wFc/jh85cj7MI2NQOmRXNdjjtryN9s9Gki9+Mq
+         aMlA==
+X-Gm-Message-State: AJIora8dctHO0CCmDnPlT5l8sRc5s1lGKtmTskdjTO+GiW7tHRppIYn6
+        9mAmDQl5sxRD8XwKWvypfyI=
+X-Google-Smtp-Source: AGRyM1vTy2dvYxcxqJcO/NwDkJd6K99I08Vit65OFHAjdofI1kKAiEe0n+koFDtrKiUAfZ9mCMMvtQ==
+X-Received: by 2002:a17:90b:4a90:b0:1e8:626c:e1b2 with SMTP id lp16-20020a17090b4a9000b001e8626ce1b2mr11840790pjb.141.1655490344461;
+        Fri, 17 Jun 2022 11:25:44 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:5d24:3188:b21f:5671? ([2620:15c:211:201:5d24:3188:b21f:5671])
+        by smtp.gmail.com with ESMTPSA id k7-20020a170902d58700b0016403cae7desm3880863plh.276.2022.06.17.11.25.42
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jun 2022 10:11:41 -0700 (PDT)
-Message-ID: <de7e4802-15b6-fbe7-f793-4454c3913f6a@kernel.dk>
-Date:   Fri, 17 Jun 2022 11:11:39 -0600
+        Fri, 17 Jun 2022 11:25:43 -0700 (PDT)
+Message-ID: <d510cb62-4b19-9ae0-cad4-1ca6756cc3fd@acm.org>
+Date:   Fri, 17 Jun 2022 11:25:41 -0700
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH 3/3] block: Specify the operation type when calling
+ blk_mq_map_queue()
 Content-Language: en-US
-To:     Linus Torvalds <torvalds@linux-foundation.org>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-From:   Jens Axboe <axboe@kernel.dk>
-Subject: [GIT PULL] Block fixes for 5.19-rc3
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20220614175725.612878-1-bvanassche@acm.org>
+ <20220614175725.612878-4-bvanassche@acm.org> <YqkoWUjOPgpqzn4E@T590>
+ <20220615060851.GE22115@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220615060851.GE22115@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Linus,
+On 6/14/22 23:08, Christoph Hellwig wrote:
+> On Wed, Jun 15, 2022 at 08:31:21AM +0800, Ming Lei wrote:
+>>> -	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
+>>> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, REQ_OP_WRITE, ctx);
+>>
+>> The change itself doesn't make a difference, since both results in choosing
+>> HCTX_TYPE_DEFAULT, but passing REQ_OP_WRITE is a bit misleading.
+> 
+> Well, the argument is an operationm so we better pass in a correct
+> operation (at some point we should look into a __bitwise annotation
+> or similar to make it clean).  And as 0 is REQ_OP_READ, we will end
+> up with the HCTX_TYPE_READ hctx IFF someone configures read queues
+> and uses an sq only schedule.  Which is a completely stupid but
+> possible setup.
 
-Block fixes for 5.19-rc3:
+Hi Christoph,
 
-- NVMe pull request from Christoph
-	- Quirks, quirks, quirks to work around buggy consumer grade
-	  devices (Keith Bush, Ning Wang, Stefan Reiter, Rasheed Hsueh)
-	- Better kernel messages for devices that need quirking
-	  (Keith Bush)
-	- Make a kernel message more useful (Thomas Weißschuh)
+I looked into adding a __bitwise annotation for request flags by 
+introducing a new type that is called blk_mq_opf_t. Introducing such a 
+type without modifying a lot of code seems difficult to me. This is what 
+I ran into:
+* If the type of the operation type constants (REQ_OP_READ etc.) is 
+modified into blk_mq_opf_t then their type changes from 'enum req_opf' 
+into type blk_mq_opf_t and sparse complains when passing e.g. 
+REQ_OP_READ to a function that accepts an argument with type enum req_opf.
+* If the type of the operation type constants is not modified then 
+sparse complains about bitwise or-ing the operation type and a request 
+flag, e.g. REQ_OP_WRITE | REQ_FUA.
 
-- MD pull request from Song, with a few fixes
+I'm not sure how to solve this other than by modifying the functions 
+that accept an 'opf' argument into accepting an additional argument 
+(enum req_opf op + blk_mq_opf_t op_flags).
 
-- blk-mq sysfs locking fixes (Ming)
+Thanks,
 
-- BFQ stats fix (Bart)
-
-- blk-mq offline queue fix (Bart)
-
-- blk-mq flush request tag fix (Ming)
-
-Please pull!
-
-
-The following changes since commit b13baccc3850ca8b8cccbf8ed9912dbaa0fdf7f3:
-
-  Linux 5.19-rc2 (2022-06-12 16:11:37 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.dk/linux-block.git tags/block-5.19-2022-06-16
-
-for you to fetch changes up to b96f3cab59654ee2c30e6adf0b1c13cf8c0850fa:
-
-  block/bfq: Enable I/O statistics (2022-06-16 16:59:28 -0600)
-
-----------------------------------------------------------------
-block-5.19-2022-06-16
-
-----------------------------------------------------------------
-Bart Van Assche (2):
-      block: Fix handling of offline queues in blk_mq_alloc_request_hctx()
-      block/bfq: Enable I/O statistics
-
-Guoqing Jiang (1):
-      Revert "md: don't unregister sync_thread with reconfig_mutex held"
-
-Jens Axboe (2):
-      Merge tag 'nvme-5.19-2022-06-15' of git://git.infradead.org/nvme into block-5.19
-      Merge branch 'md-fixes' of https://git.kernel.org/pub/scm/linux/kernel/git/song/md into block-5.19
-
-Keith Busch (5):
-      nvme: add bug report info for global duplicate id
-      nvme-pci: add trouble shooting steps for timeouts
-      nvme-pci: phison e12 has bogus namespace ids
-      nvme-pci: smi has bogus namespace ids
-      nvme-pci: sk hynix p31 has bogus namespace ids
-
-Logan Gunthorpe (1):
-      md/raid5-ppl: Fix argument order in bio_alloc_bioset()
-
-Ming Lei (3):
-      blk-mq: protect q->elevator by ->sysfs_lock in blk_mq_elv_switch_none
-      blk-mq: avoid to touch q->elevator without any protection
-      blk-mq: don't clear flush_rq from tags->rqs[]
-
-Ning Wang (1):
-      nvme-pci: avoid the deepest sleep state on ZHITAI TiPro7000 SSDs
-
-Stefan Reiter (1):
-      nvme-pci: add NVME_QUIRK_BOGUS_NID for ADATA XPG GAMMIX S50
-
-Thomas Weißschuh (1):
-      nvme: add device name to warning in uuid_show()
-
-rasheed.hsueh (1):
-      nvme-pci: disable write zeros support on UMIC and Samsung SSDs
-
- block/bfq-iosched.c      |  6 ++++++
- block/blk-mq-sched.c     |  1 +
- block/blk-mq.c           | 29 ++++++++++-------------------
- block/kyber-iosched.c    |  3 ++-
- block/mq-deadline.c      |  3 +++
- drivers/md/dm-raid.c     |  2 +-
- drivers/md/md.c          | 14 +++++---------
- drivers/md/md.h          |  2 +-
- drivers/md/raid5-ppl.c   |  4 ++--
- drivers/nvme/host/core.c |  5 +++--
- drivers/nvme/host/nvme.h | 28 ++++++++++++++++++++++++++++
- drivers/nvme/host/pci.c  | 43 ++++++++++++++++++++++++++++++++++++++++++-
- include/linux/blkdev.h   |  4 ++--
- 13 files changed, 106 insertions(+), 38 deletions(-)
-
--- 
-Jens Axboe
-
+Bart.
