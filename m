@@ -2,93 +2,208 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97F09C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 13:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF282C43334
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 13:59:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235059AbiFQNbb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 09:31:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42828 "EHLO
+        id S1382660AbiFQN7A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 09:59:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229728AbiFQNba (ORCPT
+        with ESMTP id S1382571AbiFQN6x (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 09:31:30 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05EE6CF5
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 06:31:29 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id w29so4069147pgl.8
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 06:31:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=0ofgUTDXejw/stkJnliERbhPvuNdkIVVYb65LS+lZxI=;
-        b=JErvVNAf2ggPU6BgDGKtrm0hp7KNlNy0Jd/WCNoc5MI6IhqvILFNNMsfZF2pNneQH9
-         C9ZNxji1NTS2JMFGlJJ5QbzLvBviehj/JTHTyhVc0lF5dzb0dbmcm7/S0AQAYbiKeZdX
-         T17/FiovYsMhB9tRBUWCOvzfobFTnHahmLpklsPQWJ2GQRPAweX0dNo7AtjGWkyjJ64X
-         8nqkNKfO2CayhrfsVIWzbAn4GKWBnLvI7tpsv86BTOqG77iMhGZt1N9bsj3npL0tMZzW
-         LPkfx2coh+B47YE66pYR2sgqaYmgLkmGbTvHpw0RMBhmUcfrOkeO+n4wyagKmhGZ0hKB
-         HrOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=0ofgUTDXejw/stkJnliERbhPvuNdkIVVYb65LS+lZxI=;
-        b=m3TqWZUsSOl5zQFOtcyf1kRgi2pRPvvfkHJsiedyBvCykM+Z9r9AWC6+LzXhjoCwZh
-         15OqAwvwPclclNyeNdpoiFj3PIK4fLiAXo+jmgNxe8s6PjAM2OPnr3Oze6gXM4pdBqgm
-         DQbIoPIGVquFuAE8c5hHQ7hsRrdjx8Zal+ORzJPe3wL9RNI8Tk4WluBP9eMbVK9Bte5e
-         8EAErDq0hg+HXjDRcczOwgWIK5eLtu6wUX88hpM8YUsdUJIukCmhbQnmzTRoG7Ayt8pm
-         OK2T75UtguB6sO6YsK3YB/Xh1LfM7RvlB3aGoImNU1NQexOy5uL5WkzBwsjzEhaAxdAE
-         KsjQ==
-X-Gm-Message-State: AJIora8rBgQbL1UbYY1TxLaroG+Sfzqt3r56sIqq0mofQ/ZW5HE9b58z
-        4ZHSgMvx0PM0teqH0T7iyojLOTdxP7xEAw==
-X-Google-Smtp-Source: AGRyM1urQHt8eb/aj4FiloRfY3pBEs5LzF7NvReIfkoVGFlQt+G/w/GBtLEHGhT05RM7EZ36PYKKpg==
-X-Received: by 2002:a63:6a85:0:b0:3fa:722a:fbdc with SMTP id f127-20020a636a85000000b003fa722afbdcmr9114159pgc.174.1655472688420;
-        Fri, 17 Jun 2022 06:31:28 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id w68-20020a628247000000b00522c1146e90sm3716648pfd.118.2022.06.17.06.31.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 06:31:27 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     yukuai3@huawei.com, linux-block@vger.kernel.org,
-        dan.j.williams@intel.com, ming.lei@redhat.com,
-        shinichiro.kawasaki@wdc.com
-In-Reply-To: <20220614074827.458955-1-hch@lst.de>
-References: <20220614074827.458955-1-hch@lst.de>
-Subject: Re: fix tag freeing use after free and debugfs name reuse
-Message-Id: <165547268742.360172.6417506114396990966.b4-ty@kernel.dk>
-Date:   Fri, 17 Jun 2022 07:31:27 -0600
+        Fri, 17 Jun 2022 09:58:53 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 496A84C400;
+        Fri, 17 Jun 2022 06:58:46 -0700 (PDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LPgXn6pykzBrmp;
+        Fri, 17 Jun 2022 21:55:21 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 17 Jun 2022 21:58:24 +0800
+Received: from huawei.com (10.175.127.227) by kwepemm600009.china.huawei.com
+ (7.193.23.164) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Fri, 17 Jun
+ 2022 21:58:23 +0800
+From:   Yu Kuai <yukuai3@huawei.com>
+To:     <axboe@kernel.dk>, <ming.lei@redhat.com>
+CC:     <jack@suse.cz>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yukuai3@huawei.com>,
+        <yi.zhang@huawei.com>
+Subject: [PATCH RFC -next] sbitmap: fix possible io hung due to lost wakeups
+Date:   Fri, 17 Jun 2022 22:11:25 +0800
+Message-ID: <20220617141125.3024491-1-yukuai3@huawei.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.127.227]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 14 Jun 2022 09:48:23 +0200, Christoph Hellwig wrote:
-> the first patch fixes a use after free, and the others deal with debugfs
-> name reuse that spews warnings and makes debugfs use impossible for
-> quickly reused gendisk instances.  Both of those are rooted in sloppy
-> life time rules for block device tear down.
-> 
-> Compared to the previous separate postings this adds a missing queue
-> quiesce and documents debugfs_mutex better.
-> 
-> [...]
+Currently, same waitqueue might be woken up continuously:
 
-Applied, thanks!
+__sbq_wake_up		__sbq_wake_up
+ sbq_wake_ptr -> assume	0
+			 sbq_wake_ptr -> 0
+ atomic_dec_return
+			atomic_dec_return
+ atomic_cmpxchg -> succeed
+			 atomic_cmpxchg -> failed
+			  return true
 
-[1/4] block: disable the elevator int del_gendisk
-      commit: 50e34d78815e474d410f342fbe783b18192ca518
-[2/4] block: serialize all debugfs operations using q->debugfs_mutex
-      commit: 5cf9c91ba927119fc6606b938b1895bb2459d3bc
-[3/4] block: remove per-disk debugfs files in blk_unregister_queue
-      commit: 99d055b4fd4bbb309c6cdb51a0d420669f777944
-[4/4] block: freeze the queue earlier in del_gendisk
-      commit: a09b314005f3a0956ebf56e01b3b80339df577cc
+			__sbq_wake_up
+			 sbq_wake_ptr
+			  atomic_read(&sbq->wake_index) -> still 0
+ sbq_index_atomic_inc -> inc to 1
+			  if (waitqueue_active(&ws->wait))
+			   if (wake_index != atomic_read(&sbq->wake_index))
+			    atomic_set -> reset from 1 to 0
+ wake_up_nr -> wake up first waitqueue
+			    // continue to wake up in first waitqueue
 
-Best regards,
+What's worse, io hung is possible in theory because wakeups might be
+missed. For example, 2 * wake_batch tags are put, while only wake_batch
+threads are worken:
+
+__sbq_wake_up
+ atomic_cmpxchg -> reset wait_cnt
+			__sbq_wake_up -> decrease wait_cnt
+			...
+			__sbq_wake_up -> wait_cnt is decreased to 0 again
+			 atomic_cmpxchg
+			 sbq_index_atomic_inc -> increase wake_index
+			 wake_up_nr -> wake up and waitqueue might be empty
+ sbq_index_atomic_inc -> increase again, one waitqueue is skipped
+ wake_up_nr -> invalid wake up because old wakequeue might be empty
+
+To fix the problem, refactor to make sure waitqueues will be woken up
+one by one,
+
+Signed-off-by: Yu Kuai <yukuai3@huawei.com>
+---
+ lib/sbitmap.c | 83 ++++++++++++++++++++++++++-------------------------
+ 1 file changed, 43 insertions(+), 40 deletions(-)
+
+diff --git a/lib/sbitmap.c b/lib/sbitmap.c
+index ae4fd4de9ebe..dc2959cb188c 100644
+--- a/lib/sbitmap.c
++++ b/lib/sbitmap.c
+@@ -574,66 +574,69 @@ void sbitmap_queue_min_shallow_depth(struct sbitmap_queue *sbq,
+ }
+ EXPORT_SYMBOL_GPL(sbitmap_queue_min_shallow_depth);
+ 
+-static struct sbq_wait_state *sbq_wake_ptr(struct sbitmap_queue *sbq)
++static void sbq_update_wake_index(struct sbitmap_queue *sbq,
++				  int old_wake_index)
+ {
+ 	int i, wake_index;
+-
+-	if (!atomic_read(&sbq->ws_active))
+-		return NULL;
++	struct sbq_wait_state *ws;
+ 
+ 	wake_index = atomic_read(&sbq->wake_index);
+-	for (i = 0; i < SBQ_WAIT_QUEUES; i++) {
+-		struct sbq_wait_state *ws = &sbq->ws[wake_index];
++	if (old_wake_index != wake_index)
++		return;
+ 
++	for (i = 1; i < SBQ_WAIT_QUEUES; i++) {
++		wake_index = sbq_index_inc(wake_index);
++		ws = &sbq->ws[wake_index];
++		/* Find the next active waitqueue in round robin manner */
+ 		if (waitqueue_active(&ws->wait)) {
+-			if (wake_index != atomic_read(&sbq->wake_index))
+-				atomic_set(&sbq->wake_index, wake_index);
+-			return ws;
++			atomic_cmpxchg(&sbq->wake_index, old_wake_index,
++				       wake_index);
++			return;
+ 		}
+-
+-		wake_index = sbq_index_inc(wake_index);
+ 	}
+-
+-	return NULL;
+ }
+ 
+ static bool __sbq_wake_up(struct sbitmap_queue *sbq)
+ {
+ 	struct sbq_wait_state *ws;
+ 	unsigned int wake_batch;
+-	int wait_cnt;
++	int wait_cnt, wake_index;
+ 
+-	ws = sbq_wake_ptr(sbq);
+-	if (!ws)
++	if (!atomic_read(&sbq->ws_active))
+ 		return false;
+ 
+-	wait_cnt = atomic_dec_return(&ws->wait_cnt);
+-	if (wait_cnt <= 0) {
+-		int ret;
+-
+-		wake_batch = READ_ONCE(sbq->wake_batch);
+-
+-		/*
+-		 * Pairs with the memory barrier in sbitmap_queue_resize() to
+-		 * ensure that we see the batch size update before the wait
+-		 * count is reset.
+-		 */
+-		smp_mb__before_atomic();
++	wake_index = atomic_read(&sbq->wake_index);
++	ws = &sbq->ws[wake_index];
++	/*
++	 * This can only happen in the first wakeup when sbitmap waitqueues
++	 * are no longer idle.
++	 */
++	if (!waitqueue_active(&ws->wait)) {
++		sbq_update_wake_index(sbq, wake_index);
++		return true;
++	}
+ 
+-		/*
+-		 * For concurrent callers of this, the one that failed the
+-		 * atomic_cmpxhcg() race should call this function again
+-		 * to wakeup a new batch on a different 'ws'.
+-		 */
+-		ret = atomic_cmpxchg(&ws->wait_cnt, wait_cnt, wake_batch);
+-		if (ret == wait_cnt) {
+-			sbq_index_atomic_inc(&sbq->wake_index);
+-			wake_up_nr(&ws->wait, wake_batch);
+-			return false;
+-		}
++	wait_cnt = atomic_dec_return(&ws->wait_cnt);
++	if (wait_cnt > 0)
++		return false;
+ 
++	sbq_update_wake_index(sbq, wake_index);
++	/*
++	 * Concurrent callers should call this function again
++	 * to wakeup a new batch on a different 'ws'.
++	 */
++	if (wait_cnt < 0)
+ 		return true;
+-	}
++
++	wake_batch = READ_ONCE(sbq->wake_batch);
++	/*
++	 * Pairs with the memory barrier in sbitmap_queue_resize() to
++	 * ensure that we see the batch size update before the wait
++	 * count is reset.
++	 */
++	smp_mb__before_atomic();
++	atomic_set(&ws->wait_cnt, wake_batch);
++	wake_up_nr(&ws->wait, wake_batch);
+ 
+ 	return false;
+ }
 -- 
-Jens Axboe
-
+2.31.1
 
