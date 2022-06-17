@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1C21CCA47A
-	for <linux-block@archiver.kernel.org>; Thu, 16 Jun 2022 23:49:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68B9AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 00:04:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379442AbiFPXt2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jun 2022 19:49:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43234 "EHLO
+        id S232134AbiFQAEj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jun 2022 20:04:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56288 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1379205AbiFPXtW (ORCPT
+        with ESMTP id S229454AbiFQAEi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jun 2022 19:49:22 -0400
+        Thu, 16 Jun 2022 20:04:38 -0400
 Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F9F062BF2
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 16:49:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D532762CC0
+        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 17:04:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655423361; x=1686959361;
+  t=1655424277; x=1686960277;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=ZMytOujssEcOtiMdUCJ4EFf5UjhPhqNXGPuMIYgyGew=;
-  b=HX6PfQYa8kmLQ6732lCT+TtoP6xHn1nTAUmyUZcdDifgm0TSb+SC/jiW
-   BIlRpoJyLlIbGof5RknX+c8PBwsqjXOK25VwyRlD+slgAZdcycBpABToW
-   LexDdwtd+ScaFKXYcocMs+nq0WRKrfzRVLLBb/ydZzWKpROtjx688dE9/
-   6jWYQS4rUtwLa1NqOlYCXGDGNRppxjCAyBTTMD7yQgeOw4SKZmWT3vXka
-   YZ/OSDy4UgQdhAzTuU3Bn7JY0hicIbZjYTGfMPb9K3CA9HcDkL6r63oNE
-   2U6hLi9KIheQoQYSOlHoXs4MuyL0knEuzcpitqXWGRjWeUUycwQhHJQL1
+  bh=7aH4wYdWLYsjG/9qP2xldw4GlqngeYSpfH5wn4+CgfE=;
+  b=Ibx0hmxSJMsTHYaeRVa/OU8eQ80EmYcZLXYgX5oOJq8Pv2/PxcGhea+b
+   05kwkVzMuOF7zhAwcZKdfmcNZUM+/1L0rzLp7C82Lf5Gy9uVkrWZvmMMA
+   Y8xrZsGG80aZDrUhT8ihFm7Va0dZ9JJLV7RIxOQzu+3t2vSVBpF/insMp
+   v1spm1U6ZaZR658eDiHv9OPmoAo/Qb0oHaxngl91bd0cvFDfQnMJezIsw
+   NQWgLQoYiJWpUR2+RUf5vndFadf7YW+d5zP93tuvHaNcajjBVdY0JaVG+
+   MTp++QAAggVnYbe1kyjbF1zRdpYQB+7j9JaSHyE91x/PfTsGpqQcWtlST
    A==;
 X-IronPort-AV: E=Sophos;i="5.92,306,1650902400"; 
-   d="scan'208";a="202083454"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jun 2022 07:49:19 +0800
-IronPort-SDR: 4RCpTcLITVg7+MQsyWnuhKCZsxKIH3UF9lkTeKO/fi2R6JpJLSDxAOqQ2gCzhUetxzzRvOE5oF
- C/wxdWuI5MfRY/C6Wc9yx+Ku5/pIChyUycQxyexZfsWPrIqevxYWoINfe2DF5luN0nka66alb2
- KK0+zaYCczPpLCNRjpgl7khE+MeyPucQ0Ss+D/0CPuo3jJa4u6uf30LM/+WP6xaIS0QqoVldt5
- qnmWDGDWeF3fmipAa9hBKbr8wt1LT+BLrQ2GCf2ETgu26UVwReyNvVd7LwdPut6gC4QXqBHX9n
- ydKPQXNnSJTvQlTZV7zFAPDJ
+   d="scan'208";a="202085184"
+Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
+  by ob1.hgst.iphmx.com with ESMTP; 17 Jun 2022 08:04:37 +0800
+IronPort-SDR: ropkU5ulQEEUWx6DWqgXrMwE8MZ3BPG+GYiCquybejuHYKN1uFnBtVqLCHnRTYfollzl/3K9ot
+ yKdLeFOjw0qyWNrG5F7zl8GPsejmGVjo2HA1J1vKey9WTtHi8zhUtn+X/c/nrdj0NixjJdoiJo
+ ImfR7Wb3ViVwUYQYHWmeaNUT4fbSUAQryVEzT/XrQ4MrEnh8UIHnRrqY0BwsWlOTqSU8mhOXFg
+ am/lvIH31Rnyhn3QgeH6Y1XAsaImXvQ+h3fYnj77tysuW4JYyg+sOIfof2ccy9OWnNHsXa4xjv
+ WNsDDkBKeyNB/yK0xKMp4FMj
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 16:11:55 -0700
-IronPort-SDR: Sf/cXj+WTb9ni4XTVuj6BT+ljj8ZeoqNh8FMXcLxqm2g73qIOncY/Dgslxer3OuvWNzstY7q0v
- rz3NLDebNrr/hDW4zn0BV4odLvjf7mdxc7do6RArelMFLYLOWoG/0Jx00+8J1vfowGIOv1VNf5
- lF3krMtE7YFPSxiBRPGcrhRPE9CBCHdgJaV9M5Ctvgas9IDvH6sSKUE5j50PFBDxVFX3nY87dn
- oscPLKvNFRw9a3/cWQqTovZkNDydwCw/4tK8opEVe7kup2cEb8hJoy1VcFMzInLSQl4iJsQhkF
- IZg=
+  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 16:22:50 -0700
+IronPort-SDR: xNQt2vSIgqm5xLL932afxwDPeI5D5vbMR+OyDhB/ztWo3F/CxixjMFjPg8Xf4CjWn45J+hzbp3
+ AzPQpytlI/DjO5mtsFbXaeWA02iSdgM1RB/0cfG18+/W35riv++P+WNmAOo+fFYayZyDdE3d2j
+ tXJ5sgc9B3mjO6Y+LaliTN7WtRnHxUxv9OrhBJlttL7fkhkucTH7k1tZDQUKatO43zyaNZqzIf
+ 6tmTdKT/eZEloBUBdcVn2oCzAuNogiYy6tJso93NYCZ3LMAgaryrAs3bqICgiPbs4jGqJylXc0
+ M58=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 16:49:19 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 17:04:38 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LPJmZ310Fz1SHwl
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 16:49:18 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LPK6F0p4yz1Rvlx
+        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 17:04:37 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,425 +57,99 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655423355; x=1658015356; bh=ZMytOujssEcOtiMdUCJ4EFf5UjhPhqNXGPu
-        MIYgyGew=; b=MY2781I8P6QIuOKbf4C3D9c+m5zqpH7HokQLlBMboN4Ua0KoU42
-        pCuCGXhZf8PFV5ug93eb1GQgeKi92dJVfhGyCSkwYKnFRNKwXHoWOi3r7wu4yaGi
-        7fZ+3omss2hUB2EerxihsAEAZM4copG9FcGA9SCGv/qqzNB5rzqjXmjT41kUuBQ6
-        JJYpEReR7bfcuCTwuMjsuyP5CXO5l59uWXwgQhkBNBH2/wBxrMZQ3/+3iE41bRSc
-        yXnDpeRSXe0Xq6YyDC27aDZr5V0WvgnHpQWTz/8n47zSJ7IyT6BJ6rPkYeWUDcys
-        kFHOpeJw0QdXutgSEx1baEmTl1TpposmbjQ==
+        1655424276; x=1658016277; bh=7aH4wYdWLYsjG/9qP2xldw4GlqngeYSpfH5
+        wn4+CgfE=; b=Oz8rjMWykaI2GOfMKU/8jRAsnyHocYKORS9PgBAAnIydT1yZWmq
+        qUfWu23qAmlCVvdAqllxvj0xjzJIzeBSCOTAz8cyy9J+0ymxLp9/accRsbBBvoTO
+        NEoDwOchWTHkwex9llh3miEA71JaTiT6e22PM48dxws4iQ+aBOJlR3ktlQADK6nL
+        nHX0HL+FBAABWitCzbCih+9/euSXIyJQK+8lXzw0yx1yMIg92k862dFT69dJY4zM
+        r0vEBa00ekKigKBvKjVjAx1gDEO9ELsKROBgL+h60vzljLkrdcpqs2TkH2wx+/TD
+        m8prxkx5izO657Xa8sZ2Nv9esqF/iA5EqHQ==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 6jFPjMsKL18c for <linux-block@vger.kernel.org>;
-        Thu, 16 Jun 2022 16:49:15 -0700 (PDT)
+        with ESMTP id D47gql1XrTx8 for <linux-block@vger.kernel.org>;
+        Thu, 16 Jun 2022 17:04:36 -0700 (PDT)
 Received: from [10.225.163.84] (unknown [10.225.163.84])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LPJmQ3YPgz1Rvlc;
-        Thu, 16 Jun 2022 16:49:10 -0700 (PDT)
-Message-ID: <0c4f30f2-c206-0201-31e3-fbb9edbdf666@opensource.wdc.com>
-Date:   Fri, 17 Jun 2022 08:49:09 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LPK6C4BSnz1Rvlc;
+        Thu, 16 Jun 2022 17:04:35 -0700 (PDT)
+Message-ID: <6dc7d961-7129-e143-01be-5d086bf7be43@opensource.wdc.com>
+Date:   Fri, 17 Jun 2022 09:04:34 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH v7 13/13] dm: add non power of 2 zoned target
+Subject: Re: [PATCH 8/8] block: Always initialize bio IO priority on submit
 Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
-        snitzer@redhat.com, axboe@kernel.dk
-Cc:     bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        jiangbo.365@bytedance.com, hare@suse.de, pankydev8@gmail.com,
-        dm-devel@redhat.com, jonathan.derrick@linux.dev,
-        gost.dev@samsung.com, dsterba@suse.com, jaegeuk@kernel.org,
-        linux-nvme@lists.infradead.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org, Damien Le Moal <damien.lemoal@wdc.com>
-References: <20220615101920.329421-1-p.raghav@samsung.com>
- <CGME20220615102011eucas1p220368db4a186181b1927dea50a79e5d4@eucas1p2.samsung.com>
- <20220615101920.329421-14-p.raghav@samsung.com>
- <63b0cfb6-eb24-f058-e502-2637039c5a98@opensource.wdc.com>
- <0b819562-8b16-37b6-9220-28bf1960bccb@samsung.com>
+To:     Jan Kara <jack@suse.cz>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Niklas Cassel <Niklas.Cassel@wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>
+References: <20220615160437.5478-1-jack@suse.cz>
+ <20220615161616.5055-8-jack@suse.cz>
+ <ece0af04-80c8-e0c3-702b-0d0d17f61ea9@opensource.wdc.com>
+ <20220616112303.wywyhkvyr74ipdls@quack3.lan>
+ <20220616122405.qifuahpn2mhzogwd@quack3.lan>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <0b819562-8b16-37b6-9220-28bf1960bccb@samsung.com>
+In-Reply-To: <20220616122405.qifuahpn2mhzogwd@quack3.lan>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/22 01:12, Pankaj Raghav wrote:
-> Hi Damien,
-> On 2022-06-15 13:49, Damien Le Moal wrote:
->> On 6/15/22 19:19, Pankaj Raghav wrote:
->>> Only power of 2(po2) zoned devices were supported in linux but now non
->>> power of 2(npo2) zoned device support has been added to the block layer.
+On 6/16/22 21:24, Jan Kara wrote:
+> On Thu 16-06-22 13:23:03, Jan Kara wrote:
+>> On Thu 16-06-22 12:15:25, Damien Le Moal wrote:
+>>> On 6/16/22 01:16, Jan Kara wrote:
+>>>> +	if (ioprio_class == IOPRIO_CLASS_NONE)
+>>>> +		bio->bi_ioprio = get_current_ioprio();
+>>>>   }
+>>>>   /**
 >>>
->>> Filesystems such as F2FS and btrfs have support for zoned devices with
->>> po2 zone size assumption. Before adding native support for npo2 zoned
->>> devices, it was suggested to create a dm target for npo2 zoned device to
->>> appear as po2 device so that file systems can initially work without any
->>> explicit changes by using this target.
->>>
->>> The design of this target is very simple: introduce gaps between the zone
->>> capacity and the po2 zone size of the underlying device. All IOs will be
->>> remapped from target to the actual device location. For devices that use
->>> zone append, the bi_sector is remapped from device to target's layout.
+>>> Beside this comment, I am still scratching my head regarding what the user
+>>> gets with ioprio_get(). If I understood your patches correctly, the user may
+>>> still see IOPRIO_CLASS_NONE ?
+>>> For that case, to be in sync with the man page, I thought the returned
+>>> ioprio should be the effective one based on the task io nice value, that is,
+>>> the value returned by get_current_ioprio(). Am I missing something... ?
 >>
->> Nothing special for zone append in this respect. All IOs are remapped
->> likewise, right ?
->>
-> This is what is being done: when we submit, we adjust the sector value
-> from target to device, and the actual sector value from bio gets updated
-> in the endio function where we transform from device -> target for zone
-> appends.
-
-I know all that. This was a remark intended at pointing out that this
-commit message statement does not have any value, it does not help in
-understanding any peculiarity of this target driver (if any). It seems
-targeted at zone append only. Reword this to explain the remapping for all
-IOs, and that zone management request and report zones also need remapping.
-
->>>
->>> The read IOs that fall in the "emulated" gap area will return 0 and all
->>> the other IOs in that area will result in an error. If an read IO span
->>> across the zone capacity boundary, then the IOs are split between the
->>> boundary. All other IO operations that span across a zone capacity
->>> boundary will result in an error.
->>>
->>> The target can be easily updated as follows:
->>
->> Updated ? you mean created, no ?
->>
-> Yeah. I will fix it.
->>> dmsetup create <label> --table '0 <size_sects> zoned-npo2 /dev/nvme<id>'
->>>
->>> Signed-off-by: Pankaj Raghav <p.raghav@samsung.com>
->>> Suggested-by: Johannes Thumshirn <johannes.thumshirn@wdc.com>
->>> Suggested-by: Damien Le Moal <damien.lemoal@wdc.com>
->>> Suggested-by: Hannes Reinecke <hare@suse.de>
->>> ---
->>>  drivers/md/Kconfig                |   9 +
->>>  drivers/md/Makefile               |   2 +
->>>  drivers/md/dm-zone.c              |   9 +
->>>  drivers/md/dm-zoned-npo2-target.c | 268 ++++++++++++++++++++++++++++++
->>>  4 files changed, 288 insertions(+)
->>>  create mode 100644 drivers/md/dm-zoned-npo2-target.c
->>>
->>> diff --git a/drivers/md/Kconfig b/drivers/md/Kconfig
->>> index 998a5cfdb..773314536 100644
->>> --- a/drivers/md/Kconfig
->>> +++ b/drivers/md/Kconfig
->>> @@ -518,6 +518,15 @@ config DM_FLAKEY
->>>  	help
->>>  	 A target that intermittently fails I/O for debugging purposes.
->>>  
->>> +config DM_ZONED_NPO2
->>> +	tristate "Zoned non power of 2 target"
->>> +	depends on BLK_DEV_DM
->>> +	depends on BLK_DEV_ZONED
->>> +	help
->>> +	A target that converts a zoned device with non power of 2 zone size to
->>> +	be power of 2. This is done by introducing gaps in between the zone
->>> +	capacity and the power of 2 zone size.
->>> +
->>>  config DM_VERITY
->>>  	tristate "Verity target support"
->>>  	depends on BLK_DEV_DM
->>> diff --git a/drivers/md/Makefile b/drivers/md/Makefile
->>> index 0454b0885..2863a94a7 100644
->>> --- a/drivers/md/Makefile
->>> +++ b/drivers/md/Makefile
->>> @@ -26,6 +26,7 @@ dm-era-y	+= dm-era-target.o
->>>  dm-clone-y	+= dm-clone-target.o dm-clone-metadata.o
->>>  dm-verity-y	+= dm-verity-target.o
->>>  dm-zoned-y	+= dm-zoned-target.o dm-zoned-metadata.o dm-zoned-reclaim.o
->>> +dm-zoned-npo2-y       += dm-zoned-npo2-target.o
->>
->> This naming is in my opinion very bad as it seems related to the dm-zoned
->> target. e.g. dm-po2z, dm-zp2, etc.
->>
-> Probably dm-po2z sounds good. I will go for it if others don't have any
-> objection.
->>>  
->>>  md-mod-y	+= md.o md-bitmap.o
->>>  raid456-y	+= raid5.o raid5-cache.o raid5-ppl.o
->>> @@ -60,6 +61,7 @@ obj-$(CONFIG_DM_CRYPT)		+= dm-crypt.o
->>>  obj-$(CONFIG_DM_DELAY)		+= dm-delay.o
->>>  obj-$(CONFIG_DM_DUST)		+= dm-dust.o
->>>  obj-$(CONFIG_DM_FLAKEY)		+= dm-flakey.o
->>> +obj-$(CONFIG_DM_ZONED_NPO2)	+= dm-zoned-npo2.o
->>>  obj-$(CONFIG_DM_MULTIPATH)	+= dm-multipath.o dm-round-robin.o
->>>  obj-$(CONFIG_DM_MULTIPATH_QL)	+= dm-queue-length.o
->>>  obj-$(CONFIG_DM_MULTIPATH_ST)	+= dm-service-time.o
->>> diff --git a/drivers/md/dm-zone.c b/drivers/md/dm-zone.c
->>> index af36d33f9..5efb31ba0 100644
->>> --- a/drivers/md/dm-zone.c
->>> +++ b/drivers/md/dm-zone.c
->>> @@ -210,6 +210,11 @@ static int dm_zone_revalidate_cb(struct blk_zone *zone, unsigned int idx,
->>>  		}
->>>  		md->zwp_offset[idx] = dm_get_zone_wp_offset(zone);
->>>  
->>> +		if (q->limits.chunk_sectors != zone->len) {
->>
->> Why is this if needed ?
->>
-> Explanation below.
->>> +			blk_queue_chunk_sectors(q, zone->len);
->>> +			q->nr_zones = blkdev_nr_zones(md->disk);
->>> +		}
->>> +
->>>  		break;
->>>  	default:
->>>  		DMERR("Invalid zone type 0x%x at sectors %llu",
->>> @@ -307,6 +312,9 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q)
->>>  	if (dm_table_supports_zone_append(t)) {
->>>  		clear_bit(DMF_EMULATE_ZONE_APPEND, &md->flags);
->>>  		dm_cleanup_zoned_dev(md);
->>> +
->>
->> no need for the blank line.
->>
->>> +		if (!is_power_of_2(blk_queue_zone_sectors(q)))
->>> +			goto revalidate_zones;
->>>  		return 0;
->>>  	}
->>
->> Why do you need to change dm_set_zones_restrictions() at all ?
->>
-> When the device mapper is created, the q->limits gets inherited from the
-> underlying device. The chunk sectors of the target and the device will
-> be the same but we want the chunk sector of the target to be different
-> (rounded to po2) compared to the underlying device's chunk sector. This
-> needs to be done only for the dm-po2z target and not for other targets
-> that uses npo2 zoned devices (like dm-linear). So to perform this
-> operation in a target independent way in dm-zone.c, I chose to always
-> revalidate npo2 zoned device and update the chunk sector and nr_zones in
-> dm_zone_revalidate_cb based on the zone information from the target.
-> This allows to set the limits correctly for dm-po2z target.
-
-But DM revalidate will be called for the target AFTER it is setup (after
-its gendisk is added). So how can DM revalidate see the incorrect zone
-size ? If that is the case, then the target constructor is broken or
-missing something. DM revalidate zone is generic and only allocates the
-zone bitmaps for the target device. There should be not need at all to
-touch that function.
-
->>>  
-> <snip>
-> return -EINVAL;
->>> +	}
->>> +
->>> +	if (is_power_of_2(zsze)) {
->>> +		DMERR("%pg zone size is power of 2", dmh->dev->bdev);
->>
->> Hmmm... You would end up with no remapping needed so it would still
->> work... Why error this ? A warning would work too.
->>
-> You mean a DMWARN and not return -EINVAL? I mean there is no usecase for
-> po2 device to use this target so why allow it in the first place?
-
-Why disallow it ? It will work. Either way is OK but I wanted to point out
-that both path are I think equally valid.
-
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	dmh->zsze = zsze;
->>> +	dmh->zsze_po2 = 1 << get_count_order_long(zsze);
->>> +	dmh->zsze_diff = dmh->zsze_po2 - dmh->zsze;
->>> +
->>> +	ti->private = dmh;
->>> +	ti->num_flush_bios = 1;
->>> +	ti->num_discard_bios = 1;
->>> +	ti->num_secure_erase_bios = 1;
->>> +	ti->num_write_zeroes_bios = 1;
->>
->> Why all these ? I know dm-linear do that but I do not see why they would
->> be necessary for a single device target.
->>
-> Good point. I will remove them
+>> The trouble with returning "effective ioprio" is that with IOPRIO_WHO_PGRP
+>> or IOPRIO_WHO_USER the effective IO priority may be different for different
+>> processes considered and it can be also further influenced by blk-ioprio
+>> settings. But thinking about it now after things have settled I agree that
+>> what you suggests makes more sense. I'll fix that. Thanks for suggestion!
 > 
-> <snip>
->>> +		return DMZ_NPO2_IO_INSIDE_ZONE;
->>> +	else if (relative_sect >= dmh->zsze)
->>
->> no need for the else. And this is super confusing. This case correspond to
->> the BIO going beyond the zone capacity in the target address space,
->> meaning it is still WITHIN the target zone. But you call that "outside"
->> because it is for the device zone. Super confusing. It took me a lot of
->> rereading to finally get it.
->>
-> Probably my naming choice was not correct here for the enum. It should
-> be s/IO_INSIDE_ZONE/IO_INSIDE_ZONE_CAP, etc to be clear. I mainly wanted
-> to handle the case where a read across zone capacity should return
-> something valid instead of just an error as we emulate the LBAs from
-> zone cap to zone size.
+> Oh, now I've remembered why I've done it that way. With IOPRIO_WHO_PROCESS
+> (which is probably the most used and the best defined variant), we were
+> returning IOPRIO_CLASS_NONE if the task didn't have set IO priority until
+> commit e70344c05995 ("block: fix default IO priority handling"). So my
+> patch was just making behavior of IOPRIO_WHO_PGRP & IOPRIO_WHO_USER
+> consistent with the behavior of IOPRIO_WHO_PROCESS. I'd be reluctant to
+> change the behavior of IOPRIO_WHO_PROCESS because that has the biggest
+> chances for userspace regressions. But perhaps it makes sense to keep
+> IOPRIO_WHO_PGRP & IOPRIO_WHO_USER inconsistent with IOPRIO_WHO_PROCESS and
+> just use effective IO priority in those two variants. That looks like the
+> smallest API change to make things at least somewhat sensible...
 
-Your target information fields are also badly named and make things hard
-to understand.
+Still bit lost. Let me try to summarize your goal:
 
-> 
-> DMZ_NPO2_IO_INSIDE_ZONE_CAP:
->              zcap   zsize
-> ---------------|-----|
->       <------>
->         bio
-> Normal scenario we just send what is there in the device.
-> 
-> 
-> DMZ_NPO2_IO_OUTSIDE_ZONE_CAP:
->              zcap       zsize
-> ---------------|---------|
->                  <---->
->                    bio
-> 
-> Read should return zero filled bio and other operation will return an
-> error because we are touching the emulated area.
-> 
-> DMZ_NPO2_IO_ACROSS_ZONE_CAP:
->              zcap   zsize
-> ---------------|-----|
->            <------>
->               bio
-> For reads, the bio should be split across zone cap and the bio on the
-> left hand side returns what is there in the device and the split bio on
-> the right hand side should just return zeroes. All other requests will
-> return an error.
-> 
->>> +		return DMZ_NPO2_IO_OUTSIDE_ZONE;
->>> +
->>> +	return DMZ_NPO2_IO_ACROSS_ZONE;
->>
->> So you BIO is eeither fully contained within the zone or it is not. So why
->> not just return a bool ?
->>
-> As I explained above, I was considering the boundary as zone cap inside
-> a zone. The bio can be within zone cap, across zone cap into the
-> emulated zone size and outside zone capacity.
-> 
-> I didn't take into account the read across zone. I will make sure it is
-> correctly handled in the next revision.
+1) If IOPRIO_WHO_PGRP is not set, ioprio_get(IOPRIO_WHO_PGRP) will return
+the effective priority
 
-Please test properly. This should have been caught in testing before sending.
+2) If IOPRIO_WHO_USER is not set, ioprio_get(IOPRIO_WHO_USER) will also
+return the effective priority
 
-> 
->              zcap  zsize          zcap
-> ---------------|-----|--------------|
->                   <------>
->                      bio
->>> +}
->>> +
->>> +static void split_io_across_zone_boundary(struct dmz_npo2_target *dmh,
->>> +					  struct bio *bio)
->>> +{
->>> +	sector_t sect = bio->bi_iter.bi_sector;
->>> +	sector_t sects_from_zone_start;
->>> +
->>> +	sect = target_to_device_sect(dmh, sect);
->>
->> 	sect = target_to_device_sect(dmh, bio->bi_iter.bi_sector);
->>
->> is more readable.
->>
->>> +	div64_u64_rem(sect, dmh->zsze, &sects_from_zone_start);
->>> +	dm_accept_partial_bio(bio, dmh->zsze - sects_from_zone_start);
->>
->> So if this is a read BIO starting exactly at the target zone capacity
->> (sects_from_zone_start == zsze), then you accept 0 sectors ? What am I
->> missing here ?
->>
-> Your condition will not even touch this function. This function comes
-> into play only when the bio runs across the zone capacity as I mentioned
-> before.
->>> +	bio->bi_iter.bi_sector = sect;
->>> +}
->>> +
->>> +static int handle_zone_boundary_violation(struct dmz_npo2_target *dmh,
->>> +					  struct bio *bio,
->>> +					  enum dmz_npo2_io_cond cond)
->>> +{
->>> +	/* Read should return zeroed page */
->>> +	if (bio_op(bio) == REQ_OP_READ) {
->>> +		if (cond == DMZ_NPO2_IO_ACROSS_ZONE) {
->>> +			split_io_across_zone_boundary(dmh, bio);
->>> +			return DM_MAPIO_REMAPPED;
->>> +		}
->>> +		zero_fill_bio(bio);
->>> +		bio_endio(bio);
->>> +		return DM_MAPIO_SUBMITTED;
->>> +	}
->>> +	return DM_MAPIO_KILL;
->>> +}
->>> +
->>> +static int dmz_npo2_end_io(struct dm_target *ti, struct bio *bio,
->>> +			   blk_status_t *error)
->>> +{
->>> +	struct dmz_npo2_target *dmh = ti->private;
->>> +
->>> +	if (bio->bi_status == BLK_STS_OK && bio_op(bio) == REQ_OP_ZONE_APPEND)
->>> +		bio->bi_iter.bi_sector =
->>> +			device_to_target_sect(dmh, bio->bi_iter.bi_sector);
->>> +
->>> +	return DM_ENDIO_DONE;
->>> +}
->>> +
->>> +static int dmz_npo2_map(struct dm_target *ti, struct bio *bio)
->>> +{
->>> +	struct dmz_npo2_target *dmh = ti->private;
->>> +	enum dmz_npo2_io_cond cond;
->>> +
->>> +	bio_set_dev(bio, dmh->dev->bdev);
->>> +	if (bio_sectors(bio) || op_is_zone_mgmt(bio_op(bio))) {
->>> +		cond = check_zone_boundary_violation(dmh, bio->bi_iter.bi_sector,
->>> +						     bio->bi_iter.bi_size >> SECTOR_SHIFT);
->>
->> Why check this for zone management BIOs ? These have length = 0, always.
->>
->>> +
->>> +		/*
->>> +		 * If the starting sector is in the emulated area then fill
->>> +		 * all the bio with zeros. If bio is across boundaries,
->>> +		 * split the bio across boundaries and fill zeros only for the
->>> +		 * bio that is outside the zone capacity
->>> +		 */
->>> +		switch (cond) {
->>> +		case DMZ_NPO2_IO_INSIDE_ZONE:
->>> +			bio->bi_iter.bi_sector = target_to_device_sect(dmh,
->>> +								       bio->bi_iter.bi_sector);
->>> +			break;
->>> +		case DMZ_NPO2_IO_ACROSS_ZONE:
->>> +		case DMZ_NPO2_IO_OUTSIDE_ZONE:
->>> +			return handle_zone_boundary_violation(dmh, bio, cond);
->>> +		}
->>> +	}
->>> +	return DM_MAPIO_REMAPPED;
->>
->> This entire function is very hard to read because everything is hidden in
->> helpers that are not super useful in my opinion. I would prefer seeing
->> cases for:
->> * zone management BIOs
->> * Reads and writes
->> * Everything else
->>
->> where tests against the bio sector and length are visible, so one can
->> understand what is going on. If you need helpers, have handle_zone_mgmt(),
->> handle_read() etc. Something clear.
->>
-> Got it. I see the confusion here. I will rearrange it properly in the
-> next revision. Thanks for this comment.
->>> +}
->>> +
->>> +static int dmz_npo2_iterate_devices(struct dm_target *ti,
->>> +				    iterate_devices_callout_fn fn, void *data)
->>> +{
->>> +	struct dmz_npo2_target *dmh = ti->private;
->>> +	sector_t len = 0;
->>> +
->>> +	len = dmh->nr_zones * dmh->zsze;
->>
->> Move this to the declaration instead of setting len to 0 for nothing.
->>
-> Ok.
->>> +	return fn(ti, dmh->dev, 0, len, data);
-> 
+3) if IOPRIO_WHO_PROCESS is not set, return ? I am lost for this one. Do
+you want to go back to IOPRIO_CLASS_NONE ? Keep default (IOPRIO_CLASS_BE)
+? Or switch to using the effective IO priority ? Not that the last 2
+choices are actually equivalent if the user did not IO nice the process
+(the default for the effective IO prio is class BE)
+
+For (1) and (2), I am not sure. Given that my last changes to the ioprio
+default did not seem to have bothered anyone (nobody screamed at me :)) I
+am tempted to say: any choice is OK. So we should try to get as close as
+the man page defined behavior as possible.
+
 
 
 -- 
