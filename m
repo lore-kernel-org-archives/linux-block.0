@@ -2,73 +2,100 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A2AC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 20:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D226DC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 20:48:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233622AbiFQUoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 16:44:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51718 "EHLO
+        id S1383420AbiFQUsI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 16:48:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232380AbiFQUoi (ORCPT
+        with ESMTP id S1383062AbiFQUsD (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 16:44:38 -0400
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8DEE006
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:38 -0700 (PDT)
-Received: by mail-pj1-f42.google.com with SMTP id mh16-20020a17090b4ad000b001e8313301f1so7842930pjb.1
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:38 -0700 (PDT)
+        Fri, 17 Jun 2022 16:48:03 -0400
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DB513D25
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:48:02 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id g186so4984210pgc.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=E4HU3sGB5mPpumnMyVJQV5j2OzJpJF5je3ttvMEfWHo=;
+        b=l6knT6n0Ab8El8mSxtAjG6qYxUVLQiqNQxhDfaZ2qwRU1zo5ch/ogvziylUHLMCJ95
+         9zC+5gVHL6YKRoci4D7bvhYaY13iKQMrN/Q2xBBCT/ZnKcMwu/vZZAjAb4fAw8djkZNb
+         /begVMe1DJhm0SnRRcPu/OL8fZgKVtHTXAtRJG2cF50F5y4qe2gpZ0RxqP5+iFZZ/tVY
+         ZoIrVkFpoaKGSkiVuTSy6lxecVcnA0iGgZ8IfCnxvnaolk7r8R4F79rueXVM1Y9e+va9
+         yqE5G6gIzd5zzhEUkzdVn9IVAaaFDyDpiDNdS0Z2okL7JTyhNi6A46koEHhjIwh8PPth
+         tTOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=s3LCzo9+Xp7IujTzn/HYA2MWpND56eY4jQGiRDoWqqM=;
-        b=IPSga4JS5Oc+mUKzd0OcrPSFrOtJ9hCQobod3+uz48VvyKnzCzgjzgWYCFyQkj7eEI
-         y/6wo6taFdonI265KU5UNJFPQGhlaH9exjaz476abMJT9SaX2jYWU5f5fVcqmN/ULkz9
-         KLr9myF8ZDeNWp2OkEZaZ4iYR/4bFZhUSQQ6YcnbuMN1hQLMesV1CXnclXiel1tvEy2F
-         djYVVUw0snPPZfm3zKBGPD7xKb0TJVyT6uxWMwXlN/yyK0WL5QfoAtTUWhydAiqQjbok
-         zkmuRKcmQV/L1SsmG46l9J1UwHyj94RkEBEZfki8jptrdzf+YjhGXeZxsVq9asttGN/k
-         ODuA==
-X-Gm-Message-State: AJIora8kCQ/EvHODjCcAje3edE+SaYKFutxmFjRbXbGHitZBafXm4b03
-        xmD6SDvCteEE91mTxjo3u2BWHAlFjMw=
-X-Google-Smtp-Source: AGRyM1ue5jNGu8q2J3xzUIIe14eafwgyllST03JkBvYVKVndl1K2GvsPg9ZL0gvp2Cz0EVC3Mknzqw==
-X-Received: by 2002:a17:90b:1c8f:b0:1b8:c6dc:ca61 with SMTP id oo15-20020a17090b1c8f00b001b8c6dcca61mr12577073pjb.13.1655498677410;
-        Fri, 17 Jun 2022 13:44:37 -0700 (PDT)
-Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:49d9:1d0f:f325:18fe])
-        by smtp.gmail.com with ESMTPSA id u11-20020a170902e80b00b0016a0858b25dsm1652462plg.152.2022.06.17.13.44.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 13:44:36 -0700 (PDT)
-From:   Bart Van Assche <bvanassche@acm.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: bfq: Remove an unused function definition
-Date:   Fri, 17 Jun 2022 13:44:33 -0700
-Message-Id: <20220617204433.102022-1-bvanassche@acm.org>
-X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
+        bh=E4HU3sGB5mPpumnMyVJQV5j2OzJpJF5je3ttvMEfWHo=;
+        b=ZlDOS8FyP+7RVDysxeVu0lJuv3A+2JCBrJHtR2Mo0WHENfnPMIszKMcic2uFlWu6+4
+         T1N+ilJcYXy5uwBQwEdMpUl51WY3ZXD7sTOs+80/nuz0ihsckZ+2XaZXqd8U9WDvoBqL
+         jkBqS5m7fAcPH1J1r2cuSjwQEqo0EhUVEjEava3SDBkmYIPDmfhnywXoApJt09eDMtyD
+         8q5J/4Ir0zQ4iau0s8HM1RyGFDX3QI1AKYqzWVZ0xq2iuMCIhNdeF9/AFTGOaCrYhKuX
+         JGYUH//OebkjuIChPBHxPPQkOIXr3Z+F6w1+nt71PsixDV//ILX4awvmQWOn9b0KrMHd
+         SiWw==
+X-Gm-Message-State: AJIora//IOOKefGMUnctvZ+H4ca7LjaRW6uRHeqEY24ap1kCuydoAo2N
+        Ap8GkuIglg8KmkEI9qoJBrl1dCpH7vUAwA==
+X-Google-Smtp-Source: AGRyM1uOO0feQdDhwlnuqT8XUUbVt7PUSctF7U1YV5TtzUp7y3qyopvI+yz/93p4tuJ/kkI3yvJm7A==
+X-Received: by 2002:a05:6a00:a8f:b0:524:e53b:a95b with SMTP id b15-20020a056a000a8f00b00524e53ba95bmr3162053pfl.53.1655498881674;
+        Fri, 17 Jun 2022 13:48:01 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id b9-20020a63a109000000b003fbfa234818sm4175977pgf.54.2022.06.17.13.48.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 17 Jun 2022 13:48:01 -0700 (PDT)
+Message-ID: <c303c3b9-ee5d-c3d6-6e99-48c5eb205f21@kernel.dk>
+Date:   Fri, 17 Jun 2022 14:47:59 -0600
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH] block: bfq: Fix kernel-doc headers
+Content-Language: en-US
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jan Kara <jack@suse.cz>
+References: <20220617204419.101985-1-bvanassche@acm.org>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220617204419.101985-1-bvanassche@acm.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch is the result of the analysis of a sparse report.
+On 6/17/22 2:44 PM, Bart Van Assche wrote:
+> Fix the following warnings:
+> 
+> block/bfq-cgroup.c:721: warning: Function parameter or member 'bfqg' not described in '__bfq_bic_change_cgroup'
+> block/bfq-cgroup.c:721: warning: Excess function parameter 'blkcg' description in '__bfq_bic_change_cgroup'
+> block/bfq-cgroup.c:870: warning: Function parameter or member 'ioprio_class' not described in 'bfq_reparent_leaf_entity'
+> block/bfq-cgroup.c:900: warning: Function parameter or member 'ioprio_class' not described in 'bfq_reparent_active_queues'
+> 
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+> ---
+>  block/bfq-cgroup.c | 4 +++-
+>  block/bfq-wf2q.c   | 2 ++
+>  2 files changed, 5 insertions(+), 1 deletion(-)
+> 
+> diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
+> index dc0fa93219df..abc251902e28 100644
+> --- a/block/bfq-cgroup.c
+> +++ b/block/bfq-cgroup.c
+> @@ -709,7 +709,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
+>   * __bfq_bic_change_cgroup - move @bic to @cgroup.
+>   * @bfqd: the queue descriptor.
+>   * @bic: the bic to move.
+> - * @blkcg: the blk-cgroup to move to.
+> + * @bfqg: the blk-cgroup to move to.
 
-Cc: Jan Kara <jack@suse.cz>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
- block/bfq-cgroup.c | 2 --
- 1 file changed, 2 deletions(-)
+bfqg is the bfq group, not the block cgroup.
 
-diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index 09574af83566..dc0fa93219df 100644
---- a/block/bfq-cgroup.c
-+++ b/block/bfq-cgroup.c
-@@ -1471,8 +1471,6 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
- 	return bfqq->bfqd->root_group;
- }
- 
--void bfqg_and_blkg_get(struct bfq_group *bfqg) {}
--
- void bfqg_and_blkg_put(struct bfq_group *bfqg) {}
- 
- struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
+-- 
+Jens Axboe
+
