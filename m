@@ -2,95 +2,204 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B2CC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 01:07:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55D6BC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 01:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1379457AbiFQBHd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 16 Jun 2022 21:07:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39808 "EHLO
+        id S231484AbiFQBMs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 16 Jun 2022 21:12:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42656 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229734AbiFQBHc (ORCPT
+        with ESMTP id S229734AbiFQBMs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 16 Jun 2022 21:07:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id BDB66E8
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 18:07:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655428048;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=EAdBP9v0Q3mkGXDFeOnPoAZo+l2r5ceuM6IOB5xixn8=;
-        b=F68EOC2BaACECapD5yTW8h+N6sFETS6wSKRSg7RX5y6rs/icGQPEdbW+SKC/Oar/hhQDce
-        9MO8fZYNd6byv8aioF1UwHngis37+S3atIQ4eLMx/zbsdsa3AKlvGnB5fPbJUHRd+9za5/
-        abd+MSuWCyy9Wyylckraa5XuPQCjI3M=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-554-3x7mUX34Mhmh9y5AZS3UYA-1; Thu, 16 Jun 2022 21:07:27 -0400
-X-MC-Unique: 3x7mUX34Mhmh9y5AZS3UYA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F14BD3C021B4;
-        Fri, 17 Jun 2022 01:07:26 +0000 (UTC)
-Received: from T590 (ovpn-8-16.pek2.redhat.com [10.72.8.16])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 99E2840CFD0D;
-        Fri, 17 Jun 2022 01:07:23 +0000 (UTC)
-Date:   Fri, 17 Jun 2022 09:07:18 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, Omar Sandoval <osandov@fb.com>,
-        linux-block@vger.kernel.org
-Subject: Re: Races in sbitmap batched wakeups
-Message-ID: <YqvTxl8CvRe1Anr0@T590>
-References: <20220616172102.yrxod3ptmhiuvqsw@quack3.lan>
+        Thu, 16 Jun 2022 21:12:48 -0400
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FB52A47E;
+        Thu, 16 Jun 2022 18:12:46 -0700 (PDT)
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LPLb302kZzjXcJ;
+        Fri, 17 Jun 2022 09:11:11 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 17 Jun 2022 09:12:44 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Fri, 17 Jun 2022 09:12:43 +0800
+Subject: Re: [PATCH -next v10 0/4] support concurrent sync io for bfq on a
+ specail occasion
+To:     <paolo.valente@linaro.org>, <jack@suse.cz>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220610021701.2347602-1-yukuai3@huawei.com>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <cdcba617-c27a-9a64-2560-b2b273c74511@huawei.com>
+Date:   Fri, 17 Jun 2022 09:12:42 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220616172102.yrxod3ptmhiuvqsw@quack3.lan>
-X-Scanned-By: MIMEDefang 2.84 on 10.11.54.1
+In-Reply-To: <20220610021701.2347602-1-yukuai3@huawei.com>
+Content-Type: text/plain; charset="gbk"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 16, 2022 at 07:21:02PM +0200, Jan Kara wrote:
-> Hello!
-> 
-> I've been debugging some customer reports of tasks hanging (forever)
-> waiting for free tags when in fact all tags are free. After looking into it
-> for some time I think I know what it happening. First, keep in mind that
-> it concerns a device which uses shared tags. There are 127 tags available
-> and the number of active queues using these tags is easily 40 or more. So
-> number of tags available for each device is rather small. Now I'm not sure
-> how batched wakeups can ever work in such situations, but maybe I'm missing
-> something.
-> 
-> So take for example a situation where two tags are available for a device,
-> they are both currently used. Now a process comes into blk_mq_get_tag() and
-> wants to allocate tag and goes to sleep. Now how can it ever be woken up if
-> wake_batch is 4? If the two IOs complete, sbitmap will get two wakeups but
-> that's not enough to trigger the batched wakeup to really wakeup the
-> waiter...
+Hi, Paolo
 
-commit 180dccb0dba4 ("blk-mq: fix tag_get wait task can't be awakened")
-is supposed for addressing this kind of issue.
-
-> 
-> Even if we have say 4 tags available so in theory there should be enough
-> wakeups to fill the batch, there can be the following problem. So 4 tags
-> are in use, two processes come to blk_mq_get_tag() and sleep, one on wait
-> queue 0, one on wait queue 1. Now four IOs complete so
-> sbitmap_queue_wake_up() gets called 4 times and the fourth call decrements
-> wait_cnt to 0 so it ends up calling wake_up_nr(wq0, 4). Fine, one of the
-> waiters is woken up but the other one is still sleeping in wq1 and there
-> are not enough wakeups to fill the batch and wake it up? This is
-> essentially because we have lost three wakeups on wq0 because it didn't
-> have enough waiters to wake...
-
-But the following completions will wake up the waiter in wq1, given
-there are more in-flight.
+Can you take a look at this patchset?
 
 Thanks,
-Ming
+Kuai
 
+ÔÚ 2022/06/10 10:16, Yu Kuai Ð´µÀ:
+> There are some problem in our mail server, resend v9 because Paolo seems
+> didn't receive them(hopefully v10 will be fine).
+> 
+> Changes in v10:
+>   - Add reviewed-tag for patch 2
+> 
+> Changes in v9:
+>   - also update how many bfqqs have pending_reqs bfq_bfqq_move().
+>   - fix one language in patch 4
+>   - Add reviewed-tag for patch 1,3,4
+> 
+> Changes in v8:
+>   - Instead of using whether bfqq is busy, using whether bfqq has pending
+>   requests. As Paolo pointed out the former way is problematic.
+> 
+> Changes in v7:
+>   - fix mismatch bfq_inc/del_busy_queues() and bfqq_add/del_bfqq_busy(),
+>   also retest this patchset on v5.18 to make sure functionality is
+>   correct.
+>   - move the updating of 'bfqd->busy_queues' into new apis
+> 
+> Changes in v6:
+>   - add reviewed-by tag for patch 1
+> 
+> Changes in v5:
+>   - rename bfq_add_busy_queues() to bfq_inc_busy_queues() in patch 1
+>   - fix wrong definition in patch 1
+>   - fix spelling mistake in patch 2: leaset -> least
+>   - update comments in patch 3
+>   - add reviewed-by tag in patch 2,3
+> 
+> Changes in v4:
+>   - split bfq_update_busy_queues() to bfq_add/dec_busy_queues(),
+>     suggested by Jan Kara.
+>   - remove unused 'in_groups_with_pending_reqs',
+> 
+> Changes in v3:
+>   - remove the cleanup patch that is irrelevant now(I'll post it
+>     separately).
+>   - instead of hacking wr queues and using weights tree insertion/removal,
+>     using bfq_add/del_bfqq_busy() to count the number of groups
+>     (suggested by Jan Kara).
+> 
+> Changes in v2:
+>   - Use a different approch to count root group, which is much simple.
+> 
+> Currently, bfq can't handle sync io concurrently as long as they
+> are not issued from root group. This is because
+> 'bfqd->num_groups_with_pending_reqs > 0' is always true in
+> bfq_asymmetric_scenario().
+> 
+> The way that bfqg is counted into 'num_groups_with_pending_reqs':
+> 
+> Before this patchset:
+>   1) root group will never be counted.
+>   2) Count if bfqg or it's child bfqgs have pending requests.
+>   3) Don't count if bfqg and it's child bfqgs complete all the requests.
+> 
+> After this patchset:
+>   1) root group is counted.
+>   2) Count if bfqg has pending requests.
+>   3) Don't count if bfqg complete all the requests.
+> 
+> With the above changes, concurrent sync io can be supported if only
+> one group is activated.
+> 
+> fio test script(startdelay is used to avoid queue merging):
+> [global]
+> filename=/dev/sda
+> allow_mounted_write=0
+> ioengine=psync
+> direct=1
+> ioscheduler=bfq
+> offset_increment=10g
+> group_reporting
+> rw=randwrite
+> bs=4k
+> 
+> [test1]
+> numjobs=1
+> 
+> [test2]
+> startdelay=1
+> numjobs=1
+> 
+> [test3]
+> startdelay=2
+> numjobs=1
+> 
+> [test4]
+> startdelay=3
+> numjobs=1
+> 
+> [test5]
+> startdelay=4
+> numjobs=1
+> 
+> [test6]
+> startdelay=5
+> numjobs=1
+> 
+> [test7]
+> startdelay=6
+> numjobs=1
+> 
+> [test8]
+> startdelay=7
+> numjobs=1
+> 
+> test result:
+> running fio on root cgroup
+> v5.18:	   112 Mib/s
+> v5.18-patched: 112 Mib/s
+> 
+> running fio on non-root cgroup
+> v5.18:	   51.2 Mib/s
+> v5.18-patched: 112 Mib/s
+> 
+> Note that I also test null_blk with "irqmode=2
+> completion_nsec=100000000(100ms) hw_queue_depth=1", and tests show
+> that service guarantees are still preserved.
+> 
+> Previous versions:
+> RFC: https://lore.kernel.org/all/20211127101132.486806-1-yukuai3@huawei.com/
+> v1: https://lore.kernel.org/all/20220305091205.4188398-1-yukuai3@huawei.com/
+> v2: https://lore.kernel.org/all/20220416093753.3054696-1-yukuai3@huawei.com/
+> v3: https://lore.kernel.org/all/20220427124722.48465-1-yukuai3@huawei.com/
+> v4: https://lore.kernel.org/all/20220428111907.3635820-1-yukuai3@huawei.com/
+> v5: https://lore.kernel.org/all/20220428120837.3737765-1-yukuai3@huawei.com/
+> v6: https://lore.kernel.org/all/20220523131818.2798712-1-yukuai3@huawei.com/
+> v7: https://lore.kernel.org/all/20220528095020.186970-1-yukuai3@huawei.com/
+> 
+> 
+> Yu Kuai (4):
+>    block, bfq: support to track if bfqq has pending requests
+>    block, bfq: record how many queues have pending requests
+>    block, bfq: refactor the counting of 'num_groups_with_pending_reqs'
+>    block, bfq: do not idle if only one group is activated
+> 
+>   block/bfq-cgroup.c  | 10 ++++++++++
+>   block/bfq-iosched.c | 47 +++------------------------------------------
+>   block/bfq-iosched.h | 21 +++++++++++---------
+>   block/bfq-wf2q.c    | 47 ++++++++++++++++++++++++++++++---------------
+>   4 files changed, 57 insertions(+), 68 deletions(-)
+> 
