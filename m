@@ -2,96 +2,68 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B0DEC43334
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 18:25:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73650C433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 18:26:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229485AbiFQSZq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 14:25:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55760 "EHLO
+        id S231872AbiFQS0f (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 14:26:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56480 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231165AbiFQSZp (ORCPT
+        with ESMTP id S233395AbiFQS0e (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 14:25:45 -0400
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38ABA3192D
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 11:25:45 -0700 (PDT)
-Received: by mail-pl1-f176.google.com with SMTP id d5so4527482plo.12
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 11:25:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=TpfDZIJDTOYGLVeEunX3azo5Zy9nVDPKvXJO3qdUTS4=;
-        b=S4U1xYUt96Ge9J+5m4O1ynwZ6MDW5p11EIUzlr/DjP5w+/lrIP5RZS0RWeMFGzJ2/o
-         WRq3QE5hPqQQ1Lvcq+op3Xl4k4Hkl8w4mEnmwm3Bfn2fiH3xroedWuynudnGf1xp7w8K
-         VF+QBmOfvHI9/caia57oXX7BgTkFf+JTId24Rl2e4FekTrANEmYZ0bVUDYaab9dap4v5
-         x1NYeOGXQfdTNXz5HlSMu5UsL9mvlyDgGGLvmNkmko/t01QeLtXEiPMyBP/FF51tXT5S
-         VpqpYNS12w4E51LHDx6k7iEsHiWr93wFc/jh85cj7MI2NQOmRXNdjjtryN9s9Gki9+Mq
-         aMlA==
-X-Gm-Message-State: AJIora8dctHO0CCmDnPlT5l8sRc5s1lGKtmTskdjTO+GiW7tHRppIYn6
-        9mAmDQl5sxRD8XwKWvypfyI=
-X-Google-Smtp-Source: AGRyM1vTy2dvYxcxqJcO/NwDkJd6K99I08Vit65OFHAjdofI1kKAiEe0n+koFDtrKiUAfZ9mCMMvtQ==
-X-Received: by 2002:a17:90b:4a90:b0:1e8:626c:e1b2 with SMTP id lp16-20020a17090b4a9000b001e8626ce1b2mr11840790pjb.141.1655490344461;
-        Fri, 17 Jun 2022 11:25:44 -0700 (PDT)
-Received: from ?IPV6:2620:15c:211:201:5d24:3188:b21f:5671? ([2620:15c:211:201:5d24:3188:b21f:5671])
-        by smtp.gmail.com with ESMTPSA id k7-20020a170902d58700b0016403cae7desm3880863plh.276.2022.06.17.11.25.42
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 17 Jun 2022 11:25:43 -0700 (PDT)
-Message-ID: <d510cb62-4b19-9ae0-cad4-1ca6756cc3fd@acm.org>
-Date:   Fri, 17 Jun 2022 11:25:41 -0700
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Subject: Re: [PATCH 3/3] block: Specify the operation type when calling
- blk_mq_map_queue()
-Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-References: <20220614175725.612878-1-bvanassche@acm.org>
- <20220614175725.612878-4-bvanassche@acm.org> <YqkoWUjOPgpqzn4E@T590>
- <20220615060851.GE22115@lst.de>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <20220615060851.GE22115@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        Fri, 17 Jun 2022 14:26:34 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F29A53388F
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 11:26:32 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id A7083B82A03
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 18:26:31 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 526F8C3411F;
+        Fri, 17 Jun 2022 18:26:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655490390;
+        bh=OZSYaHqdHbwGCbrnw1smhTVYmFfQWSP94v6h8Sdkrho=;
+        h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+        b=gzOLiv/gG5pKAR1LCCm2xtF/obS3ohrcqqnlQy3Y2myoEPATnMIH0eVFld0DyKvzc
+         335Pau4uzhSuD8mfs+aJy9qAoqTmmCC+Lkucp8fB8rE4zMDk4ejoF943PkpkQCV3kW
+         OU3kIlEPffCdIA3Fkm634G8p3Tcwa4B+bILtxImyA1GHBWrlhzKrnk0jN6V+gM8WMw
+         UpfvvLagmWEtewH0tKCFVJ8b+Wcs9E94952hrRpxtW8rISrybcZB+s7ywbSGidwGL9
+         ksSysxpqK8mIi2VGmJPEZzhsuMy/etOvyMNr2d7kjPIYnWm65eP2lmWLvQF757L/tZ
+         prhsJ+nv+sKfg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+        by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41117FD99FF;
+        Fri, 17 Jun 2022 18:26:30 +0000 (UTC)
+Subject: Re: [GIT PULL] Block fixes for 5.19-rc3
+From:   pr-tracker-bot@kernel.org
+In-Reply-To: <de7e4802-15b6-fbe7-f793-4454c3913f6a@kernel.dk>
+References: <de7e4802-15b6-fbe7-f793-4454c3913f6a@kernel.dk>
+X-PR-Tracked-List-Id: <linux-block.vger.kernel.org>
+X-PR-Tracked-Message-Id: <de7e4802-15b6-fbe7-f793-4454c3913f6a@kernel.dk>
+X-PR-Tracked-Remote: git://git.kernel.dk/linux-block.git tags/block-5.19-2022-06-16
+X-PR-Tracked-Commit-Id: b96f3cab59654ee2c30e6adf0b1c13cf8c0850fa
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 462abc9de7a13d90c5dcb81f440465041d06ba75
+Message-Id: <165549039025.23060.15634396521569303767.pr-tracker-bot@kernel.org>
+Date:   Fri, 17 Jun 2022 18:26:30 +0000
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Linus Torvalds <torvalds@linux-foundation.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/14/22 23:08, Christoph Hellwig wrote:
-> On Wed, Jun 15, 2022 at 08:31:21AM +0800, Ming Lei wrote:
->>> -	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, 0, ctx);
->>> +	struct blk_mq_hw_ctx *hctx = blk_mq_map_queue(q, REQ_OP_WRITE, ctx);
->>
->> The change itself doesn't make a difference, since both results in choosing
->> HCTX_TYPE_DEFAULT, but passing REQ_OP_WRITE is a bit misleading.
-> 
-> Well, the argument is an operationm so we better pass in a correct
-> operation (at some point we should look into a __bitwise annotation
-> or similar to make it clean).  And as 0 is REQ_OP_READ, we will end
-> up with the HCTX_TYPE_READ hctx IFF someone configures read queues
-> and uses an sq only schedule.  Which is a completely stupid but
-> possible setup.
+The pull request you sent on Fri, 17 Jun 2022 11:11:39 -0600:
 
-Hi Christoph,
+> git://git.kernel.dk/linux-block.git tags/block-5.19-2022-06-16
 
-I looked into adding a __bitwise annotation for request flags by 
-introducing a new type that is called blk_mq_opf_t. Introducing such a 
-type without modifying a lot of code seems difficult to me. This is what 
-I ran into:
-* If the type of the operation type constants (REQ_OP_READ etc.) is 
-modified into blk_mq_opf_t then their type changes from 'enum req_opf' 
-into type blk_mq_opf_t and sparse complains when passing e.g. 
-REQ_OP_READ to a function that accepts an argument with type enum req_opf.
-* If the type of the operation type constants is not modified then 
-sparse complains about bitwise or-ing the operation type and a request 
-flag, e.g. REQ_OP_WRITE | REQ_FUA.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/462abc9de7a13d90c5dcb81f440465041d06ba75
 
-I'm not sure how to solve this other than by modifying the functions 
-that accept an 'opf' argument into accepting an additional argument 
-(enum req_opf op + blk_mq_opf_t op_flags).
+Thank you!
 
-Thanks,
-
-Bart.
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
