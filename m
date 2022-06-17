@@ -2,48 +2,48 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6653DC43334
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 20:44:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7A2AC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 20:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234027AbiFQUob (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 16:44:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51616 "EHLO
+        id S233622AbiFQUoj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 16:44:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234976AbiFQUo2 (ORCPT
+        with ESMTP id S232380AbiFQUoi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 16:44:28 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26E5213CCF
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:27 -0700 (PDT)
-Received: by mail-pl1-f173.google.com with SMTP id d5so4793949plo.12
-        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:27 -0700 (PDT)
+        Fri, 17 Jun 2022 16:44:38 -0400
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D8DEE006
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:38 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id mh16-20020a17090b4ad000b001e8313301f1so7842930pjb.1
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 13:44:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=I+coexUdYl/cmHoLzQGmfZtjWnMmyqLiGn7ntk2+ivY=;
-        b=FnALRXLE/Z8RAku4VATPpmqQt4ppSTxisqGjJGpNLVamwiGCZZ+r2iMK2lKRdahe85
-         2yTitd9wZWz/dohmHORgPgmWlcq//KD39xiHrHxjmcUJ0OdmHB4Kcqlpkk8YzYmrMPDm
-         asn2JOFgd3xbamNHzEQOUJvvqmlnfQ2PTsWCY4tULCwoN/y5B0eXVBl+AZ8qyt+VFsHp
-         TDNRoTBVY4qOwpCpX8OzGiIM69mQSSTkLZkfua7Z8TAGKuy0SmndYd9pTmlfJkdzSNOs
-         FKWVqyEHhnPLbvEAqmm1Entgxus4e+s52yiRwOLNSSufoJQDbeU6FRztZcn3CFBOjsr/
-         HGtQ==
-X-Gm-Message-State: AJIora+kqaa9bNHCurbp8S+UYCEZLjaciqSIDVqOfgWTFe7IhyAHc0n2
-        Gx04XDpKHM0rlUQB8tmt+j0=
-X-Google-Smtp-Source: AGRyM1th1T9fOcWw5JCC9lgg99jvc39E4NKAZSMIKCcaNWnkFf15w0OzdxJspywMRVd8XGJ96BSTZQ==
-X-Received: by 2002:a17:90b:3a87:b0:1e8:8740:43e7 with SMTP id om7-20020a17090b3a8700b001e8874043e7mr12574035pjb.41.1655498666462;
-        Fri, 17 Jun 2022 13:44:26 -0700 (PDT)
+        bh=s3LCzo9+Xp7IujTzn/HYA2MWpND56eY4jQGiRDoWqqM=;
+        b=IPSga4JS5Oc+mUKzd0OcrPSFrOtJ9hCQobod3+uz48VvyKnzCzgjzgWYCFyQkj7eEI
+         y/6wo6taFdonI265KU5UNJFPQGhlaH9exjaz476abMJT9SaX2jYWU5f5fVcqmN/ULkz9
+         KLr9myF8ZDeNWp2OkEZaZ4iYR/4bFZhUSQQ6YcnbuMN1hQLMesV1CXnclXiel1tvEy2F
+         djYVVUw0snPPZfm3zKBGPD7xKb0TJVyT6uxWMwXlN/yyK0WL5QfoAtTUWhydAiqQjbok
+         zkmuRKcmQV/L1SsmG46l9J1UwHyj94RkEBEZfki8jptrdzf+YjhGXeZxsVq9asttGN/k
+         ODuA==
+X-Gm-Message-State: AJIora8kCQ/EvHODjCcAje3edE+SaYKFutxmFjRbXbGHitZBafXm4b03
+        xmD6SDvCteEE91mTxjo3u2BWHAlFjMw=
+X-Google-Smtp-Source: AGRyM1ue5jNGu8q2J3xzUIIe14eafwgyllST03JkBvYVKVndl1K2GvsPg9ZL0gvp2Cz0EVC3Mknzqw==
+X-Received: by 2002:a17:90b:1c8f:b0:1b8:c6dc:ca61 with SMTP id oo15-20020a17090b1c8f00b001b8c6dcca61mr12577073pjb.13.1655498677410;
+        Fri, 17 Jun 2022 13:44:37 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:49d9:1d0f:f325:18fe])
-        by smtp.gmail.com with ESMTPSA id c5-20020a170902d48500b0015ea95948ebsm4038914plg.134.2022.06.17.13.44.25
+        by smtp.gmail.com with ESMTPSA id u11-20020a170902e80b00b0016a0858b25dsm1652462plg.152.2022.06.17.13.44.36
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 17 Jun 2022 13:44:25 -0700 (PDT)
+        Fri, 17 Jun 2022 13:44:36 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>
-Subject: [PATCH] block: bfq: Fix kernel-doc headers
-Date:   Fri, 17 Jun 2022 13:44:19 -0700
-Message-Id: <20220617204419.101985-1-bvanassche@acm.org>
+Subject: [PATCH] block: bfq: Remove an unused function definition
+Date:   Fri, 17 Jun 2022 13:44:33 -0700
+Message-Id: <20220617204433.102022-1-bvanassche@acm.org>
 X-Mailer: git-send-email 2.36.1.476.g0c4daa206d-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -51,59 +51,24 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Fix the following warnings:
-
-block/bfq-cgroup.c:721: warning: Function parameter or member 'bfqg' not described in '__bfq_bic_change_cgroup'
-block/bfq-cgroup.c:721: warning: Excess function parameter 'blkcg' description in '__bfq_bic_change_cgroup'
-block/bfq-cgroup.c:870: warning: Function parameter or member 'ioprio_class' not described in 'bfq_reparent_leaf_entity'
-block/bfq-cgroup.c:900: warning: Function parameter or member 'ioprio_class' not described in 'bfq_reparent_active_queues'
+This patch is the result of the analysis of a sparse report.
 
 Cc: Jan Kara <jack@suse.cz>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/bfq-cgroup.c | 4 +++-
- block/bfq-wf2q.c   | 2 ++
- 2 files changed, 5 insertions(+), 1 deletion(-)
+ block/bfq-cgroup.c | 2 --
+ 1 file changed, 2 deletions(-)
 
 diff --git a/block/bfq-cgroup.c b/block/bfq-cgroup.c
-index dc0fa93219df..abc251902e28 100644
+index 09574af83566..dc0fa93219df 100644
 --- a/block/bfq-cgroup.c
 +++ b/block/bfq-cgroup.c
-@@ -709,7 +709,7 @@ void bfq_bfqq_move(struct bfq_data *bfqd, struct bfq_queue *bfqq,
-  * __bfq_bic_change_cgroup - move @bic to @cgroup.
-  * @bfqd: the queue descriptor.
-  * @bic: the bic to move.
-- * @blkcg: the blk-cgroup to move to.
-+ * @bfqg: the blk-cgroup to move to.
-  *
-  * Move bic to blkcg, assuming that bfqd->lock is held; which makes
-  * sure that the reference to cgroup is valid across the call (see
-@@ -863,6 +863,7 @@ static void bfq_flush_idle_tree(struct bfq_service_tree *st)
-  * @bfqd: the device data structure with the root group.
-  * @entity: the entity to move, if entity is a leaf; or the parent entity
-  *	    of an active leaf entity to move, if entity is not a leaf.
-+ * @ioprio_class: I/O priority class to reparent.
-  */
- static void bfq_reparent_leaf_entity(struct bfq_data *bfqd,
- 				     struct bfq_entity *entity,
-@@ -892,6 +893,7 @@ static void bfq_reparent_leaf_entity(struct bfq_data *bfqd,
-  * @bfqd: the device data structure with the root group.
-  * @bfqg: the group to move from.
-  * @st: the service tree to start the search from.
-+ * @ioprio_class: I/O priority class to reparent.
-  */
- static void bfq_reparent_active_queues(struct bfq_data *bfqd,
- 				       struct bfq_group *bfqg,
-diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
-index 089d07022066..983413cdefad 100644
---- a/block/bfq-wf2q.c
-+++ b/block/bfq-wf2q.c
-@@ -1360,6 +1360,8 @@ static struct bfq_entity *bfq_first_active_entity(struct bfq_service_tree *st,
- /**
-  * __bfq_lookup_next_entity - return the first eligible entity in @st.
-  * @st: the service tree.
-+ * @in_service: whether or not there is an in-service entity for the sched_data
-+ *	this active tree belongs to.
-  *
-  * If there is no in-service entity for the sched_data st belongs to,
-  * then return the entity that will be set in service if:
+@@ -1471,8 +1471,6 @@ struct bfq_group *bfqq_group(struct bfq_queue *bfqq)
+ 	return bfqq->bfqd->root_group;
+ }
+ 
+-void bfqg_and_blkg_get(struct bfq_group *bfqg) {}
+-
+ void bfqg_and_blkg_put(struct bfq_group *bfqg) {}
+ 
+ struct bfq_group *bfq_create_group_hierarchy(struct bfq_data *bfqd, int node)
