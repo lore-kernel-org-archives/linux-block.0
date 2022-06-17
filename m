@@ -2,170 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3E48C43334
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 06:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3914CC43334
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 08:03:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1380234AbiFQG4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 02:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35122 "EHLO
+        id S234442AbiFQIDb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 04:03:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44466 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1380098AbiFQG4M (ORCPT
+        with ESMTP id S1380724AbiFQID2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 02:56:12 -0400
-Received: from esa6.hgst.iphmx.com (esa6.hgst.iphmx.com [216.71.154.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A9DA4EDF3
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 23:56:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655448972; x=1686984972;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1h2b47a7yQ4psgtiKa1vXTHgS2gxDIb5ubjtosDpiqE=;
-  b=k+Vt48OnvEp5CofEytC2DcRniZ4I4Tc1LttqCN9bXuZY1hH5EDGLWnb+
-   mLdA4Swe8HYRCqF07RZHFrdPt9TLFBbVgzrveDmHPpludmwkPZxx67r/T
-   JGA9JWdzZLA8T/z+XN2N9nXti+YCuErbYxRX576Ynmpd2Tc7d4Tg+PXnT
-   e+IiyBgzdgZWZnWc8uW/WxfGg2EnqYyZOtjVkibejx4BGO6ZMQ9gBpaQ4
-   h3QdcqRbLheYUkiX9oSvS44gd0R4WW2P6YyQxjtA4k0J0kHHTeQhyCgkI
-   DkTOOB9BhgS6h79Po4yqhAk9cZHJ3hP+Ccw1lgbTtRKdpffIrdN5cvtAY
-   w==;
-X-IronPort-AV: E=Sophos;i="5.92,306,1650902400"; 
-   d="scan'208";a="204164975"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 17 Jun 2022 14:56:10 +0800
-IronPort-SDR: B4G83c1754Dn7O5RZSOrPgUQ5JStDBqVui2O0hq6PihuONIKhEZ1tBwXcBn3cgRyGdDawMcNbz
- lwZdUX74bpq4TaTZOg6wetw/J/z2pIR4uehqqtgIXNtQnOwOjbQ7S/xVHU75pL1FJltS+/uVvL
- Hf1VQBHNPGE2wi1EtQXy9A+ys0g3FfwZvyO+bQ559JNFo1g6BsngCNiFW00uf5OdVbJxECC/jV
- spQzfRJGfwoQ44/TwTfApjtFtq3EtZ23VFe5QgqJev948m3r4ZRccPScPv6T/y2M0Lfs1NbKeh
- C0zS6Ndh3RcHYVf10UWjtVg/
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 23:14:21 -0700
-IronPort-SDR: R4nJ06w/QInsux3yQJ7mU+J+krBS7yA7NswvYkqHmyLA8bCxcGlq6NqZzx1OgYrhhzAQDWUEXs
- /5oQA3XvA8cIndOZRjbx45EFP8ESWqqEmQ9diwkpbT8S6nBLEiJPkHunMCw4+PLs0mYZ6qfjmM
- te3FB7AuuLJvLzsSdAYUUA2W0d/UWjehFuV9T1mRaL/VjCL6+VwaQmeRULYF5cEVX9yRWoDjIX
- P8YH70x+7s/T/gfRfthNC23QfmwcNqsNHZV6rGhXRKK9qvdJ7bH7IVBRX+bP2DTIhvWuCua3u/
- xIk=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 16 Jun 2022 23:56:10 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LPVF458F0z1SVp8
-        for <linux-block@vger.kernel.org>; Thu, 16 Jun 2022 23:56:08 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655448967; x=1658040968; bh=1h2b47a7yQ4psgtiKa1vXTHgS2gxDIb5ubj
-        tosDpiqE=; b=j1atsB5LvKvor6LNUEAg43gvXa37A3NJUa7sAfj9QCf/EYpfJHa
-        J5oymJfQjtZy6XwtfcpxshMlV7cCp+t59qFyugVB4FLYtsbzJazW3KR/JD5OhMQk
-        bHFAe3xxclVqFRUazTnSh9uZfU6EFYa2jUtNdDt9dJ4vgMNb91VutEARBWy4oTPS
-        PA8Nl5n148hrOnVoOq8B8mwacDcbEAYTZOEcHsLNKeMwkjTajn5r26ZX5ihuMMf8
-        Ve8K1OpbbfXvQFFpDQmvgOfBnPIgDmnK3iemnUw6x1c/vbdXs4tQk6986dYAorr0
-        J8GoU5q8Q1JfRaj0M6RcV4IsmyO2rY03CqA==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id nkeoOHwdZoiA for <linux-block@vger.kernel.org>;
-        Thu, 16 Jun 2022 23:56:07 -0700 (PDT)
-Received: from [10.225.163.84] (unknown [10.225.163.84])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LPVF05H8mz1Rvlc;
-        Thu, 16 Jun 2022 23:56:04 -0700 (PDT)
-Message-ID: <f4cf6348-dd94-aa82-7519-318248c51151@opensource.wdc.com>
-Date:   Fri, 17 Jun 2022 15:56:03 +0900
+        Fri, 17 Jun 2022 04:03:28 -0400
+Received: from mailout1.w1.samsung.com (mailout1.w1.samsung.com [210.118.77.11])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DD4F33EA8
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 01:03:24 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+        by mailout1.w1.samsung.com (KnoxPortal) with ESMTP id 20220617080319euoutp01200584c228b4434ce56d57c9f64f89bb~5Wbtr04mQ2141321413euoutp01O
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 08:03:19 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.w1.samsung.com 20220617080319euoutp01200584c228b4434ce56d57c9f64f89bb~5Wbtr04mQ2141321413euoutp01O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1655452999;
+        bh=V56MV+Qvk7y7TAMM/soQkLYo1sKwNGw8wGk0cO7nBts=;
+        h=Date:Subject:To:CC:From:In-Reply-To:References:From;
+        b=msBXOrJKU2HMtwesLG6oLPUPTtV+MhGG8K57beMc0NorDbQIUIfIZfsAslUoUzbJX
+         p7gRHVNz2B8BppsnNQ8Z/LDzBzNvvtkGnVn9JtQiRzwqkdH0DXJtAyiOJGF3sjRpaE
+         f9gIw+8RFBU/byI2wlLacwjJ2rd/gA/hT4umzadg=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+        20220617080319eucas1p1bc4b7ac79368be83ed169769bac13881~5WbtZaKPz2524025240eucas1p1F;
+        Fri, 17 Jun 2022 08:03:19 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+        eusmges2new.samsung.com (EUCPMTA) with SMTP id 1D.1A.10067.7453CA26; Fri, 17
+        Jun 2022 09:03:19 +0100 (BST)
+Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
+        eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+        20220617080318eucas1p18554421449b17c4a2ad7816dd6584383~5Wbs4YchD3237732377eucas1p1S;
+        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
+Received: from eusmgms1.samsung.com (unknown [182.198.249.179]) by
+        eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
+        20220617080318eusmtrp2b71751d429c288c6d12854d27dd0fcf5~5Wbs3fT1h2980029800eusmtrp2E;
+        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
+X-AuditID: cbfec7f4-dd7ff70000002753-21-62ac3547daa1
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+        eusmgms1.samsung.com (EUCPMTA) with SMTP id F1.09.09095.6453CA26; Fri, 17
+        Jun 2022 09:03:18 +0100 (BST)
+Received: from CAMSVWEXC01.scsc.local (unknown [106.1.227.71]) by
+        eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+        20220617080318eusmtip13a348e9cbb58e5ec3aaf8dfa8d77b2a0~5WbsqjC4S2368423684eusmtip1X;
+        Fri, 17 Jun 2022 08:03:18 +0000 (GMT)
+Received: from [192.168.1.12] (106.210.248.244) by CAMSVWEXC01.scsc.local
+        (2002:6a01:e347::6a01:e347) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+        Fri, 17 Jun 2022 09:03:12 +0100
+Message-ID: <f83eb255-89fe-90dc-3670-79b8684389f1@samsung.com>
+Date:   Fri, 17 Jun 2022 10:03:09 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
+        Thunderbird/91.9.1
 Subject: Re: [PATCH v7 13/13] dm: add non power of 2 zoned target
 Content-Language: en-US
-To:     Pankaj Raghav <p.raghav@samsung.com>, hch@lst.de,
-        snitzer@redhat.com, axboe@kernel.dk
-Cc:     bvanassche@acm.org, linux-kernel@vger.kernel.org,
-        jiangbo.365@bytedance.com, hare@suse.de, pankydev8@gmail.com,
-        dm-devel@redhat.com, jonathan.derrick@linux.dev,
-        gost.dev@samsung.com, dsterba@suse.com, jaegeuk@kernel.org,
-        linux-nvme@lists.infradead.org, Johannes.Thumshirn@wdc.com,
-        linux-block@vger.kernel.org
-References: <20220615101920.329421-1-p.raghav@samsung.com>
- <CGME20220615102011eucas1p220368db4a186181b1927dea50a79e5d4@eucas1p2.samsung.com>
- <20220615101920.329421-14-p.raghav@samsung.com>
- <63b0cfb6-eb24-f058-e502-2637039c5a98@opensource.wdc.com>
- <0b819562-8b16-37b6-9220-28bf1960bccb@samsung.com>
- <0c4f30f2-c206-0201-31e3-fbb9edbdf666@opensource.wdc.com>
- <4746a000-2220-211e-1bd6-79c15c18a85c@samsung.com>
- <e0dc08fd-cd00-240d-edc4-5799d51aa5a8@opensource.wdc.com>
- <a945def3-ba5a-7539-e96a-43ade0ae674a@samsung.com>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <a945def3-ba5a-7539-e96a-43ade0ae674a@samsung.com>
-Content-Type: text/plain; charset=UTF-8
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>, <hch@lst.de>,
+        <snitzer@redhat.com>, <axboe@kernel.dk>
+CC:     <bvanassche@acm.org>, <linux-kernel@vger.kernel.org>,
+        <jiangbo.365@bytedance.com>, <hare@suse.de>, <pankydev8@gmail.com>,
+        <dm-devel@redhat.com>, <jonathan.derrick@linux.dev>,
+        <gost.dev@samsung.com>, <dsterba@suse.com>, <jaegeuk@kernel.org>,
+        <linux-nvme@lists.infradead.org>, <Johannes.Thumshirn@wdc.com>,
+        <linux-block@vger.kernel.org>
+From:   Pankaj Raghav <p.raghav@samsung.com>
+In-Reply-To: <f4cf6348-dd94-aa82-7519-318248c51151@opensource.wdc.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-Originating-IP: [106.210.248.244]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+        CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrPKsWRmVeSWpSXmKPExsWy7djPc7rupmuSDK59Z7FYfbefzWLah5/M
+        Fr/Pnme22PtuNqvFhR+NTBZ7Fk1isli5+iiTxZP1s5gteg58YLH423UPKNbyEKjulrbF5V1z
+        2CzmL3vKbrHm5lMWi7aNXxkdBDwuX/H2+HdiDZvHzll32T0uny312LSqk81jYcNUZo/NS+o9
+        dt9sAMq13mf1eL/vKpvH+i1XWTw2n672+LxJzqP9QDdTAF8Ul01Kak5mWWqRvl0CV8aqu59Z
+        C/4LVHT8e8PawPiWt4uRg0NCwETix46ELkZODiGBFYwSRy9JQNhfGCWmrhDvYuQCsj8zSqxp
+        ecMKkgCp39fzhwUisZxRYt2FKexwVVNfvoBydjFKLGn+yAjSwitgJ3Hr11wWEJtFQFXi/q3F
+        UHFBiZMzn4DFRQUiJFa2vmEBOUlYwFGi6UQSSJhZQFzi1pP5TCBhEYE8iXn/oMK3mCTuP60D
+        CbMJaEk0drKDhDkF3CTuff7NDlGiKdG6HcaWl9j+dg4zxL/KEv92MkO8Uiux9tgZsIMlBL5x
+        Sux7eosJIuEi8fb4NhYIW1ji1fEt7BC2jMT/nfOhaqolnt74zQzR3MIo0b9zPRvEAmuJvjM5
+        EDWOEqtanjBChPkkbrwVhDiHT2LStunMExhVZyEFwywk/85C8sEsJB8sYGRZxSieWlqcm55a
+        bJSXWq5XnJhbXJqXrpecn7uJEZgmT/87/mUH4/JXH/UOMTJxMB5ilOBgVhLhNQtemSTEm5JY
+        WZValB9fVJqTWnyIUZqDRUmcNzlzQ6KQQHpiSWp2ampBahFMlomDU6qBKet7l0PagYbSmUyc
+        K1ySGjNvZfYwSonOn57Ix2zXnM28y1lURS9V/lbkZpW6t+wZD/f7Bja2+0wLecBgnHqkc/V8
+        U7462aAcz6u/4htO5rjt5dFdpHOHZappR9CSW0UrVSIksvrSd0R17ensm2GuxHN06fvW7r7p
+        E9bMYU2NSrm47re41dIJVo4WXneZfu8pKLXluLvIfJ7X/Mm9F+X0N56ecXtV2Sr1Dfo2NmF2
+        nj6/fZLnzGcTlfrG1GNzYoPbghUl+hsVOFeL2DBaMGWfWfRZqc9Y+pLA8tJVNufnxQTNts/2
+        4Vy9VDg8ZnNDXleA4PkvztMu7/u7brGsco6vQEdyrHbCnN47jkt7ipVYijMSDbWYi4oTAdVN
+        gNACBAAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFlrOKsWRmVeSWpSXmKPExsVy+t/xu7pupmuSDPouKVisvtvPZjHtw09m
+        i99nzzNb7H03m9Xiwo9GJos9iyYxWaxcfZTJ4sn6WcwWPQc+sFj87boHFGt5CFR3S9vi8q45
+        bBbzlz1lt1hz8ymLRdvGr4wOAh6Xr3h7/Duxhs1j56y77B6Xz5Z6bFrVyeaxsGEqs8fmJfUe
+        u282AOVa77N6vN93lc1j/ZarLB6bT1d7fN4k59F+oJspgC9Kz6Yov7QkVSEjv7jEVina0MJI
+        z9DSQs/IxFLP0Ng81srIVEnfziYlNSezLLVI3y5BL2PV3c+sBf8FKjr+vWFtYHzL28XIySEh
+        YCKxr+cPSxcjF4eQwFJGiaa5jSwQCRmJT1c+skPYwhJ/rnWxQRR9ZJRY+OIdM4Szi1Hi2YTb
+        TCBVvAJ2Erd+zQXrZhFQlbh/azEjRFxQ4uTMJ2BxUYEIiU/LJrB2MXJwCAs4SjSdSAIJMwuI
+        S9x6Mp8JJCwikCcx7x9U+BaTxP2ndRCrzrNIXD68mR2khk1AS6KxE+w2TgE3iXuff7ND1GtK
+        tG6HseUltr+dwwxSLiGgLPFvJzPEK7USr+7vZpzAKDoLyW2zkBwxC8mkWUgmLWBkWcUoklpa
+        nJueW2yoV5yYW1yal66XnJ+7iRGYYrYd+7l5B+O8Vx/1DjEycTAeYpTgYFYS4TULXpkkxJuS
+        WFmVWpQfX1Sak1p8iNEUGEATmaVEk/OBSS6vJN7QzMDU0MTM0sDU0sxYSZzXs6AjUUggPbEk
+        NTs1tSC1CKaPiYNTqoFJeNO+zT3SdTe6CmSn1c+ae+6E2/0gl8kcEonyM9+yng/4pZzW0fM4
+        b1Pm6lllfmpJbw+Vzr4xfc6bYO9LfwML/t+Zsdp/ouQmz4lZ525J6Xkb7ug+xSJYd8r3r5Q5
+        E9v0+dNWq5i2yU5eMeXk0za29CVW+3y2TWnjNq40iq0tM+a+XN+7jfFTRNJrqXmf2kx//n0/
+        zVLRqWqWB/d+zvIs/rMmujrtDg87K6uPln3YMOf7xcy8nJBnjSK+PyWEcjIs/i2x22J8Y3ba
+        pah6DtlOO20mOynt48kM9+7oFNzaeWHDe7PD9Wuj/5Xsfbh88paIBIXbK/+oVNjo17LnLDK1
+        dT5+3LNieuzrRqEOxa9KLMUZiYZazEXFiQATp8hqugMAAA==
+X-CMS-MailID: 20220617080318eucas1p18554421449b17c4a2ad7816dd6584383
+X-Msg-Generator: CA
+X-RootMTR: 20220615102011eucas1p220368db4a186181b1927dea50a79e5d4
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20220615102011eucas1p220368db4a186181b1927dea50a79e5d4
+References: <20220615101920.329421-1-p.raghav@samsung.com>
+        <CGME20220615102011eucas1p220368db4a186181b1927dea50a79e5d4@eucas1p2.samsung.com>
+        <20220615101920.329421-14-p.raghav@samsung.com>
+        <63b0cfb6-eb24-f058-e502-2637039c5a98@opensource.wdc.com>
+        <0b819562-8b16-37b6-9220-28bf1960bccb@samsung.com>
+        <0c4f30f2-c206-0201-31e3-fbb9edbdf666@opensource.wdc.com>
+        <4746a000-2220-211e-1bd6-79c15c18a85c@samsung.com>
+        <e0dc08fd-cd00-240d-edc4-5799d51aa5a8@opensource.wdc.com>
+        <a945def3-ba5a-7539-e96a-43ade0ae674a@samsung.com>
+        <f4cf6348-dd94-aa82-7519-318248c51151@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/22 15:40, Pankaj Raghav wrote:
-> On 2022-06-17 08:12, Damien Le Moal wrote:
->>> I think this is a cleaner approach using features flag and io_hints
->>> instead of messing with the revalidate zone function:
->>>
->>> diff --git a/drivers/md/dm-table.c b/drivers/md/dm-table.c
->>> index 135c0cc190fb..c97a71e0473f 100644
->>> --- a/drivers/md/dm-table.c
->>> +++ b/drivers/md/dm-table.c
->>> @@ -1618,6 +1618,9 @@ static int device_not_matches_zone_sectors(struct
->>> dm_target *ti, struct dm_dev *
->>>  	if (!blk_queue_is_zoned(q))
->>>  		return 0;
->>>
->>> +	if(dm_target_supports_emulated_zone_size(ti->type))
->>> +		return 0;
->>> +
+On 2022-06-17 08:56, Damien Le Moal wrote:
 >>
->> This should be in validate_hardware_zoned_model(), not here.
->>
-> I am not sure about this comment. We need to peek into the individual
-> target from the table to check for this feature right?
+>> So we call this function device_not_matches_zone_sectors() from
+>> validate_hardware_zoned_model() for each target and we let the validate
+>> succeed even if the target's zone size is different from the underlying
+>> device zone size if this feature flag is set. Let me know if I am
+>> missing something and how this can be moved to
+>> validate_hardware_zoned_model().
 > 
-> if (dm_table_any_dev_attr(table, device_not_matches_zone_sectors,
-> &zone_sectors)) {
-> 	DMERR("%s: zone sectors is not consistent across all zoned devices",
->         dm_device_name(table->md));
-> 	return -EINVAL;
-> 	}
+> Your change does not match the function name
+> device_not_matches_zone_sectors(), at all. So I think this is wrong.
 > 
-> So we call this function device_not_matches_zone_sectors() from
-> validate_hardware_zoned_model() for each target and we let the validate
-> succeed even if the target's zone size is different from the underlying
-> device zone size if this feature flag is set. Let me know if I am
-> missing something and how this can be moved to
-> validate_hardware_zoned_model().
+> The fact is that zone support in DM has been built under the following
+> assumptions:
+> 1) A zoned device can be used to create a *zoned* target (e.g. dm-linear,
+> dm-flakey, dm-crypt). For this case, the target *must* use the same zone
+> size as the underlying devices and all devices used for the target must
+> have the same zone size.
+> 2) A zoned device can be used to create a *regular* device target (e.g.
+> dm-zoned). All zoned devices used for the target must have the same zone size.
+> 
+> This new target driver completely breaks (1) and does not fit with (2). I
+> suspect this is why you are seeing problems with dm_revalidate_zones() as
+> that one uses the underlying device instead of the target report zones.
+> 
+> Based on this analysis, validate_hardware_zoned_model() definitely needs
+> to be changed. But device_not_matches_zone_sectors() is to check the
+> assumptions (1) and (2) so changing it for your new case is wrong in my
+> opinion. You need another set of assumptions (3) (define that well please)
+> and modify validate_hardware_zoned_model() so that the defined constraints
+> are checked. Using a target flag to indicate the type of zoned target is
+> fine by me.
+> 
+Got it. Thanks for the explanation. Renaming
+device_not_matches_zone_sectors() function to something meaningful with
+my changes should address what you have pointed out to accommodate all
+three types.
 
-Your change does not match the function name
-device_not_matches_zone_sectors(), at all. So I think this is wrong.
-
-The fact is that zone support in DM has been built under the following
-assumptions:
-1) A zoned device can be used to create a *zoned* target (e.g. dm-linear,
-dm-flakey, dm-crypt). For this case, the target *must* use the same zone
-size as the underlying devices and all devices used for the target must
-have the same zone size.
-2) A zoned device can be used to create a *regular* device target (e.g.
-dm-zoned). All zoned devices used for the target must have the same zone size.
-
-This new target driver completely breaks (1) and does not fit with (2). I
-suspect this is why you are seeing problems with dm_revalidate_zones() as
-that one uses the underlying device instead of the target report zones.
-
-Based on this analysis, validate_hardware_zoned_model() definitely needs
-to be changed. But device_not_matches_zone_sectors() is to check the
-assumptions (1) and (2) so changing it for your new case is wrong in my
-opinion. You need another set of assumptions (3) (define that well please)
-and modify validate_hardware_zoned_model() so that the defined constraints
-are checked. Using a target flag to indicate the type of zoned target is
-fine by me.
-
--- 
-Damien Le Moal
-Western Digital Research
+I see that something similar was done to dm_table_supports_zoned_model()
+to accommodate type 2(dm-zoned) with different underlying zoned models
+even though the initial impl. supported only type 1.
