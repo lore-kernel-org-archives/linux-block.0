@@ -2,112 +2,69 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A0ABC43334
-	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 10:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53ADFC433EF
+	for <linux-block@archiver.kernel.org>; Fri, 17 Jun 2022 10:35:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381502AbiFQKI7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 06:08:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55752 "EHLO
+        id S231422AbiFQKfT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 17 Jun 2022 06:35:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54120 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235799AbiFQKI6 (ORCPT
+        with ESMTP id S230341AbiFQKfT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 06:08:58 -0400
-Received: from mail-yw1-x1133.google.com (mail-yw1-x1133.google.com [IPv6:2607:f8b0:4864:20::1133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A6BE02182A;
-        Fri, 17 Jun 2022 03:08:57 -0700 (PDT)
-Received: by mail-yw1-x1133.google.com with SMTP id 00721157ae682-3176b6ed923so37502437b3.11;
-        Fri, 17 Jun 2022 03:08:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=8ZtTCbfKlPy1sL/nTBNWOhi7Cc4DXnL97uQEVaSoU5Y=;
-        b=Bn9B64Pt3h6XPuX2xWZhh1L40RUgLFZn8YPoo453y7DYbt3jiKhoxaPdbdQoM2OVlP
-         qGRR8vPqBRWgs7M+UljIO+i2rZ1i3HpW+C4AcrVhmPYbsLuxo7l/VPKjIVCqSJRqLxBo
-         QdVQGH61qRJDbo/9XXdrSkyteARSwL8wSWzAdZBUPNNKJtG6QDwoc9RpKtbXrzQQ1F/n
-         0WNVbXlY7jIQuhm8gAcQX9kDW83Y1z+RtOy/uWoFpWKWcEjoZfTeUtOwcTb+hBAZ+120
-         bN+5PjBi1XEZSDWy7N4dujgTcYlKy6Gq+wQ1GiMlrZDkz+wr40dPA9HD2RTDfNG2kMyV
-         xZXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8ZtTCbfKlPy1sL/nTBNWOhi7Cc4DXnL97uQEVaSoU5Y=;
-        b=5JSF1HCLpkqQylzXv+F4FzmmZrCBzzKkKiB52xLFqFLvkhQQ5lNdGjQ1R8HlgVBf/E
-         /6ACMXNTzJz+x64dISuGwmd96s2yAQ5UlzqjFZIRbV2re8oLkKhNILmfhoqiQYdiWmFV
-         E80Iz0Thb4P6J1OqUI0RtXccIefPrjROwSTxt05uUCAxXpYdJ8h3hYVC4WTPlJ+56bWr
-         xlXMJcQl2V+zw0arUoD/Ou9XWL7yd3Ber5EJoN4EcA5MlS3pYlHhVJTNOHCDryYQL/PT
-         HrPkUpP+Z6DOZFkbS3V0AVIX2g+F24vGapsblmOKtCrC5EUENTMZyiDsdol2NliOk0j+
-         dg9Q==
-X-Gm-Message-State: AJIora8IpAv6UGP0KjqNQiU+i1TjgaZUIDwci17HtbCyPZbqANcULMGl
-        OD2gVAem0usCWWfYrUA5IGjSmFnkPZrKaMdnHgo=
-X-Google-Smtp-Source: AGRyM1uHItNie6E+DKP/KEFCrtfManttjsqKWZrVKmAP7oSq4xHHGuslFvTiGJSYcaPG3Jb3ElMPpoeai9beNh+z4Cs=
-X-Received: by 2002:a81:a24c:0:b0:314:4396:5aca with SMTP id
- z12-20020a81a24c000000b0031443965acamr10979392ywg.386.1655460536806; Fri, 17
- Jun 2022 03:08:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220605145835.26916-1-wuchi.zero@gmail.com>
-In-Reply-To: <20220605145835.26916-1-wuchi.zero@gmail.com>
-From:   chi wu <wuchi.zero@gmail.com>
-Date:   Fri, 17 Jun 2022 18:08:45 +0800
-Message-ID: <CA+tQmHAkkxFkuabjh1Apwp1ZkNEtY+7ijLEs931aFA+MZngECA@mail.gmail.com>
-Subject: Re: [PATCH] lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch()
-To:     axboe@kernel.dk, mwilck@suse.com, andriy.shevchenko@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 17 Jun 2022 06:35:19 -0400
+X-Greylist: delayed 414 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Jun 2022 03:35:18 PDT
+Received: from chinatelecom.cn (prt-mail.chinatelecom.cn [42.123.76.228])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 195A96AA6A
+        for <linux-block@vger.kernel.org>; Fri, 17 Jun 2022 03:35:18 -0700 (PDT)
+HMM_SOURCE_IP: 172.18.0.218:44466.1879482578
+HMM_ATTACHE_NUM: 0000
+HMM_SOURCE_TYPE: SMTP
+Received: from clientip-110.80.1.46 (unknown [172.18.0.218])
+        by chinatelecom.cn (HERMES) with SMTP id D19602800C3;
+        Fri, 17 Jun 2022 18:28:17 +0800 (CST)
+X-189-SAVE-TO-SEND: +zhenggy@chinatelecom.cn
+Received: from  ([172.18.0.218])
+        by app0025 with ESMTP id e3abd5973b9a41519fc97ed1e5384636 for paolo.valente@linaro.org;
+        Fri, 17 Jun 2022 18:28:19 CST
+X-Transaction-ID: e3abd5973b9a41519fc97ed1e5384636
+X-Real-From: zhenggy@chinatelecom.cn
+X-Receive-IP: 172.18.0.218
+X-MEDUSA-Status: 0
+Sender: zhenggy@chinatelecom.cn
+From:   GuoYong Zheng <zhenggy@chinatelecom.cn>
+To:     paolo.valente@linaro.org, axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org,
+        GuoYong Zheng <zhenggy@chinatelecom.cn>
+Subject: [PATCH] bfq: Remove useless code in bfq_lookup_next_entity
+Date:   Fri, 17 Jun 2022 18:28:04 +0800
+Message-Id: <1655461684-19075-1-git-send-email-zhenggy@chinatelecom.cn>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Ping....
+It is no need to judge entity is null or not here,
+directly return entity is ok, so remove it.
 
-wuchi <wuchi.zero@gmail.com> =E4=BA=8E2022=E5=B9=B46=E6=9C=885=E6=97=A5=E5=
-=91=A8=E6=97=A5 22:58=E5=86=99=E9=81=93=EF=BC=9A
->
-> 1. Getting next index before continue branch.
-> 2. Checking free bits when setting the target bits. Otherwise,
-> it may reuse the busying bits.
->
-> Signed-off-by: wuchi <wuchi.zero@gmail.com>
-> ---
->  lib/sbitmap.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/lib/sbitmap.c b/lib/sbitmap.c
-> index ae4fd4de9ebe..29eb0484215a 100644
-> --- a/lib/sbitmap.c
-> +++ b/lib/sbitmap.c
-> @@ -528,7 +528,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitma=
-p_queue *sbq, int nr_tags,
->
->                 sbitmap_deferred_clear(map);
->                 if (map->word =3D=3D (1UL << (map_depth - 1)) - 1)
-> -                       continue;
-> +                       goto next;
->
->                 nr =3D find_first_zero_bit(&map->word, map_depth);
->                 if (nr + nr_tags <=3D map_depth) {
-> @@ -539,6 +539,8 @@ unsigned long __sbitmap_queue_get_batch(struct sbitma=
-p_queue *sbq, int nr_tags,
->                         get_mask =3D ((1UL << map_tags) - 1) << nr;
->                         do {
->                                 val =3D READ_ONCE(map->word);
-> +                               if ((val & ~get_mask) !=3D val)
-> +                                       goto next;
->                                 ret =3D atomic_long_cmpxchg(ptr, val, get=
-_mask | val);
->                         } while (ret !=3D val);
->                         get_mask =3D (get_mask & ~ret) >> nr;
-> @@ -549,6 +551,7 @@ unsigned long __sbitmap_queue_get_batch(struct sbitma=
-p_queue *sbq, int nr_tags,
->                                 return get_mask;
->                         }
->                 }
-> +next:
->                 /* Jump to next index. */
->                 if (++index >=3D sb->map_nr)
->                         index =3D 0;
-> --
-> 2.20.1
->
+Signed-off-by: GuoYong Zheng <zhenggy@chinatelecom.cn>
+---
+ block/bfq-wf2q.c | 3 ---
+ 1 file changed, 3 deletions(-)
+
+diff --git a/block/bfq-wf2q.c b/block/bfq-wf2q.c
+index f8eb340..089d070 100644
+--- a/block/bfq-wf2q.c
++++ b/block/bfq-wf2q.c
+@@ -1472,9 +1472,6 @@ static struct bfq_entity *bfq_lookup_next_entity(struct bfq_sched_data *sd,
+ 			break;
+ 	}
+ 
+-	if (!entity)
+-		return NULL;
+-
+ 	return entity;
+ }
+ 
+-- 
+1.8.3.1
+
