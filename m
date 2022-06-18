@@ -2,177 +2,578 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15FF1C433EF
-	for <linux-block@archiver.kernel.org>; Sat, 18 Jun 2022 02:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E877C43334
+	for <linux-block@archiver.kernel.org>; Sat, 18 Jun 2022 12:16:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383817AbiFRCMG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 17 Jun 2022 22:12:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58184 "EHLO
+        id S232912AbiFRMQf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 18 Jun 2022 08:16:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44984 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230301AbiFRCMF (ORCPT
+        with ESMTP id S231329AbiFRMQ1 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 17 Jun 2022 22:12:05 -0400
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0092D6A433;
-        Fri, 17 Jun 2022 19:12:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1655518324; x=1687054324;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ILh8GqVgRpG2pN5N4Xid5VlyXwM8fCENiMr0RWu+Cu0=;
-  b=YRPYTT7XtHSvR6bdE0vSvE/WsmljAOGitRF32dDkdU+h54fmsHx9kp3e
-   U/qmGNr1g2a0Y3XOI7lr0U9ycBShzsfZ8YLeeCW1SN1uVfcfVE1q6kDkn
-   QL3BzxZcQmZ3rnH9QvXzegeCLV0FQBAQU3NZVbdEXSvKm3S0DvrA5zuw6
-   3ZMAlP7gy7awgCsYbT6JTxniHRlOTURr+TN58zTNvoqEV5zF3+lVjX6Wr
-   6Mzk1r0WvGxTu1z4WxPw7Hvk8XSrkTfenYrJ/IwBAGJIzK9ZBt8S+PdYk
-   Z6tjXQFeCn4z26rGGY7DORwScSXrEocXMLuSKO2w48iZeYSXPILESeiFu
-   Q==;
-X-IronPort-AV: E=McAfee;i="6400,9594,10380"; a="268336605"
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="268336605"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2022 19:12:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.92,306,1650956400"; 
-   d="scan'208";a="688548056"
-Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 17 Jun 2022 19:12:01 -0700
-Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
-        (envelope-from <lkp@intel.com>)
-        id 1o2NwP-000Pw7-6g;
-        Sat, 18 Jun 2022 02:12:01 +0000
-Date:   Sat, 18 Jun 2022 10:11:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Sergei Shtepa <sergei.shtepa@veeam.com>, axboe@kernel.dk,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Cc:     kbuild-all@lists.01.org, Sergei Shtepa <sergei.shtepa@veeam.com>
-Subject: Re: [PATCH 20/20] block, blksnap: adds a blksnap to the kernel tree
-Message-ID: <202206181039.UczT9AgC-lkp@intel.com>
-References: <1655135593-1900-21-git-send-email-sergei.shtepa@veeam.com>
+        Sat, 18 Jun 2022 08:16:27 -0400
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6E215732
+        for <linux-block@vger.kernel.org>; Sat, 18 Jun 2022 05:16:24 -0700 (PDT)
+Received: by mail-il1-f199.google.com with SMTP id w7-20020a056e021c8700b002d3bc8e95cbso4331635ill.3
+        for <linux-block@vger.kernel.org>; Sat, 18 Jun 2022 05:16:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=NkvTvifyfgJ6ACApLSOZuV2EHZkPeO+g68mZoH8EVr8=;
+        b=YYotdImXtesAv1oM8/gbtHHJQZFmoZEb/xvP9SW5vfnwoxAY1N3im1KuSvz7tjOnlE
+         4Bek1slv89WtZ/JA9Yt2lOidkYFoh7HceeCX6maZ+gIA9HiCt5QNX9Bf5vYrNX+xXpWi
+         DgZvvu53G7Nh8xCkT5tJO1rZ8nruHuJzA8sXKmDopwitfruEitEG32r2S2JjbQZdj52/
+         7TySO1qt9q1FzMy25k5SAVZ5SRLiJWqBDuBt77W0nWR5S2Xv9WJ9pUvHmNKtBNFUOEvt
+         lF3+kJNjVTHYc96MYJItzZKie282KyyeUmyNru6vkHrQZgvXuGaMmvCm8rHu0tVBSHDu
+         ytHA==
+X-Gm-Message-State: AJIora+XpGxHf1yg2NGnjX+ShLG599xenxXl3WrnldtomyyjPDW1HcSM
+        llRvY+0pqm7OjwYliPvCcnefRyja3IWgEnYnAcbZQmXj9jc/
+X-Google-Smtp-Source: AGRyM1vYZ9aukNouE7fCzLKJ84hGSxX4yKt3UxY0iVgMPfdDZUbFLoEJEW66p8Gnc1kLfNlh/8kUCpL36q/nX+WsMFpcbtDW98mp
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1655135593-1900-21-git-send-email-sergei.shtepa@veeam.com>
+X-Received: by 2002:a92:dc91:0:b0:2d8:ecc3:ffb5 with SMTP id
+ c17-20020a92dc91000000b002d8ecc3ffb5mr3105350iln.170.1655554583364; Sat, 18
+ Jun 2022 05:16:23 -0700 (PDT)
+Date:   Sat, 18 Jun 2022 05:16:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d90a8005e1b7d62b@google.com>
+Subject: [syzbot] BUG: sleeping function called from invalid context in relay_open_buf
+From:   syzbot <syzbot+4fe838aeddc9710946ca@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, mingo@redhat.com,
+        rostedt@goodmis.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Sergei,
+Hello,
 
-Thank you for the patch! Perhaps something to improve:
+syzbot found the following issue on:
 
-[auto build test WARNING on axboe-block/for-next]
-[also build test WARNING on v5.19-rc2 next-20220617]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
+HEAD commit:    6012273897fe Add linux-next specific files for 20220615
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16406cb0080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b4154677977b1776
+dashboard link: https://syzkaller.appspot.com/bug?extid=4fe838aeddc9710946ca
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Sergei-Shtepa/blksnap-creating-non-persistent-snapshots-for-backup/20220614-025950
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
-config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20220618/202206181039.UczT9AgC-lkp@intel.com/config)
-compiler: hppa-linux-gcc (GCC) 11.3.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/intel-lab-lkp/linux/commit/1cdaf9c498b3c016f311f65998256e2129623f70
-        git remote add linux-review https://github.com/intel-lab-lkp/linux
-        git fetch --no-tags linux-review Sergei-Shtepa/blksnap-creating-non-persistent-snapshots-for-backup/20220614-025950
-        git checkout 1cdaf9c498b3c016f311f65998256e2129623f70
-        # save the config file
-        mkdir build_dir && cp config build_dir/.config
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=parisc SHELL=/bin/bash drivers/ fs/
+Unfortunately, I don't have any reproducer for this issue yet.
 
-If you fix the issue, kindly add following tag where applicable
-Reported-by: kernel test robot <lkp@intel.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4fe838aeddc9710946ca@syzkaller.appspotmail.com
 
-All warnings (new ones prefixed by >>):
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 1, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Not tainted 5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 1, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 1, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 1, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ relay_alloc_buf kernel/relay.c:124 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x2a7/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
+preempt_count: 2, expected: 0
+RCU nest depth: 0, expected: 0
+2 locks held by syz-executor.5/10461:
+ #0: ffff888146a4f718 (&q->debugfs_mutex){+.+.}-{3:3}, at: blk_trace_ioctl+0xa9/0x270 kernel/trace/blktrace.c:735
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open kernel/relay.c:518 [inline]
+ #1: ffffffff8bdee228 (relay_channels_mutex){+.+.}-{3:3}, at: relay_open+0x389/0xa00 kernel/relay.c:477
+Preemption disabled at:
+[<ffffffff81bc96e5>] rmqueue_pcplist mm/page_alloc.c:3813 [inline]
+[<ffffffff81bc96e5>] rmqueue mm/page_alloc.c:3858 [inline]
+[<ffffffff81bc96e5>] get_page_from_freelist+0x455/0x3a20 mm/page_alloc.c:4293
+CPU: 0 PID: 10461 Comm: syz-executor.5 Tainted: G        W         5.19.0-rc2-next-20220615-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ __might_resched.cold+0x222/0x26b kernel/sched/core.c:9823
+ might_alloc include/linux/sched/mm.h:274 [inline]
+ prepare_alloc_pages+0x3d8/0x570 mm/page_alloc.c:5290
+ __alloc_pages+0x145/0x510 mm/page_alloc.c:5501
+ alloc_pages+0x1aa/0x310 mm/mempolicy.c:2279
+ __get_free_pages+0x8/0x40 mm/page_alloc.c:5561
+ kasan_populate_vmalloc_pte mm/kasan/shadow.c:271 [inline]
+ kasan_populate_vmalloc_pte+0x25/0x160 mm/kasan/shadow.c:262
+ apply_to_pte_range mm/memory.c:2648 [inline]
+ apply_to_pmd_range mm/memory.c:2692 [inline]
+ apply_to_pud_range mm/memory.c:2728 [inline]
+ apply_to_p4d_range mm/memory.c:2764 [inline]
+ __apply_to_page_range+0x68c/0x1030 mm/memory.c:2798
+ alloc_vmap_area+0xacf/0x1d30 mm/vmalloc.c:1625
+ __get_vm_area_node+0x142/0x3f0 mm/vmalloc.c:2483
+ get_vm_area_caller mm/vmalloc.c:2536 [inline]
+ vmap+0x131/0x330 mm/vmalloc.c:2831
+ relay_alloc_buf kernel/relay.c:129 [inline]
+ relay_create_buf kernel/relay.c:165 [inline]
+ relay_open_buf.part.0+0x4b2/0xc00 kernel/relay.c:387
+ relay_open_buf kernel/relay.c:384 [inline]
+ relay_open kernel/relay.c:520 [inline]
+ relay_open+0x4fb/0xa00 kernel/relay.c:477
+ do_blk_trace_setup+0x4bc/0xb60 kernel/trace/blktrace.c:559
+ __blk_trace_setup+0xca/0x180 kernel/trace/blktrace.c:599
+ blk_trace_ioctl+0x13b/0x270 kernel/trace/blktrace.c:740
+ blkdev_ioctl+0x181/0x800 block/ioctl.c:603
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x46/0xb0
+RIP: 0033:0x7f2933089109
+Code: Unable to access opcode bytes at RIP 0x7f29330890df.
+RSP: 002b:00007f2934150168 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00007f293319bf60 RCX: 00007f2933089109
+RDX: 0000000020000080 RSI: 00000000c0481273 RDI: 0000000000000003
+RBP: 00007f29330e305d R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe5646271f R14: 00007f2934150300 R15: 0000000000022000
+ </TASK>
+BUG: sleeping function called from invalid context at include/linux/sched/mm.h:274
+in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10461, name: syz-executor.5
 
->> drivers/block/blksnap/diff_buffer.c:10:6: warning: no previous prototype for 'diff_buffer_free' [-Wmissing-prototypes]
-      10 | void diff_buffer_free(struct diff_buffer *diff_buffer)
-         |      ^~~~~~~~~~~~~~~~
->> drivers/block/blksnap/diff_buffer.c:34:21: warning: no previous prototype for 'diff_buffer_new' [-Wmissing-prototypes]
-      34 | struct diff_buffer *diff_buffer_new(size_t page_count, size_t buffer_size,
-         |                     ^~~~~~~~~~~~~~~
---
->> drivers/block/blksnap/diff_storage.c:134:22: warning: no previous prototype for 'diff_storage_bdev_by_id' [-Wmissing-prototypes]
-     134 | struct block_device *diff_storage_bdev_by_id(struct diff_storage *diff_storage,
-         |                      ^~~~~~~~~~~~~~~~~~~~~~~
---
->> drivers/block/blksnap/tracker.c:44:6: warning: no previous prototype for 'tracker_free' [-Wmissing-prototypes]
-      44 | void tracker_free(struct tracker *tracker)
-         |      ^~~~~~~~~~~~
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-vim +/diff_buffer_free +10 drivers/block/blksnap/diff_buffer.c
-
-9377564e255bc9 Sergei Shtepa 2022-06-13   9  
-9377564e255bc9 Sergei Shtepa 2022-06-13 @10  void diff_buffer_free(struct diff_buffer *diff_buffer)
-9377564e255bc9 Sergei Shtepa 2022-06-13  11  {
-9377564e255bc9 Sergei Shtepa 2022-06-13  12  	size_t inx = 0;
-9377564e255bc9 Sergei Shtepa 2022-06-13  13  	struct page *page;
-9377564e255bc9 Sergei Shtepa 2022-06-13  14  
-9377564e255bc9 Sergei Shtepa 2022-06-13  15  	if (unlikely(!diff_buffer))
-9377564e255bc9 Sergei Shtepa 2022-06-13  16  		return;
-9377564e255bc9 Sergei Shtepa 2022-06-13  17  
-9377564e255bc9 Sergei Shtepa 2022-06-13  18  	for (inx = 0; inx < diff_buffer->page_count; inx++) {
-9377564e255bc9 Sergei Shtepa 2022-06-13  19  		page = diff_buffer->pages[inx];
-9377564e255bc9 Sergei Shtepa 2022-06-13  20  		if (page) {
-9377564e255bc9 Sergei Shtepa 2022-06-13  21  			__free_page(page);
-9377564e255bc9 Sergei Shtepa 2022-06-13  22  #ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-9377564e255bc9 Sergei Shtepa 2022-06-13  23  			memory_object_dec(memory_object_page);
-9377564e255bc9 Sergei Shtepa 2022-06-13  24  #endif
-9377564e255bc9 Sergei Shtepa 2022-06-13  25  		}
-9377564e255bc9 Sergei Shtepa 2022-06-13  26  	}
-9377564e255bc9 Sergei Shtepa 2022-06-13  27  
-9377564e255bc9 Sergei Shtepa 2022-06-13  28  	kfree(diff_buffer);
-9377564e255bc9 Sergei Shtepa 2022-06-13  29  #ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-9377564e255bc9 Sergei Shtepa 2022-06-13  30  	memory_object_dec(memory_object_diff_buffer);
-9377564e255bc9 Sergei Shtepa 2022-06-13  31  #endif
-9377564e255bc9 Sergei Shtepa 2022-06-13  32  }
-9377564e255bc9 Sergei Shtepa 2022-06-13  33  
-9377564e255bc9 Sergei Shtepa 2022-06-13 @34  struct diff_buffer *diff_buffer_new(size_t page_count, size_t buffer_size,
-9377564e255bc9 Sergei Shtepa 2022-06-13  35  				    gfp_t gfp_mask)
-9377564e255bc9 Sergei Shtepa 2022-06-13  36  {
-9377564e255bc9 Sergei Shtepa 2022-06-13  37  	struct diff_buffer *diff_buffer;
-9377564e255bc9 Sergei Shtepa 2022-06-13  38  	size_t inx = 0;
-9377564e255bc9 Sergei Shtepa 2022-06-13  39  	struct page *page;
-9377564e255bc9 Sergei Shtepa 2022-06-13  40  
-9377564e255bc9 Sergei Shtepa 2022-06-13  41  	if (unlikely(page_count <= 0))
-9377564e255bc9 Sergei Shtepa 2022-06-13  42  		return NULL;
-9377564e255bc9 Sergei Shtepa 2022-06-13  43  
-9377564e255bc9 Sergei Shtepa 2022-06-13  44  	/*
-9377564e255bc9 Sergei Shtepa 2022-06-13  45  	 * In case of overflow, it is better to get a null pointer
-9377564e255bc9 Sergei Shtepa 2022-06-13  46  	 * than a pointer to some memory area. Therefore + 1.
-9377564e255bc9 Sergei Shtepa 2022-06-13  47  	 */
-9377564e255bc9 Sergei Shtepa 2022-06-13  48  	diff_buffer = kzalloc(sizeof(struct diff_buffer) +
-9377564e255bc9 Sergei Shtepa 2022-06-13  49  				      (page_count + 1) * sizeof(struct page *),
-9377564e255bc9 Sergei Shtepa 2022-06-13  50  			      gfp_mask);
-9377564e255bc9 Sergei Shtepa 2022-06-13  51  	if (!diff_buffer)
-9377564e255bc9 Sergei Shtepa 2022-06-13  52  		return NULL;
-9377564e255bc9 Sergei Shtepa 2022-06-13  53  #ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-9377564e255bc9 Sergei Shtepa 2022-06-13  54  	memory_object_inc(memory_object_diff_buffer);
-9377564e255bc9 Sergei Shtepa 2022-06-13  55  #endif
-9377564e255bc9 Sergei Shtepa 2022-06-13  56  	INIT_LIST_HEAD(&diff_buffer->link);
-9377564e255bc9 Sergei Shtepa 2022-06-13  57  	diff_buffer->size = buffer_size;
-9377564e255bc9 Sergei Shtepa 2022-06-13  58  	diff_buffer->page_count = page_count;
-9377564e255bc9 Sergei Shtepa 2022-06-13  59  
-9377564e255bc9 Sergei Shtepa 2022-06-13  60  	for (inx = 0; inx < page_count; inx++) {
-9377564e255bc9 Sergei Shtepa 2022-06-13  61  		page = alloc_page(gfp_mask);
-9377564e255bc9 Sergei Shtepa 2022-06-13  62  		if (!page)
-9377564e255bc9 Sergei Shtepa 2022-06-13  63  			goto fail;
-9377564e255bc9 Sergei Shtepa 2022-06-13  64  #ifdef CONFIG_BLK_SNAP_DEBUG_MEMORY_LEAK
-9377564e255bc9 Sergei Shtepa 2022-06-13  65  		memory_object_inc(memory_object_page);
-9377564e255bc9 Sergei Shtepa 2022-06-13  66  #endif
-9377564e255bc9 Sergei Shtepa 2022-06-13  67  		diff_buffer->pages[inx] = page;
-9377564e255bc9 Sergei Shtepa 2022-06-13  68  	}
-9377564e255bc9 Sergei Shtepa 2022-06-13  69  	return diff_buffer;
-9377564e255bc9 Sergei Shtepa 2022-06-13  70  fail:
-9377564e255bc9 Sergei Shtepa 2022-06-13  71  	diff_buffer_free(diff_buffer);
-9377564e255bc9 Sergei Shtepa 2022-06-13  72  	return NULL;
-9377564e255bc9 Sergei Shtepa 2022-06-13  73  }
-9377564e255bc9 Sergei Shtepa 2022-06-13  74  
-
--- 
-0-DAY CI Kernel Test Service
-https://01.org/lkp
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
