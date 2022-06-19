@@ -2,79 +2,141 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFFEAC433EF
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jun 2022 22:21:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F877C43334
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jun 2022 23:29:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229988AbiFSWVn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jun 2022 18:21:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47384 "EHLO
+        id S229530AbiFSX3E (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jun 2022 19:29:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229530AbiFSWVm (ORCPT
+        with ESMTP id S231928AbiFSX3D (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jun 2022 18:21:42 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976546553
-        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 15:21:41 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id u37so8683276pfg.3
-        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 15:21:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=SCkPLyWzPu3GSvcUyrR0u67FRmIwGtikYd36/6LZ4cg=;
-        b=2jfrdaEQDfkoYhFsjtbqVugmsuj46dGuoGQ33JrbsXktuQDOlzHoXYAcSAncRY2mLI
-         xDJWWebEx4/hMo9gVKmXcB76bmHcgUwdZoucLjuygcd8LgcvbxvOoQW+Qbbhfs5por8T
-         Gefdzyl05kciDR/7Zs+OfvWHAN2YOtBjJe/vlbUwCvN5IO14GwDhKPLikVAQ9xz6ST7M
-         d2svktb+vH/6yNoJ2l2zj5ehU5eXDvQ/n0/UNUyP5Htv2kPpSCigumPPxou+R98h3RwV
-         CzLI0AdzXiPxuzX0E3R3lFpqNYb/nFp8CQLcqWWh0XEEu4q5yubqeXkguHHcX/H4T16E
-         0GbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=SCkPLyWzPu3GSvcUyrR0u67FRmIwGtikYd36/6LZ4cg=;
-        b=RrK9+MUsl0gkmruHAzZBXRHWkcewbOH4iFDCdYYBrAn0ThyA/B3Rx7ENR1z05/z+V2
-         CToLQVBljQpqtEY2/1LVdDHqwYKX/TElV8lB4qTRgLvjXbpOAs4a76GDFLIpPRFxeHEv
-         NdSWFnKUVUuPiPNe3XErFh+VdaaOYxT7nVjZgopQw47bChRw7aZ3krORDR0C45v+IgQ2
-         8BpkhwaUknTJA3a61kKte813L1nVJTLM5J/oKOu8RRs9WXQTIU2/AtnOvgTK5SEyHKzW
-         I1Nstq9v8jCHr4msrOzZY/pPexXSxHC9pukswynA+WTUptiTAfR3yGp9MibKNgYEI0n1
-         z7Aw==
-X-Gm-Message-State: AJIora9Cgx6ZnwV/WRA1YCMOEQ6vUuTafJmxll3PrMHh0rbXHReedxsJ
-        64Zz3NnWneA/PbPzdeTqjVmfoA==
-X-Google-Smtp-Source: AGRyM1sU2VYh8ZbbEM/7rLEDTZR9yIjrSRCWy3Jv80w2QIR2LAu6CWUEtFIWcU+Bn1kmYy144XJu4A==
-X-Received: by 2002:aa7:842b:0:b0:525:1e94:4de1 with SMTP id q11-20020aa7842b000000b005251e944de1mr4073710pfn.36.1655677300868;
-        Sun, 19 Jun 2022 15:21:40 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id g15-20020a63b14f000000b003fd3737f167sm7506682pgp.19.2022.06.19.15.21.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 19 Jun 2022 15:21:40 -0700 (PDT)
-Message-ID: <67dd8d1c-658c-8833-9630-79ade736b348@kernel.dk>
-Date:   Sun, 19 Jun 2022 16:21:39 -0600
+        Sun, 19 Jun 2022 19:29:03 -0400
+Received: from esa2.hgst.iphmx.com (esa2.hgst.iphmx.com [68.232.143.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCAA64E8
+        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 16:29:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655681343; x=1687217343;
+  h=message-id:date:mime-version:subject:from:to:references:
+   in-reply-to:content-transfer-encoding;
+  bh=R77Z1INZbgegEybw3H9mfdkXN5pI6YjTvkHpvWXBTVc=;
+  b=XOty2/6GhV8/4fAbVdew5JJFPIhVyJx4Acprzs26j2G+tjyMuXDuupCb
+   xCCRLl1c/w+JqzMnPszFihK+0N9iuZAw6BBnxcVt6sdfDb4E6yMQvTgcv
+   1jNQUfE0u4S8IQNy3TgImV+XdXh6v+q4UUKNpOa4ZI8kVE4Lu8nqxuaYN
+   Nbb8AHy8Jesu8Pe36Ps2atqgAH1LRhne4iPAoRNPNGImQHyz7SmI4KMKR
+   SSXr/1Qw/STv+DVpeJZB7g9lDo6RZtyffRqkFnhp5iT1V8DT7tX4Uztjv
+   J0Q6v6cRxB/W5CY7viCnyslVDPQGlNzFIRfZGqBz+4wnacOhTGZLPm7iH
+   A==;
+X-IronPort-AV: E=Sophos;i="5.92,306,1650902400"; 
+   d="scan'208";a="307888062"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 20 Jun 2022 07:29:02 +0800
+IronPort-SDR: cp1a9WghzJ9BNDIDjTomOXlFB1OtSLSmjNvZLFWnFz5vs3MMM81Tf9pZ2GowT/+8e+Sg2KZqmO
+ acLErEgDbSEgVwwg0Zv5BMLABUPxG0suR7Zt8jnmJrH9i8YpU6aCKbk63gTgrvrNewW3x/wekz
+ 7iNvhxey85k6Wvia6ScuB96y2frxMCpSsWK8u0Orn50W5qUWYWhaDhLH/+8vAw6NpSzDZik2kq
+ zXeUtZLVwkvJRXNRTC51xT2opPmuJPm2+fCQ4edL+4tCyinJ8u7UJn60GM94XZH6p6JgZA6/D7
+ Zd+PEN69v1cgrVpUPuj1gAQv
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jun 2022 15:51:34 -0700
+IronPort-SDR: +xbI54FSXw+yd/ii38ZbaZBaRz9VlE4mj+UA/GcDPQZPu0+m2yQfNaajJ4Qp1CEdyESfcY3g2p
+ L34NstDrS3WAJyVNZjAQh0GCZtGPS6PWBIBul9VtSViQr4gw7dXop6BqmhJrcpL+ZvfYgi+3d/
+ o1WF4kwQl8kFCQvH+j6xKgr+dVdh1HtIFxWi3MriN6j9ttGPGnm7mX9ja+qIDQoEfRUaT1BbLn
+ ZeR8xzxytQ8D3g0QkzxBngZG4xaJXkXn8/YjQQgfmMe3C40o3ljICbuE1eclKieEnuJ+aH018n
+ qr0=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Jun 2022 16:29:02 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LR89p3Gryz1Rwrw
+        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 16:29:02 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:references:to:from:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1655681342; x=1658273343; bh=R77Z1INZbgegEybw3H9mfdkXN5pI6YjTvkH
+        pvWXBTVc=; b=sLkMVGVkTbFwkYvlwPE5IySgpcqpoKaOqgWAiwusIH/8dAhPTyo
+        CQ3Rq8hH/ymofKm+33wmMUYJlAsM9gQkR0MNkPgXfvq7ZO8ff1TyiRWlSYN3J0Tn
+        UOXaNnpzzTkcogslewGh/R0eX5Ogp9FtfsRbYIl+HiUSdk8qiLEMtrFs2tXq/4KR
+        VuKm/5fEjzz5DptFvoED0eNTPN3ht4r/doJJEE5IDrCWfR5pnHn4vuwT911YLC2U
+        pU1a6lX+5m9cf8UGK2NRlK4N+BFeQvOr7qCM0nM581zskaafG1MI2BC4pjPc0Nfv
+        WYK0S0KHgOaUscp90G5XAphfRJqC9Zmc+cA==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id ZbUbMUAwHDcf for <linux-block@vger.kernel.org>;
+        Sun, 19 Jun 2022 16:29:02 -0700 (PDT)
+Received: from [10.225.163.87] (unknown [10.225.163.87])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LR89n35fZz1Rvlc;
+        Sun, 19 Jun 2022 16:29:01 -0700 (PDT)
+Message-ID: <3680d9fd-7543-7eba-6da4-04b92e49a45d@opensource.wdc.com>
+Date:   Mon, 20 Jun 2022 08:29:00 +0900
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: fully tear down the queue in del_gendisk
+Subject: Re: [PATCH] block: remove queue from struct
+ blk_independent_access_range
 Content-Language: en-US
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
-References: <20220619060552.1850436-1-hch@lst.de>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220619060552.1850436-1-hch@lst.de>
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
+References: <20220603053529.76405-1-damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
+In-Reply-To: <20220603053529.76405-1-damien.lemoal@opensource.wdc.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/19/22 12:05 AM, Christoph Hellwig wrote:
-> Note that while intended or 5.20, this series is generated against the
-> block-5.19 branch as that contains fixes in this area that haven't
-> made it to the for-5.10/block branch yet.
+On 6/3/22 14:35, Damien Le Moal wrote:
+> The request queue pointer in struct blk_independent_access_range is
+> unused. Remove it.
+> 
+> Signed-off-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-Side note - I rebased on -rc3 anyway because of the series that went
-into -rc2, so we should be fine there.
+Jens,
+
+Ping ?
+
+This now can have also:
+
+Fixes: 41e46b3c2aa2 ("block: Fix potential deadlock in
+blk_ia_range_sysfs_show()")
+
+> ---
+>  block/blk-ia-ranges.c  | 1 -
+>  include/linux/blkdev.h | 1 -
+>  2 files changed, 2 deletions(-)
+> 
+> diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
+> index 56ed48d2954e..47c89e65b57f 100644
+> --- a/block/blk-ia-ranges.c
+> +++ b/block/blk-ia-ranges.c
+> @@ -144,7 +144,6 @@ int disk_register_independent_access_ranges(struct gendisk *disk,
+>  	}
+>  
+>  	for (i = 0; i < iars->nr_ia_ranges; i++) {
+> -		iars->ia_range[i].queue = q;
+>  		ret = kobject_init_and_add(&iars->ia_range[i].kobj,
+>  					   &blk_ia_range_ktype, &iars->kobj,
+>  					   "%d", i);
+> diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+> index 1b24c1fb3bb1..62633619146e 100644
+> --- a/include/linux/blkdev.h
+> +++ b/include/linux/blkdev.h
+> @@ -341,7 +341,6 @@ static inline int blkdev_zone_mgmt_ioctl(struct block_device *bdev,
+>   */
+>  struct blk_independent_access_range {
+>  	struct kobject		kobj;
+> -	struct request_queue	*queue;
+>  	sector_t		sector;
+>  	sector_t		nr_sectors;
+>  };
+
 
 -- 
-Jens Axboe
-
+Damien Le Moal
+Western Digital Research
