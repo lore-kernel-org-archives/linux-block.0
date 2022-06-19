@@ -2,116 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A13FC43334
-	for <linux-block@archiver.kernel.org>; Sun, 19 Jun 2022 03:40:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1686DC433EF
+	for <linux-block@archiver.kernel.org>; Sun, 19 Jun 2022 06:06:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232040AbiFSDkd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 18 Jun 2022 23:40:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35702 "EHLO
+        id S233825AbiFSGGB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jun 2022 02:06:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230478AbiFSDkb (ORCPT
+        with ESMTP id S229611AbiFSGGA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 18 Jun 2022 23:40:31 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08C6CEE0A;
-        Sat, 18 Jun 2022 20:40:31 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id hv24-20020a17090ae41800b001e33eebdb5dso9869151pjb.0;
-        Sat, 18 Jun 2022 20:40:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:subject:message-id:mime-version:content-disposition;
-        bh=7+Qdxse151+cFPW4HdyqfeqoEPdOV150o5zOZtbT5P0=;
-        b=UOGu8v1EaOqoKCKuU1V8GJcSf3HppPzeKIv0nQL//sy926Gs8yaT1Kr2Y86+un78WT
-         QOlzLNpCeXQuOQQVku7mlb+u6XR/PyLy9JtDT7heQFhWBY6ExqOvUcYls70R0VLZ/5gs
-         yz4OWZdqRRA7u2mr+BXpSTt2XUqG79ZxsQOC1J90+HJeDzVua+LjMqrV2fUoqlxO5NEN
-         QIZyqcOz+t1Lr9d8yUlaeJbZ2/Ubh3J5UkAfmFo5rDVEOsCm5syFMTDE2pGfQ6OGi5ok
-         jWC/xgU+uN+lecVUIc/n5dYGCvP6IfDcZ8UBF2tDCEWaGc4UlnibEWZFRdGWhVuAoYUH
-         D/aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
-         :content-disposition;
-        bh=7+Qdxse151+cFPW4HdyqfeqoEPdOV150o5zOZtbT5P0=;
-        b=ZKR2g0lUssZNxcKJAp4e8D9hNN0gfwIKMtwsmtR9mgPOKTqljlDu8qPXTJYog9lcEj
-         2N2GUDZSw25/j6Ox6UZXktSiO21U5/3Z89aZyNS2eSb8N6xQliN5hFkCRKKj0/xb2uyF
-         s+1CXE9xwIBqvxdkyRdrkcBr/4QS4APbEQMaEVLEDXQyd+7PyG51/DZIjkvsIu8pR8I/
-         AD4dmk8ddslRVHTW/YqFI7ey9ETVXDTO9/tHYsOq5fXx32WxdDLRCK4EDOAD5sKI67+q
-         4WVPbGSJogL/I73MjpAcDRCGdo1JTZXs2iL/y7kr24qXIKsHERYmukyfyqOKvFJOfnHD
-         I8Cg==
-X-Gm-Message-State: AJIora99wlZ1oksuw52G6HlYGcIYKsa794BbiAafqtD0aNbTVab4QQAw
-        uaUjtgCokazLjQkR9X4U1ER1vj6Utm5NGQ==
-X-Google-Smtp-Source: AGRyM1urMB7lo5JMS9xPfIi7KPeDm53GPYYNB3uOWzfW+rXV1Ke7TY6ugEnS5kAPqqalvFwmok2bQQ==
-X-Received: by 2002:a17:90a:5b0d:b0:1ea:d1ed:186e with SMTP id o13-20020a17090a5b0d00b001ead1ed186emr19210449pji.240.1655610030426;
-        Sat, 18 Jun 2022 20:40:30 -0700 (PDT)
-Received: from ubuntu ([175.124.254.119])
-        by smtp.gmail.com with ESMTPSA id v5-20020a63b945000000b003fadd680908sm6375694pgo.83.2022.06.18.20.40.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 18 Jun 2022 20:40:29 -0700 (PDT)
-Date:   Sat, 18 Jun 2022 20:40:26 -0700
-From:   Hyunwoo Kim <imv4bel@gmail.com>
-To:     tim@cyberelk.net, axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] paride: Fixed integer overflow in pt_read and pt_write
-Message-ID: <20220619034026.GA660729@ubuntu>
+        Sun, 19 Jun 2022 02:06:00 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F7CEE2D
+        for <linux-block@vger.kernel.org>; Sat, 18 Jun 2022 23:05:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
+        Content-ID:Content-Description:In-Reply-To:References;
+        bh=SYm7AAAHqkZ81PJH0TfzCDI3HgiEpXhOftqxUNCgyDU=; b=JSF18Ycy7a56lS01rCjlfvh30r
+        EilZPNSVyh4+t+A/4S8ydfkjtt4LLTP9sdzcDiHjzBXifIYvEI5d8RRfAqESvL+uVwKxjTcuOYDIG
+        MrH3G2qLCJT+3ZXlzwvCJmQUiGWgToHfzRoiWoM5utkGoSgOwH02SX9dpflXZDDPsocrf06yMAOCM
+        v7fFI9kBp5eYHoMK/A95ZbNUhi9aBhqNQHGwPqBl7W9PK7rCZx95YMtg+Stx22phwE5YV+DI2KVdk
+        934M6gJnAOe8s/zZuLtnkFRoI5sGJ0s0TVto8lhIlgN5PJb7LqR3HeB2/sndgqgml4gOoa/mX3A76
+        9khhoxZA==;
+Received: from [2001:4bb8:189:7251:513c:d533:c6f1:1e56] (helo=localhost)
+        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o2o4J-00DJla-Da; Sun, 19 Jun 2022 06:05:55 +0000
+From:   Christoph Hellwig <hch@lst.de>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+Subject: fully tear down the queue in del_gendisk
+Date:   Sun, 19 Jun 2022 08:05:46 +0200
+Message-Id: <20220619060552.1850436-1-hch@lst.de>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-In pt_read() and pt_write(), the "size_t count" variable is
-assigned to the "int n" variable and then size check is performed.
+Hi Jens,
 
-static ssize_t pt_write(struct file *filp, const char __user *buf, size_t count, loff_t * ppos)
-{
-	...
-        int k, n, r, p, s, t, b;
+this series simplifies teardown for most block drivers.  Right now they
+also have to call blk_cleanup_queue after calling del_gendisk, making
+the teardown process rather confusing.
 
-	...
+Instead this series records if the request_queue is owned by the gendisk,
+which is always the case except for scsi and dasd or queues without a
+gendisk at all, and then does the entire teardown in del_gendisk.
 
-        while (count > 0) {
+Note that while intended or 5.20, this series is generated against the
+block-5.19 branch as that contains fixes in this area that haven't
+made it to the for-5.10/block branch yet.
 
-                if (!pt_poll_dsc(tape, HZ / 100, PT_TMO, "write"))
-                        return -EIO;
-
-                n = count;
-                if (n > 32768)
-                        n = 32768;      /* max per command */
-
-If the user passes the SIZE_MAX value to the "count" variable,
-the "n" value is greater than 32768, but it becomes a negative
-number and passes the size check.
-In other words, we need to add a negative check as well,
-since the size check makes no sense.
-
-Signed-off-by: Hyunwoo Kim <imv4bel@gmail.com>
----
- drivers/block/paride/pt.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/block/paride/pt.c b/drivers/block/paride/pt.c
-index e815312a00ad..f37aa1349622 100644
---- a/drivers/block/paride/pt.c
-+++ b/drivers/block/paride/pt.c
-@@ -787,7 +787,7 @@ static ssize_t pt_read(struct file *filp, char __user *buf, size_t count, loff_t
- 			return -EIO;
- 
- 		n = count;
--		if (n > 32768)
-+		if (n > 32768 || n < 0)
- 			n = 32768;	/* max per command */
- 		b = (n - 1 + tape->bs) / tape->bs;
- 		n = b * tape->bs;	/* rounded up to even block */
-@@ -888,7 +888,7 @@ static ssize_t pt_write(struct file *filp, const char __user *buf, size_t count,
- 			return -EIO;
- 
- 		n = count;
--		if (n > 32768)
-+		if (n > 32768 || n < 0)
- 			n = 32768;	/* max per command */
- 		b = (n - 1 + tape->bs) / tape->bs;
- 		n = b * tape->bs;	/* rounded up to even block */
--- 
-2.25.1
-
+Diffstat:
+ arch/m68k/emu/nfblock.c             |    4 
+ arch/um/drivers/ubd_kern.c          |    4 
+ arch/xtensa/platforms/iss/simdisk.c |    4 
+ block/blk-core.c                    |   43 -----
+ block/blk-mq-debugfs.c              |    8 
+ block/blk-mq.c                      |   43 ++++-
+ block/blk-sysfs.c                   |    5 
+ block/blk.h                         |    3 
+ block/bsg-lib.c                     |    4 
+ block/genhd.c                       |   38 +---
+ drivers/block/amiflop.c             |    2 
+ drivers/block/aoe/aoeblk.c          |    2 
+ drivers/block/aoe/aoedev.c          |    2 
+ drivers/block/ataflop.c             |    5 
+ drivers/block/brd.c                 |    4 
+ drivers/block/drbd/drbd_main.c      |    4 
+ drivers/block/floppy.c              |    6 
+ drivers/block/loop.c                |    3 
+ drivers/block/mtip32xx/mtip32xx.c   |  298 +++++-------------------------------
+ drivers/block/mtip32xx/mtip32xx.h   |    5 
+ drivers/block/n64cart.c             |    2 
+ drivers/block/nbd.c                 |    4 
+ drivers/block/null_blk/main.c       |    4 
+ drivers/block/paride/pcd.c          |    4 
+ drivers/block/paride/pd.c           |    4 
+ drivers/block/paride/pf.c           |    4 
+ drivers/block/pktcdvd.c             |    4 
+ drivers/block/ps3disk.c             |    4 
+ drivers/block/ps3vram.c             |    4 
+ drivers/block/rbd.c                 |    2 
+ drivers/block/rnbd/rnbd-clt.c       |    6 
+ drivers/block/sunvdc.c              |    4 
+ drivers/block/swim.c                |    2 
+ drivers/block/swim3.c               |    2 
+ drivers/block/sx8.c                 |    6 
+ drivers/block/virtio_blk.c          |    3 
+ drivers/block/xen-blkfront.c        |    4 
+ drivers/block/z2ram.c               |    3 
+ drivers/block/zram/zram_drv.c       |    4 
+ drivers/cdrom/gdrom.c               |    3 
+ drivers/md/bcache/super.c           |    2 
+ drivers/md/dm.c                     |    2 
+ drivers/md/md.c                     |    4 
+ drivers/memstick/core/ms_block.c    |    3 
+ drivers/memstick/core/mspro_block.c |    3 
+ drivers/mmc/core/block.c            |    1 
+ drivers/mmc/core/queue.c            |    1 
+ drivers/mtd/mtd_blkdevs.c           |    4 
+ drivers/mtd/ubi/block.c             |    4 
+ drivers/nvdimm/btt.c                |    4 
+ drivers/nvdimm/pmem.c               |    4 
+ drivers/nvme/host/apple.c           |    2 
+ drivers/nvme/host/core.c            |    3 
+ drivers/nvme/host/fc.c              |   12 -
+ drivers/nvme/host/multipath.c       |    2 
+ drivers/nvme/host/pci.c             |    2 
+ drivers/nvme/host/rdma.c            |   12 -
+ drivers/nvme/host/tcp.c             |   12 -
+ drivers/nvme/target/loop.c          |   12 -
+ drivers/s390/block/dasd.c           |    2 
+ drivers/s390/block/dasd_genhd.c     |    4 
+ drivers/s390/block/dcssblk.c        |    8 
+ drivers/s390/block/scm_blk.c        |    4 
+ drivers/scsi/scsi_lib.c             |    6 
+ drivers/scsi/scsi_sysfs.c           |    2 
+ drivers/scsi/sd.c                   |    4 
+ drivers/scsi/sr.c                   |    4 
+ drivers/ufs/core/ufshcd.c           |    4 
+ include/linux/blk-mq.h              |    3 
+ include/linux/blkdev.h              |    7 
+ 70 files changed, 225 insertions(+), 472 deletions(-)
