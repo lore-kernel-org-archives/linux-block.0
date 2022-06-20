@@ -2,44 +2,46 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24E97C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 06:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55658C43334
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 06:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238429AbiFTGAU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 02:00:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37116 "EHLO
+        id S235507AbiFTGJy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 02:09:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42648 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238444AbiFTGAR (ORCPT
+        with ESMTP id S232762AbiFTGJw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 02:00:17 -0400
+        Mon, 20 Jun 2022 02:09:52 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32773DFA0;
-        Sun, 19 Jun 2022 23:00:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C9A0BCAE
+        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 23:09:51 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 53BA468BEB; Mon, 20 Jun 2022 08:00:12 +0200 (CEST)
-Date:   Mon, 20 Jun 2022 08:00:11 +0200
+        id DEEA06732D; Mon, 20 Jun 2022 08:09:48 +0200 (CEST)
+Date:   Mon, 20 Jun 2022 08:09:48 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        bvanassche@acm.org, hch@lst.de, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hare@suse.de, satishkh@cisco.com,
-        sebaddel@cisco.com, kartilak@cisco.com, linux-rdma@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        mpi3mr-linuxdrv.pdl@broadcom.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org
-Subject: Re: [PATCH 5/5] blk-mq: Drop 'reserved' member of busy_tag_iter_fn
-Message-ID: <20220620060011.GD10192@lst.de>
-References: <1655463320-241202-1-git-send-email-john.garry@huawei.com> <1655463320-241202-6-git-send-email-john.garry@huawei.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org
+Subject: Re: fully tear down the queue in del_gendisk
+Message-ID: <20220620060948.GA10485@lst.de>
+References: <20220619060552.1850436-1-hch@lst.de> <67dd8d1c-658c-8833-9630-79ade736b348@kernel.dk>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1655463320-241202-6-git-send-email-john.garry@huawei.com>
+In-Reply-To: <67dd8d1c-658c-8833-9630-79ade736b348@kernel.dk>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Sun, Jun 19, 2022 at 04:21:39PM -0600, Jens Axboe wrote:
+> On 6/19/22 12:05 AM, Christoph Hellwig wrote:
+> > Note that while intended or 5.20, this series is generated against the
+> > block-5.19 branch as that contains fixes in this area that haven't
+> > made it to the for-5.10/block branch yet.
+> 
+> Side note - I rebased on -rc3 anyway because of the series that went
+> into -rc2, so we should be fine there.
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+It depends on elevator/debugfs teardown series that has not made it
+into -rc3.
