@@ -2,36 +2,36 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C331C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 03:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A070C43334
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 03:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237816AbiFTDuL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 19 Jun 2022 23:50:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40738 "EHLO
+        id S237556AbiFTDuO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 19 Jun 2022 23:50:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40816 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237556AbiFTDuJ (ORCPT
+        with ESMTP id S238142AbiFTDuM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 19 Jun 2022 23:50:09 -0400
-Received: from out0.migadu.com (out0.migadu.com [IPv6:2001:41d0:2:267::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C15260D5
-        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 20:50:08 -0700 (PDT)
+        Sun, 19 Jun 2022 23:50:12 -0400
+Received: from out0.migadu.com (out0.migadu.com [94.23.1.103])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EA8BE36
+        for <linux-block@vger.kernel.org>; Sun, 19 Jun 2022 20:50:11 -0700 (PDT)
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-        t=1655697007;
+        t=1655697010;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=NSvZ1x3ZVz8afg9wrnyoQ7JqW9Pkom0vDzE0WuJYBPM=;
-        b=GWE98LsAiyIgNvIHOvmpFg8LXvsNkSFDBWFXTM93jRlNGwz4jUB8eaAtV+B7F8qyI+LS7z
-        ZHGJkQdyGViR4EfN0dO1Vz1y0h4IUngIbzK+sKnFUQalQ0jwYirTbsrivqC3jx3GSsNkA1
-        iPfI3Iya5s9SZQ+mDUnysCTOH61vS4E=
+        bh=W8fE92pEPHab89y5DccrXQ5VRHM8DKZv1pMAZbSNu6A=;
+        b=Xg74ADFn9VFkSqBvOacr7BdRwhXredO7hgHJLZyrskzcziTLPl6sQtKWxuUoURms3KgpDI
+        WP3wTIyLP0Vt72TCysNbaIVE/h3bhvWTbkDh8G95Z5IsoTA2DUd5ZrlVLC5ynL1t6EFFbT
+        Wj3Ue2Qj3DeXShJti7qPWiwgrCsuZr4=
 From:   Guoqing Jiang <guoqing.jiang@linux.dev>
 To:     haris.iqbal@ionos.com, jinpu.wang@ionos.com, axboe@kernel.dk
 Cc:     linux-block@vger.kernel.org
-Subject: [RFC PATCH 5/6] rnbd-clt: adjust the layout of struct rnbd_clt_dev
-Date:   Mon, 20 Jun 2022 11:49:22 +0800
-Message-Id: <20220620034923.35633-6-guoqing.jiang@linux.dev>
+Subject: [RFC PATCH 6/6] rnbd-clt: refactor rnbd_clt_change_capacity
+Date:   Mon, 20 Jun 2022 11:49:23 +0800
+Message-Id: <20220620034923.35633-7-guoqing.jiang@linux.dev>
 In-Reply-To: <20220620034923.35633-1-guoqing.jiang@linux.dev>
 References: <20220620034923.35633-1-guoqing.jiang@linux.dev>
 MIME-Version: 1.0
@@ -42,52 +42,106 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-While at it, let re-arrange the struct to remove holes.
+1. process_msg_open_rsp checks if capacity changed or not before call
+rnbd_clt_change_capacity while the checking also make sense for
+rnbd_clt_resize_dev_store, let's move the checking into the function.
 
-Before, pahole reports
+2. change the parameter type to 'sector_t' then we don't need to cast
+it from rnbd_clt_resize_dev_store, and update rnbd_clt_resize_disk too.
 
-	/* size: 232, cachelines: 4, members: 17 */
-	/* sum members: 224, holes: 2, sum holes: 8 */
-	/* last cacheline: 40 bytes */
-
-After the change, the report changes to
-
-	/* size: 224, cachelines: 4, members: 17 */
-	/* last cacheline: 32 bytes */
+3. no need to checking the return value, make it return void.
 
 Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 ---
- drivers/block/rnbd/rnbd-clt.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/block/rnbd/rnbd-clt-sysfs.c |  2 +-
+ drivers/block/rnbd/rnbd-clt.c       | 24 ++++++++++++------------
+ drivers/block/rnbd/rnbd-clt.h       |  2 +-
+ 3 files changed, 14 insertions(+), 14 deletions(-)
 
+diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+index 2be5d87a3ca6..e7c7d9a68168 100644
+--- a/drivers/block/rnbd/rnbd-clt-sysfs.c
++++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+@@ -376,7 +376,7 @@ static ssize_t rnbd_clt_resize_dev_store(struct kobject *kobj,
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = rnbd_clt_resize_disk(dev, (size_t)sectors);
++	ret = rnbd_clt_resize_disk(dev, sectors);
+ 	if (ret)
+ 		return ret;
+ 
+diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+index 2c63cd5ac09d..6c6c4ba3d41d 100644
+--- a/drivers/block/rnbd/rnbd-clt.c
++++ b/drivers/block/rnbd/rnbd-clt.c
+@@ -68,13 +68,18 @@ static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
+ 	return refcount_inc_not_zero(&dev->refcount);
+ }
+ 
+-static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+-				    size_t new_nsectors)
++static void rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
++				     sector_t new_nsectors)
+ {
+-	rnbd_clt_info(dev, "Device size changed from %llu to %zu sectors\n",
++	if (get_capacity(dev->gd) != new_nsectors)
++		return;
++
++	/*
++	 * If the size changed, we need to revalidate it
++	 */
++	rnbd_clt_info(dev, "Device size changed from %llu to %llu sectors\n",
+ 		      get_capacity(dev->gd), new_nsectors);
+ 	set_capacity_and_notify(dev->gd, new_nsectors);
+-	return 0;
+ }
+ 
+ static int process_msg_open_rsp(struct rnbd_clt_dev *dev,
+@@ -93,12 +98,7 @@ static int process_msg_open_rsp(struct rnbd_clt_dev *dev,
+ 	if (dev->dev_state == DEV_STATE_MAPPED_DISCONNECTED) {
+ 		u64 nsectors = le64_to_cpu(rsp->nsectors);
+ 
+-		/*
+-		 * If the device was remapped and the size changed in the
+-		 * meantime we need to revalidate it
+-		 */
+-		if (get_capacity(dev->gd) != nsectors)
+-			rnbd_clt_change_capacity(dev, nsectors);
++		rnbd_clt_change_capacity(dev, nsectors);
+ 		gd_kobj = &disk_to_dev(dev->gd)->kobj;
+ 		kobject_uevent(gd_kobj, KOBJ_ONLINE);
+ 		rnbd_clt_info(dev, "Device online, device remapped successfully\n");
+@@ -116,7 +116,7 @@ static int process_msg_open_rsp(struct rnbd_clt_dev *dev,
+ 	return err;
+ }
+ 
+-int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize)
++int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, sector_t newsize)
+ {
+ 	int ret = 0;
+ 
+@@ -126,7 +126,7 @@ int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize)
+ 		ret = -ENOENT;
+ 		goto out;
+ 	}
+-	ret = rnbd_clt_change_capacity(dev, newsize);
++	rnbd_clt_change_capacity(dev, newsize);
+ 
+ out:
+ 	mutex_unlock(&dev->lock);
 diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-index 7520272541b1..df237d2ea0d9 100644
+index df237d2ea0d9..a48e040abe63 100644
 --- a/drivers/block/rnbd/rnbd-clt.h
 +++ b/drivers/block/rnbd/rnbd-clt.h
-@@ -106,6 +106,7 @@ struct rnbd_queue {
- };
+@@ -138,7 +138,7 @@ int rnbd_clt_unmap_device(struct rnbd_clt_dev *dev, bool force,
+ 			   const struct attribute *sysfs_self);
  
- struct rnbd_clt_dev {
-+	struct kobject		kobj;
- 	struct rnbd_clt_session	*sess;
- 	struct request_queue	*queue;
- 	struct rnbd_queue	*hw_queues;
-@@ -114,15 +115,14 @@ struct rnbd_clt_dev {
- 	u32			clt_device_id;
- 	struct mutex		lock;
- 	enum rnbd_clt_dev_state	dev_state;
-+	refcount_t		refcount;
- 	char			*pathname;
- 	enum rnbd_access_mode	access_mode;
- 	u32			nr_poll_queues;
- 	u64			size;		/* device size in bytes */
- 	struct list_head        list;
- 	struct gendisk		*gd;
--	struct kobject		kobj;
- 	char			*blk_symlink_name;
--	refcount_t		refcount;
- 	struct work_struct	unmap_on_rmmod_work;
- };
+ int rnbd_clt_remap_device(struct rnbd_clt_dev *dev);
+-int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, size_t newsize);
++int rnbd_clt_resize_disk(struct rnbd_clt_dev *dev, sector_t newsize);
+ 
+ /* rnbd-clt-sysfs.c */
  
 -- 
 2.34.1
