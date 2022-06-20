@@ -2,83 +2,53 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D35C6C433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 07:37:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CF12C43334
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 07:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239017AbiFTHhd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 03:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38010 "EHLO
+        id S239343AbiFTHsc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 03:48:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45074 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231954AbiFTHhc (ORCPT
+        with ESMTP id S239527AbiFTHs3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 03:37:32 -0400
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28E30EE32;
-        Mon, 20 Jun 2022 00:37:31 -0700 (PDT)
-Received: from fraeml708-chm.china.huawei.com (unknown [172.18.147.206])
-        by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4LRLzF1D8vz6H6l9;
-        Mon, 20 Jun 2022 15:35:37 +0800 (CST)
-Received: from lhreml724-chm.china.huawei.com (10.201.108.75) by
- fraeml708-chm.china.huawei.com (10.206.15.36) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Mon, 20 Jun 2022 09:37:28 +0200
-Received: from [10.195.35.72] (10.195.35.72) by lhreml724-chm.china.huawei.com
- (10.201.108.75) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Mon, 20 Jun
- 2022 08:37:26 +0100
-Message-ID: <b033027d-2600-0c7a-a74a-133bda610f2c@huawei.com>
-Date:   Mon, 20 Jun 2022 08:37:25 +0100
+        Mon, 20 Jun 2022 03:48:29 -0400
+Received: from smtp.hosts.co.uk (smtp.hosts.co.uk [85.233.160.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAFC21008;
+        Mon, 20 Jun 2022 00:48:24 -0700 (PDT)
+Received: from host86-158-155-35.range86-158.btcentralplus.com ([86.158.155.35] helo=[192.168.1.218])
+        by smtp.hosts.co.uk with esmtpa (Exim)
+        (envelope-from <antlists@youngman.org.uk>)
+        id 1o3C8z-0005bP-5U;
+        Mon, 20 Jun 2022 08:48:21 +0100
+Message-ID: <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
+Date:   Mon, 20 Jun 2022 08:48:21 +0100
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.6.1
-Subject: Re: [PATCH 1/5] scsi: core: Remove reserved request time-out handling
-To:     Christoph Hellwig <hch@lst.de>
-CC:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
-        <bvanassche@acm.org>, <jejb@linux.ibm.com>,
-        <martin.petersen@oracle.com>, <hare@suse.de>, <satishkh@cisco.com>,
-        <sebaddel@cisco.com>, <kartilak@cisco.com>,
-        <linux-rdma@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <linux-nvme@lists.infradead.org>, <linux-s390@vger.kernel.org>,
-        <linux-scsi@vger.kernel.org>, <mpi3mr-linuxdrv.pdl@broadcom.com>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <nbd@other.debian.org>
-References: <1655463320-241202-1-git-send-email-john.garry@huawei.com>
- <1655463320-241202-2-git-send-email-john.garry@huawei.com>
- <20220620055828.GA10192@lst.de>
-From:   John Garry <john.garry@huawei.com>
-In-Reply-To: <20220620055828.GA10192@lst.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: About the md-bitmap behavior
+Content-Language: en-GB
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>, linux-raid@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
+From:   Wols Lists <antlists@youngman.org.uk>
+In-Reply-To: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.195.35.72]
-X-ClientProxiedBy: lhreml744-chm.china.huawei.com (10.201.108.194) To
- lhreml724-chm.china.huawei.com (10.201.108.75)
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 20/06/2022 06:58, Christoph Hellwig wrote:
-> On Fri, Jun 17, 2022 at 06:55:16PM +0800, John Garry wrote:
->> The SCSI code does not currently support reserved commands. As such,
->> requests which time-out would never be reserved, and scsi_timeout()
->> 'reserved' arg should never be set.
->>
->> Remove handling for reserved requests and drop wrapper scsi_timeout() as
->> it now just calls scsi_times_out() always.
+On 20/06/2022 08:29, Qu Wenruo wrote:
+> Hi,
 > 
-> Please rename scsi_times_out to scsi_timeout so it still matches the
-> method name.
->
+> Recently I'm trying to implement a write-intent bitmap for btrfs to
+> address its write-hole problems for RAID56.
 
-ok, note that some code comments and Documentation reference 
-scsi_times_out() so I will need to fix them up also.
+Is there any reason you want a bit-map? Not a journal?
 
-
-> Otherwise looks good:
-> 
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> 
-> .
+The write-hole has been addressed with journaling already, and this will 
+be adding a new and not-needed feature - not saying it wouldn't be nice 
+to have, but do we need another way to skin this cat?
 
 Cheers,
-John
+Wol
