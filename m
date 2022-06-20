@@ -2,102 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE9FC433EF
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 20:32:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85FF6C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 21:50:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235229AbiFTUci (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 16:32:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35272 "EHLO
+        id S242815AbiFTVuL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 17:50:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234573AbiFTUcg (ORCPT
+        with ESMTP id S241057AbiFTVuK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 16:32:36 -0400
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C25F718395
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 13:32:34 -0700 (PDT)
-Received: by mail-il1-f199.google.com with SMTP id s15-20020a056e02216f00b002d3d5e41565so7985675ilv.10
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 13:32:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=3ml99mZhJ0I2jClELE5maZ4iojISOaF0nhZnt18THYY=;
-        b=rqxy7ZARZN11+anBtKHvVHeptxlKT49FSjPEgnjDas2o2d/14+bf0b5fhOSMugAJ7o
-         mrqnm4svh6UCK/cC/oVp/K8xvBing7hyyYvafmlkiKIDtjLl3g24K5sNyFuYu14LXECK
-         NYxwdEnvNIOGmMS5dcpfYs2trmXk2e2oaD4qeSb1WzBsXqF0+dNHZMPiIyangri75Dwz
-         h0RidokVmbq3Fst1BntRdacwe3kvME/hCHOQ3UTynoVtcyOubEcERed6hiVeTczthuW8
-         HC0uJx91T1NC+M87CEo8e/A7D65/yQ9Qimb/PGDs9Fgpmc08sP7ZFyX2EKb9IYNUwEUW
-         0h0Q==
-X-Gm-Message-State: AJIora9ZbZcfdoaychiB5AGiTNR+X56pt8YEBy9QO7oEqhY/NEQIBfUW
-        hdoshXvGlvVlbOtive/MlG6Y8IakoJQTNlAn+uLHNzaZyQDG
-X-Google-Smtp-Source: AGRyM1upGG3HYHjST/ghrso84riaCab6+4QfvKcziGLZcWY7ke6IlkrGR+QbOYnJGqsTgivjdRWeMOt1aqfHExSl1t74OvN49GT4
+        Mon, 20 Jun 2022 17:50:10 -0400
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3226419F86
+        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 14:50:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655761809; x=1687297809;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=76yWOCnmaKg28UmMxEHE7Dh1YumlYva2+NORg8cz358=;
+  b=KR23tAJgmC4zNXQP0kmZUaqSMOpzDaZvF7jUesI/gRNu1x0UysjeQrN1
+   5l0N7RyUBd7llkBzwRIXH8R5z5G06xPZWRrGdeILxS6oI1RMI9ObrB/mc
+   c5RqWe8k7jH+kdDap6KwCNEdX1TGde5hHc1nByN5E+Do95xbVxBxag7Ii
+   Qm3HUPOu4++N4LUGQyIDdv/aa48auESWbAoxgaPUREzVvYySQTrykgodT
+   SGBjSy3p3H6N7Ug2ocKBPOt8SHfbBiy3i7tTcuG0Btbq9UnlQHmx1XvPP
+   /TTb8cPtkPcz7Xj2AZ7yHj1jgxDR5rz1Ffv82iSnRm5CMm/4INvc+ZM1A
+   A==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10384"; a="268698173"
+X-IronPort-AV: E=Sophos;i="5.92,207,1650956400"; 
+   d="scan'208";a="268698173"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2022 14:50:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,207,1650956400"; 
+   d="scan'208";a="584847401"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 20 Jun 2022 14:50:06 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o3PHa-000Wab-1y;
+        Mon, 20 Jun 2022 21:50:06 +0000
+Date:   Tue, 21 Jun 2022 05:49:55 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     kbuild-all@lists.01.org, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 4/8] block: Fix handling of tasks without ioprio in
+ ioprio_get(2)
+Message-ID: <202206210522.eVU8S1DL-lkp@intel.com>
+References: <20220620161153.11741-4-jack@suse.cz>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:ba43:0:b0:669:a9b2:48fb with SMTP id
- k64-20020a6bba43000000b00669a9b248fbmr12841289iof.125.1655757154206; Mon, 20
- Jun 2022 13:32:34 -0700 (PDT)
-Date:   Mon, 20 Jun 2022 13:32:34 -0700
-In-Reply-To: <000000000000f5181405dff90d7f@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000002cd4005e1e70131@google.com>
-Subject: Re: [syzbot] WARNING in floppy_queue_rq
-From:   syzbot <syzbot+334c1c7dfb084b11520e@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, efremov@linux.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220620161153.11741-4-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-syzbot has found a reproducer for the following issue on:
+Hi Jan,
 
-HEAD commit:    a111daf0c53a Linux 5.19-rc3
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c2fe60080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=25cca39874d6b55f
-dashboard link: https://syzkaller.appspot.com/bug?extid=334c1c7dfb084b11520e
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-userspace arch: i386
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=153429f8080000
+I love your patch! Yet something to improve:
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+334c1c7dfb084b11520e@syzkaller.appspotmail.com
+[auto build test ERROR on axboe-block/for-next]
+[also build test ERROR on linus/master v5.19-rc2 next-20220617]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-------------[ cut here ]------------
-WARNING: CPU: 2 PID: 793 at drivers/block/floppy.c:999 schedule_bh drivers/block/floppy.c:999 [inline]
-WARNING: CPU: 2 PID: 793 at drivers/block/floppy.c:999 process_fd_request drivers/block/floppy.c:2847 [inline]
-WARNING: CPU: 2 PID: 793 at drivers/block/floppy.c:999 floppy_queue_rq+0x32b/0x390 drivers/block/floppy.c:2879
-Modules linked in:
-CPU: 2 PID: 793 Comm: kworker/2:1H Not tainted 5.19.0-rc3-syzkaller #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
-Workqueue: kblockd blk_mq_run_work_fn
-RIP: 0010:schedule_bh drivers/block/floppy.c:999 [inline]
-RIP: 0010:process_fd_request drivers/block/floppy.c:2847 [inline]
-RIP: 0010:floppy_queue_rq+0x32b/0x390 drivers/block/floppy.c:2879
-Code: ea 03 80 3c 02 00 75 67 48 8b 56 30 48 c7 c7 e0 9d 42 8a e8 40 f3 97 04 0f 0b 41 bc 0a 00 00 00 e9 36 ff ff ff e8 b5 69 e0 fc <0f> 0b e9 ec fe ff ff 48 89 df e8 46 2e 2d fd e9 ee fc ff ff 48 89
-RSP: 0018:ffffc900042a7928 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff88801bce0000 RSI: ffffffff849a0bcb RDI: 0000000000000007
-RBP: ffffffff8c8f2a20 R08: 0000000000000007 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff88801c30c188
-R13: ffff88801c30c140 R14: ffffc900042a7b68 R15: ffff88801c30c188
-FS:  0000000000000000(0000) GS:ffff88802ca00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000f6f5b024 CR3: 000000001c2ba000 CR4: 0000000000150ee0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- blk_mq_dispatch_rq_list+0x6ea/0x2350 block/blk-mq.c:1896
- __blk_mq_do_dispatch_sched block/blk-mq-sched.c:173 [inline]
- blk_mq_do_dispatch_sched+0x96d/0xc30 block/blk-mq-sched.c:187
- __blk_mq_sched_dispatch_requests+0x26d/0x3e0 block/blk-mq-sched.c:313
- blk_mq_sched_dispatch_requests+0x101/0x180 block/blk-mq-sched.c:339
- __blk_mq_run_hw_queue+0xff/0x350 block/blk-mq.c:2013
- blk_mq_run_work_fn+0x55/0x70 block/blk-mq.c:2336
- process_one_work+0x996/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
+url:    https://github.com/intel-lab-lkp/linux/commits/Jan-Kara/block-Fix-IO-priority-mess/20220621-001427
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: riscv-nommu_k210_defconfig (https://download.01.org/0day-ci/archive/20220621/202206210522.eVU8S1DL-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 11.3.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/73f39284cec50db7a3e973a9a4ed56f7f706dd1b
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jan-Kara/block-Fix-IO-priority-mess/20220621-001427
+        git checkout 73f39284cec50db7a3e973a9a4ed56f7f706dd1b
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.3.0 make.cross W=1 O=build_dir ARCH=riscv SHELL=/bin/bash
 
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   riscv64-linux-ld: fs/read_write.o: in function `.L10':
+   read_write.c:(.text+0x80): undefined reference to `__get_task_ioprio'
+   riscv64-linux-ld: fs/seq_file.o: in function `seq_read':
+>> seq_file.c:(.text+0x458): undefined reference to `__get_task_ioprio'
+   riscv64-linux-ld: fs/splice.o: in function `.L171':
+>> splice.c:(.text+0x8c6): undefined reference to `__get_task_ioprio'
+
+-- 
+0-DAY CI Kernel Test Service
+https://01.org/lkp
