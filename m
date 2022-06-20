@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DBBEC43334
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 23:44:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D88C0C433EF
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 23:45:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243417AbiFTXoq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 19:44:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58358 "EHLO
+        id S244206AbiFTXpv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 19:45:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58800 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237257AbiFTXoo (ORCPT
+        with ESMTP id S237257AbiFTXpu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 19:44:44 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C2A13E28
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 16:44:43 -0700 (PDT)
+        Mon, 20 Jun 2022 19:45:50 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CCF4513E28
+        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 16:45:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655768683; x=1687304683;
+  t=1655768747; x=1687304747;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=bIzG1pN07Tjah466x26XFthu1PMURnf0Jj1EoTmL1vY=;
-  b=qj8YxB1XL2FBYFPOhnzOqNGhLN+PiTSNGRKw3JB07SnquHfXfFJ8jLDa
-   ZHvwYh2+f5VXM6QsvVp+ueAlokWF9aNlcTVHMnSih/KteVpaD4b8M0EaW
-   9mcz5QE+m7yf34Vado5RVqj5lodnvon3yzPjh9YU3+TpZOScjHRs3kyFf
-   xEXL8VXJ1Xn/GijQLuUX2UBf6IWjnK2PV3TaD7sLAkzpqAZUswoNRzYG3
-   DfrK++qf8DwZJGcvON//RLHiM4errEhQvH4T1D8qMwEFHTMumBhmtyccw
-   EcuFboPwbvmcnMu0z+FZFgvDxAbfGPJWnpCMWsxiEj2+W9/gpJAGChwaZ
-   g==;
+  bh=Y6tM8XCp0NMNLM8k0kuJ4OfaHAUS9OfXGe/dBDVE6ZQ=;
+  b=aeiTC9xghO16yozwHSW/qEvPfmE9a+1MHLIEmDPww7Hd8TIo2cV4sQE4
+   Z+p+tCzJTMpWUIXF8d+g7HpFchjE8QxX70I0fL4nBHdG3Ko82D3Rxb2Zt
+   Uiy1Z5K1S8yS+riBWG5I39XiAXS4U3umPcsRKMla8Bk3nUUF9/jUerU4p
+   Ptsv2OTyVUa3Yu6Gwh7ySvIzKjw0XziDDTjfG740ZqBokqIB4bU6c1e/3
+   83cTQglsJsy14vtgJRE8JJ/sDW1Z4XN8oOit9cqVBP1uBX0u4HTh/mo7E
+   39cwrG/ppDQyJFNU5S677t4LMfJdB2Es1D41Y76LUl4XqW31W4ftxLQk+
+   Q==;
 X-IronPort-AV: E=Sophos;i="5.92,207,1650902400"; 
-   d="scan'208";a="202363649"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2022 07:44:43 +0800
-IronPort-SDR: ggkHAY0OGywp92nVt7KWKZig/zYbyJNGMJ8ZJrHIZ96+kX7QlH4ZGCWakCgkve7moXj0/NVXIR
- uHnhCBKU3wYU5ythOpLQpI0eeBJMpNg7Mnl31tjmXT7E8rSuxDKhlRhTtMrBXa3Ahqv3m3dgpt
- mxi5UlprlVV/FgfHyC9kWKnwPnwAPtExcMQSrNVhy9jwQ1XVVlMAXCcXoREqELuMHHlKaN2aPd
- j9maRnEmu8wggGwhYLfEnL7ecU+v3DX0Z32DV5BqpAheURl5P4v/0dsgdqrXHRtwFiRdJmEpqk
- zbqEGLcryaBl5i9WHBuODQvm
+   d="scan'208";a="203663101"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2022 07:45:46 +0800
+IronPort-SDR: v+/c/slp4PCPf/+ArItjUCZXqCkl6KHWdy3EIREEJban0GPKtsh1YpgPymrqbiwHuj+b4UpGrb
+ 7A3q9KEdljsbl0/gE9F3bvYiNdprF5rDFkCh4AR8xVXTBBYmW2smCVIA+/ZAU+Ah5lKgU5VTf4
+ sz14XuG29hFDiBFT6vohj5MtB2gOhlOVPELpeLw8PsJXL0rj7f/9RkQgncyrMTTfRs+Ih0W1Pb
+ TgJbPBxybFKZywejH4LFrogUrMR6YgtVgCHGcalgO4DvfutK+HSwa/+/Rxpxe+GRpgBVYzzAWD
+ G78/btZBeXudUWBhZM5MLLXE
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 16:07:13 -0700
-IronPort-SDR: kvVZr1KkJvxYg03lmESQPpR3FApsQ1sHP0+gxwQ8W6n6Kfb2f5LJc52kyYyX7GSb/iLm4vayyL
- 4BsvkOR6MthUmVAkJleG2/ck/hba1kYSlYZ6YSQaj4NC1G19GxRPvN0+sA85kegyzJ62x5YHz0
- iezlIqOJ0YAs1KgSKnoaQRm/jkwHgix7zhpNenwauXgXI2pgYUOY6xuieLPB4QzNjWzOkUoGvw
- a7gMxYmPoS43AvQDpFDxZhdC0lmY/jFFaJPLWrd3YjCJPSx5MIukdiyeHg9HYOMRp/dImz3+jc
- /jA=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 16:08:19 -0700
+IronPort-SDR: YEiRts0+gpDEkwmNAMO2FWSqmH6FQEzkuFMTT4dXhVA8/yHQnSuKaOET3Ki6jU/t4ErAym1HM0
+ hFlfFqDiTnoEy+3xiufThoH/WQkJY+J4u4xReriLeqP5bQooQUnIaKuqHh/Dv+unwv69KUR7cz
+ CDQZ+SYu6t2xlF8UCvKTkYerEWZeKJbd7Uj4YD1eSNxghLoXHFH4VTzMdC2avTitxEiYbCjJXD
+ qLCjczePPhXuxFo/DFUFbgNDklYSLEImNoQsRLZ8YgXNegi64Qtq9Y2/emXodt2UAkeW9ugmYz
+ eGs=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 16:44:43 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 16:45:48 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LRmTQ4hj3z1SVny
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 16:44:42 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LRmVg5LSCz1SVny
+        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 16:45:47 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,36 +57,37 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655768682; x=1658360683; bh=bIzG1pN07Tjah466x26XFthu1PMURnf0Jj1
-        EoTmL1vY=; b=MZs2+V6b7iEgTUVuR7vUeKnZigYEK8V124xcmj/lyTT/gZtPtuy
-        ATRLh+3OYgYnpiWC2432J8liyEbk6Bll5llsDk3AxpgxNHlELxGLsuy8sj4j88JX
-        TM6dxaCwHIP2N6prrYAJ1oiSAohThDLuiAXsoPlMKzqiNrmDV6U/XlrnN4UQe7nn
-        rATeofVwKfzOeD06N6Dtz7iZ5jJM3VQ/VCo2QBHuDCAEeWliXpExlwOjRyZBrXHG
-        m/YQseARre6KijaKA/WI292Mnay2qf9pVErwbm3uQmu4nympvvbZpCbMmr9myLdM
-        DVpzK0ZZvHdwKq13/t4rvrGjLqMsh/428dw==
+        1655768747; x=1658360748; bh=Y6tM8XCp0NMNLM8k0kuJ4OfaHAUS9OfXGe/
+        dBDVE6ZQ=; b=gHi3KVSnQNgrzEUR1z32jVo7MU0Fa7nzRaCT5eSlIENie/6Myt+
+        LnVWr/7UqXNiRM7f9+ctSvreUjpUGTtrCCRsk3uc7fG4QfNnpP+OErDjb5fUDnem
+        0MCN40CineLrUCbyfv8tH1cLFiP1Ge9viN88z1MVM+J8NTSEtfN5Do4/C776U8ia
+        Q5av0HrH9SrCjDwmIPF5wAonen9Qod9yaSq155mpMtDAIbAxyQnVmMget5moYr8U
+        I/v+16nzoihzxSndjdiYn2v8jCaXXAilY7JIho91tr9ZVn6s1ZVP5e7lDeCGNvCU
+        Oz5Gc7Q/gS8CFyLm6GR0462qphsEuDS8iMg==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 5JlEsqldoMCN for <linux-block@vger.kernel.org>;
-        Mon, 20 Jun 2022 16:44:42 -0700 (PDT)
+        with ESMTP id FV8M_Y7qmhsw for <linux-block@vger.kernel.org>;
+        Mon, 20 Jun 2022 16:45:47 -0700 (PDT)
 Received: from [10.225.163.87] (unknown [10.225.163.87])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LRmTN5Wszz1Rvlc;
-        Mon, 20 Jun 2022 16:44:40 -0700 (PDT)
-Message-ID: <49fcbf1a-bd64-1870-d1aa-14d3cee38475@opensource.wdc.com>
-Date:   Tue, 21 Jun 2022 08:44:39 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LRmVf3rs5z1Rvlc;
+        Mon, 20 Jun 2022 16:45:46 -0700 (PDT)
+Message-ID: <c9fa7f6e-e197-71a7-28e5-8e9321c411a3@opensource.wdc.com>
+Date:   Tue, 21 Jun 2022 08:45:45 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH 1/8] block: fix default IO priority handling again
+Subject: Re: [PATCH 2/8] block: Return effective IO priority from
+ get_current_ioprio()
 Content-Language: en-US
 To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
         Niklas Cassel <Niklas.Cassel@wdc.com>
 References: <20220620160726.19798-1-jack@suse.cz>
- <20220620161153.11741-1-jack@suse.cz>
+ <20220620161153.11741-2-jack@suse.cz>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220620161153.11741-1-jack@suse.cz>
+In-Reply-To: <20220620161153.11741-2-jack@suse.cz>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -94,89 +95,45 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 On 6/21/22 01:11, Jan Kara wrote:
-> Commit e70344c05995 ("block: fix default IO priority handling")
-> introduced an inconsistency in get_current_ioprio() that tasks without
-> IO context return IOPRIO_DEFAULT priority while tasks with freshly
-> allocated IO context will return 0 (IOPRIO_CLASS_NONE/0) IO priority.
-> Tasks without IO context used to be rare before 5a9d041ba2f6 ("block:
-> move io_context creation into where it's needed") but after this commit
-> they became common because now only BFQ IO scheduler setups task's IO
-> context. Similar inconsistency is there for get_task_ioprio() so this
-> inconsistency is now exposed to userspace and userspace will see
-> different IO priority for tasks operating on devices with BFQ compared
-> to devices without BFQ. Furthemore the changes done by commit
-> e70344c05995 change the behavior when no IO priority is set for BFQ IO
-> scheduler which is also documented in ioprio_set(2) manpage:
+> get_current_ioprio() is used to initialize IO priority of various
+> requests. As such it should be returning the effective IO priority of
+> the task (i.e., reflecting the fact that unset IO priority should get
+> set based on task's CPU priority) so that the conversion is concentrated
+> in one place.
 > 
-> "If no I/O scheduler has been set for a thread, then by default the I/O
-> priority will follow the CPU nice value (setpriority(2)).  In Linux
-> kernels before version 2.6.24, once an I/O priority had been set using
-> ioprio_set(), there was no way to reset the I/O scheduling behavior to
-> the default. Since Linux 2.6.24, specifying ioprio as 0 can be used to
-> reset to the default I/O scheduling behavior."
-> 
-> So make sure we default to IOPRIO_CLASS_NONE as used to be the case
-> before commit e70344c05995. Also cleanup alloc_io_context() to
-> explicitely set this IO priority for the allocated IO context to avoid
-> future surprises. Note that we tweak ioprio_best() to maintain
-> ioprio_get(2) behavior and make this commit easily backportable.
-> 
-> Fixes: e70344c05995 ("block: fix default IO priority handling")
 > Signed-off-by: Jan Kara <jack@suse.cz>
+> ---
+>  include/linux/ioprio.h | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
+> 
+> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+> index 3d088a88f832..61ed6bb4998e 100644
+> --- a/include/linux/ioprio.h
+> +++ b/include/linux/ioprio.h
+> @@ -53,10 +53,17 @@ static inline int task_nice_ioclass(struct task_struct *task)
+>  static inline int get_current_ioprio(void)
+>  {
+>  	struct io_context *ioc = current->io_context;
+> +	int prio;
+>  
+>  	if (ioc)
+> -		return ioc->ioprio;
+> -	return IOPRIO_DEFAULT;
+> +		prio = ioc->ioprio;
+> +	else
+> +		prio = IOPRIO_DEFAULT;
+> +
+> +	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
+> +		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(current),
+> +					 task_nice_ioprio(current));
+> +	return prio;
+>  }
+>  
+>  /*
 
 Looks good to me.
 
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
-
-> ---
->  block/blk-ioc.c        | 2 ++
->  block/ioprio.c         | 4 ++--
->  include/linux/ioprio.h | 2 +-
->  3 files changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-> index df9cfe4ca532..63fc02042408 100644
-> --- a/block/blk-ioc.c
-> +++ b/block/blk-ioc.c
-> @@ -247,6 +247,8 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
->  	INIT_HLIST_HEAD(&ioc->icq_list);
->  	INIT_WORK(&ioc->release_work, ioc_release_fn);
->  #endif
-> +	ioc->ioprio = IOPRIO_DEFAULT;
-> +
->  	return ioc;
->  }
->  
-> diff --git a/block/ioprio.c b/block/ioprio.c
-> index 2fe068fcaad5..2a34cbca18ae 100644
-> --- a/block/ioprio.c
-> +++ b/block/ioprio.c
-> @@ -157,9 +157,9 @@ static int get_task_ioprio(struct task_struct *p)
->  int ioprio_best(unsigned short aprio, unsigned short bprio)
->  {
->  	if (!ioprio_valid(aprio))
-> -		aprio = IOPRIO_DEFAULT;
-> +		aprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
->  	if (!ioprio_valid(bprio))
-> -		bprio = IOPRIO_DEFAULT;
-> +		bprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
->  
->  	return min(aprio, bprio);
->  }
-> diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-> index 3f53bc27a19b..3d088a88f832 100644
-> --- a/include/linux/ioprio.h
-> +++ b/include/linux/ioprio.h
-> @@ -11,7 +11,7 @@
->  /*
->   * Default IO priority.
->   */
-> -#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM)
-> +#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0)
->  
->  /*
->   * Check that a priority value has a valid class.
-
 
 -- 
 Damien Le Moal
