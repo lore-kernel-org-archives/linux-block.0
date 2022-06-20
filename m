@@ -2,110 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944D7CCA479
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 09:16:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52D0AC43334
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 09:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231855AbiFTJQ0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 05:16:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56466 "EHLO
+        id S240814AbiFTJ4L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 05:56:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57688 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240127AbiFTJQY (ORCPT
+        with ESMTP id S239572AbiFTJ4K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 05:16:24 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BE99DEF0;
-        Mon, 20 Jun 2022 02:16:24 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id CF0561FAC7;
-        Mon, 20 Jun 2022 09:16:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1655716582; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xkZ/s7WtxAVkUPGyFHjjsumLTjVdh8+OYxSihbuC8vY=;
-        b=AT4AJuShz4HqBI2nlNRveK+IXlQV8HIOKAgtrR2dlMOMs20lwZHTyCbhE5eEk8tI/cG/fj
-        quaiOztyq0SMOWroxPTUcgPBBHEEwj6WJHy+ROUkSs/TpDjBAUgInuK1DliqMkKE/IOTfX
-        BqL6WAPrDjNpcJ7KOac8i/pepCoiIE0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1655716582;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=xkZ/s7WtxAVkUPGyFHjjsumLTjVdh8+OYxSihbuC8vY=;
-        b=hQzyTiyG7q8KmJWCAEayXC6ZF4/JTsIl4bU+RsHupP/su5ogfLFj+IAglbIHxtqzPUIhsL
-        feoOPgyoZEA8q6Bg==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id A6ACE134CA;
-        Mon, 20 Jun 2022 09:16:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 3sI0KOY6sGKXPgAAMHmgww
-        (envelope-from <hare@suse.de>); Mon, 20 Jun 2022 09:16:22 +0000
-Message-ID: <97f428d0-8039-709c-f632-db1acc9a4315@suse.de>
-Date:   Mon, 20 Jun 2022 11:16:22 +0200
+        Mon, 20 Jun 2022 05:56:10 -0400
+Received: from smtp.hosts.co.uk (smtp.hosts.co.uk [85.233.160.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBDF13E19;
+        Mon, 20 Jun 2022 02:56:09 -0700 (PDT)
+Received: from host86-158-155-35.range86-158.btcentralplus.com ([86.158.155.35] helo=[192.168.1.218])
+        by smtp.hosts.co.uk with esmtpa (Exim)
+        (envelope-from <antlists@youngman.org.uk>)
+        id 1o3E8c-000ANp-FP;
+        Mon, 20 Jun 2022 10:56:07 +0100
+Message-ID: <06365833-bd91-7dcf-4541-f8e15ed3bef2@youngman.org.uk>
+Date:   Mon, 20 Jun 2022 10:56:06 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 5/5] blk-mq: Drop 'reserved' member of busy_tag_iter_fn
-Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, bvanassche@acm.org, hch@lst.de,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, satishkh@cisco.com,
-        sebaddel@cisco.com, kartilak@cisco.com
-Cc:     linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org
-References: <1655463320-241202-1-git-send-email-john.garry@huawei.com>
- <1655463320-241202-6-git-send-email-john.garry@huawei.com>
-From:   Hannes Reinecke <hare@suse.de>
-In-Reply-To: <1655463320-241202-6-git-send-email-john.garry@huawei.com>
+ Thunderbird/91.10.0
+Subject: Re: About the md-bitmap behavior
+Content-Language: en-GB
+To:     Qu Wenruo <quwenruo.btrfs@gmx.com>, linux-raid@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
+ <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
+ <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
+From:   Wols Lists <antlists@youngman.org.uk>
+In-Reply-To: <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/17/22 12:55, John Garry wrote:
-> We no longer use the 'reserved' member in for any iter function so it
-> may be dropped.
+On 20/06/2022 08:56, Qu Wenruo wrote:
+>> The write-hole has been addressed with journaling already, and this will
+>> be adding a new and not-needed feature - not saying it wouldn't be nice
+>> to have, but do we need another way to skin this cat?
 > 
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> ---
->   block/blk-mq-debugfs.c              |  2 +-
->   block/blk-mq-tag.c                  | 13 +++++--------
->   block/blk-mq.c                      | 10 ++++------
->   drivers/block/mtip32xx/mtip32xx.c   |  6 +++---
->   drivers/block/nbd.c                 |  2 +-
->   drivers/infiniband/ulp/srp/ib_srp.c |  3 +--
->   drivers/nvme/host/core.c            |  2 +-
->   drivers/nvme/host/fc.c              |  3 +--
->   drivers/nvme/host/nvme.h            |  2 +-
->   drivers/scsi/aacraid/comminit.c     |  2 +-
->   drivers/scsi/aacraid/linit.c        |  2 +-
->   drivers/scsi/fnic/fnic_scsi.c       | 12 ++++--------
->   drivers/scsi/hosts.c                | 14 ++++++--------
->   drivers/scsi/mpi3mr/mpi3mr_os.c     | 16 ++++------------
->   include/linux/blk-mq.h              |  2 +-
->   include/scsi/scsi_host.h            |  2 +-
->   16 files changed, 36 insertions(+), 57 deletions(-)
+> I'm talking about the BTRFS RAID56, not md-raid RAID56, which is a
+> completely different thing.
 > 
-Reviewed-by: Hannes Reinecke <hare@suse.de>
+> Here I'm just trying to understand how the md-bitmap works, so that I
+> can do a proper bitmap for btrfs RAID56.
+
+Ah. Okay.
+
+Neil Brown is likely to be the best help here as I believe he wrote a 
+lot of the code, although I don't think he's much involved with md-raid 
+any more.
 
 Cheers,
-
-Hannes
--- 
-Dr. Hannes Reinecke		           Kernel Storage Architect
-hare@suse.de			                  +49 911 74053 688
-SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
-HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
+Wol
