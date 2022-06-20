@@ -2,57 +2,89 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DBDAC43334
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 07:29:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5C1C43334
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 07:29:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233620AbiFTH3P (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 03:29:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33612 "EHLO
+        id S239348AbiFTH31 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 03:29:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239353AbiFTH3P (ORCPT
+        with ESMTP id S239344AbiFTH30 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 03:29:15 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56E7CE0F5
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 00:29:14 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 08E7668AA6; Mon, 20 Jun 2022 09:29:11 +0200 (CEST)
-Date:   Mon, 20 Jun 2022 09:29:10 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org
-Subject: Re: [PATCH 3/3] block: Specify the operation type when calling
- blk_mq_map_queue()
-Message-ID: <20220620072910.GA11786@lst.de>
-References: <20220614175725.612878-1-bvanassche@acm.org> <20220614175725.612878-4-bvanassche@acm.org> <YqkoWUjOPgpqzn4E@T590> <20220615060851.GE22115@lst.de> <d510cb62-4b19-9ae0-cad4-1ca6756cc3fd@acm.org>
+        Mon, 20 Jun 2022 03:29:26 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8EDDED6;
+        Mon, 20 Jun 2022 00:29:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1655710163;
+        bh=K/Um4X8APrJHVbHbiEkW8yuEcWBatIXLoZvBLIp5PRo=;
+        h=X-UI-Sender-Class:Date:To:From:Subject;
+        b=k3XMBsLjDX78n6Zz9tunSKltC5lXkYra+bC0hkkOnheWLF55Pnlag7rt6yDsjDZw6
+         l1Ic0q4DqGUSR06GxE/ojGCDlWBYsBc6wRI78pCR5E4eFqfMz4ReDKBNIw4p2sGC6L
+         +BIm6Is4JS+EJPw7AZ40DoV7SOfP2nLjCVv505i8=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx005
+ [212.227.17.184]) with ESMTPSA (Nemesis) id 1MK3W0-1oOiqK1xl8-00LUjx; Mon, 20
+ Jun 2022 09:29:23 +0200
+Message-ID: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
+Date:   Mon, 20 Jun 2022 15:29:19 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d510cb62-4b19-9ae0-cad4-1ca6756cc3fd@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     linux-raid@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+Subject: About the md-bitmap behavior
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:kaNPtkHOaBVDedGx4uppYXKmB1/0B20Dt7YF1HoUUkb134f0LTt
+ 2nurl3YTlct2VCA5a3zNJ8Uf8U21R5/1OKDm0y+MilHAy/TVsXoPG3kHqF7mwpc9jakgLAB
+ SsBqUS9OQ1MlBLPlZVl7Hdm3UVE29+o2AzPzUFeV07mcj82MC8uR3IBpDY1ehuoFu2Rl2KD
+ JPS7ajQRtUa98lR8WEXGQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:JAxLYB1q//4=:XOQMXeHqHCdeyocnFhvqgs
+ NyrvrkiD/h+sDvDEJGtudMAUesTIoFuW4a3/0TupAdJ5k5mGGpKcW/FEt1csD5hv1dxIJvzhp
+ 25T43HxD8Nrlm+P0iuhaVZBNiLIg/CSwkefBn5avNAgYhTo5yJyXOqEfN4IJiqi5sfTOaVhXm
+ qgUthkOEKqqMz74RJ2Lj1zEVltYQsNw2jqH2jaPxRQM+V1yPruDQWjfBxh1mvTe1Qa5gKGnMT
+ wBE3zVbu4QiY85mMuwpYOOj7jGh/8TJjKqdHhcQRtFLpml+NuaBjf1lNC87IbRmDFN+F3z38d
+ WInAYlV7W7bVxsONxrXaItLQYKm0W+prMGBCMpfm5GVzefvDOkRM21+/Bt6mHvKIKfOktTGmI
+ v0VyygsiXAU062WESysZsmjA078n20gEgUP3ugK7S96zKY91k1cAOqUIgd6Qe8p60GsYLD6sL
+ q7CoU9isjch184RxnLoi5ua0OhlHmXKhOu3b5y7QpYPQ69aZbMMNmZG4Ftx6qIYSs8Z2oZrq6
+ fxJ60l2clRNVbusGLPfjiQHuZd6DB9tbwdcAil3sslnLVT4gSlVNymL4a8LQJ3oDBUio3tBYp
+ OZaHMHWGww5Wmid+ar/FOYmYcq9MOmJ8T5LKZl+DP2E8wcZ2anyFSMY6++SeevkS5AW9FUAbz
+ Hath5Nu1QjhR6hMMKvKIYlIJjgSPCzxf6X/fI44Y2D3OeSzNkpApdWXnjR2IuwtML4uITQX7C
+ YE9r9+n8uPJvFDA3kQIyYAnzNDkeKohIkDTxRHBW0J6oB3T7tTehDbFV7oe5JXqcR9FsiornT
+ ygu2ep5kYGKcA73J9CjZXPjeHIeU3rDXX6BAYWP4ZxYmzw3FMP/zYb5EVittZEfnBfLx3znOQ
+ s/dvc7sfnJ0qHJVPf6sZAlqwWpIcPCjH+7fOr/I2/46yjDtihaOeeTe+6CDkqdZ81+HCPp4rx
+ 7xhyOxEi0NCXB3IgaH8V4SlMsEHZESy+9j8fWf9oj5a+qPyFsr3m8RUCyChCpfb1SKy6JNjkD
+ fn8fERng/xXNk+8hwVoSjUdRYWnnxhGYVZRUqjQHbX4IJ0NfSHpBXpD7DhRcxwaHwkX8KAqHR
+ P5uFKZmhh1VddhJtbzbVtDDa0PPRXfVwTkzSkk3Dk4NjrYc+sy4oacmnA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Fri, Jun 17, 2022 at 11:25:41AM -0700, Bart Van Assche wrote:
-> I looked into adding a __bitwise annotation for request flags by 
-> introducing a new type that is called blk_mq_opf_t. Introducing such a type 
-> without modifying a lot of code seems difficult to me. This is what I ran 
-> into:
-> * If the type of the operation type constants (REQ_OP_READ etc.) is 
-> modified into blk_mq_opf_t then their type changes from 'enum req_opf' into 
-> type blk_mq_opf_t and sparse complains when passing e.g. REQ_OP_READ to a 
-> function that accepts an argument with type enum req_opf.
-> * If the type of the operation type constants is not modified then sparse 
-> complains about bitwise or-ing the operation type and a request flag, e.g. 
-> REQ_OP_WRITE | REQ_FUA.
->
-> I'm not sure how to solve this other than by modifying the functions that 
-> accept an 'opf' argument into accepting an additional argument (enum 
-> req_opf op + blk_mq_opf_t op_flags).
+Hi,
 
-I actually always though of one type for the operation plus flags
-as we basically always use the together.  That might still run into
-a lot of problems, but is definitively way simpler and matches how
-all the argument passing actually works.
+Recently I'm trying to implement a write-intent bitmap for btrfs to
+address its write-hole problems for RAID56.
+
+(In theory, btrfs only needs to know where the partial stripe write
+doesn't finish properly, and do a mandatory scrub for those stripes
+before mount to address it).
+
+My initial assumption for write-intent bitmap is, before any write can
+be submitted, corresponding bit(s) must be set in the bitmap, and the
+bitmap must be flushed to disk, then the bio can really be submitted.
+
+Thus functions like md_bitmap_startwrite() should not only set the bits,
+but also submit and flush the bio. (With some bio plug to optimize).
+
+But to my surprise, md_bitmap_startwrite() really just set the bitmap,
+no obvious submit/flush path.
+
+
+Is my assumption on write-intent bitmap completely wrong, or is there
+some special handling for md write-intent bitmap?
+
+Thanks,
+Qu
