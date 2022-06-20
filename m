@@ -2,106 +2,163 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2DAC43334
-	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 07:56:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59868CCA480
+	for <linux-block@archiver.kernel.org>; Mon, 20 Jun 2022 08:02:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239647AbiFTH4T (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 03:56:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50032 "EHLO
+        id S239750AbiFTICe (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 04:02:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55084 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239648AbiFTH4T (ORCPT
+        with ESMTP id S239740AbiFTICd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 03:56:19 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D18710565;
-        Mon, 20 Jun 2022 00:56:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1655711772;
-        bh=6dlAtGOmo3iT0QO4sTYsVspXBmeZRwvlk3clJlr6isg=;
-        h=X-UI-Sender-Class:Date:To:References:From:Subject:In-Reply-To;
-        b=EkzdaCffJLewLmpbtS9p4TQkf4qY/F+VbZxJB6bJFxilSmoHupbhQ8Q+FZUH0+5GC
-         4PaNcXGdV1Azfz3bADcFIxSAhlMrgJZgAiQadXTbp8HaEjr44+K9+SmPXZyH1hxXRw
-         UIeMqaFJEvyZyuVHJD6d7T0R+m+73F5JF9UVRhSI=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx105
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MGhyc-1nqX5V2EOw-00DkSr; Mon, 20
- Jun 2022 09:56:12 +0200
-Message-ID: <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
-Date:   Mon, 20 Jun 2022 15:56:08 +0800
+        Mon, 20 Jun 2022 04:02:33 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30F0011178;
+        Mon, 20 Jun 2022 01:02:32 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id B65B91F383;
+        Mon, 20 Jun 2022 08:02:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1655712150; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K3mIJEfos5FRczXq+evNYHSc2VMl3bK+FlH80Aaf4S4=;
+        b=KG1ieZI3RKMCFozBnOgTGpV3xZogNkS7Q1rTjxmOTTDqxH2mG/t8MCit3Al4wh2LFIX77W
+        AvYsx0ICW34GwE+I3iI7UITSDrhH+cJbdyVusEIcJpD9pJQEA3IQnQopQ+tiWkvngHWbeF
+        tA1MMaLwlyVLwwTYPAWHE51AlXA4WXk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1655712150;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=K3mIJEfos5FRczXq+evNYHSc2VMl3bK+FlH80Aaf4S4=;
+        b=L5DmlH7Jm9YSeMGt37pfXDDG0KMrtRlgYLsEtgsHRuRzWyY1IvB6J26q9D+zHKxSBg+5r0
+        4QuYubwK4ylsW9Cw==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 9C61F13638;
+        Mon, 20 Jun 2022 08:02:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id 7G3cJZYpsGLsFwAAMHmgww
+        (envelope-from <hare@suse.de>); Mon, 20 Jun 2022 08:02:30 +0000
+Message-ID: <c2ae8f65-5570-fdad-3b3a-c00bb10c98c8@suse.de>
+Date:   Mon, 20 Jun 2022 10:02:30 +0200
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
+ Thunderbird/91.4.0
 Content-Language: en-US
-To:     Wols Lists <antlists@youngman.org.uk>, linux-raid@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
- <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-Subject: Re: About the md-bitmap behavior
-In-Reply-To: <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
+To:     John Garry <john.garry@huawei.com>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>, axboe@kernel.dk,
+        jejb@linux.ibm.com, martin.petersen@oracle.com, brking@us.ibm.com,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org, linux-ide@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+        chenxiang66@hisilicon.com
+References: <1654770559-101375-1-git-send-email-john.garry@huawei.com>
+ <1654770559-101375-4-git-send-email-john.garry@huawei.com>
+ <b4a0ede5-95a3-4388-e808-7627b5484d01@opensource.wdc.com>
+ <9e89360d-3325-92af-0436-b34df748f3e2@acm.org>
+ <e36bba7e-d78d-27b4-a0e2-9d921bc82f5d@opensource.wdc.com>
+ <3a27b6ff-e495-8f11-6925-1487c9d14fa9@huawei.com>
+From:   Hannes Reinecke <hare@suse.de>
+Subject: Re: [PATCH RFC v2 03/18] scsi: core: Implement reserved command
+ handling
+In-Reply-To: <3a27b6ff-e495-8f11-6925-1487c9d14fa9@huawei.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:92KW57J7jkZgJtxg/4L5TXEQunRHilHHdWC+ksoFcZQIMM5SCp/
- +BbL27Qmtj2YEeIlG5R+IXxiufqn9uDD/xgTpn8lcFd6yVdgT3TcjrR41agYw8a2HDB6FBR
- HblSoMqu7NnmVZPph0BshyCoaAUP7quixCFcb7z3+mPLBUMag9R5iNXuUQsguuDM4IMbajm
- U/jZG8/nN4l9QmiSB1Xgw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:qiz8Q26UF20=:bKmB4rg10VKWEh51KfNppW
- QoSJwjoaZGlYctfz0nRMuZghYy1lg70EwSolhBFm+IJmS92+Xw9Xl7vpd4kqMglBDgWSuuRlv
- aOGNmtozsbogkeQb7UrrIserPr0XNdNJv85cI2peLaCfknlhPVdS1lX1MarHHt0Me38uh4cEc
- wh7ppxEz7CySjpiBWaVKZWlLxSBuq7HB2qVC942k78Gfl1glCBYuv9IQGJTKeZPh8WbyjwTKP
- lwJUfc2dpPrVqmcsM2WiSg7cI54ILbXydYDLFjC4wA0Mt/iXTy9VBmQ2mzy4ZS0Axkype3LIz
- vhQ5RvKeXW5jKbbASKeTXaAP2CllEqAaMi7OScrs4gMZiVMbEWIkrRKKqRJek/31m6A6wr2qD
- PTRCfGdSZmpsJ+n+yspmO0nCteJ3vlsAWTUgyt9iIC1IHDbIlhRiyp2jK/G93qc4WBmmROaYs
- vq8hLgeflcyeNkLtelkEXRYjxvU2aD/woocJpW/S+tVlY7oqciVt0VjM7vXb/IYOIZf7DfJPi
- jnWUXwllOx1IFVlTmE9ixHT11O+7IY9xEUAZJsT3f0SZ8WgunbQy6TF4085nY224GrMtZzLCe
- cG9W+hdf9TrKPxtKY4RpTqr9ecCmgUScStjyORGLA5YrPuHsUkqk+ROvUp0FztyHO90AtFx9b
- AYzP+lWlJBnVXE02TfAgOA+eORJTXywIbCMzXMa87QzYd+giry/laOAX7TWe+AbkHVaSjjv8A
- 0QBheCYg01LiWTKD0v9Nk0tbUh0dP8oNtsT8IkDmvc2lvy0H0YvD1NFKVzQkI8gTrR5vbbvqE
- W8SgQVUaaJAUnL1YBxtipIE1/+m0oIlrWQsEuamqggRDTxSw8bOEYnQyK9vNnZNHIj2nzVTde
- jcDBaFbuqo+5wKzVAVlA6e48KaDWw0O++c0uJNaew8/0trgxeZUwmqOqBpWFQS8WNgW//dSEG
- dCt2lH+7rZwiBlnuHoZHZ798F3CD3VgWvPrIv1XGa9EYZFPRlbDm1qBE48gRTwe/DFyogcLpv
- GqM/GiFl5s6bDoTxCAG6KLGCthdfwDvnHfFSDWim1S5XtmH18OEXDmpHRkkiQ5HDaR+MvDpLc
- 6CDC5Ela8cas6Bs2VIYrnQ6TxAbGV6keI6P16M1egLPM0j9qw1DeS++aw==
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-
-
-On 2022/6/20 15:48, Wols Lists wrote:
-> On 20/06/2022 08:29, Qu Wenruo wrote:
->> Hi,
+On 6/15/22 09:35, John Garry wrote:
+> On 15/06/2022 00:43, Damien Le Moal wrote:
+>> On 6/15/22 03:20, Bart Van Assche wrote:
+>>> On 6/13/22 00:01, Damien Le Moal wrote:
+>>>> On 6/9/22 19:29, John Garry wrote:
+>>>>> +    /*
+>>>>> +     * This determines how many commands the HBA will set aside
+>>>>> +     * for internal commands. This number will be added to
+>>>>> +     * @can_queue to calcumate the maximum number of simultaneous
+>>>>
+>>>> s/calcumate/calculate
+>>>>
+>>>> But this is weird. For SATA, can_queue is 32. Having reserved commands,
+>>>> that number needs to stay the same. We cannot have more than 32 tags.
+>>>> I think keeping can_queue as the max queue depth with at most
+>>>> nr_reserved_cmds tags reserved is better.
+>>>>
+>>>>> +     * commands sent to the host.
+>>>>> +     */
+>>>>> +    int nr_reserved_cmds;
+>>>
+>>> +1 for Damien's request. I also prefer to keep can_queue as the maximum
+>>> queue depth, whether or not nr_reserved_cmds has been set.
 >>
->> Recently I'm trying to implement a write-intent bitmap for btrfs to
->> address its write-hole problems for RAID56.
->
-> Is there any reason you want a bit-map? Not a journal?
+>> For non SATA drives, I still think that is a good idea. However, for 
+>> SATA,
+>> we always have the internal tag command that is special. With John's
+>> change, it would have to be reserved but that means we are down to 31 max
+>> QD,
+> 
+> My intention is to keep regular tag depth at 32 for SATA. We add an 
+> extra tag as a reserved tag. Indeed, this is called a 'tag', but it's 
+> just really the placeholder for what will be the ATA_TAG_INTERNAL request.
+> 
+> About how we set scsi_host.can_queue, in this series we set .can_queue 
+> as max regular tags, and the handling is as follows:
+> 
+> scsi_mq_setup_tags():
+> tag_set->queue_depth = shost->can_queue + shost->nr_reserved_cmds
+> tag_set->reserved_tags = shost->nr_reserved_cmds
+> 
+> So we honour the rule that blk_mq_tag_set.queue_depth is the total tag 
+> depth, including reserved.
+> 
+> Incidentally I think Christoph prefers to keep .can_queue at total max 
+> tags including reserved:
+> https://lore.kernel.org/linux-scsi/337339b7-6f4a-a25c-f11c-7f701b42d6a8@suse.de/ 
+> 
+> 
+>> so going backward several years... That internal tag for ATA does not
+>> need to be reserved since this command is always used when the drive is
+>> idle and no other NCQ commands are on-going.
+> 
+> So do you mean that ATA_TAG_INTERNAL qc is used for other commands apart 
+> from internal commands?
+> 
+Well.
 
-For btrfs, it's a tradeoff here
+The problem is that 'ATA_TAG_INTERNAL' currently is overloaded to
+a) signal internal commands
+b) 'magic' tag when looking up commands
 
-Bitmap is a little easier, and way less data to writeback.
-And since btrfs already has all of its metadata, and quite some of its
-data protected by COW (and checksum), a btrfs write-intent bitmap is
-enough to close the write-hole already.
+My proposal would be to separate these use-cases, and use a flag (eg 
+ATA_QCFLAG_INTERNAL) to determine internal commands.
 
-Although we may want to implement journal later, mostly to be able to
-address combined cases, like powerloss followed by a missing device at
-recovery time.
+The we'll be needing an internal tag-lookup map
+(NCQ tag -> blk-mq tag) for ata_qc_from_tag() to retrieve the command 
+corresponding to a driver tag.
 
->
-> The write-hole has been addressed with journaling already, and this will
-> be adding a new and not-needed feature - not saying it wouldn't be nice
-> to have, but do we need another way to skin this cat?
+I guess we'll need that anyway with libsas, as there we're working with 
+a budget tag which has no relationship with the NCQ tag whatsoever ...
 
-I'm talking about the BTRFS RAID56, not md-raid RAID56, which is a
-completely different thing.
+But with that we can kill 'ATA_TAG_INTERNAL', and let the driver figure 
+out how to allocate internal tags.
 
-Here I'm just trying to understand how the md-bitmap works, so that I
-can do a proper bitmap for btrfs RAID56.
+Cheers,
 
-Thanks,
-Qu
-
->
-> Cheers,
-> Wol
+Hannes
+-- 
+Dr. Hannes Reinecke		           Kernel Storage Architect
+hare@suse.de			                  +49 911 74053 688
+SUSE Software Solutions Germany GmbH, Maxfeldstr. 5, 90409 Nürnberg
+HRB 36809 (AG Nürnberg), GF: Felix Imendörffer
