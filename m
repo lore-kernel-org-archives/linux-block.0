@@ -2,197 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0C27C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 08:31:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D90C43334
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 10:25:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238662AbiFUIbR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 04:31:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48492 "EHLO
+        id S1348483AbiFUKZB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 06:25:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57596 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230311AbiFUIbQ (ORCPT
+        with ESMTP id S231127AbiFUKY7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 04:31:16 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BB8113D5D
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 01:31:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655800275; x=1687336275;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=qucA03qSP9PIA2chxP6Oz8ivk3NeMPXmaIPgisWiU7w=;
-  b=SpFqvXUewMM1bzebiBr2QwQqiRVZYsfPl55a9aEEDzWspdL+vpqu1hCz
-   NgpInHGrHt+MHbcNwqONa+8bqzhbuKVDUeagCtmqAZ+dJpmpRAV82L5Qg
-   PKZ91zmYUQWVUMyJarNQjX+U8ZNnlS3cpOkn8lhoerqAD2lh0wNOX6mI7
-   WDVylD+GlJNIi/hMFxD7rt+7Mto6WMO5gR3TW/QJWi1oN6y6zhuIvv9fM
-   Mg9dn6IMxL/QqGQT6OGy6S17dsVl+Hf2xnWAK3xTt7FVOwzm0axTDQA0Z
-   YpVhB/T67aJqcrwK7fBann7cipW0RgaDO3j68Nz3uJPTYczx38Ltrbnqo
-   A==;
-X-IronPort-AV: E=Sophos;i="5.92,209,1650902400"; 
-   d="scan'208";a="208558354"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2022 16:31:14 +0800
-IronPort-SDR: 0Gie5iEv1gitsBIhnGGvpLiu1xXRf/LPDc4kQYdnKs/kKblQVw/crLELDBzezaQ4kq978wbZKf
- R6cw8xJBMi0tcd6zvyBvMrVXWrUqX1YYuMHhlCpUHiV5yU5m56GfEgxxbcNmt5J6AmvnMo8otd
- R1Jzut1iiSlfUjn8odvnyG6zupof0i3WKtJgTlfXRysPZXuElXW8GZ/xgYyWg/hpQaJICy7ZaT
- O4vOk4GVp3fkfXL7WkUw5PVRe+/wEe6Z56BgN0X5FJgzDlvFDyOr1YTqQ8FTidG9g3m5Jc3+pV
- H6uqyhQ0ci+2BtEgxjvlNzqM
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2022 00:49:22 -0700
-IronPort-SDR: tVvUKrZcqLI41iTtZjW7la+fFKtXsCF+M7oUycayq0OtAwKEPnvlKfkxUEXhZzrk92DB356Pgb
- QnKmEZiYoyB57dl1M//Jd7NsmoY511OlaSdEk3zQDpUbtYyJeQJxL0pabFDvZX8CdI6hc0qGHv
- +43KJyhXe6oovF8KEgUzIBltDbMp3C71iTt1aiMEtejyWTsMSO5CItuN6hY+Vl6ikzW3GDhuUr
- CsPylneiwoTz//Kjs10YaIPcF+QO2KnVEQ0/snH4cN3z690/2IZQ1UuB5Pt6l9wyhMnIdnU+c1
- V6I=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2022 01:31:15 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LS08y6SN5z1Rwnm
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 01:31:14 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655800274; x=1658392275; bh=qucA03qSP9PIA2chxP6Oz8ivk3NeMPXmaIP
-        gisWiU7w=; b=NVZt5ARKisL9yVfBWbErDlEI/ga4e0S8++8Xy1hDVxFjQ7lEAlT
-        Oop8a2j64KESg7Frc3j/n/39VMSwyNxs3GeVvqIHQc3i5VRQDgNSuj/sH1RbDh1i
-        v7DAbndz2dTXyDg6ebv7Gh8YTpFjyno0ZHhK+IZ4RdTYnz0A/jx+PKtaAvtFYIG3
-        GL7MHfZtB4ITNbgNkD4YlADW0x7zHmgA4frfQ7WFQxJJIQCjAe3CxfKcmK5xE15y
-        p/1x0l/fzqIy5wceIZV+U7HxR9+A9YywACFT2n00fLRpwn9mPLspDwX0ddK6BO6N
-        Nmr1dMI1MalecYN4gUsNFzTbhrV2BLg+mMQ==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id 0B9Jvt-EE7nB for <linux-block@vger.kernel.org>;
-        Tue, 21 Jun 2022 01:31:14 -0700 (PDT)
-Received: from [10.225.163.87] (unknown [10.225.163.87])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LS08x101Rz1RtVk;
-        Tue, 21 Jun 2022 01:31:13 -0700 (PDT)
-Message-ID: <3f6cdc79-8cc4-aa56-cb4c-23b94b686396@opensource.wdc.com>
-Date:   Tue, 21 Jun 2022 17:31:11 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 4/8] block: Fix handling of tasks without ioprio in
- ioprio_get(2)
-Content-Language: en-US
-To:     Jan Kara <jack@suse.cz>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Tue, 21 Jun 2022 06:24:59 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 636C928726
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 03:24:58 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 2281E21C38;
+        Tue, 21 Jun 2022 10:24:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655807097; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f113dIywoOVYzhnNFWbFdCjn+SuIZl6WdAtY+FhLYPI=;
+        b=uo4+i2H4JVjMF4eXP1Kd06v8YqYyn5plHgRRl1phVQ/5REGIx5hX/MUqp3HZPAKZAIW5kH
+        m08tNFvSf3iR12IRCa8czMbIWIqompf9KzaRykzN/0+gpQ9Ktre4ARjIpMR8e4h3gl+uaZ
+        +jQi+k+TqgBHRKigxpseLtD6NjK6k2g=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655807097;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=f113dIywoOVYzhnNFWbFdCjn+SuIZl6WdAtY+FhLYPI=;
+        b=nI9mPDh2wCikkmw40AUC8os3rLQoHBT1FUprOdbcsIEn8SDQYdvp3sDTnvYqyeIDPKfLH6
+        ujyl3TZbMjYm2OCw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by relay2.suse.de (Postfix) with ESMTPS id AF10B2C142;
+        Tue, 21 Jun 2022 10:24:56 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id D6471A0639; Tue, 21 Jun 2022 12:24:55 +0200 (CEST)
+From:   Jan Kara <jack@suse.cz>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     <linux-block@vger.kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>
-References: <20220620160726.19798-1-jack@suse.cz>
- <20220620161153.11741-4-jack@suse.cz>
- <7124bdba-e295-83d4-6346-9e9420062a0f@opensource.wdc.com>
- <20220621081558.6pzyqb67hgjncomm@quack3.lan>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220621081558.6pzyqb67hgjncomm@quack3.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 2/9] block: Return effective IO priority from get_current_ioprio()
+Date:   Tue, 21 Jun 2022 12:24:39 +0200
+Message-Id: <20220621102455.13183-2-jack@suse.cz>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <20220621102201.26337-1-jack@suse.cz>
+References: <20220621102201.26337-1-jack@suse.cz>
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1174; h=from:subject; bh=LQysfpFiMQ3cqmtBoDvv++qBY9sUt5tIGAfQXZyR7vE=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBisZxnTn0JEceDPlbxY87QGISNPTJdYcb3ah4RzceG uqFigauJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYrGcZwAKCRCcnaoHP2RA2WCTCA CjLphKtL1aVFh8h0Gz/2Za7iUY/tlID5FDMGW0g/xJLuXtPc48CvXOWaMbWfaIVCUWsYCwUOFFZ2xp m8mAEsqfyRxu0mcoIB9NqTYtCUSkZVzMfiElHE2yQylOkpU66HO9DA/74phCV/Hb6xWgLVEJcxeYG0 R9ss7BTuB1UkqtGshZ6Ux/aVl2CSTz+pDV08qtx8jDvovw5nrI8js5Ee7wNK0Cfh8W3Ss1WVgroht5 L0WOIc8z2A56kqHvAY6RODNkv+VX+epc+zHtHgbV/6J+upP2aypgF0w0HrwQGRFDPJDgVbxIuHl2Wq sJIIWiCaZhYfpk0BvfaJOFsdt904sv
+X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/22 17:15, Jan Kara wrote:
-> On Tue 21-06-22 08:57:29, Damien Le Moal wrote:
->> On 6/21/22 01:11, Jan Kara wrote:
->>> ioprio_get(2) can be asked to return the best IO priority from several
->>> tasks (IOPRIO_WHO_PGRP, IOPRIO_WHO_USER). Currently the call treats
->>> tasks without set IO priority as having priority
->>> IOPRIO_CLASS_BE/IOPRIO_BE_NORM however this does not really reflect the
->>> IO priority the task will get (which depends on task's nice value).
->>>
->>> Fix the code to use the real IO priority task's IO will use. For this we
->>> do some factoring out to share the code converting task's CPU priority
->>> to IO priority and we also have to modify code for
->>> ioprio_get(IOPRIO_WHO_PROCESS) to keep returning IOPRIO_CLASS_NONE
->>> priority for tasks without set IO priority as a special case to maintain
->>> userspace visible API.
->>>
->>> Signed-off-by: Jan Kara <jack@suse.cz>
-> 
-> ...
-> 
->>> +/*
->>> + * Return raw IO priority value as set by userspace. We use this for
->>> + * ioprio_get(pid, IOPRIO_WHO_PROCESS) so that we keep historical behavior and
->>> + * also so that userspace can distinguish unset IO priority (which just gets
->>> + * overriden based on task's nice value) from IO priority set to some value.
->>> + */
->>> +static int get_task_raw_ioprio(struct task_struct *p) { int ret;
->>
->> The "int ret;" declaration is on the wrong line, so is the curly bracket.
-> 
-> Huh, don't know how that got messed up. Anyway fixed. Thanks for noticing.
-> 
->>> +
->>> +	ret = security_task_getioprio(p);
->>> +	if (ret)
->>> +		goto out;
->>>  	task_lock(p);
->>>  	if (p->io_context)
->>>  		ret = p->io_context->ioprio;
->>> +	else
->>> +		ret = IOPRIO_DEFAULT;
->>>  	task_unlock(p);
->>>  out:
->>>  	return ret;
->>> @@ -156,11 +196,6 @@ static int get_task_ioprio(struct task_struct *p)
->>>  
->>>  static int ioprio_best(unsigned short aprio, unsigned short bprio)
->>>  {
->>> -	if (!ioprio_valid(aprio))
->>> -		aprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
->>> -	if (!ioprio_valid(bprio))
->>> -		bprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
->>> -
->>>  	return min(aprio, bprio);
->>>  }
->>
->> This function could be declared as inline now...
-> 
-> Yeah, but compilers inline (or not inline!) static functions as they see
-> fit anyway. So 'inline' keyword for static functions is generally a noise
-> which is why I just avoid it. But please let me know if you feel strongly
-> about that.
+get_current_ioprio() is used to initialize IO priority of various
+requests. As such it should be returning the effective IO priority of
+the task (i.e., reflecting the fact that unset IO priority should get
+set based on task's CPU priority) so that the conversion is concentrated
+in one place.
 
-Not at all. Fine as-is !
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Signed-off-by: Jan Kara <jack@suse.cz>
+---
+ include/linux/ioprio.h | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-> 
->>>  static inline int get_current_ioprio(void)
->>>  {
->>> -	struct io_context *ioc = current->io_context;
->>> -	int prio;
->>> -
->>> -	if (ioc)
->>> -		prio = ioc->ioprio;
->>> -	else
->>> -		prio = IOPRIO_DEFAULT;
->>> -
->>> -	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
->>> -		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(current),
->>> -					 task_nice_ioprio(current));
->>> -	return prio;
->>> +	return __get_task_ioprio(current);
->>
->> The build bot complained about this one, but I do not understand why.
->> Could it be because you do not have declared __get_task_ioprio() as "extern" ?
-> 
-> No, likely it is because !CONFIG_BLOCK kernel does not have ioprio support
-> but something uses the get_current_ioprio() anyway. I'll fix it up.
-> 
->> Also, to reduce refactoring changes in this patch, you could introduce
->> __get_task_ioprio() and make the above change in patch 2. No ?
-> 
-> OK, I will move some refactoring.
-> 
-> 								Honza
-
-
+diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+index 3d088a88f832..61ed6bb4998e 100644
+--- a/include/linux/ioprio.h
++++ b/include/linux/ioprio.h
+@@ -53,10 +53,17 @@ static inline int task_nice_ioclass(struct task_struct *task)
+ static inline int get_current_ioprio(void)
+ {
+ 	struct io_context *ioc = current->io_context;
++	int prio;
+ 
+ 	if (ioc)
+-		return ioc->ioprio;
+-	return IOPRIO_DEFAULT;
++		prio = ioc->ioprio;
++	else
++		prio = IOPRIO_DEFAULT;
++
++	if (IOPRIO_PRIO_CLASS(prio) == IOPRIO_CLASS_NONE)
++		prio = IOPRIO_PRIO_VALUE(task_nice_ioclass(current),
++					 task_nice_ioprio(current));
++	return prio;
+ }
+ 
+ /*
 -- 
-Damien Le Moal
-Western Digital Research
+2.35.3
+
