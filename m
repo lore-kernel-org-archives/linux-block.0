@@ -2,147 +2,233 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82AA3C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 10:25:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85366CCA480
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 10:25:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241404AbiFUKZF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 06:25:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57604 "EHLO
+        id S1348446AbiFUKZG (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 06:25:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346086AbiFUKY7 (ORCPT
+        with ESMTP id S231127AbiFUKZB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 06:24:59 -0400
+        Tue, 21 Jun 2022 06:25:01 -0400
 Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6859E2898F;
-        Tue, 21 Jun 2022 03:24:58 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7FDF28983
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 03:25:00 -0700 (PDT)
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out1.suse.de (Postfix) with ESMTP id 287E021DE0;
+        by smtp-out1.suse.de (Postfix) with ESMTP id BBFE321E79;
         Tue, 21 Jun 2022 10:24:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
         t=1655807097; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+LL1dq+apRByD46C4qt8iyxS+9kz4FX5965o6Hrr9kI=;
-        b=aHBePNtYp/dfR3sfYIr0qzyQOZiSnLsaIrrQLFFKP0++ROHz4OMWG02IvT8L4YF8DbTUJL
-        6oRN7cntcTpKeEPakIhoqxZGEqtpHOQbzhWpS/DR6/b/6A8+WivwRf/O4UDFG+wqVpVDSZ
-        9If7qhn3HvUa3wMvUyPBWyk11A8Nabw=
+        bh=O8WBv5yuDjiKNHctbcjKS+vyT91fXz9vb1YSfzMnH9k=;
+        b=omvFTfNQf6s9aeK6yrFyvHbjuDQMzMqT9fE3ISSRGAz4NAt8cB24ymHxWgHkTKAImkNXfF
+        YOx18+NiPEiX9R3o905OmajtTe/2UU0StmuizwFed0jmPRrnA84/5wvhDC8UYcxunqYTB+
+        AwxtERIcrdkqwizkeUj70mwKetMZf34=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
         s=susede2_ed25519; t=1655807097;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
          mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=+LL1dq+apRByD46C4qt8iyxS+9kz4FX5965o6Hrr9kI=;
-        b=iwfaTRWJz4JJ7spVJ9vo0wxLmsYxO0e67XZiYuYKgmDAs1OcrF4lTVy94Ulxs5gAYZABAJ
-        WSHvwYSllt6Ng0Bg==
+        bh=O8WBv5yuDjiKNHctbcjKS+vyT91fXz9vb1YSfzMnH9k=;
+        b=U8i4CvwRhdTwU0lYTdBLCKAIgAVzLBovoFAOpyjqdQ6OHjG8mVo5oafwJhFAS2oBZvQBIe
+        MtRWyhA5Mdy6U7Bw==
 Received: from quack3.suse.cz (unknown [10.100.224.230])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id AEF5F2C141;
-        Tue, 21 Jun 2022 10:24:56 +0000 (UTC)
+        by relay2.suse.de (Postfix) with ESMTPS id 923562C14E;
+        Tue, 21 Jun 2022 10:24:57 +0000 (UTC)
 Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id CE5C3A03DF; Tue, 21 Jun 2022 12:24:55 +0200 (CEST)
+        id 0570DA063E; Tue, 21 Jun 2022 12:24:56 +0200 (CEST)
 From:   Jan Kara <jack@suse.cz>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     <linux-block@vger.kernel.org>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>,
-        stable@vger.kernel.org
-Subject: [PATCH 1/9] block: fix default IO priority handling again
-Date:   Tue, 21 Jun 2022 12:24:38 +0200
-Message-Id: <20220621102455.13183-1-jack@suse.cz>
+        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+Subject: [PATCH 7/9] blk-ioprio: Convert from rqos policy to direct call
+Date:   Tue, 21 Jun 2022 12:24:44 +0200
+Message-Id: <20220621102455.13183-7-jack@suse.cz>
 X-Mailer: git-send-email 2.35.3
 In-Reply-To: <20220621102201.26337-1-jack@suse.cz>
 References: <20220621102201.26337-1-jack@suse.cz>
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3355; h=from:subject; bh=5Ogre5KU1EfoWt3GA/j6Xv+dEaBz2FnoJscfrVh0sr4=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBisZxmoyWjApEg1smue+DzBMpbA8NBsL+z2EMCkCzG i4BMSB6JATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYrGcZgAKCRCcnaoHP2RA2UKJCA C7cQqOQK2/oXPwq5YrSXmvn19b794aXzfOSm35wb8GGxWtJudKYEumlMw1FNY0K/KAAYQXIUN17gw3 Q3uwqP5Qwfvk2cOLdU1J02G7qPDAOcHUAPIP3Lo2XJq2zBAT565Itfe/naUukv/K7Oxfk8hrc2unR8 UcXW8SrsvJ+FO1mNqqJ4gJ5VzPI+/Wr1mfxjSsq6ZEI3/p8x0kj766JyqRHvattwXazcSGPJOu8z2L /RZGoSzRz1HglD6Vs69RcFVZ0CeernhkFryTOqsrwn597jjAgBLlASn1cSmzcVAbm3SdCKzkPCoRbI ATf+4aMhl9vlM7BJLu+7KbqHXQOwU6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4609; h=from:subject; bh=CHODQwYjVhwO17QUBAYr8MHIT3js+gfR1lh220Jg6pY=; b=owEBbQGS/pANAwAIAZydqgc/ZEDZAcsmYgBisZxr5J9xAdkQpv13TJYJ9zqx8/y7TqtxH+rB7KpT inazx5KJATMEAAEIAB0WIQSrWdEr1p4yirVVKBycnaoHP2RA2QUCYrGcawAKCRCcnaoHP2RA2Y3sCA DUuCuTN82k+2yvG/TPF8LtlU4o0PI3B8Atr8TXF5s5ZEmHBcnEn7cWYbZj86GZPopONDBgRjMRupCD Oa3NGNEgn1Nx7kkX06m1NCMaY2B9XRr0TejW5QdcEG6W3pFQ432vIde8admIWLir1Lalx4RfumpCVV mPV++A5ZJgcQ/vZzuWWavToR/Mfc2EEIxc7AeMpfW7s58+qu3ClXib2rRZXG6bjqdE6mJwv6lbBRnb 1haWLPZeAC72i7pMQHGShEJYVpnzdMAP7lVE90pe1Hx+ZXP3Kjylcow0VC7rnVe+u1P2LqgNat/INR I9HI0LI25kHH+0A78eKG/26c1NFkG0
 X-Developer-Key: i=jack@suse.cz; a=openpgp; fpr=93C6099A142276A28BBE35D815BC833443038D8C
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit e70344c05995 ("block: fix default IO priority handling")
-introduced an inconsistency in get_current_ioprio() that tasks without
-IO context return IOPRIO_DEFAULT priority while tasks with freshly
-allocated IO context will return 0 (IOPRIO_CLASS_NONE/0) IO priority.
-Tasks without IO context used to be rare before 5a9d041ba2f6 ("block:
-move io_context creation into where it's needed") but after this commit
-they became common because now only BFQ IO scheduler setups task's IO
-context. Similar inconsistency is there for get_task_ioprio() so this
-inconsistency is now exposed to userspace and userspace will see
-different IO priority for tasks operating on devices with BFQ compared
-to devices without BFQ. Furthemore the changes done by commit
-e70344c05995 change the behavior when no IO priority is set for BFQ IO
-scheduler which is also documented in ioprio_set(2) manpage:
+Convert blk-ioprio handling from a rqos policy to a direct call from
+blk_mq_submit_bio(). Firstly, blk-ioprio is not much of a rqos policy
+anyway, it just needs a hook in bio submission path to set the bio's IO
+priority. Secondly, the rqos .track hook gets actually called too late
+for blk-ioprio purposes and introducing a special rqos hook just for
+blk-ioprio looks even weirder.
 
-"If no I/O scheduler has been set for a thread, then by default the I/O
-priority will follow the CPU nice value (setpriority(2)).  In Linux
-kernels before version 2.6.24, once an I/O priority had been set using
-ioprio_set(), there was no way to reset the I/O scheduling behavior to
-the default. Since Linux 2.6.24, specifying ioprio as 0 can be used to
-reset to the default I/O scheduling behavior."
-
-So make sure we default to IOPRIO_CLASS_NONE as used to be the case
-before commit e70344c05995. Also cleanup alloc_io_context() to
-explicitely set this IO priority for the allocated IO context to avoid
-future surprises. Note that we tweak ioprio_best() to maintain
-ioprio_get(2) behavior and make this commit easily backportable.
-
-CC: stable@vger.kernel.org
-Fixes: e70344c05995 ("block: fix default IO priority handling")
 Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Signed-off-by: Jan Kara <jack@suse.cz>
 ---
- block/blk-ioc.c        | 2 ++
- block/ioprio.c         | 4 ++--
- include/linux/ioprio.h | 2 +-
- 3 files changed, 5 insertions(+), 3 deletions(-)
+ block/blk-cgroup.c |  1 +
+ block/blk-ioprio.c | 50 +++++-----------------------------------------
+ block/blk-ioprio.h |  9 +++++++++
+ block/blk-mq.c     |  8 ++++++++
+ 4 files changed, 23 insertions(+), 45 deletions(-)
 
-diff --git a/block/blk-ioc.c b/block/blk-ioc.c
-index df9cfe4ca532..63fc02042408 100644
---- a/block/blk-ioc.c
-+++ b/block/blk-ioc.c
-@@ -247,6 +247,8 @@ static struct io_context *alloc_io_context(gfp_t gfp_flags, int node)
- 	INIT_HLIST_HEAD(&ioc->icq_list);
- 	INIT_WORK(&ioc->release_work, ioc_release_fn);
- #endif
-+	ioc->ioprio = IOPRIO_DEFAULT;
-+
- 	return ioc;
- }
+diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
+index 764e740b0c0f..6906981563f8 100644
+--- a/block/blk-cgroup.c
++++ b/block/blk-cgroup.c
+@@ -1299,6 +1299,7 @@ int blkcg_init_queue(struct request_queue *q)
+ 	ret = blk_iolatency_init(q);
+ 	if (ret) {
+ 		blk_throtl_exit(q);
++		blk_ioprio_exit(q);
+ 		goto err_destroy_all;
+ 	}
  
-diff --git a/block/ioprio.c b/block/ioprio.c
-index 2fe068fcaad5..2a34cbca18ae 100644
---- a/block/ioprio.c
-+++ b/block/ioprio.c
-@@ -157,9 +157,9 @@ static int get_task_ioprio(struct task_struct *p)
- int ioprio_best(unsigned short aprio, unsigned short bprio)
+diff --git a/block/blk-ioprio.c b/block/blk-ioprio.c
+index 3f605583598b..c00060a02c6e 100644
+--- a/block/blk-ioprio.c
++++ b/block/blk-ioprio.c
+@@ -181,17 +181,12 @@ static struct blkcg_policy ioprio_policy = {
+ 	.pd_free_fn	= ioprio_free_pd,
+ };
+ 
+-struct blk_ioprio {
+-	struct rq_qos rqos;
+-};
+-
+-static void blkcg_ioprio_track(struct rq_qos *rqos, struct request *rq,
+-			       struct bio *bio)
++void blkcg_set_ioprio(struct bio *bio)
  {
- 	if (!ioprio_valid(aprio))
--		aprio = IOPRIO_DEFAULT;
-+		aprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
- 	if (!ioprio_valid(bprio))
--		bprio = IOPRIO_DEFAULT;
-+		bprio = IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM);
+ 	struct ioprio_blkcg *blkcg = ioprio_blkcg_from_bio(bio);
+ 	u16 prio;
  
- 	return min(aprio, bprio);
+-	if (blkcg->prio_policy == POLICY_NO_CHANGE)
++	if (!blkcg || blkcg->prio_policy == POLICY_NO_CHANGE)
+ 		return;
+ 
+ 	/*
+@@ -207,49 +202,14 @@ static void blkcg_ioprio_track(struct rq_qos *rqos, struct request *rq,
+ 		bio->bi_ioprio = prio;
  }
-diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
-index 3f53bc27a19b..3d088a88f832 100644
---- a/include/linux/ioprio.h
-+++ b/include/linux/ioprio.h
-@@ -11,7 +11,7 @@
- /*
-  * Default IO priority.
-  */
--#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_BE, IOPRIO_BE_NORM)
-+#define IOPRIO_DEFAULT	IOPRIO_PRIO_VALUE(IOPRIO_CLASS_NONE, 0)
  
- /*
-  * Check that a priority value has a valid class.
+-static void blkcg_ioprio_exit(struct rq_qos *rqos)
++void blk_ioprio_exit(struct request_queue *q)
+ {
+-	struct blk_ioprio *blkioprio_blkg =
+-		container_of(rqos, typeof(*blkioprio_blkg), rqos);
+-
+-	blkcg_deactivate_policy(rqos->q, &ioprio_policy);
+-	kfree(blkioprio_blkg);
++	blkcg_deactivate_policy(q, &ioprio_policy);
+ }
+ 
+-static struct rq_qos_ops blkcg_ioprio_ops = {
+-	.track	= blkcg_ioprio_track,
+-	.exit	= blkcg_ioprio_exit,
+-};
+-
+ int blk_ioprio_init(struct request_queue *q)
+ {
+-	struct blk_ioprio *blkioprio_blkg;
+-	struct rq_qos *rqos;
+-	int ret;
+-
+-	blkioprio_blkg = kzalloc(sizeof(*blkioprio_blkg), GFP_KERNEL);
+-	if (!blkioprio_blkg)
+-		return -ENOMEM;
+-
+-	ret = blkcg_activate_policy(q, &ioprio_policy);
+-	if (ret) {
+-		kfree(blkioprio_blkg);
+-		return ret;
+-	}
+-
+-	rqos = &blkioprio_blkg->rqos;
+-	rqos->id = RQ_QOS_IOPRIO;
+-	rqos->ops = &blkcg_ioprio_ops;
+-	rqos->q = q;
+-
+-	/*
+-	 * Registering the rq-qos policy after activating the blk-cgroup
+-	 * policy guarantees that ioprio_blkcg_from_bio(bio) != NULL in the
+-	 * rq-qos callbacks.
+-	 */
+-	rq_qos_add(q, rqos);
+-
+-	return 0;
++	return blkcg_activate_policy(q, &ioprio_policy);
+ }
+ 
+ static int __init ioprio_init(void)
+diff --git a/block/blk-ioprio.h b/block/blk-ioprio.h
+index a7785c2f1aea..5a1eb550e178 100644
+--- a/block/blk-ioprio.h
++++ b/block/blk-ioprio.h
+@@ -6,14 +6,23 @@
+ #include <linux/kconfig.h>
+ 
+ struct request_queue;
++struct bio;
+ 
+ #ifdef CONFIG_BLK_CGROUP_IOPRIO
+ int blk_ioprio_init(struct request_queue *q);
++void blk_ioprio_exit(struct request_queue *q);
++void blkcg_set_ioprio(struct bio *bio);
+ #else
+ static inline int blk_ioprio_init(struct request_queue *q)
+ {
+ 	return 0;
+ }
++static inline void blk_ioprio_exit(struct request_queue *q)
++{
++}
++static inline void blkcg_set_ioprio(struct bio *bio)
++{
++}
+ #endif
+ 
+ #endif /* _BLK_IOPRIO_H_ */
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index e9bf950983c7..67a7bfa58b7c 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -42,6 +42,7 @@
+ #include "blk-stat.h"
+ #include "blk-mq-sched.h"
+ #include "blk-rq-qos.h"
++#include "blk-ioprio.h"
+ 
+ static DEFINE_PER_CPU(struct llist_head, blk_cpu_done);
+ 
+@@ -2790,6 +2791,11 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 	return rq;
+ }
+ 
++static void bio_set_ioprio(struct bio *bio)
++{
++	blkcg_set_ioprio(bio);
++}
++
+ /**
+  * blk_mq_submit_bio - Create and send a request to block device.
+  * @bio: Bio pointer.
+@@ -2830,6 +2836,8 @@ void blk_mq_submit_bio(struct bio *bio)
+ 
+ 	trace_block_getrq(bio);
+ 
++	bio_set_ioprio(bio);
++
+ 	rq_qos_track(q, rq, bio);
+ 
+ 	blk_mq_bio_to_request(rq, bio, nr_segs);
 -- 
 2.35.3
 
