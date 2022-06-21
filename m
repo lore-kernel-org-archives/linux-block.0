@@ -2,129 +2,103 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CAADC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 00:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D2A1C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 00:12:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245355AbiFUACM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 20 Jun 2022 20:02:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37398 "EHLO
+        id S240115AbiFUAMU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 20 Jun 2022 20:12:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244334AbiFUACL (ORCPT
+        with ESMTP id S230172AbiFUAMU (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 20 Jun 2022 20:02:11 -0400
-Received: from esa3.hgst.iphmx.com (esa3.hgst.iphmx.com [216.71.153.141])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C17713D4A
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 17:02:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1655769729; x=1687305729;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ya/zJpT+VwFOZHDGwNPdMzoHveI6VOJnzkUngy3az/Q=;
-  b=CFjKta8QvUoTxcCcJwZltsZCuOlgwbl1RkT/lzqJREdHIBEcBrNmNx4W
-   iRGjoGbVI0J5fUu3JwBvij2bAXJ2OlBQ9GNt9zStZQ8QUap/6y+ZTD8I5
-   Yc1AnLRXHqFDOiEs105YIJ0S60nEvIykhalj7cRh9CGSYVqH1V5xuUaQM
-   fEU6P7olO61dtPGo6TThBovnajVoJdcr4z9YxQNCetKJUMyo8wD+A04SU
-   iXOdNYrpG+hhR8L5Wss0INTkrloBDx/oJ9ZmBh9Ja+H9fj4IOBmP8nylD
-   cYz2Doqf5zVwPchG6EO4gF5FdlCaYSg1saUHYuWUQdZ8hlBKfs/c6Tmic
-   A==;
-X-IronPort-AV: E=Sophos;i="5.92,207,1650902400"; 
-   d="scan'208";a="208524487"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com) ([199.255.45.15])
-  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2022 08:02:09 +0800
-IronPort-SDR: fsUIXDijuyAkIS+i4NjyECu1mxVXUyX04J9aoRQJdr+TnZ0kFAtOrpJSEnitSNuJtFov05FFem
- 6B/J445lGe/8IOp1WGAj37GEoB4Q3A5uci0fCjlMAyWikvDlbBea0KIIYNJAZhQ1mF5eBA369K
- z1DnuGdpjeRR/TjydEXGQgRpxFmSC/UWv4VIyxg90MM+tv4d4q0QBGrqddjVvX+2tVeqwLrTqM
- nKAfAgUfvoEb/MLWekm7SQDEGC808Uc1BBre8sy+EHJy0XMTl0Ho6grOfP44ELLIWFIljOmtM5
- RTyU3QyqbilTXHPYTEXJCf3Y
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
-  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 16:20:17 -0700
-IronPort-SDR: aDZtfChpJAkvGeqja91h8wl9Dyq8SN39QcoPjZF9MR35qR0VkzAVkIBo7ZEGjvyCzZKADPS3Pt
- 4b9IkRHDzBhi9642JK8UtNLE36pBK8+gh+tGVBpGl1CBHr1FVtAaM0lOZKISbGzRx1JeWSQD0h
- eDSVJhpNs3iH0eiiARS4uRHWpHFJCQEpBVQWJObhNRXxNi6I68UOsMvy6eiPSiJ7LhO0DJVa71
- bek1apoGWB4Ntixm8BnhSZ3MjUziCEC8nnKoQexvGHDk2UvaRAkrpxtEkTBTvNpt1RuNetCEtx
- THY=
-WDCIronportException: Internal
-Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 20 Jun 2022 17:02:09 -0700
-Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LRmsY2FJTz1SVnx
-        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 17:02:09 -0700 (PDT)
-Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
-        reason="pass (just generated, assumed good)"
-        header.d=opensource.wdc.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
-        opensource.wdc.com; h=content-transfer-encoding:content-type
-        :in-reply-to:organization:from:references:to:content-language
-        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1655769728; x=1658361729; bh=ya/zJpT+VwFOZHDGwNPdMzoHveI6VOJnzkU
-        ngy3az/Q=; b=YpYZif8F+b/bEQvKDxu+8i/ail/ehri7aBQeT1KeH459+4Rrdec
-        gw0R1ml9p3tuzAc/5CA1sKyiHyFxxL/YhSGkFbOJrz600YqpADMR8y2ShPFKOsfC
-        Mm52MabuWt/JQ8Jr5faDQ46bbxxAwxrTk2rx06+9GAXxgZxPeR4RKKnbbfHO6J3z
-        jt9rMIQokwy+Iv/SNNgD7qKS2kvUwIjCuSSMI9+SBNF3S9x7/Eb8wcTPXAYyoO8J
-        5y7/CDP/JQgdS1nYKKKNfJkYqOHyQrUhbJMrZDDUf8Iv/il3KSdHMojKL1syxuzx
-        g71T/sZ02Bo6Ui1d1MUG9tZrqXo4/XpF/Yw==
-X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
-Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
-        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id sH_srHItrU2Z for <linux-block@vger.kernel.org>;
-        Mon, 20 Jun 2022 17:02:08 -0700 (PDT)
-Received: from [10.225.163.87] (unknown [10.225.163.87])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LRmsX1D34z1Rvlc;
-        Mon, 20 Jun 2022 17:02:08 -0700 (PDT)
-Message-ID: <bffcca6d-eeb6-1fbd-9585-22d20b8a36df@opensource.wdc.com>
-Date:   Tue, 21 Jun 2022 09:02:07 +0900
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 8/8] block: Always initialize bio IO priority on submit
-Content-Language: en-US
+        Mon, 20 Jun 2022 20:12:20 -0400
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67CB963E8
+        for <linux-block@vger.kernel.org>; Mon, 20 Jun 2022 17:12:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655770339; x=1687306339;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=3LGjYJET3QsD34Iv5RQ8gArWSNbMQJ3af6CDxOHbJLk=;
+  b=BEqEwGrniFemITcZTcOLYb7FIDKMgviym8Um758mvD0XBrkfFPPl69Pp
+   ewKXCBVYGBaCtLPmRL9DL/3sEo/0okMVXJp2EfuoAIXd3us+Qd8iJQAHs
+   w6ct7BgjYofA/cWCJF2AbMwuzyuHgGSrkpgGUANgLdG0nmqnq6z4KowXs
+   c5fNLE0NCMMCIQC0jhhL80YYwHHUxVcZQSGT9BOomsBgiNK8kjU5nCveU
+   d4ypf8DOg36kLSXjQC8CutvGTAw3yvTalyka0dGTaMrDxaqdUkWLhr8eW
+   E8iKHlsQ/3Qjx0owBLSRI/UoFMMDq1/Uk6cZ6CsuzWDvurPiaPt2WeVd8
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10384"; a="263024986"
+X-IronPort-AV: E=Sophos;i="5.92,207,1650956400"; 
+   d="scan'208";a="263024986"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2022 17:12:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,207,1650956400"; 
+   d="scan'208";a="764266992"
+Received: from lkp-server01.sh.intel.com (HELO 60dabacc1df6) ([10.239.97.150])
+  by orsmga005.jf.intel.com with ESMTP; 20 Jun 2022 17:12:17 -0700
+Received: from kbuild by 60dabacc1df6 with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o3RVA-000XHl-LX;
+        Tue, 21 Jun 2022 00:12:16 +0000
+Date:   Tue, 21 Jun 2022 08:11:40 +0800
+From:   kernel test robot <lkp@intel.com>
 To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>
-References: <20220620160726.19798-1-jack@suse.cz>
- <20220620161153.11741-8-jack@suse.cz>
-From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
-Organization: Western Digital Research
-In-Reply-To: <20220620161153.11741-8-jack@suse.cz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Cc:     kbuild-all@lists.01.org, linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 4/8] block: Fix handling of tasks without ioprio in
+ ioprio_get(2)
+Message-ID: <202206210847.sBhjsEiQ-lkp@intel.com>
+References: <20220620161153.11741-4-jack@suse.cz>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220620161153.11741-4-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/21/22 01:11, Jan Kara wrote:
-> Currently, IO priority set in task's IO context is not reflected in the
-> bio->bi_ioprio for most IO (only io_uring and direct IO set it). This
-> results in odd results where process is submitting some bios with one
-> priority and other bios with a different (unset) priority and due to
-> differing priorities bios cannot be merged. Make sure bio->bi_ioprio is
-> always set on bio submission.
-> 
-> Signed-off-by: Jan Kara <jack@suse.cz>
-> ---
->  block/blk-mq.c | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index e17d822e6051..7548f8aebea8 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2793,6 +2793,9 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
->  
->  static void bio_set_ioprio(struct bio *bio)
->  {
-> +	/* Nobody set ioprio so far? Initialize it based on task's nice value */
-> +	if (IOPRIO_PRIO_CLASS(bio->bi_ioprio) == IOPRIO_CLASS_NONE)
-> +		bio->bi_ioprio = get_current_ioprio();
->  	blkcg_set_ioprio(bio);
->  }
->  
+Hi Jan,
 
-Looks good to me.
+I love your patch! Perhaps something to improve:
 
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v5.19-rc2 next-20220617]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Jan-Kara/block-Fix-IO-priority-mess/20220621-001427
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: mips-randconfig-m031-20220619 (https://download.01.org/0day-ci/archive/20220621/202206210847.sBhjsEiQ-lkp@intel.com/config)
+compiler: mips-linux-gcc (GCC) 11.3.0
+
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
+
+smatch warnings:
+block/ioprio.c:184 get_task_raw_ioprio() warn: inconsistent indenting
+
+vim +184 block/ioprio.c
+
+   183	
+ > 184		ret = security_task_getioprio(p);
+   185		if (ret)
+   186			goto out;
+   187		task_lock(p);
+   188		if (p->io_context)
+   189			ret = p->io_context->ioprio;
+   190		else
+   191			ret = IOPRIO_DEFAULT;
+   192		task_unlock(p);
+   193	out:
+   194		return ret;
+   195	}
+   196	
 
 -- 
-Damien Le Moal
-Western Digital Research
+0-DAY CI Kernel Test Service
+https://01.org/lkp
