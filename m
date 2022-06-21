@@ -2,92 +2,193 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7295DC43334
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 22:48:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 191B4C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 23:59:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbiFUWsr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 18:48:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46534 "EHLO
+        id S229458AbiFUX7i (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 19:59:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230021AbiFUWsr (ORCPT
+        with ESMTP id S238595AbiFUX7X (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 18:48:47 -0400
-Received: from madras.collabora.co.uk (madras.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e5ab])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CF81EED5
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 15:48:45 -0700 (PDT)
-Received: from localhost (mtl.collabora.ca [66.171.169.34])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: krisman)
-        by madras.collabora.co.uk (Postfix) with ESMTPSA id 580EC66017A2;
-        Tue, 21 Jun 2022 23:48:43 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-        s=mail; t=1655851723;
-        bh=Rt6IkFmJAfHtPrCGOe/by6P/Wefj36GKxB6XD9MdLIY=;
-        h=From:To:Cc:Subject:Date:From;
-        b=AZxMBB7Qi7NkaJhu0gVjF+E/t0bGLFprOXm3sPETfN2A4z+5d+3hMh5ilLgVJLbrP
-         ZqxzLkI8A/ZD12+gJMfh/YJPgC8Xp5rBwTmCc+9k+ZYsQhhjQ7j9FiIv3SKDpxZi+R
-         Ih5Rb8oUM0WnLRRvZpCpbPb7QkRjqHQhU0JwWS9rQqK9Gac4G2iaQ82sjAXfb5snmy
-         1gR4hfVwh2zLcMcxhTUYww/wLESe1ZpQtH4hzPfwunXyPQFTAzAtC774JI8sB0ixou
-         jXfUOjMzl4VmsxZN19JlNfWnoZcu1oToxvnp7UlpvV0BhXLit3bvvZVPoplg7fMzE8
-         OteHA8grv91MA==
-From:   Gabriel Krisman Bertazi <krisman@collabora.com>
-To:     ming.lei@redhat.com
-Cc:     linux-block@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>
-Subject: [PATCH ubdsrv] tgt_null: Return number of sectors read/written
-Date:   Tue, 21 Jun 2022 18:48:39 -0400
-Message-Id: <20220621224839.76007-1-krisman@collabora.com>
-X-Mailer: git-send-email 2.36.1
+        Tue, 21 Jun 2022 19:59:23 -0400
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7679B1FA
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 16:59:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1655855962; x=1687391962;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YjwFAUooq/ib+Rloguw7WdWKzElE9xijXQXkcyU9l8s=;
+  b=b0JxImGm914LxeOS422bhRnyLDrfkM0apJGnvEtD8tgUjfZvmVPVpZOB
+   rMfKAoQjsSEk6cWJjW3AnpaguIH2Z1Qb5pVGyZe5waIPYweao7AHfowr4
+   8nOz/q1mgBFLsrXZBTtelK+XwmcssuJsjI6LmrWhaCBaZrGycr2oZ7dIB
+   PwGIAhuRwlf6rcxdv0EGOy7UJ2xzzExmTUGSioP6Th8101Lv5Z6msOCJM
+   AFDjGcBmcFUTcy9cGJkTTYbTkodYmd9MqCMSMm7rAbVuOhJF5fR1Wxkwx
+   zc5+ylreDJEWvxBGIrRcQIKvnoPVNBXdAlmt2aw4DVhjAL2F+3PbL2lwn
+   w==;
+X-IronPort-AV: E=McAfee;i="6400,9594,10385"; a="281340725"
+X-IronPort-AV: E=Sophos;i="5.92,210,1650956400"; 
+   d="scan'208";a="281340725"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2022 16:59:22 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.92,210,1650956400"; 
+   d="scan'208";a="538237889"
+Received: from lkp-server02.sh.intel.com (HELO a67cc04a5eeb) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 21 Jun 2022 16:59:19 -0700
+Received: from kbuild by a67cc04a5eeb with local (Exim 4.95)
+        (envelope-from <lkp@intel.com>)
+        id 1o3nmA-0000aH-UA;
+        Tue, 21 Jun 2022 23:59:18 +0000
+Date:   Wed, 22 Jun 2022 07:58:43 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 3/9] block: Generalize get_current_ioprio() for any task
+Message-ID: <202206220716.sxn2tinw-lkp@intel.com>
+References: <20220621102455.13183-3-jack@suse.cz>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220621102455.13183-3-jack@suse.cz>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Ming,
+Hi Jan,
 
-I wrote this against your devel-v3 branch.  I'm wondering if you plan to
-send a new version of the kernel patch soon? From the latest
-discussions, I don't think there were major issues found on review. :)
+I love your patch! Perhaps something to improve:
 
-I hope people don't mind I cc'd linux-block about this userspace code.
-Please, let me know if I shouldn't do that.
+[auto build test WARNING on axboe-block/for-next]
+[also build test WARNING on linus/master v5.19-rc3 next-20220621]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
--- >8 --
+url:    https://github.com/intel-lab-lkp/linux/commits/Jan-Kara/block-Fix-IO-priority-mess/20220621-183235
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/axboe/linux-block.git for-next
+config: hexagon-randconfig-r016-20220622 (https://download.01.org/0day-ci/archive/20220622/202206220716.sxn2tinw-lkp@intel.com/config)
+compiler: clang version 15.0.0 (https://github.com/llvm/llvm-project af6d2a0b6825e71965f3e2701a63c239fa0ad70f)
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/intel-lab-lkp/linux/commit/8421c851d4fe5f4b9d9d6870ada8ccd0b48a4012
+        git remote add linux-review https://github.com/intel-lab-lkp/linux
+        git fetch --no-tags linux-review Jan-Kara/block-Fix-IO-priority-mess/20220621-183235
+        git checkout 8421c851d4fe5f4b9d9d6870ada8ccd0b48a4012
+        # save the config file
+        mkdir build_dir && cp config build_dir/.config
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon prepare
 
-The number of sectors read/written is used to verify forward progress of
-the request inside the kernel.  If we return 0 here, the kernel
-understands that as an IO failure (see first check in ubd_complete_rq),
-and will reissue the request, causing an infinite loop of unfullfilled
-requests.  This can be reproduced with:
+If you fix the issue, kindly add following tag where applicable
+Reported-by: kernel test robot <lkp@intel.com>
 
-  ubdsrv/ubd add -t null -n0 -q1 -d1
-  dd if=/dev/vda of=/dev/ubdb0 count=1 bs=4k
+All warnings (new ones prefixed by >>):
 
-The approach minics nullblk, which returns the total IO size.
+   In file included from arch/hexagon/kernel/asm-offsets.c:12:
+   In file included from include/linux/compat.h:17:
+   In file included from include/linux/fs.h:38:
+>> include/linux/ioprio.h:60:27: warning: incompatible pointer to integer conversion passing 'struct task_struct *' to parameter of type 'int' [-Wint-conversion]
+           return __get_task_ioprio(current);
+                                    ^~~~~~~
+   include/asm-generic/current.h:8:17: note: expanded from macro 'current'
+   #define current get_current()
+                   ^~~~~~~~~~~~~
+   include/asm-generic/current.h:7:23: note: expanded from macro 'get_current'
+   #define get_current() (current_thread_info()->task)
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/ioprio.h:52:41: note: passing argument to parameter 'ioprio' here
+   static inline int __get_task_ioprio(int ioprio)
+                                           ^
+   1 warning generated.
+--
+   In file included from drivers/iio/proximity/isl29501.c:13:
+   In file included from include/linux/i2c.h:19:
+   In file included from include/linux/regulator/consumer.h:35:
+   In file included from include/linux/suspend.h:5:
+   In file included from include/linux/swap.h:9:
+   In file included from include/linux/memcontrol.h:13:
+   In file included from include/linux/cgroup.h:17:
+   In file included from include/linux/fs.h:38:
+>> include/linux/ioprio.h:60:27: warning: incompatible pointer to integer conversion passing 'struct task_struct *' to parameter of type 'int' [-Wint-conversion]
+           return __get_task_ioprio(current);
+                                    ^~~~~~~
+   include/asm-generic/current.h:8:17: note: expanded from macro 'current'
+   #define current get_current()
+                   ^~~~~~~~~~~~~
+   include/asm-generic/current.h:7:23: note: expanded from macro 'get_current'
+   #define get_current() (current_thread_info()->task)
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/ioprio.h:52:41: note: passing argument to parameter 'ioprio' here
+   static inline int __get_task_ioprio(int ioprio)
+                                           ^
+   drivers/iio/proximity/isl29501.c:1000:34: warning: unused variable 'isl29501_i2c_matches' [-Wunused-const-variable]
+   static const struct of_device_id isl29501_i2c_matches[] = {
+                                    ^
+   2 warnings generated.
+--
+   In file included from drivers/iio/proximity/sx9500.c:13:
+   In file included from include/linux/i2c.h:19:
+   In file included from include/linux/regulator/consumer.h:35:
+   In file included from include/linux/suspend.h:5:
+   In file included from include/linux/swap.h:9:
+   In file included from include/linux/memcontrol.h:13:
+   In file included from include/linux/cgroup.h:17:
+   In file included from include/linux/fs.h:38:
+>> include/linux/ioprio.h:60:27: warning: incompatible pointer to integer conversion passing 'struct task_struct *' to parameter of type 'int' [-Wint-conversion]
+           return __get_task_ioprio(current);
+                                    ^~~~~~~
+   include/asm-generic/current.h:8:17: note: expanded from macro 'current'
+   #define current get_current()
+                   ^~~~~~~~~~~~~
+   include/asm-generic/current.h:7:23: note: expanded from macro 'get_current'
+   #define get_current() (current_thread_info()->task)
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/ioprio.h:52:41: note: passing argument to parameter 'ioprio' here
+   static inline int __get_task_ioprio(int ioprio)
+                                           ^
+   drivers/iio/proximity/sx9500.c:1035:36: warning: unused variable 'sx9500_acpi_match' [-Wunused-const-variable]
+   static const struct acpi_device_id sx9500_acpi_match[] = {
+                                      ^
+   2 warnings generated.
+--
+   In file included from arch/hexagon/kernel/asm-offsets.c:12:
+   In file included from include/linux/compat.h:17:
+   In file included from include/linux/fs.h:38:
+>> include/linux/ioprio.h:60:27: warning: incompatible pointer to integer conversion passing 'struct task_struct *' to parameter of type 'int' [-Wint-conversion]
+           return __get_task_ioprio(current);
+                                    ^~~~~~~
+   include/asm-generic/current.h:8:17: note: expanded from macro 'current'
+   #define current get_current()
+                   ^~~~~~~~~~~~~
+   include/asm-generic/current.h:7:23: note: expanded from macro 'get_current'
+   #define get_current() (current_thread_info()->task)
+                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/ioprio.h:52:41: note: passing argument to parameter 'ioprio' here
+   static inline int __get_task_ioprio(int ioprio)
+                                           ^
+   1 warning generated.
+   <stdin>:1517:2: warning: syscall clone3 not implemented [-W#warnings]
+   #warning syscall clone3 not implemented
+    ^
+   1 warning generated.
 
-Signed-off-by: Gabriel Krisman Bertazi <krisman@collabora.com>
----
- tgt_null.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tgt_null.c b/tgt_null.c
-index 85636c405f0c..61850a2cd046 100644
---- a/tgt_null.c
-+++ b/tgt_null.c
-@@ -20,7 +20,9 @@ static int null_init_tgt(struct ubdsrv_tgt_info *tgt, int type, int argc,
- static int null_handle_io_async(struct ubdsrv_queue *q, struct ubd_io *io,
- 		int tag)
- {
--	ubdsrv_mark_io_done(io, 0);
-+	const struct ubdsrv_io_desc *iod = ubdsrv_get_iod(q, tag);
-+
-+	ubdsrv_mark_io_done(io, iod->nr_sectors << 9);
- 
- 	return 0;
- }
+vim +60 include/linux/ioprio.h
+
+    57	
+    58	static inline int get_current_ioprio(void)
+    59	{
+  > 60		return __get_task_ioprio(current);
+    61	}
+    62	
+
 -- 
-2.36.1
-
+0-DAY CI Kernel Test Service
+https://01.org/lkp
