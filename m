@@ -2,93 +2,102 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F06D5CCA473
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 07:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1261C43334
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 07:56:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347664AbiFUHzl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 03:55:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51592 "EHLO
+        id S1347813AbiFUH46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 03:56:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52574 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1345332AbiFUHzk (ORCPT
+        with ESMTP id S1347817AbiFUH44 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 03:55:40 -0400
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34578240B4
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 00:55:39 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id k22so11244025wrd.6
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 00:55:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=u1L7nd9RWy6bnH2I84AvftyR0eYfq9iIPGW4WLNh4fc=;
-        b=giPyOWITw9taw4PaNQ0JGlbTMOUNhJwyE4M53GOoMqGDpIF+IKrbVQxeckOf1V53Yx
-         LdiUXJgflNcwjcuD4jMqXEuc5hlkzV5w/Qkoo25ZOv2tILXOS93Ru4DFGWOx/dkt/PDc
-         53fo6hW+pNez7BjrVXBNkqXRnEO2BXrGPypOyhQaUmy/rCACBk5DIj/k3JG80MmFw6IE
-         dgXmlEWCFiHkVNiwxRewVvCBuanEzxBInZ8nvPb62dbSIlDgHjbPL3Six75dQsnInvw6
-         m9th3TpLto75NFlInQpJa0MsuByDqaDyi28TZ10ClXPa4S0UCzFY3p0bqFOUBT2kGUWa
-         J5vg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=u1L7nd9RWy6bnH2I84AvftyR0eYfq9iIPGW4WLNh4fc=;
-        b=sbjiJ5AUTgMmPjEt/QQPqAURD1V1aLk+NQsEOy27CPR5TuPetcDqiN6Vs7QyQYGmtw
-         oH0Bob+aIEWkGXt92/wrBSsKWK9mqhK4TwYVEx9abQgJeZw38O5V12kVktOZmbW5ikme
-         ysEW2v9Hh/yctJSmNehqRRvhtvDg6gR/ROti/XtLsIlGOB9el8eAM0TaNyoOVBUoD7dZ
-         PKEkGlPV8kHT3qEfsw4IpLLKzn++FW0fJZIGfCN08ZdaJgC8FP1QaQbL1SktnXyIqnJs
-         0dz7Vi7PoqRLjyWreeC1kFSPIN3D2FCYVzVCFjgmuWt1IEakMg9gTQQIrZYvoNdPVu7L
-         0Eew==
-X-Gm-Message-State: AJIora/KEFtkdDHMY6SKIe1/B4Fam+c6SWwqrT82QnNYYLQ4/lVOymHo
-        qtvLyJ/PgI4LOZDXpofNHlL68TggSwlQf9jCr9Zabw==
-X-Google-Smtp-Source: AGRyM1tqRuIcQxhftk2xat7q2KjLeDqf4WLTaKZ42Rx/0qBDAhBIjp4VO/TVO9DuRg2px8UBFx8TKB1DmOWWiqmowuQ=
-X-Received: by 2002:a05:6000:2a4:b0:219:2aad:51ce with SMTP id
- l4-20020a05600002a400b002192aad51cemr26241317wry.719.1655798137558; Tue, 21
- Jun 2022 00:55:37 -0700 (PDT)
+        Tue, 21 Jun 2022 03:56:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D154248E8
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 00:56:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1655798214;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=A3CNJkCHn+2Ifuf6wllzWH6KabcEleGyqumFDzY2//8=;
+        b=PClXCO3APyH4p/Td17js2lvLORaMjDmgvRinBc8K+jCEmHQMDvaqNcsyuNxfmsF70dZZZO
+        gcVBW8mN55Hb42Tir1WNQh9j3N8O96YKqeQ6cnuZGYgvH51Et5NSQiL41d8JG/gbvGfV7W
+        ZZ720p53VwM0REXGVjX8ThqjNKVYzmQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-612-N_h0iBWePue4H7uvH0Ficg-1; Tue, 21 Jun 2022 03:56:50 -0400
+X-MC-Unique: N_h0iBWePue4H7uvH0Ficg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B841811E75;
+        Tue, 21 Jun 2022 07:56:50 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 122D81121314;
+        Tue, 21 Jun 2022 07:56:46 +0000 (UTC)
+Date:   Tue, 21 Jun 2022 15:56:41 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+        Thomas Gleixner <tglx@linutronix.de>
+Subject: Re: [PATCH REPOST] blk-mq: Don't disable preemption around
+ __blk_mq_run_hw_queue().
+Message-ID: <YrF5uf4ZL7Oh7LVJ@T590>
+References: <YrF1p2n0MxHQ3fcJ@linutronix.de>
 MIME-Version: 1.0
-References: <CALt099+y4-kJ0OqVeKaAjAbs4inOkR-WE0FmyiJRDc1-Ev9UKw@mail.gmail.com>
- <20220603124956.GA18365@lst.de> <CALt099JqRXwsGnq_DmHmnwPyB0K9Y+-BZUG_YoGxOg7G7ZZh9w@mail.gmail.com>
- <20220609042736.GA31823@lst.de> <CALt099+_EoSmigM5LizV8g7KFY=n0dcfPv4Ycw=YrCDvhJELMg@mail.gmail.com>
-In-Reply-To: <CALt099+_EoSmigM5LizV8g7KFY=n0dcfPv4Ycw=YrCDvhJELMg@mail.gmail.com>
-From:   Michael Schaller <misch@google.com>
-Date:   Tue, 21 Jun 2022 09:55:00 +0200
-Message-ID: <CALt099L=D58sMB4176nfmFFN5H_Bh7rvB3Qf5mWJ8MwtuSExmw@mail.gmail.com>
-Subject: Re: New partition on loop device doesn't appear in /dev anymore with
- kernel 5.17.0 and newer (repro script included)
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <YrF1p2n0MxHQ3fcJ@linutronix.de>
+X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Done: https://github.com/osandov/blktests/commit/e067296aa2c5ba89d8140113af=
-1e8e50241275b3
+On Tue, Jun 21, 2022 at 09:39:19AM +0200, Sebastian Andrzej Siewior wrote:
+> __blk_mq_delay_run_hw_queue() disables preemption to get a stable
+> current CPU number and then invokes __blk_mq_run_hw_queue() if the CPU
+> number is part the mask.
+> 
+> __blk_mq_run_hw_queue() acquires a spin_lock_t which is a sleeping lock
+> on PREEMPT_RT and can't be acquired with disabled preemption.
+> 
+> If it is important that the current CPU matches the requested CPU mask
+> and that the context does not migrate to another CPU while
+> __blk_mq_run_hw_queue() is invoked then it possible to achieve this by
+> disabling migration and keeping the context preemptible.
+> 
+> Disable only migration while testing the CPU mask and invoking
+> __blk_mq_run_hw_queue().
+> 
+> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> Link: https://lore.kernel.org/r/YnQHqx/5+54jd+U+@linutronix.de
+> Link: https://lore.kernel.org/r/YqISXf6GAQeWqcR+@linutronix.de
+> ---
+>  block/blk-mq.c |    8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> --- a/block/blk-mq.c
+> +++ b/block/blk-mq.c
+> @@ -2083,14 +2083,14 @@ static void __blk_mq_delay_run_hw_queue(
+>  		return;
+>  
+>  	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
+> -		int cpu = get_cpu();
+> -		if (cpumask_test_cpu(cpu, hctx->cpumask)) {
+> +		migrate_disable();
+> +		if (cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
+>  			__blk_mq_run_hw_queue(hctx);
+> -			put_cpu();
+> +			migrate_enable();
 
-On Thu, Jun 9, 2022 at 9:10 AM Michael Schaller <misch@google.com> wrote:
->
-> On Thu, Jun 9, 2022 at 6:27 AM Christoph Hellwig <hch@lst.de> wrote:
-> > Any chance I could trick you into submitting your reproducer to blktest=
-s:
-> >
-> >    https://github.com/osandov/blktests
-> >
-> > ?
->
-> No need to trick me. ;-)
-> https://github.com/osandov/blktests/pull/93
->
->
-> Michael Schaller
-> Site Reliability Engineer - Software Engineer
-> misch@google.com
->
-> Google Germany GmbH
-> Erika-Mann-Stra=C3=9Fe 33
-> 80636 M=C3=BCnchen
->
-> Gesch=C3=A4ftsf=C3=BChrer: Paul Manicle, Liana Sebastian
-> Registergericht und -nummer: Hamburg, HRB 86891
-> Sitz der Gesellschaft: Hamburg
+I think you can replace it with raw_smp_processor_id() directly without
+disabling migration.
+
+Both async run queue and direct issue can run on cpu not on hctx->cpumask,
+so it is fine for sync run queue too. 
+
+Thanks,
+Ming
+
