@@ -2,146 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1886CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 15:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DCC5C43334
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 16:07:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352559AbiFUPNF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 11:13:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44676 "EHLO
+        id S1353697AbiFUQHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 12:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352564AbiFUPMt (ORCPT
+        with ESMTP id S1353692AbiFUQHb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 11:12:49 -0400
-Received: from mail-ed1-x529.google.com (mail-ed1-x529.google.com [IPv6:2a00:1450:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2ADF82CCB4
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 08:11:49 -0700 (PDT)
-Received: by mail-ed1-x529.google.com with SMTP id z19so2965993edb.11
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 08:11:48 -0700 (PDT)
+        Tue, 21 Jun 2022 12:07:31 -0400
+Received: from mail-il1-x136.google.com (mail-il1-x136.google.com [IPv6:2607:f8b0:4864:20::136])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2651FFB
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 09:07:29 -0700 (PDT)
+Received: by mail-il1-x136.google.com with SMTP id k6so5184096ilq.2
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 09:07:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=zVQKmLoB1TE6Nbdx5DcwofeJrMYlMY+7K4pclCDmSBc=;
-        b=LOIl8kjOyJQ3llX8OxuesXKBKy1iwa9RmSznPkD1MRX7bYNQAyqOXIUwaLrPK04Gvk
-         YI0/Vxqb5xn6D/4UUTAW+R9+udYQ3WucNV3sU8hU/4w83q/eBddtaO9wQ1lvs5mMCD4d
-         FvTjM5suFscac6J1FKD0Uq/HAbOmNC8YifF/td1b01lkxo2e8P0Z/Z6OUQTih8sFvZYT
-         vZuEnaKcavEGPxz14nvlEh4m7hsBQbG7ubOBdoRWr3fLVqYf1vkY+yze1nWtKLezODVi
-         hSHAjCe3EVOip/r9gpI1I+XftZ9rnG/M4m2KyDNQoZ68Mx8GMoRuziMDATso5WiOhRSU
-         9uJA==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:content-language:to:from
+         :subject:cc:content-transfer-encoding;
+        bh=DXukMPLTgFb13yCCIjDEeL7bA19QAntRr4FRC1wZJBc=;
+        b=a68SrSSsLMAFEnb3WkMZvS5w1mhQS9AwT1RQK+QSjlJLUKgUostdeY6geebKJGGVy4
+         ad34D6f6tPoaWIgNkJi+L1T27MMCDBUtRgiJjyK7YzqSi4mSqbbHuW8ht40C5nWZEB6q
+         N1Y4GdD74/brRwE/OyyI+aGAWPVLLUZ0aLZQ0qQtxNDa0OGgrfHVckpSkulwWQijJ8eX
+         5bt9wQi2BvcVGdx5XvcvlpEWTmn6xWS54slQbdgPwQ1EgtPxj/5vEV0H2iS7Kctrw48N
+         6K/MplI5M0b8PcaTLV/vcw8yxBp7yZTm50u9EUNfGWLKI9ZcAYqGIso6Dohlw9dQozB9
+         A+pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=zVQKmLoB1TE6Nbdx5DcwofeJrMYlMY+7K4pclCDmSBc=;
-        b=tOShiFv37Q8+OiGN6BbNgVKt81DKvHAJNrgdsc8RZp+OzSiWCUJKOHMFwFBQ9r3uHy
-         s0sVoOyhiKkHEt4/zA08pS3GnSm8y9gX/IV8LkGswJ8IKgFjesor6Dotnl1TL21w7YLG
-         g1D4itFuphDznnvnVCNMNVb4UWT1zqSIATogdSo5ikUdHmyJZUOMDBPz08mErme37NF8
-         auHfc0aVa2RuAVv4+bwwradxAQWH5+czpLrKrpMxN9ssFu0zYoi4mqH4th86ChtRO/85
-         QMRp+vsJnnLLeUSsI+22XeuUvTPj4b911njNgkk5FW3kAveE7wajcnJeHaHFv6PcrhoE
-         Nvng==
-X-Gm-Message-State: AJIora/xTNrOgX6sF6oRKGinfYIuu6VDWAB9fefYlu5lXWlendqTFFBB
-        kE0eUd691I1qBBkE6zH00jaANefmJbx9lMY0xJ0MiQ==
-X-Google-Smtp-Source: AGRyM1tci2sochviIgiO2vkmMvtbPndJnBwhN3rk8Lc/C1Y6oqMGJYBVaGJkknqNgDhlnScvCE4Ft62vIiLkACr6iqg=
-X-Received: by 2002:a05:6402:5193:b0:435:9a5f:50a8 with SMTP id
- q19-20020a056402519300b004359a5f50a8mr3373449edd.212.1655824285815; Tue, 21
- Jun 2022 08:11:25 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:from:subject:cc:content-transfer-encoding;
+        bh=DXukMPLTgFb13yCCIjDEeL7bA19QAntRr4FRC1wZJBc=;
+        b=C2LQZ4K7Rym/62BXcloA/egI9wThj2oMm7cGEzV0HZnZiHdrsCD3x5PqdExoFs6YC9
+         /fVMg0yULb+NONSMXNFuH8htNvJkjZbpx3+I5t+FCnYOHFIYabYTMR+TtPo7vxJTaG6b
+         AyaSY2MveF9Ggk/epareVExYqbAwa4LNokRDCMkUNSa93ia/scYpCVSwun2zAy/GJYL+
+         TOzPaanhkZOt1AUIXVL7yh8gUPCbMcKQljBwNQR1GDDKNL/ACNRxYwGIEUsFNtAL/8Ox
+         5KZVi+2U5A7Tiq9NXPUhiLxJP/X6/C0UpyjRB4B6xUR4sdIuO05dNOLcwbYpRrn/e0Y9
+         IgGA==
+X-Gm-Message-State: AJIora8s+Ipd2USEkJm8HCBXSuDYaQPMLD3TUwFBBKG+4wZB51/pJ0k2
+        tqzHEtI5/XTHjcZtKjkzmDZGPKl/DZoYlQ==
+X-Google-Smtp-Source: AGRyM1uJnf/jL6bP1lrwjxZx2T7tjMyHenvymY9+aZo7Qsmrec3MdixAkBsAWDdD8ndEStxeD06y3w==
+X-Received: by 2002:a05:6e02:1885:b0:2d9:18c2:c5b6 with SMTP id o5-20020a056e02188500b002d918c2c5b6mr5035537ilu.201.1655827648972;
+        Tue, 21 Jun 2022 09:07:28 -0700 (PDT)
+Received: from [192.168.1.172] ([207.135.234.126])
+        by smtp.gmail.com with ESMTPSA id e40-20020a022128000000b0032e49fcc241sm7276777jaa.176.2022.06.21.09.07.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Jun 2022 09:07:28 -0700 (PDT)
+Message-ID: <65187802-413a-7425-234e-68cf0b281a91@kernel.dk>
+Date:   Tue, 21 Jun 2022 10:07:26 -0600
 MIME-Version: 1.0
-References: <20220620034923.35633-1-guoqing.jiang@linux.dev> <20220620034923.35633-2-guoqing.jiang@linux.dev>
-In-Reply-To: <20220620034923.35633-2-guoqing.jiang@linux.dev>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Tue, 21 Jun 2022 17:11:15 +0200
-Message-ID: <CAMGffEn9_FPgX_RLds7RwPL_TSft0NHFXTsR_AjyeQF=mXQwkA@mail.gmail.com>
-Subject: Re: [RFC PATCH 1/6] rnbd-clt: open code send_msg_open in rnbd_clt_map_device
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
-Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+From:   Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH] block: pop cached rq before potentially blocking
+ rq_qos_throttle()
+Cc:     Dylan Yudaken <dylany@fb.com>,
+        Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 5:49 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
->
-> Let's open code it in rnbd_clt_map_device, then we can use information
-> from rsp to setup gendisk and request_queue in next commits. After that,
-> we can remove some members (wc, fua and max_hw_sectors etc) from struct
-> rnbd_clt_dev.
->
-> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-> ---
->  drivers/block/rnbd/rnbd-clt.c | 44 +++++++++++++++++++++++++++++++++--
->  1 file changed, 42 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-> index 409c76b81aed..0396532da742 100644
-> --- a/drivers/block/rnbd/rnbd-clt.c
-> +++ b/drivers/block/rnbd/rnbd-clt.c
-> @@ -1562,7 +1562,14 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
->  {
->         struct rnbd_clt_session *sess;
->         struct rnbd_clt_dev *dev;
-> -       int ret;
-> +       int ret, errno;
-> +       struct rnbd_msg_open_rsp *rsp;
-> +       struct rnbd_msg_open msg;
-> +       struct rnbd_iu *iu;
-> +       struct kvec vec = {
-> +               .iov_base = &msg,
-> +               .iov_len  = sizeof(msg)
-> +       };
->
->         if (exists_devpath(pathname, sessname))
->                 return ERR_PTR(-EEXIST);
-> @@ -1582,13 +1589,46 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
->                 ret = -EEXIST;
->                 goto put_dev;
->         }
-> -       ret = send_msg_open(dev, RTRS_PERMIT_WAIT);
-> +
-> +       rsp = kzalloc(sizeof(*rsp), GFP_KERNEL);
-> +       if (!rsp) {
-> +               ret = -ENOMEM;
-> +               goto del_dev;
-> +       }
-> +
-> +       iu = rnbd_get_iu(sess, RTRS_ADMIN_CON, RTRS_PERMIT_WAIT);
-> +       if (!iu) {
-> +               ret = -ENOMEM;
-> +               kfree(rsp);
-> +               goto del_dev;
-> +       }
-> +       iu->buf = rsp;
-> +       iu->dev = dev;
-> +       sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
-> +
-> +       msg.hdr.type    = cpu_to_le16(RNBD_MSG_OPEN);
-> +       msg.access_mode = dev->access_mode;
-> +       strscpy(msg.dev_name, dev->pathname, sizeof(msg.dev_name));
-> +
-> +       WARN_ON(!rnbd_clt_get_dev(dev));
-> +       ret = send_usr_msg(sess->rtrs, READ, iu,
-> +                          &vec, sizeof(*rsp), iu->sgt.sgl, 1,
-> +                          msg_open_conf, &errno, RTRS_PERMIT_WAIT);
-> +       if (ret) {
-> +               rnbd_clt_put_dev(dev);
-> +               rnbd_put_iu(sess, iu);
-> +               kfree(rsp);
-> +       } else {
-> +               ret = errno;
-> +       }
-> +       rnbd_put_iu(sess, iu);
->         if (ret) {
->                 rnbd_clt_err(dev,
->                               "map_device: failed, can't open remote device, err: %d\n",
->                               ret);
->                 goto del_dev;
->         }
-> +
-looks ok, except this new line seems not needed.
+If rq_qos_throttle() ends up blocking, then we will have invalidated and
+flushed our current plug. Since blk_mq_get_cached_request() hasn't
+popped the cached request off the plug list just yet, we end holding a
+pointer to a request that is no longer valid. This insta-crashes with
+rq->mq_hctx being NULL in the validity checks just after.
 
-Thx!
->         mutex_lock(&dev->lock);
->         pr_debug("Opened remote device: session=%s, path='%s'\n",
->                  sess->sessname, pathname);
-> --
-> 2.34.1
->
+Pop the request off the cached list before doing rq_qos_throttle() to
+avoid using a potentially stale request.
+
+Fixes: 0a5aa8d161d1 ("block: fix blk_mq_attempt_bio_merge and rq_qos_throttle protection")
+Reported-by: Dylan Yudaken <dylany@fb.com>
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+
+---
+
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index 33145ba52c96..93d9d60980fb 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -2765,15 +2765,20 @@ static inline struct request *blk_mq_get_cached_request(struct request_queue *q,
+ 		return NULL;
+ 	}
+ 
+-	rq_qos_throttle(q, *bio);
+-
+ 	if (blk_mq_get_hctx_type((*bio)->bi_opf) != rq->mq_hctx->type)
+ 		return NULL;
+ 	if (op_is_flush(rq->cmd_flags) != op_is_flush((*bio)->bi_opf))
+ 		return NULL;
+ 
+-	rq->cmd_flags = (*bio)->bi_opf;
++	/*
++	 * If any qos ->throttle() end up blocking, we will have flushed the
++	 * plug and hence killed the cached_rq list as well. Pop this entry
++	 * before we throttle.
++	 */
+ 	plug->cached_rq = rq_list_next(rq);
++	rq_qos_throttle(q, *bio);
++
++	rq->cmd_flags = (*bio)->bi_opf;
+ 	INIT_LIST_HEAD(&rq->queuelist);
+ 	return rq;
+ }
+-- 
+Jens Axboe
+
