@@ -2,65 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DBBC43334
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 12:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17F77CCA481
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 13:01:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232254AbiFUMgq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 08:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37942 "EHLO
+        id S1349829AbiFUNBz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 09:01:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57710 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229613AbiFUMgp (ORCPT
+        with ESMTP id S1348753AbiFUNBc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 08:36:45 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A041B7B7
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 05:36:43 -0700 (PDT)
-Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id CA8921F8A3;
-        Tue, 21 Jun 2022 12:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-        t=1655815001; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vaef/sNe18TRFc1L3e9W9JFHr6a/XvRR/DMPEIxoK4U=;
-        b=Ms8h1CPs8BgnnBKQpBwenEQCfkxLtHKdTyViFbhlcQ/+OIOR0lgk4dX4calYR+CFD0mUEm
-        UQ6X2XODzd3cqe/ng6DnwfTLWrskBi1dyd5bQDiBzXIxqSZGcC8f8X7eohbTQjj5iD71O4
-        lWmdRi9TzIrAcaspQV8wB8mATqxlLqM=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-        s=susede2_ed25519; t=1655815001;
-        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=vaef/sNe18TRFc1L3e9W9JFHr6a/XvRR/DMPEIxoK4U=;
-        b=2yYOlf1uRqLY6OIyzgvmBFrhNwU0ZhXYpXnmAZPzLvrwwO/CJBP26eoF/9gUgfmiBnQCiz
-        rX3gO+t/xmOcttBw==
-Received: from quack3.suse.cz (unknown [10.100.224.230])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by relay2.suse.de (Postfix) with ESMTPS id 3F4D02C141;
-        Tue, 21 Jun 2022 12:36:41 +0000 (UTC)
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-        id D2DB4A062B; Tue, 21 Jun 2022 14:36:37 +0200 (CEST)
-Date:   Tue, 21 Jun 2022 14:36:37 +0200
-From:   Jan Kara <jack@suse.cz>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Bart Van Assche <bvanassche@acm.org>,
-        Niklas Cassel <Niklas.Cassel@wdc.com>, Jan Kara <jack@suse.cz>
+        Tue, 21 Jun 2022 09:01:32 -0400
+Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 403BC15A0A
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 06:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655816491; x=1687352491;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=x3HVeRZgvLcPMBQO1wB/GmSYT/lVNY6xC4X5G8epD2I=;
+  b=qzm7Z8ckciSoDYnT+E2sjbIZfD5/5iy8lO8YQ7HPq0wH+GcGhagZzkuF
+   vwUo/ZJ0jFDLaHSHXApY9kyVPHCv7OBbm7VZwhYMJyiVwz2luBhKgiR5R
+   s2/0gu7yRHAcYRs2Ac6tE+yyM4XttTSH4e6cCBlXyJXehGivSF27zkf2V
+   OQGqWC0xFK6XbkyYyiOv/o0DoEt01dQHt1tGKM+Y0atgjRxKPyij5rBIm
+   dxBwq8zbQACnGG2Tg0jBO1kH2Aj7U+kHQxIhiRbQVE/lG3rXwGpbqDefY
+   /h+xvY8CISMnNMSfNzSkHmCe+i5jeyQ0UV2b/sBtVGK8rtMtSo6yp4VYW
+   g==;
+X-IronPort-AV: E=Sophos;i="5.92,209,1650902400"; 
+   d="scan'208";a="202416278"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 21 Jun 2022 21:01:29 +0800
+IronPort-SDR: KoM4hYGRBHopiYLFBXt1NLr13jthAstGbIWqIsDs838+dLeGU51+K53l7DwLEyRsByALmNsSLY
+ aJUefzHzL7s29LCPsc939rooV597t/B1cInKzpnDtSWqzLc4XwL1eT3pEgrmxIBH1xe48NDP7h
+ SaY/hkABDMScSEZbIweV/o1+3XSZviZwZfAGLVdu+1tzp5sY8EOYmBc/NpWnVZRJCkYIKB0bfG
+ J8HqDLaEJSNyCZf6u3wRZz3mXqN4wbIalxHANgO20JUxHJle51J5SYs6C1vaIP7D57kTkeuiIM
+ Ln26XyCKVmYG/F1gtXkVXdUP
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2022 05:24:00 -0700
+IronPort-SDR: Zq8cPg6qCbTgnxsaaK3c1+O6qY9YDCevWRaywZoq78orscQop9BgpN4ybzOjLoHbHyYiAwHP7S
+ EXMEBofcWBRq3r+Z7ZTHfBejbQ+dE67XiEqtcnhYvEHnzfxd7bfF2xfl1RbDO7eS0W5XH1VKwZ
+ Kky9KJDedO5u4GlL3tVEp3eqnN97FD/QMBH75EmoJkljetfnXqTEP1ldb4L50V1lC3xgkm3siO
+ Vfdd63mxdlkuCkc+xsxeKHtQbYF4IT2Mo+axcyEIJ1UU7YXIRZO8gusYxnh7Udchj1nWmZZG0c
+ tlM=
+WDCIronportException: Internal
+Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2022 06:01:30 -0700
+Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LS68n2FKYz1Rwnm
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 06:01:29 -0700 (PDT)
+Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
+        reason="pass (just generated, assumed good)"
+        header.d=opensource.wdc.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
+        opensource.wdc.com; h=content-transfer-encoding:content-type
+        :in-reply-to:organization:from:references:to:content-language
+        :subject:user-agent:mime-version:date:message-id; s=dkim; t=
+        1655816488; x=1658408489; bh=x3HVeRZgvLcPMBQO1wB/GmSYT/lVNY6xC4X
+        5G8epD2I=; b=KzCaJEhwrOZDTvtVJivJ24MVV3IC7joSMR7zMcDCODgPRbbZ0Mw
+        eqbKSABeKviYWF7O9bLyjKhHf0yfoXe1gs3sCh5k7Bx7xDCSOTcD0PFT/RNPABLQ
+        Ouo3T7KlrxZj6hqtnKD4BRzLUA3CnoZmDND7m0rVFx1Y3YuuGxPJSkN/mM6JSj0i
+        RbfNt9nyce43K2ziy3vAPdQu/14vxLOM2mD6eMu1SQ8GHwe4wvkcSUF1Xrqwe9/h
+        1B/KptbXG++H5Yir5BSn1QgXIq47uCMiQo8uG3rwtOrJUFx1hIaozaPh67PGsOdN
+        oKa7W9cBX/sG9B8Uub5GG+ifzLxMnRDa3qQ==
+X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
+Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
+        by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
+        with ESMTP id Augz5hy8LVCK for <linux-block@vger.kernel.org>;
+        Tue, 21 Jun 2022 06:01:28 -0700 (PDT)
+Received: from [10.225.163.87] (unknown [10.225.163.87])
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LS68l4HW2z1RtVk;
+        Tue, 21 Jun 2022 06:01:27 -0700 (PDT)
+Message-ID: <b1a26c4c-5b52-573f-ce9d-96e21814379e@opensource.wdc.com>
+Date:   Tue, 21 Jun 2022 22:01:26 +0900
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
 Subject: Re: [PATCH 3/9] block: Generalize get_current_ioprio() for any task
-Message-ID: <20220621123637.7jp3ifk2wmbmueur@quack3.lan>
+Content-Language: en-US
+To:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
 References: <20220621102201.26337-1-jack@suse.cz>
  <20220621102455.13183-3-jack@suse.cz>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Organization: Western Digital Research
 In-Reply-To: <20220621102455.13183-3-jack@suse.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue 21-06-22 12:24:40, Jan Kara wrote:
+On 6/21/22 19:24, Jan Kara wrote:
 > get_current_ioprio() operates only on current task. We will need the
 > same functionality for other tasks as well. Generalize
 > get_current_ioprio() for that and also move the bulk out of the header
@@ -68,11 +101,9 @@ On Tue 21-06-22 12:24:40, Jan Kara wrote:
 > 
 > Signed-off-by: Jan Kara <jack@suse.cz>
 
-Bah, I've messed up the prototype of the stub function for !CONFIG_BLOCK.
-One more fixup will be needed here but let me wait if people have more
-comments...
+Looks OK to me.
 
-								Honza
+Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
 > ---
 >  block/ioprio.c         | 26 ++++++++++++++++++++++++++
@@ -155,9 +186,8 @@ comments...
 >  }
 >  
 >  /*
-> -- 
-> 2.35.3
-> 
+
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+Damien Le Moal
+Western Digital Research
