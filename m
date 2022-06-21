@@ -2,102 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1261C43334
-	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 07:56:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6DFDC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 21 Jun 2022 08:01:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347813AbiFUH46 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 03:56:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52574 "EHLO
+        id S1347948AbiFUIBY (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 04:01:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347817AbiFUH44 (ORCPT
+        with ESMTP id S239480AbiFUIBY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 03:56:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2D154248E8
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 00:56:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655798214;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+        Tue, 21 Jun 2022 04:01:24 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E28218E1D
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 01:01:23 -0700 (PDT)
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id C41FD21EA1;
+        Tue, 21 Jun 2022 08:01:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1655798481; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
          in-reply-to:in-reply-to:references:references;
-        bh=A3CNJkCHn+2Ifuf6wllzWH6KabcEleGyqumFDzY2//8=;
-        b=PClXCO3APyH4p/Td17js2lvLORaMjDmgvRinBc8K+jCEmHQMDvaqNcsyuNxfmsF70dZZZO
-        gcVBW8mN55Hb42Tir1WNQh9j3N8O96YKqeQ6cnuZGYgvH51Et5NSQiL41d8JG/gbvGfV7W
-        ZZ720p53VwM0REXGVjX8ThqjNKVYzmQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-612-N_h0iBWePue4H7uvH0Ficg-1; Tue, 21 Jun 2022 03:56:50 -0400
-X-MC-Unique: N_h0iBWePue4H7uvH0Ficg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        bh=DWWZU/9RTk0DKI5k8sAtmFDXpop1CG6B97P9TgLHjXI=;
+        b=WuzAM3o/E02rPyO9lIcUSepZF6n9rGN6EFgCaDapmWFQAGKJcwv1BpWqCBe+vgwn7URsEF
+        MgUL/UxHYCOkjZpBHQFi9Ht6T3NVrFXqx1KV0N+VHYyxHFaHCl7yAf8Q6LcX2Ej2uOVKis
+        zrHfom9dtmo4gJdjaOsuQLDOhophEwc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1655798481;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=DWWZU/9RTk0DKI5k8sAtmFDXpop1CG6B97P9TgLHjXI=;
+        b=4cDoeOtA1CmzQOWJ0tvS9HMlAGo/ZWYOYpIMEAlpYreQyTi9F1CAKViYwfnhl30a5ARB19
+        sOzo8SJ3ql2OPcCw==
+Received: from quack3.suse.cz (unknown [10.100.224.230])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9B841811E75;
-        Tue, 21 Jun 2022 07:56:50 +0000 (UTC)
-Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id 122D81121314;
-        Tue, 21 Jun 2022 07:56:46 +0000 (UTC)
-Date:   Tue, 21 Jun 2022 15:56:41 +0800
-From:   Ming Lei <ming.lei@redhat.com>
-To:     Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc:     linux-block@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
-        Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: [PATCH REPOST] blk-mq: Don't disable preemption around
- __blk_mq_run_hw_queue().
-Message-ID: <YrF5uf4ZL7Oh7LVJ@T590>
-References: <YrF1p2n0MxHQ3fcJ@linutronix.de>
+        by relay2.suse.de (Postfix) with ESMTPS id 529FD2C141;
+        Tue, 21 Jun 2022 08:01:21 +0000 (UTC)
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+        id B6504A062B; Tue, 21 Jun 2022 10:01:17 +0200 (CEST)
+Date:   Tue, 21 Jun 2022 10:01:17 +0200
+From:   Jan Kara <jack@suse.cz>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Jan Kara <jack@suse.cz>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>,
+        Niklas Cassel <Niklas.Cassel@wdc.com>
+Subject: Re: [PATCH 3/8] block: Make ioprio_best() static
+Message-ID: <20220621080117.zhnw25ny3jmmxotc@quack3.lan>
+References: <20220620160726.19798-1-jack@suse.cz>
+ <20220620161153.11741-3-jack@suse.cz>
+ <c060f9ac-90b6-3aac-e09f-9e7c99f364aa@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <YrF1p2n0MxHQ3fcJ@linutronix.de>
-X-Scanned-By: MIMEDefang 2.78 on 10.11.54.3
+In-Reply-To: <c060f9ac-90b6-3aac-e09f-9e7c99f364aa@opensource.wdc.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 21, 2022 at 09:39:19AM +0200, Sebastian Andrzej Siewior wrote:
-> __blk_mq_delay_run_hw_queue() disables preemption to get a stable
-> current CPU number and then invokes __blk_mq_run_hw_queue() if the CPU
-> number is part the mask.
+On Tue 21-06-22 08:47:29, Damien Le Moal wrote:
+> > diff --git a/include/linux/ioprio.h b/include/linux/ioprio.h
+> > index 61ed6bb4998e..519d51fc8902 100644
+> > --- a/include/linux/ioprio.h
+> > +++ b/include/linux/ioprio.h
+> > @@ -66,11 +66,6 @@ static inline int get_current_ioprio(void)
+> >  	return prio;
+> >  }
+> >  
+> > -/*
+> > - * For inheritance, return the highest of the two given priorities
+> > - */
 > 
-> __blk_mq_run_hw_queue() acquires a spin_lock_t which is a sleeping lock
-> on PREEMPT_RT and can't be acquired with disabled preemption.
-> 
-> If it is important that the current CPU matches the requested CPU mask
-> and that the context does not migrate to another CPU while
-> __blk_mq_run_hw_queue() is invoked then it possible to achieve this by
-> disabling migration and keeping the context preemptible.
-> 
-> Disable only migration while testing the CPU mask and invoking
-> __blk_mq_run_hw_queue().
-> 
-> Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Link: https://lore.kernel.org/r/YnQHqx/5+54jd+U+@linutronix.de
-> Link: https://lore.kernel.org/r/YqISXf6GAQeWqcR+@linutronix.de
-> ---
->  block/blk-mq.c |    8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
-> 
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -2083,14 +2083,14 @@ static void __blk_mq_delay_run_hw_queue(
->  		return;
->  
->  	if (!async && !(hctx->flags & BLK_MQ_F_BLOCKING)) {
-> -		int cpu = get_cpu();
-> -		if (cpumask_test_cpu(cpu, hctx->cpumask)) {
-> +		migrate_disable();
-> +		if (cpumask_test_cpu(raw_smp_processor_id(), hctx->cpumask)) {
->  			__blk_mq_run_hw_queue(hctx);
-> -			put_cpu();
-> +			migrate_enable();
+> Nit: you could move this comment over the static function. But the name
+> makes it fairly obvious what it does :)
 
-I think you can replace it with raw_smp_processor_id() directly without
-disabling migration.
+Yeah, I didn't find it particularly useful, especially after ioprio_best()
+becomes pure min() so I've just deleted it...
 
-Both async run queue and direct issue can run on cpu not on hctx->cpumask,
-so it is fine for sync run queue too. 
+> > -extern int ioprio_best(unsigned short aprio, unsigned short bprio);
+> > -
+> >  extern int set_task_ioprio(struct task_struct *task, int ioprio);
+> >  
+> >  #ifdef CONFIG_BLOCK
+> Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
 
-Thanks,
-Ming
+Thanks for review!
 
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
