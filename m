@@ -2,101 +2,119 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1D2C43334
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 14:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 098BEC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 15:20:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1358097AbiFVONL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jun 2022 10:13:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34646 "EHLO
+        id S1359251AbiFVPUL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jun 2022 11:20:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358061AbiFVONA (ORCPT
+        with ESMTP id S1359238AbiFVPUL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jun 2022 10:13:00 -0400
-Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB3F3FC1
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 07:12:57 -0700 (PDT)
-Received: by mail-ed1-x533.google.com with SMTP id eo8so24154438edb.0
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 07:12:57 -0700 (PDT)
+        Wed, 22 Jun 2022 11:20:11 -0400
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CFEB39140
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 08:20:10 -0700 (PDT)
+Received: by mail-pj1-x1031.google.com with SMTP id t3-20020a17090a510300b001ea87ef9a3dso17114027pjh.4
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 08:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linbit-com.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=fG5D+uGBwwK40MTabwUY6wsv1epKDtgAgJdk4dbADg8=;
-        b=AVxqSYm2tQicUHoKP/CQ7yVFeY1/yS3p6olpcI8LxibnzNqI0LwIFgedn3fJON+uLF
-         4y/ScsW+Av9Owd0pW239PDzkOZAGy5EYoLVnJqLECv3CE8N6mltknxWBBRtWeUk+JTP8
-         PL5kUFzheHzaWkGqv3gEUmN7pMTipy2e3YNdtuxY+QSnHEPKQUEudnxqNhbY4BfxDpd+
-         7uCRZUaFSxaWpKM3+SBtXo7OvWUXYhf/Rcy4NEJIr1y+f3hm6rn6cHazffo3Xu4r7Bwi
-         lJP+t9S171aqRH1t76uT2Wzxg1EurjYBhMYT0oz7dYAL7SJw7NFP+DIT/jDkFq84YOzR
-         3ezA==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=EwS/tK0Wy8erZTHFk7/rY1qOvDCv9NKxynpv49gC4Fg=;
+        b=h5QQSY5FM1k34pMrtVHeDpCWCD3fnChhPtZ9D9j+Y8g38Kldqqat9sXeuHEfLMzhDP
+         Sd2yj/BKtawDQSxcwFhxdSmqCrMRLjQR8Fi42r41TlbgAjY0Yv8/RP6WydX4AfxoGmKK
+         wX4cQA+FkFiBBkhShO0XU99dG9OV0Dm6/EX+E=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=fG5D+uGBwwK40MTabwUY6wsv1epKDtgAgJdk4dbADg8=;
-        b=BAmk1tAPKDPPlb/FMipBZ+d8ynq2wJGjGIVb1a1Y/7OeXQlm5GwSuP+NEEiYYPfFnW
-         bpMw8qfVncLozD8Ka6yAa/yJNOFvt49Bf5PwQcs3dfHNtV4+783lxtPr/HNJ23Uz9fdO
-         7LH+YctWKvCS+D5drsh0kTBDsBIZs4msZ/qkllS84vemKkpf0TkdWkNkizp1od5ffwr9
-         TjWpH5WdzkRYa9wYVjpCsk940tyqL2zKgEVWvYdkAfp7iBSvaYYw56LN2nWmb7Nk/j1I
-         Gd0KWVIuh6fga2rSb6HdPpRuR1m2nRf/la5q0sHDprz7BOorLCOlMVm9o+2BPWnJz5x9
-         x2Rw==
-X-Gm-Message-State: AJIora9V4ek5DP4M2CuC9zRjrh9XAFJ5REiO/XDlMZO6l5e20Q/SwXSx
-        /1l4vlOdbjv2489p95O5WNxsCA==
-X-Google-Smtp-Source: AGRyM1uUESYrbLTpgv2oZVuiUBydC1onWAi2Dy56rj0mDfvLHWZ0vYGmEitukPRk/QfY457MKqHLxQ==
-X-Received: by 2002:a05:6402:3587:b0:435:b9a1:d5c5 with SMTP id y7-20020a056402358700b00435b9a1d5c5mr2403935edc.219.1655907176277;
-        Wed, 22 Jun 2022 07:12:56 -0700 (PDT)
-Received: from [192.168.178.55] (h082218028181.host.wavenet.at. [82.218.28.181])
-        by smtp.gmail.com with ESMTPSA id ch11-20020a0564021bcb00b0043586bee560sm6526365edb.68.2022.06.22.07.12.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 22 Jun 2022 07:12:55 -0700 (PDT)
-Message-ID: <b628a808-bb07-c94f-9d70-6bd4eb4be690@linbit.com>
-Date:   Wed, 22 Jun 2022 16:12:54 +0200
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=EwS/tK0Wy8erZTHFk7/rY1qOvDCv9NKxynpv49gC4Fg=;
+        b=ep8CR1VZ5z0K+BHdvG2Arb9y8bAewp/v4BE9jXyD+qFGTeZxJeMQohWlpuXacaCQze
+         N64foxh1YlCLYDgCOKjgG2KqiQRLkAVxiJRkx335UTBhnfmZuMefHN/1uGZjS/fJXTGi
+         lSPumlf/BTWO+49mhRxHQc0SPfbxKpH9v+aS2QMk5H6d+QC4VURiWkZz7O8bgoIp9OC8
+         csggZjzQtdvOA+JQm/hHxh0UPDXjXeI5psR2pIe845abnwD5I7x1RpT/8wGqJhewq02D
+         okUsX8M3EExB5LV0wZpY6WJyEQWf2AP4W4YVzJJvXljIC9FGP9tY9T3bBONpgOcV123J
+         Mf+A==
+X-Gm-Message-State: AJIora+GMQbS0O/vZ6ykh9EzI8xQq/EbvDyt6HHIwiGUE69yTUp2N0eC
+        GZ7gddtcQSSiUDXCahUiz3m19A==
+X-Google-Smtp-Source: AGRyM1sG9n0CEU9lxzoX0n31I6e5aLUscw6tw8AvURiwXSK6E0c4SxWjAFV1o8Z/Sricdv3zDfkcwA==
+X-Received: by 2002:a17:90b:33c4:b0:1e8:6e2f:97a2 with SMTP id lk4-20020a17090b33c400b001e86e2f97a2mr4247470pjb.165.1655911209767;
+        Wed, 22 Jun 2022 08:20:09 -0700 (PDT)
+Received: from google.com ([240f:75:7537:3187:e2f3:d85c:2a24:ec47])
+        by smtp.gmail.com with ESMTPSA id bb10-20020a170902bc8a00b0016a4a2ea92asm1730412plb.255.2022.06.22.08.20.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 08:20:09 -0700 (PDT)
+Date:   Thu, 23 Jun 2022 00:20:05 +0900
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Minchan Kim <minchan@kernel.org>
+Cc:     Nitin Gupta <ngupta@vflare.org>,
+        Andrew Morton <akpm@linux-foundation.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: Re: [PATCH] zram: do not lookup algorithm in backends table
+Message-ID: <YrMzJSNb4b+tODqR@google.com>
+References: <20220622023501.517125-1-senozhatsky@chromium.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] drbd: Fix typo in comment
-Content-Language: en-US
-To:     Xiang wangx <wangxiang@cdjrlc.com>
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        drbd-dev@lists.linbit.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, axboe@kernel.dk
-References: <20220616143227.4004-1-wangxiang@cdjrlc.com>
-From:   =?UTF-8?Q?Christoph_B=c3=b6hmwalder?= 
-        <christoph.boehmwalder@linbit.com>
-In-Reply-To: <20220616143227.4004-1-wangxiang@cdjrlc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220622023501.517125-1-senozhatsky@chromium.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Am 16.06.22 um 16:32 schrieb Xiang wangx:
-> Delete the redundant word 'and'.
-> 
-> Signed-off-by: Xiang wangx <wangxiang@cdjrlc.com>
-> ---
->  drivers/block/drbd/drbd_bitmap.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
-> index 9e060e49b3f8..8afdde400e37 100644
-> --- a/drivers/block/drbd/drbd_bitmap.c
-> +++ b/drivers/block/drbd/drbd_bitmap.c
-> @@ -86,7 +86,7 @@ struct drbd_bitmap {
->  
->  	/* exclusively to be used by __al_write_transaction(),
->  	 * drbd_bm_mark_for_writeout() and
-> -	 * and drbd_bm_write_hinted() -> bm_rw() called from there.
-> +	 * drbd_bm_write_hinted() -> bm_rw() called from there.
->  	 */
->  	unsigned int n_bitmap_hints;
->  	unsigned int al_bitmap_hints[AL_UPDATES_PER_TRANSACTION];
+On (22/06/22 11:35), Sergey Senozhatsky wrote:
+> Always use crypto_has_comp() so that crypto can lookup module,
+> call usermodhelper to load the modules, wait for usermodhelper
+> to finish and so on. Otherwise crypto will do all of these steps
+> under CPU hot-plug lock and this looks like too much stuff to
+> handle under the CPU hot-plug lock. Besides this can end up in
+> a deadlock when usermodhelper triggers a code path that attempts
+> to lock the CPU hot-plug lock, that zram already holds.
 
-Thanks!
+And we think that we (not exactly "we", our partners) actually
+see a deadlock. It goes something like this:
 
-Acked-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+- path A. zram grabs CPU hot-plug lock, execs /sbin/modprobe from crypto
+  and waits for modprobe to finish
 
--- 
-Christoph Böhmwalder
-LINBIT | Keeping the Digital World Running
-DRBD HA —  Disaster Recovery — Software defined Storage
+disksize_store
+ zcomp_create
+  __cpuhp_state_add_instance
+   __cpuhp_state_add_instance_cpuslocked
+    zcomp_cpu_up_prepare
+     crypto_alloc_base
+      crypto_alg_mod_lookup
+       call_usermodehelper_exec
+        wait_for_completion_killable
+         do_wait_for_common
+          schedule
+
+- path B. async work kthread that brings in scsi device. It wants to
+  register CPUHP states at some point, and it needs the CPU hot-plug
+  lock for that, which is owned by zram.
+
+async_run_entry_fn
+ scsi_probe_and_add_lun
+  scsi_mq_alloc_queue
+   blk_mq_init_queue
+    blk_mq_init_allocated_queue
+     blk_mq_realloc_hw_ctxs
+      __cpuhp_state_add_instance
+       __cpuhp_state_add_instance_cpuslocked
+        mutex_lock
+         schedule
+
+- path C. modprobe sleeps, waiting for all aync works to finish.
+
+load_module
+ do_init_module
+  async_synchronize_full
+   async_synchronize_cookie_domain
+    schedule
+
+And none can make any progress.
+
+So I think we need to move crypto_alg_mod_lookup()->call_usermodehelper_exec()
+out of CPU hot-plug lock and pre-load modules in advance, before we grab the
+hot-plug lock.
