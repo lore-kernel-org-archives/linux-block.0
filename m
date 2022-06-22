@@ -2,149 +2,256 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE043C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 02:15:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49284CCA473
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 02:26:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355691AbiFVCPL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 22:15:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40400 "EHLO
+        id S240274AbiFVC0C (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 22:26:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45612 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354017AbiFVCPK (ORCPT
+        with ESMTP id S231720AbiFVC0B (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 22:15:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0E10C2C671
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:15:08 -0700 (PDT)
+        Tue, 21 Jun 2022 22:26:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 89B8433A17
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:26:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1655864107;
+        s=mimecast20190719; t=1655864759;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=nAF9uJDAJOO4/FSOAPwbKJV+7udaVeqmZOgkD10CgzU=;
-        b=O2C9WxhBn7VG0tJORpBySb2J5OSCr4vfcaau2J/ORGLY+qdIhN17eGAe95pw3TezGgrgTA
-        y0cYcGnMEXrWQ9LGzxqka2ctITD6CZBkWR8O1l/oZd12bMreTEPdz9lJTSVQLgl6NpzbiS
-        EM1XWqWdrNGE45pLhhHPiUO/3MzwaNU=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+         to:to:cc:mime-version:mime-version:content-type:content-type;
+        bh=rub1k0hTkvuY6qzgoWVW2ifK93q0NGoqLKkeOehtpBM=;
+        b=JDNM7OxFJh4EXuy6IN386GPDqkgen9VU/duWJ0/LEzsMSqGyitHUKsYULEz7xttjyYlz6N
+        Wq5B4HIuGZc7x7Pljq2An8TvV0DiPqgVBDrc1tXyf67jURuIH5f2WwM0DQEbckBlotvxab
+        xNZsdjdjwwCy+q10LoOqpDROn3u+LAU=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-36-RUcpws3bNEC8RgLxbIgxTw-1; Tue, 21 Jun 2022 22:15:05 -0400
-X-MC-Unique: RUcpws3bNEC8RgLxbIgxTw-1
-Received: by mail-qv1-f72.google.com with SMTP id g29-20020a0caadd000000b004702ed3c3f5so10329321qvb.11
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:15:05 -0700 (PDT)
+ us-mta-371-rL7Nt37ZOPuQpzfo2c7n3w-1; Tue, 21 Jun 2022 22:25:56 -0400
+X-MC-Unique: rL7Nt37ZOPuQpzfo2c7n3w-1
+Received: by mail-pg1-f198.google.com with SMTP id g34-20020a635662000000b0040d1da6ada4so476155pgm.1
+        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:25:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:subject:from:to:date:in-reply-to
-         :references:organization:user-agent:mime-version;
-        bh=nAF9uJDAJOO4/FSOAPwbKJV+7udaVeqmZOgkD10CgzU=;
-        b=VaQaJatYZFaetY7SRK7zQasipkP5mNSdMs/M0wSqpDqofVWoaoQJloml2lJMzuwndG
-         KbxUkAWxMzoX16bgjAYK8197fXSGRn4KMs8imPLjJ1U62UifW8N8ydT+0YCAMs+sS4YL
-         PEpQXQfVM6r8ogiQzysK7rHZ/SzcJIU6shrFuRjloSNXf2+N8Zda85X8yhN4zJszTXNY
-         u7vFBRJbJyaVZ34qF/e0yCEamIttOOkFYAHpGkCXKMVF2u3AjMVeDAMNA8/0omawp8jy
-         1EAx0qTO2Ds8MSqqKsYSxAT8DjQ+f2VY+3nnPxklx0B5s5R4QrXBjxN6vRix/aL7ibUD
-         kfnQ==
-X-Gm-Message-State: AJIora+2OlW+sAskNFtWSTFF755kJ1uExyEhYaXKZnKBS4owVdGknzVT
-        kzRQAY/2LYN1bnmJzQnmoY71ThO7PPr4KqhxQwdXb9r70Cxi0onocC8b+u4vnQYLAbnDgoClyBx
-        MP6+lB7Mo7t2zSXq3iPfeFKI=
-X-Received: by 2002:ac8:5c43:0:b0:315:a78a:4cbe with SMTP id j3-20020ac85c43000000b00315a78a4cbemr1136926qtj.420.1655864105275;
-        Tue, 21 Jun 2022 19:15:05 -0700 (PDT)
-X-Google-Smtp-Source: AGRyM1syCWBq2aCBZwpnuVMCc5xkyBqS/3fIksvrt4tcxVHLP8kR+W74PlK2W6u7x8mn6dTy1vEVPA==
-X-Received: by 2002:ac8:5c43:0:b0:315:a78a:4cbe with SMTP id j3-20020ac85c43000000b00315a78a4cbemr1136915qtj.420.1655864105028;
-        Tue, 21 Jun 2022 19:15:05 -0700 (PDT)
-Received: from linux-ws.nc.xsintricity.com (104-15-26-233.lightspeed.rlghnc.sbcglobal.net. [104.15.26.233])
-        by smtp.gmail.com with ESMTPSA id cp8-20020a05622a420800b00304bc2acc25sm13733106qtb.6.2022.06.21.19.15.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 19:15:04 -0700 (PDT)
-Message-ID: <87cb53c4f08cc7b18010e62b9b3178ed70e06e8d.camel@redhat.com>
-Subject: Re: About the md-bitmap behavior
-From:   Doug Ledford <dledford@redhat.com>
-To:     Wols Lists <antlists@youngman.org.uk>,
-        Qu Wenruo <quwenruo.btrfs@gmx.com>, linux-raid@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
-Date:   Tue, 21 Jun 2022 22:15:01 -0400
-In-Reply-To: <06365833-bd91-7dcf-4541-f8e15ed3bef2@youngman.org.uk>
-References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
-         <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
-         <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
-         <06365833-bd91-7dcf-4541-f8e15ed3bef2@youngman.org.uk>
-Organization: Red Hat, Inc.
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-3IS5LZq5RI504sawv6lh"
-User-Agent: Evolution 3.44.2 (3.44.2-1.fc36) 
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=rub1k0hTkvuY6qzgoWVW2ifK93q0NGoqLKkeOehtpBM=;
+        b=X9cUzTcMZqn2WQ0EPRvFck79q1EdzJoeGHO6lv/abcSLVeUREmvQNcgJ8JCNg2JqB2
+         hqzCyZI82wSXKdS0iKQR4RfwEIm5gf9HLh1ngBNIhUg/bBaQP22Txn79WeQFN0vgQecN
+         uggKCS7zgMD9e5Zy6T5QX06UIH51Gn4P42xwACA36H9Chw0jGuUw0N80UO86cupqncWp
+         IE3FZ+Ujdb8IMlnmperGhjfZoB8zGRqgtpF2kLGr47pTBVYmhSoCNHsErSnUVAYTmxU7
+         mhMssJPK2yauWIL3WsNC3JXeFTF1YzXoKtNLwzrgm4yTaiNkYE4g6WQKOT0LxB9fhD4W
+         zTJQ==
+X-Gm-Message-State: AJIora9Lw4fBRCBF8wd5/24gDHunVrEmS0TIMPTtC8WgdaJb1ixZFfhE
+        NCqz0Ot5R9A2pmsx20hUew832dL/xhGHCN0Y6Vs+yi16Ht5wBrOaZLUqLFDSGnAdFXOP7W6khwr
+        6EV3+vJZO/Oi61WoyyYhBp57CV3o9IVAaq1lfzVc=
+X-Received: by 2002:a63:4446:0:b0:405:2d62:95e6 with SMTP id t6-20020a634446000000b004052d6295e6mr900015pgk.328.1655864755468;
+        Tue, 21 Jun 2022 19:25:55 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1vVkaINc/KKqta830zhbeOn2mtAwsndvDBTxtCFu7/89yPPPJ/a1I0Re/YX/cgBlmwwqU2/olxh97yMeFAFPRk=
+X-Received: by 2002:a63:4446:0:b0:405:2d62:95e6 with SMTP id
+ t6-20020a634446000000b004052d6295e6mr899998pgk.328.1655864755157; Tue, 21 Jun
+ 2022 19:25:55 -0700 (PDT)
 MIME-Version: 1.0
+From:   Yi Zhang <yi.zhang@redhat.com>
+Date:   Wed, 22 Jun 2022 10:25:43 +0800
+Message-ID: <CAHj4cs--KPTAGP=jj+7KMe=arDv=HeGeOgs1T8vbusyk=EjXow@mail.gmail.com>
+Subject: [bug report] I/O blocked during nvme pci rescan/remove/reset test
+ with two nvme disks
+To:     "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>,
+        linux-block <linux-block@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hello
+I reproduced the below I/O blocked issue during nvme pci
+rescan/reset/remove test with two NVMe disks on the latest
+linux-block/for-next, pls help check it, thanks.
 
---=-3IS5LZq5RI504sawv6lh
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[51184.910570] nvme nvme1: 48/0/0 default/read/poll queues
+[51186.996061] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51186.996124] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51186.997357] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51186.997741] nvme nvme1: pci function 0000:87:00.0
+[51187.016653] nvme nvme1: 48/0/0 default/read/poll queues
+[51187.031004]  nvme1n1: p1
+[51189.995841] nvme nvme0: 31/0/0 default/read/poll queues
+[51190.198376] nvme nvme1: 48/0/0 default/read/poll queues
+[51195.380767] pci 0000:86:00.0: [8086:0953] type 00 class 0x010802
+[51195.380832] pci 0000:86:00.0: reg 0x10: [mem 0xd3900000-0xd3903fff 64bit]
+[51195.380966] pci 0000:86:00.0: reg 0x30: [mem 0xffff0000-0xffffffff pref]
+[51195.393766] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51195.393831] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51195.394995] pci 0000:86:00.0: BAR 6: assigned [mem
+0xd3900000-0xd390ffff pref]
+[51195.395005] pci 0000:86:00.0: BAR 0: assigned [mem
+0xd3910000-0xd3913fff 64bit]
+[51195.395037] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51195.395420] nvme nvme0: pci function 0000:86:00.0
+[51195.395702] nvme nvme1: pci function 0000:87:00.0
+[51195.414531] nvme nvme1: 48/0/0 default/read/poll queues
+[51195.428759]  nvme1n1: p1
+[51198.394239] nvme nvme0: 31/0/0 default/read/poll queues
+[51198.405370]  nvme0n1: p1
+[51198.590384] nvme nvme1: 48/0/0 default/read/poll queues
+[51200.553556] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51200.553621] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51200.554800] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51200.555174] nvme nvme1: pci function 0000:87:00.0
+[51200.573516] nvme nvme1: 48/0/0 default/read/poll queues
+[51200.587858]  nvme1n1: p1
+[51202.856978] nvme nvme0: 31/0/0 default/read/poll queues
+[51206.178358] pci 0000:86:00.0: [8086:0953] type 00 class 0x010802
+[51206.178423] pci 0000:86:00.0: reg 0x10: [mem 0xd3910000-0xd3913fff 64bit]
+[51206.178557] pci 0000:86:00.0: reg 0x30: [mem 0xffff0000-0xffffffff pref]
+[51206.179661] pci 0000:86:00.0: BAR 6: assigned [mem
+0xd3900000-0xd390ffff pref]
+[51206.179671] pci 0000:86:00.0: BAR 0: assigned [mem
+0xd3910000-0xd3913fff 64bit]
+[51206.180057] nvme nvme0: pci function 0000:86:00.0
+[51206.302723] nvme nvme1: 48/0/0 default/read/poll queues
+[51208.269290] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51208.269354] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51208.270576] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51208.270884] nvme nvme1: pci function 0000:87:00.0
+[51208.289461] nvme nvme1: 48/0/0 default/read/poll queues
+[51208.303177]  nvme1n1: p1
+[51211.070104] nvme nvme0: 31/0/0 default/read/poll queues
+[51211.080531] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080538] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080547] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080550] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080556] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080558] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080563] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080566] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080570] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080573] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080577] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080579] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080581] Dev nvme0n1: unable to read RDB block 0
+[51211.080585] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080587] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080592] I/O error, dev nvme0n1, sector 0 op 0x0:(READ) flags
+0x0 phys_seg 1 prio class 0
+[51211.080594] Buffer I/O error on dev nvme0n1, logical block 0, async page read
+[51211.080596]  nvme0n1: unable to read partition table
+[51211.083942] I/O error, dev nvme0n1, sector 3125627392 op 0x0:(READ)
+flags 0x80700 phys_seg 1 prio class 0
+[51211.083973] I/O error, dev nvme0n1, sector 3125627392 op 0x0:(READ)
+flags 0x0 phys_seg 1 prio class 0
+[51211.083978] Buffer I/O error on dev nvme0n1, logical block
+390703424, async page read
+[51211.454527] nvme nvme1: 48/0/0 default/read/poll queues
+[51213.417104] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51213.417169] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51213.418351] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51213.418724] nvme nvme1: pci function 0000:87:00.0
+[51213.437681] nvme nvme1: 48/0/0 default/read/poll queues
+[51213.451835]  nvme1n1: p1
+[51215.142444] nvme nvme0: 31/0/0 default/read/poll queues
+[51216.606364] nvme nvme1: 48/0/0 default/read/poll queues
+[51218.570918] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51218.570983] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51218.572165] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51218.572539] nvme nvme1: pci function 0000:87:00.0
+[51218.591636] nvme nvme1: 48/0/0 default/read/poll queues
+[51218.605022]  nvme1n1: p1
+[51221.750225] nvme nvme1: 48/0/0 default/read/poll queues
+[51223.721738] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51223.721802] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51223.722964] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51223.723358] nvme nvme1: pci function 0000:87:00.0
+[51223.743645] nvme nvme1: 48/0/0 default/read/poll queues
+[51223.757692]  nvme1n1: p1
+[51226.901932] nvme nvme1: 48/0/0 default/read/poll queues
+[51228.873546] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51228.873611] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51228.874820] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51228.875198] nvme nvme1: pci function 0000:87:00.0
+[51228.894161] nvme nvme1: 48/0/0 default/read/poll queues
+[51228.907613]  nvme1n1: p1
+[51232.053773] nvme nvme1: 48/0/0 default/read/poll queues
+[51234.131361] pci 0000:87:00.0: [8086:0a55] type 00 class 0x010802
+[51234.131425] pci 0000:87:00.0: reg 0x10: [mem 0xd3800000-0xd3803fff 64bit]
+[51234.132584] pci 0000:87:00.0: BAR 0: assigned [mem
+0xd3800000-0xd3803fff 64bit]
+[51234.132949] nvme nvme1: pci function 0000:87:00.0
+[51234.151738] nvme nvme1: 48/0/0 default/read/poll queues
+[51234.165192]  nvme1n1: p1
+[51237.317630] nvme nvme1: 48/0/0 default/read/poll queues
+[51362.993640] INFO: task kworker/u97:2:28679 blocked for more than 122 seconds.
+[51363.000796]       Tainted: G S        I       5.19.0-rc3+ #1
+[51363.006463] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[51363.014294] task:kworker/u97:2   state:D stack:    0 pid:28679
+ppid:     2 flags:0x00004000
+[51363.014300] Workqueue: nvme-reset-wq nvme_reset_work [nvme]
+[51363.014312] Call Trace:
+[51363.014313]  <TASK>
+[51363.014316]  __schedule+0x3ed/0x990
+[51363.014329]  ? _raw_spin_lock_irqsave+0x17/0x40
+[51363.014333]  schedule+0x44/0xb0
+[51363.014337]  blk_mq_freeze_queue_wait+0x62/0x90
+[51363.014345]  ? add_wait_queue_priority+0xa0/0xa0
+[51363.014357]  nvme_wait_freeze+0x31/0x50 [nvme_core]
+[51363.014371]  nvme_reset_work+0xc4b/0x1070 [nvme]
+[51363.014377]  process_one_work+0x1c8/0x390
+[51363.014386]  worker_thread+0x1b9/0x360
+[51363.014389]  ? process_one_work+0x390/0x390
+[51363.014392]  kthread+0xe8/0x110
+[51363.014396]  ? kthread_complete_and_exit+0x20/0x20
+[51363.014399]  ret_from_fork+0x22/0x30
+[51363.014406]  </TASK>
+[51363.014411] INFO: task main.sh:34574 blocked for more than 122 seconds.
+[51363.021034]       Tainted: G S        I       5.19.0-rc3+ #1
+[51363.026700] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs"
+disables this message.
+[51363.034534] task:main.sh         state:D stack:    0 pid:34574
+ppid: 33964 flags:0x00004000
+[51363.034538] Call Trace:
+[51363.034539]  <TASK>
+[51363.034541]  __schedule+0x3ed/0x990
+[51363.034546]  schedule+0x44/0xb0
+[51363.034549]  schedule_timeout+0x265/0x300
+[51363.034551]  ? resched_curr+0x23/0xc0
+[51363.034556]  ? _raw_spin_lock_irqsave+0x17/0x40
+[51363.034559]  wait_for_completion+0x94/0x130
+[51363.034561]  __flush_work+0x138/0x1f0
+[51363.034566]  ? flush_workqueue_prep_pwqs+0x110/0x110
+[51363.034569]  pci_reset_function+0x47/0x70
+[51363.034577]  reset_store+0x57/0xa0
+[51363.034580]  kernfs_fop_write_iter+0x130/0x1c0
+[51363.034585]  new_sync_write+0x10c/0x190
+[51363.034593]  vfs_write+0x218/0x2a0
+[51363.034596]  ksys_write+0x59/0xd0
+[51363.034598]  do_syscall_64+0x3a/0x80
+[51363.034605]  entry_SYSCALL_64_after_hwframe+0x46/0xb0
+[51363.034608] RIP: 0033:0x7f309c720ad8
+[51363.034610] RSP: 002b:00007ffe381be618 EFLAGS: 00000246 ORIG_RAX:
+0000000000000001
+[51363.034613] RAX: ffffffffffffffda RBX: 0000000000000002 RCX: 00007f309c720ad8
+[51363.034614] RDX: 0000000000000002 RSI: 0000556a2f887b20 RDI: 0000000000000001
+[51363.034615] RBP: 0000556a2f887b20 R08: 000000000000000a R09: 00007f309c780d40
+[51363.034616] R10: 000000000000000a R11: 0000000000000246 R12: 00007f309c9c16e0
+[51363.034617] R13: 0000000000000002 R14: 00007f309c9bc860 R15: 0000000000000002
+[51363.034619]  </TASK>
 
-On Mon, 2022-06-20 at 10:56 +0100, Wols Lists wrote:
-> On 20/06/2022 08:56, Qu Wenruo wrote:
-> > > The write-hole has been addressed with journaling already, and
-> > > this will
-> > > be adding a new and not-needed feature - not saying it wouldn't be
-> > > nice
-> > > to have, but do we need another way to skin this cat?
-> >=20
-> > I'm talking about the BTRFS RAID56, not md-raid RAID56, which is a
-> > completely different thing.
-> >=20
-> > Here I'm just trying to understand how the md-bitmap works, so that
-> > I
-> > can do a proper bitmap for btrfs RAID56.
->=20
-> Ah. Okay.
->=20
-> Neil Brown is likely to be the best help here as I believe he wrote a=20
-> lot of the code, although I don't think he's much involved with md-
-> raid=20
-> any more.
-
-I can't speak to how it is today, but I know it was *designed* to be
-sync flush of the dirty bit setting, then lazy, async write out of the
-clear bits.  But, yes, in order for the design to be reliable, you must
-flush out the dirty bits before you put writes in flight.
-
-One thing I'm not sure about though, is that MD RAID5/6 uses fixed
-stripes.  I thought btrfs, since it was an allocation filesystem, didn't
-have to use full stripes?  Am I wrong about that?  Because it would seem
-that if your data isn't necessarily in full stripes, then a bitmap might
-not work so well since it just marks a range of full stripes as
-"possibly dirty, we were writing to them, do a parity resync to make
-sure".
-
-In any case, Wols is right, probably want to ping Neil on this.  Might
-need to ping him directly though.  Not sure he'll see it just on the
-list.
-
---=20
-Doug Ledford <dledford@redhat.com>
-=C2=A0=C2=A0=C2=A0=C2=A0GPG KeyID: B826A3330E572FDD
-=C2=A0=C2=A0=C2=A0=C2=A0Fingerprint =3D AE6B 1BDA 122B 23B4 265B=C2=A0=C2=
-=A01274 B826 A333 0E57 2FDD
-
---=-3IS5LZq5RI504sawv6lh
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEErmsb2hIrI7QmWxJ0uCajMw5XL90FAmKyeyUACgkQuCajMw5X
-L90rAhAAjdD3Vb062jIe2NEUyJrAyeCHkxDNA20ja8gxSCcuEyrCJQ/NcCaK2gnA
-Z1JFxlxfpFf4kb2ZGTYXdA1qbWCwEixHTUV97PodDyfVFIarad0kLZNGmn1ssmyN
-Y33aFl/pqbEGmIZq6YHDc7N3zPgTaM6kKWtQtamklz7TFHZCNfBK1H7EDk/jun8Y
-q7Dhvgtz1W2OpjYjr49sdo0plNSLTfRj8v1h535mXl1sC1g+YvGONgDmdNmNPn12
-f9kbAuSFhVy2FPpbdQlduClAHPjEmLZomEJoy4rr1VOuqir8Yfb0O3s76TDpHs9O
-FydAOfvMabTyF6goZpz+hPN2A70TzNVvOyYnygAVjqq7g+Du+1Ug850htFM4xajQ
-gsIX2NV9HUbURWxbpLq+x2RD8DsjvO79ezEUtS+wY7szE3U7x6Gb2llpFVLPAb6e
-6v7JZ3a49U+zvjJm7hNpisKXE5Y+KwtDyLCmQib+6kG0oSnbSIZCHyZgG4Uejjqz
-GLqrj+yqw+YoVZyOumkUaEY7U0Fl+MhEe25+okj3LsHIeDv9n+JNqHlss4Yp91+Y
-I3LbmummpNbeEmwrNy7o03bnkbuEsHbSd7GCKm/kP4vAqNPHDyBpatN+Lyi5y/FZ
-8P8UTFDZDgHGvsfh7bNvi2ZVCpo9Yhne5LvsURu4hsKALsELeVY=
-=lgLm
------END PGP SIGNATURE-----
-
---=-3IS5LZq5RI504sawv6lh--
+-- 
+Best Regards,
+  Yi Zhang
 
