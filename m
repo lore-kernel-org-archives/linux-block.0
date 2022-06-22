@@ -2,115 +2,106 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47B69C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 10:59:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DBAFFC43334
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 11:13:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353204AbiFVK7A (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jun 2022 06:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42780 "EHLO
+        id S231809AbiFVLNC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jun 2022 07:13:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353440AbiFVK6W (ORCPT
+        with ESMTP id S1355022AbiFVLNB (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jun 2022 06:58:22 -0400
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C7E9165B7
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 03:58:19 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id h23so33331913ejj.12
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 03:58:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ionos.com; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xVXVUCVrx9T7gToLuzws6IAdgE4BgTCq8bWjRWB2+8o=;
-        b=UPFGklVc7f9C07cI/CohhTmtRlRrCIIpAjEUDXdiiqTLaGlcgCWocax6UOI0wuA4uN
-         XFDMUwzjJQ04iQV3d0p3FdTVwISdLNNbIyKDL2CRPG3Y33OYLVmyNN5RWTiwFRujqaUb
-         ZvIn4cvGTb5mzI/22eSLJtBRhsm+T2b+N4JDPUrn9oGBmNWi7MAk0+2GY0v/Eo6uhlGs
-         u1BljrkUmvBLe/rR8JC7zTtSy9cWMLT5nuJWjeyRxmpDWZ2nr7ohpU33fXnLgeYhycdh
-         V6mUa7kMviaIurQosNrdqdUbqFMwd4kWLelIwLKIJoi5s932ofATeoXtCcOVH57cclri
-         Vb2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xVXVUCVrx9T7gToLuzws6IAdgE4BgTCq8bWjRWB2+8o=;
-        b=Jce/iA6W9MXSGOLKUbzCrr0FYsLVNbxf86NUaOWxj8iy+yV2FV0+R9lDoEoTI93y9f
-         edz+MaU+6m0QD8Oyn/LLR2yv8srn5+aEnfcbEH2Zz4T/Xtu1Aj1g7f+MWnqAMaMWhCTq
-         9z4LORhMd/6Hqrc/byJhQk9ETQ21MTRpfYPe2jZXkS/j36wmNLB4dUoZ+M7EiLsQ+O3T
-         RdXC/4g02zFtKJkn6+e3yeIJQfquP+RUxRar1x67jtzfn4+JClXQ9rqiqocZXi/SSIEY
-         z72rtHF/bT16WGVbRZpdE5KYM6ElQlRoZ+LmEpnqd7vA5GJsLBT2scMnfxm7BeDmDBUE
-         3Fbw==
-X-Gm-Message-State: AJIora90S/rwVAMb1zpULUGfnanydNUkR0CXg9MRI6NbRBPIjYXGSLIz
-        7CoCHITnaPbliBklv7vXPI85s1NPEt26Qvswv5m5cBlN6JA=
-X-Google-Smtp-Source: AGRyM1sTCUy1vod46zGEyHMQEr0lAZcfQ4KbdTIo4MQztlPbv9tPD7Gt3NejCNQlFnK2PrasxsemSZ3m65ZJ6iG8mrc=
-X-Received: by 2002:a17:906:cc87:b0:722:fb3e:9f9c with SMTP id
- oq7-20020a170906cc8700b00722fb3e9f9cmr97868ejb.624.1655895498057; Wed, 22 Jun
- 2022 03:58:18 -0700 (PDT)
-MIME-Version: 1.0
-References: <20220620034923.35633-1-guoqing.jiang@linux.dev> <20220620034923.35633-6-guoqing.jiang@linux.dev>
-In-Reply-To: <20220620034923.35633-6-guoqing.jiang@linux.dev>
-From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Wed, 22 Jun 2022 12:58:07 +0200
-Message-ID: <CAMGffEk-M1FOLpez4qkiHLb1ms9rhye2XRXGaqzrSohL0Aoi4w@mail.gmail.com>
-Subject: Re: [RFC PATCH 5/6] rnbd-clt: adjust the layout of struct rnbd_clt_dev
-To:     Guoqing Jiang <guoqing.jiang@linux.dev>
+        Wed, 22 Jun 2022 07:13:01 -0400
+Received: from out2.migadu.com (out2.migadu.com [188.165.223.204])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A423065BA
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 04:12:57 -0700 (PDT)
+Subject: Re: [RFC PATCH 6/6] rnbd-clt: refactor rnbd_clt_change_capacity
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+        t=1655896375;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=ou1sGhm6EW73TEGyaoCxFST2Iu1qPDa4jNN9L+8FVPw=;
+        b=Hg6yBmtug/MVDJDlyR+ydiEEBwH/IiCwoXeyJc6VzNGCI1IZi8Uy0HZrWpnkWH2lD29rTk
+        etRkPg4iQJXRaTr8zGjahh0dr+dHOONTHbP1+IAZGxLb467QQO19IwZ+k4RjrJJlaS9mo4
+        RkF0hdGlpuvHgm5Zj9ZbeIZ9HzpUtt4=
+To:     Jinpu Wang <jinpu.wang@ionos.com>
 Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+References: <20220620034923.35633-1-guoqing.jiang@linux.dev>
+ <20220620034923.35633-7-guoqing.jiang@linux.dev>
+ <CAMGffE=N2hAvBQB_kt1ZcnqNBg7SHxZ=3jquR0fogatoad6WKA@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From:   Guoqing Jiang <guoqing.jiang@linux.dev>
+Message-ID: <b5b2ca6a-cc90-9065-e737-da7f2e6f27ef@linux.dev>
+Date:   Wed, 22 Jun 2022 19:12:51 +0800
+MIME-Version: 1.0
+In-Reply-To: <CAMGffE=N2hAvBQB_kt1ZcnqNBg7SHxZ=3jquR0fogatoad6WKA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-Migadu-Flow: FLOW_OUT
+X-Migadu-Auth-User: linux.dev
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 5:50 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
->
-> While at it, let re-arrange the struct to remove holes.
->
-> Before, pahole reports
->
->         /* size: 232, cachelines: 4, members: 17 */
->         /* sum members: 224, holes: 2, sum holes: 8 */
->         /* last cacheline: 40 bytes */
->
-> After the change, the report changes to
->
->         /* size: 224, cachelines: 4, members: 17 */
->         /* last cacheline: 32 bytes */
->
-> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
-lgtm
-Acked-by: Jack Wang <jinpu.wang@ionos.com>
 
-> ---
->  drivers/block/rnbd/rnbd-clt.h | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/block/rnbd/rnbd-clt.h b/drivers/block/rnbd/rnbd-clt.h
-> index 7520272541b1..df237d2ea0d9 100644
-> --- a/drivers/block/rnbd/rnbd-clt.h
-> +++ b/drivers/block/rnbd/rnbd-clt.h
-> @@ -106,6 +106,7 @@ struct rnbd_queue {
->  };
->
->  struct rnbd_clt_dev {
-> +       struct kobject          kobj;
->         struct rnbd_clt_session *sess;
->         struct request_queue    *queue;
->         struct rnbd_queue       *hw_queues;
-> @@ -114,15 +115,14 @@ struct rnbd_clt_dev {
->         u32                     clt_device_id;
->         struct mutex            lock;
->         enum rnbd_clt_dev_state dev_state;
-> +       refcount_t              refcount;
->         char                    *pathname;
->         enum rnbd_access_mode   access_mode;
->         u32                     nr_poll_queues;
->         u64                     size;           /* device size in bytes */
->         struct list_head        list;
->         struct gendisk          *gd;
-> -       struct kobject          kobj;
->         char                    *blk_symlink_name;
-> -       refcount_t              refcount;
->         struct work_struct      unmap_on_rmmod_work;
->  };
->
-> --
-> 2.34.1
->
+
+On 6/22/22 6:57 PM, Jinpu Wang wrote:
+> On Mon, Jun 20, 2022 at 5:50 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
+>> 1. process_msg_open_rsp checks if capacity changed or not before call
+>> rnbd_clt_change_capacity while the checking also make sense for
+>> rnbd_clt_resize_dev_store, let's move the checking into the function.
+>>
+>> 2. change the parameter type to 'sector_t' then we don't need to cast
+>> it from rnbd_clt_resize_dev_store, and update rnbd_clt_resize_disk too.
+>>
+>> 3. no need to checking the return value, make it return void.
+>>
+> better to split this into 3 patches.
+
+Will do.
+
+>> Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
+>> ---
+>>   drivers/block/rnbd/rnbd-clt-sysfs.c |  2 +-
+>>   drivers/block/rnbd/rnbd-clt.c       | 24 ++++++++++++------------
+>>   drivers/block/rnbd/rnbd-clt.h       |  2 +-
+>>   3 files changed, 14 insertions(+), 14 deletions(-)
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-clt-sysfs.c b/drivers/block/rnbd/rnbd-clt-sysfs.c
+>> index 2be5d87a3ca6..e7c7d9a68168 100644
+>> --- a/drivers/block/rnbd/rnbd-clt-sysfs.c
+>> +++ b/drivers/block/rnbd/rnbd-clt-sysfs.c
+>> @@ -376,7 +376,7 @@ static ssize_t rnbd_clt_resize_dev_store(struct kobject *kobj,
+>>          if (ret)
+>>                  return ret;
+>>
+>> -       ret = rnbd_clt_resize_disk(dev, (size_t)sectors);
+>> +       ret = rnbd_clt_resize_disk(dev, sectors);
+>>          if (ret)
+>>                  return ret;
+>>
+>> diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
+>> index 2c63cd5ac09d..6c6c4ba3d41d 100644
+>> --- a/drivers/block/rnbd/rnbd-clt.c
+>> +++ b/drivers/block/rnbd/rnbd-clt.c
+>> @@ -68,13 +68,18 @@ static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
+>>          return refcount_inc_not_zero(&dev->refcount);
+>>   }
+>>
+>> -static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+>> -                                   size_t new_nsectors)
+>> +static void rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+>> +                                    sector_t new_nsectors)
+>>   {
+>> -       rnbd_clt_info(dev, "Device size changed from %llu to %zu sectors\n",
+>> +       if (get_capacity(dev->gd) != new_nsectors)
+>> +               return;
+> This change is broken, it leads to resize no longer work, should be "=="
+
+Yes, thanks for catch it.
+
+Thanks,
+Guoqing
