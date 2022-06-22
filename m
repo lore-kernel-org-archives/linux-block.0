@@ -2,84 +2,113 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C83EC43334
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 17:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED751C43334
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 19:19:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1377401AbiFVRqu (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jun 2022 13:46:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51406 "EHLO
+        id S229828AbiFVTTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jun 2022 15:19:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1358743AbiFVRqt (ORCPT
+        with ESMTP id S229824AbiFVTTq (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jun 2022 13:46:49 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0969F35ABC
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 10:46:49 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id k15so1365254iok.5
-        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 10:46:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=qAFCZk1NpVWo7GACDd4Q9nQOdX9qli/cCrDJzW19dwQ=;
-        b=lM5cc9jWKp7RMHHJ75oZ37AW6q6b8mQRBreFoYC3I6pOVGQcBNw65VTfvh8PlePDYJ
-         dvh3zvQY63KLX31kXiq4tvdT5W9cg6Rt1yHnm95DvhcIsxUuuYtv3FvNiR+83ksfcTF6
-         9v7n/6m+OWci0gpOI3W16UxBwikLDmtC8BFsaw0yGwSWjNqDd3D0vDWu8FQiILeWOaoM
-         tuSYOoXOHv+mLy0rD9NjhB9umTJ88vIzri9RzMTrLbOz0+FemoyEQkxag282ueCulIom
-         1H2azU5y6v4ClOnv7/wi7HuxqR6imiozXSJbOgCKa4426hFKBMYjo48s4rRcF/VEgD3h
-         /b6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=qAFCZk1NpVWo7GACDd4Q9nQOdX9qli/cCrDJzW19dwQ=;
-        b=y7nI+ooVsedIGNpMvofG8nFUNFefH94Px3XgB2ot46BDb+Qc0PMwr7XsyK5ojjB5dz
-         1S6POqx8zj17F/DwH/bb+yvkF1nF7eBGPRljl/6M7kCGFSwnIzBWw2YLBOMU+LHjst5g
-         qSqB6/xcWs1/eihZgAeNPlvzFNLPgNkwBBQWmdbUtr3BcObGwXkl1GAWUENRBcMygsUy
-         J+jJGb8Uzo51M9Z0RdT6d64KQ05obT+CrTHFoAUwKsUTFWcFfujc/1uI+aMDJdVS88PD
-         Brg4KeqO7c6tMgHSBZLA8ZiZFRgBKWd/TCSLwQm53MQpPm+8RBwGhW13GPAl5tDeA4D8
-         JZ5g==
-X-Gm-Message-State: AJIora+dQR0jfNAF6rwl96LNjrJmRcYGY6vjeA/cKKlysX11+/dMoM1n
-        rT1gB2/4sMhEaBDw2/J9jXiENQ==
-X-Google-Smtp-Source: AGRyM1syLNDaG6ZwDSYIn5KpK1ELHjQy2WoZOIfSeKXJTPgNarzU29JKzuBPU10qdLATx8e/Oe1+Hg==
-X-Received: by 2002:a05:6638:1a8e:b0:339:cb8c:df22 with SMTP id ce14-20020a0566381a8e00b00339cb8cdf22mr2885136jab.152.1655920008372;
-        Wed, 22 Jun 2022 10:46:48 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id m18-20020a02c892000000b0032e79d23f8fsm8721910jao.156.2022.06.22.10.46.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jun 2022 10:46:47 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     ming.lei@redhat.com, bigeasy@linutronix.de
-Cc:     tglx@linutronix.de, linux-block@vger.kernel.org
-In-Reply-To: <YrLSEiNvagKJaDs5@linutronix.de>
-References: <YrF1p2n0MxHQ3fcJ@linutronix.de> <YrF5uf4ZL7Oh7LVJ@T590> <YrLSEiNvagKJaDs5@linutronix.de>
-Subject: Re: [PATCH v2] blk-mq: Don't disable preemption around __blk_mq_run_hw_queue().
-Message-Id: <165592000770.77505.5790006044844979572.b4-ty@kernel.dk>
-Date:   Wed, 22 Jun 2022 11:46:47 -0600
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+        Wed, 22 Jun 2022 15:19:46 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1EC3587E;
+        Wed, 22 Jun 2022 12:19:45 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 3A821B820DF;
+        Wed, 22 Jun 2022 19:19:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F12C34114;
+        Wed, 22 Jun 2022 19:19:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
+        s=korg; t=1655925582;
+        bh=/mqJhZHnFZv4yLcCic7/bc1inkKszgYj0JD8prJIpjk=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=qjWwYVRfzc+N/uWK1DpW6CQ1YtCEOGV22eBql0f6AWWGbzOZS1IgM/pjtupsLc42h
+         ta0txrydZ00LBL7/oBed2qA17Gp2fr41qccvrNnizD0i9RH0wCeQC//+fWo2G90mHl
+         9zKKVEDbrzi7kVNmY0rEi2WI55V7CHa6d6G4mfM4=
+Date:   Wed, 22 Jun 2022 12:19:30 -0700
+From:   Andrew Morton <akpm@linux-foundation.org>
+To:     Sergey Senozhatsky <senozhatsky@chromium.org>
+Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
+        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
+Subject: Re: [PATCH] zram: do not lookup algorithm in backends table
+Message-Id: <20220622121930.4f8d3f882bb2b0520fd6917c@linux-foundation.org>
+In-Reply-To: <YrMzJSNb4b+tODqR@google.com>
+References: <20220622023501.517125-1-senozhatsky@chromium.org>
+        <YrMzJSNb4b+tODqR@google.com>
+X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+Mime-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 22 Jun 2022 10:25:54 +0200, Sebastian Andrzej Siewior wrote:
-> __blk_mq_delay_run_hw_queue() disables preemption to get a stable
-> current CPU number and then invokes __blk_mq_run_hw_queue() if the CPU
-> number is part the mask.
+On Thu, 23 Jun 2022 00:20:05 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
+
+> On (22/06/22 11:35), Sergey Senozhatsky wrote:
+> > Always use crypto_has_comp() so that crypto can lookup module,
+> > call usermodhelper to load the modules, wait for usermodhelper
+> > to finish and so on. Otherwise crypto will do all of these steps
+> > under CPU hot-plug lock and this looks like too much stuff to
+> > handle under the CPU hot-plug lock. Besides this can end up in
+> > a deadlock when usermodhelper triggers a code path that attempts
+> > to lock the CPU hot-plug lock, that zram already holds.
 > 
-> __blk_mq_run_hw_queue() acquires a spin_lock_t which is a sleeping lock
-> on PREEMPT_RT and can't be acquired with disabled preemption.
+> And we think that we (not exactly "we", our partners) actually
+> see a deadlock. It goes something like this:
 > 
-> [...]
+> - path A. zram grabs CPU hot-plug lock, execs /sbin/modprobe from crypto
+>   and waits for modprobe to finish
 
-Applied, thanks!
+Nope, can't do that.
 
-[1/1] blk-mq: Don't disable preemption around __blk_mq_run_hw_queue().
-      commit: c9198d784fa93d447afe8e4627dfe205f0ce5ec8
+> disksize_store
+>  zcomp_create
+>   __cpuhp_state_add_instance
+>    __cpuhp_state_add_instance_cpuslocked
+>     zcomp_cpu_up_prepare
+>      crypto_alloc_base
+>       crypto_alg_mod_lookup
+>        call_usermodehelper_exec
+>         wait_for_completion_killable
+>          do_wait_for_common
+>           schedule
 
-Best regards,
--- 
-Jens Axboe
+The usermode helper is free to do anything it wants, including
+operations that take the CPU hotplug lock.  Or operations which might
+in the future be changed to take that lock.
 
+> - path B. async work kthread that brings in scsi device. It wants to
+>   register CPUHP states at some point, and it needs the CPU hot-plug
+>   lock for that, which is owned by zram.
+> 
+> async_run_entry_fn
+>  scsi_probe_and_add_lun
+>   scsi_mq_alloc_queue
+>    blk_mq_init_queue
+>     blk_mq_init_allocated_queue
+>      blk_mq_realloc_hw_ctxs
+>       __cpuhp_state_add_instance
+>        __cpuhp_state_add_instance_cpuslocked
+>         mutex_lock
+>          schedule
+> 
+> - path C. modprobe sleeps, waiting for all aync works to finish.
+> 
+> load_module
+>  do_init_module
+>   async_synchronize_full
+>    async_synchronize_cookie_domain
+>     schedule
+> 
+> And none can make any progress.
+> 
+> So I think we need to move crypto_alg_mod_lookup()->call_usermodehelper_exec()
+> out of CPU hot-plug lock and pre-load modules in advance, before we grab the
+> hot-plug lock.
 
+If the locking is fixed, why is there still a need to preload modules?
