@@ -2,94 +2,145 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2D2C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 02:35:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B258C43334
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 02:37:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355682AbiFVCfL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 22:35:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49986 "EHLO
+        id S233508AbiFVChp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 22:37:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51142 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232452AbiFVCfK (ORCPT
+        with ESMTP id S232651AbiFVCho (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 22:35:10 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59764302
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:35:09 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id t3-20020a17090a510300b001ea87ef9a3dso15364156pjh.4
-        for <linux-block@vger.kernel.org>; Tue, 21 Jun 2022 19:35:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sGl5+ehxGLowleALKzjeGZ3rc803Ngllm888LIuNvsg=;
-        b=VnSeM+TIr/QKBFk6gml/hHQpsnIEappV2NO0YNXNvzqho/5OwT2bSkTkgVw7aBqaqj
-         WBmAErFIKMAcMurvSHpjhakvBhtB9ttIM2zdqaVRZ8L+ervOtdO8ERPa9fVyHQ+GF4pV
-         fgY8bpVPoxVuaZIDRoyNgZouHIMQ24/OmUW14=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=sGl5+ehxGLowleALKzjeGZ3rc803Ngllm888LIuNvsg=;
-        b=d5FdARFoquWd0/46wwmbp5Zvai+wOlgSN/zcy4ENw1I2Ssp6ZXpcS4QOl+xxg/P4h9
-         O4x/JXO9WCzh0lij+py6Is/V1N6GkW5zzxvjAuAqUoTz4IMaVtKXWM1cpPMmawAfqjoV
-         M9s4QT7Z24Wc0+OoJaZ1ELzrpJDOGRonAeIiOcdXv8VsyMbKMJ0TWYyuGzX60DGq8NRl
-         PGDBxRxOXvglMap4fjXp7i9FIdQaDxWmFz8jnvyPUZmCVC0IXINZQYB70FVM+4yd7IxR
-         30b5T+md1tyrdOJCPuE1Cngx6CDWoH9CMAqGyski9SVCjBzuVxeD2f+Hr9XFwJcCSRxO
-         /srQ==
-X-Gm-Message-State: AJIora8U3KthRMtFdyTEw74c/JFcpesLkCukhzHSbkD2jIhYuNNQDv50
-        FIHrYxWXEsocaFsi1zPC9bt0Ww==
-X-Google-Smtp-Source: AGRyM1ve8EpdrHDDtoCMYvUHnzTm2dlt4MX4QTcOCfexmssRE74lOtugg9gSecI8FR/TbYd4g4O9eA==
-X-Received: by 2002:a17:902:c2ca:b0:168:db72:16a with SMTP id c10-20020a170902c2ca00b00168db72016amr32526387pla.171.1655865308850;
-        Tue, 21 Jun 2022 19:35:08 -0700 (PDT)
-Received: from senozhatsky.kddi.com ([240f:75:7537:3187:1922:709:82a7:e4d3])
-        by smtp.gmail.com with ESMTPSA id c11-20020a62f84b000000b0051844a64d3dsm11991277pfm.25.2022.06.21.19.35.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Jun 2022 19:35:08 -0700 (PDT)
-From:   Sergey Senozhatsky <senozhatsky@chromium.org>
-To:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>
-Cc:     Andrew Morton <akpm@linux-foundation.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        Sergey Senozhatsky <senozhatsky@chromium.org>
-Subject: [PATCH] zram: do not lookup algorithm in backends table
-Date:   Wed, 22 Jun 2022 11:35:01 +0900
-Message-Id: <20220622023501.517125-1-senozhatsky@chromium.org>
-X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
+        Tue, 21 Jun 2022 22:37:44 -0400
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033ED31220;
+        Tue, 21 Jun 2022 19:37:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1655865454;
+        bh=ZYmy+gYNPHc14IB9uGAmLHWZKGdmbfK5J4VuU0lNF54=;
+        h=X-UI-Sender-Class:Date:To:References:From:Subject:In-Reply-To;
+        b=f1SgIT2iUfgK6JGidPc7x5swAWtiCdhwcCIxLQXex6dQXJDGMnkl7phfhga1TL7Nf
+         kfNUM4YRy09UqrBzotPExrAmUBlt7HyIVSxURDZSd4AkUIjsnO0rXWlPgeaE5gs9U0
+         +V3FMee13nztLIH5LeN5k3EpJ07VuPvCRyCHghdw=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx104
+ [212.227.17.174]) with ESMTPSA (Nemesis) id 1MEFzx-1nwSNc0Xht-00AGB9; Wed, 22
+ Jun 2022 04:37:34 +0200
+Message-ID: <d15f352d-41b8-8ade-4724-8370ef17db8d@gmx.com>
+Date:   Wed, 22 Jun 2022 10:37:29 +0800
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-US
+To:     Doug Ledford <dledford@redhat.com>,
+        Wols Lists <antlists@youngman.org.uk>,
+        linux-raid@vger.kernel.org,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        NeilBrown <neilb@suse.com>
+References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
+ <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
+ <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
+ <06365833-bd91-7dcf-4541-f8e15ed3bef2@youngman.org.uk>
+ <87cb53c4f08cc7b18010e62b9b3178ed70e06e8d.camel@redhat.com>
+From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
+Subject: Re: About the md-bitmap behavior
+In-Reply-To: <87cb53c4f08cc7b18010e62b9b3178ed70e06e8d.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:3Jp0t3SNb5hovnXTWcX0Y75lNujLSTLUMhszvt05CUtW0LPK5FN
+ wgWtuV9B8yjedzRpMicYZ6nmcTkvKCvJlAnHAl3TRvSz3WElQjOq2/ufR4WBSktr0cq4b3R
+ dqklbyb6nyyFX0YiR8oVCsjI5neUuo3r7EcJi7njQJL/oLgdRWmWMbjaTtuwqI8NLdVUMY+
+ aNokqKBv9cZMSb54Dt8Zw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:WjMGLs+vJDU=:+G9gRlgq924fxm6CLceAx4
+ alNEP4MJLH0VdlshdkD1AoWvYSjdo9fG4myQpLzSWPk3kLCeWt1gX2X2B5wc63FdXO8Ud7PYe
+ 4JaHYABWPzrshzj2vqr/CVGRmVSXz4HQfDsUyjrDXSr2chzKy88CbqytNOMukWxNm1ym254Fi
+ hUyJdD2ci92f3Lkjax4y2HqQZ0RzpIZHqIC0Qy+vppR6oATC5hPVgmp6LTzYFzeLPEuQDhHtR
+ KKM/F3dUSqHwBj1J97udoIuv3bQ3rWb1F/WmcKqR06lPXNBR7vsyVhcr+cMHnT27XECbOVWhL
+ QNBcwpivYpW5OFPnzSPY2S79lhX4ae3PiitFxTJ6r6+XZcjHJ09OMr6AJdILgq7V5u1iZ1F3J
+ AT2foyPDHIm1/erYGkDzVDQEIx1lmyd9i8w7YnIepiScYeq4ywFcgIATBoGtbIKK+9SY/dibZ
+ IIxY7SBGStOUqNVqitdIxR8wg8jXPMP2rsx398UFotl3KQGfmPb+V/OfuqqTHhk1rh3gzNOiq
+ 1nPqowmMRBJctrDmQlFBphPRNu/ALBvMJKRbs6IGGoiJaLfn/Xb2wMUOtdPzEiAALqTdNgBEh
+ MTiwa+1oVFN/lJ7HA6LKpPERuNeYZoy6HY7dHy18TK3fsLqTr+00RxleJcfs1wG+Txr+K2pv6
+ CmUgEiND4kBuUbI8u50bAArUFzvCLIrt/TQWYIVua2qaxu3K8n3vfsnpIqJZ8z821Sq0BSNkP
+ 9PP12CO1Fz49miZ+mD/ifjnZwbNmeA2etRtnP62MROm87bs9/m78H20+Ug1Cu5ahoJ2eY1Umx
+ HHdonOlNHFj5qXkIuJbCpF9eNOk/elwu1rtbDyzETqOe+wq87WN5f+BhOQKb11a8XAMSBNm5f
+ hKbBKMEwFsi5+1uFHw6/b4eJ2FBfLbGEv+LVVGvRG5kbvLqJKg9DXT88jIBDE23LZA1oFWNGZ
+ X0QLzjGVEzEp85hcL8dy80I2fkGxVj6HaQYaYJ+30MiszqTIJZio14EuekvK8nJkvMtHBHI18
+ qXbVvK1O3gb8Kj0N7361dDXzGIP4w0oKNJBbEwBO2DZKf22u03KiH0xCMMmsirnviz+gA6REb
+ l/JR0uCLCzw2lWmPAl9WLJzp8ARkSD3932OGhscizjya3CbTZqHfC22yA==
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Always use crypto_has_comp() so that crypto can lookup module,
-call usermodhelper to load the modules, wait for usermodhelper
-to finish and so on. Otherwise crypto will do all of these steps
-under CPU hot-plug lock and this looks like too much stuff to
-handle under the CPU hot-plug lock. Besides this can end up in
-a deadlock when usermodhelper triggers a code path that attempts
-to lock the CPU hot-plug lock, that zram already holds.
 
-Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
----
- drivers/block/zram/zcomp.c | 6 ------
- 1 file changed, 6 deletions(-)
 
-diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
-index 052aa3f65514..398eb9e24eff 100644
---- a/drivers/block/zram/zcomp.c
-+++ b/drivers/block/zram/zcomp.c
-@@ -63,12 +63,6 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
- 
- bool zcomp_available_algorithm(const char *comp)
- {
--	int i;
--
--	i = sysfs_match_string(backends, comp);
--	if (i >= 0)
--		return true;
--
- 	/*
- 	 * Crypto does not ignore a trailing new line symbol,
- 	 * so make sure you don't supply a string containing
--- 
-2.37.0.rc0.104.g0611611a94-goog
+On 2022/6/22 10:15, Doug Ledford wrote:
+> On Mon, 2022-06-20 at 10:56 +0100, Wols Lists wrote:
+>> On 20/06/2022 08:56, Qu Wenruo wrote:
+>>>> The write-hole has been addressed with journaling already, and
+>>>> this will
+>>>> be adding a new and not-needed feature - not saying it wouldn't be
+>>>> nice
+>>>> to have, but do we need another way to skin this cat?
+>>>
+>>> I'm talking about the BTRFS RAID56, not md-raid RAID56, which is a
+>>> completely different thing.
+>>>
+>>> Here I'm just trying to understand how the md-bitmap works, so that
+>>> I
+>>> can do a proper bitmap for btrfs RAID56.
+>>
+>> Ah. Okay.
+>>
+>> Neil Brown is likely to be the best help here as I believe he wrote a
+>> lot of the code, although I don't think he's much involved with md-
+>> raid
+>> any more.
+>
+> I can't speak to how it is today, but I know it was *designed* to be
+> sync flush of the dirty bit setting, then lazy, async write out of the
+> clear bits.  But, yes, in order for the design to be reliable, you must
+> flush out the dirty bits before you put writes in flight.
 
+Thank you very much confirming my concern.
+
+So maybe it's me not checking the md-bitmap code carefully enough to
+expose the full picture.
+
+>
+> One thing I'm not sure about though, is that MD RAID5/6 uses fixed
+> stripes.  I thought btrfs, since it was an allocation filesystem, didn't
+> have to use full stripes?  Am I wrong about that?
+
+Unfortunately, we only go allocation for the RAID56 chunks. In side a
+RAID56 the underlying devices still need to go the regular RAID56 full
+stripe scheme.
+
+Thus the btrfs RAID56 is still the same regular RAID56 inside one btrfs
+RAID56 chunk, but without bitmap/journal.
+
+>  Because it would seem
+> that if your data isn't necessarily in full stripes, then a bitmap might
+> not work so well since it just marks a range of full stripes as
+> "possibly dirty, we were writing to them, do a parity resync to make
+> sure".
+
+For the resync part is where btrfs shines, as the extra csum (for the
+untouched part) and metadata COW ensures us only see the old untouched
+data, and with the extra csum, we can safely rebuild the full stripe.
+
+Thus as long as no device is missing, a write-intent-bitmap is enough to
+address the write hole in btrfs (at least for COW protected data and all
+metadata).
+
+>
+> In any case, Wols is right, probably want to ping Neil on this.  Might
+> need to ping him directly though.  Not sure he'll see it just on the
+> list.
+>
+
+Adding Neil into this thread. Any clue on the existing
+md_bitmap_startwrite() behavior?
+
+Thanks,
+Qu
