@@ -2,145 +2,165 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B258C43334
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 02:37:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C339ACCA473
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 03:10:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233508AbiFVChp (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 21 Jun 2022 22:37:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51142 "EHLO
+        id S1355886AbiFVDKv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 21 Jun 2022 23:10:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38888 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232651AbiFVCho (ORCPT
+        with ESMTP id S231720AbiFVDKu (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 21 Jun 2022 22:37:44 -0400
-Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 033ED31220;
-        Tue, 21 Jun 2022 19:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1655865454;
-        bh=ZYmy+gYNPHc14IB9uGAmLHWZKGdmbfK5J4VuU0lNF54=;
-        h=X-UI-Sender-Class:Date:To:References:From:Subject:In-Reply-To;
-        b=f1SgIT2iUfgK6JGidPc7x5swAWtiCdhwcCIxLQXex6dQXJDGMnkl7phfhga1TL7Nf
-         kfNUM4YRy09UqrBzotPExrAmUBlt7HyIVSxURDZSd4AkUIjsnO0rXWlPgeaE5gs9U0
-         +V3FMee13nztLIH5LeN5k3EpJ07VuPvCRyCHghdw=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [0.0.0.0] ([149.28.201.231]) by mail.gmx.net (mrgmx104
- [212.227.17.174]) with ESMTPSA (Nemesis) id 1MEFzx-1nwSNc0Xht-00AGB9; Wed, 22
- Jun 2022 04:37:34 +0200
-Message-ID: <d15f352d-41b8-8ade-4724-8370ef17db8d@gmx.com>
-Date:   Wed, 22 Jun 2022 10:37:29 +0800
+        Tue, 21 Jun 2022 23:10:50 -0400
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1047F2E9C3;
+        Tue, 21 Jun 2022 20:10:50 -0700 (PDT)
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25M0IiA2002242;
+        Wed, 22 Jun 2022 00:57:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
+ from : message-id : references : date : in-reply-to : content-type :
+ mime-version; s=corp-2021-07-09;
+ bh=hYPUunJv39Kc2I5cyf9e+WJqO1CwN/sdH2K7lZcHexc=;
+ b=b4gfe1KPzhVRlE1660Vbk/oN3bTJAk/Bpt494KwUuU/Nkhmvjxa2c1VvUYW5wixIsfw5
+ 0V4XCWwESSFQgqEgytte5C4e+UGt41eJSjIiUCjACmZMEjCfeGbBk9GZFZibTFu0Dxc2
+ mZxUV/q7Twncf1v7Tiw+UYIocVHg2oQ0nNBSM8ovIThiIrcAd1lvjHcaO7/c6kqnMA5T
+ gS9AO4tg/LHr6/19G+12695iW3njWDB75t9CaogW973lzNy2l2+Cmmiteqd1HPB5ZG+d
+ XOpqXf6nRKx+MN8mksbxelKvYZMDrjuhxAdeFK0CeizMSod7ioXfKRlvgTEUMMRNagfU nw== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+        by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3gs5a0f39m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jun 2022 00:57:48 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.16.1.2/8.16.1.2) with SMTP id 25M0p1Ue012151;
+        Wed, 22 Jun 2022 00:57:48 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2175.outbound.protection.outlook.com [104.47.56.175])
+        by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com with ESMTP id 3gth8wy4xb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 22 Jun 2022 00:57:48 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QM8VuCBpBslfRxaUBaiAv5AeOp2BcD0IuEB/MQojqDemXHjqeCgn3vnjkHlRdv2K1ppkYwyL2ZTuwZ0+B2r6oxH9JQWwVwSgqhcg1rSiVXjjd52HI1yMY95NmUqf4qR6JopPiRrIu1Nh2S/JSJoNAVSj5klZRUT1Gxp7a1K80PbqsHYtPvbVAsAmOrFNZ7bTZnRHYV4lPoaOYv8UU1JC2xqhVXZPwKLziKQ/tUURkgzXJrvAhGnVtAZOoHHP+mt5xj4Ot16E4YmvshPG9Omhc4RTmQXrJPtjY+sRAGYYT+9q2lBq5iOrgFXmYvIHIOxIEgNU6hHJyDZggVULY+iWlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hYPUunJv39Kc2I5cyf9e+WJqO1CwN/sdH2K7lZcHexc=;
+ b=LnR99KXqbNOiAXIOxgMAXDi5nY7QQMtB3yxr0jymPXQrl8U3g4yvsvTF1ccvNvYVN96Fuh0KglHPilDSkh4WkYA/XUQqNm8m1E+M+jISc2csEKhHdmJ7kRxaMx8Y5CfqN8wvvyZigUR/OCPlT9XMh/r81kzuZLxkQokjHSTtmSBzdYS+/QD2XeP0+t9ISgH4QsKoS7UhgBBZX8vpdBqEotmoVB0uM+UFwR8Ck5uGTYSHgAdRiX9/t+GuWsFnBc47WgVUguFMjtZuEeWNkJ2EztTou+sziwaZm6r1MhoNcPjFkfazS7HQ+fQoZg+q8rfTYrIDPMtu1yJZslCXPMk/mA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hYPUunJv39Kc2I5cyf9e+WJqO1CwN/sdH2K7lZcHexc=;
+ b=XW4RLygnn9mfc/uRXwqIA9p/khrqa9uepT/MlLY5Cih1cz5BHJc7tKtwl9eKegG/ZDa8ndaPkrFkOJnnm7f+6rQgslArwvwWUZE/U9kOL47msCic8OO0GioazQWmKxuyTRQq1Nw1UZ/l9KxiL3Mu2RYumHVoQSHTb5lOeaPacOo=
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
+ by CO1PR10MB4417.namprd10.prod.outlook.com (2603:10b6:303:93::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.15; Wed, 22 Jun
+ 2022 00:57:46 +0000
+Received: from PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::6516:e908:d2bd:ca45]) by PH0PR10MB4759.namprd10.prod.outlook.com
+ ([fe80::6516:e908:d2bd:ca45%5]) with mapi id 15.20.5353.022; Wed, 22 Jun 2022
+ 00:57:46 +0000
+To:     John Garry <john.garry@huawei.com>
+Cc:     <axboe@kernel.dk>, <damien.lemoal@opensource.wdc.com>,
+        <bvanassche@acm.org>, <hch@lst.de>, <jejb@linux.ibm.com>,
+        <martin.petersen@oracle.com>, <hare@suse.de>, <satishkh@cisco.com>,
+        <sebaddel@cisco.com>, <kartilak@cisco.com>,
+        <linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+        <linux-mmc@vger.kernel.org>, <linux-nvme@lists.infradead.org>,
+        <linux-s390@vger.kernel.org>, <linux-scsi@vger.kernel.org>,
+        <mpi3mr-linuxdrv.pdl@broadcom.com>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <nbd@other.debian.org>
+Subject: Re: [PATCH v2 0/6] blk-mq: Add a flag for reserved requests series
+From:   "Martin K. Petersen" <martin.petersen@oracle.com>
+Organization: Oracle Corporation
+Message-ID: <yq14k0dldlx.fsf@ca-mkp.ca.oracle.com>
+References: <1655810143-67784-1-git-send-email-john.garry@huawei.com>
+Date:   Tue, 21 Jun 2022 20:57:42 -0400
+In-Reply-To: <1655810143-67784-1-git-send-email-john.garry@huawei.com> (John
+        Garry's message of "Tue, 21 Jun 2022 19:15:37 +0800")
+Content-Type: text/plain
+X-ClientProxiedBy: MN2PR15CA0032.namprd15.prod.outlook.com
+ (2603:10b6:208:1b4::45) To PH0PR10MB4759.namprd10.prod.outlook.com
+ (2603:10b6:510:3d::12)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Content-Language: en-US
-To:     Doug Ledford <dledford@redhat.com>,
-        Wols Lists <antlists@youngman.org.uk>,
-        linux-raid@vger.kernel.org,
-        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        NeilBrown <neilb@suse.com>
-References: <d4163d9f-8900-1ec1-ffb8-c3834c512279@gmx.com>
- <63a9cfb7-4999-d902-a7df-278e2ec37593@youngman.org.uk>
- <1704788b-fb7d-b532-4911-238e4f7fd448@gmx.com>
- <06365833-bd91-7dcf-4541-f8e15ed3bef2@youngman.org.uk>
- <87cb53c4f08cc7b18010e62b9b3178ed70e06e8d.camel@redhat.com>
-From:   Qu Wenruo <quwenruo.btrfs@gmx.com>
-Subject: Re: About the md-bitmap behavior
-In-Reply-To: <87cb53c4f08cc7b18010e62b9b3178ed70e06e8d.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:3Jp0t3SNb5hovnXTWcX0Y75lNujLSTLUMhszvt05CUtW0LPK5FN
- wgWtuV9B8yjedzRpMicYZ6nmcTkvKCvJlAnHAl3TRvSz3WElQjOq2/ufR4WBSktr0cq4b3R
- dqklbyb6nyyFX0YiR8oVCsjI5neUuo3r7EcJi7njQJL/oLgdRWmWMbjaTtuwqI8NLdVUMY+
- aNokqKBv9cZMSb54Dt8Zw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:WjMGLs+vJDU=:+G9gRlgq924fxm6CLceAx4
- alNEP4MJLH0VdlshdkD1AoWvYSjdo9fG4myQpLzSWPk3kLCeWt1gX2X2B5wc63FdXO8Ud7PYe
- 4JaHYABWPzrshzj2vqr/CVGRmVSXz4HQfDsUyjrDXSr2chzKy88CbqytNOMukWxNm1ym254Fi
- hUyJdD2ci92f3Lkjax4y2HqQZ0RzpIZHqIC0Qy+vppR6oATC5hPVgmp6LTzYFzeLPEuQDhHtR
- KKM/F3dUSqHwBj1J97udoIuv3bQ3rWb1F/WmcKqR06lPXNBR7vsyVhcr+cMHnT27XECbOVWhL
- QNBcwpivYpW5OFPnzSPY2S79lhX4ae3PiitFxTJ6r6+XZcjHJ09OMr6AJdILgq7V5u1iZ1F3J
- AT2foyPDHIm1/erYGkDzVDQEIx1lmyd9i8w7YnIepiScYeq4ywFcgIATBoGtbIKK+9SY/dibZ
- IIxY7SBGStOUqNVqitdIxR8wg8jXPMP2rsx398UFotl3KQGfmPb+V/OfuqqTHhk1rh3gzNOiq
- 1nPqowmMRBJctrDmQlFBphPRNu/ALBvMJKRbs6IGGoiJaLfn/Xb2wMUOtdPzEiAALqTdNgBEh
- MTiwa+1oVFN/lJ7HA6LKpPERuNeYZoy6HY7dHy18TK3fsLqTr+00RxleJcfs1wG+Txr+K2pv6
- CmUgEiND4kBuUbI8u50bAArUFzvCLIrt/TQWYIVua2qaxu3K8n3vfsnpIqJZ8z821Sq0BSNkP
- 9PP12CO1Fz49miZ+mD/ifjnZwbNmeA2etRtnP62MROm87bs9/m78H20+Ug1Cu5ahoJ2eY1Umx
- HHdonOlNHFj5qXkIuJbCpF9eNOk/elwu1rtbDyzETqOe+wq87WN5f+BhOQKb11a8XAMSBNm5f
- hKbBKMEwFsi5+1uFHw6/b4eJ2FBfLbGEv+LVVGvRG5kbvLqJKg9DXT88jIBDE23LZA1oFWNGZ
- X0QLzjGVEzEp85hcL8dy80I2fkGxVj6HaQYaYJ+30MiszqTIJZio14EuekvK8nJkvMtHBHI18
- qXbVvK1O3gb8Kj0N7361dDXzGIP4w0oKNJBbEwBO2DZKf22u03KiH0xCMMmsirnviz+gA6REb
- l/JR0uCLCzw2lWmPAl9WLJzp8ARkSD3932OGhscizjya3CbTZqHfC22yA==
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 9fe1d8aa-cbd8-436f-194b-08da53ea3848
+X-MS-TrafficTypeDiagnostic: CO1PR10MB4417:EE_
+X-Microsoft-Antispam-PRVS: <CO1PR10MB44170BF067037272FE052FAC8EB29@CO1PR10MB4417.namprd10.prod.outlook.com>
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: SX57tL0ZuJv+LXmnWHuw2+0zFdTXJ45W/PXWre9o0D4SHwohMiDcYdqmzPbnd9CdGkMifkGJVg4HZpSzEa0ITMaJqj7TGQDNBBnKghTT7ZwTDucEsu9ydmjztNGfKmvrMFis3rBJUlMh79JmnWYVPZmqbxBrXpTEqvWC8C4qLByuHhaEZS6NClpSGwmA6QV6tN2/d18nH0qlCNgL3cRVf4K+zYvov035WsIwoN8n4NDXxlUuuGAryh7V7rLtsezxkYMw9m/JbHEJw5LqIWwMiWZ2ChTR/aGavnK4v5UqcTdjV+cCj6dKkRZub6ThA5NN/Pxs/7TIqkjv/bK/fqXaysh128MbUsvO39xfJngMCaazZeXS70/wpxDBrXgyBfxIL5g5S4Gli1LtM6YlWAsCXIWCY4J7QDrBcZjipWU8WK7U89yC5dHSx+JVXCI9SJq7TzS9yWzlp4MegfQHOpuDMYI8anpxhi1h8rPrl5HFOFmMOexQjBAay7RU17dZNta4SdVhTlHGGMHbOqOYKeRI+2NbhVbyLa8qpu6P+xavNUi2wUAlDKw7U7LLUWJYkqj/AID1amQ5LzZlP5BQojCk3XUaYiWSSDfK+ubyVqkFWB4W/gKLC9SeBYy0WpTIMEmc0c0cy0yUIGiNmjBHSdo98sAwTIoi4HLDlzyNHdJa6GBN4mMggN9GQupAq1Ot4sFLUXIo2B2ftu84tGtYHXVWfg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(39860400002)(136003)(346002)(366004)(376002)(396003)(7416002)(4744005)(41300700001)(8936002)(5660300002)(6486002)(186003)(83380400001)(478600001)(2906002)(86362001)(38100700002)(6506007)(26005)(6512007)(52116002)(36916002)(6666004)(38350700002)(6916009)(316002)(4326008)(66946007)(54906003)(66556008)(66476007)(8676002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4187q9J/CK/yNL2YqGEZ1ty21oEeOXmPfZq0S2L7iw+KclhfB3OKwscnOnSz?=
+ =?us-ascii?Q?9jSOkGn4iGe0mov4JyQNnr2O3Ca1cojbogdWKIGTJ+yNZq+Gse+3o0FdtGeF?=
+ =?us-ascii?Q?+88tu0p3vkTrG+SdP9rOnS8eBSakGqHZ0D0loPkGYuw7z4srGVDBRg2GVL3T?=
+ =?us-ascii?Q?BRdPauRIk2CCwUDrBvIDyGoRdkEzZZvFuulbXv8Qvki2dSNoCfvNtrkR6QBU?=
+ =?us-ascii?Q?5wekEeN5qXpgZw0Bz+CUIk0oP7m7N6QNqK8T0+TZjpx3r6IHlPWN57/TujiR?=
+ =?us-ascii?Q?xX7HM4lY5uhqxNNx/8JHBRyylvLsSImUd9neGNabZGwovq0BMq6QcahzaXqy?=
+ =?us-ascii?Q?oC66oDQODImGO4LeYsTqzAYExoC3rlVJd0tNKDX/GF5NJ4agI2bilB+ESx2r?=
+ =?us-ascii?Q?KucHbOivg6RJln75uMLwQATb2k66m1bsClHZ99qv8RvegbUyJI2GewX+aviV?=
+ =?us-ascii?Q?dPjije145cDxFoVBORi6dTnCYi5Z6jQi4bLYzPYwfe0wjFJ1Jbfl5I2xrBuj?=
+ =?us-ascii?Q?6yPkrlO1BBlZxkJUfFk2Dwc2hwd2g5MUQRnZ/MhK632bJRC3lXt0bgC12AX4?=
+ =?us-ascii?Q?hX46NugQ+ct2NYJj2ZU2Sv+S2sFOjpRRAWqCO+Dx4SCorwFvVLgM7hwgMlN0?=
+ =?us-ascii?Q?iuRBBxZdyBjhnS5xV6sww+RRyb1zH+xXFRs0dcjAkoncr15eu261qhkzOWZB?=
+ =?us-ascii?Q?qhU0k0bKsPYh438lKajMLvA1+P6Y06AdopVGK8mDJirkyufJ9GhrfPrZL/ok?=
+ =?us-ascii?Q?4JjZF6Kk33oyVZoAGDwZLbDggWKc/gimDwWOOAMd37mkeOczsojCRCUDoOZE?=
+ =?us-ascii?Q?yvv5ILhrXLUDVA3v8woNAK3yHr2VFnP0MNAaPZKuoXtH4gYUW/b/Xn4cQfhh?=
+ =?us-ascii?Q?G2sEXqw13WlTXbTjuLgY/R8Tjt50JmvDwhi996X/cTKUVVMj/7S/jsUWIcMm?=
+ =?us-ascii?Q?UCciSnIXYdPyKg+/iQbSLUydQuiVM1IdHdBYlE6NzINtx+rPK8t47ttW9GjP?=
+ =?us-ascii?Q?2/QwiZEZsE+/hQZvmwg+AwcVBWIAcj1q2tKvh9jkzM95P2a13wIKA+ObjR49?=
+ =?us-ascii?Q?ZWY+t4XvJH5C8sihn/14JOR+2XZhrn144aNcBgXc8WJ5VvAKxnhuATJOc+ju?=
+ =?us-ascii?Q?mLl996FstnYHAasyY/d7vMQxuopfp1rT/JWOmsbnF3aoDahH2jlW4s3ndID5?=
+ =?us-ascii?Q?2zhRoTV/urx7UsHTmImVwtOk2tagMirWyc8a+1PXzu1ZbrdP88aKRzwe1GvZ?=
+ =?us-ascii?Q?zERqk2I/AsJ51mztArLPq6jvY/tQHm7/OiIqoKjPDQJZ0HF6hJjFkCZUKjkj?=
+ =?us-ascii?Q?l/oMPBED0Gb3mu7DvmdfpTDj9uW3CKvqi04Dh7wXyCDv9DQLV2KJKYugJVTt?=
+ =?us-ascii?Q?NGijQ6HXmAE0tf3WMdglnz36QvGn0BFY1bcHUV53Qo9d2JTBQKHSisIlbIdo?=
+ =?us-ascii?Q?qWxC+2ivl/yKr1AMDZ8KKaAR8ObSDX8FeRUM6GAiHdFXYTDbnt195UhTo4RZ?=
+ =?us-ascii?Q?qH3MOedKaxiBLsPdTEPEfHCARmIHOkj0peCKGN6UuLDkADtlNmu/pK5l2bs0?=
+ =?us-ascii?Q?vmdaGpBk82tqa1BpArn9J4fh8feIh9TRQfqcsj7akjyB4Td4t85R9yrPemKc?=
+ =?us-ascii?Q?TM92gZLj30zcrJDegrVd+dV2B52i36xgop0B53js7HSeHPuYjC90d+AITnjJ?=
+ =?us-ascii?Q?UOORpSf1ojIzQkhFqnG4vb5Ynd479Jgsiv4hTfbQ3BPQyRV3ockC/IXId+AP?=
+ =?us-ascii?Q?3GAX4UpD5EEg+9B8UIPnsX5yqccMA48=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9fe1d8aa-cbd8-436f-194b-08da53ea3848
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2022 00:57:46.0235
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MPRo1YUazgxGRe7mTsYs3Qal9B7yPVPXLfBbYYQmI0xIg3HftnE4l5VZ7l2JPIJdk5z1aBbumfF/z8tOmvrneZXbFb5lF2Qzm+1uUQDPKlE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR10MB4417
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.517,18.0.883
+ definitions=2022-06-21_11:2022-06-21,2022-06-21 signatures=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 malwarescore=0 mlxscore=0
+ phishscore=0 adultscore=0 suspectscore=0 mlxlogscore=959 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
+ definitions=main-2206220003
+X-Proofpoint-ORIG-GUID: llj4IUyuh1EIdvAYE9Mt_03d7tmIrmCz
+X-Proofpoint-GUID: llj4IUyuh1EIdvAYE9Mt_03d7tmIrmCz
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
+John,
 
-On 2022/6/22 10:15, Doug Ledford wrote:
-> On Mon, 2022-06-20 at 10:56 +0100, Wols Lists wrote:
->> On 20/06/2022 08:56, Qu Wenruo wrote:
->>>> The write-hole has been addressed with journaling already, and
->>>> this will
->>>> be adding a new and not-needed feature - not saying it wouldn't be
->>>> nice
->>>> to have, but do we need another way to skin this cat?
->>>
->>> I'm talking about the BTRFS RAID56, not md-raid RAID56, which is a
->>> completely different thing.
->>>
->>> Here I'm just trying to understand how the md-bitmap works, so that
->>> I
->>> can do a proper bitmap for btrfs RAID56.
->>
->> Ah. Okay.
->>
->> Neil Brown is likely to be the best help here as I believe he wrote a
->> lot of the code, although I don't think he's much involved with md-
->> raid
->> any more.
->
-> I can't speak to how it is today, but I know it was *designed* to be
-> sync flush of the dirty bit setting, then lazy, async write out of the
-> clear bits.  But, yes, in order for the design to be reliable, you must
-> flush out the dirty bits before you put writes in flight.
+> In [0] I included "blk-mq: Add a flag for reserved requests" to
+> identify if a request is 'reserved' for special handling. Doing this
+> is easier than passing a 'reserved' arg to the blk_mq_ops
+> callbacks. Indeed, only 1x timeout implementation or blk-mq iter
+> function actually uses the 'reserved' arg (or 3x if you count SCSI
+> core and FNIC SCSI driver). So this series drops the 'reserved' arg
+> for these timeout and iter functions.  Christoph suggested that I try
+> to upstream now.
 
-Thank you very much confirming my concern.
+Reviewed-by: Martin K. Petersen <martin.petersen@oracle.com>
 
-So maybe it's me not checking the md-bitmap code carefully enough to
-expose the full picture.
-
->
-> One thing I'm not sure about though, is that MD RAID5/6 uses fixed
-> stripes.  I thought btrfs, since it was an allocation filesystem, didn't
-> have to use full stripes?  Am I wrong about that?
-
-Unfortunately, we only go allocation for the RAID56 chunks. In side a
-RAID56 the underlying devices still need to go the regular RAID56 full
-stripe scheme.
-
-Thus the btrfs RAID56 is still the same regular RAID56 inside one btrfs
-RAID56 chunk, but without bitmap/journal.
-
->  Because it would seem
-> that if your data isn't necessarily in full stripes, then a bitmap might
-> not work so well since it just marks a range of full stripes as
-> "possibly dirty, we were writing to them, do a parity resync to make
-> sure".
-
-For the resync part is where btrfs shines, as the extra csum (for the
-untouched part) and metadata COW ensures us only see the old untouched
-data, and with the extra csum, we can safely rebuild the full stripe.
-
-Thus as long as no device is missing, a write-intent-bitmap is enough to
-address the write hole in btrfs (at least for COW protected data and all
-metadata).
-
->
-> In any case, Wols is right, probably want to ping Neil on this.  Might
-> need to ping him directly though.  Not sure he'll see it just on the
-> list.
->
-
-Adding Neil into this thread. Any clue on the existing
-md_bitmap_startwrite() behavior?
-
-Thanks,
-Qu
+-- 
+Martin K. Petersen	Oracle Linux Engineering
