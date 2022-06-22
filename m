@@ -2,79 +2,91 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF79AC43334
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 16:11:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE97C43334
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 16:24:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359353AbiFVQLI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jun 2022 12:11:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46310 "EHLO
+        id S1376653AbiFVQYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jun 2022 12:24:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60350 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1359421AbiFVQLH (ORCPT
+        with ESMTP id S1376990AbiFVQXt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jun 2022 12:11:07 -0400
-Received: from bedivere.hansenpartnership.com (bedivere.hansenpartnership.com [IPv6:2607:fcd0:100:8a00::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B14B39B8D;
-        Wed, 22 Jun 2022 09:11:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1655914261;
-        bh=nk8KgKas3epfldKU7z9t5qNljsGwrlSJR6Zhs5ksWy8=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=R442PcJgjRtmfPMfST6Kcvdi3cLfWLqFefLyBb0duzfkUT1x8zoJZvWHv5b2gQXHj
-         Is+2cc/HPrWGRcZTXw5eMUYiSZvzrWaaRsbOk/r8bYPy2Cacq8jEM+hqW12MFTtIkL
-         IPtm2iuNf6UHakuVvWotNJptWKcx3dB3BJcUGqiA=
-Received: from localhost (localhost [127.0.0.1])
-        by bedivere.hansenpartnership.com (Postfix) with ESMTP id 263AB1281161;
-        Wed, 22 Jun 2022 12:11:01 -0400 (EDT)
-Received: from bedivere.hansenpartnership.com ([127.0.0.1])
-        by localhost (bedivere.hansenpartnership.com [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id JpddjhKFjdPk; Wed, 22 Jun 2022 12:11:01 -0400 (EDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-        d=hansenpartnership.com; s=20151216; t=1655914260;
-        bh=nk8KgKas3epfldKU7z9t5qNljsGwrlSJR6Zhs5ksWy8=;
-        h=Message-ID:Subject:From:To:Date:In-Reply-To:References:From;
-        b=hV7mle7hQJe5qKTo/ItJN7oX2BC6bF3o6SJwgQ167QmnfnIVxQr1qzuxEXoO55iMj
-         A6bKzdI38bHn/5+ICcj54L4UiQ/5EEyEI7BFSgfo2NSOB28tG1JUs2EnrQPuvEyOHU
-         j/tywTRiO2ubZKgWjoNc1PyyEAyoB/VqAHtE+MzU=
-Received: from [IPv6:2601:5c4:4300:c551:a71:90ff:fec2:f05b] (unknown [IPv6:2601:5c4:4300:c551:a71:90ff:fec2:f05b])
+        Wed, 22 Jun 2022 12:23:49 -0400
+Received: from madras.collabora.co.uk (madras.collabora.co.uk [46.235.227.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C57241263C
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 09:23:47 -0700 (PDT)
+Received: from localhost (mtl.collabora.ca [66.171.169.34])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits))
+         key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by bedivere.hansenpartnership.com (Postfix) with ESMTPSA id 219121280DD8;
-        Wed, 22 Jun 2022 12:11:00 -0400 (EDT)
-Message-ID: <49a877f33a088edc232eb98029e46e53884c5cd6.camel@HansenPartnership.com>
-Subject: Re: [PATCH] block: drbd: drbd_state: Fix typo in comments
-From:   James Bottomley <James.Bottomley@HansenPartnership.com>
-To:     Jiang Jian <jiangjian@cdjrlc.com>, axboe@kernel.dk
-Cc:     philipp.reisner@linbit.com, lars.ellenberg@linbit.com,
-        christoph.boehmwalder@linbit.com, drbd-dev@lists.linbit.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Wed, 22 Jun 2022 12:10:59 -0400
-In-Reply-To: <20220622155220.8704-1-jiangjian@cdjrlc.com>
-References: <20220622155220.8704-1-jiangjian@cdjrlc.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.34.4 
+        (Authenticated sender: krisman)
+        by madras.collabora.co.uk (Postfix) with ESMTPSA id B415B66015CD;
+        Wed, 22 Jun 2022 17:23:45 +0100 (BST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+        s=mail; t=1655915025;
+        bh=7jK8s9/W/gt2U4aZWS65uxMScHOkggxJ2GOomjy9Ydg=;
+        h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+        b=EvTErX90SwKDAtdVEE1TPddu7wzpiy6HsN9CEskwm80kJOWUgxZp5Gkr9T3tn2ZM4
+         5bBfimBG9qtHlSNFCWzMIDCKAUBG9l62L49RJg46/AcOo9M4QvLKISX7HkLuUl6Gb4
+         Ep5rLKm/Y5Nj2zV8UgWHSA+DyTwGQB6j3CpTpBxUTcp6VXEA7wvJXLaNz0fcxb1xUI
+         GGWmyj7p/jP27ypk/3U48vjTSNW4LUpup07asPUz3abYaa4wbhvC3kcFkc7cMnG3WC
+         t7+ho184z/lP/vZGl72RB6IG1jtkEvTjPAYMeLPIkCpvIwImvxGwZ4NSSxN0GoPVBO
+         5G2myywKlp/lg==
+From:   Gabriel Krisman Bertazi <krisman@collabora.com>
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org
+Subject: Re: [PATCH ubdsrv] tgt_null: Return number of sectors read/written
+Organization: Collabora
+References: <20220621224839.76007-1-krisman@collabora.com>
+        <YrJgDO9JD/le5tKK@T590>
+Date:   Wed, 22 Jun 2022 12:23:42 -0400
+In-Reply-To: <YrJgDO9JD/le5tKK@T590> (Ming Lei's message of "Wed, 22 Jun 2022
+        08:19:24 +0800")
+Message-ID: <87k0983bw1.fsf@collabora.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.2 (gnu/linux)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 2022-06-22 at 23:52 +0800, Jiang Jian wrote:
-> Replace 'is' with 'it'
-> 
-> file: drivers/block/drbd/drbd_state.c
-> line: 1900
-> 
-> * But is is still not save to dreference ldev here, since
-> 
-> changed to:
-> 
-> * But it is still not save to dreference ldev here, since
+Ming Lei <ming.lei@redhat.com> writes:
 
-I honestly don't think spelling and grammar updates to comments provide
-much value.  However, there's no value at all if it's still two
-spelling errors in that one line after the proposed patch ...
+> On Tue, Jun 21, 2022 at 06:48:39PM -0400, Gabriel Krisman Bertazi wrote:
+>> Hi Ming,
+>> 
+>> I wrote this against your devel-v3 branch.  I'm wondering if you plan to
+>> send a new version of the kernel patch soon? From the latest
+>
+> Yeah, that is on my todo list:
+>
+> https://github.com/ming1/linux/commits/my_for-5.19-ubd-devel_v3
+>
+> there has lots cleanup & improvement.
+>
+>> discussions, I don't think there were major issues found on review. :)
+>
+> One problem is the driver name, and Christoph thought we have
+> 'arch/um/drivers/ubd*.c'. Not thought of one good candidate yet.
 
-James
+Hi Ming,
 
+Thanks for the info, and sorry for not noticing the fix merged on Jun, 3rd
+on the master branch.  I will follow that branch when testing and submit
+fixes I find along the way.
 
+I guess you have considered a lot of names, but I'd suggest any of:
+
+ * blkuser,
+ * ublk
+ * BUSE (as in Block FUSE, though there is another non-upstream
+project with that name),
+ * UBIO (as in UIO, but for Block IO)
+ * B2U (Block IO Backed by userspace) :-P
+
+TBH, my favorite is ublk.
+
+Thank you,
+
+-- 
+Gabriel Krisman Bertazi
