@@ -2,113 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ED751C43334
-	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 19:19:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD21CC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 22 Jun 2022 20:50:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229828AbiFVTTr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 22 Jun 2022 15:19:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58426 "EHLO
+        id S238355AbiFVUuI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 22 Jun 2022 16:50:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36030 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229824AbiFVTTq (ORCPT
+        with ESMTP id S229824AbiFVUuG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 22 Jun 2022 15:19:46 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A1EC3587E;
-        Wed, 22 Jun 2022 12:19:45 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 3A821B820DF;
-        Wed, 22 Jun 2022 19:19:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47F12C34114;
-        Wed, 22 Jun 2022 19:19:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-        s=korg; t=1655925582;
-        bh=/mqJhZHnFZv4yLcCic7/bc1inkKszgYj0JD8prJIpjk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=qjWwYVRfzc+N/uWK1DpW6CQ1YtCEOGV22eBql0f6AWWGbzOZS1IgM/pjtupsLc42h
-         ta0txrydZ00LBL7/oBed2qA17Gp2fr41qccvrNnizD0i9RH0wCeQC//+fWo2G90mHl
-         9zKKVEDbrzi7kVNmY0rEi2WI55V7CHa6d6G4mfM4=
-Date:   Wed, 22 Jun 2022 12:19:30 -0700
-From:   Andrew Morton <akpm@linux-foundation.org>
-To:     Sergey Senozhatsky <senozhatsky@chromium.org>
-Cc:     Minchan Kim <minchan@kernel.org>, Nitin Gupta <ngupta@vflare.org>,
-        linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Subject: Re: [PATCH] zram: do not lookup algorithm in backends table
-Message-Id: <20220622121930.4f8d3f882bb2b0520fd6917c@linux-foundation.org>
-In-Reply-To: <YrMzJSNb4b+tODqR@google.com>
-References: <20220622023501.517125-1-senozhatsky@chromium.org>
-        <YrMzJSNb4b+tODqR@google.com>
-X-Mailer: Sylpheed 3.7.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Wed, 22 Jun 2022 16:50:06 -0400
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF8D239142
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 13:50:04 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id u15so9116270ejc.10
+        for <linux-block@vger.kernel.org>; Wed, 22 Jun 2022 13:50:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linbit-com.20210112.gappssmtp.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZHXPpmGBZdWvyxJmjdrgfrKKRqzgpyVWDxj3Vo4u3a8=;
+        b=amKj6GxTy79R1fQyEaKL/UbiJB+b7qC0lpa79+GG3RNmYt5sNwRzoWmFKndZ5GtSto
+         25mDi4yacnKCgTp3UlvpdhTAADuUa9T5XQ9SGMKoMNy75ZO6H7mzCBDY5vmqdsJEhGEP
+         9EtbwC3ORKDaZvhefaNNbOP47aMPcroYnTI484BN+egnnZi4XhoMOZWtlP6uVo+RBoqS
+         oZ026JONzAFv9vBGnFiQayoxuBsG7nIytyQhgZ7jv0mystORbsNYReCihNuZLTnGeQ2U
+         Sn5bvNh8WCwYFddXaKRY9Npmjg8fZADdDu+Ds2F9j8M1Ta2X+dGNRAkA1yN3uiEMwUJ8
+         wa7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZHXPpmGBZdWvyxJmjdrgfrKKRqzgpyVWDxj3Vo4u3a8=;
+        b=h+LdyNdIG4ZATlDxeeAV9dBNol8lXtHIz6dQL+vnvBv9/6Zvy46VtGl4CeO2bDXLwf
+         OBQHfi5szhjfeX4fSJKRnxa6hvh3Be2dqp9iwjGj8N8eXo16qBsFTN4r/qc1jA8xx3MS
+         MsiJRWD4i1RM8R47TA+BL5O1MdOh7AqOgZXi9UEX1+MAUg1imJKrMOG0qs12XlXcWlsU
+         8e4fZSXRbKtuLXKxGIvJxK4QRPM8/6JeuZCRYN368S+YPWNxk3fmzcVrr85OI3W/MPFE
+         E1XOGIGDvWbEtgvvtscARntoPQmkSpNGBZN5pha8NER/NBIXDRF5OYVx85RU+OObpz6U
+         YaYA==
+X-Gm-Message-State: AJIora8/4qWU+eFPdOA37e2CQmmEM5t9m0z3yKHUqkt+3UR2PXJEA51/
+        Zo58V5SsVeYhlkxM2I070+/pzV4fo4VFmEXVX3U=
+X-Google-Smtp-Source: AGRyM1uhNDH7Tmmo2hHrTQe2MuMLk8efymrGKpDNFJyYZlQwkDyFJsjamDPwgxnQFT2jP77skKEDVA==
+X-Received: by 2002:a17:907:7b86:b0:711:d2c8:ab18 with SMTP id ne6-20020a1709077b8600b00711d2c8ab18mr4827993ejc.580.1655931003525;
+        Wed, 22 Jun 2022 13:50:03 -0700 (PDT)
+Received: from localhost (h082218028181.host.wavenet.at. [82.218.28.181])
+        by smtp.gmail.com with ESMTPSA id z19-20020a056402275300b004319b12371asm16539896edd.47.2022.06.22.13.50.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Jun 2022 13:50:02 -0700 (PDT)
+From:   =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     drbd-dev@lists.linbit.com, linux-kernel@vger.kernel.org,
+        Lars Ellenberg <lars.ellenberg@linbit.com>,
+        Philipp Reisner <philipp.reisner@linbit.com>,
+        linux-block@vger.kernel.org,
+        =?UTF-8?q?Christoph=20B=C3=B6hmwalder?= 
+        <christoph.boehmwalder@linbit.com>
+Subject: [PATCH] drbd: bm_page_async_io: fix spurious bitmap "IO error" on large volumes
+Date:   Wed, 22 Jun 2022 22:49:32 +0200
+Message-Id: <20220622204932.196830-1-christoph.boehmwalder@linbit.com>
+X-Mailer: git-send-email 2.36.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 23 Jun 2022 00:20:05 +0900 Sergey Senozhatsky <senozhatsky@chromium.org> wrote:
+From: Lars Ellenberg <lars.ellenberg@linbit.com>
 
-> On (22/06/22 11:35), Sergey Senozhatsky wrote:
-> > Always use crypto_has_comp() so that crypto can lookup module,
-> > call usermodhelper to load the modules, wait for usermodhelper
-> > to finish and so on. Otherwise crypto will do all of these steps
-> > under CPU hot-plug lock and this looks like too much stuff to
-> > handle under the CPU hot-plug lock. Besides this can end up in
-> > a deadlock when usermodhelper triggers a code path that attempts
-> > to lock the CPU hot-plug lock, that zram already holds.
-> 
-> And we think that we (not exactly "we", our partners) actually
-> see a deadlock. It goes something like this:
-> 
-> - path A. zram grabs CPU hot-plug lock, execs /sbin/modprobe from crypto
->   and waits for modprobe to finish
+We usually do all our bitmap IO in units of PAGE_SIZE.
 
-Nope, can't do that.
+With very small or oddly sized external meta data, or with
+PAGE_SIZE != 4k, it can happen that our last on-disk bitmap page
+is not fully PAGE_SIZE aligned, so we may need to adjust the size
+of the IO.
 
-> disksize_store
->  zcomp_create
->   __cpuhp_state_add_instance
->    __cpuhp_state_add_instance_cpuslocked
->     zcomp_cpu_up_prepare
->      crypto_alloc_base
->       crypto_alg_mod_lookup
->        call_usermodehelper_exec
->         wait_for_completion_killable
->          do_wait_for_common
->           schedule
+We used to do that with
+  min_t(unsigned int, PAGE_SIZE,
+	last_allowed_sector - current_offset);
+And for just the right diff, (unsigned int)(diff) will result in 0.
 
-The usermode helper is free to do anything it wants, including
-operations that take the CPU hotplug lock.  Or operations which might
-in the future be changed to take that lock.
+A bio of length 0 will correctly be rejected with an IO error
+(and some scary WARN_ON_ONCE()) by the scsi layer.
 
-> - path B. async work kthread that brings in scsi device. It wants to
->   register CPUHP states at some point, and it needs the CPU hot-plug
->   lock for that, which is owned by zram.
-> 
-> async_run_entry_fn
->  scsi_probe_and_add_lun
->   scsi_mq_alloc_queue
->    blk_mq_init_queue
->     blk_mq_init_allocated_queue
->      blk_mq_realloc_hw_ctxs
->       __cpuhp_state_add_instance
->        __cpuhp_state_add_instance_cpuslocked
->         mutex_lock
->          schedule
-> 
-> - path C. modprobe sleeps, waiting for all aync works to finish.
-> 
-> load_module
->  do_init_module
->   async_synchronize_full
->    async_synchronize_cookie_domain
->     schedule
-> 
-> And none can make any progress.
-> 
-> So I think we need to move crypto_alg_mod_lookup()->call_usermodehelper_exec()
-> out of CPU hot-plug lock and pre-load modules in advance, before we grab the
-> hot-plug lock.
+Do the calculation properly.
 
-If the locking is fixed, why is there still a need to preload modules?
+Signed-off-by: Lars Ellenberg <lars.ellenberg@linbit.com>
+Signed-off-by: Christoph Böhmwalder <christoph.boehmwalder@linbit.com>
+---
+ drivers/block/drbd/drbd_bitmap.c | 49 +++++++++++++++++++++++++++-----
+ 1 file changed, 42 insertions(+), 7 deletions(-)
+
+diff --git a/drivers/block/drbd/drbd_bitmap.c b/drivers/block/drbd/drbd_bitmap.c
+index 9e060e49b3f8..bd2133ef6e0a 100644
+--- a/drivers/block/drbd/drbd_bitmap.c
++++ b/drivers/block/drbd/drbd_bitmap.c
+@@ -974,25 +974,58 @@ static void drbd_bm_endio(struct bio *bio)
+ 	}
+ }
+ 
++/* For the layout, see comment above drbd_md_set_sector_offsets(). */
++static inline sector_t drbd_md_last_bitmap_sector(struct drbd_backing_dev *bdev)
++{
++	switch (bdev->md.meta_dev_idx) {
++	case DRBD_MD_INDEX_INTERNAL:
++	case DRBD_MD_INDEX_FLEX_INT:
++		return bdev->md.md_offset + bdev->md.al_offset -1;
++	case DRBD_MD_INDEX_FLEX_EXT:
++	default:
++		return bdev->md.md_offset + bdev->md.md_size_sect -1;
++	}
++}
++
+ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_hold(local)
+ {
+ 	struct drbd_device *device = ctx->device;
+ 	unsigned int op = (ctx->flags & BM_AIO_READ) ? REQ_OP_READ : REQ_OP_WRITE;
+-	struct bio *bio = bio_alloc_bioset(device->ldev->md_bdev, 1, op,
+-					   GFP_NOIO, &drbd_md_io_bio_set);
+ 	struct drbd_bitmap *b = device->bitmap;
++	struct bio *bio;
+ 	struct page *page;
++	sector_t last_bm_sect;
++	sector_t first_bm_sect;
++	sector_t on_disk_sector;
+ 	unsigned int len;
+ 
+-	sector_t on_disk_sector =
+-		device->ldev->md.md_offset + device->ldev->md.bm_offset;
+-	on_disk_sector += ((sector_t)page_nr) << (PAGE_SHIFT-9);
++	first_bm_sect = device->ldev->md.md_offset + device->ldev->md.bm_offset;
++	on_disk_sector = first_bm_sect + (((sector_t)page_nr) << (PAGE_SHIFT-SECTOR_SHIFT));
+ 
+ 	/* this might happen with very small
+ 	 * flexible external meta data device,
+ 	 * or with PAGE_SIZE > 4k */
+-	len = min_t(unsigned int, PAGE_SIZE,
+-		(drbd_md_last_sector(device->ldev) - on_disk_sector + 1)<<9);
++	last_bm_sect = drbd_md_last_bitmap_sector(device->ldev);
++	if (first_bm_sect <= on_disk_sector && last_bm_sect >= on_disk_sector) {
++		sector_t len_sect = last_bm_sect - on_disk_sector + 1;
++		if (len_sect < PAGE_SIZE/SECTOR_SIZE)
++			len = (unsigned int)len_sect*SECTOR_SIZE;
++		else
++			len = PAGE_SIZE;
++	} else {
++		if (__ratelimit(&drbd_ratelimit_state)) {
++			drbd_err(device, "Invalid offset during on-disk bitmap access: "
++				 "page idx %u, sector %llu\n", page_nr, on_disk_sector);
++		}
++		ctx->error = -EIO;
++		bm_set_page_io_err(b->bm_pages[page_nr]);
++		if (atomic_dec_and_test(&ctx->in_flight)) {
++			ctx->done = 1;
++			wake_up(&device->misc_wait);
++			kref_put(&ctx->kref, &drbd_bm_aio_ctx_destroy);
++		}
++		return;
++	}
+ 
+ 	/* serialize IO on this page */
+ 	bm_page_lock_io(device, page_nr);
+@@ -1007,6 +1040,8 @@ static void bm_page_io_async(struct drbd_bm_aio_ctx *ctx, int page_nr) __must_ho
+ 		bm_store_page_idx(page, page_nr);
+ 	} else
+ 		page = b->bm_pages[page_nr];
++	bio = bio_alloc_bioset(device->ldev->md_bdev, 1, op, GFP_NOIO,
++			&drbd_md_io_bio_set);
+ 	bio->bi_iter.bi_sector = on_disk_sector;
+ 	/* bio_add_page of a single page to an empty bio will always succeed,
+ 	 * according to api.  Do we want to assert that? */
+-- 
+2.36.1
+
