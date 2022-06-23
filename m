@@ -2,41 +2,41 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79480CCA47F
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21155C43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231799AbiFWTBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:01:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46498 "EHLO
+        id S232020AbiFWTBU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43478 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231843AbiFWTBH (ORCPT
+        with ESMTP id S229593AbiFWTBI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:01:07 -0400
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72CC610E65B
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:22 -0700 (PDT)
-Received: by mail-pj1-f46.google.com with SMTP id f16so359681pjj.1
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:22 -0700 (PDT)
+        Thu, 23 Jun 2022 15:01:08 -0400
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D1D210E65F
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:24 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id 128so278471pfv.12
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=TraJCwU51nOTrBB3rdN7pOVK5aie3yl6MvtfDVDMn3k=;
-        b=l/Y/y/Jo/0N3y/w6TdWGgLCH9Y6+T68SYlxoNYsYGOLMeZVmaMSXvD9rBG34wX6B2i
-         QaHDfscVgilnVfS24EAmAVLAbQgnucoNCljAOhKDEMBBhI0BJ7oAsK7cGhSillQYapIN
-         FPiroXpR6O9l+BLT9f22yTjYHRGO1DQNUEmYz10zmcns/qWapVo31Ql65aiOzCRs4pnI
-         urBHnjXxndNq0ODqNE0KODR89ui7qepAJZUGVJNVimdYOvEVxVM30ASCZ6vOwTwDWS6D
-         GKBwH4NZaV0ff7k6DwpshbJr+mnsWl4zVOO9AXdAVz9zqL9O9WVn01g99SIMnXesXPjS
-         Z0jQ==
-X-Gm-Message-State: AJIora/W3vnNwj1Csj0ycclUZkxdqElWHE+q5pfwfThXY5wLsvKTgCPD
-        caaR3KSydyvUnZk6hUwER/I=
-X-Google-Smtp-Source: AGRyM1vrEkBc42g4wfDDDiN0d4OmxJ15w9u96fjf/P1MbtrhvTdliRPUGodcXOIAeN+k9b0o3e/pkw==
-X-Received: by 2002:a17:90b:1d06:b0:1ec:cd94:539b with SMTP id on6-20020a17090b1d0600b001eccd94539bmr5128394pjb.215.1656007581733;
-        Thu, 23 Jun 2022 11:06:21 -0700 (PDT)
+        bh=8ec/YeJokhE0PwfOH5Ta6a/JptpB65lHBo+E6SkP32s=;
+        b=b64K6PFlFS+oXWmE63k0LvUCpAtDuCQjHqFNHQVCJJshqgINqv55DTUHLOy4jb061b
+         R0FfBKaGNaCrB2Y9qGipHY0dWqudi75+hywq6vrnHZFI8TuP2tyTUaLAwDBCzujjZrwx
+         ZyxiOtmW8xQhbJ4I2FFM6E68KXw3D0uxawoRoaqgZNzaCcsUbDUmS6gO7zmRZK9OfxWZ
+         y8M+hpTJv6PI5H5q5EevGEDGlAOR8B/8Gv9SVx6yAPhifTfi0XhqVKZdtKP4FHU9muRD
+         k2WN2ZsmecF+BYW8TE5c0kDAAreqNU3SkxxR1/Byrx5GM8q4fNthwZ5837XzmIvBH1sY
+         k2OQ==
+X-Gm-Message-State: AJIora9z0EP6ngAUF/atTi+Ap7OLDxmuCbBpb4BBVjrKxepd2ZTEAXdY
+        ugARyhmqNzK42LDcfi2yh4o=
+X-Google-Smtp-Source: AGRyM1v8K5h7oPzlU4UvhBPQBbUG8gSEmXSXciDXi7/8VHEtjhgEpLPrFOCHL61I6KBkOubhHkV77Q==
+X-Received: by 2002:a63:fc63:0:b0:405:34ac:920d with SMTP id r35-20020a63fc63000000b0040534ac920dmr8709424pgk.40.1656007583384;
+        Thu, 23 Jun 2022 11:06:23 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.20
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:06:21 -0700 (PDT)
+        Thu, 23 Jun 2022 11:06:22 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
@@ -44,9 +44,9 @@ Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         "Martin K . Petersen" <martin.petersen@oracle.com>,
         John Garry <john.garry@huawei.com>,
         Mike Christie <michael.christie@oracle.com>
-Subject: [PATCH 30/51] scsi/core: Change the return type of scsi_noretry_cmd() into bool
-Date:   Thu, 23 Jun 2022 11:05:07 -0700
-Message-Id: <20220623180528.3595304-31-bvanassche@acm.org>
+Subject: [PATCH 31/51] scsi/core: Use the new blk_opf_t type
+Date:   Thu, 23 Jun 2022 11:05:08 -0700
+Message-Id: <20220623180528.3595304-32-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -56,71 +56,77 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-This patch prepares for introducing the new blk_opf_t type in the SCSI core.
-Since the value returned by scsi_noretry_cmd() is only used in boolean
-expressions, this patch does not change any functionality.
+Use the new blk_opf_t type for arguments and variables that represent
+request flags. Use the !! operator in scsi_noretry_cmd() to convert the
+blk_opf_t type into a boolean. This patch does not change any functionality.
 
 Cc: Martin K. Petersen <martin.petersen@oracle.com>
 Cc: John Garry <john.garry@huawei.com>
 Cc: Mike Christie <michael.christie@oracle.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/scsi_error.c | 10 +++++-----
- drivers/scsi/scsi_priv.h  |  2 +-
- 2 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/scsi/scsi_error.c  | 6 +++---
+ drivers/scsi/scsi_lib.c    | 6 +++---
+ include/scsi/scsi_device.h | 2 +-
+ 3 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-index 49ef864df581..60bcb37acafd 100644
+index 60bcb37acafd..4b8686162ddd 100644
 --- a/drivers/scsi/scsi_error.c
 +++ b/drivers/scsi/scsi_error.c
-@@ -1779,7 +1779,7 @@ static void scsi_eh_offline_sdevs(struct list_head *work_q,
-  * scsi_noretry_cmd - determine if command should be failed fast
-  * @scmd:	SCSI cmd to examine.
-  */
--int scsi_noretry_cmd(struct scsi_cmnd *scmd)
-+bool scsi_noretry_cmd(struct scsi_cmnd *scmd)
- {
- 	struct request *req = scsi_cmd_to_rq(scmd);
- 
-@@ -1794,14 +1794,14 @@ int scsi_noretry_cmd(struct scsi_cmnd *scmd)
- 		return req->cmd_flags & REQ_FAILFAST_DEV;
+@@ -1789,15 +1789,15 @@ bool scsi_noretry_cmd(struct scsi_cmnd *scmd)
+ 	case DID_TIME_OUT:
+ 		goto check_type;
+ 	case DID_BUS_BUSY:
+-		return req->cmd_flags & REQ_FAILFAST_TRANSPORT;
++		return !!(req->cmd_flags & REQ_FAILFAST_TRANSPORT);
+ 	case DID_PARITY:
+-		return req->cmd_flags & REQ_FAILFAST_DEV;
++		return !!(req->cmd_flags & REQ_FAILFAST_DEV);
  	case DID_ERROR:
  		if (get_status_byte(scmd) == SAM_STAT_RESERVATION_CONFLICT)
--			return 0;
-+			return false;
+ 			return false;
  		fallthrough;
  	case DID_SOFT_ERROR:
- 		return req->cmd_flags & REQ_FAILFAST_DRIVER;
+-		return req->cmd_flags & REQ_FAILFAST_DRIVER;
++		return !!(req->cmd_flags & REQ_FAILFAST_DRIVER);
  	}
  
  	if (!scsi_status_is_check_condition(scmd->result))
--		return 0;
-+		return false;
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 6b6a7a4b0950..beff0015258a 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -209,8 +209,8 @@ void scsi_queue_insert(struct scsi_cmnd *cmd, int reason)
+ int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 		 int data_direction, void *buffer, unsigned bufflen,
+ 		 unsigned char *sense, struct scsi_sense_hdr *sshdr,
+-		 int timeout, int retries, u64 flags, req_flags_t rq_flags,
+-		 int *resid)
++		 int timeout, int retries, blk_opf_t flags,
++		 req_flags_t rq_flags, int *resid)
+ {
+ 	struct request *req;
+ 	struct scsi_cmnd *scmd;
+@@ -633,7 +633,7 @@ static blk_status_t scsi_result_to_blk_status(struct scsi_cmnd *cmd, int result)
+  */
+ static unsigned int scsi_rq_err_bytes(const struct request *rq)
+ {
+-	unsigned int ff = rq->cmd_flags & REQ_FAILFAST_MASK;
++	blk_opf_t ff = rq->cmd_flags & REQ_FAILFAST_MASK;
+ 	unsigned int bytes = 0;
+ 	struct bio *bio;
  
- check_type:
- 	/*
-@@ -1809,9 +1809,9 @@ int scsi_noretry_cmd(struct scsi_cmnd *scmd)
- 	 * the check condition was retryable.
- 	 */
- 	if (req->cmd_flags & REQ_FAILFAST_DEV || blk_rq_is_passthrough(req))
--		return 1;
-+		return true;
- 
--	return 0;
-+	return false;
- }
- 
- /**
-diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-index 5c4786310a31..90fbffca7eb0 100644
---- a/drivers/scsi/scsi_priv.h
-+++ b/drivers/scsi/scsi_priv.h
-@@ -82,7 +82,7 @@ void scsi_eh_ready_devs(struct Scsi_Host *shost,
- 			struct list_head *done_q);
- int scsi_eh_get_sense(struct list_head *work_q,
- 		      struct list_head *done_q);
--int scsi_noretry_cmd(struct scsi_cmnd *scmd);
-+bool scsi_noretry_cmd(struct scsi_cmnd *scmd);
- void scsi_eh_done(struct scsi_cmnd *scmd);
- 
- /* scsi_lib.c */
+diff --git a/include/scsi/scsi_device.h b/include/scsi/scsi_device.h
+index 7cf5f3b7589f..2493bd65351a 100644
+--- a/include/scsi/scsi_device.h
++++ b/include/scsi/scsi_device.h
+@@ -457,7 +457,7 @@ extern void scsi_sanitize_inquiry_string(unsigned char *s, int len);
+ extern int __scsi_execute(struct scsi_device *sdev, const unsigned char *cmd,
+ 			int data_direction, void *buffer, unsigned bufflen,
+ 			unsigned char *sense, struct scsi_sense_hdr *sshdr,
+-			int timeout, int retries, u64 flags,
++			int timeout, int retries, blk_opf_t flags,
+ 			req_flags_t rq_flags, int *resid);
+ /* Make sure any sense buffer is the correct size. */
+ #define scsi_execute(sdev, cmd, data_direction, buffer, bufflen, sense,	\
