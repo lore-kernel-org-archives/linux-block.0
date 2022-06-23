@@ -2,108 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0567CCA47C
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 14:23:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BD62C43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 15:27:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231163AbiFWOXf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 10:23:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53070 "EHLO
+        id S230119AbiFWP1s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 11:27:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229768AbiFWOXf (ORCPT
+        with ESMTP id S230329AbiFWP1r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 10:23:35 -0400
-Received: from mail-io1-xd35.google.com (mail-io1-xd35.google.com [IPv6:2607:f8b0:4864:20::d35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82AE433A14
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 07:23:31 -0700 (PDT)
-Received: by mail-io1-xd35.google.com with SMTP id a10so21117896ioe.9
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 07:23:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=5mKIV7CULh3Dmn1jAWt9yxanvOIpmC+KdLcwETV5Qi8=;
-        b=7Q2GKdnxW6Df5G/bf1iNONBtGoIHgM59P/8JJirSRmMieeChM+SJewmrbcijh5I+qg
-         zu42dcDsjaa7ZNHJMIcn8kndwM3rwf2W1YGzTiW5hcB6334w01xvKqed+xq8WAvS6wMb
-         KLdz3It8AXJGgUK+g+0cTZI6J34gSkY7PcnyEuPegOtGKyjaUjx7PUAmRaqdQCSf66Bb
-         v5vml8LxNItpkUNX8x/qE5DkrP61hm1feUbEnC+DrctGYKrYMZYPwJJtTLlaa5t0ETPz
-         Mc9qEOO+ToQIBxRIQvzoz8kEmeLeQd9yHDiQwKmaGNlTbGKWEfcVoU0CFzOSY/TDN6dt
-         bH8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=5mKIV7CULh3Dmn1jAWt9yxanvOIpmC+KdLcwETV5Qi8=;
-        b=VUrp1deNcaB1e1proR7dV6dewUpq0r/++hQhIXz0x4lBG8JjQjkk8gaijKH9isovVv
-         DDJo6o82Si3103E4zJ6/9HYqXguKaaPHl2Dv7bY+OJIYWzWVneW+5q2EXxN1RwyX9GjR
-         MEnvayjVXe9jXONH3rkRu2dbG1I4xFwZuVz3tqc+V3bguJjVVdonqgEsHeItWSNC6ntd
-         AMxqlXjH/TA0pg6fmX+RmK1mV8t0p7jCQLhawl/NdS1LP0Om0tDJIbYOVoIXp6f9SrHm
-         6fcsK4GWhDjopxhwd3NcFZSA9WOpiBVbQ+QcVTMmtzy4TzKnYB/UX5JR1MyU5fcQbmkq
-         M5Iw==
-X-Gm-Message-State: AJIora+rc8JcuCu1Zm36mq840PxqZ0J4I7qQPbWzJdLRDhEvIh25wdKZ
-        8HZ5FKxDYG7HvzeUOLxludoK1E53IMkJtg==
-X-Google-Smtp-Source: AGRyM1tFHqZ7pfE4jikaP30O7tsYXsiWRBxLqekYCfwRUpp6biEOsjC0Ml9lawhSc4eKEKAEKPpW1A==
-X-Received: by 2002:a05:6638:1a0e:b0:331:9a26:57c3 with SMTP id cd14-20020a0566381a0e00b003319a2657c3mr5500736jab.310.1655994210685;
-        Thu, 23 Jun 2022 07:23:30 -0700 (PDT)
-Received: from [127.0.1.1] ([207.135.234.126])
-        by smtp.gmail.com with ESMTPSA id b27-20020a026f5b000000b00339ec5b3339sm656175jae.47.2022.06.23.07.23.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 07:23:30 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     jack@suse.cz
-Cc:     linux-block@vger.kernel.org, damien.lemoal@opensource.wdc.com,
-        stable@vger.kernel.org, Niklas.Cassel@wdc.com, bvanassche@acm.org
-In-Reply-To: <20220623074840.5960-1-jack@suse.cz>
-References: <20220623074450.30550-1-jack@suse.cz> <20220623074840.5960-1-jack@suse.cz>
-Subject: Re: [PATCH 1/9] block: fix default IO priority handling again
-Message-Id: <165599420999.483324.5087264584005816987.b4-ty@kernel.dk>
-Date:   Thu, 23 Jun 2022 08:23:29 -0600
+        Thu, 23 Jun 2022 11:27:47 -0400
+Received: from na01-obe.outbound.protection.outlook.com (mail-centralusazon11021020.outbound.protection.outlook.com [52.101.62.20])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B11573F315
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 08:27:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KrpcI1JPJho9d5DkFG7pFlw7xpJ3/87uxstCCQDNaI5FP1chv7mRj9vXIW2TyUx0pFKE5HlstegZ3lsWGIFuR826b5uu4Ij3cLTXrxfammrgHmu6YKgbWfCbuvpI8bh6+I0xV3fSaAVB9PcSZcI3gq0zgX2AZy94GrOh2ehnZjsBsb+wR8F2vAMvUl0QneiQM5j6hJwvlcPuwzh7hkRSb1xJrZzHUxdiP9QIXIj9c5g/eLzucXh6pAAmMnBR9G0CwNE/5KszN5Ywu7/GmvTapFAokPHYCrjFo2tuDkl3wy9/9Mei64lIfytqgInlg2VjRCioydzLSFjsG7x9P+ouSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V9Dakn2S0L+ZbavQ7H+M7KgVnneLEtVQ58yXFnoIilw=;
+ b=hD8uqQ8H2q5e0VzWzNaZFDDQpeXI/TfvXKIYHHTPeyS0AnI52foW9L/FYnezgq/AfB8BXNGmDfCKQmUcnsosNvgSHlbpsvH5YEoX1UvVJ5juN4oGkbbGHtfYrnO/n8Wzm0Uul9Ao96RLSOygVC+Uj9vy4kuaiwzGFbH8qB++9i5U5XOY5hKIVfNi7Yj8GOqCzrkREQ4b+5UZJoJFi+4qZ2UzxvVgxPQ1y/vgPZNd2X6XkyLTh5wehg8EPwO2ExaHvli17mrSOlnXlwFK6UlBw/kXGxvZdTuUdffWygj2iIerpWSQOvZMqz43ykKiU3TOigc1IsCR7Aa2nY8xCXLYiw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V9Dakn2S0L+ZbavQ7H+M7KgVnneLEtVQ58yXFnoIilw=;
+ b=h/Jzc4lQST83+HQk9QzssM11Jy72jYAzd9bKa0GfV9X+wlK/FskJRIYrtsWZnmGo7voYicOo5yYKoQxn0z7F+sZKKRwx+9RgaXPQSenvmiBmvxtVIYdIPK7y7HgjkRs7yz/TSgIgjzS9pvJCWKhcZX7Y5a3cUoxwM17U4Rmzlig=
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com (2603:10b6:510:d2::21)
+ by IA1PR21MB3690.namprd21.prod.outlook.com (2603:10b6:208:3e1::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.5373.16; Thu, 23 Jun
+ 2022 15:27:44 +0000
+Received: from PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::f43d:6168:3eac:d055]) by PH0PR21MB3025.namprd21.prod.outlook.com
+ ([fe80::f43d:6168:3eac:d055%4]) with mapi id 15.20.5373.017; Thu, 23 Jun 2022
+ 15:27:44 +0000
+From:   "Michael Kelley (LINUX)" <mikelley@microsoft.com>
+To:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Question about merging raw block device writes
+Thread-Topic: Question about merging raw block device writes
+Thread-Index: AdiHFR/O/apBVKitTXairniuc6HJ9Q==
+Date:   Thu, 23 Jun 2022 15:27:44 +0000
+Message-ID: <PH0PR21MB3025A7D1326A92A4B8BDB5FED7B59@PH0PR21MB3025.namprd21.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+msip_labels: MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=9eefed94-8cb9-419f-8b6a-54707b07e910;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2022-06-23T15:22:34Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: a618073d-5569-43b1-dd72-08da552ceb89
+x-ms-traffictypediagnostic: IA1PR21MB3690:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: lWpc1n0BQ91LrxrJW7ea0NMOOuPlvr9P/FXwHsgO8jipRq8kd4ZhxpIwObM9zOH/SbNg5uaUmew3TD0UO8WJdxEUGy9pwuNjZiR05nHcklHO3O8H5zbvdhjbsYfIY3Sz7MIJQUiH8bhThY3jP++ryYIrtM9SBh2YW28bcpOX3X6b8AFI+R2tc2QOxMo1y/d5+9bZs2HPaMIA0elWQtcofNF4+a7gYkFtJeFUI6sbVOD+VRujtUO0pyPztT0nSHH+aG/Qd6G5dSEjERkHiQpLuL9HhPlAAdj0vk8/IBfEsvWWMvtAZJA8oSys6uBU5yEtY0JIvByLLD/WvdxiLGvR9xU173f36Uoo5PaEYqD+Aza6WbULa2KuC7b7V8sx5nprQCmn48krNtrSkLmc4Df40n8HJmAWjNDLUWoc8X2enOoWLaMJx/wFPjSSIEoiAQ7ywXmjJK5imp/LELsMWg7DMsdcqwYVh0aQ8LZkyfVSgioIhhYG92zkx2tRVP85Z/wW4T6T8P7a2fVRd9HkmXcsi5dCVHk+j0DfmjLbnJmrlCwwCo4vpp5+srPlLiApw9O2ZBAMAZse6zMv7fZJjDBDadDolLm5hTQ6UExl/8zYsmpndQZFEOT2ruLkRucp8wjlqTS4sZ1iVM937F8FQ+k9a7lSUagdOQk+JeMtMYsD8tiIYxwwBkV0tDRLOm3wN+RFpa8JkXELIdodxiClJFTuZnyi9agiQfYRXxbo2SJS/hFHm3WJeqkTYzejrP6ImUl5YH/jJgYn5IjuqC6q6SmZxVIFN4fkJEKjeZuqol2Fz/0r1/276/nrxxNK7RrPT2rNz2hjVNHS8XWg2HBjp9hKGOdHCjnmT0RKU/616rz6uQ8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR21MB3025.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(366004)(136003)(376002)(346002)(396003)(39860400002)(451199009)(55016003)(66476007)(66446008)(76116006)(66556008)(10290500003)(71200400001)(8676002)(83380400001)(66946007)(9686003)(33656002)(5660300002)(316002)(38070700005)(2906002)(8936002)(26005)(86362001)(8990500004)(52536014)(41300700001)(186003)(478600001)(64756008)(82960400001)(7696005)(122000001)(38100700002)(6916009)(82950400001)(6506007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?eugP4wTak3P5TmdOSU+YsKp7eLiRs+3g6WJ5XkIslpdTfR25ycgohpZH/4OO?=
+ =?us-ascii?Q?9kC4/8wNumi8GANugmUQb4ipzP4st8zJfgho1W0GNdNLMJV0P7ZBCAYx52vr?=
+ =?us-ascii?Q?vWcTKMs4n3Bo8GEeE8PgL3ASu9rWtto9eKnu1vgLZ72xJV0A1XWN69TXCarI?=
+ =?us-ascii?Q?BNLTqG4y/7WMEdOC6QKWrsw8XkTf7SgVbKr87f2kLMECpSvBRsbhsjoFw2Ua?=
+ =?us-ascii?Q?npNHXEjbf+gHBHQv1Z7PWFS065xEJfbUuFjPWRhOJmbXQprAAWa8ec7goc8k?=
+ =?us-ascii?Q?D561gbEi/kQXUpYukhI4CkCC4GmkeLlsCPNxBjlR3duJVxSYcnVrr9eMttwr?=
+ =?us-ascii?Q?g0+qizh+5C8htetM7hns7gmIinH/a19LpQeIk40Sa9akHzkdelwbKQhKXQdq?=
+ =?us-ascii?Q?j2RiY+itj9lOSaeTunVem4LsJzJUBzEhEqzB+rnaMRS6KbKan/LulvgifUBp?=
+ =?us-ascii?Q?u6S/d0JnThOyfVbILbSJ5zjQGXgFybNHOYlcejwplEIk/x+TxxWld+gvdpRi?=
+ =?us-ascii?Q?kjXcZFXs7wBClr+5QDGpqs2voJEjrLZoSmvrVx+BnQah07+redp5Bv5LkPk7?=
+ =?us-ascii?Q?amlxm+CF68vA+QsFhLOyzstaQCQHMVczA9sOzEMKWBMKm+koBiKI8XK1ShPP?=
+ =?us-ascii?Q?e7Ip4D0GzAoTHbtRoWtJd42BMxpudX8rRjWM/1D+l6HfR4IphUUNjMqTCPFT?=
+ =?us-ascii?Q?398NTe+pkz4zXaAXGzklGRifnjNXZsDauS29q99Dp7WSL7Ijbd5Y7kRDO95v?=
+ =?us-ascii?Q?SVj6IrJhZj87z/9fOkt9QpEGggZzQv05z5XYF4NFDctIdueGMVHwarnFDB+l?=
+ =?us-ascii?Q?7cDF3kzl1Nmm+bov4rpBzgRy/dzaNP6C3pmDwUMV24oe0MFItUD5vufWCqyH?=
+ =?us-ascii?Q?rdc3Onk6iF58WGdPgwoMN3TQj19T1Wb5+By6Tt/H58xnWVXnEh1eFzezq5LP?=
+ =?us-ascii?Q?oXT1rHRlv3XQ1P1wFiqizjsfMGVyZibgfDT60QXzXQYmajFz+TdoB8GxqCvq?=
+ =?us-ascii?Q?2LnLz88mPXKhacsmeXdkqhih2m8KmOQcHwbg7ED29U4jhYoQ1NTdqUGtASNh?=
+ =?us-ascii?Q?i9KQnyGX2yVm2wva09y2p+cO6TRpRRuXWbdLhEWGb8iX82ATrCbwf9UFuj4i?=
+ =?us-ascii?Q?QoBYCTXAOi2v6rNvz9OXMJE/X+I/THj1nyweBQQ0iv51K9CHUWJ78KEyYWvt?=
+ =?us-ascii?Q?kqXuGWeX3fMqFWl/x7imeq9Mo3U4gA6RYa+K6ANqASyJp8BzFuBrIGaVmq3d?=
+ =?us-ascii?Q?yc6l6MAZFm6y2kiGPRtzukco6+2Adt4LVaLN0HM2q6oH4EZXbyltZG+2NaCR?=
+ =?us-ascii?Q?BdmtyCnPwqJx0m8xX5NJKudHMdJmSJXlBWNWR7OWwU0XjlGvJBtUuQJhIZEK?=
+ =?us-ascii?Q?hmj5xh/OiSQ9UvP+72Kiba4MdLNbemVUlGIAF4WDjnvZ+gKslf5esSZS0435?=
+ =?us-ascii?Q?LrwjN8AflYleltI6jm8b11MWgM1CvyttvGkzPwHHlkVHatSd97uuQ3M9uK0d?=
+ =?us-ascii?Q?QvTEIzFPgEftt1QKYRZj/eEGIGGhBGftu46rb/yK8GA0DxKqJiwNlkjiuItX?=
+ =?us-ascii?Q?zb82kLi/UpQ41gM906cO3LaoAtQcqEi4eaw61/j0PDUUtg4zzs2o42FjwTXT?=
+ =?us-ascii?Q?ig=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR21MB3025.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a618073d-5569-43b1-dd72-08da552ceb89
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2022 15:27:44.4324
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: CFdg9tHzlfQCWHVO1rfA+GuN0QYl9wMrehTsbNP8u76VtJn+0aKbGdqbaGXpgUhnNekVA61ENosyuxy0VgsQxcBcqJlKrTrb5eKwVGzg8/U=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR21MB3690
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, 23 Jun 2022 09:48:26 +0200, Jan Kara wrote:
-> Commit e70344c05995 ("block: fix default IO priority handling")
-> introduced an inconsistency in get_current_ioprio() that tasks without
-> IO context return IOPRIO_DEFAULT priority while tasks with freshly
-> allocated IO context will return 0 (IOPRIO_CLASS_NONE/0) IO priority.
-> Tasks without IO context used to be rare before 5a9d041ba2f6 ("block:
-> move io_context creation into where it's needed") but after this commit
-> they became common because now only BFQ IO scheduler setups task's IO
-> context. Similar inconsistency is there for get_task_ioprio() so this
-> inconsistency is now exposed to userspace and userspace will see
-> different IO priority for tasks operating on devices with BFQ compared
-> to devices without BFQ. Furthemore the changes done by commit
-> e70344c05995 change the behavior when no IO priority is set for BFQ IO
-> scheduler which is also documented in ioprio_set(2) manpage:
-> 
-> [...]
+In using fio for performance measurements of sequential I/O against a
+SCSI disk, I see a big difference in reads vs. writes.  Reads get good
+merging, but writes get no merging.  Here are the fio command lines:
 
-Applied, thanks!
+fio --bs=3D4k --ioengine=3Dlibaio --iodepth=3D64 --filename=3D/dev/sdc --di=
+rect=3D1 --numjobs=3D8 --rw=3Dread --name=3Dreadmerge
 
-[1/9] block: fix default IO priority handling again
-      commit: f0f5a5e24fa5412f187f429232334ad6832d1a66
-[2/9] block: Return effective IO priority from get_current_ioprio()
-      commit: 93fd10125cd702d86f1c4005349b54eeb3c02af3
-[3/9] block: Generalize get_current_ioprio() for any task
-      commit: 86f80bd5f639921c59afb113fa3ebb3ccb46be84
-[4/9] block: Make ioprio_best() static
-      commit: c85fb98c51a66ff7346f2e12f6c20fb4f60de812
-[5/9] block: Fix handling of tasks without ioprio in ioprio_get(2)
-      commit: caf2c269be20c536009ccd815a4e493d0c6c6634
-[6/9] blk-ioprio: Remove unneeded field
-      commit: d2adb01a5bcbe36bc05fbb383028da755f7a919b
-[7/9] blk-ioprio: Convert from rqos policy to direct call
-      commit: 8f3d8d7f56aba4c6171e48b107b9167255044653
-[8/9] block: Initialize bio priority earlier
-      commit: 92c3dfe1cfce7dd7cf6cd32b78b05885d824656e
-[9/9] block: Always initialize bio IO priority on submit
-      commit: 71ad7aabb8968164b1963fff7216b225fdd80f84
+fio --bs=3D4k --ioengine=3Dlibaio --iodepth=3D64 --filename=3D/dev/sdc --di=
+rect=3D1 --numjobs=3D8 --rw=3Dwrite --name=3Dwritemerge
 
-Best regards,
--- 
-Jens Axboe
+/sys/block/sdc/queue/scheduler is set to [none].  Linux kernel is 5.18.5.
 
+The code difference appears to be in blkdev_read_iter() vs.
+blkdev_write_iter().  The latter has blk_start_plug()/blk_finish_plug()
+while the former does not.  As a result, blk_mq_submit_bio() puts
+write requests on the pluglist, which is flushed almost immediately.
+blk_mq_submit_bio() sends the read requests through
+blk_mq_try_issue_directly(), and they are later merged in a blk-mq
+software queue.
 
+For writes, the pluglist flush path is as follows:
+
+blk_finish_plug()
+__blk_flush_plug()
+blk_mq_flush_plug_list()
+blk_mq_plug_issue_direct()
+blk_mq_request_issue_directly()
+__blk_mq_try_issue_directly()
+
+The last function is called with "bypass_insert" set to true, so if the
+request must wait for budget, the request doesn't go on a blk-mq
+software queue like reads do, and no merging happens.
+
+I don't know the blk-mq layer well enough to know what's
+supposed to be happening.  Is it intentional to not do write merges
+in this case? Or did something get broken, and it wasn't noticed?
+
+Michael
