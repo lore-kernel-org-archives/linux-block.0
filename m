@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F37C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74194C43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbiFWTA7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:00:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46360 "EHLO
+        id S230024AbiFWTBA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43494 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231790AbiFWTAe (ORCPT
+        with ESMTP id S231838AbiFWTAe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
         Thu, 23 Jun 2022 15:00:34 -0400
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB26FA1E0F
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:56 -0700 (PDT)
-Received: by mail-pg1-f174.google.com with SMTP id h192so175828pgc.4
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:56 -0700 (PDT)
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9EB4A1E23
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:57 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id x1-20020a17090abc8100b001ec7f8a51f5so3412525pjr.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=/CYBwJNI0zfXDMBqtEhOK5NW3yhdwcJdPVHIPEW1sS0=;
-        b=pqQ/xENAN6rGgLwdlQeJFjMb8jPrMECM1A8d56BVExYh8tmlauQ3F8nOqwjpv6U2y1
-         f6gQcnqcfTYFDItbc5HEcGEKX5pqvtVkozJ1BFZrvKORQBFp1nyFzfF+5fyrya/lprNn
-         8aE2ydth8w9hN71tZZgymNn31z4TmOgA6PTGGkNO8UFQQmBaW2vLZ6CGsXBOmZXqQl0O
-         FnpUz2xrrKozL6GFFSAPy1aITpUOHgo7K8bYhKgH/rthUiI8y87YWFTrM9RX+Jnznatu
-         3IWNQ0F/GHkeODp14YxYZm/uvWNkIgnqjFlyX0CcA/41ChbeDkOkwLyY7PHfDdPZ2hc5
-         /JfA==
-X-Gm-Message-State: AJIora/fTlq+NlZpuDKlIQZpCE0/kMDm57bfrVRojA8cW1X7Z0ceP75d
-        c3jb+27/Af7VLwTcKCy26aVR34ZM+f0=
-X-Google-Smtp-Source: AGRyM1sT8f3fuBGCkLZRpvuSK/xk+18DP+Q7+JiOKRyidbc4dV4jyzYQZsBL5ZL+l5MsjIDoxJlrzg==
-X-Received: by 2002:a63:af1c:0:b0:40c:f9d6:9f07 with SMTP id w28-20020a63af1c000000b0040cf9d69f07mr8509371pge.384.1656007556151;
-        Thu, 23 Jun 2022 11:05:56 -0700 (PDT)
+        bh=pFxKlh69vpKK2GSD0HsDe+6kxHHjfwgM5wsVikqV7XE=;
+        b=NimUElmQjDC1rnTZcbvkpKONNaB8dL9GVCXwGgPmDyZn4gjzFWCnUX4NcYweggFeD9
+         G4spg4V8o/luGowSNvoCJ7VD4ApJ3VaBsQrahXAHMui3zKrfUD9iN6UZuvtoefXnEa0y
+         nYb0ErSmcsileFhHv6/aFAV3B3CNpZjsbCHegf6NFBl15118Ou6HF1ewwvexiG2HjV7K
+         /M3/iS/FfM1oB924EVRzRii7SOW6LPlyeGvOjBgrEIbF7sBs/Ohifh8s+NK/6paP6Fvp
+         LOFZfo6JxhSpAesN8+kgqPnXvmyP9dkqrpo2ygbqL+lcyBzi9GJpd0KkKxQkCBVx3mM/
+         95hQ==
+X-Gm-Message-State: AJIora/nq+mIlf1z2qWqNkocfO6IQmjnAnQFVPwoBJl6+qlNrsr01soa
+        ADp/rmcoIBVmHZpGQl88YEw=
+X-Google-Smtp-Source: AGRyM1tbgpua8djrkFV8wAzRSqi58W+WA8yHRMA+GmP7xQ7gY3TvPr7fwak0m1MSlOXAYAOmLu1MPQ==
+X-Received: by 2002:a17:902:b090:b0:167:7ae5:e13b with SMTP id p16-20020a170902b09000b001677ae5e13bmr40194835plr.170.1656007557398;
+        Thu, 23 Jun 2022 11:05:57 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.05.54
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.05.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:05:55 -0700 (PDT)
+        Thu, 23 Jun 2022 11:05:56 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
         Alasdair Kergon <agk@redhat.com>,
         Mike Snitzer <snitzer@kernel.org>
-Subject: [PATCH 14/51] dm/core: Use the enum req_op and blk_opf_t types
-Date:   Thu, 23 Jun 2022 11:04:51 -0700
-Message-Id: <20220623180528.3595304-15-bvanassche@acm.org>
+Subject: [PATCH 15/51] dm/bufio: Change 'int rw' into 'enum req_op op'
+Date:   Thu, 23 Jun 2022 11:04:52 -0700
+Message-Id: <20220623180528.3595304-16-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -55,103 +55,86 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve static type checking by using the enum req_op type for variables
-that represent a request operation and the new blk_opf_t type for
-variables that represent request flags all or not combined with a request
-operation.
+Improve static type checking by using type 'enum req_op' instead of 'int'.
+Make the role of the 'rw' arguments more clear by renaming these into 'op'
+(operation). This patch does not change any functionality.
 
 Cc: Alasdair Kergon <agk@redhat.com>
 Cc: Mike Snitzer <snitzer@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/md/dm-io.c    | 18 ++++++++++--------
- drivers/md/dm.c       |  2 +-
- include/linux/dm-io.h |  5 +++--
- 3 files changed, 14 insertions(+), 11 deletions(-)
+ drivers/md/dm-bufio.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/md/dm-io.c b/drivers/md/dm-io.c
-index e4b95eaeec8c..29ff150634cd 100644
---- a/drivers/md/dm-io.c
-+++ b/drivers/md/dm-io.c
-@@ -293,7 +293,7 @@ static void km_dp_init(struct dpages *dp, void *data)
- /*-----------------------------------------------------------------
-  * IO routines that accept a list of pages.
-  *---------------------------------------------------------------*/
--static void do_region(int op, int op_flags, unsigned region,
-+static void do_region(enum req_op op, blk_opf_t op_flags, unsigned region,
- 		      struct dm_io_region *where, struct dpages *dp,
- 		      struct io *io)
- {
-@@ -368,9 +368,9 @@ static void do_region(int op, int op_flags, unsigned region,
- 	} while (remaining);
+diff --git a/drivers/md/dm-bufio.c b/drivers/md/dm-bufio.c
+index 5ffa1dcf84cf..666b36d043d4 100644
+--- a/drivers/md/dm-bufio.c
++++ b/drivers/md/dm-bufio.c
+@@ -577,12 +577,12 @@ static void dmio_complete(unsigned long error, void *context)
+ 	b->end_io(b, unlikely(error != 0) ? BLK_STS_IOERR : 0);
  }
  
--static void dispatch_io(int op, int op_flags, unsigned int num_regions,
--			struct dm_io_region *where, struct dpages *dp,
--			struct io *io, int sync)
-+static void dispatch_io(enum req_op op, blk_opf_t op_flags,
-+			unsigned int num_regions, struct dm_io_region *where,
-+			struct dpages *dp, struct io *io, int sync)
+-static void use_dmio(struct dm_buffer *b, int rw, sector_t sector,
++static void use_dmio(struct dm_buffer *b, enum req_op op, sector_t sector,
+ 		     unsigned n_sectors, unsigned offset)
  {
- 	int i;
- 	struct dpages old_pages = *dp;
-@@ -411,8 +411,9 @@ static void sync_io_complete(unsigned long error, void *context)
+ 	int r;
+ 	struct dm_io_request io_req = {
+-		.bi_op = rw,
++		.bi_op = op,
+ 		.bi_op_flags = 0,
+ 		.notify.fn = dmio_complete,
+ 		.notify.context = b,
+@@ -616,7 +616,7 @@ static void bio_complete(struct bio *bio)
+ 	b->end_io(b, status);
  }
  
- static int sync_io(struct dm_io_client *client, unsigned int num_regions,
--		   struct dm_io_region *where, int op, int op_flags,
--		   struct dpages *dp, unsigned long *error_bits)
-+		   struct dm_io_region *where, enum req_op op,
-+		   blk_opf_t op_flags, struct dpages *dp,
-+		   unsigned long *error_bits)
+-static void use_bio(struct dm_buffer *b, int rw, sector_t sector,
++static void use_bio(struct dm_buffer *b, enum req_op op, sector_t sector,
+ 		    unsigned n_sectors, unsigned offset)
  {
- 	struct io *io;
- 	struct sync_io sio;
-@@ -445,8 +446,9 @@ static int sync_io(struct dm_io_client *client, unsigned int num_regions,
+ 	struct bio *bio;
+@@ -630,10 +630,10 @@ static void use_bio(struct dm_buffer *b, int rw, sector_t sector,
+ 	bio = bio_kmalloc(vec_size, GFP_NOWAIT | __GFP_NORETRY | __GFP_NOWARN);
+ 	if (!bio) {
+ dmio:
+-		use_dmio(b, rw, sector, n_sectors, offset);
++		use_dmio(b, op, sector, n_sectors, offset);
+ 		return;
+ 	}
+-	bio_init(bio, b->c->bdev, bio->bi_inline_vecs, vec_size, rw);
++	bio_init(bio, b->c->bdev, bio->bi_inline_vecs, vec_size, op);
+ 	bio->bi_iter.bi_sector = sector;
+ 	bio->bi_end_io = bio_complete;
+ 	bio->bi_private = b;
+@@ -669,7 +669,8 @@ static inline sector_t block_to_sector(struct dm_bufio_client *c, sector_t block
+ 	return sector;
  }
  
- static int async_io(struct dm_io_client *client, unsigned int num_regions,
--		    struct dm_io_region *where, int op, int op_flags,
--		    struct dpages *dp, io_notify_fn fn, void *context)
-+		    struct dm_io_region *where, enum req_op op,
-+		    blk_opf_t op_flags, struct dpages *dp, io_notify_fn fn,
-+		    void *context)
+-static void submit_io(struct dm_buffer *b, int rw, void (*end_io)(struct dm_buffer *, blk_status_t))
++static void submit_io(struct dm_buffer *b, enum req_op op,
++		      void (*end_io)(struct dm_buffer *, blk_status_t))
  {
- 	struct io *io;
+ 	unsigned n_sectors;
+ 	sector_t sector;
+@@ -679,7 +680,7 @@ static void submit_io(struct dm_buffer *b, int rw, void (*end_io)(struct dm_buff
  
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index bed7ad573f79..ea0bbbd6837f 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -1622,7 +1622,7 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
- 	 * Only support bio polling for normal IO, and the target io is
- 	 * exactly inside the dm_io instance (verified in dm_poll_dm_io)
- 	 */
--	ci->submit_as_polled = ci->bio->bi_opf & REQ_POLLED;
-+	ci->submit_as_polled = !!(ci->bio->bi_opf & REQ_POLLED);
+ 	sector = block_to_sector(b->c, b->block);
  
- 	len = min_t(sector_t, max_io_len(ti, ci->sector), ci->sector_count);
- 	setup_split_accounting(ci, len);
-diff --git a/include/linux/dm-io.h b/include/linux/dm-io.h
-index a52c6580cc9a..811f29ca4971 100644
---- a/include/linux/dm-io.h
-+++ b/include/linux/dm-io.h
-@@ -13,6 +13,7 @@
- #ifdef __KERNEL__
+-	if (rw != REQ_OP_WRITE) {
++	if (op != REQ_OP_WRITE) {
+ 		n_sectors = b->c->block_size >> SECTOR_SHIFT;
+ 		offset = 0;
+ 	} else {
+@@ -698,9 +699,9 @@ static void submit_io(struct dm_buffer *b, int rw, void (*end_io)(struct dm_buff
+ 	}
  
- #include <linux/types.h>
-+#include <linux/blk_types.h>
+ 	if (b->data_mode != DATA_MODE_VMALLOC)
+-		use_bio(b, rw, sector, n_sectors, offset);
++		use_bio(b, op, sector, n_sectors, offset);
+ 	else
+-		use_dmio(b, rw, sector, n_sectors, offset);
++		use_dmio(b, op, sector, n_sectors, offset);
+ }
  
- struct dm_io_region {
- 	struct block_device *bdev;
-@@ -57,8 +58,8 @@ struct dm_io_notify {
-  */
- struct dm_io_client;
- struct dm_io_request {
--	int bi_op;			/* REQ_OP */
--	int bi_op_flags;		/* req_flag_bits */
-+	enum req_op bi_op;		/* REQ_OP */
-+	blk_opf_t bi_op_flags;	/* req_flag_bits */
- 	struct dm_io_memory mem;	/* Memory to use for io */
- 	struct dm_io_notify notify;	/* Synchronous if notify.fn is NULL */
- 	struct dm_io_client *client;	/* Client memory handler */
+ /*----------------------------------------------------------------
