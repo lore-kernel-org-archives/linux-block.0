@@ -2,50 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11A15C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 122BCCCA480
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229529AbiFWTBn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:01:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46484 "EHLO
+        id S229833AbiFWTBq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231696AbiFWTBS (ORCPT
+        with ESMTP id S229745AbiFWTB3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:01:18 -0400
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A26CA10EF72
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:37 -0700 (PDT)
-Received: by mail-pf1-f169.google.com with SMTP id n12so365743pfq.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:37 -0700 (PDT)
+        Thu, 23 Jun 2022 15:01:29 -0400
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B340D10EF7F
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:40 -0700 (PDT)
+Received: by mail-pl1-f176.google.com with SMTP id n10so1495768plp.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=4aDY5TeEl9khD/49HOQ4tT2++Ig59INqTGmDhSK7Q2A=;
-        b=P6Tpi+nICjfRHEuylppxI7my2rfOVJHr1uwWxEzUghenCElTq55SPyJB8rFlDbxi4h
-         0udgkdq/K17bQ4hK4dOvuCVTa9ieMlD0/ZdqgSW28B5Dyb5EL0V6MBkdaAWOg+P1NSQD
-         Qhqxe3+NDqUNirCimVm5A6ZqR2JDsyZReHqO7RVeMR1SAEdaPNoJmhw5HgIf8WFMNP1t
-         E6idFzmbKIve3DFmigAn9KlGNiKNgZ9J0XdhWXmZ/wLQItPTtnJXOamKXK4+Mv454bvj
-         siZz7t7MANYoM5/d2Z7DNqoJVWJMjXgOwRJlOyw9VdIogfmqE+y5cVapnlkex8yxttfI
-         cNfQ==
-X-Gm-Message-State: AJIora8itCofyjI8gfY9vRSaWggJ73y8drXk85khmdLMNOoCmIZ3K35X
-        GWkV3bxLhAvCl6v6fFzC1ZvSn9+l7Bs=
-X-Google-Smtp-Source: AGRyM1vjy2hHnvRSlfNDEjIpybCaAa/xdzu0TkfNgOsdmuOWYZ7A3gtMIize3SUSPcEx0YFeZ2ITtg==
-X-Received: by 2002:a65:6b94:0:b0:3fb:16f4:3620 with SMTP id d20-20020a656b94000000b003fb16f43620mr8550261pgw.464.1656007596777;
-        Thu, 23 Jun 2022 11:06:36 -0700 (PDT)
+        bh=NbqJk9X+e4LnUrGqAiO/XLFGsNwZG2TtaOxZSknhgOA=;
+        b=VBO9QqdoDK56NNsxis3U9PzBn6OwCux4NH0IBjdtKHqRzJLnqfDrJELh1VwSgenwIJ
+         cL2YeY7KzbiPLDZ1tvDYqO/GKJtI78DSJSH+vOl3/FEjBlNAwIK7Lvgfnjfm8JRnCCaz
+         yi3sCMmNnx7q2Dby4CXXtivG57/EHLEb6QvO8dmKxiChbv8Vt4kw7bAr4vERXmAGCLSY
+         uwzy4DFv9nqw0YQB8b1FXPS8UhiMBLWR9dL/XZ3p9T9hC4mC7TQnEbwO95acbJ9QQy1H
+         w/O+IgRBGT315OkqIFCNLPDuz+tkBPpzP7t9EkBwmJiQvXoEcHgd2tTXtrtFVwKrobl0
+         QW9Q==
+X-Gm-Message-State: AJIora9gVKxXogELPdF+zYrDFK2XLB1L036tXvHQRwxu3qTijMn5FpBP
+        Wqxtkhwo3z+xnc3FKTUeRnw95rSbG64=
+X-Google-Smtp-Source: AGRyM1u2og4SLSE7WAzLqkJpJcM2DrKeMM0eK/4cB2guw6I5VUUpodc2NvPL8B1HccMVUpzd/vggHw==
+X-Received: by 2002:a17:902:f544:b0:16a:2b62:ef77 with SMTP id h4-20020a170902f54400b0016a2b62ef77mr18995609plf.134.1656007599814;
+        Thu, 23 Jun 2022 11:06:39 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.34
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:06:36 -0700 (PDT)
+        Thu, 23 Jun 2022 11:06:39 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        David Sterba <dsterba@suse.com>,
-        Josef Bacik <josef@toxicpanda.com>
-Subject: [PATCH 39/51] fs/btrfs: Use the enum req_op and blk_opf_t types
-Date:   Thu, 23 Jun 2022 11:05:16 -0700
-Message-Id: <20220623180528.3595304-40-bvanassche@acm.org>
+        Jaegeuk Kim <jaegeuk@kernel.org>
+Subject: [PATCH 41/51] fs/f2fs: Use the enum req_op and blk_opf_t types
+Date:   Thu, 23 Jun 2022 11:05:18 -0700
+Message-Id: <20220623180528.3595304-42-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -59,203 +58,183 @@ Improve static type checking by using the enum req_op type for variables
 that represent a request operation and the new blk_opf_t type for
 variables that represent request flags.
 
-Cc: David Sterba <dsterba@suse.com>
-Cc: Josef Bacik <josef@toxicpanda.com>
+Cc: Jaegeuk Kim <jaegeuk@kernel.org>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- fs/btrfs/check-integrity.c |  4 ++--
- fs/btrfs/compression.c     |  6 +++---
- fs/btrfs/compression.h     |  2 +-
- fs/btrfs/extent_io.c       | 18 +++++++++---------
- fs/btrfs/inode.c           |  4 ++--
- fs/btrfs/raid56.c          |  4 ++--
- 6 files changed, 19 insertions(+), 19 deletions(-)
+ fs/f2fs/data.c              | 11 ++++++-----
+ fs/f2fs/f2fs.h              |  6 +++---
+ fs/f2fs/node.c              |  2 +-
+ fs/f2fs/segment.c           |  2 +-
+ include/trace/events/f2fs.h | 28 +++++++++++++++-------------
+ 5 files changed, 26 insertions(+), 23 deletions(-)
 
-diff --git a/fs/btrfs/check-integrity.c b/fs/btrfs/check-integrity.c
-index 5d20137b7b67..98c6e5feab19 100644
---- a/fs/btrfs/check-integrity.c
-+++ b/fs/btrfs/check-integrity.c
-@@ -152,7 +152,7 @@ struct btrfsic_block {
- 	struct btrfsic_block *next_in_same_bio;
- 	void *orig_bio_private;
- 	bio_end_io_t *orig_bio_end_io;
--	int submit_bio_bh_rw;
-+	blk_opf_t submit_bio_bh_rw;
- 	u64 flush_gen; /* only valid if !never_written */
- };
+diff --git a/fs/f2fs/data.c b/fs/f2fs/data.c
+index 7fcbcf979737..5c13ee321940 100644
+--- a/fs/f2fs/data.c
++++ b/fs/f2fs/data.c
+@@ -387,11 +387,11 @@ int f2fs_target_device_index(struct f2fs_sb_info *sbi, block_t blkaddr)
+ 	return 0;
+ }
  
-@@ -1681,7 +1681,7 @@ static void btrfsic_process_written_block(struct btrfsic_dev_state *dev_state,
- 					  u64 dev_bytenr, char **mapped_datav,
- 					  unsigned int num_pages,
- 					  struct bio *bio, int *bio_is_patched,
--					  int submit_bio_bh_rw)
-+					  blk_opf_t submit_bio_bh_rw)
+-static unsigned int f2fs_io_flags(struct f2fs_io_info *fio)
++static blk_opf_t f2fs_io_flags(struct f2fs_io_info *fio)
  {
- 	int is_metadata;
- 	struct btrfsic_block *block;
-diff --git a/fs/btrfs/compression.c b/fs/btrfs/compression.c
-index f4564f32f6d9..a82b9f17f476 100644
---- a/fs/btrfs/compression.c
-+++ b/fs/btrfs/compression.c
-@@ -455,7 +455,7 @@ static blk_status_t submit_compressed_bio(struct btrfs_fs_info *fs_info,
+ 	unsigned int temp_mask = (1 << NR_TEMP_TYPE) - 1;
+ 	unsigned int fua_flag, meta_flag, io_flag;
+-	unsigned int op_flags = 0;
++	blk_opf_t op_flags = 0;
  
+ 	if (fio->op != REQ_OP_WRITE)
+ 		return 0;
+@@ -999,7 +999,7 @@ void f2fs_submit_page_write(struct f2fs_io_info *fio)
+ }
  
- static struct bio *alloc_compressed_bio(struct compressed_bio *cb, u64 disk_bytenr,
--					unsigned int opf, bio_end_io_t endio_func,
-+					blk_opf_t opf, bio_end_io_t endio_func,
- 					u64 *next_stripe_start)
+ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
+-				      unsigned nr_pages, unsigned op_flag,
++				      unsigned nr_pages, blk_opf_t op_flag,
+ 				      pgoff_t first_idx, bool for_write)
  {
- 	struct btrfs_fs_info *fs_info = btrfs_sb(cb->inode->i_sb);
-@@ -505,7 +505,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
- 				 unsigned int compressed_len,
- 				 struct page **compressed_pages,
- 				 unsigned int nr_pages,
--				 unsigned int write_flags,
-+				 blk_opf_t write_flags,
- 				 struct cgroup_subsys_state *blkcg_css,
- 				 bool writeback)
- {
-@@ -517,7 +517,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
- 	blk_status_t ret;
- 	int skip_sum = inode->flags & BTRFS_INODE_NODATASUM;
- 	const bool use_append = btrfs_use_zone_append(inode, disk_start);
--	const unsigned int bio_op = use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE;
-+	const enum req_op bio_op = use_append ? REQ_OP_ZONE_APPEND : REQ_OP_WRITE;
+ 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+@@ -1047,7 +1047,8 @@ static struct bio *f2fs_grab_read_bio(struct inode *inode, block_t blkaddr,
  
- 	ASSERT(IS_ALIGNED(start, fs_info->sectorsize) &&
- 	       IS_ALIGNED(len, fs_info->sectorsize));
-diff --git a/fs/btrfs/compression.h b/fs/btrfs/compression.h
-index 2707404389a5..2b56d63e01ce 100644
---- a/fs/btrfs/compression.h
-+++ b/fs/btrfs/compression.h
-@@ -99,7 +99,7 @@ blk_status_t btrfs_submit_compressed_write(struct btrfs_inode *inode, u64 start,
- 				  unsigned int compressed_len,
- 				  struct page **compressed_pages,
- 				  unsigned int nr_pages,
--				  unsigned int write_flags,
-+				  blk_opf_t write_flags,
- 				  struct cgroup_subsys_state *blkcg_css,
- 				  bool writeback);
- void btrfs_submit_compressed_read(struct inode *inode, struct bio *bio,
-diff --git a/fs/btrfs/extent_io.c b/fs/btrfs/extent_io.c
-index 8f6b544ae616..10f8df7f883d 100644
---- a/fs/btrfs/extent_io.c
-+++ b/fs/btrfs/extent_io.c
-@@ -3357,7 +3357,7 @@ static int calc_bio_boundaries(struct btrfs_bio_ctrl *bio_ctrl,
- static int alloc_new_bio(struct btrfs_inode *inode,
- 			 struct btrfs_bio_ctrl *bio_ctrl,
- 			 struct writeback_control *wbc,
--			 unsigned int opf,
-+			 blk_opf_t opf,
- 			 bio_end_io_t end_io_func,
- 			 u64 disk_bytenr, u32 offset, u64 file_offset,
- 			 enum btrfs_compression_type compress_type)
-@@ -3437,7 +3437,7 @@ static int alloc_new_bio(struct btrfs_inode *inode,
-  * @prev_bio_flags:  flags of previous bio to see if we can merge the current one
-  * @compress_type:   compress type for current bio
+ /* This can handle encryption stuffs */
+ static int f2fs_submit_page_read(struct inode *inode, struct page *page,
+-				 block_t blkaddr, int op_flags, bool for_write)
++				 block_t blkaddr, blk_opf_t op_flags,
++				 bool for_write)
+ {
+ 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
+ 	struct bio *bio;
+@@ -1181,7 +1182,7 @@ int f2fs_get_block(struct dnode_of_data *dn, pgoff_t index)
+ }
+ 
+ struct page *f2fs_get_read_data_page(struct inode *inode, pgoff_t index,
+-						int op_flags, bool for_write)
++				     blk_opf_t op_flags, bool for_write)
+ {
+ 	struct address_space *mapping = inode->i_mapping;
+ 	struct dnode_of_data dn;
+diff --git a/fs/f2fs/f2fs.h b/fs/f2fs/f2fs.h
+index d9bbecd008d2..868170b72de9 100644
+--- a/fs/f2fs/f2fs.h
++++ b/fs/f2fs/f2fs.h
+@@ -1183,8 +1183,8 @@ struct f2fs_io_info {
+ 	nid_t ino;		/* inode number */
+ 	enum page_type type;	/* contains DATA/NODE/META/META_FLUSH */
+ 	enum temp_type temp;	/* contains HOT/WARM/COLD */
+-	int op;			/* contains REQ_OP_ */
+-	int op_flags;		/* req_flag_bits */
++	enum req_op op;		/* contains REQ_OP_ */
++	blk_opf_t op_flags;	/* req_flag_bits */
+ 	block_t new_blkaddr;	/* new block address to be written */
+ 	block_t old_blkaddr;	/* old block address before Cow */
+ 	struct page *page;	/* page to be written */
+@@ -3741,7 +3741,7 @@ int f2fs_reserve_new_block(struct dnode_of_data *dn);
+ int f2fs_get_block(struct dnode_of_data *dn, pgoff_t index);
+ int f2fs_reserve_block(struct dnode_of_data *dn, pgoff_t index);
+ struct page *f2fs_get_read_data_page(struct inode *inode, pgoff_t index,
+-			int op_flags, bool for_write);
++			blk_opf_t op_flags, bool for_write);
+ struct page *f2fs_find_data_page(struct inode *inode, pgoff_t index);
+ struct page *f2fs_get_lock_data_page(struct inode *inode, pgoff_t index,
+ 			bool for_write);
+diff --git a/fs/f2fs/node.c b/fs/f2fs/node.c
+index 836c79a20afc..c4f1e895ebd2 100644
+--- a/fs/f2fs/node.c
++++ b/fs/f2fs/node.c
+@@ -1327,7 +1327,7 @@ struct page *f2fs_new_node_page(struct dnode_of_data *dn, unsigned int ofs)
+  * 0: f2fs_put_page(page, 0)
+  * LOCKED_PAGE or error: f2fs_put_page(page, 1)
   */
--static int submit_extent_page(unsigned int opf,
-+static int submit_extent_page(blk_opf_t opf,
- 			      struct writeback_control *wbc,
- 			      struct btrfs_bio_ctrl *bio_ctrl,
- 			      struct page *page, u64 disk_bytenr,
-@@ -3615,7 +3615,7 @@ __get_extent_map(struct inode *inode, struct page *page, size_t pg_offset,
-  */
- static int btrfs_do_readpage(struct page *page, struct extent_map **em_cached,
- 		      struct btrfs_bio_ctrl *bio_ctrl,
--		      unsigned int read_flags, u64 *prev_em_start)
-+		      blk_opf_t read_flags, u64 *prev_em_start)
+-static int read_node_page(struct page *page, int op_flags)
++static int read_node_page(struct page *page, blk_opf_t op_flags)
  {
- 	struct inode *inode = page->mapping->host;
- 	struct btrfs_fs_info *fs_info = btrfs_sb(inode->i_sb);
-@@ -3983,8 +3983,8 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
- 	int saved_ret = 0;
- 	int ret = 0;
- 	int nr = 0;
--	u32 opf = REQ_OP_WRITE;
--	const unsigned int write_flags = wbc_to_write_flags(wbc);
-+	enum req_op op = REQ_OP_WRITE;
-+	const blk_opf_t write_flags = wbc_to_write_flags(wbc);
- 	bool has_error = false;
- 	bool compressed;
+ 	struct f2fs_sb_info *sbi = F2FS_P_SB(page);
+ 	struct node_info ni;
+diff --git a/fs/f2fs/segment.c b/fs/f2fs/segment.c
+index 874c1b9c41a2..c7afc588cf26 100644
+--- a/fs/f2fs/segment.c
++++ b/fs/f2fs/segment.c
+@@ -1082,7 +1082,7 @@ static int __submit_discard_cmd(struct f2fs_sb_info *sbi,
+ 	struct discard_cmd_control *dcc = SM_I(sbi)->dcc_info;
+ 	struct list_head *wait_list = (dpolicy->type == DPOLICY_FSTRIM) ?
+ 					&(dcc->fstrim_list) : &(dcc->wait_list);
+-	int flag = dpolicy->sync ? REQ_SYNC : 0;
++	blk_opf_t flag = dpolicy->sync ? REQ_SYNC : 0;
+ 	block_t lstart, start, len, total_len;
+ 	int err = 0;
  
-@@ -4058,7 +4058,7 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
- 		iosize = min(min(em_end, end + 1), dirty_range_end) - cur;
+diff --git a/include/trace/events/f2fs.h b/include/trace/events/f2fs.h
+index 513e889ef8aa..0f51b2e9c3d0 100644
+--- a/include/trace/events/f2fs.h
++++ b/include/trace/events/f2fs.h
+@@ -66,7 +66,7 @@ TRACE_DEFINE_ENUM(CP_RESIZE);
  
- 		if (btrfs_use_zone_append(inode, em->block_start))
--			opf = REQ_OP_ZONE_APPEND;
-+			op = REQ_OP_ZONE_APPEND;
+ #define F2FS_OP_FLAGS (REQ_RAHEAD | REQ_SYNC | REQ_META | REQ_PRIO |	\
+ 			REQ_PREFLUSH | REQ_FUA)
+-#define F2FS_BIO_FLAG_MASK(t)	(t & F2FS_OP_FLAGS)
++#define F2FS_BIO_FLAG_MASK(t) ((t) & (__force u32)F2FS_OP_FLAGS)
  
- 		free_extent_map(em);
- 		em = NULL;
-@@ -4094,7 +4094,7 @@ static noinline_for_stack int __extent_writepage_io(struct btrfs_inode *inode,
- 		 */
- 		btrfs_page_clear_dirty(fs_info, page, cur, iosize);
+ #define show_bio_type(op,op_flags)	show_bio_op(op),		\
+ 						show_bio_op_flags(op_flags)
+@@ -75,12 +75,12 @@ TRACE_DEFINE_ENUM(CP_RESIZE);
  
--		ret = submit_extent_page(opf | write_flags, wbc,
-+		ret = submit_extent_page(op | write_flags, wbc,
- 					 &epd->bio_ctrl, page,
- 					 disk_bytenr, iosize,
- 					 cur - page_offset(page),
-@@ -4575,7 +4575,7 @@ static int write_one_subpage_eb(struct extent_buffer *eb,
- {
- 	struct btrfs_fs_info *fs_info = eb->fs_info;
- 	struct page *page = eb->pages[0];
--	unsigned int write_flags = wbc_to_write_flags(wbc) | REQ_META;
-+	blk_opf_t write_flags = wbc_to_write_flags(wbc) | REQ_META;
- 	bool no_dirty_ebs = false;
- 	int ret;
+ #define show_bio_op_flags(flags)					\
+ 	__print_flags(F2FS_BIO_FLAG_MASK(flags), "|",			\
+-		{ REQ_RAHEAD,		"R" },				\
+-		{ REQ_SYNC,		"S" },				\
+-		{ REQ_META,		"M" },				\
+-		{ REQ_PRIO,		"P" },				\
+-		{ REQ_PREFLUSH,		"PF" },				\
+-		{ REQ_FUA,		"FUA" })
++		{ (__force u32)REQ_RAHEAD,	"R" },			\
++		{ (__force u32)REQ_SYNC,	"S" },			\
++		{ (__force u32)REQ_META,	"M" },			\
++		{ (__force u32)REQ_PRIO,	"P" },			\
++		{ (__force u32)REQ_PREFLUSH,	"PF" },			\
++		{ (__force u32)REQ_FUA,		"FUA" })
  
-@@ -4620,7 +4620,7 @@ static noinline_for_stack int write_one_eb(struct extent_buffer *eb,
- {
- 	u64 disk_bytenr = eb->start;
- 	int i, num_pages;
--	unsigned int write_flags = wbc_to_write_flags(wbc) | REQ_META;
-+	blk_opf_t write_flags = wbc_to_write_flags(wbc) | REQ_META;
- 	int ret = 0;
- 
- 	prepare_eb_write(eb);
-diff --git a/fs/btrfs/inode.c b/fs/btrfs/inode.c
-index 81737eff92f3..724f8f7e3599 100644
---- a/fs/btrfs/inode.c
-+++ b/fs/btrfs/inode.c
-@@ -485,7 +485,7 @@ struct async_chunk {
- 	struct page *locked_page;
- 	u64 start;
- 	u64 end;
--	unsigned int write_flags;
-+	blk_opf_t write_flags;
- 	struct list_head extents;
- 	struct cgroup_subsys_state *blkcg_css;
- 	struct btrfs_work work;
-@@ -1435,7 +1435,7 @@ static int cow_file_range_async(struct btrfs_inode *inode,
- 	int i;
- 	bool should_compress;
- 	unsigned nofs_flag;
--	const unsigned int write_flags = wbc_to_write_flags(wbc);
-+	const blk_opf_t write_flags = wbc_to_write_flags(wbc);
- 
- 	unlock_extent(&inode->io_tree, start, end);
- 
-diff --git a/fs/btrfs/raid56.c b/fs/btrfs/raid56.c
-index a5b623ee6fac..c520412d1f86 100644
---- a/fs/btrfs/raid56.c
-+++ b/fs/btrfs/raid56.c
-@@ -1136,7 +1136,7 @@ static int rbio_add_io_sector(struct btrfs_raid_bio *rbio,
- 			      unsigned int stripe_nr,
- 			      unsigned int sector_nr,
- 			      unsigned long bio_max_len,
--			      unsigned int opf)
-+			      enum req_op op)
- {
- 	const u32 sectorsize = rbio->bioc->fs_info->sectorsize;
- 	struct bio *last = bio_list->tail;
-@@ -1181,7 +1181,7 @@ static int rbio_add_io_sector(struct btrfs_raid_bio *rbio,
- 
- 	/* put a new bio on the list */
- 	bio = bio_alloc(stripe->dev->bdev, max(bio_max_len >> PAGE_SHIFT, 1UL),
--			opf, GFP_NOFS);
-+			op, GFP_NOFS);
- 	bio->bi_iter.bi_sector = disk_start >> 9;
- 	bio->bi_private = rbio;
- 
+ #define show_data_type(type)						\
+ 	__print_symbolic(type,						\
+@@ -1048,8 +1048,8 @@ DECLARE_EVENT_CLASS(f2fs__submit_page_bio,
+ 		__entry->index		= page->index;
+ 		__entry->old_blkaddr	= fio->old_blkaddr;
+ 		__entry->new_blkaddr	= fio->new_blkaddr;
+-		__entry->op		= fio->op;
+-		__entry->op_flags	= fio->op_flags;
++		__entry->op		= (__force int)fio->op;
++		__entry->op_flags	= (__force int)fio->op_flags;
+ 		__entry->temp		= fio->temp;
+ 		__entry->type		= fio->type;
+ 	),
+@@ -1060,7 +1060,8 @@ DECLARE_EVENT_CLASS(f2fs__submit_page_bio,
+ 		(unsigned long)__entry->index,
+ 		(unsigned long long)__entry->old_blkaddr,
+ 		(unsigned long long)__entry->new_blkaddr,
+-		show_bio_type(__entry->op, __entry->op_flags),
++		show_bio_type((__force enum req_op)__entry->op,
++			      __entry->op_flags),
+ 		show_block_temp(__entry->temp),
+ 		show_block_type(__entry->type))
+ );
+@@ -1102,8 +1103,8 @@ DECLARE_EVENT_CLASS(f2fs__bio,
+ 	TP_fast_assign(
+ 		__entry->dev		= sb->s_dev;
+ 		__entry->target		= bio_dev(bio);
+-		__entry->op		= bio_op(bio);
+-		__entry->op_flags	= bio->bi_opf;
++		__entry->op		= (__force int)bio_op(bio);
++		__entry->op_flags	= (__force int)bio->bi_opf;
+ 		__entry->type		= type;
+ 		__entry->sector		= bio->bi_iter.bi_sector;
+ 		__entry->size		= bio->bi_iter.bi_size;
+@@ -1112,7 +1113,8 @@ DECLARE_EVENT_CLASS(f2fs__bio,
+ 	TP_printk("dev = (%d,%d)/(%d,%d), rw = %s(%s), %s, sector = %lld, size = %u",
+ 		show_dev(__entry->target),
+ 		show_dev(__entry->dev),
+-		show_bio_type(__entry->op, __entry->op_flags),
++		show_bio_type((__force enum req_op)__entry->op,
++			      __entry->op_flags),
+ 		show_block_type(__entry->type),
+ 		(unsigned long long)__entry->sector,
+ 		__entry->size)
