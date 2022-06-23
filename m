@@ -2,244 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8EA0CCA480
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A00DDC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:00:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230186AbiFWTAg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:00:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46390 "EHLO
+        id S230200AbiFWTAh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:00:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229902AbiFWTAD (ORCPT
+        with ESMTP id S230235AbiFWTAH (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:00:03 -0400
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33AAFB8596
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:35 -0700 (PDT)
-Received: by mail-pj1-f48.google.com with SMTP id 73-20020a17090a0fcf00b001eaee69f600so363117pjz.1
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:35 -0700 (PDT)
+        Thu, 23 Jun 2022 15:00:07 -0400
+Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0CCBB85A5
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:37 -0700 (PDT)
+Received: by mail-pj1-f49.google.com with SMTP id w19-20020a17090a8a1300b001ec79064d8dso3381546pjn.2
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:05:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=H9ng++FzfYz5sXe+cg63siW0ug1V3EaiSEUSKrsXuvA=;
-        b=sKozEOxaV37Ohn7kTrbo6MoScmchhLpgRaM1sU5mJkb5cXxMAAhj19fFsiAikeKEmI
-         AtO1+/Yv1jYRsie6HyRgm0WMUHw6vu2EOtZeTKt2IY4vGX1SIOGOJjC0V8GItgPe5KWB
-         yrJOu2RooQpXj6eXmJj51jHbjMosKW0WJ095Vyby2kTC6ASmscG8SfJQYgis7yDcRGKU
-         untm9G6AnQn4mLcimOEfl1q18PeFql+wTO6KC+hOOcNOUPWM6zmwLrBwq9f1oZiFdFz+
-         Jg1g9jSQkSEIzeLm3h20GgbtQmTwX+4O1jBaDmJsfE5d6vUVGePwcHyYsBApZeCUN/uo
-         s8Dg==
-X-Gm-Message-State: AJIora8yhJLZ/ds0eQLDvFrEvwBqxrfyy0Pa8bUXG3oR6DP0T8Zgd/Vd
-        4+pXBsRv1k+HRx76uXa7eqY=
-X-Google-Smtp-Source: AGRyM1ssgxqJiHcZ4KMJ2104J4FR3dU72CPq6RKU1e00uYchKyzYUnw+Nt09CxLGI8abC3RAC5ROZw==
-X-Received: by 2002:a17:90b:4b02:b0:1ed:13eb:11c9 with SMTP id lx2-20020a17090b4b0200b001ed13eb11c9mr2754214pjb.76.1656007534272;
-        Thu, 23 Jun 2022 11:05:34 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=QHWu52XVuAXLu6chRMhy7VHcbAW75xRVM1TfZ9/AmXE=;
+        b=LrElEyF1lbaUu0br/YgfkSpEBsX925fM/1ScQsMfuwn0VvDRyorAbQvr/8GFcUDRjY
+         P+S/i43HPS5XUezU2fSDCeo9EP/0dbDc6sp6DD+Fxqvf90zNBM1rdo2Sty9PzOFpDyi9
+         zxZzfy6IIkEU5n6W6q4Dyq/+ndLRcRARyBVllYB9MsJ1Zrfua/OReneu0SvhxDwwNYQh
+         dbCu7zRJ67kJp9DtmVVF9+t50x0xPTNWPmlbYD4GUVrMxMbBSYZA9AwgGZB/e1IiMcDp
+         uD0ymm9KE+pycjV1iYmHgbik3wNDNCOJAQ/WBP3fdiquYsNFV53Y8R3JFqXYfU7kesh7
+         PyBQ==
+X-Gm-Message-State: AJIora8+E57dUrnzU1DR/FaZP8Bp3iDLnNKlRsRDAjFNgUBynS1+RNks
+        kJ+2pRA0Gyf4Tkw9MlaYFx4=
+X-Google-Smtp-Source: AGRyM1ulqVjbkg2BvkhJvPLdhzIklBQJZLzEmUyQqefHu3+A0QgU5tyhPEeU21uyzZTkixzIWMgtkw==
+X-Received: by 2002:a17:90a:1485:b0:1ec:788e:a053 with SMTP id k5-20020a17090a148500b001ec788ea053mr5261841pja.16.1656007537193;
+        Thu, 23 Jun 2022 11:05:37 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.05.32
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.05.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:05:33 -0700 (PDT)
+        Thu, 23 Jun 2022 11:05:36 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 00/51] Improve static type checking for request flags
-Date:   Thu, 23 Jun 2022 11:04:37 -0700
-Message-Id: <20220623180528.3595304-1-bvanassche@acm.org>
+        Bart Van Assche <bvanassche@acm.org>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH 02/51] block: Use enum req_op where appropriate
+Date:   Thu, 23 Jun 2022 11:04:39 -0700
+Message-Id: <20220623180528.3595304-3-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
+In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
+References: <20220623180528.3595304-1-bvanassche@acm.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Jens,
+Change the type of the arguments that are used to pass a REQ_OP_* value
+from int or unsigned int into enum req_op to improve static type
+checking.
 
-A source of confusion in the block layer is that can be nontrivial to determine
-which type of flags a u32 function argument accepts. This patch series clears
-up that confusion for request flags by introducing a new __bitwise type, namely
-blk_opf_t. Additionally, the type 'int' is change into 'enum req_op' where used
-to hold a request operation.
+Note: the type of the blk_mq_alloc_request() 'op' argument is not
+modified by this patch since at least once caller passes an operation
+and flags in this argument.
 
-Analysis of the sparse warnings introduced by this conversion resulted in one
-bug fix ("blktrace: Trace remap operations correctly").
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+---
+ block/blk-core.c          | 6 +++---
+ block/blk-mq-debugfs.c    | 2 +-
+ block/blk-mq.c            | 2 +-
+ block/blk-wbt.c           | 2 +-
+ block/blk.h               | 2 +-
+ include/linux/blk-mq.h    | 2 +-
+ include/linux/blk_types.h | 2 +-
+ include/linux/blkdev.h    | 6 +++---
+ 8 files changed, 12 insertions(+), 12 deletions(-)
 
-Although the number of patches in this series is significant, the risk of this
-patch series is low since most patches involve changing one integer type (int
-or u32) into another integer type of the same size (enum req_op or blk_opf_t).
-
-Please consider this patch series for kernel v5.20.
-
-Thanks,
-
-Bart.
-
-Bart Van Assche (51):
-  treewide: Rename enum req_opf into enum req_op
-  block: Use enum req_op where appropriate
-  block: Change the type of the last .rw_page() argument
-  block: Change the type of req_op() and bio_op() into enum req_op
-  block: Introduce the type blk_opf_t
-  block: Use the new blk_opf_t type
-  blktrace: Use the new blk_opf_t type
-  blktrace: Trace remap operations correctly
-  block/brd: Use the enum req_op type
-  block/drbd: Use the enum req_op and blk_opf_t types
-  block/floppy: Fix a sparse warning
-  block/null_blk: Fix sparse warnings in tracing code
-  um: Use enum req_op where appropriate
-  dm/core: Use the enum req_op and blk_opf_t types
-  dm/bufio: Change 'int rw' into 'enum req_op op'
-  dm/kcopyd: Rename kcopyd_job.rw into kcopyd_job.op
-  dm/ebs: Change 'int rw' into 'enum req_op op'
-  dm/dm-flakey: Use the new blk_opf_t type
-  dm/dm-integrity: Use the enum req_op and blk_opf_t types
-  dm/dm-snap: Use the enum req_op and blk_opf_t types
-  dm/dm-zoned: Use the enum req_op type
-  md/core: Use the enum req_op and blk_opf_t types
-  md/bcache: Use the enum req_op and blk_opf_t types
-  md/raid1: Use the new blk_opf_t type
-  md/raid10: Use the new blk_opf_t type
-  md/raid5: Use the enum req_op and blk_opf_t types
-  nvme/host: Use the enum req_op and blk_opf_t types
-  nvme/target: Use the new blk_opf_t type
-  scsi/core: Improve static type checking
-  scsi/core: Change the return type of scsi_noretry_cmd() into bool
-  scsi/core: Use the new blk_opf_t type
-  scsi/device_handlers: Use the new blk_opf_t type
-  scsi/ufs: Rename a 'dir' argument into 'op'
-  scsi/target: Use the new blk_opf_t type
-  mm: Use the new blk_opf_t type
-  fs/buffer: Use the new blk_opf_t type
-  fs/direct-io: Use the enum req_op and blk_opf_t types
-  fs/mpage: Use the new blk_opf_t type
-  fs/btrfs: Use the enum req_op and blk_opf_t types
-  fs/ext4: Use the new blk_opf_t type
-  fs/f2fs: Use the enum req_op and blk_opf_t types
-  fs/gfs2: Use the enum req_op and blk_opf_t types
-  fs/hfsplus: Use the enum req_op and blk_opf_t types
-  fs/iomap: Use the new blk_opf_t type
-  fs/jbd2: Fix the documentation of the jbd2_write_superblock() callers
-  fs/nilfs: Use the enum req_op and blk_opf_t types
-  fs/ntfs3: Use enum req_op where appropriate
-  fs/ocfs2: Use the enum req_op and blk_opf_t types
-  PM: Use the enum req_op and blk_opf_t types
-  fs/xfs: Use the enum req_op and blk_opf_t types
-  fs/zonefs: Fix sparse warnings in tracing code
-
- arch/um/drivers/ubd_kern.c                  |   4 +-
- block/bfq-cgroup.c                          |  16 +--
- block/bfq-iosched.c                         |   8 +-
- block/bfq-iosched.h                         |   8 +-
- block/bio.c                                 |  10 +-
- block/blk-cgroup-rwstat.h                   |   2 +-
- block/blk-core.c                            |   8 +-
- block/blk-flush.c                           |   6 +-
- block/blk-merge.c                           |   8 +-
- block/blk-mq-debugfs.c                      |   6 +-
- block/blk-mq.c                              |  13 ++-
- block/blk-mq.h                              |   6 +-
- block/blk-wbt.c                             |  18 +--
- block/blk-zoned.c                           |   7 +-
- block/blk.h                                 |   2 +-
- block/elevator.h                            |   2 +-
- block/fops.c                                |   8 +-
- block/kyber-iosched.c                       |   6 +-
- block/mq-deadline.c                         |   2 +-
- drivers/block/brd.c                         |   4 +-
- drivers/block/drbd/drbd_actlog.c            |   9 +-
- drivers/block/drbd/drbd_bitmap.c            |   3 +-
- drivers/block/drbd/drbd_int.h               |   6 +-
- drivers/block/drbd/drbd_receiver.c          |  11 +-
- drivers/block/floppy.c                      |   2 +-
- drivers/block/null_blk/main.c               |   9 +-
- drivers/block/null_blk/null_blk.h           |  12 +-
- drivers/block/null_blk/trace.h              |   6 +-
- drivers/block/null_blk/zoned.c              |   4 +-
- drivers/block/paride/pd.c                   |   2 +
- drivers/block/zram/zram_drv.c               |   2 +-
- drivers/md/bcache/super.c                   |   4 +-
- drivers/md/dm-bufio.c                       |  19 ++--
- drivers/md/dm-ebs-target.c                  |  15 +--
- drivers/md/dm-flakey.c                      |   8 +-
- drivers/md/dm-integrity.c                   |  14 ++-
- drivers/md/dm-io.c                          |  18 +--
- drivers/md/dm-kcopyd.c                      |  25 ++--
- drivers/md/dm-snap-persistent.c             |   6 +-
- drivers/md/dm-zoned-metadata.c              |   2 +-
- drivers/md/dm.c                             |   4 +-
- drivers/md/md.c                             |   3 +-
- drivers/md/md.h                             |   4 +-
- drivers/md/raid1.c                          |   2 +-
- drivers/md/raid10.c                         |   6 +-
- drivers/md/raid5.c                          |   5 +-
- drivers/nvdimm/btt.c                        |   2 +-
- drivers/nvdimm/pmem.c                       |   2 +-
- drivers/nvme/host/ioctl.c                   |   4 +-
- drivers/nvme/host/nvme.h                    |   2 +-
- drivers/nvme/target/io-cmd-bdev.c           |   3 +-
- drivers/nvme/target/zns.c                   |   6 +-
- drivers/scsi/device_handler/scsi_dh_alua.c  |   4 +-
- drivers/scsi/device_handler/scsi_dh_emc.c   |   2 +-
- drivers/scsi/device_handler/scsi_dh_hp_sw.c |   4 +-
- drivers/scsi/device_handler/scsi_dh_rdac.c  |   2 +-
- drivers/scsi/scsi_error.c                   |  16 +--
- drivers/scsi/scsi_lib.c                     |  10 +-
- drivers/scsi/scsi_priv.h                    |   2 +-
- drivers/scsi/sd_zbc.c                       |   2 +-
- drivers/target/target_core_iblock.c         |   4 +-
- drivers/ufs/core/ufshpb.c                   |   7 +-
- fs/btrfs/check-integrity.c                  |   4 +-
- fs/btrfs/compression.c                      |   6 +-
- fs/btrfs/compression.h                      |   2 +-
- fs/btrfs/extent_io.c                        |  18 +--
- fs/btrfs/inode.c                            |   4 +-
- fs/btrfs/raid56.c                           |   4 +-
- fs/buffer.c                                 |  21 ++--
- fs/direct-io.c                              |   4 +-
- fs/ext4/ext4.h                              |   8 +-
- fs/ext4/fast_commit.c                       |   2 +-
- fs/ext4/super.c                             |  14 +--
- fs/f2fs/data.c                              |  11 +-
- fs/f2fs/f2fs.h                              |   6 +-
- fs/f2fs/node.c                              |   2 +-
- fs/f2fs/segment.c                           |   2 +-
- fs/gfs2/log.c                               |   4 +-
- fs/gfs2/log.h                               |   2 +-
- fs/gfs2/lops.c                              |   4 +-
- fs/gfs2/lops.h                              |   2 +-
- fs/gfs2/meta_io.c                           |   6 +-
- fs/hfsplus/hfsplus_fs.h                     |   2 +-
- fs/hfsplus/wrapper.c                        |   5 +-
- fs/iomap/direct-io.c                        |   8 +-
- fs/jbd2/journal.c                           |  15 +--
- fs/mpage.c                                  |   2 +-
- fs/nilfs2/btnode.c                          |   4 +-
- fs/nilfs2/btnode.h                          |   5 +-
- fs/nilfs2/mdt.c                             |   3 +-
- fs/ntfs3/fsntfs.c                           |   2 +-
- fs/ntfs3/ntfs_fs.h                          |   2 +-
- fs/ocfs2/cluster/heartbeat.c                |   4 +-
- fs/xfs/xfs_bio_io.c                         |   2 +-
- fs/xfs/xfs_buf.c                            |   4 +-
- fs/xfs/xfs_linux.h                          |   2 +-
- fs/xfs/xfs_log_recover.c                    |   2 +-
- fs/zonefs/super.c                           |   5 +-
- fs/zonefs/trace.h                           |   8 +-
- include/linux/bio.h                         |  10 +-
- include/linux/blk-mq.h                      |  12 +-
- include/linux/blk_types.h                   | 119 +++++++++++---------
- include/linux/blkdev.h                      |  15 +--
- include/linux/blktrace_api.h                |   3 +-
- include/linux/buffer_head.h                 |   9 +-
- include/linux/dm-io.h                       |   5 +-
- include/linux/jbd2.h                        |   2 +-
- include/linux/writeback.h                   |   4 +-
- include/scsi/scsi_cmnd.h                    |   2 +-
- include/scsi/scsi_device.h                  |   2 +-
- include/trace/events/f2fs.h                 |  28 ++---
- include/trace/events/jbd2.h                 |  12 +-
- include/trace/events/nilfs2.h               |   4 +-
- kernel/power/swap.c                         |   4 +-
- kernel/trace/blktrace.c                     |  22 ++--
- 115 files changed, 456 insertions(+), 415 deletions(-)
-
+diff --git a/block/blk-core.c b/block/blk-core.c
+index eb86c756a7fd..9d420dff90f6 100644
+--- a/block/blk-core.c
++++ b/block/blk-core.c
+@@ -136,7 +136,7 @@ static const char *const blk_op_name[] = {
+  * string format. Useful in the debugging and tracing bio or request. For
+  * invalid REQ_OP_XXX it returns string "UNKNOWN".
+  */
+-inline const char *blk_op_str(unsigned int op)
++inline const char *blk_op_str(enum req_op op)
+ {
+ 	const char *op_str = "UNKNOWN";
+ 
+@@ -1010,7 +1010,7 @@ void update_io_ticks(struct block_device *part, unsigned long now, bool end)
+ }
+ 
+ unsigned long bdev_start_io_acct(struct block_device *bdev,
+-				 unsigned int sectors, unsigned int op,
++				 unsigned int sectors, enum req_op op,
+ 				 unsigned long start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+@@ -1051,7 +1051,7 @@ unsigned long bio_start_io_acct(struct bio *bio)
+ }
+ EXPORT_SYMBOL_GPL(bio_start_io_acct);
+ 
+-void bdev_end_io_acct(struct block_device *bdev, unsigned int op,
++void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+ 		      unsigned long start_time)
+ {
+ 	const int sgrp = op_stat_group(op);
+diff --git a/block/blk-mq-debugfs.c b/block/blk-mq-debugfs.c
+index 7e4136a60e1c..df0b9a458f34 100644
+--- a/block/blk-mq-debugfs.c
++++ b/block/blk-mq-debugfs.c
+@@ -306,7 +306,7 @@ static const char *blk_mq_rq_state_name(enum mq_rq_state rq_state)
+ int __blk_mq_debugfs_rq_show(struct seq_file *m, struct request *rq)
+ {
+ 	const struct blk_mq_ops *const mq_ops = rq->q->mq_ops;
+-	const unsigned int op = req_op(rq);
++	const enum req_op op = req_op(rq);
+ 	const char *op_str = blk_op_str(op);
+ 
+ 	seq_printf(m, "%p {.op=", rq);
+diff --git a/block/blk-mq.c b/block/blk-mq.c
+index f5cce377f1a8..50fc1194ebc0 100644
+--- a/block/blk-mq.c
++++ b/block/blk-mq.c
+@@ -538,7 +538,7 @@ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ EXPORT_SYMBOL(blk_mq_alloc_request);
+ 
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+-	unsigned int op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
++	enum req_op op, blk_mq_req_flags_t flags, unsigned int hctx_idx)
+ {
+ 	struct blk_mq_alloc_data data = {
+ 		.q		= q,
+diff --git a/block/blk-wbt.c b/block/blk-wbt.c
+index 0c119be0e813..7bf09ae06577 100644
+--- a/block/blk-wbt.c
++++ b/block/blk-wbt.c
+@@ -670,7 +670,7 @@ u64 wbt_default_latency_nsec(struct request_queue *q)
+ 
+ static int wbt_data_dir(const struct request *rq)
+ {
+-	const int op = req_op(rq);
++	const enum req_op op = req_op(rq);
+ 
+ 	if (op == REQ_OP_READ)
+ 		return READ;
+diff --git a/block/blk.h b/block/blk.h
+index 8e79296ee97a..13b43fb28b9f 100644
+--- a/block/blk.h
++++ b/block/blk.h
+@@ -160,7 +160,7 @@ static inline bool blk_discard_mergable(struct request *req)
+ }
+ 
+ static inline unsigned int blk_queue_get_max_sectors(struct request_queue *q,
+-						     int op)
++						     enum req_op op)
+ {
+ 	if (unlikely(op == REQ_OP_DISCARD || op == REQ_OP_SECURE_ERASE))
+ 		return min(q->limits.max_discard_sectors,
+diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
+index e2d9daf7e8dd..45d69cc46dc7 100644
+--- a/include/linux/blk-mq.h
++++ b/include/linux/blk-mq.h
+@@ -713,7 +713,7 @@ enum {
+ struct request *blk_mq_alloc_request(struct request_queue *q, unsigned int op,
+ 		blk_mq_req_flags_t flags);
+ struct request *blk_mq_alloc_request_hctx(struct request_queue *q,
+-		unsigned int op, blk_mq_req_flags_t flags,
++		enum req_op op, blk_mq_req_flags_t flags,
+ 		unsigned int hctx_idx);
+ 
+ /*
+diff --git a/include/linux/blk_types.h b/include/linux/blk_types.h
+index 0e6a2af7ed3d..cce8768bc00b 100644
+--- a/include/linux/blk_types.h
++++ b/include/linux/blk_types.h
+@@ -522,7 +522,7 @@ static inline bool op_is_zone_mgmt(enum req_op op)
+ 	}
+ }
+ 
+-static inline int op_stat_group(unsigned int op)
++static inline int op_stat_group(enum req_op op)
+ {
+ 	if (op_is_discard(op))
+ 		return STAT_DISCARD;
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 94ceed805e76..3f8ee0608d60 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -886,7 +886,7 @@ extern void blk_queue_exit(struct request_queue *q);
+ extern void blk_sync_queue(struct request_queue *q);
+ 
+ /* Helper to convert REQ_OP_XXX to its string format XXX */
+-extern const char *blk_op_str(unsigned int op);
++extern const char *blk_op_str(enum req_op op);
+ 
+ int blk_status_to_errno(blk_status_t status);
+ blk_status_t errno_to_blk_status(int errno);
+@@ -1472,9 +1472,9 @@ static inline void blk_wake_io_task(struct task_struct *waiter)
+ }
+ 
+ unsigned long bdev_start_io_acct(struct block_device *bdev,
+-				 unsigned int sectors, unsigned int op,
++				 unsigned int sectors, enum req_op op,
+ 				 unsigned long start_time);
+-void bdev_end_io_acct(struct block_device *bdev, unsigned int op,
++void bdev_end_io_acct(struct block_device *bdev, enum req_op op,
+ 		unsigned long start_time);
+ 
+ void bio_start_io_acct_time(struct bio *bio, unsigned long start_time);
