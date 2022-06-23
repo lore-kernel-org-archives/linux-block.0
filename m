@@ -2,135 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D48BC43334
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 15:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 758F6CCA481
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 15:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230508AbiFWPyJ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 11:54:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58880 "EHLO
+        id S232023AbiFWP6S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 11:58:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35424 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232005AbiFWPyF (ORCPT
+        with ESMTP id S231879AbiFWP6Q (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 11:54:05 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05ACA2DAB7
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 08:54:04 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id e10so1668947wra.11
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 08:54:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=qmKNiEIYg43PRKcgMsCwOiMbNOijTgjI9sHdcMaEUrM=;
-        b=k/dvGPiZh9R8Hr+Gj5mmKyM7sWtdvrAuUTus62tZM3deRCqhkgc1IGm/ZGosDpcITI
-         Mar50qLk4Pv3WY2YfcMAUEBaPt0Pfc5rglmibE44yGIa1tfd+80oItL/cx0l6Ir93HpZ
-         PAbL8LoaLGCuQXIxoiJqH7Z+6moMrojBSrfCXEvCrWIZnS+KZkFpBGs6ayUhjmjblzce
-         K06p4y5PoN2taIwYM+VSAFSzSCcy6rMnBXGjZXFJMg5Ut/sCxa9T1QYAYzGZ85nP4vPp
-         pxJq3PYtOgprCgZXCoY8xTHlzsIuWLtk7RRl0D80mRy/fR7dJpOhxsDRGkdgfXYgsM7a
-         AV3Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qmKNiEIYg43PRKcgMsCwOiMbNOijTgjI9sHdcMaEUrM=;
-        b=EyFD0Cps4x+y00Ygx+xD5/ayFgPNRYuiuaSWuY6WlYERFlwhegsFv9a/REnpksWWOU
-         S63+kguLqsVmt7TXPZVledMX77MUjQ9lvKS5gryF7n0z7cVf6gDBQDR7hoxIqjMoDRmV
-         /M75KceuhtswRvXsvOM+/j1T011gEjwkbjNhf4xJZGA+DT7erOlemH2fBGjleeuTXaWM
-         y9NdhZfCIOHuar8IaEOyN/Eia4xmAhwaQs8YC8IZWEpS4JXBuk9tsMKsRNIqRvnxPF2f
-         0JJNweTAnnFONIxJ+feNjeebrnGT7TjBTdYGk5ufQuSueSB8VGVaK+Qn0g3U2P9p7uag
-         RKKw==
-X-Gm-Message-State: AJIora+wsfKuB7smZ6T5ha1vYvFp3LfB7Nso1UJvHb3oA9MPjemcZQbK
-        yyKx/t940hkrVMqTDZwN8IRXzw==
-X-Google-Smtp-Source: AGRyM1tlDKB4//vnmD35H76Yze2SgIUp5Sn7QaGS0tOiDDh2Fck0ueeOS0nGGJd0GklRKcYQ6EO1AQ==
-X-Received: by 2002:a5d:43cd:0:b0:21b:8e53:befe with SMTP id v13-20020a5d43cd000000b0021b8e53befemr8659922wrr.255.1655999642537;
-        Thu, 23 Jun 2022 08:54:02 -0700 (PDT)
-Received: from OPPO-A74.station (net-37-182-48-184.cust.vodafonedsl.it. [37.182.48.184])
-        by smtp.gmail.com with ESMTPSA id n10-20020adffe0a000000b0021b5861eaf7sm20650830wrr.3.2022.06.23.08.54.01
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 23 Jun 2022 08:54:02 -0700 (PDT)
-From:   Paolo Valente <paolo.valente@linaro.org>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        jack@suse.cz, andrea.righi@canonical.com, glen.valante@linaro.org,
-        arie.vanderhoeven@seagate.com, Davide Zini <davidezini2@gmail.com>,
-        Paolo Valente <paolo.valente@linaro.org>
-Subject: [PATCH 8/8] block, bfq: balance I/O injection among underutilized actuators
-Date:   Thu, 23 Jun 2022 17:53:35 +0200
-Message-Id: <20220623155335.6147-9-paolo.valente@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20220623155335.6147-1-paolo.valente@linaro.org>
-References: <20220623155335.6147-1-paolo.valente@linaro.org>
+        Thu, 23 Jun 2022 11:58:16 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4819B1759D;
+        Thu, 23 Jun 2022 08:58:15 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id E28DEB8246F;
+        Thu, 23 Jun 2022 15:58:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9ABDCC3411B;
+        Thu, 23 Jun 2022 15:58:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1655999892;
+        bh=IDUiBH6qH1G61loO2huDf8LDrhqI5TftKFjOpKwln1w=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JVJrrlgnMomsS9MtZpmtRr2uj/8AzIx2iwsVTXJVAr8pFXOrnVs0PxFj4GbnJAiLR
+         i3hsm34ZvTcj+8gCkkFWevl7WtqEE6fN4E49FstL2oXwqdd68yQsMOt84qntsMnrwq
+         8HEcPTcx42VlaTz/YMLQOiVLJjIdlVYH5f7P8ii0d6TiDBDik4p8+H27HPFVijnOCI
+         VQc/pkbEo3Zk2QP38sf90S/pZniGo8eX6u1ZkREK5z2xzyoK/R3fYyzAb8MfzqetVP
+         dKAK1VMswGbyWx37ibSEpANTAlWQ5eAAGaHsGmYm00yfANLr+7DQ7+cI/acQk5VJec
+         0rIRGNzt5630g==
+Date:   Thu, 23 Jun 2022 08:58:12 -0700
+From:   "Darrick J. Wong" <djwong@kernel.org>
+To:     Eric Biggers <ebiggers@kernel.org>
+Cc:     linux-fsdevel@vger.kernel.org, linux-ext4@vger.kernel.org,
+        linux-f2fs-devel@lists.sourceforge.net, linux-xfs@vger.kernel.org,
+        linux-api@vger.kernel.org, linux-fscrypt@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v3 1/8] statx: add direct I/O alignment information
+Message-ID: <YrSNlFgW6X4pUelg@magnolia>
+References: <20220616201506.124209-1-ebiggers@kernel.org>
+ <20220616201506.124209-2-ebiggers@kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220616201506.124209-2-ebiggers@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-From: Davide Zini <davidezini2@gmail.com>
+On Thu, Jun 16, 2022 at 01:14:59PM -0700, Eric Biggers wrote:
+> From: Eric Biggers <ebiggers@google.com>
+> 
+> Traditionally, the conditions for when DIO (direct I/O) is supported
+> were fairly simple.  For both block devices and regular files, DIO had
+> to be aligned to the logical block size of the block device.
+> 
+> However, due to filesystem features that have been added over time (e.g.
+> multi-device support, data journalling, inline data, encryption, verity,
+> compression, checkpoint disabling, log-structured mode), the conditions
+> for when DIO is allowed on a regular file have gotten increasingly
+> complex.  Whether a particular regular file supports DIO, and with what
+> alignment, can depend on various file attributes and filesystem mount
+> options, as well as which block device(s) the file's data is located on.
+> 
+> Moreover, the general rule of DIO needing to be aligned to the block
+> device's logical block size is being relaxed to allow user buffers (but
+> not file offsets) aligned to the DMA alignment instead
+> (https://lore.kernel.org/linux-block/20220610195830.3574005-1-kbusch@fb.com/T/#u).
+> 
+> XFS has an ioctl XFS_IOC_DIOINFO that exposes DIO alignment information.
+> Uplifting this to the VFS is one possibility.  However, as discussed
+> (https://lore.kernel.org/linux-fsdevel/20220120071215.123274-1-ebiggers@kernel.org/T/#u),
+> this ioctl is rarely used and not known to be used outside of
+> XFS-specific code.  It was also never intended to indicate when a file
+> doesn't support DIO at all, nor was it intended for block devices.
+> 
+> Therefore, let's expose this information via statx().  Add the
+> STATX_DIOALIGN flag and two new statx fields associated with it:
+> 
+> * stx_dio_mem_align: the alignment (in bytes) required for user memory
+>   buffers for DIO, or 0 if DIO is not supported on the file.
+> 
+> * stx_dio_offset_align: the alignment (in bytes) required for file
+>   offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
+>   on the file.  This will only be nonzero if stx_dio_mem_align is
+>   nonzero, and vice versa.
+> 
+> Note that as with other statx() extensions, if STATX_DIOALIGN isn't set
+> in the returned statx struct, then these new fields won't be filled in.
+> This will happen if the file is neither a regular file nor a block
+> device, or if the file is a regular file and the filesystem doesn't
+> support STATX_DIOALIGN.  It might also happen if the caller didn't
+> include STATX_DIOALIGN in the request mask, since statx() isn't required
+> to return unrequested information.
+> 
+> This commit only adds the VFS-level plumbing for STATX_DIOALIGN.  For
+> regular files, individual filesystems will still need to add code to
+> support it.  For block devices, a separate commit will wire it up too.
+> 
+> Signed-off-by: Eric Biggers <ebiggers@google.com>
+> ---
+>  fs/stat.c                 | 2 ++
+>  include/linux/stat.h      | 2 ++
+>  include/uapi/linux/stat.h | 4 +++-
+>  3 files changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/fs/stat.c b/fs/stat.c
+> index 9ced8860e0f35..a7930d7444830 100644
+> --- a/fs/stat.c
+> +++ b/fs/stat.c
+> @@ -611,6 +611,8 @@ cp_statx(const struct kstat *stat, struct statx __user *buffer)
+>  	tmp.stx_dev_major = MAJOR(stat->dev);
+>  	tmp.stx_dev_minor = MINOR(stat->dev);
+>  	tmp.stx_mnt_id = stat->mnt_id;
+> +	tmp.stx_dio_mem_align = stat->dio_mem_align;
+> +	tmp.stx_dio_offset_align = stat->dio_offset_align;
+>  
+>  	return copy_to_user(buffer, &tmp, sizeof(tmp)) ? -EFAULT : 0;
+>  }
+> diff --git a/include/linux/stat.h b/include/linux/stat.h
+> index 7df06931f25d8..ff277ced50e9f 100644
+> --- a/include/linux/stat.h
+> +++ b/include/linux/stat.h
+> @@ -50,6 +50,8 @@ struct kstat {
+>  	struct timespec64 btime;			/* File creation time */
+>  	u64		blocks;
+>  	u64		mnt_id;
+> +	u32		dio_mem_align;
+> +	u32		dio_offset_align;
 
-Upon the invocation of its dispatch function, BFQ returns the next I/O
-request of the in-service bfq_queue, unless some exception holds. One
-such exception is that there is some underutilized actuator, different
-from the actuator for which the in-service queue contains I/O, and
-that some other bfq_queue happens to contain I/O for such an
-actuator. In this case, the next I/O request of the latter bfq_queue,
-and not of the in-service bfq_queue, is returned (I/O is injected from
-that bfq_queue). To find such an actuator, a linear scan, in
-increasing index order, is performed among actuators.
+Hmm.  Does the XFS port of XFS_IOC_DIOINFO to STATX_DIOALIGN look like
+this?
 
-Performing a linear scan entails a prioritization among actuators: an
-underutilized actuator may be considered for injection only if all
-actuators with a lower index are currently fully utilized, or if there
-is no pending I/O for any lower-index actuator that happens to be
-underutilized.
+	struct xfs_buftarg	*target = xfs_inode_buftarg(ip);
 
-This commits breaks this prioritization and tends to distribute
-injection uniformly across actuators. This is obtained by adding the
-following condition to the linear scan: even if an actuator A is
-underutilized, A is however skipped if its load is higher than that of
-the next actuator.
+	kstat.dio_mem_align = target->bt_logical_sectorsize;
+	kstat.dio_offset_align = target->bt_logical_sectorsize;
+	kstat.result_mask |= STATX_DIOALIGN;
 
-Signed-off-by: Paolo Valente <paolo.valente@linaro.org>
-Signed-off-by: Davide Zini <davidezini2@gmail.com>
----
- block/bfq-iosched.c | 18 +++++++++++++-----
- 1 file changed, 13 insertions(+), 5 deletions(-)
+And I guess you're tabling the "optimal" IO discussions for now, because
+there are too many variants of what that means?
 
-diff --git a/block/bfq-iosched.c b/block/bfq-iosched.c
-index 80eb7d542b70..ee113d1b949f 100644
---- a/block/bfq-iosched.c
-+++ b/block/bfq-iosched.c
-@@ -4799,17 +4799,25 @@ struct bfq_queue *bfq_find_active_bfqq_for_actuator(struct bfq_data *bfqd,
- 
- /*
-  * Perform a linear scan of each actuator, until an actuator is found
-- * for which the following two conditions hold: the load of the
-- * actuator is below the threshold (see comments on actuator_load_threshold
-- * for details), and there is a queue that contains I/O for that
-- * actuator. On success, return that queue.
-+ * for which the following three conditions hold: the load of the
-+ * actuator is below the threshold (see comments on
-+ * actuator_load_threshold for details) and lower than that of the
-+ * next actuator (comments on this extra condition below), and there
-+ * is a queue that contains I/O for that actuator. On success, return
-+ * that queue.
-+ *
-+ * Performing a plain linear scan entails a prioritization among
-+ * actuators. The extra condition above breaks this prioritization and
-+ * tends to distribute injection uniformly across actuators.
-  */
- struct bfq_queue *bfq_find_bfqq_for_underused_actuator(struct bfq_data *bfqd)
- {
- 	int i;
- 
- 	for (i = 0 ; i < bfqd->num_ia_ranges; i++)
--		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold) {
-+		if (bfqd->rq_in_driver[i] < bfqd->actuator_load_threshold &&
-+		    (i == bfqd->num_ia_ranges - 1 ||
-+		     bfqd->rq_in_driver[i] < bfqd->rq_in_driver[i+1])) {
- 			struct bfq_queue *bfqq =
- 				bfq_find_active_bfqq_for_actuator(bfqd, i);
- 
--- 
-2.20.1
+--D
 
+>  };
+>  
+>  #endif
+> diff --git a/include/uapi/linux/stat.h b/include/uapi/linux/stat.h
+> index 1500a0f58041a..7cab2c65d3d7f 100644
+> --- a/include/uapi/linux/stat.h
+> +++ b/include/uapi/linux/stat.h
+> @@ -124,7 +124,8 @@ struct statx {
+>  	__u32	stx_dev_minor;
+>  	/* 0x90 */
+>  	__u64	stx_mnt_id;
+> -	__u64	__spare2;
+> +	__u32	stx_dio_mem_align;	/* Memory buffer alignment for direct I/O */
+> +	__u32	stx_dio_offset_align;	/* File offset alignment for direct I/O */
+>  	/* 0xa0 */
+>  	__u64	__spare3[12];	/* Spare space for future expansion */
+>  	/* 0x100 */
+> @@ -152,6 +153,7 @@ struct statx {
+>  #define STATX_BASIC_STATS	0x000007ffU	/* The stuff in the normal stat struct */
+>  #define STATX_BTIME		0x00000800U	/* Want/got stx_btime */
+>  #define STATX_MNT_ID		0x00001000U	/* Got stx_mnt_id */
+> +#define STATX_DIOALIGN		0x00002000U	/* Want/got direct I/O alignment info */
+>  
+>  #define STATX__RESERVED		0x80000000U	/* Reserved for future struct statx expansion */
+>  
+> -- 
+> 2.36.1
+> 
