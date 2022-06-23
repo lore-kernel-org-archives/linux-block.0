@@ -2,171 +2,176 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AADFDC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 12:27:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5E3EC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 12:33:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231318AbiFWM1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 08:27:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42116 "EHLO
+        id S229967AbiFWMd5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 08:33:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229741AbiFWM1R (ORCPT
+        with ESMTP id S229721AbiFWMd4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:27:17 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B7D3CA40;
-        Thu, 23 Jun 2022 05:27:15 -0700 (PDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LTKHg0JJqzDsPx;
-        Thu, 23 Jun 2022 20:26:39 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 23 Jun 2022 20:27:13 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 23 Jun 2022 20:27:12 +0800
-Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
- updates
-To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
-CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
-        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
-References: <20220528064330.3471000-1-yukuai3@huawei.com>
- <20220528064330.3471000-5-yukuai3@huawei.com>
- <20220622172621.GA28246@blackbody.suse.cz>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <f5165488-2461-8946-593f-14154e404850@huawei.com>
-Date:   Thu, 23 Jun 2022 20:27:11 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Thu, 23 Jun 2022 08:33:56 -0400
+Received: from esa1.hgst.iphmx.com (esa1.hgst.iphmx.com [68.232.141.245])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB9413CFD3
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 05:33:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+  t=1655987635; x=1687523635;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=Ti2q0wk2ZWYnRbkB1WgOD+HQBNawNjCWpHEm2xXI6EM=;
+  b=Qen8aHTtjckIycMcAMceuobYrEYYElqHQ54JR0D4sVF5sVpc2GyXSl23
+   nXYlONXeI/aVv90Qkq7aEBMInb8YZWvtXjWPrNLAMENE0oaZsK1e34vg5
+   OyAl8MIugzfqKInQzF4AUgHz3a5Y7C98HD/ijrlro94ShvZuKljIVTnz8
+   F+5p2dKcwein4/SogpmLrTvaVJYcJX7SxaB+OLrN7wYu024iEdEeNsWJg
+   TKZJ9TRGRo/Is6wM/keaRwtFCwy8PKpbHYYxKIliEhcN1UKyTRRQLLXSE
+   RQzjSJFmbeY+tj5TEhddhRD7yGx6JvQ5j0Cbn6qmzS8t/02S4E3BFWT4a
+   Q==;
+X-IronPort-AV: E=Sophos;i="5.92,216,1650902400"; 
+   d="scan'208";a="316023466"
+Received: from mail-dm6nam12lp2177.outbound.protection.outlook.com (HELO NAM12-DM6-obe.outbound.protection.outlook.com) ([104.47.59.177])
+  by ob1.hgst.iphmx.com with ESMTP; 23 Jun 2022 20:33:54 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DF+4Z+fgro0YcjlXTR9PY82ql92zENVApSgKGjyj1fiR43tK3ayrlrkn1tMG7QLTRhDw4Xo6XCHcmpHG9LHhB+hu4cWv15i6KpnHNXWj1tLfqM89GAfniK6qAHZ86c/mwVIqtNkd4VdBc7pjiWmDaKzShnKg2eG6NY7LsO+s9Z+0LgNVTKvyIDNqGNSg/suQ8bY3HwnGVFbxikNnyECFab1XPbUG9NdqNqa2d6TlEFvmgYfcR8CsU3QsnGIz82myMCh23ywyCdFKjfWkEHsH3Up7LB6Hxo7KaHlykNOHRk1qd7crK8Irkl8m9f9twVuN0iOLU8CrQfhG5sU3dzaXhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Ti2q0wk2ZWYnRbkB1WgOD+HQBNawNjCWpHEm2xXI6EM=;
+ b=m6FkzwWqwKSg0xzl2sfPRNmy0BMNFnhWRZCj9loXB2UizcG/cJ6GapQXPju651hufpzenzLBlegXoOO0ZqydSGHpvToGiVNRDjfHxmKk/iFb7iw/oFMLc8xxNF0mxydborJ6Xx4adGlTcEAnqgMXdMZE7xk44+i1sCzOOVVr8JU+SqqKPS8FZY0IO3700uIWvdsjdDSmlp+rGssJ3XuGlVlegxyT4FlKr6mWtFGjxw95quQpn2jn5X8OlPSnjvC/fqpDUINBu/xsz1/6rcc2Nz+9BJabwQ3PCMYbYmZafKAzDDLnRccFOpTcYZ1xqkVm6QymlK3lfLanOZH4oGrdjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
+ header.d=wdc.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Ti2q0wk2ZWYnRbkB1WgOD+HQBNawNjCWpHEm2xXI6EM=;
+ b=VM4jfWMauqCnrGuF/Ub83WWzzWsewWL/nx1JjOA491O7WuSNnMcoO5MmysHTwmIk6WX/QADaIkE/9rM0o25Mv7phxEEA9+7Ii83lRapQcVqqAFgQgh3b7KoxkKLoyDeZ0LAJhB5QxNlPMAKnq65ok+HhByc0eeVwF8NBh2ykGMc=
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
+ BYAPR04MB4776.namprd04.prod.outlook.com (2603:10b6:a03:11::19) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.5373.15; Thu, 23 Jun 2022 12:33:53 +0000
+Received: from DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
+ ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5353.022; Thu, 23 Jun 2022
+ 12:33:53 +0000
+From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+To:     Jens Axboe <axboe@kernel.dk>
+CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Dylan Yudaken <dylany@fb.com>
+Subject: Re: [PATCH] block: pop cached rq before potentially blocking
+ rq_qos_throttle()
+Thread-Topic: [PATCH] block: pop cached rq before potentially blocking
+ rq_qos_throttle()
+Thread-Index: AQHYhYkGlgdmJpOCC0mS4qhKsmFu+61cswuAgAA02ICAAAgIAA==
+Date:   Thu, 23 Jun 2022 12:33:53 +0000
+Message-ID: <20220623123352.xhncr4rzdcmpg5i4@shindev>
+References: <65187802-413a-7425-234e-68cf0b281a91@kernel.dk>
+ <20220623085559.csg72pmamhwgkcbx@shindev>
+ <394d2490-def0-30c0-7341-983bc93b8c57@kernel.dk>
+In-Reply-To: <394d2490-def0-30c0-7341-983bc93b8c57@kernel.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=wdc.com;
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 5ed475df-6869-4690-257d-08da5514a225
+x-ms-traffictypediagnostic: BYAPR04MB4776:EE_
+x-microsoft-antispam-prvs: <BYAPR04MB4776F82C12547C0C52CCBF80EDB59@BYAPR04MB4776.namprd04.prod.outlook.com>
+wdcipoutbound: EOP-TRUE
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: Tzaimr6kpa/eY8q0tK32mu0yo4NyRnbyQaF3ubk8kAFtNIdoePOnq5KrVlFxjg4r8YeYM00TQV/kNDNrOXgYiPhN534woTCZbVEpEE0AoASbxP8iYppc+4SlJ0u11LHCFEI8RRAPKKa4D44TuU7d8FgXYsNwLfqCE6h1bYvh8ZFDTPPOl7vPXoEmXobToDwsIqSIfpxHxL4BV6zOqHde3X4ZJd+4QftVLmEHU4PNtEh/sGUe7vm/bkPIEYwQtarI1itxRri15qOzI+fEhob7DfUURvlz4X58J6FS7XbrcQGHwrgGsg6KzDY6mkiSZofe/S/+qCnVF+zxmVjEZZd67q+uk7Y7eYeOVtfXU5WGV5Z8zlCbvw/KNN9I7YyfH8wi/NxQASKQyS9vd8JY1fh+guRqTHl9cTB95ysm9WFsrNM1IS8gi5cpcWvg37VDbf1Dtng6fC8BHQNGg8FX9C7H+AdfQn36DGqWYsCDXij3q2vsoyqJTzu0hngkoMG3XoHZUafCj63RIZWOPTYn3WBgtmEFeHKzxrCAYEttgjEbxY/vqTL8za8aTzwRZy2Y6HFLB5v2greH4c2d3dcFTPhDD8pXee2X7uhMbW1QrxU72o1ZD6MFtun2DPIGOJFyTP0/IIqFiY+Wykc6dWqL7e7D6m0axomnm0kl0Msct7iGimeyzvLjbfa6sTfHK6rjbTO0xvyL7m64B32djAZZWP+0upo6atOJNIU5fyTUIdJqp6pRalcl8k1is9VOeIfhGyxIJ7RHZRbejIeTwyEGNmpxbQ==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(7916004)(4636009)(366004)(39860400002)(136003)(376002)(396003)(346002)(9686003)(6512007)(316002)(82960400001)(71200400001)(6506007)(33716001)(1076003)(26005)(44832011)(2906002)(41300700001)(54906003)(38070700005)(6916009)(6486002)(53546011)(478600001)(66946007)(8676002)(66446008)(64756008)(66476007)(66556008)(4326008)(76116006)(86362001)(83380400001)(91956017)(5660300002)(122000001)(8936002)(186003)(38100700002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?enpSclGYOWC/ttM6k9aMaxq+O+pVhfRl1tsvnB//GoL7AdQDAge0Y7qjXCOI?=
+ =?us-ascii?Q?f0RGqTmn/36GBPoOjETWwgcDCCEep1h8K8khBPumfhdAgtofye6GeuneZ1W6?=
+ =?us-ascii?Q?n1ze7M6x0V9u3RlP5GUXIDH3ZGJBqTTqkjzNLTeuotyJ4rHmOudaFNJbTNal?=
+ =?us-ascii?Q?pcJHlLTxAuXMsJBE3ZUHN8Cl2JCHcBsspVjhJBgrzzy4X8+SSUD83mG9OMDT?=
+ =?us-ascii?Q?JsUTT2GH3WPLh4BTuEeINYQQPTxjlboPX5GQJ1zVSRtRv1wnaslqu7XClXd3?=
+ =?us-ascii?Q?nuUYeT01avCsJDK7tIfebIgTlvPir5NT5K/VQWxa7q9A4HUC6uhMNPSW/fJq?=
+ =?us-ascii?Q?V8B9zXnM8UGy6vyPxYsvHZaBr4pCcs6w52yD/p64i4ZpZYhV8hBnvtrl3GPs?=
+ =?us-ascii?Q?nwaPrJaQTPibFobONna8dwRaIPRYWlENuxIHs3ZejY4Tep4DjWVkXbEXxdpq?=
+ =?us-ascii?Q?l1KMYOqd0nlEXVSCfYKbZz0HEk0K7yD+ICtw1uOrpRp7RBvYhaSmmgBXn9Wa?=
+ =?us-ascii?Q?A7FWroB4G9+O9ERoJLLDZsUHI8AdzIjqh9zMonZPqQcejNamWfKXU/EAUWBH?=
+ =?us-ascii?Q?/1xpKw+aMFczdhrCaBnCCX0FYroaDjeYuTpLc/SujECDzijKmlKXWeuUN0Gx?=
+ =?us-ascii?Q?VoB+IOiBq07U6eT5V74wLpxbTYKde0G4fxBV4OlKbDYHRHpZEN3pli+kK8IL?=
+ =?us-ascii?Q?0MQz+aCfU2QQtoa/eBXEFpJ4uy8Hd6pXYiYwR1j5spijMryj9hTxuUJfjlPO?=
+ =?us-ascii?Q?n4n8ZFOCE0HUEEdzcJnqDGVT5J7YIJdAYAHh3CxJyOqSSmS8tlMlZBzslOrm?=
+ =?us-ascii?Q?xMEtC3pJzLmJSlgzwukztKBBqkl88cHSFK3zbRYw6/iwFH4k32BVxKo4J3d9?=
+ =?us-ascii?Q?Shy/lmKUrMZv2Sw1SU4Rcev3WLAWoBUDvCx97ZkzdNKjxymD9eKspMuI3qPv?=
+ =?us-ascii?Q?8suAzKlBVvvkcTM0/VH6XEqlW7A73xIcjv3+JL3MZAUMkVpLRMuaSki+yE/U?=
+ =?us-ascii?Q?lSADiLnwkcAQI6kTtLQahJ/ge6cEthKpXaBwCU0hU1ccdOpCWs0pEPCsX2e2?=
+ =?us-ascii?Q?BRgQHFY0bBJLyUjVflmT5ZGSuz9dp4bD1Lx6difQvZyQQuketv/Gu7Nq1/rB?=
+ =?us-ascii?Q?8ozORL3Q3Q7TCGQoGqrpM6ogXx1zDz023OPq9IRX9C4wNjtb5zRMws7H6SdM?=
+ =?us-ascii?Q?rERcJSZuin47oE1lCyJ8JdVxwsbtgTEwFI8XtyDUItVQanKOMJjpKW6HY3ve?=
+ =?us-ascii?Q?z+GUR9zPuU5kWxih6fL+K2OoKY2lKx9YKByeBE/+3ilzd8P2mkqzXxuN/7zW?=
+ =?us-ascii?Q?6RRyfd3lQUedPS/xC064nzY8H3FEi9FySdrDhzHe/ojD094ZFYCEWy38H3zj?=
+ =?us-ascii?Q?8AfZhS6GWXEzYolSTEZmarCKl1EQuK3RMZZ0S8jskF38eZpTMlAFK0Lg/rME?=
+ =?us-ascii?Q?3Dqs44al7mQ3HcHWI9L2N70h0+VeHZ2MICA6JvehxVd6E4Qmwn7vN+UD02tS?=
+ =?us-ascii?Q?yMuOJ2TyjXqDPu7ruBvq7+VPCrX4PJy0tijBGsJk6R9XlCz7spIiSCo7SX6L?=
+ =?us-ascii?Q?BQSMqidNn2v20SXgXwoHaXdghSrAMvoaHb3Avx1J9jp7iN6Vm0XpM+B54sz2?=
+ =?us-ascii?Q?fjj/e8XzJw7+zriLh3J9vIpe7y9d3/XvUcmtgSx6vtfJsj0c5k8/GpVYyx19?=
+ =?us-ascii?Q?BBw0ZW73/Iq4/uEgJjtEVVfLJ7IfNe0fgVVEiiAXLpaQl+8+rjJNCLx18/xy?=
+ =?us-ascii?Q?eQvc+TWXyLj3fYB6tvZWFoIGGK72ehiaXV8iVxS6hLZUjdOCymFK?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <A439297951F39B4DACD6DDF15F846A3E@namprd04.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-In-Reply-To: <20220622172621.GA28246@blackbody.suse.cz>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+X-OriginatorOrg: wdc.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5ed475df-6869-4690-257d-08da5514a225
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2022 12:33:53.4084
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: h2/ZoTljHgIvljtf3GVRgLwz5lMgKP43pjfClJA/mzU+yxOS+8XIMDJ9UmVt4YlxJ1MMKvGWa5gKjPYVsZMvQyHrSOm+gzNr8fVwQqC3KwM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BYAPR04MB4776
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+On Jun 23, 2022 / 06:05, Jens Axboe wrote:
+> On 6/23/22 2:56 AM, Shinichiro Kawasaki wrote:
+> > On Jun 21, 2022 / 10:07, Jens Axboe wrote:
+> >> If rq_qos_throttle() ends up blocking, then we will have invalidated a=
+nd
+> >> flushed our current plug. Since blk_mq_get_cached_request() hasn't
+> >> popped the cached request off the plug list just yet, we end holding a
+> >> pointer to a request that is no longer valid. This insta-crashes with
+> >> rq->mq_hctx being NULL in the validity checks just after.
+> >>
+> >> Pop the request off the cached list before doing rq_qos_throttle() to
+> >> avoid using a potentially stale request.
+> >>
+> >> Fixes: 0a5aa8d161d1 ("block: fix blk_mq_attempt_bio_merge and rq_qos_t=
+hrottle protection")
+> >> Reported-by: Dylan Yudaken <dylany@fb.com>
+> >> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+> >=20
+> > Thank you for the fix and sorry for the trouble. The patch passed my te=
+st set:
+> >=20
+> > Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> >=20
+> >=20
+> > BTW, may I know the workload or script which triggers the failure? I'm
+> > interested in if we can add a blktests test case to exercises qos throt=
+tle
+> > and prevent similar bugs in the future.
+>=20
+> Not sure if there are others, but specifically blk-iocost will do an
+> explicit schedule() for some conditions. See the bottom of
+> ioc_rqos_throttle().
 
-在 2022/06/23 1:26, Michal Koutný 写道:
-> (Apologies for taking so long before answering.)
-> 
-> On Sat, May 28, 2022 at 02:43:26PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
->> Some simple test:
->> 1)
->> cd /sys/fs/cgroup/blkio/
->> echo $$ > cgroup.procs
->> echo "8:0 2048" > blkio.throttle.write_bps_device
->> {
->>          sleep 2
->>          echo "8:0 1024" > blkio.throttle.write_bps_device
->> } &
->> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
->>
->> 2)
->> cd /sys/fs/cgroup/blkio/
->> echo $$ > cgroup.procs
->> echo "8:0 1024" > blkio.throttle.write_bps_device
->> {
->>          sleep 4
->>          echo "8:0 2048" > blkio.throttle.write_bps_device
->> } &
->> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
->>
->> test results: io finish time
->> 	before this patch	with this patch
->> 1)	10s			6s
->> 2)	8s			6s
-> 
-> I agree these are consistent and correct times.
-> 
-> And the new implementation won't make it worse (in terms of delaying a
-> bio) than configuring minimal limits from the beginning, AFACT.
-> 
->> @@ -801,7 +836,8 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
->>   
->>   	/* Round up to the next throttle slice, wait time must be nonzero */
->>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
->> -	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
->> +	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
->> +		     tg->io_skipped[rw];
->>   	if (tg->io_disp[rw] + 1 <= io_allowed) {
->>   		if (wait)
->>   			*wait = 0;
->> @@ -838,7 +874,8 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
->>   		jiffy_elapsed_rnd = tg->td->throtl_slice;
->>   
->>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
->> -	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
->> +	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
->> +			tg->bytes_skipped[rw];
->>   	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
->>   		if (wait)
->>   			*wait = 0;
->>
-> 
-> Here we may allow to dispatch a bio above current slice's
-> calculate_bytes_allowed() if bytes_skipped is already >0.
+Thanks. Will try to create a script which triggers the schedule() in
+ioc_rqos_throttle().
 
-Hi, I don't expect that to happen. For example, if a bio is still
-throttled, then old slice is keeped with proper 'bytes_skipped',
-then new wait time is caculated based on (bio_size - bytes_skipped).
-
-After the bio is dispatched(I assum that other bios can't preempt),
-if new slice is started, then 'bytes_skipped' is cleared, there should
-be no problem; If old slice is extended, note that we only wait
-for 'bio_size - bytes_skipped' bytes, while 'bio_size' bytes is added
-to 'tg->bytes_disp'. I think this will make sure new bio won't be
-dispatched above slice.
-
-What do you think?
-> 
-> bytes_disp + bio_size <= calculate_bytes_allowed() + bytes_skipped
-> 
-> Then on the next update
-> 
->> [shuffle]
->> +static void __tg_update_skipped(struct throtl_grp *tg, bool rw)
->> +{
->> +	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
->> +	u64 bps_limit = tg_bps_limit(tg, rw);
->> +	u32 iops_limit = tg_iops_limit(tg, rw);
->> +
->> +	if (bps_limit != U64_MAX)
->> +		tg->bytes_skipped[rw] +=
->> +			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
->> +			tg->bytes_disp[rw];
->> +	if (iops_limit != UINT_MAX)
->> +		tg->io_skipped[rw] +=
->> +			calculate_io_allowed(iops_limit, jiffy_elapsed) -
->> +			tg->io_disp[rw];
->> +}
-> 
-> the difference(s) here could be negative. bytes_skipped should be
-> reduced to account for the additionally dispatched bio.
-> This is all unsigned so negative numbers underflow, however, we add them
-> again to the unsigned, so thanks to modular arithmetics the result is
-> correctly updated bytes_skipped.
-> 
-> Maybe add a comment about this (unsigned) intention?
-
-Of course I can do that.
-> 
-> (But can this happen? The discussed bio would have to outrun another bio
-> (the one which defined the current slice_end) but since blk-throttle
-> uses queues (FIFO) everywhere this shouldn't really happen. But it's
-> good to know this works as intended.)
-I can also mention that in comment.
-> 
-> This patch can have
-> Reviewed-by: Michal Koutný <mkoutny@suse.com>
-> 
-
-Thanks for the review!
-Kuai
+--=20
+Shin'ichiro Kawasaki=
