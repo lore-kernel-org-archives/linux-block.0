@@ -2,56 +2,56 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E650C43334
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 07:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D139C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 07:20:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230211AbiFWHU2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 03:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40216 "EHLO
+        id S230110AbiFWHU5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 03:20:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230242AbiFWHUV (ORCPT
+        with ESMTP id S229476AbiFWHU4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 03:20:21 -0400
-Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 832E94615D
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 00:20:20 -0700 (PDT)
-Received: by mail-ed1-x52f.google.com with SMTP id e2so16268196edv.3
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 00:20:20 -0700 (PDT)
+        Thu, 23 Jun 2022 03:20:56 -0400
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6729245AFB
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 00:20:55 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id ay16so19759124ejb.6
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 00:20:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=ionos.com; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=9n8dWAkPONYR4qOZyO/F0+9bLbexCmrnFGFIthi2GzY=;
-        b=amgWEbOm74LoYyS5RhPLzQG30LZVrXilN4+pxHZoIeJuS+HmIAhBI0tH5ErpYYD2Bk
-         levUEyD0FMzlngpxvIifcqBhd2mfrjeMkfKEbWTDxvTF8FURHx72wrNGbc5OP/b6tpXW
-         /7yVIEK4xnFMTCZeVxSEiPr28yO31+GqJKtkFNt/4M9GrRg4X4Lz3iqevxgi8QSdx1Es
-         txicYsduagkLyCvm2tFOK4EQHbJXe+6TpQpA8wERl1O9JuEFDiR4Xmgz3CRfXzhc5a1z
-         hfqFfzcc2uP6dYzxCz3WaTgm1z7aea8lXpMLRK3tyEZa0sbuPerkh/ssDKr9RzpWXtdN
-         4Kuw==
+        bh=ycA/WnTh3/ADN2YY5V61t9U1nxvBTz6zvuIq7PfwWX4=;
+        b=Dv9QzrvWijckOHORuQwyjtLLJdyScOUqXZvbm/hksyMSU03P2oQiskw8GPLGrBUvuX
+         wHuzhlknygLE5JW+lKQB6dQ/Ak2gs4zlzYvi3I77IKy73GRAP32cQt1DtNsSEg0mU7W/
+         nB7Q+kEleE3AAlaE/vtf56zhdlmsIhnYFJNj6bLdTSQEkgKLhL6gY6joplFKrv1nBt0y
+         8UOZERVscDKPznYJV67AOvuAEIpEmaLqDyOSxa90YNWRwGzWYDMp7mTGPRhQNsqFZNXP
+         dSjQm1ED31OUQEW3JIGUDF/v36L3BcTnRgxzMOaAEM4kqiWW9Ax0j0JI3yxTvaPWECls
+         rM8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=9n8dWAkPONYR4qOZyO/F0+9bLbexCmrnFGFIthi2GzY=;
-        b=bbbpM4wM7On7gHj8HpoOwjBnWlloyXH0l5yiTIxMOwD3fs4eLRIqpGPLvCwRghVw1m
-         Ju1LxXtcjV4FtP7F7QvN3A+SHuAG1Zbl4QrKkrTrJyN7Hvya1n5YflLKzW5YPrhGP/Vq
-         Ox6FomN331aapK8A9uVUOMzZkCznYGM5V9raWELv12bp7MRC5lR25DOXXMagBZwOzYh3
-         0OxL5gqVf+aeP1vlZrwE1EUwrTskPPsi6D8BbWn41EnhxQXiG75QcieDiAxCFcbdIS62
-         xBdbRQPAyPAdS4Nv4NDoELg4fBZ78jfNOYd9bqnn6OcE+xkYlx8aVP20mZPFQYBqkU9P
-         wAKA==
-X-Gm-Message-State: AJIora/dDS2BznSc4+sioCM/lIJSwyyTJ/sAGWD+sYgH0sxWAuC1Pszy
-        oM7E/fOk/lP7Hz/eXsiIXmZFUGKWw7CM0/IcDTFtRQ==
-X-Google-Smtp-Source: AGRyM1vtZEXFvolGG1jT0IjK+SZlJ7yAThBH1NuOEK546ughggx7LwzKVlPzQI3nfKi9qWEZUzmNOncP7OXzaWh4rYo=
-X-Received: by 2002:a05:6402:42d5:b0:433:1727:b31c with SMTP id
- i21-20020a05640242d500b004331727b31cmr8849484edc.9.1655968819022; Thu, 23 Jun
- 2022 00:20:19 -0700 (PDT)
+        bh=ycA/WnTh3/ADN2YY5V61t9U1nxvBTz6zvuIq7PfwWX4=;
+        b=WdzOiQKYyQblBqLj/yZ3J2ZzmqTJGSHN+fw3zJKclEDKimjQZkxtR2Qv6j8gbbl8dW
+         sKlccvczodKoNXVJMm5DsAabo0EsDtJdlLlSlzTo74303dEbIo5KNTAuiCmghiwnVawg
+         1FeY7xgJz58eY31W+rpmX0x4ED19gaxglxuW3bq9sodxCNujxDXYU1os5uOMoCOzCrA7
+         x0bY1XFrUJKWtdRngFxWDjjme9JBTpaKalgG7IswTMz46CRoPPfCZFT1EpPW5pkuV6IN
+         Cg1y8jSp7vcQIrjQFl0Cu9Ki2brRicuAtIxq54CI5rzXxBKLG84UZu7MSac4zBBNqPNM
+         ZCVA==
+X-Gm-Message-State: AJIora/mqzUmd5ZvdJvRVO1T9XNe+7d5jNZhTYxzo4WkBLHpZ8uRdR+w
+        lUoLF4V9HvWsnfcsUYDfwv/mRoAd9x6NWfDfAuZ9tA==
+X-Google-Smtp-Source: AGRyM1u/th4RrEL22BcBwqyQjUBazuHhg02xA9aSziNz58L295fC9Y3GuUaDZmUgwQ5N49LSer0ydzPCYu0X5K9VP5Q=
+X-Received: by 2002:a17:907:7da5:b0:711:c9cd:61e0 with SMTP id
+ oz37-20020a1709077da500b00711c9cd61e0mr6938713ejc.443.1655968853940; Thu, 23
+ Jun 2022 00:20:53 -0700 (PDT)
 MIME-Version: 1.0
-References: <20220623062116.15976-1-guoqing.jiang@linux.dev> <20220623062116.15976-2-guoqing.jiang@linux.dev>
-In-Reply-To: <20220623062116.15976-2-guoqing.jiang@linux.dev>
+References: <20220623062116.15976-1-guoqing.jiang@linux.dev> <20220623062116.15976-7-guoqing.jiang@linux.dev>
+In-Reply-To: <20220623062116.15976-7-guoqing.jiang@linux.dev>
 From:   Jinpu Wang <jinpu.wang@ionos.com>
-Date:   Thu, 23 Jun 2022 09:20:08 +0200
-Message-ID: <CAMGffE=xzE86vuju4mpJtETMF1B-aC=K2Kn6VtN94ZCFKbU_Mw@mail.gmail.com>
-Subject: Re: [PATCH V1 1/8] rnbd-clt: open code send_msg_open in rnbd_clt_map_device
+Date:   Thu, 23 Jun 2022 09:20:43 +0200
+Message-ID: <CAMGffEnFbdPWaBzW6htXkH1F6yudPBioAJK_58nNFT-Ln1-SHw@mail.gmail.com>
+Subject: Re: [PATCH V1 6/8] rnbd-clt: check capacity inside rnbd_clt_change_capacity
 To:     Guoqing Jiang <guoqing.jiang@linux.dev>
 Cc:     haris.iqbal@ionos.com, axboe@kernel.dk, linux-block@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
@@ -59,80 +59,49 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 8:21 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
+On Thu, Jun 23, 2022 at 8:22 AM Guoqing Jiang <guoqing.jiang@linux.dev> wrote:
 >
-> Let's open code it in rnbd_clt_map_device, then we can use information
-> from rsp to setup gendisk and request_queue in next commits. After that,
-> we can remove some members (wc, fua and max_hw_sectors etc) from struct
-> rnbd_clt_dev.
+> Currently, process_msg_open_rsp checks if capacity changed or not before
+> call rnbd_clt_change_capacity while the checking also make sense for
+> rnbd_clt_resize_dev_store, let's move the checking into the function.
 >
 > Signed-off-by: Guoqing Jiang <guoqing.jiang@linux.dev>
 Acked-by: Jack Wang <jinpu.wang@ionos.com>
 > ---
->  drivers/block/rnbd/rnbd-clt.c | 43 +++++++++++++++++++++++++++++++++--
->  1 file changed, 41 insertions(+), 2 deletions(-)
+>  drivers/block/rnbd/rnbd-clt.c | 13 +++++++------
+>  1 file changed, 7 insertions(+), 6 deletions(-)
 >
 > diff --git a/drivers/block/rnbd/rnbd-clt.c b/drivers/block/rnbd/rnbd-clt.c
-> index 409c76b81aed..9e9aeba86d33 100644
+> index da2ba9477b1e..a9bfab53bbf7 100644
 > --- a/drivers/block/rnbd/rnbd-clt.c
 > +++ b/drivers/block/rnbd/rnbd-clt.c
-> @@ -1562,7 +1562,14 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
+> @@ -71,6 +71,12 @@ static inline bool rnbd_clt_get_dev(struct rnbd_clt_dev *dev)
+>  static int rnbd_clt_change_capacity(struct rnbd_clt_dev *dev,
+>                                     size_t new_nsectors)
 >  {
->         struct rnbd_clt_session *sess;
->         struct rnbd_clt_dev *dev;
-> -       int ret;
-> +       int ret, errno;
-> +       struct rnbd_msg_open_rsp *rsp;
-> +       struct rnbd_msg_open msg;
-> +       struct rnbd_iu *iu;
-> +       struct kvec vec = {
-> +               .iov_base = &msg,
-> +               .iov_len  = sizeof(msg)
-> +       };
+> +       if (get_capacity(dev->gd) == new_nsectors)
+> +               return 0;
+> +
+> +       /*
+> +        * If the size changed, we need to revalidate it
+> +        */
+>         rnbd_clt_info(dev, "Device size changed from %llu to %zu sectors\n",
+>                       get_capacity(dev->gd), new_nsectors);
+>         set_capacity_and_notify(dev->gd, new_nsectors);
+> @@ -93,12 +99,7 @@ static int process_msg_open_rsp(struct rnbd_clt_dev *dev,
+>         if (dev->dev_state == DEV_STATE_MAPPED_DISCONNECTED) {
+>                 u64 nsectors = le64_to_cpu(rsp->nsectors);
 >
->         if (exists_devpath(pathname, sessname))
->                 return ERR_PTR(-EEXIST);
-> @@ -1582,7 +1589,39 @@ struct rnbd_clt_dev *rnbd_clt_map_device(const char *sessname,
->                 ret = -EEXIST;
->                 goto put_dev;
->         }
-> -       ret = send_msg_open(dev, RTRS_PERMIT_WAIT);
-> +
-> +       rsp = kzalloc(sizeof(*rsp), GFP_KERNEL);
-> +       if (!rsp) {
-> +               ret = -ENOMEM;
-> +               goto del_dev;
-> +       }
-> +
-> +       iu = rnbd_get_iu(sess, RTRS_ADMIN_CON, RTRS_PERMIT_WAIT);
-> +       if (!iu) {
-> +               ret = -ENOMEM;
-> +               kfree(rsp);
-> +               goto del_dev;
-> +       }
-> +       iu->buf = rsp;
-> +       iu->dev = dev;
-> +       sg_init_one(iu->sgt.sgl, rsp, sizeof(*rsp));
-> +
-> +       msg.hdr.type    = cpu_to_le16(RNBD_MSG_OPEN);
-> +       msg.access_mode = dev->access_mode;
-> +       strscpy(msg.dev_name, dev->pathname, sizeof(msg.dev_name));
-> +
-> +       WARN_ON(!rnbd_clt_get_dev(dev));
-> +       ret = send_usr_msg(sess->rtrs, READ, iu,
-> +                          &vec, sizeof(*rsp), iu->sgt.sgl, 1,
-> +                          msg_open_conf, &errno, RTRS_PERMIT_WAIT);
-> +       if (ret) {
-> +               rnbd_clt_put_dev(dev);
-> +               rnbd_put_iu(sess, iu);
-> +               kfree(rsp);
-> +       } else {
-> +               ret = errno;
-> +       }
-> +       rnbd_put_iu(sess, iu);
->         if (ret) {
->                 rnbd_clt_err(dev,
->                               "map_device: failed, can't open remote device, err: %d\n",
+> -               /*
+> -                * If the device was remapped and the size changed in the
+> -                * meantime we need to revalidate it
+> -                */
+> -               if (get_capacity(dev->gd) != nsectors)
+> -                       rnbd_clt_change_capacity(dev, nsectors);
+> +               rnbd_clt_change_capacity(dev, nsectors);
+>                 gd_kobj = &disk_to_dev(dev->gd)->kobj;
+>                 kobject_uevent(gd_kobj, KOBJ_ONLINE);
+>                 rnbd_clt_info(dev, "Device online, device remapped successfully\n");
 > --
 > 2.34.1
 >
