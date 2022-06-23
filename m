@@ -2,50 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB926C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66ABAC43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229921AbiFWTBw (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:01:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46758 "EHLO
+        id S230340AbiFWTBx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232166AbiFWTBi (ORCPT
+        with ESMTP id S230181AbiFWTBj (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:01:38 -0400
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65BE51B2
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:46 -0700 (PDT)
-Received: by mail-pl1-f173.google.com with SMTP id k7so18835975plg.7
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:46 -0700 (PDT)
+        Thu, 23 Jun 2022 15:01:39 -0400
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C58AC60C77
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:47 -0700 (PDT)
+Received: by mail-pj1-f53.google.com with SMTP id w19-20020a17090a8a1300b001ec79064d8dso3384614pjn.2
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=w33CDd6tc5/NO3OGDJVRMb5SGHoLyjsBZpnjenSoToE=;
-        b=di6XLCPEexc0Yw3hw4w+qwxXNPN+GWtSYX0TA9fI3+eUN8eItU42U31vRA/xfJcRPk
-         qXgrEoA+LiN5F9P8M0Dz7BNrediuxbjAlB56cGQocxRmZRzlvEjqO54935FttTNW/xnV
-         9/q5aJWBI6gcojQBR1EJhw1bWY7huwyVegtx733V3neETZqc1nwUSBrTvOnOhMnQWDaP
-         J2QlOF+t7BljAB/G+0+Jp6YXY3OWqySxgjegJTCY8IukXxmnOAUdhPiXinAmod9bc29q
-         xV0DYo9sxkL3hfZAmnShP0m087kLanBPHTfqEarfp0M28vcs6jG1ywwGTzXRLegFEVon
-         joEg==
-X-Gm-Message-State: AJIora/K2QECVBJGi4i9VmKkbjPPTwFp64fPpGukjBNiUCeB+EqlEAII
-        Vl24VvtgvtlHIf7xsLzcUw7/BSzbEkpWJA==
-X-Google-Smtp-Source: AGRyM1ssnLQAm7f2+uq+UpEUl6i7CBqfUMeyxJ4IFR4iomaf/8R1iflwt4CL91mbIoHywci3C3r7Sg==
-X-Received: by 2002:a17:90b:4acd:b0:1ed:55f:3ba3 with SMTP id mh13-20020a17090b4acd00b001ed055f3ba3mr5141031pjb.10.1656007605760;
-        Thu, 23 Jun 2022 11:06:45 -0700 (PDT)
+        bh=OiRFOz/pc58fJY7R3kmiJRoWVSH6zT3FtqNeu7uf5ZI=;
+        b=BX8ZhWP9PZu3a37x8h17w+ihl5DjMpIqIQC43hzVAw0e8R9Y94MdXoG+mC12PArfRJ
+         Cxx28p2IdP7JZZas8XZSSwRvOkgSaBMRFygIIwb19zO3HNo5xaxIEoc3Bx4jinxmrPrr
+         FRUsbh8kzYnlAHVV4wFgV9sQd7JHfq5M1+SYmTXPPBBQwky7X4Kau3+WVWX0yK035jBK
+         sgSF2RRf+1883LWn9E2jvENEMcvUMCPpbk9zXJJe0jIpA0UE+Lo4DgnP98qgH86TJDOT
+         0xEKHT7hUHGAFHESaHUZFbW+W1UXzOVc37D5+sTSOSGZfzwLVFn0Ts1WBY93KZKQbLvQ
+         5NyA==
+X-Gm-Message-State: AJIora9mxy4aSuCCMCRXn/14LCN61GcFNkJHgphJqJC4OwZ1O95JvUv/
+        PFblQxqGvYcVYuvn6Yh8KD6aDGUx3d3ajg==
+X-Google-Smtp-Source: AGRyM1sf/vsM1zEmtW2mlHr7TUWgGoJgCkN5ZzJKOUa4uS7nbcLH8ZqR87CiH2m/iwvcbO9K5YHzHw==
+X-Received: by 2002:a17:902:8d98:b0:168:a310:3ea6 with SMTP id v24-20020a1709028d9800b00168a3103ea6mr39803886plo.9.1656007607093;
+        Thu, 23 Jun 2022 11:06:47 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.44
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:06:45 -0700 (PDT)
+        Thu, 23 Jun 2022 11:06:46 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Mike Christie <michael.christie@oracle.com>,
-        Theodore Ts'o <tytso@mit.edu>
-Subject: [PATCH 45/51] fs/jbd2: Fix the documentation of the jbd2_write_superblock() callers
-Date:   Thu, 23 Jun 2022 11:05:22 -0700
-Message-Id: <20220623180528.3595304-46-bvanassche@acm.org>
+        Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Subject: [PATCH 46/51] fs/nilfs: Use the enum req_op and blk_opf_t types
+Date:   Thu, 23 Jun 2022 11:05:23 -0700
+Message-Id: <20220623180528.3595304-47-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -55,126 +54,83 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Commit 2a222ca992c3 ("fs: have submit_bh users pass in op and flags
-separately") renamed the jbd2_write_superblock() 'write_op' argument into
-'write_flags'. Propagate this change to the jbd2_write_superblock()
-callers. Additionally, change the type of 'write_flags' into blk_opf_t.
+Improve static type checking by using the enum req_op type for variables
+that represent a request operation and the new blk_opf_t type for
+variables that represent request flags.
 
-Cc: Mike Christie <michael.christie@oracle.com>
-Cc: Theodore Ts'o <tytso@mit.edu>
+Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- fs/jbd2/journal.c           | 15 ++++++++-------
- include/linux/jbd2.h        |  2 +-
- include/trace/events/jbd2.h | 12 ++++++------
- 3 files changed, 15 insertions(+), 14 deletions(-)
+ fs/nilfs2/btnode.c            | 4 ++--
+ fs/nilfs2/btnode.h            | 5 +++--
+ fs/nilfs2/mdt.c               | 3 ++-
+ include/trace/events/nilfs2.h | 4 ++--
+ 4 files changed, 9 insertions(+), 7 deletions(-)
 
-diff --git a/fs/jbd2/journal.c b/fs/jbd2/journal.c
-index c0cbeeaec2d1..b1be8450c50c 100644
---- a/fs/jbd2/journal.c
-+++ b/fs/jbd2/journal.c
-@@ -1602,7 +1602,7 @@ static int journal_reset(journal_t *journal)
-  * This function expects that the caller will have locked the journal
-  * buffer head, and will return with it unlocked
-  */
--static int jbd2_write_superblock(journal_t *journal, int write_flags)
-+static int jbd2_write_superblock(journal_t *journal, blk_opf_t write_flags)
+diff --git a/fs/nilfs2/btnode.c b/fs/nilfs2/btnode.c
+index ca611ac09f7c..13784cf169ca 100644
+--- a/fs/nilfs2/btnode.c
++++ b/fs/nilfs2/btnode.c
+@@ -70,8 +70,8 @@ nilfs_btnode_create_block(struct address_space *btnc, __u64 blocknr)
+ }
+ 
+ int nilfs_btnode_submit_block(struct address_space *btnc, __u64 blocknr,
+-			      sector_t pblocknr, int mode, int mode_flags,
+-			      struct buffer_head **pbh, sector_t *submit_ptr)
++		sector_t pblocknr, enum req_op mode, blk_opf_t mode_flags,
++		struct buffer_head **pbh, sector_t *submit_ptr)
  {
- 	struct buffer_head *bh = journal->j_sb_buffer;
- 	journal_superblock_t *sb = journal->j_superblock;
-@@ -1659,13 +1659,14 @@ static int jbd2_write_superblock(journal_t *journal, int write_flags)
-  * @journal: The journal to update.
-  * @tail_tid: TID of the new transaction at the tail of the log
-  * @tail_block: The first block of the transaction at the tail of the log
-- * @write_op: With which operation should we write the journal sb
-+ * @write_flags: Flags for the journal sb write operation
-  *
-  * Update a journal's superblock information about log tail and write it to
-  * disk, waiting for the IO to complete.
-  */
- int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
--				     unsigned long tail_block, int write_op)
-+				    unsigned long tail_block,
-+				    blk_opf_t write_flags)
+ 	struct buffer_head *bh;
+ 	struct inode *inode = btnc->host;
+diff --git a/fs/nilfs2/btnode.h b/fs/nilfs2/btnode.h
+index bd5544e63a01..b7d2948dc74f 100644
+--- a/fs/nilfs2/btnode.h
++++ b/fs/nilfs2/btnode.h
+@@ -34,8 +34,9 @@ void nilfs_init_btnc_inode(struct inode *btnc_inode);
+ void nilfs_btnode_cache_clear(struct address_space *);
+ struct buffer_head *nilfs_btnode_create_block(struct address_space *btnc,
+ 					      __u64 blocknr);
+-int nilfs_btnode_submit_block(struct address_space *, __u64, sector_t, int,
+-			      int, struct buffer_head **, sector_t *);
++int nilfs_btnode_submit_block(struct address_space *, __u64, sector_t,
++			      enum req_op, blk_opf_t, struct buffer_head **,
++			      sector_t *);
+ void nilfs_btnode_delete(struct buffer_head *);
+ int nilfs_btnode_prepare_change_key(struct address_space *,
+ 				    struct nilfs_btnode_chkey_ctxt *);
+diff --git a/fs/nilfs2/mdt.c b/fs/nilfs2/mdt.c
+index d29a0f2b9c16..19d878f0e923 100644
+--- a/fs/nilfs2/mdt.c
++++ b/fs/nilfs2/mdt.c
+@@ -112,7 +112,8 @@ static int nilfs_mdt_create_block(struct inode *inode, unsigned long block,
+ 
+ static int
+ nilfs_mdt_submit_block(struct inode *inode, unsigned long blkoff,
+-		       int mode, int mode_flags, struct buffer_head **out_bh)
++		       enum req_op mode, blk_opf_t mode_flags,
++		       struct buffer_head **out_bh)
  {
- 	journal_superblock_t *sb = journal->j_superblock;
- 	int ret;
-@@ -1685,7 +1686,7 @@ int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
- 	sb->s_sequence = cpu_to_be32(tail_tid);
- 	sb->s_start    = cpu_to_be32(tail_block);
+ 	struct buffer_head *bh;
+ 	__u64 blknum = 0;
+diff --git a/include/trace/events/nilfs2.h b/include/trace/events/nilfs2.h
+index 84ee31fc04cc..05668a783042 100644
+--- a/include/trace/events/nilfs2.h
++++ b/include/trace/events/nilfs2.h
+@@ -192,7 +192,7 @@ TRACE_EVENT(nilfs2_mdt_submit_block,
+ 	    TP_PROTO(struct inode *inode,
+ 		     unsigned long ino,
+ 		     unsigned long blkoff,
+-		     int mode),
++		     enum req_op mode),
  
--	ret = jbd2_write_superblock(journal, write_op);
-+	ret = jbd2_write_superblock(journal, write_flags);
- 	if (ret)
- 		goto out;
+ 	    TP_ARGS(inode, ino, blkoff, mode),
  
-@@ -1702,12 +1703,12 @@ int jbd2_journal_update_sb_log_tail(journal_t *journal, tid_t tail_tid,
- /**
-  * jbd2_mark_journal_empty() - Mark on disk journal as empty.
-  * @journal: The journal to update.
-- * @write_op: With which operation should we write the journal sb
-+ * @write_flags: Flags for the journal sb write operation
-  *
-  * Update a journal's dynamic superblock fields to show that journal is empty.
-  * Write updated superblock to disk waiting for IO to complete.
-  */
--static void jbd2_mark_journal_empty(journal_t *journal, int write_op)
-+static void jbd2_mark_journal_empty(journal_t *journal, blk_opf_t write_flags)
- {
- 	journal_superblock_t *sb = journal->j_superblock;
- 	bool had_fast_commit = false;
-@@ -1733,7 +1734,7 @@ static void jbd2_mark_journal_empty(journal_t *journal, int write_op)
- 		had_fast_commit = true;
- 	}
+@@ -207,7 +207,7 @@ TRACE_EVENT(nilfs2_mdt_submit_block,
+ 		    __entry->inode = inode;
+ 		    __entry->ino = ino;
+ 		    __entry->blkoff = blkoff;
+-		    __entry->mode = mode;
++		    __entry->mode = (__force int)mode;
+ 		    ),
  
--	jbd2_write_superblock(journal, write_op);
-+	jbd2_write_superblock(journal, write_flags);
- 
- 	if (had_fast_commit)
- 		jbd2_set_feature_fast_commit(journal);
-diff --git a/include/linux/jbd2.h b/include/linux/jbd2.h
-index e79d6e0b14e8..dc1724131300 100644
---- a/include/linux/jbd2.h
-+++ b/include/linux/jbd2.h
-@@ -1557,7 +1557,7 @@ extern int	   jbd2_journal_wipe       (journal_t *, int);
- extern int	   jbd2_journal_skip_recovery	(journal_t *);
- extern void	   jbd2_journal_update_sb_errno(journal_t *);
- extern int	   jbd2_journal_update_sb_log_tail	(journal_t *, tid_t,
--				unsigned long, int);
-+				unsigned long, blk_opf_t);
- extern void	   jbd2_journal_abort      (journal_t *, int);
- extern int	   jbd2_journal_errno      (journal_t *);
- extern void	   jbd2_journal_ack_err    (journal_t *);
-diff --git a/include/trace/events/jbd2.h b/include/trace/events/jbd2.h
-index a4dfe005983d..91dae1f678fe 100644
---- a/include/trace/events/jbd2.h
-+++ b/include/trace/events/jbd2.h
-@@ -355,22 +355,22 @@ TRACE_EVENT(jbd2_update_log_tail,
- 
- TRACE_EVENT(jbd2_write_superblock,
- 
--	TP_PROTO(journal_t *journal, int write_op),
-+	TP_PROTO(journal_t *journal, blk_opf_t write_flags),
- 
--	TP_ARGS(journal, write_op),
-+	TP_ARGS(journal, write_flags),
- 
- 	TP_STRUCT__entry(
- 		__field(	dev_t,  dev			)
--		__field(	  int,  write_op		)
-+		__field(          u32,  write_flags		)
- 	),
- 
- 	TP_fast_assign(
- 		__entry->dev		= journal->j_fs_dev->bd_dev;
--		__entry->write_op	= write_op;
-+		__entry->write_flags	= (__force u32)write_flags;
- 	),
- 
--	TP_printk("dev %d,%d write_op %x", MAJOR(__entry->dev),
--		  MINOR(__entry->dev), __entry->write_op)
-+	TP_printk("dev %d,%d write_flags %x", MAJOR(__entry->dev),
-+		  MINOR(__entry->dev), __entry->write_flags)
- );
- 
- TRACE_EVENT(jbd2_lock_buffer_stall,
+ 	    TP_printk("inode = %p ino = %lu blkoff = %lu mode = %x",
