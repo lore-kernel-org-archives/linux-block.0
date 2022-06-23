@@ -2,81 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF8BCCA47F
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 16:26:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EAE5C3F2D4
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 17:54:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230329AbiFWQ0Y (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 12:26:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57648 "EHLO
+        id S235037AbiFWRyA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 13:54:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41328 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231948AbiFWQ0Y (ORCPT
+        with ESMTP id S235511AbiFWRws (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 12:26:24 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 855CE44A19;
-        Thu, 23 Jun 2022 09:26:23 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        Thu, 23 Jun 2022 13:52:48 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A95156C00;
+        Thu, 23 Jun 2022 10:13:37 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 444791F37C;
-        Thu, 23 Jun 2022 16:26:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1656001582; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=BfdpS31BTnx0upscG9ltmSRSibzpIJMh1VIKXZtFzy8=;
-        b=LufHh/PdbNvvhLTzX1RWsvnJuM3y52l0dG9D43ioTReJGZFKFYUG8gZr79KxgrXTi8h0Ja
-        kjyYipDKbiTR3dQZjA2un27ED1YROrmJUCX2pHkcRRpIFenPpA2klysDHKFknPxpHr7ke0
-        Q99rJXpqTNuxDeCSsIfc/Wvik9/VqqM=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 13DEE133A6;
-        Thu, 23 Jun 2022 16:26:22 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id 1w3gAy6UtGLtAwAAMHmgww
-        (envelope-from <mkoutny@suse.com>); Thu, 23 Jun 2022 16:26:22 +0000
-Date:   Thu, 23 Jun 2022 18:26:20 +0200
-From:   Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
-To:     Yu Kuai <yukuai3@huawei.com>
-Cc:     tj@kernel.org, axboe@kernel.dk, ming.lei@redhat.com,
-        cgroups@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, yi.zhang@huawei.com
-Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
- updates
-Message-ID: <20220623162620.GB16004@blackbody.suse.cz>
-References: <20220528064330.3471000-1-yukuai3@huawei.com>
- <20220528064330.3471000-5-yukuai3@huawei.com>
- <20220622172621.GA28246@blackbody.suse.cz>
- <f5165488-2461-8946-593f-14154e404850@huawei.com>
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 20AA061DB9;
+        Thu, 23 Jun 2022 17:13:37 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00482C3411B;
+        Thu, 23 Jun 2022 17:13:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656004416;
+        bh=rMClqc3zvDXfYMCOvdBp6CeRJmIcRkGT8/7yt5f5Kj4=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=hy8Xfb3CaW83gPTXBez87TKF6HsLY6Vgm+L3dfAfuvodGOX+OUOmbQ/Ghk1w6n2+M
+         2DV+2gMkStrDZHG0tUAgHCir1JmtSae//xHrbJSV2gG+wwa4uN1WE2Ew04+yShP6x+
+         Wo8Q7FH6WA50N/wiz6O1C6ye8ptPWUlTYD6uObRVS2xQ/Ze/MF5VWCHOxq6jfKo6l0
+         mCqmrUBFwatWgjD3iv0rzwXH1Z/HLaoZYGH27u8U6kOqNS9YP0NtGaBshrq51xY8/4
+         F7Nj+Vat3OIy1SzwGsAmMrhnN50t3L35HZyEIHe3J5ItFl3WXqp5QqxgJxdZ26l/2R
+         70TYqohWcia9w==
+Date:   Thu, 23 Jun 2022 10:13:34 -0700
+From:   Eric Biggers <ebiggers@kernel.org>
+To:     Andreas Dilger <adilger@dilger.ca>
+Cc:     "Darrick J. Wong" <djwong@kernel.org>,
+        linux-fsdevel@vger.kernel.org, linux-man@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [man-pages RFC PATCH] statx.2, open.2: document STATX_DIOALIGN
+Message-ID: <YrSfPmaWCTOfmQ8H@sol.localdomain>
+References: <20220616202141.125079-1-ebiggers@kernel.org>
+ <YrSOm2murB4Bc1RQ@magnolia>
+ <622BA3BB-03EA-4271-8A2E-2ADAFB574155@dilger.ca>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f5165488-2461-8946-593f-14154e404850@huawei.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <622BA3BB-03EA-4271-8A2E-2ADAFB574155@dilger.ca>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 08:27:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
-> > Here we may allow to dispatch a bio above current slice's
-> > calculate_bytes_allowed() if bytes_skipped is already >0.
+On Thu, Jun 23, 2022 at 10:27:19AM -0600, Andreas Dilger wrote:
+> On Jun 23, 2022, at 10:02 AM, Darrick J. Wong <djwong@kernel.org> wrote:
+> > 
+> > On Thu, Jun 16, 2022 at 01:21:41PM -0700, Eric Biggers wrote:
+> >> From: Eric Biggers <ebiggers@google.com>
+> >> 
+> >> @@ -244,8 +249,11 @@ STATX_SIZE	Want stx_size
+> >> STATX_BLOCKS	Want stx_blocks
+> >> STATX_BASIC_STATS	[All of the above]
+> >> STATX_BTIME	Want stx_btime
+> >> +STATX_ALL	The same as STATX_BASIC_STATS | STATX_BTIME.
+> >> +         	This is deprecated and should not be used.
+> > 
+> > STATX_ALL is deprecated??  I was under the impression that _ALL meant
+> > all the known bits for that kernel release, but...
 > 
-> Hi, I don't expect that to happen. For example, if a bio is still
-> throttled, then old slice is keeped with proper 'bytes_skipped',
-> then new wait time is caculated based on (bio_size - bytes_skipped).
+> For userspace STATX_ALL doesn't make sense, and it isn't used by the kernel.
 > 
-> After the bio is dispatched(I assum that other bios can't preempt),
+> Firstly, that would be a compile-time value for an application, so it
+> may be incorrect for the kernel the code is actually run on (either too
+> many or too few bits could be set).
+> 
+> Secondly, it isn't really useful for an app to request "all attributes"
+> if it doesn't know what they all mean, as that potentially adds useless
+> overhead.  Better for it to explicitly request the attributes that it
+> needs.  If that is fewer than the kernel could return it is irrelevant,
+> since the app would ignore them anyway.
+> 
+> The kernel will already ignore and mask attributes that *it* doesn't
+> understand, so requesting more is fine and STATX_ALL doesn't help this.
+> 
 
-With this assumptions it adds up as you write. I believe we're in
-agreement.
+What Andreas said.  Note, this discussion really should be happening on my
+standalone patch that fixes the documentation for STATX_ALL:
+https://lore.kernel.org/r/20220614034459.79889-1-ebiggers@kernel.org.  I folded
+it into this RFC one only so that it applies cleanly without a prerequisite.
 
-It's the same assumption I made below (FIFO everywhere, i.e. no
-reordering). So the discussed difference shouldn't really be negative
-(and if the assumption didn't hold, so the modular arithmetic yields
-corerct bytes_skipped value).
-
-Michal
+- Eric
