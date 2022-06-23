@@ -2,102 +2,171 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20A42C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 12:05:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADFDC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 12:27:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231597AbiFWMFN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 08:05:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52830 "EHLO
+        id S231318AbiFWM1R (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 08:27:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42116 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231734AbiFWMFL (ORCPT
+        with ESMTP id S229741AbiFWM1R (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:05:11 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EDAD4969A
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 05:05:09 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 68so13515401pgb.10
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 05:05:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=7fTUfh8oa0k/yFUAPepSS4rewtDXGbbOzBk2gx6tB4A=;
-        b=jMhJWnJ3C6Gqm7C5NNvcQdJOhIQcAh5TU8WzfDuhsEwZWTBVy9cbZRume/Pw7HG2ua
-         kHfo3HE+GYqtWwB3uhILkRWEpGqsovQwWGMONlIgI+S3KwEL/kkg0RyG7Vl7Fya+n1Jg
-         FGJ//2vcHELQQlQuAVpyZvVE6zrmblUHupOcjm8FH9cjSf42bT6uRMSXNrDuznsfr41a
-         j0nlGJRaIxxgJo8Nzpuwfuablv36B4HmHC8MiyT58sDPDQsu943OrP7fRkKU/qZ8SZMK
-         9I/T7GZR/z7T86ks/LeiOXXdD7ozHZ3Kbqu5BmWaJAF5OWucryeDApxUlj1dR+hUgqn2
-         DUFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=7fTUfh8oa0k/yFUAPepSS4rewtDXGbbOzBk2gx6tB4A=;
-        b=JwsJVrrmk4d/ktWEUKBJ+1fprbAJByCTEszCp2e29p4Q0bKVxLX/i/hdf0Z4oRwFVE
-         Tn9rF9H3BLkbu333/NxvfcRyPbMA3C7nBwacq3Pl1pIfMrv9OWCDurC9AQpj4QQvllFZ
-         nM/SCXleI+03MTuCQx0NPNLKZAhQeJeSTqZ2go0T9Vq/fICzvhlaS7KHSc+aiQEMfZEm
-         1BrNaMNBHbkfRjI266KqXEMyS42juDLr0tol3SsN0p9tDV/1yFxm4/viRMaUszO7oj9M
-         7Lz+2xtuViboZqqr7xZelULx6TJUIzHPxdIZy/aWEi42MUhHIyHK3Preg1BrOVrl+MGh
-         Bftw==
-X-Gm-Message-State: AJIora90+dB77icD+jdGW9CpAaG6nq7kXNNs82KoGFFo90UwlHw9pIuL
-        IUop22rcwl7jITnA03wjRjMcrg==
-X-Google-Smtp-Source: AGRyM1v7pm8vWIsKlmFANwgtZHb6z/lgHPYUzfzpOg1iMHcCN5WHBdp9BLENdkvpv6xTNthapQsRaA==
-X-Received: by 2002:a05:6a00:ad0:b0:50a:51b3:1e3d with SMTP id c16-20020a056a000ad000b0050a51b31e3dmr40716979pfl.18.1655985908712;
-        Thu, 23 Jun 2022 05:05:08 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id e30-20020a17090a6fa100b001eafa265869sm1701374pjk.56.2022.06.23.05.05.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jun 2022 05:05:08 -0700 (PDT)
-Message-ID: <394d2490-def0-30c0-7341-983bc93b8c57@kernel.dk>
-Date:   Thu, 23 Jun 2022 06:05:07 -0600
+        Thu, 23 Jun 2022 08:27:17 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99B7D3CA40;
+        Thu, 23 Jun 2022 05:27:15 -0700 (PDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LTKHg0JJqzDsPx;
+        Thu, 23 Jun 2022 20:26:39 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 23 Jun 2022 20:27:13 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Thu, 23 Jun 2022 20:27:12 +0800
+Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
+ updates
+To:     =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>
+CC:     <tj@kernel.org>, <axboe@kernel.dk>, <ming.lei@redhat.com>,
+        <cgroups@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <yi.zhang@huawei.com>
+References: <20220528064330.3471000-1-yukuai3@huawei.com>
+ <20220528064330.3471000-5-yukuai3@huawei.com>
+ <20220622172621.GA28246@blackbody.suse.cz>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <f5165488-2461-8946-593f-14154e404850@huawei.com>
+Date:   Thu, 23 Jun 2022 20:27:11 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] block: pop cached rq before potentially blocking
- rq_qos_throttle()
-Content-Language: en-US
-To:     Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Dylan Yudaken <dylany@fb.com>
-References: <65187802-413a-7425-234e-68cf0b281a91@kernel.dk>
- <20220623085559.csg72pmamhwgkcbx@shindev>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220623085559.csg72pmamhwgkcbx@shindev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <20220622172621.GA28246@blackbody.suse.cz>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/23/22 2:56 AM, Shinichiro Kawasaki wrote:
-> On Jun 21, 2022 / 10:07, Jens Axboe wrote:
->> If rq_qos_throttle() ends up blocking, then we will have invalidated and
->> flushed our current plug. Since blk_mq_get_cached_request() hasn't
->> popped the cached request off the plug list just yet, we end holding a
->> pointer to a request that is no longer valid. This insta-crashes with
->> rq->mq_hctx being NULL in the validity checks just after.
+Hi,
+
+在 2022/06/23 1:26, Michal Koutný 写道:
+> (Apologies for taking so long before answering.)
+> 
+> On Sat, May 28, 2022 at 02:43:26PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>> Some simple test:
+>> 1)
+>> cd /sys/fs/cgroup/blkio/
+>> echo $$ > cgroup.procs
+>> echo "8:0 2048" > blkio.throttle.write_bps_device
+>> {
+>>          sleep 2
+>>          echo "8:0 1024" > blkio.throttle.write_bps_device
+>> } &
+>> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
 >>
->> Pop the request off the cached list before doing rq_qos_throttle() to
->> avoid using a potentially stale request.
+>> 2)
+>> cd /sys/fs/cgroup/blkio/
+>> echo $$ > cgroup.procs
+>> echo "8:0 1024" > blkio.throttle.write_bps_device
+>> {
+>>          sleep 4
+>>          echo "8:0 2048" > blkio.throttle.write_bps_device
+>> } &
+>> dd if=/dev/zero of=/dev/sda bs=8k count=1 oflag=direct
 >>
->> Fixes: 0a5aa8d161d1 ("block: fix blk_mq_attempt_bio_merge and rq_qos_throttle protection")
->> Reported-by: Dylan Yudaken <dylany@fb.com>
->> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> test results: io finish time
+>> 	before this patch	with this patch
+>> 1)	10s			6s
+>> 2)	8s			6s
 > 
-> Thank you for the fix and sorry for the trouble. The patch passed my test set:
+> I agree these are consistent and correct times.
 > 
-> Tested-by: Shin'ichiro Kawasaki <shinichiro.kawasaki@wdc.com>
+> And the new implementation won't make it worse (in terms of delaying a
+> bio) than configuring minimal limits from the beginning, AFACT.
 > 
+>> @@ -801,7 +836,8 @@ static bool tg_with_in_iops_limit(struct throtl_grp *tg, struct bio *bio,
+>>   
+>>   	/* Round up to the next throttle slice, wait time must be nonzero */
+>>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed + 1, tg->td->throtl_slice);
+>> -	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd);
+>> +	io_allowed = calculate_io_allowed(iops_limit, jiffy_elapsed_rnd) +
+>> +		     tg->io_skipped[rw];
+>>   	if (tg->io_disp[rw] + 1 <= io_allowed) {
+>>   		if (wait)
+>>   			*wait = 0;
+>> @@ -838,7 +874,8 @@ static bool tg_with_in_bps_limit(struct throtl_grp *tg, struct bio *bio,
+>>   		jiffy_elapsed_rnd = tg->td->throtl_slice;
+>>   
+>>   	jiffy_elapsed_rnd = roundup(jiffy_elapsed_rnd, tg->td->throtl_slice);
+>> -	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd);
+>> +	bytes_allowed = calculate_bytes_allowed(bps_limit, jiffy_elapsed_rnd) +
+>> +			tg->bytes_skipped[rw];
+>>   	if (tg->bytes_disp[rw] + bio_size <= bytes_allowed) {
+>>   		if (wait)
+>>   			*wait = 0;
+>>
 > 
-> BTW, may I know the workload or script which triggers the failure? I'm
-> interested in if we can add a blktests test case to exercises qos throttle
-> and prevent similar bugs in the future.
+> Here we may allow to dispatch a bio above current slice's
+> calculate_bytes_allowed() if bytes_skipped is already >0.
 
-Not sure if there are others, but specifically blk-iocost will do an
-explicit schedule() for some conditions. See the bottom of
-ioc_rqos_throttle().
+Hi, I don't expect that to happen. For example, if a bio is still
+throttled, then old slice is keeped with proper 'bytes_skipped',
+then new wait time is caculated based on (bio_size - bytes_skipped).
 
--- 
-Jens Axboe
+After the bio is dispatched(I assum that other bios can't preempt),
+if new slice is started, then 'bytes_skipped' is cleared, there should
+be no problem; If old slice is extended, note that we only wait
+for 'bio_size - bytes_skipped' bytes, while 'bio_size' bytes is added
+to 'tg->bytes_disp'. I think this will make sure new bio won't be
+dispatched above slice.
 
+What do you think?
+> 
+> bytes_disp + bio_size <= calculate_bytes_allowed() + bytes_skipped
+> 
+> Then on the next update
+> 
+>> [shuffle]
+>> +static void __tg_update_skipped(struct throtl_grp *tg, bool rw)
+>> +{
+>> +	unsigned long jiffy_elapsed = jiffies - tg->slice_start[rw];
+>> +	u64 bps_limit = tg_bps_limit(tg, rw);
+>> +	u32 iops_limit = tg_iops_limit(tg, rw);
+>> +
+>> +	if (bps_limit != U64_MAX)
+>> +		tg->bytes_skipped[rw] +=
+>> +			calculate_bytes_allowed(bps_limit, jiffy_elapsed) -
+>> +			tg->bytes_disp[rw];
+>> +	if (iops_limit != UINT_MAX)
+>> +		tg->io_skipped[rw] +=
+>> +			calculate_io_allowed(iops_limit, jiffy_elapsed) -
+>> +			tg->io_disp[rw];
+>> +}
+> 
+> the difference(s) here could be negative. bytes_skipped should be
+> reduced to account for the additionally dispatched bio.
+> This is all unsigned so negative numbers underflow, however, we add them
+> again to the unsigned, so thanks to modular arithmetics the result is
+> correctly updated bytes_skipped.
+> 
+> Maybe add a comment about this (unsigned) intention?
+
+Of course I can do that.
+> 
+> (But can this happen? The discussed bio would have to outrun another bio
+> (the one which defined the current slice_end) but since blk-throttle
+> uses queues (FIFO) everywhere this shouldn't really happen. But it's
+> good to know this works as intended.)
+I can also mention that in comment.
+> 
+> This patch can have
+> Reviewed-by: Michal Koutný <mkoutny@suse.com>
+> 
+
+Thanks for the review!
+Kuai
