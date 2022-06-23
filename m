@@ -2,356 +2,254 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5ECACCA481
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 12:35:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD6BEC43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 13:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbiFWMfl (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 08:35:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48040 "EHLO
+        id S231925AbiFWNAT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 09:00:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230047AbiFWMfj (ORCPT
+        with ESMTP id S231659AbiFWNAS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 08:35:39 -0400
-Received: from mail-oi1-x235.google.com (mail-oi1-x235.google.com [IPv6:2607:f8b0:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D864D3CFD3
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 05:35:37 -0700 (PDT)
-Received: by mail-oi1-x235.google.com with SMTP id s124so25148613oia.0
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 05:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9C2GQ9Ulp1b6YnCrEsaBjrJIIvHLrjIzeIsR+q3+W/4=;
-        b=uWwKxXBkCKRdx3iYwLJ/8ZDvrYVoB+1GHBLAzaHcLIFDftA2voxjLWE9fOvlF7hbWf
-         V+RwaoZPlnBsfdKY8Vdj2DVWDnkjakZVkXl3OXUYsLvIyXCIGjxF8xk8sEYHPVbaxvfX
-         eP/6ABzpV+q1emtfZ9G1ACl5C5E3nM3X7Vy6CZaB1Wev1WP22+6Zuf1I/NNfu8WF6nmX
-         qGCLzFghklGXlb7vsEmczfxpG6SLdNpMt1wSiiiP7wCpaJKyb7L7LSbDcecxHU+lr2Hz
-         y4NFkZSVH9FwZ+tfLwliZaH6dNe4puApGNDUTMLT9gRn32wTabaVFBbaBvGWWun6wVi7
-         zkBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9C2GQ9Ulp1b6YnCrEsaBjrJIIvHLrjIzeIsR+q3+W/4=;
-        b=JGieUt4kGvqSO3zLRpziy0QpU39RlX9HWVY+LNcLG71u5yJQ9KUS37QDhWgjiCY1Ay
-         VhoTaDu6HM+Wz624QRZGZzCwT724gId896maji8EVEcw72ggThnYRqkQTyePYyeC4LVQ
-         c/s/dWnWBjBhV/i3lh10eBQlOuhVJQxBLYP/JV4zFeqeQqPpmBLNXWT/d2m4PgiDKIld
-         QgU0fBIYUVyfYVpcLolYvss7ZzFgpLFG5oJdb071bJ91OnrgDIr72pW3Ej+8JE/WMfjp
-         UpCTTnBo8XRFl5q6eqjuR+wdyjj6y91OCx7UZpYWBgqxFryRkMe4xCwl1zFRAg7dwCCh
-         rzjw==
-X-Gm-Message-State: AJIora9MXcrnLWVKtWnR+8R5xlE9dyDmjyZp5olJYoJVvmdErd/ZAZRL
-        Gm+jN31ymTt/iJXnJqZWV+UcKAnpDKcGKtBuPEEKgQ==
-X-Google-Smtp-Source: AGRyM1secqzIdgl7cxbYNYLOKT6GhxiDbyKH487w1NGSVALpBPVoYlvm20+0dnzElQ/psyzuKl8Fae9I+yA8danUhUU=
-X-Received: by 2002:a05:6808:1a06:b0:32f:1a3b:69d6 with SMTP id
- bk6-20020a0568081a0600b0032f1a3b69d6mr2015631oib.202.1655987737098; Thu, 23
- Jun 2022 05:35:37 -0700 (PDT)
+        Thu, 23 Jun 2022 09:00:18 -0400
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70374BFFD;
+        Thu, 23 Jun 2022 06:00:17 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out1.suse.de (Postfix) with ESMTPS id 8046E21D51;
+        Thu, 23 Jun 2022 13:00:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+        t=1655989216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=F5rp4biCzxhXRUFFWAT3ZfHsc7jcuLns1eT+TYiLgcU=;
+        b=NqsE+R3A+G8jfvqHrFsMuoKCkpU3h16m/I3olzV12/gzWJYQnZry4r7vqoqr6NhswyO6h2
+        H6QYZ7NaQx9JdHJiyXiAgpf+4bobmSp/YZsZ8Td5v6o2WBBo9q8xRUBq5rv/QmmTDOHPKw
+        vTS61WJ9aH0xaigngd/NdcuTQGPeK/E=
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 3A20B13461;
+        Thu, 23 Jun 2022 13:00:16 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id biyuDOBjtGITGwAAMHmgww
+        (envelope-from <jgross@suse.com>); Thu, 23 Jun 2022 13:00:16 +0000
+Message-ID: <7ec07c28-479a-4fa6-cd9c-dcd0b71e3f42@suse.com>
+Date:   Thu, 23 Jun 2022 15:00:15 +0200
 MIME-Version: 1.0
-References: <1655810143-67784-1-git-send-email-john.garry@huawei.com> <1655810143-67784-4-git-send-email-john.garry@huawei.com>
-In-Reply-To: <1655810143-67784-4-git-send-email-john.garry@huawei.com>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 23 Jun 2022 14:35:00 +0200
-Message-ID: <CAPDyKFqRzOceWJUODP0YEu348S4=OHdQA-3c3tEMAJshCQN+Qg@mail.gmail.com>
-Subject: Re: [PATCH v2 3/6] blk-mq: Drop blk_mq_ops.timeout 'reserved' arg
-To:     John Garry <john.garry@huawei.com>
-Cc:     axboe@kernel.dk, damien.lemoal@opensource.wdc.com,
-        bvanassche@acm.org, hch@lst.de, jejb@linux.ibm.com,
-        martin.petersen@oracle.com, hare@suse.de, satishkh@cisco.com,
-        sebaddel@cisco.com, kartilak@cisco.com, linux-doc@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-s390@vger.kernel.org,
-        linux-scsi@vger.kernel.org, mpi3mr-linuxdrv.pdl@broadcom.com,
-        linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-        nbd@other.debian.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.0
+Subject: Re: [PATCH] xen-blkfront: Handle NULL gendisk
+Content-Language: en-US
+To:     Jason Andryuk <jandryuk@gmail.com>,
+        =?UTF-8?Q?Roger_Pau_Monn=c3=a9?= <roger.pau@citrix.com>,
+        Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+        Stefano Stabellini <sstabellini@kernel.org>,
+        Jens Axboe <axboe@kernel.dk>
+Cc:     xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?= 
+        <marmarek@invisiblethingslab.com>
+References: <20220601195341.28581-1-jandryuk@gmail.com>
+From:   Juergen Gross <jgross@suse.com>
+In-Reply-To: <20220601195341.28581-1-jandryuk@gmail.com>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------DRCs634Vc3nA0yR6EDITkIC9"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 21 Jun 2022 at 13:22, John Garry <john.garry@huawei.com> wrote:
->
-> With new API blk_mq_is_reserved_rq() we can tell if a request is from
-> the reserved pool, so stop passing 'reserved' arg. There is actually
-> only a single user of that arg for all the callback implementations, which
-> can use blk_mq_is_reserved_rq() instead.
->
-> This will also allow us to stop passing the same 'reserved' around the
-> blk-mq iter functions next.
->
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Bart Van Assche <bvanassche@acm.org>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------DRCs634Vc3nA0yR6EDITkIC9
+Content-Type: multipart/mixed; boundary="------------l05qm07gdYiFOKB7dc7Wllsf";
+ protected-headers="v1"
+From: Juergen Gross <jgross@suse.com>
+To: Jason Andryuk <jandryuk@gmail.com>, =?UTF-8?Q?Roger_Pau_Monn=c3=a9?=
+ <roger.pau@citrix.com>, Boris Ostrovsky <boris.ostrovsky@oracle.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Jens Axboe <axboe@kernel.dk>
+Cc: xen-devel@lists.xenproject.org, linux-block@vger.kernel.org,
+ linux-kernel@vger.kernel.org,
+ =?UTF-8?Q?Marek_Marczykowski-G=c3=b3recki?= <marmarek@invisiblethingslab.com>
+Message-ID: <7ec07c28-479a-4fa6-cd9c-dcd0b71e3f42@suse.com>
+Subject: Re: [PATCH] xen-blkfront: Handle NULL gendisk
+References: <20220601195341.28581-1-jandryuk@gmail.com>
+In-Reply-To: <20220601195341.28581-1-jandryuk@gmail.com>
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org> # For MMC
+--------------l05qm07gdYiFOKB7dc7Wllsf
+Content-Type: multipart/mixed; boundary="------------OBLMJDStp9e1aD6PHxmVHL9f"
 
-Kind regards
-Uffe
+--------------OBLMJDStp9e1aD6PHxmVHL9f
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
+T24gMDEuMDYuMjIgMjE6NTMsIEphc29uIEFuZHJ5dWsgd3JvdGU6DQo+IFdoZW4gYSBWQkQg
+aXMgbm90IGZ1bGx5IGNyZWF0ZWQgYW5kIHRoZW4gY2xvc2VkLCB0aGUga2VybmVsIGNhbiBo
+YXZlIGENCj4gTlVMTCBwb2ludGVyIGRlcmVmZXJlbmNlOg0KPiANCj4gVGhlIHJlcHJvZHVj
+ZXIgaXMgdHJpdmlhbDoNCj4gDQo+IFt1c2VyQGRvbTAgfl0kIHN1ZG8geGwgYmxvY2stYXR0
+YWNoIHdvcmsgYmFja2VuZD1zeXMtdXNiIHZkZXY9eHZkaSB0YXJnZXQ9L2Rldi9zZHoNCj4g
+W3VzZXJAZG9tMCB+XSQgeGwgYmxvY2stbGlzdCB3b3JrDQo+IFZkZXYgIEJFICBoYW5kbGUg
+c3RhdGUgZXZ0LWNoIHJpbmctcmVmIEJFLXBhdGgNCj4gNTE3MTIgMCAgIDI0MSAgICA0ICAg
+ICAtMSAgICAgLTEgICAgICAgL2xvY2FsL2RvbWFpbi8wL2JhY2tlbmQvdmJkLzI0MS81MTcx
+Mg0KPiA1MTcyOCAwICAgMjQxICAgIDQgICAgIC0xICAgICAtMSAgICAgICAvbG9jYWwvZG9t
+YWluLzAvYmFja2VuZC92YmQvMjQxLzUxNzI4DQo+IDUxNzQ0IDAgICAyNDEgICAgNCAgICAg
+LTEgICAgIC0xICAgICAgIC9sb2NhbC9kb21haW4vMC9iYWNrZW5kL3ZiZC8yNDEvNTE3NDQN
+Cj4gNTE3NjAgMCAgIDI0MSAgICA0ICAgICAtMSAgICAgLTEgICAgICAgL2xvY2FsL2RvbWFp
+bi8wL2JhY2tlbmQvdmJkLzI0MS81MTc2MA0KPiA1MTg0MCAzICAgMjQxICAgIDMgICAgIC0x
+ICAgICAtMSAgICAgICAvbG9jYWwvZG9tYWluLzMvYmFja2VuZC92YmQvMjQxLzUxODQwDQo+
+ICAgICAgICAgICAgICAgICAgIF4gbm90ZSBzdGF0ZSwgdGhlIC9kZXYvc2R6IGRvZXNuJ3Qg
+ZXhpc3QgaW4gdGhlIGJhY2tlbmQNCj4gDQo+IFt1c2VyQGRvbTAgfl0kIHN1ZG8geGwgYmxv
+Y2stZGV0YWNoIHdvcmsgeHZkaQ0KPiBbdXNlckBkb20wIH5dJCB4bCBibG9jay1saXN0IHdv
+cmsNCj4gVmRldiAgQkUgIGhhbmRsZSBzdGF0ZSBldnQtY2ggcmluZy1yZWYgQkUtcGF0aA0K
+PiB3b3JrIGlzIGFuIGludmFsaWQgZG9tYWluIGlkZW50aWZpZXINCj4gDQo+IEFuZCBpdHMg
+Y29uc29sZSBoYXM6DQo+IA0KPiBCVUc6IGtlcm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVu
+Y2UsIGFkZHJlc3M6IDAwMDAwMDAwMDAwMDAwNTANCj4gUEdEIDgwMDAwMDAwZWRlYmIwNjcg
+UDREIDgwMDAwMDAwZWRlYmIwNjcgUFVEIGVkZWMyMDY3IFBNRCAwDQo+IE9vcHM6IDAwMDAg
+WyMxXSBQUkVFTVBUIFNNUCBQVEkNCj4gQ1BVOiAxIFBJRDogNTIgQ29tbTogeGVud2F0Y2gg
+Tm90IHRhaW50ZWQgNS4xNi4xOC0yLjQzLmZjMzIucXViZXMueDg2XzY0ICMxDQo+IFJJUDog
+MDAxMDpibGtfbXFfc3RvcF9od19xdWV1ZXMrMHg1LzB4NDANCj4gQ29kZTogMDAgNDggODMg
+ZTAgZmQgODMgYzMgMDEgNDggODkgODUgYTggMDAgMDAgMDAgNDEgMzkgNWMgMjQgNTAgNzcg
+YzAgNWIgNWQgNDEgNWMgNDEgNWQgYzMgYzMgMGYgMWYgODAgMDAgMDAgMDAgMDAgMGYgMWYg
+NDQgMDAgMDAgPDhiPiA0NyA1MCA4NSBjMCA3NCAzMiA0MSA1NCA0OSA4OSBmYyA1NSA1MyAz
+MSBkYiA0OSA4YiA0NCAyNCA0OCA0OA0KPiBSU1A6IDAwMTg6ZmZmZmM5MDAwMGJjZmU5OCBF
+RkxBR1M6IDAwMDEwMjkzDQo+IFJBWDogZmZmZmZmZmZjMDAwODM3MCBSQlg6IDAwMDAwMDAw
+MDAwMDAwMDUgUkNYOiAwMDAwMDAwMDAwMDAwMDAwDQo+IFJEWDogMDAwMDAwMDAwMDAwMDAw
+MCBSU0k6IDAwMDAwMDAwMDAwMDAwMDUgUkRJOiAwMDAwMDAwMDAwMDAwMDAwDQo+IFJCUDog
+ZmZmZjg4ODAwNzc1ZjAwMCBSMDg6IDAwMDAwMDAwMDAwMDAwMDEgUjA5OiBmZmZmODg4MDA2
+ZTYyMGI4DQo+IFIxMDogZmZmZjg4ODAwNmU2MjBiMCBSMTE6IGYwMDAwMDAwMDAwMDAwMDAg
+UjEyOiBmZmZmODg4MGJmZjM5MDAwDQo+IFIxMzogZmZmZjg4ODBiZmYzOTAwMCBSMTQ6IDAw
+MDAwMDAwMDAwMDAwMDAgUjE1OiBmZmZmODg4MDA2MDRiZTAwDQo+IEZTOiAgMDAwMDAwMDAw
+MDAwMDAwMCgwMDAwKSBHUzpmZmZmODg4MGYzMzAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAw
+MDAwMDAwMDANCj4gQ1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4
+MDA1MDAzMw0KPiBDUjI6IDAwMDAwMDAwMDAwMDAwNTAgQ1IzOiAwMDAwMDAwMGU5MzJlMDAy
+IENSNDogMDAwMDAwMDAwMDM3MDZlMA0KPiBDYWxsIFRyYWNlOg0KPiAgIDxUQVNLPg0KPiAg
+IGJsa2JhY2tfY2hhbmdlZCsweDk1LzB4MTM3IFt4ZW5fYmxrZnJvbnRdDQo+ICAgPyByZWFk
+X3JlcGx5KzB4MTYwLzB4MTYwDQo+ICAgeGVud2F0Y2hfdGhyZWFkKzB4YzAvMHgxYTANCj4g
+ICA/IGRvX3dhaXRfaW50cl9pcnErMHhhMC8weGEwDQo+ICAga3RocmVhZCsweDE2Yi8weDE5
+MA0KPiAgID8gc2V0X2t0aHJlYWRfc3RydWN0KzB4NDAvMHg0MA0KPiAgIHJldF9mcm9tX2Zv
+cmsrMHgyMi8weDMwDQo+ICAgPC9UQVNLPg0KPiBNb2R1bGVzIGxpbmtlZCBpbjogc25kX3Nl
+cV9kdW1teSBzbmRfaHJ0aW1lciBzbmRfc2VxIHNuZF9zZXFfZGV2aWNlIHNuZF90aW1lciBz
+bmQgc291bmRjb3JlIGlwdF9SRUpFQ1QgbmZfcmVqZWN0X2lwdjQgeHRfc3RhdGUgeHRfY29u
+bnRyYWNrIG5mdF9jb3VudGVyIG5mdF9jaGFpbl9uYXQgeHRfTUFTUVVFUkFERSBuZl9uYXQg
+bmZfY29ubnRyYWNrIG5mX2RlZnJhZ19pcHY2IG5mX2RlZnJhZ19pcHY0IG5mdF9jb21wYXQg
+bmZfdGFibGVzIG5mbmV0bGluayBpbnRlbF9yYXBsX21zciBpbnRlbF9yYXBsX2NvbW1vbiBj
+cmN0MTBkaWZfcGNsbXVsIGNyYzMyX3BjbG11bCBjcmMzMmNfaW50ZWwgZ2hhc2hfY2xtdWxu
+aV9pbnRlbCB4ZW5fbmV0ZnJvbnQgcGNzcGtyIHhlbl9zY3NpYmFjayB0YXJnZXRfY29yZV9t
+b2QgeGVuX25ldGJhY2sgeGVuX3ByaXZjbWQgeGVuX2dudGRldiB4ZW5fZ250YWxsb2MgeGVu
+X2Jsa2JhY2sgeGVuX2V2dGNobiBpcG1pX2RldmludGYgaXBtaV9tc2doYW5kbGVyIGZ1c2Ug
+YnBmX3ByZWxvYWQgaXBfdGFibGVzIG92ZXJsYXkgeGVuX2Jsa2Zyb250DQo+IENSMjogMDAw
+MDAwMDAwMDAwMDA1MA0KPiAtLS1bIGVuZCB0cmFjZSA3YmM5NTk3ZmQwNmFlODlkIF0tLS0N
+Cj4gUklQOiAwMDEwOmJsa19tcV9zdG9wX2h3X3F1ZXVlcysweDUvMHg0MA0KPiBDb2RlOiAw
+MCA0OCA4MyBlMCBmZCA4MyBjMyAwMSA0OCA4OSA4NSBhOCAwMCAwMCAwMCA0MSAzOSA1YyAy
+NCA1MCA3NyBjMCA1YiA1ZCA0MSA1YyA0MSA1ZCBjMyBjMyAwZiAxZiA4MCAwMCAwMCAwMCAw
+MCAwZiAxZiA0NCAwMCAwMCA8OGI+IDQ3IDUwIDg1IGMwIDc0IDMyIDQxIDU0IDQ5IDg5IGZj
+IDU1IDUzIDMxIGRiIDQ5IDhiIDQ0IDI0IDQ4IDQ4DQo+IFJTUDogMDAxODpmZmZmYzkwMDAw
+YmNmZTk4IEVGTEFHUzogMDAwMTAyOTMNCj4gUkFYOiBmZmZmZmZmZmMwMDA4MzcwIFJCWDog
+MDAwMDAwMDAwMDAwMDAwNSBSQ1g6IDAwMDAwMDAwMDAwMDAwMDANCj4gUkRYOiAwMDAwMDAw
+MDAwMDAwMDAwIFJTSTogMDAwMDAwMDAwMDAwMDAwNSBSREk6IDAwMDAwMDAwMDAwMDAwMDAN
+Cj4gUkJQOiBmZmZmODg4MDA3NzVmMDAwIFIwODogMDAwMDAwMDAwMDAwMDAwMSBSMDk6IGZm
+ZmY4ODgwMDZlNjIwYjgNCj4gUjEwOiBmZmZmODg4MDA2ZTYyMGIwIFIxMTogZjAwMDAwMDAw
+MDAwMDAwMCBSMTI6IGZmZmY4ODgwYmZmMzkwMDANCj4gUjEzOiBmZmZmODg4MGJmZjM5MDAw
+IFIxNDogMDAwMDAwMDAwMDAwMDAwMCBSMTU6IGZmZmY4ODgwMDYwNGJlMDANCj4gRlM6ICAw
+MDAwMDAwMDAwMDAwMDAwKDAwMDApIEdTOmZmZmY4ODgwZjMzMDAwMDAoMDAwMCkga25sR1M6
+MDAwMDAwMDAwMDAwMDAwMA0KPiBDUzogIDAwMTAgRFM6IDAwMDAgRVM6IDAwMDAgQ1IwOiAw
+MDAwMDAwMDgwMDUwMDMzDQo+IENSMjogMDAwMDAwMDAwMDAwMDA1MCBDUjM6IDAwMDAwMDAw
+ZTkzMmUwMDIgQ1I0OiAwMDAwMDAwMDAwMzcwNmUwDQo+IEtlcm5lbCBwYW5pYyAtIG5vdCBz
+eW5jaW5nOiBGYXRhbCBleGNlcHRpb24NCj4gS2VybmVsIE9mZnNldDogZGlzYWJsZWQNCj4g
+DQo+IGluZm8tPnJxIGFuZCBpbmZvLT5nZCBhcmUgb25seSBzZXQgaW4gYmxrZnJvbnRfY29u
+bmVjdCgpLCB3aGljaCBpcw0KPiBjYWxsZWQgZm9yIHN0YXRlIDQgKFhlbmJ1c1N0YXRlQ29u
+bmVjdGVkKS4gIEd1YXJkIGFnYWluc3QgdXNpbmcgTlVMTA0KPiB2YXJpYWJsZXMgaW4gYmxr
+ZnJvbnRfY2xvc2luZygpIHRvIGF2b2lkIHRoZSBpc3N1ZS4NCj4gDQo+IFRoZSByZXN0IG9m
+IGJsa2Zyb250X2Nsb3NpbmcgbG9va3Mgb2theS4gIElmIGluZm8tPm5yX3JpbmdzIGlzIDAs
+IHRoZW4NCj4gZm9yX2VhY2hfcmluZm8gd29uJ3QgZG8gYW55dGhpbmcuDQo+IA0KPiBibGtm
+cm9udF9yZW1vdmUgYWxzbyBuZWVkcyB0byBjaGVjayBmb3Igbm9uLU5VTEwgcG9pbnRlcnMg
+YmVmb3JlDQo+IGNsZWFuaW5nIHVwIHRoZSBnZW5kaXNrIGFuZCByZXF1ZXN0IHF1ZXVlLg0K
+PiANCj4gRml4ZXM6IDA1ZDY5ZDk1MGQ5ZCAieGVuLWJsa2Zyb250OiBzYW5pdGl6ZSB0aGUg
+cmVtb3ZhbCBzdGF0ZSBtYWNoaW5lIg0KPiBSZXBvcnRlZC1ieTogTWFyZWsgTWFyY3p5a293
+c2tpLUfDs3JlY2tpIDxtYXJtYXJla0BpbnZpc2libGV0aGluZ3NsYWIuY29tPg0KPiBTaWdu
+ZWQtb2ZmLWJ5OiBKYXNvbiBBbmRyeXVrIDxqYW5kcnl1a0BnbWFpbC5jb20+DQoNClB1c2hl
+ZCB0byB4ZW4vdGlwLmdpdCBmb3ItbGludXMtNS4xOWENCg0KDQpKdWVyZ2VuDQo=
+--------------OBLMJDStp9e1aD6PHxmVHL9f
+Content-Type: application/pgp-keys; name="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Disposition: attachment; filename="OpenPGP_0xB0DE9DD628BF132F.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
 
-> ---
->  block/blk-mq.c                    | 6 +++---
->  block/bsg-lib.c                   | 2 +-
->  drivers/block/mtip32xx/mtip32xx.c | 5 ++---
->  drivers/block/nbd.c               | 3 +--
->  drivers/block/null_blk/main.c     | 2 +-
->  drivers/mmc/core/queue.c          | 3 +--
->  drivers/nvme/host/apple.c         | 3 +--
->  drivers/nvme/host/fc.c            | 3 +--
->  drivers/nvme/host/pci.c           | 2 +-
->  drivers/nvme/host/rdma.c          | 3 +--
->  drivers/nvme/host/tcp.c           | 3 +--
->  drivers/s390/block/dasd.c         | 2 +-
->  drivers/s390/block/dasd_int.h     | 2 +-
->  drivers/scsi/scsi_error.c         | 3 +--
->  drivers/scsi/scsi_priv.h          | 3 +--
->  include/linux/blk-mq.h            | 2 +-
->  16 files changed, 19 insertions(+), 28 deletions(-)
->
-> diff --git a/block/blk-mq.c b/block/blk-mq.c
-> index d38c97fe89f5..81bd39e36e49 100644
-> --- a/block/blk-mq.c
-> +++ b/block/blk-mq.c
-> @@ -1426,13 +1426,13 @@ bool blk_mq_queue_inflight(struct request_queue *q)
->  }
->  EXPORT_SYMBOL_GPL(blk_mq_queue_inflight);
->
-> -static void blk_mq_rq_timed_out(struct request *req, bool reserved)
-> +static void blk_mq_rq_timed_out(struct request *req)
->  {
->         req->rq_flags |= RQF_TIMED_OUT;
->         if (req->q->mq_ops->timeout) {
->                 enum blk_eh_timer_return ret;
->
-> -               ret = req->q->mq_ops->timeout(req, reserved);
-> +               ret = req->q->mq_ops->timeout(req);
->                 if (ret == BLK_EH_DONE)
->                         return;
->                 WARN_ON_ONCE(ret != BLK_EH_RESET_TIMER);
-> @@ -1481,7 +1481,7 @@ static bool blk_mq_check_expired(struct request *rq, void *priv, bool reserved)
->          * from blk_mq_check_expired().
->          */
->         if (blk_mq_req_expired(rq, next))
-> -               blk_mq_rq_timed_out(rq, reserved);
-> +               blk_mq_rq_timed_out(rq);
->         return true;
->  }
->
-> diff --git a/block/bsg-lib.c b/block/bsg-lib.c
-> index acfe1357bf6c..9570c77b9fe3 100644
-> --- a/block/bsg-lib.c
-> +++ b/block/bsg-lib.c
-> @@ -331,7 +331,7 @@ void bsg_remove_queue(struct request_queue *q)
->  }
->  EXPORT_SYMBOL_GPL(bsg_remove_queue);
->
-> -static enum blk_eh_timer_return bsg_timeout(struct request *rq, bool reserved)
-> +static enum blk_eh_timer_return bsg_timeout(struct request *rq)
->  {
->         struct bsg_set *bset =
->                 container_of(rq->q->tag_set, struct bsg_set, tag_set);
-> diff --git a/drivers/block/mtip32xx/mtip32xx.c b/drivers/block/mtip32xx/mtip32xx.c
-> index 27386a572ba4..d5767215840c 100644
-> --- a/drivers/block/mtip32xx/mtip32xx.c
-> +++ b/drivers/block/mtip32xx/mtip32xx.c
-> @@ -3487,12 +3487,11 @@ static int mtip_init_cmd(struct blk_mq_tag_set *set, struct request *rq,
->         return 0;
->  }
->
-> -static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req,
-> -                                                               bool reserved)
-> +static enum blk_eh_timer_return mtip_cmd_timeout(struct request *req)
->  {
->         struct driver_data *dd = req->q->queuedata;
->
-> -       if (reserved) {
-> +       if (blk_mq_is_reserved_rq(req)) {
->                 struct mtip_cmd *cmd = blk_mq_rq_to_pdu(req);
->
->                 cmd->status = BLK_STS_TIMEOUT;
-> diff --git a/drivers/block/nbd.c b/drivers/block/nbd.c
-> index 07f3c139a3d7..166303716560 100644
-> --- a/drivers/block/nbd.c
-> +++ b/drivers/block/nbd.c
-> @@ -393,8 +393,7 @@ static u32 req_to_nbd_cmd_type(struct request *req)
->         }
->  }
->
-> -static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req,
-> -                                                bool reserved)
-> +static enum blk_eh_timer_return nbd_xmit_timeout(struct request *req)
->  {
->         struct nbd_cmd *cmd = blk_mq_rq_to_pdu(req);
->         struct nbd_device *nbd = cmd->nbd;
-> diff --git a/drivers/block/null_blk/main.c b/drivers/block/null_blk/main.c
-> index 6b67088f4ea7..2d815d1eba25 100644
-> --- a/drivers/block/null_blk/main.c
-> +++ b/drivers/block/null_blk/main.c
-> @@ -1578,7 +1578,7 @@ static int null_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
->         return nr;
->  }
->
-> -static enum blk_eh_timer_return null_timeout_rq(struct request *rq, bool res)
-> +static enum blk_eh_timer_return null_timeout_rq(struct request *rq)
->  {
->         struct blk_mq_hw_ctx *hctx = rq->mq_hctx;
->         struct nullb_cmd *cmd = blk_mq_rq_to_pdu(rq);
-> diff --git a/drivers/mmc/core/queue.c b/drivers/mmc/core/queue.c
-> index fa5324ceeebe..17236340dbd2 100644
-> --- a/drivers/mmc/core/queue.c
-> +++ b/drivers/mmc/core/queue.c
-> @@ -116,8 +116,7 @@ static enum blk_eh_timer_return mmc_cqe_timed_out(struct request *req)
->         }
->  }
->
-> -static enum blk_eh_timer_return mmc_mq_timed_out(struct request *req,
-> -                                                bool reserved)
-> +static enum blk_eh_timer_return mmc_mq_timed_out(struct request *req)
->  {
->         struct request_queue *q = req->q;
->         struct mmc_queue *mq = q->queuedata;
-> diff --git a/drivers/nvme/host/apple.c b/drivers/nvme/host/apple.c
-> index d702d7d60235..495118ce958a 100644
-> --- a/drivers/nvme/host/apple.c
-> +++ b/drivers/nvme/host/apple.c
-> @@ -862,8 +862,7 @@ static void apple_nvme_disable(struct apple_nvme *anv, bool shutdown)
->         }
->  }
->
-> -static enum blk_eh_timer_return apple_nvme_timeout(struct request *req,
-> -                                                  bool reserved)
-> +static enum blk_eh_timer_return apple_nvme_timeout(struct request *req)
->  {
->         struct apple_nvme_iod *iod = blk_mq_rq_to_pdu(req);
->         struct apple_nvme_queue *q = iod->q;
-> diff --git a/drivers/nvme/host/fc.c b/drivers/nvme/host/fc.c
-> index 3c778bb0c294..a166c0b1cc33 100644
-> --- a/drivers/nvme/host/fc.c
-> +++ b/drivers/nvme/host/fc.c
-> @@ -2565,8 +2565,7 @@ nvme_fc_error_recovery(struct nvme_fc_ctrl *ctrl, char *errmsg)
->         nvme_reset_ctrl(&ctrl->ctrl);
->  }
->
-> -static enum blk_eh_timer_return
-> -nvme_fc_timeout(struct request *rq, bool reserved)
-> +static enum blk_eh_timer_return nvme_fc_timeout(struct request *rq)
->  {
->         struct nvme_fc_fcp_op *op = blk_mq_rq_to_pdu(rq);
->         struct nvme_fc_ctrl *ctrl = op->ctrl;
-> diff --git a/drivers/nvme/host/pci.c b/drivers/nvme/host/pci.c
-> index c7012e85d035..83b1229a4e36 100644
-> --- a/drivers/nvme/host/pci.c
-> +++ b/drivers/nvme/host/pci.c
-> @@ -1344,7 +1344,7 @@ static void nvme_warn_reset(struct nvme_dev *dev, u32 csts)
->                  "Try \"nvme_core.default_ps_max_latency_us=0 pcie_aspm=off\" and report a bug\n");
->  }
->
-> -static enum blk_eh_timer_return nvme_timeout(struct request *req, bool reserved)
-> +static enum blk_eh_timer_return nvme_timeout(struct request *req)
->  {
->         struct nvme_iod *iod = blk_mq_rq_to_pdu(req);
->         struct nvme_queue *nvmeq = iod->nvmeq;
-> diff --git a/drivers/nvme/host/rdma.c b/drivers/nvme/host/rdma.c
-> index f2a5e1ea508a..d2fb8651e49d 100644
-> --- a/drivers/nvme/host/rdma.c
-> +++ b/drivers/nvme/host/rdma.c
-> @@ -2013,8 +2013,7 @@ static void nvme_rdma_complete_timed_out(struct request *rq)
->         nvmf_complete_timed_out_request(rq);
->  }
->
-> -static enum blk_eh_timer_return
-> -nvme_rdma_timeout(struct request *rq, bool reserved)
-> +static enum blk_eh_timer_return nvme_rdma_timeout(struct request *rq)
->  {
->         struct nvme_rdma_request *req = blk_mq_rq_to_pdu(rq);
->         struct nvme_rdma_queue *queue = req->queue;
-> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
-> index bb67538d241b..f21f7b0140f9 100644
-> --- a/drivers/nvme/host/tcp.c
-> +++ b/drivers/nvme/host/tcp.c
-> @@ -2321,8 +2321,7 @@ static void nvme_tcp_complete_timed_out(struct request *rq)
->         nvmf_complete_timed_out_request(rq);
->  }
->
-> -static enum blk_eh_timer_return
-> -nvme_tcp_timeout(struct request *rq, bool reserved)
-> +static enum blk_eh_timer_return nvme_tcp_timeout(struct request *rq)
->  {
->         struct nvme_tcp_request *req = blk_mq_rq_to_pdu(rq);
->         struct nvme_ctrl *ctrl = &req->queue->ctrl->ctrl;
-> diff --git a/drivers/s390/block/dasd.c b/drivers/s390/block/dasd.c
-> index ba6d78789660..35d6f62ed515 100644
-> --- a/drivers/s390/block/dasd.c
-> +++ b/drivers/s390/block/dasd.c
-> @@ -3145,7 +3145,7 @@ static blk_status_t do_dasd_request(struct blk_mq_hw_ctx *hctx,
->   * BLK_EH_DONE if the request is handled or terminated
->   *                   by the driver.
->   */
-> -enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved)
-> +enum blk_eh_timer_return dasd_times_out(struct request *req)
->  {
->         struct dasd_block *block = req->q->queuedata;
->         struct dasd_device *device;
-> diff --git a/drivers/s390/block/dasd_int.h b/drivers/s390/block/dasd_int.h
-> index 83b918b84b4a..333a399f754e 100644
-> --- a/drivers/s390/block/dasd_int.h
-> +++ b/drivers/s390/block/dasd_int.h
-> @@ -795,7 +795,7 @@ void dasd_free_device(struct dasd_device *);
->  struct dasd_block *dasd_alloc_block(void);
->  void dasd_free_block(struct dasd_block *);
->
-> -enum blk_eh_timer_return dasd_times_out(struct request *req, bool reserved);
-> +enum blk_eh_timer_return dasd_times_out(struct request *req);
->
->  void dasd_enable_device(struct dasd_device *);
->  void dasd_set_target_state(struct dasd_device *, int);
-> diff --git a/drivers/scsi/scsi_error.c b/drivers/scsi/scsi_error.c
-> index a8b71b73a5a5..266ce414589c 100644
-> --- a/drivers/scsi/scsi_error.c
-> +++ b/drivers/scsi/scsi_error.c
-> @@ -318,7 +318,6 @@ void scsi_eh_scmd_add(struct scsi_cmnd *scmd)
->  /**
->   * scsi_timeout - Timeout function for normal scsi commands.
->   * @req:       request that is timing out.
-> - * @reserved:  whether the request is a reserved request.
->   *
->   * Notes:
->   *     We do not need to lock this.  There is the potential for a race
-> @@ -326,7 +325,7 @@ void scsi_eh_scmd_add(struct scsi_cmnd *scmd)
->   *     normal completion function determines that the timer has already
->   *     fired, then it mustn't do anything.
->   */
-> -enum blk_eh_timer_return scsi_timeout(struct request *req, bool reserved)
-> +enum blk_eh_timer_return scsi_timeout(struct request *req)
->  {
->         struct scsi_cmnd *scmd = blk_mq_rq_to_pdu(req);
->         enum blk_eh_timer_return rtn = BLK_EH_DONE;
-> diff --git a/drivers/scsi/scsi_priv.h b/drivers/scsi/scsi_priv.h
-> index 695d0c83ffe0..6eeaa0a7f86d 100644
-> --- a/drivers/scsi/scsi_priv.h
-> +++ b/drivers/scsi/scsi_priv.h
-> @@ -72,8 +72,7 @@ extern void scsi_exit_devinfo(void);
->
->  /* scsi_error.c */
->  extern void scmd_eh_abort_handler(struct work_struct *work);
-> -extern enum blk_eh_timer_return scsi_timeout(struct request *req,
-> -                                            bool reserved);
-> +extern enum blk_eh_timer_return scsi_timeout(struct request *req);
->  extern int scsi_error_handler(void *host);
->  extern enum scsi_disposition scsi_decide_disposition(struct scsi_cmnd *cmd);
->  extern void scsi_eh_wakeup(struct Scsi_Host *shost);
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 6d81fe10e850..fbb08bdd4618 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -575,7 +575,7 @@ struct blk_mq_ops {
->         /**
->          * @timeout: Called on request timeout.
->          */
-> -       enum blk_eh_timer_return (*timeout)(struct request *, bool);
-> +       enum blk_eh_timer_return (*timeout)(struct request *);
->
->         /**
->          * @poll: Called to poll for completion of a specific tag.
-> --
-> 2.25.1
->
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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
+jR/i1DG86lem3iBDXzXsZDn8R38=3D
+=3D2wuH
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------OBLMJDStp9e1aD6PHxmVHL9f--
+
+--------------l05qm07gdYiFOKB7dc7Wllsf--
+
+--------------DRCs634Vc3nA0yR6EDITkIC9
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature"
+
+-----BEGIN PGP SIGNATURE-----
+
+wsB5BAABCAAjFiEEhRJncuj2BJSl0Jf3sN6d1ii/Ey8FAmK0Y98FAwAAAAAACgkQsN6d1ii/Ey+B
+3Af+OlWAew+/rVw9xQNVq3C6Rxh/irHSZKtoDD1WkEH8nbIsVafo7VGa6jHIZF9V4oNWBk7b2D1Y
+gtdrram4DlL3XBaDPpbR9LMY4sVcfJaNomL5p1zmK/fNEXgZcqpNMaeuHxoJTDUYabe38/6LJaYJ
+OKMPFu6uyfEWI7z05EDDKLy0VtYy/GtlMn0YzMk1NcR0Oc7s1lIHfXthlNW69ixsEI3dPa9WKdj1
+IZzm3IJQRYH00few3/lZNbZdPaanMaP/pZEMlNMPp2yqhCdIEEBotuWmJuTRBi7FK34M37j/cJYp
+Xp7Xktepq6jBTUbhXhDS//yeDrcBIqGW+qqUVppZzQ==
+=tToZ
+-----END PGP SIGNATURE-----
+
+--------------DRCs634Vc3nA0yR6EDITkIC9--
