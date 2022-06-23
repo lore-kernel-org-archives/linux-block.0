@@ -2,54 +2,54 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC436C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 22:46:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BDC3C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 22:48:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230076AbiFWWq3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 18:46:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40812 "EHLO
+        id S229494AbiFWWsj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 18:48:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42964 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbiFWWq2 (ORCPT
+        with ESMTP id S229592AbiFWWsh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 18:46:28 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1FD251E64
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 15:46:27 -0700 (PDT)
+        Thu, 23 Jun 2022 18:48:37 -0400
+Received: from esa5.hgst.iphmx.com (esa5.hgst.iphmx.com [216.71.153.144])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9BCB52E62
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 15:48:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
   d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656024388; x=1687560388;
+  t=1656024513; x=1687560513;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=qppZhCvuhBSnN/hSOr5MPfcsILvys9HvUKJ9bXpwxIM=;
-  b=CAM3HyxQ6diALQgvFmTmdmvBtBSWZlZQSTcB+C7S9q1XuP7Q6OBMI58h
-   ySc+gniCHIgGdR7whE4DpF1lPtzSnmQKLA0HYUDVzNs0IkuNmJZeVZFlG
-   TFkrMptGRdohsF3gvhq7y9BH4NIPH5DcTQ/YZXVmDCMGR+C+0XGfST7nd
-   +uLaPkN0tJ8wxoAbdpzi5JLbU7t2LDVraFm1c50ycofSwow/fOLh0Vfk8
-   ohoAKqM9V2s0mGe+2R0gtww/dSHo6035JwAuyfLwCnHJE0dxkhxNNwMh6
-   ODH4vFh0WXkP8+6+vb2XmuZPcCc+2hR+ZNYmQkP2E4U6fWrZC6USrX466
+  bh=WMlE72jM23u8NWaac9uOsgczh2jP+sydx5NiZ6s3d3U=;
+  b=dFQqISoODhK7at9qMmEZh2/HQVHoFDm0lWT77sEy+z8ppT0dJ5zgclk6
+   UQCkZYGyjzvt6Qk8CWCUr+8pr92+PeCrTYMlC8ZLValXiUh4jQYjE7q9d
+   3OwejwWKHBe9GU+JL1Z17sIWT3INeA+9Y0waqgw2LMPZ4x1K1o6UvZejW
+   gf9Qe40pDM0tEMvsupQDyYXnqbhQkvLwm3qEByiu5BDUQvJv1Y9vnL9pd
+   EZCCvnluD7ypI3LkABNUKhpar6Sdiopfy+trBw04sQx5tMLcGfpkChPMb
+   Wv+i37zXLobXDBBPzm3zLHlCdYZkCBJWh2AGDQt+2YnUZYVl2W3vk3hKt
    w==;
 X-IronPort-AV: E=Sophos;i="5.92,217,1650902400"; 
-   d="scan'208";a="202650038"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Jun 2022 06:46:26 +0800
-IronPort-SDR: YjS9k5QUZ7X/a/WVyZcROxdSHHXNJyIPNhFkZ68h5buxihuLFyth2VZE23AeL6s1QsFysJ1Asm
- f+VWt//ALWZJJrQ7ggWN8jfVinpv67ccWc0re4YlYLSmj3YUsxnKAsD2vfM/VoIE0mtOEAPAUm
- inm1qDaauERbxiU9q9T2ZVrtcabJF4c5UmV6HLiZN/qNYHn5uxLdR6ZZpE42GYBgH7XqbiuxS7
- dQoJAO2Y0cYvP346m4wEniaLVBOaf3GUl+NMc06h3LKK0jcXp18pFuCbT/vG9S8FmztFK48dXu
- YsV2A5Ylpp9fRF+mNt+ZPAha
+   d="scan'208";a="203962054"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com) ([199.255.45.14])
+  by ob1.hgst.iphmx.com with ESMTP; 24 Jun 2022 06:48:30 +0800
+IronPort-SDR: SgyGik3FgcNJA0s+nzhl+PLZX9k4z6LxWpU9hoU988EsoMN5RFeU18/Dmk9gf+O4qQBSerSwtz
+ ZPk87ze/oXnDSRzFmKJRedpcBXb1p8heWlXDK3RSO7/0F4OqCigk/OfE1mCoSBcBcoU9/qVipH
+ prfeckDqKzpKwjcj2NwQEXByCDjSbFic5jowcS9IPUYlOSsekJr2hXUWyNQtybohFNjkgCrA3o
+ FqtyxUaGvZREeoHJrin3h6N09FFl3XxqXXgbq1NCRcWacNQ8S3mDVbaBMCarWeU3dLO/2UVybt
+ z93Hu8CanFiQ5Um79S/KAZSo
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
-  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jun 2022 15:08:54 -0700
-IronPort-SDR: tRPJURs3J/S6mq0yhugyI22JbmNuo3bBltuQq4gGJRx3WeAavDg/Rk9vu57ds2AM4+y7COeJCz
- eSE/suZmccM06dkD+/piyIaEvefXqCeLxDWx8AHx9PYa7T/eUVnZ4xmcWjiTKIry8T9IDKGQ2w
- dQvamTkRTgWsRpTpLgvALOZ/tZ6mcsE67uHHF7/oIeeq28xgX+cmpsNR5/On1KvAqL+uJqTuhe
- B64tf9/NKku+mCQGEZrpD+C67syohlo1yXPlXU24WOLd5oOcLAsAX7DlsZv/LyFI00llfJf5Ty
- zpY=
+  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jun 2022 15:10:59 -0700
+IronPort-SDR: oawuIpMB2cwJ3OhZM0g9DwoHP19qHlptJqRLHzn3bvDsHny+Fy4oKh81+kWdQEsZpoLvoy0+s2
+ 70K0uU4UbEQsZybFElX4MZyVRFxlKzL9Ucwk/PbmdaM3FAIgwbMjQWeu4g/+ULC8zM9gNwFxvy
+ tG5saujFPjJ2MOgFda41DYy9IwAkxceJPEb6+yVl6O6T4N/pCwamM4hf0rcGa5gKia/60C3/Bx
+ 3e8mJlYqnPQc9tP5KVI1i7Owt1jpFY7yCQzN8FKQSiQIRXzB42ZjqAp10zlYxcBUz2XTtXoXqJ
+ ba8=
 WDCIronportException: Internal
 Received: from usg-ed-osssrv.wdc.com ([10.3.10.180])
-  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jun 2022 15:46:27 -0700
+  by uls-op-cesaip02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 23 Jun 2022 15:48:32 -0700
 Received: from usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LTb2p48tsz1Rwnm
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 15:46:26 -0700 (PDT)
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTP id 4LTb5C2GLHz1RwqM
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 15:48:31 -0700 (PDT)
 Authentication-Results: usg-ed-osssrv.wdc.com (amavisd-new); dkim=pass
         reason="pass (just generated, assumed good)"
         header.d=opensource.wdc.com
@@ -57,72 +57,81 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=
         opensource.wdc.com; h=content-transfer-encoding:content-type
         :in-reply-to:organization:from:references:to:content-language
         :subject:user-agent:mime-version:date:message-id; s=dkim; t=
-        1656024386; x=1658616387; bh=qppZhCvuhBSnN/hSOr5MPfcsILvys9HvUKJ
-        9bXpwxIM=; b=OVnTwd8axDIWnvibmMG+5L1qEeFD32l9f+ZzN5s717DtcbO+Yu/
-        iB1uI3UzxidtMR7vwEsVg4ls9bcVfGrQdSwR1K8Qblv68YDUCjHUS7dw9N0NTQxk
-        nY8LTTxba05YrFL9ttv4ndEHnzQz5u7LgPGM516djE/UwQ0GtRVbaNdDFuWuML2P
-        m8wufeXQ9VPLnX1Pshfr/feXjlyKE47kvc4wyzqDi2Ejy+nHRgfnxacTWtkleQ67
-        76VtXPn+IRdQ8Y8P0os6NcZLy543gisDYdD1H6bdUp2BNrl7Ep1g29MsiE2ROJ9E
-        tv360ZU1lxkJaWZeRQ8Hnqohp/lKJTJc3KQ==
+        1656024510; x=1658616511; bh=WMlE72jM23u8NWaac9uOsgczh2jP+sydx5N
+        iZ6s3d3U=; b=GNRKy1pm3zNSrg/szwXJHRS2r5h/npu9qlHPvs+tHAW9RMmG/HC
+        BM9UV8SKX3gclDG21J+iXIfBNCFKcMyb/wLQqcT8mGgis0bujozK+pamXrkIooGX
+        5l/z35HvgKsbEuRHmUToxF/I7XLrJRIDmchNiPrItPepy8Q4SW6z/KLEyXs5vS+B
+        OV4UYGqRy+bRw66IC2v8OWNnWKHNUgMOEUrmTBqySuDr0RFytmA1UKIYEtFcaDSU
+        LUb/l1gx3vgWynvh459AAjTW8wX7wMYBZgVQsKVx8KNy1hQKy5Y0wAD9XQNa4Lr1
+        1wozJT4p/rvTSmNsgmjWxvQatxWE0HEgK1A==
 X-Virus-Scanned: amavisd-new at usg-ed-osssrv.wdc.com
 Received: from usg-ed-osssrv.wdc.com ([127.0.0.1])
         by usg-ed-osssrv.wdc.com (usg-ed-osssrv.wdc.com [127.0.0.1]) (amavisd-new, port 10026)
-        with ESMTP id XJivNQjapvmo for <linux-block@vger.kernel.org>;
-        Thu, 23 Jun 2022 15:46:26 -0700 (PDT)
+        with ESMTP id AWJKSTmE1xSc for <linux-block@vger.kernel.org>;
+        Thu, 23 Jun 2022 15:48:30 -0700 (PDT)
 Received: from [10.225.163.93] (unknown [10.225.163.93])
-        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LTb2n0rnNz1RtVk;
-        Thu, 23 Jun 2022 15:46:24 -0700 (PDT)
-Message-ID: <5df17d13-138b-f0d2-f657-3c1468fcfb33@opensource.wdc.com>
-Date:   Fri, 24 Jun 2022 07:46:23 +0900
+        by usg-ed-osssrv.wdc.com (Postfix) with ESMTPSA id 4LTb596Vqsz1RtVk;
+        Thu, 23 Jun 2022 15:48:29 -0700 (PDT)
+Message-ID: <c7de3cfd-ec60-05ab-d05c-a9c356ba6cf6@opensource.wdc.com>
+Date:   Fri, 24 Jun 2022 07:48:28 +0900
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH 21/51] dm/dm-zoned: Use the enum req_op type
+Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
 Content-Language: en-US
 To:     Bart Van Assche <bvanassche@acm.org>, Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
-        Alasdair Kergon <agk@redhat.com>,
-        Mike Snitzer <snitzer@kernel.org>
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
- <20220623180528.3595304-22-bvanassche@acm.org>
+ <20220623180528.3595304-52-bvanassche@acm.org>
 From:   Damien Le Moal <damien.lemoal@opensource.wdc.com>
 Organization: Western Digital Research
-In-Reply-To: <20220623180528.3595304-22-bvanassche@acm.org>
+In-Reply-To: <20220623180528.3595304-52-bvanassche@acm.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/24/22 03:04, Bart Van Assche wrote:
-> Improve static type checking by using the enum req_op type for arguments
-> that represent a request operation.
+On 6/24/22 03:05, Bart Van Assche wrote:
+> Since __bitwise types are not supported by the tracing infrastructure, store
+> the operation type as an int in the tracing event.
 > 
-> Cc: Alasdair Kergon <agk@redhat.com>
-> Cc: Mike Snitzer <snitzer@kernel.org>
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
+> Cc: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+> Cc: Naohiro Aota <naohiro.aota@wdc.com>
+> Cc: Johannes Thumshirn <jth@kernel.org>
 > Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 > ---
->  drivers/md/dm-zoned-metadata.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  fs/zonefs/trace.h | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/md/dm-zoned-metadata.c b/drivers/md/dm-zoned-metadata.c
-> index d1ea66114d14..9341c46e44b7 100644
-> --- a/drivers/md/dm-zoned-metadata.c
-> +++ b/drivers/md/dm-zoned-metadata.c
-> @@ -737,7 +737,7 @@ static int dmz_write_mblock(struct dmz_metadata *zmd, struct dmz_mblock *mblk,
->  /*
->   * Read/write a metadata block.
->   */
-> -static int dmz_rdwr_block(struct dmz_dev *dev, int op,
-> +static int dmz_rdwr_block(struct dmz_dev *dev, enum req_op op,
->  			  sector_t block, struct page *page)
->  {
->  	struct bio *bio;
+> diff --git a/fs/zonefs/trace.h b/fs/zonefs/trace.h
+> index 21501da764bd..8707e1c3023c 100644
+> --- a/fs/zonefs/trace.h
+> +++ b/fs/zonefs/trace.h
+> @@ -32,15 +32,15 @@ TRACE_EVENT(zonefs_zone_mgmt,
+>  	    TP_fast_assign(
+>  			   __entry->dev = inode->i_sb->s_dev;
+>  			   __entry->ino = inode->i_ino;
+> -			   __entry->op = op;
+> +			   __entry->op = (__force int)op;
+>  			   __entry->sector = ZONEFS_I(inode)->i_zsector;
+>  			   __entry->nr_sectors =
+>  				   ZONEFS_I(inode)->i_zone_size >> SECTOR_SHIFT;
+>  	    ),
+>  	    TP_printk("bdev=(%d,%d), ino=%lu op=%s, sector=%llu, nr_sectors=%llu",
+>  		      show_dev(__entry->dev), (unsigned long)__entry->ino,
+> -		      blk_op_str(__entry->op), __entry->sector,
+> -		      __entry->nr_sectors
+> +		      blk_op_str((__force enum req_op)__entry->op),
+> +		      __entry->sector, __entry->nr_sectors
+>  	    )
+>  );
+>  
 
-Looks good.
-
-Reviewed-by: Damien Le Moal <damien.lemoal@opensource.wdc.com>
+How do you get the warning ? I always run sparse and have not seen any
+warning... Looks good anyway, will apply.
 
 -- 
 Damien Le Moal
