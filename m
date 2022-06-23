@@ -2,50 +2,51 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7926C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 315A1C43334
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231838AbiFWTBR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:01:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47420 "EHLO
+        id S231781AbiFWTBT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45634 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232020AbiFWTBF (ORCPT
+        with ESMTP id S231779AbiFWTBG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:01:05 -0400
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09AFA10E64E
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:19 -0700 (PDT)
-Received: by mail-pl1-f178.google.com with SMTP id c4so2629850plc.8
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:19 -0700 (PDT)
+        Thu, 23 Jun 2022 15:01:06 -0400
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D15F310E654
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:20 -0700 (PDT)
+Received: by mail-pj1-f45.google.com with SMTP id d14so334155pjs.3
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=XJ/sGb3XCWvOZL3qB6wyTMEmWtH7m2nEWJDejHsFgow=;
-        b=agLaak4HV2sp0t3t0d8Dvrlhh/zT5/XDpuI/DqKICs2u/Yk2xtwgppgBy6MUqpe/R5
-         myLYNpocrmIRwmoNZJm5DXgushQVhxmuasBxZGyBSPJYworvCo67G9QzE20T3E44AS9h
-         iv4vTmR8Bh5bK77j9jojB5BnTzv8wBuEiZ1f8GYYLpo0CJ7sZbYWwAiTY7glPB8VYv9E
-         Lcu0wDyTQr3IfgQgZtZlhjdpU+DdXRD+/wIY0M7GVxONPvcLw5q0BVQTNg7rRxFtPVxF
-         8GTI89zcIu6SnybSpv1RPiFsaxHm4mW03v5ByHa/9TEzM0HMLfNCkORITpxDeJk+BsQY
-         Cfmg==
-X-Gm-Message-State: AJIora/VLqYq/Qa+dTAwi9C2gvuEJckfxetOL3u2oii6gfBx5+KP+5l1
-        MJKhrXeh7uTjG4sL1W34FqNvDUAIBpg=
-X-Google-Smtp-Source: AGRyM1ucaitJsUNXBveRefrZ+IgyKLhnXp216Irm/sIZWm1Q2dykhFqe2w3rsNXVd/6bGC5rSy+zOQ==
-X-Received: by 2002:a17:90b:3849:b0:1e8:7f47:5dcd with SMTP id nl9-20020a17090b384900b001e87f475dcdmr5136891pjb.61.1656007578668;
-        Thu, 23 Jun 2022 11:06:18 -0700 (PDT)
+        bh=gN4bfvORSKJmj2cEmic3OBJkZeLF1uahbAz0Y3BxY0k=;
+        b=6X+NpM/8g09nxbRpdcQ3s1p5JA7BZR1jx0+rXwmwWwun7SYWe7XBnlutWciTdPPqe4
+         ywImYovF7lcvDej4kHH0sqthfikwtj2wVCyn09od4TNQQk3b7fUanJE9Kth1ZQjwnc14
+         nez7comHROpqay8UB7Mt+qOkFNeFRm672lHVHHK5ezLKKZMLp2YcqQieGQd5UVaWNXn2
+         g9h8ERs6ZYKhe5/Bg3+DNVu1Rgic66MwUBt8k77mDAnYXLNJlDN7HCduNbUS6DB1USpb
+         r7tL3OrUoBzD5p/lPNVbGAMZZU9qRduYS9zvJlbbgNNTTX/B8431PjWPDwZyw5XRX2nZ
+         gL2A==
+X-Gm-Message-State: AJIora+v2YY+Fil41/1bESVDhtW3aTuGznXvGuSkXaNnam1cnHXBrxZu
+        8mdJ0nSQZinPmUt588MEh87F/WW7U4E=
+X-Google-Smtp-Source: AGRyM1utKMN1cClDIJr8Cf+Mreb0Nix0XVrNePm9gMTuakD3IEx0Dim9C9hXx+UaKUKHQAOS4QMkUQ==
+X-Received: by 2002:a17:902:d292:b0:16a:2a8d:616e with SMTP id t18-20020a170902d29200b0016a2a8d616emr19379555plc.5.1656007580236;
+        Thu, 23 Jun 2022 11:06:20 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.17
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:06:17 -0700 (PDT)
+        Thu, 23 Jun 2022 11:06:19 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Sagi Grimberg <sagi@grimberg.me>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: [PATCH 28/51] nvme/target: Use the new blk_opf_t type
-Date:   Thu, 23 Jun 2022 11:05:05 -0700
-Message-Id: <20220623180528.3595304-29-bvanassche@acm.org>
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        John Garry <john.garry@huawei.com>,
+        Mike Christie <michael.christie@oracle.com>
+Subject: [PATCH 29/51] scsi/core: Improve static type checking
+Date:   Thu, 23 Jun 2022 11:05:06 -0700
+Message-Id: <20220623180528.3595304-30-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -55,42 +56,41 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve static type checking by using the new blk_opf_t type for variables
-that represent a request operation combined with request flags.
+Improve static type checking by using enum req_op where appropriate.
 
-Cc: Christoph Hellwig <hch@lst.de>
-Cc: Sagi Grimberg <sagi@grimberg.me>
-Cc: Chaitanya Kulkarni <kch@nvidia.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Cc: John Garry <john.garry@huawei.com>
+Cc: Mike Christie <michael.christie@oracle.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/nvme/target/io-cmd-bdev.c | 3 ++-
- drivers/nvme/target/zns.c         | 2 +-
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ drivers/scsi/scsi_lib.c  | 4 ++--
+ include/scsi/scsi_cmnd.h | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/nvme/target/io-cmd-bdev.c b/drivers/nvme/target/io-cmd-bdev.c
-index 27a72504d31c..306d97b3840f 100644
---- a/drivers/nvme/target/io-cmd-bdev.c
-+++ b/drivers/nvme/target/io-cmd-bdev.c
-@@ -246,7 +246,8 @@ static void nvmet_bdev_execute_rw(struct nvmet_req *req)
- 	struct scatterlist *sg;
- 	struct blk_plug plug;
- 	sector_t sector;
--	int op, i, rc;
-+	blk_opf_t op;
-+	int i, rc;
- 	struct sg_mapping_iter prot_miter;
- 	unsigned int iter_flags;
- 	unsigned int total_len = nvmet_rw_data_len(req) + req->metadata_len;
-diff --git a/drivers/nvme/target/zns.c b/drivers/nvme/target/zns.c
-index 62afb7936132..c5e315d57d60 100644
---- a/drivers/nvme/target/zns.c
-+++ b/drivers/nvme/target/zns.c
-@@ -525,7 +525,7 @@ static void nvmet_bdev_zone_append_bio_done(struct bio *bio)
- void nvmet_bdev_execute_zone_append(struct nvmet_req *req)
+diff --git a/drivers/scsi/scsi_lib.c b/drivers/scsi/scsi_lib.c
+index 6ffc9e4258a8..6b6a7a4b0950 100644
+--- a/drivers/scsi/scsi_lib.c
++++ b/drivers/scsi/scsi_lib.c
+@@ -1125,8 +1125,8 @@ static void scsi_initialize_rq(struct request *rq)
+ 	cmd->retries = 0;
+ }
+ 
+-struct request *scsi_alloc_request(struct request_queue *q,
+-		unsigned int op, blk_mq_req_flags_t flags)
++struct request *scsi_alloc_request(struct request_queue *q, enum req_op op,
++				   blk_mq_req_flags_t flags)
  {
- 	sector_t sect = nvmet_lba_to_sect(req->ns, req->cmd->rw.slba);
--	const unsigned int op = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
-+	const blk_opf_t op = REQ_OP_ZONE_APPEND | REQ_SYNC | REQ_IDLE;
- 	u16 status = NVME_SC_SUCCESS;
- 	unsigned int total_len = 0;
- 	struct scatterlist *sg;
+ 	struct request *rq;
+ 
+diff --git a/include/scsi/scsi_cmnd.h b/include/scsi/scsi_cmnd.h
+index 1e80e70dfa92..6df0af7dd508 100644
+--- a/include/scsi/scsi_cmnd.h
++++ b/include/scsi/scsi_cmnd.h
+@@ -387,6 +387,6 @@ extern void scsi_build_sense(struct scsi_cmnd *scmd, int desc,
+ 			     u8 key, u8 asc, u8 ascq);
+ 
+ struct request *scsi_alloc_request(struct request_queue *q,
+-		unsigned int op, blk_mq_req_flags_t flags);
++		enum req_op op, blk_mq_req_flags_t flags);
+ 
+ #endif /* _SCSI_SCSI_CMND_H */
