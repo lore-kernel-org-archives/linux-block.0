@@ -2,49 +2,49 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B94BC43334
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 648D5C433EF
 	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 19:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbiFWTBg (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 15:01:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46970 "EHLO
+        id S232037AbiFWTBd (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 15:01:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46726 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232069AbiFWTBM (ORCPT
+        with ESMTP id S232057AbiFWTBL (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 15:01:12 -0400
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78DEC10E673
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:28 -0700 (PDT)
-Received: by mail-pf1-f182.google.com with SMTP id k127so288056pfd.10
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:28 -0700 (PDT)
+        Thu, 23 Jun 2022 15:01:11 -0400
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C06C010E67E
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:30 -0700 (PDT)
+Received: by mail-pg1-f176.google.com with SMTP id r66so184873pgr.2
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 11:06:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=wa/sr+NP/FT4fKWkIMXc8lgZJSIyAgOvOxw719smI0c=;
-        b=mIhLjUKauphq6cdPr/+abnNhI0mTrAscs6w5fAqWayH8CMr3byY80NWX3aPo3bII4S
-         xGz+OUFlB1AUVTSWJlbFATzoql0CWUm5sWVQ3WPcKoAHOnQUlMGq3JRq783HhPvaP8b8
-         aunljK7L2hbU69qViLaS1mOX0N2UmCTz5xA4yjKgLK5Crm14yH8fkuxNg3p/wwQyrtyx
-         ce6ITp+Z5WsjIoGEg1knyi+/WtLmWCbCl1uOKlr+m6yVOTYqAAHy+MnylG92fim1iqaX
-         bH4kWnxr0fkF0MdpH956jrOQXJjq/ivNSl7BxVksuOCSK7D6AiS+7rBMk1Ddp3gQU8no
-         uDCg==
-X-Gm-Message-State: AJIora93ukKzIf0aCLhUETnhLWPN72osUKLJ+pJN2dWjazFlpTdOCz1P
-        b/bbUuOP2lhqYVjCeSDbpcI=
-X-Google-Smtp-Source: AGRyM1tRGaBl/bW98h5/DKKZgjSXaxtAeOJKvM2wtJqd7pEIFCt+oLNoKBUKIJ8k+65s9yHrmQ/BkA==
-X-Received: by 2002:a05:6a00:1306:b0:512:ca3d:392f with SMTP id j6-20020a056a00130600b00512ca3d392fmr42378220pfu.79.1656007587793;
-        Thu, 23 Jun 2022 11:06:27 -0700 (PDT)
+        bh=WDrUbGX6pJvpKfdPLgsIQ+aIpWdnNjzAWz8vQdxyqAM=;
+        b=sDS+9nignxwwTbKnxpcS0Chce2jdTsxo43HBFdaHlDRRQN0HnP0+2X7V0YlN6OzaRq
+         TXywXYYSFtMM/pMn+e2ZLgXpDAfVQVSJO1HHBI/zsxnLO3nZ891Yo5VY3yNIn9i7xD0n
+         FozSbxHeOGdfAILBlux5t27uKtxwCwqNvWiuhui/8DO1tP+nxWGfWKhvahPDaiGmxO3R
+         nUqEWX+mwBryuaUgzKp8us/2KyuagYQ0yPbEd4vEJbO519zMygVQpd/Hz7kAhGIfDAcK
+         VNMFWwcFba+4tkeb+OcZ+3CxhzcEBAacmW1dsk4iasyohpmS7YbjnRruJG01ZIwSVSaJ
+         LNpA==
+X-Gm-Message-State: AJIora9Ct7bBDZpjyN/s7nhjveQR9LDqo5GemMaqD4LKugTUGhyaKk0/
+        whBgTMRoMB32EOfbXj70JQM=
+X-Google-Smtp-Source: AGRyM1vYnG3menuGI91AwfsD9P0Kr4/+Gx/XA6p1FCITgG2/oPQ1YYMbQi5OL/EsjTUaoc4ccnH4nA==
+X-Received: by 2002:a63:2b16:0:b0:3fa:faf9:e6d7 with SMTP id r22-20020a632b16000000b003fafaf9e6d7mr8442209pgr.325.1656007590051;
+        Thu, 23 Jun 2022 11:06:30 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:70af:1dc5:d20:a563])
-        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.26
+        by smtp.gmail.com with ESMTPSA id a18-20020a056a000c9200b0051c4ecb0e3dsm16019967pfv.193.2022.06.23.11.06.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jun 2022 11:06:27 -0700 (PDT)
+        Thu, 23 Jun 2022 11:06:28 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Mike Christie <michael.christie@oracle.com>
-Subject: [PATCH 34/51] scsi/target: Use the new blk_opf_t type
-Date:   Thu, 23 Jun 2022 11:05:11 -0700
-Message-Id: <20220623180528.3595304-35-bvanassche@acm.org>
+        Andrew Morton <akpm@linux-foundation.org>
+Subject: [PATCH 35/51] mm: Use the new blk_opf_t type
+Date:   Thu, 23 Jun 2022 11:05:12 -0700
+Message-Id: <20220623180528.3595304-36-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220623180528.3595304-1-bvanassche@acm.org>
 References: <20220623180528.3595304-1-bvanassche@acm.org>
@@ -54,34 +54,29 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve static type checking by using the new blk_opf_t type for variables
-that represent a request operation combined with request flags.
+Improve static type checking by using the new blk_opf_t type for block
+layer request flags.
 
-Cc: Mike Christie <michael.christie@oracle.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Christoph Hellwig <hch@lst.de>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/target/target_core_iblock.c | 4 ++--
+ include/linux/writeback.h | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/target/target_core_iblock.c b/drivers/target/target_core_iblock.c
-index 378c80313a0f..5fef19af88df 100644
---- a/drivers/target/target_core_iblock.c
-+++ b/drivers/target/target_core_iblock.c
-@@ -343,7 +343,7 @@ static void iblock_bio_done(struct bio *bio)
- }
+diff --git a/include/linux/writeback.h b/include/linux/writeback.h
+index b8c9610c2313..3f045f6d6c4f 100644
+--- a/include/linux/writeback.h
++++ b/include/linux/writeback.h
+@@ -101,9 +101,9 @@ struct writeback_control {
+ #endif
+ };
  
- static struct bio *iblock_get_bio(struct se_cmd *cmd, sector_t lba, u32 sg_num,
--				  unsigned int opf)
-+				  blk_opf_t opf)
+-static inline int wbc_to_write_flags(struct writeback_control *wbc)
++static inline blk_opf_t wbc_to_write_flags(struct writeback_control *wbc)
  {
- 	struct iblock_dev *ib_dev = IBLOCK_DEV(cmd->se_dev);
- 	struct bio *bio;
-@@ -719,7 +719,7 @@ iblock_execute_rw(struct se_cmd *cmd, struct scatterlist *sgl, u32 sgl_nents,
- 	struct bio_list list;
- 	struct scatterlist *sg;
- 	u32 sg_num = sgl_nents;
--	unsigned int opf;
-+	blk_opf_t opf;
- 	unsigned bio_cnt;
- 	int i, rc;
- 	struct sg_mapping_iter prot_miter;
+-	int flags = 0;
++	blk_opf_t flags = 0;
+ 
+ 	if (wbc->punt_to_cgroup)
+ 		flags = REQ_CGROUP_PUNT;
