@@ -2,73 +2,61 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA00EC43334
-	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 07:28:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10069CCA47C
+	for <linux-block@archiver.kernel.org>; Thu, 23 Jun 2022 07:46:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbiFWH2S (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 23 Jun 2022 03:28:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46538 "EHLO
+        id S230354AbiFWHqt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 23 Jun 2022 03:46:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229874AbiFWH2Q (ORCPT
+        with ESMTP id S230436AbiFWHqs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 23 Jun 2022 03:28:16 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B9D3DE9E;
-        Thu, 23 Jun 2022 00:28:08 -0700 (PDT)
-Received: from dggpeml500021.china.huawei.com (unknown [172.30.72.56])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LTBfX27Q1zDqqY;
-        Thu, 23 Jun 2022 15:27:32 +0800 (CST)
-Received: from dggpeml500003.china.huawei.com (7.185.36.200) by
- dggpeml500021.china.huawei.com (7.185.36.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Thu, 23 Jun 2022 15:28:06 +0800
-Received: from huawei.com (10.175.127.227) by dggpeml500003.china.huawei.com
- (7.185.36.200) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Thu, 23 Jun
- 2022 15:28:06 +0800
-From:   Li Nan <linan122@huawei.com>
-To:     <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linan122@huawei.com>, <yukuai3@huawei.com>, <yi.zhang@huawei.com>
-Subject: [PATCH -next v4] block: remove WARN_ON() from bd_link_disk_holder
-Date:   Thu, 23 Jun 2022 15:41:00 +0800
-Message-ID: <20220623074100.2251301-1-linan122@huawei.com>
-X-Mailer: git-send-email 2.31.1
+        Thu, 23 Jun 2022 03:46:48 -0400
+Received: from mail.onlinesuccesses.pl (mail.onlinesuccesses.pl [198.244.150.235])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 861BD46B39
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 00:46:47 -0700 (PDT)
+Received: by mail.onlinesuccesses.pl (Postfix, from userid 1002)
+        id 325ADAF0C1; Thu, 23 Jun 2022 07:42:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=onlinesuccesses.pl;
+        s=mail; t=1655970273;
+        bh=nE8HqilgMh4dy7+Z8ksfg7Bc9rmPeQtYFq3/3YR2ODU=;
+        h=Date:From:To:Subject:From;
+        b=CT/4LAA1MGJxGyLbIsZhGpAwfUDlZFS2Lt9nuhNU1VVAMePcT7sbqptmuE3SWOu8K
+         WDOmUHRAc3L4ft1FX0aLCfrJdSSEIRPjQv2GO/tHwLgtaY5QU94DheiZV7cqwjE27i
+         3hSz3r74JRK/oSeKtWsE1oR6hZgK1e2GFIHDbDYeX4IALvvQmD/Yb+sUaXHZr+gXah
+         N6RIk/Z237K35lAOYF+LFpz5YAeJFdsuHX0jLmUERR4Mujr08WuvZIeFX5gUZIJ+6E
+         C0WEBKyEbUKueE4v74A3aozPSv/eEw6DVUs7gfbUlCFgUAv4IgEgtwm0U2nO9IiUev
+         KiUn5G/0I/4CA==
+Received: by mail.onlinesuccesses.pl for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 07:41:20 GMT
+Message-ID: <20220623064501-0.1.51.1mry8.0.aq7wylqfjq@onlinesuccesses.pl>
+Date:   Thu, 23 Jun 2022 07:41:20 GMT
+From:   "Wiktor Zielonko" <wiktor.zielonko@onlinesuccesses.pl>
+To:     <linux-block@vger.kernel.org>
+Subject: Ruch z pierwszej pozycji w Google
+X-Mailer: mail.onlinesuccesses.pl
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpeml500003.china.huawei.com (7.185.36.200)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Since commit 83cbce957446("block: add error handling for device_add_disk /
-add_disk"), bdev->bd_holder_dir can not be empty now, so remove WARN_ON()
-from bd_link_disk_holder.
+Dzie=C5=84 dobry,=20
 
-Signed-off-by: Li Nan <linan122@huawei.com>
----
- block/holder.c | 4 ----
- 1 file changed, 4 deletions(-)
+jaki=C5=9B czas temu zg=C5=82osi=C5=82a si=C4=99 do nas firma, kt=C3=B3re=
+j strona internetowa nie pozycjonowa=C5=82a si=C4=99 wysoko w wyszukiwarc=
+e Google.=20
 
-diff --git a/block/holder.c b/block/holder.c
-index 8d750281a1cd..5283bc804cc1 100644
---- a/block/holder.c
-+++ b/block/holder.c
-@@ -79,10 +79,6 @@ int bd_link_disk_holder(struct block_device *bdev, struct gendisk *disk)
- 
- 	WARN_ON_ONCE(!bdev->bd_holder);
- 
--	/* FIXME: remove the following once add_disk() handles errors */
--	if (WARN_ON(!bdev->bd_holder_dir))
--		goto out_unlock;
--
- 	holder = bd_find_holder_disk(bdev, disk);
- 	if (holder) {
- 		holder->refcnt++;
--- 
-2.31.1
+Na podstawie wykonanego przez nas audytu SEO zoptymalizowali=C5=9Bmy tre=C5=
+=9Bci na stronie pod k=C4=85tem wcze=C5=9Bniej opracowanych s=C5=82=C3=B3=
+w kluczowych. Nasz wewn=C4=99trzny system codziennie analizuje prawid=C5=82=
+owe dzia=C5=82anie witryny.  Dzi=C4=99ki indywidualnej strategii, firma z=
+dobywa coraz wi=C4=99cej Klient=C3=B3w. =20
 
+Czy chcieliby Pa=C5=84stwo zwi=C4=99kszy=C4=87 liczb=C4=99 os=C3=B3b odwi=
+edzaj=C4=85cych stron=C4=99 internetow=C4=85 firmy? M=C3=B3g=C5=82bym prz=
+edstawi=C4=87 ofert=C4=99?=20
+
+
+Pozdrawiam serdecznie,
+Wiktor Zielonko
