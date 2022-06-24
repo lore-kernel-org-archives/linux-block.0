@@ -2,202 +2,339 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 255CAC433EF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 12:18:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE77FCCA480
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 14:14:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229587AbiFXMSX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 08:18:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37636 "EHLO
+        id S232169AbiFXOOt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 10:14:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232007AbiFXMSL (ORCPT
+        with ESMTP id S232503AbiFXOOl (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 08:18:11 -0400
-Received: from esa4.hgst.iphmx.com (esa4.hgst.iphmx.com [216.71.154.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 973751FA76
-        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 05:17:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
-  t=1656073062; x=1687609062;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=RQEuRNa7jl4cOUZo/na6K/4ZVWzDO/fSypCT6LI2fHs=;
-  b=iogN/QbldSGjvbb/yykHP2snSB0R7Wk2Dq/G74bU6GU/d69Os1EeMx5i
-   CeqN5BJXRNZU7LtJNzvC6ZpAC7JFzd00Zp/89tXbbd2dr2pgKzhIgcVlR
-   zB9cM7vSiN5tUuIWWbf31uBsBYIWEeFk3+XKjH0H01oB+m/2R+6d/lpbJ
-   lZLQ/KUSjwpZOYvJ+bA9BEoGEbDlhSnR1b0YUs6fDFDl27NaELThGh//X
-   GOz6O98od+i22LvP0E4BxlqnQZ0HO2Mhwuz/bNmh03Is3DUnYn2UYb13a
-   mWka1eZa3IxuE9B0OoLkwoPlCU7FzuR+3FtcYxiao5RZJI1ZRUaKAUaRQ
-   A==;
-X-IronPort-AV: E=Sophos;i="5.92,218,1650902400"; 
-   d="scan'208";a="202698353"
-Received: from mail-bn8nam11lp2169.outbound.protection.outlook.com (HELO NAM11-BN8-obe.outbound.protection.outlook.com) ([104.47.58.169])
-  by ob1.hgst.iphmx.com with ESMTP; 24 Jun 2022 20:17:41 +0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FM1S4eomctG0epOYP0634xCdWX0atSnbvFpvcXV7OLxRMiAmW9apsiOtxmh0gC5o/NuZuECjVg2D109bBOKR5lQqAI1z0Xxe6kOrMth2KmHAPd7f4wDPLu4W1U+VAI8BXVFc1fWka+yyFWsSadgK6xEFnCr5zVMSvpBomvoJpOMa0VbM4e+sY8iN9t9YVWFpqMWV1X1Ca7wvJCUwm3a41BeSy1uYa9M+pJj+C8EFWRmHt5plk0SgSAQ6TAvEj3CZ/VY3C6EF3zjXYki6geTUXbe9beT9lIVKZG5yUhk0RMYxJrdA0iZNx/OcOv2+yBM1jtnMA/Rp8A96qu7d1CVrHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=VliMg9yvIIwEJtSq+mpqTh1KUurh6EcJOzNufPpH2K0=;
- b=Nm0K4IWNt3LhNONjlhvwOJkdYq0hpdn5YLZOSOz/Y1WnbgsOMMM8ZBOIiuTi25yc+zfuuBU9onOq1f4svGZufJw4fAIjeMdTuWCpW9Q8bKF/dvOHdl4g6/tZCF+ozqF5lXABoSakQyrWFHJTi8mc4q0OZEBCLfbwA0J7cYH1F3aWgtTmBvmFFBxRRTAq7t4ieE+JOb7WHxdhoqeQKaQTW8e7EmQSC8MC97djd+Zl4WjfG8gljI7kpfJFvosjkk4tl5i1S+WURKDz6xFhqVWcXrDJoPuT/FFUgMNE33H1388rPVl7hTESUgcSQaqCNjTHwmalp+aeZVVnCeRV5UmCIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=wdc.com; dmarc=pass action=none header.from=wdc.com; dkim=pass
- header.d=wdc.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=sharedspace.onmicrosoft.com; s=selector2-sharedspace-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=VliMg9yvIIwEJtSq+mpqTh1KUurh6EcJOzNufPpH2K0=;
- b=c/wQnUc+um9/oefFG/MmxeVlvs5GFoFC9gTPW1XNykF62U676OYrT45XP4tGg4Nu30GWCbE0eC5zD+wfZZtQyafb/XIeNE5gV/2z8ZMlYR9s6Z1rRu27t+WNB3DDFFShhW++xdfcP7vez/M+VJr7t2B/JezhjuLnSiW7+YMgExY=
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com (2603:10b6:8:f::6) by
- BN8PR04MB5874.namprd04.prod.outlook.com (2603:10b6:408:a6::28) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.5373.15; Fri, 24 Jun 2022 12:17:39 +0000
-Received: from DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7]) by DM8PR04MB8037.namprd04.prod.outlook.com
- ([fe80::39dc:d3d:686a:9e7%3]) with mapi id 15.20.5353.022; Fri, 24 Jun 2022
- 12:17:39 +0000
-From:   Shinichiro Kawasaki <shinichiro.kawasaki@wdc.com>
-To:     "Li, Zhijian" <lizhijian@fujitsu.com>
-CC:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        "yangx.jy@fujitsu.com" <yangx.jy@fujitsu.com>
-Subject: Re: [PATCH blktests] nvmeof-mp/rc: Avoid skipping tests due to the
- expected SKIP_REASON
-Thread-Topic: [PATCH blktests] nvmeof-mp/rc: Avoid skipping tests due to the
- expected SKIP_REASON
-Thread-Index: AQHYh58XRETCr2SsZE2RADrDB0f1D61eN1SAgAAbsgCAACaEgA==
-Date:   Fri, 24 Jun 2022 12:17:38 +0000
-Message-ID: <20220624121737.iqo35ocrtttqjzzr@shindev>
-References: <20220624082039.5x2cl26q7v6rnm5n@shindev>
- <3e731962-6bf1-e45d-0b57-04a41c96dd96@fujitsu.com>
-In-Reply-To: <3e731962-6bf1-e45d-0b57-04a41c96dd96@fujitsu.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=wdc.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 49e469ee-5d2a-48f5-cedf-08da55db87c3
-x-ms-traffictypediagnostic: BN8PR04MB5874:EE_
-wdcipoutbound: EOP-TRUE
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: nl8Hv5NvLuiTvrlve+GLdx1IJzzLqyexuONC+Jzl+ag+m8dqtJtVsA9D8/E9hWeFp0Yp9cHc4SkjiyUqTzuapMS5TKjpVh7+kREIjbmhb3Ts2lCBlQyIPzIh41HuYvKfqxEAcWxMswxtqXGwMLV6mQuVtMGxOgpghKei+QfbGg1z6zZkOFcA2i73eav2bzWeiWuE88coBDPRx50WIywAeN5NI017W1/t8tpyXHyhc/W++bL+qEJGKBGvlvbxzhpWBfG7lvBM4BNdpS6OsNZbP2+Vkxq/vC347NeFG3VVRhy80yooj0e1HcVNXcRv2eaFrJ1FMBjtUJJB+6NWbvcUFuyF5xdiQ+lHvK5vR+mp2qQv0O6rYyp1NqFcEx30f5sSTWGiBmmlxy8Vu7KdDvC+hWNyAc2BUtUJ7WrB5gDVZorwoSatHU7DCiqYen/e3Vw7l4eS3b67YI6Vy1mZs4NgBruyoOjZ+AMEPqvYhJZ6WaK/7FZo7P7b/EchAwHYppr7wJtEgnJp9b1ld6mjUHPYGrEWuYon2zpJIdH48JpINCsQSb8kKm+FIq8AIzxeKpTRb+KFwsKY+1AVNd/2qgS4pAssBB4/6sZQghOnfG0bud+SaOIysM0aWIZhLzOnVHQBrJqLDAY/AqtrviEEZDz5Svu5Uc6vUPI7gIRtVxYKfQn1BkB9yRVJSaWtNqhvJAavY1filcuWnEUSI/HDepbyTw5H6OaZqkV0R/3f5nbrcYH7VUHAMa2GqHDsHYQtHxfQz2iOm2iNl4Azy4dokHQRVguvK2Jzc+bSV9YsWp4rx/U=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR04MB8037.namprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230016)(4636009)(7916004)(39860400002)(136003)(346002)(396003)(366004)(376002)(41300700001)(91956017)(66446008)(64756008)(82960400001)(86362001)(66946007)(8936002)(8676002)(4326008)(76116006)(66476007)(9686003)(1076003)(71200400001)(26005)(316002)(66556008)(6506007)(6916009)(6512007)(54906003)(122000001)(38100700002)(186003)(478600001)(38070700005)(5660300002)(33716001)(2906002)(44832011)(6486002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?uEfCDS1yxomXPlSLqX/j1W45DGoGZAvJ3vxqi1ffouzAr17pXqvjqPXzpq5o?=
- =?us-ascii?Q?eb57FqgaE/7ucfX3ZQBqOzf70rSm29NkHJxe6CVCkS+FvxSa9c4lMsSY2qfC?=
- =?us-ascii?Q?/qBJgtLORtPA4DSj18U3WEFE7bLf0+9plejqZQtR8Y+6zChT1XnOMbxvvrlH?=
- =?us-ascii?Q?WN8NjffBwuoPfKg2YJ6SK6yozNTJNr4HOKo5yOE3BafhLZApVMWQNPGEwMaW?=
- =?us-ascii?Q?lhbo4Xc10RfSCVGRUBbLhMjFiimlffZBLBo+lhdy70yuZr1YDcQd8dsd80+h?=
- =?us-ascii?Q?4PhuwaWEVhD/QbNRAv3hNxu7wTdI7dM4z8WHomO5Hy3k2MZAiqpS5QLmdm5H?=
- =?us-ascii?Q?RhyWGWSoJ2GLKdVvJp/oRgAl88TMC4I+lLLMX9VsJwzEanKDRC8yCITevT7D?=
- =?us-ascii?Q?0VdNRkHABR8FU9ZWE+9mxXOQV+72CcqEt/mRUhbvM0ClKJTFka0U/910u7Ka?=
- =?us-ascii?Q?lKtLb5oLHlhbvYoXxcV3T/I4AzVMxEQmu7rjbizlTRqiP8PwPNz66fP0pYWL?=
- =?us-ascii?Q?ccQA7OzlW0jUIGTMgjdFUY7YNNXeHtihv2Hl/gSGeHV8z3jDLuzg3O4tRiLx?=
- =?us-ascii?Q?H7ZwEvL1yXRSem//vMMKC8/DVW5AhdYsTIc/xHU3SsOtWvJOR2qOdVUmZKyd?=
- =?us-ascii?Q?xdfjmyJ92U1KHY0w2S7JKqQizbWJw9AeusgDIOrjMuJn25gctZ0/2c4x2vHP?=
- =?us-ascii?Q?2JxUckB9saKwkrzs2jX5ozRmqJBtUaIFtAKmdO671s9q+lwQl9ebJnanOwst?=
- =?us-ascii?Q?I4VRTquelYO3EK0zdH6c/sYIQfEIgY1EZJ+izR7QLGVOEC61NvLINhMfcOaU?=
- =?us-ascii?Q?wHmkRZ0ZAB6h7p3wtE7Xa5qUVGYUsF1Uyo/xTa807cXm4Sx0vqJwxYBxsDi4?=
- =?us-ascii?Q?NpFYek/KI1Ci2fTN2I/Gr+6ppp089AXjHz6aQOCxwRn87jMmFfwTeA+A5zo4?=
- =?us-ascii?Q?M1T1CGXLef2uFka003sCRCLnb/coP0OixyTLFDsR1FRzjki60eWKyCvEQ1lJ?=
- =?us-ascii?Q?OrD10qM04B3mb7buzdZBmC9/7lQNoi5rL0XqXUw7MZS+oG9yzhkPS6YorrAM?=
- =?us-ascii?Q?Vh4KLpTjOcd8TcqZO+w+i+C+9jCLbZutrwt6vsQ3ECrThapoqzFUOA2g1x93?=
- =?us-ascii?Q?mg5EYmsvn1IC+ch15Y3OS9V3WedprqJOySzP6M/fXqnr1HVhelnE5FxX77Pm?=
- =?us-ascii?Q?IboZBCCoeBnTqSB4+YfUEUa7vrfGaYM8koDy0gGf//EdzmbJWmfYJp40mDIo?=
- =?us-ascii?Q?TJ6Rcigs5gaCagEwr62XzKlurewmtl6IAPWFqqol3qjvM+47Cm2txfG6AExL?=
- =?us-ascii?Q?AAtIpQMFmQwEZlNP3vTOF3MJH3yrtB4n2WlQgUVSQNY/0oxJ9onrGlrRnTum?=
- =?us-ascii?Q?YsO2a8+fZelEt3O9KWHEcWNkoRcWYgaRFbpcX9qoIDgSvbeCVbhlRvZQT5HU?=
- =?us-ascii?Q?NidJbLHqCWlxnP4HQPdR4wGjsi7EpNrJYoB/NGZ/E0p0QR4gmx9OGgrhohod?=
- =?us-ascii?Q?sgci+x7rvQCxct2U4sRcajpr5cD33OT4u4UXOOPwExfdDMWgo4zcmOON1nU1?=
- =?us-ascii?Q?awkOjYencL05d+XhS61xAm578VaCX/6x/IjwKSFlDh9D8ZYlROVdxV0g6BWE?=
- =?us-ascii?Q?SA4Y3s7a9E+qSfHwDxYplF8=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <634A0776B6D44141A7913A8D77CD5DFC@namprd04.prod.outlook.com>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 24 Jun 2022 10:14:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 10FF052E58
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 07:14:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656080079;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=XH0aeHCEYN3yiNHfxBjLie8mlj8QLveL4/qHg4O/b2M=;
+        b=hKRJ6/5g9Pid1KrN/r+Cw8rZYC90dp86IOS1stzcD7ZinjcB4xVFYgfGEgm3kmd6lx87RB
+        cxmsmBaDCDatz49fX2TJE04VSnksLEJhkyrKTez4gfaWQtiAWdOTeqhRwxzVVzSgDozE1Z
+        YYRTC8GNhVew32mAtqHAn/4kYJc8GsI=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-122-n30C6PHdMrCcWyKnOefw8w-1; Fri, 24 Jun 2022 10:14:36 -0400
+X-MC-Unique: n30C6PHdMrCcWyKnOefw8w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9E7283802BAD;
+        Fri, 24 Jun 2022 14:14:35 +0000 (UTC)
+Received: from localhost (ovpn-8-21.pek2.redhat.com [10.72.8.21])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AEAA21415111;
+        Fri, 24 Jun 2022 14:14:34 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>
+Cc:     linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Ming Lei <ming.lei@redhat.com>,
+        Eric Biggers <ebiggers@google.com>,
+        Kent Overstreet <kent.overstreet@gmail.com>,
+        Dmitry Monakhov <dmonakhov@openvz.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: [PATCH 5.20 1/4] block: add bio_rewind() API
+Date:   Fri, 24 Jun 2022 22:12:52 +0800
+Message-Id: <20220624141255.2461148-2-ming.lei@redhat.com>
+In-Reply-To: <20220624141255.2461148-1-ming.lei@redhat.com>
+References: <20220624141255.2461148-1-ming.lei@redhat.com>
 MIME-Version: 1.0
-X-OriginatorOrg: wdc.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR04MB8037.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49e469ee-5d2a-48f5-cedf-08da55db87c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 24 Jun 2022 12:17:38.9833
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: b61c8803-16f3-4c35-9b17-6f65f441df86
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vmNzxuCs7rEIy++OX4XqQjxe2Orx27faK5D/fYsHOiU+Jet1teJz2Chb/rmq9qFdwdjyjDj/R8pm9QEA4Uztv7/KvX6VvO9IQODkWL0p/a4=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN8PR04MB5874
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 24, 2022 / 17:59, Li, Zhijian wrote:
-> > On Jun 24, 2022 / 15:50, Xiao Yang wrote:
-> > > In _have_kernel_option(), SKIP_REASON =3D "kernel option NVME_MULTIPA=
-TH
-> > > has not been enabled" is expected but all nvmeof-mp tests are skipped
-> > > due to the SKIP_REASON. For example: >
-> > ----------------------------------------------------- > ./check
-> > nvmeof-mp/001 > nvmeof-mp/*** [not run] > kernel option NVME_MULTIPATH
-> > has not been enabled >
-> > ----------------------------------------------------- > > Avoid the
-> > issue by unsetting the SKIP_REASON. > > Signed-off-by: Xiao Yang
-> > <yangx.jy@fujitsu.com>
-> > Good catch. Thanks!
-> >=20
-> > This issue was triggered by the commit 7ae143852f6c ("common/rc: don't =
-unset
-> > previous SKIP_REASON in _have_kernel_option()"). So let's add a "Fixes"=
- tag to
-> > note it.
-> >=20
-> > > --- > tests/nvmeof-mp/rc | 5 +++++ > 1 file changed, 5 insertions(+) =
->
-> > > diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc > index
-> > dcb2e3c..9c91f8c 100755 > --- a/tests/nvmeof-mp/rc > +++
-> > b/tests/nvmeof-mp/rc > @@ -24,6 +24,11 @@ and multipathing has been
-> > enabled in the nvme_core kernel module" > return > fi > > + # In
-> > _have_kernel_option(), SKIP_REASON =3D "kernel option > + # NVME_MULTIP=
-ATH
-> > has not been enabled" is expected so > + # avoid skipping tests by
-> > unsetting the SKIP_REASON
-> > Can we have shorter comment? Like:
-> >=20
-> >          # Avoid test skip due to SKIP_REASON set by _have_kernel_optio=
-n().
-> >=20
-> > > +	unset SKIP_REASON
->=20
-> Well, IMO it's not always correct to unsetSKIP_REASON, for example, if th=
-e
-> OS didn't have kernel config file, we should report the test as 'not run'
+Commit 7759eb23fd98 ("block: remove bio_rewind_iter()") removes
+the similar API because the following reasons:
 
-Actually, this group_requires() in tests/nvmeof-mp/rc has another
-_have_kernel_option() call for DM_UEVENT. It will catch and report the "no
-kernel config "case. So, I think it is ok to apply Xiao's solution to fix
-the current issue.
+    ```
+    It is pointed that bio_rewind_iter() is one very bad API[1]:
 
-I think Li's point is still valid, but let's take action for it later. One =
-more
-point I want to mention is that "unset SKIP_REASON" is not a good practice.=
- To
-seek for the best shape, I can think of following changes:
+    1) bio size may not be restored after rewinding
 
-1) Introduce _check_kernel_option(), which checks the specified kernel opti=
-on
-   is defined, but does not set SKIP_RESAON. Using this, "unset SKIP_REASON=
-" of
-   group_requires() in tests/nvme-of/rc (and tests/nvme/039) can be avoided=
-.
+    2) it causes some bogus change, such as 5151842b9d8732 (block: reset
+    bi_iter.bi_done after splitting bio)
 
-2) Introduce _have_kernel_config_file() which sets SKIP_REASON when neither
-   /boot/config* nor /proc/config.gz is available. It can be called from th=
-e
-   group_requires() in tests/nvme-of/rc before _check_kernel_option() to en=
-sure
-   the kernel option check is valid.
+    3) rewinding really makes things complicated wrt. bio splitting
 
---=20
-Shin'ichiro Kawasaki=
+    4) unnecessary updating of .bi_done in fast path
+
+    [1] https://marc.info/?t=153549924200005&r=1&w=2
+
+    So this patch takes Kent's suggestion to restore one bio into its original
+    state via saving bio iterator(struct bvec_iter) in bio_integrity_prep(),
+    given now bio_rewind_iter() is only used by bio integrity code.
+    ```
+
+However, it isn't easy to restore bio by saving 32 bytes bio->bi_iter, and saving
+it only can't restore crypto and integrity info.
+
+Add bio_rewind() back for some use cases which may not be same with
+previous generic case:
+
+1) most of bio has fixed end sector since bio split is done from front of the bio,
+if driver just records how many sectors between current bio's start sector and
+the bio's end sector, the original position can be restored
+
+2) if one bio's end sector won't change, usually bio_trim() isn't called, user can
+restore original position by storing sectors from current ->bi_iter.bi_sector to
+bio's end sector; together by saving bio size, 8 bytes can restore to
+original bio.
+
+3) dm's requeue use case: when BLK_STS_DM_REQUEUE happens, dm core needs to
+restore to the original bio which represents current dm io to be requeued.
+By storing sectors to the bio's end sector and dm io's size,
+bio_rewind() can restore such original bio, then dm core code needn't to
+allocate one bio beforehand just for handling BLK_STS_DM_REQUEUE which
+is actually one unusual event.
+
+4) Not like original rewind API, this one needn't to add .bi_done, and no any
+effect on fast path
+
+Cc: Eric Biggers <ebiggers@google.com>
+Cc: Kent Overstreet <kent.overstreet@gmail.com>
+Cc: Dmitry Monakhov <dmonakhov@openvz.org>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+---
+ block/bio-integrity.c       | 19 +++++++++++++++++++
+ block/bio.c                 | 19 +++++++++++++++++++
+ block/blk-crypto-internal.h |  7 +++++++
+ block/blk-crypto.c          | 23 +++++++++++++++++++++++
+ include/linux/bio.h         | 21 +++++++++++++++++++++
+ include/linux/bvec.h        | 33 +++++++++++++++++++++++++++++++++
+ 6 files changed, 122 insertions(+)
+
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 32929c89ba8a..06c2fe81fdf2 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -378,6 +378,25 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
+ 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
+ }
+ 
++/**
++ * bio_integrity_rewind - Rewind integrity vector
++ * @bio:	bio whose integrity vector to update
++ * @bytes_done:	number of data bytes to rewind
++ *
++ * Description: This function calculates how many integrity bytes the
++ * number of completed data bytes correspond to and rewind the
++ * integrity vector accordingly.
++ */
++void bio_integrity_rewind(struct bio *bio, unsigned int bytes_done)
++{
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
++	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
++
++	bip->bip_iter.bi_sector -= bio_integrity_intervals(bi, bytes_done >> 9);
++	bvec_iter_rewind(bip->bip_vec, &bip->bip_iter, bytes);
++}
++
+ /**
+  * bio_integrity_trim - Trim integrity vector
+  * @bio:	bio whose integrity vector to update
+diff --git a/block/bio.c b/block/bio.c
+index 51c99f2c5c90..5318944b7b18 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1360,6 +1360,25 @@ void __bio_advance(struct bio *bio, unsigned bytes)
+ }
+ EXPORT_SYMBOL(__bio_advance);
+ 
++/**
++ * bio_rewind - rewind @bio by @bytes
++ * @bio: bio to rewind
++ * @bytes: how many bytes to rewind
++ *
++ * Update ->bi_iter of @bio by rewinding @bytes. Most of bio has fixed end
++ * sector, so it is easy to rewind from end of the bio and restore its
++ * original position. And it is caller's responsibility to restore bio size.
++ */
++void bio_rewind(struct bio *bio, unsigned bytes)
++{
++	if (bio_integrity(bio))
++		bio_integrity_rewind(bio, bytes);
++
++	bio_crypt_rewind(bio, bytes);
++	bio_rewind_iter(bio, &bio->bi_iter, bytes);
++}
++EXPORT_SYMBOL(bio_rewind);
++
+ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 			struct bio *src, struct bvec_iter *src_iter)
+ {
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index e6818ffaddbf..b723599bbf99 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -114,6 +114,13 @@ static inline void bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ 		__bio_crypt_advance(bio, bytes);
+ }
+ 
++void __bio_crypt_rewind(struct bio *bio, unsigned int bytes);
++static inline void bio_crypt_rewind(struct bio *bio, unsigned int bytes)
++{
++	if (bio_has_crypt_ctx(bio))
++		__bio_crypt_rewind(bio, bytes);
++}
++
+ void __bio_crypt_free_ctx(struct bio *bio);
+ static inline void bio_crypt_free_ctx(struct bio *bio)
+ {
+diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+index a496aaef85ba..caae2f429fc7 100644
+--- a/block/blk-crypto.c
++++ b/block/blk-crypto.c
+@@ -134,6 +134,21 @@ void bio_crypt_dun_increment(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
+ 	}
+ }
+ 
++/* Decrements @dun by @dec, treating @dun as a multi-limb integer. */
++void bio_crypt_dun_decrement(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
++			     unsigned int dec)
++{
++	int i;
++
++	for (i = 0; dec && i < BLK_CRYPTO_DUN_ARRAY_SIZE; i++) {
++		dun[i] -= dec;
++		if (dun[i] > inc)
++			dec = 1;
++		else
++			dec = 0;
++	}
++}
++
+ void __bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ {
+ 	struct bio_crypt_ctx *bc = bio->bi_crypt_context;
+@@ -142,6 +157,14 @@ void __bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ 				bytes >> bc->bc_key->data_unit_size_bits);
+ }
+ 
++void __bio_crypt_rewind(struct bio *bio, unsigned int bytes)
++{
++	struct bio_crypt_ctx *bc = bio->bi_crypt_context;
++
++	bio_crypt_dun_decrement(bc->bc_dun,
++				bytes >> bc->bc_key->data_unit_size_bits);
++}
++
+ /*
+  * Returns true if @bc->bc_dun plus @bytes converted to data units is equal to
+  * @next_dun, treating the DUNs as multi-limb integers.
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 992ee987f273..4e6674f232b4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -105,6 +105,19 @@ static inline void bio_advance_iter(const struct bio *bio,
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ }
+ 
++static inline void bio_rewind_iter(const struct bio *bio,
++				    struct bvec_iter *iter, unsigned int bytes)
++{
++	iter->bi_sector -= bytes >> 9;
++
++	/* No advance means no rewind */
++	if (bio_no_advance_iter(bio))
++		iter->bi_size += bytes;
++	else
++		bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
++		/* TODO: It is reasonable to complete bio with error here. */
++}
++
+ /* @bytes should be less or equal to bvec[i->bi_idx].bv_len */
+ static inline void bio_advance_iter_single(const struct bio *bio,
+ 					   struct bvec_iter *iter,
+@@ -119,6 +132,7 @@ static inline void bio_advance_iter_single(const struct bio *bio,
+ }
+ 
+ void __bio_advance(struct bio *, unsigned bytes);
++void bio_rewind(struct bio *, unsigned bytes);
+ 
+ /**
+  * bio_advance - increment/complete a bio by some number of bytes
+@@ -699,6 +713,7 @@ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, un
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
++extern void bio_integrity_rewind(struct bio *, unsigned int);
+ extern void bio_integrity_trim(struct bio *);
+ extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
+ extern int bioset_integrity_create(struct bio_set *, int);
+@@ -739,6 +754,12 @@ static inline void bio_integrity_advance(struct bio *bio,
+ 	return;
+ }
+ 
++static inline void bio_integrity_rewind(struct bio *bio,
++					 unsigned int bytes_done)
++{
++	return;
++}
++
+ static inline void bio_integrity_trim(struct bio *bio)
+ {
+ 	return;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 35c25dff651a..b56d92e939c1 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -122,6 +122,39 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
++static inline bool bvec_iter_rewind(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned int bytes)
++{
++	int idx;
++
++	iter->bi_size += bytes;
++	if (bytes <= iter->bi_bvec_done) {
++		iter->bi_bvec_done -= bytes;
++		return true;
++	}
++
++	bytes -= iter->bi_bvec_done;
++	idx = iter->bi_idx - 1;
++
++	while (idx >= 0 && bytes && bytes > bv[idx].bv_len) {
++		bytes -= bv[idx].bv_len;
++		idx--;
++	}
++
++	if (WARN_ONCE(idx < 0 && bytes,
++		      "Attempted to rewind iter beyond bvec's boundaries\n")) {
++		iter->bi_size -= bytes;
++		iter->bi_bvec_done = 0;
++		iter->bi_idx = 0;
++		return false;
++	}
++
++	iter->bi_idx = idx;
++	iter->bi_bvec_done = bv[idx].bv_len - bytes;
++	return true;
++}
++
+ /*
+  * A simpler version of bvec_iter_advance(), @bytes should not span
+  * across multiple bvec entries, i.e. bytes <= bv[i->bi_idx].bv_len
+-- 
+2.31.1
+
