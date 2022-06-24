@@ -2,86 +2,101 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC409C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 06:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3098EC43334
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 07:50:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229920AbiFXGH7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 02:07:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51442 "EHLO
+        id S229479AbiFXHud (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 03:50:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40146 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229523AbiFXGH6 (ORCPT
+        with ESMTP id S229441AbiFXHuc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 02:07:58 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B2F65585
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 23:07:56 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 7F6F667373; Fri, 24 Jun 2022 08:07:53 +0200 (CEST)
-Date:   Fri, 24 Jun 2022 08:07:53 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Subject: Re: [PATCH v2 2/6] block: Introduce the
- blk_rq_is_zoned_seq_write() function
-Message-ID: <20220624060753.GB6494@lst.de>
-References: <20220623232603.3751912-1-bvanassche@acm.org> <20220623232603.3751912-3-bvanassche@acm.org>
+        Fri, 24 Jun 2022 03:50:32 -0400
+Received: from heian.cn.fujitsu.com (mail.cn.fujitsu.com [183.91.158.132])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id DCCB653A5D
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 00:50:30 -0700 (PDT)
+IronPort-Data: =?us-ascii?q?A9a23=3AX4MS5KryrN+z2JPr5Z26FicLG7teBmIqZxIvgKr?=
+ =?us-ascii?q?LsJaIsI5as4F+vmVMCGyOPfyCYjH1LdogbImzpE0Hv8fXm9M2T1Zp/C02QiMRo?=
+ =?us-ascii?q?6IpJ/zDcB6oYHn6wu4v7a5fx5xHLIGGdajYd1eEzvuWGuWn/SkUOZ2gHOKmUra?=
+ =?us-ascii?q?eYnkpHGeIdQ964f5ds79g6mJXqYjha++9kYuaT/z3YDdJ6RYtWo4nw/7rRCdUg?=
+ =?us-ascii?q?RjHkGhwUmrSyhx8lAS2e3E9VPrzLEwqRpfyatE88uWSH44vwFwll1418SvBCvv?=
+ =?us-ascii?q?9+lr6WkYMBLDPPwmSkWcQUK+n6vRAjnVqlP9la7xHMgEK49mKt4kZJNFlpJW2R?=
+ =?us-ascii?q?hdvPLzklvkfUgVDDmd1OqguFLrveCLi7pTPlhaaG5fr67A0ZK0sBqUc++BqESR?=
+ =?us-ascii?q?E8fsTKxgTYR2ZweG72rS2Tq9rnMtLBNLrPYUesXFh1zafDv85SIvKQKTi+tNTm?=
+ =?us-ascii?q?jw3g6hz8Vz2DyYCQWM3Kk2ePFsUYRFKYK/SVdyA3hHXGwC0YnrMzUbv31Xu8Q?=
+ =?us-ascii?q?=3D=3D?=
+IronPort-HdrOrdr: =?us-ascii?q?A9a23=3A6HyvFKuN8t8O9xiHfWROBjyj7skDnNV00zEX?=
+ =?us-ascii?q?/kB9WHVpmszxraGTdZMgpHjJYVcqKRcdcL+7Scq9qB/nmqKdgrNhWYtKPjOW2l?=
+ =?us-ascii?q?dARbsKheCJrlHd8kbFltK1u50PT0EHMqyUMbFlt7eB3CCIV8Yn3MKc8L2lwcPX?=
+ =?us-ascii?q?z3JWRwlsbK16hj0JcjqzIwlnQhVcH5olGN657spDnTCpfnMadYCVHX8ANtKz3O?=
+ =?us-ascii?q?Hjpdb3ZwIcHR475E2rhTOs0rTzFB+VxVM/flp0sM4fzVQ=3D?=
+X-IronPort-AV: E=Sophos;i="5.88,333,1635177600"; 
+   d="scan'208";a="125704134"
+Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
+  by heian.cn.fujitsu.com with ESMTP; 24 Jun 2022 15:50:29 +0800
+Received: from G08CNEXMBPEKD06.g08.fujitsu.local (unknown [10.167.33.206])
+        by cn.fujitsu.com (Postfix) with ESMTP id 510124D68A22;
+        Fri, 24 Jun 2022 15:50:26 +0800 (CST)
+Received: from G08CNEXJMPEKD02.g08.fujitsu.local (10.167.33.202) by
+ G08CNEXMBPEKD06.g08.fujitsu.local (10.167.33.206) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.23; Fri, 24 Jun 2022 15:50:26 +0800
+Received: from G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.83) by
+ G08CNEXJMPEKD02.g08.fujitsu.local (10.167.33.202) with Microsoft SMTP Server
+ (TLS) id 15.0.1497.23; Fri, 24 Jun 2022 15:50:26 +0800
+Received: from localhost.localdomain (10.167.215.54) by
+ G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.209) with Microsoft SMTP Server
+ id 15.0.1497.23 via Frontend Transport; Fri, 24 Jun 2022 15:50:26 +0800
+From:   Xiao Yang <yangx.jy@fujitsu.com>
+To:     <linux-block@vger.kernel.org>
+CC:     <shinichiro.kawasaki@wdc.com>, Xiao Yang <yangx.jy@fujitsu.com>
+Subject: [PATCH blktests] nvmeof-mp/rc: Avoid skipping tests due to the expected SKIP_REASON
+Date:   Fri, 24 Jun 2022 15:50:23 +0800
+Message-ID: <20220624075023.23104-1-yangx.jy@fujitsu.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220623232603.3751912-3-bvanassche@acm.org>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-yoursite-MailScanner-ID: 510124D68A22.A3E3B
+X-yoursite-MailScanner: Found to be clean
+X-yoursite-MailScanner-From: yangx.jy@fujitsu.com
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 23, 2022 at 04:25:59PM -0700, Bart Van Assche wrote:
-> Introduce a function that makes it easy to verify whether a write
-> request is for a sequential write required or sequential write preferred
-> zone. Simplify blk_req_needs_zone_write_lock() by using the new function.
-> 
-> Cc: Damien Le Moal <damien.lemoal@wdc.com>
-> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> ---
->  block/blk-zoned.c      | 14 +-------------
->  include/linux/blk-mq.h | 23 +++++++++++++++++++++++
->  2 files changed, 24 insertions(+), 13 deletions(-)
-> 
-> diff --git a/block/blk-zoned.c b/block/blk-zoned.c
-> index 38cd840d8838..cafcbc508dfb 100644
-> --- a/block/blk-zoned.c
-> +++ b/block/blk-zoned.c
-> @@ -57,19 +57,7 @@ EXPORT_SYMBOL_GPL(blk_zone_cond_str);
->   */
->  bool blk_req_needs_zone_write_lock(struct request *rq)
->  {
-> -	if (!rq->q->seq_zones_wlock)
-> -		return false;
-> -
-> -	if (blk_rq_is_passthrough(rq))
-> -		return false;
-> -
-> -	switch (req_op(rq)) {
-> -	case REQ_OP_WRITE_ZEROES:
-> -	case REQ_OP_WRITE:
-> -		return blk_rq_zone_is_seq(rq);
-> -	default:
-> -		return false;
-> -	}
-> +	return rq->q->seq_zones_wlock && blk_rq_is_zoned_seq_write(rq);
->  }
->  EXPORT_SYMBOL_GPL(blk_req_needs_zone_write_lock);
->  
-> diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-> index 909d47e34b7c..d5930797b84d 100644
-> --- a/include/linux/blk-mq.h
-> +++ b/include/linux/blk-mq.h
-> @@ -1136,6 +1136,24 @@ static inline unsigned int blk_rq_zone_is_seq(struct request *rq)
->  	return blk_queue_zone_is_seq(rq->q, blk_rq_pos(rq));
->  }
->  
-> +/**
-> + * blk_rq_is_zoned_seq_write() - Whether @rq is a write request for a sequential zone.
+In _have_kernel_option(), SKIP_REASON = "kernel option NVME_MULTIPATH
+has not been enabled" is expected but all nvmeof-mp tests are skipped
+due to the SKIP_REASON. For example:
+-----------------------------------------------------
+./check nvmeof-mp/001
+nvmeof-mp/***                                                [not run]
+    kernel option NVME_MULTIPATH has not been enabled
+-----------------------------------------------------
 
-This doesn't parse and is overly long at the same time.
+Avoid the issue by unsetting the SKIP_REASON.
+
+Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
+---
+ tests/nvmeof-mp/rc | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
+index dcb2e3c..9c91f8c 100755
+--- a/tests/nvmeof-mp/rc
++++ b/tests/nvmeof-mp/rc
+@@ -24,6 +24,11 @@ and multipathing has been enabled in the nvme_core kernel module"
+ 		return
+ 	fi
+ 
++	# In _have_kernel_option(), SKIP_REASON = "kernel option
++	# NVME_MULTIPATH has not been enabled" is expected so
++	# avoid skipping tests by unsetting the SKIP_REASON
++	unset SKIP_REASON
++
+ 	_have_configfs || return
+ 	required_modules=(
+ 		dm_multipath
+-- 
+2.34.1
+
+
+
