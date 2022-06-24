@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29488CCA473
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 05:25:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E21FC43334
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 05:25:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229762AbiFXFZX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 01:25:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49746 "EHLO
+        id S231191AbiFXFZZ (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 01:25:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231191AbiFXFZW (ORCPT
+        with ESMTP id S230521AbiFXFZY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 01:25:22 -0400
+        Fri, 24 Jun 2022 01:25:24 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F0534EF4D
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 22:25:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52A3381AC
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 22:25:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=nsAorcAEs6GcEiUYfqjLUKCuZsJirYig+vpdJ9aprbU=; b=JIuvul/G2qE+eutc5DL5lqQ1d9
-        x5d+Fe67D4oxT9QW6ofaEItRMnMwpaMPKElnMo7+MC4bDpfmas036BJlXPeNdurN1j8DJ2yX6TO0s
-        xzzLLz1VYP/oOg8qvnCwDw4wkuxLsPeJqxtSdgstMgylVrBoN3VI1JczMmKehCB2luCu6NLzX1hKf
-        qJ+jAFaKg1YAAWCeixv1Hb0DJ311Jf0PI0iwKQCM2KomKTkLpoyettP49hxiInU7GmRS7tekpSr9S
-        bjfbVdJpGpImET6KQP0glz7nG0JAOlhBtMTx8SMNT+4N93+V215QRIksy3h8QoZFBcs3+uKqucGW2
-        /pdyVP4A==;
+        bh=oEg67g1JJ2VGDXeVDvQvoJkv0B3bOgef5SNfjmnMEy8=; b=Y5QucFdJZs/33MYCeVggGOYBRa
+        3JIEAPnbWIEe2Um8E99+g8jUm1ZcVsEPpdwX6dU0hdmOcdVkRugIaUiAvS8DxHxYm1Z+Jbn5Rtnlt
+        /B8WHyRXgIYibhV49goq3WIIicuhB43cMbBiBXgdrVo8acEa09yKtmb7IaFu6A7jZokJScrJ7DnmG
+        QHzabNiJ7Keg/PZTmCcKp/Z120g46yU6XMZR8LUj+Sm1wRH5an8L4FfCmCbYdNHglDA8C6OQj834x
+        ksY21WyfSB4e7t32HhPRS1Pz1+a0gzL1sPx1borTDwxxfYR5UQ4Ijf8kkgBaNWmSSGIUQGm2sJz5E
+        y6Bj5p6Q==;
 Received: from [2001:4bb8:189:7251:508b:56d3:aa35:3dd8] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o4bom-000cBK-CN; Fri, 24 Jun 2022 05:25:20 +0000
+        id 1o4bop-000cC6-0i; Fri, 24 Jun 2022 05:25:23 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 3/6] block: use default groups to register the queue attributes
-Date:   Fri, 24 Jun 2022 07:25:07 +0200
-Message-Id: <20220624052510.3996673-4-hch@lst.de>
+Subject: [PATCH 4/6] block: remove the extra gendisk reference in __blk_mq_register_dev
+Date:   Fri, 24 Jun 2022 07:25:08 +0200
+Message-Id: <20220624052510.3996673-5-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220624052510.3996673-1-hch@lst.de>
 References: <20220624052510.3996673-1-hch@lst.de>
@@ -44,45 +44,43 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Set up the default_groups for blk_queue_ktype instead of manually calling
-sysfs_create_group.
+kobject_add already grabs a reference to the parent, no need to have
+another one.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 ---
- block/blk-sysfs.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ block/blk-mq-sysfs.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 520ff9aa6dd45..80f506411f92f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -788,7 +788,13 @@ static const struct sysfs_ops queue_sysfs_ops = {
- 	.store	= queue_attr_store,
- };
+diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
+index c08426975856e..f4caaa668e3cf 100644
+--- a/block/blk-mq-sysfs.c
++++ b/block/blk-mq-sysfs.c
+@@ -215,7 +215,6 @@ void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
  
-+static const struct attribute_group *blk_queue_attr_groups[] = {
-+	&queue_attr_group,
-+	NULL
-+};
-+
- struct kobj_type blk_queue_ktype = {
-+	.default_groups = blk_queue_attr_groups,
- 	.sysfs_ops	= &queue_sysfs_ops,
- 	.release	= blk_release_queue,
- };
-@@ -809,12 +815,6 @@ int blk_register_queue(struct gendisk *disk)
+ 	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
+ 	kobject_del(q->mq_kobj);
+-	kobject_put(&dev->kobj);
+ 
+ 	q->mq_sysfs_init_done = false;
+ }
+@@ -261,7 +260,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ 	WARN_ON_ONCE(!q->kobj.parent);
+ 	lockdep_assert_held(&q->sysfs_dir_lock);
+ 
+-	ret = kobject_add(q->mq_kobj, kobject_get(&dev->kobj), "%s", "mq");
++	ret = kobject_add(q->mq_kobj, &dev->kobj, "%s", "mq");
  	if (ret < 0)
- 		goto unlock;
+ 		goto out;
  
--	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
--	if (ret) {
--		kobject_del(&q->kobj);
--		goto unlock;
--	}
--
- 	if (queue_is_mq(q))
- 		__blk_mq_register_dev(dev, q);
- 	mutex_lock(&q->sysfs_lock);
+@@ -286,7 +285,6 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
+ 
+ 	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
+ 	kobject_del(q->mq_kobj);
+-	kobject_put(&dev->kobj);
+ 	return ret;
+ }
+ 
 -- 
 2.30.2
 
