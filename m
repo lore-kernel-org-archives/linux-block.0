@@ -2,192 +2,147 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6C69C433EF
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 05:25:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7638AC43334
+	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 06:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231432AbiFXFZo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 01:25:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50174 "EHLO
+        id S229710AbiFXGGN (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 02:06:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230317AbiFXFZn (ORCPT
+        with ESMTP id S229598AbiFXGGM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 01:25:43 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A3386802C
-        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 22:25:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=dY9v9Mc52ontn9o3oPV9UuW9aIS4flo6PBUUvhWcYC0=; b=3mz+ODIIFwz34pjYyRpRKguLd2
-        KNG+rEi0Py1f+OiF6Mt/gAxROfTnij5ZfZba8mTIF3ERux7uVJ3255Hq4rTh5qVXvoMwbn7yLly7Q
-        /1zfFjubzCMw4D1ASZ8XjIzZADwyleSxQ94LKXM4HfDGJSi+RGREH85yXJIIcJ2Ey9TamBUKWDtje
-        YQkTtIO4A2bcMMHfST3rjbUS9ynKGejT8ibfVyONYhe+593hhey+luZsP+iTQwkxzAo9REf5gdLD9
-        g+OybUoxrhn2kh+SnV0cl5aH6iVzYbst9Na/S4JE39sgQdbQX9X369tLJqMak11QF0m1c7rlMeCkb
-        1V61fJOQ==;
-Received: from [2001:4bb8:189:7251:508b:56d3:aa35:3dd8] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o4bou-000cEs-9U; Fri, 24 Jun 2022 05:25:28 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 6/6] blk-mq: cleanup disk sysfs registration
-Date:   Fri, 24 Jun 2022 07:25:10 +0200
-Message-Id: <20220624052510.3996673-7-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220624052510.3996673-1-hch@lst.de>
-References: <20220624052510.3996673-1-hch@lst.de>
+        Fri, 24 Jun 2022 02:06:12 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0470745078
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 23:06:12 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g10-20020a17090a708a00b001ea8aadd42bso1896457pjk.0
+        for <linux-block@vger.kernel.org>; Thu, 23 Jun 2022 23:06:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=59X2Y/lmawDJzmXwQWp9mJFaRGi+BKzpUp2IksdQUqM=;
+        b=OnJXKxUvdaQmcj7PIEfMQNOZQNQrgxlyqFN9pCLtIv2JPQFwKTqbYue+ASHmg7LJHy
+         BLqF6T9A3bZliGYY2FuNcbcMjUFDn1Ukxn/AKAalmbGHX/lN6MWAFZ6lZI6E1JSsxi8w
+         ImtOP5ZnM+BJORSm9xxUjoCkhdO50ENI5Ma8o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=59X2Y/lmawDJzmXwQWp9mJFaRGi+BKzpUp2IksdQUqM=;
+        b=PecbrR7Jrw2ReXPMIql91QPPp/UfTYtyeRaSgEv134vmDLHI+3irwjq33fnyLsi1Mq
+         TYIQx/FScZTnu3v5aROgmjIBYMKuzNpyx/Ygy0CMy2DDoG/g1u4trg6WltWYyLx8d0//
+         5dS4kvpbevtEpyn+BXMtPuJpfNj4iniz4lBJ1BH8DM/sKUeObzL62YARX9prBaIPtJMQ
+         EA4JTLaUWAM51hWmzOxascdUfXXhEBHqzHy1FZf6CUKpsjg9bQ+f0ib6OQW+3XDlsD3i
+         COSJrOR4ZEd3Je/GJbhJ1PalRpG8g8sxwMy8ZZafINy5UEM4B183oDynbq+yQnMsmYjF
+         +3gQ==
+X-Gm-Message-State: AJIora+KYpHCC+APgFLKAjy/u62JM/PzArKeUFQU3CLCelTDQm67fF7I
+        aXERpcFLbtanB9kvsphB9P24Ww==
+X-Google-Smtp-Source: AGRyM1tFIpPGmWtk1MlqL9vrcPT41S0nFC9urfAPlwORV2qpEJeMO3V45pNMPosGn/lLjhDHolVF8A==
+X-Received: by 2002:a17:902:74c7:b0:16a:1be3:b7f2 with SMTP id f7-20020a17090274c700b0016a1be3b7f2mr27150781plt.42.1656050771473;
+        Thu, 23 Jun 2022 23:06:11 -0700 (PDT)
+Received: from senozhatsky.kddi.com ([240f:75:7537:3187:421d:f075:63ad:7026])
+        by smtp.gmail.com with ESMTPSA id k7-20020a170902694700b0016511314b94sm850765plt.159.2022.06.23.23.06.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jun 2022 23:06:11 -0700 (PDT)
+From:   Sergey Senozhatsky <senozhatsky@chromium.org>
+To:     Andrew Morton <akpm@linux-foundation.org>,
+        Minchan Kim <minchan@kernel.org>
+Cc:     Nitin Gupta <ngupta@vflare.org>, linux-kernel@vger.kernel.org,
+        linux-block@vger.kernel.org,
+        Sergey Senozhatsky <senozhatsky@chromium.org>
+Subject: [PATCH v2] zram: do not lookup algorithm in backends table
+Date:   Fri, 24 Jun 2022 15:06:06 +0900
+Message-Id: <20220624060606.1014474-1-senozhatsky@chromium.org>
+X-Mailer: git-send-email 2.37.0.rc0.104.g0611611a94-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Pass a gendisk to the sysfs register/unregister functions and give
-them descriptive names.  Also move the unregistration helper next
-to the one doing the registration.
+Always use crypto_has_comp() so that crypto can lookup module,
+call usermodhelper to load the modules, wait for usermodhelper
+to finish and so on. Otherwise crypto will do all of these steps
+under CPU hot-plug lock and this looks like too much stuff to
+handle under the CPU hot-plug lock. Besides this can end up in
+a deadlock when usermodhelper triggers a code path that attempts
+to lock the CPU hot-plug lock, that zram already holds.
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+An example of such deadlock:
+
+- path A. zram grabs CPU hot-plug lock, execs /sbin/modprobe from crypto
+  and waits for modprobe to finish
+
+disksize_store
+ zcomp_create
+  __cpuhp_state_add_instance
+   __cpuhp_state_add_instance_cpuslocked
+    zcomp_cpu_up_prepare
+     crypto_alloc_base
+      crypto_alg_mod_lookup
+       call_usermodehelper_exec
+        wait_for_completion_killable
+         do_wait_for_common
+          schedule
+
+- path B. async work kthread that brings in scsi device. It wants to
+  register CPUHP states at some point, and it needs the CPU hot-plug
+  lock for that, which is owned by zram.
+
+async_run_entry_fn
+ scsi_probe_and_add_lun
+  scsi_mq_alloc_queue
+   blk_mq_init_queue
+    blk_mq_init_allocated_queue
+     blk_mq_realloc_hw_ctxs
+      __cpuhp_state_add_instance
+       __cpuhp_state_add_instance_cpuslocked
+        mutex_lock
+         schedule
+
+- path C. modprobe sleeps, waiting for all aync works to finish.
+
+load_module
+ do_init_module
+  async_synchronize_full
+   async_synchronize_cookie_domain
+    schedule
+
+Signed-off-by: Sergey Senozhatsky <senozhatsky@chromium.org>
 ---
- block/blk-mq-sysfs.c   | 39 ++++++++++++++++++++-------------------
- block/blk-mq.h         |  3 ++-
- block/blk-sysfs.c      |  9 ++++-----
- include/linux/blk-mq.h |  1 -
- 4 files changed, 26 insertions(+), 26 deletions(-)
+ drivers/block/zram/zcomp.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index ee6efe2b250d2..93997d297d427 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -203,22 +203,6 @@ static int blk_mq_register_hctx(struct blk_mq_hw_ctx *hctx)
- 	return ret;
- }
+diff --git a/drivers/block/zram/zcomp.c b/drivers/block/zram/zcomp.c
+index 052aa3f65514..0916de952e09 100644
+--- a/drivers/block/zram/zcomp.c
++++ b/drivers/block/zram/zcomp.c
+@@ -63,12 +63,6 @@ static int zcomp_strm_init(struct zcomp_strm *zstrm, struct zcomp *comp)
  
--void blk_mq_unregister_dev(struct device *dev, struct request_queue *q)
--{
--	struct blk_mq_hw_ctx *hctx;
--	unsigned long i;
--
--	lockdep_assert_held(&q->sysfs_dir_lock);
--
--	queue_for_each_hw_ctx(q, hctx, i)
--		blk_mq_unregister_hctx(hctx);
--
--	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
--	kobject_del(q->mq_kobj);
--
--	q->mq_sysfs_init_done = false;
--}
--
- void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx)
+ bool zcomp_available_algorithm(const char *comp)
  {
- 	kobject_init(&hctx->kobj, &blk_mq_hw_ktype);
-@@ -251,16 +235,16 @@ void blk_mq_sysfs_init(struct request_queue *q)
- 	}
- }
+-	int i;
+-
+-	i = sysfs_match_string(backends, comp);
+-	if (i >= 0)
+-		return true;
+-
+ 	/*
+ 	 * Crypto does not ignore a trailing new line symbol,
+ 	 * so make sure you don't supply a string containing
+@@ -217,6 +211,11 @@ struct zcomp *zcomp_create(const char *compress)
+ 	struct zcomp *comp;
+ 	int error;
  
--int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
-+int blk_mq_sysfs_register(struct gendisk *disk)
- {
-+	struct request_queue *q = disk->queue;
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i, j;
- 	int ret;
++	/*
++	 * Crypto API will execute /sbin/modprobe if the compression module
++	 * is not loaded yet. We must do it here, otherwise we are about to
++	 * call /sbin/modprobe under CPU hot-plug lock.
++	 */
+ 	if (!zcomp_available_algorithm(compress))
+ 		return ERR_PTR(-EINVAL);
  
--	WARN_ON_ONCE(!q->kobj.parent);
- 	lockdep_assert_held(&q->sysfs_dir_lock);
- 
--	ret = kobject_add(q->mq_kobj, &dev->kobj, "%s", "mq");
-+	ret = kobject_add(q->mq_kobj, &disk_to_dev(disk)->kobj, "mq");
- 	if (ret < 0)
- 		goto out;
- 
-@@ -288,6 +272,23 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 	return ret;
- }
- 
-+void blk_mq_sysfs_unregister(struct gendisk *disk)
-+{
-+	struct request_queue *q = disk->queue;
-+	struct blk_mq_hw_ctx *hctx;
-+	unsigned long i;
-+
-+	lockdep_assert_held(&q->sysfs_dir_lock);
-+
-+	queue_for_each_hw_ctx(q, hctx, i)
-+		blk_mq_unregister_hctx(hctx);
-+
-+	kobject_uevent(q->mq_kobj, KOBJ_REMOVE);
-+	kobject_del(q->mq_kobj);
-+
-+	q->mq_sysfs_init_done = false;
-+}
-+
- void blk_mq_sysfs_unregister_hctxs(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index bed34061c3a0b..7145c10932b91 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -118,7 +118,8 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
-  */
- extern void blk_mq_sysfs_init(struct request_queue *q);
- extern void blk_mq_sysfs_deinit(struct request_queue *q);
--extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
-+int blk_mq_sysfs_register(struct gendisk *disk);
-+void blk_mq_sysfs_unregister(struct gendisk *disk);
- int blk_mq_sysfs_register_hctxs(struct request_queue *q);
- void blk_mq_sysfs_unregister_hctxs(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 80f506411f92f..0415722a4625f 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -805,18 +805,17 @@ struct kobj_type blk_queue_ktype = {
-  */
- int blk_register_queue(struct gendisk *disk)
- {
--	int ret;
--	struct device *dev = disk_to_dev(disk);
- 	struct request_queue *q = disk->queue;
-+	int ret;
- 
- 	mutex_lock(&q->sysfs_dir_lock);
- 
--	ret = kobject_add(&q->kobj, &dev->kobj, "%s", "queue");
-+	ret = kobject_add(&q->kobj, &disk_to_dev(disk)->kobj, "queue");
- 	if (ret < 0)
- 		goto unlock;
- 
- 	if (queue_is_mq(q))
--		__blk_mq_register_dev(dev, q);
-+		blk_mq_sysfs_register(disk);
- 	mutex_lock(&q->sysfs_lock);
- 
- 	mutex_lock(&q->debugfs_mutex);
-@@ -912,7 +911,7 @@ void blk_unregister_queue(struct gendisk *disk)
- 	 * structures that can be modified through sysfs.
- 	 */
- 	if (queue_is_mq(q))
--		blk_mq_unregister_dev(disk_to_dev(disk), q);
-+		blk_mq_sysfs_unregister(disk);
- 	blk_crypto_sysfs_unregister(q);
- 
- 	mutex_lock(&q->sysfs_lock);
-diff --git a/include/linux/blk-mq.h b/include/linux/blk-mq.h
-index 0fd96e92c6c65..43aad0da3305d 100644
---- a/include/linux/blk-mq.h
-+++ b/include/linux/blk-mq.h
-@@ -691,7 +691,6 @@ struct gendisk *blk_mq_alloc_disk_for_queue(struct request_queue *q,
- struct request_queue *blk_mq_init_queue(struct blk_mq_tag_set *);
- int blk_mq_init_allocated_queue(struct blk_mq_tag_set *set,
- 		struct request_queue *q);
--void blk_mq_unregister_dev(struct device *, struct request_queue *);
- void blk_mq_destroy_queue(struct request_queue *);
- 
- int blk_mq_alloc_tag_set(struct blk_mq_tag_set *set);
 -- 
-2.30.2
+2.37.0.rc0.104.g0611611a94-goog
 
