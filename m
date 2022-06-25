@@ -2,93 +2,92 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 786BBC43334
-	for <linux-block@archiver.kernel.org>; Fri, 24 Jun 2022 23:47:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1640C433EF
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jun 2022 00:02:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231400AbiFXXr2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 19:47:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42452 "EHLO
+        id S231862AbiFYAC0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 20:02:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231190AbiFXXr1 (ORCPT
+        with ESMTP id S229441AbiFYACY (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 19:47:27 -0400
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E03A38BEC4;
-        Fri, 24 Jun 2022 16:47:26 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by smtp-out2.suse.de (Postfix) with ESMTPS id 70CD71F891;
-        Fri, 24 Jun 2022 23:47:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-        t=1656114445; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=aobWKircXEKbGTkT46vsoN1mG2oAxEWPsS6CajoA/6U=;
-        b=uoAaIrouqAUg4vn7RsvgiNCjACanuj9PzdM5fzvNQcyYQ5WhnxPSzG9ByaKlAXiBqmQkwx
-        8qn89Q9/xpl/cQmHs0Rw9pHZ1yP8J0RXVfZlqJlenR1qjqOD4WTtP6HcEsqzhBGVp+UBvJ
-        mDJwXEj0PoIDF9jnXRVQ6XzorSdnXhc=
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-        (No client certificate requested)
-        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 38B7113ACA;
-        Fri, 24 Jun 2022 23:47:25 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-        by imap2.suse-dmz.suse.de with ESMTPSA
-        id n38fDA1NtmLyUgAAMHmgww
-        (envelope-from <mwilck@suse.com>); Fri, 24 Jun 2022 23:47:25 +0000
-Message-ID: <c2dfae29bb2aa3b6286a3a225a27b116761b9e53.camel@suse.com>
-Subject: Re: [PATCH] lib/sbitmap: Fix invalid loop in
- __sbitmap_queue_get_batch()
-From:   Martin Wilck <mwilck@suse.com>
-To:     wuchi <wuchi.zero@gmail.com>, axboe@kernel.dk,
-        andriy.shevchenko@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-Date:   Sat, 25 Jun 2022 01:47:24 +0200
-In-Reply-To: <20220605145835.26916-1-wuchi.zero@gmail.com>
-References: <20220605145835.26916-1-wuchi.zero@gmail.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.2 
+        Fri, 24 Jun 2022 20:02:24 -0400
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0A758BEF2
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 17:02:20 -0700 (PDT)
+Received: by mail-pj1-f41.google.com with SMTP id b12-20020a17090a6acc00b001ec2b181c98so7115616pjm.4
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 17:02:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=Lf03RjqGuq6g3C7TbckjuIYKCNhKQOgqkScZcfknxbw=;
+        b=reHWZZG1cYIuWPQu4P0yNBEBWje06yw5gj41Mwy0iVLYlNZWVicQbgXthAasT+ZTWO
+         Aep3eprbzYwY+stsxDvdtAxdQUpjtGU/69l+xwd5f5Jkw+AAFl4P4PDy4smbR9BbeVGk
+         G1Bma6uygl8EEoIijxSTGilOsDkVg5EWuPhEoLGvc67hDih2qjtv0M/GXLPyaLGmdi0Z
+         +JirHrjGhEyShCN+b97I1b1Y2EB8b0XiSbRVBsHojKEado2kR+sA1o0FvIR1tZDP24aQ
+         4KyCPsqsSY+JPgFGDZwv6ao7Oyr4HXFzjSYpkpWUcZd6PORtstviwSdyulbkSS/DSl/H
+         trRg==
+X-Gm-Message-State: AJIora9MCuOv2+llmbJlz9OuG/0fWKTZrgWJKdYg2Zb48m8Otpyr7ZME
+        WKR6g5kCMZMOpv2+tmmE37DaPesW54k=
+X-Google-Smtp-Source: AGRyM1s8pHnn0bw+QtMbDb+pEl0Z47+c1gZpmAfsfLxJ4ROkmVta7cgoBzlhX+7mpKnl0fqF6s9TCA==
+X-Received: by 2002:a17:902:c2c6:b0:168:d8ce:90b2 with SMTP id c6-20020a170902c2c600b00168d8ce90b2mr1640137pla.110.1656115340062;
+        Fri, 24 Jun 2022 17:02:20 -0700 (PDT)
+Received: from ?IPV6:2620:15c:211:201:4e1:3e2c:e2fe:b5e0? ([2620:15c:211:201:4e1:3e2c:e2fe:b5e0])
+        by smtp.gmail.com with ESMTPSA id je20-20020a170903265400b00161f9e72233sm2341297plb.261.2022.06.24.17.02.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jun 2022 17:02:19 -0700 (PDT)
+Message-ID: <d6ce8f96-18af-e5b2-6ce4-3ef24b084a81@acm.org>
+Date:   Fri, 24 Jun 2022 17:02:17 -0700
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 46/51] fs/nilfs: Use the enum req_op and blk_opf_t types
+Content-Language: en-US
+To:     Ryusuke Konishi <konishi.ryusuke@gmail.com>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+References: <20220623180528.3595304-1-bvanassche@acm.org>
+ <20220623180528.3595304-47-bvanassche@acm.org>
+ <CAKFNMonCrSpx0RMdPfMXfAvfe3ZQeVae=QYbgi1iO3pTRUnD-w@mail.gmail.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <CAKFNMonCrSpx0RMdPfMXfAvfe3ZQeVae=QYbgi1iO3pTRUnD-w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-T24gU3VuLCAyMDIyLTA2LTA1IGF0IDIyOjU4ICswODAwLCB3dWNoaSB3cm90ZToKPiAxLiBHZXR0
-aW5nIG5leHQgaW5kZXggYmVmb3JlIGNvbnRpbnVlIGJyYW5jaC4KPiAyLiBDaGVja2luZyBmcmVl
-IGJpdHMgd2hlbiBzZXR0aW5nIHRoZSB0YXJnZXQgYml0cy4gT3RoZXJ3aXNlLAo+IGl0IG1heSBy
-ZXVzZSB0aGUgYnVzeWluZyBiaXRzLgo+IAo+IFNpZ25lZC1vZmYtYnk6IHd1Y2hpIDx3dWNoaS56
-ZXJvQGdtYWlsLmNvbT4KClJldmlld2VkLWJ5OiBNYXJ0aW4gV2lsY2sgPG13aWxja0BzdXNlLmNv
-bT4KCj4gLS0tCj4goGxpYi9zYml0bWFwLmMgfCA1ICsrKystCj4goDEgZmlsZSBjaGFuZ2VkLCA0
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkKPiAKPiBkaWZmIC0tZ2l0IGEvbGliL3NiaXRt
-YXAuYyBiL2xpYi9zYml0bWFwLmMKPiBpbmRleCBhZTRmZDRkZTllYmUuLjI5ZWIwNDg0MjE1YSAx
-MDA2NDQKPiAtLS0gYS9saWIvc2JpdG1hcC5jCj4gKysrIGIvbGliL3NiaXRtYXAuYwo+IEBAIC01
-MjgsNyArNTI4LDcgQEAgdW5zaWduZWQgbG9uZyBfX3NiaXRtYXBfcXVldWVfZ2V0X2JhdGNoKHN0
-cnVjdAo+IHNiaXRtYXBfcXVldWUgKnNicSwgaW50IG5yX3RhZ3MsCj4goAo+IKCgoKCgoKCgoKCg
-oKCgoKBzYml0bWFwX2RlZmVycmVkX2NsZWFyKG1hcCk7Cj4goKCgoKCgoKCgoKCgoKCgoGlmICht
-YXAtPndvcmQgPT0gKDFVTCA8PCAobWFwX2RlcHRoIC0gMSkpIC0gMSkKPiAtoKCgoKCgoKCgoKCg
-oKCgoKCgoKCgoKBjb250aW51ZTsKPiAroKCgoKCgoKCgoKCgoKCgoKCgoKCgoKBnb3RvIG5leHQ7
-Cj4goAo+IKCgoKCgoKCgoKCgoKCgoKBuciA9IGZpbmRfZmlyc3RfemVyb19iaXQoJm1hcC0+d29y
-ZCwgbWFwX2RlcHRoKTsKPiCgoKCgoKCgoKCgoKCgoKCgaWYgKG5yICsgbnJfdGFncyA8PSBtYXBf
-ZGVwdGgpIHsKPiBAQCAtNTM5LDYgKzUzOSw4IEBAIHVuc2lnbmVkIGxvbmcgX19zYml0bWFwX3F1
-ZXVlX2dldF9iYXRjaChzdHJ1Y3QKPiBzYml0bWFwX3F1ZXVlICpzYnEsIGludCBucl90YWdzLAo+
-IKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoGdldF9tYXNrID0gKCgxVUwgPDwgbWFwX3RhZ3MpIC0g
-MSkgPDwgbnI7Cj4goKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgZG8gewo+IKCgoKCgoKCgoKCgoKCg
-oKCgoKCgoKCgoKCgoKCgoKCgdmFsID0gUkVBRF9PTkNFKG1hcC0+d29yZCk7Cj4gK6CgoKCgoKCg
-oKCgoKCgoKCgoKCgoKCgoKCgoKCgoKBpZiAoKHZhbCAmIH5nZXRfbWFzaykgIT0gdmFsKQo+ICug
-oKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKBnb3RvIG5leHQ7Cj4goKCgoKCg
-oKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKByZXQgPSBhdG9taWNfbG9uZ19jbXB4Y2hnKHB0ciwg
-dmFsLAo+IGdldF9tYXNrIHwgdmFsKTsKPiCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKB9IHdoaWxl
-IChyZXQgIT0gdmFsKTsKPiCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKBnZXRfbWFzayA9IChnZXRf
-bWFzayAmIH5yZXQpID4+IG5yOwo+IEBAIC01NDksNiArNTUxLDcgQEAgdW5zaWduZWQgbG9uZyBf
-X3NiaXRtYXBfcXVldWVfZ2V0X2JhdGNoKHN0cnVjdAo+IHNiaXRtYXBfcXVldWUgKnNicSwgaW50
-IG5yX3RhZ3MsCj4goKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKByZXR1cm4gZ2V0X21h
-c2s7Cj4goKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgfQo+IKCgoKCgoKCgoKCgoKCgoKB9Cj4gK25l
-eHQ6Cj4goKCgoKCgoKCgoKCgoKCgoC8qIEp1bXAgdG8gbmV4dCBpbmRleC4gKi8KPiCgoKCgoKCg
-oKCgoKCgoKCgaWYgKCsraW5kZXggPj0gc2ItPm1hcF9ucikKPiCgoKCgoKCgoKCgoKCgoKCgoKCg
-oKCgoKBpbmRleCA9IDA7Cgo=
+On 6/23/22 20:43, Ryusuke Konishi wrote:
+> On Fri, Jun 24, 2022 at 3:06 AM Bart Van Assche wrote:
+>>
+>> Improve static type checking by using the enum req_op type for variables
+>> that represent a request operation and the new blk_opf_t type for
+>> variables that represent request flags.
+>>
+>> Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+>> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
+>> ---
+>>   fs/nilfs2/btnode.c            | 4 ++--
+>>   fs/nilfs2/btnode.h            | 5 +++--
+>>   fs/nilfs2/mdt.c               | 3 ++-
+>>   include/trace/events/nilfs2.h | 4 ++--
+>>   4 files changed, 9 insertions(+), 7 deletions(-)
+> 
+> Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
+> 
+> I've checked this patch, picking up some of the block layer patches needed
+> to understand this conversion from the list of linux-block.
 
+Hi Ryusuke,
+
+Thank you for the quick review.
+
+Does "picking up" perhaps mean that you plan to send a subset of this 
+patch series to Linus yourself? I prefer that the entire patch series is 
+sent to Linus by a single kernel maintainer.
+
+Thanks,
+
+Bart.
