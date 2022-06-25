@@ -2,102 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05BFDC43334
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jun 2022 00:56:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D84DAC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jun 2022 02:57:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231253AbiFYA4N (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Fri, 24 Jun 2022 20:56:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60488 "EHLO
+        id S231801AbiFYC53 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Fri, 24 Jun 2022 22:57:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40550 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbiFYA4M (ORCPT
+        with ESMTP id S232043AbiFYC51 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Fri, 24 Jun 2022 20:56:12 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 928D55001A
-        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 17:56:11 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id y32so7184572lfa.6
-        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 17:56:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9mu8UMNAJ24Uwc3zBvZmR8/GGKpqM/MqyFyhOPdnLaE=;
-        b=ZRRCvvVzVikiA8t/f99Zo+E+sDTGejA7ynYxR9NWewy3J7dsULeod/U7Fp+07SXy4U
-         3nVREaQEvYh3kKGBnPWhEAC4ugmbY0Gs/CZnOhd/eVtG2spJeu4x7kDFM0O3pPIld4iq
-         lxbvVd7oB/wWBrrrh9X1wymqtfYg8z03emJbZ0k9GfdMf5bJlmdBNQR8GluPpn54dlSh
-         7hepKj2bkWuvrz86NoCCeut7f5EsOMrLNpF8W7D6+47emiPpaCmve5Gs6hTaaI6d2RfZ
-         8EXESB1CiC1Ue7MaznQm9Wz9XhLilagMR3qwbd0OhsdnsUT9PM3C1FTjnnOe+CdLRDtu
-         eg9g==
+        Fri, 24 Jun 2022 22:57:27 -0400
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B490162BD2
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 19:57:26 -0700 (PDT)
+Received: by mail-pj1-f51.google.com with SMTP id p5so4365391pjt.2
+        for <linux-block@vger.kernel.org>; Fri, 24 Jun 2022 19:57:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9mu8UMNAJ24Uwc3zBvZmR8/GGKpqM/MqyFyhOPdnLaE=;
-        b=hpBVNS+N+T7m0tMVHh59CHFWmWe1J84QDuetDgV79wpeVT8/jr/O2dk3Ee/oNegO6/
-         WKxU4Y34I8AHJxddqtaR4MC0K5QYE/xsewdpTOS4glVae1YSnf80UY76kvCQkl1whaFF
-         YOQfLt8i1z74zdGiKGw+xnqfn1SrkQM1ADlSGXHIxiyFMy3LLZWPDYkhHx/CkWjnLeR5
-         +8eu5DtCpqHGywHjeT6byR0F45sfqg6Lc4rEFMfGiDOANBDT1dzjyTs79BewHWPCJMBp
-         HkoDuhXWb8f6LWOcN0re8QXfi4BqCl/qJ9NRFAxXY6tZ0cuiXKTU6GfNXVKNIQarusKK
-         QqVQ==
-X-Gm-Message-State: AJIora/9BOIOySLALyusAGJAp32P5G/wPj9/cmKhXPt0nb0uCc0yFQ0l
-        k1XPtxgylSGiCOtlZiutp0kY3pjZMF2ffxgu9rM=
-X-Google-Smtp-Source: AGRyM1uONEeI0x27khSEQYOSqP4JYMetn5qh6YQq725XOBIbUCVmYi9RTvjh83cStzMtDbD5mxpCLOYGYEbF0GE7eUM=
-X-Received: by 2002:a05:6512:110f:b0:47f:985c:e010 with SMTP id
- l15-20020a056512110f00b0047f985ce010mr1070557lfg.390.1656118569754; Fri, 24
- Jun 2022 17:56:09 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=bl6oXFbY9TDP378dyXpZwe1n450A56bEAzzcwYHghNI=;
+        b=1SSuNfRPF28/maUN8UxTnDJTIm6qKbK4ONhuUemlrxFOEdfg418RVHIV/oR9WdFbOL
+         7hiUnuPcX5lh4jXhW9N+p/P52J4v6WIJgm6vw6BDO6xbMqNFPYamlPUzJwbokwIsXz7I
+         huZTMC4eL+glgO3IpAXlpvQRZu+A+MUGkC7KaxuXCO+PKoqfDiACsEdbWbyqHugSJPzC
+         RsPsg0mpCRcUwNn6MB0mpOeL7pNSkvbOOwEBjcfSX8YEeYrld4+fcpjmTNDkuJKVg6oj
+         Mox/sFK3ckExGOI7UYzpgHDJGGa0LKar4Du3kYS4m4FFfuSK+7trwunBaE1TniriGowq
+         UiIA==
+X-Gm-Message-State: AJIora82EfYRn15am4Vf/8lk3oebpgXf2kDYrwtR1nnTrdBnTkTJxWug
+        2fvvgGzbvxDUzLKV0xtcVKCuaC+rN14=
+X-Google-Smtp-Source: AGRyM1vgWxdCCPT65obVsh/VM4okQJsX1RGSXNDA0km/x9i9Y+LEqPD4sz9FpDwr1Yhrh8BN685AJg==
+X-Received: by 2002:a17:902:d50b:b0:16a:2cb3:750d with SMTP id b11-20020a170902d50b00b0016a2cb3750dmr2239771plg.17.1656125846063;
+        Fri, 24 Jun 2022 19:57:26 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id r12-20020a170902ea4c00b001679a4711e5sm2488872plg.108.2022.06.24.19.57.24
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jun 2022 19:57:25 -0700 (PDT)
+Message-ID: <29c57d42-83d8-bbcb-d4a7-659920cd9137@acm.org>
+Date:   Fri, 24 Jun 2022 19:57:23 -0700
 MIME-Version: 1.0
-References: <20220623180528.3595304-1-bvanassche@acm.org> <20220623180528.3595304-47-bvanassche@acm.org>
- <CAKFNMonCrSpx0RMdPfMXfAvfe3ZQeVae=QYbgi1iO3pTRUnD-w@mail.gmail.com> <d6ce8f96-18af-e5b2-6ce4-3ef24b084a81@acm.org>
-In-Reply-To: <d6ce8f96-18af-e5b2-6ce4-3ef24b084a81@acm.org>
-From:   Ryusuke Konishi <konishi.ryusuke@gmail.com>
-Date:   Sat, 25 Jun 2022 09:55:52 +0900
-Message-ID: <CAKFNMonqq5j9285gKmhkyT-HrCG7WOqQSN2uw4WShNgT2Xmfrg@mail.gmail.com>
-Subject: Re: [PATCH 46/51] fs/nilfs: Use the enum req_op and blk_opf_t types
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Christoph Hellwig <hch@lst.de>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 1/6] block: simplify blktrace sysfs attribute creation
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org
+References: <20220624052510.3996673-1-hch@lst.de>
+ <20220624052510.3996673-2-hch@lst.de>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220624052510.3996673-2-hch@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi Bart,
+On 6/23/22 22:25, Christoph Hellwig wrote:
+> diff --git a/block/genhd.c b/block/genhd.c
+> index bf9be06af2c8d..12b0eda8d125b 100644
+> --- a/block/genhd.c
+> +++ b/block/genhd.c
+> @@ -1134,6 +1134,9 @@ static struct attribute_group disk_attr_group = {
+>   
+>   static const struct attribute_group *disk_attr_groups[] = {
+>   	&disk_attr_group,
+> +#ifdef CONFIG_BLK_DEV_IO_TRACE
+> +        &blk_trace_attr_group,
+> +#endif
 
-On Sat, Jun 25, 2022 at 9:02 AM Bart Van Assche wrote:
->
-> On 6/23/22 20:43, Ryusuke Konishi wrote:
-> > On Fri, Jun 24, 2022 at 3:06 AM Bart Van Assche wrote:
-> >>
-> >> Improve static type checking by using the enum req_op type for variables
-> >> that represent a request operation and the new blk_opf_t type for
-> >> variables that represent request flags.
-> >>
-> >> Cc: Ryusuke Konishi <konishi.ryusuke@gmail.com>
-> >> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
-> >> ---
-> >>   fs/nilfs2/btnode.c            | 4 ++--
-> >>   fs/nilfs2/btnode.h            | 5 +++--
-> >>   fs/nilfs2/mdt.c               | 3 ++-
-> >>   include/trace/events/nilfs2.h | 4 ++--
-> >>   4 files changed, 9 insertions(+), 7 deletions(-)
-> >
-> > Acked-by: Ryusuke Konishi <konishi.ryusuke@gmail.com>
-> >
-> > I've checked this patch, picking up some of the block layer patches needed
-> > to understand this conversion from the list of linux-block.
->
-> Hi Ryusuke,
->
-> Thank you for the quick review.
->
-> Does "picking up" perhaps mean that you plan to send a subset of this
-> patch series to Linus yourself? I prefer that the entire patch series is
-> sent to Linus by a single kernel maintainer.
+The space in front of '&' is probably unintended? Anyway:
 
-Sorry for the misleading wording.
-That just means that I tracked and confirmed the related block layer patches
-in the series to properly review this patch.  I recognize that the entire patch
-series should be sent through the same maintainer.
-
-Regards,
-Ryusuke Konishi
+Reviewed-by: Bart Van Assche <bvanassche@acm.org>
