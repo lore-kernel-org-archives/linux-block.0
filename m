@@ -2,84 +2,82 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93FC4C43334
-	for <linux-block@archiver.kernel.org>; Sat, 25 Jun 2022 16:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8986FC433EF
+	for <linux-block@archiver.kernel.org>; Sat, 25 Jun 2022 17:02:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232950AbiFYQ7d (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jun 2022 12:59:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38486 "EHLO
+        id S233126AbiFYRCL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jun 2022 13:02:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39640 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231596AbiFYQ7d (ORCPT
+        with ESMTP id S232827AbiFYRCK (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jun 2022 12:59:33 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1128C1581C
-        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 09:59:32 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id g186so5234769pgc.1
-        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 09:59:32 -0700 (PDT)
+        Sat, 25 Jun 2022 13:02:10 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BD8F15827
+        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 10:02:09 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id w6so5233541pfw.5
+        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 10:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=5n9b9moDbqljRj9kvQX7qhYgh+0pii4Py2IK3zMO58Q=;
-        b=XzvRzakJXRYQZX8QkrA/Kx1xy/ONHkwgjIDx+O97k9TCTw5f/MOi0SXpPjcuyE+kxy
-         5hb86vs53b8scNOxGfcI7pI3IF0/LkYuST7RE8t5lBJKROuzRpYQMLotGwr2V6fdEbyA
-         jIq8stNOA1QFaXrFSF3s8ZH6Oy62qavozYlLG/AWa9eC7tXL+JLyniRrLyeNDaCtR4bS
-         zG4g2pt8irHqzlshE6jnj+Y0tnySEGeInGoB1Q5JiUBB0z7PEvhPzYsUoEfj0d7gFiBZ
-         blZLwcbZqQdjSp11YdOv9fsXX4+9EWg87qn5ihiY4L+teS/INZnVhP9gou5ApPzQxR0j
-         i7Gw==
+        h=from:to:cc:in-reply-to:references:subject:message-id:date
+         :mime-version:content-transfer-encoding;
+        bh=Lyqt/8xMEJfXAgB3QKmRd6F7TnQPwfOqSXGZzoVDZfQ=;
+        b=GKyB12Ox3fecbB0aczZrQiVi9Yk1LyO8cPu3c2kKBUH1BT+1W+EY6I8OAsoG9EsvBS
+         zYFm1eocUpAjMrmj7ORwrzVmA2kgYrzk0AwJwPbj2R7kNdllfBPVmwOYIH1izdWkztxR
+         hxdPzm11ROPR4s0Jp/UDa57jBUnQ4YWYxjg6Lko6XNxxreOaNVoZYl8hGPvlg6fh9U4c
+         G8sB0seKY6Lhu/l8C6rO2ORpMjINBZ1xVVbDTIQGwUud6WPG3RN2N8s7a/3+m5NhQhbf
+         FzAnZjREKXw3B1Pa8Akz65REc/UCjYtKxEcxef0DMmHGUiX8j0LdF9DNd5i61QTD+Vkk
+         yi+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=5n9b9moDbqljRj9kvQX7qhYgh+0pii4Py2IK3zMO58Q=;
-        b=J+Tax2isesrS34ZB3xG4x+2wptkIAs6klnqSKFtaq9H3E6j/rFi2+At5mMKd3hUjZi
-         Fh56G3gp3jFQhcWbGud1XxTWg8W1ZRcNM9KJQh7/6rTZcgjCzYA/sBU+XGersCaCnxIX
-         5EVGuKJfCy5YbwZlovQmnauUmrw9H69Nl8+2/p0xVuU29XFO2wSpS9CfN/RocT5Wn9ru
-         ERn+TR0CmX6PhHaclOilTeF8wRW0GEWD8ue+ZHnW5CoIdVjnMDCqPzR2M6hB3d02GYBq
-         LdKw1iy+0CAQo5dQ9+bP7Af6wC97J8YqApCwlSC2sNsN/KbNkb6AViQ5nUXiXeJgDsNF
-         8Zmg==
-X-Gm-Message-State: AJIora93OVtX+VucqNEKGsJegkVcBSHHzDtrQQo5jJiaAIUbSPOeq1sP
-        TkR8twcwnS0B3eIWKSfJhyeeKA==
-X-Google-Smtp-Source: AGRyM1vJ4KevW8A3IUQjaIW2xTcG2zotUtlZLa90K5/1vUOKScWXZ9L2XVgPTwxHhN+H2sw1h5dwgQ==
-X-Received: by 2002:a63:6b08:0:b0:3fd:1b8e:3932 with SMTP id g8-20020a636b08000000b003fd1b8e3932mr4345566pgc.552.1656176371452;
-        Sat, 25 Jun 2022 09:59:31 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id bu5-20020a056a00410500b0052521fd6caesm3835774pfb.111.2022.06.25.09.59.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Jun 2022 09:59:30 -0700 (PDT)
-Message-ID: <b80206fa-21b7-448a-0586-c5b17f737bfb@kernel.dk>
-Date:   Sat, 25 Jun 2022 10:59:29 -0600
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH] lib/sbitmap: Fix invalid loop in
- __sbitmap_queue_get_batch()
-Content-Language: en-US
-To:     wuchi <wuchi.zero@gmail.com>, mwilck@suse.com,
-        andriy.shevchenko@linux.intel.com
-Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20220605145835.26916-1-wuchi.zero@gmail.com>
+        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
+         :message-id:date:mime-version:content-transfer-encoding;
+        bh=Lyqt/8xMEJfXAgB3QKmRd6F7TnQPwfOqSXGZzoVDZfQ=;
+        b=5PGTuv7EOublhr6kv0IL1Q446NPKD7v266q1J47icZgCfTbPvDEe5bI1GTLOBhqwaE
+         P0NmNKnCXGh+NJAnvsWffWgGMO5gGh+I+GJmofRa0o04ANWOYd1dMn+Vqah5pFRqS/z4
+         S4jHCFyvU56HHWi9T5DawSLHRo56p99BB7Jh1c+Lbh1fMO15ClKX87L5MLNHFfw3NkH5
+         +uxI2g0LmJ85+zVXGKq4XFRuhl0zIbavf+oigDz2fLY80fGAqZdoeSbUZK61VNssUDea
+         HB4Yx5k6qkl7vOZrzNJz5sywOGeRG7Rw1bCFpmTcqLnbQzxdutFzLTer3G7IO1DKco5J
+         /vdw==
+X-Gm-Message-State: AJIora+ZgeOSb4pLzpBg7gAbAOI1SFYFVOpRtvl+4Av0HuwCQzgRy7Uj
+        GronxOSM1aG6hYxiQEGxrMlEUQ==
+X-Google-Smtp-Source: AGRyM1vOj1AtuviiNYkSsNdFzXCEmg0WINR16xuef7hYkKJP7AoH8til4kjwwPRyRlHFEbtkida7oQ==
+X-Received: by 2002:aa7:8008:0:b0:51a:cae3:7563 with SMTP id j8-20020aa78008000000b0051acae37563mr5099164pfi.16.1656176528722;
+        Sat, 25 Jun 2022 10:02:08 -0700 (PDT)
+Received: from [127.0.1.1] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id r19-20020a170902e3d300b00163f8ddf160sm3932508ple.161.2022.06.25.10.02.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Jun 2022 10:02:08 -0700 (PDT)
 From:   Jens Axboe <axboe@kernel.dk>
+To:     wuchi.zero@gmail.com, mwilck@suse.com,
+        andriy.shevchenko@linux.intel.com
+Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
 In-Reply-To: <20220605145835.26916-1-wuchi.zero@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20220605145835.26916-1-wuchi.zero@gmail.com>
+Subject: Re: [PATCH] lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch()
+Message-Id: <165617652775.121867.397759941071832869.b4-ty@kernel.dk>
+Date:   Sat, 25 Jun 2022 11:02:07 -0600
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/5/22 8:58 AM, wuchi wrote:
+On Sun, 5 Jun 2022 22:58:35 +0800, wuchi wrote:
 > 1. Getting next index before continue branch.
 > 2. Checking free bits when setting the target bits. Otherwise,
 > it may reuse the busying bits.
+> 
+> 
 
-Applied with:
+Applied, thanks!
 
-Fixes: 9672b0d43782 ("sbitmap: add __sbitmap_queue_get_batch()")
+[1/1] lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch()
+      (no commit info)
 
-added as well.
-
+Best regards,
 -- 
 Jens Axboe
+
 
