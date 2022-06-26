@@ -2,62 +2,60 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBC85C43334
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 13:59:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0905C43334
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 14:16:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234473AbiFZN7B (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jun 2022 09:59:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41272 "EHLO
+        id S234338AbiFZOQM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jun 2022 10:16:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230497AbiFZN7A (ORCPT
+        with ESMTP id S230497AbiFZOQM (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jun 2022 09:59:00 -0400
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82DE9DEF1;
-        Sun, 26 Jun 2022 06:58:59 -0700 (PDT)
-Received: by mail-wr1-f52.google.com with SMTP id v14so9497042wra.5;
-        Sun, 26 Jun 2022 06:58:59 -0700 (PDT)
+        Sun, 26 Jun 2022 10:16:12 -0400
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61EAD101FA
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 07:16:11 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id m6-20020a05600c3b0600b003a0489f412cso327710wms.1
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 07:16:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=2AbSkeFZUioPAQ3a70nNyeL3mIPEJabq4zioJ0USaqA=;
-        b=geSJHIbg5t3jd54nRzJoLOR/s7fT7SkWRtJuYJnPsWfbEZyqK4XKlBl3ZvBskPd2oj
-         k/soBnos/N0cL8mZfrCw6KqM7WOgIyQzDzmP9esNMGls56ISU6KAGcithnhQnqvmBlRz
-         wjrFKNY5pvcjCBvfS4Ieron3r35hz1SP8j7aNwuBcUFA4SV+Ik7OChn9qc3++2EUzzs1
-         miSJsOflGOYxku9ZqzRgrbdcdDq78z/EjEmt3o1By8yXjKw9uottB0Nl1j1B9PsOLh5T
-         4ZGjMsfNctiLedXxhlTrwnPNpy8PmrVDvEb8aiUMiKcK5cj8ubAowDLWjrsYHD9IRpw2
-         PTog==
-X-Gm-Message-State: AJIora9lifaGOyMShuRarCPnfspoj6gOeu5wlIVQUn0lNDkCtTMAMvJ7
-        RdRMC7ybQnQAMkBmnLQqQOw=
-X-Google-Smtp-Source: AGRyM1tsNjy9pUQ2/KlwB69wacP4xwTylLY6Td/+6NMMtK1xKOX8O1lC5Yu/j8LwK2/38EbSaAC5PA==
-X-Received: by 2002:adf:f102:0:b0:21b:8bba:5025 with SMTP id r2-20020adff102000000b0021b8bba5025mr8255000wro.174.1656251938109;
-        Sun, 26 Jun 2022 06:58:58 -0700 (PDT)
+        bh=6zCJCSVlAUXRaGnISCtHsz/5Pjr48JRZxmR0ns3GnNg=;
+        b=LHUm4foAu3UR7Yx8Fl8AGeCqSs/TPCoezb0fisl9UZLar3VlQCmIdqZ9ICHItE7FXG
+         hmcss5ToH5+MPaC0BQWbcIj+2BlkG1Fnrs7MkBBuSQWurNnQQmEQyovkKEBGAKEddCqn
+         6dwQ3JgqMoIBv+5AmvmrywTlaKv5kGG1ImiBrNTYhG7RPkBQh3bef5L6XZ8eVIa5X4u6
+         TnAh4t9qArCnm1AeFKJfBKmaVrFQJwdA9lBxwoV1qjI94B+XH/0pnQC8TwXpcIqzUEDD
+         yqC8mQFF87Dph7r4OAwik7p8iUWSIrDBwOWZ3A1y8yKYOtWz2wWcyK9HqH0+9BBS/+Eb
+         P6dQ==
+X-Gm-Message-State: AJIora869l7LdTza4lIRrELg2b4Yuh9cpOPHAiJl9vU3SlYdOQ5JNbWi
+        NVD4j59F+LkKoaQPVA+YgTc=
+X-Google-Smtp-Source: AGRyM1sspwWvVudAHE6sLY9L60sphjiPlvm76BAMYyUot88IugqA5kzn6bsXWcWV02k874t3pUk54A==
+X-Received: by 2002:a7b:cb03:0:b0:39e:e826:ce6d with SMTP id u3-20020a7bcb03000000b0039ee826ce6dmr14601812wmj.102.1656252969976;
+        Sun, 26 Jun 2022 07:16:09 -0700 (PDT)
 Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id l16-20020adffe90000000b0021b9a4a75e2sm7723716wrr.30.2022.06.26.06.58.56
+        by smtp.gmail.com with ESMTPSA id z5-20020adfe545000000b0021b81855c1csm9515775wrm.27.2022.06.26.07.16.08
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jun 2022 06:58:57 -0700 (PDT)
-Message-ID: <bb9ba2df-ca20-1126-4393-d2f1e6ba6a1b@grimberg.me>
-Date:   Sun, 26 Jun 2022 16:58:55 +0300
+        Sun, 26 Jun 2022 07:16:09 -0700 (PDT)
+Message-ID: <1a253c74-9dd7-60f3-33f4-037d92c179ea@grimberg.me>
+Date:   Sun, 26 Jun 2022 17:16:08 +0300
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.9.1
-Subject: Re: [PATCH v2 5/6] blk-mq: Drop 'reserved' arg of busy_tag_iter_fn
+Subject: Re: [bug report] kmemleak observed from blktests on latest
+ linux-block/for-next
 Content-Language: en-US
-To:     John Garry <john.garry@huawei.com>, axboe@kernel.dk,
-        damien.lemoal@opensource.wdc.com, bvanassche@acm.org, hch@lst.de,
-        jejb@linux.ibm.com, martin.petersen@oracle.com, hare@suse.de,
-        satishkh@cisco.com, sebaddel@cisco.com, kartilak@cisco.com
-Cc:     linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-        linux-mmc@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
-        mpi3mr-linuxdrv.pdl@broadcom.com, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, nbd@other.debian.org
-References: <1655810143-67784-1-git-send-email-john.garry@huawei.com>
- <1655810143-67784-6-git-send-email-john.garry@huawei.com>
+To:     Yi Zhang <yi.zhang@redhat.com>, Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block <linux-block@vger.kernel.org>,
+        "open list:NVM EXPRESS DRIVER" <linux-nvme@lists.infradead.org>
+References: <CAHj4cs8iJPnQ+zGHNTapR9HWMk9nBXUPbhYi5k-vKZf4qRmz_A@mail.gmail.com>
+ <YqavC8hwLXwPVnor@T590>
+ <CAHj4cs8y5HHYjr0FtWm1AmkEY=ZqOL4OmgzrWBEhbRpu5V8dWA@mail.gmail.com>
+ <YqdIWcgnEylFuSci@T590>
+ <CAHj4cs-66nWX_8HvN4_j8QmrTKA9tXNrdfejPagaDNOzNTGs_A@mail.gmail.com>
 From:   Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <1655810143-67784-6-git-send-email-john.garry@huawei.com>
+In-Reply-To: <CAHj4cs-66nWX_8HvN4_j8QmrTKA9tXNrdfejPagaDNOzNTGs_A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
@@ -65,24 +63,26 @@ List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
 
-
-On 6/21/22 14:15, John Garry wrote:
-> We no longer use the 'reserved' arg in busy_tag_iter_fn for any iter
-> function so it may be dropped.
+>>> Hi Ming
+>>>
+>>> The kmemleak also can be reproduced on 5.19.0-rc2, pls try to enable
+>>> nvme_core multipath and retest.
+>>>
+>>> # cat /sys/module/nvme_core/parameters/multipath
+>>> Y
+>>>
+>>
+>> OK, I can understand the reason now since rqos is only removed for blk-mq queue,
+>> then rqos allocated for bio queue is leaked, see disk_release_mq().
+>>
+>> The following patch should fix it:
 > 
-> Signed-off-by: John Garry <john.garry@huawei.com>
-> Reviewed-by: Christoph Hellwig <hch@lst.de>
-> Reviewed-by: Hannes Reinecke <hare@suse.de>
-> ---
->   block/blk-mq-debugfs.c              |  2 +-
->   block/blk-mq-tag.c                  |  7 +++----
->   block/blk-mq.c                      | 10 ++++------
->   drivers/block/mtip32xx/mtip32xx.c   |  6 +++---
->   drivers/block/nbd.c                 |  2 +-
->   drivers/infiniband/ulp/srp/ib_srp.c |  3 +--
->   drivers/nvme/host/core.c            |  2 +-
->   drivers/nvme/host/fc.c              |  3 +--
->   drivers/nvme/host/nvme.h            |  2 +-
+> Hi Ming
+> The kmemleak was fixed by this change, feel free to add
+> 
+> Tested-by: Yi Zhang <yi.zhang@redhat.com>
 
-for the nvme bits:
+I just tripped on this myself...
+You can add,
+
 Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
