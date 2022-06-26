@@ -2,120 +2,129 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05D31C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 16:24:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AFF2C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 16:34:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229847AbiFZQYn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jun 2022 12:24:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41490 "EHLO
+        id S230473AbiFZQeU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jun 2022 12:34:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45808 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbiFZQYm (ORCPT
+        with ESMTP id S230220AbiFZQeT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jun 2022 12:24:42 -0400
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7926EBC30;
-        Sun, 26 Jun 2022 09:24:41 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id q6so14248790eji.13;
-        Sun, 26 Jun 2022 09:24:41 -0700 (PDT)
+        Sun, 26 Jun 2022 12:34:19 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DA1A657E
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 09:34:18 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id lw20so14383002ejb.4
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 09:34:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=GKFVONWxoNWLQ+KQRLKWkiKJtsHOSKJZH1HI0byEJP4=;
-        b=n4FZO+2HZcxIH19RNsFxZgFqDA8rtCv2e6fo2QNGXmteXn82j+/59IOLr8HUP3WoRu
-         BSxcpevYg5PO8Uai/88i0ts7gs7pDdf9L1g+ZwJUdDx7o4M2iDlsAdD+yohKgtsp1D+G
-         tZmCBi59U9IBYyxElnWF0BmAhvo9OOVYHtrKarG93dHTHOq9catXi5U9yTi7c8AMCyIH
-         TmLPqWClnd4NDm0apqfTwveN2Is6t22YB+WS8wI1OIkmGYh0A3dJZk0zcvCtFfvKUZuN
-         SEvpVSkJcDRUUzAQaBoJ7E1D/B1Bd4fzsUGyfb1SGjVWSXRQFU34Kvd82qszgyNU8Aj1
-         V2Sw==
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=mScxwT9DzL3m/fse9Qa13RHznVT8wiBux8yUPiA/65w=;
+        b=Fv68tSKqZvEHCHdmDpfHlKLYttzkO7ojxHn2al/Pb7IdSsasPmpYAK2+TpzX4qQDqt
+         oFjxvUfBmPnTQHGF+agmqW3JDOYDlGeS0gNC05KfbkWpTkkuK0w3mcidoo0C4Q2p+jH+
+         qnQ/2ntK72Zq3JYUI5Z4Y8+t5KpSct0oU8lBc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=GKFVONWxoNWLQ+KQRLKWkiKJtsHOSKJZH1HI0byEJP4=;
-        b=MgmNw15rzHfIOU/pqNWQbjq1nHc0C5lYjPKNFeTOY1o9DRu1244xCpuqPihVuQU1xq
-         aZAnwqIfoywMm4vcltCt8AbZg8x5ij35/6h3hYgGKj0iYc6cyFTLCmqywpeEdZ1onq+M
-         q/bQ6ICDF4S0PcqMsnUjkzpMGP+Onuc/XmIdqi1lB+2aPv9UGeir1SekZGE6Y2mrbB+E
-         ZWEV6XELBOnI69eEqqd5VQGVjEVIVAgegEeQwUzn9tYaVT+hIoeljk6NkhAQ0TNLgM/5
-         BKd4P8WtsQ7vU9GEGMlk9caenJV0kVIlpMBB3LieI7RsC8DHH02NZruP0Wz/5aHgZ0bB
-         oiwQ==
-X-Gm-Message-State: AJIora93l5PoJZ5zGBBugV0Abd+YH1Z3+A2AqBOIiThPxQBJS3DtX5Q7
-        15UnY1jMeF8CjwSWQrjzOY8=
-X-Google-Smtp-Source: AGRyM1tDVvC0gHUKc3HdI98C62253tpkXG/Ed29CyPIDRi+mcrBLRG8i3rXOVtt8xD2lVgZoQjNh9A==
-X-Received: by 2002:a17:906:2bda:b0:726:3b59:3ea9 with SMTP id n26-20020a1709062bda00b007263b593ea9mr8563233ejg.43.1656260680045;
-        Sun, 26 Jun 2022 09:24:40 -0700 (PDT)
-Received: from mail (239.125-180-91.adsl-dyn.isp.belgacom.be. [91.180.125.239])
-        by smtp.gmail.com with ESMTPSA id jy19-20020a170907763300b007263713cfe9sm3340683ejc.169.2022.06.26.09.24.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jun 2022 09:24:39 -0700 (PDT)
-Date:   Sun, 26 Jun 2022 18:24:38 +0200
-From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=mScxwT9DzL3m/fse9Qa13RHznVT8wiBux8yUPiA/65w=;
+        b=Odq03qT9QvPsgs5Fnv5MDjWARWW0AEpXICBTz8ZC4fjNA3gHJXYTZk3HirKTe6TCYo
+         kMiy7ukj983IpFTjbWbZ9xPzD47h/uQ2mTO8xqfJXBrzTmS3nGQZQE11m1yzVDLRKGfP
+         Y2v6RPKlUnLLrvv5ZPFwJbu3BGH/u1Ec5wtylz+3Mmhh2s1RnXIrtTqI3b42DBOt9hqX
+         /4JUormMlMfqrjTeYGJv/nF5YjxAwkXj2LH3Z69dob+CgmES+dNXgG7hGZxBe54dpIgM
+         R7Q5qoO5xYlG7OHO3XKgqg58jqM2+EWr4MLTnIoeksq7s1N7irIXCveFmSXysQnmfxHV
+         Zxkg==
+X-Gm-Message-State: AJIora9iWD3yFW+rR7w8XnFAcF1BwrU3J1iFWYsWRYXQMqNlpr1TmSde
+        z3WkQPKm26HXUmyK7GPgAtPQP5wg1ePNTD4P
+X-Google-Smtp-Source: AGRyM1s4dsNKldjeUNJXXdTki6bce+gNUgTjmxiUceHQWs4+kv/vvJ9YDVginIrNMK/BZUqQe0X7ww==
+X-Received: by 2002:a17:906:2086:b0:715:7983:a277 with SMTP id 6-20020a170906208600b007157983a277mr8757520ejq.386.1656261256851;
+        Sun, 26 Jun 2022 09:34:16 -0700 (PDT)
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
+        by smtp.gmail.com with ESMTPSA id k10-20020a170906970a00b006fea59ef3a5sm3991108ejx.32.2022.06.26.09.34.14
+        for <linux-block@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Jun 2022 09:34:15 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id e28so4651170wra.0
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 09:34:14 -0700 (PDT)
+X-Received: by 2002:a05:6000:1251:b0:21a:efae:6cbe with SMTP id
+ j17-20020a056000125100b0021aefae6cbemr8209393wrx.281.1656261253928; Sun, 26
+ Jun 2022 09:34:13 -0700 (PDT)
+MIME-Version: 1.0
+References: <20220623180528.3595304-1-bvanassche@acm.org> <20220623180528.3595304-52-bvanassche@acm.org>
+ <20220624045613.GA4505@lst.de> <aa044f61-46f0-5f21-9b17-a1bb1ff9c471@acm.org>
+ <20220625092349.GA23530@lst.de> <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
+ <20220626095814.7wtma47w4sph7dha@mail>
+In-Reply-To: <20220626095814.7wtma47w4sph7dha@mail>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Sun, 26 Jun 2022 09:33:57 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wj8gM8q04v2jS5JGjEdoE2d+B4_nm74xrFjZ77f9YRsbA@mail.gmail.com>
+Message-ID: <CAHk-=wj8gM8q04v2jS5JGjEdoE2d+B4_nm74xrFjZ77f9YRsbA@mail.gmail.com>
+Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
+To:     Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc:     Bart Van Assche <bvanassche@acm.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block <linux-block@vger.kernel.org>,
         Damien Le Moal <damien.lemoal@opensource.wdc.com>,
         Naohiro Aota <naohiro.aota@wdc.com>,
         Johannes Thumshirn <jth@kernel.org>,
         Rasmus Villemoes <linux@rasmusvillemoes.dk>,
         Steven Rostedt <rostedt@goodmis.org>,
-        linux-sparse@vger.kernel.org
-Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
-Message-ID: <20220626162438.3zyjenssj2gxy7b5@mail>
-References: <20220623180528.3595304-1-bvanassche@acm.org>
- <20220623180528.3595304-52-bvanassche@acm.org>
- <20220624045613.GA4505@lst.de>
- <aa044f61-46f0-5f21-9b17-a1bb1ff9c471@acm.org>
- <20220625092349.GA23530@lst.de>
- <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
- <20220626095814.7wtma47w4sph7dha@mail>
- <a206782a-bd90-58cd-1e83-bb5988edb0f9@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a206782a-bd90-58cd-1e83-bb5988edb0f9@acm.org>
+        Sparse Mailing-list <linux-sparse@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sun, Jun 26, 2022 at 08:42:27AM -0700, Bart Van Assche wrote:
-> On 6/26/22 02:58, Luc Van Oostenryck wrote:
-> > On Sat, Jun 25, 2022 at 05:44:54PM -0700, Bart Van Assche wrote:
-> > > On 6/25/22 02:23, Christoph Hellwig wrote:
-> > > > Yeah, that is a bit of a mess.  Rasmus, Steven - any good idea how
-> > > > we can make the trace even macros fit for sparse?  Maybe just drop the
-> > > > is_signed_type check for __CHECKER__ ?
-> > 
-> > I would strongly advise against this:
-> > -) the macro is sued elsewhere too (for overflow checking)
-> > -) sparse wouldn't check anymore the same code as the one seen by the
-> >     compiler
-> > 
-> > What about I would add to sparse something to strip away the bitwise/
-> > recover the underlying type? Something like __unbitwiseof() or
-> > __underlying_typeof() (some better name is needed)?
-> 
-> Another question is how to keep the non-sparse build working. Does
-> anyone want to comment on the following alternatives or propose another
-> alternative?
-> 
-> (1) sparse implements __strip_bitwise as a macro.
-> 
-> (in compiler.h)
-> 
-> #ifndef __strip_bitwise
-> #define __strip_bitwise(type) type
-> #endif
+On Sun, Jun 26, 2022 at 2:58 AM Luc Van Oostenryck
+<luc.vanoostenryck@gmail.com> wrote:
+>
+> What about I would add to sparse something to strip away the bitwise/
+> recover the underlying type? Something like __unbitwiseof() or
+> __underlying_typeof() (some better name is needed)?
 
-...
+Please no, we don't want to make random macros have to have sparse
+logic in them when it's not actually sparse-related.
 
-> (1) would work better than (2) for kernel developers who are using a
-> version of sparse that does not support __strip_bitwise().
+I think it would be better if sparse just recognized some of these
+kinds of situation. In particular:
 
-Yes, sure. I was thinking about using (and adding) __has_feature()
-but the goal is the same.
+ (a) for the casting part, I actually suspect we should drop the
+warning about castign integers to restricted types.
 
-[I prefer this because, internally, an operator is needed anyway and
-__has_feature() would be more general (but then it would need to be
-protected by its own #ifndef __has_feature).]
+Note that this is actually one of the main causes of "__force" use in
+the kernel, with code like
 
--- Luc
+        VM_FAULT_OOM            = (__force vm_fault_t)0x000001,
+        VM_FAULT_SIGBUS         = (__force vm_fault_t)0x000002,
+        VM_FAULT_MAJOR          = (__force vm_fault_t)0x000004,
+        VM_FAULT_WRITE          = (__force vm_fault_t)0x000008,
+
+and I think that we could/should just say that "explicit casts of
+constants are ok".
+
+That would remove two of the four warnings right there, and probably
+make bitwise types more convenient in general.
+
+We already treat "0" as special (because for bitwise things, zero is
+kind of the universal constant), and we should continue to warn about
+_implicit_ casts of restricted types, but I think the use of "__force"
+in the kernel does show that the explicit casts are probably a bad
+idea.
+
+ (b) I think we could also recognize "comparison of constants" to be
+something that doesn't necessarily require a warning.
+
+And here in particular the "compare with zero" and "compare with all
+bits set" - which is exactly that "-1" case.
+
+In fact, there's a very good argument that "-1" is as special as zero
+is ("all bits set" vs "all bits clear"), so for that (a) case, I think
+at a _minimum_ we shouldn't warn about that particular constant.
+
+So I think we could silence this sparse warning entirely, without
+really introducing any new syntax, and actually improving on how
+bitwise works.
+
+                 Linus
