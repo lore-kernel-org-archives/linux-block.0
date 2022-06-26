@@ -2,335 +2,118 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C50C43334
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 14:24:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ADAFC43334
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 15:42:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230263AbiFZOYi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jun 2022 10:24:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51256 "EHLO
+        id S231600AbiFZPmc (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jun 2022 11:42:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54172 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229657AbiFZOYh (ORCPT
+        with ESMTP id S231587AbiFZPmb (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jun 2022 10:24:37 -0400
-Received: from heian.cn.fujitsu.com (mail.cn.fujitsu.com [183.91.158.132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 61FCADFE2
-        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 07:24:36 -0700 (PDT)
-IronPort-Data: =?us-ascii?q?A9a23=3AwANz/qIDl9VZ+L0/FE+R45clxSXFcZb7ZxGrkP8?=
- =?us-ascii?q?bfHC61zlwhTBSnDEdDT+POauPNzH8c4p0aI7goU1XuZHRz4NqS1BcGVNFFSwT8?=
- =?us-ascii?q?ZWfbTi6wuYcBwvLd4ubChsPA/w2MrEsF+hpCC+MzvuRGuK59yMkj/nRHuOU5NP?=
- =?us-ascii?q?sYUideyc1EU/Ntjozw4bVsqYw6TSIK1vlVeHa+qUzC3f5s9JACV/43orYwP9ZU?=
- =?us-ascii?q?FsejxtD1rA2TagjUFYzDBD5BrpHTU26ByOQroW5goeHq+j/ILGRpgs1/j8mDJW?=
- =?us-ascii?q?rj7T6blYXBLXVOGBiiFIPA+773EcE/Xd0j87XN9JFAatToySAmd9hjtdcnZKtS?=
- =?us-ascii?q?wY1JbCKk+MYO/VdO3gkY/YcqeaXfRBTtuTWlSUqaUDEx/RoEVFzN4kf8eVfH25?=
- =?us-ascii?q?D77obJSoLYxTFgPi5qJqgSuhqh88jLdPseoAWpXh7xDLYJekqStbIRKCi2DPy9?=
- =?us-ascii?q?F/cnegXRbCHOZVfMmEpMXz9j9R0Eg9/IPoDcC2A3xETqwFllW8=3D?=
-IronPort-HdrOrdr: =?us-ascii?q?A9a23=3ADHbHBqAySGECVuDlHemQ55DYdb4zR+YMi2TD?=
- =?us-ascii?q?tnoBLSC9F/b0qynAppomPGDP4gr5NEtApTniAtjkfZq/z+8X3WB5B97LMzUO01?=
- =?us-ascii?q?HYTr2Kg7GD/xTQXwX69sN4kZxrarVCDrTLZmRSvILX5xaZHr8brOW6zA=3D=3D?=
-X-IronPort-AV: E=Sophos;i="5.88,333,1635177600"; 
-   d="scan'208";a="126329184"
-Received: from unknown (HELO cn.fujitsu.com) ([10.167.33.5])
-  by heian.cn.fujitsu.com with ESMTP; 26 Jun 2022 22:24:35 +0800
-Received: from G08CNEXMBPEKD04.g08.fujitsu.local (unknown [10.167.33.201])
-        by cn.fujitsu.com (Postfix) with ESMTP id 937674D17189;
-        Sun, 26 Jun 2022 22:24:30 +0800 (CST)
-Received: from G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.83) by
- G08CNEXMBPEKD04.g08.fujitsu.local (10.167.33.201) with Microsoft SMTP Server
- (TLS) id 15.0.1497.23; Sun, 26 Jun 2022 22:24:31 +0800
-Received: from localhost.localdomain (10.167.215.54) by
- G08CNEXCHPEKD08.g08.fujitsu.local (10.167.33.209) with Microsoft SMTP Server
- id 15.0.1497.23 via Frontend Transport; Sun, 26 Jun 2022 22:24:30 +0800
-From:   Xiao Yang <yangx.jy@fujitsu.com>
-To:     <linux-block@vger.kernel.org>
-CC:     <shinichiro.kawasaki@wdc.com>, Xiao Yang <yangx.jy@fujitsu.com>
-Subject: [PATCH blktests] blktests: Split _have_kernel_option()
-Date:   Sun, 26 Jun 2022 22:24:28 +0800
-Message-ID: <20220626142428.32874-1-yangx.jy@fujitsu.com>
-X-Mailer: git-send-email 2.34.1
+        Sun, 26 Jun 2022 11:42:31 -0400
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABADFDFDD;
+        Sun, 26 Jun 2022 08:42:30 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id r66so6898446pgr.2;
+        Sun, 26 Jun 2022 08:42:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=6CzsTVPb9sOdTz2NHINq2vECEmp32n5bp9Bleavk9Gk=;
+        b=iKVK87wm1IsGqw0BnBICfV96xr7mc1quS5kNcLHZ4Y+96T5DQ1jN01ymmioQOQK7eW
+         HDvF3cYvErBwhB5culrP1hKAzVm5UBskmxFxafv0PzZVfNSIN0jDN4OBR7lrPCq9eXtP
+         0Dbcy7QQFidBrUrm15X2BCR/V+cq+HzEs8ItQ1JWf3Lpq9WjMNFTIJtMpMHEi+zhaooo
+         9xKeFUhX6vZdjyJVSPXWoJV/BUlmNpgEX+rR6cfa2zqa9HZgB788FTQtip4TPT4z+mPJ
+         +GUOy+d4mAnuVEPAf7Z9KlgVKvQ2awaxVf2klbX1AJ5WSLjX4g8KLGzH2pfz8kXJICQ0
+         cDcQ==
+X-Gm-Message-State: AJIora+v61vvmKe10kRp5okKaKAmI1QZ++g1OZko6o5MU1WS2WphtYbe
+        U9h22L0dph5XzUbj9G55Cno=
+X-Google-Smtp-Source: AGRyM1uMT+3VhdXiNPrBuiRQrvwxCUuf2Ze27ocZbWEcfEVDIj4qVCJVsUSANf/JutWsQilZWAlg3g==
+X-Received: by 2002:a05:6a00:1305:b0:512:eb1e:7921 with SMTP id j5-20020a056a00130500b00512eb1e7921mr10019826pfu.13.1656258150006;
+        Sun, 26 Jun 2022 08:42:30 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id p26-20020a634f5a000000b0040dfb0857a0sm188343pgl.78.2022.06.26.08.42.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Jun 2022 08:42:29 -0700 (PDT)
+Message-ID: <a206782a-bd90-58cd-1e83-bb5988edb0f9@acm.org>
+Date:   Sun, 26 Jun 2022 08:42:27 -0700
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-yoursite-MailScanner-ID: 937674D17189.A4A34
-X-yoursite-MailScanner: Found to be clean
-X-yoursite-MailScanner-From: yangx.jy@fujitsu.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
+Content-Language: en-US
+To:     Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
+        Naohiro Aota <naohiro.aota@wdc.com>,
+        Johannes Thumshirn <jth@kernel.org>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+        Steven Rostedt <rostedt@goodmis.org>,
+        linux-sparse@vger.kernel.org
+References: <20220623180528.3595304-1-bvanassche@acm.org>
+ <20220623180528.3595304-52-bvanassche@acm.org> <20220624045613.GA4505@lst.de>
+ <aa044f61-46f0-5f21-9b17-a1bb1ff9c471@acm.org>
+ <20220625092349.GA23530@lst.de>
+ <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
+ <20220626095814.7wtma47w4sph7dha@mail>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <20220626095814.7wtma47w4sph7dha@mail>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Split _have_kernel_option() into _have_kernel_config_file()
-and _check_kernel_option().
-1) _have_kernel_config_file() will set SKIP_REASON when neither
-   /boot/config* nor /proc/config.gz is available.
-2) _check_kernel_option() will not set SKIP_RESAON when the specified
-   kernel option is not defined.
+On 6/26/22 02:58, Luc Van Oostenryck wrote:
+> On Sat, Jun 25, 2022 at 05:44:54PM -0700, Bart Van Assche wrote:
+>> On 6/25/22 02:23, Christoph Hellwig wrote:
+>>> Yeah, that is a bit of a mess.  Rasmus, Steven - any good idea how
+>>> we can make the trace even macros fit for sparse?  Maybe just drop the
+>>> is_signed_type check for __CHECKER__ ?
+> 
+> I would strongly advise against this:
+> -) the macro is sued elsewhere too (for overflow checking)
+> -) sparse wouldn't check anymore the same code as the one seen by the
+>     compiler
+> 
+> What about I would add to sparse something to strip away the bitwise/
+> recover the underlying type? Something like __unbitwiseof() or
+> __underlying_typeof() (some better name is needed)?
+> 
+> Implementing directly what's needed here, something like __is_signed_type()
+> would be possible too but is a bit too specialized and so much less useful.
 
-Signed-off-by: Xiao Yang <yangx.jy@fujitsu.com>
----
- common/multipath-over-rdma |  3 ++-
- common/rc                  | 13 ++++++++-----
- tests/nvme/033             |  7 ++++++-
- tests/nvme/034             |  8 +++++++-
- tests/nvme/035             |  8 +++++++-
- tests/nvme/036             |  7 ++++++-
- tests/nvme/037             |  7 ++++++-
- tests/nvme/039             | 16 ++++++++++++----
- tests/nvmeof-mp/rc         | 11 ++++++-----
- tests/srp/rc               |  6 +++++-
- tests/zbd/rc               |  9 +++++++--
- 11 files changed, 72 insertions(+), 23 deletions(-)
+Another question is how to keep the non-sparse build working. Does
+anyone want to comment on the following alternatives or propose another
+alternative?
 
-diff --git a/common/multipath-over-rdma b/common/multipath-over-rdma
-index f9d7b9a..8a2108f 100644
---- a/common/multipath-over-rdma
-+++ b/common/multipath-over-rdma
-@@ -19,7 +19,8 @@ if [ $ramdisk_size -gt $max_ramdisk_size ]; then
- fi
- 
- _have_legacy_dm() {
--	if ! _have_kernel_option DM_MQ_DEFAULT; then
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option DM_MQ_DEFAULT; then
- 		SKIP_REASON="legacy device mapper support is missing"
- 		return 1
- 	fi
-diff --git a/common/rc b/common/rc
-index d18144b..df9fcb3 100644
---- a/common/rc
-+++ b/common/rc
-@@ -149,19 +149,22 @@ _have_configfs() {
- 	return 0
- }
- 
--_have_kernel_option() {
--	local f opt=$1
--
-+_have_kernel_config_file() {
- 	if [[ ! -f /proc/config.gz && ! -f /boot/config-$(uname -r) ]]; then
- 		SKIP_REASON="kernel $(uname -r) config not found"
- 		return 1
- 	fi
-+
-+	return 0
-+}
-+
-+_check_kernel_option() {
-+	local f opt=$1
-+
- 	for f in /proc/config.gz /boot/config-$(uname -r); do
- 		[ -e "$f" ] || continue
- 		if zgrep -q "^CONFIG_${opt}=[my]$" "$f"; then
- 			return 0
--		else
--			SKIP_REASON="kernel option $opt has not been enabled"
- 		fi
- 	done
- 
-diff --git a/tests/nvme/033 b/tests/nvme/033
-index 90aee81..0f58227 100755
---- a/tests/nvme/033
-+++ b/tests/nvme/033
-@@ -10,7 +10,12 @@ QUICK=1
- 
- requires() {
- 	_nvme_requires
--	_have_kernel_option NVME_TARGET_PASSTHRU
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option NVME_TARGET_PASSTHRU; then
-+		SKIP_REASON="NVME_TARGET_PASSTHRU has not been enabled"
-+		return 1
-+	fi
- }
- 
- nvme_info() {
-diff --git a/tests/nvme/034 b/tests/nvme/034
-index f92e5e2..552c204 100755
---- a/tests/nvme/034
-+++ b/tests/nvme/034
-@@ -10,7 +10,13 @@ TIMED=1
- 
- requires() {
- 	_nvme_requires
--	_have_kernel_option NVME_TARGET_PASSTHRU
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option NVME_TARGET_PASSTHRU; then
-+		SKIP_REASON="NVME_TARGET_PASSTHRU has not been enabled"
-+		return 1
-+	fi
-+
- 	_have_fio
- }
- 
-diff --git a/tests/nvme/035 b/tests/nvme/035
-index ee78a75..8581e0c 100755
---- a/tests/nvme/035
-+++ b/tests/nvme/035
-@@ -11,7 +11,13 @@ TIMED=1
- 
- requires() {
- 	_nvme_requires
--	_have_kernel_option NVME_TARGET_PASSTHRU
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option NVME_TARGET_PASSTHRU; then
-+		SKIP_REASON="NVME_TARGET_PASSTHRU has not been enabled"
-+		return 1
-+	fi
-+
- 	_have_xfs
- 	_have_fio
- }
-diff --git a/tests/nvme/036 b/tests/nvme/036
-index 8218c65..c747489 100755
---- a/tests/nvme/036
-+++ b/tests/nvme/036
-@@ -10,7 +10,12 @@ QUICK=1
- 
- requires() {
- 	_nvme_requires
--	_have_kernel_option NVME_TARGET_PASSTHRU
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option NVME_TARGET_PASSTHRU; then
-+		SKIP_REASON="NVME_TARGET_PASSTHRU has not been enabled"
-+		return 1
-+	fi
- }
- 
- test_device() {
-diff --git a/tests/nvme/037 b/tests/nvme/037
-index fc6c213..92cff7f 100755
---- a/tests/nvme/037
-+++ b/tests/nvme/037
-@@ -9,7 +9,12 @@ DESCRIPTION="test deletion of NVMeOF passthru controllers immediately after setu
- 
- requires() {
- 	_nvme_requires
--	_have_kernel_option NVME_TARGET_PASSTHRU
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option NVME_TARGET_PASSTHRU; then
-+		SKIP_REASON="NVME_TARGET_PASSTHRU has not been enabled"
-+		return 1
-+	fi
- }
- 
- test_device() {
-diff --git a/tests/nvme/039 b/tests/nvme/039
-index 85827fa..00c6672 100755
---- a/tests/nvme/039
-+++ b/tests/nvme/039
-@@ -14,8 +14,17 @@ QUICK=1
- 
- requires() {
- 	_have_program nvme
--	_have_kernel_option FAULT_INJECTION && \
--	    _have_kernel_option FAULT_INJECTION_DEBUG_FS
-+
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option FAULT_INJECTION; then
-+		SKIP_REASON="FAULT_INJECTION has not been enabled"
-+		return 1
-+	fi
-+
-+	if ! _check_kernel_option FAULT_INJECTION_DEBUG_FS; then
-+		SKIP_REASON="FAULT_INJECTION_DEBUG_FS has not been enabled"
-+		return 1
-+	fi
- }
- 
- inject_unrec_read_on_read()
-@@ -128,10 +137,9 @@ test_device() {
- 
- 	echo "Running ${TEST_NAME}"
- 
--	if _have_kernel_option NVME_VERBOSE_ERRORS; then
-+	if _check_kernel_option NVME_VERBOSE_ERRORS; then
- 		nvme_verbose_errors=true
- 	else
--		unset SKIP_REASON
- 		nvme_verbose_errors=false
- 	fi
- 
-diff --git a/tests/nvmeof-mp/rc b/tests/nvmeof-mp/rc
-index 708196b..ea48c33 100755
---- a/tests/nvmeof-mp/rc
-+++ b/tests/nvmeof-mp/rc
-@@ -14,19 +14,17 @@ ini_timeout=1
- group_requires() {
- 	local m name p required_modules
- 
-+	_have_kernel_config_file || return
- 	# Since the nvmeof-mp tests are based on the dm-mpath driver, these
- 	# tests are incompatible with the NVME_MULTIPATH kernel configuration
- 	# option with multipathing enabled in the nvme_core kernel module.
--	if _have_kernel_option NVME_MULTIPATH && \
-+	if _check_kernel_option NVME_MULTIPATH && \
- 		_have_module_param_value nvme_core multipath Y; then
- 		SKIP_REASON="CONFIG_NVME_MULTIPATH has been set in .config \
- and multipathing has been enabled in the nvme_core kernel module"
- 		return
- 	fi
- 
--	# Avoid test skip due to SKIP_REASON set by _have_kernel_option().
--	unset SKIP_REASON
--
- 	_have_configfs || return
- 	required_modules=(
- 		dm_multipath
-@@ -53,7 +51,10 @@ and multipathing has been enabled in the nvme_core kernel module"
- 	
- 	_have_root || return
- 
--	_have_kernel_option DM_UEVENT || return
-+	if ! _check_kernel_option DM_UEVENT; then
-+		SKIP_REASON="DM_UEVENT has not been enabled"
-+		return 1
-+	fi
- 
- 	# shellcheck disable=SC2043
- 	for name in multipathd; do
-diff --git a/tests/srp/rc b/tests/srp/rc
-index d44082a..38539cb 100755
---- a/tests/srp/rc
-+++ b/tests/srp/rc
-@@ -70,7 +70,11 @@ group_requires() {
- 
- 	_have_src_program discontiguous-io || return
- 
--	_have_kernel_option DM_UEVENT || return
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option DM_UEVENT; then
-+		SKIP_REASON="DM_UEVENT has not been enabled"
-+		return 1
-+	fi
- 
- 	for name in srp_daemon multipathd; do
- 		if pidof "$name" >/dev/null; then
-diff --git a/tests/zbd/rc b/tests/zbd/rc
-index fea55d6..410e528 100644
---- a/tests/zbd/rc
-+++ b/tests/zbd/rc
-@@ -12,9 +12,14 @@
- #
- 
- group_requires() {
-+	_have_kernel_config_file || return
-+	if ! _check_kernel_option BLK_DEV_ZONED; then
-+		SKIP_REASON="BLK_DEV_ZONED has not been enabled"
-+		return 1
-+	fi
-+
- 	_have_root && _have_program blkzone && _have_program dd &&
--		_have_kernel_option BLK_DEV_ZONED && _have_null_blk &&
--		_have_module_param null_blk zoned
-+		_have_null_blk && _have_module_param null_blk zoned
- }
- 
- group_device_requires() {
--- 
-2.34.1
+(1) sparse implements __strip_bitwise as a macro.
 
+(in compiler.h)
 
+#ifndef __strip_bitwise
+#define __strip_bitwise(type) type
+#endif
 
+(in trace_events.h)
+
+#define is_signed_type(type) ((__strip_bitwise(type))(-1) < (__strip_bitwise(type))1)
+
+(2) sparse implements __strip_bitwise as an operator that works on types.
+
+#ifdef __CHECKER__
+#define is_signed_type(type) ((__strip_bitwise(type))(-1) < (__strip_bitwise(type))1)
+#else
+#define is_signed_type(type) (((type)(-1)) < (type)1)
+#endif
+
+(1) would work better than (2) for kernel developers who are using a
+version of sparse that does not support __strip_bitwise().
+
+Thanks,
+
+Bart.
