@@ -2,109 +2,136 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EEADFC43334
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 09:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C22C43334
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 10:20:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233803AbiFZJ6W (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sun, 26 Jun 2022 05:58:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44390 "EHLO
+        id S234184AbiFZKUa (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jun 2022 06:20:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231403AbiFZJ6V (ORCPT
+        with ESMTP id S229565AbiFZKU3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sun, 26 Jun 2022 05:58:21 -0400
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F47FDF46;
-        Sun, 26 Jun 2022 02:58:19 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id o10so9234813edi.1;
-        Sun, 26 Jun 2022 02:58:19 -0700 (PDT)
+        Sun, 26 Jun 2022 06:20:29 -0400
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639E012618
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 03:20:27 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id ej4so9232879edb.7
+        for <linux-block@vger.kernel.org>; Sun, 26 Jun 2022 03:20:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=/rG5L3Zjx9O3il61DrqQzvI/iIYj2HZ2W4d57u5l2ZY=;
-        b=a1p8ZXROoy3Vpxr1xGZzlW0bbbFpW5+cFhERiGrPRi59K9WiUOa5cFz5RYWNOjo1cA
-         /1N10XbiNOikzFELkZx7IjOAWs8SOb0HLxrwQ6XEEtNBmBocNbr/JJCk1m7ohRX4Jj7z
-         eHIET/VUHzCSGZK5x7uclwFqcgXN1V171I+LWkK8z0MhzeUsmv3Vxlh+4nWycqdfcHpS
-         YO4s3xspNvDVsWvY5MJYmUnl2UsY+Io6wxxVaL9rciXCY6AU4ZHEshQpL4u90G7bY+FY
-         a4DAxiUjbQEvbF/snsSPXG+RWePe7TvspLOTGBF7vzhmGNgX9s4fzNe88r2ertErdZxO
-         jATQ==
+        d=scylladb.com; s=google;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=zy1Ih5xnZLYR31pscqnLVprtiUwTUenQdef+MWxKKMA=;
+        b=oBfck6+XscL2VeZ+MF8T02/Q0GkUoM1jN27mDG9zEwpHpTEFhiBjXDUOLSiVvUMvGM
+         2sicpmI3J24iRKAA/5RxJuX+VnPWJOq0n/0CFMTZwa0ERpZlFUFFpw22CJ5BPYHwH0NF
+         xzEehUBouX/IGDTkYFQ5Ev+S6CtOjASt8p1uYEBuekmHqcuo9NYiLJuBQ11SgTbV+s4Q
+         h+eTO5wsRZUjz6KnScQnB5ClLMK88d5eMfaRvO0FBf2N/bHMRc5rTU2sCUNWnro6M8G+
+         X6ErBcZ5i27Gmfz0rtcLWgvjPPhKS2RKwPNQrtAxFkITjgYwLdz6VFt3v67paBWA0AQH
+         wxMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=/rG5L3Zjx9O3il61DrqQzvI/iIYj2HZ2W4d57u5l2ZY=;
-        b=I48t83vCCU7iIrODjxu9Tj/txRQdJAtvHvK94i7cfBnKZJ1uEhNqAHfOgUpANXKIUo
-         nlGjLBdcHrwzMOGavhDBOdufROMQPvVkyjRgeHDfT9iAw981vpBH3Muu9sYAcvw8DmWO
-         toiEAuWQZrX1FVI/1dA+s6F24t54C1io/7zSS2KVtPt1PKzUrb9U2FBidYwaxK+bA5HK
-         uWyOCjnc+IEqqG1E8XXEsQdz7f3AnlYQzcfku134/FjPg7l5YadDUcY3L2yNKAfNyx4b
-         UAaMQSRIinWhH2fA6IBE3qXxp5GhGPJjrrbvyM4xy9jhQyG0K33JFzIW1yBllSz21xhQ
-         iq6Q==
-X-Gm-Message-State: AJIora+d/q4ONCdL85UxBy6ufNNewNKbfZ9vmSLn5IR0AW3AB1SZTpgT
-        TW/gF9y5L4yEai9VJLZXtZA=
-X-Google-Smtp-Source: AGRyM1vy9WMzVInsUCMzpXRPnXKYpr0TmNJZtoX7aLWnY5PkkohhOaI2vaQ4RyrCiTT8k4E/Nqov1A==
-X-Received: by 2002:a05:6402:26cb:b0:436:2173:3f7 with SMTP id x11-20020a05640226cb00b00436217303f7mr10113913edd.61.1656237498110;
-        Sun, 26 Jun 2022 02:58:18 -0700 (PDT)
-Received: from mail (239.125-180-91.adsl-dyn.isp.belgacom.be. [91.180.125.239])
-        by smtp.gmail.com with ESMTPSA id q2-20020a170906a08200b006fed93bf71fsm3645154ejy.18.2022.06.26.02.58.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Jun 2022 02:58:17 -0700 (PDT)
-Date:   Sun, 26 Jun 2022 11:58:14 +0200
-From:   Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        linux-sparse@vger.kernel.org
-Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
-Message-ID: <20220626095814.7wtma47w4sph7dha@mail>
-References: <20220623180528.3595304-1-bvanassche@acm.org>
- <20220623180528.3595304-52-bvanassche@acm.org>
- <20220624045613.GA4505@lst.de>
- <aa044f61-46f0-5f21-9b17-a1bb1ff9c471@acm.org>
- <20220625092349.GA23530@lst.de>
- <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:organization:in-reply-to
+         :content-transfer-encoding;
+        bh=zy1Ih5xnZLYR31pscqnLVprtiUwTUenQdef+MWxKKMA=;
+        b=aHaYAGZ9fPnnpVKnSYP1T3GHL3IupPZsDv26fFJOkTQN0HaA6NV63RgnJXzDJ6NWlM
+         jYYEqKxyrfEForu7Opg+BvqSJbuXib5YiOUefjpOkhS0tJR7nPyGZNjIrZ4E+S2LMxLP
+         iQWyVv2xqyjStUvI4eVxzzTadfczb5bMoOMKl1oCnfu/B1QYN2XCNSAEp+GclBNwc2zb
+         fNSi9fWhrz4N6b6hybm8l4Lgdfpg+ESrqRXcf/lgH/izvpH+iLPAtRNxKIck3IW9cczd
+         cIT0u8I3FzWkaDXIcIkpe5xdbuc320RcOqCcmdXIgMUCqzQX/gKvwthq2HYkfnPKON3A
+         E91Q==
+X-Gm-Message-State: AJIora8SiLSgDRWGl3bNXcCLU+qjcSLCaI5IXzp4wpAJVm4ABe6akrGy
+        SaJjIwYU2CwOXr5cRduOdF4GLg==
+X-Google-Smtp-Source: AGRyM1tv3WbUrJipd2xn/7Heq9RfOQOWLVedSKXLcrr95zGLiEg/pzWHi319OrG4Zqw5VAKidmbPoA==
+X-Received: by 2002:a05:6402:26d5:b0:435:aba2:9495 with SMTP id x21-20020a05640226d500b00435aba29495mr10073740edd.133.1656238825841;
+        Sun, 26 Jun 2022 03:20:25 -0700 (PDT)
+Received: from [10.0.0.1] (system.cloudius-systems.com. [199.203.229.89])
+        by smtp.gmail.com with ESMTPSA id c4-20020a170906340400b0070abf371274sm3634422ejb.136.2022.06.26.03.20.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 26 Jun 2022 03:20:25 -0700 (PDT)
+Message-ID: <23067de5-7955-7f58-f8ad-70a812602ac8@scylladb.com>
+Date:   Sun, 26 Jun 2022 13:20:22 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 1/8] statx: add direct I/O alignment information
+Content-Language: en-US
+To:     Christoph Hellwig <hch@infradead.org>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+References: <20220616201506.124209-1-ebiggers@kernel.org>
+ <20220616201506.124209-2-ebiggers@kernel.org>
+ <6c06b2d4-2d96-c4a6-7aca-5147a91e7cf2@scylladb.com>
+ <YrgOUw6YM2c6k59U@infradead.org>
+From:   Avi Kivity <avi@scylladb.com>
+Organization: ScyllaDB
+In-Reply-To: <YrgOUw6YM2c6k59U@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Sat, Jun 25, 2022 at 05:44:54PM -0700, Bart Van Assche wrote:
-> On 6/25/22 02:23, Christoph Hellwig wrote:
-> > On Fri, Jun 24, 2022 at 12:57:56PM -0700, Bart Van Assche wrote:
-> > > BTW, I discovered the code in the tracing infrastructure
-> > > that makes sparse unhappy:
-> > > 
-> > > #define is_signed_type(type) (((type)(-1)) < (type)1)
-> > > 
-> > > Sparse reports four warnings for that expression if 'type' is a bitwise
-> > > type. Two of these warnings can be suppressed by changing 'type' into
-> > > '__force type'. I have not yet found a way to suppress all the sparse
-> > > warnings triggered by the is_signed_type() macro for bitwise types.
 
-Yes, __bitwise is quite strict and only support the bitwise operations
-(&, |, ^ and).
- 
-> > Yeah, that is a bit of a mess.  Rasmus, Steven - any good idea how
-> > we can make the trace even macros fit for sparse?  Maybe just drop the
-> > is_signed_type check for __CHECKER__ ?
+On 26/06/2022 10.44, Christoph Hellwig wrote:
+> On Sun, Jun 19, 2022 at 02:30:47PM +0300, Avi Kivity wrote:
+>>> * stx_dio_offset_align: the alignment (in bytes) required for file
+>>>     offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
+>>>     on the file.  This will only be nonzero if stx_dio_mem_align is
+>>>     nonzero, and vice versa.
+>>
+>> If you consider AIO, this is actually three alignments:
+>>
+>> 1. offset alignment for reads (sector size in XFS)
+>>
+>> 2. offset alignment for overwrites (sector size in XFS since ed1128c2d0c87e,
+>> block size earlier)
+>>
+>> 3. offset alignment for appending writes (block size)
+>>
+>>
+>> This is critical for linux-aio since violation of these alignments will
+>> stall the io_submit system call. Perhaps io_uring handles it better by
+>> bouncing to a workqueue, but there is a significant performance and latency
+>> penalty for that.
+> I think you are mixing things up here.
 
-I would strongly advise against this:
--) the macro is sued elsewhere too (for overflow checking)
--) sparse wouldn't check anymore the same code as the one seen by the
-   compiler 
 
-What about I would add to sparse something to strip away the bitwise/
-recover the underlying type? Something like __unbitwiseof() or
-__underlying_typeof() (some better name is needed)?
+Yes.
 
-Implementing directly what's needed here, something like __is_signed_type()
-would be possible too but is a bit too specialized and so much less useful.
 
--- Luc Van Oostenryck
+> We actually have two limits that
+> matter:
+>
+>   a) the hard limit, which if violated will return an error.
+>      This has been sector size for all common file systems for years,
+>      but can be bigger than that with fscrypt in the game (which
+>      triggered this series)
+>   b) an optimal write size, which can be done asynchronous and
+>      without exclusive locking.
+>      This is what your cases 2) and 3) above refer to.
+>
+> Exposting this additional optimal performance size might be a good idea
+> in addition to what is proposed here, even if matters a little less
+> with io_uring.  But I'm not sure I'd additional split it into append
+> vs overwrite vs hole filling but just round up to the maximum of those.
+
+
+Rounding up will penalize database workloads, with and without io_uring. 
+Database commit logs are characterized by frequent small writes. Telling 
+the database to round up to 4k vs 512 bytes means large write 
+amplification. The disk probably won't care (or maybe it will - it will 
+also have to generate more erase blocks), but the database will run out 
+of commitlog space much sooner and will have to compensate in expensive 
+ways.
+
+
+Of course, people that care can continue to use internal filesystem 
+knowledge, and maybe there are few enough of those that the API can 
+choose to ignore them.
+
+
