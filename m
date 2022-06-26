@@ -2,128 +2,93 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CE08C43334
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 00:45:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D8F0C433EF
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 02:39:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233601AbiFZAo7 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jun 2022 20:44:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57536 "EHLO
+        id S233692AbiFZCjv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sat, 25 Jun 2022 22:39:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233759AbiFZAo6 (ORCPT
+        with ESMTP id S232327AbiFZCjv (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jun 2022 20:44:58 -0400
-Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEB7214007
-        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 17:44:57 -0700 (PDT)
-Received: by mail-pj1-f42.google.com with SMTP id l2so4892216pjf.1
-        for <linux-block@vger.kernel.org>; Sat, 25 Jun 2022 17:44:57 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:from
-         :subject:to:cc:references:content-language:in-reply-to
-         :content-transfer-encoding;
-        bh=+3dALfFkGsSuaeuAPJOfM2MmZmY7AEbcVCeXtSaR3/g=;
-        b=VqhIIj4ZKemFMFRpdBoAlZJ2KTxvVLp3szoJtR7czpkkSH45Y7JP1Ye11oKJxezTQ9
-         k1LFBD4Kc7X6M7v/S6Wfejb41lFrWbm2EhgyRQ4A//Vv5fxsbTn9dGk3Te2VOLc2zRl0
-         BeCeLMVxBZNv7+cydUjiM8ney4WZGWCA1e5NdJYWwx4Wi3mUmGHgChyJYFxybGXfjhGl
-         K0fZOmwXuDdEEQyJ4vI0WNPCgL7bMlN/Y+nyNQIXl83a4sEt4wS3b/m6IX9WJXaU71+p
-         TyzyjY8KqU4XfLKSJ/w/Thiq3j4R12fnQ/FmRytCDDAG8aMArAJUQFVrYirM7AIbWpFK
-         BIcw==
-X-Gm-Message-State: AJIora+tKK7oDYBenY68WLZ5ITBKLfFPGgCrFbvQfQlvRR8U311r0+MQ
-        Cb3NqDEeczNeKzM84DIgE0A=
-X-Google-Smtp-Source: AGRyM1skoMbA7PlCuK7AtXnN69R91b42jhH+5BFVJj9iEcxA/2OThBulisvDbMc+13iU7+DtXzFdrA==
-X-Received: by 2002:a17:903:11cd:b0:167:8a0f:8d44 with SMTP id q13-20020a17090311cd00b001678a0f8d44mr6763178plh.72.1656204297086;
-        Sat, 25 Jun 2022 17:44:57 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id j9-20020a17090a318900b001e88c4bb3dcsm6335067pjb.25.2022.06.25.17.44.55
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Jun 2022 17:44:56 -0700 (PDT)
-Message-ID: <3eed7994-8de2-324d-c373-b6f4289a2734@acm.org>
-Date:   Sat, 25 Jun 2022 17:44:54 -0700
+        Sat, 25 Jun 2022 22:39:51 -0400
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7605712AC0;
+        Sat, 25 Jun 2022 19:39:49 -0700 (PDT)
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LVw6Q2fbjzDsC8;
+        Sun, 26 Jun 2022 10:39:10 +0800 (CST)
+Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sun, 26 Jun 2022 10:39:47 +0800
+Received: from [10.174.176.73] (10.174.176.73) by
+ kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.24; Sun, 26 Jun 2022 10:39:46 +0800
+Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
+ updates
+To:     Jens Axboe <axboe@kernel.dk>,
+        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
+        <tj@kernel.org>
+CC:     <ming.lei@redhat.com>, <cgroups@vger.kernel.org>,
+        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <yi.zhang@huawei.com>
+References: <20220528064330.3471000-1-yukuai3@huawei.com>
+ <20220528064330.3471000-5-yukuai3@huawei.com>
+ <20220622172621.GA28246@blackbody.suse.cz>
+ <f5165488-2461-8946-593f-14154e404850@huawei.com>
+ <20220623162620.GB16004@blackbody.suse.cz>
+ <75b3cdcc-1aa3-7259-4900-f09a2a081716@huawei.com>
+ <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
+From:   Yu Kuai <yukuai3@huawei.com>
+Message-ID: <65dac189-92f5-f2bc-b322-cbda10f897b4@huawei.com>
+Date:   Sun, 26 Jun 2022 10:39:45 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
+ Thunderbird/60.8.0
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-From:   Bart Van Assche <bvanassche@acm.org>
-Subject: Re: [PATCH 51/51] fs/zonefs: Fix sparse warnings in tracing code
-To:     Christoph Hellwig <hch@lst.de>
-Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
-        Damien Le Moal <damien.lemoal@opensource.wdc.com>,
-        Naohiro Aota <naohiro.aota@wdc.com>,
-        Johannes Thumshirn <jth@kernel.org>,
-        Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-        Steven Rostedt <rostedt@goodmis.org>,
-        Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-References: <20220623180528.3595304-1-bvanassche@acm.org>
- <20220623180528.3595304-52-bvanassche@acm.org> <20220624045613.GA4505@lst.de>
- <aa044f61-46f0-5f21-9b17-a1bb1ff9c471@acm.org>
- <20220625092349.GA23530@lst.de>
-Content-Language: en-US
-In-Reply-To: <20220625092349.GA23530@lst.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.176.73]
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600009.china.huawei.com (7.193.23.164)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/25/22 02:23, Christoph Hellwig wrote:
-> On Fri, Jun 24, 2022 at 12:57:56PM -0700, Bart Van Assche wrote:
->> BTW, I discovered the code in the tracing infrastructure
->> that makes sparse unhappy:
+在 2022/06/26 0:41, Jens Axboe 写道:
+> On 6/25/22 2:36 AM, Yu Kuai wrote:
+>> ? 2022/06/24 0:26, Michal Koutn? ??:
+>>> On Thu, Jun 23, 2022 at 08:27:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
+>>>>> Here we may allow to dispatch a bio above current slice's
+>>>>> calculate_bytes_allowed() if bytes_skipped is already >0.
+>>>>
+>>>> Hi, I don't expect that to happen. For example, if a bio is still
+>>>> throttled, then old slice is keeped with proper 'bytes_skipped',
+>>>> then new wait time is caculated based on (bio_size - bytes_skipped).
+>>>>
+>>>> After the bio is dispatched(I assum that other bios can't preempt),
+>>>
+>>> With this assumptions it adds up as you write. I believe we're in
+>>> agreement.
+>>>
+>>> It's the same assumption I made below (FIFO everywhere, i.e. no
+>>> reordering). So the discussed difference shouldn't really be negative
+>>> (and if the assumption didn't hold, so the modular arithmetic yields
+>>> corerct bytes_skipped value).
+>> Yes, nice that we're in aggreement.
 >>
->> #define is_signed_type(type) (((type)(-1)) < (type)1)
->>
->> Sparse reports four warnings for that expression if 'type' is a bitwise
->> type. Two of these warnings can be suppressed by changing 'type' into
->> '__force type'. I have not yet found a way to suppress all the sparse
->> warnings triggered by the is_signed_type() macro for bitwise types.
+>> I'll wait to see if Tejun has any suggestions.
 > 
-> Yeah, that is a bit of a mess.  Rasmus, Steven - any good idea how
-> we can make the trace even macros fit for sparse?  Maybe just drop the
-> is_signed_type check for __CHECKER__ ?
+> I flushed more emails from spam again. Please stop using the buggy
+> huawei address until this gets resolved, your patches are getting lost
+> left and right and I don't have time to go hunting for emails.
+> 
 
-How about the patch below?
+My apologize for that, I'm quite annoied that our IT still can't solve
+this. I'll stop sending new emails with this address for now..
 
-
-Subject: [PATCH] tracing: Suppress sparse warnings triggered by
-  is_signed_type()
-
-Using a __bitwise type in a tracing __field() definition triggers four
-sparse warnings in stage 4 of expanding the TRACE_EVENT() macro. These
-warnings are triggered by the is_signed_type() macro implementation.
-Since there is no known way of checking signedness of a bitwise type
-without triggering sparse warnings, disable signedness checking when
-verifying code with sparse.
-
-Suggested-by: Christoph Hellwig <hch@lst.de>
-Cc: Steven Rostedt <rostedt@goodmis.org>
-Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Luc Van Oostenryck <luc.vanoostenryck@gmail.com>
-Signed-off-by: Bart Van Assche <bvanassche@acm.org>
----
-  include/linux/trace_events.h | 12 ++++++++++++
-  1 file changed, 12 insertions(+)
-
-diff --git a/include/linux/trace_events.h b/include/linux/trace_events.h
-index e6e95a9f07a5..f7b2a5467361 100644
---- a/include/linux/trace_events.h
-+++ b/include/linux/trace_events.h
-@@ -814,7 +814,19 @@ extern int trace_add_event_call(struct trace_event_call *call);
-  extern int trace_remove_event_call(struct trace_event_call *call);
-  extern int trace_event_get_offsets(struct trace_event_call *call);
-
-+/*
-+ * There is no known way to check signedness of __bitwise types without
-+ * triggering a sparse warning. Hence the #ifdef __CHECKER__.
-+ *
-+ * There is another definition of is_signed_type() in <linux/overflow.h>.
-+ * Hence undefine is_signed_type() before redefining it.
-+ */
-+#undef is_signed_type
-+#ifdef __CHECKER__
-+#define is_signed_type(type)	0
-+#else
-  #define is_signed_type(type)	(((type)(-1)) < (type)1)
-+#endif
-
-  int ftrace_set_clr_event(struct trace_array *tr, char *buf, int set);
-  int trace_set_clr_event(const char *system, const char *event, int set);
+Thanks,
+Kuai
