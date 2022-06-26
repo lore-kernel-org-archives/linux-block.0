@@ -2,93 +2,87 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D8F0C433EF
-	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 02:39:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AACCBCCA480
+	for <linux-block@archiver.kernel.org>; Sun, 26 Jun 2022 07:44:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233692AbiFZCjv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Sat, 25 Jun 2022 22:39:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49870 "EHLO
+        id S233905AbiFZHo0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Sun, 26 Jun 2022 03:44:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232327AbiFZCjv (ORCPT
+        with ESMTP id S232160AbiFZHoZ (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Sat, 25 Jun 2022 22:39:51 -0400
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7605712AC0;
-        Sat, 25 Jun 2022 19:39:49 -0700 (PDT)
-Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.54])
-        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4LVw6Q2fbjzDsC8;
-        Sun, 26 Jun 2022 10:39:10 +0800 (CST)
-Received: from kwepemm600009.china.huawei.com (7.193.23.164) by
- dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sun, 26 Jun 2022 10:39:47 +0800
-Received: from [10.174.176.73] (10.174.176.73) by
- kwepemm600009.china.huawei.com (7.193.23.164) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.24; Sun, 26 Jun 2022 10:39:46 +0800
-Subject: Re: [PATCH -next v5 4/8] blk-throttle: fix io hung due to config
- updates
-To:     Jens Axboe <axboe@kernel.dk>,
-        =?UTF-8?Q?Michal_Koutn=c3=bd?= <mkoutny@suse.com>,
-        <tj@kernel.org>
-CC:     <ming.lei@redhat.com>, <cgroups@vger.kernel.org>,
-        <linux-block@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <yi.zhang@huawei.com>
-References: <20220528064330.3471000-1-yukuai3@huawei.com>
- <20220528064330.3471000-5-yukuai3@huawei.com>
- <20220622172621.GA28246@blackbody.suse.cz>
- <f5165488-2461-8946-593f-14154e404850@huawei.com>
- <20220623162620.GB16004@blackbody.suse.cz>
- <75b3cdcc-1aa3-7259-4900-f09a2a081716@huawei.com>
- <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
-From:   Yu Kuai <yukuai3@huawei.com>
-Message-ID: <65dac189-92f5-f2bc-b322-cbda10f897b4@huawei.com>
-Date:   Sun, 26 Jun 2022 10:39:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+        Sun, 26 Jun 2022 03:44:25 -0400
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ACE311A2D;
+        Sun, 26 Jun 2022 00:44:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+        :References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+        Content-Transfer-Encoding:Content-ID:Content-Description;
+        bh=ZYf9S+9v8SssB2f7SI0aLipRvyLjpdyjZAR4xNwIlyA=; b=ku+r4DqZkB95/Xfmh9ue6cm+09
+        CyOJKQrOsW5u38sU/yT0ordtzA+/36HzICae4wQDfFz2S+Hbn5laa+W58cHSq5nsw9ipLZBhM3hNJ
+        mXF+/5KDpW3EpisCVvR/XT04v0kdwEIr/NbG8Gznzxnrgcre+KeUy/4U2wO3EW4cPCpzcGr7sZHu4
+        G5qwtDrH1THEWNH3Y/cvkvBxQihfsVriRfNB5vflSLMXblFCTZcFF8+Yvxqhcd26i6lzK4QaFpaDi
+        Bn+3NT5N/eBtb5v+o6f9b2xcqVfF+oWNL2sc+ddYWmhqUodeV8wXtxU1nuUXbY0dI+3z1TddPdJIk
+        AQTuUgeQ==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
+        id 1o5MwN-00ARUE-Bk; Sun, 26 Jun 2022 07:44:19 +0000
+Date:   Sun, 26 Jun 2022 00:44:19 -0700
+From:   Christoph Hellwig <hch@infradead.org>
+To:     Avi Kivity <avi@scylladb.com>
+Cc:     Eric Biggers <ebiggers@kernel.org>, linux-fsdevel@vger.kernel.org,
+        linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+        linux-xfs@vger.kernel.org, linux-api@vger.kernel.org,
+        linux-fscrypt@vger.kernel.org, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v3 1/8] statx: add direct I/O alignment information
+Message-ID: <YrgOUw6YM2c6k59U@infradead.org>
+References: <20220616201506.124209-1-ebiggers@kernel.org>
+ <20220616201506.124209-2-ebiggers@kernel.org>
+ <6c06b2d4-2d96-c4a6-7aca-5147a91e7cf2@scylladb.com>
 MIME-Version: 1.0
-In-Reply-To: <7e14a11b-225e-13c4-35ff-762eafd20b70@kernel.dk>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.176.73]
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600009.china.huawei.com (7.193.23.164)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6c06b2d4-2d96-c4a6-7aca-5147a91e7cf2@scylladb.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-在 2022/06/26 0:41, Jens Axboe 写道:
-> On 6/25/22 2:36 AM, Yu Kuai wrote:
->> ? 2022/06/24 0:26, Michal Koutn? ??:
->>> On Thu, Jun 23, 2022 at 08:27:11PM +0800, Yu Kuai <yukuai3@huawei.com> wrote:
->>>>> Here we may allow to dispatch a bio above current slice's
->>>>> calculate_bytes_allowed() if bytes_skipped is already >0.
->>>>
->>>> Hi, I don't expect that to happen. For example, if a bio is still
->>>> throttled, then old slice is keeped with proper 'bytes_skipped',
->>>> then new wait time is caculated based on (bio_size - bytes_skipped).
->>>>
->>>> After the bio is dispatched(I assum that other bios can't preempt),
->>>
->>> With this assumptions it adds up as you write. I believe we're in
->>> agreement.
->>>
->>> It's the same assumption I made below (FIFO everywhere, i.e. no
->>> reordering). So the discussed difference shouldn't really be negative
->>> (and if the assumption didn't hold, so the modular arithmetic yields
->>> corerct bytes_skipped value).
->> Yes, nice that we're in aggreement.
->>
->> I'll wait to see if Tejun has any suggestions.
+On Sun, Jun 19, 2022 at 02:30:47PM +0300, Avi Kivity wrote:
+> > * stx_dio_offset_align: the alignment (in bytes) required for file
+> >    offsets and I/O segment lengths for DIO, or 0 if DIO is not supported
+> >    on the file.  This will only be nonzero if stx_dio_mem_align is
+> >    nonzero, and vice versa.
 > 
-> I flushed more emails from spam again. Please stop using the buggy
-> huawei address until this gets resolved, your patches are getting lost
-> left and right and I don't have time to go hunting for emails.
 > 
+> If you consider AIO, this is actually three alignments:
+> 
+> 1. offset alignment for reads (sector size in XFS)
+> 
+> 2. offset alignment for overwrites (sector size in XFS since ed1128c2d0c87e,
+> block size earlier)
+> 
+> 3. offset alignment for appending writes (block size)
+> 
+> 
+> This is critical for linux-aio since violation of these alignments will
+> stall the io_submit system call. Perhaps io_uring handles it better by
+> bouncing to a workqueue, but there is a significant performance and latency
+> penalty for that.
 
-My apologize for that, I'm quite annoied that our IT still can't solve
-this. I'll stop sending new emails with this address for now..
+I think you are mixing things up here.  We actually have two limits that
+matter:
 
-Thanks,
-Kuai
+ a) the hard limit, which if violated will return an error.
+    This has been sector size for all common file systems for years,
+    but can be bigger than that with fscrypt in the game (which
+    triggered this series)
+ b) an optimal write size, which can be done asynchronous and
+    without exclusive locking.
+    This is what your cases 2) and 3) above refer to.
+
+Exposting this additional optimal performance size might be a good idea
+in addition to what is proposed here, even if matters a little less
+with io_uring.  But I'm not sure I'd additional split it into append
+vs overwrite vs hole filling but just round up to the maximum of those.
