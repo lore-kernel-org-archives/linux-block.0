@@ -2,96 +2,98 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 142BEC43334
-	for <linux-block@archiver.kernel.org>; Mon, 27 Jun 2022 15:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B849DC43334
+	for <linux-block@archiver.kernel.org>; Mon, 27 Jun 2022 23:43:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238755AbiF0PhM (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jun 2022 11:37:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59134 "EHLO
+        id S241656AbiF0Xnt (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jun 2022 19:43:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55048 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238819AbiF0PhE (ORCPT
+        with ESMTP id S235245AbiF0Xnt (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jun 2022 11:37:04 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512551AD92;
-        Mon, 27 Jun 2022 08:37:03 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 09C11B8187D;
-        Mon, 27 Jun 2022 15:37:02 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93DFCC3411D;
-        Mon, 27 Jun 2022 15:36:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656344220;
-        bh=CuWQqDJRWxJQ6RoyWnytqv86/5mnNlfI8V08ozRBjFI=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=cTyii0/1g8OM0TNyfu2I1K6ecK0kjKlapjUP1nhlKneu1qzZn+cM4GzTZsKO08b32
-         fOldkFG8sR3Ggx0khePLHV63JLu+VXzpLZn3/mTD8Cm1pSaNzLoKO60o/7Xrkk6p92
-         9ejBxUWiEoUoWj3ImtuJMh4UmBU0i3n+fFqOIKzaBovRZj1r74so+mqbH/C7OV9BNL
-         TUVCP76VntSyT9KLb+Nna9QYxXCW85vDcOFey31DbB9TsyYdzgkJBlkOnD6k/qXTT5
-         LsCcyxad+npePYbFp6JHYUBqEKF8i95hI6ywxRoiJ3zURfRE9IS2ur7tH15Uennbdz
-         seaO7RMKDoSSw==
-Date:   Mon, 27 Jun 2022 09:36:56 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Eric Farman <farman@linux.ibm.com>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, pankydev8@gmail.com,
-        Halil Pasic <pasic@linux.ibm.com>
-Subject: Re: [PATCHv6 11/11] iomap: add support for dma aligned direct-io
-Message-ID: <YrnOmOUPukGe8xCq@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
- <20220610195830.3574005-12-kbusch@fb.com>
- <ab1bc062b4a1d0ad7f974b6068dc3a6dbf624820.camel@linux.ibm.com>
- <YrS2HLsYOe7vnbPG@kbusch-mbp>
- <YrS6/chZXbHsrAS8@kbusch-mbp>
- <e2b08a5c452d4b8322566cba4ed33b58080f03fa.camel@linux.ibm.com>
- <e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com>
- <c5affe3096fd7b7996cb5fbcb0c41bbf3dde028e.camel@linux.ibm.com>
+        Mon, 27 Jun 2022 19:43:49 -0400
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 976D113D5C
+        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 16:43:48 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id i64so10411461pfc.8
+        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 16:43:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=mPEnshaUEAGoNI4ffNkDG+b9cRihYYn55w5+nX6xUys=;
+        b=lo4j75cmCv5DX9q/LU++4eAE06XO+BCINBgN0CBV4Xx+NPXezW5BaJXR69+xdHlrYg
+         xPnJ9pZa8kfAey8UAB3uUSdIadgvLooIuOfj+xg8z1cLZj/yWZM8yRd633d8m4KOhdMy
+         xrwEm+0T1IcDiKN36US8c4glPoYiNlhWPf2TYVNh8NE0aVPReJb4qjwc74vi7tjAVbi/
+         54+TdZ+f8vg0PzGoV5o3BAWx5DR14xd6Q2uHg2+5BDGkGxdwYrT7LBg7jN7IlbTt7Ds/
+         cW2riE98yoEK8gaadqEah9x7Ix1vhYsc/KkJfnALTznyWgqWJOUt6lcjY6TQO/GPXJw8
+         ouYw==
+X-Gm-Message-State: AJIora9goSK0cfZWMCzEgqJ3TSSXHocXKbu9JsH5aF7S5wVLVdu3drWv
+        VdI3YxBwX255ml7CTnS+11Q=
+X-Google-Smtp-Source: AGRyM1vAULk0VNpvqwfhfHnFMp6GmZ7gXHEiN8k/MKeStCcuW98hkIwvV/p4T4k9qZV2Zv5kuZwvrQ==
+X-Received: by 2002:a63:301:0:b0:411:442b:bb7d with SMTP id 1-20020a630301000000b00411442bbb7dmr3531224pgd.112.1656373427957;
+        Mon, 27 Jun 2022 16:43:47 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:3879:b18f:db0d:205])
+        by smtp.gmail.com with ESMTPSA id md6-20020a17090b23c600b001e305f5cd22sm7907456pjb.47.2022.06.27.16.43.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jun 2022 16:43:47 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v3 0/8] Improve zoned storage write performance
+Date:   Mon, 27 Jun 2022 16:43:27 -0700
+Message-Id: <20220627234335.1714393-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c5affe3096fd7b7996cb5fbcb0c41bbf3dde028e.camel@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 27, 2022 at 11:21:20AM -0400, Eric Farman wrote:
-> 
-> Apologies, it took me an extra day to get back to this, but it is
-> indeed this pass through that's causing our boot failures. I note that
-> the old code (in iomap_dio_bio_iter), did:
-> 
->         if ((pos | length | align) & ((1 << blkbits) - 1))
->                 return -EINVAL;
-> 
-> With blkbits equal to 12, the resulting mask was 0x0fff against an
-> align value (from iov_iter_alignment) of x200 kicks us out.
-> 
-> The new code (in iov_iter_aligned_iovec), meanwhile, compares this:
-> 
->                 if ((unsigned long)(i->iov[k].iov_base + skip) &
-> addr_mask)
->                         return false;
-> 
-> iov_base (and the output of the old iov_iter_aligned_iovec() routine)
-> is x200, but since addr_mask is x1ff this check provides a different
-> response than it used to.
-> 
-> To check this, I changed the comparator to len_mask (almost certainly
-> not the right answer since addr_mask is then unused, but it was good
-> for a quick test), and our PV guests are able to boot again with -next
-> running in the host.
+Hi Jens,
 
-This raises more questions for me. It sounds like your process used to get an
-EINVAL error, and it wants to continue getting an EINVAL error instead of
-letting the direct-io request proceed. Is that correct? If so, could you
-provide more details on what issue occurs with dispatching this request?
+Measurements have shown that limiting the queue depth to one per sequential
+zone has a significant negative performance impact for zoned UFS devices. Hence
+this patch series that increases the queue depth for write commands for
+sequential zones when using the mq-deadline scheduler.
 
-If you really need to restrict address' alignment to the storage's logical
-block size, I think your storage driver needs to set the dma_alignment queue
-limit to that value.
+Please consider this patch series for kernel v5.20.
+
+Thanks,
+
+Bart.
+
+Changes compared to v2:
+- Included the patches again that enable write pipelining for NVMe ZNS SSDs.
+- Disabled merging in the null_blk test script. As a result, the test script
+  now shows a 14x improvement with pipelining enabled.
+- Renamed blk_rq_is_zoned_seq_write() into blk_rq_is_seq_zone_write().
+
+Changes compared to v1:
+- Left out the patch for the UFS driver.
+- Included patches for the null_blk driver.
+
+Bart Van Assche (8):
+  block: Document blk_queue_zone_is_seq() and blk_rq_zone_is_seq()
+  block: Introduce the blk_rq_is_seq_zone_write() function
+  block: Introduce a request queue flag for pipelining zoned writes
+  block/mq-deadline: Only use zone locking if necessary
+  block/null_blk: Refactor null_queue_rq()
+  block/null_blk: Add support for pipelining zoned writes
+  nvme: Make the number of retries command specific
+  nvme: Enable pipelining of zoned writes
+
+ block/blk-zoned.c                 | 17 +++--------------
+ block/mq-deadline.c               | 18 ++++++++++++------
+ drivers/block/null_blk/main.c     | 30 ++++++++++++++++++++----------
+ drivers/block/null_blk/null_blk.h |  3 +++
+ drivers/block/null_blk/zoned.c    | 13 ++++++++++++-
+ drivers/nvme/host/core.c          |  9 ++++++++-
+ drivers/nvme/host/nvme.h          |  1 +
+ drivers/nvme/host/zns.c           |  2 ++
+ include/linux/blk-mq.h            | 30 ++++++++++++++++++++++++++++++
+ include/linux/blkdev.h            | 16 ++++++++++++++++
+ 10 files changed, 107 insertions(+), 32 deletions(-)
+
