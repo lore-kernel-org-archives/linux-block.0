@@ -2,119 +2,139 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9924CCA479
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 17:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C80EBC43334
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 17:41:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230435AbiF1RTL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 13:19:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59598 "EHLO
+        id S229612AbiF1RlT (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 13:41:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56148 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231698AbiF1RTI (ORCPT
+        with ESMTP id S229463AbiF1RlS (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 13:19:08 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC2C22FFFE
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 10:19:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=ddUtJTemLhcj25Hlr1z0czySlK1sNvEvnst3D84Hzm4=; b=NbCgNCi0F7/mlEgc6LAB9TUjUa
-        RWI9kwVE8EjqDYKzXQWY2sqI3H+aJ3xuzFo9NMlhC6F2HK6Vu6Or/y6gDUnOFO3hWx+9pMo+rTDm+
-        KjCk7REXm1EFR6ycjKOFCbBqgh9Sl+x1TaPtuHjPybNiYHjpoCUXHJ2LyVRaV2Tc5wNTyyISoQAMx
-        iIFV37gvFgq8PIRfnqeWwvjmjA6joWEYiQSsxzcpHBtbrkA8NMILojJAl1JMryoiTlo6vZFkLW0iI
-        supslbAQJAFICPPJL83EJXpnJTrpuJadFfgHihPUExS4wICFSi4qkFPulVdS8rLhKpxbvU0qzMfQO
-        lZvlZGKw==;
-Received: from [2001:4bb8:199:3788:e965:1541:b076:2977] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o6Eri-007NV2-UO; Tue, 28 Jun 2022 17:19:07 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 5/6] blk-mq: rename blk_mq_sysfs_{,un}register
-Date:   Tue, 28 Jun 2022 19:18:49 +0200
-Message-Id: <20220628171850.1313069-6-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220628171850.1313069-1-hch@lst.de>
-References: <20220628171850.1313069-1-hch@lst.de>
+        Tue, 28 Jun 2022 13:41:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6268F32ED5
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 10:41:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656438076;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=YEqy8AJWkJJDvettILGtUJ75qUrhxClJ6WIqJBOIecg=;
+        b=XEtdgWFBX19L3cJBOrocf6h2MzqPotcqME+YRlCBl0vZLHKlCyOqrpzHGAIYiUwnaIZoyY
+        X2A8g9lpEJ2jmavdHszZt/ItANSYfX7AzTHyvZeK3Bua6UCDV5KE0xEPpL9ocSKoq2vsAC
+        ERjlSGSTZbxX3fkjDolDqy8e5i397C8=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-455-Gwn26hOXM9GKnsCDaoaY_Q-1; Tue, 28 Jun 2022 13:41:15 -0400
+X-MC-Unique: Gwn26hOXM9GKnsCDaoaY_Q-1
+Received: by mail-qv1-f72.google.com with SMTP id g7-20020a0ce747000000b0047079ec462dso13104235qvn.20
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 10:41:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=YEqy8AJWkJJDvettILGtUJ75qUrhxClJ6WIqJBOIecg=;
+        b=FD03mvHijMi7S2TaJhzTw+DdcW8vi6rGiWs0WR+VR4DORB6w9mXKVZUx1Q21KPi24b
+         jKkZA6mcpQ4RGp3pw+FAiKA1mB4fm3vXZOOAH18fUl6YrXNy8FJjpcf7YEiX0mfgbT3D
+         DyWDnCcpzFRkuMv0zJb0ptns2BB/eR1/UlJor8z7pR7zfc140Wp1E45UHqgWOjgdT0Gf
+         NxI8FU4SpAC4ISb8OF14YVEtS7yE8BhpCAo4xTF/wliDdeLpojnLh0esZ/dfOhyT9i6C
+         pSzSioL+3DyBSDk0ACynHOHOr/HawyjOn1y0FdJx8NZfYkQwuZXSoa6ga1caCq+KvsME
+         UYfA==
+X-Gm-Message-State: AJIora88PCWivRG2mjsFqBnXFEZzv7uF+8HlzBHA0fx9DbQM47WrJ5Tr
+        mH2iRAjAsfbnKm19dScT3Sc1C7xXbDiJjEV+bYk6cohU9kS9fQxYlqjGNzIsUeYnS3R1b9FpLoE
+        D7dq740Zsgyc7q8eSUspksA==
+X-Received: by 2002:ac8:4e87:0:b0:31b:f6ef:bdf6 with SMTP id 7-20020ac84e87000000b0031bf6efbdf6mr1387337qtp.64.1656438074391;
+        Tue, 28 Jun 2022 10:41:14 -0700 (PDT)
+X-Google-Smtp-Source: AGRyM1tYZSza3RsF03B25ldB7UEUb4Qecw+TQaQzfhz1NKC38rky8U47pk/edeUSb3sncuxS5QQZ1w==
+X-Received: by 2002:ac8:4e87:0:b0:31b:f6ef:bdf6 with SMTP id 7-20020ac84e87000000b0031bf6efbdf6mr1387321qtp.64.1656438074129;
+        Tue, 28 Jun 2022 10:41:14 -0700 (PDT)
+Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
+        by smtp.gmail.com with ESMTPSA id g16-20020ae9e110000000b006aefa015c05sm10866149qkm.25.2022.06.28.10.41.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jun 2022 10:41:13 -0700 (PDT)
+Date:   Tue, 28 Jun 2022 13:41:12 -0400
+From:   Mike Snitzer <snitzer@redhat.com>
+To:     Kent Overstreet <kent.overstreet@gmail.com>
+Cc:     Ming Lei <ming.lei@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Monakhov <dmonakhov@openvz.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
+Message-ID: <Yrs9OLNZ8xUs98OB@redhat.com>
+References: <20220624141255.2461148-1-ming.lei@redhat.com>
+ <20220624141255.2461148-2-ming.lei@redhat.com>
+ <20220626201458.ytn4mrix2pobm2mb@moria.home.lan>
+ <Yrld9rLPY6L3MhlZ@T590>
+ <20220628042610.wuittagsycyl4uwa@moria.home.lan>
+ <YrqyiCcnvPCqsn8F@T590>
+ <20220628163617.h3bmq3opd7yuiaop@moria.home.lan>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220628163617.h3bmq3opd7yuiaop@moria.home.lan>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add a _hctx postfix to better describe what the functions do, match
-the debugfs equivalents and release the old names for functions that
-should be using them.
+On Tue, Jun 28 2022 at 12:36P -0400,
+Kent Overstreet <kent.overstreet@gmail.com> wrote:
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
-Reviewed-by: Bart Van Assche <bvanassche@acm.org>
----
- block/blk-mq-sysfs.c | 4 ++--
- block/blk-mq.c       | 4 ++--
- block/blk-mq.h       | 4 ++--
- 3 files changed, 6 insertions(+), 6 deletions(-)
+> On Tue, Jun 28, 2022 at 03:49:28PM +0800, Ming Lei wrote:
+> > On Tue, Jun 28, 2022 at 12:26:10AM -0400, Kent Overstreet wrote:
+> > > On Mon, Jun 27, 2022 at 03:36:22PM +0800, Ming Lei wrote:
+> > > > Not mention bio_iter, bvec_iter has been 32 bytes, which is too big to
+> > > > hold in per-io data structure. With this patch, 8bytes is enough
+> > > > to rewind one bio if the end sector is fixed.
+> > > 
+> > > And with rewind, you're making an assumption about the state the iterator is
+> > > going to be in when the IO has completed.
+> > > 
+> > > What if the iterator was never advanced?
+> > 
+> > bio_rewind() works as expected if the iterator doesn't advance, since bytes
+> > between the recorded position and the end position isn't changed, same
+> > with the end position.
+> > 
+> > > 
+> > > So say you check for that by saving some other part of the iterator - but that
+> > > may have legitimately changed too, if the bio was redirected (bi_sector changes)
+> > > or trimmed (bi_size changes)
+> > > 
+> > > I still think this is an inherently buggy interface, the way it's being proposed
+> > > to be used.
+> > 
+> > The patch did mention that the interface should be for situation in which end
+> > sector of bio won't change.
+> 
+> But that's an assumption that you simply can't make!
 
-diff --git a/block/blk-mq-sysfs.c b/block/blk-mq-sysfs.c
-index f4caaa668e3cf..ee6efe2b250d2 100644
---- a/block/blk-mq-sysfs.c
-+++ b/block/blk-mq-sysfs.c
-@@ -288,7 +288,7 @@ int __blk_mq_register_dev(struct device *dev, struct request_queue *q)
- 	return ret;
- }
- 
--void blk_mq_sysfs_unregister(struct request_queue *q)
-+void blk_mq_sysfs_unregister_hctxs(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
-@@ -304,7 +304,7 @@ void blk_mq_sysfs_unregister(struct request_queue *q)
- 	mutex_unlock(&q->sysfs_dir_lock);
- }
- 
--int blk_mq_sysfs_register(struct request_queue *q)
-+int blk_mq_sysfs_register_hctxs(struct request_queue *q)
- {
- 	struct blk_mq_hw_ctx *hctx;
- 	unsigned long i;
-diff --git a/block/blk-mq.c b/block/blk-mq.c
-index b1dbc4b2c2c97..15c7c5c4ad222 100644
---- a/block/blk-mq.c
-+++ b/block/blk-mq.c
-@@ -4559,7 +4559,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
- 		blk_mq_debugfs_unregister_hctxs(q);
--		blk_mq_sysfs_unregister(q);
-+		blk_mq_sysfs_unregister_hctxs(q);
- 	}
- 
- 	prev_nr_hw_queues = set->nr_hw_queues;
-@@ -4590,7 +4590,7 @@ static void __blk_mq_update_nr_hw_queues(struct blk_mq_tag_set *set,
- 
- reregister:
- 	list_for_each_entry(q, &set->tag_list, tag_set_list) {
--		blk_mq_sysfs_register(q);
-+		blk_mq_sysfs_register_hctxs(q);
- 		blk_mq_debugfs_register_hctxs(q);
- 	}
- 
-diff --git a/block/blk-mq.h b/block/blk-mq.h
-index e4c6fe2c8ac8f..a92639f2bfd21 100644
---- a/block/blk-mq.h
-+++ b/block/blk-mq.h
-@@ -119,8 +119,8 @@ static inline struct blk_mq_hw_ctx *blk_mq_map_queue(struct request_queue *q,
- extern void blk_mq_sysfs_init(struct request_queue *q);
- extern void blk_mq_sysfs_deinit(struct request_queue *q);
- extern int __blk_mq_register_dev(struct device *dev, struct request_queue *q);
--extern int blk_mq_sysfs_register(struct request_queue *q);
--extern void blk_mq_sysfs_unregister(struct request_queue *q);
-+int blk_mq_sysfs_register_hctxs(struct request_queue *q);
-+void blk_mq_sysfs_unregister_hctxs(struct request_queue *q);
- extern void blk_mq_hctx_kobj_init(struct blk_mq_hw_ctx *hctx);
- void blk_mq_free_plug_rqs(struct blk_plug *plug);
- void blk_mq_flush_plug_list(struct blk_plug *plug, bool from_schedule);
--- 
-2.30.2
+Why not?  There is clear use-case for this API, as demonstrated in the
+patchset: DM can/will make use of it for the purposes of enhancing its
+more unlikely bio requeuing work (that is needed to make the more
+likely bio splitting scenario more efficient).
+
+> We allow block device drivers to be stacked in _any_ combination. After a bio is
+> completed it may have been partially advanced, fully advanced, trimmed, not
+> trimmed, anything - and bi_sector and thus also bio_end_sector() may have
+> changed, and will have if there's partition tables involved.
+
+We don't _need_ this API to cure cancer for all hypothetical block
+drivers.
+
+If consumers of the API follow the rule that end sector of the
+_original bio_ isn't changed then it is all fine.  It is that simple.
+
+Stacked drivers will work just fine.  The lower layers will be
+modifying their bios as needed. Because for DM those bios happen to
+be clones, so there is isolation to the broader design flaw you are
+trying to say is a major problem. As this patchset demonstrates.
+
+I do concede that policing who can use an API is hard.  But if some
+consumer of an API tries something that invalidates rules of the API
+they get to keep the N pieces when it breaks.
+
+Mike
 
