@@ -2,118 +2,78 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2152C43334
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 14:36:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46ACBC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 14:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346758AbiF1Ogq (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 10:36:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47010 "EHLO
+        id S234769AbiF1Omz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 10:42:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52150 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346391AbiF1Ogq (ORCPT
+        with ESMTP id S1346095AbiF1Omx (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 10:36:46 -0400
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C102A429
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 07:36:45 -0700 (PDT)
-Received: from canpemm500004.china.huawei.com (unknown [172.30.72.53])
-        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4LXRvD6XgvzkWkm;
-        Tue, 28 Jun 2022 22:34:48 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by canpemm500004.china.huawei.com
- (7.192.104.92) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2375.24; Tue, 28 Jun
- 2022 22:36:38 +0800
-From:   Jason Yan <yanaijie@huawei.com>
-To:     <tj@kernel.org>, <jack@suse.cz>, <hch@lst.de>, <axboe@kernel.dk>
-CC:     <linux-block@vger.kernel.org>, Jason Yan <yanaijie@huawei.com>
-Subject: [PATCH 1/2] blk-cgroup: factor out blkcg_iostat_update()
-Date:   Tue, 28 Jun 2022 22:49:20 +0800
-Message-ID: <20220628144921.2190275-2-yanaijie@huawei.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20220628144921.2190275-1-yanaijie@huawei.com>
-References: <20220628144921.2190275-1-yanaijie@huawei.com>
+        Tue, 28 Jun 2022 10:42:53 -0400
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 602622E6BB
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 07:42:52 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id h14-20020a1ccc0e000000b0039eff745c53so7715164wmb.5
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 07:42:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=sRgiTQE3Kf/O2zn9zI4tUobp4J47g0upsarV56Uw538=;
+        b=dABgO9wJPqRlyT+EOetnYLZCTCEGLONMxmfvitZszyMUSg9WtMN33NMjSl4bQel7BV
+         BFeiA2r3UncVS+UgEQ6SK+AguzDGKRK2KsSUBwS8EfA31g+QHmu8Ks9AFccm46Eh49Hp
+         8iPRFWVlMpZT1aQGpQd1upycJWSrdWaw2p6OcNr9x0HiSXiHIb51NddB6Ke0WahC3YPf
+         V92GxaufT+6/yNE03FEBHhr3cue86+cPD43rkrBv/+wvTAsqQ1gUePSMRZ91A7x/0b6Y
+         /k3/kxWOVKBrPI3hLIs+XumhrVJMIE9U1wnYrFtCRXBYnag/akfG8itRI+vAvyU+jnfm
+         YGgQ==
+X-Gm-Message-State: AJIora+Bn5Kp9vuxonmDc5f6OB7p5/mFdBqQNUFuPQriEq6mSJ2unThv
+        kZrcVDu0vtzCy/ygLRcF3biWzdemjss=
+X-Google-Smtp-Source: AGRyM1uy+QSLQiVIO4OASpMa0OjW4C8CBiRSTQiNkPNpbQsRE1YbuH/s2F6OcGEkQJarD0Vs9+mCkw==
+X-Received: by 2002:a1c:ed08:0:b0:39c:80b1:b0b3 with SMTP id l8-20020a1ced08000000b0039c80b1b0b3mr22466838wmh.134.1656427370669;
+        Tue, 28 Jun 2022 07:42:50 -0700 (PDT)
+Received: from [192.168.64.180] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id h2-20020adff4c2000000b0021d221daccfsm1012686wrp.78.2022.06.28.07.42.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jun 2022 07:42:50 -0700 (PDT)
+Message-ID: <6401e5b6-a964-227e-c661-7557790d918e@grimberg.me>
+Date:   Tue, 28 Jun 2022 17:42:48 +0300
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.127.227]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- canpemm500004.china.huawei.com (7.192.104.92)
-X-CFilter-Loop: Reflected
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.9.1
+Subject: Re: [PATCH 6/6] block: remove blk_cleanup_disk
+Content-Language: en-US
+To:     Christoph Hellwig <hch@lst.de>, Hannes Reinecke <hare@suse.de>
+Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
+        linux-block@vger.kernel.org
+References: <20220619060552.1850436-1-hch@lst.de>
+ <20220619060552.1850436-7-hch@lst.de>
+ <25329ddf-73d1-70e9-cd2f-372309e509ba@suse.de>
+ <20220620085647.GA13464@lst.de>
+From:   Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20220620085647.GA13464@lst.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-To reduce some duplicated code, factor out blkcg_iostat_update(). No
-functional change.
 
-Signed-off-by: Jason Yan <yanaijie@huawei.com>
----
- block/blk-cgroup.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+>> I wish we could have blktests for tearing down device-drivers; doing a
+>> regression test here will be really hard.
+> 
+> The problem with a remove is that while we have a generic device remove
+> attribute, it:
+> 
+>   a) isn't always in the same place relatively to the disk
+>   b) once removed we have no generic way to add the device back for
+>      further testing
+> 
+> nvme/032 has basic remove testing for nvme, and I think I can also
+> wire up my scsi bind/unbind testing for blktests using scsi_debug without
+> too much effort.  But that still isn't exactly a generic test.
 
-diff --git a/block/blk-cgroup.c b/block/blk-cgroup.c
-index 764e740b0c0f..60d205ec213e 100644
---- a/block/blk-cgroup.c
-+++ b/block/blk-cgroup.c
-@@ -846,6 +846,21 @@ static void blkg_iostat_sub(struct blkg_iostat *dst, struct blkg_iostat *src)
- 	}
- }
- 
-+static inline void blkcg_iostat_update(struct blkcg_gq *blkg,
-+	struct blkg_iostat *cur, struct blkg_iostat *last)
-+{
-+	struct blkg_iostat delta;
-+	unsigned long flags;
-+
-+	/* propagate percpu delta to global */
-+	flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
-+	blkg_iostat_set(&delta, cur);
-+	blkg_iostat_sub(&delta, last);
-+	blkg_iostat_add(&blkg->iostat.cur, &delta);
-+	blkg_iostat_add(last, &delta);
-+	u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
-+}
-+
- static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
- {
- 	struct blkcg *blkcg = css_to_blkcg(css);
-@@ -860,8 +875,7 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
- 	hlist_for_each_entry_rcu(blkg, &blkcg->blkg_list, blkcg_node) {
- 		struct blkcg_gq *parent = blkg->parent;
- 		struct blkg_iostat_set *bisc = per_cpu_ptr(blkg->iostat_cpu, cpu);
--		struct blkg_iostat cur, delta;
--		unsigned long flags;
-+		struct blkg_iostat cur;
- 		unsigned int seq;
- 
- 		/* fetch the current per-cpu values */
-@@ -870,23 +884,12 @@ static void blkcg_rstat_flush(struct cgroup_subsys_state *css, int cpu)
- 			blkg_iostat_set(&cur, &bisc->cur);
- 		} while (u64_stats_fetch_retry(&bisc->sync, seq));
- 
--		/* propagate percpu delta to global */
--		flags = u64_stats_update_begin_irqsave(&blkg->iostat.sync);
--		blkg_iostat_set(&delta, &cur);
--		blkg_iostat_sub(&delta, &bisc->last);
--		blkg_iostat_add(&blkg->iostat.cur, &delta);
--		blkg_iostat_add(&bisc->last, &delta);
--		u64_stats_update_end_irqrestore(&blkg->iostat.sync, flags);
-+		blkcg_iostat_update(blkg, &cur, &bisc->last);
- 
- 		/* propagate global delta to parent (unless that's root) */
--		if (parent && parent->parent) {
--			flags = u64_stats_update_begin_irqsave(&parent->iostat.sync);
--			blkg_iostat_set(&delta, &blkg->iostat.cur);
--			blkg_iostat_sub(&delta, &blkg->iostat.last);
--			blkg_iostat_add(&parent->iostat.cur, &delta);
--			blkg_iostat_add(&blkg->iostat.last, &delta);
--			u64_stats_update_end_irqrestore(&parent->iostat.sync, flags);
--		}
-+		if (parent && parent->parent)
-+			blkcg_iostat_update(parent, &blkg->iostat.cur,
-+					    &blkg->iostat.last);
- 	}
- 
- 	rcu_read_unlock();
--- 
-2.31.1
-
+It should be trivial to add a similar test for fabrics with toggling
+nvmet $ns/enable config knob...
