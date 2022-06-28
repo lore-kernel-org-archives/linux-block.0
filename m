@@ -2,52 +2,64 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3123EC43334
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 05:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDD6C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 06:08:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244760AbiF1FMS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 01:12:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54488 "EHLO
+        id S245340AbiF1GIC (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 02:08:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44356 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244765AbiF1FL4 (ORCPT
+        with ESMTP id S245325AbiF1GIC (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 01:11:56 -0400
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D7526579
-        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 22:11:43 -0700 (PDT)
-Received: by verein.lst.de (Postfix, from userid 2407)
-        id 8443F68AA6; Tue, 28 Jun 2022 07:11:39 +0200 (CEST)
-Date:   Tue, 28 Jun 2022 07:11:39 +0200
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>
-Cc:     Christoph Hellwig <hch@lst.de>, Ming Lei <ming.lei@redhat.com>,
-        linux-block@vger.kernel.org
-Subject: Re: fully tear down the queue in del_gendisk
-Message-ID: <20220628051139.GA22701@lst.de>
-References: <20220619060552.1850436-1-hch@lst.de> <67dd8d1c-658c-8833-9630-79ade736b348@kernel.dk> <20220620060948.GA10485@lst.de> <1e3f054e-eec6-be87-7039-e2b4260addc2@kernel.dk>
+        Tue, 28 Jun 2022 02:08:02 -0400
+Received: from ams.source.kernel.org (ams.source.kernel.org [145.40.68.75])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03B032315F;
+        Mon, 27 Jun 2022 23:07:57 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 99A4DB81C0C;
+        Tue, 28 Jun 2022 06:07:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF718C341C6;
+        Tue, 28 Jun 2022 06:07:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1656396475;
+        bh=qXz5gzlfeJcLBrqesZHeSe5DJNs8xr/HiIO/kMPwVds=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=pwderX56PSSyBiEfcUkhi+AmhLzOyvZB5HrHb2xytVF9/v1Duprb5b9IsVGdKEhnE
+         LYEvUfJnb3s49tKuJxLm7+LAQ0sgYD2W8dEiNRQ3xRtdh8U+tQPeDykWm6TB/78Tp5
+         HgLr1coWgYJ1JqwGnIdeWDMgYKzyrf9dsVlmpA4Y=
+Date:   Tue, 28 Jun 2022 08:07:52 +0200
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     "yangx.jy@fujitsu.com" <yangx.jy@fujitsu.com>
+Cc:     Tejun Heo <tj@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Leon Romanovsky <leon@kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+        "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>
+Subject: Re: [bug report from blktests nvme/032] WARNING: possible circular
+ locking dependency detected
+Message-ID: <YrqauCHdcieF5+C7@kroah.com>
+References: <4ed3028b-2d2f-8755-fec2-0b9cb5ad42d2@fujitsu.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1e3f054e-eec6-be87-7039-e2b4260addc2@kernel.dk>
-User-Agent: Mutt/1.5.17 (2007-11-01)
+In-Reply-To: <4ed3028b-2d2f-8755-fec2-0b9cb5ad42d2@fujitsu.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Mon, Jun 20, 2022 at 05:16:03AM -0600, Jens Axboe wrote:
-> On 6/20/22 12:09 AM, Christoph Hellwig wrote:
-> > On Sun, Jun 19, 2022 at 04:21:39PM -0600, Jens Axboe wrote:
-> >> On 6/19/22 12:05 AM, Christoph Hellwig wrote:
-> >>> Note that while intended or 5.20, this series is generated against the
-> >>> block-5.19 branch as that contains fixes in this area that haven't
-> >>> made it to the for-5.10/block branch yet.
-> >>
-> >> Side note - I rebased on -rc3 anyway because of the series that went
-> >> into -rc2, so we should be fine there.
-> > 
-> > It depends on elevator/debugfs teardown series that has not made it
-> > into -rc3.
+On Tue, Jun 28, 2022 at 04:03:55AM +0000, yangx.jy@fujitsu.com wrote:
+> Hi everyone,
 > 
-> Guess we'll rebase for -rc4 again...
+> Running blktests nvme/032 on kernel v5.19-rc2+ which enables 
+> CONFIG_LOCKDEP and CONFIG_PROVE_LOCKING triggered the below WARNING.
 
-As you'd done that, can you consider this series now?
+What was happening when this trace was created?  It looks like you were
+manually removing a PCI device from the system through sysfs?  Why would
+blktests do that?
+
+thanks,
+
+greg k-h
