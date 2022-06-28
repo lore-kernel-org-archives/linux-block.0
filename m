@@ -2,181 +2,182 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D67B1CCA479
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 15:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4E6CC433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 16:11:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346352AbiF1PVP (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 11:21:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53362 "EHLO
+        id S1345789AbiF1QLv (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 12:11:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55864 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344555AbiF1PVO (ORCPT
+        with ESMTP id S1346008AbiF1QLI (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 11:21:14 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7CC433343;
-        Tue, 28 Jun 2022 08:21:13 -0700 (PDT)
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25SFHp2u018978;
-        Tue, 28 Jun 2022 15:20:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=myzpEHdG0SHhteTqPMwMNlaiMJZ9fOBXbBrHcrj47MM=;
- b=PKaUpLA//gB/cgq1x9qZAjqjIl9yvVlLFHPiaoA1KCVgbYZEpWzlGzOKlHh6wqS+BReV
- xX9GsZSp3ZvjNRvAnmbWMeNpJfMpp/vr+zHUTaom/ZX7xnhuxux+IABcTDN/x1J8GKpH
- efdwM1/bs/lXMVJ74/hFixNzKx+JFlTmYrAONI/ZVj9deEJc+UAi7YMw3z3n1+7Cxe6I
- sT8Bm3yw2vDfARIBg02jJd1iyE6MY3gR1nuJGEptu2LKJ7K5sBlUSXggbkqiZXq1XgrC
- ojkpdIKJi2GEGE8X7Eg0+XHBZ4i+X0HjDQG7tXhUK0OYHUnkOZwEi3pUqL/f0vv24zOC VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h045jr2ge-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 15:20:50 +0000
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25SFJF6P027356;
-        Tue, 28 Jun 2022 15:20:50 GMT
-Received: from ppma05wdc.us.ibm.com (1b.90.2fa9.ip4.static.sl-reverse.com [169.47.144.27])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h045jr2g1-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 15:20:50 +0000
-Received: from pps.filterd (ppma05wdc.us.ibm.com [127.0.0.1])
-        by ppma05wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25SF80E3026731;
-        Tue, 28 Jun 2022 15:20:49 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma05wdc.us.ibm.com with ESMTP id 3gwt09x8ew-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 15:20:49 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25SFKmvs13697412
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 15:20:48 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id CC957AC059;
-        Tue, 28 Jun 2022 15:20:48 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 674CCAC05B;
-        Tue, 28 Jun 2022 15:20:45 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.211.96.189])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 15:20:45 +0000 (GMT)
-Message-ID: <83e65083890a7ac9c581c5aee0361d1b49e6abd9.camel@linux.ibm.com>
-Subject: Re: [PATCHv6 11/11] iomap: add support for dma aligned direct-io
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>, Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, pankydev8@gmail.com
-Date:   Tue, 28 Jun 2022 11:20:44 -0400
-In-Reply-To: <20220628110024.01fcf84f.pasic@linux.ibm.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
-         <20220610195830.3574005-12-kbusch@fb.com>
-         <ab1bc062b4a1d0ad7f974b6068dc3a6dbf624820.camel@linux.ibm.com>
-         <YrS2HLsYOe7vnbPG@kbusch-mbp> <YrS6/chZXbHsrAS8@kbusch-mbp>
-         <e2b08a5c452d4b8322566cba4ed33b58080f03fa.camel@linux.ibm.com>
-         <e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com>
-         <c5affe3096fd7b7996cb5fbcb0c41bbf3dde028e.camel@linux.ibm.com>
-         <YrnOmOUPukGe8xCq@kbusch-mbp.dhcp.thefacebook.com>
-         <20220628110024.01fcf84f.pasic@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: LyMatUSkhFxtAa0fPtjTaFMsaiG8XWqk
-X-Proofpoint-GUID: BxWXK2NqfjMWLv3qM9DKv1U3bwvuXAqo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-28_08,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 mlxlogscore=999
- phishscore=0 suspectscore=0 malwarescore=0 mlxscore=0 priorityscore=1501
- impostorscore=0 spamscore=0 lowpriorityscore=0 clxscore=1015 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2204290000
- definitions=main-2206280062
+        Tue, 28 Jun 2022 12:11:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id D679E37A2F
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 09:08:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656432536;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=T8jHmawIdtYbMez2n/EedP93Lukwx3rWvYMB9msDUCc=;
+        b=bgXq+wepPPnhIAWrMVT3EgN71dJJ9C3Nh1kNUKuboEHGPpkkVWY8SF6U/4aKdCpOluYvF7
+        7fNkahuCE88vgRBeS7KlZqxKCAvEAG6QTEAk5qI/ni1Ndne95Xc+H3LsUD4ccFN0oCbGZM
+        9ihmmydyh9BmzEDeA9T07GoyyIXcwXU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-571-cqNchVPlNPKAMqNlcVUkiA-1; Tue, 28 Jun 2022 12:08:52 -0400
+X-MC-Unique: cqNchVPlNPKAMqNlcVUkiA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C78FE3C01D9B;
+        Tue, 28 Jun 2022 16:08:51 +0000 (UTC)
+Received: from localhost (ovpn-8-29.pek2.redhat.com [10.72.8.29])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id AE6071415108;
+        Tue, 28 Jun 2022 16:08:50 +0000 (UTC)
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org,
+        Harris James R <james.r.harris@intel.com>,
+        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        ZiyangZhang <ZiyangZhang@linux.alibaba.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Ming Lei <ming.lei@redhat.com>
+Subject: [PATCH V3 0/1] ublk: add io_uring based userspace block driver
+Date:   Wed, 29 Jun 2022 00:08:06 +0800
+Message-Id: <20220628160807.148853-1-ming.lei@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2022-06-28 at 11:00 +0200, Halil Pasic wrote:
-> On Mon, 27 Jun 2022 09:36:56 -0600
-> Keith Busch <kbusch@kernel.org> wrote:
-> 
-> > On Mon, Jun 27, 2022 at 11:21:20AM -0400, Eric Farman wrote:
-> > > Apologies, it took me an extra day to get back to this, but it is
-> > > indeed this pass through that's causing our boot failures. I note
-> > > that
-> > > the old code (in iomap_dio_bio_iter), did:
-> > > 
-> > >         if ((pos | length | align) & ((1 << blkbits) - 1))
-> > >                 return -EINVAL;
-> > > 
-> > > With blkbits equal to 12, the resulting mask was 0x0fff against
-> > > an
-> > > align value (from iov_iter_alignment) of x200 kicks us out.
-> > > 
-> > > The new code (in iov_iter_aligned_iovec), meanwhile, compares
-> > > this:
-> > > 
-> > >                 if ((unsigned long)(i->iov[k].iov_base + skip) &
-> > > addr_mask)
-> > >                         return false;
-> > > 
-> > > iov_base (and the output of the old iov_iter_aligned_iovec()
-> > > routine)
-> > > is x200, but since addr_mask is x1ff this check provides a
-> > > different
-> > > response than it used to.
-> > > 
-> > > To check this, I changed the comparator to len_mask (almost
-> > > certainly
-> > > not the right answer since addr_mask is then unused, but it was
-> > > good
-> > > for a quick test), and our PV guests are able to boot again with
-> > > -next
-> > > running in the host.  
-> > 
-> > This raises more questions for me. It sounds like your process used
-> > to get an
-> > EINVAL error, and it wants to continue getting an EINVAL error
-> > instead of
-> > letting the direct-io request proceed. Is that correct? 
-> 
-> Is my understanding as well. But I'm not familiar enough with the
-> code to
-> tell where and how that -EINVAL gets handled.
-> 
-> BTW let me just point out that the bounce buffering via swiotlb
-> needed
-> for PV is not unlikely to mess up the alignment of things. But I'm
-> not
-> sure if that is relevant here.
-> 
-> Regards,
-> Halil
-> 
-> > If so, could you
-> > provide more details on what issue occurs with dispatching this
-> > request?
+Hello Guys,
 
-This error occurs reading the initial boot record for a guest, stating
-QEMU was unable to read block zero from the device. The code that
-complains doesn't appear to have anything that says "oh, got EINVAL,
-try it this other way" but I haven't chased down if/where something in
-between is expecting that and handling it in some unique way. I -think-
- I have an easier reproducer now, so maybe I'd be able to get a better
-answer to this question.
+ublk driver is one kernel driver for implementing generic userspace block
+device/driver, which delivers io request from ublk block device(/dev/ublkbN) into
+ublk server[1] which is the userspace part of ublk for communicating
+with ublk driver and handling specific io logic by its target module.
 
-> > 
-> > If you really need to restrict address' alignment to the storage's
-> > logical
-> > block size, I think your storage driver needs to set the
-> > dma_alignment queue
-> > limit to that value.
+Another thing ublk driver handles is to copy data between user space buffer
+and request/bio's pages, or take zero copy if mm is ready for support it in
+future. ublk driver doesn't handle any IO logic of the specific driver, so
+it is small/simple, and all io logics are done by the target code in ublkserver.
 
-It's possible that there's a problem in the virtio stack here, but the
-failing configuration is a qcow image on the host rootfs, so it's not
-using any distinct driver. The bdev request queue that ends up being
-used is the same allocated out of blk_alloc_queue, so changing
-dma_alignment there wouldn't work.
+The above two are main jobs done by ublk driver.
+
+ublk driver can help to move IO logic into userspace, in which the
+development work is easier/more effective than doing in kernel, such as,
+ublk-loop takes < 200 lines of loop specific code to get basically same 
+function with kernel loop block driver, meantime the performance is
+is even better than kernel loop with same setting. ublksrv[1] provide built-in
+test for comparing both by running "make test T=loop", for example, see
+the test result running on VM which is over my lattop(root disk is
+nvme/device mapper/xfs):
+
+	[root@ktest-36 ubdsrv]#make -s -C /root/git/ubdsrv/tests run T=loop/001 R=10
+	running loop/001
+		fio (ublk/loop(/root/git/ubdsrv/tests/tmp/ublk_loop_VqbMA), libaio, bs 4k, dio, hw queues:1)...
+		randwrite: jobs 1, iops 32572
+		randread: jobs 1, iops 143052
+		rw: jobs 1, iops read 29919 write 29964
+	
+	[root@ktest-36 ubdsrv]# make test T=loop/003
+	make -s -C /root/git/ubdsrv/tests run T=loop/003 R=10
+	running loop/003
+		fio (kernel_loop/kloop(/root/git/ubdsrv/tests/tmp/ublk_loop_ZIVnG), libaio, bs 4k, dio, hw queues:1)...
+		randwrite: jobs 1, iops 27436
+		randread: jobs 1, iops 95273
+		rw: jobs 1, iops read 22542 write 22543 
+
+
+Another example is high performance qcow2 support[2], which could be built with
+ublk framework more easily than doing it inside kernel.
+
+Also there are more people who express interests on userspace block driver[3],
+Gabriel Krisman Bertazi proposes this topic in lsf/mm/ebpf 2022 and mentioned
+requirement from Google. Ziyang Zhang from Alibaba said they "plan to
+replace TCMU by UBD as a new choice" because UBD can get better throughput than
+TCMU even with single queue[4], meantime UBD is simple. Also there is userspace
+storage service for providing storage to containers.
+
+It is io_uring based: io request is delivered to userspace via new added
+io_uring command which has been proved as very efficient for making nvme
+passthrough IO to get better IOPS than io_uring(READ/WRITE). Meantime one
+shared/mmap buffer is used for sharing io descriptor to userspace, the
+buffer is readonly for userspace, each IO just takes 24bytes so far.
+It is suggested to use io_uring in userspace(target part of ublk server)
+to handle IO request too. And it is still easy for ublkserver to support
+io handling by non-io_uring, and this work isn't done yet, but can be
+supported easily with help o eventfd.
+
+This way is efficient since no extra io command copy is required, no sleep
+is needed in transferring io command to userspace. Meantime the communication
+protocol is simple and efficient, one single command of
+UBD_IO_COMMIT_AND_FETCH_REQ can handle both fetching io request desc and commit
+command result in one trip. IO handling is often batched after single
+io_uring_enter() returns, both IO requests from ublk server target and
+IO commands could be handled as a whole batch.
+
+And the patch by patch change can be found in the following
+tree:
+
+https://github.com/ming1/linux/tree/my_for-5.20-ubd-devel_v3
+
+ublk server repo:
+
+	https://github.com/ming1/ubdsrv
+
+Any comments are welcome!
+
+Since V2:
+- fix one big performance problem:
+	https://github.com/ming1/linux/commit/3c9fd476951759858cc548dee4cedc074194d0b0
+- rename as ublk, as suggested by Gabriel Krisman Bertazi 
+- lots of cleanup & code improvement & bugfix, see details in git
+  hisotry
+
+
+Since V1:
+
+Remove RFC now because ublk driver codes gets lots of cleanup, enhancement and
+bug fixes since V1:
+
+- cleanup uapi: remove ublk specific error code,  switch to linux error code,
+remove one command op, remove one field from cmd_desc
+
+- add monitor mechanism to handle ubq_daemon being killed, ublksrv[1]
+  includes builtin tests for covering heavy IO with deleting ublk / killing
+  ubq_daemon at the same time, and V2 pass all the two tests(make test T=generic),
+  and the abort/stop mechanism is simple
+
+- fix MQ command buffer mmap bug, and now 'xfstetests -g auto' works well on
+  MQ ublk-loop devices(test/scratch)
+
+- improve batching submission as suggested by Jens
+
+- improve handling for starting device, replace random wait/poll with
+completion
+
+- all kinds of cleanup, bug fix,..
+
+
+Ming Lei (1):
+  ublk: add io_uring based userspace block driver
+
+ drivers/block/Kconfig         |    6 +
+ drivers/block/Makefile        |    2 +
+ drivers/block/ublk_drv.c      | 1603 +++++++++++++++++++++++++++++++++
+ include/uapi/linux/ublk_cmd.h |  158 ++++
+ 4 files changed, 1769 insertions(+)
+ create mode 100644 drivers/block/ublk_drv.c
+ create mode 100644 include/uapi/linux/ublk_cmd.h
+
+-- 
+2.31.1
 
