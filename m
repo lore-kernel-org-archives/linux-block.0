@@ -2,98 +2,77 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C0CC433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 02:49:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F36C43334
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 02:50:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245444AbiF1CtR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Mon, 27 Jun 2022 22:49:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40036 "EHLO
+        id S1343773AbiF1CuF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Mon, 27 Jun 2022 22:50:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40762 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343905AbiF1Cs4 (ORCPT
+        with ESMTP id S1343876AbiF1Ct7 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Mon, 27 Jun 2022 22:48:56 -0400
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16122A1AE
-        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 19:48:18 -0700 (PDT)
-Received: by mail-pg1-f174.google.com with SMTP id z14so10900186pgh.0
-        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 19:48:18 -0700 (PDT)
+        Mon, 27 Jun 2022 22:49:59 -0400
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8138C10EC
+        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 19:49:58 -0700 (PDT)
+Received: by mail-pj1-f42.google.com with SMTP id w24so11193108pjg.5
+        for <linux-block@vger.kernel.org>; Mon, 27 Jun 2022 19:49:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
          :content-language:to:cc:references:from:in-reply-to
          :content-transfer-encoding;
-        bh=l7owPl8/JaAHXzXxFn60GtYyLPaftYYs5Llja/vJKGc=;
-        b=Tv5AkLI4rpTYdzeHIXq4FY36nuZuC+I2VX9jIuRus/ifdJUzVnJnd6vtkTWp6fAKoD
-         bEBJ92D2pmMIemIpy+SqYjYOT0wPxdtb/KcNQ3geOOUU05+cZ4KoD5Mhf7190Nk7p6sE
-         wOSQ4Rw53qAWewBTN0HOzS4TeVr2ldvpC1DtYr8QdGVmV3VKwakIBuV7m4BpLEm3N/b9
-         rG3JV5Kc/+98A/dk37gNHYQAZ7JxAj3JsDadjoh0AeisTfJz61ApJc5xuAmWFhReYlU4
-         qLwqr1lFA38LXsBL+g5urUr29pqpBoiPncGlr2LLodFuiPT0ILUXEyIImnnusCUiufI5
-         GyrA==
-X-Gm-Message-State: AJIora/MXC+ap8CeA4rgWp6rKTEso6AbfIK/XLbZWDagieLXkNE1kRuC
-        1SDivNSSX0C1z+USRt9wGdY=
-X-Google-Smtp-Source: AGRyM1skxa64e35SNOjgV4ODhJKD4DbiJ7GctpSgqhXlONk4UOMuUb9qZ5bhwHCjvo6CxSbsgCV9Tw==
-X-Received: by 2002:a05:6a00:a8e:b0:527:9d23:c613 with SMTP id b14-20020a056a000a8e00b005279d23c613mr2289040pfl.53.1656384497225;
-        Mon, 27 Jun 2022 19:48:17 -0700 (PDT)
+        bh=o9O8He0A2n+R/3RTmq2ItfMPUMgdHm+kfPj1RpwnPpU=;
+        b=dT31Kf0WPcgFBQJjlLVavjyGIr+ZL/i2+yahSHFw/npMFnshcEJv39LgR55Lz1NIND
+         vUo1kMBnSI9Cuope3DCqBK4ivyoTd31bwS5TETmXBLI0EDLx7lhRX6K8D55BxpPOry8v
+         Y6PPUIU2dTqwn/DyRZx1R4YQKpNYrYNmreS/+qYvrNPEhkxaaV5FtgfEPl6fp95Sdvz1
+         prfqTNdqFDikpuAptYPHTzQ/kTT+eE1hsJDTYbQlMFs7k5MIU7JZmIAuwZkA6vjpVGWD
+         2nKeqHfZA+E5NDc7e23ldtYgUsFzPoGtR0/BPFPHaalusWayP/2/8J9Y0TyOUOg+mCLS
+         wg6Q==
+X-Gm-Message-State: AJIora8lsHCVr010/y1ZJvErezoY0fwNBs0wsRmYJxeSv/uIdwbv+Wwy
+        YFKyV5J1EGBv+ZMuZNDXrmgbTBNnxnk=
+X-Google-Smtp-Source: AGRyM1svc+BFyjvdoK6B0UzTG9/0vtVJLj8np2/zRUc5aFuPcO+mSvOvZ+sZGQMGDyfXYHSDRn9Lnw==
+X-Received: by 2002:a17:902:f689:b0:16a:4021:8848 with SMTP id l9-20020a170902f68900b0016a40218848mr1339378plg.23.1656384597897;
+        Mon, 27 Jun 2022 19:49:57 -0700 (PDT)
 Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id k21-20020a6568d5000000b0040d5abae51esm7851705pgt.91.2022.06.27.19.48.15
+        by smtp.gmail.com with ESMTPSA id w4-20020a1709029a8400b0016a0bf0ce32sm7923023plp.70.2022.06.27.19.49.56
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jun 2022 19:48:16 -0700 (PDT)
-Message-ID: <cd657392-36eb-3c1e-5891-77ec247b7ceb@acm.org>
-Date:   Mon, 27 Jun 2022 19:48:15 -0700
+        Mon, 27 Jun 2022 19:49:57 -0700 (PDT)
+Message-ID: <9dcec239-0f94-11b0-c4db-a4775e7eab4e@acm.org>
+Date:   Mon, 27 Jun 2022 19:49:56 -0700
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
-Subject: Re: [PATCH v3 7/8] nvme: Make the number of retries command specific
+Subject: Re: [PATCH v3 3/8] block: Introduce a request queue flag for
+ pipelining zoned writes
 Content-Language: en-US
 To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
 Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
         Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>,
         Jaegeuk Kim <jaegeuk@kernel.org>,
-        Keith Busch <kbusch@kernel.org>,
-        Sagi Grimberg <sagi@grimberg.me>
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
 References: <20220627234335.1714393-1-bvanassche@acm.org>
- <20220627234335.1714393-8-bvanassche@acm.org>
- <f3c1e76d-34b2-6c33-11a3-88c56e2a14fa@nvidia.com>
+ <20220627234335.1714393-4-bvanassche@acm.org>
+ <a7f3169c-2e67-7d7f-e9d4-09a5a38a7e1b@nvidia.com>
 From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <f3c1e76d-34b2-6c33-11a3-88c56e2a14fa@nvidia.com>
+In-Reply-To: <a7f3169c-2e67-7d7f-e9d4-09a5a38a7e1b@nvidia.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/27/22 17:48, Chaitanya Kulkarni wrote:
-> 
->> diff --git a/drivers/nvme/host/nvme.h b/drivers/nvme/host/nvme.h
->> index 0da94b233fed..ca415cd9571e 100644
->> --- a/drivers/nvme/host/nvme.h
->> +++ b/drivers/nvme/host/nvme.h
->> @@ -160,6 +160,7 @@ struct nvme_request {
->>    	union nvme_result	result;
->>    	u8			genctr;
->>    	u8			retries;
->> +	u8			max_retries;
->>    	u8			flags;
->>    	u16			status;
->>    	struct nvme_ctrl	*ctrl;
-> 
-> If I understand correctly then per command max_retries count is only
-> needed for zoned devices.
-> 
-> why not make struct nvme_request->max_retries field and subsequent code
-> configurable under CONFIG_BLK_DEV_ZONED ?
-> 
-> That will avoid increasing size of the nvme_request for
-> !CONFIG_BLK_DEV_ZONED case where per command
-> nvme_request->max_retries has no use.
+On 6/27/22 17:36, Chaitanya Kulkarni wrote:
+> From the comments that I've received, when introducing a new helper or
+> a flag should be a part of the patch that actually uses it,
+> is there a specific reason that this has made as a separate patch ?
 
 Hi Chaitanya,
 
-Thanks for the review.
+This patch is a separate patch to make it easy to review this patch series.
+I'm concerned that if I would combine this patch with the next patch that
+the result would be harder to verify than two separate patches.
 
-We may disagree about whether or not this patch increases the size
-of struct nvme_request. I think the new member fills an existing
-hole and hence does not increase the size of struct nvme_request :-)
+Thanks,
 
 Bart.
-
