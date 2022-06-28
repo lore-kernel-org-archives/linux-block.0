@@ -2,139 +2,96 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AC32C43334
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 09:04:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE47C43334
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 12:29:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234531AbiF1JED (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 05:04:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33158 "EHLO
+        id S1345804AbiF1M3s (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 08:29:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241106AbiF1JEC (ORCPT
+        with ESMTP id S1345802AbiF1M3r (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 05:04:02 -0400
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EF5912628;
-        Tue, 28 Jun 2022 02:04:01 -0700 (PDT)
-Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25S8rufq022609;
-        Tue, 28 Jun 2022 09:04:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : to : cc : from : subject : content-type :
- content-transfer-encoding; s=pp1;
- bh=EJGVXcpSjcj2Rfl0CfzF9RguZzjarCzVFCxQ9X1hCYA=;
- b=hpBIKYse59AYbk67PIxoVLV0X8SH144AOjWgED1Hpa318cMB1MwMfGTRf3oa9M1NizLZ
- C1DpGpSImybohGoVjjgLH+usLZ6sDhFJE1eDTw40VPfZmduESxJTlv1ckLX1sCWqlNCS
- /0SMWMA7MqR7MD8I8EVfPWBC5BHko3oJ43td32WE/epnnpKn7S5b/hzZsOJUHkns0NlG
- h4VLyZ9gv02rxlvX2HjJ1F4jJvrWRuyXj6uYt0kfY/kvoN+gB2F8Qjx79CTh5pg8pzQT
- rPi33MhEo9M6Bf8vye/ovlpq6ylZLcndXdnY/3WXXkVK5zYSZVmA/7J4QC6RaeXWQIXH 2g== 
-Received: from ppma03wdc.us.ibm.com (ba.79.3fa9.ip4.static.sl-reverse.com [169.63.121.186])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3gyxhk87we-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 09:04:00 +0000
-Received: from pps.filterd (ppma03wdc.us.ibm.com [127.0.0.1])
-        by ppma03wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25S8nxWt017280;
-        Tue, 28 Jun 2022 09:03:59 GMT
-Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com [9.57.198.25])
-        by ppma03wdc.us.ibm.com with ESMTP id 3gwt09c4y5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Tue, 28 Jun 2022 09:03:59 +0000
-Received: from b01ledav002.gho.pok.ibm.com (b01ledav002.gho.pok.ibm.com [9.57.199.107])
-        by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25S93xOq37945742
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 28 Jun 2022 09:03:59 GMT
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 55B22124052;
-        Tue, 28 Jun 2022 09:03:59 +0000 (GMT)
-Received: from b01ledav002.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id F282F124053;
-        Tue, 28 Jun 2022 09:03:56 +0000 (GMT)
-Received: from [9.43.77.224] (unknown [9.43.77.224])
-        by b01ledav002.gho.pok.ibm.com (Postfix) with ESMTP;
-        Tue, 28 Jun 2022 09:03:56 +0000 (GMT)
-Message-ID: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com>
-Date:   Tue, 28 Jun 2022 14:33:55 +0530
+        Tue, 28 Jun 2022 08:29:47 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 372592DA9A
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 05:29:46 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id l2so11265172pjf.1
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 05:29:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=pr2zoFiTpkXzREMQfcijXKJTIDFAzV0VhNSAPpthVqQ=;
+        b=ifpubo96w6hYYBA5bS4pC0BgGcTHbWsX1lMI8OvWIc4nRdQ+Hx1DFZJ6h2jvylEDSv
+         GLC5tKYdjBY7NzdsRz+mSm+BCF5m5esF93Nfo/+fgWlCpoYgpyhfrRJxvBVgNhj6ZPKS
+         PcpCqR3tPmiN139ZYFyDz34AhhGuPROq8LcILehKKF39f/DF8W57JOTi9WpjvDTq7D3i
+         Jt+bcL8sd68l7GtahWhZ20eF+vyVtVgQrWq4H6ng2rUruulLKxjq4uHVT7AwwCKO3Arv
+         bxvNGlZ0LB21oJ/A11zQswh9QFHmY4qVbzayuNZgLAIHIlt2PLG5zZ3sjZ0l2lOF27gW
+         qMgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=pr2zoFiTpkXzREMQfcijXKJTIDFAzV0VhNSAPpthVqQ=;
+        b=asMHf3a9J7ZuAfPEaObTFuxtYHmnm3vdHtq7I6sEtrPn3yoOBsy+5fEqKc1kySAJQW
+         um5ta+V8RUu8GbLRROiNJqL5IIBKIAUQhG/Y3QOlS3TUsZI0yuXpGJU7BAn1yXiJU55q
+         r2EqTwC1wSETMgfEE7DaZ7IgXqC0xDe4kRso4VCffmgQOEIz5BbFTRLOXr+RAhmP0EoI
+         AyoKJdc8fZ42CyjORIVM9XPv3Bi/meArqwHhdJXN6N2G8Cn/z6C4dNvRImid1k+ozgsJ
+         7zs0prG9U3US+ykhEhgkLUqbu9Q9kx4CJFjGyP4Tb8BVBxGYcHqBZ3VUfANPDVL+ab2+
+         7n1w==
+X-Gm-Message-State: AJIora+P8lEsiAarBvcaQd/7VKHsKwAaqEs6oJUbjEUsgINbFmKs0Nxy
+        bX9Tx0SYWq0kwlcV70dNnOlGfQ==
+X-Google-Smtp-Source: AGRyM1s3PsYtz9bnCpb08r1y8xQ4WeVyG72BF/0afktbEPpoTwa9RGJHVMgCdUI4626iicGrFkuzdQ==
+X-Received: by 2002:a17:902:c950:b0:16a:6b0c:a2e with SMTP id i16-20020a170902c95000b0016a6b0c0a2emr4612887pla.36.1656419385615;
+        Tue, 28 Jun 2022 05:29:45 -0700 (PDT)
+Received: from [192.168.1.100] ([198.8.77.157])
+        by smtp.gmail.com with ESMTPSA id v11-20020a1709028d8b00b0016a4f3ca2b5sm9175371plo.277.2022.06.28.05.29.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jun 2022 05:29:45 -0700 (PDT)
+Message-ID: <bb56a578-741a-6eb4-a66f-3c774d0a24da@kernel.dk>
+Date:   Tue, 28 Jun 2022 06:29:44 -0600
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
+User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: fully tear down the queue in del_gendisk
 Content-Language: en-US
-To:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org
-Cc:     abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
-        mputtash@linux.vnet.com
-From:   Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to
- linux-next kernel
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To:     Christoph Hellwig <hch@lst.de>
+Cc:     Ming Lei <ming.lei@redhat.com>, linux-block@vger.kernel.org
+References: <20220619060552.1850436-1-hch@lst.de>
+ <67dd8d1c-658c-8833-9630-79ade736b348@kernel.dk>
+ <20220620060948.GA10485@lst.de>
+ <1e3f054e-eec6-be87-7039-e2b4260addc2@kernel.dk>
+ <20220628051139.GA22701@lst.de>
+From:   Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20220628051139.GA22701@lst.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: _pt95T9ALtjXM3taInJZXnEO77dkQKhw
-X-Proofpoint-GUID: _pt95T9ALtjXM3taInJZXnEO77dkQKhw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-27_09,2022-06-24_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 bulkscore=0
- phishscore=0 mlxscore=0 malwarescore=0 spamscore=0 mlxlogscore=738
- priorityscore=1501 lowpriorityscore=0 suspectscore=0 adultscore=0
- clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206280037
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Greetings,
+On 6/27/22 11:11 PM, Christoph Hellwig wrote:
+> On Mon, Jun 20, 2022 at 05:16:03AM -0600, Jens Axboe wrote:
+>> On 6/20/22 12:09 AM, Christoph Hellwig wrote:
+>>> On Sun, Jun 19, 2022 at 04:21:39PM -0600, Jens Axboe wrote:
+>>>> On 6/19/22 12:05 AM, Christoph Hellwig wrote:
+>>>>> Note that while intended or 5.20, this series is generated against the
+>>>>> block-5.19 branch as that contains fixes in this area that haven't
+>>>>> made it to the for-5.10/block branch yet.
+>>>>
+>>>> Side note - I rebased on -rc3 anyway because of the series that went
+>>>> into -rc2, so we should be fine there.
+>>>
+>>> It depends on elevator/debugfs teardown series that has not made it
+>>> into -rc3.
+>>
+>> Guess we'll rebase for -rc4 again...
+> 
+> As you'd done that, can you consider this series now?
 
-[linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to 
-linux-next kernel
+It doesn't apply cleanly. I'll check if it's something minor...
 
---- Call Traces ---
-[    1.788574] ------------[ cut here ]------------
-[    1.788577] alg: self-tests for rsa-generic (rsa) failed (rc=-22)
-[    1.788586] WARNING: CPU: 9 PID: 218 at crypto/testmgr.c:5774 
-alg_test+0x438/0x880
-[    1.788598] Modules linked in:
-[    1.788603] CPU: 9 PID: 218 Comm: cryptomgr_test Not tainted 
-5.19.0-rc4-next-20220627-autotest #1
-[    1.788609] NIP:  c00000000062e078 LR: c00000000062e074 CTR: 
-c00000000075e020
-[    1.788614] REGS: c00000000e733980 TRAP: 0700   Not tainted 
-(5.19.0-rc4-next-20220627-autotest)
-[    1.788620] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: 
-28008822  XER: 20040005
-[    1.788632] CFAR: c00000000014f244 IRQMASK: 0
-[    1.788632] GPR00: c00000000062e074 c00000000e733c20 c000000002a12000 
-0000000000000035
-[    1.788632] GPR04: 00000000ffff7fff c00000000e7339e0 c00000000e7339d8 
-0000000000000000
-[    1.788632] GPR08: c000000002826b78 0000000000000000 c000000002566a50 
-c0000000028e6bb8
-[    1.788632] GPR12: 0000000000008000 c00000000fff3280 c00000000018b6d8 
-c00000000d640080
-[    1.788632] GPR16: 0000000000000000 0000000000000000 0000000000000000 
-0000000000000000
-[    1.788632] GPR20: 0000000000000000 0000000000000000 0000000000000000 
-0000000000000000
-[    1.788632] GPR24: c000000000da49e8 0000000000000000 c000000050630480 
-0000000000000400
-[    1.788632] GPR28: c000000050630400 000000000000000d c000000002cd33d8 
-ffffffffffffffea
-[    1.788691] NIP [c00000000062e078] alg_test+0x438/0x880
-[    1.788696] LR [c00000000062e074] alg_test+0x434/0x880
-[    1.788701] Call Trace:
-[    1.788704] [c00000000e733c20] [c00000000062e074] 
-alg_test+0x434/0x880 (unreliable)
-[    1.788712] [c00000000e733d90] [c00000000062c040] 
-cryptomgr_test+0x40/0x70
-[    1.788718] [c00000000e733dc0] [c00000000018b7f4] kthread+0x124/0x130
-[    1.788726] [c00000000e733e10] [c00000000000ce54] 
-ret_from_kernel_thread+0x5c/0x64
-[    1.788733] Instruction dump:
-[    1.788736] 409e02e4 3d22002c 892913fd 2f890000 409e02d4 3c62fe63 
-7f45d378 7f84e378
-[    1.788746] 7fe6fb78 3863fa90 4bb2116d 60000000 <0fe00000> fa2100f8 
-fa410100 fa610108
-[    1.788757] ---[ end trace 0000000000000000 ]---
 -- 
+Jens Axboe
 
-
-Regards,
-Tasmiya Nalatwad
-IBM Linux Technology Center
