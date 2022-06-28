@@ -2,87 +2,73 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 901A7C43334
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 16:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75D67C433EF
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 16:26:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232659AbiF1QZA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 12:25:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44308 "EHLO
+        id S234004AbiF1Q0j (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 12:26:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46692 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231861AbiF1QYF (ORCPT
+        with ESMTP id S231245AbiF1QZ6 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 12:24:05 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C908B38D99
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 09:16:15 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id y14so20716038qvs.10
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 09:16:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=fkrHLl+pC0T2wzEqJ1VmdS709M7bO1Mk3oguAYoCHsA=;
-        b=S2uMzY1TZARDv/1VadP9BGX18k9XnXAyDTT4Nr2Cc+QyruRc//9e26bPFe+XIRu0Ng
-         5peYAVYVSA4nTZoJBvAZE9Dj4kYoSgL1PKD+xUj/kFPxbGZoyrFn0Hd8qUehW1IK3RaL
-         EHkMBe3MWOhxYKINOJTTcEnFn0SeFH4N4zs4QRuX6YG1Bat6B/ZYyDhB2ZTlWFTXeY58
-         SJ2EnyKyI2/YrcgNCa8HXUd4vHC/pHyDcP72StAyKy2SsTYA9BbJ2v1KVhO0VuAP78A8
-         XAnVfHXUP8kz8shyMwOHMf+KBx2HW5qHphrlXdrmutCI43Zg08vw9sk+jSWeCuOB6yL2
-         vV4A==
+        Tue, 28 Jun 2022 12:25:58 -0400
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BD29393FB
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 09:17:46 -0700 (PDT)
+Received: by mail-pg1-f181.google.com with SMTP id h192so12683944pgc.4
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 09:17:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=fkrHLl+pC0T2wzEqJ1VmdS709M7bO1Mk3oguAYoCHsA=;
-        b=Ypj+BogKECVmTtsfJJH4ZLhuz4j0ay6H3uo7yFTa3VrtoGM4eXpCEFXjKS81oVrP4r
-         gszuZiaMNG4XwJRH/wFCS/DMY/84JMfPTVnp/dnPg9+hgUZ+rh4Hqjpvsb4Qv8BHUBFG
-         Y8/xGVz13MgKMa08qxcDb8KjzUexN7pLqzPZcaxnRrHsuqE3V9zysUV7mkhFmsI5WJP6
-         xXIaZUrWGV/h2IaV9CW9Os6hEHnFIoRs4VObPJp9IHTmkW706vogu30pfbfnQFbdP/5A
-         LbkGsdXN7ADYnbjRe9Ch8S0jwRdHAb2lPwQRxuaQvfFNQ4SEadN3vVMpeJyOnhsISkVi
-         duNw==
-X-Gm-Message-State: AJIora+s/G0AaYH+1xp3nSihUVE2wPcwSzHk09gOZsewKEgakArqPRdZ
-        nvybX8AANfDCs2JMd9MwwA==
-X-Google-Smtp-Source: AGRyM1sKkjEL7f9wSHLYpBtisYe/9DkZXLFCV6xhCzLO5Lsi0TS0+cJ3QYNT1nLShEcNWimNSwTK/w==
-X-Received: by 2002:a05:622a:58d:b0:317:ca0d:91a5 with SMTP id c13-20020a05622a058d00b00317ca0d91a5mr13633763qtb.601.1656432974892;
-        Tue, 28 Jun 2022 09:16:14 -0700 (PDT)
-Received: from localhost (c-73-219-103-14.hsd1.vt.comcast.net. [73.219.103.14])
-        by smtp.gmail.com with ESMTPSA id w11-20020a05622a190b00b003162a22f8f4sm4312465qtc.49.2022.06.28.09.16.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jun 2022 09:16:13 -0700 (PDT)
-Date:   Tue, 28 Jun 2022 12:16:12 -0400
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Jens Axboe <axboe@kernel.dk>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
-Message-ID: <20220628161612.ajbyb723zx7w6b24@moria.home.lan>
-References: <20220624141255.2461148-1-ming.lei@redhat.com>
- <20220624141255.2461148-2-ming.lei@redhat.com>
- <20220626201458.ytn4mrix2pobm2mb@moria.home.lan>
- <Yrld9rLPY6L3MhlZ@T590>
- <20220628042016.wd65amvhbjuduqou@moria.home.lan>
- <Yrqw/KY94DDtFVfl@T590>
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=OqNTPczUsw2zcywpbvs/mPwwiHqZhMHPqN5un6qsoCs=;
+        b=RC37RkucUB+GtOjJUBfmf8cYvocb9h2OZdOg7Q4us0ka2EGjbwTc9RQgsP33fCq0gy
+         8Yp0O1ZIxw0hNPqQ6UgopiXPjnyLWjTwlqx2lfC5FCCv0tDthdUlNQmjD9KKkKSXbhUG
+         VkWULnx/RKVV0Has0B62OvoRuDY2CUhghljgT0RHqaOkUcWvnJeciDxp9y6g5pZhrkx5
+         XcyvQuJ5DyDc2xrg5AGt9fNIyY8MYBuSvFlVseI4yQajNAVFmeWgN8f/aflKRPR2aOzL
+         Rn1Joc98Z3F6wR/1kkHHXtGqlcF5GJajI7C5u90U1rxXnSov6O8I2Xs4R32M8b1r4tNm
+         iZEg==
+X-Gm-Message-State: AJIora//ca3cbt5qrzTMiFsHmF3/pSTMUWh3O1GMezJb5tQ0+D5c8xpx
+        Q58t+XY2z4iVjPSOCTE5ckqcXBxjI4A=
+X-Google-Smtp-Source: AGRyM1uoibtSuzGd2gLlsK6rYv+ETUSkFAyHHUyjinyMyL4yUcjgyu+0TRn3LYSep+ezQoqeMSnPnQ==
+X-Received: by 2002:a05:6a00:2287:b0:525:5574:9ac3 with SMTP id f7-20020a056a00228700b0052555749ac3mr5441736pfe.79.1656433065429;
+        Tue, 28 Jun 2022 09:17:45 -0700 (PDT)
+Received: from [100.125.51.173] ([104.129.199.11])
+        by smtp.gmail.com with ESMTPSA id b8-20020a170902650800b00168a651316csm9507458plk.270.2022.06.28.09.17.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jun 2022 09:17:44 -0700 (PDT)
+Message-ID: <2cffff09-579a-d4e8-9f13-6c0f6b906714@acm.org>
+Date:   Tue, 28 Jun 2022 09:17:41 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Yrqw/KY94DDtFVfl@T590>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 6/8] block/null_blk: Add support for pipelining zoned
+ writes
+Content-Language: en-US
+To:     Chaitanya Kulkarni <chaitanyak@nvidia.com>
+Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
+        Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Jaegeuk Kim <jaegeuk@kernel.org>,
+        Damien Le Moal <damien.lemoal@opensource.wdc.com>
+References: <20220627234335.1714393-1-bvanassche@acm.org>
+ <20220627234335.1714393-7-bvanassche@acm.org>
+ <05441933-6a41-9b9d-a81b-2784f40840f8@nvidia.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <05441933-6a41-9b9d-a81b-2784f40840f8@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 03:42:52PM +0800, Ming Lei wrote:
-> I don't see there is 'queue depth' for bio or bio driver.
-> 
-> 32 bytes have been big, and memory footprint is increased too since the data has been
-> prepared for the future possible rewind. If crypt or integrity is considered, it
-> can be bigger.
+On 6/27/22 17:39, Chaitanya Kulkarni wrote:
+> Is it possible to move this into the blktests ?
 
-Put some thought into this, Ming. I think you've absorbed some "received
-wisdom", some of the implicit assumptions everyone seems to be making without
-ever doing any math to check if they make sense.
+That sounds like a good idea to me. I will look into that after this 
+patch series has been merged.
 
-There may not be a "queue depth" for all drivers, but the same latency
-considerations apply - if you have an unbounded number of IOs in flight, you're
-going to be having other, much more significant issues.
+Thanks,
+
+Bart.
+
