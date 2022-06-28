@@ -2,38 +2,38 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11117C433EF
-	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 17:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D297FC43334
+	for <linux-block@archiver.kernel.org>; Tue, 28 Jun 2022 17:19:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbiF1RTA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 13:19:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59350 "EHLO
+        id S232305AbiF1RTB (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 13:19:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59398 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229769AbiF1RS6 (ORCPT
+        with ESMTP id S229769AbiF1RTA (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 13:18:58 -0400
+        Tue, 28 Jun 2022 13:19:00 -0400
 Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E6AC2FFC8
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 10:18:57 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36282FFD8
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 10:18:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
         MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
         :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=qNqzKpDMF+5/hkuHiOJVHXW6CbUSQydlIV6gIV3G9fw=; b=aLSP5/PTnr/fwzymqxtdYA2OUk
-        EJsQpi6PlfYLGwU4tJplt9BpgfmyemJW9GaO/DV2XUusfTQOiKeMX143theMt9AAN8t7rwwHw0w4m
-        P5VDI8Bu8G9YduGWtkiPdYGjVt4HQldzCsGqHoIscV8eOPdsDVh3v1zpInzxfVmCJk+5lbz8Nf9bc
-        zEib3QHrvk9o3krbr+63JcuBHypF8ZLpIxsXcVvKvRuAK+n/4YCft88yTUcCdXqYeWzARK7FZSueO
-        Svk+olXrBqYXQyhTM/IBOCVTDqFeBrf+anePT1oH6C5fDOhMN+nAIblUm2BXLmgtLUfu+nMK/C4fu
-        aE373sRg==;
+        bh=F2ryPHY6L42yA5UvmNp82+RRd7gswRVifieebMlwWPA=; b=VjEQGVfCx8qfBzZ/Cm+UAGpeL6
+        ufRbznXTeYbDx53IvU7YDI+HZyEL3GYlwGIHD1H/wVx0K8eXd/RoWeNmqyEcbdAjINvdn1cXIP//Y
+        v0paoEOcectROSbLH3HnfJXxBTm4znGMdW6FSdIGqxZvDA7n6yCq8VbH80qJZ1vMdB7L84YwgIs6M
+        Uelq563GTLL3MRPJeGTRrR3etdWMnAhwl7jx7YaG8v6G27MYySrUzXnSPPa7WIu7CfkOh14QqWrPa
+        Uz5kxwgtObLkwrRY0wl+jKYGkbsOrg0TnMEbyWEoViikps5rgnrLLAhOEcPbyeF8vJNZdMF5TYIeM
+        vwETmfVA==;
 Received: from [2001:4bb8:199:3788:e965:1541:b076:2977] (helo=localhost)
         by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o6ErY-007NSS-Da; Tue, 28 Jun 2022 17:18:56 +0000
+        id 1o6Erb-007NTB-1a; Tue, 28 Jun 2022 17:18:59 +0000
 From:   Christoph Hellwig <hch@lst.de>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Bart Van Assche <bvanassche@acm.org>
-Subject: [PATCH 1/6] block: simplify blktrace sysfs attribute creation
-Date:   Tue, 28 Jun 2022 19:18:45 +0200
-Message-Id: <20220628171850.1313069-2-hch@lst.de>
+Subject: [PATCH 2/6] block: remove a superflous queue kobject reference
+Date:   Tue, 28 Jun 2022 19:18:46 +0200
+Message-Id: <20220628171850.1313069-3-hch@lst.de>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20220628171850.1313069-1-hch@lst.de>
 References: <20220628171850.1313069-1-hch@lst.de>
@@ -44,153 +44,50 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Add the trace attributes to the default gendisk attributes, just like
-we already do for partitions.
+kobject_add already adds a reference to the parent that is dropped
+on deletion, so don't bother grabbing another one.
 
 Signed-off-by: Christoph Hellwig <hch@lst.de>
 Reviewed-by: Bart Van Assche <bvanassche@acm.org>
 ---
- block/blk-sysfs.c            | 11 +----------
- block/blk.h                  |  2 ++
- block/genhd.c                |  3 +++
- block/partitions/core.c      |  1 -
- include/linux/blktrace_api.h | 10 ----------
- kernel/trace/blktrace.c      | 11 -----------
- 6 files changed, 6 insertions(+), 32 deletions(-)
+ block/blk-sysfs.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
 diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 9b211e519de81..5f3f73115988c 100644
+index 5f3f73115988c..f9373da591b83 100644
 --- a/block/blk-sysfs.c
 +++ b/block/blk-sysfs.c
-@@ -810,21 +810,14 @@ int blk_register_queue(struct gendisk *disk)
- 	struct device *dev = disk_to_dev(disk);
- 	struct request_queue *q = disk->queue;
+@@ -812,14 +812,13 @@ int blk_register_queue(struct gendisk *disk)
  
--	ret = blk_trace_init_sysfs(dev);
--	if (ret)
--		return ret;
--
  	mutex_lock(&q->sysfs_dir_lock);
  
- 	ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
--	if (ret < 0) {
--		blk_trace_remove_sysfs(dev);
-+	if (ret < 0)
+-	ret = kobject_add(&q->kobj, kobject_get(&dev->kobj), "%s", "queue");
++	ret = kobject_add(&q->kobj, &dev->kobj, "%s", "queue");
+ 	if (ret < 0)
  		goto unlock;
--	}
  
  	ret = sysfs_create_group(&q->kobj, &queue_attr_group);
  	if (ret) {
--		blk_trace_remove_sysfs(dev);
  		kobject_del(&q->kobj);
- 		kobject_put(&dev->kobj);
+-		kobject_put(&dev->kobj);
  		goto unlock;
-@@ -890,7 +883,6 @@ int blk_register_queue(struct gendisk *disk)
+ 	}
+ 
+@@ -883,7 +882,6 @@ int blk_register_queue(struct gendisk *disk)
  	mutex_unlock(&q->sysfs_lock);
  	mutex_unlock(&q->sysfs_dir_lock);
  	kobject_del(&q->kobj);
--	blk_trace_remove_sysfs(dev);
- 	kobject_put(&dev->kobj);
+-	kobject_put(&dev->kobj);
  
  	return ret;
-@@ -931,7 +923,6 @@ void blk_unregister_queue(struct gendisk *disk)
- 	if (queue_is_mq(q))
- 		blk_mq_unregister_dev(disk_to_dev(disk), q);
- 	blk_crypto_sysfs_unregister(q);
--	blk_trace_remove_sysfs(disk_to_dev(disk));
- 
- 	mutex_lock(&q->sysfs_lock);
- 	elv_unregister_queue(q);
-diff --git a/block/blk.h b/block/blk.h
-index 1a0d3e6a4a631..74d59435870cb 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -452,6 +452,8 @@ extern struct device_attribute dev_attr_events;
- extern struct device_attribute dev_attr_events_async;
- extern struct device_attribute dev_attr_events_poll_msecs;
- 
-+extern struct attribute_group blk_trace_attr_group;
-+
- long blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
- long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
- 
-diff --git a/block/genhd.c b/block/genhd.c
-index bf9be06af2c8d..b1fb7e058b9cc 100644
---- a/block/genhd.c
-+++ b/block/genhd.c
-@@ -1134,6 +1134,9 @@ static struct attribute_group disk_attr_group = {
- 
- static const struct attribute_group *disk_attr_groups[] = {
- 	&disk_attr_group,
-+#ifdef CONFIG_BLK_DEV_IO_TRACE
-+	&blk_trace_attr_group,
-+#endif
- 	NULL
- };
- 
-diff --git a/block/partitions/core.c b/block/partitions/core.c
-index 8a0ec929023bc..7dc487f5b03cd 100644
---- a/block/partitions/core.c
-+++ b/block/partitions/core.c
-@@ -9,7 +9,6 @@
- #include <linux/slab.h>
- #include <linux/ctype.h>
- #include <linux/vmalloc.h>
--#include <linux/blktrace_api.h>
- #include <linux/raid/detect.h>
- #include "check.h"
- 
-diff --git a/include/linux/blktrace_api.h b/include/linux/blktrace_api.h
-index 623e22492afa5..f6f9b544365ab 100644
---- a/include/linux/blktrace_api.h
-+++ b/include/linux/blktrace_api.h
-@@ -77,10 +77,6 @@ extern int blk_trace_setup(struct request_queue *q, char *name, dev_t dev,
- 			   char __user *arg);
- extern int blk_trace_startstop(struct request_queue *q, int start);
- extern int blk_trace_remove(struct request_queue *q);
--extern void blk_trace_remove_sysfs(struct device *dev);
--extern int blk_trace_init_sysfs(struct device *dev);
--
--extern struct attribute_group blk_trace_attr_group;
- 
- #else /* !CONFIG_BLK_DEV_IO_TRACE */
- # define blk_trace_ioctl(bdev, cmd, arg)		(-ENOTTY)
-@@ -91,13 +87,7 @@ extern struct attribute_group blk_trace_attr_group;
- # define blk_trace_remove(q)				(-ENOTTY)
- # define blk_add_trace_msg(q, fmt, ...)			do { } while (0)
- # define blk_add_cgroup_trace_msg(q, cg, fmt, ...)	do { } while (0)
--# define blk_trace_remove_sysfs(dev)			do { } while (0)
- # define blk_trace_note_message_enabled(q)		(false)
--static inline int blk_trace_init_sysfs(struct device *dev)
--{
--	return 0;
--}
--
- #endif /* CONFIG_BLK_DEV_IO_TRACE */
- 
- #ifdef CONFIG_COMPAT
-diff --git a/kernel/trace/blktrace.c b/kernel/trace/blktrace.c
-index fe04c6f96ca5d..c584effe5fe99 100644
---- a/kernel/trace/blktrace.c
-+++ b/kernel/trace/blktrace.c
-@@ -1867,17 +1867,6 @@ static ssize_t sysfs_blk_trace_attr_store(struct device *dev,
- out:
- 	return ret ? ret : count;
  }
+@@ -941,6 +939,4 @@ void blk_unregister_queue(struct gendisk *disk)
+ 	q->sched_debugfs_dir = NULL;
+ 	q->rqos_debugfs_dir = NULL;
+ 	mutex_unlock(&q->debugfs_mutex);
 -
--int blk_trace_init_sysfs(struct device *dev)
--{
--	return sysfs_create_group(&dev->kobj, &blk_trace_attr_group);
--}
--
--void blk_trace_remove_sysfs(struct device *dev)
--{
--	sysfs_remove_group(&dev->kobj, &blk_trace_attr_group);
--}
--
- #endif /* CONFIG_BLK_DEV_IO_TRACE */
- 
- #ifdef CONFIG_EVENT_TRACING
+-	kobject_put(&disk_to_dev(disk)->kobj);
+ }
 -- 
 2.30.2
 
