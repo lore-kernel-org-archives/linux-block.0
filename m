@@ -2,22 +2,22 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D7B7C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:39:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82938CCA47C
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:39:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbiF2GjW (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 02:39:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48628 "EHLO
+        id S232140AbiF2Gjo (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 02:39:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48848 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229710AbiF2GjW (ORCPT
+        with ESMTP id S229762AbiF2Gjo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 02:39:22 -0400
+        Wed, 29 Jun 2022 02:39:44 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01FC1205ED;
-        Tue, 28 Jun 2022 23:39:21 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5501320BC3;
+        Tue, 28 Jun 2022 23:39:43 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 0346867373; Wed, 29 Jun 2022 08:39:16 +0200 (CEST)
-Date:   Wed, 29 Jun 2022 08:39:15 +0200
+        id D128967373; Wed, 29 Jun 2022 08:39:39 +0200 (CEST)
+Date:   Wed, 29 Jun 2022 08:39:39 +0200
 From:   Christoph Hellwig <hch@lst.de>
 To:     Logan Gunthorpe <logang@deltatee.com>
 Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
@@ -42,16 +42,15 @@ Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
         Martin Oliveira <martin.oliveira@eideticom.com>,
         Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-Subject: Re: [PATCH v7 03/21] PCI/P2PDMA: Expose pci_p2pdma_map_type()
-Message-ID: <20220629063915.GD17234@lst.de>
-References: <20220615161233.17527-1-logang@deltatee.com> <20220615161233.17527-4-logang@deltatee.com>
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH v7 04/21] PCI/P2PDMA: Introduce helpers for dma_map_sg
+ implementations
+Message-ID: <20220629063939.GE17234@lst.de>
+References: <20220615161233.17527-1-logang@deltatee.com> <20220615161233.17527-5-logang@deltatee.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615161233.17527-4-logang@deltatee.com>
+In-Reply-To: <20220615161233.17527-5-logang@deltatee.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
