@@ -2,195 +2,422 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9F73CCA47F
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 09:05:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C807C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 11:33:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231921AbiF2JFy (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 05:05:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46504 "EHLO
+        id S232702AbiF2Ldj (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 07:33:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40796 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229811AbiF2JFx (ORCPT
+        with ESMTP id S231897AbiF2Ldi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 05:05:53 -0400
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTP id C84D722509;
-        Wed, 29 Jun 2022 02:05:50 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id B53E41477;
-        Wed, 29 Jun 2022 02:05:50 -0700 (PDT)
-Received: from [10.57.85.71] (unknown [10.57.85.71])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BA2B53F792;
-        Wed, 29 Jun 2022 02:05:45 -0700 (PDT)
-Message-ID: <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
-Date:   Wed, 29 Jun 2022 10:05:40 +0100
+        Wed, 29 Jun 2022 07:33:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 23CA7271A
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 04:33:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1656502416;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=ilJBK/v3zjRoqAnD05Wvaeb5ckpIlMQHR8Gc7dLQw7U=;
+        b=UWIK2Zn6wxzPuGIoGyaxj3JtiXqltnAdJ5L1qBGSO6zUT9fu8DH9hw2KNP/fjBfNEyugwX
+        CMf4YiQI3Y8wLtb/yClvKDC2pWpgwTnsG1Fd9ws7z0YB27g5xnZxgYL/rHE10HVUXbrnp5
+        37YnLkDUEgSIN5RKeDCVBP+ALszThOE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-653-hJYGwb4LNL-wP5nfKiPDLQ-1; Wed, 29 Jun 2022 07:33:33 -0400
+X-MC-Unique: hJYGwb4LNL-wP5nfKiPDLQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8BB19811E76;
+        Wed, 29 Jun 2022 11:33:32 +0000 (UTC)
+Received: from T590 (ovpn-8-17.pek2.redhat.com [10.72.8.17])
+        by smtp.corp.redhat.com (Postfix) with ESMTPS id 1442D1415108;
+        Wed, 29 Jun 2022 11:33:26 +0000 (UTC)
+Date:   Wed, 29 Jun 2022 19:33:20 +0800
+From:   Ming Lei <ming.lei@redhat.com>
+To:     Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        joseph.qi@linux.alibaba.com, ming.lei@redhat.com
+Subject: Re: [RFC] libubd: library for ubd(userspace block driver based on
+ io_uring passthrough)
+Message-ID: <Yrw4gJq+NaX+TCDz@T590>
+References: <fd926012-6845-05e4-077b-6c8cfbf3d3cc@linux.alibaba.com>
+ <YrnMwgW7TemVdbXv@T590>
+ <fada5140-077e-6904-f9b6-c7bfba7779eb@linux.alibaba.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101
- Thunderbird/91.11.0
-Subject: Re: [PATCH v7 01/21] lib/scatterlist: add flag for indicating P2PDMA
- segments in an SGL
-Content-Language: en-GB
-To:     Logan Gunthorpe <logang@deltatee.com>,
-        linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-References: <20220615161233.17527-1-logang@deltatee.com>
- <20220615161233.17527-2-logang@deltatee.com>
-From:   Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <20220615161233.17527-2-logang@deltatee.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fada5140-077e-6904-f9b6-c7bfba7779eb@linux.alibaba.com>
+X-Scanned-By: MIMEDefang 2.85 on 10.11.54.7
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022-06-15 17:12, Logan Gunthorpe wrote:
-> Make use of the third free LSB in scatterlist's page_link on 64bit systems.
+On Wed, Jun 29, 2022 at 11:22:23AM +0800, Ziyang Zhang wrote:
+> Hi Ming,
 > 
-> The extra bit will be used by dma_[un]map_sg_p2pdma() to determine when a
-> given SGL segments dma_address points to a PCI bus address.
-> dma_unmap_sg_p2pdma() will need to perform different cleanup when a
-> segment is marked as a bus address.
+> On 2022/6/27 23:29, Ming Lei wrote:
+> > Hi Ziyang,
+> > 
+> > On Mon, Jun 27, 2022 at 04:20:55PM +0800, Ziyang Zhang wrote:
+> >> Hi Ming,
+> >>
+> >> We are learning your ubd code and developing a library: libubd for ubd.
+> >> This article explains why we need libubd and how we design it.
+> >>
+> >> Related threads:
+> >> (1) https://lore.kernel.org/all/Yk%2Fn7UtGK1vVGFX0@T590/
+> >> (2) https://lore.kernel.org/all/YnDhorlKgOKiWkiz@T590/
+> >> (3) https://lore.kernel.org/all/20220509092312.254354-1-ming.lei@redhat.com/
+> >> (4) https://lore.kernel.org/all/20220517055358.3164431-1-ming.lei@redhat.com/
+> >>
+> >>
+> >> Userspace block driver(ubd)[1], based on io_uring passthrough,
+> >> allows users to define their own backend storage in userspace
+> >> and provides block devices such as /dev/ubdbX.
+> >> Ming Lei has provided kernel driver code: ubd_drv.c[2]
+> >> and userspace code: ubdsrv[3].
+> >>
+> >> ubd_drv.c simply passes all blk-mq IO requests
+> >> to ubdsrv through io_uring sqes/cqes. We think the kernel code
+> >> is pretty well-designed.
+> >>
+> >> ubdsrv is implemented by a single daemon
+> >> and target(backend) IO handling(null_tgt and loop_tgt) 
+> >> is embedded in the daemon. 
+> >> While trying ubdsrv, we find ubdsrv is hard to be used 
+> >> by our backend.
+> > 
+> > ubd is supposed to provide one generic framework for user space block
+> > driver, and it can be used for doing lots of fun/useful thing.
+> > 
+> > If I understand correctly, this isn't same with your use case:
+> > 
+> > 1) your user space block driver isn't generic, and should be dedicated
+> > for Alibaba's uses
+> > 
+> > 2) your case has been there for long time, and you want to switch from other
+> > approach(maybe tcmu) to ubd given ubd has better performance.
+> > 
 > 
-> The new bit will only be used when CONFIG_PCI_P2PDMA is set; this means
-> PCI P2PDMA will require CONFIG_64BIT. This should be acceptable as the
-> majority of P2PDMA use cases are restricted to newer root complexes and
-> roughly require the extra address space for memory BARs used in the
-> transactions.
+> Yes, you are correct :)
+> The idea of design libubd is actually from libtcmu.
 > 
-> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
-> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
-> ---
->   drivers/pci/Kconfig         |  5 +++++
->   include/linux/scatterlist.h | 44 ++++++++++++++++++++++++++++++++++++-
->   2 files changed, 48 insertions(+), 1 deletion(-)
+> We do have some userspace storage system as the IO handling backend, 
+> and we need ubd to provide block drivers such as /dev/ubdbX for up layer client apps.
 > 
-> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
-> index 133c73207782..5cc7cba1941f 100644
-> --- a/drivers/pci/Kconfig
-> +++ b/drivers/pci/Kconfig
-> @@ -164,6 +164,11 @@ config PCI_PASID
->   config PCI_P2PDMA
->   	bool "PCI peer-to-peer transfer support"
->   	depends on ZONE_DEVICE
-> +	#
-> +	# The need for the scatterlist DMA bus address flag means PCI P2PDMA
-> +	# requires 64bit
-> +	#
-> +	depends on 64BIT
->   	select GENERIC_ALLOCATOR
->   	help
->   	  Enableѕ drivers to do PCI peer-to-peer transactions to and from
-> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-> index 7ff9d6386c12..6561ca8aead8 100644
-> --- a/include/linux/scatterlist.h
-> +++ b/include/linux/scatterlist.h
-> @@ -64,12 +64,24 @@ struct sg_append_table {
->   #define SG_CHAIN	0x01UL
->   #define SG_END		0x02UL
->   
-> +/*
-> + * bit 2 is the third free bit in the page_link on 64bit systems which
-> + * is used by dma_unmap_sg() to determine if the dma_address is a
-> + * bus address when doing P2PDMA.
-> + */
-> +#ifdef CONFIG_PCI_P2PDMA
-> +#define SG_DMA_BUS_ADDRESS	0x04UL
-> +static_assert(__alignof__(struct page) >= 8);
-> +#else
-> +#define SG_DMA_BUS_ADDRESS	0x00UL
-> +#endif
-> +
->   /*
->    * We overload the LSB of the page pointer to indicate whether it's
->    * a valid sg entry, or whether it points to the start of a new scatterlist.
->    * Those low bits are there for everyone! (thanks mason :-)
->    */
-> -#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END)
-> +#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END | SG_DMA_BUS_ADDRESS)
->   
->   static inline unsigned int __sg_flags(struct scatterlist *sg)
->   {
-> @@ -91,6 +103,11 @@ static inline bool sg_is_last(struct scatterlist *sg)
->   	return __sg_flags(sg) & SG_END;
->   }
->   
-> +static inline bool sg_is_dma_bus_address(struct scatterlist *sg)
-> +{
-> +	return __sg_flags(sg) & SG_DMA_BUS_ADDRESS;
-> +}
-> +
->   /**
->    * sg_assign_page - Assign a given page to an SG entry
->    * @sg:		    SG entry
-> @@ -245,6 +262,31 @@ static inline void sg_unmark_end(struct scatterlist *sg)
->   	sg->page_link &= ~SG_END;
->   }
->   
-> +/**
-> + * sg_dma_mark_bus address - Mark the scatterlist entry as a bus address
-> + * @sg:		 SG entryScatterlist
+> 
+> I think your motivation is that provides a complete user block driver to users
+> and they DO NOT change any code.
+> Users DO change their code using libubd for embedding libubd into the backend.
+> 
+> 
+> >> First is description of our backend:
+> >>
+> >> (1) a distributing system sends/receives IO requests 
+> >>     through network.
+> >>
+> >> (2) The system use RPC calls among hundreds of
+> >>      storage servers and RPC calls are associated with data buffers
+> >>      allocated from a memory pool.
+> >>
+> >> (3) On each server for each device(/dev/vdX), our backend runs
+> >>      many threads to handle IO requests and manage the device. 
+> >>
+> >> Second are reasons why ubdsrv is hard to use for us:
+> >>
+> >> (1) ubdsrv requires the target(backend) issues IO requests
+> >>     to the io_uring provided by ubdsrv but our backend 
+> >>     uses something like RPC and does not support io_uring.
+> > 
+> > As one generic framework, the io command has to be io_uring
+> > passthrough, and the io doesn't have to be handled by io_uring.
+> 
+> Yes, our backend define its own communicating method.
+> 
+> > 
+> > But IMO io_uring is much more efficient, so I'd try to make async io
+> > (io uring) as the 1st citizen in the framework, especially for new
+> > driver.
+> > 
+> > But it can support other way really, such as use io_uring with eventfd,
+> > the other userspace context can handle io, then wake up io_uring context
+> > via eventfd. You may not use io_uring for handling io, but you still
+> > need to communicate with the context for handling io_uring passthrough
+> > command, and one mechanism(such as eventfd) has to be there for the
+> > communication.
+> 
+> Ok, eventfd may be helpful. 
+> If you read my API, you may find ubdlib_complete_io_request().
+> I think the backend io worker thread can call this function to tell the 
+> ubd queue thread(the io_uring context in it) to commit the IO.
 
-entryScatterlist?
+The ubdlib_complete_io_request() has to be called in the same pthread
+context, that looks not flexible. When you handle IO via non-io_uring in the same
+context, the cpu utilization in submission/completion side should be
+higher than io_uring. And this way should be worse than the usage in
+ubd/loop, that is why I suggest to use one io_uring for handling both
+io command and io request if possible.
 
-> + *
-> + * Description:
-> + *   Marks the passed in sg entry to indicate that the dma_address is
-> + *   a bus address and doesn't need to be unmapped.
-> + **/
-> +static inline void sg_dma_mark_bus_address(struct scatterlist *sg)
-> +{
-> +	sg->page_link |= SG_DMA_BUS_ADDRESS;
-> +}
-> +
-> +/**
-> + * sg_unmark_pci_p2pdma - Unmark the scatterlist entry as a bus address
-> + * @sg:		 SG entryScatterlist
-> + *
-> + * Description:
-> + *   Clears the bus address mark.
-> + **/
-> +static inline void sg_dma_unmark_bus_address(struct scatterlist *sg)
-> +{
-> +	sg->page_link &= ~SG_DMA_BUS_ADDRESS;
-> +}
+> 
+> 
+> 
+> > 
+> >>
+> >> (2) ubdsrv forks a daemon and it takes over everything.
+> >>     Users should type "list/stop/del" ctrl-commands to interact with
+> >>     the daemon. It is inconvenient for our backend
+> >>     because it has threads(from a C++ thread library) running inside.
+> > 
+> > No, list/stop/del won't interact with the daemon, and the per-queue
+> > pthread is only handling IO commands(io_uring passthrough) and IO request.
+> > 
+> 
+> 
+> Sorry I made a mistake.
+> 
+> I mean from user's view, 
+> he has to type list/del/stop from cmdlind to control the daemon.
+> (I know the control flow is cmdline-->ubd_drv.c-->ubdsrv daemon).
+> 
+> This is a little weird if we try to make a ubd library.
+> So I actually provides APIs in libubd for users to do these list/del/stop works.
 
-Does this serve any useful purpose? If a page is determined to be device 
-memory, it's not going to suddenly stop being device memory, and if the 
-underlying sg is recycled to point elsewhere then sg_assign_page() will 
-still (correctly) clear this flag anyway. Trying to reason about this 
-beyond superficial API symmetry - i.e. why exactly would a caller need 
-to call it, and what would the implications be of failing to do so - 
-seems to lead straight to confusion.
+OK, that is fine to export APIs for admin purpose.
 
-In fact I'd be inclined to have sg_assign_page() be responsible for 
-setting the flag automatically as well, and thus not need 
-sg_dma_mark_bus_address() either, however I can see the argument for 
-doing it this way round to not entangle the APIs too much, so I don't 
-have any great objection to that.
+> 
+> 
+> >>
+> >> (3) ubdsrv PRE-allocates internal data buffers for each ubd device.
+> >>     The data flow is:
+> >>     bio vectors <-1-> ubdsrv data buffer <-2-> backend buffer(our RPC buffer).
+> >>     Since ubdsrv does not export its internal data buffer to backend,
+> >>     the second copy is unavoidable. 
+> >>     PRE-allocating data buffer may not be a good idea for wasting memory
+> >>     if there are hundreds of ubd devices(/dev/ubdbX).
+> > 
+> > The preallocation is just virtual memory, which is cheap and not pinned, but
+> > ubdsrv does support buffer provided by io command, see:
+> > 
+> > https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
+> 
+> Actually I discussed on the design of pre-allocation in your RFC patch for ubd_drv
+> but you did not reply :)
+> 
+> I paste it here:
+> 
+> "I am worried about the fixed-size(size is max io size, 256KiB) pre-allocated data buffers in UBDSRV
+> may consume too much memory. Do you mean these pages can be reclaimed by sth like madvise()?
+> If (1)swap is not set and (2)madvise() is not called, these pages may not be reclaimed."
+> 
+> I observed that your ubdsrv use posix_memalign() to pre-allocate data buffers, 
+> and I have already noticed the memory cost while testing your ubdsrv with hundreds of /dev/ubdbX.
+
+Usually posix_memalign just allocates virtual memory which is unlimited
+in 64bit arch, and pages should be allocated until the buffer is read or write.
+After the READ/WRITE is done, kernel still can reclaim the pages in this
+virtual memory.
+
+In future, we still may optimize the memory uses via madvise, such as
+MADV_DONTNEED, after the slot is idle for long enough.
+
+> 
+> Another IMPORTANT problem is your commit:
+> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
+> may be not helpful for WRITE requests if I understand correctly.
+> 
+> Consider this data flow:
+> 
+> 1. ubdsrv commits an IO req(req1, a READ req).
+> 
+> 2. ubdsrv issues a sqe(UBD_IO_COMMIT_AND_FETCH_REQ), and sets io->addr to addr1.
+>    addr1 is the addr of buffer user passed.
+>    
+> 
+> 3. ubd gets the sqe and commits req1, sets io->addr to addr1.
+> 
+> 4. ubd gets IO req(req2, a WRITE req) from blk-mq(queue_rq) and commit a cqe.
+> 
+> 5. ubd copys data to be written from biovec to addr1 in a task_work.
+> 
+> 6. ubdsrv gets the cqe and tell the IO target to handle req2.
+> 
+> 7. IO target handles req2. It is a WRITE req so target issues a io_uring write
+>    cmd(with buffer set to addr1).
+> 
+> 
+> 
+> The problem happens in 5). You cannot know the actual data_len of an blk-mq req
+> until you get one in queue_rq. So length of addr1 may be less than data_len.
+
+So far, the actual length of buffer has to be set as at least rq_max_blocks, since
+we set it as ubd queue's max hw sectors. Yeah, you may argue memory
+waste, but process virtual address is unlimited for 64bit arch, and
+pages are allocated until actual read/write is started.
+
+> > 
+> >>
+> >> To better use ubd in more complicated scenarios, we have developed libubd.
+> >> It does not assume implementation of backend and can be embedded into it.
+> >> We refer to the code structure of tcmu-runner[4], 
+> >> which includes a library(libtcmu) for users 
+> >> to embed tcmu-runner inside backend's code. 
+> >> It:
+> >>
+> >> (1) Does not fork/pthread_create but embedded in backend's threads
+> > 
+> > That is because your backend may not use io_uring, I guess.
+> > 
+> > But it is pretty easy to move the decision of creating pthread to target
+> > code, which can be done in the interface of .prepare_target().
+> 
+> I think the library should not create any thread if we want a libubd.
+
+I Agree.
+
+> 
+> > 
+> >>
+> >> (2) Provides libubd APIs for backend to add/delete ubd devices 
+> >>     and fetch/commit IO requests
+> > 
+> > The above could be the main job of libubd.
+> 
+> indeed.
+> 
+> > 
+> >>
+> >> (3) simply passes backend-provided data buffers to ubd_drv.c in kernel,
+> >>     since the backend actually has no knowledge 
+> >>     on incoming data size until it gets an IO descriptor.
+> > 
+> > I can understand your requirement, not look at your code yet, but libubd
+> > should be pretty thin from function viewpoint, and there are lots of common
+> > things to abstract/share among all drivers, please see recent ubdsrv change:
+> > 
+> > https://github.com/ming1/ubdsrv/commits/master
+> > 
+> > in which:
+> > 	- coroutine is added for handling target io
+> > 	- the target interface(ubdsrv_tgt_type) has been cleaned/improved for
+> > 	supporting complicated target
+> > 	- c++ support
+> 
+> Yes, I have read your coroutine code but I am not an expert of C++ 20.:(
+> I think it is actually target(backend) design and ubd should not assume 
+> how the backend handle IOs. 
+> 
+> The work ubd in userspace has to be done is:
+> 
+> 1) give some IO descriptors to backend, such as ubd_get_io_requests()
+> 
+> 2) get IO completion form backend, such as ubd_complete_io_requests()
+
+Or the user provides/registers two callbacks: handle_io_async() and
+io_complete(), the former is called when one request comes from ubd
+driver, the latter(optional) is called when one io is done.
+
+Also you didn't mention how you notify io_uring about io completion after
+io_uring_enter() is slept if your backend code doesn't use io_uring to
+handle io.
+
+I think one communication mechanism(such as eventfd) is needed for your
+case.
+
+> 
+> 
+> 
+> > 
+> > IMO, libubd isn't worth of one freshly new project, and it could be integrated
+> > into ubdsrv easily. The potential users could be existed usersapce
+> > block driver projects.
+> 
+> Yes, so many userspace storage systems can use ubd!
+> You may look at tcmu-runner. It:
+> 
+> 1) provides a library(libtcmu.c) for those who have a existing backend.
+> 
+> 2) provides a runner(main.c in tcmu-runner) like your ubdsrv 
+>    for those who just want to run it. 
+>    And the runner is build on top of libtcmu.
+> 
+> > 
+> > If you don't object, I am happy to co-work with you to add the support
+> > for libubd in ubdsrv, then we can avoid to invent a wheel
+> 
+> +1 :)
+
+Thinking of further, I'd suggest to split ubdsrv into two parts:
+
+1) libubdsrv
+- provide APIs like what you did in libubd
+- provide API for notify io_uring(handling io command) that one io is
+completed, and the API should support handling IO from other context
+(not same with the io_uring context for handling io command).
+
+2) ubd target
+- built on libubdsrv, such as ubd command is built on libubdsrv, and
+specific target implementation is built on the library too.
+
+It shouldn't be hard to work towards this direction, and I guess this
+way should make current target implementation more clean.
+
+> 
+> > 
+> >>
+> >> Note: 
+> >>
+> >> (1) libubd is just a POC demo and is not stick to the principles of
+> >>     designing a library and we are still developing it now...
+> >>
+> >> (2) The repo[5] including some useful examples using libubd. 
+> >>
+> >> (3) We modify the kernel part: ubd_drv.c and 
+> >>     it[6] is against Ming Lei's newest branch[2]
+> >>     because we forked our branch from his early branch
+> >>     (v5.17-ubd-dev).
+> > 
+> > Please look at the following tree for ubd driver:
+> > 
+> > https://github.com/ming1/linux/tree/my_for-5.19-ubd-devel_v3
+> > 
+> > in which most of your change should have been there already.
+> > 
+> > I will post v3 soon, please feel free to review after it is out and
+> > see if it is fine for you.
+> 
+> Yes, I have read your newest branch.
+> You use some task_work() functions in ubd_drv.c 
+> for error-handling such as aborting IO.
+
+The IO aborting has to be supported, otherwise what if the io_uring
+context(pthread) is killed, and what if the device is removed when
+handling IO.
+
+ubdsrv/tests/generic provides two tests for deleting ubd & killing
+per-queue pthread meantime with heavy IO.
+
+> 
+> But I find they are too complicated to understand 
+> and it's hard to write libubd code in this branch.
+
+Actually the latest ubdsrv code becomes much clean, and should be
+easier to abstract APIs for external/binary target.
+
+> 
+> So I choose your first(easiest to understand)
+> version: v5.17-ubd-dev.
+
+That code is outdated, and full of bugs, :-(
+
 
 Thanks,
-Robin.
+Ming
 
-> +
->   /**
->    * sg_phys - Return physical address of an sg entry
->    * @sg:	     SG entry
