@@ -2,86 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0A76C43334
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 14:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A00CCA47C
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 14:48:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231742AbiF2OhA (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 10:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41176 "EHLO
+        id S233655AbiF2Osf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 10:48:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231613AbiF2OhA (ORCPT
+        with ESMTP id S233669AbiF2Osd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 10:37:00 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6D6F39148
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:36:59 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id 68so15493058pgb.10
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:36:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=from:to:cc:in-reply-to:references:subject:message-id:date
-         :mime-version:content-transfer-encoding;
-        bh=8OMjA54YB5/fjN7ZCSgm2M8RP9kWgfJthpUuTA9taMg=;
-        b=Vo/rqGL1nRRDNs7qbgHkfJXiFhzv50nXPbF3b8I9TMDkjuhNPbhQKWoa8cuDSIvqPG
-         +S1HrfC/mj7Q4u/q3gTlVdExzGLO7r58AFX2rMpKDG/9CBI/gdpb8A4Es3efFRYMho04
-         qYDHvC+T+d1/4C98y5YnsX5dous011EBAsHFecZ1hDv7ucB72d6+M8uDGlss3C9ZLwon
-         vBVfb1Eqcy+7i1ac4gRlGmQY2LC3PD39KCTmE2xwZud8iacfFgKs79QZ84ly0S1dM/v/
-         Qr/giZ14ouiwobUV0XUImtqSnI4OboZ4TinsP5lQ1JPutudTur8t5luCj7hiV0XidIkx
-         Mm4w==
+        Wed, 29 Jun 2022 10:48:33 -0400
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82CCBB4B6
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:48:31 -0700 (PDT)
+Received: by mail-io1-f71.google.com with SMTP id bw12-20020a056602398c00b00675895c2e24so695829iob.19
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:48:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:in-reply-to:references:subject
-         :message-id:date:mime-version:content-transfer-encoding;
-        bh=8OMjA54YB5/fjN7ZCSgm2M8RP9kWgfJthpUuTA9taMg=;
-        b=s+/oz49i5xJftwMlabMKRdrMhga60Kxmd+zmfUeEgEkGjzERftkeQKDF5/e0rrqcNi
-         IIS5FCqlM0/Hwft+/ST4gwtQ88v2B7cOKhRbK1nYrupH+Jwmfi1JPd7y/BJjs5FUO9u0
-         wWRAkUIKF62wFN/BhnzyKA2I0A5hMxDUZnkKn8Fzmn6anUvg+EjLevY2hcq2ctC5axHM
-         egHBmeZK4sO8fEob7d4f3WsX7moCIHk8ziSfLSezqctSWCjARzQ8NuL6wS4v3Txo1zXL
-         sahfV9T7rP0fPukyus/+AY1JLmA5KHest3FnfBedKggLHZagAjB1xIiiweHJWRZ+bvXg
-         644A==
-X-Gm-Message-State: AJIora9YoSPMTgIzhj1vmFygPC5f7Md/65s71XIdxGxgwYIv3hb0vhuv
-        mgNuicF23CxRMu9Qm1n+J5X8Ww==
-X-Google-Smtp-Source: AGRyM1uu8CJkuDKrDgX4mYfKOb9EdZvU2V5AKx9ueTNLC+e6vXHbHyt5fNxMAxHNjJHvfyWuZ2LKNw==
-X-Received: by 2002:a63:7a0e:0:b0:40c:cfa1:550a with SMTP id v14-20020a637a0e000000b0040ccfa1550amr3234851pgc.514.1656513419245;
-        Wed, 29 Jun 2022 07:36:59 -0700 (PDT)
-Received: from [127.0.1.1] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id a42-20020a056a001d2a00b0052546961424sm11367959pfx.1.2022.06.29.07.36.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 07:36:58 -0700 (PDT)
-From:   Jens Axboe <axboe@kernel.dk>
-To:     Christoph Hellwig <hch@lst.de>, damien.lemoal@wdc.com
-Cc:     linux-block@vger.kernel.org
-In-Reply-To: <20220629062013.1331068-1-hch@lst.de>
-References: <20220629062013.1331068-1-hch@lst.de>
-Subject: Re: clean up the blk-ia-ranges.c code a bit
-Message-Id: <165651341843.6730.16258965538046349662.b4-ty@kernel.dk>
-Date:   Wed, 29 Jun 2022 08:36:58 -0600
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=piY2rqjjpLSURcBVOJ67ylQE4JJjSD/EdRDbwcjkkEw=;
+        b=rhHkh7Z9AaT0sqE+yS0aGiateJPKGa59yPNOba8HW3x5jqLKYRYusYiYTbnTPj4E/Y
+         iinMDfR218eVBUlQEQ09Cg4WwvJ/+WnKS0Q23GsOzK9OI8tbMTqnZ/RusP6zXaW5gMlE
+         RprmTNsxz9sc4+KG5jKD8FarHMzx9TOgh9lFa8KnOoGyOAcaWOJ5L65oILRrO4PboXW2
+         /k88dw3eWmnBwqkJQseYiO3DvAE87h4j4cp4+M1ti723Su7QK14arK1PcoZgUJUulRqi
+         yxgBy8LqMcYscj3e1sDwCne04NrZwxedcD7xZxACcz6hseo1SwjWjhLbj+pfSjFfkjw1
+         kHVw==
+X-Gm-Message-State: AJIora+u+3Jb2P05Oi5bEy4lBFFJ94ct3dXzUZaIrWJa2HeU1JntgjSq
+        mvVybeMB0pQ0/J4/yBuKq0p6GnFmqBUSkr1Rj8h3CeDIIwl1
+X-Google-Smtp-Source: AGRyM1sUZ9tCojVibTV7y72NWNfIQpGOeRuHkb2gvuxp3tttZu+oPGZn5RsZrt2EH9ny3swAAA0KvfrzRFhuhwRVzPQt0CMJrniG
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6638:dc4:b0:33c:c2c5:50ab with SMTP id
+ m4-20020a0566380dc400b0033cc2c550abmr2093334jaj.26.1656514110924; Wed, 29 Jun
+ 2022 07:48:30 -0700 (PDT)
+Date:   Wed, 29 Jun 2022 07:48:30 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000025abbc05e2973f52@google.com>
+Subject: [syzbot] linux-next boot error: WARNING in blk_mq_release
+From:   syzbot <syzbot+7582a7c7cf0affa6c9be@syzkaller.appspotmail.com>
+To:     axboe@kernel.dk, linux-block@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
+        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, 29 Jun 2022 08:20:11 +0200, Christoph Hellwig wrote:
-> this is a little drive by cleanup for the ia-ranges code, including
-> moving the data structure to the gendisk as it is only used for
-> non-passthrough access.
-> 
-> I don't have hardware to test this on, so it would be good to make this
-> go through Damien's rig.
-> 
-> [...]
+Hello,
 
-Applied, thanks!
+syzbot found the following issue on:
 
-[1/2] block: move ->ia_ranges from the request_queue to the gendisk
-      commit: 6a27d28c81bc5843de2490688a04ee5baa6615e7
-[2/2] block: simplify disk_set_independent_access_ranges
-      commit: 22d0c4080fe49299640d9d6c43154c49794c2825
+HEAD commit:    c4ef528bd006 Add linux-next specific files for 20220629
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=115f9f4c080000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=39ac31f5c81daa7c
+dashboard link: https://syzkaller.appspot.com/bug?extid=7582a7c7cf0affa6c9be
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Best regards,
--- 
-Jens Axboe
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7582a7c7cf0affa6c9be@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 2226 at block/blk-mq.c:3876 blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3876
+Modules linked in:
+CPU: 0 PID: 2226 Comm: kworker/0:3 Not tainted 5.19.0-rc4-next-20220629-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events blkg_free_workfn
+RIP: 0010:blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3876
+Code: fd 4c 8d a3 a8 02 00 00 4c 89 e0 48 c1 e8 03 80 3c 28 00 0f 85 14 02 00 00 48 8b 83 a8 02 00 00 49 39 c4 75 b1 e8 28 af 97 fd <0f> 0b eb a8 e8 1f af 97 fd 48 8b 44 24 10 48 05 38 05 00 00 48 89
+RSP: 0000:ffffc90009837ba0 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: ffff88801bd5c000 RCX: 0000000000000000
+RDX: ffff888024193a80 RSI: ffffffff83e307e8 RDI: 0000000000000000
+RBP: dffffc0000000000 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000001 R12: ffff88801bd5c2a8
+R13: ffff88801d898190 R14: ffff88801d898048 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffff88823ffff000 CR3: 000000000ba8e000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ blk_release_queue+0x15b/0x280 block/blk-sysfs.c:782
+ kobject_cleanup lib/kobject.c:673 [inline]
+ kobject_release lib/kobject.c:704 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x1be/0x4c0 lib/kobject.c:721
+ blkg_free_workfn+0x128/0x210 block/blk-cgroup.c:96
+ process_one_work+0x991/0x1610 kernel/workqueue.c:2289
+ worker_thread+0x665/0x1080 kernel/workqueue.c:2436
+ kthread+0x2e9/0x3a0 kernel/kthread.c:376
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
