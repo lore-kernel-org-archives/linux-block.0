@@ -2,130 +2,104 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF4D6CCA47C
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 18:24:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EC53C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 18:40:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229874AbiF2SYs (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 14:24:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38040 "EHLO
+        id S229622AbiF2SkF (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 14:40:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52908 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229513AbiF2SYr (ORCPT
+        with ESMTP id S229480AbiF2SkE (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 14:24:47 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64B0B255AB;
-        Wed, 29 Jun 2022 11:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=6f/hfdoWC+PgJWoBH5fqwFGRbVxwuN3ohOs8yiOPg/w=; b=KqlIdYHpF5kcUd1uj3HgVczqN5
-        +LiC/fe4thV0n4GWyYvjongR/yShAMienfuQ1vSKr2dlutBWKxI1nszo45XAnij64gY60aWl25yKn
-        9yS7YZF5VmQ5saw9wKgfKuTqMswh1/nBQISRAQ25FYKkr6Le3Ih3GarYYS3dES6F4h5ipa5KBXImW
-        +5AYt7ZvYxGywfXkmA46cmlkEvd9ckJZYnEqkIBKI2tycRJV07BzAnX9mR41JUrGOel82aqdx3sqr
-        111sVLF6oie65Xr6Z42l/GsfBOMAbGWd8Y9f26Frw8Cb4XUZDZkK9lUUkK39WvPZjSo78/eCvKrz8
-        ZKirfsHg==;
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1o6cMk-002URm-20; Wed, 29 Jun 2022 12:24:43 -0600
-Message-ID: <9725fc38-cbe6-f660-8d5f-6ceb983e6976@deltatee.com>
-Date:   Wed, 29 Jun 2022 12:24:36 -0600
+        Wed, 29 Jun 2022 14:40:04 -0400
+Received: from mail-qv1-xf2f.google.com (mail-qv1-xf2f.google.com [IPv6:2607:f8b0:4864:20::f2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D426329810
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 11:40:03 -0700 (PDT)
+Received: by mail-qv1-xf2f.google.com with SMTP id q4so26150320qvq.8
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 11:40:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ZTPGx2N1jpuiUT68Zx+rA9I6AVj18IKzWfibl/qcoIc=;
+        b=EBIbqSNvP2ruC35qvPv9h53Col+Ygkn0I5VAjNaaA8tJlPGTKJFknqiA80PAvB/bba
+         Knl76j7bwvlybj7LtL/0noO76pjVJr4/ZqsL3SHVG6xybVP0KiDfzgrjp6VCTchCjavA
+         Xfgz7YYGNCtGpezI3h+Bg0Fe6Xx3HS7GAbya04NQ4FnwAYHYHHlYxTvwUL19B1wBM3K1
+         lw+e0dX7iCwGAi/Faf68bJHiZWuonJ0fTL7nr8sY2CUpTRP/kJqvTZLB0HIr9W9ZFT6B
+         K1zsVF1G0NOlIxXTblUTyzl5fQIiZKpA43W7kvE8tG2qbIej6vqvV8KppahTH8FWrtd0
+         Dbew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ZTPGx2N1jpuiUT68Zx+rA9I6AVj18IKzWfibl/qcoIc=;
+        b=GXgcdQSI0mczaVaS0ifnRgLaa5gYP9AojRJyqBLP3fwNpfK1NawXEjZJAchAiTcPXC
+         E/iQcUxhPJuGQMnUb37Pc7b53efEC7x+YX7NtQDGdBwq6C0eRhetErNbjTQbhx5ErJ7e
+         g+8GorHYY9hQ0Rv3xnEkOQxSdGbW+FkouB1R40PozGLY2FMT8GLGt7stUcA/LATosALu
+         tDlvc1RsMQ7qqsMArWHpdGTtQ9CBC/zJEm+GxkcVjb6bSCLYvHoQH1GlX6xjI+XYTQDS
+         m7znU0t2E4TFKD2vQOlNavwvYZLh5Ns/UVxRUdMpC/uhT/L4O9sr4g5ONrDLVdfuDBmV
+         1Pqw==
+X-Gm-Message-State: AJIora9p+ofDcyEgyunpxpKsJsEfYlWwRRHBhWpOOWfYPDnKk+ix/f7m
+        WCzLYXxEReEP1eOjji6WUQ==
+X-Google-Smtp-Source: AGRyM1t+k/LSavzJpNR9L3NcEUGUmQ3ZTiAl/yvrznRdJZcWrAFcC888FmZXs9k/HBhEyicxMrvcOw==
+X-Received: by 2002:a05:622a:174e:b0:319:5b72:173b with SMTP id l14-20020a05622a174e00b003195b72173bmr3863832qtk.13.1656528002961;
+        Wed, 29 Jun 2022 11:40:02 -0700 (PDT)
+Received: from localhost (c-73-219-103-14.hsd1.vt.comcast.net. [73.219.103.14])
+        by smtp.gmail.com with ESMTPSA id o1-20020a05620a2a0100b006a6f68c8a87sm3941480qkp.126.2022.06.29.11.40.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 11:40:01 -0700 (PDT)
+Date:   Wed, 29 Jun 2022 14:40:01 -0400
+From:   Kent Overstreet <kent.overstreet@gmail.com>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     Ming Lei <ming.lei@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Eric Biggers <ebiggers@google.com>,
+        Dmitry Monakhov <dmonakhov@openvz.org>,
+        "Martin K . Petersen" <martin.petersen@oracle.com>
+Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
+Message-ID: <20220629184001.b66bt4jnppjquzia@moria.home.lan>
+References: <20220624141255.2461148-1-ming.lei@redhat.com>
+ <20220624141255.2461148-2-ming.lei@redhat.com>
+ <20220626201458.ytn4mrix2pobm2mb@moria.home.lan>
+ <Yrld9rLPY6L3MhlZ@T590>
+ <20220628042016.wd65amvhbjuduqou@moria.home.lan>
+ <3ad782c3-4425-9ae6-e61b-9f62f76ce9f4@kernel.dk>
+ <20220628183247.bcaqvmnav34kp5zd@moria.home.lan>
+ <6f8db146-d4b3-d17b-4e58-08adc0010cba@kernel.dk>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
-References: <20220615161233.17527-1-logang@deltatee.com>
- <20220615161233.17527-2-logang@deltatee.com>
- <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
- <c42b5ee3-5d4f-7e44-8885-26b8417208ae@deltatee.com>
- <d84a0498-3b7f-3d38-2bfd-9a175db4002a@arm.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <d84a0498-3b7f-3d38-2bfd-9a175db4002a@arm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, kch@nvidia.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 01/21] lib/scatterlist: add flag for indicating P2PDMA
- segments in an SGL
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6f8db146-d4b3-d17b-4e58-08adc0010cba@kernel.dk>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+On Wed, Jun 29, 2022 at 11:16:10AM -0600, Jens Axboe wrote:
+> Not sure what Christoph change you are referring to, but all the ones
+> that I did to improve the init side were all backed by numbers I ran at
+> that time (and most/all of the commit messages will have that data). So
+> yes, it is indeed still very noticeable. Maybe not at 100K IOPS, but at
+> 10M on a core it most certainly is.
 
+I was referring to 609be1066731fea86436f5f91022f82e592ab456. You signed off on
+it, you must remember it...?
 
-On 2022-06-29 12:02, Robin Murphy wrote:
-> On 2022-06-29 16:39, Logan Gunthorpe wrote:
->> On 2022-06-29 03:05, Robin Murphy wrote:
->>> On 2022-06-15 17:12, Logan Gunthorpe wrote:
->>> Does this serve any useful purpose? If a page is determined to be device
->>> memory, it's not going to suddenly stop being device memory, and if the
->>> underlying sg is recycled to point elsewhere then sg_assign_page() will
->>> still (correctly) clear this flag anyway. Trying to reason about this
->>> beyond superficial API symmetry - i.e. why exactly would a caller need
->>> to call it, and what would the implications be of failing to do so -
->>> seems to lead straight to confusion.
->>>
->>> In fact I'd be inclined to have sg_assign_page() be responsible for
->>> setting the flag automatically as well, and thus not need
->>> sg_dma_mark_bus_address() either, however I can see the argument for
->>> doing it this way round to not entangle the APIs too much, so I don't
->>> have any great objection to that.
->>
->> Yes, I think you misunderstand what this is for. The SG_DMA_BUS_ADDDRESS
->> flag doesn't mark the segment for the page, but for the dma address. It
->> cannot be set in sg_assign_page() seeing it's not a property of the page
->> but a property of the dma_address in the sgl.
->>
->> It's not meant for use by regular SG users, it's only meant for use
->> inside DMA mapping implementations. The purpose is to know whether a
->> given dma_address in the SGL is a bus address or regular memory because
->> the two different types must be unmapped differently. We can't rely on
->> the page because, as you know, many dma_map_sg() the dma_address entry
->> in the sgl does not map to the same memory as the page. Or to put it
->> another way: is_pci_p2pdma_page(sg->page) does not imply that
->> sg->dma_address points to a bus address.
->>
->> Does that make sense?
-> 
-> Ah, you're quite right, in trying to take in the whole series at once
-> first thing in the morning I did fail to properly grasp that detail, so
-> indeed the sg_assign_page() thing couldn't possibly work, but as I said
-> that's fine anyway. I still think the lifecycle management is a bit off
-> though - equivalently, a bus address doesn't stop being a bus address,
-> so it would seem appropriate to update this flag appropriately whenever
-> sg_dma_address() is assigned to, and not when it isn't.
+> I'm all for having solid and maintainable code, obviously, but frivolous
+> bloating of structures and more expensive setup cannot be hand waved
+> away with "it doesn't matter if we touch 3 or 6 cachelines" because we
+> obviously have a disagreement on that.
 
-Yes, that's pretty much the way the code is now. The only two places
-sg_dma_mark_bus_address() is called are in the two pci_p2pdma helpers
-that set the dma address to the bus address. The lines before both calls
-set the dma_address and dma_len.
+I wouldn't propose inflating struct _bio_ like that. But Jens, to be blunt - I
+know we have different priorities in the way we write code. Your writeback
+throttling code was buggy for _ages_ and I had users hitting deadlocks there
+that I pinged you about, and I could not make heads or tails of how that code
+was supposed to work and not for lack of time spent trying!
 
-Logan
+You should be well aware that I care about performance too - I was the one who
+pushed through the patches to not separately allocate mempools and biosets, and
+a lot of the work I did ages ago was specifically to work towards getting rif of
+the counting segments pass (work I believe Ming completed); that was a _major_
+chunk of cpu time in any block layer profile I've looked at. So sure, tell me I
+don't care about performance enough.
 
+*sigh*
