@@ -2,227 +2,336 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A47DC43334
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 03:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A97DCCA479
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 03:22:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231578AbiF2DTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 23:19:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
+        id S231481AbiF2DWr (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 23:22:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50236 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231497AbiF2DTh (ORCPT
+        with ESMTP id S231318AbiF2DW3 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 23:19:37 -0400
-Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEA136159;
-        Tue, 28 Jun 2022 20:18:55 -0700 (PDT)
-Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25T3DafE008652;
-        Wed, 29 Jun 2022 03:18:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- mime-version : content-transfer-encoding; s=pp1;
- bh=od5MFZxEfwYEj4PLpFvbO/tj5BemYL4/bN3mvOWbo6w=;
- b=UmhUuvxQTsvGGNhNYpPwaqdbIQKOxF66FOaMdt6tVv6h6Z568SuPDVA6iwSY3fgCsW5q
- kKiWkNQ6tM+gWa5vWxF0OPksCFZG5f1uwewm4HFAOfsb3SohuGlkUkVBXCcBRpG2XAYX
- C0sDawltvSmPtMdDnRitw7argrr0sR1DPSms3aCJmFtQxRsNeGwJOGmpM0xMrHH5DyfW
- yw79435oOR+O9bOECBovaCykKoxtmhNYbxlboh2ZiuJW3thDrOFu7BTjCOFw7BbM2lQN
- zJt4HzdwVgKkzndzsyzxo6n4TyldfYoE2dOACtioQGzAptc2CXNKOOvI6NWORrVN45OJ BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0en282wj-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 03:18:41 +0000
-Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25T3Er48015431;
-        Wed, 29 Jun 2022 03:18:40 GMT
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
-        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0en282wb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 03:18:40 +0000
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
-        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25T2p6Eg023703;
-        Wed, 29 Jun 2022 03:18:39 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
-        by ppma01wdc.us.ibm.com with ESMTP id 3gwt09cb0g-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 29 Jun 2022 03:18:39 +0000
-Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
-        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25T3IcRa11600306
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 29 Jun 2022 03:18:39 GMT
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id E3DBEAC059;
-        Wed, 29 Jun 2022 03:18:38 +0000 (GMT)
-Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id 9FDFAAC05B;
-        Wed, 29 Jun 2022 03:18:35 +0000 (GMT)
-Received: from farman-thinkpad-t470p (unknown [9.163.2.135])
-        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
-        Wed, 29 Jun 2022 03:18:35 +0000 (GMT)
-Message-ID: <a765fff67679155b749aafa90439b46ab1269a64.camel@linux.ibm.com>
-Subject: Re: [PATCHv6 11/11] iomap: add support for dma aligned direct-io
-From:   Eric Farman <farman@linux.ibm.com>
-To:     Halil Pasic <pasic@linux.ibm.com>, Keith Busch <kbusch@kernel.org>
-Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
-        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
-        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
-        ebiggers@kernel.org, pankydev8@gmail.com
-Date:   Tue, 28 Jun 2022 23:18:34 -0400
-In-Reply-To: <83e65083890a7ac9c581c5aee0361d1b49e6abd9.camel@linux.ibm.com>
-References: <20220610195830.3574005-1-kbusch@fb.com>
-         <20220610195830.3574005-12-kbusch@fb.com>
-         <ab1bc062b4a1d0ad7f974b6068dc3a6dbf624820.camel@linux.ibm.com>
-         <YrS2HLsYOe7vnbPG@kbusch-mbp> <YrS6/chZXbHsrAS8@kbusch-mbp>
-         <e2b08a5c452d4b8322566cba4ed33b58080f03fa.camel@linux.ibm.com>
-         <e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com>
-         <c5affe3096fd7b7996cb5fbcb0c41bbf3dde028e.camel@linux.ibm.com>
-         <YrnOmOUPukGe8xCq@kbusch-mbp.dhcp.thefacebook.com>
-         <20220628110024.01fcf84f.pasic@linux.ibm.com>
-         <83e65083890a7ac9c581c5aee0361d1b49e6abd9.camel@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
-Mime-Version: 1.0
+        Tue, 28 Jun 2022 23:22:29 -0400
+Received: from out30-57.freemail.mail.aliyun.com (out30-57.freemail.mail.aliyun.com [115.124.30.57])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09F1CDAD;
+        Tue, 28 Jun 2022 20:22:26 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R681e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=7;SR=0;TI=SMTPD_---0VHlnta._1656472943;
+Received: from 30.97.57.27(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VHlnta._1656472943)
+          by smtp.aliyun-inc.com;
+          Wed, 29 Jun 2022 11:22:24 +0800
+Message-ID: <fada5140-077e-6904-f9b6-c7bfba7779eb@linux.alibaba.com>
+Date:   Wed, 29 Jun 2022 11:22:23 +0800
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
+ Gecko/20100101 Thunderbird/91.9.0
+Subject: Re: [RFC] libubd: library for ubd(userspace block driver based on
+ io_uring passthrough)
+Content-Language: en-US
+To:     Ming Lei <ming.lei@redhat.com>
+Cc:     linux-block@vger.kernel.org, io-uring@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Gabriel Krisman Bertazi <krisman@collabora.com>,
+        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
+        joseph.qi@linux.alibaba.com
+References: <fd926012-6845-05e4-077b-6c8cfbf3d3cc@linux.alibaba.com>
+ <YrnMwgW7TemVdbXv@T590>
+From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
+In-Reply-To: <YrnMwgW7TemVdbXv@T590>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: nDBxkpzP375Uv3nW7kdxyuRz0REl5oyg
-X-Proofpoint-GUID: HQTmH9Dzn0xZt9_WfWNXAAmKQGrbWDd0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
- definitions=2022-06-28_11,2022-06-28_01,2022-06-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- phishscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
- mlxlogscore=999 impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2204290000 definitions=main-2206290010
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, 2022-06-28 at 11:20 -0400, Eric Farman wrote:
-> On Tue, 2022-06-28 at 11:00 +0200, Halil Pasic wrote:
-> > On Mon, 27 Jun 2022 09:36:56 -0600
-> > Keith Busch <kbusch@kernel.org> wrote:
-> > 
-> > > On Mon, Jun 27, 2022 at 11:21:20AM -0400, Eric Farman wrote:
-> > > > Apologies, it took me an extra day to get back to this, but it
-> > > > is
-> > > > indeed this pass through that's causing our boot failures. I
-> > > > note
-> > > > that
-> > > > the old code (in iomap_dio_bio_iter), did:
-> > > > 
-> > > >         if ((pos | length | align) & ((1 << blkbits) - 1))
-> > > >                 return -EINVAL;
-> > > > 
-> > > > With blkbits equal to 12, the resulting mask was 0x0fff against
-> > > > an
-> > > > align value (from iov_iter_alignment) of x200 kicks us out.
-> > > > 
-> > > > The new code (in iov_iter_aligned_iovec), meanwhile, compares
-> > > > this:
-> > > > 
-> > > >                 if ((unsigned long)(i->iov[k].iov_base + skip)
-> > > > &
-> > > > addr_mask)
-> > > >                         return false;
-> > > > 
-> > > > iov_base (and the output of the old iov_iter_aligned_iovec()
-> > > > routine)
-> > > > is x200, but since addr_mask is x1ff this check provides a
-> > > > different
-> > > > response than it used to.
-> > > > 
-> > > > To check this, I changed the comparator to len_mask (almost
-> > > > certainly
-> > > > not the right answer since addr_mask is then unused, but it was
-> > > > good
-> > > > for a quick test), and our PV guests are able to boot again
-> > > > with
-> > > > -next
-> > > > running in the host.  
-> > > 
-> > > This raises more questions for me. It sounds like your process
-> > > used
-> > > to get an
-> > > EINVAL error, and it wants to continue getting an EINVAL error
-> > > instead of
-> > > letting the direct-io request proceed. Is that correct? 
+Hi Ming,
 
-Sort of. In the working case, I see a set of iovecs come through with
-different counts:
-
-base	count
-0000	0001
-0000	0200
-0000	0400
-0000	0800
-0000	1000
-0001	1000
-0200	1000 << Change occurs here
-0400	1000
-0800	1000
-1000	1000
-
-EINVAL was being returned for any of these iovecs except the page-
-aligned ones. Once the x200 request returns 0, the remainder of the
-above list was skipped and the requests continue elsewhere on the file.
-
-Still not sure how our request is getting us into this process. We're
-simply asking to read a single block, but that's somewhere within an
-image file.
-
-> > 
-> > Is my understanding as well. But I'm not familiar enough with the
-> > code to
-> > tell where and how that -EINVAL gets handled.
-> > 
-> > BTW let me just point out that the bounce buffering via swiotlb
-> > needed
-> > for PV is not unlikely to mess up the alignment of things. But I'm
-> > not
-> > sure if that is relevant here.
-
-It's true that PV guests were the first to trip over this, but I've
-since been able to reproduce this with a normal guest. So long as the
-image file is connected with cache.direct=true, it's unbootable. That
-should absolve the swiotlb bits from being at fault here.
-
-> > 
-> > Regards,
-> > Halil
-> > 
-> > > If so, could you
-> > > provide more details on what issue occurs with dispatching this
-> > > request?
+On 2022/6/27 23:29, Ming Lei wrote:
+> Hi Ziyang,
 > 
-> This error occurs reading the initial boot record for a guest,
-> stating
-> QEMU was unable to read block zero from the device. The code that
-> complains doesn't appear to have anything that says "oh, got EINVAL,
-> try it this other way" but I haven't chased down if/where something
-> in
-> between is expecting that and handling it in some unique way. I
-> -think-
->  I have an easier reproducer now, so maybe I'd be able to get a
-> better
-> answer to this question.
+> On Mon, Jun 27, 2022 at 04:20:55PM +0800, Ziyang Zhang wrote:
+>> Hi Ming,
+>>
+>> We are learning your ubd code and developing a library: libubd for ubd.
+>> This article explains why we need libubd and how we design it.
+>>
+>> Related threads:
+>> (1) https://lore.kernel.org/all/Yk%2Fn7UtGK1vVGFX0@T590/
+>> (2) https://lore.kernel.org/all/YnDhorlKgOKiWkiz@T590/
+>> (3) https://lore.kernel.org/all/20220509092312.254354-1-ming.lei@redhat.com/
+>> (4) https://lore.kernel.org/all/20220517055358.3164431-1-ming.lei@redhat.com/
+>>
+>>
+>> Userspace block driver(ubd)[1], based on io_uring passthrough,
+>> allows users to define their own backend storage in userspace
+>> and provides block devices such as /dev/ubdbX.
+>> Ming Lei has provided kernel driver code: ubd_drv.c[2]
+>> and userspace code: ubdsrv[3].
+>>
+>> ubd_drv.c simply passes all blk-mq IO requests
+>> to ubdsrv through io_uring sqes/cqes. We think the kernel code
+>> is pretty well-designed.
+>>
+>> ubdsrv is implemented by a single daemon
+>> and target(backend) IO handling(null_tgt and loop_tgt) 
+>> is embedded in the daemon. 
+>> While trying ubdsrv, we find ubdsrv is hard to be used 
+>> by our backend.
 > 
-> > > If you really need to restrict address' alignment to the
-> > > storage's
-> > > logical
-> > > block size, I think your storage driver needs to set the
-> > > dma_alignment queue
-> > > limit to that value.
+> ubd is supposed to provide one generic framework for user space block
+> driver, and it can be used for doing lots of fun/useful thing.
 > 
-> It's possible that there's a problem in the virtio stack here, but
-> the
-> failing configuration is a qcow image on the host rootfs
+> If I understand correctly, this isn't same with your use case:
+> 
+> 1) your user space block driver isn't generic, and should be dedicated
+> for Alibaba's uses
+> 
+> 2) your case has been there for long time, and you want to switch from other
+> approach(maybe tcmu) to ubd given ubd has better performance.
+> 
 
-(on an ext4 filesystem)
+Yes, you are correct :)
+The idea of design libubd is actually from libtcmu.
 
-> , so it's not
-> using any distinct driver. The bdev request queue that ends up being
-> used is the same allocated out of blk_alloc_queue, so changing
-> dma_alignment there wouldn't work.
+We do have some userspace storage system as the IO handling backend, 
+and we need ubd to provide block drivers such as /dev/ubdbX for up layer client apps.
 
+
+I think your motivation is that provides a complete user block driver to users
+and they DO NOT change any code.
+Users DO change their code using libubd for embedding libubd into the backend.
+
+
+>> First is description of our backend:
+>>
+>> (1) a distributing system sends/receives IO requests 
+>>     through network.
+>>
+>> (2) The system use RPC calls among hundreds of
+>>      storage servers and RPC calls are associated with data buffers
+>>      allocated from a memory pool.
+>>
+>> (3) On each server for each device(/dev/vdX), our backend runs
+>>      many threads to handle IO requests and manage the device. 
+>>
+>> Second are reasons why ubdsrv is hard to use for us:
+>>
+>> (1) ubdsrv requires the target(backend) issues IO requests
+>>     to the io_uring provided by ubdsrv but our backend 
+>>     uses something like RPC and does not support io_uring.
+> 
+> As one generic framework, the io command has to be io_uring
+> passthrough, and the io doesn't have to be handled by io_uring.
+
+Yes, our backend define its own communicating method.
+
+> 
+> But IMO io_uring is much more efficient, so I'd try to make async io
+> (io uring) as the 1st citizen in the framework, especially for new
+> driver.
+> 
+> But it can support other way really, such as use io_uring with eventfd,
+> the other userspace context can handle io, then wake up io_uring context
+> via eventfd. You may not use io_uring for handling io, but you still
+> need to communicate with the context for handling io_uring passthrough
+> command, and one mechanism(such as eventfd) has to be there for the
+> communication.
+
+Ok, eventfd may be helpful. 
+If you read my API, you may find ubdlib_complete_io_request().
+I think the backend io worker thread can call this function to tell the 
+ubd queue thread(the io_uring context in it) to commit the IO.
+
+
+
+> 
+>>
+>> (2) ubdsrv forks a daemon and it takes over everything.
+>>     Users should type "list/stop/del" ctrl-commands to interact with
+>>     the daemon. It is inconvenient for our backend
+>>     because it has threads(from a C++ thread library) running inside.
+> 
+> No, list/stop/del won't interact with the daemon, and the per-queue
+> pthread is only handling IO commands(io_uring passthrough) and IO request.
+> 
+
+
+Sorry I made a mistake.
+
+I mean from user's view, 
+he has to type list/del/stop from cmdlind to control the daemon.
+(I know the control flow is cmdline-->ubd_drv.c-->ubdsrv daemon).
+
+This is a little weird if we try to make a ubd library.
+So I actually provides APIs in libubd for users to do these list/del/stop works.
+
+
+>>
+>> (3) ubdsrv PRE-allocates internal data buffers for each ubd device.
+>>     The data flow is:
+>>     bio vectors <-1-> ubdsrv data buffer <-2-> backend buffer(our RPC buffer).
+>>     Since ubdsrv does not export its internal data buffer to backend,
+>>     the second copy is unavoidable. 
+>>     PRE-allocating data buffer may not be a good idea for wasting memory
+>>     if there are hundreds of ubd devices(/dev/ubdbX).
+> 
+> The preallocation is just virtual memory, which is cheap and not pinned, but
+> ubdsrv does support buffer provided by io command, see:
+> 
+> https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
+
+Actually I discussed on the design of pre-allocation in your RFC patch for ubd_drv
+but you did not reply :)
+
+I paste it here:
+
+"I am worried about the fixed-size(size is max io size, 256KiB) pre-allocated data buffers in UBDSRV
+may consume too much memory. Do you mean these pages can be reclaimed by sth like madvise()?
+If (1)swap is not set and (2)madvise() is not called, these pages may not be reclaimed."
+
+I observed that your ubdsrv use posix_memalign() to pre-allocate data buffers, 
+and I have already noticed the memory cost while testing your ubdsrv with hundreds of /dev/ubdbX.
+
+Another IMPORTANT problem is your commit:
+https://github.com/ming1/linux/commit/0a964a1700e11ba50227b6d633edf233bdd8a07d
+may be not helpful for WRITE requests if I understand correctly.
+
+Consider this data flow:
+
+1. ubdsrv commits an IO req(req1, a READ req).
+
+2. ubdsrv issues a sqe(UBD_IO_COMMIT_AND_FETCH_REQ), and sets io->addr to addr1.
+   addr1 is the addr of buffer user passed.
+   
+
+3. ubd gets the sqe and commits req1, sets io->addr to addr1.
+
+4. ubd gets IO req(req2, a WRITE req) from blk-mq(queue_rq) and commit a cqe.
+
+5. ubd copys data to be written from biovec to addr1 in a task_work.
+
+6. ubdsrv gets the cqe and tell the IO target to handle req2.
+
+7. IO target handles req2. It is a WRITE req so target issues a io_uring write
+   cmd(with buffer set to addr1).
+
+
+
+The problem happens in 5). You cannot know the actual data_len of an blk-mq req
+until you get one in queue_rq. So length of addr1 may be less than data_len.
+> 
+>>
+>> To better use ubd in more complicated scenarios, we have developed libubd.
+>> It does not assume implementation of backend and can be embedded into it.
+>> We refer to the code structure of tcmu-runner[4], 
+>> which includes a library(libtcmu) for users 
+>> to embed tcmu-runner inside backend's code. 
+>> It:
+>>
+>> (1) Does not fork/pthread_create but embedded in backend's threads
+> 
+> That is because your backend may not use io_uring, I guess.
+> 
+> But it is pretty easy to move the decision of creating pthread to target
+> code, which can be done in the interface of .prepare_target().
+
+I think the library should not create any thread if we want a libubd.
+
+> 
+>>
+>> (2) Provides libubd APIs for backend to add/delete ubd devices 
+>>     and fetch/commit IO requests
+> 
+> The above could be the main job of libubd.
+
+indeed.
+
+> 
+>>
+>> (3) simply passes backend-provided data buffers to ubd_drv.c in kernel,
+>>     since the backend actually has no knowledge 
+>>     on incoming data size until it gets an IO descriptor.
+> 
+> I can understand your requirement, not look at your code yet, but libubd
+> should be pretty thin from function viewpoint, and there are lots of common
+> things to abstract/share among all drivers, please see recent ubdsrv change:
+> 
+> https://github.com/ming1/ubdsrv/commits/master
+> 
+> in which:
+> 	- coroutine is added for handling target io
+> 	- the target interface(ubdsrv_tgt_type) has been cleaned/improved for
+> 	supporting complicated target
+> 	- c++ support
+
+Yes, I have read your coroutine code but I am not an expert of C++ 20.:(
+I think it is actually target(backend) design and ubd should not assume 
+how the backend handle IOs. 
+
+The work ubd in userspace has to be done is:
+
+1) give some IO descriptors to backend, such as ubd_get_io_requests()
+
+2) get IO completion form backend, such as ubd_complete_io_requests()
+
+
+
+> 
+> IMO, libubd isn't worth of one freshly new project, and it could be integrated
+> into ubdsrv easily. The potential users could be existed usersapce
+> block driver projects.
+
+Yes, so many userspace storage systems can use ubd!
+You may look at tcmu-runner. It:
+
+1) provides a library(libtcmu.c) for those who have a existing backend.
+
+2) provides a runner(main.c in tcmu-runner) like your ubdsrv 
+   for those who just want to run it. 
+   And the runner is build on top of libtcmu.
+
+> 
+> If you don't object, I am happy to co-work with you to add the support
+> for libubd in ubdsrv, then we can avoid to invent a wheel
+
++1 :)
+
+> 
+>>
+>> Note: 
+>>
+>> (1) libubd is just a POC demo and is not stick to the principles of
+>>     designing a library and we are still developing it now...
+>>
+>> (2) The repo[5] including some useful examples using libubd. 
+>>
+>> (3) We modify the kernel part: ubd_drv.c and 
+>>     it[6] is against Ming Lei's newest branch[2]
+>>     because we forked our branch from his early branch
+>>     (v5.17-ubd-dev).
+> 
+> Please look at the following tree for ubd driver:
+> 
+> https://github.com/ming1/linux/tree/my_for-5.19-ubd-devel_v3
+> 
+> in which most of your change should have been there already.
+> 
+> I will post v3 soon, please feel free to review after it is out and
+> see if it is fine for you.
+
+Yes, I have read your newest branch.
+You use some task_work() functions in ubd_drv.c 
+for error-handling such as aborting IO.
+
+But I find they are too complicated to understand 
+and it's hard to write libubd code in this branch.
+
+So I choose your first(easiest to understand)
+version: v5.17-ubd-dev.
+
+Thanks,
+Zhang.
+
+> 
+> 
+> Thanks,
+> Ming
