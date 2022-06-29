@@ -2,50 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C00C43334
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 21:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51648C43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 21:55:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230128AbiF2VzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 17:55:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
+        id S230149AbiF2VzU (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 17:55:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56050 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiF2VzR (ORCPT
+        with ESMTP id S229540AbiF2VzT (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 17:55:17 -0400
-Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3DC20F6F
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:16 -0700 (PDT)
-Received: by mail-qv1-f45.google.com with SMTP id 59so26975195qvb.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:16 -0700 (PDT)
+        Wed, 29 Jun 2022 17:55:19 -0400
+Received: from mail-qv1-f44.google.com (mail-qv1-f44.google.com [209.85.219.44])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B6C20F7A
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:18 -0700 (PDT)
+Received: by mail-qv1-f44.google.com with SMTP id i17so26866529qvo.13
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references;
-        bh=aea/5SE2fqdgOQZcTcu0s6QMHRrZWr3dDOv9618JjIw=;
-        b=mtCOlDelsA57V8hOQLOt/uDX+XImwBrh6Orr/ntf9cmmmNwq+TlOPUfeuhzhC7Qnra
-         Jh4Xs7v3BLmPtoB+QvJFKlQ1zZArW0rdYL1qvz2o3a/5WtMCp8vg6Zw7eEl6yE6UUvPS
-         pqN3H88kqSOzYxOFpCPgvffXm6m1wsZLb2RqDCz4MLfV5x0mgmcVwsJZNkwK2SaU4xrT
-         3nS8pk9lkPK6CTIQosmoF0qg7xZUqZK63DIaXYNTNMopE2n1phFZpmtL7dTdNd2SU4Mp
-         irK9dE3hE7bfy+Me/Ds10kCeMrjWCRMI9Psraw8IXeWRH3MVH2ryV3qcrRYQ5etRb1+m
-         zEKg==
-X-Gm-Message-State: AJIora9KXaJWG3iAHh8UfF6b4YvIhIQtiCS4MaqEKcWSf2lD2Jkx8HQj
-        08hfvh2RRhXwTtwhhnkQ1aZa
-X-Google-Smtp-Source: AGRyM1viI+CzApaPiScSoPhn3qnTdzxpeun+Zl6mSNYXOZ5ELYg64jnA9NzY6PKXq79JEpKAbuW0fw==
-X-Received: by 2002:ac8:7f16:0:b0:31b:f6dd:abf with SMTP id f22-20020ac87f16000000b0031bf6dd0abfmr4475170qtk.523.1656539715930;
-        Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
+        bh=V4WIFv6/9QXGVzve1iZ5cllAkxMnd3EqiiDqn4ywaWQ=;
+        b=Er+t5ani2X586X3tkimy+/iHuOsgu1GQDzSzHH1OIhIenfjDIEx9nusjsM6WS7CIG7
+         UX8TK6DHGHT6LrczyA6qgjKt5qIIFZ4DAMK6fyl0UvRuNot2EH1Lfgc5fW/N4GjkLz/c
+         hXoGGZya32QmyWcni4zDIjVWBVuOAHKgnto1RlkHmLxiQwPQ2G/s1SbNLKX5Tr+LhJbx
+         Hey3xsGV/beql+AqXWP230rIKT/F/k3TWWxngA82RIXsjqWHepl1c4Myf6O2U4mcAD3C
+         VY3Kra2V8CDa+FUTGZiEBRgAuBHBMNGk17gYh7KtvQ1iKzgi6rN7zPHnpUJpogSZ/lWA
+         cFOQ==
+X-Gm-Message-State: AJIora+YVf+Ds4NjZiSFsgby9kpT9RLfzlx60UdkFAWWWXN+B9VVVY56
+        wq3CN7WIgrguhog85QojqLeK
+X-Google-Smtp-Source: AGRyM1vGP9ahroRWPNKQa7zd/OIuNTTAvBPPSN2YXnBSN34bn4JkRZL5yT1XQccXSE5zVzjuDecwkg==
+X-Received: by 2002:ad4:5aad:0:b0:472:7486:31ac with SMTP id u13-20020ad45aad000000b00472748631acmr9924010qvg.75.1656539717461;
+        Wed, 29 Jun 2022 14:55:17 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id v22-20020ac87496000000b003051f450049sm11532659qtq.8.2022.06.29.14.55.15
+        by smtp.gmail.com with ESMTPSA id u4-20020a05620a430400b006a6d7c3a82esm13743481qko.15.2022.06.29.14.55.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
+        Wed, 29 Jun 2022 14:55:17 -0700 (PDT)
 From:   Mike Snitzer <snitzer@kernel.org>
 To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
 Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
         Eric Biggers <ebiggers@google.com>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 5.20 v2 1/3] dm: improve BLK_STS_DM_REQUEUE and BLK_STS_AGAIN handling
-Date:   Wed, 29 Jun 2022 17:55:11 -0400
-Message-Id: <20220629215513.37860-2-snitzer@kernel.org>
+Subject: [PATCH 5.20 v2 2/3] block: add bio_rewind() API
+Date:   Wed, 29 Jun 2022 17:55:12 -0400
+Message-Id: <20220629215513.37860-3-snitzer@kernel.org>
 X-Mailer: git-send-email 2.15.0
 In-Reply-To: <20220629215513.37860-1-snitzer@kernel.org>
 References: <20220629215513.37860-1-snitzer@kernel.org>
@@ -55,130 +55,296 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 From: Ming Lei <ming.lei@redhat.com>
 
-If either BLK_STS_DM_REQUEUE or BLK_STS_AGAIN is returned for POLLED
-io, we requeue the original bio into deferred list and kick md->wq to
-re-submit it to block layer.
+Commit 7759eb23fd98 ("block: remove bio_rewind_iter()") removes
+the similar API because the following reasons:
 
-Improve the handling in the following way:
+    ```
+    It is pointed that bio_rewind_iter() is one very bad API[1]:
 
-1) Factor out dm_handle_requeue() for handling dm_io requeue.
+    1) bio size may not be restored after rewinding
 
-2) Unify handling for BLK_STS_DM_REQUEUE and BLK_STS_AGAIN: clear
-   REQ_POLLED for BLK_STS_DM_REQUEUE too, for the sake of simplicity,
-   given BLK_STS_DM_REQUEUE is very unusual.
+    2) it causes some bogus change, such as 5151842b9d8732 (block: reset
+    bi_iter.bi_done after splitting bio)
 
-3) Queue md->wq explicitly in dm_handle_requeue(), so requeue handling
-   becomes more robust.
+    3) rewinding really makes things complicated wrt. bio splitting
+
+    4) unnecessary updating of .bi_done in fast path
+
+    [1] https://marc.info/?t=153549924200005&r=1&w=2
+
+    So this patch takes Kent's suggestion to restore one bio into its original
+    state via saving bio iterator(struct bvec_iter) in bio_integrity_prep(),
+    given now bio_rewind_iter() is only used by bio integrity code.
+    ```
+
+However, saving off a copy of the 32 bytes bio->bi_iter in case rewind
+needed isn't efficient because it bloats per-bio-data for what is an
+unlikely case. That suggestion also ignores the need to restore
+crypto and integrity info.
+
+Add bio_rewind() API for a specific use-case that is much more narrow
+than the previous more generic rewind code that was reverted:
+
+1) most bios have a fixed end sector since bio split is done from front
+   of the bio, if driver just records how many sectors between current
+   bio's start sector and the original bio's end sector, the original
+   position can be restored. Keeping the original bio's end sector
+   fixed is a _hard_ requirement for this bio_rewind() interface!
+
+2) if a bio's end sector won't change (usually bio_trim() isn't
+   called, or in the case of DM it preserves original bio), user can
+   restore original position by the storing sector offset from the
+   current ->bi_iter.bi_sector to bio's end sector; together with
+   saving bio size, only 8 bytes is needed to restore to original
+   bio.
+
+3) DM's requeue use case: when BLK_STS_DM_REQUEUE happens, DM core
+   needs to restore to an "original bio" which represents the current
+   dm_io to be requeued (which may be a subset of the original bio).
+   By storing the sector offset from the original bio's end sector and
+   dm_io's size, bio_rewind() can restore such original bio. See
+   commit 7dd76d1feec7 ("dm: improve bio splitting and associated IO
+   accounting") for more details on how DM does this. Leveraging this,
+   allows DM core to shift the need for bio cloning from bio-split
+   time (during IO submission) to the less likely BLK_STS_DM_REQUEUE
+   handling (after IO completes with that error).
+
+4) Unlike the original rewind API, bio_rewind() doesn't add .bi_done
+   to bvec_iter and there is no effect on the fast path.
+
+Implement bio_wind() by factoring out clear helpers that it calls:
+bio_integrity_rewind, bio_crypt_rewind and bio_rewind_iter.
 
 Signed-off-by: Ming Lei <ming.lei@redhat.com>
 Signed-off-by: Mike Snitzer <snitzer@kernel.org>
 ---
- drivers/md/dm.c | 70 ++++++++++++++++++++++++++++++++++++---------------------
- 1 file changed, 45 insertions(+), 25 deletions(-)
+ block/bio-integrity.c       | 19 +++++++++++++++++++
+ block/bio.c                 | 20 ++++++++++++++++++++
+ block/blk-crypto-internal.h |  7 +++++++
+ block/blk-crypto.c          | 25 +++++++++++++++++++++++++
+ include/linux/bio.h         | 21 +++++++++++++++++++++
+ include/linux/bvec.h        | 33 +++++++++++++++++++++++++++++++++
+ 6 files changed, 125 insertions(+)
 
-diff --git a/drivers/md/dm.c b/drivers/md/dm.c
-index 84929bd137d0..c987f9ad24a4 100644
---- a/drivers/md/dm.c
-+++ b/drivers/md/dm.c
-@@ -880,22 +880,41 @@ static int __noflush_suspending(struct mapped_device *md)
- 	return test_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
+diff --git a/block/bio-integrity.c b/block/bio-integrity.c
+index 32929c89ba8a..06c2fe81fdf2 100644
+--- a/block/bio-integrity.c
++++ b/block/bio-integrity.c
+@@ -378,6 +378,25 @@ void bio_integrity_advance(struct bio *bio, unsigned int bytes_done)
+ 	bvec_iter_advance(bip->bip_vec, &bip->bip_iter, bytes);
  }
  
--static void dm_io_complete(struct dm_io *io)
-+/*
-+ * Return true if the dm_io's original bio is requeued.
-+ * io->status is updated with error if requeue disallowed.
++/**
++ * bio_integrity_rewind - Rewind integrity vector
++ * @bio:	bio whose integrity vector to update
++ * @bytes_done:	number of data bytes to rewind
++ *
++ * Description: This function calculates how many integrity bytes the
++ * number of completed data bytes correspond to and rewind the
++ * integrity vector accordingly.
 + */
-+static bool dm_handle_requeue(struct dm_io *io)
- {
--	blk_status_t io_error;
--	struct mapped_device *md = io->md;
- 	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
-+	bool handle_requeue = (io->status == BLK_STS_DM_REQUEUE);
-+	bool handle_polled_eagain = ((io->status == BLK_STS_AGAIN) &&
-+				     (bio->bi_opf & REQ_POLLED));
-+	struct mapped_device *md = io->md;
-+	bool requeued = false;
- 
--	if (io->status == BLK_STS_DM_REQUEUE) {
-+	if (handle_requeue || handle_polled_eagain) {
- 		unsigned long flags;
++void bio_integrity_rewind(struct bio *bio, unsigned int bytes_done)
++{
++	struct bio_integrity_payload *bip = bio_integrity(bio);
++	struct blk_integrity *bi = blk_get_integrity(bio->bi_bdev->bd_disk);
++	unsigned bytes = bio_integrity_bytes(bi, bytes_done >> 9);
 +
-+		if (bio->bi_opf & REQ_POLLED) {
-+			/*
-+			 * Upper layer won't help us poll split bio
-+			 * (io->orig_bio may only reflect a subset of the
-+			 * pre-split original) so clear REQ_POLLED.
-+			 */
-+			bio_clear_polled(bio);
-+		}
-+
- 		/*
--		 * Target requested pushing back the I/O.
-+		 * Target requested pushing back the I/O or
-+		 * polled IO hit BLK_STS_AGAIN.
- 		 */
- 		spin_lock_irqsave(&md->deferred_lock, flags);
--		if (__noflush_suspending(md) &&
--		    !WARN_ON_ONCE(dm_is_zone_write(md, bio))) {
--			/* NOTE early return due to BLK_STS_DM_REQUEUE below */
-+		if ((__noflush_suspending(md) &&
-+		     !WARN_ON_ONCE(dm_is_zone_write(md, bio))) ||
-+		    handle_polled_eagain) {
- 			bio_list_add_head(&md->deferred, bio);
-+			requeued = true;
- 		} else {
- 			/*
- 			 * noflush suspend was interrupted or this is
-@@ -906,6 +925,21 @@ static void dm_io_complete(struct dm_io *io)
- 		spin_unlock_irqrestore(&md->deferred_lock, flags);
- 	}
- 
-+	if (requeued)
-+		queue_work(md->wq, &md->work);
-+
-+	return requeued;
++	bip->bip_iter.bi_sector -= bio_integrity_intervals(bi, bytes_done >> 9);
++	bvec_iter_rewind(bip->bip_vec, &bip->bip_iter, bytes);
 +}
 +
-+static void dm_io_complete(struct dm_io *io)
+ /**
+  * bio_integrity_trim - Trim integrity vector
+  * @bio:	bio whose integrity vector to update
+diff --git a/block/bio.c b/block/bio.c
+index 933ea3210954..38a4ad757777 100644
+--- a/block/bio.c
++++ b/block/bio.c
+@@ -1348,6 +1348,26 @@ void __bio_advance(struct bio *bio, unsigned bytes)
+ }
+ EXPORT_SYMBOL(__bio_advance);
+ 
++/**
++ * bio_rewind - update ->bi_iter of @bio by rewinding @bytes.
++ * @bio: bio to rewind
++ * @bytes: how many bytes to rewind
++ *
++ * WARNING:
++ * Caller must ensure that @bio has a fixed end sector, to allow
++ * rewinding from end of bio and restoring its original position.
++ * Caller is also responsibile for restoring bio's size.
++ */
++void bio_rewind(struct bio *bio, unsigned bytes)
 +{
-+	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
-+	struct mapped_device *md = io->md;
-+	blk_status_t io_error;
-+	bool requeued;
++	if (bio_integrity(bio))
++		bio_integrity_rewind(bio, bytes);
 +
-+	requeued = dm_handle_requeue(io);
++	bio_crypt_rewind(bio, bytes);
++	bio_rewind_iter(bio, &bio->bi_iter, bytes);
++}
++EXPORT_SYMBOL(bio_rewind);
 +
- 	io_error = io->status;
- 	if (dm_io_flagged(io, DM_IO_ACCOUNTED))
- 		dm_end_io_acct(io);
-@@ -925,23 +959,9 @@ static void dm_io_complete(struct dm_io *io)
- 	if (unlikely(wq_has_sleeper(&md->wait)))
- 		wake_up(&md->wait);
+ void bio_copy_data_iter(struct bio *dst, struct bvec_iter *dst_iter,
+ 			struct bio *src, struct bvec_iter *src_iter)
+ {
+diff --git a/block/blk-crypto-internal.h b/block/blk-crypto-internal.h
+index e6818ffaddbf..b723599bbf99 100644
+--- a/block/blk-crypto-internal.h
++++ b/block/blk-crypto-internal.h
+@@ -114,6 +114,13 @@ static inline void bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ 		__bio_crypt_advance(bio, bytes);
+ }
  
--	if (io_error == BLK_STS_DM_REQUEUE || io_error == BLK_STS_AGAIN) {
--		if (bio->bi_opf & REQ_POLLED) {
--			/*
--			 * Upper layer won't help us poll split bio (io->orig_bio
--			 * may only reflect a subset of the pre-split original)
--			 * so clear REQ_POLLED in case of requeue.
--			 */
--			bio_clear_polled(bio);
--			if (io_error == BLK_STS_AGAIN) {
--				/* io_uring doesn't handle BLK_STS_AGAIN (yet) */
--				queue_io(md, bio);
--				return;
--			}
--		}
--		if (io_error == BLK_STS_DM_REQUEUE)
--			return;
--	}
-+	/* Return early if the original bio was requeued */
-+	if (requeued)
-+		return;
++void __bio_crypt_rewind(struct bio *bio, unsigned int bytes);
++static inline void bio_crypt_rewind(struct bio *bio, unsigned int bytes)
++{
++	if (bio_has_crypt_ctx(bio))
++		__bio_crypt_rewind(bio, bytes);
++}
++
+ void __bio_crypt_free_ctx(struct bio *bio);
+ static inline void bio_crypt_free_ctx(struct bio *bio)
+ {
+diff --git a/block/blk-crypto.c b/block/blk-crypto.c
+index a496aaef85ba..e3584b5a6822 100644
+--- a/block/blk-crypto.c
++++ b/block/blk-crypto.c
+@@ -134,6 +134,23 @@ void bio_crypt_dun_increment(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
+ 	}
+ }
  
- 	if (bio_is_flush_with_data(bio)) {
- 		/*
++/* Decrements @dun by @dec, treating @dun as a multi-limb integer. */
++void bio_crypt_dun_decrement(u64 dun[BLK_CRYPTO_DUN_ARRAY_SIZE],
++			     unsigned int dec)
++{
++	int i;
++
++	for (i = 0; dec && i < BLK_CRYPTO_DUN_ARRAY_SIZE; i++) {
++		u64 prev = dun[i];
++
++		dun[i] -= dec;
++		if (dun[i] > prev)
++			dec = 1;
++		else
++			dec = 0;
++	}
++}
++
+ void __bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ {
+ 	struct bio_crypt_ctx *bc = bio->bi_crypt_context;
+@@ -142,6 +159,14 @@ void __bio_crypt_advance(struct bio *bio, unsigned int bytes)
+ 				bytes >> bc->bc_key->data_unit_size_bits);
+ }
+ 
++void __bio_crypt_rewind(struct bio *bio, unsigned int bytes)
++{
++	struct bio_crypt_ctx *bc = bio->bi_crypt_context;
++
++	bio_crypt_dun_decrement(bc->bc_dun,
++				bytes >> bc->bc_key->data_unit_size_bits);
++}
++
+ /*
+  * Returns true if @bc->bc_dun plus @bytes converted to data units is equal to
+  * @next_dun, treating the DUNs as multi-limb integers.
+diff --git a/include/linux/bio.h b/include/linux/bio.h
+index 992ee987f273..4e6674f232b4 100644
+--- a/include/linux/bio.h
++++ b/include/linux/bio.h
+@@ -105,6 +105,19 @@ static inline void bio_advance_iter(const struct bio *bio,
+ 		/* TODO: It is reasonable to complete bio with error here. */
+ }
+ 
++static inline void bio_rewind_iter(const struct bio *bio,
++				    struct bvec_iter *iter, unsigned int bytes)
++{
++	iter->bi_sector -= bytes >> 9;
++
++	/* No advance means no rewind */
++	if (bio_no_advance_iter(bio))
++		iter->bi_size += bytes;
++	else
++		bvec_iter_rewind(bio->bi_io_vec, iter, bytes);
++		/* TODO: It is reasonable to complete bio with error here. */
++}
++
+ /* @bytes should be less or equal to bvec[i->bi_idx].bv_len */
+ static inline void bio_advance_iter_single(const struct bio *bio,
+ 					   struct bvec_iter *iter,
+@@ -119,6 +132,7 @@ static inline void bio_advance_iter_single(const struct bio *bio,
+ }
+ 
+ void __bio_advance(struct bio *, unsigned bytes);
++void bio_rewind(struct bio *, unsigned bytes);
+ 
+ /**
+  * bio_advance - increment/complete a bio by some number of bytes
+@@ -699,6 +713,7 @@ extern struct bio_integrity_payload *bio_integrity_alloc(struct bio *, gfp_t, un
+ extern int bio_integrity_add_page(struct bio *, struct page *, unsigned int, unsigned int);
+ extern bool bio_integrity_prep(struct bio *);
+ extern void bio_integrity_advance(struct bio *, unsigned int);
++extern void bio_integrity_rewind(struct bio *, unsigned int);
+ extern void bio_integrity_trim(struct bio *);
+ extern int bio_integrity_clone(struct bio *, struct bio *, gfp_t);
+ extern int bioset_integrity_create(struct bio_set *, int);
+@@ -739,6 +754,12 @@ static inline void bio_integrity_advance(struct bio *bio,
+ 	return;
+ }
+ 
++static inline void bio_integrity_rewind(struct bio *bio,
++					 unsigned int bytes_done)
++{
++	return;
++}
++
+ static inline void bio_integrity_trim(struct bio *bio)
+ {
+ 	return;
+diff --git a/include/linux/bvec.h b/include/linux/bvec.h
+index 35c25dff651a..b56d92e939c1 100644
+--- a/include/linux/bvec.h
++++ b/include/linux/bvec.h
+@@ -122,6 +122,39 @@ static inline bool bvec_iter_advance(const struct bio_vec *bv,
+ 	return true;
+ }
+ 
++static inline bool bvec_iter_rewind(const struct bio_vec *bv,
++				     struct bvec_iter *iter,
++				     unsigned int bytes)
++{
++	int idx;
++
++	iter->bi_size += bytes;
++	if (bytes <= iter->bi_bvec_done) {
++		iter->bi_bvec_done -= bytes;
++		return true;
++	}
++
++	bytes -= iter->bi_bvec_done;
++	idx = iter->bi_idx - 1;
++
++	while (idx >= 0 && bytes && bytes > bv[idx].bv_len) {
++		bytes -= bv[idx].bv_len;
++		idx--;
++	}
++
++	if (WARN_ONCE(idx < 0 && bytes,
++		      "Attempted to rewind iter beyond bvec's boundaries\n")) {
++		iter->bi_size -= bytes;
++		iter->bi_bvec_done = 0;
++		iter->bi_idx = 0;
++		return false;
++	}
++
++	iter->bi_idx = idx;
++	iter->bi_bvec_done = bv[idx].bv_len - bytes;
++	return true;
++}
++
+ /*
+  * A simpler version of bvec_iter_advance(), @bytes should not span
+  * across multiple bvec entries, i.e. bytes <= bv[i->bi_idx].bv_len
 -- 
 2.15.0
 
