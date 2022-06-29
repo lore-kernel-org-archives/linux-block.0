@@ -2,100 +2,123 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3CD6C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 19:59:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7784CC43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 20:51:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229564AbiF2T7O (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 15:59:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36350 "EHLO
+        id S229745AbiF2Uvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 16:51:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230170AbiF2T7O (ORCPT
+        with ESMTP id S229698AbiF2Uvw (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 15:59:14 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21D266461
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 12:59:13 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id cs6so26505322qvb.6
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 12:59:13 -0700 (PDT)
+        Wed, 29 Jun 2022 16:51:52 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9120B3B57D
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id x1-20020a17090abc8100b001ec7f8a51f5so708483pjr.0
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VC1d/RtUMcFNbbvAAhEUHb9go0eBXP9ttr+DE79ATiQ=;
-        b=Fv23tTJ6quaYi2LvKMo1nA66eOBgrSIRnXQ+rAkmSA0P7xaPUowQc9+kNqAT0b9Hqy
-         347Zari8Q1UonhAFd94sTpPMUv90W4fKvOZEHS5c0eCIkFJMpT4eCQTpJB9zZJgacVwR
-         IVkRFpbb3J6gQdrH9QsJzK2OUmeFZLa0nWpr5yIHxyYh787HoGfeoBfhDfd3hEzYGqgF
-         NhBBdJuTwDwnQMnOBOVj70AA9GnsXiMxfdQN0CIJcb04jm7Wu12pHg9MLHGyUDuuHAXf
-         rSKnfk/47/+iaDKfuQBgdKW7j7viw9Mk5SvyKnrZzwD5QR33zLNBb/tB/9VszZqT7GyB
-         Wv9A==
+        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
+        h=content-transfer-encoding:from:mime-version:subject:date:message-id
+         :references:cc:in-reply-to:to;
+        bh=QzwBZ8MiKHCkHQs6ubFBUeLJm2aPz3uAJ0SJNl3Iybc=;
+        b=P/tFMAavejNGyZvqSFU2mkJlZXaYYqOnwQE6I2NFPUtuwMAstEtCx65ohUNqDaIZmC
+         MsAwqyZeKRs499JxkU2CIVrGDOLJdfHytpqNlZwZO48HpP/ARLFvaaL+eryw7wawM0iN
+         SPzlVDyieLswxUldskHOhk7PVNZ0u0ceT1c5GuTSafrVPdwF0Ov/UoN0H1zKGPUvGufb
+         REMdzsHYS2Oh/or4pVyCRa/EPokRPQmRzskkzw6UCXAK1euBekAvQw1VNcLY4Vr7Feo7
+         QObeSNT9u7mwtvvY1JIoh3J0NqN26L3uE6OMzymevAKChr3x5DcvYH8e19VoQ7obUreI
+         KxFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VC1d/RtUMcFNbbvAAhEUHb9go0eBXP9ttr+DE79ATiQ=;
-        b=4/u2EbeGrv49Slj5frsFR1AUq3TdQQHwrj3m700THpf8rJ765dQjTSdrQHyL58bhac
-         mU9IghongebvpEEoZ3ps3GAFOarxfGaAsMvAX64GdkuMFmjg5W6B3rse2C4ge86r2pNd
-         TQC89A7nQZxk3sXca6H4eJbydAEMlNKX4jS7PJ4Pxr59rmtfMt5lLUh5NSGIVWlT4+Ts
-         fkfncTOnv5y59Bu0VknawssCFSQZbYXl01kQKmbPd16xw4nUSmpmjJoUrwOTWIjtE9cF
-         WctTIYe/rBQpjudzxtuNUoBExxK+GNWeZclDfGfpMmxfWxJ6EUo2xola1DmaXrmGqNpn
-         0fDQ==
-X-Gm-Message-State: AJIora8tO5vSTK8nsQcz3JDeWtTi9k15jSUdZhnu/KchcJe1YLRVZ56Q
-        0Cp2IuW/oVQC/G5ggZ0ZEeUJ/9/zd/XsFTU=
-X-Google-Smtp-Source: AGRyM1uSdd9e1HeXILcCMJ3BPfsY+q4doaVEd0sI0eppLIPowfIBd2RkwQmcFci0vDsGg6DAH44Ytw==
-X-Received: by 2002:a05:6214:29ef:b0:470:b680:ad6f with SMTP id jv15-20020a05621429ef00b00470b680ad6fmr9407023qvb.80.1656532752181;
-        Wed, 29 Jun 2022 12:59:12 -0700 (PDT)
-Received: from localhost (c-73-219-103-14.hsd1.vt.comcast.net. [73.219.103.14])
-        by smtp.gmail.com with ESMTPSA id k12-20020a05620a414c00b006aefe22d75bsm13576490qko.80.2022.06.29.12.59.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 12:59:11 -0700 (PDT)
-Date:   Wed, 29 Jun 2022 15:59:10 -0400
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     Bart Van Assche <bvanassche@acm.org>
-Cc:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>,
-        Mike Snitzer <snitzer@redhat.com>, linux-block@vger.kernel.org,
-        dm-devel@redhat.com, Eric Biggers <ebiggers@google.com>,
+        h=x-gm-message-state:content-transfer-encoding:from:mime-version
+         :subject:date:message-id:references:cc:in-reply-to:to;
+        bh=QzwBZ8MiKHCkHQs6ubFBUeLJm2aPz3uAJ0SJNl3Iybc=;
+        b=oAqUMolzZ0LXgXQ18TQraNzLp6+QLtenB1s6bx19Xd4Hu06cBcN/UMRdl9oISdsruY
+         FHxHkN2NNjPJUImyIrec81njIKWnLAtb0/3rdMy1bBn46fDyhzTsy+El7GIDcMVG5Yrm
+         BZp276AF9Vm0IwS9V133e7XgO/SiaFM9IxOawyzx1kU5XwcfmVoJgsAQoPi763XHEeV3
+         GrTW7sAhKYvXlvoBUZ33cS6NINKTnfSjT2QdmDARVkbCXEmCeJscyXQPxYfeWCJrht/D
+         tRVuPlLbgN4afBAOI2qfdBqVV8rA6XK2AbiLZaFsCwoM1kS7YigbGvjK2OaOamA8YDdA
+         hzRw==
+X-Gm-Message-State: AJIora+a3U7uJ1/BMok8QNtvexPoTa8jNZwBwjBPx//N71aNh71BQb+G
+        rvv/kCJtNPKeRQJBVl1BSSStXg==
+X-Google-Smtp-Source: AGRyM1v1OkLy4OUlV7ZRW9VidqYwr1vCmgGeLPlNdNyB/wtkvJBb7FkK3KxiVGvVDMaUmxrLSBvU+A==
+X-Received: by 2002:a17:90b:1753:b0:1ef:2e75:8811 with SMTP id jf19-20020a17090b175300b001ef2e758811mr2120687pjb.22.1656535910048;
+        Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
+Received: from smtpclient.apple ([2600:380:b421:9fb9:5830:e8f6:f44a:f844])
+        by smtp.gmail.com with ESMTPSA id s9-20020a62e709000000b00527ab697c6asm6035747pfh.18.2022.06.29.13.51.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 29 Jun 2022 13:51:49 -0700 (PDT)
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From:   Jens Axboe <axboe@kernel.dk>
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
+Date:   Wed, 29 Jun 2022 14:51:48 -0600
+Message-Id: <788DCE4B-8992-436B-B0D4-D101E9176345@kernel.dk>
+References: <20220629192646.aoj5c7xdqkifwjdg@moria.home.lan>
+Cc:     Ming Lei <ming.lei@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
+        linux-block@vger.kernel.org, dm-devel@redhat.com,
+        Eric Biggers <ebiggers@google.com>,
         Dmitry Monakhov <dmonakhov@openvz.org>,
         "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
-Message-ID: <20220629195910.wi5u5pelescihorn@moria.home.lan>
-References: <20220626201458.ytn4mrix2pobm2mb@moria.home.lan>
- <Yrld9rLPY6L3MhlZ@T590>
- <20220628042016.wd65amvhbjuduqou@moria.home.lan>
- <3ad782c3-4425-9ae6-e61b-9f62f76ce9f4@kernel.dk>
- <20220628183247.bcaqvmnav34kp5zd@moria.home.lan>
- <6f8db146-d4b3-d17b-4e58-08adc0010cba@kernel.dk>
- <20220629184001.b66bt4jnppjquzia@moria.home.lan>
- <486ec9e2-d34d-abd5-8667-f58a07f5efad@acm.org>
- <20220629190540.fwspv66a4byzqxmg@moria.home.lan>
- <75aa2055-0f50-47ce-b9cc-8f79eba77807@acm.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <75aa2055-0f50-47ce-b9cc-8f79eba77807@acm.org>
+In-Reply-To: <20220629192646.aoj5c7xdqkifwjdg@moria.home.lan>
+To:     Kent Overstreet <kent.overstreet@gmail.com>
+X-Mailer: iPhone Mail (19F77)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Wed, Jun 29, 2022 at 12:37:59PM -0700, Bart Van Assche wrote:
-> On 6/29/22 12:05, Kent Overstreet wrote:
-> > On Wed, Jun 29, 2022 at 11:51:27AM -0700, Bart Van Assche wrote:
-> > > On 6/29/22 11:40, Kent Overstreet wrote:
-> > > > But Jens, to be blunt - I know we have different priorities in the way we write code.
-> > > 
-> > > Please stay professional in your communication and focus on the technical
-> > > issues instead of on the people involved.
-> > > 
-> > > BTW, I remember that some time ago I bisected a kernel bug to one of your
-> > > commits and that you refused to fix the bug introduced by that commit. I had
-> > > to spend my time on root-causing it and sending a fix upstream.
-> > 
-> > I'd be genuinely appreciative if you'd refresh my memory on what it was. Because
-> > yeah, if I did that that was my fuckup and I want to learn from my mistakes.
-> 
-> I was referring to the following two conversations from May 2018:
-> * [PATCH] Revert "block: Add warning for bi_next not NULL in bio_endio()" (https://lore.kernel.org/linux-block/20180522235505.20937-1-bart.vanassche@wdc.com/)
-> * [PATCH v2] Revert "block: Add warning for bi_next not NULL in bio_endio()" (https://lore.kernel.org/linux-block/20180619172640.15246-1-bart.vanassche@wdc.com/)
+On Jun 29, 2022, at 1:26 PM, Kent Overstreet <kent.overstreet@gmail.com> wro=
+te:
+>=20
+> =EF=BB=BFOn Wed, Jun 29, 2022 at 01:00:52PM -0600, Jens Axboe wrote:
+>>> On 6/29/22 12:40 PM, Kent Overstreet wrote:
+>>> On Wed, Jun 29, 2022 at 11:16:10AM -0600, Jens Axboe wrote:
+>>>> Not sure what Christoph change you are referring to, but all the ones
+>>>> that I did to improve the init side were all backed by numbers I ran at=
 
-And also, why did you decide to just revert instead of fixing the issue within
-DM? You had a WARN() printed, you shouldn't have needed to bisect, the commit
-message explained what was going on - but you never explained that part?
+>>>> that time (and most/all of the commit messages will have that data). So=
+
+>>>> yes, it is indeed still very noticeable. Maybe not at 100K IOPS, but at=
+
+>>>> 10M on a core it most certainly is.
+>>>=20
+>>> I was referring to 609be1066731fea86436f5f91022f82e592ab456. You
+>>> signed off on it, you must remember it...?
+>>=20
+>> I'm sure we all remember each and every commit that gets applied,
+>> particularly with such a precise description of the change.
+>>=20
+>>>> I'm all for having solid and maintainable code, obviously, but frivolou=
+s
+>>>> bloating of structures and more expensive setup cannot be hand waved
+>>>> away with "it doesn't matter if we touch 3 or 6 cachelines" because we
+>>>> obviously have a disagreement on that.
+>>>=20
+>>> I wouldn't propose inflating struct _bio_ like that. But Jens, to be
+>>> blunt - I know we have different priorities in the way we write code.
+>>> Your writeback throttling code was buggy for _ages_ and I had users
+>>> hitting deadlocks there that I pinged you about, and I could not make
+>>> heads or tails of how that code was supposed to work and not for lack
+>>> of time spent trying!
+>>=20
+>> OK Kent, you just wasted your 2nd chance here. Plonk. There are many
+>> rebuttals that could be made here, but I won't waste my time on it, nor
+>> would it be appropriate.
+>>=20
+>> Come back when you know how to act professionally. Or don't come back
+>> at all.
+>=20
+> Jens, you're just acting like your code is immune to criticism, and I don'=
+t have
+> an eyeroll big enough for that. We all know how you care about chasing eve=
+ry
+> last of those 10 million iops - and not much else.
+
+Kent, the time for your unsolicited opinions and attacks have passed. Just g=
+o away, not interested in interacting with you. You have no idea what you=E2=
+=80=99re talking about.=20
+
+
+
+
