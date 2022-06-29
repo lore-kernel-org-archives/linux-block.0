@@ -2,35 +2,35 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96870CCA480
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 15:39:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC3EDC43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 15:57:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232114AbiF2Pjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 11:39:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
+        id S234386AbiF2P5p (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 11:57:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37388 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233843AbiF2Pjc (ORCPT
+        with ESMTP id S233043AbiF2P5m (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 11:39:32 -0400
+        Wed, 29 Jun 2022 11:57:42 -0400
 Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4923936172;
-        Wed, 29 Jun 2022 08:39:30 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF598193FB;
+        Wed, 29 Jun 2022 08:57:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
         MIME-Version:Date:Message-ID:content-disposition;
-        bh=O0wtNrY7uERkcVmDzn9Qzn0QOjEuS076HETf2WzjME4=; b=fcBq3BeNtwnbwtK5Y2Ik7xDHNX
-        R2UXfuLGRfqLKYw2O//6lyhArxbX+eYSq7C1KjshVcSK35zRKyY1/m5BoX90BANeJxKsWQHWzpJfH
-        RLRIfLr01lR+my9+2IpdU/iMUoeB9400EApUEEHjJe6aaYg5O0DxWTZXa/RxPY1IK4XGp8wIPTO+B
-        n0noULDLnowj1XntvqsDZQQRPCkqagswEtT4sxIgVQ1daNBO6u/6PpMAZgin/duxNTYcVdNOEKaTU
-        0nCYR6bUVRS/Ok2+w20mNj06bY59NCDNF5cCXwNLFbRetVx9eUzGy9o9+U3YM2hjMTGWYbrJXVGen
-        0sKA+1AQ==;
+        bh=SVR0l1hJUb/SHapAzG2atHABZ/RRitWr1nc+ar7tRXg=; b=QyUF4DUaaZjROkuPI+1suf1xXG
+        iYuJIT9YMfYCt00rup88G3A2fOs1LDo7hhHgWo0Ohlqb76yxSlp/vgMGwxd7TW5fYAkKL79lyXLKw
+        X+zSU/4jS/f4D/m/J9gbb/UReLJ00H6u78LPJthJAR+juKfGgM94nvaKgzerE3D/pFN6SnvVDAoyK
+        eto6eEiUJPslncF4lPynUlCOC3+9GHp8EcwRnCzPOaGuxwS0LB6WUPHazf3fFRXCJnGM+lmx17Hax
+        rUH3mIYEFd4d/GhL3bWSdTf7itMjRaQRx0P2J2yU7oU/L88BMNHKeWYzP16i2n7FzmTTvUtv5REt6
+        VgBg577w==;
 Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
         by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <logang@deltatee.com>)
-        id 1o6Zmm-002RkM-SQ; Wed, 29 Jun 2022 09:39:25 -0600
-Message-ID: <c42b5ee3-5d4f-7e44-8885-26b8417208ae@deltatee.com>
-Date:   Wed, 29 Jun 2022 09:39:14 -0600
+        id 1o6a4O-002RwK-3q; Wed, 29 Jun 2022 09:57:37 -0600
+Message-ID: <f56181fb-7035-a775-22b1-77f97d6ec52c@deltatee.com>
+Date:   Wed, 29 Jun 2022 09:57:32 -0600
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.10.0
@@ -39,37 +39,36 @@ To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
         linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
         linux-pci@vger.kernel.org, linux-mm@kvack.org,
         iommu@lists.linux-foundation.org
-Cc:     Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
+Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
         Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
         Ralph Campbell <rcampbell@nvidia.com>,
-        Chaitanya Kulkarni <kch@nvidia.com>
+        Jason Gunthorpe <jgg@nvidia.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Stephen Bates <sbates@raithlin.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Xiong Jianxin <jianxin.xiong@intel.com>
 References: <20220615161233.17527-1-logang@deltatee.com>
- <20220615161233.17527-2-logang@deltatee.com>
- <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
+ <20220615161233.17527-9-logang@deltatee.com>
+ <feecc6fe-a16e-11f2-33c8-3de7c96b9ad5@arm.com>
 From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
+In-Reply-To: <feecc6fe-a16e-11f2-33c8-3de7c96b9ad5@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 24.64.144.200
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, kch@nvidia.com
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, dave.b.minturn@intel.com, martin.oliveira@eideticom.com, rcampbell@nvidia.com, jgg@nvidia.com, jhubbard@nvidia.com, dave.hansen@linux.intel.com, willy@infradead.org, christian.koenig@amd.com, jgg@ziepe.ca, ckulkarnilinux@gmail.com, jason@jlekstrand.net, daniel.vetter@ffwll.ch, helgaas@kernel.org, dan.j.williams@intel.com, sbates@raithlin.com, ira.weiny@intel.com, hch@lst.de, jianxin.xiong@intel.com
 X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 01/21] lib/scatterlist: add flag for indicating P2PDMA
- segments in an SGL
+Subject: Re: [PATCH v7 08/21] iommu/dma: support PCI P2PDMA pages in dma-iommu
+ map_sg
 X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
 X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
@@ -79,145 +78,204 @@ X-Mailing-List: linux-block@vger.kernel.org
 
 
 
-On 2022-06-29 03:05, Robin Murphy wrote:
+On 2022-06-29 06:07, Robin Murphy wrote:
 > On 2022-06-15 17:12, Logan Gunthorpe wrote:
->> Make use of the third free LSB in scatterlist's page_link on 64bit
->> systems.
+>> When a PCI P2PDMA page is seen, set the IOVA length of the segment
+>> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
+>> apply the appropriate bus address to the segment. The IOVA is not
+>> created if the scatterlist only consists of P2PDMA pages.
 >>
->> The extra bit will be used by dma_[un]map_sg_p2pdma() to determine when a
->> given SGL segments dma_address points to a PCI bus address.
->> dma_unmap_sg_p2pdma() will need to perform different cleanup when a
->> segment is marked as a bus address.
+>> A P2PDMA page may have three possible outcomes when being mapped:
+>>    1) If the data path between the two devices doesn't go through
+>>       the root port, then it should be mapped with a PCI bus address
+>>    2) If the data path goes through the host bridge, it should be mapped
+>>       normally with an IOMMU IOVA.
+>>    3) It is not possible for the two devices to communicate and thus
+>>       the mapping operation should fail (and it will return -EREMOTEIO).
 >>
->> The new bit will only be used when CONFIG_PCI_P2PDMA is set; this means
->> PCI P2PDMA will require CONFIG_64BIT. This should be acceptable as the
->> majority of P2PDMA use cases are restricted to newer root complexes and
->> roughly require the extra address space for memory BARs used in the
->> transactions.
+>> Similar to dma-direct, the sg_dma_mark_pci_p2pdma() flag is used to
+>> indicate bus address segments. On unmap, P2PDMA segments are skipped
+>> over when determining the start and end IOVA addresses.
+>>
+>> With this change, the flags variable in the dma_map_ops is set to
+>> DMA_F_PCI_P2PDMA_SUPPORTED to indicate support for P2PDMA pages.
 >>
 >> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 >> ---
->>   drivers/pci/Kconfig         |  5 +++++
->>   include/linux/scatterlist.h | 44 ++++++++++++++++++++++++++++++++++++-
->>   2 files changed, 48 insertions(+), 1 deletion(-)
+>>   drivers/iommu/dma-iommu.c | 68 +++++++++++++++++++++++++++++++++++----
+>>   1 file changed, 61 insertions(+), 7 deletions(-)
 >>
->> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
->> index 133c73207782..5cc7cba1941f 100644
->> --- a/drivers/pci/Kconfig
->> +++ b/drivers/pci/Kconfig
->> @@ -164,6 +164,11 @@ config PCI_PASID
->>   config PCI_P2PDMA
->>       bool "PCI peer-to-peer transfer support"
->>       depends on ZONE_DEVICE
->> +    #
->> +    # The need for the scatterlist DMA bus address flag means PCI P2PDMA
->> +    # requires 64bit
->> +    #
->> +    depends on 64BIT
->>       select GENERIC_ALLOCATOR
->>       help
->>         Enableѕ drivers to do PCI peer-to-peer transactions to and from
->> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
->> index 7ff9d6386c12..6561ca8aead8 100644
->> --- a/include/linux/scatterlist.h
->> +++ b/include/linux/scatterlist.h
->> @@ -64,12 +64,24 @@ struct sg_append_table {
->>   #define SG_CHAIN    0x01UL
->>   #define SG_END        0x02UL
->>   +/*
->> + * bit 2 is the third free bit in the page_link on 64bit systems which
->> + * is used by dma_unmap_sg() to determine if the dma_address is a
->> + * bus address when doing P2PDMA.
->> + */
->> +#ifdef CONFIG_PCI_P2PDMA
->> +#define SG_DMA_BUS_ADDRESS    0x04UL
->> +static_assert(__alignof__(struct page) >= 8);
->> +#else
->> +#define SG_DMA_BUS_ADDRESS    0x00UL
->> +#endif
+>> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
+>> index f90251572a5d..b01ca0c6a7ab 100644
+>> --- a/drivers/iommu/dma-iommu.c
+>> +++ b/drivers/iommu/dma-iommu.c
+>> @@ -21,6 +21,7 @@
+>>   #include <linux/iova.h>
+>>   #include <linux/irq.h>
+>>   #include <linux/list_sort.h>
+>> +#include <linux/memremap.h>
+>>   #include <linux/mm.h>
+>>   #include <linux/mutex.h>
+>>   #include <linux/pci.h>
+>> @@ -1062,6 +1063,16 @@ static int __finalise_sg(struct device *dev,
+>> struct scatterlist *sg, int nents,
+>>           sg_dma_address(s) = DMA_MAPPING_ERROR;
+>>           sg_dma_len(s) = 0;
+>>   +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
+> 
+> Logically, should we not be able to use sg_is_dma_bus_address() here? I
+> think it should be feasible, and simpler, to prepare the p2p segments
+> up-front, such that at this point all we need to do is restore the
+> original length (if even that, see below).
+
+Per my previous email, no, because sg_is_dma_bus_address() is not set
+yet and not meant to tell you something about the page. That flag will
+be set below by pci_p2pdma_map_bus_segment() and then checkd in
+iommu_dma_unmap_sg() to determine if the dma_address in the segment
+needs to be unmapped.
+
+> 
+>> +            if (i > 0)
+>> +                cur = sg_next(cur);
 >> +
->>   /*
->>    * We overload the LSB of the page pointer to indicate whether it's
->>    * a valid sg entry, or whether it points to the start of a new
->> scatterlist.
->>    * Those low bits are there for everyone! (thanks mason :-)
->>    */
->> -#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END)
->> +#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END | SG_DMA_BUS_ADDRESS)
->>     static inline unsigned int __sg_flags(struct scatterlist *sg)
+>> +            pci_p2pdma_map_bus_segment(s, cur);
+>> +            count++;
+>> +            cur_len = 0;
+>> +            continue;
+>> +        }
+>> +
+>>           /*
+>>            * Now fill in the real DMA data. If...
+>>            * - there is a valid output segment to append to
+>> @@ -1158,6 +1169,8 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>       struct iova_domain *iovad = &cookie->iovad;
+>>       struct scatterlist *s, *prev = NULL;
+>>       int prot = dma_info_to_prot(dir, dev_is_dma_coherent(dev), attrs);
+>> +    struct dev_pagemap *pgmap = NULL;
+>> +    enum pci_p2pdma_map_type map_type;
+>>       dma_addr_t iova;
+>>       size_t iova_len = 0;
+>>       unsigned long mask = dma_get_seg_boundary(dev);
+>> @@ -1193,6 +1206,35 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>           s_length = iova_align(iovad, s_length + s_iova_off);
+>>           s->length = s_length;
+>>   +        if (is_pci_p2pdma_page(sg_page(s))) {
+>> +            if (sg_page(s)->pgmap != pgmap) {
+>> +                pgmap = sg_page(s)->pgmap;
+>> +                map_type = pci_p2pdma_map_type(pgmap, dev);
+>> +            }
+> 
+> There's a definite code smell here, but per above and below I think we
+> *should* actually call the new helper instead of copy-pasting half of it.
+
+
+> 
+>> +
+>> +            switch (map_type) {
+>> +            case PCI_P2PDMA_MAP_BUS_ADDR:
+>> +                /*
+>> +                 * A zero length will be ignored by
+>> +                 * iommu_map_sg() and then can be detected
+> 
+> If that is required behaviour then it needs an explicit check in
+> iommu_map_sg() to guarantee (and document) it. It's only by chance that
+> __iommu_map() happens to return success for size == 0 *if* all the other
+> arguments still line up, which is a far cry from a safe no-op.
+
+What should such a check look like? I could certainly add some comments
+to iommu_map_sg(), but I don't see what the code would need to check for...
+
+> However, rather than play yet more silly tricks, I think it would make
+> even more sense to make iommu_map_sg() properly aware and able to skip
+> direct p2p segments on its own. Once it becomes normal to pass mixed
+> scatterlists around, it's only a matter of time until one ends up being
+> handed to a driver which manages its own IOMMU domain, and then what?
+
+I suppose we can add another call to is_pci_p2pdma_page() inside
+iommu_map_sg() if you think that is cleaner. Seems like more work on the
+fast path to me, but I'm not opposed to it.
+
+>> +                 * in __finalise_sg() to actually map the
+>> +                 * bus address.
+>> +                 */
+>> +                s->length = 0;
+>> +                continue;
+>> +            case PCI_P2PDMA_MAP_THRU_HOST_BRIDGE:
+>> +                /*
+>> +                 * Mapping through host bridge should be
+>> +                 * mapped with regular IOVAs, thus we
+>> +                 * do nothing here and continue below.
+>> +                 */
+>> +                break;
+>> +            default:
+>> +                ret = -EREMOTEIO;
+>> +                goto out_restore_sg;
+>> +            }
+>> +        }
+>> +
+>>           /*
+>>            * Due to the alignment of our single IOVA allocation, we can
+>>            * depend on these assumptions about the segment boundary mask:
+>> @@ -1215,6 +1257,9 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>           prev = s;
+>>       }
+>>   +    if (!iova_len)
+>> +        return __finalise_sg(dev, sg, nents, 0);
+>> +
+>>       iova = iommu_dma_alloc_iova(domain, iova_len, dma_get_mask(dev),
+>> dev);
+>>       if (!iova) {
+>>           ret = -ENOMEM;
+>> @@ -1236,7 +1281,7 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>   out_restore_sg:
+>>       __invalidate_sg(sg, nents);
+>>   out:
+>> -    if (ret != -ENOMEM)
+>> +    if (ret != -ENOMEM && ret != -EREMOTEIO)
+>>           return -EINVAL;
+>>       return ret;
+>>   }
+>> @@ -1244,7 +1289,7 @@ static int iommu_dma_map_sg(struct device *dev,
+>> struct scatterlist *sg,
+>>   static void iommu_dma_unmap_sg(struct device *dev, struct
+>> scatterlist *sg,
+>>           int nents, enum dma_data_direction dir, unsigned long attrs)
 >>   {
->> @@ -91,6 +103,11 @@ static inline bool sg_is_last(struct scatterlist *sg)
->>       return __sg_flags(sg) & SG_END;
->>   }
->>   +static inline bool sg_is_dma_bus_address(struct scatterlist *sg)
->> +{
->> +    return __sg_flags(sg) & SG_DMA_BUS_ADDRESS;
->> +}
->> +
->>   /**
->>    * sg_assign_page - Assign a given page to an SG entry
->>    * @sg:            SG entry
->> @@ -245,6 +262,31 @@ static inline void sg_unmark_end(struct
->> scatterlist *sg)
->>       sg->page_link &= ~SG_END;
->>   }
->>   +/**
->> + * sg_dma_mark_bus address - Mark the scatterlist entry as a bus address
->> + * @sg:         SG entryScatterlist
+>> -    dma_addr_t start, end;
+>> +    dma_addr_t end, start = DMA_MAPPING_ERROR;
 > 
-> entryScatterlist?
-> 
->> + *
->> + * Description:
->> + *   Marks the passed in sg entry to indicate that the dma_address is
->> + *   a bus address and doesn't need to be unmapped.
->> + **/
->> +static inline void sg_dma_mark_bus_address(struct scatterlist *sg)
->> +{
->> +    sg->page_link |= SG_DMA_BUS_ADDRESS;
->> +}
->> +
->> +/**
->> + * sg_unmark_pci_p2pdma - Unmark the scatterlist entry as a bus address
->> + * @sg:         SG entryScatterlist
->> + *
->> + * Description:
->> + *   Clears the bus address mark.
->> + **/
->> +static inline void sg_dma_unmark_bus_address(struct scatterlist *sg)
->> +{
->> +    sg->page_link &= ~SG_DMA_BUS_ADDRESS;
->> +}
-> 
-> Does this serve any useful purpose? If a page is determined to be device
-> memory, it's not going to suddenly stop being device memory, and if the
-> underlying sg is recycled to point elsewhere then sg_assign_page() will
-> still (correctly) clear this flag anyway. Trying to reason about this
-> beyond superficial API symmetry - i.e. why exactly would a caller need
-> to call it, and what would the implications be of failing to do so -
-> seems to lead straight to confusion.
-> 
-> In fact I'd be inclined to have sg_assign_page() be responsible for
-> setting the flag automatically as well, and thus not need
-> sg_dma_mark_bus_address() either, however I can see the argument for
-> doing it this way round to not entangle the APIs too much, so I don't
-> have any great objection to that.
+> There are several things I don't like about this logic, I'd rather have
+> "end = 0" here...
 
-Yes, I think you misunderstand what this is for. The SG_DMA_BUS_ADDDRESS
-flag doesn't mark the segment for the page, but for the dma address. It
-cannot be set in sg_assign_page() seeing it's not a property of the page
-but a property of the dma_address in the sgl.
+Ok, I think that should work.
 
-It's not meant for use by regular SG users, it's only meant for use
-inside DMA mapping implementations. The purpose is to know whether a
-given dma_address in the SGL is a bus address or regular memory because
-the two different types must be unmapped differently. We can't rely on
-the page because, as you know, many dma_map_sg() the dma_address entry
-in the sgl does not map to the same memory as the page. Or to put it
-another way: is_pci_p2pdma_page(sg->page) does not imply that
-sg->dma_address points to a bus address.
+>>       struct scatterlist *tmp;
+>>       int i;
+>>   @@ -1260,14 +1305,22 @@ static void iommu_dma_unmap_sg(struct device
+>> *dev, struct scatterlist *sg,
+>>        * The scatterlist segments are mapped into a single
+>>        * contiguous IOVA allocation, so this is incredibly easy.
+>>        */
+> 
+> [ This comment rather stops being true :( ]
 
-Does that make sense?
+Not exactly. Sure there are some segments in the SGL that have bus
+addresses, but all the regular IOVAs still have a single contiguous
+allocation and only require one call to  __iommu_dma_unmap(). The only
+trick issues is finding the first and last actual IOVA SG to get the range.
+
+> 
+>> -    start = sg_dma_address(sg);
+>> -    for_each_sg(sg_next(sg), tmp, nents - 1, i) {
+> 
+> ...then generalise the first-element special case here into a dedicated
+> "walk to the first non-p2p element" loop...
+
+Ok, I'll see what I can do for that.
 
 Logan
