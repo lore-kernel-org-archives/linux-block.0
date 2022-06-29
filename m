@@ -2,115 +2,227 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B4E6C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 03:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A47DC43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 03:19:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229980AbiF2DMn (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Tue, 28 Jun 2022 23:12:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42270 "EHLO
+        id S231578AbiF2DTz (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Tue, 28 Jun 2022 23:19:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229692AbiF2DMm (ORCPT
+        with ESMTP id S231497AbiF2DTh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Tue, 28 Jun 2022 23:12:42 -0400
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A2A2BB3A;
-        Tue, 28 Jun 2022 20:12:41 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id A74DDB8215B;
-        Wed, 29 Jun 2022 03:12:40 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 051A4C341C8;
-        Wed, 29 Jun 2022 03:12:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656472359;
-        bh=1P+6d07Qx1cBRIKwEDFs1zrtCoocCzlp05XUFi0KdN4=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=Rqlyq7g5tdJ/wYOf5A7tYj4RUmI1SFFFt5YqSgIqMD6iCvdEffAoDwZgyDi3Lo46E
-         nzPMTdCNNady34vD5iuKukBu9czAuG8iNK1tCUTnH+PYSripo9v81eqcXjZleJH92/
-         WcFN7ElTBpI56SzmBLG6gWFM3msjihVBJW947Y81lREqncC9yQFyfW+OGBCA+/2a0I
-         ZToeREUhnkPO1WGzj8UDSR7nhEOmdJevu49dLbbdkTsBGzmUrQaO8P3a5mU2nOLO7a
-         bG3AvowfGdwEZSD4K/S+qJbQ98SrosdI2zNBGtsha62ktGOYH7ndpMC1Vt51oV55+k
-         FtOHEJXL9GSYg==
-Date:   Tue, 28 Jun 2022 20:12:18 -0700
-From:   Eric Biggers <ebiggers@kernel.org>
-To:     Ignat Korchagin <ignat@cloudflare.com>
-Cc:     linux-kernel@vger.kernel.org, linux-block@vger.kernel.org,
-        linux-crypto@vger.kernel.org, kernel-team@cloudflare.com,
-        abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
-        mputtash@linux.vnet.com,
-        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
-Subject: Re: [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot
- to linux-next kernel
-Message-ID: <YrvDEqdk3ZfcEy9i@sol.localdomain>
-References: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com>
+        Tue, 28 Jun 2022 23:19:37 -0400
+Received: from mx0a-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BEA136159;
+        Tue, 28 Jun 2022 20:18:55 -0700 (PDT)
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 25T3DafE008652;
+        Wed, 29 Jun 2022 03:18:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ mime-version : content-transfer-encoding; s=pp1;
+ bh=od5MFZxEfwYEj4PLpFvbO/tj5BemYL4/bN3mvOWbo6w=;
+ b=UmhUuvxQTsvGGNhNYpPwaqdbIQKOxF66FOaMdt6tVv6h6Z568SuPDVA6iwSY3fgCsW5q
+ kKiWkNQ6tM+gWa5vWxF0OPksCFZG5f1uwewm4HFAOfsb3SohuGlkUkVBXCcBRpG2XAYX
+ C0sDawltvSmPtMdDnRitw7argrr0sR1DPSms3aCJmFtQxRsNeGwJOGmpM0xMrHH5DyfW
+ yw79435oOR+O9bOECBovaCykKoxtmhNYbxlboh2ZiuJW3thDrOFu7BTjCOFw7BbM2lQN
+ zJt4HzdwVgKkzndzsyzxo6n4TyldfYoE2dOACtioQGzAptc2CXNKOOvI6NWORrVN45OJ BA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0en282wj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Jun 2022 03:18:41 +0000
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 25T3Er48015431;
+        Wed, 29 Jun 2022 03:18:40 GMT
+Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com [169.55.85.253])
+        by mx0b-001b2d01.pphosted.com (PPS) with ESMTPS id 3h0en282wb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Jun 2022 03:18:40 +0000
+Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
+        by ppma01wdc.us.ibm.com (8.16.1.2/8.16.1.2) with SMTP id 25T2p6Eg023703;
+        Wed, 29 Jun 2022 03:18:39 GMT
+Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com [9.57.198.26])
+        by ppma01wdc.us.ibm.com with ESMTP id 3gwt09cb0g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 29 Jun 2022 03:18:39 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com [9.57.199.111])
+        by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 25T3IcRa11600306
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 29 Jun 2022 03:18:39 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id E3DBEAC059;
+        Wed, 29 Jun 2022 03:18:38 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 9FDFAAC05B;
+        Wed, 29 Jun 2022 03:18:35 +0000 (GMT)
+Received: from farman-thinkpad-t470p (unknown [9.163.2.135])
+        by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+        Wed, 29 Jun 2022 03:18:35 +0000 (GMT)
+Message-ID: <a765fff67679155b749aafa90439b46ab1269a64.camel@linux.ibm.com>
+Subject: Re: [PATCHv6 11/11] iomap: add support for dma aligned direct-io
+From:   Eric Farman <farman@linux.ibm.com>
+To:     Halil Pasic <pasic@linux.ibm.com>, Keith Busch <kbusch@kernel.org>
+Cc:     Keith Busch <kbusch@fb.com>, linux-fsdevel@vger.kernel.org,
+        linux-block@vger.kernel.org, linux-nvme@lists.infradead.org,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        axboe@kernel.dk, Kernel Team <Kernel-team@fb.com>, hch@lst.de,
+        bvanassche@acm.org, damien.lemoal@opensource.wdc.com,
+        ebiggers@kernel.org, pankydev8@gmail.com
+Date:   Tue, 28 Jun 2022 23:18:34 -0400
+In-Reply-To: <83e65083890a7ac9c581c5aee0361d1b49e6abd9.camel@linux.ibm.com>
+References: <20220610195830.3574005-1-kbusch@fb.com>
+         <20220610195830.3574005-12-kbusch@fb.com>
+         <ab1bc062b4a1d0ad7f974b6068dc3a6dbf624820.camel@linux.ibm.com>
+         <YrS2HLsYOe7vnbPG@kbusch-mbp> <YrS6/chZXbHsrAS8@kbusch-mbp>
+         <e2b08a5c452d4b8322566cba4ed33b58080f03fa.camel@linux.ibm.com>
+         <e0038866ac54176beeac944c9116f7a9bdec7019.camel@linux.ibm.com>
+         <c5affe3096fd7b7996cb5fbcb0c41bbf3dde028e.camel@linux.ibm.com>
+         <YrnOmOUPukGe8xCq@kbusch-mbp.dhcp.thefacebook.com>
+         <20220628110024.01fcf84f.pasic@linux.ibm.com>
+         <83e65083890a7ac9c581c5aee0361d1b49e6abd9.camel@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-18.el8) 
+Mime-Version: 1.0
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: nDBxkpzP375Uv3nW7kdxyuRz0REl5oyg
+X-Proofpoint-GUID: HQTmH9Dzn0xZt9_WfWNXAAmKQGrbWDd0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-28_11,2022-06-28_01,2022-06-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ phishscore=0 suspectscore=0 priorityscore=1501 clxscore=1015
+ mlxlogscore=999 impostorscore=0 bulkscore=0 adultscore=0 malwarescore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2204290000 definitions=main-2206290010
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Tue, Jun 28, 2022 at 02:33:55PM +0530, Tasmiya Nalatwad wrote:
-> Greetings,
+On Tue, 2022-06-28 at 11:20 -0400, Eric Farman wrote:
+> On Tue, 2022-06-28 at 11:00 +0200, Halil Pasic wrote:
+> > On Mon, 27 Jun 2022 09:36:56 -0600
+> > Keith Busch <kbusch@kernel.org> wrote:
+> > 
+> > > On Mon, Jun 27, 2022 at 11:21:20AM -0400, Eric Farman wrote:
+> > > > Apologies, it took me an extra day to get back to this, but it
+> > > > is
+> > > > indeed this pass through that's causing our boot failures. I
+> > > > note
+> > > > that
+> > > > the old code (in iomap_dio_bio_iter), did:
+> > > > 
+> > > >         if ((pos | length | align) & ((1 << blkbits) - 1))
+> > > >                 return -EINVAL;
+> > > > 
+> > > > With blkbits equal to 12, the resulting mask was 0x0fff against
+> > > > an
+> > > > align value (from iov_iter_alignment) of x200 kicks us out.
+> > > > 
+> > > > The new code (in iov_iter_aligned_iovec), meanwhile, compares
+> > > > this:
+> > > > 
+> > > >                 if ((unsigned long)(i->iov[k].iov_base + skip)
+> > > > &
+> > > > addr_mask)
+> > > >                         return false;
+> > > > 
+> > > > iov_base (and the output of the old iov_iter_aligned_iovec()
+> > > > routine)
+> > > > is x200, but since addr_mask is x1ff this check provides a
+> > > > different
+> > > > response than it used to.
+> > > > 
+> > > > To check this, I changed the comparator to len_mask (almost
+> > > > certainly
+> > > > not the right answer since addr_mask is then unused, but it was
+> > > > good
+> > > > for a quick test), and our PV guests are able to boot again
+> > > > with
+> > > > -next
+> > > > running in the host.  
+> > > 
+> > > This raises more questions for me. It sounds like your process
+> > > used
+> > > to get an
+> > > EINVAL error, and it wants to continue getting an EINVAL error
+> > > instead of
+> > > letting the direct-io request proceed. Is that correct? 
+
+Sort of. In the working case, I see a set of iovecs come through with
+different counts:
+
+base	count
+0000	0001
+0000	0200
+0000	0400
+0000	0800
+0000	1000
+0001	1000
+0200	1000 << Change occurs here
+0400	1000
+0800	1000
+1000	1000
+
+EINVAL was being returned for any of these iovecs except the page-
+aligned ones. Once the x200 request returns 0, the remainder of the
+above list was skipped and the requests continue elsewhere on the file.
+
+Still not sure how our request is getting us into this process. We're
+simply asking to read a single block, but that's somewhere within an
+image file.
+
+> > 
+> > Is my understanding as well. But I'm not familiar enough with the
+> > code to
+> > tell where and how that -EINVAL gets handled.
+> > 
+> > BTW let me just point out that the bounce buffering via swiotlb
+> > needed
+> > for PV is not unlikely to mess up the alignment of things. But I'm
+> > not
+> > sure if that is relevant here.
+
+It's true that PV guests were the first to trip over this, but I've
+since been able to reproduce this with a normal guest. So long as the
+image file is connected with cache.direct=true, it's unbootable. That
+should absolve the swiotlb bits from being at fault here.
+
+> > 
+> > Regards,
+> > Halil
+> > 
+> > > If so, could you
+> > > provide more details on what issue occurs with dispatching this
+> > > request?
 > 
-> [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to linux-next
-> kernel
+> This error occurs reading the initial boot record for a guest,
+> stating
+> QEMU was unable to read block zero from the device. The code that
+> complains doesn't appear to have anything that says "oh, got EINVAL,
+> try it this other way" but I haven't chased down if/where something
+> in
+> between is expecting that and handling it in some unique way. I
+> -think-
+>  I have an easier reproducer now, so maybe I'd be able to get a
+> better
+> answer to this question.
 > 
-> --- Call Traces ---
-> [    1.788574] ------------[ cut here ]------------
-> [    1.788577] alg: self-tests for rsa-generic (rsa) failed (rc=-22)
-> [    1.788586] WARNING: CPU: 9 PID: 218 at crypto/testmgr.c:5774
-> alg_test+0x438/0x880
-> [    1.788598] Modules linked in:
-> [    1.788603] CPU: 9 PID: 218 Comm: cryptomgr_test Not tainted
-> 5.19.0-rc4-next-20220627-autotest #1
-> [    1.788609] NIP:  c00000000062e078 LR: c00000000062e074 CTR:
-> c00000000075e020
-> [    1.788614] REGS: c00000000e733980 TRAP: 0700   Not tainted
-> (5.19.0-rc4-next-20220627-autotest)
-> [    1.788620] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: 28008822
-> XER: 20040005
-> [    1.788632] CFAR: c00000000014f244 IRQMASK: 0
-> [    1.788632] GPR00: c00000000062e074 c00000000e733c20 c000000002a12000
-> 0000000000000035
-> [    1.788632] GPR04: 00000000ffff7fff c00000000e7339e0 c00000000e7339d8
-> 0000000000000000
-> [    1.788632] GPR08: c000000002826b78 0000000000000000 c000000002566a50
-> c0000000028e6bb8
-> [    1.788632] GPR12: 0000000000008000 c00000000fff3280 c00000000018b6d8
-> c00000000d640080
-> [    1.788632] GPR16: 0000000000000000 0000000000000000 0000000000000000
-> 0000000000000000
-> [    1.788632] GPR20: 0000000000000000 0000000000000000 0000000000000000
-> 0000000000000000
-> [    1.788632] GPR24: c000000000da49e8 0000000000000000 c000000050630480
-> 0000000000000400
-> [    1.788632] GPR28: c000000050630400 000000000000000d c000000002cd33d8
-> ffffffffffffffea
-> [    1.788691] NIP [c00000000062e078] alg_test+0x438/0x880
-> [    1.788696] LR [c00000000062e074] alg_test+0x434/0x880
-> [    1.788701] Call Trace:
-> [    1.788704] [c00000000e733c20] [c00000000062e074] alg_test+0x434/0x880
-> (unreliable)
-> [    1.788712] [c00000000e733d90] [c00000000062c040]
-> cryptomgr_test+0x40/0x70
-> [    1.788718] [c00000000e733dc0] [c00000000018b7f4] kthread+0x124/0x130
-> [    1.788726] [c00000000e733e10] [c00000000000ce54]
-> ret_from_kernel_thread+0x5c/0x64
-> [    1.788733] Instruction dump:
-> [    1.788736] 409e02e4 3d22002c 892913fd 2f890000 409e02d4 3c62fe63
-> 7f45d378 7f84e378
-> [    1.788746] 7fe6fb78 3863fa90 4bb2116d 60000000 <0fe00000> fa2100f8
-> fa410100 fa610108
-> [    1.788757] ---[ end trace 0000000000000000 ]---
-> -- 
+> > > If you really need to restrict address' alignment to the
+> > > storage's
+> > > logical
+> > > block size, I think your storage driver needs to set the
+> > > dma_alignment queue
+> > > limit to that value.
+> 
+> It's possible that there's a problem in the virtio stack here, but
+> the
+> failing configuration is a qcow image on the host rootfs
 
-It's caused by:
+(on an ext4 filesystem)
 
-commit f145d411a67efacc0731fc3f9c7b2d89fb62523a
-Author: Ignat Korchagin <ignat@cloudflare.com>
-Date:   Fri Jun 17 09:42:10 2022 +0100
+> , so it's not
+> using any distinct driver. The bdev request queue that ends up being
+> used is the same allocated out of blk_alloc_queue, so changing
+> dma_alignment there wouldn't work.
 
-    crypto: rsa - implement Chinese Remainder Theorem for faster private key operations
