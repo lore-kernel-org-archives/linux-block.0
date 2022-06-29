@@ -2,49 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8ABC433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 23:33:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03656C433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 23:33:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231803AbiF2XdI (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 19:33:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39954 "EHLO
+        id S231778AbiF2XdL (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 19:33:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231856AbiF2XdF (ORCPT
+        with ESMTP id S231897AbiF2XdG (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 19:33:05 -0400
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 336279FF3
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:32:58 -0700 (PDT)
-Received: by mail-pf1-f179.google.com with SMTP id i64so16486443pfc.8
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:32:58 -0700 (PDT)
+        Wed, 29 Jun 2022 19:33:06 -0400
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D532227FCC
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:33:00 -0700 (PDT)
+Received: by mail-pl1-f172.google.com with SMTP id x20so9876353plx.6
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:33:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=E+7fz1kpwun+FM+ENLhLC8EM6umBuEasV+oUHoRPE00=;
-        b=XOrPQrD0jvtTSzabN2YMCASZlZQ4j7mTqbL1dl4yO3hqgVq+9M+xQloT3fQOBM3KRm
-         o7XeMxkxFN57uh/DOl0mh7sjdj4QinclgRonlGedLzn8Qx7lLlW8d2pCLGOgEqC+qPAm
-         im1T46+bXSBRMZGO6VLONheRGKqFEXvnQwf8QjryxP81vZE6mMgjObc9uJTGHfbOo3jD
-         KLlIAe0pPZU7XGR98Ia/iwaUnVDw4xaU+vbHn0dd90AblIGPfO2rNcgPlSL75JKb4uAg
-         rQ9LgObkyU28aj7v5YTBLlfJCgGNlUYFpybUAtLk9HvwzeU1H42YV2pVOZBBukOQwFCf
-         GN7A==
-X-Gm-Message-State: AJIora9CEVcndpMiFVblkAsUq7/DtVPUcsMiUJnkay7A6abZ12sg9Jg+
-        tni+miEr14vRDdNJumHAUKI=
-X-Google-Smtp-Source: AGRyM1tjha+saKLZVEPXLsDV7H/+E25OEL5OlPTmMQhFpkK2XtbHWdXZSTHc3G7CG/t++9o5rsBtfQ==
-X-Received: by 2002:a63:cd52:0:b0:3fe:30ec:825d with SMTP id a18-20020a63cd52000000b003fe30ec825dmr4885138pgj.82.1656545578086;
-        Wed, 29 Jun 2022 16:32:58 -0700 (PDT)
+        bh=MKe8TzsHwQs7VxLJm2h6A6Utj6EeaRjRrT+d5+/TuME=;
+        b=s5yDfBPbyNj6Gi0NyR/EDNjQLQdpuKlgZ0SazDY21NKiTa0mzONYiMAcBVeMoW946P
+         5FNp+YKnE+C0xixlBcHPO1HaokQg/QD9jyKrs1RG81f8HcQOZgPvzffA04E6ro9+TqFU
+         T/Y8TMn7M3kky5M8cSQprDT7qikRxR1maaZquPUv90U1tgt2du/lJuZgrPGjBfW6ZH/D
+         3yy7m75yTNvj78RkzROSvZ4EsRap4UecXfJAsiZo54b3D8Vw6r5woJ8jCjITcXiSo3RR
+         f4IoIRacOb1UUVrNdBGSitwMJs+G3pv53gNnk37lEvwF5Rk6yLUEurX018jARZUOcYnJ
+         kMow==
+X-Gm-Message-State: AJIora9GAwV8/RfDN2DnDfYranDahFK1CRdHuNtpa1rszn5ylj/l/Gip
+        Qk764H+f12yfHU6Bo+yphLw=
+X-Google-Smtp-Source: AGRyM1t7BwuG9MdJpi/sB2MZ09bUy9S/nUyViOP4dswTKmdYQqOwvWm4QpnJn+tFyfV+Ip3Z1Udpag==
+X-Received: by 2002:a17:902:b681:b0:16a:f81:6b02 with SMTP id c1-20020a170902b68100b0016a0f816b02mr12113975pls.28.1656545579578;
+        Wed, 29 Jun 2022 16:32:59 -0700 (PDT)
 Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:3841:49ce:cba5:1586])
-        by smtp.gmail.com with ESMTPSA id b21-20020a17090a8c9500b001ec8d191db4sm2763687pjo.17.2022.06.29.16.32.56
+        by smtp.gmail.com with ESMTPSA id b21-20020a17090a8c9500b001ec8d191db4sm2763687pjo.17.2022.06.29.16.32.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 16:32:57 -0700 (PDT)
+        Wed, 29 Jun 2022 16:32:58 -0700 (PDT)
 From:   Bart Van Assche <bvanassche@acm.org>
 To:     Jens Axboe <axboe@kernel.dk>
 Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
         Bart Van Assche <bvanassche@acm.org>,
-        Hannes Reinecke <hare@suse.com>
-Subject: [PATCH v2 42/63] scsi/device_handlers: Use the new blk_opf_t type
-Date:   Wed, 29 Jun 2022 16:31:24 -0700
-Message-Id: <20220629233145.2779494-43-bvanassche@acm.org>
+        "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Avri Altman <avri.altman@wdc.com>
+Subject: [PATCH v2 43/63] scsi/ufs: Rename a 'dir' argument into 'op'
+Date:   Wed, 29 Jun 2022 16:31:25 -0700
+Message-Id: <20220629233145.2779494-44-bvanassche@acm.org>
 X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 In-Reply-To: <20220629233145.2779494-1-bvanassche@acm.org>
 References: <20220629233145.2779494-1-bvanassche@acm.org>
@@ -54,85 +55,35 @@ Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Improve static type checking by using the new blk_opf_t type for variables
-that represent request flags.
+Improve consistency of the kernel code by renaming a request operation
+argument from 'dir' into 'op'.
 
-Cc: Hannes Reinecke <hare@suse.com>
+Cc: Martin K. Petersen <martin.petersen@oracle.com>
+Reviewed-by: Avri Altman <avri.altman@wdc.com>
 Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 ---
- drivers/scsi/device_handler/scsi_dh_alua.c  | 4 ++--
- drivers/scsi/device_handler/scsi_dh_emc.c   | 2 +-
- drivers/scsi/device_handler/scsi_dh_hp_sw.c | 4 ++--
- drivers/scsi/device_handler/scsi_dh_rdac.c  | 2 +-
- 4 files changed, 6 insertions(+), 6 deletions(-)
+ drivers/ufs/core/ufshpb.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/scsi/device_handler/scsi_dh_alua.c b/drivers/scsi/device_handler/scsi_dh_alua.c
-index 1d9be771f3ee..610a51538f03 100644
---- a/drivers/scsi/device_handler/scsi_dh_alua.c
-+++ b/drivers/scsi/device_handler/scsi_dh_alua.c
-@@ -127,7 +127,7 @@ static int submit_rtpg(struct scsi_device *sdev, unsigned char *buff,
- 		       int bufflen, struct scsi_sense_hdr *sshdr, int flags)
+diff --git a/drivers/ufs/core/ufshpb.c b/drivers/ufs/core/ufshpb.c
+index 24f1ee82c215..a1a7a1175a5a 100644
+--- a/drivers/ufs/core/ufshpb.c
++++ b/drivers/ufs/core/ufshpb.c
+@@ -434,7 +434,7 @@ int ufshpb_prep(struct ufs_hba *hba, struct ufshcd_lrb *lrbp)
+ }
+ 
+ static struct ufshpb_req *ufshpb_get_req(struct ufshpb_lu *hpb, int rgn_idx,
+-					 enum req_op dir, bool atomic)
++					 enum req_op op, bool atomic)
  {
- 	u8 cdb[MAX_COMMAND_SIZE];
--	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
- 
- 	/* Prepare the command. */
-@@ -157,7 +157,7 @@ static int submit_stpg(struct scsi_device *sdev, int group_id,
- 	u8 cdb[MAX_COMMAND_SIZE];
- 	unsigned char stpg_data[8];
- 	int stpg_len = 8;
--	int req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
- 
- 	/* Prepare the data buffer */
-diff --git a/drivers/scsi/device_handler/scsi_dh_emc.c b/drivers/scsi/device_handler/scsi_dh_emc.c
-index bd28ec6cfb72..2e21ab447873 100644
---- a/drivers/scsi/device_handler/scsi_dh_emc.c
-+++ b/drivers/scsi/device_handler/scsi_dh_emc.c
-@@ -239,7 +239,7 @@ static int send_trespass_cmd(struct scsi_device *sdev,
- 	unsigned char cdb[MAX_COMMAND_SIZE];
- 	int err, res = SCSI_DH_OK, len;
- 	struct scsi_sense_hdr sshdr;
--	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
- 
- 	if (csdev->flags & CLARIION_SHORT_TRESPASS) {
-diff --git a/drivers/scsi/device_handler/scsi_dh_hp_sw.c b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-index 4a3f7831a2d6..0d2cfa60aa06 100644
---- a/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-+++ b/drivers/scsi/device_handler/scsi_dh_hp_sw.c
-@@ -83,7 +83,7 @@ static int hp_sw_tur(struct scsi_device *sdev, struct hp_sw_dh_data *h)
- 	unsigned char cmd[6] = { TEST_UNIT_READY };
- 	struct scsi_sense_hdr sshdr;
- 	int ret = SCSI_DH_OK, res;
--	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
+ 	struct ufshpb_req *rq;
+ 	struct request *req;
+@@ -445,7 +445,7 @@ static struct ufshpb_req *ufshpb_get_req(struct ufshpb_lu *hpb, int rgn_idx,
+ 		return NULL;
  
  retry:
-@@ -121,7 +121,7 @@ static int hp_sw_start_stop(struct hp_sw_dh_data *h)
- 	struct scsi_device *sdev = h->sdev;
- 	int res, rc = SCSI_DH_OK;
- 	int retry_cnt = HP_SW_RETRIES;
--	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
+-	req = blk_mq_alloc_request(hpb->sdev_ufs_lu->request_queue, dir,
++	req = blk_mq_alloc_request(hpb->sdev_ufs_lu->request_queue, op,
+ 			      BLK_MQ_REQ_NOWAIT);
  
- retry:
-diff --git a/drivers/scsi/device_handler/scsi_dh_rdac.c b/drivers/scsi/device_handler/scsi_dh_rdac.c
-index 66652ab409cc..bf8754741f85 100644
---- a/drivers/scsi/device_handler/scsi_dh_rdac.c
-+++ b/drivers/scsi/device_handler/scsi_dh_rdac.c
-@@ -536,7 +536,7 @@ static void send_mode_select(struct work_struct *work)
- 	unsigned char cdb[MAX_COMMAND_SIZE];
- 	struct scsi_sense_hdr sshdr;
- 	unsigned int data_size;
--	u64 req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
-+	blk_opf_t req_flags = REQ_FAILFAST_DEV | REQ_FAILFAST_TRANSPORT |
- 		REQ_FAILFAST_DRIVER;
- 
- 	spin_lock(&ctlr->ms_lock);
+ 	if (!atomic && (PTR_ERR(req) == -EWOULDBLOCK) && (--retries > 0)) {
