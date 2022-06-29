@@ -2,61 +2,50 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E079CCA47F
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:43:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C171AC43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230233AbiF2Gn2 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 02:43:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53852 "EHLO
+        id S229832AbiF2Goi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 02:44:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56094 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231771AbiF2Gn2 (ORCPT
+        with ESMTP id S230080AbiF2Goh (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 02:43:28 -0400
+        Wed, 29 Jun 2022 02:44:37 -0400
 Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A46D2655F;
-        Tue, 28 Jun 2022 23:43:27 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2D4A275C2
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 23:44:36 -0700 (PDT)
 Received: by verein.lst.de (Postfix, from userid 2407)
-        id 721B567373; Wed, 29 Jun 2022 08:43:24 +0200 (CEST)
-Date:   Wed, 29 Jun 2022 08:43:24 +0200
+        id 36DFA67373; Wed, 29 Jun 2022 08:44:34 +0200 (CEST)
+Date:   Wed, 29 Jun 2022 08:44:33 +0200
 From:   Christoph Hellwig <hch@lst.de>
-To:     Logan Gunthorpe <logang@deltatee.com>
-Cc:     linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org,
-        linux-block@vger.kernel.org, linux-pci@vger.kernel.org,
-        linux-mm@kvack.org, iommu@lists.linux-foundation.org,
-        Stephen Bates <sbates@raithlin.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Don Dutile <ddutile@redhat.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Minturn Dave B <dave.b.minturn@intel.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Xiong Jianxin <jianxin.xiong@intel.com>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Robin Murphy <robin.murphy@arm.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Bjorn Helgaas <bhelgaas@google.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: Re: [PATCH v7 13/21] PCI/P2PDMA: Remove pci_p2pdma_[un]map_sg()
-Message-ID: <20220629064324.GM17234@lst.de>
-References: <20220615161233.17527-1-logang@deltatee.com> <20220615161233.17527-14-logang@deltatee.com>
+To:     Damien Le Moal <damien.lemoal@opensource.wdc.com>
+Cc:     Christoph Hellwig <hch@lst.de>, Jens Axboe <axboe@kernel.dk>,
+        Damien Le Moal <damien.lemoal@wdc.com>,
+        linux-block@vger.kernel.org
+Subject: Re: clean up the blk-ia-ranges.c code a bit
+Message-ID: <20220629064433.GA17552@lst.de>
+References: <20220629062013.1331068-1-hch@lst.de> <7cc69dfd-0078-dd2a-794c-a5c5a9073f0d@opensource.wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20220615161233.17527-14-logang@deltatee.com>
+In-Reply-To: <7cc69dfd-0078-dd2a-794c-a5c5a9073f0d@opensource.wdc.com>
 User-Agent: Mutt/1.5.17 (2007-11-01)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Looks good:
+On Wed, Jun 29, 2022 at 03:32:36PM +0900, Damien Le Moal wrote:
+> On 6/29/22 15:20, Christoph Hellwig wrote:
+> > Hi Jens, hi Damien,
+> > 
+> > this is a little drive by cleanup for the ia-ranges code, including
+> > moving the data structure to the gendisk as it is only used for
+> > non-passthrough access.
+> > 
+> > I don't have hardware to test this on, so it would be good to make this
+> > go through Damien's rig.
+> 
+> What branch is this based on ?
 
-Reviewed-by: Christoph Hellwig <hch@lst.de>
+for-5.20/block
