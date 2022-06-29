@@ -2,190 +2,76 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CB9C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:20:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E255C43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 06:32:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231805AbiF2GU0 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 02:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59816 "EHLO
+        id S229837AbiF2Gcm (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 02:32:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41708 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbiF2GUZ (ORCPT
+        with ESMTP id S230123AbiF2Gck (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 02:20:25 -0400
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E1ED1E3DA
-        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 23:20:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender
-        :Reply-To:Content-Type:Content-ID:Content-Description;
-        bh=w+eAhaEwYzrBKv1p2vOIrioeBsl4ezmWD5aFt2jnr5s=; b=di30CmgUipzyelyKhtkOz8ARBM
-        YE93a5qg7n77HnoRBdRXfGtP7zFIFBfKzePHd4ayKpLO2ebH9v4SXaJ28nuhIzNpihX806eykXfZj
-        ZIGIiGM+RU+7O6vlTrxtRm9lqO/pO+ui/Mg8Y7uW+IgkaUdFm86g0t8MC4Fhs457ncHVs1duwNlGc
-        VfhKt+uxNSSq96M2bVNhADttzjVbLhkbbkr3sXMxKzanAl0ETp/irlaPz1z2C5tOCLHLkoAdSQIi1
-        Dhp7ajwv8l8Cv+3/cEyn3O6VXUeMiazy/K0EeaQYHcWCYWYCpMdmYUzDXm2ccCjmDg7cBG1weKo9/
-        FuRgQrfQ==;
-Received: from [2001:4bb8:199:3788:6e38:f996:aa54:7e1e] (helo=localhost)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1o6R3n-009knu-Mr; Wed, 29 Jun 2022 06:20:24 +0000
-From:   Christoph Hellwig <hch@lst.de>
-To:     Jens Axboe <axboe@kernel.dk>,
-        Damien Le Moal <damien.lemoal@wdc.com>
-Cc:     linux-block@vger.kernel.org
-Subject: [PATCH 2/2] block: simplify disk_set_independent_access_ranges
-Date:   Wed, 29 Jun 2022 08:20:13 +0200
-Message-Id: <20220629062013.1331068-3-hch@lst.de>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20220629062013.1331068-1-hch@lst.de>
-References: <20220629062013.1331068-1-hch@lst.de>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+        Wed, 29 Jun 2022 02:32:40 -0400
+X-Greylist: delayed 474 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 28 Jun 2022 23:32:39 PDT
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTP id 9B9202AE1B
+        for <linux-block@vger.kernel.org>; Tue, 28 Jun 2022 23:32:39 -0700 (PDT)
+Received: from localhost.localdomain (unknown [124.16.141.245])
+        by APP-05 (Coremail) with SMTP id zQCowABnb7Mr8LtisqNwCA--.20398S2;
+        Wed, 29 Jun 2022 14:24:43 +0800 (CST)
+From:   sunying@nj.iscas.ac.cn
+To:     axboe@kernel.dk
+Cc:     linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Ying Sun <sunying@nj.iscas.ac.cn>
+Subject: [PATCH] block: remove "select BLK_RQ_IO_DATA_LEN" from BLK_CGROUP_IOCOST dependency
+Date:   Wed, 29 Jun 2022 14:24:09 +0800
+Message-Id: <20220629062409.19458-1-sunying@nj.iscas.ac.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID: zQCowABnb7Mr8LtisqNwCA--.20398S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7XFW3KF15Wr4fGFy3Jr1xuFg_yoW3JFc_X3
+        9xKF1jkw1DZ398Cr90vF4rAF1Igay8JFWIyw13tFsIqa42vF17Wa43Xr13ZFnrAa1jgF1a
+        q39YvFsFyr9YkjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbIxFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Jr0_
+        Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gr0_Gr
+        1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xII
+        jxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWxJVW8Jr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwAKzVCY07xG64k0F24l
+        c2xSY4AK67AK6r47MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I
+        0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWU
+        AVWUtwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcV
+        CY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Zr0_Wr1UMIIF0xvEx4A2jsIE
+        14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa
+        7VUb5fHUUUUUU==
+X-Originating-IP: [124.16.141.245]
+X-CM-SenderInfo: 5vxq5xdqj60y4olvutnvoduhdfq/
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Lift setting disk->ia_ranges from disk_register_independent_access_ranges
-into disk_set_independent_access_ranges, and make the behavior the same
-for the registered vs non-registered queue cases.
+From: Ying Sun <sunying@nj.iscas.ac.cn>
 
-Signed-off-by: Christoph Hellwig <hch@lst.de>
+The configuration item BLK_RQ_IO_DATA_LEN is not declared in the kernel.
+Select BLK_RQ_IO_DATA_LEN is meaningless which could be removed.
+
+Signed-off-by: Ying Sun <sunying@nj.iscas.ac.cn>
 ---
- block/blk-ia-ranges.c | 57 ++++++++++++-------------------------------
- block/blk-sysfs.c     |  2 +-
- block/blk.h           |  3 +--
- 3 files changed, 18 insertions(+), 44 deletions(-)
+ block/Kconfig | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/block/blk-ia-ranges.c b/block/blk-ia-ranges.c
-index c1bf14bcd15f4..2bd1d311033b5 100644
---- a/block/blk-ia-ranges.c
-+++ b/block/blk-ia-ranges.c
-@@ -102,31 +102,18 @@ static struct kobj_type blk_ia_ranges_ktype = {
-  * disk_register_independent_access_ranges - register with sysfs a set of
-  *		independent access ranges
-  * @disk:	Target disk
-- * @new_iars:	New set of independent access ranges
-  *
-  * Register with sysfs a set of independent access ranges for @disk.
-- * If @new_iars is not NULL, this set of ranges is registered and the old set
-- * specified by disk->ia_ranges is unregistered. Otherwise, disk->ia_ranges is
-- * registered if it is not already.
-  */
--int disk_register_independent_access_ranges(struct gendisk *disk,
--				struct blk_independent_access_ranges *new_iars)
-+int disk_register_independent_access_ranges(struct gendisk *disk)
- {
-+	struct blk_independent_access_ranges *iars = disk->ia_ranges;
- 	struct request_queue *q = disk->queue;
--	struct blk_independent_access_ranges *iars;
- 	int i, ret;
- 
- 	lockdep_assert_held(&q->sysfs_dir_lock);
- 	lockdep_assert_held(&q->sysfs_lock);
- 
--	/* If a new range set is specified, unregister the old one */
--	if (new_iars) {
--		if (disk->ia_ranges)
--			disk_unregister_independent_access_ranges(disk);
--		disk->ia_ranges = new_iars;
--	}
--
--	iars = disk->ia_ranges;
- 	if (!iars)
- 		return 0;
- 
-@@ -210,6 +197,9 @@ static bool disk_check_ia_ranges(struct gendisk *disk,
- 	sector_t sector = 0;
- 	int i;
- 
-+	if (WARN_ON_ONCE(!iars->nr_ia_ranges))
-+		return false;
-+
- 	/*
- 	 * While sorting the ranges in increasing LBA order, check that the
- 	 * ranges do not overlap, that there are no sector holes and that all
-@@ -298,25 +288,15 @@ void disk_set_independent_access_ranges(struct gendisk *disk,
- {
- 	struct request_queue *q = disk->queue;
- 
--	if (WARN_ON_ONCE(iars && !iars->nr_ia_ranges)) {
-+	mutex_lock(&q->sysfs_dir_lock);
-+	mutex_lock(&q->sysfs_lock);
-+	if (iars && !disk_check_ia_ranges(disk, iars)) {
- 		kfree(iars);
- 		iars = NULL;
- 	}
--
--	mutex_lock(&q->sysfs_dir_lock);
--	mutex_lock(&q->sysfs_lock);
--
--	if (iars) {
--		if (!disk_check_ia_ranges(disk, iars)) {
--			kfree(iars);
--			iars = NULL;
--			goto reg;
--		}
--
--		if (!disk_ia_ranges_changed(disk, iars)) {
--			kfree(iars);
--			goto unlock;
--		}
-+	if (iars && !disk_ia_ranges_changed(disk, iars)) {
-+		kfree(iars);
-+		goto unlock;
- 	}
- 
- 	/*
-@@ -324,17 +304,12 @@ void disk_set_independent_access_ranges(struct gendisk *disk,
- 	 * revalidation. If that is the case, we need to unregister the old
- 	 * set of independent access ranges and register the new set. If the
- 	 * queue is not registered, registration of the device request queue
--	 * will register the independent access ranges, so only swap in the
--	 * new set and free the old one.
-+	 * will register the independent access ranges.
- 	 */
--reg:
--	if (blk_queue_registered(q)) {
--		disk_register_independent_access_ranges(disk, iars);
--	} else {
--		swap(disk->ia_ranges, iars);
--		kfree(iars);
--	}
--
-+	disk_unregister_independent_access_ranges(disk);
-+	disk->ia_ranges = iars;
-+	if (blk_queue_registered(q))
-+		disk_register_independent_access_ranges(disk);
- unlock:
- 	mutex_unlock(&q->sysfs_lock);
- 	mutex_unlock(&q->sysfs_dir_lock);
-diff --git a/block/blk-sysfs.c b/block/blk-sysfs.c
-index 85ea43eff094c..58cb9cb9f48cd 100644
---- a/block/blk-sysfs.c
-+++ b/block/blk-sysfs.c
-@@ -832,7 +832,7 @@ int blk_register_queue(struct gendisk *disk)
- 		blk_mq_debugfs_register(q);
- 	mutex_unlock(&q->debugfs_mutex);
- 
--	ret = disk_register_independent_access_ranges(disk, NULL);
-+	ret = disk_register_independent_access_ranges(disk);
- 	if (ret)
- 		goto put_dev;
- 
-diff --git a/block/blk.h b/block/blk.h
-index 74d59435870cb..58ad50cacd2d5 100644
---- a/block/blk.h
-+++ b/block/blk.h
-@@ -459,8 +459,7 @@ long compat_blkdev_ioctl(struct file *file, unsigned cmd, unsigned long arg);
- 
- extern const struct address_space_operations def_blk_aops;
- 
--int disk_register_independent_access_ranges(struct gendisk *disk,
--				struct blk_independent_access_ranges *new_iars);
-+int disk_register_independent_access_ranges(struct gendisk *disk);
- void disk_unregister_independent_access_ranges(struct gendisk *disk);
- 
- #ifdef CONFIG_FAIL_MAKE_REQUEST
+diff --git a/block/Kconfig b/block/Kconfig
+index 50b17e260fa2..444c5ab3b67e 100644
+--- a/block/Kconfig
++++ b/block/Kconfig
+@@ -147,7 +147,6 @@ config BLK_CGROUP_FC_APPID
+ config BLK_CGROUP_IOCOST
+ 	bool "Enable support for cost model based cgroup IO controller"
+ 	depends on BLK_CGROUP
+-	select BLK_RQ_IO_DATA_LEN
+ 	select BLK_RQ_ALLOC_TIME
+ 	help
+ 	Enabling this option enables the .weight interface for cost
 -- 
-2.30.2
+2.17.1
 
