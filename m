@@ -2,104 +2,222 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1A00CCA47C
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 14:48:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96870CCA480
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 15:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233655AbiF2Osf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 10:48:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54928 "EHLO
+        id S232114AbiF2Pjh (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 11:39:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51768 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233669AbiF2Osd (ORCPT
+        with ESMTP id S233843AbiF2Pjc (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 10:48:33 -0400
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82CCBB4B6
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:48:31 -0700 (PDT)
-Received: by mail-io1-f71.google.com with SMTP id bw12-20020a056602398c00b00675895c2e24so695829iob.19
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 07:48:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=piY2rqjjpLSURcBVOJ67ylQE4JJjSD/EdRDbwcjkkEw=;
-        b=rhHkh7Z9AaT0sqE+yS0aGiateJPKGa59yPNOba8HW3x5jqLKYRYusYiYTbnTPj4E/Y
-         iinMDfR218eVBUlQEQ09Cg4WwvJ/+WnKS0Q23GsOzK9OI8tbMTqnZ/RusP6zXaW5gMlE
-         RprmTNsxz9sc4+KG5jKD8FarHMzx9TOgh9lFa8KnOoGyOAcaWOJ5L65oILRrO4PboXW2
-         /k88dw3eWmnBwqkJQseYiO3DvAE87h4j4cp4+M1ti723Su7QK14arK1PcoZgUJUulRqi
-         yxgBy8LqMcYscj3e1sDwCne04NrZwxedcD7xZxACcz6hseo1SwjWjhLbj+pfSjFfkjw1
-         kHVw==
-X-Gm-Message-State: AJIora+u+3Jb2P05Oi5bEy4lBFFJ94ct3dXzUZaIrWJa2HeU1JntgjSq
-        mvVybeMB0pQ0/J4/yBuKq0p6GnFmqBUSkr1Rj8h3CeDIIwl1
-X-Google-Smtp-Source: AGRyM1sUZ9tCojVibTV7y72NWNfIQpGOeRuHkb2gvuxp3tttZu+oPGZn5RsZrt2EH9ny3swAAA0KvfrzRFhuhwRVzPQt0CMJrniG
+        Wed, 29 Jun 2022 11:39:32 -0400
+Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4923936172;
+        Wed, 29 Jun 2022 08:39:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
+        MIME-Version:Date:Message-ID:content-disposition;
+        bh=O0wtNrY7uERkcVmDzn9Qzn0QOjEuS076HETf2WzjME4=; b=fcBq3BeNtwnbwtK5Y2Ik7xDHNX
+        R2UXfuLGRfqLKYw2O//6lyhArxbX+eYSq7C1KjshVcSK35zRKyY1/m5BoX90BANeJxKsWQHWzpJfH
+        RLRIfLr01lR+my9+2IpdU/iMUoeB9400EApUEEHjJe6aaYg5O0DxWTZXa/RxPY1IK4XGp8wIPTO+B
+        n0noULDLnowj1XntvqsDZQQRPCkqagswEtT4sxIgVQ1daNBO6u/6PpMAZgin/duxNTYcVdNOEKaTU
+        0nCYR6bUVRS/Ok2+w20mNj06bY59NCDNF5cCXwNLFbRetVx9eUzGy9o9+U3YM2hjMTGWYbrJXVGen
+        0sKA+1AQ==;
+Received: from s0106a84e3fe8c3f3.cg.shawcable.net ([24.64.144.200] helo=[192.168.0.10])
+        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        (Exim 4.94.2)
+        (envelope-from <logang@deltatee.com>)
+        id 1o6Zmm-002RkM-SQ; Wed, 29 Jun 2022 09:39:25 -0600
+Message-ID: <c42b5ee3-5d4f-7e44-8885-26b8417208ae@deltatee.com>
+Date:   Wed, 29 Jun 2022 09:39:14 -0600
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:dc4:b0:33c:c2c5:50ab with SMTP id
- m4-20020a0566380dc400b0033cc2c550abmr2093334jaj.26.1656514110924; Wed, 29 Jun
- 2022 07:48:30 -0700 (PDT)
-Date:   Wed, 29 Jun 2022 07:48:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000025abbc05e2973f52@google.com>
-Subject: [syzbot] linux-next boot error: WARNING in blk_mq_release
-From:   syzbot <syzbot+7582a7c7cf0affa6c9be@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, linux-block@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-        sfr@canb.auug.org.au, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Content-Language: en-CA
+To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org
+Cc:     Stephen Bates <sbates@raithlin.com>,
+        Christoph Hellwig <hch@lst.de>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>,
+        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Chaitanya Kulkarni <kch@nvidia.com>
+References: <20220615161233.17527-1-logang@deltatee.com>
+ <20220615161233.17527-2-logang@deltatee.com>
+ <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
+From:   Logan Gunthorpe <logang@deltatee.com>
+In-Reply-To: <b56d9b93-c59f-5764-e599-d9718edb42d3@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 24.64.144.200
+X-SA-Exim-Rcpt-To: robin.murphy@arm.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, sbates@raithlin.com, hch@lst.de, dan.j.williams@intel.com, jgg@ziepe.ca, christian.koenig@amd.com, jhubbard@nvidia.com, ddutile@redhat.com, willy@infradead.org, daniel.vetter@ffwll.ch, dave.b.minturn@intel.com, jason@jlekstrand.net, dave.hansen@linux.intel.com, jianxin.xiong@intel.com, helgaas@kernel.org, ira.weiny@intel.com, martin.oliveira@eideticom.com, ckulkarnilinux@gmail.com, rcampbell@nvidia.com, kch@nvidia.com
+X-SA-Exim-Mail-From: logang@deltatee.com
+Subject: Re: [PATCH v7 01/21] lib/scatterlist: add flag for indicating P2PDMA
+ segments in an SGL
+X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
+X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    c4ef528bd006 Add linux-next specific files for 20220629
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=115f9f4c080000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=39ac31f5c81daa7c
-dashboard link: https://syzkaller.appspot.com/bug?extid=7582a7c7cf0affa6c9be
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7582a7c7cf0affa6c9be@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 2226 at block/blk-mq.c:3876 blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3876
-Modules linked in:
-CPU: 0 PID: 2226 Comm: kworker/0:3 Not tainted 5.19.0-rc4-next-20220629-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events blkg_free_workfn
-RIP: 0010:blk_mq_release+0xf8/0x3e0 block/blk-mq.c:3876
-Code: fd 4c 8d a3 a8 02 00 00 4c 89 e0 48 c1 e8 03 80 3c 28 00 0f 85 14 02 00 00 48 8b 83 a8 02 00 00 49 39 c4 75 b1 e8 28 af 97 fd <0f> 0b eb a8 e8 1f af 97 fd 48 8b 44 24 10 48 05 38 05 00 00 48 89
-RSP: 0000:ffffc90009837ba0 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: ffff88801bd5c000 RCX: 0000000000000000
-RDX: ffff888024193a80 RSI: ffffffff83e307e8 RDI: 0000000000000000
-RBP: dffffc0000000000 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: ffff88801bd5c2a8
-R13: ffff88801d898190 R14: ffff88801d898048 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9a00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffff88823ffff000 CR3: 000000000ba8e000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- blk_release_queue+0x15b/0x280 block/blk-sysfs.c:782
- kobject_cleanup lib/kobject.c:673 [inline]
- kobject_release lib/kobject.c:704 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1be/0x4c0 lib/kobject.c:721
- blkg_free_workfn+0x128/0x210 block/blk-cgroup.c:96
- process_one_work+0x991/0x1610 kernel/workqueue.c:2289
- worker_thread+0x665/0x1080 kernel/workqueue.c:2436
- kthread+0x2e9/0x3a0 kernel/kthread.c:376
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:302
- </TASK>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+On 2022-06-29 03:05, Robin Murphy wrote:
+> On 2022-06-15 17:12, Logan Gunthorpe wrote:
+>> Make use of the third free LSB in scatterlist's page_link on 64bit
+>> systems.
+>>
+>> The extra bit will be used by dma_[un]map_sg_p2pdma() to determine when a
+>> given SGL segments dma_address points to a PCI bus address.
+>> dma_unmap_sg_p2pdma() will need to perform different cleanup when a
+>> segment is marked as a bus address.
+>>
+>> The new bit will only be used when CONFIG_PCI_P2PDMA is set; this means
+>> PCI P2PDMA will require CONFIG_64BIT. This should be acceptable as the
+>> majority of P2PDMA use cases are restricted to newer root complexes and
+>> roughly require the extra address space for memory BARs used in the
+>> transactions.
+>>
+>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
+>> Reviewed-by: Chaitanya Kulkarni <kch@nvidia.com>
+>> ---
+>>   drivers/pci/Kconfig         |  5 +++++
+>>   include/linux/scatterlist.h | 44 ++++++++++++++++++++++++++++++++++++-
+>>   2 files changed, 48 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/pci/Kconfig b/drivers/pci/Kconfig
+>> index 133c73207782..5cc7cba1941f 100644
+>> --- a/drivers/pci/Kconfig
+>> +++ b/drivers/pci/Kconfig
+>> @@ -164,6 +164,11 @@ config PCI_PASID
+>>   config PCI_P2PDMA
+>>       bool "PCI peer-to-peer transfer support"
+>>       depends on ZONE_DEVICE
+>> +    #
+>> +    # The need for the scatterlist DMA bus address flag means PCI P2PDMA
+>> +    # requires 64bit
+>> +    #
+>> +    depends on 64BIT
+>>       select GENERIC_ALLOCATOR
+>>       help
+>>         Enableѕ drivers to do PCI peer-to-peer transactions to and from
+>> diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
+>> index 7ff9d6386c12..6561ca8aead8 100644
+>> --- a/include/linux/scatterlist.h
+>> +++ b/include/linux/scatterlist.h
+>> @@ -64,12 +64,24 @@ struct sg_append_table {
+>>   #define SG_CHAIN    0x01UL
+>>   #define SG_END        0x02UL
+>>   +/*
+>> + * bit 2 is the third free bit in the page_link on 64bit systems which
+>> + * is used by dma_unmap_sg() to determine if the dma_address is a
+>> + * bus address when doing P2PDMA.
+>> + */
+>> +#ifdef CONFIG_PCI_P2PDMA
+>> +#define SG_DMA_BUS_ADDRESS    0x04UL
+>> +static_assert(__alignof__(struct page) >= 8);
+>> +#else
+>> +#define SG_DMA_BUS_ADDRESS    0x00UL
+>> +#endif
+>> +
+>>   /*
+>>    * We overload the LSB of the page pointer to indicate whether it's
+>>    * a valid sg entry, or whether it points to the start of a new
+>> scatterlist.
+>>    * Those low bits are there for everyone! (thanks mason :-)
+>>    */
+>> -#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END)
+>> +#define SG_PAGE_LINK_MASK (SG_CHAIN | SG_END | SG_DMA_BUS_ADDRESS)
+>>     static inline unsigned int __sg_flags(struct scatterlist *sg)
+>>   {
+>> @@ -91,6 +103,11 @@ static inline bool sg_is_last(struct scatterlist *sg)
+>>       return __sg_flags(sg) & SG_END;
+>>   }
+>>   +static inline bool sg_is_dma_bus_address(struct scatterlist *sg)
+>> +{
+>> +    return __sg_flags(sg) & SG_DMA_BUS_ADDRESS;
+>> +}
+>> +
+>>   /**
+>>    * sg_assign_page - Assign a given page to an SG entry
+>>    * @sg:            SG entry
+>> @@ -245,6 +262,31 @@ static inline void sg_unmark_end(struct
+>> scatterlist *sg)
+>>       sg->page_link &= ~SG_END;
+>>   }
+>>   +/**
+>> + * sg_dma_mark_bus address - Mark the scatterlist entry as a bus address
+>> + * @sg:         SG entryScatterlist
+> 
+> entryScatterlist?
+> 
+>> + *
+>> + * Description:
+>> + *   Marks the passed in sg entry to indicate that the dma_address is
+>> + *   a bus address and doesn't need to be unmapped.
+>> + **/
+>> +static inline void sg_dma_mark_bus_address(struct scatterlist *sg)
+>> +{
+>> +    sg->page_link |= SG_DMA_BUS_ADDRESS;
+>> +}
+>> +
+>> +/**
+>> + * sg_unmark_pci_p2pdma - Unmark the scatterlist entry as a bus address
+>> + * @sg:         SG entryScatterlist
+>> + *
+>> + * Description:
+>> + *   Clears the bus address mark.
+>> + **/
+>> +static inline void sg_dma_unmark_bus_address(struct scatterlist *sg)
+>> +{
+>> +    sg->page_link &= ~SG_DMA_BUS_ADDRESS;
+>> +}
+> 
+> Does this serve any useful purpose? If a page is determined to be device
+> memory, it's not going to suddenly stop being device memory, and if the
+> underlying sg is recycled to point elsewhere then sg_assign_page() will
+> still (correctly) clear this flag anyway. Trying to reason about this
+> beyond superficial API symmetry - i.e. why exactly would a caller need
+> to call it, and what would the implications be of failing to do so -
+> seems to lead straight to confusion.
+> 
+> In fact I'd be inclined to have sg_assign_page() be responsible for
+> setting the flag automatically as well, and thus not need
+> sg_dma_mark_bus_address() either, however I can see the argument for
+> doing it this way round to not entangle the APIs too much, so I don't
+> have any great objection to that.
+
+Yes, I think you misunderstand what this is for. The SG_DMA_BUS_ADDDRESS
+flag doesn't mark the segment for the page, but for the dma address. It
+cannot be set in sg_assign_page() seeing it's not a property of the page
+but a property of the dma_address in the sgl.
+
+It's not meant for use by regular SG users, it's only meant for use
+inside DMA mapping implementations. The purpose is to know whether a
+given dma_address in the SGL is a bus address or regular memory because
+the two different types must be unmapped differently. We can't rely on
+the page because, as you know, many dma_map_sg() the dma_address entry
+in the sgl does not map to the same memory as the page. Or to put it
+another way: is_pci_p2pdma_page(sg->page) does not imply that
+sg->dma_address points to a bus address.
+
+Does that make sense?
+
+Logan
