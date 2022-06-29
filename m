@@ -2,211 +2,306 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71778C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 22:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CDD5FC433EF
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 23:31:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbiF2Wl4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 18:41:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55884 "EHLO
+        id S231367AbiF2Xb5 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 19:31:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229876AbiF2Wlz (ORCPT
+        with ESMTP id S229821AbiF2Xb4 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 18:41:55 -0400
-Received: from ale.deltatee.com (ale.deltatee.com [204.191.154.188])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AEBA3DF70;
-        Wed, 29 Jun 2022 15:41:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=deltatee.com; s=20200525; h=Subject:In-Reply-To:From:References:Cc:To:
-        MIME-Version:Date:Message-ID:content-disposition;
-        bh=yVJkquctrxAoNz8gXWxalQPFR+kficMZVVuKxSIBo/w=; b=cX1QqveBfo+xPu7dGHmrnO0J7K
-        qJxZ/4a3qviR2YsYxAl441tnDslX7UZLKVNl7dECkLbDJBrODx24Z1FZZ2YR0gfK4Qx5bFxKsdnV+
-        ayp9miFGsznMYxLuJT8qz8m4U8lbLvb0m6Ihhj5N+dY9xmE7ZIBt8+8ePCpdzZ/dd2H7pg8bVqEIL
-        vOvuRL9kWAgEKZ7udv7uSElDfsGN0ygRfue2iteXV1Evx26BlZvoCj9t2OzZA3JRHuGstDkn2hrBY
-        PycWefQB0v5JZG34eFp4p3I7HwaoFTdQBv3Qpo6sU7xpIDA51IeoXpZk0+KoB2vKszKIczOjopgNy
-        fM05bfoA==;
-Received: from s0106ac1f6bb1ecac.cg.shawcable.net ([70.73.163.230] helo=[192.168.11.155])
-        by ale.deltatee.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <logang@deltatee.com>)
-        id 1o6gNZ-002ZYA-Ie; Wed, 29 Jun 2022 16:41:50 -0600
-Message-ID: <626de61d-e85e-bc9f-9e3d-836a408c859f@deltatee.com>
-Date:   Wed, 29 Jun 2022 16:41:42 -0600
+        Wed, 29 Jun 2022 19:31:56 -0400
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE20930B
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:31:55 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id jh14so15499991plb.1
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 16:31:55 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Iw2+V7CdxpxT0ywDoQBrSEAnLDlKm9G1WxYNU3eqmKg=;
+        b=N77COVylXeTwz0P47jg4det4m6j3xQTE1iHsbsV2sTpL2E/QTr6W1yEkO1fl+ZWcDz
+         g1ZRP1rs27/SJWbnMf0tyxhc2Ko97yoZN97X8EzEaty9/DO9D6eSHTDcwofgOAW5remm
+         wiq+Czt+Hkpq8/GHtbl9poiAU3UCCXUIXRILMVbFSym3vsPPxRNAhJ7FY/EU9AbaMx5v
+         z1zBzPeMmdUwgb4C5dS8r8TgcP3eSUMRuq3lkwFH7ncGgn+c+9eQduGAaH0PmD0edzZA
+         uazCse/UXQMVuG5V91C29j+1RsUO++8emLO6DsPywBkpY/0idz5gdGyOHtDWIXMrHWsb
+         QWLw==
+X-Gm-Message-State: AJIora/udYcLc4IvMT/iG8YkLe2cyiZ4rZ1lJ4VGoskpHTKYetDWWxuT
+        iBcDdsNLkKpsXjgKqT+9YBPN5Jhrq6c=
+X-Google-Smtp-Source: AGRyM1sod5FOlMyYwrp+GNVgem3C8YQuD8fKSkDupR/JDJ4qmpKYIjz3WxRqLJzBfDxamDekYJcBLA==
+X-Received: by 2002:a17:902:f685:b0:16a:3c40:e3b5 with SMTP id l5-20020a170902f68500b0016a3c40e3b5mr12965219plg.106.1656545514770;
+        Wed, 29 Jun 2022 16:31:54 -0700 (PDT)
+Received: from bvanassche-linux.mtv.corp.google.com ([2620:15c:211:201:3841:49ce:cba5:1586])
+        by smtp.gmail.com with ESMTPSA id b21-20020a17090a8c9500b001ec8d191db4sm2763687pjo.17.2022.06.29.16.31.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 16:31:53 -0700 (PDT)
+From:   Bart Van Assche <bvanassche@acm.org>
+To:     Jens Axboe <axboe@kernel.dk>
+Cc:     linux-block@vger.kernel.org, Christoph Hellwig <hch@lst.de>,
+        Bart Van Assche <bvanassche@acm.org>
+Subject: [PATCH v2 00/63] Improve static type checking for request flags
+Date:   Wed, 29 Jun 2022 16:30:42 -0700
+Message-Id: <20220629233145.2779494-1-bvanassche@acm.org>
+X-Mailer: git-send-email 2.37.0.rc0.161.g10f37bed90-goog
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.8.0
-Content-Language: en-US
-To:     Robin Murphy <robin.murphy@arm.com>, linux-kernel@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
-        linux-pci@vger.kernel.org, linux-mm@kvack.org,
-        iommu@lists.linux-foundation.org
-Cc:     Minturn Dave B <dave.b.minturn@intel.com>,
-        Martin Oliveira <martin.oliveira@eideticom.com>,
-        Ralph Campbell <rcampbell@nvidia.com>,
-        Jason Gunthorpe <jgg@nvidia.com>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Matthew Wilcox <willy@infradead.org>,
-        =?UTF-8?Q?Christian_K=c3=b6nig?= <christian.koenig@amd.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
-        Jason Ekstrand <jason@jlekstrand.net>,
-        Daniel Vetter <daniel.vetter@ffwll.ch>,
-        Bjorn Helgaas <helgaas@kernel.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Stephen Bates <sbates@raithlin.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Christoph Hellwig <hch@lst.de>,
-        Xiong Jianxin <jianxin.xiong@intel.com>
-References: <20220615161233.17527-1-logang@deltatee.com>
- <20220615161233.17527-9-logang@deltatee.com>
- <feecc6fe-a16e-11f2-33c8-3de7c96b9ad5@arm.com>
- <f56181fb-7035-a775-22b1-77f97d6ec52c@deltatee.com>
- <7f0673e1-433b-65fb-1d2b-c3e4adeebf87@arm.com>
-From:   Logan Gunthorpe <logang@deltatee.com>
-In-Reply-To: <7f0673e1-433b-65fb-1d2b-c3e4adeebf87@arm.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 70.73.163.230
-X-SA-Exim-Rcpt-To: robin.murphy@arm.com, linux-kernel@vger.kernel.org, linux-nvme@lists.infradead.org, linux-block@vger.kernel.org, linux-pci@vger.kernel.org, linux-mm@kvack.org, iommu@lists.linux-foundation.org, dave.b.minturn@intel.com, martin.oliveira@eideticom.com, rcampbell@nvidia.com, jgg@nvidia.com, jhubbard@nvidia.com, dave.hansen@linux.intel.com, willy@infradead.org, christian.koenig@amd.com, jgg@ziepe.ca, ckulkarnilinux@gmail.com, jason@jlekstrand.net, daniel.vetter@ffwll.ch, helgaas@kernel.org, dan.j.williams@intel.com, sbates@raithlin.com, ira.weiny@intel.com, hch@lst.de, jianxin.xiong@intel.com
-X-SA-Exim-Mail-From: logang@deltatee.com
-Subject: Re: [PATCH v7 08/21] iommu/dma: support PCI P2PDMA pages in dma-iommu
- map_sg
-X-SA-Exim-Version: 4.2.1 (built Sat, 13 Feb 2021 17:57:42 +0000)
-X-SA-Exim-Scanned: Yes (on ale.deltatee.com)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
+Hi Jens,
 
+A source of confusion in the block layer is that can be nontrivial to determine
+which type of flags a u32 function argument accepts. This patch series clears
+up that confusion for request flags by introducing a new __bitwise type, namely
+blk_opf_t. Additionally, the type 'int' is change into 'enum req_op' where used
+to hold a request operation.
 
-On 2022-06-29 13:15, Robin Murphy wrote:
-> On 2022-06-29 16:57, Logan Gunthorpe wrote:
->>
->>
->>
->> On 2022-06-29 06:07, Robin Murphy wrote:
->>> On 2022-06-15 17:12, Logan Gunthorpe wrote:
->>>> When a PCI P2PDMA page is seen, set the IOVA length of the segment
->>>> to zero so that it is not mapped into the IOVA. Then, in finalise_sg(),
->>>> apply the appropriate bus address to the segment. The IOVA is not
->>>> created if the scatterlist only consists of P2PDMA pages.
->>>>
->>>> A P2PDMA page may have three possible outcomes when being mapped:
->>>>     1) If the data path between the two devices doesn't go through
->>>>        the root port, then it should be mapped with a PCI bus address
->>>>     2) If the data path goes through the host bridge, it should be
->>>> mapped
->>>>        normally with an IOMMU IOVA.
->>>>     3) It is not possible for the two devices to communicate and thus
->>>>        the mapping operation should fail (and it will return
->>>> -EREMOTEIO).
->>>>
->>>> Similar to dma-direct, the sg_dma_mark_pci_p2pdma() flag is used to
->>>> indicate bus address segments. On unmap, P2PDMA segments are skipped
->>>> over when determining the start and end IOVA addresses.
->>>>
->>>> With this change, the flags variable in the dma_map_ops is set to
->>>> DMA_F_PCI_P2PDMA_SUPPORTED to indicate support for P2PDMA pages.
->>>>
->>>> Signed-off-by: Logan Gunthorpe <logang@deltatee.com>
->>>> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
->>>> ---
->>>>    drivers/iommu/dma-iommu.c | 68
->>>> +++++++++++++++++++++++++++++++++++----
->>>>    1 file changed, 61 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/drivers/iommu/dma-iommu.c b/drivers/iommu/dma-iommu.c
->>>> index f90251572a5d..b01ca0c6a7ab 100644
->>>> --- a/drivers/iommu/dma-iommu.c
->>>> +++ b/drivers/iommu/dma-iommu.c
->>>> @@ -21,6 +21,7 @@
->>>>    #include <linux/iova.h>
->>>>    #include <linux/irq.h>
->>>>    #include <linux/list_sort.h>
->>>> +#include <linux/memremap.h>
->>>>    #include <linux/mm.h>
->>>>    #include <linux/mutex.h>
->>>>    #include <linux/pci.h>
->>>> @@ -1062,6 +1063,16 @@ static int __finalise_sg(struct device *dev,
->>>> struct scatterlist *sg, int nents,
->>>>            sg_dma_address(s) = DMA_MAPPING_ERROR;
->>>>            sg_dma_len(s) = 0;
->>>>    +        if (is_pci_p2pdma_page(sg_page(s)) && !s_iova_len) {
->>>
->>> Logically, should we not be able to use sg_is_dma_bus_address() here? I
->>> think it should be feasible, and simpler, to prepare the p2p segments
->>> up-front, such that at this point all we need to do is restore the
->>> original length (if even that, see below).
->>
->> Per my previous email, no, because sg_is_dma_bus_address() is not set
->> yet and not meant to tell you something about the page. That flag will
->> be set below by pci_p2pdma_map_bus_segment() and then checkd in
->> iommu_dma_unmap_sg() to determine if the dma_address in the segment
->> needs to be unmapped.
-> 
-> I know it's not set yet as-is; I'm suggesting things should be
-> restructured so that it *would be*. In the logical design of this code,
-> the DMA addresses are effectively determined in iommu_dma_map_sg(), and
-> __finalise_sg() merely converts them from a relative to an absolute form
-> (along with undoing the other trickery). Thus the call to
-> pci_p2pdma_map_bus_segment() absolutely belongs in the main
-> iommu_map_sg() loop.
+Analysis of the sparse warnings introduced by this conversion resulted in one
+bug fix ("blktrace: Trace remap operations correctly").
 
-I don't see how that can work: __finalise_sg() does more than convert
-them from relative to absolute, it also figures out which SG entry will
-contain which dma_address segment. Which segment a P2PDMA address needs
-to be programmed into depends on the how 'cur' is calculated which in
-turn depends on things like seg_mask and max_len. This calculation is
-not done in iommu_dma_map_sg() so I don't see how there's any hope of
-assigning the bus address for the P2P segments in that function.
+Although the number of patches in this series is significant, the risk of this
+patch series is low since most patches involve changing one integer type (int
+or u32) into another integer type of the same size (enum req_op or blk_opf_t).
 
-If there's a way to restructure things so that's possible that I'm not
-seeing, I'm open to it but it's certainly not immediately obvious.
+Please consider this patch series for kernel v5.20.
 
->>>> +
->>>> +            switch (map_type) {
->>>> +            case PCI_P2PDMA_MAP_BUS_ADDR:
->>>> +                /*
->>>> +                 * A zero length will be ignored by
->>>> +                 * iommu_map_sg() and then can be detected
->>>
->>> If that is required behaviour then it needs an explicit check in
->>> iommu_map_sg() to guarantee (and document) it. It's only by chance that
->>> __iommu_map() happens to return success for size == 0 *if* all the other
->>> arguments still line up, which is a far cry from a safe no-op.
->>
->> What should such a check look like? I could certainly add some comments
->> to iommu_map_sg(), but I don't see what the code would need to check
->> for...
-> 
-> I'd say a check for zero-length segments would look like "if (sg->length
-> == 0)", most likely with a "continue;" on the following line.
+Thanks,
 
-Oh, that's pretty simple to add. Will change.
+Bart.
 
->>> However, rather than play yet more silly tricks, I think it would make
->>> even more sense to make iommu_map_sg() properly aware and able to skip
->>> direct p2p segments on its own. Once it becomes normal to pass mixed
->>> scatterlists around, it's only a matter of time until one ends up being
->>> handed to a driver which manages its own IOMMU domain, and then what?
->>
->> I suppose we can add another call to is_pci_p2pdma_page() inside
->> iommu_map_sg() if you think that is cleaner. Seems like more work on the
->> fast path to me, but I'm not opposed to it.
-> 
-> I was thinking more of sg_is_dma_bus_address() but admittedly under my
-> initial misapprehension of that. I suppose there's still a tenuous
-> argument that even though we're not actually consuming sg_dma_address()
-> at that point, if a segment *has* been earmarked for direct p2p, then
-> skipping it rather than mapping it at the root complex TA that's
-> probably never going to see those transactions might seem the more
-> logical choice.
-> 
-> However it's all a bit hypothetical, and not significantly cleaner than
-> a zero-size special case, so I'm not particularly tied to the idea either.
+Changes compared to v1:
+- Combined request operation and flags into a single variable or argument.
+- Changed the type of several enum req_op arguments into blk_opf_t for future
+  extensibility.
+- Removed the __force casts from tracing code.
+- Added a few additional patches that convert additional block drivers.
 
-Yeah, looking at it closer, I can't see how to get rid of the zero size
-special case without doing the whole pci_p2pdma_map_type() calculation
-twice which we really want to avoid.
+Bart Van Assche (63):
+  treewide: Rename enum req_opf into enum req_op
+  block: Use enum req_op where appropriate
+  block: Change the type of the last .rw_page() argument
+  block: Change the type of req_op() and bio_op() into enum req_op
+  block: Introduce the type blk_opf_t
+  block: Use the new blk_opf_t type
+  block/bfq: Use the new blk_opf_t type
+  block/mq-deadline: Use the new blk_opf_t type
+  block/kyber: Use the new blk_opf_t type
+  blktrace: Trace remapped requests correctly
+  blktrace: Use the new blk_opf_t type
+  block/brd: Use the enum req_op type
+  block/drbd: Use the enum req_op and blk_opf_t types
+  block/drbd: Combine two drbd_submit_peer_request() arguments
+  block/floppy: Fix a sparse warning
+  block/rnbd: Use blk_opf_t where appropriate
+  xen-blkback: Use the enum req_op and blk_opf_t types
+  block/zram: Use enum req_op where appropriate
+  nvdimm-btt: Use the enum req_op type
+  um: Use enum req_op where appropriate
+  dm/core: Reduce the size of struct dm_io_request
+  dm/core: Rename kcopyd_job.rw into kcopyd.op
+  dm/core: Combine request operation type and flags
+  dm/ebs: Change 'int rw' into 'enum req_op op'
+  dm/dm-flakey: Use the new blk_opf_t type
+  dm/dm-integrity: Combine request operation and flags
+  dm mirror log: Use the new blk_opf_t type
+  dm-snap: Combine request operation type and flags
+  dm/zone: Use the enum req_op type
+  dm/dm-zoned: Use the enum req_op type
+  md/core: Combine two sync_page_io() arguments
+  md/bcache: Combine two uuid_io() arguments
+  md/bcache: Combine two prio_io() arguments
+  md/raid1: Use the new blk_opf_t type
+  md/raid10: Use the new blk_opf_t type
+  md/raid5: Use the enum req_op and blk_opf_t types
+  nvme/host: Use the enum req_op and blk_opf_t types
+  nvme/target: Use the new blk_opf_t type
+  scsi/core: Improve static type checking
+  scsi/core: Change the return type of scsi_noretry_cmd() into bool
+  scsi/core: Use the new blk_opf_t type
+  scsi/device_handlers: Use the new blk_opf_t type
+  scsi/ufs: Rename a 'dir' argument into 'op'
+  scsi/target: Use the new blk_opf_t type
+  mm: Use the new blk_opf_t type
+  fs/buffer: Use the new blk_opf_t type
+  fs/buffer: Combine two submit_bh() and ll_rw_block() arguments
+  fs/direct-io: Reduce the size of struct dio
+  fs/mpage: Use the new blk_opf_t type
+  fs/btrfs: Use the enum req_op and blk_opf_t types
+  fs/ext4: Use the new blk_opf_t type
+  fs/f2fs: Use the enum req_op and blk_opf_t types
+  fs/gfs2: Use the enum req_op and blk_opf_t types
+  fs/hfsplus: Use the enum req_op and blk_opf_t types
+  fs/iomap: Use the new blk_opf_t type
+  fs/jbd2: Fix the documentation of the jbd2_write_superblock() callers
+  fs/nfs: Use enum req_op where appropriate
+  fs/nilfs2: Use the enum req_op and blk_opf_t types
+  fs/ntfs3: Use enum req_op where appropriate
+  fs/ocfs2: Use the enum req_op and blk_opf_t types
+  PM: Use the enum req_op and blk_opf_t types
+  fs/xfs: Use the enum req_op and blk_opf_t types
+  fs/zonefs: Use the enum req_op type for request operations
 
-Logan
+ arch/um/drivers/ubd_kern.c                  |   4 +-
+ block/bfq-cgroup.c                          |  16 +--
+ block/bfq-iosched.c                         |   8 +-
+ block/bfq-iosched.h                         |   8 +-
+ block/bio.c                                 |  10 +-
+ block/blk-cgroup-rwstat.h                   |   2 +-
+ block/blk-core.c                            |   8 +-
+ block/blk-flush.c                           |   6 +-
+ block/blk-merge.c                           |   8 +-
+ block/blk-mq-debugfs.c                      |   6 +-
+ block/blk-mq.c                              |  15 +--
+ block/blk-mq.h                              |   6 +-
+ block/blk-throttle.c                        |   7 +-
+ block/blk-wbt.c                             |  18 +--
+ block/blk-zoned.c                           |   7 +-
+ block/blk.h                                 |   2 +-
+ block/elevator.h                            |   2 +-
+ block/fops.c                                |   8 +-
+ block/kyber-iosched.c                       |   6 +-
+ block/mq-deadline.c                         |   2 +-
+ drivers/block/brd.c                         |   4 +-
+ drivers/block/drbd/drbd_actlog.c            |   9 +-
+ drivers/block/drbd/drbd_bitmap.c            |   3 +-
+ drivers/block/drbd/drbd_int.h               |   5 +-
+ drivers/block/drbd/drbd_receiver.c          |  24 ++--
+ drivers/block/drbd/drbd_worker.c            |   2 +-
+ drivers/block/floppy.c                      |   2 +-
+ drivers/block/null_blk/main.c               |   9 +-
+ drivers/block/null_blk/null_blk.h           |  12 +-
+ drivers/block/null_blk/trace.h              |   2 +-
+ drivers/block/null_blk/zoned.c              |   4 +-
+ drivers/block/paride/pd.c                   |   2 +
+ drivers/block/rnbd/rnbd-proto.h             |   7 +-
+ drivers/block/xen-blkback/blkback.c         |   6 +-
+ drivers/block/zram/zram_drv.c               |   4 +-
+ drivers/md/bcache/super.c                   |  25 ++--
+ drivers/md/dm-bufio.c                       |  26 ++---
+ drivers/md/dm-ebs-target.c                  |  15 +--
+ drivers/md/dm-flakey.c                      |   8 +-
+ drivers/md/dm-integrity.c                   |  76 ++++++-------
+ drivers/md/dm-io.c                          |  38 +++----
+ drivers/md/dm-kcopyd.c                      |  26 ++---
+ drivers/md/dm-log.c                         |   8 +-
+ drivers/md/dm-raid.c                        |   2 +-
+ drivers/md/dm-raid1.c                       |  12 +-
+ drivers/md/dm-snap-persistent.c             |  25 ++--
+ drivers/md/dm-writecache.c                  |  12 +-
+ drivers/md/dm-zone.c                        |   2 +-
+ drivers/md/dm-zoned-metadata.c              |   5 +-
+ drivers/md/dm-zoned.h                       |   2 +-
+ drivers/md/dm.c                             |  12 +-
+ drivers/md/md-bitmap.c                      |   6 +-
+ drivers/md/md.c                             |  10 +-
+ drivers/md/md.h                             |   3 +-
+ drivers/md/raid1.c                          |  12 +-
+ drivers/md/raid10.c                         |  20 ++--
+ drivers/md/raid5-cache.c                    |  12 +-
+ drivers/md/raid5-ppl.c                      |  12 +-
+ drivers/md/raid5.c                          |   5 +-
+ drivers/nvdimm/btt.c                        |   4 +-
+ drivers/nvdimm/pmem.c                       |   2 +-
+ drivers/nvme/host/ioctl.c                   |   4 +-
+ drivers/nvme/host/nvme.h                    |   2 +-
+ drivers/nvme/target/io-cmd-bdev.c           |   3 +-
+ drivers/nvme/target/zns.c                   |   6 +-
+ drivers/scsi/device_handler/scsi_dh_alua.c  |   4 +-
+ drivers/scsi/device_handler/scsi_dh_emc.c   |   2 +-
+ drivers/scsi/device_handler/scsi_dh_hp_sw.c |   4 +-
+ drivers/scsi/device_handler/scsi_dh_rdac.c  |   2 +-
+ drivers/scsi/scsi_error.c                   |  16 +--
+ drivers/scsi/scsi_lib.c                     |  12 +-
+ drivers/scsi/scsi_priv.h                    |   2 +-
+ drivers/scsi/sd_zbc.c                       |   2 +-
+ drivers/target/target_core_iblock.c         |   4 +-
+ drivers/ufs/core/ufshpb.c                   |   7 +-
+ fs/btrfs/check-integrity.c                  |   4 +-
+ fs/btrfs/compression.c                      |   6 +-
+ fs/btrfs/compression.h                      |   2 +-
+ fs/btrfs/extent_io.c                        |  18 +--
+ fs/btrfs/inode.c                            |   4 +-
+ fs/btrfs/raid56.c                           |   4 +-
+ fs/buffer.c                                 |  56 ++++-----
+ fs/direct-io.c                              |  37 +++---
+ fs/ext4/ext4.h                              |   8 +-
+ fs/ext4/fast_commit.c                       |   4 +-
+ fs/ext4/mmp.c                               |   2 +-
+ fs/ext4/super.c                             |  20 ++--
+ fs/f2fs/data.c                              |  11 +-
+ fs/f2fs/f2fs.h                              |   6 +-
+ fs/f2fs/node.c                              |   2 +-
+ fs/f2fs/segment.c                           |   2 +-
+ fs/gfs2/bmap.c                              |   5 +-
+ fs/gfs2/dir.c                               |   5 +-
+ fs/gfs2/log.c                               |   4 +-
+ fs/gfs2/log.h                               |   2 +-
+ fs/gfs2/lops.c                              |   4 +-
+ fs/gfs2/lops.h                              |   2 +-
+ fs/gfs2/meta_io.c                           |  18 ++-
+ fs/gfs2/quota.c                             |   2 +-
+ fs/hfsplus/hfsplus_fs.h                     |   2 +-
+ fs/hfsplus/part_tbl.c                       |   5 +-
+ fs/hfsplus/super.c                          |   4 +-
+ fs/hfsplus/wrapper.c                        |  12 +-
+ fs/iomap/direct-io.c                        |   8 +-
+ fs/isofs/compress.c                         |   2 +-
+ fs/jbd2/commit.c                            |   8 +-
+ fs/jbd2/journal.c                           |  19 ++--
+ fs/jbd2/recovery.c                          |   4 +-
+ fs/mpage.c                                  |   2 +-
+ fs/nfs/blocklayout/blocklayout.c            |  13 +--
+ fs/nilfs2/btnode.c                          |   8 +-
+ fs/nilfs2/btnode.h                          |   4 +-
+ fs/nilfs2/btree.c                           |   6 +-
+ fs/nilfs2/gcinode.c                         |   7 +-
+ fs/nilfs2/mdt.c                             |  19 ++--
+ fs/ntfs/aops.c                              |   6 +-
+ fs/ntfs/compress.c                          |   2 +-
+ fs/ntfs/file.c                              |   2 +-
+ fs/ntfs/logfile.c                           |   2 +-
+ fs/ntfs/mft.c                               |   4 +-
+ fs/ntfs3/file.c                             |   2 +-
+ fs/ntfs3/fsntfs.c                           |   2 +-
+ fs/ntfs3/inode.c                            |   2 +-
+ fs/ntfs3/ntfs_fs.h                          |   2 +-
+ fs/ocfs2/aops.c                             |   2 +-
+ fs/ocfs2/buffer_head_io.c                   |   8 +-
+ fs/ocfs2/cluster/heartbeat.c                |   9 +-
+ fs/ocfs2/super.c                            |   2 +-
+ fs/reiserfs/inode.c                         |   4 +-
+ fs/reiserfs/journal.c                       |  12 +-
+ fs/reiserfs/stree.c                         |   4 +-
+ fs/reiserfs/super.c                         |   2 +-
+ fs/udf/dir.c                                |   2 +-
+ fs/udf/directory.c                          |   2 +-
+ fs/udf/inode.c                              |   2 +-
+ fs/ufs/balloc.c                             |   2 +-
+ fs/xfs/xfs_bio_io.c                         |   2 +-
+ fs/xfs/xfs_buf.c                            |   4 +-
+ fs/xfs/xfs_linux.h                          |   2 +-
+ fs/xfs/xfs_log_recover.c                    |   2 +-
+ fs/zonefs/super.c                           |   5 +-
+ fs/zonefs/trace.h                           |   4 +-
+ include/linux/bio.h                         |  10 +-
+ include/linux/blk-mq.h                      |  12 +-
+ include/linux/blk_types.h                   | 119 +++++++++++---------
+ include/linux/blkdev.h                      |  12 +-
+ include/linux/blktrace_api.h                |   3 +-
+ include/linux/buffer_head.h                 |   9 +-
+ include/linux/dm-io.h                       |   4 +-
+ include/linux/jbd2.h                        |   2 +-
+ include/linux/writeback.h                   |   4 +-
+ include/scsi/scsi_cmnd.h                    |   4 +-
+ include/scsi/scsi_device.h                  |   2 +-
+ include/trace/events/f2fs.h                 |  22 ++--
+ include/trace/events/jbd2.h                 |  12 +-
+ include/trace/events/nilfs2.h               |   4 +-
+ kernel/power/swap.c                         |  29 +++--
+ kernel/trace/blktrace.c                     |  51 ++++-----
+ 158 files changed, 722 insertions(+), 716 deletions(-)
+
