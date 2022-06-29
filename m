@@ -2,96 +2,183 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B95C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 21:55:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78C00C43334
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 21:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229690AbiF2VzR (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 17:55:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56010 "EHLO
+        id S230128AbiF2VzS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 17:55:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56020 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229540AbiF2VzQ (ORCPT
+        with ESMTP id S229540AbiF2VzR (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 17:55:16 -0400
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 946DF20F6F
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
-Received: by mail-qk1-f177.google.com with SMTP id z12so13125298qki.3
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
+        Wed, 29 Jun 2022 17:55:17 -0400
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD3DC20F6F
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:16 -0700 (PDT)
+Received: by mail-qv1-f45.google.com with SMTP id 59so26975195qvb.3
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:55:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=mgLvicxygsgFWfkkr4Nfr2kLCpJ+k85KjEN3Gw0z4Zk=;
-        b=b3t86ArL6QWtna+zNP7pfckJRPQKLPrXtyQTQIXeMF8dmI/QKweZ/FexvtMISyMY8x
-         FG6PBtFFo76Qna/nUWpn9rMWEYpkrjeeO0Q5wOreaflaRJxOvXrqlhjdDPHHAjXD6+9B
-         xhz3iZO9sYbeJie9weCXyokVq+QNd5DIWLdI69c7DNmp7oSBI1jMtarMlLDZTW+Sunu9
-         X/RMffzipPyfj+n7iGQkzSorigWuuijCurWirdHIvYtYypcxchf8E8jAxEUbxLqyyAyx
-         JMxkuYdfoZRVcCw77HaZPppHoiaStBjimNTUtZCCNjA2abUyhyRa5Ia1Qs4QhP6vAdQ0
-         s29A==
-X-Gm-Message-State: AJIora8Pfz2TAAeH7AgW0AiN90zlYLYKQTPbCvd1UGnMWPaboRITFPbL
-        8XiV0VZyyVI1yqSpQhja9H/t
-X-Google-Smtp-Source: AGRyM1uXQvQsptKSLy23DUES/xRH4SfsIle9GVnQzewwll2BBUehX9+zCu4ZlGzioPk5MgGrHAZPcQ==
-X-Received: by 2002:a37:a589:0:b0:6b1:ba97:5dbf with SMTP id o131-20020a37a589000000b006b1ba975dbfmr1611512qke.772.1656539714605;
-        Wed, 29 Jun 2022 14:55:14 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=aea/5SE2fqdgOQZcTcu0s6QMHRrZWr3dDOv9618JjIw=;
+        b=mtCOlDelsA57V8hOQLOt/uDX+XImwBrh6Orr/ntf9cmmmNwq+TlOPUfeuhzhC7Qnra
+         Jh4Xs7v3BLmPtoB+QvJFKlQ1zZArW0rdYL1qvz2o3a/5WtMCp8vg6Zw7eEl6yE6UUvPS
+         pqN3H88kqSOzYxOFpCPgvffXm6m1wsZLb2RqDCz4MLfV5x0mgmcVwsJZNkwK2SaU4xrT
+         3nS8pk9lkPK6CTIQosmoF0qg7xZUqZK63DIaXYNTNMopE2n1phFZpmtL7dTdNd2SU4Mp
+         irK9dE3hE7bfy+Me/Ds10kCeMrjWCRMI9Psraw8IXeWRH3MVH2ryV3qcrRYQ5etRb1+m
+         zEKg==
+X-Gm-Message-State: AJIora9KXaJWG3iAHh8UfF6b4YvIhIQtiCS4MaqEKcWSf2lD2Jkx8HQj
+        08hfvh2RRhXwTtwhhnkQ1aZa
+X-Google-Smtp-Source: AGRyM1viI+CzApaPiScSoPhn3qnTdzxpeun+Zl6mSNYXOZ5ELYg64jnA9NzY6PKXq79JEpKAbuW0fw==
+X-Received: by 2002:ac8:7f16:0:b0:31b:f6dd:abf with SMTP id f22-20020ac87f16000000b0031bf6dd0abfmr4475170qtk.523.1656539715930;
+        Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
 Received: from localhost (pool-68-160-176-52.bstnma.fios.verizon.net. [68.160.176.52])
-        by smtp.gmail.com with ESMTPSA id d8-20020ac85ac8000000b00304e70585f9sm12400080qtd.72.2022.06.29.14.55.13
+        by smtp.gmail.com with ESMTPSA id v22-20020ac87496000000b003051f450049sm11532659qtq.8.2022.06.29.14.55.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 14:55:14 -0700 (PDT)
+        Wed, 29 Jun 2022 14:55:15 -0700 (PDT)
 From:   Mike Snitzer <snitzer@kernel.org>
 To:     Jens Axboe <axboe@kernel.dk>, Ming Lei <ming.lei@redhat.com>
 Cc:     "Martin K . Petersen" <martin.petersen@oracle.com>,
         Eric Biggers <ebiggers@google.com>,
         Kent Overstreet <kent.overstreet@gmail.com>,
         dm-devel@redhat.com, linux-block@vger.kernel.org
-Subject: [PATCH 5.20 v2 0/3] block/dm: add bio_rewind to improve DM requeue
-Date:   Wed, 29 Jun 2022 17:55:10 -0400
-Message-Id: <20220629215513.37860-1-snitzer@kernel.org>
+Subject: [PATCH 5.20 v2 1/3] dm: improve BLK_STS_DM_REQUEUE and BLK_STS_AGAIN handling
+Date:   Wed, 29 Jun 2022 17:55:11 -0400
+Message-Id: <20220629215513.37860-2-snitzer@kernel.org>
 X-Mailer: git-send-email 2.15.0
+In-Reply-To: <20220629215513.37860-1-snitzer@kernel.org>
+References: <20220629215513.37860-1-snitzer@kernel.org>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-Hi,
+From: Ming Lei <ming.lei@redhat.com>
 
-This v2 is the by-product of my having picked up v1's patch 2+3 and
-folding them (into patch 1 of this v2 series). So patch 1 of this v2
-is settled and will be merged into 5.20.
+If either BLK_STS_DM_REQUEUE or BLK_STS_AGAIN is returned for POLLED
+io, we requeue the original bio into deferred list and kick md->wq to
+re-submit it to block layer.
 
-Patches 2 and 3 are the result of me having gone over the v1 code. I
-folded in the copy-n-paste bugfix that Eric Biggers kindly pointed out
-in v1. I also updated patch headers and code comments for clarity. And
-I also renamed some variables, tweaked some style knits (subjective
-but whatever).
+Improve the handling in the following way:
 
-This code is available in linux-dm.git's 'dm-5.20' branch:
-https://git.kernel.org/pub/scm/linux/kernel/git/device-mapper/linux-dm.git/log/?h=dm-5.20
-Which is based on Jens's for-5.20/block
+1) Factor out dm_handle_requeue() for handling dm_io requeue.
 
-I'll obviously rebase 'dm-5.20' ontop of Jens's branch if/when he
-picks up patch 2 in this series.
+2) Unify handling for BLK_STS_DM_REQUEUE and BLK_STS_AGAIN: clear
+   REQ_POLLED for BLK_STS_DM_REQUEUE too, for the sake of simplicity,
+   given BLK_STS_DM_REQUEUE is very unusual.
 
-This code is passing all my tests so far but testing is ongoing.
+3) Queue md->wq explicitly in dm_handle_requeue(), so requeue handling
+   becomes more robust.
 
-All comments welcome.
+Signed-off-by: Ming Lei <ming.lei@redhat.com>
+Signed-off-by: Mike Snitzer <snitzer@kernel.org>
+---
+ drivers/md/dm.c | 70 ++++++++++++++++++++++++++++++++++++---------------------
+ 1 file changed, 45 insertions(+), 25 deletions(-)
 
-ps. I was told Kent had replied to the v1 thread while I was working
-on this v2, I kept focus on finishing this v2. I'll check my email in
-a bit.
-
-Ming Lei (3):
-  dm: improve BLK_STS_DM_REQUEUE and BLK_STS_AGAIN handling
-  block: add bio_rewind() API
-  dm: add two stage requeue mechanism
-
- block/bio-integrity.c       |  19 +++++
- block/bio.c                 |  20 +++++
- block/blk-crypto-internal.h |   7 ++
- block/blk-crypto.c          |  25 ++++++
- drivers/md/dm-core.h        |  11 ++-
- drivers/md/dm.c             | 189 ++++++++++++++++++++++++++++++++++----------
- include/linux/bio.h         |  21 +++++
- include/linux/bvec.h        |  33 ++++++++
- 8 files changed, 281 insertions(+), 44 deletions(-)
-
+diff --git a/drivers/md/dm.c b/drivers/md/dm.c
+index 84929bd137d0..c987f9ad24a4 100644
+--- a/drivers/md/dm.c
++++ b/drivers/md/dm.c
+@@ -880,22 +880,41 @@ static int __noflush_suspending(struct mapped_device *md)
+ 	return test_bit(DMF_NOFLUSH_SUSPENDING, &md->flags);
+ }
+ 
+-static void dm_io_complete(struct dm_io *io)
++/*
++ * Return true if the dm_io's original bio is requeued.
++ * io->status is updated with error if requeue disallowed.
++ */
++static bool dm_handle_requeue(struct dm_io *io)
+ {
+-	blk_status_t io_error;
+-	struct mapped_device *md = io->md;
+ 	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
++	bool handle_requeue = (io->status == BLK_STS_DM_REQUEUE);
++	bool handle_polled_eagain = ((io->status == BLK_STS_AGAIN) &&
++				     (bio->bi_opf & REQ_POLLED));
++	struct mapped_device *md = io->md;
++	bool requeued = false;
+ 
+-	if (io->status == BLK_STS_DM_REQUEUE) {
++	if (handle_requeue || handle_polled_eagain) {
+ 		unsigned long flags;
++
++		if (bio->bi_opf & REQ_POLLED) {
++			/*
++			 * Upper layer won't help us poll split bio
++			 * (io->orig_bio may only reflect a subset of the
++			 * pre-split original) so clear REQ_POLLED.
++			 */
++			bio_clear_polled(bio);
++		}
++
+ 		/*
+-		 * Target requested pushing back the I/O.
++		 * Target requested pushing back the I/O or
++		 * polled IO hit BLK_STS_AGAIN.
+ 		 */
+ 		spin_lock_irqsave(&md->deferred_lock, flags);
+-		if (__noflush_suspending(md) &&
+-		    !WARN_ON_ONCE(dm_is_zone_write(md, bio))) {
+-			/* NOTE early return due to BLK_STS_DM_REQUEUE below */
++		if ((__noflush_suspending(md) &&
++		     !WARN_ON_ONCE(dm_is_zone_write(md, bio))) ||
++		    handle_polled_eagain) {
+ 			bio_list_add_head(&md->deferred, bio);
++			requeued = true;
+ 		} else {
+ 			/*
+ 			 * noflush suspend was interrupted or this is
+@@ -906,6 +925,21 @@ static void dm_io_complete(struct dm_io *io)
+ 		spin_unlock_irqrestore(&md->deferred_lock, flags);
+ 	}
+ 
++	if (requeued)
++		queue_work(md->wq, &md->work);
++
++	return requeued;
++}
++
++static void dm_io_complete(struct dm_io *io)
++{
++	struct bio *bio = io->split_bio ? io->split_bio : io->orig_bio;
++	struct mapped_device *md = io->md;
++	blk_status_t io_error;
++	bool requeued;
++
++	requeued = dm_handle_requeue(io);
++
+ 	io_error = io->status;
+ 	if (dm_io_flagged(io, DM_IO_ACCOUNTED))
+ 		dm_end_io_acct(io);
+@@ -925,23 +959,9 @@ static void dm_io_complete(struct dm_io *io)
+ 	if (unlikely(wq_has_sleeper(&md->wait)))
+ 		wake_up(&md->wait);
+ 
+-	if (io_error == BLK_STS_DM_REQUEUE || io_error == BLK_STS_AGAIN) {
+-		if (bio->bi_opf & REQ_POLLED) {
+-			/*
+-			 * Upper layer won't help us poll split bio (io->orig_bio
+-			 * may only reflect a subset of the pre-split original)
+-			 * so clear REQ_POLLED in case of requeue.
+-			 */
+-			bio_clear_polled(bio);
+-			if (io_error == BLK_STS_AGAIN) {
+-				/* io_uring doesn't handle BLK_STS_AGAIN (yet) */
+-				queue_io(md, bio);
+-				return;
+-			}
+-		}
+-		if (io_error == BLK_STS_DM_REQUEUE)
+-			return;
+-	}
++	/* Return early if the original bio was requeued */
++	if (requeued)
++		return;
+ 
+ 	if (bio_is_flush_with_data(bio)) {
+ 		/*
 -- 
 2.15.0
 
