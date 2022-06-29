@@ -2,123 +2,131 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7784CC43334
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 20:51:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6BB6CCA47C
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 21:35:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbiF2Uvx (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 16:51:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41722 "EHLO
+        id S231145AbiF2Vf4 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 17:35:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42250 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229698AbiF2Uvw (ORCPT
+        with ESMTP id S231237AbiF2Vfs (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 16:51:52 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9120B3B57D
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id x1-20020a17090abc8100b001ec7f8a51f5so708483pjr.0
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
+        Wed, 29 Jun 2022 17:35:48 -0400
+Received: from mail-io1-xd31.google.com (mail-io1-xd31.google.com [IPv6:2607:f8b0:4864:20::d31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0F834BB3
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:35:44 -0700 (PDT)
+Received: by mail-io1-xd31.google.com with SMTP id p69so17315873iod.10
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 14:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=content-transfer-encoding:from:mime-version:subject:date:message-id
-         :references:cc:in-reply-to:to;
-        bh=QzwBZ8MiKHCkHQs6ubFBUeLJm2aPz3uAJ0SJNl3Iybc=;
-        b=P/tFMAavejNGyZvqSFU2mkJlZXaYYqOnwQE6I2NFPUtuwMAstEtCx65ohUNqDaIZmC
-         MsAwqyZeKRs499JxkU2CIVrGDOLJdfHytpqNlZwZO48HpP/ARLFvaaL+eryw7wawM0iN
-         SPzlVDyieLswxUldskHOhk7PVNZ0u0ceT1c5GuTSafrVPdwF0Ov/UoN0H1zKGPUvGufb
-         REMdzsHYS2Oh/or4pVyCRa/EPokRPQmRzskkzw6UCXAK1euBekAvQw1VNcLY4Vr7Feo7
-         QObeSNT9u7mwtvvY1JIoh3J0NqN26L3uE6OMzymevAKChr3x5DcvYH8e19VoQ7obUreI
-         KxFA==
+        d=cloudflare.com; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VGBhZHWqW6jU2n7a27O2QHBIK43y3nGHte6lt/SEtG0=;
+        b=W8+Z7i9qRM0MsWbc+KsXIAElN0YZEtmcc17hsLOb/KWWvqaEbf5Q9Btz7IbP5bm5/V
+         nydE4Dx0h63nSNLveaItcJSr4cPaMXeYz0N20AdqwpHoW+E8pV7C60HUzv9CtekRWfia
+         sbvNxWCC0oyNPa7tfrRbC+UUvIpAQtLITqPZ8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:content-transfer-encoding:from:mime-version
-         :subject:date:message-id:references:cc:in-reply-to:to;
-        bh=QzwBZ8MiKHCkHQs6ubFBUeLJm2aPz3uAJ0SJNl3Iybc=;
-        b=oAqUMolzZ0LXgXQ18TQraNzLp6+QLtenB1s6bx19Xd4Hu06cBcN/UMRdl9oISdsruY
-         FHxHkN2NNjPJUImyIrec81njIKWnLAtb0/3rdMy1bBn46fDyhzTsy+El7GIDcMVG5Yrm
-         BZp276AF9Vm0IwS9V133e7XgO/SiaFM9IxOawyzx1kU5XwcfmVoJgsAQoPi763XHEeV3
-         GrTW7sAhKYvXlvoBUZ33cS6NINKTnfSjT2QdmDARVkbCXEmCeJscyXQPxYfeWCJrht/D
-         tRVuPlLbgN4afBAOI2qfdBqVV8rA6XK2AbiLZaFsCwoM1kS7YigbGvjK2OaOamA8YDdA
-         hzRw==
-X-Gm-Message-State: AJIora+a3U7uJ1/BMok8QNtvexPoTa8jNZwBwjBPx//N71aNh71BQb+G
-        rvv/kCJtNPKeRQJBVl1BSSStXg==
-X-Google-Smtp-Source: AGRyM1v1OkLy4OUlV7ZRW9VidqYwr1vCmgGeLPlNdNyB/wtkvJBb7FkK3KxiVGvVDMaUmxrLSBvU+A==
-X-Received: by 2002:a17:90b:1753:b0:1ef:2e75:8811 with SMTP id jf19-20020a17090b175300b001ef2e758811mr2120687pjb.22.1656535910048;
-        Wed, 29 Jun 2022 13:51:50 -0700 (PDT)
-Received: from smtpclient.apple ([2600:380:b421:9fb9:5830:e8f6:f44a:f844])
-        by smtp.gmail.com with ESMTPSA id s9-20020a62e709000000b00527ab697c6asm6035747pfh.18.2022.06.29.13.51.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jun 2022 13:51:49 -0700 (PDT)
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From:   Jens Axboe <axboe@kernel.dk>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
-Date:   Wed, 29 Jun 2022 14:51:48 -0600
-Message-Id: <788DCE4B-8992-436B-B0D4-D101E9176345@kernel.dk>
-References: <20220629192646.aoj5c7xdqkifwjdg@moria.home.lan>
-Cc:     Ming Lei <ming.lei@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20220629192646.aoj5c7xdqkifwjdg@moria.home.lan>
-To:     Kent Overstreet <kent.overstreet@gmail.com>
-X-Mailer: iPhone Mail (19F77)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VGBhZHWqW6jU2n7a27O2QHBIK43y3nGHte6lt/SEtG0=;
+        b=rEYfRSn9zIrUUMELr3v5FDeLT95OpVq/Gm1uyxyA87UsNXVsHD747XBxzdnNyS7833
+         k4LfHB5k8S0Yqj3QXbznYSONDn6EhAaNl8Go9g7AfUBatAMRI9lCs4N0G4hYDP/uxf/u
+         Djbne4jhz381d9tozMtzjK4w9Mw9fZgdOJVsqpoQEx06FpIDc6IuUWar/uX3isUplNmz
+         Zlb3tbWrs6bx75MZs7NfQlWLoM06FT4PEgmwCUoX+hzElsFlr/uI7zu/P0bVVGIA5VCz
+         f2P6ArPz9BdbJWp5eWWg3QTNNJmB/U+UxjQh1HpsFNVIQv+lwR/1SdGyXPGbIsopbOa2
+         AgyQ==
+X-Gm-Message-State: AJIora8cs1NVtoUCGFAJ8KT8GJJOjsy5HYDRsM8iJ2XLvt/9t5RXo9Vx
+        7ZdNqxdSvH4DDqUW8KewZ1ILuHkSIdvAwTKniu9tdw==
+X-Google-Smtp-Source: AGRyM1sx3YTgbATfQDjAunxSoBLK3pi4IP0MMX8oiX8OkYO1T6fFycU68AHBce48c5X0XhL2pfBRw7LbtQUOSVzQraM=
+X-Received: by 2002:a05:6638:22cf:b0:33b:fd4a:122b with SMTP id
+ j15-20020a05663822cf00b0033bfd4a122bmr3164522jat.244.1656538543693; Wed, 29
+ Jun 2022 14:35:43 -0700 (PDT)
+MIME-Version: 1.0
+References: <3c38b723-40e6-ded9-5a3b-7b442a3f65d8@linux.vnet.ibm.com> <YrvDEqdk3ZfcEy9i@sol.localdomain>
+In-Reply-To: <YrvDEqdk3ZfcEy9i@sol.localdomain>
+From:   Ignat Korchagin <ignat@cloudflare.com>
+Date:   Wed, 29 Jun 2022 22:35:33 +0100
+Message-ID: <CALrw=nEsEemxP4q4QkFGxOY3+fo07wopdtLUerzBP0oKhRLmUA@mail.gmail.com>
+Subject: Re: [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to
+ linux-next kernel
+To:     Eric Biggers <ebiggers@kernel.org>,
+        Tasmiya Nalatwad <tasmiya@linux.vnet.ibm.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
+        linux-block <linux-block@vger.kernel.org>,
+        linux-crypto <linux-crypto@vger.kernel.org>,
+        kernel-team <kernel-team@cloudflare.com>,
+        abdhalee@linux.vnet.ibm.com, sachinp@linux.vnet.com,
+        mputtash@linux.vnet.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Jun 29, 2022, at 1:26 PM, Kent Overstreet <kent.overstreet@gmail.com> wro=
-te:
->=20
-> =EF=BB=BFOn Wed, Jun 29, 2022 at 01:00:52PM -0600, Jens Axboe wrote:
->>> On 6/29/22 12:40 PM, Kent Overstreet wrote:
->>> On Wed, Jun 29, 2022 at 11:16:10AM -0600, Jens Axboe wrote:
->>>> Not sure what Christoph change you are referring to, but all the ones
->>>> that I did to improve the init side were all backed by numbers I ran at=
+On Wed, Jun 29, 2022 at 4:12 AM Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Tue, Jun 28, 2022 at 02:33:55PM +0530, Tasmiya Nalatwad wrote:
+> > Greetings,
+> >
+> > [linux-next] [[5.19.0-rc4-next-20220627] WARNING during reboot to linux-next
+> > kernel
+> >
+> > --- Call Traces ---
+> > [    1.788574] ------------[ cut here ]------------
+> > [    1.788577] alg: self-tests for rsa-generic (rsa) failed (rc=-22)
+> > [    1.788586] WARNING: CPU: 9 PID: 218 at crypto/testmgr.c:5774
+> > alg_test+0x438/0x880
+> > [    1.788598] Modules linked in:
+> > [    1.788603] CPU: 9 PID: 218 Comm: cryptomgr_test Not tainted
+> > 5.19.0-rc4-next-20220627-autotest #1
+> > [    1.788609] NIP:  c00000000062e078 LR: c00000000062e074 CTR:
+> > c00000000075e020
+> > [    1.788614] REGS: c00000000e733980 TRAP: 0700   Not tainted
+> > (5.19.0-rc4-next-20220627-autotest)
+> > [    1.788620] MSR:  8000000000029033 <SF,EE,ME,IR,DR,RI,LE>  CR: 28008822
+> > XER: 20040005
+> > [    1.788632] CFAR: c00000000014f244 IRQMASK: 0
+> > [    1.788632] GPR00: c00000000062e074 c00000000e733c20 c000000002a12000
+> > 0000000000000035
+> > [    1.788632] GPR04: 00000000ffff7fff c00000000e7339e0 c00000000e7339d8
+> > 0000000000000000
+> > [    1.788632] GPR08: c000000002826b78 0000000000000000 c000000002566a50
+> > c0000000028e6bb8
+> > [    1.788632] GPR12: 0000000000008000 c00000000fff3280 c00000000018b6d8
+> > c00000000d640080
+> > [    1.788632] GPR16: 0000000000000000 0000000000000000 0000000000000000
+> > 0000000000000000
+> > [    1.788632] GPR20: 0000000000000000 0000000000000000 0000000000000000
+> > 0000000000000000
+> > [    1.788632] GPR24: c000000000da49e8 0000000000000000 c000000050630480
+> > 0000000000000400
+> > [    1.788632] GPR28: c000000050630400 000000000000000d c000000002cd33d8
+> > ffffffffffffffea
+> > [    1.788691] NIP [c00000000062e078] alg_test+0x438/0x880
+> > [    1.788696] LR [c00000000062e074] alg_test+0x434/0x880
+> > [    1.788701] Call Trace:
+> > [    1.788704] [c00000000e733c20] [c00000000062e074] alg_test+0x434/0x880
+> > (unreliable)
+> > [    1.788712] [c00000000e733d90] [c00000000062c040]
+> > cryptomgr_test+0x40/0x70
+> > [    1.788718] [c00000000e733dc0] [c00000000018b7f4] kthread+0x124/0x130
+> > [    1.788726] [c00000000e733e10] [c00000000000ce54]
+> > ret_from_kernel_thread+0x5c/0x64
+> > [    1.788733] Instruction dump:
+> > [    1.788736] 409e02e4 3d22002c 892913fd 2f890000 409e02d4 3c62fe63
+> > 7f45d378 7f84e378
+> > [    1.788746] 7fe6fb78 3863fa90 4bb2116d 60000000 <0fe00000> fa2100f8
+> > fa410100 fa610108
+> > [    1.788757] ---[ end trace 0000000000000000 ]---
+> > --
+>
+> It's caused by:
+>
+> commit f145d411a67efacc0731fc3f9c7b2d89fb62523a
+> Author: Ignat Korchagin <ignat@cloudflare.com>
+> Date:   Fri Jun 17 09:42:10 2022 +0100
+>
+>     crypto: rsa - implement Chinese Remainder Theorem for faster private key operations
 
->>>> that time (and most/all of the commit messages will have that data). So=
-
->>>> yes, it is indeed still very noticeable. Maybe not at 100K IOPS, but at=
-
->>>> 10M on a core it most certainly is.
->>>=20
->>> I was referring to 609be1066731fea86436f5f91022f82e592ab456. You
->>> signed off on it, you must remember it...?
->>=20
->> I'm sure we all remember each and every commit that gets applied,
->> particularly with such a precise description of the change.
->>=20
->>>> I'm all for having solid and maintainable code, obviously, but frivolou=
-s
->>>> bloating of structures and more expensive setup cannot be hand waved
->>>> away with "it doesn't matter if we touch 3 or 6 cachelines" because we
->>>> obviously have a disagreement on that.
->>>=20
->>> I wouldn't propose inflating struct _bio_ like that. But Jens, to be
->>> blunt - I know we have different priorities in the way we write code.
->>> Your writeback throttling code was buggy for _ages_ and I had users
->>> hitting deadlocks there that I pinged you about, and I could not make
->>> heads or tails of how that code was supposed to work and not for lack
->>> of time spent trying!
->>=20
->> OK Kent, you just wasted your 2nd chance here. Plonk. There are many
->> rebuttals that could be made here, but I won't waste my time on it, nor
->> would it be appropriate.
->>=20
->> Come back when you know how to act professionally. Or don't come back
->> at all.
->=20
-> Jens, you're just acting like your code is immune to criticism, and I don'=
-t have
-> an eyeroll big enough for that. We all know how you care about chasing eve=
-ry
-> last of those 10 million iops - and not much else.
-
-Kent, the time for your unsolicited opinions and attacks have passed. Just g=
-o away, not interested in interacting with you. You have no idea what you=E2=
-=80=99re talking about.=20
-
-
-
-
+Thanks for the report. Seems the RSA test vectors need updating as we
+now care about CRT parameters. I'll try to craft something.
