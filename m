@@ -2,125 +2,133 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47339C433EF
-	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 17:16:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F139CCA481
+	for <linux-block@archiver.kernel.org>; Wed, 29 Jun 2022 17:59:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229805AbiF2RQO (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 13:16:14 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59190 "EHLO
+        id S230340AbiF2R7L (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 13:59:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39334 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229546AbiF2RQN (ORCPT
+        with ESMTP id S231579AbiF2R7K (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 13:16:13 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9CB43CA66
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 10:16:12 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id q18so14679267pld.13
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 10:16:12 -0700 (PDT)
+        Wed, 29 Jun 2022 13:59:10 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B7D2B4
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 10:59:08 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id y14so25958198qvs.10
+        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 10:59:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=/+DA51ULPJFbE6Y+XCYKni6lHNUdKvUDD3ikKmPRkTc=;
-        b=LvM4+4s72a5HL8dl73wjDhDkw4qwi4hworxeuGXzRsZM+z2nNUWMzDNMGYZHVFxMrW
-         q9TsdwMUzro4cJ+vpQbm+N7e3hvGA5pzeCNSSns4dsO3/K3KttuBsE2qDGp9nvlyRwax
-         6mfQey6M/TVtbfRKFud9Pk55GjZIm3g1/aiyTkwR8VOh+LBHwlM2lEODkRFEjBLEosyq
-         S6F+RHGk1TKBn138gQXfv+SWQZaTooYwxzyAsywTEHoDxmBSdGaM5+hJIuhsZY1Iq3O5
-         QdpVowZyC3tP90ealsFUSc1ZDI64UwXRBA1AfFYSTAyKs5YFpbIqf+MWnB5SioAMN9c1
-         QF+A==
+        d=ziepe.ca; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=ngWx43aEx+7T9A14R2LGOmGQG6CiD1NPE7ELlQTW2Yo=;
+        b=SKmcghAf6nlxb3TYM9q+L2K6WvoAOg3jhiALBKso44zP0sXfB8bfiUedLcgKzgwJgh
+         iTJCket4ICkaBkiO0QMT6a7oZweniTqMyqfh5UKIWBSdtteoys0WU0gLpwmQxcuZ4T0C
+         B5EZV3F+pSyyuE/TubvDD1bjbB6DXWKJyou3V2eDANW0FMx1qb5IymBGqRBGbaBO/qpz
+         ziWT+UQffo2LDKQOaJhYTyVo3/P9yrGTwX9E3INhoqRXiDqc6Jau79+OQONuVBZZne7a
+         MzNQ3dTgqHtk/dbWQmfNzsZcoGEiW6sxYQ0kC+3zRe5EegJZ5dxZXRpFz6xNN0CByfx0
+         8ESA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=/+DA51ULPJFbE6Y+XCYKni6lHNUdKvUDD3ikKmPRkTc=;
-        b=0TClBzMYwryV3xTu6d3/j96tnSLafu+S06FlX5EzbR14XXSgi/bwSAgxsjKcjPjdl9
-         EwBoV4UgVn1+ZA6E8kv9thI4ZRB7XqoG3WpDd8Ins9hcEJyVGobE8Zo6ldNGatAmAArU
-         Bdgqc05XnrFifUZB8tYkCIyxBDM9dWWapkMd0fczacioDuzcEwe34iOt86SPu/sQEiqj
-         SBPmL0JRnOMlxyHAz4Wc/rGVLYPQJvcpJVMiDgZAFDdvBgMIHwlj/kQ3TNoCfrAJ5+uw
-         xufApGykeOTvUwtj1PECiztuZzA+oTwcsNKpXI+kK1K7eehUwm67WlC6xCZXZGeyXJgQ
-         YoKg==
-X-Gm-Message-State: AJIora/FRD6KXRV+zZoG2IfdE4swPsThgjZjdBWw9mQ2v5URu43ip5FQ
-        dF8O+I5wrQAGw8a6VTw+TcnwMw==
-X-Google-Smtp-Source: AGRyM1sYNbBYpPvY4Y2mmMGPN6ZIDBjC6tPIou6i47La2wx6f5mLpJ1OqrepCLDg5syxHJkuqTf4Sw==
-X-Received: by 2002:a17:902:f813:b0:169:8f5d:c343 with SMTP id ix19-20020a170902f81300b001698f5dc343mr11359822plb.98.1656522972323;
-        Wed, 29 Jun 2022 10:16:12 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id t14-20020a17090340ce00b00163bddfb109sm11614197pld.10.2022.06.29.10.16.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 29 Jun 2022 10:16:11 -0700 (PDT)
-Message-ID: <6f8db146-d4b3-d17b-4e58-08adc0010cba@kernel.dk>
-Date:   Wed, 29 Jun 2022 11:16:10 -0600
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=ngWx43aEx+7T9A14R2LGOmGQG6CiD1NPE7ELlQTW2Yo=;
+        b=JU4pw2e7FiKwVSMhSg6dY07/AIncFoA13lh6kvEZs4dm096BPCG0eQH3ZFXtj9PP3l
+         l8HHRu1KNllT3bydUNbErMm4fAPL7/eQtPuqPiuB9yNdK+p4iOUworHjkciIHfKFOzS+
+         jLKXHLTxqJZxne4BP0bG0tLGkD24ePx5jvc8L6FhlH7NfBVZ/QxyI1xON0jf33jqFnAu
+         XloHri3Y1OF8U76+n4h2TtwjwvoS34KIwHZKZhERp1BSwoxoPc8OsqwggwGLmQqU21GJ
+         KzbailfC9J0Q3dXeh+82iAOVVX7PhhSZid5+Ktf+3v+srEJclg7+vX2wIedqMtP7YATE
+         BhFA==
+X-Gm-Message-State: AJIora+uwVBlNX0GIL8Z0eOemiEuzoXcqlkjjolj+q/2y7WAejckENTh
+        HMUrH2g+POvotOPHXPJm0qxW4A==
+X-Google-Smtp-Source: AGRyM1tbrZ7P9r+hmIBmAW2EDXMkZbkavnNkEyNTe14M5A9CnmgPVypEPOrPgPFspFUz9zUokVYXKQ==
+X-Received: by 2002:a05:6214:ac2:b0:46e:7e2a:ada with SMTP id g2-20020a0562140ac200b0046e7e2a0adamr8831887qvi.81.1656525547889;
+        Wed, 29 Jun 2022 10:59:07 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-162-113-129.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.162.113.129])
+        by smtp.gmail.com with ESMTPSA id c13-20020a05620a164d00b006a6a4b43c01sm12832373qko.38.2022.06.29.10.59.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jun 2022 10:59:07 -0700 (PDT)
+Received: from jgg by mlx with local (Exim 4.94)
+        (envelope-from <jgg@ziepe.ca>)
+        id 1o6bxy-003bBJ-Q7; Wed, 29 Jun 2022 14:59:06 -0300
+Date:   Wed, 29 Jun 2022 14:59:06 -0300
+From:   Jason Gunthorpe <jgg@ziepe.ca>
+To:     Logan Gunthorpe <logang@deltatee.com>
+Cc:     Christoph Hellwig <hch@lst.de>, linux-kernel@vger.kernel.org,
+        linux-nvme@lists.infradead.org, linux-block@vger.kernel.org,
+        linux-pci@vger.kernel.org, linux-mm@kvack.org,
+        iommu@lists.linux-foundation.org,
+        Stephen Bates <sbates@raithlin.com>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+        John Hubbard <jhubbard@nvidia.com>,
+        Don Dutile <ddutile@redhat.com>,
+        Matthew Wilcox <willy@infradead.org>,
+        Daniel Vetter <daniel.vetter@ffwll.ch>,
+        Minturn Dave B <dave.b.minturn@intel.com>,
+        Jason Ekstrand <jason@jlekstrand.net>,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Xiong Jianxin <jianxin.xiong@intel.com>,
+        Bjorn Helgaas <helgaas@kernel.org>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Robin Murphy <robin.murphy@arm.com>,
+        Martin Oliveira <martin.oliveira@eideticom.com>,
+        Chaitanya Kulkarni <ckulkarnilinux@gmail.com>,
+        Ralph Campbell <rcampbell@nvidia.com>,
+        Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH v7 20/21] PCI/P2PDMA: Introduce pci_mmap_p2pmem()
+Message-ID: <20220629175906.GU23621@ziepe.ca>
+References: <20220615161233.17527-1-logang@deltatee.com>
+ <20220615161233.17527-21-logang@deltatee.com>
+ <20220629064854.GD17576@lst.de>
+ <99242789-66a6-bbd2-b56a-e47891f4522e@deltatee.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
-Content-Language: en-US
-To:     Kent Overstreet <kent.overstreet@gmail.com>
-Cc:     Ming Lei <ming.lei@redhat.com>, Mike Snitzer <snitzer@redhat.com>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-References: <20220624141255.2461148-1-ming.lei@redhat.com>
- <20220624141255.2461148-2-ming.lei@redhat.com>
- <20220626201458.ytn4mrix2pobm2mb@moria.home.lan> <Yrld9rLPY6L3MhlZ@T590>
- <20220628042016.wd65amvhbjuduqou@moria.home.lan>
- <3ad782c3-4425-9ae6-e61b-9f62f76ce9f4@kernel.dk>
- <20220628183247.bcaqvmnav34kp5zd@moria.home.lan>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20220628183247.bcaqvmnav34kp5zd@moria.home.lan>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <99242789-66a6-bbd2-b56a-e47891f4522e@deltatee.com>
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/28/22 12:32 PM, Kent Overstreet wrote:
-> On Tue, Jun 28, 2022 at 12:13:06PM -0600, Jens Axboe wrote:
->> It's much less about using whatever amount of memory for inflight IO,
->> and much more about not bloating fast path structures (of which the
->> bio is certainly one). All of this gunk has to be initialized for
->> each IO, and that's the real issue.
->>
->> Just look at the recent work for iov_iter and why ITER_UBUF makes
->> sense to do.
->>
->> This is not a commentary on this patchset, just a general
->> observation. Sizes of hot data structures DO matter, and quite a bit
->> so.
+On Wed, Jun 29, 2022 at 10:00:09AM -0600, Logan Gunthorpe wrote:
 > 
-> Younger me would have definitely been in agreement; initializing these
-> structs definitely tends to show up in profiles.
-
-Older me still greatly cares :-)
-
-> These days I'm somewhat less inclined towards that view - profiles
-> naturally highlight where your cache misses are happening, and
-> initializing a freshly allocated data structure is always going to be
-> a cache miss. But the difference between touching 3 and 6 contiguous
-> cachelines is practically nil...  assuming we aren't doing anything
-> stupid like using memset (despite what Linus wants from the CPU
-> vendors, rep stos _still_ sucks) and perhaps inserting prefetches
-> where appropriate.
 > 
-> And I see work going by that makes me really wonder if it was
-> justified - in particular I _really_ want to know if Christoph's bio
-> initialization change was justified by actual benchmarks and what
-> those numbers were, vs. looking at profiles. Wasn't anything in the
-> commit log...
+> 
+> On 2022-06-29 00:48, Christoph Hellwig wrote:
+> > On Wed, Jun 15, 2022 at 10:12:32AM -0600, Logan Gunthorpe wrote:
+> >> A pseudo mount is used to allocate an inode for each PCI device. The
+> >> inode's address_space is used in the file doing the mmap so that all
+> >> VMAs are collected and can be unmapped if the PCI device is unbound.
+> >> After unmapping, the VMAs are iterated through and their pages are
+> >> put so the device can continue to be unbound. An active flag is used
+> >> to signal to VMAs not to allocate any further P2P memory once the
+> >> removal process starts. The flag is synchronized with concurrent
+> >> access with an RCU lock.
+> > 
+> > Can't we come up with a way of doing this without all the pseudo-fs
+> > garbagage?  I really hate all the overhead for that in the next
+> > nvme patch as well.
+> 
+> I assume you still want to be able to unmap the VMAs on unbind and not
+> just hang?
+> 
+> I'll see if I can come up with something to do the a similar thing using
+> vm_private data or some such.
 
-Not sure what Christoph change you are referring to, but all the ones
-that I did to improve the init side were all backed by numbers I ran at
-that time (and most/all of the commit messages will have that data). So
-yes, it is indeed still very noticeable. Maybe not at 100K IOPS, but at
-10M on a core it most certainly is.
+I've tried in the past, this is not a good idea. There is no way to
+handle failures when a VMA is dup'd and if you rely on private_data
+you almost certainly have to alloc here.
 
-I'm all for having solid and maintainable code, obviously, but frivolous
-bloating of structures and more expensive setup cannot be hand waved
-away with "it doesn't matter if we touch 3 or 6 cachelines" because we
-obviously have a disagreement on that.
+Then there is the issue of making the locking work on invalidation
+which is crazy ugly.
 
--- 
-Jens Axboe
+> I was not a fan of the extra code for this either, but I was given to
+> understand that it was the standard way to collect and cleanup VMAs.
 
+Christoph you tried tried to clean it once globally, what happened to
+that?
+
+All that is needed here is a way to get a unique inode for the PCI
+memory.
+
+Jason
