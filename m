@@ -2,90 +2,86 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE386C433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 18:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B8CFC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 18:41:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234580AbiF3SNH (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 14:13:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59372 "EHLO
+        id S236157AbiF3Sl3 (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 14:41:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235412AbiF3SNH (ORCPT
+        with ESMTP id S236119AbiF3Sl2 (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 14:13:07 -0400
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34570B1
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:13:04 -0700 (PDT)
-Received: by mail-pl1-f180.google.com with SMTP id m14so89148plg.5
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:13:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=zUh2rG+L0yeVRVVu7GCbIp7pDwcQu3W9T9Thx8r4KYY=;
-        b=ZTEYUabASVpExkb5MiXrgMVPG0mduwKvLWGnfMN6PNDKyQqtx11jXcqtGgAmnhoLUE
-         EsPiG4ABYd9Mcr6d+pxTztlSZqfGU6B5elyG7FGGRJpEnV9hvRiPk6692S3optxzHFyi
-         bs/JzMPshZLt+gYj+arcyPKwR5yTZkNVUGMaCjkEDHwFpIQ4sj/DBN2L+BkaYnXir6lK
-         pi3jm2GMnTcw8KnZ3b2VqnJols0YR2/+q0V+Q3QBLO8/KH9ziPoJ6Z6PcTSZUtG94KLR
-         UXdg+rwQOeaZOiPOG0qebm2KXXn6sJhj+A85qOAYpNnb65MI2UJw6s2ChAcQlCaEtwOI
-         nhnQ==
-X-Gm-Message-State: AJIora+PERnJC6OvVJ2+WQtHtHn8Mmezj4hx1RGK+/JPIOrDduuVgpWt
-        xdiKk8x7355FQ1zgfli+qV4=
-X-Google-Smtp-Source: AGRyM1ul75u0NA9KRxNZT8/Dnym2mvfP+nqU3dpyHgdPp+w8rArmtVCezlEJPHgKPrpLp9h9kw8d+g==
-X-Received: by 2002:a17:902:e747:b0:16a:58f2:1d1e with SMTP id p7-20020a170902e74700b0016a58f21d1emr16881669plf.17.1656612783531;
-        Thu, 30 Jun 2022 11:13:03 -0700 (PDT)
-Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
-        by smtp.gmail.com with ESMTPSA id j8-20020a17090a318800b001ed2fae2271sm2245018pjb.31.2022.06.30.11.13.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jun 2022 11:13:02 -0700 (PDT)
-Message-ID: <12bc3e02-898a-5f29-62b7-334937efd867@acm.org>
-Date:   Thu, 30 Jun 2022 11:13:01 -0700
+        Thu, 30 Jun 2022 14:41:28 -0400
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C36BC3C70E
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:41:25 -0700 (PDT)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 5AAE762264
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 18:41:25 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF366C341CA
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 18:41:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1656614484;
+        bh=+505afaOGdC14Kno67sUW3PyS911tZg4fBKw6VzianQ=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=RcTmZfi1dIWCi4MnxJj+svW/H1b7naT6hmIDy15kWoUxh2uzN5hKX1ny3P9px/8q8
+         vFn5Alju0wsrJQBmwUeykOaNi2eSPVkjauI8gdy7TKcu8Vqb6SvHAYuSww71mDSYhS
+         hb6lyBHyLyJa69uz9gq3aYVrAdGoBfUkl/5I+4kktgMM7tCNzHFpqX7ru3tiLMnSm7
+         VuvOwUkFrzwNe3TQ4ExpjQMO+AqKzjGonbQWrj9FptEPi0svObrYtbkeSCgaFMiGZH
+         Rr5KvzfbhhPowi2btWV09cRSaWdCWn7BS8NqNqDLxJPDeKOy0Di1I+hXgfEKnEkkMg
+         38/CxdA0ca+EA==
+Received: by mail-yw1-f181.google.com with SMTP id 00721157ae682-317a66d62dfso1962697b3.7
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:41:24 -0700 (PDT)
+X-Gm-Message-State: AJIora+WsN0KhqhGJhb/N3Y0VEwAWuG5aU1JNQMmkmIEIH6E852lHnb1
+        w/Nlr4NChlTVeXZTx2zN/W/snsWuzMkRNIO1hIE=
+X-Google-Smtp-Source: AGRyM1s/iC944uFbiy9WeTiKCdDluThNxKK8Z7Hp+RMCyA5xozEjfbD/Ar/KPj11SAmM+fPvY8z1L+8tx/LiJ4AedXM=
+X-Received: by 2002:a81:4fd3:0:b0:31b:7a89:5e16 with SMTP id
+ d202-20020a814fd3000000b0031b7a895e16mr12116466ywb.472.1656614483743; Thu, 30
+ Jun 2022 11:41:23 -0700 (PDT)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [PATCH v2 10/63] blktrace: Trace remapped requests correctly
-Content-Language: en-US
-To:     =?UTF-8?B?Tk9NVVJBIEpVTklDSEko6YeO5p2RIOa3s+S4gCk=?= 
-        <junichi.nomura@nec.com>, Jens Axboe <axboe@kernel.dk>
-Cc:     "linux-block@vger.kernel.org" <linux-block@vger.kernel.org>,
-        Christoph Hellwig <hch@lst.de>,
-        Mike Snitzer <snitzer@kernel.org>
-References: <20220629233145.2779494-1-bvanassche@acm.org>
- <20220629233145.2779494-11-bvanassche@acm.org>
- <TYCPR01MB6948A4638DBA55684374AFFA83BA9@TYCPR01MB6948.jpnprd01.prod.outlook.com>
-From:   Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <TYCPR01MB6948A4638DBA55684374AFFA83BA9@TYCPR01MB6948.jpnprd01.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20220629233145.2779494-1-bvanassche@acm.org> <20220629233145.2779494-35-bvanassche@acm.org>
+In-Reply-To: <20220629233145.2779494-35-bvanassche@acm.org>
+From:   Song Liu <song@kernel.org>
+Date:   Thu, 30 Jun 2022 11:41:12 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW5GoFpGbk_MF0PFN0E3E+NwBn_sMNL3bdQ=q3VNBUKpow@mail.gmail.com>
+Message-ID: <CAPhsuW5GoFpGbk_MF0PFN0E3E+NwBn_sMNL3bdQ=q3VNBUKpow@mail.gmail.com>
+Subject: Re: [PATCH v2 34/63] md/raid1: Use the new blk_opf_t type
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/29/22 19:05, NOMURA JUNICHI(野村 淳一) wrote:
-> From: Bart Van Assche <bvanassche@acm.org>
->> Trace the remapped operation and its flags instead of only the data
->> direction of remapped operations. This issue was detected by analyzing
->> the warnings reported by sparse related to the new blk_opf_t type.
->>
->> Cc: Mike Snitzer <snitzer@kernel.org>
->> Cc: Jun'ichi Nomura <junichi.nomura@nec.com>
->> Fixes: b0da3f0dada7 ("Add a tracepoint for block request remapping")
-> ..
->>   	__blk_add_trace(bt, blk_rq_pos(rq), blk_rq_bytes(rq),
->> -			rq_data_dir(rq), 0, BLK_TA_REMAP, 0,
->> +			req_op(rq), rq->cmd_flags, BLK_TA_REMAP, 0,
->>   			sizeof(r), &r, blk_trace_request_get_cgid(rq));
-> 
-> Thank you.  I think the change is fine but what it really fixes is
-> 1b9a9ab78b0a ("blktrace: use op accessors"), where arguments of
-> __blk_add_trace() was extended.
+On Wed, Jun 29, 2022 at 4:32 PM Bart Van Assche <bvanassche@acm.org> wrote:
+>
+> Improve static type checking by using the new blk_opf_t type for
+> variables that represent request flags.
+>
+> Cc: Song Liu <song@kernel.org>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-Thanks for the feedback. I will update the "Fixes" tag.
+Acked-by: Song Liu <song@kernel.org>
 
-BTW, does the above reply count as a "Reviewed-by"?
-
-Thanks,
-
-Bart.
-
-
+> ---
+>  drivers/md/raid1.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/drivers/md/raid1.c b/drivers/md/raid1.c
+> index e7cd1d30d68a..8180b57be040 100644
+> --- a/drivers/md/raid1.c
+> +++ b/drivers/md/raid1.c
+> @@ -1220,8 +1220,8 @@ static void raid1_read_request(struct mddev *mddev, struct bio *bio,
+>         struct raid1_info *mirror;
+>         struct bio *read_bio;
+>         struct bitmap *bitmap = mddev->bitmap;
+> -       const int op = bio_op(bio);
+> -       const unsigned long do_sync = (bio->bi_opf & REQ_SYNC);
+> +       const enum req_op op = bio_op(bio);
+> +       const blk_opf_t do_sync = bio->bi_opf & REQ_SYNC;
+>         int max_sectors;
+>         int rdisk;
+>         bool r1bio_existed = !!r1_bio;
