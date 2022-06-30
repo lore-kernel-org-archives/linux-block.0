@@ -2,70 +2,75 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F9FC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 16:24:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C30D0C43334
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 18:03:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235597AbiF3QYX (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 12:24:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33336 "EHLO
+        id S235738AbiF3SDi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 14:03:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235554AbiF3QYW (ORCPT
+        with ESMTP id S236567AbiF3SDe (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 12:24:22 -0400
-Received: from dfw.source.kernel.org (dfw.source.kernel.org [139.178.84.217])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10E0E31907;
-        Thu, 30 Jun 2022 09:24:20 -0700 (PDT)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 23B796201C;
-        Thu, 30 Jun 2022 16:24:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AD74C34115;
-        Thu, 30 Jun 2022 16:24:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1656606259;
-        bh=Kyao6ux2Oi0CPubvRIyv034ggKSZ0VAhBLxea5f0PrA=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=oeaGOmnO48BqYna0op41w17dtYjRdzYVWNsmVE6RYGcn6VShmcr0NvScCL5iIgmn/
-         Wdpy1QqTitoI5SnpcasINYERq9fdXtRxBF7hvePGkVMuxVuLP+bhLJzgvfff4nKyVp
-         hFo2v4cxptJt5zr3F12OkanQP6vgPGuPD9bIO+1e46Ol5mUHRtfMH5ZS6LqWoGziMQ
-         LjIZD087NiD8ShiN44aWCXEdtXctDYBfa7hYyH7XuY2isQW4OEW2RH8ryenKG2vB4U
-         FepVqO2g8i9vrucY8Jznu9Ou6pI8XMaLV3TgZ/YQvj0oYqEcKbPEvUfgMxCY2JbVtr
-         27mUqo4fntUCg==
-Date:   Thu, 30 Jun 2022 10:24:14 -0600
-From:   Keith Busch <kbusch@kernel.org>
-To:     Chaitanya Kulkarni <kch@nvidia.com>
-Cc:     linux-block@vger.kernel.org, linux-raid@vger.kernel.org,
-        linux-nvme@lists.infradead.org, linux-fsdevel@vger.kernel.org,
-        axboe@kernel.dk, agk@redhat.com, song@kernel.org,
-        djwong@kernel.org, hch@lst.de, sagi@grimberg.me,
-        jejb@linux.ibm.com, martin.petersen@oracle.com,
-        viro@zeniv.linux.org.uk, javier@javigon.com,
-        johannes.thumshirn@wdc.com, bvanassche@acm.org,
-        dongli.zhang@oracle.com, ming.lei@redhat.com, willy@infradead.org,
-        jefflexu@linux.alibaba.com, josef@toxicpanda.com, clm@fb.com,
-        dsterba@suse.com, jack@suse.com, tytso@mit.edu,
-        adilger.kernel@dilger.ca, jlayton@kernel.org, idryomov@gmail.com,
-        danil.kipnis@cloud.ionos.com, ebiggers@google.com,
-        jinpu.wang@cloud.ionos.com
-Subject: Re: [PATCH 2/6] nvme: add support for the Verify command
-Message-ID: <Yr3OLiEd+/6wryCx@kbusch-mbp.dhcp.thefacebook.com>
-References: <20220630091406.19624-1-kch@nvidia.com>
- <20220630091406.19624-3-kch@nvidia.com>
+        Thu, 30 Jun 2022 14:03:34 -0400
+Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1431E39BAF
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:03:33 -0700 (PDT)
+Received: by mail-pj1-f47.google.com with SMTP id g7so221496pjj.2
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 11:03:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=eNVKKvwmCx7w3JRivWrKA01PyX/m9ussZwTqjP+8O44=;
+        b=D8J0AG7vsKJzB/Y9ErusYO9GCQkvbdFiqpBlWX5ptE8Km8rGtiUBPlO6Q/kPty83Yu
+         EB8BLOKN+5yw9mW5LC6xLOuXr/n8ZusjeNfK+BkFBURVA95B/ZanghRn1y1THaijs20d
+         1ehw334n8xTWuF1Wx1gUY5KMeIArFVOqZR5dL7qT0vtvvXiQrve57fKysr9l8+MFhJiP
+         S35g+re+l74NJ0Kg4zewg309BU0iz0VOyRecXthwBHLmTFmpUKWeVt9eec1WDnBHR3Qw
+         e6bRWLQ9OPxyoiQQzJZtoOWcAaSXr4oCujNrPVMh4KY+9pEskPtz19yb8zfy85ReONy+
+         toMg==
+X-Gm-Message-State: AJIora/5ih27DNNeJyKwMwKCR951rDwNQHoP73y9Vc5Q/A/MydEnnAAa
+        Q/LxzSms0z7jlFUCrp2s3wE=
+X-Google-Smtp-Source: AGRyM1vioYvmSNtVrB/vR/BqpojUCbR0H2VC6VBa3gZ3hqlXLZesxxY5/+PaEvl7YbUULPh2+JcGlA==
+X-Received: by 2002:a17:903:32c6:b0:16a:124c:9df with SMTP id i6-20020a17090332c600b0016a124c09dfmr16708001plr.126.1656612213288;
+        Thu, 30 Jun 2022 11:03:33 -0700 (PDT)
+Received: from ?IPV6:2601:647:4000:d7:feaa:14ff:fe9d:6dbd? ([2601:647:4000:d7:feaa:14ff:fe9d:6dbd])
+        by smtp.gmail.com with ESMTPSA id y17-20020a1709027c9100b0016648412514sm13780642pll.188.2022.06.30.11.03.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jun 2022 11:03:32 -0700 (PDT)
+Message-ID: <9a9e6a5f-d03d-fbb5-71df-c4e2e35e898d@acm.org>
+Date:   Thu, 30 Jun 2022 11:03:31 -0700
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20220630091406.19624-3-kch@nvidia.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.10.0
+Subject: Re: [PATCH v3 0/2] blk-cgroup: duplicated code refactor
+Content-Language: en-US
+To:     John Garry <john.garry@huawei.com>, Jens Axboe <axboe@kernel.dk>,
+        Jason Yan <yanaijie@huawei.com>, tj@kernel.org, jack@suse.cz,
+        hch@lst.de
+Cc:     linux-block@vger.kernel.org
+References: <20220629070917.3113016-1-yanaijie@huawei.com>
+ <2ba24ea6-df8f-3afb-1526-bfb5916f2fcf@kernel.dk>
+ <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
+From:   Bart Van Assche <bvanassche@acm.org>
+In-Reply-To: <da262064-3952-0ded-03e3-9c0246960603@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 02:14:02AM -0700, Chaitanya Kulkarni wrote:
-> Allow verify operations (REQ_OP_VERIFY) on the block device, if the
-> device supports optional command bit set for verify. Add support
-> to setup verify command. Set maximum possible verify sectors in one
-> verify command according to maximum hardware sectors supported by the
-> controller.
+On 6/30/22 01:16, John Garry wrote:
+> Just wondering - are there any of my mails in your spam folder?
 
-Shouldn't the limit be determined by Identify Controller NVM CSS's 'VSL' field
-instead of its max data transfer?
+This morning I found the following email from you in my spam folder:
+
+https://lore.kernel.org/linux-scsi/82e30007-1ffc-92e4-38b5-eaf7dd2e316d@huawei.com/
+
+I'm going to reinstall my email filter that keeps Huawei emails out of 
+the spam folder.
+
+If the following information has not yet been shared with your IT 
+department, please share it: https://support.google.com/a/answer/174124
+
+Bart.
