@@ -2,98 +2,74 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC6EC433EF
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 00:58:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB58FC433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 01:07:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbiF3A6o (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Wed, 29 Jun 2022 20:58:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46478 "EHLO
+        id S230262AbiF3BHi (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Wed, 29 Jun 2022 21:07:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229797AbiF3A6n (ORCPT
+        with ESMTP id S231173AbiF3BHi (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Wed, 29 Jun 2022 20:58:43 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 036A31EC40
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 17:58:43 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id u14so24843814qvv.2
-        for <linux-block@vger.kernel.org>; Wed, 29 Jun 2022 17:58:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0uppB9ii0pBd7MXi+uA0KCh+Kd0vDpxw6l/NwutkF0s=;
-        b=Jrw+5T1eBpL9wW1ZHAJ6HZhMC93ajz0dD8ij5k06lT2TYiCRkOzKVIXNVztMuydzSN
-         M2arN+q30Vw+2kjV7IvlAwoL3gWJYaaTZy2JFVJudk8tzANcL/S0a8x12XGriNvgAfd7
-         qQdk2rGHaWmKJ09iDiX+Ph8gWznfXaJQz+NvlPuK4tg8hUKLQzjRA2Kc8cSipZb01NY7
-         eAWoS3uWXXnRJ439fpKiUeJsmVB3H+pkGarQ1YHMSZKC3tU22f4qH/hgbZAy/zErQ7W8
-         NzjzGFH/18BVnUeW7ePzs9bSCp0LauBQagUnkbTUe+LfXZhMZkABP6RUVE7RyMLhIMdi
-         UKtA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0uppB9ii0pBd7MXi+uA0KCh+Kd0vDpxw6l/NwutkF0s=;
-        b=rhC3IcQZpzJRKlzk/YIyx8KO/DfHFhDdARKXh610/HfiIVPp3uU1tzqBfh+Lz7DKdo
-         vKodCs04WEM2o4yylaMzlxN58Rk6djlQ1n4gQ7Y+0vA14bz4yggqkus5of/aISzPCCft
-         OzZ/ovPUZcp2yPIQr5E9mzaDjuPPv9OgVib9VmEDR2CrlD4T+pTqHOVjFSruhuAGy68g
-         Mzcymnhkhc5GRQkRcyfZVliAzoIKTM2Pb6IrE2BARluTbzTOyIJKgq0YaYJsfQPJMis/
-         CWvziQOqvmKOLy6X/uvLtAhspWLaew9NN8kxDtFdC93j8jBtWE9dz49CWjkbcKHZ/Csn
-         lRsA==
-X-Gm-Message-State: AJIora+qPQ7mlUOtTPAbkLyRSePJHW/PWh78Ej++bTv3VAE7NXQ5cwNF
-        aXJmjabM0f+gb13LwpoB/Q==
-X-Google-Smtp-Source: AGRyM1t88mNCQuFnccSlpGOSCk9jgtxhHZcG6Sh8zLF13Wlmgeyxvv/qTSUsifWO8aJvXQitrAdhGg==
-X-Received: by 2002:ad4:5e8b:0:b0:470:2e7f:ac1e with SMTP id jl11-20020ad45e8b000000b004702e7fac1emr9098439qvb.3.1656550722148;
-        Wed, 29 Jun 2022 17:58:42 -0700 (PDT)
-Received: from localhost (c-73-219-103-14.hsd1.vt.comcast.net. [73.219.103.14])
-        by smtp.gmail.com with ESMTPSA id ca12-20020a05622a1f0c00b00307c87b8239sm11545690qtb.46.2022.06.29.17.58.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jun 2022 17:58:41 -0700 (PDT)
-Date:   Wed, 29 Jun 2022 20:58:40 -0400
-From:   Kent Overstreet <kent.overstreet@gmail.com>
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     Mike Snitzer <snitzer@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-        linux-block@vger.kernel.org, dm-devel@redhat.com,
-        Eric Biggers <ebiggers@google.com>,
-        Dmitry Monakhov <dmonakhov@openvz.org>,
-        "Martin K . Petersen" <martin.petersen@oracle.com>
-Subject: Re: [PATCH 5.20 1/4] block: add bio_rewind() API
-Message-ID: <20220630005840.s65j5vab6j2dsyq2@moria.home.lan>
-References: <20220626201458.ytn4mrix2pobm2mb@moria.home.lan>
- <Yrld9rLPY6L3MhlZ@T590>
- <20220628042610.wuittagsycyl4uwa@moria.home.lan>
- <YrqyiCcnvPCqsn8F@T590>
- <20220628163617.h3bmq3opd7yuiaop@moria.home.lan>
- <Yrs9OLNZ8xUs98OB@redhat.com>
- <20220628175253.s2ghizfucumpot5l@moria.home.lan>
- <YrvsDNltq+h6mphN@redhat.com>
- <20220629181154.eejrlfhj5n4la446@moria.home.lan>
- <YrzykX0jTWpq5DYQ@T590>
+        Wed, 29 Jun 2022 21:07:38 -0400
+Received: from out199-1.us.a.mail.aliyun.com (out199-1.us.a.mail.aliyun.com [47.90.199.1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FFE4275D9;
+        Wed, 29 Jun 2022 18:07:35 -0700 (PDT)
+X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R541e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=liusong@linux.alibaba.com;NM=1;PH=DW;RN=4;SR=0;TI=W4_0.1.30_DEFAULT_21283DCF_1656550646787_o7001c510;
+Received: from WS-web (liusong@linux.alibaba.com[W4_0.1.30_DEFAULT_21283DCF_1656550646787_o7001c510]) at Thu, 30 Jun 2022 09:07:32 +0800
+Date:   Thu, 30 Jun 2022 09:07:32 +0800
+From:   "liusong" <liusong@linux.alibaba.com>
+To:     "axboe" <axboe@kernel.dk>, "Bart Van Assche" <bvanassche@acm.org>
+Cc:     "linux-block" <linux-block@vger.kernel.org>,
+        "linux-kernel" <linux-kernel@vger.kernel.org>
+Reply-To: "liusong" <liusong@linux.alibaba.com>
+Message-ID: <aa888597-e905-40a6-89da-5341e2af44b3.liusong@linux.alibaba.com>
+Subject: =?UTF-8?B?UmU6IFtQQVRDSF0gYmxrLW1xOiBzZXQgQkxLX01RX1NfU1RPUFBFRCBmaXJzdCB0byBhdm9p?=
+  =?UTF-8?B?ZCB1bmV4cGVjdGVkIHF1ZXVlIHdvcms=?=
+X-Mailer: [Alimail-Mailagent revision 5][W4_0.1.30][DEFAULT][Chrome]
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YrzykX0jTWpq5DYQ@T590>
+References: <1656479900-58719-1-git-send-email-liusong@linux.alibaba.com>,<28db81c5-27d3-7b83-5021-4507b4dd118a@acm.org>
+x-aliyun-mail-creator: W4_0.1.30_DEFAULT_QvNTW96aWxsYS81LjAgKE1hY2ludG9zaDsgSW50ZWwgTWFjIE9TIFggMTBfMTVfNykgQXBwbGVXZWJLaXQvNTM3LjM2IChLSFRNTCwgbGlrZSBHZWNrbykgQ2hyb21lLzEwMi4wLjAuMCBTYWZhcmkvNTM3LjM2La
+In-Reply-To: <28db81c5-27d3-7b83-5021-4507b4dd118a@acm.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On Thu, Jun 30, 2022 at 08:47:13AM +0800, Ming Lei wrote:
-> What is the difference between bio_set_pos and bio_rewind()? Both have
-> to restore bio->bi_iter(the sector part and the bvec part).
-> 
-> Also how to update ->bi_done which 'counts bytes advanced'? You meant doing it in
-> very bio_advance()? then no, why do we have to pay the cost for very unusual
-> bio_rewind()?
-
-Yeah, we'll have to add a u32 to bvec_iter, and increment it in bio_advance().
-
-This would us everything we want - you'll be able to restore a bio to an initial
-state and you just have to save 8 bytes, not a whole bvec_iter, and unlike
-bio_rewind it'll be safe to use after calling submit_bio(), _and_ it solves the
-problem that stashing a copy of bvec_iter doesn't save state in integrity or
-crypt context.
-
-> Or if I misunderstood your point, please cook a patch and I am happy to
-> take a close look, and posting one very raw idea with random data
-> structure looks not helpful much for this discussion technically.
-
-I can do that...
+Pk9uIDYvMjgvMjIgMjI6MTgsIExpdSBTb25nIHdyb3RlOgo+PiBGcm9tOiBMaXUgU29uZyA8bGl1
+c29uZ0BsaW51eC5hbGliYWJhLmNvbT4KPj4KPj4gSW4gIl9fYmxrX21xX2RlbGF5X3J1bl9od19x
+dWV1ZSIsIEJMS19NUV9TX1NUT1BQRUQgaXMgY2hlY2tlZCBmaXJzdCwKPj4gYW5kIHRoZW4gcXVl
+dWUgd29yaywgYnV0IGluICJibGtfbXFfc3RvcF9od19xdWV1ZSIsIGV4ZWN1dGUgY2FuY2VsCj4+
+IHdvcmsgZmlyc3QgYW5kIHRoZW4gc2V0IEJMS19NUV9TX1NUT1BQRUQsIHNvIHRoZXJlIGlzIGEg
+cmlzayBvZgo+PiBxdWV1ZSB3b3JrIGFmdGVyIHNldHRpbmcgQkxLX01RX1NfU1RPUFBFRCwgd2hp
+Y2ggY2FuIGJlIHNvbHZlZCBieQo+PiBhZGp1c3RpbmcgdGhlIG9yZGVyLgo+Pgo+PiBTaWduZWQt
+b2ZmLWJ5OiBMaXUgU29uZyA8bGl1c29uZ0BsaW51eC5hbGliYWJhLmNvbT4KPj4gLS0tCj4+ICAg
+YmxvY2svYmxrLW1xLmMgfCA0ICsrLS0KPj4gICAxIGZpbGUgY2hhbmdlZCwgMiBpbnNlcnRpb25z
+KCspLCAyIGRlbGV0aW9ucygtKQo+Pgo+PiBkaWZmIC0tZ2l0IGEvYmxvY2svYmxrLW1xLmMgYi9i
+bG9jay9ibGstbXEuYwo+PiBpbmRleCA5M2Q5ZDYwLi44NjU5MTVlIDEwMDY0NAo+PiAtLS0gYS9i
+bG9jay9ibGstbXEuYwo+PiArKysgYi9ibG9jay9ibGstbXEuYwo+PiBAQCAtMjI1OCw5ICsyMjU4
+LDkgQEAgYm9vbCBibGtfbXFfcXVldWVfc3RvcHBlZChzdHJ1Y3QgcmVxdWVzdF9xdWV1ZSAqcSkK
+Pj4gICAgKi8KPj4gICB2b2lkIGJsa19tcV9zdG9wX2h3X3F1ZXVlKHN0cnVjdCBibGtfbXFfaHdf
+Y3R4ICpoY3R4KQo+PiAgIHsKPj4gLSBjYW5jZWxfZGVsYXllZF93b3JrKCZoY3R4LT5ydW5fd29y
+ayk7Cj4+IC0KPj4gICAgc2V0X2JpdChCTEtfTVFfU19TVE9QUEVELCAmaGN0eC0+c3RhdGUpOwo+
+PiArCj4+ICsgY2FuY2VsX2RlbGF5ZWRfd29yaygmaGN0eC0+cnVuX3dvcmspOwo+PiAgIH0KPj4g
+ICBFWFBPUlRfU1lNQk9MKGJsa19tcV9zdG9wX2h3X3F1ZXVlKTsKPgo+V2hhdCBtYWRlIHlvdSBj
+b21lIHVwIHdpdGggdGhpcyBwYXRjaD8gU291cmNlIGNvZGUgcmVhZGluZyBvciBzb21ldGhpbmcK
+PmVsc2U/IFBsZWFzZSBtZW50aW9uIHRoaXMgaW4gdGhlIHBhdGNoIGRlc2NyaXB0aW9uLgoKSGks
+CgpJIGZvdW5kIHRoaXMgYnkgc291cmNlIGNvZGUgcmVhZGluZy4KSXQgaXMgdHJ1ZSB0aGF0ICJi
+bGtfbXFfc3RvcF9od19xdWV1ZSIgZG9lcyBub3QgZ3VhcmFudGVlIGFueSBkaXNwYXRjaCB3aWxs
+IGJlIGJsb2NrZWQsCmJ1dCBJIHRoaW5rICJibGtfbXFfc3RvcF9od19xdWV1ZSIgYW5kICJfX2Js
+a19tcV9kZWxheV9ydW5faHdfcXVldWUiIGhhdmUgYSByZXZlcnNlCm9yZGVyIGluIHRoZSBwcm9j
+ZXNzaW5nIGxvZ2ljIG9mICJCTEtfTVFfU19TVE9QUEVEIi4KUGFydCBvZiB0aGUgcmFjZSBwcm9i
+bGVtIGNhbiBiZSBzb2x2ZWQgb25seSBieSBhZGp1c3RpbmcgdGhlIGp1ZGdtZW50IG9yZGVyLCBz
+byBpdCBpcyBzdGlsbCB2YWx1YWJsZS4KClRoYW5rcwoKPgo+UmVnYXJkaW5nIHRoZSBhYm92ZSBw
+YXRjaCwgSSBkb24ndCB0aGluayB0aGlzIHBhdGNoIGZpeGVzIHRoZSBleGlzdGluZwo+cmFjZSBi
+ZXR3ZWVuIGJsa19tcV9zdG9wX2h3X3F1ZXVlKCkgYW5kIF9fYmxrX21xX2RlbGF5X3J1bl9od19x
+dWV1ZSgpLAo+bm90IGV2ZW4gaWYgY2FuY2VsX2RlbGF5ZWRfd29ya19zeW5jKCkgd291bGQgYmUg
+dXNlZC4KPgo+VGhlIGNvbW1lbnQgYmxvY2sgYWJvdmUgYmxrX21xX3N0b3BfaHdfcXVldWUoKSBj
+bGVhcmx5IG1lbnRpb25zIHRoYXQgaXQKPmlzIG5vdCBndWFyYW50ZWVkIHRoYXQgdGhpcyBmdW5j
+dGlvbiBzdG9wcyBkaXNwYXRjaGluZyBvZiByZXF1ZXN0cwo+aW1tZWRpYXRlbHkuIFNvIHdoeSBi
+b3RoZXIgYWJvdXQgZml4aW5nIHRoZSBleGlzdGluZyByYWNlIGNvbmRpdGlvbnMgdGhhdAo+ZG8g
+bm90IGFmZmVjdCB3aGF0IGlzIGd1YXJhbnRlZWQgYnkgYmxrX21xX3N0b3BfaHdfcXVldWUoKT8K
+Pgo+VGhhbmtzLAo+Cj5CYXJ0Lg==
