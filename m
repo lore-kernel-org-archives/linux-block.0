@@ -2,194 +2,81 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63453C43334
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 11:35:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A4C1CCA47B
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 11:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234102AbiF3LfS (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 07:35:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51100 "EHLO
+        id S229446AbiF3Lmf (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 07:42:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56798 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232927AbiF3LfR (ORCPT
+        with ESMTP id S235132AbiF3Lmd (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 07:35:17 -0400
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F389A5A445;
-        Thu, 30 Jun 2022 04:35:15 -0700 (PDT)
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=ziyangzhang@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0VHsMSXI_1656588911;
-Received: from 30.97.57.27(mailfrom:ZiyangZhang@linux.alibaba.com fp:SMTPD_---0VHsMSXI_1656588911)
-          by smtp.aliyun-inc.com;
-          Thu, 30 Jun 2022 19:35:12 +0800
-Message-ID: <fdd06581-a8aa-5948-6043-fc7e3381eb2d@linux.alibaba.com>
-Date:   Thu, 30 Jun 2022 19:35:11 +0800
+        Thu, 30 Jun 2022 07:42:33 -0400
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.220.29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6162B58FD7
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 04:42:32 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by smtp-out2.suse.de (Postfix) with ESMTPS id 109401FABB;
+        Thu, 30 Jun 2022 11:42:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+        t=1656589351;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QmKWgIw063b5fTYfPAdvZOYvSYVD4qaTzTs73psoTqs=;
+        b=N7n/xIzb68Y8pBmG7BEYg2X9gMXFGudFJcJ4HASakca0FqqrgGLYrZYK467gDClRpy/QQw
+        VEbpRlpTPcmA2WE3IaZXFTtQQ6tf4xTI1El8my0M9pHiJCYp8pnkUdsrAagxsfxKd1r0m0
+        xiQnwM/WbHVV5ahgmI+Bdbwws+g49iI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+        s=susede2_ed25519; t=1656589351;
+        h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
+         cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=QmKWgIw063b5fTYfPAdvZOYvSYVD4qaTzTs73psoTqs=;
+        b=TFd2PnAdf4rLngqdH6SgDTBw1BevI2vyXuex2DlTXZe+4fWQM3nYbXjJ2hbnuBxYsD2cAF
+        ESmJ/W7ywmoBf7CQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+        (No client certificate requested)
+        by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id D7F23139E9;
+        Thu, 30 Jun 2022 11:42:30 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+        by imap2.suse-dmz.suse.de with ESMTPSA
+        id chW/MyaMvWLhHwAAMHmgww
+        (envelope-from <dsterba@suse.cz>); Thu, 30 Jun 2022 11:42:30 +0000
+Date:   Thu, 30 Jun 2022 13:37:48 +0200
+From:   David Sterba <dsterba@suse.cz>
+To:     Bart Van Assche <bvanassche@acm.org>
+Cc:     Jens Axboe <axboe@kernel.dk>, linux-block@vger.kernel.org,
+        Christoph Hellwig <hch@lst.de>,
+        David Sterba <dsterba@suse.com>,
+        Josef Bacik <josef@toxicpanda.com>
+Subject: Re: [PATCH v2 50/63] fs/btrfs: Use the enum req_op and blk_opf_t
+ types
+Message-ID: <20220630113748.GA15169@suse.cz>
+Reply-To: dsterba@suse.cz
+References: <20220629233145.2779494-1-bvanassche@acm.org>
+ <20220629233145.2779494-51-bvanassche@acm.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:91.0)
- Gecko/20100101 Thunderbird/91.9.0
-Subject: Re: [PATCH V3 1/1] ublk: add io_uring based userspace block driver
-Content-Language: en-US
-To:     Ming Lei <ming.lei@redhat.com>
-Cc:     linux-block@vger.kernel.org,
-        Harris James R <james.r.harris@intel.com>,
-        linux-kernel@vger.kernel.org, io-uring@vger.kernel.org,
-        Gabriel Krisman Bertazi <krisman@collabora.com>,
-        Xiaoguang Wang <xiaoguang.wang@linux.alibaba.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>
-References: <20220628160807.148853-1-ming.lei@redhat.com>
- <20220628160807.148853-2-ming.lei@redhat.com>
-From:   Ziyang Zhang <ZiyangZhang@linux.alibaba.com>
-In-Reply-To: <20220628160807.148853-2-ming.lei@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20220629233145.2779494-51-bvanassche@acm.org>
+User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 2022/6/29 00:08, Ming Lei wrote:
+On Wed, Jun 29, 2022 at 04:31:32PM -0700, Bart Van Assche wrote:
+> Improve static type checking by using the enum req_op type for variables
+> that represent a request operation and the new blk_opf_t type for
+> variables that represent request flags.
+> 
+> Cc: David Sterba <dsterba@suse.com>
+> Cc: Josef Bacik <josef@toxicpanda.com>
+> Signed-off-by: Bart Van Assche <bvanassche@acm.org>
 
-[...]
-
-> +#define UBLK_MAX_PIN_PAGES	32
-> +
-> +static inline void ublk_release_pages(struct ublk_queue *ubq, struct page **pages,
-> +		int nr_pages)
-> +{
-> +	int i;
-> +
-> +	for (i = 0; i < nr_pages; i++)
-> +		put_page(pages[i]);
-> +}
-> +
-> +static inline int ublk_pin_user_pages(struct ublk_queue *ubq, u64 start_vm,
-> +		unsigned int nr_pages, unsigned int gup_flags,
-> +		struct page **pages)
-> +{
-> +	return get_user_pages_fast(start_vm, nr_pages, gup_flags, pages);
-> +}
-
-> +
-> +static inline unsigned ublk_copy_bv(struct bio_vec *bv, void **bv_addr,
-> +		void *pg_addr, unsigned int *pg_off,
-> +		unsigned int *pg_len, bool to_bv)
-> +{
-> +	unsigned len = min_t(unsigned, bv->bv_len, *pg_len);
-> +
-> +	if (*bv_addr == NULL)
-> +		*bv_addr = kmap_local_page(bv->bv_page);
-> +
-> +	if (to_bv)
-> +		memcpy(*bv_addr + bv->bv_offset, pg_addr + *pg_off, len);
-> +	else
-> +		memcpy(pg_addr + *pg_off, *bv_addr + bv->bv_offset, len);
-> +
-> +	bv->bv_offset += len;
-> +	bv->bv_len -= len;
-> +	*pg_off += len;
-> +	*pg_len -= len;
-> +
-> +	if (!bv->bv_len) {
-> +		kunmap_local(*bv_addr);
-> +		*bv_addr = NULL;
-> +	}
-> +
-> +	return len;
-> +}
-> +
-> +/* copy rq pages to ublksrv vm address pointed by io->addr */
-> +static int ublk_copy_pages(struct ublk_queue *ubq, struct request *rq, bool to_rq,
-> +		unsigned int max_bytes)
-> +{
-> +	unsigned int gup_flags = to_rq ? 0 : FOLL_WRITE;
-> +	struct ublk_io *io = &ubq->ios[rq->tag];
-> +	struct page *pgs[UBLK_MAX_PIN_PAGES];
-> +	struct req_iterator req_iter;
-> +	struct bio_vec bv;
-> +	const unsigned int rq_bytes = min(blk_rq_bytes(rq), max_bytes);
-> +	unsigned long start = io->addr, left = rq_bytes;
-> +	unsigned int idx = 0, pg_len = 0, pg_off = 0;
-> +	int nr_pin = 0;
-> +	void *pg_addr = NULL;
-> +	struct page *curr = NULL;
-> +
-> +	rq_for_each_segment(bv, rq, req_iter) {
-> +		unsigned len, bv_off = bv.bv_offset, bv_len = bv.bv_len;
-> +		void *bv_addr = NULL;
-> +
-> +refill:
-> +		if (pg_len == 0) {
-> +			unsigned int off = 0;
-> +
-> +			if (pg_addr) {
-> +				kunmap_local(pg_addr);
-> +				if (!to_rq)
-> +					set_page_dirty_lock(curr);
-> +				pg_addr = NULL;
-> +			}
-> +
-> +			/* refill pages */
-> +			if (idx >= nr_pin) {
-> +				unsigned int max_pages;
-> +
-> +				ublk_release_pages(ubq, pgs, nr_pin);
-> +
-> +				off = start & (PAGE_SIZE - 1);
-> +				max_pages = min_t(unsigned, (off + left +
-> +						PAGE_SIZE - 1) >> PAGE_SHIFT,
-> +						UBLK_MAX_PIN_PAGES);
-> +				nr_pin = ublk_pin_user_pages(ubq, start,
-> +						max_pages, gup_flags, pgs);
-> +				if (nr_pin < 0)
-> +					goto exit;
-> +				idx = 0;
-> +			}
-> +			pg_off = off;
-> +			pg_len = min(PAGE_SIZE - off, left);
-> +			off = 0;
-> +			curr = pgs[idx++];
-> +			pg_addr = kmap_local_page(curr);
-> +		}
-> +
-> +		len = ublk_copy_bv(&bv, &bv_addr, pg_addr, &pg_off, &pg_len,
-> +				to_rq);
-> +		/* either one of the two has been consumed */
-> +		WARN_ON_ONCE(bv.bv_len && pg_len);
-> +		start += len;
-> +		left -= len;
-> +
-> +		/* overflow */
-> +		WARN_ON_ONCE(left > rq_bytes);
-> +		WARN_ON_ONCE(bv.bv_len > bv_len);
-> +		if (bv.bv_len)
-> +			goto refill;
-> +
-> +		bv.bv_len = bv_len;
-> +		bv.bv_offset = bv_off;
-> +	}
-> +	if (pg_addr) {
-> +		kunmap_local(pg_addr);
-> +		if (!to_rq)
-> +			set_page_dirty_lock(curr);
-> +	}
-> +	ublk_release_pages(ubq, pgs, nr_pin);
-> +
-> +exit:
-> +	return rq_bytes - left;
-> +}
-> +
-
-Hi Ming, 
-
-I note that you pin the user buffer's pages, memcpy() and release them immediately.
-
-1) I think maybe copy_page_from_iter() is another choice for copying user buffer to biovecs
-   since copy_page_from_iter() do not pin pages(But it may raise page fault).
-
-2) Or will you design some mechanism such as LRU to manage these pinned pages? 
-   For example pin those pages frequently required for a long time and release
-   those pages not used for a long time.
-   I remember you have talked about this LRU on pinned pages?
-
-Which one do you think is better? copy_page_from_iter() or pin pages with LRU?
-Maybe it depends on the user's workload?
-
-Regards,
-Zhang
+Acked-by: David Sterba <dsterba@suse.com>
