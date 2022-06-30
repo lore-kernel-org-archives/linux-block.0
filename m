@@ -2,98 +2,211 @@ Return-Path: <linux-block-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E12C43334
-	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 20:16:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E472C433EF
+	for <linux-block@archiver.kernel.org>; Thu, 30 Jun 2022 20:42:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230362AbiF3UQb (ORCPT <rfc822;linux-block@archiver.kernel.org>);
-        Thu, 30 Jun 2022 16:16:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45462 "EHLO
+        id S237352AbiF3Ump (ORCPT <rfc822;linux-block@archiver.kernel.org>);
+        Thu, 30 Jun 2022 16:42:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236609AbiF3UQ3 (ORCPT
+        with ESMTP id S237077AbiF3Umo (ORCPT
         <rfc822;linux-block@vger.kernel.org>);
-        Thu, 30 Jun 2022 16:16:29 -0400
-Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6D54443E9
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 13:16:27 -0700 (PDT)
-Received: by mail-pg1-x52e.google.com with SMTP id 9so370937pgd.7
-        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 13:16:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20210112.gappssmtp.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:subject:content-language:to
-         :cc:references:from:in-reply-to:content-transfer-encoding;
-        bh=9JGRYdL+NhBmDdxP0DtJXAMH0Xw0VEt3PcBHxt+iWhE=;
-        b=U4VwhHgWpLYbo1yfhPVQYypekxNNnEGuOM39MrAR9tkg1SltW/yMrcL+tHOb19/5Ld
-         U/uBofEPFhpyT5K89997+zTpHQ5hX/fT89PzFr0/T8qk2YraR0QsVV2WyweYsSHzdhjV
-         fXPtvlVryE/DgGWZfQPZ3hpc3RzzHwwHzShjd88g5TwXjZqt4w9Ii5J3G3YTOGjXeiuZ
-         GQQYLgI1bEe0Y9r7QDshAARZHioszMPiKSttRie9LhXN7bxHAkakbXC6VUoUbACwDt3M
-         8D5I36plM/3/cAd6huDtkkvDdPEhMsQv/Qg8JKR3nuW5rXOm2D698SlpKQEXDDAl4CjU
-         QYVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
-         :content-language:to:cc:references:from:in-reply-to
-         :content-transfer-encoding;
-        bh=9JGRYdL+NhBmDdxP0DtJXAMH0Xw0VEt3PcBHxt+iWhE=;
-        b=AsQOJ/xoN+SOtt1SVkGtPoyd7Q+4DRHnu73exlkHZHOFMgq2gNLltivz75wjDnj4MI
-         9J2/INghvg+axvmS+5eEUDieldfGOTBanUZ8d9NYEdB4noCZp/F08mz8+1OHrBtq/SnK
-         amhPN4hRMWoBGRvZk7RJ7rCgpeTls3jGZ9nEYfyssm5zM6HpNezpdJPqnCcCZUkat12L
-         PBulpgoGt5UjY5yA1971VVdBJ4mEyJljxMLf3UM7GcblORLqBPQH5Tj6s5jWaevFlRVt
-         dQ+sC9pv7qGy9YrkhXyX+bi4tH5jW4fhnVU3VDKmF6yCOKp2ZKpZ9jrS1loOBaXwqPq0
-         5fXw==
-X-Gm-Message-State: AJIora+t1BB6MGpgRMq+KKQLfh/ILplP4SIcS5Z1xugg6wHJP2x3+9Vf
-        bgHlsG9Ly8IYLZvpvRaxfUZbJDhFziZVFw==
-X-Google-Smtp-Source: AGRyM1vlDQn9cUzTQTt5cUwURyDkBcN61qK5SuSsmMxNNVX03FweUi2PyEwMtvC53jflfXsY/iBXKA==
-X-Received: by 2002:a65:6bd6:0:b0:39d:4f85:9ecf with SMTP id e22-20020a656bd6000000b0039d4f859ecfmr9392530pgw.336.1656620187287;
-        Thu, 30 Jun 2022 13:16:27 -0700 (PDT)
-Received: from [192.168.1.100] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id y11-20020a63de4b000000b0040c644e82efsm13705811pgi.43.2022.06.30.13.16.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jun 2022 13:16:26 -0700 (PDT)
-Message-ID: <a0fd82a0-f0fa-c9ec-cd55-b6db6b60f326@kernel.dk>
-Date:   Thu, 30 Jun 2022 14:16:25 -0600
+        Thu, 30 Jun 2022 16:42:44 -0400
+Received: from mx0a-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA3736426
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 13:42:42 -0700 (PDT)
+Received: from pps.filterd (m0089730.ppops.net [127.0.0.1])
+        by m0089730.ppops.net (8.17.1.5/8.17.1.5) with ESMTP id 25UJCLpu004575
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 13:42:42 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fb.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding : content-type; s=facebook;
+ bh=8cc23F6j5+adqkGR+byTTk90kWs3qVOG0MzAZ27W60Y=;
+ b=nZ/r4lBidqjvrhNVFQl1SXA5uaXeC2qaTVM/NqD6HQ5Zc5C3T8nHE8LcV9SdHPPv6qJa
+ j8YQbacbvqq7ezOALyZ+8KwoQcyNstDtX3Bigu74w6PH0FPNKDULJHYyEnVXclxadYMP
+ w3+UI2zuCqUcakEpyOrXDWMYeDTZ3BOyGF0= 
+Received: from mail.thefacebook.com ([163.114.132.120])
+        by m0089730.ppops.net (PPS) with ESMTPS id 3h195a4pv9-8
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
+        for <linux-block@vger.kernel.org>; Thu, 30 Jun 2022 13:42:42 -0700
+Received: from twshared10560.18.frc3.facebook.com (2620:10d:c085:108::8) by
+ mail.thefacebook.com (2620:10d:c085:11d::5) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2375.28; Thu, 30 Jun 2022 13:42:38 -0700
+Received: by devbig007.nao1.facebook.com (Postfix, from userid 544533)
+        id 1E5DD5932DB7; Thu, 30 Jun 2022 13:42:30 -0700 (PDT)
+From:   Keith Busch <kbusch@fb.com>
+To:     <linux-fsdevel@vger.kernel.org>, <linux-block@vger.kernel.org>,
+        <linux-nvme@lists.infradead.org>
+CC:     <axboe@kernel.dk>, Kernel Team <Kernel-team@fb.com>, <hch@lst.de>,
+        <willy@infradead.org>, <sagi@grimberg.me>,
+        Keith Busch <kbusch@kernel.org>
+Subject: [PATCH 01/12] block: move direct io alignment check to common
+Date:   Thu, 30 Jun 2022 13:42:01 -0700
+Message-ID: <20220630204212.1265638-2-kbusch@fb.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20220630204212.1265638-1-kbusch@fb.com>
+References: <20220630204212.1265638-1-kbusch@fb.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux aarch64; rv:91.0) Gecko/20100101
- Thunderbird/91.10.0
-Subject: Re: [GIT PULL] nvmes fixes for Linux 5.19
-Content-Language: en-US
-To:     Christoph Hellwig <hch@infradead.org>
-Cc:     Keith Busch <kbusch@kernel.org>, linux-block@vger.kernel.org,
-        Sagi Grimberg <sagi@grimberg.me>,
-        linux-nvme@lists.infradead.org
-References: <Yr39dC2Hf2/LtgXq@infradead.org>
-From:   Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <Yr39dC2Hf2/LtgXq@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-FB-Internal: Safe
+Content-Type: text/plain
+X-Proofpoint-GUID: Mljfys8ItnBcmMkiEZm2cEQnNdyoDysJ
+X-Proofpoint-ORIG-GUID: Mljfys8ItnBcmMkiEZm2cEQnNdyoDysJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.883,Hydra:6.0.517,FMLib:17.11.122.1
+ definitions=2022-06-30_14,2022-06-28_01,2022-06-22_01
 Precedence: bulk
 List-ID: <linux-block.vger.kernel.org>
 X-Mailing-List: linux-block@vger.kernel.org
 
-On 6/30/22 1:45 PM, Christoph Hellwig wrote:
-> The following changes since commit fbb564a557809466c171b95f8d593a0972450ff2:
-> 
->   lib/sbitmap: Fix invalid loop in __sbitmap_queue_get_batch() (2022-06-25 10:58:55 -0600)
-> 
-> are available in the Git repository at:
-> 
->   git://git.infradead.org/nvme.git tags/nvme-5.19-2022-06-30
-> 
-> for you to fetch changes up to e1c70d79346356bb1ede3f79436df80917845ab9:
-> 
->   nvme-pci: add NVME_QUIRK_BOGUS_NID for ADATA IM2P33F8ABR1 (2022-06-30 08:24:33 +0200)
-> 
-> ----------------------------------------------------------------
-> nvme fixes for Linux 5.19
-> 
->  - more quirks (Lamarque Vieira Souza, Pablo Greco)
->  - fix a fabrics disconnect regression (Ruozhu Li)
->  - fix a nvmet-tcp data_digest calculation regression (Sagi Grimberg)
->  - fix nvme-tcp send failure handling (Sagi Grimberg)
->  - fix a regression with nvmet-loop and passthrough controllers
->    (Alan Adamson)
+From: Keith Busch <kbusch@kernel.org>
 
-Pulled, thanks.
+All direct io has the same setup and alignment check, so just do it once
+in common code.
 
--- 
-Jens Axboe
+Signed-off-by: Keith Busch <kbusch@kernel.org>
+---
+ block/fops.c           | 44 ++++++++++++++----------------------------
+ include/linux/blkdev.h |  7 +++++++
+ 2 files changed, 22 insertions(+), 29 deletions(-)
+
+diff --git a/block/fops.c b/block/fops.c
+index 86d3cab9bf93..f37af5924cef 100644
+--- a/block/fops.c
++++ b/block/fops.c
+@@ -42,28 +42,17 @@ static unsigned int dio_bio_write_op(struct kiocb *io=
+cb)
+ 	return op;
+ }
+=20
+-static bool blkdev_dio_unaligned(struct block_device *bdev, loff_t pos,
+-			      struct iov_iter *iter)
+-{
+-	return pos & (bdev_logical_block_size(bdev) - 1) ||
+-		!bdev_iter_is_aligned(bdev, iter);
+-}
+-
+ #define DIO_INLINE_BIO_VECS 4
+=20
+ static ssize_t __blkdev_direct_IO_simple(struct kiocb *iocb,
+-		struct iov_iter *iter, unsigned int nr_pages)
++		struct iov_iter *iter, unsigned int nr_pages,
++		struct block_device *bdev, loff_t pos)
+ {
+-	struct block_device *bdev =3D iocb->ki_filp->private_data;
+ 	struct bio_vec inline_vecs[DIO_INLINE_BIO_VECS], *vecs;
+-	loff_t pos =3D iocb->ki_pos;
+ 	bool should_dirty =3D false;
+ 	struct bio bio;
+ 	ssize_t ret;
+=20
+-	if (blkdev_dio_unaligned(bdev, pos, iter))
+-		return -EINVAL;
+-
+ 	if (nr_pages <=3D DIO_INLINE_BIO_VECS)
+ 		vecs =3D inline_vecs;
+ 	else {
+@@ -168,20 +157,15 @@ static void blkdev_bio_end_io(struct bio *bio)
+ }
+=20
+ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *i=
+ter,
+-		unsigned int nr_pages)
++		unsigned int nr_pages, struct block_device *bdev, loff_t pos)
+ {
+-	struct block_device *bdev =3D iocb->ki_filp->private_data;
+ 	struct blk_plug plug;
+ 	struct blkdev_dio *dio;
+ 	struct bio *bio;
+ 	bool is_read =3D (iov_iter_rw(iter) =3D=3D READ), is_sync;
+ 	unsigned int opf =3D is_read ? REQ_OP_READ : dio_bio_write_op(iocb);
+-	loff_t pos =3D iocb->ki_pos;
+ 	int ret =3D 0;
+=20
+-	if (blkdev_dio_unaligned(bdev, pos, iter))
+-		return -EINVAL;
+-
+ 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+ 		opf |=3D REQ_ALLOC_CACHE;
+ 	bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
+@@ -292,20 +276,15 @@ static void blkdev_bio_end_io_async(struct bio *bio=
+)
+ }
+=20
+ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
+-					struct iov_iter *iter,
+-					unsigned int nr_pages)
++		struct iov_iter *iter, unsigned int nr_pages,
++		struct block_device *bdev, loff_t pos)
+ {
+-	struct block_device *bdev =3D iocb->ki_filp->private_data;
+ 	bool is_read =3D iov_iter_rw(iter) =3D=3D READ;
+ 	unsigned int opf =3D is_read ? REQ_OP_READ : dio_bio_write_op(iocb);
+ 	struct blkdev_dio *dio;
+ 	struct bio *bio;
+-	loff_t pos =3D iocb->ki_pos;
+ 	int ret =3D 0;
+=20
+-	if (blkdev_dio_unaligned(bdev, pos, iter))
+-		return -EINVAL;
+-
+ 	if (iocb->ki_flags & IOCB_ALLOC_CACHE)
+ 		opf |=3D REQ_ALLOC_CACHE;
+ 	bio =3D bio_alloc_bioset(bdev, nr_pages, opf, GFP_KERNEL,
+@@ -357,18 +336,25 @@ static ssize_t __blkdev_direct_IO_async(struct kioc=
+b *iocb,
+=20
+ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *ite=
+r)
+ {
++	struct block_device *bdev =3D iocb->ki_filp->private_data;
++	loff_t pos =3D iocb->ki_pos;
+ 	unsigned int nr_pages;
+=20
+ 	if (!iov_iter_count(iter))
+ 		return 0;
++	if (blkdev_dio_unaligned(bdev, pos, iter))
++		return -EINVAL;
+=20
+ 	nr_pages =3D bio_iov_vecs_to_alloc(iter, BIO_MAX_VECS + 1);
+ 	if (likely(nr_pages <=3D BIO_MAX_VECS)) {
+ 		if (is_sync_kiocb(iocb))
+-			return __blkdev_direct_IO_simple(iocb, iter, nr_pages);
+-		return __blkdev_direct_IO_async(iocb, iter, nr_pages);
++			return __blkdev_direct_IO_simple(iocb, iter, nr_pages,
++							 bdev, pos);
++		return __blkdev_direct_IO_async(iocb, iter, nr_pages, bdev,
++						pos);
+ 	}
+-	return __blkdev_direct_IO(iocb, iter, bio_max_segs(nr_pages));
++	return __blkdev_direct_IO(iocb, iter, bio_max_segs(nr_pages), bdev,
++				  pos);
+ }
+=20
+ static int blkdev_writepage(struct page *page, struct writeback_control =
+*wbc)
+diff --git a/include/linux/blkdev.h b/include/linux/blkdev.h
+index 22b12531aeb7..9d676adfaaa1 100644
+--- a/include/linux/blkdev.h
++++ b/include/linux/blkdev.h
+@@ -1352,6 +1352,13 @@ static inline bool bdev_iter_is_aligned(struct blo=
+ck_device *bdev,
+ 				   bdev_logical_block_size(bdev) - 1);
+ }
+=20
++static inline bool blkdev_dio_unaligned(struct block_device *bdev, loff_=
+t p,
++			      struct iov_iter *iter)
++{
++	return p & (bdev_logical_block_size(bdev) - 1) ||
++		!bdev_iter_is_aligned(bdev, iter);
++}
++
+ static inline int blk_rq_aligned(struct request_queue *q, unsigned long =
+addr,
+ 				 unsigned int len)
+ {
+--=20
+2.30.2
 
